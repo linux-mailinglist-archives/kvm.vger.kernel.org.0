@@ -2,76 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C2CE6B102
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 23:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D3AD6B167
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 23:54:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388855AbfGPVVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 17:21:38 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:41868 "EHLO
+        id S2387419AbfGPVyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 17:54:14 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:41306 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728118AbfGPVVi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 17:21:38 -0400
+        with ESMTP id S1726555AbfGPVyN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 17:54:13 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GL97mZ057848;
-        Tue, 16 Jul 2019 21:21:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=l2O6mAqVKVTjuQkQpk9ZgHJN0WFiy+lqD9X+XM975z4=;
- b=LrqVZ3ogFP0ndUvopoDrBhJq0deajNUr32y6Ew+MMtekBWHQIiKj7Ya0qYx/uHTl828m
- BUJ5Cx8FPFtX7oFxuyHNOP6sp7q0dheCGbqPf/elbESgRDHYpQoyylx7IIKgA71UCRPi
- 1hB2aKX5u6OZHGeGcpfNQWVmG+JZE6I4J1ETmtb8y4Du7wB7LfS1lMvtiIMP8dfPmO+2
- v3Iv+XdPbrFHLeyu6uornZM8kJoB6KfUVV6L7bC5vht3rCHBv9rC5+6XqzojUv60dt/6
- 6tCllTBkxjTwRpkQq5OI+lvq4PRn60fMJuzTV1VcLQKngDFfW/fUFvJ0bSv8TtiqU6nW 8A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2tq6qtq2uv-1
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GL9Zrk058061;
+        Tue, 16 Jul 2019 21:54:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=yDuVVohGdSRuWFhR5KpUOW2mednw+htZPQtBX8NGfTk=;
+ b=y8X4V82nR1vsCcGcCSAqeOREkbWvYbv+w7ek6OrmiuhvI/MfRF6rAsBw0iyMy/xThQtw
+ P74jdRrruMKXLD61uGKxvfOWjDWuJae7CK7cokgHGqUwhYiCalhfT/TDJQeQGE2BOU1k
+ x8oxbs0erJzBVDusGCbg5i5iRAItyWPUWj310YwsiEYdNH8OK1Hn74ThXSAdnCIjSvSs
+ 8FyRHKrVZgFG93HsmP6zj2X/IwU1fMci8zQ51Qj9H5F5wp/4FON3hBpApwxHQtwtsviH
+ 2SpvxW1DNJNb/DmiBoq2MUg2M7hpBzHrK4IiOC9Aj6C6ACsvmLE0E80L6yXclOPdvUmJ 8A== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2tq6qtq648-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jul 2019 21:21:22 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GL8M7m188881;
-        Tue, 16 Jul 2019 21:21:22 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2tsctwgews-1
+        Tue, 16 Jul 2019 21:54:01 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GL8MWT085957;
+        Tue, 16 Jul 2019 21:54:00 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2tsmcc25ub-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jul 2019 21:21:21 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6GLLLMO024088;
-        Tue, 16 Jul 2019 21:21:21 GMT
-Received: from [10.154.167.137] (/10.154.167.137)
+        Tue, 16 Jul 2019 21:54:00 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6GLrx2R026778;
+        Tue, 16 Jul 2019 21:53:59 GMT
+Received: from [192.168.14.112] (/109.65.220.198)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 16 Jul 2019 21:21:20 +0000
-Subject: Re: [Qemu-devel] [patch QEMU] kvm: i386: halt poll control MSR
- support
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        qemu-devel <qemu-devel@nongnu.org>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <20190603230408.GA7938@amt.cnet>
- <1afdac17-3f86-5e5b-aebc-5311576ddefb@redhat.com>
- <0c40f676-a2f4-bb45-658e-9758fd02ce36@oracle.com>
- <86e64a5c-bb2b-00c8-56c3-722c9b8f9db6@redhat.com>
- <48263030-768a-e8ee-302d-6d69c40b219c@redhat.com>
-From:   Mark Kanda <mark.kanda@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <0d51bbbf-91cd-6e87-67ad-15a918dd9ab1@oracle.com>
-Date:   Tue, 16 Jul 2019 16:21:19 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <48263030-768a-e8ee-302d-6d69c40b219c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        with ESMTP ; Tue, 16 Jul 2019 21:53:59 +0000
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 1/2] KVM: SVM: Fix workaround for AMD Errata 1096
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190716205427.GD28096@linux.intel.com>
+Date:   Wed, 17 Jul 2019 00:53:55 +0300
+Cc:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8E46D1A6-12AE-441B-B5EF-566381733106@oracle.com>
+References: <F2442A5C-702A-433D-9156-056E1844F378@oracle.com>
+ <20190716164151.GC1987@linux.intel.com>
+ <60D01C4B-EC2E-453E-B5F6-BBE8FA94E31D@oracle.com>
+ <ce1284de-6088-afd7-ead4-6ef70b89f365@redhat.com>
+ <DD44D29C-36C4-42E7-905E-7300F92F3BE6@oracle.com>
+ <015b03bc-8518-2066-c916-f5e12dd2d506@amd.com>
+ <174F27B9-2C6B-4B9F-8091-56FA85B32BB2@oracle.com>
+ <31926848-2cf3-caca-335d-5f3e32a25cd3@amd.com>
+ <AAAE41B2-C920-46E5-A171-46428E53FB20@oracle.com>
+ <17d102bd-74ef-64f8-0237-3a49d64ea344@amd.com>
+ <20190716205427.GD28096@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3445.4.7)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=647
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1810050000 definitions=main-1907160259
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=691 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1907160259
 Sender: kvm-owner@vger.kernel.org
@@ -79,22 +83,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/16/2019 4:15 PM, Paolo Bonzini wrote:
-> On 16/07/19 23:09, Paolo Bonzini wrote:
->>> As such, I think we should only enable halt polling if it is supported
->>> on the host - see the attached patch.
->>>
->>> ...thoughts?
->> No, it should not be enabled by default at all, at least not until we
->> can require kernel 5.2.  My mistake, sorry.  Can you post a patch?
-> 
-> Doh, nevermind.  This is not included in 4.1 so there's time to fix it.
->   Pfew. :)
-> 
 
-:)
 
-I'll post a patch regardless.
+> On 16 Jul 2019, at 23:54, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> On Tue, Jul 16, 2019 at 08:27:12PM +0000, Singh, Brijesh wrote:
+>>=20
+>> On 7/16/19 3:09 PM, Liran Alon wrote:
+>>>>=20
+>>>> We are discussing reserved NPF so we need to be at CPL3.
+>>>=20
+>>> I don=E2=80=99t see the connection between a reserved #NPF and the =
+need to be at
+>>> CPL3.  A vCPU can execute at CPL<3 a page that is mapped =
+user-accessible in
+>>> guest page-tables in case CR4.SMEP=3D0 and then instruction will =
+execute
+>>> successfully and can dereference a page that is mapped in NPT using =
+an
+>>> entry with a reserved bit set.  Thus, reserved #NPF will be raised =
+while
+>>> vCPU is at CPL<3 and DecodeAssist microcode will still raise SMAP =
+violation
+>>> as CR4.SMAP=3D1 and microcode perform data-fetch with CPL<3. This =
+leading
+>>> exactly to Errata condition as far as I understand.
+>>>=20
+>>=20
+>> Yes, vCPU at CPL<3 can raise the SMAP violation. When SMEP is =
+disabled,
+>> the guest kernel never should be executing from code in user-mode =
+pages,
+>> that'd be insecure. So I am not sure if kernel code can cause this
+>> errata.
+>=20
+> =46rom KVM's perspective, it's not a question of what is *likely* to =
+happen
+> so much as it's a question of what *can* happen.  Architecturally =
+there is
+> nothing that prevents CPL<3 code from encountering the SMAP fault.
 
-Thanks/regards,
--Mark
+Exactly. :)
+I will submit a v2 patch which also clarifies the details we understood =
+in this email thread.
+
+Thanks,
+-Liran
+
