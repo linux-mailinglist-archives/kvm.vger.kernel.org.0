@@ -2,146 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7AA369FB8
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 02:10:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 853436A282
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 08:59:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731933AbfGPAKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 20:10:47 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:44871 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730888AbfGPAKr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 20:10:47 -0400
-Received: by mail-ed1-f66.google.com with SMTP id k8so17095718edr.11
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 17:10:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4TuRNoOkVfCigw2Wuxe3UI/VXS3zxgaiTK+rQEL9mkw=;
-        b=X/lLfEmtOPhgzR9DUEsjJjuG5SasTk1hdZSopvddMrr6Vcm9O8K8p7MrHX42jSHP8I
-         Rx/Dz3masCIvmwkN0lqgILNwGErRuEgGdySqyRkXWvOptFRMuQlYczwmrv6x8l9FsLrn
-         jeVytrwjfkWoYAhOjvEQq1Cghv3JWsinNOb4fHC/YVMwiLkU0+tRq+zSnSLanJsRM/Iu
-         vzhL25p9JSKEeFDa9fWyu1Zc0IdiRFh8TBDQT+MQwu+AZ+smN8mpE2Ewqa5Y3t8VZoJ1
-         ZSTTE4XITYetKccfa/zD40BA4iEyKgTzpaHb4c1Jx/ojjt7dWSqTLWN4gU6CBGwkm5kk
-         sj5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4TuRNoOkVfCigw2Wuxe3UI/VXS3zxgaiTK+rQEL9mkw=;
-        b=rVTkKzVvcn84hp4+B0BgKBIwgHcBTdtMqZGlfI4qBkaW2oicRRQaqmB6mxsi1pLYFv
-         HXwP11pTYm+gRTMp7VN3FmtnfRC4qNPpVviBxsPTq6ZqFvTKk5s9FMyud5ymJC+Gm7XK
-         pioBpWaMCxeT2G30aOWUPMlooOrM99o3cqEUGouTVvjxrIW2oe3GI03Wt8hghHZ6vTcF
-         9qdoeQu9IjqU1fFlHdHMw8NXknrefzewVMFftcL61904vrwTrY8ZZjGtvjIOfbIazsVm
-         qBvzgyARLxTDlBGT6Pd6Gpvdq4TT9Ooh0tZFlURq6Ur068dTF/Bs6oM3qNaVdpiJZJSA
-         anAw==
-X-Gm-Message-State: APjAAAUXa1CbQwV7MuDNEiIJxEpfqqnu16ZmwR7EsD9o8lHTNvjV7NHh
-        PiNKe1MzoayISkD9WIubH2fhqCXh5dj87Lccdw3nDw==
-X-Google-Smtp-Source: APXvYqx/gW5mUFTFQ2dxFq7BZJg+MSLr0owyUAdpNjN8J5d0UL6/bimFkuLU5MbxXB1DVPLAD3VhWbGpUg1L4udN49E=
-X-Received: by 2002:a17:906:d7ab:: with SMTP id pk11mr22960862ejb.216.1563235845844;
- Mon, 15 Jul 2019 17:10:45 -0700 (PDT)
+        id S1727105AbfGPG6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 02:58:41 -0400
+Received: from mga12.intel.com ([192.55.52.136]:51761 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726603AbfGPG6l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 02:58:41 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 23:58:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,496,1557212400"; 
+   d="scan'208";a="366116039"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Jul 2019 23:58:38 -0700
+From:   Tao Xu <tao3.xu@intel.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
+        jingqi.liu@intel.com, tao3.xu@intel.com
+Subject: [PATCH v8 0/3] KVM: x86: Enable user wait instructions
+Date:   Tue, 16 Jul 2019 14:55:48 +0800
+Message-Id: <20190716065551.27264-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <CAOyeoRUUK+T_71J=+zcToyL93LkpARpsuWSfZS7jbJq=wd1rQg@mail.gmail.com>
- <5D27FE26.1050002@intel.com>
-In-Reply-To: <5D27FE26.1050002@intel.com>
-From:   Eric Hankland <ehankland@google.com>
-Date:   Mon, 15 Jul 2019 17:10:34 -0700
-Message-ID: <CAOyeoRV5=6pR7=sFZ+gU68L4rORjRaYDLxQrZb1enaWO=d_zpA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: PMU Event Filter
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        linux-kernel@vger.kernel.org,
-        Stephane Eranian <eranian@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> I think just disabling guest cpuid might not be enough, since guest
-> could write to the msr without checking the cpuid.
->
-> Why not just add a bitmap for fixed counter?
-> e.g. fixed_counter_reject_bitmap
->
-> At the beginning of reprogram_fixed_counter, we could add the check:
->
-> if (test_bit(idx, &kvm->arch.fixed_counter_reject_bitmap))
->      return -EACCES;
->
-> (Please test with your old guest and see if they have issues if we
-> inject #GP when
-> they try to set the fixed_ctrl msr. If there is, we could drop -EACCESS
-> above)
->
-> The bitmap could be set at kvm_vm_ioctl_set_pmu_event_filter.
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
 
-intel_pmu_refresh() checks the guest cpuid and sets the number of
-fixed counters according to that:
-pmu->nr_arch_fixed_counters = min_t(int, edx.split.num_counters_fixed,
-INTEL_PMC_MAX_FIXED);
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
 
-and reprogram_fixed_counters()/get_fixed_pmc() respect this so the
-guest can't just ignore the cpuid.
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
 
-Adding a bitmap does let you do things like disable the first counter
-but keep the second and third, but given that there are only three and
-the events are likely to be on a whitelist anyway, it seemed like
-adding the bitmap wasn't worth it. If you still feel the same way even
-though we can disable them via the cpuid, I can add this in.
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
 
-> I think it would be better to add more, please see below:
->
-> enum kvm_pmu_action_type {
->      KVM_PMU_EVENT_ACTION_NONE = 0,
->      KVM_PMU_EVENT_ACTION_ACCEPT = 1,
->      KVM_PMU_EVENT_ACTION_REJECT = 2,
->      KVM_PMU_EVENT_ACTION_MAX
-> };
->
-> and do a check in kvm_vm_ioctl_set_pmu_event_filter()
->      if (filter->action >= KVM_PMU_EVENT_ACTION_MAX)
->          return -EINVAL;
->
-> This is for detecting the case that we add a new action in
-> userspace, while the kvm hasn't been updated to support that.
->
-> KVM_PMU_EVENT_ACTION_NONE is for userspace to remove
-> the filter after they set it.
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
 
-We can achieve the same result by using a reject action with an empty
-set of events - is there some advantage to "none" over that? I can add
-that check for valid actions.
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it to kvm and enable it only when
+guest CPUID has it. If the instruction causes a delay, the amount
+of time delayed is called here the physical delay. The physical delay is
+first computed by determining the virtual delay (the time to delay
+relative to the VM’s timestamp counter). 
 
-> > +#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 63
->
-> Why is this limit needed?
+The release document ref below link:
+Intel 64 and IA-32 Architectures Software Developer's Manual,
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
 
-Serves to keep the filters on the smaller side and ensures the size
-calculation can't overflow if users attempt to. Keeping the filter
-under 4k is nicer for allocation - also, if we want really large
-filters we might want to do something smarter than a linear traversal
-of the filter when guests program counters.
+Changelog:
+v8:
+	Add vmx_waitpkg_supported() helper (Sean)
+	Add an accessor to expose umwait_control_cached (Sean)
+	Set msr_ia32_umwait_control in vcpu_vmx u32 and raise #GP when
+	[63:32] is set when rdmsr. (Sean)
+	Introduce a common exit helper handle_unexpected_vmexit (Sean)
+v7:
+	Add nested support for user wait instructions (Paolo)
+	Use the test on vmx->secondary_exec_control to replace
+	guest_cpuid_has (Paolo)
+v6:
+	add check msr_info->host_initiated in get/set msr(Xiaoyao)
+	restore the atomic_switch_umwait_control_msr()(Xiaoyao)
 
-> I think it looks tidier to wrap the changes above into a function:
->
->      if (kvm_pmu_filter_event(kvm, eventsel & AMD64_RAW_EVENT_MASK_NB))
->          return;
+Tao Xu (3):
+  KVM: x86: Add support for user wait instructions
+  KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+  KVM: vmx: Introduce handle_unexpected_vmexit and handle WAITPKG vmexit
 
-Okay - I can do that.
+ arch/x86/include/asm/vmx.h      |  1 +
+ arch/x86/include/uapi/asm/vmx.h |  6 ++-
+ arch/x86/kernel/cpu/umwait.c    |  6 +++
+ arch/x86/kvm/cpuid.c            |  2 +-
+ arch/x86/kvm/vmx/capabilities.h |  6 +++
+ arch/x86/kvm/vmx/nested.c       |  5 ++
+ arch/x86/kvm/vmx/vmx.c          | 83 ++++++++++++++++++++++++++-------
+ arch/x86/kvm/vmx/vmx.h          |  9 ++++
+ arch/x86/kvm/x86.c              |  1 +
+ 9 files changed, 101 insertions(+), 18 deletions(-)
 
-> > +       kvfree(filter);
->
-> Probably better to have it conditionally?
->
-> if (filter) {
->      synchronize_srcu();
->      kfree(filter)
-> }
->
-> You may want to factor it out, so that kvm_pmu_destroy could reuse.
+-- 
+2.20.1
 
-Do you mean kvm_arch_destroy_vm? It looks like that's where kvm_arch
-members are freed. I can do that.
-
-Eric
