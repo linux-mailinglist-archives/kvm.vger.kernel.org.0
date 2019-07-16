@@ -2,25 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 19CA26AA5D
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 16:12:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 115556AA7D
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 16:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387770AbfGPOMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 10:12:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33638 "EHLO mx1.redhat.com"
+        id S2387839AbfGPOR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 10:17:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8698 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725926AbfGPOMh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 10:12:37 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1727849AbfGPORZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 10:17:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id ED22A3CA1B;
-        Tue, 16 Jul 2019 14:12:36 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id E9AE0882EA;
+        Tue, 16 Jul 2019 14:17:24 +0000 (UTC)
 Received: from [10.36.116.218] (ovpn-116-218.ams2.redhat.com [10.36.116.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A126F60638;
-        Tue, 16 Jul 2019 14:12:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A3DB6611DE;
+        Tue, 16 Jul 2019 14:17:14 +0000 (UTC)
 Subject: Re: [PATCH v1 6/6] virtio-balloon: Add support for aerating memory
  via hinting
+From:   David Hildenbrand <david@redhat.com>
 To:     Dave Hansen <dave.hansen@intel.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Alexander Duyck <alexander.duyck@gmail.com>
@@ -35,7 +36,7 @@ References: <20190619222922.1231.27432.stgit@localhost.localdomain>
  <20190619223338.1231.52537.stgit@localhost.localdomain>
  <20190716055017-mutt-send-email-mst@kernel.org>
  <cad839c0-bbe6-b065-ac32-f32c117cf07e@intel.com>
-From:   David Hildenbrand <david@redhat.com>
+ <3f8b2a76-b2ce-fb73-13d4-22a33fc1eb17@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -81,32 +82,36 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <3f8b2a76-b2ce-fb73-13d4-22a33fc1eb17@redhat.com>
-Date:   Tue, 16 Jul 2019 16:12:30 +0200
+Message-ID: <e565859c-d41a-e3b8-fd50-4537b50b95fb@redhat.com>
+Date:   Tue, 16 Jul 2019 16:17:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <cad839c0-bbe6-b065-ac32-f32c117cf07e@intel.com>
+In-Reply-To: <3f8b2a76-b2ce-fb73-13d4-22a33fc1eb17@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 16 Jul 2019 14:12:37 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 16 Jul 2019 14:17:25 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16.07.19 16:00, Dave Hansen wrote:
-> On 7/16/19 2:55 AM, Michael S. Tsirkin wrote:
->> The approach here is very close to what on-demand hinting that is
->> already upstream does.
+On 16.07.19 16:12, David Hildenbrand wrote:
+> On 16.07.19 16:00, Dave Hansen wrote:
+>> On 7/16/19 2:55 AM, Michael S. Tsirkin wrote:
+>>> The approach here is very close to what on-demand hinting that is
+>>> already upstream does.
+>>
+>> Are you referring to the s390 (and powerpc) stuff that is hidden behind
+>> arch_free_page()?
+>>
 > 
-> Are you referring to the s390 (and powerpc) stuff that is hidden behind
-> arch_free_page()?
+> I assume Michael meant "free page reporting".
 > 
 
-I assume Michael meant "free page reporting".
+(https://lwn.net/Articles/759413/)
 
 -- 
 
