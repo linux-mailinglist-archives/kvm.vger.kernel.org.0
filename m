@@ -2,117 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B2866AFE9
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 21:34:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 406186AFEA
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 21:34:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728495AbfGPTd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 15:33:59 -0400
-Received: from mail-eopbgr750051.outbound.protection.outlook.com ([40.107.75.51]:48966
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726213AbfGPTd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 15:33:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cutQwD2fvE/IDY6D8B5e0+1qga20eBU3aOnTlpu0wxABsFFrPcCxSqirEV8m0SgGX7o99/k2KOePk6IstZikVh1TQGojwH3GyznSM6AfOAjOE7Ct6aZqfSxai99Vnk0m2lEcqxH06JI/sH9XnOfwyS+Ndy8AVlhHcGCwX7RWJ4O3lwSit4VDJCzj4dFYvjdUDNnC+B9NKpJb6WI1JnKyVVYOzvTYWwIYbMLx1KrWgkwDRQCbedcMiv3g1M7yb8bqeu3pr+KdU56MAoPN1qTTD9i72QeS2ZwcCLW0EXVoyJUqwLUWdd46RmwF4/Hnd+18cHFkY4jkrcGsUIwKWMwxpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NUgaomo9wmccwejtpGy80upjwVia6eM7xKxgF4jBbKE=;
- b=IuVDYO3akXmdaTfT3ks+OMrub4yyXFjXPzViqG1woFyVmlpMMAoeGFUY2CnCjPtZkAPvB7HqrP3UTNRAsHT1FGeqIWtnEKly0z+n9n2EA0G24MbuPWnZYkE1yq2zE3AF7QDaOPeSre5wcTjWudbxbyxSGD3ibun42F646sRoA4bV8dmWir/JZgI4nex4iSpNfCknhJ7wVZ1FOGDke+Z7YSN7K5QAnJvOjLzFAfi1RwrkuUNNA6EiCERE14wKa52mJ+8RX/cYRqZAhM/LKnRHi6SPM6b4pjH9+YvSpWUYgDxlNGxsXESuVHFlV65h3SqIAVov70riuwT/eTpDJilsmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=amd.com;dmarc=pass action=none header.from=amd.com;dkim=pass
- header.d=amd.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NUgaomo9wmccwejtpGy80upjwVia6eM7xKxgF4jBbKE=;
- b=kgVMwvbqA2o0bA6hku96/segXpfGJZvzmSjg2KHaRMmOMgdnU9zLI2wdsxq6zI+h8DnpDCWHuMedEI210ouJbblmcUGSkDna6vyiBalS2m+qUZ/hz/QvBT3ybuC1z0U75A/wb9cKnHJ93XvBFUl0sgYiBhdvB2AocOUZs2wvilk=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
- DM6PR12MB3963.namprd12.prod.outlook.com (10.255.174.212) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.14; Tue, 16 Jul 2019 19:33:56 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::7439:ea87:cc5d:71]) by DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::7439:ea87:cc5d:71%7]) with mapi id 15.20.2073.012; Tue, 16 Jul 2019
- 19:33:56 +0000
-From:   "Singh, Brijesh" <brijesh.singh@amd.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
-CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        id S1728781AbfGPTem (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 15:34:42 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:50062 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728366AbfGPTem (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 15:34:42 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GJYF5w072921;
+        Tue, 16 Jul 2019 19:34:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=EFkSt7YWsoz0jv1qNWBWOWXp5GPZBLqMXYCwiK4QU/A=;
+ b=HOLHjiH7pXBIE7Ql422wHTtrJdj5L0UMDYzIGp4rcpE6lg9L9DakvqdO1ZlDUoyijgRO
+ jtIGnOG7XAGEJWFTmEX9Bh2VWtAEwmiFn2tldbMDvJEKcf2IsolBM92jA+wzVQuQ6e/J
+ sfIhe4Rb/dS0kmXwCuL4FNbVPafIZVMcI3PSDOZbyKu7wdmYbq0sOjlbvTY37jOBvmWr
+ 1bOm4172hv5fqDoT5IzU09XhtE+dSm2yUno/+1Y7injvgt1VY/JPD5Qt2OX1TFQZqp/i
+ juouHsU5M3hrFN/lhf4k6ZVsT8aGD9T5ZeL0zJ6s3F1oq5sq8rt3LluY+xcSAtGj6T7Y TA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2tq78pph7w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jul 2019 19:34:15 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GJWoi9194135;
+        Tue, 16 Jul 2019 19:34:14 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2tq4du3vs3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jul 2019 19:34:14 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6GJYDno013904;
+        Tue, 16 Jul 2019 19:34:13 GMT
+Received: from [10.30.3.6] (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 16 Jul 2019 19:34:13 +0000
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 1/2] KVM: SVM: Fix workaround for AMD Errata 1096
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <015b03bc-8518-2066-c916-f5e12dd2d506@amd.com>
+Date:   Tue, 16 Jul 2019 22:34:08 +0300
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Rename need_emulation_on_page_fault() to
- handle_no_insn_on_page_fault()
-Thread-Topic: [PATCH 2/2] KVM: x86: Rename need_emulation_on_page_fault() to
- handle_no_insn_on_page_fault()
-Thread-Index: AQHVO0w8yx+aB1Al0EKSMExHbTWWAqbNZVmAgAADhACAAAKKgIAAOM4A
-Date:   Tue, 16 Jul 2019 19:33:56 +0000
-Message-ID: <907f5b95-cb14-155a-2e86-d808b46856c6@amd.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <174F27B9-2C6B-4B9F-8091-56FA85B32BB2@oracle.com>
 References: <20190715203043.100483-1-liran.alon@oracle.com>
- <20190715203043.100483-3-liran.alon@oracle.com>
- <20190716154855.GA1987@linux.intel.com>
- <ECF661D3-A0F0-4F55-A7E5-CE6E204947D1@oracle.com>
- <20190716161035.GB1987@linux.intel.com>
-In-Reply-To: <20190716161035.GB1987@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0501CA0107.namprd05.prod.outlook.com
- (2603:10b6:803:42::24) To DM6PR12MB2682.namprd12.prod.outlook.com
- (2603:10b6:5:42::13)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a652ee14-f5e1-4a0c-03b6-08d70a248af3
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:DM6PR12MB3963;
-x-ms-traffictypediagnostic: DM6PR12MB3963:
-x-microsoft-antispam-prvs: <DM6PR12MB3963BB9C3C306342F5D5D136E5CE0@DM6PR12MB3963.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:765;
-x-forefront-prvs: 0100732B76
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(396003)(39860400002)(346002)(376002)(366004)(199004)(189003)(66066001)(99286004)(7736002)(102836004)(68736007)(54906003)(305945005)(8936002)(316002)(110136005)(8676002)(52116002)(386003)(11346002)(186003)(2616005)(446003)(26005)(81156014)(81166006)(14454004)(66446008)(486006)(64756008)(6512007)(66556008)(66476007)(53936002)(66946007)(2906002)(25786009)(3846002)(6116002)(36756003)(31696002)(14444005)(6486002)(478600001)(86362001)(6436002)(256004)(476003)(5660300002)(53546011)(76176011)(6506007)(71200400001)(71190400001)(229853002)(4744005)(31686004)(6246003)(4326008);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3963;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: /zSBgGJKWyZXATraKG8FOXTTpL+pG4K4v1UC0P3LtLGRfxIL4o/R/1XbI8YkDAt1Z+eJ71kx1GvcQXt4vsY/Cb3nEL/Pqc4iQyDTCW+FMP78DuR+pGv7EmiGXrrc6jOx47Kp6DRa0GxZyniWZTz3nbWCYhnQjBkjBu95kzFx/ADejRe5b1demzEVhoRvwMBzZp63cK3JHBNXRDILxO/iqlx+HZZdlErV2qzfXe9twBl5sVcPoYcE/lS642scKHTF7f4pv7/Mfzi4lSPL3f67f1XBh0zbCSFS5vyhDo5phM6l+crFW3mstvd1hBoUDKFic7TFh+biw5XAHZzP1Mw4S6t/1hNZ1dyq8mULzXgZAzZh9CgwG5dSJLCFDHWZCsJUts9o42iaNn3oZe9mxIzoeI2J1a/bknxuxbcXjhJyyQY=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0A56FE2F741B304BA5DE20357574B9D9@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a652ee14-f5e1-4a0c-03b6-08d70a248af3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jul 2019 19:33:56.3626
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3963
+ <20190715203043.100483-2-liran.alon@oracle.com>
+ <1ef0f594-2039-1aeb-4fe0-edbc21fa1f60@amd.com>
+ <CF48BCA4-4BC8-4AC8-8B48-85FA29E16719@oracle.com>
+ <f6c78d65-70fc-4a79-44db-6abb0434db73@amd.com>
+ <F2442A5C-702A-433D-9156-056E1844F378@oracle.com>
+ <20190716164151.GC1987@linux.intel.com>
+ <60D01C4B-EC2E-453E-B5F6-BBE8FA94E31D@oracle.com>
+ <ce1284de-6088-afd7-ead4-6ef70b89f365@redhat.com>
+ <DD44D29C-36C4-42E7-905E-7300F92F3BE6@oracle.com>
+ <015b03bc-8518-2066-c916-f5e12dd2d506@amd.com>
+To:     "Singh, Brijesh" <brijesh.singh@amd.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907160239
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907160239
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCk9uIDcvMTYvMTkgMTE6MTAgQU0sIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6DQo+IE9u
-IFR1ZSwgSnVsIDE2LCAyMDE5IGF0IDA3OjAxOjMwUE0gKzAzMDAsIExpcmFuIEFsb24gd3JvdGU6
-DQo+Pg0KPj4+IE9uIDE2IEp1bCAyMDE5LCBhdCAxODo0OCwgU2VhbiBDaHJpc3RvcGhlcnNvbiA8
-c2Vhbi5qLmNocmlzdG9waGVyc29uQGludGVsLmNvbT4gd3JvdGU6DQo+Pj4gCWt2bV9tYWtlX3Jl
-cXVlc3QoS1ZNX1JFUV9UUklQTEVfRkFVTFQsIHZjcHUpOw0KPj4+IAlyZXR1cm4gZmFsc2U7DQo+
-Pg0KPj4gSSBkb27igJl0IHRoaW5rIHdlIHNob3VsZCB0cmlwbGUtZmF1bHQgYW5kIHJldHVybiDi
-gJxmYWxzZeKAnS4gQXMgZnJvbSBhIHNlbWFudGljDQo+PiBwZXJzcGVjdGl2ZSwgd2Ugc2hvdWxk
-IHJldHVybiB0cnVlLg0KPiANCj4gRmFpciBlbm91Z2gsIEkgZ3Vlc3MgaXQncyBubyBkaWZmZXJl
-bnQgdGhhbiB0aGUgd2Fybi1hbmQtY29udGludWUgbG9naWMNCj4gdXNlZCBpbiB0aGUgdW5yZWFj
-aGFibGUgVk0tRXhpdCBoYW5kbGVycy4NCj4gDQo+PiBCdXQgdGhpcyBjb21taXQgaXMgZ2V0dGlu
-ZyByZWFsbHkgcGhpbG9zb3BoaWNhbCA6KSBNYXliZSBsZXTigJlzIGhlYXIgUGFvbG/igJlzDQo+
-PiBwcmVmZXJlbmNlIGZpcnN0IGJlZm9yZSBkb2luZyBhbnkgY2hhbmdlLg0KPiANCj4gSGVuY2Ug
-bXkgcmVjb21tZW5kYXRpb24gdG8gcHV0IHRoZSBmdW5jdGlvbiBjaGFuZ2UgaW4gYSBzZXBhcmF0
-ZSBwYXRjaCA6LSkNCj4gDQoNCldlbGwsIGR1cmluZyB0aGUgaW5pdGlhbCBwYXRjaCB3ZSBoYWQg
-c29tZSBkaXNjdXNzaW9uIGFib3V0IHRoZSBmdW5jdGlvbg0KbmFtZXMuIEF0IHRoYXQgdGltZSB3
-ZSBhbGwgZmVsdCB0aGUgbmFtZSB3YXMgb2theS4gSSBkb24ndCBoYXZlIGFueQ0Kc3Ryb25nIHBy
-ZWZlcmVuY2UuIExldHMgZ28gd2l0aCB3aGF0ZXZlciBldmVyeW9uZSBhZ3JlZXMgdG8gOikNCg0K
-LUJyaWplc2gNCg==
+
+
+> On 16 Jul 2019, at 22:28, Singh, Brijesh <brijesh.singh@amd.com> =
+wrote:
+>=20
+>=20
+>=20
+> On 7/16/19 12:35 PM, Liran Alon wrote:
+>>=20
+>>=20
+>>> On 16 Jul 2019, at 20:27, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>=20
+>>> On 16/07/19 18:56, Liran Alon wrote:
+>>>> If the CPU performs the VMExit transition of state before doing the =
+data read for DecodeAssist,
+>>>> then I agree that CPL will be 0 on data-access regardless of vCPU =
+CPL. But this also means that SMAP
+>>>> violation should be raised based on host CR4.SMAP value and not =
+vCPU CR4.SMAP value as KVM code checks.
+>>>>=20
+>>>> Furthermore, vCPU CPL of guest doesn=E2=80=99t need to be 3 in =
+order to trigger this Errata.
+>>>=20
+>>> Under the conditions in the code, if CPL were <3 then the SMAP fault
+>>> would have been sent to the guest.
+>>> But I agree that if we need to
+>>> change it to check host CR4, then the CPL of the guest should not be
+>>> checked.
+>>=20
+>> Yep.
+>> Well it all depends on how AMD CPU actually works.
+>> We need some clarification from AMD but for sure the current code in =
+KVM is not only wrong, but probably have never been tested. :P
+>>=20
+>> Looking for further clarifications from AMD before submitting v2=E2=80=A6=
+
+>>=20
+>=20
+> When this errata is hit, the CPU will be at CPL3. =46rom hardware
+> point-of-view the below sequence happens:
+>=20
+> 1. CPL3 guest hits reserved bit NPT fault (MMIO access)
+
+Why CPU needs to be at CPL3?
+The requirement for SMAP should be that this page is user-accessible in =
+guest page-tables.
+Think on a case where guest have CR4.SMAP=3D1 and CR4.SMEP=3D0.
+
+>=20
+> 2. Microcode uses special opcode which attempts to read data using the
+> CPL0 privileges. The microcode read CS:RIP, when it hits SMAP fault,
+> it gives up and returns no instruction bytes.
+>=20
+> (Note: vCPU is still at CPL3)
+
+So at this point guest vCPU CR4.SMAP is what matters right? Not host =
+CR4.SMAP.
+
+>=20
+> 3. CPU causes #VMEXIT for original fault address.
+>=20
+> The SMAP fault occurred while we are still in guest context. It will =
+be
+> nice to have code test example to triggers this errata.
+
+I can write such code in kvm-unit-tests for you to run on relevant =
+hardware if you have such a machine present.
+I don=E2=80=99t have relevant machine with me and therefore I wrote a =
+disclaimer I couldn=E2=80=99t test it in cover letter.
+
+So to sum-up what KVM needs to do:
+1) Check guest vCPU CR4.SMAP is set to 1. (As I fixed in this commit).
+2) Remove the check for CPL=3D=3D3. If we really want to be pedantic, we =
+can parse guest page-tables to see if PTE have U/S bit set to 1.
+What do you think?
+
+-Liran
+
+>=20
+>> -Liran
+>>=20
+>>>=20
+>>> Paolo
+>>>=20
+>>>> It=E2=80=99s only important that guest page-tables maps the guest =
+RIP as user-accessible. i.e. U/S bit in PTE set to 1.
+>>>=20
+>>=20
+
