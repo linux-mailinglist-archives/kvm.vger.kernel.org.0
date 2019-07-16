@@ -2,92 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A955B6A884
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 14:15:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AA386A9F9
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 16:00:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732246AbfGPMPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 08:15:23 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35979 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728004AbfGPMPX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 08:15:23 -0400
-Received: by mail-wm1-f66.google.com with SMTP id g67so14350029wme.1
-        for <kvm@vger.kernel.org>; Tue, 16 Jul 2019 05:15:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=G49xlFZQIpZEZ4HZu+OG0eRgWg0SMkAve+hxHnDX8Yo=;
-        b=YJ4eDPmgrWFQR01kbXUwVDWRBreQmp7m+JOE2GDKsOYAHNz8vqweB1Vmb/7y3UjDWX
-         xiawQKAK3VOhRxptlsydwcYW4nwLSnRCJFkHQgCFCeyU1EXxsztTSY3hRe5bscQOUGeW
-         EV2NnZggJ0jh4aMYDI7TD3gNG/Xi6RvB9c/9t4q9szIN6QuQSd0RhFTpWST0Bt8eDF9T
-         +wALmXO4AW2EyMx/BGVYPi0BvX7hle/RYuENHz/jIn/nPgNR8na3PVSi29ftjJccAfWK
-         GgNARhF7JVsywqRZeHYgzfbHDHtI25wx4+e8mSLfmx8BkGlv5KuyRDp12TEInJ5KzHBP
-         HzuA==
-X-Gm-Message-State: APjAAAUB6hV2kDn4C5YlZ5h1dEfhtXvRqTVdDBQi7lIjrSffkhtWIllA
-        mWuy7ATtTrHP4jaCZiNrWApNPinT4RY=
-X-Google-Smtp-Source: APXvYqxAiYdNmDe395zHwRdMYB7YKpmc/1OxHgeLC6jP6813mcCsyTIe4yLVvoevv0i/tSWh6Niimg==
-X-Received: by 2002:a7b:c4d2:: with SMTP id g18mr30658327wmk.79.1563279320853;
-        Tue, 16 Jul 2019 05:15:20 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:bca4:e0e3:13b4:ec4? ([2001:b07:6468:f312:bca4:e0e3:13b4:ec4])
-        by smtp.gmail.com with ESMTPSA id s2sm16599332wmj.33.2019.07.16.05.15.20
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Jul 2019 05:15:20 -0700 (PDT)
-Subject: Re: [PATCH 14/14] docs: virtual: add it to the documentation body
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1563277838.git.mchehab+samsung@kernel.org>
- <4f3cb004a5597926ccf930e123cb063cd99f1cea.1563277838.git.mchehab+samsung@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
+        id S2387817AbfGPOAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 10:00:22 -0400
+Received: from mga06.intel.com ([134.134.136.31]:15280 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726593AbfGPOAW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 10:00:22 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jul 2019 07:00:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; 
+   d="scan'208";a="190919934"
+Received: from smatond1-mobl1.amr.corp.intel.com (HELO [10.252.143.186]) ([10.252.143.186])
+  by fmsmga004.fm.intel.com with ESMTP; 16 Jul 2019 07:00:20 -0700
+Subject: Re: [PATCH v1 6/6] virtio-balloon: Add support for aerating memory
+ via hinting
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, yang.zhang.wz@gmail.com,
+        pagupta@redhat.com, riel@surriel.com, konrad.wilk@oracle.com,
+        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com
+References: <20190619222922.1231.27432.stgit@localhost.localdomain>
+ <20190619223338.1231.52537.stgit@localhost.localdomain>
+ <20190716055017-mutt-send-email-mst@kernel.org>
+From:   Dave Hansen <dave.hansen@intel.com>
 Openpgp: preference=signencrypt
-Message-ID: <ecd9b68f-cc32-5340-e657-e1e8e4370a91@redhat.com>
-Date:   Tue, 16 Jul 2019 14:15:19 +0200
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+Message-ID: <cad839c0-bbe6-b065-ac32-f32c117cf07e@intel.com>
+Date:   Tue, 16 Jul 2019 07:00:21 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <4f3cb004a5597926ccf930e123cb063cd99f1cea.1563277838.git.mchehab+samsung@kernel.org>
+In-Reply-To: <20190716055017-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/07/19 14:10, Mauro Carvalho Chehab wrote:
-> As files are getting converted to ReST, add them to the
-> documentation body.
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-> ---
->  Documentation/index.rst             | 1 +
->  Documentation/virtual/kvm/index.rst | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/Documentation/index.rst b/Documentation/index.rst
-> index 68ae2a4d689d..2df5a3da563c 100644
-> --- a/Documentation/index.rst
-> +++ b/Documentation/index.rst
-> @@ -115,6 +115,7 @@ needed).
->     target/index
->     timers/index
->     watchdog/index
-> +   virtual/index
->     input/index
->     hwmon/index
->     gpu/index
-> diff --git a/Documentation/virtual/kvm/index.rst b/Documentation/virtual/kvm/index.rst
-> index 0b206a06f5be..ada224a511fe 100644
-> --- a/Documentation/virtual/kvm/index.rst
-> +++ b/Documentation/virtual/kvm/index.rst
-> @@ -9,3 +9,4 @@ KVM
->  
->     amd-memory-encryption
->     cpuid
-> +   vcpu-requests
-> 
+On 7/16/19 2:55 AM, Michael S. Tsirkin wrote:
+> The approach here is very close to what on-demand hinting that is
+> already upstream does.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Are you referring to the s390 (and powerpc) stuff that is hidden behind
+arch_free_page()?
