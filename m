@@ -2,164 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23A856AB7E
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 17:18:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF146AB82
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 17:18:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728513AbfGPPSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 11:18:09 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2273 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728137AbfGPPSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 11:18:09 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 500C491AD3FBB4DAFBEF;
-        Tue, 16 Jul 2019 23:18:06 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 16 Jul 2019
- 23:17:59 +0800
-Subject: Re: BUG: KASAN: slab-out-of-bounds in
- kvm_pmu_get_canonical_pmc+0x48/0x78
-From:   Zenghui Yu <yuzenghui@huawei.com>
-To:     <kvmarm@lists.cs.columbia.edu>
-CC:     Marc Zyngier <marc.zyngier@arm.com>, <andrew.murray@arm.com>,
-        <kasan-dev@googlegroups.com>, <kvm@vger.kernel.org>,
-        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
-References: <644e3455-ea6d-697a-e452-b58961341381@huawei.com>
-Message-ID: <f9d5d18a-7631-f3e2-d73a-21d8eee183f1@huawei.com>
-Date:   Tue, 16 Jul 2019 23:14:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+        id S2387847AbfGPPSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 11:18:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41436 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728137AbfGPPSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 11:18:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 408F0C025014;
+        Tue, 16 Jul 2019 15:18:16 +0000 (UTC)
+Received: from x1.home (ovpn-116-35.phx2.redhat.com [10.3.116.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 11375617AA;
+        Tue, 16 Jul 2019 15:18:16 +0000 (UTC)
+Date:   Tue, 16 Jul 2019 09:18:15 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v5.3-rc1
+Message-ID: <20190716091815.74662138@x1.home>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <644e3455-ea6d-697a-e452-b58961341381@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 16 Jul 2019 15:18:16 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Linus,
 
-On 2019/7/16 23:05, Zenghui Yu wrote:
-> Hi folks,
-> 
-> Running the latest kernel with KASAN enabled, we will hit the following
-> KASAN BUG during guest's boot process.
-> 
-> I'm in commit 9637d517347e80ee2fe1c5d8ce45ba1b88d8b5cd.
-> 
-> Any problems in the chained PMU code? Or just a false positive?
-> 
-> ---8<---
-> 
-> [  654.706268] 
-> ==================================================================
-> [  654.706280] BUG: KASAN: slab-out-of-bounds in 
-> kvm_pmu_get_canonical_pmc+0x48/0x78
-> [  654.706286] Read of size 8 at addr ffff801d6c8fea38 by task 
-> qemu-kvm/23268
-> 
-> [  654.706296] CPU: 2 PID: 23268 Comm: qemu-kvm Not tainted 5.2.0+ #178
-> [  654.706301] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 
-> 10/24/2018
-> [  654.706305] Call trace:
-> [  654.706311]  dump_backtrace+0x0/0x238
-> [  654.706317]  show_stack+0x24/0x30
-> [  654.706325]  dump_stack+0xe0/0x134
-> [  654.706332]  print_address_description+0x80/0x408
-> [  654.706338]  __kasan_report+0x164/0x1a0
-> [  654.706343]  kasan_report+0xc/0x18
-> [  654.706348]  __asan_load8+0x88/0xb0
-> [  654.706353]  kvm_pmu_get_canonical_pmc+0x48/0x78
+The following changes since commit 6fbc7275c7a9ba97877050335f290341a1fd8dbf:
 
-I noticed that we will use "pmc->idx" and the "chained" bitmap to
-determine if the pmc is chained, in kvm_pmu_pmc_is_chained().
+  Linux 5.2-rc7 (2019-06-30 11:25:36 +0800)
 
-Should we initialize the idx and the bitmap appropriately before
-doing kvm_pmu_stop_counter()?  Like:
+are available in the Git repository at:
 
+  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.3-rc1
 
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 3dd8238..cf3119a 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -224,12 +224,12 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
-  	int i;
-  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+for you to fetch changes up to 1e4d09d2212d9e230b967f57bc8df463527dbd75:
 
-+	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
-+
-  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
--		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
-  		pmu->pmc[i].idx = i;
-+		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
-  	}
--
--	bitmap_zero(vcpu->arch.pmu.chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
-  }
+  mdev: Send uevents around parent device registration (2019-07-11 13:26:52 -0600)
 
-  /**
+----------------------------------------------------------------
+VFIO updates for v5.3-rc1
 
+ - Static symbol cleanup in mdev samples (Kefeng Wang)
 
-Thanks,
-zenghui
+ - Use vma help in nvlink code (Peng Hao)
 
-> [  654.706358]  kvm_pmu_stop_counter+0x28/0x118
-> [  654.706363]  kvm_pmu_vcpu_reset+0x60/0xa8
-> [  654.706369]  kvm_reset_vcpu+0x30/0x4d8
-> [  654.706376]  kvm_arch_vcpu_ioctl+0xa04/0xc18
-> [  654.706381]  kvm_vcpu_ioctl+0x17c/0xde8
-> [  654.706387]  do_vfs_ioctl+0x150/0xaf8
-> [  654.706392]  ksys_ioctl+0x84/0xb8
-> [  654.706397]  __arm64_sys_ioctl+0x4c/0x60
-> [  654.706403]  el0_svc_common.constprop.0+0xb4/0x208
-> [  654.706409]  el0_svc_handler+0x3c/0xa8
-> [  654.706414]  el0_svc+0x8/0xc
-> 
-> [  654.706422] Allocated by task 23268:
-> [  654.706429]  __kasan_kmalloc.isra.0+0xd0/0x180
-> [  654.706435]  kasan_slab_alloc+0x14/0x20
-> [  654.706440]  kmem_cache_alloc+0x17c/0x4a8
-> [  654.706445]  kvm_arch_vcpu_create+0xa0/0x130
-> [  654.706451]  kvm_vm_ioctl+0x844/0x1218
-> [  654.706456]  do_vfs_ioctl+0x150/0xaf8
-> [  654.706461]  ksys_ioctl+0x84/0xb8
-> [  654.706466]  __arm64_sys_ioctl+0x4c/0x60
-> [  654.706472]  el0_svc_common.constprop.0+0xb4/0x208
-> [  654.706478]  el0_svc_handler+0x3c/0xa8
-> [  654.706482]  el0_svc+0x8/0xc
-> 
-> [  654.706490] Freed by task 0:
-> [  654.706493] (stack is not available)
-> 
-> [  654.706501] The buggy address belongs to the object at ffff801d6c8fc010
->   which belongs to the cache kvm_vcpu of size 10784
-> [  654.706507] The buggy address is located 8 bytes to the right of
->   10784-byte region [ffff801d6c8fc010, ffff801d6c8fea30)
-> [  654.706510] The buggy address belongs to the page:
-> [  654.706516] page:ffff7e0075b23f00 refcount:1 mapcount:0 
-> mapping:ffff801db257e480 index:0x0 compound_mapcount: 0
-> [  654.706524] flags: 0xffffe0000010200(slab|head)
-> [  654.706532] raw: 0ffffe0000010200 ffff801db2586ee0 ffff801db2586ee0 
-> ffff801db257e480
-> [  654.706538] raw: 0000000000000000 0000000000010001 00000001ffffffff 
-> 0000000000000000
-> [  654.706542] page dumped because: kasan: bad access detected
-> 
-> [  654.706549] Memory state around the buggy address:
-> [  654.706554]  ffff801d6c8fe900: 00 00 00 00 00 00 00 00 00 00 00 00 00 
-> 00 00 00
-> [  654.706560]  ffff801d6c8fe980: 00 00 00 00 00 00 00 00 00 00 00 00 00 
-> 00 00 00
-> [  654.706565] >ffff801d6c8fea00: 00 00 00 00 00 00 fc fc fc fc fc fc fc 
-> fc fc fc
-> [  654.706568]                                         ^
-> [  654.706573]  ffff801d6c8fea80: fc fc fc fc fc fc fc fc fc fc fc fc fc 
-> fc fc fc
-> [  654.706578]  ffff801d6c8feb00: fc fc fc fc fc fc fc fc fc fc fc fc fc 
-> fc fc fc
-> [  654.706582] 
-> ==================================================================
+ - Remove unused code in mbochs sample (YueHaibing)
 
+ - Send uevents around mdev registration (Alex Williamson)
+
+----------------------------------------------------------------
+Alex Williamson (1):
+      mdev: Send uevents around parent device registration
+
+Kefeng Wang (1):
+      vfio-mdev/samples: make some symbols static
+
+Peng Hao (1):
+      vfio: vfio_pci_nvlink2: use a vma helper function
+
+YueHaibing (1):
+      sample/mdev/mbochs: remove set but not used variable 'mdev_state'
+
+ drivers/vfio/mdev/mdev_core.c       |  9 +++++++
+ drivers/vfio/pci/vfio_pci_nvlink2.c |  3 +--
+ samples/vfio-mdev/mbochs.c          |  3 ---
+ samples/vfio-mdev/mtty.c            | 47 +++++++++++++++++++------------------
+ 4 files changed, 34 insertions(+), 28 deletions(-)
