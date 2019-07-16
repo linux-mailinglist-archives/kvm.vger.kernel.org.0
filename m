@@ -2,124 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 774326AD35
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 18:57:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB7FB6AD5B
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 19:06:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388165AbfGPQ4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 12:56:47 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:47722 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388117AbfGPQ4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 12:56:46 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GGsGLT133169;
-        Tue, 16 Jul 2019 16:56:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=pL4D4pNb/6nVzEODlTlauX/fHtTcE2s2zNVvaJvEa8I=;
- b=r4nbBDlMUrT7LLI9eN42SsEpxo1bQRF4C/CGSht4tNAPsXoFroCTkVe0Cao79qCcX/kh
- EuOE5mH+ReONxR6Ac1ZLGpy9ldTnQfsmNaOSXg7v/GIWF9kzDv8ZLhEafqs6goT/P3Td
- CbLqMEsigVCUHGoM8fXLBUqYGBMgu5AY234RoUCVJZo18pPOJReIPSexZk/Pv363Uz6Z
- BxxuUU65LZvGOW6KW6MJMhXzLORNrCgv0u++KVnGVfpG7x9RCnAPatxSEpHkcq2ylCgJ
- iv6HqQh1/J6U/SuqzgpGIWeyY2rssb9Gsz1vFkPLLDKKpQnkwvGY5U003RcaeRjvinEg Jg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2tq78pnrbk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jul 2019 16:56:37 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GGrNQP126556;
-        Tue, 16 Jul 2019 16:56:36 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2tq6mn0g75-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Jul 2019 16:56:36 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6GGuZsu007615;
-        Tue, 16 Jul 2019 16:56:35 GMT
-Received: from [10.30.3.6] (/213.57.127.2)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 16 Jul 2019 16:56:34 +0000
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 1/2] KVM: SVM: Fix workaround for AMD Errata 1096
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190716164151.GC1987@linux.intel.com>
-Date:   Tue, 16 Jul 2019 19:56:31 +0300
-Cc:     "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <60D01C4B-EC2E-453E-B5F6-BBE8FA94E31D@oracle.com>
-References: <20190715203043.100483-1-liran.alon@oracle.com>
- <20190715203043.100483-2-liran.alon@oracle.com>
- <1ef0f594-2039-1aeb-4fe0-edbc21fa1f60@amd.com>
- <CF48BCA4-4BC8-4AC8-8B48-85FA29E16719@oracle.com>
- <f6c78d65-70fc-4a79-44db-6abb0434db73@amd.com>
- <F2442A5C-702A-433D-9156-056E1844F378@oracle.com>
- <20190716164151.GC1987@linux.intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=567
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907160208
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=611 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907160208
+        id S1728608AbfGPRGH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 13:06:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35432 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728004AbfGPRGH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 13:06:07 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A7D6B8553A;
+        Tue, 16 Jul 2019 17:06:06 +0000 (UTC)
+Received: from [10.36.116.32] (ovpn-116-32.ams2.redhat.com [10.36.116.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DEB91001B32;
+        Tue, 16 Jul 2019 17:05:58 +0000 (UTC)
+From:   Auger Eric <eric.auger@redhat.com>
+Subject: Re: [RFC v1 3/4] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
+To:     "Liu, Yi L" <yi.l.liu@intel.com>, alex.williamson@redhat.com
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        joro@8bytes.org, ashok.raj@intel.com, jun.j.tian@intel.com,
+        yi.y.sun@intel.com, jean-philippe.brucker@arm.com,
+        peterx@redhat.com, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org
+References: <1562324772-3084-1-git-send-email-yi.l.liu@intel.com>
+ <1562324772-3084-4-git-send-email-yi.l.liu@intel.com>
+Message-ID: <50587a14-2c66-e7e9-0896-12917ffca428@redhat.com>
+Date:   Tue, 16 Jul 2019 19:05:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <1562324772-3084-4-git-send-email-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 16 Jul 2019 17:06:06 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Yi,
 
+On 7/5/19 1:06 PM, Liu, Yi L wrote:
+> From: Liu Yi L <yi.l.liu@intel.com>
+> 
+> This patch adds VFIO_IOMMU_PASID_REQUEST ioctl which aims
+> to passdown PASID allocation/free request from the virtual
+> iommu. This is required to get PASID managed in system-wide.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 125 ++++++++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       |  25 ++++++++
+>  2 files changed, 150 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 6fda4fb..d5e0c01 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1832,6 +1832,94 @@ static int vfio_cache_inv_fn(struct device *dev, void *data)
+>  	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
+>  }
+>  
+> +static int vfio_iommu_type1_pasid_alloc(struct vfio_iommu *iommu,
+> +					 int min_pasid,
+> +					 int max_pasid)
+> +{
+> +	int ret;
+> +	ioasid_t pasid;
+> +	struct mm_struct *mm = NULL;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+Is this check really mandated and do you really need to hold the iommu lock?
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +	mm = get_task_mm(current);
+> +	/* Jacob: track ioasid allocation owner by mm */
+> +	pasid = ioasid_alloc((struct ioasid_set *)mm, min_pasid,
+> +				max_pasid, NULL);
+Shouldn't we have a PASID number limit per mm to prevent a guest from
+consuming all PASIDs and induce DoS?
+> +	if (pasid == INVALID_IOASID) {
+> +		ret = -ENOSPC;
+> +		goto out_unlock;
+> +	}
+> +	ret = pasid;
+> +out_unlock:
+> +	mutex_unlock(&iommu->lock);
+> +	if (mm)
+> +		mmput(mm);
+> +	return ret;
+> +}
+> +
+> +static int vfio_iommu_type1_pasid_free(struct vfio_iommu *iommu, int pasid)
+> +{
+> +	struct mm_struct *mm = NULL;
+> +	void *pdata;
+> +	int ret = 0;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+same here
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +	pr_debug("%s: pasid: %d\n", __func__, pasid);
+> +
+> +	/**
+> +	 * TODO:
+> +	 * a) for pasid free, needs to return error if free failed
+> +	 * b) Sanity check: check if the pasid is allocated to the
+> +	 *                  current process such check may be in
+> +	 *                  vendor specific pasid_free callback or
+> +	 *                  in generic layer
+> +	 * c) clean up device list and free p_alloc structure
+> +	 *
+> +	 * Jacob:
+> +	 * There are two cases free could fail:
+> +	 * 1. free pasid by non-owner, we can use ioasid_set to track mm, if
+> +	 * the set does not match, caller is not permitted to free.
+> +	 * 2. free before unbind all devices, we can check if ioasid private
+> +	 * data, if data != NULL, then fail to free.
+> +	 */
+who is going to do the garbage collection of PASIDs used by the guest in
+general as we cannot rely on the userspace to do that in general?
+> +
+> +	mm = get_task_mm(current);
+> +	pdata = ioasid_find((struct ioasid_set *)mm, pasid, NULL);
+> +	if (IS_ERR(pdata)) {
+> +		if (pdata == ERR_PTR(-ENOENT))
+> +			pr_debug("pasid %d is not allocated\n", pasid);
+> +		else if (pdata == ERR_PTR(-EACCES))
+> +			pr_debug("Not owner of pasid %d,"
+> +				 "no pasid free allowed\n", pasid);
+> +		else
+> +			pr_debug("error happened during searching"
+> +				 " pasid: %d\n", pasid);
+> +		ret = -EPERM;
+return actual pdata error?
+> +		goto out_unlock;
+> +	}
+> +	if (pdata) {
+> +		pr_debug("Cannot free pasid %d with private data\n", pasid);
+> +		/* Expect PASID has no private data if not bond */> +		ret = -EBUSY;
+> +		goto out_unlock;
+> +	}
+> +	ioasid_free(pasid);
+> +
+> +out_unlock:
+> +	if (mm)
+> +		mmput(mm);
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -1936,6 +2024,43 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  					    &ustruct);
+>  		mutex_unlock(&iommu->lock);
+>  		return ret;
+> +
+> +	} else if (cmd == VFIO_IOMMU_PASID_REQUEST) {
+> +		struct vfio_iommu_type1_pasid_request req;
+> +		int min_pasid, max_pasid, pasid;
+> +
+> +		minsz = offsetofend(struct vfio_iommu_type1_pasid_request,
+> +				    flag);
+> +
+> +		if (copy_from_user(&req, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (req.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		switch (req.flag) {
+> +		/**
+> +		 * TODO: min_pasid and max_pasid align with
+> +		 * typedef unsigned int ioasid_t
+indeed
+> +		 */
+> +		case VFIO_IOMMU_PASID_ALLOC:
+> +			if (copy_from_user(&min_pasid,
+> +				(void __user *)arg + minsz, sizeof(min_pasid)))
+> +				return -EFAULT;
+> +			if (copy_from_user(&max_pasid,
+> +				(void __user *)arg + minsz + sizeof(min_pasid),
+> +				sizeof(max_pasid)))
+> +				return -EFAULT;
+> +			return vfio_iommu_type1_pasid_alloc(iommu,
+> +						min_pasid, max_pasid);
+> +		case VFIO_IOMMU_PASID_FREE:
+> +			if (copy_from_user(&pasid,
+> +				(void __user *)arg + minsz, sizeof(pasid)))
+> +				return -EFAULT;
+> +			return vfio_iommu_type1_pasid_free(iommu, pasid);
+> +		default:
+> +			return -EINVAL;
+> +		}
+>  	}
+>  
+>  	return -ENOTTY;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 055aa9b..af03c9f 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -798,6 +798,31 @@ struct vfio_iommu_type1_cache_invalidate {
+>  };
+>  #define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
+>  
+> +/*
+> + * @flag=VFIO_IOMMU_PASID_ALLOC, refer to the @min_pasid and @max_pasid fields
+inclusive
+> + * @flag=VFIO_IOMMU_PASID_FREE, refer to @pasid field
+> + */
+> +struct vfio_iommu_type1_pasid_request {
+> +	__u32	argsz;
+> +#define VFIO_IOMMU_PASID_ALLOC	(1 << 0)
+> +#define VFIO_IOMMU_PASID_FREE	(1 << 1)
+do you want a bitfield or an enum value here?
+> +	__u32	flag;
+> +	union {
+> +		struct {
+> +			int min_pasid;
+int -> __u32
+> +			int max_pasid;
+> +		};
+> +		int pasid;
+> +	};
+if you name the union field you can simplify the minsz/copy_from_user
+code I think.
+> +};
+> +
+> +/**
+> + * VFIO_IOMMU_PASID_REQUEST - _IOWR(VFIO_TYPE, VFIO_BASE + 27,
+> + *				struct vfio_iommu_type1_pasid_request)
+> + *
+> + */
+> +#define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 27)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+>  
+>  /*
+> 
 
-> On 16 Jul 2019, at 19:41, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->=20
-> On Tue, Jul 16, 2019 at 07:20:42PM +0300, Liran Alon wrote:
->> How can a SMAP fault occur when CPL=3D=3D3? One of the conditions for =
-SMAP is
->> that CPL<3.
->=20
-> The CPU is effectively at CPL0 when it does the decode assist, e.g.:
->=20
->  1. CPL3 guest hits reserved bit NPT fault (MMIO access)
->  2. CPU transitions to CPL0 on VM-Exit
->  3. CPU performs data access on **%rip**, encounters SMAP violation
->  4. CPU squashes SMAP violation, sets VMCB.insn_len=3D0
->  5. CPU delivers VM-Exit to software for original NPT fault
->=20
-> The original NPT fault is due to a reserved bit (or not present) entry =
-for
-> a MMIO GPA, *not* the GPA corresponding to %rip.  The fault on the =
-decode
-> assist is never delivered to software, it simply results in having =
-invalid
-> info in the VMCB's insn_bytes and insn_len fields.
+Thanks
 
-If the CPU performs the VMExit transition of state before doing the data =
-read for DecodeAssist,
-then I agree that CPL will be 0 on data-access regardless of vCPU CPL. =
-But this also means that SMAP
-violation should be raised based on host CR4.SMAP value and not vCPU =
-CR4.SMAP value as KVM code checks.
-
-Furthermore, vCPU CPL of guest doesn=E2=80=99t need to be 3 in order to =
-trigger this Errata.
-It=E2=80=99s only important that guest page-tables maps the guest RIP as =
-user-accessible. i.e. U/S bit in PTE set to 1.
-
-So I=E2=80=99m still left a bit confused rather the correctness of KVM =
-code handling this Errata.
-
--Liran
-
-
+Eric
