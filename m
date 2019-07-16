@@ -2,156 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E10966AC2E
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 17:49:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 289646AC50
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 17:56:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728619AbfGPPs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 11:48:57 -0400
-Received: from mga06.intel.com ([134.134.136.31]:23500 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728390AbfGPPs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 11:48:56 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jul 2019 08:48:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; 
-   d="scan'208";a="172578432"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.165])
-  by orsmga006.jf.intel.com with ESMTP; 16 Jul 2019 08:48:55 -0700
-Date:   Tue, 16 Jul 2019 08:48:55 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org,
-        brijesh.singh@amd.com, Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Rename need_emulation_on_page_fault() to
- handle_no_insn_on_page_fault()
-Message-ID: <20190716154855.GA1987@linux.intel.com>
+        id S1728634AbfGPP4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 11:56:47 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:35808 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728004AbfGPP4r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 11:56:47 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GFsb6F187700;
+        Tue, 16 Jul 2019 15:56:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=SbF2CDiMrf8qBoHLw8uV4VQK+h1sCUzzgJWK+xdh43A=;
+ b=ChedkShQU2X06ZnUT66zaID+H8rrxZXunjdpCTaKMHBgBB2Xv3ZT7TgMZ9FabND5PVjz
+ WTk3bfjQiSug/E4ghu1WvViutxdA8oOJGWZ0JLTDXn1I+Pe1Ia/wj4AuUbXQPYoqOLxc
+ qnJZS+qAL8qQZXSKOt3vcbaOzLW36/L/18VEwBup94C50Bd4F/lRjTt5ZC8ndWDflhs4
+ +qie+wV0H1o2620I699b9OJK86gQP3xbQiT6avO0MXihPzIGGtN/CHprPkJv4OzSZnsG
+ pWoGsTzltkhpDPPCUruChUNKjCyz1iqUffhZIF1Xh9m60sC1xnfPS3gUYiJSfTWyhN81 pg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2tq6qtnhej-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jul 2019 15:56:25 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GFr4cL177825;
+        Tue, 16 Jul 2019 15:56:24 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2tq6mmyj3f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jul 2019 15:56:24 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6GFuNwU001373;
+        Tue, 16 Jul 2019 15:56:23 GMT
+Received: from [10.30.3.6] (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 16 Jul 2019 15:56:23 +0000
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 1/2] KVM: SVM: Fix workaround for AMD Errata 1096
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <1ef0f594-2039-1aeb-4fe0-edbc21fa1f60@amd.com>
+Date:   Tue, 16 Jul 2019 18:56:19 +0300
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CF48BCA4-4BC8-4AC8-8B48-85FA29E16719@oracle.com>
 References: <20190715203043.100483-1-liran.alon@oracle.com>
- <20190715203043.100483-3-liran.alon@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190715203043.100483-3-liran.alon@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+ <20190715203043.100483-2-liran.alon@oracle.com>
+ <1ef0f594-2039-1aeb-4fe0-edbc21fa1f60@amd.com>
+To:     "Singh, Brijesh" <brijesh.singh@amd.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907160195
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907160196
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 15, 2019 at 11:30:43PM +0300, Liran Alon wrote:
-> I think this name is more appropriate to what the x86_ops method does.
-> In addition, modify VMX callback to return true as #PF handler can
-> proceed to emulation in this case. This didn't result in a bug
-> only because the callback is called when DecodeAssist is supported
-> which is currently supported only on SVM.
-> 
-> Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 3 ++-
->  arch/x86/kvm/mmu.c              | 2 +-
->  arch/x86/kvm/svm.c              | 4 ++--
->  arch/x86/kvm/vmx/vmx.c          | 6 +++---
->  4 files changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 450d69a1e6fa..536fd56f777d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1201,7 +1201,8 @@ struct kvm_x86_ops {
->  				   uint16_t *vmcs_version);
->  	uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
->  
-> -	bool (*need_emulation_on_page_fault)(struct kvm_vcpu *vcpu);
-> +	/* Returns true if #PF handler can proceed to emulation */
-> +	bool (*handle_no_insn_on_page_fault)(struct kvm_vcpu *vcpu);
 
-The problem with this name is that it requires a comment to explain the
-boolean return value.  The VMX implementation particular would be
-inscrutuable.
 
-"no insn" is also a misnomer, as the AMD quirk has an insn, it's the
-insn_len that's missing.
+> On 16 Jul 2019, at 18:48, Singh, Brijesh <brijesh.singh@amd.com> =
+wrote:
+>=20
+> On 7/15/19 3:30 PM, Liran Alon wrote:
+>> According to AMD Errata 1096:
+>> "On a nested data page fault when CR4.SMAP =3D 1 and the guest data =
+read generates a SMAP violation, the
+>> GuestInstrBytes field of the VMCB on a VMEXIT will incorrectly return =
+0h instead the correct guest instruction
+>> bytes."
+>>=20
+>> As stated above, errata is encountered when guest read generates a =
+SMAP violation. i.e. vCPU runs
+>> with CPL<3 and CR4.SMAP=3D1. However, code have mistakenly checked if =
+CPL=3D=3D3 and CR4.SMAP=3D=3D0.
+>>=20
+>=20
+> The SMAP violation will occur from CPL3 so CPL=3D=3D3 is a valid =
+check.
+>=20
+> See [1] for complete discussion
+>=20
+> =
+https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__patchwork.kernel.or=
+g_patch_10808075_-2322479271&d=3DDwIGaQ&c=3DRoP1YumCXCgaWHvlZYR8PZh8Bv7qIr=
+MUB65eapI_JnE&r=3DJk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=3DRAt8t8nB=
+aCxUPy5OTDkO0n8BMQ5l9oSfLMiL0TLTu6c&s=3DNkwe8rTJhygBCIPz27LXrylptjnWyMwB-n=
+JaiowWpWc&e=3D=20
 
-What about something like force_emulation_on_zero_len_insn()?
+I still don=E2=80=99t understand. SMAP is a mechanism which is meant to =
+protect a CPU running in CPL<3 from mistakenly referencing data =
+controllable by CPL=3D=3D3.
+Therefore, SMAP violation should be raised when CPL<3 and data =
+referenced is mapped in page-tables with PTE with U/S bit set to 1. =
+(i.e. User accessible).
 
->  };
->  
->  struct kvm_arch_async_pf {
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 1e9ba81accba..889de3ccf655 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -5423,7 +5423,7 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u64 error_code,
->  	 * guest, with the exception of AMD Erratum 1096 which is unrecoverable.
->  	 */
->  	if (unlikely(insn && !insn_len)) {
-> -		if (!kvm_x86_ops->need_emulation_on_page_fault(vcpu))
-> +		if (!kvm_x86_ops->handle_no_insn_on_page_fault(vcpu))
->  			return 1;
->  	}
->  
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 79023a41f7a7..ab89bb0de8df 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -7118,7 +7118,7 @@ static int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->  	return -ENODEV;
->  }
->  
-> -static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
-> +static bool svm_handle_no_insn_on_page_fault(struct kvm_vcpu *vcpu)
->  {
->  	bool is_user, smap;
->  
-> @@ -7291,7 +7291,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
->  	.nested_enable_evmcs = nested_enable_evmcs,
->  	.nested_get_evmcs_version = nested_get_evmcs_version,
->  
-> -	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
-> +	.handle_no_insn_on_page_fault = svm_handle_no_insn_on_page_fault,
->  };
->  
->  static int __init svm_init(void)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index f64bcbb03906..088fc6d943e9 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7419,9 +7419,9 @@ static int enable_smi_window(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> -static bool vmx_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
-> +static bool vmx_handle_no_insn_on_page_fault(struct kvm_vcpu *vcpu)
->  {
-> -	return 0;
-> +	return true;
+Thus, we should check if CPL<3 and CR4.SMAP=3D=3D1.
 
-Any functional change here should be done in a different patch.
+-Liran
 
-Given that we should never reach this point on VMX, a WARN and triple
-fault request seems in order.
+>=20
+> However, code mistakenly checked CR4.SMAP=3D=3D0, it should be =
+CR4.SMAP=3D=3D1
+>=20
+>> To avoid future confusion and improve code readbility, comment errata =
+details in code and not
+>> just in commit message.
+>>=20
+>> Fixes: 05d5a4863525 ("KVM: SVM: Workaround errata#1096 (insn_len =
+maybe zero on SMAP violation)")
+>> Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>>  arch/x86/kvm/svm.c | 17 +++++++++++++----
+>>  1 file changed, 13 insertions(+), 4 deletions(-)
+>>=20
+>> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+>> index 735b8c01895e..79023a41f7a7 100644
+>> --- a/arch/x86/kvm/svm.c
+>> +++ b/arch/x86/kvm/svm.c
+>> @@ -7123,10 +7123,19 @@ static bool =
+svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+>>  	bool is_user, smap;
+>>=20
+>>  	is_user =3D svm_get_cpl(vcpu) =3D=3D 3;
+>> -	smap =3D !kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
+>> +	smap =3D kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
+>>=20
+>=20
+> Ah good catch. thank
+>=20
+>=20
+>>  	/*
+>> -	 * Detect and workaround Errata 1096 Fam_17h_00_0Fh
+>> +	 * Detect and workaround Errata 1096 Fam_17h_00_0Fh.
+>> +	 *
+>> +	 * Errata:
+>> +	 * On a nested page fault when CR4.SMAP=3D1 and the guest data =
+read generates
+>> +	 * a SMAP violation, GuestIntrBytes field of the VMCB on a =
+VMEXIT will
+>> +	 * incorrectly return 0 instead the correct guest instruction =
+bytes.
+>> +	 *
+>> +	 * Workaround:
+>> +	 * To determine what instruction the guest was executing, the =
+hypervisor
+>> +	 * will have to decode the instruction at the instruction =
+pointer.
+>>  	 *
+>>  	 * In non SEV guest, hypervisor will be able to read the guest
+>>  	 * memory to decode the instruction pointer when insn_len is =
+zero
+>> @@ -7137,11 +7146,11 @@ static bool =
+svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+>>  	 * instruction pointer so we will not able to workaround it. =
+Lets
+>>  	 * print the error and request to kill the guest.
+>>  	 */
+>> -	if (is_user && smap) {
+>> +	if (!is_user && smap) {
+>>  		if (!sev_guest(vcpu->kvm))
+>>  			return true;
+>>=20
+>> -		pr_err_ratelimited("KVM: Guest triggered AMD Erratum =
+1096\n");
+>> +		pr_err_ratelimited("KVM: SEV Guest triggered AMD Erratum =
+1096\n");
+>>  		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>>  	}
+>>=20
+>>=20
 
-	WARN_ON_ONCE(1);
-
-	kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-	return false;
-
->  }
->  
->  static __init int hardware_setup(void)
-> @@ -7726,7 +7726,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
->  	.set_nested_state = NULL,
->  	.get_vmcs12_pages = NULL,
->  	.nested_enable_evmcs = NULL,
-> -	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
-> +	.handle_no_insn_on_page_fault = vmx_handle_no_insn_on_page_fault,
->  };
->  
->  static void vmx_cleanup_l1d_flush(void)
-> -- 
-> 2.20.1
-> 
