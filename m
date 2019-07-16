@@ -2,202 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A26276A670
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 12:26:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4D256A6B1
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 12:44:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732509AbfGPK0B convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 16 Jul 2019 06:26:01 -0400
-Received: from mga11.intel.com ([192.55.52.93]:5417 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732257AbfGPK0B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 06:26:01 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jul 2019 03:26:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,498,1557212400"; 
-   d="scan'208";a="194841602"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Jul 2019 03:26:00 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 16 Jul 2019 03:26:00 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 16 Jul 2019 03:25:57 -0700
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 16 Jul 2019 03:25:56 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.110]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.3]) with mapi id 14.03.0439.000;
- Tue, 16 Jul 2019 18:25:55 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
-Thread-Topic: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
-Thread-Index: AQHVM+ylZdJ7a+KBXU2HFFh5qj+Ya6bKg4OAgAJ3NWA=
-Date:   Tue, 16 Jul 2019 10:25:55 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
- <20190715025519.GE3440@umbus.fritz.box>
-In-Reply-To: <20190715025519.GE3440@umbus.fritz.box>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjY5YTdiNTgtOGIxMi00ZmRlLWFiNDktYTNmZWZkOTAwYWFiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZ21mRWlwNUcxbVFkSXlkczZmdjRnMlRKZlhTSCtqcGRna3hsaVdiQTgydVhkRk9pMFpxSUJLdElGXC83ZjBFMkgifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1733300AbfGPKmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 06:42:20 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:38325 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733198AbfGPKmT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 06:42:19 -0400
+Received: by mail-pg1-f193.google.com with SMTP id f5so408934pgu.5
+        for <kvm@vger.kernel.org>; Tue, 16 Jul 2019 03:42:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pcaSKUptakKKj3J2cwfnG8UjZ2PIKf/cDSDsIedAL2o=;
+        b=s+OFL3WXkvuRlzxrd5bE1Ngy+XgzRf65DCow2JPQVmoncUwZbVCqMBlaegEFH9OjoE
+         hGCT+agVZt6o7c1dpbisMO2uuxLS4ocd2/ZDN7N4RlgjJBFJVqurL7o3Ajgq9RawIe5i
+         iUUC4MErBeuJi9C5qq1rXWHueETWBI6Hzy/jstfQMgqGCotgu8bx7AIz25MV6uvB/uMd
+         AEZz6pOzM1SLevN2MhBCQnN+Ls0p0A8Ke9oO9L3/oytDbjyhFG4BNaIQGs6zmciV6uIC
+         B6Z1DPnQPaMXlwFS2CsRvlNBpOj4ZTVcwcFW3en9/NlOTRMUXcMVVd3220XqOCAD3ZI0
+         4G+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pcaSKUptakKKj3J2cwfnG8UjZ2PIKf/cDSDsIedAL2o=;
+        b=EXu0hmEGU5ndYiexP0ReoJb9AHFUMuyPc9YMj61foFWraTcN3X6XuET9MziwW9qRNF
+         NA5olizmDXI+fo6WwbzogaT6wmvz7ku+wJaFmLBzpfbOPWIO7BoZ4L3ceoNykNqfRNxa
+         aAULZFhmFl3jMxaXBhzcTLHfFRT7/4PV+Zm7flzLLNvWB+ZJ4rhoYGfmgJ22uiebwThB
+         Uw/Lc2yN64IfoBE2/li+F7Dyks1SE8Z7/d/g+JYrcs67jNzUYZ7Ff6b5S5sAywY9BPws
+         i07QKTD4kPR8BYn8NNPV+oAEqeJ6forPH8J8KmLjmHWTsq7oxhsqF+F7QcD4Pls6gska
+         7Meg==
+X-Gm-Message-State: APjAAAUooMnRsbLYPP2CuczxrZHEPbJFhxRi2P2omlQFKzNBByA4RnQ8
+        DzhqdnNupZOJ3BpvB0fb7CouU4UtdqeYbojzT3rjBg==
+X-Google-Smtp-Source: APXvYqxbAU3TJ3lRd6aOUwZ5wuALN9pC6/wjaLV/0rVHNmhI9zipeP18fROsGNN7fnnNJ7wIdpoSB0T+fWzH5C49P+M=
+X-Received: by 2002:a65:4b8b:: with SMTP id t11mr32488026pgq.130.1563273738850;
+ Tue, 16 Jul 2019 03:42:18 -0700 (PDT)
 MIME-Version: 1.0
+References: <cover.1561386715.git.andreyknvl@google.com> <ea0ff94ef2b8af12ea6c222c5ebd970e0849b6dd.1561386715.git.andreyknvl@google.com>
+ <20190624174015.GL29120@arrakis.emea.arm.com> <CAAeHK+y8vE=G_odK6KH=H064nSQcVgkQkNwb2zQD9swXxKSyUQ@mail.gmail.com>
+ <20190715180510.GC4970@ziepe.ca>
+In-Reply-To: <20190715180510.GC4970@ziepe.ca>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Tue, 16 Jul 2019 12:42:07 +0200
+Message-ID: <CAAeHK+xPQqJP7p_JFxc4jrx9k7N0TpBWEuB8Px7XHvrfDU1_gw@mail.gmail.com>
+Subject: Re: [PATCH v18 11/15] IB/mlx4: untag user pointers in mlx4_get_umem_mr
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf
-> Of David Gibson
-> Sent: Monday, July 15, 2019 10:55 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
-> 
-> On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
-> > This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid().
-> > These two functions are used to propagate guest pasid allocation and
-> > free requests to host via vfio container ioctl.
-> 
-> As I said in an earlier comment, I think doing this on the device is
-> conceptually incorrect.  I think we need an explcit notion of an SVM
-> context (i.e. the namespace in which all the PASIDs live) - which will
-> IIUC usually be shared amongst multiple devices.  The create and free
-> PASID requests should be on that object.
+On Mon, Jul 15, 2019 at 8:05 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Mon, Jul 15, 2019 at 06:01:29PM +0200, Andrey Konovalov wrote:
+> > On Mon, Jun 24, 2019 at 7:40 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > >
+> > > On Mon, Jun 24, 2019 at 04:32:56PM +0200, Andrey Konovalov wrote:
+> > > > This patch is a part of a series that extends kernel ABI to allow to pass
+> > > > tagged user pointers (with the top byte set to something else other than
+> > > > 0x00) as syscall arguments.
+> > > >
+> > > > mlx4_get_umem_mr() uses provided user pointers for vma lookups, which can
+> > > > only by done with untagged pointers.
+> > > >
+> > > > Untag user pointers in this function.
+> > > >
+> > > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> > > >  drivers/infiniband/hw/mlx4/mr.c | 7 ++++---
+> > > >  1 file changed, 4 insertions(+), 3 deletions(-)
+> > >
+> > > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > >
+> > > This patch also needs an ack from the infiniband maintainers (Jason).
+> >
+> > Hi Jason,
+> >
+> > Could you take a look and give your acked-by?
+>
+> Oh, I think I did this a long time ago. Still looks OK.
 
-Actually, the allocation is not doing on this device. System wide, it is
-done on a container. So not sure if it is the API interface gives you a
-sense that this is done on device. Also, curious on the SVM context
-concept, do you mean it a per-VM context or a per-SVM usage context?
-May you elaborate a little more. :-)
+Hm, maybe that was we who lost it. Thanks!
 
-Thanks,
-Yi Liu
+> You will send it?
 
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > ---
-> >  hw/vfio/pci.c | 61
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 61 insertions(+)
-> >
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index ce3fe96..ab184ad 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -2690,6 +2690,65 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice
-> *vdev)
-> >      vdev->req_enabled = false;
-> >  }
-> >
-> > +static int vfio_pci_device_request_pasid_alloc(PCIBus *bus,
-> > +                                               int32_t devfn,
-> > +                                               uint32_t min_pasid,
-> > +                                               uint32_t max_pasid)
-> > +{
-> > +    PCIDevice *pdev = bus->devices[devfn];
-> > +    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > +    VFIOContainer *container = vdev->vbasedev.group->container;
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> > +    int pasid;
-> > +
-> > +    argsz = sizeof(req);
-> > +    req.argsz = argsz;
-> > +    req.flag = VFIO_IOMMU_PASID_ALLOC;
-> > +    req.min_pasid = min_pasid;
-> > +    req.max_pasid = max_pasid;
-> > +
-> > +    rcu_read_lock();
-> > +    pasid = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> > +    if (pasid < 0) {
-> > +        error_report("vfio_pci_device_request_pasid_alloc:"
-> > +                     " request failed, contanier: %p", container);
-> > +    }
-> > +    rcu_read_unlock();
-> > +    return pasid;
-> > +}
-> > +
-> > +static int vfio_pci_device_request_pasid_free(PCIBus *bus,
-> > +                                              int32_t devfn,
-> > +                                              uint32_t pasid)
-> > +{
-> > +    PCIDevice *pdev = bus->devices[devfn];
-> > +    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > +    VFIOContainer *container = vdev->vbasedev.group->container;
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> > +    int ret = 0;
-> > +
-> > +    argsz = sizeof(req);
-> > +    req.argsz = argsz;
-> > +    req.flag = VFIO_IOMMU_PASID_FREE;
-> > +    req.pasid = pasid;
-> > +
-> > +    rcu_read_lock();
-> > +    ret = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> > +    if (ret != 0) {
-> > +        error_report("vfio_pci_device_request_pasid_free:"
-> > +                     " request failed, contanier: %p", container);
-> > +    }
-> > +    rcu_read_unlock();
-> > +    return ret;
-> > +}
-> > +
-> > +static PCIPASIDOps vfio_pci_pasid_ops = {
-> > +    .alloc_pasid = vfio_pci_device_request_pasid_alloc,
-> > +    .free_pasid = vfio_pci_device_request_pasid_free,
-> > +};
-> > +
-> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >  {
-> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-> > @@ -2991,6 +3050,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >      vfio_register_req_notifier(vdev);
-> >      vfio_setup_resetfn_quirk(vdev);
-> >
-> > +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
-> > +
-> >      return;
-> >
-> >  out_teardown:
-> 
-> --
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+I will resend the patchset once the merge window is closed, if that's
+what you mean.
+
+>
+> Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
+>
+> Jason
