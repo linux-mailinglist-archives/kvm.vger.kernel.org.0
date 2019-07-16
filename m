@@ -2,409 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFDF46AD2B
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 18:55:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 774326AD35
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2019 18:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387920AbfGPQyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 12:54:50 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:35241 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728124AbfGPQyu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 12:54:50 -0400
-Received: by mail-qt1-f194.google.com with SMTP id d23so20314010qto.2;
-        Tue, 16 Jul 2019 09:54:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Yt8Ques5r3GxmNn08TNzOGbnHmwr7Ju6wXEF2/Wf2Vc=;
-        b=pm1Hv0DQA/Hv0XZKBqVf9YxmoDPcsXMAHnJRey4kDZ9clh7uqk68EojVMuVmtiGD5t
-         pGI+b1AL/ftizaIUR1vvv/VGNkj06hcGIfKX5JwWAcw1KuD6pzB7U6moSEq3LJ2GirNq
-         zEh97gmB/3oHEd7CjX6iyoeTQJCwyJ4ZJBUcRUM5oFXgwwuokEtlz/QlPvR6VcC9EzMY
-         N0kNOG5Wr3sQC8cJ+pEill8kXWr5mGkBTjRVP7rAlEUXHV1aPParfBm3/RRhRTCu2D/k
-         ecSpBycbJGZAUeHmEZcTyadmC3U7uDScs3yfYPu3UB/rr4oSQVrWWJujXZuvvzuCHDWr
-         qwag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Yt8Ques5r3GxmNn08TNzOGbnHmwr7Ju6wXEF2/Wf2Vc=;
-        b=tqz4t3ZamV1cAMyF1TY7ZxnsIwufHJ4PSTnqLgx+yvtBkERZ1YtmHE7mtCmpp6Q3d3
-         IokQVZjfBWLyVGy8MOp+lR7i2HekbtE05gckfdy93xsRNrFMUjVoKsH06KEfed7sB4HF
-         d6enijQ5C5OhSZBav/hxUgRSEc8k7ud2XBFHTPu7eIJSHXbXUsJXKwnTg56tCDY6JHMv
-         90BM9qN0kRvcwsOp+yIMAsImMr7DOoKpXpPoMdjHdRnq2TI9XrJKGYj6Rx8lF+mP7e43
-         z+GZNM7QR3v+2A2s6ceyb6aJ+RDiR9Ug6PU0APXbFk/yeBVLdZqZuOMdyCKeXKsF48HW
-         995A==
-X-Gm-Message-State: APjAAAX7UX1dKgYn0pJGWN+3vSS6PFSepHQbyzpmYxcSU4qbnXn4+8WE
-        ZqTaO+dWPtbbzfSvFQYLKLCcHxMAsGUTtOpbPvU=
-X-Google-Smtp-Source: APXvYqygRIlTpAQplnpjInPPUCVPg1uexykUpFrrTyjeP4rLyOtMiB4/J8ZdswyN71ZQ/jF9KZ3kMI0SOBcl+YgeRNE=
-X-Received: by 2002:ac8:2f43:: with SMTP id k3mr24232552qta.179.1563296088752;
- Tue, 16 Jul 2019 09:54:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190619222922.1231.27432.stgit@localhost.localdomain>
- <20190619223338.1231.52537.stgit@localhost.localdomain> <20190716055017-mutt-send-email-mst@kernel.org>
- <CAKgT0Uc-2k9o7pjtf-GFAgr83c7RM-RTJ8-OrEzFv92uz+MTDw@mail.gmail.com> <20190716115535-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190716115535-mutt-send-email-mst@kernel.org>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Tue, 16 Jul 2019 09:54:37 -0700
-Message-ID: <CAKgT0Ud47-cWu9VnAAD_Q2Fjia5gaWCz_L9HUF6PBhbugv6tCQ@mail.gmail.com>
-Subject: Re: [PATCH v1 6/6] virtio-balloon: Add support for aerating memory
- via hinting
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
-        Rik van Riel <riel@surriel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        lcapitulino@redhat.com, wei.w.wang@intel.com,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S2388165AbfGPQ4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 12:56:47 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47722 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388117AbfGPQ4q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 12:56:46 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GGsGLT133169;
+        Tue, 16 Jul 2019 16:56:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=pL4D4pNb/6nVzEODlTlauX/fHtTcE2s2zNVvaJvEa8I=;
+ b=r4nbBDlMUrT7LLI9eN42SsEpxo1bQRF4C/CGSht4tNAPsXoFroCTkVe0Cao79qCcX/kh
+ EuOE5mH+ReONxR6Ac1ZLGpy9ldTnQfsmNaOSXg7v/GIWF9kzDv8ZLhEafqs6goT/P3Td
+ CbLqMEsigVCUHGoM8fXLBUqYGBMgu5AY234RoUCVJZo18pPOJReIPSexZk/Pv363Uz6Z
+ BxxuUU65LZvGOW6KW6MJMhXzLORNrCgv0u++KVnGVfpG7x9RCnAPatxSEpHkcq2ylCgJ
+ iv6HqQh1/J6U/SuqzgpGIWeyY2rssb9Gsz1vFkPLLDKKpQnkwvGY5U003RcaeRjvinEg Jg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2tq78pnrbk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jul 2019 16:56:37 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6GGrNQP126556;
+        Tue, 16 Jul 2019 16:56:36 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2tq6mn0g75-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Jul 2019 16:56:36 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6GGuZsu007615;
+        Tue, 16 Jul 2019 16:56:35 GMT
+Received: from [10.30.3.6] (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 16 Jul 2019 16:56:34 +0000
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 1/2] KVM: SVM: Fix workaround for AMD Errata 1096
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190716164151.GC1987@linux.intel.com>
+Date:   Tue, 16 Jul 2019 19:56:31 +0300
+Cc:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <60D01C4B-EC2E-453E-B5F6-BBE8FA94E31D@oracle.com>
+References: <20190715203043.100483-1-liran.alon@oracle.com>
+ <20190715203043.100483-2-liran.alon@oracle.com>
+ <1ef0f594-2039-1aeb-4fe0-edbc21fa1f60@amd.com>
+ <CF48BCA4-4BC8-4AC8-8B48-85FA29E16719@oracle.com>
+ <f6c78d65-70fc-4a79-44db-6abb0434db73@amd.com>
+ <F2442A5C-702A-433D-9156-056E1844F378@oracle.com>
+ <20190716164151.GC1987@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=567
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907160208
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9320 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=611 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907160208
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 16, 2019 at 9:08 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, Jul 16, 2019 at 08:37:06AM -0700, Alexander Duyck wrote:
-> > On Tue, Jul 16, 2019 at 2:55 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Wed, Jun 19, 2019 at 03:33:38PM -0700, Alexander Duyck wrote:
-> > > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > >
-> > > > Add support for aerating memory using the hinting feature provided by
-> > > > virtio-balloon. Hinting differs from the regular balloon functionality in
-> > > > that is is much less durable than a standard memory balloon. Instead of
-> > > > creating a list of pages that cannot be accessed the pages are only
-> > > > inaccessible while they are being indicated to the virtio interface. Once
-> > > > the interface has acknowledged them they are placed back into their
-> > > > respective free lists and are once again accessible by the guest system.
-> > > >
-> > > > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > > ---
-> > > >  drivers/virtio/Kconfig              |    1
-> > > >  drivers/virtio/virtio_balloon.c     |  110 ++++++++++++++++++++++++++++++++++-
-> > > >  include/uapi/linux/virtio_balloon.h |    1
-> > > >  3 files changed, 108 insertions(+), 4 deletions(-)
-> > > >
-> > > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > > > index 023fc3bc01c6..9cdaccf92c3a 100644
-> > > > --- a/drivers/virtio/Kconfig
-> > > > +++ b/drivers/virtio/Kconfig
-> > > > @@ -47,6 +47,7 @@ config VIRTIO_BALLOON
-> > > >       tristate "Virtio balloon driver"
-> > > >       depends on VIRTIO
-> > > >       select MEMORY_BALLOON
-> > > > +     select AERATION
-> > > >       ---help---
-> > > >        This driver supports increasing and decreasing the amount
-> > > >        of memory within a KVM guest.
-> > > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> > > > index 44339fc87cc7..91f1e8c9017d 100644
-> > > > --- a/drivers/virtio/virtio_balloon.c
-> > > > +++ b/drivers/virtio/virtio_balloon.c
-> > > > @@ -18,6 +18,7 @@
-> > > >  #include <linux/mm.h>
-> > > >  #include <linux/mount.h>
-> > > >  #include <linux/magic.h>
-> > > > +#include <linux/memory_aeration.h>
-> > > >
-> > > >  /*
-> > > >   * Balloon device works in 4K page units.  So each page is pointed to by
-> > > > @@ -26,6 +27,7 @@
-> > > >   */
-> > > >  #define VIRTIO_BALLOON_PAGES_PER_PAGE (unsigned)(PAGE_SIZE >> VIRTIO_BALLOON_PFN_SHIFT)
-> > > >  #define VIRTIO_BALLOON_ARRAY_PFNS_MAX 256
-> > > > +#define VIRTIO_BALLOON_ARRAY_HINTS_MAX       32
-> > > >  #define VIRTBALLOON_OOM_NOTIFY_PRIORITY 80
-> > > >
-> > > >  #define VIRTIO_BALLOON_FREE_PAGE_ALLOC_FLAG (__GFP_NORETRY | __GFP_NOWARN | \
-> > > > @@ -45,6 +47,7 @@ enum virtio_balloon_vq {
-> > > >       VIRTIO_BALLOON_VQ_DEFLATE,
-> > > >       VIRTIO_BALLOON_VQ_STATS,
-> > > >       VIRTIO_BALLOON_VQ_FREE_PAGE,
-> > > > +     VIRTIO_BALLOON_VQ_HINTING,
-> > > >       VIRTIO_BALLOON_VQ_MAX
-> > > >  };
-> > > >
-> > > > @@ -54,7 +57,8 @@ enum virtio_balloon_config_read {
-> > > >
-> > > >  struct virtio_balloon {
-> > > >       struct virtio_device *vdev;
-> > > > -     struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq;
-> > > > +     struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq,
-> > > > +                                                             *hinting_vq;
-> > > >
-> > > >       /* Balloon's own wq for cpu-intensive work items */
-> > > >       struct workqueue_struct *balloon_wq;
-> > > > @@ -103,9 +107,21 @@ struct virtio_balloon {
-> > > >       /* Synchronize access/update to this struct virtio_balloon elements */
-> > > >       struct mutex balloon_lock;
-> > > >
-> > > > -     /* The array of pfns we tell the Host about. */
-> > > > -     unsigned int num_pfns;
-> > > > -     __virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
-> > > > +
-> > > > +     union {
-> > > > +             /* The array of pfns we tell the Host about. */
-> > > > +             struct {
-> > > > +                     unsigned int num_pfns;
-> > > > +                     __virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
-> > > > +             };
-> > > > +             /* The array of physical addresses we are hinting on */
-> > > > +             struct {
-> > > > +                     unsigned int num_hints;
-> > > > +                     __virtio64 hints[VIRTIO_BALLOON_ARRAY_HINTS_MAX];
-> > > > +             };
-> > > > +     };
-> > > > +
-> > > > +     struct aerator_dev_info a_dev_info;
-> > > >
-> > > >       /* Memory statistics */
-> > > >       struct virtio_balloon_stat stats[VIRTIO_BALLOON_S_NR];
-> > > > @@ -151,6 +167,68 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
-> > > >
-> > > >  }
-> > > >
-> > > > +static u64 page_to_hints_pa_order(struct page *page)
-> > > > +{
-> > > > +     unsigned char order;
-> > > > +     dma_addr_t pa;
-> > > > +
-> > > > +     BUILD_BUG_ON((64 - VIRTIO_BALLOON_PFN_SHIFT) >=
-> > > > +                  (1 << VIRTIO_BALLOON_PFN_SHIFT));
-> > > > +
-> > > > +     /*
-> > > > +      * Record physical page address combined with page order.
-> > > > +      * Order will never exceed 64 - VIRTIO_BALLON_PFN_SHIFT
-> > > > +      * since the size has to fit into a 64b value. So as long
-> > > > +      * as VIRTIO_BALLOON_SHIFT is greater than this combining
-> > > > +      * the two values should be safe.
-> > > > +      */
-> > > > +     pa = page_to_phys(page);
-> > > > +     order = page_private(page) +
-> > > > +             PAGE_SHIFT - VIRTIO_BALLOON_PFN_SHIFT;
-> > > > +
-> > > > +     return (u64)(pa | order);
-> > > > +}
-> > > > +
-> > > > +void virtballoon_aerator_react(struct aerator_dev_info *a_dev_info)
-> > > > +{
-> > > > +     struct virtio_balloon *vb = container_of(a_dev_info,
-> > > > +                                             struct virtio_balloon,
-> > > > +                                             a_dev_info);
-> > > > +     struct virtqueue *vq = vb->hinting_vq;
-> > > > +     struct scatterlist sg;
-> > > > +     unsigned int unused;
-> > > > +     struct page *page;
-> > > > +
-> > > > +     mutex_lock(&vb->balloon_lock);
-> > > > +
-> > > > +     vb->num_hints = 0;
-> > > > +
-> > > > +     list_for_each_entry(page, &a_dev_info->batch, lru) {
-> > > > +             vb->hints[vb->num_hints++] =
-> > > > +                             cpu_to_virtio64(vb->vdev,
-> > > > +                                             page_to_hints_pa_order(page));
-> > > > +     }
-> > > > +
-> > > > +     /* We shouldn't have been called if there is nothing to process */
-> > > > +     if (WARN_ON(vb->num_hints == 0))
-> > > > +             goto out;
-> > > > +
-> > > > +     sg_init_one(&sg, vb->hints,
-> > > > +                 sizeof(vb->hints[0]) * vb->num_hints);
-> > > > +
-> > > > +     /*
-> > > > +      * We should always be able to add one buffer to an
-> > > > +      * empty queue.
-> > > > +      */
-> > > > +     virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
-> > > > +     virtqueue_kick(vq);
-> > > > +
-> > > > +     /* When host has read buffer, this completes via balloon_ack */
-> > > > +     wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
-> > > > +out:
-> > > > +     mutex_unlock(&vb->balloon_lock);
-> > > > +}
-> > > > +
-> > > >  static void set_page_pfns(struct virtio_balloon *vb,
-> > > >                         __virtio32 pfns[], struct page *page)
-> > > >  {
-> > > > @@ -475,6 +553,7 @@ static int init_vqs(struct virtio_balloon *vb)
-> > > >       names[VIRTIO_BALLOON_VQ_DEFLATE] = "deflate";
-> > > >       names[VIRTIO_BALLOON_VQ_STATS] = NULL;
-> > > >       names[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
-> > > > +     names[VIRTIO_BALLOON_VQ_HINTING] = NULL;
-> > > >
-> > > >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-> > > >               names[VIRTIO_BALLOON_VQ_STATS] = "stats";
-> > > > @@ -486,11 +565,19 @@ static int init_vqs(struct virtio_balloon *vb)
-> > > >               callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
-> > > >       }
-> > > >
-> > > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HINTING)) {
-> > > > +             names[VIRTIO_BALLOON_VQ_HINTING] = "hinting_vq";
-> > > > +             callbacks[VIRTIO_BALLOON_VQ_HINTING] = balloon_ack;
-> > > > +     }
-> > > > +
-> > > >       err = vb->vdev->config->find_vqs(vb->vdev, VIRTIO_BALLOON_VQ_MAX,
-> > > >                                        vqs, callbacks, names, NULL, NULL);
-> > > >       if (err)
-> > > >               return err;
-> > > >
-> > > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HINTING))
-> > > > +             vb->hinting_vq = vqs[VIRTIO_BALLOON_VQ_HINTING];
-> > > > +
-> > > >       vb->inflate_vq = vqs[VIRTIO_BALLOON_VQ_INFLATE];
-> > > >       vb->deflate_vq = vqs[VIRTIO_BALLOON_VQ_DEFLATE];
-> > > >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-> > > > @@ -929,12 +1016,24 @@ static int virtballoon_probe(struct virtio_device *vdev)
-> > > >               if (err)
-> > > >                       goto out_del_balloon_wq;
-> > > >       }
-> > > > +
-> > > > +     vb->a_dev_info.react = virtballoon_aerator_react;
-> > > > +     vb->a_dev_info.capacity = VIRTIO_BALLOON_ARRAY_HINTS_MAX;
-> > > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HINTING)) {
-> > > > +             err = aerator_startup(&vb->a_dev_info);
-> > > > +             if (err)
-> > > > +                     goto out_unregister_shrinker;
-> > > > +     }
-> > > > +
-> > > >       virtio_device_ready(vdev);
-> > > >
-> > > >       if (towards_target(vb))
-> > > >               virtballoon_changed(vdev);
-> > > >       return 0;
-> > > >
-> > > > +out_unregister_shrinker:
-> > > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
-> > > > +             virtio_balloon_unregister_shrinker(vb);
-> > > >  out_del_balloon_wq:
-> > > >       if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
-> > > >               destroy_workqueue(vb->balloon_wq);
-> > > > @@ -963,6 +1062,8 @@ static void virtballoon_remove(struct virtio_device *vdev)
-> > > >  {
-> > > >       struct virtio_balloon *vb = vdev->priv;
-> > > >
-> > > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HINTING))
-> > > > +             aerator_shutdown();
-> > > >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
-> > > >               virtio_balloon_unregister_shrinker(vb);
-> > > >       spin_lock_irq(&vb->stop_update_lock);
-> > > > @@ -1032,6 +1133,7 @@ static int virtballoon_validate(struct virtio_device *vdev)
-> > > >       VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
-> > > >       VIRTIO_BALLOON_F_FREE_PAGE_HINT,
-> > > >       VIRTIO_BALLOON_F_PAGE_POISON,
-> > > > +     VIRTIO_BALLOON_F_HINTING,
-> > > >  };
-> > > >
-> > > >  static struct virtio_driver virtio_balloon_driver = {
-> > > > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-> > > > index a1966cd7b677..2b0f62814e22 100644
-> > > > --- a/include/uapi/linux/virtio_balloon.h
-> > > > +++ b/include/uapi/linux/virtio_balloon.h
-> > > > @@ -36,6 +36,7 @@
-> > > >  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM      2 /* Deflate balloon on OOM */
-> > > >  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT      3 /* VQ to report free pages */
-> > > >  #define VIRTIO_BALLOON_F_PAGE_POISON 4 /* Guest is using page poisoning */
-> > > > +#define VIRTIO_BALLOON_F_HINTING     5 /* Page hinting virtqueue */
-> > > >
-> > > >  /* Size of a PFN in the balloon interface. */
-> > > >  #define VIRTIO_BALLOON_PFN_SHIFT 12
-> > >
-> > >
-> > >
-> > > The approach here is very close to what on-demand hinting that is
-> > > already upstream does.
-> > >
-> > > This should have resulted in a most of the code being shared
-> > > but this does not seem to happen here.
-> > >
-> > > Can we unify the code in some way?
-> > > It can still use a separate feature flag, but there are things
-> > > I like very much about current hinting code, such as
-> > > using s/g instead of passing PFNs in a buffer.
-> > >
-> > > If this doesn't work could you elaborate on why?
-> >
-> > As far as sending a scatter gather that shouldn't be too much of an
-> > issue, however I need to double check that I will still be able to
-> > keep the completions as a single block.
-> >
-> > One significant spot where the "VIRTIO_BALLOON_F_FREE_PAGE_HINT" code
-> > and my code differs. My code is processing a fixed discreet block of
-> > pages at a time, whereas the FREE_PAGE_HINT code is slurping up all
-> > available high-order memory and stuffing it into a giant balloon and
-> > has more of a streaming setup as it doesn't return things until either
-> > forced to by the shrinker or once it has processed all available
-> > memory.
->
-> This is what I am saying. Having watched that patchset being developed,
-> I think that's simply because processing blocks required mm core
-> changes, which Wei was not up to pushing through.
->
->
-> If we did
->
->         while (1) {
->                 alloc_pages
->                 add_buf
->                 get_buf
->                 free_pages
->         }
->
-> We'd end up passing the same page to balloon again and again.
->
-> So we end up reserving lots of memory with alloc_pages instead.
->
-> What I am saying is that now that you are developing
-> infrastructure to iterate over free pages,
-> FREE_PAGE_HINT should be able to use it too.
-> Whether that's possible might be a good indication of
-> whether the new mm APIs make sense.
 
-The problem is the infrastructure as implemented isn't designed to do
-that. I am pretty certain this interface will have issues with being
-given small blocks to process at a time.
 
-Basically the design for the FREE_PAGE_HINT feature doesn't really
-have the concept of doing things a bit at a time. It is either
-filling, stopped, or done. From what I can tell it requires a
-configuration change for the virtio balloon interface to toggle
-between those states.
+> On 16 Jul 2019, at 19:41, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> On Tue, Jul 16, 2019 at 07:20:42PM +0300, Liran Alon wrote:
+>> How can a SMAP fault occur when CPL=3D=3D3? One of the conditions for =
+SMAP is
+>> that CPL<3.
+>=20
+> The CPU is effectively at CPL0 when it does the decode assist, e.g.:
+>=20
+>  1. CPL3 guest hits reserved bit NPT fault (MMIO access)
+>  2. CPU transitions to CPL0 on VM-Exit
+>  3. CPU performs data access on **%rip**, encounters SMAP violation
+>  4. CPU squashes SMAP violation, sets VMCB.insn_len=3D0
+>  5. CPU delivers VM-Exit to software for original NPT fault
+>=20
+> The original NPT fault is due to a reserved bit (or not present) entry =
+for
+> a MMIO GPA, *not* the GPA corresponding to %rip.  The fault on the =
+decode
+> assist is never delivered to software, it simply results in having =
+invalid
+> info in the VMCB's insn_bytes and insn_len fields.
 
-> > The basic idea with the bubble hinting was to essentially create mini
-> > balloons. As such I had based the code off of the balloon inflation
-> > code. The only spot where it really differs is that I needed the
-> > ability to pass higher order pages so I tweaked thinks and passed
-> > "hints" instead of "pfns".
->
-> And that is fine. But there isn't really such a big difference with
-> FREE_PAGE_HINT except FREE_PAGE_HINT triggers upon host request and not
-> in response to guest load.
+If the CPU performs the VMExit transition of state before doing the data =
+read for DecodeAssist,
+then I agree that CPL will be 0 on data-access regardless of vCPU CPL. =
+But this also means that SMAP
+violation should be raised based on host CR4.SMAP value and not vCPU =
+CR4.SMAP value as KVM code checks.
 
-I disagree, I believe there is a significant difference. The
-FREE_PAGE_HINT code was implemented to be more of a streaming
-interface. This is one of the things Linus kept complaining about in
-his comments. This code attempts to pull in ALL of the higher order
-pages, not just a smaller block of them. Honestly the difference is
-mostly in the hypervisor interface than what is needed for the kernel
-interface, however the design of the hypervisor interface would make
-doing things more incrementally much more difficult.
+Furthermore, vCPU CPL of guest doesn=E2=80=99t need to be 3 in order to =
+trigger this Errata.
+It=E2=80=99s only important that guest page-tables maps the guest RIP as =
+user-accessible. i.e. U/S bit in PTE set to 1.
 
-With that said I will take a look into at least using the scatter
-gather interface directly rather than sending the list. I think I can
-probably do that much. However it will actually reduce code reuse as I
-have to check and verify the pages have been processed before I can
-free them back to the host.
+So I=E2=80=99m still left a bit confused rather the correctness of KVM =
+code handling this Errata.
 
-- Alex
+-Liran
+
+
