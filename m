@@ -2,79 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C22C6C06C
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 19:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 986D96C0F3
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 20:30:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387984AbfGQRaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 13:30:11 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51630 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727351AbfGQRaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 13:30:10 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 207so22990586wma.1
-        for <kvm@vger.kernel.org>; Wed, 17 Jul 2019 10:30:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=okpiWpdfnwyM1YLlRg9SVp2HCONGDPFvxji/Vr8VZhQ=;
-        b=ENkoIMpD87zHl1DrkjMHCCs5KJa4dwxW7/sRVSfgQGONNLcX+Omst31+jqNEeV4HSa
-         Akh80OQpa8rA3Vfm8ShcnOiNMBJqk023PNqHRSh9dkeZoJoRcv4vDC7SLxgpFDlgao4M
-         gM+h+MooGwVCev1JE0wr1nWYZJzEzUrSa5vu2bEvYYpHhLSmh+LJsWp+EcrbVQ2kAIXs
-         /K1Yw9wzffdXMw4Qw3/soJvGny2leV99X1BTV4Q3hIAY8UHaKwsvQLFTx+AUz+CNHJ2y
-         tALH+VPRv7lF1fOhuyZ79bVZOTO7QEgXa0m8FAmoFfAYN+aQdEcs5WVZomKz7fFLhe4k
-         veAw==
-X-Gm-Message-State: APjAAAXY98b5gvbxUnXXoDu2HSsCKyUapQpLABKeJ6BN0d/97rb7YIg7
-        4mJScTzVheV6ULZlbhL3uTucZyA94cHuoQ==
-X-Google-Smtp-Source: APXvYqw4wLFosMCJsKcqyu21VYl8wlKY1wom+uuOIwtMWn3hdWHXZB+88Xz1muoOJYlZ3/Z6MxyDWg==
-X-Received: by 2002:a1c:f515:: with SMTP id t21mr39364355wmh.39.1563384608699;
-        Wed, 17 Jul 2019 10:30:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
-        by smtp.gmail.com with ESMTPSA id i18sm29599639wrp.91.2019.07.17.10.30.07
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 17 Jul 2019 10:30:08 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: x86: PMU Event Filter
-To:     Eric Hankland <ehankland@google.com>
-Cc:     Wei Wang <wei.w.wang@intel.com>, rkrcmar@redhat.com,
-        linux-kernel@vger.kernel.org,
-        Stephane Eranian <eranian@google.com>, kvm@vger.kernel.org
-References: <CAOyeoRUUK+T_71J=+zcToyL93LkpARpsuWSfZS7jbJq=wd1rQg@mail.gmail.com>
- <5D27FE26.1050002@intel.com>
- <CAOyeoRV5=6pR7=sFZ+gU68L4rORjRaYDLxQrZb1enaWO=d_zpA@mail.gmail.com>
- <5D2D8FB4.3020505@intel.com>
- <5580889b-e357-e7bc-88e6-d68c4a23dd64@redhat.com>
- <CAOyeoRUOqMmG6KkGXUMeK2gz8CmN=TiiuqhtVcM-kekPoHb4wA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <0c1655c8-3a5b-f961-ab52-290a69ef4af6@redhat.com>
-Date:   Wed, 17 Jul 2019 19:30:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <CAOyeoRUOqMmG6KkGXUMeK2gz8CmN=TiiuqhtVcM-kekPoHb4wA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1727439AbfGQSaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jul 2019 14:30:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44626 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727229AbfGQSaE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 14:30:04 -0400
+Subject: Re: [PULL] virtio, vhost: fixes, features, performance
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563388203;
+        bh=SsgEQ229BFDzVjWE4Rfd94cxbm2rr6++cJP0jupJNlI=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=1OMBw+NNcoYT1euAQa76cEb1EnJLTbURZO01B9VLtWDbz6o2ygQuSEU/k5bwly/JN
+         I9WKTyRViJihLBuveQwr15VdePBK/oENdwCbcZIOCueP649B9L4SUwnKWdXebZmJ3r
+         0AOCFDDnCBkwuFhQ3rgUh397M2+y0SfUzso6xWjs=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190716113151-mutt-send-email-mst@kernel.org>
+References: <20190716113151-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <linux-parisc.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190716113151-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 5e663f0410fa2f355042209154029842ba1abd43
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3a1d5384b7decbff6519daa9c65a35665e227323
+Message-Id: <156338820366.716.10416228849149522179.pr-tracker-bot@kernel.org>
+Date:   Wed, 17 Jul 2019 18:30:03 +0000
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        aarcange@redhat.com, bharat.bhushan@nxp.com, bhelgaas@google.com,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-parisc@vger.kernel.org, davem@davemloft.net,
+        eric.auger@redhat.com, gustavo@embeddedor.com, hch@infradead.org,
+        ihor.matushchak@foobox.net, James.Bottomley@hansenpartnership.com,
+        jasowang@redhat.com, jean-philippe.brucker@arm.com,
+        jglisse@redhat.com, mst@redhat.com, natechancellor@gmail.com
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/07/19 19:05, Eric Hankland wrote:
->> Let's just implement the bitmap of fixed counters (it's okay to follow
->> the same action as gp counters), and add it to struct
->> kvm_pmu_event_filter.  While at it, we can add a bunch of padding u32s
->> and a flags field that can come in handy later (it would fail the ioctl
->> if nonzero).
->>
->> Wei, Eric, who's going to do it? :)
-> 
-> I'm happy to do it - I'll send out a v3.
+The pull request you sent on Tue, 16 Jul 2019 11:31:51 -0400:
 
-Please send a patch on top of what is currently in Linus's tree.
+> git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-Thanks!
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3a1d5384b7decbff6519daa9c65a35665e227323
 
-Paolo
+Thank you!
 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
