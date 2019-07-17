@@ -2,84 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34DE86BB96
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 13:37:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3B166BBA9
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 13:44:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731599AbfGQLhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 07:37:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38846 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726284AbfGQLhq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 07:37:46 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 83C0321743;
-        Wed, 17 Jul 2019 11:37:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563363466;
-        bh=tq+6xuI8SQMUzIcpH5lQylstA6fY9G03SjvpF49Mn2E=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LyYLGrvDiM18pUehSMqkl7EfV7nTxu+TP8iz9zuDkbtis9IhHbLdioUOrimvCYnj5
-         fBlgIMDcyBjdbOcwuu8f3bV3+ZlarDx4fL9xPPmh0krBOFae8O3tRwJKqorg0FEC2r
-         gLsjYOdU7afjfIpVmRacn61BGofcHdODOgtn5qGk=
-Date:   Wed, 17 Jul 2019 12:37:40 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Russell King <linux@arm.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org
-Subject: Re: [PATCH] MAINTAINERS: Update my email address to @kernel.org
-Message-ID: <20190717113739.ffw43htk5vtt5bfr@willie-the-truck>
-References: <20190716174308.17147-1-marc.zyngier@arm.com>
- <20190717064315.tn26dss343iv33oj@willie-the-truck>
+        id S1726085AbfGQLnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jul 2019 07:43:03 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44093 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730980AbfGQLnD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 07:43:03 -0400
+Received: by mail-pl1-f196.google.com with SMTP id t14so11814883plr.11
+        for <kvm@vger.kernel.org>; Wed, 17 Jul 2019 04:43:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Grx9Ph9cpPxnp5U6FBRGOs65Gt1iaoMhcGq5W71SZXw=;
+        b=dPqGbc0mQ4L1HVZkSH8ToVI8fJKg/9UNHDO/j/ERbXAicYMzOFznsbpKlaHUysv6li
+         HI+ov6aZkI81aTTtxCqQqgB/bUVOpQn9oyTV62JlPhH7/hgOpXEwCdWu9ddqQHOpZpdv
+         vvSbjVE/k6KiaC4iA854H6gt6BntwHIeZhW6TlwY6wZ/6+elD6DGPCHZxZrxLz2uCTHc
+         8iFhpa9H1Y4EYvcxgufIOEc+0j2fY1DuwRMYeLwfiF/zvSCA0YG2Xctd4B7QhffRyXW7
+         79B+/AUSAWe5ZZuaO+yAHuZlFSQxsBpNhxsDDOkk9SiW6k2AqHelqnkNry2oBYROn4ta
+         qk0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Grx9Ph9cpPxnp5U6FBRGOs65Gt1iaoMhcGq5W71SZXw=;
+        b=AMaeYA16MtkQOhv+XaAQGWHitHRsUzPGgf8HzbBExCB2i6rFbluL+p7xwV0QtUeTad
+         YtPCXp4LQUhBUfT1ywrEXUnj3cbzmEY+4xPlGTux6FcOBg0fllmpTY2XXwYhTyLxeo+e
+         koknnLw2S7pgxDsc5qP/Gwi7Pnq2CV5JJqyr/BXR5H7Di3SW2yct3+Bfug62S1UaG2Gr
+         6dUPfKRQu3kXw+hGnaJF518/qMSuu0KAPTHOiuuzrFNhHh5qOAal/gIKt1SxGOtcu5o/
+         VfU+pt3CTfl7gvq+eC9bchssmwU70KbWyHWlU4PpZOeZDsH/uX/U4TadPtPrFcgd+gdY
+         TSHg==
+X-Gm-Message-State: APjAAAUPcEapJDyunWSCNSN81Tr3wFj+VkSRDX9MSrPv38G5ULOFZr0W
+        9VBRPlv64ys32KUpRW4Z/Tk9OGji7bO2znjzOqSXXA==
+X-Google-Smtp-Source: APXvYqwmLG+YoWbUJiFaN+0PkmRQxPro9175aUMwlEodu495a+iL+q6DhBuBElFNfaLl03HSknMS7Mny75X+YTtbitI=
+X-Received: by 2002:a17:902:8689:: with SMTP id g9mr39719354plo.252.1563363782037;
+ Wed, 17 Jul 2019 04:43:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190717064315.tn26dss343iv33oj@willie-the-truck>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <cover.1561386715.git.andreyknvl@google.com> <ea0ff94ef2b8af12ea6c222c5ebd970e0849b6dd.1561386715.git.andreyknvl@google.com>
+ <20190624174015.GL29120@arrakis.emea.arm.com> <CAAeHK+y8vE=G_odK6KH=H064nSQcVgkQkNwb2zQD9swXxKSyUQ@mail.gmail.com>
+ <20190715180510.GC4970@ziepe.ca> <CAAeHK+xPQqJP7p_JFxc4jrx9k7N0TpBWEuB8Px7XHvrfDU1_gw@mail.gmail.com>
+ <20190716120624.GA29727@ziepe.ca>
+In-Reply-To: <20190716120624.GA29727@ziepe.ca>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Wed, 17 Jul 2019 13:42:50 +0200
+Message-ID: <CAAeHK+xGfCSNgJ1FA1Bi3-6iVZNa5-cPJF54SY9rETqSqnrOTw@mail.gmail.com>
+Subject: Re: [PATCH v18 11/15] IB/mlx4: untag user pointers in mlx4_get_umem_mr
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 07:43:15AM +0100, Will Deacon wrote:
-> On Tue, Jul 16, 2019 at 06:43:08PM +0100, Marc Zyngier wrote:
-> > I will soon lose access to my @arm.com email address, so let's
-> > update the MAINTAINERS file to point to my @kernel.org address,
-> > as well as .mailmap for good measure.
-> > 
-> > Note that my @arm.com address will still work, but someone else
-> > will be reading whatever is sent there. Don't say you didn't know!
-> > 
-> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > ---
-> > 
-> > Notes:
-> >     Yes, I'm sending this from my ARM address. That's intentional.
-> >     I'll probably send it as part of a pull request later in the
-> >     cycle, but that's just so that people know what is coming.
-> > 
-> >  .mailmap    | 1 +
-> >  MAINTAINERS | 8 ++++----
-> >  2 files changed, 5 insertions(+), 4 deletions(-)
-> 
-> Let's see if you manage a better job of getting people to use your new
-> address than I have:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
-
-Actually, since there's another change from Julien, I'll just pick both of
-these up via the arm64 tree for -rc2 along with the vdso fixes we've got
-kicking around.
-
-Will
+On Tue, Jul 16, 2019 at 2:06 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Tue, Jul 16, 2019 at 12:42:07PM +0200, Andrey Konovalov wrote:
+> > On Mon, Jul 15, 2019 at 8:05 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Mon, Jul 15, 2019 at 06:01:29PM +0200, Andrey Konovalov wrote:
+> > > > On Mon, Jun 24, 2019 at 7:40 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > > >
+> > > > > On Mon, Jun 24, 2019 at 04:32:56PM +0200, Andrey Konovalov wrote:
+> > > > > > This patch is a part of a series that extends kernel ABI to allow to pass
+> > > > > > tagged user pointers (with the top byte set to something else other than
+> > > > > > 0x00) as syscall arguments.
+> > > > > >
+> > > > > > mlx4_get_umem_mr() uses provided user pointers for vma lookups, which can
+> > > > > > only by done with untagged pointers.
+> > > > > >
+> > > > > > Untag user pointers in this function.
+> > > > > >
+> > > > > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> > > > > >  drivers/infiniband/hw/mlx4/mr.c | 7 ++++---
+> > > > > >  1 file changed, 4 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > > > >
+> > > > > This patch also needs an ack from the infiniband maintainers (Jason).
+> > > >
+> > > > Hi Jason,
+> > > >
+> > > > Could you take a look and give your acked-by?
+> > >
+> > > Oh, I think I did this a long time ago. Still looks OK.
+> >
+> > Hm, maybe that was we who lost it. Thanks!
+> >
+> > > You will send it?
+> >
+> > I will resend the patchset once the merge window is closed, if that's
+> > what you mean.
+>
+> No.. I mean who send it to Linus's tree? ie do you want me to take
+> this patch into rdma?
+>
+> Jason
