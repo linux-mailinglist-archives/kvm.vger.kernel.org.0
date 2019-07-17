@@ -2,68 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 306056BC46
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 14:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08B806BC70
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 14:36:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726973AbfGQM1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 08:27:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39198 "EHLO mx1.redhat.com"
+        id S1726260AbfGQMfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jul 2019 08:35:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43356 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725936AbfGQM1j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 08:27:39 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1725799AbfGQMfn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 08:35:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CA9753DE0F;
-        Wed, 17 Jul 2019 12:27:39 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 143BA330265;
+        Wed, 17 Jul 2019 12:35:43 +0000 (UTC)
 Received: from [10.72.12.61] (ovpn-12-61.pek2.redhat.com [10.72.12.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B2E12600C8;
-        Wed, 17 Jul 2019 12:27:30 +0000 (UTC)
-Subject: Re: [PATCH V3 00/15] Packed virtqueue support for vhost
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jfreimann@redhat.com, tiwei.bie@intel.com,
-        maxime.coquelin@redhat.com
-References: <20190717105255.63488-1-jasowang@redhat.com>
- <20190717070100-mutt-send-email-mst@kernel.org>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 746645D9D6;
+        Wed, 17 Jul 2019 12:35:37 +0000 (UTC)
+Subject: Re: [PATCH] vhost_net: fix missing descriptor recovery
+To:     huhai <huhai@kylinos.cn>, mst@redhat.com
+Cc:     kvm@vger.kernel.org
+References: <20190717115834.25988-1-huhai@kylinos.cn>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <af066030-96f1-4a8d-4864-7b6b903477a6@redhat.com>
-Date:   Wed, 17 Jul 2019 20:27:28 +0800
+Message-ID: <2b582257-d3f3-2793-2256-c6120b6459c0@redhat.com>
+Date:   Wed, 17 Jul 2019 20:35:26 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190717070100-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190717115834.25988-1-huhai@kylinos.cn>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 17 Jul 2019 12:27:39 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 17 Jul 2019 12:35:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/7/17 下午7:02, Michael S. Tsirkin wrote:
-> On Wed, Jul 17, 2019 at 06:52:40AM -0400, Jason Wang wrote:
->> Hi all:
->>
->> This series implements packed virtqueues which were described
->> at [1]. In this version we try to address the performance regression
->> saw by V2. The root cause is packed virtqueue need more times of
->> userspace memory accesssing which turns out to be very
->> expensive. Thanks to the help of 7f466032dc9e ("vhost: access vq
->> metadata through kernel virtual address"), such overhead cold be
->> eliminated. So in this version, we can see about 2% improvement for
->> packed virtqueue on PPS.
-> Great job, thanks!
-> Pls allow a bit more review time than usual as this is a big patchset.
-> Should be done by Tuesday.
-> -next material anyway.
+On 2019/7/17 下午7:58, huhai wrote:
+> When get_tx_bufs get descriptor successful, but this descriptor have
+> some problem, we should inform the guest to recycle this descriptor,
+> instead of doing nothing.
+>
+> Signed-off-by: huhai <huhai@kylinos.cn>
+> ---
+>   drivers/vhost/net.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 247e5585af5d..939a2ef9c223 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -620,6 +620,7 @@ static int get_tx_bufs(struct vhost_net *net,
+>   	if (*in) {
+>   		vq_err(vq, "Unexpected descriptor format for TX: out %d, int %d\n",
+>   			*out, *in);
+> +		vhost_add_used_and_signal(&net->dev, vq, ret, 0);
+>   		return -EFAULT;
+>   	}
+>   
+> @@ -628,6 +629,7 @@ static int get_tx_bufs(struct vhost_net *net,
+>   	if (*len == 0) {
+>   		vq_err(vq, "Unexpected header len for TX: %zd expected %zd\n",
+>   			*len, nvq->vhost_hlen);
+> +		vhost_add_used_and_signal(&net->dev, vq, ret, 0);
+>   		return -EFAULT;
+>   	}
+>   
 
 
-Sure, just to confirm, I think this should go for your vhost tree?.
+This is usually a hint of driver bug. I believe it's better to fail 
+explicitly here instead of trying to workaround it.
 
 Thanks
 
