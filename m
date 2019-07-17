@@ -2,154 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D365E6BD33
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 15:37:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D22A6BD2B
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 15:37:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728253AbfGQNgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 09:36:54 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45667 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727945AbfGQNgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 09:36:50 -0400
-Received: by mail-pf1-f194.google.com with SMTP id r1so10845582pfq.12
-        for <kvm@vger.kernel.org>; Wed, 17 Jul 2019 06:36:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=upJur9hX33jRa5ZDAABYWCcVNIU4OKrA323sUj0kiJ0=;
-        b=jU/Zat9i+mrs8cSnCYXrBiEONUz0WXxyKyOECIIPiTvG8WEhtGZGjK61290IX8o36U
-         OrHTHQ7Woyg/qn3+sukX8RWKFmT/Ab3vSFlM0FM2BRuiucJNWXV94DF4e2NhGQgdA44A
-         dT08TPfZUZgkz0of54cXYItyNEHlQbHBkArsYbqcDoUXDHAB+kz50O9ewS939NtAQV8u
-         N3pg+MG4dZM9J1oQTBELA9KEuGXZuE94dTh2nx4VJ6oW11nUXuKKdq/o5lVXbnas7dEB
-         7eGFT9GZTTNoP+bU6YviC4h7qnZidfElkMDjIpsDOMoPQb/nzifgWXLs7MlD24BgMlQq
-         Xslw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=upJur9hX33jRa5ZDAABYWCcVNIU4OKrA323sUj0kiJ0=;
-        b=rTs8HeJNEoHO+BhT0az5xH5bbfq8Xs1o1GfQSv8rooQk5fQp93v+oMv1FvXcFqSp4k
-         6i74byC3FzWnxEUoGzFwb7WczEhDP73ovQqxkIwhrxPKnN7ZownsmiIqh05/I8MzVNKR
-         GwKsBt2lW+ej1miu8Qimbn/+YUQr2aJxQYERVJl8fIbQzJ3hCToTvS/+7jYSY5b7rGJy
-         Mz8EAJRBW76bIwT7+fzsa2uThN/ndC6X++ycVarSmGRauOz5u6IeVw2KTTUmz/TtOKhx
-         bPHRoCgHnxEROhhIlXKysYtz7x/poG8KYHp6ewhsa6VMM2eNRYYDQCSNSUMSvmBTuziD
-         /GpQ==
-X-Gm-Message-State: APjAAAX82XTZ375wtocvnCyRQVzvvrBqnK2nAh4Z8sfwVoUVMKn/3Slh
-        06M17UFpJafAgCp0w0AFuBfkMQ3+LXuXbOph7LAbkQ==
-X-Google-Smtp-Source: APXvYqz7m/UfmCxQEvGyEZmLKWfGDEQqrP2qzxF/oMVv3Ek5NDX+f4ncbRdtOgqzhkxO4Lp3vwbZe7MPyGJ1vZM4Wx0=
-X-Received: by 2002:a17:90a:2488:: with SMTP id i8mr43162554pje.123.1563370608796;
- Wed, 17 Jul 2019 06:36:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1561386715.git.andreyknvl@google.com> <ea0ff94ef2b8af12ea6c222c5ebd970e0849b6dd.1561386715.git.andreyknvl@google.com>
- <20190624174015.GL29120@arrakis.emea.arm.com> <CAAeHK+y8vE=G_odK6KH=H064nSQcVgkQkNwb2zQD9swXxKSyUQ@mail.gmail.com>
- <20190715180510.GC4970@ziepe.ca> <CAAeHK+xPQqJP7p_JFxc4jrx9k7N0TpBWEuB8Px7XHvrfDU1_gw@mail.gmail.com>
- <20190716120624.GA29727@ziepe.ca> <CAAeHK+xPPQ9QjAksbfWG-Zmnawt-cdw9eO_6GVxjEYcaDGvaRA@mail.gmail.com>
- <20190717115828.GE12119@ziepe.ca>
-In-Reply-To: <20190717115828.GE12119@ziepe.ca>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Wed, 17 Jul 2019 15:36:37 +0200
-Message-ID: <CAAeHK+yyQpc6cxyVeUUWUwiQYy8iAgVXmOVO=EQYSNzy9G8Q0A@mail.gmail.com>
-Subject: Re: [PATCH v18 11/15] IB/mlx4: untag user pointers in mlx4_get_umem_mr
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727318AbfGQNgd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jul 2019 09:36:33 -0400
+Received: from mga04.intel.com ([192.55.52.120]:36148 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726880AbfGQNgd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 09:36:33 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jul 2019 06:36:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,274,1559545200"; 
+   d="scan'208";a="191261813"
+Received: from local-michael-cet-test.sh.intel.com ([10.239.159.128])
+  by fmsmga004.fm.intel.com with ESMTP; 17 Jul 2019 06:36:31 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com, alazar@bitdefender.com,
+        Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v4 0/9] Enable Sub-page Write Protection Support
+Date:   Wed, 17 Jul 2019 21:37:42 +0800
+Message-Id: <20190717133751.12910-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 1:58 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Wed, Jul 17, 2019 at 01:44:07PM +0200, Andrey Konovalov wrote:
-> > On Tue, Jul 16, 2019 at 2:06 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > >
-> > > On Tue, Jul 16, 2019 at 12:42:07PM +0200, Andrey Konovalov wrote:
-> > > > On Mon, Jul 15, 2019 at 8:05 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > > > >
-> > > > > On Mon, Jul 15, 2019 at 06:01:29PM +0200, Andrey Konovalov wrote:
-> > > > > > On Mon, Jun 24, 2019 at 7:40 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > > > > >
-> > > > > > > On Mon, Jun 24, 2019 at 04:32:56PM +0200, Andrey Konovalov wrote:
-> > > > > > > > This patch is a part of a series that extends kernel ABI to allow to pass
-> > > > > > > > tagged user pointers (with the top byte set to something else other than
-> > > > > > > > 0x00) as syscall arguments.
-> > > > > > > >
-> > > > > > > > mlx4_get_umem_mr() uses provided user pointers for vma lookups, which can
-> > > > > > > > only by done with untagged pointers.
-> > > > > > > >
-> > > > > > > > Untag user pointers in this function.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > > > > > > >  drivers/infiniband/hw/mlx4/mr.c | 7 ++++---
-> > > > > > > >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > > > > > >
-> > > > > > > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> > > > > > >
-> > > > > > > This patch also needs an ack from the infiniband maintainers (Jason).
-> > > > > >
-> > > > > > Hi Jason,
-> > > > > >
-> > > > > > Could you take a look and give your acked-by?
-> > > > >
-> > > > > Oh, I think I did this a long time ago. Still looks OK.
-> > > >
-> > > > Hm, maybe that was we who lost it. Thanks!
-> > > >
-> > > > > You will send it?
-> > > >
-> > > > I will resend the patchset once the merge window is closed, if that's
-> > > > what you mean.
-> > >
-> > > No.. I mean who send it to Linus's tree? ie do you want me to take
-> > > this patch into rdma?
-> >
-> > I think the plan was to merge the whole series through the mm tree.
-> > But I don't mind if you want to take this patch into your tree. It's
-> > just that this patch doesn't make much sense without the rest of the
-> > series.
->
-> Generally I prefer if subsystem changes stay in subsystem trees. If
-> the patch is good standalone, and the untag API has already been
-> merged, this is a better strategy.
+EPT-Based Sub-Page write Protection(SPP)is a HW capability which allows
+Virtual Machine Monitor(VMM) to specify write-permission for guest
+physical memory at a sub-page(128 byte) granularity. When this
+capability is enabled, the CPU enforces write-access check for sub-pages
+within a 4KB page.
 
-OK, feel free to take this into your tree, this works for me.
+The feature is targeted to provide fine-grained memory protection for
+usages such as device virtualization, memory check-point and VM
+introspection etc.
 
->
-> Jason
+SPP is active when the "sub-page write protection" (bit 23) is 1 in
+Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+Permission Table(SPPT), SPPT is referenced via a 64-bit control field
+called Sub-Page Permission Table Pointer (SPPTP) which contains a
+4K-aligned physical address.
+
+Right now, only 4KB physical pages are supported for SPP. To enable SPP
+for certain physical page, we need to first make the physical page
+write-protected, then set bit 61 of the corresponding EPT leaf entry. 
+While HW walks EPT, if bit 61 is set, it traverses SPPT with the guset
+physical address to find out the sub-page permissions at the leaf entry.
+If the corresponding bit is set, write to sub-page is permitted,
+otherwise, SPP induced EPT vilation is generated.
+
+Please refer to the SPP introduction document in this patch set and
+Intel SDM for details:
+
+Intel SDM:
+https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Previous patch:
+https://lkml.org/lkml/2019/6/6/695
+
+Patch 1: Introduction to SPP.
+Patch 2: Add SPP related flags and control bits.
+Patch 3: Functions for SPPT setup.
+Patch 4: Add SPP access bitmaps for memslots.
+Patch 5: Low level implementation of SPP operations.
+Patch 6: Implement User space access IOCTLs.
+Patch 7: Handle SPP induced VMExit and EPT violation.
+Patch 8: Enable lazy mode SPPT setup.
+Patch 9: Handle memory remapping and reclaim.
+
+
+Change logs:
+
+V3 -> v4:
+  1. Modified documentation to make it consistent with patches.
+  2. Allocated SPPT root page in init_spp() instead of vmx_set_cr3() to
+     avoid SPPT miss error.
+  3. Added back co-developers and sign-offs.
+
+V2 -> V3:                                                                
+  1. Rebased patches to kernel 5.1 release                                
+  2. Deferred SPPT setup to EPT fault handler if the page is not
+     available while set_subpage() is being called.
+  3. Added init IOCTL to reduce extra cost if SPP is not used.
+  4. Refactored patch structure, cleaned up cross referenced functions.
+  5. Added code to deal with memory swapping/migration/shrinker cases.
+
+V2 -> V1:
+  1. Rebased to 4.20-rc1
+  2. Move VMCS change to a separated patch.
+  3. Code refine and Bug fix 
+
+
+Yang Weijiang (9):
+  Documentation: Introduce EPT based Subpage Protection
+  KVM: VMX: Add control flags for SPP enabling
+  KVM: VMX: Implement functions for SPPT paging setup
+  KVM: VMX: Introduce SPP access bitmap and operation functions
+  KVM: VMX: Add init/set/get functions for SPP
+  KVM: VMX: Introduce SPP user-space IOCTLs
+  KVM: VMX: Handle SPP induced vmexit and page fault
+  KVM: MMU: Enable Lazy mode SPPT setup
+  KVM: MMU: Handle host memory remapping and reclaim
+
+ Documentation/virtual/kvm/spp_kvm.txt | 173 ++++++++++
+ arch/x86/include/asm/cpufeatures.h    |   1 +
+ arch/x86/include/asm/kvm_host.h       |  26 +-
+ arch/x86/include/asm/vmx.h            |  10 +
+ arch/x86/include/uapi/asm/vmx.h       |   2 +
+ arch/x86/kernel/cpu/intel.c           |   4 +
+ arch/x86/kvm/mmu.c                    | 480 ++++++++++++++++++++++++++
+ arch/x86/kvm/mmu.h                    |   1 +
+ arch/x86/kvm/vmx/capabilities.h       |   5 +
+ arch/x86/kvm/vmx/vmx.c                | 129 +++++++
+ arch/x86/kvm/x86.c                    | 141 ++++++++
+ include/linux/kvm_host.h              |   9 +
+ include/uapi/linux/kvm.h              |  17 +
+ 13 files changed, 997 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
+
+-- 
+2.17.2
+
