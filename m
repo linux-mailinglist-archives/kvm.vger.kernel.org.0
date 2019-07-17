@@ -2,76 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24D146B2E0
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 02:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 896E06B315
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 03:17:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387781AbfGQAaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Jul 2019 20:30:14 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:39785 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726954AbfGQAaO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Jul 2019 20:30:14 -0400
-Received: by mail-ot1-f67.google.com with SMTP id r21so17067007otq.6;
-        Tue, 16 Jul 2019 17:30:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=MCQzjwUfSJg8bVO8ghpSoCJiKJHXzfZqPvw/ahHwNPw=;
-        b=r8RkSqE+qR7LaYol52hD5Dvfbz30XMK7h8IO7ZYcUatnZjYqDyYB9knIneCuG34u0u
-         Q+tnanwGyUBGo30K0/kfsaOThbM8D2oERf9Gb+h5rZ9M7LhehsO4yPxSRVWJRxgtxGnN
-         h9N6G/3dfhWNIHvqwdM+VgQKZHBGB4DP1LC1uU5DbGDm0V+X7xegwK7R9uLvsOtQVprn
-         Ew1cclbTrx528p9yWGPAZoZrH/vJOphp9OMpEES0kZFY6b1eO2GKJkjDkpsGor/B5L/L
-         1XNdnHmga/qB1T/PZbAMMfT7gLKrShkpzMj5CL7/a99AI1lDIXBGuedjDN5tA7BXRNK5
-         S5Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=MCQzjwUfSJg8bVO8ghpSoCJiKJHXzfZqPvw/ahHwNPw=;
-        b=sk2tuUJtJzF3qKgzLw4IU8bikJUALF4dCKQnsn9wQF3VtA2vg6tbsTZgiZh0bWorvd
-         ifaRhsO+Nr5lm6wqgSzalsgYOXBUYFtiNzRGqfLbqMjpvxLS3rFMdOmfqGHrzTVmvy2n
-         XpuEzJRR0em3eMvhnkw7W3a2h8aE4/exq3xMl29hV2/rTedg26YStwTp3kL06fr9+OO2
-         YA22HUwP3mmXnPIfE3LWE+AaoBi25lkphzCXgUhiotU6iFdyCwU85SgIzPSbp+tX2a+p
-         jqlqIRwN5gJvZM76grvuWp1xqB44sOLcrcRuoZi8itGmf/8Whi5R8Yal4mJiD6Zjo2ou
-         HZog==
-X-Gm-Message-State: APjAAAUpAJBgRTdDpuAcCwEFXJyxsw1gkV2efuWntW40x/JTJqWeQbBG
-        82IrDW8iea95JzuSbg5pL10vJYzvbC8kitVuQNoJEEz8
-X-Google-Smtp-Source: APXvYqwQuNZFZzhUZbkicKvWjEpcwSqJAVFAEJ9MRYLTYpXpNAERa2KheVR2ATM+eFC1fFJ24NlNJK8RLN6Zt/a/5BY=
-X-Received: by 2002:a9d:2c47:: with SMTP id f65mr27751467otb.185.1563323413251;
- Tue, 16 Jul 2019 17:30:13 -0700 (PDT)
+        id S1725899AbfGQBRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Jul 2019 21:17:31 -0400
+Received: from mga09.intel.com ([134.134.136.24]:48554 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725850AbfGQBRb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Jul 2019 21:17:31 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jul 2019 18:17:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,272,1559545200"; 
+   d="scan'208";a="366853507"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.165]) ([10.239.196.165])
+  by fmsmga006.fm.intel.com with ESMTP; 16 Jul 2019 18:17:28 -0700
+Subject: Re: [PATCH v7 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, fenghua.yu@intel.com,
+        xiaoyao.li@linux.intel.com, jingqi.liu@intel.com
+References: <20190712082907.29137-1-tao3.xu@intel.com>
+ <20190712082907.29137-3-tao3.xu@intel.com>
+ <20190716160358.GE26800@habkost.net>
+From:   Tao Xu <tao3.xu@intel.com>
+Message-ID: <ec13a518-6dcb-fc87-36e6-31befd62281e@intel.com>
+Date:   Wed, 17 Jul 2019 09:17:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1562376411-3533-1-git-send-email-wanpengli@tencent.com>
- <TY2PR02MB41600B4C6B9FF4A9F8CD957880F30@TY2PR02MB4160.apcprd02.prod.outlook.com>
- <0e05bac0-af49-996a-c5fd-f6c61782ae4f@redhat.com>
-In-Reply-To: <0e05bac0-af49-996a-c5fd-f6c61782ae4f@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 17 Jul 2019 08:30:07 +0800
-Message-ID: <CANRm+Cwi33d5LCNu0JTRkf1W5dSVUOOfqo+QGYe=pd0i=vRXzw@mail.gmail.com>
-Subject: Re: [PATCH v7 0/2] KVM: LAPIC: Implement Exitless Timer
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpeng.li@hotmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190716160358.GE26800@habkost.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Jul 2019 at 22:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/07/19 15:50, Wanpeng Li wrote:
-> > kindly ping=EF=BC=8C
->
-> Sorry, I need more time to review this.  It's basically the only
-> remaining item for the 5.3 merge window, even though it won't be part of
-> the first pull request to Linus.
+On 7/17/2019 12:03 AM, Eduardo Habkost wrote:
+> On Fri, Jul 12, 2019 at 04:29:06PM +0800, Tao Xu wrote:
+>> UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index E1H
+>> to determines the maximum time in TSC-quanta that the processor can reside
+>> in either C0.1 or C0.2.
+>>
+>> This patch emulates MSR IA32_UMWAIT_CONTROL in guest and differentiate
+>> IA32_UMWAIT_CONTROL between host and guest. The variable
+>> mwait_control_cached in arch/x86/power/umwait.c caches the MSR value, so
+>> this patch uses it to avoid frequently rdmsr of IA32_UMWAIT_CONTROL.
+>>
+>> Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
+>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+> [...]
+>> +static void atomic_switch_umwait_control_msr(struct vcpu_vmx *vmx)
+>> +{
+>> +	if (!vmx_has_waitpkg(vmx))
+>> +		return;
+>> +
+>> +	if (vmx->msr_ia32_umwait_control != umwait_control_cached)
+>> +		add_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL,
+>> +			vmx->msr_ia32_umwait_control,
+>> +			umwait_control_cached, false);
+> 
+> How exactly do we ensure NR_AUTOLOAD_MSRS (8) is still large enough?
+> 
+> I see 3 existing add_atomic_switch_msr() calls, but the one at
+> atomic_switch_perf_msrs() is in a loop.  Are we absolutely sure
+> that perf_guest_get_msrs() will never return more than 5 MSRs?
+> 
 
-Thank you! Hope finally we will not miss it. :)
+Quote the code of intel_guest_get_msrs:
 
-Regards,
-Wanpeng Li
+static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
+{
+[...]
+	arr[0].msr = MSR_CORE_PERF_GLOBAL_CTRL;
+	arr[0].host = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
+	arr[0].guest = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_host_mask;
+	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+		arr[0].guest &= ~cpuc->pebs_enabled;
+	else
+		arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
+	*nr = 1;
+
+	if (x86_pmu.pebs && x86_pmu.pebs_no_isolation) {
+[...]
+		arr[1].msr = MSR_IA32_PEBS_ENABLE;
+		arr[1].host = cpuc->pebs_enabled;
+		arr[1].guest = 0;
+		*nr = 2;
+[...]
+
+There are most 2 msrs now. By default umwait is disabled in KVM. So by 
+default there is no MSR_IA32_UMWAIT_CONTROL added into 
+add_atomic_switch_msr().
+
+Thanks.
+> 
+>> +	else
+>> +		clear_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL);
+>> +}
+>> +
+>>   static void vmx_arm_hv_timer(struct vcpu_vmx *vmx, u32 val)
+>>   {
+>>   	vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, val);
+> [...]
+> 
+> 
+
