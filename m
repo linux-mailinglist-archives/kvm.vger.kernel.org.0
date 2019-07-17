@@ -2,215 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 380846BBC5
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 13:47:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66CE96BBD1
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 13:50:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731110AbfGQLrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 07:47:04 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:43871 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbfGQLrE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 07:47:04 -0400
-Received: by mail-pl1-f194.google.com with SMTP id 4so4880521pld.10
-        for <kvm@vger.kernel.org>; Wed, 17 Jul 2019 04:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XH7pgHFzkwihJR5psn/ZNzGH7d1Hcpwg4ypt2aGmLUk=;
-        b=q9rg5oP+7QfRryee4CQfI+zTuO8vcNkAU+Zb8S/XX5gbQKX1OYbsUUbB3B8KK9hFmU
-         UHgvh4Mz+Kyv0D5E5zvwH3nJNYoE2P1kzcK2Rg1yMoExsViP4+PURLjfYPF2WZhrd0MF
-         a+zGI8yxCxdvE8nZGITXCK8/RaYQDCnkR7z8XELwz+GgVBZndcqvcfCaF4ihTHl0HyVo
-         bFY7Esho++ViErb2avPSuS/M58xcsz7oUebcD6xLNGIpCphqGpuQ31GuhoMHpSqGmldC
-         ZKZZNvAff0cBNn4NnOvQXzgW64bJR2BOmy7dIGzstZ5vq+Xgsj3OiBdAV2LIo/WRsiLm
-         aMOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XH7pgHFzkwihJR5psn/ZNzGH7d1Hcpwg4ypt2aGmLUk=;
-        b=CsMLSWwMsDyK1NZ0LH4aG8fwSwGyxLbjv63vxDBtPyeDo5rJgKJTGbz4VvvdG9vgZm
-         IBQn3K4HTBPJuMx+RpOslKPcVrHAWag4MPxzMzlmAw1SrgFvHsCHCZKdQ8CXFiIPjf6A
-         Yyu5w3mKyfi7PcXONciItw+MhMiA75p1jU+83qOGE0zswtGHXLZBTgeImdfcvlpj7bOT
-         pBnmoG47/QeUkWjSD9wPSmNL2hz/NK00oyOKhyHK4tBg3ftGpuSjDJmReTkD+lqAfkFe
-         /vJ74laSO4wNqh/OuaboF4vA00N/YagY815EzTlxDP6tI8TZswOgv0QqTKs1K0BZx9vh
-         dPMA==
-X-Gm-Message-State: APjAAAU9l7O4YjpEiVoFwaeaVf0YiRFAiIdmQHUMQsN5859MuNYh2O71
-        oRtbt4mDEXAnbfRQ6c1m5II8IopwE/smjg20HGF2dg==
-X-Google-Smtp-Source: APXvYqz8S3jyPxed+oPtsIDmi9g4NsD5ItlfcVysZ7+qze2pU/edo+3e3aBEztJRj4XnLTpHjY2eNg/431rKCehxHqk=
-X-Received: by 2002:a17:902:8689:: with SMTP id g9mr39736837plo.252.1563364023206;
- Wed, 17 Jul 2019 04:47:03 -0700 (PDT)
+        id S1726326AbfGQLuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jul 2019 07:50:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45510 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725906AbfGQLuD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 07:50:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id CF44C309174E;
+        Wed, 17 Jul 2019 11:50:02 +0000 (UTC)
+Received: from localhost (dhcp-192-232.str.redhat.com [10.33.192.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 72A4B5D720;
+        Wed, 17 Jul 2019 11:50:00 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH] vfio: re-arrange vfio region definitions
+Date:   Wed, 17 Jul 2019 13:49:56 +0200
+Message-Id: <20190717114956.16263-1-cohuck@redhat.com>
 MIME-Version: 1.0
-References: <cover.1561386715.git.andreyknvl@google.com> <d8e3b9a819e98d6527e506027b173b128a148d3c.1561386715.git.andreyknvl@google.com>
- <20190624175120.GN29120@arrakis.emea.arm.com> <20190717110910.GA12017@rapoport-lnx>
-In-Reply-To: <20190717110910.GA12017@rapoport-lnx>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Wed, 17 Jul 2019 13:46:52 +0200
-Message-ID: <CAAeHK+yB=d_oXOVZ2TuVe2UkBAx-GM_f+mu88JeVWqPO95xVHQ@mail.gmail.com>
-Subject: Re: [PATCH v18 08/15] userfaultfd: untag user pointers
-To:     Mike Rapoport <rppt@linux.ibm.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 17 Jul 2019 11:50:02 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 1:09 PM Mike Rapoport <rppt@linux.ibm.com> wrote:
->
-> On Mon, Jun 24, 2019 at 06:51:21PM +0100, Catalin Marinas wrote:
-> > On Mon, Jun 24, 2019 at 04:32:53PM +0200, Andrey Konovalov wrote:
-> > > This patch is a part of a series that extends kernel ABI to allow to pass
-> > > tagged user pointers (with the top byte set to something else other than
-> > > 0x00) as syscall arguments.
-> > >
-> > > userfaultfd code use provided user pointers for vma lookups, which can
-> > > only by done with untagged pointers.
-> > >
-> > > Untag user pointers in validate_range().
-> > >
-> > > Reviewed-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
-> > > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> > > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > > ---
-> > >  fs/userfaultfd.c | 22 ++++++++++++----------
-> > >  1 file changed, 12 insertions(+), 10 deletions(-)
-> >
-> > Same here, it needs an ack from Al Viro.
->
-> The userfault patches usually go via -mm tree, not sure if Al looks at them :)
+It is easy to miss already defined region types. Let's re-arrange
+the definitions a bit and add more comments to make it hopefully
+a bit clearer.
 
-Ah, OK, I guess than Andrew will take a look at them when merging.
+No functional change.
 
->
-> FWIW, you can add
->
-> Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ include/uapi/linux/vfio.h | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-I will, thanks!
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 8f10748dac79..d9bcf40240be 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -295,15 +295,23 @@ struct vfio_region_info_cap_type {
+ 	__u32 subtype;	/* type specific */
+ };
+ 
++/*
++ * List of region types, global per bus driver.
++ * If you introduce a new type, please add it here.
++ */
++
++/* PCI region type containing a PCI vendor part */
+ #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
+ #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
++#define VFIO_REGION_TYPE_GFX                    (1)
++#define VFIO_REGION_TYPE_CCW			(2)
+ 
+-/* 8086 Vendor sub-types */
++/* 8086 vendor PCI sub-types */
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+ 
+-#define VFIO_REGION_TYPE_GFX                    (1)
++/* GFX sub-types */
+ #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+ 
+ /**
+@@ -353,20 +361,17 @@ struct vfio_region_gfx_edid {
+ #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
+ };
+ 
+-#define VFIO_REGION_TYPE_CCW			(2)
+ /* ccw sub-types */
+ #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+ 
++/* 10de vendor PCI sub-types */
+ /*
+- * 10de vendor sub-type
+- *
+  * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
+  */
+ #define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
+ 
++/* 1014 vendor PCI sub-types*/
+ /*
+- * 1014 vendor sub-type
+- *
+  * IBM NPU NVlink2 ATSD (Address Translation Shootdown) register of NPU
+  * to do TLB invalidation on a GPU.
+  */
+-- 
+2.20.1
 
->
-> > > diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> > > index ae0b8b5f69e6..c2be36a168ca 100644
-> > > --- a/fs/userfaultfd.c
-> > > +++ b/fs/userfaultfd.c
-> > > @@ -1261,21 +1261,23 @@ static __always_inline void wake_userfault(struct userfaultfd_ctx *ctx,
-> > >  }
-> > >
-> > >  static __always_inline int validate_range(struct mm_struct *mm,
-> > > -                                     __u64 start, __u64 len)
-> > > +                                     __u64 *start, __u64 len)
-> > >  {
-> > >     __u64 task_size = mm->task_size;
-> > >
-> > > -   if (start & ~PAGE_MASK)
-> > > +   *start = untagged_addr(*start);
-> > > +
-> > > +   if (*start & ~PAGE_MASK)
-> > >             return -EINVAL;
-> > >     if (len & ~PAGE_MASK)
-> > >             return -EINVAL;
-> > >     if (!len)
-> > >             return -EINVAL;
-> > > -   if (start < mmap_min_addr)
-> > > +   if (*start < mmap_min_addr)
-> > >             return -EINVAL;
-> > > -   if (start >= task_size)
-> > > +   if (*start >= task_size)
-> > >             return -EINVAL;
-> > > -   if (len > task_size - start)
-> > > +   if (len > task_size - *start)
-> > >             return -EINVAL;
-> > >     return 0;
-> > >  }
-> > > @@ -1325,7 +1327,7 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
-> > >             goto out;
-> > >     }
-> > >
-> > > -   ret = validate_range(mm, uffdio_register.range.start,
-> > > +   ret = validate_range(mm, &uffdio_register.range.start,
-> > >                          uffdio_register.range.len);
-> > >     if (ret)
-> > >             goto out;
-> > > @@ -1514,7 +1516,7 @@ static int userfaultfd_unregister(struct userfaultfd_ctx *ctx,
-> > >     if (copy_from_user(&uffdio_unregister, buf, sizeof(uffdio_unregister)))
-> > >             goto out;
-> > >
-> > > -   ret = validate_range(mm, uffdio_unregister.start,
-> > > +   ret = validate_range(mm, &uffdio_unregister.start,
-> > >                          uffdio_unregister.len);
-> > >     if (ret)
-> > >             goto out;
-> > > @@ -1665,7 +1667,7 @@ static int userfaultfd_wake(struct userfaultfd_ctx *ctx,
-> > >     if (copy_from_user(&uffdio_wake, buf, sizeof(uffdio_wake)))
-> > >             goto out;
-> > >
-> > > -   ret = validate_range(ctx->mm, uffdio_wake.start, uffdio_wake.len);
-> > > +   ret = validate_range(ctx->mm, &uffdio_wake.start, uffdio_wake.len);
-> > >     if (ret)
-> > >             goto out;
-> > >
-> > > @@ -1705,7 +1707,7 @@ static int userfaultfd_copy(struct userfaultfd_ctx *ctx,
-> > >                        sizeof(uffdio_copy)-sizeof(__s64)))
-> > >             goto out;
-> > >
-> > > -   ret = validate_range(ctx->mm, uffdio_copy.dst, uffdio_copy.len);
-> > > +   ret = validate_range(ctx->mm, &uffdio_copy.dst, uffdio_copy.len);
-> > >     if (ret)
-> > >             goto out;
-> > >     /*
-> > > @@ -1761,7 +1763,7 @@ static int userfaultfd_zeropage(struct userfaultfd_ctx *ctx,
-> > >                        sizeof(uffdio_zeropage)-sizeof(__s64)))
-> > >             goto out;
-> > >
-> > > -   ret = validate_range(ctx->mm, uffdio_zeropage.range.start,
-> > > +   ret = validate_range(ctx->mm, &uffdio_zeropage.range.start,
-> > >                          uffdio_zeropage.range.len);
-> > >     if (ret)
-> > >             goto out;
-> > > --
-> > > 2.22.0.410.gd8fdbe21b5-goog
->
-> --
-> Sincerely yours,
-> Mike.
->
