@@ -2,153 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C7226B9F0
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 12:19:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7184A6B9FE
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 12:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725936AbfGQKTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 06:19:47 -0400
-Received: from foss.arm.com ([217.140.110.172]:45536 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725873AbfGQKTr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 06:19:47 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C88F428;
-        Wed, 17 Jul 2019 03:19:44 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F31903F71A;
-        Wed, 17 Jul 2019 03:19:43 -0700 (PDT)
-Subject: Re: [PATCH 55/59] arm64: KVM: nv: Add handling of EL2-specific timer
- registers
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-56-marc.zyngier@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <9dca3fa9-e02b-ad4a-f9d0-0d637177b932@arm.com>
-Date:   Wed, 17 Jul 2019 11:19:42 +0100
+        id S1726900AbfGQKW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jul 2019 06:22:28 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35471 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbfGQKW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 06:22:28 -0400
+Received: by mail-wm1-f67.google.com with SMTP id l2so21569381wmg.0
+        for <kvm@vger.kernel.org>; Wed, 17 Jul 2019 03:22:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jLTb8XaQwDXkfXSX6rjJzVtQ/s+CDif4rrylvctVb1E=;
+        b=IaCvhCuEVYehtPEPZXsXPCXXD/sXCK1EOm+rLKM1QzcsOENWXKVZUln9NDGBCLPay4
+         4bNCaQoL+wpSQ3otQfYuJbmDhYQIZ0pIuKM6DgPhTR85W1TmSzk8ywCy9+oeaYFrsHya
+         XJKwg7BrTa+jtW51vHeUDCDHmtCjJZlsEhUpfk5prm110OJntkFW08F3GJojNtom3vf6
+         qSI1CX97fHGYLSVV/7ZvJSkAfXhHgvusPPnU2LVHfXSEDIks8GSdmhkKpP9CUIVBKnPR
+         a2ER18+5rx8rDf37t2lbLxfEjv9sMEQT447MWThiX+GwycTRasqcQVqXrfT919O5AA1M
+         Fdfw==
+X-Gm-Message-State: APjAAAWGRW+OnXpzgm5PcEQpG8qyxfNXlyLbrQe1cpJvJ1VlA+YCOuBI
+        6e0mgbxmxNfyk+YBF6qMKW7LAKePHWzoRg==
+X-Google-Smtp-Source: APXvYqxg7asgftVlbHdDAy8AZswsqWfMo4yX1870wYoGzbxKjR9+cxc4Cqnn60F61CBtgD5q5kG7wg==
+X-Received: by 2002:a05:600c:212:: with SMTP id 18mr4545813wmi.88.1563358945785;
+        Wed, 17 Jul 2019 03:22:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+        by smtp.gmail.com with ESMTPSA id h133sm24198066wme.28.2019.07.17.03.22.24
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 17 Jul 2019 03:22:25 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: x86: PMU Event Filter
+To:     Wei Wang <wei.w.wang@intel.com>,
+        Eric Hankland <ehankland@google.com>
+Cc:     rkrcmar@redhat.com, linux-kernel@vger.kernel.org,
+        Stephane Eranian <eranian@google.com>, kvm@vger.kernel.org
+References: <CAOyeoRUUK+T_71J=+zcToyL93LkpARpsuWSfZS7jbJq=wd1rQg@mail.gmail.com>
+ <5D27FE26.1050002@intel.com>
+ <CAOyeoRV5=6pR7=sFZ+gU68L4rORjRaYDLxQrZb1enaWO=d_zpA@mail.gmail.com>
+ <5D2D8FB4.3020505@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5580889b-e357-e7bc-88e6-d68c4a23dd64@redhat.com>
+Date:   Wed, 17 Jul 2019 12:22:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-56-marc.zyngier@arm.com>
+In-Reply-To: <5D2D8FB4.3020505@intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/19 10:38 AM, Marc Zyngier wrote:
-> Add the required handling for EL2 and EL02 registers, as
-> well as EL1 registers used in the E2H context.
+On 16/07/19 10:49, Wei Wang wrote:
+> {
+>   KVM_PMU_EVENT_ACTION_GP_NONE = 0,
+>   KVM_PMU_EVENT_ACTION_GP_ACCEPT = 1,
+>   KVM_PMU_EVENT_ACTION_GP_REJECT = 2,
+>   KVM_PMU_EVENT_ACTION_MAX
+> };
+> 
+> and add comments to explain something like below:
+> 
+> Those GP actions are for the filtering of guest events running on the
+> virtual general
+> purpose counters. The actions to filter guest events running on the
+> virtual fixed
+> function counters are not added currently as they all seem fine to be
+> used by the
+> guest so far, but that could be supported on demand in the future via
+> adding new
+> actions.
+> 
 
-Shouldn't that be "[..] EL0 registers used in E2H context"?
+Let's just implement the bitmap of fixed counters (it's okay to follow
+the same action as gp counters), and add it to struct
+kvm_pmu_event_filter.  While at it, we can add a bunch of padding u32s
+and a flags field that can come in handy later (it would fail the ioctl
+if nonzero).
 
-Thanks,
-Alex
->
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 72 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 72 insertions(+)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index ba3bcd29c02d..0bd6a66b621e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1361,20 +1361,92 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  
->  	switch (reg) {
->  	case SYS_CNTP_TVAL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_TVAL:
-> +	case SYS_CNTP_TVAL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_TVAL;
->  		break;
-> +
-> +	case SYS_CNTV_TVAL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
-> +	case SYS_CNTHP_TVAL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
-> +	case SYS_CNTHV_TVAL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
->  	case SYS_CNTP_CTL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CTL:
-> +	case SYS_CNTP_CTL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_CTL;
->  		break;
-> +
-> +	case SYS_CNTV_CTL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
-> +	case SYS_CNTHP_CTL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
-> +	case SYS_CNTHV_CTL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +		
->  	case SYS_CNTP_CVAL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CVAL:
-> +	case SYS_CNTP_CVAL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_CVAL;
->  		break;
-> +
-> +	case SYS_CNTV_CVAL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
-> +	case SYS_CNTHP_CVAL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
-> +	case SYS_CNTHV_CVAL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
->  	case SYS_CNTVOFF_EL2:
->  		tmr = TIMER_VTIMER;
->  		treg = TIMER_REG_VOFF;
+Wei, Eric, who's going to do it? :)
+
+Paolo
