@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3835F6B979
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 11:44:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34AA16B97B
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2019 11:44:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726275AbfGQJn5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 05:43:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52806 "EHLO mx1.redhat.com"
+        id S1726991AbfGQJoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Jul 2019 05:44:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40728 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725890AbfGQJn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 05:43:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1726326AbfGQJoA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 05:44:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B23E781F1B;
-        Wed, 17 Jul 2019 09:43:56 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id A117E300CB04;
+        Wed, 17 Jul 2019 09:43:59 +0000 (UTC)
 Received: from localhost (dhcp-192-232.str.redhat.com [10.33.192.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F67560BFC;
-        Wed, 17 Jul 2019 09:43:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F2671001DC3;
+        Wed, 17 Jul 2019 09:43:58 +0000 (UTC)
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
@@ -27,50 +27,74 @@ Cc:     Farhan Ali <alifm@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-Subject: [PULL v2 0/6] vfio-ccw fixes for 5.3
-Date:   Wed, 17 Jul 2019 11:43:44 +0200
-Message-Id: <20190717094350.13620-1-cohuck@redhat.com>
+Subject: [PULL v2 1/6] vfio-ccw: Fix misleading comment when setting orb.cmd.c64
+Date:   Wed, 17 Jul 2019 11:43:45 +0200
+Message-Id: <20190717094350.13620-2-cohuck@redhat.com>
+In-Reply-To: <20190717094350.13620-1-cohuck@redhat.com>
+References: <20190717094350.13620-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 17 Jul 2019 09:43:56 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 17 Jul 2019 09:43:59 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 9a159190414d461fdac7ae5bb749c2d532b35419:
+From: Farhan Ali <alifm@linux.ibm.com>
 
-  s390/unwind: avoid int overflow in outside_of_stack (2019-07-11 20:40:02 +0200)
+The comment is misleading because it tells us that
+we should set orb.cmd.c64 before calling ccwchain_calc_length,
+otherwise the function ccwchain_calc_length would return an
+error. This is not completely accurate.
 
-are available in the Git repository at:
+We want to allow an orb without cmd.c64, and this is fine
+as long as the channel program does not use IDALs. But we do
+want to reject any channel program that uses IDALs and does
+not set the flag, which is what we do in ccwchain_calc_length.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git tags/vfio-ccw-20190717-2
+After we have done the ccw processing, we need to set cmd.c64,
+as we use IDALs for all translated channel programs.
 
-for you to fetch changes up to 4c4cbbaa693a5cc435664f2f220c8b0be873abd1:
+Also for better code readability let's move the setting of
+cmd.c64 within the non error path.
 
-  Documentation: fix vfio-ccw doc (2019-07-17 11:35:35 +0200)
+Fixes: fb9e7880af35 ("vfio: ccw: push down unsupported IDA check")
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <f68636106aef0faeb6ce9712584d102d1b315ff8.1562854091.git.alifm@linux.ibm.com>
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ drivers/s390/cio/vfio_ccw_cp.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-----------------------------------------------------------------
-Fixes in vfio-ccw for older and newer issues.
-
-----------------------------------------------------------------
-
-Cornelia Huck (1):
-  Documentation: fix vfio-ccw doc
-
-Farhan Ali (5):
-  vfio-ccw: Fix misleading comment when setting orb.cmd.c64
-  vfio-ccw: Fix memory leak and don't call cp_free in cp_init
-  vfio-ccw: Set pa_nr to 0 if memory allocation fails for pa_iova_pfn
-  vfio-ccw: Don't call cp_free if we are processing a channel program
-  vfio-ccw: Update documentation for csch/hsch
-
- Documentation/s390/vfio-ccw.rst | 31 ++++++++++++++++++++++++++++---
- drivers/s390/cio/vfio_ccw_cp.c  | 28 +++++++++++++++++-----------
- drivers/s390/cio/vfio_ccw_drv.c |  2 +-
- 3 files changed, 46 insertions(+), 15 deletions(-)
-
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index 1d4c893ead23..46967c664c0f 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -645,14 +645,15 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+ 	if (ret)
+ 		cp_free(cp);
+ 
+-	/* It is safe to force: if not set but idals used
+-	 * ccwchain_calc_length returns an error.
+-	 */
+-	cp->orb.cmd.c64 = 1;
+-
+-	if (!ret)
++	if (!ret) {
+ 		cp->initialized = true;
+ 
++		/* It is safe to force: if it was not set but idals used
++		 * ccwchain_calc_length would have returned an error.
++		 */
++		cp->orb.cmd.c64 = 1;
++	}
++
+ 	return ret;
+ }
+ 
 -- 
 2.20.1
 
