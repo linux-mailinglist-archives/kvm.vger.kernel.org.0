@@ -2,178 +2,354 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E5EF6CCFE
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 12:50:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 925BB6CD4C
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 13:21:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727131AbfGRKu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 06:50:27 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43617 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726608AbfGRKu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 06:50:27 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p13so28126792wru.10
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 03:50:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=r/6N+NqUcfNUhaLvc/XebCwHV0my/Y+ood81huzepL4=;
-        b=MjX3VOZEcx804g0f53DUBh4qCS8x+YQp3hBhiTZD86ZDmT3MUAVelvaTpprt7vASnb
-         0IXmea3IRFt3JKkB5oG5umMso2X3YoDUspuWYeHn+Y9Pmlp6W+SSCGXEPf83U5aenl07
-         3EiD+QgrDHVc2PGzgzLyR+K6fNYrI/kRc4DrDIq1Gifw5eYIcE7+KSev+eeH0zb8l15j
-         2il9jeNU7AdwMrG7yXOKB/2OgidONB8nAya1Mrpc4kizgiJol+cViUn0Hk3X37BeoNdk
-         1/Ga7yTv5phfeyx4kEgQjIqZnjnYrxlgMIWbCvXDqHdPpNPTDAxgUWSLIjrw8RBPdlyf
-         NLeQ==
-X-Gm-Message-State: APjAAAWuNLD6O4MFeksrEh1yPJTEgZT2tXK8mogV16FDxXmCNIEpk/Q4
-        5B+xd4+Vz8fSXenwOmoaN1yEY5ydIebNeA==
-X-Google-Smtp-Source: APXvYqxDEd0BHdy/LnKTX0FqAAxAAhRgawn6cQuZMDEm2oFxCN05FuKmdpRDPiLbogbas8mX6C7cJQ==
-X-Received: by 2002:adf:9ece:: with SMTP id b14mr365651wrf.192.1563447024327;
-        Thu, 18 Jul 2019 03:50:24 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
-        by smtp.gmail.com with ESMTPSA id l17sm13512499wrr.94.2019.07.18.03.50.23
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Jul 2019 03:50:23 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: SVM: Fix detection of AMD Errata 1096
-To:     Liran Alon <liran.alon@oracle.com>, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Cc:     Singh Brijesh <brijesh.singh@amd.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-References: <20190716235658.18185-1-liran.alon@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f011a43e-6bd3-0a90-fc19-a5b075994aa3@redhat.com>
-Date:   Thu, 18 Jul 2019 12:50:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S2390094AbfGRLVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 07:21:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10382 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726608AbfGRLVL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jul 2019 07:21:11 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6IB68YE038296
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 07:21:09 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ttq5qhjdq-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 07:21:09 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Thu, 18 Jul 2019 12:21:07 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 18 Jul 2019 12:21:02 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6IBL0lK56098986
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Jul 2019 11:21:00 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 92BAC11C058;
+        Thu, 18 Jul 2019 11:21:00 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37D5711C04C;
+        Thu, 18 Jul 2019 11:21:00 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.219])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Jul 2019 11:21:00 +0000 (GMT)
+Date:   Thu, 18 Jul 2019 13:20:49 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Vivek Goyal <vgoyal@redhat.com>, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-nvdimm@lists.01.org, miklos@szeredi.hu, stefanha@redhat.com,
+        dgilbert@redhat.com, swhiteho@redhat.com,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Collin Walling <walling@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 18/30] virtio_fs, dax: Set up virtio_fs dax_device
+In-Reply-To: <20190718110417.561f6475.cohuck@redhat.com>
+References: <20190515192715.18000-1-vgoyal@redhat.com>
+        <20190515192715.18000-19-vgoyal@redhat.com>
+        <20190717192725.25c3d146.pasic@linux.ibm.com>
+        <20190718110417.561f6475.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190716235658.18185-1-liran.alon@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19071811-0008-0000-0000-000002FEA506
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19071811-0009-0000-0000-0000226C22D8
+Message-Id: <20190718132049.37bea675.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-18_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907180122
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/07/19 01:56, Liran Alon wrote:
-> AMD Errata 1096:
-> When CPU raise #NPF on guest data access and vCPU CR4.SMAP=1, it is
-> possible that CPU microcode implementing DecodeAssist will fail
-> to read bytes of instruction which caused #NPF. In this case,
-> GuestIntrBytes field of the VMCB on a VMEXIT will incorrectly
-> return 0 instead of the correct guest instruction bytes.
-> This happens because CPU microcode reading instruction bytes
-> uses a special opcode which attempts to read data using CPL=0
-> priviledges. The microcode reads CS:RIP and if it hits a SMAP
-> fault, it gives up and returns no instruction bytes.
+On Thu, 18 Jul 2019 11:04:17 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Wed, 17 Jul 2019 19:27:25 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> Current KVM code which attemps to detect and workaround this errata have
-> multiple issues:
+> > On Wed, 15 May 2019 15:27:03 -0400
+> > Vivek Goyal <vgoyal@redhat.com> wrote:
+> > 
+> > > From: Stefan Hajnoczi <stefanha@redhat.com>
+> > > 
+> > > Setup a dax device.
+> > > 
+> > > Use the shm capability to find the cache entry and map it.
+> > > 
+> > > The DAX window is accessed by the fs/dax.c infrastructure and must have
+> > > struct pages (at least on x86).  Use devm_memremap_pages() to map the
+> > > DAX window PCI BAR and allocate struct page.
+> > >  
+> > 
+> > Sorry for being this late. I don't see any more recent version so I will
+> > comment here.
 > 
-> 1) Code mistakenly checks if vCPU CR4.SMAP=0 instead of vCPU CR4.SMAP=1 which
-> is required for encountering a SMAP fault.
+> [Yeah, this one has been sitting in my to-review queue far too long as
+> well :(]
 > 
-> 2) Code assumes SMAP fault can only occur when vCPU CPL==3.
-> However, the condition for a SMAP fault is a data access with CPL<3
-> to a page mapped in page-tables as user-accessible (i.e. PTE with U/S
-> bit set to 1).
-> Therefore, in case vCPU CR4.SMEP=0, guest can execute an instruction
-> which reside in a user-accessible page with CPL<3 priviledge. If this
-> instruction raise a #NPF on it's data access, then CPU DecodeAssist
-> microcode will still encounter a SMAP violation.
-> Even though no sane OS will do so (as it's an obvious priviledge
-> escalation vulnerability), we still need to handle this semanticly
-> correct in KVM side.
+> > 
+> > I'm trying to figure out how is this supposed to work on s390. My concern
+> > is, that on s390 PCI memory needs to be accessed by special
+> > instructions. This is taken care of by the stuff defined in
+> > arch/s390/include/asm/io.h. E.g. we 'override' __raw_writew so it uses
+> > the appropriate s390 instruction. However if the code does not use the
+> > linux abstractions for accessing PCI memory, but assumes it can be
+> > accessed like RAM, we have a problem.
+> > 
+> > Looking at this patch, it seems to me, that we might end up with exactly
+> > the case described. For example AFAICT copy_to_iter() (3) resolves to
+> > the function in lib/iov_iter.c which does not seem to cater for s390
+> > oddities.
 > 
-> As CR4.SMAP=1 is an easy triggerable condition, attempt to avoid
-> false-positive of detecting errata by taking note that in case vCPU
-> CR4.SMEP=1, errata could only be encountered in case CPL==3 (As
-> otherwise, CPU would raise SMEP fault to guest instead of #NPF).
-> This can be a useful condition to avoid false-positive because guests
-> usually enable SMAP if they have also enabled SMEP.
-> 
-> In addition, to avoid future confusion and improve code readbility,
-> comment errata details in code and not just in commit message.
-> 
-> Fixes: 05d5a4863525 ("KVM: SVM: Workaround errata#1096 (insn_len maybe zero on SMAP violation)")
-> Cc: Singh Brijesh <brijesh.singh@amd.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  arch/x86/kvm/svm.c | 42 +++++++++++++++++++++++++++++++++++-------
->  1 file changed, 35 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 735b8c01895e..7d6410539dd7 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -7120,13 +7120,41 @@ static int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->  
->  static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
->  {
-> -	bool is_user, smap;
-> -
-> -	is_user = svm_get_cpl(vcpu) == 3;
-> -	smap = !kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
-> +	unsigned long cr4 = kvm_read_cr4(vcpu);
-> +	bool smep = cr4 & X86_CR4_SMEP;
-> +	bool smap = cr4 & X86_CR4_SMAP;
-> +	bool is_user = svm_get_cpl(vcpu) == 3;
->  
->  	/*
-> -	 * Detect and workaround Errata 1096 Fam_17h_00_0Fh
-> +	 * Detect and workaround Errata 1096 Fam_17h_00_0Fh.
-> +	 *
-> +	 * Errata:
-> +	 * When CPU raise #NPF on guest data access and vCPU CR4.SMAP=1, it is
-> +	 * possible that CPU microcode implementing DecodeAssist will fail
-> +	 * to read bytes of instruction which caused #NPF. In this case,
-> +	 * GuestIntrBytes field of the VMCB on a VMEXIT will incorrectly
-> +	 * return 0 instead of the correct guest instruction bytes.
-> +	 *
-> +	 * This happens because CPU microcode reading instruction bytes
-> +	 * uses a special opcode which attempts to read data using CPL=0
-> +	 * priviledges. The microcode reads CS:RIP and if it hits a SMAP
-> +	 * fault, it gives up and returns no instruction bytes.
-> +	 *
-> +	 * Detection:
-> +	 * We reach here in case CPU supports DecodeAssist, raised #NPF and
-> +	 * returned 0 in GuestIntrBytes field of the VMCB.
-> +	 * First, errata can only be triggered in case vCPU CR4.SMAP=1.
-> +	 * Second, if vCPU CR4.SMEP=1, errata could only be triggered
-> +	 * in case vCPU CPL==3 (Because otherwise guest would have triggered
-> +	 * a SMEP fault instead of #NPF).
-> +	 * Otherwise, vCPU CR4.SMEP=0, errata could be triggered by any vCPU CPL.
-> +	 * As most guests enable SMAP if they have also enabled SMEP, use above
-> +	 * logic in order to attempt minimize false-positive of detecting errata
-> +	 * while still preserving all cases semantic correctness.
-> +	 *
-> +	 * Workaround:
-> +	 * To determine what instruction the guest was executing, the hypervisor
-> +	 * will have to decode the instruction at the instruction pointer.
->  	 *
->  	 * In non SEV guest, hypervisor will be able to read the guest
->  	 * memory to decode the instruction pointer when insn_len is zero
-> @@ -7137,11 +7165,11 @@ static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
->  	 * instruction pointer so we will not able to workaround it. Lets
->  	 * print the error and request to kill the guest.
->  	 */
-> -	if (is_user && smap) {
-> +	if (smap && (!smep || is_user)) {
->  		if (!sev_guest(vcpu->kvm))
->  			return true;
->  
-> -		pr_err_ratelimited("KVM: Guest triggered AMD Erratum 1096\n");
-> +		pr_err_ratelimited("KVM: SEV Guest triggered AMD Erratum 1096\n");
->  		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
->  	}
->  
+> What about the new pci instructions recently introduced? Not sure how
+> they differ from the old ones (which are currently the only ones
+> supported in QEMU...), but I'm pretty sure they are supposed to solve
+> an issue :)
 > 
 
-Queued, subject to Brijesh's answer on guest CR4.SMAP vs host CR4.SMAP.
+I'm struggling to find the connection between this topic and the new pci
+instructions. Can you please explain in more detail?
 
-Paolo
+> > 
+> > I didn't have the time to investigate this properly, and since virtio-fs
+> > is virtual, we may be able to get around what is otherwise a
+> > limitation on s390. My understanding of these areas is admittedly
+> > shallow, and since I'm not sure I'll have much more time to
+> > invest in the near future I decided to raise concern.
+> > 
+> > Any opinions?
+> 
+> Let me point to the thread starting at
+> https://marc.info/?l=linux-s390&m=155048406205221&w=2 as well. That
+> memory region stuff is still unsolved for ccw, and I'm not sure if we
+> need to do something for zpci as well.
+> 
+
+Right virtio-ccw is another problem, but at least there we don't have the
+need to limit ourselves to a very specific set of instructions (for
+accessing memory).
+
+zPCI i.e. virtio-pci on z should require much less dedicated love if any
+at all. Unfortunately I'm not very knowledgeable on either PCI in general
+or its s390 variant.
+
+> Does s390 work with DAX at all? ISTR that DAX evolved from XIP, so I
+> thought it did?
+> 
+
+Documentation/filesystems/dax.txt even mentions dcssblk: s390 dcss block
+device driver as a source of inspiration. So I suppose it does work.
+
+Regards,
+Halil
+
+> > 
+> > [CCing some s390 people who are probably more knowledgeable than my
+> > on these matters.]
+> > 
+> > Regards,
+> > Halil
+> > 
+> > 
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> > > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> > > Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+> > > ---  
+> > 
+> > [..]
+> >   
+> > > +/* Map a window offset to a page frame number.  The window offset
+> > > will have
+> > > + * been produced by .iomap_begin(), which maps a file offset to a
+> > > window
+> > > + * offset.
+> > > + */
+> > > +static long virtio_fs_direct_access(struct dax_device *dax_dev,
+> > > pgoff_t pgoff,
+> > > +				    long nr_pages, void **kaddr,
+> > > pfn_t *pfn) +{
+> > > +	struct virtio_fs *fs = dax_get_private(dax_dev);
+> > > +	phys_addr_t offset = PFN_PHYS(pgoff);
+> > > +	size_t max_nr_pages = fs->window_len/PAGE_SIZE - pgoff;
+> > > +
+> > > +	if (kaddr)
+> > > +		*kaddr = fs->window_kaddr + offset;  
+> > 
+> > (2) Here we use fs->window_kaddr, basically directing the access to
+> > the virtio shared memory region.
+> > 
+> > > +	if (pfn)
+> > > +		*pfn = phys_to_pfn_t(fs->window_phys_addr +
+> > > offset,
+> > > +					PFN_DEV | PFN_MAP);
+> > > +	return nr_pages > max_nr_pages ? max_nr_pages : nr_pages;
+> > > +}
+> > > +
+> > > +static size_t virtio_fs_copy_from_iter(struct dax_device *dax_dev,
+> > > +				       pgoff_t pgoff, void *addr,
+> > > +				       size_t bytes, struct
+> > > iov_iter *i) +{
+> > > +	return copy_from_iter(addr, bytes, i);
+> > > +}
+> > > +
+> > > +static size_t virtio_fs_copy_to_iter(struct dax_device *dax_dev,
+> > > +				       pgoff_t pgoff, void *addr,
+> > > +				       size_t bytes, struct
+> > > iov_iter *i) +{
+> > > +	return copy_to_iter(addr, bytes, i);  
+> > 
+> > (3) And this should be the access to it. Which does not seem to use.
+> > 
+> > > +}
+> > > +
+> > > +static const struct dax_operations virtio_fs_dax_ops = {
+> > > +	.direct_access = virtio_fs_direct_access,
+> > > +	.copy_from_iter = virtio_fs_copy_from_iter,
+> > > +	.copy_to_iter = virtio_fs_copy_to_iter,
+> > > +};
+> > > +
+> > > +static void virtio_fs_percpu_release(struct percpu_ref *ref)
+> > > +{
+> > > +	struct virtio_fs_memremap_info *mi =
+> > > +		container_of(ref, struct virtio_fs_memremap_info,
+> > > ref); +
+> > > +	complete(&mi->completion);
+> > > +}
+> > > +
+> > > +static void virtio_fs_percpu_exit(void *data)
+> > > +{
+> > > +	struct virtio_fs_memremap_info *mi = data;
+> > > +
+> > > +	wait_for_completion(&mi->completion);
+> > > +	percpu_ref_exit(&mi->ref);
+> > > +}
+> > > +
+> > > +static void virtio_fs_percpu_kill(struct percpu_ref *ref)
+> > > +{
+> > > +	percpu_ref_kill(ref);
+> > > +}
+> > > +
+> > > +static void virtio_fs_cleanup_dax(void *data)
+> > > +{
+> > > +	struct virtio_fs *fs = data;
+> > > +
+> > > +	kill_dax(fs->dax_dev);
+> > > +	put_dax(fs->dax_dev);
+> > > +}
+> > > +
+> > > +static int virtio_fs_setup_dax(struct virtio_device *vdev, struct
+> > > virtio_fs *fs) +{
+> > > +	struct virtio_shm_region cache_reg;
+> > > +	struct virtio_fs_memremap_info *mi;
+> > > +	struct dev_pagemap *pgmap;
+> > > +	bool have_cache;
+> > > +	int ret;
+> > > +
+> > > +	if (!IS_ENABLED(CONFIG_DAX_DRIVER))
+> > > +		return 0;
+> > > +
+> > > +	/* Get cache region */
+> > > +	have_cache = virtio_get_shm_region(vdev,
+> > > +					   &cache_reg,
+> > > +
+> > > (u8)VIRTIO_FS_SHMCAP_ID_CACHE);
+> > > +	if (!have_cache) {
+> > > +		dev_err(&vdev->dev, "%s: No cache capability\n",
+> > > __func__);
+> > > +		return -ENXIO;
+> > > +	} else {
+> > > +		dev_notice(&vdev->dev, "Cache len: 0x%llx @
+> > > 0x%llx\n",
+> > > +			   cache_reg.len, cache_reg.addr);
+> > > +	}
+> > > +
+> > > +	mi = devm_kzalloc(&vdev->dev, sizeof(*mi), GFP_KERNEL);
+> > > +	if (!mi)
+> > > +		return -ENOMEM;
+> > > +
+> > > +	init_completion(&mi->completion);
+> > > +	ret = percpu_ref_init(&mi->ref, virtio_fs_percpu_release,
+> > > 0,
+> > > +			      GFP_KERNEL);
+> > > +	if (ret < 0) {
+> > > +		dev_err(&vdev->dev, "%s: percpu_ref_init failed
+> > > (%d)\n",
+> > > +			__func__, ret);
+> > > +		return ret;
+> > > +	}
+> > > +
+> > > +	ret = devm_add_action(&vdev->dev, virtio_fs_percpu_exit,
+> > > mi);
+> > > +	if (ret < 0) {
+> > > +		percpu_ref_exit(&mi->ref);
+> > > +		return ret;
+> > > +	}
+> > > +
+> > > +	pgmap = &mi->pgmap;
+> > > +	pgmap->altmap_valid = false;
+> > > +	pgmap->ref = &mi->ref;
+> > > +	pgmap->kill = virtio_fs_percpu_kill;
+> > > +	pgmap->type = MEMORY_DEVICE_FS_DAX;
+> > > +
+> > > +	/* Ideally we would directly use the PCI BAR resource but
+> > > +	 * devm_memremap_pages() wants its own copy in pgmap.  So
+> > > +	 * initialize a struct resource from scratch (only the
+> > > start
+> > > +	 * and end fields will be used).
+> > > +	 */
+> > > +	pgmap->res = (struct resource){
+> > > +		.name = "virtio-fs dax window",
+> > > +		.start = (phys_addr_t) cache_reg.addr,
+> > > +		.end = (phys_addr_t) cache_reg.addr +
+> > > cache_reg.len - 1,
+> > > +	};
+> > > +
+> > > +	fs->window_kaddr = devm_memremap_pages(&vdev->dev,
+> > > pgmap);  
+> > 
+> > (1) Here we assign fs->window_kaddr basically from the virtio shm
+> > region.
+> > 
+> > > +	if (IS_ERR(fs->window_kaddr))
+> > > +		return PTR_ERR(fs->window_kaddr);
+> > > +
+> > > +	fs->window_phys_addr = (phys_addr_t) cache_reg.addr;
+> > > +	fs->window_len = (phys_addr_t) cache_reg.len;
+> > > +
+> > > +	dev_dbg(&vdev->dev, "%s: window kaddr 0x%px phys_addr
+> > > 0x%llx"
+> > > +		" len 0x%llx\n", __func__, fs->window_kaddr,
+> > > cache_reg.addr,
+> > > +		cache_reg.len);
+> > > +
+> > > +	fs->dax_dev = alloc_dax(fs, NULL, &virtio_fs_dax_ops);
+> > > +	if (!fs->dax_dev)
+> > > +		return -ENOMEM;
+> > > +
+> > > +	return devm_add_action_or_reset(&vdev->dev,
+> > > virtio_fs_cleanup_dax, fs); +}
+> > > +  
+> > 
+> > [..]
+> > 
+> 
+
