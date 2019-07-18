@@ -2,104 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 485AC6CB20
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 10:44:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 845486CB78
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 11:05:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389572AbfGRIni (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 04:43:38 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:42299 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726488AbfGRInh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 04:43:37 -0400
-Received: by mail-ot1-f66.google.com with SMTP id l15so28152163otn.9;
-        Thu, 18 Jul 2019 01:43:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=d2Q3qNlicAJFSj13hQsbAPBZr2sr3JIHVAU8/U9TgNw=;
-        b=NKuW4qeRZrqPwnUXP5Y15D4GRPwypc0idrFTYQ+p1hW4EGtRC1hFQCLVQrW/IaLw3G
-         2y1M35J86sAKLEGvwJHL8nNn4z5ploMmTVLoBYRhaMMNlDsah1foDMMtdGAXakBlOZe6
-         SghOlESbA2vA1zwz5uGrJN8bNJgA2vJ4J1jhh6w9nxSoTEXWMeGXJ74xwTuIfmXG86GS
-         HVmhG2ad/5ic79f5pSCAx85O0ckrkCb/eT68neFVfF9oV8biQNXBhV2ngQ6bPuKXftp/
-         rXcj9lDL/ifeVKw9+W17/+TGo6Lrl+3/znt+l9+UrODwg64f00L8M8LwHGbWzfnHucye
-         kKLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=d2Q3qNlicAJFSj13hQsbAPBZr2sr3JIHVAU8/U9TgNw=;
-        b=Z9SFDA4cBL4QOB5afzmwf8BPtLEUhP13/QRp+boeCH41t9M54j2sqgmdxYy1EXuWWY
-         EdguwE8A+u5WWDaKbdJDr62FAHY9Y51lwnss/85Rk6TOenXWWN7CwL4U1tFMKkhUK3dc
-         wo5O8azIbhS6mBDKFrSTgGxw9LDqBq03brRwj21d2doUiWeOgLOIfP/eO81hiSyBOy3d
-         tpnczSyPsYoJS2G0/espkHvuQRlcdXblkpoKPWX2Tz2gS187nMLiRzKwQtbpTg3mP6Xg
-         PMWwL12b/EIxNbQP7h3CMwLwdvn5XrK0s/rC81g3nsS65Exi/ugGH01NDqn0aheUvsF7
-         lmjg==
-X-Gm-Message-State: APjAAAUiNxOiOlk+nSApO1hn4Met4SiUF2YQ6JqJ+SDjpYzvk0kz2iQT
-        LEOIRhY+Tkve6KnyM9CdmhHlnuFQ0TASh85XVc0=
-X-Google-Smtp-Source: APXvYqy0R2wRkwvHCqhND6qiR8C+r9+t40Iz3gOZu8JnZ2J+eHk5DYXaB9ecsGeIP1uWTKH8nJdjYqoOn1YeQ07lQ2A=
-X-Received: by 2002:a9d:2c47:: with SMTP id f65mr34015931otb.185.1563439416885;
- Thu, 18 Jul 2019 01:43:36 -0700 (PDT)
+        id S2389534AbfGRJE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 05:04:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39012 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726488AbfGRJE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 05:04:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4492D3179157;
+        Thu, 18 Jul 2019 09:04:27 +0000 (UTC)
+Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 48FA760C70;
+        Thu, 18 Jul 2019 09:04:20 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 11:04:17 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Vivek Goyal <vgoyal@redhat.com>, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-nvdimm@lists.01.org, miklos@szeredi.hu, stefanha@redhat.com,
+        dgilbert@redhat.com, swhiteho@redhat.com,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Collin Walling <walling@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 18/30] virtio_fs, dax: Set up virtio_fs dax_device
+Message-ID: <20190718110417.561f6475.cohuck@redhat.com>
+In-Reply-To: <20190717192725.25c3d146.pasic@linux.ibm.com>
+References: <20190515192715.18000-1-vgoyal@redhat.com>
+        <20190515192715.18000-19-vgoyal@redhat.com>
+        <20190717192725.25c3d146.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
- <f95fbf72-090f-fb34-3c20-64508979f251@redhat.com> <db74a3a8-290e-edff-10ad-f861c60fbf8e@de.ibm.com>
- <e31024e4-f437-becd-a9e3-e1ea8cd2e0c7@redhat.com>
-In-Reply-To: <e31024e4-f437-becd-a9e3-e1ea8cd2e0c7@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 18 Jul 2019 16:43:28 +0800
-Message-ID: <CANRm+Cw43DKqD17U+7-OPX3BmeNBThSe9-uWP2Atob+A0ApzLA@mail.gmail.com>
-Subject: Re: [PATCH RESEND] KVM: Boosting vCPUs that are delivering interrupts
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 18 Jul 2019 09:04:27 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Jul 2019 at 16:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 18/07/19 10:15, Christian Borntraeger wrote:
-> >
-> >
-> > On 18.07.19 09:59, Paolo Bonzini wrote:
-> >> On 12/07/19 09:15, Wanpeng Li wrote:
-> >>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> >>> index b4ab59d..2c46705 100644
-> >>> --- a/virt/kvm/kvm_main.c
-> >>> +++ b/virt/kvm/kvm_main.c
-> >>> @@ -2404,8 +2404,10 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
-> >>>     int me;
-> >>>     int cpu = vcpu->cpu;
-> >>>
-> >>> -   if (kvm_vcpu_wake_up(vcpu))
-> >>> +   if (kvm_vcpu_wake_up(vcpu)) {
-> >>> +           vcpu->preempted = true;
-> >>>             return;
-> >>> +   }
-> >>>
-> >>>     me = get_cpu();
-> >>>     if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
-> >>>
-> >>
-> >> Who is resetting vcpu->preempted to false in this case?  This also
-> >> applies to s390 in fact.
-> >
-> > Isnt that done by the sched_in handler?
->
-> I am a bit confused because, if it is done by the sched_in later, I
-> don't understand why the sched_out handler hasn't set vcpu->preempted
-> already.
->
-> The s390 commit message is not very clear, but it talks about "a former
-> sleeping cpu" that "gave up the cpu voluntarily".  Does "voluntarily"
-> that mean it is in kvm_vcpu_block?  But then at least for x86 it would
+On Wed, 17 Jul 2019 19:27:25 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-see the prepare_to_swait_exlusive() in kvm_vcpu_block(), the task will
-be set in TASK_INTERRUPTIBLE state, kvm_sched_out will set
-vcpu->preempted to true iff current->state == TASK_RUNNING.
+> On Wed, 15 May 2019 15:27:03 -0400
+> Vivek Goyal <vgoyal@redhat.com> wrote:
+> 
+> > From: Stefan Hajnoczi <stefanha@redhat.com>
+> > 
+> > Setup a dax device.
+> > 
+> > Use the shm capability to find the cache entry and map it.
+> > 
+> > The DAX window is accessed by the fs/dax.c infrastructure and must have
+> > struct pages (at least on x86).  Use devm_memremap_pages() to map the
+> > DAX window PCI BAR and allocate struct page.
+> >  
+> 
+> Sorry for being this late. I don't see any more recent version so I will
+> comment here.
 
-Regards,
-Wanpeng Li
+[Yeah, this one has been sitting in my to-review queue far too long as
+well :(]
+
+> 
+> I'm trying to figure out how is this supposed to work on s390. My concern
+> is, that on s390 PCI memory needs to be accessed by special
+> instructions. This is taken care of by the stuff defined in
+> arch/s390/include/asm/io.h. E.g. we 'override' __raw_writew so it uses
+> the appropriate s390 instruction. However if the code does not use the
+> linux abstractions for accessing PCI memory, but assumes it can be
+> accessed like RAM, we have a problem.
+> 
+> Looking at this patch, it seems to me, that we might end up with exactly
+> the case described. For example AFAICT copy_to_iter() (3) resolves to
+> the function in lib/iov_iter.c which does not seem to cater for s390
+> oddities.
+
+What about the new pci instructions recently introduced? Not sure how
+they differ from the old ones (which are currently the only ones
+supported in QEMU...), but I'm pretty sure they are supposed to solve
+an issue :)
+
+> 
+> I didn't have the time to investigate this properly, and since virtio-fs
+> is virtual, we may be able to get around what is otherwise a
+> limitation on s390. My understanding of these areas is admittedly
+> shallow, and since I'm not sure I'll have much more time to
+> invest in the near future I decided to raise concern.
+> 
+> Any opinions?
+
+Let me point to the thread starting at
+https://marc.info/?l=linux-s390&m=155048406205221&w=2 as well. That
+memory region stuff is still unsolved for ccw, and I'm not sure if we
+need to do something for zpci as well.
+
+Does s390 work with DAX at all? ISTR that DAX evolved from XIP, so I
+thought it did?
+
+> 
+> [CCing some s390 people who are probably more knowledgeable than my on
+> these matters.]
+> 
+> Regards,
+> Halil
+> 
+> 
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> > Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+> > ---  
+> 
+> [..]
+>   
+> > +/* Map a window offset to a page frame number.  The window offset will have
+> > + * been produced by .iomap_begin(), which maps a file offset to a window
+> > + * offset.
+> > + */
+> > +static long virtio_fs_direct_access(struct dax_device *dax_dev, pgoff_t pgoff,
+> > +				    long nr_pages, void **kaddr, pfn_t *pfn)
+> > +{
+> > +	struct virtio_fs *fs = dax_get_private(dax_dev);
+> > +	phys_addr_t offset = PFN_PHYS(pgoff);
+> > +	size_t max_nr_pages = fs->window_len/PAGE_SIZE - pgoff;
+> > +
+> > +	if (kaddr)
+> > +		*kaddr = fs->window_kaddr + offset;  
+> 
+> (2) Here we use fs->window_kaddr, basically directing the access to the
+> virtio shared memory region.
+> 
+> > +	if (pfn)
+> > +		*pfn = phys_to_pfn_t(fs->window_phys_addr + offset,
+> > +					PFN_DEV | PFN_MAP);
+> > +	return nr_pages > max_nr_pages ? max_nr_pages : nr_pages;
+> > +}
+> > +
+> > +static size_t virtio_fs_copy_from_iter(struct dax_device *dax_dev,
+> > +				       pgoff_t pgoff, void *addr,
+> > +				       size_t bytes, struct iov_iter *i)
+> > +{
+> > +	return copy_from_iter(addr, bytes, i);
+> > +}
+> > +
+> > +static size_t virtio_fs_copy_to_iter(struct dax_device *dax_dev,
+> > +				       pgoff_t pgoff, void *addr,
+> > +				       size_t bytes, struct iov_iter *i)
+> > +{
+> > +	return copy_to_iter(addr, bytes, i);  
+> 
+> (3) And this should be the access to it. Which does not seem to use.
+> 
+> > +}
+> > +
+> > +static const struct dax_operations virtio_fs_dax_ops = {
+> > +	.direct_access = virtio_fs_direct_access,
+> > +	.copy_from_iter = virtio_fs_copy_from_iter,
+> > +	.copy_to_iter = virtio_fs_copy_to_iter,
+> > +};
+> > +
+> > +static void virtio_fs_percpu_release(struct percpu_ref *ref)
+> > +{
+> > +	struct virtio_fs_memremap_info *mi =
+> > +		container_of(ref, struct virtio_fs_memremap_info, ref);
+> > +
+> > +	complete(&mi->completion);
+> > +}
+> > +
+> > +static void virtio_fs_percpu_exit(void *data)
+> > +{
+> > +	struct virtio_fs_memremap_info *mi = data;
+> > +
+> > +	wait_for_completion(&mi->completion);
+> > +	percpu_ref_exit(&mi->ref);
+> > +}
+> > +
+> > +static void virtio_fs_percpu_kill(struct percpu_ref *ref)
+> > +{
+> > +	percpu_ref_kill(ref);
+> > +}
+> > +
+> > +static void virtio_fs_cleanup_dax(void *data)
+> > +{
+> > +	struct virtio_fs *fs = data;
+> > +
+> > +	kill_dax(fs->dax_dev);
+> > +	put_dax(fs->dax_dev);
+> > +}
+> > +
+> > +static int virtio_fs_setup_dax(struct virtio_device *vdev, struct virtio_fs *fs)
+> > +{
+> > +	struct virtio_shm_region cache_reg;
+> > +	struct virtio_fs_memremap_info *mi;
+> > +	struct dev_pagemap *pgmap;
+> > +	bool have_cache;
+> > +	int ret;
+> > +
+> > +	if (!IS_ENABLED(CONFIG_DAX_DRIVER))
+> > +		return 0;
+> > +
+> > +	/* Get cache region */
+> > +	have_cache = virtio_get_shm_region(vdev,
+> > +					   &cache_reg,
+> > +					   (u8)VIRTIO_FS_SHMCAP_ID_CACHE);
+> > +	if (!have_cache) {
+> > +		dev_err(&vdev->dev, "%s: No cache capability\n", __func__);
+> > +		return -ENXIO;
+> > +	} else {
+> > +		dev_notice(&vdev->dev, "Cache len: 0x%llx @ 0x%llx\n",
+> > +			   cache_reg.len, cache_reg.addr);
+> > +	}
+> > +
+> > +	mi = devm_kzalloc(&vdev->dev, sizeof(*mi), GFP_KERNEL);
+> > +	if (!mi)
+> > +		return -ENOMEM;
+> > +
+> > +	init_completion(&mi->completion);
+> > +	ret = percpu_ref_init(&mi->ref, virtio_fs_percpu_release, 0,
+> > +			      GFP_KERNEL);
+> > +	if (ret < 0) {
+> > +		dev_err(&vdev->dev, "%s: percpu_ref_init failed (%d)\n",
+> > +			__func__, ret);
+> > +		return ret;
+> > +	}
+> > +
+> > +	ret = devm_add_action(&vdev->dev, virtio_fs_percpu_exit, mi);
+> > +	if (ret < 0) {
+> > +		percpu_ref_exit(&mi->ref);
+> > +		return ret;
+> > +	}
+> > +
+> > +	pgmap = &mi->pgmap;
+> > +	pgmap->altmap_valid = false;
+> > +	pgmap->ref = &mi->ref;
+> > +	pgmap->kill = virtio_fs_percpu_kill;
+> > +	pgmap->type = MEMORY_DEVICE_FS_DAX;
+> > +
+> > +	/* Ideally we would directly use the PCI BAR resource but
+> > +	 * devm_memremap_pages() wants its own copy in pgmap.  So
+> > +	 * initialize a struct resource from scratch (only the start
+> > +	 * and end fields will be used).
+> > +	 */
+> > +	pgmap->res = (struct resource){
+> > +		.name = "virtio-fs dax window",
+> > +		.start = (phys_addr_t) cache_reg.addr,
+> > +		.end = (phys_addr_t) cache_reg.addr + cache_reg.len - 1,
+> > +	};
+> > +
+> > +	fs->window_kaddr = devm_memremap_pages(&vdev->dev, pgmap);  
+> 
+> (1) Here we assign fs->window_kaddr basically from the virtio shm region.
+> 
+> > +	if (IS_ERR(fs->window_kaddr))
+> > +		return PTR_ERR(fs->window_kaddr);
+> > +
+> > +	fs->window_phys_addr = (phys_addr_t) cache_reg.addr;
+> > +	fs->window_len = (phys_addr_t) cache_reg.len;
+> > +
+> > +	dev_dbg(&vdev->dev, "%s: window kaddr 0x%px phys_addr 0x%llx"
+> > +		" len 0x%llx\n", __func__, fs->window_kaddr, cache_reg.addr,
+> > +		cache_reg.len);
+> > +
+> > +	fs->dax_dev = alloc_dax(fs, NULL, &virtio_fs_dax_ops);
+> > +	if (!fs->dax_dev)
+> > +		return -ENOMEM;
+> > +
+> > +	return devm_add_action_or_reset(&vdev->dev, virtio_fs_cleanup_dax, fs);
+> > +}
+> > +  
+> 
+> [..]
+> 
+
