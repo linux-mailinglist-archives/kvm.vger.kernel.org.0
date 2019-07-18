@@ -2,94 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B95D36D60C
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:54:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A25D6D611
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:54:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727950AbfGRUyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 16:54:09 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58738 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727762AbfGRUyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 16:54:09 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5E7FBAD1E;
-        Thu, 18 Jul 2019 20:54:08 +0000 (UTC)
-Date:   Thu, 18 Jul 2019 22:54:02 +0200
-From:   Petr Tesarik <ptesarik@suse.cz>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
-Message-ID: <20190718225402.6e8f31e0@ezekiel.suse.cz>
-In-Reply-To: <20190718172120.69947-1-pasic@linux.ibm.com>
-References: <20190718172120.69947-1-pasic@linux.ibm.com>
-Organization: SUSE Linux, s.r.o.
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+        id S1727928AbfGRUy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 16:54:28 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:46144 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728014AbfGRUy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 16:54:27 -0400
+Received: by mail-qk1-f194.google.com with SMTP id r4so21552639qkm.13;
+        Thu, 18 Jul 2019 13:54:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7emRYoT5fb8r2z6gXsWHsiNYUTpTl/PouMaFyVOjnww=;
+        b=UTzC65bgSmS0ZVhgdWSoC3T5DMUpzjrxwzvNfIMglsBH1bv2RR184lr6xU7FEpxEwW
+         rGcf8KKjlzepDJvuwOk+V7PacziM1Wa46b0Mda1ESFrVemjZtCu3R+3xko8BvfDtYqlg
+         NsDu1s5waBUWJQIa+G4+mxanK2mzuA1uLYeDJ0YmKMpRgfFIDKYzNcRSMbNdAPxdNVly
+         NAMdVsTdSkjj0OK4oeOSEVmTagAyQ0jo8t/q6CXLUvBEVqDWnX1rqmORNv6VJpEhAiIj
+         sf1FZZBwqUMSvo1ik1WbhMkklOPSy7WXWxxCMV3zSbp8gHG/NRQDvDwKM51n95pq/Bvk
+         h9jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7emRYoT5fb8r2z6gXsWHsiNYUTpTl/PouMaFyVOjnww=;
+        b=Tz7X3mz7MFPYGv6qr0C5kxt3yOcXtDwqhE2XB5FNjzXGgwIshtPIkvUXfmCiWB0EsQ
+         hFE1DJK4gPWPba2DO44YWnx5lA8Ud1MgQ/vwW7zDjv4CbSRtZU9F/WjwuZRQMMkmHtgp
+         DNvjpxoFY9SAN8ZKF0loAdwt4UiOB0FuFD8XX8c5zyFiWLC9S4dSJH/Jys/mOeRhXV79
+         BCRD6AU5es44SPZvSagkmUurknqeA9I8THdMJTQ/7/pSU+VYxU5kCjxD40xNLpcvKTFh
+         hHAfXnSvywWwf4gEFQNFRuWvE8GPnKaw5FLwp3y0WEt5t7yla/9ccbfz05PyiLP60ObN
+         4Obw==
+X-Gm-Message-State: APjAAAUBGrCS9Ggj8xtaFaFym1bo8CARZe1JEFuYv/kgOvQFg8OrG6QZ
+        sjDU9tJsYgOU6CZZd/yAWzjLMbKpJvxBt6SH1sE=
+X-Google-Smtp-Source: APXvYqzCbtKw7lABM5d7gtaXQR8QpjKah4ysVH7vLjkBhNJeiCYXH0PXPFpR/DGO1YaYtTEaiy/hYhgQ9cACF4oYkSQ=
+X-Received: by 2002:a37:7ec1:: with SMTP id z184mr32664238qkc.491.1563483266795;
+ Thu, 18 Jul 2019 13:54:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z"; protocol="application/pgp-signature"
+References: <20190716115535-mutt-send-email-mst@kernel.org>
+ <CAKgT0Ud47-cWu9VnAAD_Q2Fjia5gaWCz_L9HUF6PBhbugv6tCQ@mail.gmail.com>
+ <20190716125845-mutt-send-email-mst@kernel.org> <CAKgT0UfgPdU1H5ZZ7GL7E=_oZNTzTwZN60Q-+2keBxDgQYODfg@mail.gmail.com>
+ <20190717055804-mutt-send-email-mst@kernel.org> <CAKgT0Uf4iJxEx+3q_Vo9L1QPuv9PhZUv1=M9UCsn6_qs7rG4aw@mail.gmail.com>
+ <20190718003211-mutt-send-email-mst@kernel.org> <CAKgT0UfQ3dtfjjm8wnNxX1+Azav6ws9zemH6KYc7RuyvyFo3fQ@mail.gmail.com>
+ <20190718113548-mutt-send-email-mst@kernel.org> <CAKgT0UeRy2eHKnz4CorefBAG8ro+3h4oFX+z1JY2qRm17fcV8w@mail.gmail.com>
+ <20190718163325-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190718163325-mutt-send-email-mst@kernel.org>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Thu, 18 Jul 2019 13:54:15 -0700
+Message-ID: <CAKgT0UcFqYm-b1zh4UT8m=3gi950T0c-gsxjhszeVgANfKQCRA@mail.gmail.com>
+Subject: Re: [PATCH v1 6/6] virtio-balloon: Add support for aerating memory
+ via hinting
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
+        Rik van Riel <riel@surriel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        lcapitulino@redhat.com, wei.w.wang@intel.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jul 18, 2019 at 1:37 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Jul 18, 2019 at 01:29:14PM -0700, Alexander Duyck wrote:
+> > So one thing that is still an issue then is that my approach would
+> > only work on the first migration. The problem is the logic I have
+> > implemented assumes that once we have hinted on a page we don't need
+> > to do it again. However in order to support migration you would need
+> > to reset the hinting entirely and start over again after doing a
+> > migration.
+>
+> Well with precopy at least it's simple: just clear the
+> dirty bit, it won't be sent, and then on destination
+> you get a zero page and later COW on first write.
+> Right?
 
-On Thu, 18 Jul 2019 19:21:20 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Are you talking about adding MADV_DONTNEED functionality to FREE_PAGE_HINTS?
 
-> On s390 ZONE_DMA is up to 2G, i.e. ARCH_ZONE_DMA_BITS should be 31 bits.
-> The current value is 24 and makes __dma_direct_alloc_pages() take a
-> wrong turn first (but __dma_direct_alloc_pages() recovers then).
->=20
-> Let's correct ARCH_ZONE_DMA_BITS value and avoid wrong turns.
->=20
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reported-by: Petr Tesarik <ptesarik@suse.cz>
-> Fixes: c61e9637340e ("dma-direct: add support for allocation from
-> ZONE_DMA and ZONE_DMA32")
-> ---
->  arch/s390/include/asm/dma.h | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/arch/s390/include/asm/dma.h b/arch/s390/include/asm/dma.h
-> index 6f26f35d4a71..3b0329665b13 100644
-> --- a/arch/s390/include/asm/dma.h
-> +++ b/arch/s390/include/asm/dma.h
-> @@ -10,6 +10,7 @@
->   * by the 31 bit heritage.
->   */
->  #define MAX_DMA_ADDRESS         0x80000000
-> +#define ARCH_ZONE_DMA_BITS      31
-> =20
->  #ifdef CONFIG_PCI
->  extern int isa_dma_bridge_buggy;
+> With precopy it is tricker as destination waits until it gets
+> all of memory. I think we could use some trick to
+> make source pretend it's a zero page, that is cheap to send.
 
-Looks good to me.
+So I am confused again.
 
-Petr T
+What I was getting at is that if I am not mistaken block->bmap is set
+to all 1s for each page in ram_list_init_bitmaps(). After that the
+precopy starts and begins moving memory over. We need to be able to go
+in and hint away all the free pages from that initial bitmap. To do
+that we would need to have the "Hinted" flag I added in the patch set
+cleared for all pages, and then go through all free memory and start
+over in order to hint on which pages are actually free. Otherwise all
+we are doing is hinting on which pages have been freed since the last
+round of hints.
 
---Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z
-Content-Type: application/pgp-signature
-Content-Description: Digitální podpis OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEHl2YIZkIo5VO2MxYqlA7ya4PR6cFAl0w3GoACgkQqlA7ya4P
-R6cplggAueuZZMDHcHgPZXsVT6ZtElx6CMi1ODR2GMydMbgaHrsYUZVSNGsRZuUf
-lQqeDk1Ssyg9Q4In6Fq9qkzhCoaGRr5jm8tBUlSg4ov9QX+XugmxPOT6YVRIuPAf
-+ko+Wagwsb1BhbGJuE/jXJSOdis1ORZPTKE7TG+5cKNffwRgR9TEJUW2DmWOWeh/
-c5hD1rJKSI5E+SNDKHcONOuoAut8UEFbi3my0a4luHxIov+UkxhG6oPQpjuHDCaI
-c26k6RyPynGS2p/wY2oBw/5zHxZML+mm7F0dTLZyCQT55871mbFJqRCZSwbL/dmK
-hZqlwPCjGe0Bu8GskCPmEMuHnQ+Lkw==
-=lwF8
------END PGP SIGNATURE-----
-
---Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z--
+Essentially this is another case where being incremental is
+problematic for this design. What I would need to do is reset the
+"Hinted" flag in all of the free pages after the migration has been
+completed.
