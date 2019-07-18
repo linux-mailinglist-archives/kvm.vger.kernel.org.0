@@ -2,141 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 295BD6CAC0
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 10:16:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F38456CAF1
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 10:34:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727580AbfGRIQA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 04:16:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35894 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726000AbfGRIQA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jul 2019 04:16:00 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6I89vj9130270
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 04:15:59 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ttjh6xhj3-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 04:15:59 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 18 Jul 2019 09:15:57 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 18 Jul 2019 09:15:54 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6I8FsdF45547574
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Jul 2019 08:15:54 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DDB9E52077;
-        Thu, 18 Jul 2019 08:15:53 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.96.236])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AEBCD52074;
-        Thu, 18 Jul 2019 08:15:53 +0000 (GMT)
+        id S1726972AbfGRIeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 04:34:08 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50627 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726488AbfGRIeI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 04:34:08 -0400
+Received: by mail-wm1-f68.google.com with SMTP id v15so24697474wml.0
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 01:34:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oyQnxgvW48MflIIGvDKgphM3U+A4nQhpaY8n8J3JEU8=;
+        b=LrEM2k12zapBLuTzpIfK/OSUM7YkM+Fxo4J+TrF1mcc2O/9ET7sLiU7/9EYLfhu30a
+         s/3OoY0jhZ8wgFXqpwykmoPFDOb+f1ANlfBr0i1flfmdV3ZilHdsyWylB3FIkAbHHSKw
+         k6c2oYRlN4dsmvOi20jMvEAYYi1I4tgzeTCVSKuHZg/SNz9ChVVT53iOBg5FVD+a6Z1M
+         NTSIVcE90sHT8RgeBfR9lGcpNU1jDI2NY4LDZ/I/O2CXTDRF7gEAhGa4/FOoJgeNop1N
+         6OXVQraK6jdP8ztzQ1d3j+oENCf6omr5cYLlr29iqE9UVXEdlXkyYi2Beh6FQZxL9J/t
+         ZePg==
+X-Gm-Message-State: APjAAAWo5KFuiDmhDx1QV9HsU59Glh7Y9Zz9O0VmNqxiYuZLBKveJkUx
+        boOa6tpzVWZhLhT6LJHc97UJ7Q==
+X-Google-Smtp-Source: APXvYqxkdaslaXuIOrStTxZXg88Np8F8FRCcSBEQh5L+2SsEztfofLT+uhyL1VDV8EDLffiZ4NpMUg==
+X-Received: by 2002:a1c:44d7:: with SMTP id r206mr42116191wma.164.1563438846134;
+        Thu, 18 Jul 2019 01:34:06 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+        by smtp.gmail.com with ESMTPSA id p18sm24776435wrm.16.2019.07.18.01.34.05
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 18 Jul 2019 01:34:05 -0700 (PDT)
 Subject: Re: [PATCH RESEND] KVM: Boosting vCPUs that are delivering interrupts
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 References: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
  <f95fbf72-090f-fb34-3c20-64508979f251@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+ <db74a3a8-290e-edff-10ad-f861c60fbf8e@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Thu, 18 Jul 2019 10:15:53 +0200
+Message-ID: <e31024e4-f437-becd-a9e3-e1ea8cd2e0c7@redhat.com>
+Date:   Thu, 18 Jul 2019 10:34:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <f95fbf72-090f-fb34-3c20-64508979f251@redhat.com>
+In-Reply-To: <db74a3a8-290e-edff-10ad-f861c60fbf8e@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19071808-0016-0000-0000-00000293F1DF
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071808-0017-0000-0000-000032F1CCCD
-Message-Id: <db74a3a8-290e-edff-10ad-f861c60fbf8e@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-18_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=767 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907180094
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 18.07.19 09:59, Paolo Bonzini wrote:
-> On 12/07/19 09:15, Wanpeng Li wrote:
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index b4ab59d..2c46705 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -2404,8 +2404,10 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
->>  	int me;
->>  	int cpu = vcpu->cpu;
->>  
->> -	if (kvm_vcpu_wake_up(vcpu))
->> +	if (kvm_vcpu_wake_up(vcpu)) {
->> +		vcpu->preempted = true;
->>  		return;
->> +	}
->>  
->>  	me = get_cpu();
->>  	if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
->>
+On 18/07/19 10:15, Christian Borntraeger wrote:
 > 
-> Who is resetting vcpu->preempted to false in this case?  This also
-> applies to s390 in fact.
+> 
+> On 18.07.19 09:59, Paolo Bonzini wrote:
+>> On 12/07/19 09:15, Wanpeng Li wrote:
+>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>> index b4ab59d..2c46705 100644
+>>> --- a/virt/kvm/kvm_main.c
+>>> +++ b/virt/kvm/kvm_main.c
+>>> @@ -2404,8 +2404,10 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+>>>  	int me;
+>>>  	int cpu = vcpu->cpu;
+>>>  
+>>> -	if (kvm_vcpu_wake_up(vcpu))
+>>> +	if (kvm_vcpu_wake_up(vcpu)) {
+>>> +		vcpu->preempted = true;
+>>>  		return;
+>>> +	}
+>>>  
+>>>  	me = get_cpu();
+>>>  	if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
+>>>
+>>
+>> Who is resetting vcpu->preempted to false in this case?  This also
+>> applies to s390 in fact.
+> 
+> Isnt that done by the sched_in handler?
 
-Isnt that done by the sched_in handler?
+I am a bit confused because, if it is done by the sched_in later, I
+don't understand why the sched_out handler hasn't set vcpu->preempted
+already.
 
+The s390 commit message is not very clear, but it talks about "a former
+sleeping cpu" that "gave up the cpu voluntarily".  Does "voluntarily"
+that mean it is in kvm_vcpu_block?  But then at least for x86 it would
+be after vcpu_load so the preempt notifiers have been registered, and
+for s390 too (kvm_arch_vcpu_ioctl_run -> __vcpu_run -> vcpu_post_run ->
+kvm_handle_sie_intercept etc.).
+
+Paolo
