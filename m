@@ -2,108 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 101866CD7A
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 13:39:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B9D86CD7F
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 13:40:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390195AbfGRLjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 07:39:18 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:41267 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390092AbfGRLjQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 07:39:16 -0400
-Received: by mail-pl1-f194.google.com with SMTP id m9so13690244pls.8;
-        Thu, 18 Jul 2019 04:39:15 -0700 (PDT)
+        id S2390080AbfGRLkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 07:40:14 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:46294 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727882AbfGRLkO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 07:40:14 -0400
+Received: by mail-ot1-f67.google.com with SMTP id z23so318758ote.13;
+        Thu, 18 Jul 2019 04:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=VDOpNg7e30z+8UVXeCnwHjFkxSm/l6mZSdia9FK/R+w=;
-        b=C4SN7AQTPn4QlWvHwdFmGsZnJagnhpazBqcZQbp5cRc2OrODZW+y/r26U1QH14fbQw
-         isrmi0DkonkpQkpiRNzrl04hW0i7jAh9th0SiHERSboSt/S9C6RQ61aiBwtQa3QEPhxx
-         Vky/kmjgOgASoyzgieBHpTjGYALtxbiPHzSmMwjQPKkH6YiTYwZ8HetBfNXBBwYKVUdM
-         sqlPXei0aBKwACgp8KULE7BfVTBH8Y8p+M39+XZrG8NVm5TuMK7dzVjhH+V1w84/hrWj
-         PMvdAaBeFCsLWUMu0udI8KEYBPY/VdmqAf+Aa6Cg5kDKnAcUK6VhMFfUmi1mF3/XEXY6
-         ltMA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0wT5Tj/n2RBfQhJG08mVc86LI5QLyQMdXu4Aow//MCg=;
+        b=Z7xXDV/4TY1dg6KBkMskZBDH3w92Xls9x8KPY9aIyeqdukEOhimPJD/+5aFOdB+zlk
+         UO10r/49CLzHyeb4CgO06m5s/qPl7+MhGOP4AJq5SLVjIj8jPBYROtT5OX3RltkAvPDn
+         mN3ombIS7+3MdpXh9/Z58mAvk40Jkjqa2qKqmayuD+DPoldj5z9QJKD/PJPW7CpvIdPh
+         fqJgrcLYzNsbUTVKz7j197z0/k4LMhb9D+ChPFPbXSLshlmThLpUtmk2pJCVPDtzzwma
+         e7wdUNUjOP1XNPz6mf9rTm1DkkOJcIFMOXC0f0GpP6XDS5WS56P1XTPEpuwxe34INHoN
+         pcTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=VDOpNg7e30z+8UVXeCnwHjFkxSm/l6mZSdia9FK/R+w=;
-        b=juJxjhdfM3tdKtE5khzaIeyfTDbV0ROXlW6Bc4JKRxy4H6TtlY8Oot1J/MPjUYcdJS
-         9gGK0b9tcHy+N3SaPxm5vv1kESkgW1f6YtQSDzNFqR5kO0i4rpT/X7VMcAomOu7i/jkN
-         yBRyHwLIisdtW0n4aEjx2cmxuHrf+0mmPMjVwoq8u01o3E0KbcRl6RtfZgWNZT+kEfNG
-         D94kzW/pRhJPmIoi6JRx0Qg8RbqEmugrzoPpQykQepjMtxiFgY4xm7nUFT/B8kYn05Ok
-         gwaFb+RKJQ0pmymg5q67Ow5VNRDFMMMqU5dWX97BGtIkcktXedwds/PrOHEuR17KkgNw
-         y28g==
-X-Gm-Message-State: APjAAAW9ZIh4G1fWcTHn8LDT408IqI1zzWbqVRaX2iT02iYk4Rcn7fXf
-        /pvuq1sB0JvhqykesYyZRzdKFxTejCw=
-X-Google-Smtp-Source: APXvYqySc9AQVpF1vgciB3LhNwYLa2ShbrHBMZ+w+hyNAzWKCfXLB9c8RBnhe8s7vDSohh5kYtUgqA==
-X-Received: by 2002:a17:902:24a2:: with SMTP id w31mr50712692pla.324.1563449955157;
-        Thu, 18 Jul 2019 04:39:15 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id f15sm11908581pgu.2.2019.07.18.04.39.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 18 Jul 2019 04:39:14 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH v2 2/2] KVM:390: Use kvm_vcpu_wake_up in kvm_s390_vcpu_wakeup
-Date:   Thu, 18 Jul 2019 19:39:07 +0800
-Message-Id: <1563449947-7749-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1563449947-7749-1-git-send-email-wanpengli@tencent.com>
-References: <1563449947-7749-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0wT5Tj/n2RBfQhJG08mVc86LI5QLyQMdXu4Aow//MCg=;
+        b=GJL2SlPdZVQyh5PKVs1vwRQxK4Wjbm2NrvDwkont3LlKmNOHANzvrMOVyv9SGw/BsA
+         GdWx404cZJf1vyHfmo7xX2h+NNnTRSVxCyf2ILZ/bfdlUApvw4Sc2VADPy+iCc0BiQ+s
+         8LvXqiYNNla+3TeKCfjcB27BmVqSs+1aF8ujmAhUVD0cxe9HP4ZCCthBZzRmHRXA5wRd
+         yB/d4+KArCCoQ4l8HUnhKuPhFpkcyl+cBoEhNzNkATthPBfWAIPby/ScAiboqz9RCl8t
+         e44593pgCCzyjKDWxVTGF80FbEUiq6EC5f+Bzph6Ul/MbqN8Yctn2BkdZf63WsowXcDp
+         Osow==
+X-Gm-Message-State: APjAAAX3L4BqscPwuFG0klP9SEQ6T1Q0LQwBOZxjq7YinGV0m3zrfTwL
+        frY/lO5bj3bRscnHtxvPSbfbyRS3iseSJxvdxR8=
+X-Google-Smtp-Source: APXvYqxhC2R1XSP9OMlLkXamvscGo+GlECN3WFHF9e8PPObst5TaewmXC2qc4Qh5ZxmXZITEg8SeryCqElJgBnFkRwI=
+X-Received: by 2002:a9d:1b02:: with SMTP id l2mr14808131otl.45.1563450013270;
+ Thu, 18 Jul 2019 04:40:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
+ <f95fbf72-090f-fb34-3c20-64508979f251@redhat.com> <db74a3a8-290e-edff-10ad-f861c60fbf8e@de.ibm.com>
+ <e31024e4-f437-becd-a9e3-e1ea8cd2e0c7@redhat.com> <CANRm+Cw43DKqD17U+7-OPX3BmeNBThSe9-uWP2Atob+A0ApzLA@mail.gmail.com>
+ <bc210153-fbae-25d4-bf6b-e31ceef36aa5@redhat.com> <CANRm+CxV0c3RSidV_GQtVuQ5fUUCT8vM=5LpodgDg+dFWhkH3w@mail.gmail.com>
+ <f6f9c2ca-6fea-d7b5-9797-d180e42f50d5@redhat.com>
+In-Reply-To: <f6f9c2ca-6fea-d7b5-9797-d180e42f50d5@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 18 Jul 2019 19:40:04 +0800
+Message-ID: <CANRm+CzJtSeCtuNHqGc588FMLzFvjFAcBhhipORsJSisk_KdRw@mail.gmail.com>
+Subject: Re: [PATCH RESEND] KVM: Boosting vCPUs that are delivering interrupts
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, 18 Jul 2019 at 17:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 18/07/19 11:29, Wanpeng Li wrote:
+> > On Thu, 18 Jul 2019 at 17:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 18/07/19 10:43, Wanpeng Li wrote:
+> >>>>> Isnt that done by the sched_in handler?
+> >>>>
+> >>>> I am a bit confused because, if it is done by the sched_in later, I
+> >>>> don't understand why the sched_out handler hasn't set vcpu->preempted
+> >>>> already.
+> >>>>
+> >>>> The s390 commit message is not very clear, but it talks about "a former
+> >>>> sleeping cpu" that "gave up the cpu voluntarily".  Does "voluntarily"
+> >>>> that mean it is in kvm_vcpu_block?  But then at least for x86 it would
+> >>>
+> >>> see the prepare_to_swait_exlusive() in kvm_vcpu_block(), the task will
+> >>> be set in TASK_INTERRUPTIBLE state, kvm_sched_out will set
+> >>> vcpu->preempted to true iff current->state == TASK_RUNNING.
+> >>
+> >> Ok, I was totally blind to that "if" around vcpu->preempted = true, it's
+> >> obvious now.
+> >>
+> >> I think we need two flags then, for example vcpu->preempted and vcpu->ready:
+> >>
+> >> - kvm_sched_out sets both of them to true iff current->state == TASK_RUNNING
+> >>
+> >> - kvm_vcpu_kick sets vcpu->ready to true
+> >>
+> >> - kvm_sched_in clears both of them
+>
+> ... and also kvm_vcpu_on_spin should check vcpu->ready.  vcpu->preempted
+> remains only for use by vmx_vcpu_pi_put.
 
-Use kvm_vcpu_wake_up() in kvm_s390_vcpu_wakeup().
+Done in v2, please have a look. :)
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/s390/kvm/interrupt.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
-
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 26f8bf4..881cc5a 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -1229,21 +1229,8 @@ void kvm_s390_vcpu_wakeup(struct kvm_vcpu *vcpu)
- 	 * in kvm_vcpu_block without having the waitqueue set (polling)
- 	 */
- 	vcpu->valid_wakeup = true;
--	/*
--	 * This is mostly to document, that the read in swait_active could
--	 * be moved before other stores, leading to subtle races.
--	 * All current users do not store or use an atomic like update
--	 */
--	smp_mb__after_atomic();
--	if (swait_active(&vcpu->wq)) {
--		/*
--		 * The vcpu gave up the cpu voluntarily, mark it as a good
--		 * yield-candidate.
--		 */
-+	if (kvm_vcpu_wake_up(vcpu))
- 		vcpu->ready = true;
--		swake_up_one(&vcpu->wq);
--		vcpu->stat.halt_wakeup++;
--	}
- 	/*
- 	 * The VCPU might not be sleeping but is executing the VSIE. Let's
- 	 * kick it, so it leaves the SIE to process the request.
--- 
-2.7.4
-
+Regards,
+Wanpeng Li
