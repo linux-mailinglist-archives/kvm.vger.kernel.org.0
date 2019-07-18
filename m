@@ -2,101 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C4606CEAA
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 15:15:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 729576CED9
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 15:30:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727740AbfGRNPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 09:15:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38656 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726513AbfGRNPf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 09:15:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6F0EA3086222;
-        Thu, 18 Jul 2019 13:15:35 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.18.25.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB9395E7C0;
-        Thu, 18 Jul 2019 13:15:32 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 76ADD2238A7; Thu, 18 Jul 2019 09:15:32 -0400 (EDT)
-Date:   Thu, 18 Jul 2019 09:15:32 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-nvdimm@lists.01.org, miklos@szeredi.hu,
-        stefanha@redhat.com, dgilbert@redhat.com, swhiteho@redhat.com,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
+        id S1727694AbfGRNaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 09:30:21 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38311 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726735AbfGRNaU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 09:30:20 -0400
+Received: by mail-wm1-f67.google.com with SMTP id s15so4343521wmj.3
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 06:30:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZE7qeIo+WhLKExx8RJE14kSmCWYHFTAnkh+UlLH0SC8=;
+        b=UtSrEAZaYrW/pAqsufYME4je0b9bBCW75me226Al0sRX/WFRTRSkMIbgg2Ia1jsj2o
+         Gr+AbQ+znQOJicM0j4a5Zzu1/1a684tsNiB/0EixcWfFOnlzrmW+Uj7c8GpvKN8aDbbm
+         ItoTKYRFFPLI877SOtEnqILRJNK/LzcfQqWEuDt79/B1q3CgaEjTFCNYMfS2F5JF+8f1
+         /xT2gQFce5s1CijY83c0jzT2MtNmOaLjwzQGCwYZlEADfFhb3d73nGWCzjI67wVEa+VF
+         jaD8EwipC3avpWfOdmeoNH2KeH6vGUMEa0+xohhbGa47tuAt3V4kLZhVMVIDhC2WrzH/
+         n31w==
+X-Gm-Message-State: APjAAAX4F2YX62FbNpKRyNdYNEMP2oM2s8lG4RC8Ltk9HzIBEvL5g2v3
+        0xeJmVucybMgYAEYxj3daIYfcg==
+X-Google-Smtp-Source: APXvYqx3V5p2CKlfwWpWyhN/va1NPlp3PYMM04M8eSKtHjS8zhgid38VQPsLoaAWTYKhki9qOPdqrw==
+X-Received: by 2002:a05:600c:2218:: with SMTP id z24mr42485323wml.84.1563456618835;
+        Thu, 18 Jul 2019 06:30:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+        by smtp.gmail.com with ESMTPSA id k124sm42226579wmk.47.2019.07.18.06.30.17
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 18 Jul 2019 06:30:18 -0700 (PDT)
+Subject: Re: [PATCH v2 1/2] KVM: Boosting vCPUs that are delivering interrupts
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Collin Walling <walling@linux.ibm.com>
-Subject: Re: [PATCH v2 18/30] virtio_fs, dax: Set up virtio_fs dax_device
-Message-ID: <20190718131532.GA13883@redhat.com>
-References: <20190515192715.18000-1-vgoyal@redhat.com>
- <20190515192715.18000-19-vgoyal@redhat.com>
- <20190717192725.25c3d146.pasic@linux.ibm.com>
+        Paul Mackerras <paulus@ozlabs.org>,
+        Marc Zyngier <maz@kernel.org>
+References: <1563449947-7749-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <c4c23d93-879b-1783-afa5-b6e053f32990@redhat.com>
+Date:   Thu, 18 Jul 2019 15:30:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190717192725.25c3d146.pasic@linux.ibm.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Thu, 18 Jul 2019 13:15:35 +0000 (UTC)
+In-Reply-To: <1563449947-7749-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 07:27:25PM +0200, Halil Pasic wrote:
-> On Wed, 15 May 2019 15:27:03 -0400
-> Vivek Goyal <vgoyal@redhat.com> wrote:
-> 
-> > From: Stefan Hajnoczi <stefanha@redhat.com>
-> > 
-> > Setup a dax device.
-> > 
-> > Use the shm capability to find the cache entry and map it.
-> > 
-> > The DAX window is accessed by the fs/dax.c infrastructure and must have
-> > struct pages (at least on x86).  Use devm_memremap_pages() to map the
-> > DAX window PCI BAR and allocate struct page.
-> >
-> 
-> Sorry for being this late. I don't see any more recent version so I will
-> comment here.
-> 
-> I'm trying to figure out how is this supposed to work on s390. My concern
-> is, that on s390 PCI memory needs to be accessed by special
-> instructions. This is taken care of by the stuff defined in
-> arch/s390/include/asm/io.h. E.g. we 'override' __raw_writew so it uses
-> the appropriate s390 instruction. However if the code does not use the
-> linux abstractions for accessing PCI memory, but assumes it can be
-> accessed like RAM, we have a problem.
-> 
-> Looking at this patch, it seems to me, that we might end up with exactly
-> the case described. For example AFAICT copy_to_iter() (3) resolves to
-> the function in lib/iov_iter.c which does not seem to cater for s390
-> oddities.
-> 
-> I didn't have the time to investigate this properly, and since virtio-fs
-> is virtual, we may be able to get around what is otherwise a
-> limitation on s390. My understanding of these areas is admittedly
-> shallow, and since I'm not sure I'll have much more time to
-> invest in the near future I decided to raise concern.
-> 
-> Any opinions?
+On 18/07/19 13:39, Wanpeng Li wrote:
+> -	if (kvm_vcpu_wake_up(vcpu))
+> +	if (kvm_vcpu_wake_up(vcpu)) {
+> +		vcpu->ready = true;
+>  		return;
+> +	}
 
-Hi Halil,
+Why here and not in kvm_vcpu_wake_up (which would allow further
+simplification of s390 code)?
 
-I don't understand s390 and how PCI works there as well. Is there any
-other transport we can use there to map IO memory directly and access
-using DAX?
+Paolo
 
-BTW, is DAX supported for s390.
-
-I am also hoping somebody who knows better can chip in. Till that time,
-we could still use virtio-fs on s390 without DAX.
-
-Thanks
-Vivek
+Paolo
