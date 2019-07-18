@@ -2,109 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A65576C975
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 08:52:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B01B76CA2B
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 09:43:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728127AbfGRGwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 02:52:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42148 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726397AbfGRGwG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 02:52:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A54388E24F;
-        Thu, 18 Jul 2019 06:52:05 +0000 (UTC)
-Received: from redhat.com (ovpn-120-147.rdu2.redhat.com [10.10.120.147])
-        by smtp.corp.redhat.com (Postfix) with SMTP id E894160D7C;
-        Thu, 18 Jul 2019 06:51:52 +0000 (UTC)
-Date:   Thu, 18 Jul 2019 02:51:51 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, xdeguillard@vmware.com, namit@vmware.com,
-        akpm@linux-foundation.org, pagupta@redhat.com, riel@surriel.com,
-        dave.hansen@intel.com, david@redhat.com, konrad.wilk@oracle.com,
-        yang.zhang.wz@gmail.com, nitesh@redhat.com, lcapitulino@redhat.com,
-        aarcange@redhat.com, pbonzini@redhat.com,
-        alexander.h.duyck@linux.intel.com, dan.j.williams@intel.com
-Subject: Re: [PATCH v1] mm/balloon_compaction: avoid duplicate page removal
-Message-ID: <20190718024822-mutt-send-email-mst@kernel.org>
-References: <1563416610-11045-1-git-send-email-wei.w.wang@intel.com>
- <20190718001605-mutt-send-email-mst@kernel.org>
- <5D301232.7080808@intel.com>
+        id S2389308AbfGRHnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 03:43:12 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53143 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726386AbfGRHnK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 03:43:10 -0400
+Received: by mail-wm1-f66.google.com with SMTP id s3so24517922wms.2
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 00:43:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=+5h5a3O3K59BqV9oPAQLtP560NcGiWgROtgONhhQBcA=;
+        b=odhKfRFsoPRyrEYOahjP4cnDXHCgEXJ87ttvrrLJZohIlOr6/EmncOTc6GW6QmETqf
+         m2bX14YyVedNzL5p98dbzStUUjenn2/gq1N7JurbbyOirrkAPP/cvmAH0xXt4mCOI4bN
+         uUlfrdAidEua956ChX2PuzU+An7oipepEFoSaMkDp7c1H6uVuY/QWvJe6gKVoUSPlaFT
+         NhgdsxCspwnDAo6W/XlcI032zwSabliD4U6RnTUD68AEdDapeaEGx2g5Vsnnf4ZCYNuH
+         PWzAETW8eWWVqLExNo4N5/l91MhPlURm5y7ZxqDgeM5kHV2ZGr2kP3rz2M0LGvZK8Msk
+         V5mw==
+X-Gm-Message-State: APjAAAWAp5eaRHpChZxF3a2adv3DAApeY20mRzCyHAmgJVmddN/SvJYF
+        K23wDXvnGTHf37L7YKDdfpJDTA==
+X-Google-Smtp-Source: APXvYqwtVzF6pOrVC5RrHtwRwAyqm+l6A25CyYC8a8Kyj4y50SwTmJGOs3CDoEzgqjZKGhzJbIUIfQ==
+X-Received: by 2002:a1c:3:: with SMTP id 3mr41105085wma.6.1563435787761;
+        Thu, 18 Jul 2019 00:43:07 -0700 (PDT)
+Received: from steredhat ([5.170.38.133])
+        by smtp.gmail.com with ESMTPSA id g25sm18763167wmk.39.2019.07.18.00.43.06
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 18 Jul 2019 00:43:07 -0700 (PDT)
+Date:   Thu, 18 Jul 2019 09:43:04 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 3/5] vsock/virtio: fix locking in
+ virtio_transport_inc_tx_pkt()
+Message-ID: <CAGxU2F5PS8Ug3ei79ShVHOwLSXGYKwn3umvfvnhSFDs9pdvH2g@mail.gmail.com>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190717113030.163499-4-sgarzare@redhat.com>
+ <20190717105056-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5D301232.7080808@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 18 Jul 2019 06:52:05 +0000 (UTC)
+In-Reply-To: <20190717105056-mutt-send-email-mst@kernel.org>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 18, 2019 at 02:31:14PM +0800, Wei Wang wrote:
-> On 07/18/2019 12:31 PM, Michael S. Tsirkin wrote:
-> > On Thu, Jul 18, 2019 at 10:23:30AM +0800, Wei Wang wrote:
-> > > Fixes: 418a3ab1e778 (mm/balloon_compaction: List interfaces)
-> > > 
-> > > A #GP is reported in the guest when requesting balloon inflation via
-> > > virtio-balloon. The reason is that the virtio-balloon driver has
-> > > removed the page from its internal page list (via balloon_page_pop),
-> > > but balloon_page_enqueue_one also calls "list_del"  to do the removal.
-> > I would add here "this is necessary when it's used from
-> > balloon_page_enqueue_list but not when it's called
-> > from balloon_page_enqueue".
-> > 
-> > > So remove the list_del in balloon_page_enqueue_one, and have the callers
-> > > do the page removal from their own page lists.
-> > > 
-> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > Patch is good but comments need some work.
-> > 
-> > > ---
-> > >   mm/balloon_compaction.c | 3 ++-
-> > >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
-> > > index 83a7b61..1a5ddc4 100644
-> > > --- a/mm/balloon_compaction.c
-> > > +++ b/mm/balloon_compaction.c
-> > > @@ -11,6 +11,7 @@
-> > >   #include <linux/export.h>
-> > >   #include <linux/balloon_compaction.h>
-> > > +/* Callers ensure that @page has been removed from its original list. */
-> > This comment does not make sense. E.g. balloon_page_enqueue
-> > does nothing to ensure this. And drivers are not supposed
-> > to care how the page lists are managed. Pls drop.
-> > 
-> > Instead please add the following to balloon_page_enqueue:
-> > 
-> > 
-> > 	Note: drivers must not call balloon_page_list_enqueue on
-> 
-> Probably, you meant balloon_page_enqueue here.
+On Wed, Jul 17, 2019 at 4:51 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Jul 17, 2019 at 01:30:28PM +0200, Stefano Garzarella wrote:
+> > fwd_cnt and last_fwd_cnt are protected by rx_lock, so we should use
+> > the same spinlock also if we are in the TX path.
+> >
+> > Move also buf_alloc under the same lock.
+> >
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>
+> Wait a second is this a bugfix?
+> If it's used under the wrong lock won't values get corrupted?
+> Won't traffic then stall or more data get to sent than
+> credits?
 
-yes
+Before this series, we only read vvs->fwd_cnt and vvs->buf_alloc in this
+function, but using a different lock than the one used to write them.
+I'm not sure if a corruption can happen, but if we want to avoid the
+lock, we should use an atomic operation or memory barriers.
 
-> The description for balloon_page_enqueue also seems incorrect:
-> "allocates a new page and inserts it into the balloon page list."
-> This function doesn't do any allocation itself.
-> Plan to reword it: inserts a new page into the balloon page list."
-
-And maybe
-" Page must have been allocated with balloon_page_alloc.".
+Since now we also need to update vvs->last_fwd_cnt, in order to limit the
+credit message, I decided to take the same lock used to protect vvs->fwd_cnt
+and vvs->last_fwd_cnt.
 
 
-Also
- * Driver must call it to properly enqueue a balloon pages before definitively
+Thanks,
+Stefano
 
-should be
- * Driver must call it to properly enqueue balloon pages before definitively
-
-
-> 
-> Best,
-> Wei
+>
+> > ---
+> >  include/linux/virtio_vsock.h            | 2 +-
+> >  net/vmw_vsock/virtio_transport_common.c | 4 ++--
+> >  2 files changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > index 49fc9d20bc43..4c7781f4b29b 100644
+> > --- a/include/linux/virtio_vsock.h
+> > +++ b/include/linux/virtio_vsock.h
+> > @@ -35,7 +35,6 @@ struct virtio_vsock_sock {
+> >
+> >       /* Protected by tx_lock */
+> >       u32 tx_cnt;
+> > -     u32 buf_alloc;
+> >       u32 peer_fwd_cnt;
+> >       u32 peer_buf_alloc;
+> >
+> > @@ -43,6 +42,7 @@ struct virtio_vsock_sock {
+> >       u32 fwd_cnt;
+> >       u32 last_fwd_cnt;
+> >       u32 rx_bytes;
+> > +     u32 buf_alloc;
+> >       struct list_head rx_queue;
+> >  };
+> >
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index a85559d4d974..34a2b42313b7 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -210,11 +210,11 @@ static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
+> >
+> >  void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct virtio_vsock_pkt *pkt)
+> >  {
+> > -     spin_lock_bh(&vvs->tx_lock);
+> > +     spin_lock_bh(&vvs->rx_lock);
+> >       vvs->last_fwd_cnt = vvs->fwd_cnt;
+> >       pkt->hdr.fwd_cnt = cpu_to_le32(vvs->fwd_cnt);
+> >       pkt->hdr.buf_alloc = cpu_to_le32(vvs->buf_alloc);
+> > -     spin_unlock_bh(&vvs->tx_lock);
+> > +     spin_unlock_bh(&vvs->rx_lock);
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtio_transport_inc_tx_pkt);
+> >
+> > --
+> > 2.20.1
