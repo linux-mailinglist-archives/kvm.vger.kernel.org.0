@@ -2,97 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 782FB6D2A8
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 19:21:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F02906D40E
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 20:38:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727812AbfGRRVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 13:21:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62312 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727623AbfGRRVe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jul 2019 13:21:34 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6IHHXPN019604
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 13:21:33 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ttw16870j-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 13:21:33 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Thu, 18 Jul 2019 18:21:31 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 18 Jul 2019 18:21:30 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6IHLEx834013532
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Jul 2019 17:21:14 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 946D6AE057;
-        Thu, 18 Jul 2019 17:21:28 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4EB77AE059;
-        Thu, 18 Jul 2019 17:21:28 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Jul 2019 17:21:28 +0000 (GMT)
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, Petr Tesarik <ptesarik@suse.cz>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: [PATCH 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
-Date:   Thu, 18 Jul 2019 19:21:20 +0200
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-x-cbid: 19071817-0012-0000-0000-00000334200E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071817-0013-0000-0000-0000216DA31D
-Message-Id: <20190718172120.69947-1-pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-18_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=631 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907180182
+        id S1727623AbfGRSiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 14:38:22 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:52668 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726715AbfGRSiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 14:38:22 -0400
+Received: by mail-pf1-f202.google.com with SMTP id a20so17089703pfn.19
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 11:38:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=n8VorecpPGmR7cZwCga8Jqx3nBBTF8cHAFyZf3z5/Dc=;
+        b=OKg+YDslZgql7NzppycnzhnaaEHSefuv6GvCgntPJSplHAjZc3Wj2+Akp5UvKETYp1
+         T95Eqc0Yasu59LBHw+0leU9b3aeA25+xjGThT62o0QUFVDhsg8mkcJLFc2UkvYeHU0xT
+         T0MQWY0cbXxMWiww9TDF4UxcgRMmcqOcdHl/kdvRtuqgAg5uLKYmBSFps3EvfrY90UkK
+         TObrzh8/82mfVxce6YozV1BoeMpA7KBT+H6bCnsdVijB6UUUNe5EtRnZrOFdmrIGp52h
+         dV4qy52Rh+nnaH2Lrrvg+oU8dAybxCIS9itOR2snqSJCazsi7y7Zdn/LAKMdiqRF2s3V
+         AhtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=n8VorecpPGmR7cZwCga8Jqx3nBBTF8cHAFyZf3z5/Dc=;
+        b=Dm/c/2/NNY7qWoBiCJTBgE1cJAfAZhGVxZteQ9r7UYSnu+h/aZr9TNkWxMp26YBSTY
+         uRUM6LV4WWH9q/eJOBXWhjGN7BDeCrt+jcD928xg7S8qdmkyhMouFsxHie9HCzQbhdSp
+         KphXKOBubhIiyBIHfsgQVBfbmGqNUacsNw7abp18AwbYJZenQyq9AiT82j9v/tDDxL0O
+         4PXPnMWdrM/Uf3VoQcCqAlMV6tWtGFcwYqWsRTAwOX5zHTxetACfCrktvSWuxQo9dfBn
+         /vTJ/nFj0afZzFHByLA8jZrLVxNeaU7i+v8lbEKGtuvhMO+2AVrwmTzprLYHqge0gY1M
+         sr5Q==
+X-Gm-Message-State: APjAAAXuPHR5pA2eR4+j+o7aN2QWLaqF6lfcrB632OkzVPMLHMmkYVwh
+        C52tB95YpkaldZc7WKQ33IdHmwFYHkrnhy0=
+X-Google-Smtp-Source: APXvYqwW4ad1ldW7ulsb5U6WAMuDEcP6FnqUzvb+QMVND8OUDZGmfLBJdLJmNttOYZYKkh8hw/ddZU7cMQ+RCiQ=
+X-Received: by 2002:a63:e5a:: with SMTP id 26mr47410389pgo.3.1563475101281;
+ Thu, 18 Jul 2019 11:38:21 -0700 (PDT)
+Date:   Thu, 18 Jul 2019 11:38:18 -0700
+Message-Id: <20190718183818.190051-1-ehankland@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.22.0.510.g264f2c817a-goog
+Subject: [PATCH] KVM: x86: Add fixed counters to PMU filter
+From:   Eric Hankland <ehankland@google.com>
+To:     Wei Wang <wei.w.wang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stephane Eranian <eranian@google.com>,
+        ehankland <ehankland@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On s390 ZONE_DMA is up to 2G, i.e. ARCH_ZONE_DMA_BITS should be 31 bits.
-The current value is 24 and makes __dma_direct_alloc_pages() take a
-wrong turn first (but __dma_direct_alloc_pages() recovers then).
+From: ehankland <ehankland@google.com>
 
-Let's correct ARCH_ZONE_DMA_BITS value and avoid wrong turns.
+Updates KVM_CAP_PMU_EVENT_FILTER so it can also whitelist or blacklist
+fixed counters.
 
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Reported-by: Petr Tesarik <ptesarik@suse.cz>
-Fixes: c61e9637340e ("dma-direct: add support for allocation from
-ZONE_DMA and ZONE_DMA32")
+Signed-off-by: ehankland <ehankland@google.com>
 ---
- arch/s390/include/asm/dma.h | 1 +
- 1 file changed, 1 insertion(+)
+ Documentation/virtual/kvm/api.txt | 13 ++++++++-----
+ arch/x86/include/uapi/asm/kvm.h   |  9 ++++++---
+ arch/x86/kvm/pmu.c                | 30 +++++++++++++++++++++++++-----
+ 3 files changed, 39 insertions(+), 13 deletions(-)
 
-diff --git a/arch/s390/include/asm/dma.h b/arch/s390/include/asm/dma.h
-index 6f26f35d4a71..3b0329665b13 100644
---- a/arch/s390/include/asm/dma.h
-+++ b/arch/s390/include/asm/dma.h
-@@ -10,6 +10,7 @@
-  * by the 31 bit heritage.
-  */
- #define MAX_DMA_ADDRESS         0x80000000
-+#define ARCH_ZONE_DMA_BITS      31
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 2cd6250b2896..96bcf1aa1931 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -4090,17 +4090,20 @@ Parameters: struct kvm_pmu_event_filter (in)
+ Returns: 0 on success, -1 on error
  
- #ifdef CONFIG_PCI
- extern int isa_dma_bridge_buggy;
--- 
-2.17.1
-
+ struct kvm_pmu_event_filter {
+-       __u32 action;
+-       __u32 nevents;
+-       __u64 events[0];
++	__u32 action;
++	__u32 nevents;
++	__u32 fixed_counter_bitmap;
++	__u32 flags;
++	__u32 pad[4];
++	__u64 events[0];
+ };
+ 
+ This ioctl restricts the set of PMU events that the guest can program.
+ The argument holds a list of events which will be allowed or denied.
+ The eventsel+umask of each event the guest attempts to program is compared
+ against the events field to determine whether the guest should have access.
+-This only affects general purpose counters; fixed purpose counters can
+-be disabled by changing the perfmon CPUID leaf.
++The events field only controls general purpose counters; fixed purpose
++counters are controlled by the fixed_counter_bitmap.
+ 
+ Valid values for 'action':
+ #define KVM_PMU_EVENT_ALLOW 0
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index e901b0ab116f..503d3f42da16 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -435,9 +435,12 @@ struct kvm_nested_state {
+ 
+ /* for KVM_CAP_PMU_EVENT_FILTER */
+ struct kvm_pmu_event_filter {
+-       __u32 action;
+-       __u32 nevents;
+-       __u64 events[0];
++	__u32 action;
++	__u32 nevents;
++	__u32 fixed_counter_bitmap;
++	__u32 flags;
++	__u32 pad[4];
++	__u64 events[0];
+ };
+ 
+ #define KVM_PMU_EVENT_ALLOW 0
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index aa5a2597305a..ae5cd1b02086 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -19,8 +19,8 @@
+ #include "lapic.h"
+ #include "pmu.h"
+ 
+-/* This keeps the total size of the filter under 4k. */
+-#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 63
++/* This is enough to filter the vast majority of currently defined events. */
++#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 300
+ 
+ /* NOTE:
+  * - Each perf counter is defined as "struct kvm_pmc";
+@@ -206,12 +206,25 @@ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int idx)
+ {
+ 	unsigned en_field = ctrl & 0x3;
+ 	bool pmi = ctrl & 0x8;
++	struct kvm_pmu_event_filter *filter;
++	struct kvm *kvm = pmc->vcpu->kvm;
++
+ 
+ 	pmc_stop_counter(pmc);
+ 
+ 	if (!en_field || !pmc_is_enabled(pmc))
+ 		return;
+ 
++	filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
++	if (filter) {
++		if (filter->action == KVM_PMU_EVENT_DENY &&
++		    test_bit(idx, (ulong *)&filter->fixed_counter_bitmap))
++			return;
++		if (filter->action == KVM_PMU_EVENT_ALLOW &&
++		    !test_bit(idx, (ulong *)&filter->fixed_counter_bitmap))
++			return;
++	}
++
+ 	pmc_reprogram_counter(pmc, PERF_TYPE_HARDWARE,
+ 			      kvm_x86_ops->pmu_ops->find_fixed_event(idx),
+ 			      !(en_field & 0x2), /* exclude user */
+@@ -376,7 +389,7 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_pmu_event_filter tmp, *filter;
+ 	size_t size;
+-	int r;
++	int r, i;
+ 
+ 	if (copy_from_user(&tmp, argp, sizeof(tmp)))
+ 		return -EFAULT;
+@@ -385,6 +398,13 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ 	    tmp.action != KVM_PMU_EVENT_DENY)
+ 		return -EINVAL;
+ 
++	if (tmp.flags != 0)
++		return -EINVAL;
++
++	for (i = 0; i < ARRAY_SIZE(tmp.pad); i++)
++		if (tmp.pad[i] != 0)
++			return -EINVAL;
++
+ 	if (tmp.nevents > KVM_PMU_EVENT_FILTER_MAX_EVENTS)
+ 		return -E2BIG;
+ 
+@@ -406,8 +426,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ 	mutex_unlock(&kvm->lock);
+ 
+ 	synchronize_srcu_expedited(&kvm->srcu);
+- 	r = 0;
++	r = 0;
+ cleanup:
+ 	kfree(filter);
+- 	return r;
++	return r;
+ }
