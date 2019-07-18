@@ -2,122 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 22D1B6CE09
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 14:26:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5B526CE0F
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 14:28:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727794AbfGRM0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 08:26:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48338 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726715AbfGRM0c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 08:26:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0D1E58553B;
-        Thu, 18 Jul 2019 12:26:32 +0000 (UTC)
-Received: from redhat.com (ovpn-120-147.rdu2.redhat.com [10.10.120.147])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 5B13360A35;
-        Thu, 18 Jul 2019 12:26:18 +0000 (UTC)
-Date:   Thu, 18 Jul 2019 08:26:11 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, xdeguillard@vmware.com, namit@vmware.com,
-        akpm@linux-foundation.org, pagupta@redhat.com, riel@surriel.com,
-        dave.hansen@intel.com, david@redhat.com, konrad.wilk@oracle.com,
-        yang.zhang.wz@gmail.com, nitesh@redhat.com, lcapitulino@redhat.com,
-        aarcange@redhat.com, pbonzini@redhat.com,
-        alexander.h.duyck@linux.intel.com, dan.j.williams@intel.com
-Subject: Re: [PATCH v2] mm/balloon_compaction: avoid duplicate page removal
-Message-ID: <20190718082535-mutt-send-email-mst@kernel.org>
-References: <1563442040-13510-1-git-send-email-wei.w.wang@intel.com>
+        id S1727754AbfGRM2o convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 18 Jul 2019 08:28:44 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41120 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726608AbfGRM2o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jul 2019 08:28:44 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 77B822883D
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 12:28:43 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 733BA28843; Thu, 18 Jul 2019 12:28:43 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+        pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
+        NO_RELAYS autolearn=unavailable version=3.3.1
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 204209] kernel 5.2.1: "floating point exception" in qemu with
+ kvm enabled
+Date:   Thu, 18 Jul 2019 12:28:42 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: mail@thomaslambertz.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-204209-28872-P4PmmjXnMc@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204209-28872@https.bugzilla.kernel.org/>
+References: <bug-204209-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1563442040-13510-1-git-send-email-wei.w.wang@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Thu, 18 Jul 2019 12:26:32 +0000 (UTC)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 18, 2019 at 05:27:20PM +0800, Wei Wang wrote:
-> Fixes: 418a3ab1e778 (mm/balloon_compaction: List interfaces)
-> 
-> A #GP is reported in the guest when requesting balloon inflation via
-> virtio-balloon. The reason is that the virtio-balloon driver has
-> removed the page from its internal page list (via balloon_page_pop),
-> but balloon_page_enqueue_one also calls "list_del"  to do the removal.
-> This is necessary when it's used from balloon_page_enqueue_list, but
-> not from balloon_page_enqueue_one.
-> 
-> So remove the list_del balloon_page_enqueue_one, and update some
-> comments as a reminder.
-> 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=204209
+
+Thomas Lambertz (mail@thomaslambertz.de) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |mail@thomaslambertz.de
+
+--- Comment #1 from Thomas Lambertz (mail@thomaslambertz.de) ---
+I can confirm this issue. It occurs since 5.2, when the FPU state changes were
+introduced. I send an e-mail about this yesterday, seems I should have included
+the kvm mailing list:
+
+https://lkml.org/lkml/2019/7/17/758
 
 
-ok I posted v3 with typo fixes. 1/2 is this patch with comment changes. Pls take a look.
+- Thomas
 
-> ---
-> ChangeLong:
-> v1->v2: updated some comments
-> 
->  mm/balloon_compaction.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
-> index 83a7b61..8639bfc 100644
-> --- a/mm/balloon_compaction.c
-> +++ b/mm/balloon_compaction.c
-> @@ -21,7 +21,6 @@ static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
->  	 * memory corruption is possible and we should stop execution.
->  	 */
->  	BUG_ON(!trylock_page(page));
-> -	list_del(&page->lru);
->  	balloon_page_insert(b_dev_info, page);
->  	unlock_page(page);
->  	__count_vm_event(BALLOON_INFLATE);
-> @@ -33,7 +32,7 @@ static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
->   * @b_dev_info: balloon device descriptor where we will insert a new page to
->   * @pages: pages to enqueue - allocated using balloon_page_alloc.
->   *
-> - * Driver must call it to properly enqueue a balloon pages before definitively
-> + * Driver must call it to properly enqueue balloon pages before definitively
->   * removing it from the guest system.
->   *
->   * Return: number of pages that were enqueued.
-> @@ -47,6 +46,7 @@ size_t balloon_page_list_enqueue(struct balloon_dev_info *b_dev_info,
->  
->  	spin_lock_irqsave(&b_dev_info->pages_lock, flags);
->  	list_for_each_entry_safe(page, tmp, pages, lru) {
-> +		list_del(&page->lru);
->  		balloon_page_enqueue_one(b_dev_info, page);
->  		n_pages++;
->  	}
-> @@ -128,13 +128,19 @@ struct page *balloon_page_alloc(void)
->  EXPORT_SYMBOL_GPL(balloon_page_alloc);
->  
->  /*
-> - * balloon_page_enqueue - allocates a new page and inserts it into the balloon
-> - *			  page list.
-> + * balloon_page_enqueue - inserts a new page into the balloon page list.
-> + *
->   * @b_dev_info: balloon device descriptor where we will insert a new page to
->   * @page: new page to enqueue - allocated using balloon_page_alloc.
->   *
->   * Driver must call it to properly enqueue a new allocated balloon page
->   * before definitively removing it from the guest system.
-> + *
-> + * Drivers must not call balloon_page_enqueue on pages that have been
-> + * pushed to a list with balloon_page_push before removing them with
-> + * balloon_page_pop. To all pages on a list, use balloon_page_list_enqueue
-> + * instead.
-> + *
->   * This function returns the page address for the recently enqueued page or
->   * NULL in the case we fail to allocate a new page this turn.
->   */
-> -- 
-> 2.7.4
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
