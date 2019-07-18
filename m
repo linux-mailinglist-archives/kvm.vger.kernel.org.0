@@ -2,80 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E4EB16CA7F
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 09:59:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C31A6CA70
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 09:58:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726554AbfGRH7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 03:59:23 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38607 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726423AbfGRH7X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 03:59:23 -0400
-Received: by mail-wr1-f66.google.com with SMTP id g17so27571416wrr.5
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 00:59:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YU7xn75zhWNLYZOYfhl/a8jSpCY374NewaLRikXTmDo=;
-        b=PCqOXr88BmPgWgrqgDxcbrBD7giEeBNkXxf3pKczk1IVjMhJALVHJObOaJ/gY8YCYp
-         AQynlKZY9KjrgoN2hwH7o/zB4X4xsf+J1mcSLWChHhvvEOXj6ERvBGKfaiOika2sIqD3
-         Zp98gKMos2KcPlpCpcRsR5s2U3qpoHjb4tEQ/sBfYMLWII0y6rdnnK6MBmATFz3xOoVL
-         +MNe48+E8MbBaJmBdpWZzMiqKZ2lphnvz0ulevqzmcuWwKF471XFxrgAOjp25yNDgc0e
-         RPj70cwtWfo04kxr/JTSsR9rd8xRjqPA3ADeIUpu0Gx77KHVNouZTVx9119K3joJXgs/
-         hZhw==
-X-Gm-Message-State: APjAAAXWrUdoyhW0JoUVG2N07aka+2W/d0UoA7FJsUo+kOH0sIi2zsl+
-        BRu2HbT2kZaEIxN7rlvimieXfw==
-X-Google-Smtp-Source: APXvYqzWOySTek5F18g1Rk+88tPU7Ltg9YyBhOWSMynJ49lXZcAstzow7qtQj3uQua/BgR9A1MHXIA==
-X-Received: by 2002:a5d:4941:: with SMTP id r1mr46108607wrs.225.1563436761296;
-        Thu, 18 Jul 2019 00:59:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
-        by smtp.gmail.com with ESMTPSA id q18sm27264015wrw.36.2019.07.18.00.59.19
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Jul 2019 00:59:20 -0700 (PDT)
-Subject: Re: [PATCH RESEND] KVM: Boosting vCPUs that are delivering interrupts
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-References: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f95fbf72-090f-fb34-3c20-64508979f251@redhat.com>
-Date:   Thu, 18 Jul 2019 09:59:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S2389308AbfGRH4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 03:56:36 -0400
+Received: from mga09.intel.com ([134.134.136.24]:11953 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726423AbfGRH4g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 03:56:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jul 2019 00:56:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,276,1559545200"; 
+   d="scan'208";a="158712948"
+Received: from gvt-optiplex-7060.bj.intel.com ([10.238.158.89])
+  by orsmga007.jf.intel.com with ESMTP; 18 Jul 2019 00:56:33 -0700
+From:   Kechen Lu <kechen.lu@intel.com>
+To:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Kechen Lu <kechen.lu@intel.com>, kraxel@redhat.com,
+        zhenyuw@linux.intel.com, zhiyuan.lv@intel.com,
+        zhi.a.wang@intel.com, kevin.tian@intel.com, hang.yuan@intel.com,
+        alex.williamson@redhat.com
+Subject: [RFC PATCH v4 0/6] Deliver vGPU display refresh event to  userspace
+Date:   Thu, 18 Jul 2019 23:56:34 +0800
+Message-Id: <20190718155640.25928-1-kechen.lu@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/07/19 09:15, Wanpeng Li wrote:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index b4ab59d..2c46705 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2404,8 +2404,10 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
->  	int me;
->  	int cpu = vcpu->cpu;
->  
-> -	if (kvm_vcpu_wake_up(vcpu))
-> +	if (kvm_vcpu_wake_up(vcpu)) {
-> +		vcpu->preempted = true;
->  		return;
-> +	}
->  
->  	me = get_cpu();
->  	if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
-> 
+This series tries to send the vGPU display refresh event to user land.
 
-Who is resetting vcpu->preempted to false in this case?  This also
-applies to s390 in fact.
+Instead of delivering page flip events only or vblank events only, we 
+choose to combine two of them, i.e. post display refresh event at vblanks 
+and skip some of them when no page flip happens. Vblanks as upper bound 
+are safe and skipping no-page-flip vblanks guarantees both trivial performance 
+impacts and good user experience without screen tearing. Plus, we have the 
+mask/unmask mechansim providing user space flexibility to switch between 
+event-notified refresh and classic timer-based refresh.
 
-Paolo
+In addition, there are some cases that guest app only uses one framebuffer 
+for both drawing and display. In such case, guest OS won't do the plane page 
+flip when the framebuffer is updated, thus the user land won't be notified 
+about the updated framebuffer. Hence, in single framebuffer case, we apply
+a heuristic to determine whether it is the case or not. If it is, notify user
+land when each vblank event triggers.
+
+v4:
+- Deliver page flip event and single framebuffer refresh event bounded 
+by display vblanks. (Kechen)
+v3:
+- Deliver display vblank event instead of page flip event. (Zhenyu)
+v2:
+- Use VFIO irq chain to get eventfds from userspace instead of adding
+a new ABI. (Alex)
+v1:
+- https://patchwork.kernel.org/cover/10962341/
+
+Kechen Lu (2):
+  drm/i915/gvt: Deliver async primary plane page flip events at vblank
+  drm/i915/gvt: Add cursor plane reg update trap emulation handler
+
+Tina Zhang (4):
+  vfio: Define device specific irq type capability
+  vfio: Introduce vGPU display irq type
+  drm/i915/gvt: Register vGPU display event irq
+  drm/i915/gvt: Deliver vGPU refresh event to userspace
+
+ drivers/gpu/drm/i915/gvt/cmd_parser.c |   5 +-
+ drivers/gpu/drm/i915/gvt/display.c    |  54 ++++++-
+ drivers/gpu/drm/i915/gvt/gvt.h        |  11 ++
+ drivers/gpu/drm/i915/gvt/handlers.c   |  32 ++++-
+ drivers/gpu/drm/i915/gvt/hypercall.h  |   1 +
+ drivers/gpu/drm/i915/gvt/interrupt.c  |   7 +
+ drivers/gpu/drm/i915/gvt/interrupt.h  |   3 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c      | 197 ++++++++++++++++++++++++--
+ drivers/gpu/drm/i915/gvt/mpt.h        |  17 +++
+ include/uapi/linux/vfio.h             |  22 ++-
+ 10 files changed, 330 insertions(+), 19 deletions(-)
+
+-- 
+2.17.1
+
