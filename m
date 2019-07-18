@@ -2,110 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 746CE6D5FF
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B95D36D60C
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:54:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728022AbfGRUtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 16:49:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51386 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726040AbfGRUtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 16:49:13 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 40A2230B8E03;
-        Thu, 18 Jul 2019 20:49:12 +0000 (UTC)
-Received: from redhat.com (ovpn-120-147.rdu2.redhat.com [10.10.120.147])
-        by smtp.corp.redhat.com (Postfix) with SMTP id D4D7F19D7A;
-        Thu, 18 Jul 2019 20:48:57 +0000 (UTC)
-Date:   Thu, 18 Jul 2019 16:48:56 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
-        Rik van Riel <riel@surriel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        lcapitulino@redhat.com, wei.w.wang@intel.com,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Subject: Re: [PATCH v1 6/6] virtio-balloon: Add support for aerating memory
- via hinting
-Message-ID: <20190718164656-mutt-send-email-mst@kernel.org>
-References: <20190716115535-mutt-send-email-mst@kernel.org>
- <CAKgT0Ud47-cWu9VnAAD_Q2Fjia5gaWCz_L9HUF6PBhbugv6tCQ@mail.gmail.com>
- <20190716125845-mutt-send-email-mst@kernel.org>
- <CAKgT0UfgPdU1H5ZZ7GL7E=_oZNTzTwZN60Q-+2keBxDgQYODfg@mail.gmail.com>
- <20190717055804-mutt-send-email-mst@kernel.org>
- <CAKgT0Uf4iJxEx+3q_Vo9L1QPuv9PhZUv1=M9UCsn6_qs7rG4aw@mail.gmail.com>
- <20190718003211-mutt-send-email-mst@kernel.org>
- <CAKgT0UfQ3dtfjjm8wnNxX1+Azav6ws9zemH6KYc7RuyvyFo3fQ@mail.gmail.com>
- <20190718162040-mutt-send-email-mst@kernel.org>
- <CAKgT0UcKTzSYZnYsMQoG6pXhpDS7uLbDd31dqfojCSXQWSsX_A@mail.gmail.com>
+        id S1727950AbfGRUyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 16:54:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58738 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727762AbfGRUyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 16:54:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 5E7FBAD1E;
+        Thu, 18 Jul 2019 20:54:08 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 22:54:02 +0200
+From:   Petr Tesarik <ptesarik@suse.cz>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
+Message-ID: <20190718225402.6e8f31e0@ezekiel.suse.cz>
+In-Reply-To: <20190718172120.69947-1-pasic@linux.ibm.com>
+References: <20190718172120.69947-1-pasic@linux.ibm.com>
+Organization: SUSE Linux, s.r.o.
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0UcKTzSYZnYsMQoG6pXhpDS7uLbDd31dqfojCSXQWSsX_A@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 18 Jul 2019 20:49:12 +0000 (UTC)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z"; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 18, 2019 at 01:34:03PM -0700, Alexander Duyck wrote:
-> On Thu, Jul 18, 2019 at 1:24 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Thu, Jul 18, 2019 at 08:34:37AM -0700, Alexander Duyck wrote:
-> > > > > > For example we allocate pages until shrinker kicks in.
-> > > > > > Fair enough but in fact many it would be better to
-> > > > > > do the reverse: trigger shrinker and then send as many
-> > > > > > free pages as we can to host.
-> > > > >
-> > > > > I'm not sure I understand this last part.
-> > > >
-> > > > Oh basically what I am saying is this: one of the reasons to use page
-> > > > hinting is when host is short on memory.  In that case, why don't we use
-> > > > shrinker to ask kernel drivers to free up memory? Any memory freed could
-> > > > then be reported to host.
-> > >
-> > > Didn't the balloon driver already have a feature like that where it
-> > > could start shrinking memory if the host was under memory pressure? If
-> > > so how would adding another one add much value.
-> >
-> > Well fundamentally the basic balloon inflate kind of does this, yes :)
-> >
-> > The difference with what I am suggesting is that balloon inflate tries
-> > to aggressively achieve a specific goal of freed memory. We could have a
-> > weaker "free as much as you can" that is still stronger than free page
-> > hint which as you point out below does not try to free at all, just
-> > hints what is already free.
-> 
-> Yes, but why wait until the host is low on memory?
+--Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-It can come about for a variety of reasons, such as
-other VMs being aggressive, or ours aggressively caching
-stuff in memory.
+On Thu, 18 Jul 2019 19:21:20 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-> With my
-> implementation we can perform the hints in the background for a low
-> cost already. So why should we wait to free up memory when we could do
-> it immediately. Why let things get to the state where the host is
-> under memory pressure when the guests can be proactively freeing up
-> the pages and improving performance as a result be reducing swap
-> usage?
+> On s390 ZONE_DMA is up to 2G, i.e. ARCH_ZONE_DMA_BITS should be 31 bits.
+> The current value is 24 and makes __dma_direct_alloc_pages() take a
+> wrong turn first (but __dma_direct_alloc_pages() recovers then).
+>=20
+> Let's correct ARCH_ZONE_DMA_BITS value and avoid wrong turns.
+>=20
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Reported-by: Petr Tesarik <ptesarik@suse.cz>
+> Fixes: c61e9637340e ("dma-direct: add support for allocation from
+> ZONE_DMA and ZONE_DMA32")
+> ---
+>  arch/s390/include/asm/dma.h | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/arch/s390/include/asm/dma.h b/arch/s390/include/asm/dma.h
+> index 6f26f35d4a71..3b0329665b13 100644
+> --- a/arch/s390/include/asm/dma.h
+> +++ b/arch/s390/include/asm/dma.h
+> @@ -10,6 +10,7 @@
+>   * by the 31 bit heritage.
+>   */
+>  #define MAX_DMA_ADDRESS         0x80000000
+> +#define ARCH_ZONE_DMA_BITS      31
+> =20
+>  #ifdef CONFIG_PCI
+>  extern int isa_dma_bridge_buggy;
 
-You are talking about sending free memory to host.
-Fair enough but if you have drivers that aggressively
-allocate memory then there won't be that much free guest
-memory without invoking a shrinker.
+Looks good to me.
 
--- 
-MST
+Petr T
+
+--Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z
+Content-Type: application/pgp-signature
+Content-Description: Digitální podpis OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEHl2YIZkIo5VO2MxYqlA7ya4PR6cFAl0w3GoACgkQqlA7ya4P
+R6cplggAueuZZMDHcHgPZXsVT6ZtElx6CMi1ODR2GMydMbgaHrsYUZVSNGsRZuUf
+lQqeDk1Ssyg9Q4In6Fq9qkzhCoaGRr5jm8tBUlSg4ov9QX+XugmxPOT6YVRIuPAf
++ko+Wagwsb1BhbGJuE/jXJSOdis1ORZPTKE7TG+5cKNffwRgR9TEJUW2DmWOWeh/
+c5hD1rJKSI5E+SNDKHcONOuoAut8UEFbi3my0a4luHxIov+UkxhG6oPQpjuHDCaI
+c26k6RyPynGS2p/wY2oBw/5zHxZML+mm7F0dTLZyCQT55871mbFJqRCZSwbL/dmK
+hZqlwPCjGe0Bu8GskCPmEMuHnQ+Lkw==
+=lwF8
+-----END PGP SIGNATURE-----
+
+--Sig_/4Ll9JpNP1hrR3Lz8kH3Tm9Z--
