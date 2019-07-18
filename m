@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B88AF6D5C6
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:30:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 674DF6D5D5
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:35:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391655AbfGRU31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 16:29:27 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43531 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727687AbfGRU31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 16:29:27 -0400
-Received: by mail-qt1-f195.google.com with SMTP id w17so28629901qto.10;
-        Thu, 18 Jul 2019 13:29:26 -0700 (PDT)
+        id S2391431AbfGRUeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 16:34:16 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:35552 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727687AbfGRUeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 16:34:16 -0400
+Received: by mail-qk1-f194.google.com with SMTP id r21so21607478qke.2;
+        Thu, 18 Jul 2019 13:34:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=JUUHjmg0ZJlEMX+5AtmRzyp8ZylGGNhXn5v6WzeqTo0=;
-        b=Y/qJ3wC7lCk9kEZssbkBI/gkQdhuwiy4ifGVRGGiJNvAFxFoCzoCRiVh2OqmkH3nj4
-         TjO+9Grh7N49eh/cS4HANTtHCHTBvPydFBIxFWF/UCXTmseqaCEPkadsRMS1lvMwpuKR
-         fKfL+c6zkn5Da3l8N/CT17I7zjp8C3+fHViFGjExp8txHDlaq8WaMh3Zw/RvLltA1DNy
-         TrfIsCYu/LMC9GO8tvwUbbbrwM1riNmyY0hrBPZYor2C6MBFCZeSb9OPRIe1OS+1zzmv
-         GCS80WZE8idvO30m5HjU+OFSnWdyMWVrfYjuCvhqSfSqRPS+HZwa3l6eFd1Ish2WBU5H
-         iscg==
+        bh=lUeG90JN23owse4hkCx6s3PvuPmRRtzpsafpqQdcTUA=;
+        b=QrW2+V7Xl/KTpbKakLlvwVZhX3mvxwY8oW2vB8V+YuPlRdScITuH23acCo57C3rm+/
+         h14/iR5ajTzevvTZgDQqOGErulK0PjguBwTAsH9Y3EKi7j2DqAkinW13yKCiWiMvwlhz
+         G337M9FxyP8xW3prNI+Y46tV6LKGfIKoJnpWP/StoXaJ8VaE6k8S6GraWUdl1DQ0jPVo
+         5Nzq45cBYGbC8mYGBvPk+lRY+CeB7ljQ0M/WcypXEL0YLyup+trYqw1VrHc7N+XihAnT
+         qSr15Qriyhre6ikVXcxStPhA9GKq5L81kUbOPa4ctMEOcvvh0wTxrAiF0q1LX9t8rDOw
+         pMUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=JUUHjmg0ZJlEMX+5AtmRzyp8ZylGGNhXn5v6WzeqTo0=;
-        b=K5XrYbtuUO99wEtpNdh/SzDS15ZDknKgAq9MT+PS6S8C9QFJqJTgLxE9Rbota8Xga1
-         5Gt3E4DOH2o2qST/LPgPwroh8VKXwcZiRkoGh1dFwv/l5Jx8JMpw8DttUG4yS+HGeqk4
-         gukPVdx/26ta4KW1sUbydT40vF5okhG+Z0DjAMF6zTMPLcYPuBwT2FV8ax05KeW2xfTR
-         TNv2T+CtZ5yyAKeyMLBTYyexFP2rhbyk9Bzcgae49WlePIomhUuW0rbShmzuIn+woNpH
-         +b2mTw2zLF89waztpJViQBX/d5+vmIM5ZrzIGJtz1/n3W/547248AhUiFPmZiTNisGRj
-         3kxw==
-X-Gm-Message-State: APjAAAWF8+mxaVmOLMOKYqAcDcP3SrqGYW9YQT2Id1hz3zuepxvGrKnR
-        ekknnJwRWRBEy5pdArsYsLUSt9GobieWWhpSF84=
-X-Google-Smtp-Source: APXvYqwl+bEO1h8j2u/h/gYaq6zlsr1eertU95oqDRxjqkM7ku54EZON6JrY0jQ1geCz48TkU7laYiYzVhvnq8OjPuQ=
-X-Received: by 2002:ac8:2f43:: with SMTP id k3mr34539909qta.179.1563481766276;
- Thu, 18 Jul 2019 13:29:26 -0700 (PDT)
+        bh=lUeG90JN23owse4hkCx6s3PvuPmRRtzpsafpqQdcTUA=;
+        b=tV6AzQ70CZ50bIq9WkIk8mYzhWZnE43IifEmj1tFpm0upBP1EYn3XXh68o+Kv/gTH7
+         rV3kE6Cf6f+45UPdPM5yE2lLcWq5QnSnwtQ6EWfOO9yGNcQk/q8l/+lPGfSofhZwjTSM
+         wB7H4udHyzDZJGfpj/MOZHL6O5V+Xk5oUmVWzzyL+PEvlm2stJV7XbCjn+iJ8M9oa5g9
+         r9MEIh7qWvc/O09UmJGa48ksNCLYnnjp83KVpZUqJ7rwOZmu/uY3BTWQvgEivKE3l1Ia
+         sinDbQURHHwgs6x673X9h8+CCC15IpOYDQGtjwR6beBYOKfgDQriNjVVsdmPCbztC7/E
+         qYCw==
+X-Gm-Message-State: APjAAAXGYLlAm+58JuDOP8Wdlm/SjefGYl5/R2l0pnviuR4AWgYDvUI8
+        WQd0NjFxf88hHk7kjLRMJG/6LwimFx1+PyJcqwGTpQ==
+X-Google-Smtp-Source: APXvYqwjvJkRVs5rf6lR3JoHp630zNQ2CmcMU/UwjepgFtUoHLwCD2p9IdMuPtw8xc2XXrQdtk3z1AdJz1RZ4J6/Kh8=
+X-Received: by 2002:a37:9042:: with SMTP id s63mr31248155qkd.344.1563482055130;
+ Thu, 18 Jul 2019 13:34:15 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190716055017-mutt-send-email-mst@kernel.org>
  <CAKgT0Uc-2k9o7pjtf-GFAgr83c7RM-RTJ8-OrEzFv92uz+MTDw@mail.gmail.com>
@@ -47,11 +47,11 @@ References: <20190716055017-mutt-send-email-mst@kernel.org>
  <20190716125845-mutt-send-email-mst@kernel.org> <CAKgT0UfgPdU1H5ZZ7GL7E=_oZNTzTwZN60Q-+2keBxDgQYODfg@mail.gmail.com>
  <20190717055804-mutt-send-email-mst@kernel.org> <CAKgT0Uf4iJxEx+3q_Vo9L1QPuv9PhZUv1=M9UCsn6_qs7rG4aw@mail.gmail.com>
  <20190718003211-mutt-send-email-mst@kernel.org> <CAKgT0UfQ3dtfjjm8wnNxX1+Azav6ws9zemH6KYc7RuyvyFo3fQ@mail.gmail.com>
- <20190718113548-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190718113548-mutt-send-email-mst@kernel.org>
+ <20190718162040-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190718162040-mutt-send-email-mst@kernel.org>
 From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Thu, 18 Jul 2019 13:29:14 -0700
-Message-ID: <CAKgT0UeRy2eHKnz4CorefBAG8ro+3h4oFX+z1JY2qRm17fcV8w@mail.gmail.com>
+Date:   Thu, 18 Jul 2019 13:34:03 -0700
+Message-ID: <CAKgT0UcKTzSYZnYsMQoG6pXhpDS7uLbDd31dqfojCSXQWSsX_A@mail.gmail.com>
 Subject: Re: [PATCH v1 6/6] virtio-balloon: Add support for aerating memory
  via hinting
 To:     "Michael S. Tsirkin" <mst@redhat.com>
@@ -75,106 +75,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 18, 2019 at 9:07 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+On Thu, Jul 18, 2019 at 1:24 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 >
 > On Thu, Jul 18, 2019 at 08:34:37AM -0700, Alexander Duyck wrote:
-> > On Wed, Jul 17, 2019 at 10:14 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Wed, Jul 17, 2019 at 09:43:52AM -0700, Alexander Duyck wrote:
-> > > > On Wed, Jul 17, 2019 at 3:28 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > >
-> > > > > On Tue, Jul 16, 2019 at 02:06:59PM -0700, Alexander Duyck wrote:
-> > > > > > On Tue, Jul 16, 2019 at 10:41 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > >
-> > > > > > <snip>
-> > > > > >
-> > > > > > > > > This is what I am saying. Having watched that patchset being developed,
-> > > > > > > > > I think that's simply because processing blocks required mm core
-> > > > > > > > > changes, which Wei was not up to pushing through.
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > If we did
-> > > > > > > > >
-> > > > > > > > >         while (1) {
-> > > > > > > > >                 alloc_pages
-> > > > > > > > >                 add_buf
-> > > > > > > > >                 get_buf
-> > > > > > > > >                 free_pages
-> > > > > > > > >         }
-> > > > > > > > >
-> > > > > > > > > We'd end up passing the same page to balloon again and again.
-> > > > > > > > >
-> > > > > > > > > So we end up reserving lots of memory with alloc_pages instead.
-> > > > > > > > >
-> > > > > > > > > What I am saying is that now that you are developing
-> > > > > > > > > infrastructure to iterate over free pages,
-> > > > > > > > > FREE_PAGE_HINT should be able to use it too.
-> > > > > > > > > Whether that's possible might be a good indication of
-> > > > > > > > > whether the new mm APIs make sense.
-> > > > > > > >
-> > > > > > > > The problem is the infrastructure as implemented isn't designed to do
-> > > > > > > > that. I am pretty certain this interface will have issues with being
-> > > > > > > > given small blocks to process at a time.
-> > > > > > > >
-> > > > > > > > Basically the design for the FREE_PAGE_HINT feature doesn't really
-> > > > > > > > have the concept of doing things a bit at a time. It is either
-> > > > > > > > filling, stopped, or done. From what I can tell it requires a
-> > > > > > > > configuration change for the virtio balloon interface to toggle
-> > > > > > > > between those states.
-> > > > > > >
-> > > > > > > Maybe I misunderstand what you are saying.
-> > > > > > >
-> > > > > > > Filling state can definitely report things
-> > > > > > > a bit at a time. It does not assume that
-> > > > > > > all of guest free memory can fit in a VQ.
-> > > > > >
-> > > > > > I think where you and I may differ is that you are okay with just
-> > > > > > pulling pages until you hit OOM, or allocation failures. Do I have
-> > > > > > that right?
-> > > > >
-> > > > > This is exactly what the current code does. But that's an implementation
-> > > > > detail which came about because we failed to find any other way to
-> > > > > iterate over free blocks.
+> > > > > For example we allocate pages until shrinker kicks in.
+> > > > > Fair enough but in fact many it would be better to
+> > > > > do the reverse: trigger shrinker and then send as many
+> > > > > free pages as we can to host.
 > > > >
-> > > > I get that. However my concern is that permeated other areas of the
-> > > > implementation that make taking another approach much more difficult
-> > > > than it needs to be.
+> > > > I'm not sure I understand this last part.
 > > >
-> > > Implementation would have to change to use an iterator obviously. But I don't see
-> > > that it leaked out to a hypervisor interface.
-> > >
-> > > In fact take a look at virtio_balloon_shrinker_scan
-> > > and you will see that it calls shrink_free_pages
-> > > without waiting for the device at all.
+> > > Oh basically what I am saying is this: one of the reasons to use page
+> > > hinting is when host is short on memory.  In that case, why don't we use
+> > > shrinker to ask kernel drivers to free up memory? Any memory freed could
+> > > then be reported to host.
 > >
-> > Yes, and in case you missed it earlier I am pretty sure that leads to
-> > possible memory corruption. I don't think it was tested enough to be
-> > able to say that is safe.
+> > Didn't the balloon driver already have a feature like that where it
+> > could start shrinking memory if the host was under memory pressure? If
+> > so how would adding another one add much value.
 >
-> More testing would be good, for sure.
+> Well fundamentally the basic balloon inflate kind of does this, yes :)
 >
-> > Specifically we cannot be clearing the dirty flag on pages that are in
-> > use. We should only be clearing that flag for pages that are
-> > guaranteed to not be in use.
->
-> I think that clearing the dirty flag is safe if the flag was originally
-> set and the page has been
-> write-protected before reporting was requested.
-> In that case we know that page has not been changed.
-> Right?
+> The difference with what I am suggesting is that balloon inflate tries
+> to aggressively achieve a specific goal of freed memory. We could have a
+> weaker "free as much as you can" that is still stronger than free page
+> hint which as you point out below does not try to free at all, just
+> hints what is already free.
 
-I am just going to drop the rest of this thread as I agree we have
-been running ourselves around in circles. The part I had missed was
-the part where there are 2 bitmaps and that you are are using
-migration_bitmap_sync_precopy() to align the two.
-
-This is just running at the same time as the precopy code and is only
-really meant to try and clear the bit before the precopy gets to it
-from what I can tell.
-
-So one thing that is still an issue then is that my approach would
-only work on the first migration. The problem is the logic I have
-implemented assumes that once we have hinted on a page we don't need
-to do it again. However in order to support migration you would need
-to reset the hinting entirely and start over again after doing a
-migration.
+Yes, but why wait until the host is low on memory? With my
+implementation we can perform the hints in the background for a low
+cost already. So why should we wait to free up memory when we could do
+it immediately. Why let things get to the state where the host is
+under memory pressure when the guests can be proactively freeing up
+the pages and improving performance as a result be reducing swap
+usage?
