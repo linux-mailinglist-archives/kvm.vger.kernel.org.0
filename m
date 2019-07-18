@@ -2,115 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B81536C841
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 06:13:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 003956C873
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 06:32:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726520AbfGRENa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 00:13:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58142 "EHLO mx1.redhat.com"
+        id S1727195AbfGREbq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 00:31:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37912 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725976AbfGRENa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 00:13:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1725976AbfGREbq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 00:31:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9E1FFC053B34;
-        Thu, 18 Jul 2019 04:13:29 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 73314308FBA9;
+        Thu, 18 Jul 2019 04:31:45 +0000 (UTC)
 Received: from redhat.com (ovpn-120-147.rdu2.redhat.com [10.10.120.147])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 1D7AC600D1;
-        Thu, 18 Jul 2019 04:13:16 +0000 (UTC)
-Date:   Thu, 18 Jul 2019 00:13:15 -0400
+        by smtp.corp.redhat.com (Postfix) with SMTP id 87DBA5D71D;
+        Thu, 18 Jul 2019 04:31:33 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 00:31:31 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Wang, Wei W" <wei.w.wang@intel.com>
-Cc:     Alexander Duyck <alexander.duyck@gmail.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        "pagupta@redhat.com" <pagupta@redhat.com>,
-        Rik van Riel <riel@surriel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "lcapitulino@redhat.com" <lcapitulino@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Subject: Re: use of shrinker in virtio balloon free page hinting
-Message-ID: <20190718000434-mutt-send-email-mst@kernel.org>
-References: <20190717071332-mutt-send-email-mst@kernel.org>
- <286AC319A985734F985F78AFA26841F73E16D4B2@shsmsx102.ccr.corp.intel.com>
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, xdeguillard@vmware.com, namit@vmware.com,
+        akpm@linux-foundation.org, pagupta@redhat.com, riel@surriel.com,
+        dave.hansen@intel.com, david@redhat.com, konrad.wilk@oracle.com,
+        yang.zhang.wz@gmail.com, nitesh@redhat.com, lcapitulino@redhat.com,
+        aarcange@redhat.com, pbonzini@redhat.com,
+        alexander.h.duyck@linux.intel.com, dan.j.williams@intel.com
+Subject: Re: [PATCH v1] mm/balloon_compaction: avoid duplicate page removal
+Message-ID: <20190718001605-mutt-send-email-mst@kernel.org>
+References: <1563416610-11045-1-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <286AC319A985734F985F78AFA26841F73E16D4B2@shsmsx102.ccr.corp.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 18 Jul 2019 04:13:30 +0000 (UTC)
+In-Reply-To: <1563416610-11045-1-git-send-email-wei.w.wang@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 18 Jul 2019 04:31:45 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 03:46:57PM +0000, Wang, Wei W wrote:
-> On Wednesday, July 17, 2019 7:21 PM, Michael S. Tsirkin wrote:
-> > 
-> > Wei, others,
-> > 
-> > ATM virtio_balloon_shrinker_scan will only get registered when deflate on
-> > oom feature bit is set.
-> > 
-> > Not sure whether that's intentional. 
+On Thu, Jul 18, 2019 at 10:23:30AM +0800, Wei Wang wrote:
+> Fixes: 418a3ab1e778 (mm/balloon_compaction: List interfaces)
 > 
-> Yes, we wanted to follow the old oom behavior, which allows the oom notifier
-> to deflate pages only when this feature bit has been negotiated.
+> A #GP is reported in the guest when requesting balloon inflation via
+> virtio-balloon. The reason is that the virtio-balloon driver has
+> removed the page from its internal page list (via balloon_page_pop),
+> but balloon_page_enqueue_one also calls "list_del"  to do the removal.
 
-It makes sense for pages in the balloon (requested by hypervisor).
-However free page hinting can freeze up lots of memory for its own
-internal reasons. It does not make sense to ask hypervisor
-to set flags in order to fix internal guest issues.
+I would add here "this is necessary when it's used from
+balloon_page_enqueue_list but not when it's called
+from balloon_page_enqueue".
 
-> > Assuming it is:
-> > 
-> > virtio_balloon_shrinker_scan will try to locate and free pages that are
-> > processed by host.
-> > The above seems broken in several ways:
-> > - count ignores the free page list completely
+> So remove the list_del in balloon_page_enqueue_one, and have the callers
+> do the page removal from their own page lists.
 > 
-> Do you mean virtio_balloon_shrinker_count()? It just reports to
-> do_shrink_slab the amount of freeable memory that balloon has.
-> (vb->num_pages and vb->num_free_page_blocks are all included )
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 
-Right. But that does not include the pages in the hint vq,
-which could be a significant amount of memory.
+Patch is good but comments need some work.
 
-
-> > - if free pages are being reported, pages freed
-> >   by shrinker will just get re-allocated again
+> ---
+>  mm/balloon_compaction.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> fill_balloon will re-try the allocation after sleeping 200ms once allocation fails.
-
-Even if ballon was never inflated, if shrinker frees some memory while
-we are hinting, hint vq will keep going and allocate it back without
-sleeping.
-
+> diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+> index 83a7b61..1a5ddc4 100644
+> --- a/mm/balloon_compaction.c
+> +++ b/mm/balloon_compaction.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/export.h>
+>  #include <linux/balloon_compaction.h>
 >  
-> > I was unable to make this part of code behave in any reasonable way - was
-> > shrinker usage tested? What's a good way to test that?
-> 
-> Please see the example that I tested before : https://lkml.org/lkml/2018/8/6/29
-> (just the first one: *1. V3 patches)
-> 
-> What problem did you see?
-> I just tried the latest code, and find ballooning reports a #GP (seems caused by
-> 418a3ab1e). 
-> I'll take a look at the details in the office tomorrow.
-> 
-> Best,
-> Wei
+> +/* Callers ensure that @page has been removed from its original list. */
 
-I saw that VM hangs. Could be the above problem, let me know how it
-goes.
+This comment does not make sense. E.g. balloon_page_enqueue
+does nothing to ensure this. And drivers are not supposed
+to care how the page lists are managed. Pls drop.
 
+Instead please add the following to balloon_page_enqueue:
+
+
+	Note: drivers must not call balloon_page_list_enqueue on
+	pages that have been pushed to a list with balloon_page_push
+	before removing them with balloon_page_pop.
+	To all pages on a list, use balloon_page_list_enqueue instead.
+
+>  static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
+>  				     struct page *page)
+>  {
+> @@ -21,7 +22,6 @@ static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
+>  	 * memory corruption is possible and we should stop execution.
+>  	 */
+>  	BUG_ON(!trylock_page(page));
+> -	list_del(&page->lru);
+>  	balloon_page_insert(b_dev_info, page);
+>  	unlock_page(page);
+>  	__count_vm_event(BALLOON_INFLATE);
+> @@ -47,6 +47,7 @@ size_t balloon_page_list_enqueue(struct balloon_dev_info *b_dev_info,
+>  
+>  	spin_lock_irqsave(&b_dev_info->pages_lock, flags);
+>  	list_for_each_entry_safe(page, tmp, pages, lru) {
+> +		list_del(&page->lru);
+>  		balloon_page_enqueue_one(b_dev_info, page);
+>  		n_pages++;
+>  	}
+> -- 
+> 2.7.4
