@@ -2,98 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 117966CBEB
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 11:30:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7FCB6CC05
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 11:37:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727666AbfGRJ33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 05:29:29 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:33076 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726513AbfGRJ32 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 05:29:28 -0400
-Received: by mail-ot1-f68.google.com with SMTP id q20so28256992otl.0;
-        Thu, 18 Jul 2019 02:29:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NpasdpGQ+k5k5hCl+7N6bXO3B/SAFa/2qIIRqxZLH2k=;
-        b=EPwd0NHIgUF5z1lJ4D0bV1b32GqgQ8BaowK4v4Z9r5Aim+npx7WLCJQTMJtCsmzWyc
-         OR7tKFCW6AAquA/cyG90tXUJFnA2Yoj7q2HLuUE8TM979Z451SE17/LiaIy1ILKMhyEW
-         Dw+JC54KPWNOJTvxUNNg98EVVaGkqGpnttu7dAQHmnQ20F3yoVy7Mw9vLTuHxbwkocmV
-         1wvoOHCNjuUw2TWfbJV2DifziYLllFfvI1fBpH4lSgFJy4E/TvrJEISioaOkUBmi246K
-         s7j7RwW2ZRIt6JN1pROCnMCT+PNKbkOPE/d7bV1yQj8XOshVzri4zicMVDVpcBUKB4D7
-         AAkw==
+        id S2389814AbfGRJhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 05:37:41 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42331 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727609AbfGRJhl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 05:37:41 -0400
+Received: by mail-wr1-f65.google.com with SMTP id x1so12908568wrr.9
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 02:37:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NpasdpGQ+k5k5hCl+7N6bXO3B/SAFa/2qIIRqxZLH2k=;
-        b=QpIDbd6ysLDpYyEAJqqOvxjHWMmdAXkj0S4fobxV+TZ0eHtSbiVqi1krlTEOkHEqZm
-         vYNzUqr87MFF0vp+L0P/A2d7Iha/I9MI46VpNEDgPgA81OJyex+arXlF5/vlpYXzLM7h
-         m0EIlVdm9JzKWt8ecAcMnW2/f6XRblJGi8zmrwDhNozZplFIUAGEgeEeHVeGo86+Zq68
-         bT5bFFIph0eAK+yo5rZs8qiylPENlBnDQ4vgm8ZvPd688Vhar3oWdX3B0I++YtC8fabp
-         NaGjJB/0HhWudcX+TwbDt59GkqlSZdivsDc4BPHi5cORnvKQ6Qng19bZih9rgaQfv8DJ
-         M6UA==
-X-Gm-Message-State: APjAAAUwOzpJUwoZEmxfdPlM5nkBQylULNNIiWbdilEdkfwD2tCyAxWp
-        jnPvlqzEWupLbYAPrYXUUBPnfUpwcb+ZABmUq3Tg4hqZ
-X-Google-Smtp-Source: APXvYqz/cWRn5R55kKWuILJDwaGqioXzFn+iU7ibeLIuE7V6kDlJtr/zLoHWxeSnK2gz//Je7OTAbTcRq9DGNrvdLUg=
-X-Received: by 2002:a9d:4590:: with SMTP id x16mr30910465ote.254.1563442167790;
- Thu, 18 Jul 2019 02:29:27 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Vums2zz+KqGmXaH/Vl3B9M8z+ViEwY48CergeYbypPk=;
+        b=t3CiQg7CSXIPxnwS+sRB8l2/cjokzoOYGibGzoqqKYVg/nwRFptyt53erIwukWEitL
+         2W55nYvFaQwBJsKltMTD2CtnPGCSsb1OenKFT11BMGMbIOMR1DE2OhRX77nZgAjwC0Qx
+         DqkEXEEz38PUlG8oFKYKQ7MX+uBnIz0014I/3IT84l1KBgeDXVp+zx2FpI06QJEslUS0
+         SYhBz5CjzK8n3jWRw4yaUOptew/NjVzX42dbUHrSn88Ju0tYx7u+WqBB16pDTve+MoS4
+         cGgOoXRijkT/VCLcEJ2mbzOU9x5kJ0p+sJI6iI56IhcG4X+QQVj7mUW1uxMvtbmB43oG
+         XVCw==
+X-Gm-Message-State: APjAAAWdXo93tkkyJRpwr8jHQCcf+xsdQ1U4VFXxqml7sjOLL41bfiJh
+        B6FT3YL/ML47u0S0Rxfyi1+0XHJRTqs=
+X-Google-Smtp-Source: APXvYqxYCA1EVl1T2DVO3iZedENcjrNB6Hslgz4pOwp4UFAclSWI8asScK5ZYvkj/r17GyN6S1B6Kg==
+X-Received: by 2002:adf:ec0f:: with SMTP id x15mr13474237wrn.165.1563442659406;
+        Thu, 18 Jul 2019 02:37:39 -0700 (PDT)
+Received: from steredhat ([5.171.190.136])
+        by smtp.gmail.com with ESMTPSA id q18sm27647509wrw.36.2019.07.18.02.37.37
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 18 Jul 2019 02:37:38 -0700 (PDT)
+Date:   Thu, 18 Jul 2019 11:37:30 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 4/5] vhost/vsock: split packets to send using multiple
+ buffers
+Message-ID: <CAGxU2F6oo7Cou7t9o=gG2=wxHMKX9xYQXNxVtDYeHq5fyEhJWg@mail.gmail.com>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190717113030.163499-5-sgarzare@redhat.com>
+ <20190717105336-mutt-send-email-mst@kernel.org>
+ <CAGxU2F45v40qAOHkm1Hk2E69gCS0UwVgS5NS+tDXXuzdF4EixA@mail.gmail.com>
+ <20190718041234-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
- <f95fbf72-090f-fb34-3c20-64508979f251@redhat.com> <db74a3a8-290e-edff-10ad-f861c60fbf8e@de.ibm.com>
- <e31024e4-f437-becd-a9e3-e1ea8cd2e0c7@redhat.com> <CANRm+Cw43DKqD17U+7-OPX3BmeNBThSe9-uWP2Atob+A0ApzLA@mail.gmail.com>
- <bc210153-fbae-25d4-bf6b-e31ceef36aa5@redhat.com>
-In-Reply-To: <bc210153-fbae-25d4-bf6b-e31ceef36aa5@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 18 Jul 2019 17:29:19 +0800
-Message-ID: <CANRm+CxV0c3RSidV_GQtVuQ5fUUCT8vM=5LpodgDg+dFWhkH3w@mail.gmail.com>
-Subject: Re: [PATCH RESEND] KVM: Boosting vCPUs that are delivering interrupts
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190718041234-mutt-send-email-mst@kernel.org>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Jul 2019 at 17:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 18/07/19 10:43, Wanpeng Li wrote:
-> >>> Isnt that done by the sched_in handler?
-> >>
-> >> I am a bit confused because, if it is done by the sched_in later, I
-> >> don't understand why the sched_out handler hasn't set vcpu->preempted
-> >> already.
-> >>
-> >> The s390 commit message is not very clear, but it talks about "a former
-> >> sleeping cpu" that "gave up the cpu voluntarily".  Does "voluntarily"
-> >> that mean it is in kvm_vcpu_block?  But then at least for x86 it would
+On Thu, Jul 18, 2019 at 10:13 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Thu, Jul 18, 2019 at 09:50:14AM +0200, Stefano Garzarella wrote:
+> > On Wed, Jul 17, 2019 at 4:55 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > On Wed, Jul 17, 2019 at 01:30:29PM +0200, Stefano Garzarella wrote:
+> > > > If the packets to sent to the guest are bigger than the buffer
+> > > > available, we can split them, using multiple buffers and fixing
+> > > > the length in the packet header.
+> > > > This is safe since virtio-vsock supports only stream sockets.
+> > > >
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > >
+> > > So how does it work right now? If an app
+> > > does sendmsg with a 64K buffer and the other
+> > > side publishes 4K buffers - does it just stall?
 > >
-> > see the prepare_to_swait_exlusive() in kvm_vcpu_block(), the task will
-> > be set in TASK_INTERRUPTIBLE state, kvm_sched_out will set
-> > vcpu->preempted to true iff current->state == TASK_RUNNING.
+> > Before this series, the 64K (or bigger) user messages was split in 4K packets
+> > (fixed in the code) and queued in an internal list for the TX worker.
+> >
+> > After this series, we will queue up to 64K packets and then it will be split in
+> > the TX worker, depending on the size of the buffers available in the
+> > vring. (The idea was to allow EWMA or a configuration of the buffers size, but
+> > for now we postponed it)
 >
-> Ok, I was totally blind to that "if" around vcpu->preempted = true, it's
-> obvious now.
->
-> I think we need two flags then, for example vcpu->preempted and vcpu->ready:
->
-> - kvm_sched_out sets both of them to true iff current->state == TASK_RUNNING
->
-> - kvm_vcpu_kick sets vcpu->ready to true
->
-> - kvm_sched_in clears both of them
->
-> This way, vmx_vcpu_pi_load can keep looking at preempted only (it
-> handles voluntary preemption in pi_pre_block/pi_post_block).
->
-> Also, kvm_s390_vcpu_wakeup can be changed to use kvm_vcpu_wake_up, which
-> is nice.
+> Got it. Using workers for xmit is IMHO a bad idea btw.
+> Why is it done like this?
 
-Will do. :)
+Honestly, I don't know the exact reasons for this design, but I suppose
+that the idea was to have only one worker that uses the vring, and
+multiple user threads that enqueue packets in the list.
+This can simplify the code and we can put the user threads to sleep if
+we don't have "credit" available (this means that the receiver doesn't
+have space to receive the packet).
 
-Wanpeng
+What are the drawbacks in your opinion?
+
+
+Thanks,
+Stefano
