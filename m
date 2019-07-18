@@ -2,106 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33A8F6CC10
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 11:40:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E98776CC94
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 12:11:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727474AbfGRJjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 05:39:48 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33582 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726454AbfGRJjr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 05:39:47 -0400
-Received: by mail-wm1-f66.google.com with SMTP id h19so21086937wme.0
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 02:39:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8haVWoDpVR5WxCmFLokklmzinBm2VLPR7zTTlvNe1xo=;
-        b=sraqjUm3iQpUcYKLq/AN6GWvMCKoqr5FOx6vn8bdeKuFHJVwOYRn2Wg9sbm4tplRqs
-         7ti0MvvjNTc9ZAvEoThiyLBe/9sK19Fb4dR5X4n1Z0p6rJSkcixjmF1UYXDveZMtjc7Y
-         QoYKmq9jDreGjLusHzeouI2fXuTb5oO1wSThGbrLmLSXG3vN3yP7jCcd52j2PMe0brQY
-         KK8A01P8JhxXZndZVFjeU653X4ptzY501Ec4fP421QmFv3jG2HZIVi7LoALoX5//vwzh
-         enfC/WAgr58pR6jrzFDhGSJ/m0ntqLb/URzVJt99v9pKokf4KXngc/pReuE20PLzkNPf
-         nx2g==
-X-Gm-Message-State: APjAAAW5im98J9H1i2t4VRsCteVlHx/J8ywSwF4u1LLO5I2ethqJDqxS
-        AIlvZ+Tb/17OMoTlc+AfdgamQQ==
-X-Google-Smtp-Source: APXvYqx23CP7qsEyw52dzAYhntF3bkpxTa1Ol4aIfCYcJ9vKxpbFYwnXz61NjcCrebAKq/6WqokZGQ==
-X-Received: by 2002:a7b:cc09:: with SMTP id f9mr42911311wmh.68.1563442785542;
-        Thu, 18 Jul 2019 02:39:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
-        by smtp.gmail.com with ESMTPSA id p3sm24437124wmg.15.2019.07.18.02.39.44
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Jul 2019 02:39:45 -0700 (PDT)
-Subject: Re: [PATCH RESEND] KVM: Boosting vCPUs that are delivering interrupts
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
- <f95fbf72-090f-fb34-3c20-64508979f251@redhat.com>
- <db74a3a8-290e-edff-10ad-f861c60fbf8e@de.ibm.com>
- <e31024e4-f437-becd-a9e3-e1ea8cd2e0c7@redhat.com>
- <CANRm+Cw43DKqD17U+7-OPX3BmeNBThSe9-uWP2Atob+A0ApzLA@mail.gmail.com>
- <bc210153-fbae-25d4-bf6b-e31ceef36aa5@redhat.com>
- <CANRm+CxV0c3RSidV_GQtVuQ5fUUCT8vM=5LpodgDg+dFWhkH3w@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f6f9c2ca-6fea-d7b5-9797-d180e42f50d5@redhat.com>
-Date:   Thu, 18 Jul 2019 11:39:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <CANRm+CxV0c3RSidV_GQtVuQ5fUUCT8vM=5LpodgDg+dFWhkH3w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1727131AbfGRKKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 06:10:43 -0400
+Received: from mga14.intel.com ([192.55.52.115]:2216 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726495AbfGRKKn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 06:10:43 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jul 2019 03:10:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,276,1559545200"; 
+   d="scan'208";a="162031470"
+Received: from devel-ww.sh.intel.com ([10.239.48.128])
+  by orsmga008.jf.intel.com with ESMTP; 18 Jul 2019 03:10:39 -0700
+From:   Wei Wang <wei.w.wang@intel.com>
+To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, mst@redhat.com, xdeguillard@vmware.com,
+        namit@vmware.com
+Cc:     akpm@linux-foundation.org, pagupta@redhat.com, riel@surriel.com,
+        dave.hansen@intel.com, david@redhat.com, konrad.wilk@oracle.com,
+        yang.zhang.wz@gmail.com, nitesh@redhat.com, lcapitulino@redhat.com,
+        aarcange@redhat.com, pbonzini@redhat.com,
+        alexander.h.duyck@linux.intel.com, dan.j.williams@intel.com
+Subject: [PATCH v2] mm/balloon_compaction: avoid duplicate page removal
+Date:   Thu, 18 Jul 2019 17:27:20 +0800
+Message-Id: <1563442040-13510-1-git-send-email-wei.w.wang@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/07/19 11:29, Wanpeng Li wrote:
-> On Thu, 18 Jul 2019 at 17:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 18/07/19 10:43, Wanpeng Li wrote:
->>>>> Isnt that done by the sched_in handler?
->>>>
->>>> I am a bit confused because, if it is done by the sched_in later, I
->>>> don't understand why the sched_out handler hasn't set vcpu->preempted
->>>> already.
->>>>
->>>> The s390 commit message is not very clear, but it talks about "a former
->>>> sleeping cpu" that "gave up the cpu voluntarily".  Does "voluntarily"
->>>> that mean it is in kvm_vcpu_block?  But then at least for x86 it would
->>>
->>> see the prepare_to_swait_exlusive() in kvm_vcpu_block(), the task will
->>> be set in TASK_INTERRUPTIBLE state, kvm_sched_out will set
->>> vcpu->preempted to true iff current->state == TASK_RUNNING.
->>
->> Ok, I was totally blind to that "if" around vcpu->preempted = true, it's
->> obvious now.
->>
->> I think we need two flags then, for example vcpu->preempted and vcpu->ready:
->>
->> - kvm_sched_out sets both of them to true iff current->state == TASK_RUNNING
->>
->> - kvm_vcpu_kick sets vcpu->ready to true
->>
->> - kvm_sched_in clears both of them
+Fixes: 418a3ab1e778 (mm/balloon_compaction: List interfaces)
 
-... and also kvm_vcpu_on_spin should check vcpu->ready.  vcpu->preempted
-remains only for use by vmx_vcpu_pi_put.
+A #GP is reported in the guest when requesting balloon inflation via
+virtio-balloon. The reason is that the virtio-balloon driver has
+removed the page from its internal page list (via balloon_page_pop),
+but balloon_page_enqueue_one also calls "list_del"  to do the removal.
+This is necessary when it's used from balloon_page_enqueue_list, but
+not from balloon_page_enqueue_one.
 
-Later we could think of removing vcpu->preempted.  For example,
-kvm_arch_sched_out and kvm_x86_ops->sched_out could get the code
-currently in vmx_vcpu_pi_put (testing curent->state == TASK_RUNNING
-instead of vcpu->preempted).  But for now there's no need and I'm not
-sure it's an improvement at all.
+So remove the list_del balloon_page_enqueue_one, and update some
+comments as a reminder.
 
-Paolo
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ChangeLong:
+v1->v2: updated some comments
 
->> This way, vmx_vcpu_pi_load can keep looking at preempted only (it
->> handles voluntary preemption in pi_pre_block/pi_post_block).
+ mm/balloon_compaction.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
+index 83a7b61..8639bfc 100644
+--- a/mm/balloon_compaction.c
++++ b/mm/balloon_compaction.c
+@@ -21,7 +21,6 @@ static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
+ 	 * memory corruption is possible and we should stop execution.
+ 	 */
+ 	BUG_ON(!trylock_page(page));
+-	list_del(&page->lru);
+ 	balloon_page_insert(b_dev_info, page);
+ 	unlock_page(page);
+ 	__count_vm_event(BALLOON_INFLATE);
+@@ -33,7 +32,7 @@ static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
+  * @b_dev_info: balloon device descriptor where we will insert a new page to
+  * @pages: pages to enqueue - allocated using balloon_page_alloc.
+  *
+- * Driver must call it to properly enqueue a balloon pages before definitively
++ * Driver must call it to properly enqueue balloon pages before definitively
+  * removing it from the guest system.
+  *
+  * Return: number of pages that were enqueued.
+@@ -47,6 +46,7 @@ size_t balloon_page_list_enqueue(struct balloon_dev_info *b_dev_info,
+ 
+ 	spin_lock_irqsave(&b_dev_info->pages_lock, flags);
+ 	list_for_each_entry_safe(page, tmp, pages, lru) {
++		list_del(&page->lru);
+ 		balloon_page_enqueue_one(b_dev_info, page);
+ 		n_pages++;
+ 	}
+@@ -128,13 +128,19 @@ struct page *balloon_page_alloc(void)
+ EXPORT_SYMBOL_GPL(balloon_page_alloc);
+ 
+ /*
+- * balloon_page_enqueue - allocates a new page and inserts it into the balloon
+- *			  page list.
++ * balloon_page_enqueue - inserts a new page into the balloon page list.
++ *
+  * @b_dev_info: balloon device descriptor where we will insert a new page to
+  * @page: new page to enqueue - allocated using balloon_page_alloc.
+  *
+  * Driver must call it to properly enqueue a new allocated balloon page
+  * before definitively removing it from the guest system.
++ *
++ * Drivers must not call balloon_page_enqueue on pages that have been
++ * pushed to a list with balloon_page_push before removing them with
++ * balloon_page_pop. To all pages on a list, use balloon_page_list_enqueue
++ * instead.
++ *
+  * This function returns the page address for the recently enqueued page or
+  * NULL in the case we fail to allocate a new page this turn.
+  */
+-- 
+2.7.4
 
