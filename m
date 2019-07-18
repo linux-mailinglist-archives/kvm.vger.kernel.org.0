@@ -2,77 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5B526CE0F
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 14:28:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E03E96CE27
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 14:33:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbfGRM2o convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 18 Jul 2019 08:28:44 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41120 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726608AbfGRM2o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jul 2019 08:28:44 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 77B822883D
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 12:28:43 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 733BA28843; Thu, 18 Jul 2019 12:28:43 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-        pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
-        NO_RELAYS autolearn=unavailable version=3.3.1
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 204209] kernel 5.2.1: "floating point exception" in qemu with
- kvm enabled
-Date:   Thu, 18 Jul 2019 12:28:42 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mail@thomaslambertz.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-204209-28872-P4PmmjXnMc@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204209-28872@https.bugzilla.kernel.org/>
-References: <bug-204209-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S2390267AbfGRMdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 08:33:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51384 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727692AbfGRMdx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 08:33:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 43D52307D941;
+        Thu, 18 Jul 2019 12:33:53 +0000 (UTC)
+Received: from redhat.com (ovpn-120-147.rdu2.redhat.com [10.10.120.147])
+        by smtp.corp.redhat.com (Postfix) with SMTP id AD1EA5D720;
+        Thu, 18 Jul 2019 12:33:47 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 08:33:40 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 5/5] vsock/virtio: change the maximum packet size
+ allowed
+Message-ID: <20190718083105-mutt-send-email-mst@kernel.org>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190717113030.163499-6-sgarzare@redhat.com>
+ <20190717105703-mutt-send-email-mst@kernel.org>
+ <CAGxU2F5ybg1_8VhS=COMnxSKC4AcW4ZagYwNMi==d6-rNPgzsg@mail.gmail.com>
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F5ybg1_8VhS=COMnxSKC4AcW4ZagYwNMi==d6-rNPgzsg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Thu, 18 Jul 2019 12:33:53 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=204209
+On Thu, Jul 18, 2019 at 09:52:41AM +0200, Stefano Garzarella wrote:
+> On Wed, Jul 17, 2019 at 5:00 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Wed, Jul 17, 2019 at 01:30:30PM +0200, Stefano Garzarella wrote:
+> > > Since now we are able to split packets, we can avoid limiting
+> > > their sizes to VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE.
+> > > Instead, we can use VIRTIO_VSOCK_MAX_PKT_BUF_SIZE as the max
+> > > packet size.
+> > >
+> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> >
+> >
+> > OK so this is kind of like GSO where we are passing
+> > 64K packets to the vsock and then split at the
+> > low level.
+> 
+> Exactly, something like that in the Host->Guest path, instead in the
+> Guest->Host we use the entire 64K packet.
+> 
+> Thanks,
+> Stefano
 
-Thomas Lambertz (mail@thomaslambertz.de) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |mail@thomaslambertz.de
-
---- Comment #1 from Thomas Lambertz (mail@thomaslambertz.de) ---
-I can confirm this issue. It occurs since 5.2, when the FPU state changes were
-introduced. I send an e-mail about this yesterday, seems I should have included
-the kvm mailing list:
-
-https://lkml.org/lkml/2019/7/17/758
-
-
-- Thomas
+btw two allocations for each packet isn't great. How about
+allocating the struct linearly with the data?
+And all buffers are same length for you - so you can actually
+do alloc_pages.
+Allocating/freeing pages in a batch should also be considered.
 
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+MST
