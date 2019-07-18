@@ -2,74 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B58CB6D5DA
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:36:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72D126D5E4
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 22:38:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728014AbfGRUg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 16:36:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43900 "EHLO mail.kernel.org"
+        id S1727950AbfGRUh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 16:37:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34732 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727685AbfGRUg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 16:36:28 -0400
-Received: from akpm3.svl.corp.google.com (unknown [104.133.8.64])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727685AbfGRUh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 16:37:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9D45A21019;
-        Thu, 18 Jul 2019 20:36:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563482187;
-        bh=n33RnYgEWXmqJNz9rAt/hhFEfid9BuR/+DJfKxYaK0U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=lUOwsJeO09VcivQzELIEb1xspaeMrv8igfqpVje7IjB8d0vzktO7JZSGLFIM+EfTr
-         h/bHRCTZ3vQJKeX3CNOxKC0fE0T4geSoEIcdsi2HhD4Y4RNcoErz93W0ItzQFE/qdX
-         vMDMu7ZP5PtAPbBp6eeXNJtHCfHbt5jrTeJLUhF0=
-Date:   Thu, 18 Jul 2019 13:36:26 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Wei Wang <wei.w.wang@intel.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        xdeguillard@vmware.com, namit@vmware.com, pagupta@redhat.com,
-        riel@surriel.com, dave.hansen@intel.com, david@redhat.com,
-        konrad.wilk@oracle.com, yang.zhang.wz@gmail.com, nitesh@redhat.com,
-        lcapitulino@redhat.com, aarcange@redhat.com, pbonzini@redhat.com,
-        alexander.h.duyck@linux.intel.com, dan.j.williams@intel.com
-Subject: Re: [PATCH v2] mm/balloon_compaction: avoid duplicate page removal
-Message-Id: <20190718133626.e30bec8fc506689b3daf48ee@linux-foundation.org>
-In-Reply-To: <20190718082535-mutt-send-email-mst@kernel.org>
-References: <1563442040-13510-1-git-send-email-wei.w.wang@intel.com>
-        <20190718082535-mutt-send-email-mst@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        by mx1.redhat.com (Postfix) with ESMTPS id E683881F0C;
+        Thu, 18 Jul 2019 20:37:57 +0000 (UTC)
+Received: from redhat.com (ovpn-120-147.rdu2.redhat.com [10.10.120.147])
+        by smtp.corp.redhat.com (Postfix) with SMTP id 7D93B1001B35;
+        Thu, 18 Jul 2019 20:37:45 +0000 (UTC)
+Date:   Thu, 18 Jul 2019 16:37:44 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
+        Rik van Riel <riel@surriel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        lcapitulino@redhat.com, wei.w.wang@intel.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Subject: Re: [PATCH v1 6/6] virtio-balloon: Add support for aerating memory
+ via hinting
+Message-ID: <20190718163325-mutt-send-email-mst@kernel.org>
+References: <20190716115535-mutt-send-email-mst@kernel.org>
+ <CAKgT0Ud47-cWu9VnAAD_Q2Fjia5gaWCz_L9HUF6PBhbugv6tCQ@mail.gmail.com>
+ <20190716125845-mutt-send-email-mst@kernel.org>
+ <CAKgT0UfgPdU1H5ZZ7GL7E=_oZNTzTwZN60Q-+2keBxDgQYODfg@mail.gmail.com>
+ <20190717055804-mutt-send-email-mst@kernel.org>
+ <CAKgT0Uf4iJxEx+3q_Vo9L1QPuv9PhZUv1=M9UCsn6_qs7rG4aw@mail.gmail.com>
+ <20190718003211-mutt-send-email-mst@kernel.org>
+ <CAKgT0UfQ3dtfjjm8wnNxX1+Azav6ws9zemH6KYc7RuyvyFo3fQ@mail.gmail.com>
+ <20190718113548-mutt-send-email-mst@kernel.org>
+ <CAKgT0UeRy2eHKnz4CorefBAG8ro+3h4oFX+z1JY2qRm17fcV8w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UeRy2eHKnz4CorefBAG8ro+3h4oFX+z1JY2qRm17fcV8w@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Thu, 18 Jul 2019 20:37:58 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Jul 2019 08:26:11 -0400 "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Thu, Jul 18, 2019 at 01:29:14PM -0700, Alexander Duyck wrote:
+> So one thing that is still an issue then is that my approach would
+> only work on the first migration. The problem is the logic I have
+> implemented assumes that once we have hinted on a page we don't need
+> to do it again. However in order to support migration you would need
+> to reset the hinting entirely and start over again after doing a
+> migration.
 
-> On Thu, Jul 18, 2019 at 05:27:20PM +0800, Wei Wang wrote:
-> > Fixes: 418a3ab1e778 (mm/balloon_compaction: List interfaces)
-> > 
-> > A #GP is reported in the guest when requesting balloon inflation via
-> > virtio-balloon. The reason is that the virtio-balloon driver has
-> > removed the page from its internal page list (via balloon_page_pop),
-> > but balloon_page_enqueue_one also calls "list_del"  to do the removal.
-> > This is necessary when it's used from balloon_page_enqueue_list, but
-> > not from balloon_page_enqueue_one.
-> > 
-> > So remove the list_del balloon_page_enqueue_one, and update some
-> > comments as a reminder.
-> > 
-> > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> 
-> 
-> ok I posted v3 with typo fixes. 1/2 is this patch with comment changes. Pls take a look.
+Well with precopy at least it's simple: just clear the
+dirty bit, it won't be sent, and then on destination
+you get a zero page and later COW on first write.
+Right?
 
-I really have no idea what you're talking about here :(.  Some other
-discussion and patch thread, I suppose.
+With precopy it is tricker as destination waits until it gets
+all of memory. I think we could use some trick to
+make source pretend it's a zero page, that is cheap to send.
 
-You're OK with this patch?
-
-Should this patch have cc:stable?
+-- 
+MST
