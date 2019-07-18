@@ -2,84 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A694B6C57D
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 05:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 589FC6C82A
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 05:53:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389807AbfGRDG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Jul 2019 23:06:58 -0400
-Received: from mga12.intel.com ([192.55.52.136]:49738 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390322AbfGRDGw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Jul 2019 23:06:52 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jul 2019 20:06:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,276,1559545200"; 
-   d="scan'208";a="175892069"
-Received: from devel-ww.sh.intel.com ([10.239.48.128])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Jul 2019 20:06:49 -0700
-From:   Wei Wang <wei.w.wang@intel.com>
-To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, mst@redhat.com, xdeguillard@vmware.com,
-        namit@vmware.com
-Cc:     akpm@linux-foundation.org, pagupta@redhat.com, riel@surriel.com,
-        dave.hansen@intel.com, david@redhat.com, konrad.wilk@oracle.com,
-        yang.zhang.wz@gmail.com, nitesh@redhat.com, lcapitulino@redhat.com,
-        aarcange@redhat.com, pbonzini@redhat.com,
-        alexander.h.duyck@linux.intel.com, dan.j.williams@intel.com
-Subject: [PATCH v1] mm/balloon_compaction: avoid duplicate page removal
-Date:   Thu, 18 Jul 2019 10:23:30 +0800
-Message-Id: <1563416610-11045-1-git-send-email-wei.w.wang@intel.com>
-X-Mailer: git-send-email 2.7.4
+        id S2387675AbfGRDxn convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 17 Jul 2019 23:53:43 -0400
+Received: from mail.colonizacion.com.uy ([201.217.141.18]:47479 "EHLO
+        colonizaciontest.com.uy" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728103AbfGRDxn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Jul 2019 23:53:43 -0400
+X-Greylist: delayed 8272 seconds by postgrey-1.27 at vger.kernel.org; Wed, 17 Jul 2019 23:53:43 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by colonizaciontest.com.uy (Postfix) with ESMTP id BEC1BACCD89;
+        Wed, 17 Jul 2019 21:43:45 -0300 (GMT+3)
+Received: from colonizaciontest.com.uy ([127.0.0.1])
+        by localhost (colonizaciontest.com.uy [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id Tnw47RF1Odee; Wed, 17 Jul 2019 21:43:45 -0300 (GMT+3)
+Received: from localhost (localhost [127.0.0.1])
+        by colonizaciontest.com.uy (Postfix) with ESMTP id 6F6FCACCDB8;
+        Wed, 17 Jul 2019 21:43:45 -0300 (GMT+3)
+X-Virus-Scanned: amavisd-new at colonizaciontest.com.uy
+Received: from colonizaciontest.com.uy ([127.0.0.1])
+        by localhost (colonizaciontest.com.uy [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id jPPMLIbRHlhO; Wed, 17 Jul 2019 21:43:45 -0300 (GMT+3)
+Received: from [10.53.219.149] (unknown [105.4.1.176])
+        by colonizaciontest.com.uy (Postfix) with ESMTPSA id 927A0ACC3A8;
+        Wed, 17 Jul 2019 21:43:34 -0300 (GMT+3)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: =?utf-8?q?Wohlt=C3=A4tigkeitsspende_von_2=2E000=2E000_Millionen_Euro?=
+To:     Recipients <rbarboza@colonizaciontest.com.uy>
+From:   ''Michael Weirsky'' <rbarboza@colonizaciontest.com.uy>
+Date:   Thu, 18 Jul 2019 02:43:30 +0200
+Reply-To: mikeweirskyspende@gmail.com
+Message-Id: <20190718004334.927A0ACC3A8@colonizaciontest.com.uy>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fixes: 418a3ab1e778 (mm/balloon_compaction: List interfaces)
 
-A #GP is reported in the guest when requesting balloon inflation via
-virtio-balloon. The reason is that the virtio-balloon driver has
-removed the page from its internal page list (via balloon_page_pop),
-but balloon_page_enqueue_one also calls "list_del"  to do the removal.
-So remove the list_del in balloon_page_enqueue_one, and have the callers
-do the page removal from their own page lists.
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- mm/balloon_compaction.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/mm/balloon_compaction.c b/mm/balloon_compaction.c
-index 83a7b61..1a5ddc4 100644
---- a/mm/balloon_compaction.c
-+++ b/mm/balloon_compaction.c
-@@ -11,6 +11,7 @@
- #include <linux/export.h>
- #include <linux/balloon_compaction.h>
- 
-+/* Callers ensure that @page has been removed from its original list. */
- static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
- 				     struct page *page)
- {
-@@ -21,7 +22,6 @@ static void balloon_page_enqueue_one(struct balloon_dev_info *b_dev_info,
- 	 * memory corruption is possible and we should stop execution.
- 	 */
- 	BUG_ON(!trylock_page(page));
--	list_del(&page->lru);
- 	balloon_page_insert(b_dev_info, page);
- 	unlock_page(page);
- 	__count_vm_event(BALLOON_INFLATE);
-@@ -47,6 +47,7 @@ size_t balloon_page_list_enqueue(struct balloon_dev_info *b_dev_info,
- 
- 	spin_lock_irqsave(&b_dev_info->pages_lock, flags);
- 	list_for_each_entry_safe(page, tmp, pages, lru) {
-+		list_del(&page->lru);
- 		balloon_page_enqueue_one(b_dev_info, page);
- 		n_pages++;
- 	}
--- 
-2.7.4
 
+Lieber Freund,
+
+Ich bin Herr Mike Weirsky, New Jersey, Vereinigte Staaten von Amerika, der Mega-Gewinner von $ 273million In Mega Millions Jackpot, spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt.Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die Summe von € 2.000.000,00 an Sie als eine der ausgewählten 5 zu spenden, um meine Gewinne zu überprüfen.
+Das ist dein Spendencode: [MW530342019]
+
+www.youtube.com/watch?v=un8yRTmrYMY
+
+Antworten Sie mit dem SPENDE-CODE an diese E-Mail:mikeweirskyspende@gmail.com
+
+Ich hoffe, Sie und Ihre Familie glücklich zu machen.
+
+Grüße
+Herr Mike Weirsky
