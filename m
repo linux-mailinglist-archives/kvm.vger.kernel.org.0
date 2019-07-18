@@ -2,177 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CC896CF19
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 15:47:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAA236CF23
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 15:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390452AbfGRNrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 09:47:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40126 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726665AbfGRNrW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Jul 2019 09:47:22 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6IDgSVu108180
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 09:47:20 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ttqje6enp-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 09:47:20 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 18 Jul 2019 14:47:18 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 18 Jul 2019 14:47:15 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6IDlESv38470070
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Jul 2019 13:47:14 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4238A4054;
-        Thu, 18 Jul 2019 13:47:14 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E8ACA4062;
-        Thu, 18 Jul 2019 13:47:14 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.115])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Jul 2019 13:47:14 +0000 (GMT)
-Subject: Re: [PATCH 2/2] KVM: s390: Use kvm_vcpu_wake_up in
- kvm_s390_vcpu_wakeup
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        id S2390448AbfGRNuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 09:50:10 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37116 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390362AbfGRNuK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 09:50:10 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n9so3719841wrr.4
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 06:50:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Bz4hXPRK29P5/tSQD68cHTBPadb5Yosu8Qu+r8c9DuM=;
+        b=AJ3BgNJPLLIS67exuRRFHDTVawKPgGjPLSBkib/1iVgNS2RgtoEEHyhMW7rJV8tme+
+         5FGN0IWN56koz2cbMiHCnFXTYhZ3qao3bvx1L/DMapiW2lpcDQjXD3VXh+r4yrw2Q9uU
+         tpkEJ58ARpiDpui52rxs8YcBNIBCu70jVIC4qDQlHWCtgu4DugwAzzOIRpLBRHAHbUTD
+         psCIlqYsK/c9Ime220F08EJqSP9X3hIU08h7JsCAGAwE+QetDqXgXGPZItULPGxFWu4z
+         5X1MvC5acwF45ny6XTSom4x5QT3GUQCDt3vS+pfqAYdBL9wzuLDMhhjlQ3EFRdAMpF7f
+         OQTw==
+X-Gm-Message-State: APjAAAXKMFdBxjWxAToK5Zpirq0bxcx5O5MDQi3rruh+Y9AT7dwVc6d0
+        vWbL0jA0JfeFqsQUhUQcSAooLQ==
+X-Google-Smtp-Source: APXvYqwpwFxUVWFfPgX205bMOicWtlXBUDH5d5qy2/uaaO9L8NQkWL0kgSuznvRy5cX56Dyvvft4SA==
+X-Received: by 2002:a05:6000:1043:: with SMTP id c3mr24338666wrx.236.1563457807970;
+        Thu, 18 Jul 2019 06:50:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
+        by smtp.gmail.com with ESMTPSA id t13sm33212917wrr.0.2019.07.18.06.50.06
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 18 Jul 2019 06:50:07 -0700 (PDT)
+Subject: Re: [PATCH 1/2] KVM: Boost vCPUs that are delivering interrupts
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     wanpengli@tencent.com, rkrcmar@redhat.com, paulus@ozlabs.org,
         maz@kernel.org
 References: <1563457031-21189-1-git-send-email-pbonzini@redhat.com>
- <1563457031-21189-3-git-send-email-pbonzini@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+ <1563457031-21189-2-git-send-email-pbonzini@redhat.com>
+ <c28fb650-8150-4f42-4d01-8e8b2490c8b6@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Thu, 18 Jul 2019 15:47:14 +0200
+Message-ID: <d935d853-fa09-f41a-637a-77b45fd611d3@redhat.com>
+Date:   Thu, 18 Jul 2019 15:50:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1563457031-21189-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <c28fb650-8150-4f42-4d01-8e8b2490c8b6@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19071813-0012-0000-0000-000003341491
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071813-0013-0000-0000-0000216D96E4
-Message-Id: <2af3fb79-61ae-d361-24d7-665cf9638e0b@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-18_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=765 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907180144
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 18.07.19 15:37, Paolo Bonzini wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 18/07/19 15:45, Christian Borntraeger wrote:
 > 
-> Use kvm_vcpu_wake_up() in kvm_s390_vcpu_wakeup().
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-> 	v2->v3: no need to set vcpu->ready here
->  arch/s390/kvm/interrupt.c | 23 +++--------------------
->  1 file changed, 3 insertions(+), 20 deletions(-)
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
+> On 18.07.19 15:37, Paolo Bonzini wrote:
+>> From: Wanpeng Li <wanpengli@tencent.com>
+>>
+>> Inspired by commit 9cac38dd5d (KVM/s390: Set preempted flag during
+>> vcpu wakeup and interrupt delivery), we want to also boost not just
+>> lock holders but also vCPUs that are delivering interrupts. Most
+>> smp_call_function_many calls are synchronous, so the IPI target vCPUs
+>> are also good yield candidates.  This patch introduces vcpu->ready to
+>> boost vCPUs during wakeup and interrupt delivery time; unlike s390 we do
+>> not reuse vcpu->preempted so that voluntarily preempted vCPUs are taken
+>> into account by kvm_vcpu_on_spin, but vmx_vcpu_pi_put is not affected
+>> (VT-d PI handles voluntary preemption separately, in pi_pre_block).
+>>
+>> Testing on 80 HT 2 socket Xeon Skylake server, with 80 vCPUs VM 80GB RAM:
+>> ebizzy -M
+>>
+>>             vanilla     boosting    improved
+>> 1VM          21443       23520         9%
+>> 2VM           2800        8000       180%
+>> 3VM           1800        3100        72%
+>>
+>> Testing on my Haswell desktop 8 HT, with 8 vCPUs VM 8GB RAM, two VMs,
+>> one running ebizzy -M, the other running 'stress --cpu 2':
+>>
+>> w/ boosting + w/o pv sched yield(vanilla)
+>>
+>>             vanilla     boosting   improved
+>>               1570         4000      155%
+>>
+>> w/ boosting + w/ pv sched yield(vanilla)
+>>
+>>             vanilla     boosting   improved
+>>               1844         5157      179%
+>>
+>> w/o boosting, perf top in VM:
+>>
+>>  72.33%  [kernel]       [k] smp_call_function_many
+>>   4.22%  [kernel]       [k] call_function_i
+>>   3.71%  [kernel]       [k] async_page_fault
+>>
+>> w/ boosting, perf top in VM:
+>>
+>>  38.43%  [kernel]       [k] smp_call_function_many
+>>   6.31%  [kernel]       [k] async_page_fault
+>>   6.13%  libc-2.23.so   [.] __memcpy_avx_unaligned
+>>   4.88%  [kernel]       [k] call_function_interrupt
+>>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Radim Krčmář <rkrcmar@redhat.com>
+>> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Cc: Paul Mackerras <paulus@ozlabs.org>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>> 	v2->v3: put it in kvm_vcpu_wake_up, use WRITE_ONCE
 > 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 26f8bf4a22a7..b5fd6e85657c 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -1224,28 +1224,11 @@ int kvm_s390_handle_wait(struct kvm_vcpu *vcpu)
->  
->  void kvm_s390_vcpu_wakeup(struct kvm_vcpu *vcpu)
->  {
-> -	/*
-> -	 * We cannot move this into the if, as the CPU might be already
-> -	 * in kvm_vcpu_block without having the waitqueue set (polling)
-> -	 */
->  	vcpu->valid_wakeup = true;
-> +	kvm_vcpu_wake_up(vcpu);
-> +
->  	/*
-> -	 * This is mostly to document, that the read in swait_active could
-> -	 * be moved before other stores, leading to subtle races.
-> -	 * All current users do not store or use an atomic like update
-> -	 */
-> -	smp_mb__after_atomic();
-> -	if (swait_active(&vcpu->wq)) {
-> -		/*
-> -		 * The vcpu gave up the cpu voluntarily, mark it as a good
-> -		 * yield-candidate.
-> -		 */
-> -		WRITE_ONCE(vcpu->ready, true);
-> -		swake_up_one(&vcpu->wq);
-> -		vcpu->stat.halt_wakeup++;
-> -	}
-> -	/*
-> -	 * The VCPU might not be sleeping but is executing the VSIE. Let's
-> +	 * The VCPU might not be sleeping but rather executing VSIE. Let's
->  	 * kick it, so it leaves the SIE to process the request.
->  	 */
->  	kvm_s390_vsie_kick(vcpu);
+> 
+> Looks good. Some more comments
+> 
+>>
+>>  arch/s390/kvm/interrupt.c | 2 +-
+>>  include/linux/kvm_host.h  | 1 +
+>>  virt/kvm/kvm_main.c       | 9 +++++++--
+> [...]
+> 
+>> @@ -4205,6 +4206,8 @@ static void kvm_sched_in(struct preempt_notifier *pn, int cpu)
+>>  
+>>  	if (vcpu->preempted)
+>>  		vcpu->preempted = false;
+>> +	if (vcpu->ready)
+>> +		WRITE_ONCE(vcpu->ready, false);
+> 
+> What is the rationale of checking before writing. Avoiding writable cache line ping pong?
+
+I think it can be removed.  The only case where you'd have ping pong is
+when vcpu->ready is true due to kvm_vcpu_wake_up, so it's not saving
+anything.
+
+>>  	kvm_arch_sched_in(vcpu, cpu);
+>>  
+>> @@ -4216,8 +4219,10 @@ static void kvm_sched_out(struct preempt_notifier *pn,
+>>  {
+>>  	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
+>>  
+>> -	if (current->state == TASK_RUNNING)
+>> +	if (current->state == TASK_RUNNING) {
+>>  		vcpu->preempted = true;
+> 
+> WOuld it make sense to also use WRITE_ONCE for vcpu->preempted ?
+
+vcpu->preempted is not read/written anymore by other threads after this
+patch.
+> 
+>> +		WRITE_ONCE(vcpu->ready, true);
+>> +	}
+>>  	kvm_arch_vcpu_put(vcpu);
+>>  }
+>>  
+>>
 > 
 
