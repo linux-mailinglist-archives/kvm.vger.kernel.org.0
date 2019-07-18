@@ -2,164 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CAA236CF23
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 15:50:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0780C6CF31
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2019 15:54:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390448AbfGRNuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 09:50:10 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37116 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390362AbfGRNuK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 09:50:10 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n9so3719841wrr.4
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 06:50:08 -0700 (PDT)
+        id S1727825AbfGRNw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Jul 2019 09:52:57 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:40185 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727757AbfGRNw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Jul 2019 09:52:57 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r1so28782521wrl.7
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2019 06:52:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Bz4hXPRK29P5/tSQD68cHTBPadb5Yosu8Qu+r8c9DuM=;
-        b=AJ3BgNJPLLIS67exuRRFHDTVawKPgGjPLSBkib/1iVgNS2RgtoEEHyhMW7rJV8tme+
-         5FGN0IWN56koz2cbMiHCnFXTYhZ3qao3bvx1L/DMapiW2lpcDQjXD3VXh+r4yrw2Q9uU
-         tpkEJ58ARpiDpui52rxs8YcBNIBCu70jVIC4qDQlHWCtgu4DugwAzzOIRpLBRHAHbUTD
-         psCIlqYsK/c9Ime220F08EJqSP9X3hIU08h7JsCAGAwE+QetDqXgXGPZItULPGxFWu4z
-         5X1MvC5acwF45ny6XTSom4x5QT3GUQCDt3vS+pfqAYdBL9wzuLDMhhjlQ3EFRdAMpF7f
-         OQTw==
-X-Gm-Message-State: APjAAAXKMFdBxjWxAToK5Zpirq0bxcx5O5MDQi3rruh+Y9AT7dwVc6d0
-        vWbL0jA0JfeFqsQUhUQcSAooLQ==
-X-Google-Smtp-Source: APXvYqwpwFxUVWFfPgX205bMOicWtlXBUDH5d5qy2/uaaO9L8NQkWL0kgSuznvRy5cX56Dyvvft4SA==
-X-Received: by 2002:a05:6000:1043:: with SMTP id c3mr24338666wrx.236.1563457807970;
-        Thu, 18 Jul 2019 06:50:07 -0700 (PDT)
+        bh=2defXGb6i7e6Mhp08ZGJPyYpwSINwFXbDxPiExwBqLw=;
+        b=MIXvrewBs5eQ2HwSMKpubPV/HUypORDRmbAv3BBfqU6+CJd7NiLHsg1UsUJXM1N+lI
+         Q/dtbFxUuLotjnz++H0Fke3Tr+QhHH6O6DRtkNRBSDG8IL3i2QEjWooxs8+cuK9aPmKC
+         IDs/YlAXO6/pwQK7j+I218jrZ/94mE361ETi9XRFzMtz5CFer26J+Ub7wwPlpzA/Vv3i
+         zz4y2myOF8LHw5kbUIGGqQpD9KQ4PCiOZxe/Cv1XfW8hJZ74aBEMpNfb5FJhVvOnSHsg
+         JGSGVifX8+92eU/Ota17LNUBmmr8BUi12EQP5hvqXX2DcO+ss2COM5fhTmQKIi1d5Crq
+         1l5g==
+X-Gm-Message-State: APjAAAVYpyV3T2oxaw6bO6hAES69/wkcW6GfOFoLuyDfTiNgB+9YSHx0
+        +ffM0/ituxeAEoyEyxBjmosYOQ==
+X-Google-Smtp-Source: APXvYqyWEoHk4aK6RXQz+bas0Gq722UUqaEAn6c901GtELogmOWF10zIm+PB7Lewb7/ketJ/Fti5Rw==
+X-Received: by 2002:adf:f186:: with SMTP id h6mr37752268wro.274.1563457975062;
+        Thu, 18 Jul 2019 06:52:55 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:e427:3beb:1110:dda2? ([2001:b07:6468:f312:e427:3beb:1110:dda2])
-        by smtp.gmail.com with ESMTPSA id t13sm33212917wrr.0.2019.07.18.06.50.06
+        by smtp.gmail.com with ESMTPSA id r123sm24558962wme.7.2019.07.18.06.52.54
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Jul 2019 06:50:07 -0700 (PDT)
-Subject: Re: [PATCH 1/2] KVM: Boost vCPUs that are delivering interrupts
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     wanpengli@tencent.com, rkrcmar@redhat.com, paulus@ozlabs.org,
-        maz@kernel.org
-References: <1563457031-21189-1-git-send-email-pbonzini@redhat.com>
- <1563457031-21189-2-git-send-email-pbonzini@redhat.com>
- <c28fb650-8150-4f42-4d01-8e8b2490c8b6@de.ibm.com>
+        Thu, 18 Jul 2019 06:52:54 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: x86/vPMU: refine kvm_pmu err msg when event
+ creation failed
+To:     Like Xu <like.xu@linux.intel.com>, Avi Kivity <avi@scylladb.com>
+Cc:     Joe Perches <joe@perches.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190718053514.59742-1-like.xu@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <d935d853-fa09-f41a-637a-77b45fd611d3@redhat.com>
-Date:   Thu, 18 Jul 2019 15:50:04 +0200
+Message-ID: <3d1d84a0-7c63-e470-a1d1-b32f56e52f74@redhat.com>
+Date:   Thu, 18 Jul 2019 15:52:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <c28fb650-8150-4f42-4d01-8e8b2490c8b6@de.ibm.com>
+In-Reply-To: <20190718053514.59742-1-like.xu@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/07/19 15:45, Christian Borntraeger wrote:
+On 18/07/19 07:35, Like Xu wrote:
+> If a perf_event creation fails due to any reason of the host perf
+> subsystem, it has no chance to log the corresponding event for guest
+> which may cause abnormal sampling data in guest result. In debug mode,
+> this message helps to understand the state of vPMC and we may not
+> limit the number of occurrences but not in a spamming style.
 > 
+> Suggested-by: Joe Perches <joe@perches.com>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  arch/x86/kvm/pmu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> On 18.07.19 15:37, Paolo Bonzini wrote:
->> From: Wanpeng Li <wanpengli@tencent.com>
->>
->> Inspired by commit 9cac38dd5d (KVM/s390: Set preempted flag during
->> vcpu wakeup and interrupt delivery), we want to also boost not just
->> lock holders but also vCPUs that are delivering interrupts. Most
->> smp_call_function_many calls are synchronous, so the IPI target vCPUs
->> are also good yield candidates.  This patch introduces vcpu->ready to
->> boost vCPUs during wakeup and interrupt delivery time; unlike s390 we do
->> not reuse vcpu->preempted so that voluntarily preempted vCPUs are taken
->> into account by kvm_vcpu_on_spin, but vmx_vcpu_pi_put is not affected
->> (VT-d PI handles voluntary preemption separately, in pi_pre_block).
->>
->> Testing on 80 HT 2 socket Xeon Skylake server, with 80 vCPUs VM 80GB RAM:
->> ebizzy -M
->>
->>             vanilla     boosting    improved
->> 1VM          21443       23520         9%
->> 2VM           2800        8000       180%
->> 3VM           1800        3100        72%
->>
->> Testing on my Haswell desktop 8 HT, with 8 vCPUs VM 8GB RAM, two VMs,
->> one running ebizzy -M, the other running 'stress --cpu 2':
->>
->> w/ boosting + w/o pv sched yield(vanilla)
->>
->>             vanilla     boosting   improved
->>               1570         4000      155%
->>
->> w/ boosting + w/ pv sched yield(vanilla)
->>
->>             vanilla     boosting   improved
->>               1844         5157      179%
->>
->> w/o boosting, perf top in VM:
->>
->>  72.33%  [kernel]       [k] smp_call_function_many
->>   4.22%  [kernel]       [k] call_function_i
->>   3.71%  [kernel]       [k] async_page_fault
->>
->> w/ boosting, perf top in VM:
->>
->>  38.43%  [kernel]       [k] smp_call_function_many
->>   6.31%  [kernel]       [k] async_page_fault
->>   6.13%  libc-2.23.so   [.] __memcpy_avx_unaligned
->>   4.88%  [kernel]       [k] call_function_interrupt
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Radim Krčmář <rkrcmar@redhat.com>
->> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->> Cc: Paul Mackerras <paulus@ozlabs.org>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> 	v2->v3: put it in kvm_vcpu_wake_up, use WRITE_ONCE
-> 
-> 
-> Looks good. Some more comments
-> 
->>
->>  arch/s390/kvm/interrupt.c | 2 +-
->>  include/linux/kvm_host.h  | 1 +
->>  virt/kvm/kvm_main.c       | 9 +++++++--
-> [...]
-> 
->> @@ -4205,6 +4206,8 @@ static void kvm_sched_in(struct preempt_notifier *pn, int cpu)
->>  
->>  	if (vcpu->preempted)
->>  		vcpu->preempted = false;
->> +	if (vcpu->ready)
->> +		WRITE_ONCE(vcpu->ready, false);
-> 
-> What is the rationale of checking before writing. Avoiding writable cache line ping pong?
-
-I think it can be removed.  The only case where you'd have ping pong is
-when vcpu->ready is true due to kvm_vcpu_wake_up, so it's not saving
-anything.
-
->>  	kvm_arch_sched_in(vcpu, cpu);
->>  
->> @@ -4216,8 +4219,10 @@ static void kvm_sched_out(struct preempt_notifier *pn,
->>  {
->>  	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
->>  
->> -	if (current->state == TASK_RUNNING)
->> +	if (current->state == TASK_RUNNING) {
->>  		vcpu->preempted = true;
-> 
-> WOuld it make sense to also use WRITE_ONCE for vcpu->preempted ?
-
-vcpu->preempted is not read/written anymore by other threads after this
-patch.
-> 
->> +		WRITE_ONCE(vcpu->ready, true);
->> +	}
->>  	kvm_arch_vcpu_put(vcpu);
->>  }
->>  
->>
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index aa5a2597305a..cedaa01ceb6f 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -131,8 +131,8 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>  						 intr ? kvm_perf_overflow_intr :
+>  						 kvm_perf_overflow, pmc);
+>  	if (IS_ERR(event)) {
+> -		printk_once("kvm_pmu: event creation failed %ld\n",
+> -			    PTR_ERR(event));
+> +		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
+> +			    PTR_ERR(event), pmc->idx);
+>  		return;
+>  	}
+>  
 > 
 
+Queued, thanks.
+
+Paolo
