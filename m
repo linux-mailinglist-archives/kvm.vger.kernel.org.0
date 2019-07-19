@@ -2,83 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B99F06E8EB
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 18:42:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0362E6E9B0
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 18:56:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731292AbfGSQmZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 12:42:25 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54082 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727577AbfGSQmV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 12:42:21 -0400
-Received: by mail-wm1-f65.google.com with SMTP id x15so29412192wmj.3;
-        Fri, 19 Jul 2019 09:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=SyuzXM1UA0r411S68OsfdkYKutqC9A46TddWlatyHsQ=;
-        b=vTEXtvEHhSuArsy9QXt3XHQbJbvp781op8ZBwDYw39LvNyfC/ICdcmHqY+/BCErSIs
-         5TgpjeHzeQrXXPycz2Sff3/1oFsCV0fy3a3W6GCrHdqLHR4bYHMCiNUiWYavNGUfxLqM
-         h14Fw/nWo4HtVHTGRy1ElIsU9/AFJBuYcvY69DRa/V0cJP74WDmugxyCOIy9tNfTB6Z0
-         vr+OPw3OtSdjGN4kpxe532H8GyztrYsC2VOlTosqF05Y8MDMtt9L5ZIozYxhIjjUIUu4
-         jBe6usBUSBWiQjdCQ4a5WemFS6eJzY6kGs0MDXvoDA7n095RUkuTmNYzDJxjMUsNczxU
-         kBdw==
+        id S1731887AbfGSQz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 12:55:58 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33230 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729947AbfGSQz6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 12:55:58 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n9so32993162wru.0
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 09:55:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=SyuzXM1UA0r411S68OsfdkYKutqC9A46TddWlatyHsQ=;
-        b=nAEEkchpHxOEhNg6HsFdPngjlKQYqxHrWe8WV8b1tRsD/FDuoKTi2l3nTvvw4lX3Vu
-         XyqT5ohyzOy+P9xfE7M3kzyBSM7V/zi10Ot3+zEyhtP/7uU53r1qaD+aglDNfmHg1GBQ
-         tidKXaAgK1HqfzaJsdxruwv6Nb78/f8LuPBSFudVNgZT/wlx8dLdd34AOHH/RoZ0YuS0
-         JD0mj11uGUEdlw8woHClRTPhlR4BiM+jxobNDqQhJU+Rvp8pAdwRtZbFTrc4Gq/gG3eW
-         B89xgwzFhugUgaQLYARQkuum/v/Wcp667XqNIjFSlBGQ8B3k+EUcR6o2TVrUk3OWHC/y
-         v6fA==
-X-Gm-Message-State: APjAAAU7OZlwNBodPnSyaBIMR8vBTgHcY7U2iNOAFSGJoAo6HFndyCSP
-        Gb2lDGZi6pwdFNlsIfhbsbpoMK171SY=
-X-Google-Smtp-Source: APXvYqzWYqZbqCkuugTsLZdVV4wmZfFs6xj6yP8zSZeAXjYDXg/BpLT2hCqiQZgocDM/xwIAKfjpDA==
-X-Received: by 2002:a7b:c310:: with SMTP id k16mr11083048wmj.133.1563554539165;
-        Fri, 19 Jul 2019 09:42:19 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id g19sm32764233wmg.10.2019.07.19.09.42.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Jul 2019 09:42:18 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RBvdy3j/dhCYKIZJnUPTzXQIvahYRfbHJdHaNI3eSIc=;
+        b=sSl2YjgOtZfVuio/O/fbIjw3hHxdQilXrvSLCJOqGNcuQbRJf4M8OnoWWpTRv+Y9Li
+         5bJEFk59SQ0xfT214gd1uuIijdNnw2JWO1rjjJWtuSoCDSojuQjte7gQfM5r4nwt0nbj
+         +uHcG2S7euMy3EEMYQc3OBYMa+rLM9LzgnzW3BhSLA4l/kvjrGA2+u7KGY4EKTOAlmhU
+         ou2sRnM2XVkpAGcBqeuVJwOBA5WKsGTwqhhm/8d9NY6bOYDOavUI1Cw3Ep+Dz4pnbkmo
+         o2f0gsHMCfkE9XMCxGdZxBhOpClNvJmoCdkTggKux1iqOTxHMZTwZPrf3zLKfRImG+/s
+         VK8Q==
+X-Gm-Message-State: APjAAAUYFpnVozyL25Tl0lWlTAbwBprnMcYKwP+ok25kyaeDZYvF+zZm
+        a5uwsDRx+qLv7Np9WvPL1W29sA==
+X-Google-Smtp-Source: APXvYqwe2mJPKiPtJFOoa2KLgzD4pwJyIgLxoBcFNx6HMokPG7rxdxjAhwBpBI0dEokftw1KeRTy8g==
+X-Received: by 2002:a05:6000:4b:: with SMTP id k11mr55177677wrx.82.1563555355497;
+        Fri, 19 Jul 2019 09:55:55 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8? ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
+        by smtp.gmail.com with ESMTPSA id f3sm15880801wrt.56.2019.07.19.09.55.54
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 19 Jul 2019 09:55:54 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: Add fixed counters to PMU filter
+To:     Eric Hankland <ehankland@google.com>,
+        Wei Wang <wei.w.wang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stephane Eranian <eranian@google.com>
+References: <20190718183818.190051-1-ehankland@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: nVMX: do not use dangling shadow VMCS after guest reset
-Date:   Fri, 19 Jul 2019 18:42:14 +0200
-Message-Id: <1563554534-46556-3-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Message-ID: <e3d2ecb1-5a1d-3294-8de1-eff98a935a5f@redhat.com>
+Date:   Fri, 19 Jul 2019 18:55:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190718183818.190051-1-ehankland@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If a KVM guest is reset while running a nested guest, free_nested will
-disable the shadow VMCS execution control in the vmcs01.  However,
-on the next KVM_RUN vmx_vcpu_run would nevertheless try to sync
-the VMCS12 to the shadow VMCS which has since been freed.
+On 18/07/19 20:38, Eric Hankland wrote:
+> From: ehankland <ehankland@google.com>
+> 
+> Updates KVM_CAP_PMU_EVENT_FILTER so it can also whitelist or blacklist
+> fixed counters.
+> 
+> Signed-off-by: ehankland <ehankland@google.com>
 
-This causes a vmptrld of a NULL pointer on my machime, but Jan reports
-the host to hang altogether.  Let's see how much this trivial patch fixes.
+Very nice, thanks.
 
-Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/nested.c | 1 +
- 1 file changed, 1 insertion(+)
+There's no need to check the padding for zero (flags can be defined to
+give specific meanings in the future to the padding fields), I removed
+that loop and queued the patch.
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 6e88f459b323..6119b30347c6 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -194,6 +194,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
- {
- 	secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
- 	vmcs_write64(VMCS_LINK_POINTER, -1ull);
-+	vmx->nested.need_vmcs12_to_shadow_sync = false;
- }
- 
- static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
--- 
-1.8.3.1
+Paolo
+
+> ---
+>  Documentation/virtual/kvm/api.txt | 13 ++++++++-----
+>  arch/x86/include/uapi/asm/kvm.h   |  9 ++++++---
+>  arch/x86/kvm/pmu.c                | 30 +++++++++++++++++++++++++-----
+>  3 files changed, 39 insertions(+), 13 deletions(-)
+> 
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 2cd6250b2896..96bcf1aa1931 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -4090,17 +4090,20 @@ Parameters: struct kvm_pmu_event_filter (in)
+>  Returns: 0 on success, -1 on error
+>  
+>  struct kvm_pmu_event_filter {
+> -       __u32 action;
+> -       __u32 nevents;
+> -       __u64 events[0];
+> +	__u32 action;
+> +	__u32 nevents;
+> +	__u32 fixed_counter_bitmap;
+> +	__u32 flags;
+> +	__u32 pad[4];
+> +	__u64 events[0];
+>  };
+>  
+>  This ioctl restricts the set of PMU events that the guest can program.
+>  The argument holds a list of events which will be allowed or denied.
+>  The eventsel+umask of each event the guest attempts to program is compared
+>  against the events field to determine whether the guest should have access.
+> -This only affects general purpose counters; fixed purpose counters can
+> -be disabled by changing the perfmon CPUID leaf.
+> +The events field only controls general purpose counters; fixed purpose
+> +counters are controlled by the fixed_counter_bitmap.
+>  
+>  Valid values for 'action':
+>  #define KVM_PMU_EVENT_ALLOW 0
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index e901b0ab116f..503d3f42da16 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -435,9 +435,12 @@ struct kvm_nested_state {
+>  
+>  /* for KVM_CAP_PMU_EVENT_FILTER */
+>  struct kvm_pmu_event_filter {
+> -       __u32 action;
+> -       __u32 nevents;
+> -       __u64 events[0];
+> +	__u32 action;
+> +	__u32 nevents;
+> +	__u32 fixed_counter_bitmap;
+> +	__u32 flags;
+> +	__u32 pad[4];
+> +	__u64 events[0];
+>  };
+>  
+>  #define KVM_PMU_EVENT_ALLOW 0
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index aa5a2597305a..ae5cd1b02086 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -19,8 +19,8 @@
+>  #include "lapic.h"
+>  #include "pmu.h"
+>  
+> -/* This keeps the total size of the filter under 4k. */
+> -#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 63
+> +/* This is enough to filter the vast majority of currently defined events. */
+> +#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 300
+>  
+>  /* NOTE:
+>   * - Each perf counter is defined as "struct kvm_pmc";
+> @@ -206,12 +206,25 @@ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int idx)
+>  {
+>  	unsigned en_field = ctrl & 0x3;
+>  	bool pmi = ctrl & 0x8;
+> +	struct kvm_pmu_event_filter *filter;
+> +	struct kvm *kvm = pmc->vcpu->kvm;
+> +
+>  
+>  	pmc_stop_counter(pmc);
+>  
+>  	if (!en_field || !pmc_is_enabled(pmc))
+>  		return;
+>  
+> +	filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
+> +	if (filter) {
+> +		if (filter->action == KVM_PMU_EVENT_DENY &&
+> +		    test_bit(idx, (ulong *)&filter->fixed_counter_bitmap))
+> +			return;
+> +		if (filter->action == KVM_PMU_EVENT_ALLOW &&
+> +		    !test_bit(idx, (ulong *)&filter->fixed_counter_bitmap))
+> +			return;
+> +	}
+> +
+>  	pmc_reprogram_counter(pmc, PERF_TYPE_HARDWARE,
+>  			      kvm_x86_ops->pmu_ops->find_fixed_event(idx),
+>  			      !(en_field & 0x2), /* exclude user */
+> @@ -376,7 +389,7 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_pmu_event_filter tmp, *filter;
+>  	size_t size;
+> -	int r;
+> +	int r, i;
+>  
+>  	if (copy_from_user(&tmp, argp, sizeof(tmp)))
+>  		return -EFAULT;
+> @@ -385,6 +398,13 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+>  	    tmp.action != KVM_PMU_EVENT_DENY)
+>  		return -EINVAL;
+>  
+> +	if (tmp.flags != 0)
+> +		return -EINVAL;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(tmp.pad); i++)
+> +		if (tmp.pad[i] != 0)
+> +			return -EINVAL;
+> +
+>  	if (tmp.nevents > KVM_PMU_EVENT_FILTER_MAX_EVENTS)
+>  		return -E2BIG;
+>  
+> @@ -406,8 +426,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+>  	mutex_unlock(&kvm->lock);
+>  
+>  	synchronize_srcu_expedited(&kvm->srcu);
+> - 	r = 0;
+> +	r = 0;
+>  cleanup:
+>  	kfree(filter);
+> - 	return r;
+> +	return r;
+>  }
+> 
 
