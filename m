@@ -2,143 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC2166E301
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 10:59:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A53526E30C
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 11:02:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726239AbfGSI7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 04:59:38 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:46833 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725794AbfGSI7h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 04:59:37 -0400
-Received: by mail-oi1-f196.google.com with SMTP id 65so23702547oid.13;
-        Fri, 19 Jul 2019 01:59:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gBusBZhQcLKBWDanQAGbHMALYypzWJ4WXbnd8gqcE3w=;
-        b=hzQUCbzumVp7OrDT0mxpxR3wMx4ptyZYpa6YUNaWZPMrRycx8xtDDqJXyYTTAGhRoQ
-         mka1Z7qRSaSNvxu9QSd3RzxuZclNptcC6dYCbJBvRYk6RB/K9v7lKHYZ+dPy2t204zDG
-         8N8aV6KlPlWZoj607hSatkWfw5L2pTyTxUXmFOWPNhqGdLZYpnQpzAwIgvvAzLfrC1JI
-         eqiZxe/3w3ZF+rYttmsr3JQhPutJmcdGhZrWWjFL8aTLYCN+dHTlx5MU4AN4XhQWFlJv
-         snwD0vfxkiSuL+//2Wh85TxuU7E8dkMJIV4+a91zaiLdcz3S6JMMsYJh97qjyx0ciDHJ
-         I21g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gBusBZhQcLKBWDanQAGbHMALYypzWJ4WXbnd8gqcE3w=;
-        b=WfLT+ga7JYV4BIEDmpGdqoHJleYQTKOfnKtHq6g0wQi3yihNb+VEhB9ErP3pxrRutY
-         pablp5GCh9R4rkVPp6vOY3FvsdCqfgVuJSyuINUBMIBziZw8gqjyW4g+rKMTiQ+7iAn3
-         joyDzZv9JxrMnZQqY1fR30IY+/Cjn7FKqEjxmChi9Z0xDEdpq8vNjnoMOkSaILAHtoXj
-         VUx8wl9/N0KuTCgKISTqoxTp+qL+82LN036aoGedR/9jg9Dmyadkhc4gltoeykyf5n8t
-         Zrgl2QnbHrfEExdQL8Gv7/R1kg4XOPUuv8gkFB6to7V63JpnvLSVpo4lcUlLETcQL6Un
-         6Vvg==
-X-Gm-Message-State: APjAAAX+HDauyeBvs62Lmg6r1h0ApkrcBPcRYQAeMmcOUatgh3soxBx6
-        VvVinBMQ2V7lzmwXXFmvk8Q9N9ydchdJv3gMDVgW8bS+ces=
-X-Google-Smtp-Source: APXvYqxkeToemgSjhvUX7UQTyztvFqqM2CAb21z3wyp+gF2R8lPYi/gkwN79NQrxS+EPPCdNYXXQg9mhLqXK9xHzGBw=
-X-Received: by 2002:aca:b9d4:: with SMTP id j203mr25350397oif.5.1563526776730;
- Fri, 19 Jul 2019 01:59:36 -0700 (PDT)
+        id S1726243AbfGSJCi convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 19 Jul 2019 05:02:38 -0400
+Received: from mga18.intel.com ([134.134.136.126]:19218 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725798AbfGSJCh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 05:02:37 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Jul 2019 02:02:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,281,1559545200"; 
+   d="scan'208";a="195888255"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga002.fm.intel.com with ESMTP; 19 Jul 2019 02:02:36 -0700
+Received: from fmsmsx155.amr.corp.intel.com (10.18.116.71) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 19 Jul 2019 02:02:36 -0700
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ FMSMSX155.amr.corp.intel.com (10.18.116.71) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 19 Jul 2019 02:02:36 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.3]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.60]) with mapi id 14.03.0439.000;
+ Fri, 19 Jul 2019 17:02:34 +0800
+From:   "Lu, Kechen" <kechen.lu@intel.com>
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Zhang, Tina" <tina.zhang@intel.com>
+CC:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: RE: [RFC PATCH v4 1/6] vfio: Define device specific irq type
+ capability
+Thread-Topic: [RFC PATCH v4 1/6] vfio: Define device specific irq type
+ capability
+Thread-Index: AQHVPfh+laa+mTOUHUqdBIkmECCN6KbRmVnQ
+Date:   Fri, 19 Jul 2019 09:02:33 +0000
+Message-ID: <31185F57AF7C4B4F87C41E735C23A6FE64DFC7@shsmsx102.ccr.corp.intel.com>
+References: <20190718155640.25928-1-kechen.lu@intel.com>
+ <20190718155640.25928-2-kechen.lu@intel.com>
+ <20190719060540.GC28809@zhen-hp.sh.intel.com>
+In-Reply-To: <20190719060540.GC28809@zhen-hp.sh.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOTA2Nzc3ZWUtZDM0Ny00MDhmLTk3OWYtMjRlYWExMjQwYjEyIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicEVwaUZEbVBtSzBnYUpWMnY4clwvV201N2c0MlNWQlZZOTlSM0FlN2NNMElKb1g2VzVFUGVtVlNxSEp4MWJcL0JTIn0=
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-References: <217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de>
-In-Reply-To: <217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 19 Jul 2019 16:59:25 +0800
-Message-ID: <CANRm+CxWbkr0=DB7DBdaQOsTTt0XS5vSk_BRL2iFeAAm81H8Bg@mail.gmail.com>
-Subject: Re: [5.2 regression] x86/fpu changes cause crashes in KVM guest
-To:     Thomas Lambertz <mail@thomaslambertz.de>
-Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Rik van Riel <riel@surriel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cc kvm ml,
-On Thu, 18 Jul 2019 at 08:08, Thomas Lambertz <mail@thomaslambertz.de> wrote:
->
-> Since kernel 5.2, I've been experiencing strange issues in my Windows 10
-> QEMU/KVM guest.
-> Via bisection, I have tracked down that the issue lies in the FPU state
-> handling changes.
-> Kernels before 8ff468c29e9a9c3afe9152c10c7b141343270bf3 work great, the
-> ones afterwards are affected.
-> Sometimes the state seems to be restored incorrectly in the guest.
->
-> I have managed to reproduce it relatively cleanly, on a linux guest.
-> (ubuntu-server 18.04, but that should not matter, since it occured on
-> windows aswell)
->
-> To reproduce the issue, you need prime95 (or mprime), from
-> https://www.mersenne.org/download/ .
-> This is just a stress test for the FPU, which helps reproduce the error
-> much quicker.
->
-> - Run it in the guest as 'Benchmark Only', and choose the '(2) Small
-> FFTs' torture test. Give it the maximum amount of cores (for me 10).
-> - On the host, run the same test. To keep my pc usable, I limited it to
-> 5 cores. I do this to put some pressure on the system.
-> - repeatedly focus and unfocus the qemu window
->
-> With this config, errors in the guest usually occur within 30 seconds.
-> Without the refocusing, takes ~5min on average, but the variance of this
-> time is quite large.
->
-> The error messages are either
->      "FATAL ERROR: Rounding was ......., expected less than 0.4"
-> or
->      "FATAL ERROR: Resulting sum was ....., expexted: ......",
-> suggesting that something in the calculation has gone wrong.
->
-> On the host, no errors are ever observed!
+Hi,
 
-I found it is offended by commit 5f409e20b (x86/fpu: Defer FPU state
-load until return to userspace) and can only be reproduced when
-CONFIG_PREEMPT is enabled. Why restore qemu userspace fpu context to
-hardware before vmentry in the commit?
-https://lkml.org/lkml/2017/11/14/945 Actually I suspect the commit
-f775b13eedee2 (x86,kvm: move qemu/guest FPU switching out to vcpu_run)
-inaccurately save guest fpu state which in xsave area into the qemu
-userspace fpu buffer. However, Rik replied in
-https://lkml.org/lkml/2017/11/14/891, "The scheduler will save the
-guest fpu context when a vCPU thread is preempted, and restore it when
-it is scheduled back in." But I can't find any scheduler codes do
-this. In addition, below codes can fix the mprime error warning.
-(Still not sure it is correct)
+> -----Original Message-----
+> From: Zhenyu Wang [mailto:zhenyuw@linux.intel.com]
+> Sent: Friday, July 19, 2019 2:06 PM
+> To: Lu, Kechen <kechen.lu@intel.com>
+> Cc: intel-gvt-dev@lists.freedesktop.org; kvm@vger.kernel.org; linux- 
+> kernel@vger.kernel.org; Zhang, Tina <tina.zhang@intel.com>; 
+> kraxel@redhat.com; zhenyuw@linux.intel.com; Lv, Zhiyuan 
+> <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian, 
+> Kevin <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>; 
+> alex.williamson@redhat.com; Eric Auger <eric.auger@redhat.com>
+> Subject: Re: [RFC PATCH v4 1/6] vfio: Define device specific irq type 
+> capability
+> 
+> On 2019.07.18 23:56:35 +0800, Kechen Lu wrote:
+> > From: Tina Zhang <tina.zhang@intel.com>
+> >
+> > Cap the number of irqs with fixed indexes and use capability chains 
+> > to chain device specific irqs.
+> >
+> > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > ---
+> >  include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
+> >  1 file changed, 18 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h 
+> > index 8f10748dac79..be6adab4f759 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -448,11 +448,27 @@ struct vfio_irq_info {
+> >  #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
+> >  #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
+> >  #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
+> > +#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info supports caps
+> */
+> >  	__u32	index;		/* IRQ index */
+> >  	__u32	count;		/* Number of IRQs within this index */
+> > +	__u32	cap_offset;	/* Offset within info struct of first cap */
+> 
+> This still breaks ABI as argsz would be updated with this new field, 
+> so it would cause compat issue. I think my last suggestion was to 
+> assume cap list starts after vfio_irq_info.
+>
+ 
+In the common practice, the general logic is first use the "count" as the "minsz" boundary to perform copy from user, and then perform following logic, so that the incompatibility issue would not happen. BTW, this patch has been double checked by Eric Auger before included in his patch-set. 
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 58305cf..18f928e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3306,6 +3306,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+Best Regards,
+Kechen
 
-     kvm_x86_ops->vcpu_load(vcpu, cpu);
-
-+    if (test_thread_flag(TIF_NEED_FPU_LOAD))
-+        switch_fpu_return();
-+
-     /* Apply any externally detected TSC adjustments (due to suspend) */
-     if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
-         adjust_tsc_offset_host(vcpu, vcpu->arch.tsc_offset_adjustment);
-@@ -7990,10 +7993,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-     trace_kvm_entry(vcpu->vcpu_id);
-     guest_enter_irqoff();
-
--    fpregs_assert_state_consistent();
--    if (test_thread_flag(TIF_NEED_FPU_LOAD))
--        switch_fpu_return();
--
-     if (unlikely(vcpu->arch.switch_db_regs)) {
-         set_debugreg(0, 7);
-         set_debugreg(vcpu->arch.eff_db[0], 0);
+> >  };
+> >  #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE + 9)
+> >
+> > +/*
+> > + * The irq type capability allows irqs unique to a specific device 
+> > +or
+> > + * class of devices to be exposed.
+> > + *
+> > + * The structures below define version 1 of this capability.
+> > + */
+> > +#define VFIO_IRQ_INFO_CAP_TYPE      3
+> > +
+> > +struct vfio_irq_info_cap_type {
+> > +	struct vfio_info_cap_header header;
+> > +	__u32 type;     /* global per bus driver */
+> > +	__u32 subtype;  /* type specific */ };
+> > +
+> >  /**
+> >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct
+> vfio_irq_set)
+> >   *
+> > @@ -554,7 +570,8 @@ enum {
+> >  	VFIO_PCI_MSIX_IRQ_INDEX,
+> >  	VFIO_PCI_ERR_IRQ_INDEX,
+> >  	VFIO_PCI_REQ_IRQ_INDEX,
+> > -	VFIO_PCI_NUM_IRQS
+> > +	VFIO_PCI_NUM_IRQS = 5	/* Fixed user ABI, IRQ indexes >=5 use
+> */
+> > +				/* device specific cap to define content */
+> >  };
+> >
+> >  /*
+> > --
+> > 2.17.1
+> >
+> 
+> --
+> Open Source Technology Center, Intel ltd.
+> 
+> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
