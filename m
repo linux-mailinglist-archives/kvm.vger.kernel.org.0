@@ -2,105 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 149A66E4BA
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 13:09:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C88596E8BC
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 18:25:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727373AbfGSLJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 07:09:07 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54953 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726072AbfGSLJH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 07:09:07 -0400
-Received: by mail-wm1-f65.google.com with SMTP id p74so28383040wme.4
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 04:09:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jZTpt124xkvIC199mqq/Y1JoK7GIwu0z9IqI5bP/sDw=;
-        b=b87U0uB0GRbwAlrHFbC6KSzwac4kCEZ0GnUjgHFehLJ37bSs7NkoAcNucRDBuLgaE2
-         lIDpsps4Ef4oCZdNvag+hOK6tHk5T0Dx/nu0Ai0RkGQVVXiHfUJuysbd4iRwcA1P7lLk
-         jQn7PO1+jokOwzBMmZyTcvusJNeBkpuRw16d9KrHa2X8SLuqhisXxbrx5VJTfF7Owfs1
-         9BerNvQohpZF75aE1XhETTPqZq/a1HOtJd4I6CM07fvKD3bzC+6tma/uZixjnbgmyn+F
-         v/cS/qRqcDuPFcDBXoW68W4EI7KN20Yd4NM9ERo/bT7fdHdamuOGJwdsnAe+gasRm87k
-         sOzA==
-X-Gm-Message-State: APjAAAX+InzolTXQhc/wPrB6Id8gHw+fqZrhwosSl5bh9inzcX3VJU4g
-        kuXBs6MA/HWSi8Y/uYjhayD0uA==
-X-Google-Smtp-Source: APXvYqy8J64o/W1vhWCroMIOpTpGntL1yVyaLhpT/aa7pg1hpD5LFTyt3PBsqrwCwNryxxXKXqVQVA==
-X-Received: by 2002:a7b:c215:: with SMTP id x21mr47986773wmi.38.1563534544929;
-        Fri, 19 Jul 2019 04:09:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8? ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
-        by smtp.gmail.com with ESMTPSA id l2sm20503956wmj.4.2019.07.19.04.09.03
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Jul 2019 04:09:04 -0700 (PDT)
-Subject: Re: [5.2 regression] x86/fpu changes cause crashes in KVM guest
-To:     Wanpeng Li <kernellwp@gmail.com>,
-        Thomas Lambertz <mail@thomaslambertz.de>
-Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Rik van Riel <riel@surriel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Marc Orr <marcorr@google.com>,
-        Dave Hansen <dave.hansen@intel.com>
-References: <217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de>
- <CANRm+CxWbkr0=DB7DBdaQOsTTt0XS5vSk_BRL2iFeAAm81H8Bg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3ae96202-a121-70a9-fe00-4b5bb4970242@redhat.com>
-Date:   Fri, 19 Jul 2019 13:09:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729123AbfGSQZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 12:25:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33280 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728051AbfGSQZV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 12:25:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EC83B3364D;
+        Fri, 19 Jul 2019 16:25:20 +0000 (UTC)
+Received: from x1.home (ovpn-116-35.phx2.redhat.com [10.3.116.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C67DE1001B02;
+        Fri, 19 Jul 2019 16:25:17 +0000 (UTC)
+Date:   Fri, 19 Jul 2019 10:25:16 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kechen Lu <kechen.lu@intel.com>
+Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Tina Zhang <tina.zhang@intel.com>,
+        kraxel@redhat.com, zhenyuw@linux.intel.com, zhiyuan.lv@intel.com,
+        zhi.a.wang@intel.com, kevin.tian@intel.com, hang.yuan@intel.com
+Subject: Re: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
+Message-ID: <20190719102516.60af527f@x1.home>
+In-Reply-To: <20190718155640.25928-3-kechen.lu@intel.com>
+References: <20190718155640.25928-1-kechen.lu@intel.com>
+        <20190718155640.25928-3-kechen.lu@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CxWbkr0=DB7DBdaQOsTTt0XS5vSk_BRL2iFeAAm81H8Bg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 19 Jul 2019 16:25:21 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/07/19 10:59, Wanpeng Li wrote:
-> https://lkml.org/lkml/2017/11/14/891, "The scheduler will save the
-> guest fpu context when a vCPU thread is preempted, and restore it when
-> it is scheduled back in." But I can't find any scheduler codes do
-> this.
+On Thu, 18 Jul 2019 23:56:36 +0800
+Kechen Lu <kechen.lu@intel.com> wrote:
 
-That's because applying commit 240c35a37 was completely wrong.  The idea
-before commit 240c35a37 was that you have the following FPU states:
+> From: Tina Zhang <tina.zhang@intel.com>
+> 
+> Introduce vGPU specific irq type VFIO_IRQ_TYPE_GFX, and
+> VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ as the subtype for vGPU display
+> 
+> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+> ---
+>  include/uapi/linux/vfio.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index be6adab4f759..df28b17a6e2e 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -469,6 +469,9 @@ struct vfio_irq_info_cap_type {
+>  	__u32 subtype;  /* type specific */
+>  };
+>  
+> +#define VFIO_IRQ_TYPE_GFX				(1)
+> +#define VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ		(1)
+> +
 
-               userspace (QEMU)             guest
----------------------------------------------------------------------------
-               processor                    vcpu->arch.guest_fpu
->>> KVM_RUN: kvm_load_guest_fpu
-               vcpu->arch.user_fpu          processor
->>> preempt out
-               vcpu->arch.user_fpu          current->thread.fpu
->>> preempt in
-               vcpu->arch.user_fpu          processor
->>> back to userspace
->>> kvm_put_guest_fpu
-               processor                    vcpu->arch.guest_fpu
----------------------------------------------------------------------------
+Please include a description defining exactly what this IRQ is intended
+to signal.  For instance, if another vGPU vendor wanted to implement
+this in their driver and didn't have the QEMU code for reference to
+what it does with the IRQ, what would they need to know?  Thanks,
 
-After removing user_fpu, QEMU's FPU state is destroyed when KVM_RUN is
-preempted.  So that's already messed up (I'll send a revert), and given
-the diagram above your patch makes total sense.
+Alex 
 
-With the new lazy model we want to hook into kvm_vcpu_arch_load and get
-the state back to the processor from current->thread.fpu, and indeed
-switch_fpu_return is essentially copy_kernel_to_fpregs(&current->thread.
-fpu->state).
+>  /**
+>   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
+>   *
 
-However I would keep the fpregs_assert_state_consistent in
-kvm_arch_vcpu_load, and also
-WARN_ON_ONCE(test_thread_flag(TIF_NEED_FPU_LOAD)) in vcpu_enter_guest.
-
-Paolo
