@@ -2,133 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF6766E9EF
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 19:18:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24CEF6EA12
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 19:26:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730913AbfGSRSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 13:18:36 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:45956 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728475AbfGSRSf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 13:18:35 -0400
-Received: by mail-wr1-f66.google.com with SMTP id f9so32950366wre.12
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 10:18:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=e6CLIOKxxHQ60CyDNUesfrqwN5wWOdGDSUFSJX50UpA=;
-        b=fjsfkTjFRk5f2SHonDU5QcHxSI81PSOy20SNk9aABE4gSYzHBhEPmGDKd+i/2GDGzn
-         GDk1tT8LUcJQf/BiuRUx2Yg0HxHH1477WcVhyVhRIE+69H3YCFN/+f5mUt02tWMSmnGo
-         nzCLtPJDUGfc4ApmdwTTlilVgXuO9hZpbUE2i/0DsH5KF/Qjcu74e18HS1GJct2QQ3tK
-         gohdQ5zs4dLGJjp/Xk9Qwnt0e4u8uRO4y5AyYnfYflAhIciGUlyex59XB6abHiHgJTbp
-         u+Uij9WLQcRKhXcfYvzg+yIRUL8rHH75FFVRHBH6ytcnlL+cLIOMMNWjYBjbhT8peMWA
-         3UHw==
-X-Gm-Message-State: APjAAAXSDS4qkKjxCAkbJVn9PhzaC0k3X/MrEIjzgAE/Zo2YRJvsa/fI
-        aE6uUinp122gWeqgl4NP4JjPNg==
-X-Google-Smtp-Source: APXvYqzJx1HwtFtqTy4uddTx8HPLulB4T5O8jWKvOwCs9aejPI5UxADk2J/Yq8//ReZVhtr/rpQLGA==
-X-Received: by 2002:adf:8364:: with SMTP id 91mr57058267wrd.13.1563556713168;
-        Fri, 19 Jul 2019 10:18:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8? ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
-        by smtp.gmail.com with ESMTPSA id w14sm23627591wrk.44.2019.07.19.10.18.32
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Jul 2019 10:18:32 -0700 (PDT)
-Subject: Re: [PATCH v8 0/3] KVM: x86: Enable user wait instructions
-To:     Tao Xu <tao3.xu@intel.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
-        jingqi.liu@intel.com
-References: <20190716065551.27264-1-tao3.xu@intel.com>
- <d01e6b8b-279c-84da-1f08-7b01baf9fdbf@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ad687740-1525-f9c2-b441-63613b7dd93e@redhat.com>
-Date:   Fri, 19 Jul 2019 19:18:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729812AbfGSRZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 13:25:42 -0400
+Received: from mga14.intel.com ([192.55.52.115]:21962 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729425AbfGSRZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 13:25:42 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Jul 2019 10:25:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,283,1559545200"; 
+   d="scan'208";a="252213001"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.165])
+  by orsmga001.jf.intel.com with ESMTP; 19 Jul 2019 10:25:41 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     kvm@vger.kernel.org
+Subject: [PATCH 0/4] KVM: VMX: Preemptivly optimize VMX instrs
+Date:   Fri, 19 Jul 2019 10:25:36 -0700
+Message-Id: <20190719172540.7697-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-In-Reply-To: <d01e6b8b-279c-84da-1f08-7b01baf9fdbf@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/07/19 08:31, Tao Xu wrote:
-> Ping for comments :)
+An in-flight patch[1] to make __kvm_handle_fault_on_reboot() play nice
+with objtool will add a JMP after most VMX instructions so that the reboot
+macro can use an actual CALL to kvm_spurious_fault() instead of a funky
+PUSH+JMP facsimile.
 
-Hi, I'll look at it for 5.4, right after the merge window.
+Rework the low level VMX instruction helpers to handle unexpected faults
+manually instead of relying on the "fault on reboot" macro.  By using
+asm-goto, most helpers can branch directly to an in-function call to
+kvm_spurious_fault(), which can then be optimized by compilers to reside
+out-of-line at the end of the function instead of inline as done by
+"fault on reboot".
 
-Paolo
+The net impact relative to the current code base is more or less a nop
+when building with a compiler that supports __GCC_ASM_FLAG_OUTPUTS__.
+A bunch of code that was previously in .fixup gets moved into the slow
+paths of functions, but the fast paths are more basically unchanged.
 
-> On 7/16/2019 2:55 PM, Tao Xu wrote:
->> UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
->>
->> UMONITOR arms address monitoring hardware using an address. A store
->> to an address within the specified address range triggers the
->> monitoring hardware to wake up the processor waiting in umwait.
->>
->> UMWAIT instructs the processor to enter an implementation-dependent
->> optimized state while monitoring a range of addresses. The optimized
->> state may be either a light-weight power/performance optimized state
->> (c0.1 state) or an improved power/performance optimized state
->> (c0.2 state).
->>
->> TPAUSE instructs the processor to enter an implementation-dependent
->> optimized state c0.1 or c0.2 state and wake up when time-stamp counter
->> reaches specified timeout.
->>
->> Availability of the user wait instructions is indicated by the presence
->> of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
->>
->> The patches enable the umonitor, umwait and tpause features in KVM.
->> Because umwait and tpause can put a (psysical) CPU into a power saving
->> state, by default we dont't expose it to kvm and enable it only when
->> guest CPUID has it. If the instruction causes a delay, the amount
->> of time delayed is called here the physical delay. The physical delay is
->> first computed by determining the virtual delay (the time to delay
->> relative to the VM’s timestamp counter).
->>
->> The release document ref below link:
->> Intel 64 and IA-32 Architectures Software Developer's Manual,
->> https://software.intel.com/sites/default/files/\
->> managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
->>
->> Changelog:
->> v8:
->>     Add vmx_waitpkg_supported() helper (Sean)
->>     Add an accessor to expose umwait_control_cached (Sean)
->>     Set msr_ia32_umwait_control in vcpu_vmx u32 and raise #GP when
->>     [63:32] is set when rdmsr. (Sean)
->>     Introduce a common exit helper handle_unexpected_vmexit (Sean)
->> v7:
->>     Add nested support for user wait instructions (Paolo)
->>     Use the test on vmx->secondary_exec_control to replace
->>     guest_cpuid_has (Paolo)
->> v6:
->>     add check msr_info->host_initiated in get/set msr(Xiaoyao)
->>     restore the atomic_switch_umwait_control_msr()(Xiaoyao)
->>
->> Tao Xu (3):
->>    KVM: x86: Add support for user wait instructions
->>    KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
->>    KVM: vmx: Introduce handle_unexpected_vmexit and handle WAITPKG vmexit
->>
->>   arch/x86/include/asm/vmx.h      |  1 +
->>   arch/x86/include/uapi/asm/vmx.h |  6 ++-
->>   arch/x86/kernel/cpu/umwait.c    |  6 +++
->>   arch/x86/kvm/cpuid.c            |  2 +-
->>   arch/x86/kvm/vmx/capabilities.h |  6 +++
->>   arch/x86/kvm/vmx/nested.c       |  5 ++
->>   arch/x86/kvm/vmx/vmx.c          | 83 ++++++++++++++++++++++++++-------
->>   arch/x86/kvm/vmx/vmx.h          |  9 ++++
->>   arch/x86/kvm/x86.c              |  1 +
->>   9 files changed, 101 insertions(+), 18 deletions(-)
->>
-> 
+Without __GCC_ASM_FLAG_OUTPUTS__, manually coding the Jcc is a net
+positive as CC_SET() without compiler support almost always generates a
+SETcc+CMP+Jcc sequence, which is now replaced with a single Jcc.
+
+A small bonus is that the Jcc instrs are hinted to predict that the VMX
+instr will be successful.
+
+[1] https://lkml.kernel.org/r/64a9b64d127e87b6920a97afde8e96ea76f6524e.1563413318.git.jpoimboe@redhat.com
+
+Sean Christopherson (4):
+  objtool: KVM: x86: Check kvm_rebooting in kvm_spurious_fault()
+  KVM: VMX: Optimize VMX instruction error and fault handling
+  KVM: VMX: Add error handling to VMREAD helper
+  KVM: x86: Drop ____kvm_handle_fault_on_reboot()
+
+ arch/x86/include/asm/kvm_host.h |  6 +--
+ arch/x86/kvm/vmx/ops.h          | 93 ++++++++++++++++++++-------------
+ arch/x86/kvm/vmx/vmx.c          | 42 +++++++++++++++
+ arch/x86/kvm/x86.c              |  3 +-
+ tools/objtool/check.c           |  1 -
+ 5 files changed, 102 insertions(+), 43 deletions(-)
+
+-- 
+2.22.0
 
