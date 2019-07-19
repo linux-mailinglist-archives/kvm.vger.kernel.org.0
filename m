@@ -2,41 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 907876DA1C
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 06:00:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C834C6DAE3
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 06:05:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728660AbfGSD7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Jul 2019 23:59:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58888 "EHLO mail.kernel.org"
+        id S1731119AbfGSEEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 00:04:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36802 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728536AbfGSD7U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Jul 2019 23:59:20 -0400
+        id S1731098AbfGSEEc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 00:04:32 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4FC8521873;
-        Fri, 19 Jul 2019 03:59:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 91B8E218BB;
+        Fri, 19 Jul 2019 04:04:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563508759;
-        bh=XCx3U6QGCEruMuB3Gk5DOn102BevaT/DEuK7/cTFsYk=;
+        s=default; t=1563509071;
+        bh=Wt/gn8m83bZpyLcVa1ftJFsQb6lYMfvE8ePzwf81kV4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gU2DNRBMRLXV6VHLYBiF+S5/zb39zgMOA04UGlKM9XKXnTdCQcQhXRYgScoVnClDk
-         zupFXfmGyPmMUyl5fR8LGfkGpkDAZGuuNK/Trwp270+sDaY7iEZCGkZSXsea+WEK3l
-         GbefznlrUFa8gvR/lmGQcCPBLwaKWI4i8nGzLJyw=
+        b=uH5Erg4J7RjhUrakMzf7Y6U2i5m2BG3GI2mZZwuSP7PH1FOTiGJQ5ii273C0zv6fH
+         uFePtrJMEE6Piab1ZFzUWEue7Ccf2Z7ylFfWALRDAweaGWyHDuZhiNKmzNwU3LlhRs
+         9hvViaTYr9ODXCDv8Ry11XDTIyMlOdORqSFkek+g=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
+Cc:     Eugene Korenevsky <ekorenevsky@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 074/171] KVM: nVMX: Intercept VMWRITEs to GUEST_{CS,SS}_AR_BYTES
-Date:   Thu, 18 Jul 2019 23:55:05 -0400
-Message-Id: <20190719035643.14300-74-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.1 053/141] kvm: vmx: fix limit checking in get_vmx_mem_address()
+Date:   Fri, 19 Jul 2019 00:01:18 -0400
+Message-Id: <20190719040246.15945-53-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190719035643.14300-1-sashal@kernel.org>
-References: <20190719035643.14300-1-sashal@kernel.org>
+In-Reply-To: <20190719040246.15945-1-sashal@kernel.org>
+References: <20190719040246.15945-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -45,106 +44,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Eugene Korenevsky <ekorenevsky@gmail.com>
 
-[ Upstream commit b643780562af5378ef7fe731c65b8f93e49c59c6 ]
+[ Upstream commit c1a9acbc5295e278d788e9f7510f543bc9864fa2 ]
 
-VMMs frequently read the guest's CS and SS AR bytes to detect 64-bit
-mode and CPL respectively, but effectively never write said fields once
-the VM is initialized.  Intercepting VMWRITEs for the two fields saves
-~55 cycles in copy_shadow_to_vmcs12().
+Intel SDM vol. 3, 5.3:
+The processor causes a
+general-protection exception (or, if the segment is SS, a stack-fault
+exception) any time an attempt is made to access the following addresses
+in a segment:
+- A byte at an offset greater than the effective limit
+- A word at an offset greater than the (effective-limit â€“ 1)
+- A doubleword at an offset greater than the (effective-limit â€“ 3)
+- A quadword at an offset greater than the (effective-limit â€“ 7)
 
-Because some Intel CPUs, e.g. Haswell, drop the reserved bits of the
-guest access rights fields on VMWRITE, exposing the fields to L1 for
-VMREAD but not VMWRITE leads to inconsistent behavior between L1 and L2.
-On hardware that drops the bits, L1 will see the stripped down value due
-to reading the value from hardware, while L2 will see the full original
-value as stored by KVM.  To avoid such an inconsistency, emulate the
-behavior on all CPUS, but only for intercepted VMWRITEs so as to avoid
-introducing pointless latency into copy_shadow_to_vmcs12(), e.g. if the
-emulation were added to vmcs12_write_any().
+Therefore, the generic limit checking error condition must be
 
-Since the AR_BYTES emulation is done only for intercepted VMWRITE, if a
-future patch (re)exposed AR_BYTES for both VMWRITE and VMREAD, then KVM
-would end up with incosistent behavior on pre-Haswell hardware, e.g. KVM
-would drop the reserved bits on intercepted VMWRITE, but direct VMWRITE
-to the shadow VMCS would not drop the bits.  Add a WARN in the shadow
-field initialization to detect any attempt to expose an AR_BYTES field
-without updating vmcs12_write_any().
+exn = (off > limit + 1 - access_len) = (off + access_len - 1 > limit)
 
-Note, emulation of the AR_BYTES reserved bit behavior is based on a
-patch[1] from Jim Mattson that applied the emulation to all writes to
-vmcs12 so that live migration across different generations of hardware
-would not introduce divergent behavior.  But given that live migration
-of nested state has already been enabled, that ship has sailed (not to
-mention that no sane VMM will be affected by this behavior).
+but not
 
-[1] https://patchwork.kernel.org/patch/10483321/
+exn = (off + access_len > limit)
 
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+as for now.
+
+Also avoid integer overflow of `off` at 32-bit KVM by casting it to u64.
+
+Note: access length is currently sizeof(u64) which is incorrect. This
+will be fixed in the subsequent patch.
+
+Signed-off-by: Eugene Korenevsky <ekorenevsky@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/vmx/nested.c             | 15 +++++++++++++++
- arch/x86/kvm/vmx/vmcs_shadow_fields.h |  4 ++--
- 2 files changed, 17 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 7958189ee702..4c0aa676f843 100644
+index 4ca834d22169..897ae4b62980 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -91,6 +91,10 @@ static void init_vmcs_shadow_fields(void)
- 			pr_err("Missing field from shadow_read_write_field %x\n",
- 			       field + 1);
- 
-+		WARN_ONCE(field >= GUEST_ES_AR_BYTES &&
-+			  field <= GUEST_TR_AR_BYTES,
-+			  "Update vmcs12_write_any() to expose AR_BYTES RW");
-+
- 		/*
- 		 * PML and the preemption timer can be emulated, but the
- 		 * processor cannot vmwrite to fields that don't exist
-@@ -4496,6 +4500,17 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 		vmcs12 = get_shadow_vmcs12(vcpu);
+@@ -4143,7 +4143,7 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
+ 		 */
+ 		if (!(s.base == 0 && s.limit == 0xffffffff &&
+ 		     ((s.type & 8) || !(s.type & 4))))
+-			exn = exn || (off + sizeof(u64) > s.limit);
++			exn = exn || ((u64)off + sizeof(u64) - 1 > s.limit);
  	}
- 
-+	/*
-+	 * Some Intel CPUs intentionally drop the reserved bits of the AR byte
-+	 * fields on VMWRITE.  Emulate this behavior to ensure consistent KVM
-+	 * behavior regardless of the underlying hardware, e.g. if an AR_BYTE
-+	 * field is intercepted for VMWRITE but not VMREAD (in L1), then VMREAD
-+	 * from L1 will return a different value than VMREAD from L2 (L1 sees
-+	 * the stripped down value, L2 sees the full value as stored by KVM).
-+	 */
-+	if (field >= GUEST_ES_AR_BYTES && field <= GUEST_TR_AR_BYTES)
-+		field_value &= 0x1f0ff;
-+
- 	if (vmcs12_write_any(vmcs12, field, field_value) < 0)
- 		return nested_vmx_failValid(vcpu,
- 			VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-index 132432f375c2..97dd5295be31 100644
---- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-+++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-@@ -40,14 +40,14 @@ SHADOW_FIELD_RO(VM_EXIT_INSTRUCTION_LEN)
- SHADOW_FIELD_RO(IDT_VECTORING_INFO_FIELD)
- SHADOW_FIELD_RO(IDT_VECTORING_ERROR_CODE)
- SHADOW_FIELD_RO(VM_EXIT_INTR_ERROR_CODE)
-+SHADOW_FIELD_RO(GUEST_CS_AR_BYTES)
-+SHADOW_FIELD_RO(GUEST_SS_AR_BYTES)
- SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL)
- SHADOW_FIELD_RW(EXCEPTION_BITMAP)
- SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE)
- SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD)
- SHADOW_FIELD_RW(VM_ENTRY_INSTRUCTION_LEN)
- SHADOW_FIELD_RW(TPR_THRESHOLD)
--SHADOW_FIELD_RW(GUEST_CS_AR_BYTES)
--SHADOW_FIELD_RW(GUEST_SS_AR_BYTES)
- SHADOW_FIELD_RW(GUEST_INTERRUPTIBILITY_INFO)
- SHADOW_FIELD_RW(VMX_PREEMPTION_TIMER_VALUE)
- 
+ 	if (exn) {
+ 		kvm_queue_exception_e(vcpu,
 -- 
 2.20.1
 
