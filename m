@@ -2,180 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6347E6E3D6
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 12:04:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 971246E4A5
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 13:03:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727206AbfGSKCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 06:02:42 -0400
-Received: from mga17.intel.com ([192.55.52.151]:43793 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725853AbfGSKCm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 06:02:42 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Jul 2019 03:02:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,281,1559545200"; 
-   d="asc'?scan'208";a="176257422"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
-  by FMSMGA003.fm.intel.com with ESMTP; 19 Jul 2019 03:02:39 -0700
-Date:   Fri, 19 Jul 2019 17:59:27 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     "Lu, Kechen" <kechen.lu@intel.com>
-Cc:     "Zhang, Tina" <tina.zhang@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: Re: [RFC PATCH v4 1/6] vfio: Define device specific irq type
- capability
-Message-ID: <20190719095927.GG28809@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20190718155640.25928-1-kechen.lu@intel.com>
- <20190718155640.25928-2-kechen.lu@intel.com>
- <20190719060540.GC28809@zhen-hp.sh.intel.com>
- <31185F57AF7C4B4F87C41E735C23A6FE64DFC7@shsmsx102.ccr.corp.intel.com>
+        id S1727546AbfGSLCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 07:02:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19462 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726075AbfGSLCD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jul 2019 07:02:03 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6JAwYDt019971
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 07:02:02 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tuanqnab2-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 07:01:50 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Fri, 19 Jul 2019 12:01:36 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 19 Jul 2019 12:01:33 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6JB1VTh41812050
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Jul 2019 11:01:31 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C551042047;
+        Fri, 19 Jul 2019 11:01:31 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8671F42049;
+        Fri, 19 Jul 2019 11:01:31 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.184])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 19 Jul 2019 11:01:31 +0000 (GMT)
+Date:   Fri, 19 Jul 2019 13:01:30 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Heiko Carstens <heiko.carstens@de.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
+In-Reply-To: <20190719063249.GA4852@osiris>
+References: <20190718172120.69947-1-pasic@linux.ibm.com>
+        <20190719063249.GA4852@osiris>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="HKEL+t8MFpg/ASTE"
-Content-Disposition: inline
-In-Reply-To: <31185F57AF7C4B4F87C41E735C23A6FE64DFC7@shsmsx102.ccr.corp.intel.com>
-User-Agent: Mutt/1.10.0 (2018-05-17)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19071911-0020-0000-0000-0000035557B7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19071911-0021-0000-0000-000021A9344B
+Message-Id: <20190719130130.3ef4fa9c.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-19_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=782 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907190128
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 19 Jul 2019 08:32:49 +0200
+Heiko Carstens <heiko.carstens@de.ibm.com> wrote:
 
---HKEL+t8MFpg/ASTE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Thu, Jul 18, 2019 at 07:21:20PM +0200, Halil Pasic wrote:
+> > On s390 ZONE_DMA is up to 2G, i.e. ARCH_ZONE_DMA_BITS should be 31 bits.
+> > The current value is 24 and makes __dma_direct_alloc_pages() take a
+> > wrong turn first (but __dma_direct_alloc_pages() recovers then).
+> > 
+> > Let's correct ARCH_ZONE_DMA_BITS value and avoid wrong turns.
+> > 
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > Reported-by: Petr Tesarik <ptesarik@suse.cz>
+> > Fixes: c61e9637340e ("dma-direct: add support for allocation from
+> > ZONE_DMA and ZONE_DMA32")
+> 
+> Please don't add linebreaks to "Fixes:" tags.
+> 
 
-On 2019.07.19 09:02:33 +0000, Lu, Kechen wrote:
-> Hi,
->=20
-> > -----Original Message-----
-> > From: Zhenyu Wang [mailto:zhenyuw@linux.intel.com]
-> > Sent: Friday, July 19, 2019 2:06 PM
-> > To: Lu, Kechen <kechen.lu@intel.com>
-> > Cc: intel-gvt-dev@lists.freedesktop.org; kvm@vger.kernel.org; linux-=20
-> > kernel@vger.kernel.org; Zhang, Tina <tina.zhang@intel.com>;=20
-> > kraxel@redhat.com; zhenyuw@linux.intel.com; Lv, Zhiyuan=20
-> > <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian,=20
-> > Kevin <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>;=20
-> > alex.williamson@redhat.com; Eric Auger <eric.auger@redhat.com>
-> > Subject: Re: [RFC PATCH v4 1/6] vfio: Define device specific irq type=
-=20
-> > capability
-> >=20
-> > On 2019.07.18 23:56:35 +0800, Kechen Lu wrote:
-> > > From: Tina Zhang <tina.zhang@intel.com>
-> > >
-> > > Cap the number of irqs with fixed indexes and use capability chains=
-=20
-> > > to chain device specific irqs.
-> > >
-> > > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > > ---
-> > >  include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
-> > >  1 file changed, 18 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h=20
-> > > index 8f10748dac79..be6adab4f759 100644
-> > > --- a/include/uapi/linux/vfio.h
-> > > +++ b/include/uapi/linux/vfio.h
-> > > @@ -448,11 +448,27 @@ struct vfio_irq_info {
-> > >  #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
-> > >  #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
-> > >  #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
-> > > +#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info supports caps
-> > */
-> > >  	__u32	index;		/* IRQ index */
-> > >  	__u32	count;		/* Number of IRQs within this index */
-> > > +	__u32	cap_offset;	/* Offset within info struct of first cap */
-> >=20
-> > This still breaks ABI as argsz would be updated with this new field,=20
-> > so it would cause compat issue. I think my last suggestion was to=20
-> > assume cap list starts after vfio_irq_info.
-> >
-> =20
-> In the common practice, the general logic is first use the "count" as the=
- "minsz" boundary to perform copy from user, and then perform following log=
-ic, so that the incompatibility issue would not happen. BTW, this patch has=
- been double checked by Eric Auger before included in his patch-set.=20
->=20
+Will remember that, thanks! I was not aware of the rule and checkpatch
+did not complain. 
 
-yeah, sorry I was thinking vfio might fail in that case but it seems
-current code assume argsz should be larger than minsz for count here,
-so that's fine.
+> > ---
+> >  arch/s390/include/asm/dma.h | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/s390/include/asm/dma.h b/arch/s390/include/asm/dma.h
+> > index 6f26f35d4a71..3b0329665b13 100644
+> > --- a/arch/s390/include/asm/dma.h
+> > +++ b/arch/s390/include/asm/dma.h
+> > @@ -10,6 +10,7 @@
+> >   * by the 31 bit heritage.
+> >   */
+> >  #define MAX_DMA_ADDRESS         0x80000000
+> > +#define ARCH_ZONE_DMA_BITS      31
+> 
+> powerpc has this in arch/powerpc/include/asm/page.h. This really
+> should be consistently defined in the same header file across
+> architectures.
+> 
+> Christoph, what is the preferred header file for this definition?
+> 
+> I'd also rather say it would be better to move the #ifndef ARCH_ZONE_DMA_BITS
+> check to a common code header file instead of having it in a C file, and
+> make it more obvious in which header file architectures should/can override
+> the default, no?
 
->=20
-> > >  };
-> > >  #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE + 9)
-> > >
-> > > +/*
-> > > + * The irq type capability allows irqs unique to a specific device=
-=20
-> > > +or
-> > > + * class of devices to be exposed.
-> > > + *
-> > > + * The structures below define version 1 of this capability.
-> > > + */
-> > > +#define VFIO_IRQ_INFO_CAP_TYPE      3
-> > > +
-> > > +struct vfio_irq_info_cap_type {
-> > > +	struct vfio_info_cap_header header;
-> > > +	__u32 type;     /* global per bus driver */
-> > > +	__u32 subtype;  /* type specific */ };
-> > > +
-> > >  /**
-> > >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct
-> > vfio_irq_set)
-> > >   *
-> > > @@ -554,7 +570,8 @@ enum {
-> > >  	VFIO_PCI_MSIX_IRQ_INDEX,
-> > >  	VFIO_PCI_ERR_IRQ_INDEX,
-> > >  	VFIO_PCI_REQ_IRQ_INDEX,
-> > > -	VFIO_PCI_NUM_IRQS
-> > > +	VFIO_PCI_NUM_IRQS =3D 5	/* Fixed user ABI, IRQ indexes >=3D5 use
-> > */
-> > > +				/* device specific cap to define content */
-> > >  };
-> > >
-> > >  /*
-> > > --
-> > > 2.17.1
-> > >
-> >=20
-> > --
-> > Open Source Technology Center, Intel ltd.
-> >=20
-> > $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
++1
 
---=20
-Open Source Technology Center, Intel ltd.
+I will wait for Christoph's answer with a respin. Thanks for having a
+look.
 
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+Regards,
+Halil
 
---HKEL+t8MFpg/ASTE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXTGUfwAKCRCxBBozTXgY
-J/UoAJ44zsldWP7UQPboscULWpi5vt3WswCePRPUL9w/jjULfR02ApGsutPBcso=
-=0x0A
------END PGP SIGNATURE-----
-
---HKEL+t8MFpg/ASTE--
