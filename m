@@ -2,130 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AF696E265
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 10:22:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 351736E26E
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 10:26:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbfGSIWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 04:22:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38228 "EHLO mx1.redhat.com"
+        id S1726856AbfGSI0W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 04:26:22 -0400
+Received: from mga14.intel.com ([192.55.52.115]:51802 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725798AbfGSIWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 04:22:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 95A7630860D3;
-        Fri, 19 Jul 2019 08:22:03 +0000 (UTC)
-Received: from [10.72.12.179] (ovpn-12-179.pek2.redhat.com [10.72.12.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 147D65DA35;
-        Fri, 19 Jul 2019 08:21:53 +0000 (UTC)
-Subject: Re: [PATCH v4 4/5] vhost/vsock: split packets to send using multiple
- buffers
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-References: <20190717113030.163499-1-sgarzare@redhat.com>
- <20190717113030.163499-5-sgarzare@redhat.com>
- <20190717105336-mutt-send-email-mst@kernel.org>
- <CAGxU2F45v40qAOHkm1Hk2E69gCS0UwVgS5NS+tDXXuzdF4EixA@mail.gmail.com>
- <20190718041234-mutt-send-email-mst@kernel.org>
- <CAGxU2F6oo7Cou7t9o=gG2=wxHMKX9xYQXNxVtDYeHq5fyEhJWg@mail.gmail.com>
- <20190718072741-mutt-send-email-mst@kernel.org>
- <20190719080832.7hoeus23zjyrx3cc@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <fcd19719-e5a9-adad-1e6c-c84487187088@redhat.com>
-Date:   Fri, 19 Jul 2019 16:21:52 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1725853AbfGSI0W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 04:26:22 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Jul 2019 01:26:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,281,1559545200"; 
+   d="scan'208";a="319903679"
+Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
+  by orsmga004.jf.intel.com with ESMTP; 19 Jul 2019 01:26:18 -0700
+Message-ID: <5D317FFA.8000507@intel.com>
+Date:   Fri, 19 Jul 2019 16:31:54 +0800
+From:   Wei Wang <wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190719080832.7hoeus23zjyrx3cc@steredhat>
+To:     Eric Hankland <ehankland@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stephane Eranian <eranian@google.com>
+Subject: Re: [PATCH] KVM: x86: Add fixed counters to PMU filter
+References: <20190718183818.190051-1-ehankland@google.com>
+In-Reply-To: <20190718183818.190051-1-ehankland@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 19 Jul 2019 08:22:03 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/7/19 下午4:08, Stefano Garzarella wrote:
-> On Thu, Jul 18, 2019 at 07:35:46AM -0400, Michael S. Tsirkin wrote:
->> On Thu, Jul 18, 2019 at 11:37:30AM +0200, Stefano Garzarella wrote:
->>> On Thu, Jul 18, 2019 at 10:13 AM Michael S. Tsirkin<mst@redhat.com>  wrote:
->>>> On Thu, Jul 18, 2019 at 09:50:14AM +0200, Stefano Garzarella wrote:
->>>>> On Wed, Jul 17, 2019 at 4:55 PM Michael S. Tsirkin<mst@redhat.com>  wrote:
->>>>>> On Wed, Jul 17, 2019 at 01:30:29PM +0200, Stefano Garzarella wrote:
->>>>>>> If the packets to sent to the guest are bigger than the buffer
->>>>>>> available, we can split them, using multiple buffers and fixing
->>>>>>> the length in the packet header.
->>>>>>> This is safe since virtio-vsock supports only stream sockets.
->>>>>>>
->>>>>>> Signed-off-by: Stefano Garzarella<sgarzare@redhat.com>
->>>>>> So how does it work right now? If an app
->>>>>> does sendmsg with a 64K buffer and the other
->>>>>> side publishes 4K buffers - does it just stall?
->>>>> Before this series, the 64K (or bigger) user messages was split in 4K packets
->>>>> (fixed in the code) and queued in an internal list for the TX worker.
->>>>>
->>>>> After this series, we will queue up to 64K packets and then it will be split in
->>>>> the TX worker, depending on the size of the buffers available in the
->>>>> vring. (The idea was to allow EWMA or a configuration of the buffers size, but
->>>>> for now we postponed it)
->>>> Got it. Using workers for xmit is IMHO a bad idea btw.
->>>> Why is it done like this?
->>> Honestly, I don't know the exact reasons for this design, but I suppose
->>> that the idea was to have only one worker that uses the vring, and
->>> multiple user threads that enqueue packets in the list.
->>> This can simplify the code and we can put the user threads to sleep if
->>> we don't have "credit" available (this means that the receiver doesn't
->>> have space to receive the packet).
->> I think you mean the reverse: even without credits you can copy from
->> user and queue up data, then process it without waking up the user
->> thread.
-> I checked the code better, but it doesn't seem to do that.
-> The .sendmsg callback of af_vsock, check if the transport has space
-> (virtio-vsock transport returns the credit available). If there is no
-> space, it put the thread to sleep on the 'sk_sleep(sk)' wait_queue.
+On 07/19/2019 02:38 AM, Eric Hankland wrote:
+> From: ehankland <ehankland@google.com>
 >
-> When the transport receives an update of credit available on the other
-> peer, it calls 'sk->sk_write_space(sk)' that wakes up the thread
-> sleeping, that will queue the new packet.
+> Updates KVM_CAP_PMU_EVENT_FILTER so it can also whitelist or blacklist
+> fixed counters.
 >
-> So, in the current implementation, the TX worker doesn't check the
-> credit available, it only sends the packets.
+> Signed-off-by: ehankland <ehankland@google.com>
+> ---
+>   Documentation/virtual/kvm/api.txt | 13 ++++++++-----
+>   arch/x86/include/uapi/asm/kvm.h   |  9 ++++++---
+>   arch/x86/kvm/pmu.c                | 30 +++++++++++++++++++++++++-----
+>   3 files changed, 39 insertions(+), 13 deletions(-)
 >
->> Does it help though? It certainly adds up work outside of
->> user thread context which means it's not accounted for
->> correctly.
-> I can try to xmit the packet directly in the user thread context, to see
-> the improvements.
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 2cd6250b2896..96bcf1aa1931 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -4090,17 +4090,20 @@ Parameters: struct kvm_pmu_event_filter (in)
+>   Returns: 0 on success, -1 on error
+>   
+>   struct kvm_pmu_event_filter {
+> -       __u32 action;
+> -       __u32 nevents;
+> -       __u64 events[0];
+> +	__u32 action;
+> +	__u32 nevents;
+> +	__u32 fixed_counter_bitmap;
+> +	__u32 flags;
+> +	__u32 pad[4];
+> +	__u64 events[0];
+>   };
+>   
+>   This ioctl restricts the set of PMU events that the guest can program.
+>   The argument holds a list of events which will be allowed or denied.
+>   The eventsel+umask of each event the guest attempts to program is compared
+>   against the events field to determine whether the guest should have access.
+> -This only affects general purpose counters; fixed purpose counters can
+> -be disabled by changing the perfmon CPUID leaf.
+> +The events field only controls general purpose counters; fixed purpose
+> +counters are controlled by the fixed_counter_bitmap.
+>   
+>   Valid values for 'action':
+>   #define KVM_PMU_EVENT_ALLOW 0
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index e901b0ab116f..503d3f42da16 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -435,9 +435,12 @@ struct kvm_nested_state {
+>   
+>   /* for KVM_CAP_PMU_EVENT_FILTER */
+>   struct kvm_pmu_event_filter {
+> -       __u32 action;
+> -       __u32 nevents;
+> -       __u64 events[0];
+> +	__u32 action;
+> +	__u32 nevents;
+> +	__u32 fixed_counter_bitmap;
+> +	__u32 flags;
+> +	__u32 pad[4];
+> +	__u64 events[0];
+>   };
+>   
+>   #define KVM_PMU_EVENT_ALLOW 0
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index aa5a2597305a..ae5cd1b02086 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -19,8 +19,8 @@
+>   #include "lapic.h"
+>   #include "pmu.h"
+>   
+> -/* This keeps the total size of the filter under 4k. */
+> -#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 63
+> +/* This is enough to filter the vast majority of currently defined events. */
+> +#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 300
+>   
+>   /* NOTE:
+>    * - Each perf counter is defined as "struct kvm_pmc";
+> @@ -206,12 +206,25 @@ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int idx)
+>   {
+>   	unsigned en_field = ctrl & 0x3;
+>   	bool pmi = ctrl & 0x8;
+> +	struct kvm_pmu_event_filter *filter;
+> +	struct kvm *kvm = pmc->vcpu->kvm;
+> +
 
+unnecessary white space here, other part looks good to me.
 
-It will then looks more like what virtio-net (and other networking 
-device) did.
+Reviewed-by: Wei Wang <wei.w.wang@intel.com>
 
-
->
->> Maybe we want more VQs. Would help improve parallelism. The question
->> would then become how to map sockets to VQs. With a simple hash
->> it's easy to create collisions ...
-> Yes, more VQs can help but the map question is not simple to answer.
-> Maybe we can do an hash on the (cid, port) or do some kind of estimation
-> of queue utilization and try to balance.
-> Should the mapping be unique?
-
-
-It sounds to me you want some kind of fair queuing? We've already had 
-several qdiscs that do this.
-
-So if we use the kernel networking xmit path, all those issues could be 
-addressed.
-
-Thanks
-
->
+Best,
+Wei
