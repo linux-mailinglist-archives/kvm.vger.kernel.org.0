@@ -2,164 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A53526E30C
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 11:02:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E62E36E353
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 11:21:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726243AbfGSJCi convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 19 Jul 2019 05:02:38 -0400
-Received: from mga18.intel.com ([134.134.136.126]:19218 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725798AbfGSJCh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 05:02:37 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Jul 2019 02:02:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,281,1559545200"; 
-   d="scan'208";a="195888255"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga002.fm.intel.com with ESMTP; 19 Jul 2019 02:02:36 -0700
-Received: from fmsmsx155.amr.corp.intel.com (10.18.116.71) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 19 Jul 2019 02:02:36 -0700
-Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
- FMSMSX155.amr.corp.intel.com (10.18.116.71) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 19 Jul 2019 02:02:36 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.3]) by
- SHSMSX153.ccr.corp.intel.com ([169.254.12.60]) with mapi id 14.03.0439.000;
- Fri, 19 Jul 2019 17:02:34 +0800
-From:   "Lu, Kechen" <kechen.lu@intel.com>
-To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Zhang, Tina" <tina.zhang@intel.com>
-CC:     "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: RE: [RFC PATCH v4 1/6] vfio: Define device specific irq type
- capability
-Thread-Topic: [RFC PATCH v4 1/6] vfio: Define device specific irq type
- capability
-Thread-Index: AQHVPfh+laa+mTOUHUqdBIkmECCN6KbRmVnQ
-Date:   Fri, 19 Jul 2019 09:02:33 +0000
-Message-ID: <31185F57AF7C4B4F87C41E735C23A6FE64DFC7@shsmsx102.ccr.corp.intel.com>
-References: <20190718155640.25928-1-kechen.lu@intel.com>
- <20190718155640.25928-2-kechen.lu@intel.com>
- <20190719060540.GC28809@zhen-hp.sh.intel.com>
-In-Reply-To: <20190719060540.GC28809@zhen-hp.sh.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOTA2Nzc3ZWUtZDM0Ny00MDhmLTk3OWYtMjRlYWExMjQwYjEyIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicEVwaUZEbVBtSzBnYUpWMnY4clwvV201N2c0MlNWQlZZOTlSM0FlN2NNMElKb1g2VzVFUGVtVlNxSEp4MWJcL0JTIn0=
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727189AbfGSJUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 05:20:17 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54770 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726100AbfGSJUR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 05:20:17 -0400
+Received: by mail-wm1-f68.google.com with SMTP id p74so28069857wme.4
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 02:20:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=d7xtP+xXY/V65lMm7hyePdSkWsPyNf2dDv+CiXw5rLE=;
+        b=Ugj+uyODsTjkRuAnjMrgkWm2XT857LRpuEF5d9ACr8SnyY1Rlz6bal+tCLEew1KmvM
+         wOq0Jl6iCgaSdmVyA7MdlrbdnVdEsokweR4PduJDOxMg37sd+wE5ZqTcDdycDRgpBpVH
+         vG9+ZJsXGPyrVc3MvaJWMJevc6ZtJos0mplGeGt0SXVhvtFsZISJ3O7I4Ox0K6pqkMT9
+         5QwlCCvGw339CaH33BCmbhQVvXv+Ry9l9u/t4KTnJan60m0XauZ893F8v6rg2PhqIkHN
+         0gDdp3F//BfBAWHcCV5hcAPH5EczOrRvb0HpCfLwYMwm9mVzSmkGmt8GQc50jFC2CdxY
+         cghg==
+X-Gm-Message-State: APjAAAW/Pkkb1jgPxGdcnUN3WUqDXMHgHbniqhq7aZj5FKt2Vpk78rvB
+        zC8r5n/xlzOLaisRKdECBYV4KA==
+X-Google-Smtp-Source: APXvYqy62hSCfG9ct3WGUrLI/2F1gd44Qr2LvGY4D/nvEZf/p8Jwws1gAc8sewlXn3W8/m75H0THhw==
+X-Received: by 2002:a1c:44d7:: with SMTP id r206mr48394331wma.164.1563528014194;
+        Fri, 19 Jul 2019 02:20:14 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it. [79.13.201.122])
+        by smtp.gmail.com with ESMTPSA id l8sm50906682wrg.40.2019.07.19.02.20.12
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 19 Jul 2019 02:20:13 -0700 (PDT)
+Date:   Fri, 19 Jul 2019 11:20:11 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 4/5] vhost/vsock: split packets to send using multiple
+ buffers
+Message-ID: <20190719092011.czzju7lepn3lv3up@steredhat>
+References: <20190717113030.163499-5-sgarzare@redhat.com>
+ <20190717105336-mutt-send-email-mst@kernel.org>
+ <CAGxU2F45v40qAOHkm1Hk2E69gCS0UwVgS5NS+tDXXuzdF4EixA@mail.gmail.com>
+ <20190718041234-mutt-send-email-mst@kernel.org>
+ <CAGxU2F6oo7Cou7t9o=gG2=wxHMKX9xYQXNxVtDYeHq5fyEhJWg@mail.gmail.com>
+ <20190718072741-mutt-send-email-mst@kernel.org>
+ <20190719080832.7hoeus23zjyrx3cc@steredhat>
+ <fcd19719-e5a9-adad-1e6c-c84487187088@redhat.com>
+ <20190719083920.67qo2umpthz454be@steredhat>
+ <53da84b9-184f-1377-0582-ab7cf42ebdb6@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <53da84b9-184f-1377-0582-ab7cf42ebdb6@redhat.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, Jul 19, 2019 at 04:51:00PM +0800, Jason Wang wrote:
+> 
+> On 2019/7/19 下午4:39, Stefano Garzarella wrote:
+> > On Fri, Jul 19, 2019 at 04:21:52PM +0800, Jason Wang wrote:
+> > > On 2019/7/19 下午4:08, Stefano Garzarella wrote:
+> > > > On Thu, Jul 18, 2019 at 07:35:46AM -0400, Michael S. Tsirkin wrote:
+> > > > > On Thu, Jul 18, 2019 at 11:37:30AM +0200, Stefano Garzarella wrote:
+> > > > > > On Thu, Jul 18, 2019 at 10:13 AM Michael S. Tsirkin<mst@redhat.com>  wrote:
+> > > > > > > On Thu, Jul 18, 2019 at 09:50:14AM +0200, Stefano Garzarella wrote:
+> > > > > > > > On Wed, Jul 17, 2019 at 4:55 PM Michael S. Tsirkin<mst@redhat.com>  wrote:
+> > > > > > > > > On Wed, Jul 17, 2019 at 01:30:29PM +0200, Stefano Garzarella wrote:
+> > > > > > > > > > If the packets to sent to the guest are bigger than the buffer
+> > > > > > > > > > available, we can split them, using multiple buffers and fixing
+> > > > > > > > > > the length in the packet header.
+> > > > > > > > > > This is safe since virtio-vsock supports only stream sockets.
+> > > > > > > > > > 
+> > > > > > > > > > Signed-off-by: Stefano Garzarella<sgarzare@redhat.com>
+> > > > > > > > > So how does it work right now? If an app
+> > > > > > > > > does sendmsg with a 64K buffer and the other
+> > > > > > > > > side publishes 4K buffers - does it just stall?
+> > > > > > > > Before this series, the 64K (or bigger) user messages was split in 4K packets
+> > > > > > > > (fixed in the code) and queued in an internal list for the TX worker.
+> > > > > > > > 
+> > > > > > > > After this series, we will queue up to 64K packets and then it will be split in
+> > > > > > > > the TX worker, depending on the size of the buffers available in the
+> > > > > > > > vring. (The idea was to allow EWMA or a configuration of the buffers size, but
+> > > > > > > > for now we postponed it)
+> > > > > > > Got it. Using workers for xmit is IMHO a bad idea btw.
+> > > > > > > Why is it done like this?
+> > > > > > Honestly, I don't know the exact reasons for this design, but I suppose
+> > > > > > that the idea was to have only one worker that uses the vring, and
+> > > > > > multiple user threads that enqueue packets in the list.
+> > > > > > This can simplify the code and we can put the user threads to sleep if
+> > > > > > we don't have "credit" available (this means that the receiver doesn't
+> > > > > > have space to receive the packet).
+> > > > > I think you mean the reverse: even without credits you can copy from
+> > > > > user and queue up data, then process it without waking up the user
+> > > > > thread.
+> > > > I checked the code better, but it doesn't seem to do that.
+> > > > The .sendmsg callback of af_vsock, check if the transport has space
+> > > > (virtio-vsock transport returns the credit available). If there is no
+> > > > space, it put the thread to sleep on the 'sk_sleep(sk)' wait_queue.
+> > > > 
+> > > > When the transport receives an update of credit available on the other
+> > > > peer, it calls 'sk->sk_write_space(sk)' that wakes up the thread
+> > > > sleeping, that will queue the new packet.
+> > > > 
+> > > > So, in the current implementation, the TX worker doesn't check the
+> > > > credit available, it only sends the packets.
+> > > > 
+> > > > > Does it help though? It certainly adds up work outside of
+> > > > > user thread context which means it's not accounted for
+> > > > > correctly.
+> > > > I can try to xmit the packet directly in the user thread context, to see
+> > > > the improvements.
+> > > 
+> > > It will then looks more like what virtio-net (and other networking device)
+> > > did.
+> > I'll try ASAP, the changes should not be too complicated... I hope :)
+> > 
+> > > 
+> > > > > Maybe we want more VQs. Would help improve parallelism. The question
+> > > > > would then become how to map sockets to VQs. With a simple hash
+> > > > > it's easy to create collisions ...
+> > > > Yes, more VQs can help but the map question is not simple to answer.
+> > > > Maybe we can do an hash on the (cid, port) or do some kind of estimation
+> > > > of queue utilization and try to balance.
+> > > > Should the mapping be unique?
+> > > 
+> > > It sounds to me you want some kind of fair queuing? We've already had
+> > > several qdiscs that do this.
+> > Thanks for pointing it out!
+> > 
+> > > So if we use the kernel networking xmit path, all those issues could be
+> > > addressed.
+> > One more point to AF_VSOCK + net-stack, but we have to evaluate possible
+> > drawbacks in using the net-stack. (e.g. more latency due to the complexity
+> > of the net-stack?)
+> 
+> 
+> Yes, we need benchmark the performance. But as we've noticed, current vsock
+> implementation is not efficient, and for stream socket, the overhead should
+> be minimal. The most important thing is to avoid reinventing things that has
+> already existed.
 
-> -----Original Message-----
-> From: Zhenyu Wang [mailto:zhenyuw@linux.intel.com]
-> Sent: Friday, July 19, 2019 2:06 PM
-> To: Lu, Kechen <kechen.lu@intel.com>
-> Cc: intel-gvt-dev@lists.freedesktop.org; kvm@vger.kernel.org; linux- 
-> kernel@vger.kernel.org; Zhang, Tina <tina.zhang@intel.com>; 
-> kraxel@redhat.com; zhenyuw@linux.intel.com; Lv, Zhiyuan 
-> <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian, 
-> Kevin <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>; 
-> alex.williamson@redhat.com; Eric Auger <eric.auger@redhat.com>
-> Subject: Re: [RFC PATCH v4 1/6] vfio: Define device specific irq type 
-> capability
-> 
-> On 2019.07.18 23:56:35 +0800, Kechen Lu wrote:
-> > From: Tina Zhang <tina.zhang@intel.com>
-> >
-> > Cap the number of irqs with fixed indexes and use capability chains 
-> > to chain device specific irqs.
-> >
-> > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > ---
-> >  include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
-> >  1 file changed, 18 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h 
-> > index 8f10748dac79..be6adab4f759 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -448,11 +448,27 @@ struct vfio_irq_info {
-> >  #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
-> >  #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
-> >  #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
-> > +#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info supports caps
-> */
-> >  	__u32	index;		/* IRQ index */
-> >  	__u32	count;		/* Number of IRQs within this index */
-> > +	__u32	cap_offset;	/* Offset within info struct of first cap */
-> 
-> This still breaks ABI as argsz would be updated with this new field, 
-> so it would cause compat issue. I think my last suggestion was to 
-> assume cap list starts after vfio_irq_info.
->
- 
-In the common practice, the general logic is first use the "count" as the "minsz" boundary to perform copy from user, and then perform following logic, so that the incompatibility issue would not happen. BTW, this patch has been double checked by Eric Auger before included in his patch-set. 
+Got it. I completely agree with you, and I want to avoid reinventing things
+(surely in a worse way).
 
-Best Regards,
-Kechen
+But the idea (suggested also by Micheal) to discover how fast can go a
+new protocol separate from the networking stack, is quite attractive :)
 
-> >  };
-> >  #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE + 9)
-> >
-> > +/*
-> > + * The irq type capability allows irqs unique to a specific device 
-> > +or
-> > + * class of devices to be exposed.
-> > + *
-> > + * The structures below define version 1 of this capability.
-> > + */
-> > +#define VFIO_IRQ_INFO_CAP_TYPE      3
-> > +
-> > +struct vfio_irq_info_cap_type {
-> > +	struct vfio_info_cap_header header;
-> > +	__u32 type;     /* global per bus driver */
-> > +	__u32 subtype;  /* type specific */ };
-> > +
-> >  /**
-> >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct
-> vfio_irq_set)
-> >   *
-> > @@ -554,7 +570,8 @@ enum {
-> >  	VFIO_PCI_MSIX_IRQ_INDEX,
-> >  	VFIO_PCI_ERR_IRQ_INDEX,
-> >  	VFIO_PCI_REQ_IRQ_INDEX,
-> > -	VFIO_PCI_NUM_IRQS
-> > +	VFIO_PCI_NUM_IRQS = 5	/* Fixed user ABI, IRQ indexes >=5 use
-> */
-> > +				/* device specific cap to define content */
-> >  };
-> >
-> >  /*
-> > --
-> > 2.17.1
-> >
-> 
-> --
-> Open Source Technology Center, Intel ltd.
-> 
-> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+Thanks,
+Stefano
