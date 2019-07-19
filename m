@@ -2,111 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD3BF6E105
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 08:33:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED5216E116
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 08:38:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbfGSGc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 02:32:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22990 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727102AbfGSGc7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Jul 2019 02:32:59 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6J6Rk9U139973
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 02:32:58 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tu762v0qb-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 02:32:57 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
-        Fri, 19 Jul 2019 07:32:55 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 19 Jul 2019 07:32:52 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6J6Wp7I51118114
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Jul 2019 06:32:51 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1020EA405F;
-        Fri, 19 Jul 2019 06:32:51 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C2EA1A405B;
-        Fri, 19 Jul 2019 06:32:50 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.134])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 19 Jul 2019 06:32:50 +0000 (GMT)
-Date:   Fri, 19 Jul 2019 08:32:49 +0200
-From:   Heiko Carstens <heiko.carstens@de.ibm.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
-References: <20190718172120.69947-1-pasic@linux.ibm.com>
+        id S1727005AbfGSGiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 02:38:00 -0400
+Received: from mga17.intel.com ([192.55.52.151]:30838 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726067AbfGSGh7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 02:37:59 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jul 2019 23:37:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,281,1559545200"; 
+   d="asc'?scan'208";a="367166291"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
+  by fmsmga005.fm.intel.com with ESMTP; 18 Jul 2019 23:37:55 -0700
+Date:   Fri, 19 Jul 2019 14:34:43 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     Kechen Lu <kechen.lu@intel.com>
+Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kraxel@redhat.com,
+        zhenyuw@linux.intel.com, zhiyuan.lv@intel.com,
+        zhi.a.wang@intel.com, kevin.tian@intel.com, hang.yuan@intel.com,
+        alex.williamson@redhat.com
+Subject: Re: [RFC PATCH v4 6/6] drm/i915/gvt: Add cursor plane reg update
+ trap emulation handler
+Message-ID: <20190719063443.GE28809@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20190718155640.25928-1-kechen.lu@intel.com>
+ <20190718155640.25928-7-kechen.lu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="DqhR8hV3EnoxUkKN"
 Content-Disposition: inline
-In-Reply-To: <20190718172120.69947-1-pasic@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19071906-4275-0000-0000-0000034EAD30
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071906-4276-0000-0000-0000385EC843
-Message-Id: <20190719063249.GA4852@osiris>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-19_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=720 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907190071
+In-Reply-To: <20190718155640.25928-7-kechen.lu@intel.com>
+User-Agent: Mutt/1.10.0 (2018-05-17)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 18, 2019 at 07:21:20PM +0200, Halil Pasic wrote:
-> On s390 ZONE_DMA is up to 2G, i.e. ARCH_ZONE_DMA_BITS should be 31 bits.
-> The current value is 24 and makes __dma_direct_alloc_pages() take a
-> wrong turn first (but __dma_direct_alloc_pages() recovers then).
-> 
-> Let's correct ARCH_ZONE_DMA_BITS value and avoid wrong turns.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reported-by: Petr Tesarik <ptesarik@suse.cz>
-> Fixes: c61e9637340e ("dma-direct: add support for allocation from
-> ZONE_DMA and ZONE_DMA32")
 
-Please don't add linebreaks to "Fixes:" tags.
+--DqhR8hV3EnoxUkKN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 2019.07.18 23:56:40 +0800, Kechen Lu wrote:
+> This patch adds the cursor plane CURBASE reg update trap handler
+> in order to :
+>=20
+> - Deliver the cursor refresh event at each vblank emulation,
+> the flip_done_event bit check is supposed to do here. If cursor
+> plane updates happen, deliver the cursor refresh events.
+>=20
+> - Support the sync and async cursor plane updates and
+> corresponding cursor plane flip interrupts reporting.
+>=20
+> Signed-off-by: Kechen Lu <kechen.lu@intel.com>
 > ---
->  arch/s390/include/asm/dma.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/s390/include/asm/dma.h b/arch/s390/include/asm/dma.h
-> index 6f26f35d4a71..3b0329665b13 100644
-> --- a/arch/s390/include/asm/dma.h
-> +++ b/arch/s390/include/asm/dma.h
-> @@ -10,6 +10,7 @@
->   * by the 31 bit heritage.
->   */
->  #define MAX_DMA_ADDRESS         0x80000000
-> +#define ARCH_ZONE_DMA_BITS      31
+>  drivers/gpu/drm/i915/gvt/display.c   | 11 +++++++++++
+>  drivers/gpu/drm/i915/gvt/handlers.c  | 27 ++++++++++++++++++++++++---
+>  drivers/gpu/drm/i915/gvt/interrupt.c |  7 +++++++
+>  drivers/gpu/drm/i915/gvt/interrupt.h |  3 +++
+>  4 files changed, 45 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/display.c b/drivers/gpu/drm/i915/gv=
+t/display.c
+> index df52e4b4c1b0..a0accc51d44f 100644
+> --- a/drivers/gpu/drm/i915/gvt/display.c
+> +++ b/drivers/gpu/drm/i915/gvt/display.c
+> @@ -399,6 +399,7 @@ static void emulate_vblank_on_pipe(struct intel_vgpu =
+*vgpu, int pipe)
+>  		[PIPE_C] =3D PIPE_C_VBLANK,
+>  	};
+>  	int pri_flip_event =3D SKL_FLIP_EVENT(pipe, PLANE_PRIMARY);
+> +	int cur_flip_event =3D CURSOR_A_FLIP_DONE + pipe;
+>  	int event;
+>  	u64 eventfd_signal_val =3D 0;
+>  	static int pageflip_count;
+> @@ -417,6 +418,11 @@ static void emulate_vblank_on_pipe(struct intel_vgpu=
+ *vgpu, int pipe)
+>  			pageflip_count +=3D PAGEFLIP_INC_COUNT;
+>  		}
+> =20
+> +		if (event =3D=3D cur_flip_event) {
+> +			eventfd_signal_val +=3D DISPLAY_CUR_REFRESH_EVENT_INC;
+> +			pageflip_count +=3D PAGEFLIP_INC_COUNT;
+> +		}
+> +
+>  		intel_vgpu_trigger_virtual_event(vgpu, event);
+>  	}
+> =20
+> @@ -430,6 +436,11 @@ static void emulate_vblank_on_pipe(struct intel_vgpu=
+ *vgpu, int pipe)
+>  			eventfd_signal_val +=3D DISPLAY_PRI_REFRESH_EVENT_INC;
+>  			pageflip_count +=3D PAGEFLIP_INC_COUNT;
+>  		}
+> +
+> +		if (event =3D=3D PLANE_CURSOR) {
+> +			eventfd_signal_val +=3D DISPLAY_CUR_REFRESH_EVENT_INC;
+> +			pageflip_count +=3D PAGEFLIP_INC_COUNT;
+> +		}
+>  	}
+> =20
+>  	if (--pageflip_count < 0) {
+> diff --git a/drivers/gpu/drm/i915/gvt/handlers.c b/drivers/gpu/drm/i915/g=
+vt/handlers.c
+> index 6ad29c4f08e5..821ff88977d8 100644
+> --- a/drivers/gpu/drm/i915/gvt/handlers.c
+> +++ b/drivers/gpu/drm/i915/gvt/handlers.c
+> @@ -767,6 +767,27 @@ static int pri_surf_mmio_write(struct intel_vgpu *vg=
+pu, unsigned int offset,
+>  	return 0;
+>  }
+> =20
+> +#define CURBASE_TO_PIPE(reg) \
+> +	calc_index(offset, _CURABASE, _CURBBASE, 0, CURBASE(PIPE_C))
+> +
+> +static int cur_surf_mmio_write(struct intel_vgpu *vgpu, unsigned int off=
+set,
+> +		void *p_data, unsigned int bytes)
+> +{
+> +	struct drm_i915_private *dev_priv =3D vgpu->gvt->dev_priv;
+> +	u32 pipe =3D CURBASE_TO_PIPE(offset);
+> +	int event =3D CURSOR_A_FLIP_DONE + pipe;
+> +
+> +	write_vreg(vgpu, offset, p_data, bytes);
+> +
+> +	if (vgpu_vreg_t(vgpu, CURCNTR(pipe)) & PLANE_CTL_ASYNC_FLIP) {
+> +		intel_vgpu_trigger_virtual_event(vgpu, event);
+> +		set_bit(PLANE_CURSOR, vgpu->display.async_flip_event[pipe]);
+> +	} else
+> +		set_bit(event, vgpu->irq.flip_done_event[pipe]);
+> +
+> +	return 0;
+> +}
+> +
+>  #define SPRSURF_TO_PIPE(offset) \
+>  	calc_index(offset, _SPRA_SURF, _SPRB_SURF, 0, SPRSURF(PIPE_C))
+> =20
+> @@ -1955,9 +1976,9 @@ static int init_generic_mmio_info(struct intel_gvt =
+*gvt)
+>  	MMIO_D(CURPOS(PIPE_B), D_ALL);
+>  	MMIO_D(CURPOS(PIPE_C), D_ALL);
+> =20
+> -	MMIO_D(CURBASE(PIPE_A), D_ALL);
+> -	MMIO_D(CURBASE(PIPE_B), D_ALL);
+> -	MMIO_D(CURBASE(PIPE_C), D_ALL);
+> +	MMIO_DH(CURBASE(PIPE_A), D_ALL, NULL, cur_surf_mmio_write);
+> +	MMIO_DH(CURBASE(PIPE_B), D_ALL, NULL, cur_surf_mmio_write);
+> +	MMIO_DH(CURBASE(PIPE_C), D_ALL, NULL, cur_surf_mmio_write);
 
-powerpc has this in arch/powerpc/include/asm/page.h. This really
-should be consistently defined in the same header file across
-architectures.
+I think we should also track cursor pos change right?
 
-Christoph, what is the preferred header file for this definition?
+> =20
+>  	MMIO_D(CUR_FBC_CTL(PIPE_A), D_ALL);
+>  	MMIO_D(CUR_FBC_CTL(PIPE_B), D_ALL);
+> diff --git a/drivers/gpu/drm/i915/gvt/interrupt.c b/drivers/gpu/drm/i915/=
+gvt/interrupt.c
+> index 951681813230..9c2b9d2e1529 100644
+> --- a/drivers/gpu/drm/i915/gvt/interrupt.c
+> +++ b/drivers/gpu/drm/i915/gvt/interrupt.c
+> @@ -113,6 +113,9 @@ static const char * const irq_name[INTEL_GVT_EVENT_MA=
+X] =3D {
+>  	[SPRITE_A_FLIP_DONE] =3D "Sprite Plane A flip done",
+>  	[SPRITE_B_FLIP_DONE] =3D "Sprite Plane B flip done",
+>  	[SPRITE_C_FLIP_DONE] =3D "Sprite Plane C flip done",
+> +	[CURSOR_A_FLIP_DONE] =3D "Cursor Plane A flip done",
+> +	[CURSOR_B_FLIP_DONE] =3D "Cursor Plane B flip done",
+> +	[CURSOR_C_FLIP_DONE] =3D "Cursor Plane C flip done",
+> =20
+>  	[PCU_THERMAL] =3D "PCU Thermal Event",
+>  	[PCU_PCODE2DRIVER_MAILBOX] =3D "PCU pcode2driver mailbox event",
+> @@ -593,6 +596,10 @@ static void gen8_init_irq(
+>  		SET_BIT_INFO(irq, 4, SPRITE_A_FLIP_DONE, INTEL_GVT_IRQ_INFO_DE_PIPE_A);
+>  		SET_BIT_INFO(irq, 4, SPRITE_B_FLIP_DONE, INTEL_GVT_IRQ_INFO_DE_PIPE_B);
+>  		SET_BIT_INFO(irq, 4, SPRITE_C_FLIP_DONE, INTEL_GVT_IRQ_INFO_DE_PIPE_C);
+> +
+> +		SET_BIT_INFO(irq, 6, CURSOR_A_FLIP_DONE, INTEL_GVT_IRQ_INFO_DE_PIPE_A);
+> +		SET_BIT_INFO(irq, 6, CURSOR_B_FLIP_DONE, INTEL_GVT_IRQ_INFO_DE_PIPE_B);
+> +		SET_BIT_INFO(irq, 6, CURSOR_C_FLIP_DONE, INTEL_GVT_IRQ_INFO_DE_PIPE_C);
+>  	}
+> =20
+>  	/* GEN8 interrupt PCU events */
+> diff --git a/drivers/gpu/drm/i915/gvt/interrupt.h b/drivers/gpu/drm/i915/=
+gvt/interrupt.h
+> index 5313fb1b33e1..158f1c7a23f2 100644
+> --- a/drivers/gpu/drm/i915/gvt/interrupt.h
+> +++ b/drivers/gpu/drm/i915/gvt/interrupt.h
+> @@ -92,6 +92,9 @@ enum intel_gvt_event_type {
+>  	SPRITE_A_FLIP_DONE,
+>  	SPRITE_B_FLIP_DONE,
+>  	SPRITE_C_FLIP_DONE,
+> +	CURSOR_A_FLIP_DONE,
+> +	CURSOR_B_FLIP_DONE,
+> +	CURSOR_C_FLIP_DONE,
+> =20
+>  	PCU_THERMAL,
+>  	PCU_PCODE2DRIVER_MAILBOX,
+> --=20
+> 2.17.1
+>=20
 
-I'd also rather say it would be better to move the #ifndef ARCH_ZONE_DMA_BITS
-check to a common code header file instead of having it in a C file, and
-make it more obvious in which header file architectures should/can override
-the default, no?
+--=20
+Open Source Technology Center, Intel ltd.
 
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--DqhR8hV3EnoxUkKN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXTFkgwAKCRCxBBozTXgY
+J4d8AJ99urqsjYPF0voL37JuWJgmO27bhACfdInwRS5Cx4nZdmSF129gjIl2A38=
+=ka4J
+-----END PGP SIGNATURE-----
+
+--DqhR8hV3EnoxUkKN--
