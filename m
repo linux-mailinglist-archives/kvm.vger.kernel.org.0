@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BB6EC6EA6F
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 20:01:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C95806EA71
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 20:01:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729485AbfGSSB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 14:01:27 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40524 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727497AbfGSSB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 14:01:27 -0400
-Received: by mail-wm1-f65.google.com with SMTP id v19so29820287wmj.5
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 11:01:25 -0700 (PDT)
+        id S1730352AbfGSSBm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 14:01:42 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33767 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729769AbfGSSBm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 14:01:42 -0400
+Received: by mail-wm1-f68.google.com with SMTP id h19so24224728wme.0
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 11:01:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=glVXcYJgC6+xN1fJyxN8vMROWGd0QRIs5qsZ+/VfNTE=;
-        b=miysL0C44heG7pfCwt/GtjcFK9NcsnchZrb2AoCThV99NspiuOiI91r9vc7/urdRrK
-         5NoIwljRFDtkkOB/FBzSAZGz/sB1Gplm+wFVP1U8CHMd7dg0LVBDoOaloe2nWizDkQEJ
-         6VIngXauO1KOJM5pn4fBtdFkxlqg/CzdjH1Iv+IMPhfo5ecXesgmvaGI2GGovXfBZsGO
-         HvyTktRlFHLOiZ7e0m7hAE1f1Hvn9ukcFbZ7Hudqv/mHTJV1WYpujL8XWezE8YP0l1kM
-         QBJRRsNqDhb/lQDMrk40eLQN9KoS46Wuxdt19G5NwDqpnStHAB468MNdTlup6HijZvL/
-         LNnQ==
-X-Gm-Message-State: APjAAAUsho1poMsQsCpM/sv43fC4AND2Ejia0fPdU487TDG5FD/NLqtC
-        pKixTLipm2A9nirQHFPDSUTP/YOJ8mo=
-X-Google-Smtp-Source: APXvYqy4kgeauWud2yowIbe5ZmJJGhSxCjr/9dtHvZTr9LUuzJclaFN62/heA68sUOhgsEliqPlzqg==
-X-Received: by 2002:a1c:6882:: with SMTP id d124mr48027233wmc.40.1563559284590;
-        Fri, 19 Jul 2019 11:01:24 -0700 (PDT)
+        bh=HWXDGs03LlwJgYH9CB+elGBEaKY5SGGpnZ0sOz+NTWM=;
+        b=fDt4HyXOP/+uLorqNBhFgmR7IT1QUp9IbkDm5AxD5eSvhm0Uw2CzImmthlDHRmBp3A
+         TcJO801jAtatLg8iV02ALq1QWu2tIEKdvFdvRcatNbU1MMwWUqWzfO2UPjDMikOhqUuG
+         HEYcmxw6uOozDjEoIhjAp2Gdf4KN4itMrVG0af5Apib0aifPkOOqa60dJ4uE6vjAfVpM
+         IKtWC6zu8pN91J0hCApswipQ9cO2ilXcz75gWrzwZM/ANMxJnLb52YbGnjKg/wvZAy36
+         XHlZ1hTPbQMD0JbPhv+wQWkFZMTX4i3cWVEV8XxokUbQEq3B34jlQeuVlwUGlQ5vUsV9
+         TrGA==
+X-Gm-Message-State: APjAAAU7jwZX9ByA7K9yVpor+9Jsaid4c17V9vDgEYJtaS3nXXGx4qvt
+        Y9q0PA6PkFA8+GIFGqMUBMi4A2+xh0A=
+X-Google-Smtp-Source: APXvYqy+61UZz3eVi81de4LKKGy7PvriR8Az4/nlqbO5YAmACxnWuvq/jWI86zBPsjaZNF+KsZQHGA==
+X-Received: by 2002:a7b:c215:: with SMTP id x21mr49378944wmi.38.1563559299814;
+        Fri, 19 Jul 2019 11:01:39 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8? ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
-        by smtp.gmail.com with ESMTPSA id y7sm23970213wmm.19.2019.07.19.11.01.23
+        by smtp.gmail.com with ESMTPSA id l2sm21115094wmj.4.2019.07.19.11.01.39
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Jul 2019 11:01:24 -0700 (PDT)
+        Fri, 19 Jul 2019 11:01:39 -0700 (PDT)
 Subject: Re: [PATCH 0/4] KVM: VMX: Preemptivly optimize VMX instrs
 To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
@@ -43,8 +43,8 @@ Cc:     kvm@vger.kernel.org
 References: <20190719172540.7697-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <dc2e7ed5-bc1c-6392-9e12-ff9284e7a9f4@redhat.com>
-Date:   Fri, 19 Jul 2019 20:01:23 +0200
+Message-ID: <0113d029-11b9-1955-907b-3dbc9ccd0b91@redhat.com>
+Date:   Fri, 19 Jul 2019 20:01:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
@@ -98,7 +98,8 @@ On 19/07/19 19:25, Sean Christopherson wrote:
 >  5 files changed, 102 insertions(+), 43 deletions(-)
 > 
 
-Sean, would you mind basing these on top of Josh's patches, so that
-Peter can add them to his tree?
+Very nice - series
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Paolo
