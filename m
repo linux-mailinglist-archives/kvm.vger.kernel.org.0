@@ -2,145 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE2B46E2E8
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 10:52:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC2166E301
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 10:59:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727376AbfGSIvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 04:51:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43532 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725794AbfGSIvR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 04:51:17 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BEFDB2EED01;
-        Fri, 19 Jul 2019 08:51:16 +0000 (UTC)
-Received: from [10.72.12.179] (ovpn-12-179.pek2.redhat.com [10.72.12.179])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 29D6C5C57A;
-        Fri, 19 Jul 2019 08:51:01 +0000 (UTC)
-Subject: Re: [PATCH v4 4/5] vhost/vsock: split packets to send using multiple
- buffers
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-References: <20190717113030.163499-1-sgarzare@redhat.com>
- <20190717113030.163499-5-sgarzare@redhat.com>
- <20190717105336-mutt-send-email-mst@kernel.org>
- <CAGxU2F45v40qAOHkm1Hk2E69gCS0UwVgS5NS+tDXXuzdF4EixA@mail.gmail.com>
- <20190718041234-mutt-send-email-mst@kernel.org>
- <CAGxU2F6oo7Cou7t9o=gG2=wxHMKX9xYQXNxVtDYeHq5fyEhJWg@mail.gmail.com>
- <20190718072741-mutt-send-email-mst@kernel.org>
- <20190719080832.7hoeus23zjyrx3cc@steredhat>
- <fcd19719-e5a9-adad-1e6c-c84487187088@redhat.com>
- <20190719083920.67qo2umpthz454be@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <53da84b9-184f-1377-0582-ab7cf42ebdb6@redhat.com>
-Date:   Fri, 19 Jul 2019 16:51:00 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726239AbfGSI7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 04:59:38 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:46833 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725794AbfGSI7h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 04:59:37 -0400
+Received: by mail-oi1-f196.google.com with SMTP id 65so23702547oid.13;
+        Fri, 19 Jul 2019 01:59:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gBusBZhQcLKBWDanQAGbHMALYypzWJ4WXbnd8gqcE3w=;
+        b=hzQUCbzumVp7OrDT0mxpxR3wMx4ptyZYpa6YUNaWZPMrRycx8xtDDqJXyYTTAGhRoQ
+         mka1Z7qRSaSNvxu9QSd3RzxuZclNptcC6dYCbJBvRYk6RB/K9v7lKHYZ+dPy2t204zDG
+         8N8aV6KlPlWZoj607hSatkWfw5L2pTyTxUXmFOWPNhqGdLZYpnQpzAwIgvvAzLfrC1JI
+         eqiZxe/3w3ZF+rYttmsr3JQhPutJmcdGhZrWWjFL8aTLYCN+dHTlx5MU4AN4XhQWFlJv
+         snwD0vfxkiSuL+//2Wh85TxuU7E8dkMJIV4+a91zaiLdcz3S6JMMsYJh97qjyx0ciDHJ
+         I21g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gBusBZhQcLKBWDanQAGbHMALYypzWJ4WXbnd8gqcE3w=;
+        b=WfLT+ga7JYV4BIEDmpGdqoHJleYQTKOfnKtHq6g0wQi3yihNb+VEhB9ErP3pxrRutY
+         pablp5GCh9R4rkVPp6vOY3FvsdCqfgVuJSyuINUBMIBziZw8gqjyW4g+rKMTiQ+7iAn3
+         joyDzZv9JxrMnZQqY1fR30IY+/Cjn7FKqEjxmChi9Z0xDEdpq8vNjnoMOkSaILAHtoXj
+         VUx8wl9/N0KuTCgKISTqoxTp+qL+82LN036aoGedR/9jg9Dmyadkhc4gltoeykyf5n8t
+         Zrgl2QnbHrfEExdQL8Gv7/R1kg4XOPUuv8gkFB6to7V63JpnvLSVpo4lcUlLETcQL6Un
+         6Vvg==
+X-Gm-Message-State: APjAAAX+HDauyeBvs62Lmg6r1h0ApkrcBPcRYQAeMmcOUatgh3soxBx6
+        VvVinBMQ2V7lzmwXXFmvk8Q9N9ydchdJv3gMDVgW8bS+ces=
+X-Google-Smtp-Source: APXvYqxkeToemgSjhvUX7UQTyztvFqqM2CAb21z3wyp+gF2R8lPYi/gkwN79NQrxS+EPPCdNYXXQg9mhLqXK9xHzGBw=
+X-Received: by 2002:aca:b9d4:: with SMTP id j203mr25350397oif.5.1563526776730;
+ Fri, 19 Jul 2019 01:59:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190719083920.67qo2umpthz454be@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Fri, 19 Jul 2019 08:51:16 +0000 (UTC)
+References: <217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de>
+In-Reply-To: <217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 19 Jul 2019 16:59:25 +0800
+Message-ID: <CANRm+CxWbkr0=DB7DBdaQOsTTt0XS5vSk_BRL2iFeAAm81H8Bg@mail.gmail.com>
+Subject: Re: [5.2 regression] x86/fpu changes cause crashes in KVM guest
+To:     Thomas Lambertz <mail@thomaslambertz.de>
+Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Rik van Riel <riel@surriel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/7/19 下午4:39, Stefano Garzarella wrote:
-> On Fri, Jul 19, 2019 at 04:21:52PM +0800, Jason Wang wrote:
->> On 2019/7/19 下午4:08, Stefano Garzarella wrote:
->>> On Thu, Jul 18, 2019 at 07:35:46AM -0400, Michael S. Tsirkin wrote:
->>>> On Thu, Jul 18, 2019 at 11:37:30AM +0200, Stefano Garzarella wrote:
->>>>> On Thu, Jul 18, 2019 at 10:13 AM Michael S. Tsirkin<mst@redhat.com>  wrote:
->>>>>> On Thu, Jul 18, 2019 at 09:50:14AM +0200, Stefano Garzarella wrote:
->>>>>>> On Wed, Jul 17, 2019 at 4:55 PM Michael S. Tsirkin<mst@redhat.com>  wrote:
->>>>>>>> On Wed, Jul 17, 2019 at 01:30:29PM +0200, Stefano Garzarella wrote:
->>>>>>>>> If the packets to sent to the guest are bigger than the buffer
->>>>>>>>> available, we can split them, using multiple buffers and fixing
->>>>>>>>> the length in the packet header.
->>>>>>>>> This is safe since virtio-vsock supports only stream sockets.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Stefano Garzarella<sgarzare@redhat.com>
->>>>>>>> So how does it work right now? If an app
->>>>>>>> does sendmsg with a 64K buffer and the other
->>>>>>>> side publishes 4K buffers - does it just stall?
->>>>>>> Before this series, the 64K (or bigger) user messages was split in 4K packets
->>>>>>> (fixed in the code) and queued in an internal list for the TX worker.
->>>>>>>
->>>>>>> After this series, we will queue up to 64K packets and then it will be split in
->>>>>>> the TX worker, depending on the size of the buffers available in the
->>>>>>> vring. (The idea was to allow EWMA or a configuration of the buffers size, but
->>>>>>> for now we postponed it)
->>>>>> Got it. Using workers for xmit is IMHO a bad idea btw.
->>>>>> Why is it done like this?
->>>>> Honestly, I don't know the exact reasons for this design, but I suppose
->>>>> that the idea was to have only one worker that uses the vring, and
->>>>> multiple user threads that enqueue packets in the list.
->>>>> This can simplify the code and we can put the user threads to sleep if
->>>>> we don't have "credit" available (this means that the receiver doesn't
->>>>> have space to receive the packet).
->>>> I think you mean the reverse: even without credits you can copy from
->>>> user and queue up data, then process it without waking up the user
->>>> thread.
->>> I checked the code better, but it doesn't seem to do that.
->>> The .sendmsg callback of af_vsock, check if the transport has space
->>> (virtio-vsock transport returns the credit available). If there is no
->>> space, it put the thread to sleep on the 'sk_sleep(sk)' wait_queue.
->>>
->>> When the transport receives an update of credit available on the other
->>> peer, it calls 'sk->sk_write_space(sk)' that wakes up the thread
->>> sleeping, that will queue the new packet.
->>>
->>> So, in the current implementation, the TX worker doesn't check the
->>> credit available, it only sends the packets.
->>>
->>>> Does it help though? It certainly adds up work outside of
->>>> user thread context which means it's not accounted for
->>>> correctly.
->>> I can try to xmit the packet directly in the user thread context, to see
->>> the improvements.
->>
->> It will then looks more like what virtio-net (and other networking device)
->> did.
-> I'll try ASAP, the changes should not be too complicated... I hope :)
+Cc kvm ml,
+On Thu, 18 Jul 2019 at 08:08, Thomas Lambertz <mail@thomaslambertz.de> wrote:
 >
->>
->>>> Maybe we want more VQs. Would help improve parallelism. The question
->>>> would then become how to map sockets to VQs. With a simple hash
->>>> it's easy to create collisions ...
->>> Yes, more VQs can help but the map question is not simple to answer.
->>> Maybe we can do an hash on the (cid, port) or do some kind of estimation
->>> of queue utilization and try to balance.
->>> Should the mapping be unique?
->>
->> It sounds to me you want some kind of fair queuing? We've already had
->> several qdiscs that do this.
-> Thanks for pointing it out!
+> Since kernel 5.2, I've been experiencing strange issues in my Windows 10
+> QEMU/KVM guest.
+> Via bisection, I have tracked down that the issue lies in the FPU state
+> handling changes.
+> Kernels before 8ff468c29e9a9c3afe9152c10c7b141343270bf3 work great, the
+> ones afterwards are affected.
+> Sometimes the state seems to be restored incorrectly in the guest.
 >
->> So if we use the kernel networking xmit path, all those issues could be
->> addressed.
-> One more point to AF_VSOCK + net-stack, but we have to evaluate possible
-> drawbacks in using the net-stack. (e.g. more latency due to the complexity
-> of the net-stack?)
-
-
-Yes, we need benchmark the performance. But as we've noticed, current 
-vsock implementation is not efficient, and for stream socket, the 
-overhead should be minimal. The most important thing is to avoid 
-reinventing things that has already existed.
-
-Thanks
-
-
+> I have managed to reproduce it relatively cleanly, on a linux guest.
+> (ubuntu-server 18.04, but that should not matter, since it occured on
+> windows aswell)
 >
-> Thanks,
-> Stefano
+> To reproduce the issue, you need prime95 (or mprime), from
+> https://www.mersenne.org/download/ .
+> This is just a stress test for the FPU, which helps reproduce the error
+> much quicker.
+>
+> - Run it in the guest as 'Benchmark Only', and choose the '(2) Small
+> FFTs' torture test. Give it the maximum amount of cores (for me 10).
+> - On the host, run the same test. To keep my pc usable, I limited it to
+> 5 cores. I do this to put some pressure on the system.
+> - repeatedly focus and unfocus the qemu window
+>
+> With this config, errors in the guest usually occur within 30 seconds.
+> Without the refocusing, takes ~5min on average, but the variance of this
+> time is quite large.
+>
+> The error messages are either
+>      "FATAL ERROR: Rounding was ......., expected less than 0.4"
+> or
+>      "FATAL ERROR: Resulting sum was ....., expexted: ......",
+> suggesting that something in the calculation has gone wrong.
+>
+> On the host, no errors are ever observed!
+
+I found it is offended by commit 5f409e20b (x86/fpu: Defer FPU state
+load until return to userspace) and can only be reproduced when
+CONFIG_PREEMPT is enabled. Why restore qemu userspace fpu context to
+hardware before vmentry in the commit?
+https://lkml.org/lkml/2017/11/14/945 Actually I suspect the commit
+f775b13eedee2 (x86,kvm: move qemu/guest FPU switching out to vcpu_run)
+inaccurately save guest fpu state which in xsave area into the qemu
+userspace fpu buffer. However, Rik replied in
+https://lkml.org/lkml/2017/11/14/891, "The scheduler will save the
+guest fpu context when a vCPU thread is preempted, and restore it when
+it is scheduled back in." But I can't find any scheduler codes do
+this. In addition, below codes can fix the mprime error warning.
+(Still not sure it is correct)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 58305cf..18f928e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3306,6 +3306,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+
+     kvm_x86_ops->vcpu_load(vcpu, cpu);
+
++    if (test_thread_flag(TIF_NEED_FPU_LOAD))
++        switch_fpu_return();
++
+     /* Apply any externally detected TSC adjustments (due to suspend) */
+     if (unlikely(vcpu->arch.tsc_offset_adjustment)) {
+         adjust_tsc_offset_host(vcpu, vcpu->arch.tsc_offset_adjustment);
+@@ -7990,10 +7993,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+     trace_kvm_entry(vcpu->vcpu_id);
+     guest_enter_irqoff();
+
+-    fpregs_assert_state_consistent();
+-    if (test_thread_flag(TIF_NEED_FPU_LOAD))
+-        switch_fpu_return();
+-
+     if (unlikely(vcpu->arch.switch_db_regs)) {
+         set_debugreg(0, 7);
+         set_debugreg(vcpu->arch.eff_db[0], 0);
