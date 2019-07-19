@@ -2,114 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5FF76EC27
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 23:40:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E13296EC2B
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2019 23:41:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388354AbfGSVjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Jul 2019 17:39:55 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36534 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727528AbfGSVjz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Jul 2019 17:39:55 -0400
-Received: by mail-wm1-f66.google.com with SMTP id g67so26127378wme.1;
-        Fri, 19 Jul 2019 14:39:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=dJZwB/Clkci6ZFRbtdSU37FYwxEFZIATbsU+Tyu15yU=;
-        b=J5/uLkUQiySkxXmK4m2T0AjaKrFTGYUOyNeGEK/FehRSVzgscPlWhQi3qkQ1LU7R1H
-         t/fN2q9m/LRjIgu59k+dJllD0xfhaHaoHFBXemQbpAfD6UphBhYJeJ03Uv8+E7ckRFc4
-         YPCJGeORBPmXuqlD2Ir10H8NA/XeZTzr3uKGVO2nGUSUAs3LfeK9aU8qZH5fkZu6Oqd3
-         LBk0KI38nPeuqE6fM/aASkK8CDDk0ze/P/OjZmPt4nIvoyt+YmyBnaFTuoWC+PCMMMM3
-         Lur/5TnAZCngt3K7UlBO5OQZEakO+WOpSopYTjpRGZgAZGFQVRDbLCGCJSAwIQjGmi7z
-         MOiA==
+        id S1730811AbfGSVlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Jul 2019 17:41:24 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50950 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728391AbfGSVlY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Jul 2019 17:41:24 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v15so30037395wml.0
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2019 14:41:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=dJZwB/Clkci6ZFRbtdSU37FYwxEFZIATbsU+Tyu15yU=;
-        b=i91lo4GOHzSZl7lsAyfsuZ1dbJJXj1o++1IoC3JkgV7RPCAkrjm/WSmzypiMudS/u8
-         i7xKxRGf9kzFZU/ht5q+/GfOnCV/ExVv0NRCREqLbxY1hJ3MUEZSSBZY6PXw2rAnTBvm
-         8gYfTKqeio/MuN0ZFgo4eDokXwDQRblIv5yDx36P/CtO8y/N4RSbt14k7/Amk36vweH4
-         nCRdDgiE5dqeMBW4956K0nB6t7uI6z6d8Wyod59MMTSKOt+sd7vH0GgNt4fAK8n236Jl
-         K3ULj6niZBK3dxWLhxhwuM0bwd36mRXF1kxCIHlxY0oM3otbolBSLOpuas/ZqTBedFHc
-         IEYw==
-X-Gm-Message-State: APjAAAWaXHqbM32MrbFQ5tPOeHSKox29AnH8m4QKic2V/HYnGm5GfbPS
-        t6dKa3VZeznlXYF2HsC8aXNuvBoQ9aA=
-X-Google-Smtp-Source: APXvYqy22DLKRAzSsbKsRzshsG+BNywMNiZsLK/xOpZhQVmuyq2WCMJhopvjLFhb8SHCCAhir6F9eA==
-X-Received: by 2002:a05:600c:da:: with SMTP id u26mr48223115wmm.108.1563572392538;
-        Fri, 19 Jul 2019 14:39:52 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id i18sm39303874wrp.91.2019.07.19.14.39.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Jul 2019 14:39:51 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JPnD2on9MPes546wI5hB8iJA16OLHGs/RSJMTP+xE/g=;
+        b=QuiW6Iaq2CkFORbhqt9xeDkzIeLW3XlDFmUb/rlotRxd3nsovfnXs1UMzYzjyx4uTD
+         RDAVNqfXmOd6/VkqlLW1h/xk7ZQ5zHGoVOj3qdcDPQhtpRI7yqqY/21g9jpoftkrL/kL
+         Nw9WOUXRJeHzOJIj5Ncf1Wh0Jk6maANi1XEkYLiH9mBKQP1mq3KoeONsRuQBqI16MKc8
+         1rf20MUDTRPn1s40bVYr5xMj4lON8/6EFXBWxefwkf30BTFPaMn3uADhcIqEvvFYfuIX
+         4pA/5FMdd7XUx51e7OhY4R1bN5ZG7iYsn0SsZOyqpFTX3PyFyMRIqJCYA+bHbOLwxjzk
+         66EQ==
+X-Gm-Message-State: APjAAAU2fM/Y0UCP1uYFttweNsx8AA/xMTJgReubmC2RWKU4VodY2ZWu
+        VcDiGrkM9ytSTeL7had0jqh2vLBssx8=
+X-Google-Smtp-Source: APXvYqzWFOG1apvfJTpaD1HUhIGFOxEDFz5ZgU6gLi4SlZV7MzTBwfbH9+P+iHt7d6Pk/Val0bHt2g==
+X-Received: by 2002:a7b:c251:: with SMTP id b17mr51176977wmj.143.1563572481866;
+        Fri, 19 Jul 2019 14:41:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8501:6b03:f18c:74f8? ([2001:b07:6468:f312:8501:6b03:f18c:74f8])
+        by smtp.gmail.com with ESMTPSA id j10sm50967571wrd.26.2019.07.19.14.41.20
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 19 Jul 2019 14:41:21 -0700 (PDT)
+Subject: Re: [PATCH v2 5/5] KVM: x86: Don't check kvm_rebooting in
+ __kvm_handle_fault_on_reboot()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190719204110.18306-1-sean.j.christopherson@intel.com>
+ <20190719204110.18306-6-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Liran Alon <liran.alon@oracle.com>, stable@vger.kernel.org
-Subject: [PATCH v2] KVM: nVMX: do not use dangling shadow VMCS after guest reset
-Date:   Fri, 19 Jul 2019 23:39:50 +0200
-Message-Id: <1563572390-28823-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Openpgp: preference=signencrypt
+Message-ID: <2fe374ae-9611-1f29-32f0-e8fce126cd41@redhat.com>
+Date:   Fri, 19 Jul 2019 23:41:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190719204110.18306-6-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If a KVM guest is reset while running a nested guest, free_nested will
-disable the shadow VMCS execution control in the vmcs01.  However,
-on the next KVM_RUN vmx_vcpu_run would nevertheless try to sync
-the VMCS12 to the shadow VMCS which has since been freed.
+On 19/07/19 22:41, Sean Christopherson wrote:
+> Remove the kvm_rebooting check from VMX/SVM instruction exception fixup
+> now that kvm_spurious_fault() conditions its BUG() on !kvm_rebooting.
+> Because the 'cleanup_insn' functionally is also gone, deferring to
+> kvm_spurious_fault() means __kvm_handle_fault_on_reboot() can eliminate
+> its .fixup code entirely and have its exception table entry branch
+> directly to the call to kvm_spurious_fault().
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 92c59cd923b6..a5ae5562ce0a 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1511,13 +1511,7 @@ asmlinkage void kvm_spurious_fault(void);
+>  	"667: \n\t"							\
+>  	"call	kvm_spurious_fault \n\t"				\
+>  	"668: \n\t"							\
+> -	".pushsection .fixup, \"ax\" \n\t"				\
+> -	"700: \n\t"							\
+> -	"cmpb	$0, kvm_rebooting\n\t"					\
+> -	"je	667b \n\t"						\
+> -	"jmp	668b \n\t"						\
+> -	".popsection \n\t"						\
+> -	_ASM_EXTABLE(666b, 700b)
+> +	_ASM_EXTABLE(666b, 667b)
+>  
+>  #define KVM_ARCH_WANT_MMU_NOTIFIER
+>  int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
+> 
 
-This causes a vmptrld of a NULL pointer on my machime, but Jan reports
-the host to hang altogether.  Let's see how much this trivial patch fixes.
-
-Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/nested.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4f23e34f628b..0f1378789bd0 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -194,6 +194,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
- {
- 	secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
- 	vmcs_write64(VMCS_LINK_POINTER, -1ull);
-+	vmx->nested.need_vmcs12_to_shadow_sync = false;
- }
- 
- static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
-@@ -1341,6 +1342,9 @@ static void copy_shadow_to_vmcs12(struct vcpu_vmx *vmx)
- 	unsigned long val;
- 	int i;
- 
-+	if (WARN_ON(!shadow_vmcs))
-+		return;
-+
- 	preempt_disable();
- 
- 	vmcs_load(shadow_vmcs);
-@@ -1373,6 +1377,9 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
- 	unsigned long val;
- 	int i, q;
- 
-+	if (WARN_ON(!shadow_vmcs))
-+		return;
-+
- 	vmcs_load(shadow_vmcs);
- 
- 	for (q = 0; q < ARRAY_SIZE(fields); q++) {
-@@ -4436,7 +4443,6 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
- 		/* copy to memory all shadowed fields in case
- 		   they were modified */
- 		copy_shadow_to_vmcs12(vmx);
--		vmx->nested.need_vmcs12_to_shadow_sync = false;
- 		vmx_disable_shadow_vmcs(vmx);
- 	}
- 	vmx->nested.posted_intr_nv = -1;
--- 
-1.8.3.1
-
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
