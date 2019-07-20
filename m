@@ -2,123 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5843D6EE20
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2019 09:14:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B1176EF3E
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2019 13:43:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726584AbfGTHOZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 20 Jul 2019 03:14:25 -0400
-Received: from mga17.intel.com ([192.55.52.151]:63545 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726572AbfGTHOZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 20 Jul 2019 03:14:25 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Jul 2019 00:14:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,285,1559545200"; 
-   d="scan'208";a="162626522"
-Received: from jiahaofa-mobl2.ccr.corp.intel.com (HELO [10.255.30.12]) ([10.255.30.12])
-  by orsmga008.jf.intel.com with ESMTP; 20 Jul 2019 00:14:21 -0700
-Subject: Re: [PATCH v8 0/3] KVM: x86: Enable user wait instructions
-To:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
-        jingqi.liu@intel.com
-References: <20190716065551.27264-1-tao3.xu@intel.com>
- <d01e6b8b-279c-84da-1f08-7b01baf9fdbf@intel.com>
- <ad687740-1525-f9c2-b441-63613b7dd93e@redhat.com>
-From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <cabca5db-6c50-42f2-e689-3e2906a88294@intel.com>
-Date:   Sat, 20 Jul 2019 15:14:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <ad687740-1525-f9c2-b441-63613b7dd93e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1728119AbfGTLnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 20 Jul 2019 07:43:12 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:33063 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728112AbfGTLnM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 20 Jul 2019 07:43:12 -0400
+Received: by mail-wm1-f67.google.com with SMTP id h19so25416213wme.0;
+        Sat, 20 Jul 2019 04:43:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=XVV4X3alYKb2X9EHysocks5DqDmw0SO8ilOGMts74Zs=;
+        b=p6qIF2FadZEen8ai9zu0WoxyCLHFZns+nZEp2lOxyPSdiZeqJ4cKxjBmTxo8kDGosR
+         O7x1uz30V3uq6rD0jxM+5Hm4zH7EM6b/q+y403zN/MPF1p4ZlQYYMhujEM3JhIpzlm+v
+         s6WJgHQ4kYI2WlXj75GxeztmrxXN+MNdfPkM7KKLqXjpw9aRRuF8otWim3lKIZSqHA7/
+         Dm6YxEpM1PdH9KsKn/hENmVVcMdWRrsFiXYoH0tUjMI5LAw2iDtZOGLKsAFC+MInGlzJ
+         TiIKJP5TrBg5HO0EevRdH06KFL0/LKRrHoVjmzeXdxrnvXoQtJSUKEUzzcCWaMDitD3U
+         CEDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=XVV4X3alYKb2X9EHysocks5DqDmw0SO8ilOGMts74Zs=;
+        b=XAajDLz5GLIagAxgY5P75pPX8ASPKUkdUGV77v6k4v2GGzXcbiJjeuOVrVDVQhFlR/
+         CWpPNRNUUwTRRlDdaQvFoVqYOTLmKifm7/rwbgD39TpKzzCsuwnzV2qIs7cXYfjRanyK
+         EP8gwMaIFD37ial0wszexLYudjP7cqoEBVRmFBn8qHa5w5EspnvGGPM4c/8hE024Qk6Y
+         jNFbtTeVWYDiF4s7atDhCTZfHqcXtVP2BJXpTFaIVSb6aiLzP0CyMqSgiKOiuxwiZZ/S
+         YodOCA4E6pp4vJED/Ckj7yKzKXvCNkwMQsv2cPaa8H01Tk6H7u0UJl58KYf3Y7lXbK3i
+         blLw==
+X-Gm-Message-State: APjAAAVsMV9vAVkrksUkVCgW3yeVE2D8HIzSdKNXH+fvaw38MnRDqvtK
+        vYvdhzbijYqrsrY69UPNFUg=
+X-Google-Smtp-Source: APXvYqzf+D9LIBSrZ42KLnpdqpg4UEiyKywNBWDsLb80+0DyG+rBop/8hhfpEiBaqxJttudl0lM70w==
+X-Received: by 2002:a1c:ca14:: with SMTP id a20mr11986794wmg.71.1563622989872;
+        Sat, 20 Jul 2019 04:43:09 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id g12sm44682270wrv.9.2019.07.20.04.43.08
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 20 Jul 2019 04:43:09 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for 5.3 merge window
+Date:   Sat, 20 Jul 2019 13:43:07 +0200
+Message-Id: <1563622987-4738-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/20/2019 1:18 AM, Paolo Bonzini wrote:
-> On 19/07/19 08:31, Tao Xu wrote:
->> Ping for comments :)
-> 
-> Hi, I'll look at it for 5.4, right after the merge window.
-> 
-> Paolo
-> 
-Thank you Paolo!
+Linus,
 
->> On 7/16/2019 2:55 PM, Tao Xu wrote:
->>> UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
->>>
->>> UMONITOR arms address monitoring hardware using an address. A store
->>> to an address within the specified address range triggers the
->>> monitoring hardware to wake up the processor waiting in umwait.
->>>
->>> UMWAIT instructs the processor to enter an implementation-dependent
->>> optimized state while monitoring a range of addresses. The optimized
->>> state may be either a light-weight power/performance optimized state
->>> (c0.1 state) or an improved power/performance optimized state
->>> (c0.2 state).
->>>
->>> TPAUSE instructs the processor to enter an implementation-dependent
->>> optimized state c0.1 or c0.2 state and wake up when time-stamp counter
->>> reaches specified timeout.
->>>
->>> Availability of the user wait instructions is indicated by the presence
->>> of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
->>>
->>> The patches enable the umonitor, umwait and tpause features in KVM.
->>> Because umwait and tpause can put a (psysical) CPU into a power saving
->>> state, by default we dont't expose it to kvm and enable it only when
->>> guest CPUID has it. If the instruction causes a delay, the amount
->>> of time delayed is called here the physical delay. The physical delay is
->>> first computed by determining the virtual delay (the time to delay
->>> relative to the VM’s timestamp counter).
->>>
->>> The release document ref below link:
->>> Intel 64 and IA-32 Architectures Software Developer's Manual,
->>> https://software.intel.com/sites/default/files/\
->>> managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
->>>
->>> Changelog:
->>> v8:
->>>      Add vmx_waitpkg_supported() helper (Sean)
->>>      Add an accessor to expose umwait_control_cached (Sean)
->>>      Set msr_ia32_umwait_control in vcpu_vmx u32 and raise #GP when
->>>      [63:32] is set when rdmsr. (Sean)
->>>      Introduce a common exit helper handle_unexpected_vmexit (Sean)
->>> v7:
->>>      Add nested support for user wait instructions (Paolo)
->>>      Use the test on vmx->secondary_exec_control to replace
->>>      guest_cpuid_has (Paolo)
->>> v6:
->>>      add check msr_info->host_initiated in get/set msr(Xiaoyao)
->>>      restore the atomic_switch_umwait_control_msr()(Xiaoyao)
->>>
->>> Tao Xu (3):
->>>     KVM: x86: Add support for user wait instructions
->>>     KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
->>>     KVM: vmx: Introduce handle_unexpected_vmexit and handle WAITPKG vmexit
->>>
->>>    arch/x86/include/asm/vmx.h      |  1 +
->>>    arch/x86/include/uapi/asm/vmx.h |  6 ++-
->>>    arch/x86/kernel/cpu/umwait.c    |  6 +++
->>>    arch/x86/kvm/cpuid.c            |  2 +-
->>>    arch/x86/kvm/vmx/capabilities.h |  6 +++
->>>    arch/x86/kvm/vmx/nested.c       |  5 ++
->>>    arch/x86/kvm/vmx/vmx.c          | 83 ++++++++++++++++++++++++++-------
->>>    arch/x86/kvm/vmx/vmx.h          |  9 ++++
->>>    arch/x86/kvm/x86.c              |  1 +
->>>    9 files changed, 101 insertions(+), 18 deletions(-)
->>>
->>
-> 
+The following changes since commit 964a4eacef67503a1154f7e0a75f52fbdce52022:
 
+  Merge tag 'dlm-5.3' of git://git.kernel.org/pub/scm/linux/kernel/git/teigland/linux-dlm (2019-07-12 17:37:53 -0700)
+
+are available in the git repository at:
+
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 30cd8604323dbaf20a80e797fe7057f5b02e394d:
+
+  KVM: x86: Add fixed counters to PMU filter (2019-07-20 09:00:48 +0200)
+
+----------------------------------------------------------------
+Mostly bugfixes, but also:
+- s390 support for KVM selftests
+- LAPIC timer offloading to housekeeping CPUs
+- Extend an s390 optimization for overcommitted hosts to all architectures
+- Debugging cleanups and improvements
+
+----------------------------------------------------------------
+Arnd Bergmann (2):
+      x86: kvm: avoid -Wsometimes-uninitized warning
+      x86: kvm: avoid constant-conversion warning
+
+Christian Borntraeger (1):
+      KVM: selftests: enable pgste option for the linker on s390
+
+Eric Hankland (1):
+      KVM: x86: Add fixed counters to PMU filter
+
+Jing Liu (1):
+      KVM: x86: expose AVX512_BF16 feature to guest
+
+Like Xu (2):
+      KVM: x86/vPMU: reset pmc->counter to 0 for pmu fixed_counters
+      KVM: x86/vPMU: refine kvm_pmu err msg when event creation failed
+
+Liran Alon (2):
+      KVM: nVMX: Ignore segment base for VMX memory operand when segment not FS or GS
+      KVM: SVM: Fix detection of AMD Errata 1096
+
+Paolo Bonzini (3):
+      Merge tag 'kvm-s390-next-5.3-1' of git://git.kernel.org/.../kvms390/linux into HEAD
+      KVM: VMX: dump VMCS on failed entry
+      KVM: nVMX: do not use dangling shadow VMCS after guest reset
+
+Thomas Huth (7):
+      KVM: selftests: Guard struct kvm_vcpu_events with __KVM_HAVE_VCPU_EVENTS
+      KVM: selftests: Introduce a VM_MODE_DEFAULT macro for the default bits
+      KVM: selftests: Align memory region addresses to 1M on s390x
+      KVM: selftests: Add processor code for s390x
+      KVM: selftests: Add the sync_regs test for s390x
+      KVM: selftests: Move kvm_create_max_vcpus test to generic code
+      KVM: selftests: Remove superfluous define from vmx.c
+
+Wanpeng Li (4):
+      KVM: LAPIC: Make lapic timer unpinned
+      KVM: LAPIC: Inject timer interrupt via posted interrupt
+      KVM: Boost vCPUs that are delivering interrupts
+      KVM: s390: Use kvm_vcpu_wake_up in kvm_s390_vcpu_wakeup
+
+Yi Wang (3):
+      kvm: vmx: fix coccinelle warnings
+      kvm: x86: some tsc debug cleanup
+      kvm: x86: ioapic and apic debug macros cleanup
+
+ Documentation/virtual/kvm/api.txt                  |  15 +-
+ MAINTAINERS                                        |   2 +
+ arch/s390/kvm/interrupt.c                          |  23 +-
+ arch/x86/include/uapi/asm/kvm.h                    |   9 +-
+ arch/x86/kvm/cpuid.c                               |  12 +-
+ arch/x86/kvm/hyperv.c                              |  20 +-
+ arch/x86/kvm/ioapic.c                              |  15 --
+ arch/x86/kvm/lapic.c                               | 202 ++++++---------
+ arch/x86/kvm/lapic.h                               |   1 +
+ arch/x86/kvm/mmu.c                                 |   6 +-
+ arch/x86/kvm/pmu.c                                 |  27 +-
+ arch/x86/kvm/svm.c                                 |  42 +++-
+ arch/x86/kvm/vmx/nested.c                          |  13 +-
+ arch/x86/kvm/vmx/pmu_intel.c                       |  11 +-
+ arch/x86/kvm/vmx/vmx.c                             |   6 +-
+ arch/x86/kvm/x86.c                                 |  20 +-
+ arch/x86/kvm/x86.h                                 |   2 +
+ include/linux/kvm_host.h                           |   1 +
+ include/linux/sched/isolation.h                    |   6 +
+ kernel/sched/isolation.c                           |   6 +
+ tools/testing/selftests/kvm/Makefile               |  14 +-
+ tools/testing/selftests/kvm/include/kvm_util.h     |   8 +
+ .../selftests/kvm/include/s390x/processor.h        |  22 ++
+ .../kvm/{x86_64 => }/kvm_create_max_vcpus.c        |   2 +-
+ .../testing/selftests/kvm/lib/aarch64/processor.c  |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c         |  23 +-
+ tools/testing/selftests/kvm/lib/s390x/processor.c  | 278 +++++++++++++++++++++
+ tools/testing/selftests/kvm/lib/x86_64/processor.c |   2 +-
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c       |   2 -
+ tools/testing/selftests/kvm/s390x/sync_regs_test.c | 151 +++++++++++
+ virt/kvm/kvm_main.c                                |  12 +-
+ 31 files changed, 723 insertions(+), 232 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/processor.h
+ rename tools/testing/selftests/kvm/{x86_64 => }/kvm_create_max_vcpus.c (95%)
+ create mode 100644 tools/testing/selftests/kvm/lib/s390x/processor.c
+ create mode 100644 tools/testing/selftests/kvm/s390x/sync_regs_test.c
