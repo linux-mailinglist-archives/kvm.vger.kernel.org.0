@@ -2,103 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C0B26F433
-	for <lists+kvm@lfdr.de>; Sun, 21 Jul 2019 18:51:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67D4B6F469
+	for <lists+kvm@lfdr.de>; Sun, 21 Jul 2019 19:41:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726190AbfGUQvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Jul 2019 12:51:12 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51149 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725847AbfGUQvM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Jul 2019 12:51:12 -0400
-Received: by mail-wm1-f66.google.com with SMTP id v15so32946606wml.0
-        for <kvm@vger.kernel.org>; Sun, 21 Jul 2019 09:51:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/qhfeHSiMexw5eQJpU5Wbr90RfewcH7B3yhTNyxrERI=;
-        b=JoPVvvFQ16ElJV5j+PVhZjI6VkTqoXstzyqxbH7bIf+mQbri0FKm991J4sB3an5g+S
-         O0mPuJWgpHA0XKy4HUkHNTcX3bFp9k1XaDRJ4BtUkhlauXI4Wx6GWFZoh9Edu8g7M5Zc
-         0kCw98AGCL8DFTzj2w+idm6+Qc1fEkz3VS3BUhmdKeaAgTxPf1V0QPCpSyz8kambumWt
-         zdcPQUPDSVr1h12OChqeBPllDkWIQyQl3PAjohriGypiTlZHasjYeUkKvYVyThc60Uvm
-         mVI97t6/taseVzNOkCzheG4Vc5EJSRMsPB2ucHXl5kFs7sNlyK+gHcilbCisHr05q9uD
-         eI3A==
-X-Gm-Message-State: APjAAAU123NDlEz+WOleS6ygT+PBP89DjPniozBe7m2vITO1PUjMUUmR
-        D1JrGAcFpv72TNsCIF1qS7CtG7ufe08=
-X-Google-Smtp-Source: APXvYqw45mGPmjr0VC0bZVlqCMJtuic0OzY7ShhsPKKAAx7qxIMC7isImmwG7xUe+jEB0AfwUt9gcQ==
-X-Received: by 2002:a1c:2e09:: with SMTP id u9mr59966911wmu.137.1563727870194;
-        Sun, 21 Jul 2019 09:51:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:59c3:355d:cfd:35b0? ([2001:b07:6468:f312:59c3:355d:cfd:35b0])
-        by smtp.gmail.com with ESMTPSA id y16sm75440249wrg.85.2019.07.21.09.51.09
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Sun, 21 Jul 2019 09:51:09 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Support environments without
- test-devices
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Andrew Jones <drjones@redhat.com>, kvm list <kvm@vger.kernel.org>
-References: <20190628203019.3220-1-nadav.amit@gmail.com>
- <20190628203019.3220-4-nadav.amit@gmail.com>
- <20190715154812.mlw4toyzkpwsfrfm@kamzik.brq.redhat.com>
- <FFD1C3FC-C442-4953-AFA6-0FFADDEA8351@gmail.com>
- <ab5e8e73-5214-e455-950d-e837979bb536@redhat.com>
- <9A78B004-E8B8-427A-B522-C0847CBEFDD3@gmail.com>
- <91f59a9e-f225-b225-079b-f4ef32724163@redhat.com>
- <08914961-07E1-4B78-AC80-1755F0B98BCE@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8a54afaf-09a8-9423-3514-65e38cd14272@redhat.com>
-Date:   Sun, 21 Jul 2019 18:51:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726462AbfGURlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Jul 2019 13:41:14 -0400
+Received: from mout.web.de ([212.227.15.3]:38279 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725828AbfGURlN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 Jul 2019 13:41:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1563730857;
+        bh=w9GNqAKd76XzfPzQug3XxCRQvdkACTEm125ytZ6Jm6A=;
+        h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
+        b=U7hBUTnRjVBw5nDVrP5xu2rEHgVBVtMwAj1Z/ob06RjDaQlLcErLq4Qdpc1UwxjnC
+         3gyQMp10s+MpU3y4rpFyW08TATYQCVzZcUu44R2O/HRw+0M1xu0aNrbpBjXDiQ6x2Q
+         KXk38/TgHd8+Uj96h4o/8eG1tdeyqAbIRoBQMwww=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0Lx7OL-1iVFQX3bhJ-016fWE; Sun, 21
+ Jul 2019 19:40:56 +0200
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>, kvm <kvm@vger.kernel.org>
+Cc:     Jim Mattson <jmattson@google.com>,
+        KarimAllah Ahmed <karahmed@amazon.de>
+From:   Jan Kiszka <jan.kiszka@web.de>
+Subject: nvmx: get/set_nested_state ignores VM_EXIT_INSTRUCTION_LEN
+Message-ID: <3299adf3-3979-7718-702f-bab2d9324c69@web.de>
+Date:   Sun, 21 Jul 2019 19:40:55 +0200
+User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
+ Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
 MIME-Version: 1.0
-In-Reply-To: <08914961-07E1-4B78-AC80-1755F0B98BCE@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:XU/at5aPEU0NgG7iurmztEYin2k/uQJtcrrumnWwAP4QDKheW33
+ nW16vM1JTjwXpPoSlRcIyxmNQZgX+XNGMh96MyK4XA792Qh+1wzJwSO/denUIFpeJC0ygGh
+ 9UWdmO3Nhx/tqwypU/Dv15MSF5u/t9Ls4kovyG4s59odcxxTTeBswos1OPuYno7QxRrsznB
+ d1CDKOmoGVVye+o3WjC5w==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NEn6FZAXtoc=:ySMSdxe/wBHb7Vwwfcs2N9
+ r6BNwnu5t9/p81c3YVnH/6qE/Bx44nrjbpQgCa1XgfXROem8KiaqiD8iX6DUhtOVsvj7GtKYC
+ v/gE5kHZ9+aY0bCi8xTlyqwF2u9dbWSC0PPXCb8stiTwkPju5IZKkt3uxfZcUxOprzY6i/0bA
+ 8HmQtxnnsOe9AFF+gQvzvDap3LGKu+ebMGIn3ZuneypesVSG/jwyF7ip2c+rZOKzBmtQ9R8Fj
+ wyQDBX94cTmMAojeRNhnTv3O+aZHJxiscaoxnEerv+/Q3+0sP3+fG6E8OZcYWlNYecsUGmFb4
+ flMJF3K4JbR0FGboE8oKah2mnEUiEBlnITS8aT98vVHSRw37bDzL5b/dDdIuHpOmglkazHPHW
+ dInaiKwbFaKY0Lnxcybvl88zoWUjksSBicKZof5wn3joLbrwloFe/ZP3EBaTHKitQAf7mm5dB
+ 9H8g56z3rOU8D0jfMwaXCLSQnsgSxFP9VIWLKvnV5DRBevvd1g4RLOQ+42PMH0x0KA78C1GJA
+ 58oz1VkBFp2otjJE3irR6kDLrXssp7grfL9Ed6MAC+9qgO9/S8snLkCLnsDfDYB8oZnktNfi1
+ j0hEJqt4gzj8wNcOxVc9dTQaw78bsEFmjrK7FsTTZt1Xrmcr1LfVG+CyM6KvUx6X+hVfqMoxR
+ xCfGu8WIOv22XxXptyhsk2eyt2PH5usNz8d+A8AFc/xdvF6zi1sz1d35l68NeAN5ptA/0UL3l
+ 99yoSWLov8hgFPd3am7VQ7NddJ9ShUy5gcNwlaorQ4mFYdin1xirltca+niOc5ve/Qyqy4QGz
+ 0UH2pg1fhBk00K2eNoO1o08iPPg0uRSH+8lj7UsTQmBpLVMhSUOC625nmXFd1pKBAGpqN+2oa
+ y5ZmSGh2y1+/aOVPg2bFqk3K09PZ3ssnj64UlYerxignMzMwvPB3+7BuKYBNfZu4m4x229Nxy
+ lwqeHNmuj9hchUUSVz2W8TzJxZCWdPU6Yu18088+Sw/TZM3sotlY5Ljxk9ndB4Xk4F/VXwiuC
+ sV7nm3gpZWmj5AoCXa/GEiVW4357Ih6rFDO4Xg0x0U1BLIhiOIBkfWWEhQN+NU72g6iEL5Xkn
+ d/61ZHGCLXu8swzSDDCGEDmUs+jx5brI1fl
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/19 18:40, Nadav Amit wrote:
->> On Jul 15, 2019, at 11:54 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 15/07/19 20:43, Nadav Amit wrote:
->>>> On Jul 15, 2019, at 11:26 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> On 15/07/19 20:08, Nadav Amit wrote:
->>>>>> This works because setup_multiboot() looks for an initrd, and then,
->>>>>> if present, it gets interpreted as a list of environment variables
->>>>>> which become the unit tests **envp.
->>>>>
->>>>> Looks like a nice solution, but Paolo preferred to see if this information
->>>>> can be extracted from e810 and ACPI MADT. Paolo?
->>>>
->>>> It was mostly a matter of requiring adjustments in the tests.  Andrew's
->>>> solution would be fine!
->>>
->>> Ok, but I must be missing something, because the changes I proposed before
->>> did not require any changes to the tests either (when they are run on top
->>> of KVM).
->>
->> You're right, I was confused.  There were changes to a couple tests but
->> they are not related to fw_cfg.  I only disliked having to repeat the
->> same information (as opposed to just the initrd path) in all the
->> entries.  Memory map and MADT would be my preferred choice, but as a
->> stopgap Andrew's idea is okay.
->>
->> Paolo
->>
->>> Andrew’s solution would just make it easier to set “fixed” boot-loader
->>> entries, although they would still need a different root and
->>> boot-relative-path on different machines.
-> 
-> Paolo, can you please push all (or at my) queued patches?
-> 
-> I prefer to work on the latest code (including my patches that were queued),
-> and anyhow kvm-unit-tests repository is broken right now and does not build.
+Hi all,
 
-Oops, sorry.  I pushed now
+made some progress understanding why vmport from L2 breaks since QEMU gets/sets
+the nested state around it: We do not preserve VM_EXIT_INSTRUCTION_LEN, and that
+breaks skip_emulated_instruction when completing the PIO access on next run. The
+field is suddenly 0, and so we loop infinitely over the IO instruction. Unless
+some other magic prevents migration while an IO instruction is in flight, vmport
+may not be the only victim here.
 
-Paolo
+Now the question is how to preserve that information: Can we restore the value
+into vmcs02 on set_nested_state, despite this field being read-only? Or do we
+need to cache its content and use that instead in skip_emulated_instruction?
+
+Looking at this pattern, I wonder if there is more. What other fields are used
+across PIO or MMIO when the handling is done by userland?
+
+Jan
