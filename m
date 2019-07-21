@@ -2,95 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 62B0D6F4A1
-	for <lists+kvm@lfdr.de>; Sun, 21 Jul 2019 20:26:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E8486F4EC
+	for <lists+kvm@lfdr.de>; Sun, 21 Jul 2019 21:14:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727296AbfGUS01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Jul 2019 14:26:27 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36422 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726830AbfGUS00 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Jul 2019 14:26:26 -0400
-Received: by mail-pf1-f195.google.com with SMTP id r7so16254700pfl.3
-        for <kvm@vger.kernel.org>; Sun, 21 Jul 2019 11:26:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=PHDIIvGX8533QpOCTfiRKfsRytK8ntOLSE4rPnK0DcE=;
-        b=gTnUIHabBFHS9xrqgPlxB9AhrNMSrqldXIMyFiC0HOxe+VtKN99aVPaCrZ0g098tkg
-         CItVA3Gb9sq3PMrIV836EkQ0Z/Qj474xD2mljxobhWonSA4n9GR3gTIDrkdiAjJKFOcP
-         DELqFbFhaYByE6k/TbnTyxzsm0EPca0D5sVCj8tolHcOAPQ4rFvdROstHG3dGMgkpgXS
-         B07b8kMhZ9TtN+gm1CGSnpdowu0/IJdd3beZ8/OpZXONjs8bIyn38l5iHUx9hhYwaL28
-         LZVEhDpTtaHAMDb+pZLopPhCx6W9IB+dIb03eJxJnkmIQP01hNFpUr587/OPHd9BtMMi
-         ye6g==
+        id S1727160AbfGUTOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Jul 2019 15:14:15 -0400
+Received: from mail-wr1-f51.google.com ([209.85.221.51]:33666 "EHLO
+        mail-wr1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726946AbfGUTOP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 Jul 2019 15:14:15 -0400
+Received: by mail-wr1-f51.google.com with SMTP id n9so37190740wru.0
+        for <kvm@vger.kernel.org>; Sun, 21 Jul 2019 12:14:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=PHDIIvGX8533QpOCTfiRKfsRytK8ntOLSE4rPnK0DcE=;
-        b=sLO3KuetJu8LSK9qWvxH2wycx6Vo+MQv2m+s/rRogXNG5nsjfmTujjiocKE7SHmGLn
-         tDvbyxyxOYB0+1YEebS9XAhufGTSVX+14fomh6coHMIlh3jaxlJMMis9H4zLUQsZu0qL
-         a5tVjqCrjX1Xf810VByh/jAlvCsau/EpATufYycAKXwSv8zRmZvR2ZyA4O/EZBmqEblc
-         OO0RCDmpPcsgVFgbj1QDZFNephrRqc5Cif7fTNiYywU/A+Dfrjzqv/cMbUB7lMioVLUW
-         FzJrNFx0+IBD4eA8A+5lwCD4H/a8CdjxvU9QAGaEqW0CIs/I6rPCrsnQOdO1fXdzebzb
-         iCjQ==
-X-Gm-Message-State: APjAAAXsHhsyWT2l3H6AsNXgkZ8gI6WSM8VdzAr+etb61ShEjPbGxLa2
-        I86dt1qClrME+TNOyZ40KEo=
-X-Google-Smtp-Source: APXvYqyRu7VzzQXPKyYd0VylkwVtJelcAOkBsW0sMnuvmttJ2raM2pesVKxIV317LJMcAUlglIki+g==
-X-Received: by 2002:a17:90a:2ec1:: with SMTP id h1mr72786268pjs.101.1563733585981;
-        Sun, 21 Jul 2019 11:26:25 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id v13sm45227252pfe.105.2019.07.21.11.26.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 21 Jul 2019 11:26:25 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 2/2 v2]kvm-unit-test: nVMX: Test Host Segment Registers
- and Descriptor Tables on vmentry of nested guests
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20190703235437.13429-3-krish.sadhukhan@oracle.com>
-Date:   Sun, 21 Jul 2019 11:26:24 -0700
-Cc:     kvm list <kvm@vger.kernel.org>,
-        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <826A8AB0-D0A3-4C77-96C9-9C6670CF6C9C@gmail.com>
-References: <20190703235437.13429-1-krish.sadhukhan@oracle.com>
- <20190703235437.13429-3-krish.sadhukhan@oracle.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8c4DJTfhSg2W6KoSf+Qxaj24B9FivVRolxBUf34I1A4=;
+        b=GT0EVx9ejuMhXl/BtrLs3T1QlndlaXcLeLBFaA4OOQUtiGVa0dswyOdp5eNtUYMYsn
+         TCsHEo+ZTi0IaiO4CXuuhFilyr+z+XttMQ6OAenilH7l2rWqRLBwZPtuVEDJe4ceNa8o
+         Ug2Wr1WkhNYGkmOIsbw9r1wIRfPyaEQbYzsSjNTn00Owh8E3hVT64ntk99gZW7iytxia
+         /Rti8bu/zIsuVusYGSsjYvpFVSs2pKl6osU3zvGrRtel/GA0V0/zruLrs5SFSJa4OGm4
+         pRsbhxHTtzTUQq9SJmsvxFq4Nedm5r8KnBw8fvBVB7St1mg5mh8HrYhX3bipWcpiNviz
+         rLKQ==
+X-Gm-Message-State: APjAAAWoam551ReUQvb+JvLO6XE72inWtMMTOYSSlFtOHsl5jtcx95P+
+        Xrow8H9TvISygHgJIb9Ais71qA==
+X-Google-Smtp-Source: APXvYqw8cLUk/79FWV524hjEPaZnlwTw0ykVQbH9waqyrQMZU6w/Eb0X+2Ew5CgF/VEH6geHNZ2fvA==
+X-Received: by 2002:a5d:62cc:: with SMTP id o12mr13779208wrv.63.1563736453010;
+        Sun, 21 Jul 2019 12:14:13 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f5ce:1d64:8195:e39d? ([2001:b07:6468:f312:f5ce:1d64:8195:e39d])
+        by smtp.gmail.com with ESMTPSA id v124sm39039546wmf.23.2019.07.21.12.14.11
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Sun, 21 Jul 2019 12:14:11 -0700 (PDT)
+Subject: Re: nvmx: get/set_nested_state ignores VM_EXIT_INSTRUCTION_LEN
+To:     Jan Kiszka <jan.kiszka@web.de>, Liran Alon <liran.alon@oracle.com>,
+        kvm <kvm@vger.kernel.org>
+Cc:     Jim Mattson <jmattson@google.com>,
+        KarimAllah Ahmed <karahmed@amazon.de>
+References: <3299adf3-3979-7718-702f-bab2d9324c69@web.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5bfb611e-f136-d9e4-7888-123d21e738c2@redhat.com>
+Date:   Sun, 21 Jul 2019 21:14:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <3299adf3-3979-7718-702f-bab2d9324c69@web.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jul 3, 2019, at 4:54 PM, Krish Sadhukhan =
-<krish.sadhukhan@oracle.com> wrote:
->=20
-> According to section "Checks on Host Segment and Descriptor-Table
-> Registers" in Intel SDM vol 3C, the following checks are performed on
-> vmentry of nested guests:
->=20
->    - In the selector field for each of CS, SS, DS, ES, FS, GS and TR, =
-the
->      RPL (bits 1:0) and the TI flag (bit 2) must be 0.
->    - The selector fields for CS and TR cannot be 0000H.
->    - The selector field for SS cannot be 0000H if the "host =
-address-space
->      size" VM-exit control is 0.
->    - On processors that support Intel 64 architecture, the =
-base-address
->      fields for FS, GS, GDTR, IDTR, and TR must contain canonical
->      addresses.
+On 21/07/19 19:40, Jan Kiszka wrote:
+> Hi all,
+> 
+> made some progress understanding why vmport from L2 breaks since QEMU gets/sets
+> the nested state around it: We do not preserve VM_EXIT_INSTRUCTION_LEN, and that
+> breaks skip_emulated_instruction when completing the PIO access on next run. The
+> field is suddenly 0, and so we loop infinitely over the IO instruction. Unless
+> some other magic prevents migration while an IO instruction is in flight, vmport
+> may not be the only victim here.
+> 
+> Now the question is how to preserve that information: Can we restore the value
+> into vmcs02 on set_nested_state, despite this field being read-only? Or do we
+> need to cache its content and use that instead in skip_emulated_instruction?
 
-As I noted on v1, this patch causes the test to fail on bare-metal:
+Hmm I think technically this is invalid, since you're not supposed to
+modify state at all while MMIO is pending.  Of course that's kinda moot
+if it's the only way to emulate vmport, but perhaps we can (or even
+should!) fix it in QEMU.  Is KVM_SET_NESTED_STATE needed for level <
+KVM_PUT_RESET_STATE?  Even if it is, we should first complete I/O and
+then do kvm_arch_put_registers.
 
- FAIL: HOST_SEL_SS 0: VMX inst error is 8 (actual 7)
-
-I don=E2=80=99t know what the root-cause is, but I don't think that =
-tests that
-fail on bare-metal (excluding because of CPU errata) should be included.
+> Looking at this pattern, I wonder if there is more. What other fields are used
+> across PIO or MMIO when the handling is done by userland?
 
