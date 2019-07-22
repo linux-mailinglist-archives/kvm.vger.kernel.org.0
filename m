@@ -2,142 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA43B70200
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 16:14:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCF7A702AB
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 16:51:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730465AbfGVOOr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 10:14:47 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:34795 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727880AbfGVOOq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jul 2019 10:14:46 -0400
-Received: by mail-ed1-f68.google.com with SMTP id s49so5941165edb.1
-        for <kvm@vger.kernel.org>; Mon, 22 Jul 2019 07:14:45 -0700 (PDT)
+        id S1726467AbfGVOvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jul 2019 10:51:13 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:46011 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726084AbfGVOvN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 10:51:13 -0400
+Received: by mail-lj1-f195.google.com with SMTP id m23so37823994lje.12
+        for <kvm@vger.kernel.org>; Mon, 22 Jul 2019 07:51:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=RndvtDH92J1EDhqL1dSbJVA7yR/niGc5Ev9iShmRw7Y=;
-        b=rwT+K1Dva3LqMdJtA5IlAJUqEOr+5t7jZJ4sl82MQCxJNp/lq7LKgn6OM2Y/0lvvTR
-         +B/0HZroyefezbg/lVEO8e7tdX0EfHAOt2z4RRfHLtj8fuwbCyxBnpRLtONQ6sbcqGOO
-         3zjMa+BuxABPXbQfmae/uE38bPH54FW3SytpIvrs8PWiUuTdCw4zqGvqlV1QNJAjFb8I
-         7PmNu/fyf9pinu2TWylVlceGDruUg5g2V1IoblNUlXz75TvjPDmXXG7wpzDBLIff/DLQ
-         neljxqjHvAab5fySju2nFvFi14/0TvDht9V6W1HQy1DP2MTlNcbX+PM/wH3OPkbNHNp1
-         r/nw==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=NmRF2kaOw40rznWfjCJVbDC4AKTC36kv0HPXnc5ddCE=;
+        b=IcEx/SXtNd4jWKbyW4aH7+REj3HlGulQ0ynWwdqqpmDj81tKnzrPGxonAKrC41cDu1
+         lIjkyi3Imh05LQD/0cMlmohlgwjz4mmgtxrAXd/QqKUVBlntJJPFyJ5Ykqts8SbYemwy
+         r+CNet9lKScw3W0R5gJRlOD5ElE90Kbh9xzctfXfi2JKlC7PQwx6AZ+Y0JXHfCoPai5D
+         OCjg7Cy09oD4gFtU6yJdcp/l7DZ2MElTIEl120681RvM8SskJ+G/AXESTDhV07phceK6
+         7lNJbPV2nP3usZ48j9i5lU/z55NVR7d5jaFMh5OD1NMgokaPXTC6aOD5zu4Uv9tFSz+3
+         sZpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=RndvtDH92J1EDhqL1dSbJVA7yR/niGc5Ev9iShmRw7Y=;
-        b=jBFxI+nXxnGAIKM9ZNhQYM6aYdXZ15wcFHkvb2FMzCeK/lJesRUQfy3N3e6fK6I6yC
-         DaPY/ILbkE/j3ylERlhOzqWIy1pzccyYis89hDxMDqnd2PPtKKkR8Dr4R8mab5vaOK6e
-         A7yc9gZJWssWd53jVXgcjxl5WggWbtmGgs1kjQAZkB+PE6bC8t4RfjxDMoNR2KvXnoPx
-         MDiq3Yi9qXhk3TXB1M3PeE2ze+Mm0k5V3dMLYEv8fCGF/8+96VlehsatzpWPkd6+nNo5
-         n4N7mEk3OIhj4KsOTOXIWgoqFEz1kOwuBY0933A7IsT9VvhzSGzErsMNc/d+X1mcS0fZ
-         Fesg==
-X-Gm-Message-State: APjAAAVfyz7XoyN3e0hISflgrS9MyCCZCZ5pRJRKmXuGUqVib0ZNIrN/
-        mHb0Kvijkj0OS8ecFC80G6qvoNeTimgYulf5nyVbKp85FQA=
-X-Google-Smtp-Source: APXvYqxQFGICOLgyYhzs8o+woFHj1Zc3USMyOMb876MgR4r9p/4MwuG1+5WJQzEbiCmz73AKDmMBhXmByKpDUUtG7RY=
-X-Received: by 2002:a17:906:718:: with SMTP id y24mr53229318ejb.71.1563804884419;
- Mon, 22 Jul 2019 07:14:44 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=NmRF2kaOw40rznWfjCJVbDC4AKTC36kv0HPXnc5ddCE=;
+        b=gTKVRHvl+R1HiIRM2aITyeuerd9tWirhFsIVQrqycTgP5oV0FojcsSshpnuHkjSTxs
+         BxgaHuPJGqg8dVvmRTtEoBR2ruYyJg/MQnngJ6G34QBOGea/YJ9sOHCRVBcBdfpN0T5S
+         hco57Sr9HaezPklx6ZnXDR1/UHnOBQosCqKhLpg9YbUHZi3nTafE7bbIg/z1FZxdSJgT
+         XnnBOW70H7e1Wy0V1VE+za0/u+46WqKFseaQMUOBcuPZEceP9z3k0vFxQvknS1WXrw+R
+         jsRw4HYh1iQOj6d8OR7HIjpGDBeghMhxBJbQgFisOApEltrBYcMmhW2TWuM2elgviGCi
+         5OSw==
+X-Gm-Message-State: APjAAAVHuIHN/wus9sYAoGJ6rCGT0pKwjvCtzlDWddhK9XJeqw2+sprg
+        lsu9Rx4hPwr9Ahoo3GR4se6R5kM25T1TtaGarb2AdQ==
+X-Google-Smtp-Source: APXvYqz6JRfNu2bVHEI+xCIwQ7lkO4Ojm0nd94T2byHbDrkwkxd9qY8dFLL8/8bRVKt2iVlrg/oo/r8WhE7XeaCxwxc=
+X-Received: by 2002:a2e:8945:: with SMTP id b5mr35716701ljk.93.1563807071622;
+ Mon, 22 Jul 2019 07:51:11 -0700 (PDT)
 MIME-Version: 1.0
-From:   Kaushal Shriyan <kaushalshriyan@gmail.com>
-Date:   Mon, 22 Jul 2019 19:44:55 +0530
-Message-ID: <CAD7Ssm9NRozuNBX0puYyd-JnkhNt0AonerPZfZ=Qou-5inTaRw@mail.gmail.com>
-Subject: KVM bridge networking
-To:     kvm@vger.kernel.org
+References: <20190715210316.25569-1-aaronlewis@google.com>
+In-Reply-To: <20190715210316.25569-1-aaronlewis@google.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Mon, 22 Jul 2019 07:51:00 -0700
+Message-ID: <CAAAPnDE43xj+A6f3mxN9P1GKAQq1fk7HvUu8Z9R9MKnguUO9eQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: CPUID: Add new features to the guest's CPUID
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, Jul 15, 2019 at 2:03 PM Aaron Lewis <aaronlewis@google.com> wrote:
+>
+> Add features X86_FEATURE_FDP_EXCPTN_ONLY and X86_FEATURE_ZERO_FCS_FDS to the
+> mask for CPUID.(EAX=07H,ECX=0H):EBX.  Doing this will ensure the guest's CPUID
+> for these bits match the host, rather than the guest being blindly set to 0.
+>
+> This is important as these are actually defeature bits, which means that
+> a 0 indicates the presence of a feature and a 1 indicates the absence of
+> a feature.  since these features cannot be emulated, kvm should not
+> claim the existence of a feature that isn't present on the host.
+>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index ead681210306..64c3fad068e1 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -353,7 +353,8 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+>                 F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | f_mpx | F(RDSEED) |
+>                 F(ADX) | F(SMAP) | F(AVX512IFMA) | F(AVX512F) | F(AVX512PF) |
+>                 F(AVX512ER) | F(AVX512CD) | F(CLFLUSHOPT) | F(CLWB) | F(AVX512DQ) |
+> -               F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt;
+> +               F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt |
+> +               F(FDP_EXCPTN_ONLY) | F(ZERO_FCS_FDS);
+>
+>         /* cpuid 7.0.ecx*/
+>         const u32 kvm_cpuid_7_0_ecx_x86_features =
+> --
+> 2.22.0.510.g264f2c817a-goog
+>
 
-I am confused regarding KVM networking. I have configured base OS and guest OS.
-
-[root@baremetalinhousebaseserver1 network-scripts]# cat ifcfg-br0
-TYPE=bridge
-PROXY_METHOD=none
-BROWSER_ONLY=no
-BOOTPROTO=static
-DEFROUTE=yes
-IPV4_FAILURE_FATAL=no
-#IPV6INIT=yes
-#IPV6_AUTOCONF=yes
-#IPV6_DEFROUTE=yes
-#IPV6_FAILURE_FATAL=no
-#IPV6_ADDR_GEN_MODE=stable-privacy
-NAME=br0
-#UUID=af60e6bd-e824-44fa-a816-763e6e977ae6
-DEVICE=br0
-ONBOOT=yes
-IPADDR=192.168.0.65
-PREFIX=24
-GATEWAY=192.168.0.10
-DNS1=213.117.155.12
-DNS2=213.117.155.10
-[root@baremetainhousebaseserver1 network-scripts]# cat ifcfg-em1
-TYPE=Ethernet
-PROXY_METHOD=none
-BROWSER_ONLY=no
-BOOTPROTO=static
-DEFROUTE=yes
-IPV4_FAILURE_FATAL=no
-IPV6INIT=yes
-IPV6_AUTOCONF=yes
-IPV6_DEFROUTE=yes
-IPV6_FAILURE_FATAL=no
-IPV6_ADDR_GEN_MODE=stable-privacy
-NAME=em1
-UUID=af60e6bd-e824-44fa-a816-763e6e977ae6
-DEVICE=em1
-ONBOOT=yes
-BRIDGE=br0
-IPADDR=192.168.0.35
-PREFIX=24
-GATEWAY=192.168.0.10
-DNS1=213.117.155.12
-DNS2=213.117.155.10
-[root@baremetainhousebaseserver1 network-scripts]#
-
-I use the below command to launch KVM guest VM
-
-#virt-install --name=qubecrafter02
---file=/var/lib/libvirt/images/apprafter02centos7.img --file-size=50
---nonsparse --vcpus=2 --ram=8096 --network=bridge:br0 --os-type=linux
---os-variant=rhel7 --graphics none
---location=/var/lib/libvirt/isos/CentOS-7-x86_64-DVD-1810.iso
---extra-args="console=ttyS0"
-
-I do vim /etc/sysconfig/network-scripts/ifcfg-eth0 on guestosvm1
-
-[root@guestosvm1 network-scripts]# cat ifcfg-eth0
-TYPE=Ethernet
-PROXY_METHOD=none
-BROWSER_ONLY=no
-BOOTPROTO=static
-DEFROUTE=yes
-IPV4_FAILURE_FATAL=no
-IPV6INIT=yes
-IPV6_AUTOCONF=yes
-IPV6_DEFROUTE=yes
-IPV6_FAILURE_FATAL=no
-IPV6_ADDR_GEN_MODE=stable-privacy
-NAME=eth0
-UUID=805ff146-ecc1-460a-a7e2-e35eb19814c2
-DEVICE=eth0
-ONBOOT=yes
-IPADDR=192.168.0.66
-PREFIX=24
-GATEWAY=192.168.0.10
-DNS1=213.117.155.12
-DNS2=213.117.155.10
-[root@guestosvm1 network-scripts]#
-
-I am confused between bridge and ethernet networking. Am i missing
-anything in the above configurations, Please comment.
-
-Thanks in Advance and i look forward to hearing from you.
-
-Best Regards,
-
-Kaushal
+ping
