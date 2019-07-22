@@ -2,135 +2,374 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D0326FA6F
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 09:37:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4F126FB43
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 10:27:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727723AbfGVHhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 03:37:04 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:50030 "EHLO mxct.zte.com.cn"
+        id S1728173AbfGVI1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jul 2019 04:27:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52454 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726120AbfGVHhE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jul 2019 03:37:04 -0400
-Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
-        by Forcepoint Email with ESMTPS id 8DEAFB8D5B9EA263227B;
-        Mon, 22 Jul 2019 15:36:58 +0800 (CST)
-Received: from notes_smtp.zte.com.cn ([10.30.1.239])
-        by mse-fl2.zte.com.cn with ESMTP id x6M7alam028721;
-        Mon, 22 Jul 2019 15:36:47 +0800 (GMT-8)
-        (envelope-from wang.yi59@zte.com.cn)
-Received: from fox-host8.localdomain ([10.74.120.8])
-          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
-          with ESMTP id 2019072215365173-2482797 ;
-          Mon, 22 Jul 2019 15:36:51 +0800 
-From:   Yi Wang <wang.yi59@zte.com.cn>
-To:     pbonzini@redhat.com
-Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        wang.yi59@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
-Subject: [PATCH] kvm: x86: Use DEFINE_DEBUGFS_ATTRIBUTE for debugfs files
-Date:   Mon, 22 Jul 2019 15:33:59 +0800
-Message-Id: <1563780839-14739-1-git-send-email-wang.yi59@zte.com.cn>
-X-Mailer: git-send-email 1.8.3.1
-X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
- 21, 2013) at 2019-07-22 15:36:51,
-        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2019-07-22 15:36:48,
-        Serialize complete at 2019-07-22 15:36:48
-X-MAIL: mse-fl2.zte.com.cn x6M7alam028721
+        id S1726120AbfGVI1G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 04:27:06 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C1333335CF;
+        Mon, 22 Jul 2019 08:27:05 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C7DB9600C7;
+        Mon, 22 Jul 2019 08:27:04 +0000 (UTC)
+Date:   Mon, 22 Jul 2019 10:27:02 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v2] x86: Support environments without
+ test-devices
+Message-ID: <20190722082702.rsjb3hick6524yoc@kamzik.brq.redhat.com>
+References: <20190721122841.21416-1-nadav.amit@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190721122841.21416-1-nadav.amit@gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Mon, 22 Jul 2019 08:27:05 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We got these coccinelle warning:
-./arch/x86/kvm/debugfs.c:23:0-23: WARNING: vcpu_timer_advance_ns_fops
-should be defined with DEFINE_DEBUGFS_ATTRIBUTE
-./arch/x86/kvm/debugfs.c:32:0-23: WARNING: vcpu_tsc_offset_fops should
-be defined with DEFINE_DEBUGFS_ATTRIBUTE
-./arch/x86/kvm/debugfs.c:41:0-23: WARNING: vcpu_tsc_scaling_fops should
-be defined with DEFINE_DEBUGFS_ATTRIBUTE
-./arch/x86/kvm/debugfs.c:49:0-23: WARNING: vcpu_tsc_scaling_frac_fops
-should be defined with DEFINE_DEBUGFS_ATTRIBUTE
+On Sun, Jul 21, 2019 at 05:28:41AM -0700, Nadav Amit wrote:
+> Enable to run the tests when test-device is not present (e.g.,
+> bare-metal). Users can provide the number of CPUs and ram size through
+> kernel parameters.
+> 
+> On Ubuntu, for example, the tests can be run by copying a test to the
+> boot directory (/boot) and adding a menuentry to grub (editing
+> /etc/grub.d/40_custom):
+> 
+>   menuentry 'idt_test' {
+> 	set root='ROOT'
+> 	multiboot BOOT_RELATIVE/idt_test.flat
+> 	module params.initrd
+>   }
+> 
+> Replace ROOT with `grub-probe --target=bios_hints /boot` and
+> BOOT_RELATIVE with `grub-mkrelpath /boot`, and run update-grub.
+> 
+> params.initrd, which would be located on the boot directory should
+> describe the machine. For example for a 4 core machines with 4GB of
+> memory:
+> 
+>   NR_CPUS=4
+>   MEMSIZE=4096
+>   TEST_DEVICE=0
+>   BOOTLOADER=1
+> 
+> Since we do not really use E820, using more than 4GB is likely to fail
+> due to holes.
+> 
+> Remember that the output goes to the serial port.
+> 
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> 
+> ---
+> 
+> v1->v2:
+>  * Using initrd to hold configuration override [Andrew]
+>  * Adapting vmx, tscdeadline_latency not to ignore the first argument
+>    on native
+> ---
+>  lib/x86/fwcfg.c           | 32 ++++++++++++++++++++++++++++++++
+>  lib/x86/fwcfg.h           | 16 ++++++++++++++++
+>  x86/apic.c                |  4 +++-
+>  x86/cstart64.S            |  8 ++++++--
+>  x86/eventinj.c            | 20 ++++++++++++++++----
+>  x86/tscdeadline_latency.c |  8 +++++---
+>  x86/vmx.c                 |  7 +++++--
+>  x86/vmx_tests.c           |  5 +++++
+>  8 files changed, 88 insertions(+), 12 deletions(-)
+> 
+> diff --git a/lib/x86/fwcfg.c b/lib/x86/fwcfg.c
+> index c52b445..5f85acf 100644
+> --- a/lib/x86/fwcfg.c
+> +++ b/lib/x86/fwcfg.c
+> @@ -1,14 +1,46 @@
+>  #include "fwcfg.h"
+>  #include "smp.h"
+> +#include "libcflat.h"
+>  
+>  static struct spinlock lock;
+>  
+> +static long fw_override[FW_CFG_MAX_ENTRY];
+> +
+> +bool no_test_device;
+> +bool bootloader;
+> +
+> +void read_cfg_override(void)
+> +{
+> +	const char *str;
+> +	int i;
+> +
+> +	/* Initialize to negative value that would be considered as invalid */
+> +	for (i = 0; i < FW_CFG_MAX_ENTRY; i++)
+> +		fw_override[i] = -1;
+> +
+> +	if ((str = getenv("NR_CPUS")))
+> +		fw_override[FW_CFG_NB_CPUS] = atol(str);
+> +
+> +	/* MEMSIZE is in megabytes */
+> +	if ((str = getenv("MEMSIZE")))
+> +		fw_override[FW_CFG_RAM_SIZE] = atol(str) * 1024 * 1024;
+> +
+> +	if ((str = getenv("TEST_DEVICE")))
+> +		no_test_device = !atol(str);
+> +
+> +	if ((str = getenv("BOOTLOADER")))
+> +		bootloader = !!atol(str);
+> +}
+> +
+>  static uint64_t fwcfg_get_u(uint16_t index, int bytes)
+>  {
+>      uint64_t r = 0;
+>      uint8_t b;
+>      int i;
+>  
+> +    if (fw_override[index] >= 0)
+> +	    return fw_override[index];
+> +
+>      spin_lock(&lock);
+>      asm volatile ("out %0, %1" : : "a"(index), "d"((uint16_t)BIOS_CFG_IOPORT));
+>      for (i = 0; i < bytes; ++i) {
+> diff --git a/lib/x86/fwcfg.h b/lib/x86/fwcfg.h
+> index e0836ca..587aa95 100644
+> --- a/lib/x86/fwcfg.h
+> +++ b/lib/x86/fwcfg.h
+> @@ -2,6 +2,7 @@
+>  #define FWCFG_H
+>  
+>  #include <stdint.h>
+> +#include <stdbool.h>
+>  
+>  #define FW_CFG_SIGNATURE        0x00
+>  #define FW_CFG_ID               0x01
+> @@ -33,6 +34,21 @@
+>  #define FW_CFG_SMBIOS_ENTRIES (FW_CFG_ARCH_LOCAL + 1)
+>  #define FW_CFG_IRQ0_OVERRIDE (FW_CFG_ARCH_LOCAL + 2)
+>  
+> +extern bool no_test_device;
+> +extern bool bootloader;
+> +
+> +void read_cfg_override(void);
+> +
+> +static inline bool test_device_enabled(void)
+> +{
+> +	return !no_test_device;
+> +}
+> +
+> +static inline bool using_bootloader(void)
+> +{
+> +	return bootloader;
+> +}
+> +
+>  uint8_t fwcfg_get_u8(unsigned index);
+>  uint16_t fwcfg_get_u16(unsigned index);
+>  uint32_t fwcfg_get_u32(unsigned index);
+> diff --git a/x86/apic.c b/x86/apic.c
+> index 7617351..f01a5e7 100644
+> --- a/x86/apic.c
+> +++ b/x86/apic.c
+> @@ -6,6 +6,7 @@
+>  #include "isr.h"
+>  #include "msr.h"
+>  #include "atomic.h"
+> +#include "fwcfg.h"
+>  
+>  #define MAX_TPR			0xf
+>  
+> @@ -655,7 +656,8 @@ int main(void)
+>  
+>      test_self_ipi();
+>      test_physical_broadcast();
+> -    test_pv_ipi();
+> +    if (test_device_enabled())
+> +        test_pv_ipi();
+>  
+>      test_sti_nmi();
+>      test_multiple_nmi();
+> diff --git a/x86/cstart64.S b/x86/cstart64.S
+> index 1889c6b..23c1bd4 100644
+> --- a/x86/cstart64.S
+> +++ b/x86/cstart64.S
+> @@ -246,8 +246,6 @@ start64:
+>  	call mask_pic_interrupts
+>  	call enable_apic
+>  	call save_id
+> -	call smp_init
+> -	call enable_x2apic
+>  	mov mb_boot_info(%rip), %rbx
+>  	mov %rbx, %rdi
+>  	call setup_multiboot
+> @@ -255,6 +253,12 @@ start64:
+>  	mov mb_cmdline(%rbx), %eax
+>  	mov %rax, __args(%rip)
+>  	call __setup_args
 
-Use DEFINE_DEBUGFS_ATTRIBUTE() rather than DEFINE_SIMPLE_ATTRIBUTE()
-to fix this.
+[Marking this place to reference below]
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
----
- arch/x86/kvm/debugfs.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+> +
+> +	/* Read the configuration before running smp_init */
+> +	call read_cfg_override
+> +	call smp_init
+> +	call enable_x2apic
+> +
+>  	mov __argc(%rip), %edi
+>  	lea __argv(%rip), %rsi
+>  	lea __environ(%rip), %rdx
+> diff --git a/x86/eventinj.c b/x86/eventinj.c
+> index 901b9db..9e4dbec 100644
+> --- a/x86/eventinj.c
+> +++ b/x86/eventinj.c
+> @@ -8,6 +8,7 @@
+>  #include "vmalloc.h"
+>  #include "alloc_page.h"
+>  #include "delay.h"
+> +#include "fwcfg.h"
+>  
+>  #ifdef __x86_64__
+>  #  define R "r"
+> @@ -28,10 +29,15 @@ static void apic_self_nmi(void)
+>  	apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_NMI | APIC_INT_ASSERT, 0);
+>  }
+>  
+> -#define flush_phys_addr(__s) outl(__s, 0xe4)
+> +#define flush_phys_addr(__s) do {					\
+> +		if (test_device_enabled())				\
+> +			outl(__s, 0xe4);				\
+> +	} while (0)
+> +
+>  #define flush_stack() do {						\
+>  		int __l;						\
+> -		flush_phys_addr(virt_to_phys(&__l));			\
+> +		if (test_device_enabled())				\
+> +			flush_phys_addr(virt_to_phys(&__l));		\
 
-diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-index 329361b..24016fb 100644
---- a/arch/x86/kvm/debugfs.c
-+++ b/arch/x86/kvm/debugfs.c
-@@ -20,7 +20,7 @@ static int vcpu_get_timer_advance_ns(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(vcpu_timer_advance_ns_fops, vcpu_get_timer_advance_ns, NULL, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(vcpu_timer_advance_ns_fops, vcpu_get_timer_advance_ns, NULL, "%llu\n");
- 
- static int vcpu_get_tsc_offset(void *data, u64 *val)
- {
-@@ -29,7 +29,7 @@ static int vcpu_get_tsc_offset(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_offset_fops, vcpu_get_tsc_offset, NULL, "%lld\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_offset_fops, vcpu_get_tsc_offset, NULL, "%lld\n");
- 
- static int vcpu_get_tsc_scaling_ratio(void *data, u64 *val)
- {
-@@ -38,7 +38,7 @@ static int vcpu_get_tsc_scaling_ratio(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL, "%llu\n");
- 
- static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
- {
-@@ -46,20 +46,20 @@ static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_frac_fops, vcpu_get_tsc_scaling_frac_bits, NULL, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_scaling_frac_fops, vcpu_get_tsc_scaling_frac_bits, NULL, "%llu\n");
- 
- int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
- {
- 	struct dentry *ret;
- 
--	ret = debugfs_create_file("tsc-offset", 0444,
-+	ret = debugfs_create_file_unsafe("tsc-offset", 0444,
- 							vcpu->debugfs_dentry,
- 							vcpu, &vcpu_tsc_offset_fops);
- 	if (!ret)
- 		return -ENOMEM;
- 
- 	if (lapic_in_kernel(vcpu)) {
--		ret = debugfs_create_file("lapic_timer_advance_ns", 0444,
-+		ret = debugfs_create_file_unsafe("lapic_timer_advance_ns", 0444,
- 								vcpu->debugfs_dentry,
- 								vcpu, &vcpu_timer_advance_ns_fops);
- 		if (!ret)
-@@ -67,12 +67,12 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (kvm_has_tsc_control) {
--		ret = debugfs_create_file("tsc-scaling-ratio", 0444,
-+		ret = debugfs_create_file_unsafe("tsc-scaling-ratio", 0444,
- 							vcpu->debugfs_dentry,
- 							vcpu, &vcpu_tsc_scaling_fops);
- 		if (!ret)
- 			return -ENOMEM;
--		ret = debugfs_create_file("tsc-scaling-ratio-frac-bits", 0444,
-+		ret = debugfs_create_file_unsafe("tsc-scaling-ratio-frac-bits", 0444,
- 							vcpu->debugfs_dentry,
- 							vcpu, &vcpu_tsc_scaling_frac_fops);
- 		if (!ret)
--- 
-1.8.3.1
+nit: This shouldn't be necessary as the condition is already embedded.
 
+>  	} while (0)
+>  
+>  extern char isr_iret_ip[];
+> @@ -136,6 +142,8 @@ extern void do_iret(ulong phys_stack, void *virt_stack);
+>  // Return to same privilege level won't pop SS or SP, so
+>  // save it in RDX while we run on the nested stack
+>  
+> +extern bool no_test_device;
+> +
+>  asm("do_iret:"
+>  #ifdef __x86_64__
+>  	"mov %rdi, %rax \n\t"		// phys_stack
+> @@ -148,10 +156,14 @@ asm("do_iret:"
+>  	"pushf"W" \n\t"
+>  	"mov %cs, %ecx \n\t"
+>  	"push"W" %"R "cx \n\t"
+> -	"push"W" $1f \n\t"
+> +	"push"W" $2f \n\t"
+> +
+> +	"cmpb $0, no_test_device\n\t"	// see if need to flush
+> +	"jnz 1f\n\t"
+>  	"outl %eax, $0xe4 \n\t"		// flush page
+> +	"1: \n\t"
+>  	"iret"W" \n\t"
+> -	"1: xchg %"R "dx, %"R "sp \n\t"	// point to old stack
+> +	"2: xchg %"R "dx, %"R "sp \n\t"	// point to old stack
+>  	"ret\n\t"
+>     );
+>  
+> diff --git a/x86/tscdeadline_latency.c b/x86/tscdeadline_latency.c
+> index 4ee5917..4a9889a 100644
+> --- a/x86/tscdeadline_latency.c
+> +++ b/x86/tscdeadline_latency.c
+> @@ -21,6 +21,7 @@
+>   */
+>  
+>  #include "libcflat.h"
+> +#include "fwcfg.h"
+>  #include "apic.h"
+>  #include "vm.h"
+>  #include "smp.h"
+> @@ -103,6 +104,7 @@ static void test_tsc_deadline_timer(void)
+>  int main(int argc, char **argv)
+>  {
+>      int i, size;
+> +    int first_arg = using_bootloader() ? 0 : 1;
+>  
+>      setup_vm();
+>      smp_init();
+> @@ -111,9 +113,9 @@ int main(int argc, char **argv)
+>  
+>      mask_pic_interrupts();
+>  
+> -    delta = argc <= 1 ? 200000 : atol(argv[1]);
+> -    size = argc <= 2 ? TABLE_SIZE : atol(argv[2]);
+> -    breakmax = argc <= 3 ? 0 : atol(argv[3]);
+> +    delta = argc <= first_arg + 1 ? 200000 : atol(argv[first_arg + 1]);
+> +    size = argc <= first_arg + 2 ? TABLE_SIZE : atol(argv[first_arg + 2]);
+> +    breakmax = argc <= first_arg + 3 ? 0 : atol(argv[first_arg + 3]);
+>      printf("breakmax=%d\n", breakmax);
+>      test_tsc_deadline_timer();
+>      irq_enable();
+> diff --git a/x86/vmx.c b/x86/vmx.c
+> index 872ba11..a10b0fb 100644
+> --- a/x86/vmx.c
+> +++ b/x86/vmx.c
+> @@ -29,6 +29,7 @@
+>   */
+>  
+>  #include "libcflat.h"
+> +#include "fwcfg.h"
+>  #include "processor.h"
+>  #include "alloc_page.h"
+>  #include "vm.h"
+> @@ -1919,8 +1920,10 @@ int main(int argc, const char *argv[])
+>  	/* We want xAPIC mode to test MMIO passthrough from L1 (us) to L2.  */
+>  	reset_apic();
+>  
+> -	argv++;
+> -	argc--;
+> +	if (!using_bootloader()) {
+> +		argv++;
+> +		argc--;
+> +	}
+
+If you read the cfg overrides before calling __setup_args (marked above),
+then you could conditionally call __setup_args, as is done now, when
+using_booloader() is true, but when it's false, you could create a fake
+auxinfo.progname, and then call setup_args_progname instead. That would
+provide you a first arg, of whatever the fake auxinfo.progname is, and
+then you can avoid shuffling args in the unit tests.
+
+>  
+>  	if (!(cpuid(1).c & (1 << 5))) {
+>  		printf("WARNING: vmx not supported, add '-cpu host'\n");
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 8ad2674..c4b37ca 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -8162,6 +8162,11 @@ static void vmx_apic_passthrough(bool set_irq_line_from_thread)
+>  		return;
+>  	}
+>  
+> +	/* Test device is required for generating IRQs */
+> +	if (!test_device_enabled()) {
+> +		report_skip(__func__);
+> +		return;
+> +	}
+>  	u64 cpu_ctrl_0 = CPU_SECONDARY;
+>  	u64 cpu_ctrl_1 = 0;
+>  
+> -- 
+> 2.19.1
+> 
+
+Thanks,
+drew
