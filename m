@@ -2,51 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A836E6FEFA
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 13:50:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBA636FEFF
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 13:52:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730009AbfGVLut (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 07:50:49 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:40445 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728079AbfGVLut (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jul 2019 07:50:49 -0400
-Received: by mail-wm1-f68.google.com with SMTP id v19so35036660wmj.5
-        for <kvm@vger.kernel.org>; Mon, 22 Jul 2019 04:50:47 -0700 (PDT)
+        id S1730021AbfGVLwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jul 2019 07:52:16 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43472 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728079AbfGVLwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 07:52:16 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p13so39062780wru.10
+        for <kvm@vger.kernel.org>; Mon, 22 Jul 2019 04:52:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=swsIdjk1/KK2lJCfjS3uejgNTYuy7pWMGo/hVmMGJDI=;
-        b=HlIdpC0oDVORl8hQrO5/1lCQ3ALW+z+jRSg3ZpYv6bAuXUKIniv0Rzvq792QxuCzBh
-         SIL9eH79oxrYRDBTR+JpnpgfrfP4g1ssVgnYhKBO3vQZwyYJDBh398MheppJ8UjtlGej
-         mkaJ2zx4vzoPLW+P/o5FJmfXehn1nnQpSh1pnkOJsXhuPrbDqVT8HisbWWjVDUbapL06
-         QG8GE9zcoNlsm1kicEe2xsshLRgE73ezGKbYi9cgZmpDkexCc03+3h84yh4LStL1eI+n
-         vDcUjPqmSeMJwPzIDjDp2YMjTtiuvXrx/4wKoglCYy+VI7UpFDinSpVVbsVvKi487QPh
-         DLDg==
-X-Gm-Message-State: APjAAAWVCIvfjIbVbNX2+L5FoNrM6rslzfDHTSo8OUFSTaBp036eNrQ8
-        PUaRaiEGB+lgbvaNyFCMG1+vLQ==
-X-Google-Smtp-Source: APXvYqzZuTV90BVyNv3OMyw8IlsWCnh4WG9oAD3jh1iq91o6fJrZYzogzkGWadMfuQRbbHO9M4tqRg==
-X-Received: by 2002:a7b:c95a:: with SMTP id i26mr66164271wml.175.1563796247019;
-        Mon, 22 Jul 2019 04:50:47 -0700 (PDT)
+        bh=BE8JIygzINCp1gyrm3FdkUYHuzLOE+CPIQkp+cGSXp8=;
+        b=MP4cPHdIfLhQt6gPF+FgdqLrtfo3R5SuXzjccc7++QZKA+jInC+fscETzbV9Ye7IZd
+         t+W0ngJRiAh1tuUi0/8frtO5HuC+p2Pi+4CgaoBqf+sfXv0IR4xD6bjiPm57LakqjMdX
+         +le5qjkWbg4U8Uzzq/56OkpDGL8MUIkPiXYc8Ji0C/7M90UHANCwb5hPrqHjTaRf7ACj
+         P9X3GO328wS17j+Ka03Z2H+wa6E9sQXSBg4XvO3Or7OvL/jW3uM69Wy5Hu7cMt4dYyeh
+         wHnuq3TyPvvEfLRAoBJ9sSNfTYnd3AN8lMYx08YfzRlO6MAiMCHx8pWVoV9D71QMG59V
+         TY/g==
+X-Gm-Message-State: APjAAAXPC83qJM60ShehqvP+9BkzkkTBfSygiekJTRbVZrS/6Vvy6+Zv
+        LXAhDmbXNtM8tfVE47CyHm8HGg==
+X-Google-Smtp-Source: APXvYqwfHFIBVnsFDSM0voRD+9JN0UDeEAkXCVSaMpU1vsGU+PYLKb/I6toSih8nGFXGvBX9kY69mA==
+X-Received: by 2002:a5d:4941:: with SMTP id r1mr71698709wrs.225.1563796334656;
+        Mon, 22 Jul 2019 04:52:14 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:10f7:67c8:abb4:8512? ([2001:b07:6468:f312:10f7:67c8:abb4:8512])
-        by smtp.gmail.com with ESMTPSA id 32sm32994837wrh.76.2019.07.22.04.50.46
+        by smtp.gmail.com with ESMTPSA id j9sm42749201wrn.81.2019.07.22.04.52.13
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Jul 2019 04:50:46 -0700 (PDT)
-Subject: Re: [PATCH] KVM: nVMX: Set cached_vmcs12 and cached_shadow_vmcs12
- NULL after free
+        Mon, 22 Jul 2019 04:52:14 -0700 (PDT)
+Subject: Re: [PATCH] KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when
+ leaving nested
 To:     Jan Kiszka <jan.kiszka@web.de>, kvm <kvm@vger.kernel.org>
-Cc:     Liran Alon <liran.alon@oracle.com>
-References: <e48af3c7-c7ac-87b4-3ce1-9b7b775cd6f2@web.de>
+Cc:     Liran Alon <liran.alon@oracle.com>,
+        Jim Mattson <jmattson@google.com>,
+        KarimAllah Ahmed <karahmed@amazon.de>
+References: <ee67b5c3-d660-179a-07fa-2bebdc940d4f@web.de>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <b31e088d-59cb-bbd7-159f-070e57cc121f@redhat.com>
-Date:   Mon, 22 Jul 2019 13:50:47 +0200
+Message-ID: <ab8cfd4b-90de-b96f-5e5f-7bd5c42b5a4d@redhat.com>
+Date:   Mon, 22 Jul 2019 13:52:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <e48af3c7-c7ac-87b4-3ce1-9b7b775cd6f2@web.de>
+In-Reply-To: <ee67b5c3-d660-179a-07fa-2bebdc940d4f@web.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -55,31 +57,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/19 16:01, Jan Kiszka wrote:
+On 21/07/19 13:52, Jan Kiszka wrote:
 > From: Jan Kiszka <jan.kiszka@siemens.com>
 > 
-> Shall help finding use-after-free bugs earlier.
+> Letting this pend may cause nested_get_vmcs12_pages to run against an
+> invalid state, corrupting the effective vmcs of L1.
 > 
-> Suggested-by: Liran Alon <liran.alon@oracle.com>
+> This was triggerable in QEMU after a guest corruption in L2, followed by
+> a L1 reset.
+> 
 > Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 > ---
+> 
+> And another gremlin. I'm afraid there is at least one more because
+> vmport access from L2 is still failing in QEMU. This is just another
+> fallout from that. At least the host seems stable now.
+> 
 >  arch/x86/kvm/vmx/nested.c | 2 ++
 >  1 file changed, 2 insertions(+)
 > 
 > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 4cdab4b4eff1..ced9fba32598 100644
+> index 0f1378789bd0..4cdab4b4eff1 100644
 > --- a/arch/x86/kvm/vmx/nested.c
 > +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -234,7 +234,9 @@ static void free_nested(struct kvm_vcpu *vcpu)
->  		vmx->vmcs01.shadow_vmcs = NULL;
->  	}
->  	kfree(vmx->nested.cached_vmcs12);
-> +	vmx->nested.cached_vmcs12 = NULL;
->  	kfree(vmx->nested.cached_shadow_vmcs12);
-> +	vmx->nested.cached_shadow_vmcs12 = NULL;
->  	/* Unpin physical memory we referred to in the vmcs02 */
->  	if (vmx->nested.apic_access_page) {
->  		kvm_release_page_dirty(vmx->nested.apic_access_page);
+> @@ -220,6 +220,8 @@ static void free_nested(struct kvm_vcpu *vcpu)
+>  	if (!vmx->nested.vmxon && !vmx->nested.smm.vmxon)
+>  		return;
+> 
+> +	kvm_clear_request(KVM_REQ_GET_VMCS12_PAGES, vcpu);
+> +
+>  	vmx->nested.vmxon = false;
+>  	vmx->nested.smm.vmxon = false;
+>  	free_vpid(vmx->nested.vpid02);
 > --
 > 2.16.4
 > 
