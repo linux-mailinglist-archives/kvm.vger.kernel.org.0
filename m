@@ -2,90 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C5A8709BF
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 21:33:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65F7C709EE
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 21:41:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727562AbfGVTdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 15:33:04 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:37354 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726641AbfGVTdE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jul 2019 15:33:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=zw0OzLY2qkyLgMJYZmR8YfjGW2oVP8VhhsbR5Yd/A7w=; b=TqldDQQlZ5ZIvVudiXOATvg8+6
-        99A+Mn8ucymBMPFhYx39j7RhwEqzKlskYs7uBA2fXig+Bxy7FrABNjSPOmH4GIcSvZhdDn6/2+ZsJ
-        VUg6cZbX8pBbqtj2bpRyU9Hzp/nnIWZowUX2X0jd2bLQuCjO1IrSHkq7ZpEA2agi1YNRwmTRLLboh
-        67TOwpPTag0FdERZ4yZ/3XiWzg/K9OYALvLZ0986XmDMNqvH4LVlmKnnhtNsUUIsaVZ0eY6sn+2NN
-        AtPJRQxOZ5Fl/h2Qzpox5vkgD09aPBondQwxq2tWQ+ZSFyHsqkgVr0smD7+AfjWNC6hLNxOuTf5H+
-        UtPXJ1DA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hpe3J-0006Hn-Eh; Mon, 22 Jul 2019 19:32:53 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id A1F78980C59; Mon, 22 Jul 2019 21:32:51 +0200 (CEST)
-Date:   Mon, 22 Jul 2019 21:32:51 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Juergen Gross <jgross@suse.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
+        id S1729117AbfGVTl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jul 2019 15:41:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45964 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726443AbfGVTl2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 15:41:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6AE96308424C;
+        Mon, 22 Jul 2019 19:41:28 +0000 (UTC)
+Received: from x1.home (ovpn-116-35.phx2.redhat.com [10.3.116.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 522D0600C4;
+        Mon, 22 Jul 2019 19:41:25 +0000 (UTC)
+Date:   Mon, 22 Jul 2019 13:41:24 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Lu, Kechen" <kechen.lu@intel.com>
+Cc:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Subject: Re: [PATCH v3 4/9] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Message-ID: <20190722193251.GF6698@worktop.programming.kicks-ass.net>
-References: <20190719005837.4150-1-namit@vmware.com>
- <20190719005837.4150-5-namit@vmware.com>
- <20190722191433.GD6698@worktop.programming.kicks-ass.net>
- <58DA0841-33C2-4D16-A671-08064A15001C@vmware.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Zhang, Tina" <tina.zhang@intel.com>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yuan, Hang" <hang.yuan@intel.com>
+Subject: Re: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
+Message-ID: <20190722134124.16c55c2f@x1.home>
+In-Reply-To: <31185F57AF7C4B4F87C41E735C23A6FE64E06F@shsmsx102.ccr.corp.intel.com>
+References: <20190718155640.25928-1-kechen.lu@intel.com>
+        <20190718155640.25928-3-kechen.lu@intel.com>
+        <20190719102516.60af527f@x1.home>
+        <31185F57AF7C4B4F87C41E735C23A6FE64E06F@shsmsx102.ccr.corp.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <58DA0841-33C2-4D16-A671-08064A15001C@vmware.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Mon, 22 Jul 2019 19:41:28 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 22, 2019 at 07:27:09PM +0000, Nadav Amit wrote:
-> > On Jul 22, 2019, at 12:14 PM, Peter Zijlstra <peterz@infradead.org> wrote:
+On Mon, 22 Jul 2019 05:28:35 +0000
+"Lu, Kechen" <kechen.lu@intel.com> wrote:
 
-> > But then we can still do something like the below, which doesn't change
-> > things and still gets rid of that dual function crud, simplifying
-> > smp_call_function_many again.
-
-> Nice! I will add it on top, if you don’t mind (instead squashing it).
-
-Not at all.
-
-> The original decision to have local/remote functions was mostly to provide
-> the generality.
+> Hi, 
 > 
-> I would change the last argument of __smp_call_function_many() from “wait”
-> to “flags” that would indicate whether to run the function locally, since I
-> don’t want to change the semantics of smp_call_function_many() and decide
-> whether to run the function locally purely based on the mask. Let me know if
-> you disagree.
+> > -----Original Message-----
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: Saturday, July 20, 2019 12:25 AM
+> > To: Lu, Kechen <kechen.lu@intel.com>
+> > Cc: intel-gvt-dev@lists.freedesktop.org; kvm@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; Zhang, Tina <tina.zhang@intel.com>;
+> > kraxel@redhat.com; zhenyuw@linux.intel.com; Lv, Zhiyuan
+> > <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian, Kevin
+> > <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>
+> > Subject: Re: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
+> > 
+> > On Thu, 18 Jul 2019 23:56:36 +0800
+> > Kechen Lu <kechen.lu@intel.com> wrote:
+> >   
+> > > From: Tina Zhang <tina.zhang@intel.com>
+> > >
+> > > Introduce vGPU specific irq type VFIO_IRQ_TYPE_GFX, and
+> > > VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ as the subtype for vGPU display
+> > >
+> > > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+> > > ---
+> > >  include/uapi/linux/vfio.h | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > > index be6adab4f759..df28b17a6e2e 100644
+> > > --- a/include/uapi/linux/vfio.h
+> > > +++ b/include/uapi/linux/vfio.h
+> > > @@ -469,6 +469,9 @@ struct vfio_irq_info_cap_type {
+> > >  	__u32 subtype;  /* type specific */
+> > >  };
+> > >
+> > > +#define VFIO_IRQ_TYPE_GFX				(1)
+> > > +#define VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ		(1)
+> > > +  
+> > 
+> > Please include a description defining exactly what this IRQ is intended to signal.
+> > For instance, if another vGPU vendor wanted to implement this in their driver
+> > and didn't have the QEMU code for reference to what it does with the IRQ, what
+> > would they need to know?  Thanks,
+> > 
+> > Alex
+> >   
+> 
+> Yes, that makes more sense. I'll add the description for it at next version patch.
+> 
+> BTW, may I have one more question? In the current design ideas, we partitioned 
+> the vGPU display eventfd counted 8-byte value into at most 8 events to deliver 
+> multiple display events, so we need different increasement counter value to 
+> differentiate the events. As this is the exposed thing the QEMU has to know, we
+> plan adds a macro here VFIO_IRQ_SUBTYPE_GFX_DISPLAY_EVENTFD_BASE_SHIFT to
+> make sure the partitions shift in 1 byte, does it make sense putting here? Looking  
+> forward to your and Gerd's comments. Thanks!
 
-Agreed.
+Couldn't you expose this as another capability within the IRQ_INFO
+return data?  If you were to define it as a macro, I assume that means
+it would be hard coded, in which case this probably becomes an Intel
+specific IRQ, rather than what appears to be framed as a generic
+graphics IRQ extension.  A new capability could instead allow the
+vendor to specify their own value, where we could define how userspace
+should interpret and make use of this value.  Thanks,
+
+Alex
