@@ -2,233 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D91AC6FE19
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 12:52:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C83B26FE1E
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 12:54:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729745AbfGVKwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 06:52:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51674 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727310AbfGVKwD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Jul 2019 06:52:03 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6MApx37018133
-        for <kvm@vger.kernel.org>; Mon, 22 Jul 2019 06:52:01 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2tw9qu5k1d-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 22 Jul 2019 06:52:00 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 22 Jul 2019 11:51:58 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 22 Jul 2019 11:51:54 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6MApq5l9633978
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Jul 2019 10:51:52 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4949811C052;
-        Mon, 22 Jul 2019 10:51:52 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D000C11C050;
-        Mon, 22 Jul 2019 10:51:49 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.116])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 22 Jul 2019 10:51:49 +0000 (GMT)
-Subject: Re: [PATCH v2 18/30] virtio_fs, dax: Set up virtio_fs dax_device
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Vivek Goyal <vgoyal@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Collin Walling <walling@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Steven Whitehouse <swhiteho@redhat.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-References: <20190515192715.18000-1-vgoyal@redhat.com>
- <20190515192715.18000-19-vgoyal@redhat.com>
- <20190717192725.25c3d146.pasic@linux.ibm.com>
- <20190718131532.GA13883@redhat.com>
- <CAPcyv4i+2nKJYqkbrdm3hWcjaMYkCKUxqLBq96HOZe6xOZzGGg@mail.gmail.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+        id S1728616AbfGVKya (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jul 2019 06:54:30 -0400
+Received: from foss.arm.com ([217.140.110.172]:35790 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726130AbfGVKya (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 06:54:30 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5324928;
+        Mon, 22 Jul 2019 03:54:29 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C1D5C3F71A;
+        Mon, 22 Jul 2019 03:54:27 -0700 (PDT)
+Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
+ translation cache on specific commands
+To:     Auger Eric <eric.auger@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Julien Thierry <julien.thierry@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        "Saidi, Ali" <alisaidi@amazon.com>
+References: <20190611170336.121706-1-marc.zyngier@arm.com>
+ <20190611170336.121706-5-marc.zyngier@arm.com>
+ <9ff329a3-44f2-1de3-b6cc-58ed38a63665@redhat.com>
+From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Mon, 22 Jul 2019 12:51:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ Z46HaNmN2hZS/oJ69c1DI5Rcww==
+Organization: ARM Ltd
+Message-ID: <1a78d52c-7a31-8981-230b-abe85d11b8ec@arm.com>
+Date:   Mon, 22 Jul 2019 11:54:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4i+2nKJYqkbrdm3hWcjaMYkCKUxqLBq96HOZe6xOZzGGg@mail.gmail.com>
+In-Reply-To: <9ff329a3-44f2-1de3-b6cc-58ed38a63665@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19072210-0008-0000-0000-000002FFBFD8
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072210-0009-0000-0000-0000226D481B
-Message-Id: <c519011e-1df3-3f35-8582-2cb58367ff8a@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-22_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907220130
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Eric,
 
-
-On 18.07.19 16:30, Dan Williams wrote:
-> On Thu, Jul 18, 2019 at 6:15 AM Vivek Goyal <vgoyal@redhat.com> wrote:
->>
->> On Wed, Jul 17, 2019 at 07:27:25PM +0200, Halil Pasic wrote:
->>> On Wed, 15 May 2019 15:27:03 -0400
->>> Vivek Goyal <vgoyal@redhat.com> wrote:
->>>
->>>> From: Stefan Hajnoczi <stefanha@redhat.com>
->>>>
->>>> Setup a dax device.
->>>>
->>>> Use the shm capability to find the cache entry and map it.
->>>>
->>>> The DAX window is accessed by the fs/dax.c infrastructure and must have
->>>> struct pages (at least on x86).  Use devm_memremap_pages() to map the
->>>> DAX window PCI BAR and allocate struct page.
->>>>
->>>
->>> Sorry for being this late. I don't see any more recent version so I will
->>> comment here.
->>>
->>> I'm trying to figure out how is this supposed to work on s390. My concern
->>> is, that on s390 PCI memory needs to be accessed by special
->>> instructions. This is taken care of by the stuff defined in
->>> arch/s390/include/asm/io.h. E.g. we 'override' __raw_writew so it uses
->>> the appropriate s390 instruction. However if the code does not use the
->>> linux abstractions for accessing PCI memory, but assumes it can be
->>> accessed like RAM, we have a problem.
->>>
->>> Looking at this patch, it seems to me, that we might end up with exactly
->>> the case described. For example AFAICT copy_to_iter() (3) resolves to
->>> the function in lib/iov_iter.c which does not seem to cater for s390
->>> oddities.
->>>
->>> I didn't have the time to investigate this properly, and since virtio-fs
->>> is virtual, we may be able to get around what is otherwise a
->>> limitation on s390. My understanding of these areas is admittedly
->>> shallow, and since I'm not sure I'll have much more time to
->>> invest in the near future I decided to raise concern.
->>>
->>> Any opinions?
->>
->> Hi Halil,
->>
->> I don't understand s390 and how PCI works there as well. Is there any
->> other transport we can use there to map IO memory directly and access
->> using DAX?
->>
->> BTW, is DAX supported for s390.
->>
->> I am also hoping somebody who knows better can chip in. Till that time,
->> we could still use virtio-fs on s390 without DAX.
+On 01/07/2019 13:38, Auger Eric wrote:
+> Hi Marc,
 > 
-> s390 has so-called "limited" dax support, see CONFIG_FS_DAX_LIMITED.
-> In practice that means that support for PTE_DEVMAP is missing which
-> means no get_user_pages() support for dax mappings. Effectively it's
-> only useful for execute-in-place as operations like fork() and ptrace
-> of dax mappings will fail.
+> On 6/11/19 7:03 PM, Marc Zyngier wrote:
+>> The LPI translation cache needs to be discarded when an ITS command
+>> may affect the translation of an LPI (DISCARD and MAPD with V=0) or
+>> the routing of an LPI to a redistributor with disabled LPIs (MOVI,
+>> MOVALL).
+>>
+>> We decide to perform a full invalidation of the cache, irrespective
+>> of the LPI that is affected. Commands are supposed to be rare enough
+>> that it doesn't matter.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic-its.c | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 9b6b66204b97..5254bb762e1b 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -733,6 +733,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+>>  		 * don't bother here since we clear the ITTE anyway and the
+>>  		 * pending state is a property of the ITTE struct.
+>>  		 */
+>> +		vgic_its_invalidate_cache(kvm);
+>> +
+>>  		its_free_ite(kvm, ite);
+>>  		return 0;
+>>  	}
+>> @@ -768,6 +770,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+>>  	ite->collection = collection;
+>>  	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+>>  
+>> +	vgic_its_invalidate_cache(kvm);
+>> +
+>>  	return update_affinity(ite->irq, vcpu);
+>>  }
+>>  
+>> @@ -996,6 +1000,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
+>>  	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
+>>  		its_free_ite(kvm, ite);
+>>  
+>> +	vgic_its_invalidate_cache(kvm);
+>> +
+>>  	list_del(&device->dev_list);
+>>  	kfree(device);
+>>  }
+>> @@ -1249,6 +1255,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+>>  		vgic_put_irq(kvm, irq);
+>>  	}
+>>  
+>> +	vgic_its_invalidate_cache(kvm);
+> All the commands are executed with the its_lock held. Now we don't take
+> it anymore on the fast cache injection path. Don't we have a window
+> where the move has been applied at table level and the cache is not yet
+> invalidated? Same question for vgic_its_free_device().
 
+There is definitely a race, but that race is invisible from the guest's
+perspective. The guest can only assume that the command has taken effect
+once a SYNC command has been executed, and it cannot observe that the
+SYNC command has been executed before we have invalidated the cache.
 
-This is only true for the dcssblk device driver (drivers/s390/block/dcssblk.c
-and arch/s390/mm/extmem.c). 
+Does this answer your question?
 
-For what its worth, the dcssblk looks to Linux like normal memory (just above the
-previously detected memory) that can be used like normal memory. In previous time
-we even had struct pages for this memory - this was removed long ago (when it was
-still xip) to reduce the memory footprint for large dcss blocks and small memory
-guests.
-Can the CONFIG_FS_DAX_LIMITED go away if we have struct pages for that memory?
+Thanks,
 
-Now some observations: 
-- dcssblk is z/VM only (not KVM)
-- Setting CONFIG_FS_DAX_LIMITED globally as a Kconfig option depending on wether
-  a device driver is compiled in or not seems not flexible enough in case if you
-  have device driver that does have struct pages and another one that doesn't
-- I do not see a reason why we should not be able to map anything from QEMU
-  into the guest real memory via an additional KVM memory slot. 
-  We would need to handle that in the guest somehow (and not as a PCI bar),
-  register this with struct pages etc.
-- we must then look how we can create the link between the guest memory and the
-  virtio-fs driver. For virtio-ccw we might be able to add a new ccw command or
-  whatever. Maybe we could also piggy-back on some memory hotplug work from David
-  Hildenbrand (add cc).
-
-Regarding limitations on the platform:
-- while we do have PCI, the virtio devices are usually plugged via the ccw bus.
-  That implies no PCI bars. I assume you use those PCI bars only to implicitely 
-  have the location of the shared memory
-  Correct?
-- no real memory mapped I/O. Instead there are instructions that work on the mmio.
-  As I understand things, this is of no concern regarding virtio-fs as you do not
-  need mmio in the sense that a memory access of the guest to such an address 
-  triggers an exit. You just need the shared memory as a mean to have the data
-  inside the guest. Any notification is done via normal virtqueue mechanisms
-  Correct?
-
-
-Adding Heiko, maybe he remembers some details of the dcssblk/xip history.
-
+	M.
+-- 
+Jazz is not dead. It just smells funny...
