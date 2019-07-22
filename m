@@ -2,297 +2,370 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 965AD7110C
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 07:19:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C48E4711C7
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 08:18:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727467AbfGWFS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 01:18:59 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50827 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725788AbfGWFS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 01:18:59 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 45t6G86368z9sNj; Tue, 23 Jul 2019 15:18:56 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1563859136;
-        bh=LVElsxlEjj9eAHx9QwFBDQHB2x3EWkcADiMOuLqBkbc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hQRQK7RNhoYojwH1rk+tC54GBEyqOisNgPXPCTLBy00p1UAk5vK26F4a3h/y6kc29
-         J+mwuivdT8sAqB+8T6990OVqd3mu01gUUhPlpHXdneUL3TxLxdTMDRG5suBNUzwfIE
-         0DeB10jreTXvvT9O8RA1kMOsz2qF3icMMcoq2rmM=
-Date:   Tue, 23 Jul 2019 13:57:41 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
-Message-ID: <20190723035741.GR25073@umbus.fritz.box>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
- <20190715025519.GE3440@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
- <20190717030640.GG9123@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A0140E0@SHSMSX104.ccr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="YttKMwf6abDJOSyE"
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0140E0@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+        id S1728683AbfGWGSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 02:18:03 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:34271 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbfGWGSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jul 2019 02:18:03 -0400
+Received: by mail-pf1-f194.google.com with SMTP id b13so18587699pfo.1
+        for <kvm@vger.kernel.org>; Mon, 22 Jul 2019 23:18:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=V4r/sCkqL/htcfgi7PT7rVIqiScW9vEz4Go7KVkYDFY=;
+        b=K+jYJnk6dd83Jpw4wOFDOB5pJ5xrlDApuT8no2ab/UDzPk+mdZm6ZKc0yETEoM5QsY
+         q2XWiCumbw9R1W5uq/NvrQysXzGfO3p4eAIVkrMQ/ynYrszADoMfTcDK4qoQqjN+O83t
+         Z66txXqCcrs5xsF+0SkVoxNcLb+yYVROe1Zl5jphM8BZEmtn6rZnlsPp4jZChvg7t/mp
+         u2sOCJgWiXsDgkLmg/BeLqwc/wjGfT+S3cA7xcxq3LhuuVQJ0FVajcrlxCL6qcpqq5sE
+         C3OhMABwhwN2BWC07KBW3RdnumMBjD8oUpocRRpiVb0RP8gcH7xysVOMRvYAKnyYBzy2
+         RU+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=V4r/sCkqL/htcfgi7PT7rVIqiScW9vEz4Go7KVkYDFY=;
+        b=re19Xhl4lw2g03H2U44uJykVWqySYWb2AJAqfU/gBc4WEJOIjki62MvL3/t4BdIZCm
+         YMu+8s45Cfv+OkOev4eDp2kDGnnb6LXoyY1F5gFgitK/vIjGjKpEd4f+DwgmCzmsw0WJ
+         mX6Ude/lKFkrt7o58xeqadNeWxHyBMGWCoGqouJvBm0Apd7hWkrzoWmKDmIH9CqP2/cZ
+         FHqsZVMJY255PNhiBnweL+fRnfDLI+QHVATM6l3bOWaMrsy1/pSU5zH0cua2PXPH6uYa
+         Oz7tspK32bGZuJmrZn3Dr3MDjg19daCgBh8F4Dax0LqzBypFBAhLvXELc1J4gp0ZG1nG
+         nYLg==
+X-Gm-Message-State: APjAAAXvHOd5HjlrpzTu39rZSUwrTy6iDfW4/ayRo5bm+TlOT95r+JYl
+        MV8hDlfOZoaMUDFahwYeYoI=
+X-Google-Smtp-Source: APXvYqzE9u63XJzGYWt99+4WJ8SRzPvXuj7xZsRtbaupJqMW+JfXFut9cAZsVvcgawPcG6sFNI8p8w==
+X-Received: by 2002:a63:60a:: with SMTP id 10mr43843643pgg.381.1563862682232;
+        Mon, 22 Jul 2019 23:18:02 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id j6sm27151727pfa.141.2019.07.22.23.18.00
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 22 Jul 2019 23:18:01 -0700 (PDT)
+From:   Nadav Amit <nadav.amit@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        Nadav Amit <nadav.amit@gmail.com>
+Subject: [kvm-unit-tests PATCH v3] x86: Support environments without test-devices
+Date:   Mon, 22 Jul 2019 15:55:40 -0700
+Message-Id: <20190722225540.43572-1-nadav.amit@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Enable to run the tests when test-device is not present (e.g.,
+bare-metal). Users can provide the number of CPUs and ram size through
+kernel parameters.
 
---YttKMwf6abDJOSyE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Ubuntu that uses grub, for example, the tests can be run by copying a
+test to the boot directory (/boot) and adding a menu-entry to grub
+(e.g., by editing /etc/grub.d/40_custom):
 
-On Mon, Jul 22, 2019 at 07:02:51AM +0000, Liu, Yi L wrote:
-> > From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On B=
-ehalf
-> > Of David Gibson
-> > Sent: Wednesday, July 17, 2019 11:07 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementati=
-on
-> >=20
-> > On Tue, Jul 16, 2019 at 10:25:55AM +0000, Liu, Yi L wrote:
-> > > > From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] =
-On
-> > Behalf
-> > > > Of David Gibson
-> > > > Sent: Monday, July 15, 2019 10:55 AM
-> > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implemen=
-tation
-> > > >
-> > > > On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
-> > > > > This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_=
-pasid().
-> > > > > These two functions are used to propagate guest pasid allocation =
-and
-> > > > > free requests to host via vfio container ioctl.
-> > > >
-> > > > As I said in an earlier comment, I think doing this on the device is
-> > > > conceptually incorrect.  I think we need an explcit notion of an SVM
-> > > > context (i.e. the namespace in which all the PASIDs live) - which w=
-ill
-> > > > IIUC usually be shared amongst multiple devices.  The create and fr=
-ee
-> > > > PASID requests should be on that object.
-> > >
-> > > Actually, the allocation is not doing on this device. System wide, it=
- is
-> > > done on a container. So not sure if it is the API interface gives you=
- a
-> > > sense that this is done on device.
-> >=20
-> > Sorry, I should have been clearer.  I can see that at the VFIO level
-> > it is done on the container.  However the function here takes a bus
-> > and devfn, so this qemu internal interface is per-device, which
-> > doesn't really make sense.
->=20
-> Got it. The reason here is to pass the bus and devfn info, so that VFIO
-> can figure out a container for the operation. So far in QEMU, there is
-> no good way to connect the vIOMMU emulator and VFIO regards to
-> SVM.
+  menuentry 'idt_test' {
+	set root='[ROOT]'
+	multiboot [BOOT_RELATIVE]/[TEST].flat [PARAMETERS]
+	module params.initrd
+  }
 
-Right, and I think that's an indication that we're not modelling
-something in qemu that we should be.
+Replace:
+  * [ROOT] with `grub-probe --target=bios_hints /boot`
+  * [BOOT_RELATIVE] with `grub-mkrelpath /boot`
+  * [TEST] with the test executed
+  * [PARAMETERS] with the test parameters
 
-> hw/pci layer is a choice based on some previous discussion. But
-> yes, I agree with you that we may need to have an explicit notion for
-> SVM. Do you think it is good to introduce a new abstract layer for SVM
-> (may name as SVMContext).
+params.initrd, which would be located on the boot directory should
+describe the machine and tell the test infrastructure that a test
+device is not present and boot-loader was used (the bootloader and qemu
+deliver test . For example for a 4 core machines with 4GB of
+memory:
 
-I think so, yes.
+  NR_CPUS=4
+  MEMSIZE=4096
+  TEST_DEVICE=0
+  BOOTLOADER=1
 
-If nothing else, I expect we'll need this concept if we ever want to
-be able to implement SVM for emulated devices (which could be useful
-for debugging, even if it's not something you'd do in production).
+Since we do not really use E820, using more than 4GB is likely to fail
+due to holes.
 
-> The idea would be that vIOMMU maintain
-> the SVMContext instances and expose explicit interface for VFIO to get
-> it. Then VFIO register notifiers on to the SVMContext. When vIOMMU
-> emulator wants to do PASID alloc/free, it fires the corresponding
-> notifier. After call into VFIO, the notifier function itself figure out t=
-he
-> container it is bound. In this way, it's the duty of vIOMMU emulator to
-> figure out a proper notifier to fire. From interface point of view, it is=
- no
-> longer per-device.
+Finally, do not forget to run update-grub. Remember that the output goes
+to the serial port.
 
-Exactly.
+Cc: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 
-> Also, it leaves the PASID management details to
-> vIOMMU emulator as it can be vendor specific. Does it make sense?
-> Also, I'd like to know if you have any other idea on it. That would
-> surely be helpful. :-)
->=20
-> > > Also, curious on the SVM context
-> > > concept, do you mean it a per-VM context or a per-SVM usage context?
-> > > May you elaborate a little more. :-)
-> >=20
-> > Sorry, I'm struggling to find a good term for this.  By "context" I
-> > mean a namespace containing a bunch of PASID address spaces, those
-> > PASIDs are then visible to some group of devices.
->=20
-> I see. May be the SVMContext instance above can include multiple PASID
-> address spaces. And again, I think this relationship should be maintained
-> in vIOMMU emulator.
->=20
-> Thanks,
-> Yi Liu
->=20
-> >=20
-> > >
-> > > Thanks,
-> > > Yi Liu
-> > >
-> > > > >
-> > > > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > > > Cc: Peter Xu <peterx@redhat.com>
-> > > > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > > > > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > > > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > > > > ---
-> > > > >  hw/vfio/pci.c | 61
-> > > > +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > > > >  1 file changed, 61 insertions(+)
-> > > > >
-> > > > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > > > > index ce3fe96..ab184ad 100644
-> > > > > --- a/hw/vfio/pci.c
-> > > > > +++ b/hw/vfio/pci.c
-> > > > > @@ -2690,6 +2690,65 @@ static void
-> > vfio_unregister_req_notifier(VFIOPCIDevice
-> > > > *vdev)
-> > > > >      vdev->req_enabled =3D false;
-> > > > >  }
-> > > > >
-> > > > > +static int vfio_pci_device_request_pasid_alloc(PCIBus *bus,
-> > > > > +                                               int32_t devfn,
-> > > > > +                                               uint32_t min_pasi=
-d,
-> > > > > +                                               uint32_t max_pasi=
-d)
-> > > > > +{
-> > > > > +    PCIDevice *pdev =3D bus->devices[devfn];
-> > > > > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > > > > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
-> > > > > +    struct vfio_iommu_type1_pasid_request req;
-> > > > > +    unsigned long argsz;
-> > > > > +    int pasid;
-> > > > > +
-> > > > > +    argsz =3D sizeof(req);
-> > > > > +    req.argsz =3D argsz;
-> > > > > +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
-> > > > > +    req.min_pasid =3D min_pasid;
-> > > > > +    req.max_pasid =3D max_pasid;
-> > > > > +
-> > > > > +    rcu_read_lock();
-> > > > > +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &re=
-q);
-> > > > > +    if (pasid < 0) {
-> > > > > +        error_report("vfio_pci_device_request_pasid_alloc:"
-> > > > > +                     " request failed, contanier: %p", container=
-);
-> > > > > +    }
-> > > > > +    rcu_read_unlock();
-> > > > > +    return pasid;
-> > > > > +}
-> > > > > +
-> > > > > +static int vfio_pci_device_request_pasid_free(PCIBus *bus,
-> > > > > +                                              int32_t devfn,
-> > > > > +                                              uint32_t pasid)
-> > > > > +{
-> > > > > +    PCIDevice *pdev =3D bus->devices[devfn];
-> > > > > +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> > > > > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
-> > > > > +    struct vfio_iommu_type1_pasid_request req;
-> > > > > +    unsigned long argsz;
-> > > > > +    int ret =3D 0;
-> > > > > +
-> > > > > +    argsz =3D sizeof(req);
-> > > > > +    req.argsz =3D argsz;
-> > > > > +    req.flag =3D VFIO_IOMMU_PASID_FREE;
-> > > > > +    req.pasid =3D pasid;
-> > > > > +
-> > > > > +    rcu_read_lock();
-> > > > > +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> > > > > +    if (ret !=3D 0) {
-> > > > > +        error_report("vfio_pci_device_request_pasid_free:"
-> > > > > +                     " request failed, contanier: %p", container=
-);
-> > > > > +    }
-> > > > > +    rcu_read_unlock();
-> > > > > +    return ret;
-> > > > > +}
-> > > > > +
-> > > > > +static PCIPASIDOps vfio_pci_pasid_ops =3D {
-> > > > > +    .alloc_pasid =3D vfio_pci_device_request_pasid_alloc,
-> > > > > +    .free_pasid =3D vfio_pci_device_request_pasid_free,
-> > > > > +};
-> > > > > +
-> > > > >  static void vfio_realize(PCIDevice *pdev, Error **errp)
-> > > > >  {
-> > > > >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-> > > > > @@ -2991,6 +3050,8 @@ static void vfio_realize(PCIDevice *pdev, E=
-rror
-> > **errp)
-> > > > >      vfio_register_req_notifier(vdev);
-> > > > >      vfio_setup_resetfn_quirk(vdev);
-> > > > >
-> > > > > +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
-> > > > > +
-> > > > >      return;
-> > > > >
-> > > > >  out_teardown:
-> > > >
-> > >
-> >=20
->=20
+---
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+v2->v3:
+ * Adding argument to argv when bootloader is used [Andrew]
+ * Avoid unnecessary check of test-device availability [Andrew]
 
---YttKMwf6abDJOSyE
-Content-Type: application/pgp-signature; name="signature.asc"
+v1->v2:
+ * Using initrd to hold configuration override [Andrew]
+ * Adapting vmx, tscdeadline_latency not to ignore the first argument
+   on native
+---
+ lib/argv.c      | 13 +++++++++----
+ lib/argv.h      |  1 +
+ lib/x86/fwcfg.c | 28 ++++++++++++++++++++++++++++
+ lib/x86/fwcfg.h | 10 ++++++++++
+ lib/x86/setup.c |  5 +++++
+ x86/apic.c      |  4 +++-
+ x86/cstart64.S  |  8 ++++++--
+ x86/eventinj.c  | 17 ++++++++++++++---
+ x86/vmx_tests.c |  5 +++++
+ 9 files changed, 81 insertions(+), 10 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/lib/argv.c b/lib/argv.c
+index f0e183a..0312d74 100644
+--- a/lib/argv.c
++++ b/lib/argv.c
+@@ -53,12 +53,17 @@ static void setup_args(const char *args)
+ 	__setup_args();
+ }
+ 
+-void setup_args_progname(const char *args)
++void add_setup_arg(const char *arg)
+ {
+-	__argv[0] = copy_ptr;
+-	strcpy(__argv[0], auxinfo.progname);
+-	copy_ptr += strlen(auxinfo.progname) + 1;
++	__argv[__argc] = copy_ptr;
++	strcpy(__argv[__argc], arg);
++	copy_ptr += strlen(arg) + 1;
+ 	++__argc;
++}
++
++void setup_args_progname(const char *args)
++{
++	add_setup_arg(auxinfo.progname);
+ 	setup_args(args);
+ }
+ 
+diff --git a/lib/argv.h b/lib/argv.h
+index 2104dd4..e5fcf84 100644
+--- a/lib/argv.h
++++ b/lib/argv.h
+@@ -8,3 +8,4 @@
+ extern void __setup_args(void);
+ extern void setup_args_progname(const char *args);
+ extern void setup_env(char *env, int size);
++extern void add_setup_arg(const char *arg);
+diff --git a/lib/x86/fwcfg.c b/lib/x86/fwcfg.c
+index c52b445..d8d797f 100644
+--- a/lib/x86/fwcfg.c
++++ b/lib/x86/fwcfg.c
+@@ -1,14 +1,42 @@
+ #include "fwcfg.h"
+ #include "smp.h"
++#include "libcflat.h"
+ 
+ static struct spinlock lock;
+ 
++static long fw_override[FW_CFG_MAX_ENTRY];
++
++bool no_test_device;
++
++void read_cfg_override(void)
++{
++	const char *str;
++	int i;
++
++	/* Initialize to negative value that would be considered as invalid */
++	for (i = 0; i < FW_CFG_MAX_ENTRY; i++)
++		fw_override[i] = -1;
++
++	if ((str = getenv("NR_CPUS")))
++		fw_override[FW_CFG_NB_CPUS] = atol(str);
++
++	/* MEMSIZE is in megabytes */
++	if ((str = getenv("MEMSIZE")))
++		fw_override[FW_CFG_RAM_SIZE] = atol(str) * 1024 * 1024;
++
++	if ((str = getenv("TEST_DEVICE")))
++		no_test_device = !atol(str);
++}
++
+ static uint64_t fwcfg_get_u(uint16_t index, int bytes)
+ {
+     uint64_t r = 0;
+     uint8_t b;
+     int i;
+ 
++    if (fw_override[index] >= 0)
++	    return fw_override[index];
++
+     spin_lock(&lock);
+     asm volatile ("out %0, %1" : : "a"(index), "d"((uint16_t)BIOS_CFG_IOPORT));
+     for (i = 0; i < bytes; ++i) {
+diff --git a/lib/x86/fwcfg.h b/lib/x86/fwcfg.h
+index e0836ca..88dc7a7 100644
+--- a/lib/x86/fwcfg.h
++++ b/lib/x86/fwcfg.h
+@@ -2,6 +2,7 @@
+ #define FWCFG_H
+ 
+ #include <stdint.h>
++#include <stdbool.h>
+ 
+ #define FW_CFG_SIGNATURE        0x00
+ #define FW_CFG_ID               0x01
+@@ -33,6 +34,15 @@
+ #define FW_CFG_SMBIOS_ENTRIES (FW_CFG_ARCH_LOCAL + 1)
+ #define FW_CFG_IRQ0_OVERRIDE (FW_CFG_ARCH_LOCAL + 2)
+ 
++extern bool no_test_device;
++
++void read_cfg_override(void);
++
++static inline bool test_device_enabled(void)
++{
++	return !no_test_device;
++}
++
+ uint8_t fwcfg_get_u8(unsigned index);
+ uint16_t fwcfg_get_u16(unsigned index);
+ uint32_t fwcfg_get_u32(unsigned index);
+diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+index 28bbcf4..3a2741a 100644
+--- a/lib/x86/setup.c
++++ b/lib/x86/setup.c
+@@ -8,6 +8,7 @@
+ #include "libcflat.h"
+ #include "fwcfg.h"
+ #include "alloc_phys.h"
++#include "argv.h"
+ 
+ extern char edata;
+ 
+@@ -66,7 +67,11 @@ void setup_libcflat(void)
+ 	if (initrd) {
+ 		/* environ is currently the only file in the initrd */
+ 		u32 size = MIN(initrd_size, ENV_SIZE);
++		const char *str;
++
+ 		memcpy(env, initrd, size);
+ 		setup_env(env, size);
++		if ((str = getenv("BOOTLOADER")) && atol(str) != 0)
++			add_setup_arg("bootloader");
+ 	}
+ }
+diff --git a/x86/apic.c b/x86/apic.c
+index 7617351..f01a5e7 100644
+--- a/x86/apic.c
++++ b/x86/apic.c
+@@ -6,6 +6,7 @@
+ #include "isr.h"
+ #include "msr.h"
+ #include "atomic.h"
++#include "fwcfg.h"
+ 
+ #define MAX_TPR			0xf
+ 
+@@ -655,7 +656,8 @@ int main(void)
+ 
+     test_self_ipi();
+     test_physical_broadcast();
+-    test_pv_ipi();
++    if (test_device_enabled())
++        test_pv_ipi();
+ 
+     test_sti_nmi();
+     test_multiple_nmi();
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 1889c6b..23c1bd4 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -246,8 +246,6 @@ start64:
+ 	call mask_pic_interrupts
+ 	call enable_apic
+ 	call save_id
+-	call smp_init
+-	call enable_x2apic
+ 	mov mb_boot_info(%rip), %rbx
+ 	mov %rbx, %rdi
+ 	call setup_multiboot
+@@ -255,6 +253,12 @@ start64:
+ 	mov mb_cmdline(%rbx), %eax
+ 	mov %rax, __args(%rip)
+ 	call __setup_args
++
++	/* Read the configuration before running smp_init */
++	call read_cfg_override
++	call smp_init
++	call enable_x2apic
++
+ 	mov __argc(%rip), %edi
+ 	lea __argv(%rip), %rsi
+ 	lea __environ(%rip), %rdx
+diff --git a/x86/eventinj.c b/x86/eventinj.c
+index 901b9db..c38848e 100644
+--- a/x86/eventinj.c
++++ b/x86/eventinj.c
+@@ -8,6 +8,7 @@
+ #include "vmalloc.h"
+ #include "alloc_page.h"
+ #include "delay.h"
++#include "fwcfg.h"
+ 
+ #ifdef __x86_64__
+ #  define R "r"
+@@ -28,7 +29,11 @@ static void apic_self_nmi(void)
+ 	apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_NMI | APIC_INT_ASSERT, 0);
+ }
+ 
+-#define flush_phys_addr(__s) outl(__s, 0xe4)
++#define flush_phys_addr(__s) do {					\
++		if (test_device_enabled())				\
++			outl(__s, 0xe4);				\
++	} while (0)
++
+ #define flush_stack() do {						\
+ 		int __l;						\
+ 		flush_phys_addr(virt_to_phys(&__l));			\
+@@ -136,6 +141,8 @@ extern void do_iret(ulong phys_stack, void *virt_stack);
+ // Return to same privilege level won't pop SS or SP, so
+ // save it in RDX while we run on the nested stack
+ 
++extern bool no_test_device;
++
+ asm("do_iret:"
+ #ifdef __x86_64__
+ 	"mov %rdi, %rax \n\t"		// phys_stack
+@@ -148,10 +155,14 @@ asm("do_iret:"
+ 	"pushf"W" \n\t"
+ 	"mov %cs, %ecx \n\t"
+ 	"push"W" %"R "cx \n\t"
+-	"push"W" $1f \n\t"
++	"push"W" $2f \n\t"
++
++	"cmpb $0, no_test_device\n\t"	// see if need to flush
++	"jnz 1f\n\t"
+ 	"outl %eax, $0xe4 \n\t"		// flush page
++	"1: \n\t"
+ 	"iret"W" \n\t"
+-	"1: xchg %"R "dx, %"R "sp \n\t"	// point to old stack
++	"2: xchg %"R "dx, %"R "sp \n\t"	// point to old stack
+ 	"ret\n\t"
+    );
+ 
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 8ad2674..c4b37ca 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -8162,6 +8162,11 @@ static void vmx_apic_passthrough(bool set_irq_line_from_thread)
+ 		return;
+ 	}
+ 
++	/* Test device is required for generating IRQs */
++	if (!test_device_enabled()) {
++		report_skip(__func__);
++		return;
++	}
+ 	u64 cpu_ctrl_0 = CPU_SECONDARY;
+ 	u64 cpu_ctrl_1 = 0;
+ 
+-- 
+2.19.1
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl02hbUACgkQbDjKyiDZ
-s5LSWBAAwQ5upHdyGvRP2wAh73heUVk9nDRZemvfdJzIt9XKNspTs8U5HQifgTAE
-uUeG/0zuykWzmfkdblvD22LCE5+PKFWSA2RQpJm7g/XqmWPt6EkFwViX7QkVKgJu
-+RCHRtAbw4LS0x5Rav1ginzsKeeAsO8GDJlOupNILe0/fpcHq+DKCZPcJX7HanYH
-12yfQLcP0KfaRO0O962kQZ0yekPokvAVHej78Jr0hLRJSTvLtVVmY68/Vz0fZK/y
-EoaCgp7r3uBvCa2EAEYXmGONK8IAC7+fier4/BeM6upYQqsh5Ek8LPJiP3LwC1T5
-Gw2KLG6sN0NH0mhsDwIOz6c0e9z9pEi5BRVnEFSDCAdR7Ax9XgdQ00salYTfFTgX
-qZm4URcpVOc7JRf/yJoJCOzE/jap7zAx+P/4+SLA3odVlftUUtqCFiA7Uz3JjGRc
-YgrrJOOiawp3atgmDGw6ne6+AbKKBAbXTcwbX9/VIEwZFViOzH3OZDohKHBBPgmN
-gOD9Zy/0GVJpwf5B8TirLEQj2jh9XVCH/D41ly3X8tP/dcGQT4FO6tEEZWEurwLz
-hHqyRiBTBhyvIGH/rKZanKH4YSwI5usnpynoGwS4vtadviMUzMJMfB/ee+hUn8rp
-OLQ9b43yGIhqSoknxl5SgkBOp8OBRGZkez36JRmX9Xl7HcK0I7M=
-=sNH7
------END PGP SIGNATURE-----
-
---YttKMwf6abDJOSyE--
