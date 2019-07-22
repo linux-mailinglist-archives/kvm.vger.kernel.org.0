@@ -2,211 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 031736F875
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 06:26:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB2D66F87B
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 06:28:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727558AbfGVE03 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 00:26:29 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:38708 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727404AbfGVE03 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jul 2019 00:26:29 -0400
-Received: by mail-pl1-f194.google.com with SMTP id az7so18552024plb.5;
-        Sun, 21 Jul 2019 21:26:28 -0700 (PDT)
+        id S1727403AbfGVE2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jul 2019 00:28:51 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:39685 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726024AbfGVE2v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 00:28:51 -0400
+Received: by mail-ot1-f66.google.com with SMTP id r21so32777000otq.6;
+        Sun, 21 Jul 2019 21:28:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=KkQ+Pf6+qToCR37/fN3WwGFZWrKUQApYlq4rvuPnwdM=;
-        b=UMHZ+vKEgfICcULWelNdpMFtjDrGGeWbirtEqMLDBazIKNkXIxBOzORVSj+IWXigfP
-         lW1G14yX9+pjePMWtHJPv7gfsGkl4FV7J3/ZOg2KcE6ShNvwFpRdr3gw5dZZqFgBiPrD
-         6gKKq5dMkxfQItddrXM78QNAIa1SibQIP74lyXnUWt6dfu/VeiwSfkruWQ6hj8uugI8C
-         urHrXZMVrJGUz3LGwE7g5HTCHr0eYl6B20LmOw6ccRNCDyKTO42Ynvawx/MQbVpBmbDx
-         gAQPv0v0i06QObd4a7okMRUrpyO7dOw/lRzWU/JAJKY7sps8JiNBYCTVW0IK/qEb8xNv
-         +lbg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=u9bIll45IkEv61GnSgi6Wk39bsONFi+netx8AhCfi7w=;
+        b=NHUxNR/FbcDIls4wN/7K5xWw6t8TG9WA5uwgNKY3twE8BQCdSpTorc48b0xlAnS14F
+         qUf7KXocl2+7NbhgxJd/93i5J81zHxQH/vSasc6+aKGXME0g61VTCydf1sfZTyGkQi41
+         du3UKdzrgvosoE3hO50QGf/6dVGjB9BfHLL7OMjoR7tnnZRRhZux2fYTAmF49Sz0VtSv
+         Ykp6WapqR6L55lEqWd7lzmc9YCMJvZrVEQbiF+Q02NuT2HeOcmfY1NGXjIr0DGNHUkMN
+         a3Im6biTl3Z/+kKKoSj64+QOG4Ah4XLhBUdUA36xDzxETxN4PPw3bzzQNbYRs7VCB4vh
+         2urA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=KkQ+Pf6+qToCR37/fN3WwGFZWrKUQApYlq4rvuPnwdM=;
-        b=c7f2wA/4YUeVUwtAF9kHkJPSbj78e1QnQLHexDP4CWnuXPfMyXVISEIzxPzkTnOYYs
-         GjQaVI5i3KllYtPfkJL8MOAjfzGyULE7QV1pwtu7pnLpWrp9WVVwlOqfonSjZMq9ZelM
-         h3kI+CnPmwww61ifGwtlQoAu/6OtsnUAVaZEN7UTaH4bQja7o9Z7otw9haLfVRY/VsE8
-         Rkicp0ZH1fSeye+cKT0WRLXRUv2XZdWtV1hwKWimoOaTI0Dpt0PiZ4Gwqwd7lBD8F4PX
-         A2lnqx6F0XjQQ+MqamTHAsS8yMJXUoCKGThyDiH5d4DFq/tpG6S6/hj/TR6FuZ7D80mJ
-         6udg==
-X-Gm-Message-State: APjAAAVDUiZbZyPpjEDxkJbM5WlI/mutTX9vJZ5SWSp8o/B5rqWzAJkk
-        pYVCoy35g72ljO9f7ZpT5AuD6WyDOLc=
-X-Google-Smtp-Source: APXvYqzooHPsRlSTibc76awHb/m7uhXARacTdJ6Wh1ZeBuu2i/mFRc3kI4AmUc//gnr1bDDlhch9yQ==
-X-Received: by 2002:a17:902:b08a:: with SMTP id p10mr73916631plr.83.1563769588393;
-        Sun, 21 Jul 2019 21:26:28 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id r9sm17108217pjq.3.2019.07.21.21.26.26
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 21 Jul 2019 21:26:27 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 2/2] KVM: X86: Dynamically allocate user_fpu
-Date:   Mon, 22 Jul 2019 12:26:21 +0800
-Message-Id: <1563769581-20293-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1563769581-20293-1-git-send-email-wanpengli@tencent.com>
-References: <1563769581-20293-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=u9bIll45IkEv61GnSgi6Wk39bsONFi+netx8AhCfi7w=;
+        b=Ykx0QjP1k4xxvpVsgucWns1cTR52mRGPcFAWT/8T1V15DmtA6ojMFRhlzGq6k4eB6n
+         Gkv0b1l3be/okOErOeUVosgju0Di+yPeh2QDymkzXgMzcTk0djCleLMOe8cihUc64z3p
+         /k/LEmD6PVynFjDHjOkEJgI7nvwYCvf614+zD4o8/PBvy4LO0z5Pzxq3o4bogOACSW2I
+         NQbzLj0BXThL5WTGr8p3tgSkn7ow9pNJpS4U/t7l5boWD+5ZVwawc3lnSieyizhIvxqp
+         lu1kIZZWvxtzs+Avi0Tvn7vAoQPoyBGfH0X2keFmc2QiuQMOgMO5mZG12mHQFj4qfi5v
+         /Eww==
+X-Gm-Message-State: APjAAAWccNWQWDWlTy4jQHDw44YrQciNUBj1zdiNKfokyHniuotFzBxx
+        G9mqbgWSB/PhUx8cGZgXrj29Hgpripg4M8/Aa24=
+X-Google-Smtp-Source: APXvYqyxpVloP1FtjqIXhMKYQbprE+yYhKEYjJOhaWjBcK4B/AL3PjudcWZ4D5hPMOwpbMl/tKjdl9D1Dt9gJ30lSqw=
+X-Received: by 2002:a9d:2c47:: with SMTP id f65mr50830747otb.185.1563769730249;
+ Sun, 21 Jul 2019 21:28:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <217248af-e980-9cb0-ff0d-9773413b9d38@thomaslambertz.de>
+ <CANRm+CxWbkr0=DB7DBdaQOsTTt0XS5vSk_BRL2iFeAAm81H8Bg@mail.gmail.com> <3ae96202-a121-70a9-fe00-4b5bb4970242@redhat.com>
+In-Reply-To: <3ae96202-a121-70a9-fe00-4b5bb4970242@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 22 Jul 2019 12:28:42 +0800
+Message-ID: <CANRm+CwiLn-FUM89t-rg-9za-e28KX9XQo5zVs3_XAq+Ya_0vA@mail.gmail.com>
+Subject: Re: [5.2 regression] x86/fpu changes cause crashes in KVM guest
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Lambertz <mail@thomaslambertz.de>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Rik van Riel <riel@surriel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Marc Orr <marcorr@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Fri, 19 Jul 2019 at 19:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 19/07/19 10:59, Wanpeng Li wrote:
+> > https://lkml.org/lkml/2017/11/14/891, "The scheduler will save the
+> > guest fpu context when a vCPU thread is preempted, and restore it when
+> > it is scheduled back in." But I can't find any scheduler codes do
+> > this.
+>
+> That's because applying commit 240c35a37 was completely wrong.  The idea
+> before commit 240c35a37 was that you have the following FPU states:
+>
+>                userspace (QEMU)             guest
+> ---------------------------------------------------------------------------
+>                processor                    vcpu->arch.guest_fpu
+> >>> KVM_RUN: kvm_load_guest_fpu
+>                vcpu->arch.user_fpu          processor
+> >>> preempt out
+>                vcpu->arch.user_fpu          current->thread.fpu
+> >>> preempt in
+>                vcpu->arch.user_fpu          processor
+> >>> back to userspace
+> >>> kvm_put_guest_fpu
+>                processor                    vcpu->arch.guest_fpu
+> ---------------------------------------------------------------------------
+>
+> After removing user_fpu, QEMU's FPU state is destroyed when KVM_RUN is
+> preempted.  So that's already messed up (I'll send a revert), and given
+> the diagram above your patch makes total sense.
+>
+> With the new lazy model we want to hook into kvm_vcpu_arch_load and get
+> the state back to the processor from current->thread.fpu, and indeed
+> switch_fpu_return is essentially copy_kernel_to_fpregs(&current->thread.
+> fpu->state).
+>
+> However I would keep the fpregs_assert_state_consistent in
+> kvm_arch_vcpu_load, and also
+> WARN_ON_ONCE(test_thread_flag(TIF_NEED_FPU_LOAD)) in vcpu_enter_guest.
 
-After reverting commit 240c35a3783a (kvm: x86: Use task structs fpu field
-for user), struct kvm_vcpu is 19456 bytes on my server, PAGE_ALLOC_COSTLY_ORDER(3)
-is the order at which allocations are deemed costly to service. In serveless
-scenario, one host can service hundreds/thoudands firecracker/kata-container
-instances, howerver, new instance will fail to launch after memory is too
-fragmented to allocate kvm_vcpu struct on host, this was observed in some
-cloud provider product environments.
+Looks good to me, just send out two patches rebase on the revert.
 
-This patch dynamically allocates user_fpu, kvm_vcpu is 15168 bytes now on my
-Skylake server.
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/svm.c              | 13 ++++++++++++-
- arch/x86/kvm/vmx/vmx.c          | 13 ++++++++++++-
- arch/x86/kvm/x86.c              |  4 ++--
- 4 files changed, 27 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4f938ac..7b0a4ee 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -616,7 +616,7 @@ struct kvm_vcpu_arch {
- 	 * "guest_fpu" state here contains the guest FPU context, with the
- 	 * host PRKU bits.
- 	 */
--	struct fpu user_fpu;
-+	struct fpu *user_fpu;
- 	struct fpu *guest_fpu;
- 
- 	u64 xcr0;
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 19f69df..7eafc69 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2143,12 +2143,20 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
- 		goto out;
- 	}
- 
-+	svm->vcpu.arch.user_fpu = kmem_cache_zalloc(x86_fpu_cache,
-+						     GFP_KERNEL_ACCOUNT);
-+	if (!svm->vcpu.arch.user_fpu) {
-+		printk(KERN_ERR "kvm: failed to allocate kvm userspace's fpu\n");
-+		err = -ENOMEM;
-+		goto free_partial_svm;
-+	}
-+
- 	svm->vcpu.arch.guest_fpu = kmem_cache_zalloc(x86_fpu_cache,
- 						     GFP_KERNEL_ACCOUNT);
- 	if (!svm->vcpu.arch.guest_fpu) {
- 		printk(KERN_ERR "kvm: failed to allocate vcpu's fpu\n");
- 		err = -ENOMEM;
--		goto free_partial_svm;
-+		goto free_user_fpu;
- 	}
- 
- 	err = kvm_vcpu_init(&svm->vcpu, kvm, id);
-@@ -2211,6 +2219,8 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
- 	kvm_vcpu_uninit(&svm->vcpu);
- free_svm:
- 	kmem_cache_free(x86_fpu_cache, svm->vcpu.arch.guest_fpu);
-+free_user_fpu:
-+	kmem_cache_free(x86_fpu_cache, svm->vcpu.arch.user_fpu);
- free_partial_svm:
- 	kmem_cache_free(kvm_vcpu_cache, svm);
- out:
-@@ -2241,6 +2251,7 @@ static void svm_free_vcpu(struct kvm_vcpu *vcpu)
- 	__free_page(virt_to_page(svm->nested.hsave));
- 	__free_pages(virt_to_page(svm->nested.msrpm), MSRPM_ALLOC_ORDER);
- 	kvm_vcpu_uninit(vcpu);
-+	kmem_cache_free(x86_fpu_cache, svm->vcpu.arch.user_fpu);
- 	kmem_cache_free(x86_fpu_cache, svm->vcpu.arch.guest_fpu);
- 	kmem_cache_free(kvm_vcpu_cache, svm);
- }
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a279447..074385c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6598,6 +6598,7 @@ static void vmx_free_vcpu(struct kvm_vcpu *vcpu)
- 	free_loaded_vmcs(vmx->loaded_vmcs);
- 	kfree(vmx->guest_msrs);
- 	kvm_vcpu_uninit(vcpu);
-+	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.user_fpu);
- 	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.guest_fpu);
- 	kmem_cache_free(kvm_vcpu_cache, vmx);
- }
-@@ -6613,12 +6614,20 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 	if (!vmx)
- 		return ERR_PTR(-ENOMEM);
- 
-+	vmx->vcpu.arch.user_fpu = kmem_cache_zalloc(x86_fpu_cache,
-+			GFP_KERNEL_ACCOUNT);
-+	if (!vmx->vcpu.arch.user_fpu) {
-+		printk(KERN_ERR "kvm: failed to allocate kvm userspace's fpu\n");
-+		err = -ENOMEM;
-+		goto free_partial_vcpu;
-+	}
-+
- 	vmx->vcpu.arch.guest_fpu = kmem_cache_zalloc(x86_fpu_cache,
- 			GFP_KERNEL_ACCOUNT);
- 	if (!vmx->vcpu.arch.guest_fpu) {
- 		printk(KERN_ERR "kvm: failed to allocate vcpu's fpu\n");
- 		err = -ENOMEM;
--		goto free_partial_vcpu;
-+		goto free_user_fpu;
- 	}
- 
- 	vmx->vpid = allocate_vpid();
-@@ -6721,6 +6730,8 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- free_vcpu:
- 	free_vpid(vmx->vpid);
- 	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.guest_fpu);
-+free_user_fpu:
-+	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.user_fpu);
- free_partial_vcpu:
- 	kmem_cache_free(kvm_vcpu_cache, vmx);
- 	return ERR_PTR(err);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bdcd250..09dbc93 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8272,7 +8272,7 @@ static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
- {
- 	fpregs_lock();
- 
--	copy_fpregs_to_fpstate(&vcpu->arch.user_fpu);
-+	copy_fpregs_to_fpstate(vcpu->arch.user_fpu);
- 	/* PKRU is separately restored in kvm_x86_ops->run.  */
- 	__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
- 				~XFEATURE_MASK_PKRU);
-@@ -8289,7 +8289,7 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
- 	fpregs_lock();
- 
- 	copy_fpregs_to_fpstate(vcpu->arch.guest_fpu);
--	copy_kernel_to_fpregs(&vcpu->arch.user_fpu.state);
-+	copy_kernel_to_fpregs(&vcpu->arch.user_fpu->state);
- 
- 	fpregs_mark_activate();
- 	fpregs_unlock();
--- 
-2.7.4
-
+Regards,
+Wanpeng Li
