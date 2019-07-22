@@ -2,130 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 845CD6F8DC
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 07:28:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A6CC6F8DF
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 07:28:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbfGVF2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 01:28:17 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:46980 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbfGVF2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jul 2019 01:28:16 -0400
-Received: by mail-ot1-f66.google.com with SMTP id z23so10574770ote.13;
-        Sun, 21 Jul 2019 22:28:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=h+i9jewAdtfLLPC8niA+t9B34gWGVVKpI03gRjn4UC4=;
-        b=YP5cgo1NXLokkSmA5Uny5czJ4oMGoZzdhA5iLLo2LGpPM9lK51oPdM0XpbE6kFY4IG
-         dKTTBfv4Q/vMXZDkJCsMKl/wYz8EhY1oq/hd9WAKSgsgtlvN/cNYMEvUH4VJpMcFNkIl
-         XSMW51LZlAS1UccY1dyCXYunK+TuB5aMzjvBfdoefq0Lbu0SFMndRVNvQeBjBmgDvFY6
-         wIcdh7UaTLjAYdoXGkW7QIClzl38FXzcVyKAk8VALPaD+ByDIHS41Ud7z8KSwOpo3VC9
-         CYJfN/P91Q6zan0O7G4hV2VolOuX7bQefZi9trxu8zBDoALAwC1twBtFXR5KqhYYtlgS
-         LOQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=h+i9jewAdtfLLPC8niA+t9B34gWGVVKpI03gRjn4UC4=;
-        b=hapCmWCtfHZq1ZndKEecYyiFUrz9zgOW1X3SqdJeOqDVYxCGPV3blaYQFbkJRjNpEm
-         k5Tv9VhrVssa+EjgG8S6iq7qFGbRZHIhSiUcCdM/v/HAK5Xzj6C5RKvSViHgzfqdfW48
-         /oQPmr+/AwopxfvMe6Fd60hh+smHQ5HDbHsvOoh04PXjPPgLuZ2vuglv/yvD8mne41Sr
-         VBKu/E+AvXj5PN9WSx6wCMfv/QSVzfwkvfMDLuoaHPJOjWXKo33dkdJiHjKytFC/yFbJ
-         cVAsqI7BNXzItelJnbfjpWRr8OBzheBTnRfGa51nYOS+Xp/5Y4bJ5Ote6o1mc++VbQ6h
-         SrmA==
-X-Gm-Message-State: APjAAAWWrPJh+p0Mb0DiPfVpx1mijariloRiLVakQAZsZNI+NY8RMxEo
-        dlYS+/mQnsyzG28oNochxN3bEZQfIkHFafgniQfhGqcQ
-X-Google-Smtp-Source: APXvYqz2TdTBO+yorxieSvfbToEVUV2J9chaylFyyRANU8W4nVYKtGry30Vq/MI+Jkkr4dNHSPuVU0C7JDwuIx6htOg=
-X-Received: by 2002:a9d:4590:: with SMTP id x16mr373173ote.254.1563773295708;
- Sun, 21 Jul 2019 22:28:15 -0700 (PDT)
+        id S1727341AbfGVF2j convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 22 Jul 2019 01:28:39 -0400
+Received: from mga02.intel.com ([134.134.136.20]:5444 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726895AbfGVF2j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 01:28:39 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jul 2019 22:28:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,293,1559545200"; 
+   d="scan'208";a="163063514"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga008.jf.intel.com with ESMTP; 21 Jul 2019 22:28:38 -0700
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 21 Jul 2019 22:28:37 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 21 Jul 2019 22:28:37 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.3]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.240]) with mapi id 14.03.0439.000;
+ Mon, 22 Jul 2019 13:28:35 +0800
+From:   "Lu, Kechen" <kechen.lu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Zhang, Tina" <tina.zhang@intel.com>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yuan, Hang" <hang.yuan@intel.com>
+Subject: RE: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
+Thread-Topic: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
+Thread-Index: AQHVPk6Tjcq5grzPBEGxRHokEzi0nabV959w
+Date:   Mon, 22 Jul 2019 05:28:35 +0000
+Message-ID: <31185F57AF7C4B4F87C41E735C23A6FE64E06F@shsmsx102.ccr.corp.intel.com>
+References: <20190718155640.25928-1-kechen.lu@intel.com>
+        <20190718155640.25928-3-kechen.lu@intel.com>
+ <20190719102516.60af527f@x1.home>
+In-Reply-To: <20190719102516.60af527f@x1.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTQ3NTYyM2QtZWZmYy00Yzg5LTk3NWItM2E0OWRkNjc0YTAxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib0pcL0ttdkRHOW1FZGVHQlo4Tko2WEZKNWEyMWRBNm4zSVhncnJCSk92azViVWZXZkhNbHZzV2RZVXRac1JzT04ifQ==
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-References: <1562917140-12035-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1562917140-12035-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 22 Jul 2019 13:28:07 +0800
-Message-ID: <CANRm+CwfjQfjS4SvUGnCLG-JNVyBLM=NB+Eu5u-=z1KiATjFKw@mail.gmail.com>
-Subject: Re: [PATCH RESEND 1/2] KVM: LAPIC: Add pv ipi tracepoint
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ping,
-On Fri, 12 Jul 2019 at 15:39, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> Add pv ipi tracepoint.
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c |  2 ++
->  arch/x86/kvm/trace.h | 25 +++++++++++++++++++++++++
->  2 files changed, 27 insertions(+)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 42da7eb..403ae3f 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -562,6 +562,8 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ip=
-i_bitmap_low,
->         irq.level =3D (icr & APIC_INT_ASSERT) !=3D 0;
->         irq.trig_mode =3D icr & APIC_INT_LEVELTRIG;
->
-> +       trace_kvm_pv_send_ipi(irq.vector, min, ipi_bitmap_low, ipi_bitmap=
-_high);
-> +
->         if (icr & APIC_DEST_MASK)
->                 return -KVM_EINVAL;
->         if (icr & APIC_SHORT_MASK)
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index b5c831e..ce6ee34 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -1462,6 +1462,31 @@ TRACE_EVENT(kvm_hv_send_ipi_ex,
->                   __entry->vector, __entry->format,
->                   __entry->valid_bank_mask)
->  );
-> +
-> +/*
-> + * Tracepoints for kvm_pv_send_ipi.
-> + */
-> +TRACE_EVENT(kvm_pv_send_ipi,
-> +       TP_PROTO(u32 vector, u32 min, unsigned long ipi_bitmap_low, unsig=
-ned long ipi_bitmap_high),
-> +       TP_ARGS(vector, min, ipi_bitmap_low, ipi_bitmap_high),
-> +
-> +       TP_STRUCT__entry(
-> +               __field(u32, vector)
-> +               __field(u32, min)
-> +               __field(unsigned long, ipi_bitmap_low)
-> +               __field(unsigned long, ipi_bitmap_high)
-> +       ),
-> +
-> +       TP_fast_assign(
-> +               __entry->vector =3D vector;
-> +               __entry->min =3D min;
-> +               __entry->ipi_bitmap_low =3D ipi_bitmap_low;
-> +               __entry->ipi_bitmap_high =3D ipi_bitmap_high;
-> +       ),
-> +
-> +       TP_printk("vector %d min 0x%x ipi_bitmap_low 0x%lx ipi_bitmap_hig=
-h 0x%lx",
-> +                 __entry->vector, __entry->min, __entry->ipi_bitmap_low,=
- __entry->ipi_bitmap_high)
-> +);
->  #endif /* _TRACE_KVM_H */
->
->  #undef TRACE_INCLUDE_PATH
-> --
-> 2.7.4
->
+Hi, 
+
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Saturday, July 20, 2019 12:25 AM
+> To: Lu, Kechen <kechen.lu@intel.com>
+> Cc: intel-gvt-dev@lists.freedesktop.org; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Zhang, Tina <tina.zhang@intel.com>;
+> kraxel@redhat.com; zhenyuw@linux.intel.com; Lv, Zhiyuan
+> <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian, Kevin
+> <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>
+> Subject: Re: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
+> 
+> On Thu, 18 Jul 2019 23:56:36 +0800
+> Kechen Lu <kechen.lu@intel.com> wrote:
+> 
+> > From: Tina Zhang <tina.zhang@intel.com>
+> >
+> > Introduce vGPU specific irq type VFIO_IRQ_TYPE_GFX, and
+> > VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ as the subtype for vGPU display
+> >
+> > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+> > ---
+> >  include/uapi/linux/vfio.h | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index be6adab4f759..df28b17a6e2e 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -469,6 +469,9 @@ struct vfio_irq_info_cap_type {
+> >  	__u32 subtype;  /* type specific */
+> >  };
+> >
+> > +#define VFIO_IRQ_TYPE_GFX				(1)
+> > +#define VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ		(1)
+> > +
+> 
+> Please include a description defining exactly what this IRQ is intended to signal.
+> For instance, if another vGPU vendor wanted to implement this in their driver
+> and didn't have the QEMU code for reference to what it does with the IRQ, what
+> would they need to know?  Thanks,
+> 
+> Alex
+> 
+
+Yes, that makes more sense. I'll add the description for it at next version patch.
+
+BTW, may I have one more question? In the current design ideas, we partitioned 
+the vGPU display eventfd counted 8-byte value into at most 8 events to deliver 
+multiple display events, so we need different increasement counter value to 
+differentiate the events. As this is the exposed thing the QEMU has to know, we
+plan adds a macro here VFIO_IRQ_SUBTYPE_GFX_DISPLAY_EVENTFD_BASE_SHIFT to
+make sure the partitions shift in 1 byte, does it make sense putting here? Looking  
+forward to your and Gerd's comments. Thanks!
+
+
+Best Regards,
+Kechen
+
+> >  /**
+> >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct
+> vfio_irq_set)
+> >   *
+
