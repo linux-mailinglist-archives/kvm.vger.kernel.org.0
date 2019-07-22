@@ -2,166 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C83B26FE1E
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 12:54:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D169C6FE2A
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2019 12:56:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728616AbfGVKya (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Jul 2019 06:54:30 -0400
-Received: from foss.arm.com ([217.140.110.172]:35790 "EHLO foss.arm.com"
+        id S1729765AbfGVK4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Jul 2019 06:56:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51210 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726130AbfGVKya (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Jul 2019 06:54:30 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5324928;
-        Mon, 22 Jul 2019 03:54:29 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C1D5C3F71A;
-        Mon, 22 Jul 2019 03:54:27 -0700 (PDT)
-Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
- translation cache on specific commands
-To:     Auger Eric <eric.auger@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Julien Thierry <julien.thierry@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        "Saidi, Ali" <alisaidi@amazon.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-5-marc.zyngier@arm.com>
- <9ff329a3-44f2-1de3-b6cc-58ed38a63665@redhat.com>
-From:   Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
- Z46HaNmN2hZS/oJ69c1DI5Rcww==
-Organization: ARM Ltd
-Message-ID: <1a78d52c-7a31-8981-230b-abe85d11b8ec@arm.com>
-Date:   Mon, 22 Jul 2019 11:54:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726130AbfGVK4n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Jul 2019 06:56:43 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4AFE0308219F;
+        Mon, 22 Jul 2019 10:56:42 +0000 (UTC)
+Received: from work-vm (ovpn-117-221.ams2.redhat.com [10.36.117.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0992E60497;
+        Mon, 22 Jul 2019 10:56:32 +0000 (UTC)
+Date:   Mon, 22 Jul 2019 11:56:30 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Collin Walling <walling@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 18/30] virtio_fs, dax: Set up virtio_fs dax_device
+Message-ID: <20190722105630.GC3035@work-vm>
+References: <20190515192715.18000-1-vgoyal@redhat.com>
+ <20190515192715.18000-19-vgoyal@redhat.com>
+ <20190717192725.25c3d146.pasic@linux.ibm.com>
+ <20190718131532.GA13883@redhat.com>
+ <CAPcyv4i+2nKJYqkbrdm3hWcjaMYkCKUxqLBq96HOZe6xOZzGGg@mail.gmail.com>
+ <c519011e-1df3-3f35-8582-2cb58367ff8a@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <9ff329a3-44f2-1de3-b6cc-58ed38a63665@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c519011e-1df3-3f35-8582-2cb58367ff8a@de.ibm.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Mon, 22 Jul 2019 10:56:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 01/07/2019 13:38, Auger Eric wrote:
-> Hi Marc,
+* Christian Borntraeger (borntraeger@de.ibm.com) wrote:
 > 
-> On 6/11/19 7:03 PM, Marc Zyngier wrote:
->> The LPI translation cache needs to be discarded when an ITS command
->> may affect the translation of an LPI (DISCARD and MAPD with V=0) or
->> the routing of an LPI to a redistributor with disabled LPIs (MOVI,
->> MOVALL).
->>
->> We decide to perform a full invalidation of the cache, irrespective
->> of the LPI that is affected. Commands are supposed to be rare enough
->> that it doesn't matter.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/vgic/vgic-its.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->> index 9b6b66204b97..5254bb762e1b 100644
->> --- a/virt/kvm/arm/vgic/vgic-its.c
->> +++ b/virt/kvm/arm/vgic/vgic-its.c
->> @@ -733,6 +733,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
->>  		 * don't bother here since we clear the ITTE anyway and the
->>  		 * pending state is a property of the ITTE struct.
->>  		 */
->> +		vgic_its_invalidate_cache(kvm);
->> +
->>  		its_free_ite(kvm, ite);
->>  		return 0;
->>  	}
->> @@ -768,6 +770,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
->>  	ite->collection = collection;
->>  	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
->>  
->> +	vgic_its_invalidate_cache(kvm);
->> +
->>  	return update_affinity(ite->irq, vcpu);
->>  }
->>  
->> @@ -996,6 +1000,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
->>  	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
->>  		its_free_ite(kvm, ite);
->>  
->> +	vgic_its_invalidate_cache(kvm);
->> +
->>  	list_del(&device->dev_list);
->>  	kfree(device);
->>  }
->> @@ -1249,6 +1255,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
->>  		vgic_put_irq(kvm, irq);
->>  	}
->>  
->> +	vgic_its_invalidate_cache(kvm);
-> All the commands are executed with the its_lock held. Now we don't take
-> it anymore on the fast cache injection path. Don't we have a window
-> where the move has been applied at table level and the cache is not yet
-> invalidated? Same question for vgic_its_free_device().
+> 
+> On 18.07.19 16:30, Dan Williams wrote:
+> > On Thu, Jul 18, 2019 at 6:15 AM Vivek Goyal <vgoyal@redhat.com> wrote:
+> >>
+> >> On Wed, Jul 17, 2019 at 07:27:25PM +0200, Halil Pasic wrote:
+> >>> On Wed, 15 May 2019 15:27:03 -0400
+> >>> Vivek Goyal <vgoyal@redhat.com> wrote:
+> >>>
+> >>>> From: Stefan Hajnoczi <stefanha@redhat.com>
+> >>>>
+> >>>> Setup a dax device.
+> >>>>
+> >>>> Use the shm capability to find the cache entry and map it.
+> >>>>
+> >>>> The DAX window is accessed by the fs/dax.c infrastructure and must have
+> >>>> struct pages (at least on x86).  Use devm_memremap_pages() to map the
+> >>>> DAX window PCI BAR and allocate struct page.
+> >>>>
+> >>>
+> >>> Sorry for being this late. I don't see any more recent version so I will
+> >>> comment here.
+> >>>
+> >>> I'm trying to figure out how is this supposed to work on s390. My concern
+> >>> is, that on s390 PCI memory needs to be accessed by special
+> >>> instructions. This is taken care of by the stuff defined in
+> >>> arch/s390/include/asm/io.h. E.g. we 'override' __raw_writew so it uses
+> >>> the appropriate s390 instruction. However if the code does not use the
+> >>> linux abstractions for accessing PCI memory, but assumes it can be
+> >>> accessed like RAM, we have a problem.
+> >>>
+> >>> Looking at this patch, it seems to me, that we might end up with exactly
+> >>> the case described. For example AFAICT copy_to_iter() (3) resolves to
+> >>> the function in lib/iov_iter.c which does not seem to cater for s390
+> >>> oddities.
+> >>>
+> >>> I didn't have the time to investigate this properly, and since virtio-fs
+> >>> is virtual, we may be able to get around what is otherwise a
+> >>> limitation on s390. My understanding of these areas is admittedly
+> >>> shallow, and since I'm not sure I'll have much more time to
+> >>> invest in the near future I decided to raise concern.
+> >>>
+> >>> Any opinions?
+> >>
+> >> Hi Halil,
+> >>
+> >> I don't understand s390 and how PCI works there as well. Is there any
+> >> other transport we can use there to map IO memory directly and access
+> >> using DAX?
+> >>
+> >> BTW, is DAX supported for s390.
+> >>
+> >> I am also hoping somebody who knows better can chip in. Till that time,
+> >> we could still use virtio-fs on s390 without DAX.
+> > 
+> > s390 has so-called "limited" dax support, see CONFIG_FS_DAX_LIMITED.
+> > In practice that means that support for PTE_DEVMAP is missing which
+> > means no get_user_pages() support for dax mappings. Effectively it's
+> > only useful for execute-in-place as operations like fork() and ptrace
+> > of dax mappings will fail.
+> 
+> 
+> This is only true for the dcssblk device driver (drivers/s390/block/dcssblk.c
+> and arch/s390/mm/extmem.c). 
+> 
+> For what its worth, the dcssblk looks to Linux like normal memory (just above the
+> previously detected memory) that can be used like normal memory. In previous time
+> we even had struct pages for this memory - this was removed long ago (when it was
+> still xip) to reduce the memory footprint for large dcss blocks and small memory
+> guests.
+> Can the CONFIG_FS_DAX_LIMITED go away if we have struct pages for that memory?
+> 
+> Now some observations: 
+> - dcssblk is z/VM only (not KVM)
+> - Setting CONFIG_FS_DAX_LIMITED globally as a Kconfig option depending on wether
+>   a device driver is compiled in or not seems not flexible enough in case if you
+>   have device driver that does have struct pages and another one that doesn't
+> - I do not see a reason why we should not be able to map anything from QEMU
+>   into the guest real memory via an additional KVM memory slot. 
+>   We would need to handle that in the guest somehow (and not as a PCI bar),
+>   register this with struct pages etc.
+> - we must then look how we can create the link between the guest memory and the
+>   virtio-fs driver. For virtio-ccw we might be able to add a new ccw command or
+>   whatever. Maybe we could also piggy-back on some memory hotplug work from David
+>   Hildenbrand (add cc).
+> 
+> Regarding limitations on the platform:
+> - while we do have PCI, the virtio devices are usually plugged via the ccw bus.
+>   That implies no PCI bars. I assume you use those PCI bars only to implicitely 
+>   have the location of the shared memory
+>   Correct?
 
-There is definitely a race, but that race is invisible from the guest's
-perspective. The guest can only assume that the command has taken effect
-once a SYNC command has been executed, and it cannot observe that the
-SYNC command has been executed before we have invalidated the cache.
+Right.
 
-Does this answer your question?
+> - no real memory mapped I/O. Instead there are instructions that work on the mmio.
+>   As I understand things, this is of no concern regarding virtio-fs as you do not
+>   need mmio in the sense that a memory access of the guest to such an address 
+>   triggers an exit. You just need the shared memory as a mean to have the data
+>   inside the guest. Any notification is done via normal virtqueue mechanisms
+>   Correct?
 
-Thanks,
+Yep.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> Adding Heiko, maybe he remembers some details of the dcssblk/xip history.
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
