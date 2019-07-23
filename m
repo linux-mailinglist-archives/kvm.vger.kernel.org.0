@@ -2,104 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 418FB721C4
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 23:42:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DFFC722A1
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 00:52:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392120AbfGWVm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 17:42:29 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52540 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731707AbfGWVm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 17:42:29 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6NLdDFf042571;
-        Tue, 23 Jul 2019 21:42:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=wYntv4n+4p/Yolp6n9pjkXrq1pe8qYSecC1zTbanCkY=;
- b=1KnVg8MyEvwg40vIY8uETC+raBib1uco3j7tbp0SwarejxEu3KmY6FaB3GUp4nKvfFrE
- Pmclrf1BW8hwmECxEG82wNJN8cn1BWeonClBXzJfHumWyBHbPIBrOFW729zWRJ/NjOCU
- TyoukKinRZlr2WsT8gLQ/m+umZtfJzz5bkzCgRDUN8cn+tzF93ysS7GYCa933TKeCnRQ
- 8Aai9acl36Fjlor75OaorP+1zerIP0pw5d7JqVZCIhVJFLMRttRRfDxR/Ar5SDhYl/cW
- fkF31uU8FzlOVskHJR4Z1/c8FZpwpk6seQu0CKFilbhkECP6Ux71dFFPBlGHrz/kbuJ7 lQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2tx61bsdde-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Jul 2019 21:42:25 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6NLc4qE094669;
-        Tue, 23 Jul 2019 21:42:25 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2tx60x7t6r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Jul 2019 21:42:25 +0000
-Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6NLgOnI007608;
-        Tue, 23 Jul 2019 21:42:24 GMT
-Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 23 Jul 2019 14:42:24 -0700
-Subject: Re: [PATCH] KVM: CPUID: Add new features to the guest's CPUID
-To:     Aaron Lewis <aaronlewis@google.com>, jmattson@google.com,
-        kvm@vger.kernel.org
-References: <20190715210316.25569-1-aaronlewis@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <87d3c508-31be-1264-e168-c72b6857d000@oracle.com>
-Date:   Tue, 23 Jul 2019 14:42:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190715210316.25569-1-aaronlewis@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9327 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1907230218
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9327 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1907230219
+        id S2389670AbfGWWwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 18:52:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28256 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728777AbfGWWwN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jul 2019 18:52:13 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6NMq0pF030767
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 18:52:12 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2tx927534u-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 18:52:12 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Tue, 23 Jul 2019 23:52:10 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 23 Jul 2019 23:52:08 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6NMq7Va56819772
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Jul 2019 22:52:07 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25DDA42041;
+        Tue, 23 Jul 2019 22:52:07 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C708B42042;
+        Tue, 23 Jul 2019 22:52:06 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Jul 2019 22:52:06 +0000 (GMT)
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, Petr Tesarik <ptesarik@suse.cz>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: [PATCH v2 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
+Date:   Wed, 24 Jul 2019 00:51:55 +0200
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+x-cbid: 19072322-0008-0000-0000-000003002A73
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072322-0009-0000-0000-0000226DB8FD
+Message-Id: <20190723225155.3915-1-pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-23_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=423 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907230234
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On s390 ZONE_DMA is up to 2G, i.e. ARCH_ZONE_DMA_BITS should be 31 bits.
+The current value is 24 and makes __dma_direct_alloc_pages() take a
+wrong turn first (but __dma_direct_alloc_pages() recovers then).
 
+Let's correct ARCH_ZONE_DMA_BITS value and avoid wrong turns.
 
-On 07/15/2019 02:03 PM, Aaron Lewis wrote:
-> Add features X86_FEATURE_FDP_EXCPTN_ONLY and X86_FEATURE_ZERO_FCS_FDS to the
-> mask for CPUID.(EAX=07H,ECX=0H):EBX.  Doing this will ensure the guest's CPUID
-> for these bits match the host, rather than the guest being blindly set to 0.
->
-> This is important as these are actually defeature bits, which means that
-> a 0 indicates the presence of a feature and a 1 indicates the absence of
-> a feature.  since these features cannot be emulated, kvm should not
-> claim the existence of a feature that isn't present on the host.
->
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> ---
->   arch/x86/kvm/cpuid.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index ead681210306..64c3fad068e1 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -353,7 +353,8 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
->   		F(BMI2) | F(ERMS) | f_invpcid | F(RTM) | f_mpx | F(RDSEED) |
->   		F(ADX) | F(SMAP) | F(AVX512IFMA) | F(AVX512F) | F(AVX512PF) |
->   		F(AVX512ER) | F(AVX512CD) | F(CLFLUSHOPT) | F(CLWB) | F(AVX512DQ) |
-> -		F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt;
-> +		F(SHA_NI) | F(AVX512BW) | F(AVX512VL) | f_intel_pt |
-> +		F(FDP_EXCPTN_ONLY) | F(ZERO_FCS_FDS);
->   
->   	/* cpuid 7.0.ecx*/
->   	const u32 kvm_cpuid_7_0_ecx_x86_features =
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Reported-by: Petr Tesarik <ptesarik@suse.cz>
+Fixes: c61e9637340e ("dma-direct: add support for allocation from ZONE_DMA and ZONE_DMA32")
+---
+ arch/s390/include/asm/page.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
+index a4d38092530a..27470dae31d2 100644
+--- a/arch/s390/include/asm/page.h
++++ b/arch/s390/include/asm/page.h
+@@ -177,6 +177,8 @@ static inline int devmem_is_allowed(unsigned long pfn)
+ #define VM_DATA_DEFAULT_FLAGS	(VM_READ | VM_WRITE | \
+ 				 VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC)
+ 
++#define ARCH_ZONE_DMA_BITS      31
++
+ #include <asm-generic/memory_model.h>
+ #include <asm-generic/getorder.h>
+ 
+-- 
+2.17.1
+
