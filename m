@@ -2,204 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A596B71868
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 14:43:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91FE17188A
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 14:47:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387837AbfGWMn5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 08:43:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43210 "EHLO mx1.redhat.com"
+        id S2389875AbfGWMr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 08:47:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44930 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732336AbfGWMn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 08:43:57 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1731293AbfGWMrz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jul 2019 08:47:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B0D342F8BDD;
-        Tue, 23 Jul 2019 12:43:56 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0FA4881F12;
+        Tue, 23 Jul 2019 12:47:55 +0000 (UTC)
 Received: from [10.36.117.239] (ovpn-117-239.ams2.redhat.com [10.36.117.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B9BD0646C7;
-        Tue, 23 Jul 2019 12:43:51 +0000 (UTC)
-Subject: Re: [PATCH v2 1/9] KVM: arm/arm64: vgic: Add LPI translation cache
- definition
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D4A419C58;
+        Tue, 23 Jul 2019 12:47:49 +0000 (UTC)
+Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
+ translation cache on specific commands
 To:     Marc Zyngier <marc.zyngier@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
+Cc:     Julien Thierry <julien.thierry@arm.com>,
         James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
         "Saidi, Ali" <alisaidi@amazon.com>
 References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-2-marc.zyngier@arm.com>
+ <20190611170336.121706-5-marc.zyngier@arm.com>
+ <9ff329a3-44f2-1de3-b6cc-58ed38a63665@redhat.com>
+ <1a78d52c-7a31-8981-230b-abe85d11b8ec@arm.com>
+ <8b5e029c-a08f-b86b-7021-5d68ec05d3bd@redhat.com>
+ <ffb327bf-b05c-b7ca-d509-2a98dea37fdf@arm.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <f6388e96-5e22-3b84-532a-e28582e5f4d5@redhat.com>
-Date:   Tue, 23 Jul 2019 14:43:48 +0200
+Message-ID: <166921d3-39c4-d13c-bdee-dd404d468e7e@redhat.com>
+Date:   Tue, 23 Jul 2019 14:47:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190611170336.121706-2-marc.zyngier@arm.com>
+In-Reply-To: <ffb327bf-b05c-b7ca-d509-2a98dea37fdf@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 23 Jul 2019 12:43:56 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Tue, 23 Jul 2019 12:47:55 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Hi Marc,
-On 6/11/19 7:03 PM, Marc Zyngier wrote:
-> Add the basic data structure that expresses an MSI to LPI
-> translation as well as the allocation/release hooks.
+
+On 7/23/19 2:43 PM, Marc Zyngier wrote:
+> On 23/07/2019 13:25, Auger Eric wrote:
+>> Hi Marc,
+>>
+>> On 7/22/19 12:54 PM, Marc Zyngier wrote:
+>>> Hi Eric,
+>>>
+>>> On 01/07/2019 13:38, Auger Eric wrote:
+>>>> Hi Marc,
+>>>>
+>>>> On 6/11/19 7:03 PM, Marc Zyngier wrote:
+>>>>> The LPI translation cache needs to be discarded when an ITS command
+>>>>> may affect the translation of an LPI (DISCARD and MAPD with V=0) or
+>>>>> the routing of an LPI to a redistributor with disabled LPIs (MOVI,
+>>>>> MOVALL).
+>>>>>
+>>>>> We decide to perform a full invalidation of the cache, irrespective
+>>>>> of the LPI that is affected. Commands are supposed to be rare enough
+>>>>> that it doesn't matter.
+>>>>>
+>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>>> ---
+>>>>>  virt/kvm/arm/vgic/vgic-its.c | 8 ++++++++
+>>>>>  1 file changed, 8 insertions(+)
+>>>>>
+>>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>>>> index 9b6b66204b97..5254bb762e1b 100644
+>>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>>>> @@ -733,6 +733,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
+>>>>>  		 * don't bother here since we clear the ITTE anyway and the
+>>>>>  		 * pending state is a property of the ITTE struct.
+>>>>>  		 */
+>>>>> +		vgic_its_invalidate_cache(kvm);
+>>>>> +
+>>>>>  		its_free_ite(kvm, ite);
+>>>>>  		return 0;
+>>>>>  	}
+>>>>> @@ -768,6 +770,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+>>>>>  	ite->collection = collection;
+>>>>>  	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+>>>>>  
+>>>>> +	vgic_its_invalidate_cache(kvm);
+>>>>> +
+>>>>>  	return update_affinity(ite->irq, vcpu);
+>>>>>  }
+>>>>>  
+>>>>> @@ -996,6 +1000,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
+>>>>>  	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
+>>>>>  		its_free_ite(kvm, ite);
+>>>>>  
+>>>>> +	vgic_its_invalidate_cache(kvm);
+>>>>> +
+>>>>>  	list_del(&device->dev_list);
+>>>>>  	kfree(device);
+>>>>>  }
+>>>>> @@ -1249,6 +1255,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+>>>>>  		vgic_put_irq(kvm, irq);
+>>>>>  	}
+>>>>>  
+>>>>> +	vgic_its_invalidate_cache(kvm);
+>>>> All the commands are executed with the its_lock held. Now we don't take
+>>>> it anymore on the fast cache injection path. Don't we have a window
+>>>> where the move has been applied at table level and the cache is not yet
+>>>> invalidated? Same question for vgic_its_free_device().
+>>>
+>>> There is definitely a race, but that race is invisible from the guest's
+>>> perspective. The guest can only assume that the command has taken effect
+>>> once a SYNC command has been executed, and it cannot observe that the
+>>> SYNC command has been executed before we have invalidated the cache.
+>>>
+>>> Does this answer your question?
+>>
+>> OK make sense. Thank you for the clarification
+>>
+>> Another question, don't we need to invalidate the cache on  MAPC V=0 as
+>> well? Removing the mapping of the collection results in interrupts
+>> belonging to that collection being ignored. If we don't flush the
+>> pending bit will be set?
 > 
-> THe size of the cache is arbitrarily defined as 4*nr_vcpus.
-The
+> Yup, that's a good point. I think i had that at some point, and ended up 
+> dropping it, probably missing the point that the interrupt would be made 
+> pending.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  include/kvm/arm_vgic.h        |  3 +++
->  virt/kvm/arm/vgic/vgic-init.c |  5 ++++
->  virt/kvm/arm/vgic/vgic-its.c  | 49 +++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h      |  2 ++
->  4 files changed, 59 insertions(+)
+> I'll add this:
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index c36c86f1ec9a..ca7bcf52dc85 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -260,6 +260,9 @@ struct vgic_dist {
->  	struct list_head	lpi_list_head;
->  	int			lpi_list_count;
+> @@ -1218,6 +1218,7 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
 >  
-> +	/* LPI translation cache */
-> +	struct list_head	lpi_translation_cache;
-> +
->  	/* used by vgic-debug */
->  	struct vgic_state_iter *iter;
+>  	if (!valid) {
+>  		vgic_its_free_collection(its, coll_id);
+> +		vgic_its_invalidate_cache(kvm);
+>  	} else {
+>  		collection = find_collection(its, coll_id);
 >  
-> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-> index 3bdb31eaed64..c7c4c77dd430 100644
-> --- a/virt/kvm/arm/vgic/vgic-init.c
-> +++ b/virt/kvm/arm/vgic/vgic-init.c
-> @@ -64,6 +64,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
->  	struct vgic_dist *dist = &kvm->arch.vgic;
->  
->  	INIT_LIST_HEAD(&dist->lpi_list_head);
-> +	INIT_LIST_HEAD(&dist->lpi_translation_cache);
->  	raw_spin_lock_init(&dist->lpi_list_lock);
->  }
->  
-> @@ -305,6 +306,7 @@ int vgic_init(struct kvm *kvm)
->  	}
->  
->  	if (vgic_has_its(kvm)) {
-> +		vgic_lpi_translation_cache_init(kvm);
->  		ret = vgic_v4_init(kvm);
->  		if (ret)
->  			goto out;
-> @@ -346,6 +348,9 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
->  		INIT_LIST_HEAD(&dist->rd_regions);
->  	}
->  
-> +	if (vgic_has_its(kvm))
-> +		vgic_lpi_translation_cache_destroy(kvm);
-> +
->  	if (vgic_supports_direct_msis(kvm))
->  		vgic_v4_teardown(kvm);
->  }
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 44ceaccb18cf..ce9bcddeb7f1 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -149,6 +149,14 @@ struct its_ite {
->  	u32 event_id;
->  };
->  
-> +struct vgic_translation_cache_entry {
-> +	struct list_head	entry;
-> +	phys_addr_t		db;
-> +	u32			devid;
-> +	u32			eventid;
-> +	struct vgic_irq		*irq;
-> +};
-> +
->  /**
->   * struct vgic_its_abi - ITS abi ops and settings
->   * @cte_esz: collection table entry size
-> @@ -1668,6 +1676,45 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
->  	return ret;
->  }
->  
-> +/* Default is 16 cached LPIs per vcpu */
-> +#define LPI_DEFAULT_PCPU_CACHE_SIZE	16
-> +
-> +void vgic_lpi_translation_cache_init(struct kvm *kvm)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	unsigned int sz;
-> +	int i;
-> +
-> +	if (!list_empty(&dist->lpi_translation_cache))
-> +		return;
-> +
-> +	sz = atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
-> +
-> +	for (i = 0; i < sz; i++) {
-> +		struct vgic_translation_cache_entry *cte;
-> +
-> +		/* An allocation failure is not fatal */
-> +		cte = kzalloc(sizeof(*cte), GFP_KERNEL);
-> +		if (WARN_ON(!cte))
-> +			break;
-> +
-> +		INIT_LIST_HEAD(&cte->entry);
-> +		list_add(&cte->entry, &dist->lpi_translation_cache);
-> +	}
-> +}
-> +
-> +void vgic_lpi_translation_cache_destroy(struct kvm *kvm)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct vgic_translation_cache_entry *cte, *tmp;
-> +
-> +	list_for_each_entry_safe(cte, tmp,
-> +				 &dist->lpi_translation_cache, entry) {
-> +		list_del(&cte->entry);
-> +		kfree(cte);
-> +	}
-> +}
-> +
->  #define INITIAL_BASER_VALUE						  \
->  	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
->  	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
-> @@ -1696,6 +1743,8 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
->  			kfree(its);
->  			return ret;
->  		}
-> +
-> +		vgic_lpi_translation_cache_init(dev->kvm);
->  	}
->  
->  	mutex_init(&its->its_lock);
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index abeeffabc456..50aad705c4a9 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -316,6 +316,8 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr);
->  int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
->  			 u32 devid, u32 eventid, struct vgic_irq **irq);
->  struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
-> +void vgic_lpi_translation_cache_init(struct kvm *kvm);
-> +void vgic_lpi_translation_cache_destroy(struct kvm *kvm);
->  
->  bool vgic_supports_direct_msis(struct kvm *kvm);
->  int vgic_v4_init(struct kvm *kvm);
-> 
+Yep, with that change feel free to add my R-b
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
+> 
+> Thanks,
+> 
+> 	M.
+> 
