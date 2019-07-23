@@ -2,79 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FEA871C3B
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 17:52:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D773171C74
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 18:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732390AbfGWPwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 11:52:50 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:53224 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728497AbfGWPwt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 11:52:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=is+r8dxblNhDKZzXEGDWw1uqTuIfnmvA2uNHNQ+F5to=; b=s2nY5uuCAcKnWxU4mjttDOOje
-        7rbAEudFeIwehYshWoTvjgcXy0wzo9BTlNMYfyOMOXhi2EOpPgUtoofsTBxiCmlwq1P46YMmhYfGI
-        yRXilMY6iS0pViD+TIy3Syddkf4cNI5wWxzxcIRpcVynblMemsOtNcN/66yu/lBo59NJ5MgIn5zWU
-        0fAEMeg7kN/52f57NR3WUS+PJN6uSorPSGCFvFOi7bB1qyl0T2SrFTKuHlQSoJjl76lAp2csXPOTk
-        ZyAmBxnxhV2aPMorzg8ZKIW0LOQA9OwhnkiVdhrcv+csIW1URAGUn8Zocfhs6i/lZp4fZeLqmfFMo
-        +zRfQjGOg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1hpx5t-00081N-6X; Tue, 23 Jul 2019 15:52:49 +0000
-Date:   Tue, 23 Jul 2019 08:52:49 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
-Message-ID: <20190723155249.GA30643@infradead.org>
-References: <20190718172120.69947-1-pasic@linux.ibm.com>
- <20190719063249.GA4852@osiris>
- <20190719130130.3ef4fa9c.pasic@linux.ibm.com>
- <20190723143226.6d929d7a.pasic@linux.ibm.com>
+        id S2387910AbfGWQI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 12:08:28 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2705 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727363AbfGWQI2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jul 2019 12:08:28 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 0681BBBCE45D5BFE0D5D;
+        Wed, 24 Jul 2019 00:08:24 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 24 Jul 2019 00:08:15 +0800
+From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To:     <alex.williamson@redhat.com>, <eric.auger@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <iommu@lists.linux-foundation.org>, <linuxarm@huawei.com>,
+        <john.garry@huawei.com>, <xuwei5@hisilicon.com>,
+        <kevin.tian@intel.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v8 0/6] vfio/type1: Add support for valid iova list management
+Date:   Tue, 23 Jul 2019 17:06:31 +0100
+Message-ID: <20190723160637.8384-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190723143226.6d929d7a.pasic@linux.ibm.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
+X-Originating-IP: [10.202.227.237]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 23, 2019 at 02:32:26PM +0200, Halil Pasic wrote:
-> On Fri, 19 Jul 2019 13:01:30 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
-> > > > diff --git a/arch/s390/include/asm/dma.h b/arch/s390/include/asm/dma.h
-> > > > index 6f26f35d4a71..3b0329665b13 100644
-> > > > --- a/arch/s390/include/asm/dma.h
-> > > > +++ b/arch/s390/include/asm/dma.h
-> > > > @@ -10,6 +10,7 @@
-> > > >   * by the 31 bit heritage.
-> > > >   */
-> > > >  #define MAX_DMA_ADDRESS         0x80000000
-> > > > +#define ARCH_ZONE_DMA_BITS      31  
-> > > 
-> > > powerpc has this in arch/powerpc/include/asm/page.h. This really
-> > > should be consistently defined in the same header file across
-> > > architectures.
-> > > 
-> > > Christoph, what is the preferred header file for this definition?
-> 
-> ping
-> 
-> Christoph could you please answer Heiko's question, so I can do my
-> respin.
+This is to revive this series which almost made to 4.18 but got dropped
+as Alex found an issue[1] with IGD and USB devices RMRR region being
+reported as reserved regions.
 
-page.h is fine for now.  dma.h is odd for sure as it is for legacy
-ISA DMA only.
+Thanks to Eric for his work here[2]. It provides a way to exclude
+these regions while reporting the valid iova regions and this respin
+make use of that.
+
+Please note that I don't have a platform to verify the reported RMRR
+issue and appreciate testing on those platforms.
+
+Thanks,
+Shameer
+
+[1] https://lkml.org/lkml/2018/6/5/760
+[2] https://lore.kernel.org/patchwork/cover/1083072/
+
+v7-->v8
+  -Rebased to 5.3-rc1
+  -Addressed comments from Alex and Eric. Please see
+   individual patch history.
+  -Added Eric's R-by to patches 4/5/6
+
+v6-->v7
+ -Rebased to 5.2-rc6 + Eric's patches
+ -Added logic to exclude IOMMU_RESV_DIRECT_RELAXABLE reserved memory
+  region type(patch #2).
+ -Dropped patch #4 of v6 as it is already part of mainline.
+ -Addressed "container with only an mdev device will have an empty list"
+  case(patches 4/6 & 5/6 - Suggested by Alex)
+
+Old
+----
+This series introduces an iova list associated with a vfio 
+iommu. The list is kept updated taking care of iommu apertures,
+and reserved regions. Also this series adds checks for any conflict
+with existing dma mappings whenever a new device group is attached to
+the domain.
+
+User-space can retrieve valid iova ranges using VFIO_IOMMU_GET_INFO
+ioctl capability chains. Any dma map request outside the valid iova
+range will be rejected.
+
+v5 --> v6
+
+ -Rebased to 4.17-rc1
+ -Changed the ordering such that previous patch#7 "iommu/dma: Move
+  PCI window region reservation back...")  is now patch #4. This
+  will avoid any bisection issues pointed out by Alex.
+ -Added Robins's Reviewed-by tag for patch#4
+
+v4 --> v5
+Rebased to next-20180315.
+ 
+ -Incorporated the corner case bug fix suggested by Alex to patch #5.
+ -Based on suggestions by Alex and Robin, added patch#7. This
+  moves the PCI window  reservation back in to DMA specific path.
+  This is to fix the issue reported by Eric[1].
+
+v3 --> v4
+ Addressed comments received for v3.
+ -dma_addr_t instead of phys_addr_t
+ -LIST_HEAD() usage.
+ -Free up iova_copy list in case of error.
+ -updated logic in filling the iova caps info(patch #5)
+
+RFCv2 --> v3
+ Removed RFC tag.
+ Addressed comments from Alex and Eric:
+ - Added comments to make iova list management logic more clear.
+ - Use of iova list copy so that original is not altered in
+   case of failure.
+
+RFCv1 --> RFCv2
+ Addressed comments from Alex:
+-Introduced IOVA list management and added checks for conflicts with 
+ existing dma map entries during attach/detach.
+
+Shameer Kolothum (6):
+  vfio/type1: Introduce iova list and add iommu aperture validity check
+  vfio/type1: Check reserved region conflict and update iova list
+  vfio/type1: Update iova list on detach
+  vfio/type1: check dma map request is within a valid iova range
+  vfio/type1: Add IOVA range capability support
+  vfio/type1: remove duplicate retrieval of reserved regions
+
+ drivers/vfio/vfio_iommu_type1.c | 518 +++++++++++++++++++++++++++++++-
+ include/uapi/linux/vfio.h       |  26 +-
+ 2 files changed, 531 insertions(+), 13 deletions(-)
+
+-- 
+2.17.1
+
+
