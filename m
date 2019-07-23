@@ -2,75 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A83C712F2
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 09:35:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 432BF71376
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 09:58:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732747AbfGWHfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 03:35:10 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50779 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732613AbfGWHfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 03:35:09 -0400
-Received: by mail-wm1-f65.google.com with SMTP id v15so37477135wml.0
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 00:35:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=weeVjf/Jly+Inq7rrMi7gHQ0j/OuLTL5EFdg7avawSo=;
-        b=nhfE72WuA6LHfnD2nVLyE1ujtfmGcNZxakvbe0GPM4SsWBG8SFMLxJXPGZ3tELbnDp
-         qriaFhcxGzd846ePkDeYlkrR/0krT8C+dRcVope4dyA6tPnITjJCssq5VjM+E5DBLhRz
-         N+/h+sXYH7oS1jpr6U2eoii/JJg2AlrAQh49tQRYaoCmUXqOSfWm1zwMNBhr+PwNuDaj
-         +bfU8M9ek4vKszKuL7AVAozvHr0P7wI6SRcb4vdkPeMGR0Zc4VLSvmcu2DQogsN1OPgC
-         IQ4b9fIQqmBiKJM4VkHRQ1wZmVVRReeIpi/txtp2IGd9S4uUR/7WvC+1tVW7yFc+mEhz
-         ODcQ==
-X-Gm-Message-State: APjAAAXAImCr+mUAIPU264lQ3hrOnxZlrualNw0swFV7axuTKLgF6zQ5
-        hZ5dtg93rT0iIcO3ikZKCuH+nA==
-X-Google-Smtp-Source: APXvYqyWvaMO5IsmxLwfIf/M3f3J+BPyluUZ9RtI3u69i6rj0Wg7FwJpPmGYV2DVsW5IwZS6ldTMwg==
-X-Received: by 2002:a1c:3cc4:: with SMTP id j187mr64455922wma.36.1563867307765;
-        Tue, 23 Jul 2019 00:35:07 -0700 (PDT)
-Received: from [10.201.49.73] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id r14sm37030867wrx.57.2019.07.23.00.35.06
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Jul 2019 00:35:07 -0700 (PDT)
-Subject: Re: [PATCH] Revert "kvm: x86: Use task structs fpu field for user"
-To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org
-References: <1563796594-25317-1-git-send-email-pbonzini@redhat.com>
- <20190723043132.556EC2239E@mail.kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e30db831-6498-95df-031d-908b18cf37f3@redhat.com>
-Date:   Tue, 23 Jul 2019 09:35:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190723043132.556EC2239E@mail.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S2388591AbfGWH5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 03:57:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53056 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731735AbfGWH5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jul 2019 03:57:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E3462307D915;
+        Tue, 23 Jul 2019 07:57:24 +0000 (UTC)
+Received: from hp-dl380pg8-01.lab.eng.pek2.redhat.com (hp-dl380pg8-01.lab.eng.pek2.redhat.com [10.73.8.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 63B0260603;
+        Tue, 23 Jul 2019 07:57:20 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     mst@redhat.com, jasowang@redhat.com
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/6] Fixes for meta data acceleration
+Date:   Tue, 23 Jul 2019 03:57:12 -0400
+Message-Id: <20190723075718.6275-1-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 23 Jul 2019 07:57:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/07/19 06:31, Sasha Levin wrote:
-> 
-> v5.2.2: Build OK!
-> v5.1.19: Failed to apply! Possible dependencies:
->     0cecca9d03c9 ("x86/fpu: Eager switch PKRU state")
->     2722146eb784 ("x86/fpu: Remove fpu->initialized")
->     4ee91519e1dc ("x86/fpu: Add an __fpregs_load_activate() internal helper")
->     5f409e20b794 ("x86/fpu: Defer FPU state load until return to userspace")
-> 
-> 
-> NOTE: The patch will not be queued to stable trees until it is upstream.
-> 
-> How should we proceed with this patch?
+Hi all:
 
-I have 5-6 pending stable patches and I will send a backport for all of
-them.
+This series try to fix several issues introduced by meta data
+accelreation series. Please review.
 
-Paolo
+Jason Wang (6):
+  vhost: don't set uaddr for invalid address
+  vhost: validate MMU notifier registration
+  vhost: fix vhost map leak
+  vhost: reset invalidate_count in vhost_set_vring_num_addr()
+  vhost: mark dirty pages during map uninit
+  vhost: don't do synchronize_rcu() in vhost_uninit_vq_maps()
+
+ drivers/vhost/vhost.c | 56 +++++++++++++++++++++++++++++++------------
+ drivers/vhost/vhost.h |  1 +
+ 2 files changed, 42 insertions(+), 15 deletions(-)
+
+-- 
+2.18.1
+
