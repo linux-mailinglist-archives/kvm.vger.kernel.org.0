@@ -2,66 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65CB771378
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 09:58:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D651B713AB
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 10:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388719AbfGWH6K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 03:58:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37532 "EHLO mx1.redhat.com"
+        id S1733039AbfGWIPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 04:15:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35564 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726989AbfGWH6J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 03:58:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726405AbfGWIPL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jul 2019 04:15:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3C5BD335E7;
-        Tue, 23 Jul 2019 07:58:09 +0000 (UTC)
-Received: from hp-dl380pg8-01.lab.eng.pek2.redhat.com (hp-dl380pg8-01.lab.eng.pek2.redhat.com [10.73.8.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C210E608A5;
-        Tue, 23 Jul 2019 07:57:57 +0000 (UTC)
-From:   Jason Wang <jasowang@redhat.com>
-To:     mst@redhat.com, jasowang@redhat.com
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 6/6] vhost: don't do synchronize_rcu() in vhost_uninit_vq_maps()
-Date:   Tue, 23 Jul 2019 03:57:18 -0400
-Message-Id: <20190723075718.6275-7-jasowang@redhat.com>
-In-Reply-To: <20190723075718.6275-1-jasowang@redhat.com>
-References: <20190723075718.6275-1-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 23 Jul 2019 07:58:09 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4C086308C216;
+        Tue, 23 Jul 2019 08:15:11 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 64FB760BEC;
+        Tue, 23 Jul 2019 08:15:10 +0000 (UTC)
+Date:   Tue, 23 Jul 2019 10:15:07 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3] x86: Support environments without
+ test-devices
+Message-ID: <20190723081507.vkostd7cjzxcomes@kamzik.brq.redhat.com>
+References: <20190722225540.43572-1-nadav.amit@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190722225540.43572-1-nadav.amit@gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 23 Jul 2019 08:15:11 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There's no need for RCU synchronization in vhost_uninit_vq_maps()
-since we've already serialized with readers (memory accessors). This
-also avoid the possible userspace DOS through ioctl() because of the
-possible high latency caused by synchronize_rcu().
+On Mon, Jul 22, 2019 at 03:55:40PM -0700, Nadav Amit wrote:
+> Enable to run the tests when test-device is not present (e.g.,
+> bare-metal). Users can provide the number of CPUs and ram size through
+> kernel parameters.
+> 
+> On Ubuntu that uses grub, for example, the tests can be run by copying a
+> test to the boot directory (/boot) and adding a menu-entry to grub
+> (e.g., by editing /etc/grub.d/40_custom):
+> 
+>   menuentry 'idt_test' {
+> 	set root='[ROOT]'
+> 	multiboot [BOOT_RELATIVE]/[TEST].flat [PARAMETERS]
+> 	module params.initrd
+>   }
+> 
+> Replace:
+>   * [ROOT] with `grub-probe --target=bios_hints /boot`
+>   * [BOOT_RELATIVE] with `grub-mkrelpath /boot`
+>   * [TEST] with the test executed
+>   * [PARAMETERS] with the test parameters
+> 
+> params.initrd, which would be located on the boot directory should
+> describe the machine and tell the test infrastructure that a test
+> device is not present and boot-loader was used (the bootloader and qemu
+> deliver test . For example for a 4 core machines with 4GB of
+> memory:
+> 
+>   NR_CPUS=4
+>   MEMSIZE=4096
+>   TEST_DEVICE=0
+>   BOOTLOADER=1
+> 
+> Since we do not really use E820, using more than 4GB is likely to fail
+> due to holes.
+> 
+> Finally, do not forget to run update-grub. Remember that the output goes
+> to the serial port.
+> 
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> 
+> ---
+> 
+> v2->v3:
+>  * Adding argument to argv when bootloader is used [Andrew]
+>  * Avoid unnecessary check of test-device availability [Andrew]
+> 
+> v1->v2:
+>  * Using initrd to hold configuration override [Andrew]
+>  * Adapting vmx, tscdeadline_latency not to ignore the first argument
+>    on native
+> ---
+>  lib/argv.c      | 13 +++++++++----
+>  lib/argv.h      |  1 +
+>  lib/x86/fwcfg.c | 28 ++++++++++++++++++++++++++++
+>  lib/x86/fwcfg.h | 10 ++++++++++
+>  lib/x86/setup.c |  5 +++++
+>  x86/apic.c      |  4 +++-
+>  x86/cstart64.S  |  8 ++++++--
+>  x86/eventinj.c  | 17 ++++++++++++++---
+>  x86/vmx_tests.c |  5 +++++
+>  9 files changed, 81 insertions(+), 10 deletions(-)
+> 
 
-Reported-by: Michael S. Tsirkin <mst@redhat.com>
-Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vhost/vhost.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 5b8821d00fe4..a17df1f4069a 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -334,7 +334,9 @@ static void vhost_uninit_vq_maps(struct vhost_virtqueue *vq)
- 	}
- 	spin_unlock(&vq->mmu_lock);
- 
--	synchronize_rcu();
-+	/* No need for synchronize_rcu() or kfree_rcu() since we are
-+	 * serialized with memory accessors (e.g vq mutex held).
-+	 */
- 
- 	for (i = 0; i < VHOST_NUM_ADDRS; i++)
- 		if (map[i])
--- 
-2.18.1
-
+Reviewed-by: Andrew Jones <drjones@redhat.com>
