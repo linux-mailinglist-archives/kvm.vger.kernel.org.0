@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D4DBD71C86
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 18:09:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E54C671C7C
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 18:08:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390687AbfGWQI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 12:08:56 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2741 "EHLO huawei.com"
+        id S2388896AbfGWQIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 12:08:45 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2742 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388820AbfGWQIl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 12:08:41 -0400
+        id S2388840AbfGWQIo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jul 2019 12:08:44 -0400
 Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 3E9C692B2A821DFB467A;
+        by Forcepoint Email with ESMTP id 43523B08A765E3E9D256;
         Wed, 24 Jul 2019 00:08:39 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 24 Jul 2019 00:08:28 +0800
+ 14.3.439.0; Wed, 24 Jul 2019 00:08:31 +0800
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <alex.williamson@redhat.com>, <eric.auger@redhat.com>
 CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
@@ -24,9 +24,9 @@ CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <john.garry@huawei.com>, <xuwei5@hisilicon.com>,
         <kevin.tian@intel.com>,
         Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH v8 4/6] vfio/type1: check dma map request is within a valid iova range
-Date:   Tue, 23 Jul 2019 17:06:35 +0100
-Message-ID: <20190723160637.8384-5-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v8 5/6] vfio/type1: Add IOVA range capability support
+Date:   Tue, 23 Jul 2019 17:06:36 +0100
+Message-ID: <20190723160637.8384-6-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20190723160637.8384-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190723160637.8384-1-shameerali.kolothum.thodi@huawei.com>
@@ -39,59 +39,187 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This checks and rejects any dma map request outside valid iova
-range.
+This allows the user-space to retrieve the supported IOVA
+range(s), excluding any non-relaxable reserved regions. The
+implementation is based on capability chains, added to
+VFIO_IOMMU_GET_INFO ioctl.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 101 ++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       |  26 +++++++-
+ 2 files changed, 126 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 7005a8cfca1b..56cf55776d6c 100644
+index 56cf55776d6c..d0c5e768acb7 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1038,6 +1038,27 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+@@ -2138,6 +2138,73 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
  	return ret;
  }
  
-+/*
-+ * Check dma map request is within a valid iova range
-+ */
-+static bool vfio_iommu_iova_dma_valid(struct vfio_iommu *iommu,
-+				      dma_addr_t start, dma_addr_t end)
++static int vfio_iommu_iova_add_cap(struct vfio_info_cap *caps,
++		 struct vfio_iommu_type1_info_cap_iova_range *cap_iovas,
++		 size_t size)
 +{
-+	struct list_head *iova = &iommu->iova_list;
-+	struct vfio_iova *node;
++	struct vfio_info_cap_header *header;
++	struct vfio_iommu_type1_info_cap_iova_range *iova_cap;
 +
-+	list_for_each_entry(node, iova, list) {
-+		if (start >= node->start && end <= node->end)
-+			return true;
-+	}
++	header = vfio_info_cap_add(caps, size,
++				   VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE, 1);
++	if (IS_ERR(header))
++		return PTR_ERR(header);
 +
-+	/*
-+	 * Check for list_empty() as well since a container with
-+	 * a single mdev device will have an empty list.
-+	 */
-+	return list_empty(iova);
++	iova_cap = container_of(header,
++				struct vfio_iommu_type1_info_cap_iova_range,
++				header);
++	iova_cap->nr_iovas = cap_iovas->nr_iovas;
++	memcpy(iova_cap->iova_ranges, cap_iovas->iova_ranges,
++	       cap_iovas->nr_iovas * sizeof(*cap_iovas->iova_ranges));
++	return 0;
 +}
 +
- static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 			   struct vfio_iommu_type1_dma_map *map)
- {
-@@ -1081,6 +1102,11 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 		goto out_unlock;
- 	}
- 
-+	if (!vfio_iommu_iova_dma_valid(iommu, iova, iova + size - 1)) {
-+		ret = -EINVAL;
++static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
++				      struct vfio_info_cap *caps)
++{
++	struct vfio_iommu_type1_info_cap_iova_range *cap_iovas;
++	struct vfio_iova *iova;
++	size_t size;
++	int iovas = 0, i = 0, ret;
++
++	mutex_lock(&iommu->lock);
++
++	list_for_each_entry(iova, &iommu->iova_list, list)
++		iovas++;
++
++	if (!iovas) {
++		/*
++		 * Return 0 as a container with a single mdev device
++		 * will have an empty list
++		 */
++		ret = 0;
 +		goto out_unlock;
 +	}
 +
- 	dma = kzalloc(sizeof(*dma), GFP_KERNEL);
- 	if (!dma) {
- 		ret = -ENOMEM;
++	size = sizeof(*cap_iovas) + (iovas * sizeof(*cap_iovas->iova_ranges));
++
++	cap_iovas = kzalloc(size, GFP_KERNEL);
++	if (!cap_iovas) {
++		ret = -ENOMEM;
++		goto out_unlock;
++	}
++
++	cap_iovas->nr_iovas = iovas;
++
++	list_for_each_entry(iova, &iommu->iova_list, list) {
++		cap_iovas->iova_ranges[i].start = iova->start;
++		cap_iovas->iova_ranges[i].end = iova->end;
++		i++;
++	}
++
++	ret = vfio_iommu_iova_add_cap(caps, cap_iovas, size);
++
++	kfree(cap_iovas);
++out_unlock:
++	mutex_unlock(&iommu->lock);
++	return ret;
++}
++
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
+ {
+@@ -2159,19 +2226,53 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		}
+ 	} else if (cmd == VFIO_IOMMU_GET_INFO) {
+ 		struct vfio_iommu_type1_info info;
++		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
++		unsigned long capsz;
++		int ret;
+ 
+ 		minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
+ 
++		/* For backward compatibility, cannot require this */
++		capsz = offsetofend(struct vfio_iommu_type1_info, cap_offset);
++
+ 		if (copy_from_user(&info, (void __user *)arg, minsz))
+ 			return -EFAULT;
+ 
+ 		if (info.argsz < minsz)
+ 			return -EINVAL;
+ 
++		if (info.argsz >= capsz) {
++			minsz = capsz;
++			info.cap_offset = 0; /* output, no-recopy necessary */
++		}
++
+ 		info.flags = VFIO_IOMMU_INFO_PGSIZES;
+ 
+ 		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
+ 
++		ret = vfio_iommu_iova_build_caps(iommu, &caps);
++		if (ret)
++			return ret;
++
++		if (caps.size) {
++			info.flags |= VFIO_IOMMU_INFO_CAPS;
++
++			if (info.argsz < sizeof(info) + caps.size) {
++				info.argsz = sizeof(info) + caps.size;
++			} else {
++				vfio_info_cap_shift(&caps, sizeof(info));
++				if (copy_to_user((void __user *)arg +
++						sizeof(info), caps.buf,
++						caps.size)) {
++					kfree(caps.buf);
++					return -EFAULT;
++				}
++				info.cap_offset = sizeof(info);
++			}
++
++			kfree(caps.buf);
++		}
++
+ 		return copy_to_user((void __user *)arg, &info, minsz) ?
+ 			-EFAULT : 0;
+ 
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 8f10748dac79..1259dccd09d2 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -714,7 +714,31 @@ struct vfio_iommu_type1_info {
+ 	__u32	argsz;
+ 	__u32	flags;
+ #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
+-	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
++#define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
++	__u64	iova_pgsizes;	/* Bitmap of supported page sizes */
++	__u32   cap_offset;	/* Offset within info struct of first cap */
++};
++
++/*
++ * The IOVA capability allows to report the valid IOVA range(s)
++ * excluding any non-relaxable reserved regions exposed by
++ * devices attached to the container. Any DMA map attempt
++ * outside the valid iova range will return error.
++ *
++ * The structures below define version 1 of this capability.
++ */
++#define VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE  1
++
++struct vfio_iova_range {
++	__u64	start;
++	__u64	end;
++};
++
++struct vfio_iommu_type1_info_cap_iova_range {
++	struct	vfio_info_cap_header header;
++	__u32	nr_iovas;
++	__u32	reserved;
++	struct	vfio_iova_range iova_ranges[];
+ };
+ 
+ #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
 -- 
 2.17.1
 
