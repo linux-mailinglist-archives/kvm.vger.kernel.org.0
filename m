@@ -2,98 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D7E21714BD
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 11:14:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB0A714CB
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 11:16:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388797AbfGWJOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 05:14:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39852 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730843AbfGWJOL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jul 2019 05:14:11 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6N98bqn079556
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 05:14:10 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2twxv2hg1u-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 05:14:09 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
-        Tue, 23 Jul 2019 10:14:07 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 23 Jul 2019 10:14:04 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6N9E34q59834518
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Jul 2019 09:14:03 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B8EBA4040;
-        Tue, 23 Jul 2019 09:14:03 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0902BA4069;
-        Tue, 23 Jul 2019 09:14:03 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.134])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 23 Jul 2019 09:14:02 +0000 (GMT)
-Date:   Tue, 23 Jul 2019 11:14:01 +0200
-From:   Heiko Carstens <heiko.carstens@de.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PULL v2 0/6] vfio-ccw fixes for 5.3
-References: <20190717094350.13620-1-cohuck@redhat.com>
+        id S2388863AbfGWJQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 05:16:52 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:38983 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729835AbfGWJQw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Jul 2019 05:16:52 -0400
+Received: by mail-qk1-f195.google.com with SMTP id w190so30557003qkc.6
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 02:16:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=p1+gYIBWMowLYRybQ6oWxpq5UdgeV2arIpG6bdXu/8w=;
+        b=YfaXF57AbePgoX8Y2VpSzcfhiwZRHzAjxqlZ9iHnylVFH729p7dGYeaZ6lUKVAiZQK
+         /2yeEuQ4lNSFGiK1e4zBFDDGylTr61lo35wJS14ff+LBJFfgRwhvO5FP0ZpS+PW2uGkz
+         akKqeVlFtbn1SLcKoafFTBbd85L8kn2dcn19qw5mUkes2qk8oOj2KQEA2jl3PPvLitAi
+         fyHSNXxB06RIIanq4Jz2x39cy+KgmvZsxpe76Xthuozp+CKGWY9jGaw09P98i5LXJ9W1
+         RmzeUb9/ZoyMWrwvxSZuNrX+KSeGLlkeQzSGyeCNLLJ65aUnqJjm8DQUDtG8IQkNqp3Q
+         epMw==
+X-Gm-Message-State: APjAAAW0yMnNPSzbaO4ah7CfBs1Cuq9BEd4UCmIVHpSPFWa5hjVT293w
+        FJymdRwZEsIR/e0vfMAHOXeZEA==
+X-Google-Smtp-Source: APXvYqyu6jNlikk+iK+Qd5rby5/UX6t/lEzykZfn5ns4rVGJkT29eU29dnU+XKBwjNMXoWgetKh15w==
+X-Received: by 2002:a37:6508:: with SMTP id z8mr48471820qkb.492.1563873411371;
+        Tue, 23 Jul 2019 02:16:51 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+        by smtp.gmail.com with ESMTPSA id t12sm18734095qtr.49.2019.07.23.02.16.48
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 23 Jul 2019 02:16:50 -0700 (PDT)
+Date:   Tue, 23 Jul 2019 05:16:45 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/6] vhost: don't do synchronize_rcu() in
+ vhost_uninit_vq_maps()
+Message-ID: <20190723041144-mutt-send-email-mst@kernel.org>
+References: <20190723075718.6275-1-jasowang@redhat.com>
+ <20190723075718.6275-7-jasowang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190717094350.13620-1-cohuck@redhat.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19072309-0028-0000-0000-000003870AC2
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072309-0029-0000-0000-000024474209
-Message-Id: <20190723091401.GA4022@osiris>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-23_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=976 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907230086
+In-Reply-To: <20190723075718.6275-7-jasowang@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 11:43:44AM +0200, Cornelia Huck wrote:
-> The following changes since commit 9a159190414d461fdac7ae5bb749c2d532b35419:
+On Tue, Jul 23, 2019 at 03:57:18AM -0400, Jason Wang wrote:
+> There's no need for RCU synchronization in vhost_uninit_vq_maps()
+> since we've already serialized with readers (memory accessors). This
+> also avoid the possible userspace DOS through ioctl() because of the
+> possible high latency caused by synchronize_rcu().
 > 
->   s390/unwind: avoid int overflow in outside_of_stack (2019-07-11 20:40:02 +0200)
-> 
-> are available in the Git repository at:
-> 
->   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git tags/vfio-ccw-20190717-2
->
-> Cornelia Huck (1):
->   Documentation: fix vfio-ccw doc
-> 
-> Farhan Ali (5):
->   vfio-ccw: Fix misleading comment when setting orb.cmd.c64
->   vfio-ccw: Fix memory leak and don't call cp_free in cp_init
->   vfio-ccw: Set pa_nr to 0 if memory allocation fails for pa_iova_pfn
->   vfio-ccw: Don't call cp_free if we are processing a channel program
->   vfio-ccw: Update documentation for csch/hsch
-> 
->  Documentation/s390/vfio-ccw.rst | 31 ++++++++++++++++++++++++++++---
->  drivers/s390/cio/vfio_ccw_cp.c  | 28 +++++++++++++++++-----------
->  drivers/s390/cio/vfio_ccw_drv.c |  2 +-
->  3 files changed, 46 insertions(+), 15 deletions(-)
+> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+> Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Pulled and pushed to fixes branch. Thanks!
+I agree synchronize_rcu in both mmu notifiers and ioctl
+is a problem we must fix.
 
+> ---
+>  drivers/vhost/vhost.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 5b8821d00fe4..a17df1f4069a 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -334,7 +334,9 @@ static void vhost_uninit_vq_maps(struct vhost_virtqueue *vq)
+>  	}
+>  	spin_unlock(&vq->mmu_lock);
+>  
+> -	synchronize_rcu();
+> +	/* No need for synchronize_rcu() or kfree_rcu() since we are
+> +	 * serialized with memory accessors (e.g vq mutex held).
+> +	 */
+>  
+>  	for (i = 0; i < VHOST_NUM_ADDRS; i++)
+>  		if (map[i])
+> -- 
+> 2.18.1
+
+.. however we can not RCU with no synchronization in sight.
+Sometimes there are hacks like using a lock/unlock
+pair instead of sync, but here no one bothers.
+
+specifically notifiers call reset vq maps which calls
+uninit vq maps which is not under any lock.
+
+You will get use after free when map is then accessed.
+
+If you always have a lock then just take that lock
+and no need for RCU.
+
+-- 
+MST
