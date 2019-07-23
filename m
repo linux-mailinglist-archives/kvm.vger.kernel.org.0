@@ -2,139 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 122247182F
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 14:25:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2492A7184D
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2019 14:32:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726645AbfGWMZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Jul 2019 08:25:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47018 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726438AbfGWMZv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Jul 2019 08:25:51 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7035F300CB0E;
-        Tue, 23 Jul 2019 12:25:50 +0000 (UTC)
-Received: from [10.36.117.239] (ovpn-117-239.ams2.redhat.com [10.36.117.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D4BB21001DE1;
-        Tue, 23 Jul 2019 12:25:45 +0000 (UTC)
-Subject: Re: [PATCH v2 4/9] KVM: arm/arm64: vgic-its: Invalidate MSI-LPI
- translation cache on specific commands
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Julien Thierry <julien.thierry@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        "Saidi, Ali" <alisaidi@amazon.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-5-marc.zyngier@arm.com>
- <9ff329a3-44f2-1de3-b6cc-58ed38a63665@redhat.com>
- <1a78d52c-7a31-8981-230b-abe85d11b8ec@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <8b5e029c-a08f-b86b-7021-5d68ec05d3bd@redhat.com>
-Date:   Tue, 23 Jul 2019 14:25:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1732005AbfGWMch (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Jul 2019 08:32:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52706 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726438AbfGWMcg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Jul 2019 08:32:36 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6NCSMev162045
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 08:32:35 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2tx14skhmw-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2019 08:32:35 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Tue, 23 Jul 2019 13:32:32 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 23 Jul 2019 13:32:29 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6NCWSEu59703370
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Jul 2019 12:32:28 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E418D11C054;
+        Tue, 23 Jul 2019 12:32:27 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9FC5811C052;
+        Tue, 23 Jul 2019 12:32:27 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.145])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Jul 2019 12:32:27 +0000 (GMT)
+Date:   Tue, 23 Jul 2019 14:32:26 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Heiko Carstens <heiko.carstens@de.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
+In-Reply-To: <20190719130130.3ef4fa9c.pasic@linux.ibm.com>
+References: <20190718172120.69947-1-pasic@linux.ibm.com>
+        <20190719063249.GA4852@osiris>
+        <20190719130130.3ef4fa9c.pasic@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <1a78d52c-7a31-8981-230b-abe85d11b8ec@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 23 Jul 2019 12:25:50 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19072312-4275-0000-0000-0000034FD5FC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072312-4276-0000-0000-0000385FFAD5
+Message-Id: <20190723143226.6d929d7a.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-23_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=887 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907230123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Fri, 19 Jul 2019 13:01:30 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-On 7/22/19 12:54 PM, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On 01/07/2019 13:38, Auger Eric wrote:
->> Hi Marc,
->>
->> On 6/11/19 7:03 PM, Marc Zyngier wrote:
->>> The LPI translation cache needs to be discarded when an ITS command
->>> may affect the translation of an LPI (DISCARD and MAPD with V=0) or
->>> the routing of an LPI to a redistributor with disabled LPIs (MOVI,
->>> MOVALL).
->>>
->>> We decide to perform a full invalidation of the cache, irrespective
->>> of the LPI that is affected. Commands are supposed to be rare enough
->>> that it doesn't matter.
->>>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 8 ++++++++
->>>  1 file changed, 8 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 9b6b66204b97..5254bb762e1b 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -733,6 +733,8 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
->>>  		 * don't bother here since we clear the ITTE anyway and the
->>>  		 * pending state is a property of the ITTE struct.
->>>  		 */
->>> +		vgic_its_invalidate_cache(kvm);
->>> +
->>>  		its_free_ite(kvm, ite);
->>>  		return 0;
->>>  	}
->>> @@ -768,6 +770,8 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
->>>  	ite->collection = collection;
->>>  	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
->>>  
->>> +	vgic_its_invalidate_cache(kvm);
->>> +
->>>  	return update_affinity(ite->irq, vcpu);
->>>  }
->>>  
->>> @@ -996,6 +1000,8 @@ static void vgic_its_free_device(struct kvm *kvm, struct its_device *device)
->>>  	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
->>>  		its_free_ite(kvm, ite);
->>>  
->>> +	vgic_its_invalidate_cache(kvm);
->>> +
->>>  	list_del(&device->dev_list);
->>>  	kfree(device);
->>>  }
->>> @@ -1249,6 +1255,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
->>>  		vgic_put_irq(kvm, irq);
->>>  	}
->>>  
->>> +	vgic_its_invalidate_cache(kvm);
->> All the commands are executed with the its_lock held. Now we don't take
->> it anymore on the fast cache injection path. Don't we have a window
->> where the move has been applied at table level and the cache is not yet
->> invalidated? Same question for vgic_its_free_device().
-> 
-> There is definitely a race, but that race is invisible from the guest's
-> perspective. The guest can only assume that the command has taken effect
-> once a SYNC command has been executed, and it cannot observe that the
-> SYNC command has been executed before we have invalidated the cache.
-> 
-> Does this answer your question?
+> > > diff --git a/arch/s390/include/asm/dma.h b/arch/s390/include/asm/dma.h
+> > > index 6f26f35d4a71..3b0329665b13 100644
+> > > --- a/arch/s390/include/asm/dma.h
+> > > +++ b/arch/s390/include/asm/dma.h
+> > > @@ -10,6 +10,7 @@
+> > >   * by the 31 bit heritage.
+> > >   */
+> > >  #define MAX_DMA_ADDRESS         0x80000000
+> > > +#define ARCH_ZONE_DMA_BITS      31  
+> > 
+> > powerpc has this in arch/powerpc/include/asm/page.h. This really
+> > should be consistently defined in the same header file across
+> > architectures.
+> > 
+> > Christoph, what is the preferred header file for this definition?
 
-OK make sense. Thank you for the clarification
+ping
 
-Another question, don't we need to invalidate the cache on  MAPC V=0 as
-well? Removing the mapping of the collection results in interrupts
-belonging to that collection being ignored. If we don't flush the
-pending bit will be set?
+Christoph could you please answer Heiko's question, so I can do my
+respin.
 
-Thanks
+Regards,
+Halil
 
-Eric
+> > 
+> > I'd also rather say it would be better to move the #ifndef ARCH_ZONE_DMA_BITS
+> > check to a common code header file instead of having it in a C file, and
+> > make it more obvious in which header file architectures should/can override
+> > the default, no?  
 > 
-> Thanks,
+> +1
 > 
-> 	M.
-> 
+> I will wait for Christoph's answer with a respin. Thanks for having a
+> look.
+
