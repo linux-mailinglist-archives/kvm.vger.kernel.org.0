@@ -2,166 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C54F272E8B
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 14:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74C1F72E9C
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 14:17:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728047AbfGXMQG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 08:16:06 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55186 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726546AbfGXMQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 08:16:06 -0400
-Received: by mail-wm1-f65.google.com with SMTP id p74so41602249wme.4;
-        Wed, 24 Jul 2019 05:16:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=SLt95QYbjQo4qkZN/GwEGgN0OUNxg3y/mONcPhKuAqY=;
-        b=MhdwV55oPsXubgTXUOYG0oxOZTQiJundGhkrJpMdcknYzOV8SpYqCsYCvFIiiU7qqW
-         T3qREmkPF1z1fEP455xBMeGDz9GlRvMRRJMptGUe34+OTlW0zAdcSa0Pz/iYNze+VS15
-         7cG7BGNPqpywKStA5TeHr3fLX6VIMSGW07oPpftAixOP8UYUcG0C6B3PnAqF6G1w063Y
-         gHXkllCZExUeQayQ9pcyHX6UDzhFxkENHkH8Zu3roS6TjieITiLmgHThclhTtsog9xQD
-         Ub9BQnfSzj3f3icw6pMSkJhyqcRv23C79djXQYJnTFsgv2EDjL8iECcdObLUe2HmMMMR
-         rcWg==
+        id S1727957AbfGXMRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 08:17:18 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35140 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726408AbfGXMRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 08:17:17 -0400
+Received: by mail-wm1-f66.google.com with SMTP id l2so41410292wmg.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 05:17:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=SLt95QYbjQo4qkZN/GwEGgN0OUNxg3y/mONcPhKuAqY=;
-        b=aCXnDj6vJvSd5RpYzqY5QPGqLZOKgiO6bBAEkxT2EYU4qL8JPKr2xEgD2Q6TIWHAdk
-         qBb3QrmCTYBPAyGqFObj33/bhoxWbNyt2ddS29s9AKwu8RjtmEb3EmKJwu86jsm4IvTs
-         jj54Os3iRgAhYSuugGbVQyboSMyrO2HowXor4GVuGJRMvHE1AWRmAtoskXdzNkRbRzTb
-         pOVKDDVAtu4QtuHhWJSN0XX1PQoEMaqwQgCubScPQZ05q0msLkF3mTPiZRkTG1J0g22a
-         NKN4FAuwsiB0vi5XfVc4E+pF1IyE2wWhCceCwaW7SvkTyRLlAHtab1tktZbvwL/QIl++
-         Qaug==
-X-Gm-Message-State: APjAAAX7vTUJ6HerR2rSfZ1QWSp61jWXU//MzNgQduCzG031H6vr0i2b
-        rixM7t6xDhNp8qq23NEOTO2k4fZg3eA=
-X-Google-Smtp-Source: APXvYqxLWXrNBrWIjcHD5Vhitxx7W51qWVtaUAHfTjqLntQc/Szx8WPAUClq6rEkyIbPdHHvo1pk3Q==
-X-Received: by 2002:a1c:cb43:: with SMTP id b64mr75609112wmg.86.1563970563187;
-        Wed, 24 Jul 2019 05:16:03 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id o6sm89302289wra.27.2019.07.24.05.16.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2019 05:16:02 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=d/bnNeFnlnArvv9m90hzgTqoTaqu56sti/BTphxXxoM=;
+        b=dFOkuLHt4cLFjGFdd2Z1bcqCzrewruuu+D2ujPuF0alInjkkgPKadZP7CQW+Rx56TJ
+         9q39hxPpRP4PWgHVH+qUjZFLT1WVMq+YT1/aMlO+oi/szPyvG+5EUIaOr1pyMeXNmg6o
+         E3v3n8yaxuHOwGJXYLyfVWrVBf8s3yJ7NGDe94i7xVXsC6JvC+6Jw9qDnWZShVH/y6Ql
+         fvyOUcpvLI4gY5kHEaCkQFVO7WtqOjck/qbBERBR6H0dP63I+RnJmuZQgK7KXg2+eVaL
+         EJYkcktWKsXbUB11SIeDh77ZiePKKCEXyYxktZuSjmD2VRUi6FJnfCZd7Fy8ESUFOlZ3
+         sNxQ==
+X-Gm-Message-State: APjAAAV1grCv0NlUQbW+Kw2unsfUhnjFABdCnRx0AaP40lCj6UBsiMEV
+        R3P5UplGjIinnMZRP1x+0HDfEA==
+X-Google-Smtp-Source: APXvYqwCvrf4yPzzk3NFn3Qx2+lKh32KmGRJqKMQSlgWv3da79lYQl+eEShtkRMIfH4axXaXxN60Qw==
+X-Received: by 2002:a1c:407:: with SMTP id 7mr78394104wme.113.1563970635452;
+        Wed, 24 Jul 2019 05:17:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:10f7:67c8:abb4:8512? ([2001:b07:6468:f312:10f7:67c8:abb4:8512])
+        by smtp.gmail.com with ESMTPSA id y12sm41112207wrm.79.2019.07.24.05.17.14
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Jul 2019 05:17:14 -0700 (PDT)
+Subject: Re: [PATCH] KVM: X86: Boost queue head vCPU to mitigate lock waiter
+ preemption
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 5.3-rc2
-Date:   Wed, 24 Jul 2019 14:16:01 +0200
-Message-Id: <1563970561-44925-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Waiman Long <longman@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <1563961393-10301-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5ffaea5b-fb07-0141-cab8-6dce39071abe@redhat.com>
+Date:   Wed, 24 Jul 2019 14:17:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1563961393-10301-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On 24/07/19 11:43, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> Commit 11752adb (locking/pvqspinlock: Implement hybrid PV queued/unfair locks)
+> introduces hybrid PV queued/unfair locks 
+>  - queued mode (no starvation)
+>  - unfair mode (good performance on not heavily contended lock)
+> The lock waiter goes into the unfair mode especially in VMs with over-commit
+> vCPUs since increaing over-commitment increase the likehood that the queue 
+> head vCPU may have been preempted and not actively spinning.
+> 
+> However, reschedule queue head vCPU timely to acquire the lock still can get 
+> better performance than just depending on lock stealing in over-subscribe 
+> scenario.
+> 
+> Testing on 80 HT 2 socket Xeon Skylake server, with 80 vCPUs VM 80GB RAM:
+> ebizzy -M
+>              vanilla     boosting    improved
+>  1VM          23520        25040         6%
+>  2VM           8000        13600        70%
+>  3VM           3100         5400        74%
+> 
+> The lock holder vCPU yields to the queue head vCPU when unlock, to boost queue 
+> head vCPU which is involuntary preemption or the one which is voluntary halt 
+> due to fail to acquire the lock after a short spin in the guest.
 
-The following changes since commit 30cd8604323dbaf20a80e797fe7057f5b02e394d:
+Clever!  I have applied the patch.
 
-  KVM: x86: Add fixed counters to PMU filter (2019-07-20 09:00:48 +0200)
+Paolo
 
-are available in the git repository at:
+> Cc: Waiman Long <longman@redhat.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/x86.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 01e18ca..c6d951c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7206,7 +7206,7 @@ static void kvm_sched_yield(struct kvm *kvm, unsigned long dest_id)
+>  
+>  	rcu_read_unlock();
+>  
+> -	if (target)
+> +	if (target && READ_ONCE(target->ready))
+>  		kvm_vcpu_yield_to(target);
+>  }
+>  
+> @@ -7246,6 +7246,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  		break;
+>  	case KVM_HC_KICK_CPU:
+>  		kvm_pv_kick_cpu_op(vcpu->kvm, a0, a1);
+> +		kvm_sched_yield(vcpu->kvm, a1);
+>  		ret = 0;
+>  		break;
+>  #ifdef CONFIG_X86_64
+> 
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 266e85a5ec9100dcd9ae03601453bbc96fefee5d:
-
-  KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption (2019-07-24 13:56:53 +0200)
-
-----------------------------------------------------------------
-Bugfixes, and a pvspinlock optimization
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      Documentation: move Documentation/virtual to Documentation/virt
-
-Jan Kiszka (2):
-      KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
-      KVM: nVMX: Set cached_vmcs12 and cached_shadow_vmcs12 NULL after free
-
-Paolo Bonzini (1):
-      Revert "kvm: x86: Use task structs fpu field for user"
-
-Wanpeng Li (3):
-      KVM: X86: Fix fpu state crash in kvm guest
-      KVM: X86: Dynamically allocate user_fpu
-      KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption
-
- Documentation/admin-guide/kernel-parameters.txt          |  2 +-
- Documentation/{virtual => virt}/index.rst                |  0
- .../{virtual => virt}/kvm/amd-memory-encryption.rst      |  0
- Documentation/{virtual => virt}/kvm/api.txt              |  2 +-
- Documentation/{virtual => virt}/kvm/arm/hyp-abi.txt      |  0
- Documentation/{virtual => virt}/kvm/arm/psci.txt         |  0
- Documentation/{virtual => virt}/kvm/cpuid.rst            |  0
- Documentation/{virtual => virt}/kvm/devices/README       |  0
- .../{virtual => virt}/kvm/devices/arm-vgic-its.txt       |  0
- .../{virtual => virt}/kvm/devices/arm-vgic-v3.txt        |  0
- Documentation/{virtual => virt}/kvm/devices/arm-vgic.txt |  0
- Documentation/{virtual => virt}/kvm/devices/mpic.txt     |  0
- .../{virtual => virt}/kvm/devices/s390_flic.txt          |  0
- Documentation/{virtual => virt}/kvm/devices/vcpu.txt     |  0
- Documentation/{virtual => virt}/kvm/devices/vfio.txt     |  0
- Documentation/{virtual => virt}/kvm/devices/vm.txt       |  0
- Documentation/{virtual => virt}/kvm/devices/xics.txt     |  0
- Documentation/{virtual => virt}/kvm/devices/xive.txt     |  0
- Documentation/{virtual => virt}/kvm/halt-polling.txt     |  0
- Documentation/{virtual => virt}/kvm/hypercalls.txt       |  4 ++--
- Documentation/{virtual => virt}/kvm/index.rst            |  0
- Documentation/{virtual => virt}/kvm/locking.txt          |  0
- Documentation/{virtual => virt}/kvm/mmu.txt              |  2 +-
- Documentation/{virtual => virt}/kvm/msr.txt              |  0
- Documentation/{virtual => virt}/kvm/nested-vmx.txt       |  0
- Documentation/{virtual => virt}/kvm/ppc-pv.txt           |  0
- Documentation/{virtual => virt}/kvm/review-checklist.txt |  2 +-
- Documentation/{virtual => virt}/kvm/s390-diag.txt        |  0
- Documentation/{virtual => virt}/kvm/timekeeping.txt      |  0
- Documentation/{virtual => virt}/kvm/vcpu-requests.rst    |  0
- Documentation/{virtual => virt}/paravirt_ops.rst         |  0
- .../{virtual => virt}/uml/UserModeLinux-HOWTO.txt        |  0
- MAINTAINERS                                              |  6 +++---
- arch/powerpc/include/uapi/asm/kvm_para.h                 |  2 +-
- arch/x86/include/asm/kvm_host.h                          |  7 ++++---
- arch/x86/kvm/mmu.c                                       |  2 +-
- arch/x86/kvm/svm.c                                       | 13 ++++++++++++-
- arch/x86/kvm/vmx/nested.c                                |  4 ++++
- arch/x86/kvm/vmx/vmx.c                                   | 13 ++++++++++++-
- arch/x86/kvm/x86.c                                       | 16 ++++++++++------
- include/uapi/linux/kvm.h                                 |  4 ++--
- tools/include/uapi/linux/kvm.h                           |  4 ++--
- virt/kvm/arm/arm.c                                       |  2 +-
- virt/kvm/arm/vgic/vgic-mmio-v3.c                         |  2 +-
- virt/kvm/arm/vgic/vgic.h                                 |  4 ++--
- 45 files changed, 61 insertions(+), 30 deletions(-)
- rename Documentation/{virtual => virt}/index.rst (100%)
- rename Documentation/{virtual => virt}/kvm/amd-memory-encryption.rst (100%)
- rename Documentation/{virtual => virt}/kvm/api.txt (99%)
- rename Documentation/{virtual => virt}/kvm/arm/hyp-abi.txt (100%)
- rename Documentation/{virtual => virt}/kvm/arm/psci.txt (100%)
- rename Documentation/{virtual => virt}/kvm/cpuid.rst (100%)
- rename Documentation/{virtual => virt}/kvm/devices/README (100%)
- rename Documentation/{virtual => virt}/kvm/devices/arm-vgic-its.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/arm-vgic-v3.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/arm-vgic.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/mpic.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/s390_flic.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/vcpu.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/vfio.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/vm.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/xics.txt (100%)
- rename Documentation/{virtual => virt}/kvm/devices/xive.txt (100%)
- rename Documentation/{virtual => virt}/kvm/halt-polling.txt (100%)
- rename Documentation/{virtual => virt}/kvm/hypercalls.txt (97%)
- rename Documentation/{virtual => virt}/kvm/index.rst (100%)
- rename Documentation/{virtual => virt}/kvm/locking.txt (100%)
- rename Documentation/{virtual => virt}/kvm/mmu.txt (99%)
- rename Documentation/{virtual => virt}/kvm/msr.txt (100%)
- rename Documentation/{virtual => virt}/kvm/nested-vmx.txt (100%)
- rename Documentation/{virtual => virt}/kvm/ppc-pv.txt (100%)
- rename Documentation/{virtual => virt}/kvm/review-checklist.txt (95%)
- rename Documentation/{virtual => virt}/kvm/s390-diag.txt (100%)
- rename Documentation/{virtual => virt}/kvm/timekeeping.txt (100%)
- rename Documentation/{virtual => virt}/kvm/vcpu-requests.rst (100%)
- rename Documentation/{virtual => virt}/paravirt_ops.rst (100%)
- rename Documentation/{virtual => virt}/uml/UserModeLinux-HOWTO.txt (100%)
