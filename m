@@ -2,83 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 558A77275D
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 07:31:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDE3272777
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 07:44:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726107AbfGXFbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 01:31:18 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:41224 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725829AbfGXFbS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 01:31:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=QMaeodYE6xPawroosfuLAM7Isuyd6msaiuu7WIzXJNg=; b=oW2+1uEt0qJRsZ3rIR+o/XGwJ
-        IpJYdIAzmbpSGeQXXd0w7hFDdorld2bWWW2oiCVa9bfBdmqzQ8VzYAS+3VpPpYND1enTUT3LXM1SV
-        CwbH89SUpW2WcPCY1lNCr1Q9WWq6hrUjLEGXr0uuup16IdlyJWTjkk54FwGggAAJ6/K2n0CpTScov
-        6bsInH3E0/xFvQn6gl70zra+lZBETmvjV0nc1ECTcsc2eePjN7LRDKmPqETKEgRYUFXsRBdhR/R8v
-        o2dvpNjC4kqeW2Xy7IKsHBsPaIMTNnKrfPXCCv6MAnnK2HeXtxBGaSw/R+BXARy62cABx/L38sQl7
-        Pi0QmIdOw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1hq9rZ-0006FA-JW; Wed, 24 Jul 2019 05:30:53 +0000
-Date:   Tue, 23 Jul 2019 22:30:53 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     john.hubbard@gmail.com
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        LKML <linux-kernel@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, samba-technical@lists.samba.org,
-        v9fs-developer@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org,
-        John Hubbard <jhubbard@nvidia.com>,
+        id S1725955AbfGXFov (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 01:44:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4388 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725894AbfGXFou (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jul 2019 01:44:50 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6O5gQ3T021204
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 01:44:49 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2txe9qxfe1-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 01:44:49 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+        Wed, 24 Jul 2019 06:44:47 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 24 Jul 2019 06:44:44 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6O5igU540436056
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Jul 2019 05:44:42 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7DD0311C050;
+        Wed, 24 Jul 2019 05:44:42 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39B9C11C052;
+        Wed, 24 Jul 2019 05:44:42 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.134])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 24 Jul 2019 05:44:42 +0000 (GMT)
+Date:   Wed, 24 Jul 2019 07:44:40 +0200
+From:   Heiko Carstens <heiko.carstens@de.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: Re: [PATCH 03/12] block: bio_release_pages: use flags arg instead of
- bool
-Message-ID: <20190724053053.GA18330@infradead.org>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
- <20190724042518.14363-4-jhubbard@nvidia.com>
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v2 1/1] s390/dma: provide proper ARCH_ZONE_DMA_BITS value
+References: <20190723225155.3915-1-pasic@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190724042518.14363-4-jhubbard@nvidia.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20190723225155.3915-1-pasic@linux.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19072405-0008-0000-0000-000003003A0C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072405-0009-0000-0000-0000226DC921
+Message-Id: <20190724054440.GA4412@osiris>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-24_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=553 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907240065
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 23, 2019 at 09:25:09PM -0700, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
+On Wed, Jul 24, 2019 at 12:51:55AM +0200, Halil Pasic wrote:
+> On s390 ZONE_DMA is up to 2G, i.e. ARCH_ZONE_DMA_BITS should be 31 bits.
+> The current value is 24 and makes __dma_direct_alloc_pages() take a
+> wrong turn first (but __dma_direct_alloc_pages() recovers then).
 > 
-> In commit d241a95f3514 ("block: optionally mark pages dirty in
-> bio_release_pages"), new "bool mark_dirty" argument was added to
-> bio_release_pages.
+> Let's correct ARCH_ZONE_DMA_BITS value and avoid wrong turns.
 > 
-> In upcoming work, another bool argument (to indicate that the pages came
-> from get_user_pages) is going to be added. That's one bool too many,
-> because it's not desirable have calls of the form:
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Reported-by: Petr Tesarik <ptesarik@suse.cz>
+> Fixes: c61e9637340e ("dma-direct: add support for allocation from ZONE_DMA and ZONE_DMA32")
+> ---
+>  arch/s390/include/asm/page.h | 2 ++
+>  1 file changed, 2 insertions(+)
 
-All pages releases by bio_release_pages should come from
-get_get_user_pages, so I don't really see the point here.
+Applied, thanks!
+
