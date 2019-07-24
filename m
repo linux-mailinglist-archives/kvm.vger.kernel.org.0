@@ -2,110 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC6F972CC0
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:01:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7F0972CC3
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:01:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727310AbfGXLBI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 07:01:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41750 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726514AbfGXLBI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 07:01:08 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E802D30BD1CA;
-        Wed, 24 Jul 2019 11:01:07 +0000 (UTC)
-Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B997600C7;
-        Wed, 24 Jul 2019 11:01:05 +0000 (UTC)
-Date:   Wed, 24 Jul 2019 12:01:03 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Juan Quintela <quintela@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Thomas Huth <thuth@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH 3/4] migration: Make explicit that we are quitting multifd
-Message-ID: <20190724110103.GC2717@work-vm>
-References: <20190724095523.1527-1-quintela@redhat.com>
- <20190724095523.1527-4-quintela@redhat.com>
+        id S1727327AbfGXLBe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 07:01:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12264 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726300AbfGXLBe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jul 2019 07:01:34 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6OAvSC9126834
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 07:01:33 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2txnkus8u1-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 07:01:32 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Wed, 24 Jul 2019 12:01:30 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 24 Jul 2019 12:01:27 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6OB1PAf47448152
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Jul 2019 11:01:25 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 934A652059;
+        Wed, 24 Jul 2019 11:01:25 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.141])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 53D9A52052;
+        Wed, 24 Jul 2019 11:01:25 +0000 (GMT)
+Date:   Wed, 24 Jul 2019 13:01:24 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org, stable@vger.kernel.org
+Subject: Re: [PATCH 1/1] virtio/s390: fix race on airq_areas[]
+In-Reply-To: <74087255-fdae-01a1-7152-f6fac8e13019@de.ibm.com>
+References: <20190723225817.12800-1-pasic@linux.ibm.com>
+        <74087255-fdae-01a1-7152-f6fac8e13019@de.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190724095523.1527-4-quintela@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 24 Jul 2019 11:01:07 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19072411-0028-0000-0000-000003875644
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072411-0029-0000-0000-00002447919D
+Message-Id: <20190724130124.0dcfc5c0.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-24_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907240124
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We add a bool to indicate that.
+On Wed, 24 Jul 2019 08:44:19 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-OK, similar to send.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  migration/ram.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 87bb7da8e2..eb6716710e 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -677,6 +677,8 @@ typedef struct {
->      QemuMutex mutex;
->      /* is this channel thread running */
->      bool running;
-> +    /* should this thread finish */
-> +    bool quit;
->      /* array of pages to receive */
->      MultiFDPages_t *pages;
->      /* packet allocated len */
-> @@ -1266,6 +1268,7 @@ static void multifd_recv_terminate_threads(Error *err)
->          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->  
->          qemu_mutex_lock(&p->mutex);
-> +        p->quit = true;
->          /* We could arrive here for two reasons:
->             - normal quit, i.e. everything went fine, just finished
->             - error quit: We close the channels so the channel threads
-> @@ -1288,6 +1291,7 @@ int multifd_load_cleanup(Error **errp)
->          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->  
->          if (p->running) {
-> +            p->quit = true;
->              qemu_thread_join(&p->thread);
->          }
->          object_unref(OBJECT(p->c));
-> @@ -1351,6 +1355,10 @@ static void *multifd_recv_thread(void *opaque)
->          uint32_t used;
->          uint32_t flags;
->  
-> +        if (p->quit) {
-> +            break;
-> +        }
-> +
->          ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
->                                         p->packet_len, &local_err);
->          if (ret == 0) {   /* EOF */
-> @@ -1422,6 +1430,7 @@ int multifd_load_setup(void)
->  
->          qemu_mutex_init(&p->mutex);
->          qemu_sem_init(&p->sem_sync, 0);
-> +        p->quit = false;
->          p->id = i;
->          p->pages = multifd_pages_init(page_count);
->          p->packet_len = sizeof(MultiFDPacket_t)
-> -- 
-> 2.21.0
+> On 24.07.19 00:58, Halil Pasic wrote:
+> > The access to airq_areas was racy ever since the adapter interrupts got
+> > introduced to virtio-ccw, but since commit 39c7dcb15892 ("virtio/s390:
+> > make airq summary indicators DMA") this became an issue in practice as
+> > well. Namely before that commit the airq_info that got overwritten was
+> > still functional. After that commit however the two infos share a
+> > summary_indicator, which aggravates the situation. Which means
+> > auto-online mechanism occasionally hangs the boot with virtio_blk.
+> > 
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> > Fixes: 96b14536d935 ("virtio-ccw: virtio-ccw adapter interrupt support.")
+> > ---
+> > * We need definitely this fixed for 5.3. For older stable kernels it is
+> > to be discussed. @Connie what do you think: do we need a cc stable?
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Unless you can prove that the problem could never happen on old version
+> we absolutely do need cc stable.
+
+No I would not like to make an attempt at proving that. I prefer code
+race free anyway. CC-ing stable.
+ 
+> 
+> > 
+> > * I have a variant that does not need the extra mutex but uses cmpxchg().
+> > Decided to post this one because that one is more complex. But if there
+> > is interest we can have a look at it as well.
+> 
+> This is slow path (startup) and never called in hot path. Correct? Mutex should be
+> fine.
+
+Right, this is only relevant during device initialization, which is an
+infrequent operation.
+
+Thanks,
+Halil
+
+> > ---
+> >  drivers/s390/virtio/virtio_ccw.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> > index 1a55e5942d36..d97742662755 100644
+> > --- a/drivers/s390/virtio/virtio_ccw.c
+> > +++ b/drivers/s390/virtio/virtio_ccw.c
+> > @@ -145,6 +145,8 @@ struct airq_info {
+> >  	struct airq_iv *aiv;
+> >  };
+> >  static struct airq_info *airq_areas[MAX_AIRQ_AREAS];
+> > +DEFINE_MUTEX(airq_areas_lock);
+> > +
+> >  static u8 *summary_indicators;
+> >  
+> >  static inline u8 *get_summary_indicator(struct airq_info *info)
+> > @@ -265,9 +267,11 @@ static unsigned long get_airq_indicator(struct virtqueue *vqs[], int nvqs,
+> >  	unsigned long bit, flags;
+> >  
+> >  	for (i = 0; i < MAX_AIRQ_AREAS && !indicator_addr; i++) {
+> > +		mutex_lock(&airq_areas_lock);
+> >  		if (!airq_areas[i])
+> >  			airq_areas[i] = new_airq_info(i);
+> >  		info = airq_areas[i];
+> > +		mutex_unlock(&airq_areas_lock);
+> >  		if (!info)
+> >  			return 0;
+> >  		write_lock_irqsave(&info->lock, flags);
+> > 
+> 
+
