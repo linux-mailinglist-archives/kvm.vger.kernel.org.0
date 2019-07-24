@@ -2,118 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 87A0273180
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 16:21:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 808A87332E
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 17:55:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726855AbfGXOVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 10:21:07 -0400
-Received: from foss.arm.com ([217.140.110.172]:41946 "EHLO foss.arm.com"
+        id S1726869AbfGXPzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 11:55:38 -0400
+Received: from mga12.intel.com ([192.55.52.136]:26320 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726166AbfGXOVH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 10:21:07 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AFA328;
-        Wed, 24 Jul 2019 07:21:06 -0700 (PDT)
-Received: from fuggles.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 761323F71A;
-        Wed, 24 Jul 2019 07:21:01 -0700 (PDT)
-Date:   Wed, 24 Jul 2019 15:20:59 +0100
-From:   Will Deacon <will.deacon@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        dri-devel@lists.freedesktop.org,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
-Message-ID: <20190724142059.GC21234@fuggles.cambridge.arm.com>
-References: <cover.1563904656.git.andreyknvl@google.com>
- <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
- <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
- <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
+        id S1725776AbfGXPzh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 11:55:37 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jul 2019 08:55:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,303,1559545200"; 
+   d="scan'208";a="193502096"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.165])
+  by fmsmga004.fm.intel.com with ESMTP; 24 Jul 2019 08:55:36 -0700
+Date:   Wed, 24 Jul 2019 08:55:36 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH 2/2 v2]kvm-unit-test: nVMX: Test Host Segment Registers
+ and Descriptor Tables on vmentry of nested guests
+Message-ID: <20190724155536.GA25376@linux.intel.com>
+References: <20190703235437.13429-1-krish.sadhukhan@oracle.com>
+ <20190703235437.13429-3-krish.sadhukhan@oracle.com>
+ <826A8AB0-D0A3-4C77-96C9-9C6670CF6C9C@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
-User-Agent: Mutt/1.11.1+86 (6f28e57d73f2) ()
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <826A8AB0-D0A3-4C77-96C9-9C6670CF6C9C@gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 24, 2019 at 04:16:49PM +0200, Andrey Konovalov wrote:
-> On Wed, Jul 24, 2019 at 4:02 PM Will Deacon <will@kernel.org> wrote:
-> > On Tue, Jul 23, 2019 at 08:03:29PM +0200, Andrey Konovalov wrote:
-> > > On Tue, Jul 23, 2019 at 7:59 PM Andrey Konovalov <andreyknvl@google.com> wrote:
-> > > >
-> > > > === Overview
-> > > >
-> > > > arm64 has a feature called Top Byte Ignore, which allows to embed pointer
-> > > > tags into the top byte of each pointer. Userspace programs (such as
-> > > > HWASan, a memory debugging tool [1]) might use this feature and pass
-> > > > tagged user pointers to the kernel through syscalls or other interfaces.
-> > > >
-> > > > Right now the kernel is already able to handle user faults with tagged
-> > > > pointers, due to these patches:
-> > > >
-> > > > 1. 81cddd65 ("arm64: traps: fix userspace cache maintenance emulation on a
-> > > >              tagged pointer")
-> > > > 2. 7dcd9dd8 ("arm64: hw_breakpoint: fix watchpoint matching for tagged
-> > > >               pointers")
-> > > > 3. 276e9327 ("arm64: entry: improve data abort handling of tagged
-> > > >               pointers")
-> > > >
-> > > > This patchset extends tagged pointer support to syscall arguments.
-> >
-> > [...]
-> >
-> > > Do you think this is ready to be merged?
-> > >
-> > > Should this go through the mm or the arm tree?
-> >
-> > I would certainly prefer to take at least the arm64 bits via the arm64 tree
-> > (i.e. patches 1, 2 and 15). We also need a Documentation patch describing
-> > the new ABI.
+On Sun, Jul 21, 2019 at 11:26:24AM -0700, Nadav Amit wrote:
+> > On Jul 3, 2019, at 4:54 PM, Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
+> > 
+> > According to section "Checks on Host Segment and Descriptor-Table
+> > Registers" in Intel SDM vol 3C, the following checks are performed on
+> > vmentry of nested guests:
+> > 
+> >    - In the selector field for each of CS, SS, DS, ES, FS, GS and TR, the
+> >      RPL (bits 1:0) and the TI flag (bit 2) must be 0.
+> >    - The selector fields for CS and TR cannot be 0000H.
+> >    - The selector field for SS cannot be 0000H if the "host address-space
+> >      size" VM-exit control is 0.
+> >    - On processors that support Intel 64 architecture, the base-address
+> >      fields for FS, GS, GDTR, IDTR, and TR must contain canonical
+> >      addresses.
 > 
-> Sounds good! Should I post those patches together with the
-> Documentation patches from Vincenzo as a separate patchset?
+> As I noted on v1, this patch causes the test to fail on bare-metal:
+> 
+>  FAIL: HOST_SEL_SS 0: VMX inst error is 8 (actual 7)
+> 
+> I don’t know what the root-cause is, but I don't think that tests that
+> fail on bare-metal (excluding because of CPU errata) should be included.
 
-Yes, please (although as you say below, we need a new version of those
-patches from Vincenzo to address the feedback on v5). The other thing I
-should say is that I'd be happy to queue the other patches in the series
-too, but some of them are missing acks from the relevant maintainers (e.g.
-the mm/ and fs/ changes).
+A 64-bit VMM isn't allowed to transition to 32-bit mode by way of VM-Exit,
+and the VMX tests are 64-bit only.
 
-Will
+  If the logical processor is in IA-32e mode (if IA32_EFER.LMA=1) at the
+  time of VM entry, the "host address space size" VM-exit control must be 1.
