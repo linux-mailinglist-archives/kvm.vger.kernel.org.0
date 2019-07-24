@@ -2,160 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D89272B08
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 11:04:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C91DD72B73
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 11:33:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbfGXJEr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 05:04:47 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2749 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726070AbfGXJEr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 05:04:47 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 02EDA65D9F3FEEC4FB62;
-        Wed, 24 Jul 2019 17:04:46 +0800 (CST)
-Received: from localhost (10.177.19.122) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Wed, 24 Jul 2019
- 17:04:42 +0800
-From:   Xiangyou Xie <xiexiangyou@huawei.com>
-To:     <marc.zyngier@arm.com>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-Subject: [PATCH 3/3] KVM: arm/arm64: vgic: introduce vgic_cpu pending status and lowest_priority
-Date:   Wed, 24 Jul 2019 17:04:37 +0800
-Message-ID: <20190724090437.49952-4-xiexiangyou@huawei.com>
-X-Mailer: git-send-email 2.10.0.windows.1
-In-Reply-To: <20190724090437.49952-1-xiexiangyou@huawei.com>
-References: <20190724090437.49952-1-xiexiangyou@huawei.com>
+        id S1726785AbfGXJdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 05:33:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46688 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726585AbfGXJdT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 05:33:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8736030860D1;
+        Wed, 24 Jul 2019 09:33:18 +0000 (UTC)
+Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C14110018F9;
+        Wed, 24 Jul 2019 09:33:08 +0000 (UTC)
+Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
+ <20190715025519.GE3440@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
+ <20190717030640.GG9123@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A0140E0@SHSMSX104.ccr.corp.intel.com>
+ <20190723035741.GR25073@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A0160C9@SHSMSX104.ccr.corp.intel.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <abf336b6-4c51-7742-44aa-5b51c8ea4af7@redhat.com>
+Date:   Wed, 24 Jul 2019 11:33:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.177.19.122]
-X-CFilter-Loop: Reflected
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0160C9@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 24 Jul 2019 09:33:18 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-During the halt polling process, vgic_cpu->ap_list_lock is frequently
-obtained andreleased, (kvm_vcpu_check_block->kvm_arch_vcpu_runnable->
-kvm_vgic_vcpu_pending_irq).This action affects the performance of virq
-interrupt injection, because vgic_queue_irq_unlock also attempts to get
-vgic_cpu->ap_list_lock and add irq to vgic_cpu ap_list.
+Hi Yi, David,
 
-The irq pending state and the minimum priority introduced by the patch,
-kvm_vgic_vcpu_pending_irq do not need to traverse vgic_cpu ap_list, only
-the check pending state and priority.
+On 7/24/19 6:57 AM, Liu, Yi L wrote:
+>> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf
+>> Of David Gibson
+>> Sent: Tuesday, July 23, 2019 11:58 AM
+>> To: Liu, Yi L <yi.l.liu@intel.com>
+>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
+>>
+>> On Mon, Jul 22, 2019 at 07:02:51AM +0000, Liu, Yi L wrote:
+>>>> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
+>>>> On Behalf Of David Gibson
+>>>> Sent: Wednesday, July 17, 2019 11:07 AM
+>>>> To: Liu, Yi L <yi.l.liu@intel.com>
+>>>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
+>>>> implementation
+>>>>
+>>>> On Tue, Jul 16, 2019 at 10:25:55AM +0000, Liu, Yi L wrote:
+>>>>>> From: kvm-owner@vger.kernel.org
+>>>>>> [mailto:kvm-owner@vger.kernel.org] On
+>>>> Behalf
+>>>>>> Of David Gibson
+>>>>>> Sent: Monday, July 15, 2019 10:55 AM
+>>>>>> To: Liu, Yi L <yi.l.liu@intel.com>
+>>>>>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
+>>>>>> implementation
+>>>>>>
+>>>>>> On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
+>>>>>>> This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid().
+>>>>>>> These two functions are used to propagate guest pasid
+>>>>>>> allocation and free requests to host via vfio container ioctl.
+>>>>>>
+>>>>>> As I said in an earlier comment, I think doing this on the
+>>>>>> device is conceptually incorrect.  I think we need an explcit
+>>>>>> notion of an SVM context (i.e. the namespace in which all the
+>>>>>> PASIDs live) - which will IIUC usually be shared amongst
+>>>>>> multiple devices.  The create and free PASID requests should be on that object.
+>>>>>
+>>>>> Actually, the allocation is not doing on this device. System wide,
+>>>>> it is done on a container. So not sure if it is the API interface
+>>>>> gives you a sense that this is done on device.
+>>>>
+>>>> Sorry, I should have been clearer.  I can see that at the VFIO level
+>>>> it is done on the container.  However the function here takes a bus
+>>>> and devfn, so this qemu internal interface is per-device, which
+>>>> doesn't really make sense.
+>>>
+>>> Got it. The reason here is to pass the bus and devfn info, so that
+>>> VFIO can figure out a container for the operation. So far in QEMU,
+>>> there is no good way to connect the vIOMMU emulator and VFIO regards
+>>> to SVM.
+>>
+>> Right, and I think that's an indication that we're not modelling something in qemu
+>> that we should be.
+>>
+>>> hw/pci layer is a choice based on some previous discussion. But yes, I
+>>> agree with you that we may need to have an explicit notion for SVM. Do
+>>> you think it is good to introduce a new abstract layer for SVM (may
+>>> name as SVMContext).
+>>
+>> I think so, yes.
+>>
+>> If nothing else, I expect we'll need this concept if we ever want to be able to
+>> implement SVM for emulated devices (which could be useful for debugging, even if
+>> it's not something you'd do in production).
+>>
+>>> The idea would be that vIOMMU maintain the SVMContext instances and
+>>> expose explicit interface for VFIO to get it. Then VFIO register
+>>> notifiers on to the SVMContext. When vIOMMU emulator wants to do PASID
+>>> alloc/free, it fires the corresponding notifier. After call into VFIO,
+>>> the notifier function itself figure out the container it is bound. In
+>>> this way, it's the duty of vIOMMU emulator to figure out a proper
+>>> notifier to fire. From interface point of view, it is no longer
+>>> per-device.
+>>
+>> Exactly.
+> 
+> Cool, let me prepare another version with the ideas. Thanks for your
+> review. :-)
+> 
+> Regards,
+> Yi Liu
+> 
+>>> Also, it leaves the PASID management details to vIOMMU emulator as it
+>>> can be vendor specific. Does it make sense?
+>>> Also, I'd like to know if you have any other idea on it. That would
+>>> surely be helpful. :-)
+>>>
+>>>>> Also, curious on the SVM context
+>>>>> concept, do you mean it a per-VM context or a per-SVM usage context?
+>>>>> May you elaborate a little more. :-)
+>>>>
+>>>> Sorry, I'm struggling to find a good term for this.  By "context" I
+>>>> mean a namespace containing a bunch of PASID address spaces, those
+>>>> PASIDs are then visible to some group of devices.
+>>>
+>>> I see. May be the SVMContext instance above can include multiple PASID
+>>> address spaces. And again, I think this relationship should be
+>>> maintained in vIOMMU emulator.
+> 
+So if I understand we now head towards introducing new notifiers taking
+a "SVMContext" as argument instead of an IOMMUMemoryRegion.
 
-Signed-off-by: Xiangyou Xie <xiexiangyou@huawei.com>
----
- include/kvm/arm_vgic.h   |  5 +++++
- virt/kvm/arm/vgic/vgic.c | 40 ++++++++++++++++++++++------------------
- 2 files changed, 27 insertions(+), 18 deletions(-)
+I think we need to be clear about how both abstractions (SVMContext and
+IOMMUMemoryRegion) differ. I would also need "SVMContext" abstraction
+for 2stage SMMU integration (to notify stage 1 config changes and MSI
+bindings) so I would need this new object to be not too much tied to SVM
+use case.
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index ce372a0..636db29 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -337,6 +337,11 @@ struct vgic_cpu {
- 
- 	/* Cache guest interrupt ID bits */
- 	u32 num_id_bits;
-+
-+	/* Minimum of priority in all irqs */
-+	u8 lowest_priority;
-+	/* Irq pending flag */
-+	bool pending;
- };
- 
- extern struct static_key_false vgic_v2_cpuif_trap;
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index deb8471..767dfe0 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -398,6 +398,12 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 	 * now in the ap_list.
- 	 */
- 	vgic_get_irq_kref(irq);
-+
-+	if (!irq->active) {
-+		vcpu->arch.vgic_cpu.pending = true;
-+		if (vcpu->arch.vgic_cpu.lowest_priority > irq->priority)
-+			vcpu->arch.vgic_cpu.lowest_priority = irq->priority;
-+	}
- 	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
- 	irq->vcpu = vcpu;
- 
-@@ -618,6 +624,9 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- retry:
- 	raw_spin_lock(&vgic_cpu->ap_list_lock);
- 
-+	vgic_cpu->lowest_priority = U8_MAX;
-+	vgic_cpu->pending = false;
-+
- 	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
- 		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
- 		bool target_vcpu_needs_kick = false;
-@@ -649,6 +658,11 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 		}
- 
- 		if (target_vcpu == vcpu) {
-+			if (!irq->active) {
-+				vgic_cpu->pending = true;
-+				if (vgic_cpu->lowest_priority > irq->priority)
-+					vgic_cpu->lowest_priority = irq->priority;
-+			}
- 			/* We're on the right CPU */
- 			raw_spin_unlock(&irq->irq_lock);
- 			continue;
-@@ -690,6 +704,11 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
- 
- 			list_del(&irq->ap_list);
- 			irq->vcpu = target_vcpu;
-+			if (!irq->active) {
-+				new_cpu->pending = true;
-+				if (new_cpu->lowest_priority > irq->priority)
-+					new_cpu->lowest_priority = irq->priority;
-+			}
- 			list_add_tail(&irq->ap_list, &new_cpu->ap_list_head);
- 			target_vcpu_needs_kick = true;
- 		}
-@@ -930,9 +949,6 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu)
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
--	struct vgic_irq *irq;
--	bool pending = false;
--	unsigned long flags;
- 	struct vgic_vmcr vmcr;
- 
- 	if (!vcpu->kvm->arch.vgic.enabled)
-@@ -943,22 +959,10 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
- 
- 	vgic_get_vmcr(vcpu, &vmcr);
- 
--	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
--
--	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
--		raw_spin_lock(&irq->irq_lock);
--		pending = irq_is_pending(irq) && irq->enabled &&
--			  !irq->active &&
--			  irq->priority < vmcr.pmr;
--		raw_spin_unlock(&irq->irq_lock);
--
--		if (pending)
--			break;
--	}
--
--	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
-+	if (vgic_cpu->pending && vgic_cpu->lowest_priority < vmcr.pmr)
-+		return true;
- 
--	return pending;
-+	return false;
- }
- 
- void vgic_kick_vcpus(struct kvm *kvm)
--- 
-1.8.3.1
+Thanks
 
+Eric
 
