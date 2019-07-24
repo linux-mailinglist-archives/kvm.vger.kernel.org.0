@@ -2,125 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B893740B9
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 23:14:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97E8C740DC
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 23:32:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728824AbfGXVOp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 17:14:45 -0400
-Received: from mga01.intel.com ([192.55.52.88]:47941 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727868AbfGXVOp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 17:14:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jul 2019 14:14:43 -0700
-X-IronPort-AV: E=Sophos;i="5.64,304,1559545200"; 
-   d="scan'208";a="253724062"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jul 2019 14:14:43 -0700
-Message-ID: <d70c9d97571e8efd4c971eaa73d67fc50222e67d.camel@linux.intel.com>
-Subject: Re: [PATCH v2 QEMU] virtio-balloon: Provide a interface for "bubble
- hinting"
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
-        kvm@vger.kernel.org, david@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, yang.zhang.wz@gmail.com,
-        pagupta@redhat.com, riel@surriel.com, konrad.wilk@oracle.com,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com
-Date:   Wed, 24 Jul 2019 14:14:43 -0700
-In-Reply-To: <20190724164433-mutt-send-email-mst@kernel.org>
-References: <20190724165158.6685.87228.stgit@localhost.localdomain>
-         <20190724171050.7888.62199.stgit@localhost.localdomain>
-         <20190724150224-mutt-send-email-mst@kernel.org>
-         <6218af96d7d55935f2cf607d47680edc9b90816e.camel@linux.intel.com>
-         <20190724164433-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1727516AbfGXVcJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 17:32:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46188 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726087AbfGXVcI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jul 2019 17:32:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6OLSFgj053934;
+        Wed, 24 Jul 2019 17:32:07 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2txwrpunjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Jul 2019 17:32:07 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x6OLTDQF062752;
+        Wed, 24 Jul 2019 17:32:07 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2txwrpunj7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Jul 2019 17:32:07 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6OLTrdV019840;
+        Wed, 24 Jul 2019 21:32:06 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma03dal.us.ibm.com with ESMTP id 2tx61n9jcx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Jul 2019 21:32:06 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6OLW43I57672018
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Jul 2019 21:32:04 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6B247136055;
+        Wed, 24 Jul 2019 21:32:04 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DFE1613604F;
+        Wed, 24 Jul 2019 21:32:03 +0000 (GMT)
+Received: from alifm-ThinkPad-T470p.pok.ibm.com (unknown [9.56.58.37])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Wed, 24 Jul 2019 21:32:03 +0000 (GMT)
+From:   Farhan Ali <alifm@linux.ibm.com>
+To:     cohuck@redhat.com, farman@linux.ibm.com, pasic@linux.ibm.com
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        alifm@linux.ibm.com
+Subject: [PATCH 1/1] MAINTAINERS: vfio-ccw: Remove myself as the maintainer
+Date:   Wed, 24 Jul 2019 17:32:03 -0400
+Message-Id: <19aee1ab0e5bcc01053b515117a66426a9332086.1564003585.git.alifm@linux.ibm.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cover.1564003585.git.alifm@linux.ibm.com>
+References: <cover.1564003585.git.alifm@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-24_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=794 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907240228
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2019-07-24 at 16:46 -0400, Michael S. Tsirkin wrote:
-> On Wed, Jul 24, 2019 at 01:18:00PM -0700, Alexander Duyck wrote:
-> > On Wed, 2019-07-24 at 15:02 -0400, Michael S. Tsirkin wrote:
-> > > On Wed, Jul 24, 2019 at 10:12:10AM -0700, Alexander Duyck wrote:
-> > > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > > 
-> > > > Add support for what I am referring to as "bubble hinting". Basically the
-> > > > idea is to function very similar to how the balloon works in that we
-> > > > basically end up madvising the page as not being used. However we don't
-> > > > really need to bother with any deflate type logic since the page will be
-> > > > faulted back into the guest when it is read or written to.
-> > > > 
-> > > > This is meant to be a simplification of the existing balloon interface
-> > > > to use for providing hints to what memory needs to be freed. I am assuming
-> > > > this is safe to do as the deflate logic does not actually appear to do very
-> > > > much other than tracking what subpages have been released and which ones
-> > > > haven't.
-> > > > 
-> > > > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > > ---
-> > > >  hw/virtio/virtio-balloon.c                      |   40 +++++++++++++++++++++++
-> > > >  include/hw/virtio/virtio-balloon.h              |    2 +
-> > > >  include/standard-headers/linux/virtio_balloon.h |    1 +
-> > > >  3 files changed, 42 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> > > > index 2112874055fb..70c0004c0f88 100644
-> > > > --- a/hw/virtio/virtio-balloon.c
-> > > > +++ b/hw/virtio/virtio-balloon.c
-> > > > @@ -328,6 +328,39 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-> > > >      balloon_stats_change_timer(s, 0);
-> > > >  }
-> > > >  
-> > > > +static void virtio_bubble_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> > > > +{
-> > > > +    VirtQueueElement *elem;
-> > > > +
-> > > > +    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-> > > > +    	unsigned int i;
-> > > > +
-> > > > +        for (i = 0; i < elem->in_num; i++) {
-> > > > +            void *addr = elem->in_sg[i].iov_base;
-> > > > +            size_t size = elem->in_sg[i].iov_len;
-> > > > +            ram_addr_t ram_offset;
-> > > > +            size_t rb_page_size;
-> > > > +            RAMBlock *rb;
-> > > > +
-> > > > +            if (qemu_balloon_is_inhibited())
-> > > > +                continue;
-> > > > +
-> > > > +            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-> > > > +            rb_page_size = qemu_ram_pagesize(rb);
-> > > > +
-> > > > +            /* For now we will simply ignore unaligned memory regions */
-> > > > +            if ((ram_offset | size) & (rb_page_size - 1))
-> > > > +                continue;
-> > > > +
-> > > > +            ram_block_discard_range(rb, ram_offset, size);
-> > > 
-> > > I suspect this needs to do like the migration type of
-> > > hinting and get disabled if page poisoning is in effect.
-> > > Right?
-> > 
-> > Shouldn't something like that end up getting handled via
-> > qemu_balloon_is_inhibited, or did I miss something there? I assumed cases
-> > like that would end up setting qemu_balloon_is_inhibited to true, if that
-> > isn't the case then I could add some additional conditions. I would do it
-> > in about the same spot as the qemu_balloon_is_inhibited check.
-> 
-> Well qemu_balloon_is_inhibited is for the regular ballooning,
-> mostly a work-around for limitations is host linux iommu
-> APIs when it's used with VFIO.
+I will not be able to continue with my maintainership responsibilities
+going forward, so remove myself as the maintainer.
 
-I understood that. However it also addresses the shared memory case as
-well if I recall correctly. Basically any case where us discarding the
-page could cause issues we should be causing that function to return true.
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0e90487..dd07a23 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13696,7 +13696,6 @@ F:	drivers/pci/hotplug/s390_pci_hpc.c
+ 
+ S390 VFIO-CCW DRIVER
+ M:	Cornelia Huck <cohuck@redhat.com>
+-M:	Farhan Ali <alifm@linux.ibm.com>
+ M:	Eric Farman <farman@linux.ibm.com>
+ R:	Halil Pasic <pasic@linux.ibm.com>
+ L:	linux-s390@vger.kernel.org
+-- 
+2.7.4
 
