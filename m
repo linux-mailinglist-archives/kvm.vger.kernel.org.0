@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 00C8772D4F
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:20:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA22672DCA
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727228AbfGXLUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 07:20:47 -0400
-Received: from foss.arm.com ([217.140.110.172]:39292 "EHLO foss.arm.com"
+        id S1727582AbfGXLjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 07:39:43 -0400
+Received: from foss.arm.com ([217.140.110.172]:39622 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726514AbfGXLUr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 07:20:47 -0400
+        id S1727128AbfGXLjm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 07:39:42 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7FBB8337;
-        Wed, 24 Jul 2019 04:20:46 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4F13E337;
+        Wed, 24 Jul 2019 04:39:41 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA6C13F71A;
-        Wed, 24 Jul 2019 04:20:45 -0700 (PDT)
-Subject: Re: [PATCH 2/3] KVM: arm/arm64: vgic-its: Do not execute invalidate
- MSI-LPI translation cache on movi command
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9585C3F71A;
+        Wed, 24 Jul 2019 04:39:40 -0700 (PDT)
+Subject: Re: [PATCH 3/3] KVM: arm/arm64: vgic: introduce vgic_cpu pending
+ status and lowest_priority
 To:     Xiangyou Xie <xiexiangyou@huawei.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
 References: <20190724090437.49952-1-xiexiangyou@huawei.com>
- <20190724090437.49952-3-xiexiangyou@huawei.com>
+ <20190724090437.49952-4-xiexiangyou@huawei.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -70,12 +70,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <cb0aad13-6928-820a-1592-b3345c87f9c8@arm.com>
-Date:   Wed, 24 Jul 2019 12:20:43 +0100
+Message-ID: <c43d7331-a30b-5c0f-47ce-a5d9a1840a63@arm.com>
+Date:   Wed, 24 Jul 2019 12:39:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190724090437.49952-3-xiexiangyou@huawei.com>
+In-Reply-To: <20190724090437.49952-4-xiexiangyou@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -85,31 +85,140 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 24/07/2019 10:04, Xiangyou Xie wrote:
-> It is not necessary to invalidate the lpi translation cache when the
-> virtual machine executes the movi instruction to adjust the affinity of
-> the interrupt. Irqbalance will adjust the interrupt affinity in a short
-> period of time to achieve the purpose of interrupting load balancing,
-> but this does not affect the contents of the lpi translation cache.
+> During the halt polling process, vgic_cpu->ap_list_lock is frequently
+> obtained andreleased, (kvm_vcpu_check_block->kvm_arch_vcpu_runnable->
+> kvm_vgic_vcpu_pending_irq).This action affects the performance of virq
+> interrupt injection, because vgic_queue_irq_unlock also attempts to get
+> vgic_cpu->ap_list_lock and add irq to vgic_cpu ap_list.
 
-What does irqbalance have to do with it? We're dealing with the GIC
-architecture here, not with userspace.
+Numbers. Give me numbers. Please.
 
-If the guest issues a MOVI command to a RD where GICR_CTLR.EnableLPI is
-0, and that we use an existing cached translation, we are going to make
-the interrupt pending for that RD. This is direct violation of the
-architecture, which says:
+> 
+> The irq pending state and the minimum priority introduced by the patch,
+> kvm_vgic_vcpu_pending_irq do not need to traverse vgic_cpu ap_list, only
+> the check pending state and priority.
+> 
+> Signed-off-by: Xiangyou Xie <xiexiangyou@huawei.com>
+> ---
+>  include/kvm/arm_vgic.h   |  5 +++++
+>  virt/kvm/arm/vgic/vgic.c | 40 ++++++++++++++++++++++------------------
+>  2 files changed, 27 insertions(+), 18 deletions(-)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index ce372a0..636db29 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -337,6 +337,11 @@ struct vgic_cpu {
+>  
+>  	/* Cache guest interrupt ID bits */
+>  	u32 num_id_bits;
+> +
+> +	/* Minimum of priority in all irqs */
+> +	u8 lowest_priority;
 
-"LPI support is disabled. Any doorbell interrupt generated as a result
-of a write to a virtual LPI register must be discarded, and any ITS
-translation requests or commands involving LPIs in this Redistributor
-are ignored."
+In all IRQs? That are in every possible state?
 
-So the interrupt cannot be made pending. No IFs, no BUTs. If you really
-want to optimize it, check that the target RD is actually enabled and
-only invalidate in this particular case.
+> +	/* Irq pending flag */
+> +	bool pending;
 
-Your guest would have to have a rate of MOVI that is comparable to that
-of the interrupts for it to show on any radar though...
+What does pending mean here? Strictly pending? or covering the other
+states of an interrupt (Active, Active+Pending)?
+
+>  };
+>  
+>  extern struct static_key_false vgic_v2_cpuif_trap;
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index deb8471..767dfe0 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -398,6 +398,12 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+>  	 * now in the ap_list.
+>  	 */
+>  	vgic_get_irq_kref(irq);
+> +
+> +	if (!irq->active) {
+
+Why not active? What if the interrupt is Active+Pending? What is the
+rational for this? This applies to the whole of this patch.
+
+> +		vcpu->arch.vgic_cpu.pending = true;
+> +		if (vcpu->arch.vgic_cpu.lowest_priority > irq->priority)
+> +			vcpu->arch.vgic_cpu.lowest_priority = irq->priority;
+> +	}
+>  	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
+>  	irq->vcpu = vcpu;
+>  
+> @@ -618,6 +624,9 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+>  retry:
+>  	raw_spin_lock(&vgic_cpu->ap_list_lock);
+>  
+> +	vgic_cpu->lowest_priority = U8_MAX;
+> +	vgic_cpu->pending = false;
+> +
+>  	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
+>  		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
+>  		bool target_vcpu_needs_kick = false;
+> @@ -649,6 +658,11 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+>  		}
+>  
+>  		if (target_vcpu == vcpu) {
+> +			if (!irq->active) {
+> +				vgic_cpu->pending = true;
+> +				if (vgic_cpu->lowest_priority > irq->priority)
+> +					vgic_cpu->lowest_priority = irq->priority;
+> +			}
+>  			/* We're on the right CPU */
+>  			raw_spin_unlock(&irq->irq_lock);
+>  			continue;
+> @@ -690,6 +704,11 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+>  
+>  			list_del(&irq->ap_list);
+>  			irq->vcpu = target_vcpu;
+> +			if (!irq->active) {
+> +				new_cpu->pending = true;
+> +				if (new_cpu->lowest_priority > irq->priority)
+> +					new_cpu->lowest_priority = irq->priority;
+> +			}
+>  			list_add_tail(&irq->ap_list, &new_cpu->ap_list_head);
+>  			target_vcpu_needs_kick = true;
+>  		}
+> @@ -930,9 +949,6 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu)
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> -	struct vgic_irq *irq;
+> -	bool pending = false;
+> -	unsigned long flags;
+>  	struct vgic_vmcr vmcr;
+>  
+>  	if (!vcpu->kvm->arch.vgic.enabled)
+> @@ -943,22 +959,10 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+>  
+>  	vgic_get_vmcr(vcpu, &vmcr);
+>  
+> -	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
+> -
+> -	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> -		raw_spin_lock(&irq->irq_lock);
+> -		pending = irq_is_pending(irq) && irq->enabled &&
+> -			  !irq->active &&
+> -			  irq->priority < vmcr.pmr;
+> -		raw_spin_unlock(&irq->irq_lock);
+> -
+> -		if (pending)
+> -			break;
+> -	}
+> -
+> -	raw_spin_unlock_irqrestore(&vgic_cpu->ap_list_lock, flags);
+> +	if (vgic_cpu->pending && vgic_cpu->lowest_priority < vmcr.pmr)
+> +		return true;
+
+And here we go. You've dropped the lock, and yet are evaluating two
+unrelated fields that could be changed by a parallel injection or the
+vcpu entering/exiting the guest.
+
+I'm sure you get better performance. I'm also pretty sure this is
+completely unsafe.
 
 Thanks,
 
