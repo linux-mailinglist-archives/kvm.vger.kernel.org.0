@@ -2,144 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CC9772921
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 09:41:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E59C872985
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 10:08:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725883AbfGXHly (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 03:41:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38492 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725826AbfGXHly (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 03:41:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D6A430B8DE4;
-        Wed, 24 Jul 2019 07:41:53 +0000 (UTC)
-Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE5E160603;
-        Wed, 24 Jul 2019 07:41:50 +0000 (UTC)
-Subject: Re: [PATCH v2 8/9] KVM: arm/arm64: vgic-its: Check the LPI
- translation cache on MSI injection
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "Saidi, Ali" <alisaidi@amazon.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-9-marc.zyngier@arm.com>
- <485d9990-a6ad-2be0-e829-a0290d7d6a6f@redhat.com>
- <3e3bf6bc-d1ab-ec77-e94c-d5defd133c5b@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <1642a2fb-153b-070c-465d-fca27b76e3a0@redhat.com>
-Date:   Wed, 24 Jul 2019 09:41:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726138AbfGXIII (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 04:08:08 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:40266 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726026AbfGXIII (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 04:08:08 -0400
+Received: by mail-qk1-f195.google.com with SMTP id s145so33120268qke.7
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 01:08:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=/MFYQFzENwHk5G46kOvOVKTzaxjp4jXpKM7WypPWBDc=;
+        b=gDQErPDSLiMWLan6BDK1jk6brvRulVUYiABa1sbw9XfRd6NWElTX6TfJlOOIsUFCWI
+         WMYnlFm7zK27V9UkZItWE28zQ7LH74D6bI0aK9JkLOe7TBIRW8onUu1Qa6dGBdv4/Y7q
+         IHwMVW3BbZHpSBwq3N/Od8nksjdIydNASkjAfkUqeBkrbN3/lOuhYvqWHF9tihQ3dMCU
+         mDUZ7YvXwch8qOwYwoY87+2AyOCuDeRT+H0FtKeyQDJy3tPfPb7Fk4fx2v37KVVfERR+
+         uI/nZF2OgT9ggmttjBzXmIxWqmLP1R+/LY14Qk/KsbojwEcjU+f1/8CfwaEry+Zy0S1R
+         635A==
+X-Gm-Message-State: APjAAAXS+bNdX90KdzEc/Q1JslCd7h4kmRNza8mu58PmG7M0fHJTmkEt
+        fqvD5r/1FPccfsTNJEB4VQKPmQ==
+X-Google-Smtp-Source: APXvYqyqOJ7xj5WyBSGnSKw6r+fHzKSSQgggyWILPC/N5KbhyvrIGi3wpGDnO2q6i0xNWsrtSCd37A==
+X-Received: by 2002:a05:620a:31b:: with SMTP id s27mr17648521qkm.264.1563955687250;
+        Wed, 24 Jul 2019 01:08:07 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+        by smtp.gmail.com with ESMTPSA id t26sm23203051qtc.95.2019.07.24.01.07.58
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 24 Jul 2019 01:08:06 -0700 (PDT)
+Date:   Wed, 24 Jul 2019 04:07:55 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     john.hubbard@gmail.com
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        LKML <linux-kernel@vger.kernel.org>, ceph-devel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        netdev@vger.kernel.org, samba-technical@lists.samba.org,
+        v9fs-developer@lists.sourceforge.net,
+        virtualization@lists.linux-foundation.org,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>, Jan Kara <jack@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Boaz Harrosh <boaz@plexistor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 07/12] vhost-scsi: convert put_page() to put_user_page*()
+Message-ID: <20190724040745-mutt-send-email-mst@kernel.org>
+References: <20190724042518.14363-1-jhubbard@nvidia.com>
+ <20190724042518.14363-8-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <3e3bf6bc-d1ab-ec77-e94c-d5defd133c5b@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 24 Jul 2019 07:41:53 +0000 (UTC)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190724042518.14363-8-jhubbard@nvidia.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Tue, Jul 23, 2019 at 09:25:13PM -0700, john.hubbard@gmail.com wrote:
+> From: Jérôme Glisse <jglisse@redhat.com>
+> 
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> Changes from Jérôme's original patch:
+> 
+> * Changed a WARN_ON to a BUG_ON.
+> 
+> Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: linux-fsdevel@vger.kernel.org
+> Cc: linux-block@vger.kernel.org
+> Cc: linux-mm@kvack.org
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: Johannes Thumshirn <jthumshirn@suse.de>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Dave Chinner <david@fromorbit.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: Boaz Harrosh <boaz@plexistor.com>
+> Cc: Miklos Szeredi <miklos@szeredi.hu>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-On 7/23/19 5:45 PM, Marc Zyngier wrote:
-> Hi Eric,
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+> ---
+>  drivers/vhost/scsi.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
 > 
-> On 23/07/2019 16:10, Auger Eric wrote:
->> Hi Marc,
->>
->> On 6/11/19 7:03 PM, Marc Zyngier wrote:
->>> When performing an MSI injection, let's first check if the translation
->>> is already in the cache. If so, let's inject it quickly without
->>> going through the whole translation process.
->>>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  virt/kvm/arm/vgic/vgic-its.c | 36 ++++++++++++++++++++++++++++++++++++
->>>  virt/kvm/arm/vgic/vgic.h     |  1 +
->>>  2 files changed, 37 insertions(+)
->>>
->>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>> index 62932458476a..83d80ec33473 100644
->>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>> @@ -577,6 +577,20 @@ static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
->>>  	return irq;
->>>  }
->>>  
->>> +static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
->>> +					     u32 devid, u32 eventid)
->>> +{
->>> +	struct vgic_dist *dist = &kvm->arch.vgic;
->>> +	struct vgic_irq *irq;
->>> +	unsigned long flags;
->>> +
->>> +	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
->>> +	irq = __vgic_its_check_cache(dist, db, devid, eventid);
->>> +	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
->>> +
->>> +	return irq;
->>> +}
->>> +
->>>  static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->>>  				       u32 devid, u32 eventid,
->>>  				       struct vgic_irq *irq)
->>> @@ -736,6 +750,25 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
->>>  	return 0;
->>>  }
->>>  
->>> +int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
->>> +{
->>> +	struct vgic_irq *irq;
->>> +	unsigned long flags;
->>> +	phys_addr_t db;
->>> +
->>> +	db = (u64)msi->address_hi << 32 | msi->address_lo;
->>> +	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
->>
->> I think we miss a check of its->enabled. This is currently done in
->> vgic_its_resolve_lpi() but now likely to be bypassed.
-> 
-> But why would a translation be cached if the ITS is disabled? It should
-> never haver been there the first place (vgic_its_resolve_lpi does check
-> for the ITS being enabled, as you pointed out).
-> 
-> Which makes me think that we miss an invalidate on an ITS being disabled:
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 2633b0e88981..5f2ad74ad834 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -1719,6 +1719,8 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
->  		goto out;
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index a9caf1bc3c3e..282565ab5e3f 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -329,11 +329,11 @@ static void vhost_scsi_release_cmd(struct se_cmd *se_cmd)
 >  
->  	its->enabled = !!(val & GITS_CTLR_ENABLE);
-> +	if (!its->enabled)
-> +		vgic_its_invalidate_cache(kvm);
+>  	if (tv_cmd->tvc_sgl_count) {
+>  		for (i = 0; i < tv_cmd->tvc_sgl_count; i++)
+> -			put_page(sg_page(&tv_cmd->tvc_sgl[i]));
+> +			put_user_page(sg_page(&tv_cmd->tvc_sgl[i]));
+>  	}
+>  	if (tv_cmd->tvc_prot_sgl_count) {
+>  		for (i = 0; i < tv_cmd->tvc_prot_sgl_count; i++)
+> -			put_page(sg_page(&tv_cmd->tvc_prot_sgl[i]));
+> +			put_user_page(sg_page(&tv_cmd->tvc_prot_sgl[i]));
+>  	}
 >  
->  	/*
->  	 * Try to process any pending commands. This function bails out early
-> 
-> 
-> What do you think?
-
-Yes I agree this is the right way to fix it.
-
-Thanks
-
-Eric
-> 
-> 	M.
-> 
+>  	vhost_scsi_put_inflight(tv_cmd->inflight);
+> @@ -630,6 +630,13 @@ vhost_scsi_map_to_sgl(struct vhost_scsi_cmd *cmd,
+>  	size_t offset;
+>  	unsigned int npages = 0;
+>  
+> +	/*
+> +	 * Here in all cases we should have an IOVEC which use GUP. If that is
+> +	 * not the case then we will wrongly call put_user_page() and the page
+> +	 * refcount will go wrong (this is in vhost_scsi_release_cmd())
+> +	 */
+> +	WARN_ON(!iov_iter_get_pages_use_gup(iter));
+> +
+>  	bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
+>  				VHOST_SCSI_PREALLOC_UPAGES, &offset);
+>  	/* No pages were pinned */
+> @@ -681,7 +688,7 @@ vhost_scsi_iov_to_sgl(struct vhost_scsi_cmd *cmd, bool write,
+>  			while (p < sg) {
+>  				struct page *page = sg_page(p++);
+>  				if (page)
+> -					put_page(page);
+> +					put_user_page(page);
+>  			}
+>  			return ret;
+>  		}
+> -- 
+> 2.22.0
