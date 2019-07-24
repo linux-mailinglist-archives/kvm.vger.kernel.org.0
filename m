@@ -2,163 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2E3872D43
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:17:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00C8772D4F
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:20:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727322AbfGXLRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 07:17:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48944 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726070AbfGXLRq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Jul 2019 07:17:46 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6OBHCjl069485
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 07:17:45 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2txnyb0xmw-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 07:17:44 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Wed, 24 Jul 2019 12:17:43 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 24 Jul 2019 12:17:40 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6OBHcgG41615564
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Jul 2019 11:17:38 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 98893AE051;
-        Wed, 24 Jul 2019 11:17:38 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5386AAE056;
-        Wed, 24 Jul 2019 11:17:38 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.141])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 24 Jul 2019 11:17:38 +0000 (GMT)
-Date:   Wed, 24 Jul 2019 13:17:37 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 1/1] virtio/s390: fix race on airq_areas[]
-In-Reply-To: <4a6d82b5-db9d-ed2e-2d07-e14aee3884af@de.ibm.com>
-References: <20190723225817.12800-1-pasic@linux.ibm.com>
-        <74087255-fdae-01a1-7152-f6fac8e13019@de.ibm.com>
-        <20190724103410.574dd259.cohuck@redhat.com>
-        <4a6d82b5-db9d-ed2e-2d07-e14aee3884af@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1727228AbfGXLUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 07:20:47 -0400
+Received: from foss.arm.com ([217.140.110.172]:39292 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726514AbfGXLUr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 07:20:47 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7FBB8337;
+        Wed, 24 Jul 2019 04:20:46 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA6C13F71A;
+        Wed, 24 Jul 2019 04:20:45 -0700 (PDT)
+Subject: Re: [PATCH 2/3] KVM: arm/arm64: vgic-its: Do not execute invalidate
+ MSI-LPI translation cache on movi command
+To:     Xiangyou Xie <xiexiangyou@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+References: <20190724090437.49952-1-xiexiangyou@huawei.com>
+ <20190724090437.49952-3-xiexiangyou@huawei.com>
+From:   Marc Zyngier <marc.zyngier@arm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ Z46HaNmN2hZS/oJ69c1DI5Rcww==
+Organization: ARM Ltd
+Message-ID: <cb0aad13-6928-820a-1592-b3345c87f9c8@arm.com>
+Date:   Wed, 24 Jul 2019 12:20:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19072411-0016-0000-0000-00000295AA4C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072411-0017-0000-0000-000032F39EAF
-Message-Id: <20190724131737.24347915.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-24_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907240128
+In-Reply-To: <20190724090437.49952-3-xiexiangyou@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 Jul 2019 10:39:13 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 24/07/2019 10:04, Xiangyou Xie wrote:
+> It is not necessary to invalidate the lpi translation cache when the
+> virtual machine executes the movi instruction to adjust the affinity of
+> the interrupt. Irqbalance will adjust the interrupt affinity in a short
+> period of time to achieve the purpose of interrupting load balancing,
+> but this does not affect the contents of the lpi translation cache.
 
-> 
-> 
-> On 24.07.19 10:34, Cornelia Huck wrote:
-> > On Wed, 24 Jul 2019 08:44:19 +0200
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> > 
-> >> On 24.07.19 00:58, Halil Pasic wrote:
-> >>> The access to airq_areas was racy ever since the adapter interrupts got
-> >>> introduced to virtio-ccw, but since commit 39c7dcb15892 ("virtio/s390:
-> >>> make airq summary indicators DMA") this became an issue in practice as
-> >>> well. Namely before that commit the airq_info that got overwritten was
-> >>> still functional. After that commit however the two infos share a
-> >>> summary_indicator, which aggravates the situation. Which means
-> >>> auto-online mechanism occasionally hangs the boot with virtio_blk.
-> >>>
-> >>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> >>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> >>> Fixes: 96b14536d935 ("virtio-ccw: virtio-ccw adapter interrupt support.")
-> >>> ---
-> >>> * We need definitely this fixed for 5.3. For older stable kernels it is
-> >>> to be discussed. @Connie what do you think: do we need a cc stable?  
-> >>
-> >> Unless you can prove that the problem could never happen on old version
-> >> we absolutely do need cc stable. 
-> > 
-> > Yes, this needs to be cc:stable.
-> > 
-> >>
-> >>>
-> >>> * I have a variant that does not need the extra mutex but uses cmpxchg().
-> >>> Decided to post this one because that one is more complex. But if there
-> >>> is interest we can have a look at it as well.  
-> >>
-> >> This is slow path (startup) and never called in hot path. Correct? Mutex should be
-> >> fine.
-> > 
-> > Yes, this is ultimately called through the ->probe functions of virtio
-> > drivers.
-> > 
-> >>> ---
-> >>>  drivers/s390/virtio/virtio_ccw.c | 4 ++++
-> >>>  1 file changed, 4 insertions(+)
-> >>>
-> >>> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> >>> index 1a55e5942d36..d97742662755 100644
-> >>> --- a/drivers/s390/virtio/virtio_ccw.c
-> >>> +++ b/drivers/s390/virtio/virtio_ccw.c
-> >>> @@ -145,6 +145,8 @@ struct airq_info {
-> >>>  	struct airq_iv *aiv;
-> >>>  };
-> >>>  static struct airq_info *airq_areas[MAX_AIRQ_AREAS];
-> >>> +DEFINE_MUTEX(airq_areas_lock);
-> >>> +
-> >>>  static u8 *summary_indicators;
-> >>>  
-> >>>  static inline u8 *get_summary_indicator(struct airq_info *info)
-> >>> @@ -265,9 +267,11 @@ static unsigned long get_airq_indicator(struct virtqueue *vqs[], int nvqs,
-> >>>  	unsigned long bit, flags;
-> >>>  
-> >>>  	for (i = 0; i < MAX_AIRQ_AREAS && !indicator_addr; i++) {
-> >>> +		mutex_lock(&airq_areas_lock);
-> >>>  		if (!airq_areas[i])
-> >>>  			airq_areas[i] = new_airq_info(i);
-> >>>  		info = airq_areas[i];
-> >>> +		mutex_unlock(&airq_areas_lock);
-> >>>  		if (!info)
-> >>>  			return 0;
-> >>>  		write_lock_irqsave(&info->lock, flags);
-> >>>   
-> >>
-> > 
-> > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> > 
-> > Should I pick this and send a pull request, or is it quicker to just
-> > take this directly?
-> 
-> I think we can you did via a fast path. Halil, can you push to the s390 tree?
+What does irqbalance have to do with it? We're dealing with the GIC
+architecture here, not with userspace.
 
-Sure!
+If the guest issues a MOVI command to a RD where GICR_CTLR.EnableLPI is
+0, and that we use an existing cached translation, we are going to make
+the interrupt pending for that RD. This is direct violation of the
+architecture, which says:
 
-Regards,
-Halil
+"LPI support is disabled. Any doorbell interrupt generated as a result
+of a write to a virtual LPI register must be discarded, and any ITS
+translation requests or commands involving LPIs in this Redistributor
+are ignored."
 
-> 
+So the interrupt cannot be made pending. No IFs, no BUTs. If you really
+want to optimize it, check that the target RD is actually enabled and
+only invalidate in this particular case.
 
+Your guest would have to have a rate of MOVI that is comparable to that
+of the interrupts for it to show on any radar though...
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
