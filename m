@@ -2,172 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B10AD73F0D
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 22:29:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8387273FE1
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 22:36:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389539AbfGXU3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 16:29:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45872 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389224AbfGXU3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 16:29:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 70E7130BD1BB;
-        Wed, 24 Jul 2019 20:29:37 +0000 (UTC)
-Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB5695D968;
-        Wed, 24 Jul 2019 20:29:28 +0000 (UTC)
-Subject: Re: [PATCH v2 QEMU] virtio-balloon: Provide a interface for "bubble
- hinting"
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, yang.zhang.wz@gmail.com,
-        pagupta@redhat.com, riel@surriel.com, konrad.wilk@oracle.com,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com
-References: <20190724165158.6685.87228.stgit@localhost.localdomain>
- <20190724171050.7888.62199.stgit@localhost.localdomain>
- <20190724150224-mutt-send-email-mst@kernel.org>
- <6218af96d7d55935f2cf607d47680edc9b90816e.camel@linux.intel.com>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- VujM7c/b4pps
-Organization: Red Hat Inc,
-Message-ID: <ee5387b1-89af-daf4-8492-8139216c6dcf@redhat.com>
-Date:   Wed, 24 Jul 2019 16:29:27 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726640AbfGXUgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 16:36:05 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:34804 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727747AbfGXTZG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 15:25:06 -0400
+Received: by mail-qk1-f194.google.com with SMTP id t8so34634067qkt.1
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 12:25:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=OkPU/CLyukMOj3ZbNY/O7tpHR8CxfiQ425Gxa1fb2JQ=;
+        b=cizJvBvS9LWtQgqD7tHrOnbfUKLn3IKwTexaKlCz0aV8WGl+nqxYE5pseR5xXgl2ZJ
+         m8csupMpr7OwAKhyoW9lBHKDfnN0nYwK9z7/RsX4VX3pqa9PWl3XI5/GUR4dWGbBS/2X
+         l7xDDDeEor3Zjue37hzwItxKtPGOFgmLJ5n/YPHgvOS+Y7TaohrswgfdoQ2xx5ljLnn5
+         gCACdxiqqXuMTz9u7PVtheBQ9dr7K2gpEpuVehHqwNFqED9VeiqZrebhSMSMl/zhVVtH
+         139CJQm906dlJU9cmPZyBRd9LIjBH6vCpXIBSECVQGTTiiTBHHUCo4qXoOTM7WaE9BBS
+         G4Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=OkPU/CLyukMOj3ZbNY/O7tpHR8CxfiQ425Gxa1fb2JQ=;
+        b=poNJ8FVCYdBTR2T/uLKFzuohyo2bFrW/i2QpV14SotoidrzuUH2dVF6ftu0UDZpk01
+         eFnr59ZyNCJR92ztDSN8U2/FBcxK7PI5X1gTmo/mh3lHQU1vVcjYu+IRXnDHRuvgdocE
+         A5JrJDKFHzR3p/2JrxuBLofH4aca7vZfdYm7XwXN/NzVP5lNC1S+TG1JhHzzLiO6uT4o
+         IqMjDhnInJl3/bjpLJ9T4szO3NEsbZdN+RnzKLjuaG3dqWBY6PW5XfKQHf59WjDGiTXf
+         Sw/4Z0CNA+eg9B8aY8yRM6GeFjZSsJQ4q2zFh+kY681OPcfr0yOc26OThv5k762shN/R
+         N3Wg==
+X-Gm-Message-State: APjAAAVDJIZN3zE6yHXWowsk3LG4K437wttP9mq1Xat2lL5S3h0kdL8n
+        wxQCdOZ3BJhIiNtXvP31RXO6Uw==
+X-Google-Smtp-Source: APXvYqyhflls5Pd07xc/KaSNWazAfdY/U63489DoRwgjjWJQqGNW++Rr6B+pQE207tw0i/3votp85A==
+X-Received: by 2002:a05:620a:1f4:: with SMTP id x20mr56790548qkn.415.1563996305707;
+        Wed, 24 Jul 2019 12:25:05 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id r40sm29245885qtk.2.2019.07.24.12.25.05
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 24 Jul 2019 12:25:05 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hqMsq-0001Uo-Fh; Wed, 24 Jul 2019 16:25:04 -0300
+Date:   Wed, 24 Jul 2019 16:25:04 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v19 11/15] IB/mlx4: untag user pointers in
+ mlx4_get_umem_mr
+Message-ID: <20190724192504.GA5716@ziepe.ca>
+References: <cover.1563904656.git.andreyknvl@google.com>
+ <7969018013a67ddbbf784ac7afeea5a57b1e2bcb.1563904656.git.andreyknvl@google.com>
 MIME-Version: 1.0
-In-Reply-To: <6218af96d7d55935f2cf607d47680edc9b90816e.camel@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 24 Jul 2019 20:29:37 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7969018013a67ddbbf784ac7afeea5a57b1e2bcb.1563904656.git.andreyknvl@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 23, 2019 at 07:58:48PM +0200, Andrey Konovalov wrote:
+> This patch is a part of a series that extends kernel ABI to allow to pass
+> tagged user pointers (with the top byte set to something else other than
+> 0x00) as syscall arguments.
+> 
+> mlx4_get_umem_mr() uses provided user pointers for vma lookups, which can
+> only by done with untagged pointers.
+> 
+> Untag user pointers in this function.
+> 
+> Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> ---
+>  drivers/infiniband/hw/mlx4/mr.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
-On 7/24/19 4:18 PM, Alexander Duyck wrote:
-> On Wed, 2019-07-24 at 15:02 -0400, Michael S. Tsirkin wrote:
->> On Wed, Jul 24, 2019 at 10:12:10AM -0700, Alexander Duyck wrote:
->>> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->>>
->>> Add support for what I am referring to as "bubble hinting". Basically the
->>> idea is to function very similar to how the balloon works in that we
->>> basically end up madvising the page as not being used. However we don't
->>> really need to bother with any deflate type logic since the page will be
->>> faulted back into the guest when it is read or written to.
->>>
->>> This is meant to be a simplification of the existing balloon interface
->>> to use for providing hints to what memory needs to be freed. I am assuming
->>> this is safe to do as the deflate logic does not actually appear to do very
->>> much other than tracking what subpages have been released and which ones
->>> haven't.
->>>
->>> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->>> ---
->>>  hw/virtio/virtio-balloon.c                      |   40 +++++++++++++++++++++++
->>>  include/hw/virtio/virtio-balloon.h              |    2 +
->>>  include/standard-headers/linux/virtio_balloon.h |    1 +
->>>  3 files changed, 42 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->>> index 2112874055fb..70c0004c0f88 100644
->>> --- a/hw/virtio/virtio-balloon.c
->>> +++ b/hw/virtio/virtio-balloon.c
->>> @@ -328,6 +328,39 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
->>>      balloon_stats_change_timer(s, 0);
->>>  }
->>>  
->>> +static void virtio_bubble_handle_output(VirtIODevice *vdev, VirtQueue *vq)
->>> +{
->>> +    VirtQueueElement *elem;
->>> +
->>> +    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
->>> +    	unsigned int i;
->>> +
->>> +        for (i = 0; i < elem->in_num; i++) {
->>> +            void *addr = elem->in_sg[i].iov_base;
->>> +            size_t size = elem->in_sg[i].iov_len;
->>> +            ram_addr_t ram_offset;
->>> +            size_t rb_page_size;
->>> +            RAMBlock *rb;
->>> +
->>> +            if (qemu_balloon_is_inhibited())
->>> +                continue;
->>> +
->>> +            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
->>> +            rb_page_size = qemu_ram_pagesize(rb);
->>> +
->>> +            /* For now we will simply ignore unaligned memory regions */
->>> +            if ((ram_offset | size) & (rb_page_size - 1))
->>> +                continue;
->>> +
->>> +            ram_block_discard_range(rb, ram_offset, size);
->> I suspect this needs to do like the migration type of
->> hinting and get disabled if page poisoning is in effect.
->> Right?
-> Shouldn't something like that end up getting handled via
-> qemu_balloon_is_inhibited, or did I miss something there? I assumed cases
-> like that would end up setting qemu_balloon_is_inhibited to true, if that
-> isn't the case then I could add some additional conditions. I would do it
-> in about the same spot as the qemu_balloon_is_inhibited check.
-I don't think qemu_balloon_is_inhibited() will take care of the page poisoning
-situations.
-If I am not wrong we may have to look to extend VIRTIO_BALLOON_F_PAGE_POISON
-support as per Michael's suggestion.
->
->
--- 
-Thanks
-Nitesh
+Applied to rdma-for next, please don't sent it via other trees :)
+
+Thanks,
+Jason
