@@ -2,100 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0AE772CCA
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:03:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FA6472CE1
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 13:09:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727364AbfGXLDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 07:03:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43706 "EHLO mx1.redhat.com"
+        id S1726981AbfGXLJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 07:09:36 -0400
+Received: from foss.arm.com ([217.140.110.172]:39056 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726070AbfGXLDz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 07:03:55 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 332CC30B1AC9;
-        Wed, 24 Jul 2019 11:03:55 +0000 (UTC)
-Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A4AD60BEC;
-        Wed, 24 Jul 2019 11:03:53 +0000 (UTC)
-Date:   Wed, 24 Jul 2019 12:03:50 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Juan Quintela <quintela@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Thomas Huth <thuth@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Ivan Ren <renyime@gmail.com>, Ivan Ren <ivanren@tencent.com>
-Subject: Re: [PATCH 4/4] migration: fix migrate_cancel multifd migration
- leads destination hung forever
-Message-ID: <20190724110350.GD2717@work-vm>
-References: <20190724095523.1527-1-quintela@redhat.com>
- <20190724095523.1527-5-quintela@redhat.com>
+        id S1726514AbfGXLJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 07:09:36 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A53FD337;
+        Wed, 24 Jul 2019 04:09:35 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 020013F71A;
+        Wed, 24 Jul 2019 04:09:34 -0700 (PDT)
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: vgic-its: Introduce multiple LPI
+ translation caches
+To:     Xiangyou Xie <xiexiangyou@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+References: <20190724090437.49952-1-xiexiangyou@huawei.com>
+ <20190724090437.49952-2-xiexiangyou@huawei.com>
+From:   Marc Zyngier <marc.zyngier@arm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ mQINBE6Jf0UBEADLCxpix34Ch3kQKA9SNlVQroj9aHAEzzl0+V8jrvT9a9GkK+FjBOIQz4KE
+ g+3p+lqgJH4NfwPm9H5I5e3wa+Scz9wAqWLTT772Rqb6hf6kx0kKd0P2jGv79qXSmwru28vJ
+ t9NNsmIhEYwS5eTfCbsZZDCnR31J6qxozsDHpCGLHlYym/VbC199Uq/pN5gH+5JHZyhyZiNW
+ ozUCjMqC4eNW42nYVKZQfbj/k4W9xFfudFaFEhAf/Vb1r6F05eBP1uopuzNkAN7vqS8XcgQH
+ qXI357YC4ToCbmqLue4HK9+2mtf7MTdHZYGZ939OfTlOGuxFW+bhtPQzsHiW7eNe0ew0+LaL
+ 3wdNzT5abPBscqXWVGsZWCAzBmrZato+Pd2bSCDPLInZV0j+rjt7MWiSxEAEowue3IcZA++7
+ ifTDIscQdpeKT8hcL+9eHLgoSDH62SlubO/y8bB1hV8JjLW/jQpLnae0oz25h39ij4ijcp8N
+ t5slf5DNRi1NLz5+iaaLg4gaM3ywVK2VEKdBTg+JTg3dfrb3DH7ctTQquyKun9IVY8AsxMc6
+ lxl4HxrpLX7HgF10685GG5fFla7R1RUnW5svgQhz6YVU33yJjk5lIIrrxKI/wLlhn066mtu1
+ DoD9TEAjwOmpa6ofV6rHeBPehUwMZEsLqlKfLsl0PpsJwov8TQARAQABtCNNYXJjIFp5bmdp
+ ZXIgPG1hcmMuenluZ2llckBhcm0uY29tPokCTwQTAQIAOQIbAwYLCQgHAwIGFQgCCQoLBBYC
+ AwECHgECF4AWIQSf1RxT4LVjGP2VnD0j0NC60T16QwUCXR3BUgAKCRAj0NC60T16Qyd/D/9s
+ x0puxd3lI+jdLMEY8sTsNxw/+CZfyKaHtysasZlloLK7ftYhRUc63mMW2mrvgB1GEnXYIdj3
+ g6Qo4csoDuN+9EBmejh7SglM/h0evOtrY2V5QmZA/e/Pqfj0P3N/Eb5BiB3R4ptLtvKCTsqr
+ 3womxCRqQY3IrMn1s2qfpmeNLUIfCUtgh8opzPtFuFJWVBzbzvhPEApZzMe9Vs1O2P8BQaay
+ QXpbzHaKruthoLICRzS/3UCe0N/mBZQRKHrqhPwvjZdO0KMqjSsPqfukOJ8bl5jZxYk+G/3T
+ 66Z4JUpZ7RkcrX7CvBfZqRo19WyWFfjGz79iVMJNIEkJvJBANbTSiWUC6IkP+zT/zWYzZPXx
+ XRlrKWSBBqJrWQKZBwKOLsL62oQG7ARvpCG9rZ6hd5CLQtPI9dasgTwOIA1OW2mWzi20jDjD
+ cGC9ifJiyWL8L/bgwyL3F/G0R1gxAfnRUknyzqfpLy5cSgwKCYrXOrRqgHoB+12HA/XQUG+k
+ vKW8bbdVk5XZPc5ghdFIlza/pb1946SrIg1AsjaEMZqunh0G7oQhOWHKOd6fH0qg8NssMqQl
+ jLfFiOlgEV2mnaz6XXQe/viXPwa4NCmdXqxeBDpJmrNMtbEbq+QUbgcwwle4Xx2/07ICkyZH
+ +7RvbmZ/dM9cpzMAU53sLxSIVQT5lj23WLkCDQROiX9FARAAz/al0tgJaZ/eu0iI/xaPk3DK
+ NIvr9SsKFe2hf3CVjxriHcRfoTfriycglUwtvKvhvB2Y8pQuWfLtP9Hx3H+YI5a78PO2tU1C
+ JdY5Momd3/aJBuUFP5blbx6n+dLDepQhyQrAp2mVC3NIp4T48n4YxL4Og0MORytWNSeygISv
+ Rordw7qDmEsa7wgFsLUIlhKmmV5VVv+wAOdYXdJ9S8n+XgrxSTgHj5f3QqkDtT0yG8NMLLmY
+ kZpOwWoMumeqn/KppPY/uTIwbYTD56q1UirDDB5kDRL626qm63nF00ByyPY+6BXH22XD8smj
+ f2eHw2szECG/lpD4knYjxROIctdC+gLRhz+Nlf8lEHmvjHgiErfgy/lOIf+AV9lvDF3bztjW
+ M5oP2WGeR7VJfkxcXt4JPdyDIH6GBK7jbD7bFiXf6vMiFCrFeFo/bfa39veKUk7TRlnX13go
+ gIZxqR6IvpkG0PxOu2RGJ7Aje/SjytQFa2NwNGCDe1bH89wm9mfDW3BuZF1o2+y+eVqkPZj0
+ mzfChEsiNIAY6KPDMVdInILYdTUAC5H26jj9CR4itBUcjE/tMll0n2wYRZ14Y/PM+UosfAhf
+ YfN9t2096M9JebksnTbqp20keDMEBvc3KBkboEfoQLU08NDo7ncReitdLW2xICCnlkNIUQGS
+ WlFVPcTQ2sMAEQEAAYkCHwQYAQIACQUCTol/RQIbDAAKCRAj0NC60T16QwsFD/9T4y30O0Wn
+ MwIgcU8T2c2WwKbvmPbaU2LDqZebHdxQDemX65EZCv/NALmKdA22MVSbAaQeqsDD5KYbmCyC
+ czilJ1i+tpZoJY5kJALHWWloI6Uyi2s1zAwlMktAZzgGMnI55Ifn0dAOK0p8oy7/KNGHNPwJ
+ eHKzpHSRgysQ3S1t7VwU4mTFJtXQaBFMMXg8rItP5GdygrFB7yUbG6TnrXhpGkFBrQs9p+SK
+ vCqRS3Gw+dquQ9QR+QGWciEBHwuSad5gu7QC9taN8kJQfup+nJL8VGtAKgGr1AgRx/a/V/QA
+ ikDbt/0oIS/kxlIdcYJ01xuMrDXf1jFhmGZdocUoNJkgLb1iFAl5daV8MQOrqciG+6tnLeZK
+ HY4xCBoigV7E8KwEE5yUfxBS0yRreNb+pjKtX6pSr1Z/dIo+td/sHfEHffaMUIRNvJlBeqaj
+ BX7ZveskVFafmErkH7HC+7ErIaqoM4aOh/Z0qXbMEjFsWA5yVXvCoJWSHFImL9Bo6PbMGpI0
+ 9eBrkNa1fd6RGcktrX6KNfGZ2POECmKGLTyDC8/kb180YpDJERN48S0QBa3Rvt06ozNgFgZF
+ Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
+ Z46HaNmN2hZS/oJ69c1DI5Rcww==
+Organization: ARM Ltd
+Message-ID: <a8b74b25-8c92-4aad-f94d-8371126798ef@arm.com>
+Date:   Wed, 24 Jul 2019 12:09:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190724095523.1527-5-quintela@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 24 Jul 2019 11:03:55 +0000 (UTC)
+In-Reply-To: <20190724090437.49952-2-xiexiangyou@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> From: Ivan Ren <renyime@gmail.com>
-> 
-> When migrate_cancel a multifd migration, if run sequence like this:
-> 
->         [source]                              [destination]
-> 
-> multifd_send_sync_main[finish]
->                                     multifd_recv_thread wait &p->sem_sync
-> shutdown to_dst_file
->                                     detect error from_src_file
-> send  RAM_SAVE_FLAG_EOS[fail]       [no chance to run multifd_recv_sync_main]
->                                     multifd_load_cleanup
->                                     join multifd receive thread forever
-> 
-> will lead destination qemu hung at following stack:
-> 
-> pthread_join
-> qemu_thread_join
-> multifd_load_cleanup
-> process_incoming_migration_co
-> coroutine_trampoline
-> 
-> Signed-off-by: Ivan Ren <ivanren@tencent.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Message-Id: <1561468699-9819-4-git-send-email-ivanren@tencent.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+Hi Xiangyou,
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 24/07/2019 10:04, Xiangyou Xie wrote:
+> Because dist->lpi_list_lock is a perVM lock, when a virtual machine
+> is configured with multiple virtual NIC devices and receives
+> network packets at the same time, dist->lpi_list_lock will become
+> a performance bottleneck.
 
-> ---
->  migration/ram.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index eb6716710e..889148dd84 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1292,6 +1292,11 @@ int multifd_load_cleanup(Error **errp)
->  
->          if (p->running) {
->              p->quit = true;
-> +            /*
-> +             * multifd_recv_thread may hung at MULTIFD_FLAG_SYNC handle code,
-> +             * however try to wakeup it without harm in cleanup phase.
-> +             */
-> +            qemu_sem_post(&p->sem_sync);
->              qemu_thread_join(&p->thread);
->          }
->          object_unref(OBJECT(p->c));
-> -- 
-> 2.21.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I'm sorry, but you'll have to show me some real numbers before I
+consider any of this. There is a reason why the original series still
+isn't in mainline, and that's because people don't post any numbers.
+Adding more patches is not going to change that small fact.
+
+> This patch increases the number of lpi_translation_cache to eight,
+> hashes the cpuid that executes irqfd_wakeup, and chooses which
+> lpi_translation_cache to use.
+
+So you've now switched to a per-cache lock, meaning that the rest of the
+ITS code can manipulate the the lpi_list without synchronization with
+the caches. Have you worked out all the possible races? Also, how does
+this new lock class fits in the whole locking hierarchy?
+
+If you want something that is actually scalable, do it the right way.
+Use a better data structure than a list, switch to using RCU rather than
+the current locking strategy. But your current approach looks quite fragile.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
