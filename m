@@ -2,133 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 573D1734B7
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 19:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9932E7363B
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 20:00:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728172AbfGXRM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 13:12:27 -0400
-Received: from foss.arm.com ([217.140.110.172]:44146 "EHLO foss.arm.com"
+        id S1727908AbfGXSAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 14:00:08 -0400
+Received: from ms.lwn.net ([45.79.88.28]:56828 "EHLO ms.lwn.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726238AbfGXRM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 13:12:26 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E49528;
-        Wed, 24 Jul 2019 10:12:26 -0700 (PDT)
-Received: from [10.1.196.72] (e119884-lin.cambridge.arm.com [10.1.196.72])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CE253F71F;
-        Wed, 24 Jul 2019 10:12:21 -0700 (PDT)
-Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
-To:     Will Deacon <will.deacon@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        dri-devel@lists.freedesktop.org,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-References: <cover.1563904656.git.andreyknvl@google.com>
- <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
- <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
- <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
- <20190724142059.GC21234@fuggles.cambridge.arm.com>
-From:   Vincenzo Frascino <vincenzo.frascino@arm.com>
-Message-ID: <f27f4e55-fcd6-9ae7-d9ca-cac2aea5fe70@arm.com>
-Date:   Wed, 24 Jul 2019 18:12:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726242AbfGXSAH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 14:00:07 -0400
+Received: from lwn.net (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id BEBCD300;
+        Wed, 24 Jul 2019 18:00:06 +0000 (UTC)
+Date:   Wed, 24 Jul 2019 12:00:05 -0600
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, rkrcmar@redhat.com,
+        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Documentation: move Documentation/virtual to
+ Documentation/virt
+Message-ID: <20190724120005.31a990af@lwn.net>
+In-Reply-To: <b9baabbb-9e9b-47cf-f5a8-ea42ba1ddc25@redhat.com>
+References: <20190724072449.19599-1-hch@lst.de>
+        <b9baabbb-9e9b-47cf-f5a8-ea42ba1ddc25@redhat.com>
+Organization: LWN.net
 MIME-Version: 1.0
-In-Reply-To: <20190724142059.GC21234@fuggles.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will and Andrey,
+On Wed, 24 Jul 2019 10:51:36 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On 24/07/2019 15:20, Will Deacon wrote:
-> On Wed, Jul 24, 2019 at 04:16:49PM +0200, Andrey Konovalov wrote:
->> On Wed, Jul 24, 2019 at 4:02 PM Will Deacon <will@kernel.org> wrote:
->>> On Tue, Jul 23, 2019 at 08:03:29PM +0200, Andrey Konovalov wrote:
->>>> On Tue, Jul 23, 2019 at 7:59 PM Andrey Konovalov <andreyknvl@google.com> wrote:
->>>>>
->>>>> === Overview
->>>>>
->>>>> arm64 has a feature called Top Byte Ignore, which allows to embed pointer
->>>>> tags into the top byte of each pointer. Userspace programs (such as
->>>>> HWASan, a memory debugging tool [1]) might use this feature and pass
->>>>> tagged user pointers to the kernel through syscalls or other interfaces.
->>>>>
->>>>> Right now the kernel is already able to handle user faults with tagged
->>>>> pointers, due to these patches:
->>>>>
->>>>> 1. 81cddd65 ("arm64: traps: fix userspace cache maintenance emulation on a
->>>>>              tagged pointer")
->>>>> 2. 7dcd9dd8 ("arm64: hw_breakpoint: fix watchpoint matching for tagged
->>>>>               pointers")
->>>>> 3. 276e9327 ("arm64: entry: improve data abort handling of tagged
->>>>>               pointers")
->>>>>
->>>>> This patchset extends tagged pointer support to syscall arguments.
->>>
->>> [...]
->>>
->>>> Do you think this is ready to be merged?
->>>>
->>>> Should this go through the mm or the arm tree?
->>>
->>> I would certainly prefer to take at least the arm64 bits via the arm64 tree
->>> (i.e. patches 1, 2 and 15). We also need a Documentation patch describing
->>> the new ABI.
->>
->> Sounds good! Should I post those patches together with the
->> Documentation patches from Vincenzo as a separate patchset?
+> On 24/07/19 09:24, Christoph Hellwig wrote:
+> > Renaming docs seems to be en vogue at the moment, so fix on of the
+> > grossly misnamed directories.  We usually never use "virtual" as
+> > a shortcut for virtualization in the kernel, but always virt,
+> > as seen in the virt/ top-level directory.  Fix up the documentation
+> > to match that.
+> > 
+> > Fixes: ed16648eb5b8 ("Move kvm, uml, and lguest subdirectories under a common "virtual" directory, I.E:")
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>  
 > 
-> Yes, please (although as you say below, we need a new version of those
-> patches from Vincenzo to address the feedback on v5). The other thing I
-> should say is that I'd be happy to queue the other patches in the series
-> too, but some of them are missing acks from the relevant maintainers (e.g.
-> the mm/ and fs/ changes).
-> 
+> Queued, thanks.  I can't count how many times I said "I really should
+> rename that directory".
 
-I am actively working on the document and will share v6 with the requested
-changes in the next few days.
+...and it's up to Linus before I even got a chance to look at it - one has
+to be fast around here...:)
 
-> Will
-> 
+There's nothing wrong with this move, but it does miss the point of much
+of the reorganization that has been going on in the docs tree.  It's not
+just a matter of getting more pleasing names; the real idea is to create a
+better, more reader-focused organization on kernel documentation as a
+whole.  Documentation/virt still has the sort of confusion of audiences
+that we're trying to fix:
 
--- 
-Regards,
-Vincenzo
+ - kvm/api.txt pretty clearly belongs in the userspace-api book, rather
+   than tossed in with:
+
+ - kvm/review-checklist.txt, which belongs in the subsystem guide, if only
+   we'd gotten around to creating it yet, or
+
+ - kvm/mmu.txt, which is information for kernel developers, or
+
+ - uml/UserModeLinux-HOWTO.txt, which belongs in the admin guide.
+
+I suspect that organization is going to be one of the main issues to talk
+about in Lisbon.  Meanwhile, I hope that this rename won't preclude
+organizational work in the future.
+
+Thanks,
+
+jon
