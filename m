@@ -2,30 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 21EA4730AB
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 16:02:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 772DA73161
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 16:17:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728180AbfGXOCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 10:02:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44322 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725870AbfGXOCY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 10:02:24 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0A09422BE8;
-        Wed, 24 Jul 2019 14:02:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563976942;
-        bh=akL4t3WLQfvH/sx6baSCdRPzrJPet6bQ0ZZAPYisZi4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HGjiQdK87WShqPUCUDRg97LnVe6uyeIf9yy5HPpwultEhX+41Yn3D/DKXjIK8Af4f
-         0ygT0V9wgzsE+RPZ4QFVtqujFkiagNZGrOWFPz6QtW3TCSySYN2+CMJ5pNSGE1vClG
-         0S7ixJF2Qf9InXHgM9sSGPD0ag6vRkrIxQa7ibh4=
-Date:   Wed, 24 Jul 2019 15:02:12 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
+        id S1725870AbfGXORC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 10:17:02 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40886 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726316AbfGXORB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 10:17:01 -0400
+Received: by mail-pf1-f195.google.com with SMTP id p184so21026481pfp.7
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 07:17:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iVEa+BrbD+ybsnA2U1ljAFs3yPdamhmoGuSiTUjWPJ4=;
+        b=DWU4WjGAtgl8VCFFOjc8wXQ0g23uMAUtJpd38Z3oaJgwn4NfatixOvhmdpOdL+fxhG
+         e0wlc3X1shT5Iq30jjbbWGUReEBT4OBXlYiiQUhWx2Q7uiFMfOEneT8NH6f9J2qp0V5H
+         uul5tf2SvUAF38K7907CwJA6dKexcEorDJsv/KoSqA3HSUAO6tsOMxjz0hFsJBWrp9kB
+         d53dWGlSvFswyl6j+n5LUh4qGYRvo3+KwFNfAV8S+2jUqD0GvKKHxnABV1FWZ1+b1OBh
+         oB2T3ZDN/Zfw5qlFjUWW5qYsM2z/YZXngByjiqcmIeT7gWGze9CMbYqnOAvNwjkoL4TA
+         mEew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iVEa+BrbD+ybsnA2U1ljAFs3yPdamhmoGuSiTUjWPJ4=;
+        b=ecZKFWVVEkEbUD8IQJV4ltLQV03nsClsJtVLeTAAzy7raQUlOU/nih/uizlCKWhdAf
+         2BClYYNxM1CGOiB+i0C7rHJ9pwgaUbhzDnIxGSxt5wRWyZhWNBYKg7sjakEbGFoLHKzd
+         cAnbUySHAcHTYMXzlleHI7IY/koSOCn7VJD7t1yQf8+UWK98yE7xFsZ6ova68iqqJ5AT
+         xdEX6zUSOSWHM5denx+zIZtEnFuFolzm4Rnk18pOKxq15T7jZxL1/eFjtr9sVYlDd2vD
+         7x+gmENriqfCczuwXW+6rP1S9S+9x47TNYKO2MyDNHy09vHuMkPYJN41KL8I+Oq+tB9p
+         Pv9Q==
+X-Gm-Message-State: APjAAAUn6m9a/xLRJCEXTeN+UXKoEo1wCK6vAtjXf+g4xhMyN9TcXlVR
+        0v2UlP2CzUvj+/5FB6Vozl/0Ky7bzAzxcvd+HpOSyw==
+X-Google-Smtp-Source: APXvYqz2dMxGxnq2kAfIP49TpeG4FcaV+yTvRZ4CcUcR9QT0oeQ2GoQPtuki1B+xbKFnrASZfeBQUkyN7t1WRbfNCv8=
+X-Received: by 2002:aa7:86c6:: with SMTP id h6mr11779914pfo.51.1563977820600;
+ Wed, 24 Jul 2019 07:17:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1563904656.git.andreyknvl@google.com> <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
+ <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
+In-Reply-To: <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Wed, 24 Jul 2019 16:16:49 +0200
+Message-ID: <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
+Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
+To:     Will Deacon <will@kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
@@ -37,7 +61,6 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         "open list:KERNEL SELFTEST FRAMEWORK" 
         <linux-kselftest@vger.kernel.org>,
         Felix Kuehling <Felix.Kuehling@amd.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
         Jacob Bramley <Jacob.Bramley@arm.com>,
         Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
         amd-gfx@lists.freedesktop.org,
@@ -63,52 +86,54 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
         Christian Koenig <Christian.Koenig@amd.com>,
         Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
-Message-ID: <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
-References: <cover.1563904656.git.andreyknvl@google.com>
- <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andrey,
-
-On Tue, Jul 23, 2019 at 08:03:29PM +0200, Andrey Konovalov wrote:
-> On Tue, Jul 23, 2019 at 7:59 PM Andrey Konovalov <andreyknvl@google.com> wrote:
+On Wed, Jul 24, 2019 at 4:02 PM Will Deacon <will@kernel.org> wrote:
+>
+> Hi Andrey,
+>
+> On Tue, Jul 23, 2019 at 08:03:29PM +0200, Andrey Konovalov wrote:
+> > On Tue, Jul 23, 2019 at 7:59 PM Andrey Konovalov <andreyknvl@google.com> wrote:
+> > >
+> > > === Overview
+> > >
+> > > arm64 has a feature called Top Byte Ignore, which allows to embed pointer
+> > > tags into the top byte of each pointer. Userspace programs (such as
+> > > HWASan, a memory debugging tool [1]) might use this feature and pass
+> > > tagged user pointers to the kernel through syscalls or other interfaces.
+> > >
+> > > Right now the kernel is already able to handle user faults with tagged
+> > > pointers, due to these patches:
+> > >
+> > > 1. 81cddd65 ("arm64: traps: fix userspace cache maintenance emulation on a
+> > >              tagged pointer")
+> > > 2. 7dcd9dd8 ("arm64: hw_breakpoint: fix watchpoint matching for tagged
+> > >               pointers")
+> > > 3. 276e9327 ("arm64: entry: improve data abort handling of tagged
+> > >               pointers")
+> > >
+> > > This patchset extends tagged pointer support to syscall arguments.
+>
+> [...]
+>
+> > Do you think this is ready to be merged?
 > >
-> > === Overview
-> >
-> > arm64 has a feature called Top Byte Ignore, which allows to embed pointer
-> > tags into the top byte of each pointer. Userspace programs (such as
-> > HWASan, a memory debugging tool [1]) might use this feature and pass
-> > tagged user pointers to the kernel through syscalls or other interfaces.
-> >
-> > Right now the kernel is already able to handle user faults with tagged
-> > pointers, due to these patches:
-> >
-> > 1. 81cddd65 ("arm64: traps: fix userspace cache maintenance emulation on a
-> >              tagged pointer")
-> > 2. 7dcd9dd8 ("arm64: hw_breakpoint: fix watchpoint matching for tagged
-> >               pointers")
-> > 3. 276e9327 ("arm64: entry: improve data abort handling of tagged
-> >               pointers")
-> >
-> > This patchset extends tagged pointer support to syscall arguments.
+> > Should this go through the mm or the arm tree?
+>
+> I would certainly prefer to take at least the arm64 bits via the arm64 tree
+> (i.e. patches 1, 2 and 15). We also need a Documentation patch describing
+> the new ABI.
 
-[...]
+Sounds good! Should I post those patches together with the
+Documentation patches from Vincenzo as a separate patchset?
 
-> Do you think this is ready to be merged?
-> 
-> Should this go through the mm or the arm tree?
+Vincenzo, could you share the last version of the Documentation patches?
 
-I would certainly prefer to take at least the arm64 bits via the arm64 tree
-(i.e. patches 1, 2 and 15). We also need a Documentation patch describing
-the new ABI.
+Thanks!
 
-Will
+>
+> Will
