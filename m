@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EB8973CE2
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 22:13:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D6E573CA1
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 22:10:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391858AbfGXT46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 15:56:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39990 "EHLO mx1.redhat.com"
+        id S2392670AbfGXUKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 16:10:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49028 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404721AbfGXT44 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 15:56:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S2390935AbfGXUKe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 16:10:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D582A330272;
-        Wed, 24 Jul 2019 19:56:55 +0000 (UTC)
-Received: from [10.36.116.35] (ovpn-116-35.ams2.redhat.com [10.36.116.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E7AFB605C3;
-        Wed, 24 Jul 2019 19:56:44 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 223DC8553D;
+        Wed, 24 Jul 2019 20:10:34 +0000 (UTC)
+Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BA0FD5D9DE;
+        Wed, 24 Jul 2019 20:10:22 +0000 (UTC)
 Subject: Re: [RFC][Patch v11 2/2] virtio-balloon: page_hinting: reporting to
  the host
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>
+To:     David Hildenbrand <david@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, pbonzini@redhat.com, lcapitulino@redhat.com,
         pagupta@redhat.com, wei.w.wang@intel.com, yang.zhang.wz@gmail.com,
@@ -33,186 +33,187 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 References: <20190710195158.19640-1-nitesh@redhat.com>
  <20190710195158.19640-3-nitesh@redhat.com>
  <20190724153951-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
+ <d4f827a5-7914-4f8c-932e-91ef173b65d0@redhat.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <d4f827a5-7914-4f8c-932e-91ef173b65d0@redhat.com>
-Date:   Wed, 24 Jul 2019 21:56:44 +0200
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <a230c221-604f-44d8-9895-a22123704c72@redhat.com>
+Date:   Wed, 24 Jul 2019 16:10:22 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190724153951-mutt-send-email-mst@kernel.org>
+In-Reply-To: <d4f827a5-7914-4f8c-932e-91ef173b65d0@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 24 Jul 2019 19:56:56 +0000 (UTC)
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 24 Jul 2019 20:10:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.07.19 21:47, Michael S. Tsirkin wrote:
-> On Wed, Jul 10, 2019 at 03:51:58PM -0400, Nitesh Narayan Lal wrote:
->> Enables the kernel to negotiate VIRTIO_BALLOON_F_HINTING feature with the
->> host. If it is available and page_hinting_flag is set to true, page_hinting
->> is enabled and its callbacks are configured along with the max_pages count
->> which indicates the maximum number of pages that can be isolated and hinted
->> at a time. Currently, only free pages of order >= (MAX_ORDER - 2) are
->> reported. To prevent any false OOM max_pages count is set to 16.
->>
->> By default page_hinting feature is enabled and gets loaded as soon
->> as the virtio-balloon driver is loaded. However, it could be disabled
->> by writing the page_hinting_flag which is a virtio-balloon parameter.
->>
->> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
->> ---
->>  drivers/virtio/Kconfig              |  1 +
->>  drivers/virtio/virtio_balloon.c     | 91 ++++++++++++++++++++++++++++-
->>  include/uapi/linux/virtio_balloon.h | 11 ++++
->>  3 files changed, 102 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
->> index 023fc3bc01c6..dcc0cb4269a5 100644
->> --- a/drivers/virtio/Kconfig
->> +++ b/drivers/virtio/Kconfig
->> @@ -47,6 +47,7 @@ config VIRTIO_BALLOON
->>  	tristate "Virtio balloon driver"
->>  	depends on VIRTIO
->>  	select MEMORY_BALLOON
->> +	select PAGE_HINTING
->>  	---help---
->>  	 This driver supports increasing and decreasing the amount
->>  	 of memory within a KVM guest.
->> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
->> index 44339fc87cc7..1fb0eb0b2c20 100644
->> --- a/drivers/virtio/virtio_balloon.c
->> +++ b/drivers/virtio/virtio_balloon.c
->> @@ -18,6 +18,7 @@
->>  #include <linux/mm.h>
->>  #include <linux/mount.h>
->>  #include <linux/magic.h>
->> +#include <linux/page_hinting.h>
->>  
->>  /*
->>   * Balloon device works in 4K page units.  So each page is pointed to by
->> @@ -35,6 +36,12 @@
->>  /* The size of a free page block in bytes */
->>  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
->>  	(1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
->> +/* Number of isolated pages to be reported to the host at a time.
->> + * TODO:
->> + * 1. Set it via host.
->> + * 2. Find an optimal value for this.
->> + */
->> +#define PAGE_HINTING_MAX_PAGES	16
->>  
->>  #ifdef CONFIG_BALLOON_COMPACTION
->>  static struct vfsmount *balloon_mnt;
->> @@ -45,6 +52,7 @@ enum virtio_balloon_vq {
->>  	VIRTIO_BALLOON_VQ_DEFLATE,
->>  	VIRTIO_BALLOON_VQ_STATS,
->>  	VIRTIO_BALLOON_VQ_FREE_PAGE,
->> +	VIRTIO_BALLOON_VQ_HINTING,
->>  	VIRTIO_BALLOON_VQ_MAX
->>  };
->>  
->> @@ -54,7 +62,8 @@ enum virtio_balloon_config_read {
->>  
->>  struct virtio_balloon {
->>  	struct virtio_device *vdev;
->> -	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq;
->> +	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq,
->> +			 *hinting_vq;
->>  
->>  	/* Balloon's own wq for cpu-intensive work items */
->>  	struct workqueue_struct *balloon_wq;
->> @@ -112,6 +121,9 @@ struct virtio_balloon {
->>  
->>  	/* To register a shrinker to shrink memory upon memory pressure */
->>  	struct shrinker shrinker;
->> +
->> +	/* Array object pointing at the isolated pages ready for hinting */
->> +	struct isolated_memory isolated_pages[PAGE_HINTING_MAX_PAGES];
->>  };
->>  
->>  static struct virtio_device_id id_table[] = {
->> @@ -119,6 +131,66 @@ static struct virtio_device_id id_table[] = {
->>  	{ 0 },
->>  };
->>  
->> +static struct page_hinting_config page_hinting_conf;
->> +bool page_hinting_flag = true;
->> +struct virtio_balloon *hvb;
->> +module_param(page_hinting_flag, bool, 0444);
->> +MODULE_PARM_DESC(page_hinting_flag, "Enable page hinting");
->> +
->> +static int page_hinting_report(void)
->> +{
->> +	struct virtqueue *vq = hvb->hinting_vq;
->> +	struct scatterlist sg;
->> +	int err = 0, unused;
->> +
->> +	mutex_lock(&hvb->balloon_lock);
->> +	sg_init_one(&sg, hvb->isolated_pages, sizeof(hvb->isolated_pages[0]) *
->> +		    PAGE_HINTING_MAX_PAGES);
->> +	err = virtqueue_add_outbuf(vq, &sg, 1, hvb, GFP_KERNEL);
-> 
-> In Alex's patch, I really like it that he's passing pages as sg
-> entries. IMHO that's both cleaner and allows seamless
-> support for arbitrary page sizes.
-> 
 
-+1
-
-I especially like passing full addresses and sizes instead of PFNs and
-orders (compared to Alex's v1, where he would pass PFNs and orders).
-
+On 7/24/19 3:56 PM, David Hildenbrand wrote:
+> On 24.07.19 21:47, Michael S. Tsirkin wrote:
+>> On Wed, Jul 10, 2019 at 03:51:58PM -0400, Nitesh Narayan Lal wrote:
+>>> Enables the kernel to negotiate VIRTIO_BALLOON_F_HINTING feature with the
+>>> host. If it is available and page_hinting_flag is set to true, page_hinting
+>>> is enabled and its callbacks are configured along with the max_pages count
+>>> which indicates the maximum number of pages that can be isolated and hinted
+>>> at a time. Currently, only free pages of order >= (MAX_ORDER - 2) are
+>>> reported. To prevent any false OOM max_pages count is set to 16.
+>>>
+>>> By default page_hinting feature is enabled and gets loaded as soon
+>>> as the virtio-balloon driver is loaded. However, it could be disabled
+>>> by writing the page_hinting_flag which is a virtio-balloon parameter.
+>>>
+>>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+>>> ---
+>>>  drivers/virtio/Kconfig              |  1 +
+>>>  drivers/virtio/virtio_balloon.c     | 91 ++++++++++++++++++++++++++++-
+>>>  include/uapi/linux/virtio_balloon.h | 11 ++++
+>>>  3 files changed, 102 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+>>> index 023fc3bc01c6..dcc0cb4269a5 100644
+>>> --- a/drivers/virtio/Kconfig
+>>> +++ b/drivers/virtio/Kconfig
+>>> @@ -47,6 +47,7 @@ config VIRTIO_BALLOON
+>>>  	tristate "Virtio balloon driver"
+>>>  	depends on VIRTIO
+>>>  	select MEMORY_BALLOON
+>>> +	select PAGE_HINTING
+>>>  	---help---
+>>>  	 This driver supports increasing and decreasing the amount
+>>>  	 of memory within a KVM guest.
+>>> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+>>> index 44339fc87cc7..1fb0eb0b2c20 100644
+>>> --- a/drivers/virtio/virtio_balloon.c
+>>> +++ b/drivers/virtio/virtio_balloon.c
+>>> @@ -18,6 +18,7 @@
+>>>  #include <linux/mm.h>
+>>>  #include <linux/mount.h>
+>>>  #include <linux/magic.h>
+>>> +#include <linux/page_hinting.h>
+>>>  
+>>>  /*
+>>>   * Balloon device works in 4K page units.  So each page is pointed to by
+>>> @@ -35,6 +36,12 @@
+>>>  /* The size of a free page block in bytes */
+>>>  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
+>>>  	(1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
+>>> +/* Number of isolated pages to be reported to the host at a time.
+>>> + * TODO:
+>>> + * 1. Set it via host.
+>>> + * 2. Find an optimal value for this.
+>>> + */
+>>> +#define PAGE_HINTING_MAX_PAGES	16
+>>>  
+>>>  #ifdef CONFIG_BALLOON_COMPACTION
+>>>  static struct vfsmount *balloon_mnt;
+>>> @@ -45,6 +52,7 @@ enum virtio_balloon_vq {
+>>>  	VIRTIO_BALLOON_VQ_DEFLATE,
+>>>  	VIRTIO_BALLOON_VQ_STATS,
+>>>  	VIRTIO_BALLOON_VQ_FREE_PAGE,
+>>> +	VIRTIO_BALLOON_VQ_HINTING,
+>>>  	VIRTIO_BALLOON_VQ_MAX
+>>>  };
+>>>  
+>>> @@ -54,7 +62,8 @@ enum virtio_balloon_config_read {
+>>>  
+>>>  struct virtio_balloon {
+>>>  	struct virtio_device *vdev;
+>>> -	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq;
+>>> +	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq,
+>>> +			 *hinting_vq;
+>>>  
+>>>  	/* Balloon's own wq for cpu-intensive work items */
+>>>  	struct workqueue_struct *balloon_wq;
+>>> @@ -112,6 +121,9 @@ struct virtio_balloon {
+>>>  
+>>>  	/* To register a shrinker to shrink memory upon memory pressure */
+>>>  	struct shrinker shrinker;
+>>> +
+>>> +	/* Array object pointing at the isolated pages ready for hinting */
+>>> +	struct isolated_memory isolated_pages[PAGE_HINTING_MAX_PAGES];
+>>>  };
+>>>  
+>>>  static struct virtio_device_id id_table[] = {
+>>> @@ -119,6 +131,66 @@ static struct virtio_device_id id_table[] = {
+>>>  	{ 0 },
+>>>  };
+>>>  
+>>> +static struct page_hinting_config page_hinting_conf;
+>>> +bool page_hinting_flag = true;
+>>> +struct virtio_balloon *hvb;
+>>> +module_param(page_hinting_flag, bool, 0444);
+>>> +MODULE_PARM_DESC(page_hinting_flag, "Enable page hinting");
+>>> +
+>>> +static int page_hinting_report(void)
+>>> +{
+>>> +	struct virtqueue *vq = hvb->hinting_vq;
+>>> +	struct scatterlist sg;
+>>> +	int err = 0, unused;
+>>> +
+>>> +	mutex_lock(&hvb->balloon_lock);
+>>> +	sg_init_one(&sg, hvb->isolated_pages, sizeof(hvb->isolated_pages[0]) *
+>>> +		    PAGE_HINTING_MAX_PAGES);
+>>> +	err = virtqueue_add_outbuf(vq, &sg, 1, hvb, GFP_KERNEL);
+>> In Alex's patch, I really like it that he's passing pages as sg
+>> entries. IMHO that's both cleaner and allows seamless
+>> support for arbitrary page sizes.
+>>
+> +1
+>
+> I especially like passing full addresses and sizes instead of PFNs and
+> orders (compared to Alex's v1, where he would pass PFNs and orders).
+I agree it fixes the issues which could have been introduced due to different
+page sizes in the host and the guest.
+>
 -- 
-
-Thanks,
-
-David / dhildenb
+Thanks
+Nitesh
