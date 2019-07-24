@@ -2,121 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74C1F72E9C
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 14:17:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5EE572F11
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2019 14:39:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727957AbfGXMRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Jul 2019 08:17:18 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35140 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726408AbfGXMRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Jul 2019 08:17:17 -0400
-Received: by mail-wm1-f66.google.com with SMTP id l2so41410292wmg.0
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2019 05:17:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=d/bnNeFnlnArvv9m90hzgTqoTaqu56sti/BTphxXxoM=;
-        b=dFOkuLHt4cLFjGFdd2Z1bcqCzrewruuu+D2ujPuF0alInjkkgPKadZP7CQW+Rx56TJ
-         9q39hxPpRP4PWgHVH+qUjZFLT1WVMq+YT1/aMlO+oi/szPyvG+5EUIaOr1pyMeXNmg6o
-         E3v3n8yaxuHOwGJXYLyfVWrVBf8s3yJ7NGDe94i7xVXsC6JvC+6Jw9qDnWZShVH/y6Ql
-         fvyOUcpvLI4gY5kHEaCkQFVO7WtqOjck/qbBERBR6H0dP63I+RnJmuZQgK7KXg2+eVaL
-         EJYkcktWKsXbUB11SIeDh77ZiePKKCEXyYxktZuSjmD2VRUi6FJnfCZd7Fy8ESUFOlZ3
-         sNxQ==
-X-Gm-Message-State: APjAAAV1grCv0NlUQbW+Kw2unsfUhnjFABdCnRx0AaP40lCj6UBsiMEV
-        R3P5UplGjIinnMZRP1x+0HDfEA==
-X-Google-Smtp-Source: APXvYqwCvrf4yPzzk3NFn3Qx2+lKh32KmGRJqKMQSlgWv3da79lYQl+eEShtkRMIfH4axXaXxN60Qw==
-X-Received: by 2002:a1c:407:: with SMTP id 7mr78394104wme.113.1563970635452;
-        Wed, 24 Jul 2019 05:17:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:10f7:67c8:abb4:8512? ([2001:b07:6468:f312:10f7:67c8:abb4:8512])
-        by smtp.gmail.com with ESMTPSA id y12sm41112207wrm.79.2019.07.24.05.17.14
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2019 05:17:14 -0700 (PDT)
-Subject: Re: [PATCH] KVM: X86: Boost queue head vCPU to mitigate lock waiter
- preemption
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        id S1728414AbfGXMjT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Jul 2019 08:39:19 -0400
+Received: from foss.arm.com ([217.140.110.172]:40352 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725776AbfGXMjR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Jul 2019 08:39:17 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3FA53337;
+        Wed, 24 Jul 2019 05:39:17 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C34F3F71A;
+        Wed, 24 Jul 2019 05:39:16 -0700 (PDT)
+Subject: Re: [PATCH 43/59] KVM: arm64: nv: Trap and emulate AT instructions
+ from virtual EL2
+To:     Tomasz Nowicki <tn@semihalf.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Waiman Long <longman@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <1563961393-10301-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-44-marc.zyngier@arm.com>
+ <0411c636-adbd-98d0-5191-2b073daaf68e@semihalf.com>
+From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
-Message-ID: <5ffaea5b-fb07-0141-cab8-6dce39071abe@redhat.com>
-Date:   Wed, 24 Jul 2019 14:17:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ mQINBE6Jf0UBEADLCxpix34Ch3kQKA9SNlVQroj9aHAEzzl0+V8jrvT9a9GkK+FjBOIQz4KE
+ g+3p+lqgJH4NfwPm9H5I5e3wa+Scz9wAqWLTT772Rqb6hf6kx0kKd0P2jGv79qXSmwru28vJ
+ t9NNsmIhEYwS5eTfCbsZZDCnR31J6qxozsDHpCGLHlYym/VbC199Uq/pN5gH+5JHZyhyZiNW
+ ozUCjMqC4eNW42nYVKZQfbj/k4W9xFfudFaFEhAf/Vb1r6F05eBP1uopuzNkAN7vqS8XcgQH
+ qXI357YC4ToCbmqLue4HK9+2mtf7MTdHZYGZ939OfTlOGuxFW+bhtPQzsHiW7eNe0ew0+LaL
+ 3wdNzT5abPBscqXWVGsZWCAzBmrZato+Pd2bSCDPLInZV0j+rjt7MWiSxEAEowue3IcZA++7
+ ifTDIscQdpeKT8hcL+9eHLgoSDH62SlubO/y8bB1hV8JjLW/jQpLnae0oz25h39ij4ijcp8N
+ t5slf5DNRi1NLz5+iaaLg4gaM3ywVK2VEKdBTg+JTg3dfrb3DH7ctTQquyKun9IVY8AsxMc6
+ lxl4HxrpLX7HgF10685GG5fFla7R1RUnW5svgQhz6YVU33yJjk5lIIrrxKI/wLlhn066mtu1
+ DoD9TEAjwOmpa6ofV6rHeBPehUwMZEsLqlKfLsl0PpsJwov8TQARAQABtCNNYXJjIFp5bmdp
+ ZXIgPG1hcmMuenluZ2llckBhcm0uY29tPokCTwQTAQIAOQIbAwYLCQgHAwIGFQgCCQoLBBYC
+ AwECHgECF4AWIQSf1RxT4LVjGP2VnD0j0NC60T16QwUCXR3BUgAKCRAj0NC60T16Qyd/D/9s
+ x0puxd3lI+jdLMEY8sTsNxw/+CZfyKaHtysasZlloLK7ftYhRUc63mMW2mrvgB1GEnXYIdj3
+ g6Qo4csoDuN+9EBmejh7SglM/h0evOtrY2V5QmZA/e/Pqfj0P3N/Eb5BiB3R4ptLtvKCTsqr
+ 3womxCRqQY3IrMn1s2qfpmeNLUIfCUtgh8opzPtFuFJWVBzbzvhPEApZzMe9Vs1O2P8BQaay
+ QXpbzHaKruthoLICRzS/3UCe0N/mBZQRKHrqhPwvjZdO0KMqjSsPqfukOJ8bl5jZxYk+G/3T
+ 66Z4JUpZ7RkcrX7CvBfZqRo19WyWFfjGz79iVMJNIEkJvJBANbTSiWUC6IkP+zT/zWYzZPXx
+ XRlrKWSBBqJrWQKZBwKOLsL62oQG7ARvpCG9rZ6hd5CLQtPI9dasgTwOIA1OW2mWzi20jDjD
+ cGC9ifJiyWL8L/bgwyL3F/G0R1gxAfnRUknyzqfpLy5cSgwKCYrXOrRqgHoB+12HA/XQUG+k
+ vKW8bbdVk5XZPc5ghdFIlza/pb1946SrIg1AsjaEMZqunh0G7oQhOWHKOd6fH0qg8NssMqQl
+ jLfFiOlgEV2mnaz6XXQe/viXPwa4NCmdXqxeBDpJmrNMtbEbq+QUbgcwwle4Xx2/07ICkyZH
+ +7RvbmZ/dM9cpzMAU53sLxSIVQT5lj23WLkCDQROiX9FARAAz/al0tgJaZ/eu0iI/xaPk3DK
+ NIvr9SsKFe2hf3CVjxriHcRfoTfriycglUwtvKvhvB2Y8pQuWfLtP9Hx3H+YI5a78PO2tU1C
+ JdY5Momd3/aJBuUFP5blbx6n+dLDepQhyQrAp2mVC3NIp4T48n4YxL4Og0MORytWNSeygISv
+ Rordw7qDmEsa7wgFsLUIlhKmmV5VVv+wAOdYXdJ9S8n+XgrxSTgHj5f3QqkDtT0yG8NMLLmY
+ kZpOwWoMumeqn/KppPY/uTIwbYTD56q1UirDDB5kDRL626qm63nF00ByyPY+6BXH22XD8smj
+ f2eHw2szECG/lpD4knYjxROIctdC+gLRhz+Nlf8lEHmvjHgiErfgy/lOIf+AV9lvDF3bztjW
+ M5oP2WGeR7VJfkxcXt4JPdyDIH6GBK7jbD7bFiXf6vMiFCrFeFo/bfa39veKUk7TRlnX13go
+ gIZxqR6IvpkG0PxOu2RGJ7Aje/SjytQFa2NwNGCDe1bH89wm9mfDW3BuZF1o2+y+eVqkPZj0
+ mzfChEsiNIAY6KPDMVdInILYdTUAC5H26jj9CR4itBUcjE/tMll0n2wYRZ14Y/PM+UosfAhf
+ YfN9t2096M9JebksnTbqp20keDMEBvc3KBkboEfoQLU08NDo7ncReitdLW2xICCnlkNIUQGS
+ WlFVPcTQ2sMAEQEAAYkCHwQYAQIACQUCTol/RQIbDAAKCRAj0NC60T16QwsFD/9T4y30O0Wn
+ MwIgcU8T2c2WwKbvmPbaU2LDqZebHdxQDemX65EZCv/NALmKdA22MVSbAaQeqsDD5KYbmCyC
+ czilJ1i+tpZoJY5kJALHWWloI6Uyi2s1zAwlMktAZzgGMnI55Ifn0dAOK0p8oy7/KNGHNPwJ
+ eHKzpHSRgysQ3S1t7VwU4mTFJtXQaBFMMXg8rItP5GdygrFB7yUbG6TnrXhpGkFBrQs9p+SK
+ vCqRS3Gw+dquQ9QR+QGWciEBHwuSad5gu7QC9taN8kJQfup+nJL8VGtAKgGr1AgRx/a/V/QA
+ ikDbt/0oIS/kxlIdcYJ01xuMrDXf1jFhmGZdocUoNJkgLb1iFAl5daV8MQOrqciG+6tnLeZK
+ HY4xCBoigV7E8KwEE5yUfxBS0yRreNb+pjKtX6pSr1Z/dIo+td/sHfEHffaMUIRNvJlBeqaj
+ BX7ZveskVFafmErkH7HC+7ErIaqoM4aOh/Z0qXbMEjFsWA5yVXvCoJWSHFImL9Bo6PbMGpI0
+ 9eBrkNa1fd6RGcktrX6KNfGZ2POECmKGLTyDC8/kb180YpDJERN48S0QBa3Rvt06ozNgFgZF
+ Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
+ Z46HaNmN2hZS/oJ69c1DI5Rcww==
+Organization: ARM Ltd
+Message-ID: <327dfc0e-e7c9-0d18-2615-1db5b05121f4@arm.com>
+Date:   Wed, 24 Jul 2019 13:39:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1563961393-10301-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <0411c636-adbd-98d0-5191-2b073daaf68e@semihalf.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/07/19 11:43, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 24/07/2019 11:25, Tomasz Nowicki wrote:
+> On 21.06.2019 11:38, Marc Zyngier wrote:
+>> From: Jintack Lim <jintack.lim@linaro.org>
+>>
+>> When supporting nested virtualization a guest hypervisor executing AT
+>> instructions must be trapped and emulated by the host hypervisor,
+>> because untrapped AT instructions operating on S1E1 will use the wrong
+>> translation regieme (the one used to emulate virtual EL2 in EL1 instead
+>> of virtual EL1) and AT instructions operating on S12 will not work from
+>> EL1.
+>>
+>> This patch does several things.
+>>
+>> 1. List and define all AT system instructions to emulate and document
+>> the emulation design.
+>>
+>> 2. Implement AT instruction handling logic in EL2. This will be used to
+>> emulate AT instructions executed in the virtual EL2.
+>>
+>> AT instruction emulation works by loading the proper processor
+>> context, which depends on the trapped instruction and the virtual
+>> HCR_EL2, to the EL1 virtual memory control registers and executing AT
+>> instructions. Note that ctxt->hw_sys_regs is expected to have the
+>> proper processor context before calling the handling
+>> function(__kvm_at_insn) implemented in this patch.
+>>
+>> 4. Emulate AT S1E[01] instructions by issuing the same instructions in
+>> EL2. We set the physical EL1 registers, NV and NV1 bits as described in
+>> the AT instruction emulation overview.
+>>
+>> 5. Emulate AT A12E[01] instructions in two steps: First, do the stage-1
+>> translation by reusing the existing AT emulation functions.  Second, do
+>> the stage-2 translation by walking the guest hypervisor's stage-2 page
+>> table in software. Record the translation result to PAR_EL1.
+>>
+>> 6. Emulate AT S1E2 instructions by issuing the corresponding S1E1
+>> instructions in EL2. We set the physical EL1 registers and the HCR_EL2
+>> register as described in the AT instruction emulation overview.
+>>
+>> 7. Forward system instruction traps to the virtual EL2 if the corresponding
+>> virtual AT bit is set in the virtual HCR_EL2.
+>>
+>>    [ Much logic above has been reworked by Marc Zyngier ]
+>>
+>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_arm.h |   2 +
+>>   arch/arm64/include/asm/kvm_asm.h |   2 +
+>>   arch/arm64/include/asm/sysreg.h  |  17 +++
+>>   arch/arm64/kvm/hyp/Makefile      |   1 +
+>>   arch/arm64/kvm/hyp/at.c          | 217 +++++++++++++++++++++++++++++++
+>>   arch/arm64/kvm/hyp/switch.c      |  13 +-
+>>   arch/arm64/kvm/sys_regs.c        | 202 +++++++++++++++++++++++++++-
+>>   7 files changed, 450 insertions(+), 4 deletions(-)
+>>   create mode 100644 arch/arm64/kvm/hyp/at.c
+>>
 > 
-> Commit 11752adb (locking/pvqspinlock: Implement hybrid PV queued/unfair locks)
-> introduces hybrid PV queued/unfair locks 
->  - queued mode (no starvation)
->  - unfair mode (good performance on not heavily contended lock)
-> The lock waiter goes into the unfair mode especially in VMs with over-commit
-> vCPUs since increaing over-commitment increase the likehood that the queue 
-> head vCPU may have been preempted and not actively spinning.
+> [...]
 > 
-> However, reschedule queue head vCPU timely to acquire the lock still can get 
-> better performance than just depending on lock stealing in over-subscribe 
-> scenario.
+>> +
+>> +void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>> +{
+>> +	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+>> +	struct mmu_config config;
+>> +	struct kvm_s2_mmu *mmu;
+>> +
+>> +	/*
+>> +	 * We can only get here when trapping from vEL2, so we're
+>> +	 * translating a guest guest VA.
+>> +	 *
+>> +	 * FIXME: Obtaining the S2 MMU for a a guest guest is horribly
+>> +	 * racy, and we may not find it.
+>> +	 */
+>> +	spin_lock(&vcpu->kvm->mmu_lock);
+>> +
+>> +	mmu = lookup_s2_mmu(vcpu->kvm,
+>> +			    vcpu_read_sys_reg(vcpu, VTTBR_EL2),
+>> +			    vcpu_read_sys_reg(vcpu, HCR_EL2));
+>> +
+>> +	if (WARN_ON(!mmu))
+>> +		goto out;
+>> +
+>> +	/* We've trapped, so everything is live on the CPU. */
+>> +	__mmu_config_save(&config);
+>> +
+>> +	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	SYS_TTBR0);
+>> +	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	SYS_TTBR1);
+>> +	write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+>> +	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+>> +	write_sysreg(kvm_get_vttbr(mmu),		vttbr_el2);
+>> +	/* FIXME: write S2 MMU VTCR_EL2 */
+>> +	write_sysreg(config.hcr & ~HCR_TGE,		hcr_el2);
 > 
-> Testing on 80 HT 2 socket Xeon Skylake server, with 80 vCPUs VM 80GB RAM:
-> ebizzy -M
->              vanilla     boosting    improved
->  1VM          23520        25040         6%
->  2VM           8000        13600        70%
->  3VM           3100         5400        74%
+> All below AT S1E* operations may initiate stage-1 PTW. And stage-1 table 
+> walk addresses are themselves subject to stage-2 translation.
 > 
-> The lock holder vCPU yields to the queue head vCPU when unlock, to boost queue 
-> head vCPU which is involuntary preemption or the one which is voluntary halt 
-> due to fail to acquire the lock after a short spin in the guest.
+> So should we enable stage-2 translation here by setting HCR_VM bit?
 
-Clever!  I have applied the patch.
+Hopefully that's already the case, otherwise nothing works. Have you
+verified that it is actually clear at this stage?
 
-Paolo
+It's a bit of a moot point as we need a full S1 PTW in SW anyway (so
+most of that code will eventually be removed), but at least this should
+be fixed if it needs to.
 
-> Cc: Waiman Long <longman@redhat.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/x86.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 01e18ca..c6d951c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7206,7 +7206,7 @@ static void kvm_sched_yield(struct kvm *kvm, unsigned long dest_id)
->  
->  	rcu_read_unlock();
->  
-> -	if (target)
-> +	if (target && READ_ONCE(target->ready))
->  		kvm_vcpu_yield_to(target);
->  }
->  
-> @@ -7246,6 +7246,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  		break;
->  	case KVM_HC_KICK_CPU:
->  		kvm_pv_kick_cpu_op(vcpu->kvm, a0, a1);
-> +		kvm_sched_yield(vcpu->kvm, a1);
->  		ret = 0;
->  		break;
->  #ifdef CONFIG_X86_64
-> 
+Thanks,
 
+	M. (who really needs to get on top of these review comments)
+-- 
+Jazz is not dead. It just smells funny...
