@@ -2,38 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8400874D2B
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 13:35:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D10D674D67
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 13:47:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391959AbfGYLfi convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 25 Jul 2019 07:35:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34652 "EHLO mx1.redhat.com"
+        id S2403954AbfGYLrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 07:47:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50186 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390908AbfGYLfi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 07:35:38 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S2387517AbfGYLrR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 07:47:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8DBFDC05E760;
-        Thu, 25 Jul 2019 11:35:36 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id A0DB4C0BB29E;
+        Thu, 25 Jul 2019 11:47:16 +0000 (UTC)
 Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1440A19C7F;
-        Thu, 25 Jul 2019 11:35:26 +0000 (UTC)
-Subject: Re: [PATCH v2 QEMU] virtio-balloon: Provide a interface for "bubble
- hinting"
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, dave.hansen@intel.com,
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E76F61F21;
+        Thu, 25 Jul 2019 11:46:57 +0000 (UTC)
+Subject: Re: [PATCH v2 4/5] mm: Introduce Hinted pages
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, dave.hansen@intel.com,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, yang.zhang.wz@gmail.com,
-        pagupta@redhat.com, riel@surriel.com, konrad.wilk@oracle.com,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com
+        akpm@linux-foundation.org
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, Matthew Wilcox <willy@infradead.org>
 References: <20190724165158.6685.87228.stgit@localhost.localdomain>
- <20190724171050.7888.62199.stgit@localhost.localdomain>
- <20190724173403-mutt-send-email-mst@kernel.org>
- <ada4e7d932ebd436d00c46e8de699212e72fd989.camel@linux.intel.com>
+ <20190724170259.6685.18028.stgit@localhost.localdomain>
+ <a9f52894-52df-cd0c-86ac-eea9fbe96e34@redhat.com>
 From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
@@ -80,71 +78,203 @@ Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
  NK9ZhT0+qkiN7npFLtNtbzwqaqceq3XhafmCiw8xrtzCnlB/C4SiBr/93Ip4kihXJ0EuHSLn
  VujM7c/b4pps
 Organization: Red Hat Inc,
-Message-ID: <fed474fe-93f4-a9f6-2e01-75e8903edd81@redhat.com>
-Date:   Thu, 25 Jul 2019 07:35:25 -0400
+Message-ID: <227bf405-a924-a8de-3f58-f7799f1ba7a1@redhat.com>
+Date:   Thu, 25 Jul 2019 07:46:56 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <ada4e7d932ebd436d00c46e8de699212e72fd989.camel@linux.intel.com>
+In-Reply-To: <a9f52894-52df-cd0c-86ac-eea9fbe96e34@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 25 Jul 2019 11:35:37 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 25 Jul 2019 11:47:16 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 7/24/19 6:03 PM, Alexander Duyck wrote:
-> On Wed, 2019-07-24 at 17:38 -0400, Michael S. Tsirkin wrote:
->> On Wed, Jul 24, 2019 at 10:12:10AM -0700, Alexander Duyck wrote:
->>> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->>>
->>> Add support for what I am referring to as "bubble hinting". Basically the
->>> idea is to function very similar to how the balloon works in that we
->>> basically end up madvising the page as not being used. However we don't
->>> really need to bother with any deflate type logic since the page will be
->>> faulted back into the guest when it is read or written to.
->>>
->>> This is meant to be a simplification of the existing balloon interface
->>> to use for providing hints to what memory needs to be freed. I am assuming
->>> this is safe to do as the deflate logic does not actually appear to do very
->>> much other than tracking what subpages have been released and which ones
->>> haven't.
->>>
->>> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->> BTW I wonder about migration here.  When we migrate we lose all hints
->> right?  Well destination could be smarter, detect that page is full of
->> 0s and just map a zero page. Then we don't need a hint as such - but I
->> don't think it's done like that ATM.
-> I was wondering about that a bit myself. If you migrate with a balloon
-> active what currently happens with the pages in the balloon? Do you
-> actually migrate them, or do you ignore them and just assume a zero page?
-> I'm just reusing the ram_block_discard_range logic that was being used for
-> the balloon inflation so I would assume the behavior would be the same.
-I agree, however, I think it is worth investigating to see if enabling hinting
-adds some sort of overhead specifically in this kind of scenarios. What do you
-think?
->> I also wonder about interaction with deflate.  ATM deflate will add
->> pages to the free list, then balloon will come right back and report
->> them as free.
-> I don't know how likely it is that somebody who is getting the free page
-> reporting is likely to want to also use the balloon to take up memory.
-I think it is possible. There are two possibilities:
-1. User has a workload running, which is allocating and freeing the pages and at
-the same time, user deflates.
-If these new pages get used by this workload, we don't have to worry as you are
-already handling that by not hinting the free pages immediately.
-2. Guest is idle and the user adds up some memory, for this situation what you
-have explained below does seems reasonable.
-> However hinting on a page that came out of deflate might make sense when
-> you consider that the balloon operates on 4K pages and the hints are on 2M
-> pages. You are likely going to lose track of it all anyway as you have to
-> work to merge the 4K pages up to the higher order page.
+On 7/25/19 4:53 AM, David Hildenbrand wrote:
+> On 24.07.19 19:03, Alexander Duyck wrote:
+>> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+>>
+>> In order to pave the way for free page hinting in virtualized environments
+>> we will need a way to get pages out of the free lists and identify those
+>> pages after they have been returned. To accomplish this, this patch adds
+>> the concept of a Hinted Buddy, which is essentially meant to just be the
+>> Offline page type used in conjunction with the Buddy page type.
+>>
+>> It adds a set of pointers we shall call "boundary" which represents the
+>> upper boundary between the unhinted and hinted pages. The general idea is
+>> that in order for a page to cross from one side of the boundary to the
+>> other it will need to go through the hinting process. Ultimately a
+>> free_list has been fully processed when the boundary has been moved from
+>> the tail all they way up to occupying the first entry in the list.
+>>
+>> Doing this we should be able to make certain that we keep the hinted
+>> pages as one contiguous block in each free list. This will allow us to
+>> efficiently manipulate the free lists whenever we need to go in and start
+>> sending hints to the hypervisor that there are new pages that have been
+>> freed and are no longer in use.
+>>
+>> An added advantage to this approach is that we should be reducing the
+>> overall memory footprint of the guest as it will be more likely to recycle
+>> warm pages versus trying to allocate the hinted pages that were likely
+>> evicted from the guest memory.
+>>
+>> Since we will only be hinting one zone at a time we keep the boundary
+>> limited to being defined for just the zone we are currently placing hinted
+>> pages into. Doing this we can keep the number of additional pointers needed
+>> quite small. To flag that the boundaries are in place we use a single bit
+>> in the zone to indicate that hinting and the boundaries are active.
+>>
+>> The determination of when to start hinting is based on the tracking of the
+>> number of free pages in a given area versus the number of hinted pages in
+>> that area. We keep track of the number of hinted pages per free_area in a
+>> separate zone specific area. We do this to avoid modifying the free_area
+>> structure as this can lead to false sharing for the highest order with the
+>> zone lock which leads to a noticeable performance degradation.
+>>
+>> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+>> ---
+>>  include/linux/mmzone.h       |   40 +++++-
+>>  include/linux/page-flags.h   |    8 +
+>>  include/linux/page_hinting.h |  139 ++++++++++++++++++++
+>>  mm/Kconfig                   |    5 +
+>>  mm/Makefile                  |    1 
+>>  mm/memory_hotplug.c          |    1 
+>>  mm/page_alloc.c              |  136 ++++++++++++++++++-
+>>  mm/page_hinting.c            |  298 ++++++++++++++++++++++++++++++++++++++++++
+>>  8 files changed, 620 insertions(+), 8 deletions(-)
+>>  create mode 100644 include/linux/page_hinting.h
+>>  create mode 100644 mm/page_hinting.c
+>>
+>> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+>> index f0c68b6b6154..42bdebb20484 100644
+>> --- a/include/linux/mmzone.h
+>> +++ b/include/linux/mmzone.h
+>> @@ -460,6 +460,14 @@ struct zone {
+>>  	seqlock_t		span_seqlock;
+>>  #endif
+>>  
+>> +#ifdef CONFIG_PAGE_HINTING
+>> +	/*
+>> +	 * Pointer to hinted page tracking statistics array. The size of
+>> +	 * the array is MAX_ORDER - PAGE_HINTING_MIN_ORDER. NULL when
+>> +	 * page hinting is not present.
+>> +	 */
+>> +	unsigned long		*hinted_pages;
+>> +#endif
+>>  	int initialized;
+>>  
+>>  	/* Write-intensive fields used from the page allocator */
+>> @@ -535,6 +543,14 @@ enum zone_flags {
+>>  	ZONE_BOOSTED_WATERMARK,		/* zone recently boosted watermarks.
+>>  					 * Cleared when kswapd is woken.
+>>  					 */
+>> +	ZONE_PAGE_HINTING_REQUESTED,	/* zone enabled page hinting and has
+>> +					 * requested flushing the data out of
+>> +					 * higher order pages.
+>> +					 */
+>> +	ZONE_PAGE_HINTING_ACTIVE,	/* zone enabled page hinting and is
+>> +					 * activly flushing the data out of
+>> +					 * higher order pages.
+>> +					 */
+>>  };
+>>  
+>>  static inline unsigned long zone_managed_pages(struct zone *zone)
+>> @@ -755,6 +771,8 @@ static inline bool pgdat_is_empty(pg_data_t *pgdat)
+>>  	return !pgdat->node_start_pfn && !pgdat->node_spanned_pages;
+>>  }
+>>  
+>> +#include <linux/page_hinting.h>
+>> +
+>>  /* Used for pages not on another list */
+>>  static inline void add_to_free_list(struct page *page, struct zone *zone,
+>>  				    unsigned int order, int migratetype)
+>> @@ -769,10 +787,16 @@ static inline void add_to_free_list(struct page *page, struct zone *zone,
+>>  static inline void add_to_free_list_tail(struct page *page, struct zone *zone,
+>>  					 unsigned int order, int migratetype)
+>>  {
+>> -	struct free_area *area = &zone->free_area[order];
+>> +	struct list_head *tail = get_unhinted_tail(zone, order, migratetype);
+>>  
+>> -	list_add_tail(&page->lru, &area->free_list[migratetype]);
+>> -	area->nr_free++;
+>> +	/*
+>> +	 * To prevent the unhinted pages from being interleaved with the
+>> +	 * hinted ones while we are actively processing pages we will use
+>> +	 * the head of the hinted pages to determine the tail of the free
+>> +	 * list.
+>> +	 */
+>> +	list_add_tail(&page->lru, tail);
+>> +	zone->free_area[order].nr_free++;
+>>  }
+>>  
+>>  /* Used for pages which are on another list */
+>> @@ -781,12 +805,22 @@ static inline void move_to_free_list(struct page *page, struct zone *zone,
+>>  {
+>>  	struct free_area *area = &zone->free_area[order];
+>>  
+>> +	/*
+>> +	 * Clear Hinted flag, if present, to avoid placing hinted pages
+>> +	 * at the top of the free_list. It is cheaper to just process this
+>> +	 * page again, then have to walk around a page that is already hinted.
+>> +	 */
+>> +	clear_page_hinted(page, zone);
+>> +
+>>  	list_move(&page->lru, &area->free_list[migratetype]);
+>>  }
+>>  
+>>  static inline void del_page_from_free_list(struct page *page, struct zone *zone,
+>>  					   unsigned int order)
+>>  {
+>> +	/* Clear Hinted flag, if present, before clearing the Buddy flag */
+>> +	clear_page_hinted(page, zone);
+>> +
+>>  	list_del(&page->lru);
+>>  	__ClearPageBuddy(page);
+>>  	set_page_private(page, 0);
+>> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+>> index b848517da64c..b753dbf673cb 100644
+>> --- a/include/linux/page-flags.h
+>> +++ b/include/linux/page-flags.h
+>> @@ -745,6 +745,14 @@ static inline int page_has_type(struct page *page)
+>>  PAGE_TYPE_OPS(Offline, offline)
+>>  
+>>  /*
+>> + * PageHinted() is an alias for Offline, however it is not meant to be an
+>> + * exclusive value. It should be combined with PageBuddy() when seen as it
+>> + * is meant to indicate that the page has been scrubbed while waiting in
+>> + * the buddy system.
+>> + */
+>> +PAGE_TYPE_OPS(Hinted, offline)
+>
+> CCing Matthew
+>
+> I am still not sure if I like the idea of having two page types at a time.
+>
+> 1. Once we run out of page type bits (which can happen easily looking at
+> it getting more and more user - e.g., maybe for vmmap pages soon), we
+> might want to convert again back to a value-based, not bit-based type
+> detection. This will certainly make this switch harder.
+>
+> 2. It will complicate the kexec/kdump handling. I assume it can be fixed
+> some way - e.g., making the elf interface aware of the exact notion of
+> page type bits compared to mapcount values we have right now (e.g.,
+> PAGE_BUDDY_MAPCOUNT_VALUE). Not addressed in this series yet.
+>
+>
+> Can't we reuse one of the traditional page flags for that, not used
+> along with buddy pages? E.g., PG_dirty: Pages that were not hinted yet
+> are dirty.
+
+Will it not conflict with the regular use case of PG_dirty bit somehow?
+
+
+> Matthew, what's your take?
 >
 -- 
 Thanks
 Nitesh
-
