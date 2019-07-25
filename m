@@ -2,77 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C797075324
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 17:48:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D0DA7532A
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 17:49:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389545AbfGYPsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 11:48:19 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:37221 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389518AbfGYPsT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 11:48:19 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n9so26234754wrr.4
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 08:48:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=I4QDjchJ1/9s6J6Y1a0RgnIiWEEdaEcTSin7dYrxSRw=;
-        b=Lk075I9h9pTP9v5zIDm9EMXytThMtdwQQYfBd2dJcWjXlE0VhYSh2g2dMn9EOgcirf
-         Y5oKAqDtl6+vkf+jYZazljSPaNnCyU/2PillQY13n16ksXnl349f9iRrTcYzgFURsrvI
-         8HdEjVy/pfM84wUL938daXvfQN5kbLmVXXT8VjUUFMvWz3/jG1+u3NeCSHR8PrR06nH4
-         B4hZSqhq+/n7SdZ2ZnaEv2cVQrjmYYMHWfKMwV3PI+ygYXPeiYrYX7DptQ1y1LS1RLGU
-         +ALS8BEgCETm0M0gbSHw/Uq3Z1ac49HTtl/FabRsL+7lhrLAGKD3REZoCr8C0gA09Bte
-         BOsQ==
-X-Gm-Message-State: APjAAAU+NLMVAuRxgx23661cKN9AwP7yT+PHM3wg+1/iscUn5Ua6Zcwf
-        oUXIA6h+3SmA0dG8ldqnDOtCEQ==
-X-Google-Smtp-Source: APXvYqyX97fVHoHfJDtU+40WfznB31tygbJh3/z14EvSWABjQetB6WlOQaGguH0KUd8uaKnQ79Oh4w==
-X-Received: by 2002:adf:e841:: with SMTP id d1mr15978720wrn.204.1564069697484;
-        Thu, 25 Jul 2019 08:48:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee? ([2001:b07:6468:f312:cc23:f353:392:d2ee])
-        by smtp.gmail.com with ESMTPSA id z7sm47618849wrh.67.2019.07.25.08.48.16
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Jul 2019 08:48:16 -0700 (PDT)
-Subject: Re: [PATCH stable-5.1 0/3] KVM: x86: FPU and nested VMX guest reset
- fixes
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, stable@vger.kernel.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <20190725114938.3976-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
+        id S1727115AbfGYPtE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 11:49:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36120 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726692AbfGYPtD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jul 2019 11:49:03 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6PFl61Q121952
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 11:49:02 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2tyetv1mw9-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 11:49:02 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 25 Jul 2019 16:49:00 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 25 Jul 2019 16:48:58 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6PFmgwT33554782
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Jul 2019 15:48:42 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC7FFA405C;
+        Thu, 25 Jul 2019 15:48:57 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B1C68A4060;
+        Thu, 25 Jul 2019 15:48:57 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.116])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 25 Jul 2019 15:48:57 +0000 (GMT)
+Subject: Re: [ v2 1/1] kvm-unit-tests: s390: add cpu model checks
+To:     David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+References: <20190725151125.145362-1-borntraeger@de.ibm.com>
+ <20190725151125.145362-2-borntraeger@de.ibm.com>
+ <6b1c2a14-b2ca-c9e4-cc49-765d2452f4eb@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
-Message-ID: <60cb964f-7866-0da7-8ea2-ba51eab7a57c@redhat.com>
-Date:   Thu, 25 Jul 2019 17:48:15 +0200
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Thu, 25 Jul 2019 17:48:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190725114938.3976-1-vkuznets@redhat.com>
+In-Reply-To: <6b1c2a14-b2ca-c9e4-cc49-765d2452f4eb@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19072515-0008-0000-0000-00000300CEBB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072515-0009-0000-0000-0000226E63EE
+Message-Id: <8b68ffc8-1ed0-a65e-c1b0-accbf2af1ce1@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-25_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907250185
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/07/19 13:49, Vitaly Kuznetsov wrote:
-> Few patches were recently marked for stable@ but commits are not
-> backportable as-is and require a few tweaks. Here is 5.1 stable backport.
+
+
+On 25.07.19 17:36, David Hildenbrand wrote:
+> On 25.07.19 17:11, Christian Borntraeger wrote:
+>> This adds a check for documented stfle dependencies.
+>>
 > 
-> [PATCH2 of the series applies as-is, I have it here for completeness]
+> Expected error under TCG:
 > 
-> Jan Kiszka (1):
->   KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
+> FAIL: cpumodel: dependency: 37 implies 42
 > 
-> Paolo Bonzini (2):
->   KVM: nVMX: do not use dangling shadow VMCS after guest reset
->   Revert "kvm: x86: Use task structs fpu field for user"
+> DFP not implemented (yet).
 > 
->  arch/x86/include/asm/kvm_host.h |  7 ++++---
->  arch/x86/kvm/vmx/nested.c       | 10 +++++++++-
->  arch/x86/kvm/x86.c              |  4 ++--
->  3 files changed, 15 insertions(+), 6 deletions(-)
+> We also don't warn about this in check_consistency(), which is nice for
+> TCG ;)
+
+So should I force this to KVM? Or should I try to detect TCG and make this
+xfail?
+
+> 
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  s390x/Makefile      |  1 +
+>>  s390x/cpumodel.c    | 58 +++++++++++++++++++++++++++++++++++++++++++++
+>>  s390x/unittests.cfg |  3 +++
+>>  3 files changed, 62 insertions(+)
+>>  create mode 100644 s390x/cpumodel.c
+>>
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 1f21ddb9c943..574a9a20824d 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -11,6 +11,7 @@ tests += $(TEST_DIR)/cmm.elf
+>>  tests += $(TEST_DIR)/vector.elf
+>>  tests += $(TEST_DIR)/gs.elf
+>>  tests += $(TEST_DIR)/iep.elf
+>> +tests += $(TEST_DIR)/cpumodel.elf
+>>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>  
+>>  all: directories test_cases test_cases_binary
+>> diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
+>> new file mode 100644
+>> index 000000000000..8ff61f7f6ec9
+>> --- /dev/null
+>> +++ b/s390x/cpumodel.c
+>> @@ -0,0 +1,58 @@
+>> +/*
+>> + * Test the known dependencies for facilities
+>> + *
+>> + * Copyright 2019 IBM Corp.
+>> + *
+>> + * Authors:
+>> + *    Christian Borntraeger <borntraeger@de.ibm.com>
+>> + *
+>> + * This code is free software; you can redistribute it and/or modify it
+>> + * under the terms of the GNU Library General Public License version 2.
+>> + */
+>> +
+>> +#include <asm/facility.h>
+>> +
+>> +static int dep[][2] = {
+>> +	/* from SA22-7832-11 4-98 facility indications */
+>> +	{  4,   3},
+>> +	{  5,   3},
+>> +	{  5,   4},
+>> +	{ 19,  18},
+>> +	{ 37,  42},
+>> +	{ 43,  42},
+>> +	{ 73,  49},
+>> +	{134, 129},
+>> +	{139,  25},
+>> +	{139,  28},
+>> +	{146,  76},
+>> +	/* indirectly documented in description */
+>> +	{ 78,   8},  /* EDAT */
+>> +	/* new dependencies from gen15 */
+>> +	{ 61,  45},
+>> +	{148, 129},
+>> +	{148, 135},
+>> +	{152, 129},
+>> +	{152, 134},
+>> +	{155,  76},
+>> +	{155,  77},
+>> +};
+>> +
+>> +int main(void)
+>> +{
+>> +	int i;
+>> +
+>> +	report_prefix_push("cpumodel");
+>> +
+>> +	report_prefix_push("dependency");
+>> +	for (i = 0; i < ARRAY_SIZE(dep); i++) {
+>> +		if (test_facility(dep[i][0])) {
+>> +			report("%d implies %d",
+>> +				!(test_facility(dep[i][0]) && !test_facility(dep[i][1])),
+>> +				dep[i][0], dep[i][1]);
+>> +		} else {
+>> +			report_skip("facility %d not present", dep[i][0]);
+>> +		}
+>> +	}
+>> +	report_prefix_pop();
+> 
+> Are you missing another pop here?
+
+Yes it seems.
+> 
+>> +	return report_summary();
+>> +}
+>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+>> index 546b1f281f8f..db58bad5a038 100644
+>> --- a/s390x/unittests.cfg
+>> +++ b/s390x/unittests.cfg
+>> @@ -61,3 +61,6 @@ file = gs.elf
+>>  
+>>  [iep]
+>>  file = iep.elf
+>> +
+>> +[cpumodel]
+>> +file = cpumodel.elf
+>>
+> 
+> Didn't verify the facilities. In general, looks good to me.
 > 
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
