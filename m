@@ -2,380 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 35BF874ED9
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 15:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D250474F39
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 15:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387789AbfGYNKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 09:10:07 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:7495 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726282AbfGYNKH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 09:10:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1564060205; x=1595596205;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=XVUUtw0CvlEEBiYTPB9kfxqDs5UZqL6rWnE9qzMwF0s=;
-  b=B/FBoR7X/DN+AHna2GFzNgGMXHp/8u4cM9njUALbmKumMrgwmkhYi1KN
-   4paSfE9yd3oaCxTZjeK5zM0DWx/mO6R1pQcoJq8mlzgAeBuFEu+0gUJJ5
-   xDzlNsWtdx3L9J/1cX+bq0kdfMiHmw1ruM66MVjzn9klxmkJt0cQQf3YD
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.64,306,1559520000"; 
-   d="scan'208";a="813661062"
-Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com) ([10.47.22.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 25 Jul 2019 13:10:02 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com (Postfix) with ESMTPS id D6240C068E;
-        Thu, 25 Jul 2019 13:09:59 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 25 Jul 2019 13:09:59 +0000
-Received: from u79c5a0a55de558.ant.amazon.com (10.43.162.137) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 25 Jul 2019 13:09:57 +0000
-From:   Alexander Graf <graf@amazon.com>
-To:     <kvm@vger.kernel.org>
-CC:     Andrew Jones <drjones@redhat.com>, <kvmarm@lists.cs.columbia.edu>,
-        "Marc Zyngier" <marc.zyngier@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Andre Przywara" <andre.przywara@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvm-unit-tests v4] arm: Add PL031 test
-Date:   Thu, 25 Jul 2019 15:09:49 +0200
-Message-ID: <20190725130949.27436-1-graf@amazon.com>
-X-Mailer: git-send-email 2.17.1
+        id S1729732AbfGYNYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 09:24:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64540 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726653AbfGYNYI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jul 2019 09:24:08 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6PDM8H8112696;
+        Thu, 25 Jul 2019 09:24:07 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tybqbcse8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Jul 2019 09:24:07 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x6PDMLav113681;
+        Thu, 25 Jul 2019 09:24:07 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tybqbcsdd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Jul 2019 09:24:07 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6PDJTAj023197;
+        Thu, 25 Jul 2019 13:24:06 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma04dal.us.ibm.com with ESMTP id 2tx61n6sg8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Jul 2019 13:24:06 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6PDO1Vd53346578
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Jul 2019 13:24:01 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7AB0B6E05B;
+        Thu, 25 Jul 2019 13:24:01 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ABD536E052;
+        Thu, 25 Jul 2019 13:24:00 +0000 (GMT)
+Received: from [9.56.58.37] (unknown [9.56.58.37])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 25 Jul 2019 13:24:00 +0000 (GMT)
+Subject: Re: [PATCH 1/1] MAINTAINERS: vfio-ccw: Remove myself as the
+ maintainer
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     farman@linux.ibm.com, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <cover.1564003585.git.alifm@linux.ibm.com>
+ <19aee1ab0e5bcc01053b515117a66426a9332086.1564003585.git.alifm@linux.ibm.com>
+ <20190725093335.09c96c0d.cohuck@redhat.com>
+From:   Farhan Ali <alifm@linux.ibm.com>
+Message-ID: <42b67a01-1194-7f4b-5c13-ad86454590f7@linux.ibm.com>
+Date:   Thu, 25 Jul 2019 09:24:00 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.162.137]
-X-ClientProxiedBy: EX13D04UWA002.ant.amazon.com (10.43.160.31) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+In-Reply-To: <20190725093335.09c96c0d.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-25_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907250156
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds a unit test for the PL031 RTC that is used in the virt machine.
-It just pokes basic functionality. I've mostly written it to familiarize myself
-with the device, but I suppose having the test around does not hurt, as it also
-exercises the GIC SPI interrupt path.
 
-Signed-off-by: Alexander Graf <graf@amazon.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 
----
+On 07/25/2019 03:33 AM, Cornelia Huck wrote:
+> On Wed, 24 Jul 2019 17:32:03 -0400
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+> 
+>> I will not be able to continue with my maintainership responsibilities
+>> going forward, so remove myself as the maintainer.
+> 
+> ::sadface::
+> 
+> Thank you for all of your good work!
 
-v1 -> v2:
+It was a pleasure working with everyone :)
 
-  - Use FDT to find base, irq and existence
-  - Put isb after timer read
-  - Use dist_base for gicv3
+Thanks for all your help.
 
-v2 -> v3
+Thanks
+Farhan
 
-  - Enable compilation on 32bit ARM target
-  - Use ioremap
-
-v3 -> v4:
-
-  - Use dt_pbus_translate_node()
-  - Make irq_triggered volatile
----
- arm/Makefile.common |   1 +
- arm/pl031.c         | 260 ++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic.h   |   1 +
- 3 files changed, 262 insertions(+)
- create mode 100644 arm/pl031.c
-
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index f0c4b5d..b8988f2 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
- tests-common += $(TEST_DIR)/gic.flat
- tests-common += $(TEST_DIR)/psci.flat
- tests-common += $(TEST_DIR)/sieve.flat
-+tests-common += $(TEST_DIR)/pl031.flat
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/pl031.c b/arm/pl031.c
-new file mode 100644
-index 0000000..e335cd6
---- /dev/null
-+++ b/arm/pl031.c
-@@ -0,0 +1,260 @@
-+/*
-+ * Verify PL031 functionality
-+ *
-+ * This test verifies whether the emulated PL031 behaves correctly.
-+ *
-+ * Copyright 2019 Amazon.com, Inc. or its affiliates.
-+ * Author: Alexander Graf <graf@amazon.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <libcflat.h>
-+#include <devicetree.h>
-+#include <asm/processor.h>
-+#include <asm/io.h>
-+#include <asm/gic.h>
-+
-+struct pl031_regs {
-+	uint32_t dr;	/* Data Register */
-+	uint32_t mr;	/* Match Register */
-+	uint32_t lr;	/* Load Register */
-+	union {
-+		uint8_t cr;	/* Control Register */
-+		uint32_t cr32;
-+	};
-+	union {
-+		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
-+		uint32_t imsc32;
-+	};
-+	union {
-+		uint8_t ris;	/* Raw Interrupt Status */
-+		uint32_t ris32;
-+	};
-+	union {
-+		uint8_t mis;	/* Masked Interrupt Status */
-+		uint32_t mis32;
-+	};
-+	union {
-+		uint8_t icr;	/* Interrupt Clear Register */
-+		uint32_t icr32;
-+	};
-+	uint32_t reserved[1008];
-+	uint32_t periph_id[4];
-+	uint32_t pcell_id[4];
-+};
-+
-+static u32 cntfrq;
-+static struct pl031_regs *pl031;
-+static int pl031_irq;
-+static void *gic_ispendr;
-+static void *gic_isenabler;
-+static volatile bool irq_triggered;
-+
-+static int check_id(void)
-+{
-+	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(id); i++)
-+		if (id[i] != readl(&pl031->periph_id[i]))
-+			return 1;
-+
-+	return 0;
-+}
-+
-+static int check_ro(void)
-+{
-+	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
-+			    offsetof(struct pl031_regs, mis),
-+			    offsetof(struct pl031_regs, periph_id[0]),
-+			    offsetof(struct pl031_regs, periph_id[1]),
-+			    offsetof(struct pl031_regs, periph_id[2]),
-+			    offsetof(struct pl031_regs, periph_id[3]),
-+			    offsetof(struct pl031_regs, pcell_id[0]),
-+			    offsetof(struct pl031_regs, pcell_id[1]),
-+			    offsetof(struct pl031_regs, pcell_id[2]),
-+			    offsetof(struct pl031_regs, pcell_id[3]) };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(offs); i++) {
-+		uint32_t before32;
-+		uint16_t before16;
-+		uint8_t before8;
-+		void *addr = (void*)pl031 + offs[i];
-+		uint32_t poison = 0xdeadbeefULL;
-+
-+		before8 = readb(addr);
-+		before16 = readw(addr);
-+		before32 = readl(addr);
-+
-+		writeb(poison, addr);
-+		writew(poison, addr);
-+		writel(poison, addr);
-+
-+		if (before8 != readb(addr))
-+			return 1;
-+		if (before16 != readw(addr))
-+			return 1;
-+		if (before32 != readl(addr))
-+			return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int check_rtc_freq(void)
-+{
-+	uint32_t seconds_to_wait = 2;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = get_cntvct();
-+	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
-+
-+	/* Wait for 2 seconds */
-+	while (get_cntvct() < target_tick) ;
-+
-+	if (readl(&pl031->dr) != before + seconds_to_wait)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static bool gic_irq_pending(void)
-+{
-+	uint32_t offset = (pl031_irq / 32) * 4;
-+
-+	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
-+}
-+
-+static void gic_irq_unmask(void)
-+{
-+	uint32_t offset = (pl031_irq / 32) * 4;
-+
-+	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
-+}
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	u32 irqstat = gic_read_iar();
-+	u32 irqnr = gic_iar_irqnr(irqstat);
-+
-+	gic_write_eoir(irqstat);
-+
-+	if (irqnr == pl031_irq) {
-+		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
-+		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
-+
-+		/* Writing any value should clear IRQ status */
-+		writel(0x80000000ULL, &pl031->icr);
-+
-+		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
-+		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
-+		irq_triggered = true;
-+	} else {
-+		report_info("Unexpected interrupt: %d\n", irqnr);
-+		return;
-+	}
-+}
-+
-+static int check_rtc_irq(void)
-+{
-+	uint32_t seconds_to_wait = 1;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = get_cntvct();
-+	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
-+
-+	report_info("Checking IRQ trigger (MR)");
-+
-+	irq_triggered = false;
-+
-+	/* Fire IRQ in 1 second */
-+	writel(before + seconds_to_wait, &pl031->mr);
-+
-+#ifdef __aarch64__
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+#else
-+	install_exception_handler(EXCPTN_IRQ, irq_handler);
-+#endif
-+
-+	/* Wait until 2 seconds are over */
-+	while (get_cntvct() < target_tick) ;
-+
-+	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
-+
-+	/* Mask the IRQ so that it gets delivered */
-+	writel(1, &pl031->imsc);
-+	report("  RTC IRQ pending now", gic_irq_pending());
-+
-+	/* Enable retrieval of IRQ */
-+	gic_irq_unmask();
-+	local_irq_enable();
-+
-+	report("  IRQ triggered", irq_triggered);
-+	report("  RTC IRQ not pending anymore", !gic_irq_pending());
-+	if (!irq_triggered) {
-+		report_info("  RTC RIS: %x", readl(&pl031->ris));
-+		report_info("  RTC MIS: %x", readl(&pl031->mis));
-+		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
-+		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
-+	}
-+
-+	local_irq_disable();
-+	return 0;
-+}
-+
-+static void rtc_irq_init(void)
-+{
-+	gic_enable_defaults();
-+
-+	switch (gic_version()) {
-+	case 2:
-+		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-+		break;
-+	case 3:
-+		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
-+		break;
-+	}
-+}
-+
-+static int rtc_fdt_init(void)
-+{
-+	const struct fdt_property *prop;
-+	const void *fdt = dt_fdt();
-+	struct dt_pbus_reg base;
-+	int node, len;
-+	u32 *data;
-+
-+	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
-+	if (node < 0)
-+		return -1;
-+
-+	prop = fdt_get_property(fdt, node, "interrupts", &len);
-+	assert(prop && len == (3 * sizeof(u32)));
-+	data = (u32 *)prop->data;
-+	assert(data[0] == 0); /* SPI */
-+	pl031_irq = SPI(fdt32_to_cpu(data[1]));
-+
-+	assert(!dt_pbus_translate_node(node, 0, &base));
-+	pl031 = ioremap(base.addr, base.size);
-+
-+	return 0;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	cntfrq = get_cntfrq();
-+	rtc_irq_init();
-+	if (rtc_fdt_init()) {
-+		report_skip("Skipping PL031 tests. No device present.");
-+		return 0;
-+	}
-+
-+	report("Periph/PCell IDs match", !check_id());
-+	report("R/O fields are R/O", !check_ro());
-+	report("RTC ticks at 1HZ", !check_rtc_freq());
-+	report("RTC IRQ not pending yet", !gic_irq_pending());
-+	check_rtc_irq();
-+
-+	return report_summary();
-+}
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index f6dfb90..1fc10a0 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -41,6 +41,7 @@
- #include <asm/gic-v3.h>
- 
- #define PPI(irq)			((irq) + 16)
-+#define SPI(irq)			((irq) + GIC_FIRST_SPI)
- 
- #ifndef __ASSEMBLY__
- #include <asm/cpumask.h>
--- 
-2.17.1
-
+> 
+>>
+>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>> ---
+>>   MAINTAINERS | 1 -
+>>   1 file changed, 1 deletion(-)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 0e90487..dd07a23 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -13696,7 +13696,6 @@ F:	drivers/pci/hotplug/s390_pci_hpc.c
+>>   
+>>   S390 VFIO-CCW DRIVER
+>>   M:	Cornelia Huck <cohuck@redhat.com>
+>> -M:	Farhan Ali <alifm@linux.ibm.com>
+>>   M:	Eric Farman <farman@linux.ibm.com>
+>>   R:	Halil Pasic <pasic@linux.ibm.com>
+>>   L:	linux-s390@vger.kernel.org
+> 
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> Heiko/Vasily/Christian: can you take this one directly through the s390
+> tree?
+> 
+> 
