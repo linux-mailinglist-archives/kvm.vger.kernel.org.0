@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BCE2752C9
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 17:36:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86147752CC
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 17:36:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387468AbfGYPga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 11:36:30 -0400
-Received: from foss.arm.com ([217.140.110.172]:59446 "EHLO foss.arm.com"
+        id S2389053AbfGYPgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 11:36:32 -0400
+Received: from foss.arm.com ([217.140.110.172]:59466 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728332AbfGYPg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 11:36:29 -0400
+        id S2389159AbfGYPgc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 11:36:32 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6203C1595;
-        Thu, 25 Jul 2019 08:36:29 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 492BD15AB;
+        Thu, 25 Jul 2019 08:36:31 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B18293F71A;
-        Thu, 25 Jul 2019 08:36:27 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 981D63F71A;
+        Thu, 25 Jul 2019 08:36:29 -0700 (PDT)
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -30,9 +30,9 @@ Cc:     Marc Zyngier <marc.zyngier@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         "Raslan, KarimAllah" <karahmed@amazon.de>,
         "Saidi, Ali" <alisaidi@amazon.com>
-Subject: [PATCH v3 02/10] KVM: arm/arm64: vgic: Add __vgic_put_lpi_locked primitive
-Date:   Thu, 25 Jul 2019 16:35:35 +0100
-Message-Id: <20190725153543.24386-3-maz@kernel.org>
+Subject: [PATCH v3 03/10] KVM: arm/arm64: vgic-its: Add MSI-LPI translation cache invalidation
+Date:   Thu, 25 Jul 2019 16:35:36 +0100
+Message-Id: <20190725153543.24386-4-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190725153543.24386-1-maz@kernel.org>
 References: <20190725153543.24386-1-maz@kernel.org>
@@ -45,75 +45,62 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-Our LPI translation cache needs to be able to drop the refcount
-on an LPI whilst already holding the lpi_list_lock.
-
-Let's add a new primitive for this.
+There's a number of cases where we need to invalidate the caching
+of translations, so let's add basic support for that.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic.c | 26 +++++++++++++++++---------
- virt/kvm/arm/vgic/vgic.h |  1 +
- 2 files changed, 18 insertions(+), 9 deletions(-)
+ virt/kvm/arm/vgic/vgic-its.c | 23 +++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h     |  1 +
+ 2 files changed, 24 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 04786c8ec77e..deb84712f550 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -119,6 +119,22 @@ static void vgic_irq_release(struct kref *ref)
- {
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 0e5c1519bbe2..cc6b5e49a312 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -535,6 +535,29 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+ 	return 0;
  }
  
-+/*
-+ * Drop the refcount on the LPI. Must be called with lpi_list_lock held.
-+ */
-+void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
++void vgic_its_invalidate_cache(struct kvm *kvm)
 +{
 +	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_translation_cache_entry *cte;
++	unsigned long flags;
 +
-+	if (!kref_put(&irq->refcount, vgic_irq_release))
-+		return;
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
 +
-+	list_del(&irq->lpi_list);
-+	dist->lpi_list_count--;
++	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
++		/*
++		 * If we hit a NULL entry, there is nothing after this
++		 * point.
++		 */
++		if (!cte->irq)
++			break;
 +
-+	kfree(irq);
++		__vgic_put_lpi_locked(kvm, cte->irq);
++		cte->irq = NULL;
++	}
++
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
 +}
 +
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq)
  {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-@@ -128,16 +144,8 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- 		return;
- 
- 	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
--	if (!kref_put(&irq->refcount, vgic_irq_release)) {
--		raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
--		return;
--	};
--
--	list_del(&irq->lpi_list);
--	dist->lpi_list_count--;
-+	__vgic_put_lpi_locked(kvm, irq);
- 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
--
--	kfree(irq);
- }
- 
- void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 11291a9c8c1c..e523b3a54590 100644
+index e523b3a54590..09908b80fb1e 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -161,6 +161,7 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- 		     gpa_t addr, int len);
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
-+void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+@@ -308,6 +308,7 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+ void vgic_lpi_translation_cache_init(struct kvm *kvm);
+ void vgic_lpi_translation_cache_destroy(struct kvm *kvm);
++void vgic_its_invalidate_cache(struct kvm *kvm);
+ 
+ bool vgic_supports_direct_msis(struct kvm *kvm);
+ int vgic_v4_init(struct kvm *kvm);
 -- 
 2.20.1
 
