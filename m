@@ -2,87 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ABBC74C16
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 12:47:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6D9374C46
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 12:57:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728288AbfGYKqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 06:46:53 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:34773 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728569AbfGYKqv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 06:46:51 -0400
-Received: by mail-wm1-f67.google.com with SMTP id w9so35467916wmd.1
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 03:46:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=rT2+tyA6pTmguoDJ8MW+YlSOOFSIN1Vu53Mbq2U4pRc=;
-        b=qTqi2XoaXMpbmxB/rSnGU0R0GKYqqkwOuLuGL76caiZE7NkL1ECBxkNhOz4Kd0oX/O
-         n2KMXxwjYAYJFz5v89NPrVp7OJiJgsNVqKOtGbpZyhw0SmvlSoHOmjb/StVvSihGkZWz
-         HlDC7H6hVwBapb8LSZMWsSYLuZFiUbXLSnZeqWxzmTRe/3VMhjZWE7MTQ5u7CzgB9hu+
-         Ysy+8APwgkweOqIgUfYsuoIGS7iMHt+lrHr8/iB6t1PfBscXFjBrGKnKxG0U1wqgGY9w
-         vHhJISnijdOTFlztOt2yCE1QmBJCycCMiX25NjfVhji/sdXwsjt6ylBuYewFMZq+XEar
-         Zyfw==
-X-Gm-Message-State: APjAAAWPffobnRfqSrOCZBA1+Tas42oO8qUaASew62aK58cB2CA2hnuo
-        Qov+NQuKXGpb7idJY04aOvhKxVrHWyA=
-X-Google-Smtp-Source: APXvYqwTcecpPSHGjHuXabH4BPu7LoiVzTbv2SdE24oH8xT1yDoFoSRpS5PQy97iHgQ88CuC5+fdjQ==
-X-Received: by 2002:a7b:c7cb:: with SMTP id z11mr72257839wmk.24.1564051609799;
-        Thu, 25 Jul 2019 03:46:49 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id f204sm72042696wme.18.2019.07.25.03.46.48
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 25 Jul 2019 03:46:49 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     stable@vger.kernel.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S2390119AbfGYK5a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 06:57:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58028 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389859AbfGYK5a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 06:57:30 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2679A30821B3;
+        Thu, 25 Jul 2019 10:57:30 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-190.ams2.redhat.com [10.36.117.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 40A7C19C7F;
+        Thu, 25 Jul 2019 10:57:27 +0000 (UTC)
+From:   Juan Quintela <quintela@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH stable-4.19 2/2] KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
-Date:   Thu, 25 Jul 2019 12:46:45 +0200
-Message-Id: <20190725104645.30642-3-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190725104645.30642-1-vkuznets@redhat.com>
-References: <20190725104645.30642-1-vkuznets@redhat.com>
+        Richard Henderson <rth@twiddle.net>
+Subject: [PULL 0/4] Migration patches
+Date:   Thu, 25 Jul 2019 12:57:20 +0200
+Message-Id: <20190725105724.2562-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 25 Jul 2019 10:57:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
+The following changes since commit bf8b024372bf8abf5a9f40bfa65eeefad23ff988:
 
-[ Upstream commit cf64527bb33f6cec2ed50f89182fc4688d0056b6 ]
+  Update version for v4.1.0-rc2 release (2019-07-23 18:28:08 +0100)
 
-Letting this pend may cause nested_get_vmcs12_pages to run against an
-invalid state, corrupting the effective vmcs of L1.
+are available in the Git repository at:
 
-This was triggerable in QEMU after a guest corruption in L2, followed by
-a L1 reset.
+  https://github.com/juanquintela/qemu.git tags/migration-pull-request
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-Cc: stable@vger.kernel.org
-Fixes: 7f7f1ba33cf2 ("KVM: x86: do not load vmcs12 pages while still in SMM")
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx.c | 2 ++
- 1 file changed, 2 insertions(+)
+for you to fetch changes up to f193bc0c5342496ce07355c0c30394560a7f4738:
 
-diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index 880bc36a0d5d..4cf16378dffe 100644
---- a/arch/x86/kvm/vmx.c
-+++ b/arch/x86/kvm/vmx.c
-@@ -8490,6 +8490,8 @@ static void free_nested(struct vcpu_vmx *vmx)
- 	if (!vmx->nested.vmxon && !vmx->nested.smm.vmxon)
- 		return;
- 
-+	kvm_clear_request(KVM_REQ_GET_VMCS12_PAGES, &vmx->vcpu);
-+
- 	hrtimer_cancel(&vmx->nested.preemption_timer);
- 	vmx->nested.vmxon = false;
- 	vmx->nested.smm.vmxon = false;
+  migration: fix migrate_cancel multifd migration leads destination hung forever (2019-07-24 14:47:21 +0200)
+
+----------------------------------------------------------------
+Migration pull request
+
+This series fixes problems with migration-cancel while using multifd.
+In some cases it can hang waiting in a semaphore.
+
+Please apply.
+
+----------------------------------------------------------------
+
+Ivan Ren (3):
+  migration: fix migrate_cancel leads live_migration thread endless loop
+  migration: fix migrate_cancel leads live_migration thread hung forever
+  migration: fix migrate_cancel multifd migration leads destination hung
+    forever
+
+Juan Quintela (1):
+  migration: Make explicit that we are quitting multifd
+
+ migration/ram.c | 66 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 57 insertions(+), 9 deletions(-)
+
 -- 
-2.20.1
+2.21.0
 
