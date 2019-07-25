@@ -2,111 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CDCA74B75
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 12:24:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6119C74C1B
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 12:47:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729845AbfGYKWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 06:22:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33776 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727402AbfGYKWG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Jul 2019 06:22:06 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6PAHWi5038525
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 06:22:04 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tya8n91dw-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 06:22:04 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
-        Thu, 25 Jul 2019 11:22:03 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 25 Jul 2019 11:22:01 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6PALx6F38732286
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Jul 2019 10:21:59 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 619D5AE057;
-        Thu, 25 Jul 2019 10:21:59 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 19606AE053;
-        Thu, 25 Jul 2019 10:21:59 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.134])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 25 Jul 2019 10:21:59 +0000 (GMT)
-Date:   Thu, 25 Jul 2019 12:21:57 +0200
-From:   Heiko Carstens <heiko.carstens@de.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        farman@linux.ibm.com, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/1] MAINTAINERS: vfio-ccw: Remove myself as the
- maintainer
-References: <cover.1564003585.git.alifm@linux.ibm.com>
- <19aee1ab0e5bcc01053b515117a66426a9332086.1564003585.git.alifm@linux.ibm.com>
- <20190725093335.09c96c0d.cohuck@redhat.com>
+        id S1728405AbfGYKqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 06:46:49 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33288 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726366AbfGYKqt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 06:46:49 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n9so50332322wru.0
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 03:46:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pjvXzHuYUakR2/Ani3ARG2fLWxvZAXWrrCuKN/oKrQA=;
+        b=pUdccOP41mxTjVd9GEaQ12w42XzG686s8/JtkqoG1Ehq/6jxjGxm8IqXhEs0uQ1JU3
+         Lmp7Pm5khv3cyBgPImTNuWBYkJe7I1OMFGkGGWxvm2AZQtCOoHBda8Wie8Tuzzc2l2PV
+         E8tz1uy3pdm6THnEl0Pv678ZK8V0SUFQlGKP/ogSOZLqQFpEYfWjCz7se1YGkRWX+3Pr
+         6JtmV0janJJYeqEqUqDIyXXlVRlI8C48QGsrjvtIAYbuWPVZleF1G2uQoIBJw5hU3SCq
+         oOcFgXzbaborq8TAMrZFcSZIFKF+YI7e5A8Tq5YTmLsG2eCNMTslNwTtL7KviLENCp6o
+         EMOg==
+X-Gm-Message-State: APjAAAXzba/gTlmBTStONthzzLjbG4aqE01+J9DQGGb3mUhNx2e9ffRF
+        yKm1XVkH5Vp0CGjbRt+xH218xA==
+X-Google-Smtp-Source: APXvYqwoFxodO1E/5vAA3SDxtHGf23l+eqoIo+8ZfDDxQgcNNEAScxQXjmpGb4BGzRNs9hlgbhxRCQ==
+X-Received: by 2002:a5d:65c5:: with SMTP id e5mr46038769wrw.266.1564051607733;
+        Thu, 25 Jul 2019 03:46:47 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id f204sm72042696wme.18.2019.07.25.03.46.46
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 25 Jul 2019 03:46:47 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     stable@vger.kernel.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH stable-4.19 0/2] KVM: nVMX: guest reset fixes
+Date:   Thu, 25 Jul 2019 12:46:43 +0200
+Message-Id: <20190725104645.30642-1-vkuznets@redhat.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190725093335.09c96c0d.cohuck@redhat.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19072510-0012-0000-0000-000003360C8C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072510-0013-0000-0000-0000216FA3AC
-Message-Id: <20190725102157.GA25333@osiris>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-25_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=721 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907250124
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 09:33:35AM +0200, Cornelia Huck wrote:
-> On Wed, 24 Jul 2019 17:32:03 -0400
-> Farhan Ali <alifm@linux.ibm.com> wrote:
-> 
-> > I will not be able to continue with my maintainership responsibilities
-> > going forward, so remove myself as the maintainer.
-> 
-> ::sadface::
-> 
-> Thank you for all of your good work!
-> 
-> > 
-> > Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> > ---
-> >  MAINTAINERS | 1 -
-> >  1 file changed, 1 deletion(-)
-> > 
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 0e90487..dd07a23 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -13696,7 +13696,6 @@ F:	drivers/pci/hotplug/s390_pci_hpc.c
-> >  
-> >  S390 VFIO-CCW DRIVER
-> >  M:	Cornelia Huck <cohuck@redhat.com>
-> > -M:	Farhan Ali <alifm@linux.ibm.com>
-> >  M:	Eric Farman <farman@linux.ibm.com>
-> >  R:	Halil Pasic <pasic@linux.ibm.com>
-> >  L:	linux-s390@vger.kernel.org
-> 
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
-> 
-> Heiko/Vasily/Christian: can you take this one directly through the s390
-> tree?
+Few patches were recently marked for stable@ but commits are not
+backportable as-is and require a few tweaks. Here is 4.19 stable backport.
 
-Sure.
+Jan Kiszka (1):
+  KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
+
+Paolo Bonzini (1):
+  KVM: nVMX: do not use dangling shadow VMCS after guest reset
+
+ arch/x86/kvm/vmx.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+-- 
+2.20.1
 
