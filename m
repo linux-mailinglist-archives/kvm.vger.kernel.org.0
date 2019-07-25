@@ -2,182 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 07939751FB
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 16:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77D2F75216
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 17:05:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388840AbfGYO7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 10:59:49 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:43985 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388820AbfGYO7t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 10:59:49 -0400
-Received: by mail-qt1-f194.google.com with SMTP id w17so5039873qto.10
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 07:59:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Rmm6yLiguxnk1HEaBFpodRlU5b5ba8DS6Z2s5rRsdl0=;
-        b=D+QKCDh/UmLzkSaglYZzTcWGx2nSewlFe6rY505tMzLf7bDcaRKkl2HqJuTae3BBPM
-         1ArAKj88LO39cary7OKoUWh+tFLIaNtfj7dD8NNquPHYbROe+Kaq1/RVNWng9BJcRVtA
-         NOidcpYqKHodMExeXtz0UcQulFq82bSVBQ/iL2WqQTET2obI62JgGo/1RL/rJoFpEdIP
-         UPoHT84b54WxcTmHeELy87Oasjfr1mE3s22H6a+gCTFZBOkLEvXQRKWCQ8cQZyg0EFvZ
-         TLVDdi+Yda0rlJfG6Hv03v0VxQaKDJUZtiAhagKFD0gaGO8mhdVOK9b8WamCFDZS1Xn9
-         7/AA==
-X-Gm-Message-State: APjAAAXOqVDhFiTFuvi0eZPxaYEQP5BVg3uZxXAm1dIUeCHZSdw9E+/A
-        cpSV8CJfs2WKGr66VLq0I0JOyA==
-X-Google-Smtp-Source: APXvYqzoIpindOeRtA1tCkHO4cy0qQv+nosyivtBgk+2pOYdPVUj3ArumomPLobNHAIjfwa4IloqWA==
-X-Received: by 2002:ac8:3907:: with SMTP id s7mr64407808qtb.374.1564066787847;
-        Thu, 25 Jul 2019 07:59:47 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
-        by smtp.gmail.com with ESMTPSA id v75sm24506057qka.38.2019.07.25.07.59.42
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 25 Jul 2019 07:59:47 -0700 (PDT)
-Date:   Thu, 25 Jul 2019 10:59:40 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, david@redhat.com, dave.hansen@intel.com,
+        id S2388871AbfGYPFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 11:05:32 -0400
+Received: from mga14.intel.com ([192.55.52.115]:45598 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388312AbfGYPFb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 11:05:31 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jul 2019 08:05:30 -0700
+X-IronPort-AV: E=Sophos;i="5.64,307,1559545200"; 
+   d="scan'208";a="321690255"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jul 2019 08:05:30 -0700
+Message-ID: <bc162a5eaa58ac074c8ad20cb23d579aa04d0f43.camel@linux.intel.com>
+Subject: Re: [PATCH v2 QEMU] virtio-balloon: Provide a interface for "bubble
+ hinting"
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     kvm@vger.kernel.org, david@redhat.com, dave.hansen@intel.com,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         akpm@linux-foundation.org, yang.zhang.wz@gmail.com,
         pagupta@redhat.com, riel@surriel.com, konrad.wilk@oracle.com,
         lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
         pbonzini@redhat.com, dan.j.williams@intel.com
-Subject: Re: [PATCH v2 5/5] virtio-balloon: Add support for providing page
- hints to host
-Message-ID: <20190725105852-mutt-send-email-mst@kernel.org>
+Date:   Thu, 25 Jul 2019 08:05:30 -0700
+In-Reply-To: <fed474fe-93f4-a9f6-2e01-75e8903edd81@redhat.com>
 References: <20190724165158.6685.87228.stgit@localhost.localdomain>
- <20190724170514.6685.17161.stgit@localhost.localdomain>
- <20190724143902-mutt-send-email-mst@kernel.org>
- <21cc88cd-3577-e8b4-376f-26c7848f5764@redhat.com>
- <d75ba86f0cab44562148f3ffd66684c167952079.camel@linux.intel.com>
+         <20190724171050.7888.62199.stgit@localhost.localdomain>
+         <20190724173403-mutt-send-email-mst@kernel.org>
+         <ada4e7d932ebd436d00c46e8de699212e72fd989.camel@linux.intel.com>
+         <fed474fe-93f4-a9f6-2e01-75e8903edd81@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d75ba86f0cab44562148f3ffd66684c167952079.camel@linux.intel.com>
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 07:56:15AM -0700, Alexander Duyck wrote:
-> On Thu, 2019-07-25 at 10:44 -0400, Nitesh Narayan Lal wrote:
-> > On 7/24/19 3:02 PM, Michael S. Tsirkin wrote:
-> > > On Wed, Jul 24, 2019 at 10:05:14AM -0700, Alexander Duyck wrote:
+On Thu, 2019-07-25 at 07:35 -0400, Nitesh Narayan Lal wrote:
+> On 7/24/19 6:03 PM, Alexander Duyck wrote:
+> > On Wed, 2019-07-24 at 17:38 -0400, Michael S. Tsirkin wrote:
+> > > On Wed, Jul 24, 2019 at 10:12:10AM -0700, Alexander Duyck wrote:
 > > > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > > > > 
-> > > > Add support for the page hinting feature provided by virtio-balloon.
-> > > > Hinting differs from the regular balloon functionality in that is is
-> > > > much less durable than a standard memory balloon. Instead of creating a
-> > > > list of pages that cannot be accessed the pages are only inaccessible
-> > > > while they are being indicated to the virtio interface. Once the
-> > > > interface has acknowledged them they are placed back into their respective
-> > > > free lists and are once again accessible by the guest system.
+> > > > Add support for what I am referring to as "bubble hinting". Basically the
+> > > > idea is to function very similar to how the balloon works in that we
+> > > > basically end up madvising the page as not being used. However we don't
+> > > > really need to bother with any deflate type logic since the page will be
+> > > > faulted back into the guest when it is read or written to.
+> > > > 
+> > > > This is meant to be a simplification of the existing balloon interface
+> > > > to use for providing hints to what memory needs to be freed. I am assuming
+> > > > this is safe to do as the deflate logic does not actually appear to do very
+> > > > much other than tracking what subpages have been released and which ones
+> > > > haven't.
 > > > > 
 > > > > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > Looking at the design, it seems that hinted pages can immediately be
-> > > reused. I wonder how we can efficiently support this
-> > > with kvm when poisoning is in effect. Of course we can just
-> > > ignore the poison. However it seems cleaner to
-> > > 1. verify page is poisoned with the correct value
-> > > 2. fill the page with the correct value on fault
-> > > 
-> > > Requirement 2 requires some kind of madvise that
-> > > will save the poison e.g. in the VMA.
-> > > 
-> > > Not a blocker for sure ... 
-> > > 
-> > > 
-> > > > ---
-> > > >  drivers/virtio/Kconfig              |    1 +
-> > > >  drivers/virtio/virtio_balloon.c     |   47 +++++++++++++++++++++++++++++++++++
-> > > >  include/uapi/linux/virtio_balloon.h |    1 +
-> > > >  3 files changed, 49 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > > > index 078615cf2afc..d45556ae1f81 100644
-> > > > --- a/drivers/virtio/Kconfig
-> > > > +++ b/drivers/virtio/Kconfig
-> > > > @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
-> > > >  	tristate "Virtio balloon driver"
-> > > >  	depends on VIRTIO
-> > > >  	select MEMORY_BALLOON
-> > > > +	select PAGE_HINTING
-> > > >  	---help---
-> > > >  	 This driver supports increasing and decreasing the amount
-> > > >  	 of memory within a KVM guest.
-> > > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> > > > index 226fbb995fb0..dee9f8f3ad09 100644
-> > > > --- a/drivers/virtio/virtio_balloon.c
-> > > > +++ b/drivers/virtio/virtio_balloon.c
-> > > > @@ -19,6 +19,7 @@
-> > > >  #include <linux/mount.h>
-> > > >  #include <linux/magic.h>
-> > > >  #include <linux/pseudo_fs.h>
-> > > > +#include <linux/page_hinting.h>
-> > > >  
-> > > >  /*
-> > > >   * Balloon device works in 4K page units.  So each page is pointed to by
-> > > > @@ -27,6 +28,7 @@
-> > > >   */
-> > > >  #define VIRTIO_BALLOON_PAGES_PER_PAGE (unsigned)(PAGE_SIZE >> VIRTIO_BALLOON_PFN_SHIFT)
-> > > >  #define VIRTIO_BALLOON_ARRAY_PFNS_MAX 256
-> > > > +#define VIRTIO_BALLOON_ARRAY_HINTS_MAX	32
-> > > >  #define VIRTBALLOON_OOM_NOTIFY_PRIORITY 80
-> > > >  
-> > > >  #define VIRTIO_BALLOON_FREE_PAGE_ALLOC_FLAG (__GFP_NORETRY | __GFP_NOWARN | \
-> > > > @@ -46,6 +48,7 @@ enum virtio_balloon_vq {
-> > > >  	VIRTIO_BALLOON_VQ_DEFLATE,
-> > > >  	VIRTIO_BALLOON_VQ_STATS,
-> > > >  	VIRTIO_BALLOON_VQ_FREE_PAGE,
-> > > > +	VIRTIO_BALLOON_VQ_HINTING,
-> > > >  	VIRTIO_BALLOON_VQ_MAX
-> > > >  };
-> > > >  
-> > > > @@ -113,6 +116,10 @@ struct virtio_balloon {
-> > > >  
-> > > >  	/* To register a shrinker to shrink memory upon memory pressure */
-> > > >  	struct shrinker shrinker;
-> > > > +
-> > > > +	/* Unused page hinting device */
-> > > > +	struct virtqueue *hinting_vq;
-> > > > +	struct page_hinting_dev_info ph_dev_info;
-> > > >  };
-> > > >  
-> > > >  static struct virtio_device_id id_table[] = {
-> > > > @@ -152,6 +159,22 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
-> > > >  
-> > > >  }
-> > > >  
-> > > > +void virtballoon_page_hinting_react(struct page_hinting_dev_info *ph_dev_info,
-> > > > +				    unsigned int num_hints)
-> > > > +{
-> > > > +	struct virtio_balloon *vb =
-> > > > +		container_of(ph_dev_info, struct virtio_balloon, ph_dev_info);
-> > > > +	struct virtqueue *vq = vb->hinting_vq;
-> > > > +	unsigned int unused;
-> > > > +
-> > > > +	/* We should always be able to add these buffers to an empty queue. */
-> > > 
-> > > can be an out of memory condition, and then ...
-> > 
-> > Do we need an error check here?
-> > 
-> > For situations where this fails we should disable hinting completely, maybe?
-> 
-> No. Instead I will just limit the capacity to no more than the vq size.
-> Doing that should allow us to avoid the out of memory issue here if I am
-> understanding things correctly.
-> 
-> I'm assuming the allocation being referred to is alloc_indirect_split(),
-> if so then it looks like it can fail and then we just fall back to using
-> the vring.desc directly which will work for my purposes as long as I limit
-> the capacity of the scatterlist to no more than the size of the vring.
-> 
+> > > BTW I wonder about migration here.  When we migrate we lose all hints
+> > > right?  Well destination could be smarter, detect that page is full of
+> > > 0s and just map a zero page. Then we don't need a hint as such - but I
+> > > don't think it's done like that ATM.
+> > I was wondering about that a bit myself. If you migrate with a balloon
+> > active what currently happens with the pages in the balloon? Do you
+> > actually migrate them, or do you ignore them and just assume a zero page?
+> > I'm just reusing the ram_block_discard_range logic that was being used for
+> > the balloon inflation so I would assume the behavior would be the same.
+> I agree, however, I think it is worth investigating to see if enabling hinting
+> adds some sort of overhead specifically in this kind of scenarios. What do you
+> think?
 
+I suspect that the hinting/reporting would probably improve migration
+times based on the fact that from the sound of things it would just be
+migrated as a zero page.
 
-Right. And maybe tweak the GFP mask - no reason to try to
-allocate memory aggressively with just 1 element in flight.
+I don't have a good setup for testing migration though and I am not that
+familiar with trying to do a live migration. That is one of the reasons
+why I didn't want to stray too far from the existing balloon code as that
+has already been tested with migration so I would assume as long as I am
+doing almost the exact same thing to hint the pages away it should behave
+exactly the same.
 
-> 
+> > > I also wonder about interaction with deflate.  ATM deflate will add
+> > > pages to the free list, then balloon will come right back and report
+> > > them as free.
+> > I don't know how likely it is that somebody who is getting the free page
+> > reporting is likely to want to also use the balloon to take up memory.
+> I think it is possible. There are two possibilities:
+> 1. User has a workload running, which is allocating and freeing the pages and at
+> the same time, user deflates.
+> If these new pages get used by this workload, we don't have to worry as you are
+> already handling that by not hinting the free pages immediately.
+> 2. Guest is idle and the user adds up some memory, for this situation what you
+> have explained below does seems reasonable.
+
+Us hinting on pages that are freed up via deflate wouldn't be too big of a
+deal. I would think that is something we could look at addressing as more
+of a follow-on if we ever needed to since it would just add more
+complexity.
+
+Really what I would like to see is the balloon itself get updated first to
+perhaps work with variable sized pages first so that we could then have
+pages come directly out of the balloon and go back into the freelist as
+hinted, or visa-versa where hinted pages could be pulled directly into the
+balloon without needing to notify the host.
+
