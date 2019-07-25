@@ -2,46 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D4E67756FE
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 20:33:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82DD97571E
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 20:40:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbfGYSdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 14:33:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40428 "EHLO mx1.redhat.com"
+        id S1726220AbfGYSkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 14:40:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32840 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725800AbfGYSdF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 14:33:05 -0400
+        id S1726087AbfGYSkp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 14:40:45 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1878459440;
-        Thu, 25 Jul 2019 18:33:04 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6DEBC81F10;
+        Thu, 25 Jul 2019 18:40:44 +0000 (UTC)
 Received: from [10.36.116.69] (ovpn-116-69.ams2.redhat.com [10.36.116.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 61F015C542;
-        Thu, 25 Jul 2019 18:32:51 +0000 (UTC)
-Subject: Re: [PATCH v2 4/5] mm: Introduce Hinted pages
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
-        Rik van Riel <riel@surriel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        lcapitulino@redhat.com, wei.w.wang@intel.com,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com,
-        Matthew Wilcox <willy@infradead.org>
-References: <20190724165158.6685.87228.stgit@localhost.localdomain>
- <20190724170259.6685.18028.stgit@localhost.localdomain>
- <a9f52894-52df-cd0c-86ac-eea9fbe96e34@redhat.com>
- <CAKgT0Ud-UNk0Mbef92hDLpWb2ppVHsmd24R9gEm2N8dujb4iLw@mail.gmail.com>
- <f0ac7747-0e18-5039-d341-5dfda8d5780e@redhat.com>
- <b3568a5422d0f6b88f7c5cb46577db1a43057c04.camel@linux.intel.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 659AF5C22F;
+        Thu, 25 Jul 2019 18:40:43 +0000 (UTC)
+Subject: Re: [ v2 1/1] kvm-unit-tests: s390: add cpu model checks
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+References: <20190725151125.145362-1-borntraeger@de.ibm.com>
+ <20190725151125.145362-2-borntraeger@de.ibm.com>
+ <6b1c2a14-b2ca-c9e4-cc49-765d2452f4eb@redhat.com>
+ <8b68ffc8-1ed0-a65e-c1b0-accbf2af1ce1@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -88,89 +73,46 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <c200d5cf-90f7-9dca-5061-b6e0233ca089@redhat.com>
-Date:   Thu, 25 Jul 2019 20:32:50 +0200
+Message-ID: <c8cadd1d-a5bb-0f1b-ca79-0bc6d5ab1040@redhat.com>
+Date:   Thu, 25 Jul 2019 20:40:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <b3568a5422d0f6b88f7c5cb46577db1a43057c04.camel@linux.intel.com>
+In-Reply-To: <8b68ffc8-1ed0-a65e-c1b0-accbf2af1ce1@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Thu, 25 Jul 2019 18:33:04 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 25 Jul 2019 18:40:44 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.07.19 19:38, Alexander Duyck wrote:
-> On Thu, 2019-07-25 at 18:48 +0200, David Hildenbrand wrote:
->> On 25.07.19 17:59, Alexander Duyck wrote:
->>> On Thu, Jul 25, 2019 at 1:53 AM David Hildenbrand <david@redhat.com> wrote:
->>>> On 24.07.19 19:03, Alexander Duyck wrote:
->>>>> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On 25.07.19 17:48, Christian Borntraeger wrote:
+> 
+> 
+> On 25.07.19 17:36, David Hildenbrand wrote:
+>> On 25.07.19 17:11, Christian Borntraeger wrote:
+>>> This adds a check for documented stfle dependencies.
 >>>
-> 
-> <snip>
-> 
->>>> Can't we reuse one of the traditional page flags for that, not used
->>>> along with buddy pages? E.g., PG_dirty: Pages that were not hinted yet
->>>> are dirty.
->>>
->>> Reusing something like the dirty bit would just be confusing in my
->>> opinion. In addition it looks like Xen has also re-purposed PG_dirty
->>> already for another purpose.
 >>
->> You brought up waste page management. A dirty bit for unprocessed pages
->> fits perfectly in this context. Regarding XEN, as long as it's not used
->> along with buddy pages, no issue.
-> 
-> I would rather not have to dirty all pages that aren't hinted. That starts
-> to get too invasive. Ideally we only modify pages if we are hinting on
-> them. That is why I said I didn't like the use of a dirty bit. What we
-> want is more of a "guaranteed clean" bit.
-
-Not sure if that is too invasive, but fair enough.
-
-> 
->> FWIW, I don't even thing PG_offline matches to what you are using it
->> here for. The pages are not logically offline. They were simply buddy
->> pages that were hinted. (I'd even prefer a separate page type for that
->> instead - if we cannot simply reuse one of the other flags)
+>> Expected error under TCG:
 >>
->> "Offline pages" that are not actually offline in the context of the
->> buddy is way more confusing.
-> 
-> Right now offline and hinted are essentially the same thing since the
-> effect is identical.
-
-No they are not the same thing. Regarding virtio-balloon: You are free
-to reuse any hinted pages immediate. Offline pages (a.k.a. inflated) you
-might not generally reuse before deflating.
-
-> 
-> There may be cases in the future where that is not the case, but with the
-> current patch set they both result in the pages being evicted from the
-> guest.
-> 
->>> If anything I could probably look at seeing if the PG_private flags
->>> are available when a page is in the buddy allocator which I suspect
->>> they probably are since the only users I currently see appear to be
->>> SLOB and compound pages. Either that or maybe something like PG_head
->>> might make sense since once we start allocating them we are popping
->>> the head off of the boundary list.
+>> FAIL: cpumodel: dependency: 37 implies 42
 >>
->> Would also be fine with me.
+>> DFP not implemented (yet).
+>>
+>> We also don't warn about this in check_consistency(), which is nice for
+>> TCG ;)
 > 
-> Actually I may have found an even better bit if we are going with the
-> "reporting" name. I could probably use "PG_uptodate" since it looks like
-> most of its uses are related to filesystems. I will wait till I hear from
-> Matthew on what bits would be available for use before I update things.
+> So should I force this to KVM? Or should I try to detect TCG and make this
+> xfail?
 
-Also fine with me. In the optimal case we (in my opinion)
-a) Don't reuse PG_offline
-b) Don't use another page type
+Hmm, good question. If it's broken, it's broken - maybe it's just the
+right thing to do here - let the test fail for TCG.
+
+Might take quite some time to fix, though :)
 
 -- 
 
