@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C97FF74D77
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 13:50:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A53A474D7B
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 13:50:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404325AbfGYLtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 07:49:43 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38340 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404292AbfGYLtn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 07:49:43 -0400
-Received: by mail-wm1-f66.google.com with SMTP id s15so23102757wmj.3
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 04:49:42 -0700 (PDT)
+        id S2404342AbfGYLtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 07:49:45 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36995 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404314AbfGYLto (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 07:49:44 -0400
+Received: by mail-wm1-f68.google.com with SMTP id f17so44442773wme.2
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 04:49:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ahpb6xPK075Z6njHxQUERLqrZnJthEhBDnChxsDJ0yI=;
-        b=Qx9lGeub0o7AUamHE34nZWPZ4DFbSzRlMur5WPEokKCvVpH9ekx2vrfXXgybx+rEkR
-         rLGbFYaUVqH3nnN5vlnzit17iOUXrRMGyKEBeGL42QxMk8TVAPfXMqjJwmm32YKlf48m
-         j8Yb5kXfXJZxr+H4OKpBbDPLTFzJX7yoSdjuxFrDCiBMpd/UZnc+OP3RH1hJLr9dxEW7
-         OCakhF0UsPKj2veMS2/MNEyzy46c5rTkuxtWCUK3eL4/3wM7rmrBZ0S21DB4e4LKW5sB
-         e1RuZFUW/EsCysL2sGfn+AVlsBBJrgguh75ciwfrzmKieQ7MCak2c1QxxaKxP+SX13mw
-         26bg==
-X-Gm-Message-State: APjAAAUE9VKyMDhUg3/LAF87V4yARrkv2v4V3QHzzuguTpkAdEWMX8EW
-        iq4msjjtQbRbdgi5O6UYIzvj8w==
-X-Google-Smtp-Source: APXvYqysh53Nn7YpCuVhrX6td5G/bTjwKnhelBX4YvIb8Js+9A/cGM/O1IBBsQ19J2X8WwmSCryqSg==
-X-Received: by 2002:a7b:cf0b:: with SMTP id l11mr83901119wmg.143.1564055381570;
-        Thu, 25 Jul 2019 04:49:41 -0700 (PDT)
+        bh=Z59Fx3FchhtcYpGTAy6/0+pqXBGTFpbIQm7SLJs066s=;
+        b=hPB+y1n3DGhqwTejfhuunmAh0if7stGpUKgZVwqDHxfa3apC6KOINiewBj7cUxVrHt
+         +mikQR3U55aMPaxp1ZeucSZsvp6RcG2e8V8dcwrYnba7iRw8lMPIWeTPXmaZySHHL2HF
+         QmwYkdNuHz2jpYzO3U4SQSKJ1Q23D2CyxF9VKCUXVvSfDd0tl0ufatjw/EJ/io+HyKd0
+         bEfj5sw5E49jR8vejzv9u0jVhsOOTWnIMmVAz+65WnnuMpD8meZAST0MgzaTRWXs67Gj
+         nMZoHr2d6WG3u4+MIjhQ1AwpwqLEfStWExG8q56pCiiOLOexT8CXR2F9UFr16ZbMZeMb
+         cFAQ==
+X-Gm-Message-State: APjAAAWZt84c+1mEKJJw4fxJZ58XA9cRdULMyDRGpt7b+uWDiIUSHeEW
+        dVygOqd9p65G+Q6cRVto7nX/cg==
+X-Google-Smtp-Source: APXvYqxRX1Odd/FqOub1CpfyIe42j8zssRTmGESC5RT9PX9QN36ChMZZssuNdKvI3JcnDGwivfGf1A==
+X-Received: by 2002:a7b:c0c6:: with SMTP id s6mr3698651wmh.115.1564055382411;
+        Thu, 25 Jul 2019 04:49:42 -0700 (PDT)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id t140sm44784683wmt.0.2019.07.25.04.49.40
+        by smtp.gmail.com with ESMTPSA id t140sm44784683wmt.0.2019.07.25.04.49.41
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
         Thu, 25 Jul 2019 04:49:41 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -38,9 +38,9 @@ To:     stable@vger.kernel.org
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH stable-5.1 1/3] KVM: nVMX: do not use dangling shadow VMCS after guest reset
-Date:   Thu, 25 Jul 2019 13:49:36 +0200
-Message-Id: <20190725114938.3976-2-vkuznets@redhat.com>
+Subject: [PATCH stable-5.1 2/3] KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
+Date:   Thu, 25 Jul 2019 13:49:37 +0200
+Message-Id: <20190725114938.3976-3-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190725114938.3976-1-vkuznets@redhat.com>
 References: <20190725114938.3976-1-vkuznets@redhat.com>
@@ -51,66 +51,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-[ Upstream commit 88dddc11a8d6b09201b4db9d255b3394d9bc9e57 ]
+[ Upstream commit cf64527bb33f6cec2ed50f89182fc4688d0056b6 ]
 
-If a KVM guest is reset while running a nested guest, free_nested will
-disable the shadow VMCS execution control in the vmcs01.  However,
-on the next KVM_RUN vmx_vcpu_run would nevertheless try to sync
-the VMCS12 to the shadow VMCS which has since been freed.
+Letting this pend may cause nested_get_vmcs12_pages to run against an
+invalid state, corrupting the effective vmcs of L1.
 
-This causes a vmptrld of a NULL pointer on my machime, but Jan reports
-the host to hang altogether.  Let's see how much this trivial patch fixes.
+This was triggerable in QEMU after a guest corruption in L2, followed by
+a L1 reset.
 
-Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Liran Alon <liran.alon@oracle.com>
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
 Cc: stable@vger.kernel.org
+Fixes: 7f7f1ba33cf2 ("KVM: x86: do not load vmcs12 pages while still in SMM")
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4ca834d22169..3f48006a43ec 100644
+index 3f48006a43ec..f78975d4a7fa 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -184,6 +184,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
- {
- 	vmcs_clear_bits(SECONDARY_VM_EXEC_CONTROL, SECONDARY_EXEC_SHADOW_VMCS);
- 	vmcs_write64(VMCS_LINK_POINTER, -1ull);
-+	vmx->nested.need_vmcs12_sync = false;
- }
+@@ -212,6 +212,8 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	if (!vmx->nested.vmxon && !vmx->nested.smm.vmxon)
+ 		return;
  
- static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
-@@ -1328,6 +1329,9 @@ static void copy_shadow_to_vmcs12(struct vcpu_vmx *vmx)
- 	u64 field_value;
- 	struct vmcs *shadow_vmcs = vmx->vmcs01.shadow_vmcs;
- 
-+	if (WARN_ON(!shadow_vmcs))
-+		return;
++	kvm_clear_request(KVM_REQ_GET_VMCS12_PAGES, vcpu);
 +
- 	preempt_disable();
- 
- 	vmcs_load(shadow_vmcs);
-@@ -1366,6 +1370,9 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
- 	u64 field_value = 0;
- 	struct vmcs *shadow_vmcs = vmx->vmcs01.shadow_vmcs;
- 
-+	if (WARN_ON(!shadow_vmcs))
-+		return;
-+
- 	vmcs_load(shadow_vmcs);
- 
- 	for (q = 0; q < ARRAY_SIZE(fields); q++) {
-@@ -4340,7 +4347,6 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
- 		/* copy to memory all shadowed fields in case
- 		   they were modified */
- 		copy_shadow_to_vmcs12(vmx);
--		vmx->nested.need_vmcs12_sync = false;
- 		vmx_disable_shadow_vmcs(vmx);
- 	}
- 	vmx->nested.posted_intr_nv = -1;
+ 	vmx->nested.vmxon = false;
+ 	vmx->nested.smm.vmxon = false;
+ 	free_vpid(vmx->nested.vpid02);
 -- 
 2.20.1
 
