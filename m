@@ -2,82 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9758D752E5
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 17:37:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2300175320
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2019 17:47:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728240AbfGYPhv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 11:37:51 -0400
-Received: from foss.arm.com ([217.140.110.172]:59718 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726312AbfGYPhv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 11:37:51 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 944DC174E;
-        Thu, 25 Jul 2019 08:37:50 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C67DB3F71A;
-        Thu, 25 Jul 2019 08:37:49 -0700 (PDT)
-Subject: Re: [PATCH v2 0/9] KVM: arm/arm64: vgic: ITS translation cache
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, "Raslan, KarimAllah" <karahmed@amazon.de>,
-        "Saidi, Ali" <alisaidi@amazon.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190723121424.0b632efa@donnerap.cambridge.arm.com>
- <a757bac1-41d1-8ce5-9393-ac2e8a5e1114@arm.com>
- <20190725110148.792e2706@donnerap.cambridge.arm.com>
-From:   Marc Zyngier <marc.zyngier@arm.com>
+        id S2389487AbfGYPrq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 11:47:46 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42370 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726692AbfGYPrq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 11:47:46 -0400
+Received: by mail-wr1-f67.google.com with SMTP id x1so1398787wrr.9
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 08:47:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8E/W+J79L+KYsv7Uh31e54tPI2Vvux5yVJ3FL+wNPf4=;
+        b=JE4MpSPJLMlt7glrgl10s4W2X2L52kItgNQ9UrDJaSIfoPLwTfhJYXmQuNvcTmCqnV
+         ncsnqv4b/jr5v0Zz66jOAAPHbdOosWmv5BITu90Gi3w95RKQpKz/4Aq+NeMHs5y/3SDN
+         EE4/F1/b6xluMs9J/5ZJe1n5BB6RmFVZoVitzDOxDSIRUqwiy134AaJ1vDBveo7v9uFe
+         kOeLdgV4YCEb3Vu/c+vBU0rWJzDWC+iGZwKjRyPUILIbbj94IpPe+DnK70oeK/vilOZ1
+         AQymp4I9Dyk/np3z9kl7fndikh/CRYko2lXkwKQZryb5eAKgaCajQOB0MG4gWzdZF6d4
+         P1XQ==
+X-Gm-Message-State: APjAAAXnI9gJN+xa1I5izF92wKYS6epu0+2LcLOPUDnqp+96Gh4QJ2iy
+        V9aCYsOiXMioSBmAkbiiSkrL+w==
+X-Google-Smtp-Source: APXvYqx8F4rl5cD7W/KK+pbOY5/EcnFeHrrid7MBUlv1f7jQoc3usw2wMBNEimIgXyzH9Mg8NMGD3g==
+X-Received: by 2002:adf:f046:: with SMTP id t6mr10549790wro.307.1564069664285;
+        Thu, 25 Jul 2019 08:47:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee? ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+        by smtp.gmail.com with ESMTPSA id n5sm38864628wmi.21.2019.07.25.08.47.43
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 25 Jul 2019 08:47:43 -0700 (PDT)
+Subject: Re: [PATCH stable-5.2 0/3] KVM: x86: FPU and nested VMX guest reset
+ fixes
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, stable@vger.kernel.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+References: <20190725120436.5432-1-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
- Z46HaNmN2hZS/oJ69c1DI5Rcww==
-Organization: ARM Ltd
-Message-ID: <a5fa8cce-32c2-3e31-cb2c-58decb4032a0@arm.com>
-Date:   Thu, 25 Jul 2019 16:37:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+Message-ID: <5c3736e4-4987-5396-c3a7-c5c97241eb2d@redhat.com>
+Date:   Thu, 25 Jul 2019 17:47:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190725110148.792e2706@donnerap.cambridge.arm.com>
+In-Reply-To: <20190725120436.5432-1-vkuznets@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -86,15 +56,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/07/2019 11:01, Andre Przywara wrote:
+On 25/07/19 14:04, Vitaly Kuznetsov wrote:
+> Few patches were recently marked for stable@ but commits are not
+> backportable as-is and require a few tweaks. Here is 5.2 stable backport.
+> 
+> [PATCHes 2/3 of the series apply as-is, I have them here for completeness]
+> 
+> Jan Kiszka (1):
+>   KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
+> 
+> Paolo Bonzini (2):
+>   KVM: nVMX: do not use dangling shadow VMCS after guest reset
+>   Revert "kvm: x86: Use task structs fpu field for user"
+> 
+>  arch/x86/include/asm/kvm_host.h |  7 ++++---
+>  arch/x86/kvm/vmx/nested.c       | 10 +++++++++-
+>  arch/x86/kvm/x86.c              |  4 ++--
+>  3 files changed, 15 insertions(+), 6 deletions(-)
+> 
 
-> Thanks! Feel free to add my Tested-by: at an appropriate place.
-
-Ah, sorry, missed that. If you give the new series a go, I swear I'll
-add your tag! ;-)
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
