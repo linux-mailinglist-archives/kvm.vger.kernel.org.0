@@ -2,58 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40AE775F98
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 09:20:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3546375FD5
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 09:28:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726158AbfGZHUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 03:20:16 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:48302 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725864AbfGZHUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 03:20:16 -0400
-Received: from pd9ef1cb8.dip0.t-ipconnect.de ([217.239.28.184] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1hquWR-00046z-0R; Fri, 26 Jul 2019 09:20:11 +0200
-Date:   Fri, 26 Jul 2019 09:20:09 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Wanpeng Li <kernellwp@gmail.com>
-cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Nadav Amit <namit@vmware.com>
-Subject: Re: [PATCH] KVM: X86: Use IPI shorthands in kvm guest when support
-In-Reply-To: <CANRm+CzTJ6dCv=NSHLGV-uWdaES2F0T7PXgu0LXXEsBCJ8mxEA@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.1907260917340.1791@nanos.tec.linutronix.de>
-References: <1564121417-29375-1-git-send-email-wanpengli@tencent.com> <CANRm+CzTJ6dCv=NSHLGV-uWdaES2F0T7PXgu0LXXEsBCJ8mxEA@mail.gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1726408AbfGZH2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 03:28:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46750 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725864AbfGZH2Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 03:28:24 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 18647AF47;
+        Fri, 26 Jul 2019 07:28:23 +0000 (UTC)
+Subject: Re: [PATCH v3 4/9] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+To:     Nadav Amit <namit@vmware.com>, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sasha Levin <sashal@kernel.org>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190719005837.4150-1-namit@vmware.com>
+ <20190719005837.4150-5-namit@vmware.com>
+From:   Juergen Gross <jgross@suse.com>
+Message-ID: <3fc06d95-5f17-4642-cd91-49a0f70057c0@suse.com>
+Date:   Fri, 26 Jul 2019 09:28:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <20190719005837.4150-5-namit@vmware.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 26 Jul 2019, Wanpeng Li wrote:
-> On Fri, 26 Jul 2019 at 14:10, Wanpeng Li <kernellwp@gmail.com> wrote:
-> >  static void kvm_send_ipi_all(int vector)
-> >  {
-> > -       __send_ipi_mask(cpu_online_mask, vector);
-> > +       if (static_branch_likely(&apic_use_ipi_shorthand))
-> > +               orig_apic.send_IPI_allbutself(vector);
+On 19.07.19 02:58, Nadav Amit wrote:
+> To improve TLB shootdown performance, flush the remote and local TLBs
+> concurrently. Introduce flush_tlb_multi() that does so. Introduce
+> paravirtual versions of flush_tlb_multi() for KVM, Xen and hyper-v (Xen
+> and hyper-v are only compile-tested).
 > 
-> Make a mistake here, just resend the patch.
+> While the updated smp infrastructure is capable of running a function on
+> a single local core, it is not optimized for this case. The multiple
+> function calls and the indirect branch introduce some overhead, and
+> might make local TLB flushes slower than they were before the recent
+> changes.
+> 
+> Before calling the SMP infrastructure, check if only a local TLB flush
+> is needed to restore the lost performance in this common case. This
+> requires to check mm_cpumask() one more time, but unless this mask is
+> updated very frequently, this should impact performance negatively.
+> 
+> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+> Cc: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: Stephen Hemminger <sthemmin@microsoft.com>
+> Cc: Sasha Levin <sashal@kernel.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: x86@kernel.org
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> Cc: linux-hyperv@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: kvm@vger.kernel.org
+> Cc: xen-devel@lists.xenproject.org
+> Signed-off-by: Nadav Amit <namit@vmware.com>
+> ---
+>   arch/x86/hyperv/mmu.c                 | 10 +++---
+>   arch/x86/include/asm/paravirt.h       |  6 ++--
+>   arch/x86/include/asm/paravirt_types.h |  4 +--
+>   arch/x86/include/asm/tlbflush.h       |  8 ++---
+>   arch/x86/include/asm/trace/hyperv.h   |  2 +-
+>   arch/x86/kernel/kvm.c                 | 11 +++++--
+>   arch/x86/kernel/paravirt.c            |  2 +-
+>   arch/x86/mm/tlb.c                     | 47 ++++++++++++++++++---------
+>   arch/x86/xen/mmu_pv.c                 | 11 +++----
+>   include/trace/events/xen.h            |  2 +-
+>   10 files changed, 62 insertions(+), 41 deletions(-)
 
-Please don't use [RESEND] if the patch is different. Use [PATCH v2].
+Xen and paravirt parts: Reviewed-by: Juergen Gross <jgross@suse.com>
 
-[RESEND] is used when you actually resend an unmodified patch, e.g. when
-the first submission was ignored for a longer time.
 
-Thanks,
-
-	tglx
+Juergen
