@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0329176F8B
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 19:10:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EC1B76F83
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 19:09:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387724AbfGZRJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 13:09:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35004 "EHLO mx1.redhat.com"
+        id S2387779AbfGZRJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 13:09:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43692 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387437AbfGZRJt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 13:09:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S2387437AbfGZRJv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 13:09:51 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7BD9681DF9;
-        Fri, 26 Jul 2019 17:09:48 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id B16F25AFD9;
+        Fri, 26 Jul 2019 17:09:50 +0000 (UTC)
 Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 720055DE80;
-        Fri, 26 Jul 2019 17:09:43 +0000 (UTC)
-Subject: Re: [PATCH v8 3/6] vfio/type1: Update iova list on detach
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F2771711C;
+        Fri, 26 Jul 2019 17:09:44 +0000 (UTC)
+Subject: Re: [PATCH v8 2/6] vfio/type1: Check reserved region conflict and
+ update iova list
 To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
         alex.williamson@redhat.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         iommu@lists.linux-foundation.org, linuxarm@huawei.com,
         john.garry@huawei.com, xuwei5@hisilicon.com, kevin.tian@intel.com
 References: <20190723160637.8384-1-shameerali.kolothum.thodi@huawei.com>
- <20190723160637.8384-4-shameerali.kolothum.thodi@huawei.com>
+ <20190723160637.8384-3-shameerali.kolothum.thodi@huawei.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <c672300c-b689-d880-8cec-94092d9583ca@redhat.com>
-Date:   Fri, 26 Jul 2019 19:09:41 +0200
+Message-ID: <f8cf7545-2f8c-d1d9-dc51-e787c1a881fb@redhat.com>
+Date:   Fri, 26 Jul 2019 19:09:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190723160637.8384-4-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20190723160637.8384-3-shameerali.kolothum.thodi@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Fri, 26 Jul 2019 17:09:48 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 26 Jul 2019 17:09:50 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -47,9 +48,13 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Shameer,
 
 On 7/23/19 6:06 PM, Shameer Kolothum wrote:
-> Get a copy of iova list on _group_detach and try to update the list.
-> On success replace the current one with the copy. Leave the list as
-> it is if update fails.
+> This retrieves the reserved regions associated with dev group and
+> checks for conflicts with any existing dma mappings. Also update
+> the iova list excluding the reserved regions.
+> 
+> Reserved regions with type IOMMU_RESV_DIRECT_RELAXABLE are
+> excluded from above checks as they are considered as directly
+> mapped regions which are known to be relaxable.
 > 
 > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
@@ -58,143 +63,155 @@ Thanks
 
 Eric
 > ---
-> v7 --> v8
->   -Fixed possible invalid holes in iova list if there are no more
->    reserved regions in vfio_iommu_resv_refresh().
->   -Handled iommu_get_group_resv_regions() err case in
->    vfio_iommu_resv_refresh()
->   -Tidy up of iova_copy list fail case.
+> v7-->v8
+>  -Added check for iommu_get_group_resv_regions() error ret.
+> 
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 94 +++++++++++++++++++++++++++++++++
->  1 file changed, 94 insertions(+)
+>  drivers/vfio/vfio_iommu_type1.c | 98 +++++++++++++++++++++++++++++++++
+>  1 file changed, 98 insertions(+)
 > 
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index a3c9794ccf83..7005a8cfca1b 100644
+> index 6a69652b406b..a3c9794ccf83 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -1867,12 +1867,93 @@ static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
->  	WARN_ON(iommu->notifier.head);
+> @@ -1496,6 +1496,88 @@ static int vfio_iommu_aper_resize(struct list_head *iova,
+>  	return 0;
 >  }
 >  
 > +/*
-> + * Called when a domain is removed in detach. It is possible that
-> + * the removed domain decided the iova aperture window. Modify the
-> + * iova aperture with the smallest window among existing domains.
+> + * Check reserved region conflicts with existing dma mappings
 > + */
-> +static void vfio_iommu_aper_expand(struct vfio_iommu *iommu,
-> +				   struct list_head *iova_copy)
+> +static bool vfio_iommu_resv_conflict(struct vfio_iommu *iommu,
+> +				     struct list_head *resv_regions)
 > +{
-> +	struct vfio_domain *domain;
-> +	struct iommu_domain_geometry geo;
-> +	struct vfio_iova *node;
-> +	dma_addr_t start = 0;
-> +	dma_addr_t end = (dma_addr_t)~0;
+> +	struct iommu_resv_region *region;
 > +
-> +	if (list_empty(iova_copy))
-> +		return;
+> +	/* Check for conflict with existing dma mappings */
+> +	list_for_each_entry(region, resv_regions, list) {
+> +		if (region->type == IOMMU_RESV_DIRECT_RELAXABLE)
+> +			continue;
 > +
-> +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> +		iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY,
-> +				      &geo);
-> +		if (geo.aperture_start > start)
-> +			start = geo.aperture_start;
-> +		if (geo.aperture_end < end)
-> +			end = geo.aperture_end;
+> +		if (vfio_find_dma(iommu, region->start, region->length))
+> +			return true;
 > +	}
 > +
-> +	/* Modify aperture limits. The new aper is either same or bigger */
-> +	node = list_first_entry(iova_copy, struct vfio_iova, list);
-> +	node->start = start;
-> +	node = list_last_entry(iova_copy, struct vfio_iova, list);
-> +	node->end = end;
+> +	return false;
 > +}
 > +
 > +/*
-> + * Called when a group is detached. The reserved regions for that
-> + * group can be part of valid iova now. But since reserved regions
-> + * may be duplicated among groups, populate the iova valid regions
-> + * list again.
+> + * Check iova region overlap with  reserved regions and
+> + * exclude them from the iommu iova range
 > + */
-> +static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
-> +				   struct list_head *iova_copy)
+> +static int vfio_iommu_resv_exclude(struct list_head *iova,
+> +				   struct list_head *resv_regions)
 > +{
-> +	struct vfio_domain *d;
-> +	struct vfio_group *g;
-> +	struct vfio_iova *node;
-> +	dma_addr_t start, end;
-> +	LIST_HEAD(resv_regions);
-> +	int ret;
+> +	struct iommu_resv_region *resv;
+> +	struct vfio_iova *n, *next;
 > +
-> +	if (list_empty(iova_copy))
-> +		return -EINVAL;
+> +	list_for_each_entry(resv, resv_regions, list) {
+> +		phys_addr_t start, end;
 > +
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		list_for_each_entry(g, &d->group_list, next) {
-> +			ret = iommu_get_group_resv_regions(g->iommu_group,
-> +							   &resv_regions);
+> +		if (resv->type == IOMMU_RESV_DIRECT_RELAXABLE)
+> +			continue;
+> +
+> +		start = resv->start;
+> +		end = resv->start + resv->length - 1;
+> +
+> +		list_for_each_entry_safe(n, next, iova, list) {
+> +			int ret = 0;
+> +
+> +			/* No overlap */
+> +			if (start > n->end || end < n->start)
+> +				continue;
+> +			/*
+> +			 * Insert a new node if current node overlaps with the
+> +			 * reserve region to exlude that from valid iova range.
+> +			 * Note that, new node is inserted before the current
+> +			 * node and finally the current node is deleted keeping
+> +			 * the list updated and sorted.
+> +			 */
+> +			if (start > n->start)
+> +				ret = vfio_iommu_iova_insert(&n->list, n->start,
+> +							     start - 1);
+> +			if (!ret && end < n->end)
+> +				ret = vfio_iommu_iova_insert(&n->list, end + 1,
+> +							     n->end);
 > +			if (ret)
-> +				goto done;
+> +				return ret;
+> +
+> +			list_del(&n->list);
+> +			kfree(n);
 > +		}
 > +	}
 > +
-> +	node = list_first_entry(iova_copy, struct vfio_iova, list);
-> +	start = node->start;
-> +	node = list_last_entry(iova_copy, struct vfio_iova, list);
-> +	end = node->end;
+> +	if (list_empty(iova))
+> +		return -EINVAL;
 > +
-> +	/* purge the iova list and create new one */
-> +	vfio_iommu_iova_free(iova_copy);
-> +
-> +	ret = vfio_iommu_aper_resize(iova_copy, start, end);
-> +	if (ret)
-> +		goto done;
-> +
-> +	/* Exclude current reserved regions from iova ranges */
-> +	ret = vfio_iommu_resv_exclude(iova_copy, &resv_regions);
-> +done:
-> +	vfio_iommu_resv_free(&resv_regions);
-> +	return ret;
+> +	return 0;
 > +}
 > +
->  static void vfio_iommu_type1_detach_group(void *iommu_data,
->  					  struct iommu_group *iommu_group)
+> +static void vfio_iommu_resv_free(struct list_head *resv_regions)
+> +{
+> +	struct iommu_resv_region *n, *next;
+> +
+> +	list_for_each_entry_safe(n, next, resv_regions, list) {
+> +		list_del(&n->list);
+> +		kfree(n);
+> +	}
+> +}
+> +
+>  static void vfio_iommu_iova_free(struct list_head *iova)
 >  {
->  	struct vfio_iommu *iommu = iommu_data;
->  	struct vfio_domain *domain;
->  	struct vfio_group *group;
-> +	LIST_HEAD(iova_copy);
+>  	struct vfio_iova *n, *next;
+> @@ -1547,6 +1629,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	phys_addr_t resv_msi_base;
+>  	struct iommu_domain_geometry geo;
+>  	LIST_HEAD(iova_copy);
+> +	LIST_HEAD(group_resv_regions);
 >  
 >  	mutex_lock(&iommu->lock);
 >  
-> @@ -1895,6 +1976,13 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  		}
+> @@ -1632,6 +1715,15 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		goto out_detach;
 >  	}
 >  
-> +	/*
-> +	 * Get a copy of iova list. This will be used to update
-> +	 * and to replace the current one later. Please note that
-> +	 * we will leave the original list as it is if update fails.
-> +	 */
-> +	vfio_iommu_iova_get_copy(iommu, &iova_copy);
+> +	ret = iommu_get_group_resv_regions(iommu_group, &group_resv_regions);
+> +	if (ret)
+> +		goto out_detach;
 > +
->  	list_for_each_entry(domain, &iommu->domain_list, next) {
->  		group = find_iommu_group(domain, iommu_group);
->  		if (!group)
-> @@ -1920,10 +2008,16 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  			iommu_domain_free(domain->domain);
->  			list_del(&domain->next);
->  			kfree(domain);
-> +			vfio_iommu_aper_expand(iommu, &iova_copy);
->  		}
->  		break;
->  	}
+> +	if (vfio_iommu_resv_conflict(iommu, &group_resv_regions)) {
+> +		ret = -EINVAL;
+> +		goto out_detach;
+> +	}
+> +
+>  	/*
+>  	 * We don't want to work on the original iova list as the list
+>  	 * gets modified and in case of failure we have to retain the
+> @@ -1646,6 +1738,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	if (ret)
+>  		goto out_detach;
 >  
-> +	if (!vfio_iommu_resv_refresh(iommu, &iova_copy))
-> +		vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-> +	else
-> +		vfio_iommu_iova_free(&iova_copy);
+> +	ret = vfio_iommu_resv_exclude(&iova_copy, &group_resv_regions);
+> +	if (ret)
+> +		goto out_detach;
 > +
->  detach_group_done:
+>  	resv_msi = vfio_iommu_has_sw_msi(iommu_group, &resv_msi_base);
+>  
+>  	INIT_LIST_HEAD(&domain->group_list);
+> @@ -1706,6 +1802,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	/* Delete the old one and insert new iova list */
+>  	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
 >  	mutex_unlock(&iommu->lock);
->  }
+> +	vfio_iommu_resv_free(&group_resv_regions);
+>  
+>  	return 0;
+>  
+> @@ -1714,6 +1811,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  out_domain:
+>  	iommu_domain_free(domain->domain);
+>  	vfio_iommu_iova_free(&iova_copy);
+> +	vfio_iommu_resv_free(&group_resv_regions);
+>  out_free:
+>  	kfree(domain);
+>  	kfree(group);
 > 
