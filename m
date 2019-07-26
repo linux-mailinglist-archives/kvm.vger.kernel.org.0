@@ -2,88 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DDAE777056
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 19:34:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CB7377381
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 23:35:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387794AbfGZRel (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 13:34:41 -0400
-Received: from mail-io1-f42.google.com ([209.85.166.42]:40762 "EHLO
-        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387653AbfGZRel (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 13:34:41 -0400
-Received: by mail-io1-f42.google.com with SMTP id h6so19855266iom.7
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 10:34:41 -0700 (PDT)
+        id S2387459AbfGZVfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 17:35:44 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:40438 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726366AbfGZVfo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 17:35:44 -0400
+Received: by mail-lj1-f196.google.com with SMTP id m8so19203714lji.7
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 14:35:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=VM6QcyYtmoUIAEEgaIXBG1Y50lo7oqpYxWqPVuZTL/s=;
-        b=UlYOcPWlY1WKThR2wj1Iy0fYhf2mjYbhXFBuUDgvO05h/XPVOFYRk7OfuB0q4sT4b+
-         8HScZWyXhq0CisCvne+2mWdo3zwz1LKcimOPuPh7FbmckiAPTEg5kAxNj3OSl+NCXMhz
-         69pjuOmMUPcaLNT0VZf/i/J/f+IGxhKCalN3R8hDii2pGe6S9J9B80g1G1VxnFz60OWr
-         Od0dKTm+tyCOSdizOVNujeWqiM2ODh3TYsT/zlpA07MVYL1Pmq69A+el3Z9QzNW4CPA7
-         o/Z44u8Cj/tPuEOBTGFMA9Vr0zPR9CtI9Wri8twz8Zihr3GJPviU7yquHkW7qKeWttl/
-         PNzw==
+         :cc;
+        bh=cVmcZwFhu0VmRu42g2oqdHVRFxqVWleFTBghf3PdU0s=;
+        b=auPaSao4Pu92MrHcL8ri0lwhHW+MxKtMjV1DpxAsA7pVZXiYOWxWxhMCN+yWqE/ApM
+         N1RAQkb6zmoRJMBukop8ckoCwrxu+fdsXpdHaXZqjEngnR6ahHT+uJi/+bo3yEWp6UbC
+         NE3E48fT2I4XCRhysWOc0g0KiUbHZXwqDqq8Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VM6QcyYtmoUIAEEgaIXBG1Y50lo7oqpYxWqPVuZTL/s=;
-        b=H7zfghXaALnB56CNASpYS1GxVbm9v3LEsTtOT++pRFHiYx8X/0spgjrRjofBAZA0Hs
-         hdA9qrDzK6Sg91RKqR8f+jVUKSrI8X4xWyemq2U0NvAFWHVDHuO1nIiKrkEYMuGFz0bU
-         DauZErwR4MG49xk/HqV4dtyX/GMHb9XHKoSJ6SkIiQPLlrvYLs90d5hEMOcIMNDWcHQX
-         0CsrK6kzNVERV/xodaQ9YmVluB1iUrtfLp/yGQiQeLi0drYNU5mUqmb1UbXMqy/DMq4T
-         KOFvmnJtmJh9zFBJPLcNCdAp0+PNPAW4mXiOLyPG+DcUf4JAGvj/yCG1G1LZuITo0YN/
-         9cjg==
-X-Gm-Message-State: APjAAAXcSONU354MHZ6KRy8ltLFDWjiL3mMhKwnxzZFKiIRSdezP3vLC
-        5fJDCRtfWQJQ3NdZa+vPZj+ok0ZRvaqTzzQoqHhT99TIx0E=
-X-Google-Smtp-Source: APXvYqwiwWCKCBFe1bVrTLFie7EBzPHidQ85JUlt7Ai07XeVAqAluBYUS86aZ7d0XIBIlJ/Pd352rJW212f1GOzUsew=
-X-Received: by 2002:a6b:f80b:: with SMTP id o11mr80569544ioh.40.1564162480574;
- Fri, 26 Jul 2019 10:34:40 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=cVmcZwFhu0VmRu42g2oqdHVRFxqVWleFTBghf3PdU0s=;
+        b=oMpQhV35F9/RTGiSw+3CLk8d3lbXAXdvA1M6+oOM+4aYgoMpkkTHhUSL80JtOzEDOI
+         Y/aiscxJkiix5M3yJBFPlrHf++t+uirxV2A9h6P5pXbyUEMyfiZZDTlKYCByK9wTkf0K
+         nG2TMdcYRAyE1PsqSt815nmnS6vuLnbTDjSj1D7v4xCR+LQnY5Rjq+R02vuKNqK6f1gH
+         Bh1RDtrOSWsw5VTjIjST8C7HOy+GT4Kzyz595CJTPf89UcbBFjTn+OGaYoBsPF72De4V
+         R9GZf5mH4VHvAwQyqXn8R0F+jndeLfjspw8pEhslEncHOxHVdGl0/f1OtuFOrWES6jfV
+         grEA==
+X-Gm-Message-State: APjAAAVyRaERFd8pFZlKs48FStymKaM6M2KLV2PR1qHyyarCXZR/yF4x
+        ZHqoyIV+6whWR08rzeDycjk/wOdbivU=
+X-Google-Smtp-Source: APXvYqxSErCxiomzwfj9H7V2iZZ2E27JUXFfOk71pFyhHB4XG4LBJxiGtqNAIuqbmPBnTZBjMRJCXw==
+X-Received: by 2002:a2e:8847:: with SMTP id z7mr51283546ljj.51.1564176942284;
+        Fri, 26 Jul 2019 14:35:42 -0700 (PDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id f10sm8674760lfh.82.2019.07.26.14.35.41
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 26 Jul 2019 14:35:41 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id v18so52762716ljh.6
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 14:35:41 -0700 (PDT)
+X-Received: by 2002:a2e:b003:: with SMTP id y3mr51555432ljk.72.1564176941127;
+ Fri, 26 Jul 2019 14:35:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <CALMp9eSYQGy4ZEXtO92zr-NG5cvDdA4qK+PzqbzwFP3TU-=hGg@mail.gmail.com>
- <C3CF882E-C7B4-459B-A3A3-25C5E453C512@oracle.com>
-In-Reply-To: <C3CF882E-C7B4-459B-A3A3-25C5E453C512@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 26 Jul 2019 10:34:29 -0700
-Message-ID: <CALMp9eSbX8orxJkJ8f2aGX5DJ2FbB6nu60TeVz-0GuRpcQDwxQ@mail.gmail.com>
-Subject: Re: Intercepting MOV to/from CR3 when using EPT
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>
+References: <000000000000b4358f058e924c6d@google.com> <000000000000e87d14058e9728d7@google.com>
+In-Reply-To: <000000000000e87d14058e9728d7@google.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 26 Jul 2019 14:35:25 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whnM5+FBJuVoxXELvFgecuc0+vW7ibWy4Gc5qJbW8HL2Q@mail.gmail.com>
+Message-ID: <CAHk-=whnM5+FBJuVoxXELvFgecuc0+vW7ibWy4Gc5qJbW8HL2Q@mail.gmail.com>
+Subject: Re: INFO: rcu detected stall in vhost_worker
+To:     syzbot <syzbot+36e93b425cd6eb54fcc1@syzkaller.appspotmail.com>
+Cc:     Jason Wang <jasowang@redhat.com>, KVM list <kvm@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        michal.lkml@markovi.net, "Michael S. Tsirkin" <mst@redhat.com>,
+        Netdev <netdev@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        virtualization@lists.linux-foundation.org,
+        Masahiro Yamada <yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ah. That makes sense! I should have looked at the call stack.
+On Fri, Jul 26, 2019 at 8:26 AM syzbot
+<syzbot+36e93b425cd6eb54fcc1@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has bisected this bug to:
+>
+> commit 0ecfebd2b52404ae0c54a878c872bb93363ada36
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Sun Jul 7 22:41:56 2019 +0000
+>
+>      Linux 5.2
 
-Thanks!
+That seems very unlikely. That commit literally just changes the
+EXTRAVERSION part of the version string.
 
-On Fri, Jul 26, 2019 at 10:32 AM Liran Alon <liran.alon@oracle.com> wrote:
->
->
-> > On 26 Jul 2019, at 20:22, Jim Mattson <jmattson@google.com> wrote:
-> >
-> > When using EPT, why does kvm intercept MOV to/from CR3 when paging is
-> > disabled in the guest? It doesn't seem necessary to me, but perhaps I
-> > am missing something.
-> >
-> > I'm referring to this code in ept_update_paging_mode_cr0():
-> >
-> > exec_controls_setbit(vmx, CPU_BASED_CR3_LOAD_EXITING |
-> > CPU_BASED_CR3_STORE_EXITING);
-> >
-> > Thanks!
->
-> Note that ept_update_paging_mode_cr0() is called only in case (enable_ept=
- && !enable_unrestricted_guest).
-> Even though function name doesn=E2=80=99t imply this=E2=80=A6
->
-> When unrestricted-guest is not enabled, KVM runs a vCPU with paging disab=
-led, with paging enabled in VMCS and CR3 of ept_identity_map_addr.
-> See how it is initialised at init_rmode_identity_map().
->
-> -Liran
->
+So even if something actually depended on the version number, even
+that wouldn't have triggered any semantic change.
+
+              Linus
