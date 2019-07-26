@@ -2,134 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9176F7629D
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 11:50:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C4297631A
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 12:06:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726215AbfGZJiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 05:38:07 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:37221 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbfGZJiH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 05:38:07 -0400
-Received: by mail-io1-f72.google.com with SMTP id v3so58125401ios.4
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 02:38:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=QDNthF8eUHdqYI8kSSEW4zJ8AlkW+NY0ccSrbtgPmUo=;
-        b=C+uv4I/IYciEFZ6napzWjFp9lPDHv7uKmvb24wsMDSP7Sdq0hok35BcdFCCzLr9dyq
-         MIxvKes/nDyrGGwhvXiutq1ZBq4uPFnh6O17NZVsk0qm+5YDBM747fwxTH+j/fOgyQ/2
-         2+gG8JmSXE6XOq/DmbbsELmNSMTnPd7dmCZjGD2t1zNs66WCv7CLF683rmu28c5eyFnh
-         5e82GrGceBibO/npscad6eyQRXWjDa5NNix8/KfaawZ3z5/xWFg8KtydqhgzYxP0pkFE
-         c9rznSaX1P3GlBanqbq8UYxPmxh4vaGGdSDuchdFe4SJ0jDuK7PBlifQ61XCasvT0iNr
-         YnRQ==
-X-Gm-Message-State: APjAAAUu2C2DNUbEHTugaSld6DjgJGalzSbLyBcy+ouKQs/1RWCDmTUE
-        kO4ZHxaaFAqqau9MzPkh0iIuU/krPzHNRCSF7ouIPrMP+m37
-X-Google-Smtp-Source: APXvYqxZyRhoRRM4yZ/SXtXxqgJFOOdNBkxlozj1hSnyOWnQiwPMwSyUjqxsEA+FwP5IKOIsmu9huWtjTJ7T27mCGuM0yNwEzorL
+        id S1726248AbfGZKGX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 06:06:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45282 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725953AbfGZKGW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 06:06:22 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 23E8081134;
+        Fri, 26 Jul 2019 10:06:22 +0000 (UTC)
+Received: from localhost (dhcp-192-232.str.redhat.com [10.33.192.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A1339600C4;
+        Fri, 26 Jul 2019 10:06:21 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH RFC UNTESTED] vfio-ccw: indirect access to translated cps
+Date:   Fri, 26 Jul 2019 12:06:17 +0200
+Message-Id: <20190726100617.19718-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a02:8816:: with SMTP id r22mr22730032jai.60.1564133886797;
- Fri, 26 Jul 2019 02:38:06 -0700 (PDT)
-Date:   Fri, 26 Jul 2019 02:38:06 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b4358f058e924c6d@google.com>
-Subject: INFO: rcu detected stall in vhost_worker
-From:   syzbot <syzbot+36e93b425cd6eb54fcc1@syzkaller.appspotmail.com>
-To:     jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 26 Jul 2019 10:06:22 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+We're currently keeping a single area for translated channel
+programs in our private structure, which is filled out when
+we are translating a channel program we have been given by
+user space and marked invalid again when we received an final
+interrupt for that I/O.
 
-syzbot found the following crash on:
+Unfortunately, properly tracking the lifetime of that cp is
+not easy: failures may happen during translation or right when
+it is sent to the hardware, unsolicited interrupts may trigger
+a deferred condition code, a halt/clear request may be issued
+while the I/O is supposed to be running, or a reset request may
+come in from the side. The _PROCESSING state and the ->initialized
+flag help a bit, but not enough.
 
-HEAD commit:    13bf6d6a Add linux-next specific files for 20190725
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=141449f0600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8ae987d803395886
-dashboard link: https://syzkaller.appspot.com/bug?extid=36e93b425cd6eb54fcc1
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15112f3fa00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=131ab578600000
+We want to have a way to figure out whether we actually have a cp
+currently in progress, so we can update/free only when applicable.
+Points to keep in mind:
+- We will get an interrupt after a cp has been submitted iff ssch
+  finished with cc 0.
+- We will get more interrupts for a cp if the interrupt status is
+  not final.
+- We can have only one cp in flight at a time.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+36e93b425cd6eb54fcc1@syzkaller.appspotmail.com
+Let's decouple the actual area in the private structure from the
+means to access it: Only after we have successfully submitted a
+cp (ssch with cc 0), update the pointer in the private structure
+to point to the area used. Therefore, the interrupt handler won't
+access the cp if we don't actually expect an interrupt pertaining
+to it.
 
-rcu: INFO: rcu_preempt self-detected stall on CPU
-rcu: 	0-....: (10500 ticks this GP) idle=a56/1/0x4000000000000002  
-softirq=12266/12266 fqs=5250
-	(t=10502 jiffies g=14905 q=12)
-NMI backtrace for cpu 0
-CPU: 0 PID: 10848 Comm: vhost-10847 Not tainted 5.3.0-rc1-next-20190725 #52
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  <IRQ>
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  nmi_cpu_backtrace.cold+0x70/0xb2 lib/nmi_backtrace.c:101
-  nmi_trigger_cpumask_backtrace+0x23b/0x28b lib/nmi_backtrace.c:62
-  arch_trigger_cpumask_backtrace+0x14/0x20 arch/x86/kernel/apic/hw_nmi.c:38
-  trigger_single_cpu_backtrace include/linux/nmi.h:164 [inline]
-  rcu_dump_cpu_stacks+0x183/0x1cf kernel/rcu/tree_stall.h:254
-  print_cpu_stall kernel/rcu/tree_stall.h:455 [inline]
-  check_cpu_stall kernel/rcu/tree_stall.h:529 [inline]
-  rcu_pending kernel/rcu/tree.c:2736 [inline]
-  rcu_sched_clock_irq.cold+0x4dd/0xc13 kernel/rcu/tree.c:2183
-  update_process_times+0x32/0x80 kernel/time/timer.c:1639
-  tick_sched_handle+0xa2/0x190 kernel/time/tick-sched.c:167
-  tick_sched_timer+0x53/0x140 kernel/time/tick-sched.c:1296
-  __run_hrtimer kernel/time/hrtimer.c:1389 [inline]
-  __hrtimer_run_queues+0x364/0xe40 kernel/time/hrtimer.c:1451
-  hrtimer_interrupt+0x314/0x770 kernel/time/hrtimer.c:1509
-  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1068 [inline]
-  smp_apic_timer_interrupt+0x160/0x610 arch/x86/kernel/apic/apic.c:1093
-  apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:828
-  </IRQ>
-RIP: 0010:check_memory_region_inline mm/kasan/generic.c:173 [inline]
-RIP: 0010:check_memory_region+0x0/0x1a0 mm/kasan/generic.c:192
-Code: 66 2e 0f 1f 84 00 00 00 00 00 55 48 89 f2 be f8 00 00 00 48 89 e5 e8  
-df 60 90 05 5d c3 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 <48> 85 f6 0f 84  
-34 01 00 00 48 b8 ff ff ff ff ff 7f ff ff 55 0f b6
-RSP: 0018:ffff8880a40bf950 EFLAGS: 00000246 ORIG_RAX: ffffffffffffff13
-RAX: 0000000000000000 RBX: ffff8880836a8220 RCX: ffffffff81599777
-RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff8880836a8220
-RBP: ffff8880a40bf958 R08: 1ffff110106d5044 R09: ffffed10106d5045
-R10: ffffed10106d5044 R11: ffff8880836a8223 R12: 0000000000000001
-R13: 0000000000000003 R14: ffffed10106d5044 R15: 0000000000000001
-  atomic_read include/asm-generic/atomic-instrumented.h:26 [inline]
-  virt_spin_lock arch/x86/include/asm/qspinlock.h:83 [inline]
-  native_queued_spin_lock_slowpath+0xb7/0x9f0 kernel/locking/qspinlock.c:325
-  pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:642 [inline]
-  queued_spin_lock_slowpath arch/x86/include/asm/qspinlock.h:50 [inline]
-  queued_spin_lock include/asm-generic/qspinlock.h:81 [inline]
-  do_raw_spin_lock+0x20e/0x2e0 kernel/locking/spinlock_debug.c:113
-  __raw_spin_lock include/linux/spinlock_api_smp.h:143 [inline]
-  _raw_spin_lock+0x37/0x40 kernel/locking/spinlock.c:151
-  spin_lock include/linux/spinlock.h:338 [inline]
-  vhost_setup_uaddr drivers/vhost/vhost.c:790 [inline]
-  vhost_setup_vq_uaddr drivers/vhost/vhost.c:801 [inline]
-  vhost_vq_map_prefetch drivers/vhost/vhost.c:1783 [inline]
-  vq_meta_prefetch+0x2a0/0xcb0 drivers/vhost/vhost.c:1804
-  handle_rx+0x145/0x1890 drivers/vhost/net.c:1128
-  handle_rx_net+0x19/0x20 drivers/vhost/net.c:1270
-  vhost_worker+0x2af/0x4d0 drivers/vhost/vhost.c:473
-  kthread+0x361/0x430 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
 
+Just hacked this up to get some feedback, did not actually try it
+out. Not even sure if this is a sensible approach; if not, let's
+blame it on the heat and pretend it didn't happen :)
+
+I also thought about having *two* translation areas and switching
+the pointer between them; this might be too complicated, though?
 
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/s390/cio/vfio_ccw_drv.c     | 19 +++++++++++--------
+ drivers/s390/cio/vfio_ccw_fsm.c     | 25 +++++++++++++++++--------
+ drivers/s390/cio/vfio_ccw_ops.c     | 11 +++++++----
+ drivers/s390/cio/vfio_ccw_private.h |  6 ++++--
+ 4 files changed, 39 insertions(+), 22 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index 9208c0e56c33..059b88c94378 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -86,10 +86,13 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+ 
+ 	is_final = !(scsw_actl(&irb->scsw) &
+ 		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+-	if (scsw_is_solicited(&irb->scsw)) {
+-		cp_update_scsw(&private->cp, &irb->scsw);
+-		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
+-			cp_free(&private->cp);
++	if (scsw_is_solicited(&irb->scsw) && private->cp) {
++		cp_update_scsw(private->cp, &irb->scsw);
++		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING) {
++			struct channel_program *cp = private->cp;
++			private->cp = NULL;
++			cp_free(cp);
++		}
+ 	}
+ 	mutex_lock(&private->io_mutex);
+ 	memcpy(private->io_region->irb_area, irb, sizeof(*irb));
+@@ -129,9 +132,9 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 	if (!private)
+ 		return -ENOMEM;
+ 
+-	private->cp.guest_cp = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1),
++	private->cp_area.guest_cp = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1),
+ 				       GFP_KERNEL);
+-	if (!private->cp.guest_cp)
++	if (!private->cp_area.guest_cp)
+ 		goto out_free;
+ 
+ 	private->io_region = kmem_cache_zalloc(vfio_ccw_io_region,
+@@ -174,7 +177,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 		kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
+ 	if (private->io_region)
+ 		kmem_cache_free(vfio_ccw_io_region, private->io_region);
+-	kfree(private->cp.guest_cp);
++	kfree(private->cp_area.guest_cp);
+ 	kfree(private);
+ 	return ret;
+ }
+@@ -191,7 +194,7 @@ static int vfio_ccw_sch_remove(struct subchannel *sch)
+ 
+ 	kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
+ 	kmem_cache_free(vfio_ccw_io_region, private->io_region);
+-	kfree(private->cp.guest_cp);
++	kfree(private->cp_area.guest_cp);
+ 	kfree(private);
+ 
+ 	return 0;
+diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+index 49d9d3da0282..543d007ddc46 100644
+--- a/drivers/s390/cio/vfio_ccw_fsm.c
++++ b/drivers/s390/cio/vfio_ccw_fsm.c
+@@ -18,7 +18,8 @@
+ #define CREATE_TRACE_POINTS
+ #include "vfio_ccw_trace.h"
+ 
+-static int fsm_io_helper(struct vfio_ccw_private *private)
++static int fsm_io_helper(struct vfio_ccw_private *private,
++			 struct channel_program *cp)
+ {
+ 	struct subchannel *sch;
+ 	union orb *orb;
+@@ -31,7 +32,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+ 
+ 	spin_lock_irqsave(sch->lock, flags);
+ 
+-	orb = cp_get_orb(&private->cp, (u32)(addr_t)sch, sch->lpm);
++	orb = cp_get_orb(cp, (u32)(addr_t)sch, sch->lpm);
+ 	if (!orb) {
+ 		ret = -EIO;
+ 		goto out;
+@@ -47,6 +48,7 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
+ 		 */
+ 		sch->schib.scsw.cmd.actl |= SCSW_ACTL_START_PEND;
+ 		ret = 0;
++		private->cp = cp;
+ 		private->state = VFIO_CCW_STATE_CP_PENDING;
+ 		break;
+ 	case 1:		/* Status pending */
+@@ -236,31 +238,38 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+ 	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+ 		orb = (union orb *)io_region->orb_area;
+ 
++		/* I/O already in progress? Should not happen (bug in FSM?). */
++		if (private->cp) {
++			io_region->ret_code = -EBUSY;
++			errstr = "cp in progress";
++			goto err_out;
++		}
+ 		/* Don't try to build a cp if transport mode is specified. */
+ 		if (orb->tm.b) {
+ 			io_region->ret_code = -EOPNOTSUPP;
+ 			errstr = "transport mode";
+ 			goto err_out;
+ 		}
+-		io_region->ret_code = cp_init(&private->cp, mdev_dev(mdev),
+-					      orb);
++		io_region->ret_code = cp_init(&private->cp_area,
++					      mdev_dev(mdev), orb);
+ 		if (io_region->ret_code) {
+ 			errstr = "cp init";
+ 			goto err_out;
+ 		}
+ 
+-		io_region->ret_code = cp_prefetch(&private->cp);
++		io_region->ret_code = cp_prefetch(&private->cp_area);
+ 		if (io_region->ret_code) {
+ 			errstr = "cp prefetch";
+-			cp_free(&private->cp);
++			cp_free(&private->cp_area);
+ 			goto err_out;
+ 		}
+ 
+ 		/* Start channel program and wait for I/O interrupt. */
+-		io_region->ret_code = fsm_io_helper(private);
++		io_region->ret_code = fsm_io_helper(private,
++						    &private->cp_area);
+ 		if (io_region->ret_code) {
+ 			errstr = "cp fsm_io_helper";
+-			cp_free(&private->cp);
++			cp_free(&private->cp_area);
+ 			goto err_out;
+ 		}
+ 		return;
+diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+index 5eb61116ca6f..5ad6a7b672bd 100644
+--- a/drivers/s390/cio/vfio_ccw_ops.c
++++ b/drivers/s390/cio/vfio_ccw_ops.c
+@@ -58,13 +58,14 @@ static int vfio_ccw_mdev_notifier(struct notifier_block *nb,
+ 	if (action == VFIO_IOMMU_NOTIFY_DMA_UNMAP) {
+ 		struct vfio_iommu_type1_dma_unmap *unmap = data;
+ 
+-		if (!cp_iova_pinned(&private->cp, unmap->iova))
++		if (!cp_iova_pinned(&private->cp_area, unmap->iova))
+ 			return NOTIFY_OK;
+ 
+ 		if (vfio_ccw_mdev_reset(private->mdev))
+ 			return NOTIFY_BAD;
+ 
+-		cp_free(&private->cp);
++		private->cp = NULL;
++		cp_free(&private->cp_area);
+ 		return NOTIFY_OK;
+ 	}
+ 
+@@ -139,7 +140,8 @@ static int vfio_ccw_mdev_remove(struct mdev_device *mdev)
+ 		/* The state will be NOT_OPER on error. */
+ 	}
+ 
+-	cp_free(&private->cp);
++	private->cp = NULL;
++	cp_free(&private->cp_area);
+ 	private->mdev = NULL;
+ 	atomic_inc(&private->avail);
+ 
+@@ -180,7 +182,8 @@ static void vfio_ccw_mdev_release(struct mdev_device *mdev)
+ 		/* The state will be NOT_OPER on error. */
+ 	}
+ 
+-	cp_free(&private->cp);
++	private->cp = NULL;
++	cp_free(&private->cp_area);
+ 	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+ 				 &private->nb);
+ 
+diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
+index f1092c3dc1b1..e792a20202c3 100644
+--- a/drivers/s390/cio/vfio_ccw_private.h
++++ b/drivers/s390/cio/vfio_ccw_private.h
+@@ -68,7 +68,8 @@ int vfio_ccw_register_async_dev_regions(struct vfio_ccw_private *private);
+  * @region: additional regions for other subchannel operations
+  * @cmd_region: MMIO region for asynchronous I/O commands other than START
+  * @num_regions: number of additional regions
+- * @cp: channel program for the current I/O operation
++ * @cp_area: channel program memory area
++ * @cp: pointer to channel program for the current I/O operation
+  * @irb: irb info received from interrupt
+  * @scsw: scsw info
+  * @io_trigger: eventfd ctx for signaling userspace I/O results
+@@ -87,7 +88,8 @@ struct vfio_ccw_private {
+ 	struct ccw_cmd_region	*cmd_region;
+ 	int num_regions;
+ 
+-	struct channel_program	cp;
++	struct channel_program cp_area;
++	struct channel_program	*cp;
+ 	struct irb		irb;
+ 	union scsw		scsw;
+ 
+-- 
+2.20.1
+
