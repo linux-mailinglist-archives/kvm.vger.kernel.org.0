@@ -2,76 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B301975ADA
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 00:46:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A37AA75C79
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 03:24:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbfGYWqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Jul 2019 18:46:06 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40008 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725819AbfGYWqG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Jul 2019 18:46:06 -0400
-Received: by mail-io1-f68.google.com with SMTP id h6so14201101iom.7
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2019 15:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1Lxk0Ae7eDDKEWg9SwJtgC0ktt4wB85YsNwhNQopsQE=;
-        b=vn+If9uM7OK/c4BDp83YxyN8Hqm+Tju9v0u51Z/IQPMHlSCtaGPh5Q7X+e425wh/+E
-         LzPaMmqdsmNoA9vnzbl/axrZ91lKio/M//eQGwJjp8xTx6CJHGpKqd+p87GYAE1DAXJa
-         A2JX4fdLAApFH2Ycb20E/LxUli/6aYwPe6oYcFE+I3G8B4x+EQqwvVYabJ6QSrKnJ8LI
-         Wefkga0EaUOcI1Qm4ixTEj1v+dRWsQOSqY9qOBgr+EU9OxiRXWpP2PLzSJI+9NnjnhCN
-         vt+74ucixxSRr8D4oGhayuOOYzuRqsHccZmvP4PEML1DfvB+onpftSMxJWAg5N/Gs+v/
-         g3PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1Lxk0Ae7eDDKEWg9SwJtgC0ktt4wB85YsNwhNQopsQE=;
-        b=R0lUMxbnzNco/rbfJNr4neoTzhJ2tb/Q9y62QnUl8G45fPEgHfgjHJigcaZnmHZPvG
-         JZ40nFyPvjsdDIKkS8YyveOjqanSAyccXndlTr0Umzt2NpSU8428RMKAllxLAQRC+PI+
-         bFOWHLC5JwSZGMrRUwGZYpy8wknMnLsvd7AqrkiIfdIVQcFEjHSlqQ3WQhFq15s0D/L6
-         nO0HpecYtM+dwZ5DIlXo3ARFluzzUk4rowbC6RFvO4lPfrup2n1i3ykDMG8VPXIWQFH1
-         Q8hMVqzMpfxXDyWlVJXAIpL2a0FpUdWiqB0Wm5Et/uR3gj3SsYDtkmdc3G2jTOFdhCkb
-         0GKQ==
-X-Gm-Message-State: APjAAAXs3LyhLFJxtPHjaJbRdMiKI645SifQDXSoXX38K42H/YyU1Baq
-        7HiEji/luoxwREdY07pUgjvFfl4Ccg7nNNz+cp1WZw==
-X-Google-Smtp-Source: APXvYqyty0QNo+axJfjhDdYuiK/A/ZWfJww001uTTQdL+szCi8qIhWSK/XO2ZKlcUqCvUT19NUF+enS+CvYkAcqMzbw=
-X-Received: by 2002:a02:9004:: with SMTP id w4mr69525400jaf.111.1564094764872;
- Thu, 25 Jul 2019 15:46:04 -0700 (PDT)
+        id S1725878AbfGZBYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Jul 2019 21:24:18 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:12796 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725808AbfGZBYS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Jul 2019 21:24:18 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d3a563e0000>; Thu, 25 Jul 2019 18:24:14 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 25 Jul 2019 18:24:17 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 25 Jul 2019 18:24:17 -0700
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 26 Jul
+ 2019 01:24:16 +0000
+Subject: Re: [PATCH 00/12] block/bio, fs: convert put_page() to
+ put_user_page*()
+To:     Bob Liu <bob.liu@oracle.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <ceph-devel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <samba-technical@lists.samba.org>,
+        <v9fs-developer@lists.sourceforge.net>,
+        <virtualization@lists.linux-foundation.org>
+References: <20190724042518.14363-1-jhubbard@nvidia.com>
+ <8621066c-e242-c449-eb04-4f2ce6867140@oracle.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <88864b91-516d-9774-f4ca-b45927ac4556@nvidia.com>
+Date:   Thu, 25 Jul 2019 18:24:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190703235437.13429-1-krish.sadhukhan@oracle.com>
- <20190703235437.13429-3-krish.sadhukhan@oracle.com> <20190724161247.GB25376@linux.intel.com>
- <d157a449-c31d-a7e1-b855-60541aad8501@oracle.com>
-In-Reply-To: <d157a449-c31d-a7e1-b855-60541aad8501@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 25 Jul 2019 15:45:53 -0700
-Message-ID: <CALMp9eQFcYujT9di_qrqmwzMy8sXXY0bJqO+pdiMSd1qQtFNsw@mail.gmail.com>
-Subject: Re: [PATCH 2/2 v2]kvm-unit-test: nVMX: Test Host Segment Registers
- and Descriptor Tables on vmentry of nested guests
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <8621066c-e242-c449-eb04-4f2ce6867140@oracle.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1564104254; bh=QKXKINFukbwLIIsnFYM0gxF2tKYcHndEGgwougXKa7I=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=PQnzJX5xz5ikEiwrLKM8WsALivZ88h6rrpD5As08defMJIkdP+u4c4qNjj9VJ4tt7
+         nwv4lirmE3zmhFpqjjtQZ51fomZqIx7+Z5K/hIMgtkne3B/lAraavguLY6SA4HXRUi
+         W4SUZZlps8N4rFxPowCNQkldeoVK/fBECjRShYxjtzJx8yvDnyDgvLG3XjCMQgN0HE
+         j0RlPZtSamPdX7GpRyHeIVO0klar+OAGzPGoJx+oiz7wZ/GbisDHnJkR/hoyBrvfQa
+         +HuyKaWvKrWvHxopvgEQcRa8uv0hWn0N0u4M8vDDfrnuUHyPlJZxMytFt1GB3uPYBU
+         1cdZ+M2GXGeqw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 3:32 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
-> As an aside,  I am curious to know why the hardware threw "invalid
-> VMX-control" error on bare-metal.  My idea was that since the hardware
-> checks VMX controls before Host State and since bit# 9 in VMX
-> Exit-control is unset, we are seeing "invalid VMX-control" error instead
-> of "invalid Host State" error.
+On 7/24/19 5:41 PM, Bob Liu wrote:
+> On 7/24/19 12:25 PM, john.hubbard@gmail.com wrote:
+>> From: John Hubbard <jhubbard@nvidia.com>
+>>
+>> Hi,
+>>
+>> This is mostly Jerome's work, converting the block/bio and related areas
+>> to call put_user_page*() instead of put_page(). Because I've changed
+>> Jerome's patches, in some cases significantly, I'd like to get his
+>> feedback before we actually leave him listed as the author (he might
+>> want to disown some or all of these).
+>>
+> 
+> Could you add some background to the commit log for people don't have the context..
+> Why this converting? What's the main differences?
+> 
 
-See the SDM, volume 3, 26.2 CHECKS ON VMX CONTROLS AND HOST-STATE AREA:
+Hi Bob,
 
-These checks may be performed in any order. Thus, an indication by
-error number of one cause (for example, host state) does not imply
-that there are not also other errors.
+1. Many of the patches have a blurb like this:
+
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page().
+
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
+
+...and if you look at that commit, you'll find several pages of
+information in its commit description, which should address your point.
+
+2. This whole series has to be re-worked, as per the other feedback thread.
+So I'll keep your comment in mind when I post a new series.
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
