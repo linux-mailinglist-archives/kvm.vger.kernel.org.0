@@ -2,88 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CB7377381
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 23:35:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD25A773DC
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2019 00:10:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387459AbfGZVfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 17:35:44 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:40438 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726366AbfGZVfo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 17:35:44 -0400
-Received: by mail-lj1-f196.google.com with SMTP id m8so19203714lji.7
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 14:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cVmcZwFhu0VmRu42g2oqdHVRFxqVWleFTBghf3PdU0s=;
-        b=auPaSao4Pu92MrHcL8ri0lwhHW+MxKtMjV1DpxAsA7pVZXiYOWxWxhMCN+yWqE/ApM
-         N1RAQkb6zmoRJMBukop8ckoCwrxu+fdsXpdHaXZqjEngnR6ahHT+uJi/+bo3yEWp6UbC
-         NE3E48fT2I4XCRhysWOc0g0KiUbHZXwqDqq8Y=
+        id S1728290AbfGZWKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 18:10:35 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42173 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726767AbfGZWKf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 18:10:35 -0400
+Received: by mail-wr1-f65.google.com with SMTP id x1so5924602wrr.9
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 15:10:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cVmcZwFhu0VmRu42g2oqdHVRFxqVWleFTBghf3PdU0s=;
-        b=oMpQhV35F9/RTGiSw+3CLk8d3lbXAXdvA1M6+oOM+4aYgoMpkkTHhUSL80JtOzEDOI
-         Y/aiscxJkiix5M3yJBFPlrHf++t+uirxV2A9h6P5pXbyUEMyfiZZDTlKYCByK9wTkf0K
-         nG2TMdcYRAyE1PsqSt815nmnS6vuLnbTDjSj1D7v4xCR+LQnY5Rjq+R02vuKNqK6f1gH
-         Bh1RDtrOSWsw5VTjIjST8C7HOy+GT4Kzyz595CJTPf89UcbBFjTn+OGaYoBsPF72De4V
-         R9GZf5mH4VHvAwQyqXn8R0F+jndeLfjspw8pEhslEncHOxHVdGl0/f1OtuFOrWES6jfV
-         grEA==
-X-Gm-Message-State: APjAAAVyRaERFd8pFZlKs48FStymKaM6M2KLV2PR1qHyyarCXZR/yF4x
-        ZHqoyIV+6whWR08rzeDycjk/wOdbivU=
-X-Google-Smtp-Source: APXvYqxSErCxiomzwfj9H7V2iZZ2E27JUXFfOk71pFyhHB4XG4LBJxiGtqNAIuqbmPBnTZBjMRJCXw==
-X-Received: by 2002:a2e:8847:: with SMTP id z7mr51283546ljj.51.1564176942284;
-        Fri, 26 Jul 2019 14:35:42 -0700 (PDT)
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
-        by smtp.gmail.com with ESMTPSA id f10sm8674760lfh.82.2019.07.26.14.35.41
-        for <kvm@vger.kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3uH6wRDL6m6XJhTTMaf9vseYu7YZD/ywsLcXQB/jjqU=;
+        b=Iz/0Xl6AbdQzLG8xIuGbnoNigiz7qTCti35OwWVm9QLzY4lyAjLEyNHo9hEQvMblBV
+         bPTIujCkECgFWv7VK6xlXsovNI+gxANdupzBjLV6TbDGhHzGUqi4RqBB/TtbDmVzulIu
+         9YUSXkc0NtvvUrZTMY6bbYmTkMK+2vQXBQ582GGHgCCVrRVwEfGwZB6n22bxfDLNQv3e
+         42B/8B5p0qnD2CRAe3v5yqZkgIrd8h+Yu5RXHPgzPKaTtX7PkfIMq/jFuCa960QrZzZH
+         ngst+EtTnib3TQTnGzvdpRBcsvUgUHhTeu6yfMQDuq1BW+8RDW6ahCFw8/tEen6jb46k
+         q0tA==
+X-Gm-Message-State: APjAAAWbad+T18rOSixGs4jg0KTj8cYjqrqBfGLPeveQgeQoO2xzL/H5
+        RHOFxXDvXLreA0ZDkY9Ian0r7g==
+X-Google-Smtp-Source: APXvYqzcff0a62xyZ1uFR2gsycPFMbRcnCLACAl1fTNDob/Jl6sm3/hEJ5mjpbBEtl+zmxqlsSDf9A==
+X-Received: by 2002:a5d:568e:: with SMTP id f14mr22603718wrv.167.1564179033572;
+        Fri, 26 Jul 2019 15:10:33 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9036:7130:d6ec:a346? ([2001:b07:6468:f312:9036:7130:d6ec:a346])
+        by smtp.gmail.com with ESMTPSA id k9sm37976888wmi.33.2019.07.26.15.10.32
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Jul 2019 14:35:41 -0700 (PDT)
-Received: by mail-lj1-f170.google.com with SMTP id v18so52762716ljh.6
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 14:35:41 -0700 (PDT)
-X-Received: by 2002:a2e:b003:: with SMTP id y3mr51555432ljk.72.1564176941127;
- Fri, 26 Jul 2019 14:35:41 -0700 (PDT)
+        Fri, 26 Jul 2019 15:10:33 -0700 (PDT)
+Subject: Re: [PATCH] Documentation: move Documentation/virtual to
+ Documentation/virt
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     Christoph Hellwig <hch@lst.de>, rkrcmar@redhat.com,
+        jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20190724072449.19599-1-hch@lst.de>
+ <b9baabbb-9e9b-47cf-f5a8-ea42ba1ddc25@redhat.com>
+ <20190724120005.31a990af@lwn.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <be4ba4a7-a21b-8c56-4517-8886a754ff55@redhat.com>
+Date:   Sat, 27 Jul 2019 00:10:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <000000000000b4358f058e924c6d@google.com> <000000000000e87d14058e9728d7@google.com>
-In-Reply-To: <000000000000e87d14058e9728d7@google.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 26 Jul 2019 14:35:25 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whnM5+FBJuVoxXELvFgecuc0+vW7ibWy4Gc5qJbW8HL2Q@mail.gmail.com>
-Message-ID: <CAHk-=whnM5+FBJuVoxXELvFgecuc0+vW7ibWy4Gc5qJbW8HL2Q@mail.gmail.com>
-Subject: Re: INFO: rcu detected stall in vhost_worker
-To:     syzbot <syzbot+36e93b425cd6eb54fcc1@syzkaller.appspotmail.com>
-Cc:     Jason Wang <jasowang@redhat.com>, KVM list <kvm@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        michal.lkml@markovi.net, "Michael S. Tsirkin" <mst@redhat.com>,
-        Netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        virtualization@lists.linux-foundation.org,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190724120005.31a990af@lwn.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 26, 2019 at 8:26 AM syzbot
-<syzbot+36e93b425cd6eb54fcc1@syzkaller.appspotmail.com> wrote:
->
-> syzbot has bisected this bug to:
->
-> commit 0ecfebd2b52404ae0c54a878c872bb93363ada36
-> Author: Linus Torvalds <torvalds@linux-foundation.org>
-> Date:   Sun Jul 7 22:41:56 2019 +0000
->
->      Linux 5.2
+On 24/07/19 20:00, Jonathan Corbet wrote:
+>  - kvm/api.txt pretty clearly belongs in the userspace-api book, rather
+>    than tossed in with:
+> 
+>  - kvm/review-checklist.txt, which belongs in the subsystem guide, if only
+>    we'd gotten around to creating it yet, or
+> 
+>  - kvm/mmu.txt, which is information for kernel developers, or
+> 
+>  - uml/UserModeLinux-HOWTO.txt, which belongs in the admin guide.
+> 
+> I suspect that organization is going to be one of the main issues to talk
+> about in Lisbon.  Meanwhile, I hope that this rename won't preclude
+> organizational work in the future.
 
-That seems very unlikely. That commit literally just changes the
-EXTRAVERSION part of the version string.
+Absolutely not, this rename was just about a badly-named directory.  I
+totally agree with the above reorganization.  Does the userspace API
+cover only syscall or perhaps sysfs interfaces?   There are more API
+files (amd-memory-encryption.txt, cpuid.txt, halt-polling.txt msr.txt,
+ppc-pv.txt, s390-diag.txt) but, with the exception of
+amd-memory-encryption.txt and halt-polling.txt, they cover the
+emulated-hardware interfaces that KVM provides to virtual machines.
 
-So even if something actually depended on the version number, even
-that wouldn't have triggered any semantic change.
-
-              Linus
+Paolo
