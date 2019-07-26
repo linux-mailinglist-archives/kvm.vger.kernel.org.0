@@ -2,165 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 37E57768B7
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A2C2768EB
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388652AbfGZNqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 09:46:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55544 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388647AbfGZNqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:46:09 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9C0A422CF8;
-        Fri, 26 Jul 2019 13:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148768;
-        bh=VP5Xc+mcNUjTtiLWHYus4hbqwajzv9y+NnGgO4hQQU4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uKWkM7+f7ZSKStUhf91bzXqWWFSx8oMYYMG1Pa6XmSGe+/R1005zzY5xcrcCUpYiL
-         9hzEQduSu8n2OzDIWItuWigwaoW208T4sTZ4Srt2mKwqwuxkCzR8fewahBx8ASAVJP
-         WTBwHXNPzN65BGf/AEMJY90+1R3YaKeBXi2YzJLg=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 23/23] x86/kvm: Don't call kvm_spurious_fault() from .fixup
-Date:   Fri, 26 Jul 2019 09:45:22 -0400
-Message-Id: <20190726134522.13308-23-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190726134522.13308-1-sashal@kernel.org>
-References: <20190726134522.13308-1-sashal@kernel.org>
+        id S2388415AbfGZNsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 09:48:05 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:46059 "EHLO
+        wout1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388036AbfGZNsE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Jul 2019 09:48:04 -0400
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailout.west.internal (Postfix) with ESMTP id 9DA8E5B5;
+        Fri, 26 Jul 2019 09:48:03 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Fri, 26 Jul 2019 09:48:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm1; bh=EwBpIkjhCHtc6Po0QEhUGVxUPV9
+        vvyQZliRF9TyzIsw=; b=TuZpe1Nk0q/BOxdUgTXVqKmed6/8769jGxywKgLJ7Ok
+        aKoIHR7vG+pP09vplXewjZXdn44bfCuodsSZm7w+BB6xkHJsxijVQDxWbIFZguNd
+        WUAMuIadKIae+ziCON8pz4Kw34mcIUQCjgReYu5OGcGmz2oO9G5X/w8s3oTkWXbL
+        brufs+Qtr7/v0JU6u7EQKZcgWujewbF/y/vcSlsWtsTg4E7EPKvfr3QcbYU5YYVC
+        RFBKDn2tPzO/6LQzHt1mdGH0Yl0ViNyTy9wASG9CcvOF0v9tfOo/vd4rxGUaO2iF
+        n9WMU77YbyDPDdBKan1UcJ3+klT4gDG+xaixVaYDzkw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=EwBpIk
+        jhCHtc6Po0QEhUGVxUPV9vvyQZliRF9TyzIsw=; b=pSlIkRnRajFAAKrhMWR0nF
+        ciGnPNIcILZ/TwwalAjPGFPxCget17THr/UOL2MvXxPkf09ovVO/rtjaU75ZB3/D
+        W/w++jTgRZdCmk4iMLmY1s4LOHfMfGm1Q677Pt+Zj8HLw2bHgjlHKGTUg6KVgnxl
+        //vhKI8qE3dCEZMpI+cqB3iIsBjCUWlMnQRX+C63tzZFPqAvC0B17ALmEoVDKqK5
+        lE3kwD1Zs2WA4jaVVFX2wErQTNFYstng3breWrR293AkIsLwD9YxPdSBiOCiJLdd
+        wNnfLb0FbLa7GPREuTh60Om4QBEQGMImlyaGNR6kkp4gLr8MzQcPoV+MWn9q6tXA
+        ==
+X-ME-Sender: <xms:kgQ7XUzzqfCSn_myxjMq4PC-VB9hFVqwZEkMYNjjWQQ3dfWEtz6pkQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduvddrkeeggdeilecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkfhggtggujggfsehttdertddtredvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucfkphepkeefrdekiedrkeelrddutd
+    ejnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomhenucev
+    lhhushhtvghrufhiiigvpedt
+X-ME-Proxy: <xmx:kgQ7XbozBuhl0-RHB9XXsPFLlKVCqQkfG9THTamB2ZQ15-8tOORpyA>
+    <xmx:kgQ7XRk1nIlbiZe0Sq-KrILzoq9b-dFwSrPD_HJUR5BRRZGLMMjnQg>
+    <xmx:kgQ7XUCB_8YJ6eOFctKG6ApUxSt8QH57q3JiJIqsDFY8fBDb3jgHbg>
+    <xmx:kwQ7XW3d_regz52ZsMOFHmxRgATolIEq4VYi6RqKmBux6kfh_gBBbQ>
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 7A03C380086;
+        Fri, 26 Jul 2019 09:48:02 -0400 (EDT)
+Date:   Fri, 26 Jul 2019 15:48:00 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     stable@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH stable-4.19 0/2] KVM: nVMX: guest reset fixes
+Message-ID: <20190726134800.GA23085@kroah.com>
+References: <20190725104645.30642-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190725104645.30642-1-vkuznets@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Josh Poimboeuf <jpoimboe@redhat.com>
+On Thu, Jul 25, 2019 at 12:46:43PM +0200, Vitaly Kuznetsov wrote:
+> Few patches were recently marked for stable@ but commits are not
+> backportable as-is and require a few tweaks. Here is 4.19 stable backport.
+> 
+> Jan Kiszka (1):
+>   KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
+> 
+> Paolo Bonzini (1):
+>   KVM: nVMX: do not use dangling shadow VMCS after guest reset
+> 
+>  arch/x86/kvm/vmx.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 
-[ Upstream commit 3901336ed9887b075531bffaeef7742ba614058b ]
+All now applied, thanks!
 
-After making a change to improve objtool's sibling call detection, it
-started showing the following warning:
-
-  arch/x86/kvm/vmx/nested.o: warning: objtool: .fixup+0x15: sibling call from callable instruction with modified stack frame
-
-The problem is the ____kvm_handle_fault_on_reboot() macro.  It does a
-fake call by pushing a fake RIP and doing a jump.  That tricks the
-unwinder into printing the function which triggered the exception,
-rather than the .fixup code.
-
-Instead of the hack to make it look like the original function made the
-call, just change the macro so that the original function actually does
-make the call.  This allows removal of the hack, and also makes objtool
-happy.
-
-I triggered a vmx instruction exception and verified that the stack
-trace is still sane:
-
-  kernel BUG at arch/x86/kvm/x86.c:358!
-  invalid opcode: 0000 [#1] SMP PTI
-  CPU: 28 PID: 4096 Comm: qemu-kvm Not tainted 5.2.0+ #16
-  Hardware name: Lenovo THINKSYSTEM SD530 -[7X2106Z000]-/-[7X2106Z000]-, BIOS -[TEE113Z-1.00]- 07/17/2017
-  RIP: 0010:kvm_spurious_fault+0x5/0x10
-  Code: 00 00 00 00 00 8b 44 24 10 89 d2 45 89 c9 48 89 44 24 10 8b 44 24 08 48 89 44 24 08 e9 d4 40 22 00 0f 1f 40 00 0f 1f 44 00 00 <0f> 0b 66 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 41 55 49 89 fd 41
-  RSP: 0018:ffffbf91c683bd00 EFLAGS: 00010246
-  RAX: 000061f040000000 RBX: ffff9e159c77bba0 RCX: ffff9e15a5c87000
-  RDX: 0000000665c87000 RSI: ffff9e15a5c87000 RDI: ffff9e159c77bba0
-  RBP: 0000000000000000 R08: 0000000000000000 R09: ffff9e15a5c87000
-  R10: 0000000000000000 R11: fffff8f2d99721c0 R12: ffff9e159c77bba0
-  R13: ffffbf91c671d960 R14: ffff9e159c778000 R15: 0000000000000000
-  FS:  00007fa341cbe700(0000) GS:ffff9e15b7400000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00007fdd38356804 CR3: 00000006759de003 CR4: 00000000007606e0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  PKRU: 55555554
-  Call Trace:
-   loaded_vmcs_init+0x4f/0xe0
-   alloc_loaded_vmcs+0x38/0xd0
-   vmx_create_vcpu+0xf7/0x600
-   kvm_vm_ioctl+0x5e9/0x980
-   ? __switch_to_asm+0x40/0x70
-   ? __switch_to_asm+0x34/0x70
-   ? __switch_to_asm+0x40/0x70
-   ? __switch_to_asm+0x34/0x70
-   ? free_one_page+0x13f/0x4e0
-   do_vfs_ioctl+0xa4/0x630
-   ksys_ioctl+0x60/0x90
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x55/0x1c0
-   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-  RIP: 0033:0x7fa349b1ee5b
-
-Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Link: https://lkml.kernel.org/r/64a9b64d127e87b6920a97afde8e96ea76f6524e.1563413318.git.jpoimboe@redhat.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/include/asm/kvm_host.h | 34 ++++++++++++++++++---------------
- 1 file changed, 19 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2cb49ac1b2b2..39f202462029 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1184,25 +1184,29 @@ enum {
- #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
- #define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
- 
-+asmlinkage void __noreturn kvm_spurious_fault(void);
-+
- /*
-  * Hardware virtualization extension instructions may fault if a
-  * reboot turns off virtualization while processes are running.
-- * Trap the fault and ignore the instruction if that happens.
-+ * Usually after catching the fault we just panic; during reboot
-+ * instead the instruction is ignored.
-  */
--asmlinkage void kvm_spurious_fault(void);
--
--#define ____kvm_handle_fault_on_reboot(insn, cleanup_insn)	\
--	"666: " insn "\n\t" \
--	"668: \n\t"                           \
--	".pushsection .fixup, \"ax\" \n" \
--	"667: \n\t" \
--	cleanup_insn "\n\t"		      \
--	"cmpb $0, kvm_rebooting \n\t"	      \
--	"jne 668b \n\t"      		      \
--	__ASM_SIZE(push) " $666b \n\t"	      \
--	"jmp kvm_spurious_fault \n\t"	      \
--	".popsection \n\t" \
--	_ASM_EXTABLE(666b, 667b)
-+#define ____kvm_handle_fault_on_reboot(insn, cleanup_insn)		\
-+	"666: \n\t"							\
-+	insn "\n\t"							\
-+	"jmp	668f \n\t"						\
-+	"667: \n\t"							\
-+	"call	kvm_spurious_fault \n\t"				\
-+	"668: \n\t"							\
-+	".pushsection .fixup, \"ax\" \n\t"				\
-+	"700: \n\t"							\
-+	cleanup_insn "\n\t"						\
-+	"cmpb	$0, kvm_rebooting\n\t"					\
-+	"je	667b \n\t"						\
-+	"jmp	668b \n\t"						\
-+	".popsection \n\t"						\
-+	_ASM_EXTABLE(666b, 700b)
- 
- #define __kvm_handle_fault_on_reboot(insn)		\
- 	____kvm_handle_fault_on_reboot(insn, "")
--- 
-2.20.1
-
+greg k-h
