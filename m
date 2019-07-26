@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 105E3768E9
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:48:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37E57768B7
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:46:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388538AbfGZNpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 09:45:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54174 "EHLO mail.kernel.org"
+        id S2388652AbfGZNqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 09:46:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55544 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388531AbfGZNpT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:45:19 -0400
+        id S2388647AbfGZNqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:46:09 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B482122CD8;
-        Fri, 26 Jul 2019 13:45:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9C0A422CF8;
+        Fri, 26 Jul 2019 13:46:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148718;
-        bh=5FX+wq9W2/yXLvQvozoVGSUl6g+1aCWYapttN7WDd7U=;
+        s=default; t=1564148768;
+        bh=VP5Xc+mcNUjTtiLWHYus4hbqwajzv9y+NnGgO4hQQU4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=X1KVydY7RcTONPGInkY7qNqUu1seiMv4g0ULmY6CWPj/BEzH198C4JVvuKUhnvIhv
-         XoW6NSLBWjcovSkmYKTE6RJ3aHPu4SU+7iCCPvfVqJubglTArYstvYuU8ci0pBHLsE
-         r4zvaGAxnZRTNPUcq734NNOzpOnzmlmVzDA3Pwi0=
+        b=uKWkM7+f7ZSKStUhf91bzXqWWFSx8oMYYMG1Pa6XmSGe+/R1005zzY5xcrcCUpYiL
+         9hzEQduSu8n2OzDIWItuWigwaoW208T4sTZ4Srt2mKwqwuxkCzR8fewahBx8ASAVJP
+         WTBwHXNPzN65BGf/AEMJY90+1R3YaKeBXi2YzJLg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
@@ -30,12 +30,12 @@ Cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 29/30] x86/kvm: Don't call kvm_spurious_fault() from .fixup
-Date:   Fri, 26 Jul 2019 09:44:31 -0400
-Message-Id: <20190726134432.12993-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 23/23] x86/kvm: Don't call kvm_spurious_fault() from .fixup
+Date:   Fri, 26 Jul 2019 09:45:22 -0400
+Message-Id: <20190726134522.13308-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190726134432.12993-1-sashal@kernel.org>
-References: <20190726134432.12993-1-sashal@kernel.org>
+In-Reply-To: <20190726134522.13308-1-sashal@kernel.org>
+References: <20190726134522.13308-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -113,10 +113,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 19 insertions(+), 15 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 83b5b2990b49..222cb69e1219 100644
+index 2cb49ac1b2b2..39f202462029 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1309,25 +1309,29 @@ enum {
+@@ -1184,25 +1184,29 @@ enum {
  #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
  #define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
  
