@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DDA9769C3
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:54:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC4FC76959
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:51:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388056AbfGZNmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 09:42:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50168 "EHLO mail.kernel.org"
+        id S1727507AbfGZNvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 09:51:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51868 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388047AbfGZNmt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:42:49 -0400
+        id S1727794AbfGZNnz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:43:55 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3D88022CBF;
-        Fri, 26 Jul 2019 13:42:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 51DF022CC2;
+        Fri, 26 Jul 2019 13:43:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564148569;
-        bh=xcrPwqvyu0V0LBKurqlo82+0cYsgFDQ2imAbyZfWuw4=;
+        s=default; t=1564148635;
+        bh=0Gb08muBv98DTLQL3LipRqh0c9UU8aTqxL/YMxmBZU4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=I45MlmzvuS/OTGHy2Glg2oyMXykjiqtIN8s2Md0kix+L2OzrkuobjqrCgPLtnqxak
-         S6Qte4rwe/hdcloO5XS+nUQ2GHaEOhDb7TlhoP0HmzUALSv7C2WoCQ3EBoc8Ky8YgC
-         mjiXq+y2a6oKswJAb0ppCwfqLo6HV538wiYn8ELA=
+        b=avuMpCqEF/kn+lup9gOBnajumscWAIxICekM8dkdXGuZzBpqAlaEpAw8kQEL+j5KF
+         Uyig6ZVjx1PC9J/LH1ePgMu6ydjfwR5dhJa0QicLlJgv/2uQUjr18SqkADfhDbr5IL
+         zuoQ8FMSt6xJhoRMTSniaoKukM0nLg+VV13J3Dbo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Arnd Bergmann <arnd@arndb.de>, Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 4.19 24/47] x86: kvm: avoid constant-conversion warning
-Date:   Fri, 26 Jul 2019 09:41:47 -0400
-Message-Id: <20190726134210.12156-24-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 17/37] x86: kvm: avoid constant-conversion warning
+Date:   Fri, 26 Jul 2019 09:43:12 -0400
+Message-Id: <20190726134332.12626-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190726134210.12156-1-sashal@kernel.org>
-References: <20190726134210.12156-1-sashal@kernel.org>
+In-Reply-To: <20190726134332.12626-1-sashal@kernel.org>
+References: <20190726134332.12626-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -72,10 +72,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index e0f982e35c96..cdc0c460950f 100644
+index f97b533bc6e6..87a0601b1c20 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -4532,11 +4532,11 @@ static void update_permission_bitmask(struct kvm_vcpu *vcpu,
+@@ -4313,11 +4313,11 @@ static void update_permission_bitmask(struct kvm_vcpu *vcpu,
  		 */
  
  		/* Faults from writes to non-writable pages */
