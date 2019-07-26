@@ -2,88 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90B5A7692F
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:50:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C261176999
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2019 15:53:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388814AbfGZNtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Jul 2019 09:49:49 -0400
-Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:47311 "EHLO
-        wout1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388765AbfGZNts (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Jul 2019 09:49:48 -0400
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailout.west.internal (Postfix) with ESMTP id F00E15C9;
-        Fri, 26 Jul 2019 09:49:46 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Fri, 26 Jul 2019 09:49:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=motsW62/zDKPXGCLrT7MqZ29ytZ
-        w59P9Qz8xs3ekSRg=; b=aVDDRB+zax/ku7QQ5cjTDGVh7dRXVJO7keafLqzQQNk
-        1X4raI1/HMUuJt14w6nbNtAIHmLyrnWLIaQPCVK5e+JwrI2bif6EJl/bSvxKDxRd
-        tyYX/JxBvH3QiwVsLaz2fahvQDexwQ4r8X8mx9Tt3p64g5U2YdYx8SphmLqxYAON
-        1E89TqiIjDZHbJxGDskIfpVhesxstcY8sKShZLfwCYpeLXexAeqBuymf/uw6AreC
-        MiI6ieTnqI4P8h9d9l/jNxG/YvpAbINFe92mP01bvrexIIvMdJU3vCi6Iwcpv/eq
-        GTcfxeoZl/qg/tBwEx8VuSmRSKJxVQsos0j3xkV8BqQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=motsW6
-        2/zDKPXGCLrT7MqZ29ytZw59P9Qz8xs3ekSRg=; b=yiu5fdhUcPkBy7xm4u7X8C
-        UMQ6OLqoMfAIOfGvPx4M5LHpNW7A74j4Te/PK479oa4eUI39ZzU27wczzWCs8oBC
-        arIYaDxbFOqTBdmLImD7jRL9xp9s0ShU2uAmGapevAXoQgtazYbI9nZ1mpRm/gxf
-        bTiibrzKM/uWMc1TdFpgMoYMACFPGQSJWGMOvibKDMUvBvXnre/mTsuwUE3bTuz4
-        2pK7ez9WGoSvcMHwctuZM1K9aDaX74NqmswTJnNHbye3rJ7o0v9xKBL4KNKqUTj3
-        SQzojnWYiGPQ/sGuxaviq198wDlNtgPPNGFhTp9QDfXY9gNHqDRp+otbYqudHykA
-        ==
-X-ME-Sender: <xms:-gQ7XTvBeiatOwXS8KwV3f58eu4a2ROmO0gQC59aAHJBgLG7PNzE2g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduvddrkeeggdeilecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvuffkfhggtggujggfsehttdertddtredvnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucfkphepkeefrdekiedrkeelrddutd
-    ejnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdrtghomhenucev
-    lhhushhtvghrufhiiigvpedv
-X-ME-Proxy: <xmx:-gQ7XdY89d0Cinh3qP3tBJ3seK1uE1fPZ6_WEEHwgRGDggIT5x1AcQ>
-    <xmx:-gQ7XfhQ1-W8hMsLqI9kLU8Z1iLO35VA6AzrElY7ga37YXS8Na7bdQ>
-    <xmx:-gQ7XVVkli7gn4vuX6RTEUPAq3xTUEaCfHpmONQ6UGrN_c1XTz_ysA>
-    <xmx:-gQ7Xf8kThzapeyEozunRzL5KdfaXoVrn0ak3OK0NS7ZHct_liiUaA>
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 1CB16380074;
-        Fri, 26 Jul 2019 09:49:46 -0400 (EDT)
-Date:   Fri, 26 Jul 2019 15:49:44 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     stable@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH stable-5.1 0/3] KVM: x86: FPU and nested VMX guest reset
- fixes
-Message-ID: <20190726134944.GC23085@kroah.com>
-References: <20190725114938.3976-1-vkuznets@redhat.com>
+        id S2388836AbfGZNxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Jul 2019 09:53:08 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:35226 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388270AbfGZNxF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Jul 2019 09:53:05 -0400
+Received: by mail-qt1-f195.google.com with SMTP id d23so52677243qto.2
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2019 06:53:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=AG8g0/5+Esm5c3gfwUTGC7xBT2DUyGJWbBLEtSQE6Lo=;
+        b=D6UFcr8vWjxE+y1IjsYqP6Imni5R5j3pvuvqwLSuBm2wZ1wny3gv9v2OrzYzj3Q2mG
+         +3pmaalFtpv+glYyeuOlmwZldlPMLjwbJodWN3FcwSUa9ha/ze+kn3Ye801F6OBPpqrR
+         XgrYJ4uDJ+bM8aOzL8dMidfTLOBabeJAeXbODxOcBYykrcNxyaFevpZ3yVHpPzjaJRMc
+         DLEo1wbFsxvcZhvOenA2WY34urY0sRWAYP56ez2pTuR1opxaetv2hDUseQZwPyB7nKeB
+         YpV5l+yPS+iKA7LcKU0/z9w/6DdzODiSTWgUzoutw8+DcU13st2Dp6caLKyBBy8mggFA
+         ZSQQ==
+X-Gm-Message-State: APjAAAXe8+s8aYE7C/hEA9MhKU5cO5yYJNCoIyisiBpyeanYVfJz6tDC
+        XaD8fqXm3z3zyC9je/jSUdSVcw==
+X-Google-Smtp-Source: APXvYqydwEkRiDUhjkzyGjQfoaMf8JbYOCxKxauTFB3YoeZG49kK7ARiVn02SSH3ZF9H39y3z1BKaA==
+X-Received: by 2002:a0c:b521:: with SMTP id d33mr68309462qve.239.1564149185035;
+        Fri, 26 Jul 2019 06:53:05 -0700 (PDT)
+Received: from redhat.com ([212.92.104.165])
+        by smtp.gmail.com with ESMTPSA id v17sm30156688qtc.23.2019.07.26.06.53.02
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 26 Jul 2019 06:53:04 -0700 (PDT)
+Date:   Fri, 26 Jul 2019 09:52:59 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] vhost: disable metadata prefetch optimization
+Message-ID: <20190726095044-mutt-send-email-mst@kernel.org>
+References: <20190726115021.7319-1-mst@redhat.com>
+ <ccba99c1-7708-3e55-6fc9-7775415c77a8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190725114938.3976-1-vkuznets@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ccba99c1-7708-3e55-6fc9-7775415c77a8@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 01:49:35PM +0200, Vitaly Kuznetsov wrote:
-> Few patches were recently marked for stable@ but commits are not
-> backportable as-is and require a few tweaks. Here is 5.1 stable backport.
+On Fri, Jul 26, 2019 at 07:57:25PM +0800, Jason Wang wrote:
 > 
-> [PATCH2 of the series applies as-is, I have it here for completeness]
+> On 2019/7/26 下午7:51, Michael S. Tsirkin wrote:
+> > This seems to cause guest and host memory corruption.
+> > Disable for now until we get a better handle on that.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> > 
+> > I put this in linux-next, we'll re-enable if we can fix
+> > the outstanding issues in a short order.
 > 
-> Jan Kiszka (1):
->   KVM: nVMX: Clear pending KVM_REQ_GET_VMCS12_PAGES when leaving nested
 > 
-> Paolo Bonzini (2):
->   KVM: nVMX: do not use dangling shadow VMCS after guest reset
->   Revert "kvm: x86: Use task structs fpu field for user"
+> Btw, is this more suitable to e.g revert the
+> 842aa64eddacd23adc6ecdbc69cb2030bec47122
 
-All now applied, thanks!
+Yes I did that too.
 
-greg k-h
+> and let syzbot fuzz more on the
+> current code?
+
+Current metadata direct access code is known to corrupt guest and host
+memory - I don't feel we need more fuzzing.
+
+> 
+> I think we won't accept that patch eventually, so I suspect what syzbot
+> reports today is a false positives.
+
+Today's reports are real, it's a bug in my patch. But I reverted it -
+the below is an easier way to make sure at least linux-next is stable
+for everyone.
+
+> 
+> Thanks
+> 
+> 
+> > 
+> >   drivers/vhost/vhost.h | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> > index 819296332913..42a8c2a13ab1 100644
+> > --- a/drivers/vhost/vhost.h
+> > +++ b/drivers/vhost/vhost.h
+> > @@ -96,7 +96,7 @@ struct vhost_uaddr {
+> >   };
+> >   #if defined(CONFIG_MMU_NOTIFIER) && ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
+> > -#define VHOST_ARCH_CAN_ACCEL_UACCESS 1
+> > +#define VHOST_ARCH_CAN_ACCEL_UACCESS 0
+> >   #else
+> >   #define VHOST_ARCH_CAN_ACCEL_UACCESS 0
+> >   #endif
