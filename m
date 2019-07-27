@@ -2,172 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 42964776F2
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2019 07:52:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43D887772B
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2019 08:14:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728533AbfG0Fws (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Jul 2019 01:52:48 -0400
-Received: from mga02.intel.com ([134.134.136.20]:40956 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728467AbfG0FwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Jul 2019 01:52:23 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jul 2019 22:52:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,313,1559545200"; 
-   d="scan'208";a="254568642"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga001.jf.intel.com with ESMTP; 26 Jul 2019 22:52:16 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
-        Andy Lutomirski <luto@amacapital.net>
-Subject: [RFC PATCH 21/21] KVM: x86: Add capability to grant VM access to privileged SGX attribute
-Date:   Fri, 26 Jul 2019 22:52:14 -0700
-Message-Id: <20190727055214.9282-22-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190727055214.9282-1-sean.j.christopherson@intel.com>
-References: <20190727055214.9282-1-sean.j.christopherson@intel.com>
+        id S1728151AbfG0GOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Jul 2019 02:14:01 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:34968 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725905AbfG0GOB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Jul 2019 02:14:01 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 08A0BF04ED6C5744E314;
+        Sat, 27 Jul 2019 14:13:59 +0800 (CST)
+Received: from [127.0.0.1] (10.177.19.122) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Sat, 27 Jul 2019
+ 14:13:56 +0800
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: vgic-its: Introduce multiple LPI
+ translation caches
+To:     Marc Zyngier <marc.zyngier@arm.com>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
+References: <20190724090437.49952-1-xiexiangyou@huawei.com>
+ <20190724090437.49952-2-xiexiangyou@huawei.com>
+ <a8b74b25-8c92-4aad-f94d-8371126798ef@arm.com>
+ <c0f441b5-2ba2-0482-6736-eb7835a24f0a@huawei.com>
+ <86blxhne2s.wl-marc.zyngier@arm.com>
+From:   Xiangyou Xie <xiexiangyou@huawei.com>
+Message-ID: <0db37e66-4a5c-f6e7-65e2-c95fcbc4ee3b@huawei.com>
+Date:   Sat, 27 Jul 2019 14:13:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <86blxhne2s.wl-marc.zyngier@arm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.177.19.122]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SGX subsystem restricts access to a subset of enclave attributes to
-provide additional security for an uncompromised kernel, e.g. to prevent
-malware from using the PROVISIONKEY to ensure its nodes are running
-inside a geniune SGX enclave and/or to obtain a stable fingerprint.
+Hi Marc,
 
-To prevent userspace from circumventing such restrictions by running an
-enclave in a VM, KVM restricts guest access to privileged attributes by
-default.  Add a capability, KVM_CAP_SGX_ATTRIBUTE, that can be used by
-userspace to grant a VM access to a priveleged attribute, with args[0]
-holding a file handle to a valid SGX attribute file corresponding to
-an attribute that is restricted by KVM (currently only PROVISIONKEY).
+Adding a new lpi to lpi_list, the contents of the caches will not be 
+updated immediately until the irq is injected.
 
-Cc: Andy Lutomirski <luto@amacapital.net>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- Documentation/virtual/kvm/api.txt | 20 ++++++++++++++++++++
- arch/x86/kvm/cpuid.c              |  2 +-
- arch/x86/kvm/x86.c                | 22 ++++++++++++++++++++++
- include/uapi/linux/kvm.h          |  1 +
- 4 files changed, 44 insertions(+), 1 deletion(-)
+Irq's reference count will be increased when synchronized to each cache, 
+and reduced after deleting from each cache. Only when irq is removed 
+from all caches, the reference count is reduced to 0, which is allowed 
+to be removed from lpi_list.
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 383b292966fa..b1c0ff4e9224 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -5013,6 +5013,26 @@ it hard or impossible to use it correctly.  The availability of
- KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
- Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
- 
-+7.19 KVM_CAP_SGX_ATTRIBUTE
-+
-+Architectures: x86
-+Parameters: args[0] is a file handle of a SGX attribute file in securityfs
-+Returns: 0 on success, -EINVAL if the file handle is invalid or if a requested
-+	 attribute is not supported by KVM.
-+
-+The SGX subsystem restricts access to a subset of enclave attributes, e.g. the
-+PROVISIONKEY, to provide additional security for an uncompromised kernel, e.g.
-+to prevent malware from using the PROVISIONKEY to ensure its nodes are running
-+inside a geniune SGX enclave and/or to obtain a stable system fingerprint.
-+
-+To prevent userspace from circumventing such restrictions by running an enclave
-+in a VM, KVM prevents access to privileged attributes by default.  Userspace
-+can use KVM_CAP_SGX_ATTRIBUTE to grant a VM access to a priveleged attribute.
-+args[0] must hold a file handle to a valid SGX attribute file corresponding to
-+an attribute that is supported/restricted by KVM (currently only PROVISIONKEY).
-+
-+See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
-+
- 8. Other capabilities.
- ----------------------
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 73a0326a1968..73af09edb2fa 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -439,7 +439,7 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
- 
- 	/* cpuid 12.1.eax*/
- 	const u32 kvm_cpuid_12_1_eax_sgx_features =
--		SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT | 0 /* PROVISIONKEY */ |
-+		SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT | SGX_ATTR_PROVISIONKEY |
- 		SGX_ATTR_EINITTOKENKEY | SGX_ATTR_KSS;
- 
- 	/* cpuid 12.1.ebx*/
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ec92c5534336..9144909d4a8e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -67,6 +67,8 @@
- #include <asm/mshyperv.h>
- #include <asm/hypervisor.h>
- #include <asm/intel_pt.h>
-+#include <asm/sgx.h>
-+#include <asm/sgx_arch.h>
- #include <clocksource/hyperv_timer.h>
- 
- #define CREATE_TRACE_POINTS
-@@ -3090,6 +3092,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_GET_MSR_FEATURES:
- 	case KVM_CAP_MSR_PLATFORM_INFO:
- 	case KVM_CAP_EXCEPTION_PAYLOAD:
-+#ifdef CONFIG_INTEL_SGX_VIRTUALIZATION
-+	case KVM_CAP_SGX_ATTRIBUTE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -4626,6 +4631,23 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.exception_payload_enabled = cap->args[0];
- 		r = 0;
- 		break;
-+#ifdef CONFIG_INTEL_SGX_VIRTUALIZATION
-+	case KVM_CAP_SGX_ATTRIBUTE: {
-+		u64 allowed_attributes = 0;
-+
-+		r = sgx_set_attribute(&allowed_attributes, cap->args[0]);
-+		if (r)
-+			break;
-+
-+		/* KVM only supports the PROVISIONKEY privileged attribute. */
-+		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
-+		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
-+			kvm->arch.sgx_provisioning_allowed = true;
-+		else
-+			r = -EINVAL;
-+		break;
-+	}
-+#endif
- 	default:
- 		r = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2fe12b40d503..b16708c2b6c9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_SGX_ATTRIBUTE 200
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.22.0
+So I think that the reference count of IRQ can guarantee the consistency 
+of lpi_list and cache, is right?
+
+When multiple CPUs inject different lpi interrupts at the same time, 
+which may result in different sorts of interrupts in different caches, 
+even some interrupts of a certain cache are overflowed.
+Eg:
+The contents of the cache at a certain moment：
+cache 0: c->b->a
+cache 1: a->b->c
+
+Then, inject two interrupts "d,e" simultaneously, the following results 
+may occur:
+cache 0: e->d->c
+cache 1: d->e->a
+
+But this is no problem, just make sure that the irq found is correct.
+
+In addition, about Locking order:
+kvm->lock (mutex)
+   its->cmd_lock (mutex)
+     its->its_lock (mutex)
+       vgic_cpu->ap_list_lock
+         cache->lpi_cache_lock  /**/
+            kvm->lpi_list_lock	
+              vgic_irq->irq_lock	
+
+Thanks,
+
+Xiangyou.
+
+On 2019/7/26 21:02, Marc Zyngier wrote:
+> On Fri, 26 Jul 2019 13:35:20 +0100,
+> Xiangyou Xie <xiexiangyou@huawei.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> Sorry, the test data was not posted in the previous email.
+>>
+>> I tested the impact of virtual interrupt injection time-consuming：
+>> Run the iperf command to send UDP packets to the VM:
+>> 	iperf -c $IP -u -b 40m -l 64 -t 6000&
+>> The vm just receive UDP traffic. When configure multiple NICs, each
+>> NIC receives the above iperf UDP traffic, This may reflect the
+>> performance impact of shared resource competition, such as lock.
+>>
+>> Observing the delay of virtual interrupt injection: the time spent by
+>> the "irqfd_wakeup", "irqfd_inject" function, and kworker context
+>> switch.
+>> The less the better.
+>>
+>> ITS translation cache greatly reduces the delay of interrupt injection
+>> compared to kworker thread, because it eliminate wakeup and uncertain
+>> scheduling delay:
+>>                    kworker              ITS translation cache    improved
+>>    1 NIC           6.692 us                 1.766 us
+>> 73.6%
+>>   10 NICs          7.536 us                 2.574 us
+>> 65.8%
+> 
+> OK, that's pretty interesting. It would have been good to post such
+> data in reply to the ITS cache series.
+> 
+>>
+>> Increases the number of lpi_translation_cache reduce lock competition.
+>> Multi-interrupt concurrent injections perform better:
+>>
+>>              ITS translation cache      with patch             improved
+>>     1 NIC        1.766 us                 1.694 us                4.1%
+>>   10 NICs        2.574 us                 1.848 us               28.2%
+> 
+> 
+> That's sort off interesting too, but it doesn't answer any of the
+> questions I had in response to your patch: How do you ensure mutual
+> exclusion with the LPI list being concurrently updated? How does the
+> new locking fit in the current locking scheme?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+>> Regards,
+>>
+>> Xiangyou
+>>
+>> On 2019/7/24 19:09, Marc Zyngier wrote:
+>>> Hi Xiangyou,
+>>>
+>>> On 24/07/2019 10:04, Xiangyou Xie wrote:
+>>>> Because dist->lpi_list_lock is a perVM lock, when a virtual machine
+>>>> is configured with multiple virtual NIC devices and receives
+>>>> network packets at the same time, dist->lpi_list_lock will become
+>>>> a performance bottleneck.
+>>>
+>>> I'm sorry, but you'll have to show me some real numbers before I
+>>> consider any of this. There is a reason why the original series still
+>>> isn't in mainline, and that's because people don't post any numbers.
+>>> Adding more patches is not going to change that small fact.
+>>>
+>>>> This patch increases the number of lpi_translation_cache to eight,
+>>>> hashes the cpuid that executes irqfd_wakeup, and chooses which
+>>>> lpi_translation_cache to use.
+>>>
+>>> So you've now switched to a per-cache lock, meaning that the rest of the
+>>> ITS code can manipulate the the lpi_list without synchronization with
+>>> the caches. Have you worked out all the possible races? Also, how does
+>>> this new lock class fits in the whole locking hierarchy?
+>>>
+>>> If you want something that is actually scalable, do it the right way.
+>>> Use a better data structure than a list, switch to using RCU rather than
+>>> the current locking strategy. But your current approach looks quite fragile.
+>>>
+>>> Thanks,
+>>>
+>>> 	M.
+>>>
+>>
+> 
 
