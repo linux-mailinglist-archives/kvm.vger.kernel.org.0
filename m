@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8787D7770D
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2019 07:54:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FB707770A
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2019 07:54:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727539AbfG0FwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Jul 2019 01:52:16 -0400
-Received: from mga02.intel.com ([134.134.136.20]:40956 "EHLO mga02.intel.com"
+        id S1728903AbfG0Fxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Jul 2019 01:53:53 -0400
+Received: from mga02.intel.com ([134.134.136.20]:40958 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726197AbfG0FwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Jul 2019 01:52:16 -0400
+        id S1728033AbfG0FwR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Jul 2019 01:52:17 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
   by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jul 2019 22:52:15 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,313,1559545200"; 
-   d="scan'208";a="254568578"
+   d="scan'208";a="254568581"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga001.jf.intel.com with ESMTP; 26 Jul 2019 22:52:15 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -31,10 +31,12 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
         Andy Lutomirski <luto@amacapital.net>
-Subject: [RFC PATCH 00/21] x86/sgx: KVM: Add SGX virtualization
-Date:   Fri, 26 Jul 2019 22:51:53 -0700
-Message-Id: <20190727055214.9282-1-sean.j.christopherson@intel.com>
+Subject: [RFC PATCH 01/21] x86/sgx: Add defines for SGX device minor numbers
+Date:   Fri, 26 Jul 2019 22:51:54 -0700
+Message-Id: <20190727055214.9282-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190727055214.9282-1-sean.j.christopherson@intel.com>
+References: <20190727055214.9282-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -42,103 +44,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an "early" RFC series for adding SGX virtualization to KVM.  SGX
-virtualization (more specifically, EPC virtualization) is dependent on the
-not-yet-merged SGX enabling series and so cannot be considered for
-inclusion any time soon.
+Add defines to track the minor numbers for each SGX device in
+preparation for moving the helper code and provisioning device to the
+common subsystem, and in preparation for adding a third device, i.e. a
+virtual EPC device.
 
-The primary goal of this RFC is to get feedback on the overall approach,
-e.g. code location, uAPI changes, functionality, etc...  My hope is to
-sort out any major issues sooner rather than later, so that if/when the
-base SGX enabling is merged, virtualization support can quickly follow
-suit.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kernel/cpu/sgx/driver/driver.h | 1 -
+ arch/x86/kernel/cpu/sgx/driver/main.c   | 9 +++++----
+ arch/x86/kernel/cpu/sgx/sgx.h           | 4 ++++
+ 3 files changed, 9 insertions(+), 5 deletions(-)
 
-That being said, nitpicking and bikeshedding is more than welcome :-)
-
-This code applies on top of a slightly modified version of v21 of the SGX
-enabling series[1].  The modifications on top of the SGX series are a few
-minor bug fixes that are not related to SGX virtualization, but affect
-code that is moved/modified by this series.  The full source for the
-modified version of v21 can be found at:
-
- https://github.com/sean-jc/linux.git
-
-under the tag:
-
-  sgx-v21-ish
-
-A corresponding Qemu RFC will (hopefully) follow next week, the Qemu
-patches need a bit more cleanup...
-
-[1] https://lkml.kernel.org/r/20190713170804.2340-1-jarkko.sakkinen@linux.intel.com
-
-Sean Christopherson (21):
-  x86/sgx: Add defines for SGX device minor numbers
-  x86/sgx: Move bus registration and device init to common code
-  x86/sgx: Move provisioning device to common code
-  x86/sgx: Add /dev/sgx/virt_epc device to allocate "raw" EPC for VMs
-  x86/sgx: Expose SGX architectural definitions to the kernel
-  KVM: x86: Add SGX sub-features leaf to reverse CPUID table
-  KVM: x86: Add WARN_ON_ONCE(index!=0) in __do_cpuid_ent
-  KVM: x86: Add kvm_x86_ops hook to short circuit emulation
-  KVM: VMX: Add basic handling of VM-Exit from SGX enclave
-  KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for VMX/SGX
-  KVM: x86: Export kvm_propagate_fault (as kvm_propagate_page_fault)
-  KVM: x86: Define new #PF SGX error code bit
-  x86/sgx: Move the intermediate EINIT helper into the driver
-  x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
-  KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
-  KVM: VMX: Edd emulation of SGX Launch Control LE hash MSRs
-  KVM: VMX: Add handler for ENCLS[EINIT] to support SGX Launch Control
-  KVM: x86: Invoke kvm_x86_ops->cpuid_update() after kvm_update_cpuid()
-  KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC
-  x86/sgx: Export sgx_set_attribute() for use by KVM
-  KVM: x86: Add capability to grant VM access to privileged SGX
-    attribute
-
- Documentation/virtual/kvm/api.txt             |  20 ++
- arch/x86/Kconfig                              |  13 +
- arch/x86/include/asm/kvm_host.h               |   8 +-
- arch/x86/include/asm/sgx.h                    |  17 +
- .../cpu/sgx/arch.h => include/asm/sgx_arch.h} |   1 +
- arch/x86/include/asm/vmx.h                    |   1 +
- arch/x86/include/uapi/asm/vmx.h               |   1 +
- arch/x86/kernel/cpu/sgx/Makefile              |   1 +
- arch/x86/kernel/cpu/sgx/driver/driver.h       |   3 +-
- arch/x86/kernel/cpu/sgx/driver/ioctl.c        |  40 ++-
- arch/x86/kernel/cpu/sgx/driver/main.c         |  73 +----
- arch/x86/kernel/cpu/sgx/encl.c                |   2 +-
- arch/x86/kernel/cpu/sgx/encls.h               |   2 +-
- arch/x86/kernel/cpu/sgx/main.c                | 141 ++++++--
- arch/x86/kernel/cpu/sgx/sgx.h                 |  16 +-
- arch/x86/kernel/cpu/sgx/virt.c                | 308 ++++++++++++++++++
- arch/x86/kernel/cpu/sgx/virt.h                |  14 +
- arch/x86/kvm/Makefile                         |   2 +
- arch/x86/kvm/cpuid.c                          | 135 ++++++--
- arch/x86/kvm/cpuid.h                          |  20 ++
- arch/x86/kvm/emulate.c                        |   1 +
- arch/x86/kvm/mmu.c                            |  12 -
- arch/x86/kvm/svm.c                            |  19 +-
- arch/x86/kvm/vmx/nested.c                     |  21 +-
- arch/x86/kvm/vmx/nested.h                     |   5 +
- arch/x86/kvm/vmx/sgx.c                        | 247 ++++++++++++++
- arch/x86/kvm/vmx/sgx.h                        |  11 +
- arch/x86/kvm/vmx/vmcs12.c                     |   1 +
- arch/x86/kvm/vmx/vmcs12.h                     |   4 +-
- arch/x86/kvm/vmx/vmx.c                        | 251 +++++++++++++-
- arch/x86/kvm/vmx/vmx.h                        |   6 +
- arch/x86/kvm/x86.c                            |  40 ++-
- arch/x86/kvm/x86.h                            |   5 -
- include/uapi/linux/kvm.h                      |   1 +
- tools/testing/selftests/x86/sgx/defines.h     |   2 +-
- 35 files changed, 1234 insertions(+), 210 deletions(-)
- create mode 100644 arch/x86/include/asm/sgx.h
- rename arch/x86/{kernel/cpu/sgx/arch.h => include/asm/sgx_arch.h} (99%)
- create mode 100644 arch/x86/kernel/cpu/sgx/virt.c
- create mode 100644 arch/x86/kernel/cpu/sgx/virt.h
- create mode 100644 arch/x86/kvm/vmx/sgx.c
- create mode 100644 arch/x86/kvm/vmx/sgx.h
-
+diff --git a/arch/x86/kernel/cpu/sgx/driver/driver.h b/arch/x86/kernel/cpu/sgx/driver/driver.h
+index da60839b133a..6ce18c766a5a 100644
+--- a/arch/x86/kernel/cpu/sgx/driver/driver.h
++++ b/arch/x86/kernel/cpu/sgx/driver/driver.h
+@@ -15,7 +15,6 @@
+ #include "../encls.h"
+ #include "../sgx.h"
+ 
+-#define SGX_DRV_NR_DEVICES	2
+ #define SGX_EINIT_SPIN_COUNT	20
+ #define SGX_EINIT_SLEEP_COUNT	50
+ #define SGX_EINIT_SLEEP_TIME	20
+diff --git a/arch/x86/kernel/cpu/sgx/driver/main.c b/arch/x86/kernel/cpu/sgx/driver/main.c
+index bb7f1932529f..a2506a49c95a 100644
+--- a/arch/x86/kernel/cpu/sgx/driver/main.c
++++ b/arch/x86/kernel/cpu/sgx/driver/main.c
+@@ -211,7 +211,7 @@ int __init sgx_drv_init(void)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = alloc_chrdev_region(&sgx_devt, 0, SGX_DRV_NR_DEVICES, "sgx");
++	ret = alloc_chrdev_region(&sgx_devt, 0, SGX_MAX_NR_DEVICES, "sgx");
+ 	if (ret < 0)
+ 		goto err_bus;
+ 
+@@ -238,12 +238,13 @@ int __init sgx_drv_init(void)
+ 	}
+ 
+ 	ret = sgx_dev_init("sgx/enclave", &sgx_encl_dev, &sgx_encl_cdev,
+-			   &sgx_encl_fops, 0);
++			   &sgx_encl_fops, SGX_ENCL_DEV_MINOR);
+ 	if (ret)
+ 		goto err_chrdev_region;
+ 
+ 	ret = sgx_dev_init("sgx/provision", &sgx_provision_dev,
+-			   &sgx_provision_cdev, &sgx_provision_fops, 1);
++			   &sgx_provision_cdev, &sgx_provision_fops,
++			   SGX_PROV_DEV_MINOR);
+ 	if (ret)
+ 		goto err_encl_dev;
+ 
+@@ -277,7 +278,7 @@ int __init sgx_drv_init(void)
+ 	put_device(&sgx_encl_dev);
+ 
+ err_chrdev_region:
+-	unregister_chrdev_region(sgx_devt, SGX_DRV_NR_DEVICES);
++	unregister_chrdev_region(sgx_devt, SGX_MAX_NR_DEVICES);
+ 
+ err_bus:
+ 	bus_unregister(&sgx_bus_type);
+diff --git a/arch/x86/kernel/cpu/sgx/sgx.h b/arch/x86/kernel/cpu/sgx/sgx.h
+index c9276d4b6ffe..4e2c3ce94f63 100644
+--- a/arch/x86/kernel/cpu/sgx/sgx.h
++++ b/arch/x86/kernel/cpu/sgx/sgx.h
+@@ -89,4 +89,8 @@ void sgx_free_page(struct sgx_epc_page *page);
+ int sgx_einit(struct sgx_sigstruct *sigstruct, struct sgx_einittoken *token,
+ 	      struct sgx_epc_page *secs, u64 *lepubkeyhash);
+ 
++#define SGX_ENCL_DEV_MINOR	0
++#define SGX_PROV_DEV_MINOR	1
++#define SGX_MAX_NR_DEVICES	2
++
+ #endif /* _X86_SGX_H */
 -- 
 2.22.0
 
