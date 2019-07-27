@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E142D776FE
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2019 07:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 016BC776E9
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2019 07:52:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728792AbfG0FxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Jul 2019 01:53:18 -0400
-Received: from mga02.intel.com ([134.134.136.20]:40958 "EHLO mga02.intel.com"
+        id S1728495AbfG0FwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Jul 2019 01:52:23 -0400
+Received: from mga02.intel.com ([134.134.136.20]:40960 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728307AbfG0FwU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Jul 2019 01:52:20 -0400
+        id S1728342AbfG0FwV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Jul 2019 01:52:21 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jul 2019 22:52:15 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jul 2019 22:52:16 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,313,1559545200"; 
-   d="scan'208";a="254568617"
+   d="scan'208";a="254568620"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga001.jf.intel.com with ESMTP; 26 Jul 2019 22:52:15 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -31,9 +31,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org,
         Andy Lutomirski <luto@amacapital.net>
-Subject: [RFC PATCH 13/21] x86/sgx: Move the intermediate EINIT helper into the driver
-Date:   Fri, 26 Jul 2019 22:52:06 -0700
-Message-Id: <20190727055214.9282-14-sean.j.christopherson@intel.com>
+Subject: [RFC PATCH 14/21] x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
+Date:   Fri, 26 Jul 2019 22:52:07 -0700
+Message-Id: <20190727055214.9282-15-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190727055214.9282-1-sean.j.christopherson@intel.com>
 References: <20190727055214.9282-1-sean.j.christopherson@intel.com>
@@ -44,135 +44,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Providing sgx_einit() in the common SGX code was a bit premature.  The
-thought was that the native SGX driver and KVM would be able to use a
-common EINIT helper, but that may or may not hold true depending on
-how KVM's implementation shakes out.  For example, KVM may want to pass
-user pointers directly to EINIT in order to avoid copying large amounts
-of data to in-kernel temp structures.
+Provide wrappers around __ecreate() and __einit() to export their
+functionality for use by KVM without having to export a large amount of
+SGX boilerplate code.  Intermediate helpers also shelter KVM from the
+ugliness of overloading the ENCLS return value to encode multiple error
+formats in a single int.
+
+KVM will use the helpers to trap-and-execute ECREATE and EINIT as part
+its SGX virtualization.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kernel/cpu/sgx/driver/ioctl.c | 21 +++++++++++--
- arch/x86/kernel/cpu/sgx/main.c         | 43 ++++++--------------------
- arch/x86/kernel/cpu/sgx/sgx.h          |  4 +--
- 3 files changed, 30 insertions(+), 38 deletions(-)
+ arch/x86/Kconfig               |  3 ++
+ arch/x86/include/asm/sgx.h     | 15 ++++++++++
+ arch/x86/kernel/cpu/sgx/virt.c | 55 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 73 insertions(+)
+ create mode 100644 arch/x86/include/asm/sgx.h
 
-diff --git a/arch/x86/kernel/cpu/sgx/driver/ioctl.c b/arch/x86/kernel/cpu/sgx/driver/ioctl.c
-index b7aa06920d10..a1cb5f772363 100644
---- a/arch/x86/kernel/cpu/sgx/driver/ioctl.c
-+++ b/arch/x86/kernel/cpu/sgx/driver/ioctl.c
-@@ -658,6 +658,23 @@ static int sgx_get_key_hash(const void *modulus, void *hash)
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index c1bdb9f85928..8bbc6a30588d 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1969,6 +1969,9 @@ config INTEL_SGX_VIRTUALIZATION
+ 	  "raw" EPC for the purpose of exposing EPC to a KVM guest, i.e. a
+ 	  virtual machine, via a device node (/dev/sgx/virt_epc by default).
+ 
++	  SGX virtualization also adds helpers that are used by KVM to trap
++	  and execute certain ENCLS instructions on behalf of a KVM guest.
++
+ 	  If unsure, say N.
+ 
+ config EFI
+diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
+new file mode 100644
+index 000000000000..f0f0176b8e2f
+--- /dev/null
++++ b/arch/x86/include/asm/sgx.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_SGX_H
++#define _ASM_X86_SGX_H
++
++#include <linux/types.h>
++
++struct sgx_pageinfo;
++
++#if IS_ENABLED(CONFIG_KVM_INTEL)
++int sgx_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs, int *trapnr);
++int sgx_einit(void __user *sigstruct, void __user *token,
++	      void __user *secs, u64 *lepubkeyhash, int *trapnr);
++#endif
++
++#endif /* _ASM_X86_SGX_H */
+diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
+index 79ee5917a4fc..9e5bf4450bf7 100644
+--- a/arch/x86/kernel/cpu/sgx/virt.c
++++ b/arch/x86/kernel/cpu/sgx/virt.c
+@@ -251,3 +251,58 @@ int __init sgx_virt_epc_init(void)
+ 
  	return ret;
  }
- 
-+static int __sgx_einit(struct sgx_sigstruct *sigstruct,
-+		       struct sgx_einittoken *token, struct sgx_epc_page *secs,
-+		       u64 *lepubkeyhash)
++
++#if IS_ENABLED(CONFIG_KVM_INTEL)
++int sgx_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs, int *trapnr)
 +{
 +	int ret;
 +
-+	preempt_disable();
-+	sgx_update_lepubkeyhash_msrs(lepubkeyhash, false);
-+	ret = __einit(sigstruct, token, sgx_epc_addr(secs));
-+	if (ret == SGX_INVALID_EINITTOKEN) {
-+		sgx_update_lepubkeyhash_msrs(lepubkeyhash, true);
-+		ret = __einit(sigstruct, token, sgx_epc_addr(secs));
++	__uaccess_begin();
++	ret = __ecreate(pageinfo, (void *)secs);
++	__uaccess_end();
++
++	if (encls_faulted(ret)) {
++		*trapnr = ENCLS_TRAPNR(ret);
++		return -EFAULT;
 +	}
-+	preempt_enable();
++	return ret;
++}
++EXPORT_SYMBOL_GPL(sgx_ecreate);
++
++static int __sgx_einit(void __user *sigstruct, void __user *token,
++		       void __user *secs)
++{
++	int ret;
++
++	__uaccess_begin();
++	ret =  __einit((void *)sigstruct, (void *)token, (void *)secs);
++	__uaccess_end();
 +	return ret;
 +}
 +
- static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
- 			 struct sgx_einittoken *token)
- {
-@@ -686,8 +703,8 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
- 
- 	for (i = 0; i < SGX_EINIT_SLEEP_COUNT; i++) {
- 		for (j = 0; j < SGX_EINIT_SPIN_COUNT; j++) {
--			ret = sgx_einit(sigstruct, token, encl->secs.epc_page,
--					mrsigner);
-+			ret = __sgx_einit(sigstruct, token,
-+					  encl->secs.epc_page, mrsigner);
- 			if (ret == SGX_UNMASKED_EVENT)
- 				continue;
- 			else
-diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-index 532dd90e09e1..542427c6ae9c 100644
---- a/arch/x86/kernel/cpu/sgx/main.c
-+++ b/arch/x86/kernel/cpu/sgx/main.c
-@@ -166,7 +166,15 @@ void sgx_free_page(struct sgx_epc_page *page)
- 	WARN(ret > 0, "sgx: EREMOVE returned %d (0x%x)", ret, ret);
- }
- 
--static void sgx_update_lepubkeyhash_msrs(u64 *lepubkeyhash, bool enforce)
-+/**
-+ * sgx_update_lepubkeyhash_msrs - Write the IA32_SGXLEPUBKEYHASHx MSRs
-+ * @lepubkeyhash:	array of desired MSRs values
-+ * @enforce:		force WRMSR regardless of cache status
-+ *
-+ * Write the IA32_SGXLEPUBKEYHASHx MSRs according to @lepubkeyhash if the
-+ * last cached value doesn't match the desired value, or if @enforce is %true.
-+ */
-+void sgx_update_lepubkeyhash_msrs(u64 *lepubkeyhash, bool enforce)
- {
- 	u64 *cache;
- 	int i;
-@@ -180,39 +188,6 @@ static void sgx_update_lepubkeyhash_msrs(u64 *lepubkeyhash, bool enforce)
- 	}
- }
- 
--/**
-- * sgx_einit - initialize an enclave
-- * @sigstruct:		a pointer a SIGSTRUCT
-- * @token:		a pointer an EINITTOKEN (optional)
-- * @secs:		a pointer a SECS
-- * @lepubkeyhash:	the desired value for IA32_SGXLEPUBKEYHASHx MSRs
-- *
-- * Execute ENCLS[EINIT], writing the IA32_SGXLEPUBKEYHASHx MSRs according
-- * to @lepubkeyhash (if possible and necessary).
-- *
-- * Return:
-- *   0 on success,
-- *   -errno or SGX error on failure
-- */
--int sgx_einit(struct sgx_sigstruct *sigstruct, struct sgx_einittoken *token,
--	      struct sgx_epc_page *secs, u64 *lepubkeyhash)
--{
--	int ret;
--
--	if (!boot_cpu_has(X86_FEATURE_SGX_LC))
--		return __einit(sigstruct, token, sgx_epc_addr(secs));
--
--	preempt_disable();
--	sgx_update_lepubkeyhash_msrs(lepubkeyhash, false);
--	ret = __einit(sigstruct, token, sgx_epc_addr(secs));
--	if (ret == SGX_INVALID_EINITTOKEN) {
--		sgx_update_lepubkeyhash_msrs(lepubkeyhash, true);
--		ret = __einit(sigstruct, token, sgx_epc_addr(secs));
--	}
--	preempt_enable();
--	return ret;
--}
--
- static __init void sgx_free_epc_section(struct sgx_epc_section *section)
- {
- 	struct sgx_epc_page *page;
-diff --git a/arch/x86/kernel/cpu/sgx/sgx.h b/arch/x86/kernel/cpu/sgx/sgx.h
-index 748b1633d770..3f3311024bd0 100644
---- a/arch/x86/kernel/cpu/sgx/sgx.h
-+++ b/arch/x86/kernel/cpu/sgx/sgx.h
-@@ -85,8 +85,8 @@ void sgx_reclaim_pages(void);
- struct sgx_epc_page *sgx_alloc_page(void *owner, bool reclaim);
- int __sgx_free_page(struct sgx_epc_page *page);
- void sgx_free_page(struct sgx_epc_page *page);
--int sgx_einit(struct sgx_sigstruct *sigstruct, struct sgx_einittoken *token,
--	      struct sgx_epc_page *secs, u64 *lepubkeyhash);
++int sgx_einit(void __user *sigstruct, void __user *token,
++	      void __user *secs, u64 *lepubkeyhash, int *trapnr)
++{
++	int ret;
 +
-+void sgx_update_lepubkeyhash_msrs(u64 *lepubkeyhash, bool enforce);
- 
- #define SGX_ENCL_DEV_MINOR	0
- #define SGX_PROV_DEV_MINOR	1
++	if (!boot_cpu_has(X86_FEATURE_SGX_LC)) {
++		ret = __sgx_einit(sigstruct, token, secs);
++	} else {
++		preempt_disable();
++		sgx_update_lepubkeyhash_msrs(lepubkeyhash, false);
++		ret = __sgx_einit(sigstruct, token, secs);
++		if (ret == SGX_INVALID_EINITTOKEN) {
++			sgx_update_lepubkeyhash_msrs(lepubkeyhash, true);
++			ret = __sgx_einit(sigstruct, token, secs);
++		}
++		preempt_enable();
++	}
++
++	if (encls_faulted(ret)) {
++		*trapnr = ENCLS_TRAPNR(ret);
++		return -EFAULT;
++	}
++	return ret;
++}
++EXPORT_SYMBOL_GPL(sgx_einit);
++#endif
 -- 
 2.22.0
 
