@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 595FF78FCA
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 17:49:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC03679032
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 18:01:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388262AbfG2PtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jul 2019 11:49:10 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:45203 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387444AbfG2PtK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jul 2019 11:49:10 -0400
-Received: by mail-vs1-f65.google.com with SMTP id h28so41100496vsl.12
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2019 08:49:09 -0700 (PDT)
+        id S1728325AbfG2QBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 12:01:44 -0400
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:35097 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726714AbfG2QBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 12:01:44 -0400
+Received: by mail-vs1-f67.google.com with SMTP id u124so41172011vsu.2
+        for <kvm@vger.kernel.org>; Mon, 29 Jul 2019 09:01:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=/niwkJuj+kTChFIxAZJ7R3qyc1S8YzIk+KDkO6xs7tI=;
-        b=mPi3eDXnXPY70b42qt5xcYgvCh197M5mMEkTcOFSSVUVP9WfITLvZqewIRSjTLQpNp
-         viEMfbKrbD9qRhqUDyfrR+gmiINyUbgzuTG1Vy9oeRxN3NTltW4+L9XxGHo7IMHzaGmg
-         AkptHlaR8fV7SqQbRLRRB7+ziHQ3J1NlIw3wpnUMtidCLyH4RSUbGSmBvmSbORQXPv2k
-         sIzDEDifuF07zWMTITbo+mp47gCS1JnoIj8moOWs/d0a+el0/gUGs6znYK2nluDalo+v
-         M0s45V/MyXFsKsysgKvICCUEIGYYRm82WLF1NVSerOshyHCBZGQWMoIjbnXSGcbVN56c
-         KeFg==
-X-Gm-Message-State: APjAAAWZZAc7zKE3VrmgpBp25wEjcEg7jKJG2CyZBcBcXF0jOQkEvvjr
-        FoqOwKnppDXiY0wo/6xjMAub0g==
-X-Google-Smtp-Source: APXvYqzLzOdW28+st9J99eGOoagZRY/+6mNu7Jt6yXi0Ig2fmuLKwy4BkNu3szWlUISUaVAULlX13Q==
-X-Received: by 2002:a67:694f:: with SMTP id e76mr14283114vsc.77.1564415349351;
-        Mon, 29 Jul 2019 08:49:09 -0700 (PDT)
+        bh=F22IOpvGzuwCs+Et2Wm6c0mIYlOT2lCTjpD6ddOFTas=;
+        b=jyLlwMpdERDjv82VyURMVg7YaqX/Ds2S7FpSKuq784W3+htMxKFDwM7dbl67XQE8id
+         BUyLqtFi5awvt2A2Qvuij6B7oIG5YWN5DsZyOOnJEGdqJ0F01dq7Tkq+3hHpf+bM1Efj
+         pbXELkgsGhYYrF+PlyTyBC+oP5aRydr4Rf5b/KCnQ6qNQ6hv1R+f9JTRIJ8W8ZV/HVXJ
+         nLTmtFu5IsPpcTUrJveEDDozH6Msh3U4RGsQEcCAeyzEy/hd8tT27HullL2bKXWXu1Dw
+         7og4Yn5jZ/dHKh4+jDPWR56ZtL7h/TEAxmgMlI1xuhPGTADmwMtXpbg+oCVZSZ5D0cKr
+         kOqQ==
+X-Gm-Message-State: APjAAAWEYzILc9/l3S8G21QW+kbVDCjYE3H0VenUjVYPAy9lbFVsPvtJ
+        HrMa5ygLH4uhTCjyZf6/rXd5Gg==
+X-Google-Smtp-Source: APXvYqyL15XGjOVMiK+yH1llx7jj3/of29D33b3O3EZv3RPYANUrqdhIF1TDRY/qzMWca1WS02erEA==
+X-Received: by 2002:a67:89c7:: with SMTP id l190mr68587815vsd.13.1564416103428;
+        Mon, 29 Jul 2019 09:01:43 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
-        by smtp.gmail.com with ESMTPSA id h81sm16021382vka.19.2019.07.29.08.49.05
+        by smtp.gmail.com with ESMTPSA id t200sm25600663vke.5.2019.07.29.09.01.39
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 29 Jul 2019 08:49:08 -0700 (PDT)
-Date:   Mon, 29 Jul 2019 11:49:02 -0400
+        Mon, 29 Jul 2019 09:01:42 -0700 (PDT)
+Date:   Mon, 29 Jul 2019 12:01:37 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Stefano Garzarella <sgarzare@redhat.com>
 Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -42,7 +42,7 @@ Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
 Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
-Message-ID: <20190729114302-mutt-send-email-mst@kernel.org>
+Message-ID: <20190729115904-mutt-send-email-mst@kernel.org>
 References: <20190717113030.163499-1-sgarzare@redhat.com>
  <20190717113030.163499-2-sgarzare@redhat.com>
  <20190729095956-mutt-send-email-mst@kernel.org>
@@ -93,25 +93,18 @@ On Mon, Jul 29, 2019 at 05:36:56PM +0200, Stefano Garzarella wrote:
 > I should check better, because I'm not sure what happen if the peer sees
 > 1KB of space available, then it sends 1KB of payload (using a 4KB
 > buffer).
-> 
 > The other option is to copy each packet in a new buffer like I did in
 > the v2 [2], but this forces us to make a copy for each packet that does
 > not fill the entire buffer, perhaps too expensive.
 > 
 > [2] https://patchwork.kernel.org/patch/10938741/
 > 
+
+So one thing we can easily do is to under-report the
+available credit. E.g. if we copy up to 256bytes,
+then report just 256bytes for every buffer in the queue.
+
+
 > 
 > Thanks,
 > Stefano
-
-Interesting. You are right, and at some level the protocol forces copies.
-
-We could try to detect that the actual memory is getting close to
-admin limits and force copies on queued packets after the fact.
-Is that practical?
-
-And yes we can extend the credit accounting to include buffer size.
-That's a protocol change but maybe it makes sense.
-
--- 
-MST
