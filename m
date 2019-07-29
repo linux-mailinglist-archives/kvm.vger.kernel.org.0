@@ -2,81 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B743378139
-	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2019 21:37:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB6247846C
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 07:32:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726151AbfG1Tgp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Jul 2019 15:36:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43990 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726105AbfG1Tgp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Jul 2019 15:36:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7A07785538;
-        Sun, 28 Jul 2019 19:36:44 +0000 (UTC)
-Received: from treble (ovpn-120-102.rdu2.redhat.com [10.10.120.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 200465D6A9;
-        Sun, 28 Jul 2019 19:36:43 +0000 (UTC)
-Date:   Sun, 28 Jul 2019 14:36:41 -0500
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] KVM: VMX: Add error handling to VMREAD helper
-Message-ID: <20190728193641.mjxrtcc6ps72z3sp@treble>
-References: <20190719204110.18306-1-sean.j.christopherson@intel.com>
- <20190719204110.18306-4-sean.j.christopherson@intel.com>
+        id S1726558AbfG2Fcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 01:32:54 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:35196 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbfG2Fcy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 01:32:54 -0400
+Received: by mail-pl1-f194.google.com with SMTP id w24so27036495plp.2
+        for <kvm@vger.kernel.org>; Sun, 28 Jul 2019 22:32:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=flBFoWj0dK5v1hltqk4vN/oY+8Ju11YahL+AoE9d1ZE=;
+        b=RuXlHHMtb0vEmgIMqb7K8m3rS3qHEgjJERbeiqKdVMfr0rndQJWdGt8ZR2qxSYs3J2
+         XoDUPQ3in901w6OXibmxt5EK2wOOBnkmclXwB8IJyblJvHRvJVyzRrVkgncmRuFVtG0/
+         eI1gfPFC36f0botXyX0o7LhHw98FVOgO5DfKR4GmejYlfQe/jK1PnxbZaYzaQC9yTw7m
+         75PJfT3k/G2u4+ZuXFxOHbzfZYJu8KA7erNRlzRHZDQUxpi1uXBrWMyL4PnYz3dP+9Fv
+         fkXqhv6d00iax8FgSEwigsnZfbm+zGjkNIS/2AzgUXHtHhAMcuG1f/DHzfFncuTP1O7k
+         5xyA==
+X-Gm-Message-State: APjAAAUV0CI9uClVAs6Y2opWC+4ZYorarH/jbLeq/unNmGpJfKwHsOGA
+        RfMDiE/tCiRt6/Nbm7M/qsv2la9rtyM=
+X-Google-Smtp-Source: APXvYqxjX3ivPDXUJ7bHOtjj3LdA6XZt1RkF0qZ8OaG4JOZ5oqrugR6668nQVmL0c2L7y6FafUoToA==
+X-Received: by 2002:a17:902:ff10:: with SMTP id f16mr13596215plj.141.1564378372802;
+        Sun, 28 Jul 2019 22:32:52 -0700 (PDT)
+Received: from xz-x1.redhat.com ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id o129sm30498550pfg.1.2019.07.28.22.32.50
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sun, 28 Jul 2019 22:32:52 -0700 (PDT)
+From:   Peter Xu <zhexu@redhat.com>
+X-Google-Original-From: Peter Xu <peterx@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
+Subject: [PATCH 0/3] KVM: X86: Some tracepoint enhancements
+Date:   Mon, 29 Jul 2019 13:32:40 +0800
+Message-Id: <20190729053243.9224-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190719204110.18306-4-sean.j.christopherson@intel.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Sun, 28 Jul 2019 19:36:44 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 19, 2019 at 01:41:08PM -0700, Sean Christopherson wrote:
-> @@ -68,8 +67,22 @@ static __always_inline unsigned long __vmcs_readl(unsigned long field)
->  {
->  	unsigned long value;
->  
-> -	asm volatile (__ex_clear("vmread %1, %0", "%k0")
-> -		      : "=r"(value) : "r"(field));
-> +	asm volatile("1: vmread %2, %1\n\t"
-> +		     ".byte 0x3e\n\t" /* branch taken hint */
-> +		     "ja 3f\n\t"
-> +		     "mov %2, %%" _ASM_ARG1 "\n\t"
-> +		     "xor %%" _ASM_ARG2 ", %%" _ASM_ARG2 "\n\t"
-> +		     "2: call vmread_error\n\t"
-> +		     "xor %k1, %k1\n\t"
-> +		     "3:\n\t"
-> +
-> +		     ".pushsection .fixup, \"ax\"\n\t"
-> +		     "4: mov %2, %%" _ASM_ARG1 "\n\t"
-> +		     "mov $1, %%" _ASM_ARG2 "\n\t"
-> +		     "jmp 2b\n\t"
-> +		     ".popsection\n\t"
-> +		     _ASM_EXTABLE(1b, 4b)
-> +		     : ASM_CALL_CONSTRAINT, "=r"(value) : "r"(field) : "cc");
+Each small patch explains itself.  I noticed them when I'm tracing
+some IRQ paths and I found them helpful at least to me.
 
-Was there a reason you didn't do the asm goto thing here like you did
-for the previous patch?  That seemed cleaner, and needs less asm.  
+Please have a look.  Thanks,
 
-I think the branch hints aren't needed -- they're ignored on modern
-processors.  Ditto for the previous patch.
+Peter Xu (3):
+  KVM: X86: Trace vcpu_id for vmexit
+  KVM: X86: Remove tailing newline for tracepoints
+  KVM: X86: Tune PLE Window tracepoint
 
-Also please use named asm operands whereever you can, like "%[field]"
-instead of "%2".  It helps a lot with readability.
+ arch/x86/kvm/svm.c     |  8 ++++----
+ arch/x86/kvm/trace.h   | 33 ++++++++++++++++-----------------
+ arch/x86/kvm/vmx/vmx.c |  4 ++--
+ 3 files changed, 22 insertions(+), 23 deletions(-)
 
 -- 
-Josh
+2.21.0
+
