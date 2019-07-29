@@ -2,91 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 144627880B
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 11:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3E4D78831
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 11:20:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726526AbfG2JK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jul 2019 05:10:27 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46901 "EHLO
+        id S1727477AbfG2JUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 05:20:17 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46133 "EHLO
         mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbfG2JK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jul 2019 05:10:26 -0400
-Received: by mail-wr1-f68.google.com with SMTP id z1so60923097wru.13
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2019 02:10:25 -0700 (PDT)
+        with ESMTP id S1726526AbfG2JUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 05:20:16 -0400
+Received: by mail-wr1-f68.google.com with SMTP id z1so60958379wru.13
+        for <kvm@vger.kernel.org>; Mon, 29 Jul 2019 02:20:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=zV+bTIgChlMbStRhEz4HmI17F1bLOP/P0h9cutKjnuk=;
-        b=sZqhgBAUVWlkQ/olBC24mjfBF21QLCDvO5YDiBj2dr8GtnnbUs/iHcNLEGuqLHmM/X
-         UZ93HtM9wZakgDJQ6fuXCKuvg8G/zLfbE53Xwc9CRkdps0xRqOsIVmLQS8jz069xuYOj
-         5bbX6JAyC3UveWGuJRI4bSJCypHJc/cpxCEPUUXQTVay+7kCvwAVWZn3J3JxIviLIsPL
-         oxdCk1zJk29AlCFpR6bH9KMDSdr4TinAdozXH5N61p8amEuRD/rc9yzAJTGTucnhYhuI
-         R9X9zUTk47WR4nG4GUaSD1Zawt3Kv+3f8yN0f8sG60xtLlVV9qo1kIYzgmRrfSYq99uy
-         +haw==
-X-Gm-Message-State: APjAAAU5wwP/T7KgOp9T4y/EJ1PzhBodUW+Bn+oLOPK8vdBgM6Ttr6Lr
-        hAyL3E9moX8vSZzfvujI9lYNjg==
-X-Google-Smtp-Source: APXvYqwu+iJxG0Nnx1LAgpMTW4dJUcSifVyQWlGLBgiZPy7xi6UkywxpJxOjNTGIQL6gbv5Vi6t8kA==
-X-Received: by 2002:a5d:4e8a:: with SMTP id e10mr38159080wru.26.1564391424671;
-        Mon, 29 Jul 2019 02:10:24 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id e6sm57983191wrw.23.2019.07.29.02.10.23
+        bh=uXbHp4eBJvOivXe3gCAiTk5IMqXsOx6plzKSBZNiGpQ=;
+        b=bnHElU7hIKQbQfJj1pWQ6ZdQ1a6c/khnDGzBoRNLfPTf2+4hsrjC/uv2kUhsZPYrff
+         oJHk1OEhoXkBQN5dmY3yUlR1YRJtovMU1B4/RW/IhbhTVBWE4PdRn9ON3Wz0tlOlXhHD
+         UfYntnuBai7LRNAimqeeuRV6nnYd0HsLrAgmh4F66TJ65Mv2/lfMLm6uzMMk8mhsb/3H
+         kIfSJAFJsRIApeuQ5nWfGCR1d7x5gL5puL/W0NYU+FWjvplL40CsM+I5mGj9CMAeG9hY
+         sgmeQPcReL2qU5hy05ACWu9509HS+LFV+IGg5UXsm0uJkOvgj0MNToqy9XwJ6tsTMgYY
+         sWyg==
+X-Gm-Message-State: APjAAAUqcsseVrVQO5AFcI7Epe3w4c+ac1Pgpd3Hh9xIwgciS6DgjdJW
+        aXM4Q1MRsSmVh9xL74dD7vh67w==
+X-Google-Smtp-Source: APXvYqyLDdpNaY9V1WepUQO0fPV/p+GwAXZPJm4OXn15VZtBt43XB+wYaq6vIkAZVLbjYIdAAle3aw==
+X-Received: by 2002:adf:e6c5:: with SMTP id y5mr124260124wrm.235.1564392014705;
+        Mon, 29 Jul 2019 02:20:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:29d3:6123:6d5f:2c04? ([2001:b07:6468:f312:29d3:6123:6d5f:2c04])
+        by smtp.gmail.com with ESMTPSA id w7sm69866212wrn.11.2019.07.29.02.20.13
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Jul 2019 02:10:23 -0700 (PDT)
-Subject: Re: [PATCH stable-4.19 1/2] KVM: nVMX: do not use dangling shadow
- VMCS after guest reset
-To:     Jack Wang <jack.wang.usish@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     stable@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <20190725104645.30642-1-vkuznets@redhat.com>
- <20190725104645.30642-2-vkuznets@redhat.com>
- <CA+res+RfqpT=g1QbCqr3OkHVzFFSAt3cfCYNcwqiemWmOifFxg@mail.gmail.com>
+        Mon, 29 Jul 2019 02:20:14 -0700 (PDT)
+Subject: Re: [PATCH v2 3/5] KVM: VMX: Add error handling to VMREAD helper
+To:     Josh Poimboeuf <jpoimboe@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190719204110.18306-1-sean.j.christopherson@intel.com>
+ <20190719204110.18306-4-sean.j.christopherson@intel.com>
+ <20190728193641.mjxrtcc6ps72z3sp@treble>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <2ea5d588-8573-6653-b848-0b06d1f98310@redhat.com>
-Date:   Mon, 29 Jul 2019 11:10:26 +0200
+Message-ID: <abcf50fc-0037-446f-36a3-1bd00091ce4f@redhat.com>
+Date:   Mon, 29 Jul 2019 11:20:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CA+res+RfqpT=g1QbCqr3OkHVzFFSAt3cfCYNcwqiemWmOifFxg@mail.gmail.com>
+In-Reply-To: <20190728193641.mjxrtcc6ps72z3sp@treble>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/07/19 10:58, Jack Wang wrote:
-> Vitaly Kuznetsov <vkuznets@redhat.com> 于2019年7月25日周四 下午3:29写道：
->>
->> From: Paolo Bonzini <pbonzini@redhat.com>
->>
->> [ Upstream commit 88dddc11a8d6b09201b4db9d255b3394d9bc9e57 ]
->>
->> If a KVM guest is reset while running a nested guest, free_nested will
->> disable the shadow VMCS execution control in the vmcs01.  However,
->> on the next KVM_RUN vmx_vcpu_run would nevertheless try to sync
->> the VMCS12 to the shadow VMCS which has since been freed.
->>
->> This causes a vmptrld of a NULL pointer on my machime, but Jan reports
->> the host to hang altogether.  Let's see how much this trivial patch fixes.
->>
->> Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
->> Cc: Liran Alon <liran.alon@oracle.com>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 28/07/19 21:36, Josh Poimboeuf wrote:
+> On Fri, Jul 19, 2019 at 01:41:08PM -0700, Sean Christopherson wrote:
+>> @@ -68,8 +67,22 @@ static __always_inline unsigned long __vmcs_readl(unsigned long field)
+>>  {
+>>  	unsigned long value;
+>>  
+>> -	asm volatile (__ex_clear("vmread %1, %0", "%k0")
+>> -		      : "=r"(value) : "r"(field));
+>> +	asm volatile("1: vmread %2, %1\n\t"
+>> +		     ".byte 0x3e\n\t" /* branch taken hint */
+>> +		     "ja 3f\n\t"
+>> +		     "mov %2, %%" _ASM_ARG1 "\n\t"
+>> +		     "xor %%" _ASM_ARG2 ", %%" _ASM_ARG2 "\n\t"
+>> +		     "2: call vmread_error\n\t"
+>> +		     "xor %k1, %k1\n\t"
+>> +		     "3:\n\t"
+>> +
+>> +		     ".pushsection .fixup, \"ax\"\n\t"
+>> +		     "4: mov %2, %%" _ASM_ARG1 "\n\t"
+>> +		     "mov $1, %%" _ASM_ARG2 "\n\t"
+>> +		     "jmp 2b\n\t"
+>> +		     ".popsection\n\t"
+>> +		     _ASM_EXTABLE(1b, 4b)
+>> +		     : ASM_CALL_CONSTRAINT, "=r"(value) : "r"(field) : "cc");
 > 
-> Hi all,
-> 
-> Do we need to backport the fix also to stable 4.14?  It applies
-> cleanly and compiles fine.
+> Was there a reason you didn't do the asm goto thing here like you did
+> for the previous patch?  That seemed cleaner, and needs less asm.  
 
-The reproducer required newer kernels that support KVM_GET_NESTED_STATE
-and KVM_SET_NESTED_STATE, so it would be hard to test it.  However, the
-patch itself should be safe.
+It's because asm goto doesn't support outputs.
 
 Paolo
+
+> I think the branch hints aren't needed -- they're ignored on modern
+> processors.  Ditto for the previous patch.
+> 
+> Also please use named asm operands whereever you can, like "%[field]"
+> instead of "%2".  It helps a lot with readability.
+> 
+
