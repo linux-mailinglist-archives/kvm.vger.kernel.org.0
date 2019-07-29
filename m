@@ -2,83 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7AB1790D0
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 18:28:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5D5479143
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 18:41:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387557AbfG2Q2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jul 2019 12:28:18 -0400
-Received: from mga12.intel.com ([192.55.52.136]:4210 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387549AbfG2Q2R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jul 2019 12:28:17 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jul 2019 09:28:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,323,1559545200"; 
-   d="scan'208";a="346698348"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga005.jf.intel.com with ESMTP; 29 Jul 2019 09:28:15 -0700
-Date:   Mon, 29 Jul 2019 09:28:15 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <zhexu@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        peterx@redhat.com
-Subject: Re: [PATCH 1/3] KVM: X86: Trace vcpu_id for vmexit
-Message-ID: <20190729162815.GF21120@linux.intel.com>
-References: <20190729053243.9224-1-peterx@redhat.com>
- <20190729053243.9224-2-peterx@redhat.com>
+        id S1727988AbfG2Qlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 12:41:40 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:42126 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726526AbfG2Qlj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 12:41:39 -0400
+Received: by mail-oi1-f196.google.com with SMTP id s184so45743979oie.9
+        for <kvm@vger.kernel.org>; Mon, 29 Jul 2019 09:41:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qEnidYZvMtI0djmi8U0ZEWcmJ8XfKi49GrC/Gx0OghM=;
+        b=hpDGASE8gWlB5Kvd/VVgrXDa0ScCf7sOLr3U9vKjlSn79zD0bv8XbnZKm849xjR4HH
+         9jS/s3aAbdtJG4o46zWw30anvsZPDbQmgkx8sH0Un6Kun3yVc7Q267S81yBYt9pB/3UR
+         MA9SVq7FR+ndy2+f60TSq/2yl7kN+Rxiz4I7daqRnDYbmkYQ8jHc1rMbffO0wAWBiakF
+         RQ/Jy4KeFp0g4y0QmorytTyGPhbzgrUGan6Vbwi2zdHlK42ZFXwkjipHYNcDS0wO9+EM
+         epRuq2Utiyj5xisvr9orHI3azi2NdBSDVBrCg7E4VFIr/OfnKSq8iY5Cme1ez4S2EK5t
+         ueKg==
+X-Gm-Message-State: APjAAAUVDpaAaIyEvToQ4c/Ocbl5LmOy8/dX/7H1EwhYH+EoRHOFyejg
+        ndE2hyCoUczk9PWMKeJb5q7mzpv9E2Enmekp1OWWDA==
+X-Google-Smtp-Source: APXvYqwLmyK1E/4jrfGUT98xeH//0WmrilX5ZcE9+u6f94aZr6eu7bn4vAgIsx2aZWLhabtNB/WLd0Vdna3tzy2IXKU=
+X-Received: by 2002:aca:1803:: with SMTP id h3mr20756041oih.24.1564418498709;
+ Mon, 29 Jul 2019 09:41:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190729053243.9224-2-peterx@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190717113030.163499-1-sgarzare@redhat.com> <20190717113030.163499-2-sgarzare@redhat.com>
+ <20190729095956-mutt-send-email-mst@kernel.org> <20190729153656.zk4q4rob5oi6iq7l@steredhat>
+ <20190729115904-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190729115904-mutt-send-email-mst@kernel.org>
+From:   Stefano Garzarella <sgarzare@redhat.com>
+Date:   Mon, 29 Jul 2019 18:41:27 +0200
+Message-ID: <CAGxU2F5F1KcaFNJ6n7++ApZiYMGnoEWKVRgo3Vc4h5hpxSJEZg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 29, 2019 at 01:32:41PM +0800, Peter Xu wrote:
-> It helps to pair vmenters and vmexis with multi-core systems.
+On Mon, Jul 29, 2019 at 12:01:37PM -0400, Michael S. Tsirkin wrote:
+> On Mon, Jul 29, 2019 at 05:36:56PM +0200, Stefano Garzarella wrote:
+> > On Mon, Jul 29, 2019 at 10:04:29AM -0400, Michael S. Tsirkin wrote:
+> > > On Wed, Jul 17, 2019 at 01:30:26PM +0200, Stefano Garzarella wrote:
+> > > > Since virtio-vsock was introduced, the buffers filled by the host
+> > > > and pushed to the guest using the vring, are directly queued in
+> > > > a per-socket list. These buffers are preallocated by the guest
+> > > > with a fixed size (4 KB).
+> > > >
+> > > > The maximum amount of memory used by each socket should be
+> > > > controlled by the credit mechanism.
+> > > > The default credit available per-socket is 256 KB, but if we use
+> > > > only 1 byte per packet, the guest can queue up to 262144 of 4 KB
+> > > > buffers, using up to 1 GB of memory per-socket. In addition, the
+> > > > guest will continue to fill the vring with new 4 KB free buffers
+> > > > to avoid starvation of other sockets.
+> > > >
+> > > > This patch mitigates this issue copying the payload of small
+> > > > packets (< 128 bytes) into the buffer of last packet queued, in
+> > > > order to avoid wasting memory.
+> > > >
+> > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > >
+> > > This is good enough for net-next, but for net I think we
+> > > should figure out how to address the issue completely.
+> > > Can we make the accounting precise? What happens to
+> > > performance if we do?
+> > >
+> >
+> > In order to do more precise accounting maybe we can use the buffer size,
+> > instead of payload size when we update the credit available.
+> > In this way, the credit available for each socket will reflect the memory
+> > actually used.
+> >
+> > I should check better, because I'm not sure what happen if the peer sees
+> > 1KB of space available, then it sends 1KB of payload (using a 4KB
+> > buffer).
+> > The other option is to copy each packet in a new buffer like I did in
+> > the v2 [2], but this forces us to make a copy for each packet that does
+> > not fill the entire buffer, perhaps too expensive.
+> >
+> > [2] https://patchwork.kernel.org/patch/10938741/
+> >
+>
+> So one thing we can easily do is to under-report the
+> available credit. E.g. if we copy up to 256bytes,
+> then report just 256bytes for every buffer in the queue.
+>
 
-Typo "vmexis".  The wording is also a bit funky.  How about:
+Ehm sorry, I got lost :(
+Can you explain better?
 
-Tracing the ID helps to pair vmenters and vmexits for guests with
-multiple vCPUs.
 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  arch/x86/kvm/trace.h | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index 4d47a2631d1f..26423d2e45df 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -232,17 +232,20 @@ TRACE_EVENT(kvm_exit,
->  		__field(	u32,	        isa             )
->  		__field(	u64,	        info1           )
->  		__field(	u64,	        info2           )
-> +		__field(	int,	        vcpu_id         )
->  	),
->  
->  	TP_fast_assign(
->  		__entry->exit_reason	= exit_reason;
->  		__entry->guest_rip	= kvm_rip_read(vcpu);
->  		__entry->isa            = isa;
-> +		__entry->vcpu_id        = vcpu->vcpu_id;
->  		kvm_x86_ops->get_exit_info(vcpu, &__entry->info1,
->  					   &__entry->info2);
->  	),
->  
-> -	TP_printk("reason %s rip 0x%lx info %llx %llx",
-> +	TP_printk("vcpu %d reason %s rip 0x%lx info %llx %llx",
-> +		  __entry->vcpu_id,
->  		 (__entry->isa == KVM_ISA_VMX) ?
->  		 __print_symbolic(__entry->exit_reason, VMX_EXIT_REASONS) :
->  		 __print_symbolic(__entry->exit_reason, SVM_EXIT_REASONS),
-> -- 
-> 2.21.0
-> 
+Thanks,
+Stefano
