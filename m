@@ -2,170 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD6CA7846F
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 07:33:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E12DD787D9
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 10:58:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726713AbfG2FdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jul 2019 01:33:01 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:37405 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726631AbfG2FdB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jul 2019 01:33:01 -0400
-Received: by mail-pl1-f196.google.com with SMTP id b3so27056275plr.4
-        for <kvm@vger.kernel.org>; Sun, 28 Jul 2019 22:33:00 -0700 (PDT)
+        id S1727223AbfG2I6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 04:58:44 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:34672 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727195AbfG2I6o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 04:58:44 -0400
+Received: by mail-lf1-f68.google.com with SMTP id b29so34247708lfq.1;
+        Mon, 29 Jul 2019 01:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=I1Kj7YUPvkqZu0AVoqLEWB0rMOmtYob12XhQjO3Ri6Q=;
+        b=cqvfLHPFUr5VxLj7mTj7MPXkdMQrlElRYzxTAKvcRGsHMjXI10VTKm4NlH9fEjQCX7
+         +HyrBLZh73kMWXuARtvgjMlo6mHSUe5xs+i/Jhy4EblsDE7sji2m1JzJ3oaeyt/EuFnb
+         mK0hJ18HHpmV3uHcNB5U6SBZc7ICPlwSSgwX5eQbHPsRuHa9PhFEJnjhPo29ufjn+mwK
+         REBtU646Guh/uerj6wz5DOsVddH3mBBhJ/5AGJO97VwAofsGZeelKO0q0Lemqj50c/Dz
+         nsneBBBi7xzaAPaX/70YoFTn0x2CY4K+SXJKHtxuWSOA8+6uFU4I2i+2HPZNAGKevH7s
+         fV4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=dl9/+u0b6L/IcklRFKklE/XMP6QZhufwp9r7/QOwquY=;
-        b=ua+sProjCIRzLvxS4QT1MHBlqOpB7AhbFURjrRlWcv72ugbgZQhKB3ZUUtRRQSR3H+
-         KDJsVTx9hDjIXplU1fYOw2br2wyjfeMdohHhsG8mizCLQtdRynOWtGRR5X9u42I4AiG4
-         Y7NOTncks7wylIBGh4G5tys2iv/kizxd3Pg1WVYqbLB+ShO7KkZb/M4BJerftvBpLdy0
-         ThmShgR+MgZ6vtK0/gz2TYS9n8RwiYNBQZaZbuymnZCWWSXIl61EFtwV9h/uIJqFXqJN
-         z4R++VdExX/uZ6rwklvxfQrD0TVSY6a32W+Y1WEYUJCsUbnfGCjNNahjEUNH55yMDlqy
-         L0jQ==
-X-Gm-Message-State: APjAAAWdY7WDN6iZwbGtT4Sr81V9hHz0Ac96+AOQ5gqA2BthX68jhW9N
-        4xxVhBcZFuQ7cgrV5G97Gh3dvD3ZDlY=
-X-Google-Smtp-Source: APXvYqwJ75zOeV3IXYaS4xaDewF73/KCZ1eplBMwKI992xyAk5GCZmKqw8Ou8QQfAw1iWvlwpBI0DA==
-X-Received: by 2002:a17:902:e011:: with SMTP id ca17mr110382769plb.328.1564378379971;
-        Sun, 28 Jul 2019 22:32:59 -0700 (PDT)
-Received: from xz-x1.redhat.com ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id o129sm30498550pfg.1.2019.07.28.22.32.57
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 28 Jul 2019 22:32:59 -0700 (PDT)
-From:   Peter Xu <zhexu@redhat.com>
-X-Google-Original-From: Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
-Subject: [PATCH 3/3] KVM: X86: Tune PLE Window tracepoint
-Date:   Mon, 29 Jul 2019 13:32:43 +0800
-Message-Id: <20190729053243.9224-4-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190729053243.9224-1-peterx@redhat.com>
-References: <20190729053243.9224-1-peterx@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=I1Kj7YUPvkqZu0AVoqLEWB0rMOmtYob12XhQjO3Ri6Q=;
+        b=MgHmd4uYtFe8WB38OOp4+SUMj6T76r5U+PX7+WqTQePF+FWrZqlLYdvvtH9SbuxYff
+         RfHnvD+7JlYP/ogyZMlyCZRHI2Ny2wTd230B9EBwEMKWPFj0J5Wk616AdU0OlXXO09Ew
+         /WUOhJjegZbdXNouxW4CH3q+rW7xPRdeZmiEM00WYgppMc7pIGkLHTd+hsZY0Qa/Htfx
+         QYHyCh3fRXpLPd676/YpiXA5rr5Ldj/v6c4vXgNxb93YwMqfHDJq0a2tI6y736u0hCyl
+         a5Yb/g1uJHyUCLm5oJa1DqgcbAkeEn46kzTHmIwn7JxEh3S2wmbPuW5paej+s3LLeJn6
+         tVgw==
+X-Gm-Message-State: APjAAAXBZryT5ctImfqcZnTuRQsY2Nta8R30GPnHmVuSWY2ELajUXD5D
+        7Ak0m4er+tJAn+yHcGB4BqX6bjm2z3qPuUtD9/1iIA==
+X-Google-Smtp-Source: APXvYqwEYMRATv6hJXcp2sN2uBqY7MeCPBYc/cx7vGGCDzzL9FkPA8m7NHC3RC8RJW7yXkhUwM+YmkfaE0n50XYnM0E=
+X-Received: by 2002:a19:4349:: with SMTP id m9mr50210064lfj.64.1564390721868;
+ Mon, 29 Jul 2019 01:58:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190725104645.30642-1-vkuznets@redhat.com> <20190725104645.30642-2-vkuznets@redhat.com>
+In-Reply-To: <20190725104645.30642-2-vkuznets@redhat.com>
+From:   Jack Wang <jack.wang.usish@gmail.com>
+Date:   Mon, 29 Jul 2019 10:58:30 +0200
+Message-ID: <CA+res+RfqpT=g1QbCqr3OkHVzFFSAt3cfCYNcwqiemWmOifFxg@mail.gmail.com>
+Subject: Re: [PATCH stable-4.19 1/2] KVM: nVMX: do not use dangling shadow
+ VMCS after guest reset
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     stable@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The PLE window tracepoint triggers easily and it can be a bit
-confusing too.  One example line:
+Vitaly Kuznetsov <vkuznets@redhat.com> =E4=BA=8E2019=E5=B9=B47=E6=9C=8825=
+=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=883:29=E5=86=99=E9=81=93=EF=BC=
+=9A
+>
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>
+> [ Upstream commit 88dddc11a8d6b09201b4db9d255b3394d9bc9e57 ]
+>
+> If a KVM guest is reset while running a nested guest, free_nested will
+> disable the shadow VMCS execution control in the vmcs01.  However,
+> on the next KVM_RUN vmx_vcpu_run would nevertheless try to sync
+> the VMCS12 to the shadow VMCS which has since been freed.
+>
+> This causes a vmptrld of a NULL pointer on my machime, but Jan reports
+> the host to hang altogether.  Let's see how much this trivial patch fixes=
+.
+>
+> Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-  kvm_ple_window: vcpu 0: ple_window 4096 (shrink 4096)
+Hi all,
 
-It easily let people think of "the window now is 4096 which is
-shrinked", but the truth is the value actually didn't change (4096).
+Do we need to backport the fix also to stable 4.14?  It applies
+cleanly and compiles fine.
 
-Let's only dump this message if the value really changed, and we make
-the message even simpler like:
-
-  kvm_ple_window: vcpu 4 (4096 -> 8192)
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- arch/x86/kvm/svm.c     |  8 ++++----
- arch/x86/kvm/trace.h   | 22 +++++++++-------------
- arch/x86/kvm/vmx/vmx.c |  4 ++--
- 3 files changed, 15 insertions(+), 19 deletions(-)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 48c865a4e5dd..0d365b621b5a 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -1268,8 +1268,8 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
- 	if (control->pause_filter_count != old)
- 		mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
- 
--	trace_kvm_ple_window_grow(vcpu->vcpu_id,
--				  control->pause_filter_count, old);
-+	trace_kvm_ple_window_changed(vcpu->vcpu_id,
-+				     control->pause_filter_count, old);
- }
- 
- static void shrink_ple_window(struct kvm_vcpu *vcpu)
-@@ -1286,8 +1286,8 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
- 	if (control->pause_filter_count != old)
- 		mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
- 
--	trace_kvm_ple_window_shrink(vcpu->vcpu_id,
--				    control->pause_filter_count, old);
-+	trace_kvm_ple_window_changed(vcpu->vcpu_id,
-+				     control->pause_filter_count, old);
- }
- 
- static __init int svm_hardware_setup(void)
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 76a39bc25b95..91c91f358b23 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -891,34 +891,30 @@ TRACE_EVENT(kvm_pml_full,
- );
- 
- TRACE_EVENT(kvm_ple_window,
--	TP_PROTO(bool grow, unsigned int vcpu_id, int new, int old),
--	TP_ARGS(grow, vcpu_id, new, old),
-+	TP_PROTO(unsigned int vcpu_id, int new, int old),
-+	TP_ARGS(vcpu_id, new, old),
- 
- 	TP_STRUCT__entry(
--		__field(                bool,      grow         )
- 		__field(        unsigned int,   vcpu_id         )
- 		__field(                 int,       new         )
- 		__field(                 int,       old         )
- 	),
- 
- 	TP_fast_assign(
--		__entry->grow           = grow;
- 		__entry->vcpu_id        = vcpu_id;
- 		__entry->new            = new;
- 		__entry->old            = old;
- 	),
- 
--	TP_printk("vcpu %u: ple_window %d (%s %d)",
--	          __entry->vcpu_id,
--	          __entry->new,
--	          __entry->grow ? "grow" : "shrink",
--	          __entry->old)
-+	TP_printk("vcpu %u (%d -> %d)",
-+	          __entry->vcpu_id, __entry->old, __entry->new)
- );
- 
--#define trace_kvm_ple_window_grow(vcpu_id, new, old) \
--	trace_kvm_ple_window(true, vcpu_id, new, old)
--#define trace_kvm_ple_window_shrink(vcpu_id, new, old) \
--	trace_kvm_ple_window(false, vcpu_id, new, old)
-+#define trace_kvm_ple_window_changed(vcpu, new, old)		\
-+	do {							\
-+		if (old != new)					\
-+			trace_kvm_ple_window(vcpu, new, old);	\
-+	} while (0)
- 
- TRACE_EVENT(kvm_pvclock_update,
- 	TP_PROTO(unsigned int vcpu_id, struct pvclock_vcpu_time_info *pvclock),
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d98eac371c0a..cc1f98130e6a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5214,7 +5214,7 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
- 	if (vmx->ple_window != old)
- 		vmx->ple_window_dirty = true;
- 
--	trace_kvm_ple_window_grow(vcpu->vcpu_id, vmx->ple_window, old);
-+	trace_kvm_ple_window_changed(vcpu->vcpu_id, vmx->ple_window, old);
- }
- 
- static void shrink_ple_window(struct kvm_vcpu *vcpu)
-@@ -5229,7 +5229,7 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
- 	if (vmx->ple_window != old)
- 		vmx->ple_window_dirty = true;
- 
--	trace_kvm_ple_window_shrink(vcpu->vcpu_id, vmx->ple_window, old);
-+	trace_kvm_ple_window_changed(vcpu->vcpu_id, vmx->ple_window, old);
- }
- 
- /*
--- 
-2.21.0
-
+Regards,
+Jack Wang
