@@ -2,79 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E403B7886D
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 11:30:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF87B78A5B
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 13:23:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727959AbfG2JaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jul 2019 05:30:19 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42762 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727937AbfG2JaS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jul 2019 05:30:18 -0400
-Received: by mail-wr1-f68.google.com with SMTP id x1so11107867wrr.9
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2019 02:30:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9avy5m8auN2z87gWKpbvtw9ce3O/3bqjjaiEc9X8IB4=;
-        b=IeWhGb8/8Anh6JloQHqnlP5CaJTPVNSGr/Mtl0m3APuzagb6VgddAg1KSQUmML077v
-         v1FB+RhNwW4XLO/RP85d2dUYT21yCGwr6x29JxHv7QPU39mQBsaSoD1dshQVtEClljIy
-         LBtxNUCflWt5Y20Gk/j/uUN7I+9soN5TUP50K5LZlCnp6rMvgw+UVoQRbuBu++LPKfAg
-         BX/jd1Cs53CWS3L/5Ijo4JEOL3rGKSbLPDhC+8qUA3ZUZhutWE5T0l03MrCbN1DOPt0U
-         5bvTFoCUn+sUu6Pyh7QVXN9P0pDY+11UFGpcOMGXAaVvNZ8Pk2BJnRIaZBoNOR80Cy+a
-         QO4g==
-X-Gm-Message-State: APjAAAXV//boXCjhG/mEsLndEhlJVBJuxpYipuS+7NsUjGteV8SQ3xIq
-        yt9SSctxPKFgZp/TCgfiEuYl9g==
-X-Google-Smtp-Source: APXvYqy0ukqUzu8jgOYkuviFDoJUTuAF/SmhWh3Yh9peouGgMoj42CbJFnks9ZQse0UPz648OOpZQw==
-X-Received: by 2002:adf:f28a:: with SMTP id k10mr41842741wro.343.1564392617641;
-        Mon, 29 Jul 2019 02:30:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:29d3:6123:6d5f:2c04? ([2001:b07:6468:f312:29d3:6123:6d5f:2c04])
-        by smtp.gmail.com with ESMTPSA id w24sm48173380wmc.30.2019.07.29.02.30.16
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Jul 2019 02:30:17 -0700 (PDT)
-Subject: Re: [PATCH stable-4.19 1/2] KVM: nVMX: do not use dangling shadow
- VMCS after guest reset
-To:     Jack Wang <jack.wang.usish@gmail.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, stable@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <20190725104645.30642-1-vkuznets@redhat.com>
- <20190725104645.30642-2-vkuznets@redhat.com>
- <CA+res+RfqpT=g1QbCqr3OkHVzFFSAt3cfCYNcwqiemWmOifFxg@mail.gmail.com>
- <2ea5d588-8573-6653-b848-0b06d1f98310@redhat.com>
- <CA+res+ShqmPcJWj+0F7X8=0DM_ys8HCP+rjg4Nv-7o06EipJQw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <471a1023-4f0a-5727-e7b2-48701f75188f@redhat.com>
-Date:   Mon, 29 Jul 2019 11:30:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2387632AbfG2LXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 07:23:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33596 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387450AbfG2LXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 07:23:13 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 11EAD4E8AC;
+        Mon, 29 Jul 2019 11:23:13 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D41FA60C5F;
+        Mon, 29 Jul 2019 11:23:11 +0000 (UTC)
+Date:   Mon, 29 Jul 2019 13:23:09 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com
+Subject: Re: [kvm-unit-tests PATCH] arm: timer: Fix potential deadlock when
+ waiting for interrupt
+Message-ID: <20190729112309.wooytkz7g6qtvvc2@kamzik.brq.redhat.com>
+References: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <CA+res+ShqmPcJWj+0F7X8=0DM_ys8HCP+rjg4Nv-7o06EipJQw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Mon, 29 Jul 2019 11:23:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/07/19 11:29, Jack Wang wrote:
-> Thanks Paolo for confirmation. I'm asking because we had one incident
-> in our production with 4.14.129 kernel,
-> System is Skylake Gold cpu, first kvm errors, host hung afterwards
+On Mon, Jul 29, 2019 at 10:28:52AM +0100, Alexandru Elisei wrote:
+> Commit 204e85aa9352 ("arm64: timer: a few test improvements") added a call
+> to report_info after enabling the timer and before the wfi instruction. The
+> uart that printf uses is emulated by userspace and is slow, which makes it
+> more likely that the timer interrupt will fire before executing the wfi
+> instruction, which leads to a deadlock.
 > 
-> kernel: [1186161.091160] kvm: vmptrld           (null)/6bfc00000000 failed
-> kernel: [1186161.091537] kvm: vmclear fail:           (null)/6bfc00000000
-> kernel: [1186186.490300] watchdog: BUG: soft lockup - CPU#54 stuck for
-> 23s! [qemu:16639]
+> An interrupt can wake up a CPU out of wfi, regardless of the
+> PSTATE.{A, I, F} bits. Fix the deadlock by masking interrupts on the CPU
+> before enabling the timer and unmasking them after the wfi returns so the
+> CPU can execute the timer interrupt handler.
 > 
-> Hi Sasha, hi Greg,
+> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/timer.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Would be great if you can pick this patch also to 4.14 kernel.
+> diff --git a/arm/timer.c b/arm/timer.c
+> index 6f2ad1d76ab2..f2f60192ba62 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -242,9 +242,11 @@ static void test_timer(struct timer_info *info)
+>  	/* Test TVAL and IRQ trigger */
+>  	info->irq_received = false;
+>  	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
+> +	local_irq_disable();
+>  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+>  	report_info("waiting for interrupt...");
+>  	wfi();
+> +	local_irq_enable();
+>  	left = info->read_tval();
+>  	report("interrupt received after TVAL/WFI", info->irq_received);
+>  	report("timer has expired (%d)", left < 0, left);
+> -- 
+> 2.7.4
+>
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks Alexandru. It now makes more sense to me that wfi wakes up on
+an interrupt, even when interrupts are masked, as it's clearly to
+avoid these types of races. I see we have the same type of race in
+arm/gic.c. I'll try to get around to fixing that at some point, unless
+somebody beats me to it :)
+
+drew
