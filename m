@@ -2,138 +2,290 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F77279A9C
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 23:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B00479B41
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 23:37:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729777AbfG2VIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jul 2019 17:08:49 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:35903 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725894AbfG2VIs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jul 2019 17:08:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1564434529; x=1595970529;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=WT99HgsiSLRKqsljjUoE9XwJ1kGXUPdlDPeLmaM+9YQ=;
-  b=BLH33HdIhDKuvYOPQ0/PTBPRksfj2xRA8siGd5eFTNa26bAR/TmvOrT2
-   p5iav+bafbBa/OlXXi+90yHIX6/aUIljvnRekrg7e+SgiQBIpCspQ4G5e
-   qBC6dEB5AJrEMZH2yjb2RpQjqsM1So17YY/ntGl41LPNZ4nuMLvHa8BS/
-   bILOs5+0s7GyZtawvaUvbqYqv5kF27cFBBX0l/uJpQ9pAuKoVBmiu9UwZ
-   R5PjYGrDAFIZsZliruT/5SiMFShpk0JMoEFS/yzzSFF03HfLfjqJ2rbL6
-   tYwGbjDNPlzhUdvvrWpnA3Eoy54NmJpK5BhUrHTbj6mP4ukG4t0s/ogYM
-   g==;
-IronPort-SDR: Yl+zMQ+/dcPV7wXoaNyRaLYDNYR1Jjn3dcVCn/qY3Qo6T3az1nw+P8SArW2xHZR2abUK5R+TWI
- Gn8ar0IUoInKrc60RIsn5fT03tcns8Ds0ROY1IIKrTNuhOq488jeMaDsZGOyH/q+1etGSKdqtn
- B52yNcFtvr27SMIo/KXACTIx41koYtmVJAi8T8JQzyVjqMp728i2H+RSSkNFrYAit3wlxJDEKd
- mUE9CNSFJvQJ/x0JUUemHhIV2B/JzSjx/Bd3uiQ9e6FcWVnDzJ/o8FkFO/UcZLY8JlxsA6kiJk
- HVk=
-X-IronPort-AV: E=Sophos;i="5.64,324,1559491200"; 
-   d="scan'208";a="115443431"
-Received: from mail-sn1nam04lp2059.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.59])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Jul 2019 05:08:47 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bOp4id6k0J2rnEI99FT0ZZN8FZonwXNZWOvYbqJbSNw3FqmblWZ8S39slaZYWr5THJQT4fM2ut+vhefWDjm1mCehj8/EjBMSq7ldps4kBkETi2EWMadDD1Xb/UbGnKPDkCVgM8SxJSLL5zTPYW8R59ZyvGfn1uMAbj7qtCKJbuTpy4iWaIZOxxTO+UCLZpSubFFaYKs2HhlWgTS5LUAa5KNuVsX2gJROD1jM0DQRB1EueETFZSUQynPjdSqIeK6AoalDH9NBVpwEStUCU3bwMdin4kIkJkCbVT0jMn4coeKI6KI9lflJRAvyqEhVswlWuOOZ3c7gJCuV5VUL5x14PQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WT99HgsiSLRKqsljjUoE9XwJ1kGXUPdlDPeLmaM+9YQ=;
- b=jXwsVbUPnMZuM0uBQuHRyDIyjmeNhOTbGXSIJjX5bdxm1Kf882SOnNZBHO013ZV2IuC89R2Oamzlf3fDXIEAwbWuq33uVC5nMivJlQOGROuIf5eV7eAC0XdpTpWzmB3y6wiH5y7eDbsGsnXaZTxOyE/rgw/I6yTx8/RqmDk9728yBmHlW9SiMn6yVuUKLPDFz2GQT0CF27+fN7dVIFDLv97Vn2RcO8akMA5WEWFRQTYwTcsseqh9bGJ1f5JU98C3R5ICBTJyp85Y5TaNQsw9R4aJG1/bVS+0XO8wwhcCmDYOTBBGzM6QmOgbv7Azc3xVii6Cypoiq9c2fP0bxVUrAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=wdc.com;dmarc=pass action=none header.from=wdc.com;dkim=pass
- header.d=wdc.com;arc=none
+        id S2388743AbfG2Vhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 17:37:39 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:32798 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729229AbfG2Vhi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 17:37:38 -0400
+Received: by mail-io1-f67.google.com with SMTP id z3so4552907iog.0;
+        Mon, 29 Jul 2019 14:37:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WT99HgsiSLRKqsljjUoE9XwJ1kGXUPdlDPeLmaM+9YQ=;
- b=KVcboa31dd0nWr2O+qK+UGYwIAF3tB7Jt1f5syLRrGEWrecN/owFCttfVSK9KQ/yiGrzTfQupiMJMfVzJr/rWSRUJ4cBSt9Tg/On9jjEIgE+oS4SrJeC4vLJmX+iVvDK6Fxl9QWhD4LviBZmz4YX9MhDApPkBLgK3XyMn4r9qmA=
-Received: from BYAPR04MB3782.namprd04.prod.outlook.com (52.135.214.142) by
- BYAPR04MB4023.namprd04.prod.outlook.com (52.135.215.142) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.15; Mon, 29 Jul 2019 21:08:45 +0000
-Received: from BYAPR04MB3782.namprd04.prod.outlook.com
- ([fe80::ac9a:967e:70a5:e926]) by BYAPR04MB3782.namprd04.prod.outlook.com
- ([fe80::ac9a:967e:70a5:e926%7]) with mapi id 15.20.2115.005; Mon, 29 Jul 2019
- 21:08:45 +0000
-From:   Atish Patra <Atish.Patra@wdc.com>
-To:     "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "palmer@sifive.com" <palmer@sifive.com>,
-        Anup Patel <Anup.Patel@wdc.com>
-CC:     "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "anup@brainfault.org" <anup@brainfault.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 15/16] RISC-V: KVM: Add SBI v0.1 support
-Thread-Topic: [RFC PATCH 15/16] RISC-V: KVM: Add SBI v0.1 support
-Thread-Index: AQHVRgTdLbP8aD0d50+SPOvQQEaYeqbh/v2AgAAC3ICAAATnAIAAENOA
-Date:   Mon, 29 Jul 2019 21:08:45 +0000
-Message-ID: <9914fa698cb0f2d72e2e92d98136100ea36e4c47.camel@wdc.com>
-References: <20190729115544.17895-1-anup.patel@wdc.com>
-         <20190729115544.17895-16-anup.patel@wdc.com>
-         <b461c82f-960a-306e-b76b-f2c329cabf21@redhat.com>
-         <0e19ff14a51e210af91c4b0f2e649b8f5e140ce1.camel@wdc.com>
-         <b6c884cc-e156-d125-b3a2-c8a843de34c2@redhat.com>
-In-Reply-To: <b6c884cc-e156-d125-b3a2-c8a843de34c2@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Atish.Patra@wdc.com; 
-x-originating-ip: [199.255.44.250]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 600d3425-f131-4a4d-bcaf-08d71468f196
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4023;
-x-ms-traffictypediagnostic: BYAPR04MB4023:
-x-microsoft-antispam-prvs: <BYAPR04MB4023F882EC0432E7A719F02FFADD0@BYAPR04MB4023.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 01136D2D90
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(376002)(39860400002)(366004)(396003)(346002)(136003)(189003)(199004)(316002)(53546011)(76176011)(2906002)(4744005)(71190400001)(66556008)(64756008)(66446008)(66946007)(478600001)(86362001)(6512007)(486006)(66476007)(7736002)(14444005)(6506007)(76116006)(446003)(66066001)(305945005)(256004)(11346002)(68736007)(71200400001)(5660300002)(2616005)(476003)(7416002)(25786009)(99286004)(8676002)(14454004)(6436002)(53936002)(118296001)(2501003)(6246003)(8936002)(36756003)(110136005)(6116002)(4326008)(6486002)(3846002)(229853002)(6636002)(102836004)(2201001)(26005)(81156014)(54906003)(186003)(81166006);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4023;H:BYAPR04MB3782.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: SOXly4XCR1WWuptyVO3HGtexM827OCy8aMMv6N8SgAd4YZA89vb3mmGfrOhmq44fehUIU8wTw8DKNvSaO6Hqw8z2o/wxcVReIFtt1TBHMUGPHZCvZ/de9PXhevCVFkIDQ+rLiyQ70/ucA7GdI9qY3Zdlr7ESpNVzsuPD8sXCb9/KQ7FeEdNKLHuCVTAiFvQI5zbQtk6qt8nFRtMP/hTBC8iLY2Puqa0Uk26G0JEuSFIwV6c7SxGcV7efKiW9McqbjJzRiMe0eClcii2E76sbkXuc0iCGXiFAqbIH80tPFWDw96NJezqggRUl/gFENTXy/6fOlOUsbSsARlRrg9MC4v2+OPdvBtJ6y+YfQo0y9Hci1WtfS9FgHQ5+BokJaVZudJPlVmRH2+lAzvc7RccWQkTynyhrtBrXITfFXSbgoZs=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B0FE8B5DD99C9344B145D264ABBBADF2@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5cCIss0pU8KiL1WOCYgq6SrmvzURzIys2UArJ6GdY2k=;
+        b=Vz+ggA29aLJ48naPv3uVKqtuppaCpQ/kdYIpM0wb6c+Qi7sGykFaQRbRVSnOQkH2BL
+         u1oq67k2Y3VZJ+DMR8P1t0ARnKG1DTJjjrOvPPkwKOVBJZBXwJBQ1bJlj+dqsd1lgQdZ
+         InuDzNcrfv39Jj+o07XwV0tQRWrfiqi1eafRZs5GmfYwS0nVIzKb2YkDHQbLGhx0eJ2F
+         O5TjiRzSZ3IPL3Xh8QNphxCwPzk7zVzpXdubW85mcAdo3dhCBM2G9fNLzt6DijA66f/9
+         FNESZra1vJheRLUzTrvGaZwPxiYQ2HuPge83FMGnfr0pfA5IloMB6Xt0bO4yy5xroaSi
+         3chA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5cCIss0pU8KiL1WOCYgq6SrmvzURzIys2UArJ6GdY2k=;
+        b=V0gB3mNtRy4NfwOY6qQ5LvsXJJ4bQ96cQAetlFGoFyKANbu1vjEAlKnLvMWgEdhyQi
+         7RrV1MtcOp/cNVuwx0aq8wbYAsxJC0Y0uk4H9ATJ/RgGw68S82HPAjE6HAO9AuGU9OvV
+         Ewkn7seuaIEtkAcQ8HSQDeaCTdsxr4Wx0GzaAFw78CUv33b+X7bZhx1PWa51S3rDsJbt
+         Z4Z7PyvFElBt6oZ1oFDyE9WO5Gqz/jhJPvMw2qsVC3HfbmHTwsV2Zh+GAA9jWuz8JVps
+         H0N7vLvzS07pS4KJmYkmHX/+/uo+r4lVcDk6Trkksd/p1EKy8hZB5qi+DssXnTafXMM2
+         Zlyg==
+X-Gm-Message-State: APjAAAV9YGHy10qyxZIF46r/JsOJItE/MyhMw4J1NJQIzpVHtvd8JQkg
+        DP/LwWI+ycf9dPaA/ZstZlwaWtXXc38nIn1Kk3o=
+X-Google-Smtp-Source: APXvYqwD23fVr0zS/hJPKXGQ25v0gjbF/tFuxkk1ZMc570Q8iffL2hFloWKw4n+ABGA4U5+2kfsuCVK5M/Q+Cllvb1s=
+X-Received: by 2002:a6b:6409:: with SMTP id t9mr36763195iog.270.1564436257764;
+ Mon, 29 Jul 2019 14:37:37 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 600d3425-f131-4a4d-bcaf-08d71468f196
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jul 2019 21:08:45.6147
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Atish.Patra@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4023
+References: <20190724165158.6685.87228.stgit@localhost.localdomain>
+ <20190724171050.7888.62199.stgit@localhost.localdomain> <20190724150224-mutt-send-email-mst@kernel.org>
+ <6218af96d7d55935f2cf607d47680edc9b90816e.camel@linux.intel.com>
+ <ee5387b1-89af-daf4-8492-8139216c6dcf@redhat.com> <20190724164023-mutt-send-email-mst@kernel.org>
+ <CAKgT0Ud6jPpsvJWFAMSnQXAXeNZb116kR7D2Xb7U-7BOtctK_Q@mail.gmail.com>
+ <20190729151805-mutt-send-email-mst@kernel.org> <CAKgT0Ufq9RE_4B5bdsYyEf65WJkZsDHMD+MEJVJyev22+J3XAg@mail.gmail.com>
+ <20190729163053-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190729163053-mutt-send-email-mst@kernel.org>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Mon, 29 Jul 2019 14:37:26 -0700
+Message-ID: <CAKgT0UfxQb2aLiTKz5JeHt76R8WFQcnVg_wq1wxJV_1UhbPJMg@mail.gmail.com>
+Subject: Re: [PATCH v2 QEMU] virtio-balloon: Provide a interface for "bubble hinting"
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     wei.w.wang@intel.com, Nitesh Narayan Lal <nitesh@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
+        Rik van Riel <riel@surriel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        lcapitulino@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gTW9uLCAyMDE5LTA3LTI5IGF0IDIyOjA4ICswMjAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
-PiBPbiAyOS8wNy8xOSAyMTo1MSwgQXRpc2ggUGF0cmEgd3JvdGU6DQo+ID4gT24gTW9uLCAyMDE5
-LTA3LTI5IGF0IDIxOjQwICswMjAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0KPiA+ID4gT24gMjkv
-MDcvMTkgMTM6NTcsIEFudXAgUGF0ZWwgd3JvdGU6DQo+ID4gPiA+ICsJY3NyX3dyaXRlKENTUl9I
-U1RBVFVTLCB2Y3B1LT5hcmNoLmd1ZXN0X2NvbnRleHQuaHN0YXR1cyANCj4gPiA+ID4gfA0KPiA+
-ID4gPiBIU1RBVFVTX1NQUlYpOw0KPiA+ID4gPiArCWNzcl93cml0ZShDU1JfU1NUQVRVUywgdmNw
-dS0NCj4gPiA+ID4gPmFyY2guZ3Vlc3RfY29udGV4dC5zc3RhdHVzKTsNCj4gPiA+ID4gKwl2YWwg
-PSAqYWRkcjsNCj4gPiA+IA0KPiA+ID4gV2hhdCBoYXBwZW5zIGlmIHRoaXMgbG9hZCBmYXVsdHM/
-DQo+ID4gPiANCj4gPiANCj4gPiBJdCBzaG91bGQgcmVkaXJlY3QgdGhlIHRyYXAgYmFjayB0byBW
-UyBtb2RlLiBDdXJyZW50bHksIGl0IGlzIG5vdA0KPiA+IGltcGxlbWVudGVkLiBJdCBpcyBvbiB0
-aGUgVE8tRE8gbGlzdCBmb3IgZnV0dXJlIGl0ZXJhdGlvbiBvZiB0aGUNCj4gPiBzZXJpZXMuDQo+
-IA0KPiBPaywgcGxlYXNlIGFkZCBUT0RPIGNvbW1lbnRzIGZvciB0aGUgbW9yZSBpbXBvcnRhbnQg
-dGFza3MgbGlrZSB0aGlzDQo+IG9uZQ0KPiAoYW5kL29yIHBvc3QgYSBzb21ld2hhdCBjb21wbGV0
-ZSBsaXN0IGluIHJlcGx5IHRvIDAwLzE2KS4NCj4gDQoNClN1cmUuIFdpbGwgYWRkIGEgVE9ETyBj
-b21tZW50IGhlcmUgYW5kIHB1dCB0aGUgY29tcGxldGUgVE9ETyBsaXN0IGluDQpjb3ZlciBsZXR0
-ZXIgYXMgd2VsbC4NCg0KUmVnYXJkcywNCkF0aXNoDQo+IFRoYW5rcyENCj4gDQo+IFBhb2xvDQo+
-IA0KDQo=
+On Mon, Jul 29, 2019 at 1:49 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Jul 29, 2019 at 01:21:32PM -0700, Alexander Duyck wrote:
+> > On Mon, Jul 29, 2019 at 12:25 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Mon, Jul 29, 2019 at 09:58:04AM -0700, Alexander Duyck wrote:
+> > > > On Wed, Jul 24, 2019 at 1:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > >
+> > > > > On Wed, Jul 24, 2019 at 04:29:27PM -0400, Nitesh Narayan Lal wrote:
+> > > > > >
+> > > > > > On 7/24/19 4:18 PM, Alexander Duyck wrote:
+> > > > > > > On Wed, 2019-07-24 at 15:02 -0400, Michael S. Tsirkin wrote:
+> > > > > > >> On Wed, Jul 24, 2019 at 10:12:10AM -0700, Alexander Duyck wrote:
+> > > > > > >>> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > > > > > >>>
+> > > > > > >>> Add support for what I am referring to as "bubble hinting". Basically the
+> > > > > > >>> idea is to function very similar to how the balloon works in that we
+> > > > > > >>> basically end up madvising the page as not being used. However we don't
+> > > > > > >>> really need to bother with any deflate type logic since the page will be
+> > > > > > >>> faulted back into the guest when it is read or written to.
+> > > > > > >>>
+> > > > > > >>> This is meant to be a simplification of the existing balloon interface
+> > > > > > >>> to use for providing hints to what memory needs to be freed. I am assuming
+> > > > > > >>> this is safe to do as the deflate logic does not actually appear to do very
+> > > > > > >>> much other than tracking what subpages have been released and which ones
+> > > > > > >>> haven't.
+> > > > > > >>>
+> > > > > > >>> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > > > > > >>> ---
+> > > > > > >>>  hw/virtio/virtio-balloon.c                      |   40 +++++++++++++++++++++++
+> > > > > > >>>  include/hw/virtio/virtio-balloon.h              |    2 +
+> > > > > > >>>  include/standard-headers/linux/virtio_balloon.h |    1 +
+> > > > > > >>>  3 files changed, 42 insertions(+), 1 deletion(-)
+> > > > > > >>>
+> > > > > > >>> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> > > > > > >>> index 2112874055fb..70c0004c0f88 100644
+> > > > > > >>> --- a/hw/virtio/virtio-balloon.c
+> > > > > > >>> +++ b/hw/virtio/virtio-balloon.c
+> > > > > > >>> @@ -328,6 +328,39 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
+> > > > > > >>>      balloon_stats_change_timer(s, 0);
+> > > > > > >>>  }
+> > > > > > >>>
+> > > > > > >>> +static void virtio_bubble_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+> > > > > > >>> +{
+> > > > > > >>> +    VirtQueueElement *elem;
+> > > > > > >>> +
+> > > > > > >>> +    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
+> > > > > > >>> +         unsigned int i;
+> > > > > > >>> +
+> > > > > > >>> +        for (i = 0; i < elem->in_num; i++) {
+> > > > > > >>> +            void *addr = elem->in_sg[i].iov_base;
+> > > > > > >>> +            size_t size = elem->in_sg[i].iov_len;
+> > > > > > >>> +            ram_addr_t ram_offset;
+> > > > > > >>> +            size_t rb_page_size;
+> > > > > > >>> +            RAMBlock *rb;
+> > > > > > >>> +
+> > > > > > >>> +            if (qemu_balloon_is_inhibited())
+> > > > > > >>> +                continue;
+> > > > > > >>> +
+> > > > > > >>> +            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
+> > > > > > >>> +            rb_page_size = qemu_ram_pagesize(rb);
+> > > > > > >>> +
+> > > > > > >>> +            /* For now we will simply ignore unaligned memory regions */
+> > > > > > >>> +            if ((ram_offset | size) & (rb_page_size - 1))
+> > > > > > >>> +                continue;
+> > > > > > >>> +
+> > > > > > >>> +            ram_block_discard_range(rb, ram_offset, size);
+> > > > > > >> I suspect this needs to do like the migration type of
+> > > > > > >> hinting and get disabled if page poisoning is in effect.
+> > > > > > >> Right?
+> > > > > > > Shouldn't something like that end up getting handled via
+> > > > > > > qemu_balloon_is_inhibited, or did I miss something there? I assumed cases
+> > > > > > > like that would end up setting qemu_balloon_is_inhibited to true, if that
+> > > > > > > isn't the case then I could add some additional conditions. I would do it
+> > > > > > > in about the same spot as the qemu_balloon_is_inhibited check.
+> > > > > > I don't think qemu_balloon_is_inhibited() will take care of the page poisoning
+> > > > > > situations.
+> > > > > > If I am not wrong we may have to look to extend VIRTIO_BALLOON_F_PAGE_POISON
+> > > > > > support as per Michael's suggestion.
+> > > > >
+> > > > >
+> > > > > BTW upstream qemu seems to ignore VIRTIO_BALLOON_F_PAGE_POISON ATM.
+> > > > > Which is probably a bug.
+> > > > > Wei, could you take a look pls?
+> > > >
+> > > > So I was looking at sorting out this for the unused page reporting
+> > > > that I am working on and it occurred to me that I don't think we can
+> > > > do the free page hinting if any sort of poison validation is present.
+> > > > The problem is that free page hinting simply stops the page from being
+> > > > migrated. As a result if there was stale data present it will just
+> > > > leave it there instead of zeroing it or writing it to alternating 1s
+> > > > and 0s.
+> > >
+> > > stale data where? on source or on destination?
+> > > do you mean the case where memory was corrupted?
+> > >
+> >
+> > Actually I am getting my implementation and this one partially mixed
+> > up again. I was thinking that the page just gets put back. However it
+> > doesn't. Instead free_pages is called. As such it is going to dirty
+> > the page by poisoning it as soon as the hinting is complete.
+> >
+> > In some ways it is worse because I think page poisoning combined with
+> > free page hinting will make the VM nearly unusable because it will be
+> > burning cycles allocating all memory, and then poisoning all those
+> > pages on free. So it will be populating the dirty bitmap with all free
+> > memory each time it goes through and attempts to determine what memory
+> > is free.
+>
+> Right, it does make it useless.
+>
+> I really consider this a bug: page should be given to hypervisor after
+> it's poisoned. Then at least with 0 poison we could just mark it clean.
+> For non-zero poison, we could think about adding kvm APIs for
+> aggressively mapping all freed pages to a single non-zero one with COW.
+>
+> I guess it's prudent to sacrifice another feature bit if/when
+> we fix it properly, saving a feature bit isn't worth
+> the risk that someone shipped a guest like this.
+>
+> But it does show why just using alloc/free for hinting isn't
+> as great an idea as it seems on the surface.
+
+What I think I can do for now is address this partially in QEMU. What
+I will do is just return without starting the free page hinting in
+virtio_balloon_free_page_start() if VIRTIO_BALLOON_F_PAGE_POISON is
+set.
+
+> > > >
+> > > > Also it looks like the VIRTIO_BALLOON_F_PAGE_POISON feature is
+> > > > assuming that 0 means that page poisoning is disabled,
+> > > > when in reality
+> > > > it might just mean we are using the value zero to poison pages instead
+> > > > of the 0xaa pattern. As such I think there are several cases where we
+> > > > could incorrectly flag the pages with the hint and result in the
+> > > > migrated guest reporting pages that contain non-poison values.
+> > > >
+> > >
+> > >
+> > > Well guest has this code:
+> > > static int virtballoon_validate(struct virtio_device *vdev)
+> > > {
+> > >         if (!page_poisoning_enabled())
+> > >                 __virtio_clear_bit(vdev, VIRTIO_BALLOON_F_PAGE_POISON);
+> > >
+> > >         __virtio_clear_bit(vdev, VIRTIO_F_IOMMU_PLATFORM);
+> > >         return 0;
+> > > }
+> > >
+> > > So it seems that host can figure out what is going on easily enough.
+> > > What did I miss?
+> >
+> > Okay. So it is clearing that feature bit. I didn't see that part.
+> > However that leads to the question of where we should be setting that
+> > feature bit in the QEMU side of things. I was looking at setting that
+> > bit in virtio_balloon_get_features(). Would that be the appropriate
+> > place to set that so that the feature flag is reset when we are
+> > changing OSes or rebooting the guest?
+>
+> We have
+>     DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
+>                     VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
+> and poison should be there, too.
+
+I don't think we want it to be user configurable though, do we? It
+seems like it should be set if either free-page-hint or
+unused-page-reporting are enabled. Then the guest can disable it on
+its end if poisoning is not present.
+
+> > > > The zero assumption works for unused page reporting since we will be
+> > > > zeroing out the page when it is faulted back into the guest, however
+> > > > the same doesn't work for the free page hint since it is simply
+> > > > skipping the migration of the recently dirtied page.
+> > >
+> > > Right but the dirtied page is normally full of 0 since that is the
+> > > poison value, if we just leave it there we still get 0s, right?
+> >
+> > So for the unused page reporting which I am working on we can still
+> > hint the page away since it will be 0s, and us returning the pages
+> > doesn't alter the page data. However for the free page hinting I don't
+> > think we can.
+> >
+> > With page poisoning and free page hinting I am thinking we should just
+> > disable the free page hinting as I don't see how there can be any
+> > advantage to it if page poisoning is enbled. Basically the thing that
+> > makes the hinting "safe" will sabotage it since for every page we
+> > don't migrate we will also be marking as dirty for the next iteration
+> > through migration. As such we are just pushing the migration of any
+> > free pages until the VM has stopped since the VM will just keep
+> > dirtying the free pages until it stops hinting.
+>
+>
+> Right this was discussed at the time for non-zero poison.
+>
+> For hinting, my argument was simple: the reason it's useless is contained
+> within the hypervisor. So don't put the logic in the guest:
+> hypervisor can see poison is set and not request hints from guest.
+
+Agreed. What I am going to do is store off the config value to a value
+local to the vdev when the config is written from the guest and the
+VIRTIO_BALLOON_F_PAGE_POISON value is set.
+
+Like I mentioned above I will just disable the free page hinting
+functionality by just not having the hypervisor request hinting if
+page poisoning is set. I will just drop the reports from the guest
+when the poison value is non-zero.
+
+> For reporting, as you say it works with 0s and we can thinkably
+> make it work with non-0s down the road.
+> Until we do we can always have the hypervisor do something like
+>
+>         if (poisoning && poison != 0)
+>                 return;
+>         madvise(MADV_FREE);
+
+Agreed.
