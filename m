@@ -2,89 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E12DD787D9
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 10:58:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 144627880B
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2019 11:10:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727223AbfG2I6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Jul 2019 04:58:44 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:34672 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727195AbfG2I6o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Jul 2019 04:58:44 -0400
-Received: by mail-lf1-f68.google.com with SMTP id b29so34247708lfq.1;
-        Mon, 29 Jul 2019 01:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=I1Kj7YUPvkqZu0AVoqLEWB0rMOmtYob12XhQjO3Ri6Q=;
-        b=cqvfLHPFUr5VxLj7mTj7MPXkdMQrlElRYzxTAKvcRGsHMjXI10VTKm4NlH9fEjQCX7
-         +HyrBLZh73kMWXuARtvgjMlo6mHSUe5xs+i/Jhy4EblsDE7sji2m1JzJ3oaeyt/EuFnb
-         mK0hJ18HHpmV3uHcNB5U6SBZc7ICPlwSSgwX5eQbHPsRuHa9PhFEJnjhPo29ufjn+mwK
-         REBtU646Guh/uerj6wz5DOsVddH3mBBhJ/5AGJO97VwAofsGZeelKO0q0Lemqj50c/Dz
-         nsneBBBi7xzaAPaX/70YoFTn0x2CY4K+SXJKHtxuWSOA8+6uFU4I2i+2HPZNAGKevH7s
-         fV4w==
+        id S1726526AbfG2JK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Jul 2019 05:10:27 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46901 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbfG2JK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Jul 2019 05:10:26 -0400
+Received: by mail-wr1-f68.google.com with SMTP id z1so60923097wru.13
+        for <kvm@vger.kernel.org>; Mon, 29 Jul 2019 02:10:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=I1Kj7YUPvkqZu0AVoqLEWB0rMOmtYob12XhQjO3Ri6Q=;
-        b=MgHmd4uYtFe8WB38OOp4+SUMj6T76r5U+PX7+WqTQePF+FWrZqlLYdvvtH9SbuxYff
-         RfHnvD+7JlYP/ogyZMlyCZRHI2Ny2wTd230B9EBwEMKWPFj0J5Wk616AdU0OlXXO09Ew
-         /WUOhJjegZbdXNouxW4CH3q+rW7xPRdeZmiEM00WYgppMc7pIGkLHTd+hsZY0Qa/Htfx
-         QYHyCh3fRXpLPd676/YpiXA5rr5Ldj/v6c4vXgNxb93YwMqfHDJq0a2tI6y736u0hCyl
-         a5Yb/g1uJHyUCLm5oJa1DqgcbAkeEn46kzTHmIwn7JxEh3S2wmbPuW5paej+s3LLeJn6
-         tVgw==
-X-Gm-Message-State: APjAAAXBZryT5ctImfqcZnTuRQsY2Nta8R30GPnHmVuSWY2ELajUXD5D
-        7Ak0m4er+tJAn+yHcGB4BqX6bjm2z3qPuUtD9/1iIA==
-X-Google-Smtp-Source: APXvYqwEYMRATv6hJXcp2sN2uBqY7MeCPBYc/cx7vGGCDzzL9FkPA8m7NHC3RC8RJW7yXkhUwM+YmkfaE0n50XYnM0E=
-X-Received: by 2002:a19:4349:: with SMTP id m9mr50210064lfj.64.1564390721868;
- Mon, 29 Jul 2019 01:58:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190725104645.30642-1-vkuznets@redhat.com> <20190725104645.30642-2-vkuznets@redhat.com>
-In-Reply-To: <20190725104645.30642-2-vkuznets@redhat.com>
-From:   Jack Wang <jack.wang.usish@gmail.com>
-Date:   Mon, 29 Jul 2019 10:58:30 +0200
-Message-ID: <CA+res+RfqpT=g1QbCqr3OkHVzFFSAt3cfCYNcwqiemWmOifFxg@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zV+bTIgChlMbStRhEz4HmI17F1bLOP/P0h9cutKjnuk=;
+        b=sZqhgBAUVWlkQ/olBC24mjfBF21QLCDvO5YDiBj2dr8GtnnbUs/iHcNLEGuqLHmM/X
+         UZ93HtM9wZakgDJQ6fuXCKuvg8G/zLfbE53Xwc9CRkdps0xRqOsIVmLQS8jz069xuYOj
+         5bbX6JAyC3UveWGuJRI4bSJCypHJc/cpxCEPUUXQTVay+7kCvwAVWZn3J3JxIviLIsPL
+         oxdCk1zJk29AlCFpR6bH9KMDSdr4TinAdozXH5N61p8amEuRD/rc9yzAJTGTucnhYhuI
+         R9X9zUTk47WR4nG4GUaSD1Zawt3Kv+3f8yN0f8sG60xtLlVV9qo1kIYzgmRrfSYq99uy
+         +haw==
+X-Gm-Message-State: APjAAAU5wwP/T7KgOp9T4y/EJ1PzhBodUW+Bn+oLOPK8vdBgM6Ttr6Lr
+        hAyL3E9moX8vSZzfvujI9lYNjg==
+X-Google-Smtp-Source: APXvYqwu+iJxG0Nnx1LAgpMTW4dJUcSifVyQWlGLBgiZPy7xi6UkywxpJxOjNTGIQL6gbv5Vi6t8kA==
+X-Received: by 2002:a5d:4e8a:: with SMTP id e10mr38159080wru.26.1564391424671;
+        Mon, 29 Jul 2019 02:10:24 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id e6sm57983191wrw.23.2019.07.29.02.10.23
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Jul 2019 02:10:23 -0700 (PDT)
 Subject: Re: [PATCH stable-4.19 1/2] KVM: nVMX: do not use dangling shadow
  VMCS after guest reset
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jack Wang <jack.wang.usish@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     stable@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20190725104645.30642-1-vkuznets@redhat.com>
+ <20190725104645.30642-2-vkuznets@redhat.com>
+ <CA+res+RfqpT=g1QbCqr3OkHVzFFSAt3cfCYNcwqiemWmOifFxg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2ea5d588-8573-6653-b848-0b06d1f98310@redhat.com>
+Date:   Mon, 29 Jul 2019 11:10:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CA+res+RfqpT=g1QbCqr3OkHVzFFSAt3cfCYNcwqiemWmOifFxg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> =E4=BA=8E2019=E5=B9=B47=E6=9C=8825=
-=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=883:29=E5=86=99=E9=81=93=EF=BC=
-=9A
->
-> From: Paolo Bonzini <pbonzini@redhat.com>
->
-> [ Upstream commit 88dddc11a8d6b09201b4db9d255b3394d9bc9e57 ]
->
-> If a KVM guest is reset while running a nested guest, free_nested will
-> disable the shadow VMCS execution control in the vmcs01.  However,
-> on the next KVM_RUN vmx_vcpu_run would nevertheless try to sync
-> the VMCS12 to the shadow VMCS which has since been freed.
->
-> This causes a vmptrld of a NULL pointer on my machime, but Jan reports
-> the host to hang altogether.  Let's see how much this trivial patch fixes=
-.
->
-> Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Cc: Liran Alon <liran.alon@oracle.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 29/07/19 10:58, Jack Wang wrote:
+> Vitaly Kuznetsov <vkuznets@redhat.com> 于2019年7月25日周四 下午3:29写道：
+>>
+>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> [ Upstream commit 88dddc11a8d6b09201b4db9d255b3394d9bc9e57 ]
+>>
+>> If a KVM guest is reset while running a nested guest, free_nested will
+>> disable the shadow VMCS execution control in the vmcs01.  However,
+>> on the next KVM_RUN vmx_vcpu_run would nevertheless try to sync
+>> the VMCS12 to the shadow VMCS which has since been freed.
+>>
+>> This causes a vmptrld of a NULL pointer on my machime, but Jan reports
+>> the host to hang altogether.  Let's see how much this trivial patch fixes.
+>>
+>> Reported-by: Jan Kiszka <jan.kiszka@siemens.com>
+>> Cc: Liran Alon <liran.alon@oracle.com>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Hi all,
+> 
+> Do we need to backport the fix also to stable 4.14?  It applies
+> cleanly and compiles fine.
 
-Hi all,
+The reproducer required newer kernels that support KVM_GET_NESTED_STATE
+and KVM_SET_NESTED_STATE, so it would be hard to test it.  However, the
+patch itself should be safe.
 
-Do we need to backport the fix also to stable 4.14?  It applies
-cleanly and compiles fine.
-
-Regards,
-Jack Wang
+Paolo
