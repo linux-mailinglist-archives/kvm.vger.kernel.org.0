@@ -2,106 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C3D57A754
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 13:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02B857A765
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 14:00:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731004AbfG3Lw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 07:52:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34126 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731005AbfG3Lw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 07:52:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 54BD35AFF8
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 11:52:56 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5FD405D6C8;
-        Tue, 30 Jul 2019 11:52:53 +0000 (UTC)
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     Cole Robinson <crobinso@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: kvm-unit-tests for arm are broken with GCC 9.1 on Fedora 30
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <60a5a0ed-1149-0bc7-1e05-ef7876448891@redhat.com>
-Date:   Tue, 30 Jul 2019 13:52:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1728783AbfG3MA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 08:00:28 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38621 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728534AbfG3MAZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 08:00:25 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g17so65471661wrr.5
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 05:00:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=n/JJxoSHKvaru38fIGlmwaHlnuxMxh6jpy0Kuq5lmmE=;
+        b=Sl72/4E2kqtDZ2CQIMMfomIbhFZDZDSCqUCB+R4H7uJSODB8IQnLn5GgZEZ5fShul4
+         b8zn3xuhCVjR16uUHRlBKI+jKBAUgRYXeMtoFwC8z+gIlDJZVWCP3jM504guxcVTvzLP
+         fYQwNm74kcCX4M7eMly/p7M+P9RiJW9QBkMOutLsLrApJDeWgjwJ/iDNbb/gZufDTAGU
+         rNoKlvBwDliEOVi3jOqIklKVRYOQVQTzoGeOwWLK6zKLI7UKqD991GvjbFAD09/D1HXg
+         ONKN2qH0FVKuNIRfa8SpTV62TzfkoXcJhFg6zQjdpI/jBmCaPoInWqiPyYf+LGwBSfyW
+         ug6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=n/JJxoSHKvaru38fIGlmwaHlnuxMxh6jpy0Kuq5lmmE=;
+        b=uZhczM4DriLHo/JNkrs99eCFXxA3+WZs4zFoJDBwiM67Z4Vz30ViwHAG/4h6/BG9dZ
+         UGRDBPWiNtl77FfLlmCHGfQ8ffaw5M4B4DzYyYsBvOUW1ZnkX/CF+ZH4sDlMSNglsCWW
+         iaIJ5lnvH+as3uAg+N4bygUdd0kWdcXqCKldw+KVumRFimaDcf2MP4K9F06LncNWXRX0
+         FKlakSO3pTwmkOqDln9DG5cyKYQ1iILFJ3Pyn8Wcyypmg/k31MK9Z8bU9J7/VcWGqmTm
+         koPAGEMdgenAcPODMi+hN6vyNi0+pD4aKFVlHA7R4G+Vx4r6gR9lkW/9wMVr0KDe/jNY
+         MFjg==
+X-Gm-Message-State: APjAAAUhUANpWnop+0ptikwI87oPEKU4gZLi7aJziaXpB6wbyou3P+uI
+        XsGZOH06jqgL8ROmvfURxfQI0Nx6WQRCwYunFmU=
+X-Google-Smtp-Source: APXvYqwdGj8tn+Lc+jdWqVTEGuaT6OEVtpsGQreyIcF1DxNxjXt75IZwoWbIPt3vCU8A0lK4eiedRhBfqabA/jYv85k=
+X-Received: by 2002:a5d:6b11:: with SMTP id v17mr50383530wrw.323.1564488022522;
+ Tue, 30 Jul 2019 05:00:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 30 Jul 2019 11:52:56 +0000 (UTC)
+References: <20190729115544.17895-1-anup.patel@wdc.com> <20190729115544.17895-6-anup.patel@wdc.com>
+ <9f9d09e5-49bc-f8e3-cfe1-bd5221e3b683@redhat.com>
+In-Reply-To: <9f9d09e5-49bc-f8e3-cfe1-bd5221e3b683@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 30 Jul 2019 17:30:10 +0530
+Message-ID: <CAAhSdy3JZVEEnPnssALaxvCsyznF=rt=7-d5J_OgQEJv6cPhxQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 05/16] RISC-V: KVM: Implement VCPU interrupts and
+ requests handling
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 30, 2019 at 4:47 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> First, something that is not clear to me: how do you deal with a guest
+> writing 1 to VSIP.SSIP?  I think that could lead to lost interrupts if
+> you have the following sequence
+>
+> 1) guest writes 1 to VSIP.SSIP
+>
+> 2) guest leaves VS-mode
+>
+> 3) host syncs VSIP
+>
+> 4) user mode triggers interrupt
+>
+> 5) host reenters guest
+>
+> 6) host moves irqs_pending to VSIP and clears VSIP.SSIP in the process
 
- Hi all,
+This reasoning also apply to M-mode firmware (OpenSBI) providing timer
+and IPI services to HS-mode software. We had some discussion around
+it in a different context.
+(Refer, https://github.com/riscv/opensbi/issues/128)
 
-I recently noticed that the current kvm-unit-tests are failing on ARM in
-the gitlab CI:
+The thing is SIP CSR is supposed to be read-only for any S-mode SW. This
+means HS-mode/VS-mode SW modifications to SIP CSR should have no
+effect.
 
- https://gitlab.com/huth/kvm-unit-tests/-/jobs/251480671
+For HS-mode, only certain bits are writable from M-mode such as SSIP
+and in-future even this will go away when we have specialized HW to
+trigger S-mode IPIs without going through M-mode firmware.
 
-This still used to work fine a month ago:
+For VS-mode, only HS-mode controls the pending bits writes to VSIP CSR.
 
- https://gitlab.com/huth/kvm-unit-tests/-/jobs/231667434
+If above is honored correctly by HW then the use-case you mentioned above
+is not possible because Guest writing 1 to SIP.SSIP will be ignored.
 
-After some trial and error, I discovered that the Fedora folks updated
-the "gcc-arm-linux-gnu" package from version 8.2 to 9.1 in F30 recently.
-If I force it back to 8.2, the kvm-unit-tests work fine again:
+It is possible that we have buggy HW which does allow Guest write to SIP
+CSR bits then our current approach is to just overwrite VSIP whenver it
+is different from irq_pending bits before entering Guest.
 
- https://gitlab.com/huth/kvm-unit-tests/-/jobs/262134101
+Do you still an issue here?
 
-So the kvm-unit-tests do not work with GCC 9 on ARM anymore. Does
-anybody have a clue what might be wrong here now?
+Regards,
+Anup
 
- Thomas
+>
+> Perhaps irqs_pending needs to be split in two fields, irqs_pending and
+> irqs_pending_mask, and then you can do this:
+>
+> /*
+>  * irqs_pending and irqs_pending_mask have multiple-producer/single-
+>  * consumer semantics; therefore bits can be set in the mask without
+>  * a lock, but clearing the bits requires vcpu_lock.  Furthermore,
+>  * consumers should never write to irqs_pending, and should not
+>  * use bits of irqs_pending that weren't 1 in the mask.
+>  */
+>
+> int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
+> {
+>         ...
+>         set_bit(irq, &vcpu->arch.irqs_pending);
+>         smp_mb__before_atomic();
+>         set_bit(irq, &vcpu->arch.irqs_pending_mask);
+>         kvm_vcpu_kick(vcpu);
+> }
+>
+> int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
+> {
+>         ...
+>         clear_bit(irq, &vcpu->arch.irqs_pending);
+>         smp_mb__before_atomic();
+>         set_bit(irq, &vcpu->arch.irqs_pending_mask);
+> }
+>
+> static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+> {
+>         ...
+>         WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+> }
+>
+> and kvm_riscv_vcpu_flush_interrupts can leave aside VSIP bits that
+> aren't in vcpu->arch.irqs_pending_mask:
+>
+>         if (atomic_read(&vcpu->arch.irqs_pending_mask)) {
+>                 u32 mask, val;
+>
+>                 mask = xchg_acquire(&vcpu->arch.irqs_pending_mask, 0);
+>                 val = READ_ONCE(vcpu->arch.irqs_pending) & mask;
+>
+>                 vcpu->arch.guest_csr.vsip &= ~mask;
+>                 vcpu->arch.guest_csr.vsip |= val;
+>                 csr_write(CSR_VSIP, vsip);
+>         }
+>
+> Also, the getter of CSR_VSIP should call
+> kvm_riscv_vcpu_flush_interrupts, while the setter should clear
+> irqs_pending_mask.
+>
+> On 29/07/19 13:56, Anup Patel wrote:
+> > +     kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > +     kvm_vcpu_kick(vcpu);
+>
+> The request is not needed as long as kvm_riscv_vcpu_flush_interrupts is
+> called *after* smp_store_mb(vcpu->mode, IN_GUEST_MODE) in
+> kvm_arch_vcpu_ioctl_run.  This is the "request-less vCPU kick" pattern
+> in Documentation/virtual/kvm/vcpu-requests.rst.  The smp_store_mb then
+> orders the write of IN_GUEST_MODE before the read of irqs_pending (or
+> irqs_pending_mask in my proposal above); in the producers, there is a
+> dual memory barrier in kvm_vcpu_exiting_guest_mode(), ordering the write
+> of irqs_pending(_mask) before the read of vcpu->mode.
+>
+> Similar to other VS* CSRs, I'd rather have a ONE_REG interface for VSIE
+> and VSIP from the beginning as well.  Note that the VSIP setter would
+> clear irqs_pending_mask, while the getter would call
+> kvm_riscv_vcpu_flush_interrupts before reading.  It's up to userspace to
+> ensure that no interrupt injections happen between the calls to the
+> getter and the setter.
+>
+> Paolo
+>
+> > +             csr_write(CSR_VSIP, vcpu->arch.irqs_pending);
+> > +             vcpu->arch.guest_csr.vsip = vcpu->arch.irqs_pending;
+> > +     }
+>
