@@ -2,79 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E2B97A4C7
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 11:40:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D2547A562
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 12:01:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731845AbfG3JkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 05:40:24 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44703 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726811AbfG3JkR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 05:40:17 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p17so64979763wrf.11
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 02:40:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=fQg1192WhNDyv6FjBGie6urrqGv9zjrLIH2bCUp56uc=;
-        b=uIult0x7n6xSSbx6LcJnEAeG68/B/uMaoUW5NmPy2CEEMjajfwezBvJcGzDLw6DrBX
-         6b1QCiLEMUSR1SMMBnj5QyO8IJer5x5xWencgpyc7j/bmkCf+bZfatcETImHNLK9ibNb
-         +ZkbFwrnrLe74+Sjj9ofdBaKRqRgdCEq3us0ePL5dVDqRTvVbHWAI5gnCw7JFA2NEU9G
-         PJgHK7Njbvd99ivkipPC0PQmxsVnBxAJ2jv2Z3KJhalQWaAkvn0uZOI1VBeADamVeQUk
-         BKMg6zx8TTazbnXwpiSJ8ES2+HfUGASRI8z1YReXM6q7RYPwEDxmjwuLmzn2wSjhyij3
-         AHRg==
-X-Gm-Message-State: APjAAAWow6MW3aaXxNROPTxywlE5QjCpciJDGhRz5xZUmX1EedJ75jFh
-        ltP061SkMeh5SGNCVav9txQL4w==
-X-Google-Smtp-Source: APXvYqwQrJXSgJVI83eo1dkA3KRV/8pRzTuIDgoLCeF0kh3lvGAFxSVFdhlDZkRo9pud0n2msXMp9A==
-X-Received: by 2002:a5d:50d1:: with SMTP id f17mr72705216wrt.124.1564479615723;
-        Tue, 30 Jul 2019 02:40:15 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it. [79.13.201.122])
-        by smtp.gmail.com with ESMTPSA id r12sm77203676wrt.95.2019.07.30.02.40.14
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 30 Jul 2019 02:40:15 -0700 (PDT)
-Date:   Tue, 30 Jul 2019 11:40:13 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 0/5] vsock/virtio: optimizations to increase the
- throughput
-Message-ID: <20190730094013.ruqjllqrjmkdnh5y@steredhat>
-References: <20190717113030.163499-1-sgarzare@redhat.com>
- <20190729095743-mutt-send-email-mst@kernel.org>
+        id S1731991AbfG3KBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 06:01:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57644 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727770AbfG3KBY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 06:01:24 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EEAC7C024906;
+        Tue, 30 Jul 2019 10:01:23 +0000 (UTC)
+Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0175B19C77;
+        Tue, 30 Jul 2019 10:01:16 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>
+Subject: [PATCH 0/2] KVM: selftests: Enable ucall and dirty_log_test on s390x
+Date:   Tue, 30 Jul 2019 12:01:10 +0200
+Message-Id: <20190730100112.18205-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190729095743-mutt-send-email-mst@kernel.org>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 30 Jul 2019 10:01:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 29, 2019 at 09:59:23AM -0400, Michael S. Tsirkin wrote:
-> On Wed, Jul 17, 2019 at 01:30:25PM +0200, Stefano Garzarella wrote:
-> > This series tries to increase the throughput of virtio-vsock with slight
-> > changes.
-> > While I was testing the v2 of this series I discovered an huge use of memory,
-> > so I added patch 1 to mitigate this issue. I put it in this series in order
-> > to better track the performance trends.
-> 
-> Series:
-> 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> Can this go into net-next?
-> 
+Implement the ucall() interface on s390x to be able to use the
+dirty_log_test KVM selftest on s390x, too.
 
-I think so.
-Michael, Stefan thanks to ack the series!
+Thomas Huth (2):
+  KVM: selftests: Implement ucall() for s390x
+  KVM: selftests: Enable dirty_log_test on s390x
 
-Should I resend it with net-next tag?
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ tools/testing/selftests/kvm/dirty_log_test.c  | 70 +++++++++++++++++--
+ .../testing/selftests/kvm/include/kvm_util.h  |  2 +-
+ tools/testing/selftests/kvm/lib/ucall.c       | 34 +++++++--
+ .../selftests/kvm/s390x/sync_regs_test.c      |  6 +-
+ 5 files changed, 98 insertions(+), 15 deletions(-)
 
-Thanks,
-Stefano
+-- 
+2.21.0
+
