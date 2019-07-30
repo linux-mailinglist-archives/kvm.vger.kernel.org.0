@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A44907B0CE
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 19:47:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EF297B131
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 20:04:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728270AbfG3Rre (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 13:47:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17090 "EHLO
+        id S2387801AbfG3SEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 14:04:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15724 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725935AbfG3Rre (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Jul 2019 13:47:34 -0400
+        by vger.kernel.org with ESMTP id S1728116AbfG3SEM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Jul 2019 14:04:12 -0400
 Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6UHlTn6052802
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 13:47:32 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2u2tamgmax-1
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6UI2wCO099830
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 14:04:11 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2u2tamh7p7-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 13:47:32 -0400
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 14:04:10 -0400
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 30 Jul 2019 18:47:30 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 30 Jul 2019 19:04:09 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 30 Jul 2019 18:47:26 +0100
+        Tue, 30 Jul 2019 19:04:04 +0100
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6UHlPWJ39715146
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6UI43V029360352
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Jul 2019 17:47:25 GMT
+        Tue, 30 Jul 2019 18:04:04 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 187154C04A;
-        Tue, 30 Jul 2019 17:47:25 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C01ED4C052;
+        Tue, 30 Jul 2019 18:04:03 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60FDE4C059;
-        Tue, 30 Jul 2019 17:47:24 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 616CE4C040;
+        Tue, 30 Jul 2019 18:04:02 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.144.206])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Jul 2019 17:47:24 +0000 (GMT)
-Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
- before ioctl call
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-        qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc:     vsementsov@virtuozzo.com, berto@igalia.com, ehabkost@redhat.com,
-        kvm@vger.kernel.org, mtosatti@redhat.com,
-        mdroth@linux.vnet.ibm.com, armbru@redhat.com, den@openvz.org,
-        pbonzini@redhat.com, rth@twiddle.net
-References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
- <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
- <e78f8ce4-3dcf-61b1-1eec-bd28f6ba9b4c@redhat.com>
+        Tue, 30 Jul 2019 18:04:02 +0000 (GMT)
+Subject: Re: [PATCH 2/2] KVM: selftests: Enable dirty_log_test on s390x
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>
+References: <20190730100112.18205-1-thuth@redhat.com>
+ <20190730100112.18205-3-thuth@redhat.com>
+ <d48ac43b-c960-54af-a145-360a67b4a3d9@de.ibm.com>
+ <02c5c7b4-c45e-4573-d2c3-ebfa2cd2c9d1@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -98,26 +97,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Tue, 30 Jul 2019 19:47:23 +0200
+Date:   Tue, 30 Jul 2019 20:04:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <e78f8ce4-3dcf-61b1-1eec-bd28f6ba9b4c@redhat.com>
+In-Reply-To: <02c5c7b4-c45e-4573-d2c3-ebfa2cd2c9d1@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19073017-0012-0000-0000-00000337B25F
+x-cbid: 19073018-0008-0000-0000-000003024C05
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19073017-0013-0000-0000-0000217158B5
-Message-Id: <cfdfca59-283d-a73d-5a49-b010e1b50633@de.ibm.com>
+x-cbparentid: 19073018-0009-0000-0000-0000226FEEC7
+Message-Id: <341c3705-c2cb-9e87-cc03-42e0cefba308@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-30_08:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907300187
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907300188
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -125,44 +124,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 30.07.19 19:14, Philippe Mathieu-Daudé wrote:
-> On 7/30/19 7:05 PM, Christian Borntraeger wrote:
->> On 30.07.19 18:44, Philippe Mathieu-Daudé wrote:
->>> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
->>>> Not the whole structure is initialized before passing it to the KVM.
->>>> Reduce the number of Valgrind reports.
->>>>
->>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>>> ---
->>>>  target/i386/kvm.c | 3 +++
->>>>  1 file changed, 3 insertions(+)
->>>>
->>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>>> index dbbb137..ed57e31 100644
->>>> --- a/target/i386/kvm.c
->>>> +++ b/target/i386/kvm.c
->>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
->>>>          return 0;
->>>>      }
->>>>  
->>>> +    memset(&msr_data, 0, sizeof(msr_data));
->>>
->>> I wonder the overhead of this one...
+On 30.07.19 19:11, Thomas Huth wrote:
+> On 30/07/2019 16.57, Christian Borntraeger wrote:
 >>
->> Cant we use designated initializers like in
 >>
->> commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
->> Author:     Christian Borntraeger <borntraeger@de.ibm.com>
->> AuthorDate: Thu Oct 30 09:23:41 2014 +0100
->> Commit:     Paolo Bonzini <pbonzini@redhat.com>
->> CommitDate: Mon Dec 15 12:21:01 2014 +0100
+>> On 30.07.19 12:01, Thomas Huth wrote:
+>>> To run the dirty_log_test on s390x, we have to make sure that we
+>>> access the dirty log bitmap with little endian byte ordering and
+>>> we have to properly align the memslot of the guest.
+>>> Also all dirty bits of a segment are set once on s390x when one
+>>> of the pages of a segment are written to for the first time, so
+>>> we have to make sure that we touch all pages during the first
+>>> iteration to keep the test in sync here.
 >>
->>     valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
->>
->> and others?
+>> While this fixes the test (and the migration does work fine), it still
+>> means that s390x overindicates the dirty bit for sparsely populated
+>> 1M segments. It is just a performance issue, but maybe we should try 
+>> to get this fixed.
 > 
-> Is the compiler smart enough to figure out it doesn't need to zeroes in
-> case env->tsc_valid is true and the function returns?
+> I hope you don't expect me to fix this - the gmap code is really not my
+> turf...
 
-Good question, we would need to double check with objdump.
+No, this is clearly on our turf. 
+> 
+>> Not sure what to do here to remember us about this, 
+>> adding this as expected fail?
+> 
+> There is no such thing like an expected failure in KVM selftests -
+> that's only available in kvm-unit-tests.
+> 
+> So the only option that I currently see is to add a printf("TODO: ...")
+> on s390x here... would that work for you?
+
+Maybe just keep this as is - we should just not forget about it.
 
