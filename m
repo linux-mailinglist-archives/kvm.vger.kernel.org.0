@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E54B7A3F3
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 11:23:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 728C07A401
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 11:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729246AbfG3JXo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 05:23:44 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53485 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725934AbfG3JXo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 05:23:44 -0400
-Received: by mail-wm1-f66.google.com with SMTP id x15so56438926wmj.3
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 02:23:43 -0700 (PDT)
+        id S1730375AbfG3JZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 05:25:29 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43031 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728874AbfG3JZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 05:25:29 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p13so64919235wru.10
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 02:25:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=mWMZh3wUcWsqPn07oFt7cBOH5RBu0IlIBiCukBD3l9o=;
-        b=M3a/smUaIRUnUdyROGxk6MZ8E7BSx34Rcf/8dNc892qkruNP2SLXTKCSvSPlm5hdFw
-         JvHkG14gHZ+8/b3iImoXOmkWyc2dGvOq0TP+3Q1t6ErFJ5KUl3nIjAhkk3nrZX04uzkq
-         alIhmNASZtEVKhJ8zy3eu+5aubTulLpJe94G1zWWRC+81y28NpQfRywTdeT31evfJQov
-         MSfIEx+2BdpkVscBM5eLcLQyPHl3+SUhXF5JSycce1gH8McjeTuI9w8xEsU69PSQ8FQP
-         srtWQpdje3SFmKjKv1JfTNRvixjpkmW8LAF8uW1596Lf5nBLmzknWAscoh0B6tzrYjAX
-         dzGA==
-X-Gm-Message-State: APjAAAUtIypjlj4GQ4VP0L2/6ojuNWC8MmKgMrgyEpF6F6wDFQy2oj9c
-        iULv/65fS6MN5WPHrjZcpA+dvA==
-X-Google-Smtp-Source: APXvYqyjkTFE8K19/Ax2T+TuTtN5zUHOBpO/LA8yzScwVqCfBWpuwT+J9Qb8/NNoeIAkuB0HbwVZzQ==
-X-Received: by 2002:a7b:cc04:: with SMTP id f4mr40005383wmh.125.1564478622449;
-        Tue, 30 Jul 2019 02:23:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:29d3:6123:6d5f:2c04? ([2001:b07:6468:f312:29d3:6123:6d5f:2c04])
-        by smtp.gmail.com with ESMTPSA id s10sm48654942wrt.49.2019.07.30.02.23.40
+        bh=cUzWE80r0+/Jm/PmpREfM87NZ7CTSmB2MTbi4J4MfgQ=;
+        b=HGcQQTGJsHa0C3YQciiV+jpHgZ3WM+j3kdng8CcBsCFwF0O2aNwmkh3aAt5W+gFRpf
+         M2oxtowWvuKEATUqZ0Lw1VP9nKMRkXHn8/Ae5NJ9kCVbcmn+KSTtiYfSxSIDYvf/4bVV
+         3u06TzNtkyq7iV3Lun5+HPtUErq0OHnBOrD9+3/jXsy9Qk4jp+4Z+XDfenCQSPEFse8y
+         wSDW+c5+I5TA5IDqJGvoU6/NUV4YzWAIWhOTYdBOrQbXYtdUlPO9T4ESVs36ybBqbM12
+         6N30d+Rhmr9eUckqpXPFRubpSzYHulBK6ASfbHWpUHHooN4MsbFNP5mowILAasVFa9lW
+         N/kQ==
+X-Gm-Message-State: APjAAAW8i9EqiepvqNZKS2BLVG0R1VMtFICne4qXj8HFFKdG4TfSHvFw
+        gYoS8+wtEJsCfhZNWun3dvf5vQ==
+X-Google-Smtp-Source: APXvYqz+F0XEhEJWXPXqrEBWvnNsKyL98ooHfR6J44rQZTpHYL5dhBASE4lu+y3QS4SD34KieOnK3Q==
+X-Received: by 2002:adf:dd8e:: with SMTP id x14mr124398481wrl.344.1564478727541;
+        Tue, 30 Jul 2019 02:25:27 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id o7sm34682654wru.58.2019.07.30.02.25.26
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2019 02:23:41 -0700 (PDT)
+        Tue, 30 Jul 2019 02:25:27 -0700 (PDT)
 Subject: Re: [RFC PATCH 03/16] RISC-V: Add initial skeletal KVM support
 To:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
@@ -52,8 +52,8 @@ Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
 References: <20190729115544.17895-1-anup.patel@wdc.com>
  <20190729115544.17895-4-anup.patel@wdc.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <309b9fb3-9909-48d6-eabf-88356df4bb3b@redhat.com>
-Date:   Tue, 30 Jul 2019 11:23:40 +0200
+Message-ID: <d1157450-258b-91c1-72cb-867c96f929d8@redhat.com>
+Date:   Tue, 30 Jul 2019 11:25:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
@@ -67,20 +67,26 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 29/07/19 13:56, Anup Patel wrote:
-> +	case KVM_CAP_DEVICE_CTRL:
-> +	case KVM_CAP_USER_MEMORY:
-> +	case KVM_CAP_SYNC_MMU:
+> +void kvm_riscv_halt_guest(struct kvm *kvm)
+> +{
+> +	int i;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		vcpu->arch.pause = true;
+> +	kvm_make_all_cpus_request(kvm, KVM_REQ_SLEEP);
+> +}
+> +
+> +void kvm_riscv_resume_guest(struct kvm *kvm)
+> +{
+> +	int i;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		vcpu->arch.pause = false;
+> +		swake_up_one(kvm_arch_vcpu_wq(vcpu));
+> +	}
 
-Technically KVM_CAP_SYNC_MMU should only be added after you add MMU
-notifiers.
+Are these unused?  (Perhaps I'm just blind :))
 
 Paolo
-
-> +	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
-> +	case KVM_CAP_ONE_REG:
-> +	case KVM_CAP_READONLY_MEM:
-> +	case KVM_CAP_MP_STATE:
-> +	case KVM_CAP_IMMEDIATE_EXIT:
-> +		r = 1;
-> +		break;
-
