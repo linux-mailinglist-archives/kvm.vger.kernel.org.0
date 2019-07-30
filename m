@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E249E7A22F
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 09:26:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C6C07A261
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 09:36:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730425AbfG3H0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 03:26:02 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42093 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730006AbfG3HZo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 03:25:44 -0400
-Received: by mail-wr1-f65.google.com with SMTP id x1so14623560wrr.9
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 00:25:43 -0700 (PDT)
+        id S1730591AbfG3Hg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 03:36:29 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45865 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730585AbfG3Hg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 03:36:29 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f9so64537936wre.12
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 00:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=zHsfGOiHudmcq3LRs8Aej8bkXt/7q6tGTs328qFT3fk=;
-        b=LrczV40PBYaEexs2nulDPR9CbIEw7ONJ5yLSnCOFXbBboSYj4LvB840cLolZPaw7D7
-         2SH/3EZ21korc3Uq3tCl5SXaAiI8mZ/Qh6D+mIJstzIy1ez/cPVHYOdwB0h2O0dVyohc
-         nxGd5YiRj3L5zZ7QzRfEaUwQFuL2R8291rzLiLCJWEY7dWxNSKh525tdU02FOSmR67l0
-         5qd8nclSVf1X3wt81DKacMW3Az7iMY2pq0tKyalbqZ0+SpswNxqkNPCeKU5+CW++CaT0
-         0i00b+aNdPcm9Ydin1BMYTueOxMbaRh5qYlmxtwSbiG1CjFl/xxjpkuVu0HVzlN7I/2z
-         BolQ==
+        bh=6U2acd1QmQp/fq0L96aRRGzLE2S05j+iUMMl/7Ujgp4=;
+        b=I1JeO/u2t/9GtL4gb/6m3g7NQxNda7RBoL3u/BA4m3wmjG5pt9vru1WU9kUlKHh+TC
+         5B5w9WYYre+FTnHTNqUp1FeYn/NuopIyDJJ5jD22bCDNEtLOl2qp7mqD5yUp0iPxbHMs
+         U5KnIhavW/n2QLqF37U2bM9CqL7CPSf7Blg3DxyVQwBTruspAU+/kTvscIiG1RojUOUT
+         q/fACG+tK3bBrNQXzYUjfKHji27uEAeZE/AA1o7lA/5MlHRq1MtiF8EgSuog2xvJ3RE2
+         0tUerzh5y9KoUC7nN7zl+rVjq7brxpYDqrP+GsPO9SR8uFrWI/SkZFF6FerhO2zo5j87
+         dzHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=zHsfGOiHudmcq3LRs8Aej8bkXt/7q6tGTs328qFT3fk=;
-        b=lJz4Bbo/tNUxLOJx2n1iUjz2lrY5uwnMwAT9yZPwLB8nOvKckisuQNieJY6DNGrBGU
-         efIhfZ8sBTs/17vT5l6jKWMpu8OVplAg9joss+4/vwot8cXGHizEP/kgWa+dACHqpRMb
-         Sr21sRgFNZWWUoFS0McWznOQsDOjs19jWOqeFVBBoPv4DekkPDnfn7I+6YtXK1A1/J7A
-         6MRspBUUd+qxUajR8HtLQ5PTkfc0wmEy97AYhZhF5Tw/ckcF0+zglGklES747cTpu6dq
-         1CkKDsfr9mATeUtH8nKhb+UNfj9TN6ob/RgHavGOgqav/xgr8oxQB7TaMyP+UZS8urlV
-         k2IA==
-X-Gm-Message-State: APjAAAVS4FWBtFP3LXqy/QhHsRuqBlKK3DAvvi5qahpL3NmYobSYDo1v
-        qBlC1x8WRxtBC6EJa7/7HHE20TRPpmwLz2h1U+s=
-X-Google-Smtp-Source: APXvYqzfPqQlTpifZXrLgaPOHcYZc+NXl65yC/U+gpC8aBM5EAS2Ozjrobt3zBDfVK+pW5CxK1jdZLTWfym4UfgP5I0=
-X-Received: by 2002:adf:b1cb:: with SMTP id r11mr118068531wra.328.1564471542194;
- Tue, 30 Jul 2019 00:25:42 -0700 (PDT)
+        bh=6U2acd1QmQp/fq0L96aRRGzLE2S05j+iUMMl/7Ujgp4=;
+        b=OZaT0fNO1NiT83TfUhHmrYh7rN8CgL7OpWPooeLXtaPwe5BROBX5b5ForXzuZbYWW9
+         OQerxmN3fjpIiyRdnXxSZkkYd05g9lXHeH2GXObSHTexsbdhhUAEcn9I74VeD/JDQBxE
+         qx6FzxeT6QOTf6/2IVai6Yf/1fMcK2cgcHe9YimBzxrSrm9sQSouuvX19eAOK0yiGd9D
+         jkIMQ8GT0uHa1zjZ6KQoVgxn0Zpn5QxYFqltCvzNe8mFvkLHBPQOzVhYC5hQB7UXG4CB
+         0sCTKE10M7nRktS2eindSUQawKEtex10HYu/ddMQbNp9kK5q4IAvooZHc4Aegt9dq0qR
+         rdZg==
+X-Gm-Message-State: APjAAAVriyTq0JSbjyDIa3mR8zuyFHJ+DVrwfw3XfifFF6bBCfqIoNyc
+        z66ElK8K7s9TOIuqrSB3VGtKLw+TUXy43Aeg9PE=
+X-Google-Smtp-Source: APXvYqySD/VhLD/1gRxFJ7qx4IrEkz4AhGCFJYUHqM5n38YeZUjiLceMw/XbhrPAFunOMf8mFEW26/rfKEpjphPolrI=
+X-Received: by 2002:a5d:6284:: with SMTP id k4mr93182866wru.179.1564472186392;
+ Tue, 30 Jul 2019 00:36:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190729115544.17895-1-anup.patel@wdc.com> <mvm5znkau8u.fsf@suse.de>
 In-Reply-To: <mvm5znkau8u.fsf@suse.de>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 30 Jul 2019 12:55:30 +0530
-Message-ID: <CAAhSdy2jKQspZNwvd5VnZ8iyWjwe0fGXR+3WwP9cn5pEOcSfVg@mail.gmail.com>
+Date:   Tue, 30 Jul 2019 13:06:15 +0530
+Message-ID: <CAAhSdy3+vkJkugqrDrw4tnPWRsPw0L8r_49pEWqrqxes69X2Pw@mail.gmail.com>
 Subject: Re: [RFC PATCH 00/16] KVM RISC-V Support
 To:     Andreas Schwab <schwab@suse.de>
 Cc:     Anup Patel <Anup.Patel@wdc.com>,
@@ -75,11 +75,11 @@ On Tue, Jul 30, 2019 at 12:23 PM Andreas Schwab <schwab@suse.de> wrote:
 > ERROR: "smp_send_reschedule" [arch/riscv/kvm/kvm.ko] undefined!
 > ERROR: "riscv_timebase" [arch/riscv/kvm/kvm.ko] undefined!
 
-Strange, we are not seeing these compile errors.
+Found the issue.
 
-Anyway, please ensure that you apply Atish's KVM prep patches
-(https://lkml.org/lkml/2019/7/26/1271) on Linux-5.3-rcX before applying
-this series.
+These symbols are not exported and you are building KVM RISC-V as module.
+
+Thanks for reporting. We will fix it.
 
 Regards,
 Anup
