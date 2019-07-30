@@ -2,44 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB6A97A177
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 08:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E3FF7A17B
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 08:53:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729257AbfG3Gvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 02:51:48 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45072 "EHLO mx1.suse.de"
+        id S1729303AbfG3GxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 02:53:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45426 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726833AbfG3Gvs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 02:51:48 -0400
+        id S1726833AbfG3GxW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 02:53:22 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 97E03AE5C;
-        Tue, 30 Jul 2019 06:51:46 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 71AB0AED6;
+        Tue, 30 Jul 2019 06:53:21 +0000 (UTC)
 From:   Andreas Schwab <schwab@suse.de>
-To:     Atish Patra <Atish.Patra@wdc.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        "linux-riscv\@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "hch\@infradead.org" <hch@infradead.org>,
-        "daniel.lezcano\@linaro.org" <daniel.lezcano@linaro.org>,
+To:     Anup Patel <Anup.Patel@wdc.com>
+Cc:     Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
         Alistair Francis <Alistair.Francis@wdc.com>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "paul.walmsley\@sifive.com" <paul.walmsley@sifive.com>,
-        "rkrcmar\@redhat.com" <rkrcmar@redhat.com>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx\@linutronix.de" <tglx@linutronix.de>,
-        "anup\@brainfault.org" <anup@brainfault.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Anup Patel <anup@brainfault.org>,
         "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        "palmer\@sifive.com" <palmer@sifive.com>,
-        "pbonzini\@redhat.com" <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 13/16] RISC-V: KVM: Add timer functionality
+        "linux-riscv\@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH 00/16] KVM RISC-V Support
 References: <20190729115544.17895-1-anup.patel@wdc.com>
-        <20190729115544.17895-14-anup.patel@wdc.com> <mvmpnlsc39p.fsf@suse.de>
-        <d26a4582fad27d0f475cf8bca4d3e6c49987d37d.camel@wdc.com>
-X-Yow:  This is a NO-FRILLS flight -- hold th' CANADIAN BACON!!
-Date:   Tue, 30 Jul 2019 08:51:43 +0200
-In-Reply-To: <d26a4582fad27d0f475cf8bca4d3e6c49987d37d.camel@wdc.com> (Atish
-        Patra's message of "Mon, 29 Jul 2019 18:02:00 +0000")
-Message-ID: <mvma7cwaubk.fsf@suse.de>
+X-Yow:  MERYL STREEP is my obstetrician!
+Date:   Tue, 30 Jul 2019 08:53:21 +0200
+In-Reply-To: <20190729115544.17895-1-anup.patel@wdc.com> (Anup Patel's message
+        of "Mon, 29 Jul 2019 11:56:19 +0000")
+Message-ID: <mvm5znkau8u.fsf@suse.de>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2.90 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -48,18 +46,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Jul 29 2019, Atish Patra <Atish.Patra@wdc.com> wrote:
-
-> Strange. We never saw this error.
-
-It is part of CONFIG_KERNEL_HEADER_TEST.  Everyone developing a driver
-should enable it.
-
-> #include <linux/types.h>
->
-> Can you try it at your end and confirm please ?
-
-Confirmed.
+ERROR: "riscv_cs_get_mult_shift" [arch/riscv/kvm/kvm.ko] undefined!
+ERROR: "riscv_isa" [arch/riscv/kvm/kvm.ko] undefined!
+ERROR: "smp_send_reschedule" [arch/riscv/kvm/kvm.ko] undefined!
+ERROR: "riscv_timebase" [arch/riscv/kvm/kvm.ko] undefined!
 
 Andreas.
 
