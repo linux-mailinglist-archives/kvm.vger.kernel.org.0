@@ -2,196 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BCEAB7A63A
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 12:48:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE7767A63C
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 12:49:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729426AbfG3KsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 06:48:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45578 "EHLO mx1.redhat.com"
+        id S1729643AbfG3KtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 06:49:12 -0400
+Received: from foss.arm.com ([217.140.110.172]:59182 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728907AbfG3KsU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 06:48:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9241E30C5843;
-        Tue, 30 Jul 2019 10:48:19 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F7355C1B4;
-        Tue, 30 Jul 2019 10:48:09 +0000 (UTC)
-Date:   Tue, 30 Jul 2019 12:48:07 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Implement ucall() for s390x
-Message-ID: <20190730104807.7uzuvd52foybakgu@kamzik.brq.redhat.com>
-References: <20190730100112.18205-1-thuth@redhat.com>
- <20190730100112.18205-2-thuth@redhat.com>
+        id S1727868AbfG3KtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 06:49:12 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B05CF344;
+        Tue, 30 Jul 2019 03:49:11 -0700 (PDT)
+Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 011073F575;
+        Tue, 30 Jul 2019 03:49:10 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] arm: timer: Fix potential deadlock when
+ waiting for interrupt
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com
+References: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
+ <20190729112309.wooytkz7g6qtvvc2@kamzik.brq.redhat.com>
+ <ab4d8b69-9fc2-94a0-f5a3-01fb87c3ac44@arm.com>
+ <20190730101215.i3geqxzwjqwyp3bz@kamzik.brq.redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <e827084e-7c8c-0970-dcb0-8227d5660bff@arm.com>
+Date:   Tue, 30 Jul 2019 11:49:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190730100112.18205-2-thuth@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 30 Jul 2019 10:48:19 +0000 (UTC)
+In-Reply-To: <20190730101215.i3geqxzwjqwyp3bz@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 12:01:11PM +0200, Thomas Huth wrote:
-> On s390x, we can neither exit via PIO nor MMIO, but have to use
-> an instruction like DIAGNOSE. While we're at it, rename UCALL_PIO
-> to UCALL_DEFAULT, since PIO only works on x86 anyway, and this
-> way we can re-use the "default" type for the DIAGNOSE exit on s390x.
-> 
-> Now that ucall() is implemented, we can use it in the sync_reg_test
-> on s390x, too.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  .../testing/selftests/kvm/include/kvm_util.h  |  2 +-
->  tools/testing/selftests/kvm/lib/ucall.c       | 34 +++++++++++++++----
->  .../selftests/kvm/s390x/sync_regs_test.c      |  6 ++--
->  3 files changed, 32 insertions(+), 10 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index e0e66b115ef2..c37aea2e33e5 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -167,7 +167,7 @@ int vm_create_device(struct kvm_vm *vm, struct kvm_create_device *cd);
->  
->  /* ucall implementation types */
->  typedef enum {
-> -	UCALL_PIO,
-> +	UCALL_DEFAULT,
-
-I'd rather we keep explicit types defined; keep PIO and add DIAG. Then
-we can have
-
-/*  Set default ucall types */
-#if defined(__x86_64__)
-  ucall_type = UCALL_PIO;
-#elif defined(__aarch64__)
-  ucall_type = UCALL_MMIO;
-  ucall_requires_init = true;
-#elif defined(__s390x__)
-  ucall_type = UCALL_DIAG;
-#endif
-
-And add an assert in get_ucall()
-
- assert(!ucall_requires_init || ucall_initialized);
-
-
->  	UCALL_MMIO,
->  } ucall_type_t;
->  
-> diff --git a/tools/testing/selftests/kvm/lib/ucall.c b/tools/testing/selftests/kvm/lib/ucall.c
-> index dd9a66700f96..55534dd014dc 100644
-> --- a/tools/testing/selftests/kvm/lib/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/ucall.c
-> @@ -30,7 +30,7 @@ void ucall_init(struct kvm_vm *vm, ucall_type_t type, void *arg)
->  	ucall_type = type;
->  	sync_global_to_guest(vm, ucall_type);
->  
-> -	if (type == UCALL_PIO)
-> +	if (type == UCALL_DEFAULT)
->  		return;
->  
->  	if (type == UCALL_MMIO) {
-> @@ -84,11 +84,18 @@ void ucall_uninit(struct kvm_vm *vm)
->  	sync_global_to_guest(vm, ucall_exit_mmio_addr);
->  }
->  
-> -static void ucall_pio_exit(struct ucall *uc)
-> +static void ucall_default_exit(struct ucall *uc)
->  {
-> -#ifdef __x86_64__
-> +#if defined(__x86_64__)
-> +	/* Exit via PIO */
->  	asm volatile("in %[port], %%al"
->  		: : [port] "d" (UCALL_PIO_PORT), "D" (uc) : "rax");
-> +#elif defined(__s390x__)
-> +	/* Exit via DIAGNOSE 0x501 (normally used for breakpoints) */
-> +	asm volatile ("diag 0,%0,0x501" : : "a"(uc) : "memory");
-> +#else
-> +	fprintf(stderr, "No default ucall available on this architecture.\n");
-> +	exit(1);
->  #endif
->  }
->  
-> @@ -113,8 +120,8 @@ void ucall(uint64_t cmd, int nargs, ...)
->  	va_end(va);
->  
->  	switch (ucall_type) {
-> -	case UCALL_PIO:
-> -		ucall_pio_exit(&uc);
-> +	case UCALL_DEFAULT:
-> +		ucall_default_exit(&uc);
->  		break;
->  	case UCALL_MMIO:
->  		ucall_mmio_exit(&uc);
-> @@ -128,15 +135,28 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
->  	struct ucall ucall = {};
->  	bool got_ucall = false;
->  
-> -#ifdef __x86_64__
-> -	if (ucall_type == UCALL_PIO && run->exit_reason == KVM_EXIT_IO &&
-> +#if defined(__x86_64__)
-> +	if (ucall_type == UCALL_DEFAULT && run->exit_reason == KVM_EXIT_IO &&
->  	    run->io.port == UCALL_PIO_PORT) {
->  		struct kvm_regs regs;
->  		vcpu_regs_get(vm, vcpu_id, &regs);
->  		memcpy(&ucall, addr_gva2hva(vm, (vm_vaddr_t)regs.rdi), sizeof(ucall));
->  		got_ucall = true;
->  	}
-> +#elif defined(__s390x__)
-> +	if (ucall_type == UCALL_DEFAULT &&
-> +	    run->exit_reason == KVM_EXIT_S390_SIEIC &&
-> +	    run->s390_sieic.icptcode == 4 &&
-> +	    (run->s390_sieic.ipa >> 8) == 0x83 &&    /* 0x83 means DIAGNOSE */
-> +	    (run->s390_sieic.ipb >> 16) == 0x501) {
-> +		int reg = run->s390_sieic.ipa & 0xf;
-> +
-> +		memcpy(&ucall, addr_gva2hva(vm, run->s.regs.gprs[reg]),
-> +		       sizeof(ucall));
-> +		got_ucall = true;
-> +	}
->  #endif
-> +
->  	if (ucall_type == UCALL_MMIO && run->exit_reason == KVM_EXIT_MMIO &&
->  	    run->mmio.phys_addr == (uint64_t)ucall_exit_mmio_addr) {
->  		vm_vaddr_t gva;
-> diff --git a/tools/testing/selftests/kvm/s390x/sync_regs_test.c b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-> index e85ff0d69548..bbc93094519b 100644
-> --- a/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-> +++ b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-> @@ -25,9 +25,11 @@
->  
->  static void guest_code(void)
->  {
-> +	register u64 stage asm("11") = 0;
-> +
->  	for (;;) {
-> -		asm volatile ("diag 0,0,0x501");
-> -		asm volatile ("ahi 11,1");
-> +		GUEST_SYNC(0);
-> +		asm volatile ("ahi %0,1" : : "r"(stage));
->  	}
->  }
->  
-> -- 
-> 2.21.0
+On 7/30/19 11:12 AM, Andrew Jones wrote:
+> On Tue, Jul 30, 2019 at 10:30:50AM +0100, Alexandru Elisei wrote:
+>> On 7/29/19 12:23 PM, Andrew Jones wrote:
+>>> On Mon, Jul 29, 2019 at 10:28:52AM +0100, Alexandru Elisei wrote:
+>>>> Commit 204e85aa9352 ("arm64: timer: a few test improvements") added a call
+>>>> to report_info after enabling the timer and before the wfi instruction. The
+>>>> uart that printf uses is emulated by userspace and is slow, which makes it
+>>>> more likely that the timer interrupt will fire before executing the wfi
+>>>> instruction, which leads to a deadlock.
+>>>>
+>>>> An interrupt can wake up a CPU out of wfi, regardless of the
+>>>> PSTATE.{A, I, F} bits. Fix the deadlock by masking interrupts on the CPU
+>>>> before enabling the timer and unmasking them after the wfi returns so the
+>>>> CPU can execute the timer interrupt handler.
+>>>>
+>>>> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>> ---
+>>>>  arm/timer.c | 2 ++
+>>>>  1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/arm/timer.c b/arm/timer.c
+>>>> index 6f2ad1d76ab2..f2f60192ba62 100644
+>>>> --- a/arm/timer.c
+>>>> +++ b/arm/timer.c
+>>>> @@ -242,9 +242,11 @@ static void test_timer(struct timer_info *info)
+>>>>  	/* Test TVAL and IRQ trigger */
+>>>>  	info->irq_received = false;
+>>>>  	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
+>>>> +	local_irq_disable();
+>>>>  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
+>>>>  	report_info("waiting for interrupt...");
+>>>>  	wfi();
+>>>> +	local_irq_enable();
+>>>>  	left = info->read_tval();
+>>>>  	report("interrupt received after TVAL/WFI", info->irq_received);
+>>>>  	report("timer has expired (%d)", left < 0, left);
+>>>> -- 
+>>>> 2.7.4
+>>>>
+>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>>
+>>> Thanks Alexandru. It now makes more sense to me that wfi wakes up on
+>>> an interrupt, even when interrupts are masked, as it's clearly to
+>>> avoid these types of races. I see we have the same type of race in
+>>> arm/gic.c. I'll try to get around to fixing that at some point, unless
+>>> somebody beats me to it :)
+>> Something like this? Tested with gicv3-ipi.
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index ed5642e74f70..f0bd5739842a 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -220,12 +220,12 @@ static void ipi_enable(void)
+>>  #else
+>>         install_irq_handler(EL1H_IRQ, ipi_handler);
+>>  #endif
+>> -       local_irq_enable();
+>>  }
+>>  
+>>  static void ipi_send(void)
+>>  {
+>>         ipi_enable();
+>> +       local_irq_enable();
+>>         wait_on_ready();
+>>         ipi_test_self();
+>>         ipi_test_smp();
+>> @@ -236,9 +236,13 @@ static void ipi_send(void)
+>>  static void ipi_recv(void)
+>>  {
+>>         ipi_enable();
+>> +       local_irq_disable();
+>>         cpumask_set_cpu(smp_processor_id(), &ready);
+>> -       while (1)
+>> +       while (1) {
+>> +               local_irq_disable();
+>>                 wfi();
+>> +               local_irq_enable();
+>> +       }
+>>  }
+>>  
+>>  static void ipi_test(void *data __unused)
+> I'm not sure we need to worry about enabling/disabling interrupts around
+> the wfi, since we're just doing a tight loop on it. I think something like
+> this (untested), which is quite similar to your approach, should work
 >
+> diff --git a/arm/gic.c b/arm/gic.c
+> index ed5642e74f70..cdbb4134b0af 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -214,18 +214,19 @@ static void ipi_test_smp(void)
+>  
+>  static void ipi_enable(void)
+>  {
+> +       local_irq_disable();
+>         gic_enable_defaults();
+>  #ifdef __arm__
+>         install_exception_handler(EXCPTN_IRQ, ipi_handler);
+>  #else
+>         install_irq_handler(EL1H_IRQ, ipi_handler);
+>  #endif
+> -       local_irq_enable();
+>  }
+>  
+>  static void ipi_send(void)
+>  {
+>         ipi_enable();
+> +       local_irq_enable();
+>         wait_on_ready();
+>         ipi_test_self();
+>         ipi_test_smp();
+> @@ -237,6 +238,7 @@ static void ipi_recv(void)
+>  {
+>         ipi_enable();
+>         cpumask_set_cpu(smp_processor_id(), &ready);
+> +       local_irq_enable();
+>         while (1)
+>                 wfi();
+>  }
+>
+> What do you think?
+
+I've been thinking about it and I think that the gic test is fine as it is. The
+secondaries are already synchronized with the boot cpu via the ready mask, we
+don't care if the secondaries receive the IPIs before or after the wfi
+instruction, and they will end up blocked in wfi at the end of the test either
+way (because of the while(1) loop). Am I missing something?
 
 Thanks,
-drew
+Alex
+>
+> Thanks,
+> drew
