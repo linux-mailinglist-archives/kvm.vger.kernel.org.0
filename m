@@ -2,169 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 303047A5BB
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 12:12:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB6C37A5D3
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 12:17:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732262AbfG3KMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 06:12:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36974 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726078AbfG3KMU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 06:12:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2A29ADF26;
-        Tue, 30 Jul 2019 10:12:19 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E1F2860922;
-        Tue, 30 Jul 2019 10:12:17 +0000 (UTC)
-Date:   Tue, 30 Jul 2019 12:12:15 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com
-Subject: Re: [kvm-unit-tests PATCH] arm: timer: Fix potential deadlock when
- waiting for interrupt
-Message-ID: <20190730101215.i3geqxzwjqwyp3bz@kamzik.brq.redhat.com>
-References: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
- <20190729112309.wooytkz7g6qtvvc2@kamzik.brq.redhat.com>
- <ab4d8b69-9fc2-94a0-f5a3-01fb87c3ac44@arm.com>
+        id S1732505AbfG3KRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 06:17:01 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45962 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726078AbfG3KRB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 06:17:01 -0400
+Received: by mail-wr1-f68.google.com with SMTP id f9so65102091wre.12
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 03:17:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0BfXKRiEVxvU8bBbaJFcml0F4XwqkulSy5LoM8k5vnU=;
+        b=iHGVZWBInxNRqZy5kybY7r3vO8Q5QXjcrUTMekEYhG1OvvFLugYHabszgwIQw+c0sB
+         QDs4aIy9yY88GTRx6H8OHKCZk90cx6F86fKqKCYZ+W551htBih6bmdnPHCWS23fdTR17
+         xYxMNmk9GrhnRzXJHbtylSPiOeQwNyI7ivHdd5pyWGxFn1CSNNaL4ZT73RzFPp1kXdy7
+         KvvrPWYRZcvsq0a3SFBMXoMrBAohr5XuCcDbMnAzc1b/aYlaq/yrM4qXMhDjHnWIULC2
+         sHzQQzKZ1wQZfECfBs0EiLXrJ2WrWC2Q4+Uzl8hbnTtFcZHAgU8WhBgLZs6Zul2b+AK3
+         cvdg==
+X-Gm-Message-State: APjAAAXugIf8OuzU9rW4I/DYPazO97pdbL4bRJRBD15HvuYYYQ3b7o9J
+        Gdboga53NindbvjgUrPP3M4u8w==
+X-Google-Smtp-Source: APXvYqy6/dowCLGeT9RriCZ015qAZZF2PPTjzlMgI9dPdoZanSSBKVmGsIjx7EURe6YAtK3Npnanuw==
+X-Received: by 2002:a5d:4041:: with SMTP id w1mr115756381wrp.199.1564481819511;
+        Tue, 30 Jul 2019 03:16:59 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id s15sm46966792wrw.21.2019.07.30.03.16.58
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Jul 2019 03:16:58 -0700 (PDT)
+Subject: Re: [RFC PATCH 04/16] RISC-V: KVM: Implement VCPU create, init and
+ destroy functions
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Radim K <rkrcmar@redhat.com>
+Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Anup Patel <anup@brainfault.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20190729115544.17895-1-anup.patel@wdc.com>
+ <20190729115544.17895-5-anup.patel@wdc.com>
+ <ade614ae-fcfe-35f2-0519-1df71d035bcd@redhat.com>
+Message-ID: <2de10efc-56f8-ff47-ed69-7e471a099c80@redhat.com>
+Date:   Tue, 30 Jul 2019 12:16:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ab4d8b69-9fc2-94a0-f5a3-01fb87c3ac44@arm.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Tue, 30 Jul 2019 10:12:19 +0000 (UTC)
+In-Reply-To: <ade614ae-fcfe-35f2-0519-1df71d035bcd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 10:30:50AM +0100, Alexandru Elisei wrote:
-> On 7/29/19 12:23 PM, Andrew Jones wrote:
-> > On Mon, Jul 29, 2019 at 10:28:52AM +0100, Alexandru Elisei wrote:
-> >> Commit 204e85aa9352 ("arm64: timer: a few test improvements") added a call
-> >> to report_info after enabling the timer and before the wfi instruction. The
-> >> uart that printf uses is emulated by userspace and is slow, which makes it
-> >> more likely that the timer interrupt will fire before executing the wfi
-> >> instruction, which leads to a deadlock.
-> >>
-> >> An interrupt can wake up a CPU out of wfi, regardless of the
-> >> PSTATE.{A, I, F} bits. Fix the deadlock by masking interrupts on the CPU
-> >> before enabling the timer and unmasking them after the wfi returns so the
-> >> CPU can execute the timer interrupt handler.
-> >>
-> >> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> ---
-> >>  arm/timer.c | 2 ++
-> >>  1 file changed, 2 insertions(+)
-> >>
-> >> diff --git a/arm/timer.c b/arm/timer.c
-> >> index 6f2ad1d76ab2..f2f60192ba62 100644
-> >> --- a/arm/timer.c
-> >> +++ b/arm/timer.c
-> >> @@ -242,9 +242,11 @@ static void test_timer(struct timer_info *info)
-> >>  	/* Test TVAL and IRQ trigger */
-> >>  	info->irq_received = false;
-> >>  	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
-> >> +	local_irq_disable();
-> >>  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
-> >>  	report_info("waiting for interrupt...");
-> >>  	wfi();
-> >> +	local_irq_enable();
-> >>  	left = info->read_tval();
-> >>  	report("interrupt received after TVAL/WFI", info->irq_received);
-> >>  	report("timer has expired (%d)", left < 0, left);
-> >> -- 
-> >> 2.7.4
-> >>
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> >
-> > Thanks Alexandru. It now makes more sense to me that wfi wakes up on
-> > an interrupt, even when interrupts are masked, as it's clearly to
-> > avoid these types of races. I see we have the same type of race in
-> > arm/gic.c. I'll try to get around to fixing that at some point, unless
-> > somebody beats me to it :)
+On 30/07/19 10:48, Paolo Bonzini wrote:
+> On 29/07/19 13:56, Anup Patel wrote:
+>> +	cntx->hstatus |= HSTATUS_SP2V;
+>> +	cntx->hstatus |= HSTATUS_SP2P;
+> IIUC, cntx->hstatus's SP2P bit contains the guest's sstatus.SPP bit?
+
+Nevermind, that was also a bit confused.  The guest's sstatus.SPP is in
+vsstatus.  The pseudocode for V-mode switch is
+
+SRET:
+  V = hstatus.SPV (1)
+  MODE = sstatus.SPP
+  hstatus.SPV = hstatus.SP2V
+  sstatus.SPP = hstatus.SP2P
+  hstatus.SP2V = 0
+  hstatus.SP2P = 0
+  ...
+
+trap:
+  hstatus.SP2V = hstatus.SPV
+  hstatus.SP2P = sstatus.SPP
+  hstatus.SPV = V (1)
+  sstatus.SPP = MODE
+  V = 0
+  MODE = 1
+
+so:
+
+1) indeed we need SP2V=SPV=1 when entering guest mode
+
+2) sstatus.SPP contains the guest mode
+
+3) SP2P doesn't really matter for KVM since it never goes to VS-mode
+from an interrupt handler, so if my reasoning is correct I'd leave it
+clear, but I guess it's up to you whether to set it or not.
+
+Paolo
+
+> I suggest adding a comment here, and again providing a ONE_REG interface
+> to sstatus so that the ABI is final before RISC-V KVM is merged.
 > 
-> Something like this? Tested with gicv3-ipi.
+> What happens if the guest executes SRET?  Is that EXC_SYSCALL in hedeleg?
 > 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index ed5642e74f70..f0bd5739842a 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -220,12 +220,12 @@ static void ipi_enable(void)
->  #else
->         install_irq_handler(EL1H_IRQ, ipi_handler);
->  #endif
-> -       local_irq_enable();
->  }
->  
->  static void ipi_send(void)
->  {
->         ipi_enable();
-> +       local_irq_enable();
->         wait_on_ready();
->         ipi_test_self();
->         ipi_test_smp();
-> @@ -236,9 +236,13 @@ static void ipi_send(void)
->  static void ipi_recv(void)
->  {
->         ipi_enable();
-> +       local_irq_disable();
->         cpumask_set_cpu(smp_processor_id(), &ready);
-> -       while (1)
-> +       while (1) {
-> +               local_irq_disable();
->                 wfi();
-> +               local_irq_enable();
-> +       }
->  }
->  
->  static void ipi_test(void *data __unused)
+> (BTW the name of SP2V and SP2P is horrible, I think HPV/HPP or HSPV/HSPP
+> would have been clearer, but that's not your fault).
 
-I'm not sure we need to worry about enabling/disabling interrupts around
-the wfi, since we're just doing a tight loop on it. I think something like
-this (untested), which is quite similar to your approach, should work
-
-diff --git a/arm/gic.c b/arm/gic.c
-index ed5642e74f70..cdbb4134b0af 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -214,18 +214,19 @@ static void ipi_test_smp(void)
- 
- static void ipi_enable(void)
- {
-+       local_irq_disable();
-        gic_enable_defaults();
- #ifdef __arm__
-        install_exception_handler(EXCPTN_IRQ, ipi_handler);
- #else
-        install_irq_handler(EL1H_IRQ, ipi_handler);
- #endif
--       local_irq_enable();
- }
- 
- static void ipi_send(void)
- {
-        ipi_enable();
-+       local_irq_enable();
-        wait_on_ready();
-        ipi_test_self();
-        ipi_test_smp();
-@@ -237,6 +238,7 @@ static void ipi_recv(void)
- {
-        ipi_enable();
-        cpumask_set_cpu(smp_processor_id(), &ready);
-+       local_irq_enable();
-        while (1)
-                wfi();
- }
-
-What do you think?
-
-Thanks,
-drew
