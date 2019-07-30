@@ -2,84 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E112A7A486
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 11:36:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E2B97A4C7
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 11:40:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731549AbfG3JgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 05:36:00 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44217 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730880AbfG3Jf6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 05:35:58 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p17so64964207wrf.11
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 02:35:57 -0700 (PDT)
+        id S1731845AbfG3JkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 05:40:24 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44703 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726811AbfG3JkR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 05:40:17 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p17so64979763wrf.11
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 02:40:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LfBe8BIZguRGaVcqxBIUd21ri7wgmIbA7EXh3G0N3Hw=;
-        b=ZZxhrWcBAqOa9NczKjDuFzHoKu9y2vyavzG5htQpcMjwFofdW/ab6M2O4trwhsUl8C
-         Wsk9A4ujwqPje3E+3caw9bhq7BFe7yod58cXDeTV79VoKH/qk32/QDs2O03J6XB2irHb
-         mdiwzu5ZTvG8OZ2rUVK7mAW8MRkPJNZewTMQONzzSPO5o1pkN14LywGdi5nxUtizEyg5
-         E3MYOPNWXTJQzqL+7KEQ+6VOrc0NKJ6GWLCTD84yiv0nOs3AtErzAobKodrTIvEOYi8E
-         HXpFGjFwVm5xbc/27hbZlXXWzYwP4cKSkj60rooaC6Y9FKKobFgEQtLHHYzlsQn4WPsK
-         HYGQ==
-X-Gm-Message-State: APjAAAVuj5nXyYHj8fmATXkjJpjnagEierGuy4HcBdPCov7HKGAbtyA+
-        /BNS7fXwlJf647LMB15cYDYLQA==
-X-Google-Smtp-Source: APXvYqwq3Hft9cpeFWfJQOdIrZK1BvEf6TQWeB6zhzE98jxFZtCFfEZfO6QPRJKZp8CB+tTOovDs0w==
-X-Received: by 2002:a5d:4f01:: with SMTP id c1mr45610035wru.43.1564479356485;
-        Tue, 30 Jul 2019 02:35:56 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id v204sm67712311wma.20.2019.07.30.02.35.55
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2019 02:35:55 -0700 (PDT)
-Subject: Re: [RFC PATCH 06/16] RISC-V: KVM: Implement
- KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Radim K <rkrcmar@redhat.com>
-Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190729115544.17895-1-anup.patel@wdc.com>
- <20190729115544.17895-7-anup.patel@wdc.com>
- <3caa5b31-f5ed-98cd-2bdf-88d8cb837919@redhat.com>
-Message-ID: <536673cd-3b84-4e56-6042-de73a536653f@redhat.com>
-Date:   Tue, 30 Jul 2019 11:35:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=fQg1192WhNDyv6FjBGie6urrqGv9zjrLIH2bCUp56uc=;
+        b=uIult0x7n6xSSbx6LcJnEAeG68/B/uMaoUW5NmPy2CEEMjajfwezBvJcGzDLw6DrBX
+         6b1QCiLEMUSR1SMMBnj5QyO8IJer5x5xWencgpyc7j/bmkCf+bZfatcETImHNLK9ibNb
+         +ZkbFwrnrLe74+Sjj9ofdBaKRqRgdCEq3us0ePL5dVDqRTvVbHWAI5gnCw7JFA2NEU9G
+         PJgHK7Njbvd99ivkipPC0PQmxsVnBxAJ2jv2Z3KJhalQWaAkvn0uZOI1VBeADamVeQUk
+         BKMg6zx8TTazbnXwpiSJ8ES2+HfUGASRI8z1YReXM6q7RYPwEDxmjwuLmzn2wSjhyij3
+         AHRg==
+X-Gm-Message-State: APjAAAWow6MW3aaXxNROPTxywlE5QjCpciJDGhRz5xZUmX1EedJ75jFh
+        ltP061SkMeh5SGNCVav9txQL4w==
+X-Google-Smtp-Source: APXvYqwQrJXSgJVI83eo1dkA3KRV/8pRzTuIDgoLCeF0kh3lvGAFxSVFdhlDZkRo9pud0n2msXMp9A==
+X-Received: by 2002:a5d:50d1:: with SMTP id f17mr72705216wrt.124.1564479615723;
+        Tue, 30 Jul 2019 02:40:15 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it. [79.13.201.122])
+        by smtp.gmail.com with ESMTPSA id r12sm77203676wrt.95.2019.07.30.02.40.14
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 30 Jul 2019 02:40:15 -0700 (PDT)
+Date:   Tue, 30 Jul 2019 11:40:13 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 0/5] vsock/virtio: optimizations to increase the
+ throughput
+Message-ID: <20190730094013.ruqjllqrjmkdnh5y@steredhat>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190729095743-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3caa5b31-f5ed-98cd-2bdf-88d8cb837919@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190729095743-mutt-send-email-mst@kernel.org>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/07/19 10:43, Paolo Bonzini wrote:
-> On 29/07/19 13:56, Anup Patel wrote:
->> The PC register represents program counter whereas the MODE
->> register represent VCPU privilege mode (i.e. S/U-mode).
->>
-> Is there any reason to include this pseudo-register instead of allowing
-> SSTATUS access directly in this patch (and perhaps also SEPC)?
+On Mon, Jul 29, 2019 at 09:59:23AM -0400, Michael S. Tsirkin wrote:
+> On Wed, Jul 17, 2019 at 01:30:25PM +0200, Stefano Garzarella wrote:
+> > This series tries to increase the throughput of virtio-vsock with slight
+> > changes.
+> > While I was testing the v2 of this series I discovered an huge use of memory,
+> > so I added patch 1 to mitigate this issue. I put it in this series in order
+> > to better track the performance trends.
+> 
+> Series:
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Can this go into net-next?
+> 
 
-Nevermind, I was confused - the current MODE is indeed not accessible as
-a "real" CSR in RISC-V.
+I think so.
+Michael, Stefan thanks to ack the series!
 
-Still, I would prefer all the VS CSRs to be accessible via the get/set
-reg ioctls.
+Should I resend it with net-next tag?
 
-Paolo
+Thanks,
+Stefano
