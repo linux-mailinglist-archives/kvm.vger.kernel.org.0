@@ -2,53 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E4CD7A8FB
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 14:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8FAD7A94D
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 15:19:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730012AbfG3Mvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 08:51:38 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40940 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726190AbfG3Mvi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 08:51:38 -0400
-Received: by mail-wm1-f65.google.com with SMTP id v19so56569437wmj.5
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 05:51:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xlyMVEJE1Dy/QWFW2G9NXycH3WhR1tYzSwV5Ut1wIIw=;
-        b=QyvteSpZvYEwd3gV2EtvARV1NGAzZRk5lzI2uo4SdM8QoQ36QBtPMGTg3JDRwhcFtR
-         RpXL7DNOrvr1lP7GhriG0Fa+aGdcjHMS+hpGS/kuo+pyYMKQGSE/4of7VqDGY+vov/H5
-         r7TNVf6EaAi7cC0DnOnJ8wtNZBkHk4vNlcrh1ex5A3pQBSfBT+j2zbjCJPGbIMeZu/pq
-         QhcWAsS+vVjtTKy53+LSoBPyGfeqqHaHvqqYScc3s0Jm+WXk5so/EBMKcqspHr9pmK1W
-         vBxsbxpgKH/VGIvvIDaorODcrwTeuSmfNl9AykChCaUJi0k828CGXOd2XLSlKY4SXwCU
-         Todg==
+        id S1730720AbfG3NTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 09:19:01 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43922 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729351AbfG3NTA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 09:19:00 -0400
+Received: by mail-wr1-f66.google.com with SMTP id p13so65731287wru.10
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 06:18:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xlyMVEJE1Dy/QWFW2G9NXycH3WhR1tYzSwV5Ut1wIIw=;
-        b=RCBlt7YIaqwoNH1UnCnhrFZq2dF0ezW8xg51IYOx0lq6UkCZGijn6hOhIg9YT+4hmS
-         dYJsltLID07oV53t3J08th1Je5erNTON2QEQ09wjxaPZ9Ho6OnYdPXjHbVMThCIBquWD
-         1/OPyLLTCfGhnX96Ooc84Os3IEYSuBM4F+sjFTrwN1dPx0sS2atD58ibdILUthaiuKMh
-         8+LRlu+t/19J7rksWNsUs+kUGVF4LYmCAsO7X/U/4MSNkbxgWVaCFLsjWH4dCXgZxaDy
-         7jZLBCuY8hx05OgHIU0MFxWEZ81GAY73wKBHjz76TbsZF6t1nKAwu/yYFURKxW49QZvL
-         hDOQ==
-X-Gm-Message-State: APjAAAVykMj0ITWGVxs1mwVxYuQbHS7Y6hsJLIUazKr53gr3tDDPdbTE
-        qMDuoaJrSW1EzclD/nZmC9L/zCCWLQrINiWvtCA=
-X-Google-Smtp-Source: APXvYqxuguKU0X+siFrvn9HOub5fk0XoQDRv8R/r/X/5oWCQQU/kraAMUh75sFlJTua5yk0lVONdEWCEt0D0+4rQl0o=
-X-Received: by 2002:a1c:e0c4:: with SMTP id x187mr100750011wmg.177.1564491096568;
- Tue, 30 Jul 2019 05:51:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190729115544.17895-1-anup.patel@wdc.com> <20190729115544.17895-8-anup.patel@wdc.com>
- <cbb1b995-be2f-96a5-9890-63e1941e7f3c@redhat.com>
-In-Reply-To: <cbb1b995-be2f-96a5-9890-63e1941e7f3c@redhat.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 30 Jul 2019 18:21:24 +0530
-Message-ID: <CAAhSdy2KbiEq35NSyKHNjrxbJOeh0U02mmf=bueDuXCEZCyXpg@mail.gmail.com>
-Subject: Re: [RFC PATCH 07/16] RISC-V: KVM: Implement VCPU world-switch
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4T+N5rDWzyUqBCwwe6XKAKGnNik0HfsnLC/oOFv9Yvo=;
+        b=s/BpIKT5TK45B+o/yHm2zZDIXPhP7PP2sUutAQaC55tHJDfZ+6myp9m6cibhRuB4PN
+         Z0ekhh/ulgOK4a7dLbgzbXZZpmUAazlPOa8K09ArQO01IuTbilwgIzrb53xlGhU22hOM
+         GJrRVlRf3R8T5jU4Z5RCxWuY2op00dIgwNVNSwgtv8aeY6TONgqS7eu+DnFxe8uiFPwT
+         DQ3zFlJOJuIzhXP8nmZukW9c2GPN8lEdigOCNJHg893be2Gp0Gm5YCLcQ57gw6aJ+Cnw
+         yHGLPfeaHxxc59ro7ppgbhceeGbvQlshx2p3lZArJQkRr6oUHl3Zy0xErW89qUud1riM
+         Y75w==
+X-Gm-Message-State: APjAAAVrC8XlyksN6IqqqSh4Kc2fI78Xv4JXkS0oFsH9sYrYTr+Cp8k5
+        ms8nvZOt/nWC4ATjbXsSfoRfvw==
+X-Google-Smtp-Source: APXvYqxH5jMUMQZRjTvBj61yj3IX+c8QpeNllhHi+YlYGKDbWnFDORisbT652uSyoJl02SGXzGJpZw==
+X-Received: by 2002:a5d:4212:: with SMTP id n18mr5731078wrq.261.1564492738582;
+        Tue, 30 Jul 2019 06:18:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:29d3:6123:6d5f:2c04? ([2001:b07:6468:f312:29d3:6123:6d5f:2c04])
+        by smtp.gmail.com with ESMTPSA id a8sm51401838wma.31.2019.07.30.06.18.56
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Jul 2019 06:18:57 -0700 (PDT)
+Subject: Re: [RFC PATCH 05/16] RISC-V: KVM: Implement VCPU interrupts and
+ requests handling
+To:     Anup Patel <anup@brainfault.org>
 Cc:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -62,40 +50,52 @@ Cc:     Anup Patel <Anup.Patel@wdc.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190729115544.17895-1-anup.patel@wdc.com>
+ <20190729115544.17895-6-anup.patel@wdc.com>
+ <9f9d09e5-49bc-f8e3-cfe1-bd5221e3b683@redhat.com>
+ <CAAhSdy3JZVEEnPnssALaxvCsyznF=rt=7-d5J_OgQEJv6cPhxQ@mail.gmail.com>
+ <66c4e468-7a69-31e7-778b-228908f0e737@redhat.com>
+ <CAAhSdy3b-o6y1fsYi1iQcCN=9ZuC98TLCqjHCYAzOCx+N+_89w@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <828f01a9-2f11-34b6-7753-dc8fa7aa0d18@redhat.com>
+Date:   Tue, 30 Jul 2019 15:18:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAAhSdy3b-o6y1fsYi1iQcCN=9ZuC98TLCqjHCYAzOCx+N+_89w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 3:04 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 29/07/19 13:57, Anup Patel wrote:
-> >  void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> >  {
-> > -     /* TODO: */
-> > +     struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-> > +
-> > +     csr_write(CSR_HIDELEG, csr->hideleg);
-> > +     csr_write(CSR_HEDELEG, csr->hedeleg);
->
-> Writing HIDELEG and HEDELEG here seems either wrong or inefficient to me.
->
-> I don't remember the spec well enough, but there are two cases:
->
-> 1) either they only matter while the guest runs and then you can set
-> them in kvm_arch_hardware_enable.  KVM common code takes care of doing
-> this on all CPUs for you.
+On 30/07/19 14:45, Anup Patel wrote:
+> Here's some text from RISC-V spec regarding SIP CSR:
+> "software interrupt-pending (SSIP) bit in the sip register. A pending
+> supervisor-level software interrupt can be cleared by writing 0 to the SSIP bit
+> in sip. Supervisor-level software interrupts are disabled when the SSIE bit in
+> the sie register is clear."
+> 
+> Without RISC-V hypervisor extension, the SIP is essentially a restricted
+> view of MIP CSR. Also as-per above, S-mode SW can only write 0 to SSIP
+> bit in SIP CSR whereas it can only be set by M-mode SW or some HW
+> mechanism (such as S-mode CLINT).
 
-This is a good suggestion. I will use kvm_arch_hardware_enable() for
-programming HIDELEG and HEDELEG CSRs.
+But that's not what the spec says.  It just says (just before the
+sentence you quoted):
 
->
-> 2) or they also matter while the host runs and then you need to set them
-> in vcpu_switch.S.
+   A supervisor-level software interrupt is triggered on the current
+   hart by writing 1 to its supervisor software interrupt-pending (SSIP)
+   bit in the sip register.
 
-They don't matter in HS-mode so we don't need to access them in
-vcpu_switch.S
+and it's not written anywhere that S-mode SW cannot write 1.  In fact
+that text is even under sip, not under mip, so IMO there's no doubt that
+S-mode SW _can_ write 1, and the hypervisor must operate accordingly.
 
-Regards,
-Anup
+In fact I'm sure that if Windows were ever ported to RISC-V, it would be
+very happy to use that feature.  On x86, Intel even accelerated it
+specifically for Microsoft. :)
+
+Paolo
