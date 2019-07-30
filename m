@@ -2,55 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73C637AEDE
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 19:05:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D4A17AF18
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 19:11:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727201AbfG3RF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 13:05:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19700 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726930AbfG3RF2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Jul 2019 13:05:28 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6UH5RCm073020
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 13:05:27 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2u2t04g02c-1
+        id S1729844AbfG3RKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 13:10:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10044 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726246AbfG3RKF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Jul 2019 13:10:05 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6UH8dbG111700
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 13:10:04 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2u2q8mg2s2-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 13:05:27 -0400
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 13:10:03 -0400
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 30 Jul 2019 18:05:25 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 30 Jul 2019 18:10:01 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 30 Jul 2019 18:05:20 +0100
+        Tue, 30 Jul 2019 18:09:58 +0100
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6UH5KAO42401892
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6UH9vsJ52822072
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Jul 2019 17:05:20 GMT
+        Tue, 30 Jul 2019 17:09:57 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E38774C040;
-        Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3CC444C04A;
+        Tue, 30 Jul 2019 17:09:57 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 525804C058;
-        Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 8902B4C044;
+        Tue, 30 Jul 2019 17:09:56 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.144.206])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+        Tue, 30 Jul 2019 17:09:56 +0000 (GMT)
 Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
  before ioctl call
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-        qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc:     vsementsov@virtuozzo.com, berto@igalia.com, ehabkost@redhat.com,
-        kvm@vger.kernel.org, mtosatti@redhat.com,
-        mdroth@linux.vnet.ibm.com, armbru@redhat.com, den@openvz.org,
-        pbonzini@redhat.com, rth@twiddle.net
+To:     Peter Maydell <peter.maydell@linaro.org>,
+        Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Qemu-block <qemu-block@nongnu.org>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Alberto Garcia <berto@igalia.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
 References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
  <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
+ <CAFEAcA_M7kTA-tmdNdP4-pVjKkdzHFXuSeR3wKYSohK+W38m+Q@mail.gmail.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -96,26 +103,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Tue, 30 Jul 2019 19:05:19 +0200
+Date:   Tue, 30 Jul 2019 19:09:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
+In-Reply-To: <CAFEAcA_M7kTA-tmdNdP4-pVjKkdzHFXuSeR3wKYSohK+W38m+Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19073017-4275-0000-0000-0000035215A3
+x-cbid: 19073017-0028-0000-0000-0000038954DB
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19073017-4276-0000-0000-0000386302CE
-Message-Id: <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-30_07:,,
+x-cbparentid: 19073017-0029-0000-0000-00002449A30A
+Message-Id: <515f23a7-c520-5474-e03b-4344a06bea2f@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-30_08:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907300178
+ mlxlogscore=714 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907300179
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -123,70 +130,26 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 30.07.19 18:44, Philippe Mathieu-Daudé wrote:
-> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
+On 30.07.19 18:46, Peter Maydell wrote:
+> On Tue, 30 Jul 2019 at 17:05, Andrey Shinkevich
+> <andrey.shinkevich@virtuozzo.com> wrote:
+>>
 >> Not the whole structure is initialized before passing it to the KVM.
 >> Reduce the number of Valgrind reports.
 >>
 >> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>  target/i386/kvm.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index dbbb137..ed57e31 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
->>          return 0;
->>      }
->>  
->> +    memset(&msr_data, 0, sizeof(msr_data));
 > 
-> I wonder the overhead of this one...
+> Does it even make sense to try to valgrind a KVM-enabled run
+> of QEMU? As soon as we run the guest it will make modifications
+> to memory which Valgrind can't track; and I don't think
+> Valgrind supports the KVM_RUN ioctl anyway...
 
-Cant we use designated initializers like in
+As long as we do not care about the guest memory, it does make sense 
+and it does find bugs.
 
-commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
-Author:     Christian Borntraeger <borntraeger@de.ibm.com>
-AuthorDate: Thu Oct 30 09:23:41 2014 +0100
-Commit:     Paolo Bonzini <pbonzini@redhat.com>
-CommitDate: Mon Dec 15 12:21:01 2014 +0100
+See also 
+https://www.linux-kvm.org/page/KVM_Forum_2014
+https://www.linux-kvm.org/images/d/d2/03x07-Valgrind.pdf
 
-    valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
-
-and others?
-
-This should minimize the impact. 
-> 
->>      msr_data.info.nmsrs = 1;
->>      msr_data.entries[0].index = MSR_IA32_TSC;
->>      env->tsc_valid = !runstate_is_running();
->> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>  
->>      if (has_xsave) {
->>          env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
->> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
-> 
-> OK
-> 
->>      }
->>  
->>      max_nested_state_len = kvm_max_nested_state_length();
->> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
->>          return 0;
->>      }
->>  
->> +    memset(&dbgregs, 0, sizeof(dbgregs));
-> 
-> OK
-> 
->>      for (i = 0; i < 4; i++) {
->>          dbgregs.db[i] = env->dr[i];
->>      }
-> 
-> We could remove 'dbgregs.flags = 0;'
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
+Unfortunately I wasnt able to follow up on those.
 
