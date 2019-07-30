@@ -2,123 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C6AE7AF4E
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 19:11:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4559A7AF68
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 19:14:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730435AbfG3RLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 13:11:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60956 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725947AbfG3RLa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 13:11:30 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9335E31D8AA;
-        Tue, 30 Jul 2019 17:11:29 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-106.ams2.redhat.com [10.36.116.106])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 729155D6B2;
-        Tue, 30 Jul 2019 17:11:24 +0000 (UTC)
-Subject: Re: [PATCH 2/2] KVM: selftests: Enable dirty_log_test on s390x
+        id S1729883AbfG3RO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 13:14:29 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46485 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729835AbfG3RO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 13:14:28 -0400
+Received: by mail-wr1-f67.google.com with SMTP id z1so66593940wru.13
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 10:14:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jaUSv3VJf+V+ChRyECDPLwYXei53onF28jWtYlsjjZQ=;
+        b=XlgsRlzm3QlzZkdB6FBPusu6lxckMGT0OAHTMnNDj3odVu8RyGZEwK172UJvMuq+CY
+         hYvJ5Yilobia7MzytNrUC0dCo2XUNETQLwBGezm48SkhXLF+eqi6MFvvabwSJcRKoSPl
+         2dab3X5K4yFX0J8BP7JsotDRDiEmn89TGOZ0XzIPMcERC4bxb0TXy5miUGRwvpCO13b3
+         0e8N5qJMlrlOQLSBcrgAt8ucYj4kq8uIAtXpebBYmg8IqMX6k8XYCzZEdbp79KcO57mD
+         0R1jNhaZ68dFiWNKUpO3zelyMhYHATU9m61TOKzrr5We8V/IL8lSrr8Dwb1n1bvn7HIi
+         KOdg==
+X-Gm-Message-State: APjAAAXKNAPrc23z50sSWJ/7NlcSAMZgie/0bcwOsaLERaogrJf3++HB
+        KezB/+b/mFkkIC/afNxz5OoYjg==
+X-Google-Smtp-Source: APXvYqyw/SCjqRuMPPC/CHN26txaGhj5ZA2OGT6qHfR/E/Xs0s0/5e9orcuDBRjt7xAFlaqJmkfoxQ==
+X-Received: by 2002:adf:e444:: with SMTP id t4mr27910270wrm.262.1564506866578;
+        Tue, 30 Jul 2019 10:14:26 -0700 (PDT)
+Received: from [192.168.43.238] (63.red-95-127-155.staticip.rima-tde.net. [95.127.155.63])
+        by smtp.gmail.com with ESMTPSA id c11sm110206849wrq.45.2019.07.30.10.14.24
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Jul 2019 10:14:26 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
+ before ioctl call
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>
-References: <20190730100112.18205-1-thuth@redhat.com>
- <20190730100112.18205-3-thuth@redhat.com>
- <d48ac43b-c960-54af-a145-360a67b4a3d9@de.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <02c5c7b4-c45e-4573-d2c3-ebfa2cd2c9d1@redhat.com>
-Date:   Tue, 30 Jul 2019 19:11:23 +0200
+        Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+        qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc:     vsementsov@virtuozzo.com, berto@igalia.com, ehabkost@redhat.com,
+        kvm@vger.kernel.org, mtosatti@redhat.com,
+        mdroth@linux.vnet.ibm.com, armbru@redhat.com, den@openvz.org,
+        pbonzini@redhat.com, rth@twiddle.net
+References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
+ <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <e78f8ce4-3dcf-61b1-1eec-bd28f6ba9b4c@redhat.com>
+Date:   Tue, 30 Jul 2019 19:14:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <d48ac43b-c960-54af-a145-360a67b4a3d9@de.ibm.com>
+In-Reply-To: <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 30 Jul 2019 17:11:29 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/07/2019 16.57, Christian Borntraeger wrote:
+On 7/30/19 7:05 PM, Christian Borntraeger wrote:
+> On 30.07.19 18:44, Philippe Mathieu-Daudé wrote:
+>> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
+>>> Not the whole structure is initialized before passing it to the KVM.
+>>> Reduce the number of Valgrind reports.
+>>>
+>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>> ---
+>>>  target/i386/kvm.c | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>> index dbbb137..ed57e31 100644
+>>> --- a/target/i386/kvm.c
+>>> +++ b/target/i386/kvm.c
+>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
+>>>          return 0;
+>>>      }
+>>>  
+>>> +    memset(&msr_data, 0, sizeof(msr_data));
+>>
+>> I wonder the overhead of this one...
 > 
+> Cant we use designated initializers like in
 > 
-> On 30.07.19 12:01, Thomas Huth wrote:
->> To run the dirty_log_test on s390x, we have to make sure that we
->> access the dirty log bitmap with little endian byte ordering and
->> we have to properly align the memslot of the guest.
->> Also all dirty bits of a segment are set once on s390x when one
->> of the pages of a segment are written to for the first time, so
->> we have to make sure that we touch all pages during the first
->> iteration to keep the test in sync here.
+> commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
+> Author:     Christian Borntraeger <borntraeger@de.ibm.com>
+> AuthorDate: Thu Oct 30 09:23:41 2014 +0100
+> Commit:     Paolo Bonzini <pbonzini@redhat.com>
+> CommitDate: Mon Dec 15 12:21:01 2014 +0100
 > 
-> While this fixes the test (and the migration does work fine), it still
-> means that s390x overindicates the dirty bit for sparsely populated
-> 1M segments. It is just a performance issue, but maybe we should try 
-> to get this fixed.
+>     valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
+> 
+> and others?
 
-I hope you don't expect me to fix this - the gmap code is really not my
-turf...
+Is the compiler smart enough to figure out it doesn't need to zeroes in
+case env->tsc_valid is true and the function returns?
 
-> Not sure what to do here to remember us about this, 
-> adding this as expected fail?
-
-There is no such thing like an expected failure in KVM selftests -
-that's only available in kvm-unit-tests.
-
-So the only option that I currently see is to add a printf("TODO: ...")
-on s390x here... would that work for you?
-
- Thomas
+> 
+> This should minimize the impact. 
+>>
+>>>      msr_data.info.nmsrs = 1;
+>>>      msr_data.entries[0].index = MSR_IA32_TSC;
+>>>      env->tsc_valid = !runstate_is_running();
+>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>  
+>>>      if (has_xsave) {
+>>>          env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+>>
+>> OK
+>>
+>>>      }
+>>>  
+>>>      max_nested_state_len = kvm_max_nested_state_length();
+>>> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
+>>>          return 0;
+>>>      }
+>>>  
+>>> +    memset(&dbgregs, 0, sizeof(dbgregs));
+>>
+>> OK
+>>
+>>>      for (i = 0; i < 4; i++) {
+>>>          dbgregs.db[i] = env->dr[i];
+>>>      }
+>>
+>> We could remove 'dbgregs.flags = 0;'
+>>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
+> 
