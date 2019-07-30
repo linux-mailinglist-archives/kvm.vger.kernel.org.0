@@ -2,175 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE7767A63C
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 12:49:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53EAF7A653
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 12:57:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729643AbfG3KtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 06:49:12 -0400
-Received: from foss.arm.com ([217.140.110.172]:59182 "EHLO foss.arm.com"
+        id S1729748AbfG3K5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 06:57:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58044 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727868AbfG3KtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 06:49:12 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B05CF344;
-        Tue, 30 Jul 2019 03:49:11 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 011073F575;
-        Tue, 30 Jul 2019 03:49:10 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] arm: timer: Fix potential deadlock when
- waiting for interrupt
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com
-References: <1564392532-7692-1-git-send-email-alexandru.elisei@arm.com>
- <20190729112309.wooytkz7g6qtvvc2@kamzik.brq.redhat.com>
- <ab4d8b69-9fc2-94a0-f5a3-01fb87c3ac44@arm.com>
- <20190730101215.i3geqxzwjqwyp3bz@kamzik.brq.redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <e827084e-7c8c-0970-dcb0-8227d5660bff@arm.com>
-Date:   Tue, 30 Jul 2019 11:49:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727445AbfG3K5a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 06:57:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 59E042F8BE3;
+        Tue, 30 Jul 2019 10:57:30 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C77A5C1A1;
+        Tue, 30 Jul 2019 10:57:23 +0000 (UTC)
+Date:   Tue, 30 Jul 2019 12:57:21 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Enable dirty_log_test on s390x
+Message-ID: <20190730105721.z4zsul7uxl2igoue@kamzik.brq.redhat.com>
+References: <20190730100112.18205-1-thuth@redhat.com>
+ <20190730100112.18205-3-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190730101215.i3geqxzwjqwyp3bz@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190730100112.18205-3-thuth@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 30 Jul 2019 10:57:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/30/19 11:12 AM, Andrew Jones wrote:
-> On Tue, Jul 30, 2019 at 10:30:50AM +0100, Alexandru Elisei wrote:
->> On 7/29/19 12:23 PM, Andrew Jones wrote:
->>> On Mon, Jul 29, 2019 at 10:28:52AM +0100, Alexandru Elisei wrote:
->>>> Commit 204e85aa9352 ("arm64: timer: a few test improvements") added a call
->>>> to report_info after enabling the timer and before the wfi instruction. The
->>>> uart that printf uses is emulated by userspace and is slow, which makes it
->>>> more likely that the timer interrupt will fire before executing the wfi
->>>> instruction, which leads to a deadlock.
->>>>
->>>> An interrupt can wake up a CPU out of wfi, regardless of the
->>>> PSTATE.{A, I, F} bits. Fix the deadlock by masking interrupts on the CPU
->>>> before enabling the timer and unmasking them after the wfi returns so the
->>>> CPU can execute the timer interrupt handler.
->>>>
->>>> Suggested-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>> ---
->>>>  arm/timer.c | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/arm/timer.c b/arm/timer.c
->>>> index 6f2ad1d76ab2..f2f60192ba62 100644
->>>> --- a/arm/timer.c
->>>> +++ b/arm/timer.c
->>>> @@ -242,9 +242,11 @@ static void test_timer(struct timer_info *info)
->>>>  	/* Test TVAL and IRQ trigger */
->>>>  	info->irq_received = false;
->>>>  	info->write_tval(read_sysreg(cntfrq_el0) / 100);	/* 10 ms */
->>>> +	local_irq_disable();
->>>>  	info->write_ctl(ARCH_TIMER_CTL_ENABLE);
->>>>  	report_info("waiting for interrupt...");
->>>>  	wfi();
->>>> +	local_irq_enable();
->>>>  	left = info->read_tval();
->>>>  	report("interrupt received after TVAL/WFI", info->irq_received);
->>>>  	report("timer has expired (%d)", left < 0, left);
->>>> -- 
->>>> 2.7.4
->>>>
->>> Reviewed-by: Andrew Jones <drjones@redhat.com>
->>>
->>> Thanks Alexandru. It now makes more sense to me that wfi wakes up on
->>> an interrupt, even when interrupts are masked, as it's clearly to
->>> avoid these types of races. I see we have the same type of race in
->>> arm/gic.c. I'll try to get around to fixing that at some point, unless
->>> somebody beats me to it :)
->> Something like this? Tested with gicv3-ipi.
->>
->> diff --git a/arm/gic.c b/arm/gic.c
->> index ed5642e74f70..f0bd5739842a 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -220,12 +220,12 @@ static void ipi_enable(void)
->>  #else
->>         install_irq_handler(EL1H_IRQ, ipi_handler);
->>  #endif
->> -       local_irq_enable();
->>  }
->>  
->>  static void ipi_send(void)
->>  {
->>         ipi_enable();
->> +       local_irq_enable();
->>         wait_on_ready();
->>         ipi_test_self();
->>         ipi_test_smp();
->> @@ -236,9 +236,13 @@ static void ipi_send(void)
->>  static void ipi_recv(void)
->>  {
->>         ipi_enable();
->> +       local_irq_disable();
->>         cpumask_set_cpu(smp_processor_id(), &ready);
->> -       while (1)
->> +       while (1) {
->> +               local_irq_disable();
->>                 wfi();
->> +               local_irq_enable();
->> +       }
->>  }
->>  
->>  static void ipi_test(void *data __unused)
-> I'm not sure we need to worry about enabling/disabling interrupts around
-> the wfi, since we're just doing a tight loop on it. I think something like
-> this (untested), which is quite similar to your approach, should work
->
-> diff --git a/arm/gic.c b/arm/gic.c
-> index ed5642e74f70..cdbb4134b0af 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -214,18 +214,19 @@ static void ipi_test_smp(void)
+On Tue, Jul 30, 2019 at 12:01:12PM +0200, Thomas Huth wrote:
+> To run the dirty_log_test on s390x, we have to make sure that we
+> access the dirty log bitmap with little endian byte ordering and
+> we have to properly align the memslot of the guest.
+> Also all dirty bits of a segment are set once on s390x when one
+> of the pages of a segment are written to for the first time, so
+> we have to make sure that we touch all pages during the first
+> iteration to keep the test in sync here.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile         |  1 +
+>  tools/testing/selftests/kvm/dirty_log_test.c | 70 ++++++++++++++++++--
+>  2 files changed, 66 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index ba7849751989..ac7e63e00fee 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -33,6 +33,7 @@ TEST_GEN_PROGS_aarch64 += dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
 >  
->  static void ipi_enable(void)
->  {
-> +       local_irq_disable();
->         gic_enable_defaults();
->  #ifdef __arm__
->         install_exception_handler(EXCPTN_IRQ, ipi_handler);
->  #else
->         install_irq_handler(EL1H_IRQ, ipi_handler);
->  #endif
-> -       local_irq_enable();
->  }
+>  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+> +TEST_GEN_PROGS_s390x += dirty_log_test
+>  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
 >  
->  static void ipi_send(void)
->  {
->         ipi_enable();
-> +       local_irq_enable();
->         wait_on_ready();
->         ipi_test_self();
->         ipi_test_smp();
-> @@ -237,6 +238,7 @@ static void ipi_recv(void)
->  {
->         ipi_enable();
->         cpumask_set_cpu(smp_processor_id(), &ready);
-> +       local_irq_enable();
->         while (1)
->                 wfi();
->  }
->
-> What do you think?
+>  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> index ceb52b952637..7a1223ad0ff3 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> @@ -26,9 +26,22 @@
+>  /* The memory slot index to track dirty pages */
+>  #define TEST_MEM_SLOT_INDEX		1
+>  
+> +#ifdef __s390x__
+> +
+> +/*
+> + * On s390x, the ELF program is sometimes linked at 0x80000000, so we can
+> + * not use 0x40000000 here without overlapping into that region. Thus let's
+> + * use 0xc0000000 as base address there instead.
+> + */
+> +#define DEFAULT_GUEST_TEST_MEM		0xc0000000
 
-I've been thinking about it and I think that the gic test is fine as it is. The
-secondaries are already synchronized with the boot cpu via the ready mask, we
-don't care if the secondaries receive the IPIs before or after the wfi
-instruction, and they will end up blocked in wfi at the end of the test either
-way (because of the while(1) loop). Am I missing something?
+I think both x86 and aarch64 should be ok with this offset. If testing
+proves it does, then we can just change it for all architecture.
+
+> +
+> +#else
+> +
+>  /* Default guest test memory offset, 1G */
+>  #define DEFAULT_GUEST_TEST_MEM		0x40000000
+>  
+> +#endif
+> +
+>  /* How many pages to dirty for each guest loop */
+>  #define TEST_PAGES_PER_LOOP		1024
+>  
+> @@ -38,6 +51,27 @@
+>  /* Interval for each host loop (ms) */
+>  #define TEST_HOST_LOOP_INTERVAL		10UL
+>  
+> +/* Dirty bitmaps are always little endian, so we need to swap on big endian */
+> +#if defined(__s390x__)
+> +# define BITOP_LE_SWIZZLE	((BITS_PER_LONG-1) & ~0x7)
+> +# define test_bit_le(nr, addr) \
+> +	test_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+> +# define set_bit_le(nr, addr) \
+> +	set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+> +# define clear_bit_le(nr, addr) \
+> +	clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+> +# define test_and_set_bit_le(nr, addr) \
+> +	test_and_set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+> +# define test_and_clear_bit_le(nr, addr) \
+> +	test_and_clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+> +#else
+> +# define test_bit_le	test_bit
+> +# define set_bit_le	set_bit
+> +# define clear_bit_le	clear_bit
+> +# define test_and_set_bit_le	test_and_set_bit
+> +# define test_and_clear_bit_le	test_and_clear_bit
+> +#endif
+
+nit: does the formatting above look right after applying the patch?
+
+> +
+>  /*
+>   * Guest/Host shared variables. Ensure addr_gva2hva() and/or
+>   * sync_global_to/from_guest() are used when accessing from
+> @@ -69,11 +103,25 @@ static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
+>   */
+>  static void guest_code(void)
+>  {
+> +	uint64_t addr;
+>  	int i;
+>  
+> +#ifdef __s390x__
+> +	/*
+> +	 * On s390x, all pages of a 1M segment are initially marked as dirty
+> +	 * when a page of the segment is written to for the very first time.
+> +	 * To compensate this specialty in this test, we need to touch all
+> +	 * pages during the first iteration.
+> +	 */
+> +	for (i = 0; i < guest_num_pages; i++) {
+> +		addr = guest_test_virt_mem + i * guest_page_size;
+> +		*(uint64_t *)addr = READ_ONCE(iteration);
+> +	}
+> +#endif
+> +
+>  	while (true) {
+>  		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
+> -			uint64_t addr = guest_test_virt_mem;
+> +			addr = guest_test_virt_mem;
+>  			addr += (READ_ONCE(random_array[i]) % guest_num_pages)
+>  				* guest_page_size;
+>  			addr &= ~(host_page_size - 1);
+> @@ -158,15 +206,15 @@ static void vm_dirty_log_verify(unsigned long *bmap)
+>  		value_ptr = host_test_mem + page * host_page_size;
+>  
+>  		/* If this is a special page that we were tracking... */
+> -		if (test_and_clear_bit(page, host_bmap_track)) {
+> +		if (test_and_clear_bit_le(page, host_bmap_track)) {
+>  			host_track_next_count++;
+> -			TEST_ASSERT(test_bit(page, bmap),
+> +			TEST_ASSERT(test_bit_le(page, bmap),
+>  				    "Page %"PRIu64" should have its dirty bit "
+>  				    "set in this iteration but it is missing",
+>  				    page);
+>  		}
+>  
+> -		if (test_bit(page, bmap)) {
+> +		if (test_bit_le(page, bmap)) {
+>  			host_dirty_count++;
+>  			/*
+>  			 * If the bit is set, the value written onto
+> @@ -209,7 +257,7 @@ static void vm_dirty_log_verify(unsigned long *bmap)
+>  				 * should report its dirtyness in the
+>  				 * next run
+>  				 */
+> -				set_bit(page, host_bmap_track);
+> +				set_bit_le(page, host_bmap_track);
+>  			}
+>  		}
+>  	}
+> @@ -293,6 +341,10 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+>  	 * case where the size is not aligned to 64 pages.
+>  	 */
+>  	guest_num_pages = (1ul << (30 - guest_page_shift)) + 16;
+> +#ifdef __s390x__
+> +	/* Round up to multiple of 1M (segment size) */
+> +	guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
+
+We could maybe do this for all architectures as well.
+
+> +#endif
+>  	host_page_size = getpagesize();
+>  	host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
+>  			 !!((guest_num_pages * guest_page_size) % host_page_size);
+> @@ -304,6 +356,11 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+>  		guest_test_phys_mem = phys_offset;
+>  	}
+>  
+> +#ifdef __s390x__
+> +	/* Align to 1M (segment size) */
+> +	guest_test_phys_mem &= ~((1 << 20) - 1);
+
+and this
+
+> +#endif
+> +
+>  	DEBUG("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
+>  
+>  	bmap = bitmap_alloc(host_num_pages);
+> @@ -454,6 +511,9 @@ int main(int argc, char *argv[])
+>  		vm_guest_mode_params_init(VM_MODE_P48V48_64K, true, true);
+>  	}
+>  #endif
+> +#ifdef __s390x__
+> +	vm_guest_mode_params_init(VM_MODE_P40V48_4K, true, true);
+> +#endif
+>  
+>  	while ((opt = getopt(argc, argv, "hi:I:p:m:")) != -1) {
+>  		switch (opt) {
+> -- 
+> 2.21.0
+>
 
 Thanks,
-Alex
->
-> Thanks,
-> drew
+drew 
