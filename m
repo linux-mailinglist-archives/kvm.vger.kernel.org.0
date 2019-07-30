@@ -2,717 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F2447B388
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 21:53:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E6237B473
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2019 22:42:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726469AbfG3TxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 15:53:08 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:52963 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725209AbfG3TxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 15:53:07 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1M2ep5-1hwguM3SiF-004Dqv; Tue, 30 Jul 2019 21:52:33 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Jiri Kosina <jkosina@suse.cz>,
+        id S1727600AbfG3Umd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 16:42:33 -0400
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:34659 "EHLO
+        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727195AbfG3Umc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 16:42:32 -0400
+Received: by mail-ua1-f65.google.com with SMTP id c4so26050566uad.1
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2019 13:42:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=h4kyAN8zAS9Uf4irFUDSjqH9ZWhN5E7zurQwgpnPXwU=;
+        b=OEtS4OC3sve6VxpGjR/kNn8GXoNNFJlsf9OO8SP18uNcfkbZwcnoSxdrh8mhHsBaNy
+         wa5U9lNru3Lz//n0DjCmi3sNm8mPUQd1OeoYNyzwI3/cCrQYZd7xttP55EiwQQLw1RHB
+         BnBExLOH6D137aKUIL+7aebsgRYWxY882qMQQJvPTS2HF15umeNO2JUEn50h1C5mPdvf
+         iQNfNDAJQLgqelz/D9oECs/ooKqXgNhZSyudGig8za67rtnRr6bCTKu3DGBwmY2GT/2R
+         mS7UvZSkyY8ECx/ny/b2PPpLgP5jAZ2Z+BgocxJw+09LZ+TfeiDkwiW80A1vAQQQg8Eq
+         YTUA==
+X-Gm-Message-State: APjAAAUvm9rXxrd5TgevDCClanX2jFsFemSimbWuHYtVY7yu7uIqSqlQ
+        ySIVRDu13PJDnzO2S38xV59Pxw==
+X-Google-Smtp-Source: APXvYqzuofIoIgW0NFQRZMAF5gCoA5QsmaeHY7a5l8LrRfDIeWZx1zRIzcCUI7+E/DfBxSmEXTf/9g==
+X-Received: by 2002:ab0:64cc:: with SMTP id j12mr25828664uaq.110.1564519351815;
+        Tue, 30 Jul 2019 13:42:31 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+        by smtp.gmail.com with ESMTPSA id i137sm31392254vkd.24.2019.07.30.13.42.28
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 30 Jul 2019 13:42:30 -0700 (PDT)
+Date:   Tue, 30 Jul 2019 16:42:25 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-integrity@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-usb@vger.kernel.org,
-        linux-input@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
-        devel@driverdev.osuosl.org, kvm@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         virtualization@lists.linux-foundation.org,
-        ceph-devel@vger.kernel.org
-Subject: [PATCH v5 12/29] compat_ioctl: move drivers to compat_ptr_ioctl
-Date:   Tue, 30 Jul 2019 21:50:28 +0200
-Message-Id: <20190730195227.742215-1-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20190730192552.4014288-1-arnd@arndb.de>
-References: <20190730192552.4014288-1-arnd@arndb.de>
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
+Message-ID: <20190730163807-mutt-send-email-mst@kernel.org>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190717113030.163499-2-sgarzare@redhat.com>
+ <20190729095956-mutt-send-email-mst@kernel.org>
+ <20190729153656.zk4q4rob5oi6iq7l@steredhat>
+ <20190729114302-mutt-send-email-mst@kernel.org>
+ <20190729161903.yhaj5rfcvleexkhc@steredhat>
+ <20190729165056.r32uzj6om3o6vfvp@steredhat>
+ <20190729143622-mutt-send-email-mst@kernel.org>
+ <20190730093539.dcksure3vrykir3g@steredhat>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:f4kyacZkBh7d2L8DvfG/VWglDWmV1r6PyMvHlDfoj4C7ggclB67
- iYy8MoHZ4ZjuI6LNLyJEN3yiNqmQw5XpLccLKCY831oDCsExHVnyRsQw8RhuXBWAupdrWGU
- 2uujPAjsUE4qQ22u48yyaIJueGs1R4h2CIxPvTzi5pGqdRk3Jl1MaQfXUJiC/aGxUwrOT6G
- Ape/7iXHD3yCgh14Z37RA==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:O3QlaSg0p94=:2DC89ChFTfzqSY3IIwQ7UN
- xd3l5T4yi05idZGMcAom12BDjEwRndOWlluV3dv9kwnrIlv6FXxgCAuZpK+r6w6IQ8DJ+hd/w
- eNe2JmIEZ0O947bREIbVnghXzoDsNhb/k4GhdagSKBJMuiKSx6FvgiCloXsk+MwE9wIF8Mi8t
- OaiDAO5is7ZrdpajoFOJwfkd/HGzdP/XXH0zGWsGIpATl1gEHU2U0R8/o5JwK/BiMH4N/hpi9
- 6Pj6G5XUeVMuuAVNYoIMUwa4DTtFhMb0zdxPoAqLkvrC0cOcVK5kDtyzLkXHb19krCEnxSvH9
- xSAisf/onUmQT/aR/R2k7HCF5D8v8yqpvJgY8KCvRKjjNdq/Kehh1Ev6C68pyOXzG96g7wos6
- m8eLeJowf0dLdiTflRagoHdVMRg/jBLl0ARN0j0/nXPtR+IjdkjADW7zvFhLYkXqZkbL5DGhY
- tH7TvoRuR3rY4Q072FzD+A+IfBe+cg9OzyaQLv7A47rkwZZlyIXqh5fQBWBCOINljdNv17lpE
- Osp7k4bcfZGhUKqYJjtxf9uvbBwIv1Yi7fZP4oPbCp6V98KGd8KP6Pg34UbofokiwizyBakGd
- F9QmeKEOX806mM2gvmP5CExg1+AicT9AOnlvsd+AmokRI3klpronJMiCiYfxMqcru9NgTaX5q
- ZAj1xkW+A+XM9qrwKrEzGxwWmAk9LM/hcMi2xrgFVqwXsrbQdASKOLuLxgrfEYaJwdL3zbVNf
- V8Futwfot9Yamgna+5pt17t5UNBev1eV66UBeg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190730093539.dcksure3vrykir3g@steredhat>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Each of these drivers has a copy of the same trivial helper function to
-convert the pointer argument and then call the native ioctl handler.
+On Tue, Jul 30, 2019 at 11:35:39AM +0200, Stefano Garzarella wrote:
+> On Mon, Jul 29, 2019 at 03:10:15PM -0400, Michael S. Tsirkin wrote:
+> > On Mon, Jul 29, 2019 at 06:50:56PM +0200, Stefano Garzarella wrote:
+> > > On Mon, Jul 29, 2019 at 06:19:03PM +0200, Stefano Garzarella wrote:
+> > > > On Mon, Jul 29, 2019 at 11:49:02AM -0400, Michael S. Tsirkin wrote:
+> > > > > On Mon, Jul 29, 2019 at 05:36:56PM +0200, Stefano Garzarella wrote:
+> > > > > > On Mon, Jul 29, 2019 at 10:04:29AM -0400, Michael S. Tsirkin wrote:
+> > > > > > > On Wed, Jul 17, 2019 at 01:30:26PM +0200, Stefano Garzarella wrote:
+> > > > > > > > Since virtio-vsock was introduced, the buffers filled by the host
+> > > > > > > > and pushed to the guest using the vring, are directly queued in
+> > > > > > > > a per-socket list. These buffers are preallocated by the guest
+> > > > > > > > with a fixed size (4 KB).
+> > > > > > > > 
+> > > > > > > > The maximum amount of memory used by each socket should be
+> > > > > > > > controlled by the credit mechanism.
+> > > > > > > > The default credit available per-socket is 256 KB, but if we use
+> > > > > > > > only 1 byte per packet, the guest can queue up to 262144 of 4 KB
+> > > > > > > > buffers, using up to 1 GB of memory per-socket. In addition, the
+> > > > > > > > guest will continue to fill the vring with new 4 KB free buffers
+> > > > > > > > to avoid starvation of other sockets.
+> > > > > > > > 
+> > > > > > > > This patch mitigates this issue copying the payload of small
+> > > > > > > > packets (< 128 bytes) into the buffer of last packet queued, in
+> > > > > > > > order to avoid wasting memory.
+> > > > > > > > 
+> > > > > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > > > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > > > > 
+> > > > > > > This is good enough for net-next, but for net I think we
+> > > > > > > should figure out how to address the issue completely.
+> > > > > > > Can we make the accounting precise? What happens to
+> > > > > > > performance if we do?
+> > > > > > > 
+> > > > > > 
+> > > > > > In order to do more precise accounting maybe we can use the buffer size,
+> > > > > > instead of payload size when we update the credit available.
+> > > > > > In this way, the credit available for each socket will reflect the memory
+> > > > > > actually used.
+> > > > > > 
+> > > > > > I should check better, because I'm not sure what happen if the peer sees
+> > > > > > 1KB of space available, then it sends 1KB of payload (using a 4KB
+> > > > > > buffer).
+> > > > > > 
+> > > > > > The other option is to copy each packet in a new buffer like I did in
+> > > > > > the v2 [2], but this forces us to make a copy for each packet that does
+> > > > > > not fill the entire buffer, perhaps too expensive.
+> > > > > > 
+> > > > > > [2] https://patchwork.kernel.org/patch/10938741/
+> > > > > > 
+> > > > > > 
+> > > > > > Thanks,
+> > > > > > Stefano
+> > > > > 
+> > > > > Interesting. You are right, and at some level the protocol forces copies.
+> > > > > 
+> > > > > We could try to detect that the actual memory is getting close to
+> > > > > admin limits and force copies on queued packets after the fact.
+> > > > > Is that practical?
+> > > > 
+> > > > Yes, I think it is doable!
+> > > > We can decrease the credit available with the buffer size queued, and
+> > > > when the buffer size of packet to queue is bigger than the credit
+> > > > available, we can copy it.
+> > > > 
+> > > > > 
+> > > > > And yes we can extend the credit accounting to include buffer size.
+> > > > > That's a protocol change but maybe it makes sense.
+> > > > 
+> > > > Since we send to the other peer the credit available, maybe this
+> > > > change can be backwards compatible (I'll check better this).
+> > > 
+> > > What I said was wrong.
+> > > 
+> > > We send a counter (increased when the user consumes the packets) and the
+> > > "buf_alloc" (the max memory allowed) to the other peer.
+> > > It makes a difference between a local counter (increased when the
+> > > packets are sent) and the remote counter to calculate the credit available:
+> > > 
+> > >     u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> > >     {
+> > >     	u32 ret;
+> > > 
+> > >     	spin_lock_bh(&vvs->tx_lock);
+> > >     	ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+> > >     	if (ret > credit)
+> > >     		ret = credit;
+> > >     	vvs->tx_cnt += ret;
+> > >     	spin_unlock_bh(&vvs->tx_lock);
+> > > 
+> > >     	return ret;
+> > >     }
+> > > 
+> > > Maybe I can play with "buf_alloc" to take care of bytes queued but not
+> > > used.
+> > > 
+> > > Thanks,
+> > > Stefano
+> > 
+> > Right. And the idea behind it all was that if we send a credit
+> > to remote then we have space for it.
+> 
+> Yes.
+> 
+> > I think the basic idea was that if we have actual allocated
+> > memory and can copy data there, then we send the credit to
+> > remote.
+> > 
+> > Of course that means an extra copy every packet.
+> > So as an optimization, it seems that we just assume
+> > that we will be able to allocate a new buffer.
+> 
+> Yes, we refill the virtqueue when half of the buffers were used.
+> 
+> > 
+> > First this is not the best we can do. We can actually do
+> > allocate memory in the socket before sending credit.
+> 
+> In this case, IIUC we should allocate an entire buffer (4KB),
+> so we can reuse it if the packet is big.
+> 
+> > If packet is small then we copy it there.
+> > If packet is big then we queue the packet,
+> > take the buffer out of socket and add it to the virtqueue.
+> > 
+> > Second question is what to do about medium sized packets.
+> > Packet is 1K but buffer is 4K, what do we do?
+> > And here I wonder - why don't we add the 3K buffer
+> > to the vq?
+> 
+> This would allow us to have an accurate credit account.
+> 
+> The problem here is the compatibility. Before this series virtio-vsock
+> and vhost-vsock modules had the RX buffer size hard-coded
+> (VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE = 4K). So, if we send a buffer smaller
+> of 4K, there might be issues.
 
-We now have a generic implementation of that, so use it.
+Shouldn't be if they are following the spec. If not let's fix
+the broken parts.
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
-Reviewed-by: Jiri Kosina <jkosina@suse.cz>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/char/ppdev.c              | 12 +---------
- drivers/char/tpm/tpm_vtpm_proxy.c | 12 +---------
- drivers/firewire/core-cdev.c      | 12 +---------
- drivers/hid/usbhid/hiddev.c       | 11 +--------
- drivers/hwtracing/stm/core.c      | 12 +---------
- drivers/misc/mei/main.c           | 22 +----------------
- drivers/mtd/ubi/cdev.c            | 36 +++-------------------------
- drivers/net/tap.c                 | 12 +---------
- drivers/staging/pi433/pi433_if.c  | 12 +---------
- drivers/usb/core/devio.c          | 16 +------------
- drivers/vfio/vfio.c               | 39 +++----------------------------
- drivers/vhost/net.c               | 12 +---------
- drivers/vhost/scsi.c              | 12 +---------
- drivers/vhost/test.c              | 12 +---------
- drivers/vhost/vsock.c             | 12 +---------
- fs/ceph/dir.c                     |  2 +-
- fs/ceph/file.c                    |  2 +-
- fs/ceph/super.h                   |  9 -------
- fs/fat/file.c                     | 13 +----------
- 19 files changed, 22 insertions(+), 248 deletions(-)
+> 
+> Maybe it is the time to add add 'features' to virtio-vsock device.
+> 
+> Thanks,
+> Stefano
 
-diff --git a/drivers/char/ppdev.c b/drivers/char/ppdev.c
-index f0a8adca1eee..c4d5cc4a1d3e 100644
---- a/drivers/char/ppdev.c
-+++ b/drivers/char/ppdev.c
-@@ -670,14 +670,6 @@ static long pp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 	return ret;
- }
- 
--#ifdef CONFIG_COMPAT
--static long pp_compat_ioctl(struct file *file, unsigned int cmd,
--			    unsigned long arg)
--{
--	return pp_ioctl(file, cmd, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static int pp_open(struct inode *inode, struct file *file)
- {
- 	unsigned int minor = iminor(inode);
-@@ -786,9 +778,7 @@ static const struct file_operations pp_fops = {
- 	.write		= pp_write,
- 	.poll		= pp_poll,
- 	.unlocked_ioctl	= pp_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl   = pp_compat_ioctl,
--#endif
-+	.compat_ioctl   = compat_ptr_ioctl,
- 	.open		= pp_open,
- 	.release	= pp_release,
- };
-diff --git a/drivers/char/tpm/tpm_vtpm_proxy.c b/drivers/char/tpm/tpm_vtpm_proxy.c
-index 2f6e087ec496..91c772e38bb5 100644
---- a/drivers/char/tpm/tpm_vtpm_proxy.c
-+++ b/drivers/char/tpm/tpm_vtpm_proxy.c
-@@ -670,20 +670,10 @@ static long vtpmx_fops_ioctl(struct file *f, unsigned int ioctl,
- 	}
- }
- 
--#ifdef CONFIG_COMPAT
--static long vtpmx_fops_compat_ioctl(struct file *f, unsigned int ioctl,
--					  unsigned long arg)
--{
--	return vtpmx_fops_ioctl(f, ioctl, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static const struct file_operations vtpmx_fops = {
- 	.owner = THIS_MODULE,
- 	.unlocked_ioctl = vtpmx_fops_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl = vtpmx_fops_compat_ioctl,
--#endif
-+	.compat_ioctl = compat_ptr_ioctl,
- 	.llseek = noop_llseek,
- };
- 
-diff --git a/drivers/firewire/core-cdev.c b/drivers/firewire/core-cdev.c
-index 1da7ba18d399..c777088f5828 100644
---- a/drivers/firewire/core-cdev.c
-+++ b/drivers/firewire/core-cdev.c
-@@ -1646,14 +1646,6 @@ static long fw_device_op_ioctl(struct file *file,
- 	return dispatch_ioctl(file->private_data, cmd, (void __user *)arg);
- }
- 
--#ifdef CONFIG_COMPAT
--static long fw_device_op_compat_ioctl(struct file *file,
--				      unsigned int cmd, unsigned long arg)
--{
--	return dispatch_ioctl(file->private_data, cmd, compat_ptr(arg));
--}
--#endif
--
- static int fw_device_op_mmap(struct file *file, struct vm_area_struct *vma)
- {
- 	struct client *client = file->private_data;
-@@ -1795,7 +1787,5 @@ const struct file_operations fw_device_ops = {
- 	.mmap		= fw_device_op_mmap,
- 	.release	= fw_device_op_release,
- 	.poll		= fw_device_op_poll,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= fw_device_op_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- };
-diff --git a/drivers/hid/usbhid/hiddev.c b/drivers/hid/usbhid/hiddev.c
-index 55b72573066b..70009bd76ac1 100644
---- a/drivers/hid/usbhid/hiddev.c
-+++ b/drivers/hid/usbhid/hiddev.c
-@@ -842,13 +842,6 @@ static long hiddev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 	return r;
- }
- 
--#ifdef CONFIG_COMPAT
--static long hiddev_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
--{
--	return hiddev_ioctl(file, cmd, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static const struct file_operations hiddev_fops = {
- 	.owner =	THIS_MODULE,
- 	.read =		hiddev_read,
-@@ -858,9 +851,7 @@ static const struct file_operations hiddev_fops = {
- 	.release =	hiddev_release,
- 	.unlocked_ioctl =	hiddev_ioctl,
- 	.fasync =	hiddev_fasync,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= hiddev_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- 	.llseek		= noop_llseek,
- };
- 
-diff --git a/drivers/hwtracing/stm/core.c b/drivers/hwtracing/stm/core.c
-index e55b902560de..0fbc994900fd 100644
---- a/drivers/hwtracing/stm/core.c
-+++ b/drivers/hwtracing/stm/core.c
-@@ -839,23 +839,13 @@ stm_char_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 	return err;
- }
- 
--#ifdef CONFIG_COMPAT
--static long
--stm_char_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
--{
--	return stm_char_ioctl(file, cmd, (unsigned long)compat_ptr(arg));
--}
--#else
--#define stm_char_compat_ioctl	NULL
--#endif
--
- static const struct file_operations stm_fops = {
- 	.open		= stm_char_open,
- 	.release	= stm_char_release,
- 	.write		= stm_char_write,
- 	.mmap		= stm_char_mmap,
- 	.unlocked_ioctl	= stm_char_ioctl,
--	.compat_ioctl	= stm_char_compat_ioctl,
-+	.compat_ioctl	= compat_ptr_ioctl,
- 	.llseek		= no_llseek,
- };
- 
-diff --git a/drivers/misc/mei/main.c b/drivers/misc/mei/main.c
-index f894d1f8a53e..4ea7feb4ec2d 100644
---- a/drivers/misc/mei/main.c
-+++ b/drivers/misc/mei/main.c
-@@ -532,24 +532,6 @@ static long mei_ioctl(struct file *file, unsigned int cmd, unsigned long data)
- 	return rets;
- }
- 
--/**
-- * mei_compat_ioctl - the compat IOCTL function
-- *
-- * @file: pointer to file structure
-- * @cmd: ioctl command
-- * @data: pointer to mei message structure
-- *
-- * Return: 0 on success , <0 on error
-- */
--#ifdef CONFIG_COMPAT
--static long mei_compat_ioctl(struct file *file,
--			unsigned int cmd, unsigned long data)
--{
--	return mei_ioctl(file, cmd, (unsigned long)compat_ptr(data));
--}
--#endif
--
--
- /**
-  * mei_poll - the poll function
-  *
-@@ -905,9 +887,7 @@ static const struct file_operations mei_fops = {
- 	.owner = THIS_MODULE,
- 	.read = mei_read,
- 	.unlocked_ioctl = mei_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl = mei_compat_ioctl,
--#endif
-+	.compat_ioctl = compat_ptr_ioctl,
- 	.open = mei_open,
- 	.release = mei_release,
- 	.write = mei_write,
-diff --git a/drivers/mtd/ubi/cdev.c b/drivers/mtd/ubi/cdev.c
-index 1b77fff9f892..cc9a28cf9d82 100644
---- a/drivers/mtd/ubi/cdev.c
-+++ b/drivers/mtd/ubi/cdev.c
-@@ -1078,36 +1078,6 @@ static long ctrl_cdev_ioctl(struct file *file, unsigned int cmd,
- 	return err;
- }
- 
--#ifdef CONFIG_COMPAT
--static long vol_cdev_compat_ioctl(struct file *file, unsigned int cmd,
--				  unsigned long arg)
--{
--	unsigned long translated_arg = (unsigned long)compat_ptr(arg);
--
--	return vol_cdev_ioctl(file, cmd, translated_arg);
--}
--
--static long ubi_cdev_compat_ioctl(struct file *file, unsigned int cmd,
--				  unsigned long arg)
--{
--	unsigned long translated_arg = (unsigned long)compat_ptr(arg);
--
--	return ubi_cdev_ioctl(file, cmd, translated_arg);
--}
--
--static long ctrl_cdev_compat_ioctl(struct file *file, unsigned int cmd,
--				   unsigned long arg)
--{
--	unsigned long translated_arg = (unsigned long)compat_ptr(arg);
--
--	return ctrl_cdev_ioctl(file, cmd, translated_arg);
--}
--#else
--#define vol_cdev_compat_ioctl  NULL
--#define ubi_cdev_compat_ioctl  NULL
--#define ctrl_cdev_compat_ioctl NULL
--#endif
--
- /* UBI volume character device operations */
- const struct file_operations ubi_vol_cdev_operations = {
- 	.owner          = THIS_MODULE,
-@@ -1118,7 +1088,7 @@ const struct file_operations ubi_vol_cdev_operations = {
- 	.write          = vol_cdev_write,
- 	.fsync		= vol_cdev_fsync,
- 	.unlocked_ioctl = vol_cdev_ioctl,
--	.compat_ioctl   = vol_cdev_compat_ioctl,
-+	.compat_ioctl   = compat_ptr_ioctl,
- };
- 
- /* UBI character device operations */
-@@ -1126,13 +1096,13 @@ const struct file_operations ubi_cdev_operations = {
- 	.owner          = THIS_MODULE,
- 	.llseek         = no_llseek,
- 	.unlocked_ioctl = ubi_cdev_ioctl,
--	.compat_ioctl   = ubi_cdev_compat_ioctl,
-+	.compat_ioctl   = compat_ptr_ioctl,
- };
- 
- /* UBI control character device operations */
- const struct file_operations ubi_ctrl_cdev_operations = {
- 	.owner          = THIS_MODULE,
- 	.unlocked_ioctl = ctrl_cdev_ioctl,
--	.compat_ioctl   = ctrl_cdev_compat_ioctl,
-+	.compat_ioctl   = compat_ptr_ioctl,
- 	.llseek		= no_llseek,
- };
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index dd614c2cd994..bcdfb0d88753 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1123,14 +1123,6 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
- 	}
- }
- 
--#ifdef CONFIG_COMPAT
--static long tap_compat_ioctl(struct file *file, unsigned int cmd,
--			     unsigned long arg)
--{
--	return tap_ioctl(file, cmd, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static const struct file_operations tap_fops = {
- 	.owner		= THIS_MODULE,
- 	.open		= tap_open,
-@@ -1140,9 +1132,7 @@ static const struct file_operations tap_fops = {
- 	.poll		= tap_poll,
- 	.llseek		= no_llseek,
- 	.unlocked_ioctl	= tap_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= tap_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- };
- 
- static int tap_get_user_xdp(struct tap_queue *q, struct xdp_buff *xdp)
-diff --git a/drivers/staging/pi433/pi433_if.c b/drivers/staging/pi433/pi433_if.c
-index 40c6f4e7632f..313d22f6210f 100644
---- a/drivers/staging/pi433/pi433_if.c
-+++ b/drivers/staging/pi433/pi433_if.c
-@@ -928,16 +928,6 @@ pi433_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
- 	return 0;
- }
- 
--#ifdef CONFIG_COMPAT
--static long
--pi433_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
--{
--	return pi433_ioctl(filp, cmd, (unsigned long)compat_ptr(arg));
--}
--#else
--#define pi433_compat_ioctl NULL
--#endif /* CONFIG_COMPAT */
--
- /*-------------------------------------------------------------------------*/
- 
- static int pi433_open(struct inode *inode, struct file *filp)
-@@ -1094,7 +1084,7 @@ static const struct file_operations pi433_fops = {
- 	.write =	pi433_write,
- 	.read =		pi433_read,
- 	.unlocked_ioctl = pi433_ioctl,
--	.compat_ioctl = pi433_compat_ioctl,
-+	.compat_ioctl = compat_ptr_ioctl,
- 	.open =		pi433_open,
- 	.release =	pi433_release,
- 	.llseek =	no_llseek,
-diff --git a/drivers/usb/core/devio.c b/drivers/usb/core/devio.c
-index b265ab5405f9..efea6cff66d4 100644
---- a/drivers/usb/core/devio.c
-+++ b/drivers/usb/core/devio.c
-@@ -2604,18 +2604,6 @@ static long usbdev_ioctl(struct file *file, unsigned int cmd,
- 	return ret;
- }
- 
--#ifdef CONFIG_COMPAT
--static long usbdev_compat_ioctl(struct file *file, unsigned int cmd,
--			unsigned long arg)
--{
--	int ret;
--
--	ret = usbdev_do_ioctl(file, cmd, compat_ptr(arg));
--
--	return ret;
--}
--#endif
--
- /* No kernel lock - fine */
- static __poll_t usbdev_poll(struct file *file,
- 				struct poll_table_struct *wait)
-@@ -2639,9 +2627,7 @@ const struct file_operations usbdev_file_operations = {
- 	.read =		  usbdev_read,
- 	.poll =		  usbdev_poll,
- 	.unlocked_ioctl = usbdev_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl =   usbdev_compat_ioctl,
--#endif
-+	.compat_ioctl =   compat_ptr_ioctl,
- 	.mmap =           usbdev_mmap,
- 	.open =		  usbdev_open,
- 	.release =	  usbdev_release,
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 388597930b64..c8482624ca34 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -1184,15 +1184,6 @@ static long vfio_fops_unl_ioctl(struct file *filep,
- 	return ret;
- }
- 
--#ifdef CONFIG_COMPAT
--static long vfio_fops_compat_ioctl(struct file *filep,
--				   unsigned int cmd, unsigned long arg)
--{
--	arg = (unsigned long)compat_ptr(arg);
--	return vfio_fops_unl_ioctl(filep, cmd, arg);
--}
--#endif	/* CONFIG_COMPAT */
--
- static int vfio_fops_open(struct inode *inode, struct file *filep)
- {
- 	struct vfio_container *container;
-@@ -1275,9 +1266,7 @@ static const struct file_operations vfio_fops = {
- 	.read		= vfio_fops_read,
- 	.write		= vfio_fops_write,
- 	.unlocked_ioctl	= vfio_fops_unl_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= vfio_fops_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- 	.mmap		= vfio_fops_mmap,
- };
- 
-@@ -1556,15 +1545,6 @@ static long vfio_group_fops_unl_ioctl(struct file *filep,
- 	return ret;
- }
- 
--#ifdef CONFIG_COMPAT
--static long vfio_group_fops_compat_ioctl(struct file *filep,
--					 unsigned int cmd, unsigned long arg)
--{
--	arg = (unsigned long)compat_ptr(arg);
--	return vfio_group_fops_unl_ioctl(filep, cmd, arg);
--}
--#endif	/* CONFIG_COMPAT */
--
- static int vfio_group_fops_open(struct inode *inode, struct file *filep)
- {
- 	struct vfio_group *group;
-@@ -1620,9 +1600,7 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
- static const struct file_operations vfio_group_fops = {
- 	.owner		= THIS_MODULE,
- 	.unlocked_ioctl	= vfio_group_fops_unl_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= vfio_group_fops_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- 	.open		= vfio_group_fops_open,
- 	.release	= vfio_group_fops_release,
- };
-@@ -1687,24 +1665,13 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
- 	return device->ops->mmap(device->device_data, vma);
- }
- 
--#ifdef CONFIG_COMPAT
--static long vfio_device_fops_compat_ioctl(struct file *filep,
--					  unsigned int cmd, unsigned long arg)
--{
--	arg = (unsigned long)compat_ptr(arg);
--	return vfio_device_fops_unl_ioctl(filep, cmd, arg);
--}
--#endif	/* CONFIG_COMPAT */
--
- static const struct file_operations vfio_device_fops = {
- 	.owner		= THIS_MODULE,
- 	.release	= vfio_device_fops_release,
- 	.read		= vfio_device_fops_read,
- 	.write		= vfio_device_fops_write,
- 	.unlocked_ioctl	= vfio_device_fops_unl_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= vfio_device_fops_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- 	.mmap		= vfio_device_fops_mmap,
- };
- 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 1a2dd53caade..e158159671fa 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1751,14 +1751,6 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 	}
- }
- 
--#ifdef CONFIG_COMPAT
--static long vhost_net_compat_ioctl(struct file *f, unsigned int ioctl,
--				   unsigned long arg)
--{
--	return vhost_net_ioctl(f, ioctl, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static ssize_t vhost_net_chr_read_iter(struct kiocb *iocb, struct iov_iter *to)
- {
- 	struct file *file = iocb->ki_filp;
-@@ -1794,9 +1786,7 @@ static const struct file_operations vhost_net_fops = {
- 	.write_iter     = vhost_net_chr_write_iter,
- 	.poll           = vhost_net_chr_poll,
- 	.unlocked_ioctl = vhost_net_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl   = vhost_net_compat_ioctl,
--#endif
-+	.compat_ioctl   = compat_ptr_ioctl,
- 	.open           = vhost_net_open,
- 	.llseek		= noop_llseek,
- };
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index a9caf1bc3c3e..0b949a14bce3 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -1727,21 +1727,11 @@ vhost_scsi_ioctl(struct file *f,
- 	}
- }
- 
--#ifdef CONFIG_COMPAT
--static long vhost_scsi_compat_ioctl(struct file *f, unsigned int ioctl,
--				unsigned long arg)
--{
--	return vhost_scsi_ioctl(f, ioctl, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static const struct file_operations vhost_scsi_fops = {
- 	.owner          = THIS_MODULE,
- 	.release        = vhost_scsi_release,
- 	.unlocked_ioctl = vhost_scsi_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= vhost_scsi_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- 	.open           = vhost_scsi_open,
- 	.llseek		= noop_llseek,
- };
-diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-index 9e90e969af55..71954077df69 100644
---- a/drivers/vhost/test.c
-+++ b/drivers/vhost/test.c
-@@ -297,21 +297,11 @@ static long vhost_test_ioctl(struct file *f, unsigned int ioctl,
- 	}
- }
- 
--#ifdef CONFIG_COMPAT
--static long vhost_test_compat_ioctl(struct file *f, unsigned int ioctl,
--				   unsigned long arg)
--{
--	return vhost_test_ioctl(f, ioctl, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static const struct file_operations vhost_test_fops = {
- 	.owner          = THIS_MODULE,
- 	.release        = vhost_test_release,
- 	.unlocked_ioctl = vhost_test_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl   = vhost_test_compat_ioctl,
--#endif
-+	.compat_ioctl   = compat_ptr_ioctl,
- 	.open           = vhost_test_open,
- 	.llseek		= noop_llseek,
- };
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 6a50e1d0529c..69c0350f622e 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -729,23 +729,13 @@ static long vhost_vsock_dev_ioctl(struct file *f, unsigned int ioctl,
- 	}
- }
- 
--#ifdef CONFIG_COMPAT
--static long vhost_vsock_dev_compat_ioctl(struct file *f, unsigned int ioctl,
--					 unsigned long arg)
--{
--	return vhost_vsock_dev_ioctl(f, ioctl, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static const struct file_operations vhost_vsock_fops = {
- 	.owner          = THIS_MODULE,
- 	.open           = vhost_vsock_dev_open,
- 	.release        = vhost_vsock_dev_release,
- 	.llseek		= noop_llseek,
- 	.unlocked_ioctl = vhost_vsock_dev_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl   = vhost_vsock_dev_compat_ioctl,
--#endif
-+	.compat_ioctl   = compat_ptr_ioctl,
- };
- 
- static struct miscdevice vhost_vsock_misc = {
-diff --git a/fs/ceph/dir.c b/fs/ceph/dir.c
-index 401c17d36b71..811f45badc10 100644
---- a/fs/ceph/dir.c
-+++ b/fs/ceph/dir.c
-@@ -1808,7 +1808,7 @@ const struct file_operations ceph_dir_fops = {
- 	.open = ceph_open,
- 	.release = ceph_release,
- 	.unlocked_ioctl = ceph_ioctl,
--	.compat_ioctl = ceph_compat_ioctl,
-+	.compat_ioctl = compat_ptr_ioctl,
- 	.fsync = ceph_fsync,
- 	.lock = ceph_lock,
- 	.flock = ceph_flock,
-diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-index 99712b6b1ad5..676e5aed7a58 100644
---- a/fs/ceph/file.c
-+++ b/fs/ceph/file.c
-@@ -2138,7 +2138,7 @@ const struct file_operations ceph_file_fops = {
- 	.splice_read = generic_file_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.unlocked_ioctl = ceph_ioctl,
--	.compat_ioctl = ceph_compat_ioctl,
-+	.compat_ioctl = compat_ptr_ioctl,
- 	.fallocate	= ceph_fallocate,
- 	.copy_file_range = ceph_copy_file_range,
- };
-diff --git a/fs/ceph/super.h b/fs/ceph/super.h
-index 0aebccd48fa0..f7945e16ee09 100644
---- a/fs/ceph/super.h
-+++ b/fs/ceph/super.h
-@@ -1109,15 +1109,6 @@ extern void ceph_readdir_cache_release(struct ceph_readdir_cache_control *ctl);
- 
- /* ioctl.c */
- extern long ceph_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
--static inline long
--ceph_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
--{
--#ifdef CONFIG_COMPAT
--	return ceph_ioctl(file, cmd, (unsigned long)compat_ptr(arg));
--#else
--	return -ENOTTY;
--#endif
--}
- 
- /* export.c */
- extern const struct export_operations ceph_export_ops;
-diff --git a/fs/fat/file.c b/fs/fat/file.c
-index 4614c0ba5f1c..bdc4503c00a3 100644
---- a/fs/fat/file.c
-+++ b/fs/fat/file.c
-@@ -172,15 +172,6 @@ long fat_generic_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
- 	}
- }
- 
--#ifdef CONFIG_COMPAT
--static long fat_generic_compat_ioctl(struct file *filp, unsigned int cmd,
--				      unsigned long arg)
--
--{
--	return fat_generic_ioctl(filp, cmd, (unsigned long)compat_ptr(arg));
--}
--#endif
--
- static int fat_file_release(struct inode *inode, struct file *filp)
- {
- 	if ((filp->f_mode & FMODE_WRITE) &&
-@@ -215,9 +206,7 @@ const struct file_operations fat_file_operations = {
- 	.mmap		= generic_file_mmap,
- 	.release	= fat_file_release,
- 	.unlocked_ioctl	= fat_generic_ioctl,
--#ifdef CONFIG_COMPAT
--	.compat_ioctl	= fat_generic_compat_ioctl,
--#endif
-+	.compat_ioctl	= compat_ptr_ioctl,
- 	.fsync		= fat_file_fsync,
- 	.splice_read	= generic_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
+Why would a remote care about buffer sizes?
+
+Let's first see what the issues are. If they exist
+we can either fix the bugs, or code the bug as a feature in spec.
+
 -- 
-2.20.0
-
+MST
