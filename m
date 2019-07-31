@@ -2,179 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 59AD87BB61
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 10:18:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53A1C7BB6C
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 10:20:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726840AbfGaISB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 04:18:01 -0400
-Received: from thoth.sbs.de ([192.35.17.2]:59872 "EHLO thoth.sbs.de"
+        id S1727259AbfGaIUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 04:20:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44002 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726185AbfGaISB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 04:18:01 -0400
-Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
-        by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id x6V8HsUc007864
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 Jul 2019 10:17:54 +0200
-Received: from [139.22.32.241] ([139.22.32.241])
-        by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id x6V8HrnF023114;
-        Wed, 31 Jul 2019 10:17:53 +0200
-Subject: Re: [PATCH] kvm: arm: Promote KVM_ARM_TARGET_CORTEX_A7 to generic V7
- core
-From:   Jan Kiszka <jan.kiszka@siemens.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>,
-        Vladimir Murzin <vladimir.murzin@arm.com>
-Cc:     kvm <kvm@vger.kernel.org>
-References: <b486cb75-4b8e-c847-a019-81e822223fb6@web.de>
-Message-ID: <ad19bda0-48df-1df0-7fb0-fc7d88ab1964@siemens.com>
-Date:   Wed, 31 Jul 2019 10:17:53 +0200
-User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
- Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
+        id S1726096AbfGaIUI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 04:20:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C4E8E307CDFC;
+        Wed, 31 Jul 2019 08:20:07 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E7ACE600CC;
+        Wed, 31 Jul 2019 08:19:58 +0000 (UTC)
+Subject: Re: [PATCH 2/2] KVM: selftests: Enable dirty_log_test on s390x
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>
+References: <20190730100112.18205-1-thuth@redhat.com>
+ <20190730100112.18205-3-thuth@redhat.com>
+ <20190730105721.z4zsul7uxl2igoue@kamzik.brq.redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <a9824265-daf8-db36-86b8-ad890dc73f14@redhat.com>
+Date:   Wed, 31 Jul 2019 10:19:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <b486cb75-4b8e-c847-a019-81e822223fb6@web.de>
+In-Reply-To: <20190730105721.z4zsul7uxl2igoue@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 31 Jul 2019 08:20:07 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30.06.19 17:19, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
+On 30/07/2019 12.57, Andrew Jones wrote:
+> On Tue, Jul 30, 2019 at 12:01:12PM +0200, Thomas Huth wrote:
+>> To run the dirty_log_test on s390x, we have to make sure that we
+>> access the dirty log bitmap with little endian byte ordering and
+>> we have to properly align the memslot of the guest.
+>> Also all dirty bits of a segment are set once on s390x when one
+>> of the pages of a segment are written to for the first time, so
+>> we have to make sure that we touch all pages during the first
+>> iteration to keep the test in sync here.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+[...]
+>> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+>> index ceb52b952637..7a1223ad0ff3 100644
+>> --- a/tools/testing/selftests/kvm/dirty_log_test.c
+>> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+>> @@ -26,9 +26,22 @@
+>>  /* The memory slot index to track dirty pages */
+>>  #define TEST_MEM_SLOT_INDEX		1
+>>  
+>> +#ifdef __s390x__
+>> +
+>> +/*
+>> + * On s390x, the ELF program is sometimes linked at 0x80000000, so we can
+>> + * not use 0x40000000 here without overlapping into that region. Thus let's
+>> + * use 0xc0000000 as base address there instead.
+>> + */
+>> +#define DEFAULT_GUEST_TEST_MEM		0xc0000000
 > 
-> The only difference between the currently supported A15 and A7 target
-> cores is the reset state of bit 11 in SCTLR. This bit is RES1 or RAO/WI
-> in other ARM cores, including ARMv8 ones. By promoting A7 to a generic
-> default target, this allows to use yet unsupported core types. E.g.,
-> this enables KVM on the A72 of the RPi4.
-> 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> ---
->  arch/arm/include/uapi/asm/kvm.h                |  1 +
->  arch/arm/kvm/Makefile                          |  2 +-
->  arch/arm/kvm/{coproc_a7.c => coproc_generic.c} | 18 +++++++++---------
->  arch/arm/kvm/guest.c                           |  4 +---
->  arch/arm/kvm/reset.c                           |  5 +----
->  5 files changed, 13 insertions(+), 17 deletions(-)
->  rename arch/arm/kvm/{coproc_a7.c => coproc_generic.c} (70%)
-> 
-> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
-> index 4602464ebdfb..e0c5bbec3d3d 100644
-> --- a/arch/arm/include/uapi/asm/kvm.h
-> +++ b/arch/arm/include/uapi/asm/kvm.h
-> @@ -70,6 +70,7 @@ struct kvm_regs {
->  /* Supported Processor Types */
->  #define KVM_ARM_TARGET_CORTEX_A15	0
->  #define KVM_ARM_TARGET_CORTEX_A7	1
-> +#define KVM_ARM_TARGET_GENERIC_V7	KVM_ARM_TARGET_CORTEX_A7
->  #define KVM_ARM_NUM_TARGETS		2
-> 
->  /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
-> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-> index 531e59f5be9c..d959f89135d6 100644
-> --- a/arch/arm/kvm/Makefile
-> +++ b/arch/arm/kvm/Makefile
-> @@ -21,7 +21,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
-> 
->  obj-y += kvm-arm.o init.o interrupts.o
->  obj-y += handle_exit.o guest.o emulate.o reset.o
-> -obj-y += coproc.o coproc_a15.o coproc_a7.o   vgic-v3-coproc.o
-> +obj-y += coproc.o coproc_a15.o coproc_generic.o   vgic-v3-coproc.o
->  obj-y += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
->  obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
->  obj-y += $(KVM)/arm/aarch32.o
-> diff --git a/arch/arm/kvm/coproc_a7.c b/arch/arm/kvm/coproc_generic.c
-> similarity index 70%
-> rename from arch/arm/kvm/coproc_a7.c
-> rename to arch/arm/kvm/coproc_generic.c
-> index 40f643e1e05c..b32a541ad7bf 100644
-> --- a/arch/arm/kvm/coproc_a7.c
-> +++ b/arch/arm/kvm/coproc_generic.c
-> @@ -15,28 +15,28 @@
->  #include "coproc.h"
-> 
->  /*
-> - * Cortex-A7 specific CP15 registers.
-> + * Generic CP15 registers.
->   * CRn denotes the primary register number, but is copied to the CRm in the
->   * user space API for 64-bit register access in line with the terminology used
->   * in the ARM ARM.
->   * Important: Must be sorted ascending by CRn, CRM, Op1, Op2 and with 64-bit
->   *            registers preceding 32-bit ones.
->   */
-> -static const struct coproc_reg a7_regs[] = {
-> +static const struct coproc_reg generic_regs[] = {
->  	/* SCTLR: swapped by interrupt.S. */
->  	{ CRn( 1), CRm( 0), Op1( 0), Op2( 0), is32,
->  			access_vm_reg, reset_val, c1_SCTLR, 0x00C50878 },
->  };
-> 
-> -static struct kvm_coproc_target_table a7_target_table = {
-> -	.target = KVM_ARM_TARGET_CORTEX_A7,
-> -	.table = a7_regs,
-> -	.num = ARRAY_SIZE(a7_regs),
-> +static struct kvm_coproc_target_table generic_target_table = {
-> +	.target = KVM_ARM_TARGET_GENERIC_V7,
-> +	.table = generic_regs,
-> +	.num = ARRAY_SIZE(generic_regs),
->  };
-> 
-> -static int __init coproc_a7_init(void)
-> +static int __init coproc_generic_init(void)
->  {
-> -	kvm_register_target_coproc_table(&a7_target_table);
-> +	kvm_register_target_coproc_table(&generic_target_table);
->  	return 0;
->  }
-> -late_initcall(coproc_a7_init);
-> +late_initcall(coproc_generic_init);
-> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-> index 684cf64b4033..d33a24e70f49 100644
-> --- a/arch/arm/kvm/guest.c
-> +++ b/arch/arm/kvm/guest.c
-> @@ -275,12 +275,10 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  int __attribute_const__ kvm_target_cpu(void)
->  {
->  	switch (read_cpuid_part()) {
-> -	case ARM_CPU_PART_CORTEX_A7:
-> -		return KVM_ARM_TARGET_CORTEX_A7;
->  	case ARM_CPU_PART_CORTEX_A15:
->  		return KVM_ARM_TARGET_CORTEX_A15;
->  	default:
-> -		return -EINVAL;
-> +		return KVM_ARM_TARGET_GENERIC_V7;
->  	}
->  }
-> 
-> diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-> index eb4174f6ebbd..d6e07500bab4 100644
-> --- a/arch/arm/kvm/reset.c
-> +++ b/arch/arm/kvm/reset.c
-> @@ -43,13 +43,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  	struct kvm_regs *reset_regs;
-> 
->  	switch (vcpu->arch.target) {
-> -	case KVM_ARM_TARGET_CORTEX_A7:
-> -	case KVM_ARM_TARGET_CORTEX_A15:
-> +	default:
->  		reset_regs = &cortexa_regs_reset;
->  		vcpu->arch.midr = read_cpuid_id();
->  		break;
-> -	default:
-> -		return -ENODEV;
->  	}
-> 
->  	/* Reset core registers */
-> --
-> 2.16.4
-> 
+> I think both x86 and aarch64 should be ok with this offset. If testing
+> proves it does, then we can just change it for all architecture.
 
-Any comments on this one now? Vladimir, you had some concerns in the other
-thread. I'm not sure if I got them correctly, if they apply here.
+Ok. It seems to work on x86 - could you please check aarch64, since I
+don't have such a system available right now?
 
-Jan
+>> +/* Dirty bitmaps are always little endian, so we need to swap on big endian */
+>> +#if defined(__s390x__)
+>> +# define BITOP_LE_SWIZZLE	((BITS_PER_LONG-1) & ~0x7)
+>> +# define test_bit_le(nr, addr) \
+>> +	test_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+>> +# define set_bit_le(nr, addr) \
+>> +	set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+>> +# define clear_bit_le(nr, addr) \
+>> +	clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+>> +# define test_and_set_bit_le(nr, addr) \
+>> +	test_and_set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+>> +# define test_and_clear_bit_le(nr, addr) \
+>> +	test_and_clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+>> +#else
+>> +# define test_bit_le	test_bit
+>> +# define set_bit_le	set_bit
+>> +# define clear_bit_le	clear_bit
+>> +# define test_and_set_bit_le	test_and_set_bit
+>> +# define test_and_clear_bit_le	test_and_clear_bit
+>> +#endif
+> 
+> nit: does the formatting above look right after applying the patch?
 
--- 
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+It looked ok to me, but I can add some more tabs to even make it nicer :)
+
+>> @@ -293,6 +341,10 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+>>  	 * case where the size is not aligned to 64 pages.
+>>  	 */
+>>  	guest_num_pages = (1ul << (30 - guest_page_shift)) + 16;
+>> +#ifdef __s390x__
+>> +	/* Round up to multiple of 1M (segment size) */
+>> +	guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
+> 
+> We could maybe do this for all architectures as well.
+
+It's really only needed on s390x, so I think we should keep the #ifdef here.
+
+ Thomas
