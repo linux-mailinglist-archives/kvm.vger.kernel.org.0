@@ -2,139 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D45D97C5F2
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:19:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE33D7C5E5
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:16:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729393AbfGaPTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:19:08 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:37187 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726594AbfGaPTH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:19:07 -0400
-Received: by mail-ed1-f66.google.com with SMTP id w13so66093135eds.4
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:19:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Qu4eqa88cl7hA3fQdb28KWqV5w4hCLiKuLbYR7iJuDE=;
-        b=EapzB6nV2zuG3XXqORhtOg865rDFWXiiuUO8FpJLb/h1WDao3VpOzWeFDmaFbxm/XL
-         47TBQ8nUUTf9qkmZiYlrYuMBsFG5TIn6RKRtGHhdoEi679Dd/WD/MF4HtnmQP59r+ZVS
-         lWZPfIfuMFEgQo4Y3mbUEU6Vw4ZKVnL+c9FxScjZKMpMrPiR+cuZijKKGYKRXfElKJqa
-         Xlf/ibW3jXNNJBvLlFTHpGgT5lOrKP+W2Zir2emFXNHQgTL1ugZEAXaNqYvDXjvvf1sY
-         eVxqaYVdOcCPAQPOF9hrrzA0BOHPgcYf40DmCzESR4BUuRMyXnjNV9lnjdj/b1tOOPp+
-         BzBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Qu4eqa88cl7hA3fQdb28KWqV5w4hCLiKuLbYR7iJuDE=;
-        b=bKOm8qZ3R6z/rZ7NOtqCb4KOZmLc4x6BjWxJ306MOxWAOp+fsI/ELShAfp7LgU3KkR
-         4wQW8DPwG5mZoP0BspjrnYMD+sD52msYdObIUo2GNTPzGPX+opsvJU9O8vuVLLVvWX4a
-         cSMOzA/yIv7a12fa4IRgDrpKgQDT24z5Zh0yKd3ykJYuudI9AzPwCd4RYrDcRE6x+RH+
-         BHj0U2pept6aEJTs/xq7QDaMSaZqJijlwErkwP0+9Wkw/25g3Lsu7lPDIU4g5rPdyfBw
-         uVv3YSxABPQtFuRWQb2MDshArXlYDbczkiUv841YkWF59i0MZHisEBJ83Humv1uJT3qB
-         FxFg==
-X-Gm-Message-State: APjAAAVw+T7ImGssBJ/PUoZ2esgiCnyYjkRW772hxSREYVEFDy9+31RD
-        zK7UBZsTB2RTNqm3RFS1Fo0=
-X-Google-Smtp-Source: APXvYqx2zTJL6YB+Gc6tZHir/y3NwypWB6AAdiaRHKrntm3SVSrSWzIlrCWGYk+WyVgbmkUaGcUHkg==
-X-Received: by 2002:a50:acc6:: with SMTP id x64mr110288029edc.100.1564586034088;
-        Wed, 31 Jul 2019 08:13:54 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id oe21sm11729742ejb.44.2019.07.31.08.13.50
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 08:13:52 -0700 (PDT)
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 172081045FF; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
-To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@amacapital.net>,
-        David Howells <dhowells@redhat.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Kai Huang <kai.huang@linux.intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 41/59] mm: Generalize the mprotect implementation to support extensions
-Date:   Wed, 31 Jul 2019 18:07:55 +0300
-Message-Id: <20190731150813.26289-42-kirill.shutemov@linux.intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
-References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
+        id S1726865AbfGaPQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:16:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53152 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726219AbfGaPQW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:16:22 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D56CC30A7C66;
+        Wed, 31 Jul 2019 15:16:20 +0000 (UTC)
+Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F030C19C78;
+        Wed, 31 Jul 2019 15:15:41 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Andrew Jones <drjones@redhat.com>
+Subject: [PATCH v3 3/3] KVM: selftests: Enable dirty_log_test on s390x
+Date:   Wed, 31 Jul 2019 17:15:25 +0200
+Message-Id: <20190731151525.17156-4-thuth@redhat.com>
+In-Reply-To: <20190731151525.17156-1-thuth@redhat.com>
+References: <20190731151525.17156-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 31 Jul 2019 15:16:21 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alison Schofield <alison.schofield@intel.com>
+To run the dirty_log_test on s390x, we have to make sure that we
+access the dirty log bitmap with little endian byte ordering and
+we have to properly align the memslot of the guest.
+Also all dirty bits of a segment are set once on s390x when one
+of the pages of a segment are written to for the first time, so
+we have to make sure that we touch all pages during the first
+iteration to keep the test in sync here.
+DEFAULT_GUEST_TEST_MEM needs an adjustment, too. On some s390x
+distributions, the ELF binary is linked to address 0x80000000,
+so we have to avoid that our test region overlaps into this area.
+0xc0000000 seems to be a good alternative that should work on x86
+and aarch64, too.
 
-Today mprotect is implemented to support legacy mprotect behavior
-plus an extension for memory protection keys. Make it more generic
-so that it can support additional extensions in the future.
-
-This is done is preparation for adding a new system call for memory
-encyption keys. The intent is that the new encrypted mprotect will be
-another extension to legacy mprotect.
-
-Signed-off-by: Alison Schofield <alison.schofield@intel.com>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- mm/mprotect.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ tools/testing/selftests/kvm/Makefile         |  1 +
+ tools/testing/selftests/kvm/dirty_log_test.c | 59 +++++++++++++++++---
+ 2 files changed, 53 insertions(+), 7 deletions(-)
 
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index 82d7b194a918..4d55725228e3 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -35,6 +35,8 @@
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 75ea1ecbf85a..1b48a94b4350 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -33,6 +33,7 @@ TEST_GEN_PROGS_aarch64 += dirty_log_test
+ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
  
- #include "internal.h"
+ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
++TEST_GEN_PROGS_s390x += dirty_log_test
+ TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
  
-+#define NO_KEY	-1
+ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 5d5ae1be4984..dc3346e090f5 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -26,8 +26,8 @@
+ /* The memory slot index to track dirty pages */
+ #define TEST_MEM_SLOT_INDEX		1
+ 
+-/* Default guest test memory offset, 1G */
+-#define DEFAULT_GUEST_TEST_MEM		0x40000000
++/* Default guest test virtual memory offset */
++#define DEFAULT_GUEST_TEST_MEM		0xc0000000
+ 
+ /* How many pages to dirty for each guest loop */
+ #define TEST_PAGES_PER_LOOP		1024
+@@ -38,6 +38,27 @@
+ /* Interval for each host loop (ms) */
+ #define TEST_HOST_LOOP_INTERVAL		10UL
+ 
++/* Dirty bitmaps are always little endian, so we need to swap on big endian */
++#if defined(__s390x__)
++# define BITOP_LE_SWIZZLE	((BITS_PER_LONG-1) & ~0x7)
++# define test_bit_le(nr, addr) \
++	test_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define set_bit_le(nr, addr) \
++	set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define clear_bit_le(nr, addr) \
++	clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define test_and_set_bit_le(nr, addr) \
++	test_and_set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define test_and_clear_bit_le(nr, addr) \
++	test_and_clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++#else
++# define test_bit_le		test_bit
++# define set_bit_le		set_bit
++# define clear_bit_le		clear_bit
++# define test_and_set_bit_le	test_and_set_bit
++# define test_and_clear_bit_le	test_and_clear_bit
++#endif
 +
- static unsigned long change_pte_range(struct vm_area_struct *vma, pmd_t *pmd,
- 		unsigned long addr, unsigned long end, pgprot_t newprot,
- 		int dirty_accountable, int prot_numa)
-@@ -453,9 +455,9 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- }
- 
  /*
-- * pkey==-1 when doing a legacy mprotect()
-+ * When pkey==NO_KEY we get legacy mprotect behavior here.
+  * Guest/Host shared variables. Ensure addr_gva2hva() and/or
+  * sync_global_to/from_guest() are used when accessing from
+@@ -69,11 +90,23 @@ static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
   */
--static int do_mprotect_pkey(unsigned long start, size_t len,
-+static int do_mprotect_ext(unsigned long start, size_t len,
- 		unsigned long prot, int pkey)
+ static void guest_code(void)
  {
- 	unsigned long nstart, end, tmp, reqprot;
-@@ -579,7 +581,7 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
- SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot)
- {
--	return do_mprotect_pkey(start, len, prot, -1);
-+	return do_mprotect_ext(start, len, prot, NO_KEY);
- }
++	uint64_t addr;
+ 	int i;
  
- #ifdef CONFIG_ARCH_HAS_PKEYS
-@@ -587,7 +589,7 @@ SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- SYSCALL_DEFINE4(pkey_mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot, int, pkey)
- {
--	return do_mprotect_pkey(start, len, prot, pkey);
-+	return do_mprotect_ext(start, len, prot, pkey);
- }
++	/*
++	 * On s390x, all pages of a 1M segment are initially marked as dirty
++	 * when a page of the segment is written to for the very first time.
++	 * To compensate this specialty in this test, we need to touch all
++	 * pages during the first iteration.
++	 */
++	for (i = 0; i < guest_num_pages; i++) {
++		addr = guest_test_virt_mem + i * guest_page_size;
++		*(uint64_t *)addr = READ_ONCE(iteration);
++	}
++
+ 	while (true) {
+ 		for (i = 0; i < TEST_PAGES_PER_LOOP; i++) {
+-			uint64_t addr = guest_test_virt_mem;
++			addr = guest_test_virt_mem;
+ 			addr += (READ_ONCE(random_array[i]) % guest_num_pages)
+ 				* guest_page_size;
+ 			addr &= ~(host_page_size - 1);
+@@ -158,15 +191,15 @@ static void vm_dirty_log_verify(unsigned long *bmap)
+ 		value_ptr = host_test_mem + page * host_page_size;
  
- SYSCALL_DEFINE2(pkey_alloc, unsigned long, flags, unsigned long, init_val)
+ 		/* If this is a special page that we were tracking... */
+-		if (test_and_clear_bit(page, host_bmap_track)) {
++		if (test_and_clear_bit_le(page, host_bmap_track)) {
+ 			host_track_next_count++;
+-			TEST_ASSERT(test_bit(page, bmap),
++			TEST_ASSERT(test_bit_le(page, bmap),
+ 				    "Page %"PRIu64" should have its dirty bit "
+ 				    "set in this iteration but it is missing",
+ 				    page);
+ 		}
+ 
+-		if (test_bit(page, bmap)) {
++		if (test_bit_le(page, bmap)) {
+ 			host_dirty_count++;
+ 			/*
+ 			 * If the bit is set, the value written onto
+@@ -209,7 +242,7 @@ static void vm_dirty_log_verify(unsigned long *bmap)
+ 				 * should report its dirtyness in the
+ 				 * next run
+ 				 */
+-				set_bit(page, host_bmap_track);
++				set_bit_le(page, host_bmap_track);
+ 			}
+ 		}
+ 	}
+@@ -293,6 +326,10 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 	 * case where the size is not aligned to 64 pages.
+ 	 */
+ 	guest_num_pages = (1ul << (30 - guest_page_shift)) + 16;
++#ifdef __s390x__
++	/* Round up to multiple of 1M (segment size) */
++	guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
++#endif
+ 	host_page_size = getpagesize();
+ 	host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
+ 			 !!((guest_num_pages * guest_page_size) % host_page_size);
+@@ -304,6 +341,11 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 		guest_test_phys_mem = phys_offset;
+ 	}
+ 
++#ifdef __s390x__
++	/* Align to 1M (segment size) */
++	guest_test_phys_mem &= ~((1 << 20) - 1);
++#endif
++
+ 	DEBUG("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
+ 
+ 	bmap = bitmap_alloc(host_num_pages);
+@@ -454,6 +496,9 @@ int main(int argc, char *argv[])
+ 		vm_guest_mode_params_init(VM_MODE_P48V48_64K, true, true);
+ 	}
+ #endif
++#ifdef __s390x__
++	vm_guest_mode_params_init(VM_MODE_P40V48_4K, true, true);
++#endif
+ 
+ 	while ((opt = getopt(argc, argv, "hi:I:p:m:")) != -1) {
+ 		switch (opt) {
 -- 
 2.21.0
 
