@@ -2,123 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44BCB7D025
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 23:33:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AAAA7D047
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 23:50:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730086AbfGaVdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 17:33:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40966 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728928AbfGaVdb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 17:33:31 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B44F630872C2;
-        Wed, 31 Jul 2019 21:33:30 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5CE355D9C9;
-        Wed, 31 Jul 2019 21:33:28 +0000 (UTC)
-Date:   Wed, 31 Jul 2019 15:33:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio: re-arrange vfio region definitions
-Message-ID: <20190731153327.7d65b90d@x1.home>
-In-Reply-To: <05e97697-70a3-51dd-dd2a-4a8bf6c380bb@redhat.com>
-References: <20190717114956.16263-1-cohuck@redhat.com>
-        <05e97697-70a3-51dd-dd2a-4a8bf6c380bb@redhat.com>
-Organization: Red Hat
+        id S1730995AbfGaVuR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 17:50:17 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:40716 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729472AbfGaVuR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 17:50:17 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6VLne5u118033;
+        Wed, 31 Jul 2019 21:49:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=r4Zi+6BIBluGOzcRqoiDPAygyExOFTGCHzb+lcOWRyU=;
+ b=olTHyfKWxCzqItGuucpTfh+qL27NLjY+d1sw3ubtnglXVLpvrGGJPb+iXgnyJ+JhrDHQ
+ r5OHbusimrqdUn0ZwdsFqWUgLH1GL3rQx097ms9JvOhSo1lzg6cpMCinkXnhAO2DNY+S
+ YeiS1VYfawOg8vJgJYPQvLIFjLKNl/ipWhCuaIlJPeTrCyl0gNk/w7s1m4lCiJPJzK99
+ 91AdQ/XUBTa5rcoKXPey1BUh0RIAyUVqjnJ4vx4j/8OV90aDWYR2tR3ddsR730X4osmL
+ kK6au0saRh7Vfyi3pmTfXnt0Our2FCmYgSPJYa/apYIaCzcvf0VG1AoZGB0BuDx1PrQx 4w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2u0f8r7vcp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Jul 2019 21:49:56 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6VLmLmD130836;
+        Wed, 31 Jul 2019 21:49:56 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2u349db3xv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Jul 2019 21:49:55 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6VLntKn008788;
+        Wed, 31 Jul 2019 21:49:55 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 31 Jul 2019 14:49:55 -0700
+Subject: Re: [PATCH 1/3] KVM: X86: Trace vcpu_id for vmexit
+To:     Peter Xu <zhexu@redhat.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
+References: <20190729053243.9224-1-peterx@redhat.com>
+ <20190729053243.9224-2-peterx@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <4cf0d8e6-7e5d-5372-3d7f-429b82034f60@oracle.com>
+Date:   Wed, 31 Jul 2019 14:49:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190729053243.9224-2-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 31 Jul 2019 21:33:30 +0000 (UTC)
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9335 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1907310218
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9335 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1907310218
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 31 Jul 2019 20:47:07 +0200
-Auger Eric <eric.auger@redhat.com> wrote:
 
-> Hi Connie,
-> 
-> On 7/17/19 1:49 PM, Cornelia Huck wrote:
-> > It is easy to miss already defined region types. Let's re-arrange
-> > the definitions a bit and add more comments to make it hopefully
-> > a bit clearer.
-> > 
-> > No functional change.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  include/uapi/linux/vfio.h | 19 ++++++++++++-------
-> >  1 file changed, 12 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 8f10748dac79..d9bcf40240be 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -295,15 +295,23 @@ struct vfio_region_info_cap_type {
-> >  	__u32 subtype;	/* type specific */
-> >  };
-> >  
-> > +/*
-> > + * List of region types, global per bus driver.
-> > + * If you introduce a new type, please add it here.
-> > + */
-> > +
-> > +/* PCI region type containing a PCI vendor part */
-> >  #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
-> >  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
-> > +#define VFIO_REGION_TYPE_GFX                    (1)
-> > +#define VFIO_REGION_TYPE_CCW			(2)
-> >  
-> > -/* 8086 Vendor sub-types */
-> > +/* 8086 vendor PCI sub-types */
-> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
-> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
-> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
-> >  
-> > -#define VFIO_REGION_TYPE_GFX                    (1)
-> > +/* GFX sub-types */
-> >  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
-> >  
-> >  /**
-> > @@ -353,20 +361,17 @@ struct vfio_region_gfx_edid {
-> >  #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
-> >  };
-> >  
-> > -#define VFIO_REGION_TYPE_CCW			(2)
-> >  /* ccw sub-types */
-> >  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
-> >  
-> > +/* 10de vendor PCI sub-types */
-> >  /*
-> > - * 10de vendor sub-type
-> > - *
-> >   * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
-> >   */
-> >  #define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
-> >  
-> > +/* 1014 vendor PCI sub-types*/
-> >  /*
-> > - * 1014 vendor sub-type  
-> Maybe the 10de vendor sub-type and 1014 vendor sub-type could be put
-> just after /* 8086 vendor PCI sub-types */
-> 
-> More generally if it were possible to leave the subtypes close to their
-> parent type too, this would be beneficial I think.
-> 
-> Besides that becomes sensible to put all those definitions together.
 
-Any sort of consolidation or grouping is an improvement here, thanks
-for taking this on, Connie!  I haven't started my branch yet for v5.4,
-but if you want to iterate to something agreeable, I'll happily take
-the end product :)  The original patch here looks like a good degree of
-consolidating the type definitions and improving consistency without
-moving large chunks of code.  Thanks,
+On 07/28/2019 10:32 PM, Peter Xu wrote:
+> It helps to pair vmenters and vmexis with multi-core systems.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   arch/x86/kvm/trace.h | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index 4d47a2631d1f..26423d2e45df 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -232,17 +232,20 @@ TRACE_EVENT(kvm_exit,
+>   		__field(	u32,	        isa             )
+>   		__field(	u64,	        info1           )
+>   		__field(	u64,	        info2           )
+> +		__field(	int,	        vcpu_id         )
+>   	),
+>   
+>   	TP_fast_assign(
+>   		__entry->exit_reason	= exit_reason;
+>   		__entry->guest_rip	= kvm_rip_read(vcpu);
+>   		__entry->isa            = isa;
+> +		__entry->vcpu_id        = vcpu->vcpu_id;
+>   		kvm_x86_ops->get_exit_info(vcpu, &__entry->info1,
+>   					   &__entry->info2);
+>   	),
+>   
+> -	TP_printk("reason %s rip 0x%lx info %llx %llx",
+> +	TP_printk("vcpu %d reason %s rip 0x%lx info %llx %llx",
+> +		  __entry->vcpu_id,
+>   		 (__entry->isa == KVM_ISA_VMX) ?
+>   		 __print_symbolic(__entry->exit_reason, VMX_EXIT_REASONS) :
+>   		 __print_symbolic(__entry->exit_reason, SVM_EXIT_REASONS),
 
-Alex
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
