@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3006A7C651
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:22:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D577A7C621
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:20:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730128AbfGaPWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:22:12 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:46326 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727962AbfGaPWI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:22:08 -0400
-Received: by mail-ed1-f65.google.com with SMTP id d4so66102150edr.13
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:22:06 -0700 (PDT)
+        id S1730076AbfGaPUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:20:54 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:46168 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726979AbfGaPUx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:20:53 -0400
+Received: by mail-ed1-f66.google.com with SMTP id d4so66098369edr.13
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:20:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=PzedmcWsRc3DhudY/wiWcVyq0AAagaASN0DGAs1EUfk=;
-        b=oLYDLyPe+JzY2m1J7wjX7AgBe2E4rUQv0fXNMOTxiG0nu3Kabo9U15Ufg7K6WUQgmi
-         RNNtxu0DlWJ+voFj2zV59ecQN7UXfIGdJz6l2QQg7hl1DF1htbBcFoFM/zAI2mPjcI1U
-         l3fEHvv0/1gka708wHD2qXwLZrc051+nm/YjhW0tIhCa72L/Tien3Zer+cqAIsJMVqNK
-         L0WPnYRQdIixCyrAGbQRcVHhSuhtXWLR41Rx6IQOFrIz+x0hmONqrQ/gZtqcXxab8960
-         yeuaFiFWFODRPxwK1POFLi1ZUqFHAQQefGlgCb9xVI6pv/BL6bFoNByecBEofA/OdSSY
-         7nrg==
+        bh=bD/5ZInA5DBfNF/OoolUD2uLCIaOC1DGsUwSCxp+njs=;
+        b=nvqdVZ7hy8prTTJcbUZBwkmbx2dG13l4tJOjU/HGiWPNPCIzhkiP7BT5p8Q5xWDndr
+         7DeAzS8uAbr6+O45Oq+aNxw5yIDCtTUXGB0id3g7Z8mpUiISvVh8+Qdpp6w9Mrz78JiC
+         0VezF9Twz7YfGrVqrIO2CaQOxV5IahFa9jvmh6yBk00rx18AqNPPp2V83WMw5/RHJxZK
+         V7Ij2TTHXT4PuakKHcAQZMB0LBshUp7ZbQOCUWMzIrguS1msbfDi5NilYa6XZJJc6A82
+         xAVNYZPhVRKGVGB4dKsMF59lYW4aPwm4ovfr9mL7D2xAkl0s4z/mmm5UiL+UO1fObzyu
+         5wPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=PzedmcWsRc3DhudY/wiWcVyq0AAagaASN0DGAs1EUfk=;
-        b=aVmaVQsTCDqmPWRz8nvjnoKLlnRRnlWoDJNDEGykyzUtP/yChh2VZvSiRS0YG+cfAy
-         d1bRjLmsIMpd6DlpZNQ1DkOIYsjTxXBBP6Z7HnRQUQbxKU2N32w/asy4HBwFOrybP6wE
-         X2BB8XAfiZwtzUk9VSqXaKOTunGtPdcfspRg7dqFfJidEdfR8ZfCfD+0eb18tyBupIRr
-         2jp0AKDYt7YedFKgDmW51B9jma4lE2fQW0lHZJGYntLwo2GmQM31X3vge8bf0bgM3qFk
-         SZZ6ErnlScAGRqq3x6lfQaLidM2EL+bpLhX9gcagp0QJsmAiMcsS5Jx6o8uAioD4JR6i
-         4vPQ==
-X-Gm-Message-State: APjAAAULttjD0jF8yujh8VehuJPu+M+zsQmVSKdpQC0jRJU9mNsUALvv
-        3aF4Wbs/Tr+pBy3TcXu4Arg=
-X-Google-Smtp-Source: APXvYqzcJGczjYcDRUjZLltV4/L8von3YErmNZFFERlXjz5jyiPEJ/PtKIEf2ACHSo4AM9+ctzEY3w==
-X-Received: by 2002:a17:906:c2c9:: with SMTP id ch9mr2839424ejb.167.1564586028666;
-        Wed, 31 Jul 2019 08:13:48 -0700 (PDT)
+        bh=bD/5ZInA5DBfNF/OoolUD2uLCIaOC1DGsUwSCxp+njs=;
+        b=naTenLs3HkwhaJPeI6R8vanmQP+XerIv5lgLBr0DJUiWUiuvxgubtlQWSxAQUftrqK
+         AR13TeP73ypFUp0h+o4quF5hZ2K1x9eb+NdRBMDcV0DU9VWkTGy6zs5jWt5FxfE+llk1
+         YBcsB6VnqT4m2qUhHb67BkLRuiyMo/jvH1lkotT/84//AE2cahuE/WpGeTTDj0KQsLqk
+         zIHFgCqYP+G5Vt+getUbDdomp361XM9avc+nMJTcOzj9lTC/ziT6Ieaw30X9jEcn6kCa
+         ggssyzxWQ8NZ7Z+wgu4gw8eA9JVPo2wKGMPC03WLaouNhJT/+3GBedrNAgP79O+67RPG
+         QMdg==
+X-Gm-Message-State: APjAAAUHOOrnSrbRcm5vw3PvglDl/RoUSRMLU5TJ/V8lu4H2eXrKlmTy
+        Wqe7Ah+DZ2/XpH22UYfuPmw=
+X-Google-Smtp-Source: APXvYqxJIvkHF7kejGb362uxw7wEOxIDocRJ4jXYfh9K6XIBqdmcEBR8hDmMszbdv7iLHfJZFlKGzw==
+X-Received: by 2002:a05:6402:6d0:: with SMTP id n16mr25572624edy.168.1564586037300;
+        Wed, 31 Jul 2019 08:13:57 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id a18sm9661518ejp.2.2019.07.31.08.13.47
+        by smtp.gmail.com with ESMTPSA id t2sm17397627eda.95.2019.07.31.08.13.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 08:13:47 -0700 (PDT)
+        Wed, 31 Jul 2019 08:13:54 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id BF3F9103FDC; Wed, 31 Jul 2019 18:08:16 +0300 (+03)
+        id C65041044A6; Wed, 31 Jul 2019 18:08:16 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 30/59] keys/mktme: Program MKTME keys into the platform hardware
-Date:   Wed, 31 Jul 2019 18:07:44 +0300
-Message-Id: <20190731150813.26289-31-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 31/59] keys/mktme: Set up a percpu_ref_count for MKTME keys
+Date:   Wed, 31 Jul 2019 18:07:45 +0300
+Message-Id: <20190731150813.26289-32-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -78,132 +78,109 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-Finally, the keys are programmed into the hardware via each
-lead CPU. Every package has to be programmed successfully.
-There is no partial success allowed here.
+The MKTME key service needs to keep usage counts on the encryption
+keys in order to know when it is safe to free a key for reuse.
 
-Here a retry scheme is included for two errors that may succeed
-on retry: MKTME_DEVICE_BUSY and MKTME_ENTROPY_ERROR.
-However, it's not clear if even those errors should be retried
-at this level. Perhaps they too, should be returned to user space
-for handling.
+percpu_ref_count applies well here because the key service will
+take the initial reference and typically hold that reference while
+the intermediary references are get/put. The intermediaries in this
+case will be encrypted VMA's,
+
+Align the percpu_ref_init and percpu_ref_kill with the key service
+instantiate and destroy methods respectively.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- security/keys/mktme_keys.c | 92 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 91 insertions(+), 1 deletion(-)
+ security/keys/mktme_keys.c | 39 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
 
 diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
-index 272bff8591b7..3c641f3ee794 100644
+index 3c641f3ee794..18cb57be5193 100644
 --- a/security/keys/mktme_keys.c
 +++ b/security/keys/mktme_keys.c
-@@ -83,6 +83,96 @@ static const match_table_t mktme_token = {
- 	{OPT_ERROR, NULL}
- };
- 
-+struct mktme_hw_program_info {
-+	struct mktme_key_program *key_program;
-+	int *status;
-+};
-+
-+struct mktme_err_table {
-+	const char *msg;
-+	bool retry;
-+};
-+
-+static const struct mktme_err_table mktme_error[] = {
-+/* MKTME_PROG_SUCCESS     */ {"KeyID was successfully programmed",   false},
-+/* MKTME_INVALID_PROG_CMD */ {"Invalid KeyID programming command",   false},
-+/* MKTME_ENTROPY_ERROR    */ {"Insufficient entropy",		      true},
-+/* MKTME_INVALID_KEYID    */ {"KeyID not valid",		     false},
-+/* MKTME_INVALID_ENC_ALG  */ {"Invalid encryption algorithm chosen", false},
-+/* MKTME_DEVICE_BUSY      */ {"Failure to access key table",	      true},
-+};
-+
-+static int mktme_parse_program_status(int status[])
-+{
-+	int cpu, sum = 0;
-+
-+	/* Success: all CPU(s) programmed all key table(s) */
-+	for_each_cpu(cpu, mktme_leadcpus)
-+		sum += status[cpu];
-+	if (!sum)
-+		return MKTME_PROG_SUCCESS;
-+
-+	/* Invalid Parameters: log the error and return the error. */
-+	for_each_cpu(cpu, mktme_leadcpus) {
-+		switch (status[cpu]) {
-+		case MKTME_INVALID_KEYID:
-+		case MKTME_INVALID_PROG_CMD:
-+		case MKTME_INVALID_ENC_ALG:
-+			pr_err("mktme: %s\n", mktme_error[status[cpu]].msg);
-+			return status[cpu];
-+
-+		default:
-+			break;
-+		}
-+	}
-+	/*
-+	 * Device Busy or Insufficient Entropy: do not log the
-+	 * error. These will be retried and if retries (time or
-+	 * count runs out) caller will log the error.
-+	 */
-+	for_each_cpu(cpu, mktme_leadcpus) {
-+		if (status[cpu] == MKTME_DEVICE_BUSY)
-+			return status[cpu];
-+	}
-+	return MKTME_ENTROPY_ERROR;
-+}
-+
-+/* Program a single key using one CPU. */
-+static void mktme_do_program(void *hw_program_info)
-+{
-+	struct mktme_hw_program_info *info = hw_program_info;
-+	int cpu;
-+
-+	cpu = smp_processor_id();
-+	info->status[cpu] = mktme_key_program(info->key_program);
-+}
-+
-+static int mktme_program_all_keytables(struct mktme_key_program *key_program)
-+{
-+	struct mktme_hw_program_info info;
-+	int err, retries = 10; /* Maybe users should handle retries */
-+
-+	info.key_program = key_program;
-+	info.status = kcalloc(num_possible_cpus(), sizeof(info.status[0]),
-+			      GFP_KERNEL);
-+
-+	while (retries--) {
-+		get_online_cpus();
-+		on_each_cpu_mask(mktme_leadcpus, mktme_do_program,
-+				 &info, 1);
-+		put_online_cpus();
-+
-+		err = mktme_parse_program_status(info.status);
-+		if (!err)			   /* Success */
-+			return err;
-+		else if (!mktme_error[err].retry)  /* Error no retry */
-+			return -ENOKEY;
-+	}
-+	/* Ran out of retries */
-+	pr_err("mktme: %s\n", mktme_error[err].msg);
-+	return err;
-+}
-+
- /* Copy the payload to the HW programming structure and program this KeyID */
- static int mktme_program_keyid(int keyid, u32 payload)
- {
-@@ -97,7 +187,7 @@ static int mktme_program_keyid(int keyid, u32 payload)
- 	kprog->keyid = keyid;
- 	kprog->keyid_ctrl = payload;
- 
--	ret = MKTME_PROG_SUCCESS;	/* Future programming call */
-+	ret = mktme_program_all_keytables(kprog);
- 	kmem_cache_free(mktme_prog_cache, kprog);
- 	return ret;
+@@ -8,6 +8,7 @@
+ #include <linux/key-type.h>
+ #include <linux/mm.h>
+ #include <linux/parser.h>
++#include <linux/percpu-refcount.h>
+ #include <linux/string.h>
+ #include <asm/intel_pconfig.h>
+ #include <keys/mktme-type.h>
+@@ -71,6 +72,26 @@ int mktme_keyid_from_key(struct key *key)
+ 	return 0;
  }
+ 
++struct percpu_ref *encrypt_count;
++void mktme_percpu_ref_release(struct percpu_ref *ref)
++{
++	unsigned long flags;
++	int keyid;
++
++	for (keyid = 1; keyid <= mktme_nr_keyids(); keyid++) {
++		if (&encrypt_count[keyid] == ref)
++			break;
++	}
++	if (&encrypt_count[keyid] != ref) {
++		pr_debug("%s: invalid ref counter\n", __func__);
++		return;
++	}
++	percpu_ref_exit(ref);
++	spin_lock_irqsave(&mktme_lock, flags);
++	mktme_release_keyid(keyid);
++	spin_unlock_irqrestore(&mktme_lock, flags);
++}
++
+ enum mktme_opt_id {
+ 	OPT_ERROR,
+ 	OPT_TYPE,
+@@ -199,8 +220,10 @@ static void mktme_destroy_key(struct key *key)
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&mktme_lock, flags);
+-	mktme_release_keyid(keyid);
++	mktme_map[keyid].key = NULL;
++	mktme_map[keyid].state = KEYID_REF_KILLED;
+ 	spin_unlock_irqrestore(&mktme_lock, flags);
++	percpu_ref_kill(&encrypt_count[keyid]);
+ }
+ 
+ /* Key Service Method to create a new key. Payload is preparsed. */
+@@ -216,9 +239,15 @@ int mktme_instantiate_key(struct key *key, struct key_preparsed_payload *prep)
+ 	if (!keyid)
+ 		return -ENOKEY;
+ 
++	if (percpu_ref_init(&encrypt_count[keyid], mktme_percpu_ref_release,
++			    0, GFP_KERNEL))
++		goto err_out;
++
+ 	if (!mktme_program_keyid(keyid, *payload))
+ 		return MKTME_PROG_SUCCESS;
+ 
++	percpu_ref_exit(&encrypt_count[keyid]);
++err_out:
+ 	spin_lock_irqsave(&mktme_lock, flags);
+ 	mktme_release_keyid(keyid);
+ 	spin_unlock_irqrestore(&mktme_lock, flags);
+@@ -405,10 +434,18 @@ static int __init init_mktme(void)
+ 	/* Initialize first programming targets */
+ 	mktme_update_pconfig_targets();
+ 
++	/* Reference counters to protect in use KeyIDs */
++	encrypt_count = kvcalloc(mktme_nr_keyids() + 1, sizeof(encrypt_count[0]),
++				 GFP_KERNEL);
++	if (!encrypt_count)
++		goto free_targets;
++
+ 	ret = register_key_type(&key_type_mktme);
+ 	if (!ret)
+ 		return ret;			/* SUCCESS */
+ 
++	kvfree(encrypt_count);
++free_targets:
+ 	free_cpumask_var(mktme_leadcpus);
+ 	bitmap_free(mktme_target_map);
+ free_cache:
 -- 
 2.21.0
 
