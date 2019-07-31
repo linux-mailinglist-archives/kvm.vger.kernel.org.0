@@ -2,180 +2,292 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC93F7C313
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 15:15:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EDC47C373
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 15:28:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388205AbfGaNPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 09:15:01 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43549 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbfGaNO6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 09:14:58 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so69611363wru.10
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 06:14:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2qO4ZtAFEjGbhKpZYZIrICeNvO6yrVyniiCc6Rw+4tA=;
-        b=eMR9kuu+hRA/UzZ8JjL1CcRrYVQT3qTNIUkO8XBNZP4/l6bn4SgsKl56rSBBPBcK3H
-         Hyn2OrYEvWMaVZ1K+ZV55ODBvezCecTMCozUnsCdY1oaW7mQ0xMvb243BSrPuywd6f8+
-         6jbzOf1wtQdUtDecSTZ8HAyReoEk/49vtKpDYEhVW9n3ppy0knA6733x4KItyesKZj9J
-         wpg0SSI22lu984adwdAZzvjrFJ7486drnN5aLmhJ1pyxhG40NfcL1brscjxaq6CEzHRt
-         NXKNgKTSuhCRIvBlQ0ythytTl+AEZFUbLJhacfve6rCOPoPmKAEmcv1Zh/8ou/EQho3m
-         jJxw==
-X-Gm-Message-State: APjAAAWhMZFO7gt8Z9HDrJjJzHkaCxEfJ+6tx3XwHtYsv15trQJ08hnp
-        TVphGI85Y4hurdyMGShoiRnbjg==
-X-Google-Smtp-Source: APXvYqxYCllhTfncAoR1iIV4Cdz6EoShZ6pM0+LLTCU1P8Ot61fd3+4nd92y4hrwUv/3eSz8q1Pp5g==
-X-Received: by 2002:a5d:680d:: with SMTP id w13mr136812839wru.141.1564578895964;
-        Wed, 31 Jul 2019 06:14:55 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3? ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
-        by smtp.gmail.com with ESMTPSA id t63sm61935053wmt.6.2019.07.31.06.14.54
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 06:14:55 -0700 (PDT)
-Subject: Re: [PATCH RFC 4/5] x86: KVM: add xsetbv to the emulator
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>
-References: <20190620110240.25799-1-vkuznets@redhat.com>
- <20190620110240.25799-5-vkuznets@redhat.com>
- <a86ca8b7-0333-398b-7bf6-90cb79366226@redhat.com>
- <87lfwe73oz.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <73e6ddee-5ca9-64ea-d8d3-fabe046691fd@redhat.com>
-Date:   Wed, 31 Jul 2019 15:14:54 +0200
+        id S1729468AbfGaN22 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 09:28:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38126 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726096AbfGaN21 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 09:28:27 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id CB32081F18;
+        Wed, 31 Jul 2019 13:28:26 +0000 (UTC)
+Received: from [10.72.12.118] (ovpn-12-118.pek2.redhat.com [10.72.12.118])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C57C560BEC;
+        Wed, 31 Jul 2019 13:28:21 +0000 (UTC)
+Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
+ with worker
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     mst@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+References: <20190731084655.7024-1-jasowang@redhat.com>
+ <20190731084655.7024-8-jasowang@redhat.com> <20190731123935.GC3946@ziepe.ca>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
+Date:   Wed, 31 Jul 2019 21:28:20 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87lfwe73oz.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190731123935.GC3946@ziepe.ca>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 31 Jul 2019 13:28:26 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/19 15:07, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 20/06/19 13:02, Vitaly Kuznetsov wrote:
->>> To avoid hardcoding xsetbv length to '3' we need to support decoding it in
->>> the emulator.
->>>
->>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+On 2019/7/31 下午8:39, Jason Gunthorpe wrote:
+> On Wed, Jul 31, 2019 at 04:46:53AM -0400, Jason Wang wrote:
+>> We used to use RCU to synchronize MMU notifier with worker. This leads
+>> calling synchronize_rcu() in invalidate_range_start(). But on a busy
+>> system, there would be many factors that may slow down the
+>> synchronize_rcu() which makes it unsuitable to be called in MMU
+>> notifier.
 >>
->> Can you also emulate it properly?  The code from QEMU's
->> target/i386/fpu_helper.c can help. :)
+>> A solution is SRCU but its overhead is obvious with the expensive full
+>> memory barrier. Another choice is to use seqlock, but it doesn't
+>> provide a synchronization method between readers and writers. The last
+>> choice is to use vq mutex, but it need to deal with the worst case
+>> that MMU notifier must be blocked and wait for the finish of swap in.
 >>
-> 
-> (Had a chance to get back to this just now, sorry)
-> 
-> Assuming __kvm_set_xcr() is also a correct implementation, would the
-> code below do the job? (Just trying to figure out why you suggested
-> me to take a look at QEMU's variant):
-> 
+>> So this patch switches use a counter to track whether or not the map
+>> was used. The counter was increased when vq try to start or finish
+>> uses the map. This means, when it was even, we're sure there's no
+>> readers and MMU notifier is synchronized. When it was odd, it means
+>> there's a reader we need to wait it to be even again then we are
+>> synchronized.
+> You just described a seqlock.
 
-Yes, I didn't remember __kvm_set_xcr.
 
-Paolo
+Kind of, see my explanation below.
 
-> diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
-> index feab24cac610..77cf6c11f66b 100644
-> --- a/arch/x86/include/asm/kvm_emulate.h
-> +++ b/arch/x86/include/asm/kvm_emulate.h
-> @@ -229,7 +229,7 @@ struct x86_emulate_ops {
->  	int (*pre_leave_smm)(struct x86_emulate_ctxt *ctxt,
->  			     const char *smstate);
->  	void (*post_leave_smm)(struct x86_emulate_ctxt *ctxt);
-> -
-> +	int (*set_xcr)(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr);
->  };
->  
->  typedef u32 __attribute__((vector_size(16))) sse128_t;
-> @@ -429,6 +429,7 @@ enum x86_intercept {
->  	x86_intercept_ins,
->  	x86_intercept_out,
->  	x86_intercept_outs,
-> +	x86_intercept_xsetbv,
->  
->  	nr_x86_intercepts
->  };
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 718f7d9afedc..f9e843dd992a 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -4156,6 +4156,20 @@ static int em_fxrstor(struct x86_emulate_ctxt *ctxt)
->  	return rc;
->  }
->  
-> +static int em_xsetbv(struct x86_emulate_ctxt *ctxt)
-> +{
-> +	u32 eax, ecx, edx;
-> +
-> +	eax = reg_read(ctxt, VCPU_REGS_RAX);
-> +	edx = reg_read(ctxt, VCPU_REGS_RDX);
-> +	ecx = reg_read(ctxt, VCPU_REGS_RCX);
-> +
-> +	if (ctxt->ops->set_xcr(ctxt, ecx, ((u64)edx << 32) | eax))
-> +		return emulate_gp(ctxt, 0);
-> +
-> +	return X86EMUL_CONTINUE;
-> +}
-> +
->  static bool valid_cr(int nr)
->  {
->  	switch (nr) {
-> @@ -4409,6 +4423,12 @@ static const struct opcode group7_rm1[] = {
->  	N, N, N, N, N, N,
->  };
->  
-> +static const struct opcode group7_rm2[] = {
-> +	N,
-> +	II(ImplicitOps | Priv,			em_xsetbv,	xsetbv),
-> +	N, N, N, N, N, N,
-> +};
-> +
->  static const struct opcode group7_rm3[] = {
->  	DIP(SrcNone | Prot | Priv,		vmrun,		check_svme_pa),
->  	II(SrcNone  | Prot | EmulateOnUD,	em_hypercall,	vmmcall),
-> @@ -4498,7 +4518,8 @@ static const struct group_dual group7 = { {
->  }, {
->  	EXT(0, group7_rm0),
->  	EXT(0, group7_rm1),
-> -	N, EXT(0, group7_rm3),
-> +	EXT(0, group7_rm2),
-> +	EXT(0, group7_rm3),
->  	II(SrcNone | DstMem | Mov,		em_smsw, smsw), N,
->  	II(SrcMem16 | Mov | Priv,		em_lmsw, lmsw),
->  	EXT(0, group7_rm7),
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c6d951cbd76c..9512cc38dfe9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6068,6 +6068,11 @@ static void emulator_post_leave_smm(struct x86_emulate_ctxt *ctxt)
->  	kvm_smm_changed(emul_to_vcpu(ctxt));
->  }
->  
-> +static int emulator_set_xcr(struct x86_emulate_ctxt *ctxt, u32 index, u64 xcr)
-> +{
-> +	return __kvm_set_xcr(emul_to_vcpu(ctxt), index, xcr);
-> +}
-> +
->  static const struct x86_emulate_ops emulate_ops = {
->  	.read_gpr            = emulator_read_gpr,
->  	.write_gpr           = emulator_write_gpr,
-> @@ -6109,6 +6114,7 @@ static const struct x86_emulate_ops emulate_ops = {
->  	.set_hflags          = emulator_set_hflags,
->  	.pre_leave_smm       = emulator_pre_leave_smm,
->  	.post_leave_smm      = emulator_post_leave_smm,
-> +	.set_xcr             = emulator_set_xcr,
->  };
->  
->  static void toggle_interruptibility(struct kvm_vcpu *vcpu, u32 mask)
-> 
 
+>
+> We've been talking about providing this as some core service from mmu
+> notifiers because nearly every use of this API needs it.
+
+
+That would be very helpful.
+
+
+>
+> IMHO this gets the whole thing backwards, the common pattern is to
+> protect the 'shadow pte' data with a seqlock (usually open coded),
+> such that the mmu notififer side has the write side of that lock and
+> the read side is consumed by the thread accessing or updating the SPTE.
+
+
+Yes, I've considered something like that. But the problem is, mmu 
+notifier (writer) need to wait for the vhost worker to finish the read 
+before it can do things like setting dirty pages and unmapping page.  It 
+looks to me seqlock doesn't provide things like this.  Or are you 
+suggesting that taking writer seq lock in vhost worker and busy wait for 
+seqcount to be even in MMU notifier (something similar to what this 
+patch did)? I don't do this because e.g:
+
+
+write_seqcount_begin()
+
+map = vq->map[X]
+
+write or read through map->addr directly
+
+write_seqcount_end()
+
+
+There's no rmb() in write_seqcount_begin(), so map could be read before 
+write_seqcount_begin(), but it looks to me now that this doesn't harm at 
+all, maybe we can try this way.
+
+
+>
+>
+>> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+>> Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>   drivers/vhost/vhost.c | 145 ++++++++++++++++++++++++++----------------
+>>   drivers/vhost/vhost.h |   7 +-
+>>   2 files changed, 94 insertions(+), 58 deletions(-)
+>>
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> index cfc11f9ed9c9..db2c81cb1e90 100644
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -324,17 +324,16 @@ static void vhost_uninit_vq_maps(struct vhost_virtqueue *vq)
+>>   
+>>   	spin_lock(&vq->mmu_lock);
+>>   	for (i = 0; i < VHOST_NUM_ADDRS; i++) {
+>> -		map[i] = rcu_dereference_protected(vq->maps[i],
+>> -				  lockdep_is_held(&vq->mmu_lock));
+>> +		map[i] = vq->maps[i];
+>>   		if (map[i]) {
+>>   			vhost_set_map_dirty(vq, map[i], i);
+>> -			rcu_assign_pointer(vq->maps[i], NULL);
+>> +			vq->maps[i] = NULL;
+>>   		}
+>>   	}
+>>   	spin_unlock(&vq->mmu_lock);
+>>   
+>> -	/* No need for synchronize_rcu() or kfree_rcu() since we are
+>> -	 * serialized with memory accessors (e.g vq mutex held).
+>> +	/* No need for synchronization since we are serialized with
+>> +	 * memory accessors (e.g vq mutex held).
+>>   	 */
+>>   
+>>   	for (i = 0; i < VHOST_NUM_ADDRS; i++)
+>> @@ -362,6 +361,44 @@ static bool vhost_map_range_overlap(struct vhost_uaddr *uaddr,
+>>   	return !(end < uaddr->uaddr || start > uaddr->uaddr - 1 + uaddr->size);
+>>   }
+>>   
+>> +static void inline vhost_vq_access_map_begin(struct vhost_virtqueue *vq)
+>> +{
+>> +	int ref = READ_ONCE(vq->ref);
+> Is a lock/single threaded supposed to be held for this?
+
+
+Yes, only vhost worker kthread can accept this.
+
+
+>
+>> +
+>> +	smp_store_release(&vq->ref, ref + 1);
+>> +	/* Make sure ref counter is visible before accessing the map */
+>> +	smp_load_acquire(&vq->ref);
+> release/acquire semantics are intended to protect blocks of related
+> data, so reading something with acquire and throwing away the result
+> is nonsense.
+
+
+Actually I want to use smp_mb() here, so I admit it's a trick that even 
+won't work. But now I think I can just use write_seqcount_begin() here.
+
+
+>
+>> +}
+>> +
+>> +static void inline vhost_vq_access_map_end(struct vhost_virtqueue *vq)
+>> +{
+>> +	int ref = READ_ONCE(vq->ref);
+> If the write to vq->ref is not locked this algorithm won't work, if it
+> is locked the READ_ONCE is not needed.
+
+
+Yes.
+
+
+>
+>> +	/* Make sure vq access is done before increasing ref counter */
+>> +	smp_store_release(&vq->ref, ref + 1);
+>> +}
+>> +
+>> +static void inline vhost_vq_sync_access(struct vhost_virtqueue *vq)
+>> +{
+>> +	int ref;
+>> +
+>> +	/* Make sure map change was done before checking ref counter */
+>> +	smp_mb();
+> This is probably smp_rmb after reading ref, and if you are setting ref
+> with smp_store_release then this should be smp_load_acquire() without
+> an explicit mb.
+
+
+We had something like:
+
+spin_lock();
+
+vq->maps[index] = NULL;
+
+spin_unlock();
+
+vhost_vq_sync_access(vq);
+
+we need to make sure the read of ref is done after setting 
+vq->maps[index] to NULL. It looks to me neither smp_load_acquire() nor 
+smp_store_release() can help in this case.
+
+
+>
+>> +	ref = READ_ONCE(vq->ref);
+>> +	if (ref & 0x1) {
+>> +		/* When ref change, we are sure no reader can see
+>> +		 * previous map */
+>> +		while (READ_ONCE(vq->ref) == ref) {
+>> +			set_current_state(TASK_RUNNING);
+>> +			schedule();
+>> +		}
+>> +	}
+> This is basically read_seqcount_begin()' with a schedule instead of
+> cpu_relax
+
+
+Yes it is.
+
+
+>
+>
+>> +	/* Make sure ref counter was checked before any other
+>> +	 * operations that was dene on map. */
+>> +	smp_mb();
+> should be in a smp_load_acquire()
+
+
+Right, if we use smp_load_acquire() to load the counter.
+
+
+>
+>> +}
+>> +
+>>   static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
+>>   				      int index,
+>>   				      unsigned long start,
+>> @@ -376,16 +413,15 @@ static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
+>>   	spin_lock(&vq->mmu_lock);
+>>   	++vq->invalidate_count;
+>>   
+>> -	map = rcu_dereference_protected(vq->maps[index],
+>> -					lockdep_is_held(&vq->mmu_lock));
+>> +	map = vq->maps[index];
+>>   	if (map) {
+>>   		vhost_set_map_dirty(vq, map, index);
+>> -		rcu_assign_pointer(vq->maps[index], NULL);
+>> +		vq->maps[index] = NULL;
+>>   	}
+>>   	spin_unlock(&vq->mmu_lock);
+>>   
+>>   	if (map) {
+>> -		synchronize_rcu();
+>> +		vhost_vq_sync_access(vq);
+> What prevents racing with vhost_vq_access_map_end here?
+
+
+vhost_vq_access_map_end() uses smp_store_release() for the counter. Is 
+this not sufficient?
+
+
+>
+>>   		vhost_map_unprefetch(map);
+>>   	}
+>>   }
+> Overall I don't like it.
+>
+> We are trying to get rid of these botique mmu notifier patterns in
+> drivers.
+
+
+I agree, so do you think we can take write lock in vhost worker then 
+wait for the counter to be even in MMU notifier? It looks much cleaner 
+than this patch.
+
+Thanks
+
+
+>
+> Jason
