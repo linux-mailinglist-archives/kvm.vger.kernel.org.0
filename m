@@ -2,169 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 372A27B698
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 02:14:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86E037B7DD
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 03:56:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728249AbfGaAOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Jul 2019 20:14:01 -0400
-Received: from mail-eopbgr800115.outbound.protection.outlook.com ([40.107.80.115]:20983
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726210AbfGaAOB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Jul 2019 20:14:01 -0400
+        id S1727894AbfGaB4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Jul 2019 21:56:02 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:28543 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726559AbfGaB4C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Jul 2019 21:56:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1564538162; x=1596074162;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=EzIkLL33VfiaDDUjvmHCkM+3WyciIBxzfLE+FrI2JX4=;
+  b=RtWQBvR1+HnWanFvtxZpfnxAYXmvfZaRqPChGvbtkbnTAggdYSiIYWw2
+   9ES8Axy7M0dqhezNAoarmQuZdIh33FWMGDGh0IAXUbjSA9OEZEjO0qxmz
+   KK6axDxAAA/CErJ/K4ZO7l89lT9F8s33BwYsaJCoQaeN3fvcs82z1ufOG
+   573XR2SKffECDlwqkHD3e2nOi+XynDryc+LV4nwKNJlebwJacNGZVlmIK
+   0gudB4k5Srzi80UuiD1Nv40yIL/eV2FJ60LcTG43hAPe831ZGqii56sMJ
+   R+JUqJbreMZfweXG+T5bcstOUq3nDmXs1rG+aQwfMffffH2F5DUZwFIMl
+   Q==;
+IronPort-SDR: 5N9bK50D871o+QHmPZCmTRj5VRV4GjVXnn+LZdnbqtND7tliUEEfhSBdeXaXbUFYKnU+iUyOTd
+ fG9fBwOInGATVbFFVrXK6ot+ZNlN+Pu1ErQ8t6wo4wW/wqra/1hsr2HEmFo8b0fnvH/nUlSdtd
+ CbyM6bZPMvuInPLcB5iJK+GB/NmXeiUzvrmJs3VqFC2pq/lf5JXM459IzO9otEqQCDpkVHti+H
+ tAfZf28HDD/NE8DmOz2JQAVQz+EMuPEDwWr3y7zP/hR+RZhV7P2qFVhaG5ABhx294UO+lCFRED
+ Oow=
+X-IronPort-AV: E=Sophos;i="5.64,328,1559491200"; 
+   d="scan'208";a="119220292"
+Received: from mail-by2nam05lp2055.outbound.protection.outlook.com (HELO NAM05-BY2-obe.outbound.protection.outlook.com) ([104.47.50.55])
+  by ob1.hgst.iphmx.com with ESMTP; 31 Jul 2019 09:56:02 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HaK//ynzrov6VJEPzNcUs4KyjELk1JNEH7PVN+FgTVnc84IwUMQjnVLNjrfr6D4z6FRGtf+onXgeATNsaDYaJHiu77E1BH7vIUUoxOey3wXFnISviN+DeLLdFjNtqtlV+M470Hm5H20LnD8OKCKQzl374Ugsox7cLTx4/NyrGmxXmJ65Hdzi1ufHaJEd+0+hXvnLpW22UI68W9FfRQiHM3Bv8f+V5boXA3kCK8g7p4EW9dOkYLnaEIlQQHbrDP8kjeHThmYrB53cqYOLncYJHW0feOSNQt7EoeMvdCSGtHRTlVPnuR2AR+PAynIZElej8qGBD0tGX58soMS2PEEYtA==
+ b=Uio0qAt1waLd5VdTbxaaawoBZF06vXoRu3l5aXqQiLzKkNBaZGcW8+gS8Ci0FT87P12yi3GnR85cPeHW+HZtVgrTyTIqxQiRXr1by/tzv6MRcH8SQ9bG6/1Be/D0mLlENa7lEiDPtkvvvsQLAlU0ta3NnIEJIUpdGr1sFTUma86oVAJPZ1shisWSKJI5bIecGG7LrOJAlLc9+zdrOhVHbOoE9tKsERXUBOxeY0bjvMTELEfZ2iYeApZQBRucW2wT3pfn7/7p5GTy+PE5nw4RaFchxLP8IIhu6jSQZTQWPupeGMw1QYU4SkjLSnmijx/pPbe/ipzp3yMUgWDNWQOFbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7+qkt2g1PB4yERKLvl3kj4w8iAPpQ6pFCDJAgd1iDx8=;
- b=h55tKpqQSKPz4zX9L4WWqTWLagEEFHcVeL3loQMWvEY46z+bQ/f0wdFs/QzoTG7khWvzpni3LXLldU1qRA+yNfpxgLAr5IlLfn2IZzMAeCYKG8CvcIcAfiWXeS5mjbbZC9WiCAAGLALpRUQHPxt9OX+OqxDJ24zhpPP57HLBaHH3M5uHSRxoawje18naTLbobEFIUVzb/OMVdCniDsrFIEFEvwC1P6+8XtOrKo2wOfzNrV+ci/nkj41Kj/OTbCiP06HQU6OAIAC1kSbe3FOCfa80X2mxqzDDng+/YwNZUlW5MDkqXlPXiD88Xe05WHXNLeT/ZdBnim9g92JORDlnBw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector1;
+ bh=EzIkLL33VfiaDDUjvmHCkM+3WyciIBxzfLE+FrI2JX4=;
+ b=iVxOWkAYWb62vRgnj03mYg3l0/fO2BPKY46A8jELo5sOk/DrXCT9i3D92DpR2JNezC5Ows+riyiGeIhVYt/5+37U70jcvM2coX6vDPp5cWv4TsWmuhNNIBb3T1TYCMmGj+SWzc5pYi/Fy7IBzAWSZR8OkzqyAhbBcqV7MlZsWnSEJhLguGrn5RZZ75nDjMhxv2qlw9qv+fuIRt+Hz2/fbwiqvOEvRfLy0EZ/Z7tMUVJEY0vLQugB733ZZwNrhZgsjRp5SEyQ9L9eXw1Z7gEd3VZEJUywSoHHaDomDbGQXJ/d59/3yEqqFf8mWKfMQ+d8+B2XubLx181liGWmwbdcYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=wdc.com;dmarc=pass action=none header.from=wdc.com;dkim=pass
+ header.d=wdc.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7+qkt2g1PB4yERKLvl3kj4w8iAPpQ6pFCDJAgd1iDx8=;
- b=l2L/PE7xCtrKV4xHoOP70MrJo0sAxlPV6A+748sijZcttPRlbN0Vvt3JhUV07uYmIznlzsE7m7r05xz2U87a+DYtt+NS4IiXeO4DR79dJh+O3TrPFey9B9yD+tPWark8gZQoHMt47lsCWYD6osWhltXJWR6pOp0imCdmQz3NPw4=
-Received: from MWHPR21MB0784.namprd21.prod.outlook.com (10.173.51.150) by
- MWHPR21MB0288.namprd21.prod.outlook.com (10.173.53.18) with Microsoft SMTP
+ bh=EzIkLL33VfiaDDUjvmHCkM+3WyciIBxzfLE+FrI2JX4=;
+ b=k/LjvsRiKrWv4YVOvVckmsmyiRjzQiOd+yGWgNWxVtgX1UEruFEWiF9TL6t9Qz3TMnQXFk/t2cjybsHiAhZuMoKBvC5QEeXYbWG7zljKSJhB8dEYkVeYoIvzMrh4S8oqblNLbM50uT5FVlM7TdhGDk566GUPiWMgsNhG2OOQYiM=
+Received: from BYAPR04MB3782.namprd04.prod.outlook.com (52.135.214.142) by
+ BYAPR04MB4598.namprd04.prod.outlook.com (52.135.238.75) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.2; Wed, 31 Jul 2019 00:13:57 +0000
-Received: from MWHPR21MB0784.namprd21.prod.outlook.com
- ([fe80::7de1:e6c1:296:4e82]) by MWHPR21MB0784.namprd21.prod.outlook.com
- ([fe80::7de1:e6c1:296:4e82%5]) with mapi id 15.20.2157.001; Wed, 31 Jul 2019
- 00:13:57 +0000
-From:   Michael Kelley <mikelley@microsoft.com>
-To:     Nadav Amit <namit@vmware.com>, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-CC:     "x86@kernel.org" <x86@kernel.org>,
+ 15.20.2094.14; Wed, 31 Jul 2019 01:55:59 +0000
+Received: from BYAPR04MB3782.namprd04.prod.outlook.com
+ ([fe80::ac9a:967e:70a5:e926]) by BYAPR04MB3782.namprd04.prod.outlook.com
+ ([fe80::ac9a:967e:70a5:e926%7]) with mapi id 15.20.2115.005; Wed, 31 Jul 2019
+ 01:55:59 +0000
+From:   Atish Patra <Atish.Patra@wdc.com>
+To:     "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "palmer@sifive.com" <palmer@sifive.com>,
+        Anup Patel <Anup.Patel@wdc.com>
+CC:     "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Juergen Gross <jgross@suse.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Subject: RE: [PATCH v3 4/9] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Thread-Topic: [PATCH v3 4/9] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Thread-Index: AQHVPc0tyN8NiFudS0OHFO0tHQVBDqbj7WKw
-Date:   Wed, 31 Jul 2019 00:13:57 +0000
-Message-ID: <MWHPR21MB07849B8AE6D1C4943B6F06F7D7DF0@MWHPR21MB0784.namprd21.prod.outlook.com>
-References: <20190719005837.4150-1-namit@vmware.com>
- <20190719005837.4150-5-namit@vmware.com>
-In-Reply-To: <20190719005837.4150-5-namit@vmware.com>
+        "hch@infradead.org" <hch@infradead.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "anup@brainfault.org" <anup@brainfault.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [RFC PATCH 13/16] RISC-V: KVM: Add timer functionality
+Thread-Topic: [RFC PATCH 13/16] RISC-V: KVM: Add timer functionality
+Thread-Index: AQHVRgTUPAB7n90qAEyqoYXnGhI7+KbjB0QAgADy5IA=
+Date:   Wed, 31 Jul 2019 01:55:59 +0000
+Message-ID: <7fe9e845c33e49e4c215e12b1ee1b5ed86a95bc1.camel@wdc.com>
+References: <20190729115544.17895-1-anup.patel@wdc.com>
+         <20190729115544.17895-14-anup.patel@wdc.com>
+         <abedb067-b91f-8821-9bce-d27f6c4efdee@redhat.com>
+In-Reply-To: <abedb067-b91f-8821-9bce-d27f6c4efdee@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=mikelley@ntdev.microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-07-31T00:13:55.8711110Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=18386b13-1653-4a41-8c42-2a8ca745b308;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=mikelley@microsoft.com; 
-x-originating-ip: [24.22.167.197]
+ smtp.mailfrom=Atish.Patra@wdc.com; 
+x-originating-ip: [199.255.44.250]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4136bceb-ab23-4308-66e5-08d7154bfb15
+x-ms-office365-filtering-correlation-id: 3f3e1aa5-aacd-4351-0986-08d7155a3c37
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MWHPR21MB0288;
-x-ms-traffictypediagnostic: MWHPR21MB0288:|MWHPR21MB0288:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR21MB028844C36D7FAD0B1375BD8BD7DF0@MWHPR21MB0288.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB4598;
+x-ms-traffictypediagnostic: BYAPR04MB4598:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <BYAPR04MB45982766F9391E322B792EE7FADF0@BYAPR04MB4598.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 011579F31F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(366004)(39860400002)(346002)(136003)(376002)(199004)(189003)(256004)(22452003)(71190400001)(71200400001)(316002)(66066001)(66556008)(9686003)(53936002)(14444005)(6436002)(7696005)(110136005)(476003)(486006)(478600001)(66446008)(68736007)(76116006)(229853002)(11346002)(76176011)(54906003)(66946007)(66476007)(446003)(33656002)(55016002)(64756008)(10290500003)(186003)(52536014)(102836004)(6116002)(7416002)(3846002)(305945005)(99286004)(7736002)(26005)(4326008)(2906002)(5660300002)(10090500001)(6246003)(8990500004)(6506007)(86362001)(14454004)(8676002)(25786009)(81156014)(74316002)(81166006)(8936002);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR21MB0288;H:MWHPR21MB0784.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(396003)(136003)(366004)(376002)(39860400002)(189003)(199004)(446003)(229853002)(110136005)(76176011)(476003)(11346002)(54906003)(2201001)(2616005)(71200400001)(316002)(8676002)(81156014)(7416002)(256004)(8936002)(7736002)(966005)(486006)(81166006)(6506007)(14454004)(66066001)(305945005)(53546011)(68736007)(5660300002)(6246003)(26005)(478600001)(71190400001)(3846002)(6116002)(6636002)(25786009)(6306002)(66946007)(53936002)(6512007)(118296001)(102836004)(186003)(86362001)(66476007)(4326008)(2501003)(36756003)(6486002)(2906002)(66446008)(64756008)(99286004)(76116006)(6436002)(66556008);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4598;H:BYAPR04MB3782.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 7pM4N/3Ak2c/DZOAGoI2OlGmJPZe1oSdhoZpBXNisjOTgAcGdF3O8e+eIhajqjhsE0NY9KUfx5W/iVI49EwHSuqABhxWDG1Kr9bZqXkB2+JCITHuZ+fNuMZ25cIEZHbe0jyVQGn9/V9EF/qQitQlBdtzaOO0BoXcHT+BXhLJs3pyqcCGcnTJxpCdfIEg8rtJvBnEUJqqQtlAhs8Li/5HmRaCt35oCSgY9aGfvck212X1Zur05OVSMLKe7dvfPunMW2kfc+cwhwba9kfGydo2u5Ah+l7KwC7pP4JmKRcmwhFoH3RULLT5v5FpOxreJZLMtBC87MuOUl0QcqDRYY7Rb8yhO+eDY7953WqIP/bO2EIJxeXeTkCx5Iipg38yOlTEXHw3h41sEAX9fYaFBnPsYXcxnrRYpnP7mGHvNOBN+k8=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+x-microsoft-antispam-message-info: KBPg7aI1bItGwl35cvKVqoMbhvKSUDM9bqd8SXYB8fKJ+RHQD78/XUBqDY6ZyOAO5CJOfemG888MXplGdWxJ2+uy8RuXRz9jDPeK2csKuAWSFmceE828Du/GdlQ4RwD9XPwBtR0LFFrRPJF1KVdowvXkyQB4SX3peouFXT6ftg/1rDhiSL3tCKwPn1BRCZAYoQXGjiuu/sWrXO22oEpsmPPckQUBF805s74vwAHhM3ulPAuIIRJ0tDpAwLmLTSRtABou3BxMN3jscrzXzUdpABz+zo2hVSxj57n+lijF5X19vhdbbieP0LJyGkg99udfFiRcpomRPNx1bp0jL6QGqiH3m60DB+pJwAG4OqRFnqFaVTP/DuZFJJgJIxCLE2mRt8oE/vD1D82qU6ChfxopGkI6JgoaizV3G2iLcB2smOQ=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <13B323065899E54CB3E7D3A54271A60D@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4136bceb-ab23-4308-66e5-08d7154bfb15
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 00:13:57.4299
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f3e1aa5-aacd-4351-0986-08d7155a3c37
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 01:55:59.6574
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uUl+NcMFyy3iOycg7CU2I+3933Yo3iaMJO735J1Vj5VxvRlEmuMyfMxQLd8hgncrZsmrilYj3DL5D2ehRvAWkYnS6LwZwCFdREsqx/h3AlY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR21MB0288
+X-MS-Exchange-CrossTenant-userprincipalname: Atish.Patra@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4598
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nadav Amit <namit@vmware.com> Sent: Thursday, July 18, 2019 5:59 PM
->=20
-> To improve TLB shootdown performance, flush the remote and local TLBs
-> concurrently. Introduce flush_tlb_multi() that does so. Introduce
-> paravirtual versions of flush_tlb_multi() for KVM, Xen and hyper-v (Xen
-> and hyper-v are only compile-tested).
->=20
-> While the updated smp infrastructure is capable of running a function on
-> a single local core, it is not optimized for this case. The multiple
-> function calls and the indirect branch introduce some overhead, and
-> might make local TLB flushes slower than they were before the recent
-> changes.
->=20
-> Before calling the SMP infrastructure, check if only a local TLB flush
-> is needed to restore the lost performance in this common case. This
-> requires to check mm_cpumask() one more time, but unless this mask is
-> updated very frequently, this should impact performance negatively.
->=20
-> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
-> Cc: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: Stephen Hemminger <sthemmin@microsoft.com>
-> Cc: Sasha Levin <sashal@kernel.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: x86@kernel.org
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: Andy Lutomirski <luto@kernel.org>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Cc: linux-hyperv@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: kvm@vger.kernel.org
-> Cc: xen-devel@lists.xenproject.org
-> Signed-off-by: Nadav Amit <namit@vmware.com>
-> ---
->  arch/x86/hyperv/mmu.c                 | 10 +++---
->  arch/x86/include/asm/paravirt.h       |  6 ++--
->  arch/x86/include/asm/paravirt_types.h |  4 +--
->  arch/x86/include/asm/tlbflush.h       |  8 ++---
->  arch/x86/include/asm/trace/hyperv.h   |  2 +-
->  arch/x86/kernel/kvm.c                 | 11 +++++--
->  arch/x86/kernel/paravirt.c            |  2 +-
->  arch/x86/mm/tlb.c                     | 47 ++++++++++++++++++---------
->  arch/x86/xen/mmu_pv.c                 | 11 +++----
->  include/trace/events/xen.h            |  2 +-
->  10 files changed, 62 insertions(+), 41 deletions(-)
->=20
-
-For the Hyper-V parts --
-Reviewed-by: Michael Kelley <mikelley@microsoft.com>
-
+T24gVHVlLCAyMDE5LTA3LTMwIGF0IDEzOjI2ICswMjAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
+PiBPbiAyOS8wNy8xOSAxMzo1NywgQW51cCBQYXRlbCB3cm90ZToNCj4gPiArCWlmIChkZWx0YV9u
+cyA+IFZDUFVfVElNRVJfUFJPR1JBTV9USFJFU0hPTERfTlMpIHsNCj4gPiArCQlocnRpbWVyX3N0
+YXJ0KCZ0LT5ocnQsIGt0aW1lX2FkZF9ucyhrdGltZV9nZXQoKSwNCj4gPiBkZWx0YV9ucyksDQo+
+IA0KPiBJIHRoaW5rIHRoZSBndWVzdCB3b3VsZCBwcmVmZXIgaWYgeW91IHNhdmVkIHRoZSB0aW1l
+IGJlZm9yZSBlbmFibGluZw0KPiBpbnRlcnJ1cHRzIG9uIHRoZSBob3N0LCBhbmQgdXNlIHRoYXQg
+aGVyZSBpbnN0ZWFkIG9mIGt0aW1lX2dldCgpLg0KPiBPdGhlcndpc2UgdGhlIHRpbWVyIGNvdWxk
+IGJlIGRlbGF5ZWQgYXJiaXRyYXJpbHkgYnkgaG9zdCBpbnRlcnJ1cHRzLg0KPiANCj4gKEJlY2F1
+c2UgdGhlIFJJU0MtViBTQkkgdGltZXIgaXMgcmVsYXRpdmUgb25seS0tLXdoaWNoIGlzDQo+IHVu
+Zm9ydHVuYXRlLS0tDQoNCkp1c3QgdG8gY2xhcmlmeTogUklTQy1WIFNCSSB0aW1lciBjYWxsIHBh
+c3NlcyBhYnNvbHV0ZSB0aW1lLg0KDQpodHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51eC92
+NS4zLXJjMi9zb3VyY2UvZHJpdmVycy9jbG9ja3NvdXJjZS90aW1lci1yaXNjdi5jI0wzMg0KDQpU
+aGF0J3Mgd2h5IHdlIGNvbXB1dGUgYSBkZWx0YSBiZXR3ZWVuIGFic29sdXRlIHRpbWUgcGFzc2Vk
+IHZpYSBTQkkgYW5kDQpjdXJyZW50IHRpbWUuIGhydGltZXIgaXMgcHJvZ3JhbW1lZCB0byB0cmln
+Z2VyIG9ubHkgYWZ0ZXIgdGhlIGRlbHRhDQp0aW1lIGZyb20gbm93Lg0KDQoNCj4gZ3Vlc3RzIHdp
+bGwgYWxyZWFkeSBwYXkgYSBsYXRlbmN5IHByaWNlIGR1ZSB0byB0aGUgZXh0cmENCj4gY29zdCBv
+ZiB0aGUgU0JJIGNhbGwgY29tcGFyZWQgdG8gYSBiYXJlIG1ldGFsIGltcGxlbWVudGF0aW9uLiAN
+Cg0KWWVzLiBUaGVyZSBhcmUgb25nb2luZyBkaXNjdXNzaW9ucyB0byByZW1vdmUgdGhpcyBTQkkg
+Y2FsbCBjb21wbGV0ZWx5LiANCkhvcGVmdWxseSwgdGhhdCB3aWxsIGhhcHBlbiBiZWZvcmUgYW55
+IHJlYWwgaGFyZHdhcmUgd2l0aA0KdmlydHVhbGl6YXRpb24gc3VwcG9ydCBzaG93cyB1cCA6KS4N
+Cg0KPiAgU29vbmVyIG9yDQo+IGxhdGVyIHlvdSBtYXkgd2FudCB0byBpbXBsZW1lbnQgc29tZXRo
+aW5nIGxpa2UgeDg2J3MgaGV1cmlzdGljIHRvDQo+IGFkdmFuY2UgdGhlIHRpbWVyIGRlYWRsaW5l
+IGJ5IGEgZmV3IGh1bmRyZWQgbmFub3NlY29uZHM7IHBlcmhhcHMgYWRkDQo+IGENCj4gVE9ETyBu
+b3cpLg0KPiANCg0KSSBhbSBub3QgYXdhcmUgb2YgdGhpcyBhcHByb2FjaC4gSSB3aWxsIHRha2Ug
+YSBsb29rLiBUaGFua3MuDQoNClJlZ2FyZHMsDQpBdGlzaA0KPiBQYW9sbw0KPiANCj4gPiArCQkJ
+CUhSVElNRVJfTU9ERV9BQlMpOw0KPiA+ICsJCXQtPmlzX3NldCA9IHRydWU7DQo+ID4gKwl9IGVs
+c2UNCj4gPiArCQlrdm1fcmlzY3ZfdmNwdV9zZXRfaW50ZXJydXB0KHZjcHUsIElSUV9TX1RJTUVS
+KTsNCj4gPiArDQo+IA0KPiBfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXw0KPiBsaW51eC1yaXNjdiBtYWlsaW5nIGxpc3QNCj4gbGludXgtcmlzY3ZAbGlzdHMu
+aW5mcmFkZWFkLm9yZw0KPiBodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9tYWlsbWFuL2xpc3Rp
+bmZvL2xpbnV4LXJpc2N2DQoNCg==
