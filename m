@@ -2,465 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 036767BC3D
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 10:51:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A565D7BC93
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 11:05:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727638AbfGaIvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 04:51:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58824 "EHLO mx1.redhat.com"
+        id S1728417AbfGaJFd convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 31 Jul 2019 05:05:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37228 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726444AbfGaIvC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 04:51:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1726666AbfGaJFa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 05:05:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CF17C3084025;
-        Wed, 31 Jul 2019 08:51:01 +0000 (UTC)
-Received: from [10.72.12.51] (ovpn-12-51.pek2.redhat.com [10.72.12.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F03B85D6A7;
-        Wed, 31 Jul 2019 08:50:55 +0000 (UTC)
-Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
- with worker
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, jgg@ziepe.ca
-References: <20190731084655.7024-1-jasowang@redhat.com>
- <20190731084655.7024-8-jasowang@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <cab99dc3-962e-57a2-70f3-73e9f64f3a49@redhat.com>
-Date:   Wed, 31 Jul 2019 16:50:54 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 97F51550CF;
+        Wed, 31 Jul 2019 09:05:28 +0000 (UTC)
+Received: from ptitpuce (ovpn-116-130.ams2.redhat.com [10.36.116.130])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4423F60852;
+        Wed, 31 Jul 2019 09:05:21 +0000 (UTC)
+References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com> <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com> <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com> <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
+User-agent: mu4e 1.3.2; emacs 26.2
+From:   Christophe de Dinechin <dinechin@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+        qemu-block@nongnu.org, vsementsov@virtuozzo.com, berto@igalia.com,
+        ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
+        mdroth@linux.vnet.ibm.com, armbru@redhat.com, pbonzini@redhat.com,
+        den@openvz.org, rth@twiddle.net
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full before ioctl call
+In-reply-to: <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
+Date:   Wed, 31 Jul 2019 11:05:19 +0200
+Message-ID: <m136imo9ps.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190731084655.7024-8-jasowang@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 31 Jul 2019 08:51:01 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 31 Jul 2019 09:05:29 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/7/31 下午4:46, Jason Wang wrote:
-> We used to use RCU to synchronize MMU notifier with worker. This leads
-> calling synchronize_rcu() in invalidate_range_start(). But on a busy
-> system, there would be many factors that may slow down the
-> synchronize_rcu() which makes it unsuitable to be called in MMU
-> notifier.
+Christian Borntraeger writes:
+
+> On 30.07.19 18:44, Philippe Mathieu-Daudé wrote:
+>> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
+>>> Not the whole structure is initialized before passing it to the KVM.
+>>> Reduce the number of Valgrind reports.
+>>>
+>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>> ---
+>>>  target/i386/kvm.c | 3 +++
+>>>  1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>> index dbbb137..ed57e31 100644
+>>> --- a/target/i386/kvm.c
+>>> +++ b/target/i386/kvm.c
+>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
+>>>          return 0;
+>>>      }
+>>>
+>>> +    memset(&msr_data, 0, sizeof(msr_data));
+>>
+>> I wonder the overhead of this one...
 >
-> A solution is SRCU but its overhead is obvious with the expensive full
-> memory barrier. Another choice is to use seqlock, but it doesn't
-> provide a synchronization method between readers and writers. The last
-> choice is to use vq mutex, but it need to deal with the worst case
-> that MMU notifier must be blocked and wait for the finish of swap in.
+> Cant we use designated initializers like in
 >
-> So this patch switches use a counter to track whether or not the map
-> was used. The counter was increased when vq try to start or finish
-> uses the map. This means, when it was even, we're sure there's no
-> readers and MMU notifier is synchronized. When it was odd, it means
-> there's a reader we need to wait it to be even again then we are
-> synchronized. To avoid full memory barrier, store_release +
-> load_acquire on the counter is used.
+> commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
+> Author:     Christian Borntraeger <borntraeger@de.ibm.com>
+> AuthorDate: Thu Oct 30 09:23:41 2014 +0100
+> Commit:     Paolo Bonzini <pbonzini@redhat.com>
+> CommitDate: Mon Dec 15 12:21:01 2014 +0100
+>
+>     valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
+>
+> and others?
+>
+> This should minimize the impact.
+
+Oh, when you talked about using designated initializers, I thought you
+were talking about fully initializing the struct, like so:
+
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index dbbb13772a..3533870c43 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -180,19 +180,20 @@ static int kvm_get_tsc(CPUState *cs)
+ {
+     X86CPU *cpu = X86_CPU(cs);
+     CPUX86State *env = &cpu->env;
+-    struct {
+-        struct kvm_msrs info;
+-        struct kvm_msr_entry entries[1];
+-    } msr_data;
+     int ret;
+
+     if (env->tsc_valid) {
+         return 0;
+     }
+
+-    msr_data.info.nmsrs = 1;
+-    msr_data.entries[0].index = MSR_IA32_TSC;
+-    env->tsc_valid = !runstate_is_running();
++    struct {
++        struct kvm_msrs info;
++        struct kvm_msr_entry entries[1];
++    } msr_data = {
++        .info = { .nmsrs =  1 },
++        .entries = { [0] = { .index = MSR_IA32_TSC } }
++    };
++     env->tsc_valid = !runstate_is_running();
+
+     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
+     if (ret < 0) {
 
 
-For reviewers, I try hard to avoid e.g smp_mb(), please double check 
-whether or not this trick work.
+This gives the compiler maximum opportunities to flag mistakes like
+initializing the same thing twice, and make it easier (read no smart
+optimizations) to initialize in one go. Moving the declaration past the
+'if' also addresses Philippe's concern.
 
-Thanks
+>>
+>>>      msr_data.info.nmsrs = 1;
+>>>      msr_data.entries[0].index = MSR_IA32_TSC;
+>>>      env->tsc_valid = !runstate_is_running();
+>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>
+>>>      if (has_xsave) {
+>>>          env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+>>
+>> OK
+>>
+>>>      }
+>>>
+>>>      max_nested_state_len = kvm_max_nested_state_length();
+>>> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
+>>>          return 0;
+>>>      }
+>>>
+>>> +    memset(&dbgregs, 0, sizeof(dbgregs));
+>>
+>> OK
+>>
+>>>      for (i = 0; i < 4; i++) {
+>>>          dbgregs.db[i] = env->dr[i];
+>>>      }
+>>
+>> We could remove 'dbgregs.flags = 0;'
+>>
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
 
 
->
-> Consider the read critical section is pretty small the synchronization
-> should be done very fast.
->
-> Note the patch lead about 3% PPS dropping.
->
-> Reported-by: Michael S. Tsirkin <mst@redhat.com>
-> Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->   drivers/vhost/vhost.c | 145 ++++++++++++++++++++++++++----------------
->   drivers/vhost/vhost.h |   7 +-
->   2 files changed, 94 insertions(+), 58 deletions(-)
->
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index cfc11f9ed9c9..db2c81cb1e90 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -324,17 +324,16 @@ static void vhost_uninit_vq_maps(struct vhost_virtqueue *vq)
->   
->   	spin_lock(&vq->mmu_lock);
->   	for (i = 0; i < VHOST_NUM_ADDRS; i++) {
-> -		map[i] = rcu_dereference_protected(vq->maps[i],
-> -				  lockdep_is_held(&vq->mmu_lock));
-> +		map[i] = vq->maps[i];
->   		if (map[i]) {
->   			vhost_set_map_dirty(vq, map[i], i);
-> -			rcu_assign_pointer(vq->maps[i], NULL);
-> +			vq->maps[i] = NULL;
->   		}
->   	}
->   	spin_unlock(&vq->mmu_lock);
->   
-> -	/* No need for synchronize_rcu() or kfree_rcu() since we are
-> -	 * serialized with memory accessors (e.g vq mutex held).
-> +	/* No need for synchronization since we are serialized with
-> +	 * memory accessors (e.g vq mutex held).
->   	 */
->   
->   	for (i = 0; i < VHOST_NUM_ADDRS; i++)
-> @@ -362,6 +361,44 @@ static bool vhost_map_range_overlap(struct vhost_uaddr *uaddr,
->   	return !(end < uaddr->uaddr || start > uaddr->uaddr - 1 + uaddr->size);
->   }
->   
-> +static void inline vhost_vq_access_map_begin(struct vhost_virtqueue *vq)
-> +{
-> +	int ref = READ_ONCE(vq->ref);
-> +
-> +	smp_store_release(&vq->ref, ref + 1);
-> +	/* Make sure ref counter is visible before accessing the map */
-> +	smp_load_acquire(&vq->ref);
-> +}
-> +
-> +static void inline vhost_vq_access_map_end(struct vhost_virtqueue *vq)
-> +{
-> +	int ref = READ_ONCE(vq->ref);
-> +
-> +	/* Make sure vq access is done before increasing ref counter */
-> +	smp_store_release(&vq->ref, ref + 1);
-> +}
-> +
-> +static void inline vhost_vq_sync_access(struct vhost_virtqueue *vq)
-> +{
-> +	int ref;
-> +
-> +	/* Make sure map change was done before checking ref counter */
-> +	smp_mb();
-> +
-> +	ref = READ_ONCE(vq->ref);
-> +	if (ref & 0x1) {
-> +		/* When ref change, we are sure no reader can see
-> +		 * previous map */
-> +		while (READ_ONCE(vq->ref) == ref) {
-> +			set_current_state(TASK_RUNNING);
-> +			schedule();
-> +		}
-> +	}
-> +	/* Make sure ref counter was checked before any other
-> +	 * operations that was dene on map. */
-> +	smp_mb();
-> +}
-> +
->   static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
->   				      int index,
->   				      unsigned long start,
-> @@ -376,16 +413,15 @@ static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
->   	spin_lock(&vq->mmu_lock);
->   	++vq->invalidate_count;
->   
-> -	map = rcu_dereference_protected(vq->maps[index],
-> -					lockdep_is_held(&vq->mmu_lock));
-> +	map = vq->maps[index];
->   	if (map) {
->   		vhost_set_map_dirty(vq, map, index);
-> -		rcu_assign_pointer(vq->maps[index], NULL);
-> +		vq->maps[index] = NULL;
->   	}
->   	spin_unlock(&vq->mmu_lock);
->   
->   	if (map) {
-> -		synchronize_rcu();
-> +		vhost_vq_sync_access(vq);
->   		vhost_map_unprefetch(map);
->   	}
->   }
-> @@ -457,7 +493,7 @@ static void vhost_init_maps(struct vhost_dev *dev)
->   	for (i = 0; i < dev->nvqs; ++i) {
->   		vq = dev->vqs[i];
->   		for (j = 0; j < VHOST_NUM_ADDRS; j++)
-> -			RCU_INIT_POINTER(vq->maps[j], NULL);
-> +			vq->maps[j] = NULL;
->   	}
->   }
->   #endif
-> @@ -655,6 +691,7 @@ void vhost_dev_init(struct vhost_dev *dev,
->   		vq->indirect = NULL;
->   		vq->heads = NULL;
->   		vq->dev = dev;
-> +		vq->ref = 0;
->   		mutex_init(&vq->mutex);
->   		spin_lock_init(&vq->mmu_lock);
->   		vhost_vq_reset(dev, vq);
-> @@ -921,7 +958,7 @@ static int vhost_map_prefetch(struct vhost_virtqueue *vq,
->   	map->npages = npages;
->   	map->pages = pages;
->   
-> -	rcu_assign_pointer(vq->maps[index], map);
-> +	vq->maps[index] = map;
->   	/* No need for a synchronize_rcu(). This function should be
->   	 * called by dev->worker so we are serialized with all
->   	 * readers.
-> @@ -1216,18 +1253,18 @@ static inline int vhost_put_avail_event(struct vhost_virtqueue *vq)
->   	struct vring_used *used;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_USED]);
-> +		map = vq->maps[VHOST_ADDR_USED];
->   		if (likely(map)) {
->   			used = map->addr;
->   			*((__virtio16 *)&used->ring[vq->num]) =
->   				cpu_to_vhost16(vq, vq->avail_idx);
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1245,18 +1282,18 @@ static inline int vhost_put_used(struct vhost_virtqueue *vq,
->   	size_t size;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_USED]);
-> +		map = vq->maps[VHOST_ADDR_USED];
->   		if (likely(map)) {
->   			used = map->addr;
->   			size = count * sizeof(*head);
->   			memcpy(used->ring + idx, head, size);
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1272,17 +1309,17 @@ static inline int vhost_put_used_flags(struct vhost_virtqueue *vq)
->   	struct vring_used *used;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_USED]);
-> +		map = vq->maps[VHOST_ADDR_USED];
->   		if (likely(map)) {
->   			used = map->addr;
->   			used->flags = cpu_to_vhost16(vq, vq->used_flags);
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1298,17 +1335,17 @@ static inline int vhost_put_used_idx(struct vhost_virtqueue *vq)
->   	struct vring_used *used;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_USED]);
-> +		map = vq->maps[VHOST_ADDR_USED];
->   		if (likely(map)) {
->   			used = map->addr;
->   			used->idx = cpu_to_vhost16(vq, vq->last_used_idx);
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1362,17 +1399,17 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq,
->   	struct vring_avail *avail;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_AVAIL]);
-> +		map = vq->maps[VHOST_ADDR_AVAIL];
->   		if (likely(map)) {
->   			avail = map->addr;
->   			*idx = avail->idx;
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1387,17 +1424,17 @@ static inline int vhost_get_avail_head(struct vhost_virtqueue *vq,
->   	struct vring_avail *avail;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_AVAIL]);
-> +		map = vq->maps[VHOST_ADDR_AVAIL];
->   		if (likely(map)) {
->   			avail = map->addr;
->   			*head = avail->ring[idx & (vq->num - 1)];
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1413,17 +1450,17 @@ static inline int vhost_get_avail_flags(struct vhost_virtqueue *vq,
->   	struct vring_avail *avail;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_AVAIL]);
-> +		map = vq->maps[VHOST_ADDR_AVAIL];
->   		if (likely(map)) {
->   			avail = map->addr;
->   			*flags = avail->flags;
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1438,15 +1475,15 @@ static inline int vhost_get_used_event(struct vhost_virtqueue *vq,
->   	struct vring_avail *avail;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_AVAIL]);
-> +		vhost_vq_access_map_begin(vq);
-> +		map = vq->maps[VHOST_ADDR_AVAIL];
->   		if (likely(map)) {
->   			avail = map->addr;
->   			*event = (__virtio16)avail->ring[vq->num];
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1461,17 +1498,17 @@ static inline int vhost_get_used_idx(struct vhost_virtqueue *vq,
->   	struct vring_used *used;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_USED]);
-> +		map = vq->maps[VHOST_ADDR_USED];
->   		if (likely(map)) {
->   			used = map->addr;
->   			*idx = used->idx;
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1486,17 +1523,17 @@ static inline int vhost_get_desc(struct vhost_virtqueue *vq,
->   	struct vring_desc *d;
->   
->   	if (!vq->iotlb) {
-> -		rcu_read_lock();
-> +		vhost_vq_access_map_begin(vq);
->   
-> -		map = rcu_dereference(vq->maps[VHOST_ADDR_DESC]);
-> +		map = vq->maps[VHOST_ADDR_DESC];
->   		if (likely(map)) {
->   			d = map->addr;
->   			*desc = *(d + idx);
-> -			rcu_read_unlock();
-> +			vhost_vq_access_map_end(vq);
->   			return 0;
->   		}
->   
-> -		rcu_read_unlock();
-> +		vhost_vq_access_map_end(vq);
->   	}
->   #endif
->   
-> @@ -1843,13 +1880,11 @@ static bool iotlb_access_ok(struct vhost_virtqueue *vq,
->   #if VHOST_ARCH_CAN_ACCEL_UACCESS
->   static void vhost_vq_map_prefetch(struct vhost_virtqueue *vq)
->   {
-> -	struct vhost_map __rcu *map;
-> +	struct vhost_map *map;
->   	int i;
->   
->   	for (i = 0; i < VHOST_NUM_ADDRS; i++) {
-> -		rcu_read_lock();
-> -		map = rcu_dereference(vq->maps[i]);
-> -		rcu_read_unlock();
-> +		map = vq->maps[i];
->   		if (unlikely(!map))
->   			vhost_map_prefetch(vq, i);
->   	}
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index a9a2a93857d2..f9e9558a529d 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -115,16 +115,17 @@ struct vhost_virtqueue {
->   #if VHOST_ARCH_CAN_ACCEL_UACCESS
->   	/* Read by memory accessors, modified by meta data
->   	 * prefetching, MMU notifier and vring ioctl().
-> -	 * Synchonrized through mmu_lock (writers) and RCU (writers
-> -	 * and readers).
-> +	 * Synchonrized through mmu_lock (writers) and ref counters,
-> +	 * see vhost_vq_access_map_begin()/vhost_vq_access_map_end().
->   	 */
-> -	struct vhost_map __rcu *maps[VHOST_NUM_ADDRS];
-> +	struct vhost_map *maps[VHOST_NUM_ADDRS];
->   	/* Read by MMU notifier, modified by vring ioctl(),
->   	 * synchronized through MMU notifier
->   	 * registering/unregistering.
->   	 */
->   	struct vhost_uaddr uaddrs[VHOST_NUM_ADDRS];
->   #endif
-> +	int ref;
->   	const struct vhost_umem_node *meta_iotlb[VHOST_NUM_ADDRS];
->   
->   	struct file *kick;
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
