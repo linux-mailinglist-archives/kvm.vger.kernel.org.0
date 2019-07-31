@@ -2,45 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74DA17C0A9
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 14:04:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CB957C14B
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 14:28:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728390AbfGaMEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 08:04:51 -0400
-Received: from mail-eopbgr80111.outbound.protection.outlook.com ([40.107.8.111]:43334
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725935AbfGaMEu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 08:04:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=grpHDtWprOVhDeYy0o00wtmflcvu4mJXbxwCQ2Fn/K4C7cjFytu1++DlYCpTCjJ5rV9TC1L3G21c9i9cWWC3gpt/M9Tz1jMe7qKUFcv1ycma1YsqFOPpWgCAFLQikkf5my0nOppiyqwL7Q5omW3ikK4zssF6eQVdcS+3qN2NY4J+6cgub0HOKYzMwDXsm5//tN1RTrjAJ6X5zzBISqowLY/y3/kG4Hwcsc8H7PnyAgY+ASzY6A3BaCIIqEqi+NniNZ5LHng+S7tW+Wn7cW5rfDww4Lyv38t4JjdGGO0icq/iomWXEMbFUbnm9ebOetgc+n8aZXvxoe0XVnga1Xwh7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yilQWr7gqdzBqbFGRwV7j8g6Cey0XHXd2U0NVWn2ZG0=;
- b=NvK8Wlmc9X1iSE6zoWRmJOAgMid0yYyRCnlCCm10WpQwlU4qnLoDYrQBsH7mJlV67bUaoPv2spJgR9T3RfAu1gOQExlrqzwm2+YmNpKAjU/dQqI0S/wJicfTCFf1DgxKyRWl7H2U6uop/Ekcr9ps7jim8PflLVGZUfLspTRmqBniSOb0FHlnWayW+4r8NZlqfsr+YfHJAfjZEFjMj66LE9kTj7GBuvJcLENQIxaXoE1Z3bV2LYk5xKSZLgH6/6L4yflLk+Sj7ypDYRK9NIS5l+Gg4if2nSun2nX/Oizomjpr4wyQ0fvLh1bnLi1Ch9s8nGw1385eATDA8yLpImbgLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
- header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yilQWr7gqdzBqbFGRwV7j8g6Cey0XHXd2U0NVWn2ZG0=;
- b=Fo777J2FPnHx653/I0nKZsdIrxW5W8D1O0vcjTxwfgFSGfpZeEyBPye04VlL26Plj5EpwA+gJnk58C/IAPjSN8egryaPmwhrQwxwryDxrnS2DHTI/FKHzL9S8+IDQFtjxJckImIjMjdfhuxmitjtOcotcxKQck2SRXZdKx3yvF8=
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com (20.179.28.141) by
- VI1PR08MB3469.eurprd08.prod.outlook.com (20.177.59.23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.15; Wed, 31 Jul 2019 12:04:45 +0000
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::303d:1bb9:76b2:99d7]) by VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::303d:1bb9:76b2:99d7%6]) with mapi id 15.20.2115.005; Wed, 31 Jul 2019
- 12:04:44 +0000
-From:   Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        id S2387423AbfGaM21 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 08:28:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46136 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2387598AbfGaM21 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Jul 2019 08:28:27 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6VCO7EA036228
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:28:25 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2u37hntb6g-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:28:25 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Wed, 31 Jul 2019 13:28:23 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 31 Jul 2019 13:28:19 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6VCSIZr43450730
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Jul 2019 12:28:18 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 79B724C046;
+        Wed, 31 Jul 2019 12:28:18 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1C9E04C044;
+        Wed, 31 Jul 2019 12:28:18 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 31 Jul 2019 12:28:18 +0000 (GMT)
+Subject: Re: [PATCH 3/3] i386/kvm: initialize struct at full before ioctl call
+To:     Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
         "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "berto@igalia.com" <berto@igalia.com>,
         "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
         "armbru@redhat.com" <armbru@redhat.com>,
@@ -49,106 +53,185 @@ CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "mtosatti@redhat.com" <mtosatti@redhat.com>,
         Denis Lunev <den@virtuozzo.com>,
         Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 3/3] i386/kvm: initialize struct at full before ioctl call
-Thread-Topic: [PATCH 3/3] i386/kvm: initialize struct at full before ioctl
- call
-Thread-Index: AQHVRvAnLLtzNA+T0EeBbI/1wGIp+qbjic2AgADKawCAAE4tAA==
-Date:   Wed, 31 Jul 2019 12:04:44 +0000
-Message-ID: <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
 References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
  <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
  <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
  <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
-In-Reply-To: <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P189CA0022.EURP189.PROD.OUTLOOK.COM (2603:10a6:7:53::35)
- To VI1PR08MB4399.eurprd08.prod.outlook.com (2603:10a6:803:102::13)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6ab02044-8263-48a3-3822-08d715af46be
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:VI1PR08MB3469;
-x-ms-traffictypediagnostic: VI1PR08MB3469:
-x-microsoft-antispam-prvs: <VI1PR08MB3469E7E52B6E049612BC837CF4DF0@VI1PR08MB3469.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 011579F31F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(376002)(39850400004)(136003)(346002)(199004)(189003)(66476007)(102836004)(86362001)(6116002)(66556008)(52116002)(71190400001)(186003)(107886003)(36756003)(486006)(99286004)(64756008)(71200400001)(53546011)(3846002)(76176011)(66066001)(386003)(44832011)(305945005)(66446008)(54906003)(6506007)(66946007)(7416002)(6512007)(5660300002)(110136005)(31696002)(4326008)(229853002)(256004)(6486002)(53936002)(476003)(81166006)(31686004)(11346002)(2616005)(316002)(26005)(68736007)(2201001)(6246003)(6436002)(8676002)(2501003)(7736002)(8936002)(446003)(81156014)(478600001)(25786009)(14454004)(2906002);DIR:OUT;SFP:1102;SCL:1;SRVR:VI1PR08MB3469;H:VI1PR08MB4399.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Arcn5437whNXUyLF2PB4nMOXWlr4kTb/S01Ee+K2HbvkkvOwy/CGIWYGqtyBbGBvaoRzT6R+u8UmKTcEkCWBCRoPlDJ8dsOsWh26mp/BhT/Uwlj/1G3PCJVCTgyqxwUoY+ZkSQLbXl4/Sq35D3rDRdvru+BhojASYibZWk44iSdas3qaVuprPa8641n1CfgxyMUieG1zrQZOZbB+jKeTL10+Zt2/azuD+x8KN/p7s7i49a2Wp/kQGXORugKl0ivULnVx0JYbZr17M8b5T913ZGvzXKHNkW9en1VOYAxnKnyx1COokPJ8jpb1L4QjX8+hPY+NcYh5KETEInLkx1HoKvYh4wWvG/LkRtJhKT4I2sRA98Gt5Hu2xWFHu1N01JdwWGhVSUKqd/dXl8cCaQSEHwvlzgEyOV0HkYs8ARq8Z68=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EEBD0B39DB78A6469C8D26470591EE39@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Wed, 31 Jul 2019 14:28:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ab02044-8263-48a3-3822-08d715af46be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 12:04:44.8424
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: andrey.shinkevich@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3469
+In-Reply-To: <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19073112-0016-0000-0000-00000297F2F5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19073112-0017-0000-0000-000032F60621
+Message-Id: <bdbee2e0-62a7-8906-8076-408922511146@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-31_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907310126
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMzEvMDcvMjAxOSAxMDoyNCwgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyIHdyb3RlOg0KPiANCj4g
-DQo+IE9uIDMwLjA3LjE5IDIxOjIwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0KPj4gT24gMzAvMDcv
-MTkgMTg6MDEsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4+IE5vdCB0aGUgd2hvbGUgc3Ry
-dWN0dXJlIGlzIGluaXRpYWxpemVkIGJlZm9yZSBwYXNzaW5nIGl0IHRvIHRoZSBLVk0uDQo+Pj4g
-UmVkdWNlIHRoZSBudW1iZXIgb2YgVmFsZ3JpbmQgcmVwb3J0cy4NCj4+Pg0KPj4+IFNpZ25lZC1v
-ZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29t
-Pg0KPj4NCj4+IENocmlzdGlhbiwgaXMgdGhpcyB0aGUgcmlnaHQgZml4PyAgSXQncyBub3QgZXhw
-ZW5zaXZlIHNvIGl0IHdvdWxkbid0IGJlDQo+PiBhbiBpc3N1ZSwganVzdCBjaGVja2luZyBpZiB0
-aGVyZSdzIGFueSBiZXR0ZXIgYWx0ZXJuYXRpdmUuDQo+IA0KPiBJIHRoaW5rIGFsbCBvZiB0aGVz
-ZSB2YXJpYW50cyBhcmUgdmFsaWQgd2l0aCBwcm9zIGFuZCBjb25zDQo+IDEuIHRlYWNoIHZhbGdy
-aW5kIGFib3V0IHRoaXM6DQo+IEFkZCB0byBjb3JlZ3JpbmQvbV9zeXN3cmFwL3N5c3dyYXAtbGlu
-dXguYyAoYW5kIHRoZSByZWxldmFudCBoZWFkZXIgZmlsZXMpDQo+IGtub3dsZWRnZSBhYm91dCB3
-aGljaCBwYXJ0cyBhcmUgYWN0dWFsbHkgdG91Y2hlZC4NCj4gMi4gdXNlIGRlc2lnbmF0ZWQgaW5p
-dGlhbGl6ZXJzDQo+IDMuIHVzZSBtZW1zZXQNCj4gMy4gdXNlIGEgdmFsZ3JpbmQgY2FsbGJhY2sg
-VkdfVVNFUlJFUV9fTUFLRV9NRU1fREVGSU5FRCB0byB0ZWxsIHRoYXQgdGhpcyBtZW1vcnkgaXMg
-ZGVmaW5lZA0KPiANCg0KVGhhbmsgeW91IGFsbCB2ZXJ5IG11Y2ggZm9yIHRha2luZyBwYXJ0IGlu
-IHRoZSBkaXNjdXNzaW9uLg0KQWxzbywgb25lIG1heSB1c2UgdGhlIFZhbGdyaW5kIHRlY2hub2xv
-Z3kgdG8gc3VwcHJlc3MgdGhlIHVud2FudGVkIA0KcmVwb3J0cyBieSBhZGRpbmcgdGhlIFZhbGdy
-aW5kIHNwZWNpZmljIGZvcm1hdCBmaWxlIHZhbGdyaW5kLnN1cHAgdG8gdGhlIA0KUUVNVSBwcm9q
-ZWN0LiBUaGUgZmlsZSBjb250ZW50IGlzIGV4dGVuZGFibGUgZm9yIGZ1dHVyZSBuZWVkcy4NCkFs
-bCB0aGUgY2FzZXMgd2UgbGlrZSB0byBzdXBwcmVzcyB3aWxsIGJlIHJlY291bnRlZCBpbiB0aGF0
-IGZpbGUuDQpBIGNhc2UgbG9va3MgbGlrZSB0aGUgc3RhY2sgZnJhZ21lbnRzLiBGb3IgaW5zdGFu
-Y2UsIGZyb20gUUVNVSBibG9jazoNCg0Kew0KICAgIGh3L2Jsb2NrL2hkLWdlb21ldHJ5LmMNCiAg
-ICBNZW1jaGVjazpDb25kDQogICAgZnVuOmd1ZXNzX2Rpc2tfbGNocw0KICAgIGZ1bjpoZF9nZW9t
-ZXRyeV9ndWVzcw0KICAgIGZ1bjpibGtjb25mX2dlb21ldHJ5DQogICAgLi4uDQogICAgZnVuOmRl
-dmljZV9zZXRfcmVhbGl6ZWQNCiAgICBmdW46cHJvcGVydHlfc2V0X2Jvb2wNCiAgICBmdW46b2Jq
-ZWN0X3Byb3BlcnR5X3NldA0KICAgIGZ1bjpvYmplY3RfcHJvcGVydHlfc2V0X3FvYmplY3QNCiAg
-ICBmdW46b2JqZWN0X3Byb3BlcnR5X3NldF9ib29sDQp9DQoNClRoZSBudW1iZXIgb2Ygc3VwcHJl
-c3NlZCBjYXNlcyBhcmUgcmVwb3J0ZWQgYnkgdGhlIFZhbGdyaW5kIHdpdGggZXZlcnkgDQpydW46
-ICJFUlJPUiBTVU1NQVJZOiA1IGVycm9ycyBmcm9tIDMgY29udGV4dHMgKHN1cHByZXNzZWQ6IDAg
-ZnJvbSAwKSINCg0KQW5kcmV5DQoNCj4+DQo+PiBQYW9sbw0KPj4NCj4+PiAtLS0NCj4+PiAgIHRh
-cmdldC9pMzg2L2t2bS5jIHwgMyArKysNCj4+PiAgIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlv
-bnMoKykNCj4+Pg0KPj4+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9rdm0uYyBiL3RhcmdldC9p
-Mzg2L2t2bS5jDQo+Pj4gaW5kZXggZGJiYjEzNy4uZWQ1N2UzMSAxMDA2NDQNCj4+PiAtLS0gYS90
-YXJnZXQvaTM4Ni9rdm0uYw0KPj4+ICsrKyBiL3RhcmdldC9pMzg2L2t2bS5jDQo+Pj4gQEAgLTE5
-MCw2ICsxOTAsNyBAQCBzdGF0aWMgaW50IGt2bV9nZXRfdHNjKENQVVN0YXRlICpjcykNCj4+PiAg
-ICAgICAgICAgcmV0dXJuIDA7DQo+Pj4gICAgICAgfQ0KPj4+ICAgDQo+Pj4gKyAgICBtZW1zZXQo
-Jm1zcl9kYXRhLCAwLCBzaXplb2YobXNyX2RhdGEpKTsNCj4+PiAgICAgICBtc3JfZGF0YS5pbmZv
-Lm5tc3JzID0gMTsNCj4+PiAgICAgICBtc3JfZGF0YS5lbnRyaWVzWzBdLmluZGV4ID0gTVNSX0lB
-MzJfVFNDOw0KPj4+ICAgICAgIGVudi0+dHNjX3ZhbGlkID0gIXJ1bnN0YXRlX2lzX3J1bm5pbmco
-KTsNCj4+PiBAQCAtMTcwNiw2ICsxNzA3LDcgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVT
-dGF0ZSAqY3MpDQo+Pj4gICANCj4+PiAgICAgICBpZiAoaGFzX3hzYXZlKSB7DQo+Pj4gICAgICAg
-ICAgIGVudi0+eHNhdmVfYnVmID0gcWVtdV9tZW1hbGlnbig0MDk2LCBzaXplb2Yoc3RydWN0IGt2
-bV94c2F2ZSkpOw0KPj4+ICsgICAgICAgIG1lbXNldChlbnYtPnhzYXZlX2J1ZiwgMCwgc2l6ZW9m
-KHN0cnVjdCBrdm1feHNhdmUpKTsNCj4+PiAgICAgICB9DQo+Pj4gICANCj4+PiAgICAgICBtYXhf
-bmVzdGVkX3N0YXRlX2xlbiA9IGt2bV9tYXhfbmVzdGVkX3N0YXRlX2xlbmd0aCgpOw0KPj4+IEBA
-IC0zNDc3LDYgKzM0NzksNyBAQCBzdGF0aWMgaW50IGt2bV9wdXRfZGVidWdyZWdzKFg4NkNQVSAq
-Y3B1KQ0KPj4+ICAgICAgICAgICByZXR1cm4gMDsNCj4+PiAgICAgICB9DQo+Pj4gICANCj4+PiAr
-ICAgIG1lbXNldCgmZGJncmVncywgMCwgc2l6ZW9mKGRiZ3JlZ3MpKTsNCj4+PiAgICAgICBmb3Ig
-KGkgPSAwOyBpIDwgNDsgaSsrKSB7DQo+Pj4gICAgICAgICAgIGRiZ3JlZ3MuZGJbaV0gPSBlbnYt
-PmRyW2ldOw0KPj4+ICAgICAgIH0NCj4+PiAtLSANCj4+PiAxLjguMy4xDQo+Pj4NCj4+DQo+Pg0K
-PiANCg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
+
+
+On 31.07.19 14:04, Andrey Shinkevich wrote:
+> On 31/07/2019 10:24, Christian Borntraeger wrote:
+>>
+>>
+>> On 30.07.19 21:20, Paolo Bonzini wrote:
+>>> On 30/07/19 18:01, Andrey Shinkevich wrote:
+>>>> Not the whole structure is initialized before passing it to the KVM.
+>>>> Reduce the number of Valgrind reports.
+>>>>
+>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>>
+>>> Christian, is this the right fix?  It's not expensive so it wouldn't be
+>>> an issue, just checking if there's any better alternative.
+>>
+>> I think all of these variants are valid with pros and cons
+>> 1. teach valgrind about this:
+>> Add to coregrind/m_syswrap/syswrap-linux.c (and the relevant header files)
+>> knowledge about which parts are actually touched.
+>> 2. use designated initializers
+>> 3. use memset
+>> 3. use a valgrind callback VG_USERREQ__MAKE_MEM_DEFINED to tell that this memory is defined
+>>
+> 
+> Thank you all very much for taking part in the discussion.
+> Also, one may use the Valgrind technology to suppress the unwanted 
+> reports by adding the Valgrind specific format file valgrind.supp to the 
+> QEMU project. The file content is extendable for future needs.
+> All the cases we like to suppress will be recounted in that file.
+> A case looks like the stack fragments. For instance, from QEMU block:
+> 
+> {
+>     hw/block/hd-geometry.c
+>     Memcheck:Cond
+>     fun:guess_disk_lchs
+>     fun:hd_geometry_guess
+>     fun:blkconf_geometry
+>     ...
+>     fun:device_set_realized
+>     fun:property_set_bool
+>     fun:object_property_set
+>     fun:object_property_set_qobject
+>     fun:object_property_set_bool
+> }
+> 
+> The number of suppressed cases are reported by the Valgrind with every 
+> run: "ERROR SUMMARY: 5 errors from 3 contexts (suppressed: 0 from 0)"
+> 
+> Andrey
+
+Yes, indeed that would be another variant. How performance critical are
+the fixed locations? That might have an impact on what is the best solution.
+From a cleanliness approach doing 1 (adding the ioctl definition to valgrind)
+is certainly the most beautiful way. I did that in the past, look for example at
+
+https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=c2baee9b7bf043702c130de0771a4df439fcf403
+or 
+https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=00a31dd3d1e7101b331c2c83fca6c666ba35d910
+
+for examples. 
+
+
+> 
+>>>
+>>> Paolo
+>>>
+>>>> ---
+>>>>   target/i386/kvm.c | 3 +++
+>>>>   1 file changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>>> index dbbb137..ed57e31 100644
+>>>> --- a/target/i386/kvm.c
+>>>> +++ b/target/i386/kvm.c
+>>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
+>>>>           return 0;
+>>>>       }
+>>>>   
+>>>> +    memset(&msr_data, 0, sizeof(msr_data));
+>>>>       msr_data.info.nmsrs = 1;
+>>>>       msr_data.entries[0].index = MSR_IA32_TSC;
+>>>>       env->tsc_valid = !runstate_is_running();
+>>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>>   
+>>>>       if (has_xsave) {
+>>>>           env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+>>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+>>>>       }
+>>>>   
+>>>>       max_nested_state_len = kvm_max_nested_state_length();
+>>>> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
+>>>>           return 0;
+>>>>       }
+>>>>   
+>>>> +    memset(&dbgregs, 0, sizeof(dbgregs));
+>>>>       for (i = 0; i < 4; i++) {
+>>>>           dbgregs.db[i] = env->dr[i];
+>>>>       }
+>>>> -- 
+>>>> 1.8.3.1
+>>>>
+>>>
+>>>
+>>
+> 
+
