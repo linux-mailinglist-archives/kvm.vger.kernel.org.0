@@ -2,60 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15B2F7C27A
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 14:58:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6CB27C2A2
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 15:02:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727841AbfGaM61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 08:58:27 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37541 "EHLO
+        id S1729324AbfGaNCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 09:02:21 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44044 "EHLO
         mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728027AbfGaM60 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 08:58:26 -0400
-Received: by mail-wr1-f68.google.com with SMTP id n9so44503792wrr.4
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 05:58:25 -0700 (PDT)
+        with ESMTP id S1726559AbfGaNCU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 09:02:20 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p17so69572706wrf.11
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 06:02:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=5fP2qCBEwihSuFPG1uN/AQ6+YLyq3LrKayldIArWOpA=;
-        b=BuTELiIinysGxBmbRW5i9O0Dp/dzSEkEemnYoCyNaGu83gn0wObwBHgHITeMyO/n2O
-         vuN6fL7vHnwQtPJB24E1IVhSWNkwxFYg2ObqdhQdCrTSz1Lwez0cuQb8Jqo3wxlhxFtI
-         ze8IPv/gjnZbaZ0ik/3M+UtrQ8cIIdC/JED++xxbsr1dZQccclh0u5ZxG5ickMTYXogD
-         GyRmGgdGnjKQZU+WCLk8FzaSKj2IUqnJcrRsamFmnPc9m04gJvrUgQsEdRxGsOBgQIVv
-         m/JgY2fO+olC1oMsyYCt/ZmUCBM+uuCqzrsyp62QBngzkQWS9lhDhqrLDm2b6N+FswO7
-         H8+A==
-X-Gm-Message-State: APjAAAWr26HeiKXrjGntwXn+7yeeJ34hrSbyPKIBeLuWd94YM47WRjg4
-        OdDqFomQHcF2iShSGaSQhlhbkQ==
-X-Google-Smtp-Source: APXvYqw1s7YQ7Musw4tNdkwIb4qMQbr7VmKUKXvia/n7SbLvxes86b9xZXW+ODrBjEijk/QTUhcq2w==
-X-Received: by 2002:adf:de90:: with SMTP id w16mr37579726wrl.217.1564577905024;
-        Wed, 31 Jul 2019 05:58:25 -0700 (PDT)
+        bh=OrhRm6hcm8XAS5rJURO8NQ/9XsfNWDSC5tHBQHcDz/M=;
+        b=AEGsukuKBK7iPDDbLoBBmiEZKf6Ai5xUVivOvPsjD26vLTniv7Qa098d7fyeAT47RL
+         fcm/zGUQElscAOMY7asKHz4tWrULX/BfFkXt/3/vNLcdXxfHkb+hJACxmr2o8SOjkmm9
+         QGixLmnFncCzC6b7Qz94nci/Gk34VSpzy45rwGLuLMppXx+oFoaUqCEX1CBnaQFFdbOq
+         CkEufdJRGT6yfBuOuUv4tzBPAl5eWnz4R5Ih8a3VhxgxKsPqOxjIXGoJZTaRKmMOCxdr
+         EoQX2axFTHTGlIPw/E39bt6TZTd2XbPkyfl/WJZVkpskoPoU36VYBY0S4uPKjm37x/P5
+         K1gA==
+X-Gm-Message-State: APjAAAXENpY1PhReASQopGap4KfhoDH2k67BHpCHFnZMEu6ucpZmj0R+
+        KuL6In2hCIkz/CImcBhqm4T+Xg==
+X-Google-Smtp-Source: APXvYqxf6pEx9kjzhl6+ziNUinxsA8XNUQEe22hXvk6qWrgDyW26ihoHLEH5Brf5eo9dygInUHQbJA==
+X-Received: by 2002:a5d:6ccd:: with SMTP id c13mr132842592wrc.4.1564578138595;
+        Wed, 31 Jul 2019 06:02:18 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3? ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
-        by smtp.gmail.com with ESMTPSA id g12sm100117916wrv.9.2019.07.31.05.58.23
+        by smtp.gmail.com with ESMTPSA id z7sm66068294wrh.67.2019.07.31.06.02.17
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 05:58:24 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: selftests: Enable dirty_log_test on s390x
-To:     Thomas Huth <thuth@redhat.com>, Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>
-References: <20190730100112.18205-1-thuth@redhat.com>
- <20190730100112.18205-3-thuth@redhat.com>
- <20190730105721.z4zsul7uxl2igoue@kamzik.brq.redhat.com>
- <a9824265-daf8-db36-86b8-ad890dc73f14@redhat.com>
+        Wed, 31 Jul 2019 06:02:18 -0700 (PDT)
+Subject: Re: [PATCH] selftests: kvm: Adding config fragments
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, drjones@redhat.com,
+        sean.j.christopherson@intel.com
+References: <20190731105540.28962-1-naresh.kamboju@linaro.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <afdf2b18-47fd-aa48-41b7-130122590068@redhat.com>
-Date:   Wed, 31 Jul 2019 14:58:23 +0200
+Message-ID: <43fd5a9b-7ecd-3fff-2381-1dfce7b8618a@redhat.com>
+Date:   Wed, 31 Jul 2019 15:02:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <a9824265-daf8-db36-86b8-ad890dc73f14@redhat.com>
+In-Reply-To: <20190731105540.28962-1-naresh.kamboju@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,18 +56,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/19 10:19, Thomas Huth wrote:
->>> @@ -293,6 +341,10 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
->>>  	 * case where the size is not aligned to 64 pages.
->>>  	 */
->>>  	guest_num_pages = (1ul << (30 - guest_page_shift)) + 16;
->>> +#ifdef __s390x__
->>> +	/* Round up to multiple of 1M (segment size) */
->>> +	guest_num_pages = (guest_num_pages + 0xff) & ~0xffUL;
->> We could maybe do this for all architectures as well.
-> It's really only needed on s390x, so I think we should keep the #ifdef here.
+On 31/07/19 12:55, Naresh Kamboju wrote:
+> selftests kvm test cases need pre-required kernel configs for the test
+> to get pass.
+> 
+> Signed-off-by: Naresh Kamboju <naresh.kamboju@linaro.org>
 
-Yes, on non-s390 we should keep covering the case where the size is not
-a multiple of BITS_PER_LONG.
+Most of these are selected by other items.  CONFIG_KVM should be enough
+on ARM and s390 but MIPS, x86 and PPC may also need to select the
+specific "flavors" (for example Intel/AMD for x86).
+
+How are these used?  Are they used to build a kernel, or to check that
+an existing kernel supports virtualization?
 
 Paolo
+
+> +CONFIG_KVM=y
+> +CONFIG_VHOST_NET=y
+> +CONFIG_VHOST=y
+> +CONFIG_VHOST_CROSS_ENDIAN_LEGACY=y
+> +CONFIG_USER_RETURN_NOTIFIER=y
+> +CONFIG_PREEMPT_NOTIFIERS=y
+> +CONFIG_TRANSPARENT_HUGEPAGE=y
+> +CONFIG_TRANSPARENT_HUGEPAGE_MADVISE=y
+> +CONFIG_THP_SWAP=y
+> +CONFIG_TRANSPARENT_HUGE_PAGECACHE=y
+> +CONFIG_IRQ_BYPASS_MANAGER=y
+> +CONFIG_XARRAY_MULTI=y
+> 
+
