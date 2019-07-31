@@ -2,100 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 453427CE51
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 22:28:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44BCB7D025
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 23:33:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730562AbfGaU2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 16:28:05 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:32863 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727686AbfGaU2F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 16:28:05 -0400
-Received: by mail-io1-f65.google.com with SMTP id z3so20352348iog.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 13:28:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dBGsm49OysEg7bHxsXfAQevchwfTyjC8ZOrR2juUMrM=;
-        b=Q2Q5ZZvLyygWDWivclFZ/bbeT+uEMirhfkYAS8VsgPhwm33/Jc50fxvztwqBGotkl4
-         Z77nFFONeALg1wxjQFQEPl5UoFIbBWWFs4S9nWN1EOgNVML9wAHPIIZQibmOIIzwDJz3
-         if2AqAe6gOov1+C6pHUgExQbnR6eZzQ3t9F1GhfgnVBios2EmHYkB3loA3VHMkVMcBYK
-         db7fMEI7Srk5UcuHSJku7GmxCP4WnpXaqwUJfvXX2eOWE7En4qRQS569NYYC20Z5nscq
-         qV+0lUKrc8OxaEadG5SqiqKehkqy837x0fj+4KGHGek8q/RibYkZ32XYlvloXV18PUvY
-         6Rfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dBGsm49OysEg7bHxsXfAQevchwfTyjC8ZOrR2juUMrM=;
-        b=YZtpBZhjdDdLDdUeZ9vXKEn5xA9As7k1r71RzjYG6F9lhBYm751pgNlK8QLaH8difW
-         c3MpplZMoRQDczAg4khGeiuWUIhSC3QPkTE40z2fBj+WzQLXutEp5LY1YmEKl24UebtF
-         9NFMZRO5L+qTQdMt1tJWLwQSmjuvsvkxjuvhXapTbdk2mRuqraj3g1o7rQyJ03Q4vPEI
-         t/mAAVjCdNp0NpHSyJp7u9HPmS3CLU3JkPecZv6FfoW4m67CjZ9FtT7DEy1Xa/dN62qn
-         P3h7JdQ/HpCiUn7u3swacNpn/tNFFIwDbtONcEWStha8p6mK7ZHLUpYwErxiqBOfbT0V
-         duCQ==
-X-Gm-Message-State: APjAAAU9OfZxXM9Cb/1FYR8c6LrX9yhstMGyvbPWuQkNQ4mxk8Bm9G4D
-        UZZ5YUQzggWaEStLNDdcpHqlnDsRRodWhaEf4jZtjQ==
-X-Google-Smtp-Source: APXvYqyOzq7qMPN4kDm5eOtE9EWegyQb/wzIOUIkgNtV+zq8BKZKflp19YlrudQqhSU6vBVMkwR59UO5rIWIwtPEaWs=
-X-Received: by 2002:a6b:6310:: with SMTP id p16mr241134iog.118.1564604884032;
- Wed, 31 Jul 2019 13:28:04 -0700 (PDT)
+        id S1730086AbfGaVdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 17:33:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40966 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728928AbfGaVdb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 17:33:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B44F630872C2;
+        Wed, 31 Jul 2019 21:33:30 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5CE355D9C9;
+        Wed, 31 Jul 2019 21:33:28 +0000 (UTC)
+Date:   Wed, 31 Jul 2019 15:33:27 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio: re-arrange vfio region definitions
+Message-ID: <20190731153327.7d65b90d@x1.home>
+In-Reply-To: <05e97697-70a3-51dd-dd2a-4a8bf6c380bb@redhat.com>
+References: <20190717114956.16263-1-cohuck@redhat.com>
+        <05e97697-70a3-51dd-dd2a-4a8bf6c380bb@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20190620110240.25799-1-vkuznets@redhat.com> <20190620110240.25799-4-vkuznets@redhat.com>
- <CALMp9eQ85h58NMDh-yOYvHN6_2f2T-wu63f+yLnNbwuG+p3Uvw@mail.gmail.com>
- <87ftmm71p3.fsf@vitty.brq.redhat.com> <36a9f411-f90c-3ffa-9ee3-6ebee13a763f@redhat.com>
-In-Reply-To: <36a9f411-f90c-3ffa-9ee3-6ebee13a763f@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 31 Jul 2019 13:27:53 -0700
-Message-ID: <CALMp9eQLCEzfdNzdhPtCf3bD-5c6HrSvJqP7idyoo4Gf3i5O1w@mail.gmail.com>
-Subject: Re: [PATCH RFC 3/5] x86: KVM: svm: clear interrupt shadow on all
- paths in skip_emulated_instruction()
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 31 Jul 2019 21:33:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 31, 2019 at 9:37 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 31/07/19 15:50, Vitaly Kuznetsov wrote:
-> > Jim Mattson <jmattson@google.com> writes:
-> >
-> >> On Thu, Jun 20, 2019 at 4:02 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >>>
-> >>> Regardless of the way how we skip instruction, interrupt shadow needs to be
-> >>> cleared.
-> >>
-> >> This change is definitely an improvement, but the existing code seems
-> >> to assume that we never call skip_emulated_instruction on a
-> >> POP-SS/MOV-to-SS/STI. Is that enforced anywhere?
-> >
-> > (before I send v1 of the series) I looked at the current code and I
-> > don't think it is enforced, however, VMX version does the same and
-> > honestly I can't think of a situation when we would be doing 'skip' for
-> > such an instruction.... and there's nothing we can easily enforce from
-> > skip_emulated_instruction() as we have no idea what the instruction
-> > is...
+On Wed, 31 Jul 2019 20:47:07 +0200
+Auger Eric <eric.auger@redhat.com> wrote:
 
-Can't we still coerce kvm into emulating any instruction by leveraging
-a stale ITLB entry? The 'emulator' kvm-unit-test did this before the
-KVM forced emulation prefix was introduced, but I haven't checked to
-see if the original (admittedly fragile) approach still works. Also,
-for POP-SS, you could always force emulation by mapping the %rsp
-address beyond guest physical memory. The hypervisor would then have
-to emulate the instruction to provide bus-error semantics.
+> Hi Connie,
+> 
+> On 7/17/19 1:49 PM, Cornelia Huck wrote:
+> > It is easy to miss already defined region types. Let's re-arrange
+> > the definitions a bit and add more comments to make it hopefully
+> > a bit clearer.
+> > 
+> > No functional change.
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  include/uapi/linux/vfio.h | 19 ++++++++++++-------
+> >  1 file changed, 12 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 8f10748dac79..d9bcf40240be 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -295,15 +295,23 @@ struct vfio_region_info_cap_type {
+> >  	__u32 subtype;	/* type specific */
+> >  };
+> >  
+> > +/*
+> > + * List of region types, global per bus driver.
+> > + * If you introduce a new type, please add it here.
+> > + */
+> > +
+> > +/* PCI region type containing a PCI vendor part */
+> >  #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
+> >  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> > +#define VFIO_REGION_TYPE_GFX                    (1)
+> > +#define VFIO_REGION_TYPE_CCW			(2)
+> >  
+> > -/* 8086 Vendor sub-types */
+> > +/* 8086 vendor PCI sub-types */
+> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+> >  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+> >  
+> > -#define VFIO_REGION_TYPE_GFX                    (1)
+> > +/* GFX sub-types */
+> >  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+> >  
+> >  /**
+> > @@ -353,20 +361,17 @@ struct vfio_region_gfx_edid {
+> >  #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
+> >  };
+> >  
+> > -#define VFIO_REGION_TYPE_CCW			(2)
+> >  /* ccw sub-types */
+> >  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+> >  
+> > +/* 10de vendor PCI sub-types */
+> >  /*
+> > - * 10de vendor sub-type
+> > - *
+> >   * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
+> >   */
+> >  #define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
+> >  
+> > +/* 1014 vendor PCI sub-types*/
+> >  /*
+> > - * 1014 vendor sub-type  
+> Maybe the 10de vendor sub-type and 1014 vendor sub-type could be put
+> just after /* 8086 vendor PCI sub-types */
+> 
+> More generally if it were possible to leave the subtypes close to their
+> parent type too, this would be beneficial I think.
+> 
+> Besides that becomes sensible to put all those definitions together.
 
-> I agree, I think a comment is worthwhile but we can live with the
-> limitation.
+Any sort of consolidation or grouping is an improvement here, thanks
+for taking this on, Connie!  I haven't started my branch yet for v5.4,
+but if you want to iterate to something agreeable, I'll happily take
+the end product :)  The original patch here looks like a good degree of
+consolidating the type definitions and improving consistency without
+moving large chunks of code.  Thanks,
 
-I think we can live with the limitation, but I'd really prefer to see
-a KVM exit with KVM_INTERNAL_ERROR_EMULATION for an instruction that
-kvm doesn't emulate properly. That seems better than just a comment
-that the virtual CPU doesn't behave as architected. (I realize that I
-am probably in the minority here.)
+Alex
