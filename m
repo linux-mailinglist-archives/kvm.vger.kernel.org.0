@@ -2,181 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 697977BAAA
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 09:25:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59AD87BB61
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 10:18:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728165AbfGaHZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 03:25:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55580 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727312AbfGaHZD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Jul 2019 03:25:03 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6V7M17P112509
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 03:25:02 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2u34xhca5y-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 03:25:02 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 31 Jul 2019 08:25:00 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 31 Jul 2019 08:24:55 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6V7OsDD41091580
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 Jul 2019 07:24:54 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B9CE9AE04D;
-        Wed, 31 Jul 2019 07:24:54 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5ADD0AE053;
-        Wed, 31 Jul 2019 07:24:54 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 31 Jul 2019 07:24:54 +0000 (GMT)
-Subject: Re: [PATCH 3/3] i386/kvm: initialize struct at full before ioctl call
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-        qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc:     kvm@vger.kernel.org, berto@igalia.com, mdroth@linux.vnet.ibm.com,
-        armbru@redhat.com, ehabkost@redhat.com, rth@twiddle.net,
-        mtosatti@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
-References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Wed, 31 Jul 2019 09:24:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726840AbfGaISB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 04:18:01 -0400
+Received: from thoth.sbs.de ([192.35.17.2]:59872 "EHLO thoth.sbs.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726185AbfGaISB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 04:18:01 -0400
+Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
+        by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id x6V8HsUc007864
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Jul 2019 10:17:54 +0200
+Received: from [139.22.32.241] ([139.22.32.241])
+        by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id x6V8HrnF023114;
+        Wed, 31 Jul 2019 10:17:53 +0200
+Subject: Re: [PATCH] kvm: arm: Promote KVM_ARM_TARGET_CORTEX_A7 to generic V7
+ core
+From:   Jan Kiszka <jan.kiszka@siemens.com>
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>,
+        Vladimir Murzin <vladimir.murzin@arm.com>
+Cc:     kvm <kvm@vger.kernel.org>
+References: <b486cb75-4b8e-c847-a019-81e822223fb6@web.de>
+Message-ID: <ad19bda0-48df-1df0-7fb0-fc7d88ab1964@siemens.com>
+Date:   Wed, 31 Jul 2019 10:17:53 +0200
+User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
+ Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
 MIME-Version: 1.0
-In-Reply-To: <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
+In-Reply-To: <b486cb75-4b8e-c847-a019-81e822223fb6@web.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19073107-4275-0000-0000-00000352498B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19073107-4276-0000-0000-000038633808
-Message-Id: <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-31_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907310078
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 30.07.19 21:20, Paolo Bonzini wrote:
-> On 30/07/19 18:01, Andrey Shinkevich wrote:
->> Not the whole structure is initialized before passing it to the KVM.
->> Reduce the number of Valgrind reports.
->>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+On 30.06.19 17:19, Jan Kiszka wrote:
+> From: Jan Kiszka <jan.kiszka@siemens.com>
 > 
-> Christian, is this the right fix?  It's not expensive so it wouldn't be
-> an issue, just checking if there's any better alternative.
+> The only difference between the currently supported A15 and A7 target
+> cores is the reset state of bit 11 in SCTLR. This bit is RES1 or RAO/WI
+> in other ARM cores, including ARMv8 ones. By promoting A7 to a generic
+> default target, this allows to use yet unsupported core types. E.g.,
+> this enables KVM on the A72 of the RPi4.
+> 
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+>  arch/arm/include/uapi/asm/kvm.h                |  1 +
+>  arch/arm/kvm/Makefile                          |  2 +-
+>  arch/arm/kvm/{coproc_a7.c => coproc_generic.c} | 18 +++++++++---------
+>  arch/arm/kvm/guest.c                           |  4 +---
+>  arch/arm/kvm/reset.c                           |  5 +----
+>  5 files changed, 13 insertions(+), 17 deletions(-)
+>  rename arch/arm/kvm/{coproc_a7.c => coproc_generic.c} (70%)
+> 
+> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+> index 4602464ebdfb..e0c5bbec3d3d 100644
+> --- a/arch/arm/include/uapi/asm/kvm.h
+> +++ b/arch/arm/include/uapi/asm/kvm.h
+> @@ -70,6 +70,7 @@ struct kvm_regs {
+>  /* Supported Processor Types */
+>  #define KVM_ARM_TARGET_CORTEX_A15	0
+>  #define KVM_ARM_TARGET_CORTEX_A7	1
+> +#define KVM_ARM_TARGET_GENERIC_V7	KVM_ARM_TARGET_CORTEX_A7
+>  #define KVM_ARM_NUM_TARGETS		2
+> 
+>  /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
+> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+> index 531e59f5be9c..d959f89135d6 100644
+> --- a/arch/arm/kvm/Makefile
+> +++ b/arch/arm/kvm/Makefile
+> @@ -21,7 +21,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+> 
+>  obj-y += kvm-arm.o init.o interrupts.o
+>  obj-y += handle_exit.o guest.o emulate.o reset.o
+> -obj-y += coproc.o coproc_a15.o coproc_a7.o   vgic-v3-coproc.o
+> +obj-y += coproc.o coproc_a15.o coproc_generic.o   vgic-v3-coproc.o
+>  obj-y += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+>  obj-y += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+>  obj-y += $(KVM)/arm/aarch32.o
+> diff --git a/arch/arm/kvm/coproc_a7.c b/arch/arm/kvm/coproc_generic.c
+> similarity index 70%
+> rename from arch/arm/kvm/coproc_a7.c
+> rename to arch/arm/kvm/coproc_generic.c
+> index 40f643e1e05c..b32a541ad7bf 100644
+> --- a/arch/arm/kvm/coproc_a7.c
+> +++ b/arch/arm/kvm/coproc_generic.c
+> @@ -15,28 +15,28 @@
+>  #include "coproc.h"
+> 
+>  /*
+> - * Cortex-A7 specific CP15 registers.
+> + * Generic CP15 registers.
+>   * CRn denotes the primary register number, but is copied to the CRm in the
+>   * user space API for 64-bit register access in line with the terminology used
+>   * in the ARM ARM.
+>   * Important: Must be sorted ascending by CRn, CRM, Op1, Op2 and with 64-bit
+>   *            registers preceding 32-bit ones.
+>   */
+> -static const struct coproc_reg a7_regs[] = {
+> +static const struct coproc_reg generic_regs[] = {
+>  	/* SCTLR: swapped by interrupt.S. */
+>  	{ CRn( 1), CRm( 0), Op1( 0), Op2( 0), is32,
+>  			access_vm_reg, reset_val, c1_SCTLR, 0x00C50878 },
+>  };
+> 
+> -static struct kvm_coproc_target_table a7_target_table = {
+> -	.target = KVM_ARM_TARGET_CORTEX_A7,
+> -	.table = a7_regs,
+> -	.num = ARRAY_SIZE(a7_regs),
+> +static struct kvm_coproc_target_table generic_target_table = {
+> +	.target = KVM_ARM_TARGET_GENERIC_V7,
+> +	.table = generic_regs,
+> +	.num = ARRAY_SIZE(generic_regs),
+>  };
+> 
+> -static int __init coproc_a7_init(void)
+> +static int __init coproc_generic_init(void)
+>  {
+> -	kvm_register_target_coproc_table(&a7_target_table);
+> +	kvm_register_target_coproc_table(&generic_target_table);
+>  	return 0;
+>  }
+> -late_initcall(coproc_a7_init);
+> +late_initcall(coproc_generic_init);
+> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+> index 684cf64b4033..d33a24e70f49 100644
+> --- a/arch/arm/kvm/guest.c
+> +++ b/arch/arm/kvm/guest.c
+> @@ -275,12 +275,10 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  int __attribute_const__ kvm_target_cpu(void)
+>  {
+>  	switch (read_cpuid_part()) {
+> -	case ARM_CPU_PART_CORTEX_A7:
+> -		return KVM_ARM_TARGET_CORTEX_A7;
+>  	case ARM_CPU_PART_CORTEX_A15:
+>  		return KVM_ARM_TARGET_CORTEX_A15;
+>  	default:
+> -		return -EINVAL;
+> +		return KVM_ARM_TARGET_GENERIC_V7;
+>  	}
+>  }
+> 
+> diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+> index eb4174f6ebbd..d6e07500bab4 100644
+> --- a/arch/arm/kvm/reset.c
+> +++ b/arch/arm/kvm/reset.c
+> @@ -43,13 +43,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	struct kvm_regs *reset_regs;
+> 
+>  	switch (vcpu->arch.target) {
+> -	case KVM_ARM_TARGET_CORTEX_A7:
+> -	case KVM_ARM_TARGET_CORTEX_A15:
+> +	default:
+>  		reset_regs = &cortexa_regs_reset;
+>  		vcpu->arch.midr = read_cpuid_id();
+>  		break;
+> -	default:
+> -		return -ENODEV;
+>  	}
+> 
+>  	/* Reset core registers */
+> --
+> 2.16.4
+> 
 
-I think all of these variants are valid with pros and cons
-1. teach valgrind about this:
-Add to coregrind/m_syswrap/syswrap-linux.c (and the relevant header files)
-knowledge about which parts are actually touched.
-2. use designated initializers
-3. use memset
-3. use a valgrind callback VG_USERREQ__MAKE_MEM_DEFINED to tell that this memory is defined
+Any comments on this one now? Vladimir, you had some concerns in the other
+thread. I'm not sure if I got them correctly, if they apply here.
 
-> 
-> Paolo
-> 
->> ---
->>  target/i386/kvm.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index dbbb137..ed57e31 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
->>          return 0;
->>      }
->>  
->> +    memset(&msr_data, 0, sizeof(msr_data));
->>      msr_data.info.nmsrs = 1;
->>      msr_data.entries[0].index = MSR_IA32_TSC;
->>      env->tsc_valid = !runstate_is_running();
->> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>  
->>      if (has_xsave) {
->>          env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
->> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
->>      }
->>  
->>      max_nested_state_len = kvm_max_nested_state_length();
->> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
->>          return 0;
->>      }
->>  
->> +    memset(&dbgregs, 0, sizeof(dbgregs));
->>      for (i = 0; i < 4; i++) {
->>          dbgregs.db[i] = env->dr[i];
->>      }
->> -- 
->> 1.8.3.1
->>
-> 
-> 
+Jan
 
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
