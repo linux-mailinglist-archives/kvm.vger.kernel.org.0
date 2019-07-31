@@ -2,110 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE8FE7C73B
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:47:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98B557C80C
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 18:01:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730196AbfGaPrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:47:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8701 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730177AbfGaPrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:47:12 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 318DE2D1CE;
-        Wed, 31 Jul 2019 15:47:12 +0000 (UTC)
-Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F6E55C1B5;
-        Wed, 31 Jul 2019 15:47:11 +0000 (UTC)
-Date:   Wed, 31 Jul 2019 17:47:09 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio: re-arrange vfio region definitions
-Message-ID: <20190731174709.471126e6.cohuck@redhat.com>
-In-Reply-To: <20190717114956.16263-1-cohuck@redhat.com>
-References: <20190717114956.16263-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
+        id S1729830AbfGaQBj convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 31 Jul 2019 12:01:39 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:56708 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727276AbfGaQBj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Jul 2019 12:01:39 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id D887D26E79
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 16:01:37 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id C5337274A3; Wed, 31 Jul 2019 16:01:37 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+        pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
+        NO_RELAYS autolearn=unavailable version=3.3.1
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 203477] [AMD][KVM] Windows L1 guest becomes extremely slow and
+ unusable after enabling Hyper-V
+Date:   Wed, 31 Jul 2019 16:01:36 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jiribelsky@hotmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-203477-28872-H7K7BApFLt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203477-28872@https.bugzilla.kernel.org/>
+References: <bug-203477-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 31 Jul 2019 15:47:12 +0000 (UTC)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 17 Jul 2019 13:49:56 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=203477
 
-> It is easy to miss already defined region types. Let's re-arrange
-> the definitions a bit and add more comments to make it hopefully
-> a bit clearer.
-> 
-> No functional change.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  include/uapi/linux/vfio.h | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
+wUFr (jiribelsky@hotmail.com) changed:
 
-Friendly ping :)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jiribelsky@hotmail.com
 
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 8f10748dac79..d9bcf40240be 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -295,15 +295,23 @@ struct vfio_region_info_cap_type {
->  	__u32 subtype;	/* type specific */
->  };
->  
-> +/*
-> + * List of region types, global per bus driver.
-> + * If you introduce a new type, please add it here.
-> + */
-> +
-> +/* PCI region type containing a PCI vendor part */
->  #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
->  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
-> +#define VFIO_REGION_TYPE_GFX                    (1)
-> +#define VFIO_REGION_TYPE_CCW			(2)
->  
-> -/* 8086 Vendor sub-types */
-> +/* 8086 vendor PCI sub-types */
->  #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
->  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
->  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
->  
-> -#define VFIO_REGION_TYPE_GFX                    (1)
-> +/* GFX sub-types */
->  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
->  
->  /**
-> @@ -353,20 +361,17 @@ struct vfio_region_gfx_edid {
->  #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
->  };
->  
-> -#define VFIO_REGION_TYPE_CCW			(2)
->  /* ccw sub-types */
->  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
->  
-> +/* 10de vendor PCI sub-types */
->  /*
-> - * 10de vendor sub-type
-> - *
->   * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
->   */
->  #define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
->  
-> +/* 1014 vendor PCI sub-types*/
->  /*
-> - * 1014 vendor sub-type
-> - *
->   * IBM NPU NVlink2 ATSD (Address Translation Shootdown) register of NPU
->   * to do TLB invalidation on a GPU.
->   */
+--- Comment #2 from wUFr (jiribelsky@hotmail.com) ---
+I have same errors pop in "dmesg", but only when my second VM (Ubuntu 18.04) is
+running. Windows 10 VM does not seem to be causing these (at least not for me).
+Kernel 5.1.16-050116-generic (Elementary OS 5), QEMU emulator version
+2.11.1(Debian 1:2.11+dfsg-1ubuntu7.15). Can post configs later if needed
 
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
