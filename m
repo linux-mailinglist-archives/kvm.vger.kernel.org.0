@@ -2,188 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E66D7C162
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 14:32:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A555C7C1AB
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 14:40:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387643AbfGaMcK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 08:32:10 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54030 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387639AbfGaMcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 08:32:10 -0400
-Received: by mail-wm1-f67.google.com with SMTP id x15so60652480wmj.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 05:32:09 -0700 (PDT)
+        id S2387942AbfGaMjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 08:39:39 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:33945 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726378AbfGaMji (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 08:39:38 -0400
+Received: by mail-qk1-f195.google.com with SMTP id t8so49057984qkt.1
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 05:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ntHuD78E1C49ZvRvAJ6XgDuP1G4iMkkai3jqPaZStVQ=;
+        b=QYLt5oLxRfkO8iVQlcM8CFDLc+4aB1oq1G5gPzD6FWEByB19Sd3Eq075eKqH5NmW7r
+         yXUDMxL5fze2A5G71ENrhWbScZuetvwRZCvr7X56doCnXI9uRYUnRWTYeIM3gRLiUeyi
+         /eh7SRWLFZtd2zOIxcaSfePSYA3z8PqF8WyX2YtQr70udr1hR6V+9yQyJWWOm0FhCYn3
+         RrLimA3hfR0j6oFPuGpOrXLDhZfmxhVa2mCfh5ZGJrV7tIaubv2+pcRGOH8HyUhlMu/X
+         gRA+wBoXedUidty3leb/SYk1yPOT9L3tkNi4HVKQb4piuEQsqs8j7Li0axrda17mfn/2
+         BcXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=piBqViNj5aiB48a8+E54EeLVhMXIbc+xWJcJdyIBVRU=;
-        b=f8WXT5aY5wZdRpik55tMo4sDrc37aLh+UbITyfWNEiCXAwtfUoQ6bRdzqmXreqSQRL
-         F10/RTsnkK2bE5COCi/kVmCZaanG9r01vlDydnYFU9HQ6YzwoJPJi68oyCOlBbFYN4jD
-         GQ/s9ztPDnUxx8jv+bDsZ2squfIMJX+mD8Irq9gkn+ZdtL89dxoOW1n4r4j75dOAcZo3
-         RC3yd+J2FOh/M8fjFkA7e+V5/NNgfzKoq6j63OEIb78gIVkK7eFmNr/0/F8EvQulBz7t
-         eLEPdopQffXGnJiBSwCwqcgjU6/lANWiQKsWjGOhfGlAzuIxvIPC8InKOWF3MnZ1Xf/D
-         18QQ==
-X-Gm-Message-State: APjAAAWpTjq2hsEKLZCTTR4OcS4J7um4nMtne/pFcYX+Z1Fd9411fex1
-        C4wZWq5aZbctWNA2C19nBZxnHA==
-X-Google-Smtp-Source: APXvYqxDwbqMowdTxUGOO/zJ1b5eZ6/+R1PBgjWPGyp7OZCh+kRuXlsNV/ubjRsD+DSZFNBVLs9Lcw==
-X-Received: by 2002:a1c:988a:: with SMTP id a132mr108312390wme.165.1564576328381;
-        Wed, 31 Jul 2019 05:32:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3? ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
-        by smtp.gmail.com with ESMTPSA id b8sm62042864wrr.43.2019.07.31.05.32.07
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 05:32:07 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
- before ioctl call
-To:     Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-        qemu-block@nongnu.org, vsementsov@virtuozzo.com, berto@igalia.com,
-        ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
-        mdroth@linux.vnet.ibm.com, armbru@redhat.com, den@openvz.org,
-        rth@twiddle.net
-References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
- <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com> <m136imo9ps.fsf@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <038487b3-0b39-0695-7ef7-ede1b3143ad1@redhat.com>
-Date:   Wed, 31 Jul 2019 14:32:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ntHuD78E1C49ZvRvAJ6XgDuP1G4iMkkai3jqPaZStVQ=;
+        b=XoKv9zudZynb5zS853SdmhFhggBfPDGz+jUmMoL+AW6LCTUWmPzDR45CIyLU/O3Zxq
+         wA21pol5/5/fsPQs90Q+6bcrXtOl51b6tnunYc8JkqFmUSgITVdWBrtiy7GaqYR45lC9
+         6uBJ6UCnuSL3QnUgcVKO4fgQp/cMgxozzwknukud4mj6aR7XwvWPR8pxJiorKE8/9CcA
+         s74A0LntR9acHwq3S55yNqEm0S+Jt7bCJnU4sW/65ZZ+6zI/QGNuDpiGkMuePz3lhS7B
+         jxn8hbyM22vvU+uPOcdH86YlxqmZ3KUPlDpO5OKuCOLGpke6dg0gP7wPZF1bX8kUmr9J
+         S9LQ==
+X-Gm-Message-State: APjAAAVXzq74RGn0gsKh83yvjMXcfI4M/JNa4xYO4AuhzFGFiznAdf23
+        TjfasuFen9iFbYfmCI3hE9TIYQ==
+X-Google-Smtp-Source: APXvYqx/s09x34m2m60hGEG8oq9rNNiSt1/4j5qtIhV1B9Qgz5W3aPna7RR3oLU+V41Ml5DJ6UJ2Ng==
+X-Received: by 2002:a05:620a:1648:: with SMTP id c8mr79693913qko.106.1564576777216;
+        Wed, 31 Jul 2019 05:39:37 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id m12sm27127419qkk.123.2019.07.31.05.39.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 31 Jul 2019 05:39:36 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hsntH-0006OW-WA; Wed, 31 Jul 2019 09:39:36 -0300
+Date:   Wed, 31 Jul 2019 09:39:35 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
+ with worker
+Message-ID: <20190731123935.GC3946@ziepe.ca>
+References: <20190731084655.7024-1-jasowang@redhat.com>
+ <20190731084655.7024-8-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <m136imo9ps.fsf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190731084655.7024-8-jasowang@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/19 11:05, Christophe de Dinechin wrote:
+On Wed, Jul 31, 2019 at 04:46:53AM -0400, Jason Wang wrote:
+> We used to use RCU to synchronize MMU notifier with worker. This leads
+> calling synchronize_rcu() in invalidate_range_start(). But on a busy
+> system, there would be many factors that may slow down the
+> synchronize_rcu() which makes it unsuitable to be called in MMU
+> notifier.
 > 
-> Christian Borntraeger writes:
+> A solution is SRCU but its overhead is obvious with the expensive full
+> memory barrier. Another choice is to use seqlock, but it doesn't
+> provide a synchronization method between readers and writers. The last
+> choice is to use vq mutex, but it need to deal with the worst case
+> that MMU notifier must be blocked and wait for the finish of swap in.
 > 
->> On 30.07.19 18:44, Philippe Mathieu-Daudé wrote:
->>> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
->>>> Not the whole structure is initialized before passing it to the KVM.
->>>> Reduce the number of Valgrind reports.
->>>>
->>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>>> ---
->>>>  target/i386/kvm.c | 3 +++
->>>>  1 file changed, 3 insertions(+)
->>>>
->>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>>> index dbbb137..ed57e31 100644
->>>> --- a/target/i386/kvm.c
->>>> +++ b/target/i386/kvm.c
->>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
->>>>          return 0;
->>>>      }
->>>>
->>>> +    memset(&msr_data, 0, sizeof(msr_data));
->>>
->>> I wonder the overhead of this one...
->>
->> Cant we use designated initializers like in
->>
->> commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
->> Author:     Christian Borntraeger <borntraeger@de.ibm.com>
->> AuthorDate: Thu Oct 30 09:23:41 2014 +0100
->> Commit:     Paolo Bonzini <pbonzini@redhat.com>
->> CommitDate: Mon Dec 15 12:21:01 2014 +0100
->>
->>     valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
->>
->> and others?
->>
->> This should minimize the impact.
-> 
-> Oh, when you talked about using designated initializers, I thought you
-> were talking about fully initializing the struct, like so:
+> So this patch switches use a counter to track whether or not the map
+> was used. The counter was increased when vq try to start or finish
+> uses the map. This means, when it was even, we're sure there's no
+> readers and MMU notifier is synchronized. When it was odd, it means
+> there's a reader we need to wait it to be even again then we are
+> synchronized. 
 
-Yeah, that would be good too.  For now I'm applying Andrey's series though.
+You just described a seqlock.
 
-Paolo
+We've been talking about providing this as some core service from mmu
+notifiers because nearly every use of this API needs it.
 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index dbbb13772a..3533870c43 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -180,19 +180,20 @@ static int kvm_get_tsc(CPUState *cs)
->  {
->      X86CPU *cpu = X86_CPU(cs);
->      CPUX86State *env = &cpu->env;
-> -    struct {
-> -        struct kvm_msrs info;
-> -        struct kvm_msr_entry entries[1];
-> -    } msr_data;
->      int ret;
-> 
->      if (env->tsc_valid) {
->          return 0;
->      }
-> 
-> -    msr_data.info.nmsrs = 1;
-> -    msr_data.entries[0].index = MSR_IA32_TSC;
-> -    env->tsc_valid = !runstate_is_running();
-> +    struct {
-> +        struct kvm_msrs info;
-> +        struct kvm_msr_entry entries[1];
-> +    } msr_data = {
-> +        .info = { .nmsrs =  1 },
-> +        .entries = { [0] = { .index = MSR_IA32_TSC } }
-> +    };
-> +     env->tsc_valid = !runstate_is_running();
-> 
->      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
->      if (ret < 0) {
-> 
-> 
-> This gives the compiler maximum opportunities to flag mistakes like
-> initializing the same thing twice, and make it easier (read no smart
-> optimizations) to initialize in one go. Moving the declaration past the
-> 'if' also addresses Philippe's concern.
-> 
->>>
->>>>      msr_data.info.nmsrs = 1;
->>>>      msr_data.entries[0].index = MSR_IA32_TSC;
->>>>      env->tsc_valid = !runstate_is_running();
->>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>>
->>>>      if (has_xsave) {
->>>>          env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
->>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
->>>
->>> OK
->>>
->>>>      }
->>>>
->>>>      max_nested_state_len = kvm_max_nested_state_length();
->>>> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
->>>>          return 0;
->>>>      }
->>>>
->>>> +    memset(&dbgregs, 0, sizeof(dbgregs));
->>>
->>> OK
->>>
->>>>      for (i = 0; i < 4; i++) {
->>>>          dbgregs.db[i] = env->dr[i];
->>>>      }
->>>
->>> We could remove 'dbgregs.flags = 0;'
->>>
->>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>
-> 
-> 
-> --
-> Cheers,
-> Christophe de Dinechin (IRC c3d)
-> 
+IMHO this gets the whole thing backwards, the common pattern is to
+protect the 'shadow pte' data with a seqlock (usually open coded),
+such that the mmu notififer side has the write side of that lock and
+the read side is consumed by the thread accessing or updating the SPTE.
 
+
+> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+> Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>  drivers/vhost/vhost.c | 145 ++++++++++++++++++++++++++----------------
+>  drivers/vhost/vhost.h |   7 +-
+>  2 files changed, 94 insertions(+), 58 deletions(-)
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index cfc11f9ed9c9..db2c81cb1e90 100644
+> +++ b/drivers/vhost/vhost.c
+> @@ -324,17 +324,16 @@ static void vhost_uninit_vq_maps(struct vhost_virtqueue *vq)
+>  
+>  	spin_lock(&vq->mmu_lock);
+>  	for (i = 0; i < VHOST_NUM_ADDRS; i++) {
+> -		map[i] = rcu_dereference_protected(vq->maps[i],
+> -				  lockdep_is_held(&vq->mmu_lock));
+> +		map[i] = vq->maps[i];
+>  		if (map[i]) {
+>  			vhost_set_map_dirty(vq, map[i], i);
+> -			rcu_assign_pointer(vq->maps[i], NULL);
+> +			vq->maps[i] = NULL;
+>  		}
+>  	}
+>  	spin_unlock(&vq->mmu_lock);
+>  
+> -	/* No need for synchronize_rcu() or kfree_rcu() since we are
+> -	 * serialized with memory accessors (e.g vq mutex held).
+> +	/* No need for synchronization since we are serialized with
+> +	 * memory accessors (e.g vq mutex held).
+>  	 */
+>  
+>  	for (i = 0; i < VHOST_NUM_ADDRS; i++)
+> @@ -362,6 +361,44 @@ static bool vhost_map_range_overlap(struct vhost_uaddr *uaddr,
+>  	return !(end < uaddr->uaddr || start > uaddr->uaddr - 1 + uaddr->size);
+>  }
+>  
+> +static void inline vhost_vq_access_map_begin(struct vhost_virtqueue *vq)
+> +{
+> +	int ref = READ_ONCE(vq->ref);
+
+Is a lock/single threaded supposed to be held for this?
+
+> +
+> +	smp_store_release(&vq->ref, ref + 1);
+> +	/* Make sure ref counter is visible before accessing the map */
+> +	smp_load_acquire(&vq->ref);
+
+release/acquire semantics are intended to protect blocks of related
+data, so reading something with acquire and throwing away the result
+is nonsense.
+
+> +}
+> +
+> +static void inline vhost_vq_access_map_end(struct vhost_virtqueue *vq)
+> +{
+> +	int ref = READ_ONCE(vq->ref);
+
+If the write to vq->ref is not locked this algorithm won't work, if it
+is locked the READ_ONCE is not needed.
+
+> +	/* Make sure vq access is done before increasing ref counter */
+> +	smp_store_release(&vq->ref, ref + 1);
+> +}
+> +
+> +static void inline vhost_vq_sync_access(struct vhost_virtqueue *vq)
+> +{
+> +	int ref;
+> +
+> +	/* Make sure map change was done before checking ref counter */
+> +	smp_mb();
+
+This is probably smp_rmb after reading ref, and if you are setting ref
+with smp_store_release then this should be smp_load_acquire() without
+an explicit mb.
+
+> +	ref = READ_ONCE(vq->ref);
+> +	if (ref & 0x1) {
+> +		/* When ref change, we are sure no reader can see
+> +		 * previous map */
+> +		while (READ_ONCE(vq->ref) == ref) {
+> +			set_current_state(TASK_RUNNING);
+> +			schedule();
+> +		}
+> +	}
+
+This is basically read_seqcount_begin()' with a schedule instead of
+cpu_relax
+
+
+> +	/* Make sure ref counter was checked before any other
+> +	 * operations that was dene on map. */
+> +	smp_mb();
+
+should be in a smp_load_acquire()
+
+> +}
+> +
+>  static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
+>  				      int index,
+>  				      unsigned long start,
+> @@ -376,16 +413,15 @@ static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
+>  	spin_lock(&vq->mmu_lock);
+>  	++vq->invalidate_count;
+>  
+> -	map = rcu_dereference_protected(vq->maps[index],
+> -					lockdep_is_held(&vq->mmu_lock));
+> +	map = vq->maps[index];
+>  	if (map) {
+>  		vhost_set_map_dirty(vq, map, index);
+> -		rcu_assign_pointer(vq->maps[index], NULL);
+> +		vq->maps[index] = NULL;
+>  	}
+>  	spin_unlock(&vq->mmu_lock);
+>  
+>  	if (map) {
+> -		synchronize_rcu();
+> +		vhost_vq_sync_access(vq);
+
+What prevents racing with vhost_vq_access_map_end here?
+
+>  		vhost_map_unprefetch(map);
+>  	}
+>  }
+
+Overall I don't like it. 
+
+We are trying to get rid of these botique mmu notifier patterns in
+drivers. 
+
+Jason
