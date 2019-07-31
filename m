@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3CCC7C591
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:09:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08F1A7C599
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:09:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388665AbfGaPIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:08:35 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:33647 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388644AbfGaPIe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S2388701AbfGaPIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:08:55 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:41242 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388650AbfGaPIe (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 31 Jul 2019 11:08:34 -0400
-Received: by mail-ed1-f67.google.com with SMTP id i11so2525063edq.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:08:32 -0700 (PDT)
+Received: by mail-ed1-f65.google.com with SMTP id p15so65977928eds.8
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:08:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=WXT2KCVQy2E86WIHV388gpcH/h/cqapkcTgzB8ITRTY=;
-        b=gbgwfZZpKF7Zw4y/Cy0+El8MhN5OgIgEsj0rN2nkj9PakelkWIC/N62lsNpt78P51H
-         jvP8xx7Juipvx0RgC4SB4vNCw1P4PSVg2b2+doiEir7dfWiW3vsGXqpbQGM6KNexQSTP
-         r3fNkw3L7doZwwJenk62AM3aDDoLUPKu0t7NkU1I3mRXbo3XJ9NXobg93l8rusAKYuRo
-         dypVLFF2TyUrUJhBYMTvoExAgOrk1M4x1MfzcZx90KOF0LZV+HC3Q1R85RN5+Yd5tXFt
-         ULtpKhZLGf3u8jhLzjctfNyP1AJ1tjB1U+mn3PJugnraGtaxozLw2DlDsbKDrENsFSdN
-         bcCQ==
+        bh=bKIWoBO1Ox9foRE7zQy0IoCXQXSDJQsZ/wpbYRrt7O8=;
+        b=PbSjR/3YSpT3z0VTol0zIBTaptMjGhUYM3HUndjM3neCQkCTkww5qEep158FrhMPDB
+         lOja6cV3oSHoyK5HuysL26jeiqkfqfvW5YCcm+LVastLopDh0evznn9Jq/ft27Nk0yls
+         rnC1AKEeGTuwcFgRdFljMrIygrLWBDFyhvLXjbwshxlOfCLSeM8F5NTRRHEv0Ie5JSY0
+         b1aiesbbVNHw4aazLYgwIMzT8ab5pWkVI/0jSeHw4sNpg9XZaJV+IqQWo3AWpb2CYE/1
+         0iRZiF3T3Y4zZUpFAx0MzBe/Qihdixe290PHhrcx6T5Kzu6+jBCiV+w7prbZ/t0zig7E
+         KLeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=WXT2KCVQy2E86WIHV388gpcH/h/cqapkcTgzB8ITRTY=;
-        b=o8yik4tXKKWG/s8JlLBCSTTzmUOF8dQL3/7YlKrnqOezAW0h9dZeNEol51qubdOkeU
-         Ms+06MnGoQE7Hn9Be2iwsjTTbnMot/op7bHZ+2XRjqGSBi8DXswt6501byTqoGuO5TbQ
-         DbVQkx+NV6O+fxQDfTqVc0sBpYktvpIzP1MJ4AClp7/ZLkAiGkZErL9M5s0Gd+0XHaTT
-         e7yc5RzYovBseJSfPw/X913LbyK+74DT7X8YQPtryVqgPlGVT68BdV6mmlFzE0nd8uNy
-         kGRaPbaucJ3/SrQxKelwdUbV/PpO5GQvgDfRLveRVZeuvlXjltDoqDjAEBqnPQpspWDM
-         /Mlw==
-X-Gm-Message-State: APjAAAWGJwIW6nR9/PA8z05nl2NAwWikp7nxiltYncRkaDk8GuE2/en8
-        ejbSIc/KLU31SnC7mWj6GNQ=
-X-Google-Smtp-Source: APXvYqwiaqlBMCu7NWbE38q/iVndeTnZvf7qpo+nZ6NbB+Pm6uXYyVJ+okRcWjQSuw2bxKJtzce2+A==
-X-Received: by 2002:a50:f70c:: with SMTP id g12mr108973248edn.139.1564585712069;
+        bh=bKIWoBO1Ox9foRE7zQy0IoCXQXSDJQsZ/wpbYRrt7O8=;
+        b=m4EaXSttML5FCIUuMGPe4IFzMjji7FbJLPbGFdMxGMrIgyMXiQBLlMyjBiMQn9u/fS
+         s/riEBD9JNgE8ISyCONigOE+9PiWpmTXnk+oOF1pHr8pwBMWIAxYuC4EciJ7cMgxYROT
+         TBcKZSWwuAcrPIlkwy8/YOJZOBPft4Ck4SelhsxERw7X/vRhmg41M1a7jj31tmapirBo
+         CCneiKlEc0k8jqSzfm9bvCpUYoS+Pu1ya8Ghavfb513uUjiDOSw4OtuVjhvA15klS2lv
+         7qYzcGaIbLdRokPVMjGvA68LRc3ivMX2rEaCi95sFVsc/4/SQCnACCe2zE9XaYxh0lvh
+         iVMQ==
+X-Gm-Message-State: APjAAAVjAYjoy/+Yw3XHziZyjp1bjS/Y1QE/MCtivieuPNqZ8YTQq3LD
+        e1iuj8PlQdOlxOL1Mh0G3Ok=
+X-Google-Smtp-Source: APXvYqxPGPCNvE23xibIXe+57N4H71XsaK3wWKF6xCUN274arFhtKnpkEJtXRg5udE0RuJ4iEKcGYA==
+X-Received: by 2002:a05:6402:145a:: with SMTP id d26mr107237799edx.10.1564585712394;
         Wed, 31 Jul 2019 08:08:32 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id b15sm5578799ejj.5.2019.07.31.08.08.25
+        by smtp.gmail.com with ESMTPSA id g7sm16942446eda.52.2019.07.31.08.08.25
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
         Wed, 31 Jul 2019 08:08:30 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 2C437104602; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
+        id 57277104836; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 44/59] mm: Add the encrypt_mprotect() system call for MKTME
-Date:   Wed, 31 Jul 2019 18:07:58 +0300
-Message-Id: <20190731150813.26289-45-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 50/59] x86/mm: Use common code for DMA memory encryption
+Date:   Wed, 31 Jul 2019 18:08:04 +0300
+Message-Id: <20190731150813.26289-51-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -76,197 +76,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alison Schofield <alison.schofield@intel.com>
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-Implement memory encryption for MKTME (Multi-Key Total Memory
-Encryption) with a new system call that is an extension of the
-legacy mprotect() system call.
+Replace sme_ code with x86 memory encryption common code such that
+Intel MKTME can be supported underneath generic DMA code.
+dma_to_phys() & phys_to_dma() results will be runtime modified by
+memory encryption code.
 
-In encrypt_mprotect the caller must pass a handle to a previously
-allocated and programmed MKTME encryption key. The key can be
-obtained through the kernel key service type "mktme". The caller
-must have KEY_NEED_VIEW permission on the key.
-
-MKTME places an additional restriction on the protected data:
-The length of the data must be page aligned. This is in addition
-to the existing mprotect restriction that the addr must be page
-aligned.
-
-encrypt_mprotect() will lookup the hardware keyid for the given
-userspace key. It will use previously defined helpers to insert
-that keyid in the VMAs during legacy mprotect() execution.
-
-Signed-off-by: Alison Schofield <alison.schofield@intel.com>
+Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/exec.c          |  4 +--
- include/linux/mm.h |  3 +-
- mm/mprotect.c      | 68 +++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 65 insertions(+), 10 deletions(-)
+ arch/x86/include/asm/mem_encrypt.h | 29 +++++++++++++++++++++++++++++
+ arch/x86/mm/mem_encrypt_common.c   |  2 +-
+ include/linux/dma-direct.h         |  4 ++--
+ include/linux/mem_encrypt.h        | 23 ++++++++++-------------
+ 4 files changed, 42 insertions(+), 16 deletions(-)
 
-diff --git a/fs/exec.c b/fs/exec.c
-index c71cbfe6826a..261e81b7e3a4 100644
---- a/fs/exec.c
-+++ b/fs/exec.c
-@@ -756,8 +756,8 @@ int setup_arg_pages(struct linux_binprm *bprm,
- 	vm_flags |= mm->def_flags;
- 	vm_flags |= VM_STACK_INCOMPLETE_SETUP;
+diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
+index 0c196c47d621..62a1493f389c 100644
+--- a/arch/x86/include/asm/mem_encrypt.h
++++ b/arch/x86/include/asm/mem_encrypt.h
+@@ -52,8 +52,19 @@ bool sev_active(void);
  
--	ret = mprotect_fixup(vma, &prev, vma->vm_start, vma->vm_end,
--			vm_flags);
-+	ret = mprotect_fixup(vma, &prev, vma->vm_start, vma->vm_end, vm_flags,
-+			     -1);
- 	if (ret)
- 		goto out_unlock;
- 	BUG_ON(prev != vma);
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 98a6d2bd66a6..8551b5ebdedf 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1660,7 +1660,8 @@ extern unsigned long change_protection(struct vm_area_struct *vma, unsigned long
- 			      int dirty_accountable, int prot_numa);
- extern int mprotect_fixup(struct vm_area_struct *vma,
- 			  struct vm_area_struct **pprev, unsigned long start,
--			  unsigned long end, unsigned long newflags);
-+			  unsigned long end, unsigned long newflags,
-+			  int newkeyid);
+ #define __bss_decrypted __attribute__((__section__(".bss..decrypted")))
  
- /*
-  * doesn't attempt to fault and will return short.
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index 4d55725228e3..518d75582e7b 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -28,6 +28,7 @@
- #include <linux/ksm.h>
- #include <linux/uaccess.h>
- #include <linux/mm_inline.h>
-+#include <linux/key.h>
- #include <asm/pgtable.h>
- #include <asm/cacheflush.h>
- #include <asm/mmu_context.h>
-@@ -348,7 +349,8 @@ static int prot_none_walk(struct vm_area_struct *vma, unsigned long start,
- 
- int
- mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
--	unsigned long start, unsigned long end, unsigned long newflags)
-+	       unsigned long start, unsigned long end, unsigned long newflags,
-+	       int newkeyid)
- {
- 	struct mm_struct *mm = vma->vm_mm;
- 	unsigned long oldflags = vma->vm_flags;
-@@ -358,7 +360,14 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- 	int error;
- 	int dirty_accountable = 0;
- 
--	if (newflags == oldflags) {
-+	/*
-+	 * Flags match and Keyids match or we have NO_KEY.
-+	 * This _fixup is usually called from do_mprotect_ext() except
-+	 * for one special case: caller fs/exec.c/setup_arg_pages()
-+	 * In that case, newkeyid is passed as -1 (NO_KEY).
-+	 */
-+	if (newflags == oldflags &&
-+	    (newkeyid == vma_keyid(vma) || newkeyid == NO_KEY)) {
- 		*pprev = vma;
- 		return 0;
- 	}
-@@ -424,6 +433,8 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- 	}
- 
- success:
-+	if (newkeyid != NO_KEY)
-+		mprotect_set_encrypt(vma, newkeyid, start, end);
- 	/*
- 	 * vm_flags and vm_page_prot are protected by the mmap_sem
- 	 * held in write mode.
-@@ -455,10 +466,15 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- }
- 
- /*
-- * When pkey==NO_KEY we get legacy mprotect behavior here.
-+ * do_mprotect_ext() supports the legacy mprotect behavior plus extensions
-+ * for Protection Keys and Memory Encryption Keys. These extensions are
-+ * mutually exclusive and the behavior is:
-+ *	(pkey==NO_KEY && keyid==NO_KEY) ==> legacy mprotect
-+ *	(pkey is valid)  ==> legacy mprotect plus Protection Key extensions
-+ *	(keyid is valid) ==> legacy mprotect plus Encryption Key extensions
-  */
- static int do_mprotect_ext(unsigned long start, size_t len,
--		unsigned long prot, int pkey)
-+			   unsigned long prot, int pkey, int keyid)
- {
- 	unsigned long nstart, end, tmp, reqprot;
- 	struct vm_area_struct *vma, *prev;
-@@ -556,7 +572,8 @@ static int do_mprotect_ext(unsigned long start, size_t len,
- 		tmp = vma->vm_end;
- 		if (tmp > end)
- 			tmp = end;
--		error = mprotect_fixup(vma, &prev, nstart, tmp, newflags);
-+		error = mprotect_fixup(vma, &prev, nstart, tmp, newflags,
-+				       keyid);
- 		if (error)
- 			goto out;
- 		nstart = tmp;
-@@ -581,7 +598,7 @@ static int do_mprotect_ext(unsigned long start, size_t len,
- SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot)
- {
--	return do_mprotect_ext(start, len, prot, NO_KEY);
-+	return do_mprotect_ext(start, len, prot, NO_KEY, NO_KEY);
- }
- 
- #ifdef CONFIG_ARCH_HAS_PKEYS
-@@ -589,7 +606,7 @@ SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- SYSCALL_DEFINE4(pkey_mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot, int, pkey)
- {
--	return do_mprotect_ext(start, len, prot, pkey);
-+	return do_mprotect_ext(start, len, prot, pkey, NO_KEY);
- }
- 
- SYSCALL_DEFINE2(pkey_alloc, unsigned long, flags, unsigned long, init_val)
-@@ -638,3 +655,40 @@ SYSCALL_DEFINE1(pkey_free, int, pkey)
- }
- 
- #endif /* CONFIG_ARCH_HAS_PKEYS */
++/*
++ * The __sme_set() and __sme_clr() macros are useful for adding or removing
++ * the encryption mask from a value (e.g. when dealing with pagetable
++ * entries).
++ */
++#define __sme_set(x)		((x) | sme_me_mask)
++#define __sme_clr(x)		((x) & ~sme_me_mask)
 +
-+#ifdef CONFIG_X86_INTEL_MKTME
+ #else	/* !CONFIG_AMD_MEM_ENCRYPT */
+ 
++#define __sme_set(x)		(x)
++#define __sme_clr(x)		(x)
 +
-+extern int mktme_keyid_from_key(struct key *key);
+ #define sme_me_mask	0ULL
+ 
+ static inline void __init sme_early_encrypt(resource_size_t paddr,
+@@ -94,4 +105,22 @@ extern char __start_bss_decrypted[], __end_bss_decrypted[], __start_bss_decrypte
+ 
+ #endif	/* __ASSEMBLY__ */
+ 
++#ifdef CONFIG_X86_MEM_ENCRYPT_COMMON
 +
-+SYSCALL_DEFINE4(encrypt_mprotect, unsigned long, start, size_t, len,
-+		unsigned long, prot, key_serial_t, serial)
++extern dma_addr_t __mem_encrypt_dma_set(dma_addr_t daddr, phys_addr_t paddr);
++extern phys_addr_t __mem_encrypt_dma_clear(phys_addr_t paddr);
++
++#else
++static inline dma_addr_t __mem_encrypt_dma_set(dma_addr_t daddr, phys_addr_t paddr)
 +{
-+	key_ref_t key_ref;
-+	struct key *key;
-+	int ret, keyid;
-+
-+	/* MKTME restriction */
-+	if (!PAGE_ALIGNED(len))
-+		return -EINVAL;
-+
-+	/*
-+	 * key_ref prevents the destruction of the key
-+	 * while the memory encryption is being set up.
-+	 */
-+
-+	key_ref = lookup_user_key(serial, 0, KEY_NEED_VIEW);
-+	if (IS_ERR(key_ref))
-+		return PTR_ERR(key_ref);
-+
-+	key = key_ref_to_ptr(key_ref);
-+	keyid = mktme_keyid_from_key(key);
-+	if (!keyid) {
-+		key_ref_put(key_ref);
-+		return -EINVAL;
-+	}
-+	ret = do_mprotect_ext(start, len, prot, NO_KEY, keyid);
-+	key_ref_put(key_ref);
-+	return ret;
++	return daddr;
 +}
 +
-+#endif /* CONFIG_X86_INTEL_MKTME */
++static inline phys_addr_t __mem_encrypt_dma_clear(phys_addr_t paddr)
++{
++	return paddr;
++}
++#endif /* CONFIG_X86_MEM_ENCRYPT_COMMON */
++
++
+ #endif	/* __X86_MEM_ENCRYPT_H__ */
+diff --git a/arch/x86/mm/mem_encrypt_common.c b/arch/x86/mm/mem_encrypt_common.c
+index c11d70151735..588d6ea45624 100644
+--- a/arch/x86/mm/mem_encrypt_common.c
++++ b/arch/x86/mm/mem_encrypt_common.c
+@@ -1,6 +1,6 @@
+ #include <linux/mm.h>
+-#include <linux/mem_encrypt.h>
+ #include <linux/dma-mapping.h>
++#include <asm/mem_encrypt.h>
+ #include <asm/mktme.h>
+ 
+ /*
+diff --git a/include/linux/dma-direct.h b/include/linux/dma-direct.h
+index adf993a3bd58..6ce96b06c440 100644
+--- a/include/linux/dma-direct.h
++++ b/include/linux/dma-direct.h
+@@ -49,12 +49,12 @@ static inline bool force_dma_unencrypted(struct device *dev)
+  */
+ static inline dma_addr_t phys_to_dma(struct device *dev, phys_addr_t paddr)
+ {
+-	return __sme_set(__phys_to_dma(dev, paddr));
++	return __mem_encrypt_dma_set(__phys_to_dma(dev, paddr), paddr);
+ }
+ 
+ static inline phys_addr_t dma_to_phys(struct device *dev, dma_addr_t daddr)
+ {
+-	return __sme_clr(__dma_to_phys(dev, daddr));
++	return __mem_encrypt_dma_clear(__dma_to_phys(dev, daddr));
+ }
+ 
+ u64 dma_direct_get_required_mask(struct device *dev);
+diff --git a/include/linux/mem_encrypt.h b/include/linux/mem_encrypt.h
+index 470bd53a89df..88724aa7c065 100644
+--- a/include/linux/mem_encrypt.h
++++ b/include/linux/mem_encrypt.h
+@@ -23,6 +23,16 @@
+ static inline bool sme_active(void) { return false; }
+ static inline bool sev_active(void) { return false; }
+ 
++static inline dma_addr_t __mem_encrypt_dma_set(dma_addr_t daddr, phys_addr_t paddr)
++{
++	return daddr;
++}
++
++static inline phys_addr_t __mem_encrypt_dma_clear(phys_addr_t paddr)
++{
++	return paddr;
++}
++
+ #endif	/* CONFIG_ARCH_HAS_MEM_ENCRYPT */
+ 
+ static inline bool mem_encrypt_active(void)
+@@ -35,19 +45,6 @@ static inline u64 sme_get_me_mask(void)
+ 	return sme_me_mask;
+ }
+ 
+-#ifdef CONFIG_AMD_MEM_ENCRYPT
+-/*
+- * The __sme_set() and __sme_clr() macros are useful for adding or removing
+- * the encryption mask from a value (e.g. when dealing with pagetable
+- * entries).
+- */
+-#define __sme_set(x)		((x) | sme_me_mask)
+-#define __sme_clr(x)		((x) & ~sme_me_mask)
+-#else
+-#define __sme_set(x)		(x)
+-#define __sme_clr(x)		(x)
+-#endif
+-
+ #endif	/* __ASSEMBLY__ */
+ 
+ #endif	/* __MEM_ENCRYPT_H__ */
 -- 
 2.21.0
 
