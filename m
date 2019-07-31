@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6DDE7C628
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:21:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 011B57C64A
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:22:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727723AbfGaPVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:21:05 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:41679 "EHLO
+        id S1728345AbfGaPWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:22:20 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:40802 "EHLO
         mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729675AbfGaPTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:19:50 -0400
-Received: by mail-ed1-f65.google.com with SMTP id p15so66012380eds.8
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:19:48 -0700 (PDT)
+        with ESMTP id S1730170AbfGaPWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:22:13 -0400
+Received: by mail-ed1-f65.google.com with SMTP id k8so66040102eds.7
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:22:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=hC2uwgXxojO8zk/Rcrr6mceJUJW70ppjchwtq4ruRCg=;
-        b=0XV6P/gt+Sg4f27WCDZfMiz3yUD8gmqmXbpUkqw2qeKte/64P4ld/yFj9TtHQsxMva
-         Sbd6SFVGZn15wA2StFIL5OKo0viglmdPGCy3S9nsnoLjxmIaz4pZPHVNhzJMBFiEItzK
-         GGFxIZHfCywnX+w1VFB8az1H4FFBZ0dEp86xAnm0F7Jfw3TX8bJ2UwJ4MOp6xtqistdS
-         ci1LlbxLwNn2UPtS72pBvzNbUsUQSbVvUvjpSYYoWOORZ9uWxZOyAGcJabNrh3zrp7Ty
-         xsBZdp44F7iwElj0Db5RusDWd82dGLl/6L2fkZUDkulyOvXwh+aBdW95+eM1LPwVFqZZ
-         pCfQ==
+        bh=xZCrLs3XD8OGAT3ycWjyC35TQ10BuGZLp4dKCEJJsRg=;
+        b=ZzxPi2vB6H9up8THEqzUbCNwa2E1YZmLUp1GoionKsfBr1KQUEhgprj6heyI63fXrw
+         H+vh1QV4vFyU7pFE4ViKBgvENglga5fVeNfWMRPCrZCi98qsi+r5zk6N62pl/svz4DjD
+         WnRM8TC+Pj61sbunfqi5fGW98WW6DAYki4QW6kO4N7z8wCx7WTMte/S7jP4fuei7n7eq
+         Hftvw0iaa2a1kXT25K4D3+dXvLj2vwBC0o2P1NCeJjiYQsXP0Nqqds5A7BCA5ZOq7vv9
+         366A7NPLtjGoulNRAC6+0JGz6sJc40LnEY1OPEQYpV1Yi42ZVQe4Pz+slBHXGt07SvXV
+         N3yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hC2uwgXxojO8zk/Rcrr6mceJUJW70ppjchwtq4ruRCg=;
-        b=BMpY1ZQV17zvIoTy0qFOEeEqo1nVW1v9bzj2bZfVW2HLBDOSmBFvC5Ubozh9gs/x+r
-         OxYFGD2q2D3DQltFF9/vRulXmkLlIGc79YikOXxxwRrCHFM6dFuPaDtIO/uPbus7h1fP
-         ruovnYDz984AocOE3lfjafdahYuNVxna9joPrdLEzJVlDKp0tlQ4IZkFZnEQ9gkov/02
-         e+/0JzBlRs/xnHXxgv1VGR7PkBJi/giv145fxMUiByWYgJqUAe8+BNabyLKcF7ZBxlqG
-         LJO3Lxd93IEo1IPBvdWZEYz5x5qMLcYGL+B3elhuTgIerSEEyDy6W+Qw5Wf8EI18FI2P
-         Z5cg==
-X-Gm-Message-State: APjAAAWqP2oiyMCRivet/6skHhXFxerFBNXbq/nNq1jZXX3wEmDE6RP7
-        j/V5YF5wArlD2Enr89ICcHI=
-X-Google-Smtp-Source: APXvYqz5v5Tv2OUvZrbCEWIRRAB8vEgVkF30Jl6xeuTpZr0HJyo73/wTXum206aQYtxXoB+6KiDpDg==
-X-Received: by 2002:a17:906:9447:: with SMTP id z7mr29540487ejx.165.1564586039736;
-        Wed, 31 Jul 2019 08:13:59 -0700 (PDT)
+        bh=xZCrLs3XD8OGAT3ycWjyC35TQ10BuGZLp4dKCEJJsRg=;
+        b=QW4Zc7XgSfdwp3oOWZ9YPaZxg/ht0DxOg3qdgv6AhnGdAIiTVqJgooz2vWrfrudOoP
+         tvnvVIp2/2qr2dMhVmZ4hMNyRgNU5iBlkIE6/y/ybrKf7Nrtc90twXTSk9c0+Yud9hRE
+         6+B/8sasMPZypHelXGJVHlhvhfNyhziwgXtYee9qtzFk2U9N1HDXRDc9xzD5tpqiRNBg
+         FzhY926TOAXgPRkNfmu9fkGieIFkoekDDT2H4BwEMurLbFNTs2sGzCYJRdeiZGiVA1xu
+         0Duxddme59TxyjJRGhdDVEb1bPl+MqN4ND+iG7wrdtWDDiUyVY0isa8QZD/XQqM5Zgyz
+         i8/g==
+X-Gm-Message-State: APjAAAUN4BSDhKFt14NumFIvsOJuzM3/l0RXjmlFKgzaD2l8dWGddDJr
+        FZhckPvrI6mFN+uLZS1/5K0=
+X-Google-Smtp-Source: APXvYqzi+h2CEkJox27TxBwILuSunR6853S6mGlis2VdUPScZU2xczXssICyuyck991q2MnJokM4kQ==
+X-Received: by 2002:a17:906:1dd5:: with SMTP id v21mr65219317ejh.112.1564586040695;
+        Wed, 31 Jul 2019 08:14:00 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id g11sm12443173ejm.86.2019.07.31.08.13.53
+        by smtp.gmail.com with ESMTPSA id h10sm16374181edn.86.2019.07.31.08.13.54
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
         Wed, 31 Jul 2019 08:13:57 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 488B9104606; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
+        id 4FE39104831; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 48/59] iommu/vt-d: Support MKTME in DMA remapping
-Date:   Wed, 31 Jul 2019 18:08:02 +0300
-Message-Id: <20190731150813.26289-49-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 49/59] x86/mm: introduce common code for mem encryption
+Date:   Wed, 31 Jul 2019 18:08:03 +0300
+Message-Id: <20190731150813.26289-50-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -78,109 +78,158 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-When MKTME is enabled, keyid is stored in the high order bits of physical
-address. For DMA transactions targeting encrypted physical memory, keyid
-must be included in the IOVA to physical address translation.
-
-This patch appends page keyid when setting up the IOMMU PTEs. On the
-reverse direction, keyid bits are cleared in the physical address lookup.
-Mapping functions of both DMA ops and IOMMU ops are covered.
+Both Intel MKTME and AMD SME have needs to support DMA address
+translation with encryption related bits. Common functions are
+introduced in this patch to keep DMA generic code abstracted.
 
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/iommu/intel-iommu.c | 29 +++++++++++++++++++++++++++--
- include/linux/intel-iommu.h |  9 ++++++++-
- 2 files changed, 35 insertions(+), 3 deletions(-)
+ arch/x86/Kconfig                 |  8 +++--
+ arch/x86/mm/Makefile             |  1 +
+ arch/x86/mm/mem_encrypt.c        | 30 ------------------
+ arch/x86/mm/mem_encrypt_common.c | 52 ++++++++++++++++++++++++++++++++
+ 4 files changed, 59 insertions(+), 32 deletions(-)
+ create mode 100644 arch/x86/mm/mem_encrypt_common.c
 
-diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index ac4172c02244..32d22872656b 100644
---- a/drivers/iommu/intel-iommu.c
-+++ b/drivers/iommu/intel-iommu.c
-@@ -867,6 +867,28 @@ static void free_context_table(struct intel_iommu *iommu)
- 	spin_unlock_irqrestore(&iommu->lock, flags);
- }
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 2eb2867db5fa..f2cc88fe8ada 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1521,12 +1521,16 @@ config X86_CPA_STATISTICS
+ config ARCH_HAS_MEM_ENCRYPT
+ 	def_bool y
  
-+static inline void set_pte_mktme_keyid(unsigned long phys_pfn,
-+		phys_addr_t *pteval)
++config X86_MEM_ENCRYPT_COMMON
++	select ARCH_HAS_FORCE_DMA_UNENCRYPTED
++	select DYNAMIC_PHYSICAL_MASK
++	def_bool n
++
+ config AMD_MEM_ENCRYPT
+ 	bool "AMD Secure Memory Encryption (SME) support"
+ 	depends on X86_64 && CPU_SUP_AMD
+-	select DYNAMIC_PHYSICAL_MASK
+ 	select ARCH_USE_MEMREMAP_PROT
+-	select ARCH_HAS_FORCE_DMA_UNENCRYPTED
++	select X86_MEM_ENCRYPT_COMMON
+ 	---help---
+ 	  Say yes to enable support for the encryption of system memory.
+ 	  This requires an AMD processor that supports Secure Memory
+diff --git a/arch/x86/mm/Makefile b/arch/x86/mm/Makefile
+index 600d18691876..608e57cda784 100644
+--- a/arch/x86/mm/Makefile
++++ b/arch/x86/mm/Makefile
+@@ -55,3 +55,4 @@ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_identity.o
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_boot.o
+ 
+ obj-$(CONFIG_X86_INTEL_MKTME)	+= mktme.o
++obj-$(CONFIG_X86_MEM_ENCRYPT_COMMON)	+= mem_encrypt_common.o
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index fece30ca8b0c..e94e0a62ba92 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -15,10 +15,6 @@
+ #include <linux/dma-direct.h>
+ #include <linux/swiotlb.h>
+ #include <linux/mem_encrypt.h>
+-#include <linux/device.h>
+-#include <linux/kernel.h>
+-#include <linux/bitops.h>
+-#include <linux/dma-mapping.h>
+ 
+ #include <asm/tlbflush.h>
+ #include <asm/fixmap.h>
+@@ -352,32 +348,6 @@ bool sev_active(void)
+ }
+ EXPORT_SYMBOL(sev_active);
+ 
+-/* Override for DMA direct allocation check - ARCH_HAS_FORCE_DMA_UNENCRYPTED */
+-bool force_dma_unencrypted(struct device *dev)
+-{
+-	/*
+-	 * For SEV, all DMA must be to unencrypted addresses.
+-	 */
+-	if (sev_active())
+-		return true;
+-
+-	/*
+-	 * For SME, all DMA must be to unencrypted addresses if the
+-	 * device does not support DMA to addresses that include the
+-	 * encryption mask.
+-	 */
+-	if (sme_active()) {
+-		u64 dma_enc_mask = DMA_BIT_MASK(__ffs64(sme_me_mask));
+-		u64 dma_dev_mask = min_not_zero(dev->coherent_dma_mask,
+-						dev->bus_dma_mask);
+-
+-		if (dma_dev_mask <= dma_enc_mask)
+-			return true;
+-	}
+-
+-	return false;
+-}
+-
+ /* Architecture __weak replacement functions */
+ void __init mem_encrypt_free_decrypted_mem(void)
+ {
+diff --git a/arch/x86/mm/mem_encrypt_common.c b/arch/x86/mm/mem_encrypt_common.c
+new file mode 100644
+index 000000000000..c11d70151735
+--- /dev/null
++++ b/arch/x86/mm/mem_encrypt_common.c
+@@ -0,0 +1,52 @@
++#include <linux/mm.h>
++#include <linux/mem_encrypt.h>
++#include <linux/dma-mapping.h>
++#include <asm/mktme.h>
++
++/*
++ * Encryption bits need to be set and cleared for both Intel MKTME and
++ * AMD SME when converting between DMA address and physical address.
++ */
++dma_addr_t __mem_encrypt_dma_set(dma_addr_t daddr, phys_addr_t paddr)
 +{
 +	unsigned long keyid;
 +
-+	if (!pfn_valid(phys_pfn))
-+		return;
++	if (sme_active())
++		return __sme_set(daddr);
++	keyid = page_keyid(pfn_to_page(__phys_to_pfn(paddr)));
 +
-+	keyid = page_keyid(pfn_to_page(phys_pfn));
-+
-+#ifdef CONFIG_X86_INTEL_MKTME
-+	/*
-+	 * When MKTME is enabled, set keyid in PTE such that DMA
-+	 * remapping will include keyid in the translation from IOVA
-+	 * to physical address. This applies to both user and kernel
-+	 * allocated DMA memory.
-+	 */
-+	*pteval &= ~mktme_keyid_mask();
-+	*pteval |= keyid << mktme_keyid_shift();
-+#endif
++	return (daddr & ~mktme_keyid_mask()) | (keyid << mktme_keyid_shift());
 +}
 +
- static struct dma_pte *pfn_to_dma_pte(struct dmar_domain *domain,
- 				      unsigned long pfn, int *target_level)
- {
-@@ -893,7 +915,7 @@ static struct dma_pte *pfn_to_dma_pte(struct dmar_domain *domain,
- 			break;
- 
- 		if (!dma_pte_present(pte)) {
--			uint64_t pteval;
-+			phys_addr_t pteval;
- 
- 			tmp_page = alloc_pgtable_page(domain->nid);
- 
-@@ -901,7 +923,8 @@ static struct dma_pte *pfn_to_dma_pte(struct dmar_domain *domain,
- 				return NULL;
- 
- 			domain_flush_cache(domain, tmp_page, VTD_PAGE_SIZE);
--			pteval = ((uint64_t)virt_to_dma_pfn(tmp_page) << VTD_PAGE_SHIFT) | DMA_PTE_READ | DMA_PTE_WRITE;
-+			pteval = (virt_to_dma_pfn(tmp_page) << VTD_PAGE_SHIFT) | DMA_PTE_READ | DMA_PTE_WRITE;
-+			set_pte_mktme_keyid(virt_to_dma_pfn(tmp_page), &pteval);
- 			if (cmpxchg64(&pte->val, 0ULL, pteval))
- 				/* Someone else set it while we were thinking; use theirs. */
- 				free_pgtable_page(tmp_page);
-@@ -2214,6 +2237,8 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
- 			}
- 
- 		}
-+		set_pte_mktme_keyid(phys_pfn, &pteval);
++phys_addr_t __mem_encrypt_dma_clear(phys_addr_t paddr)
++{
++	if (sme_active())
++		return __sme_clr(paddr);
 +
- 		/* We don't need lock here, nobody else
- 		 * touches the iova range
- 		 */
-diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-index f2ae8a006ff8..8fbb9353d5a6 100644
---- a/include/linux/intel-iommu.h
-+++ b/include/linux/intel-iommu.h
-@@ -22,6 +22,8 @@
- 
- #include <asm/cacheflush.h>
- #include <asm/iommu.h>
-+#include <asm/page.h>
++	return paddr & ~mktme_keyid_mask();
++}
 +
- 
- /*
-  * VT-d hardware uses 4KiB page size regardless of host page size.
-@@ -608,7 +610,12 @@ static inline void dma_clear_pte(struct dma_pte *pte)
- static inline u64 dma_pte_addr(struct dma_pte *pte)
- {
- #ifdef CONFIG_64BIT
--	return pte->val & VTD_PAGE_MASK;
-+	u64 addr = pte->val;
-+	addr &= VTD_PAGE_MASK;
-+#ifdef CONFIG_X86_INTEL_MKTME
-+	addr &= ~mktme_keyid_mask();
-+#endif
-+	return addr;
- #else
- 	/* Must have a full atomic 64-bit read */
- 	return  __cmpxchg64(&pte->val, 0ULL, 0ULL) & VTD_PAGE_MASK;
++/* Override for DMA direct allocation check - ARCH_HAS_FORCE_DMA_UNENCRYPTED */
++bool force_dma_unencrypted(struct device *dev)
++{
++	u64 dma_enc_mask, dma_dev_mask;
++
++	/*
++	 * For SEV, all DMA must be to unencrypted addresses.
++	 */
++	if (sev_active())
++		return true;
++
++	/*
++	 * For SME and MKTME, all DMA must be to unencrypted addresses if the
++	 * device does not support DMA to addresses that include the encryption
++	 * mask.
++	 */
++	if (!sme_active() && !mktme_enabled())
++		return false;
++
++	dma_enc_mask = sme_me_mask | mktme_keyid_mask();
++	dma_dev_mask = min_not_zero(dev->coherent_dma_mask, dev->bus_dma_mask);
++
++	return (dma_dev_mask & dma_enc_mask) != dma_enc_mask;
++}
 -- 
 2.21.0
 
