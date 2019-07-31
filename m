@@ -2,150 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2970E7C676
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:25:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE8FE7C73B
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:47:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730152AbfGaPYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:24:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36454 "EHLO mx1.redhat.com"
+        id S1730196AbfGaPrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:47:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:8701 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730143AbfGaPYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:24:51 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1730177AbfGaPrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:47:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B07AF89C3A;
-        Wed, 31 Jul 2019 15:15:41 +0000 (UTC)
-Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CF8F019C65;
-        Wed, 31 Jul 2019 15:15:39 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v3 2/3] KVM: selftests: Implement ucall() for s390x
-Date:   Wed, 31 Jul 2019 17:15:24 +0200
-Message-Id: <20190731151525.17156-3-thuth@redhat.com>
-In-Reply-To: <20190731151525.17156-1-thuth@redhat.com>
-References: <20190731151525.17156-1-thuth@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 318DE2D1CE;
+        Wed, 31 Jul 2019 15:47:12 +0000 (UTC)
+Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F6E55C1B5;
+        Wed, 31 Jul 2019 15:47:11 +0000 (UTC)
+Date:   Wed, 31 Jul 2019 17:47:09 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio: re-arrange vfio region definitions
+Message-ID: <20190731174709.471126e6.cohuck@redhat.com>
+In-Reply-To: <20190717114956.16263-1-cohuck@redhat.com>
+References: <20190717114956.16263-1-cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 31 Jul 2019 15:15:41 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 31 Jul 2019 15:47:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On s390x, we can neither exit via PIO nor MMIO, but have to use an
-instruction like DIAGNOSE. Now that ucall() is implemented, we can
-use it in the sync_reg_test on s390x, too.
+On Wed, 17 Jul 2019 13:49:56 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tools/testing/selftests/kvm/Makefile          |  2 +-
- tools/testing/selftests/kvm/lib/s390x/ucall.c | 56 +++++++++++++++++++
- .../selftests/kvm/s390x/sync_regs_test.c      |  6 +-
- 3 files changed, 61 insertions(+), 3 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/lib/s390x/ucall.c
+> It is easy to miss already defined region types. Let's re-arrange
+> the definitions a bit and add more comments to make it hopefully
+> a bit clearer.
+> 
+> No functional change.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  include/uapi/linux/vfio.h | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a51e3b83df40..75ea1ecbf85a 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -10,7 +10,7 @@ UNAME_M := $(shell uname -m)
- LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/sparsebit.c
- LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/ucall.c
- LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
--LIBKVM_s390x = lib/s390x/processor.c
-+LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c
- 
- TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
- TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
-diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-new file mode 100644
-index 000000000000..fd589dc9bfab
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-@@ -0,0 +1,56 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * ucall support. A ucall is a "hypercall to userspace".
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ */
-+#include "kvm_util.h"
-+
-+void ucall_init(struct kvm_vm *vm, void *arg)
-+{
-+}
-+
-+void ucall_uninit(struct kvm_vm *vm)
-+{
-+}
-+
-+void ucall(uint64_t cmd, int nargs, ...)
-+{
-+	struct ucall uc = {
-+		.cmd = cmd,
-+	};
-+	va_list va;
-+	int i;
-+
-+	nargs = nargs <= UCALL_MAX_ARGS ? nargs : UCALL_MAX_ARGS;
-+
-+	va_start(va, nargs);
-+	for (i = 0; i < nargs; ++i)
-+		uc.args[i] = va_arg(va, uint64_t);
-+	va_end(va);
-+
-+	/* Exit via DIAGNOSE 0x501 (normally used for breakpoints) */
-+	asm volatile ("diag 0,%0,0x501" : : "a"(&uc) : "memory");
-+}
-+
-+uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
-+{
-+	struct kvm_run *run = vcpu_state(vm, vcpu_id);
-+	struct ucall ucall = {};
-+
-+	if (run->exit_reason == KVM_EXIT_S390_SIEIC &&
-+	    run->s390_sieic.icptcode == 4 &&
-+	    (run->s390_sieic.ipa >> 8) == 0x83 &&    /* 0x83 means DIAGNOSE */
-+	    (run->s390_sieic.ipb >> 16) == 0x501) {
-+		int reg = run->s390_sieic.ipa & 0xf;
-+
-+		memcpy(&ucall, addr_gva2hva(vm, run->s.regs.gprs[reg]),
-+		       sizeof(ucall));
-+
-+		vcpu_run_complete_io(vm, vcpu_id);
-+		if (uc)
-+			memcpy(uc, &ucall, sizeof(ucall));
-+	}
-+
-+	return ucall.cmd;
-+}
-diff --git a/tools/testing/selftests/kvm/s390x/sync_regs_test.c b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-index e85ff0d69548..bbc93094519b 100644
---- a/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-+++ b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
-@@ -25,9 +25,11 @@
- 
- static void guest_code(void)
- {
-+	register u64 stage asm("11") = 0;
-+
- 	for (;;) {
--		asm volatile ("diag 0,0,0x501");
--		asm volatile ("ahi 11,1");
-+		GUEST_SYNC(0);
-+		asm volatile ("ahi %0,1" : : "r"(stage));
- 	}
- }
- 
--- 
-2.21.0
+Friendly ping :)
+
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 8f10748dac79..d9bcf40240be 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -295,15 +295,23 @@ struct vfio_region_info_cap_type {
+>  	__u32 subtype;	/* type specific */
+>  };
+>  
+> +/*
+> + * List of region types, global per bus driver.
+> + * If you introduce a new type, please add it here.
+> + */
+> +
+> +/* PCI region type containing a PCI vendor part */
+>  #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
+>  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> +#define VFIO_REGION_TYPE_GFX                    (1)
+> +#define VFIO_REGION_TYPE_CCW			(2)
+>  
+> -/* 8086 Vendor sub-types */
+> +/* 8086 vendor PCI sub-types */
+>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+>  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+>  
+> -#define VFIO_REGION_TYPE_GFX                    (1)
+> +/* GFX sub-types */
+>  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+>  
+>  /**
+> @@ -353,20 +361,17 @@ struct vfio_region_gfx_edid {
+>  #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
+>  };
+>  
+> -#define VFIO_REGION_TYPE_CCW			(2)
+>  /* ccw sub-types */
+>  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+>  
+> +/* 10de vendor PCI sub-types */
+>  /*
+> - * 10de vendor sub-type
+> - *
+>   * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
+>   */
+>  #define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
+>  
+> +/* 1014 vendor PCI sub-types*/
+>  /*
+> - * 1014 vendor sub-type
+> - *
+>   * IBM NPU NVlink2 ATSD (Address Translation Shootdown) register of NPU
+>   * to do TLB invalidation on a GPU.
+>   */
 
