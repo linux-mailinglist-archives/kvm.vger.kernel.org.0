@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0C267C5F7
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:19:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D45D97C5F2
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:19:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729477AbfGaPTW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:19:22 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:33976 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729444AbfGaPTU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:19:20 -0400
-Received: by mail-ed1-f65.google.com with SMTP id s49so31231317edb.1
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:19:19 -0700 (PDT)
+        id S1729393AbfGaPTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:19:08 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:37187 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726594AbfGaPTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:19:07 -0400
+Received: by mail-ed1-f66.google.com with SMTP id w13so66093135eds.4
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ukIFHDJenwkznoJ0S+ycGyH8eEeHrvR6n2ACiYDuDdk=;
-        b=AOy2CWLXXb5HmAhiEuMvNlpAfvbzvVTmBhdFbnfbTg/elp4wHPlGZlanZYYDI/FrxG
-         XR1qjn43zM5orBwV4t3lyE99FyrF9PkSX5oImrC331w0Zqkq8aM4qZ7W1MIsKYtR1Iq+
-         R9RJkh8iSQEpA340quOn7TlujXd6hrIkjm5Jm0Xb21fUTBV8fnmRZXlmIojL8rcIgjCU
-         PUTp3qDE06KwYQHnhsuC+tatmmIbYIQBPxFpZQsboYojGA8UMc7qiPLpOzuIoc1jePqI
-         mj+jOHlIVv7dZaf23nr1b3w0Wc5cWJIlxSvk362WiEcqLVDtgLk3XpruSZHTCkoabCWN
-         v2Aw==
+        bh=Qu4eqa88cl7hA3fQdb28KWqV5w4hCLiKuLbYR7iJuDE=;
+        b=EapzB6nV2zuG3XXqORhtOg865rDFWXiiuUO8FpJLb/h1WDao3VpOzWeFDmaFbxm/XL
+         47TBQ8nUUTf9qkmZiYlrYuMBsFG5TIn6RKRtGHhdoEi679Dd/WD/MF4HtnmQP59r+ZVS
+         lWZPfIfuMFEgQo4Y3mbUEU6Vw4ZKVnL+c9FxScjZKMpMrPiR+cuZijKKGYKRXfElKJqa
+         Xlf/ibW3jXNNJBvLlFTHpGgT5lOrKP+W2Zir2emFXNHQgTL1ugZEAXaNqYvDXjvvf1sY
+         eVxqaYVdOcCPAQPOF9hrrzA0BOHPgcYf40DmCzESR4BUuRMyXnjNV9lnjdj/b1tOOPp+
+         BzBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ukIFHDJenwkznoJ0S+ycGyH8eEeHrvR6n2ACiYDuDdk=;
-        b=UJ7R4RHNYxY8SakBkeid2j0bTGZ6QpEd5goZxCfF5CeqLAQYuHMqQanyzN3Rn8kzy9
-         TtZDorL2d2wUlPM1DM/Paxru6WNMTcziknpoL2ueTh8apmvlYuhia86f4CI2ON0gF5ap
-         7VVsn/xTC3UziyNqUw0gxojMNGTYoHg0JsSESnVbwOP714LcYgDHHQaVlJd0MhPwgKeg
-         dVgsvBd9VDTmx0CVQqQ+TEUv1JcPP3iPRv6NiDnPdIiXDnMvZ5U0mwb4jj+xwLW43wpe
-         CrJtr0aZwU2qFnYVqG8RjZ/aaq8s9SDf4E8SX1ItOo2HHg8smXZTyEvGQTBkBmgiLpt2
-         fxkQ==
-X-Gm-Message-State: APjAAAU7DZj9aUHecE7mHpthM5bFlnK0e+yZvsCN/ZAoxRbCNUoWxXJc
-        J17HCut9VKIiO/Z+4EjjXAc=
-X-Google-Smtp-Source: APXvYqySwhWDf4JA3GLQlNS2pqACUoF55kJ2wCVDTSRm+FoPw2vi1mKPJsOuuhC2eFbEA1+1nD2ApQ==
-X-Received: by 2002:a17:906:1e85:: with SMTP id e5mr94007378ejj.200.1564586029031;
-        Wed, 31 Jul 2019 08:13:49 -0700 (PDT)
+        bh=Qu4eqa88cl7hA3fQdb28KWqV5w4hCLiKuLbYR7iJuDE=;
+        b=bKOm8qZ3R6z/rZ7NOtqCb4KOZmLc4x6BjWxJ306MOxWAOp+fsI/ELShAfp7LgU3KkR
+         4wQW8DPwG5mZoP0BspjrnYMD+sD52msYdObIUo2GNTPzGPX+opsvJU9O8vuVLLVvWX4a
+         cSMOzA/yIv7a12fa4IRgDrpKgQDT24z5Zh0yKd3ykJYuudI9AzPwCd4RYrDcRE6x+RH+
+         BHj0U2pept6aEJTs/xq7QDaMSaZqJijlwErkwP0+9Wkw/25g3Lsu7lPDIU4g5rPdyfBw
+         uVv3YSxABPQtFuRWQb2MDshArXlYDbczkiUv841YkWF59i0MZHisEBJ83Humv1uJT3qB
+         FxFg==
+X-Gm-Message-State: APjAAAVw+T7ImGssBJ/PUoZ2esgiCnyYjkRW772hxSREYVEFDy9+31RD
+        zK7UBZsTB2RTNqm3RFS1Fo0=
+X-Google-Smtp-Source: APXvYqx2zTJL6YB+Gc6tZHir/y3NwypWB6AAdiaRHKrntm3SVSrSWzIlrCWGYk+WyVgbmkUaGcUHkg==
+X-Received: by 2002:a50:acc6:: with SMTP id x64mr110288029edc.100.1564586034088;
+        Wed, 31 Jul 2019 08:13:54 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id v6sm12580413ejx.28.2019.07.31.08.13.47
+        by smtp.gmail.com with ESMTPSA id oe21sm11729742ejb.44.2019.07.31.08.13.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 08:13:47 -0700 (PDT)
+        Wed, 31 Jul 2019 08:13:52 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 025681045FC; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
+        id 172081045FF; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 38/59] keys/mktme: Do not allow key creation in unsafe topologies
-Date:   Wed, 31 Jul 2019 18:07:52 +0300
-Message-Id: <20190731150813.26289-39-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 41/59] mm: Generalize the mprotect implementation to support extensions
+Date:   Wed, 31 Jul 2019 18:07:55 +0300
+Message-Id: <20190731150813.26289-42-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -78,99 +78,63 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-MKTME depends upon at least one online CPU capable of programming
-each memory controller in the platform.
+Today mprotect is implemented to support legacy mprotect behavior
+plus an extension for memory protection keys. Make it more generic
+so that it can support additional extensions in the future.
 
-An unsafe topology for MKTME is a memory only package or a package
-with no online CPUs. Key creation with unsafe topologies will fail
-with EINVAL and a warning will be logged one time.
-For example:
-	[ ] MKTME: no online CPU in proximity domain
-	[ ] MKTME: topology does not support key creation
-
-These are recoverable errors. CPUs may be brought online that are
-capable of programming a previously unprogrammable memory controller.
+This is done is preparation for adding a new system call for memory
+encyption keys. The intent is that the new encrypted mprotect will be
+another extension to legacy mprotect.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- security/keys/mktme_keys.c | 36 ++++++++++++++++++++++++++++++------
- 1 file changed, 30 insertions(+), 6 deletions(-)
+ mm/mprotect.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
-index 6265b62801e9..70662e882674 100644
---- a/security/keys/mktme_keys.c
-+++ b/security/keys/mktme_keys.c
-@@ -23,6 +23,7 @@ static unsigned int mktme_available_keyids;  /* Free Hardware KeyIDs */
- static struct kmem_cache *mktme_prog_cache;  /* Hardware programming cache */
- static unsigned long *mktme_target_map;	     /* PCONFIG programming target */
- static cpumask_var_t mktme_leadcpus;	     /* One CPU per PCONFIG target */
-+static bool mktme_allow_keys;		     /* HW topology supports keys */
+diff --git a/mm/mprotect.c b/mm/mprotect.c
+index 82d7b194a918..4d55725228e3 100644
+--- a/mm/mprotect.c
++++ b/mm/mprotect.c
+@@ -35,6 +35,8 @@
  
- enum mktme_keyid_state {
- 	KEYID_AVAILABLE,	/* Available to be assigned */
-@@ -253,32 +254,55 @@ static void mktme_destroy_key(struct key *key)
- 	percpu_ref_kill(&encrypt_count[keyid]);
+ #include "internal.h"
+ 
++#define NO_KEY	-1
++
+ static unsigned long change_pte_range(struct vm_area_struct *vma, pmd_t *pmd,
+ 		unsigned long addr, unsigned long end, pgprot_t newprot,
+ 		int dirty_accountable, int prot_numa)
+@@ -453,9 +455,9 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
  }
  
-+static void mktme_update_pconfig_targets(void);
- /* Key Service Method to create a new key. Payload is preparsed. */
- int mktme_instantiate_key(struct key *key, struct key_preparsed_payload *prep)
+ /*
+- * pkey==-1 when doing a legacy mprotect()
++ * When pkey==NO_KEY we get legacy mprotect behavior here.
+  */
+-static int do_mprotect_pkey(unsigned long start, size_t len,
++static int do_mprotect_ext(unsigned long start, size_t len,
+ 		unsigned long prot, int pkey)
  {
- 	u32 *payload = prep->payload.data[0];
- 	unsigned long flags;
-+	int ret = -ENOKEY;
- 	int keyid;
- 
- 	spin_lock_irqsave(&mktme_lock, flags);
-+
-+	/* Topology supports key creation */
-+	if (mktme_allow_keys)
-+		goto get_key;
-+
-+	/* Topology unknown, check it. */
-+	if (!mktme_hmat_evaluate()) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	/* Keys are now allowed. Update the programming targets. */
-+	mktme_update_pconfig_targets();
-+	mktme_allow_keys = true;
-+
-+get_key:
- 	keyid = mktme_reserve_keyid(key);
- 	spin_unlock_irqrestore(&mktme_lock, flags);
- 	if (!keyid)
--		return -ENOKEY;
-+		goto out;
- 
- 	if (percpu_ref_init(&encrypt_count[keyid], mktme_percpu_ref_release,
- 			    0, GFP_KERNEL))
--		goto err_out;
-+		goto out_free_key;
- 
--	if (!mktme_program_keyid(keyid, *payload))
--		return MKTME_PROG_SUCCESS;
-+	ret = mktme_program_keyid(keyid, *payload);
-+	if (ret == MKTME_PROG_SUCCESS)
-+		goto out;
- 
-+	/* Key programming failed */
- 	percpu_ref_exit(&encrypt_count[keyid]);
--err_out:
-+
-+out_free_key:
- 	spin_lock_irqsave(&mktme_lock, flags);
- 	mktme_release_keyid(keyid);
-+out_unlock:
- 	spin_unlock_irqrestore(&mktme_lock, flags);
--	return -ENOKEY;
-+out:
-+	return ret;
+ 	unsigned long nstart, end, tmp, reqprot;
+@@ -579,7 +581,7 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
+ SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
+ 		unsigned long, prot)
+ {
+-	return do_mprotect_pkey(start, len, prot, -1);
++	return do_mprotect_ext(start, len, prot, NO_KEY);
  }
  
- /* Make sure arguments are correct for the TYPE of key requested */
+ #ifdef CONFIG_ARCH_HAS_PKEYS
+@@ -587,7 +589,7 @@ SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
+ SYSCALL_DEFINE4(pkey_mprotect, unsigned long, start, size_t, len,
+ 		unsigned long, prot, int, pkey)
+ {
+-	return do_mprotect_pkey(start, len, prot, pkey);
++	return do_mprotect_ext(start, len, prot, pkey);
+ }
+ 
+ SYSCALL_DEFINE2(pkey_alloc, unsigned long, flags, unsigned long, init_val)
 -- 
 2.21.0
 
