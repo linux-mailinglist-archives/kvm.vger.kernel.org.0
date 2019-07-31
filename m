@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68A947C608
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D012D7C671
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:24:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729801AbfGaPT4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:19:56 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36456 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729765AbfGaPTz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:19:55 -0400
-Received: by mail-ed1-f66.google.com with SMTP id k21so66067565edq.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:19:53 -0700 (PDT)
+        id S1730114AbfGaPYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:24:41 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:39978 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727349AbfGaPXt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:23:49 -0400
+Received: by mail-ed1-f67.google.com with SMTP id k8so66044715eds.7
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:23:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Eu+g52fZa4bEGKyIAIp4EBxePC6msthuJH3Uu+nPhTw=;
-        b=wnJQX8mAznJJYoCaujK7jTh3QOUX6PWjjuHiLLJcqeV5ss0Z+2QOjKE/V/f7i2iOiK
-         nWVMBrRzOEuvD50CqQeMSrlLn2yn9nza0e9HYNf9Ci+gZHXztuPcnXQO8Dv/jueUicfh
-         7x8hxn+DoCcOemE+5xb8GVrcsoOF21pEeWL359gwrBqCcOEFkYVISmg99A9v32xeC8nY
-         K1fXvjaKfAQ0uf1yUKgRc0FXE0a1c8GjVdeZkh9RF4YCM+ZniD98ehoTPZKfBwPrhyWd
-         vT4LGzn8l+GiV/PrV8efZhSU7sLAmcDsKabNfPrtzDTZJ+6VtoCaBOiq1M24C/XlfUJi
-         ySJg==
+        bh=a18UOZt3FCDvDMvgP9zldJLt6lTKwFfHbu73YInWFn4=;
+        b=NRoJL3bi5X5MHI+UHT7B1S62Fze3JOWhyFVaj3bzy32xghKUPsGgZO7GdGj/I+MGwQ
+         IcszjXoHkHLCYl9E9+S0TVZkBMexB6yUan+V+lOdKu1ZTL//k329IuqiUOHsMZt8zobx
+         DpyOBiRYKgBlkPN70qU0UyV4A9sw+9NOai6RD5k+KXVTchojnkBQ/9wvCG9xsOR3lQJH
+         25Orq3JTmZBnhwFdJDSLbIjUUACw24Q/2V5Z/1iDJXDUwr6CPtjVVjX8EN+dRQ/iWt3F
+         ajr2K45loyNYVlzJu2bXoVrUmjOiINR3+Zakf9U0MEFo74tWWpXOujPELeLbtPwG7Bf+
+         4HTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Eu+g52fZa4bEGKyIAIp4EBxePC6msthuJH3Uu+nPhTw=;
-        b=kTD4wcuoEbrF6CmekhPNgN+Spx7MupCVANW9/kvD/KGyXP4kSrZi9qkMQ5jefi5Kow
-         Fy/B5YPjTlrAwRBdKkwVMRUOIS97bYhsEvJj9aaFboxsbpQxnH2+cY479Jjo+rVsIKBi
-         LA0cn3e7VeWPl867OyycCGDoGeGTUW02qqgojZs1Hw6/SZKLjWJK7O9ni0xTsoZCIwOz
-         tqEKK62pAuyavKApJqDQc8wpgdu29GO9OqmhrSu8sPZDIQp4LHzu8s7XUFsPUtNgGCzs
-         3jpbqHec122SRd8/2r8zGgifZt6esI98/NFzQkdsi9i32bbC9OZ+89y3pu4MFTv6iiy8
-         JVqg==
-X-Gm-Message-State: APjAAAXTEJXl6XVEWrfABShBVwps6KNs2LeTlGOhfdwaFHv/SK6C3t3l
-        Fr5SbMps4BanaUtDtW8az/U=
-X-Google-Smtp-Source: APXvYqxAI13PpDAJZQellLR+hBXyuxC6IRUxmch2g01/3TCjBtlaolRAKh1msonh8wE/v8SwQy/t/w==
-X-Received: by 2002:a50:addc:: with SMTP id b28mr108191573edd.174.1564586031854;
-        Wed, 31 Jul 2019 08:13:51 -0700 (PDT)
+        bh=a18UOZt3FCDvDMvgP9zldJLt6lTKwFfHbu73YInWFn4=;
+        b=dD/fEmf0pq7van2g4+M0veGaNjnnJjBE+Abjn9qLJqpWhe2LwRWsdpjWiwLSC4Xabx
+         NXtQVEOt7G+efENJ0JjG+8cWTVGe4aC0j6Qb/fVV3Jcrg12wTnq1BJkuJa+cLCLW3NFh
+         RvGwhhIHtZxrUsN7+VCUci7fYg3jbFLEpcI5EjL7dbZEPp5aDbT7MQ8zR4H90Aqlzx9B
+         n4oNEPgwTNfpO1lPZFWMxWbaVVD+WIjmAlEvPETYc0Up8r4gZh5Zhag1cLU91WNldGl8
+         wj1dlQ7IVDcQUG0QyxUwcXtguUKIE0Rwy8jGHFKSIFB8Wa9FpAEURgH94C/O2+OQKxYN
+         TdNw==
+X-Gm-Message-State: APjAAAXDOeykivX2Rd+DjFtjGJf1G0M9Ia49VbfHJTnwVBpAJlrc5rBD
+        gierlk6ggBnjYBxYzT+deWIIu+hS
+X-Google-Smtp-Source: APXvYqz4eqsH2iJwU1tjXfKb0+/bNd+u2NkjVb8FXDZ8ZsSkbsVxoPTi6IlMDOoUIFCjKkMNnj7bMA==
+X-Received: by 2002:a50:b87c:: with SMTP id k57mr105890483ede.226.1564586627977;
+        Wed, 31 Jul 2019 08:23:47 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id l2sm16613746edn.59.2019.07.31.08.13.49
+        by smtp.gmail.com with ESMTPSA id f24sm17482856edf.30.2019.07.31.08.23.46
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 08:13:50 -0700 (PDT)
+        Wed, 31 Jul 2019 08:23:47 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 7A1691030BB; Wed, 31 Jul 2019 18:08:16 +0300 (+03)
+        id 953461030BF; Wed, 31 Jul 2019 18:08:16 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -62,10 +62,10 @@ Cc:     Kees Cook <keescook@chromium.org>,
         Alison Schofield <alison.schofield@intel.com>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 20/59] x86/mm: Handle encrypted memory in page_to_virt() and __pa()
-Date:   Wed, 31 Jul 2019 18:07:34 +0300
-Message-Id: <20190731150813.26289-21-kirill.shutemov@linux.intel.com>
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 24/59] keys/mktme: Introduce a Kernel Key Service for MKTME
+Date:   Wed, 31 Jul 2019 18:07:38 +0300
+Message-Id: <20190731150813.26289-25-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -76,45 +76,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Per-KeyID direct mappings require changes into how we find the right
-virtual address for a page and virt-to-phys address translations.
+From: Alison Schofield <alison.schofield@intel.com>
 
-page_to_virt() definition overwrites default macros provided by
-<linux/mm.h>.
+MKTME (Multi-Key Total Memory Encryption) is a technology that allows
+transparent memory encryption in upcoming Intel platforms. MKTME will
+support multiple encryption domains, each having their own key.
 
+The MKTME key service will manage the hardware encryption keys. It
+will map Userspace Keys to Hardware KeyIDs and program the hardware
+with the user requested encryption options.
+
+Here the mapping structure is introduced, as well as the key service
+initialization and registration.
+
+Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/include/asm/page.h    | 3 +++
- arch/x86/include/asm/page_64.h | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ security/keys/Makefile     |  1 +
+ security/keys/mktme_keys.c | 60 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 61 insertions(+)
+ create mode 100644 security/keys/mktme_keys.c
 
-diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/page.h
-index 39af59487d5f..aff30554f38e 100644
---- a/arch/x86/include/asm/page.h
-+++ b/arch/x86/include/asm/page.h
-@@ -72,6 +72,9 @@ static inline void copy_user_page(void *to, void *from, unsigned long vaddr,
- extern bool __virt_addr_valid(unsigned long kaddr);
- #define virt_addr_valid(kaddr)	__virt_addr_valid((unsigned long) (kaddr))
- 
-+#define page_to_virt(x) \
-+	(__va(PFN_PHYS(page_to_pfn(x))) + page_keyid(x) * direct_mapping_size)
+diff --git a/security/keys/Makefile b/security/keys/Makefile
+index 9cef54064f60..28799be801a9 100644
+--- a/security/keys/Makefile
++++ b/security/keys/Makefile
+@@ -30,3 +30,4 @@ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += keyctl_pkey.o
+ obj-$(CONFIG_BIG_KEYS) += big_key.o
+ obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
+ obj-$(CONFIG_ENCRYPTED_KEYS) += encrypted-keys/
++obj-$(CONFIG_X86_INTEL_MKTME) += mktme_keys.o
+diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
+new file mode 100644
+index 000000000000..d262e0f348e4
+--- /dev/null
++++ b/security/keys/mktme_keys.c
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: GPL-3.0
 +
- #endif	/* __ASSEMBLY__ */
- 
- #include <asm-generic/memory_model.h>
-diff --git a/arch/x86/include/asm/page_64.h b/arch/x86/include/asm/page_64.h
-index f57fc3cc2246..a4f394e3471d 100644
---- a/arch/x86/include/asm/page_64.h
-+++ b/arch/x86/include/asm/page_64.h
-@@ -24,7 +24,7 @@ static inline unsigned long __phys_addr_nodebug(unsigned long x)
- 	/* use the carry flag to determine if x was < __START_KERNEL_map */
- 	x = y + ((x > y) ? phys_base : (__START_KERNEL_map - PAGE_OFFSET));
- 
--	return x;
-+	return x & direct_mapping_mask;
- }
- 
- #ifdef CONFIG_DEBUG_VIRTUAL
++/* Documentation/x86/mktme/ */
++
++#include <linux/init.h>
++#include <linux/key.h>
++#include <linux/key-type.h>
++#include <linux/mm.h>
++#include <keys/user-type.h>
++
++#include "internal.h"
++
++static unsigned int mktme_available_keyids;  /* Free Hardware KeyIDs */
++
++enum mktme_keyid_state {
++	KEYID_AVAILABLE,	/* Available to be assigned */
++	KEYID_ASSIGNED,		/* Assigned to a userspace key */
++	KEYID_REF_KILLED,	/* Userspace key has been destroyed */
++	KEYID_REF_RELEASED,	/* Last reference is released */
++};
++
++/* 1:1 Mapping between Userspace Keys (struct key) and Hardware KeyIDs */
++struct mktme_mapping {
++	struct key		*key;
++	enum mktme_keyid_state	state;
++};
++
++static struct mktme_mapping *mktme_map;
++
++struct key_type key_type_mktme = {
++	.name		= "mktme",
++	.describe	= user_describe,
++};
++
++static int __init init_mktme(void)
++{
++	int ret;
++
++	/* Verify keys are present */
++	if (mktme_nr_keyids() < 1)
++		return 0;
++
++	mktme_available_keyids = mktme_nr_keyids();
++
++	/* Mapping of Userspace Keys to Hardware KeyIDs */
++	mktme_map = kvzalloc((sizeof(*mktme_map) * (mktme_nr_keyids() + 1)),
++			     GFP_KERNEL);
++	if (!mktme_map)
++		return -ENOMEM;
++
++	ret = register_key_type(&key_type_mktme);
++	if (!ret)
++		return ret;			/* SUCCESS */
++
++	kvfree(mktme_map);
++
++	return -ENOMEM;
++}
++
++late_initcall(init_mktme);
 -- 
 2.21.0
 
