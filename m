@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53CD67C5CD
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:10:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3D557C5C5
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:10:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729363AbfGaPKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:10:21 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:38786 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388482AbfGaPIX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:08:23 -0400
-Received: by mail-ed1-f68.google.com with SMTP id r12so31220329edo.5
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:08:22 -0700 (PDT)
+        id S2388335AbfGaPJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:09:49 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:42283 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388544AbfGaPI1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:08:27 -0400
+Received: by mail-ed1-f67.google.com with SMTP id v15so66044045eds.9
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:08:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=UEVrEENQF6GgqskaCpeVIXbw1wxW9ZHP7LEfmwaIX1Y=;
-        b=McRooZfyR/RpXN5XMwhhQ4fnXOkpn46XyCphce8PhxPou3dx2i+zeEUPZwHp8TipgC
-         BGI1enXNjaRfPWABi/58N/CnaStzBfe7I/sVoHLEwUVWO5RPpvbMnQlhUk+vrP5KitP0
-         xlN7apakZ23IIc8QM67elrLhwzfh8ZdwIfgG4AOrbh58L2rHumcrLS2HKAJ0RvRNAs4E
-         tHD5vqNYW5h49SvrGSAt/0No/7IhX7t7K59+y1G7hgFuma9uWtGUIV6MdVueE6BaPNDj
-         +qOFDedI65e57Y1anrGxh7x7TSxMfmTc9skU5uDbNPifz28H6hTWzz2877Q1hXd1xky2
-         0RXg==
+        bh=D3iLJ7KF8Vm9odDmu+BTFZ/KOQRQtwHyPsHUVXUW2iI=;
+        b=kM1i0F40FYXfEMcdQiR9VUZLV2aBUr0DIlco9iB3hlWgYlqGoH3YhFqThyiuG3GlhU
+         MICJOrT8oqR+53hRqgv3cF8csRqL1xVpyX6tD/ZJaUBHXHN9slodEDUAQFc2ndeYmsWR
+         WW3A0qapPQ7CP1xULEMwz3e4zS5z/Rmun6q/0nEmdJiaXIJHY6yN81AnytapRernvBrE
+         raTbz2gJS/FTTNoeLLnIs+MXpv+7iucyiiIu1zFPo09iRbaEfSGAfhH+M11KFAhMEC6e
+         NwTMUxuK0IGQ7DtfynJRVOV/piQIKxKjIlGe+MhgETY+7kSa+fXty72q0sWznKXB/EmX
+         L2Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=UEVrEENQF6GgqskaCpeVIXbw1wxW9ZHP7LEfmwaIX1Y=;
-        b=G1RHbHL7VwF7RUBrmRqzL7TxVKVgd7pGOrC0ANwvFRDZR0Dx5349NR2vd/O1Ke3UAS
-         PYCQ4d35KylqT4cCyJnge0NmmEJTrMaO2c3HWK6uacgkqrj9qhlE7KVOHRlgdPpYFf8F
-         km/ZoaF2qkPHKpW1BuuZqSPSgLJtnL73KX8svLSYsZACL39MpJ6tChSCd0fojNj0UvSa
-         JdaASEjnXAkNcrPaYECz6fDpHQ6Mc53uZSUCvimLpkBeLu01WeXMwjJLTAfhgjgovvlb
-         COgyXphsrbTauVz0/ddlPvNIvj73fopB+exSoMkj05PeXQSBDPot928xWXlWhsPE0mzR
-         HoOA==
-X-Gm-Message-State: APjAAAWvRdoHyZ+fjtp+mpkQ2luNFdLOy1WsJbMliALGUTcujBJ8dj/0
-        XNSfOp6So1gH4XCrIF66uxQ=
-X-Google-Smtp-Source: APXvYqz0kJ4Lqf/rOwIPdDm01UGfUWsjDSwUjlM7k6Av4cmEuFi6nnooAYqixqH6Nb/ho2xl1lQryA==
-X-Received: by 2002:a50:a3ec:: with SMTP id t41mr107352548edb.43.1564585701601;
-        Wed, 31 Jul 2019 08:08:21 -0700 (PDT)
+        bh=D3iLJ7KF8Vm9odDmu+BTFZ/KOQRQtwHyPsHUVXUW2iI=;
+        b=cENcpnH0/vNWyRkB7u9oKKGW5qGe4ie6NdlnbHCMSqmxOaccEnMnv/Y6BHSMMlXhqH
+         G4ht3SEjm6bGdf1r2vbzdhkLC1gEdO+cKmEeucf+PbSiTCVfSkTKNVoufHUsee6/ZHV3
+         mIiq6ROG1vGgxglJ2ktQuCzd/uBmekcyIzLn+MthiZwmPuEshzCujq3jvP2xc3nSyfjG
+         BzfHjD4n0WNFpmbxUx8pcPezdHnOxWm/lsJYbLm4UB9rpFGYhAQHjpk6r9ICF3lvabgO
+         l7iZnt0D+ty0046LaD7Uc+DF8UMMgx+dprvpMpXjU4QJbU/NeJJTPNJV81CmZnZDAptB
+         Rl/Q==
+X-Gm-Message-State: APjAAAXwYJF7214eAlHizFuIQJe1E7babTngEv7UNWCasCr1Rf6FB7n5
+        t6cssv7Rx0wEaSGGEsf7g7w=
+X-Google-Smtp-Source: APXvYqzHXFkffBxAenDjJHEoVzdmjQiN5+u8mCxxAUf8k5rkMpqzlIwg7G5dir5Kcyl0q83T3wGkPw==
+X-Received: by 2002:a17:906:1496:: with SMTP id x22mr96005472ejc.191.1564585705643;
+        Wed, 31 Jul 2019 08:08:25 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id a9sm17507685edc.44.2019.07.31.08.08.18
+        by smtp.gmail.com with ESMTPSA id u7sm12521820ejm.48.2019.07.31.08.08.19
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 08:08:19 -0700 (PDT)
+        Wed, 31 Jul 2019 08:08:22 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 33AC2101321; Wed, 31 Jul 2019 18:08:16 +0300 (+03)
+        id 3A8CF101322; Wed, 31 Jul 2019 18:08:16 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 10/59] x86/mm: Preserve KeyID on pte_modify() and pgprot_modify()
-Date:   Wed, 31 Jul 2019 18:07:24 +0300
-Message-Id: <20190731150813.26289-11-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 11/59] x86/mm: Detect MKTME early
+Date:   Wed, 31 Jul 2019 18:07:25 +0300
+Message-Id: <20190731150813.26289-12-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -76,58 +76,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-An encrypted VMA will have KeyID stored in vma->vm_page_prot. This way
-we don't need to do anything special to setup encrypted page table
-entries and don't need to reserve space for KeyID in a VMA.
+We need to know the number of KeyIDs before page_ext is initialized.
+We are going to use page_ext to store KeyID and it would be handly to
+avoid page_ext allocation if there's no MKMTE in the system.
 
-This patch changes _PAGE_CHG_MASK to include KeyID bits. Otherwise they
-are going to be stripped from vm_page_prot on the first pgprot_modify().
-
-Define PTE_PFN_MASK_MAX similar to PTE_PFN_MASK but based on
-__PHYSICAL_MASK_SHIFT. This way we include whole range of bits
-architecturally available for PFN without referencing physical_mask and
-mktme_keyid_mask variables.
+page_ext initialization happens before full CPU initizliation is complete.
+Move detect_tme() call to early_init_intel().
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/include/asm/pgtable_types.h | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ arch/x86/kernel/cpu/intel.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
-index b5e49e6bac63..c23793146759 100644
---- a/arch/x86/include/asm/pgtable_types.h
-+++ b/arch/x86/include/asm/pgtable_types.h
-@@ -116,12 +116,25 @@
- 				 _PAGE_ACCESSED | _PAGE_DIRTY)
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index 991bdcb2a55a..4c2d70287eb4 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -187,6 +187,8 @@ static bool bad_spectre_microcode(struct cpuinfo_x86 *c)
+ 	return false;
+ }
  
- /*
-- * Set of bits not changed in pte_modify.  The pte's
-- * protection key is treated like _PAGE_RW, for
-- * instance, and is *not* included in this mask since
-- * pte_modify() does modify it.
-+ * Set of bits not changed in pte_modify.
-+ *
-+ * The pte's protection key is treated like _PAGE_RW, for instance, and is
-+ * *not* included in this mask since pte_modify() does modify it.
-+ *
-+ * They include the physical address and the memory encryption keyID.
-+ * The paddr and the keyID never occupy the same bits at the same time.
-+ * But, a given bit might be used for the keyID on one system and used for
-+ * the physical address on another. As an optimization, we manage them in
-+ * one unit here since their combination always occupies the same hardware
-+ * bits. PTE_PFN_MASK_MAX stores combined mask.
-+ *
-+ * Cast PAGE_MASK to a signed type so that it is sign-extended if
-+ * virtual addresses are 32-bits but physical addresses are larger
-+ * (ie, 32-bit PAE).
-  */
--#define _PAGE_CHG_MASK	(PTE_PFN_MASK | _PAGE_PCD | _PAGE_PWT |		\
-+#define PTE_PFN_MASK_MAX \
-+	(((signed long)PAGE_MASK) & ((1ULL << __PHYSICAL_MASK_SHIFT) - 1))
-+#define _PAGE_CHG_MASK	(PTE_PFN_MASK_MAX | _PAGE_PCD | _PAGE_PWT |		\
- 			 _PAGE_SPECIAL | _PAGE_ACCESSED | _PAGE_DIRTY |	\
- 			 _PAGE_SOFT_DIRTY | _PAGE_DEVMAP)
- #define _HPAGE_CHG_MASK (_PAGE_CHG_MASK | _PAGE_PSE)
++static void detect_tme(struct cpuinfo_x86 *c);
++
+ static void early_init_intel(struct cpuinfo_x86 *c)
+ {
+ 	u64 misc_enable;
+@@ -338,6 +340,9 @@ static void early_init_intel(struct cpuinfo_x86 *c)
+ 	 */
+ 	if (detect_extended_topology_early(c) < 0)
+ 		detect_ht_early(c);
++
++	if (cpu_has(c, X86_FEATURE_TME))
++		detect_tme(c);
+ }
+ 
+ #ifdef CONFIG_X86_32
+@@ -793,9 +798,6 @@ static void init_intel(struct cpuinfo_x86 *c)
+ 	if (cpu_has(c, X86_FEATURE_VMX))
+ 		detect_vmx_virtcap(c);
+ 
+-	if (cpu_has(c, X86_FEATURE_TME))
+-		detect_tme(c);
+-
+ 	init_intel_misc_features(c);
+ }
+ 
 -- 
 2.21.0
 
