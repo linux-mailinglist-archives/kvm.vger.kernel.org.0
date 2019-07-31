@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B41A07C630
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D935E7C626
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:21:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729646AbfGaPTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:19:38 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:39543 "EHLO
+        id S1729815AbfGaPU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:20:59 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:34209 "EHLO
         mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728943AbfGaPTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:19:37 -0400
-Received: by mail-ed1-f68.google.com with SMTP id m10so66044518edv.6
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:19:35 -0700 (PDT)
+        with ESMTP id S1726979AbfGaPU6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:20:58 -0400
+Received: by mail-ed1-f68.google.com with SMTP id s49so31236123edb.1
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:20:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=dXgFqK9tRsaes8xbX8jlTX0gUbPqQYtilIkdLoU6CY4=;
-        b=D/xOlMhrdU0ZyN8+we4kbni7hHuGIfv/4U4Ig0LX9ewfIEajz0z1lI9iS5QnH6yCat
-         sfE6Wxgj7gCcNgGeO8sqZDkOENTjXyGaq0eGqLegmkmODaaLkPBU23YDdAqvq4s4OSxZ
-         N0A8Q4QWYpmDkk2dAzVYUHeLTCw2YmNW5FYuyTsyMmseshWxSznRJue51TmL0r+h8LG/
-         vb4cNBRmMjzUCNNogPHi3S31sph/SJ/M4uXMSstfF9OC/trKRR9pDG2nUWbNR9Ymsx50
-         ScB2FK2fZENk5csdIp1g+R48LmIGH0MJ/LiEr5bfor9Gh3Un92wYv/649p99ZIJ8QAGO
-         S6YQ==
+        bh=k+U6VIHmZ/fZHykv9hSZy3hTFPe14uQwWZPNGVQf9Wg=;
+        b=bRpitEYFAw0iw9F4lWLWOaj8uAivovFwyv4AWNZf1NY1sGLxSiCLjNDzw6evzISUMa
+         GHJXwwWF7WOifVXGeInd0STe8yx3ZYQIBXHrbJkyF+Rm71XJH0Uqn7KhiVn6RKSVi/NH
+         GnIdsyLQWF+U1/Hz7RYNsNvOWkWTR+mduMkRXQK/n0AYcfSL5nkUiUeRr88V6rdddNZa
+         NnYZWfhk4GFsXaFANiQNQQqJaMiCdDw2sC/yGDEkK8d34cXt5u306IrMfDI46uU39c0H
+         ulh3gI4vz6iIiS8U4HduYh7aIdHho4vvV2rbd58qJxpeTNRRIu4peFugSAhril4FyF28
+         DzHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dXgFqK9tRsaes8xbX8jlTX0gUbPqQYtilIkdLoU6CY4=;
-        b=dpJC0+UNPcwjCPp4067c/p41hbD+j/8Q9wkGoWKMyF9ur91vETXC1ycRWUHGjQvW5K
-         sdxGyDv87S5LtLb0S2C+YBss6nb1Vu/qNe4m9eZ4Podc1rS9LvzF4YwU+NpoQ9q3qWUZ
-         cg8mfG5RRLUfTx+J6qFTxL972c34Vy9Z6WMFgO3X59UxuyMWyDtTPSZHmMRrtyCK8uam
-         EFMyXaeTRhcGSAZaKfkqo9Wgzk6BOMTbXJpNIAm/PtC4IjjnXEsbCckcRnp8xjb3JYFx
-         ufOQVLPJi0xW1/XRoaICH9SnsCi6qlRQ25alZ9OOh0p7V02iO3l34Hc4dG/fIjZfDxta
-         k78g==
-X-Gm-Message-State: APjAAAUZ3R6zT64FD8TkpsWOS/L8ZokrH5ZgW1NnROpOu9gIrAeZgzQu
-        cLX1sBl8BwlQHeo6PmnJpjU=
-X-Google-Smtp-Source: APXvYqyagj0pny7ZfrRGD/QMhFKklBkFWmGDfmQgFU5rbWlHF6yWjUkfAl5cJt9AcGs7WHAa7fbavg==
-X-Received: by 2002:a50:a485:: with SMTP id w5mr108547875edb.277.1564586038641;
+        bh=k+U6VIHmZ/fZHykv9hSZy3hTFPe14uQwWZPNGVQf9Wg=;
+        b=onRdpOlc/0ValaG/4OL6fQpfxctWfTZlf/Hz3IUMDzLmSHvvgpTIag2DZ8spIGZ8Aa
+         YRnYnnK4/VoJhBvTDuwCkKPshhU23d7dCAg8bf324inHs/fXU0L6b7sYSur35YV2FDfG
+         pf/uCI+rxzT/2Dsj5HKqUy4vW5t/dvFh+7uzclM6KsBtQUruZBEcbefar511lIgsqmtJ
+         ayNOvnTNwfrvxkfYFs5VuvaZt8iFUl74GXtKa6StQzTFGsEh1iib6OM7UIerflxUgfUx
+         44TO64qh7iX1KKL7B9RRS2r9wOlYyI9x+EMIp5+OS7TDOxlB03MCB4wzgQfXOevCTIbv
+         h8/w==
+X-Gm-Message-State: APjAAAWkF7S8sgzhu4+7xwtOxj8ASeDX5Pbolev2yWiDZ7Y0z8MLiXq0
+        WLwHgXYLrgMcLfO8/ZbQp1A=
+X-Google-Smtp-Source: APXvYqx+v4/Pbf2jShDF7c6rephC3qv4nn7vrbh6ErmrX7qhFi1sSZ2Ot8M2CUcvWdStTREYbHHJ+Q==
+X-Received: by 2002:a50:9468:: with SMTP id q37mr106511363eda.163.1564586038381;
         Wed, 31 Jul 2019 08:13:58 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id i8sm17219860edg.12.2019.07.31.08.13.54
+        by smtp.gmail.com with ESMTPSA id e43sm17445027ede.62.2019.07.31.08.13.53
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
         Wed, 31 Jul 2019 08:13:57 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 3A5C3104604; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
+        id 41659104605; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 46/59] mm: Restrict MKTME memory encryption to anonymous VMAs
-Date:   Wed, 31 Jul 2019 18:08:00 +0300
-Message-Id: <20190731150813.26289-47-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 47/59] kvm, x86, mmu: setup MKTME keyID to spte for given PFN
+Date:   Wed, 31 Jul 2019 18:08:01 +0300
+Message-Id: <20190731150813.26289-48-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -76,62 +76,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alison Schofield <alison.schofield@intel.com>
+From: Kai Huang <kai.huang@linux.intel.com>
 
-Memory encryption is only supported for mappings that are ANONYMOUS.
-Test the VMA's in an encrypt_mprotect() request to make sure they all
-meet that requirement before encrypting any.
+Setup keyID to SPTE, which will be eventually programmed to shadow MMU
+or EPT table, according to page's associated keyID, so that guest is
+able to use correct keyID to access guest memory.
 
-The encrypt_mprotect syscall will return -EINVAL and will not encrypt
-any VMA's if this check fails.
+Note current shadow_me_mask doesn't suit MKTME's needs, since for MKTME
+there's no fixed memory encryption mask, but can vary from keyID 1 to
+maximum keyID, therefore shadow_me_mask remains 0 for MKTME.
 
-Signed-off-by: Alison Schofield <alison.schofield@intel.com>
+Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- mm/mprotect.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ arch/x86/kvm/mmu.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index 518d75582e7b..4b079e1b2d6f 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -347,6 +347,24 @@ static int prot_none_walk(struct vm_area_struct *vma, unsigned long start,
- 	return walk_page_range(start, end, &prot_none_walk);
- }
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 8f72526e2f68..b8742e6219f6 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -2936,6 +2936,22 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
+ #define SET_SPTE_WRITE_PROTECTED_PT	BIT(0)
+ #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
  
-+/*
-+ * Encrypted mprotect is only supported on anonymous mappings.
-+ * If this test fails on any single VMA, the entire mprotect
-+ * request fails.
-+ */
-+static bool mem_supports_encryption(struct vm_area_struct *vma, unsigned long end)
++static u64 get_phys_encryption_mask(kvm_pfn_t pfn)
 +{
-+	struct vm_area_struct *test_vma = vma;
++#ifdef CONFIG_X86_INTEL_MKTME
++	struct page *page;
 +
-+	do {
-+		if (!vma_is_anonymous(test_vma))
-+			return false;
++	if (!pfn_valid(pfn))
++		return 0;
 +
-+		test_vma = test_vma->vm_next;
-+	} while (test_vma && test_vma->vm_start < end);
-+	return true;
++	page = pfn_to_page(pfn);
++
++	return ((u64)page_keyid(page)) << mktme_keyid_shift();
++#else
++	return shadow_me_mask;
++#endif
 +}
 +
- int
- mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- 	       unsigned long start, unsigned long end, unsigned long newflags,
-@@ -533,6 +551,12 @@ static int do_mprotect_ext(unsigned long start, size_t len,
- 				goto out;
- 		}
- 	}
-+
-+	if (keyid > 0 && !mem_supports_encryption(vma, end)) {
-+		error = -EINVAL;
-+		goto out;
-+	}
-+
- 	if (start > vma->vm_start)
- 		prev = vma;
+ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 		    unsigned pte_access, int level,
+ 		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
+@@ -2982,7 +2998,7 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 		pte_access &= ~ACC_WRITE_MASK;
+ 
+ 	if (!kvm_is_mmio_pfn(pfn))
+-		spte |= shadow_me_mask;
++		spte |= get_phys_encryption_mask(pfn);
+ 
+ 	spte |= (u64)pfn << PAGE_SHIFT;
  
 -- 
 2.21.0
