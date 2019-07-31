@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53B467C627
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:21:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6905F7C61E
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 17:20:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730086AbfGaPVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 11:21:01 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:34211 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729131AbfGaPVA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 11:21:00 -0400
-Received: by mail-ed1-f67.google.com with SMTP id s49so31236152edb.1
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:20:58 -0700 (PDT)
+        id S1729687AbfGaPUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 11:20:49 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:46160 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730061AbfGaPUt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 11:20:49 -0400
+Received: by mail-ed1-f68.google.com with SMTP id d4so66098203edr.13
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 08:20:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=shutemov-name.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=WTAAjTsK3+3w7eSPHsyJf/zyVQM+N+66EXtK8GvqGh0=;
-        b=vHCm2eeuCUQs2yHSeXWs6297E3LD/DJ3yKHjxnQ3uS38oTOhZMWNOL2t2b8qyqezCd
-         TSyHJ2nZIkIp+xozfa1fMkbPHgLyD07pzVHXY1r0RJbOqJQjIa59zY+kzkFpFK+i6bAm
-         u2IRsUZJ7qr8muyrOi/vvs1sPIHYD5F+Sz93KlJmSVBGUVMoNkaJnWL0flwcUWdk1Rd+
-         pJLhMUZ1mXkr512XbgaOmHVFaepWq9DNGGdxUvxD97xw+4EXINwjigBZSkDbyOrFGk9v
-         coI9yYfL7DOZadkWb+EyLWXGslgUVJIufSy67o3yRyMY9W/s+uFsbxg0YK6+eu5onsz9
-         Qs2g==
+        bh=giiClMAwHghspubxRJeU98UBj4kcy5uaSNNQ5yHBQr8=;
+        b=YaTXMBHevd+rhxg7oKsHgnNx749IFnPZBGV8uL7sZwZst8GkM7+TgJ5hOEwl+8ch77
+         0SnQ660ccq3nonm+oPVfiPClF1RSRdsFcsOmiSCMAee/860JmulRtpJu6ZVUPIXxPpab
+         A4HPUmoMK+oL/ZYU5z/0aKIN4ZyJj82QmP1VUkYEBl9uw4vslQvBcp1bM5ghPUhjzxVC
+         giBVV/0crRxnqKUVAJjYi7W4wag0HivWwFFhHGvLdDIRmm1PDwxpL1ZVySWrGgKoEpQY
+         GhlGRvNmW51GC9GcIML/xNJIoQeLdRe0qiR4tweLB/NiOTOi4OWFj5nMUqbAYuKnK/j8
+         MnLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=WTAAjTsK3+3w7eSPHsyJf/zyVQM+N+66EXtK8GvqGh0=;
-        b=XfmqWz9zenlUYcQsfFuXYu9+sIWnQnmlZC3wVp5JM7o6ldafCGNgWybFsEqFNlgNTS
-         Xif5++he/k26tLXVFjjU1vKcS4+/o5HcOISVOZ4asQdra/g5XW6qr0iCk5aeJdWMR4UY
-         FbflqRYEAai4OMe75riEpkEWur+oeympU+n6+eCbz3EIjtGkjtKSHUmzPm1oe+pd68HD
-         Fg4xuxJjawJG8FEGYqvh3+IatHd1Lp0woq9zk03WyaQeRGRRs/BI4CZX44eH1s+RQNpU
-         o1/bG/NLkmJqQhPmZ8mWzZ60n9K0yLnt/W+vMlhDVPAup/057FCAszuHkHpiWrkx5sM2
-         yL6Q==
-X-Gm-Message-State: APjAAAU3xsqbySsmWtsKufKH9KPZ18KbrCFXiMRfSz89dGgho8OD7jyC
-        kclwLDR0VOJn9CnlsdZ9NSA=
-X-Google-Smtp-Source: APXvYqyDF7Ax4wPwm75VtJQs6n6Sw+upz55I60UXt6jJNg1T+Xcry5rWrrwsNPjn0mCM+yzapDyh9Q==
-X-Received: by 2002:a50:9153:: with SMTP id f19mr109455097eda.70.1564586035945;
-        Wed, 31 Jul 2019 08:13:55 -0700 (PDT)
+        bh=giiClMAwHghspubxRJeU98UBj4kcy5uaSNNQ5yHBQr8=;
+        b=EpsL2yAFQnYSP1cFKFjVqQdWk/OdzgvVeGQ0m2hdC9qGQxUGvR1rhV5PBGPSIeGUEl
+         sPMlGhFRzoJelpeMUqxTVVd+h0DghXz3WIk2qXeG3uejvwap++J2m4ZjLl5Fxo7Pqe9L
+         4zozR+yOP9dH++c+rc5JgI7qrOHQLy7McE1Lj5FDQMmzbo6Q5s+qskXTcwanXv5ARth7
+         fTAH5nNffcbCcIelleDk4+Hz04tXQyYr8YyBOzc9RvPcgniUqQlRLpByUfNM+UorUJFz
+         whdmfFlG/ZFMd3OZi3jLkoP/naSxKWU8PRkEEHbv7coErIAIX0VRYsEqd8QIHt25lVVn
+         toFQ==
+X-Gm-Message-State: APjAAAX/+VzOQzjk+mFd7NGq36SKJtZj6alLuUi/4xrrupNuBYDVoCPQ
+        +MNk7jxsUD9f7hpG/EB+hhk=
+X-Google-Smtp-Source: APXvYqwa7uk1eoCfkAn/mJHFtQFBKd5911qUgdeykZm3YPTTj3MkDFh75r+Wsq0y3PI0U1ZEMWspDg==
+X-Received: by 2002:aa7:dd09:: with SMTP id i9mr109849959edv.193.1564586036906;
+        Wed, 31 Jul 2019 08:13:56 -0700 (PDT)
 Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id q56sm17022134eda.28.2019.07.31.08.13.51
+        by smtp.gmail.com with ESMTPSA id t13sm17047248edd.13.2019.07.31.08.13.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
         Wed, 31 Jul 2019 08:13:53 -0700 (PDT)
 From:   "Kirill A. Shutemov" <kirill@shutemov.name>
 X-Google-Original-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Received: by box.localdomain (Postfix, from userid 1000)
-        id 87A6F1048A9; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
+        id 8EA5E1048AA; Wed, 31 Jul 2019 18:08:17 +0300 (+03)
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 57/59] x86/mktme: Document the MKTME Key Service API
-Date:   Wed, 31 Jul 2019 18:08:11 +0300
-Message-Id: <20190731150813.26289-58-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 58/59] x86/mktme: Document the MKTME API for anonymous memory encryption
+Date:   Wed, 31 Jul 2019 18:08:12 +0300
+Message-Id: <20190731150813.26289-59-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
 References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
@@ -81,87 +81,82 @@ From: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- Documentation/x86/mktme/index.rst      |  1 +
- Documentation/x86/mktme/mktme_keys.rst | 61 ++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
- create mode 100644 Documentation/x86/mktme/mktme_keys.rst
+ Documentation/x86/mktme/index.rst         |  1 +
+ Documentation/x86/mktme/mktme_encrypt.rst | 56 +++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
+ create mode 100644 Documentation/x86/mktme/mktme_encrypt.rst
 
 diff --git a/Documentation/x86/mktme/index.rst b/Documentation/x86/mktme/index.rst
-index 0f021cc4a2db..8cf2b7d62091 100644
+index 8cf2b7d62091..ca3c76adc596 100644
 --- a/Documentation/x86/mktme/index.rst
 +++ b/Documentation/x86/mktme/index.rst
-@@ -8,3 +8,4 @@ Multi-Key Total Memory Encryption (MKTME)
-    mktme_overview
+@@ -9,3 +9,4 @@ Multi-Key Total Memory Encryption (MKTME)
     mktme_mitigations
     mktme_configuration
-+   mktme_keys
-diff --git a/Documentation/x86/mktme/mktme_keys.rst b/Documentation/x86/mktme/mktme_keys.rst
+    mktme_keys
++   mktme_encrypt
+diff --git a/Documentation/x86/mktme/mktme_encrypt.rst b/Documentation/x86/mktme/mktme_encrypt.rst
 new file mode 100644
-index 000000000000..5d9125eb7950
+index 000000000000..6dc8ae11f1cb
 --- /dev/null
-+++ b/Documentation/x86/mktme/mktme_keys.rst
-@@ -0,0 +1,61 @@
-+MKTME Key Service API
-+=====================
-+MKTME is a new key service type added to the Linux Kernel Key Service.
++++ b/Documentation/x86/mktme/mktme_encrypt.rst
+@@ -0,0 +1,56 @@
++MKTME API: system call encrypt_mprotect()
++=========================================
 +
-+The MKTME Key Service type is available when CONFIG_X86_INTEL_MKTME is
-+turned on in Intel platforms that support the MKTME feature.
-+
-+The MKTME Key Service type manages the allocation of hardware encryption
-+keys. Users can request an MKTME type key and then use that key to
-+encrypt memory with the encrypt_mprotect() system call.
-+
-+Usage
-+-----
-+    When using the Kernel Key Service to request an *mktme* key,
-+    specify the *payload* as follows:
-+
-+    type=
-+        *cpu*	User requests a CPU generated encryption key.
-+                The CPU generates and assigns an ephemeral key.
-+
-+        *no-encrypt*
-+                 User requests that hardware does not encrypt
-+                 memory when this key is in use.
-+
-+    algorithm=
-+        When type=cpu the algorithm field must be *aes-xts-128*
-+        *aes-xts-128* is the only supported encryption algorithm
-+
-+        When type=no-encrypt the algorithm field must not be
-+        present in the payload.
-+
-+ERRORS
-+------
-+    In addition to the Errors returned from the Kernel Key Service,
-+    add_key(2) or keyctl(1) commands, the MKTME Key Service type may
-+    return the following errors:
-+
-+    EINVAL for any payload specification that does not match the
-+           MKTME type payload as defined above.
-+
-+    EACCES for access denied. The MKTME key type uses capabilities
-+           to restrict the allocation of keys to privileged users.
-+           CAP_SYS_RESOURCE is required, but it will accept the
-+           broader capability of CAP_SYS_ADMIN. See capabilities(7).
-+
-+    ENOKEY if a hardware key cannot be allocated. Additional error
-+           messages will describe the hardware programming errors.
-+
-+EXAMPLES
++Synopsis
 +--------
-+    Add a 'cpu' type key::
++int encrypt_mprotect(void \*addr, size_t len, int prot, key_serial_t serial);
 +
-+        char \*options_CPU = "type=cpu algorithm=aes-xts-128";
++Where *key_serial_t serial* is the serial number of a key allocated
++using the MKTME Key Service.
 +
-+        key = add_key("mktme", "name", options_CPU, strlen(options_CPU),
-+                      KEY_SPEC_THREAD_KEYRING);
++Description
++-----------
++    encrypt_mprotect() encrypts the memory pages containing any part
++    of the address range in the interval specified by addr and len.
 +
-+    Add a "no-encrypt' type key::
++    encrypt_mprotect() supports the legacy mprotect() behavior plus
++    the enabling of memory encryption. That means that in addition
++    to encrypting the memory, the protection flags will be updated
++    as requested in the call.
 +
-+	key = add_key("mktme", "name", "no-encrypt", strlen(options_CPU),
-+		      KEY_SPEC_THREAD_KEYRING);
++    The *addr* and *len* must be aligned to a page boundary.
++
++    The caller must have *KEY_NEED_VIEW* permission on the key.
++
++    The memory that is to be protected must be mapped *ANONYMOUS*.
++
++Errors
++------
++    In addition to the Errors returned from legacy mprotect()
++    encrypt_mprotect will return:
++
++    ENOKEY *serial* parameter does not represent a valid key.
++
++    EINVAL *len* parameter is not page aligned.
++
++    EACCES Caller does not have *KEY_NEED_VIEW* permission on the key.
++
++EXAMPLE
++--------
++  Allocate an MKTME Key::
++        serial = add_key("mktme", "name", "type=cpu algorithm=aes-xts-128" @u
++
++  Map ANONYMOUS memory::
++        ptr = mmap(NULL, size, PROT_NONE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
++
++  Protect memory::
++        ret = syscall(SYS_encrypt_mprotect, ptr, size, PROT_READ|PROT_WRITE,
++                      serial);
++
++  Use the encrypted memory
++
++  Free memory::
++        ret = munmap(ptr, size);
++
++  Free the key resource::
++        ret = keyctl(KEYCTL_INVALIDATE, serial);
 -- 
 2.21.0
 
