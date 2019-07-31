@@ -2,157 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 762F27CCC1
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 21:31:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E78F47CCC7
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2019 21:33:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730901AbfGaTbA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 15:31:00 -0400
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:36393 "EHLO
-        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728809AbfGaTbA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 15:31:00 -0400
-Received: by mail-ua1-f66.google.com with SMTP id v20so27442359uao.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 12:30:59 -0700 (PDT)
+        id S1730939AbfGaTcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 15:32:54 -0400
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:37639 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730523AbfGaTcy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 15:32:54 -0400
+Received: by mail-ua1-f67.google.com with SMTP id z13so27446259uaa.4
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 12:32:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to
          :user-agent;
-        bh=V4Wcp011k9h7N5iAJkWpP1Nbu9oN4M2GGvG06LvdU2U=;
-        b=fUaCEUhNC4Tuu1n1nF8asI51cgg70GaR9H/nMdDM2BZwKIGwYESyC+ANrzEzNbyCCK
-         Oo9kAgTUGUCRJpgDkeKVwv2v7LNE0yerjxD0FFu+TlVm1wemvoI2V5qJum7RZWCsIsFu
-         caZSoA1qPEKO3nEIy2wlsOXadZQb5TaaAqtNv95x4AfEvUSG01PbXA2WgagTZHsb7aMz
-         DXvwhLJ2m6xnSVDL9BTKqy7XAh7eilMxSkpBweTk3v2EiycxvGfTJMtMv1lYRBGBE0MV
-         Tk6sq+Q07tuHcFgS507UyAJFXfBxy4xzy4NGxxbF1CNkFe49Cf8Iq4yLVLNYGHjD92T2
-         DCGg==
+        bh=c/NJmknjYXnLTaXRtiFYceCSSkLEpxXu+tMv/jvhB4c=;
+        b=LI2KcArlX/KDX2TcyNDMmZ/ZE5cTjMJZAWURsjSV4Imlv9kH1NUViD2h4jhBiochFl
+         PcBkIr6h+Ama1aEpsEKY0+YWcr4zGIYiDZeHjfAcoJ7D5bhZGrutuuXh2VyPBF/PGSWj
+         rBFxsMepIBDKtn7K+Eb/QauyvOUUPBIaZeWYB7D9OTcRzYVrpta97Tts+NPdJEtxyeZT
+         4mnFi5qkP9mb/xCWugLIcKxaQeVkFke1DMMaZqkdopWouBcYnmfoYEzQAihrW4DvwoYG
+         gTaz79+pmrgYhwBHdPqps4krBCsM0VZnUBMsMvvHGss/KNwAXa5MNeRXmHLX55kimuyr
+         zZ8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=V4Wcp011k9h7N5iAJkWpP1Nbu9oN4M2GGvG06LvdU2U=;
-        b=gKrvgWM82fRYEFrjZiJMdbR/XgRvqxrAdfdEz20/3/zQXC4WW5QnyVE/Zw1RZbvFe5
-         jDSb10og1fDaWQLXQB/7gjl7klqVeA2J96MlG+FSPKveJBvAr8YgDVosiHcC2HWXc2dY
-         vf/gfYMkoR6PKoQPNw2p3MAQ+aQbE2aHZUc39ayNerBqZqIsy8oGrUq96x1X+EOQH0+y
-         YeQrvn9XICyerrOGfiSeWQcj92704k4lHsIo+aosvGd8eoOd/EZyLCAecj3Zu1CzH8HW
-         J7Y7j5fXciwWZYFpkwxkF1o7lpxzFC7IiVoo1PQ1ew5A5f9F+XmPq/4aIdE+1dz+QT1a
-         gB1Q==
-X-Gm-Message-State: APjAAAUR5Cwx5voEPLvdYOZpWrynM/EVjor33JYLCHbDGumvVUiEKrAD
-        Dc3vri7iGwebuHWdokB1JBwpug==
-X-Google-Smtp-Source: APXvYqzup5DZ6q8bxH1OXHSeDiBtafoJQmznWiwBSNHtM04i2y2ha7deX2jX6U9UfYm6veI89m6bZw==
-X-Received: by 2002:ab0:49b0:: with SMTP id e45mr17499877uad.120.1564601458846;
-        Wed, 31 Jul 2019 12:30:58 -0700 (PDT)
+        bh=c/NJmknjYXnLTaXRtiFYceCSSkLEpxXu+tMv/jvhB4c=;
+        b=NLtUA5JEQFdYWKGJ2JGpDgZDU1a1gTXmP8vPluyr1PokSswCqnA0/LfUYlCc3A4Sm2
+         fu0PW1uiA9LadguHSDyGedDU0t9JDQdRsr5oMOZhxMdnOkk8F9HOD2RuybRWtJmUMwp8
+         jfDx/8eizvIc9LPxbKY8k6lFxujtjs6M/2CknxIJPZXFKpVjCrg5o/TAwJz/R8SPBhAA
+         aQZsBT8wCg+pBQEe8Yo2qbmtcs3ybUa9yY2cncGiLBC9JfGRlQBmGdnkBvWCTGFx+r6M
+         htJ2T2Os0c8Zf7AMwCTYT8rNlxP9HXrXCSi6wgiuabydrYeSzFG6VrDgwFOmmIYGmtas
+         rLAg==
+X-Gm-Message-State: APjAAAV3qO4BwdG1jP/IuyAqHruZAXEqTsEGJ/sxhwr4mPBOluenyLnd
+        MfUndPHvL08ydr09EpTwwptWqg==
+X-Google-Smtp-Source: APXvYqw7F0dP8sLkKJbAjJz+H7jEhemrR3x/a26pLVHnQrJcxOczpiTadHqsEDo3aJO4KIor71NCpQ==
+X-Received: by 2002:ab0:67d6:: with SMTP id w22mr11381723uar.68.1564601573050;
+        Wed, 31 Jul 2019 12:32:53 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id 10sm28842460vkl.33.2019.07.31.12.30.58
+        by smtp.gmail.com with ESMTPSA id g8sm21073143vkf.21.2019.07.31.12.32.52
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 31 Jul 2019 12:30:58 -0700 (PDT)
+        Wed, 31 Jul 2019 12:32:52 -0700 (PDT)
 Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
         (envelope-from <jgg@ziepe.ca>)
-        id 1hsuJN-0007XW-Lr; Wed, 31 Jul 2019 16:30:57 -0300
-Date:   Wed, 31 Jul 2019 16:30:57 -0300
+        id 1hsuLE-0007bw-8g; Wed, 31 Jul 2019 16:32:52 -0300
+Date:   Wed, 31 Jul 2019 16:32:52 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     mst@redhat.com, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
- with worker
-Message-ID: <20190731193057.GG3946@ziepe.ca>
+Subject: Re: [PATCH V2 4/9] vhost: reset invalidate_count in
+ vhost_set_vring_num_addr()
+Message-ID: <20190731193252.GH3946@ziepe.ca>
 References: <20190731084655.7024-1-jasowang@redhat.com>
- <20190731084655.7024-8-jasowang@redhat.com>
- <20190731123935.GC3946@ziepe.ca>
- <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
+ <20190731084655.7024-5-jasowang@redhat.com>
+ <20190731124124.GD3946@ziepe.ca>
+ <31ef9ed4-d74a-3454-a57d-fa843a3a802b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
+In-Reply-To: <31ef9ed4-d74a-3454-a57d-fa843a3a802b@redhat.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 31, 2019 at 09:28:20PM +0800, Jason Wang wrote:
+On Wed, Jul 31, 2019 at 09:29:28PM +0800, Jason Wang wrote:
 > 
-> On 2019/7/31 下午8:39, Jason Gunthorpe wrote:
-> > On Wed, Jul 31, 2019 at 04:46:53AM -0400, Jason Wang wrote:
-> > > We used to use RCU to synchronize MMU notifier with worker. This leads
-> > > calling synchronize_rcu() in invalidate_range_start(). But on a busy
-> > > system, there would be many factors that may slow down the
-> > > synchronize_rcu() which makes it unsuitable to be called in MMU
-> > > notifier.
+> On 2019/7/31 下午8:41, Jason Gunthorpe wrote:
+> > On Wed, Jul 31, 2019 at 04:46:50AM -0400, Jason Wang wrote:
+> > > The vhost_set_vring_num_addr() could be called in the middle of
+> > > invalidate_range_start() and invalidate_range_end(). If we don't reset
+> > > invalidate_count after the un-registering of MMU notifier, the
+> > > invalidate_cont will run out of sync (e.g never reach zero). This will
+> > > in fact disable the fast accessor path. Fixing by reset the count to
+> > > zero.
 > > > 
-> > > A solution is SRCU but its overhead is obvious with the expensive full
-> > > memory barrier. Another choice is to use seqlock, but it doesn't
-> > > provide a synchronization method between readers and writers. The last
-> > > choice is to use vq mutex, but it need to deal with the worst case
-> > > that MMU notifier must be blocked and wait for the finish of swap in.
-> > > 
-> > > So this patch switches use a counter to track whether or not the map
-> > > was used. The counter was increased when vq try to start or finish
-> > > uses the map. This means, when it was even, we're sure there's no
-> > > readers and MMU notifier is synchronized. When it was odd, it means
-> > > there's a reader we need to wait it to be even again then we are
-> > > synchronized.
-> > You just described a seqlock.
+> > > Reported-by: Michael S. Tsirkin <mst@redhat.com>
+> > Did Michael report this as well?
 > 
 > 
-> Kind of, see my explanation below.
-> 
-> 
-> > 
-> > We've been talking about providing this as some core service from mmu
-> > notifiers because nearly every use of this API needs it.
-> 
-> 
-> That would be very helpful.
-> 
-> 
-> > 
-> > IMHO this gets the whole thing backwards, the common pattern is to
-> > protect the 'shadow pte' data with a seqlock (usually open coded),
-> > such that the mmu notififer side has the write side of that lock and
-> > the read side is consumed by the thread accessing or updating the SPTE.
-> 
-> 
-> Yes, I've considered something like that. But the problem is, mmu notifier
-> (writer) need to wait for the vhost worker to finish the read before it can
-> do things like setting dirty pages and unmapping page.  It looks to me
-> seqlock doesn't provide things like this.  
+> Correct me if I was wrong. I think it's point 4 described in
+> https://lkml.org/lkml/2019/7/21/25.
 
-The seqlock is usually used to prevent a 2nd thread from accessing the
-VA while it is being changed by the mm. ie you use something seqlocky
-instead of the ugly mmu_notifier_unregister/register cycle.
+I'm not sure what that is talking about
 
-You are supposed to use something simple like a spinlock or mutex
-inside the invalidate_range_start to serialized tear down of the SPTEs
-with their accessors.
+But this fixes what I described:
 
-> write_seqcount_begin()
-> 
-> map = vq->map[X]
-> 
-> write or read through map->addr directly
-> 
-> write_seqcount_end()
-> 
-> 
-> There's no rmb() in write_seqcount_begin(), so map could be read before
-> write_seqcount_begin(), but it looks to me now that this doesn't harm at
-> all, maybe we can try this way.
-
-That is because it is a write side lock, not a read lock. IIRC
-seqlocks have weaker barriers because the write side needs to be
-serialized in some other way.
-
-The requirement I see is you need invalidate_range_start to block
-until another thread exits its critical section (ie stops accessing
-the SPTEs). 
-
-That is a spinlock/mutex.
-
-You just can't invent a faster spinlock by open coding something with
-barriers, it doesn't work.
+https://lkml.org/lkml/2019/7/22/554
 
 Jason
