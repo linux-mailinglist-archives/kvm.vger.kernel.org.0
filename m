@@ -2,87 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 54AC97DE26
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 16:43:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DA1D7DE37
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 16:48:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729091AbfHAOnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 10:43:10 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53618 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726756AbfHAOnK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 10:43:10 -0400
-Received: by mail-wm1-f65.google.com with SMTP id x15so64944150wmj.3
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2019 07:43:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=AQVZzxviCSRzfupMACZrSRSzcwDwgjm3ki6dTQwgdSY=;
-        b=VvwhW0ofxz84GpoV/P217P7W5TwYbbMd+N7MgF7MnGte4qDguta0KeKtrXeUvKPQVg
-         0RhNt5hPQ0jLWOr2CBssqAYRYcMpgaMPTd5QeIFocIb3urEso/4jGlyLyZDOCXDhndhb
-         9eXyT4ygAS4SCr3lDsfpTW0eYgrmseFw2YxgYkD2EB2WSY/ZjQUI11xc1sciZMXg6mum
-         VCRtHvRB+S5pH8CbJmfGyC+o4dPGQlPTGaJJwBlUaefoGpAze6wrbhaQbhfN2Xy84Xwp
-         K6+SQRAYN6Lqxs8Ksk9MZVJVJDnz1o0zQZb/5/uFOGuHOP1uFhtlM1SrTlUqVr+w+cj3
-         oMDA==
-X-Gm-Message-State: APjAAAVAA09LU+41jeMHNEwF9EKj0FKvmiNfneiwAkI4pjkUmAaJJQiB
-        P3LPSQTrnZytwOhdoftJCXcxpCV+bPw=
-X-Google-Smtp-Source: APXvYqyvHJ4XFkD6+G+k8opm3OHCmgXq7DQbrlYYAWG0VPhgFif8OCAYnGiM6GkBJFvf5mNzeQpPPQ==
-X-Received: by 2002:a1c:5602:: with SMTP id k2mr109441102wmb.173.1564670587902;
-        Thu, 01 Aug 2019 07:43:07 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id f204sm111394043wme.18.2019.08.01.07.43.06
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 01 Aug 2019 07:43:06 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S1730865AbfHAOs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Aug 2019 10:48:26 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:46366 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726017AbfHAOsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Aug 2019 10:48:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=FVxP2v3HSjN6nIrTmQY1MmXZ4a26DwBVy18A1yxDdt8=; b=P0Rj7mqbyuYvFdd0q6pQeHYl0
+        q747aTpMZ22E6YzbbPJ1dmW36LDqN0j9PraHO7LjbYSTsA2KNDYf96eCftrUt0mlj+io53lKQaBk1
+        kSElFmfkZeVkryaw+R9OgRCBiglpNmIe1kFBb4y+iu/irJaeUsQuieiGW5T+iPsoBhTodA0elX1+j
+        Xu6KvKonSX05mIgmCSmRbP2cD2XvC2zgn1KTXUMnbUnIZrvUI52vsYuaQe6w98qcqTl1AeHU2pXPE
+        hT0pCVt/kQJgmYTbObMwYStlAFf3+sTh+pS2DYtQJMRfhvoElh6TtVTp/OQYhu6Mf3Tn/TQc+3jSg
+        Auk7R0f0w==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1htCNM-0003HG-GM; Thu, 01 Aug 2019 14:48:16 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id CDBFB2029F4C9; Thu,  1 Aug 2019 16:48:14 +0200 (CEST)
+Date:   Thu, 1 Aug 2019 16:48:14 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Ingo Molnar <mingo@kernel.org>,
+        Sebastian Siewior <bigeasy@linutronix.de>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Julia Cartwright <julia@ni.com>,
+        Paul McKenney <paulmck@linux.vnet.ibm.com>,
+        Frederic Weisbecker <fweisbec@gmail.com>,
+        Oleg Nesterov <oleg@redhat.com>, kvm@vger.kernel.org,
+        Radim Krcmar <rkrcmar@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 3/5] x86: KVM: svm: clear interrupt shadow on all paths in skip_emulated_instruction()
-In-Reply-To: <20190801141802.GA6783@linux.intel.com>
-References: <20190801051418.15905-1-vkuznets@redhat.com> <20190801051418.15905-4-vkuznets@redhat.com> <20190801141802.GA6783@linux.intel.com>
-Date:   Thu, 01 Aug 2019 16:43:05 +0200
-Message-ID: <87ftml54li.fsf@vitty.brq.redhat.com>
+        John Stultz <john.stultz@linaro.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Paul E. McKenney" <paulmck@linux.ibm.com>
+Subject: Re: [patch 1/5] tracehook: Provide TIF_NOTIFY_RESUME handling for KVM
+Message-ID: <20190801144814.GC31398@hirez.programming.kicks-ass.net>
+References: <20190801143250.370326052@linutronix.de>
+ <20190801143657.785902257@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190801143657.785902257@linutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Thu, Aug 01, 2019 at 04:32:51PM +0200, Thomas Gleixner wrote:
+> +#ifdef CONFIG_HAVE_ARCH_TRACEHOOK
+> +/**
+> + * tracehook_handle_notify_resume - Notify resume handling for virt
+> + *
+> + * Called with interrupts and preemption enabled from VMENTER/EXIT.
+> + */
+> +void tracehook_handle_notify_resume(void)
+> +{
+> +	local_irq_disable();
+> +	while (test_and_clear_thread_flag(TIF_NOTIFY_RESUME)) {
+> +		local_irq_enable();
+> +		tracehook_notify_resume(NULL);
+> +		local_irq_disable();
+> +	}
+> +	local_irq_enable();
 
-> On Thu, Aug 01, 2019 at 07:14:16AM +0200, Vitaly Kuznetsov wrote:
->> Regardless of the way how we skip instruction, interrupt shadow needs to be
->> cleared.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Reviewed-by: Jim Mattson <jmattson@google.com>
->> ---
->>  arch/x86/kvm/svm.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->> 
->> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
->> index 80f576e05112..7c7dff3f461f 100644
->> --- a/arch/x86/kvm/svm.c
->> +++ b/arch/x86/kvm/svm.c
->> @@ -784,13 +784,15 @@ static void skip_emulated_instruction(struct kvm_vcpu *vcpu)
->>  				EMULATE_DONE)
->>  			pr_err_once("KVM: %s: unable to skip instruction\n",
->>  				    __func__);
->> -		return;
->> +		goto clear_int_shadow;
->
-> A better fix would be to clear the interrupt shadow in x86_emulate_instruction()
-> after updating RIP for EMULTYPE_SKIP.  VMX has this same flaw when running
-> nested as handle_ept_misconfig() also expects the interrupt shadow to be
-> handled by kvm_emulate_instruction().  Clearing the shadow if and only if
-> the skipping is successful also means KVM isn't incorrectly zapping the
-> shadow when emulation fails.
+I'm confused by the IRQ state swizzling here, what is it doing?
 
-Oh, nice catch actually! Will do in v2.
-
--- 
-Vitaly
+> +}
+> +EXPORT_SYMBOL_GPL(tracehook_handle_notify_resume);
+> +#endif
+> 
+> 
