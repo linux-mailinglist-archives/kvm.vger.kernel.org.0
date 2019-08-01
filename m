@@ -2,111 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BCC47DBA2
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 14:38:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A903A7DBA9
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 14:40:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731341AbfHAMiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 08:38:14 -0400
-Received: from foss.arm.com ([217.140.110.172]:35274 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726422AbfHAMiN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 08:38:13 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA8AC1570;
-        Thu,  1 Aug 2019 05:38:12 -0700 (PDT)
-Received: from [10.1.194.48] (e123572-lin.cambridge.arm.com [10.1.194.48])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E84103F575;
-        Thu,  1 Aug 2019 05:38:07 -0700 (PDT)
-Subject: Re: [PATCH v19 02/15] arm64: Introduce prctl() options to control the
- tagged user addresses ABI
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-References: <cover.1563904656.git.andreyknvl@google.com>
- <1c05651c53f90d07e98ee4973c2786ccf315db12.1563904656.git.andreyknvl@google.com>
- <7a34470c-73f0-26ac-e63d-161191d4b1e4@intel.com>
-From:   Kevin Brodsky <kevin.brodsky@arm.com>
-Message-ID: <2b274c6f-6023-8eb8-5a86-507e6000e13d@arm.com>
-Date:   Thu, 1 Aug 2019 13:38:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731316AbfHAMj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Aug 2019 08:39:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58096 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730881AbfHAMj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Aug 2019 08:39:56 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D26CBB00E;
+        Thu,  1 Aug 2019 12:39:54 +0000 (UTC)
+Message-ID: <6d9e85ac5768e920805f121eeaff1360f3b257df.camel@suse.com>
+Subject: Re: [PATCH] KVM: Disable wake-affine vCPU process to mitigate lock
+ holder preemption
+From:   Dario Faggioli <dfaggioli@suse.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Date:   Thu, 01 Aug 2019 14:39:34 +0200
+In-Reply-To: <19e0beb6-a732-ea1f-79a5-41be92569338@redhat.com>
+References: <1564479235-25074-1-git-send-email-wanpengli@tencent.com>
+         <19e0beb6-a732-ea1f-79a5-41be92569338@redhat.com>
+Organization: SUSE
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-OoP9rETHtqYOrghGbkKn"
+User-Agent: Evolution 3.32.3 
 MIME-Version: 1.0
-In-Reply-To: <7a34470c-73f0-26ac-e63d-161191d4b1e4@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/2019 18:05, Dave Hansen wrote:
-> On 7/23/19 10:58 AM, Andrey Konovalov wrote:
->> +long set_tagged_addr_ctrl(unsigned long arg)
->> +{
->> +	if (!tagged_addr_prctl_allowed)
->> +		return -EINVAL;
->> +	if (is_compat_task())
->> +		return -EINVAL;
->> +	if (arg & ~PR_TAGGED_ADDR_ENABLE)
->> +		return -EINVAL;
->> +
->> +	update_thread_flag(TIF_TAGGED_ADDR, arg & PR_TAGGED_ADDR_ENABLE);
->> +
->> +	return 0;
->> +}
-> Instead of a plain enable/disable, a more flexible ABI would be to have
-> the tag mask be passed in.  That way, an implementation that has a
-> flexible tag size can select it.  It also ensures that userspace
-> actually knows what the tag size is and isn't surprised if a hardware
-> implementation changes the tag size or position.
->
-> Also, this whole set deals with tagging/untagging, but there's an
-> effective loss of address space when you do this.  Is that dealt with
-> anywhere?  How do we ensure that allocations don't get placed at a
-> tagged address before this gets turned on?  Where's that checking?
 
-This patch series only changes what is allowed or not at the syscall interface. It 
-does not change the address space size. On arm64, TBI (Top Byte Ignore) has always 
-been enabled for userspace, so it has never been possible to use the upper 8 bits of 
-user pointers for addressing.
+--=-OoP9rETHtqYOrghGbkKn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-If other architectures were to support a similar functionality, then I agree that a 
-common and more generic interface (if needed) would be helpful, but as it stands this 
-is an arm64-specific prctl, and on arm64 the address tag is defined by the 
-architecture as bits [63:56].
+On Tue, 2019-07-30 at 13:46 +0200, Paolo Bonzini wrote:
+> On 30/07/19 11:33, Wanpeng Li wrote:
+> > When qemu/other vCPU inject virtual interrupt to guest through
+> > waking up one=20
+> > sleeping vCPU, it increases the probability to stack vCPUs/qemu by
+> > scheduler
+> > wake-affine. vCPU stacking issue can greately inceases the lock
+> > synchronization=20
+> > latency in a virtualized environment. This patch disables wake-
+> > affine vCPU=20
+> > process to mitigtate lock holder preemption.
+>=20
+> There is no guarantee that the vCPU remains on the thread where it's
+> created, so the patch is not enough.
+>=20
+> If many vCPUs are stacked on the same pCPU, why doesn't the wake_cap
+> kick in sooner or later?
+>=20
+Assuming it actually is the case that vcpus *do* get stacked *and* that
+wake_cap() *doesn't* kick in, maybe it could be because of this check?
 
-Kevin
+        /* Minimum capacity is close to max, no need to abort wake_affine *=
+/
+        if (max_cap - min_cap < max_cap >> 3)
+                return 0;
+
+Regards
+--=20
+Dario Faggioli, Ph.D
+http://about.me/dario.faggioli
+Virtualization Software Engineer
+SUSE Labs, SUSE https://www.suse.com/
+-------------------------------------------------------------------
+<<This happens because _I_ choose it to happen!>> (Raistlin Majere)
+
+
+--=-OoP9rETHtqYOrghGbkKn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEES5ssOj3Vhr0WPnOLFkJ4iaW4c+4FAl1C3YYACgkQFkJ4iaW4
+c+7Y7w/9FDc59iIus5zhBIvPf3Lieg7DPJpO7lV5BX3b9Aom3UVTDfgniByN88hC
+hk4lyNnLozzX6zv8AiPtWCWdtvXnjLewY5Z0OSsmQyCL3TdX09h8FXiqfRkcrCQX
+MJj81jMD8AHXQ1tRY5p+k653LpzFRQS4uckBgSklWr2ZAdfwNQLaHA2jdUQ4oatV
+SLN07+3MQaKfea1rdhGCiD4ME+sdOBZO+gwVoosWIDMYKDevuVR54ghl6lBW98pR
+dj+ZSVtlqFfSUYpjtL/l3P3+hHB7292OC+uh9T9ESGR0xk/ggCl7X1H5ELUL+wDG
+M4CNTsr1Z5oihfFGpZk3hZk0qLfOOPDwxbT47tv/RsEqjMRcumkCaldweG6fS9oO
+DUTqauzyAlRo9Ipt29BGRj7mpzd4y4+bZpJJedoql0Yhc4VP3brJneJxWqeNylBQ
+EWtowwuc9hUnewZi2VHPCbAFPIwo2YLyqFApNDMjbtO/Ar6f04BrYwANKj96aOgI
+T1yvC0Q2NaeYJ27wdpRo13TI4FXLVSJhKFEL/80Iw98xyAf6ZShr/Z0RHJbBMoPm
+o2pVT27JwuVcsfM+79kRrN+AJCopRVEfZFpvZ7coLeyxwQKmgcRUTDjxlklJMvly
+TTR5/8tyIA4kUW9ngTGEi4i7LWrMiMP7+tDeQJyZcqkOJ+SFyig=
+=fjyt
+-----END PGP SIGNATURE-----
+
+--=-OoP9rETHtqYOrghGbkKn--
+
