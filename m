@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C69F7DE0F
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 16:38:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5857D7DE0D
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 16:38:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731556AbfHAOin (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 10:38:43 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:36216 "EHLO
+        id S1732132AbfHAOiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Aug 2019 10:38:20 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:36213 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731397AbfHAOiU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1729084AbfHAOiU (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 1 Aug 2019 10:38:20 -0400
 Received: from localhost ([127.0.0.1] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtp (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1htCDU-0000lv-Qd; Thu, 01 Aug 2019 16:38:04 +0200
-Message-Id: <20190801143250.370326052@linutronix.de>
+        id 1htCDV-0000lz-DQ; Thu, 01 Aug 2019 16:38:05 +0200
+Message-Id: <20190801143657.785902257@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Thu, 01 Aug 2019 16:32:50 +0200
+Date:   Thu, 01 Aug 2019 16:32:51 +0200
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
@@ -34,49 +34,85 @@ Cc:     x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
         John Stultz <john.stultz@linaro.org>,
         Andy Lutomirski <luto@kernel.org>,
         "Paul E. McKenney" <paulmck@linux.ibm.com>
-Subject: [patch 0/5] posix-cpu-timers: Move expiry into task work context
+Subject: [patch 1/5] tracehook: Provide TIF_NOTIFY_RESUME handling for KVM
+References: <20190801143250.370326052@linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Running posix cpu timers in hard interrupt context has a few downsides:
+TIF_NOTITY_RESUME is evaluated on return to user space along with other TIF
+flags.
 
- - For PREEMPT_RT it cannot work as the expiry code needs to take sighand
-   lock, which is a 'sleeping spinlock' in RT
+>From the kernels point of view a VMENTER is more or less equivalent to
+return to user space which means that at least a subset of TIF flags needs
+to be evaluated and handled.
 
- - For fine grained accounting it's just wrong to run this in context of
-   the timer interrupt because that way a process specific cpu time is
-   accounted to the timer interrupt.
+Currently KVM handles only TIF_SIGPENDING and TIF_NEED_RESCHED, but
+TIF_NOTIFY_RESUME is ignored. So pending task_work etc, is completely
+ignored until the vCPU thread actually goes all the way back into
+userspace/qemu.
 
-There is no real hard requirement to run the expiry code in hard interrupt
-context. The posix CPU timers are an approximation anyway, so having them
-expired and evaluated in task work context does not really make them worse.
+Provide notify_resume_pending() and tracehook_handle_notify_resume() so
+this can be handled similar to SIGPENDING.
 
-That unearthed the fact that KVM is missing to handle task work before
-entering a VM which is delaying pending task work until the vCPU thread
-goes all the way back to user space qemu.
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Oleg Nesterov <oleg@redhat.com>
+---
+ include/linux/tracehook.h |   15 +++++++++++++++
+ kernel/task_work.c        |   19 +++++++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-The series implements the necessary handling for x86/KVM and switches the
-posix cpu timer expiry into task work for X86. The posix timer modification
-is conditional on a selectable config switch as this requires that
-task work is handled in KVM.
-
-The available tests pass and no problematic difference has been observed.
-
-Thanks,
-
-	tglx
-
-8<--------------------
- arch/x86/kvm/x86.c             |    8 ++++-
- arch/x86/Kconfig               |    1 
- include/linux/sched.h          |    3 ++
- include/linux/tracehook.h      |   15 ++++++++++
- kernel/task_work.c             |   19 ++++++++++++
- kernel/time/Kconfig            |    5 +++
- kernel/time/posix-cpu-timers.c |   61 ++++++++++++++++++++++++++++++-----------
- 7 files changed, 95 insertions(+), 17 deletions(-)
-
+--- a/include/linux/tracehook.h
++++ b/include/linux/tracehook.h
+@@ -163,6 +163,21 @@ static inline void set_notify_resume(str
+ #endif
+ }
+ 
++#ifdef CONFIG_HAVE_ARCH_TRACEHOOK
++/**
++ * notify_resume_pending - Check whether current has TIF_NOTIFY_RESUME set
++ */
++static inline bool notify_resume_pending(void)
++{
++	return test_thread_flag(TIF_NOTIFY_RESUME);
++}
++
++void tracehook_handle_notify_resume(void);
++#else
++static inline bool notify_resume_pending(void) { return false; }
++static inline void tracehook_handle_notify_resume(void) { }
++#endif
++
+ /**
+  * tracehook_notify_resume - report when about to return to user mode
+  * @regs:		user-mode registers of @current task
+--- a/kernel/task_work.c
++++ b/kernel/task_work.c
+@@ -116,3 +116,22 @@ void task_work_run(void)
+ 		} while (work);
+ 	}
+ }
++
++#ifdef CONFIG_HAVE_ARCH_TRACEHOOK
++/**
++ * tracehook_handle_notify_resume - Notify resume handling for virt
++ *
++ * Called with interrupts and preemption enabled from VMENTER/EXIT.
++ */
++void tracehook_handle_notify_resume(void)
++{
++	local_irq_disable();
++	while (test_and_clear_thread_flag(TIF_NOTIFY_RESUME)) {
++		local_irq_enable();
++		tracehook_notify_resume(NULL);
++		local_irq_disable();
++	}
++	local_irq_enable();
++}
++EXPORT_SYMBOL_GPL(tracehook_handle_notify_resume);
++#endif
 
 
