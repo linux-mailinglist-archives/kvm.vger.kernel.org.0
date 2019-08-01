@@ -2,105 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A903A7DBA9
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 14:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D15E87DBDF
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 14:48:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731316AbfHAMj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 08:39:56 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58096 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730881AbfHAMj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 08:39:56 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D26CBB00E;
-        Thu,  1 Aug 2019 12:39:54 +0000 (UTC)
-Message-ID: <6d9e85ac5768e920805f121eeaff1360f3b257df.camel@suse.com>
-Subject: Re: [PATCH] KVM: Disable wake-affine vCPU process to mitigate lock
- holder preemption
-From:   Dario Faggioli <dfaggioli@suse.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Date:   Thu, 01 Aug 2019 14:39:34 +0200
-In-Reply-To: <19e0beb6-a732-ea1f-79a5-41be92569338@redhat.com>
-References: <1564479235-25074-1-git-send-email-wanpengli@tencent.com>
-         <19e0beb6-a732-ea1f-79a5-41be92569338@redhat.com>
-Organization: SUSE
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-OoP9rETHtqYOrghGbkKn"
-User-Agent: Evolution 3.32.3 
+        id S1731530AbfHAMsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Aug 2019 08:48:50 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42003 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731439AbfHAMsu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Aug 2019 08:48:50 -0400
+Received: by mail-pf1-f193.google.com with SMTP id q10so34002405pff.9
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2019 05:48:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ATAFhJly7oayn4QwVxAmF/cKx18eZXYIEq5cLXvpdzg=;
+        b=mjC+j0aaEEkkMHnLNHs9TEJqIdScFWRlkAZG8TbiBl3AyUZ8l5nLaU29ZLHSb7WvwH
+         X3OlQDdgsBZjncfM3ONy8Dqcuih1q2WnbLztoEOKMtf5vefqmMIHHwchJuo+ue+DCVka
+         b9rui+0AvY5PeeX+qJY2jvBZQab/NzRkSsMupCgkTdlEDxE6K7Nu5zDKiMeGfnD3hicf
+         2VPYUTHD9bJKAQWesHnbiPWY9rwW/eF7WIHmcnvL9DkrJEokfA1mnjx39I+4RQdt1WLM
+         ieuyPRr8iw6XMHiEGmpinxm+wGAydMTsA6N4zI0Tg/WWtENcJ84NKdjINucR3C9EQWXN
+         EQGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ATAFhJly7oayn4QwVxAmF/cKx18eZXYIEq5cLXvpdzg=;
+        b=CCDuh/vkOqHxDeJjg2/YROmRg9PcPcm8xUc55gpb6cemLxVH1ri2/Nfk9o6UEiKVmC
+         2A4iUlmWyLpA8upIp/QzUBk1rMpTYx0d2TkdYvOk7UToET5t22N7Oo9MTZcLBw5qsRKx
+         clWJmeGq809/b55tGSXA/uz/t8rUxAydrhXKZCA6iNe6QpHrGTbe3eUEkBzNtnhBqUHf
+         W3bHMGXF1PS8ARI4wJ3rwyxSti1Odj6yDVaThrhbxe1VQTAYC8kglTHwxrBYt19GeHse
+         DnMFkmJDZuLx2rLVo2Rc7eAEFri632FBRlGPBmASJaq/4bn9yHLxTcbsjgqyNc0AHl3A
+         irqQ==
+X-Gm-Message-State: APjAAAXPqptKFDSnAJzVWIllkZutSuD7GmQ+GFzi7cauiD6QVrvGES9h
+        k2KJipf4qzgnLmwqsnI5fRw5e/7XjLcwxzZY8ZsdQA==
+X-Google-Smtp-Source: APXvYqyuYmWo+CP2FzNWYkHFT0ZLT3W5Y5OJQeMQdVh76HiNmdD4jPQ2fznL3kD7gDek9Cqsx8/zBcK9HOnHQgVpStE=
+X-Received: by 2002:a65:4b8b:: with SMTP id t11mr118476394pgq.130.1564663728917;
+ Thu, 01 Aug 2019 05:48:48 -0700 (PDT)
 MIME-Version: 1.0
+References: <cover.1563904656.git.andreyknvl@google.com> <8c618cc9-ae68-9769-c5bb-67f1295abc4e@intel.com>
+ <13b4cf53-3ecb-f7e7-b504-d77af15d77aa@arm.com>
+In-Reply-To: <13b4cf53-3ecb-f7e7-b504-d77af15d77aa@arm.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Thu, 1 Aug 2019 14:48:37 +0200
+Message-ID: <CAAeHK+zTFqsLiB3Wf0bAi5A8ukQX5ZuvfUg4td-=r5UhBsUBOQ@mail.gmail.com>
+Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
+To:     Kevin Brodsky <kevin.brodsky@arm.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Aug 1, 2019 at 2:11 PM Kevin Brodsky <kevin.brodsky@arm.com> wrote:
+>
+> On 31/07/2019 17:50, Dave Hansen wrote:
+> > On 7/23/19 10:58 AM, Andrey Konovalov wrote:
+> >> The mmap and mremap (only new_addr) syscalls do not currently accept
+> >> tagged addresses. Architectures may interpret the tag as a background
+> >> colour for the corresponding vma.
+> > What the heck is a "background colour"? :)
+>
+> Good point, this is some jargon that we started using for MTE, the idea being that
+> the kernel could set a tag value (specified during mmap()) as "background colour" for
+> anonymous pages allocated in that range.
+>
+> Anyway, this patch series is not about MTE. Andrey, for v20 (if any), I think it's
+> best to drop this last sentence to avoid any confusion.
 
---=-OoP9rETHtqYOrghGbkKn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Sure, thanks!
 
-On Tue, 2019-07-30 at 13:46 +0200, Paolo Bonzini wrote:
-> On 30/07/19 11:33, Wanpeng Li wrote:
-> > When qemu/other vCPU inject virtual interrupt to guest through
-> > waking up one=20
-> > sleeping vCPU, it increases the probability to stack vCPUs/qemu by
-> > scheduler
-> > wake-affine. vCPU stacking issue can greately inceases the lock
-> > synchronization=20
-> > latency in a virtualized environment. This patch disables wake-
-> > affine vCPU=20
-> > process to mitigtate lock holder preemption.
->=20
-> There is no guarantee that the vCPU remains on the thread where it's
-> created, so the patch is not enough.
->=20
-> If many vCPUs are stacked on the same pCPU, why doesn't the wake_cap
-> kick in sooner or later?
->=20
-Assuming it actually is the case that vcpus *do* get stacked *and* that
-wake_cap() *doesn't* kick in, maybe it could be because of this check?
-
-        /* Minimum capacity is close to max, no need to abort wake_affine *=
-/
-        if (max_cap - min_cap < max_cap >> 3)
-                return 0;
-
-Regards
---=20
-Dario Faggioli, Ph.D
-http://about.me/dario.faggioli
-Virtualization Software Engineer
-SUSE Labs, SUSE https://www.suse.com/
--------------------------------------------------------------------
-<<This happens because _I_ choose it to happen!>> (Raistlin Majere)
-
-
---=-OoP9rETHtqYOrghGbkKn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEES5ssOj3Vhr0WPnOLFkJ4iaW4c+4FAl1C3YYACgkQFkJ4iaW4
-c+7Y7w/9FDc59iIus5zhBIvPf3Lieg7DPJpO7lV5BX3b9Aom3UVTDfgniByN88hC
-hk4lyNnLozzX6zv8AiPtWCWdtvXnjLewY5Z0OSsmQyCL3TdX09h8FXiqfRkcrCQX
-MJj81jMD8AHXQ1tRY5p+k653LpzFRQS4uckBgSklWr2ZAdfwNQLaHA2jdUQ4oatV
-SLN07+3MQaKfea1rdhGCiD4ME+sdOBZO+gwVoosWIDMYKDevuVR54ghl6lBW98pR
-dj+ZSVtlqFfSUYpjtL/l3P3+hHB7292OC+uh9T9ESGR0xk/ggCl7X1H5ELUL+wDG
-M4CNTsr1Z5oihfFGpZk3hZk0qLfOOPDwxbT47tv/RsEqjMRcumkCaldweG6fS9oO
-DUTqauzyAlRo9Ipt29BGRj7mpzd4y4+bZpJJedoql0Yhc4VP3brJneJxWqeNylBQ
-EWtowwuc9hUnewZi2VHPCbAFPIwo2YLyqFApNDMjbtO/Ar6f04BrYwANKj96aOgI
-T1yvC0Q2NaeYJ27wdpRo13TI4FXLVSJhKFEL/80Iw98xyAf6ZShr/Z0RHJbBMoPm
-o2pVT27JwuVcsfM+79kRrN+AJCopRVEfZFpvZ7coLeyxwQKmgcRUTDjxlklJMvly
-TTR5/8tyIA4kUW9ngTGEi4i7LWrMiMP7+tDeQJyZcqkOJ+SFyig=
-=fjyt
------END PGP SIGNATURE-----
-
---=-OoP9rETHtqYOrghGbkKn--
-
+>
+> Kevin
