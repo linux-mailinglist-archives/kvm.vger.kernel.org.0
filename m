@@ -2,111 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B413D7D3BC
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 05:35:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A5E07D3C2
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 05:39:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728516AbfHADfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 23:35:34 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:39064 "EHLO
+        id S1728843AbfHADjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 23:39:22 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:40408 "EHLO
         mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726118AbfHADfe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 23:35:34 -0400
-Received: by mail-ot1-f68.google.com with SMTP id r21so66642967otq.6;
-        Wed, 31 Jul 2019 20:35:34 -0700 (PDT)
+        with ESMTP id S1725793AbfHADjW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 23:39:22 -0400
+Received: by mail-ot1-f68.google.com with SMTP id l15so15434664oth.7
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 20:39:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=tfDohl1hkWyeEmYeVB02shzd6/LeRxstafK96hHNxW0=;
-        b=oKJz2gJxDCanli9BPv4VG6U/5X4U5UnD11UUuzvvBmj0XdmH2vUg4t7rF8KK6UWDj/
-         QLWbNSok3bW+sM+rdFbWiMCadM6lYkOFsD2qTktf4K1y9l3XetlUSYnazqyn/XJC1VHh
-         +XEXoFVmTI/0cmXV7W0Yx8yesQLFy43K94EW/ZTX+t9S1oXOFQgJlAEn+MKzVgOvXIBj
-         aLSZu7q7VHVyHv/QUaOl8T9BhnVKs/rz+Y53NC7y43LIdInp8iaU+gkCCXj86pTeD/tq
-         Hj8+g7YQOYLwC2uPJJqSuAh2UsFtlX4xjTW8KcGB9ANDKMheaopQLgFVHC7JYYkf0Cw/
-         sp1g==
+        bh=EVsoW03bnJnM3ix4ADkBj5P+u3h7qEgC2Ua1WOX+7+8=;
+        b=uf1iW1QQE/gRuVsnj4WotzVEILDbFZsF88YQYt4idtbhD0+lijZjR3+eJ4vd5tEDRy
+         756ghwz3wC00dn6gkJGM8BouxTHrQJOOKxBON5tIqo8AT6knfgh+ZfkJ0D7o850nNLJH
+         8FC3u5R51YnHGhBSR3lHBnTI3HDDpGDiscY0nwfQw/mSXQERPoxejCAk4WqsN37iuAgS
+         Pic7P6otDTeK/ZqEraoroggsPnqDurKZ3V0zQEpi0zgKFPjd6QpUGH6DDouyeTNdo7Y1
+         gDDaho9zt5oJd++/eePFCUwGUH2oxn/PvTxKR7lrxkqHarFlCClZMoAjh8yFah7vs/lw
+         vqvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=tfDohl1hkWyeEmYeVB02shzd6/LeRxstafK96hHNxW0=;
-        b=Jwh3XdXCJIMbfp3XjeX+WTDFJgWxYUr8E+21eaP5K8BHgoQ9UdTHRH/ajUDCpUcwKt
-         qaIvYmKtzm4ZrLVMu1/tzx8GgMBQxiR3QzYmDe7JRQBUJWsoX6cG6HWL1J9RdqNuyJ5O
-         wg7VbJhBO4+DAfFx4mFQuOoKVtLyx9YpDMzOO/nlEcuS7uqQogO7iDXf4PO9WiaePv9L
-         9e+Rg9EgXe8XYRtetp7gUfDxI9KIA0Go8XN6MDkX4qho3WzYqurn8n2Jq99QGe5Buneu
-         wbJh9Tgnyn6wIlhFZrBi9VdXcjrLWasHpVMEY9EySgwgDvEfuhZ2z7DFnH/OFWBJef4L
-         /jKg==
-X-Gm-Message-State: APjAAAUd4ul8admj3RVvEqpCRBDJnqz8tXrsiFrQPBKHj6jMPmt78hG/
-        q+CRQjNHuy5eeOTtOcJiZgzDcllt5CsNnnfJsdw=
-X-Google-Smtp-Source: APXvYqzEj5zqAqL4CVWZMSE8/eXPHQ6/+Opbz5Yftop3kbDtgICLJgAAjsit3aXWYne4p69TTLUGc0flvh/G4IxRPCw=
-X-Received: by 2002:a9d:6959:: with SMTP id p25mr11102801oto.118.1564630533734;
- Wed, 31 Jul 2019 20:35:33 -0700 (PDT)
+        bh=EVsoW03bnJnM3ix4ADkBj5P+u3h7qEgC2Ua1WOX+7+8=;
+        b=JHEFgEiVI518gUT3AQ2QQb3Mw2YaULB5FO8rEgfKl5yh1KwNH3Egu76+Y4I16WTMB8
+         W5b4bglZgxYKDoi/USARNr2eoTLL7LsppAxx/id5hin8oS2RBoIdaiW0DaXcCT9rwsR6
+         expoDSPyMCeW393tbIlq272UszNgQInc58XkbmnUI2TLwDsv2uL2K1ozXneyL8zGbjEn
+         3D+DLlY3K6535IS1uw/xhStgfNIslbpk62iUyGIzxQCBJe+Lo0ixpMGrY9UBFEew0t77
+         R/8pzwvHpLjKdI2n2EksdEgc1fEmfkdLJNkbgVkgIzCEqUWZWujbaVEXPQnb6pNg1nLw
+         XDLg==
+X-Gm-Message-State: APjAAAXzrwbW7dgXrWHKSv+v4Lc1tStWvjZiXt67sDwZK97fkjirzaPh
+        4euFoWNTPOBh+81qyHsI8CxUudvXd+W95APLzvyM2E1s5YY=
+X-Google-Smtp-Source: APXvYqwT4noTjZ2hegFbRxGRNNvTZ8qZ7va9pMoKPLu0mS8Qm34ezheCKpv4MSCXmOkiMdSYMGL6iaKUvvPiAKedALU=
+X-Received: by 2002:a9d:4590:: with SMTP id x16mr40511834ote.254.1564630761341;
+ Wed, 31 Jul 2019 20:39:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <1564572438-15518-3-git-send-email-wanpengli@tencent.com>
- <1564573198-16219-1-git-send-email-wanpengli@tencent.com> <9240ada8-8e18-d2b2-006e-41ededb89efb@redhat.com>
-In-Reply-To: <9240ada8-8e18-d2b2-006e-41ededb89efb@redhat.com>
+References: <20190729053243.9224-1-peterx@redhat.com> <20190729053243.9224-3-peterx@redhat.com>
+In-Reply-To: <20190729053243.9224-3-peterx@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 1 Aug 2019 11:35:17 +0800
-Message-ID: <CANRm+CwJyShOHCanUNmeq8Rr3OWJc1iw0vq5ZAF_WLD-0mSEHA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: Fix leak vCPU's VMCS value into other pCPU
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        "# v3 . 10+" <stable@vger.kernel.org>,
-        Marc Zyngier <Marc.Zyngier@arm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
+Date:   Thu, 1 Aug 2019 11:39:04 +0800
+Message-ID: <CANRm+CxkdBXZ170nXiKiQ-a-xzZObEXZdBgsAx5jrE=aroTR5w@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: X86: Remove tailing newline for tracepoints
+To:     Peter Xu <zhexu@redhat.com>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 31 Jul 2019 at 20:55, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, 29 Jul 2019 at 13:35, Peter Xu <zhexu@redhat.com> wrote:
 >
-> On 31/07/19 13:39, Wanpeng Li wrote:
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index ed061d8..12f2c91 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -2506,7 +2506,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
-> >                               continue;
-> >                       if (vcpu == me)
-> >                               continue;
-> > -                     if (swait_active(&vcpu->wq) && !kvm_arch_vcpu_runnable(vcpu))
-> > +                     if (READ_ONCE(vcpu->preempted) && swait_active(&vcpu->wq))
-> >                               continue;
-> >                       if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
-> >                               !kvm_arch_vcpu_in_kernel(vcpu))
-> >
+> It's done by TP_printk() already.
 >
-> This cannot work.  swait_active means you are waiting, so you cannot be
-> involuntarily preempted.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  arch/x86/kvm/trace.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> The problem here is simply that kvm_vcpu_has_events is being called
-> without holding the lock.  So kvm_arch_vcpu_runnable is okay, it's the
-> implementation that's wrong.
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index 26423d2e45df..76a39bc25b95 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -1323,7 +1323,7 @@ TRACE_EVENT(kvm_avic_incomplete_ipi,
+>                 __entry->index = index;
+>         ),
 >
-> Just rename the existing function to just vcpu_runnable and make a new
-> arch callback kvm_arch_dy_runnable.   kvm_arch_dy_runnable can be
-> conservative and only returns true for a subset of events, in particular
-> for x86 it can check:
+> -       TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u\n",
+> +       TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u",
+>                   __entry->vcpu, __entry->icrh, __entry->icrl,
+>                   __entry->id, __entry->index)
+>  );
+> @@ -1348,7 +1348,7 @@ TRACE_EVENT(kvm_avic_unaccelerated_access,
+>                 __entry->vec = vec;
+>         ),
 >
-> - vcpu->arch.pv.pv_unhalted
->
-> - KVM_REQ_NMI or KVM_REQ_SMI or KVM_REQ_EVENT
->
-> - PIR.ON if APICv is set
->
-> Ultimately, all variables accessed in kvm_arch_dy_runnable should be
-> accessed with READ_ONCE or atomic_read.
->
-> And for all architectures, kvm_vcpu_on_spin should check
-> list_empty_careful(&vcpu->async_pf.done)
->
-> It's okay if your patch renames the function in non-x86 architectures,
-> leaving the fix to maintainers.  So, let's CC Marc and Christian since
-> ARM and s390 have pretty complex kvm_arch_vcpu_runnable as well.
+> -       TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x\n",
+> +       TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x",
+>                   __entry->vcpu,
+>                   __entry->offset,
+>                   __print_symbolic(__entry->offset, kvm_trace_symbol_apic),
+> @@ -1368,7 +1368,7 @@ TRACE_EVENT(kvm_hv_timer_state,
+>                         __entry->vcpu_id = vcpu_id;
+>                         __entry->hv_timer_in_use = hv_timer_in_use;
+>                         ),
+> -               TP_printk("vcpu_id %x hv_timer %x\n",
+> +               TP_printk("vcpu_id %x hv_timer %x",
+>                         __entry->vcpu_id,
+>                         __entry->hv_timer_in_use)
 
-Ok, just sent patch to do this.
+The last one is handled by commit 7be373b6de503 .
 
 Regards,
 Wanpeng Li
