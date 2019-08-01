@@ -2,98 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 376297D231
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 02:17:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BD567D236
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 02:19:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727595AbfHAARb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 20:17:31 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:43799 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726118AbfHAARb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 20:17:31 -0400
-Received: by mail-io1-f65.google.com with SMTP id k20so140353178ios.10
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2019 17:17:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5OGNJ2zIkCd2eyV8mt8HLf/hU6G3Prg746o+XeDun8g=;
-        b=JCFsLphCWpry/6Z2MYbxZsoelgfg0dW6fPui5qNa86PZh7AC//uOmL1tF5DM0fWcws
-         uVCWw7Gg5nO4WE12kTufLugnDNzFoToiSR5Kt7yBOVeK2bA5ME/qMOv+jcsbSex/54dE
-         7H/wS8SOiUp9UGXC98OBEZDAmbeqjQep+T0MWjoGujTGJOOL9c/eMnJECmN+Ytt6gxyJ
-         wgP4f8kweiH1k8wEvp4jF/KNc2Jh298x0TlgadHwnAap/nzwvIfBrHnAeKE2vPZFXHrB
-         X/JIYcd6D4xrL9N14F89a13JYqFnzkne9eCIkAQR+T5HjRl9whFTOY1AQgXm1Y5HZ/DD
-         OJEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5OGNJ2zIkCd2eyV8mt8HLf/hU6G3Prg746o+XeDun8g=;
-        b=dg7JfdUlgIZQrmd9swOuuPIiLHKKNg1TlnskwOefuFxHrdG/marzHfMmTFCvbRDdVk
-         Ex03DPFCoe0LhYceSO9p82yJAi9Nb+wusIGGfIkTcf9zuI0mug53Kews3f0fPgGPObJl
-         y1iQ7wXZnUOnbGzULb9BcF/PixXLU+KTsU7CLrz7Jy0wRTwHaOqb9D7k+Ih0OiSLr6vV
-         9AI6cHvhP8rSXEk/leQWXsi9YjJQjUBlSQ/qJS+pk7zGAavoRQvPmMFh5QQk4UhxCNoa
-         007zKd9a53RLMLLTQ+V4hRdhwKfVKkOpLfSyw3OdMB/ounH2+MbK9iDb5cuUqzY7ETDD
-         FQkA==
-X-Gm-Message-State: APjAAAW2I5u1Sj+OnoWpdQJ5BHDIPqGLkVBzNTGDX6x5bQGFuQFrXzV/
-        NmJ+dYnbBepQbxA3g9k78cjy3mhxOoe1C47U8fEg1Q==
-X-Google-Smtp-Source: APXvYqyFFqBV4DEKqLfGZ756X6zAkYSLEDdAzTvUc0fwEV47BgUGQsmryHFzasj08Mxw4FPOOGKkCfE0xT8+JctkT14=
-X-Received: by 2002:a6b:f906:: with SMTP id j6mr32237818iog.26.1564618650462;
- Wed, 31 Jul 2019 17:17:30 -0700 (PDT)
+        id S1729326AbfHAATw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 20:19:52 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:35152 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728189AbfHAATw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 20:19:52 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x710J0lq020741;
+        Thu, 1 Aug 2019 00:19:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=NwTUhBa2pGAirQxYZmWa0hrLdVAupmUuCAnymoKD3AA=;
+ b=leEyxnzbfZxX1ngVAifWcLf1WLHxgDmjq8/A+zTOJEXvPa+DBH2jHhrlxIZ2yYjAdLJd
+ CUyVGHA5glIq89f5L843OOErehVkvH0MMv0TL78vf/H12JJFmChEXdhQ6tM4O9EmPsaF
+ MUqJNjwvirfkHcGzcc/xp11i7Spz9xN+2D9sQxvX3QgMNvFgK8SwCumZcEQF/3FVVqIB
+ /z0IbtcwUKNuGu/4Na5KQJAU6y6Y5ELlq20KQfxxRyYNr/UTE1m7OPv4efi7+aXbZafB
+ cmTNuWojsKGus/EJcI/1tgy6vK6/3UX3FDFZpcTmw6SEpv162xNAw9h/nBdxTIKe3a66 dg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2u0e1u0gjm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Aug 2019 00:19:26 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x710IIOt170989;
+        Thu, 1 Aug 2019 00:19:25 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2u2jp5mfwa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Aug 2019 00:19:25 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x710JOMd015810;
+        Thu, 1 Aug 2019 00:19:24 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 31 Jul 2019 17:19:23 -0700
+Subject: Re: [PATCH 2/3] KVM: X86: Remove tailing newline for tracepoints
+To:     Peter Xu <zhexu@redhat.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
+References: <20190729053243.9224-1-peterx@redhat.com>
+ <20190729053243.9224-3-peterx@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <ba2516a4-9e82-bc4c-e3a9-c5bb26ff6d6e@oracle.com>
+Date:   Wed, 31 Jul 2019 17:19:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-References: <20190620110240.25799-1-vkuznets@redhat.com> <20190620110240.25799-4-vkuznets@redhat.com>
- <CALMp9eQ85h58NMDh-yOYvHN6_2f2T-wu63f+yLnNbwuG+p3Uvw@mail.gmail.com>
- <87ftmm71p3.fsf@vitty.brq.redhat.com> <36a9f411-f90c-3ffa-9ee3-6ebee13a763f@redhat.com>
- <CALMp9eQLCEzfdNzdhPtCf3bD-5c6HrSvJqP7idyoo4Gf3i5O1w@mail.gmail.com>
- <20190731233731.GA2845@linux.intel.com> <CALMp9eRRqCLKAL4FoZVMk=fHfnrN7EnTVxR___soiHUdrHLAMQ@mail.gmail.com>
- <20190731235637.GB2845@linux.intel.com> <46f3cf18-f167-f66e-18b4-b66c8551dcd8@redhat.com>
-In-Reply-To: <46f3cf18-f167-f66e-18b4-b66c8551dcd8@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 31 Jul 2019 17:17:18 -0700
-Message-ID: <CALMp9eS7W_n8Gk5bsGCre0pTr19mGiRhYLq5O5NkRct+AUJOPQ@mail.gmail.com>
-Subject: Re: [PATCH RFC 3/5] x86: KVM: svm: clear interrupt shadow on all
- paths in skip_emulated_instruction()
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190729053243.9224-3-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9335 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908010002
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9335 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908010002
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 31, 2019 at 5:13 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 01/08/19 01:56, Sean Christopherson wrote:
-> > On Wed, Jul 31, 2019 at 04:45:21PM -0700, Jim Mattson wrote:
-> >> On Wed, Jul 31, 2019 at 4:37 PM Sean Christopherson
-> >> <sean.j.christopherson@intel.com> wrote:
-> >>
-> >>> At a glance, the full emulator models behavior correctly, e.g. see
-> >>> toggle_interruptibility() and setters of ctxt->interruptibility.
-> >>>
-> >>> I'm pretty sure that leaves the EPT misconfig MMIO and APIC access EOI
-> >>> fast paths as the only (VMX) path that would incorrectly handle a
-> >>> MOV/POP SS.  Reading the guest's instruction stream to detect MOV/POP SS
-> >>> would defeat the whole "fast path" thing, not to mention both paths aren't
-> >>> exactly architecturally compliant in the first place.
-> >>
-> >> The proposed patch clears the interrupt shadow in the VMCB on all
-> >> paths through svm's skip_emulated_instruction. If this happens at the
-> >> tail end of emulation, it doesn't matter if the full emulator does the
-> >> right thing.
-> >
-> > Unless I'm missing something, skip_emulated_instruction() isn't called in
-> > the emulation case, x86_emulate_instruction() updates %rip directly, e.g.:
->
-> Indeed.  skip_emulated_instruction() is only used when the vmexit code
-> takes care of emulation directly.
 
-Mea culpa. I had incorrectly assumed that "skip_emulated_instruction"
-was used when an instruction was emulated. I retract my objection.
-Having now been twice bitten by misleading function names, I'll be
-more careful in the future.
+
+On 07/28/2019 10:32 PM, Peter Xu wrote:
+> It's done by TP_printk() already.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   arch/x86/kvm/trace.h | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index 26423d2e45df..76a39bc25b95 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -1323,7 +1323,7 @@ TRACE_EVENT(kvm_avic_incomplete_ipi,
+>   		__entry->index = index;
+>   	),
+>   
+> -	TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u\n",
+> +	TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u",
+>   		  __entry->vcpu, __entry->icrh, __entry->icrl,
+>   		  __entry->id, __entry->index)
+>   );
+> @@ -1348,7 +1348,7 @@ TRACE_EVENT(kvm_avic_unaccelerated_access,
+>   		__entry->vec = vec;
+>   	),
+>   
+> -	TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x\n",
+> +	TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x",
+>   		  __entry->vcpu,
+>   		  __entry->offset,
+>   		  __print_symbolic(__entry->offset, kvm_trace_symbol_apic),
+> @@ -1368,7 +1368,7 @@ TRACE_EVENT(kvm_hv_timer_state,
+>   			__entry->vcpu_id = vcpu_id;
+>   			__entry->hv_timer_in_use = hv_timer_in_use;
+>   			),
+> -		TP_printk("vcpu_id %x hv_timer %x\n",
+> +		TP_printk("vcpu_id %x hv_timer %x",
+>   			__entry->vcpu_id,
+>   			__entry->hv_timer_in_use)
+>   );
+
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
