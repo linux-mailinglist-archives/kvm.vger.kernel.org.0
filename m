@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 014F17E23B
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 20:35:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83FFE7E267
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 20:41:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731719AbfHASfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 14:35:06 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:37603 "EHLO
+        id S1731616AbfHASlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Aug 2019 14:41:35 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37660 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727218AbfHASfF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 14:35:05 -0400
+        with ESMTP id S1727899AbfHASlf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Aug 2019 14:41:35 -0400
 Received: from pd9ef1cb8.dip0.t-ipconnect.de ([217.239.28.184] helo=nanos)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1htFug-0007CB-NP; Thu, 01 Aug 2019 20:34:54 +0200
-Date:   Thu, 1 Aug 2019 20:34:53 +0200 (CEST)
+        id 1htG0x-0007Ns-FW; Thu, 01 Aug 2019 20:41:23 +0200
+Date:   Thu, 1 Aug 2019 20:41:22 +0200 (CEST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     Oleg Nesterov <oleg@redhat.com>
 cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
@@ -27,16 +27,17 @@ cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
         Steven Rostedt <rostedt@goodmis.org>,
         Julia Cartwright <julia@ni.com>,
         Paul McKenney <paulmck@linux.vnet.ibm.com>,
-        Frederic Weisbecker <fweisbec@gmail.com>, kvm@vger.kernel.org,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        Frederic Weisbecker <fweisbec@gmail.com>,
         John Stultz <john.stultz@linaro.org>,
         Andy Lutomirski <luto@kernel.org>,
-        "Paul E. McKenney" <paulmck@linux.ibm.com>
-Subject: Re: [patch 2/5] x86/kvm: Handle task_work on VMENTER/EXIT
-In-Reply-To: <20190801162451.GE31538@redhat.com>
-Message-ID: <alpine.DEB.2.21.1908012025100.1789@nanos.tec.linutronix.de>
-References: <20190801143250.370326052@linutronix.de> <20190801143657.887648487@linutronix.de> <20190801162451.GE31538@redhat.com>
+        "Paul E. McKenney" <paulmck@linux.ibm.com>, kvm@vger.kernel.org,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [patch 4/5] posix-cpu-timers: Defer timer handling to
+ task_work
+In-Reply-To: <20190801153936.GD31538@redhat.com>
+Message-ID: <alpine.DEB.2.21.1908012035130.1789@nanos.tec.linutronix.de>
+References: <20190801143250.370326052@linutronix.de> <20190801143658.074833024@linutronix.de> <20190801153936.GD31538@redhat.com>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -51,29 +52,26 @@ X-Mailing-List: kvm@vger.kernel.org
 On Thu, 1 Aug 2019, Oleg Nesterov wrote:
 > On 08/01, Thomas Gleixner wrote:
 > >
-> > @@ -8172,6 +8174,10 @@ static int vcpu_run(struct kvm_vcpu *vcp
-> >  			++vcpu->stat.signal_exits;
-> >  			break;
-> >  		}
-> > +
-> > +		if (notify_resume_pending())
-> > +			tracehook_handle_notify_resume();
+> > +static void __run_posix_cpu_timers(struct task_struct *tsk)
+> > +{
+> > +	/* FIXME: Init it proper in fork or such */
+> > +	init_task_work(&tsk->cpu_timer_work, posix_cpu_timers_work);
+> > +	task_work_add(tsk, &tsk->cpu_timer_work, true);
+> > +}
 > 
-> shouldn't you drop kvm->srcu before tracehook_handle_notify_resume() ?
+> What if update_process_times/run_posix_cpu_timers is called again before
+> this task does task_work_run() ?
 > 
-> I don't understand this code at all, but vcpu_run() does this even before
-> cond_resched().
+> somehow it should check that ->cpu_timer_work is not already queued...
 
-Yeah, I noticed that it's dropped around cond_resched().
+Right.
 
-My understanding is that for voluntary giving up the CPU via cond_resched()
-it needs to be dropped.
+> Or suppose that this is called when task_work_run() executes this
+> cpu_timer_work. Looks like you need another flag checked by
+> __run_posix_cpu_timers() and cleare in posix_cpu_timers_work() ?
 
-For involuntary preemption (CONFIG_PREEMPT=y) it's not required as the
-whole code section after preempt_enable() is fully preemptible.
-
-Now the 1Mio$ question is whether any of the notify functions invokes
-cond_resched() and whether that really matters. Paolo?
+That's a non issue. The only thing which can happen is that it runs through
+the task_work once more to figure out there is nothing to do.
 
 Thanks,
 
