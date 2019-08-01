@@ -2,83 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66E0B7DD0F
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 15:58:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6048A7DD8D
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 16:15:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730931AbfHAN6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 09:58:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33886 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727537AbfHAN6j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 09:58:39 -0400
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C328C20838;
-        Thu,  1 Aug 2019 13:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564667918;
-        bh=sloo8NtsVS8tKYY6BZDzoeCr41LlzdgRSZc+mtHfZqM=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=aiAh4ZaNRKuR+YTlJNoGYmB3DQEqWi8LUFgBASJ4/TSRxK5u9OHFop1ePHoeVTcre
-         YTl+57EfnvFJAgwfUr+1ziMxe8Z21ewdGlK22aYoqPDp7xYXT4kPd4PUH4M6rIl37v
-         4JyPDc7mk/v7yEYjpEapUH9kIeknC2Cabz7r4XxY=
-Subject: Re: [PATCH] KVM: selftests: Update gitignore file for latest changes
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        shuah <shuah@kernel.org>
-References: <20190731142851.9793-1-thuth@redhat.com>
-From:   shuah <shuah@kernel.org>
-Message-ID: <20c43c74-09f9-8f0b-64e4-a481a40387cb@kernel.org>
-Date:   Thu, 1 Aug 2019 07:58:01 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731864AbfHAOPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Aug 2019 10:15:15 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:37707 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731793AbfHAOPP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Aug 2019 10:15:15 -0400
+Received: by mail-qt1-f194.google.com with SMTP id y26so70361873qto.4
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2019 07:15:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=is8PyxvRhNytWxsxvai2fZ7Vunv6qUm5JlLk3gubz8A=;
+        b=Xxvi13uMIuNd1i7qKKgkImlPAjK1xDFLxSCWyTWQlSWc0W0RYQ1MIbkdfqnYLZG9yu
+         5JI71oibP9i2ddPwTU9YBExPCU3Dlsj9Hb5dtaQ5jQpFVrZe095cwJxIxT6yDBH5wF1p
+         wCJApD147HK5V4ZzkFqufCd3njndvpO/gboYNoDeFKB07FcDW1Fik2Hzi8KFbGkqeU8B
+         FnLAkMgm4iKJeXTHx5eicQowVzuFCmxijHVptaHIDUKgEIgd9VbBsMKuWbYIgOQnQmmN
+         1oNq+b5+5oWwfawyEFBafayDt06Az4m3upS8lvLUrhifXOq6NRLkSxQqkth2e/4StwnK
+         u5vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=is8PyxvRhNytWxsxvai2fZ7Vunv6qUm5JlLk3gubz8A=;
+        b=Kp7Nvyf5vRRlmbb5T6jQEh8Mw48FpYYsEySRIIKAGozuiHEmJpLSDSgFQiKkbZewKw
+         PMkWJ5K8xDPLVjNgCUfDqkDIFMRjo0gP3Gb0xR2ttuyrZxM4HJS2j9nqTLwhn33ZjCMq
+         iG8IXqb+e1AZxamwDnLnJ5QJqf+0NAcdML/U/WMVp1BwI6gM1F6h07b2Ip8IeNJbv7wK
+         B4jX4qOkU+RuQuhW8xWYtNUGLwRb5BY0V6qog8xT4NHUBHBpSC1El/ClMZiYhDvRSOy0
+         /NijOwZ2UGEjmgTQ4vh6ZrTtmNCfcrmdmfXOJkp3IgZinfnczEqWddSP7K0Kq4ciJYQc
+         eWbQ==
+X-Gm-Message-State: APjAAAVYTBgRtO0xGwHjtHZ1pTEyDFp9mUeC1siYMdYWy75zDnNgdsaI
+        LQxdd1aBuh0ais+SzgQkaKM72w==
+X-Google-Smtp-Source: APXvYqzpRyNA15Vg4dJPptP9AquA0hd08+YvFQ9QkFLiFtu1omZ5ju/uevoFFYsI/1tqgZOzWDDXnw==
+X-Received: by 2002:ac8:1a7d:: with SMTP id q58mr88042253qtk.310.1564668914103;
+        Thu, 01 Aug 2019 07:15:14 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id e125sm29217763qkd.120.2019.08.01.07.15.13
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 01 Aug 2019 07:15:13 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1htBrN-00082a-0Q; Thu, 01 Aug 2019 11:15:13 -0300
+Date:   Thu, 1 Aug 2019 11:15:12 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
+ with worker
+Message-ID: <20190801141512.GB23899@ziepe.ca>
+References: <20190731084655.7024-1-jasowang@redhat.com>
+ <20190731084655.7024-8-jasowang@redhat.com>
+ <20190731123935.GC3946@ziepe.ca>
+ <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
+ <20190731193057.GG3946@ziepe.ca>
+ <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190731142851.9793-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/31/19 8:28 AM, Thomas Huth wrote:
-> The kvm_create_max_vcpus test has been moved to the main directory,
-> and sync_regs_test is now available on s390x, too.
+On Thu, Aug 01, 2019 at 01:02:18PM +0800, Jason Wang wrote:
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   tools/testing/selftests/kvm/.gitignore | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> On 2019/8/1 上午3:30, Jason Gunthorpe wrote:
+> > On Wed, Jul 31, 2019 at 09:28:20PM +0800, Jason Wang wrote:
+> > > On 2019/7/31 下午8:39, Jason Gunthorpe wrote:
+> > > > On Wed, Jul 31, 2019 at 04:46:53AM -0400, Jason Wang wrote:
+> > > > > We used to use RCU to synchronize MMU notifier with worker. This leads
+> > > > > calling synchronize_rcu() in invalidate_range_start(). But on a busy
+> > > > > system, there would be many factors that may slow down the
+> > > > > synchronize_rcu() which makes it unsuitable to be called in MMU
+> > > > > notifier.
+> > > > > 
+> > > > > A solution is SRCU but its overhead is obvious with the expensive full
+> > > > > memory barrier. Another choice is to use seqlock, but it doesn't
+> > > > > provide a synchronization method between readers and writers. The last
+> > > > > choice is to use vq mutex, but it need to deal with the worst case
+> > > > > that MMU notifier must be blocked and wait for the finish of swap in.
+> > > > > 
+> > > > > So this patch switches use a counter to track whether or not the map
+> > > > > was used. The counter was increased when vq try to start or finish
+> > > > > uses the map. This means, when it was even, we're sure there's no
+> > > > > readers and MMU notifier is synchronized. When it was odd, it means
+> > > > > there's a reader we need to wait it to be even again then we are
+> > > > > synchronized.
+> > > > You just described a seqlock.
+> > > 
+> > > Kind of, see my explanation below.
+> > > 
+> > > 
+> > > > We've been talking about providing this as some core service from mmu
+> > > > notifiers because nearly every use of this API needs it.
+> > > 
+> > > That would be very helpful.
+> > > 
+> > > 
+> > > > IMHO this gets the whole thing backwards, the common pattern is to
+> > > > protect the 'shadow pte' data with a seqlock (usually open coded),
+> > > > such that the mmu notififer side has the write side of that lock and
+> > > > the read side is consumed by the thread accessing or updating the SPTE.
+> > > 
+> > > Yes, I've considered something like that. But the problem is, mmu notifier
+> > > (writer) need to wait for the vhost worker to finish the read before it can
+> > > do things like setting dirty pages and unmapping page.  It looks to me
+> > > seqlock doesn't provide things like this.
+> > The seqlock is usually used to prevent a 2nd thread from accessing the
+> > VA while it is being changed by the mm. ie you use something seqlocky
+> > instead of the ugly mmu_notifier_unregister/register cycle.
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 41266af0d3dc..b35da375530a 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -1,7 +1,7 @@
-> +/s390x/sync_regs_test
->   /x86_64/cr4_cpuid_sync_test
->   /x86_64/evmcs_test
->   /x86_64/hyperv_cpuid
-> -/x86_64/kvm_create_max_vcpus
->   /x86_64/mmio_warning_test
->   /x86_64/platform_info_test
->   /x86_64/set_sregs_test
-> @@ -13,3 +13,4 @@
->   /x86_64/vmx_tsc_adjust_test
->   /clear_dirty_log_test
->   /dirty_log_test
-> +/kvm_create_max_vcpus
 > 
+> Yes, so we have two mappings:
+> 
+> [1] vring address to VA
+> [2] VA to PA
+> 
+> And have several readers and writers
+> 
+> 1) set_vring_num_addr(): writer of both [1] and [2]
+> 2) MMU notifier: reader of [1] writer of [2]
+> 3) GUP: reader of [1] writer of [2]
+> 4) memory accessors: reader of [1] and [2]
+> 
+> Fortunately, 1) 3) and 4) have already synchronized through vq->mutex. We
+> only need to deal with synchronization between 2) and each of the reset:
+> Sync between 1) and 2): For mapping [1], I do
+> mmu_notifier_unregister/register. This help to avoid holding any lock to do
+> overlap check.
 
-Hi Paolo,
+I suspect you could have done this with a RCU technique instead of
+register/unregister.
 
-Let me know if you need me to take any of these patches. In any
-case:
+> Sync between 2) and 4): For mapping [1], both are readers, no need any
+> synchronization. For mapping [2], synchronize through RCU (or something
+> simliar to seqlock).
 
-Acked-by: Shuah Khan <skhan@linuxfoundation.org>
+You can't really use a seqlock, seqlocks are collision-retry locks,
+and the semantic here is that invalidate_range_start *MUST* not
+continue until thread doing #4 above is guarenteed no longer touching
+the memory.
 
-thanks,
--- Shuah
+This must be a proper barrier, like a spinlock, mutex, or
+synchronize_rcu.
+
+And, again, you can't re-invent a spinlock with open coding and get
+something better.
+
+Jason
