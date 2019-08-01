@@ -2,113 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 774137D3A8
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 05:30:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B413D7D3BC
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 05:35:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729488AbfHADae (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Jul 2019 23:30:34 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:42226 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729454AbfHADad (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Jul 2019 23:30:33 -0400
-Received: by mail-pl1-f195.google.com with SMTP id ay6so31524647plb.9;
-        Wed, 31 Jul 2019 20:30:33 -0700 (PDT)
+        id S1728516AbfHADfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Jul 2019 23:35:34 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:39064 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726118AbfHADfe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Jul 2019 23:35:34 -0400
+Received: by mail-ot1-f68.google.com with SMTP id r21so66642967otq.6;
+        Wed, 31 Jul 2019 20:35:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=yi1exxOESZzEycuHqysD1gM72+t7zQj2sGD0fd3bGxo=;
-        b=WgBWrKZaLmBTaX24JiBvKUKx7PQpnV2Eul0GiwAhK3ZH9enQM5V7htJwd8Vv5XsZtO
-         bGHNooihQQjFoXxasvPnI++UueyCREWT6vPLJGb592F5YejmHk21BjMQf/VZs5nWjIDq
-         9ebsDepEaqi2a0KNouAOD6mO0HoYxNttmCB3MGgcF84iR9+DSXCGKuaHAUrkhyOXBj2t
-         G82lSOMdxAgQBA2BL6DBRSIBgASBN+pdCBpUuhVvlOKU6RFdmN4MuZJN6FBlamEzks6q
-         Wwy1kGXsjj+t1VGc7YEDIvD/cuYg3p/yup6rcgJ/J99C4NGCBDJS+04azSkTv0EbIEh4
-         QPPg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tfDohl1hkWyeEmYeVB02shzd6/LeRxstafK96hHNxW0=;
+        b=oKJz2gJxDCanli9BPv4VG6U/5X4U5UnD11UUuzvvBmj0XdmH2vUg4t7rF8KK6UWDj/
+         QLWbNSok3bW+sM+rdFbWiMCadM6lYkOFsD2qTktf4K1y9l3XetlUSYnazqyn/XJC1VHh
+         +XEXoFVmTI/0cmXV7W0Yx8yesQLFy43K94EW/ZTX+t9S1oXOFQgJlAEn+MKzVgOvXIBj
+         aLSZu7q7VHVyHv/QUaOl8T9BhnVKs/rz+Y53NC7y43LIdInp8iaU+gkCCXj86pTeD/tq
+         Hj8+g7YQOYLwC2uPJJqSuAh2UsFtlX4xjTW8KcGB9ANDKMheaopQLgFVHC7JYYkf0Cw/
+         sp1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=yi1exxOESZzEycuHqysD1gM72+t7zQj2sGD0fd3bGxo=;
-        b=SiO7eWU/lBbWvMEIh/8pTwkENSYSSm4t4A826W67Vaz9qQkcb6QtZ+KRjbyIQ8W3Dc
-         wqmUkIBP8ySw+uWWoTxb4zXxNo70IXSENu+WEmo/FkI4Jobf8mlSvmYj5WafIfPzYSPW
-         iFFwEhsA095iXSCLzqRTqVbe7gC5GkTF8rhGFKHo6/jD2zirFI6m1UzrHy7yoHEmpN89
-         fORDbydg8eHVehaCquuOatdGPgh+xt9RvMWeU6r5AF8IIfIvBxIwES8kJ6un7xxk6Pkt
-         GnPyEgDLfwchPbV757dwEJZFqUIbjp6D5nsnJYXe9P/d1JNRhr3E6wxnH1V5Z1i5Hh+k
-         2+6w==
-X-Gm-Message-State: APjAAAW/wB0xn7zN66rwH8bKNEa9v6ys4UxzQPN5iiqVRPzMJfl+rYNK
-        KkmzvFI1CGcA90bTe5JPNG068qmU0d8=
-X-Google-Smtp-Source: APXvYqwOn+Gh45VcjomgcGYGqPzbg5aUZP4hCLrhQtoQlTTJBOvBqxErP0KkfU6WXVM8k22o5+Yeug==
-X-Received: by 2002:a17:902:6a2:: with SMTP id 31mr117261254plh.296.1564630233098;
-        Wed, 31 Jul 2019 20:30:33 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id d14sm86158055pfo.154.2019.07.31.20.30.31
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 31 Jul 2019 20:30:32 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH v3 3/3] KVM: Check preempted_in_kernel for involuntary preemption
-Date:   Thu,  1 Aug 2019 11:30:14 +0800
-Message-Id: <1564630214-28442-3-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1564630214-28442-1-git-send-email-wanpengli@tencent.com>
-References: <1564630214-28442-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tfDohl1hkWyeEmYeVB02shzd6/LeRxstafK96hHNxW0=;
+        b=Jwh3XdXCJIMbfp3XjeX+WTDFJgWxYUr8E+21eaP5K8BHgoQ9UdTHRH/ajUDCpUcwKt
+         qaIvYmKtzm4ZrLVMu1/tzx8GgMBQxiR3QzYmDe7JRQBUJWsoX6cG6HWL1J9RdqNuyJ5O
+         wg7VbJhBO4+DAfFx4mFQuOoKVtLyx9YpDMzOO/nlEcuS7uqQogO7iDXf4PO9WiaePv9L
+         9e+Rg9EgXe8XYRtetp7gUfDxI9KIA0Go8XN6MDkX4qho3WzYqurn8n2Jq99QGe5Buneu
+         wbJh9Tgnyn6wIlhFZrBi9VdXcjrLWasHpVMEY9EySgwgDvEfuhZ2z7DFnH/OFWBJef4L
+         /jKg==
+X-Gm-Message-State: APjAAAUd4ul8admj3RVvEqpCRBDJnqz8tXrsiFrQPBKHj6jMPmt78hG/
+        q+CRQjNHuy5eeOTtOcJiZgzDcllt5CsNnnfJsdw=
+X-Google-Smtp-Source: APXvYqzEj5zqAqL4CVWZMSE8/eXPHQ6/+Opbz5Yftop3kbDtgICLJgAAjsit3aXWYne4p69TTLUGc0flvh/G4IxRPCw=
+X-Received: by 2002:a9d:6959:: with SMTP id p25mr11102801oto.118.1564630533734;
+ Wed, 31 Jul 2019 20:35:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1564572438-15518-3-git-send-email-wanpengli@tencent.com>
+ <1564573198-16219-1-git-send-email-wanpengli@tencent.com> <9240ada8-8e18-d2b2-006e-41ededb89efb@redhat.com>
+In-Reply-To: <9240ada8-8e18-d2b2-006e-41ededb89efb@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 1 Aug 2019 11:35:17 +0800
+Message-ID: <CANRm+CwJyShOHCanUNmeq8Rr3OWJc1iw0vq5ZAF_WLD-0mSEHA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] KVM: Fix leak vCPU's VMCS value into other pCPU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        "# v3 . 10+" <stable@vger.kernel.org>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, 31 Jul 2019 at 20:55, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 31/07/19 13:39, Wanpeng Li wrote:
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index ed061d8..12f2c91 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -2506,7 +2506,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+> >                               continue;
+> >                       if (vcpu == me)
+> >                               continue;
+> > -                     if (swait_active(&vcpu->wq) && !kvm_arch_vcpu_runnable(vcpu))
+> > +                     if (READ_ONCE(vcpu->preempted) && swait_active(&vcpu->wq))
+> >                               continue;
+> >                       if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
+> >                               !kvm_arch_vcpu_in_kernel(vcpu))
+> >
+>
+> This cannot work.  swait_active means you are waiting, so you cannot be
+> involuntarily preempted.
+>
+> The problem here is simply that kvm_vcpu_has_events is being called
+> without holding the lock.  So kvm_arch_vcpu_runnable is okay, it's the
+> implementation that's wrong.
+>
+> Just rename the existing function to just vcpu_runnable and make a new
+> arch callback kvm_arch_dy_runnable.   kvm_arch_dy_runnable can be
+> conservative and only returns true for a subset of events, in particular
+> for x86 it can check:
+>
+> - vcpu->arch.pv.pv_unhalted
+>
+> - KVM_REQ_NMI or KVM_REQ_SMI or KVM_REQ_EVENT
+>
+> - PIR.ON if APICv is set
+>
+> Ultimately, all variables accessed in kvm_arch_dy_runnable should be
+> accessed with READ_ONCE or atomic_read.
+>
+> And for all architectures, kvm_vcpu_on_spin should check
+> list_empty_careful(&vcpu->async_pf.done)
+>
+> It's okay if your patch renames the function in non-x86 architectures,
+> leaving the fix to maintainers.  So, let's CC Marc and Christian since
+> ARM and s390 have pretty complex kvm_arch_vcpu_runnable as well.
 
-preempted_in_kernel is updated in preempt_notifier when involuntary preemption 
-ocurrs, it can be stale when the voluntarily preempted vCPUs are taken into 
-account by kvm_vcpu_on_spin() loop. This patch lets it just check preempted_in_kernel 
-for involuntary preemption.
+Ok, just sent patch to do this.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- virt/kvm/kvm_main.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3e1a509..58b9590 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2519,7 +2519,8 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 				continue;
- 			if (swait_active(&vcpu->wq) && !vcpu_runnable(vcpu))
- 				continue;
--			if (yield_to_kernel_mode && !kvm_arch_vcpu_in_kernel(vcpu))
-+			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
-+				!kvm_arch_vcpu_in_kernel(vcpu))
- 				continue;
- 			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
- 				continue;
-@@ -4216,7 +4217,7 @@ static void kvm_sched_in(struct preempt_notifier *pn, int cpu)
- {
- 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
- 
--	vcpu->preempted = false;
-+	WRITE_ONCE(vcpu->preempted, false);
- 	WRITE_ONCE(vcpu->ready, false);
- 
- 	kvm_arch_sched_in(vcpu, cpu);
-@@ -4230,7 +4231,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
- 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
- 
- 	if (current->state == TASK_RUNNING) {
--		vcpu->preempted = true;
-+		WRITE_ONCE(vcpu->preempted, true);
- 		WRITE_ONCE(vcpu->ready, true);
- 	}
- 	kvm_arch_vcpu_put(vcpu);
--- 
-2.7.4
-
+Regards,
+Wanpeng Li
