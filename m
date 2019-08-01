@@ -2,88 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C6DB7E4D0
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 23:35:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 066117E4E0
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 23:39:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389178AbfHAVfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 17:35:53 -0400
-Received: from mga06.intel.com ([134.134.136.31]:35131 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728248AbfHAVfw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 17:35:52 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Aug 2019 14:35:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,335,1559545200"; 
-   d="scan'208";a="173038368"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga008.fm.intel.com with ESMTP; 01 Aug 2019 14:35:51 -0700
-Date:   Thu, 1 Aug 2019 14:35:50 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Oleg Nesterov <oleg@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Sebastian Siewior <bigeasy@linutronix.de>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Julia Cartwright <julia@ni.com>,
-        Paul McKenney <paulmck@linux.vnet.ibm.com>,
-        Frederic Weisbecker <fweisbec@gmail.com>, kvm@vger.kernel.org,
-        Radim Krcmar <rkrcmar@redhat.com>,
+        id S2389212AbfHAVjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Aug 2019 17:39:53 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:51290 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389271AbfHAVjx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Aug 2019 17:39:53 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x71LY1II104448;
+        Thu, 1 Aug 2019 21:39:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=LUtX7pBhHZfsgp7r0OheG59VIw+dCJxYfKI4K2OdooM=;
+ b=m9lrReYJkWWi9heHpCLNN++GRGEAshPIkE3IkSr39RFyK2mEk0XKPLZthhaz88ya0+xH
+ hT7scQxOq7bnEzOQ7MhadvXLPKp5MIPu7gmt8I0wTfp4zR+jsPcCh9lWrVpDEQj8Zjf0
+ KmppReF76YcfcIVAgE7IaMAy9O0vNt7srWnZtahhkoGpXlSliZnimUtwUFulGQwSnQGz
+ 7gnjfcXPqxTKH0O+iGpsLA1oLfADHjH2/6Th8iI6ixPafwBBVTPCFlV6MJTDERyD0J/o
+ 4rXKWJkT3Ub9VHKZr8QQqdXq397o/6KwXuqcpLYFthhAEQ25U8jYG0wkrSZOSW+8kGh9 +A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2u0e1u6kws-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Aug 2019 21:39:40 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x71LXL0l183979;
+        Thu, 1 Aug 2019 21:39:39 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2u2jp6kvym-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Aug 2019 21:39:39 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x71LddYJ015405;
+        Thu, 1 Aug 2019 21:39:39 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 01 Aug 2019 14:39:38 -0700
+Subject: Re: [PATCH] KVM: x86: Unconditionally call x86 ops that are always
+ implemented
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        John Stultz <john.stultz@linaro.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        "Paul E. McKenney" <paulmck@linux.ibm.com>
-Subject: Re: [patch 2/5] x86/kvm: Handle task_work on VMENTER/EXIT
-Message-ID: <20190801213550.GE6783@linux.intel.com>
-References: <20190801143250.370326052@linutronix.de>
- <20190801143657.887648487@linutronix.de>
- <20190801162451.GE31538@redhat.com>
- <alpine.DEB.2.21.1908012025100.1789@nanos.tec.linutronix.de>
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190801164606.20777-1-sean.j.christopherson@intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <3337d56f-de99-6879-96c2-0255db68541d@oracle.com>
+Date:   Thu, 1 Aug 2019 14:39:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.1908012025100.1789@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190801164606.20777-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9336 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=676
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908010228
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9336 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=728 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908010228
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 08:34:53PM +0200, Thomas Gleixner wrote:
-> On Thu, 1 Aug 2019, Oleg Nesterov wrote:
-> > On 08/01, Thomas Gleixner wrote:
-> > >
-> > > @@ -8172,6 +8174,10 @@ static int vcpu_run(struct kvm_vcpu *vcp
-> > >  			++vcpu->stat.signal_exits;
-> > >  			break;
-> > >  		}
-> > > +
-> > > +		if (notify_resume_pending())
-> > > +			tracehook_handle_notify_resume();
-> > 
-> > shouldn't you drop kvm->srcu before tracehook_handle_notify_resume() ?
-> > 
-> > I don't understand this code at all, but vcpu_run() does this even before
-> > cond_resched().
-> 
-> Yeah, I noticed that it's dropped around cond_resched().
-> 
-> My understanding is that for voluntary giving up the CPU via cond_resched()
-> it needs to be dropped.
-> 
-> For involuntary preemption (CONFIG_PREEMPT=y) it's not required as the
-> whole code section after preempt_enable() is fully preemptible.
-> 
-> Now the 1Mio$ question is whether any of the notify functions invokes
-> cond_resched() and whether that really matters. Paolo?
 
-cond_resched() is called via tracehook_notify_resume()->task_work_run(),
-and "kernel code can only call cond_resched() in places where it ...
-cannot hold references to any RCU-protected data structures" according to
-https://lwn.net/Articles/603252/.
+
+On 08/01/2019 09:46 AM, Sean Christopherson wrote:
+> Remove two stale checks for non-NULL ops now that they're implemented by
+> both VMX and SVM.
+>
+> Fixes: 74f169090b6f ("kvm/svm: Setup MCG_CAP on AMD properly")
+> Fixes: b31c114b82b2 ("KVM: X86: Provide a capability to disable PAUSE intercepts")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>   arch/x86/kvm/x86.c | 8 ++------
+>   1 file changed, 2 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 01e18caac825..2c25a19d436f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3506,8 +3506,7 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
+>   	for (bank = 0; bank < bank_num; bank++)
+>   		vcpu->arch.mce_banks[bank*4] = ~(u64)0;
+>   
+> -	if (kvm_x86_ops->setup_mce)
+> -		kvm_x86_ops->setup_mce(vcpu);
+> +	kvm_x86_ops->setup_mce(vcpu);
+>   out:
+>   	return r;
+>   }
+> @@ -9313,10 +9312,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	kvm_page_track_init(kvm);
+>   	kvm_mmu_init_vm(kvm);
+>   
+> -	if (kvm_x86_ops->vm_init)
+> -		return kvm_x86_ops->vm_init(kvm);
+> -
+> -	return 0;
+> +	return kvm_x86_ops->vm_init(kvm);
+>   }
+>   
+>   static void kvm_unload_vcpu_mmu(struct kvm_vcpu *vcpu)
+
+The following two ops are also implemented by both VMX and SVM:
+
+         update_cr8_intercept
+         update_pi_irte
