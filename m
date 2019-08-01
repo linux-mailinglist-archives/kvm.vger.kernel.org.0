@@ -2,150 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 561D47D99F
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 12:48:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C0877DADC
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2019 14:04:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730165AbfHAKsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 06:48:00 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35756 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727506AbfHAKr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 06:47:59 -0400
-Received: by mail-wr1-f68.google.com with SMTP id y4so73064564wrm.2
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2019 03:47:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Qw6j853wZUG0P4ng1fQNKfQUl03rC9IHR3/FL4fgPwk=;
-        b=QcnBxGvVUpes0SuHVcIGnZFFzA6gwZZXWskcPz0zIF32VjVU0MWTrk0abftjsWP9fz
-         78/U35eAyYCZSRekPEkffNnLmoBQjdj/Lfz6FCodIw3nuHOoZMThtF/WNzoeiLBa52Yt
-         uVaKpYX60fY0hHRYxnbLJGewmvhxZuGYi1qa5fYYJ/cYyRNHbA40JPC4BmV1LYBhu9fP
-         AOYgmfP3wKVahlustytnNZmI5TMAumKoCvLNwweoR1llfLd97XLpyzH20X2GWfuP74Uh
-         zmut+MhAwg8YUZq4wvHVu4YbJyDFRzMKxRGl/Wjyg/QBJ5296PAtx1cLute6AaQRw5Dk
-         XN4w==
-X-Gm-Message-State: APjAAAUplzyD2TbLITd6QvOI/Iq8A+fyNMtg9xXhrPq+pJvzriDdlINR
-        LbULLsBsHqu9H4rasyk5wmIdWDkIE1A=
-X-Google-Smtp-Source: APXvYqxw85Z/h+/LijJBZKEF9X3Av4FcGm9GhgdFvPrI4Hc/B6vXckRANX/RaJawe7pCHRv8hHxJ0Q==
-X-Received: by 2002:adf:e8c8:: with SMTP id k8mr36986014wrn.285.1564656477234;
-        Thu, 01 Aug 2019 03:47:57 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it. [79.13.201.122])
-        by smtp.gmail.com with ESMTPSA id h8sm75520711wmf.12.2019.08.01.03.47.55
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 01 Aug 2019 03:47:56 -0700 (PDT)
-Date:   Thu, 1 Aug 2019 12:47:54 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
-Message-ID: <20190801104754.lb3ju5xjfmnxioii@steredhat>
-References: <20190717113030.163499-1-sgarzare@redhat.com>
- <20190717113030.163499-2-sgarzare@redhat.com>
- <20190729095956-mutt-send-email-mst@kernel.org>
- <20190729153656.zk4q4rob5oi6iq7l@steredhat>
- <20190729114302-mutt-send-email-mst@kernel.org>
- <20190729161903.yhaj5rfcvleexkhc@steredhat>
- <20190729165056.r32uzj6om3o6vfvp@steredhat>
- <20190729143622-mutt-send-email-mst@kernel.org>
- <20190730093539.dcksure3vrykir3g@steredhat>
- <20190730163807-mutt-send-email-mst@kernel.org>
+        id S1727198AbfHAMEl convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 1 Aug 2019 08:04:41 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41850 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726227AbfHAMEk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Aug 2019 08:04:40 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BE2F9285AA
+        for <kvm@vger.kernel.org>; Thu,  1 Aug 2019 12:04:39 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id B184E2855D; Thu,  1 Aug 2019 12:04:39 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+        pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
+        NO_RELAYS autolearn=unavailable version=3.3.1
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 204401] New: After a VMexit, the guest is re-entring with a
+ wrong vcpu PC address which is causing the guest to crash.
+Date:   Thu, 01 Aug 2019 12:04:38 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: denis_roux_@hotmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-204401-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190730163807-mutt-send-email-mst@kernel.org>
-User-Agent: NeoMutt/20180716
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 04:42:25PM -0400, Michael S. Tsirkin wrote:
-> On Tue, Jul 30, 2019 at 11:35:39AM +0200, Stefano Garzarella wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=204401
 
-(...)
+            Bug ID: 204401
+           Summary: After a VMexit, the guest is re-entring with a wrong
+                    vcpu PC address which is causing the guest to crash.
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 4.19.26
+          Hardware: ARM
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: denis_roux_@hotmail.com
+        Regression: No
 
-> > 
-> > The problem here is the compatibility. Before this series virtio-vsock
-> > and vhost-vsock modules had the RX buffer size hard-coded
-> > (VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE = 4K). So, if we send a buffer smaller
-> > of 4K, there might be issues.
-> 
-> Shouldn't be if they are following the spec. If not let's fix
-> the broken parts.
-> 
-> > 
-> > Maybe it is the time to add add 'features' to virtio-vsock device.
-> > 
-> > Thanks,
-> > Stefano
-> 
-> Why would a remote care about buffer sizes?
-> 
-> Let's first see what the issues are. If they exist
-> we can either fix the bugs, or code the bug as a feature in spec.
-> 
+Created attachment 284069
+  --> https://bugzilla.kernel.org/attachment.cgi?id=284069&action=edit
+Fix applied to linux
 
-The vhost_transport '.stream_enqueue' callback
-[virtio_transport_stream_enqueue()] calls the virtio_transport_send_pkt_info(),
-passing the user message. This function allocates a new packet, copying
-the user message, but (before this series) it limits the packet size to
-the VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE (4K):
+guest crash:
 
-static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-					  struct virtio_vsock_pkt_info *info)
-{
- ...
-	/* we can send less than pkt_len bytes */
-	if (pkt_len > VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE)
-		pkt_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
-
-	/* virtio_transport_get_credit might return less than pkt_len credit */
-	pkt_len = virtio_transport_get_credit(vvs, pkt_len);
-
-	/* Do not send zero length OP_RW pkt */
-	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
-		return pkt_len;
- ...
-}
-
-then it queues the packet for the TX worker calling .send_pkt()
-[vhost_transport_send_pkt() in the vhost_transport case]
-
-The main function executed by the TX worker is
-vhost_transport_do_send_pkt() that picks up a buffer from the virtqueue
-and it tries to copy the packet (up to 4K) on it.  If the buffer
-allocated from the guest will be smaller then 4K, I think here it will
-be discarded with an error:
-
-static void
-vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-				struct vhost_virtqueue *vq)
-{
- ...
-		nbytes = copy_to_iter(pkt->buf, pkt->len, &iov_iter);
-		if (nbytes != pkt->len) {
-			virtio_transport_free_pkt(pkt);
-			vq_err(vq, "Faulted on copying pkt buf\n");
-			break;
-		}
- ...
-}
+ESF PC                 : 0x7004b528 ( (0x7004b4a4) + 0x84)
+Exception Vec          : 1 (Undefined Instruction)
+CPSR                   : 0x20000093
+PE Mode             : Supervisor
+Instruction         : A32
+FIQ                 : Not Masked
+IRQ                 : Masked
+Async data abort    : Not Masked
+Endianness          : little-endian
+GE flag             : 0x0
+Status flags        : nzCvq
+SCTLR                  : 0x20C5183D
+MMU                : Enabled
+Alignment Check    : Disabled
+Cache              : Enabled
+CP15 barrier op    : Enabled
+IT instr           : Enabled
+SETEND instr       : Enabled
+Instr cache        : Enabled
+Vector address     : In VBAR
+PL0 WFI            : Enabled
+PL0 WFE            : Enabled
+Exec at writable   : Allowed
+Exec at unprivileged write: Allowed
+Exec endianness    : Little-endian
+TEX Remap          : Disabled
+Access flag        : Enabled
+Exception exc state: A32
+TTBR0                  : 0x0000000072C56000
+TTBR1                  : 0x0000000000000000
+TCB PC                 : 0x7004b528 ( (0x7004b4a4) + 0x84)
+TCB LR                 : 0x703f482c ( (0x703f26b4) + 0x2178)
+TCB Registers          : r0 = 00000080 r1 = 00000086 r2 = 00000100 r3 =
+89DA3500
+                       : r4 = 70C085A0 r5 = 703F473C r6 = 001E83D7 r7 =
+00000000
+                       : r8 = 0F13B46A r9 = 00000000 r10= 703B8484 fp =
+7260FCC4
+                       : ip = 12200000 sp = 7260FCA0 lr = 703F482C pc =
+7004B528
 
 
-This series changes this behavior since now we will split the packet in
-vhost_transport_do_send_pkt() depending on the buffer found in the
-virtqueue.
+Guest assembly being execute leading to the crash:
 
-We didn't change the buffer size in this series, so we still backward
-compatible, but if we will use buffers smaller than 4K, we should
-encounter the error described above.
+0x7004b508 <+0x0064>: bc 00 c3 e1                       strh    r0, [r3, #12]  
+                                      /* will cause a MMIO VMexit */
+0x7004b50c <+0x0068>: 04 30 94 e5                       ldr    r3, [r4, #4]
+0x7004b510 <+0x006c>: bc 10 c3 e1                       strh    r1, [r3, #12]  
+                                      /* will cause a MMIO VMexit */
+0x7004b514 <+0x0070>: 04 30 94 e5                       ldr    r3, [r4, #4]
+0x7004b518 <+0x0074>: bc 20 c3 e1                       strh    r2, [r3, #12]  
+                                      /* will cause a MMIO VMexit */
+0x7004b51c <+0x0078>: f0 ab 9d e8                       ldm    sp, {r4, r5, r6,
+r7, r8, r9, r11, sp, pc}   /* function return */
+0x7004b520 <+0x007c>: 88 c7 03 70                       andvc    r12, r3, r8,
+lsl #15                             /* Compiler generated data */
+0x7004b524 <+0x0080>: 90 c8 03 70                       mulvc    r3, r0, r8    
+                                       /* Compiler generated data */
+0x7004b528 <+0x0084>: 3c 47 3f 70                       eorsvc    r4, pc, r12,
+lsr r7    ; <UNPREDICTABLE> /* Compiler generated data */
 
-How do you suggest we proceed if we want to change the buffer size?
-Maybe adding a feature to "support any buffer size"?
 
-Thanks,
-Stefano
+Observed scenario on KVM:
+
+    VM exit occured at vcpu PC 0x7004b518 (exit reason KVM_EXIT_MMIO)
+    kvm_arch_vcpu_ioctl_run re-entered
+    kvm_handle_mmio_return is executed to emulate the instruction at vcpu PC
+0x7004b518. This is done successfully and vcpu PC is updated to 0x7004b51c.
+    run->immediate_exit is checked and found to be set. It returns.
+    kvm_arch_vcpu_ioctl_run re-entered
+    kvm_handle_mmio_return is executed to emulate the instruction at vcpu PC
+0x7004b518. This is done successfully and vcpu PC is updated to 0x7004b520.
+    run->immediate_exit is checked but is not set.
+    VM enter occurs with a corrupted vcpu PC which leads to the crash.
+
+System information:
+cpu model: ARMv7 Processor rev 4 (v7l)
+Linux: 4.19.26
+host kernel arch: arm
+guest arch: arm
+qemu cmd:qemu-system-arm -nographic -M virt -enable-kvm- cpu host ...
+
+I have attached the patch that I have used to fix this issue.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
