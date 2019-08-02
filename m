@@ -2,136 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BF597F569
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 12:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 694C77F57A
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 12:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732075AbfHBKqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 06:46:36 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43710 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730841AbfHBKqf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 06:46:35 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so2131417wru.10
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 03:46:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8nHVa+8uGKdtX3pSY7JjerDZijsdBHPkAyPWVC/nVmk=;
-        b=ZAEf+KTy6f5AhWFlRsx61w4ofZ81YfGRsavZCFgDbWCjF7HcLOO9915Wa+i4qPOGNq
-         JWlrVG4P8jEDG+EK8rfHr7EBb8BIsyhkzXs7OcfBp4oN9v9M5P5HTM+VECZY6EBhgCT8
-         QngMkcjlTE4fDfMn5Jgl34Dr1aI+TVu7MmYv8XsmYReLt/nVf/veGk4Iw6apaEmyZbku
-         N3bw/siJ5td+hGRkz847Cjv8/4pJOLibkEbA9f+UVOGhtlG6KzQkCg7xHeXu/NZik89X
-         MqJOY0byLzgciLKrRg3EAOhbC1B5gRdiDA1+ad07r/e3XfoVxlAQ/KOMWeZ9haTPN8PW
-         mO7g==
-X-Gm-Message-State: APjAAAW2W4NEwiILDrVM+lsUSi+yLqn72ZXwtBgZ6BoyffnFLtqm/6uw
-        GVK4ikc4jkQ5oejxk4SRA/7D0Q==
-X-Google-Smtp-Source: APXvYqweacgUco11b5+iiklsZr3HnubI3sddSf7PjrsWTggPB1b/KH1PZW2FxQ0WyAeTEVE3WuJUPQ==
-X-Received: by 2002:a5d:4484:: with SMTP id j4mr3719539wrq.143.1564742793492;
-        Fri, 02 Aug 2019 03:46:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff? ([2001:b07:6468:f312:4013:e920:9388:c3ff])
-        by smtp.gmail.com with ESMTPSA id l9sm58540760wmh.36.2019.08.02.03.46.32
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 03:46:32 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: Call kvm_arch_vcpu_blocking early into the
- blocking sequence
-To:     Marc Zyngier <maz@kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
-        Tangnianyao <tangnianyao@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20190802103709.70148-1-maz@kernel.org>
- <20190802103709.70148-3-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <a7250b9a-60e9-b04c-5515-e506aea46515@redhat.com>
-Date:   Fri, 2 Aug 2019 12:46:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1732382AbfHBKuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 06:50:46 -0400
+Received: from foss.arm.com ([217.140.110.172]:49624 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725844AbfHBKuq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 06:50:46 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6CBE3344;
+        Fri,  2 Aug 2019 03:50:45 -0700 (PDT)
+Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9FF973F71F;
+        Fri,  2 Aug 2019 03:50:40 -0700 (PDT)
+Date:   Fri, 2 Aug 2019 11:50:38 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Kevin Brodsky <kevin.brodsky@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v19 02/15] arm64: Introduce prctl() options to control
+ the tagged user addresses ABI
+Message-ID: <20190802105038.GC4175@arrakis.emea.arm.com>
+References: <cover.1563904656.git.andreyknvl@google.com>
+ <1c05651c53f90d07e98ee4973c2786ccf315db12.1563904656.git.andreyknvl@google.com>
+ <7a34470c-73f0-26ac-e63d-161191d4b1e4@intel.com>
+ <2b274c6f-6023-8eb8-5a86-507e6000e13d@arm.com>
+ <88c59d1e-eda9-fcfe-5ee3-64a331f34313@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190802103709.70148-3-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <88c59d1e-eda9-fcfe-5ee3-64a331f34313@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/08/19 12:37, Marc Zyngier wrote:
-> When a vpcu is about to block by calling kvm_vcpu_block, we call
-> back into the arch code to allow any form of synchronization that
-> may be required at this point (SVN stops the AVIC, ARM synchronises
-> the VMCR and enables GICv4 doorbells). But this synchronization
-> comes in quite late, as we've potentially waited for halt_poll_ns
-> to expire.
+On Thu, Aug 01, 2019 at 09:45:05AM -0700, Dave Hansen wrote:
+> On 8/1/19 5:38 AM, Kevin Brodsky wrote:
+> > This patch series only changes what is allowed or not at the syscall
+> > interface. It does not change the address space size. On arm64, TBI (Top
+> > Byte Ignore) has always been enabled for userspace, so it has never been
+> > possible to use the upper 8 bits of user pointers for addressing.
 > 
-> Instead, let's move kvm_arch_vcpu_blocking() to the beginning of
-> kvm_vcpu_block(), which on ARM has several benefits:
-> 
-> - VMCR gets synchronised early, meaning that any interrupt delivered
->   during the polling window will be evaluated with the correct guest
->   PMR
-> - GICv4 doorbells are enabled, which means that any guest interrupt
->   directly injected during that window will be immediately recognised
-> 
-> Tang Nianyao ran some tests on a GICv4 machine to evaluate such
-> change, and reported up to a 10% improvement for netperf:
-> 
-> <quote>
-> 	netperf result:
-> 	D06 as server, intel 8180 server as client
-> 	with change:
-> 	package 512 bytes - 5500 Mbits/s
-> 	package 64 bytes - 760 Mbits/s
-> 	without change:
-> 	package 512 bytes - 5000 Mbits/s
-> 	package 64 bytes - 710 Mbits/s
-> </quote>
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  virt/kvm/kvm_main.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 887f3b0c2b60..90d429c703cb 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2322,6 +2322,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->  	bool waited = false;
->  	u64 block_ns;
->  
-> +	kvm_arch_vcpu_blocking(vcpu);
-> +
->  	start = cur = ktime_get();
->  	if (vcpu->halt_poll_ns && !kvm_arch_no_poll(vcpu)) {
->  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
-> @@ -2342,8 +2344,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->  		} while (single_task_running() && ktime_before(cur, stop));
->  	}
->  
-> -	kvm_arch_vcpu_blocking(vcpu);
-> -
->  	for (;;) {
->  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
->  
-> @@ -2356,9 +2356,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->  
->  	finish_swait(&vcpu->wq, &wait);
->  	cur = ktime_get();
-> -
-> -	kvm_arch_vcpu_unblocking(vcpu);
->  out:
-> +	kvm_arch_vcpu_unblocking(vcpu);
->  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
->  
->  	if (!vcpu_valid_wakeup(vcpu))
-> 
+> Oh, so does the address space that's available already chop that out?
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Yes. Currently the hardware only supports 52-bit virtual addresses. It
+could be expanded (though it needs a 5th page table level) to 56-bit VA
+but it's not currently on our (hardware) plans. Beyond 56-bit, it cannot
+be done without breaking the software expectations (and hopefully I'll
+retire before we need this ;)).
+
+> > If other architectures were to support a similar functionality, then I
+> > agree that a common and more generic interface (if needed) would be
+> > helpful, but as it stands this is an arm64-specific prctl, and on arm64
+> > the address tag is defined by the architecture as bits [63:56].
+> 
+> It should then be an arch_prctl(), no?
+
+I guess you just want renaming SET_TAGGED_ADDR_CTRL() to
+arch_prctl_tagged_addr_ctrl_set()? (similarly for 'get')
+
+-- 
+Catalin
