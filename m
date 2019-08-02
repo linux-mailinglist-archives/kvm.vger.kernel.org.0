@@ -2,115 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A27BC7EB88
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 06:37:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00CC47EC49
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 07:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731688AbfHBEg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 00:36:57 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45098 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728157AbfHBEg4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 00:36:56 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 56E85AD2B;
-        Fri,  2 Aug 2019 04:36:53 +0000 (UTC)
+        id S2387918AbfHBFt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 01:49:57 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:2974 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728714AbfHBFt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 01:49:56 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d43cf030000>; Thu, 01 Aug 2019 22:49:55 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 01 Aug 2019 22:49:54 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 01 Aug 2019 22:49:54 -0700
+Received: from [10.2.171.217] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 2 Aug
+ 2019 05:49:53 +0000
 Subject: Re: [PATCH 20/34] xen: convert put_page() to put_user_page*()
-To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
-Cc:     devel@driverdev.osuosl.org, Dave Chinner <david@fromorbit.com>,
+To:     Juergen Gross <jgross@suse.com>, <john.hubbard@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     <devel@driverdev.osuosl.org>, Dave Chinner <david@fromorbit.com>,
         Christoph Hellwig <hch@infradead.org>,
         Dan Williams <dan.j.williams@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, x86@kernel.org,
-        linux-mm@kvack.org, Dave Hansen <dave.hansen@linux.intel.com>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-rpi-kernel@lists.infradead.org, devel@lists.orangefs.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Ira Weiny <ira.weiny@intel.com>, <x86@kernel.org>,
+        <linux-mm@kvack.org>, Dave Hansen <dave.hansen@linux.intel.com>,
+        <amd-gfx@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-rpi-kernel@lists.infradead.org>, <devel@lists.orangefs.org>,
+        <xen-devel@lists.xenproject.org>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        rds-devel@oss.oracle.com,
+        <rds-devel@oss.oracle.com>,
         =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, ceph-devel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, sparclinux@vger.kernel.org,
+        Jan Kara <jack@suse.cz>, <ceph-devel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-fbdev@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-xfs@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <sparclinux@vger.kernel.org>,
         Jason Gunthorpe <jgg@ziepe.ca>
 References: <20190802022005.5117-1-jhubbard@nvidia.com>
  <20190802022005.5117-21-jhubbard@nvidia.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <4471e9dc-a315-42c1-0c3c-55ba4eeeb106@suse.com>
-Date:   Fri, 2 Aug 2019 06:36:51 +0200
+ <4471e9dc-a315-42c1-0c3c-55ba4eeeb106@suse.com>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <d5140833-e9ee-beb5-ff0a-2d13a4fe819f@nvidia.com>
+Date:   Thu, 1 Aug 2019 22:48:15 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190802022005.5117-21-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4471e9dc-a315-42c1-0c3c-55ba4eeeb106@suse.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1564724995; bh=OWvjPY2RJnSXiNaT1G8Eyahp8MUAsm98cTkExQmaDUY=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=g4+wbBM5eRNl11+v4FSAl8PrvEnWACjbjTJMUv4Ewv3g+h7PgD8hueH5dPeoF8sW5
+         c20eFrVi38BUjWugKSUxA2GH7CM3A3OrXQMppFfNCHg/NTgln/g1EuAeIEfsheR70J
+         47ajhTYRdBziMz0qVCHRjvKDjLN869T+rpjyKMqZQbhfLl80UOF5a6wxQMkyYeuu5C
+         +SnQBQbOJUSigTfdZ2ZjmuC0GsGJhOMqTD72slI2rg2m1d7LKmLad2tBrS2UUN+9aI
+         ixGXEdOyIH0YMQhEWsNGgp8xCyCNq0cOZ0EzzfGMekaZZJReXbXnLe2japHjsnQzSN
+         gxuwPmkfTC8TQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.08.19 04:19, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page() or
-> release_pages().
-> 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: xen-devel@lists.xenproject.org
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->   drivers/xen/gntdev.c  | 5 +----
->   drivers/xen/privcmd.c | 7 +------
->   2 files changed, 2 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/xen/gntdev.c b/drivers/xen/gntdev.c
-> index 4c339c7e66e5..2586b3df2bb6 100644
-> --- a/drivers/xen/gntdev.c
-> +++ b/drivers/xen/gntdev.c
-> @@ -864,10 +864,7 @@ static int gntdev_get_page(struct gntdev_copy_batch *batch, void __user *virt,
->   
->   static void gntdev_put_pages(struct gntdev_copy_batch *batch)
->   {
-> -	unsigned int i;
-> -
-> -	for (i = 0; i < batch->nr_pages; i++)
-> -		put_page(batch->pages[i]);
-> +	put_user_pages(batch->pages, batch->nr_pages);
->   	batch->nr_pages = 0;
->   }
->   
-> diff --git a/drivers/xen/privcmd.c b/drivers/xen/privcmd.c
-> index 2f5ce7230a43..29e461dbee2d 100644
-> --- a/drivers/xen/privcmd.c
-> +++ b/drivers/xen/privcmd.c
-> @@ -611,15 +611,10 @@ static int lock_pages(
->   
->   static void unlock_pages(struct page *pages[], unsigned int nr_pages)
->   {
-> -	unsigned int i;
-> -
->   	if (!pages)
->   		return;
->   
-> -	for (i = 0; i < nr_pages; i++) {
-> -		if (pages[i])
-> -			put_page(pages[i]);
-> -	}
-> +	put_user_pages(pages, nr_pages);
+On 8/1/19 9:36 PM, Juergen Gross wrote:
+> On 02.08.19 04:19, john.hubbard@gmail.com wrote:
+>> From: John Hubbard <jhubbard@nvidia.com>
+...
+>> diff --git a/drivers/xen/privcmd.c b/drivers/xen/privcmd.c
+>> index 2f5ce7230a43..29e461dbee2d 100644
+>> --- a/drivers/xen/privcmd.c
+>> +++ b/drivers/xen/privcmd.c
+>> @@ -611,15 +611,10 @@ static int lock_pages(
+>> =C2=A0 static void unlock_pages(struct page *pages[], unsigned int nr_pa=
+ges)
+>> =C2=A0 {
+>> -=C2=A0=C2=A0=C2=A0 unsigned int i;
+>> -
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!pages)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> -=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < nr_pages; i++) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (pages[i])
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 put_=
+page(pages[i]);
+>> -=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 put_user_pages(pages, nr_pages);
+>=20
+> You are not handling the case where pages[i] is NULL here. Or am I
+> missing a pending patch to put_user_pages() here?
+>=20
 
-You are not handling the case where pages[i] is NULL here. Or am I
-missing a pending patch to put_user_pages() here?
+Hi Juergen,
+
+You are correct--this no longer handles the cases where pages[i]
+is NULL. It's intentional, though possibly wrong. :)
+
+I see that I should have added my standard blurb to this
+commit description. I missed this one, but some of the other patches
+have it. It makes the following, possibly incorrect claim:
+
+"This changes the release code slightly, because each page slot in the
+page_list[] array is no longer checked for NULL. However, that check
+was wrong anyway, because the get_user_pages() pattern of usage here
+never allowed for NULL entries within a range of pinned pages."
+
+The way I've seen these page arrays used with get_user_pages(),
+things are either done single page, or with a contiguous range. So
+unless I'm missing a case where someone is either
+
+a) releasing individual pages within a range (and thus likely messing
+up their count of pages they have), or
+
+b) allocating two gup ranges within the same pages[] array, with a
+gap between the allocations,
+
+...then it should be correct. If so, then I'll add the above blurb
+to this patch's commit description.
+
+If that's not the case (both here, and in 3 or 4 other patches in this
+series, then as you said, I should add NULL checks to put_user_pages()
+and put_user_pages_dirty_lock().
 
 
-Juergen
+thanks,
+--=20
+John Hubbard
+NVIDIA
