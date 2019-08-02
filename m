@@ -2,78 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2DA77F027
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 11:14:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95ECE7F044
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 11:19:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729432AbfHBJOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 05:14:44 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38606 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726818AbfHBJOo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 05:14:44 -0400
-Received: by mail-wr1-f65.google.com with SMTP id g17so76393554wrr.5
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 02:14:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qip0/4niVe3t0eqLUXzaEsnThAuuUjr0Sl7TEveH/lY=;
-        b=QY8HUJPMKBAaFGAvfEwoVT9DlbP0sioHyftTT3O+Nn5SkWWmPpFHQIJuKP6mBx2gB6
-         F/d8CnpVKX1Py0qjI3hOkBAxWJvl0noyhygp0Rgo5ZZqJU4XVqqUS3hc9rypnr3n3ggz
-         IhaXWSeabacfJsGGIHnp//wANg8Mmc1OlfeolksshDJEA2WB1IB3z6CmOTgtjL1yHL73
-         LoXlKF7B/EudnfL2DeTbhW+xAGgb3Yknuhe+B5CpZxL8TX3NkSF8XVgLEuMm2LFPaRgQ
-         Hc3xBs0wTd19eyONyDbgqvvoxuuBwvetw4kWvcg+zKQUt2NtPSsh6lb40Dz9xwUR6Oqu
-         qY/A==
-X-Gm-Message-State: APjAAAW04On3NAEdvlrUvWeDH4EHor8tWBRmpAyjuTLmF3wRTZlaDfWZ
-        lPjRYU98mo+8Ga+M06aq44hafA==
-X-Google-Smtp-Source: APXvYqzBUUchxm6j0ktdj9jreOdHWCW7hMz3Yz24xUQA2HVmbvwbX1hgS8nU0BDDul8xNizaVm6PxQ==
-X-Received: by 2002:adf:e8d0:: with SMTP id k16mr1884801wrn.31.1564737282526;
-        Fri, 02 Aug 2019 02:14:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff? ([2001:b07:6468:f312:4013:e920:9388:c3ff])
-        by smtp.gmail.com with ESMTPSA id y6sm62931619wrp.12.2019.08.02.02.14.40
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 02:14:42 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 12/19] RISC-V: KVM: Implement stage2 page table
- programming
-To:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Radim K <rkrcmar@redhat.com>
-Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190802074620.115029-1-anup.patel@wdc.com>
- <20190802074620.115029-13-anup.patel@wdc.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <949b75ef-5ec6-cdfd-5d5d-5695f35bd20c@redhat.com>
-Date:   Fri, 2 Aug 2019 11:14:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2387961AbfHBJTf convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 2 Aug 2019 05:19:35 -0400
+Received: from mga09.intel.com ([134.134.136.24]:11805 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387890AbfHBJTf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 05:19:35 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 02:19:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,337,1559545200"; 
+   d="scan'208";a="178105348"
+Received: from jlahtine-desk.ger.corp.intel.com (HELO localhost) ([10.252.3.11])
+  by orsmga006.jf.intel.com with ESMTP; 02 Aug 2019 02:19:23 -0700
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20190802074620.115029-13-anup.patel@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
+To:     Andrew Morton <akpm@linux-foundation.org>, john.hubbard@gmail.com
+From:   Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <20190802022005.5117-7-jhubbard@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?utf-8?b?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        David Airlie <airlied@linux.ie>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802022005.5117-7-jhubbard@nvidia.com>
+Message-ID: <156473756254.19842.12384378926183716632@jlahtine-desk.ger.corp.intel.com>
+User-Agent: alot/0.7
+Subject: Re: [PATCH 06/34] drm/i915: convert put_page() to put_user_page*()
+Date:   Fri, 02 Aug 2019 12:19:22 +0300
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/08/19 09:48, Anup Patel wrote:
-> +	hgatp |= (k->vmid.vmid << HGATP_VMID_SHIFT) & HGATP_VMID_MASK;
+Quoting john.hubbard@gmail.com (2019-08-02 05:19:37)
+> From: John Hubbard <jhubbard@nvidia.com>
+> 
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> Note that this effectively changes the code's behavior in
+> i915_gem_userptr_put_pages(): it now calls set_page_dirty_lock(),
+> instead of set_page_dirty(). This is probably more accurate.
 
-This should use READ_ONCE.
+We've already fixed this in drm-tip where the current code uses
+set_page_dirty_lock().
 
-Paolo
+This would conflict with our tree. Rodrigo is handling
+drm-intel-next for 5.4, so you guys want to coordinate how
+to merge.
 
-> +	hgatp |= (k->pgd_phys >> PAGE_SHIFT) & HGATP_PPN;
-
+Regards, Joonas
