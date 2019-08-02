@@ -2,40 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17A7D7EEAE
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 10:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A56587EF4D
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 10:30:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404055AbfHBIRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 04:17:47 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36410 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727949AbfHBIRr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 04:17:47 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n4so76303574wrs.3
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 01:17:45 -0700 (PDT)
+        id S2404188AbfHBIaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 04:30:14 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37183 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726756AbfHBIaO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 04:30:14 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n9so51185192wrr.4
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 01:30:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=APOXhup+sZGXS5d0UC7uGeTiWB/G8v81K64OFOYtTQY=;
-        b=UBjBignOublgVPBWUC/zK3kpget1FBb+Asumf0hqAM5134bQUOFDAQ/gBP1MW5pdIc
-         FK1RM1S3Bey08e37Z2Ngn0ZZdPLd3FmmJQJz8c0UFlD1wrlMve9taXs7E/KJpoubemrB
-         evh1oWsffSGJEjOhs30DUS6+VtUjj11o73l15rOs/nG9R4ZPmAz0Yt3kqU+7U6CjPkUe
-         B8V1GDxC6GfKRit8HE+u33VcVwlaQG7iU1501RluI4S2m56FsDu5SZXQPDunYCR/u/UV
-         hk33oBr4TfkXiHIDFaFvRL2qYJGAOzWETXPoM1nAgF58quuG/XFvYKRBJx1K9Mn5+aBz
-         AYUw==
-X-Gm-Message-State: APjAAAU+pHocsRDSkjq8ZktV3ppgCazOV24AtkgaT6fcHAILLwWRNI10
-        LMzH3ht5/xKktk5EmTKSsURXWQ==
-X-Google-Smtp-Source: APXvYqxouFvTCxPN5ary3LSNHZng7Fu6r6547Mi/qZeNJXWg0W3zH8U/xLY5N3dAloNhdOrtFxV+kg==
-X-Received: by 2002:a5d:4101:: with SMTP id l1mr7547509wrp.202.1564733864909;
-        Fri, 02 Aug 2019 01:17:44 -0700 (PDT)
+        bh=+MjSLRhTHy/z+LM8sRLnyEruabbpzZhCsOii1dxVU9Y=;
+        b=ABjjmBa63ORx5S85nQTU3ArYFnduFCEPXOIcUyf85QtNLRegddmzQe+zhTlWqIEKBw
+         +ssZAR7i1HHBcEa6y8e2/7DZf30iNzpUtzbsYJ4iEvU3cZGIuR36N8E0HDXqawwrUvQT
+         ao785ZMHt4k+7N92p9JsH+eOeZiMKlN5rXciTIueCtcqP8DX5gZvYxeuIof5D5VpB+YO
+         zCGLh4ztQzWeVVlcyy0I0gku7ZnxzRfXFgVPxlY4TxM6ypp49ErrrswShEL0zQDnARGH
+         DniLzsWnkHA8Z0cY0o5prbZNcjEdLUy+dPlMqHCZ4KTTcfOPFPUFXbO41SjgtMUUmWdR
+         4jJA==
+X-Gm-Message-State: APjAAAVYWM0W0468+ATF3J2V8qVP/VBKMz+eXQR0ucDRWWS9PjQ8cBPO
+        0upcWZYR+7LVZ1vLTUgAVM/Usg==
+X-Google-Smtp-Source: APXvYqxQ8H0EwfjmiYP1/SUacCSArAMVaY+7Hsw2aimu6rkqpcHBrjydXWxpNn5htwW5YM1MsKxGqQ==
+X-Received: by 2002:adf:dcc6:: with SMTP id x6mr117116586wrm.322.1564734611723;
+        Fri, 02 Aug 2019 01:30:11 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff? ([2001:b07:6468:f312:4013:e920:9388:c3ff])
-        by smtp.gmail.com with ESMTPSA id p18sm75207312wrm.16.2019.08.02.01.17.43
+        by smtp.gmail.com with ESMTPSA id b8sm99851723wmh.46.2019.08.02.01.30.10
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 01:17:44 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 06/19] RISC-V: KVM: Implement VCPU interrupts and
- requests handling
+        Fri, 02 Aug 2019 01:30:11 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 08/19] RISC-V: KVM: Implement VCPU world-switch
 To:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -51,15 +50,15 @@ Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 References: <20190802074620.115029-1-anup.patel@wdc.com>
- <20190802074620.115029-7-anup.patel@wdc.com>
+ <20190802074620.115029-9-anup.patel@wdc.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <98eaa917-8270-ecdc-2420-491ed1c903d8@redhat.com>
-Date:   Fri, 2 Aug 2019 10:17:44 +0200
+Message-ID: <72d8efbf-ec62-ab1e-68bf-e0c5f0bc256e@redhat.com>
+Date:   Fri, 2 Aug 2019 10:30:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190802074620.115029-7-anup.patel@wdc.com>
+In-Reply-To: <20190802074620.115029-9-anup.patel@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -69,12 +68,19 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 02/08/19 09:47, Anup Patel wrote:
-> +	/* VCPU interrupts */
-> +	unsigned long irqs_pending;
-> +	unsigned long irqs_pending_mask;
+> +	/* Save Host SSTATUS, HSTATUS, SCRATCH and STVEC */
+> +	csrr	t0, CSR_SSTATUS
+> +	REG_S	t0, (KVM_ARCH_HOST_SSTATUS)(a0)
+> +	csrr	t1, CSR_HSTATUS
+> +	REG_S	t1, (KVM_ARCH_HOST_HSTATUS)(a0)
+> +	csrr	t2, CSR_SSCRATCH
+> +	REG_S	t2, (KVM_ARCH_HOST_SSCRATCH)(a0)
+> +	csrr	t3, CSR_STVEC
+> +	REG_S	t3, (KVM_ARCH_HOST_STVEC)(a0)
 > +
 
-This deserves a comment on the locking policy (none for producer,
-vcpu_lock for consumers).
+A possible optimization: if these cannot change while Linux runs (I am
+thinking especially of STVEC and HSTATUS, but perhaps SSCRATCH can be
+saved on kvm_arch_vcpu_load too) you can avoid the csrr and store.
 
 Paolo
