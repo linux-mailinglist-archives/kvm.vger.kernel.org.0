@@ -2,91 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DBACC7EFD4
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 11:03:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D5BF7F01B
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 11:13:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404597AbfHBJDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 05:03:48 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44827 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732895AbfHBJDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 05:03:47 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p17so76349774wrf.11
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 02:03:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Bwx8/3+omec7zmijOtKif9DQxXapLJoupah+QfmoXjM=;
-        b=N/AEu3hBPLdL4vg9tsSS6KikLBHJQE5kO6krW1gVc4kMOsZkFwErVX8M86CpocgWSx
-         TBD+zEaz/w9+zmaj+jGmGMJc6yB90sQ96L6sFAmN32XmkrFAN/AZLmqCifZd9FjxyIAH
-         j5Ogm/MeGKQCqmju/FARRtMRiOcABjXOzJ7oZtkYzoVp+YZzM4PMoCqYd6fG+RIQlT3N
-         /3WiP8LoQct+bjvn+LKOwOH2EYTaL3pElAxwKV/3asgtTAXiElq5EsPZMw2KB08ORYW8
-         39CVXYp75VAeHI64/yTWUXMvu1N4Ez8v/D3+IPoZkDYpJ7AptQdXoA0wrUfT/06oJrAg
-         gtiQ==
-X-Gm-Message-State: APjAAAVfOlhJlPGELxR29b+tjBhdwj1VgzCVf4ASne7tpgYrdnu8CJY2
-        JeIxSqH9XbBpzaP4XSe6xHnTTw==
-X-Google-Smtp-Source: APXvYqzL/HKYIOOtRRO6u1IKHQOTKAtJRMqcFBTlwICbd/6fS4zdHbTSm6by+RvwTllnE7+5D6q80Q==
-X-Received: by 2002:a5d:4e02:: with SMTP id p2mr36191018wrt.182.1564736625330;
-        Fri, 02 Aug 2019 02:03:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff? ([2001:b07:6468:f312:4013:e920:9388:c3ff])
-        by smtp.gmail.com with ESMTPSA id c30sm140911490wrb.15.2019.08.02.02.03.44
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 02:03:44 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 07/19] RISC-V: KVM: Implement
- KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
-To:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Radim K <rkrcmar@redhat.com>
-Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        id S1732700AbfHBJMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 05:12:50 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54294 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727127AbfHBJMu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 05:12:50 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 4990DAFE2;
+        Fri,  2 Aug 2019 09:12:47 +0000 (UTC)
+Date:   Fri, 2 Aug 2019 11:12:44 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     john.hubbard@gmail.com
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190802074620.115029-1-anup.patel@wdc.com>
- <20190802074620.115029-8-anup.patel@wdc.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <03f60f3a-bb50-9210-8352-da16cca322b9@redhat.com>
-Date:   Fri, 2 Aug 2019 11:03:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
+Message-ID: <20190802091244.GD6461@dhcp22.suse.cz>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190802074620.115029-8-anup.patel@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190802022005.5117-1-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/08/19 09:47, Anup Patel wrote:
-> +	if (reg_num == KVM_REG_RISCV_CSR_REG(sip))
-> +		kvm_riscv_vcpu_flush_interrupts(vcpu, false);
+On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
+[...]
+> 2) Convert all of the call sites for get_user_pages*(), to
+> invoke put_user_page*(), instead of put_page(). This involves dozens of
+> call sites, and will take some time.
 
-Not updating the vsip CSR here can cause an interrupt to be lost, if the
-next call to kvm_riscv_vcpu_flush_interrupts finds a zero mask.
+How do we make sure this is the case and it will remain the case in the
+future? There must be some automagic to enforce/check that. It is simply
+not manageable to do it every now and then because then 3) will simply
+be never safe.
 
-You could add a new field vcpu->vsip_shadow that is updated every time
-CSR_VSIP is written (including kvm_arch_vcpu_load) with a function like
-
-void kvm_riscv_update_vsip(struct kvm_vcpu *vcpu)
-{
-	if (vcpu->vsip_shadow != vcpu->arch.guest_csr.vsip) {
-		csr_write(CSR_VSIP, vcpu->arch.guest_csr.vsip);
-		vcpu->vsip_shadow = vcpu->arch.guest_csr.vsip;
-	}
-}
-
-And just call this unconditionally from kvm_vcpu_ioctl_run.  The cost is
-just a memory load per VS-mode entry, it should hardly be measurable.
-
-Paolo
+Have you considered coccinele or some other scripted way to do the
+transition? I have no idea how to deal with future changes that would
+break the balance though.
+-- 
+Michal Hocko
+SUSE Labs
