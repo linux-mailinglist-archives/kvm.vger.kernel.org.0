@@ -2,103 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 59CD980286
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 00:06:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08CBA802AC
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 00:23:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437144AbfHBWGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 18:06:20 -0400
-Received: from mga04.intel.com ([192.55.52.120]:11278 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732385AbfHBWGT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 18:06:19 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 15:06:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,339,1559545200"; 
-   d="scan'208";a="201806637"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga002.fm.intel.com with ESMTP; 02 Aug 2019 15:06:19 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: [PATCH v2] KVM: x86: Unconditionally call x86 ops that are always implemented
-Date:   Fri,  2 Aug 2019 15:06:17 -0700
-Message-Id: <20190802220617.10869-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
+        id S2388697AbfHBWXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 18:23:23 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:40613 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730633AbfHBWXX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 18:23:23 -0400
+Received: from pd9ef1cb8.dip0.t-ipconnect.de ([217.239.28.184] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1htfwv-0002gc-Jk; Sat, 03 Aug 2019 00:22:57 +0200
+Date:   Sat, 3 Aug 2019 00:22:54 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Sebastian Siewior <bigeasy@linutronix.de>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Julia Cartwright <julia@ni.com>,
+        Paul McKenney <paulmck@linux.vnet.ibm.com>,
+        Frederic Weisbecker <fweisbec@gmail.com>, kvm@vger.kernel.org,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Paul E. McKenney" <paulmck@linux.ibm.com>
+Subject: Re: [patch 2/5] x86/kvm: Handle task_work on VMENTER/EXIT
+In-Reply-To: <c8294b01-62d1-95df-6ff6-213f945a434f@redhat.com>
+Message-ID: <alpine.DEB.2.21.1908030015330.4029@nanos.tec.linutronix.de>
+References: <20190801143250.370326052@linutronix.de> <20190801143657.887648487@linutronix.de> <20190801162451.GE31538@redhat.com> <alpine.DEB.2.21.1908012025100.1789@nanos.tec.linutronix.de> <20190801213550.GE6783@linux.intel.com>
+ <alpine.DEB.2.21.1908012343530.1789@nanos.tec.linutronix.de> <alpine.DEB.2.21.1908012345000.1789@nanos.tec.linutronix.de> <c8294b01-62d1-95df-6ff6-213f945a434f@redhat.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove a few stale checks for non-NULL ops now that the ops in question
-are implemented by both VMX and SVM.
+On Fri, 2 Aug 2019, Paolo Bonzini wrote:
+> On 01/08/19 23:47, Thomas Gleixner wrote:
+> > Right you are about cond_resched() being called, but for SRCU this does not
+> > matter unless there is some way to do a synchronize operation on that SRCU
+> > entity. It might have some other performance side effect though.
+> 
+> I would use srcu_read_unlock/lock around the call.
+> 
+> However, I'm wondering if the API can be improved because basically we
+> have six functions for three checks of TIF flags.  Does it make sense to
+> have something like task_has_request_flags and task_do_requests (names
+> are horrible I know) that can be used like
+> 
+> 	if (task_has_request_flags()) {
+> 		int err;
+> 		...srcu_read_unlock...
+> 		// return -EINTR if signal_pending
+> 		err = task_do_requests();
+> 		if (err < 0)
+> 			goto exit_no_srcu_read_unlock;
+> 		...srcu_read_lock...
+> 	}
+> 
+> taking care of all three cases with a single hook?  This is important
+> especially because all these checks are done by all KVM architectures in
+> slightly different ways, and a unified API would be a good reason to
+> make all architectures look the same.
+> 
+> (Of course I could also define this unified API in virt/kvm/kvm_main.c,
+> so this is not blocking the series in any way!).
 
-Note, this is **not** stable material, the Fixes tags are there purely
-to show when a particular op was first supported by both VMX and SVM.
+You're not holding up something. Having a common function for this is
+definitely the right approach.
 
-Fixes: 74f169090b6f ("kvm/svm: Setup MCG_CAP on AMD properly")
-Fixes: b31c114b82b2 ("KVM: X86: Provide a capability to disable PAUSE intercepts")
-Fixes: 411b44ba80ab ("svm: Implements update_pi_irte hook to setup posted interrupt")
-Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
+As this is virt specific because it only checks for non arch specific bits
+(TIF_NOTIFY_RESUME should be available for all KVM archs) and the TIF bits
+are a subset of the available TIF bits because all others do not make any
+sense there, this really should be a common function for KVM so that all
+other archs which obviously lack a TIF_NOTIFY_RESUME check, can be fixed up
+and consolidated. If we add another TIF check later then we only have to do
+it in one place.
 
-v2: Give update_pi_iret the same treatment [Krish].
+Thanks,
 
- arch/x86/kvm/x86.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 01e18caac825..e7c993f0cbed 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3506,8 +3506,7 @@ static int kvm_vcpu_ioctl_x86_setup_mce(struct kvm_vcpu *vcpu,
- 	for (bank = 0; bank < bank_num; bank++)
- 		vcpu->arch.mce_banks[bank*4] = ~(u64)0;
- 
--	if (kvm_x86_ops->setup_mce)
--		kvm_x86_ops->setup_mce(vcpu);
-+	kvm_x86_ops->setup_mce(vcpu);
- out:
- 	return r;
- }
-@@ -9313,10 +9312,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm_page_track_init(kvm);
- 	kvm_mmu_init_vm(kvm);
- 
--	if (kvm_x86_ops->vm_init)
--		return kvm_x86_ops->vm_init(kvm);
--
--	return 0;
-+	return kvm_x86_ops->vm_init(kvm);
- }
- 
- static void kvm_unload_vcpu_mmu(struct kvm_vcpu *vcpu)
-@@ -9992,7 +9988,7 @@ EXPORT_SYMBOL_GPL(kvm_arch_has_noncoherent_dma);
- 
- bool kvm_arch_has_irq_bypass(void)
- {
--	return kvm_x86_ops->update_pi_irte != NULL;
-+	return true;
- }
- 
- int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
-@@ -10032,9 +10028,6 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
- int kvm_arch_update_irqfd_routing(struct kvm *kvm, unsigned int host_irq,
- 				   uint32_t guest_irq, bool set)
- {
--	if (!kvm_x86_ops->update_pi_irte)
--		return -EINVAL;
--
- 	return kvm_x86_ops->update_pi_irte(kvm, host_irq, guest_irq, set);
- }
- 
--- 
-2.22.0
-
+	tglx
