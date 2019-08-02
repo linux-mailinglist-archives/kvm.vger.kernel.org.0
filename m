@@ -2,82 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0508F7EE5D
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 10:07:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17A7D7EEAE
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 10:17:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390686AbfHBIHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 04:07:22 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:59956 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731650AbfHBIHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 04:07:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=oQGkgX+xjP5mcvxvnZUNTJDjzsROZ8JGq6RAdmO4uPA=; b=Kn7zyiwFYY1w4GG19f5Z+fxXG
-        rpdCjyayz/9gviyRYspgLpeSBWC2GfVoCY+63/ODQnmLa1Ss8JkqUpftu3V0chMAiw/KlU2kDYgEh
-        oR5YKgy/zWb5/EAWdvNxCcTyybQ/h6IZloFk2u58KpdWjALZ6VxSlYgO9NyD6ORVH0k4+/SJs5gc5
-        s9u9DnNkq+UczyxB+jcY/9wLHc7m1xooYunausG0HwlgSx5YAgAGjYk+/D776D8302Y3gySch17HH
-        NqaNqFjlPIzia2+bWk3vao3mV6/a02u4eJ9MN9jE/yE1oy7yiEOCMpBpQIwm2mrZk60vD3Q8D3Ve6
-        97+ImnTKw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1htSZZ-0007h0-0W; Fri, 02 Aug 2019 08:05:57 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8B3D42029F4CB; Fri,  2 Aug 2019 10:05:54 +0200 (CEST)
-Date:   Fri, 2 Aug 2019 10:05:54 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     john.hubbard@gmail.com
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        id S2404055AbfHBIRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 04:17:47 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36410 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727949AbfHBIRr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 04:17:47 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n4so76303574wrs.3
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 01:17:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=APOXhup+sZGXS5d0UC7uGeTiWB/G8v81K64OFOYtTQY=;
+        b=UBjBignOublgVPBWUC/zK3kpget1FBb+Asumf0hqAM5134bQUOFDAQ/gBP1MW5pdIc
+         FK1RM1S3Bey08e37Z2Ngn0ZZdPLd3FmmJQJz8c0UFlD1wrlMve9taXs7E/KJpoubemrB
+         evh1oWsffSGJEjOhs30DUS6+VtUjj11o73l15rOs/nG9R4ZPmAz0Yt3kqU+7U6CjPkUe
+         B8V1GDxC6GfKRit8HE+u33VcVwlaQG7iU1501RluI4S2m56FsDu5SZXQPDunYCR/u/UV
+         hk33oBr4TfkXiHIDFaFvRL2qYJGAOzWETXPoM1nAgF58quuG/XFvYKRBJx1K9Mn5+aBz
+         AYUw==
+X-Gm-Message-State: APjAAAU+pHocsRDSkjq8ZktV3ppgCazOV24AtkgaT6fcHAILLwWRNI10
+        LMzH3ht5/xKktk5EmTKSsURXWQ==
+X-Google-Smtp-Source: APXvYqxouFvTCxPN5ary3LSNHZng7Fu6r6547Mi/qZeNJXWg0W3zH8U/xLY5N3dAloNhdOrtFxV+kg==
+X-Received: by 2002:a5d:4101:: with SMTP id l1mr7547509wrp.202.1564733864909;
+        Fri, 02 Aug 2019 01:17:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff? ([2001:b07:6468:f312:4013:e920:9388:c3ff])
+        by smtp.gmail.com with ESMTPSA id p18sm75207312wrm.16.2019.08.02.01.17.43
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 02 Aug 2019 01:17:44 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 06/19] RISC-V: KVM: Implement VCPU interrupts and
+ requests handling
+To:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Radim K <rkrcmar@redhat.com>
+Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-Message-ID: <20190802080554.GD2332@hirez.programming.kicks-ass.net>
-References: <20190802021653.4882-1-jhubbard@nvidia.com>
+        Anup Patel <anup@brainfault.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20190802074620.115029-1-anup.patel@wdc.com>
+ <20190802074620.115029-7-anup.patel@wdc.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <98eaa917-8270-ecdc-2420-491ed1c903d8@redhat.com>
+Date:   Fri, 2 Aug 2019 10:17:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190802021653.4882-1-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190802074620.115029-7-anup.patel@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 07:16:19PM -0700, john.hubbard@gmail.com wrote:
+On 02/08/19 09:47, Anup Patel wrote:
+> +	/* VCPU interrupts */
+> +	unsigned long irqs_pending;
+> +	unsigned long irqs_pending_mask;
+> +
 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions"). That commit
-> has an extensive description of the problem and the planned steps to
-> solve it, but the highlites are:
+This deserves a comment on the locking policy (none for producer,
+vcpu_lock for consumers).
 
-That is one horridly mangled Changelog there :-/ It looks like it's
-partially duplicated.
-
-Anyway; no objections to any of that, but I just wanted to mention that
-there are other problems with long term pinning that haven't been
-mentioned, notably they inhibit compaction.
-
-A long time ago I proposed an interface to mark pages as pinned, such
-that we could run compaction before we actually did the pinning.
+Paolo
