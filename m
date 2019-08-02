@@ -2,210 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 786ED7ED9D
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 09:36:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D57F67EDC4
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 09:47:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732277AbfHBHg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 03:36:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60886 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726601AbfHBHg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 03:36:28 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0CBFB30C62A2;
-        Fri,  2 Aug 2019 07:36:28 +0000 (UTC)
-Received: from [10.36.117.35] (ovpn-117-35.ams2.redhat.com [10.36.117.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D60E5C205;
-        Fri,  2 Aug 2019 07:36:17 +0000 (UTC)
-Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        id S2390051AbfHBHq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 03:46:58 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:64637 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726601AbfHBHq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 03:46:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1564732018; x=1596268018;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=ySrGdBz8+mepbRHPgMNAFkoede7afn/0rhlkTyMV/ko=;
+  b=IHZEjHYjHTOIaOnlk73nVgIb6DnwCjd1zVf/qWUAER0R17L5JSH5wT7e
+   mSLN2YHNE2AXAS2aC6qA5E7ztIZTNn7HQNRqzYOi8iiR/eQMegm8Llm+0
+   wXPOQq77CKodcMDgvUmlJrxB3WJeqxtoXqQZzoLgtjBuNHneVHut3Nv1M
+   dvDOGoTKZm60ZjzR9ljdUKOyva6bmWhJtKO+AZBUlJs434vcFbxv+PdjO
+   EoJHM1yUHFMo1THLnPa8KL6FvrXvf67yAAqq8Qc09fUuiwrzIbys4RnnQ
+   BqhAy4tuR7LDv+E9XfL3ob9ugH82GVpI3lnahfSI12Cih4vnoCKa8FZ8d
+   g==;
+IronPort-SDR: zrxWfLSjCrBfIT+QTz5dPlsQwgqfLhWExkXNQZflLXc+96z8McEYuh5ldoJpGCnBlGX+T3q04j
+ dgdB2w7BGX6vmRqviemzJiUDYM6B+b12V8ntb3I9sFQN6t2LlCvikdklzYSSp4Ys15nWtrqBsh
+ GOCNmPi8Ib+NbPznGcrk3Ksg20Ini+RuIi4QQhPBsvZB9pJVy+HmiczMJx6axgPfae2/YOUu1V
+ 6iNAiz0vdvpsg14GOBsfc5tdNnuNBaPUQB8WBKvlHCu/NLnP5nhGlmWzDK5ARlZBE0h8e+xm5e
+ prI=
+X-IronPort-AV: E=Sophos;i="5.64,337,1559491200"; 
+   d="scan'208";a="116382430"
+Received: from mail-cys01nam02lp2054.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.54])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2019 15:46:56 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HpKLabwnepj+mv91c4TzeBBIs2tRvsnPTa4jG06dXG+5R0zNNVI1hxjXB6pwsSfIWhCsezPQ6CMHdtXT/VzgUK8JrdUHdyqH3urETuge8GjaCXVLN5zMZiSiMKUrk2dotz/AaQqa35Pfv21MFjdZv11DqjRnLgNidU4dnv02QofntXwoi8eCcBlB/CQGtXHtXk9BqlCPFpG6q9vbOd/MCTKqAS/Z2+BUmsGrvWf6wpGbxbWh7yK2NX1/9IbIwWbSrAn0EjVU51guzt7M7jUX70LVGGzBj0gpB1AJm4USO1nJf/suBgAjySbBcOtAvs34Z8e817cdfGZCF28+Iouebg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=83/1uV1MBJ75j22TCDvsq+vhFkRSloCFZYxmLBm/DVY=;
+ b=jeiPlUGTH1SIUtO/s/U1dI7Gpcs1yQNcsTnNaQKfwL3O1LVuSL218vvqZiO44ezDxxDa2bfK7a5ztR2940g57BJc4DCjg0zsKOPbPooEfB9vDv7U5q1KxMmVGkBCguY4QFtyaBaW/cHV66UqtkGwTwxkGAZJomHIx+ZwwKi0SxzuTsli3sjdjzk7Xzd7H9AH7DNTcUSzuThdy61jjGSUsGnEquLB+lkY4psqMY/5fGDNb4up/U2yHRldHrk9Webe3mihYWszRUaXhkADMJJRTpZo1fIYyiCD30AjP+7RZgQ8cDI9QikeoBdUesz3TqlVQxWdWZLeORaZiBuBbZEx4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=wdc.com;dmarc=pass action=none header.from=wdc.com;dkim=pass
+ header.d=wdc.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=83/1uV1MBJ75j22TCDvsq+vhFkRSloCFZYxmLBm/DVY=;
+ b=eNpuMMh43B4v3Mdn+dNYCUqPVZT1lpC7sen8xQrSYhEfZd/Ndoj1Aw2k6r+7wHZuRN80/xfQBoR39/4lFvuwc1ZuzBTJUYF0SHXR3r+nJMqn9gnMhmn+mXe2ogr3OFY1WHEvZQfox83q813CGQO05u/rrovGKvSDvOBTXyx41y8=
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
+ MN2PR04MB5566.namprd04.prod.outlook.com (20.178.248.217) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.15; Fri, 2 Aug 2019 07:46:54 +0000
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::a815:e61a:b4aa:60c8]) by MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::a815:e61a:b4aa:60c8%7]) with mapi id 15.20.2136.010; Fri, 2 Aug 2019
+ 07:46:54 +0000
+From:   Anup Patel <Anup.Patel@wdc.com>
+To:     Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>
+CC:     Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Anup Patel <anup@brainfault.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
- <20190715025519.GE3440@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
- <20190717030640.GG9123@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A0140E0@SHSMSX104.ccr.corp.intel.com>
- <20190723035741.GR25073@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A0160C9@SHSMSX104.ccr.corp.intel.com>
- <abf336b6-4c51-7742-44aa-5b51c8ea4af7@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A022E63@SHSMSX104.ccr.corp.intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <32088b27-612c-1773-ac66-7ab318fe10a4@redhat.com>
-Date:   Fri, 2 Aug 2019 09:36:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A022E63@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Anup Patel <Anup.Patel@wdc.com>
+Subject: [RFC PATCH v2 00/19] KVM RISC-V Support
+Thread-Topic: [RFC PATCH v2 00/19] KVM RISC-V Support
+Thread-Index: AQHVSQZ0LiMZv8p/N0WUPDIsIAdXhQ==
+Date:   Fri, 2 Aug 2019 07:46:54 +0000
+Message-ID: <20190802074620.115029-1-anup.patel@wdc.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Fri, 02 Aug 2019 07:36:28 +0000 (UTC)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: PN1PR01CA0111.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c00::27)
+ To MN2PR04MB6061.namprd04.prod.outlook.com (2603:10b6:208:d8::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Anup.Patel@wdc.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.17.1
+x-originating-ip: [106.51.20.161]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 777e4781-e879-4e0d-9397-08d7171d967b
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MN2PR04MB5566;
+x-ms-traffictypediagnostic: MN2PR04MB5566:
+x-ms-exchange-purlcount: 3
+x-microsoft-antispam-prvs: <MN2PR04MB5566A53AB5F33A3EBCE084058DD90@MN2PR04MB5566.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:2276;
+x-forefront-prvs: 011787B9DD
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(376002)(39850400004)(136003)(366004)(396003)(189003)(199004)(36756003)(14454004)(7736002)(54906003)(6116002)(102836004)(110136005)(71190400001)(966005)(4326008)(3846002)(5660300002)(52116002)(66066001)(2906002)(25786009)(6486002)(6506007)(386003)(55236004)(316002)(53936002)(6436002)(305945005)(9456002)(81156014)(64756008)(66476007)(78486014)(86362001)(66556008)(66946007)(8936002)(476003)(68736007)(81166006)(2616005)(478600001)(486006)(26005)(1076003)(99286004)(50226002)(14444005)(6306002)(256004)(71200400001)(66446008)(186003)(6512007)(44832011)(8676002)(7416002);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB5566;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: NV51pMzEdrZj7/6CLhsV9ldR8286dmPPZlmsGZTYvFFKAdUxQ4VoY7mVKpURwXinAe9Y7OBNzhHhq0NODtkwthv9idCVkIM9M95SC0jiH4lNUnD+O7cPggOdOswOvcbZj3DKaYQ+jQo/seQop6GgVgsQSlV7fa1VQ2TlumauVv1QnHZIWet+G/3q2W/9TvRj0e8qoCIvIAvnKVC5M/C9d01TkfNmqnstL716nduH7ITehe/AOE0UH49TQt2N3fvdBvYtizQCljtllr25n3yQBwrZG5z5VnzsEE3ZX+aUdo3tkJK3QodsP7WRzdjR3lmzzyy++PiCn24ErsT0GyXRDArBl9hFsvlMkoBWd06ROcvNnWIRYw6R+7PxSeHEv+d4S5tmypY9i9DNjAkhmqwZJh+2yamoq1LJv3EJA07y/ew=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 777e4781-e879-4e0d-9397-08d7171d967b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2019 07:46:54.4255
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Anup.Patel@wdc.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB5566
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+This series adds initial KVM RISC-V support. Currently, we are able to boot
+RISC-V 64bit Linux Guests with multiple VCPUs.
 
-On 7/26/19 7:18 AM, Liu, Yi L wrote:
-> Hi Eric,
-> 
->> -----Original Message-----
->> From: Auger Eric [mailto:eric.auger@redhat.com]
->> Sent: Wednesday, July 24, 2019 5:33 PM
->> To: Liu, Yi L <yi.l.liu@intel.com>; David Gibson <david@gibson.dropbear.id.au>
->> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
->>
->> Hi Yi, David,
->>
->> On 7/24/19 6:57 AM, Liu, Yi L wrote:
->>>> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On
->>>> Behalf Of David Gibson
->>>> Sent: Tuesday, July 23, 2019 11:58 AM
->>>> To: Liu, Yi L <yi.l.liu@intel.com>
->>>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
->>>> implementation
->>>>
->>>> On Mon, Jul 22, 2019 at 07:02:51AM +0000, Liu, Yi L wrote:
->>>>>> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
->>>>>> On Behalf Of David Gibson
->>>>>> Sent: Wednesday, July 17, 2019 11:07 AM
->>>>>> To: Liu, Yi L <yi.l.liu@intel.com>
->>>>>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
->>>>>> implementation
->>>>>>
->>>>>> On Tue, Jul 16, 2019 at 10:25:55AM +0000, Liu, Yi L wrote:
->>>>>>>> From: kvm-owner@vger.kernel.org
->>>>>>>> [mailto:kvm-owner@vger.kernel.org] On
->>>>>> Behalf
->>>>>>>> Of David Gibson
->>>>>>>> Sent: Monday, July 15, 2019 10:55 AM
->>>>>>>> To: Liu, Yi L <yi.l.liu@intel.com>
->>>>>>>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
->>>>>>>> implementation
->>>>>>>>
->>>>>>>> On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
->>>>>>>>> This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid().
->>>>>>>>> These two functions are used to propagate guest pasid allocation
->>>>>>>>> and free requests to host via vfio container ioctl.
->>>>>>>>
->>>>>>>> As I said in an earlier comment, I think doing this on the device
->>>>>>>> is conceptually incorrect.  I think we need an explcit notion of
->>>>>>>> an SVM context (i.e. the namespace in which all the PASIDs live)
->>>>>>>> - which will IIUC usually be shared amongst multiple devices.
->>>>>>>> The create and free PASID requests should be on that object.
->>>>>>>
->>>>>>> Actually, the allocation is not doing on this device. System wide,
->>>>>>> it is done on a container. So not sure if it is the API interface
->>>>>>> gives you a sense that this is done on device.
->>>>>>
->>>>>> Sorry, I should have been clearer.  I can see that at the VFIO
->>>>>> level it is done on the container.  However the function here takes
->>>>>> a bus and devfn, so this qemu internal interface is per-device,
->>>>>> which doesn't really make sense.
->>>>>
->>>>> Got it. The reason here is to pass the bus and devfn info, so that
->>>>> VFIO can figure out a container for the operation. So far in QEMU,
->>>>> there is no good way to connect the vIOMMU emulator and VFIO regards
->>>>> to SVM.
->>>>
->>>> Right, and I think that's an indication that we're not modelling
->>>> something in qemu that we should be.
->>>>
->>>>> hw/pci layer is a choice based on some previous discussion. But yes,
->>>>> I agree with you that we may need to have an explicit notion for
->>>>> SVM. Do you think it is good to introduce a new abstract layer for
->>>>> SVM (may name as SVMContext).
->>>>
->>>> I think so, yes.
->>>>
->>>> If nothing else, I expect we'll need this concept if we ever want to
->>>> be able to implement SVM for emulated devices (which could be useful
->>>> for debugging, even if it's not something you'd do in production).
->>>>
->>>>> The idea would be that vIOMMU maintain the SVMContext instances and
->>>>> expose explicit interface for VFIO to get it. Then VFIO register
->>>>> notifiers on to the SVMContext. When vIOMMU emulator wants to do
->>>>> PASID alloc/free, it fires the corresponding notifier. After call
->>>>> into VFIO, the notifier function itself figure out the container it
->>>>> is bound. In this way, it's the duty of vIOMMU emulator to figure
->>>>> out a proper notifier to fire. From interface point of view, it is
->>>>> no longer per-device.
->>>>
->>>> Exactly.
->>>
->>> Cool, let me prepare another version with the ideas. Thanks for your
->>> review. :-)
->>>
->>> Regards,
->>> Yi Liu
->>>
->>>>> Also, it leaves the PASID management details to vIOMMU emulator as
->>>>> it can be vendor specific. Does it make sense?
->>>>> Also, I'd like to know if you have any other idea on it. That would
->>>>> surely be helpful. :-)
->>>>>
->>>>>>> Also, curious on the SVM context
->>>>>>> concept, do you mean it a per-VM context or a per-SVM usage context?
->>>>>>> May you elaborate a little more. :-)
->>>>>>
->>>>>> Sorry, I'm struggling to find a good term for this.  By "context" I
->>>>>> mean a namespace containing a bunch of PASID address spaces, those
->>>>>> PASIDs are then visible to some group of devices.
->>>>>
->>>>> I see. May be the SVMContext instance above can include multiple
->>>>> PASID address spaces. And again, I think this relationship should be
->>>>> maintained in vIOMMU emulator.
->>>
->> So if I understand we now head towards introducing new notifiers taking a
->> "SVMContext" as argument instead of an IOMMUMemoryRegion.
-> 
-> yes, this is the rough idea.
->  
->> I think we need to be clear about how both abstractions (SVMContext and
->> IOMMUMemoryRegion) differ. I would also need "SVMContext" abstraction for
->> 2stage SMMU integration (to notify stage 1 config changes and MSI
->> bindings) so I would need this new object to be not too much tied to SVM use case.
-> 
-> I agree. SVMContext is just a proposed name. We may have better naming for it
-> as long as the thing we want to have is a new abstract layer between VFIO and
-> vIOMMU. Per my understanding, the IOMMUMemoryRegion abstraction is for
-> the notifications around guest memory changes. e.g. VFIO needs to be notified
-> when there is MAP/UNMAP happened. However, for the SVMContext, it aims to
-> be an abstraction for SVM/PASID related operations, which has no direct
-> relationship with memory. e.g. for VT-d, pasid allocation, pasid bind/unbind,
-> pasid based-iotlb flush. I think pasid bind/unbind and pasid based-iotlb flush is
-> equivalent with the stage 1 config changes in SMMU. If you agree to use it
-> all the same, how about naming it as IOMMUConext? Also, pls feel free to
-> propose your suggestion. :-)
-Sorry for the delay. Yes IOMMUContext sounds OK to me. Looking forward
-to reading your next revision.
+Few key aspects of KVM RISC-V added by this series are:
+1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
+2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
+3. KVM ONE_REG interface for VCPU register access from user-space.
+4. PLIC emulation is done in user-space. In-kernel PLIC emulation, will
+   be added in future.
+5. Timer and IPI emuation is done in-kernel.
+6. MMU notifiers supported.
+7. FP lazy save/restore supported.
+8. SBI v0.1 emulation for KVM Guest available.
 
-Thanks
+Here's a brief TODO list which we will work upon after this series:
+1. Handle trap from unpriv access in reading Guest instruction
+2. Handle trap from unpriv access in SBI v0.1 emulation
+3. Implement recursive stage2 page table programing
+4. SBI v0.2 emulation in-kernel
+5. SBI v0.2 hart hotplug emulation in-kernel
+6. In-kernel PLIC emulation
+7. ..... and more .....
 
-Eric
-> 
-> Thanks,
-> Yi Liu
-> 
-> changes.
-> 
->> Thanks
->>
->> Eric
-> 
+This series is based upon KVM pre-patches sent by Atish earlier
+(https://lkml.org/lkml/2019/7/31/1503) and it can be found in
+riscv_kvm_v2 branch at:
+https//github.com/avpatel/linux.git
+
+Our work-in-progress KVMTOOL RISC-V port can be found in riscv_v1 branch at=
+:
+https//github.com/avpatel/kvmtool.git
+
+We need OpenSBI with RISC-V hypervisor extension support which can be
+found in hyp_ext_changes_v1 branch at:
+https://github.com/riscv/opensbi.git
+
+The QEMU RISC-V hypervisor emulation is done by Alistair and is available
+in riscv-hyp-work.next branch at:
+https://github.com/alistair23/qemu.git
+
+To play around with KVM RISC-V, here are few reference commands:
+1) To cross-compile KVMTOOL:
+   $ make lkvm-static
+2) To launch RISC-V Host Linux:
+   $ qemu-system-riscv64 -monitor null -cpu rv64,h=3Dtrue -M virt \
+   -m 512M -display none -serial mon:stdio \
+   -kernel opensbi/build/platform/qemu/virt/firmware/fw_jump.elf \
+   -device loader,file=3Dbuild-riscv64/arch/riscv/boot/Image,addr=3D0x80200=
+000 \
+   -initrd ./rootfs_kvm_riscv64.img \
+   -append "root=3D/dev/ram rw console=3DttyS0 earlycon=3Dsbi"
+3) To launch RISC-V Guest Linux with 9P rootfs:
+   $ ./apps/lkvm-static run -m 128 -c2 --console serial \
+   -p "console=3DttyS0 earlycon=3Duart8250,mmio,0x3f8" -k ./apps/Image --de=
+bug
+4) To launch RISC-V Guest Linux with initrd:
+   $ ./apps/lkvm-static run -m 128 -c2 --console serial \
+   -p "console=3DttyS0 earlycon=3Duart8250,mmio,0x3f8" -k ./apps/Image \
+   -i ./apps/rootfs.img --debug
+
+Changes since v1:
+- Fixed compile errors in building KVM RISC-V as module
+- Removed unused kvm_riscv_halt_guest() and kvm_riscv_resume_guest()
+- Set KVM_CAP_SYNC_MMU capability only after MMU notifiers are implemented
+- Made vmid_version as unsigned long instead of atomic
+- Renamed KVM_REQ_UPDATE_PGTBL to KVM_REQ_UPDATE_HGATP
+- Renamed kvm_riscv_stage2_update_pgtbl() to kvm_riscv_stage2_update_hgatp(=
+)
+- Configure HIDELEG and HEDELEG in kvm_arch_hardware_enable()
+- Updated ONE_REG interface for CSR access to user-space
+- Removed irqs_pending_lock and use atomic bitops instead
+- Added separate patch for FP ONE_REG interface
+- Added separate patch for updating MAINTAINERS file
+
+Anup Patel (14):
+  KVM: RISC-V: Add KVM_REG_RISCV for ONE_REG interface
+  RISC-V: Add hypervisor extension related CSR defines
+  RISC-V: Add initial skeletal KVM support
+  RISC-V: KVM: Implement VCPU create, init and destroy functions
+  RISC-V: KVM: Implement VCPU interrupts and requests handling
+  RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
+  RISC-V: KVM: Implement VCPU world-switch
+  RISC-V: KVM: Handle MMIO exits for VCPU
+  RISC-V: KVM: Handle WFI exits for VCPU
+  RISC-V: KVM: Implement VMID allocator
+  RISC-V: KVM: Implement stage2 page table programming
+  RISC-V: KVM: Implement MMU notifiers
+  RISC-V: Enable VIRTIO drivers in RV64 and RV32 defconfig
+  RISC-V: KVM: Add MAINTAINERS entry
+
+Atish Patra (5):
+  RISC-V: Export few kernel symbols
+  RISC-V: KVM: Add timer functionality
+  RISC-V: KVM: FP lazy save/restore
+  RISC-V: KVM: Implement ONE REG interface for FP registers
+  RISC-V: KVM: Add SBI v0.1 support
+
+ MAINTAINERS                             |  10 +
+ arch/riscv/Kconfig                      |   2 +
+ arch/riscv/Makefile                     |   2 +
+ arch/riscv/configs/defconfig            |  23 +-
+ arch/riscv/configs/rv32_defconfig       |  13 +
+ arch/riscv/include/asm/csr.h            |  58 ++
+ arch/riscv/include/asm/kvm_host.h       | 228 ++++++
+ arch/riscv/include/asm/kvm_vcpu_timer.h |  32 +
+ arch/riscv/include/asm/pgtable-bits.h   |   1 +
+ arch/riscv/include/uapi/asm/kvm.h       |  98 +++
+ arch/riscv/kernel/asm-offsets.c         | 148 ++++
+ arch/riscv/kernel/smp.c                 |   2 +-
+ arch/riscv/kernel/time.c                |   1 +
+ arch/riscv/kvm/Kconfig                  |  34 +
+ arch/riscv/kvm/Makefile                 |  14 +
+ arch/riscv/kvm/main.c                   |  84 +++
+ arch/riscv/kvm/mmu.c                    | 904 +++++++++++++++++++++++
+ arch/riscv/kvm/tlb.S                    |  43 ++
+ arch/riscv/kvm/vcpu.c                   | 936 ++++++++++++++++++++++++
+ arch/riscv/kvm/vcpu_exit.c              | 554 ++++++++++++++
+ arch/riscv/kvm/vcpu_sbi.c               | 119 +++
+ arch/riscv/kvm/vcpu_switch.S            | 368 ++++++++++
+ arch/riscv/kvm/vcpu_timer.c             | 106 +++
+ arch/riscv/kvm/vm.c                     |  86 +++
+ arch/riscv/kvm/vmid.c                   | 124 ++++
+ drivers/clocksource/timer-riscv.c       |   8 +
+ include/clocksource/timer-riscv.h       |  16 +
+ include/uapi/linux/kvm.h                |   1 +
+ 28 files changed, 4009 insertions(+), 6 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_host.h
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_timer.h
+ create mode 100644 arch/riscv/include/uapi/asm/kvm.h
+ create mode 100644 arch/riscv/kvm/Kconfig
+ create mode 100644 arch/riscv/kvm/Makefile
+ create mode 100644 arch/riscv/kvm/main.c
+ create mode 100644 arch/riscv/kvm/mmu.c
+ create mode 100644 arch/riscv/kvm/tlb.S
+ create mode 100644 arch/riscv/kvm/vcpu.c
+ create mode 100644 arch/riscv/kvm/vcpu_exit.c
+ create mode 100644 arch/riscv/kvm/vcpu_sbi.c
+ create mode 100644 arch/riscv/kvm/vcpu_switch.S
+ create mode 100644 arch/riscv/kvm/vcpu_timer.c
+ create mode 100644 arch/riscv/kvm/vm.c
+ create mode 100644 arch/riscv/kvm/vmid.c
+ create mode 100644 include/clocksource/timer-riscv.h
+
+--
+2.17.1
