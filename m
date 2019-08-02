@@ -2,102 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3545A7EA6B
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 04:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D2EC7EAE0
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 06:00:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728704AbfHBCjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Aug 2019 22:39:04 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:11756 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726654AbfHBCjE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Aug 2019 22:39:04 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d43a24e0000>; Thu, 01 Aug 2019 19:39:10 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 01 Aug 2019 19:39:01 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 01 Aug 2019 19:39:01 -0700
-Received: from [10.110.48.28] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 2 Aug
- 2019 02:39:00 +0000
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-To:     <john.hubbard@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
-References: <20190802021653.4882-1-jhubbard@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <ec87b662-0fc2-0951-1337-a91b4888201b@nvidia.com>
-Date:   Thu, 1 Aug 2019 19:39:00 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726052AbfHBEAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 00:00:13 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37120 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725385AbfHBEAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 00:00:13 -0400
+Received: by mail-wm1-f67.google.com with SMTP id f17so64950540wme.2
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2019 21:00:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=I/Kfc6ZbOZnKoxJL7rV1rbyTQYfEjNQbR94dlPzKkok=;
+        b=RJKKjy4lH/3bgMCwOjm1J18wa06vOSJLnIfHMmvULIy2YSHW3G15WM/m7+XeVtQwTr
+         UtiihTcbvICV40K4Nt5x73lPEsV6pBUGS2RPKA5G47fKyoSSsc05AlAuvBSyjU7yAX3Z
+         UoEhsAOtv282G86OCYcLO5YN8helw4/uL1qOeUEBiTmpuinXLeVN3veX4kAGMwHIkC65
+         EKZaEk2RjAR5n1/oURiPuFkOL29Vt+pAgswdD0zpyPv3xy2fYhEiWrtIozD6TCcfhHcV
+         OMLP1cmi5mf327NBxa+CEE9sTtQnunCR/GUerMu62fmDkaROt4YIFVsA2qWBl2CNKsLY
+         7Dvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=I/Kfc6ZbOZnKoxJL7rV1rbyTQYfEjNQbR94dlPzKkok=;
+        b=gOOPrrJHAmCnA6XLl+6Qrc67kVSD4C0mBJ3FR8Wfwi4WkVCLrwZKH3dhUAqIHhRryb
+         okZVbJKegmaImk8IOiJCyruFsAFoga0Syt5F46AgvoRbMkzrYIRDnKCbQMrTEtqwoh/D
+         S5wMq2244gvWDziO+eTkqMsUR5ssaYl0lbOw8sktgWkyCQbWreW84LNEPm7zhwJSi8OV
+         PqASMFefSkzQtYexl9XkUw4V81fSV+6iwr2voJ9nybtOwp/Zml81q8KqdfmZT7npvnqn
+         ltMp94eX85sNskw7oNZLhKS/7ozCgwr5wl6H7h29tRUwdaHhuPm2+5qGs5zEjStSVEGc
+         DrNQ==
+X-Gm-Message-State: APjAAAVkstULgjPZH/zj1CnoZtJtoYq+8p2wWTDyPlttnYad9jtOO5Pt
+        q3IBir6mFtI/EUS32xgOg3cG0i0If7n91k6+/6gn8A==
+X-Google-Smtp-Source: APXvYqyGKKA06Ook1nC1Ms5baz5sFRFDqfDRQkOGCbnR8q7MWD+Cy/I3+JJpDuoiot2nNz8c8O4OOUXtH5DkcbO6xGI=
+X-Received: by 2002:a1c:cfc5:: with SMTP id f188mr1649160wmg.24.1564718409992;
+ Thu, 01 Aug 2019 21:00:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190802021653.4882-1-jhubbard@nvidia.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1564713550; bh=uB7qKWJf2vIk7MCI51NrKGKnU0tjP3n9YQM4FSsQ99A=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=aftmkmmNomCdfG4/nsU7QFjmse0kzSiVn7k6qdyITGQKtpIb7fXB3ira93x2ikjhP
-         hh9fWh6OxSH7I4ITUxx9rk4nMXoUcCl6xE7j7d8OaKs0QzK3tWjGXYe1PPsA5+CMkF
-         sKiN+5/hdBTh4TsmJWAPetkvcksKG1W7KX4K24lGpfHw6t/QQ4fbKf5zlriq/zHiCI
-         WN7lLvY4tFrWOLTfdOFRIa/sFBuq00RVcHrLnsHi/Dnbw2dVeWXrugMTAYnP04jnRA
-         tXP1GLNpYcsDC/T0sb/csl6pvYXC87xnKjlVca8dQdSp/cuFTGUobSHcHyKfqM9q/X
-         eCw5n+JFkzHyg==
+References: <20190729115544.17895-1-anup.patel@wdc.com> <20190729115544.17895-6-anup.patel@wdc.com>
+ <9f9d09e5-49bc-f8e3-cfe1-bd5221e3b683@redhat.com> <CAAhSdy3JZVEEnPnssALaxvCsyznF=rt=7-d5J_OgQEJv6cPhxQ@mail.gmail.com>
+ <66c4e468-7a69-31e7-778b-228908f0e737@redhat.com> <CAAhSdy3b-o6y1fsYi1iQcCN=9ZuC98TLCqjHCYAzOCx+N+_89w@mail.gmail.com>
+ <828f01a9-2f11-34b6-7753-dc8fa7aa0d18@redhat.com> <CAAhSdy19_dEL7e_sEFYi-hXvhVerm_cr3BdZ-TRw0aTTL-O9ZQ@mail.gmail.com>
+ <816c70e7-0ea3-1dde-510e-f1d5c6a02dd5@redhat.com>
+In-Reply-To: <816c70e7-0ea3-1dde-510e-f1d5c6a02dd5@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Fri, 2 Aug 2019 09:29:59 +0530
+Message-ID: <CAAhSdy0Er92SCPSyYj-59PAwXvZkgfWbJQwr_qQKGXp3s43xqA@mail.gmail.com>
+Subject: Re: [RFC PATCH 05/16] RISC-V: KVM: Implement VCPU interrupts and
+ requests handling
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/1/19 7:16 PM, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> Hi,
-> 
-> These are best characterized as miscellaneous conversions: many (not all)
-> call sites that don't involve biovec or iov_iter, nor mm/. It also leaves
-> out a few call sites that require some more work. These are mostly pretty
-> simple ones.
-> 
-> It's probably best to send all of these via Andrew's -mm tree, assuming
-> that there are no significant merge conflicts with ongoing work in other
-> trees (which I doubt, given that these are small changes).
-> 
+On Tue, Jul 30, 2019 at 7:38 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 30/07/19 15:35, Anup Patel wrote:
+> > On Tue, Jul 30, 2019 at 6:48 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 30/07/19 14:45, Anup Patel wrote:
+> >>> Here's some text from RISC-V spec regarding SIP CSR:
+> >>> "software interrupt-pending (SSIP) bit in the sip register. A pending
+> >>> supervisor-level software interrupt can be cleared by writing 0 to the SSIP bit
+> >>> in sip. Supervisor-level software interrupts are disabled when the SSIE bit in
+> >>> the sie register is clear."
+> >>>
+> >>> Without RISC-V hypervisor extension, the SIP is essentially a restricted
+> >>> view of MIP CSR. Also as-per above, S-mode SW can only write 0 to SSIP
+> >>> bit in SIP CSR whereas it can only be set by M-mode SW or some HW
+> >>> mechanism (such as S-mode CLINT).
+> >>
+> >> But that's not what the spec says.  It just says (just before the
+> >> sentence you quoted):
+> >>
+> >>    A supervisor-level software interrupt is triggered on the current
+> >>    hart by writing 1 to its supervisor software interrupt-pending (SSIP)
+> >>    bit in the sip register.
+> >
+> > Unfortunately, this statement does not state who is allowed to write 1
+> > in SIP.SSIP bit.
+>
+> If it doesn't state who is allowed to write 1, whoever has access to sip
+> can.
+>
+> > I quoted MIP CSR documentation to highlight the fact that only M-mode
+> > SW can set SSIP bit.
+> >
+> > In fact, I had same understanding as you have regarding SSIP bit
+> > until we had MSIP issue in OpenSBI.
+> > (https://github.com/riscv/opensbi/issues/128)
+> >
+> >> and it's not written anywhere that S-mode SW cannot write 1.  In fact
+> >> that text is even under sip, not under mip, so IMO there's no doubt that
+> >> S-mode SW _can_ write 1, and the hypervisor must operate accordingly.
+> >
+> > Without hypervisor support, SIP CSR is nothing but a restricted view of
+> > MIP CSR thats why MIP CSR documentation applies here.
+>
+> But the privileged spec says mip.MSIP is read-only, it cannot be cleared
+> (as in the above OpenSBI issue).  So mip.MSIP and sip.SSIP are already
+> different in that respect, and I don't see how the spec says that S-mode
+> SW cannot set sip.SSIP.
+>
+> (As an aside, why would M-mode even bother using sip and not mip to
+> write 1 to SSIP?).
+>
+> > I think this discussion deserves a Github issue on RISC-V ISA manual.
+>
+> Perhaps, but I think it makes more sense this way.  The question remains
+> of why M-mode is not allowed to write to MSIP/MEIP/MTIP.  My guess is
+> that then MSIP/MEIP/MTIP are simply a read-only view of an external pin,
+> so it simplifies hardware a tiny bit by forcing acks to go through the
+> MMIO registers.
+>
+> > If my interpretation is incorrect then it would be really strange that
+> > HART in S-mode SW can inject IPI to itself by writing 1 to SIP.SSIP bit.
+>
+> Well, it can be useful, for example Windows does it when interrupt
+> handlers want to schedule some work to happen out of interrupt context.
+>  Going through SBI would be unpleasant if it causes an HS-mode trap.
 
-In case anyone is wondering, this truncated series is due to a script failure:
-git-send-email chokes when it hits email addresses whose names have a
-comma in them, as happened here with patch 0003.  
+Another way of artificially injecting interrupt would be using interrupt
+controller, where Windows can just write to some pending register of
+interrupt controller.
 
-Please disregard this set and reply to the other thread.
+I have raised a new Github issue on GitHub for clarity on this. You can
+add your comments to this issue as well.
+https://github.com/riscv/riscv-isa-manual/issues/425
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+Also, I have raised a proposal to support mechanism for external entity
+(such as PLICv2 with virtualization support) to inject virtual interrupts.
+https://github.com/riscv/riscv-isa-manual/issues/429
+
+Regards,
+Anup
