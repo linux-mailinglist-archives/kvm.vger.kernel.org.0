@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E6147FA79
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:34:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 644F27F9D3
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:30:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728714AbfHBNXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 09:23:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33662 "EHLO mail.kernel.org"
+        id S2394188AbfHBNY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 09:24:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35170 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731618AbfHBNXG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 09:23:06 -0400
+        id S2394169AbfHBNY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 09:24:27 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C8D9720880;
-        Fri,  2 Aug 2019 13:23:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 279D621773;
+        Fri,  2 Aug 2019 13:24:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564752185;
-        bh=lgIcao1FUsYr2I98X1TWGI5JBvZiDsyIgND5NxpgbiQ=;
+        s=default; t=1564752266;
+        bh=zf98jIThURIzPyBzuwzuyYqGB/35TOYpCG5ZJG94bJQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YaUPpmLdYBi5ATqml64cPdG5xGqsS8+fYVViScC75/4JPJg5fUzsFNtTmKs6QCREo
-         ym2nGcShAVwf51V+ZcYoYst19yLQjF3WKvAhVCOXtDOErr0BIk+LVYifR64K3kVmi3
-         ySYsZ3cBGkS/m6074LYgS8qm9q+aLyBEOROVL2rY=
+        b=0A8KdpP8gsfz5hY4B5jPzSSMwCoWmwQD8uHPppJEUbqHmjTkvSv33z78KCvXK/R+j
+         T9G5GHs/yFXKMRlEZMNbpcB8lYDbLKDDVtfvyPH+NvJn5/4Dolv2h2CtsAKSChCqLO
+         30BAvIn67bDFWrtQfcHm9sgO6h6je4nJxKzC0tCY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Farhan Ali <alifm@linux.ibm.com>,
@@ -30,12 +30,12 @@ Cc:     Farhan Ali <alifm@linux.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 02/42] vfio-ccw: Set pa_nr to 0 if memory allocation fails for pa_iova_pfn
-Date:   Fri,  2 Aug 2019 09:22:22 -0400
-Message-Id: <20190802132302.13537-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 02/30] vfio-ccw: Set pa_nr to 0 if memory allocation fails for pa_iova_pfn
+Date:   Fri,  2 Aug 2019 09:23:54 -0400
+Message-Id: <20190802132422.13963-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190802132302.13537-1-sashal@kernel.org>
-References: <20190802132302.13537-1-sashal@kernel.org>
+In-Reply-To: <20190802132422.13963-1-sashal@kernel.org>
+References: <20190802132422.13963-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -63,10 +63,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 70a006ba4d050..4fe06ff7b2c8b 100644
+index 1419eaea03d84..5a9e457caef33 100644
 --- a/drivers/s390/cio/vfio_ccw_cp.c
 +++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -89,8 +89,10 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
+@@ -119,8 +119,10 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
  				  sizeof(*pa->pa_iova_pfn) +
  				  sizeof(*pa->pa_pfn),
  				  GFP_KERNEL);
@@ -77,7 +77,7 @@ index 70a006ba4d050..4fe06ff7b2c8b 100644
 +	}
  	pa->pa_pfn = pa->pa_iova_pfn + pa->pa_nr;
  
- 	pa->pa_iova_pfn[0] = pa->pa_iova >> PAGE_SHIFT;
+ 	ret = pfn_array_pin(pa, mdev);
 -- 
 2.20.1
 
