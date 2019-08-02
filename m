@@ -2,96 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3522F7FBB0
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 16:04:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 934847FBFE
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 16:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731260AbfHBOD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 10:03:59 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:43598 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729125AbfHBOD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 10:03:58 -0400
-Received: by mail-qt1-f196.google.com with SMTP id w17so29655743qto.10
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 07:03:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WV2Ae/gfauZPjPhFYOLLqagCyB4HyL2HjQauKn3bqsM=;
-        b=PGUmCo6rsYuhX89KhgUNgVr7HK5Kl3Hkbo5jhnQ9bQCaJKck+VoelfQTG/dGGJ9bqC
-         JRURgkNFFpIlczJBSRStpG2Ba4rXe/64QK8qrBCQqPIMjdWow6dxsRM/zmYC3fYkS9Gb
-         RFcuyrsoG6gGziRhijbbKISoD/zsNL/MmVE1lSP14JA2fLAUlQCJSEfuFsXue/x5rwcv
-         7ljkgQ6bp8ma72TSEuCxNBWLhQmDsOJbwwziG9vH3AGOUWIJ8chhh7G5/T0+15I/1X+4
-         wo+VN9KfQ1LfF+0EuaCiJ7S/EUG7mBa1vqZuI0t/8w27YdAuddqs6fh1PAQacq6BPWLS
-         P71Q==
-X-Gm-Message-State: APjAAAV4VPTDyDWdCYhmN6cCmGWEEC1D2ey8SxMC6bOdWNk21k1+z7Nr
-        41vjlMxEWdP9v+cXijtFmYmzjA==
-X-Google-Smtp-Source: APXvYqxqWV5TMaysY1q7/YjNkaoGeUmT+T8Aja0Ppx3ngtfg+CGh7SDzsuYF2FJmZ32u93WwxfAAKw==
-X-Received: by 2002:ac8:2b49:: with SMTP id 9mr99459163qtv.343.1564754637929;
-        Fri, 02 Aug 2019 07:03:57 -0700 (PDT)
-Received: from redhat.com ([147.234.38.1])
-        by smtp.gmail.com with ESMTPSA id v4sm30651268qtq.15.2019.08.02.07.03.52
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 02 Aug 2019 07:03:56 -0700 (PDT)
-Date:   Fri, 2 Aug 2019 10:03:49 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
- with worker
-Message-ID: <20190802094331-mutt-send-email-mst@kernel.org>
-References: <20190731084655.7024-1-jasowang@redhat.com>
- <20190731084655.7024-8-jasowang@redhat.com>
- <20190731123935.GC3946@ziepe.ca>
- <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
- <20190731193057.GG3946@ziepe.ca>
- <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
- <20190801141512.GB23899@ziepe.ca>
- <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
+        id S2392317AbfHBOWe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 10:22:34 -0400
+Received: from mga09.intel.com ([134.134.136.24]:45140 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726667AbfHBOWd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 10:22:33 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 07:22:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,338,1559545200"; 
+   d="scan'208";a="167245949"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga008.jf.intel.com with ESMTP; 02 Aug 2019 07:22:29 -0700
+Date:   Fri, 2 Aug 2019 08:19:52 -0600
+From:   Keith Busch <keith.busch@intel.com>
+To:     john.hubbard@gmail.com
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: Re: [PATCH 26/34] mm/gup_benchmark.c: convert put_page() to
+ put_user_page*()
+Message-ID: <20190802141952.GA18214@localhost.localdomain>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802022005.5117-27-jhubbard@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
+In-Reply-To: <20190802022005.5117-27-jhubbard@nvidia.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
-> Btw, I come up another idea, that is to disable preemption when vhost thread
-> need to access the memory. Then register preempt notifier and if vhost
-> thread is preempted, we're sure no one will access the memory and can do the
-> cleanup.
+On Thu, Aug 01, 2019 at 07:19:57PM -0700, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
+> 
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> Cc: Dan Carpenter <dan.carpenter@oracle.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: YueHaibing <yuehaibing@huawei.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
-Great, more notifiers :(
+Looks fine.
 
-Maybe can live with
-1- disable preemption while using the cached pointer
-2- teach vhost to recover from memory access failures,
-   by switching to regular from/to user path
+Reviewed-by: Keith Busch <keith.busch@intel.com>
 
-So if you want to try that, fine since it's a step in
-the right direction.
-
-But I think fundamentally it's not what we want to do long term.
-
-It's always been a fundamental problem with this patch series that only
-metadata is accessed through a direct pointer.
-
-The difference in ways you handle metadata and data is what is
-now coming and messing everything up.
-
-So if continuing the direct map approach,
-what is needed is a cache of mapped VM memory, then on a cache miss
-we'd queue work along the lines of 1-2 above.
-
-That's one direction to take. Another one is to give up on that and
-write our own version of uaccess macros.  Add a "high security" flag to
-the vhost module and if not active use these for userspace memory
-access.
-
-
--- 
-MST
+>  mm/gup_benchmark.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/mm/gup_benchmark.c b/mm/gup_benchmark.c
+> index 7dd602d7f8db..515ac8eeb6ee 100644
+> --- a/mm/gup_benchmark.c
+> +++ b/mm/gup_benchmark.c
+> @@ -79,7 +79,7 @@ static int __gup_benchmark_ioctl(unsigned int cmd,
+>  	for (i = 0; i < nr_pages; i++) {
+>  		if (!pages[i])
+>  			break;
+> -		put_page(pages[i]);
+> +		put_user_page(pages[i]);
+>  	}
+>  	end_time = ktime_get();
+>  	gup->put_delta_usec = ktime_us_delta(end_time, start_time);
+> -- 
