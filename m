@@ -2,101 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 553357FB64
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:44:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3522F7FBB0
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 16:04:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406636AbfHBNno (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 09:43:44 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33794 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730910AbfHBNnk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 09:43:40 -0400
-Received: by mail-wr1-f65.google.com with SMTP id 31so77266779wrm.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 06:43:38 -0700 (PDT)
+        id S1731260AbfHBOD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 10:03:59 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:43598 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729125AbfHBOD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 10:03:58 -0400
+Received: by mail-qt1-f196.google.com with SMTP id w17so29655743qto.10
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 07:03:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3i+v6PWLAFY4pLYnR68bLFCR3VGy3PuSRw0b9/MCRls=;
-        b=UJAIULt8mye8vhuIaFjjBzor+wuGchF5WQrXcBKNP8t2bVf8/JBZQQ4DjCD7uRnI6r
-         SetdLwhpae6NxDJYjkKm1W4z7ZJBQygg2720bbmi3gIqQQGC9Hnd6Y7XvVdN/CqAbcOE
-         59Sd6fwsWo+t6SDcpa+ypLGZE2VqU87wsx8i+Xj33FxZtqZ4uteWbnZ7lsXJp5PaZyxL
-         t7Yt2QdDwTgFG7z0B7k6P37BZpnKlwut/YWjKydKgK65qPmitm3jUV1MXoTjzsZV9f4S
-         +7B7MHEcpOvgxWfCMDoDObrobSnI3tZFeTLKe4Zatw8Y+LV6Bc/9+lHJpFQX25kH4cxg
-         kjhg==
-X-Gm-Message-State: APjAAAWTo7yOYHuIZAJaAAmVvYilm+CZMAgZcZjiiR5elhuJxSNWSiM5
-        mj8uf9eMTPutuxW1IrVCdlHeZw==
-X-Google-Smtp-Source: APXvYqwlWPI9epVJFEWNOTqzS7ZJ4IYVa0FZTw8meKi5eAb8tedQqtVhMZGqG3X7gTxs2cm6xqIjrA==
-X-Received: by 2002:adf:df8b:: with SMTP id z11mr89917522wrl.62.1564753418003;
-        Fri, 02 Aug 2019 06:43:38 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff? ([2001:b07:6468:f312:4013:e920:9388:c3ff])
-        by smtp.gmail.com with ESMTPSA id r123sm70327253wme.7.2019.08.02.06.43.37
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 06:43:37 -0700 (PDT)
-Subject: Re: [PATCH v3 0/3] KVM: selftests: Enable ucall and dirty_log_test on
- s390x
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Andrew Jones <drjones@redhat.com>
-References: <20190731151525.17156-1-thuth@redhat.com>
- <551b42ae-78a1-e55a-e4b8-bb5cc3a8eb8b@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9684b15d-39a4-2c1b-3269-466ceb37ef90@redhat.com>
-Date:   Fri, 2 Aug 2019 15:43:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WV2Ae/gfauZPjPhFYOLLqagCyB4HyL2HjQauKn3bqsM=;
+        b=PGUmCo6rsYuhX89KhgUNgVr7HK5Kl3Hkbo5jhnQ9bQCaJKck+VoelfQTG/dGGJ9bqC
+         JRURgkNFFpIlczJBSRStpG2Ba4rXe/64QK8qrBCQqPIMjdWow6dxsRM/zmYC3fYkS9Gb
+         RFcuyrsoG6gGziRhijbbKISoD/zsNL/MmVE1lSP14JA2fLAUlQCJSEfuFsXue/x5rwcv
+         7ljkgQ6bp8ma72TSEuCxNBWLhQmDsOJbwwziG9vH3AGOUWIJ8chhh7G5/T0+15I/1X+4
+         wo+VN9KfQ1LfF+0EuaCiJ7S/EUG7mBa1vqZuI0t/8w27YdAuddqs6fh1PAQacq6BPWLS
+         P71Q==
+X-Gm-Message-State: APjAAAV4VPTDyDWdCYhmN6cCmGWEEC1D2ey8SxMC6bOdWNk21k1+z7Nr
+        41vjlMxEWdP9v+cXijtFmYmzjA==
+X-Google-Smtp-Source: APXvYqxqWV5TMaysY1q7/YjNkaoGeUmT+T8Aja0Ppx3ngtfg+CGh7SDzsuYF2FJmZ32u93WwxfAAKw==
+X-Received: by 2002:ac8:2b49:: with SMTP id 9mr99459163qtv.343.1564754637929;
+        Fri, 02 Aug 2019 07:03:57 -0700 (PDT)
+Received: from redhat.com ([147.234.38.1])
+        by smtp.gmail.com with ESMTPSA id v4sm30651268qtq.15.2019.08.02.07.03.52
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 02 Aug 2019 07:03:56 -0700 (PDT)
+Date:   Fri, 2 Aug 2019 10:03:49 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
+ with worker
+Message-ID: <20190802094331-mutt-send-email-mst@kernel.org>
+References: <20190731084655.7024-1-jasowang@redhat.com>
+ <20190731084655.7024-8-jasowang@redhat.com>
+ <20190731123935.GC3946@ziepe.ca>
+ <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
+ <20190731193057.GG3946@ziepe.ca>
+ <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
+ <20190801141512.GB23899@ziepe.ca>
+ <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <551b42ae-78a1-e55a-e4b8-bb5cc3a8eb8b@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/08/19 15:39, Christian Borntraeger wrote:
-> On 31.07.19 17:15, Thomas Huth wrote:
->> Implement the ucall() interface on s390x to be able to use the
->> dirty_log_test KVM selftest on s390x, too.
->>
->> v3:
->>  - Fix compilation issue on aarch64 (thanks to Andrew for testing it!)
->>  - Added Reviewed-bys
->>
->> v2:
->>  - Split up ucall.c into architecture specific files
->>  - Removed some #ifdef __s390x__  in the dirty_log patch
->>
->> Thomas Huth (3):
->>   KVM: selftests: Split ucall.c into architecture specific files
->>   KVM: selftests: Implement ucall() for s390x
->>   KVM: selftests: Enable dirty_log_test on s390x
->>
->>  tools/testing/selftests/kvm/Makefile          |   9 +-
->>  tools/testing/selftests/kvm/dirty_log_test.c  |  61 ++++++-
->>  .../testing/selftests/kvm/include/kvm_util.h  |   8 +-
->>  .../testing/selftests/kvm/lib/aarch64/ucall.c | 112 +++++++++++++
->>  tools/testing/selftests/kvm/lib/s390x/ucall.c |  56 +++++++
->>  tools/testing/selftests/kvm/lib/ucall.c       | 157 ------------------
->>  .../testing/selftests/kvm/lib/x86_64/ucall.c  |  56 +++++++
->>  .../selftests/kvm/s390x/sync_regs_test.c      |   6 +-
->>  8 files changed, 287 insertions(+), 178 deletions(-)
->>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/ucall.c
->>  create mode 100644 tools/testing/selftests/kvm/lib/s390x/ucall.c
->>  delete mode 100644 tools/testing/selftests/kvm/lib/ucall.c
->>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/ucall.c
->>
-> 
-> Paolo, I guess you do not mind if I carry patch 1 also via the s390x tree?
+On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
+> Btw, I come up another idea, that is to disable preemption when vhost thread
+> need to access the memory. Then register preempt notifier and if vhost
+> thread is preempted, we're sure no one will access the memory and can do the
+> cleanup.
 
-Sure,
+Great, more notifiers :(
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Maybe can live with
+1- disable preemption while using the cached pointer
+2- teach vhost to recover from memory access failures,
+   by switching to regular from/to user path
 
-Paolo
+So if you want to try that, fine since it's a step in
+the right direction.
+
+But I think fundamentally it's not what we want to do long term.
+
+It's always been a fundamental problem with this patch series that only
+metadata is accessed through a direct pointer.
+
+The difference in ways you handle metadata and data is what is
+now coming and messing everything up.
+
+So if continuing the direct map approach,
+what is needed is a cache of mapped VM memory, then on a cache miss
+we'd queue work along the lines of 1-2 above.
+
+That's one direction to take. Another one is to give up on that and
+write our own version of uaccess macros.  Add a "high security" flag to
+the vhost module and if not active use these for userspace memory
+access.
+
+
+-- 
+MST
