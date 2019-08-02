@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5C0D7EDF8
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 09:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 694FB7EDFE
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 09:49:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390305AbfHBHsm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 03:48:42 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:64812 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731569AbfHBHsm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 03:48:42 -0400
+        id S2390431AbfHBHst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 03:48:49 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:39501 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728272AbfHBHss (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 03:48:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1564732122; x=1596268122;
+  t=1564732150; x=1596268150;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=j1+PIkgehirU5mVwmiJM9G1j9n28LPyLji88N+l0Eoo=;
-  b=M8zWNVLRo1e3uP58gLc3oxHHM9xhQJTBJBz2cU0grBB+73zDUU7g4RHC
-   LYljTMFEYKHcnriWiNmz3dYLuQXhb1qpk3l9sQGGHC8mAupSVR++5R9jv
-   Ti5ask52Ua379HGmFjpYfw0K1a4SSp3lWHlBKHk/50z4JIuHjSBOB7yQ0
-   reoQjX3SkgTmgoUnXtKSFwRF3E08AyVDwp03xaC5pG4I6thNqD77Cf4Cm
-   u057kdTGVaQG3qoI/xCM38sa3FGlIW0ZfQHKk96CUBt0NaO2PB4NOP7wS
-   jHzAJHB3g6+s0sUZph5RWYv7FqrQ+UwvMV+Urfb1o7oL25i0MdrXe2RvI
-   g==;
-IronPort-SDR: dcbD2oRR/ZZI+at0H8YrdNVkvPOnaaQaNXI7FmMiGyRfGMBuhtY8vRFgWLLIKSa6OxPUcmWcwE
- UJlDKg5p7WyBxaGC5nqdSaGcQ1OmyDUyFq1aVKwUo7n+50KpqCH+ML6glG5+K14wVAn/bT7Ely
- aI77SVuk97fpTEv0fVDpkJXSq3ofRmSsNxWGKxGSbz9ysNhEw3xVGQFz5swdoj/7ZORFpczDo6
- hntJLibRHKfmqPtue5DCtdfkxzBnqnXQXbzbLeQDHvkFSerjupKjQwjejJhUMy/+7EAvGmQv1P
- cuI=
+  bh=e+kyewE4ROqForPiiZc8CPhe7KiF+cZH3jJVEnqVXRI=;
+  b=jLZ0FlvtWIQFP3Y5NpPZ0ii8JGscOkjI+bfXhynn3zNv/jkBHUstDCMh
+   I3inh+McoKZjDrspWFRJDmxeqkR9sgnUTqDd+4YGKrO6rRklibbIjgdQh
+   OMia4ub2vKy8wRF3bl0YS7eW1Y1k7piCa51EXjed487z0pB0TqUb4gHCi
+   Vc/4k0nQlVLZVwx0dciJs81VOcjyU0ySv1dTFKW/14/ZbpNDfPWMiFQy3
+   3Ba7sVy34v5jzQyl/N4GvNTfQAPh+Zw3yUluzjMkDHl44ATAWK0LmVPgY
+   IbBzvXAZqTYiifaxMdkpQ4RA0xpDgLHumxTQlqPSKp1bryuuGmvua5YOa
+   Q==;
+IronPort-SDR: cg9TLFefsjcZpCPxuMI3aJKNlnQzq80hsq8lsgzKXmDsKwA0lX/09JJDBz6kVDJG620SXJQ/AG
+ R7PeIC3C+QOI3J9gqX55Ac9nTxE+0gwceDAEXLkL08r5Q8XXW9NfEeojP2ouf3EMDgaD1Ggh92
+ ivMw8N63OPVBNb92m9i07Zk+8Q+Be0TvvPSfKRLzOcYRGCf/iXvjgwZoLXshzMC75aznBQN7Xb
+ zinzexgWmuwOcSkbvXJLi3wfc2mo4h4Mpro3u5ALtyOLbliKpL1qFNrIe/yG/ra5EboXwqOJ5Y
+ nB0=
 X-IronPort-AV: E=Sophos;i="5.64,337,1559491200"; 
-   d="scan'208";a="116382577"
-Received: from mail-by2nam01lp2050.outbound.protection.outlook.com (HELO NAM01-BY2-obe.outbound.protection.outlook.com) ([104.47.34.50])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2019 15:48:39 +0800
+   d="scan'208";a="215006741"
+Received: from mail-co1nam04lp2053.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.53])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Aug 2019 15:49:06 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KUsaIH9XSU5hWLou44RGqYG0tA62Jfpg4HCCv+mrVnvOUaCIpIcK6+XCRNpIds5TmYjIZ9ps2KsaIl49CxjQc9T3w8oSukoXO7Cbae/UvcvbaXMfwSEeAz6Qs2iasJMiYCZjPH330+Gy8CRUXVUoRelcVvcViyK16Cy1IvAVUxeCeXPcf9HREMYzKxN80oQluJhsWLa6a3gwUKWzw9ddfk/vTTQFjj+H0EjCphhy14JVeihcjA4jkpSLqHZJR/Xpf/CNuyzhCPl9wxAA5xn5r7JhgQpaHJZlvO+hI+yWT06KecTN+xyjwUr0dlSlV5f7G4J55ZZvvQ+yECVq44fbdA==
+ b=T/fiI4dbAAI0HiAZkXi8RddvM1JyzhbxyD4p48Bbgp0KOJpMkVJUhCgsQN0HlwT99Sq4wMGtDbyqUpmde9XdYNANuYD4tQUJ9ry/y252e8rawTuNa1meQ3FVOaScU6IpTrnm3jjdb0w2LWDwD+t+Tg/GqrjpQwUkZikm6xYsqif3SL0+VkPOdvitE9ROBdga36le3u05hLgKWjXpmnV0oGLdQ/KyhcXHeSkGH/MfJhBHU+GuwEgUWlz/BQ8Ga/PIdTZw0KHneJldLsLqP+JdPXZt3Qp3cGPrpbMAgmYtWbAnyCRkcGsZEUqT+pwIBOvzmJ7Z11tnFR8M17TNKWTlgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FSYq7+uz3grBYRWhkdQOsG1/DGi2yeh+QFdXAta+gkY=;
- b=Jx2snp0E1miLwmG22xzxiyGzwUlXaEOv3N3KFQ4RXkMDVkUqAAO305DUxzQM6hoHPqreo1wosXce0qrwfxTHFxAOu0sVUmmaziEL49Y0lCyfhxifuiByyZf8yDDewdDb4mglS2LtFYt0ahIz0aVerPN+6SzfpDaM29c1jQELTv+qezI2kdPyAe3ktfe4O5B2Phak6lwqSvydQRCvvrJm0k8XmLmX0530tIkScbBrIwIO56M+DsyX9EmNr9YZmjhGdLdoy1gdsM+PTVUfi2Myx15ceAoAkSzHBo8XLfWth5SrNUCVbJQLkT74/G+0xI3LRvkpeF9ilS8SQ/EkWWQFKA==
+ bh=mAZsNAz9rX57qDjhaI5L4DRsQiSpZbIU43MbFP/PU9Y=;
+ b=U8711IQ9GWhWZXFLEI7bMOfL+h/nKyam/EJbOk3n+g8Zyn53W96q4rh4d4tR0HKHBL3gM0Lff3z7YzgddSHbqVX39MixKrPGAWofPf2rYNzuWJ4KYu6uvocsa0H9iHGRlCXoQPh5OkTkamEm3Ee0AcFy/CtgjWFmQJbxHcLK+BvKnsk/9KhK0WGkBWmwXvigCXdIPLvoMGp+6dhSQi1f3h07EcV/krNitMRE0zcNNItF3YrrgoBvxbBnEoYujPMhPBHbNAavwNE5ghYcIAUjh+c68B0J/FoZ5t3AV4H40+9cbQgYawmXBBxrYOQ6j7B+IuBFZg6Jzzbup4N+xXPXjQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
  smtp.mailfrom=wdc.com;dmarc=pass action=none header.from=wdc.com;dkim=pass
  header.d=wdc.com;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FSYq7+uz3grBYRWhkdQOsG1/DGi2yeh+QFdXAta+gkY=;
- b=mirTueIWzlsDzGymriQpI0dgHetIu7a5N8Oydc055a5lpsltbyptx1BJU2taUvLwS/Zx5XwxM13YaIdw67IabEmsb/oADGPAMI3eHyaBhVi9BOdTzY3wblAlUZRlAraUPr+bBWQAW3KqxHGaLE7lT/H6d3QTD2O5arwPIw1k3tU=
+ bh=mAZsNAz9rX57qDjhaI5L4DRsQiSpZbIU43MbFP/PU9Y=;
+ b=G31vd5bVu+s4CIlj7GvhbHrjspp8kLSJWvrLcxoSng4RSOtU5cm97BBWupsE3xVCHUgd8g5HvF+FsWnBF9jo+PpPSF5Uma5Gi33A+Y15Jjq6lFxC/e7ef4E/TBMS2Ze71menV/cWR2uawG7wk8USXN1lJxKDKr2JRlaSC4wsT2M=
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
- MN2PR04MB5566.namprd04.prod.outlook.com (20.178.248.217) with Microsoft SMTP
+ MN2PR04MB6208.namprd04.prod.outlook.com (20.178.248.211) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.15; Fri, 2 Aug 2019 07:48:37 +0000
+ 15.20.2136.16; Fri, 2 Aug 2019 07:48:44 +0000
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::a815:e61a:b4aa:60c8]) by MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::a815:e61a:b4aa:60c8%7]) with mapi id 15.20.2136.010; Fri, 2 Aug 2019
- 07:48:37 +0000
+ 07:48:43 +0000
 From:   Anup Patel <Anup.Patel@wdc.com>
 To:     Palmer Dabbelt <palmer@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -72,13 +72,11 @@ CC:     Daniel Lezcano <daniel.lezcano@linaro.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Anup Patel <Anup.Patel@wdc.com>
-Subject: [RFC PATCH v2 16/19] RISC-V: KVM: Implement ONE REG interface for FP
- registers
-Thread-Topic: [RFC PATCH v2 16/19] RISC-V: KVM: Implement ONE REG interface
- for FP registers
-Thread-Index: AQHVSQaxU3hbnoBay0C9NeTjhAbblg==
-Date:   Fri, 2 Aug 2019 07:48:37 +0000
-Message-ID: <20190802074620.115029-17-anup.patel@wdc.com>
+Subject: [RFC PATCH v2 17/19] RISC-V: KVM: Add SBI v0.1 support
+Thread-Topic: [RFC PATCH v2 17/19] RISC-V: KVM: Add SBI v0.1 support
+Thread-Index: AQHVSQa1Rkael+9fmkqpDsQP+NHgHA==
+Date:   Fri, 2 Aug 2019 07:48:43 +0000
+Message-ID: <20190802074620.115029-18-anup.patel@wdc.com>
 References: <20190802074620.115029-1-anup.patel@wdc.com>
 In-Reply-To: <20190802074620.115029-1-anup.patel@wdc.com>
 Accept-Language: en-US
@@ -93,29 +91,29 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: git-send-email 2.17.1
 x-originating-ip: [106.51.20.161]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 81529680-71c2-44e2-9160-08d7171dd3a0
+x-ms-office365-filtering-correlation-id: 39164e97-db5d-484d-2fa4-08d7171dd768
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MN2PR04MB5566;
-x-ms-traffictypediagnostic: MN2PR04MB5566:
-x-microsoft-antispam-prvs: <MN2PR04MB5566F632828DB77B2D631A9C8DD90@MN2PR04MB5566.namprd04.prod.outlook.com>
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:MN2PR04MB6208;
+x-ms-traffictypediagnostic: MN2PR04MB6208:
+x-microsoft-antispam-prvs: <MN2PR04MB6208DF6452150581318979A28DD90@MN2PR04MB6208.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:854;
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
 x-forefront-prvs: 011787B9DD
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(376002)(39850400004)(136003)(366004)(396003)(189003)(199004)(36756003)(14454004)(7736002)(54906003)(6116002)(102836004)(110136005)(71190400001)(446003)(4326008)(3846002)(5660300002)(52116002)(66066001)(2906002)(25786009)(6486002)(6506007)(386003)(55236004)(76176011)(316002)(53936002)(6436002)(305945005)(9456002)(81156014)(64756008)(66476007)(78486014)(86362001)(66556008)(66946007)(8936002)(11346002)(476003)(68736007)(81166006)(2616005)(478600001)(486006)(26005)(1076003)(99286004)(50226002)(256004)(71200400001)(66446008)(186003)(6512007)(44832011)(8676002)(7416002);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB5566;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(136003)(39860400002)(396003)(376002)(346002)(199004)(189003)(99286004)(7736002)(305945005)(9456002)(50226002)(2906002)(8936002)(14444005)(256004)(3846002)(14454004)(86362001)(5660300002)(6116002)(478600001)(53936002)(316002)(66446008)(64756008)(66476007)(66946007)(66556008)(6512007)(68736007)(81166006)(81156014)(102836004)(55236004)(76176011)(71190400001)(386003)(25786009)(6506007)(54906003)(71200400001)(110136005)(78486014)(476003)(8676002)(446003)(44832011)(66066001)(6436002)(52116002)(2616005)(1076003)(186003)(7416002)(486006)(36756003)(6486002)(4326008)(26005)(11346002);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB6208;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: k13uP7ovOs6+WH1iUwAGYBVfmwJ9V5TL53h6ch09JaGjUhMB8bTM9YN4/M/67FdO1m5Kx2JuOlhm9/GQxhbQ9g3ssL1I80BMyGdLC6/Be1Ow8xYCus0p1DscyScVbJ03IT3pMjicErRZtWfjNdFie54ruHH1kwWIB3J184hP5rj0ZaMRdB3H7Fh1Mw+j/TvRj86f6OxXXe9AFKUv0b3uAdX47vALOCNVR6azY3bDR0fLejmvma5CaT0ZELtByXZTJefQV+7Oon66ivKTaLjvr+NwvzxtgN6LCO5z7V27Yji6JTZ49HSsG3ShKfz6IgefVC+BPDmHaqIOy6pY8smCYU/VzIMOx01HiDzb8g43ExolOuSLhi2aETflS+wqFNBvgZJhEzz4OuyLIl8SwmN8J0GqLUCCaL0pE5w/lWhPH1k=
+x-microsoft-antispam-message-info: XBQVS2+Ui03vLUWcdxb/x/OhRJ379YWE2zqBGWFNFPab59VTBCQEg6jFgmEq5Nxr/INLEJ83joeclqvAUd5yC+ck4w74qLC3yXSw7DMplBRXvbmTQVi1BUP1FM4cGznl6j2+P2OO1Jnbd2NmfUfjL74fXOa8Ee+pyaqfsaUaiwMZnslA06XPsjJXhzrPVLv7YHXUIVBaPoHJG6v7DFeXHcyc15mM8x6gedvFak+Fh4jlfGg6JFhE2qzec+brok3AWYCT1nAEoGtIP/0417Es+ExsMOW1Ln3WPonjqljURU0Ld6b/PvWfR3sniUjkC+sLsRqnpaQG+gSrzJLlA2wrLSbDuHnI1/8vINF6AygkppVHhSpT/cso68Ds41I+OA7FCRXIl+RtHJX+h6Jh3D/ZvyE5D7Uig4Q64q7kPaCA46w=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81529680-71c2-44e2-9160-08d7171dd3a0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2019 07:48:37.0629
+X-MS-Exchange-CrossTenant-Network-Message-Id: 39164e97-db5d-484d-2fa4-08d7171dd768
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2019 07:48:43.3353
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: Anup.Patel@wdc.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB5566
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6208
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -123,169 +121,189 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Atish Patra <atish.patra@wdc.com>
 
-Add a KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctl interface for floating
-point registers such as F0-F31 and FCSR. This support is added for
-both 'F' and 'D' extensions.
+The KVM host kernel running in HS-mode needs to handle SBI calls coming
+from guest kernel running in VS-mode.
+
+This patch adds SBI v0.1 support in KVM RISC-V. All the SBI calls are
+implemented correctly except remote tlb flushes. For remote TLB flushes,
+we are doing full TLB flush and this will be optimized in future.
 
 Signed-off-by: Atish Patra <atish.patra@wdc.com>
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 ---
- arch/riscv/include/uapi/asm/kvm.h |  10 +++
- arch/riscv/kvm/vcpu.c             | 100 ++++++++++++++++++++++++++++++
- 2 files changed, 110 insertions(+)
+ arch/riscv/include/asm/kvm_host.h |   2 +
+ arch/riscv/kvm/Makefile           |   2 +-
+ arch/riscv/kvm/vcpu_exit.c        |   3 +
+ arch/riscv/kvm/vcpu_sbi.c         | 119 ++++++++++++++++++++++++++++++
+ 4 files changed, 125 insertions(+), 1 deletion(-)
+ create mode 100644 arch/riscv/kvm/vcpu_sbi.c
 
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/as=
-m/kvm.h
-index 024f220eb17e..c9f03363bb28 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -83,6 +83,16 @@ struct kvm_sregs {
- #define KVM_REG_RISCV_CSR_REG(name)	\
- 		(offsetof(struct kvm_sregs, name) / sizeof(unsigned long))
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm=
+_host.h
+index 08990ecd2260..edd9e6d2e811 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -223,4 +223,6 @@ bool kvm_riscv_vcpu_has_interrupt(struct kvm_vcpu *vcpu=
+);
+ void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
+ void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
 =20
-+/* F extension registers are mapped as type4 */
-+#define KVM_REG_RISCV_FP_F		(0x04 << KVM_REG_RISCV_TYPE_SHIFT)
-+#define KVM_REG_RISCV_FP_F_REG(name)	\
-+		(offsetof(struct __riscv_f_ext_state, name) / sizeof(u32))
++int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu);
 +
-+/* D extension registers are mapped as type 5 */
-+#define KVM_REG_RISCV_FP_D		(0x05 << KVM_REG_RISCV_TYPE_SHIFT)
-+#define KVM_REG_RISCV_FP_D_REG(name)	\
-+		(offsetof(struct __riscv_d_ext_state, name) / sizeof(u64))
+ #endif /* __RISCV_KVM_HOST_H__ */
+diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+index 3e0c7558320d..b56dc1650d2c 100644
+--- a/arch/riscv/kvm/Makefile
++++ b/arch/riscv/kvm/Makefile
+@@ -9,6 +9,6 @@ ccflags-y :=3D -Ivirt/kvm -Iarch/riscv/kvm
+ kvm-objs :=3D $(common-objs-y)
+=20
+ kvm-objs +=3D main.o vm.o vmid.o tlb.o mmu.o
+-kvm-objs +=3D vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o
++kvm-objs +=3D vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o vcpu_sbi.o
+=20
+ obj-$(CONFIG_KVM)	+=3D kvm.o
+diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+index f4ddf357ded8..96565fa19771 100644
+--- a/arch/riscv/kvm/vcpu_exit.c
++++ b/arch/riscv/kvm/vcpu_exit.c
+@@ -532,6 +532,9 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct k=
+vm_run *run,
+ 		    (vcpu->arch.guest_context.hstatus & HSTATUS_STL))
+ 			ret =3D stage2_page_fault(vcpu, run, scause, stval);
+ 		break;
++	case EXC_SUPERVISOR_SYSCALL:
++		if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
++			ret =3D kvm_riscv_vcpu_sbi_ecall(vcpu);
+ 	default:
+ 		break;
+ 	};
+diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+new file mode 100644
+index 000000000000..5793202eb514
+--- /dev/null
++++ b/arch/riscv/kvm/vcpu_sbi.c
+@@ -0,0 +1,119 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
++ *
++ * Authors:
++ *     Atish Patra <atish.patra@wdc.com>
++ */
 +
- #endif
-=20
- #endif /* __LINUX_KVM_RISCV_H */
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 995ee27e9b8a..bd79790c5438 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -423,6 +423,94 @@ static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcpu =
-*vcpu,
- 	return 0;
- }
-=20
-+static int kvm_riscv_vcpu_get_reg_fp(struct kvm_vcpu *vcpu,
-+				     const struct kvm_one_reg *reg,
-+				     unsigned long rtype)
++#include <linux/errno.h>
++#include <linux/err.h>
++#include <linux/kvm_host.h>
++#include <asm/csr.h>
++#include <asm/kvm_vcpu_timer.h>
++
++#define SBI_VERSION_MAJOR			0
++#define SBI_VERSION_MINOR			1
++
++/* TODO: Handle traps due to unpriv load and redirect it back to VS-mode *=
+/
++static unsigned long kvm_sbi_unpriv_load(const unsigned long *addr,
++					 struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
-+	unsigned long isa =3D vcpu->arch.isa;
-+	unsigned long __user *uaddr =3D
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num =3D reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    rtype);
-+	void *reg_val;
++	unsigned long flags, val;
++	unsigned long __hstatus, __sstatus;
 +
-+	if ((rtype =3D=3D KVM_REG_RISCV_FP_F) && (isa & RISCV_ISA_EXT_f)) {
-+		if (KVM_REG_SIZE(reg->id) !=3D sizeof(u32))
-+			return -EINVAL;
-+		if (reg_num =3D=3D KVM_REG_RISCV_FP_F_REG(fcsr))
-+			reg_val =3D &cntx->fp.f.fcsr;
-+		else if ((KVM_REG_RISCV_FP_F_REG(f[0]) <=3D reg_num) &&
-+			  reg_num <=3D KVM_REG_RISCV_FP_F_REG(f[31]))
-+			reg_val =3D &cntx->fp.f.f[reg_num];
-+		else
-+			return -EINVAL;
-+	} else if ((rtype =3D=3D KVM_REG_RISCV_FP_D) && (isa & RISCV_ISA_EXT_d)) =
-{
-+		if (reg_num =3D=3D KVM_REG_RISCV_FP_D_REG(fcsr)) {
-+			if (KVM_REG_SIZE(reg->id) !=3D sizeof(u32))
-+				return -EINVAL;
-+			reg_val =3D &cntx->fp.d.fcsr;
-+		} else if ((KVM_REG_RISCV_FP_D_REG(f[0]) <=3D reg_num) &&
-+			   reg_num <=3D KVM_REG_RISCV_FP_D_REG(f[31])) {
-+			if (KVM_REG_SIZE(reg->id) !=3D sizeof(u64))
-+				return -EINVAL;
-+			reg_val =3D &cntx->fp.d.f[reg_num];
-+		} else
-+			return -EINVAL;
-+	} else
-+		return -EINVAL;
++	local_irq_save(flags);
++	__hstatus =3D csr_read(CSR_HSTATUS);
++	__sstatus =3D csr_read(CSR_SSTATUS);
++	csr_write(CSR_HSTATUS, vcpu->arch.guest_context.hstatus | HSTATUS_SPRV);
++	csr_write(CSR_SSTATUS, vcpu->arch.guest_context.sstatus);
++	val =3D *addr;
++	csr_write(CSR_HSTATUS, __hstatus);
++	csr_write(CSR_SSTATUS, __sstatus);
++	local_irq_restore(flags);
 +
-+	if (copy_to_user(uaddr, reg_val, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
++	return val;
 +}
 +
-+static int kvm_riscv_vcpu_set_reg_fp(struct kvm_vcpu *vcpu,
-+				     const struct kvm_one_reg *reg,
-+				     unsigned long rtype)
++static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu, u32 type)
 +{
-+	struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
-+	unsigned long isa =3D vcpu->arch.isa;
-+	unsigned long __user *uaddr =3D
-+			(unsigned long __user *)(unsigned long)reg->addr;
-+	unsigned long reg_num =3D reg->id & ~(KVM_REG_ARCH_MASK |
-+					    KVM_REG_SIZE_MASK |
-+					    rtype);
-+	void *reg_val;
++	int i;
++	struct kvm_vcpu *tmp;
 +
-+	if ((rtype =3D=3D KVM_REG_RISCV_FP_F) && (isa & RISCV_ISA_EXT_f)) {
-+		if (KVM_REG_SIZE(reg->id) !=3D sizeof(u32))
-+			return -EINVAL;
-+		if (reg_num =3D=3D KVM_REG_RISCV_FP_F_REG(fcsr))
-+			reg_val =3D &cntx->fp.f.fcsr;
-+		else if ((KVM_REG_RISCV_FP_F_REG(f[0]) <=3D reg_num) &&
-+			  reg_num <=3D KVM_REG_RISCV_FP_F_REG(f[31]))
-+			reg_val =3D &cntx->fp.f.f[reg_num];
-+		else
-+			return -EINVAL;
-+	} else if ((rtype =3D=3D KVM_REG_RISCV_FP_D) && (isa & RISCV_ISA_EXT_d)) =
-{
-+		if (reg_num =3D=3D KVM_REG_RISCV_FP_D_REG(fcsr)) {
-+			if (KVM_REG_SIZE(reg->id) !=3D sizeof(u32))
-+				return -EINVAL;
-+			reg_val =3D &cntx->fp.d.fcsr;
-+		} else if ((KVM_REG_RISCV_FP_D_REG(f[0]) <=3D reg_num) &&
-+			   reg_num <=3D KVM_REG_RISCV_FP_D_REG(f[31])) {
-+			if (KVM_REG_SIZE(reg->id) !=3D sizeof(u64))
-+				return -EINVAL;
-+			reg_val =3D &cntx->fp.d.f[reg_num];
-+		} else
-+			return -EINVAL;
-+	} else
-+		return -EINVAL;
++	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
++		tmp->arch.power_off =3D true;
++	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
 +
-+	if (copy_from_user(reg_val, uaddr, KVM_REG_SIZE(reg->id)))
-+		return -EFAULT;
-+
-+	return 0;
++	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
++	vcpu->run->system_event.type =3D type;
++	vcpu->run->exit_reason =3D KVM_EXIT_SYSTEM_EVENT;
 +}
 +
- static int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vcpu,
- 				  const struct kvm_one_reg *reg)
- {
-@@ -432,6 +520,12 @@ static int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vcp=
-u,
- 		return kvm_riscv_vcpu_set_reg_core(vcpu, reg);
- 	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) =3D=3D KVM_REG_RISCV_CSR)
- 		return kvm_riscv_vcpu_set_reg_csr(vcpu, reg);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) =3D=3D KVM_REG_RISCV_FP_F)
-+		return kvm_riscv_vcpu_set_reg_fp(vcpu, reg,
-+						 KVM_REG_RISCV_FP_F);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) =3D=3D KVM_REG_RISCV_FP_D)
-+		return kvm_riscv_vcpu_set_reg_fp(vcpu, reg,
-+						 KVM_REG_RISCV_FP_D);
-=20
- 	return -EINVAL;
- }
-@@ -445,6 +539,12 @@ static int kvm_riscv_vcpu_get_reg(struct kvm_vcpu *vcp=
-u,
- 		return kvm_riscv_vcpu_get_reg_core(vcpu, reg);
- 	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) =3D=3D KVM_REG_RISCV_CSR)
- 		return kvm_riscv_vcpu_get_reg_csr(vcpu, reg);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) =3D=3D KVM_REG_RISCV_FP_F)
-+		return kvm_riscv_vcpu_get_reg_fp(vcpu, reg,
-+						 KVM_REG_RISCV_FP_F);
-+	else if ((reg->id & KVM_REG_RISCV_TYPE_MASK) =3D=3D KVM_REG_RISCV_FP_D)
-+		return kvm_riscv_vcpu_get_reg_fp(vcpu, reg,
-+						 KVM_REG_RISCV_FP_D);
-=20
- 	return -EINVAL;
- }
++int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu)
++{
++	int ret =3D 1;
++	u64 next_cycle;
++	int vcpuid;
++	struct kvm_vcpu *remote_vcpu;
++	ulong dhart_mask;
++	struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
++
++	if (!cp)
++		return -EINVAL;
++	switch (cp->a7) {
++	case SBI_SET_TIMER:
++#if __riscv_xlen =3D=3D 32
++		next_cycle =3D ((u64)cp->a1 << 32) | (u64)cp->a0;
++#else
++		next_cycle =3D (u64)cp->a0;
++#endif
++		kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
++		break;
++	case SBI_CONSOLE_PUTCHAR:
++		/* Not implemented */
++		cp->a0 =3D -ENOTSUPP;
++		break;
++	case SBI_CONSOLE_GETCHAR:
++		/* Not implemented */
++		cp->a0 =3D -ENOTSUPP;
++		break;
++	case SBI_CLEAR_IPI:
++		kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_S_SOFT);
++		break;
++	case SBI_SEND_IPI:
++		dhart_mask =3D kvm_sbi_unpriv_load((unsigned long *)cp->a0, vcpu);
++		for_each_set_bit(vcpuid, &dhart_mask, BITS_PER_LONG) {
++			remote_vcpu =3D kvm_get_vcpu_by_id(vcpu->kvm, vcpuid);
++			kvm_riscv_vcpu_set_interrupt(remote_vcpu, IRQ_S_SOFT);
++		}
++		break;
++	case SBI_SHUTDOWN:
++		kvm_sbi_system_shutdown(vcpu, KVM_SYSTEM_EVENT_SHUTDOWN);
++		ret =3D 0;
++		break;
++	case SBI_REMOTE_FENCE_I:
++		sbi_remote_fence_i(NULL);
++		break;
++	/*
++	 * TODO: There should be a way to call remote hfence.bvma.
++	 * Preferred method is now a SBI call. Until then, just flush
++	 * all tlbs.
++	 */
++	case SBI_REMOTE_SFENCE_VMA:
++		/*TODO: Parse vma range.*/
++		sbi_remote_sfence_vma(NULL, 0, 0);
++		break;
++	case SBI_REMOTE_SFENCE_VMA_ASID:
++		/*TODO: Parse vma range for given ASID */
++		sbi_remote_sfence_vma(NULL, 0, 0);
++		break;
++	default:
++		cp->a0 =3D ENOTSUPP;
++		break;
++	};
++
++	if (ret >=3D 0)
++		cp->sepc +=3D 4;
++
++	return ret;
++}
 --=20
 2.17.1
 
