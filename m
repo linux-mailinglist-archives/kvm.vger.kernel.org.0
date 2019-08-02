@@ -2,95 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 087487FAE6
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:36:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86D867FB3B
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:40:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406174AbfHBNfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 09:35:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36735 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406126AbfHBNfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 09:35:36 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7FA03882F2;
-        Fri,  2 Aug 2019 13:35:36 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-81.ams2.redhat.com [10.36.116.81])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB2A860C47;
-        Fri,  2 Aug 2019 13:35:32 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id DCD6916E05; Fri,  2 Aug 2019 15:35:31 +0200 (CEST)
-Date:   Fri, 2 Aug 2019 15:35:31 +0200
-From:   "kraxel@redhat.com" <kraxel@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Zhang, Tina" <tina.zhang@intel.com>,
-        "Lu, Kechen" <kechen.lu@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>
-Subject: Re: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
-Message-ID: <20190802133531.4zwsjltvjisq4sfz@sirius.home.kraxel.org>
-References: <20190718155640.25928-1-kechen.lu@intel.com>
- <20190718155640.25928-3-kechen.lu@intel.com>
- <20190719102516.60af527f@x1.home>
- <31185F57AF7C4B4F87C41E735C23A6FE64E06F@shsmsx102.ccr.corp.intel.com>
- <20190722134124.16c55c2f@x1.home>
- <237F54289DF84E4997F34151298ABEBC876BC9AD@SHSMSX101.ccr.corp.intel.com>
- <20190722191830.425d1593@x1.home>
+        id S2393933AbfHBNjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 09:39:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27154 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2392161AbfHBNjk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 2 Aug 2019 09:39:40 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x72DbSdb018922
+        for <kvm@vger.kernel.org>; Fri, 2 Aug 2019 09:39:39 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2u4n03bc3q-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 09:39:39 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 2 Aug 2019 14:39:37 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 2 Aug 2019 14:39:33 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x72DdWSW53215342
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 2 Aug 2019 13:39:32 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1692E5206C;
+        Fri,  2 Aug 2019 13:39:32 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B66C95204E;
+        Fri,  2 Aug 2019 13:39:31 +0000 (GMT)
+Subject: Re: [PATCH v3 0/3] KVM: selftests: Enable ucall and dirty_log_test on
+ s390x
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Andrew Jones <drjones@redhat.com>
+References: <20190731151525.17156-1-thuth@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Fri, 2 Aug 2019 15:39:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190722191830.425d1593@x1.home>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 02 Aug 2019 13:35:36 +0000 (UTC)
+In-Reply-To: <20190731151525.17156-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19080213-0008-0000-0000-00000304027F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080213-0009-0000-0000-0000A17E029A
+Message-Id: <551b42ae-78a1-e55a-e4b8-bb5cc3a8eb8b@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-02_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=936 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908020140
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
-
-> > > Couldn't you expose this as another capability within the IRQ_INFO return
-> > > data?  If you were to define it as a macro, I assume that means it would be
-> > > hard coded, in which case this probably becomes an Intel specific IRQ, rather
-> > > than what appears to be framed as a generic graphics IRQ extension.  A new
-> > > capability could instead allow the vendor to specify their own value, where
-> > > we could define how userspace should interpret and make use of this value.
-> > > Thanks,  
-> > Good suggestion. Currently, vfio_irq_info is used to save one irq
-> > info. What we need here is to use it to save several events info.
-> > Maybe we could figure out a general layout of this capability so that
-> > it can be leveraged by others, not only for display irq/events.
+On 31.07.19 17:15, Thomas Huth wrote:
+> Implement the ucall() interface on s390x to be able to use the
+> dirty_log_test KVM selftest on s390x, too.
 > 
-> You could also expose a device specific IRQ with count > 1 (ie. similar
-> to MSI/X) and avoid munging the eventfd value, which is not something
-> we do elsewhere, at least in vfio.  Thanks,
+> v3:
+>  - Fix compilation issue on aarch64 (thanks to Andrew for testing it!)
+>  - Added Reviewed-bys
+> 
+> v2:
+>  - Split up ucall.c into architecture specific files
+>  - Removed some #ifdef __s390x__  in the dirty_log patch
+> 
+> Thomas Huth (3):
+>   KVM: selftests: Split ucall.c into architecture specific files
+>   KVM: selftests: Implement ucall() for s390x
+>   KVM: selftests: Enable dirty_log_test on s390x
+> 
+>  tools/testing/selftests/kvm/Makefile          |   9 +-
+>  tools/testing/selftests/kvm/dirty_log_test.c  |  61 ++++++-
+>  .../testing/selftests/kvm/include/kvm_util.h  |   8 +-
+>  .../testing/selftests/kvm/lib/aarch64/ucall.c | 112 +++++++++++++
+>  tools/testing/selftests/kvm/lib/s390x/ucall.c |  56 +++++++
+>  tools/testing/selftests/kvm/lib/ucall.c       | 157 ------------------
+>  .../testing/selftests/kvm/lib/x86_64/ucall.c  |  56 +++++++
+>  .../selftests/kvm/s390x/sync_regs_test.c      |   6 +-
+>  8 files changed, 287 insertions(+), 178 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/ucall.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/s390x/ucall.c
+>  delete mode 100644 tools/testing/selftests/kvm/lib/ucall.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> 
 
-Well, the basic idea is to use the eventfd value to signal the kind of
-changes which did happen, simliar to IRQ status register bits.
+Paolo, I guess you do not mind if I carry patch 1 also via the s390x tree?
 
-So, when the guest changes the primary plane, the mdev driver notes
-this.  Same with the cursor plane.  On vblank (when the guests update
-is actually applied) the mdev driver wakes the eventfd and uses eventfd
-value to signal whenever primary plane or cursor plane or both did
-change.
-
-Then userspace knows which planes need an update without an extra
-VFIO_DEVICE_QUERY_GFX_PLANE roundtrip to the kernel.
-
-Alternatively we could have one eventfd for each change type.  But given
-that these changes are typically applied at the same time (vblank) we
-would have multiple eventfds being signaled at the same time.  Which
-doesn't look ideal to me ...
-
-cheers,
-  Gerd
+Thanks, all applied
 
