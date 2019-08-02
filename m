@@ -2,82 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 644F27F9D3
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 087487FAE6
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:36:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394188AbfHBNY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 09:24:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35170 "EHLO mail.kernel.org"
+        id S2406174AbfHBNfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 09:35:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36735 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2394169AbfHBNY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 09:24:27 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2406126AbfHBNfg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 09:35:36 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 279D621773;
-        Fri,  2 Aug 2019 13:24:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564752266;
-        bh=zf98jIThURIzPyBzuwzuyYqGB/35TOYpCG5ZJG94bJQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0A8KdpP8gsfz5hY4B5jPzSSMwCoWmwQD8uHPppJEUbqHmjTkvSv33z78KCvXK/R+j
-         T9G5GHs/yFXKMRlEZMNbpcB8lYDbLKDDVtfvyPH+NvJn5/4Dolv2h2CtsAKSChCqLO
-         30BAvIn67bDFWrtQfcHm9sgO6h6je4nJxKzC0tCY=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 02/30] vfio-ccw: Set pa_nr to 0 if memory allocation fails for pa_iova_pfn
-Date:   Fri,  2 Aug 2019 09:23:54 -0400
-Message-Id: <20190802132422.13963-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190802132422.13963-1-sashal@kernel.org>
-References: <20190802132422.13963-1-sashal@kernel.org>
+        by mx1.redhat.com (Postfix) with ESMTPS id 7FA03882F2;
+        Fri,  2 Aug 2019 13:35:36 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-81.ams2.redhat.com [10.36.116.81])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB2A860C47;
+        Fri,  2 Aug 2019 13:35:32 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id DCD6916E05; Fri,  2 Aug 2019 15:35:31 +0200 (CEST)
+Date:   Fri, 2 Aug 2019 15:35:31 +0200
+From:   "kraxel@redhat.com" <kraxel@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Zhang, Tina" <tina.zhang@intel.com>,
+        "Lu, Kechen" <kechen.lu@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yuan, Hang" <hang.yuan@intel.com>
+Subject: Re: [RFC PATCH v4 2/6] vfio: Introduce vGPU display irq type
+Message-ID: <20190802133531.4zwsjltvjisq4sfz@sirius.home.kraxel.org>
+References: <20190718155640.25928-1-kechen.lu@intel.com>
+ <20190718155640.25928-3-kechen.lu@intel.com>
+ <20190719102516.60af527f@x1.home>
+ <31185F57AF7C4B4F87C41E735C23A6FE64E06F@shsmsx102.ccr.corp.intel.com>
+ <20190722134124.16c55c2f@x1.home>
+ <237F54289DF84E4997F34151298ABEBC876BC9AD@SHSMSX101.ccr.corp.intel.com>
+ <20190722191830.425d1593@x1.home>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190722191830.425d1593@x1.home>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 02 Aug 2019 13:35:36 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Farhan Ali <alifm@linux.ibm.com>
+  Hi,
 
-[ Upstream commit c1ab69268d124ebdbb3864580808188ccd3ea355 ]
+> > > Couldn't you expose this as another capability within the IRQ_INFO return
+> > > data?  If you were to define it as a macro, I assume that means it would be
+> > > hard coded, in which case this probably becomes an Intel specific IRQ, rather
+> > > than what appears to be framed as a generic graphics IRQ extension.  A new
+> > > capability could instead allow the vendor to specify their own value, where
+> > > we could define how userspace should interpret and make use of this value.
+> > > Thanks,  
+> > Good suggestion. Currently, vfio_irq_info is used to save one irq
+> > info. What we need here is to use it to save several events info.
+> > Maybe we could figure out a general layout of this capability so that
+> > it can be leveraged by others, not only for display irq/events.
+> 
+> You could also expose a device specific IRQ with count > 1 (ie. similar
+> to MSI/X) and avoid munging the eventfd value, which is not something
+> we do elsewhere, at least in vfio.  Thanks,
 
-So we don't call try to call vfio_unpin_pages() incorrectly.
+Well, the basic idea is to use the eventfd value to signal the kind of
+changes which did happen, simliar to IRQ status register bits.
 
-Fixes: 0a19e61e6d4c ("vfio: ccw: introduce channel program interfaces")
-Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <33a89467ad6369196ae6edf820cbcb1e2d8d050c.1562854091.git.alifm@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/s390/cio/vfio_ccw_cp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+So, when the guest changes the primary plane, the mdev driver notes
+this.  Same with the cursor plane.  On vblank (when the guests update
+is actually applied) the mdev driver wakes the eventfd and uses eventfd
+value to signal whenever primary plane or cursor plane or both did
+change.
 
-diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 1419eaea03d84..5a9e457caef33 100644
---- a/drivers/s390/cio/vfio_ccw_cp.c
-+++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -119,8 +119,10 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
- 				  sizeof(*pa->pa_iova_pfn) +
- 				  sizeof(*pa->pa_pfn),
- 				  GFP_KERNEL);
--	if (unlikely(!pa->pa_iova_pfn))
-+	if (unlikely(!pa->pa_iova_pfn)) {
-+		pa->pa_nr = 0;
- 		return -ENOMEM;
-+	}
- 	pa->pa_pfn = pa->pa_iova_pfn + pa->pa_nr;
- 
- 	ret = pfn_array_pin(pa, mdev);
--- 
-2.20.1
+Then userspace knows which planes need an update without an extra
+VFIO_DEVICE_QUERY_GFX_PLANE roundtrip to the kernel.
+
+Alternatively we could have one eventfd for each change type.  But given
+that these changes are typically applied at the same time (vblank) we
+would have multiple eventfds being signaled at the same time.  Which
+doesn't look ideal to me ...
+
+cheers,
+  Gerd
 
