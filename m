@@ -2,121 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC8D77F729
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 14:46:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E6147FA79
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2019 15:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389616AbfHBMqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 08:46:15 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:39792 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726118AbfHBMqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 08:46:15 -0400
-Received: by mail-qk1-f196.google.com with SMTP id w190so54630301qkc.6
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 05:46:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=6ql0O82ncHZU71SnaUyYlbcaPGtvlWm+BrLQDkFEDbY=;
-        b=MRMA2whmjpLNxlhbDl5mBbGm/wxr+mnLnwdUEiOzNBsQbTy974xui1zcbJXuaVeMgi
-         +e6pAPXNKqJ5FLrB5btG3fWEwJOZCNVqx7WhXgNhnlz2EhhnCC/jrtDsn55I0rQrPbEs
-         kTXxKo2YuV2bT1/e1Z1A6Wf8qvRURa8Gr3WBc9QO7dijfCQypZgeANqmpaiWdSJoUCtu
-         VXKmwcx2rj/qqL+7cWXldCjZ59ch1b87c5iVVd4Ql5AT2hWXZoJ7MKekKjw5eD86xgli
-         DTGd7yg7MsSW0a1wLwfpAvBC9sgR49+QmZEGlFoYAgcWlKpxKOv19D6RuAJw4q09e1/M
-         Xu1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=6ql0O82ncHZU71SnaUyYlbcaPGtvlWm+BrLQDkFEDbY=;
-        b=DhcQDAm5A8jLJKxNLgH7iH4rm857NE8nUGp49129bltLD4+uW8X4E8F2jWU+9mOzBh
-         ftaZ/AmO3y/Iong20V30fIU9S+sbTunBpfxsUjrmNO3BuifpYY3LJH5sSPLB27mxYdTg
-         FsJGR8SsoejP/4nacak3mhcexoOtVYA8rgdkvsN/KVQge4gVd0DfZgaG6P8s00I9tP0Y
-         rNyFB/urjBEbo77SDH6TlhVtH28w3Sen8X5eCxSnxEadPlDtaBVy0hp8dos7T5ZlyOLJ
-         25xsOnebNFjPHolyfBI2FqUYGYyQTwygzFNKMgbjYQv3jxZctBrEk47xJvhHcjOaQDDt
-         Z2Lw==
-X-Gm-Message-State: APjAAAX8gsHAQ6aDQ6FOC/clM52vGYyEQo87mT775KsEIdC9+DgW4SRj
-        Uc0I5ULPaMDRqS9OTskTAfDkug==
-X-Google-Smtp-Source: APXvYqxtz2vM6y/fN8WSSWPve6vWs8cD8+KUQAMGJTQIxCltGAZYGzTtsZ3uymeGSjZYIgEaLwJYTg==
-X-Received: by 2002:a37:bc03:: with SMTP id m3mr89369627qkf.199.1564749974287;
-        Fri, 02 Aug 2019 05:46:14 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id l19sm41561137qtb.6.2019.08.02.05.46.13
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 02 Aug 2019 05:46:13 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1htWwn-0003D2-5A; Fri, 02 Aug 2019 09:46:13 -0300
-Date:   Fri, 2 Aug 2019 09:46:13 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
- with worker
-Message-ID: <20190802124613.GA11245@ziepe.ca>
-References: <20190731084655.7024-1-jasowang@redhat.com>
- <20190731084655.7024-8-jasowang@redhat.com>
- <20190731123935.GC3946@ziepe.ca>
- <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
- <20190731193057.GG3946@ziepe.ca>
- <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
- <20190801141512.GB23899@ziepe.ca>
- <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
+        id S1728714AbfHBNXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 09:23:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33662 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731618AbfHBNXG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 09:23:06 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C8D9720880;
+        Fri,  2 Aug 2019 13:23:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564752185;
+        bh=lgIcao1FUsYr2I98X1TWGI5JBvZiDsyIgND5NxpgbiQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=YaUPpmLdYBi5ATqml64cPdG5xGqsS8+fYVViScC75/4JPJg5fUzsFNtTmKs6QCREo
+         ym2nGcShAVwf51V+ZcYoYst19yLQjF3WKvAhVCOXtDOErr0BIk+LVYifR64K3kVmi3
+         ySYsZ3cBGkS/m6074LYgS8qm9q+aLyBEOROVL2rY=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 02/42] vfio-ccw: Set pa_nr to 0 if memory allocation fails for pa_iova_pfn
+Date:   Fri,  2 Aug 2019 09:22:22 -0400
+Message-Id: <20190802132302.13537-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190802132302.13537-1-sashal@kernel.org>
+References: <20190802132302.13537-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
-> > This must be a proper barrier, like a spinlock, mutex, or
-> > synchronize_rcu.
-> 
-> 
-> I start with synchronize_rcu() but both you and Michael raise some
-> concern.
+From: Farhan Ali <alifm@linux.ibm.com>
 
-I've also idly wondered if calling synchronize_rcu() under the various
-mm locks is a deadlock situation.
+[ Upstream commit c1ab69268d124ebdbb3864580808188ccd3ea355 ]
 
-> Then I try spinlock and mutex:
-> 
-> 1) spinlock: add lots of overhead on datapath, this leads 0 performance
-> improvement.
+So we don't call try to call vfio_unpin_pages() incorrectly.
 
-I think the topic here is correctness not performance improvement
+Fixes: 0a19e61e6d4c ("vfio: ccw: introduce channel program interfaces")
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <33a89467ad6369196ae6edf820cbcb1e2d8d050c.1562854091.git.alifm@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/s390/cio/vfio_ccw_cp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> 2) SRCU: full memory barrier requires on srcu_read_lock(), which still leads
-> little performance improvement
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index 70a006ba4d050..4fe06ff7b2c8b 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -89,8 +89,10 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
+ 				  sizeof(*pa->pa_iova_pfn) +
+ 				  sizeof(*pa->pa_pfn),
+ 				  GFP_KERNEL);
+-	if (unlikely(!pa->pa_iova_pfn))
++	if (unlikely(!pa->pa_iova_pfn)) {
++		pa->pa_nr = 0;
+ 		return -ENOMEM;
++	}
+ 	pa->pa_pfn = pa->pa_iova_pfn + pa->pa_nr;
  
-> 3) mutex: a possible issue is need to wait for the page to be swapped in (is
-> this unacceptable ?), another issue is that we need hold vq lock during
-> range overlap check.
+ 	pa->pa_iova_pfn[0] = pa->pa_iova >> PAGE_SHIFT;
+-- 
+2.20.1
 
-I have a feeling that mmu notififers cannot safely become dependent on
-progress of swap without causing deadlock. You probably should avoid
-this.
-
-> > And, again, you can't re-invent a spinlock with open coding and get
-> > something better.
-> 
-> So the question is if waiting for swap is considered to be unsuitable for
-> MMU notifiers. If not, it would simplify codes. If not, we still need to
-> figure out a possible solution.
-> 
-> Btw, I come up another idea, that is to disable preemption when vhost thread
-> need to access the memory. Then register preempt notifier and if vhost
-> thread is preempted, we're sure no one will access the memory and can do the
-> cleanup.
-
-I think you should use the spinlock so at least the code is obviously
-functionally correct and worry about designing some properly justified
-performance change after.
-
-Jason
