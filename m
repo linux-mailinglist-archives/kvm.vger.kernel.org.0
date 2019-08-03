@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C6CE80618
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 13:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1A538063C
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 14:51:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390106AbfHCLz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Aug 2019 07:55:28 -0400
-Received: from inca-roads.misterjones.org ([213.251.177.50]:57306 "EHLO
+        id S2390791AbfHCMv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Aug 2019 08:51:26 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:47317 "EHLO
         inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390012AbfHCLz2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 3 Aug 2019 07:55:28 -0400
+        by vger.kernel.org with ESMTP id S2389830AbfHCMvZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 3 Aug 2019 08:51:25 -0400
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
         by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
         (Exim 4.80)
         (envelope-from <maz@kernel.org>)
-        id 1htsd4-0007Y3-3V; Sat, 03 Aug 2019 13:55:19 +0200
-Date:   Sat, 3 Aug 2019 12:55:15 +0100
+        id 1httVD-00081Q-QI; Sat, 03 Aug 2019 14:51:17 +0200
+Date:   Sat, 3 Aug 2019 13:51:13 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Steven Price <steven.price@arm.com>
 Cc:     Catalin Marinas <catalin.marinas@arm.com>,
@@ -30,12 +30,11 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/9] KVM: arm64: Support stolen time reporting via
- shared structure
-Message-ID: <20190803125515.6aa50084@why>
-In-Reply-To: <20190802145017.42543-5-steven.price@arm.com>
+Subject: Re: [PATCH 6/9] KVM: arm64: Provide a PV_TIME device to user space
+Message-ID: <20190803135113.6cdf500c@why>
+In-Reply-To: <20190802145017.42543-7-steven.price@arm.com>
 References: <20190802145017.42543-1-steven.price@arm.com>
-        <20190802145017.42543-5-steven.price@arm.com>
+        <20190802145017.42543-7-steven.price@arm.com>
 Organization: Approximate
 X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -50,289 +49,365 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  2 Aug 2019 15:50:12 +0100
+On Fri,  2 Aug 2019 15:50:14 +0100
 Steven Price <steven.price@arm.com> wrote:
 
-> Implement the service call for configuring a shared structre between a
-
-structure
-
-> VCPU and the hypervisor in which the hypervisor can write the time
-> stolen from the VCPU's execution time by other tasks on the host.
+> Allow user space to inform the KVM host where in the physical memory
+> map the paravirtualized time structures should be located.
 > 
-> The hypervisor allocates memory which is placed at an IPA chosen by user
-> space. The hypervisor then uses WRITE_ONCE() to update the shared
-> structre ensuring single copy atomicity of the 64-bit unsigned value
-
-structure
-
-> that reports stolen time in nanoseconds.
+> A device is created which provides the base address of an array of
+> Stolen Time (ST) structures, one for each VCPU. There must be (64 *
+> total number of VCPUs) bytes of memory available at this location.
 > 
-> Whenever stolen time is enabled by the guest, the stolen time counter is
-> reset.
-> 
-> The stolen time itself is retrieved from the sched_info structure
-> maintained by the Linux scheduler code. We enable SCHEDSTATS when
-> selecting KVM Kconfig to ensure this value is meaningful.
+> The address is given in terms of the physical address visible to
+> the guest and must be 64 byte aligned. The memory should be marked as
+> reserved to the guest to stop it allocating it for other purposes.
+
+Why? You seem to be allocating the memory from the kernel, so as far as
+the guest is concerned, this isn't generally usable memory.
+
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 13 +++++-
->  arch/arm64/kvm/Kconfig            |  1 +
->  include/kvm/arm_hypercalls.h      |  1 +
->  include/linux/kvm_types.h         |  2 +
->  virt/kvm/arm/arm.c                | 18 ++++++++
->  virt/kvm/arm/hypercalls.c         | 70 +++++++++++++++++++++++++++++++
->  6 files changed, 104 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/kvm_mmu.h  |   2 +
+>  arch/arm64/include/uapi/asm/kvm.h |   6 +
+>  arch/arm64/kvm/Makefile           |   1 +
+>  include/uapi/linux/kvm.h          |   2 +
+>  virt/kvm/arm/mmu.c                |  44 +++++++
+>  virt/kvm/arm/pvtime.c             | 190 ++++++++++++++++++++++++++++++
+>  6 files changed, 245 insertions(+)
+>  create mode 100644 virt/kvm/arm/pvtime.c
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f656169db8c3..78f270190d43 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -44,6 +44,7 @@
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index befe37d4bc0e..88c8a4b2836f 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -157,6 +157,8 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm);
+>  void kvm_free_stage2_pgd(struct kvm *kvm);
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  			  phys_addr_t pa, unsigned long size, bool writable);
+> +int kvm_phys_addr_memremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> +			  phys_addr_t pa, unsigned long size, bool writable);
 >  
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
 >  
-> @@ -83,6 +84,11 @@ struct kvm_arch {
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 9a507716ae2f..95516a4198ea 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -367,6 +367,12 @@ struct kvm_vcpu_events {
+>  #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
+>  #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
 >  
->  	/* Mandated version of PSCI */
->  	u32 psci_version;
+> +/* Device Control API: PV_TIME */
+> +#define KVM_DEV_ARM_PV_TIME_PADDR	0
+> +#define  KVM_DEV_ARM_PV_TIME_ST		0
+> +#define KVM_DEV_ARM_PV_TIME_STATE_SIZE	1
+> +#define KVM_DEV_ARM_PV_TIME_STATE	2
 > +
-> +	struct kvm_arch_pvtime {
-> +		void *st;
-
-Is it really a void *? I'm sure you can use a proper type here...
-
-> +		gpa_t st_base;
-> +	} pvtime;
+>  #endif
+>  
+>  #endif /* __ARM_KVM_H__ */
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 73dce4d47d47..5ffbdc39e780 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -14,6 +14,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hypercalls.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/pvtime.o
+>  
+>  kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index a7c19540ce21..04bffafa0708 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1222,6 +1222,8 @@ enum kvm_device_type {
+>  #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
+>  	KVM_DEV_TYPE_XIVE,
+>  #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+> +	KVM_DEV_TYPE_ARM_PV_TIME,
+> +#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
+>  	KVM_DEV_TYPE_MAX,
 >  };
 >  
->  #define KVM_NR_MEM_OBJS     40
-> @@ -338,8 +344,13 @@ struct kvm_vcpu_arch {
->  	/* True when deferrable sysregs are loaded on the physical CPU,
->  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
->  	bool sysregs_loaded_on_cpu;
-> -};
->  
-> +	/* Guest PV state */
-> +	struct {
-> +		u64 steal;
-> +		u64 last_steal;
-> +	} steal;
-> +};
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
->  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index a67121d419a2..d8b88e40d223 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -39,6 +39,7 @@ config KVM
->  	select IRQ_BYPASS_MANAGER
->  	select HAVE_KVM_IRQ_BYPASS
->  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
-> +	select SCHEDSTATS
->  	---help---
->  	  Support hosting virtualized guest machines.
->  	  We don't support KVM with 16K page tables yet, due to the multiple
-> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> index 35a5abcc4ca3..9f0710ab4292 100644
-> --- a/include/kvm/arm_hypercalls.h
-> +++ b/include/kvm/arm_hypercalls.h
-> @@ -7,6 +7,7 @@
->  #include <asm/kvm_emulate.h>
->  
->  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu);
->  
->  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index bde5374ae021..1c88e69db3d9 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
->  typedef u64            gpa_t;
->  typedef u64            gfn_t;
->  
-> +#define GPA_INVALID	(~(gpa_t)0)
-> +
->  typedef unsigned long  hva_t;
->  typedef u64            hpa_t;
->  typedef u64            hfn_t;
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index f645c0fbf7ec..ebd963d2580b 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -40,6 +40,10 @@
->  #include <asm/kvm_coproc.h>
->  #include <asm/sections.h>
->  
-> +#include <kvm/arm_hypercalls.h>
-> +#include <kvm/arm_pmu.h>
-> +#include <kvm/arm_psci.h>
-> +
->  #ifdef REQUIRES_VIRT
->  __asm__(".arch_extension	virt");
->  #endif
-> @@ -135,6 +139,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm->arch.max_vcpus = vgic_present ?
->  				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->  
-> +	kvm->arch.pvtime.st_base = GPA_INVALID;
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 38b4c910b6c3..be28a4aee451 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -1368,6 +1368,50 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
 >  	return ret;
->  out_free_stage2_pgd:
->  	kvm_free_stage2_pgd(kvm);
-> @@ -371,6 +376,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	kvm_vcpu_load_sysregs(vcpu);
->  	kvm_arch_vcpu_load_fp(vcpu);
->  	kvm_vcpu_pmu_restore_guest(vcpu);
-> +	kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->  
->  	if (single_task_running())
->  		vcpu_clear_wfe_traps(vcpu);
-> @@ -617,6 +623,15 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
->  	smp_rmb();
 >  }
 >  
-> +static void vcpu_req_record_steal(struct kvm_vcpu *vcpu)
+> +/**
+> + * kvm_phys_addr_memremap - map a memory range to guest IPA
+> + *
+> + * @kvm:	The KVM pointer
+> + * @guest_ipa:	The IPA at which to insert the mapping
+> + * @pa:		The physical address of the memory
+> + * @size:	The size of the mapping
+> + */
+> +int kvm_phys_addr_memremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> +			  phys_addr_t pa, unsigned long size, bool writable)
 > +{
-> +	int idx;
+> +	phys_addr_t addr, end;
+> +	int ret = 0;
+> +	unsigned long pfn;
+> +	struct kvm_mmu_memory_cache cache = { 0, };
 > +
-> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> +	kvm_update_stolen_time(vcpu);
-> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> +	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
+> +	pfn = __phys_to_pfn(pa);
+> +
+> +	for (addr = guest_ipa; addr < end; addr += PAGE_SIZE) {
+> +		pte_t pte = pfn_pte(pfn, PAGE_S2);
+> +
+> +		if (writable)
+> +			pte = kvm_s2pte_mkwrite(pte);
+> +
+> +		ret = mmu_topup_memory_cache(&cache,
+> +					     kvm_mmu_cache_min_pages(kvm),
+> +					     KVM_NR_MEM_OBJS);
+> +		if (ret)
+> +			goto out;
+> +		spin_lock(&kvm->mmu_lock);
+> +		ret = stage2_set_pte(kvm, &cache, addr, &pte, 0);
+> +		spin_unlock(&kvm->mmu_lock);
+> +		if (ret)
+> +			goto out;
+> +
+> +		pfn++;
+> +	}
+> +
+> +out:
+> +	mmu_free_memory_cache(&cache);
+> +	return ret;
 > +}
+
+This is an exact copy of kvm_phys_addr_ioremap(), with only the memory
+attributes changing. Surely we can have a shared implementation that
+takes the memory attribute as a parameter.
+
 > +
->  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+>  static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
 >  {
->  	return vcpu->arch.target >= 0;
-> @@ -636,6 +651,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->  		 * that a VCPU sees new virtual interrupts.
->  		 */
->  		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
+>  	kvm_pfn_t pfn = *pfnp;
+> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
+> new file mode 100644
+> index 000000000000..9051bc07eae1
+> --- /dev/null
+> +++ b/virt/kvm/arm/pvtime.c
+> @@ -0,0 +1,190 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +// Copyright (C) 2019 Arm Ltd.
 > +
-> +		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
-> +			vcpu_req_record_steal(vcpu);
->  	}
->  }
->  
-> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-> index 2906b2df99df..196c71c8dd87 100644
-> --- a/virt/kvm/arm/hypercalls.c
-> +++ b/virt/kvm/arm/hypercalls.c
-> @@ -10,6 +10,70 @@
->  #include <kvm/arm_hypercalls.h>
->  #include <kvm/arm_psci.h>
->  
+> +#include <linux/kvm_host.h>
+> +#include <asm/kvm_mmu.h>
 > +
-> +static struct pvclock_vcpu_stolen_time_info *pvtime_get_st(
-> +		struct kvm_vcpu *vcpu)
+> +/* We currently only support PV time on ARM64 */
+> +#ifdef CONFIG_ARM64
 
-nit: on a single line.
+And we're only compiling it on arm64, so why the #ifdef?
 
+> +
+> +#include <asm/pvclock-abi.h>
+> +
+> +static int max_stolen_size(void)
 > +{
-> +	struct pvclock_vcpu_stolen_time_info *st = vcpu->kvm->arch.pvtime.st;
+> +	int size = KVM_MAX_VCPUS * sizeof(struct pvclock_vcpu_stolen_time_info);
+
+So we're always allocating enough memory for 512 CPUs? That's an
+additional 32kB of contiguous memory...
+
 > +
-> +	if (!st)
-> +		return NULL;
-> +
-> +	return &st[kvm_vcpu_get_idx(vcpu)];
+> +	return ALIGN(size, PAGE_SIZE);
 > +}
 > +
-> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+> +static int kvm_arm_pvtime_create(struct kvm_device *dev, u32 type)
 > +{
-> +	u64 steal;
-> +	struct pvclock_vcpu_stolen_time_info *kaddr;
+> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
 > +
-> +	if (vcpu->kvm->arch.pvtime.st_base == GPA_INVALID)
-> +		return -ENOTSUPP;
+> +	pvtime->st = alloc_pages_exact(max_stolen_size(),
+> +				       GFP_KERNEL | __GFP_ZERO);
+> +	if (!pvtime->st)
+> +		return -ENOMEM;
 
-So for a guest that doesn't have stolen time support (which is 100% of
-them for the foreseeable future), we still set a request, take the srcu
-lock and end-up here for nothing. I'd rather we test this st_base
-early, as it should never change once the guest has started.
-
-> +
-> +	kaddr = pvtime_get_st(vcpu);
-> +
-> +	if (!kaddr)
-> +		return -ENOTSUPP;
-
-How can this happen?
-
-> +
-> +	kaddr->revision = 0;
-> +	kaddr->attributes = 0;
-
-Why does this need to be written each time we update the stolen time? I
-have the feeling this would be better moved to the hypercall
-initializing the data structure.
-
-> +
-> +	/* Let's do the local bookkeeping */
-> +	steal = vcpu->arch.steal.steal;
-> +	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
-> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +	vcpu->arch.steal.steal = steal;
-> +
-> +	/* Now write out the value to the shared page */
-> +	WRITE_ONCE(kaddr->stolen_time, cpu_to_le64(steal));
-
-Is there any requirement for this to be visible to another CPU than the
-one this is being written from?
+Is there any chance we could use a vmalloc allocation instead? This
+would lift the requirement on having physically contiguous memory.
 
 > +
 > +	return 0;
 > +}
 > +
-> +static int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
+> +static void kvm_arm_pvtime_destroy(struct kvm_device *dev)
 > +{
-> +	u64 ret;
-> +	int err;
+> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
 > +
-> +	/*
-> +	 * Start counting stolen time from the time the guest requests
-> +	 * the feature enabled.
-> +	 */
-> +	vcpu->arch.steal.steal = 0;
-> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +
-> +	err = kvm_update_stolen_time(vcpu);
-> +
-> +	if (err)
-> +		ret = SMCCC_RET_NOT_SUPPORTED;
-> +	else
-> +		ret = vcpu->kvm->arch.pvtime.st_base +
-> +			(sizeof(struct pvclock_vcpu_stolen_time_info) *
-> +			 kvm_vcpu_get_idx(vcpu));
-> +
-> +	smccc_set_retval(vcpu, ret, 0, 0, 0);
-> +	return 1;
+> +	pvtime->st_base = GPA_INVALID;
+> +	free_pages_exact(pvtime->st, max_stolen_size());
+> +	kfree(dev);
 > +}
->  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  {
->  	u32 func_id = smccc_get_function(vcpu);
-> @@ -57,8 +121,14 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  	case ARM_SMCCC_HV_PV_FEATURES:
->  		feature = smccc_get_arg1(vcpu);
->  		switch (feature) {
-> +		case ARM_SMCCC_HV_PV_FEATURES:
-> +		case ARM_SMCCC_HV_PV_TIME_ST:
-> +			val = SMCCC_RET_SUCCESS;
-> +			break;
->  		}
->  		break;
-> +	case ARM_SMCCC_HV_PV_TIME_ST:
-> +		return kvm_hypercall_stolen_time(vcpu);
->  	default:
->  		return kvm_psci_call(vcpu);
->  	}
+> +
+> +static int pvtime_map_pages(struct kvm *kvm, gpa_t guest_paddr,
+> +			    void *kaddr, int size)
+> +{
+> +	return kvm_phys_addr_memremap(kvm, guest_paddr,
+> +			virt_to_phys(kaddr),
+> +			size, false);
+> +}
+> +
+> +static int pvtime_save_state(struct kvm *kvm, u64 type, void __user *user)
+> +{
+> +	void *source;
+> +	size_t size;
+> +
+> +	switch (type) {
+> +	case KVM_DEV_ARM_PV_TIME_ST:
+> +		source = kvm->arch.pvtime.st;
+> +		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
+> +			atomic_read(&kvm->online_vcpus);
+> +		break;
+> +	default:
+> +		return -ENXIO;
+> +	}
+> +
+> +	if (copy_to_user(user, source, size))
+> +		return -EFAULT;
+> +	return 0;
+> +}
+> +
+> +static int pvtime_restore_state(struct kvm *kvm, u64 type, void __user *user)
+> +{
+> +	void *dest;
+> +	size_t size;
+> +
+> +	switch (type) {
+> +	case KVM_DEV_ARM_PV_TIME_ST:
+> +		dest = kvm->arch.pvtime.st;
+> +		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
+> +			atomic_read(&kvm->online_vcpus);
+> +		break;
+> +	default:
+> +		return -ENXIO;
+> +	}
+> +
+> +	if (copy_from_user(dest, user, size))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
+> +				   struct kvm_device_attr *attr)
+> +{
+> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+> +	u64 __user *user = (u64 __user *)attr->addr;
+> +	u64 paddr;
+> +	int ret;
+> +
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PV_TIME_PADDR:
+> +		if (get_user(paddr, user))
+> +			return -EFAULT;
+> +		if (paddr & 63)
+> +			return -EINVAL;
 
+You should check whether the device fits into the IPA space for this
+guest, and whether it overlaps with anything else.
+
+> +		switch (attr->attr) {
+> +		case KVM_DEV_ARM_PV_TIME_ST:
+> +			if (pvtime->st_base != GPA_INVALID)
+> +				return -EEXIST;
+> +			ret = pvtime_map_pages(dev->kvm, paddr, pvtime->st,
+> +					max_stolen_size());
+
+Consider moving the size directly into pvtime_map_pages(), and dropping
+the pvtime->st parameter. All you need is kvm and paddr.
+
+> +			if (ret)
+> +				return ret;
+> +			pvtime->st_base = paddr;
+> +			return 0;
+> +		}
+> +		break;
+> +	case KVM_DEV_ARM_PV_TIME_STATE_SIZE:
+> +		return -EPERM;
+> +	case KVM_DEV_ARM_PV_TIME_STATE:
+> +		return pvtime_restore_state(dev->kvm, attr->attr, user);
+> +	}
+> +	return -ENXIO;
+> +}
+> +
+> +static int kvm_arm_pvtime_get_attr(struct kvm_device *dev,
+> +				   struct kvm_device_attr *attr)
+> +{
+> +	u64 __user *user = (u64 __user *)attr->addr;
+> +	u32 size;
+> +
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PV_TIME_PADDR:
+> +		switch (attr->attr) {
+> +		case KVM_DEV_ARM_PV_TIME_ST:
+> +			if (put_user(dev->kvm->arch.pvtime.st_base, user))
+> +				return -EFAULT;
+> +			return 0;
+> +		}
+> +		break;
+> +	case KVM_DEV_ARM_PV_TIME_STATE_SIZE:
+> +		switch (attr->attr) {
+> +		case KVM_DEV_ARM_PV_TIME_ST:
+> +			size = sizeof(struct pvclock_vcpu_stolen_time_info);
+> +			size *= atomic_read(&dev->kvm->online_vcpus);
+> +			break;
+> +		default:
+> +			return -ENXIO;
+> +		}
+> +		if (put_user(size, user))
+> +			return -EFAULT;
+> +		return 0;
+> +	case KVM_DEV_ARM_PV_TIME_STATE:
+> +		return pvtime_save_state(dev->kvm, attr->attr, user);
+> +	}
+> +	return -ENXIO;
+> +}
+> +
+> +static int kvm_arm_pvtime_has_attr(struct kvm_device *dev,
+> +				   struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PV_TIME_PADDR:
+> +	case KVM_DEV_ARM_PV_TIME_STATE_SIZE:
+> +	case KVM_DEV_ARM_PV_TIME_STATE:
+> +		switch (attr->attr) {
+> +		case KVM_DEV_ARM_PV_TIME_ST:
+> +			return 0;
+> +		}
+> +		break;
+> +	}
+> +	return -ENXIO;
+> +}
+> +
+> +static const struct kvm_device_ops pvtime_ops = {
+> +	"Arm PV time",
+> +	.create = kvm_arm_pvtime_create,
+> +	.destroy = kvm_arm_pvtime_destroy,
+> +	.set_attr = kvm_arm_pvtime_set_attr,
+> +	.get_attr = kvm_arm_pvtime_get_attr,
+> +	.has_attr = kvm_arm_pvtime_has_attr
+> +};
+> +
+> +static int __init kvm_pvtime_init(void)
+> +{
+> +	kvm_register_device_ops(&pvtime_ops, KVM_DEV_TYPE_ARM_PV_TIME);
+> +
+> +	return 0;
+> +}
+> +
+> +late_initcall(kvm_pvtime_init);
+> +
+> +#endif
 
 Thanks,
 
