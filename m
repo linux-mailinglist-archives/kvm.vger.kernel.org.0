@@ -2,89 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B2F6880844
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 22:21:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F9BE8086C
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 23:36:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729019AbfHCUVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Aug 2019 16:21:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54994 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728906AbfHCUVg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Aug 2019 16:21:36 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B8EC0A4D31;
-        Sat,  3 Aug 2019 20:21:35 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 17FC25C22B;
-        Sat,  3 Aug 2019 20:21:35 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id C4ED6105135;
-        Sat,  3 Aug 2019 17:21:05 -0300 (BRT)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x73KL24Q009531;
-        Sat, 3 Aug 2019 17:21:02 -0300
-Date:   Sat, 3 Aug 2019 17:21:01 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Linux PM <linux-pm@vger.kernel.org>
-Subject: Re: [PATCH] cpuidle-haltpoll: Enable kvm guest polling when
- dedicated physical CPUs are available
-Message-ID: <20190803202058.GA9316@amt.cnet>
-References: <1564643196-7797-1-git-send-email-wanpengli@tencent.com>
- <7b1e3025-f513-7068-32ac-4830d67b65ac@intel.com>
- <c3fe182f-627f-88ad-cb4d-a4189202b438@redhat.com>
+        id S1729093AbfHCVgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Aug 2019 17:36:25 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:45800 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729094AbfHCVgU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Aug 2019 17:36:20 -0400
+Received: by mail-qt1-f193.google.com with SMTP id x22so4104386qtp.12
+        for <kvm@vger.kernel.org>; Sat, 03 Aug 2019 14:36:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EkifmyHxwnsPs8regEBTA5tK93nCtmZrIpRMe8ScOn4=;
+        b=uDiu39t3YMBasAn4G7bzwSVvBSyBu3nUHFSNdRbXb+xXqLf61mcH7Cc7bnSz+ScW0a
+         F7RKm3tkuNerPkHk0A5ljW95agjCmbsUoStXXHScaVFkGbia2OV5TjC0ij9M+ywquUPE
+         7fRadt1iVhvrsNnNI1obpMYotYpTuKJtePwKGom/inpaX/qA0aHwBgd/+5+mzvHINcmb
+         zvBk5ir7qspIHJEEKSBtrt1N/to2U3EmJkaIbIedhLuHBFYuhiFmpxzCe16rslUbm57L
+         3Tcrduuflz0Pwhx481uvmicfyd1/4buhaDwPPsy/88gHr5TVecNzosRY7DWhqjc4t/Yg
+         FJPA==
+X-Gm-Message-State: APjAAAVjV0NeLyfMMv/r3UFqbe0nK8WwBqahOHoX+VRf4AqhX6FhOBvc
+        2dtNSmMkUT/+5k8Q/yk0CTPJsg==
+X-Google-Smtp-Source: APXvYqyFdgNs0jCQVpmdi8dR64CNPy6wD73snHAaLEfC40B+RZ0ZopacAYTEXjRinq1ReEeoFWNEuA==
+X-Received: by 2002:ac8:32ec:: with SMTP id a41mr103176717qtb.375.1564868179417;
+        Sat, 03 Aug 2019 14:36:19 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+        by smtp.gmail.com with ESMTPSA id g3sm33648801qke.105.2019.08.03.14.36.15
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sat, 03 Aug 2019 14:36:18 -0700 (PDT)
+Date:   Sat, 3 Aug 2019 17:36:13 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
+ with worker
+Message-ID: <20190803172944-mutt-send-email-mst@kernel.org>
+References: <20190731084655.7024-8-jasowang@redhat.com>
+ <20190731123935.GC3946@ziepe.ca>
+ <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
+ <20190731193057.GG3946@ziepe.ca>
+ <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
+ <20190801141512.GB23899@ziepe.ca>
+ <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
+ <20190802124613.GA11245@ziepe.ca>
+ <20190802100414-mutt-send-email-mst@kernel.org>
+ <20190802172418.GB11245@ziepe.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c3fe182f-627f-88ad-cb4d-a4189202b438@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Sat, 03 Aug 2019 20:21:35 +0000 (UTC)
+In-Reply-To: <20190802172418.GB11245@ziepe.ca>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 06:54:49PM +0200, Paolo Bonzini wrote:
-> On 01/08/19 18:51, Rafael J. Wysocki wrote:
-> > On 8/1/2019 9:06 AM, Wanpeng Li wrote:
-> >> From: Wanpeng Li <wanpengli@tencent.com>
-> >>
-> >> The downside of guest side polling is that polling is performed even
-> >> with other runnable tasks in the host. However, even if poll in kvm
-> >> can aware whether or not other runnable tasks in the same pCPU, it
-> >> can still incur extra overhead in over-subscribe scenario. Now we can
-> >> just enable guest polling when dedicated pCPUs are available.
-> >>
-> >> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> >> Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> >> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+On Fri, Aug 02, 2019 at 02:24:18PM -0300, Jason Gunthorpe wrote:
+> On Fri, Aug 02, 2019 at 10:27:21AM -0400, Michael S. Tsirkin wrote:
+> > On Fri, Aug 02, 2019 at 09:46:13AM -0300, Jason Gunthorpe wrote:
+> > > On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
+> > > > > This must be a proper barrier, like a spinlock, mutex, or
+> > > > > synchronize_rcu.
+> > > > 
+> > > > 
+> > > > I start with synchronize_rcu() but both you and Michael raise some
+> > > > concern.
+> > > 
+> > > I've also idly wondered if calling synchronize_rcu() under the various
+> > > mm locks is a deadlock situation.
+> > > 
+> > > > Then I try spinlock and mutex:
+> > > > 
+> > > > 1) spinlock: add lots of overhead on datapath, this leads 0 performance
+> > > > improvement.
+> > > 
+> > > I think the topic here is correctness not performance improvement
 > > 
-> > Paolo, Marcelo, any comments?
+> > The topic is whether we should revert
+> > commit 7f466032dc9 ("vhost: access vq metadata through kernel virtual address")
+> > 
+> > or keep it in. The only reason to keep it is performance.
 > 
-> Yes, it's a good idea.
+> Yikes, I'm not sure you can ever win against copy_from_user using
+> mmu_notifiers?
+
+Ever since copy_from_user started playing with flags (for SMAP) and
+added speculation barriers there's a chance we can win by accessing
+memory through the kernel address.
+
+
+Another reason would be to access it from e.g. softirq
+context. copy_from_user will only work if the
+correct mmu is active.
+
+
+> The synchronization requirements are likely always
+> more expensive unless large and scattered copies are being done..
 > 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> The rcu is about the only simple approach that could be less
+> expensive, and that gets back to the question if you can block an
+> invalidate_start_range in synchronize_rcu or not..
 > 
-> Paolo
+> So, frankly, I'd revert it until someone could prove the rcu solution is
+> OK..
 
-I think KVM_HINTS_REALTIME is being abused somewhat.
-It has no clear meaning and used in different locations 
-for different purposes.
+I have it all disabled at compile time, so reverting isn't urgent
+anymore. I'll wait a couple more days to decide what's cleanest.
 
-For example, i think that using pv queued spinlocks and 
-haltpoll is a desired scenario, which the patch below disallows.
+> BTW, how do you get copy_from_user to work outside a syscall?
 
-Wanpeng Li, currently the driver does not autoload. So polling in 
-the guest has to be enabled manually. Isnt that sufficient?
+By switching to the correct mm.
 
-
+> 
+> Also, why can't this just permanently GUP the pages? In fact, where
+> does it put_page them anyhow? Worrying that 7f466 adds a get_user page
+> but does not add a put_page??
+> 
+> Jason
