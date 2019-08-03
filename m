@@ -2,106 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B0F18030E
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 01:15:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFDBB803C6
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 03:33:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392560AbfHBXPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Aug 2019 19:15:25 -0400
-Received: from mga01.intel.com ([192.55.52.88]:52106 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729782AbfHBXPY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Aug 2019 19:15:24 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 16:15:23 -0700
-X-IronPort-AV: E=Sophos;i="5.64,339,1559545200"; 
-   d="scan'208";a="184721864"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 16:15:23 -0700
-Message-ID: <c43723f2acdf257309dca55eac900dc71bca31c3.camel@linux.intel.com>
-Subject: Re: [PATCH v3 0/6] mm / virtio: Provide support for unused page
- reporting
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
-        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, akpm@linux-foundation.org
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
-        konrad.wilk@oracle.com, willy@infradead.org,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com
-Date:   Fri, 02 Aug 2019 16:15:23 -0700
-In-Reply-To: <ac434f1cad234920c0e75fe809ac05053395524b.camel@linux.intel.com>
-References: <20190801222158.22190.96964.stgit@localhost.localdomain>
-         <9cddf98d-e2ce-0f8a-d46c-e15a54bc7391@redhat.com>
-         <3f6c133ec1eabb8f4fd5c0277f8af254b934b14f.camel@linux.intel.com>
-         <291a1259-fd20-1712-0f0f-5abdefdca95f@redhat.com>
-         <ac434f1cad234920c0e75fe809ac05053395524b.camel@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S2390942AbfHCBdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Aug 2019 21:33:39 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60096 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390493AbfHCBdj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Aug 2019 21:33:39 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x731TjiM041024;
+        Sat, 3 Aug 2019 01:30:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc : subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=PzG5W+xMCPCqX5V/WwOxL0iZTAvQCXHlqgOKkoOg1MQ=;
+ b=2UsMaGPWcwZDgPtPG4vvO4o2+XprVDs5YewZlGJ99NG/oeu5neHqgRolXDdQUDZF8YMI
+ IxYI2JZfBcSTSH5fID80qQTk2RWiC2i2+JKhPWGaFknkpOXtRCnVCla7UCXQjDJ07TcC
+ Y8zIof10PGpETzEquU4Ep6o2lM98f1fWi0d++c5eyIcbTbo8lM/F3e4I2lqnL2U/DsCA
+ 8mUjAebH6kYb0xf2V8EwArlSIvwpZUBAi4UxsNctBmeyR2rpJRijKuOrdEc0RMfPWfzX
+ anPCkdDrm0pEBpPwYOnfJAsFmVDpXvcG9fkUEJAY/0LPZMTheZ3JVp0D915Q7k5fKIRC kQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2u0f8rn4cg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 03 Aug 2019 01:30:13 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x731SCbQ177888;
+        Sat, 3 Aug 2019 01:28:12 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by aserp3030.oracle.com with ESMTP id 2u50aa8apf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Sat, 03 Aug 2019 01:28:12 +0000
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x731SC7W177834;
+        Sat, 3 Aug 2019 01:28:12 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2u50aa8ap0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 03 Aug 2019 01:28:12 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x731S6LT032689;
+        Sat, 3 Aug 2019 01:28:06 GMT
+Received: from mbp2018.cdmnet.org (/82.27.120.181)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 02 Aug 2019 18:28:05 -0700
+Cc:     calum.mackay@oracle.com, Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>
+Subject: Re: [PATCH 31/34] nfs: convert put_page() to put_user_page*()
+To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802022005.5117-32-jhubbard@nvidia.com>
+From:   Calum Mackay <calum.mackay@oracle.com>
+Organization: Oracle
+Message-ID: <1738cb1e-15d8-0bbe-5362-341664f6efc8@oracle.com>
+Date:   Sat, 3 Aug 2019 02:27:55 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0)
+ Gecko/20100101 Thunderbird/70.0a1
 MIME-Version: 1.0
+In-Reply-To: <20190802022005.5117-32-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9337 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908030013
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2019-08-02 at 10:28 -0700, Alexander Duyck wrote:
-> On Fri, 2019-08-02 at 12:19 -0400, Nitesh Narayan Lal wrote:
-> > On 8/2/19 11:13 AM, Alexander Duyck wrote:
-> > > On Fri, 2019-08-02 at 10:41 -0400, Nitesh Narayan Lal wrote:
-> > > > On 8/1/19 6:24 PM, Alexander Duyck wrote:
-> > > > > 
-
-<snip>
-
-> > > > > One side effect of these patches is that the guest becomes much more
-> > > > > resilient in terms of NUMA locality. With the pages being freed and then
-> > > > > reallocated when used it allows for the pages to be much closer to the
-> > > > > active thread, and as a result there can be situations where this patch
-> > > > > set will out-perform the stock kernel when the guest memory is not local
-> > > > > to the guest vCPUs.
-> > > > Was this the reason because of which you were seeing better results for
-> > > > page_fault1 earlier?
-> > > Yes I am thinking so. What I have found is that in the case where the
-> > > patches are not applied on the guest it takes a few runs for the numbers
-> > > to stabilize. What I think was going on is that I was running memhog to
-> > > initially fill the guest and that was placing all the pages on one node or
-> > > the other and as such was causing additional variability as the pages were
-> > > slowly being migrated over to the other node to rebalance the workload.
-> > > One way I tested it was by trying the unpatched case with a direct-
-> > > assigned device since that forces it to pin the memory. In that case I was
-> > > getting bad results consistently as all the memory was forced to come from
-> > > one node during the pre-allocation process.
-> > > 
-> > 
-> > I have also seen that the page_fault1 values take some time to get stabilize on
-> > an unmodified kernel.
-> > What I am wondering here is that if on a single NUMA guest doing the following
-> > will give the right/better idea or not:
-> > 
-> > 1. Pin the guest to a single NUMA node.
-> > 2. Run memhog so that it touches all the guest memory.
-> > 3. Run will-it-scale/page_fault1.
-> > 
-> > Compare/observe the values for the last core (this is considering the other core
-> > values doesn't drastically differ).
+On 02/08/2019 3:20 am, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
 > 
-> I'll rerun the test with qemu affinitized to one specific socket. It will
-> cut the core/thread count down to 8/16 on my test system. Also I will try
-> with THP and page shuffling enabled.
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+> Cc: Anna Schumaker <anna.schumaker@netapp.com>
+> Cc: linux-nfs@vger.kernel.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>   fs/nfs/direct.c | 4 +---
+>   1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
+> index 0cb442406168..b00b89dda3c5 100644
+> --- a/fs/nfs/direct.c
+> +++ b/fs/nfs/direct.c
+> @@ -278,9 +278,7 @@ ssize_t nfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+>   
+>   static void nfs_direct_release_pages(struct page **pages, unsigned int npages)
+>   {
+> -	unsigned int i;
+> -	for (i = 0; i < npages; i++)
+> -		put_page(pages[i]);
+> +	put_user_pages(pages, npages);
+>   }
 
-Okay so results with 8/16 all affinitized to one socket, THP enabled
-page_fault1, and shuffling enabled:
+Since it's static, and only called twice, might it be better to change 
+its two callers [nfs_direct_{read,write}_schedule_iovec()] to call 
+put_user_pages() directly, and remove nfs_direct_release_pages() entirely?
 
-With page reporting disabled in the hypervisor there wasn't much
-difference. I saw a range of 0.69% to -1.35% versus baseline, and an
-average of 0.16% improvement. So effectively no change.
+thanks,
+calum.
 
-With page reporting enabled I saw a range of -2.10% to -4.50%, with an
-average of -3.05% regression. This is much closer to what I would expect
-for this patch set as the page faulting, double zeroing (once in host, and
-once in guest), and hinting process itself should have some overhead.
 
+>   
+>   void nfs_init_cinfo_from_dreq(struct nfs_commit_info *cinfo,
+> 
