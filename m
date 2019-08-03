@@ -2,51 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B8E4D804AA
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 08:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6F0F804B5
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2019 08:36:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbfHCGaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Aug 2019 02:30:10 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:56163 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726612AbfHCGaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Aug 2019 02:30:08 -0400
-Received: by mail-wm1-f68.google.com with SMTP id a15so69932399wmj.5
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 23:30:06 -0700 (PDT)
+        id S1726822AbfHCGg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Aug 2019 02:36:29 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38657 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726806AbfHCGg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Aug 2019 02:36:28 -0400
+Received: by mail-wr1-f66.google.com with SMTP id g17so79310165wrr.5
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2019 23:36:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=k16GciQDdsFXL1/gbaqPADgfBEVZRulBTAenPeqqAmY=;
-        b=bI8MP4NInL0ZnOzhUhw9wTGbl0h+yBwHY4NR+sYDCrb4PM7mDkFCW8JuvFu02OMExS
-         Axr5m8wsDlrC96vi9FJmZrSkua22Ar/eERfyPNSfxhnxLYga7jeqOFfCKVgMhV3brm7M
-         tbNKejzwWRW9oLKxhwE8f5eU68sL58rxBKTLwcq+Tew/aiHFRJcMFchPCBBC82wvkKx4
-         JR0fhC/qhb7/G5uAx6lg6GMIl2YfOZzirWymCYD0cRSbQOscnbULLJ+2Jy0erQplkU/z
-         JP1turwe424vxkrrvtA4yCJ7uPlBkoR3w1eL4BCyWBFUbv/tEg2M0BWaO1mjo08qEO/B
-         XytQ==
-X-Gm-Message-State: APjAAAX5pBwZJGp/MRcywSuBFCcvDNLQQ+AvuPW2t3Tr5D4Sbm70TMHb
-        rJMDvlPp3tijYwN4fBs9n7anXw==
-X-Google-Smtp-Source: APXvYqwS/D+b20geKl9iYom06BhFEyIz+muV/nijzcR5qufyNkHyVlr9BYRCDyDFBdrU0znfJ4mHcQ==
-X-Received: by 2002:a7b:c202:: with SMTP id x2mr7504795wmi.49.1564813805534;
-        Fri, 02 Aug 2019 23:30:05 -0700 (PDT)
+        bh=CxBS9dU0c4bmMBQFrGHmBgCL8Xa1VLsfjnTYVWRb6Mo=;
+        b=nmF3XPsHZQ5vkNYg9sTxDdVpD//5u5pVshLleoTDkRKeWq1hfPy0yjcjH9jyDq5yKt
+         xxbcfplKqMBKdSWG6ZR8dGZ0rDyBN4N0oo+APCu3d2IJr240kCF/VZYSENqRt2MxXkea
+         KawgtwUovRMPD/p/xDfh3qEVR59yTKRM8nJXukykCujuklKtMEQlWNpWcyJG03HIA5L5
+         R1uYjhYW7WprXECbQvUoMvCmJRsmzFrtANrWLEH+hgwuWHyV1TF4lIdSs3aEOPZTufWI
+         VVZJSK1CwHHtaz0UBePT+KldOoVVYxxg183b2hx7QIrDZF5A0EIQkEpdZEQ2DN49jBo/
+         tmPg==
+X-Gm-Message-State: APjAAAV7ygn3jlczDW9BgVXV1I9AjAMzTMr8PqmV+SGwK0bEXJOsOQxE
+        noRETBAadzCTuLprOq88+WBIXw==
+X-Google-Smtp-Source: APXvYqzZQCJeHqyLw20M7N2TNmKBi8IwDHr1fSzkT1RENNvynG3/SjhC6PDSr6O2Hjklu3bZBeMSuA==
+X-Received: by 2002:a05:6000:4b:: with SMTP id k11mr47230220wrx.82.1564814186606;
+        Fri, 02 Aug 2019 23:36:26 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:4013:e920:9388:c3ff? ([2001:b07:6468:f312:4013:e920:9388:c3ff])
-        by smtp.gmail.com with ESMTPSA id o20sm200895026wrh.8.2019.08.02.23.30.04
+        by smtp.gmail.com with ESMTPSA id s10sm94948121wmf.8.2019.08.02.23.36.25
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 23:30:05 -0700 (PDT)
-Subject: Re: [PATCH 0/3] KVM: x86/mmu: minor MMIO SPTE cleanup
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190801203523.5536-1-sean.j.christopherson@intel.com>
+        Fri, 02 Aug 2019 23:36:25 -0700 (PDT)
+Subject: Re: [PATCH v3 1/3] KVM: Fix leak vCPU's VMCS value into other pCPU
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Marc Zyngier <Marc.Zyngier@arm.com>, stable@vger.kernel.org
+References: <1564630214-28442-1-git-send-email-wanpengli@tencent.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <c2860baa-6ef9-1020-eb6f-886a3b7cda65@redhat.com>
-Date:   Sat, 3 Aug 2019 08:30:04 +0200
+Message-ID: <a2900ee5-61cf-a35b-7ae5-b326052e0a6d@redhat.com>
+Date:   Sat, 3 Aug 2019 08:36:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190801203523.5536-1-sean.j.christopherson@intel.com>
+In-Reply-To: <1564630214-28442-1-git-send-email-wanpengli@tencent.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -55,28 +57,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/08/19 22:35, Sean Christopherson wrote:
-> A few loosely related MMIO SPTE patches to get rid of a bit of cruft that
-> has been a source of annoyance when mucking around in the MMIO code.
-> 
-> No functional changes intended.
-> 
-> Sean Christopherson (3):
->   KVM: x86: Rename access permissions cache member in struct
->     kvm_vcpu_arch
->   KVM: x86/mmu: Add explicit access mask for MMIO SPTEs
->   KVM: x86/mmu: Consolidate "is MMIO SPTE" code
-> 
->  Documentation/virtual/kvm/mmu.txt |  4 ++--
->  arch/x86/include/asm/kvm_host.h   |  2 +-
->  arch/x86/kvm/mmu.c                | 31 +++++++++++++++++--------------
->  arch/x86/kvm/mmu.h                |  2 +-
->  arch/x86/kvm/vmx/vmx.c            |  2 +-
->  arch/x86/kvm/x86.c                |  2 +-
->  arch/x86/kvm/x86.h                |  2 +-
->  7 files changed, 24 insertions(+), 21 deletions(-)
-> 
+On 01/08/19 05:30, Wanpeng Li wrote:
+> +bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
+> +{
+> +	if (READ_ONCE(vcpu->arch.pv.pv_unhalted))
+> +		return true;
+> +
+> +	if (kvm_test_request(KVM_REQ_NMI, vcpu) ||
+> +	    (READ_ONCE(vcpu->arch.nmi_pending) &&
+> +	     kvm_x86_ops->nmi_allowed(vcpu)))
 
-Queued, thanks.
+You cannot check kvm_x86_ops->nmi_allowed(vcpu), so just use
+kvm_test_request.
+
+> +		return true;
+> +
+> +	if (kvm_test_request(KVM_REQ_SMI, vcpu) ||
+> +	    (READ_ONCE(vcpu->arch.smi_pending) && !is_smm(vcpu)))
+> +		return true;
+
+Same here, if only for simplicity.
+
+> +	if (kvm_test_request(KVM_REQ_EVENT, vcpu))
+> +		return true;
+> +
+> +	if (vcpu->arch.apicv_active && kvm_x86_ops->apicv_test_pi_on(vcpu))
+> +		return true;
+
+Let's call it apicv_has_pending_interrupt instead.
+
+Also, please add a comment in kvm_main.c saying that
+kvm_arch_dy_runnable is called outside vcpu_load/vcpu_put.
 
 Paolo
+
+> +
+> +	return false;
+> +}
