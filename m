@@ -2,128 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DC72827C2
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 00:54:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8664827D6
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 01:17:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730572AbfHEWyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 18:54:38 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:17712 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728483AbfHEWyi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 18:54:38 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d48b3b50000>; Mon, 05 Aug 2019 15:54:45 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 05 Aug 2019 15:54:36 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 05 Aug 2019 15:54:36 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 5 Aug
- 2019 22:54:35 +0000
-Subject: Re: [PATCH 00/12] block/bio, fs: convert put_page() to
- put_user_page*()
-To:     Christoph Hellwig <hch@infradead.org>, <john.hubbard@gmail.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <ceph-devel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <samba-technical@lists.samba.org>,
-        <v9fs-developer@lists.sourceforge.net>,
-        <virtualization@lists.linux-foundation.org>
-References: <20190724042518.14363-1-jhubbard@nvidia.com>
- <20190724061750.GA19397@infradead.org>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <c35aa2bf-c830-9e57-78ca-9ce6fb6cb53b@nvidia.com>
-Date:   Mon, 5 Aug 2019 15:54:35 -0700
+        id S1730907AbfHEXRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 19:17:31 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41099 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727928AbfHEXRb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 19:17:31 -0400
+Received: by mail-wr1-f66.google.com with SMTP id c2so82758175wrm.8
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 16:17:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PeMpHB1UaVYGh8oqL7/+H8waTPb/Jq8dxVIPc4CJ+Qk=;
+        b=B+MOm0DAhyPIdohaD7OpFSzkrqppjACHyzZHnHkS4kyDIu3vWNbCGTfTPAv3XAYjUb
+         EjEc8BZw8Cv9OQxUYRN7WVxWfVKtKOL1JznIeqb82nWqSwFZ3ykjs5pcHaofKuRnq70S
+         bwbRHXd+SLKXk54dmkksqXOKcKZaCrwnqlvvGkGCZGDcTg46lRjZtULosjryM3AB0U2M
+         epJcQzlXz8Py8p6YCbwz5zRXWbUvuG+LZzVqpwQU+RcOUNCc55ZSL82tXd6m23jUuuEO
+         Y5TTZUrCyAoZlb1y49k3rxngZ960RwGrFEYwWHFZGPNq+YEMDGqEQiD2TXphYGhcZFwp
+         +K0A==
+X-Gm-Message-State: APjAAAWd8ItLmSyhk6pmVxCl0zQW/DaSnpTMYIEjJ3CdeM7BuQx28QS3
+        Zndvl+5GMtMDQE4V8+o6HcRfxg==
+X-Google-Smtp-Source: APXvYqxCLIfa99wR63hAGf/aZH8p3Qjmcyz3+bBsnzEqVWm1qaEhqTrx+w5t3jeY/vvTd63LA9R0og==
+X-Received: by 2002:a5d:67cd:: with SMTP id n13mr342350wrw.138.1565047049292;
+        Mon, 05 Aug 2019 16:17:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810? ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
+        by smtp.gmail.com with ESMTPSA id h14sm85951308wrs.66.2019.08.05.16.17.28
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Aug 2019 16:17:28 -0700 (PDT)
+Subject: Re: [PATCH v4 1/6] KVM: Fix leak vCPU's VMCS value into other pCPU
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Marc Zyngier <Marc.Zyngier@arm.com>, stable@vger.kernel.org
+References: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9acbc733-442f-0f65-9b56-ff800a3fa0f5@redhat.com>
+Date:   Tue, 6 Aug 2019 01:17:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190724061750.GA19397@infradead.org>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1565045686; bh=su7Un7Lsr0IB37YVHfSyk5WWru26t8lLPZpTgkOrxAY=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=MABsVuv2G9BzGpy+DkzIhxi90zmgNTMYOagd/ashPLcDOi2sWU6YznkbyPDv/xcq/
-         O5RFeXAwmCAh/JO0LO+ze2NEhPe2n+psweVYXa8pjERXCCCfGYTxQ9SDkc4s4KNR59
-         NLyb52q+/1fN+RE5h7a69JZCsNpaL7gcHJobrCC7E9UqWrmG9ACN7VwIX7DKaTA/Rb
-         eRaFep1AoazjTxyXxT6Tx1JQhDVjP38m4xzwGlHYvs4ZQCYA68yceeG7xda5nxeUcP
-         Q7wlfmFbcUA/T+jBVHNbqmQyCuHaQMhgKiqtQK78vKYLrwPUcmbghr4B0X7IdrZjfb
-         e4QZrUIdtNMcg==
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/23/19 11:17 PM, Christoph Hellwig wrote:
-> On Tue, Jul 23, 2019 at 09:25:06PM -0700, john.hubbard@gmail.com wrote:
->> * Store, in the iov_iter, a "came from gup (get_user_pages)" parameter.
->>   Then, use the new iov_iter_get_pages_use_gup() to retrieve it when
->>   it is time to release the pages. That allows choosing between put_page=
-()
->>   and put_user_page*().
->>
->> * Pass in one more piece of information to bio_release_pages: a "from_gu=
-p"
->>   parameter. Similar use as above.
->>
->> * Change the block layer, and several file systems, to use
->>   put_user_page*().
->=20
-> I think we can do this in a simple and better way.  We have 5 ITER_*
-> types.  Of those ITER_DISCARD as the name suggests never uses pages, so
-> we can skip handling it.  ITER_PIPE is rejected =D1=96n the direct I/O pa=
-th,
-> which leaves us with three.
->=20
+On 05/08/19 04:03, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> After commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts), a 
+> five years old bug is exposed. Running ebizzy benchmark in three 80 vCPUs VMs 
+> on one 80 pCPUs Skylake server, a lot of rcu_sched stall warning splatting 
+> in the VMs after stress testing:
+> 
+>  INFO: rcu_sched detected stalls on CPUs/tasks: { 4 41 57 62 77} (detected by 15, t=60004 jiffies, g=899, c=898, q=15073)
+>  Call Trace:
+>    flush_tlb_mm_range+0x68/0x140
+>    tlb_flush_mmu.part.75+0x37/0xe0
+>    tlb_finish_mmu+0x55/0x60
+>    zap_page_range+0x142/0x190
+>    SyS_madvise+0x3cd/0x9c0
+>    system_call_fastpath+0x1c/0x21
+> 
+> swait_active() sustains to be true before finish_swait() is called in 
+> kvm_vcpu_block(), voluntarily preempted vCPUs are taken into account 
+> by kvm_vcpu_on_spin() loop greatly increases the probability condition 
+> kvm_arch_vcpu_runnable(vcpu) is checked and can be true, when APICv 
+> is enabled the yield-candidate vCPU's VMCS RVI field leaks(by 
+> vmx_sync_pir_to_irr()) into spinning-on-a-taken-lock vCPU's current 
+> VMCS.
+> 
+> This patch fixes it by checking conservatively a subset of events.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Marc Zyngier <Marc.Zyngier@arm.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 98f4a1467 (KVM: add kvm_arch_vcpu_runnable() test to kvm_vcpu_on_spin() loop)
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+> v3 -> v4:
+>  * just test KVM_REQ_*
+>  * rename the hook to apicv_has_pending_interrupt
+>  * wrap with #ifdef CONFIG_KVM_ASYNC_PF 
+> v2 -> v3:
+>  * check conservatively a subset of events
+> v1 -> v2:
+>  * checking swait_active(&vcpu->wq) for involuntary preemption
+> 
+>  arch/mips/kvm/mips.c            |  5 +++++
+>  arch/powerpc/kvm/powerpc.c      |  5 +++++
+>  arch/s390/kvm/kvm-s390.c        |  5 +++++
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/svm.c              |  6 ++++++
+>  arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+>  arch/x86/kvm/x86.c              | 16 ++++++++++++++++
+>  include/linux/kvm_host.h        |  1 +
+>  virt/kvm/arm/arm.c              |  5 +++++
+>  virt/kvm/kvm_main.c             | 16 +++++++++++++++-
+>  10 files changed, 65 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index 2cfe839..95a4642 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -98,6 +98,11 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+>  	return !!(vcpu->arch.pending_exceptions);
+>  }
+>  
+> +bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
 
-Hi Christoph,
+Using a __weak definition for the default implementation is a bit more
+concise.  Queued with that change.
 
-Are you working on anything like this? Or on the put_user_bvec() idea?
-Please let me know, otherwise I'll go in and implement something here.
-
-
-thanks,
---=20
-John Hubbard
-NVIDIA
-
-> Out of those ITER_BVEC needs a user page reference, so we want to call
-> put_user_page* on it.  ITER_BVEC always already has page reference,
-> which means in the block direct I/O path path we alread don't take
-> a page reference.  We should extent that handling to all other calls
-> of iov_iter_get_pages / iov_iter_get_pages_alloc.  I think we should
-> just reject ITER_KVEC for direct I/O as well as we have no users and
-> it is rather pointless.  Alternatively if we see a use for it the
-> callers should always have a life page reference anyway (or might
-> be on kmalloc memory), so we really should not take a reference either.
->=20
-> In other words:  the only time we should ever have to put a page in
-> this patch is when they are user pages.  We'll need to clean up
-> various bits of code for that, but that can be done gradually before
-> even getting to the actual put_user_pages conversion.
->=20
+Paolo
