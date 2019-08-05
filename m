@@ -2,59 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4F2C81024
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 04:03:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96F5A81028
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 04:03:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727086AbfHECDl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727129AbfHECDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Aug 2019 22:03:50 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40398 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727082AbfHECDl (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 4 Aug 2019 22:03:41 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36553 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727060AbfHECDj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Aug 2019 22:03:39 -0400
-Received: by mail-pg1-f195.google.com with SMTP id l21so38836418pgm.3;
-        Sun, 04 Aug 2019 19:03:39 -0700 (PDT)
+Received: by mail-pf1-f195.google.com with SMTP id p184so38765839pfp.7;
+        Sun, 04 Aug 2019 19:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jGqqJdoFPgJRfsp1veHs6du8u1sFJO+Ydm26xk5LIKY=;
-        b=Xk3DeOF+Q2VofPljRLhC6CCEq1+BN2Mk/wjSANITZuaSY20WOH+WPYkQJWFOObpmrO
-         bpsnSXk5JcWYIMKSZC2plULWQtsCTYiGvkD/4az2GR4uOhj0wd+LstHF/ClEosGMCQPw
-         lb1kb55OEJFNG7Eh9E644AfDvu3Lto1ZK89D2tyjouFjQguZnjRVFxaBrn4tnKUJyiNx
-         Sr16EnS0eruQ0YO6gVBpfXjKsr/7r+/AemBkoYTu1EOHOJsFnCWSlOF9ccss3HE3Ak0b
-         M/G5jQ3JvY9h9Xvc+Vmv0dd0UutHogKn/F7x5BHeHE0+hlLlUyh7+Qx2NVfiUnXByZz6
-         r06A==
+        bh=tRG59/5lE82m1QRtQTpYyWmXnnIcRnkPvf94Bgtr6Rs=;
+        b=q9mkPyPceELpn2nS45fd46f3dkwHuqerVMaCCDQW9O7ZH/uJcjqgXNwUzHpEPO+fkV
+         bhmqeoFDPFXWFV6GCKMOonq5lalU8ZX8371rKLqI8mf4AnJd/klM8/C6hx2qxoqZrsdi
+         PaJyeiqaJ4a35dHkOri7RlJ0enZQfn0EG6QxmnHMv8FLtl7QojEjVj8oCt7dRcA6whay
+         IttSV6Ui/sXbt3uXRuGl+5hibYOHTLWKXVVG6TNpPzrU0obWgS3MObkwqMIeD79n5QCs
+         vkjgtxsl6zShlvKSAEm70dD4GU/gIMhpMBToTEbhuGNVegwWv5/sty+QGTrUaj1vIh+s
+         2VKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jGqqJdoFPgJRfsp1veHs6du8u1sFJO+Ydm26xk5LIKY=;
-        b=JQrOjVgR8lKghFumUgt4rYXMU9FkypsIIZyYPMB0rfMNXh/0QLoMmQ5ccRUdTc0Zgv
-         jybZvCeDtqT1hCtsaTv6vIgevVPe8V6HyUv535eE80Skav+VMVYMjgSzXtVMk+kh2Kik
-         hgcgC40UBIbBOdv7igcukcn+oZWpX8bdz/C/f/Be+6jm+Sv6pMwJragSZm4y5c3VeMFf
-         ve7upF2w6w8ZPWP0eSVA5yd32E+llzNuPgz4NIIP/A7NM+abMtytqsjsE+VpC5sApnxw
-         F7TrWFb3pTLqit4QcYc+Cb4qk4/qTSu3ZqPVFSMVLc6tlb/AAQElIhuPFlvJRp9Wrw4i
-         SHkw==
-X-Gm-Message-State: APjAAAXfX6o3Z1maRTzjnGUIjBh2kMH/GOAIm3Fcszdz/2laKVlSTDjU
-        gMWMJ+rXcpL4/tatoxyfrL+8Pp2L
-X-Google-Smtp-Source: APXvYqz+Q9PM/X7k6L6D+IfKYndmCPEBeDNfA4xoBsr4C1ljccCsECgjdtNKyzuq869gnzWJhdzYzw==
-X-Received: by 2002:a63:2a08:: with SMTP id q8mr102013732pgq.415.1564970618660;
-        Sun, 04 Aug 2019 19:03:38 -0700 (PDT)
+        bh=tRG59/5lE82m1QRtQTpYyWmXnnIcRnkPvf94Bgtr6Rs=;
+        b=nUxOwjVBHFucdJZNouf/lHw8kIZiodoFumF0oGGn72L1zhEJUUsqrWGKga/BUfBTQL
+         HM4IBrrT6Z009oQjfP1JH6OOQdiXALHzi2b4YvNmj43OC7wO/H6FC7Adzrzf0gyi5Kz5
+         N2F8Y2N0na+xdEux86gb1TcbSpJhS0jLJftGXoSP0s0/QN9Fsf5pHfJaU3YnKJfeTY+A
+         QrLgry8aJZZtKXtUPkzp2sQDOKnQ7LRYkZj8DalcEdbpwFdp6Gp7mE0X6/H9zDxWzLYJ
+         cszVti1EAtxQq1p56dbSx6X3ZVHkHL4e4ZMMR79O7A5NnONAedbh/4MUoatGuS02IHnx
+         zgkA==
+X-Gm-Message-State: APjAAAXX0+Of+grKcA2viLXwQMW+2+ASF14Ucsr5PuLk3hJ7pXvf3NnE
+        PmddhFfutuswBVSCiLHEi5yJiGxn
+X-Google-Smtp-Source: APXvYqwx+O2T3Y/610fDmG08ETEs/T5eFALd0i8ye3h0Jacluk6ChqZA8qzKZcGWSykIkqQbUTCC7A==
+X-Received: by 2002:a63:ec13:: with SMTP id j19mr52731786pgh.369.1564970620508;
+        Sun, 04 Aug 2019 19:03:40 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id o32sm14739365pje.9.2019.08.04.19.03.36
+        by smtp.googlemail.com with ESMTPSA id o32sm14739365pje.9.2019.08.04.19.03.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 04 Aug 2019 19:03:38 -0700 (PDT)
+        Sun, 04 Aug 2019 19:03:40 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Nadav Amit <namit@vmware.com>
-Subject: [PATCH v4 4/6] KVM: X86: Use IPI shorthands in kvm guest when support
-Date:   Mon,  5 Aug 2019 10:03:22 +0800
-Message-Id: <1564970604-10044-4-git-send-email-wanpengli@tencent.com>
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH v4 5/6] KVM: LAPIC: Add pv ipi tracepoint
+Date:   Mon,  5 Aug 2019 10:03:23 +0800
+Message-Id: <1564970604-10044-5-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
 References: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
@@ -68,58 +65,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-IPI shorthand is supported now by linux apic/x2apic driver, switch to
-IPI shorthand for all excluding self and all including self destination
-shorthand in kvm guest, to avoid splitting the target mask into several
-PV IPI hypercalls. This patch removes the kvm_send_ipi_all() and
-kvm_send_ipi_allbutself() since the callers in APIC codes have already
-taken care of apic_use_ipi_shorthand and fallback to ->send_IPI_mask
-and ->send_IPI_mask_allbutself if it is false.
+Add pv ipi tracepoint.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Nadav Amit <namit@vmware.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
-Note: rebase against tip tree's x86/apic branch, but just modify kvm codes
-v1 -> v2:
- * remove kvm_send_ipi_all() and kvm_send_ipi_allbutself()
+ arch/x86/kvm/lapic.c |  2 ++
+ arch/x86/kvm/trace.h | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
- arch/x86/kernel/kvm.c | 12 ------------
- 1 file changed, 12 deletions(-)
-
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index b7f34fe..96626d8 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -505,16 +505,6 @@ static void kvm_send_ipi_mask_allbutself(const struct cpumask *mask, int vector)
- 	__send_ipi_mask(local_mask, vector);
- }
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 685d17c..df5cd07 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -570,6 +570,8 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
+ 	irq.level = (icr & APIC_INT_ASSERT) != 0;
+ 	irq.trig_mode = icr & APIC_INT_LEVELTRIG;
  
--static void kvm_send_ipi_allbutself(int vector)
--{
--	kvm_send_ipi_mask_allbutself(cpu_online_mask, vector);
--}
--
--static void kvm_send_ipi_all(int vector)
--{
--	__send_ipi_mask(cpu_online_mask, vector);
--}
--
- /*
-  * Set the IPI entry points
-  */
-@@ -522,8 +512,6 @@ static void kvm_setup_pv_ipi(void)
- {
- 	apic->send_IPI_mask = kvm_send_ipi_mask;
- 	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
--	apic->send_IPI_allbutself = kvm_send_ipi_allbutself;
--	apic->send_IPI_all = kvm_send_ipi_all;
- 	pr_info("KVM setup pv IPIs\n");
- }
++	trace_kvm_pv_send_ipi(irq.vector, min, ipi_bitmap_low, ipi_bitmap_high);
++
+ 	if (icr & APIC_DEST_MASK)
+ 		return -KVM_EINVAL;
+ 	if (icr & APIC_SHORT_MASK)
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index b5c831e..ce6ee34 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -1462,6 +1462,31 @@ TRACE_EVENT(kvm_hv_send_ipi_ex,
+ 		  __entry->vector, __entry->format,
+ 		  __entry->valid_bank_mask)
+ );
++
++/*
++ * Tracepoints for kvm_pv_send_ipi.
++ */
++TRACE_EVENT(kvm_pv_send_ipi,
++	TP_PROTO(u32 vector, u32 min, unsigned long ipi_bitmap_low, unsigned long ipi_bitmap_high),
++	TP_ARGS(vector, min, ipi_bitmap_low, ipi_bitmap_high),
++
++	TP_STRUCT__entry(
++		__field(u32, vector)
++		__field(u32, min)
++		__field(unsigned long, ipi_bitmap_low)
++		__field(unsigned long, ipi_bitmap_high)
++	),
++
++	TP_fast_assign(
++		__entry->vector = vector;
++		__entry->min = min;
++		__entry->ipi_bitmap_low = ipi_bitmap_low;
++		__entry->ipi_bitmap_high = ipi_bitmap_high;
++	),
++
++	TP_printk("vector %d min 0x%x ipi_bitmap_low 0x%lx ipi_bitmap_high 0x%lx",
++		  __entry->vector, __entry->min, __entry->ipi_bitmap_low, __entry->ipi_bitmap_high)
++);
+ #endif /* _TRACE_KVM_H */
  
+ #undef TRACE_INCLUDE_PATH
 -- 
 2.7.4
 
