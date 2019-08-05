@@ -2,124 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FA7181122
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 06:42:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2E04811C4
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 07:48:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726757AbfHEElw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 00:41:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41568 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725782AbfHEElv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 00:41:51 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9510FC0AD2BB;
-        Mon,  5 Aug 2019 04:41:51 +0000 (UTC)
-Received: from [10.72.12.115] (ovpn-12-115.pek2.redhat.com [10.72.12.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EE54619C59;
-        Mon,  5 Aug 2019 04:41:46 +0000 (UTC)
-Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
- with worker
-From:   Jason Wang <jasowang@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-References: <20190731084655.7024-1-jasowang@redhat.com>
- <20190731084655.7024-8-jasowang@redhat.com> <20190731123935.GC3946@ziepe.ca>
- <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
- <20190731193057.GG3946@ziepe.ca>
- <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
- <20190801141512.GB23899@ziepe.ca>
- <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
- <20190802124613.GA11245@ziepe.ca>
- <20190802100414-mutt-send-email-mst@kernel.org>
- <e8ecb811-6653-cff4-bc11-81f4ccb0dbbf@redhat.com>
-Message-ID: <494ac30d-b750-52c8-b927-16cd4b9414c4@redhat.com>
-Date:   Mon, 5 Aug 2019 12:41:45 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727251AbfHEFsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 01:48:50 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34830 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726423AbfHEFst (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 01:48:49 -0400
+Received: by mail-wm1-f65.google.com with SMTP id l2so71664659wmg.0
+        for <kvm@vger.kernel.org>; Sun, 04 Aug 2019 22:48:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1TgAgMN1acZNwv5Q61grmXOTBBeUYwY88MxdxlFsIgo=;
+        b=sVnmdtBTLTowplyB43mPn9+XoIJom4npEqgCUIIA9I6z56mRtxYVMUUcDlq+XvFMl0
+         SN6cLhPICpsyH32V+Pk3fcQsMLNfI8XWZHZwK35OZEmkchXkHZuB2R7U9Eo2vMf+8eZc
+         4Wk2w/b2Q0K+QYb5s/FZZ++0Zu4jh5eYgUzfhRNP9nUtl1LG1eQPQyDFiTN+gW2fkht3
+         ukkGxL+AVLE41Lp2MCbJZ4PFjOU7foC7WwD4VgSBd9EkBfKFfqO9aH43GMaCxkzPcyb/
+         i8QUc3Pb1e8jaxMzV8q1CdLlAQE0pQlf87lWDs3irHeCIAkKkcaq6jEhhjCJ03SVqrDK
+         gISQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1TgAgMN1acZNwv5Q61grmXOTBBeUYwY88MxdxlFsIgo=;
+        b=FsebE7ZajUtO0c0vm//g2WW6Qi3Dd6EogZeXMEhqB9Tu9Kr6tghT122zyNDMiQuSfM
+         EqX8224UeAvo1fKO2OvZSFEGIlUKfokpH9WJCff/MkzUZkHKYRowVJb28od0lYz4Pg9+
+         ElqqWnFVQzsB/lhYiUgKGJXAtpgHRLVQRqFV+iBH1siyB3UWlqGuwcb1YE17uTKaPnkO
+         XgXKx3AMEDlMsAGTJPHIgVn98zaDNYeXhq21T15ekOWgVPYWYfVclM+S4eISbbaRqWGs
+         moYYLMhMUwVE/qqDZLv0Qeqi9F39sgUgbpIIGNY+MpC0BaridezHsIFKn492Qw59P5U5
+         VQYQ==
+X-Gm-Message-State: APjAAAVko3/d+EyQqLK72Xa29jLQa9s9b2mmXVl5BpN39vm3RRG9AgXQ
+        YuySgkwkPGpcP9ViM+uQGoYCD/uh5MM44x2euw4Pqg==
+X-Google-Smtp-Source: APXvYqzW3IowkTSrn4nUEPSacemcxGVfBVssQwFtqtRFmO8Phkuhnd8lGP7wGdYpat5rhVK2w/B0MXCPFoNEYeOkEz4=
+X-Received: by 2002:a1c:cfc5:: with SMTP id f188mr15160196wmg.24.1564984126543;
+ Sun, 04 Aug 2019 22:48:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e8ecb811-6653-cff4-bc11-81f4ccb0dbbf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Mon, 05 Aug 2019 04:41:51 +0000 (UTC)
+References: <20190802074620.115029-1-anup.patel@wdc.com> <20190802074620.115029-5-anup.patel@wdc.com>
+ <9f30d2b6-fa2c-22ff-e597-b9fbd1c700ff@redhat.com>
+In-Reply-To: <9f30d2b6-fa2c-22ff-e597-b9fbd1c700ff@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 5 Aug 2019 11:18:34 +0530
+Message-ID: <CAAhSdy16w+98VB7+DtVJOngABu2uUDmYmqURMsRBqzvKCQfGUQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/19] RISC-V: Add initial skeletal KVM support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/8/5 下午12:36, Jason Wang wrote:
+On Fri, Aug 2, 2019 at 2:31 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On 2019/8/2 下午10:27, Michael S. Tsirkin wrote:
->> On Fri, Aug 02, 2019 at 09:46:13AM -0300, Jason Gunthorpe wrote:
->>> On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
->>>>> This must be a proper barrier, like a spinlock, mutex, or
->>>>> synchronize_rcu.
->>>>
->>>> I start with synchronize_rcu() but both you and Michael raise some
->>>> concern.
->>> I've also idly wondered if calling synchronize_rcu() under the various
->>> mm locks is a deadlock situation.
->>>
->>>> Then I try spinlock and mutex:
->>>>
->>>> 1) spinlock: add lots of overhead on datapath, this leads 0 
->>>> performance
->>>> improvement.
->>> I think the topic here is correctness not performance improvement
->> The topic is whether we should revert
->> commit 7f466032dc9 ("vhost: access vq metadata through kernel virtual 
->> address")
->>
->> or keep it in. The only reason to keep it is performance.
+> On 02/08/19 09:47, Anup Patel wrote:
+> > +static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > +{
+> > +     if (kvm_request_pending(vcpu)) {
+> > +             /* TODO: */
+> > +
+> > +             /*
+> > +              * Clear IRQ_PENDING requests that were made to guarantee
+> > +              * that a VCPU sees new virtual interrupts.
+> > +              */
+> > +             kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
+> > +     }
+> > +}
 >
->
-> Maybe it's time to introduce the config option?
+> This kvm_check_request can go away (as it does in patch 6).
 
+Argh, I should have removed it in v2 itself.
 
-Or does it make sense if I post a V3 with:
-
-- introduce config option and disable the optimization by default
-
-- switch from synchronize_rcu() to vhost_flush_work(), but the rest are 
-the same
-
-This can give us some breath to decide which way should go for next release?
-
-Thanks
-
+Thanks for catching. I will update.
 
 >
+> > +int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> > +{
+> > +     int ret;
+> > +     unsigned long scause, stval;
 >
->>
->> Now as long as all this code is disabled anyway, we can experiment a
->> bit.
->>
->> I personally feel we would be best served by having two code paths:
->>
->> - Access to VM memory directly mapped into kernel
->> - Access to userspace
->>
->>
->> Having it all cleanly split will allow a bunch of optimizations, for
->> example for years now we planned to be able to process an incoming short
->> packet directly on softirq path, or an outgoing on directly within
->> eventfd.
+> You need to wrap this with srcu_read_lock/srcu_read_unlock, otherwise
+> stage2_page_fault can access freed memslot arrays.  (ARM doesn't have
+> this issue because it does not have to decode instructions on MMIO faults).
+
+Looking at KVM ARM/ARM64, I was not sure about use of kvm->srcu. Thanks
+for clarifying. I will use kvm->srcu like you suggested.
+
+>
+> That is,
+>
+>         vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+>
+> > +     /* Process MMIO value returned from user-space */
+> > +     if (run->exit_reason == KVM_EXIT_MMIO) {
+> > +             ret = kvm_riscv_vcpu_mmio_return(vcpu, vcpu->run);
+> > +             if (ret)
+> > +                     return ret;
+> > +     }
+> > +
+> > +     if (run->immediate_exit)
+> > +             return -EINTR;
+> > +
+> > +     vcpu_load(vcpu);
+> > +
+> > +     kvm_sigset_activate(vcpu);
+> > +
+> > +     ret = 1;
+> > +     run->exit_reason = KVM_EXIT_UNKNOWN;
+> > +     while (ret > 0) {
+> > +             /* Check conditions before entering the guest */
+> > +             cond_resched();
+> > +
+> > +             kvm_riscv_check_vcpu_requests(vcpu);
+> > +
+> > +             preempt_disable();
+> > +
+> > +             local_irq_disable();
+> > +
+> > +             /*
+> > +              * Exit if we have a signal pending so that we can deliver
+> > +              * the signal to user space.
+> > +              */
+> > +             if (signal_pending(current)) {
+> > +                     ret = -EINTR;
+> > +                     run->exit_reason = KVM_EXIT_INTR;
+> > +             }
+>
+> Add an srcu_read_unlock here (and then the smp_store_mb can become
+> smp_mb__after_srcu_read_unlock + WRITE_ONCE).
+
+Sure, I will update.
+
 >
 >
-> It's not hard consider we've already had our own accssors. But the 
-> question is (as asked in another thread), do you want permanent GUP or 
-> still use MMU notifiers.
+> > +             /*
+> > +              * Ensure we set mode to IN_GUEST_MODE after we disable
+> > +              * interrupts and before the final VCPU requests check.
+> > +              * See the comment in kvm_vcpu_exiting_guest_mode() and
+> > +              * Documentation/virtual/kvm/vcpu-requests.rst
+> > +              */
+> > +             smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+> > +
+> > +             if (ret <= 0 ||
+> > +                 kvm_request_pending(vcpu)) {
+> > +                     vcpu->mode = OUTSIDE_GUEST_MODE;
+> > +                     local_irq_enable();
+> > +                     preempt_enable();
+> > +                     continue;
+> > +             }
+> > +
+> > +             guest_enter_irqoff();
+> > +
+> > +             __kvm_riscv_switch_to(&vcpu->arch);
+> > +
+> > +             vcpu->mode = OUTSIDE_GUEST_MODE;
+> > +             vcpu->stat.exits++;
+> > +
+> > +             /* Save SCAUSE and STVAL because we might get an interrupt
+> > +              * between __kvm_riscv_switch_to() and local_irq_enable()
+> > +              * which can potentially overwrite SCAUSE and STVAL.
+> > +              */
+> > +             scause = csr_read(CSR_SCAUSE);
+> > +             stval = csr_read(CSR_STVAL);
+> > +
+> > +             /*
+> > +              * We may have taken a host interrupt in VS/VU-mode (i.e.
+> > +              * while executing the guest). This interrupt is still
+> > +              * pending, as we haven't serviced it yet!
+> > +              *
+> > +              * We're now back in HS-mode with interrupts disabled
+> > +              * so enabling the interrupts now will have the effect
+> > +              * of taking the interrupt again, in HS-mode this time.
+> > +              */
+> > +             local_irq_enable();
+> > +
+> > +             /*
+> > +              * We do local_irq_enable() before calling guest_exit() so
+> > +              * that if a timer interrupt hits while running the guest
+> > +              * we account that tick as being spent in the guest. We
+> > +              * enable preemption after calling guest_exit() so that if
+> > +              * we get preempted we make sure ticks after that is not
+> > +              * counted as guest time.
+> > +              */
+> > +             guest_exit();
+> > +
+> > +             preempt_enable();
 >
-> Thanks
+> And another srcu_read_lock here.  Using vcpu->srcu_idx instead of a
+> local variable also allows system_opcode_insn to wrap kvm_vcpu_block
+> with a srcu_read_unlock/srcu_read_lock pair.
+
+Okay.
+
 >
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+> > +             ret = kvm_riscv_vcpu_exit(vcpu, run, scause, stval);
+> > +     }
+> > +
+> > +     kvm_sigset_deactivate(vcpu);
+>
+> And finally srcu_read_unlock here.
+
+Okay.
+
+Regards,
+Anup
