@@ -2,233 +2,349 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2462A82137
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 18:05:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A8548215C
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 18:10:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729818AbfHEQFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 12:05:41 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35575 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728760AbfHEQFk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 12:05:40 -0400
-Received: by mail-wr1-f65.google.com with SMTP id y4so84982622wrm.2
-        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 09:05:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=F30R4qg1ehN1CROeEQ4O0h0Y95Idm2w6D1zzJAIh5ac=;
-        b=J9cAExhPJ3YWklneaX2hjxbwf6xigZAVJbLffTnZ5vfiqP+vb61tWYDj1ldZzkvILo
-         TUBtoNO6I2rINZK134XHXaSzZYNOWcPGkS38t9h2Qv+CsjvJJPED7lATUUnc2X0N6nE0
-         SkT63ECK2/l4LpB3v8eMAJKJxWdAiQ3QRY6vF/go3M69wAb50WJX0NrxP0FMb0nbL1cb
-         O+JVmRy1BpnN1XNSTxgqe1QOlaHnkg5wy4vCeDc27VK2kYVNh3tdGmR4U+CwEOlvymEZ
-         HVRV1JWVq42tx7cFXplguMz8h8Pu1Cc14Q58+3j33dwswQNLp4rDm7w2WNT1aitn3/BU
-         23uw==
-X-Gm-Message-State: APjAAAV9ROQqTMr2KXBx5/QQwgfNam4FnH65RPQBenAZ3hWMg5Q/zJ4v
-        8AYt+0pzpRQJhzc7mM4Oxx+YOb7JNdY=
-X-Google-Smtp-Source: APXvYqy7A9JkVqAMIMky+gYE7j+6NzxtekmRVJCCCasvFXTPDZNrK+JWKAporAiSAWY+bNgMyEHjGg==
-X-Received: by 2002:adf:f646:: with SMTP id x6mr18935724wrp.18.1565021137746;
-        Mon, 05 Aug 2019 09:05:37 -0700 (PDT)
-Received: from [192.168.178.40] ([151.21.165.91])
-        by smtp.gmail.com with ESMTPSA id 2sm121528630wrn.29.2019.08.05.09.05.36
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Aug 2019 09:05:37 -0700 (PDT)
-Subject: Re: [PATCH v3 00/19] KVM RISC-V Support
-To:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Radim K <rkrcmar@redhat.com>
-Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Albert Ou <aou@eecs.berkeley.edu>
-References: <20190805134201.2814-1-anup.patel@wdc.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <c8ea136f-b34b-c7b4-c319-93906fa595bd@redhat.com>
-Date:   Mon, 5 Aug 2019 18:05:36 +0200
+        id S1728998AbfHEQKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 12:10:39 -0400
+Received: from foss.arm.com ([217.140.110.172]:51364 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728760AbfHEQKi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 12:10:38 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74DFF344;
+        Mon,  5 Aug 2019 09:10:37 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD0323F694;
+        Mon,  5 Aug 2019 09:10:35 -0700 (PDT)
+Subject: Re: [PATCH 6/9] KVM: arm64: Provide a PV_TIME device to user space
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20190802145017.42543-1-steven.price@arm.com>
+ <20190802145017.42543-7-steven.price@arm.com> <20190803135113.6cdf500c@why>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <1a7d5be6-184b-0c78-61a3-b01730cb5df9@arm.com>
+Date:   Mon, 5 Aug 2019 17:10:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190805134201.2814-1-anup.patel@wdc.com>
+In-Reply-To: <20190803135113.6cdf500c@why>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/08/19 15:42, Anup Patel wrote:
-> This series adds initial KVM RISC-V support. Currently, we are able to boot
-> RISC-V 64bit Linux Guests with multiple VCPUs.
+On 03/08/2019 13:51, Marc Zyngier wrote:
+> On Fri,  2 Aug 2019 15:50:14 +0100
+> Steven Price <steven.price@arm.com> wrote:
 > 
-> Few key aspects of KVM RISC-V added by this series are:
-> 1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
-> 2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
-> 3. KVM ONE_REG interface for VCPU register access from user-space.
-> 4. PLIC emulation is done in user-space. In-kernel PLIC emulation, will
->    be added in future.
-> 5. Timer and IPI emuation is done in-kernel.
-> 6. MMU notifiers supported.
-> 7. FP lazy save/restore supported.
-> 8. SBI v0.1 emulation for KVM Guest available.
+>> Allow user space to inform the KVM host where in the physical memory
+>> map the paravirtualized time structures should be located.
+>>
+>> A device is created which provides the base address of an array of
+>> Stolen Time (ST) structures, one for each VCPU. There must be (64 *
+>> total number of VCPUs) bytes of memory available at this location.
+>>
+>> The address is given in terms of the physical address visible to
+>> the guest and must be 64 byte aligned. The memory should be marked as
+>> reserved to the guest to stop it allocating it for other purposes.
 > 
-> Here's a brief TODO list which we will work upon after this series:
-> 1. Handle trap from unpriv access in reading Guest instruction
-> 2. Handle trap from unpriv access in SBI v0.1 emulation
-> 3. Implement recursive stage2 page table programing
-> 4. SBI v0.2 emulation in-kernel
-> 5. SBI v0.2 hart hotplug emulation in-kernel
-> 6. In-kernel PLIC emulation
-> 7. ..... and more .....
-> 
-> This series is based upon KVM pre-patches sent by Atish earlier
-> (https://lkml.org/lkml/2019/8/3/3) and it can be found in
-> riscv_kvm_v3 branch at:
-> https//github.com/avpatel/linux.git
-> 
-> Our work-in-progress KVMTOOL RISC-V port can be found in riscv_v1 branch at:
-> https//github.com/avpatel/kvmtool.git
-> 
-> We need OpenSBI with RISC-V hypervisor extension support which can be
-> found in hyp_ext_changes_v1 branch at:
-> https://github.com/riscv/opensbi.git
-> 
-> The QEMU RISC-V hypervisor emulation is done by Alistair and is available
-> in riscv-hyp-work.next branch at:
-> https://github.com/alistair23/qemu.git
-> 
-> To play around with KVM RISC-V, here are few reference commands:
-> 1) To cross-compile KVMTOOL:
->    $ make lkvm-static
-> 2) To launch RISC-V Host Linux:
->    $ qemu-system-riscv64 -monitor null -cpu rv64,h=true -M virt \
->    -m 512M -display none -serial mon:stdio \
->    -kernel opensbi/build/platform/qemu/virt/firmware/fw_jump.elf \
->    -device loader,file=build-riscv64/arch/riscv/boot/Image,addr=0x80200000 \
->    -initrd ./rootfs_kvm_riscv64.img \
->    -append "root=/dev/ram rw console=ttyS0 earlycon=sbi"
-> 3) To launch RISC-V Guest Linux with 9P rootfs:
->    $ ./apps/lkvm-static run -m 128 -c2 --console serial \
->    -p "console=ttyS0 earlycon=uart8250,mmio,0x3f8" -k ./apps/Image --debug
-> 4) To launch RISC-V Guest Linux with initrd:
->    $ ./apps/lkvm-static run -m 128 -c2 --console serial \
->    -p "console=ttyS0 earlycon=uart8250,mmio,0x3f8" -k ./apps/Image \
->    -i ./apps/rootfs.img --debug
-> 
-> Changes since v2:
-> - Removed references of KVM_REQ_IRQ_PENDING from all patches
-> - Use kvm->srcu within in-kernel KVM run loop
-> - Added percpu vsip_shadow to track last value programmed in VSIP CSR
-> - Added comments about irqs_pending and irqs_pending_mask
-> - Used kvm_arch_vcpu_runnable() in-place-of kvm_riscv_vcpu_has_interrupt()
->   in system_opcode_insn()
-> - Removed unwanted smp_wmb() in kvm_riscv_stage2_vmid_update()
-> - Use kvm_flush_remote_tlbs() in kvm_riscv_stage2_vmid_update()
-> - Use READ_ONCE() in kvm_riscv_stage2_update_hgatp() for vmid
-> 
-> Changes since v1:
-> - Fixed compile errors in building KVM RISC-V as module
-> - Removed unused kvm_riscv_halt_guest() and kvm_riscv_resume_guest()
-> - Set KVM_CAP_SYNC_MMU capability only after MMU notifiers are implemented
-> - Made vmid_version as unsigned long instead of atomic
-> - Renamed KVM_REQ_UPDATE_PGTBL to KVM_REQ_UPDATE_HGATP
-> - Renamed kvm_riscv_stage2_update_pgtbl() to kvm_riscv_stage2_update_hgatp()
-> - Configure HIDELEG and HEDELEG in kvm_arch_hardware_enable()
-> - Updated ONE_REG interface for CSR access to user-space
-> - Removed irqs_pending_lock and use atomic bitops instead
-> - Added separate patch for FP ONE_REG interface
-> - Added separate patch for updating MAINTAINERS file
+> Why? You seem to be allocating the memory from the kernel, so as far as
+> the guest is concerned, this isn't generally usable memory.
 
-Down to one comment, which can be addressed when applying (though I'd
-prefer if you tested the one-token fix).
+I obviously didn't word it very well - that's what I meant. The "memory"
+that represents the stolen time structure shouldn't be shown to the
+guest as normal memory, but "reserved" for the purpose of stolen time.
 
-Palmer, Albert, can you give your Acked-by, especially for patches
-2-3-18-19?
+To be honest it looks like I forgot to rewrite this commit message -
+which 64 byte alignment is all that the guest can rely on (because each
+vCPU has it's own structure), the actual array of structures needs to be
+page aligned to ensure we can safely map it into the guest.
+
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_mmu.h  |   2 +
+>>  arch/arm64/include/uapi/asm/kvm.h |   6 +
+>>  arch/arm64/kvm/Makefile           |   1 +
+>>  include/uapi/linux/kvm.h          |   2 +
+>>  virt/kvm/arm/mmu.c                |  44 +++++++
+>>  virt/kvm/arm/pvtime.c             | 190 ++++++++++++++++++++++++++++++
+>>  6 files changed, 245 insertions(+)
+>>  create mode 100644 virt/kvm/arm/pvtime.c
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index befe37d4bc0e..88c8a4b2836f 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -157,6 +157,8 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm);
+>>  void kvm_free_stage2_pgd(struct kvm *kvm);
+>>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>>  			  phys_addr_t pa, unsigned long size, bool writable);
+>> +int kvm_phys_addr_memremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>> +			  phys_addr_t pa, unsigned long size, bool writable);
+>>  
+>>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>>  
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 9a507716ae2f..95516a4198ea 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -367,6 +367,12 @@ struct kvm_vcpu_events {
+>>  #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
+>>  #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
+>>  
+>> +/* Device Control API: PV_TIME */
+>> +#define KVM_DEV_ARM_PV_TIME_PADDR	0
+>> +#define  KVM_DEV_ARM_PV_TIME_ST		0
+>> +#define KVM_DEV_ARM_PV_TIME_STATE_SIZE	1
+>> +#define KVM_DEV_ARM_PV_TIME_STATE	2
+>> +
+>>  #endif
+>>  
+>>  #endif /* __ARM_KVM_H__ */
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 73dce4d47d47..5ffbdc39e780 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -14,6 +14,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/e
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/psci.o $(KVM)/arm/perf.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hypercalls.o
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/pvtime.o
+>>  
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += inject_fault.o regmap.o va_layout.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index a7c19540ce21..04bffafa0708 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1222,6 +1222,8 @@ enum kvm_device_type {
+>>  #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
+>>  	KVM_DEV_TYPE_XIVE,
+>>  #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+>> +	KVM_DEV_TYPE_ARM_PV_TIME,
+>> +#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
+>>  	KVM_DEV_TYPE_MAX,
+>>  };
+>>  
+>> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> index 38b4c910b6c3..be28a4aee451 100644
+>> --- a/virt/kvm/arm/mmu.c
+>> +++ b/virt/kvm/arm/mmu.c
+>> @@ -1368,6 +1368,50 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>>  	return ret;
+>>  }
+>>  
+>> +/**
+>> + * kvm_phys_addr_memremap - map a memory range to guest IPA
+>> + *
+>> + * @kvm:	The KVM pointer
+>> + * @guest_ipa:	The IPA at which to insert the mapping
+>> + * @pa:		The physical address of the memory
+>> + * @size:	The size of the mapping
+>> + */
+>> +int kvm_phys_addr_memremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>> +			  phys_addr_t pa, unsigned long size, bool writable)
+>> +{
+>> +	phys_addr_t addr, end;
+>> +	int ret = 0;
+>> +	unsigned long pfn;
+>> +	struct kvm_mmu_memory_cache cache = { 0, };
+>> +
+>> +	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
+>> +	pfn = __phys_to_pfn(pa);
+>> +
+>> +	for (addr = guest_ipa; addr < end; addr += PAGE_SIZE) {
+>> +		pte_t pte = pfn_pte(pfn, PAGE_S2);
+>> +
+>> +		if (writable)
+>> +			pte = kvm_s2pte_mkwrite(pte);
+>> +
+>> +		ret = mmu_topup_memory_cache(&cache,
+>> +					     kvm_mmu_cache_min_pages(kvm),
+>> +					     KVM_NR_MEM_OBJS);
+>> +		if (ret)
+>> +			goto out;
+>> +		spin_lock(&kvm->mmu_lock);
+>> +		ret = stage2_set_pte(kvm, &cache, addr, &pte, 0);
+>> +		spin_unlock(&kvm->mmu_lock);
+>> +		if (ret)
+>> +			goto out;
+>> +
+>> +		pfn++;
+>> +	}
+>> +
+>> +out:
+>> +	mmu_free_memory_cache(&cache);
+>> +	return ret;
+>> +}
+> 
+> This is an exact copy of kvm_phys_addr_ioremap(), with only the memory
+> attributes changing. Surely we can have a shared implementation that
+> takes the memory attribute as a parameter.
+
+Good point - although due to below I'm going to need something which can
+deal with non-contiguous memory...
+
+>> +
+>>  static bool transparent_hugepage_adjust(kvm_pfn_t *pfnp, phys_addr_t *ipap)
+>>  {
+>>  	kvm_pfn_t pfn = *pfnp;
+>> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
+>> new file mode 100644
+>> index 000000000000..9051bc07eae1
+>> --- /dev/null
+>> +++ b/virt/kvm/arm/pvtime.c
+>> @@ -0,0 +1,190 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +// Copyright (C) 2019 Arm Ltd.
+>> +
+>> +#include <linux/kvm_host.h>
+>> +#include <asm/kvm_mmu.h>
+>> +
+>> +/* We currently only support PV time on ARM64 */
+>> +#ifdef CONFIG_ARM64
+> 
+> And we're only compiling it on arm64, so why the #ifdef?
+
+Another good point - will remove.
+
+>> +
+>> +#include <asm/pvclock-abi.h>
+>> +
+>> +static int max_stolen_size(void)
+>> +{
+>> +	int size = KVM_MAX_VCPUS * sizeof(struct pvclock_vcpu_stolen_time_info);
+> 
+> So we're always allocating enough memory for 512 CPUs? That's an
+> additional 32kB of contiguous memory...
+> 
+>> +
+>> +	return ALIGN(size, PAGE_SIZE);
+>> +}
+>> +
+>> +static int kvm_arm_pvtime_create(struct kvm_device *dev, u32 type)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +
+>> +	pvtime->st = alloc_pages_exact(max_stolen_size(),
+>> +				       GFP_KERNEL | __GFP_ZERO);
+>> +	if (!pvtime->st)
+>> +		return -ENOMEM;
+> 
+> Is there any chance we could use a vmalloc allocation instead? This
+> would lift the requirement on having physically contiguous memory.
+
+Yes I think it should be possible to use non-contiguous memory and vmalloc.
+
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void kvm_arm_pvtime_destroy(struct kvm_device *dev)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +
+>> +	pvtime->st_base = GPA_INVALID;
+>> +	free_pages_exact(pvtime->st, max_stolen_size());
+>> +	kfree(dev);
+>> +}
+>> +
+>> +static int pvtime_map_pages(struct kvm *kvm, gpa_t guest_paddr,
+>> +			    void *kaddr, int size)
+>> +{
+>> +	return kvm_phys_addr_memremap(kvm, guest_paddr,
+>> +			virt_to_phys(kaddr),
+>> +			size, false);
+>> +}
+>> +
+>> +static int pvtime_save_state(struct kvm *kvm, u64 type, void __user *user)
+>> +{
+>> +	void *source;
+>> +	size_t size;
+>> +
+>> +	switch (type) {
+>> +	case KVM_DEV_ARM_PV_TIME_ST:
+>> +		source = kvm->arch.pvtime.st;
+>> +		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
+>> +			atomic_read(&kvm->online_vcpus);
+>> +		break;
+>> +	default:
+>> +		return -ENXIO;
+>> +	}
+>> +
+>> +	if (copy_to_user(user, source, size))
+>> +		return -EFAULT;
+>> +	return 0;
+>> +}
+>> +
+>> +static int pvtime_restore_state(struct kvm *kvm, u64 type, void __user *user)
+>> +{
+>> +	void *dest;
+>> +	size_t size;
+>> +
+>> +	switch (type) {
+>> +	case KVM_DEV_ARM_PV_TIME_ST:
+>> +		dest = kvm->arch.pvtime.st;
+>> +		size = sizeof(struct pvclock_vcpu_stolen_time_info) *
+>> +			atomic_read(&kvm->online_vcpus);
+>> +		break;
+>> +	default:
+>> +		return -ENXIO;
+>> +	}
+>> +
+>> +	if (copy_from_user(dest, user, size))
+>> +		return -EFAULT;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
+>> +				   struct kvm_device_attr *attr)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +	u64 __user *user = (u64 __user *)attr->addr;
+>> +	u64 paddr;
+>> +	int ret;
+>> +
+>> +	switch (attr->group) {
+>> +	case KVM_DEV_ARM_PV_TIME_PADDR:
+>> +		if (get_user(paddr, user))
+>> +			return -EFAULT;
+>> +		if (paddr & 63)
+>> +			return -EINVAL;
+> 
+> You should check whether the device fits into the IPA space for this
+> guest, and whether it overlaps with anything else.
+
+pvtime_map_pages() should fail in the case of overlap. That seems
+sufficient to me - do you think we need something stronger?
+
+>> +		switch (attr->attr) {
+>> +		case KVM_DEV_ARM_PV_TIME_ST:
+>> +			if (pvtime->st_base != GPA_INVALID)
+>> +				return -EEXIST;
+>> +			ret = pvtime_map_pages(dev->kvm, paddr, pvtime->st,
+>> +					max_stolen_size());
+> 
+> Consider moving the size directly into pvtime_map_pages(), and dropping
+> the pvtime->st parameter. All you need is kvm and paddr.
+
+Will do.
 
 Thanks,
 
-Paolo
-
-> Anup Patel (14):
->   KVM: RISC-V: Add KVM_REG_RISCV for ONE_REG interface
->   RISC-V: Add hypervisor extension related CSR defines
->   RISC-V: Add initial skeletal KVM support
->   RISC-V: KVM: Implement VCPU create, init and destroy functions
->   RISC-V: KVM: Implement VCPU interrupts and requests handling
->   RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
->   RISC-V: KVM: Implement VCPU world-switch
->   RISC-V: KVM: Handle MMIO exits for VCPU
->   RISC-V: KVM: Handle WFI exits for VCPU
->   RISC-V: KVM: Implement VMID allocator
->   RISC-V: KVM: Implement stage2 page table programming
->   RISC-V: KVM: Implement MMU notifiers
->   RISC-V: Enable VIRTIO drivers in RV64 and RV32 defconfig
->   RISC-V: KVM: Add MAINTAINERS entry
-> 
-> Atish Patra (5):
->   RISC-V: Export few kernel symbols
->   RISC-V: KVM: Add timer functionality
->   RISC-V: KVM: FP lazy save/restore
->   RISC-V: KVM: Implement ONE REG interface for FP registers
->   RISC-V: KVM: Add SBI v0.1 support
-> 
->  MAINTAINERS                             |  10 +
->  arch/riscv/Kconfig                      |   2 +
->  arch/riscv/Makefile                     |   2 +
->  arch/riscv/configs/defconfig            |  13 +
->  arch/riscv/configs/rv32_defconfig       |  13 +
->  arch/riscv/include/asm/csr.h            |  58 ++
->  arch/riscv/include/asm/kvm_host.h       | 243 ++++++
->  arch/riscv/include/asm/kvm_vcpu_timer.h |  32 +
->  arch/riscv/include/asm/pgtable-bits.h   |   1 +
->  arch/riscv/include/uapi/asm/kvm.h       |  98 +++
->  arch/riscv/kernel/asm-offsets.c         | 148 ++++
->  arch/riscv/kernel/smp.c                 |   2 +-
->  arch/riscv/kernel/time.c                |   1 +
->  arch/riscv/kvm/Kconfig                  |  34 +
->  arch/riscv/kvm/Makefile                 |  14 +
->  arch/riscv/kvm/main.c                   |  86 +++
->  arch/riscv/kvm/mmu.c                    | 905 ++++++++++++++++++++++
->  arch/riscv/kvm/tlb.S                    |  43 ++
->  arch/riscv/kvm/vcpu.c                   | 969 ++++++++++++++++++++++++
->  arch/riscv/kvm/vcpu_exit.c              | 556 ++++++++++++++
->  arch/riscv/kvm/vcpu_sbi.c               | 119 +++
->  arch/riscv/kvm/vcpu_switch.S            | 368 +++++++++
->  arch/riscv/kvm/vcpu_timer.c             | 106 +++
->  arch/riscv/kvm/vm.c                     |  86 +++
->  arch/riscv/kvm/vmid.c                   | 111 +++
->  drivers/clocksource/timer-riscv.c       |   8 +
->  include/clocksource/timer-riscv.h       |  16 +
->  include/uapi/linux/kvm.h                |   1 +
->  28 files changed, 4044 insertions(+), 1 deletion(-)
->  create mode 100644 arch/riscv/include/asm/kvm_host.h
->  create mode 100644 arch/riscv/include/asm/kvm_vcpu_timer.h
->  create mode 100644 arch/riscv/include/uapi/asm/kvm.h
->  create mode 100644 arch/riscv/kvm/Kconfig
->  create mode 100644 arch/riscv/kvm/Makefile
->  create mode 100644 arch/riscv/kvm/main.c
->  create mode 100644 arch/riscv/kvm/mmu.c
->  create mode 100644 arch/riscv/kvm/tlb.S
->  create mode 100644 arch/riscv/kvm/vcpu.c
->  create mode 100644 arch/riscv/kvm/vcpu_exit.c
->  create mode 100644 arch/riscv/kvm/vcpu_sbi.c
->  create mode 100644 arch/riscv/kvm/vcpu_switch.S
->  create mode 100644 arch/riscv/kvm/vcpu_timer.c
->  create mode 100644 arch/riscv/kvm/vm.c
->  create mode 100644 arch/riscv/kvm/vmid.c
->  create mode 100644 include/clocksource/timer-riscv.h
-> 
-> --
-> 2.17.1
-> 
-
+Steve
