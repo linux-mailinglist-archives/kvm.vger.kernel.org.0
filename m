@@ -2,143 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC8FE8127C
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 08:40:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CCEC81294
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 08:55:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727401AbfHEGkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 02:40:31 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:38848 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725976AbfHEGkb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 02:40:31 -0400
-Received: by mail-qt1-f193.google.com with SMTP id n11so79897084qtl.5
-        for <kvm@vger.kernel.org>; Sun, 04 Aug 2019 23:40:30 -0700 (PDT)
+        id S1726713AbfHEGze (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 02:55:34 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43688 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726394AbfHEGze (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 02:55:34 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p13so8627090wru.10
+        for <kvm@vger.kernel.org>; Sun, 04 Aug 2019 23:55:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4TTBYe7R89ObYhNrQ7Cl1PDjf+qeeSySCDSm/yvi8hE=;
+        b=ZW+9EsnPgnlzTYewisjxT+EOSy6r2aUxK55FB/Fm+mi+AtDooHD4mu+yQ4gb37M10g
+         NFW40A+O1T6r5RXaZM/8SExP8R6DwkNY4tOg66IuS30k7+H4zGVIjXQc5CsCiFM2+BMe
+         V0+mlrOMXhxPEG24hqd84dDo9gu3cphW0r9/JFlKTTaR+vGq0uS9aklZTp2Wcx8DcdRa
+         2kuzuR1HDGS6PxOG/Lzvo154FcmiWh5jjA0bm9vC2WXhhhOramW5aZIV01jvhSj2rdDM
+         n+kO58hpipZI6NalfKRWflgcGxRn2DNY40LLNgm/sPPLUvZwPDy7XRixemaSGUe+O/Df
+         PYaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=TJherR/Px/4Fbrw9YV+u4NRMIhgPOAQEPfJAeZ4Vfls=;
-        b=pvfD6g3hRlZKXpqdOcVXA3VW61v8MnJWSRvF08ftMMeJ1Nm4nMS/GquZNIutSOLRCy
-         yifGtbe+VL3jSAVquKtyQUxe59NnH7kX5oE7y8v5ZXRUzua0JIakmfWko6EolT58MghM
-         I0JyVYY3a+dS9Oq6kUNTWVCTlcrUKH5K6Twuyz9SMEqkjMJAI/N+GfxwhE2VXHORbyWR
-         FgnBLHt9croBtPsEVGuCLd9VNzCumPuqf/GtW/VVPTtkpUcjB0Hv5TGrHV19/4ew02MZ
-         lsjCilJ3+7UDP/9cJ4T4CITHOlAJh37pYXCVCtQmne1D3/KYRyM8zFxg3e9a2q5DHONI
-         s4Rg==
-X-Gm-Message-State: APjAAAV4l1/deIbOuSw+epYTtRSyvhVaqphPEJD6v9W9UmEKAem3N8z8
-        cttyqQUS/tqR//9GYa5+d4rA7w==
-X-Google-Smtp-Source: APXvYqySQxd6FG3GHb6mKg/OD+gospqbuIs1GOIQkfQIZWqsFx5h/wKXKUUrJ/WUSB3S9we9808RDA==
-X-Received: by 2002:aed:2dc7:: with SMTP id i65mr87212492qtd.365.1564987230384;
-        Sun, 04 Aug 2019 23:40:30 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
-        by smtp.gmail.com with ESMTPSA id 6sm38704287qkp.82.2019.08.04.23.40.27
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 04 Aug 2019 23:40:29 -0700 (PDT)
-Date:   Mon, 5 Aug 2019 02:40:24 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, linux-mm@kvack.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
- with worker
-Message-ID: <20190805023106-mutt-send-email-mst@kernel.org>
-References: <20190731123935.GC3946@ziepe.ca>
- <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
- <20190731193057.GG3946@ziepe.ca>
- <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
- <20190801141512.GB23899@ziepe.ca>
- <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
- <20190802124613.GA11245@ziepe.ca>
- <20190802100414-mutt-send-email-mst@kernel.org>
- <e8ecb811-6653-cff4-bc11-81f4ccb0dbbf@redhat.com>
- <494ac30d-b750-52c8-b927-16cd4b9414c4@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4TTBYe7R89ObYhNrQ7Cl1PDjf+qeeSySCDSm/yvi8hE=;
+        b=D61N9THj3mJg9Lj2eZgYt1snS1YDi+qAUAnVjaxmBCdGpV/aAI0zO+ONZIC9Uqbokg
+         MGxyjp2Y7m/loqG34svJH9/NRMXCGDm3NnkjiWXn4fEEHhJwUwQBMlZ1QwfZI/BMtwjS
+         kU6ciuH+jr6mtZRTXK/nhWzrQKT9XkWxNF2I7RO0ISxDpENcLn8kyZpIHeoJNJV7cw4r
+         IdSRQlHNk4x+hcbHufLMGdzyVUEuBBhy3r7Yf8aml7G7a1Uv8ZWqswgBmmmEBK+WacQh
+         slsGXXL+SZmzZDHhWSlAXhwbVzPGnaAkeqS+otfb35nPnB3eZOatzgJZ8U7wjfgSgc4S
+         RaOw==
+X-Gm-Message-State: APjAAAW8NZ/hADnoHjjIXjUMUJNBCbO1w+/urWfmLNi4oGzmPc2IgDvu
+        KTVCTFtpG7wCTyb610nx82dsmQ0s69Ost/MDFkE=
+X-Google-Smtp-Source: APXvYqxAjiUTpRBRVnl8zo2WRruaXTltVlSlDaYn0gjxaCM1yH1vbKfeokdHZ8Ie7GExj9eQjB7BsoJu8wlqK+dlYTk=
+X-Received: by 2002:adf:b1cb:: with SMTP id r11mr150790179wra.328.1564988131513;
+ Sun, 04 Aug 2019 23:55:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <494ac30d-b750-52c8-b927-16cd4b9414c4@redhat.com>
+References: <20190802074620.115029-1-anup.patel@wdc.com> <20190802074620.115029-8-anup.patel@wdc.com>
+ <03f60f3a-bb50-9210-8352-da16cca322b9@redhat.com>
+In-Reply-To: <03f60f3a-bb50-9210-8352-da16cca322b9@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 5 Aug 2019 12:25:20 +0530
+Message-ID: <CAAhSdy3hdWfUCUEK-idoTzgB2hKeAd3FzsHEH1DK_BTC_KGdJw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 07/19] RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG
+ ioctls
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 12:41:45PM +0800, Jason Wang wrote:
-> 
-> On 2019/8/5 下午12:36, Jason Wang wrote:
-> > 
-> > On 2019/8/2 下午10:27, Michael S. Tsirkin wrote:
-> > > On Fri, Aug 02, 2019 at 09:46:13AM -0300, Jason Gunthorpe wrote:
-> > > > On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
-> > > > > > This must be a proper barrier, like a spinlock, mutex, or
-> > > > > > synchronize_rcu.
-> > > > > 
-> > > > > I start with synchronize_rcu() but both you and Michael raise some
-> > > > > concern.
-> > > > I've also idly wondered if calling synchronize_rcu() under the various
-> > > > mm locks is a deadlock situation.
-> > > > 
-> > > > > Then I try spinlock and mutex:
-> > > > > 
-> > > > > 1) spinlock: add lots of overhead on datapath, this leads 0
-> > > > > performance
-> > > > > improvement.
-> > > > I think the topic here is correctness not performance improvement
-> > > The topic is whether we should revert
-> > > commit 7f466032dc9 ("vhost: access vq metadata through kernel
-> > > virtual address")
-> > > 
-> > > or keep it in. The only reason to keep it is performance.
-> > 
-> > 
-> > Maybe it's time to introduce the config option?
-> 
-> 
-> Or does it make sense if I post a V3 with:
-> 
-> - introduce config option and disable the optimization by default
-> 
-> - switch from synchronize_rcu() to vhost_flush_work(), but the rest are the
-> same
-> 
-> This can give us some breath to decide which way should go for next release?
-> 
-> Thanks
+On Fri, Aug 2, 2019 at 2:33 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 02/08/19 09:47, Anup Patel wrote:
+> > +     if (reg_num == KVM_REG_RISCV_CSR_REG(sip))
+> > +             kvm_riscv_vcpu_flush_interrupts(vcpu, false);
+>
+> Not updating the vsip CSR here can cause an interrupt to be lost, if the
+> next call to kvm_riscv_vcpu_flush_interrupts finds a zero mask.
 
-As is, with preempt enabled?  Nope I don't think blocking an invalidator
-on swap IO is ok, so I don't believe this stuff is going into this
-release at this point.
+Thanks for catching this issue. I will address it in v3.
 
-So it's more a question of whether it's better to revert and apply a clean
-patch on top, or just keep the code around but disabled with an ifdef as is.
-I'm open to both options, and would like your opinion on this.
+If we think more on similar lines then we also need to handle the case
+where Guest VCPU had pending interrupts and we suddenly stopped it
+for Guest migration. In this case, we would eventually use SET_ONE_REG
+ioctl on destination Host which should set vsip_shadow instead of vsip so
+that we force update HW after resuming Guest VCPU on destination host.
 
-> 
-> > 
-> > 
-> > > 
-> > > Now as long as all this code is disabled anyway, we can experiment a
-> > > bit.
-> > > 
-> > > I personally feel we would be best served by having two code paths:
-> > > 
-> > > - Access to VM memory directly mapped into kernel
-> > > - Access to userspace
-> > > 
-> > > 
-> > > Having it all cleanly split will allow a bunch of optimizations, for
-> > > example for years now we planned to be able to process an incoming short
-> > > packet directly on softirq path, or an outgoing on directly within
-> > > eventfd.
-> > 
-> > 
-> > It's not hard consider we've already had our own accssors. But the
-> > question is (as asked in another thread), do you want permanent GUP or
-> > still use MMU notifiers.
-> > 
-> > Thanks
-> > 
-> > _______________________________________________
-> > Virtualization mailing list
-> > Virtualization@lists.linux-foundation.org
-> > https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+>
+> You could add a new field vcpu->vsip_shadow that is updated every time
+> CSR_VSIP is written (including kvm_arch_vcpu_load) with a function like
+>
+> void kvm_riscv_update_vsip(struct kvm_vcpu *vcpu)
+> {
+>         if (vcpu->vsip_shadow != vcpu->arch.guest_csr.vsip) {
+>                 csr_write(CSR_VSIP, vcpu->arch.guest_csr.vsip);
+>                 vcpu->vsip_shadow = vcpu->arch.guest_csr.vsip;
+>         }
+> }
+>
+> And just call this unconditionally from kvm_vcpu_ioctl_run.  The cost is
+> just a memory load per VS-mode entry, it should hardly be measurable.
+>
+
+I think we can do this at start of kvm_riscv_vcpu_flush_interrupts() as well.
+
+Regards,
+Anup
