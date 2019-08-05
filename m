@@ -2,155 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D8EAA80FAD
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 02:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 352BF8102A
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 04:04:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726903AbfHEA2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Aug 2019 20:28:55 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:35932 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726844AbfHEA2z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Aug 2019 20:28:55 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x750PN8L099080;
-        Mon, 5 Aug 2019 00:27:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc : subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=csR1CFI12mg4Wfl/I1DmedWmi55eZjSHDbam/aE57Lg=;
- b=UxnSselyJSkDrlgtrJqirrqIgp3f8N92FZdRzvuEzRyV0BK1GmSaf9C8PKnong3YQqHb
- MCpznjeWe33FH9kWSVMHzf3ueNmMrgta/dHNshxU+ezcH/SlcYl3T1BbtssK9RamgmgB
- uxHaAwYQYSv2zhs8xcIQpAvtnAqvLsICBKD/Oi73oWTTrzZCg0llYMmo1CN1xJK1/n6p
- FN3jH23l0bDAY+8rbi5+pi71wYYr59UK7ki0dfZmNagJqJGpCz4Dhc49Z+1r5jDxqopk
- IUz6WPSid5pJVTZGy3yYzlDcCEYZUIldAG3FEELFmfGykxTqdKwI/FpOYaMM05PGsiiD Lg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2u527pc6va-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 05 Aug 2019 00:27:22 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x750Mxa2125660;
-        Mon, 5 Aug 2019 00:27:22 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3020.oracle.com with ESMTP id 2u5232s8j6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 05 Aug 2019 00:27:22 +0000
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x750RLrL130645;
-        Mon, 5 Aug 2019 00:27:22 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2u5232s8hy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 05 Aug 2019 00:27:21 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x750R78g009479;
-        Mon, 5 Aug 2019 00:27:08 GMT
-Received: from mbp2018.cdmnet.org (/82.27.120.181)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 04 Aug 2019 17:27:07 -0700
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>
-Subject: Re: [PATCH v2 31/34] fs/nfs: convert put_page() to put_user_page*()
-To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
-References: <20190804224915.28669-1-jhubbard@nvidia.com>
- <20190804224915.28669-32-jhubbard@nvidia.com>
-From:   Calum Mackay <calum.mackay@oracle.com>
-Organization: Oracle
-Message-ID: <cf978e10-facc-ba5b-d7e4-d7fc2c3f7ebc@oracle.com>
-Date:   Mon, 5 Aug 2019 01:26:59 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0)
- Gecko/20100101 Thunderbird/70.0a1
+        id S1726877AbfHECDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Aug 2019 22:03:34 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45301 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726561AbfHECDd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Aug 2019 22:03:33 -0400
+Received: by mail-pf1-f195.google.com with SMTP id r1so38758706pfq.12;
+        Sun, 04 Aug 2019 19:03:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jiBgil2/CkGQonyAGH+YMpxsvKYd1DL9LetvX2PzPhw=;
+        b=Sri3eDfc55rI/wpwxTRkj+wYpuXeNOp1RNaGXWAtZwYN2OSDgwA1vmavxFv5ksAwrI
+         4dQtipdp0Dcnh06Hnoq53v+zCyNVgRa44voGibej/Jbefpn29PqGcMjqezq0O2DGe1X1
+         A15jqQvx/GpcghTEiftmrQlt3jrqN74mEPBJ3nokf9EKm049NisKhPuv+KGC6q32cyQM
+         PdAowMOLod1qYJ27TLW/+qjNNNoanboDzG+JbneWMBDHLG+rI+618ftP4Fq1gDwuwLKG
+         pO+fwW775gdlwvyGZ3SyWlqobd5CyJtZYfB9EUJojPwr2byWtz7/ZKgOX8f0CoPlBpLm
+         5BdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jiBgil2/CkGQonyAGH+YMpxsvKYd1DL9LetvX2PzPhw=;
+        b=DFG1J+PX7Pid4tvWwdE6isRkAIJRA0A+822Q+FCVtqOSsWFMs0RaBQS8DvhkhIDP1L
+         bNMF7XyNrkqFJHORRR68cHTtuQOLmHriAG+KrfrWnhla1x6vxB+/j9s0e3G81Lya0std
+         uySFe5F9PeZ0Ijd0l7bvYVez1K9SJOYcLM5OvejqUflKYCvDTyIy5erJvwuWTQfRmVvr
+         laQ4ctV8dl4LhzFJZ6CDPEbSinh0W1Bc91o/ZV45qQ9yyFc4W9NrJnMLCS1HxiqCaByy
+         3If/u24ggKZjGdoelhyLpjzeOgugNVAUzllBUAPNxl/uFPTtGIaMfq8maNlunu7fn0CX
+         p8PA==
+X-Gm-Message-State: APjAAAWMXU/to7V3gIEv+K/EbBxgAnrAGHfjwChwwFjgfH8rz8wxgRqv
+        cyWMAKB5KSTso8PTlLLglwicO4U7
+X-Google-Smtp-Source: APXvYqxxWug8Or45Qneeg9wv6QTz/aQQLe+0S9HWR44eyK+PFyFo45D8eoqR4rVD1eovdUsqTgjF6w==
+X-Received: by 2002:a63:7709:: with SMTP id s9mr18114256pgc.296.1564970612644;
+        Sun, 04 Aug 2019 19:03:32 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id o32sm14739365pje.9.2019.08.04.19.03.30
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Sun, 04 Aug 2019 19:03:32 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Marc Zyngier <Marc.Zyngier@arm.com>, stable@vger.kernel.org
+Subject: [PATCH v4 1/6] KVM: Fix leak vCPU's VMCS value into other pCPU
+Date:   Mon,  5 Aug 2019 10:03:19 +0800
+Message-Id: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <20190804224915.28669-32-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9339 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908050001
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/08/2019 11:49 pm, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page() or
-> release_pages().
-> 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> Cc: Calum Mackay <calum.mackay@oracle.com>
-> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-> Cc: Anna Schumaker <anna.schumaker@netapp.com>
-> Cc: linux-nfs@vger.kernel.org
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->   fs/nfs/direct.c | 11 ++---------
->   1 file changed, 2 insertions(+), 9 deletions(-)
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Reviewed-by: Calum Mackay <calum.mackay@oracle.com>
+After commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts), a 
+five years old bug is exposed. Running ebizzy benchmark in three 80 vCPUs VMs 
+on one 80 pCPUs Skylake server, a lot of rcu_sched stall warning splatting 
+in the VMs after stress testing:
 
+ INFO: rcu_sched detected stalls on CPUs/tasks: { 4 41 57 62 77} (detected by 15, t=60004 jiffies, g=899, c=898, q=15073)
+ Call Trace:
+   flush_tlb_mm_range+0x68/0x140
+   tlb_flush_mmu.part.75+0x37/0xe0
+   tlb_finish_mmu+0x55/0x60
+   zap_page_range+0x142/0x190
+   SyS_madvise+0x3cd/0x9c0
+   system_call_fastpath+0x1c/0x21
 
-> diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-> index 0cb442406168..c0c1b9f2c069 100644
-> --- a/fs/nfs/direct.c
-> +++ b/fs/nfs/direct.c
-> @@ -276,13 +276,6 @@ ssize_t nfs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
->   	return nfs_file_direct_write(iocb, iter);
->   }
->   
-> -static void nfs_direct_release_pages(struct page **pages, unsigned int npages)
-> -{
-> -	unsigned int i;
-> -	for (i = 0; i < npages; i++)
-> -		put_page(pages[i]);
-> -}
-> -
->   void nfs_init_cinfo_from_dreq(struct nfs_commit_info *cinfo,
->   			      struct nfs_direct_req *dreq)
->   {
-> @@ -512,7 +505,7 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
->   			pos += req_len;
->   			dreq->bytes_left -= req_len;
->   		}
-> -		nfs_direct_release_pages(pagevec, npages);
-> +		put_user_pages(pagevec, npages);
->   		kvfree(pagevec);
->   		if (result < 0)
->   			break;
-> @@ -935,7 +928,7 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
->   			pos += req_len;
->   			dreq->bytes_left -= req_len;
->   		}
-> -		nfs_direct_release_pages(pagevec, npages);
-> +		put_user_pages(pagevec, npages);
->   		kvfree(pagevec);
->   		if (result < 0)
->   			break;
-> 
+swait_active() sustains to be true before finish_swait() is called in 
+kvm_vcpu_block(), voluntarily preempted vCPUs are taken into account 
+by kvm_vcpu_on_spin() loop greatly increases the probability condition 
+kvm_arch_vcpu_runnable(vcpu) is checked and can be true, when APICv 
+is enabled the yield-candidate vCPU's VMCS RVI field leaks(by 
+vmx_sync_pir_to_irr()) into spinning-on-a-taken-lock vCPU's current 
+VMCS.
+
+This patch fixes it by checking conservatively a subset of events.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>
+Cc: stable@vger.kernel.org
+Fixes: 98f4a1467 (KVM: add kvm_arch_vcpu_runnable() test to kvm_vcpu_on_spin() loop)
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v3 -> v4:
+ * just test KVM_REQ_*
+ * rename the hook to apicv_has_pending_interrupt
+ * wrap with #ifdef CONFIG_KVM_ASYNC_PF 
+v2 -> v3:
+ * check conservatively a subset of events
+v1 -> v2:
+ * checking swait_active(&vcpu->wq) for involuntary preemption
+
+ arch/mips/kvm/mips.c            |  5 +++++
+ arch/powerpc/kvm/powerpc.c      |  5 +++++
+ arch/s390/kvm/kvm-s390.c        |  5 +++++
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/svm.c              |  6 ++++++
+ arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+ arch/x86/kvm/x86.c              | 16 ++++++++++++++++
+ include/linux/kvm_host.h        |  1 +
+ virt/kvm/arm/arm.c              |  5 +++++
+ virt/kvm/kvm_main.c             | 16 +++++++++++++++-
+ 10 files changed, 65 insertions(+), 1 deletion(-)
+
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 2cfe839..95a4642 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -98,6 +98,11 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ 	return !!(vcpu->arch.pending_exceptions);
+ }
+ 
++bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
++{
++	return kvm_arch_vcpu_runnable(vcpu);
++}
++
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	return false;
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 0dba7eb..3e34d5f 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -50,6 +50,11 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ 	return !!(v->arch.pending_exceptions) || kvm_request_pending(v);
+ }
+ 
++bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
++{
++	return kvm_arch_vcpu_runnable(vcpu);
++}
++
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	return false;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 3f520cd8..5623b23 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3102,6 +3102,11 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ 	return kvm_s390_vcpu_has_irq(vcpu, 0);
+ }
+ 
++bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
++{
++	return kvm_arch_vcpu_runnable(vcpu);
++}
++
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	return !(vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7b0a4ee..25ffa7c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1175,6 +1175,7 @@ struct kvm_x86_ops {
+ 	int (*update_pi_irte)(struct kvm *kvm, unsigned int host_irq,
+ 			      uint32_t guest_irq, bool set);
+ 	void (*apicv_post_state_restore)(struct kvm_vcpu *vcpu);
++	bool (*apicv_has_pending_interrupt)(struct kvm_vcpu *vcpu);
+ 
+ 	int (*set_hv_timer)(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
+ 			    bool *expired);
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 7eafc69..1b4384f 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -5190,6 +5190,11 @@ static void svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+ 		kvm_vcpu_wake_up(vcpu);
+ }
+ 
++static bool svm_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
+ static void svm_ir_list_del(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
+ {
+ 	unsigned long flags;
+@@ -7314,6 +7319,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 
+ 	.pmu_ops = &amd_pmu_ops,
+ 	.deliver_posted_interrupt = svm_deliver_avic_intr,
++	.apicv_has_pending_interrupt = svm_apicv_has_pending_interrupt,
+ 	.update_pi_irte = svm_update_pi_irte,
+ 	.setup_mce = svm_setup_mce,
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 074385c..59871b6 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6117,6 +6117,11 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+ 	return max_irr;
+ }
+ 
++static bool vmx_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
++{
++	return pi_test_on(vcpu_to_pi_desc(vcpu));
++}
++
+ static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+ {
+ 	if (!kvm_vcpu_apicv_active(vcpu))
+@@ -7726,6 +7731,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+ 	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
+ 	.sync_pir_to_irr = vmx_sync_pir_to_irr,
+ 	.deliver_posted_interrupt = vmx_deliver_posted_interrupt,
++	.apicv_has_pending_interrupt = vmx_apicv_has_pending_interrupt,
+ 
+ 	.set_tss_addr = vmx_set_tss_addr,
+ 	.set_identity_map_addr = vmx_set_identity_map_addr,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c6d951c..f715efb 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9698,6 +9698,22 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_running(vcpu) || kvm_vcpu_has_events(vcpu);
+ }
+ 
++bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
++{
++	if (READ_ONCE(vcpu->arch.pv.pv_unhalted))
++		return true;
++
++	if (kvm_test_request(KVM_REQ_NMI, vcpu) ||
++		kvm_test_request(KVM_REQ_SMI, vcpu) ||
++		 kvm_test_request(KVM_REQ_EVENT, vcpu))
++		return true;
++
++	if (vcpu->arch.apicv_active && kvm_x86_ops->apicv_has_pending_interrupt(vcpu))
++		return true;
++
++	return false;
++}
++
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.preempted_in_kernel;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 5c5b586..9e4c2bb 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -872,6 +872,7 @@ int kvm_arch_check_processor_compat(void);
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
++bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+ 
+ #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+ /*
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index acc4324..2927895 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -444,6 +444,11 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+ 		&& !v->arch.power_off && !v->arch.pause);
+ }
+ 
++bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
++{
++	return kvm_arch_vcpu_runnable(vcpu);
++}
++
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu_mode_priv(vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 887f3b0..e121423 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2477,6 +2477,20 @@ static bool kvm_vcpu_eligible_for_directed_yield(struct kvm_vcpu *vcpu)
+ #endif
+ }
+ 
++static bool vcpu_runnable(struct kvm_vcpu *vcpu)
++{
++	/* It is called outside vcpu_load/vcpu_put */
++	if (kvm_arch_dy_runnable(vcpu))
++		return true;
++
++#ifdef CONFIG_KVM_ASYNC_PF
++	if (!list_empty_careful(&vcpu->async_pf.done))
++		return true;
++#endif
++
++	return false;
++}
++
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ {
+ 	struct kvm *kvm = me->kvm;
+@@ -2506,7 +2520,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ 				continue;
+ 			if (vcpu == me)
+ 				continue;
+-			if (swait_active(&vcpu->wq) && !kvm_arch_vcpu_runnable(vcpu))
++			if (swait_active(&vcpu->wq) && !vcpu_runnable(vcpu))
+ 				continue;
+ 			if (yield_to_kernel_mode && !kvm_arch_vcpu_in_kernel(vcpu))
+ 				continue;
+-- 
+2.7.4
+
