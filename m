@@ -2,87 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2A4F8188B
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 13:56:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D878A81898
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 13:58:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728694AbfHEL4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 07:56:43 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45329 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727553AbfHEL4h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 07:56:37 -0400
-Received: by mail-wr1-f67.google.com with SMTP id f9so5208629wre.12
-        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 04:56:36 -0700 (PDT)
+        id S1728659AbfHEL6W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 07:58:22 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:45586 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728056AbfHEL6W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 07:58:22 -0400
+Received: by mail-qt1-f194.google.com with SMTP id x22so7193288qtp.12;
+        Mon, 05 Aug 2019 04:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=Cf79lRbjTxuYvrjTYwQy5DclxuSwBZtPZCw1u1tZDjw=;
+        b=MEROJahA3aFopIyauLYvf1B6zTAtFRQGVywLTvuOwy0JV4Azcl0Amnbxf4zUVIqC/G
+         5kTOuNGsltVhyCAHagN0JycjpE1hWV9by85hkhO/e+7MOMdTir8envu7FOhORPmE+286
+         Rrll9tSc18atKkAuKx4mDNGgcbTqwXWZzHoKEGJ9EBYA4Qu3jZJIZjuPs+D4LuugbDMq
+         TMArjd+Kq+lMGFYUAQPDTWziIsUQLdTMdCJiL+xRYXHehHWHrlnDLvfUjCcu6lV7t75R
+         CeJhw2oihej2DOdXP3Y+mMlHNT4OYC236xyTHU1Qpvtt/KG/LwaKs5PpyEP/H38MYFBd
+         KujQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TY4SwjXmEN9gc5bLylSn4Hg0/dB7NKueAsPGd6xGBoQ=;
-        b=TNX8eRkn/+urFB0t6dQmh0V/R5junwwfhqge8PnHmYmhidwlVaGQFc8BMNqueSgYsb
-         R0hXZ5VuBKyhlhemeAB39xkb80QBa1bLH+h9QKjqQ2YmATbbzitp32Q+giZVHWxxEEf2
-         gNzoMHhpxkK1W9glnRqe7NavUl8FmtkmZPQY3dK+W+W+9d+DvVuHc/haf7HDZcu8aYcH
-         qJH+X7EbcyC2Dd6xpBBB4h9fEksnK30Y/V3vbQvu1fTJ8knxguA5+XtDHy+Rpncc9xrC
-         /rOhtpS4Jfpfu5ZZVS+D6rM9Fn/q6naJfJBSPsXM2opCHewW8OThvWUamJycQ0ttb07z
-         69yA==
-X-Gm-Message-State: APjAAAXq+cZKNN5oQWXdk/btd4T0wZwrOpblx7wcjRcCTFiUyNFudExe
-        gjX78eXXAHcnGMizJZ1+8EFOwg==
-X-Google-Smtp-Source: APXvYqyiW6VU1XQOFEG2eUsh/f6zKNWC3klkjjD7J05dOiekrtpHuIxq6IVPBKdC0E3ZEqXFzkJjhg==
-X-Received: by 2002:a5d:4cc5:: with SMTP id c5mr107334032wrt.278.1565006195708;
-        Mon, 05 Aug 2019 04:56:35 -0700 (PDT)
-Received: from [192.168.178.40] ([151.21.165.91])
-        by smtp.gmail.com with ESMTPSA id v15sm77198646wrt.25.2019.08.05.04.56.34
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Aug 2019 04:56:35 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 07/19] RISC-V: KVM: Implement
- KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Radim K <rkrcmar@redhat.com>
-Cc:     Daniel Lezcano <daniel.lezcano@linaro.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Cf79lRbjTxuYvrjTYwQy5DclxuSwBZtPZCw1u1tZDjw=;
+        b=H1Kor2Oq7J3iEcqqwVl197sYp1OZNJGWvYFyFhKwPr+pMPtWUSL0UMAcOTHrOe8fUj
+         a+0W46sGpadr/IBI+9rv+PW/n+Tx6A0KzDrMhC9615rT5P30vjS5dvwHVvhPn/vCR38n
+         jWvLKv1do9YNSwHL9fAy455+slB3yKijJf/nu81NmdOoyUZo99VVBKPI7HUQD4ZkC6g9
+         srlcC4AYkSzJLSFcV/gUKzwHBthWtpMvAr5Njt1Ui0DzZkuUNFpKbGypyVMTp1UhCkhR
+         MOG+IGz/9aPnxgXMPGfGxmuSjAGddmJBAG7kRth3Kh8kJ0T2SfTXS3mIRk8vSVw4ffCO
+         aIeA==
+X-Gm-Message-State: APjAAAWY4rbzh5Asv5hCg/x7PmzQHJWJh0vq1X+ERfQjdeIG786As8Pf
+        wuNFKnyV/SngKZQJ8Y+zGNE=
+X-Google-Smtp-Source: APXvYqzR5O4gZkb0h8p/vmE0FqgjnI+i2nL2OnMMo6DdX+NKyxRyToVMerzJYx27wg9lgahrIR5eNA==
+X-Received: by 2002:ac8:34c5:: with SMTP id x5mr101803128qtb.91.1565006300868;
+        Mon, 05 Aug 2019 04:58:20 -0700 (PDT)
+Received: from localhost (tripoint.kitware.com. [66.194.253.20])
+        by smtp.gmail.com with ESMTPSA id e7sm34167209qtp.91.2019.08.05.04.58.20
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 05 Aug 2019 04:58:20 -0700 (PDT)
+Date:   Mon, 5 Aug 2019 07:58:19 -0400
+From:   Ben Boeckel <mathstuf@gmail.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190802074620.115029-1-anup.patel@wdc.com>
- <20190802074620.115029-8-anup.patel@wdc.com>
- <edbed85f-f7ad-a240-1bef-75729b527a69@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8563b869-1ab4-d0f1-afad-9cd864b6019a@redhat.com>
-Date:   Mon, 5 Aug 2019 13:56:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@amacapital.net>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCHv2 25/59] keys/mktme: Preparse the MKTME key payload
+Message-ID: <20190805115819.GA31656@rotor>
+Reply-To: mathstuf@gmail.com
+References: <20190731150813.26289-1-kirill.shutemov@linux.intel.com>
+ <20190731150813.26289-26-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <edbed85f-f7ad-a240-1bef-75729b527a69@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20190731150813.26289-26-kirill.shutemov@linux.intel.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/08/19 13:37, Christian Borntraeger wrote:
-> While have ONE_REG will certainly work, have you considered the sync_reg scheme
-> (registers as part of kvm_run structure)
-> This will speed up the exit to QEMU as you do not have to do multiple ioctls
-> (each imposing a systemcall overhead) for one exit. 
-> 
-> Ideally you should not exit too often into qemu, but for those cases sync_regs
-> is faster than ONE_REG.
+On Wed, Jul 31, 2019 at 18:07:39 +0300, Kirill A. Shutemov wrote:
+> From: Alison Schofield <alison.schofield@intel.com>
+> +/* Make sure arguments are correct for the TYPE of key requested */
+> +static int mktme_check_options(u32 *payload, unsigned long token_mask,
+> +			       enum mktme_type type, enum mktme_alg alg)
+> +{
+> +	if (!token_mask)
+> +		return -EINVAL;
+> +
+> +	switch (type) {
+> +	case MKTME_TYPE_CPU:
+> +		if (test_bit(OPT_ALGORITHM, &token_mask))
+> +			*payload |= (1 << alg) << 8;
+> +		else
+> +			return -EINVAL;
+> +
+> +		*payload |= MKTME_KEYID_SET_KEY_RANDOM;
+> +		break;
+> +
+> +	case MKTME_TYPE_NO_ENCRYPT:
+> +		*payload |= MKTME_KEYID_NO_ENCRYPT;
+> +		break;
 
-At least in theory, RISC-V should never have exits to QEMU that need
-accessing the registers.  (The same is true for x86; Google implemented
-sync_regs because they moved the instruction emulator to userspace in
-their fork).
+The documentation states that for `type=no-encrypt`, algorithm must not
+be specified at all. Where is that checked?
 
-Paolo
-
+--Ben
