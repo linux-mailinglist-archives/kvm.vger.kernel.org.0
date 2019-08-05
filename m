@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D41528124E
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 08:28:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 086D38125B
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 08:30:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727346AbfHEG2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 02:28:24 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:39279 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725992AbfHEG2X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 02:28:23 -0400
-Received: by mail-qt1-f195.google.com with SMTP id l9so79844837qtu.6
-        for <kvm@vger.kernel.org>; Sun, 04 Aug 2019 23:28:23 -0700 (PDT)
+        id S1727330AbfHEGal (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 02:30:41 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:44633 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726829AbfHEGal (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 02:30:41 -0400
+Received: by mail-qk1-f195.google.com with SMTP id d79so59222427qke.11
+        for <kvm@vger.kernel.org>; Sun, 04 Aug 2019 23:30:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=KWA/zRel4261JwzY6PT0mEAQMawH9MJ6QOovbW+PtWw=;
-        b=szIdke9IZ/uZzjIbsRaMhK49F+kZbq9kQXZnwierH8b7hd5j5PLJutS3XGPZCFsymG
-         9eaiot1esh9demlqyCot29HRqYIQj4BJjd8q+eUKsg+icF0SEcQgMfonYC8JGtQdTmZy
-         UsZzPbOsodVOHKDN0z0ZN3sy1TPGWra8ByzjI4ca8AUZX9eLeZo7fmMP/FtOSA+up21S
-         EVf4YY6S0A7PnraSXLBWudG7DGcR446mjDD8WDH63Sp+tXQWZhK5tT9mO5j4xp5coC/P
-         e6PKHuZIaW+C/twRQMEne6tCzZiQUfHIRh2BgVIxH0xr1ab+iJLeYlFGQ44KfFgwx7qI
-         dnxw==
-X-Gm-Message-State: APjAAAUXzmmJuzUkUuB69YCaFChgMFhA8Rswqh8aS/B+ZA0OUPxEn+Ob
-        oaSMZZ+qaaw9xOgB6Cmy4X87AQ==
-X-Google-Smtp-Source: APXvYqxmlaPhRV6WcTX7MFxiXlbHz2huG6EImOc41/XnvtSvCJPv0MiUiy9pupzwZ++qXjlc9yUxxA==
-X-Received: by 2002:ad4:4a14:: with SMTP id m20mr5317024qvz.58.1564986502769;
-        Sun, 04 Aug 2019 23:28:22 -0700 (PDT)
+        bh=PVqIsmchklCTrdzugsyQL+AeUL8kmqaAFQiz9HKaITE=;
+        b=Hpmj5s7SWXV5VBBZ34OB0AydpQlujJKXkpVQviLxayo6F9ZtzZYXIbD6chvogIU6EI
+         DGvsjyezHu0RQg/ALJtmPB9yvvNzyrVi9YojGr9zruSHyVAQBNhScXKwO+0ENj4bviv9
+         X607T1ZAZQMN44PbUqFOMhbZNL1MQHQb5jNhEoDO5knqRMD8m101GI+i10R4XL/LaABr
+         g0A3lKou3sUeA7xe8LcBRelYxBfNSReciLp2w8fcG52eSpdJPLyPcsiFmPXrlh2uWcLx
+         ZuQqQrtXpb0P98miFCGgH0Bi+gxLrozUKzhTO+zYQ613Nj7wgvvOjThmf2Mkn0OhXsoG
+         hfrg==
+X-Gm-Message-State: APjAAAXw4VPy8kpYmC6eMCLeOma37IGsTvf/ojI+pBIRvkPMpFhL5Rsg
+        Oq6wQvK94bGGCqcoKnyIaFN95A==
+X-Google-Smtp-Source: APXvYqwS0Eo1lXfnBu6u3xqFFZLty3hYj+avFeIYmNSdIaVzfHVVLe9QhqalA5xTV3YZrONCooErvg==
+X-Received: by 2002:a37:86c4:: with SMTP id i187mr100882695qkd.464.1564986640071;
+        Sun, 04 Aug 2019 23:30:40 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
-        by smtp.gmail.com with ESMTPSA id q56sm42239382qtq.64.2019.08.04.23.28.19
+        by smtp.gmail.com with ESMTPSA id n3sm34029874qkk.54.2019.08.04.23.30.36
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 04 Aug 2019 23:28:21 -0700 (PDT)
-Date:   Mon, 5 Aug 2019 02:28:16 -0400
+        Sun, 04 Aug 2019 23:30:39 -0700 (PDT)
+Date:   Mon, 5 Aug 2019 02:30:34 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
@@ -42,114 +42,79 @@ Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
  with worker
-Message-ID: <20190805020752-mutt-send-email-mst@kernel.org>
-References: <20190731084655.7024-1-jasowang@redhat.com>
- <20190731084655.7024-8-jasowang@redhat.com>
+Message-ID: <20190805022833-mutt-send-email-mst@kernel.org>
+References: <20190731084655.7024-8-jasowang@redhat.com>
  <20190731123935.GC3946@ziepe.ca>
  <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
  <20190731193057.GG3946@ziepe.ca>
  <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
  <20190801141512.GB23899@ziepe.ca>
  <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
- <20190802094331-mutt-send-email-mst@kernel.org>
- <6c3a0a1c-ce87-907b-7bc8-ec41bf9056d8@redhat.com>
+ <20190802124613.GA11245@ziepe.ca>
+ <20190802100414-mutt-send-email-mst@kernel.org>
+ <e8ecb811-6653-cff4-bc11-81f4ccb0dbbf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6c3a0a1c-ce87-907b-7bc8-ec41bf9056d8@redhat.com>
+In-Reply-To: <e8ecb811-6653-cff4-bc11-81f4ccb0dbbf@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 12:33:45PM +0800, Jason Wang wrote:
+On Mon, Aug 05, 2019 at 12:36:40PM +0800, Jason Wang wrote:
 > 
-> On 2019/8/2 下午10:03, Michael S. Tsirkin wrote:
-> > On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
-> > > Btw, I come up another idea, that is to disable preemption when vhost thread
-> > > need to access the memory. Then register preempt notifier and if vhost
-> > > thread is preempted, we're sure no one will access the memory and can do the
-> > > cleanup.
-> > Great, more notifiers :(
+> On 2019/8/2 下午10:27, Michael S. Tsirkin wrote:
+> > On Fri, Aug 02, 2019 at 09:46:13AM -0300, Jason Gunthorpe wrote:
+> > > On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
+> > > > > This must be a proper barrier, like a spinlock, mutex, or
+> > > > > synchronize_rcu.
+> > > > 
+> > > > I start with synchronize_rcu() but both you and Michael raise some
+> > > > concern.
+> > > I've also idly wondered if calling synchronize_rcu() under the various
+> > > mm locks is a deadlock situation.
+> > > 
+> > > > Then I try spinlock and mutex:
+> > > > 
+> > > > 1) spinlock: add lots of overhead on datapath, this leads 0 performance
+> > > > improvement.
+> > > I think the topic here is correctness not performance improvement
+> > The topic is whether we should revert
+> > commit 7f466032dc9 ("vhost: access vq metadata through kernel virtual address")
 > > 
-> > Maybe can live with
-> > 1- disable preemption while using the cached pointer
-> > 2- teach vhost to recover from memory access failures,
-> >     by switching to regular from/to user path
+> > or keep it in. The only reason to keep it is performance.
 > 
 > 
-> I don't get this, I believe we want to recover from regular from/to user
-> path, isn't it?
+> Maybe it's time to introduce the config option?
 
-That (disable copy to/from user completely) would be a nice to have
-since it would reduce the attack surface of the driver, but e.g. your
-code already doesn't do that.
-
-
-
-> 
-> > 
-> > So if you want to try that, fine since it's a step in
-> > the right direction.
-> > 
-> > But I think fundamentally it's not what we want to do long term.
-> 
-> 
-> Yes.
-> 
-> 
-> > 
-> > It's always been a fundamental problem with this patch series that only
-> > metadata is accessed through a direct pointer.
-> > 
-> > The difference in ways you handle metadata and data is what is
-> > now coming and messing everything up.
-> 
-> 
-> I do propose soemthing like this in the past:
-> https://www.spinics.net/lists/linux-virtualization/msg36824.html. But looks
-> like you have some concern about its locality.
-
-Right and it doesn't go away. You'll need to come up
-with a test that messes it up and triggers a worst-case
-scenario, so we can measure how bad is that worst-case.
-
-> But the problem still there, GUP can do page fault, so still need to
-> synchronize it with MMU notifiers.
-
-I think the idea was, if GUP would need a pagefault, don't
-do a GUP and do to/from user instead. Hopefully that
-will fault the page in and the next access will go through.
-
-> The solution might be something like
-> moving GUP to a dedicated kind of vhost work.
-
-Right, generally GUP.
+Depending on CONFIG_BROKEN? I'm not sure it's a good idea.
 
 > 
 > > 
-> > So if continuing the direct map approach,
-> > what is needed is a cache of mapped VM memory, then on a cache miss
-> > we'd queue work along the lines of 1-2 above.
+> > Now as long as all this code is disabled anyway, we can experiment a
+> > bit.
 > > 
-> > That's one direction to take. Another one is to give up on that and
-> > write our own version of uaccess macros.  Add a "high security" flag to
-> > the vhost module and if not active use these for userspace memory
-> > access.
+> > I personally feel we would be best served by having two code paths:
+> > 
+> > - Access to VM memory directly mapped into kernel
+> > - Access to userspace
+> > 
+> > 
+> > Having it all cleanly split will allow a bunch of optimizations, for
+> > example for years now we planned to be able to process an incoming short
+> > packet directly on softirq path, or an outgoing on directly within
+> > eventfd.
 > 
 > 
-> Or using SET_BACKEND_FEATURES?
-
-No, I don't think it's considered best practice to allow unpriveledged
-userspace control over whether kernel enables security features.
-
-> But do you mean permanent GUP as I did in
-> original RFC https://lkml.org/lkml/2018/12/13/218?
+> It's not hard consider we've already had our own accssors. But the question
+> is (as asked in another thread), do you want permanent GUP or still use MMU
+> notifiers.
 > 
 > Thanks
 
-Permanent GUP breaks THP and NUMA.
+We want THP and NUMA to work. Both are important for performance.
 
-> > 
-> > 
+-- 
+MST
