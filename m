@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A9B881020
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 04:03:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 595BC81022
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 04:03:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727002AbfHECDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Aug 2019 22:03:36 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:45303 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726561AbfHECDf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Aug 2019 22:03:35 -0400
-Received: by mail-pf1-f196.google.com with SMTP id r1so38758746pfq.12;
-        Sun, 04 Aug 2019 19:03:34 -0700 (PDT)
+        id S1727043AbfHECDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Aug 2019 22:03:38 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:45417 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727023AbfHECDh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Aug 2019 22:03:37 -0400
+Received: by mail-pg1-f193.google.com with SMTP id o13so38824266pgp.12;
+        Sun, 04 Aug 2019 19:03:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Jyl7Q+fNfa4JowIqcItEgbQqxdMDKkuTAtedoCYt2UY=;
-        b=FvtLpj1sIKat6dYZDCdBvSFKvcXW3Uzr84PPtyV93kaWXBpfrl0mFg4f1neMu+P9Em
-         I4fQvEcqTuyi0x86KFVggzspCC7VOzaD0TIOapteN+A+KR6LwI5y+l9cLxR4n4Rc09a9
-         I7vvBsLWOkbECEO2/Vwc+tAZGVv8EPoajf/CHljXF9KY5DSY6o78B1rorXDplCOTV4+L
-         2fZYeRVqqrhdRT3bap2WHJRAr6i29xQAYKyBS5/O315xGBd/3v6TrUT/Qh32TldsY96q
-         K+7fVqzqxtHppK8rPWIjeZG0Swen6j9v06MbEiRkj2L5FzrbR5ITOQ3fneyvn6XS6c5r
-         6NCg==
+        bh=8vRU7XOXMncH2HX3CBvpyWbhKeVRVshARm7btXYP42w=;
+        b=JRkjiLqhPiQzvIKEiCqljsdkL9L0PLKJGD0M8FGiSEQyGD+ayKEZ1oT7QXiCZFYHee
+         11YGuCpYCC6khFTJMikwh8WVdxpDp8RPH3UCmQX5RNukpM62vOyZS/JlrSYBauHjkbI4
+         ThhsMYl3X2EeTzmjEVV1jbSEz/RGq1kvDR3IcbnbmhmzBYr4MlWfX8lMILYtL3urNZ6v
+         5T0IEg7vk3JVIckFDPvX1DR1i/ngxbrIKITnakd7yN0ctRDNZ/UXgiUaTgqQ0KemY0sI
+         s/UgfztHXULBduVkloiO3K0ih2YFU/b8D8hrcWR9ZJdxdJJedNKudUKhkzSth7mLDLAF
+         4QQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Jyl7Q+fNfa4JowIqcItEgbQqxdMDKkuTAtedoCYt2UY=;
-        b=RuUwGksfrIDE68rzrzgiiTBlhW0OL3vxWSkt3ZY9GyjhQ/4OFzMiuZynYMcAPY5DGG
-         JVeOTyddu540vN54mjgKuShgIOreBbtuyeSt6s/SRmz7aT3Q2RUm9eKDdrLvPOA+0nVY
-         LAj6NHD09cKZOKjtNETZg4u9P+RD6Glu0dQqOUOCB0OCSfAJKPqhvm5B2X+SyVym983t
-         5WB7WUQfpTo4oA0LfyaBOBLzYDQiSaZlasH69fYrNDxEOKQh+9loTPEbaSt0HQGiZhGY
-         yjXQQxWIR+9kd+WR720lFsADgRxWXnJnPmZ/9kYTuIjuURxUbtU7dYtPNBKpV3GvWJ8w
-         xFUQ==
-X-Gm-Message-State: APjAAAXjKAAF2selOS+6WTznxwnoI560Fsi0su4fg5pm/fk0t8Obafrv
-        7VsJofvnHk/jLDMSA5ElAejXguip
-X-Google-Smtp-Source: APXvYqwRqJB+jqVWCZuUvoalycZom+qF1VmCfkrl4I+LHUC3Ms2Glw+z/ecn2x+sAYTkrXOs8cxrUQ==
-X-Received: by 2002:a63:e54f:: with SMTP id z15mr133763407pgj.4.1564970614483;
-        Sun, 04 Aug 2019 19:03:34 -0700 (PDT)
+        bh=8vRU7XOXMncH2HX3CBvpyWbhKeVRVshARm7btXYP42w=;
+        b=HYDXeY2IQHdkPCvCHQcws5ySpKdRohTsC3DPcYLtRo5rowoli++bH/73sK2kh49sTJ
+         YUkEF6vxo6iePoaY28acGQNeGKY3ebBunqYIuz3ymaZC9O2pgKmQ12q31VD6zytnkL28
+         USmMPIWRDYXBxwTL1NV32j8rfwzGJ0iIcadjsjQZZCRNUmy2vvCgnIPTQHpMuhbwOF3p
+         s4Dha3frmoNjR0fY/0H+y2dG5PQlTb0KM5G64n93hsTlaZJoSJ1Q9NZNZMf3aZgyanHU
+         HHyC0cjycK/oHV2Ap5sMcsrxK/GWEKLvYRCVQmPlOMUcgQTN5rmfBHlR4cYDc571Qtf2
+         9mTg==
+X-Gm-Message-State: APjAAAUfsGrTn663v1ZHPfCpT4BzDCiN2//AW7kOM6W7iWa/RtZEfJtV
+        ac/KrV60dOdTrMPIIPSe8vavHbc9
+X-Google-Smtp-Source: APXvYqysH9UkVdeV7dX871CfGOlNrU5gaJfRp3C10inbQrUR5nPcAsJ8RE+ytIeCd/Eih61gHq03dQ==
+X-Received: by 2002:a17:90a:2ec1:: with SMTP id h1mr15787587pjs.119.1564970616325;
+        Sun, 04 Aug 2019 19:03:36 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id o32sm14739365pje.9.2019.08.04.19.03.32
+        by smtp.googlemail.com with ESMTPSA id o32sm14739365pje.9.2019.08.04.19.03.34
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 04 Aug 2019 19:03:34 -0700 (PDT)
+        Sun, 04 Aug 2019 19:03:35 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH v4 2/6] KVM: LAPIC: Don't need to wakeup vCPU twice afer timer fire
-Date:   Mon,  5 Aug 2019 10:03:20 +0800
-Message-Id: <1564970604-10044-2-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v4 3/6] KVM: Check preempted_in_kernel for involuntary preemption
+Date:   Mon,  5 Aug 2019 10:03:21 +0800
+Message-Id: <1564970604-10044-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
 References: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
@@ -65,42 +65,50 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-kvm_set_pending_timer() will take care to wake up the sleeping vCPU which
-has pending timer, don't need to check this in apic_timer_expired() again.
+preempted_in_kernel is updated in preempt_notifier when involuntary preemption
+ocurrs, it can be stale when the voluntarily preempted vCPUs are taken into
+account by kvm_vcpu_on_spin() loop. This patch lets it just check preempted_in_kernel
+for involuntary preemption.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/lapic.c | 8 --------
- 1 file changed, 8 deletions(-)
+ virt/kvm/kvm_main.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 0aa1586..685d17c 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1548,7 +1548,6 @@ static void kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
- static void apic_timer_expired(struct kvm_lapic *apic)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e121423..2ae9e84 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2522,7 +2522,8 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ 				continue;
+ 			if (swait_active(&vcpu->wq) && !vcpu_runnable(vcpu))
+ 				continue;
+-			if (yield_to_kernel_mode && !kvm_arch_vcpu_in_kernel(vcpu))
++			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
++				!kvm_arch_vcpu_in_kernel(vcpu))
+ 				continue;
+ 			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
+ 				continue;
+@@ -4219,7 +4220,7 @@ static void kvm_sched_in(struct preempt_notifier *pn, int cpu)
  {
- 	struct kvm_vcpu *vcpu = apic->vcpu;
--	struct swait_queue_head *q = &vcpu->wq;
- 	struct kvm_timer *ktimer = &apic->lapic_timer;
+ 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
  
- 	if (atomic_read(&apic->lapic_timer.pending))
-@@ -1566,13 +1565,6 @@ static void apic_timer_expired(struct kvm_lapic *apic)
+-	vcpu->preempted = false;
++	WRITE_ONCE(vcpu->preempted, false);
+ 	WRITE_ONCE(vcpu->ready, false);
  
- 	atomic_inc(&apic->lapic_timer.pending);
- 	kvm_set_pending_timer(vcpu);
--
--	/*
--	 * For x86, the atomic_inc() is serialized, thus
--	 * using swait_active() is safe.
--	 */
--	if (swait_active(q))
--		swake_up_one(q);
- }
+ 	kvm_arch_sched_in(vcpu, cpu);
+@@ -4233,7 +4234,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
+ 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
  
- static void start_sw_tscdeadline(struct kvm_lapic *apic)
+ 	if (current->state == TASK_RUNNING) {
+-		vcpu->preempted = true;
++		WRITE_ONCE(vcpu->preempted, true);
+ 		WRITE_ONCE(vcpu->ready, true);
+ 	}
+ 	kvm_arch_vcpu_put(vcpu);
 -- 
 2.7.4
 
