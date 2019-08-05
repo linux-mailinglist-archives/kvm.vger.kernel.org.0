@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 086D38125B
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 08:30:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC8FE8127C
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 08:40:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727330AbfHEGal (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 02:30:41 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:44633 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726829AbfHEGal (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 02:30:41 -0400
-Received: by mail-qk1-f195.google.com with SMTP id d79so59222427qke.11
-        for <kvm@vger.kernel.org>; Sun, 04 Aug 2019 23:30:40 -0700 (PDT)
+        id S1727401AbfHEGkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 02:40:31 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:38848 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725976AbfHEGkb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 02:40:31 -0400
+Received: by mail-qt1-f193.google.com with SMTP id n11so79897084qtl.5
+        for <kvm@vger.kernel.org>; Sun, 04 Aug 2019 23:40:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=PVqIsmchklCTrdzugsyQL+AeUL8kmqaAFQiz9HKaITE=;
-        b=Hpmj5s7SWXV5VBBZ34OB0AydpQlujJKXkpVQviLxayo6F9ZtzZYXIbD6chvogIU6EI
-         DGvsjyezHu0RQg/ALJtmPB9yvvNzyrVi9YojGr9zruSHyVAQBNhScXKwO+0ENj4bviv9
-         X607T1ZAZQMN44PbUqFOMhbZNL1MQHQb5jNhEoDO5knqRMD8m101GI+i10R4XL/LaABr
-         g0A3lKou3sUeA7xe8LcBRelYxBfNSReciLp2w8fcG52eSpdJPLyPcsiFmPXrlh2uWcLx
-         ZuQqQrtXpb0P98miFCGgH0Bi+gxLrozUKzhTO+zYQ613Nj7wgvvOjThmf2Mkn0OhXsoG
-         hfrg==
-X-Gm-Message-State: APjAAAXw4VPy8kpYmC6eMCLeOma37IGsTvf/ojI+pBIRvkPMpFhL5Rsg
-        Oq6wQvK94bGGCqcoKnyIaFN95A==
-X-Google-Smtp-Source: APXvYqwS0Eo1lXfnBu6u3xqFFZLty3hYj+avFeIYmNSdIaVzfHVVLe9QhqalA5xTV3YZrONCooErvg==
-X-Received: by 2002:a37:86c4:: with SMTP id i187mr100882695qkd.464.1564986640071;
-        Sun, 04 Aug 2019 23:30:40 -0700 (PDT)
+        bh=TJherR/Px/4Fbrw9YV+u4NRMIhgPOAQEPfJAeZ4Vfls=;
+        b=pvfD6g3hRlZKXpqdOcVXA3VW61v8MnJWSRvF08ftMMeJ1Nm4nMS/GquZNIutSOLRCy
+         yifGtbe+VL3jSAVquKtyQUxe59NnH7kX5oE7y8v5ZXRUzua0JIakmfWko6EolT58MghM
+         I0JyVYY3a+dS9Oq6kUNTWVCTlcrUKH5K6Twuyz9SMEqkjMJAI/N+GfxwhE2VXHORbyWR
+         FgnBLHt9croBtPsEVGuCLd9VNzCumPuqf/GtW/VVPTtkpUcjB0Hv5TGrHV19/4ew02MZ
+         lsjCilJ3+7UDP/9cJ4T4CITHOlAJh37pYXCVCtQmne1D3/KYRyM8zFxg3e9a2q5DHONI
+         s4Rg==
+X-Gm-Message-State: APjAAAV4l1/deIbOuSw+epYTtRSyvhVaqphPEJD6v9W9UmEKAem3N8z8
+        cttyqQUS/tqR//9GYa5+d4rA7w==
+X-Google-Smtp-Source: APXvYqySQxd6FG3GHb6mKg/OD+gospqbuIs1GOIQkfQIZWqsFx5h/wKXKUUrJ/WUSB3S9we9808RDA==
+X-Received: by 2002:aed:2dc7:: with SMTP id i65mr87212492qtd.365.1564987230384;
+        Sun, 04 Aug 2019 23:40:30 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
-        by smtp.gmail.com with ESMTPSA id n3sm34029874qkk.54.2019.08.04.23.30.36
+        by smtp.gmail.com with ESMTPSA id 6sm38704287qkp.82.2019.08.04.23.40.27
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 04 Aug 2019 23:30:39 -0700 (PDT)
-Date:   Mon, 5 Aug 2019 02:30:34 -0400
+        Sun, 04 Aug 2019 23:40:29 -0700 (PDT)
+Date:   Mon, 5 Aug 2019 02:40:24 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, linux-mm@kvack.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
 Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
  with worker
-Message-ID: <20190805022833-mutt-send-email-mst@kernel.org>
-References: <20190731084655.7024-8-jasowang@redhat.com>
- <20190731123935.GC3946@ziepe.ca>
+Message-ID: <20190805023106-mutt-send-email-mst@kernel.org>
+References: <20190731123935.GC3946@ziepe.ca>
  <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
  <20190731193057.GG3946@ziepe.ca>
  <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
@@ -53,68 +52,93 @@ References: <20190731084655.7024-8-jasowang@redhat.com>
  <20190802124613.GA11245@ziepe.ca>
  <20190802100414-mutt-send-email-mst@kernel.org>
  <e8ecb811-6653-cff4-bc11-81f4ccb0dbbf@redhat.com>
+ <494ac30d-b750-52c8-b927-16cd4b9414c4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e8ecb811-6653-cff4-bc11-81f4ccb0dbbf@redhat.com>
+In-Reply-To: <494ac30d-b750-52c8-b927-16cd4b9414c4@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 12:36:40PM +0800, Jason Wang wrote:
+On Mon, Aug 05, 2019 at 12:41:45PM +0800, Jason Wang wrote:
 > 
-> On 2019/8/2 下午10:27, Michael S. Tsirkin wrote:
-> > On Fri, Aug 02, 2019 at 09:46:13AM -0300, Jason Gunthorpe wrote:
-> > > On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
-> > > > > This must be a proper barrier, like a spinlock, mutex, or
-> > > > > synchronize_rcu.
+> On 2019/8/5 下午12:36, Jason Wang wrote:
+> > 
+> > On 2019/8/2 下午10:27, Michael S. Tsirkin wrote:
+> > > On Fri, Aug 02, 2019 at 09:46:13AM -0300, Jason Gunthorpe wrote:
+> > > > On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
+> > > > > > This must be a proper barrier, like a spinlock, mutex, or
+> > > > > > synchronize_rcu.
+> > > > > 
+> > > > > I start with synchronize_rcu() but both you and Michael raise some
+> > > > > concern.
+> > > > I've also idly wondered if calling synchronize_rcu() under the various
+> > > > mm locks is a deadlock situation.
 > > > > 
-> > > > I start with synchronize_rcu() but both you and Michael raise some
-> > > > concern.
-> > > I've also idly wondered if calling synchronize_rcu() under the various
-> > > mm locks is a deadlock situation.
+> > > > > Then I try spinlock and mutex:
+> > > > > 
+> > > > > 1) spinlock: add lots of overhead on datapath, this leads 0
+> > > > > performance
+> > > > > improvement.
+> > > > I think the topic here is correctness not performance improvement
+> > > The topic is whether we should revert
+> > > commit 7f466032dc9 ("vhost: access vq metadata through kernel
+> > > virtual address")
 > > > 
-> > > > Then I try spinlock and mutex:
-> > > > 
-> > > > 1) spinlock: add lots of overhead on datapath, this leads 0 performance
-> > > > improvement.
-> > > I think the topic here is correctness not performance improvement
-> > The topic is whether we should revert
-> > commit 7f466032dc9 ("vhost: access vq metadata through kernel virtual address")
+> > > or keep it in. The only reason to keep it is performance.
 > > 
-> > or keep it in. The only reason to keep it is performance.
+> > 
+> > Maybe it's time to introduce the config option?
 > 
 > 
-> Maybe it's time to introduce the config option?
-
-Depending on CONFIG_BROKEN? I'm not sure it's a good idea.
-
+> Or does it make sense if I post a V3 with:
 > 
-> > 
-> > Now as long as all this code is disabled anyway, we can experiment a
-> > bit.
-> > 
-> > I personally feel we would be best served by having two code paths:
-> > 
-> > - Access to VM memory directly mapped into kernel
-> > - Access to userspace
-> > 
-> > 
-> > Having it all cleanly split will allow a bunch of optimizations, for
-> > example for years now we planned to be able to process an incoming short
-> > packet directly on softirq path, or an outgoing on directly within
-> > eventfd.
+> - introduce config option and disable the optimization by default
 > 
+> - switch from synchronize_rcu() to vhost_flush_work(), but the rest are the
+> same
 > 
-> It's not hard consider we've already had our own accssors. But the question
-> is (as asked in another thread), do you want permanent GUP or still use MMU
-> notifiers.
+> This can give us some breath to decide which way should go for next release?
 > 
 > Thanks
 
-We want THP and NUMA to work. Both are important for performance.
+As is, with preempt enabled?  Nope I don't think blocking an invalidator
+on swap IO is ok, so I don't believe this stuff is going into this
+release at this point.
 
--- 
-MST
+So it's more a question of whether it's better to revert and apply a clean
+patch on top, or just keep the code around but disabled with an ifdef as is.
+I'm open to both options, and would like your opinion on this.
+
+> 
+> > 
+> > 
+> > > 
+> > > Now as long as all this code is disabled anyway, we can experiment a
+> > > bit.
+> > > 
+> > > I personally feel we would be best served by having two code paths:
+> > > 
+> > > - Access to VM memory directly mapped into kernel
+> > > - Access to userspace
+> > > 
+> > > 
+> > > Having it all cleanly split will allow a bunch of optimizations, for
+> > > example for years now we planned to be able to process an incoming short
+> > > packet directly on softirq path, or an outgoing on directly within
+> > > eventfd.
+> > 
+> > 
+> > It's not hard consider we've already had our own accssors. But the
+> > question is (as asked in another thread), do you want permanent GUP or
+> > still use MMU notifiers.
+> > 
+> > Thanks
+> > 
+> > _______________________________________________
+> > Virtualization mailing list
+> > Virtualization@lists.linux-foundation.org
+> > https://lists.linuxfoundation.org/mailman/listinfo/virtualization
