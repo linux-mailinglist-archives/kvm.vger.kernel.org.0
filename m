@@ -2,144 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB25C821AC
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 18:27:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C7F182238
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 18:29:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728892AbfHEQ1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 12:27:18 -0400
-Received: from mga17.intel.com ([192.55.52.151]:35190 "EHLO mga17.intel.com"
+        id S1730146AbfHEQ3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 12:29:10 -0400
+Received: from foss.arm.com ([217.140.110.172]:51590 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726620AbfHEQ1R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 12:27:17 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Aug 2019 09:27:17 -0700
-X-IronPort-AV: E=Sophos;i="5.64,350,1559545200"; 
-   d="scan'208";a="185363930"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Aug 2019 09:27:17 -0700
-Message-ID: <ed48ecdb833808bf6b08bc54fa98503cbad493f3.camel@linux.intel.com>
-Subject: Re: [PATCH v3 6/6] virtio-balloon: Add support for providing unused
- page reports to host
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
-        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, akpm@linux-foundation.org
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
-        konrad.wilk@oracle.com, willy@infradead.org,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com
-Date:   Mon, 05 Aug 2019 09:27:16 -0700
-In-Reply-To: <1cff09a4-d302-639c-ab08-9d82e5fc1383@redhat.com>
-References: <20190801222158.22190.96964.stgit@localhost.localdomain>
-         <20190801223829.22190.36831.stgit@localhost.localdomain>
-         <1cff09a4-d302-639c-ab08-9d82e5fc1383@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S1729835AbfHEQ3B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 12:29:01 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5058A344;
+        Mon,  5 Aug 2019 09:29:00 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 96E5D3F694;
+        Mon,  5 Aug 2019 09:28:58 -0700 (PDT)
+Subject: Re: [PATCH 6/9] KVM: arm64: Provide a PV_TIME device to user space
+To:     Steven Price <steven.price@arm.com>
+Cc:     kvm@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20190802145017.42543-1-steven.price@arm.com>
+ <20190802145017.42543-7-steven.price@arm.com> <20190803135113.6cdf500c@why>
+ <1a7d5be6-184b-0c78-61a3-b01730cb5df9@arm.com>
+From:   Marc Zyngier <maz@kernel.org>
+Organization: Approximate
+Message-ID: <c18f9d74-48eb-3e03-dca8-ad44e6d6b682@kernel.org>
+Date:   Mon, 5 Aug 2019 17:28:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <1a7d5be6-184b-0c78-61a3-b01730cb5df9@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2019-08-05 at 12:00 -0400, Nitesh Narayan Lal wrote:
-> On 8/1/19 6:38 PM, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > 
-> > Add support for the page reporting feature provided by virtio-balloon.
-> > Reporting differs from the regular balloon functionality in that is is
-> > much less durable than a standard memory balloon. Instead of creating a
-> > list of pages that cannot be accessed the pages are only inaccessible
-> > while they are being indicated to the virtio interface. Once the
-> > interface has acknowledged them they are placed back into their respective
-> > free lists and are once again accessible by the guest system.
-> > 
-> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > ---
-> >  drivers/virtio/Kconfig              |    1 +
-> >  drivers/virtio/virtio_balloon.c     |   56 +++++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/virtio_balloon.h |    1 +
-> >  3 files changed, 58 insertions(+)
-> > 
-> > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > index 078615cf2afc..4b2dd8259ff5 100644
-> > --- a/drivers/virtio/Kconfig
-> > +++ b/drivers/virtio/Kconfig
-> > @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
-> >  	tristate "Virtio balloon driver"
-> >  	depends on VIRTIO
-> >  	select MEMORY_BALLOON
-> > +	select PAGE_REPORTING
-> >  	---help---
-> >  	 This driver supports increasing and decreasing the amount
-> >  	 of memory within a KVM guest.
-> > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> > index 2c19457ab573..971fe924e34f 100644
-> > --- a/drivers/virtio/virtio_balloon.c
-> > +++ b/drivers/virtio/virtio_balloon.c
-> > @@ -19,6 +19,7 @@
-> >  #include <linux/mount.h>
-> >  #include <linux/magic.h>
-> >  #include <linux/pseudo_fs.h>
-> > +#include <linux/page_reporting.h>
-> >  
-> >  /*
-> >   * Balloon device works in 4K page units.  So each page is pointed to by
-> > @@ -37,6 +38,9 @@
-> >  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
-> >  	(1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
-> >  
-> > +/*  limit on the number of pages that can be on the reporting vq */
-> > +#define VIRTIO_BALLOON_VRING_HINTS_MAX	16
-> > +
-> >  #ifdef CONFIG_BALLOON_COMPACTION
-> >  static struct vfsmount *balloon_mnt;
-> >  #endif
-> > @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
-> >  	VIRTIO_BALLOON_VQ_DEFLATE,
-> >  	VIRTIO_BALLOON_VQ_STATS,
-> >  	VIRTIO_BALLOON_VQ_FREE_PAGE,
-> > +	VIRTIO_BALLOON_VQ_REPORTING,
-> >  	VIRTIO_BALLOON_VQ_MAX
-> >  };
-> >  
-> > @@ -113,6 +118,10 @@ struct virtio_balloon {
-> >  
-> >  	/* To register a shrinker to shrink memory upon memory pressure */
-> >  	struct shrinker shrinker;
-> > +
-> > +	/* Unused page reporting device */
-> > +	struct virtqueue *reporting_vq;
-> > +	struct page_reporting_dev_info ph_dev_info;
-> >  };
-> >  
-> >  static struct virtio_device_id id_table[] = {
-> > @@ -152,6 +161,23 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
-> >  
-> >  }
-> >  
-> > +void virtballoon_unused_page_report(struct page_reporting_dev_info *ph_dev_info,
-> > +				    unsigned int nents)
-> > +{
-> > +	struct virtio_balloon *vb =
-> > +		container_of(ph_dev_info, struct virtio_balloon, ph_dev_info);
-> > +	struct virtqueue *vq = vb->reporting_vq;
-> > +	unsigned int unused;
-> > +
-> > +	/* We should always be able to add these buffers to an empty queue. */
-> > +	virtqueue_add_inbuf(vq, ph_dev_info->sg, nents, vb,
-> > +			    GFP_NOWAIT | __GFP_NOWARN);
+On 05/08/2019 17:10, Steven Price wrote:
+> On 03/08/2019 13:51, Marc Zyngier wrote:
+>> On Fri,  2 Aug 2019 15:50:14 +0100
+>> Steven Price <steven.price@arm.com> wrote:
+>>
+>>> Allow user space to inform the KVM host where in the physical memory
+>>> map the paravirtualized time structures should be located.
+>>>
+>>> A device is created which provides the base address of an array of
+>>> Stolen Time (ST) structures, one for each VCPU. There must be (64 *
+>>> total number of VCPUs) bytes of memory available at this location.
+>>>
+>>> The address is given in terms of the physical address visible to
+>>> the guest and must be 64 byte aligned. The memory should be marked as
+>>> reserved to the guest to stop it allocating it for other purposes.
+>>
+>> Why? You seem to be allocating the memory from the kernel, so as far as
+>> the guest is concerned, this isn't generally usable memory.
 > 
-> I think you should handle allocation failure here. It is a possibility, isn't?
-> Maybe return an error or even disable page hinting/reporting?
+> I obviously didn't word it very well - that's what I meant. The "memory"
+> that represents the stolen time structure shouldn't be shown to the
+> guest as normal memory, but "reserved" for the purpose of stolen time.
 > 
+> To be honest it looks like I forgot to rewrite this commit message -
+> which 64 byte alignment is all that the guest can rely on (because each
+> vCPU has it's own structure), the actual array of structures needs to be
+> page aligned to ensure we can safely map it into the guest.
+> 
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_mmu.h  |   2 +
+>>>  arch/arm64/include/uapi/asm/kvm.h |   6 +
+>>>  arch/arm64/kvm/Makefile           |   1 +
+>>>  include/uapi/linux/kvm.h          |   2 +
+>>>  virt/kvm/arm/mmu.c                |  44 +++++++
+>>>  virt/kvm/arm/pvtime.c             | 190 ++++++++++++++++++++++++++++++
+>>>  6 files changed, 245 insertions(+)
+>>>  create mode 100644 virt/kvm/arm/pvtime.c
 
-I don't think it is an issue I have to worry about. Specifically I am
-limiting the size of the scatterlist based on the size of the vq. As such
-I will never exceed the size and should be able to use it to store the
-scatterlist directly.
+[...]
 
+>>> +static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
+>>> +				   struct kvm_device_attr *attr)
+>>> +{
+>>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>>> +	u64 __user *user = (u64 __user *)attr->addr;
+>>> +	u64 paddr;
+>>> +	int ret;
+>>> +
+>>> +	switch (attr->group) {
+>>> +	case KVM_DEV_ARM_PV_TIME_PADDR:
+>>> +		if (get_user(paddr, user))
+>>> +			return -EFAULT;
+>>> +		if (paddr & 63)
+>>> +			return -EINVAL;
+>>
+>> You should check whether the device fits into the IPA space for this
+>> guest, and whether it overlaps with anything else.
+> 
+> pvtime_map_pages() should fail in the case of overlap. That seems
+> sufficient to me - do you think we need something stronger?
+
+Definitely. stage2_set_pte() won't fail for a non-IO overlapping
+mapping, and will just treat it as guest memory. If this overlaps with a
+memslot, we'll never be able to fault that page in, ending up with
+interesting memory corruption... :-/
+
+That's one of the reasons why I think option (2) in your earlier email
+is an interesting one, as it sidesteps a whole lot of ugly and hard to
+test corner cases.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead, it just smells funny...
