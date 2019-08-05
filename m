@@ -2,86 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4104981945
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 14:27:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FC3B81BAE
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2019 15:16:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728665AbfHEM1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Aug 2019 08:27:35 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38233 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728144AbfHEM1e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Aug 2019 08:27:34 -0400
-Received: by mail-wr1-f68.google.com with SMTP id g17so84218920wrr.5
-        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 05:27:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9vjnriQzTp+3fhGfRWD4sJQPpUsfPg2DbYoNAsu2SiI=;
-        b=w4+AecEmFQ/isfLzRPwHz/5MZljTohJlWFNeug8MdHi82X9VKPhe2ZyRzjWlJCvepw
-         kiniiAn5l66EGF3UK+orcy9NcLV/dmSLcCGmna4yi0GF+i5dlXhqrxaPH9KubY6FHjLD
-         99EpBHJsVCkZSJoOyTaWRD/ilyziUyk+nwPk0RUQNGwqFtyKJh13sW08S3edQKCVQCth
-         hXeCoblZKRkBPCTcvTHLXaFhtdFGztMlOBo56CnAVX+z7v0wWKGwWN9zmif9kthuQeXJ
-         pVWvaRXUT6j8dcd4c9QdaTp337ImgbfM8u4W9iSkzJGgF+BBdaFvp1PMRW7Na8yEVZk+
-         giDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9vjnriQzTp+3fhGfRWD4sJQPpUsfPg2DbYoNAsu2SiI=;
-        b=KbuYh8CT7g4QP0UN4bxrSVsTj8DzSZUqIcln7nzWS0RF5Tn/xDyciI810236zwjVLj
-         OMM9krd0K7rM7teg5FM9RP3aer5U9ZDis6G5rMPcj9TDvzkiJ+7c6uR7FYFW1vEdnwtQ
-         0BmblAZXofIyBQBLyA4bgSS4JtUip8xMluEVr1DcjdB9PABJ/Q8/FPEmSPIxW3NI/yu5
-         xlPyDAHIy5NE1R4wuaj5SN8ishZKccaSr9lsaUMj/0PljO0/LCQ+9lt107EGQ7cC6T3E
-         kwdBzYEfFxk2GrnBMiC/my+iYtIPd3yMoPNtgSgS7pqjyMAibhBF2DZNSYT91aaH+C6/
-         EwlA==
-X-Gm-Message-State: APjAAAW0cR5Y3cwOe0Gw7j3VFif0xmAIqGUPciarsCdbpGe7V7NyGxgm
-        FQU9aa3MfyGUALhHO5KqRzLh9d9N+g97bH0HIFc=
-X-Google-Smtp-Source: APXvYqz/HgV3blyNJGsp03Z7QumAb6XXL7e/qsJ596wIug7Wl/foiSB6qgn4qCCaL+3bGAF5TklCThDKf6RqGhrKNGc=
-X-Received: by 2002:adf:b1cb:: with SMTP id r11mr152697746wra.328.1565008052530;
- Mon, 05 Aug 2019 05:27:32 -0700 (PDT)
+        id S1729518AbfHENGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Aug 2019 09:06:11 -0400
+Received: from foss.arm.com ([217.140.110.172]:48156 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729031AbfHENGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Aug 2019 09:06:09 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06BD41570;
+        Mon,  5 Aug 2019 06:06:09 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 15F153F706;
+        Mon,  5 Aug 2019 06:06:06 -0700 (PDT)
+Subject: Re: [PATCH 0/9] arm64: Stolen time support
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20190802145017.42543-1-steven.price@arm.com>
+ <20190803190522.5fec8f7d@why>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <6789f477-8ab5-cc54-1ad2-8627917b07c9@arm.com>
+Date:   Mon, 5 Aug 2019 14:06:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190802074620.115029-1-anup.patel@wdc.com> <20190802074620.115029-7-anup.patel@wdc.com>
- <98eaa917-8270-ecdc-2420-491ed1c903d8@redhat.com>
-In-Reply-To: <98eaa917-8270-ecdc-2420-491ed1c903d8@redhat.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 5 Aug 2019 17:57:20 +0530
-Message-ID: <CAAhSdy2rYy+hAaQROYqjDQPKDq1DvROLMjOuWamn6333W-rrpg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 06/19] RISC-V: KVM: Implement VCPU interrupts and
- requests handling
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190803190522.5fec8f7d@why>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 2, 2019 at 1:47 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 02/08/19 09:47, Anup Patel wrote:
-> > +     /* VCPU interrupts */
-> > +     unsigned long irqs_pending;
-> > +     unsigned long irqs_pending_mask;
-> > +
->
-> This deserves a comment on the locking policy (none for producer,
-> vcpu_lock for consumers).
+On 03/08/2019 19:05, Marc Zyngier wrote:
+> On Fri,  2 Aug 2019 15:50:08 +0100
+> Steven Price <steven.price@arm.com> wrote:
+> 
+> Hi Steven,
+> 
+>> This series add support for paravirtualized time for arm64 guests and
+>> KVM hosts following the specification in Arm's document DEN 0057A:
+>>
+>> https://developer.arm.com/docs/den0057/a
+>>
+>> It implements support for stolen time, allowing the guest to
+>> identify time when it is forcibly not executing.
+>>
+>> It doesn't implement support for Live Physical Time (LPT) as there are
+>> some concerns about the overheads and approach in the above
+>> specification, and I expect an updated version of the specification to
+>> be released soon with just the stolen time parts.
+> 
+> Thanks for posting this.
+> 
+> My current concern with this series is around the fact that we allocate
+> memory from the kernel on behalf of the guest. It is the first example
+> of such thing in the ARM port, and I can't really say I'm fond of it.
+> 
+> x86 seems to get away with it by having the memory allocated from
+> userspace, why I tend to like more. Yes, put_user is more
+> expensive than a straight store, but this isn't done too often either.
+> 
+> What is the rational for your current approach?
 
-Yes, I will certainly add comments about our approach in
-asm/kvm_host.h
+As I see it there are 3 approaches that can be taken here:
 
-Regards,
-Anup
+1. Hypervisor allocates memory and adds it to the virtual machine. This
+means that everything to do with the 'device' is encapsulated behind the
+KVM_CREATE_DEVICE / KVM_[GS]ET_DEVICE_ATTR ioctls. But since we want the
+stolen time structure to be fast it cannot be a trapping region and has
+to be backed by real memory - in this case allocated by the host kernel.
+
+2. Host user space allocates memory. Similar to above, but this time
+user space needs to manage the memory region as well as the usual
+KVM_CREATE_DEVICE dance. I've no objection to this, but it means
+kvmtool/QEMU needs to be much more aware of what is going on (e.g. how
+to size the memory region).
+
+3. Guest kernel "donates" the memory to the hypervisor for the
+structure. As far as I'm aware this is what x86 does. The problems I see
+this approach are:
+
+ a) kexec becomes much more tricky - there needs to be a disabling
+mechanism for the guest to stop the hypervisor scribbling on memory
+before starting the new kernel.
+
+ b) If there is more than one entity that is interested in the
+information (e.g. firmware and kernel) then this requires some form of
+arbitration in the guest because the hypervisor doesn't want to have to
+track an arbitrary number of regions to update.
+
+ c) Performance can suffer if the host kernel doesn't have a suitably
+aligned/sized area to use. As you say - put_user() is more expensive.
+The structure is updated on every return to the VM.
+
+
+Of course x86 does prove the third approach can work, but I'm not sure
+which is actually better. Avoid the kexec cancellation requirements was
+the main driver of the current approach. Although many of the
+conversations about this were also tied up with Live Physical Time which
+adds its own complications.
+
+Steve
