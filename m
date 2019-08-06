@@ -2,408 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BD7B8380D
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 19:40:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B013E83925
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 20:57:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387621AbfHFRjy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 13:39:54 -0400
-Received: from mga12.intel.com ([192.55.52.136]:3801 "EHLO mga12.intel.com"
+        id S1726497AbfHFS52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 14:57:28 -0400
+Received: from mga06.intel.com ([134.134.136.31]:40914 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387490AbfHFRjx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 13:39:53 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1726331AbfHFS5H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 14:57:07 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 10:39:46 -0700
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 11:56:59 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,353,1559545200"; 
-   d="scan'208";a="174242846"
-Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Aug 2019 10:39:46 -0700
-Date:   Tue, 6 Aug 2019 10:39:46 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     john.hubbard@gmail.com
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jan Kara <jack@suse.cz>, Jason Gunthorpe <jgg@ziepe.ca>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v2 01/34] mm/gup: add make_dirty arg to
- put_user_pages_dirty_lock()
-Message-ID: <20190806173945.GA4748@iweiny-DESK2.sc.intel.com>
-References: <20190804224915.28669-1-jhubbard@nvidia.com>
- <20190804224915.28669-2-jhubbard@nvidia.com>
+   d="scan'208";a="176715062"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 06 Aug 2019 11:56:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Eduardo Habkost <ehabkost@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: [RFC PATCH 00/20] i386: Add support for Intel SGX
+Date:   Tue,  6 Aug 2019 11:56:29 -0700
+Message-Id: <20190806185649.2476-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190804224915.28669-2-jhubbard@nvidia.com>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 04, 2019 at 03:48:42PM -0700, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> Provide a more capable variation of put_user_pages_dirty_lock(),
-> and delete put_user_pages_dirty(). This is based on the
-> following:
-> 
-> 1. Lots of call sites become simpler if a bool is passed
-> into put_user_page*(), instead of making the call site
-> choose which put_user_page*() variant to call.
-> 
-> 2. Christoph Hellwig's observation that set_page_dirty_lock()
-> is usually correct, and set_page_dirty() is usually a
-> bug, or at least questionable, within a put_user_page*()
-> calling chain.
-> 
-> This leads to the following API choices:
-> 
->     * put_user_pages_dirty_lock(page, npages, make_dirty)
-> 
->     * There is no put_user_pages_dirty(). You have to
->       hand code that, in the rare case that it's
->       required.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Ira Weiny <ira.weiny@intel.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/infiniband/core/umem.c             |   5 +-
->  drivers/infiniband/hw/hfi1/user_pages.c    |   5 +-
->  drivers/infiniband/hw/qib/qib_user_pages.c |  13 +--
->  drivers/infiniband/hw/usnic/usnic_uiom.c   |   5 +-
->  drivers/infiniband/sw/siw/siw_mem.c        |  19 +---
->  include/linux/mm.h                         |   5 +-
->  mm/gup.c                                   | 115 +++++++++------------
->  7 files changed, 61 insertions(+), 106 deletions(-)
-> 
-> diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.c
-> index 08da840ed7ee..965cf9dea71a 100644
-> --- a/drivers/infiniband/core/umem.c
-> +++ b/drivers/infiniband/core/umem.c
-> @@ -54,10 +54,7 @@ static void __ib_umem_release(struct ib_device *dev, struct ib_umem *umem, int d
->  
->  	for_each_sg_page(umem->sg_head.sgl, &sg_iter, umem->sg_nents, 0) {
->  		page = sg_page_iter_page(&sg_iter);
-> -		if (umem->writable && dirty)
-> -			put_user_pages_dirty_lock(&page, 1);
-> -		else
-> -			put_user_page(page);
-> +		put_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
->  	}
->  
->  	sg_free_table(&umem->sg_head);
-> diff --git a/drivers/infiniband/hw/hfi1/user_pages.c b/drivers/infiniband/hw/hfi1/user_pages.c
-> index b89a9b9aef7a..469acb961fbd 100644
-> --- a/drivers/infiniband/hw/hfi1/user_pages.c
-> +++ b/drivers/infiniband/hw/hfi1/user_pages.c
-> @@ -118,10 +118,7 @@ int hfi1_acquire_user_pages(struct mm_struct *mm, unsigned long vaddr, size_t np
->  void hfi1_release_user_pages(struct mm_struct *mm, struct page **p,
->  			     size_t npages, bool dirty)
->  {
-> -	if (dirty)
-> -		put_user_pages_dirty_lock(p, npages);
-> -	else
-> -		put_user_pages(p, npages);
-> +	put_user_pages_dirty_lock(p, npages, dirty);
->  
->  	if (mm) { /* during close after signal, mm can be NULL */
->  		atomic64_sub(npages, &mm->pinned_vm);
-> diff --git a/drivers/infiniband/hw/qib/qib_user_pages.c b/drivers/infiniband/hw/qib/qib_user_pages.c
-> index bfbfbb7e0ff4..26c1fb8d45cc 100644
-> --- a/drivers/infiniband/hw/qib/qib_user_pages.c
-> +++ b/drivers/infiniband/hw/qib/qib_user_pages.c
-> @@ -37,15 +37,6 @@
->  
->  #include "qib.h"
->  
-> -static void __qib_release_user_pages(struct page **p, size_t num_pages,
-> -				     int dirty)
-> -{
-> -	if (dirty)
-> -		put_user_pages_dirty_lock(p, num_pages);
-> -	else
-> -		put_user_pages(p, num_pages);
-> -}
-> -
->  /**
->   * qib_map_page - a safety wrapper around pci_map_page()
->   *
-> @@ -124,7 +115,7 @@ int qib_get_user_pages(unsigned long start_page, size_t num_pages,
->  
->  	return 0;
->  bail_release:
-> -	__qib_release_user_pages(p, got, 0);
-> +	put_user_pages_dirty_lock(p, got, false);
->  bail:
->  	atomic64_sub(num_pages, &current->mm->pinned_vm);
->  	return ret;
-> @@ -132,7 +123,7 @@ int qib_get_user_pages(unsigned long start_page, size_t num_pages,
->  
->  void qib_release_user_pages(struct page **p, size_t num_pages)
->  {
-> -	__qib_release_user_pages(p, num_pages, 1);
-> +	put_user_pages_dirty_lock(p, num_pages, true);
->  
->  	/* during close after signal, mm can be NULL */
->  	if (current->mm)
-> diff --git a/drivers/infiniband/hw/usnic/usnic_uiom.c b/drivers/infiniband/hw/usnic/usnic_uiom.c
-> index 0b0237d41613..62e6ffa9ad78 100644
-> --- a/drivers/infiniband/hw/usnic/usnic_uiom.c
-> +++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-> @@ -75,10 +75,7 @@ static void usnic_uiom_put_pages(struct list_head *chunk_list, int dirty)
->  		for_each_sg(chunk->page_list, sg, chunk->nents, i) {
->  			page = sg_page(sg);
->  			pa = sg_phys(sg);
-> -			if (dirty)
-> -				put_user_pages_dirty_lock(&page, 1);
-> -			else
-> -				put_user_page(page);
-> +			put_user_pages_dirty_lock(&page, 1, dirty);
->  			usnic_dbg("pa: %pa\n", &pa);
->  		}
->  		kfree(chunk);
-> diff --git a/drivers/infiniband/sw/siw/siw_mem.c b/drivers/infiniband/sw/siw/siw_mem.c
-> index 67171c82b0c4..1e197753bf2f 100644
-> --- a/drivers/infiniband/sw/siw/siw_mem.c
-> +++ b/drivers/infiniband/sw/siw/siw_mem.c
-> @@ -60,20 +60,6 @@ struct siw_mem *siw_mem_id2obj(struct siw_device *sdev, int stag_index)
->  	return NULL;
->  }
->  
-> -static void siw_free_plist(struct siw_page_chunk *chunk, int num_pages,
-> -			   bool dirty)
-> -{
-> -	struct page **p = chunk->plist;
-> -
-> -	while (num_pages--) {
-> -		if (!PageDirty(*p) && dirty)
-> -			put_user_pages_dirty_lock(p, 1);
-> -		else
-> -			put_user_page(*p);
-> -		p++;
-> -	}
-> -}
-> -
->  void siw_umem_release(struct siw_umem *umem, bool dirty)
->  {
->  	struct mm_struct *mm_s = umem->owning_mm;
-> @@ -82,8 +68,9 @@ void siw_umem_release(struct siw_umem *umem, bool dirty)
->  	for (i = 0; num_pages; i++) {
->  		int to_free = min_t(int, PAGES_PER_CHUNK, num_pages);
->  
-> -		siw_free_plist(&umem->page_chunk[i], to_free,
-> -			       umem->writable && dirty);
-> +		put_user_pages_dirty_lock(umem->page_chunk[i].plist,
-> +					  to_free,
-> +					  umem->writable && dirty);
->  		kfree(umem->page_chunk[i].plist);
->  		num_pages -= to_free;
->  	}
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 0334ca97c584..9759b6a24420 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1057,8 +1057,9 @@ static inline void put_user_page(struct page *page)
->  	put_page(page);
->  }
->  
-> -void put_user_pages_dirty(struct page **pages, unsigned long npages);
-> -void put_user_pages_dirty_lock(struct page **pages, unsigned long npages);
-> +void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
-> +			       bool make_dirty);
-> +
->  void put_user_pages(struct page **pages, unsigned long npages);
->  
->  #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 98f13ab37bac..7fefd7ab02c4 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -29,85 +29,70 @@ struct follow_page_context {
->  	unsigned int page_mask;
->  };
->  
-> -typedef int (*set_dirty_func_t)(struct page *page);
-> -
-> -static void __put_user_pages_dirty(struct page **pages,
-> -				   unsigned long npages,
-> -				   set_dirty_func_t sdf)
-> -{
-> -	unsigned long index;
-> -
-> -	for (index = 0; index < npages; index++) {
-> -		struct page *page = compound_head(pages[index]);
-> -
-> -		/*
-> -		 * Checking PageDirty at this point may race with
-> -		 * clear_page_dirty_for_io(), but that's OK. Two key cases:
-> -		 *
-> -		 * 1) This code sees the page as already dirty, so it skips
-> -		 * the call to sdf(). That could happen because
-> -		 * clear_page_dirty_for_io() called page_mkclean(),
-> -		 * followed by set_page_dirty(). However, now the page is
-> -		 * going to get written back, which meets the original
-> -		 * intention of setting it dirty, so all is well:
-> -		 * clear_page_dirty_for_io() goes on to call
-> -		 * TestClearPageDirty(), and write the page back.
-> -		 *
-> -		 * 2) This code sees the page as clean, so it calls sdf().
-> -		 * The page stays dirty, despite being written back, so it
-> -		 * gets written back again in the next writeback cycle.
-> -		 * This is harmless.
-> -		 */
-> -		if (!PageDirty(page))
-> -			sdf(page);
-> -
-> -		put_user_page(page);
-> -	}
-> -}
-> -
->  /**
-> - * put_user_pages_dirty() - release and dirty an array of gup-pinned pages
-> - * @pages:  array of pages to be marked dirty and released.
-> + * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned pages
-> + * @pages:  array of pages to be maybe marked dirty, and definitely released.
+This series enables exposing Intel Software Guard Extensions (SGX) to KVM
+guests.  This series is firmly RFC due to SGX support not yet being
+accepted into the Linux kernel, let alone KVM.
 
-Better would be.
+The primary goal of this RFC is to get feedback on the overall approach,
+especially with respect to Enclave Page Cache (EPC) handling, but any
+feedback whatsoever would be greatly appreciated.  Please don't hesitate
+to ask for more details and/or clarification.
 
-@pages:  array of pages to be put
+The code is based on 'https://github.com/ehabkost/qemu.git x86-next',
+which currently points at commit:
 
->   * @npages: number of pages in the @pages array.
-> + * @make_dirty: whether to mark the pages dirty
->   *
->   * "gup-pinned page" refers to a page that has had one of the get_user_pages()
->   * variants called on that page.
->   *
->   * For each page in the @pages array, make that page (or its head page, if a
-> - * compound page) dirty, if it was previously listed as clean. Then, release
-> - * the page using put_user_page().
-> + * compound page) dirty, if @make_dirty is true, and if the page was previously
-> + * listed as clean. In any case, releases all pages using put_user_page(),
-> + * possibly via put_user_pages(), for the non-dirty case.
-
-I don't think users of this interface need this level of detail.  I think
-something like.
-
- * For each page in the @pages array, release the page.  If @make_dirty is
- * true, mark the page dirty prior to release.
+  ff656fcd33 ("i386: Fix Snowridge CPU model name and features")
 
 
->   *
->   * Please see the put_user_page() documentation for details.
->   *
-> - * set_page_dirty(), which does not lock the page, is used here.
-> - * Therefore, it is the caller's responsibility to ensure that this is
-> - * safe. If not, then put_user_pages_dirty_lock() should be called instead.
-> + * set_page_dirty_lock() is used internally. If instead, set_page_dirty() is
-> + * required, then the caller should a) verify that this is really correct,
-> + * because _lock() is usually required, and b) hand code it:
-> + * set_page_dirty_lock(), put_user_page().
->   *
->   */
-> -void put_user_pages_dirty(struct page **pages, unsigned long npages)
-> +void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
-> +			       bool make_dirty)
->  {
-> -	__put_user_pages_dirty(pages, npages, set_page_dirty);
-> -}
-> -EXPORT_SYMBOL(put_user_pages_dirty);
-> +	unsigned long index;
->  
-> -/**
-> - * put_user_pages_dirty_lock() - release and dirty an array of gup-pinned pages
-> - * @pages:  array of pages to be marked dirty and released.
-> - * @npages: number of pages in the @pages array.
-> - *
-> - * For each page in the @pages array, make that page (or its head page, if a
-> - * compound page) dirty, if it was previously listed as clean. Then, release
-> - * the page using put_user_page().
-> - *
-> - * Please see the put_user_page() documentation for details.
-> - *
-> - * This is just like put_user_pages_dirty(), except that it invokes
-> - * set_page_dirty_lock(), instead of set_page_dirty().
-> - *
-> - */
-> -void put_user_pages_dirty_lock(struct page **pages, unsigned long npages)
-> -{
-> -	__put_user_pages_dirty(pages, npages, set_page_dirty_lock);
-> +	/*
-> +	 * TODO: this can be optimized for huge pages: if a series of pages is
-> +	 * physically contiguous and part of the same compound page, then a
-> +	 * single operation to the head page should suffice.
-> +	 */
+Brief arch blurb (providing useful documentation in a cover letter is
+impractical due to scope of SGX):
 
-I think this comment belongs to the for loop below...  or just something about
-how to make this and put_user_pages() more efficient.  It is odd, that this is
-the same comment as in put_user_pages()...
+  SGX is a set of instructions and mechanisms that enable ring 3
+  applications to set aside private regions of code and data for the
+  purpose of establishing and running enclaves.  An enclave is a secure
+  entity whose private memory can only be accessed by code running within
+  the enclave.  Accesses from outside the enclave, including software
+  running at a higher privilege level and other enclaves, are disallowed
+  by hardware.
 
-The code is good.  So... Other than the comments.
+Overviews and details:
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+  SGX arch kernel doc - https://patchwork.kernel.org/patch/11043125/
 
-Ira
+  SGX arch overview   - https://www.youtube.com/watch?v=mPT_vJrlHlg
 
-> +
-> +	if (!make_dirty) {
-> +		put_user_pages(pages, npages);
-> +		return;
-> +	}
-> +
-> +	for (index = 0; index < npages; index++) {
-> +		struct page *page = compound_head(pages[index]);
-> +		/*
-> +		 * Checking PageDirty at this point may race with
-> +		 * clear_page_dirty_for_io(), but that's OK. Two key
-> +		 * cases:
-> +		 *
-> +		 * 1) This code sees the page as already dirty, so it
-> +		 * skips the call to set_page_dirty(). That could happen
-> +		 * because clear_page_dirty_for_io() called
-> +		 * page_mkclean(), followed by set_page_dirty().
-> +		 * However, now the page is going to get written back,
-> +		 * which meets the original intention of setting it
-> +		 * dirty, so all is well: clear_page_dirty_for_io() goes
-> +		 * on to call TestClearPageDirty(), and write the page
-> +		 * back.
-> +		 *
-> +		 * 2) This code sees the page as clean, so it calls
-> +		 * set_page_dirty(). The page stays dirty, despite being
-> +		 * written back, so it gets written back again in the
-> +		 * next writeback cycle. This is harmless.
-> +		 */
-> +		if (!PageDirty(page))
-> +			set_page_dirty_lock(page);
-> +		put_user_page(page);
-> +	}
->  }
->  EXPORT_SYMBOL(put_user_pages_dirty_lock);
->  
-> -- 
-> 2.22.0
-> 
+Gory details on SGX are also available in all recent versions of Intel's
+SDM, e.g. chapters 37-42 in Vol. 3 of the May 2019 version of the SDM.
+
+
+Linux kernel and KVM enabling:
+
+  SGX kernel enabling - https://lkml.kernel.org/r/20190713170804.2340-1-jarkko.sakkinen@linux.intel.com
+
+  SGX KVM enabling    - https://lkml.kernel.org/r/20190727055214.9282-1-sean.j.christopherson@intel.com
+
+
+QEMU points of interest:
+
+Basics - SGX is exposed the guest if and only if KVM is enabled and
+         supports virtualization of SGX, and the kernel provides access
+         to "raw" EPC.  Because SGX uses a hardware-based root of trust,
+         the attestation aspects of SGX cannot be emulated in software,
+         i.e. ultimately emulation will fail as software cannot generate
+         a valid quote/report.  The complexity of partially emulating SGX
+         in Qemu far outweighs the value added, e.g. an SGX specific
+         simulator for userspace applications can emulate SGX for
+         development and testing purposes.
+
+EPC - Because of its unique requirements, the kernel manages EPC separately
+      from normal memory.  Similar to memfd, the device /dev/sgx/virt_epc
+      can be opened to obtain a file descriptor which can in turn be used
+      to mmap() EPC memory.
+
+      The notable quirk with EPC from QEMU's perspective is that EPC is
+      enumerated via CPUID, which complicates realizing EPC as a normal
+      device due to vCPU creation depending on the location/size of EPC
+      sections.
+
+Migration - Physical EPC is encrypted with an ephemeral key that is
+            (re)generated at CPU reset, i.e. is platform specific.  Thus,
+            migrating EPC contents between physical platforms is
+            infeasible.  However, live migration is not blocked by SGX as
+            kernels and applications are conditioned to gracefully handle
+            EPC invalidation due to the EPC being zapped on power state
+            transitions that power down the CPU, e.g. S3.  I.e. from the
+            guest's perspective, live migration appears and is handled
+            like an unannounced suspend/resume cycle.
+
+NUMA - How EPC NUMA affinity will be enumerated to the kernel is not yet
+       defined (initial hardware support for SGX was limited to single
+       socket systems).
+
+Sean Christopherson (20):
+  hostmem: Add hostmem-epc as a backend for SGX EPC
+  i386: Add 'sgx-epc' device to expose EPC sections to guest
+  vl: Add "sgx-epc" option to expose SGX EPC sections to guest
+  i386: Add primary SGX CPUID and MSR defines
+  i386: Add SGX CPUID leaf FEAT_SGX_12_0_EAX
+  i386: Add SGX CPUID leaf FEAT_SGX_12_1_EAX
+  i386: Add SGX CPUID leaf FEAT_SGX_12_1_EBX
+  i386: Add get/set/migrate support for SGX LE public key hash MSRs
+  i386: Add feature control MSR dependency when SGX is enabled
+  i386: Update SGX CPUID info according to hardware/KVM/user input
+  linux-headers: Add temporary placeholder for KVM_CAP_SGX_ATTRIBUTE
+  i386: kvm: Add support for exposing PROVISIONKEY to guest
+  i386: Propagate SGX CPUID sub-leafs to KVM
+  i386: Adjust min CPUID level to 0x12 when SGX is enabled
+  hw/i386/pc: Set SGX bits in feature control fw_cfg accordingly
+  hw/i386/pc: Account for SGX EPC sections when calculating device
+    memory
+  i386/pc: Add e820 entry for SGX EPC section(s)
+  i386: acpi: Add SGX EPC entry to ACPI tables
+  q35: Add support for SGX EPC
+  i440fx: Add support for SGX EPC
+
+ backends/Makefile.objs    |   1 +
+ backends/hostmem-epc.c    |  91 ++++++++++++
+ hw/i386/Makefile.objs     |   1 +
+ hw/i386/acpi-build.c      |  22 +++
+ hw/i386/pc.c              |  23 ++-
+ hw/i386/pc_piix.c         |   3 +
+ hw/i386/pc_q35.c          |   2 +
+ hw/i386/sgx-epc.c         | 291 ++++++++++++++++++++++++++++++++++++++
+ include/hw/i386/pc.h      |   3 +
+ include/hw/i386/sgx-epc.h |  75 ++++++++++
+ linux-headers/linux/kvm.h |   1 +
+ qapi/misc.json            |  32 ++++-
+ qemu-options.hx           |  12 ++
+ target/i386/cpu.c         | 148 ++++++++++++++++++-
+ target/i386/cpu.h         |  14 ++
+ target/i386/kvm-stub.c    |   5 +
+ target/i386/kvm.c         |  70 +++++++++
+ target/i386/kvm_i386.h    |   3 +
+ target/i386/machine.c     |  20 +++
+ vl.c                      |   9 ++
+ 20 files changed, 820 insertions(+), 6 deletions(-)
+ create mode 100644 backends/hostmem-epc.c
+ create mode 100644 hw/i386/sgx-epc.c
+ create mode 100644 include/hw/i386/sgx-epc.h
+
+-- 
+2.22.0
+
