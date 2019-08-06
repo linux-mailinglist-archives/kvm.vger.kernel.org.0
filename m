@@ -2,163 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C29A830AE
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 13:31:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3136683100
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 13:53:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732753AbfHFLbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 07:31:22 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:41431 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729702AbfHFLbV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 07:31:21 -0400
-Received: by mail-qt1-f195.google.com with SMTP id d17so5186580qtj.8
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2019 04:31:21 -0700 (PDT)
+        id S1726834AbfHFLxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 07:53:20 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:42044 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726092AbfHFLxU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 07:53:20 -0400
+Received: by mail-qk1-f193.google.com with SMTP id 201so62547343qkm.9
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2019 04:53:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=eo4243fxJunv120eldJ+yINhsaoHQ/b07ic+MhyUnUY=;
+        b=Z0mI1c0biLAyuHhq5HIH9liJ9V9NmYB6TCZCXG/MS5n6b7MXngGDqXWAvW9Q3wU70f
+         Yuj4Gf5hmNpwIefJdv3jpcVqzwrm17rlQpqCpa8h75KznnlVcHW+bOQ8mi52XzW32i5X
+         xMyKUlZMHS1zgPqQftCrIwo83eGAnrddpriXhq4ERkbDt3WwCS0upZb4/WtoahuAO8kW
+         rLLLe/brCqzVyuGIKUWxPpcJJrKlwgWXPRE3jAKSeJ2mD0cdUXjpM0rJYi2yNTADYoYQ
+         aDzSN7ZZQHTrS2/K7nALIkgZpt7+fyciFkxjLncICC8fqlQT1qsJ9jdY2CtN6k6kVuIQ
+         kuUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6MKE3WpJRvmKRFMaN2W9lDZcPJmjUwMQHP29v6g6oiE=;
-        b=BIwvv1acuK7O0n7mP70KLfexTDrqSwYZ4DSKE03yXTFc94IjXMWEMHLGo0Z4RIURil
-         iIWawGp+I3Y5/WxNLS9ePX3wBJZr2EBrICJb51VW354JPY69vYmyuP3hpQCJEJ+q9zGe
-         kfWBCs2Y/FAmQUC20A9Y9m5RtH47Qd53CmJmxXwcYLhOG3YSvvvYUvLYhziAx0DxLALp
-         niluqDfDAAl8qEiNi7sM+srpxD5/itFUOakwzQ1s0GcO4chX62IP3a/P8IESBdCCcbw9
-         YyjOTU89KzGYU1A9Zst/nUQ+3ZtXF0F/ASCWGS9Q4OBuXUN1qU2B6Cr69mZEBNS0Py09
-         H6Gg==
-X-Gm-Message-State: APjAAAUiyNrbUpMTchiAW/y+0RjaFTiG15iVnRyQgpwCyQ34+ewoOiEv
-        fraEvwma2/JYfd7yoGJMoM+JVA==
-X-Google-Smtp-Source: APXvYqzvrf13MUE19LiIf1x3M2bj2D6eaCY1fg59zYnBrXL5jz1U6+gizBe5cXM8McsO2BykNMm8bA==
-X-Received: by 2002:ac8:7a9a:: with SMTP id x26mr2526029qtr.251.1565091080543;
-        Tue, 06 Aug 2019 04:31:20 -0700 (PDT)
-Received: from redhat.com ([147.234.38.1])
-        by smtp.gmail.com with ESMTPSA id d31sm44554913qta.39.2019.08.06.04.31.14
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 04:31:19 -0700 (PDT)
-Date:   Tue, 6 Aug 2019 07:31:11 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, david@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, yang.zhang.wz@gmail.com,
-        pagupta@redhat.com, riel@surriel.com, konrad.wilk@oracle.com,
-        willy@infradead.org, lcapitulino@redhat.com, wei.w.wang@intel.com,
-        aarcange@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com
-Subject: Re: [PATCH v3 6/6] virtio-balloon: Add support for providing unused
- page reports to host
-Message-ID: <20190806073047-mutt-send-email-mst@kernel.org>
-References: <20190801222158.22190.96964.stgit@localhost.localdomain>
- <20190801223829.22190.36831.stgit@localhost.localdomain>
- <1cff09a4-d302-639c-ab08-9d82e5fc1383@redhat.com>
- <ed48ecdb833808bf6b08bc54fa98503cbad493f3.camel@linux.intel.com>
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=eo4243fxJunv120eldJ+yINhsaoHQ/b07ic+MhyUnUY=;
+        b=NDI66pK35dkk1PGT6NPxEKCiQ5vZ/V7iEWjK04R3agRV0+Oxqoml/8DWmkavu8vpVD
+         dt8hsWDcnOGujKBpMz8zZEitP+HCjBbCm8lqw2Q7UtoJvunZMY7S5EefPaou+vR46UCY
+         tA2ZeiaPpKflonIi1k51kODpk8uWC9MBfvHLOyV89CC3PalW7lWAHh/PeBG+9IO/VqKb
+         ztA+GFKx2iU/GTl0YZYr31erqD2x4qgcT0j9sYq5zrFzUTEk7zaY6H/1PQIN1cSH4KFC
+         wrbof408SA6wNUVY8UoL6Nvad/S1cuQdw9W4WojRFJO2qDbdKSFLlzXYAzHTEq/AG+t6
+         9JVw==
+X-Gm-Message-State: APjAAAWrs5YaVELZipiKw0gZoeR4KDAtZlrhSxuJQj05yNU2gNTC/F/I
+        7Z5B9j17lY3TiKZjPwn0/e6KSQ==
+X-Google-Smtp-Source: APXvYqw8Kp97Codo4loFeh85jsMCmVqW5Bh1vzUEuORvgfGzgHvIynQzybQA5mb0rqsqpydwn040qg==
+X-Received: by 2002:a05:620a:127c:: with SMTP id b28mr2606352qkl.299.1565092399391;
+        Tue, 06 Aug 2019 04:53:19 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id r14sm40128814qke.47.2019.08.06.04.53.18
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 06 Aug 2019 04:53:18 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1huy1l-0003cs-Vr; Tue, 06 Aug 2019 08:53:17 -0300
+Date:   Tue, 6 Aug 2019 08:53:17 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
+ with worker
+Message-ID: <20190806115317.GA11627@ziepe.ca>
+References: <20190731193057.GG3946@ziepe.ca>
+ <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
+ <20190801141512.GB23899@ziepe.ca>
+ <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
+ <20190802124613.GA11245@ziepe.ca>
+ <20190802100414-mutt-send-email-mst@kernel.org>
+ <20190802172418.GB11245@ziepe.ca>
+ <20190803172944-mutt-send-email-mst@kernel.org>
+ <20190804001400.GA25543@ziepe.ca>
+ <20190804040034-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ed48ecdb833808bf6b08bc54fa98503cbad493f3.camel@linux.intel.com>
+In-Reply-To: <20190804040034-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 09:27:16AM -0700, Alexander Duyck wrote:
-> On Mon, 2019-08-05 at 12:00 -0400, Nitesh Narayan Lal wrote:
-> > On 8/1/19 6:38 PM, Alexander Duyck wrote:
-> > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > 
-> > > Add support for the page reporting feature provided by virtio-balloon.
-> > > Reporting differs from the regular balloon functionality in that is is
-> > > much less durable than a standard memory balloon. Instead of creating a
-> > > list of pages that cannot be accessed the pages are only inaccessible
-> > > while they are being indicated to the virtio interface. Once the
-> > > interface has acknowledged them they are placed back into their respective
-> > > free lists and are once again accessible by the guest system.
-> > > 
-> > > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > ---
-> > >  drivers/virtio/Kconfig              |    1 +
-> > >  drivers/virtio/virtio_balloon.c     |   56 +++++++++++++++++++++++++++++++++++
-> > >  include/uapi/linux/virtio_balloon.h |    1 +
-> > >  3 files changed, 58 insertions(+)
-> > > 
-> > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > > index 078615cf2afc..4b2dd8259ff5 100644
-> > > --- a/drivers/virtio/Kconfig
-> > > +++ b/drivers/virtio/Kconfig
-> > > @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
-> > >  	tristate "Virtio balloon driver"
-> > >  	depends on VIRTIO
-> > >  	select MEMORY_BALLOON
-> > > +	select PAGE_REPORTING
-> > >  	---help---
-> > >  	 This driver supports increasing and decreasing the amount
-> > >  	 of memory within a KVM guest.
-> > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> > > index 2c19457ab573..971fe924e34f 100644
-> > > --- a/drivers/virtio/virtio_balloon.c
-> > > +++ b/drivers/virtio/virtio_balloon.c
-> > > @@ -19,6 +19,7 @@
-> > >  #include <linux/mount.h>
-> > >  #include <linux/magic.h>
-> > >  #include <linux/pseudo_fs.h>
-> > > +#include <linux/page_reporting.h>
-> > >  
-> > >  /*
-> > >   * Balloon device works in 4K page units.  So each page is pointed to by
-> > > @@ -37,6 +38,9 @@
-> > >  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
-> > >  	(1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
-> > >  
-> > > +/*  limit on the number of pages that can be on the reporting vq */
-> > > +#define VIRTIO_BALLOON_VRING_HINTS_MAX	16
-> > > +
-> > >  #ifdef CONFIG_BALLOON_COMPACTION
-> > >  static struct vfsmount *balloon_mnt;
-> > >  #endif
-> > > @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
-> > >  	VIRTIO_BALLOON_VQ_DEFLATE,
-> > >  	VIRTIO_BALLOON_VQ_STATS,
-> > >  	VIRTIO_BALLOON_VQ_FREE_PAGE,
-> > > +	VIRTIO_BALLOON_VQ_REPORTING,
-> > >  	VIRTIO_BALLOON_VQ_MAX
-> > >  };
-> > >  
-> > > @@ -113,6 +118,10 @@ struct virtio_balloon {
-> > >  
-> > >  	/* To register a shrinker to shrink memory upon memory pressure */
-> > >  	struct shrinker shrinker;
-> > > +
-> > > +	/* Unused page reporting device */
-> > > +	struct virtqueue *reporting_vq;
-> > > +	struct page_reporting_dev_info ph_dev_info;
-> > >  };
-> > >  
-> > >  static struct virtio_device_id id_table[] = {
-> > > @@ -152,6 +161,23 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
-> > >  
-> > >  }
-> > >  
-> > > +void virtballoon_unused_page_report(struct page_reporting_dev_info *ph_dev_info,
-> > > +				    unsigned int nents)
-> > > +{
-> > > +	struct virtio_balloon *vb =
-> > > +		container_of(ph_dev_info, struct virtio_balloon, ph_dev_info);
-> > > +	struct virtqueue *vq = vb->reporting_vq;
-> > > +	unsigned int unused;
-> > > +
-> > > +	/* We should always be able to add these buffers to an empty queue. */
-> > > +	virtqueue_add_inbuf(vq, ph_dev_info->sg, nents, vb,
-> > > +			    GFP_NOWAIT | __GFP_NOWARN);
+On Sun, Aug 04, 2019 at 04:07:17AM -0400, Michael S. Tsirkin wrote:
+> > > > Also, why can't this just permanently GUP the pages? In fact, where
+> > > > does it put_page them anyhow? Worrying that 7f466 adds a get_user page
+> > > > but does not add a put_page??
 > > 
-> > I think you should handle allocation failure here. It is a possibility, isn't?
-> > Maybe return an error or even disable page hinting/reporting?
+> > You didn't answer this.. Why not just use GUP?
 > > 
+> > Jason
 > 
-> I don't think it is an issue I have to worry about. Specifically I am
-> limiting the size of the scatterlist based on the size of the vq. As such
-> I will never exceed the size and should be able to use it to store the
-> scatterlist directly.
+> Sorry I misunderstood the question. Permanent GUP breaks lots of
+> functionality we need such as THP and numa balancing.
 
-I agree. But it can't hurt to BUG_ON for good measure.
+Really? It doesn't look like that many pages are involved..
 
--- 
-MST
+Jason
