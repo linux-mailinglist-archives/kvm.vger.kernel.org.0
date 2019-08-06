@@ -2,88 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AABB982E30
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 10:55:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2C5082EB4
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 11:30:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732356AbfHFIzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 04:55:25 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:39722 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728056AbfHFIzZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 04:55:25 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 00BF69BDC5D9930B0BAB;
-        Tue,  6 Aug 2019 16:55:23 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 6 Aug 2019
- 16:55:12 +0800
-Subject: Re: [PATCH 1/2] KVM: arm64: Don't write junk to sysregs on reset
-To:     Marc Zyngier <maz@kernel.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>
-CC:     Andrew Jones <drjones@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20190805121555.130897-1-maz@kernel.org>
- <20190805121555.130897-2-maz@kernel.org>
- <01b74492-c59f-dfd9-e439-752e6b1c53dc@huawei.com>
- <7b36f1dd-e44f-af75-0e51-8f6e705e81f6@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <1a5eb1cb-99e4-6e20-576a-076ca4fd3342@huawei.com>
-Date:   Tue, 6 Aug 2019 16:52:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+        id S1732493AbfHFJaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 05:30:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59628 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726713AbfHFJaP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 05:30:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5159B7BDB0;
+        Tue,  6 Aug 2019 09:30:15 +0000 (UTC)
+Received: from localhost (dhcp-192-181.str.redhat.com [10.33.192.181])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E1985C296;
+        Tue,  6 Aug 2019 09:30:04 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Auger Eric <eric.auger@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH v2] vfio: re-arrange vfio region definitions
+Date:   Tue,  6 Aug 2019 11:30:00 +0200
+Message-Id: <20190806093000.30149-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <7b36f1dd-e44f-af75-0e51-8f6e705e81f6@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 06 Aug 2019 09:30:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019/8/6 16:35, Marc Zyngier wrote:
-> On 06/08/2019 07:29, Zenghui Yu wrote:
->> Hi Marc,
->>
->> On 2019/8/5 20:15, Marc Zyngier wrote:
->>> At the moment, the way we reset system registers is mildly insane:
->>> We write junk to them, call the reset functions, and then check that
->>> we have something else in them.
->>>
->>> The "fun" thing is that this can happen while the guest is running
->>> (PSCI, for example). If anything in KVM has to evaluate the state
->>> of a system register while junk is in there, bad thing may happen.
->>>
->>> Let's stop doing that. Instead, we track that we have called a
->>> reset function for that register, and assume that the reset
->>> function has done something. This requires fixing a couple of
->>> sysreg refinition in the trap table.
->>>
->>> In the end, the very need of this reset check is pretty dubious,
->>> as it doesn't check everything (a lot of the sysregs leave outside of
->>> the sys_regs[] array). It may well be axed in the near future.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>
->> (Regardless of whether this check is needed or not,) I tested this patch
->> with kvm-unit-tests:
->>
->> for i in {1..100}; do QEMU=/path/to/qemu-system-aarch64 accel=kvm
->> arch=arm64 ./run_tests.sh; done
->>
->> And all the tests passed!
-> 
-> Great! Can I take this as a 'Tested-by:'?
+It is easy to miss already defined region types. Let's re-arrange
+the definitions a bit and add more comments to make it hopefully
+a bit clearer.
 
-Yes, please add:
+No functional change.
 
-Tested-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+v1 -> v2:
+  - moved all pci subtypes together
+  - tweaked comments a bit more
+---
+ include/uapi/linux/vfio.h | 45 ++++++++++++++++++++++-----------------
+ 1 file changed, 26 insertions(+), 19 deletions(-)
 
-
-Zenghui
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 8f10748dac79..e809b22f6a60 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -295,15 +295,38 @@ struct vfio_region_info_cap_type {
+ 	__u32 subtype;	/* type specific */
+ };
+ 
++/*
++ * List of region types, global per bus driver.
++ * If you introduce a new type, please add it here.
++ */
++
++/* PCI region type containing a PCI vendor part */
+ #define VFIO_REGION_TYPE_PCI_VENDOR_TYPE	(1 << 31)
+ #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
++#define VFIO_REGION_TYPE_GFX                    (1)
++#define VFIO_REGION_TYPE_CCW			(2)
++
++/* sub-types for VFIO_REGION_TYPE_PCI_* */
+ 
+-/* 8086 Vendor sub-types */
++/* 8086 vendor PCI sub-types */
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_OPREGION	(1)
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
+ #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
+ 
+-#define VFIO_REGION_TYPE_GFX                    (1)
++/* 10de vendor PCI sub-types */
++/*
++ * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
++ */
++#define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
++
++/* 1014 vendor PCI sub-types */
++/*
++ * IBM NPU NVlink2 ATSD (Address Translation Shootdown) register of NPU
++ * to do TLB invalidation on a GPU.
++ */
++#define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
++
++/* sub-types for VFIO_REGION_TYPE_GFX */
+ #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+ 
+ /**
+@@ -353,25 +376,9 @@ struct vfio_region_gfx_edid {
+ #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
+ };
+ 
+-#define VFIO_REGION_TYPE_CCW			(2)
+-/* ccw sub-types */
++/* sub-types for VFIO_REGION_TYPE_CCW */
+ #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+ 
+-/*
+- * 10de vendor sub-type
+- *
+- * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
+- */
+-#define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
+-
+-/*
+- * 1014 vendor sub-type
+- *
+- * IBM NPU NVlink2 ATSD (Address Translation Shootdown) register of NPU
+- * to do TLB invalidation on a GPU.
+- */
+-#define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
+-
+ /*
+  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+  * which allows direct access to non-MSIX registers which happened to be within
+-- 
+2.20.1
 
