@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0EF382B69
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 08:03:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2263882B65
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 08:02:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731852AbfHFGC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 02:02:26 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35712 "EHLO
+        id S1731845AbfHFGCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 02:02:15 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43788 "EHLO
         mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731594AbfHFGB4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 02:01:56 -0400
-Received: by mail-wr1-f68.google.com with SMTP id k2so702564wrq.2
-        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 23:01:55 -0700 (PDT)
+        with ESMTP id S1731748AbfHFGB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 02:01:58 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p13so11999783wru.10
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 23:01:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yAuOdcFvKcJE+TJQBnlj7YZrsenOZm0DkL2Ya79xDlk=;
-        b=sSj7ZgYQv3h7JuYXxxeg6yGVWKzoOVVEJCTfbIElKxsTE5G+89jtRAKXXeshQ5ooWu
-         TjIFmL4yjxuJjlp+ZqpbTgzgXHnfZtA+mmIssCXqgmMOosop7gNhvDK3GhqEgLyNTV6S
-         JgJsCDRd90yNDPYXUgjbFVtWGozYfMjkPMyK1VU4mcNctfEqEIYP31MKF5Vv9eXQEae3
-         zwhcaCZt4SMEnOViFuv3zW5SGAnaOu6FBHUqswo9HZiKsOAUo3Bu31BepRMTx2DZPO6k
-         jHy8kdQkkUuHbXx8MAzQFjwK5fzd0InV/VfDtmZRZiX7jjFghmfUw11u6/IZwZ9V2pE9
-         NfLA==
-X-Gm-Message-State: APjAAAXYmfKdYtpbJ/mi8zVyifd8t5zvazTj4CJlpm8NwkImpI4nkO/f
-        0CteYSH3bIx/C4WgqCJv+vGfNstbeVc=
-X-Google-Smtp-Source: APXvYqwiXF1AxGJU6sydSioAj2Kx1NEbKgbGzojrBQjdzJNbV+M2zF0ErfZ5H9XpyXimTCxAOZa3Bg==
-X-Received: by 2002:adf:db09:: with SMTP id s9mr1692425wri.214.1565071314493;
-        Mon, 05 Aug 2019 23:01:54 -0700 (PDT)
+        bh=k0Ev3p94bFZcOBtAj2tXYSUGySXDoFmcSIvRC97mli0=;
+        b=ddbO2kZcz5sjZ4wnUTTKMm5ncm3ezHPkmla4g02GCsIY9fM96dkUgPMn2AwWUlyMXj
+         ah98KYaTX3ABlnIYXtG2UeLz9Efo/01GWDnGw+MkKoky9Y1gACl76arSS6wphzc3ax9E
+         azZ0fiwoM0b/eFV6kkNrKQHon4opUVkNlycG2yHRD3/RhaRSD5S1BQg5zGx6hB9dsMg/
+         63qbPebdnsfGnpk9eLx3bQEcsGqmO2Jz0y/xhCbrBCF3Uha8tnvVhX9eLNB5cveXfvo6
+         6uH4raZs9nBn2AJohmnIwdPxqoUWnKT+fnsiHJWJj5xrMAE5wthaZ/qhU0KxHD1pBaGy
+         Zzsg==
+X-Gm-Message-State: APjAAAVg4ZIB3y57pdGcEmfCogvnuUcWu8M+PeWi+hEGeXRXveSOWlLk
+        QNeR/8Vc9TsKzSWzj9pqvyeuB60Aqp4=
+X-Google-Smtp-Source: APXvYqwP9Zzy60aDGWWgds+ahxo2L68kGsBd9jl629Unyb7waA9fRwq/O3Jk3pB0tas0oMMvz4jHlg==
+X-Received: by 2002:adf:8364:: with SMTP id 91mr2255022wrd.13.1565071315768;
+        Mon, 05 Aug 2019 23:01:55 -0700 (PDT)
 Received: from vitty.brq.redhat.com (ip-89-176-127-93.net.upcbroadband.cz. [89.176.127.93])
-        by smtp.gmail.com with ESMTPSA id r5sm94216756wmh.35.2019.08.05.23.01.53
+        by smtp.gmail.com with ESMTPSA id r5sm94216756wmh.35.2019.08.05.23.01.54
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 05 Aug 2019 23:01:54 -0700 (PDT)
+        Mon, 05 Aug 2019 23:01:55 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -40,9 +40,9 @@ Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v2 1/5] x86: KVM: svm: don't pretend to advance RIP in case wrmsr_interception() results in #GP
-Date:   Tue,  6 Aug 2019 08:01:46 +0200
-Message-Id: <20190806060150.32360-2-vkuznets@redhat.com>
+Subject: [PATCH v2 2/5] x86: KVM: svm: avoid flooding logs when skip_emulated_instruction() fails
+Date:   Tue,  6 Aug 2019 08:01:47 +0200
+Message-Id: <20190806060150.32360-3-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190806060150.32360-1-vkuznets@redhat.com>
 References: <20190806060150.32360-1-vkuznets@redhat.com>
@@ -53,38 +53,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-svm->next_rip is only used by skip_emulated_instruction() and in case
-kvm_set_msr() fails we rightfully don't do that. Move svm->next_rip
-advancement to 'else' branch to avoid creating false impression that
-it's always advanced (and make it look like rdmsr_interception()).
+When we're unable to skip instruction with kvm_emulate_instruction() we
+will not advance RIP and most likely the guest will get stuck as
+consequitive attempts to execute the same instruction will likely result
+in the same behavior.
 
-This is a preparatory change to removing hardcoded RIP advancement
-from instruction intercepts, no functional change.
+As we're not supposed to see these messages under normal conditions, switch
+to pr_err_once().
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/kvm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 7eafc6907861..7e843b340490 100644
+index 7e843b340490..80f576e05112 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -4447,13 +4447,13 @@ static int wrmsr_interception(struct vcpu_svm *svm)
- 	msr.index = ecx;
- 	msr.host_initiated = false;
- 
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
- 	if (kvm_set_msr(&svm->vcpu, &msr)) {
- 		trace_kvm_msr_write_ex(ecx, data);
- 		kvm_inject_gp(&svm->vcpu, 0);
- 		return 1;
- 	} else {
- 		trace_kvm_msr_write(ecx, data);
-+		svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
- 		return kvm_skip_emulated_instruction(&svm->vcpu);
+@@ -782,7 +782,8 @@ static void skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ 	if (!svm->next_rip) {
+ 		if (kvm_emulate_instruction(vcpu, EMULTYPE_SKIP) !=
+ 				EMULATE_DONE)
+-			printk(KERN_DEBUG "%s: NOP\n", __func__);
++			pr_err_once("KVM: %s: unable to skip instruction\n",
++				    __func__);
+ 		return;
  	}
- }
+ 	if (svm->next_rip - kvm_rip_read(vcpu) > MAX_INST_SIZE)
 -- 
 2.20.1
 
