@@ -2,92 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3136683100
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 13:53:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2631783122
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 14:04:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726834AbfHFLxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 07:53:20 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:42044 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726092AbfHFLxU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 07:53:20 -0400
-Received: by mail-qk1-f193.google.com with SMTP id 201so62547343qkm.9
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2019 04:53:19 -0700 (PDT)
+        id S1730593AbfHFMES (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 08:04:18 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:44899 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726711AbfHFMES (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 08:04:18 -0400
+Received: by mail-qt1-f194.google.com with SMTP id 44so53145431qtg.11
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2019 05:04:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=eo4243fxJunv120eldJ+yINhsaoHQ/b07ic+MhyUnUY=;
-        b=Z0mI1c0biLAyuHhq5HIH9liJ9V9NmYB6TCZCXG/MS5n6b7MXngGDqXWAvW9Q3wU70f
-         Yuj4Gf5hmNpwIefJdv3jpcVqzwrm17rlQpqCpa8h75KznnlVcHW+bOQ8mi52XzW32i5X
-         xMyKUlZMHS1zgPqQftCrIwo83eGAnrddpriXhq4ERkbDt3WwCS0upZb4/WtoahuAO8kW
-         rLLLe/brCqzVyuGIKUWxPpcJJrKlwgWXPRE3jAKSeJ2mD0cdUXjpM0rJYi2yNTADYoYQ
-         aDzSN7ZZQHTrS2/K7nALIkgZpt7+fyciFkxjLncICC8fqlQT1qsJ9jdY2CtN6k6kVuIQ
-         kuUg==
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=/FPGr6jzHPYMmvLrWMP/4jeZ5wMtWr8MomConqYdxCw=;
+        b=kwN8iZgGsA616k+ie7zVtqoKkPJCUoU9iiNH6foaeOBTxgKFKg+cZig/4zEdPfsbAE
+         imTkOw+N/gal+1pboal/fWK91KxOgzhhMdL0iTRREJABvKyEt3Ufx9IKidWtLDpA7wlG
+         9D0U+Ocv+7+jGN8gmxkVmfJqgoulbE7JQaMbA++nVny+EMylWeaEfpgkD0hSjvguAUdx
+         LTme6+JAjIDsU31cell6nZpPIOasOpsE3BLX48Nh53wDpRS1MGS6UPgJlSEriefVBoaW
+         X9Q/yQXt7r0a9KNgEj2XwtztzIPh4TLr8mCicotwiPelZo/OQ+sSdt6ODRD0nTuMLItg
+         nPCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=eo4243fxJunv120eldJ+yINhsaoHQ/b07ic+MhyUnUY=;
-        b=NDI66pK35dkk1PGT6NPxEKCiQ5vZ/V7iEWjK04R3agRV0+Oxqoml/8DWmkavu8vpVD
-         dt8hsWDcnOGujKBpMz8zZEitP+HCjBbCm8lqw2Q7UtoJvunZMY7S5EefPaou+vR46UCY
-         tA2ZeiaPpKflonIi1k51kODpk8uWC9MBfvHLOyV89CC3PalW7lWAHh/PeBG+9IO/VqKb
-         ztA+GFKx2iU/GTl0YZYr31erqD2x4qgcT0j9sYq5zrFzUTEk7zaY6H/1PQIN1cSH4KFC
-         wrbof408SA6wNUVY8UoL6Nvad/S1cuQdw9W4WojRFJO2qDbdKSFLlzXYAzHTEq/AG+t6
-         9JVw==
-X-Gm-Message-State: APjAAAWrs5YaVELZipiKw0gZoeR4KDAtZlrhSxuJQj05yNU2gNTC/F/I
-        7Z5B9j17lY3TiKZjPwn0/e6KSQ==
-X-Google-Smtp-Source: APXvYqw8Kp97Codo4loFeh85jsMCmVqW5Bh1vzUEuORvgfGzgHvIynQzybQA5mb0rqsqpydwn040qg==
-X-Received: by 2002:a05:620a:127c:: with SMTP id b28mr2606352qkl.299.1565092399391;
-        Tue, 06 Aug 2019 04:53:19 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=/FPGr6jzHPYMmvLrWMP/4jeZ5wMtWr8MomConqYdxCw=;
+        b=bj0Gv+gwMXxqPT1Km3qiFWivOdR5lXhxiTktlgZvVenQCotwcEoDxui/eLek6gXl4U
+         pVNKUh9Bzn1f2btc2Xmo4rI6266cJbeT7NxZdlcw0LEmlPhu5Gw6C4/h1XCJ0hmJbYP3
+         yAm3HD2Wlh3i0Y4rLUCPs76hdb5VZSiPjesocn0IknD6x/o67DB72MqUtTRT6D+hwcOz
+         kSIj6d/T1njC6HHdBXpvlCkeIQ7VBJGMd/mXNDX73LePOSOnAqfWWssqClj3A2ICwZJm
+         9V5hNDMGtAf0iZE8wUHbSt5wsuONa8kR6MOzT7IjFX43NZq6AvVCK/FJiiYHrDGbKezC
+         guKg==
+X-Gm-Message-State: APjAAAXEjU/a74msUUjFYjmDIIOneywfhrviubpXETxtdBVVZZ92WQgW
+        N9eAkpt5uVuEzBuY5n3ixKdcLg==
+X-Google-Smtp-Source: APXvYqyl6pRejslnyvYVBtbHRarAvLE8/IwB9kBOqtljVW3kFuK45lKI6xsfV3oqosPPvOz7rhnfwA==
+X-Received: by 2002:ac8:252e:: with SMTP id 43mr2606764qtm.61.1565093057443;
+        Tue, 06 Aug 2019 05:04:17 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id r14sm40128814qke.47.2019.08.06.04.53.18
+        by smtp.gmail.com with ESMTPSA id c45sm44553632qte.70.2019.08.06.05.04.16
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 06 Aug 2019 04:53:18 -0700 (PDT)
+        Tue, 06 Aug 2019 05:04:16 -0700 (PDT)
 Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
         (envelope-from <jgg@ziepe.ca>)
-        id 1huy1l-0003cs-Vr; Tue, 06 Aug 2019 08:53:17 -0300
-Date:   Tue, 6 Aug 2019 08:53:17 -0300
+        id 1huyCO-0003hy-5t; Tue, 06 Aug 2019 09:04:16 -0300
+Date:   Tue, 6 Aug 2019 09:04:16 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Subject: Re: [PATCH V2 7/9] vhost: do not use RCU to synchronize MMU notifier
  with worker
-Message-ID: <20190806115317.GA11627@ziepe.ca>
-References: <20190731193057.GG3946@ziepe.ca>
+Message-ID: <20190806120416.GB11627@ziepe.ca>
+References: <20190731084655.7024-1-jasowang@redhat.com>
+ <20190731084655.7024-8-jasowang@redhat.com>
+ <20190731123935.GC3946@ziepe.ca>
+ <7555c949-ae6f-f105-6e1d-df21ddae9e4e@redhat.com>
+ <20190731193057.GG3946@ziepe.ca>
  <a3bde826-6329-68e4-2826-8a9de4c5bd1e@redhat.com>
  <20190801141512.GB23899@ziepe.ca>
  <42ead87b-1749-4c73-cbe4-29dbeb945041@redhat.com>
  <20190802124613.GA11245@ziepe.ca>
- <20190802100414-mutt-send-email-mst@kernel.org>
- <20190802172418.GB11245@ziepe.ca>
- <20190803172944-mutt-send-email-mst@kernel.org>
- <20190804001400.GA25543@ziepe.ca>
- <20190804040034-mutt-send-email-mst@kernel.org>
+ <11b2a930-eae4-522c-4132-3f8a2da05666@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190804040034-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <11b2a930-eae4-522c-4132-3f8a2da05666@redhat.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 04, 2019 at 04:07:17AM -0400, Michael S. Tsirkin wrote:
-> > > > Also, why can't this just permanently GUP the pages? In fact, where
-> > > > does it put_page them anyhow? Worrying that 7f466 adds a get_user page
-> > > > but does not add a put_page??
-> > 
-> > You didn't answer this.. Why not just use GUP?
-> > 
-> > Jason
+On Mon, Aug 05, 2019 at 12:20:45PM +0800, Jason Wang wrote:
 > 
-> Sorry I misunderstood the question. Permanent GUP breaks lots of
-> functionality we need such as THP and numa balancing.
+> On 2019/8/2 下午8:46, Jason Gunthorpe wrote:
+> > On Fri, Aug 02, 2019 at 05:40:07PM +0800, Jason Wang wrote:
+> > > > This must be a proper barrier, like a spinlock, mutex, or
+> > > > synchronize_rcu.
+> > > 
+> > > I start with synchronize_rcu() but both you and Michael raise some
+> > > concern.
+> > I've also idly wondered if calling synchronize_rcu() under the various
+> > mm locks is a deadlock situation.
+> 
+> 
+> Maybe, that's why I suggest to use vhost_work_flush() which is much
+> lightweight can can achieve the same function. It can guarantee all previous
+> work has been processed after vhost_work_flush() return.
 
-Really? It doesn't look like that many pages are involved..
+If things are already running in a work, then yes, you can piggyback
+on the existing spinlocks inside the workqueue and be Ok
+
+However, if that work is doing any copy_from_user, then the flush
+becomes dependent on swap and it won't work again...
+
+> > > 1) spinlock: add lots of overhead on datapath, this leads 0 performance
+> > > improvement.
+> > I think the topic here is correctness not performance improvement> 
+ 
+> But the whole series is to speed up vhost.
+
+So? Starting with a whole bunch of crazy, possibly broken, locking and
+claiming a performance win is not reasonable.
+
+> Spinlock is correct but make the whole series meaningless consider it won't
+> bring any performance improvement.
+
+You can't invent a faster spinlock by opencoding some wild
+scheme. There is nothing special about the usage here, it needs a
+blocking lock, plain and simple.
 
 Jason
