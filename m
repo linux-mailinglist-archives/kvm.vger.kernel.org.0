@@ -2,163 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92400834F7
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 17:18:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60FD383543
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 17:29:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732515AbfHFPSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 11:18:10 -0400
-Received: from mga06.intel.com ([134.134.136.31]:22167 "EHLO mga06.intel.com"
+        id S1729680AbfHFP3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 11:29:44 -0400
+Received: from mga18.intel.com ([134.134.136.126]:27216 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726713AbfHFPSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 11:18:09 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1728259AbfHFP3o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 11:29:44 -0400
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 08:16:37 -0700
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 08:29:43 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,353,1559545200"; 
-   d="scan'208";a="185676339"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 08:16:36 -0700
-Message-ID: <dcd778623685079f66bfccb5dc0195e6f5bc992d.camel@linux.intel.com>
-Subject: Re: [PATCH v3 6/6] virtio-balloon: Add support for providing unused
- page reports to host
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, david@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, yang.zhang.wz@gmail.com,
-        pagupta@redhat.com, riel@surriel.com, konrad.wilk@oracle.com,
-        willy@infradead.org, lcapitulino@redhat.com, wei.w.wang@intel.com,
-        aarcange@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com
-Date:   Tue, 06 Aug 2019 08:16:36 -0700
-In-Reply-To: <20190806073047-mutt-send-email-mst@kernel.org>
-References: <20190801222158.22190.96964.stgit@localhost.localdomain>
-         <20190801223829.22190.36831.stgit@localhost.localdomain>
-         <1cff09a4-d302-639c-ab08-9d82e5fc1383@redhat.com>
-         <ed48ecdb833808bf6b08bc54fa98503cbad493f3.camel@linux.intel.com>
-         <20190806073047-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+   d="scan'208";a="192690589"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga001.fm.intel.com with ESMTP; 06 Aug 2019 08:29:43 -0700
+Date:   Tue, 6 Aug 2019 08:29:43 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 1/5] x86: KVM: svm: don't pretend to advance RIP in
+ case wrmsr_interception() results in #GP
+Message-ID: <20190806152943.GC27766@linux.intel.com>
+References: <20190806060150.32360-1-vkuznets@redhat.com>
+ <20190806060150.32360-2-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190806060150.32360-2-vkuznets@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2019-08-06 at 07:31 -0400, Michael S. Tsirkin wrote:
-> On Mon, Aug 05, 2019 at 09:27:16AM -0700, Alexander Duyck wrote:
-> > On Mon, 2019-08-05 at 12:00 -0400, Nitesh Narayan Lal wrote:
-> > > On 8/1/19 6:38 PM, Alexander Duyck wrote:
-> > > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > > 
-> > > > Add support for the page reporting feature provided by virtio-balloon.
-> > > > Reporting differs from the regular balloon functionality in that is is
-> > > > much less durable than a standard memory balloon. Instead of creating a
-> > > > list of pages that cannot be accessed the pages are only inaccessible
-> > > > while they are being indicated to the virtio interface. Once the
-> > > > interface has acknowledged them they are placed back into their respective
-> > > > free lists and are once again accessible by the guest system.
-> > > > 
-> > > > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > > > ---
-> > > >  drivers/virtio/Kconfig              |    1 +
-> > > >  drivers/virtio/virtio_balloon.c     |   56 +++++++++++++++++++++++++++++++++++
-> > > >  include/uapi/linux/virtio_balloon.h |    1 +
-> > > >  3 files changed, 58 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > > > index 078615cf2afc..4b2dd8259ff5 100644
-> > > > --- a/drivers/virtio/Kconfig
-> > > > +++ b/drivers/virtio/Kconfig
-> > > > @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
-> > > >  	tristate "Virtio balloon driver"
-> > > >  	depends on VIRTIO
-> > > >  	select MEMORY_BALLOON
-> > > > +	select PAGE_REPORTING
-> > > >  	---help---
-> > > >  	 This driver supports increasing and decreasing the amount
-> > > >  	 of memory within a KVM guest.
-> > > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> > > > index 2c19457ab573..971fe924e34f 100644
-> > > > --- a/drivers/virtio/virtio_balloon.c
-> > > > +++ b/drivers/virtio/virtio_balloon.c
-> > > > @@ -19,6 +19,7 @@
-> > > >  #include <linux/mount.h>
-> > > >  #include <linux/magic.h>
-> > > >  #include <linux/pseudo_fs.h>
-> > > > +#include <linux/page_reporting.h>
-> > > >  
-> > > >  /*
-> > > >   * Balloon device works in 4K page units.  So each page is pointed to by
-> > > > @@ -37,6 +38,9 @@
-> > > >  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
-> > > >  	(1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
-> > > >  
-> > > > +/*  limit on the number of pages that can be on the reporting vq */
-> > > > +#define VIRTIO_BALLOON_VRING_HINTS_MAX	16
-> > > > +
-> > > >  #ifdef CONFIG_BALLOON_COMPACTION
-> > > >  static struct vfsmount *balloon_mnt;
-> > > >  #endif
-> > > > @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
-> > > >  	VIRTIO_BALLOON_VQ_DEFLATE,
-> > > >  	VIRTIO_BALLOON_VQ_STATS,
-> > > >  	VIRTIO_BALLOON_VQ_FREE_PAGE,
-> > > > +	VIRTIO_BALLOON_VQ_REPORTING,
-> > > >  	VIRTIO_BALLOON_VQ_MAX
-> > > >  };
-> > > >  
-> > > > @@ -113,6 +118,10 @@ struct virtio_balloon {
-> > > >  
-> > > >  	/* To register a shrinker to shrink memory upon memory pressure */
-> > > >  	struct shrinker shrinker;
-> > > > +
-> > > > +	/* Unused page reporting device */
-> > > > +	struct virtqueue *reporting_vq;
-> > > > +	struct page_reporting_dev_info ph_dev_info;
-> > > >  };
-> > > >  
-> > > >  static struct virtio_device_id id_table[] = {
-> > > > @@ -152,6 +161,23 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
-> > > >  
-> > > >  }
-> > > >  
-> > > > +void virtballoon_unused_page_report(struct page_reporting_dev_info *ph_dev_info,
-> > > > +				    unsigned int nents)
-> > > > +{
-> > > > +	struct virtio_balloon *vb =
-> > > > +		container_of(ph_dev_info, struct virtio_balloon, ph_dev_info);
-> > > > +	struct virtqueue *vq = vb->reporting_vq;
-> > > > +	unsigned int unused;
-> > > > +
-> > > > +	/* We should always be able to add these buffers to an empty queue. */
-> > > > +	virtqueue_add_inbuf(vq, ph_dev_info->sg, nents, vb,
-> > > > +			    GFP_NOWAIT | __GFP_NOWARN);
-> > > 
-> > > I think you should handle allocation failure here. It is a possibility, isn't?
-> > > Maybe return an error or even disable page hinting/reporting?
-> > > 
-> > 
-> > I don't think it is an issue I have to worry about. Specifically I am
-> > limiting the size of the scatterlist based on the size of the vq. As such
-> > I will never exceed the size and should be able to use it to store the
-> > scatterlist directly.
+On Tue, Aug 06, 2019 at 08:01:46AM +0200, Vitaly Kuznetsov wrote:
+> svm->next_rip is only used by skip_emulated_instruction() and in case
+> kvm_set_msr() fails we rightfully don't do that. Move svm->next_rip
+> advancement to 'else' branch to avoid creating false impression that
+> it's always advanced (and make it look like rdmsr_interception()).
 > 
-> I agree. But it can't hurt to BUG_ON for good measure.
+> This is a preparatory change to removing hardcoded RIP advancement
+> from instruction intercepts, no functional change.
 > 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-I wouldn't use a BUG_ON as that seems overkill. No need to panic the
-kernel just because we couldn't report some idle pages.
-
-I can probably do something like:
-	if (WARN_ON(err))
-		return;
-
-That way the unused page reporting can run to completion still and the
-fact that we aren't really hinting on the pages would effectively be no
-different then if we had a direct assigned device or shared memory in the
-hypervisor.
-
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
