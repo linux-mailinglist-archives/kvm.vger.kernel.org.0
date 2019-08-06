@@ -2,71 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BA71782B8B
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 08:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E974582BAC
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 08:32:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731728AbfHFGU6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 02:20:58 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:35481 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731540AbfHFGU6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 02:20:58 -0400
-Received: by mail-wr1-f66.google.com with SMTP id k2so744809wrq.2
-        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 23:20:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aMztFRMwS894XHsmEs01R20QPKJnerKfJ/mqwGoosCA=;
-        b=n+y5uGPrOFJ4vBVGvbkJgNkaC4G1XcHrFlRE2SvnYQxsWICe6p/zwjQKhtXwQoz5ju
-         Dm7jPlVXVT/O9B2PIFjL3LqOscERL7qTbvgv3/T3RcJgCQoggUW3e25hSWQU4vx5Dl7/
-         izYc3V7G+9jA7hzp2xMOOm/3u09qXyBoZ+ePEgUIr5eDGlnj+P3o3dgh/ORKfOdiY0R6
-         bA2It/TDAjZmUpNDMsDrqoJ3mWSjOJCqgmo/xFCfXAySVEKKexD+vOQGd2FBxVUnKMAd
-         GR/Z8CFdxtijXvevEVqfyqCVWjZzY8Rfbm5j638kHsDGGM18Zped2C3KjAf5UhNb9wj0
-         l8uA==
-X-Gm-Message-State: APjAAAVypj3Ej0WEA+TVu7X6M4kWDGQY6+HtrtKYXIIByAL/JtI2pxp/
-        rUjpJftfvICm44KrrXsZyeXHBg==
-X-Google-Smtp-Source: APXvYqylbgUdbdCCip+TqSzuS3nN/TZgFkjI643QFSasgjW2I/qMUGjPcLCRAwvxZhdJxcEgwJic+A==
-X-Received: by 2002:a5d:4949:: with SMTP id r9mr2276210wrs.289.1565072456384;
-        Mon, 05 Aug 2019 23:20:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810? ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
-        by smtp.gmail.com with ESMTPSA id t63sm84881683wmt.6.2019.08.05.23.20.55
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Aug 2019 23:20:55 -0700 (PDT)
-Subject: Re: [PATCH v4 1/6] KVM: Fix leak vCPU's VMCS value into other pCPU
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Marc Zyngier <Marc.Zyngier@arm.com>,
-        "# v3 . 10+" <stable@vger.kernel.org>
-References: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
- <9acbc733-442f-0f65-9b56-ff800a3fa0f5@redhat.com>
- <CANRm+CwH54S555nw-Zik-3NFDH9yqe+SOZrGc3mPoAU_qGxP-A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e7b84893-42bf-e80e-61c9-ef5d1b200064@redhat.com>
-Date:   Tue, 6 Aug 2019 08:20:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731671AbfHFGb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 02:31:59 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3765 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726076AbfHFGb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 02:31:59 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id E3131677EF7A9412FF53;
+        Tue,  6 Aug 2019 14:31:56 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Tue, 6 Aug 2019
+ 14:31:46 +0800
+Subject: Re: [PATCH 1/2] KVM: arm64: Don't write junk to sysregs on reset
+To:     Marc Zyngier <maz@kernel.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>
+CC:     Andrew Jones <drjones@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20190805121555.130897-1-maz@kernel.org>
+ <20190805121555.130897-2-maz@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <01b74492-c59f-dfd9-e439-752e6b1c53dc@huawei.com>
+Date:   Tue, 6 Aug 2019 14:29:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CwH54S555nw-Zik-3NFDH9yqe+SOZrGc3mPoAU_qGxP-A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190805121555.130897-2-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/08/19 02:35, Wanpeng Li wrote:
-> Thank you, Paolo! Btw, how about other 5 patches?
+Hi Marc,
 
-Queued everything else too.
+On 2019/8/5 20:15, Marc Zyngier wrote:
+> At the moment, the way we reset system registers is mildly insane:
+> We write junk to them, call the reset functions, and then check that
+> we have something else in them.
+> 
+> The "fun" thing is that this can happen while the guest is running
+> (PSCI, for example). If anything in KVM has to evaluate the state
+> of a system register while junk is in there, bad thing may happen.
+> 
+> Let's stop doing that. Instead, we track that we have called a
+> reset function for that register, and assume that the reset
+> function has done something. This requires fixing a couple of
+> sysreg refinition in the trap table.
+> 
+> In the end, the very need of this reset check is pretty dubious,
+> as it doesn't check everything (a lot of the sysregs leave outside of
+> the sys_regs[] array). It may well be axed in the near future.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Paolo
+(Regardless of whether this check is needed or not,) I tested this patch
+with kvm-unit-tests:
 
-> Regards,
-> Wanpeng Li
+for i in {1..100}; do QEMU=/path/to/qemu-system-aarch64 accel=kvm 
+arch=arm64 ./run_tests.sh; done
+
+And all the tests passed!
+
+
+Thanks,
+zenghui
 
