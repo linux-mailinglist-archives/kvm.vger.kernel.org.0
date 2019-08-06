@@ -2,79 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E974582BAC
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 08:32:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9432D82D62
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 10:05:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731671AbfHFGb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 02:31:59 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3765 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726076AbfHFGb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 02:31:59 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id E3131677EF7A9412FF53;
-        Tue,  6 Aug 2019 14:31:56 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Tue, 6 Aug 2019
- 14:31:46 +0800
-Subject: Re: [PATCH 1/2] KVM: arm64: Don't write junk to sysregs on reset
-To:     Marc Zyngier <maz@kernel.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>
-CC:     Andrew Jones <drjones@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20190805121555.130897-1-maz@kernel.org>
- <20190805121555.130897-2-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <01b74492-c59f-dfd9-e439-752e6b1c53dc@huawei.com>
-Date:   Tue, 6 Aug 2019 14:29:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
-MIME-Version: 1.0
-In-Reply-To: <20190805121555.130897-2-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
+        id S1732215AbfHFIEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 04:04:44 -0400
+Received: from mga03.intel.com ([134.134.136.65]:5752 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728998AbfHFIEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 04:04:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 01:00:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,352,1559545200"; 
+   d="scan'208";a="373337263"
+Received: from devel-ww.sh.intel.com ([10.239.48.128])
+  by fmsmga005.fm.intel.com with ESMTP; 06 Aug 2019 01:00:33 -0700
+From:   Wei Wang <wei.w.wang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        ak@linux.intel.com, peterz@infradead.org, pbonzini@redhat.com
+Cc:     kan.liang@intel.com, mingo@redhat.com, rkrcmar@redhat.com,
+        like.xu@intel.com, wei.w.wang@intel.com, jannh@google.com,
+        arei.gonglei@huawei.com, jmattson@google.com
+Subject: [PATCH v8 00/14] Guest LBR Enabling
+Date:   Tue,  6 Aug 2019 15:16:00 +0800
+Message-Id: <1565075774-26671-1-git-send-email-wei.w.wang@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Last Branch Recording (LBR) is a performance monitor unit (PMU) feature
+on Intel CPUs that captures branch related info. This patch series enables
+this feature to KVM guests.
 
-On 2019/8/5 20:15, Marc Zyngier wrote:
-> At the moment, the way we reset system registers is mildly insane:
-> We write junk to them, call the reset functions, and then check that
-> we have something else in them.
-> 
-> The "fun" thing is that this can happen while the guest is running
-> (PSCI, for example). If anything in KVM has to evaluate the state
-> of a system register while junk is in there, bad thing may happen.
-> 
-> Let's stop doing that. Instead, we track that we have called a
-> reset function for that register, and assume that the reset
-> function has done something. This requires fixing a couple of
-> sysreg refinition in the trap table.
-> 
-> In the end, the very need of this reset check is pretty dubious,
-> as it doesn't check everything (a lot of the sysregs leave outside of
-> the sys_regs[] array). It may well be axed in the near future.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Each guest can be configured to expose this LBR feature to the guest via
+userspace setting the enabling param in KVM_CAP_X86_GUEST_LBR (patch 3).
 
-(Regardless of whether this check is needed or not,) I tested this patch
-with kvm-unit-tests:
+About the lbr emulation method:
+Since the vcpu get scheduled in, the lbr related msrs are made
+interceptible. This makes guest first access to a lbr related msr always
+vm-exit to kvm, so that kvm can know whether the lbr feature is used
+during the vcpu time slice. The kvm lbr msr handler does the following
+things:
+  - create an lbr perf event (task pinned) for the vcpu thread.
+    The perf event mainly serves 2 purposes:
+      -- follow the host perf scheduling rules to manage the vcpu's usage
+         of lbr (e.g. a cpu pinned lbr event could reclaim lbr and thus
+         stopping the vcpu's use);
+      -- have the host perf do context switching of the lbr state on the
+         vcpu thread switching.
+  - pass the lbr related msrs through to the guest.
+    This enables the following guest accesses to the lbr related msrs
+    without vm-exit, as long as the vcpu's lbr event owns the lbr feature.
+    A cpu pinned lbr event on the host could come and take over the lbr
+    feature via IPI calls. In this case, the pass-through will be
+    cancelled (patch 13), and the guest following accesses to the lbr msrs
+    will vm-exit to kvm and accesses will be forbidden in the handler.
 
-for i in {1..100}; do QEMU=/path/to/qemu-system-aarch64 accel=kvm 
-arch=arm64 ./run_tests.sh; done
+If the guest doesn't touch any of the lbr related msrs (likely the guest
+doesn't need to run lbr in the near future), the vcpu's lbr perf event
+will be freed (please see patch 12 commit for more details).
 
-And all the tests passed!
+* Tests
+Conclusion: the profiling results on the guest are similar to that on the host.
 
+Run: ./perf -b ./test_program
 
-Thanks,
-zenghui
+- Test on the host:
+Overhead  Command  Source Shared Object  Source Symbol    Target Symbol   
+  22.35%  ftest    libc-2.23.so          [.] __random     [.] __random        
+   8.20%  ftest    ftest                 [.] qux          [.] qux             
+   5.88%  ftest    ftest                 [.] random@plt   [.] __random        
+   5.88%  ftest    libc-2.23.so          [.] __random     [.] __random_r  
+   5.79%  ftest    ftest                 [.] main         [.] random@plt  
+   5.60%  ftest    ftest                 [.] main         [.] foo             
+   5.24%  ftest    libc-2.23.so          [.] __random     [.] main            
+   5.20%  ftest    libc-2.23.so          [.] __random_r   [.] __random        
+   5.00%  ftest    ftest                 [.] foo          [.] qux             
+   4.91%  ftest    ftest                 [.] main         [.] bar             
+   4.83%  ftest    ftest                 [.] bar          [.] qux             
+   4.57%  ftest    ftest                 [.] main         [.] main            
+   4.38%  ftest    ftest                 [.] foo          [.] main            
+   4.13%  ftest    ftest                 [.] qux          [.] foo             
+   3.89%  ftest    ftest                 [.] qux          [.] bar             
+   3.86%  ftest    ftest                 [.] bar          [.] main            
+
+- Test on the guest:
+Overhead  Command  Source Shaged Object  Source Symbol    Target Symbol
+  22.36%  ftest    libc-2.23.so          [.] random       [.] random  
+   8.55%  ftest    ftest                 [.] qux          [.] qux                    
+   5.79%  ftest    libc-2.23.so          [.] random       [.] random_r                     
+   5.64%  ftest    ftest                 [.] random@plt   [.] random                     
+   5.58%  ftest    ftest                 [.] main         [.] random@plt                       
+   5.55%  ftest    ftest                 [.] main         [.] foo                       
+   5.41%  ftest    libc-2.23.so          [.] random       [.] main                 
+   5.31%  ftest    libc-2.23.so          [.] random_r     [.] random                      
+   5.11%  ftest    ftest                 [.] foo          [.] qux                     
+   4.93%  ftest    ftest                 [.] main         [.] main                     
+   4.59%  ftest    ftest                 [.] qux          [.] bar                       
+   4.49%  ftest    ftest                 [.] bar          [.] main                       
+   4.42%  ftest    ftest                 [.] bar          [.] qux                       
+   4.16%  ftest    ftest                 [.] main         [.] bar                       
+   3.95%  ftest    ftest                 [.] qux          [.] foo                        
+   3.79%  ftest    ftest                 [.] foo          [.] main
+(due to the lib version difference, "random" is equavlent to __random above)
+
+v7->v8 Changelog:
+  - Patch 3:
+    -- document KVM_CAP_X86_GUEST_LBR in api.txt
+    -- make the check of KVM_CAP_X86_GUEST_LBR return the size of
+       struct x86_perf_lbr_stack, to let userspace do a compatibility
+       check.
+  - Patch 7:
+    -- support perf scheduler to not assign a counter for the perf event
+       that has PERF_EV_CAP_NO_COUNTER set (rather than skipping the perf
+       scheduler). This allows the scheduler to detect lbr usage conflicts
+       via get_event_constraints, and lower priority events will finally
+       fail to use lbr.
+    -- define X86_PMC_IDX_NA as "-1", which represents a never assigned
+       counter id. There are other places that use "-1", but could be
+       updated to use the new macro in another patch series.
+  - Patch 8:
+    -- move the event->owner assignment into perf_event_alloc to have it
+       set before event_init is called. Please see this patch's commit for
+       reasons.
+  - Patch 9:
+    -- use "exclude_host" and "is_kernel_event" to decide if the lbr event
+       is used for the vcpu lbr emulation, which doesn't need a counter,
+       and removes the usage of the previous new perf_event_create API.
+    -- remove the unused attr fields.
+  - Patch 10:
+    -- set a hardware reserved bit (bit 62 of LBR_SELECT) to reg->config
+       for the vcpu lbr emulation event. This makes the config different
+       from other host lbr event, so that they don't share the lbr.
+       Please see the comments in the patch for the reasons why they
+       shouldn't share.
+  - Patch 12:
+    -- disable interrupt and check if the vcpu lbr event owns the lbr
+       feature before kvm writing to the lbr related msr. This avoids kvm
+       updating the lbr msrs after lbr has been reclaimed by other events
+       via ipi.
+    -- remove arch v4 related support.
+  - Patch 13:
+    -- double check if the vcpu lbr event owns the lbr feature before
+       vm-entry into the guest. The lbr pass-through will be cancelled if
+       lbr feature has been reclaimed by a cpu pinned lbr event.
+
+Previous:
+https://lkml.kernel.org/r/1562548999-37095-1-git-send-email-wei.w.wang@intel.com
+
+Wei Wang (14):
+  perf/x86: fix the variable type of the lbr msrs
+  perf/x86: add a function to get the addresses of the lbr stack msrs
+  KVM/x86: KVM_CAP_X86_GUEST_LBR
+  KVM/x86: intel_pmu_lbr_enable
+  KVM/x86/vPMU: tweak kvm_pmu_get_msr
+  KVM/x86: expose MSR_IA32_PERF_CAPABILITIES to the guest
+  perf/x86: support to create a perf event without counter allocation
+  perf/core: set the event->owner before event_init
+  KVM/x86/vPMU: APIs to create/free lbr perf event for a vcpu thread
+  perf/x86/lbr: don't share lbr for the vcpu usage case
+  perf/x86: save/restore LBR_SELECT on vcpu switching
+  KVM/x86/lbr: lbr emulation
+  KVM/x86/vPMU: check the lbr feature before entering guest
+  KVM/x86: remove the common handling of the debugctl msr
+
+ Documentation/virt/kvm/api.txt    |  26 +++
+ arch/x86/events/core.c            |  36 ++-
+ arch/x86/events/intel/core.c      |   3 +
+ arch/x86/events/intel/lbr.c       |  95 +++++++-
+ arch/x86/events/perf_event.h      |   6 +-
+ arch/x86/include/asm/kvm_host.h   |   5 +
+ arch/x86/include/asm/perf_event.h |  17 ++
+ arch/x86/kvm/cpuid.c              |   2 +-
+ arch/x86/kvm/pmu.c                |  24 +-
+ arch/x86/kvm/pmu.h                |  11 +-
+ arch/x86/kvm/pmu_amd.c            |   7 +-
+ arch/x86/kvm/vmx/pmu_intel.c      | 476 +++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.c            |   4 +-
+ arch/x86/kvm/vmx/vmx.h            |   2 +
+ arch/x86/kvm/x86.c                |  47 ++--
+ include/linux/perf_event.h        |  18 ++
+ include/uapi/linux/kvm.h          |   1 +
+ kernel/events/core.c              |  19 +-
+ 18 files changed, 738 insertions(+), 61 deletions(-)
+
+-- 
+2.7.4
 
