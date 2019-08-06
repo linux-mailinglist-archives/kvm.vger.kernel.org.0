@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B013E83925
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 20:57:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9189383927
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 20:57:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbfHFS52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 14:57:28 -0400
-Received: from mga06.intel.com ([134.134.136.31]:40914 "EHLO mga06.intel.com"
+        id S1726788AbfHFS5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 14:57:31 -0400
+Received: from mga06.intel.com ([134.134.136.31]:40918 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726331AbfHFS5H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726136AbfHFS5H (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 6 Aug 2019 14:57:07 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 11:56:59 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,353,1559545200"; 
-   d="scan'208";a="176715062"
+   d="scan'208";a="176715063"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga003.jf.intel.com with ESMTP; 06 Aug 2019 11:56:59 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -32,10 +32,12 @@ To:     Eduardo Habkost <ehabkost@redhat.com>,
         Markus Armbruster <armbru@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>
 Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [RFC PATCH 00/20] i386: Add support for Intel SGX
-Date:   Tue,  6 Aug 2019 11:56:29 -0700
-Message-Id: <20190806185649.2476-1-sean.j.christopherson@intel.com>
+Subject: [RFC PATCH 01/20] hostmem: Add hostmem-epc as a backend for SGX EPC
+Date:   Tue,  6 Aug 2019 11:56:30 -0700
+Message-Id: <20190806185649.2476-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190806185649.2476-1-sean.j.christopherson@intel.com>
+References: <20190806185649.2476-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -43,133 +45,136 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series enables exposing Intel Software Guard Extensions (SGX) to KVM
-guests.  This series is firmly RFC due to SGX support not yet being
-accepted into the Linux kernel, let alone KVM.
+EPC (Enclave Page Cache) is a specialized type of memory used by Intel
+SGX (Software Guard Extensions).  The SDM desribes EPC as:
 
-The primary goal of this RFC is to get feedback on the overall approach,
-especially with respect to Enclave Page Cache (EPC) handling, but any
-feedback whatsoever would be greatly appreciated.  Please don't hesitate
-to ask for more details and/or clarification.
+    The Enclave Page Cache (EPC) is the secure storage used to store
+    enclave pages when they are a part of an executing enclave. For an
+    EPC page, hardware performs additional access control checks to
+    restrict access to the page. After the current page access checks
+    and translations are performed, the hardware checks that the EPC
+    page is accessible to the program currently executing. Generally an
+    EPC page is only accessed by the owner of the executing enclave or
+    an instruction which is setting up an EPC page.
 
-The code is based on 'https://github.com/ehabkost/qemu.git x86-next',
-which currently points at commit:
+Because of its unique requirements, Linux manages EPC separately from
+normal memory.  Similar to memfd, the device /dev/sgx/virt_epc can be
+opened to obtain a file descriptor which can in turn be used to mmap()
+EPC memory.
 
-  ff656fcd33 ("i386: Fix Snowridge CPU model name and features")
-
-
-Brief arch blurb (providing useful documentation in a cover letter is
-impractical due to scope of SGX):
-
-  SGX is a set of instructions and mechanisms that enable ring 3
-  applications to set aside private regions of code and data for the
-  purpose of establishing and running enclaves.  An enclave is a secure
-  entity whose private memory can only be accessed by code running within
-  the enclave.  Accesses from outside the enclave, including software
-  running at a higher privilege level and other enclaves, are disallowed
-  by hardware.
-
-Overviews and details:
-
-  SGX arch kernel doc - https://patchwork.kernel.org/patch/11043125/
-
-  SGX arch overview   - https://www.youtube.com/watch?v=mPT_vJrlHlg
-
-Gory details on SGX are also available in all recent versions of Intel's
-SDM, e.g. chapters 37-42 in Vol. 3 of the May 2019 version of the SDM.
-
-
-Linux kernel and KVM enabling:
-
-  SGX kernel enabling - https://lkml.kernel.org/r/20190713170804.2340-1-jarkko.sakkinen@linux.intel.com
-
-  SGX KVM enabling    - https://lkml.kernel.org/r/20190727055214.9282-1-sean.j.christopherson@intel.com
-
-
-QEMU points of interest:
-
-Basics - SGX is exposed the guest if and only if KVM is enabled and
-         supports virtualization of SGX, and the kernel provides access
-         to "raw" EPC.  Because SGX uses a hardware-based root of trust,
-         the attestation aspects of SGX cannot be emulated in software,
-         i.e. ultimately emulation will fail as software cannot generate
-         a valid quote/report.  The complexity of partially emulating SGX
-         in Qemu far outweighs the value added, e.g. an SGX specific
-         simulator for userspace applications can emulate SGX for
-         development and testing purposes.
-
-EPC - Because of its unique requirements, the kernel manages EPC separately
-      from normal memory.  Similar to memfd, the device /dev/sgx/virt_epc
-      can be opened to obtain a file descriptor which can in turn be used
-      to mmap() EPC memory.
-
-      The notable quirk with EPC from QEMU's perspective is that EPC is
-      enumerated via CPUID, which complicates realizing EPC as a normal
-      device due to vCPU creation depending on the location/size of EPC
-      sections.
-
-Migration - Physical EPC is encrypted with an ephemeral key that is
-            (re)generated at CPU reset, i.e. is platform specific.  Thus,
-            migrating EPC contents between physical platforms is
-            infeasible.  However, live migration is not blocked by SGX as
-            kernels and applications are conditioned to gracefully handle
-            EPC invalidation due to the EPC being zapped on power state
-            transitions that power down the CPU, e.g. S3.  I.e. from the
-            guest's perspective, live migration appears and is handled
-            like an unannounced suspend/resume cycle.
-
-NUMA - How EPC NUMA affinity will be enumerated to the kernel is not yet
-       defined (initial hardware support for SGX was limited to single
-       socket systems).
-
-Sean Christopherson (20):
-  hostmem: Add hostmem-epc as a backend for SGX EPC
-  i386: Add 'sgx-epc' device to expose EPC sections to guest
-  vl: Add "sgx-epc" option to expose SGX EPC sections to guest
-  i386: Add primary SGX CPUID and MSR defines
-  i386: Add SGX CPUID leaf FEAT_SGX_12_0_EAX
-  i386: Add SGX CPUID leaf FEAT_SGX_12_1_EAX
-  i386: Add SGX CPUID leaf FEAT_SGX_12_1_EBX
-  i386: Add get/set/migrate support for SGX LE public key hash MSRs
-  i386: Add feature control MSR dependency when SGX is enabled
-  i386: Update SGX CPUID info according to hardware/KVM/user input
-  linux-headers: Add temporary placeholder for KVM_CAP_SGX_ATTRIBUTE
-  i386: kvm: Add support for exposing PROVISIONKEY to guest
-  i386: Propagate SGX CPUID sub-leafs to KVM
-  i386: Adjust min CPUID level to 0x12 when SGX is enabled
-  hw/i386/pc: Set SGX bits in feature control fw_cfg accordingly
-  hw/i386/pc: Account for SGX EPC sections when calculating device
-    memory
-  i386/pc: Add e820 entry for SGX EPC section(s)
-  i386: acpi: Add SGX EPC entry to ACPI tables
-  q35: Add support for SGX EPC
-  i440fx: Add support for SGX EPC
-
- backends/Makefile.objs    |   1 +
- backends/hostmem-epc.c    |  91 ++++++++++++
- hw/i386/Makefile.objs     |   1 +
- hw/i386/acpi-build.c      |  22 +++
- hw/i386/pc.c              |  23 ++-
- hw/i386/pc_piix.c         |   3 +
- hw/i386/pc_q35.c          |   2 +
- hw/i386/sgx-epc.c         | 291 ++++++++++++++++++++++++++++++++++++++
- include/hw/i386/pc.h      |   3 +
- include/hw/i386/sgx-epc.h |  75 ++++++++++
- linux-headers/linux/kvm.h |   1 +
- qapi/misc.json            |  32 ++++-
- qemu-options.hx           |  12 ++
- target/i386/cpu.c         | 148 ++++++++++++++++++-
- target/i386/cpu.h         |  14 ++
- target/i386/kvm-stub.c    |   5 +
- target/i386/kvm.c         |  70 +++++++++
- target/i386/kvm_i386.h    |   3 +
- target/i386/machine.c     |  20 +++
- vl.c                      |   9 ++
- 20 files changed, 820 insertions(+), 6 deletions(-)
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ backends/Makefile.objs |  1 +
+ backends/hostmem-epc.c | 91 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
  create mode 100644 backends/hostmem-epc.c
- create mode 100644 hw/i386/sgx-epc.c
- create mode 100644 include/hw/i386/sgx-epc.h
 
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 981e8e122f..6e96549c5e 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -17,3 +17,4 @@ endif
+ common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_VIRTIO)) += vhost-user.o
+ 
+ common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
++common-obj-$(CONFIG_LINUX) += hostmem-epc.o
+diff --git a/backends/hostmem-epc.c b/backends/hostmem-epc.c
+new file mode 100644
+index 0000000000..24a22dede5
+--- /dev/null
++++ b/backends/hostmem-epc.c
+@@ -0,0 +1,91 @@
++/*
++ * QEMU host SGX EPC memory backend
++ *
++ * Copyright (C) 2019 Intel Corporation
++ *
++ * Authors:
++ *   Sean Christopherson <sean.j.christopherson@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#include <sys/ioctl.h>
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qom/object_interfaces.h"
++#include "qapi/error.h"
++#include "sysemu/hostmem.h"
++
++#define TYPE_MEMORY_BACKEND_EPC "memory-backend-epc"
++
++#define MEMORY_BACKEND_EPC(obj)                                        \
++    OBJECT_CHECK(HostMemoryBackendEpc, (obj), TYPE_MEMORY_BACKEND_EPC)
++
++typedef struct HostMemoryBackendEpc HostMemoryBackendEpc;
++
++struct HostMemoryBackendEpc {
++    HostMemoryBackend parent_obj;
++};
++
++static void
++sgx_epc_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
++{
++    char *name;
++    int fd;
++
++    if (!backend->size) {
++        error_setg(errp, "can't create backend with size 0");
++        return;
++    }
++    backend->force_prealloc = mem_prealloc;
++
++    fd = open("/dev/sgx/virt_epc", O_RDWR);
++    if (fd < 0) {
++        error_setg_errno(errp, errno,
++                         "failed to open /dev/sgx/virt_epc to alloc SGX EPC");
++        return;
++    }
++
++    name = object_get_canonical_path(OBJECT(backend));
++    memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
++                                   name, backend->size,
++                                   backend->share, fd, errp);
++    g_free(name);
++}
++
++static void sgx_epc_backend_instance_init(Object *obj)
++{
++    HostMemoryBackend *m = MEMORY_BACKEND(obj);
++
++    m->share = true;
++    m->merge = false;
++    m->dump = false;
++}
++
++static void sgx_epc_backend_class_init(ObjectClass *oc, void *data)
++{
++    HostMemoryBackendClass *bc = MEMORY_BACKEND_CLASS(oc);
++
++    bc->alloc = sgx_epc_backend_memory_alloc;
++}
++
++static const TypeInfo sgx_epc_backed_info = {
++    .name = TYPE_MEMORY_BACKEND_EPC,
++    .parent = TYPE_MEMORY_BACKEND,
++    .instance_init = sgx_epc_backend_instance_init,
++    .class_init = sgx_epc_backend_class_init,
++    .instance_size = sizeof(HostMemoryBackendEpc),
++};
++
++static void register_types(void)
++{
++    int fd = open("/dev/sgx/virt_epc", O_RDWR);
++    if (fd >= 0) {
++        close(fd);
++
++        type_register_static(&sgx_epc_backed_info);
++    }
++}
++
++type_init(register_types);
 -- 
 2.22.0
 
