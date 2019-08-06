@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5C6482D67
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 10:05:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B6AB82D64
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 10:05:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732291AbfHFIFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 04:05:10 -0400
+        id S1732277AbfHFIFD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 04:05:03 -0400
 Received: from mga03.intel.com ([134.134.136.65]:5765 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732235AbfHFIFD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1732264AbfHFIFD (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 6 Aug 2019 04:05:03 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 01:00:40 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 01:00:42 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,352,1559545200"; 
-   d="scan'208";a="373337285"
+   d="scan'208";a="373337292"
 Received: from devel-ww.sh.intel.com ([10.239.48.128])
-  by fmsmga005.fm.intel.com with ESMTP; 06 Aug 2019 01:00:38 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 06 Aug 2019 01:00:40 -0700
 From:   Wei Wang <wei.w.wang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         ak@linux.intel.com, peterz@infradead.org, pbonzini@redhat.com
 Cc:     kan.liang@intel.com, mingo@redhat.com, rkrcmar@redhat.com,
         like.xu@intel.com, wei.w.wang@intel.com, jannh@google.com,
         arei.gonglei@huawei.com, jmattson@google.com
-Subject: [PATCH v8 02/14] perf/x86: add a function to get the addresses of the lbr stack msrs
-Date:   Tue,  6 Aug 2019 15:16:02 +0800
-Message-Id: <1565075774-26671-3-git-send-email-wei.w.wang@intel.com>
+Subject: [PATCH v8 03/14] KVM/x86: KVM_CAP_X86_GUEST_LBR
+Date:   Tue,  6 Aug 2019 15:16:03 +0800
+Message-Id: <1565075774-26671-4-git-send-email-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1565075774-26671-1-git-send-email-wei.w.wang@intel.com>
 References: <1565075774-26671-1-git-send-email-wei.w.wang@intel.com>
@@ -37,60 +37,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The lbr stack msrs are model specific. The perf subsystem has already
-assigned the abstracted msr address values based on the cpu model.
-So add a function to enable callers outside the perf subsystem to get the
-lbr stack addresses. This is useful for hypervisors to emulate the lbr
-feature for the guest.
+Introduce KVM_CAP_X86_GUEST_LBR to allow per-VM enabling of the guest
+lbr feature.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Andi Kleen <ak@linux.intel.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- arch/x86/events/intel/lbr.c       | 23 +++++++++++++++++++++++
- arch/x86/include/asm/perf_event.h | 14 ++++++++++++++
- 2 files changed, 37 insertions(+)
+ Documentation/virt/kvm/api.txt  | 26 ++++++++++++++++++++++++++
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/x86.c              | 16 ++++++++++++++++
+ include/uapi/linux/kvm.h        |  1 +
+ 4 files changed, 45 insertions(+)
 
-diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-index 6f814a2..9b2d05c 100644
---- a/arch/x86/events/intel/lbr.c
-+++ b/arch/x86/events/intel/lbr.c
-@@ -1311,3 +1311,26 @@ void intel_pmu_lbr_init_knl(void)
- 	if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_LIP)
- 		x86_pmu.intel_cap.lbr_format = LBR_FORMAT_EIP_FLAGS;
- }
-+
-+/**
-+ * x86_perf_get_lbr_stack - get the lbr stack related msrs
-+ *
-+ * @stack: the caller's memory to get the lbr stack
-+ *
-+ * Returns: 0 indicates that the lbr stack has been successfully obtained.
-+ */
-+int x86_perf_get_lbr_stack(struct x86_perf_lbr_stack *stack)
-+{
-+	stack->nr = x86_pmu.lbr_nr;
-+	stack->tos = x86_pmu.lbr_tos;
-+	stack->from = x86_pmu.lbr_from;
-+	stack->to = x86_pmu.lbr_to;
-+
-+	if (x86_pmu.intel_cap.lbr_format == LBR_FORMAT_INFO)
-+		stack->info = MSR_LBR_INFO_0;
-+	else
-+		stack->info = 0;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(x86_perf_get_lbr_stack);
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 1392d5e..2606100 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -318,7 +318,16 @@ struct perf_guest_switch_msr {
- 	u64 host, guest;
- };
+diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+index 2d06776..64632a8 100644
+--- a/Documentation/virt/kvm/api.txt
++++ b/Documentation/virt/kvm/api.txt
+@@ -5046,6 +5046,32 @@ it hard or impossible to use it correctly.  The availability of
+ KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
+ Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
  
++7.19 KVM_CAP_X86_GUEST_LBR
++Architectures: x86
++Parameters: args[0] whether feature should be enabled or not
++            args[1] pointer to the userspace memory to load the lbr stack info
++
++The lbr stack info is described by
 +struct x86_perf_lbr_stack {
 +	unsigned int	nr;
 +	unsigned int	tos;
@@ -99,23 +70,87 @@ index 1392d5e..2606100 100644
 +	unsigned int	info;
 +};
 +
- extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
-+extern int x86_perf_get_lbr_stack(struct x86_perf_lbr_stack *stack);
- extern void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap);
- extern void perf_check_microcode(void);
- extern int x86_perf_rdpmc_index(struct perf_event *event);
-@@ -329,6 +338,11 @@ static inline struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
- 	return NULL;
- }
- 
-+static inline int x86_perf_get_lbr_stack(struct x86_perf_lbr_stack *stack)
-+{
-+	return -1;
-+}
++@nr: number of lbr stack entries
++@tos: index of the top of stack msr
++@from: index of the msr that stores a branch source address
++@to: index of the msr that stores a branch destination address
++@info: index of the msr that stores lbr related flags
 +
- static inline void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
- {
- 	memset(cap, 0, sizeof(*cap));
++Enabling this capability allows guest accesses to the lbr feature. Otherwise,
++#GP will be injected to the guest when it accesses to the lbr related msrs.
++
++After the feature is enabled, before exiting to userspace, kvm handlers should
++fill the lbr stack info into the userspace memory pointed by args[1].
++
+ 8. Other capabilities.
+ ----------------------
+ 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7b0a4ee..d29dddd 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -875,6 +875,7 @@ struct kvm_arch {
+ 	atomic_t vapics_in_nmi_mode;
+ 	struct mutex apic_map_lock;
+ 	struct kvm_apic_map *apic_map;
++	struct x86_perf_lbr_stack lbr_stack;
+ 
+ 	bool apic_access_page_done;
+ 
+@@ -884,6 +885,7 @@ struct kvm_arch {
+ 	bool hlt_in_guest;
+ 	bool pause_in_guest;
+ 	bool cstate_in_guest;
++	bool lbr_in_guest;
+ 
+ 	unsigned long irq_sources_bitmap;
+ 	s64 kvmclock_offset;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c6d951c..e1eb1be 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3129,6 +3129,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_EXCEPTION_PAYLOAD:
+ 		r = 1;
+ 		break;
++	case KVM_CAP_X86_GUEST_LBR:
++		r = sizeof(struct x86_perf_lbr_stack);
++		break;
+ 	case KVM_CAP_SYNC_REGS:
+ 		r = KVM_SYNC_X86_VALID_FIELDS;
+ 		break;
+@@ -4670,6 +4673,19 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		kvm->arch.exception_payload_enabled = cap->args[0];
+ 		r = 0;
+ 		break;
++	case KVM_CAP_X86_GUEST_LBR:
++		r = -EINVAL;
++		if (cap->args[0] &&
++		    x86_perf_get_lbr_stack(&kvm->arch.lbr_stack))
++			break;
++
++		if (copy_to_user((void __user *)cap->args[1],
++				 &kvm->arch.lbr_stack,
++				 sizeof(struct x86_perf_lbr_stack)))
++			break;
++		kvm->arch.lbr_in_guest = cap->args[0];
++		r = 0;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e3f12d..dd53edc 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -996,6 +996,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+ #define KVM_CAP_PMU_EVENT_FILTER 173
++#define KVM_CAP_X86_GUEST_LBR 174
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.7.4
 
