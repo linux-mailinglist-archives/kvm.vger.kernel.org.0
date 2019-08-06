@@ -2,178 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 39DA182B63
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 08:02:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA71782B8B
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 08:21:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731816AbfHFGCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 02:02:10 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51887 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731781AbfHFGCB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 02:02:01 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 207so76881719wma.1
-        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 23:02:00 -0700 (PDT)
+        id S1731728AbfHFGU6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 02:20:58 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35481 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731540AbfHFGU6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 02:20:58 -0400
+Received: by mail-wr1-f66.google.com with SMTP id k2so744809wrq.2
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2019 23:20:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Tkvvx2iRnaycAi/FkGoOmS/ThrIymYj/5i78t7ct+Z8=;
-        b=K99xZqzUE+a+GV8yCtyKEqJ8Iw0oRqV5PwoxputkIoaXNoKyd6g1pfOBqVf+fbJ7wT
-         q+q+95iTauT/CXMiebWQoLajd4wy4CCrhAMuZcOEEq88y2AZwt4Obt7pnzfiMwHo3eoD
-         Q19ELaW88PzB6ZKTj3yuaqqA6TPkOpdsS9hc58qAmCHG7at2i0T+Xd74Su7b4ektCIcp
-         Of/KwVU2yLZLApjBnG+lTAv1f0glYLEfqGV4jUAVpVGlXyfOcnJLOq1wK7g03Jq8FWjG
-         N4q4asCsb4oLpz5zcbShYLepeBOLEkS0+KiF/N8Fu+nINNy9aenT+QRyCub20BLNlSRL
-         IwSg==
-X-Gm-Message-State: APjAAAXG+em0rljt0SyQMqq/gXb3xR7N/vo1d6qU35DT3MnZv5Laa7fb
-        3v0xKvG65fROzUvceUup+RLPZUnt7Wc=
-X-Google-Smtp-Source: APXvYqxc5AfCgo4BlXYzJWn0+nyE9MnXkXVpOxzPDyyh7/hDJRDChmIFsHVwdimzqHhqfNjj5xb73w==
-X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr2343169wmm.62.1565071319471;
-        Mon, 05 Aug 2019 23:01:59 -0700 (PDT)
-Received: from vitty.brq.redhat.com (ip-89-176-127-93.net.upcbroadband.cz. [89.176.127.93])
-        by smtp.gmail.com with ESMTPSA id r5sm94216756wmh.35.2019.08.05.23.01.58
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 05 Aug 2019 23:01:58 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v2 5/5] x86: KVM: svm: remove hardcoded instruction length from intercepts
-Date:   Tue,  6 Aug 2019 08:01:50 +0200
-Message-Id: <20190806060150.32360-6-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190806060150.32360-1-vkuznets@redhat.com>
-References: <20190806060150.32360-1-vkuznets@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aMztFRMwS894XHsmEs01R20QPKJnerKfJ/mqwGoosCA=;
+        b=n+y5uGPrOFJ4vBVGvbkJgNkaC4G1XcHrFlRE2SvnYQxsWICe6p/zwjQKhtXwQoz5ju
+         Dm7jPlVXVT/O9B2PIFjL3LqOscERL7qTbvgv3/T3RcJgCQoggUW3e25hSWQU4vx5Dl7/
+         izYc3V7G+9jA7hzp2xMOOm/3u09qXyBoZ+ePEgUIr5eDGlnj+P3o3dgh/ORKfOdiY0R6
+         bA2It/TDAjZmUpNDMsDrqoJ3mWSjOJCqgmo/xFCfXAySVEKKexD+vOQGd2FBxVUnKMAd
+         GR/Z8CFdxtijXvevEVqfyqCVWjZzY8Rfbm5j638kHsDGGM18Zped2C3KjAf5UhNb9wj0
+         l8uA==
+X-Gm-Message-State: APjAAAVypj3Ej0WEA+TVu7X6M4kWDGQY6+HtrtKYXIIByAL/JtI2pxp/
+        rUjpJftfvICm44KrrXsZyeXHBg==
+X-Google-Smtp-Source: APXvYqylbgUdbdCCip+TqSzuS3nN/TZgFkjI643QFSasgjW2I/qMUGjPcLCRAwvxZhdJxcEgwJic+A==
+X-Received: by 2002:a5d:4949:: with SMTP id r9mr2276210wrs.289.1565072456384;
+        Mon, 05 Aug 2019 23:20:56 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810? ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
+        by smtp.gmail.com with ESMTPSA id t63sm84881683wmt.6.2019.08.05.23.20.55
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Aug 2019 23:20:55 -0700 (PDT)
+Subject: Re: [PATCH v4 1/6] KVM: Fix leak vCPU's VMCS value into other pCPU
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        "# v3 . 10+" <stable@vger.kernel.org>
+References: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
+ <9acbc733-442f-0f65-9b56-ff800a3fa0f5@redhat.com>
+ <CANRm+CwH54S555nw-Zik-3NFDH9yqe+SOZrGc3mPoAU_qGxP-A@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <e7b84893-42bf-e80e-61c9-ef5d1b200064@redhat.com>
+Date:   Tue, 6 Aug 2019 08:20:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANRm+CwH54S555nw-Zik-3NFDH9yqe+SOZrGc3mPoAU_qGxP-A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Various intercepts hard-code the respective instruction lengths to optimize
-skip_emulated_instruction(): when next_rip is pre-set we skip
-kvm_emulate_instruction(vcpu, EMULTYPE_SKIP). The optimization is, however,
-incorrect: different (redundant) prefixes could be used to enlarge the
-instruction. We can't really avoid decoding.
+On 06/08/19 02:35, Wanpeng Li wrote:
+> Thank you, Paolo! Btw, how about other 5 patches?
 
-svm->next_rip is not used when CPU supports 'nrips' (X86_FEATURE_NRIPS)
-feature: next RIP is provided in VMCB. The feature is not really new
-(Opteron G3s had it already) and the change should have zero affect.
+Queued everything else too.
 
-Remove manual svm->next_rip setting with hard-coded instruction lengths.
-The only case where we now use svm->next_rip is EXIT_IOIO: the instruction
-length is provided to us by hardware.
+Paolo
 
-Reported-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/svm.c | 15 ++-------------
- 1 file changed, 2 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 793a60461abe..dce215250d1f 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2905,13 +2905,11 @@ static int nop_on_interception(struct vcpu_svm *svm)
- 
- static int halt_interception(struct vcpu_svm *svm)
- {
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 1;
- 	return kvm_emulate_halt(&svm->vcpu);
- }
- 
- static int vmmcall_interception(struct vcpu_svm *svm)
- {
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 3;
- 	return kvm_emulate_hypercall(&svm->vcpu);
- }
- 
-@@ -3699,7 +3697,6 @@ static int vmload_interception(struct vcpu_svm *svm)
- 
- 	nested_vmcb = map.hva;
- 
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 3;
- 	ret = kvm_skip_emulated_instruction(&svm->vcpu);
- 
- 	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
-@@ -3726,7 +3723,6 @@ static int vmsave_interception(struct vcpu_svm *svm)
- 
- 	nested_vmcb = map.hva;
- 
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 3;
- 	ret = kvm_skip_emulated_instruction(&svm->vcpu);
- 
- 	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
-@@ -3740,8 +3736,8 @@ static int vmrun_interception(struct vcpu_svm *svm)
- 	if (nested_svm_check_permissions(svm))
- 		return 1;
- 
--	/* Save rip after vmrun instruction */
--	kvm_rip_write(&svm->vcpu, kvm_rip_read(&svm->vcpu) + 3);
-+	if (!kvm_skip_emulated_instruction(&svm->vcpu))
-+		return 1;
- 
- 	if (!nested_svm_vmrun(svm))
- 		return 1;
-@@ -3777,7 +3773,6 @@ static int stgi_interception(struct vcpu_svm *svm)
- 	if (vgif_enabled(svm))
- 		clr_intercept(svm, INTERCEPT_STGI);
- 
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 3;
- 	ret = kvm_skip_emulated_instruction(&svm->vcpu);
- 	kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
- 
-@@ -3793,7 +3788,6 @@ static int clgi_interception(struct vcpu_svm *svm)
- 	if (nested_svm_check_permissions(svm))
- 		return 1;
- 
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 3;
- 	ret = kvm_skip_emulated_instruction(&svm->vcpu);
- 
- 	disable_gif(svm);
-@@ -3818,7 +3812,6 @@ static int invlpga_interception(struct vcpu_svm *svm)
- 	/* Let's treat INVLPGA the same as INVLPG (can be optimized!) */
- 	kvm_mmu_invlpg(vcpu, kvm_rax_read(&svm->vcpu));
- 
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 3;
- 	return kvm_skip_emulated_instruction(&svm->vcpu);
- }
- 
-@@ -3841,7 +3834,6 @@ static int xsetbv_interception(struct vcpu_svm *svm)
- 	u32 index = kvm_rcx_read(&svm->vcpu);
- 
- 	if (kvm_set_xcr(&svm->vcpu, index, new_bv) == 0) {
--		svm->next_rip = kvm_rip_read(&svm->vcpu) + 3;
- 		return kvm_skip_emulated_instruction(&svm->vcpu);
- 	}
- 
-@@ -3918,7 +3910,6 @@ static int task_switch_interception(struct vcpu_svm *svm)
- 
- static int cpuid_interception(struct vcpu_svm *svm)
- {
--	svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
- 	return kvm_emulate_cpuid(&svm->vcpu);
- }
- 
-@@ -4248,7 +4239,6 @@ static int rdmsr_interception(struct vcpu_svm *svm)
- 
- 		kvm_rax_write(&svm->vcpu, msr_info.data & 0xffffffff);
- 		kvm_rdx_write(&svm->vcpu, msr_info.data >> 32);
--		svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
- 		return kvm_skip_emulated_instruction(&svm->vcpu);
- 	}
- }
-@@ -4454,7 +4444,6 @@ static int wrmsr_interception(struct vcpu_svm *svm)
- 		return 1;
- 	} else {
- 		trace_kvm_msr_write(ecx, data);
--		svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
- 		return kvm_skip_emulated_instruction(&svm->vcpu);
- 	}
- }
--- 
-2.20.1
+> Regards,
+> Wanpeng Li
 
