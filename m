@@ -2,116 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44D7F84544
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 09:07:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 272068459E
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 09:21:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387471AbfHGHGy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Aug 2019 03:06:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51842 "EHLO mx1.redhat.com"
+        id S2387408AbfHGHU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Aug 2019 03:20:59 -0400
+Received: from mga03.intel.com ([134.134.136.65]:56011 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387451AbfHGHGx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Aug 2019 03:06:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2EC3CC009DE2;
-        Wed,  7 Aug 2019 07:06:53 +0000 (UTC)
-Received: from hp-dl380pg8-01.lab.eng.pek2.redhat.com (hp-dl380pg8-01.lab.eng.pek2.redhat.com [10.73.8.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A5BFA1000324;
-        Wed,  7 Aug 2019 07:06:50 +0000 (UTC)
-From:   Jason Wang <jasowang@redhat.com>
-To:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, jgg@ziepe.ca,
-        Jason Wang <jasowang@redhat.com>
-Subject: [PATCH V4 9/9] vhost: do not return -EAGAIN for non blocking invalidation too early
-Date:   Wed,  7 Aug 2019 03:06:17 -0400
-Message-Id: <20190807070617.23716-10-jasowang@redhat.com>
-In-Reply-To: <20190807070617.23716-1-jasowang@redhat.com>
-References: <20190807070617.23716-1-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Wed, 07 Aug 2019 07:06:53 +0000 (UTC)
+        id S1727285AbfHGHU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Aug 2019 03:20:59 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Aug 2019 00:19:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,356,1559545200"; 
+   d="scan'208";a="176880179"
+Received: from paasikivi.fi.intel.com ([10.237.72.42])
+  by orsmga003.jf.intel.com with ESMTP; 07 Aug 2019 00:19:32 -0700
+Received: by paasikivi.fi.intel.com (Postfix, from userid 1000)
+        id 9980B202CC; Wed,  7 Aug 2019 10:20:07 +0300 (EEST)
+Date:   Wed, 7 Aug 2019 10:20:07 +0300
+From:   Sakari Ailus <sakari.ailus@linux.intel.com>
+To:     john.hubbard@gmail.com
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Hans Verkuil <hans.verkuil@cisco.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Souptick Joarder <jrdr.linux@gmail.com>
+Subject: Re: [PATCH v3 11/41] media/v4l2-core/mm: convert put_page() to
+ put_user_page*()
+Message-ID: <20190807072007.GG21370@paasikivi.fi.intel.com>
+References: <20190807013340.9706-1-jhubbard@nvidia.com>
+ <20190807013340.9706-12-jhubbard@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190807013340.9706-12-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Instead of returning -EAGAIN unconditionally, we'd better do that only
-we're sure the range is overlapped with the metadata area.
+On Tue, Aug 06, 2019 at 06:33:10PM -0700, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
+> 
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Hans Verkuil <hans.verkuil@cisco.com>
+> Cc: Sakari Ailus <sakari.ailus@linux.intel.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Robin Murphy <robin.murphy@arm.com>
+> Cc: Souptick Joarder <jrdr.linux@gmail.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: linux-media@vger.kernel.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
-Reported-by: Jason Gunthorpe <jgg@ziepe.ca>
-Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vhost/vhost.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+Acked-by: Sakari Ailus <sakari.ailus@linux.intel.com>
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 6650a3ff88c1..0271f853fa9c 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -395,16 +395,19 @@ static void inline vhost_vq_sync_access(struct vhost_virtqueue *vq)
- 	smp_mb();
- }
- 
--static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
--				      int index,
--				      unsigned long start,
--				      unsigned long end)
-+static int vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
-+				     int index,
-+				     unsigned long start,
-+				     unsigned long end,
-+				     bool blockable)
- {
- 	struct vhost_uaddr *uaddr = &vq->uaddrs[index];
- 	struct vhost_map *map;
- 
- 	if (!vhost_map_range_overlap(uaddr, start, end))
--		return;
-+		return 0;
-+	else if (!blockable)
-+		return -EAGAIN;
- 
- 	spin_lock(&vq->mmu_lock);
- 	++vq->invalidate_count;
-@@ -419,6 +422,8 @@ static void vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
- 		vhost_set_map_dirty(vq, map, index);
- 		vhost_map_unprefetch(map);
- 	}
-+
-+	return 0;
- }
- 
- static void vhost_invalidate_vq_end(struct vhost_virtqueue *vq,
-@@ -439,18 +444,19 @@ static int vhost_invalidate_range_start(struct mmu_notifier *mn,
- {
- 	struct vhost_dev *dev = container_of(mn, struct vhost_dev,
- 					     mmu_notifier);
--	int i, j;
--
--	if (!mmu_notifier_range_blockable(range))
--		return -EAGAIN;
-+	bool blockable = mmu_notifier_range_blockable(range);
-+	int i, j, ret;
- 
- 	for (i = 0; i < dev->nvqs; i++) {
- 		struct vhost_virtqueue *vq = dev->vqs[i];
- 
--		for (j = 0; j < VHOST_NUM_ADDRS; j++)
--			vhost_invalidate_vq_start(vq, j,
--						  range->start,
--						  range->end);
-+		for (j = 0; j < VHOST_NUM_ADDRS; j++) {
-+			ret = vhost_invalidate_vq_start(vq, j,
-+							range->start,
-+							range->end, blockable);
-+			if (ret)
-+				return ret;
-+		}
- 	}
- 
- 	return 0;
 -- 
-2.18.1
-
+Sakari Ailus
+sakari.ailus@linux.intel.com
