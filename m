@@ -2,142 +2,386 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C3728440D
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 07:56:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AE088444E
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 08:11:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726159AbfHGF4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Aug 2019 01:56:53 -0400
-Received: from mga14.intel.com ([192.55.52.115]:41058 "EHLO mga14.intel.com"
+        id S1726697AbfHGGLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Aug 2019 02:11:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:22214 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725794AbfHGF4x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Aug 2019 01:56:53 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 22:56:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,356,1559545200"; 
-   d="scan'208";a="325857009"
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by orsmga004.jf.intel.com with ESMTP; 06 Aug 2019 22:56:50 -0700
-Message-ID: <5D4A697D.3030604@intel.com>
-Date:   Wed, 07 Aug 2019 14:02:37 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+        id S1726599AbfHGGLm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Aug 2019 02:11:42 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 460BD30A0101;
+        Wed,  7 Aug 2019 06:11:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-197.ams2.redhat.com [10.36.116.197])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 362041FD3B;
+        Wed,  7 Aug 2019 06:11:39 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 9F1B1113864E; Wed,  7 Aug 2019 07:57:59 +0200 (CEST)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Eduardo Habkost <ehabkost@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: Re: [Qemu-devel] [RFC PATCH 02/20] i386: Add 'sgx-epc' device to expose EPC sections to guest
+References: <20190806185649.2476-1-sean.j.christopherson@intel.com>
+        <20190806185649.2476-3-sean.j.christopherson@intel.com>
+Date:   Wed, 07 Aug 2019 07:57:59 +0200
+In-Reply-To: <20190806185649.2476-3-sean.j.christopherson@intel.com> (Sean
+        Christopherson's message of "Tue, 6 Aug 2019 11:56:31 -0700")
+Message-ID: <87a7clbjq0.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        ak@linux.intel.com, peterz@infradead.org, pbonzini@redhat.com
-CC:     kan.liang@intel.com, mingo@redhat.com, rkrcmar@redhat.com,
-        like.xu@intel.com, jannh@google.com, arei.gonglei@huawei.com,
-        jmattson@google.com
-Subject: Re: [PATCH v8 13/14] KVM/x86/vPMU: check the lbr feature before entering
- guest
-References: <1565075774-26671-1-git-send-email-wei.w.wang@intel.com> <1565075774-26671-14-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1565075774-26671-14-git-send-email-wei.w.wang@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Wed, 07 Aug 2019 06:11:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/06/2019 03:16 PM, Wei Wang wrote:
-> The guest can access the lbr related msrs only when the vcpu's lbr event
-> has been assigned the lbr feature. A cpu pinned lbr event (though no such
-> event usages in the current upstream kernel) could reclaim the lbr feature
-> from the vcpu's lbr event (task pinned) via ipi calls. If the cpu is
-> running in the non-root mode, this will cause the cpu to vm-exit to handle
-> the host ipi and then vm-entry back to the guest. So on vm-entry (where
-> interrupt has been disabled), we double confirm that the vcpu's lbr event
-> is still assigned the lbr feature via checking event->oncpu.
+Quick QAPI schema sanity check, mostly.
+
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
+
+> SGX EPC is enumerated through CPUID, i.e. EPC "devices" need to be
+> realized prior to realizing the vCPUs themselves, which occurs long
+> before generic devices are parsed and realized.  Because of this,
+> do not allow 'sgx-epc' devices to be instantiated after vCPUS have
+> been created.
 >
-> The pass-through of the lbr related msrs will be cancelled if the lbr is
-> reclaimed, and the following guest accesses to the lbr related msrs will
-> vm-exit to the related msr emulation handler in kvm, which will prevent
-> the accesses.
+> The 'sgx-epc' device is essentially a placholder at this time, it will
+> be fully implemented in a future patch along with a dedicated command
+> to create 'sgx-epc' devices.
 >
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->   arch/x86/kvm/pmu.c           |  6 ++++++
->   arch/x86/kvm/pmu.h           |  3 +++
->   arch/x86/kvm/vmx/pmu_intel.c | 35 +++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/x86.c           | 13 +++++++++++++
->   4 files changed, 57 insertions(+)
+>  hw/i386/Makefile.objs     |   1 +
+>  hw/i386/sgx-epc.c         | 169 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/i386/sgx-epc.h |  44 ++++++++++
+>  qapi/misc.json            |  32 +++++++-
+>  4 files changed, 244 insertions(+), 2 deletions(-)
+>  create mode 100644 hw/i386/sgx-epc.c
+>  create mode 100644 include/hw/i386/sgx-epc.h
 >
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index afad092..ed10a57 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -339,6 +339,12 @@ bool kvm_pmu_lbr_enable(struct kvm_vcpu *vcpu)
->   	return false;
->   }
->   
-> +void kvm_pmu_enabled_feature_confirm(struct kvm_vcpu *vcpu)
+> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+> index 5d9c9efd5f..18c9693d9d 100644
+> --- a/hw/i386/Makefile.objs
+> +++ b/hw/i386/Makefile.objs
+> @@ -13,3 +13,4 @@ obj-$(CONFIG_VMMOUSE) += vmmouse.o
+>  
+>  obj-y += kvmvapic.o
+>  obj-y += acpi-build.o
+> +obj-y += sgx-epc.o
+> diff --git a/hw/i386/sgx-epc.c b/hw/i386/sgx-epc.c
+> new file mode 100644
+> index 0000000000..73221ba86b
+> --- /dev/null
+> +++ b/hw/i386/sgx-epc.c
+> @@ -0,0 +1,169 @@
+> +/*
+> + * SGX EPC device
+> + *
+> + * Copyright (C) 2019 Intel Corporation
+> + *
+> + * Authors:
+> + *   Sean Christopherson <sean.j.christopherson@intel.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "hw/i386/pc.h"
+> +#include "hw/i386/sgx-epc.h"
+> +#include "hw/mem/memory-device.h"
+> +#include "monitor/qdev.h"
+> +#include "qapi/error.h"
+> +#include "qapi/visitor.h"
+> +#include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/option.h"
+> +#include "qemu/units.h"
+> +#include "target/i386/cpu.h"
+> +
+> +static Property sgx_epc_properties[] = {
+> +    DEFINE_PROP_UINT64(SGX_EPC_ADDR_PROP, SGXEPCDevice, addr, 0),
+> +    DEFINE_PROP_LINK(SGX_EPC_MEMDEV_PROP, SGXEPCDevice, hostmem,
+> +                     TYPE_MEMORY_BACKEND, HostMemoryBackend *),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void sgx_epc_get_size(Object *obj, Visitor *v, const char *name,
+> +                             void *opaque, Error **errp)
 > +{
-> +	if (kvm_x86_ops->pmu_ops->enabled_feature_confirm)
-> +		kvm_x86_ops->pmu_ops->enabled_feature_confirm(vcpu);
+> +    Error *local_err = NULL;
+> +    uint64_t value;
+> +
+> +    value = memory_device_get_region_size(MEMORY_DEVICE(obj), &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    visit_type_uint64(v, name, &value, errp);
 > +}
 > +
->   void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
->   {
->   	if (lapic_in_kernel(vcpu))
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index f875721..7467907 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -30,6 +30,7 @@ struct kvm_pmu_ops {
->   	int (*is_valid_msr_idx)(struct kvm_vcpu *vcpu, unsigned idx);
->   	bool (*is_valid_msr)(struct kvm_vcpu *vcpu, u32 msr);
->   	bool (*lbr_enable)(struct kvm_vcpu *vcpu);
-> +	void (*enabled_feature_confirm)(struct kvm_vcpu *vcpu);
->   	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
->   	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
->   	void (*sched_in)(struct kvm_vcpu *vcpu, int cpu);
-> @@ -126,6 +127,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
->   
->   bool is_vmware_backdoor_pmc(u32 pmc_idx);
->   
-> +void kvm_pmu_enabled_feature_confirm(struct kvm_vcpu *vcpu);
-> +
->   extern struct kvm_pmu_ops intel_pmu_ops;
->   extern struct kvm_pmu_ops amd_pmu_ops;
->   #endif /* __KVM_X86_PMU_H */
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 5580f1a..421051aa 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -781,6 +781,40 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
->   	intel_pmu_free_lbr_event(vcpu);
->   }
->   
-> +void intel_pmu_lbr_confirm(struct kvm_vcpu *vcpu)
+> +static void sgx_epc_init(Object *obj)
 > +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +    object_property_add(obj, SGX_EPC_SIZE_PROP, "uint64", sgx_epc_get_size,
+> +                        NULL, NULL, NULL, &error_abort);
+> +}
 > +
-> +	/*
-> +	 * Either lbr_event being NULL or lbr_used being false indicates that
-> +	 * the lbr msrs haven't been passed through to the guest, so no need
-> +	 * to cancel passthrough.
-> +	 */
-> +	if (!pmu->lbr_event || !pmu->lbr_used)
-> +		return;
+> +static void sgx_epc_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+> +    SGXEPCDevice *epc = SGX_EPC(dev);
 > +
-> +	/*
-> +	 * The lbr feature gets reclaimed via IPI calls, so checking of
-> +	 * lbr_event->oncpu needs to be in an atomic context. Just confirm
-> +	 * that irq has been disabled already.
-> +	 */
-> +	lockdep_assert_irqs_disabled();
+> +    if (pcms->boot_cpus != 0) {
+> +        error_setg(errp,
+> +            "'" TYPE_SGX_EPC "' can't be created after vCPUs, e.g. via -device");
+> +        return;
+> +    }
 > +
-> +	/*
-> +	 * Cancel the pass-through of the lbr msrs if lbr has been reclaimed
-> +	 * by the host perf.
-> +	 */
-> +	if (pmu->lbr_event->oncpu != -1) {
+> +    if (!epc->hostmem) {
+> +        error_setg(errp, "'" SGX_EPC_MEMDEV_PROP "' property is not set");
+> +        return;
+> +    } else if (host_memory_backend_is_mapped(epc->hostmem)) {
+> +        char *path = object_get_canonical_path_component(OBJECT(epc->hostmem));
+> +        error_setg(errp, "can't use already busy memdev: %s", path);
+> +        g_free(path);
+> +        return;
+> +    }
 
-A mistake here,  should be "pmu->lbr_event->oncpu == -1".
-(It didn't seem to affect the profiling result, but generated
-more vm-exits due to mistakenly cancelling the passthrough)
 
-Best,
-Wei
+Please avoid "return; else":
+
+       if (!epc->hostmem) {
+           error_setg(errp, "'" SGX_EPC_MEMDEV_PROP "' property is not set");
+           return;
+       }
+       if (host_memory_backend_is_mapped(epc->hostmem)) {
+           char *path = object_get_canonical_path_component(OBJECT(epc->hostmem));
+           error_setg(errp, "can't use already busy memdev: %s", path);
+           g_free(path);
+           return;
+       }
+
+> +
+> +    error_setg(errp, "'" TYPE_SGX_EPC "' not supported");
+> +}
+> +
+> +static void sgx_epc_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    SGXEPCDevice *epc = SGX_EPC(dev);
+> +
+> +    host_memory_backend_set_mapped(epc->hostmem, false);
+> +}
+> +
+> +static uint64_t sgx_epc_md_get_addr(const MemoryDeviceState *md)
+> +{
+> +    const SGXEPCDevice *epc = SGX_EPC(md);
+> +
+> +    return epc->addr;
+> +}
+> +
+> +static void sgx_epc_md_set_addr(MemoryDeviceState *md, uint64_t addr,
+> +                                Error **errp)
+> +{
+> +    object_property_set_uint(OBJECT(md), addr, SGX_EPC_ADDR_PROP, errp);
+> +}
+> +
+> +static uint64_t sgx_epc_md_get_plugged_size(const MemoryDeviceState *md,
+> +                                            Error **errp)
+> +{
+> +    return 0;
+> +}
+> +
+> +static MemoryRegion *sgx_epc_md_get_memory_region(MemoryDeviceState *md,
+> +                                                  Error **errp)
+> +{
+> +    SGXEPCDevice *epc = SGX_EPC(md);
+> +
+> +    if (!epc->hostmem) {
+> +        error_setg(errp, "'" SGX_EPC_MEMDEV_PROP "' property must be set");
+> +        return NULL;
+> +    }
+> +
+> +    return host_memory_backend_get_memory(epc->hostmem);
+> +}
+> +
+> +static void sgx_epc_md_fill_device_info(const MemoryDeviceState *md,
+> +                                        MemoryDeviceInfo *info)
+> +{
+> +    SGXEPCDeviceInfo *di = g_new0(SGXEPCDeviceInfo, 1);
+> +    const SGXEPCDevice *epc = SGX_EPC(md);
+> +    const DeviceState *dev = DEVICE(md);
+> +
+> +    if (dev->id) {
+> +        di->has_id = true;
+> +        di->id = g_strdup(dev->id);
+> +    }
+> +    di->addr = epc->addr;
+> +    di->node = 0 /* TODO: EPC NUMA spec not yet defined */;
+> +    di->size = memory_device_get_region_size(MEMORY_DEVICE(epc), &error_fatal);
+> +    di->memdev = object_get_canonical_path(OBJECT(epc->hostmem));
+> +}
+> +
+> +static void sgx_epc_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(oc);
+> +
+> +    dc->hotpluggable = false;
+> +    dc->realize = sgx_epc_realize;
+> +    dc->unrealize = sgx_epc_unrealize;
+> +    dc->props = sgx_epc_properties;
+> +    dc->desc = "SGX EPC section";
+> +
+> +    mdc->get_addr = sgx_epc_md_get_addr;
+> +    mdc->set_addr = sgx_epc_md_set_addr;
+> +    mdc->get_plugged_size = sgx_epc_md_get_plugged_size;
+> +    mdc->get_memory_region = sgx_epc_md_get_memory_region;
+> +    mdc->fill_device_info = sgx_epc_md_fill_device_info;
+> +}
+> +
+> +static TypeInfo sgx_epc_info = {
+> +    .name          = TYPE_SGX_EPC,
+> +    .parent        = TYPE_DEVICE,
+> +    .instance_size = sizeof(SGXEPCDevice),
+> +    .instance_init = sgx_epc_init,
+> +    .class_init    = sgx_epc_class_init,
+> +    .class_size    = sizeof(DeviceClass),
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_MEMORY_DEVICE },
+> +        { }
+> +    },
+> +};
+> +
+> +static void sgx_epc_register_types(void)
+> +{
+> +    type_register_static(&sgx_epc_info);
+> +}
+> +
+> +type_init(sgx_epc_register_types)
+> diff --git a/include/hw/i386/sgx-epc.h b/include/hw/i386/sgx-epc.h
+> new file mode 100644
+> index 0000000000..5fd9ae2d0c
+> --- /dev/null
+> +++ b/include/hw/i386/sgx-epc.h
+> @@ -0,0 +1,44 @@
+> +/*
+> + * SGX EPC device
+> + *
+> + * Copyright (C) 2019 Intel Corporation
+> + *
+> + * Authors:
+> + *   Sean Christopherson <sean.j.christopherson@intel.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef QEMU_SGX_EPC_H
+> +#define QEMU_SGX_EPC_H
+> +
+> +#include "sysemu/hostmem.h"
+> +
+> +#define TYPE_SGX_EPC "sgx-epc"
+> +#define SGX_EPC(obj) \
+> +    OBJECT_CHECK(SGXEPCDevice, (obj), TYPE_SGX_EPC)
+> +#define SGX_EPC_CLASS(oc) \
+> +    OBJECT_CLASS_CHECK(SGXEPCDeviceClass, (oc), TYPE_SGX_EPC)
+> +#define SGX_EPC_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(SGXEPCDeviceClass, (obj), TYPE_SGX_EPC)
+> +
+> +#define SGX_EPC_ADDR_PROP "addr"
+> +#define SGX_EPC_SIZE_PROP "size"
+> +#define SGX_EPC_MEMDEV_PROP "memdev"
+> +
+> +/**
+> + * SGXEPCDevice:
+> + * @addr: starting guest physical address, where @SGXEPCDevice is mapped.
+> + *         Default value: 0, means that address is auto-allocated.
+> + * @hostmem: host memory backend providing memory for @SGXEPCDevice
+> + */
+> +typedef struct SGXEPCDevice {
+> +    /* private */
+> +    DeviceState parent_obj;
+> +
+> +    /* public */
+> +    uint64_t addr;
+> +    HostMemoryBackend *hostmem;
+> +} SGXEPCDevice;
+> +
+> +#endif
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index a7fba7230c..965905c9e8 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1573,19 +1573,47 @@
+>            }
+>  }
+>  
+> +##
+> +# @SGXEPCDeviceInfo:
+> +#
+> +# SGX EPC state information
+> +#
+> +# @id: device's ID
+> +#
+> +# @addr: physical address, where device is mapped
+> +#
+> +# @size: size of memory that the device provides
+> +#
+> +# @node: NUMA node number where device is plugged in
+> +#
+> +# @memdev: memory backend linked with device
+> +#
+> +# Since: TBD
+> +##
+> +{ 'struct': 'SGXEPCDeviceInfo',
+> +  'data': { '*id': 'str',
+> +            'addr': 'int',
+> +            'size': 'int',
+> +            'node': 'int',
+> +            'memdev': 'str'
+> +          }
+> +}
+> +
+>  ##
+>  # @MemoryDeviceInfo:
+>  #
+>  # Union containing information about a memory device
+>  #
+> -# nvdimm is included since 2.12. virtio-pmem is included since 4.1.
+> +# nvdimm is included since 2.12. virtio-pmem is included since 4.1,
+> +# sgx-epc is included since TBD.
+>  #
+>  # Since: 2.1
+>  ##
+>  { 'union': 'MemoryDeviceInfo',
+>    'data': { 'dimm': 'PCDIMMDeviceInfo',
+>              'nvdimm': 'PCDIMMDeviceInfo',
+> -            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+> +            'virtio-pmem': 'VirtioPMEMDeviceInfo',
+> +            'sgx-epc': 'SGXEPCDeviceInfo'
+>            }
+>  }
+
+This adds a fourth kind of MemoryDeviceInfo.  Their doc comments all
+neglect to tell us what a "DIMM Device" is, why it's a "PC DIMM Device",
+how that differs from an "NVDIMM Device", what a "Virtio PMEM Device"
+is, and now what an "SGX EPC Device" is.
+
+I'd appreciate a brief explanation, possibly with a reference to
+pertinent documentation elsewhere.  I'm not demanding you do that for
+the existing kinds, too.  Igor, perhaps?
