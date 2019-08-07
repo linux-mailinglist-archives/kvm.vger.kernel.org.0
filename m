@@ -2,95 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6092E85661
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 01:16:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C48A856AA
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 01:54:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730262AbfHGXPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Aug 2019 19:15:55 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:45318 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729938AbfHGXPz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Aug 2019 19:15:55 -0400
-Received: by mail-ot1-f68.google.com with SMTP id x21so17839165otq.12
-        for <kvm@vger.kernel.org>; Wed, 07 Aug 2019 16:15:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=y5EH+uVVZi4pQVkeOf2HQsE+Jig/HWZWR6VmtoAY/1Y=;
-        b=FGcfSyAeEFjqXYP2MrFafKVs59mKd5RhDN781c4BKDO2f/tstYFQWAk7ef9lbMC+VX
-         n4iCrqINcgklwLrmdjb2Cos54LCdLCcyb7QcM7kuc8FOxBB3fRXTx6Oywwp9h6VWvx1H
-         gmRm/yoxs4FAtigFdXUo+yrEGTaUIp6IprhAyYiqEWxZT0n2ymRbF1OSRkd4X0bN1mKN
-         Q8lLzK9JQR5AiUsmP3QEDgPcCBrvfMvbWslxDAR9f2LPqkx8z6WvrM0fJwwLD+66SBoo
-         r0DkKXC5icFFRcmDxjgHcNqpTjePFGswpj/5G8T1q2ISUiq2aRrWHMGxmYmNFhmRVtu2
-         FbKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=y5EH+uVVZi4pQVkeOf2HQsE+Jig/HWZWR6VmtoAY/1Y=;
-        b=nQqwYycfDnpQMbGLNbqv1tdeR/F07gRcLJGyI6w33eynm9uSVXEIl0H/2RpNuJHd4f
-         I/Bdla5wF6WgJYjkGaLRX5rINdBySX/IsnJRAEkz1xsf+lM/EX0FOFbAAa5mw9qIcTV+
-         8RdRbqNwEMRPvuNn1fevKmbfio/Jqjv3xVH7+pyyNWq4RtcLSmWLcNp5cgQOh93i5mW0
-         N31avohF4maPWEFpRu6FNGhTCgluucOylmtiljCDnncwD51/3HHM0yXeQgruC379rn7g
-         KcglpsWCd7EcgKYeKFGdXCedvVomS+p0vwMZcL79VkhhULhnv03h5AL37Wn7JWcKXtCo
-         OI4g==
-X-Gm-Message-State: APjAAAX/QZyC+FMyKLAV7iqcqXlGaIG4WgzQrU/tfD9L76lLIPdxNNbL
-        p0bUA5i6vD1tUTVRrzca543Tqw==
-X-Google-Smtp-Source: APXvYqybsW+ELbkjOgVjKbuZyZcQ6XTGYZ1w7r83yiScAbSQwX+IQI76DhcZQtcniQZcwYt7DLwiYg==
-X-Received: by 2002:a5d:94d0:: with SMTP id y16mr10862099ior.123.1565219754480;
-        Wed, 07 Aug 2019 16:15:54 -0700 (PDT)
-Received: from localhost (c-73-95-159-87.hsd1.co.comcast.net. [73.95.159.87])
-        by smtp.gmail.com with ESMTPSA id j23sm74215587ioo.6.2019.08.07.16.15.53
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 07 Aug 2019 16:15:54 -0700 (PDT)
-Date:   Wed, 7 Aug 2019 16:15:53 -0700 (PDT)
-From:   Paul Walmsley <paul.walmsley@sifive.com>
-X-X-Sender: paulw@viisi.sifive.com
-To:     Paolo Bonzini <pbonzini@redhat.com>
-cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 00/20] KVM RISC-V Support
-In-Reply-To: <4a991aa3-154a-40b2-a37d-9ee4a4c7a2ca@redhat.com>
-Message-ID: <alpine.DEB.2.21.9999.1908071606560.13971@viisi.sifive.com>
-References: <20190807122726.81544-1-anup.patel@wdc.com> <4a991aa3-154a-40b2-a37d-9ee4a4c7a2ca@redhat.com>
-User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
+        id S2388270AbfHGXyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Aug 2019 19:54:23 -0400
+Received: from mga04.intel.com ([192.55.52.120]:34651 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387536AbfHGXyX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Aug 2019 19:54:23 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Aug 2019 16:54:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,358,1559545200"; 
+   d="scan'208";a="182430251"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by FMSMGA003.fm.intel.com with ESMTP; 07 Aug 2019 16:54:23 -0700
+Date:   Wed, 7 Aug 2019 16:54:23 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jintack Lim <incredible.tack@gmail.com>
+Cc:     KVM General <kvm@vger.kernel.org>,
+        Jintack Lim <jintack@cs.columbia.edu>
+Subject: Re: Why are we using preemption timer on x86?
+Message-ID: <20190807235423.GD16491@linux.intel.com>
+References: <CAHyh4xhDZdr0gOJCrSBB5rXYXw7Kpxsw_Oe=tSHMCgi_2G3ouQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHyh4xhDZdr0gOJCrSBB5rXYXw7Kpxsw_Oe=tSHMCgi_2G3ouQ@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 7 Aug 2019, Paolo Bonzini wrote:
-
-> On 07/08/19 14:27, Anup Patel wrote:
-> > This series adds initial KVM RISC-V support. Currently, we are able to boot
-> > RISC-V 64bit Linux Guests with multiple VCPUs.
+On Wed, Aug 07, 2019 at 02:52:19PM -0700, Jintack Lim wrote:
+> Hi,
 > 
-> Looks good to me!  Still need an Acked-by from arch/riscv folks if I
-> have to merge it, otherwise they can take care of the initial merge.
+> I'm just wondering what's the reason why we use the preemption timer
+> instead of emulating VM's timer using hrtimer in software? Is there
+> anything the the preemption timer can do that can't be done with
+> hrtimer?
+> 
+> I guess the x86 architecture provides the preemption timer for *some*
+> reason, but I'm not sure what they are.
 
-Since almost all of the patches touch arch/riscv files, we'll plan to 
-merge them through the RISC-V tree.  Care to ack patch one, and send tags 
-for any other patches as you think might be appropriate?
+Assuming you're referring to Intel/VMX's preemption timer, programming
+the preemption timer and servicing its VM-Exits both have lower overhead
+than going through hrtimer.
 
-At the moment we're focused on dealing with a TLB flush-related critical 
-stability bug in RISC-V kernel land.  Once that gets cleared up, we'll 
-start pulling stuff in for the merge window.
+commit ce7a058a2117f0bca2f42f2870a97bfa9aa8e099
+Author: Yunhong Jiang <yunhong.jiang@gmail.com>
+Date:   Mon Jun 13 14:20:01 2016 -0700
 
-Thanks for the speedy review,
+    KVM: x86: support using the vmx preemption timer for tsc deadline timer
 
+    The VMX preemption timer can be used to virtualize the TSC deadline timer.
+    The VMX preemption timer is armed when the vCPU is running, and a VMExit
+    will happen if the virtual TSC deadline timer expires.
 
-- Paul
+    When the vCPU thread is blocked because of HLT, KVM will switch to use
+    an hrtimer, and then go back to the VMX preemption timer when the vCPU
+    thread is unblocked.
+
+    This solution avoids the complex OS's hrtimer system, and the host
+    timer interrupt handling cost, replacing them with a little math
+    (for guest->host TSC and host TSC->preemption timer conversion)
+    and a cheaper VMexit.  This benefits latency for isolated pCPUs.
+
+    [A word about performance... Yunhong reported a 30% reduction in average
+     latency from cyclictest.  I made a similar test with tscdeadline_latency
+     from kvm-unit-tests, and measured
+
+     - ~20 clock cycles loss (out of ~3200, so less than 1% but still
+       statistically significant) in the worst case where the test halts
+       just after programming the TSC deadline timer
+
+     - ~800 clock cycles gain (25% reduction in latency) in the best case
+       where the test busy waits.
+
+     I removed the VMX bits from Yunhong's patch, to concentrate them in the
+     next patch - Paolo]
+
+    Signed-off-by: Yunhong Jiang <yunhong.jiang@intel.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
