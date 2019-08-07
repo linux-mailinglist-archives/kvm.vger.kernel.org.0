@@ -2,71 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CAD7C8489D
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 11:28:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EB39848F4
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 11:54:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387396AbfHGJ2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Aug 2019 05:28:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53948 "EHLO mx1.redhat.com"
+        id S1729278AbfHGJxw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Aug 2019 05:53:52 -0400
+Received: from foss.arm.com ([217.140.110.172]:45634 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726461AbfHGJ2H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Aug 2019 05:28:07 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AF3B72F366E;
-        Wed,  7 Aug 2019 09:28:07 +0000 (UTC)
-Received: from gondolin (ovpn-117-166.ams2.redhat.com [10.36.117.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EDD391001284;
-        Wed,  7 Aug 2019 09:28:03 +0000 (UTC)
-Date:   Wed, 7 Aug 2019 11:28:01 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     kvm@vger.kernel.org, wankhede@nvidia.com,
-        linux-kernel@vger.kernel.org, alex.williamson@redhat.com,
-        cjia@nvidia.com
-Subject: Re: [PATCH v1 2/2] vfio/mdev: Removed unused and redundant API for
- mdev UUID
-Message-ID: <20190807112801.6b2ceb36.cohuck@redhat.com>
-In-Reply-To: <20190806141826.52712-3-parav@mellanox.com>
-References: <20190802065905.45239-1-parav@mellanox.com>
-        <20190806141826.52712-1-parav@mellanox.com>
-        <20190806141826.52712-3-parav@mellanox.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 07 Aug 2019 09:28:07 +0000 (UTC)
+        id S1727541AbfHGJxv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Aug 2019 05:53:51 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 938E128;
+        Wed,  7 Aug 2019 02:53:51 -0700 (PDT)
+Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com [10.1.196.217])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8D1D83F575;
+        Wed,  7 Aug 2019 02:53:50 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     maz@kernel.org, eric.auger@redhat.com, andre.przywara@arm.com,
+        christoffer.dall@arm.com
+Subject: [PATCH] KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable
+Date:   Wed,  7 Aug 2019 10:53:20 +0100
+Message-Id: <1565171600-11082-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  6 Aug 2019 09:18:26 -0500
-Parav Pandit <parav@mellanox.com> wrote:
+A HW mapped level sensitive interrupt asserted by a device will not be put
+into the ap_list if it is disabled at the VGIC level. When it is enabled
+again, it will be inserted into the ap_list and written to a list register
+on guest entry regardless of the state of the device.
 
-> There is no single production driver who is interested in mdev device
-> uuid. Currently UUID is mainly used to derive a device name.
-> Additionally mdev device name is already available using core kernel
-> API dev_name().
+We could argue that this can also happen on real hardware, when the command
+to enable the interrupt reached the GIC before the device had the chance to
+de-assert the interrupt signal; however, we emulate the distributor and
+redistributors in software and we can do better than that.
 
-Well, the mdev code actually uses the uuid to check for duplicates
-before registration with the driver core would fail... I'd just drop
-the two sentences talking about the device name, IMHO they don't really
-add useful information; but I'll leave that decision to the maintainers.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-mmio.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-> 
-> Hence removed unused exported symbol.
-> 
-> Signed-off-by: Parav Pandit <parav@mellanox.com>
-> ---
-> Changelog:
-> v0->v1:
->  - Updated commit log to address comments from Cornelia
-> ---
->  drivers/vfio/mdev/mdev_core.c | 6 ------
->  include/linux/mdev.h          | 1 -
->  2 files changed, 7 deletions(-)
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index 3ba7278fb533..44efc2ff863f 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -113,6 +113,22 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
+ 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+ 
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
++		if (vgic_irq_is_mapped_level(irq)) {
++			bool was_high = irq->line_level;
++
++			/*
++			 * We need to update the state of the interrupt because
++			 * the guest might have changed the state of the device
++			 * while the interrupt was disabled at the VGIC level.
++			 */
++			irq->line_level = vgic_get_phys_line_level(irq);
++			/*
++			 * Deactivate the physical interrupt so the GIC will let
++			 * us know when it is asserted again.
++			 */
++			if (!irq->active && was_high && !irq->line_level)
++				vgic_irq_set_phys_active(irq, false);
++		}
+ 		irq->enabled = true;
+ 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+ 
+-- 
+2.7.4
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
