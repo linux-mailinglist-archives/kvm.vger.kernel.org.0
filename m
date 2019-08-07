@@ -2,97 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8485F841E5
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 03:50:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C3728440D
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 07:56:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729185AbfHGBt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 21:49:59 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:13872 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727788AbfHGBt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 21:49:58 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d4a2e4e0000>; Tue, 06 Aug 2019 18:50:06 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 06 Aug 2019 18:49:56 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 06 Aug 2019 18:49:56 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 7 Aug
- 2019 01:49:55 +0000
-Subject: Re: [PATCH v3 00/39] put_user_pages(): miscellaneous call sites
-To:     <john.hubbard@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
-References: <20190807013340.9706-1-jhubbard@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <912eb2bd-4102-05c1-5571-c261617ad30b@nvidia.com>
-Date:   Tue, 6 Aug 2019 18:49:55 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726159AbfHGF4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Aug 2019 01:56:53 -0400
+Received: from mga14.intel.com ([192.55.52.115]:41058 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725794AbfHGF4x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Aug 2019 01:56:53 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 22:56:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,356,1559545200"; 
+   d="scan'208";a="325857009"
+Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
+  by orsmga004.jf.intel.com with ESMTP; 06 Aug 2019 22:56:50 -0700
+Message-ID: <5D4A697D.3030604@intel.com>
+Date:   Wed, 07 Aug 2019 14:02:37 +0800
+From:   Wei Wang <wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        ak@linux.intel.com, peterz@infradead.org, pbonzini@redhat.com
+CC:     kan.liang@intel.com, mingo@redhat.com, rkrcmar@redhat.com,
+        like.xu@intel.com, jannh@google.com, arei.gonglei@huawei.com,
+        jmattson@google.com
+Subject: Re: [PATCH v8 13/14] KVM/x86/vPMU: check the lbr feature before entering
+ guest
+References: <1565075774-26671-1-git-send-email-wei.w.wang@intel.com> <1565075774-26671-14-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1565075774-26671-14-git-send-email-wei.w.wang@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1565142606; bh=Dn5BKjZ7JEBRqWgfa18GnM7OhUXy8yDZwMN3JIIxlGw=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Ikr1Z0QmiSe2izYZJH1uqOSC6icnToC0RNMEpxuB23chpfLBCzP3w/AieqLXvDTl5
-         WiAJO8Q4P7LqaICg9w9tXQj3/iPr6N76Dc9IbqJMajQoyinrqFfwgCWwW9UnKbczaL
-         GaLoALYFsFwWv8Sy+VSzQYK1xKYCINe6tMld2WSk4jzjh2UDaUm/4PS/zoETIOvAHY
-         Cv7DiogcZErrjHQstqfLwjbbIS2N4ESoffKtD4ugOTExuz4uGt5TgMT8y01S0TheeO
-         6qVWyeW6YYVimOARtYB9SW21zJJlrmRpt7UH+8pXV98uEPUBYTW77sxtUkB504xqpb
-         D9OLrQ7tTourQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/6/19 6:32 PM, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> ...
-> 
-> John Hubbard (38):
->   mm/gup: add make_dirty arg to put_user_pages_dirty_lock()
-...
->  54 files changed, 191 insertions(+), 323 deletions(-)
-> 
-ahem, yes, apparently this is what happens if I add a few patches while editing
-the cover letter... :) 
+On 08/06/2019 03:16 PM, Wei Wang wrote:
+> The guest can access the lbr related msrs only when the vcpu's lbr event
+> has been assigned the lbr feature. A cpu pinned lbr event (though no such
+> event usages in the current upstream kernel) could reclaim the lbr feature
+> from the vcpu's lbr event (task pinned) via ipi calls. If the cpu is
+> running in the non-root mode, this will cause the cpu to vm-exit to handle
+> the host ipi and then vm-entry back to the guest. So on vm-entry (where
+> interrupt has been disabled), we double confirm that the vcpu's lbr event
+> is still assigned the lbr feature via checking event->oncpu.
+>
+> The pass-through of the lbr related msrs will be cancelled if the lbr is
+> reclaimed, and the following guest accesses to the lbr related msrs will
+> vm-exit to the related msr emulation handler in kvm, which will prevent
+> the accesses.
+>
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> ---
+>   arch/x86/kvm/pmu.c           |  6 ++++++
+>   arch/x86/kvm/pmu.h           |  3 +++
+>   arch/x86/kvm/vmx/pmu_intel.c | 35 +++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/x86.c           | 13 +++++++++++++
+>   4 files changed, 57 insertions(+)
+>
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index afad092..ed10a57 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -339,6 +339,12 @@ bool kvm_pmu_lbr_enable(struct kvm_vcpu *vcpu)
+>   	return false;
+>   }
+>   
+> +void kvm_pmu_enabled_feature_confirm(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_x86_ops->pmu_ops->enabled_feature_confirm)
+> +		kvm_x86_ops->pmu_ops->enabled_feature_confirm(vcpu);
+> +}
+> +
+>   void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
+>   {
+>   	if (lapic_in_kernel(vcpu))
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index f875721..7467907 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -30,6 +30,7 @@ struct kvm_pmu_ops {
+>   	int (*is_valid_msr_idx)(struct kvm_vcpu *vcpu, unsigned idx);
+>   	bool (*is_valid_msr)(struct kvm_vcpu *vcpu, u32 msr);
+>   	bool (*lbr_enable)(struct kvm_vcpu *vcpu);
+> +	void (*enabled_feature_confirm)(struct kvm_vcpu *vcpu);
+>   	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+>   	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+>   	void (*sched_in)(struct kvm_vcpu *vcpu, int cpu);
+> @@ -126,6 +127,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
+>   
+>   bool is_vmware_backdoor_pmc(u32 pmc_idx);
+>   
+> +void kvm_pmu_enabled_feature_confirm(struct kvm_vcpu *vcpu);
+> +
+>   extern struct kvm_pmu_ops intel_pmu_ops;
+>   extern struct kvm_pmu_ops amd_pmu_ops;
+>   #endif /* __KVM_X86_PMU_H */
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 5580f1a..421051aa 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -781,6 +781,40 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+>   	intel_pmu_free_lbr_event(vcpu);
+>   }
+>   
+> +void intel_pmu_lbr_confirm(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +
+> +	/*
+> +	 * Either lbr_event being NULL or lbr_used being false indicates that
+> +	 * the lbr msrs haven't been passed through to the guest, so no need
+> +	 * to cancel passthrough.
+> +	 */
+> +	if (!pmu->lbr_event || !pmu->lbr_used)
+> +		return;
+> +
+> +	/*
+> +	 * The lbr feature gets reclaimed via IPI calls, so checking of
+> +	 * lbr_event->oncpu needs to be in an atomic context. Just confirm
+> +	 * that irq has been disabled already.
+> +	 */
+> +	lockdep_assert_irqs_disabled();
+> +
+> +	/*
+> +	 * Cancel the pass-through of the lbr msrs if lbr has been reclaimed
+> +	 * by the host perf.
+> +	 */
+> +	if (pmu->lbr_event->oncpu != -1) {
 
-The subject line should read "00/41", and the list of files affected here is
-therefore under-reported in this cover letter. However, the patch series itself is 
-intact and ready for submission.
+A mistake here,  should be "pmu->lbr_event->oncpu == -1".
+(It didn't seem to affect the profiling result, but generated
+more vm-exits due to mistakenly cancelling the passthrough)
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+Best,
+Wei
