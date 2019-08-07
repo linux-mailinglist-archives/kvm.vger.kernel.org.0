@@ -2,134 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F70F84A8D
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 13:23:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E1E284B30
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 14:07:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729612AbfHGLXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Aug 2019 07:23:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41342 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729516AbfHGLXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Aug 2019 07:23:16 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6EE7E3C936;
-        Wed,  7 Aug 2019 11:23:16 +0000 (UTC)
-Received: from gondolin (ovpn-117-166.ams2.redhat.com [10.36.117.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 12BA72619E;
-        Wed,  7 Aug 2019 11:23:14 +0000 (UTC)
-Date:   Wed, 7 Aug 2019 13:23:11 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH RFC UNTESTED] vfio-ccw: indirect access to translated
- cps
-Message-ID: <20190807132311.5238bc24.cohuck@redhat.com>
-In-Reply-To: <20190730174910.47930494.pasic@linux.ibm.com>
-References: <20190726100617.19718-1-cohuck@redhat.com>
-        <20190730174910.47930494.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729769AbfHGMHk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Aug 2019 08:07:40 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:33077 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727213AbfHGMHk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Aug 2019 08:07:40 -0400
+Received: by mail-qt1-f194.google.com with SMTP id r6so83771416qtt.0
+        for <kvm@vger.kernel.org>; Wed, 07 Aug 2019 05:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=v26ljGQm8kb1b/B+MgY9iqkRnu2IlPlITotoyjOaRLE=;
+        b=FwqxEndrrseDTfa7IA+ahMyXJcw275sq/ogyK1cE9Brfp/+cA5dthaNKeo43mipwCW
+         6M3TrldZWv7JXH9KLIINp0G6YhemLDU3zOb98Y6ixjqND8Edt4vtD4dtABJZtPFOlNWQ
+         7o+i/B+d4dsypsLc9FAuuiUZqdV3+cuQPd1u7fGeYNEYgtw4WFPR67fjUunxQzqjk+D+
+         m/Hrc+kRzSQLc/Y4MNwDwO+mVI0ImT4tvNWKY8DSYiKFsYOn0c9EH2FZcaFik8oOhgro
+         wCckNCtxQRpeA/pGd5OtN/Hmf4FSEtEBQR4gGNGlbagAyW+no63yQWaSBO4AtHGy6HOL
+         lRNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=v26ljGQm8kb1b/B+MgY9iqkRnu2IlPlITotoyjOaRLE=;
+        b=ruEBMWZUwtZ12oYQCs/V6oFZTxW+lb2GTTSOotKKhPnn72XVmj7e13i4etmoEJyJiY
+         kGr6mWn4I7fjvIvlSxBDpcnwK4hNA12Qshoyqit1HUWRJKfJxddzpPc1Ix5UOcNPzVUN
+         HWLBex4volDe4/7aANTWnVykmYnosuSGpQB2zAxuKYHvSVBPYYmfvjBJVXb35jMLFgah
+         944vD5Ksnht7jXwpOAtbBCumQdj0VqTv3dFxfJHqqaCJCEjoF0KqMvLldOwnf7OlUNkM
+         DnlIrlLEToAOCSHODqhfz5l+i6xoIf7VidWIcsmOKyOZ0oiJrc3bjV1lR++b+13z+d/M
+         sfmw==
+X-Gm-Message-State: APjAAAW4+rCDPWXgnM3u9qKbMHeZG1jMnzZz1ZWTiehQIecuyS1bbl+7
+        mzyeEhDKnmbL78qlcw0v7qDYBw==
+X-Google-Smtp-Source: APXvYqwdlTEXDfbCbN8MO6nqW9FtHXr3xg/qpTMHDicPu2B1XqjJOXbR74uxCwKcBjwiEflnXc1c9w==
+X-Received: by 2002:a0c:e790:: with SMTP id x16mr7775534qvn.120.1565179659437;
+        Wed, 07 Aug 2019 05:07:39 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id p32sm45431550qtb.67.2019.08.07.05.07.38
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 07 Aug 2019 05:07:38 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hvKjC-0000z1-4M; Wed, 07 Aug 2019 09:07:38 -0300
+Date:   Wed, 7 Aug 2019 09:07:38 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V4 7/9] vhost: do not use RCU to synchronize MMU notifier
+ with worker
+Message-ID: <20190807120738.GB1557@ziepe.ca>
+References: <20190807070617.23716-1-jasowang@redhat.com>
+ <20190807070617.23716-8-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Wed, 07 Aug 2019 11:23:16 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190807070617.23716-8-jasowang@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 30 Jul 2019 17:49:10 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> On Fri, 26 Jul 2019 12:06:17 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
+On Wed, Aug 07, 2019 at 03:06:15AM -0400, Jason Wang wrote:
+> We used to use RCU to synchronize MMU notifier with worker. This leads
+> calling synchronize_rcu() in invalidate_range_start(). But on a busy
+> system, there would be many factors that may slow down the
+> synchronize_rcu() which makes it unsuitable to be called in MMU
+> notifier.
 > 
-> > We're currently keeping a single area for translated channel
-> > programs in our private structure, which is filled out when
-> > we are translating a channel program we have been given by
-> > user space and marked invalid again when we received an final
-> > interrupt for that I/O.
-> > 
-> > Unfortunately, properly tracking the lifetime of that cp is
-> > not easy: failures may happen during translation or right when
-> > it is sent to the hardware, unsolicited interrupts may trigger
-> > a deferred condition code, a halt/clear request may be issued
-> > while the I/O is supposed to be running, or a reset request may
-> > come in from the side. The _PROCESSING state and the ->initialized
-> > flag help a bit, but not enough.
-> > 
-> > We want to have a way to figure out whether we actually have a cp
-> > currently in progress, so we can update/free only when applicable.
-> > Points to keep in mind:
-> > - We will get an interrupt after a cp has been submitted iff ssch
-> >   finished with cc 0.
-> > - We will get more interrupts for a cp if the interrupt status is
-> >   not final.
-> > - We can have only one cp in flight at a time.
-> > 
-> > Let's decouple the actual area in the private structure from the
-> > means to access it: Only after we have successfully submitted a
-> > cp (ssch with cc 0), update the pointer in the private structure
-> > to point to the area used. Therefore, the interrupt handler won't
-> > access the cp if we don't actually expect an interrupt pertaining
-> > to it.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> > 
-> > Just hacked this up to get some feedback, did not actually try it
-> > out. Not even sure if this is a sensible approach; if not, let's
-> > blame it on the heat and pretend it didn't happen :)
-> >   
+> So this patch switches use seqlock counter to track whether or not the
+> map was used. The counter was increased when vq try to start or finish
+> uses the map. This means, when it was even, we're sure there's no
+> readers and MMU notifier is synchronized. When it was odd, it means
+> there's a reader we need to wait it to be even again then we are
+> synchronized. Consider the read critical section is pretty small the
+> synchronization should be done very fast.
 > 
-> Do not multiple threads access this new cp pointer (and at least one of
-> them writes)? If that is the case, it smells like a data race to me.
-
-We might need some additional concurrent read/write handling on top, if
-state machine guarantees are not enough. (We may need a respin of the
-state machine locking for that, which we probably want anyway.)
-
+> Reported-by: Michael S. Tsirkin <mst@redhat.com>
+> Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>  drivers/vhost/vhost.c | 141 ++++++++++++++++++++++++++----------------
+>  drivers/vhost/vhost.h |   7 ++-
+>  2 files changed, 90 insertions(+), 58 deletions(-)
 > 
-> Besides the only point of converting cp to a pointer seems to be
-> policing access to cp_area (which used to be cp). I.e. if it is
-> NULL: don't touch it, otherwise: go ahead. We can do that with a single
-> bit, we don't need a pointer for that.
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index cfc11f9ed9c9..57bfbb60d960 100644
+> +++ b/drivers/vhost/vhost.c
+> @@ -324,17 +324,16 @@ static void vhost_uninit_vq_maps(struct vhost_virtqueue *vq)
+>  
+>  	spin_lock(&vq->mmu_lock);
+>  	for (i = 0; i < VHOST_NUM_ADDRS; i++) {
+> -		map[i] = rcu_dereference_protected(vq->maps[i],
+> -				  lockdep_is_held(&vq->mmu_lock));
+> +		map[i] = vq->maps[i];
+>  		if (map[i]) {
+>  			vhost_set_map_dirty(vq, map[i], i);
+> -			rcu_assign_pointer(vq->maps[i], NULL);
+> +			vq->maps[i] = NULL;
+>  		}
+>  	}
+>  	spin_unlock(&vq->mmu_lock);
+>  
+> -	/* No need for synchronize_rcu() or kfree_rcu() since we are
+> -	 * serialized with memory accessors (e.g vq mutex held).
+> +	/* No need for synchronization since we are serialized with
+> +	 * memory accessors (e.g vq mutex held).
+>  	 */
+>  
+>  	for (i = 0; i < VHOST_NUM_ADDRS; i++)
+> @@ -362,6 +361,40 @@ static bool vhost_map_range_overlap(struct vhost_uaddr *uaddr,
+>  	return !(end < uaddr->uaddr || start > uaddr->uaddr - 1 + uaddr->size);
+>  }
+>  
+> +static void inline vhost_vq_access_map_begin(struct vhost_virtqueue *vq)
+> +{
+> +	write_seqcount_begin(&vq->seq);
+> +}
+> +
+> +static void inline vhost_vq_access_map_end(struct vhost_virtqueue *vq)
+> +{
+> +	write_seqcount_end(&vq->seq);
+> +}
 
-The idea was
-- do translation etc. on an area only accessed by the thread doing the
-  translation
-- switch the pointer to that area once the cp has been submitted
-  successfully (and it is therefore associated with further interrupts
-  etc.)
-The approach in this patch is probably a bit simplistic.
+The write side of a seqlock only provides write barriers. Access to
 
-I think one bit is not enough, we have at least three states:
-- idle; start using the area if you like
-- translating; i.e. only the translator is touching the area, keep off
-- submitted; we wait for interrupts, handle them or free if no (more)
-  interrupts can happen
+	map = vq->maps[VHOST_ADDR_USED];
 
-> 
-> Could we convert initialized into some sort of cp.status that
-> tracks/controls access and responsibilities? By working with bits we
-> could benefit from the atomicity of bit-ops -- if I'm not wrong.
+Still needs a read side barrier, and then I think this will be no
+better than a normal spinlock.
 
-We have both the state of the device (state machine) and the state of a
-cp, then. If we keep to a single cp area, we should track that within a
-single state (i.e. the device state).
+It also doesn't seem like this algorithm even needs a seqlock, as this
+is just a one bit flag
 
-> 
-> > I also thought about having *two* translation areas and switching
-> > the pointer between them; this might be too complicated, though?  
-> 
-> We only have one channel program at a time or? I can't see the benefit
-> of having two areas.
+atomic_set_bit(using map)
+smp_mb__after_atomic()
+.. maps [...]
+atomic_clear_bit(using map)
 
-We can only have one in flight at a time; we could conceivably have
-another one that is currently in the process of being built. The idea
-was to switch between the two (so processing an in-flight one cannot
-overwrite one that is currently being built); but I think this is too
-complicated.
+
+map = NULL;
+smp_mb__before_atomic();
+while (atomic_read_bit(using map))
+   relax()
+
+Again, not clear this could be faster than a spinlock when the
+barriers are correct...
+
+Jason
