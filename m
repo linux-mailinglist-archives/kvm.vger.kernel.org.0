@@ -2,140 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AFB383AC2
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2019 23:05:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30A6183EE5
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2019 03:34:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726677AbfHFVFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Aug 2019 17:05:07 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:56907 "EHLO
-        7.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726069AbfHFVFH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Aug 2019 17:05:07 -0400
-X-Greylist: delayed 8401 seconds by postgrey-1.27 at vger.kernel.org; Tue, 06 Aug 2019 17:05:06 EDT
-Received: from player730.ha.ovh.net (unknown [10.108.57.43])
-        by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6EC9A2484E3
-        for <kvm@vger.kernel.org>; Tue,  6 Aug 2019 19:26:00 +0200 (CEST)
-Received: from kaod.org (bad36-1-78-202-132-1.fbx.proxad.net [78.202.132.1])
-        (Authenticated sender: clg@kaod.org)
-        by player730.ha.ovh.net (Postfix) with ESMTPSA id 4A00688A6119;
-        Tue,  6 Aug 2019 17:25:51 +0000 (UTC)
-From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To:     Paul Mackerras <paulus@samba.org>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org,
-        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH] KVM: PPC: Book3S HV: XIVE: Free escalation interrupts before disabling the VP
-Date:   Tue,  6 Aug 2019 19:25:38 +0200
-Message-Id: <20190806172538.5087-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+        id S1728975AbfHGBeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Aug 2019 21:34:04 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:41958 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728924AbfHGBeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Aug 2019 21:34:03 -0400
+Received: by mail-pg1-f194.google.com with SMTP id x15so32192682pgg.8;
+        Tue, 06 Aug 2019 18:34:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=5vxuyadJL7U7uLaLdbmi0wM48++CcjfxvCZKqh2vh4A=;
+        b=tJ4avExMGOslRL3KTWrhxlFpoBzlcAAoAY6nsujGir08N57EmfZrSbOMeRJcJde7Uj
+         6p8KfFB2QlchOp80DqoDBBsPKN3gUIJOh4n7D6Yh9T3nSHLo+8OFWd8EJLXKFWC0xEFu
+         BmWUmZQDsFc5eWFMiByCMGNsi+mAFSq87ACVXRceUieYWtrqNYA6DLXxvBADUzuXvcU6
+         1ZXKcyzgzSqHuvc1l/kZ62Ao/hhcpehqRB7H988g3B52fcurQVWKcDzBWGtinssBwiFv
+         8PQfq3+x8otin0I6bbeyX/WVus24QowHZw+Uv5/OsksPBR/5x/rAPJ/L+1xe6jkKCsU8
+         nEag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5vxuyadJL7U7uLaLdbmi0wM48++CcjfxvCZKqh2vh4A=;
+        b=VcLP2a1VlQWIxYZF5x1k4nc8UlCcA9DEXNAMxRpP1YBx+CKfPOV0EG70h6coDq3ueb
+         Z1l7XnKf1kWe3HC5g8Ur5q7PGYyXwRWHeIeGV/hbgZDQUFFRBJ/mA2YXlGlT2PisLivR
+         xyzgofr0OGhMX8eB+w2zDNbKLSWcj7H9f+6iVKKhNVFxG4P1QkHly4+nd4LYOgNGOZAi
+         2UkMsaEioc9MGDTnFXzgGI9iuFClCGIE6reE0n93i3Xm2L5giHDvIN+J8lVUBb/5MT6U
+         3GZ17w670+Qw3sZ35OLWtzl1Gqm1I8am7CLklPk4PrmResPGYd32Iw011e86OiR40CXT
+         kvNw==
+X-Gm-Message-State: APjAAAU2bhCLIXR2Q3j0r25JAEvFCR5y8WUnDRzrjum4QDfYKL3om06f
+        4Pc2rctE6qNfWc/fZY5bkos=
+X-Google-Smtp-Source: APXvYqwZ5yA40o4DlM/E4D19FajcupEJefAyWq7AP8+bod/B2xp44JmZHMRv4wRgb1laJgr8Owsqyg==
+X-Received: by 2002:a65:6256:: with SMTP id q22mr5552901pgv.408.1565141642021;
+        Tue, 06 Aug 2019 18:34:02 -0700 (PDT)
+Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.00
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 06 Aug 2019 18:34:01 -0700 (PDT)
+From:   john.hubbard@gmail.com
+X-Google-Original-From: jhubbard@nvidia.com
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Hans Verkuil <hans.verkuil@cisco.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Souptick Joarder <jrdr.linux@gmail.com>
+Subject: [PATCH v3 11/41] media/v4l2-core/mm: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:10 -0700
+Message-Id: <20190807013340.9706-12-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
+References: <20190807013340.9706-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 13269856306298588020
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddutddgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a vCPU is brought done, the XIVE VP is first disabled and then
-the event notification queues are freed. When freeing the queues, we
-check for possible escalation interrupts and free them also.
+From: John Hubbard <jhubbard@nvidia.com>
 
-But when a XIVE VP is disabled, the underlying XIVE ENDs also are
-disabled in OPAL. When an END is disabled, its ESB pages (ESn and ESe)
-are disabled and loads return all 1s. Which means that any access on
-the ESB page of the escalation interrupt will return invalid values.
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page() or
+release_pages().
 
-When an interrupt is freed, the shutdown handler computes a 'saved_p'
-field from the value returned by a load in xive_do_source_set_mask().
-This value is incorrect for escalation interrupts for the reason
-described above.
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
 
-This has no impact on Linux/KVM today because we don't make use of it
-but we will introduce in future changes a xive_get_irqchip_state()
-handler. This handler will use the 'saved_p' field to return the state
-of an interrupt and 'saved_p' being incorrect, softlockup will occur.
-
-Fix the vCPU cleanup sequence by first freeing the escalation
-interrupts if any, then disable the XIVE VP and last free the queues.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Hans Verkuil <hans.verkuil@cisco.com>
+Cc: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: Souptick Joarder <jrdr.linux@gmail.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: linux-media@vger.kernel.org
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- arch/powerpc/kvm/book3s_xive.c        | 18 ++++++++++--------
- arch/powerpc/kvm/book3s_xive_native.c | 12 +++++++-----
- 2 files changed, 17 insertions(+), 13 deletions(-)
+ drivers/media/v4l2-core/videobuf-dma-sg.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index e3ba67095895..09f838aa3138 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -1134,20 +1134,22 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	/* Mask the VP IPI */
- 	xive_vm_esb_load(&xc->vp_ipi_data, XIVE_ESB_SET_PQ_01);
+diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2-core/videobuf-dma-sg.c
+index 66a6c6c236a7..d6eeb437ec19 100644
+--- a/drivers/media/v4l2-core/videobuf-dma-sg.c
++++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
+@@ -349,8 +349,7 @@ int videobuf_dma_free(struct videobuf_dmabuf *dma)
+ 	BUG_ON(dma->sglen);
  
--	/* Disable the VP */
--	xive_native_disable_vp(xc->vp_id);
--
--	/* Free the queues & associated interrupts */
-+	/* Free escalations */
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
--		struct xive_q *q = &xc->queues[i];
--
--		/* Free the escalation irq */
- 		if (xc->esc_virq[i]) {
- 			free_irq(xc->esc_virq[i], vcpu);
- 			irq_dispose_mapping(xc->esc_virq[i]);
- 			kfree(xc->esc_virq_names[i]);
- 		}
--		/* Free the queue */
-+	}
-+
-+	/* Disable the VP */
-+	xive_native_disable_vp(xc->vp_id);
-+
-+	/* Free the queues */
-+	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
-+		struct xive_q *q = &xc->queues[i];
-+
- 		xive_native_disable_queue(xc->vp_id, q, i);
- 		if (q->qpage) {
- 			free_pages((unsigned long)q->qpage,
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index a998823f68a3..368427fcad20 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -67,10 +67,7 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	xc->valid = false;
- 	kvmppc_xive_disable_vcpu_interrupts(vcpu);
- 
--	/* Disable the VP */
--	xive_native_disable_vp(xc->vp_id);
--
--	/* Free the queues & associated interrupts */
-+	/* Free escalations */
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		/* Free the escalation irq */
- 		if (xc->esc_virq[i]) {
-@@ -79,8 +76,13 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 			kfree(xc->esc_virq_names[i]);
- 			xc->esc_virq[i] = 0;
- 		}
-+	}
- 
--		/* Free the queue */
-+	/* Disable the VP */
-+	xive_native_disable_vp(xc->vp_id);
-+
-+	/* Free the queues */
-+	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		kvmppc_xive_native_cleanup_queue(vcpu, i);
+ 	if (dma->pages) {
+-		for (i = 0; i < dma->nr_pages; i++)
+-			put_page(dma->pages[i]);
++		put_user_pages(dma->pages, dma->nr_pages);
+ 		kfree(dma->pages);
+ 		dma->pages = NULL;
  	}
- 
 -- 
-2.21.0
+2.22.0
 
