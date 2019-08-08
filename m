@@ -2,80 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8812C867DB
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 19:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D79968680C
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 19:30:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404283AbfHHRWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Aug 2019 13:22:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41992 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728289AbfHHRWt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Aug 2019 13:22:49 -0400
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9B2AC217F4;
-        Thu,  8 Aug 2019 17:22:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565284968;
-        bh=goDYQLYWzyP/I29xI6KE9eIk6wrBfRZGKb9lERIu32E=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=ua1MGXeQgpUilKwU9Lv6sFBtO5Ne3BfYuhBuC2bI/xL1c/K6rZ+GE5kbSBIAM9H73
-         2xuxIpKlQbsYUjWDPlQp6YqlPF4drvL4x1jkHEm+EhI1QRTuRhSdKoUqsEKHEv8bgP
-         aRFjcz2gknk+f1DC/RQI4SFJKyW1uuQr+QciRObU=
-Subject: Re: [PATCH v2] selftests: kvm: Adding config fragments
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>, pbonzini@redhat.com
-Cc:     linux-kernel@vger.kernel.org, drjones@redhat.com,
-        sean.j.christopherson@intel.com, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, shuah <shuah@kernel.org>
-References: <20190808123140.25583-1-naresh.kamboju@linaro.org>
-From:   shuah <shuah@kernel.org>
-Message-ID: <5a06389b-5996-b11d-1435-8f4667c1dc4b@kernel.org>
-Date:   Thu, 8 Aug 2019 11:22:46 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2404363AbfHHRa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Aug 2019 13:30:58 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51572 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404318AbfHHRa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Aug 2019 13:30:57 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 207so3188804wma.1
+        for <kvm@vger.kernel.org>; Thu, 08 Aug 2019 10:30:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZC0jDq9siC882owlOIi/dn8ZAzGWdWlZvUaAcIsKJJ0=;
+        b=b0uhcCpHgRNLH2KJYpzxhDDEBwk2l7GQkuP8AWEBVhC0SSRon945L6Fnm/3sCGRPSt
+         dC55UUWYNBFsTE1OIrLu99lOL2svUVuTZOaXu2fNyM/LEnN5JAFMHC9zwgzJOA0gNj+K
+         r0J92Qr+E4VqMVpP6328mSPlf6NM0menrjs4b5MuDjhhf6JQJGdO6sAHzgBzRmLXYFTx
+         Ul5yJuqxHasD5zvsMdeBMb+GyDhw5WGtLPcXt0UCId/pLaVmSSIJc+Bcz4eI7uoEfjXz
+         7ufZgMSqwK3sDLGBvpBNvKPcHkbo925VYQxs6qh1crbaZebUuE7X+drnQyCcthAvcntF
+         ymtg==
+X-Gm-Message-State: APjAAAXpe3IAOPPTEIah4eRhy+eGjo1HAiXaps+QKNd4akQ7SNXD8V5a
+        DaW13M6t7XtgaQcjKwmyw3RoMXgeIII=
+X-Google-Smtp-Source: APXvYqwVAGL4jlttMY7DPiKgvoXEAX4Gtj+3vXIMWc6nv6zg9eT/yzjB7iWyxDufwMQFCfCn6We9TQ==
+X-Received: by 2002:a1c:ca06:: with SMTP id a6mr5701266wmg.48.1565285454628;
+        Thu, 08 Aug 2019 10:30:54 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id g25sm2136859wmk.39.2019.08.08.10.30.53
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 08 Aug 2019 10:30:53 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v3 0/7] x86: KVM: svm: get rid of hardcoded instructions lengths
+Date:   Thu,  8 Aug 2019 19:30:44 +0200
+Message-Id: <20190808173051.6359-1-vkuznets@redhat.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190808123140.25583-1-naresh.kamboju@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/8/19 6:31 AM, Naresh Kamboju wrote:
-> selftests kvm all test cases need pre-required kernel configs for the
-> tests to get pass.
-> 
-> The KVM tests are skipped without these configs:
-> 
->          dev_fd = open(KVM_DEV_PATH, O_RDONLY);
->          if (dev_fd < 0)
->                  exit(KSFT_SKIP);
-> 
+Changes since v2 [Sean Christopherson]:
+- Add Reviewed-by tags:
+- PATCH2 replaced with the suggested "x86: kvm: svm: propagate errors from
+  skip_emulated_instruction()" approach.
+- PATCH5 split into three separating vmrun_interception() from others and
+  implementing the suggested solution.
 
-Thanks.
+Original description:
 
-> Signed-off-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> ---
->   tools/testing/selftests/kvm/config | 3 +++
->   1 file changed, 3 insertions(+)
->   create mode 100644 tools/testing/selftests/kvm/config
-> 
-> diff --git a/tools/testing/selftests/kvm/config b/tools/testing/selftests/kvm/config
-> new file mode 100644
-> index 000000000000..63ed533f73d6
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/config
-> @@ -0,0 +1,3 @@
-> +CONFIG_KVM=y
-> +CONFIG_KVM_INTEL=y
-> +CONFIG_KVM_AMD=y
-> 
+Jim rightfully complains that hardcoding instuctions lengths is not always
+correct: additional (redundant) prefixes can be used. Luckily, the ugliness
+is mostly harmless: modern AMD CPUs support NRIP_SAVE feature but I'd like
+to clean things up and sacrifice speed in favor of correctness.
 
-Acked-by: Shuah Khan <skhan@linuxfoundation.org>
+Vitaly Kuznetsov (7):
+  x86: KVM: svm: don't pretend to advance RIP in case
+    wrmsr_interception() results in #GP
+  x86: kvm: svm: propagate errors from skip_emulated_instruction()
+  x86: KVM: clear interrupt shadow on EMULTYPE_SKIP
+  x86: KVM: add xsetbv to the emulator
+  x86: KVM: svm: remove hardcoded instruction length from intercepts
+  x86: KVM: svm: eliminate weird goto from vmrun_interception()
+  x86: KVM: svm: eliminate hardcoded RIP advancement from
+    vmrun_interception()
 
-thanks,
--- Shuah
+ arch/x86/include/asm/kvm_emulate.h |  3 +-
+ arch/x86/include/asm/kvm_host.h    |  2 +-
+ arch/x86/kvm/emulate.c             | 23 ++++++-
+ arch/x86/kvm/svm.c                 | 98 +++++++++++++-----------------
+ arch/x86/kvm/vmx/vmx.c             |  8 ++-
+ arch/x86/kvm/x86.c                 | 13 +++-
+ 6 files changed, 83 insertions(+), 64 deletions(-)
+
+-- 
+2.20.1
 
