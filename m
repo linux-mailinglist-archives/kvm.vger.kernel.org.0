@@ -2,101 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B884586D4F
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 00:33:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC5F186D8C
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 01:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404842AbfHHWdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Aug 2019 18:33:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39538 "EHLO mail.kernel.org"
+        id S2390303AbfHHXCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Aug 2019 19:02:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45758 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404681AbfHHWdD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Aug 2019 18:33:03 -0400
-Received: from localhost.localdomain (c-73-223-200-170.hsd1.ca.comcast.net [73.223.200.170])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1731914AbfHHXCt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Aug 2019 19:02:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1ECB5216C8;
-        Thu,  8 Aug 2019 22:33:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565303582;
-        bh=M1LHDKT+Utjw2MuliMFXwjmQGIz79EFLeGhC6jmdeW8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=rJm/bKIjqOczu37MctJclbvuCqDc2bjNbCOceXgrdzzO5jdTQq59GCZBl+aaSOFHo
-         JWftfKITVhkjQlcdggzJR5GIR3v5lckbgstfbb5fdsE0+HHu12+i5Q62vy30iUhD6A
-         xVNDNvwKYNXCR25osWwquW4PqKI0St9mmWBTs9xA=
-Date:   Thu, 8 Aug 2019 15:33:00 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Will Deacon <will@kernel.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        dri-devel@lists.freedesktop.org,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the
- kernel
-Message-Id: <20190808153300.09d3eb80772515f0ea062833@linux-foundation.org>
-In-Reply-To: <201908081410.C16D2BD@keescook>
-References: <cover.1563904656.git.andreyknvl@google.com>
-        <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
-        <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
-        <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
-        <20190724142059.GC21234@fuggles.cambridge.arm.com>
-        <20190806171335.4dzjex5asoertaob@willie-the-truck>
-        <CAAeHK+zF01mxU+PkEYLkoVu-ZZM6jNfL_OwMJKRwLr-sdU4Myg@mail.gmail.com>
-        <201908081410.C16D2BD@keescook>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 9871930EF4A0;
+        Thu,  8 Aug 2019 23:02:48 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CA205D772;
+        Thu,  8 Aug 2019 23:02:48 +0000 (UTC)
+Date:   Thu, 8 Aug 2019 17:02:47 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     kvm@vger.kernel.org, kwankhede@nvidia.com,
+        linux-kernel@vger.kernel.org, cohuck@redhat.com, cjia@nvidia.com
+Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+Message-ID: <20190808170247.1fc2c4c4@x1.home>
+In-Reply-To: <20190808141255.45236-1-parav@mellanox.com>
+References: <20190802065905.45239-1-parav@mellanox.com>
+        <20190808141255.45236-1-parav@mellanox.com>
+Organization: Red Hat
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Thu, 08 Aug 2019 23:02:48 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 8 Aug 2019 14:12:19 -0700 Kees Cook <keescook@chromium.org> wrote:
+On Thu,  8 Aug 2019 09:12:53 -0500
+Parav Pandit <parav@mellanox.com> wrote:
 
-> > The ones that are left are the mm ones: 4, 5, 6, 7 and 8.
-> > 
-> > Andrew, could you take a look and give your Acked-by or pick them up directly?
+> Currently mtty sample driver uses mdev state and UUID in convoluated way to
+> generate an interrupt.
+> It uses several translations from mdev_state to mdev_device to mdev uuid.
+> After which it does linear search of long uuid comparision to
+> find out mdev_state in mtty_trigger_interrupt().
+> mdev_state is already available while generating interrupt from which all
+> such translations are done to reach back to mdev_state.
 > 
-> Given the subsystem Acks, it seems like 3-10 and 12 could all just go
-> via Andrew? I hope he agrees. :)
+> This translations are done during interrupt generation path.
+> This is unnecessary and reduandant.
 
-I'll grab everything that has not yet appeared in linux-next.  If more
-of these patches appear in linux-next I'll drop those as well.
+Is the interrupt handling efficiency of this particular sample driver
+really relevant, or is its purpose more to illustrate the API and
+provide a proof of concept?  If we go to the trouble to optimize the
+sample driver and remove this interface from the API, what do we lose?
 
-The review discussion against " [PATCH v19 02/15] arm64: Introduce
-prctl() options to control the tagged user addresses ABI" has petered
-out inconclusively.  prctl() vs arch_prctl().
+This interface was added via commit:
+
+99e3123e3d72 vfio-mdev: Make mdev_device private and abstract interfaces
+
+Where the goal was to create a more formal interface and abstract
+driver access to the struct mdev_device.  In part this served to make
+out-of-tree mdev vendor drivers more supportable; the object is
+considered opaque and access is provided via an API rather than through
+direct structure fields.
+
+I believe that the NVIDIA GRID mdev driver does make use of this
+interface and it's likely included in the sample driver specifically so
+that there is an in-kernel user for it (ie. specifically to avoid it
+being removed so casually).  An interesting feature of the NVIDIA mdev
+driver is that I believe it has portions that run in userspace.  As we
+know, mdevs are named with a UUID, so I can imagine there are some
+efficiencies to be gained in having direct access to the UUID for a
+device when interacting with userspace, rather than repeatedly parsing
+it from a device name.  Is that really something we want to make more
+difficult in order to optimize a sample driver?  Knowing that an mdev
+device uses a UUID for it's name, as tools like libvirt and mdevctl
+expect, is it really worthwhile to remove such a trivial API?
+
+> Hence,
+> Patch-1 simplifies mtty sample driver to directly use mdev_state.
+> 
+> Patch-2, Since no production driver uses mdev_uuid(), simplifies and
+> removes redandant mdev_uuid() exported symbol.
+
+s/no production driver/no in-kernel production driver/
+
+I'd be interested to hear how the NVIDIA folks make use of this API
+interface.  Thanks,
+
+Alex
+
+> ---
+> Changelog:
+> v1->v2:
+>  - Corrected email of Kirti
+>  - Updated cover letter commit log to address comment from Cornelia
+>  - Added Reviewed-by tag
+> v0->v1:
+>  - Updated commit log
+> 
+> Parav Pandit (2):
+>   vfio-mdev/mtty: Simplify interrupt generation
+>   vfio/mdev: Removed unused and redundant API for mdev UUID
+> 
+>  drivers/vfio/mdev/mdev_core.c |  6 ------
+>  include/linux/mdev.h          |  1 -
+>  samples/vfio-mdev/mtty.c      | 39 +++++++----------------------------
+>  3 files changed, 8 insertions(+), 38 deletions(-)
+> 
 
