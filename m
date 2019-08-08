@@ -2,86 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACD918641E
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 16:13:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD5EC86530
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 17:10:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403979AbfHHON3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Aug 2019 10:13:29 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:36589 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1733253AbfHHON3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Aug 2019 10:13:29 -0400
-Received: from Internal Mail-Server by MTLPINE2 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 8 Aug 2019 17:13:21 +0300
-Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x78EDFcY025404;
-        Thu, 8 Aug 2019 17:13:19 +0300
-From:   Parav Pandit <parav@mellanox.com>
-To:     kvm@vger.kernel.org, kwankhede@nvidia.com,
-        linux-kernel@vger.kernel.org
-Cc:     parav@mellanox.com, alex.williamson@redhat.com, cohuck@redhat.com,
-        cjia@nvidia.com
-Subject: [PATCH v2 2/2] vfio/mdev: Removed unused and redundant API for mdev UUID
-Date:   Thu,  8 Aug 2019 09:12:55 -0500
-Message-Id: <20190808141255.45236-3-parav@mellanox.com>
-X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20190808141255.45236-1-parav@mellanox.com>
-References: <20190802065905.45239-1-parav@mellanox.com>
- <20190808141255.45236-1-parav@mellanox.com>
+        id S1732562AbfHHPKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Aug 2019 11:10:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40690 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730678AbfHHPKO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Aug 2019 11:10:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5ED5C8DA5B;
+        Thu,  8 Aug 2019 15:10:14 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D1EF9600CC;
+        Thu,  8 Aug 2019 15:10:12 +0000 (UTC)
+Date:   Thu, 8 Aug 2019 17:10:10 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     pbonzini@redhat.com, shuah@kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2] selftests: kvm: Adding config fragments
+Message-ID: <20190808151010.ktbqbfevgcs3bkjy@kamzik.brq.redhat.com>
+References: <20190808123140.25583-1-naresh.kamboju@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190808123140.25583-1-naresh.kamboju@linaro.org>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Thu, 08 Aug 2019 15:10:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is no single production driver who is interested in mdev device
-uuid. Currently UUID is mainly used to derive a device name.
-Additionally mdev device name is already available using core kernel
-API dev_name().
+On Thu, Aug 08, 2019 at 01:31:40PM +0100, Naresh Kamboju wrote:
+> selftests kvm all test cases need pre-required kernel configs for the
+> tests to get pass.
+> 
+> The KVM tests are skipped without these configs:
+> 
+>         dev_fd = open(KVM_DEV_PATH, O_RDONLY);
+>         if (dev_fd < 0)
+>                 exit(KSFT_SKIP);
+> 
+> Signed-off-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> ---
+>  tools/testing/selftests/kvm/config | 3 +++
+>  1 file changed, 3 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/config
+> 
+> diff --git a/tools/testing/selftests/kvm/config b/tools/testing/selftests/kvm/config
+> new file mode 100644
+> index 000000000000..63ed533f73d6
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/config
+> @@ -0,0 +1,3 @@
+> +CONFIG_KVM=y
+> +CONFIG_KVM_INTEL=y
+> +CONFIG_KVM_AMD=y
+> -- 
+> 2.17.1
+>
 
-Hence removed unused exported symbol.
+What does the kselftests config file do? I was about to complain that this
+would break compiling on non-x86 platforms, but 'make kselftest' and other
+forms of invoking the build work fine on aarch64 even with this config
+file. So is this just for documentation? If so, then its still obviously
+wrong for non-x86 platforms. The only config that makes sense here is KVM.
+If the other options need to be documented for x86, then should they get
+an additional config file? tools/testing/selftests/kvm/x86_64/config?
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Parav Pandit <parav@mellanox.com>
----
-Changelog:
-v0->v1:
- - Updated commit log to address comments from Cornelia
----
- drivers/vfio/mdev/mdev_core.c | 6 ------
- include/linux/mdev.h          | 1 -
- 2 files changed, 7 deletions(-)
-
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index b558d4cfd082..c2b809cbe59f 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -57,12 +57,6 @@ struct mdev_device *mdev_from_dev(struct device *dev)
- }
- EXPORT_SYMBOL(mdev_from_dev);
- 
--const guid_t *mdev_uuid(struct mdev_device *mdev)
--{
--	return &mdev->uuid;
--}
--EXPORT_SYMBOL(mdev_uuid);
--
- /* Should be called holding parent_list_lock */
- static struct mdev_parent *__find_parent_device(struct device *dev)
- {
-diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index 0ce30ca78db0..375a5830c3d8 100644
---- a/include/linux/mdev.h
-+++ b/include/linux/mdev.h
-@@ -131,7 +131,6 @@ struct mdev_driver {
- 
- void *mdev_get_drvdata(struct mdev_device *mdev);
- void mdev_set_drvdata(struct mdev_device *mdev, void *data);
--const guid_t *mdev_uuid(struct mdev_device *mdev);
- 
- extern struct bus_type mdev_bus_type;
- 
--- 
-2.21.0.777.g83232e3864
-
+Thanks,
+drew
