@@ -2,141 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BF5286816
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 19:31:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 024A386899
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 20:19:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404438AbfHHRbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Aug 2019 13:31:13 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35529 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404424AbfHHRbI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Aug 2019 13:31:08 -0400
-Received: by mail-wm1-f67.google.com with SMTP id l2so3217396wmg.0
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2019 10:31:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=TTZm60GAsSP4uZ7ke7WjjVtBxVOkdxgjVOUbmfjlSFM=;
-        b=P9HSDiC3JoF24U+k5fy5vaMCD0prcMr5rEVDXi6n43J7tG66c9d+H56tDoie2EiqZf
-         JvAV8QtI+AiyBb4nrQr7Ir6nGYKP8qaGPKS8WfoMtseyhdHgdsq248ZZR4P4ds+UnSFN
-         VVqMO6LxSw9QiFPZkE7Y034MW29rJOFXtFbsJglEE6d8rLNhb6HI14uBoOEq5cHmOsMe
-         8J8lOfc47evnM71MK9P1bDJ5fA0/t9LMaR/ERx1+EfUd30Xlr/GSWqr9zl7kbvsntfNS
-         g3ri+DLEU49HW2KgxhhZMY/siqstQ8e0buzeos/B4I1mL/2/340oRh27D5UaEUtPToYH
-         DjQQ==
-X-Gm-Message-State: APjAAAXcD7WBmLntVHRoze6gQeS8KXLvNhCN1CYuipbgGuQE8Qv+QRMB
-        Hnlxe7OeJuOAyt5yTx/lGhLCZPktvew=
-X-Google-Smtp-Source: APXvYqw/0dqnfvUwk64IA5doLWsFAskTaRC0hLIdWmbQw5k+mt5FEgsb9eej1mt7vLafyfq5Guz+Nw==
-X-Received: by 2002:a1c:8185:: with SMTP id c127mr5653513wmd.126.1565285466244;
-        Thu, 08 Aug 2019 10:31:06 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id g25sm2136859wmk.39.2019.08.08.10.31.04
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 08 Aug 2019 10:31:05 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v3 7/7] x86: KVM: svm: eliminate hardcoded RIP advancement from vmrun_interception()
-Date:   Thu,  8 Aug 2019 19:30:51 +0200
-Message-Id: <20190808173051.6359-8-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190808173051.6359-1-vkuznets@redhat.com>
-References: <20190808173051.6359-1-vkuznets@redhat.com>
+        id S2390178AbfHHSSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Aug 2019 14:18:52 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:14243 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731038AbfHHSSw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Aug 2019 14:18:52 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d4c678b0000>; Thu, 08 Aug 2019 11:18:52 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Thu, 08 Aug 2019 11:18:50 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Thu, 08 Aug 2019 11:18:50 -0700
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 8 Aug
+ 2019 18:18:49 +0000
+Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
+To:     "Weiny, Ira" <ira.weiny@intel.com>,
+        Michal Hocko <mhocko@kernel.org>
+CC:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+        "devel@lists.orangefs.org" <devel@lists.orangefs.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-rpi-kernel@lists.infradead.org" 
+        <linux-rpi-kernel@lists.infradead.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802091244.GD6461@dhcp22.suse.cz>
+ <20190802124146.GL25064@quack2.suse.cz>
+ <20190802142443.GB5597@bombadil.infradead.org>
+ <20190802145227.GQ25064@quack2.suse.cz>
+ <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
+ <20190807083726.GA14658@quack2.suse.cz>
+ <20190807084649.GQ11812@dhcp22.suse.cz>
+ <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
+ <e648a7f3-6a1b-c9ea-1121-7ab69b6b173d@nvidia.com>
+ <2807E5FD2F6FDA4886F6618EAC48510E79E79644@CRSMSX101.amr.corp.intel.com>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <b1b33292-d929-f9ff-dd75-02828228f35e@nvidia.com>
+Date:   Thu, 8 Aug 2019 11:18:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <2807E5FD2F6FDA4886F6618EAC48510E79E79644@CRSMSX101.amr.corp.intel.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1565288332; bh=JXH0z+PATu5ChINAttu0xw8NI7VYrjVhdTogRmB3Q5s=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=Ne1ScLdQ+tu5qOaISiLlk/MzD+D0tWGCUEcW8KATp/99KORz80qhTvSS0MA86k71v
+         1gG74XZNfpVRbFXyQsXs+wV66Ly/i7Omeym8buU22OwtUh/B674iBCJPOoXFe5hxmV
+         1e7OUBsDbdwXkl/h4Pjx1eOWT4qAVANZ24jESe93raeMkGLORABLpzcfJ+l/YUvFr/
+         bUBCYBUk9JXLyxcXRRJ6Qo5DLPNTbuOY1/JVx8JLOWf78tx+O5w4P2ZxYGmo4q53CG
+         aum+FjJWUhUsxhssDMyUyjXEHRPMBfcGtXYtpdJqmbhfodN4x0QDM6mw3fwyew2GF4
+         p5OXETBP5SbRg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just like we do with other intercepts, in vmrun_interception() we should be
-doing kvm_skip_emulated_instruction() and not just RIP += 3. Also, it is
-wrong to increment RIP before nested_svm_vmrun() as it can result in
-kvm_inject_gp().
+On 8/8/19 9:25 AM, Weiny, Ira wrote:
+>>
+>> On 8/7/19 7:36 PM, Ira Weiny wrote:
+>>> On Wed, Aug 07, 2019 at 10:46:49AM +0200, Michal Hocko wrote:
+>>>> On Wed 07-08-19 10:37:26, Jan Kara wrote:
+>>>>> On Fri 02-08-19 12:14:09, John Hubbard wrote:
+>>>>>> On 8/2/19 7:52 AM, Jan Kara wrote:
+>>>>>>> On Fri 02-08-19 07:24:43, Matthew Wilcox wrote:
+>>>>>>>> On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
+>>>>>>>>> On Fri 02-08-19 11:12:44, Michal Hocko wrote:
+>>>>>>>>>> On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
+>>   [...]
+> Yep I can do this.  I did not realize that Andrew had accepted any of this work.  I'll check out his tree.  But I don't think he is going to accept this series through his tree.  So what is the ETA on that landing in Linus' tree?
+> 
 
-We can't call kvm_skip_emulated_instruction() after nested_svm_vmrun() so
-move it inside. To preserve the return value from it nested_svm_vmrun()
-needs to start returning an int.
+I'd expect it to go into 5.4, according to my understanding of how
+the release cycles are arranged.
 
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/svm.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 43bc4a5e4948..6c4046eb26b3 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -3586,9 +3586,9 @@ static void enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa,
- 	mark_all_dirty(svm->vmcb);
- }
- 
--static bool nested_svm_vmrun(struct vcpu_svm *svm)
-+static int nested_svm_vmrun(struct vcpu_svm *svm)
- {
--	int rc;
-+	int rc, ret;
- 	struct vmcb *nested_vmcb;
- 	struct vmcb *hsave = svm->nested.hsave;
- 	struct vmcb *vmcb = svm->vmcb;
-@@ -3598,12 +3598,15 @@ static bool nested_svm_vmrun(struct vcpu_svm *svm)
- 	vmcb_gpa = svm->vmcb->save.rax;
- 
- 	rc = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(vmcb_gpa), &map);
--	if (rc) {
--		if (rc == -EINVAL)
--			kvm_inject_gp(&svm->vcpu, 0);
--		return false;
-+	if (rc == -EINVAL) {
-+		kvm_inject_gp(&svm->vcpu, 0);
-+		return 1;
- 	}
- 
-+	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-+	if (rc)
-+		return ret;
-+
- 	nested_vmcb = map.hva;
- 
- 	if (!nested_vmcb_checks(nested_vmcb)) {
-@@ -3614,7 +3617,7 @@ static bool nested_svm_vmrun(struct vcpu_svm *svm)
- 
- 		kvm_vcpu_unmap(&svm->vcpu, &map, true);
- 
--		return false;
-+		return ret;
- 	}
- 
- 	trace_kvm_nested_vmrun(svm->vmcb->save.rip, vmcb_gpa,
-@@ -3667,7 +3670,7 @@ static bool nested_svm_vmrun(struct vcpu_svm *svm)
- 		nested_svm_vmexit(svm);
- 	}
- 
--	return true;
-+	return ret;
- }
- 
- static void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
-@@ -3743,13 +3746,7 @@ static int vmrun_interception(struct vcpu_svm *svm)
- 	if (nested_svm_check_permissions(svm))
- 		return 1;
- 
--	/* Save rip after vmrun instruction */
--	kvm_rip_write(&svm->vcpu, kvm_rip_read(&svm->vcpu) + 3);
--
--	if (!nested_svm_vmrun(svm))
--		return 1;
--
--	return 1;
-+	return nested_svm_vmrun(svm);
- }
- 
- static int stgi_interception(struct vcpu_svm *svm)
+> To that point I'm still not sure who would take all this as I am now touching mm, procfs, rdma, ext4, and xfs.
+> 
+> I just thought I would chime in with my progress because I'm to a point where things are working and so I can submit the code but I'm not sure what I can/should depend on landing...  Also, now that 0day has run overnight it has found issues with this rebase so I need to clean those up...  Perhaps I will base on Andrew's tree prior to doing that...
+
+I'm certainly not the right person to answer, but in spite of that, I'd think
+Andrew's tree is a reasonable place for it. Sort of.
+
+thanks,
 -- 
-2.20.1
-
+John Hubbard
+NVIDIA
