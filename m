@@ -2,90 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C48A856AA
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 01:54:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2986385751
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 02:53:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388270AbfHGXyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Aug 2019 19:54:23 -0400
-Received: from mga04.intel.com ([192.55.52.120]:34651 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387536AbfHGXyX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Aug 2019 19:54:23 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Aug 2019 16:54:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,358,1559545200"; 
-   d="scan'208";a="182430251"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 07 Aug 2019 16:54:23 -0700
-Date:   Wed, 7 Aug 2019 16:54:23 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jintack Lim <incredible.tack@gmail.com>
-Cc:     KVM General <kvm@vger.kernel.org>,
-        Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: Why are we using preemption timer on x86?
-Message-ID: <20190807235423.GD16491@linux.intel.com>
-References: <CAHyh4xhDZdr0gOJCrSBB5rXYXw7Kpxsw_Oe=tSHMCgi_2G3ouQ@mail.gmail.com>
+        id S1730543AbfHHAxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Aug 2019 20:53:15 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:41471 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730149AbfHHAxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Aug 2019 20:53:15 -0400
+Received: by mail-pf1-f196.google.com with SMTP id m30so43059459pff.8
+        for <kvm@vger.kernel.org>; Wed, 07 Aug 2019 17:53:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=RYvASjp7Wn9RMY59p408gW18WYgaC6cZBG6rwBoYt8c=;
+        b=EQ1V5532pWSC01xRIbBals7TfyG8s0+WGku7qiJ5OJ8JmmQN7e+VFUFiIRP4vj2NWq
+         SJtgkNzW3gStYja/vtBrUY+SBwOsXWnZsCNGWiGNjGtg6Yji/EkgQ3mDYSdjFuJm3BC/
+         YKOCb/nDnL1cpXWi/bMZHltHFiEn8YRLmKfnY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=RYvASjp7Wn9RMY59p408gW18WYgaC6cZBG6rwBoYt8c=;
+        b=YBNG7h4z9GyGfsyCBkZxI1RBLJe/2eSZK+f5qc019RTLLrQejNgc8rz4xmUo/MwonT
+         JV0V2EkWZWJyEWW5NYQ7MlG3XGe7uzDiLh76+iyUyBtTix/pwXByNHKF1vuldcpZqS1b
+         XkdHWxcYVdOu/SiMmA3qcYll2uzKBJvYtVN3mNEW8weVUzzKWbsVQZoQwH64+3iO9tPc
+         hk2W7nAWyPLoiYHmPwsOZU/yxZjxl18g1gX2OKNxYQf7448+O2aITnqjBxzK2fibb8O8
+         rFiVSW1200muDHilK+m0uPe3uO34cE7OotAzMAKHCpiYmiubbGaXGMEG7ZowGFmpUbMT
+         y3vQ==
+X-Gm-Message-State: APjAAAVChA0xiH6GNyAM5Nrcvxq0PnQb2kt+fqAByC18Qg23BeOEwZvA
+        OeQ+Pl1T5b3civlpg+N2x2go+A==
+X-Google-Smtp-Source: APXvYqyMfzV1h6/SCyekjmDcrbuLcZLPLV1nHCP/caQMz+jJuG+42aGNUBeRBEeIFp/PVkM4tniLEw==
+X-Received: by 2002:aa7:93bb:: with SMTP id x27mr12721421pff.10.1565225595039;
+        Wed, 07 Aug 2019 17:53:15 -0700 (PDT)
+Received: from egranata0.mtv.corp.google.com ([2620:15c:202:0:20e7:7eb9:f5ee:bbbc])
+        by smtp.gmail.com with ESMTPSA id 64sm94456617pfe.128.2019.08.07.17.53.13
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 07 Aug 2019 17:53:14 -0700 (PDT)
+From:   egranata@chromium.org
+To:     linux-kernel@vger.kernel.org
+Cc:     mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        trivial@kernel.org, egranata@google.com
+Subject: [PATCH] vhost: do not reference a file that does not exist
+Date:   Wed,  7 Aug 2019 17:52:55 -0700
+Message-Id: <20190808005255.106299-1-egranata@chromium.org>
+X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHyh4xhDZdr0gOJCrSBB5rXYXw7Kpxsw_Oe=tSHMCgi_2G3ouQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 07, 2019 at 02:52:19PM -0700, Jintack Lim wrote:
-> Hi,
-> 
-> I'm just wondering what's the reason why we use the preemption timer
-> instead of emulating VM's timer using hrtimer in software? Is there
-> anything the the preemption timer can do that can't be done with
-> hrtimer?
-> 
-> I guess the x86 architecture provides the preemption timer for *some*
-> reason, but I'm not sure what they are.
+From: Enrico Granata <egranata@google.com>
 
-Assuming you're referring to Intel/VMX's preemption timer, programming
-the preemption timer and servicing its VM-Exits both have lower overhead
-than going through hrtimer.
+lguest was removed from the mainline kernel in late 2017.
 
-commit ce7a058a2117f0bca2f42f2870a97bfa9aa8e099
-Author: Yunhong Jiang <yunhong.jiang@gmail.com>
-Date:   Mon Jun 13 14:20:01 2016 -0700
+Signed-off-by: Enrico Granata <egranata@google.com>
+---
+ drivers/vhost/vhost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-    KVM: x86: support using the vmx preemption timer for tsc deadline timer
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 0536f8526359..2c376cb66971 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -4,8 +4,8 @@
+  *
+  * Author: Michael S. Tsirkin <mst@redhat.com>
+  *
+- * Inspiration, some code, and most witty comments come from
+- * Documentation/virtual/lguest/lguest.c, by Rusty Russell
++ * Inspiration, some code, and most witty comments come from lguest.c
++ * by Rusty Russell
+  *
+  * Generic code for virtio server in host kernel.
+  */
+-- 
+2.22.0.770.g0f2c4a37fd-goog
 
-    The VMX preemption timer can be used to virtualize the TSC deadline timer.
-    The VMX preemption timer is armed when the vCPU is running, and a VMExit
-    will happen if the virtual TSC deadline timer expires.
-
-    When the vCPU thread is blocked because of HLT, KVM will switch to use
-    an hrtimer, and then go back to the VMX preemption timer when the vCPU
-    thread is unblocked.
-
-    This solution avoids the complex OS's hrtimer system, and the host
-    timer interrupt handling cost, replacing them with a little math
-    (for guest->host TSC and host TSC->preemption timer conversion)
-    and a cheaper VMexit.  This benefits latency for isolated pCPUs.
-
-    [A word about performance... Yunhong reported a 30% reduction in average
-     latency from cyclictest.  I made a similar test with tscdeadline_latency
-     from kvm-unit-tests, and measured
-
-     - ~20 clock cycles loss (out of ~3200, so less than 1% but still
-       statistically significant) in the worst case where the test halts
-       just after programming the TSC deadline timer
-
-     - ~800 clock cycles gain (25% reduction in latency) in the best case
-       where the test busy waits.
-
-     I removed the VMX bits from Yunhong's patch, to concentrate them in the
-     next patch - Paolo]
-
-    Signed-off-by: Yunhong Jiang <yunhong.jiang@intel.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
