@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D79968680C
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 19:30:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2F878681B
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2019 19:31:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404363AbfHHRa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2404370AbfHHRa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Aug 2019 13:30:59 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41790 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404360AbfHHRa6 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 8 Aug 2019 13:30:58 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51572 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404318AbfHHRa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Aug 2019 13:30:57 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 207so3188804wma.1
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2019 10:30:55 -0700 (PDT)
+Received: by mail-wr1-f67.google.com with SMTP id c2so92496475wrm.8
+        for <kvm@vger.kernel.org>; Thu, 08 Aug 2019 10:30:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZC0jDq9siC882owlOIi/dn8ZAzGWdWlZvUaAcIsKJJ0=;
-        b=b0uhcCpHgRNLH2KJYpzxhDDEBwk2l7GQkuP8AWEBVhC0SSRon945L6Fnm/3sCGRPSt
-         dC55UUWYNBFsTE1OIrLu99lOL2svUVuTZOaXu2fNyM/LEnN5JAFMHC9zwgzJOA0gNj+K
-         r0J92Qr+E4VqMVpP6328mSPlf6NM0menrjs4b5MuDjhhf6JQJGdO6sAHzgBzRmLXYFTx
-         Ul5yJuqxHasD5zvsMdeBMb+GyDhw5WGtLPcXt0UCId/pLaVmSSIJc+Bcz4eI7uoEfjXz
-         7ufZgMSqwK3sDLGBvpBNvKPcHkbo925VYQxs6qh1crbaZebUuE7X+drnQyCcthAvcntF
-         ymtg==
-X-Gm-Message-State: APjAAAXpe3IAOPPTEIah4eRhy+eGjo1HAiXaps+QKNd4akQ7SNXD8V5a
-        DaW13M6t7XtgaQcjKwmyw3RoMXgeIII=
-X-Google-Smtp-Source: APXvYqwVAGL4jlttMY7DPiKgvoXEAX4Gtj+3vXIMWc6nv6zg9eT/yzjB7iWyxDufwMQFCfCn6We9TQ==
-X-Received: by 2002:a1c:ca06:: with SMTP id a6mr5701266wmg.48.1565285454628;
-        Thu, 08 Aug 2019 10:30:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=opuSm2G6gYcM4qXZGufoG5jzs7R2voT6tX4ZJqRDemo=;
+        b=h1kAsp8+hYUtD2/msk3CXAebtugpLa7F9lJAkP+sNI9BGFrvPo/vZTTtwrn+OsMsw7
+         dx1zNsYqBnAFt6W6sZU4PTxY+zUR3m+geD/3lJ5s5W4rWPnYUrbOThZ5hndHtWfrklr8
+         ZvGpp/KRntptCTt3TFOZ6h4keNbUVOqK8tz4kZXdmaLuXMLwmnGH4OEtqGMx0OtBsdtg
+         lt0tY0R/CjSN1vbQNcwnqafd2PSTK7k1auuh0TkR3yUeh7J7kukPb6Fsb6JV7FVS7l7f
+         zrpDf/nbCrU7hsuq83X2/d+rcr3ZLY6LgixyhrUVBN/wCqgzJ7AlVOJ93mmQMm9lRy+b
+         8BcQ==
+X-Gm-Message-State: APjAAAXwBz3PezuGar0vqugbpKLbLPuOECpqvy9uHbNW3ntEHZjikqNI
+        NGzuY0z6oDLVZQu+l9JAqCUG+yjTpY4=
+X-Google-Smtp-Source: APXvYqyUVqYAQ2UvaxoCGqK9ceqXcGh57DEZNtxscWVW21P5Hs1wAi/nlcToykofZ6QtlBr6x+TNkQ==
+X-Received: by 2002:a5d:628d:: with SMTP id k13mr18529949wru.69.1565285456583;
+        Thu, 08 Aug 2019 10:30:56 -0700 (PDT)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id g25sm2136859wmk.39.2019.08.08.10.30.53
+        by smtp.gmail.com with ESMTPSA id g25sm2136859wmk.39.2019.08.08.10.30.54
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 08 Aug 2019 10:30:53 -0700 (PDT)
+        Thu, 08 Aug 2019 10:30:55 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -40,10 +40,12 @@ Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v3 0/7] x86: KVM: svm: get rid of hardcoded instructions lengths
-Date:   Thu,  8 Aug 2019 19:30:44 +0200
-Message-Id: <20190808173051.6359-1-vkuznets@redhat.com>
+Subject: [PATCH v3 1/7] x86: KVM: svm: don't pretend to advance RIP in case wrmsr_interception() results in #GP
+Date:   Thu,  8 Aug 2019 19:30:45 +0200
+Message-Id: <20190808173051.6359-2-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190808173051.6359-1-vkuznets@redhat.com>
+References: <20190808173051.6359-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -51,39 +53,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Changes since v2 [Sean Christopherson]:
-- Add Reviewed-by tags:
-- PATCH2 replaced with the suggested "x86: kvm: svm: propagate errors from
-  skip_emulated_instruction()" approach.
-- PATCH5 split into three separating vmrun_interception() from others and
-  implementing the suggested solution.
+svm->next_rip is only used by skip_emulated_instruction() and in case
+kvm_set_msr() fails we rightfully don't do that. Move svm->next_rip
+advancement to 'else' branch to avoid creating false impression that
+it's always advanced (and make it look like rdmsr_interception()).
 
-Original description:
+This is a preparatory change to removing hardcoded RIP advancement
+from instruction intercepts, no functional change.
 
-Jim rightfully complains that hardcoding instuctions lengths is not always
-correct: additional (redundant) prefixes can be used. Luckily, the ugliness
-is mostly harmless: modern AMD CPUs support NRIP_SAVE feature but I'd like
-to clean things up and sacrifice speed in favor of correctness.
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/svm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Vitaly Kuznetsov (7):
-  x86: KVM: svm: don't pretend to advance RIP in case
-    wrmsr_interception() results in #GP
-  x86: kvm: svm: propagate errors from skip_emulated_instruction()
-  x86: KVM: clear interrupt shadow on EMULTYPE_SKIP
-  x86: KVM: add xsetbv to the emulator
-  x86: KVM: svm: remove hardcoded instruction length from intercepts
-  x86: KVM: svm: eliminate weird goto from vmrun_interception()
-  x86: KVM: svm: eliminate hardcoded RIP advancement from
-    vmrun_interception()
-
- arch/x86/include/asm/kvm_emulate.h |  3 +-
- arch/x86/include/asm/kvm_host.h    |  2 +-
- arch/x86/kvm/emulate.c             | 23 ++++++-
- arch/x86/kvm/svm.c                 | 98 +++++++++++++-----------------
- arch/x86/kvm/vmx/vmx.c             |  8 ++-
- arch/x86/kvm/x86.c                 | 13 +++-
- 6 files changed, 83 insertions(+), 64 deletions(-)
-
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 7eafc6907861..7e843b340490 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -4447,13 +4447,13 @@ static int wrmsr_interception(struct vcpu_svm *svm)
+ 	msr.index = ecx;
+ 	msr.host_initiated = false;
+ 
+-	svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
+ 	if (kvm_set_msr(&svm->vcpu, &msr)) {
+ 		trace_kvm_msr_write_ex(ecx, data);
+ 		kvm_inject_gp(&svm->vcpu, 0);
+ 		return 1;
+ 	} else {
+ 		trace_kvm_msr_write(ecx, data);
++		svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
+ 		return kvm_skip_emulated_instruction(&svm->vcpu);
+ 	}
+ }
 -- 
 2.20.1
 
