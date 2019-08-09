@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B24D687F2A
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:15:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D9F087F52
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:15:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437118AbfHIQPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:15:03 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52912 "EHLO
+        id S2437183AbfHIQPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:15:55 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52860 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2436990AbfHIQPB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:01 -0400
+        by vger.kernel.org with ESMTP id S2437106AbfHIQPG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:06 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 58D6C305D35A;
-        Fri,  9 Aug 2019 19:01:35 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 9A916305D35B;
+        Fri,  9 Aug 2019 19:01:37 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id ECE6F305B7A4;
-        Fri,  9 Aug 2019 19:01:34 +0300 (EEST)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 53189305B7A0;
+        Fri,  9 Aug 2019 19:01:35 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -34,9 +34,9 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
         =?UTF-8?q?Mircea=20C=C3=AErjaliu?= <mcirjaliu@bitdefender.com>
-Subject: [RFC PATCH v6 72/92] kvm: introspection: add memory map/unmap support on the guest side
-Date:   Fri,  9 Aug 2019 19:00:27 +0300
-Message-Id: <20190809160047.8319-73-alazar@bitdefender.com>
+Subject: [RFC PATCH v6 73/92] kvm: introspection: use remote mapping
+Date:   Fri,  9 Aug 2019 19:00:28 +0300
+Message-Id: <20190809160047.8319-74-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -49,210 +49,210 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
 
-An introspection tool running in a dedicated VM can use the new device
-(/dev/kvmmem) to map memory from other introspected VM-s.
+This commit adds the missing KVMI_GET_MAP_TOKEN command and handle the
+hypercalls used to map/unmap guest pages.
 
-Two ioctl operations are supported:
-  - KVM_HC_MEM_MAP/struct kvmi_mem_map
-  - KVM_HC_MEM_UNMAP/unsigned long
-
-In order to map an introspected gpa to the local gva, the process using
-this device needs to obtain a token from the host KVMI subsystem (see
-Documentation/virtual/kvm/kvmi.rst - KVMI_GET_MAP_TOKEN).
-
-Both operations use hypercalls (KVM_HC_MEM_MAP, KVM_HC_MEM_UNMAP)
-to pass the requests to the host kernel/KVMi (see hypercalls.txt).
-
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/hypercalls.txt |  34 ++
- arch/x86/Kconfig                         |   9 +
- arch/x86/include/asm/kvmi_guest.h        |  10 +
- arch/x86/kernel/Makefile                 |   1 +
- arch/x86/kernel/kvmi_mem_guest.c         |  26 +
- include/uapi/linux/kvm_para.h            |   2 +
- include/uapi/linux/kvmi.h                |  21 +
- virt/kvm/kvmi_mem_guest.c                | 651 +++++++++++++++++++++++
- 8 files changed, 754 insertions(+)
- create mode 100644 arch/x86/include/asm/kvmi_guest.h
- create mode 100644 arch/x86/kernel/kvmi_mem_guest.c
- create mode 100644 virt/kvm/kvmi_mem_guest.c
+ Documentation/virtual/kvm/kvmi.rst |  39 ++++
+ arch/x86/kvm/Makefile              |   2 +-
+ arch/x86/kvm/x86.c                 |   6 +
+ include/linux/kvmi.h               |   3 +
+ virt/kvm/kvmi.c                    |  12 +-
+ virt/kvm/kvmi_int.h                |  10 +
+ virt/kvm/kvmi_mem.c                | 319 +++++++++++++++++++++++++++++
+ virt/kvm/kvmi_msg.c                |  15 ++
+ 8 files changed, 404 insertions(+), 2 deletions(-)
+ create mode 100644 virt/kvm/kvmi_mem.c
 
-diff --git a/Documentation/virtual/kvm/hypercalls.txt b/Documentation/virtual/kvm/hypercalls.txt
-index 1ab59537b2fb..a47fae926201 100644
---- a/Documentation/virtual/kvm/hypercalls.txt
-+++ b/Documentation/virtual/kvm/hypercalls.txt
-@@ -173,3 +173,37 @@ The following registers are clobbered:
- In particular, for KVM_HC_XEN_HVM_OP_GUEST_REQUEST_VM_EVENT, the last two
- registers can be poisoned deliberately and cannot be used for passing
- information.
+diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
+index 572abab1f6ef..b12e14f14c21 100644
+--- a/Documentation/virtual/kvm/kvmi.rst
++++ b/Documentation/virtual/kvm/kvmi.rst
+@@ -1144,6 +1144,45 @@ Returns the guest memory type for a specific physical address.
+ * -KVM_EINVAL - padding is not zero
+ * -KVM_EAGAIN - the selected vCPU can't be introspected yet
+ 
++25. KVMI_GET_MAP_TOKEN
++----------------------
 +
-+9. KVM_HC_MEM_MAP
-+-----------------
++:Architecture: all
++:Versions: >= 1
++:Parameters: none
++:Returns:
 +
-+Architecture: x86
-+Status: active
-+Purpose: Map a guest physical page to another VM (the introspector).
-+Usage:
++::
 +
-+a0: pointer to a token obtained with a KVMI_GET_MAP_TOKEN command (see kvmi.rst)
++	struct kvmi_error_code;
++	struct kvmi_get_map_token_reply {
++		struct kvmi_map_mem_token token;
++	};
++
++Where::
++
 +	struct kvmi_map_mem_token {
 +		__u64 token[4];
 +	};
 +
-+a1: guest physical address to be mapped
++Requests a token for a memory map operation.
 +
-+a2: guest physical address from introspector that will be replaced
++On this command, the host generates a random token to be used (once)
++to map a physical page from the introspected guest. The introspector
++could use the token with the KVM_INTRO_MEM_MAP ioctl (on /dev/kvmmem)
++to map a guest physical page to one of its memory pages. The ioctl,
++in turn, will use the KVM_HC_MEM_MAP hypercall (see hypercalls.txt).
 +
-+Both guest physical addresses will end up poiting to the same physical page.
++The guest kernel exposing /dev/kvmmem keeps a list with all the mappings
++(to all the guests introspected by the tool) in order to unmap them
++(using the KVM_HC_MEM_UNMAP hypercall) when /dev/kvmmem is closed or on
++demand (using the KVM_INTRO_MEM_UNMAP ioctl).
 +
-+Returns any error that the memory manager can return.
++:Errors:
 +
-+10. KVM_HC_MEM_UNMAP
-+-------------------
++* -KVM_EAGAIN - too many tokens have accumulated
++* -KVM_ENOMEM - not enough memory to allocate a new token
 +
-+Architecture: x86
-+Status: active
-+Purpose: Unmap a previously mapped page.
-+Usage:
-+
-+a0: guest physical address from introspector
-+
-+The address will stop pointing to the introspected page and a new physical
-+page is allocated for this gpa.
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 68261430fe6e..a7527c1f90a0 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -820,6 +820,15 @@ config KVM_DEBUG_FS
- 	  Statistics are displayed in debugfs filesystem. Enabling this option
- 	  may incur significant overhead.
+ Events
+ ======
  
-+config KVM_INTROSPECTION_GUEST
-+	bool "KVM Memory Introspection support on Guest"
-+	depends on KVM_GUEST
-+	default n
-+	help
-+	  This option enables functions and hypercalls for security applications
-+	  running in a separate VM to control the execution of other VM-s, query
-+	  the state of the vCPU-s (GPR-s, MSR-s etc.).
-+
- config PARAVIRT_TIME_ACCOUNTING
- 	bool "Paravirtual steal time accounting"
- 	depends on PARAVIRT
-diff --git a/arch/x86/include/asm/kvmi_guest.h b/arch/x86/include/asm/kvmi_guest.h
-new file mode 100644
-index 000000000000..c7ed53a938e0
---- /dev/null
-+++ b/arch/x86/include/asm/kvmi_guest.h
-@@ -0,0 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVMI_GUEST_H__
-+#define __KVMI_GUEST_H__
-+
-+long kvmi_arch_map_hc(struct kvmi_map_mem_token *tknp,
-+	gpa_t req_gpa, gpa_t map_gpa);
-+long kvmi_arch_unmap_hc(gpa_t map_gpa);
-+
-+
-+#endif
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 00b7e27bc2b7..995652ba53b3 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -116,6 +116,7 @@ obj-$(CONFIG_PARAVIRT)		+= paravirt.o paravirt_patch_$(BITS).o
- obj-$(CONFIG_PARAVIRT_SPINLOCKS)+= paravirt-spinlocks.o
- obj-$(CONFIG_PARAVIRT_CLOCK)	+= pvclock.o
- obj-$(CONFIG_X86_PMEM_LEGACY_DEVICE) += pmem.o
-+obj-$(CONFIG_KVM_INTROSPECTION_GUEST)	+= kvmi_mem_guest.o ../../../virt/kvm/kvmi_mem_guest.o
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 673cf37c0747..5bea446219ca 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -7,7 +7,7 @@ KVM := ../../../virt/kvm
+ kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
+ 				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o
+ kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
+-kvm-$(CONFIG_KVM_INTROSPECTION) += $(KVM)/kvmi.o $(KVM)/kvmi_msg.o kvmi.o
++kvm-$(CONFIG_KVM_INTROSPECTION) += $(KVM)/kvmi.o $(KVM)/kvmi_msg.o $(KVM)/kvmi_mem.o kvmi.o
  
- obj-$(CONFIG_JAILHOUSE_GUEST)	+= jailhouse.o
+ kvm-y			+= x86.o mmu.o emulate.o i8259.o irq.o lapic.o \
+ 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 06f44ce8ed07..04b1d2916a0a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7337,6 +7337,12 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 		ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
+ 		break;
+ #ifdef CONFIG_KVM_INTROSPECTION
++	case KVM_HC_MEM_MAP:
++		ret = kvmi_host_mem_map(vcpu, (gva_t)a0, (gpa_t)a1, (gpa_t)a2);
++		break;
++	case KVM_HC_MEM_UNMAP:
++		ret = kvmi_host_mem_unmap(vcpu, (gpa_t)a0);
++		break;
+ 	case KVM_HC_XEN_HVM_OP:
+ 		ret = 0;
+ 		if (!kvmi_hypercall_event(vcpu))
+diff --git a/include/linux/kvmi.h b/include/linux/kvmi.h
+index 10cd6c6412d2..dd980fb0ebcd 100644
+--- a/include/linux/kvmi.h
++++ b/include/linux/kvmi.h
+@@ -24,6 +24,9 @@ bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, u8 write);
+ bool kvmi_tracked_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ bool kvmi_single_step(struct kvm_vcpu *vcpu, gpa_t gpa, int *emulation_type);
+ void kvmi_handle_requests(struct kvm_vcpu *vcpu);
++int kvmi_host_mem_map(struct kvm_vcpu *vcpu, gva_t tkn_gva,
++			     gpa_t req_gpa, gpa_t map_gpa);
++int kvmi_host_mem_unmap(struct kvm_vcpu *vcpu, gpa_t map_gpa);
+ void kvmi_stop_ss(struct kvm_vcpu *vcpu);
+ bool kvmi_vcpu_enabled_ss(struct kvm_vcpu *vcpu);
+ void kvmi_init_emulate(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
+index ca146ffec061..157f3a401d64 100644
+--- a/virt/kvm/kvmi.c
++++ b/virt/kvm/kvmi.c
+@@ -10,6 +10,7 @@
+ #include "kvmi_int.h"
+ #include <linux/kthread.h>
+ #include <linux/bitmap.h>
++#include <linux/remote_mapping.h>
  
-diff --git a/arch/x86/kernel/kvmi_mem_guest.c b/arch/x86/kernel/kvmi_mem_guest.c
-new file mode 100644
-index 000000000000..c4e2613f90f3
---- /dev/null
-+++ b/arch/x86/kernel/kvmi_mem_guest.c
-@@ -0,0 +1,26 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KVM introspection guest implementation
-+ *
-+ * Copyright (C) 2017 Bitdefender S.R.L.
-+ *
-+ * Author:
-+ *   Mircea Cirjaliu <mcirjaliu@bitdefender.com>
-+ */
-+
-+#include <uapi/linux/kvmi.h>
-+#include <uapi/linux/kvm_para.h>
-+#include <linux/kvm_types.h>
-+#include <asm/kvm_para.h>
-+
-+long kvmi_arch_map_hc(struct kvmi_map_mem_token *tknp,
-+		       gpa_t req_gpa, gpa_t map_gpa)
+ #define MAX_PAUSE_REQUESTS 1001
+ 
+@@ -320,11 +321,13 @@ static int kvmi_cache_create(void)
+ 
+ int kvmi_init(void)
+ {
++	kvmi_mem_init();
+ 	return kvmi_cache_create();
+ }
+ 
+ void kvmi_uninit(void)
+ {
++	kvmi_mem_exit();
+ 	kvmi_cache_destroy();
+ }
+ 
+@@ -1647,6 +1650,11 @@ int kvmi_cmd_write_physical(struct kvm *kvm, u64 gpa, u64 size, const void *buf)
+ 	return 0;
+ }
+ 
++int kvmi_cmd_alloc_token(struct kvm *kvm, struct kvmi_map_mem_token *token)
 +{
-+	return kvm_hypercall3(KVM_HC_MEM_MAP, (unsigned long)tknp,
-+			      req_gpa, map_gpa);
++	return kvmi_mem_generate_token(kvm, token);
 +}
 +
-+long kvmi_arch_unmap_hc(gpa_t map_gpa)
-+{
-+	return kvm_hypercall1(KVM_HC_MEM_UNMAP, map_gpa);
-+}
-diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
-index 592bda92b6d5..a083e3e66de6 100644
---- a/include/uapi/linux/kvm_para.h
-+++ b/include/uapi/linux/kvm_para.h
-@@ -33,6 +33,8 @@
- #define KVM_HC_CLOCK_PAIRING		9
- #define KVM_HC_SEND_IPI		10
+ int kvmi_cmd_control_events(struct kvm_vcpu *vcpu, unsigned int event_id,
+ 			    bool enable)
+ {
+@@ -2015,7 +2023,9 @@ int kvmi_ioctl_unhook(struct kvm *kvm, bool force_reset)
+ 	if (!ikvm)
+ 		return -EFAULT;
  
-+#define KVM_HC_MEM_MAP			32
-+#define KVM_HC_MEM_UNMAP		33
- #define KVM_HC_XEN_HVM_OP		34 /* Xen's __HYPERVISOR_hvm_op */
+-	if (!force_reset && !kvmi_unhook_event(kvm))
++	if (force_reset)
++		mm_remote_reset();
++	else if (!kvmi_unhook_event(kvm))
+ 		err = -ENOENT;
  
- /*
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index b072e0a4f33d..8591c748524f 100644
---- a/include/uapi/linux/kvmi.h
-+++ b/include/uapi/linux/kvmi.h
-@@ -262,4 +262,25 @@ struct kvmi_event_breakpoint {
- 	__u8 padding[7];
- };
+ 	kvmi_put(kvm);
+diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
+index c96fa2b1e9b7..2432377d6371 100644
+--- a/virt/kvm/kvmi_int.h
++++ b/virt/kvm/kvmi_int.h
+@@ -148,6 +148,8 @@ struct kvmi {
+ 	struct task_struct *recv;
+ 	atomic_t ev_seq;
  
-+struct kvmi_map_mem_token {
-+	__u64 token[4];
-+};
++	atomic_t num_tokens;
 +
-+struct kvmi_get_map_token_reply {
-+	struct kvmi_map_mem_token token;
-+};
+ 	uuid_t uuid;
+ 
+ 	DECLARE_BITMAP(cmd_allow_mask, KVMI_NUM_COMMANDS);
+@@ -229,7 +231,9 @@ int kvmi_cmd_control_events(struct kvm_vcpu *vcpu, unsigned int event_id,
+ 			    bool enable);
+ int kvmi_cmd_control_vm_events(struct kvmi *ikvm, unsigned int event_id,
+ 			       bool enable);
++int kvmi_cmd_alloc_token(struct kvm *kvm, struct kvmi_map_mem_token *token);
+ int kvmi_cmd_pause_vcpu(struct kvm_vcpu *vcpu, bool wait);
++unsigned long gfn_to_hva_safe(struct kvm *kvm, gfn_t gfn);
+ struct kvmi * __must_check kvmi_get(struct kvm *kvm);
+ void kvmi_put(struct kvm *kvm);
+ int kvmi_run_jobs_and_wait(struct kvm_vcpu *vcpu);
+@@ -298,4 +302,10 @@ int kvmi_arch_cmd_control_msr(struct kvm_vcpu *vcpu,
+ 			      const struct kvmi_control_msr *req);
+ int kvmi_arch_cmd_get_mtrr_type(struct kvm_vcpu *vcpu, u64 gpa, u8 *type);
+ 
++/* kvmi_mem.c */
++void kvmi_mem_init(void);
++void kvmi_mem_exit(void);
++int kvmi_mem_generate_token(struct kvm *kvm, struct kvmi_map_mem_token *token);
++void kvmi_clear_vm_tokens(struct kvm *kvm);
 +
-+/* Map other guest's gpa to local gva */
-+struct kvmi_mem_map {
-+	struct kvmi_map_mem_token token;
-+	__u64 gpa;
-+	__u64 gva;
-+};
-+
-+/*
-+ * ioctls for /dev/kvmmem
-+ */
-+#define KVM_INTRO_MEM_MAP       _IOW('i', 0x01, struct kvmi_mem_map)
-+#define KVM_INTRO_MEM_UNMAP     _IOW('i', 0x02, unsigned long)
-+
- #endif /* _UAPI__LINUX_KVMI_H */
-diff --git a/virt/kvm/kvmi_mem_guest.c b/virt/kvm/kvmi_mem_guest.c
+ #endif
+diff --git a/virt/kvm/kvmi_mem.c b/virt/kvm/kvmi_mem.c
 new file mode 100644
-index 000000000000..bec473b45289
+index 000000000000..6244add60062
 --- /dev/null
-+++ b/virt/kvm/kvmi_mem_guest.c
-@@ -0,0 +1,651 @@
++++ b/virt/kvm/kvmi_mem.c
+@@ -0,0 +1,319 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * KVM introspection guest implementation
++ * KVM introspection memory mapping implementation
 + *
 + * Copyright (C) 2017-2019 Bitdefender S.R.L.
 + *
@@ -260,644 +260,352 @@ index 000000000000..bec473b45289
 + *   Mircea Cirjaliu <mcirjaliu@bitdefender.com>
 + */
 +
-+#include <linux/module.h>
-+#include <linux/init.h>
 +#include <linux/kernel.h>
-+#include <linux/miscdevice.h>
-+#include <linux/fs.h>
-+#include <linux/mm.h>
-+#include <linux/sched/mm.h>
-+#include <linux/types.h>
-+#include <linux/kvm_types.h>
-+#include <linux/kvm_para.h>
-+#include <linux/uaccess.h>
-+#include <linux/slab.h>
-+#include <linux/sched.h>
++#include <linux/kvm_host.h>
 +#include <linux/list.h>
++#include <linux/slab.h>
++#include <linux/pagemap.h>
 +#include <linux/spinlock.h>
-+#include <linux/rwlock.h>
-+#include <linux/hashtable.h>
-+#include <linux/refcount.h>
-+#include <linux/ioctl.h>
++#include <linux/printk.h>
++#include <linux/random.h>
++#include <linux/kvmi.h>
++#include <linux/ktime.h>
++#include <linux/hrtimer.h>
++#include <linux/workqueue.h>
++#include <linux/remote_mapping.h>
 +
 +#include <uapi/linux/kvmi.h>
-+#include <asm/kvmi_guest.h>
 +
-+#define ASSERT(exp) BUG_ON(!(exp))
-+#define DB_HASH_BITS 4
++#include "kvmi_int.h"
 +
-+static struct kmem_cache *proc_map_cachep;
-+static struct kmem_cache *file_map_cachep;
-+static struct kmem_cache *page_map_cachep;
++#define KVMI_MEM_MAX_TOKENS 8
++#define KVMI_MEM_TOKEN_TIMEOUT 3
++#define TOKEN_TIMEOUT_NSEC (KVMI_MEM_TOKEN_TIMEOUT * NSEC_PER_SEC)
 +
-+/* process/mm to proc_map */
-+static DEFINE_HASHTABLE(db_hash, DB_HASH_BITS);
-+static DEFINE_SPINLOCK(db_hash_lock);
++static struct list_head token_list;
++static spinlock_t token_lock;
++static struct hrtimer token_timer;
++static struct work_struct token_work;
 +
-+struct proc_map {
-+	struct mm_struct *mm;		/* database key */
-+	struct hlist_node db_link;	/* database link */
-+	refcount_t refcnt;
-+
-+	struct rb_root entries;		/* mapping entries for this mm */
-+	rwlock_t entries_lock;
++struct token_entry {
++	struct list_head token_list;
++	struct kvmi_map_mem_token token;
++	struct kvm *kvm;
++	ktime_t timestamp;
 +};
 +
-+struct file_map {
-+	struct proc_map *proc;
-+
-+	struct list_head entries;	/* mapping entries for this file */
-+	spinlock_t entries_lock;
-+};
-+
-+struct page_map {
-+	struct rb_node proc_link;	/* link to struct proc_map */
-+	struct list_head file_link;	/* link to struct file_map */
-+
-+	gpa_t gpa;			/* target GPA */
-+	gva_t vaddr;			/* local GVA */
-+};
-+
-+static void proc_map_init(struct proc_map *pmap)
++void kvmi_clear_vm_tokens(struct kvm *kvm)
 +{
-+	pmap->mm = NULL;
-+	INIT_HLIST_NODE(&pmap->db_link);
-+	refcount_set(&pmap->refcnt, 0);
++	struct token_entry *cur, *next;
++	struct kvmi *ikvm = IKVM(kvm);
++	struct list_head temp;
 +
-+	pmap->entries = RB_ROOT;
-+	rwlock_init(&pmap->entries_lock);
-+}
++	INIT_LIST_HEAD(&temp);
 +
-+static struct proc_map *proc_map_alloc(void)
-+{
-+	struct proc_map *obj;
++	spin_lock(&token_lock);
++	list_for_each_entry_safe(cur, next, &token_list, token_list) {
++		if (cur->kvm == kvm) {
++			atomic_dec(&ikvm->num_tokens);
 +
-+	obj = kmem_cache_alloc(proc_map_cachep, GFP_KERNEL);
-+	if (obj != NULL)
-+		proc_map_init(obj);
-+
-+	return obj;
-+}
-+
-+static void proc_map_free(struct proc_map *pmap)
-+{
-+	ASSERT(hlist_unhashed(&pmap->db_link));
-+	ASSERT(refcount_read(&pmap->refcnt) == 0);
-+	ASSERT(RB_EMPTY_ROOT(&pmap->entries));
-+
-+	kmem_cache_free(proc_map_cachep, pmap);
-+}
-+
-+static void file_map_init(struct file_map *fmp)
-+{
-+	INIT_LIST_HEAD(&fmp->entries);
-+	spin_lock_init(&fmp->entries_lock);
-+}
-+
-+static struct file_map *file_map_alloc(void)
-+{
-+	struct file_map *obj;
-+
-+	obj = kmem_cache_alloc(file_map_cachep, GFP_KERNEL);
-+	if (obj != NULL)
-+		file_map_init(obj);
-+
-+	return obj;
-+}
-+
-+static void file_map_free(struct file_map *fmp)
-+{
-+	ASSERT(list_empty(&fmp->entries));
-+
-+	kmem_cache_free(file_map_cachep, fmp);
-+}
-+
-+static void page_map_init(struct page_map *pmp)
-+{
-+	memset(pmp, 0, sizeof(*pmp));
-+
-+	RB_CLEAR_NODE(&pmp->proc_link);
-+	INIT_LIST_HEAD(&pmp->file_link);
-+}
-+
-+static struct page_map *page_map_alloc(void)
-+{
-+	struct page_map *obj;
-+
-+	obj = kmem_cache_alloc(page_map_cachep, GFP_KERNEL);
-+	if (obj != NULL)
-+		page_map_init(obj);
-+
-+	return obj;
-+}
-+
-+static void page_map_free(struct page_map *pmp)
-+{
-+	ASSERT(RB_EMPTY_NODE(&pmp->proc_link));
-+
-+	kmem_cache_free(page_map_cachep, pmp);
-+}
-+
-+static struct proc_map *get_proc_map(void)
-+{
-+	struct proc_map *pmap, *allocated;
-+	struct mm_struct *mm;
-+	bool found = false;
-+
-+	if (!mmget_not_zero(current->mm))
-+		return NULL;
-+	mm = current->mm;
-+
-+	allocated = proc_map_alloc();	/* may be NULL */
-+
-+	spin_lock(&db_hash_lock);
-+
-+	hash_for_each_possible(db_hash, pmap, db_link, (unsigned long)mm)
-+		if (pmap->mm == mm && refcount_inc_not_zero(&pmap->refcnt)) {
-+			found = true;
-+			break;
-+		}
-+
-+	if (!found && allocated != NULL) {
-+		pmap = allocated;
-+		allocated = NULL;
-+
-+		pmap->mm = mm;
-+		hash_add(db_hash, &pmap->db_link, (unsigned long)mm);
-+		refcount_set(&pmap->refcnt, 1);
-+	} else
-+		mmput(mm);
-+
-+	spin_unlock(&db_hash_lock);
-+
-+	if (allocated != NULL)
-+		proc_map_free(allocated);
-+
-+	return pmap;
-+}
-+
-+static void put_proc_map(struct proc_map *pmap)
-+{
-+	if (refcount_dec_and_test(&pmap->refcnt)) {
-+		mmput(pmap->mm);
-+
-+		/* remove from hash table */
-+		spin_lock(&db_hash_lock);
-+		hash_del(&pmap->db_link);
-+		spin_unlock(&db_hash_lock);
-+
-+		proc_map_free(pmap);
-+	}
-+}
-+
-+static bool proc_map_insert(struct proc_map *pmap, struct page_map *pmp)
-+{
-+	struct rb_root *root = &pmap->entries;
-+	struct rb_node **new = &root->rb_node;
-+	struct rb_node *parent = NULL;
-+	struct page_map *this;
-+	bool inserted = true;
-+
-+	write_lock(&pmap->entries_lock);
-+
-+	/* Figure out where to put new node */
-+	while (*new) {
-+		this = rb_entry(*new, struct page_map, proc_link);
-+
-+		parent = *new;
-+		if (pmp->vaddr < this->vaddr)
-+			new = &((*new)->rb_left);
-+		else if (pmp->vaddr > this->vaddr)
-+			new = &((*new)->rb_right);
-+		else {
-+			/* Already have this address */
-+			inserted = false;
-+			goto out;
++			list_del(&cur->token_list);
++			list_add(&cur->token_list, &temp);
 +		}
 +	}
++	spin_unlock(&token_lock);
 +
-+	/* Add new node and rebalance tree. */
-+	rb_link_node(&pmp->proc_link, parent, new);
-+	rb_insert_color(&pmp->proc_link, root);
-+
-+out:
-+	write_unlock(&pmap->entries_lock);
-+
-+	return inserted;
-+}
-+
-+#if 0 /* will use this later */
-+static struct page_map *proc_map_search(struct proc_map *pmap,
-+					unsigned long vaddr)
-+{
-+	struct rb_root *root = &pmap->entries;
-+	struct rb_node *node;
-+	struct page_map *pmp;
-+
-+	read_lock(&pmap->entries_lock);
-+
-+	node = root->rb_node;
-+
-+	while (node) {
-+		pmp = rb_entry(node, struct page_map, proc_link);
-+
-+		if (vaddr < pmp->vaddr)
-+			node = node->rb_left;
-+		else if (vaddr > pmp->vaddr)
-+			node = node->rb_right;
-+		else
-+			break;
++	/* freeing a KVM may sleep */
++	list_for_each_entry_safe(cur, next, &temp, token_list) {
++		kvm_put_kvm(cur->kvm);
++		kfree(cur);
 +	}
-+
-+	if (!node)
-+		pmp = NULL;
-+
-+	read_unlock(&pmap->entries_lock);
-+
-+	return pmp;
 +}
-+#endif
 +
-+static struct page_map *proc_map_search_extract(struct proc_map *pmap,
-+						unsigned long vaddr)
++static void token_timeout_work(struct work_struct *work)
 +{
-+	struct rb_root *root = &pmap->entries;
-+	struct rb_node *node;
-+	struct page_map *pmp;
++	struct token_entry *cur, *next;
++	ktime_t now = ktime_get();
++	struct kvmi *ikvm;
++	struct list_head temp;
 +
-+	write_lock(&pmap->entries_lock);
++	INIT_LIST_HEAD(&temp);
 +
-+	node = root->rb_node;
++	spin_lock(&token_lock);
++	list_for_each_entry_safe(cur, next, &token_list, token_list)
++		if (ktime_sub(now, cur->timestamp) > TOKEN_TIMEOUT_NSEC) {
++			ikvm = kvmi_get(cur->kvm);
++			if (ikvm) {
++				atomic_dec(&ikvm->num_tokens);
++				kvmi_put(cur->kvm);
++			}
 +
-+	while (node) {
-+		pmp = rb_entry(node, struct page_map, proc_link);
++			list_del(&cur->token_list);
++			list_add(&cur->token_list, &temp);
++		}
++	spin_unlock(&token_lock);
 +
-+		if (vaddr < pmp->vaddr)
-+			node = node->rb_left;
-+		else if (vaddr > pmp->vaddr)
-+			node = node->rb_right;
-+		else
-+			break;
++	if (!list_empty(&temp))
++		kvm_info("kvmi: token(s) timed out\n");
++
++	/* freeing a KVM may sleep */
++	list_for_each_entry_safe(cur, next, &temp, token_list) {
++		kvm_put_kvm(cur->kvm);
++		kfree(cur);
 +	}
-+
-+	if (node) {
-+		rb_erase(&pmp->proc_link, &pmap->entries);
-+		RB_CLEAR_NODE(&pmp->proc_link);
-+	} else
-+		pmp = NULL;
-+
-+	write_unlock(&pmap->entries_lock);
-+
-+	return pmp;
 +}
 +
-+static void proc_map_remove(struct proc_map *pmap, struct page_map *pmp)
++static enum hrtimer_restart token_timer_fn(struct hrtimer *timer)
 +{
-+	write_lock(&pmap->entries_lock);
-+	rb_erase(&pmp->proc_link, &pmap->entries);
-+	RB_CLEAR_NODE(&pmp->proc_link);
-+	write_unlock(&pmap->entries_lock);
++	schedule_work(&token_work);
++
++	hrtimer_add_expires_ns(timer, NSEC_PER_SEC);
++	return HRTIMER_RESTART;
 +}
 +
-+static void file_map_insert(struct file_map *fmp, struct page_map *pmp)
++int kvmi_mem_generate_token(struct kvm *kvm, struct kvmi_map_mem_token *token)
 +{
-+	spin_lock(&fmp->entries_lock);
-+	list_add(&pmp->file_link, &fmp->entries);
-+	spin_unlock(&fmp->entries_lock);
-+}
++	struct kvmi *ikvm;
++	struct token_entry *tep;
 +
-+static void file_map_remove(struct file_map *fmp, struct page_map *pmp)
-+{
-+	spin_lock(&fmp->entries_lock);
-+	list_del(&pmp->file_link);
-+	spin_unlock(&fmp->entries_lock);
-+}
++	/* too many tokens have accumulated, retry later */
++	ikvm = IKVM(kvm);
++	if (atomic_read(&ikvm->num_tokens) > KVMI_MEM_MAX_TOKENS)
++		return -KVM_EAGAIN;
 +
-+/*
-+ * Opens the device for map/unmap operations. The mm of this process is
-+ * associated with these files in a 1:many relationship.
-+ * Operations on this file must be done within the same process that opened it.
-+ */
-+static int kvm_dev_open(struct inode *inodep, struct file *filp)
-+{
-+	struct proc_map *pmap;
-+	struct file_map *fmp;
++	print_hex_dump_debug("kvmi: new token ", DUMP_PREFIX_NONE,
++			     32, 1, token, sizeof(*token), false);
 +
-+	pr_debug("kvmi: file %016lx opened by mm %016lx\n",
-+		 (unsigned long) filp, (unsigned long)current->mm);
++	tep = kmalloc(sizeof(*tep), GFP_KERNEL);
++	if (tep == NULL)
++		return -KVM_ENOMEM;
 +
-+	pmap = get_proc_map();
-+	if (pmap == NULL)
-+		return -ENOENT;
++	/* pin KVM so it won't go away while we wait for HC */
++	kvm_get_kvm(kvm);
++	get_random_bytes(token, sizeof(*token));
++	atomic_inc(&ikvm->num_tokens);
 +
-+	/* link the file 1:1 with such a structure */
-+	fmp = file_map_alloc();
-+	if (fmp == NULL)
-+		return -ENOMEM;
++	/* init token entry */
++	INIT_LIST_HEAD(&tep->token_list);
++	memcpy(&tep->token, token, sizeof(*token));
++	tep->kvm = kvm;
++	tep->timestamp = ktime_get();
 +
-+	fmp->proc = pmap;
-+	filp->private_data = fmp;
++	/* add to list */
++	spin_lock(&token_lock);
++	list_add_tail(&tep->token_list, &token_list);
++	spin_unlock(&token_lock);
 +
 +	return 0;
 +}
 +
-+static long _do_mapping(struct kvmi_mem_map *map_req, struct page_map *pmp)
++static struct kvm *find_machine_at(struct kvm_vcpu *vcpu, gva_t tkn_gva)
 +{
-+	struct page *page;
-+	phys_addr_t paddr;
-+	long nrpages;
-+	long result = 0;
-+
-+	down_read(&current->mm->mmap_sem);
-+
-+	/* pin the page to be replaced (also swaps in the page) */
-+	nrpages = get_user_pages_locked(map_req->gva, 1,
-+					FOLL_SPLIT | FOLL_MIGRATION,
-+					&page, NULL);
-+	if (unlikely(nrpages == 0)) {
-+		result = -ENOENT;
-+		pr_err("kvmi: found no page for %016llx\n", map_req->gva);
-+		goto out;
-+	} else if (IS_ERR_VALUE(nrpages)) {
-+		result = nrpages;
-+		pr_err("kvmi: get_user_pages_locked() failed (%ld)\n", result);
-+		goto out;
-+	}
-+
-+	paddr = page_to_phys(page);
-+	pr_debug("%s: page phys addr %016llx\n", __func__, paddr);
-+
-+	/* last thing to do is host mapping */
-+	result = kvmi_arch_map_hc(&map_req->token, map_req->gpa, paddr);
-+	if (IS_ERR_VALUE(result)) {
-+		pr_err("kvmi: mapping failed for %016llx -> %016lx (%ld)\n",
-+			pmp->gpa, pmp->vaddr, result);
-+
-+		/* don't need this page anymore */
-+		put_page(page);
-+	}
-+
-+out:
-+	up_read(&current->mm->mmap_sem);
-+
-+	return result;
-+}
-+
-+static long _do_unmapping(struct mm_struct *mm, struct page_map *pmp)
-+{
-+	struct vm_area_struct *vma;
-+	struct page *page;
-+	phys_addr_t paddr;
-+	long result = 0;
-+
-+	down_read(&mm->mmap_sem);
-+
-+	/* find the VMA for the virtual address */
-+	vma = find_vma(mm, pmp->vaddr);
-+	if (vma == NULL) {
-+		result = -ENOENT;
-+		pr_err("kvmi: find_vma() found no VMA\n");
-+		goto out;
-+	}
-+
-+	/* the page is pinned, thus easy to access */
-+	page = follow_page(vma, pmp->vaddr, 0);
-+	if (IS_ERR_VALUE(page)) {
-+		result = PTR_ERR(page);
-+		pr_err("kvmi: follow_page() failed (%ld)\n", result);
-+		goto out;
-+	} else if (page == NULL) {
-+		result = -ENOENT;
-+		pr_err("kvmi: follow_page() found no page\n");
-+		goto out;
-+	}
-+
-+	paddr = page_to_phys(page);
-+	pr_debug("%s: page phys addr %016llx\n", __func__, paddr);
-+
-+	/* last thing to do is host unmapping */
-+	result = kvmi_arch_unmap_hc(paddr);
-+	if (IS_ERR_VALUE(result))
-+		pr_warn("kvmi: unmapping failed for %016lx (%ld)\n",
-+			pmp->vaddr, result);
-+
-+	/* finally unpin the page */
-+	put_page(page);
-+
-+out:
-+	up_read(&mm->mmap_sem);
-+
-+	return result;
-+}
-+
-+static noinline long kvm_dev_ioctl_map(struct file_map *fmp,
-+				       struct kvmi_mem_map *map)
-+{
-+	struct proc_map *pmap = fmp->proc;
-+	struct page_map *pmp;
-+	bool added;
-+	long result = 0;
-+
-+	pr_debug("kvmi: mm %016lx map request %016llx -> %016llx\n",
-+		(unsigned long)current->mm, map->gpa, map->gva);
-+
-+	if (!access_ok(map->gva, PAGE_SIZE))
-+		return -EINVAL;
-+
-+	/* prepare list entry */
-+	pmp = page_map_alloc();
-+	if (pmp == NULL)
-+		return -ENOMEM;
-+
-+	pmp->gpa = map->gpa;
-+	pmp->vaddr = map->gva;
-+
-+	added = proc_map_insert(pmap, pmp);
-+	if (added == false) {
-+		result = -EALREADY;
-+		pr_err("kvmi: address %016llx already mapped into\n", map->gva);
-+		goto out_free;
-+	}
-+	file_map_insert(fmp, pmp);
-+
-+	/* actual mapping here */
-+	result = _do_mapping(map, pmp);
-+	if (IS_ERR_VALUE(result))
-+		goto out_remove;
-+
-+	return 0;
-+
-+out_remove:
-+	proc_map_remove(pmap, pmp);
-+	file_map_remove(fmp, pmp);
-+
-+out_free:
-+	page_map_free(pmp);
-+
-+	return result;
-+}
-+
-+static noinline long kvm_dev_ioctl_unmap(struct file_map *fmp,
-+					 unsigned long vaddr)
-+{
-+	struct proc_map *pmap = fmp->proc;
-+	struct page_map *pmp;
-+	long result = 0;
-+
-+	pr_debug("kvmi: mm %016lx unmap request %016lx\n",
-+		(unsigned long)current->mm, vaddr);
-+
-+	pmp = proc_map_search_extract(pmap, vaddr);
-+	if (pmp == NULL) {
-+		pr_err("kvmi: address %016lx not mapped\n", vaddr);
-+		return -ENOENT;
-+	}
-+
-+	/* actual unmapping here */
-+	result = _do_unmapping(current->mm, pmp);
-+
-+	file_map_remove(fmp, pmp);
-+	page_map_free(pmp);
-+
-+	return result;
-+}
-+
-+/*
-+ * Operations on this file must be done within the same process that opened it.
-+ */
-+static long kvm_dev_ioctl(struct file *filp,
-+			  unsigned int ioctl, unsigned long arg)
-+{
-+	void __user *argp = (void __user *) arg;
-+	struct file_map *fmp = filp->private_data;
-+	struct proc_map *pmap = fmp->proc;
 +	long result;
++	gpa_t tkn_gpa;
++	struct kvmi_map_mem_token token;
++	struct list_head *cur;
++	struct token_entry *tep, *found = NULL;
++	struct kvm *target_kvm = NULL;
++	struct kvmi *ikvm;
 +
-+	/* this helps keep my code simpler */
-+	if (current->mm != pmap->mm) {
-+		pr_err("kvmi: ioctl request by different process\n");
-+		return -EINVAL;
++	/* machine token is passed as pointer */
++	tkn_gpa = kvm_mmu_gva_to_gpa_system(vcpu, tkn_gva, 0, NULL);
++	if (tkn_gpa == UNMAPPED_GVA)
++		return NULL;
++
++	/* copy token to local address space */
++	result = kvm_read_guest(vcpu->kvm, tkn_gpa, &token, sizeof(token));
++	if (IS_ERR_VALUE(result)) {
++		kvm_err("kvmi: failed copying token from user\n");
++		return ERR_PTR(result);
 +	}
 +
-+	switch (ioctl) {
-+	case KVM_INTRO_MEM_MAP: {
-+		struct kvmi_mem_map map;
++	/* consume token & find the VM */
++	spin_lock(&token_lock);
++	list_for_each(cur, &token_list) {
++		tep = list_entry(cur, struct token_entry, token_list);
 +
-+		result = -EFAULT;
-+		if (copy_from_user(&map, argp, sizeof(map)))
++		if (!memcmp(&token, &tep->token, sizeof(token))) {
++			list_del(&tep->token_list);
++			found = tep;
 +			break;
-+
-+		result = kvm_dev_ioctl_map(fmp, &map);
-+		break;
++		}
 +	}
-+	case KVM_INTRO_MEM_UNMAP: {
-+		unsigned long vaddr = (unsigned long) arg;
++	spin_unlock(&token_lock);
 +
-+		result = kvm_dev_ioctl_unmap(fmp, vaddr);
-+		break;
-+	}
-+	default:
-+		pr_err("kvmi: ioctl %d not implemented\n", ioctl);
-+		result = -ENOTTY;
++	if (found != NULL) {
++		target_kvm = found->kvm;
++		kfree(found);
++
++		ikvm = kvmi_get(target_kvm);
++		if (ikvm) {
++			atomic_dec(&ikvm->num_tokens);
++			kvmi_put(target_kvm);
++		}
 +	}
 +
-+	return result;
++	return target_kvm;
 +}
 +
-+/*
-+ * No constraint on closing the device.
-+ */
-+static int kvm_dev_release(struct inode *inodep, struct file *filp)
-+{
-+	struct file_map *fmp = filp->private_data;
-+	struct proc_map *pmap = fmp->proc;
-+	struct page_map *pmp, *temp;
 +
-+	pr_debug("kvmi: file %016lx closed by mm %016lx\n",
-+		 (unsigned long) filp, (unsigned long)current->mm);
-+
-+	/* this file_map has no more users, thus no more concurrent access */
-+	list_for_each_entry_safe(pmp, temp, &fmp->entries, file_link) {
-+		proc_map_remove(pmap, pmp);
-+		list_del(&pmp->file_link);
-+
-+		_do_unmapping(pmap->mm, pmp);
-+
-+		page_map_free(pmp);
-+	}
-+
-+	file_map_free(fmp);
-+	put_proc_map(pmap);
-+
-+	return 0;
-+}
-+
-+static const struct file_operations kvmmem_ops = {
-+	.open		= kvm_dev_open,
-+	.unlocked_ioctl = kvm_dev_ioctl,
-+	.compat_ioctl   = kvm_dev_ioctl,
-+	.release	= kvm_dev_release,
-+};
-+
-+static struct miscdevice kvm_mem_dev = {
-+	.minor		= MISC_DYNAMIC_MINOR,
-+	.name		= "kvmmem",
-+	.fops		= &kvmmem_ops,
-+};
-+
-+static int __init kvm_intro_guest_init(void)
++int kvmi_host_mem_map(struct kvm_vcpu *vcpu, gva_t tkn_gva,
++		      gpa_t req_gpa, gpa_t map_gpa)
 +{
 +	int result = 0;
++	struct kvm *target_kvm;
 +
-+	if (!kvm_para_available()) {
-+		pr_err("kvmi: paravirt not available\n");
-+		return -EPERM;
++	gfn_t req_gfn;
++	hva_t req_hva;
++	struct mm_struct *req_mm;
++
++	gfn_t map_gfn;
++	hva_t map_hva;
++
++	kvm_debug("kvmi: mapping request req_gpa %016llx, map_gpa %016llx\n",
++		  req_gpa, map_gpa);
++
++	/* get the struct kvm * corresponding to the token */
++	target_kvm = find_machine_at(vcpu, tkn_gva);
++	if (IS_ERR_VALUE(target_kvm)) {
++		return PTR_ERR(target_kvm);
++	} else if (target_kvm == NULL) {
++		kvm_err("kvmi: unable to find target machine\n");
++		return -KVM_ENOENT;
++	}
++	req_mm = target_kvm->mm;
++
++	/* translate source addresses */
++	req_gfn = gpa_to_gfn(req_gpa);
++	req_hva = gfn_to_hva_safe(target_kvm, req_gfn);
++	if (kvm_is_error_hva(req_hva)) {
++		kvm_err("kvmi: invalid req_gpa %016llx\n", req_gpa);
++		result = -KVM_EFAULT;
++		goto out;
 +	}
 +
-+	proc_map_cachep = KMEM_CACHE(proc_map, SLAB_PANIC | SLAB_ACCOUNT);
-+	if (proc_map_cachep == NULL) {
-+		result = -ENOMEM;
-+		goto out_err;
++	kvm_debug("kvmi: req_gpa %016llx -> req_hva %016lx\n",
++		  req_gpa, req_hva);
++
++	/* translate destination addresses */
++	map_gfn = gpa_to_gfn(map_gpa);
++	map_hva = gfn_to_hva_safe(vcpu->kvm, map_gfn);
++	if (kvm_is_error_hva(map_hva)) {
++		kvm_err("kvmi: invalid map_gpa %016llx\n", map_gpa);
++		result = -KVM_EFAULT;
++		goto out;
 +	}
 +
-+	file_map_cachep = KMEM_CACHE(file_map, SLAB_PANIC | SLAB_ACCOUNT);
-+	if (file_map_cachep == NULL) {
-+		result = -ENOMEM;
-+		goto out_err;
++	kvm_debug("kvmi: map_gpa %016llx -> map_hva %016lx\n",
++		map_gpa, map_hva);
++
++	/* actually do the mapping */
++	result = mm_remote_map(req_mm, req_hva, map_hva);
++	if (IS_ERR_VALUE((long)result)) {
++		if (result == -EBUSY)
++			kvm_debug("kvmi: mapping of req_gpa %016llx failed: %d.\n",
++				req_gpa, result);
++		else
++			kvm_err("kvmi: mapping of req_gpa %016llx failed: %d.\n",
++				req_gpa, result);
++		goto out;
 +	}
 +
-+	page_map_cachep = KMEM_CACHE(page_map, SLAB_PANIC | SLAB_ACCOUNT);
-+	if (page_map_cachep == NULL) {
-+		result = -ENOMEM;
-+		goto out_err;
-+	}
++	/* all fine */
++	kvm_debug("kvmi: mapping of req_gpa %016llx successful\n", req_gpa);
 +
-+	result = misc_register(&kvm_mem_dev);
-+	if (result) {
-+		pr_err("kvmi: misc device register failed (%d)\n", result);
-+		goto out_err;
-+	}
-+
-+	pr_debug("kvmi: guest memory introspection device created\n");
-+
-+	return 0;
-+
-+out_err:
-+	kmem_cache_destroy(page_map_cachep);
-+	kmem_cache_destroy(file_map_cachep);
-+	kmem_cache_destroy(proc_map_cachep);
++out:
++	kvm_put_kvm(target_kvm);
 +
 +	return result;
 +}
 +
-+static void __exit kvm_intro_guest_exit(void)
++int kvmi_host_mem_unmap(struct kvm_vcpu *vcpu, gpa_t map_gpa)
 +{
-+	misc_deregister(&kvm_mem_dev);
++	gfn_t map_gfn;
++	hva_t map_hva;
++	int result;
 +
-+	kmem_cache_destroy(page_map_cachep);
-+	kmem_cache_destroy(file_map_cachep);
-+	kmem_cache_destroy(proc_map_cachep);
++	kvm_debug("kvmi: unmapping request for map_gpa %016llx\n", map_gpa);
++
++	/* convert GPA -> HVA */
++	map_gfn = gpa_to_gfn(map_gpa);
++	map_hva = gfn_to_hva_safe(vcpu->kvm, map_gfn);
++	if (kvm_is_error_hva(map_hva)) {
++		result = -KVM_EFAULT;
++		kvm_err("kvmi: invalid map_gpa %016llx\n", map_gpa);
++		goto out;
++	}
++
++	kvm_debug("kvmi: map_gpa %016llx -> map_hva %016lx\n",
++		map_gpa, map_hva);
++
++	/* actually do the unmapping */
++	result = mm_remote_unmap(map_hva);
++	if (IS_ERR_VALUE((long)result))
++		goto out;
++
++	kvm_debug("kvmi: unmapping of map_gpa %016llx successful\n", map_gpa);
++
++out:
++	return result;
 +}
 +
-+module_init(kvm_intro_guest_init)
-+module_exit(kvm_intro_guest_exit)
++void kvmi_mem_init(void)
++{
++	ktime_t expire;
++
++	INIT_LIST_HEAD(&token_list);
++	spin_lock_init(&token_lock);
++	INIT_WORK(&token_work, token_timeout_work);
++
++	hrtimer_init(&token_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
++	token_timer.function = token_timer_fn;
++	expire = ktime_add_ns(ktime_get(), NSEC_PER_SEC);
++	hrtimer_start(&token_timer, expire, HRTIMER_MODE_ABS);
++
++	kvm_info("kvmi: initialized host memory introspection\n");
++}
++
++void kvmi_mem_exit(void)
++{
++	hrtimer_cancel(&token_timer);
++}
+diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
+index 3e381f95b686..a5f87aafa237 100644
+--- a/virt/kvm/kvmi_msg.c
++++ b/virt/kvm/kvmi_msg.c
+@@ -33,6 +33,7 @@ static const char *const msg_IDs[] = {
+ 	[KVMI_EVENT_REPLY]           = "KVMI_EVENT_REPLY",
+ 	[KVMI_GET_CPUID]             = "KVMI_GET_CPUID",
+ 	[KVMI_GET_GUEST_INFO]        = "KVMI_GET_GUEST_INFO",
++	[KVMI_GET_MAP_TOKEN]         = "KVMI_GET_MAP_TOKEN",
+ 	[KVMI_GET_MTRR_TYPE]         = "KVMI_GET_MTRR_TYPE",
+ 	[KVMI_GET_PAGE_ACCESS]       = "KVMI_GET_PAGE_ACCESS",
+ 	[KVMI_GET_PAGE_WRITE_BITMAP] = "KVMI_GET_PAGE_WRITE_BITMAP",
+@@ -352,6 +353,19 @@ static int handle_write_physical(struct kvmi *ikvm,
+ 	return kvmi_msg_vm_maybe_reply(ikvm, msg, ec, NULL, 0);
+ }
+ 
++static int handle_get_map_token(struct kvmi *ikvm,
++				const struct kvmi_msg_hdr *msg,
++				const void *_req)
++{
++	struct kvmi_get_map_token_reply rpl;
++	int ec;
++
++	memset(&rpl, 0, sizeof(rpl));
++	ec = kvmi_cmd_alloc_token(ikvm->kvm, &rpl.token);
++
++	return kvmi_msg_vm_maybe_reply(ikvm, msg, ec, &rpl, sizeof(rpl));
++}
++
+ static bool enable_spp(struct kvmi *ikvm)
+ {
+ 	if (!ikvm->spp.initialized) {
+@@ -524,6 +538,7 @@ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
+ 	[KVMI_CONTROL_SPP]           = handle_control_spp,
+ 	[KVMI_CONTROL_VM_EVENTS]     = handle_control_vm_events,
+ 	[KVMI_GET_GUEST_INFO]        = handle_get_guest_info,
++	[KVMI_GET_MAP_TOKEN]         = handle_get_map_token,
+ 	[KVMI_GET_PAGE_ACCESS]       = handle_get_page_access,
+ 	[KVMI_GET_PAGE_WRITE_BITMAP] = handle_get_page_write_bitmap,
+ 	[KVMI_GET_VERSION]           = handle_get_version,
