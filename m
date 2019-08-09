@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FC3B87EFE
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:09:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24AF587EFF
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:09:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437045AbfHIQJ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:09:56 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52686 "EHLO
+        id S2437048AbfHIQJ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:09:57 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52684 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437013AbfHIQJ4 (ORCPT
+        by vger.kernel.org with ESMTP id S2437001AbfHIQJ4 (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:09:56 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 8379A301AB43;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id C03DD301AB36;
         Fri,  9 Aug 2019 19:00:53 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 43B2A305B7A3;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 82DC0305B7A0;
         Fri,  9 Aug 2019 19:00:53 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -33,9 +33,9 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v6 04/92] kvm: introspection: add the read/dispatch message function
-Date:   Fri,  9 Aug 2019 18:59:19 +0300
-Message-Id: <20190809160047.8319-5-alazar@bitdefender.com>
+Subject: [RFC PATCH v6 05/92] kvm: introspection: add KVMI_GET_VERSION
+Date:   Fri,  9 Aug 2019 18:59:20 +0300
+Message-Id: <20190809160047.8319-6-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -46,494 +46,142 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Based on the common header used by all messages (struct kvmi_msg_hdr),
-the worker will read/validate all messages, execute the VM introspection
-commands (eg. KVMI_GET_GUEST_INFO) and dispatch to vCPUs the vCPU
-introspection commands (eg. KVMI_GET_REGISTERS) and the replies to
-vCPU events. The vCPU threads will reply to vCPU introspection commands
-without the help of the receiving worker.
+This command should be used by the introspection tool to identify the
+commands/events supported by the KVMi subsystem and, most important,
+what messages must be used for event replies. The kernel side will accept
+smaller or bigger command messages, but it can be more strict with bigger
+event reply messages.
 
-Because of the command header (struct kvmi_error_code) used in any
-command reply, this worker could respond to any unsupported/disallowed
-command with an error code.
-
-This thread will end when the socket is closed (signaled by userspace/QEMU
-or the introspection tool) or on the first API error (eg. wrong message
-size).
+The command is always allowed and any attempt from userspace to disallow it
+through KVM_INTROSPECTION_COMMAND will get -EPERM (unless userspace choose
+to disable all commands, using id=-1, in which case KVMI_GET_VERSION is
+quietly allowed, without an error).
 
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst |  86 +++++++++++
- include/uapi/linux/kvmi.h          |  13 ++
- virt/kvm/kvmi.c                    |  43 +++++-
- virt/kvm/kvmi_int.h                |   7 +
- virt/kvm/kvmi_msg.c                | 240 ++++++++++++++++++++++++++++-
- 5 files changed, 386 insertions(+), 3 deletions(-)
+ Documentation/virtual/kvm/kvmi.rst | 28 ++++++++++++++++++++++++++++
+ include/uapi/linux/kvmi.h          |  5 +++++
+ virt/kvm/kvmi.c                    | 14 ++++++++++++++
+ virt/kvm/kvmi_msg.c                | 13 +++++++++++++
+ 4 files changed, 60 insertions(+)
 
 diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index 47b7c36d334a..1d4a1dcd7d2f 100644
+index 1d4a1dcd7d2f..0f296e3c4244 100644
 --- a/Documentation/virtual/kvm/kvmi.rst
 +++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -64,6 +64,85 @@ used on that guest. Obviously, whether the guest can really continue
- normal execution depends on whether the introspection tool has made any
- modifications that require an active KVMI channel.
- 
-+All messages (commands or events) have a common header::
+@@ -224,3 +224,31 @@ device-specific memory (DMA, emulated MMIO, reserved by a passthrough
+ device etc.). It is up to the user to determine, using the guest operating
+ system data structures, the areas that are safe to access (code, stack, heap
+ etc.).
 +
-+	struct kvmi_msg_hdr {
-+		__u16 id;
-+		__u16 size;
-+		__u32 seq;
++Commands
++--------
++
++The following C structures are meant to be used directly when communicating
++over the wire. The peer that detects any size mismatch should simply close
++the connection and report the error.
++
++1. KVMI_GET_VERSION
++-------------------
++
++:Architectures: all
++:Versions: >= 1
++:Parameters: none
++:Returns:
++
++::
++
++	struct kvmi_error_code;
++	struct kvmi_get_version_reply {
++		__u32 version;
++		__u32 padding;
 +	};
 +
-+The replies have the same header, with the sequence number (``seq``)
-+and message id (``id``) matching the command/event.
++Returns the introspection API version.
 +
-+After ``kvmi_msg_hdr``, ``id`` specific data of ``size`` bytes will
-+follow.
-+
-+The message header and its data must be sent with one ``sendmsg()`` call
-+to the socket. This simplifies the receiver loop and avoids
-+the reconstruction of messages on the other side.
-+
-+The wire protocol uses the host native byte-order. The introspection tool
-+must check this during the handshake and do the necessary conversion.
-+
-+A command reply begins with::
-+
-+	struct kvmi_error_code {
-+		__s32 err;
-+		__u32 padding;
-+	}
-+
-+followed by the command specific data if the error code ``err`` is zero.
-+
-+The error code -KVM_EOPNOTSUPP is returned for unsupported commands.
-+
-+The error code -KVM_EPERM is returned for disallowed commands (see **Hooking**).
-+
-+The error code is related to the message processing, including unsupported
-+commands. For all the other errors (incomplete messages, wrong sequence
-+numbers, socket errors etc.) the socket will be closed. The device
-+manager should reconnect.
-+
-+While all commands will have a reply as soon as possible, the replies
-+to events will probably be delayed until a set of (new) commands will
-+complete::
-+
-+   Host kernel               Tool
-+   -----------               ----
-+   event 1 ->
-+                             <- command 1
-+   command 1 reply ->
-+                             <- command 2
-+   command 2 reply ->
-+                             <- event 1 reply
-+
-+If both ends send a message at the same time::
-+
-+   Host kernel               Tool
-+   -----------               ----
-+   event X ->                <- command X
-+
-+the host kernel will reply to 'command X', regardless of the receive time
-+(before or after the 'event X' was sent).
-+
-+As it can be seen below, the wire protocol specifies occasional padding. This
-+is to permit working with the data by directly using C structures or to round
-+the structure size to a multiple of 8 bytes (64bit) to improve the copy
-+operations that happen during ``recvmsg()`` or ``sendmsg()``. The members
-+should have the native alignment of the host (4 bytes on x86). All padding
-+must be initialized with zero otherwise the respective commands will fail
-+with -KVM_EINVAL.
-+
-+To describe the commands/events, we reuse some conventions from api.txt:
-+
-+  - Architectures: which instruction set architectures provide this command/event
-+
-+  - Versions: which versions provide this command/event
-+
-+  - Parameters: incoming message data
-+
-+  - Returns: outgoing/reply message data
-+
- Handshake
- ---------
- 
-@@ -99,6 +178,13 @@ commands/events) to KVM, and forget about it. It will be notified by
- KVM when the introspection tool closes the file handle (in case of
- errors), and should reinitiate the handshake.
- 
-+Once the file handle reaches KVM, the introspection tool should use
-+the *KVMI_GET_VERSION* command to get the API version and/or
-+the *KVMI_CHECK_COMMAND* and *KVMI_CHECK_EVENTS* commands to see which
-+commands/events are allowed for this guest. The error code -KVM_EPERM
-+will be returned if the introspection tool uses a command or enables an
-+event which is disallowed.
-+
- Unhooking
- ---------
- 
++This command is always allowed and successful (if the introspection is
++built in kernel).
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index dbf63ad0862f..6c7600ed4564 100644
+index 6c7600ed4564..9574ba0b9565 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -65,4 +65,17 @@ enum {
- 	KVMI_NUM_EVENTS
+@@ -78,4 +78,9 @@ struct kvmi_error_code {
+ 	__u32 padding;
  };
  
-+#define KVMI_MSG_SIZE (4096 - sizeof(struct kvmi_msg_hdr))
-+
-+struct kvmi_msg_hdr {
-+	__u16 id;
-+	__u16 size;
-+	__u32 seq;
-+};
-+
-+struct kvmi_error_code {
-+	__s32 err;
++struct kvmi_get_version_reply {
++	__u32 version;
 +	__u32 padding;
 +};
 +
  #endif /* _UAPI__LINUX_KVMI_H */
 diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
-index dc64f975998f..afa31748d7f4 100644
+index afa31748d7f4..d5b6af21564e 100644
 --- a/virt/kvm/kvmi.c
 +++ b/virt/kvm/kvmi.c
-@@ -10,13 +10,54 @@
- #include <linux/kthread.h>
- #include <linux/bitmap.h>
+@@ -68,6 +68,8 @@ static bool alloc_kvmi(struct kvm *kvm, const struct kvm_introspection *qemu)
+ 	if (!ikvm)
+ 		return false;
  
--int kvmi_init(void)
-+static struct kmem_cache *msg_cache;
++	set_bit(KVMI_GET_VERSION, ikvm->cmd_allow_mask);
 +
-+void *kvmi_msg_alloc(void)
-+{
-+	return kmem_cache_zalloc(msg_cache, GFP_KERNEL);
-+}
+ 	memcpy(&ikvm->uuid, &qemu->uuid, sizeof(ikvm->uuid));
+ 
+ 	ikvm->kvm = kvm;
+@@ -290,6 +292,18 @@ int kvmi_ioctl_command(struct kvm *kvm, void __user *argp)
+ 	bitmap_from_u64(known, KVMI_KNOWN_COMMANDS);
+ 	bitmap_and(requested, requested, known, KVMI_NUM_COMMANDS);
+ 
++	if (!allow) {
++		DECLARE_BITMAP(always_allowed, KVMI_NUM_COMMANDS);
 +
-+void *kvmi_msg_alloc_check(size_t size)
-+{
-+	if (size > KVMI_MSG_SIZE_ALLOC)
-+		return NULL;
-+	return kvmi_msg_alloc();
-+}
++		if (id == KVMI_GET_VERSION)
++			return -EPERM;
 +
-+void kvmi_msg_free(void *addr)
-+{
-+	if (addr)
-+		kmem_cache_free(msg_cache, addr);
-+}
++		set_bit(KVMI_GET_VERSION, always_allowed);
 +
-+static void kvmi_cache_destroy(void)
- {
-+	kmem_cache_destroy(msg_cache);
-+	msg_cache = NULL;
-+}
-+
-+static int kvmi_cache_create(void)
-+{
-+	msg_cache = kmem_cache_create("kvmi_msg", KVMI_MSG_SIZE_ALLOC,
-+				      4096, SLAB_ACCOUNT, NULL);
-+
-+	if (!msg_cache) {
-+		kvmi_cache_destroy();
-+
-+		return -1;
++		bitmap_andnot(requested, requested, always_allowed,
++			      KVMI_NUM_COMMANDS);
 +	}
 +
- 	return 0;
- }
- 
-+int kvmi_init(void)
-+{
-+	return kvmi_cache_create();
-+}
-+
- void kvmi_uninit(void)
- {
-+	kvmi_cache_destroy();
- }
- 
- static bool alloc_kvmi(struct kvm *kvm, const struct kvm_introspection *qemu)
-diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-index bd8b539e917a..76119a4b69d8 100644
---- a/virt/kvm/kvmi_int.h
-+++ b/virt/kvm/kvmi_int.h
-@@ -23,6 +23,8 @@
- #define kvmi_err(ikvm, fmt, ...) \
- 	kvm_info("%pU ERROR: " fmt, &ikvm->uuid, ## __VA_ARGS__)
- 
-+#define KVMI_MSG_SIZE_ALLOC (sizeof(struct kvmi_msg_hdr) + KVMI_MSG_SIZE)
-+
- #define KVMI_KNOWN_VCPU_EVENTS ( \
- 		BIT(KVMI_EVENT_CR) | \
- 		BIT(KVMI_EVENT_MSR) | \
-@@ -91,4 +93,9 @@ void kvmi_sock_shutdown(struct kvmi *ikvm);
- void kvmi_sock_put(struct kvmi *ikvm);
- bool kvmi_msg_process(struct kvmi *ikvm);
- 
-+/* kvmi.c */
-+void *kvmi_msg_alloc(void);
-+void *kvmi_msg_alloc_check(size_t size);
-+void kvmi_msg_free(void *addr);
-+
- #endif
+ 	return kvmi_ioctl_feature(kvm, allow, requested,
+ 				  offsetof(struct kvmi, cmd_allow_mask),
+ 				  KVMI_NUM_COMMANDS);
 diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index 4de012eafb6d..af6bc47dc031 100644
+index af6bc47dc031..6fe04de29f7e 100644
 --- a/virt/kvm/kvmi_msg.c
 +++ b/virt/kvm/kvmi_msg.c
-@@ -8,6 +8,19 @@
- #include <linux/net.h>
+@@ -9,6 +9,7 @@
  #include "kvmi_int.h"
  
-+static const char *const msg_IDs[] = {
-+};
-+
-+static bool is_known_message(u16 id)
-+{
-+	return id < ARRAY_SIZE(msg_IDs) && msg_IDs[id];
-+}
-+
-+static const char *id2str(u16 id)
-+{
-+	return is_known_message(id) ? msg_IDs[id] : "unknown";
-+}
-+
- bool kvmi_sock_get(struct kvmi *ikvm, int fd)
- {
- 	struct socket *sock;
-@@ -35,8 +48,231 @@ void kvmi_sock_shutdown(struct kvmi *ikvm)
- 	kernel_sock_shutdown(ikvm->sock, SHUT_RDWR);
+ static const char *const msg_IDs[] = {
++	[KVMI_GET_VERSION]           = "KVMI_GET_VERSION",
+ };
+ 
+ static bool is_known_message(u16 id)
+@@ -129,6 +130,17 @@ static int kvmi_msg_vm_reply(struct kvmi *ikvm,
+ 	return kvmi_msg_reply(ikvm, msg, err, rpl, rpl_size);
  }
  
-+static int kvmi_sock_read(struct kvmi *ikvm, void *buf, size_t size)
++static int handle_get_version(struct kvmi *ikvm,
++			      const struct kvmi_msg_hdr *msg, const void *req)
 +{
-+	struct kvec i = {
-+		.iov_base = buf,
-+		.iov_len = size,
-+	};
-+	struct msghdr m = { };
-+	int rc;
++	struct kvmi_get_version_reply rpl;
 +
-+	rc = kernel_recvmsg(ikvm->sock, &m, &i, 1, size, MSG_WAITALL);
++	memset(&rpl, 0, sizeof(rpl));
++	rpl.version = KVMI_VERSION;
 +
-+	if (rc > 0)
-+		print_hex_dump_debug("read: ", DUMP_PREFIX_NONE, 32, 1,
-+					buf, rc, false);
-+
-+	if (unlikely(rc != size)) {
-+		if (rc >= 0)
-+			rc = -EPIPE;
-+		else
-+			kvmi_err(ikvm, "kernel_recvmsg: %d\n", rc);
-+		return rc;
-+	}
-+
-+	return 0;
++	return kvmi_msg_vm_reply(ikvm, msg, 0, &rpl, sizeof(rpl));
 +}
 +
-+static int kvmi_sock_write(struct kvmi *ikvm, struct kvec *i, size_t n,
-+			   size_t size)
-+{
-+	struct msghdr m = { };
-+	int rc, k;
-+
-+	rc = kernel_sendmsg(ikvm->sock, &m, i, n, size);
-+
-+	if (rc > 0)
-+		for (k = 0; k < n; k++)
-+			print_hex_dump_debug("write: ", DUMP_PREFIX_NONE, 32, 1,
-+					i[k].iov_base, i[k].iov_len, false);
-+
-+	if (unlikely(rc != size)) {
-+		kvmi_err(ikvm, "kernel_sendmsg: %d\n", rc);
-+		if (rc >= 0)
-+			rc = -EPIPE;
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+static int kvmi_msg_reply(struct kvmi *ikvm,
-+			  const struct kvmi_msg_hdr *msg, int err,
-+			  const void *rpl, size_t rpl_size)
-+{
-+	struct kvmi_error_code ec;
-+	struct kvmi_msg_hdr h;
-+	struct kvec vec[3] = {
-+		{ .iov_base = &h, .iov_len = sizeof(h) },
-+		{ .iov_base = &ec, .iov_len = sizeof(ec) },
-+		{ .iov_base = (void *)rpl, .iov_len = rpl_size },
-+	};
-+	size_t size = sizeof(h) + sizeof(ec) + (err ? 0 : rpl_size);
-+	size_t n = err ? ARRAY_SIZE(vec) - 1 : ARRAY_SIZE(vec);
-+
-+	memset(&h, 0, sizeof(h));
-+	h.id = msg->id;
-+	h.seq = msg->seq;
-+	h.size = size - sizeof(h);
-+
-+	memset(&ec, 0, sizeof(ec));
-+	ec.err = err;
-+
-+	return kvmi_sock_write(ikvm, vec, n, size);
-+}
-+
-+static int kvmi_msg_vm_reply(struct kvmi *ikvm,
-+			     const struct kvmi_msg_hdr *msg, int err,
-+			     const void *rpl, size_t rpl_size)
-+{
-+	return kvmi_msg_reply(ikvm, msg, err, rpl, rpl_size);
-+}
-+
-+static bool is_command_allowed(struct kvmi *ikvm, int id)
-+{
-+	return test_bit(id, ikvm->cmd_allow_mask);
-+}
-+
-+/*
-+ * These commands are executed on the receiving thread/worker.
-+ */
-+static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
-+			    const void *) = {
-+};
-+
-+static bool is_vm_message(u16 id)
-+{
-+	return id < ARRAY_SIZE(msg_vm) && !!msg_vm[id];
-+}
-+
-+static bool is_unsupported_message(u16 id)
-+{
-+	bool supported;
-+
-+	supported = is_known_message(id) && is_vm_message(id);
-+
-+	return !supported;
-+}
-+
-+static int kvmi_consume_bytes(struct kvmi *ikvm, size_t bytes)
-+{
-+	size_t to_read;
-+	u8 buf[1024];
-+	int err = 0;
-+
-+	while (bytes && !err) {
-+		to_read = min(bytes, sizeof(buf));
-+
-+		err = kvmi_sock_read(ikvm, buf, to_read);
-+
-+		bytes -= to_read;
-+	}
-+
-+	return err;
-+}
-+
-+static struct kvmi_msg_hdr *kvmi_msg_recv(struct kvmi *ikvm, bool *unsupported)
-+{
-+	struct kvmi_msg_hdr *msg;
-+	int err;
-+
-+	*unsupported = false;
-+
-+	msg = kvmi_msg_alloc();
-+	if (!msg)
-+		goto out_err;
-+
-+	err = kvmi_sock_read(ikvm, msg, sizeof(*msg));
-+	if (err)
-+		goto out_err;
-+
-+	if (msg->size > KVMI_MSG_SIZE)
-+		goto out_err_msg;
-+
-+	if (is_unsupported_message(msg->id)) {
-+		if (msg->size && kvmi_consume_bytes(ikvm, msg->size) < 0)
-+			goto out_err_msg;
-+
-+		*unsupported = true;
-+		return msg;
-+	}
-+
-+	if (msg->size && kvmi_sock_read(ikvm, msg + 1, msg->size) < 0)
-+		goto out_err_msg;
-+
-+	return msg;
-+
-+out_err_msg:
-+	kvmi_err(ikvm, "%s id %u (%s) size %u\n",
-+		 __func__, msg->id, id2str(msg->id), msg->size);
-+
-+out_err:
-+	kvmi_msg_free(msg);
-+
-+	return NULL;
-+}
-+
-+static int kvmi_msg_dispatch_vm_cmd(struct kvmi *ikvm,
-+				    const struct kvmi_msg_hdr *msg)
-+{
-+	return msg_vm[msg->id](ikvm, msg, msg + 1);
-+}
-+
-+static int kvmi_msg_dispatch(struct kvmi *ikvm,
-+			     struct kvmi_msg_hdr *msg, bool *queued)
-+{
-+	int err;
-+
-+	err = kvmi_msg_dispatch_vm_cmd(ikvm, msg);
-+
-+	if (err)
-+		kvmi_err(ikvm, "%s: msg id: %u (%s), err: %d\n", __func__,
-+			 msg->id, id2str(msg->id), err);
-+
-+	return err;
-+}
-+
-+static bool is_message_allowed(struct kvmi *ikvm, __u16 id)
-+{
-+	if (id == KVMI_EVENT_REPLY)
-+		return true;
-+
-+	/*
-+	 * Some commands (eg.pause) request events that might be
-+	 * disallowed. The command is allowed here, but the function
-+	 * handling the command will return -KVM_EPERM if the event
-+	 * is disallowed.
-+	 */
-+	return is_command_allowed(ikvm, id);
-+}
-+
- bool kvmi_msg_process(struct kvmi *ikvm)
+ static bool is_command_allowed(struct kvmi *ikvm, int id)
  {
--	kvmi_info(ikvm, "TODO: %s", __func__);
--	return false;
-+	struct kvmi_msg_hdr *msg;
-+	bool queued = false;
-+	bool unsupported;
-+	int err = -1;
-+
-+	msg = kvmi_msg_recv(ikvm, &unsupported);
-+	if (!msg)
-+		goto out;
-+
-+	if (unsupported) {
-+		err = kvmi_msg_vm_reply(ikvm, msg, -KVM_EOPNOTSUPP, NULL, 0);
-+		goto out;
-+	}
-+
-+	if (!is_message_allowed(ikvm, msg->id)) {
-+		err = kvmi_msg_vm_reply(ikvm, msg, -KVM_EPERM, NULL, 0);
-+		goto out;
-+	}
-+
-+	err = kvmi_msg_dispatch(ikvm, msg, &queued);
-+
-+out:
-+	if (!queued)
-+		kvmi_msg_free(msg);
-+
-+	return err == 0;
- }
+ 	return test_bit(id, ikvm->cmd_allow_mask);
+@@ -139,6 +151,7 @@ static bool is_command_allowed(struct kvmi *ikvm, int id)
+  */
+ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
+ 			    const void *) = {
++	[KVMI_GET_VERSION]           = handle_get_version,
+ };
+ 
+ static bool is_vm_message(u16 id)
