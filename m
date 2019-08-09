@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6964F87FAD
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:20:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2555387FB0
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:20:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437151AbfHIQT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:19:59 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53322 "EHLO
+        id S2437283AbfHIQUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:20:44 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53298 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437092AbfHIQT6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:19:58 -0400
+        by vger.kernel.org with ESMTP id S2407411AbfHIQT5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:19:57 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 9792F305D3D9;
-        Fri,  9 Aug 2019 19:00:58 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 075DE305D3DA;
+        Fri,  9 Aug 2019 19:00:59 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 51651305B7A0;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 92936305B7A5;
         Fri,  9 Aug 2019 19:00:58 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -32,10 +32,11 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Weijiang Yang <weijiang.yang@intel.com>, Zhang@vger.kernel.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v6 18/92] kvm: introspection: add KVMI_EVENT_UNHOOK
-Date:   Fri,  9 Aug 2019 18:59:33 +0300
-Message-Id: <20190809160047.8319-19-alazar@bitdefender.com>
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
+        =?UTF-8?q?Mircea=20C=C3=AErjaliu?= <mcirjaliu@bitdefender.com>
+Subject: [RFC PATCH v6 19/92] kvm: introspection: add KVMI_EVENT_CREATE_VCPU
+Date:   Fri,  9 Aug 2019 18:59:34 +0300
+Message-Id: <20190809160047.8319-20-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -46,36 +47,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In certain situations (when the guest has to be paused, suspended,
-migrated, etc.), userspace/QEMU will use the KVM_INTROSPECTION_UNHOOK
-ioctl in order to trigger the KVMI_EVENT_UNHOOK. If the event is sent
-successfully (the VM has an active introspection channel), userspace
-should delay the action (pause/suspend/...) to give the introspection
-tool the chance to remove its hooks (eg. breakpoints). Once a timeout
-is reached or the introspection tool has closed the socket, QEMU should
-continue with the planned action.
+From: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
 
+This event is sent when a vCPU is ready to be introspected.
+
+Signed-off-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
+Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst | 20 ++++++++++++++++++
- virt/kvm/kvmi.c                    | 34 +++++++++++++++++++++++++++++-
+ Documentation/virtual/kvm/kvmi.rst | 23 +++++++++++++++
+ virt/kvm/kvmi.c                    | 47 ++++++++++++++++++++++++++++++
  virt/kvm/kvmi_int.h                |  1 +
- virt/kvm/kvmi_msg.c                | 20 ++++++++++++++++++
- 4 files changed, 74 insertions(+), 1 deletion(-)
+ virt/kvm/kvmi_msg.c                | 12 ++++++++
+ 4 files changed, 83 insertions(+)
 
 diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index 1ea4be0d5a45..28e1a1c80551 100644
+index 28e1a1c80551..b29cd1b80b4f 100644
 --- a/Documentation/virtual/kvm/kvmi.rst
 +++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -493,3 +493,23 @@ Some of the events accept the KVMI_EVENT_ACTION_RETRY action, to continue
- by re-entering the guest.
- 
- Specific data can follow these common structures.
+@@ -513,3 +513,26 @@ pause/stop/migrate the guest (see **Unhooking**) and the introspection
+ has been enabled for this event (see **KVMI_CONTROL_VM_EVENTS**).
+ The introspection tool has a chance to unhook and close the KVMI channel
+ (signaling that the operation can proceed).
 +
-+1. KVMI_EVENT_UNHOOK
-+--------------------
++2. KVMI_EVENT_CREATE_VCPU
++-------------------------
 +
-+:Architecture: all
++:Architectures: all
 +:Versions: >= 1
 +:Actions: CONTINUE, CRASH
 +:Parameters:
@@ -84,109 +82,131 @@ index 1ea4be0d5a45..28e1a1c80551 100644
 +
 +	struct kvmi_event;
 +
-+:Returns: none
++:Returns:
 +
-+This event is sent when the device manager (ie. QEMU) has to
-+pause/stop/migrate the guest (see **Unhooking**) and the introspection
-+has been enabled for this event (see **KVMI_CONTROL_VM_EVENTS**).
-+The introspection tool has a chance to unhook and close the KVMI channel
-+(signaling that the operation can proceed).
++::
++
++	struct kvmi_vcpu_hdr;
++	struct kvmi_event_reply;
++
++This event is sent when a new vCPU is created and the introspection has
++been enabled for this event (see *KVMI_CONTROL_VM_EVENTS*).
++
 diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
-index 0d3560b74f2d..7eda49bf65c4 100644
+index 7eda49bf65c4..d0d9adf5b6ed 100644
 --- a/virt/kvm/kvmi.c
 +++ b/virt/kvm/kvmi.c
-@@ -644,6 +644,9 @@ int kvmi_cmd_control_vm_events(struct kvmi *ikvm, unsigned int event_id,
+@@ -13,6 +13,7 @@
+ static struct kmem_cache *msg_cache;
+ static struct kmem_cache *job_cache;
  
- static void kvmi_job_abort(struct kvm_vcpu *vcpu, void *ctx)
- {
-+	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
-+
-+	ivcpu->reply_waiting = false;
++static bool kvmi_create_vcpu_event(struct kvm_vcpu *vcpu);
+ static void kvmi_abort_events(struct kvm *kvm);
+ 
+ void *kvmi_msg_alloc(void)
+@@ -150,6 +151,11 @@ static struct kvmi_job *kvmi_pull_job(struct kvmi_vcpu *ivcpu)
+ 	return job;
  }
  
- static void kvmi_abort_events(struct kvm *kvm)
-@@ -655,6 +658,34 @@ static void kvmi_abort_events(struct kvm *kvm)
- 		kvmi_add_job(vcpu, kvmi_job_abort, NULL, NULL);
- }
- 
-+static bool __kvmi_unhook_event(struct kvmi *ikvm)
++static void kvmi_job_create_vcpu(struct kvm_vcpu *vcpu, void *ctx)
 +{
-+	int err;
-+
-+	if (!test_bit(KVMI_EVENT_UNHOOK, ikvm->vm_ev_mask))
-+		return false;
-+
-+	err = kvmi_msg_send_unhook(ikvm);
-+
-+	return !err;
++	kvmi_create_vcpu_event(vcpu);
 +}
 +
-+static bool kvmi_unhook_event(struct kvm *kvm)
+ static bool alloc_ivcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvmi_vcpu *ivcpu;
+@@ -245,6 +251,9 @@ int kvmi_vcpu_init(struct kvm_vcpu *vcpu)
+ 		goto out;
+ 	}
+ 
++	if (kvmi_add_job(vcpu, kvmi_job_create_vcpu, NULL, NULL))
++		ret = -ENOMEM;
++
+ out:
+ 	kvmi_put(vcpu->kvm);
+ 
+@@ -330,6 +339,10 @@ int kvmi_hook(struct kvm *kvm, const struct kvm_introspection *qemu)
+ 			err = -ENOMEM;
+ 			goto err_alloc;
+ 		}
++		if (kvmi_add_job(vcpu, kvmi_job_create_vcpu, NULL, NULL)) {
++			err = -ENOMEM;
++			goto err_alloc;
++		}
+ 	}
+ 
+ 	/* interact with other kernel components after structure allocation */
+@@ -551,6 +564,40 @@ void kvmi_handle_common_event_actions(struct kvm_vcpu *vcpu, u32 action,
+ 	}
+ }
+ 
++static bool __kvmi_create_vcpu_event(struct kvm_vcpu *vcpu)
 +{
-+	struct kvmi *ikvm;
-+	bool ret = true;
++	u32 action;
++	bool ret = false;
 +
-+	ikvm = kvmi_get(kvm);
-+	if (!ikvm)
-+		return false;
-+
-+	ret = __kvmi_unhook_event(ikvm);
-+
-+	kvmi_put(kvm);
++	action = kvmi_msg_send_create_vcpu(vcpu);
++	switch (action) {
++	case KVMI_EVENT_ACTION_CONTINUE:
++		ret = true;
++		break;
++	default:
++		kvmi_handle_common_event_actions(vcpu, action, "CREATE");
++	}
 +
 +	return ret;
 +}
 +
- int kvmi_ioctl_unhook(struct kvm *kvm, bool force_reset)
++static bool kvmi_create_vcpu_event(struct kvm_vcpu *vcpu)
++{
++	struct kvmi *ikvm;
++	bool ret = true;
++
++	ikvm = kvmi_get(vcpu->kvm);
++	if (!ikvm)
++		return true;
++
++	if (test_bit(KVMI_EVENT_CREATE_VCPU, ikvm->vm_ev_mask))
++		ret = __kvmi_create_vcpu_event(vcpu);
++
++	kvmi_put(vcpu->kvm);
++
++	return ret;
++}
++
+ void kvmi_run_jobs(struct kvm_vcpu *vcpu)
  {
- 	struct kvmi *ikvm;
-@@ -664,7 +695,8 @@ int kvmi_ioctl_unhook(struct kvm *kvm, bool force_reset)
- 	if (!ikvm)
- 		return -EFAULT;
- 
--	kvm_info("TODO: %s force_reset %d", __func__, force_reset);
-+	if (!force_reset && !kvmi_unhook_event(kvm))
-+		err = -ENOENT;
- 
- 	kvmi_put(kvm);
- 
+ 	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
 diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-index 70c8ca0343a3..9750a9b9902b 100644
+index 9750a9b9902b..c21f0fd5e16c 100644
 --- a/virt/kvm/kvmi_int.h
 +++ b/virt/kvm/kvmi_int.h
 @@ -123,6 +123,7 @@ bool kvmi_sock_get(struct kvmi *ikvm, int fd);
  void kvmi_sock_shutdown(struct kvmi *ikvm);
  void kvmi_sock_put(struct kvmi *ikvm);
  bool kvmi_msg_process(struct kvmi *ikvm);
-+int kvmi_msg_send_unhook(struct kvmi *ikvm);
++u32 kvmi_msg_send_create_vcpu(struct kvm_vcpu *vcpu);
+ int kvmi_msg_send_unhook(struct kvmi *ikvm);
  
  /* kvmi.c */
- void *kvmi_msg_alloc(void);
 diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index 536034e1bea7..0c7c1e968007 100644
+index 0c7c1e968007..8e8af572a4f4 100644
 --- a/virt/kvm/kvmi_msg.c
 +++ b/virt/kvm/kvmi_msg.c
-@@ -705,3 +705,23 @@ int kvmi_send_event(struct kvm_vcpu *vcpu, u32 ev_id,
- 	return err;
- }
+@@ -725,3 +725,15 @@ int kvmi_msg_send_unhook(struct kvmi *ikvm)
  
-+int kvmi_msg_send_unhook(struct kvmi *ikvm)
+ 	return kvmi_sock_write(ikvm, vec, n, msg_size);
+ }
++
++u32 kvmi_msg_send_create_vcpu(struct kvm_vcpu *vcpu)
 +{
-+	struct kvmi_msg_hdr hdr;
-+	struct kvmi_event common;
-+	struct kvec vec[] = {
-+		{.iov_base = &hdr,	.iov_len = sizeof(hdr)	 },
-+		{.iov_base = &common,	.iov_len = sizeof(common)},
-+	};
-+	size_t msg_size = sizeof(hdr) + sizeof(common);
-+	size_t n = ARRAY_SIZE(vec);
++	int err, action;
 +
-+	memset(&hdr, 0, sizeof(hdr));
-+	hdr.id = KVMI_EVENT;
-+	hdr.seq = new_seq(ikvm);
-+	hdr.size = msg_size - sizeof(hdr);
++	err = kvmi_send_event(vcpu, KVMI_EVENT_CREATE_VCPU, NULL, 0,
++			      NULL, 0, &action);
++	if (err)
++		return KVMI_EVENT_ACTION_CONTINUE;
 +
-+	kvmi_setup_event_common(&common, KVMI_EVENT_UNHOOK, 0);
-+
-+	return kvmi_sock_write(ikvm, vec, n, msg_size);
++	return action;
 +}
