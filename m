@@ -2,89 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E97E8736E
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:49:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1FDF87381
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:53:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405922AbfHIHtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 03:49:07 -0400
-Received: from foss.arm.com ([217.140.110.172]:42812 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405811AbfHIHtG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 03:49:06 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DDA3344;
-        Fri,  9 Aug 2019 00:49:06 -0700 (PDT)
-Received: from why.lan (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D509C3F706;
-        Fri,  9 Aug 2019 00:49:04 -0700 (PDT)
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: [PATCH 4/4] KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable
-Date:   Fri,  9 Aug 2019 08:48:32 +0100
-Message-Id: <20190809074832.13283-5-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190809074832.13283-1-maz@kernel.org>
-References: <20190809074832.13283-1-maz@kernel.org>
+        id S2405885AbfHIHxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 03:53:21 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:39402 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405811AbfHIHxV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 03:53:21 -0400
+Received: by mail-lj1-f194.google.com with SMTP id v18so91185350ljh.6
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 00:53:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GqqiFOTILayCWP92aAvbU7rZYbJzYJq2hFWqssnZfow=;
+        b=nY8IF2S8A3L3Vuay9KDIsTtuFYPZeeklDr8dKII6lyiCdYnIje0PkqQD6KT7a8QWHU
+         4FUv3TSucrFG98xqdbHX/fz/oYdj+KcmhxIwu8wKAtss6gbGo71dbqGgeWzg90cnNTLd
+         daAxPNFCgGaViq4pcXkR0d3YXrO3QvcYqJLrUvOmGL94qGQ59Qp7Xv4ryXeG5I2fMJ+M
+         RYNGCai1CaOieNia2IDUnrL3GIqtVgZc/GqiIUa3v0hJ0AeNWaNOq2pWS/Vu4XzMDeyG
+         iuvJ/pFULgifhSM/dP60F1hCYQ+lhZ8YerE+lgkMmWp/Rib29Nj7JqNyN1P8uIoH04Es
+         rtlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GqqiFOTILayCWP92aAvbU7rZYbJzYJq2hFWqssnZfow=;
+        b=Tlaqrw25Qcu9I/CJieruJCUu5Cgg5SkdELF4eSABd+9e6oVdWTolYFmRq60/mjmSQa
+         52nbdp0y7Fm5ebRQ6h4omE+vV57Ix7c7bQqANcdRA1HoV0K3jxirh2qZk1qny3ErVt4O
+         9LCiM6QhnPWHMDce4sLo8plzEdiIkl1h4j8a8kR8ChhAV/YVo8VTKKMxEfTlru6h2VUh
+         Kjuen2LCAH3iLgfZDD+s+wuuC7NoOcRsMgKV08Q8eyrlcdqTP961+WE4scz2cVLd+Snn
+         4OfNU9oTsNFPGlwdwB/DpH49fCfX0N1XFrmqqJwFepky2Zxbv+emdXO2mIZETodjv9SY
+         fyEQ==
+X-Gm-Message-State: APjAAAW+nIuXde4aTxmJGc0ofpLUiZZvo1X7gTAx9X3ScIrviJVrG+IN
+        lcd4PsnXDh46Y86L0PEIeI2JkwQjDcCv8+xRwWDhug==
+X-Google-Smtp-Source: APXvYqxFQuHM3xYJAfyF6kQS8ItALDrQIiaCIj4v6PZYeYPQwqRCeQNlySydBHuBNvEurL5a+9vQM3W8O0NVFX8Igw4=
+X-Received: by 2002:a2e:87d0:: with SMTP id v16mr10709810ljj.24.1565337199321;
+ Fri, 09 Aug 2019 00:53:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190809072415.29305-1-naresh.kamboju@linaro.org> <0a0e0563-aba7-e59c-1fbd-547126d404ed@redhat.com>
+In-Reply-To: <0a0e0563-aba7-e59c-1fbd-547126d404ed@redhat.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Fri, 9 Aug 2019 13:23:08 +0530
+Message-ID: <CA+G9fYt4QPjHtyoZUfe_tv+uT6yybHehymuDWBFHL-QH3K-PxA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] selftests: kvm: Adding config fragments
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Shuah Khan <shuah@kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        sean.j.christopherson@intel.com,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>, kvm list <kvm@vger.kernel.org>,
+        Dan Rue <dan.rue@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+On Fri, 9 Aug 2019 at 13:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 09/08/19 09:24, Naresh Kamboju wrote:
+> > selftests kvm all test cases need pre-required kernel config for the
+> > tests to get pass.
+> >
+> > CONFIG_KVM=y
+> >
+> > The KVM tests are skipped without these configs:
+> >
+> >         dev_fd = open(KVM_DEV_PATH, O_RDONLY);
+> >         if (dev_fd < 0)
+> >                 exit(KSFT_SKIP);
+> >
+> > Signed-off-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> > Acked-by: Shuah Khan <skhan@linuxfoundation.org>
+> > ---
+> >  tools/testing/selftests/kvm/config | 1 +
+> >  1 file changed, 1 insertion(+)
+> >  create mode 100644 tools/testing/selftests/kvm/config
+> >
+> > diff --git a/tools/testing/selftests/kvm/config b/tools/testing/selftests/kvm/config
+> > new file mode 100644
+> > index 000000000000..14f90d8d6801
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/config
+> > @@ -0,0 +1 @@
+> > +CONFIG_KVM=y
+> >
+>
+> I think this is more complicated without a real benefit, so I'll merge v2.
 
-A HW mapped level sensitive interrupt asserted by a device will not be put
-into the ap_list if it is disabled at the VGIC level. When it is enabled
-again, it will be inserted into the ap_list and written to a list register
-on guest entry regardless of the state of the device.
-
-We could argue that this can also happen on real hardware, when the command
-to enable the interrupt reached the GIC before the device had the chance to
-de-assert the interrupt signal; however, we emulate the distributor and
-redistributors in software and we can do better than that.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+With the recent changes to 'kselftest-merge' nested configs also get merged.
+Please refer this below commit for more details.
 ---
- virt/kvm/arm/vgic/vgic-mmio.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+commit 6d3db46c8e331908775b0135dc7d2e5920bf6d90
+Author: Dan Rue <dan.rue@linaro.org>
+Date:   Mon May 20 10:16:14 2019 -0500
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 3ba7278fb533..44efc2ff863f 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -113,6 +113,22 @@ void vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
- 		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+		if (vgic_irq_is_mapped_level(irq)) {
-+			bool was_high = irq->line_level;
-+
-+			/*
-+			 * We need to update the state of the interrupt because
-+			 * the guest might have changed the state of the device
-+			 * while the interrupt was disabled at the VGIC level.
-+			 */
-+			irq->line_level = vgic_get_phys_line_level(irq);
-+			/*
-+			 * Deactivate the physical interrupt so the GIC will let
-+			 * us know when it is asserted again.
-+			 */
-+			if (!irq->active && was_high && !irq->line_level)
-+				vgic_irq_set_phys_active(irq, false);
-+		}
- 		irq->enabled = true;
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 
--- 
-2.20.1
+    kbuild: teach kselftest-merge to find nested config files
 
+    Current implementation of kselftest-merge only finds config files that
+    are one level deep using `$(srctree)/tools/testing/selftests/*/config`.
+
+    Often, config files are added in nested directories, and do not get
+    picked up by kselftest-merge.
+
+    Use `find` to catch all config files under
+    `$(srctree)/tools/testing/selftests` instead.
+
+    Signed-off-by: Dan Rue <dan.rue@linaro.org>
+    Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+- Naresh
