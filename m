@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2555387FB0
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:20:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D37387FA6
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:20:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437283AbfHIQUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:20:44 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53298 "EHLO
+        id S2437259AbfHIQUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:20:18 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53320 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2407411AbfHIQT5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:19:57 -0400
+        by vger.kernel.org with ESMTP id S2437092AbfHIQUB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:20:01 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 075DE305D3DA;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 49B84305D3DC;
         Fri,  9 Aug 2019 19:00:59 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 92936305B7A5;
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id F37DF305B7A0;
         Fri,  9 Aug 2019 19:00:58 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
@@ -32,11 +32,10 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Weijiang Yang <weijiang.yang@intel.com>, Zhang@vger.kernel.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
-        =?UTF-8?q?Mircea=20C=C3=AErjaliu?= <mcirjaliu@bitdefender.com>
-Subject: [RFC PATCH v6 19/92] kvm: introspection: add KVMI_EVENT_CREATE_VCPU
-Date:   Fri,  9 Aug 2019 18:59:34 +0300
-Message-Id: <20190809160047.8319-20-alazar@bitdefender.com>
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
+Subject: [RFC PATCH v6 20/92] kvm: introspection: add KVMI_GET_VCPU_INFO
+Date:   Fri,  9 Aug 2019 18:59:35 +0300
+Message-Id: <20190809160047.8319-21-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -47,166 +46,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
+From: Mihai Donțu <mdontu@bitdefender.com>
 
-This event is sent when a vCPU is ready to be introspected.
+For now, this command returns the TSC frequency (in HZ) for the specified
+vCPU if available (otherwise it returns zero).
 
-Signed-off-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
-Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
+Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst | 23 +++++++++++++++
- virt/kvm/kvmi.c                    | 47 ++++++++++++++++++++++++++++++
- virt/kvm/kvmi_int.h                |  1 +
- virt/kvm/kvmi_msg.c                | 12 ++++++++
- 4 files changed, 83 insertions(+)
+ Documentation/virtual/kvm/kvmi.rst | 29 +++++++++++++++++++++++++++++
+ arch/x86/kvm/kvmi.c                | 12 ++++++++++++
+ include/uapi/linux/kvmi.h          |  4 ++++
+ virt/kvm/kvmi_int.h                |  2 ++
+ virt/kvm/kvmi_msg.c                | 14 ++++++++++++++
+ 5 files changed, 61 insertions(+)
 
 diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index 28e1a1c80551..b29cd1b80b4f 100644
+index b29cd1b80b4f..71897338e85a 100644
 --- a/Documentation/virtual/kvm/kvmi.rst
 +++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -513,3 +513,26 @@ pause/stop/migrate the guest (see **Unhooking**) and the introspection
- has been enabled for this event (see **KVMI_CONTROL_VM_EVENTS**).
- The introspection tool has a chance to unhook and close the KVMI channel
- (signaling that the operation can proceed).
-+
-+2. KVMI_EVENT_CREATE_VCPU
-+-------------------------
+@@ -427,6 +427,35 @@ in almost all cases, it must reply with: continue, retry, crash, etc.
+ * -KVM_EINVAL - padding is not zero
+ * -KVM_EPERM - the access is restricted by the host
+ 
++7. KVMI_GET_VCPU_INFO
++---------------------
 +
 +:Architectures: all
 +:Versions: >= 1
-+:Actions: CONTINUE, CRASH
 +:Parameters:
 +
 +::
 +
-+	struct kvmi_event;
++	struct kvmi_vcpu_hdr;
 +
 +:Returns:
 +
 +::
 +
-+	struct kvmi_vcpu_hdr;
-+	struct kvmi_event_reply;
++	struct kvmi_error_code;
++	struct kvmi_get_vcpu_info_reply {
++		__u64 tsc_speed;
++	};
 +
-+This event is sent when a new vCPU is created and the introspection has
-+been enabled for this event (see *KVMI_CONTROL_VM_EVENTS*).
++Returns the TSC frequency (in HZ) for the specified vCPU if available
++(otherwise it returns zero).
 +
-diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
-index 7eda49bf65c4..d0d9adf5b6ed 100644
---- a/virt/kvm/kvmi.c
-+++ b/virt/kvm/kvmi.c
-@@ -13,6 +13,7 @@
- static struct kmem_cache *msg_cache;
- static struct kmem_cache *job_cache;
++:Errors:
++
++* -KVM_EINVAL - the selected vCPU is invalid
++* -KVM_EINVAL - padding is not zero
++* -KVM_EAGAIN - the selected vCPU can't be introspected yet
++
+ Events
+ ======
  
-+static bool kvmi_create_vcpu_event(struct kvm_vcpu *vcpu);
- static void kvmi_abort_events(struct kvm *kvm);
- 
- void *kvmi_msg_alloc(void)
-@@ -150,6 +151,11 @@ static struct kvmi_job *kvmi_pull_job(struct kvmi_vcpu *ivcpu)
- 	return job;
+diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
+index 9aecca551673..97c72cdc6fb0 100644
+--- a/arch/x86/kvm/kvmi.c
++++ b/arch/x86/kvm/kvmi.c
+@@ -90,3 +90,15 @@ void kvmi_arch_setup_event(struct kvm_vcpu *vcpu, struct kvmi_event *ev)
+ 	ev->arch.mode = kvmi_vcpu_mode(vcpu, &event->sregs);
+ 	kvmi_get_msrs(vcpu, event);
  }
- 
-+static void kvmi_job_create_vcpu(struct kvm_vcpu *vcpu, void *ctx)
++
++int kvmi_arch_cmd_get_vcpu_info(struct kvm_vcpu *vcpu,
++				struct kvmi_get_vcpu_info_reply *rpl)
 +{
-+	kvmi_create_vcpu_event(vcpu);
++	if (kvm_has_tsc_control)
++		rpl->tsc_speed = 1000ul * vcpu->arch.virtual_tsc_khz;
++	else
++		rpl->tsc_speed = 0;
++
++	return 0;
 +}
 +
- static bool alloc_ivcpu(struct kvm_vcpu *vcpu)
- {
- 	struct kvmi_vcpu *ivcpu;
-@@ -245,6 +251,9 @@ int kvmi_vcpu_init(struct kvm_vcpu *vcpu)
- 		goto out;
- 	}
+diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
+index ccf2239b5db4..aa5bc909e278 100644
+--- a/include/uapi/linux/kvmi.h
++++ b/include/uapi/linux/kvmi.h
+@@ -112,6 +112,10 @@ struct kvmi_get_guest_info_reply {
+ 	__u32 padding[3];
+ };
  
-+	if (kvmi_add_job(vcpu, kvmi_job_create_vcpu, NULL, NULL))
-+		ret = -ENOMEM;
++struct kvmi_get_vcpu_info_reply {
++	__u64 tsc_speed;
++};
 +
- out:
- 	kvmi_put(vcpu->kvm);
- 
-@@ -330,6 +339,10 @@ int kvmi_hook(struct kvm *kvm, const struct kvm_introspection *qemu)
- 			err = -ENOMEM;
- 			goto err_alloc;
- 		}
-+		if (kvmi_add_job(vcpu, kvmi_job_create_vcpu, NULL, NULL)) {
-+			err = -ENOMEM;
-+			goto err_alloc;
-+		}
- 	}
- 
- 	/* interact with other kernel components after structure allocation */
-@@ -551,6 +564,40 @@ void kvmi_handle_common_event_actions(struct kvm_vcpu *vcpu, u32 action,
- 	}
- }
- 
-+static bool __kvmi_create_vcpu_event(struct kvm_vcpu *vcpu)
-+{
-+	u32 action;
-+	bool ret = false;
-+
-+	action = kvmi_msg_send_create_vcpu(vcpu);
-+	switch (action) {
-+	case KVMI_EVENT_ACTION_CONTINUE:
-+		ret = true;
-+		break;
-+	default:
-+		kvmi_handle_common_event_actions(vcpu, action, "CREATE");
-+	}
-+
-+	return ret;
-+}
-+
-+static bool kvmi_create_vcpu_event(struct kvm_vcpu *vcpu)
-+{
-+	struct kvmi *ikvm;
-+	bool ret = true;
-+
-+	ikvm = kvmi_get(vcpu->kvm);
-+	if (!ikvm)
-+		return true;
-+
-+	if (test_bit(KVMI_EVENT_CREATE_VCPU, ikvm->vm_ev_mask))
-+		ret = __kvmi_create_vcpu_event(vcpu);
-+
-+	kvmi_put(vcpu->kvm);
-+
-+	return ret;
-+}
-+
- void kvmi_run_jobs(struct kvm_vcpu *vcpu)
- {
- 	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
+ struct kvmi_control_vm_events {
+ 	__u16 event_id;
+ 	__u8 enable;
 diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-index 9750a9b9902b..c21f0fd5e16c 100644
+index c21f0fd5e16c..7cff91bc1acc 100644
 --- a/virt/kvm/kvmi_int.h
 +++ b/virt/kvm/kvmi_int.h
-@@ -123,6 +123,7 @@ bool kvmi_sock_get(struct kvmi *ikvm, int fd);
- void kvmi_sock_shutdown(struct kvmi *ikvm);
- void kvmi_sock_put(struct kvmi *ikvm);
- bool kvmi_msg_process(struct kvmi *ikvm);
-+u32 kvmi_msg_send_create_vcpu(struct kvm_vcpu *vcpu);
- int kvmi_msg_send_unhook(struct kvmi *ikvm);
+@@ -139,5 +139,7 @@ int kvmi_add_job(struct kvm_vcpu *vcpu,
  
- /* kvmi.c */
+ /* arch */
+ void kvmi_arch_setup_event(struct kvm_vcpu *vcpu, struct kvmi_event *ev);
++int kvmi_arch_cmd_get_vcpu_info(struct kvm_vcpu *vcpu,
++				struct kvmi_get_vcpu_info_reply *rpl);
+ 
+ #endif
 diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index 0c7c1e968007..8e8af572a4f4 100644
+index 8e8af572a4f4..3372d8c7e74f 100644
 --- a/virt/kvm/kvmi_msg.c
 +++ b/virt/kvm/kvmi_msg.c
-@@ -725,3 +725,15 @@ int kvmi_msg_send_unhook(struct kvmi *ikvm)
+@@ -28,6 +28,7 @@ static const char *const msg_IDs[] = {
+ 	[KVMI_EVENT]                 = "KVMI_EVENT",
+ 	[KVMI_EVENT_REPLY]           = "KVMI_EVENT_REPLY",
+ 	[KVMI_GET_GUEST_INFO]        = "KVMI_GET_GUEST_INFO",
++	[KVMI_GET_VCPU_INFO]         = "KVMI_GET_VCPU_INFO",
+ 	[KVMI_GET_VERSION]           = "KVMI_GET_VERSION",
+ };
  
- 	return kvmi_sock_write(ikvm, vec, n, msg_size);
+@@ -390,6 +391,18 @@ static int handle_event_reply(struct kvm_vcpu *vcpu,
+ 	return expected->error;
  }
-+
-+u32 kvmi_msg_send_create_vcpu(struct kvm_vcpu *vcpu)
+ 
++static int handle_get_vcpu_info(struct kvm_vcpu *vcpu,
++				const struct kvmi_msg_hdr *msg,
++				const void *req, vcpu_reply_fct reply_cb)
 +{
-+	int err, action;
++	struct kvmi_get_vcpu_info_reply rpl;
 +
-+	err = kvmi_send_event(vcpu, KVMI_EVENT_CREATE_VCPU, NULL, 0,
-+			      NULL, 0, &action);
-+	if (err)
-+		return KVMI_EVENT_ACTION_CONTINUE;
++	memset(&rpl, 0, sizeof(rpl));
++	kvmi_arch_cmd_get_vcpu_info(vcpu, &rpl);
 +
-+	return action;
++	return reply_cb(vcpu, msg, 0, &rpl, sizeof(rpl));
 +}
++
+ /*
+  * These commands are executed on the vCPU thread. The receiving thread
+  * passes the messages using a newly allocated 'struct kvmi_vcpu_cmd'
+@@ -400,6 +413,7 @@ static int(*const msg_vcpu[])(struct kvm_vcpu *,
+ 			      const struct kvmi_msg_hdr *, const void *,
+ 			      vcpu_reply_fct) = {
+ 	[KVMI_EVENT_REPLY]      = handle_event_reply,
++	[KVMI_GET_VCPU_INFO]    = handle_get_vcpu_info,
+ };
+ 
+ static void kvmi_job_vcpu_cmd(struct kvm_vcpu *vcpu, void *_ctx)
