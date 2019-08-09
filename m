@@ -2,81 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53ECB872D0
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:19:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEBA2872E2
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:24:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405711AbfHIHTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 03:19:23 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38016 "EHLO
+        id S2405686AbfHIHYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 03:24:23 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54918 "EHLO
         mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405664AbfHIHTW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 03:19:22 -0400
-Received: by mail-wm1-f68.google.com with SMTP id m125so602670wmm.3;
-        Fri, 09 Aug 2019 00:19:21 -0700 (PDT)
+        with ESMTP id S1727040AbfHIHYW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 03:24:22 -0400
+Received: by mail-wm1-f68.google.com with SMTP id p74so4646246wme.4
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 00:24:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=Vz75i2RTvhUJa5g/9yEomMKKQAza1FcKyAdc6BXdIz4=;
-        b=fZhSoo2XgAJGnYA6RXKxk4XccYB41qWDwO4vKG5SPzL1nXWjkbLKgG2uFeCc+RGqVg
-         mhA+oa47b3Ed2IckmD+yW7mtLuyPikQ9DU0oCykKzO986yOa+zguNyR+B+Oyzfpq6a9T
-         fJ4TRjHNcPgfKcU51GuEj0u8q8h9BAyMFSPW6INMYczY1repivftEu3pH4ESGPi42Vna
-         Eg/188GV3vJqjOL5b54dT88PnU5MdOZ+avjFdXbJlE/T1HFx5DR8+P3svAFV+gK0mN/f
-         FS0SCEx6WxZW5Hy90DNjcKRbuyuifyZxmRI0Fs/YbeaJIQZxdZpkar2VKORU/kbQZfHC
-         kj+A==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=C5YgxiRdWg1QeF0RKI1Qt9EbdjzocEjmRbp/WRepaaE=;
+        b=y6iGPlilN8Si8QhpWCJ9jAq3We6ZMX7x6l04tVExxbpkgl4qKg9Dj98hDdVl7XWf8y
+         PV3WfvEwgUvjE7oGBt/zg5N+39uCB7dUHoUdKPCtiLHMgrKvCYxNX2PhKBSjqFWwgGzp
+         6Qz/slTlHhh8Hrpf6CVmmYFnCBm0Xd/j2crNXq78Dy4j9qQDyafXTpX1rD1XFAwPTqyA
+         eKbxucva1RMOlQQ6OpUGTEpxL29e5/jioOouxU4KYUjFKudIJaxLhzNkDHqieMfkZNOU
+         E3HlzzQ9vbOJSbVzD6y9s/gyAQpxQDe+yyf4X2R6KRsl5tWkHBNOY00kybUw7UWKOdCx
+         mHUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=Vz75i2RTvhUJa5g/9yEomMKKQAza1FcKyAdc6BXdIz4=;
-        b=G/EiDw4Qa+yFmOkrpulzHAfcjRagjUmICAYfTbSyp9xDsS5X8TTkto9D1qHBuCVTvz
-         y6IjdGJ+OoyXxC9kul40Gx4myvLra3fEbVSysinxEDxFap65yBUEAqz+62BdSBhFevoX
-         svbxAx+T5mqcgLKi7fcoyp4tz9Q3+8Yo/61Z2O/FFebGP7VWFifQlzqxRJr+DwYKjXeH
-         UZm5/FGOvUl3p0I7u3feuTKfR62EarF8IIKNhIQGBwYnRhkL8iGb/DwMASyCayA7GuI6
-         3X0NJJg7j/lHUM3TmaoXFttfxm+OKt4W2ShSuxYtk4mT6dxuWU2/nzp+adZjb1/574Cj
-         bywA==
-X-Gm-Message-State: APjAAAURiWFBykifJ1f0hrtQjQVaLAqSrCR5Ba7HnRnbDKveoMoltqBQ
-        N1GmoQtsHxVEMCVpw9HOTvUNdT40
-X-Google-Smtp-Source: APXvYqwp+9XJ5xl3RIvMkHOPPPYbtfw6fOO//jyrZnMBeqMEUI2L5Nput20D3n5kUIOlj9sAQ4u13Q==
-X-Received: by 2002:a1c:c706:: with SMTP id x6mr7402591wmf.104.1565335160191;
-        Fri, 09 Aug 2019 00:19:20 -0700 (PDT)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id f10sm1503270wrm.31.2019.08.09.00.19.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 09 Aug 2019 00:19:19 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH] MAINTAINERS: change list for KVM/s390
-Date:   Fri,  9 Aug 2019 09:19:16 +0200
-Message-Id: <1565335156-28660-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=C5YgxiRdWg1QeF0RKI1Qt9EbdjzocEjmRbp/WRepaaE=;
+        b=rXz7/yhsHJ7O7AOAcxaz9JjhZEdFogcfnQAIHTJAsNWK+RoKIZLGAI3cub/UAg3gVR
+         figNL+bgapB+DydKMouD1OPy6CVZfoC2CZF77na/T9OODrrPKF/zsnnb2N+CiHtqfyHD
+         d777AylwDJJwJFLhoX+IGH8HLhENI3ni1E5TTDOO5FOFBjtVUkPljEijKZ28pNPuZy6s
+         nx1j5MyqwshrkRE/Pw6MJbdoCvSg2VaR1P3tLSFRstxDCOvVUHYNYI0YQna5HKsXgwgo
+         kQ3J0OxSgIjtAuI9YIDU65ObzLgGi/OAtHUSlk0PpRz7k/82+bsqLmvzqsAFtYKkRwPz
+         WL3Q==
+X-Gm-Message-State: APjAAAVW7+IWEwi2aMpRghKdtzSdhbeT7cBJieoGzbAZIlWO37v7FGcJ
+        ef9qr8/rQPh+RwzFpgdkHMUiEg==
+X-Google-Smtp-Source: APXvYqzY/NrXDMMzWYfoIwzHh3sPo0P5ORJ4j0cOgeIwUdZDRDI4SZtMfr6mDW9pMufCtCpKa+OJ4Q==
+X-Received: by 2002:a1c:cfc3:: with SMTP id f186mr8407951wmg.134.1565335460541;
+        Fri, 09 Aug 2019 00:24:20 -0700 (PDT)
+Received: from hackbox2.linaroharston ([81.128.185.34])
+        by smtp.gmail.com with ESMTPSA id p13sm26232705wrw.90.2019.08.09.00.24.19
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 09 Aug 2019 00:24:19 -0700 (PDT)
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+To:     naresh.kamboju@linaro.org, pbonzini@redhat.com, shuah@kernel.org
+Cc:     linux-kernel@vger.kernel.org, drjones@redhat.com,
+        sean.j.christopherson@intel.com, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH v3 1/2] selftests: kvm: Adding config fragments
+Date:   Fri,  9 Aug 2019 08:24:14 +0100
+Message-Id: <20190809072415.29305-1-naresh.kamboju@linaro.org>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM/s390 does not have a list of its own, and linux-s390 is in the
-loop anyway thanks to the generic arch/s390 match.  So use the generic
-KVM list for s390 patches.
+selftests kvm all test cases need pre-required kernel config for the
+tests to get pass.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+CONFIG_KVM=y
+
+The KVM tests are skipped without these configs:
+
+        dev_fd = open(KVM_DEV_PATH, O_RDONLY);
+        if (dev_fd < 0)
+                exit(KSFT_SKIP);
+
+Signed-off-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Acked-by: Shuah Khan <skhan@linuxfoundation.org>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/config | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 tools/testing/selftests/kvm/config
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1aec93695040..6498ebaca2f6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8788,7 +8788,7 @@ M:	Christian Borntraeger <borntraeger@de.ibm.com>
- M:	Janosch Frank <frankja@linux.ibm.com>
- R:	David Hildenbrand <david@redhat.com>
- R:	Cornelia Huck <cohuck@redhat.com>
--L:	linux-s390@vger.kernel.org
-+L:	kvm@vger.kernel.org
- W:	http://www.ibm.com/developerworks/linux/linux390/
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git
- S:	Supported
+diff --git a/tools/testing/selftests/kvm/config b/tools/testing/selftests/kvm/config
+new file mode 100644
+index 000000000000..14f90d8d6801
+--- /dev/null
++++ b/tools/testing/selftests/kvm/config
+@@ -0,0 +1 @@
++CONFIG_KVM=y
 -- 
-1.8.3.1
+2.17.1
 
