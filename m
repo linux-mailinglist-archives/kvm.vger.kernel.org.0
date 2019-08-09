@@ -2,132 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E08F587439
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 10:34:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 448A4874B4
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 11:00:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405818AbfHIIel (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 04:34:41 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38264 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726054AbfHIIek (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 04:34:40 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id DD89FAE49;
-        Fri,  9 Aug 2019 08:34:36 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id DC04B1E437E; Fri,  9 Aug 2019 10:34:35 +0200 (CEST)
-Date:   Fri, 9 Aug 2019 10:34:35 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     Michal Hocko <mhocko@kernel.org>, Jan Kara <jack@suse.cz>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Matthew Wilcox <willy@infradead.org>, john.hubbard@gmail.com,
-        Andrew Morton <akpm@linux-foundation.org>,
+        id S2406049AbfHIJAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 05:00:25 -0400
+Received: from foss.arm.com ([217.140.110.172]:43754 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405974AbfHIJAZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 05:00:25 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F595344;
+        Fri,  9 Aug 2019 02:00:24 -0700 (PDT)
+Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 796343F706;
+        Fri,  9 Aug 2019 02:00:19 -0700 (PDT)
+Date:   Fri, 9 Aug 2019 10:00:17 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Will Deacon <will@kernel.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        dri-devel@lists.freedesktop.org,
+        Kostya Serebryany <kcc@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
         Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-Message-ID: <20190809083435.GA17568@quack2.suse.cz>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802091244.GD6461@dhcp22.suse.cz>
- <20190802124146.GL25064@quack2.suse.cz>
- <20190802142443.GB5597@bombadil.infradead.org>
- <20190802145227.GQ25064@quack2.suse.cz>
- <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
- <20190807083726.GA14658@quack2.suse.cz>
- <20190807084649.GQ11812@dhcp22.suse.cz>
- <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
+Message-ID: <20190809090016.GA23083@arrakis.emea.arm.com>
+References: <cover.1563904656.git.andreyknvl@google.com>
+ <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
+ <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
+ <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
+ <20190724142059.GC21234@fuggles.cambridge.arm.com>
+ <20190806171335.4dzjex5asoertaob@willie-the-truck>
+ <CAAeHK+zF01mxU+PkEYLkoVu-ZZM6jNfL_OwMJKRwLr-sdU4Myg@mail.gmail.com>
+ <201908081410.C16D2BD@keescook>
+ <20190808153300.09d3eb80772515f0ea062833@linux-foundation.org>
+ <201908081608.A4F6711@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
+In-Reply-To: <201908081608.A4F6711@keescook>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed 07-08-19 19:36:37, Ira Weiny wrote:
-> On Wed, Aug 07, 2019 at 10:46:49AM +0200, Michal Hocko wrote:
-> > > So I think your debug option and my suggested renaming serve a bit
-> > > different purposes (and thus both make sense). If you do the renaming, you
-> > > can just grep to see unconverted sites. Also when someone merges new GUP
-> > > user (unaware of the new rules) while you switch GUP to use pins instead of
-> > > ordinary references, you'll get compilation error in case of renaming
-> > > instead of hard to debug refcount leak without the renaming. And such
-> > > conflict is almost bound to happen given the size of GUP patch set... Also
-> > > the renaming serves against the "coding inertia" - i.e., GUP is around for
-> > > ages so people just use it without checking any documentation or comments.
-> > > After switching how GUP works, what used to be correct isn't anymore so
-> > > renaming the function serves as a warning that something has really
-> > > changed.
+On Thu, Aug 08, 2019 at 04:09:04PM -0700, Kees Cook wrote:
+> On Thu, Aug 08, 2019 at 03:33:00PM -0700, Andrew Morton wrote:
+> > On Thu, 8 Aug 2019 14:12:19 -0700 Kees Cook <keescook@chromium.org> wrote:
 > > 
-> > Fully agreed!
+> > > > The ones that are left are the mm ones: 4, 5, 6, 7 and 8.
+> > > > 
+> > > > Andrew, could you take a look and give your Acked-by or pick them up directly?
+> > > 
+> > > Given the subsystem Acks, it seems like 3-10 and 12 could all just go
+> > > via Andrew? I hope he agrees. :)
+> > 
+> > I'll grab everything that has not yet appeared in linux-next.  If more
+> > of these patches appear in linux-next I'll drop those as well.
+> > 
+> > The review discussion against " [PATCH v19 02/15] arm64: Introduce
+> > prctl() options to control the tagged user addresses ABI" has petered
+> > out inconclusively.  prctl() vs arch_prctl().
 > 
-> Ok Prior to this I've been basing all my work for the RDMA/FS DAX stuff in
-> Johns put_user_pages()...  (Including when I proposed failing truncate with a
-> lease in June [1])
-> 
-> However, based on the suggestions in that thread it became clear that a new
-> interface was going to need to be added to pass in the "RDMA file" information
-> to GUP to associate file pins with the correct processes...
-> 
-> I have many drawings on my white board with "a whole lot of lines" on them to
-> make sure that if a process opens a file, mmaps it, pins it with RDMA, _closes_
-> it, and ummaps it; that the resulting file pin can still be traced back to the
-> RDMA context and all the processes which may have access to it....  No matter
-> where the original context may have come from.  I believe I have accomplished
-> that.
-> 
-> Before I go on, I would like to say that the "imbalance" of get_user_pages()
-> and put_page() bothers me from a purist standpoint...  However, since this
-> discussion cropped up I went ahead and ported my work to Linus' current master
-> (5.3-rc3+) and in doing so I only had to steal a bit of Johns code...  Sorry
-> John...  :-(
-> 
-> I don't have the commit messages all cleaned up and I know there may be some
-> discussion on these new interfaces but I wanted to throw this series out there
-> because I think it may be what Jan and Michal are driving at (or at least in
-> that direction.
-> 
-> Right now only RDMA and DAX FS's are supported.  Other users of GUP will still
-> fail on a DAX file and regular files will still be at risk.[2]
-> 
-> I've pushed this work (based 5.3-rc3+ (33920f1ec5bf)) here[3]:
-> 
-> https://github.com/weiny2/linux-kernel/tree/linus-rdmafsdax-b0-v3
-> 
-> I think the most relevant patch to this conversation is:
-> 
-> https://github.com/weiny2/linux-kernel/commit/5d377653ba5cf11c3b716f904b057bee6641aaf6
-> 
-> I stole Jans suggestion for a name as the name I used while prototyping was
-> pretty bad...  So Thanks Jan...  ;-)
+> I've always disliked arch_prctl() existing at all. Given that tagging is
+> likely to be a multi-architectural feature, it seems like the controls
+> should live in prctl() to me.
 
-For your function, I'd choose a name like vaddr_pin_leased_pages() so that
-association with a lease is clear from the name :) Also I'd choose the
-counterpart to be vaddr_unpin_leased_page[s](). Especially having put_page in
-the name looks confusing to me...
+It took a bit of grep'ing to figure out what Dave H meant by
+arch_prctl(). It's an x86-specific syscall which we do not have on arm64
+(and possibly any other architecture). Actually, we don't have any arm64
+specific syscalls, only the generic unistd.h, hence the confusion. For
+other arm64-specific prctls like SVE we used the generic sys_prctl() and
+I can see x86 not being consistent either (PR_MPX_ENABLE_MANAGEMENT).
 
-								Honza
+In general I disagree with adding any arm64-specific syscalls but in
+this instance it can't even be justified. I'd rather see some clean-up
+similar to arch_ptrace/ptrace_request than introducing new syscall
+numbers (but as I suggested in my reply to Dave, that's for another
+patch series).
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Catalin
