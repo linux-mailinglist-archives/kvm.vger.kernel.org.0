@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C354C87F41
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:15:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAFCA87F5C
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:16:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437156AbfHIQPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:15:10 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52906 "EHLO
+        id S2437120AbfHIQQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:16:07 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52910 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437123AbfHIQPH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:07 -0400
+        by vger.kernel.org with ESMTP id S2437093AbfHIQPD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:03 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 2FF813031ED5;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 6E9AD3031EDB;
         Fri,  9 Aug 2019 19:01:41 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id DE1A9305B7A4;
-        Fri,  9 Aug 2019 19:01:40 +0300 (EEST)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 2797E305B7A3;
+        Fri,  9 Aug 2019 19:01:41 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -33,9 +33,9 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v6 83/92] kvm: x86: emulate movd xmm, m32
-Date:   Fri,  9 Aug 2019 19:00:38 +0300
-Message-Id: <20190809160047.8319-84-alazar@bitdefender.com>
+Subject: [RFC PATCH v6 84/92] kvm: x86: enable the half part of movss, movsd, movups
+Date:   Fri,  9 Aug 2019 19:00:39 +0300
+Message-Id: <20190809160047.8319-85-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -48,49 +48,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Mihai Donțu <mdontu@bitdefender.com>
 
-This is needed in order to be able to support guest code that uses movd to
-write into pages that are marked for write tracking.
+A previous patch added emulation support for these instructions with a
+register source and memory destination. This patch adds the variants
+with a memory source and a register destination.
 
 Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- arch/x86/kvm/emulate.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ arch/x86/kvm/emulate.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 7c79504e58cd..b42a71653622 100644
+index b42a71653622..a2e5e63bd94a 100644
 --- a/arch/x86/kvm/emulate.c
 +++ b/arch/x86/kvm/emulate.c
-@@ -1203,6 +1203,11 @@ static u8 simd_prefix_to_bytes(const struct x86_emulate_ctxt *ctxt,
- 		if (simd_prefix == 0x66)
- 			bytes = 8;
- 		break;
-+	case 0x7e:
-+		/* movd xmm, m32 */
-+		if (simd_prefix == 0x66)
-+			bytes = 4;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -4564,6 +4569,10 @@ static const struct gprefix pfx_0f_d6 = {
- 	N, I(0, em_mov), N, N,
- };
+@@ -1184,6 +1184,10 @@ static u8 simd_prefix_to_bytes(const struct x86_emulate_ctxt *ctxt,
+ 	u8 bytes = 16;
  
-+static const struct gprefix pfx_0f_7e = {
-+	N, I(0, em_mov), N, N,
-+};
-+
- static const struct gprefix pfx_0f_2b = {
- 	ID(0, &instr_dual_0f_2b), ID(0, &instr_dual_0f_2b), N, N,
- };
-@@ -4823,7 +4832,8 @@ static const struct opcode twobyte_table[256] = {
- 	N, N, N, N,
- 	N, N, N, N,
- 	N, N, N, N,
--	N, N, N, GP(SrcReg | DstMem | ModRM | Mov, &pfx_0f_6f_0f_7f),
-+	N, N, GP(ModRM | SrcReg | DstMem | GPRModRM | Mov | Sse, &pfx_0f_7e),
-+	GP(SrcReg | DstMem | ModRM | Mov, &pfx_0f_6f_0f_7f),
- 	/* 0x80 - 0x8F */
- 	X16(D(SrcImm | NearBranch)),
- 	/* 0x90 - 0x9F */
+ 	switch (ctxt->b) {
++	case 0x10:
++		/* movss m32, xmm */
++		/* movsd m64, xmm */
++		/* movups m128, xmm */
+ 	case 0x11:
+ 		/* movss xmm, m32 */
+ 		/* movsd xmm, m64 */
