@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 039A387368
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:49:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 733D387369
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:49:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405809AbfHIHs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 03:48:59 -0400
-Received: from foss.arm.com ([217.140.110.172]:42742 "EHLO foss.arm.com"
+        id S2405888AbfHIHtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 03:49:01 -0400
+Received: from foss.arm.com ([217.140.110.172]:42758 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405737AbfHIHs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 03:48:59 -0400
+        id S2405737AbfHIHtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 03:49:01 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7897344;
-        Fri,  9 Aug 2019 00:48:58 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B35CE15AB;
+        Fri,  9 Aug 2019 00:49:00 -0700 (PDT)
 Received: from why.lan (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 290EE3F706;
-        Fri,  9 Aug 2019 00:48:57 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 14BA53F706;
+        Fri,  9 Aug 2019 00:48:58 -0700 (PDT)
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -27,10 +27,12 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm updates for 5.3-rc4
-Date:   Fri,  9 Aug 2019 08:48:28 +0100
-Message-Id: <20190809074832.13283-1-maz@kernel.org>
+Subject: [PATCH 1/4] KVM: arm/arm64: Sync ICH_VMCR_EL2 back when about to block
+Date:   Fri,  9 Aug 2019 08:48:29 +0100
+Message-Id: <20190809074832.13283-2-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190809074832.13283-1-maz@kernel.org>
+References: <20190809074832.13283-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -38,59 +40,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo, Radim,
+Since commit commit 328e56647944 ("KVM: arm/arm64: vgic: Defer
+touching GICH_VMCR to vcpu_load/put"), we leave ICH_VMCR_EL2 (or
+its GICv2 equivalent) loaded as long as we can, only syncing it
+back when we're scheduled out.
 
-Here's a set of update for -rc4. Yet another reset fix, and two subtle
-VGIC fixes for issues that can be observed in interesting corner cases.
+There is a small snag with that though: kvm_vgic_vcpu_pending_irq(),
+which is indirectly called from kvm_vcpu_check_block(), needs to
+evaluate the guest's view of ICC_PMR_EL1. At the point were we
+call kvm_vcpu_check_block(), the vcpu is still loaded, and whatever
+changes to PMR is not visible in memory until we do a vcpu_put().
 
-Note that this is on top of kvmarm-fixes-for-5.3[1], which hasn't been
-pulled yet. Hopefully you can pull both at the same time!
+Things go really south if the guest does the following:
 
-Thanks,
+	mov x0, #0	// or any small value masking interrupts
+	msr ICC_PMR_EL1, x0
 
-	M.
+	[vcpu preempted, then rescheduled, VMCR sampled]
 
-[1] https://lore.kernel.org/kvmarm/20190731173650.12627-1-maz@kernel.org
+	mov x0, #ff	// allow all interrupts
+	msr ICC_PMR_EL1, x0
+	wfi		// traps to EL2, so samping of VMCR
 
-The following changes since commit cdb2d3ee0436d74fa9092f2df46aaa6f9e03c969:
+	[interrupt arrives just after WFI]
 
-  arm64: KVM: hyp: debug-sr: Mark expected switch fall-through (2019-07-29 11:01:37 +0100)
+Here, the hypervisor's view of PMR is zero, while the guest has enabled
+its interrupts. kvm_vgic_vcpu_pending_irq() will then say that no
+interrupts are pending (despite an interrupt being received) and we'll
+block for no reason. If the guest doesn't have a periodic interrupt
+firing once it has blocked, it will stay there forever.
 
-are available in the Git repository at:
+To avoid this unfortuante situation, let's resync VMCR from
+kvm_arch_vcpu_blocking(), ensuring that a following kvm_vcpu_check_block()
+will observe the latest value of PMR.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.3-2
+This has been found by booting an arm64 Linux guest with the pseudo NMI
+feature, and thus using interrupt priorities to mask interrupts instead
+of the usual PSTATE masking.
 
-for you to fetch changes up to 16e604a437c89751dc626c9e90cf88ba93c5be64:
+Cc: stable@vger.kernel.org # 4.12
+Fixes: 328e56647944 ("KVM: arm/arm64: vgic: Defer touching GICH_VMCR to vcpu_load/put")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ include/kvm/arm_vgic.h      |  1 +
+ virt/kvm/arm/arm.c          | 11 +++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c |  9 ++++++++-
+ virt/kvm/arm/vgic/vgic-v3.c |  7 ++++++-
+ virt/kvm/arm/vgic/vgic.c    | 11 +++++++++++
+ virt/kvm/arm/vgic/vgic.h    |  2 ++
+ 6 files changed, 39 insertions(+), 2 deletions(-)
 
-  KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable (2019-08-09 08:07:26 +0100)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 46bbc949c20a..7a30524a80ee 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -350,6 +350,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ 
+ void kvm_vgic_load(struct kvm_vcpu *vcpu);
+ void kvm_vgic_put(struct kvm_vcpu *vcpu);
++void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	((k)->arch.vgic.initialized)
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index c704fa696184..482b20256fa8 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -323,6 +323,17 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * If we're about to block (most likely because we've just hit a
++	 * WFI), we need to sync back the state of the GIC CPU interface
++	 * so that we have the lastest PMR and group enables. This ensures
++	 * that kvm_arch_vcpu_runnable has up-to-date data to decide
++	 * whether we have pending interrupts.
++	 */
++	preempt_disable();
++	kvm_vgic_vmcr_sync(vcpu);
++	preempt_enable();
++
+ 	kvm_vgic_v4_enable_doorbell(vcpu);
+ }
+ 
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 6dd5ad706c92..96aab77d0471 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -484,10 +484,17 @@ void vgic_v2_load(struct kvm_vcpu *vcpu)
+ 		       kvm_vgic_global_state.vctrl_base + GICH_APR);
+ }
+ 
+-void vgic_v2_put(struct kvm_vcpu *vcpu)
++void vgic_v2_vmcr_sync(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+ 
+ 	cpu_if->vgic_vmcr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_VMCR);
++}
++
++void vgic_v2_put(struct kvm_vcpu *vcpu)
++{
++	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
++
++	vgic_v2_vmcr_sync(vcpu);
+ 	cpu_if->vgic_apr = readl_relaxed(kvm_vgic_global_state.vctrl_base + GICH_APR);
+ }
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index c2c9ce009f63..0c653a1e5215 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -662,12 +662,17 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
+ 		__vgic_v3_activate_traps(vcpu);
+ }
+ 
+-void vgic_v3_put(struct kvm_vcpu *vcpu)
++void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+ 
+ 	if (likely(cpu_if->vgic_sre))
+ 		cpu_if->vgic_vmcr = kvm_call_hyp_ret(__vgic_v3_read_vmcr);
++}
++
++void vgic_v3_put(struct kvm_vcpu *vcpu)
++{
++	vgic_v3_vmcr_sync(vcpu);
+ 
+ 	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 04786c8ec77e..13d4b38a94ec 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -919,6 +919,17 @@ void kvm_vgic_put(struct kvm_vcpu *vcpu)
+ 		vgic_v3_put(vcpu);
+ }
+ 
++void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu)
++{
++	if (unlikely(!irqchip_in_kernel(vcpu->kvm)))
++		return;
++
++	if (kvm_vgic_global_state.type == VGIC_V2)
++		vgic_v2_vmcr_sync(vcpu);
++	else
++		vgic_v3_vmcr_sync(vcpu);
++}
++
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 57205beaa981..11adbdac1d56 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -193,6 +193,7 @@ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+ void vgic_v2_init_lrs(void);
+ void vgic_v2_load(struct kvm_vcpu *vcpu);
+ void vgic_v2_put(struct kvm_vcpu *vcpu);
++void vgic_v2_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
+ void vgic_v2_save_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+@@ -223,6 +224,7 @@ bool vgic_v3_check_base(struct kvm *kvm);
+ 
+ void vgic_v3_load(struct kvm_vcpu *vcpu);
+ void vgic_v3_put(struct kvm_vcpu *vcpu);
++void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+-- 
+2.20.1
 
-----------------------------------------------------------------
-KVM/arm fixes for 5.3, take #2
-
-- Fix our system register reset so that we stop writing
-  non-sensical values to them, and track which registers
-  get reset instead.
-- Sync VMCR back from the GIC on WFI so that KVM has an
-  exact vue of PMR.
-- Reevaluate state of HW-mapped, level triggered interrupts
-  on enable.
-
-----------------------------------------------------------------
-Alexandru Elisei (1):
-      KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable
-
-Marc Zyngier (3):
-      KVM: arm/arm64: Sync ICH_VMCR_EL2 back when about to block
-      KVM: arm64: Don't write junk to sysregs on reset
-      KVM: arm: Don't write junk to CP15 registers on reset
-
- arch/arm/kvm/coproc.c         | 23 +++++++++++++++--------
- arch/arm64/kvm/sys_regs.c     | 32 ++++++++++++++++++--------------
- include/kvm/arm_vgic.h        |  1 +
- virt/kvm/arm/arm.c            | 11 +++++++++++
- virt/kvm/arm/vgic/vgic-mmio.c | 16 ++++++++++++++++
- virt/kvm/arm/vgic/vgic-v2.c   |  9 ++++++++-
- virt/kvm/arm/vgic/vgic-v3.c   |  7 ++++++-
- virt/kvm/arm/vgic/vgic.c      | 11 +++++++++++
- virt/kvm/arm/vgic/vgic.h      |  2 ++
- 9 files changed, 88 insertions(+), 24 deletions(-)
