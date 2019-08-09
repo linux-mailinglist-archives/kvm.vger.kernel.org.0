@@ -2,125 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DB6B86DB3
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 01:09:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8C7686F4E
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 03:26:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404001AbfHHXJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Aug 2019 19:09:07 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:38057 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404388AbfHHXJH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Aug 2019 19:09:07 -0400
-Received: by mail-pl1-f194.google.com with SMTP id m12so5546688plt.5
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2019 16:09:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PshILyRjCCo0C5QCJz7frN2AnaNP8oJw8QYaH2iANig=;
-        b=dbDwiA4Adn6NNb5EvA73thvbmUP2keuqre4+n/NxwEHqhexDztnDaNh7AsRSTZZe49
-         hYpD3IzLcNsObNJn7jV0JwQOyof3bHoudWE9xbxMphJZ3xC6+cAju3iiWanCTUgT+RRy
-         5BTDqjSStXzv50strdYe4GteQ70uxl48L/KiQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PshILyRjCCo0C5QCJz7frN2AnaNP8oJw8QYaH2iANig=;
-        b=atTGt76S971EtNYrNbimW4ry8XA41H9VL93hc4i2/HfHeFAQZ7KD3rIEI2XMJBDTGD
-         0SzToyzJ74tmAIQX45IR5FBGLZ30+JcqUXDIwhWAcoqVWz1DVWtjsUkv8JPOn9RxvdsL
-         3aYqRJQw1SJv/1ONBVU9NvmLbrlmab4nvJX5NfDOeNgVnsEVVg7mGX5hc47Qa7GNcFpT
-         rqF5nXloNSeLtwO/v4ZHaU6n7gBuHI5P5Bc92QDBMjUskLW7SbpmgfhgcxCWm2Ej8DGZ
-         2qioklZiexwwAr6ZIhpQBuuIF6OBaagS1CWmPBwQ8XnYDMvePs2GMzaWgsP2c/P4A1Hr
-         X/WA==
-X-Gm-Message-State: APjAAAUMpXw2/1U6Yh3BGtIy1ArzfVb5/sSpENM04kYIPWQH2kwLIehT
-        iKIV4N4rkGL6R/1+5oMTEbsnuQ==
-X-Google-Smtp-Source: APXvYqwRMwQCoIwwE1SVnXBBenp7lYzRwUiHs8nPiovNgZn+1R84ViErtlLi11BYuAEM5u5dpbcusw==
-X-Received: by 2002:a17:902:d70a:: with SMTP id w10mr15179356ply.251.1565305746634;
-        Thu, 08 Aug 2019 16:09:06 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id o130sm157376311pfg.171.2019.08.08.16.09.05
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 08 Aug 2019 16:09:05 -0700 (PDT)
-Date:   Thu, 8 Aug 2019 16:09:04 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Will Deacon <will@kernel.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        dri-devel@lists.freedesktop.org,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
+        id S2405266AbfHIB0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Aug 2019 21:26:45 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:16697 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405142AbfHIB0o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Aug 2019 21:26:44 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d4ccbd50000>; Thu, 08 Aug 2019 18:26:45 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 08 Aug 2019 18:26:43 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 08 Aug 2019 18:26:43 -0700
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 9 Aug
+ 2019 01:26:42 +0000
+Subject: Re: [PATCH v3 38/41] powerpc: convert put_page() to put_user_page*()
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
         Jason Gunthorpe <jgg@ziepe.ca>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
-Message-ID: <201908081608.A4F6711@keescook>
-References: <cover.1563904656.git.andreyknvl@google.com>
- <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
- <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
- <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
- <20190724142059.GC21234@fuggles.cambridge.arm.com>
- <20190806171335.4dzjex5asoertaob@willie-the-truck>
- <CAAeHK+zF01mxU+PkEYLkoVu-ZZM6jNfL_OwMJKRwLr-sdU4Myg@mail.gmail.com>
- <201908081410.C16D2BD@keescook>
- <20190808153300.09d3eb80772515f0ea062833@linux-foundation.org>
+        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
+        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
+        <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
+        <x86@kernel.org>, <xen-devel@lists.xenproject.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Hellwig <hch@lst.de>, <linuxppc-dev@lists.ozlabs.org>
+References: <20190807013340.9706-1-jhubbard@nvidia.com>
+ <20190807013340.9706-39-jhubbard@nvidia.com>
+ <87k1botdpx.fsf@concordia.ellerman.id.au>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <248c9ab2-93cc-6d8b-606d-d85b83e791e5@nvidia.com>
+Date:   Thu, 8 Aug 2019 18:26:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190808153300.09d3eb80772515f0ea062833@linux-foundation.org>
+In-Reply-To: <87k1botdpx.fsf@concordia.ellerman.id.au>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1565314005; bh=mIo2y95DYwpm5TwfN0ChMwsAj72bzfnkFfj+rLdjqVU=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=sN/0osHqfMASG3Gn5uYJsmBevNgkDITrwy5z0XhYDRnSVjTtczC6Zn93vXUVACtgl
+         zsE5J5OQn1U0e8RQtUv/QuY5iXNoztc7U7xk0b8D/XTbbdQX85oERprBP+FlchEBmH
+         cDA/Z0zP30Are5EcBXQtJgaAWOYtGMQytxGRabpoiJwuifLVi+3nH2crRLrU8L/jsz
+         NjANrKoFZE22mpOq52s3fZ9ut+mKAUlAXHfdi2WiqPjr5KVieTASv9oPdSZ5QUx628
+         sL0qbeXqIPI+CnsO9wdJm+9w+qSRY9+X67MIO8EOa4e3TPJTGVb16/VuBW7YteYrzL
+         bdoBRcdIA11ng==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 08, 2019 at 03:33:00PM -0700, Andrew Morton wrote:
-> On Thu, 8 Aug 2019 14:12:19 -0700 Kees Cook <keescook@chromium.org> wrote:
+On 8/7/19 10:42 PM, Michael Ellerman wrote:
+> Hi John,
 > 
-> > > The ones that are left are the mm ones: 4, 5, 6, 7 and 8.
-> > > 
-> > > Andrew, could you take a look and give your Acked-by or pick them up directly?
-> > 
-> > Given the subsystem Acks, it seems like 3-10 and 12 could all just go
-> > via Andrew? I hope he agrees. :)
+> john.hubbard@gmail.com writes:
+>> diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s64/iommu_api.c
+>> index b056cae3388b..e126193ba295 100644
+>> --- a/arch/powerpc/mm/book3s64/iommu_api.c
+>> +++ b/arch/powerpc/mm/book3s64/iommu_api.c
+>> @@ -203,6 +202,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
+>>  {
+>>  	long i;
+>>  	struct page *page = NULL;
+>> +	bool dirty = false;
 > 
-> I'll grab everything that has not yet appeared in linux-next.  If more
-> of these patches appear in linux-next I'll drop those as well.
+> I don't think you need that initialisation do you?
 > 
-> The review discussion against " [PATCH v19 02/15] arm64: Introduce
-> prctl() options to control the tagged user addresses ABI" has petered
-> out inconclusively.  prctl() vs arch_prctl().
 
-I've always disliked arch_prctl() existing at all. Given that tagging is
-likely to be a multi-architectural feature, it seems like the controls
-should live in prctl() to me.
+Nope, it can go. Fixed locally, thanks.
 
+Did you get a chance to look at enough of the other bits to feel comfortable 
+with the patch, overall?
+
+thanks,
 -- 
-Kees Cook
+John Hubbard
+NVIDIA
