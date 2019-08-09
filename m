@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8701387F2D
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:15:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B8CC87F43
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:15:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437158AbfHIQPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:15:06 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52920 "EHLO
+        id S2437180AbfHIQPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:15:33 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53068 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437083AbfHIQPD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:03 -0400
+        by vger.kernel.org with ESMTP id S2437142AbfHIQPJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:09 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 3017E3031EBD;
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id D9B4C305D350;
         Fri,  9 Aug 2019 19:01:25 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id C3273305B7A0;
-        Fri,  9 Aug 2019 19:01:24 +0300 (EEST)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 81218305B7A1;
+        Fri,  9 Aug 2019 19:01:25 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -32,11 +32,10 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Weijiang Yang <weijiang.yang@intel.com>, Zhang@vger.kernel.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
-        =?UTF-8?q?Nicu=C8=99or=20C=C3=AE=C8=9Bu?= <ncitu@bitdefender.com>
-Subject: [RFC PATCH v6 58/92] kvm: introspection: add KVMI_GET_MTRR_TYPE
-Date:   Fri,  9 Aug 2019 19:00:13 +0300
-Message-Id: <20190809160047.8319-59-alazar@bitdefender.com>
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
+Subject: [RFC PATCH v6 59/92] kvm: introspection: add KVMI_EVENT_XSETBV
+Date:   Fri,  9 Aug 2019 19:00:14 +0300
+Message-Id: <20190809160047.8319-60-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -49,146 +48,137 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Mihai Donțu <mdontu@bitdefender.com>
 
-This command returns the memory type for a guest physical address.
+This event is sent when the extended control register XCR0 is going to
+be changed.
 
 Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
-Co-developed-by: Nicușor Cîțu <ncitu@bitdefender.com>
-Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst | 32 ++++++++++++++++++++++++++++++
- arch/x86/include/uapi/asm/kvmi.h   |  9 +++++++++
- arch/x86/kvm/kvmi.c                |  7 +++++++
- virt/kvm/kvmi_int.h                |  1 +
- virt/kvm/kvmi_msg.c                | 17 ++++++++++++++++
- 5 files changed, 66 insertions(+)
+ Documentation/virtual/kvm/kvmi.rst | 25 +++++++++++++++++++
+ arch/x86/include/asm/kvmi_host.h   |  5 ++++
+ arch/x86/kvm/kvmi.c                | 39 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c                 |  5 ++++
+ 4 files changed, 74 insertions(+)
 
 diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index c43ea1b33a51..e58f0e22f188 100644
+index e58f0e22f188..1d2431639770 100644
 --- a/Documentation/virtual/kvm/kvmi.rst
 +++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -1112,6 +1112,38 @@ the buffer size from the message size.
- * -KVM_EAGAIN - the selected vCPU can't be introspected yet
- * -KVM_ENOMEM - not enough memory to allocate the reply
+@@ -1444,3 +1444,28 @@ register (see **KVMI_CONTROL_EVENTS**).
  
-+24. KVMI_GET_MTRR_TYPE
-+----------------------
+ ``kvmi_event``, the MSR number, the old value and the new value are
+ sent to the introspector. The *CONTINUE* action will set the ``new_val``.
 +
-+:Architecture: x86
++8. KVMI_EVENT_XSETBV
++--------------------
++
++:Architectures: x86
 +:Versions: >= 1
++:Actions: CONTINUE, CRASH
 +:Parameters:
 +
 +::
 +
-+	struct kvmi_vcpu_hdr;
-+	struct kvmi_get_mtrr_type {
-+		__u64 gpa;
-+	};
++	struct kvmi_event;
 +
 +:Returns:
 +
 +::
 +
-+	struct kvmi_error_code;
-+	struct kvmi_get_mtrr_type_reply {
-+		__u8 type;
-+		__u8 padding[7];
-+	};
++	struct kvmi_vcpu_hdr;
++	struct kvmi_event_reply;
 +
-+Returns the guest memory type for a specific physical address.
++This event is sent when the extended control register XCR0 is going
++to be changed and the introspection has been enabled for this event
++(see *KVMI_CONTROL_EVENTS*).
 +
-+:Errors:
-+
-+* -KVM_EINVAL - the selected vCPU is invalid
-+* -KVM_EINVAL - padding is not zero
-+* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+
- Events
- ======
++``kvmi_event`` is sent to the introspector.
+diff --git a/arch/x86/include/asm/kvmi_host.h b/arch/x86/include/asm/kvmi_host.h
+index 86d90b7bed84..3f066e7feee2 100644
+--- a/arch/x86/include/asm/kvmi_host.h
++++ b/arch/x86/include/asm/kvmi_host.h
+@@ -15,6 +15,7 @@ bool kvmi_msr_event(struct kvm_vcpu *vcpu, struct msr_data *msr);
+ bool kvmi_monitored_msr(struct kvm_vcpu *vcpu, u32 msr);
+ bool kvmi_cr_event(struct kvm_vcpu *vcpu, unsigned int cr,
+ 		   unsigned long old_value, unsigned long *new_value);
++void kvmi_xsetbv_event(struct kvm_vcpu *vcpu);
  
-diff --git a/arch/x86/include/uapi/asm/kvmi.h b/arch/x86/include/uapi/asm/kvmi.h
-index a3fcb1ef8404..c3c96e6e2a26 100644
---- a/arch/x86/include/uapi/asm/kvmi.h
-+++ b/arch/x86/include/uapi/asm/kvmi.h
-@@ -101,4 +101,13 @@ struct kvmi_get_xsave_reply {
- 	__u32 region[0];
- };
+ #else /* CONFIG_KVM_INTROSPECTION */
  
-+struct kvmi_get_mtrr_type {
-+	__u64 gpa;
-+};
+@@ -35,6 +36,10 @@ static inline bool kvmi_cr_event(struct kvm_vcpu *vcpu, unsigned int cr,
+ 	return true;
+ }
+ 
++static inline void kvmi_xsetbv_event(struct kvm_vcpu *vcpu)
++{
++}
 +
-+struct kvmi_get_mtrr_type_reply {
-+	__u8 type;
-+	__u8 padding[7];
-+};
-+
- #endif /* _UAPI_ASM_X86_KVMI_H */
+ #endif /* CONFIG_KVM_INTROSPECTION */
+ 
+ #endif /* _ASM_X86_KVMI_HOST_H */
 diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 078d714b59d5..0114ed66f4f3 100644
+index 0114ed66f4f3..0e9c91d2f282 100644
 --- a/arch/x86/kvm/kvmi.c
 +++ b/arch/x86/kvm/kvmi.c
-@@ -811,3 +811,10 @@ int kvmi_arch_cmd_get_xsave(struct kvm_vcpu *vcpu,
- 
- 	return 0;
- }
-+
-+int kvmi_arch_cmd_get_mtrr_type(struct kvm_vcpu *vcpu, u64 gpa, u8 *type)
-+{
-+	*type = kvm_mtrr_get_guest_memory_type(vcpu, gpa_to_gfn(gpa));
-+
-+	return 0;
-+}
-diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-index 1a705cba4776..ac2e13787f01 100644
---- a/virt/kvm/kvmi_int.h
-+++ b/virt/kvm/kvmi_int.h
-@@ -267,5 +267,6 @@ int kvmi_arch_cmd_control_cr(struct kvm_vcpu *vcpu,
- 			     const struct kvmi_control_cr *req);
- int kvmi_arch_cmd_control_msr(struct kvm_vcpu *vcpu,
- 			      const struct kvmi_control_msr *req);
-+int kvmi_arch_cmd_get_mtrr_type(struct kvm_vcpu *vcpu, u64 gpa, u8 *type);
- 
- #endif
-diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index 6bc18b7973cf..ee54d92b07ec 100644
---- a/virt/kvm/kvmi_msg.c
-+++ b/virt/kvm/kvmi_msg.c
-@@ -33,6 +33,7 @@ static const char *const msg_IDs[] = {
- 	[KVMI_EVENT_REPLY]           = "KVMI_EVENT_REPLY",
- 	[KVMI_GET_CPUID]             = "KVMI_GET_CPUID",
- 	[KVMI_GET_GUEST_INFO]        = "KVMI_GET_GUEST_INFO",
-+	[KVMI_GET_MTRR_TYPE]         = "KVMI_GET_MTRR_TYPE",
- 	[KVMI_GET_PAGE_ACCESS]       = "KVMI_GET_PAGE_ACCESS",
- 	[KVMI_GET_PAGE_WRITE_BITMAP] = "KVMI_GET_PAGE_WRITE_BITMAP",
- 	[KVMI_GET_REGISTERS]         = "KVMI_GET_REGISTERS",
-@@ -701,6 +702,21 @@ static int handle_get_cpuid(struct kvm_vcpu *vcpu,
- 	return reply_cb(vcpu, msg, ec, &rpl, sizeof(rpl));
+@@ -389,6 +389,45 @@ bool kvmi_cr_event(struct kvm_vcpu *vcpu, unsigned int cr,
+ 	return ret;
  }
  
-+static int handle_get_mtrr_type(struct kvm_vcpu *vcpu,
-+				const struct kvmi_msg_hdr *msg,
-+				const void *_req, vcpu_reply_fct reply_cb)
++static u32 kvmi_send_xsetbv(struct kvm_vcpu *vcpu)
 +{
-+	const struct kvmi_get_mtrr_type *req = _req;
-+	struct kvmi_get_mtrr_type_reply rpl;
-+	int ec;
++	int err, action;
 +
-+	memset(&rpl, 0, sizeof(rpl));
++	err = kvmi_send_event(vcpu, KVMI_EVENT_XSETBV, NULL, 0,
++			      NULL, 0, &action);
++	if (err)
++		return KVMI_EVENT_ACTION_CONTINUE;
 +
-+	ec = kvmi_arch_cmd_get_mtrr_type(vcpu, req->gpa, &rpl.type);
-+
-+	return reply_cb(vcpu, msg, ec, &rpl, sizeof(rpl));
++	return action;
 +}
 +
- static int handle_get_xsave(struct kvm_vcpu *vcpu,
- 			    const struct kvmi_msg_hdr *msg, const void *req,
- 			    vcpu_reply_fct reply_cb)
-@@ -730,6 +746,7 @@ static int(*const msg_vcpu[])(struct kvm_vcpu *,
- 	[KVMI_CONTROL_MSR]      = handle_control_msr,
- 	[KVMI_EVENT_REPLY]      = handle_event_reply,
- 	[KVMI_GET_CPUID]        = handle_get_cpuid,
-+	[KVMI_GET_MTRR_TYPE]    = handle_get_mtrr_type,
- 	[KVMI_GET_REGISTERS]    = handle_get_registers,
- 	[KVMI_GET_VCPU_INFO]    = handle_get_vcpu_info,
- 	[KVMI_GET_XSAVE]        = handle_get_xsave,
++static void __kvmi_xsetbv_event(struct kvm_vcpu *vcpu)
++{
++	u32 action;
++
++	action = kvmi_send_xsetbv(vcpu);
++	switch (action) {
++	case KVMI_EVENT_ACTION_CONTINUE:
++		break;
++	default:
++		kvmi_handle_common_event_actions(vcpu, action, "XSETBV");
++	}
++}
++
++void kvmi_xsetbv_event(struct kvm_vcpu *vcpu)
++{
++	struct kvmi *ikvm;
++
++	ikvm = kvmi_get(vcpu->kvm);
++	if (!ikvm)
++		return;
++
++	if (is_event_enabled(vcpu, KVMI_EVENT_XSETBV))
++		__kvmi_xsetbv_event(vcpu);
++
++	kvmi_put(vcpu->kvm);
++}
++
+ bool kvmi_arch_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
+ 			u8 access)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 05ff23180355..278a286ba262 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -868,6 +868,11 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+ 
+ int kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+ {
++#ifdef CONFIG_KVM_INTROSPECTION
++	if (xcr != vcpu->arch.xcr0)
++		kvmi_xsetbv_event(vcpu);
++#endif /* CONFIG_KVM_INTROSPECTION */
++
+ 	if (kvm_x86_ops->get_cpl(vcpu) != 0 ||
+ 	    __kvm_set_xcr(vcpu, index, xcr)) {
+ 		kvm_inject_gp(vcpu, 0);
