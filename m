@@ -2,97 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C4F588054
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:39:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 232E18806C
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:44:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437168AbfHIQjd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:39:33 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:41028 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437081AbfHIQjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 12:39:32 -0400
-Received: by mail-ot1-f67.google.com with SMTP id o101so28501ota.8
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 09:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CikhgCxe5YHX0c3F28QN7MAGvPAtgLNBsm2uQo1hLD0=;
-        b=btgHICFcCUxPl6D9I8cv8GHpDwrNnZfc0toIv36RpNA6sM6aRbW7JK+RL7MY7vx6cQ
-         ulcmH6aZbBZ7PVYZRkbprh65Ce29zF+FlETeZck1Xe83EP9G+Qdu9A0J7DxlcUKWxKtH
-         n1hcpUP6onuyWpBKc0ArYdjNP2ihj3W3NT/BzYZ05r4r39ufzzLEAEijCePWKjm0IhYi
-         dwwmjTjfFuClvAyaGFaTcaIz0i8h9o3BqYcXcztpUXcZgSVVz7bVuAt39mryY0fPT/BN
-         y8a51j/EZPgx1B4pZ+wD1Fvxlf3dC4UCYSsmEb5WTcDyL40t+VXkFs3n2FiCM6UjBavk
-         QggA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CikhgCxe5YHX0c3F28QN7MAGvPAtgLNBsm2uQo1hLD0=;
-        b=CnX1zMWVfCd72UL2zoa+ZKK5w6gALrMI2FKYRUXOjnIE3XeQlrif61Z3M5neQah94Q
-         tFUnoN1gkMsmTkUJkTXsOj5JcApqxgV0xuEWVo919w/eVfytp/hR48Bvinz4y6TYjCCR
-         Jo1sBm+q/8A36dPO6EftIZKYnH4JP7IeQ9dySCkLKSDV+nWnMK94nJ/pZIOGpfWDCSnM
-         bhVNsOw3la1k4QwZQfnGsDZbXccBmk8hKRUe43soypLw2dQ4qs6Suf0Zrtz2crK+oE31
-         uhzHWBGQMeIjcDNpVIeHH9xCMLZlCuZ1hHb4jGIoGTlRquADVU0P3n5K2QGPfUooKhH2
-         LSlw==
-X-Gm-Message-State: APjAAAX8dfz/mMdJl1ImcvdKxqNZ/G/66Nj58vUPUzcg3aV3WZ24kjXl
-        UsE3y8gNQAsRPYnvuAeMMre8o+lY/UMg97Fy2eDatA==
-X-Google-Smtp-Source: APXvYqxwLpoE/tc3o62UOQlp4MxHt/gGVuPES6o5jLGsvs8jO6hTe+N8rC2/0es03Xs8vz2GcFCsFP96KEZXcmGwrF8=
-X-Received: by 2002:a02:c65a:: with SMTP id k26mr12576081jan.18.1565368771480;
- Fri, 09 Aug 2019 09:39:31 -0700 (PDT)
+        id S1726465AbfHIQo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:44:56 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:54102 "EHLO
+        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726157AbfHIQo4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:44:56 -0400
+Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id E5A0C301AB4A;
+        Fri,  9 Aug 2019 19:00:54 +0300 (EEST)
+Received: from localhost.localdomain (unknown [89.136.169.210])
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id A705D305B7A0;
+        Fri,  9 Aug 2019 19:00:54 +0300 (EEST)
+From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        =?UTF-8?q?Samuel=20Laur=C3=A9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>, Zhang@vger.kernel.org,
+        Yu C <yu.c.zhang@intel.com>,
+        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
+Subject: [RFC PATCH v6 09/92] kvm: introspection: add KVMI_GET_GUEST_INFO
+Date:   Fri,  9 Aug 2019 18:59:24 +0300
+Message-Id: <20190809160047.8319-10-alazar@bitdefender.com>
+In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
+References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
-References: <1565336051-31793-1-git-send-email-pbonzini@redhat.com> <20190809161937.GB10541@linux.intel.com>
-In-Reply-To: <20190809161937.GB10541@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 9 Aug 2019 09:39:19 -0700
-Message-ID: <CALMp9eT+biHFQDygxk4aNg2huP_DHG=BTPYnbmLsY9bfGcwi0g@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: add KVM x86 reviewers
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 9, 2019 at 9:19 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Fri, Aug 09, 2019 at 09:34:11AM +0200, Paolo Bonzini wrote:
-> > This is probably overdone---KVM x86 has quite a few contributors that
-> > usually review each other's patches, which is really helpful to me.
-> > Formalize this by listing them as reviewers.  I am including people
-> > with various expertise:
-> >
-> > - Joerg for SVM (with designated reviewers, it makes more sense to have
-> > him in the main KVM/x86 stanza)
-> >
-> > - Sean for MMU and VMX
-> >
-> > - Jim for VMX
-> >
-> > - Vitaly for Hyper-V and possibly SVM
-> >
-> > - Wanpeng for LAPIC and paravirtualization.
-> >
-> > Please ack if you are okay with this arrangement, otherwise speak up.
-> >
-> > In other news, Radim is going to leave Red Hat soon.  However, he has
-> > not been very much involved in upstream KVM development for some time,
-> > and in the immediate future he is still going to help maintain kvm/queue
-> > while I am on vacation.  Since not much is going to change, I will let
-> > him decide whether he wants to keep the maintainer role after he leaves.
-> >
-> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > Cc: Wanpeng Li <wanpengli@tencent.com>
-> > Cc: Jim Mattson <jmattson@google.com>
-> > Cc: Joerg Roedel <joro@8bytes.org>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-Acked-by: Jim Mattson <jmattson@google.com>
+From: Mihai Donțu <mdontu@bitdefender.com>
+
+For now, this command returns only the number of online vCPUs.
+
+Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
+Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
+---
+ Documentation/virtual/kvm/kvmi.rst | 18 ++++++++++++++++++
+ include/uapi/linux/kvmi.h          |  5 +++++
+ virt/kvm/kvmi_msg.c                | 14 ++++++++++++++
+ 3 files changed, 37 insertions(+)
+
+diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
+index 61cf69aa5d07..2fbe7c28e4f1 100644
+--- a/Documentation/virtual/kvm/kvmi.rst
++++ b/Documentation/virtual/kvm/kvmi.rst
+@@ -362,3 +362,21 @@ This command is always allowed.
+ 
+ * -KVM_PERM - the event specified by ``id`` is disallowed
+ * -KVM_EINVAL - padding is not zero
++
++5. KVMI_GET_GUEST_INFO
++----------------------
++
++:Architectures: all
++:Versions: >= 1
++:Parameters:: none
++:Returns:
++
++::
++
++	struct kvmi_error_code;
++	struct kvmi_get_guest_info_reply {
++		__u32 vcpu_count;
++		__u32 padding[3];
++	};
++
++Returns the number of online vCPUs.
+diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
+index 7390303371c9..367c8ec28f75 100644
+--- a/include/uapi/linux/kvmi.h
++++ b/include/uapi/linux/kvmi.h
+@@ -102,4 +102,9 @@ struct kvmi_check_event {
+ 	__u32 padding2;
+ };
+ 
++struct kvmi_get_guest_info_reply {
++	__u32 vcpu_count;
++	__u32 padding[3];
++};
++
+ #endif /* _UAPI__LINUX_KVMI_H */
+diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
+index e24996611e3a..cf8a120b0eae 100644
+--- a/virt/kvm/kvmi_msg.c
++++ b/virt/kvm/kvmi_msg.c
+@@ -12,6 +12,7 @@ static const char *const msg_IDs[] = {
+ 	[KVMI_CHECK_COMMAND]         = "KVMI_CHECK_COMMAND",
+ 	[KVMI_CHECK_EVENT]           = "KVMI_CHECK_EVENT",
+ 	[KVMI_CONTROL_CMD_RESPONSE]  = "KVMI_CONTROL_CMD_RESPONSE",
++	[KVMI_GET_GUEST_INFO]        = "KVMI_GET_GUEST_INFO",
+ 	[KVMI_GET_VERSION]           = "KVMI_GET_VERSION",
+ };
+ 
+@@ -213,6 +214,18 @@ static int handle_check_event(struct kvmi *ikvm,
+ 	return kvmi_msg_vm_maybe_reply(ikvm, msg, ec, NULL, 0);
+ }
+ 
++static int handle_get_guest_info(struct kvmi *ikvm,
++				 const struct kvmi_msg_hdr *msg,
++				 const void *req)
++{
++	struct kvmi_get_guest_info_reply rpl;
++
++	memset(&rpl, 0, sizeof(rpl));
++	rpl.vcpu_count = atomic_read(&ikvm->kvm->online_vcpus);
++
++	return kvmi_msg_vm_maybe_reply(ikvm, msg, 0, &rpl, sizeof(rpl));
++}
++
+ static int handle_control_cmd_response(struct kvmi *ikvm,
+ 					const struct kvmi_msg_hdr *msg,
+ 					const void *_req)
+@@ -246,6 +259,7 @@ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
+ 	[KVMI_CHECK_COMMAND]         = handle_check_command,
+ 	[KVMI_CHECK_EVENT]           = handle_check_event,
+ 	[KVMI_CONTROL_CMD_RESPONSE]  = handle_control_cmd_response,
++	[KVMI_GET_GUEST_INFO]        = handle_get_guest_info,
+ 	[KVMI_GET_VERSION]           = handle_get_version,
+ };
+ 
