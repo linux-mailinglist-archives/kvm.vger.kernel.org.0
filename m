@@ -2,142 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E69B87365
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:48:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 039A387368
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:49:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405904AbfHIHsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 03:48:12 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43304 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405737AbfHIHsI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 03:48:08 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p13so22735531wru.10
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 00:48:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=aRURCPsR50XeHaMxy4aGY+5TvqUSmUNLHU5PV2hq+Sc=;
-        b=pweKhfeG2M9NUGZ0wJw51iq3r7ZI3g2QhmkCG+L5qY4j1EqnnwRHx7TQ2UVcjq7dHk
-         9OKpTnS7ZjVOu18SIWZJK8eDiQffA6COtD8HQJpvEosK61AyxTl0pYclX82YvbFOWt+f
-         iQOdF3dOwJItKU52QITF8mm2/4HXE1CPu1Ghw3kmjCa9TzIuB69TubTVQIJ1oAyDk0+R
-         rvCow1YiXr2dE3a7OAJw90T31bNpDMqcP8Y/xnKyee8M2B1kwV02g7zaISFUK7HJZcfs
-         m9qYYP25CYVK7j8Ssit8HywzHDD+jaiqZAQdCwLkKg6O8M7MmDYjE6w39K6206wxWOt4
-         uCUg==
-X-Gm-Message-State: APjAAAU3UTqLG5XkcNjHBIrOEmUMY1dNz+GjnH38cT3I//zRJyIbNvaj
-        7ry0L14zBmgT3NsYN2cSeomqRA==
-X-Google-Smtp-Source: APXvYqwpqMiVUAPU8g9ahDmvVPjC05yU9bGUo5wuD9h15WS1oaYHAqTh2qJ2IidOMMi9/fG1axdPoQ==
-X-Received: by 2002:adf:eb51:: with SMTP id u17mr21487207wrn.257.1565336886420;
-        Fri, 09 Aug 2019 00:48:06 -0700 (PDT)
-Received: from vitty.brq.redhat.com (ip-89-176-127-93.net.upcbroadband.cz. [89.176.127.93])
-        by smtp.gmail.com with ESMTPSA id l8sm194121076wrg.40.2019.08.09.00.48.05
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 09 Aug 2019 00:48:05 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        id S2405809AbfHIHs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 03:48:59 -0400
+Received: from foss.arm.com ([217.140.110.172]:42742 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405737AbfHIHs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 03:48:59 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7897344;
+        Fri,  9 Aug 2019 00:48:58 -0700 (PDT)
+Received: from why.lan (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 290EE3F706;
+        Fri,  9 Aug 2019 00:48:57 -0700 (PDT)
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] MAINTAINERS: add KVM x86 reviewers
-In-Reply-To: <1565336051-31793-1-git-send-email-pbonzini@redhat.com>
-References: <1565336051-31793-1-git-send-email-pbonzini@redhat.com>
-Date:   Fri, 09 Aug 2019 09:48:04 +0200
-Message-ID: <875zn6dbkb.fsf@vitty.brq.redhat.com>
+Subject: [GIT PULL] KVM/arm updates for 5.3-rc4
+Date:   Fri,  9 Aug 2019 08:48:28 +0100
+Message-Id: <20190809074832.13283-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Paolo, Radim,
 
-> This is probably overdone---KVM x86 has quite a few contributors that
-> usually review each other's patches, which is really helpful to me.
-> Formalize this by listing them as reviewers.  I am including people
-> with various expertise:
->
-> - Joerg for SVM (with designated reviewers, it makes more sense to have
-> him in the main KVM/x86 stanza)
->
-> - Sean for MMU and VMX
->
+Here's a set of update for -rc4. Yet another reset fix, and two subtle
+VGIC fixes for issues that can be observed in interesting corner cases.
 
-Sean is known to be a great SVM reviewer too!
+Note that this is on top of kvmarm-fixes-for-5.3[1], which hasn't been
+pulled yet. Hopefully you can pull both at the same time!
 
-> - Jim for VMX
->
-> - Vitaly for Hyper-V and possibly SVM
->
-> - Wanpeng for LAPIC and paravirtualization.
->
-> Please ack if you are okay with this arrangement, otherwise speak up.
->
-> In other news, Radim is going to leave Red Hat soon.  However, he has
-> not been very much involved in upstream KVM development for some time,
-> and in the immediate future he is still going to help maintain kvm/queue
-> while I am on vacation.  Since not much is going to change, I will let
-> him decide whether he wants to keep the maintainer role after he leaves.
->
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  MAINTAINERS | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 6498ebaca2f6..c569bd194d2a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -8738,14 +8738,6 @@ F:	virt/kvm/*
->  F:	tools/kvm/
->  F:	tools/testing/selftests/kvm/
->  
-> -KERNEL VIRTUAL MACHINE FOR AMD-V (KVM/amd)
-> -M:	Joerg Roedel <joro@8bytes.org>
-> -L:	kvm@vger.kernel.org
-> -W:	http://www.linux-kvm.org/
-> -S:	Maintained
-> -F:	arch/x86/include/asm/svm.h
-> -F:	arch/x86/kvm/svm.c
-> -
->  KERNEL VIRTUAL MACHINE FOR ARM/ARM64 (KVM/arm, KVM/arm64)
->  M:	Marc Zyngier <marc.zyngier@arm.com>
->  R:	James Morse <james.morse@arm.com>
-> @@ -8803,6 +8795,11 @@ F:	tools/testing/selftests/kvm/*/s390x/
->  KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)
->  M:	Paolo Bonzini <pbonzini@redhat.com>
->  M:	Radim Krčmář <rkrcmar@redhat.com>
-> +R:	Sean Christopherson <sean.j.christopherson@intel.com>
-> +R:	Vitaly Kuznetsov <vkuznets@redhat.com>
+Thanks,
 
-Acked-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+	M.
 
-> +R:	Wanpeng Li <wanpengli@tencent.com>
-> +R:	Jim Mattson <jmattson@google.com>
-> +R:	Joerg Roedel <joro@8bytes.org>
->  L:	kvm@vger.kernel.org
->  W:	http://www.linux-kvm.org
->  T:	git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
-> @@ -8810,8 +8807,12 @@ S:	Supported
->  F:	arch/x86/kvm/
->  F:	arch/x86/kvm/*/
->  F:	arch/x86/include/uapi/asm/kvm*
-> +F:	arch/x86/include/uapi/asm/vmx.h
-> +F:	arch/x86/include/uapi/asm/svm.h
->  F:	arch/x86/include/asm/kvm*
->  F:	arch/x86/include/asm/pvclock-abi.h
-> +F:	arch/x86/include/asm/svm.h
-> +F:	arch/x86/include/asm/vmx.h
->  F:	arch/x86/kernel/kvm.c
->  F:	arch/x86/kernel/kvmclock.c
+[1] https://lore.kernel.org/kvmarm/20190731173650.12627-1-maz@kernel.org
 
--- 
-Vitaly
+The following changes since commit cdb2d3ee0436d74fa9092f2df46aaa6f9e03c969:
+
+  arm64: KVM: hyp: debug-sr: Mark expected switch fall-through (2019-07-29 11:01:37 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.3-2
+
+for you to fetch changes up to 16e604a437c89751dc626c9e90cf88ba93c5be64:
+
+  KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable (2019-08-09 08:07:26 +0100)
+
+----------------------------------------------------------------
+KVM/arm fixes for 5.3, take #2
+
+- Fix our system register reset so that we stop writing
+  non-sensical values to them, and track which registers
+  get reset instead.
+- Sync VMCR back from the GIC on WFI so that KVM has an
+  exact vue of PMR.
+- Reevaluate state of HW-mapped, level triggered interrupts
+  on enable.
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable
+
+Marc Zyngier (3):
+      KVM: arm/arm64: Sync ICH_VMCR_EL2 back when about to block
+      KVM: arm64: Don't write junk to sysregs on reset
+      KVM: arm: Don't write junk to CP15 registers on reset
+
+ arch/arm/kvm/coproc.c         | 23 +++++++++++++++--------
+ arch/arm64/kvm/sys_regs.c     | 32 ++++++++++++++++++--------------
+ include/kvm/arm_vgic.h        |  1 +
+ virt/kvm/arm/arm.c            | 11 +++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.c | 16 ++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c   |  9 ++++++++-
+ virt/kvm/arm/vgic/vgic-v3.c   |  7 ++++++-
+ virt/kvm/arm/vgic/vgic.c      | 11 +++++++++++
+ virt/kvm/arm/vgic/vgic.h      |  2 ++
+ 9 files changed, 88 insertions(+), 24 deletions(-)
