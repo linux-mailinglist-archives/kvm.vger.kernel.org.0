@@ -2,116 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1FDF87381
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:53:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0236F873C2
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 10:07:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405885AbfHIHxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 03:53:21 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:39402 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405811AbfHIHxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 03:53:21 -0400
-Received: by mail-lj1-f194.google.com with SMTP id v18so91185350ljh.6
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 00:53:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GqqiFOTILayCWP92aAvbU7rZYbJzYJq2hFWqssnZfow=;
-        b=nY8IF2S8A3L3Vuay9KDIsTtuFYPZeeklDr8dKII6lyiCdYnIje0PkqQD6KT7a8QWHU
-         4FUv3TSucrFG98xqdbHX/fz/oYdj+KcmhxIwu8wKAtss6gbGo71dbqGgeWzg90cnNTLd
-         daAxPNFCgGaViq4pcXkR0d3YXrO3QvcYqJLrUvOmGL94qGQ59Qp7Xv4ryXeG5I2fMJ+M
-         RYNGCai1CaOieNia2IDUnrL3GIqtVgZc/GqiIUa3v0hJ0AeNWaNOq2pWS/Vu4XzMDeyG
-         iuvJ/pFULgifhSM/dP60F1hCYQ+lhZ8YerE+lgkMmWp/Rib29Nj7JqNyN1P8uIoH04Es
-         rtlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GqqiFOTILayCWP92aAvbU7rZYbJzYJq2hFWqssnZfow=;
-        b=Tlaqrw25Qcu9I/CJieruJCUu5Cgg5SkdELF4eSABd+9e6oVdWTolYFmRq60/mjmSQa
-         52nbdp0y7Fm5ebRQ6h4omE+vV57Ix7c7bQqANcdRA1HoV0K3jxirh2qZk1qny3ErVt4O
-         9LCiM6QhnPWHMDce4sLo8plzEdiIkl1h4j8a8kR8ChhAV/YVo8VTKKMxEfTlru6h2VUh
-         Kjuen2LCAH3iLgfZDD+s+wuuC7NoOcRsMgKV08Q8eyrlcdqTP961+WE4scz2cVLd+Snn
-         4OfNU9oTsNFPGlwdwB/DpH49fCfX0N1XFrmqqJwFepky2Zxbv+emdXO2mIZETodjv9SY
-         fyEQ==
-X-Gm-Message-State: APjAAAW+nIuXde4aTxmJGc0ofpLUiZZvo1X7gTAx9X3ScIrviJVrG+IN
-        lcd4PsnXDh46Y86L0PEIeI2JkwQjDcCv8+xRwWDhug==
-X-Google-Smtp-Source: APXvYqxFQuHM3xYJAfyF6kQS8ItALDrQIiaCIj4v6PZYeYPQwqRCeQNlySydBHuBNvEurL5a+9vQM3W8O0NVFX8Igw4=
-X-Received: by 2002:a2e:87d0:: with SMTP id v16mr10709810ljj.24.1565337199321;
- Fri, 09 Aug 2019 00:53:19 -0700 (PDT)
+        id S2405804AbfHIIHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 04:07:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53198 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405567AbfHIIHU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 04:07:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E6B0869086;
+        Fri,  9 Aug 2019 08:07:19 +0000 (UTC)
+Received: from gondolin (dhcp-192-181.str.redhat.com [10.33.192.181])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B21CE5D9D3;
+        Fri,  9 Aug 2019 08:07:16 +0000 (UTC)
+Date:   Fri, 9 Aug 2019 10:07:14 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Parav Pandit <parav@mellanox.com>, kvm@vger.kernel.org,
+        kwankhede@nvidia.com, linux-kernel@vger.kernel.org, cjia@nvidia.com
+Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+Message-ID: <20190809100714.6b012f41.cohuck@redhat.com>
+In-Reply-To: <20190808170247.1fc2c4c4@x1.home>
+References: <20190802065905.45239-1-parav@mellanox.com>
+        <20190808141255.45236-1-parav@mellanox.com>
+        <20190808170247.1fc2c4c4@x1.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20190809072415.29305-1-naresh.kamboju@linaro.org> <0a0e0563-aba7-e59c-1fbd-547126d404ed@redhat.com>
-In-Reply-To: <0a0e0563-aba7-e59c-1fbd-547126d404ed@redhat.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Fri, 9 Aug 2019 13:23:08 +0530
-Message-ID: <CA+G9fYt4QPjHtyoZUfe_tv+uT6yybHehymuDWBFHL-QH3K-PxA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] selftests: kvm: Adding config fragments
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Shuah Khan <shuah@kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        sean.j.christopherson@intel.com,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>, kvm list <kvm@vger.kernel.org>,
-        Dan Rue <dan.rue@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 09 Aug 2019 08:07:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 9 Aug 2019 at 13:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/08/19 09:24, Naresh Kamboju wrote:
-> > selftests kvm all test cases need pre-required kernel config for the
-> > tests to get pass.
-> >
-> > CONFIG_KVM=y
-> >
-> > The KVM tests are skipped without these configs:
-> >
-> >         dev_fd = open(KVM_DEV_PATH, O_RDONLY);
-> >         if (dev_fd < 0)
-> >                 exit(KSFT_SKIP);
-> >
-> > Signed-off-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-> > Acked-by: Shuah Khan <skhan@linuxfoundation.org>
+On Thu, 8 Aug 2019 17:02:47 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
+
+> On Thu,  8 Aug 2019 09:12:53 -0500
+> Parav Pandit <parav@mellanox.com> wrote:
+> 
+> > Currently mtty sample driver uses mdev state and UUID in convoluated way to
+> > generate an interrupt.
+> > It uses several translations from mdev_state to mdev_device to mdev uuid.
+> > After which it does linear search of long uuid comparision to
+> > find out mdev_state in mtty_trigger_interrupt().
+> > mdev_state is already available while generating interrupt from which all
+> > such translations are done to reach back to mdev_state.
+> > 
+> > This translations are done during interrupt generation path.
+> > This is unnecessary and reduandant.  
+> 
+> Is the interrupt handling efficiency of this particular sample driver
+> really relevant, or is its purpose more to illustrate the API and
+> provide a proof of concept?  If we go to the trouble to optimize the
+> sample driver and remove this interface from the API, what do we lose?
+
+Not sure how useful the sample driver is as a template; blindly copying
+their interrupt handling is probably not a good idea.
+
+> 
+> This interface was added via commit:
+> 
+> 99e3123e3d72 vfio-mdev: Make mdev_device private and abstract interfaces
+> 
+> Where the goal was to create a more formal interface and abstract
+> driver access to the struct mdev_device.  In part this served to make
+> out-of-tree mdev vendor drivers more supportable; the object is
+> considered opaque and access is provided via an API rather than through
+> direct structure fields.
+> 
+> I believe that the NVIDIA GRID mdev driver does make use of this
+> interface and it's likely included in the sample driver specifically so
+> that there is an in-kernel user for it (ie. specifically to avoid it
+> being removed so casually).  An interesting feature of the NVIDIA mdev
+> driver is that I believe it has portions that run in userspace.  As we
+> know, mdevs are named with a UUID, so I can imagine there are some
+> efficiencies to be gained in having direct access to the UUID for a
+> device when interacting with userspace, rather than repeatedly parsing
+> it from a device name.  Is that really something we want to make more
+> difficult in order to optimize a sample driver?  Knowing that an mdev
+> device uses a UUID for it's name, as tools like libvirt and mdevctl
+> expect, is it really worthwhile to remove such a trivial API?
+
+Ripping out the uuid is a bad idea, I agree. The device name simply is
+no good replacement for that.
+
+If there's a good use case for using the uuid in a vendor driver, let's
+keep the accessor. But then we probably should either leave the sample
+driver alone, or add a more compelling use of the api there.
+
+> 
+> > Hence,
+> > Patch-1 simplifies mtty sample driver to directly use mdev_state.
+> > 
+> > Patch-2, Since no production driver uses mdev_uuid(), simplifies and
+> > removes redandant mdev_uuid() exported symbol.  
+> 
+> s/no production driver/no in-kernel production driver/
+> 
+> I'd be interested to hear how the NVIDIA folks make use of this API
+> interface.  Thanks,
+> 
+> Alex
+> 
 > > ---
-> >  tools/testing/selftests/kvm/config | 1 +
-> >  1 file changed, 1 insertion(+)
-> >  create mode 100644 tools/testing/selftests/kvm/config
-> >
-> > diff --git a/tools/testing/selftests/kvm/config b/tools/testing/selftests/kvm/config
-> > new file mode 100644
-> > index 000000000000..14f90d8d6801
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/config
-> > @@ -0,0 +1 @@
-> > +CONFIG_KVM=y
-> >
->
-> I think this is more complicated without a real benefit, so I'll merge v2.
+> > Changelog:
+> > v1->v2:
+> >  - Corrected email of Kirti
+> >  - Updated cover letter commit log to address comment from Cornelia
+> >  - Added Reviewed-by tag
+> > v0->v1:
+> >  - Updated commit log
+> > 
+> > Parav Pandit (2):
+> >   vfio-mdev/mtty: Simplify interrupt generation
+> >   vfio/mdev: Removed unused and redundant API for mdev UUID
+> > 
+> >  drivers/vfio/mdev/mdev_core.c |  6 ------
+> >  include/linux/mdev.h          |  1 -
+> >  samples/vfio-mdev/mtty.c      | 39 +++++++----------------------------
+> >  3 files changed, 8 insertions(+), 38 deletions(-)
+> >   
+> 
 
-With the recent changes to 'kselftest-merge' nested configs also get merged.
-Please refer this below commit for more details.
----
-commit 6d3db46c8e331908775b0135dc7d2e5920bf6d90
-Author: Dan Rue <dan.rue@linaro.org>
-Date:   Mon May 20 10:16:14 2019 -0500
-
-    kbuild: teach kselftest-merge to find nested config files
-
-    Current implementation of kselftest-merge only finds config files that
-    are one level deep using `$(srctree)/tools/testing/selftests/*/config`.
-
-    Often, config files are added in nested directories, and do not get
-    picked up by kselftest-merge.
-
-    Use `find` to catch all config files under
-    `$(srctree)/tools/testing/selftests` instead.
-
-    Signed-off-by: Dan Rue <dan.rue@linaro.org>
-    Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-- Naresh
