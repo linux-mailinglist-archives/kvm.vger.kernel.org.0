@@ -2,92 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F4D2874B9
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 11:01:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B89B6874CA
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 11:04:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406068AbfHIJBB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 05:01:01 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52564 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406032AbfHIJBB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 05:01:01 -0400
-Received: by mail-wm1-f66.google.com with SMTP id s3so4932574wms.2
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 02:01:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wi2BHvM1fl4ETS2j2+rpRDcLcQQawHudgg0yb+P5OTU=;
-        b=PhsIamZaM/PeDCNTWZp8nBpw4E0sU/Snmg42i1uXZeU0IO5AE2ZkyV4D1Hs+uLdZrj
-         cN5VWwdbDczV57U3TZcRAt+1x7jhIQ82qNQLI92sBZk9T/NzIekPJZ+AZjZEWseYUc8K
-         HUrez8JEgLorFVyGf0HYjirDSQC+zkydqC6bsZ7B5YmdHKh5Wpgzcc7IrpS1Sd4oUtjE
-         HrfK71ldKBcJ/mS+kq74FodhD1noFEU47Q3Z+uXS4KlRtYHTbjF5oDP40rHnHaHJar5N
-         74SxUmjLIfpmjRgqM2uIwNGRXqUPgEV34aPa9FXkLuS2EuqpEWnjzpYr25tbYJqK4jyM
-         SPkQ==
-X-Gm-Message-State: APjAAAV96U84Ovlhx+s0nXCrqD3HyCXSWNzevBFrIoc3j+/esCqlBf6v
-        CfWFTLm2PFDJo3XgxCjkrzh8aQ==
-X-Google-Smtp-Source: APXvYqyNMFM488WmLYeAfYIO7lJmFRdi3Vo5BGW5Y1C/q8YX6x7ObiHJh0qxETNqgckUmR7/YulERA==
-X-Received: by 2002:a7b:cb8a:: with SMTP id m10mr9779246wmi.154.1565341259261;
-        Fri, 09 Aug 2019 02:00:59 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a84sm6937335wmf.29.2019.08.09.02.00.58
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 09 Aug 2019 02:00:58 -0700 (PDT)
-Subject: Re: [PATCH v4 00/20] KVM RISC-V Support
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190807122726.81544-1-anup.patel@wdc.com>
- <4a991aa3-154a-40b2-a37d-9ee4a4c7a2ca@redhat.com>
- <alpine.DEB.2.21.9999.1908071606560.13971@viisi.sifive.com>
- <df0638d9-e2f4-30f5-5400-9078bf9d1f99@redhat.com>
- <alpine.DEB.2.21.9999.1908081824500.21111@viisi.sifive.com>
- <2ea0c656-bd7e-ae79-1f8e-6b60374ccc6e@redhat.com>
- <CAAhSdy1Hn69CxERttqa39wWr1-EYJtUPSG7TZnavZQqnMOHUqA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <97987944-b42f-4f51-acfb-f318b41875bc@redhat.com>
-Date:   Fri, 9 Aug 2019 11:00:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2406068AbfHIJE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 05:04:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60544 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405962AbfHIJE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 05:04:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5623A2F30D8;
+        Fri,  9 Aug 2019 09:04:28 +0000 (UTC)
+Received: from gondolin (dhcp-192-181.str.redhat.com [10.33.192.181])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 487DA5D9DC;
+        Fri,  9 Aug 2019 09:04:27 +0000 (UTC)
+Date:   Fri, 9 Aug 2019 11:04:25 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        frankja@linux.ibm.com,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: change list for KVM/s390
+Message-ID: <20190809110425.45a62e7a.cohuck@redhat.com>
+In-Reply-To: <1565335156-28660-1-git-send-email-pbonzini@redhat.com>
+References: <1565335156-28660-1-git-send-email-pbonzini@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <CAAhSdy1Hn69CxERttqa39wWr1-EYJtUPSG7TZnavZQqnMOHUqA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Fri, 09 Aug 2019 09:04:28 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/19 10:22, Anup Patel wrote:
->> the L here should be kvm@vger.kernel.org.  arch/riscv/kvm/ files would
->> still match RISC-V ARCHITECTURE and therefore
->> linux-riscv@lists.infradead.org would be CCed.
-> In addition to above mentioned lists, we insist of having a separate
-> KVM RISC-V list which can be CCed for non-kernel patches for projects
-> such as QEMU, KVMTOOL, and Libvirt. This KVM RISC-V list can also
-> be used for general queries related to KVM RISCV.
+On Fri,  9 Aug 2019 09:19:16 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-You can use kvm@vger.kernel.org for that, with CCs to the other
-appropriate list (qemu-devel, libvir-list, LKML, linux-riscv, etc.).
-But if you want to have kvm-riscv, go ahead and ask for it.
+> KVM/s390 does not have a list of its own, and linux-s390 is in the
+> loop anyway thanks to the generic arch/s390 match.  So use the generic
+> KVM list for s390 patches.
 
-In any case, you can send v5 with all R-b and Acked-by and a fixed
-MAINTAINERS entry (listing kvm@vger for now), and Paul will apply it.
-For 5.5 you can start sending patches to me, either for direct
-application to the KVM tree or as pull requests.
+Let's add the s390 list manually just for this patch, for awareness :)
 
-Paolo
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1aec93695040..6498ebaca2f6 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -8788,7 +8788,7 @@ M:	Christian Borntraeger <borntraeger@de.ibm.com>
+>  M:	Janosch Frank <frankja@linux.ibm.com>
+>  R:	David Hildenbrand <david@redhat.com>
+>  R:	Cornelia Huck <cohuck@redhat.com>
+> -L:	linux-s390@vger.kernel.org
+> +L:	kvm@vger.kernel.org
+>  W:	http://www.ibm.com/developerworks/linux/linux390/
+>  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git
+>  S:	Supported
+
+Yes, get_maintainers.pl should add in the s390 list, so that sounds
+fine.
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
