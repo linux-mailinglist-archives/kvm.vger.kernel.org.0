@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B30987F00
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:10:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0032787F96
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:20:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437063AbfHIQJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:09:59 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52682 "EHLO
+        id S2437231AbfHIQUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:20:05 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53318 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2436964AbfHIQJ4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:09:56 -0400
+        by vger.kernel.org with ESMTP id S2437184AbfHIQUE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:20:04 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 5A61E305D3CD;
-        Fri,  9 Aug 2019 19:00:50 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id F4021305D3CE;
+        Fri,  9 Aug 2019 19:00:52 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 15181305B7A0;
-        Fri,  9 Aug 2019 19:00:50 +0300 (EEST)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id A7894305B7A0;
+        Fri,  9 Aug 2019 19:00:52 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -34,9 +34,9 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
         =?UTF-8?q?Mircea=20C=C3=AErjaliu?= <mcirjaliu@bitdefender.com>
-Subject: [RFC PATCH v6 01/92] kvm: introduce KVMI (VM introspection subsystem)
-Date:   Fri,  9 Aug 2019 18:59:16 +0300
-Message-Id: <20190809160047.8319-2-alazar@bitdefender.com>
+Subject: [RFC PATCH v6 02/92] kvm: introspection: add basic ioctls (hook/unhook)
+Date:   Fri,  9 Aug 2019 18:59:17 +0300
+Message-Id: <20190809160047.8319-3-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -47,325 +47,522 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+The connection of the introspection socket with the introspection tool
+is initialized by userspace/QEMU. Once the handshake is done, the file
+descriptor is passed to KVMi using the KVM_INTROSPECTION_HOOK ioctl. A
+new thread will be created to handle/dispatch all introspection commands
+or replies to introspection events. This thread will finish when the
+socket is closed by userspace (eg. when the guest is restarted) or by
+the introspection tool. The uuid member of struct kvm_introspection is
+used to show the guest id with the error messages.
 
-Besides the pointer to the new structure, the patch adds to the kvm
-structure a reference counter (the new object will be used by the thread
-receiving introspection commands/events) and a completion variable
-(to signal that the VM can be hooked by the introspection tool).
+On certain actions from userspace (pause, suspend, migrate, etc.) the
+KVM_INTROSPECTION_UNHOOK ioctl is used to notify the introspection tool
+to remove its hooks (eg. breakpoints).
 
+Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Co-developed-by: Mihai Donțu <mdontu@bitdefender.com>
 Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Co-developed-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
 Signed-off-by: Mircea Cîrjaliu <mcirjaliu@bitdefender.com>
+Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst | 75 ++++++++++++++++++++++++++++++
- arch/x86/kvm/Kconfig               |  7 +++
- arch/x86/kvm/Makefile              |  1 +
- include/linux/kvm_host.h           |  4 ++
- include/linux/kvmi.h               | 23 +++++++++
- include/uapi/linux/kvmi.h          | 68 +++++++++++++++++++++++++++
- virt/kvm/kvm_main.c                | 10 +++-
- virt/kvm/kvmi.c                    | 64 +++++++++++++++++++++++++
- virt/kvm/kvmi_int.h                | 12 +++++
- 9 files changed, 263 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/virtual/kvm/kvmi.rst
- create mode 100644 include/linux/kvmi.h
- create mode 100644 include/uapi/linux/kvmi.h
- create mode 100644 virt/kvm/kvmi.c
- create mode 100644 virt/kvm/kvmi_int.h
+ Documentation/virtual/kvm/api.txt  |  50 ++++++++++
+ Documentation/virtual/kvm/kvmi.rst |  65 +++++++++++++
+ arch/x86/kvm/Makefile              |   2 +-
+ arch/x86/kvm/x86.c                 |   7 ++
+ include/linux/kvmi.h               |   4 +
+ include/uapi/linux/kvm.h           |  11 +++
+ virt/kvm/kvm_main.c                |   8 ++
+ virt/kvm/kvmi.c                    | 145 +++++++++++++++++++++++++++++
+ virt/kvm/kvmi_int.h                |  31 ++++++
+ virt/kvm/kvmi_msg.c                |  42 +++++++++
+ 10 files changed, 364 insertions(+), 1 deletion(-)
+ create mode 100644 virt/kvm/kvmi_msg.c
 
-diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-new file mode 100644
-index 000000000000..d54caf8d974f
---- /dev/null
-+++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -0,0 +1,75 @@
-+=========================================================
-+KVMI - The kernel virtual machine introspection subsystem
-+=========================================================
-+
-+The KVM introspection subsystem provides a facility for applications running
-+on the host or in a separate VM, to control the execution of other VM-s
-+(pause, resume, shutdown), query the state of the vCPUs (GPRs, MSRs etc.),
-+alter the page access bits in the shadow page tables (only for the hardware
-+backed ones, eg. Intel's EPT) and receive notifications when events of
-+interest have taken place (shadow page table level faults, key MSR writes,
-+hypercalls etc.). Some notifications can be responded to with an action
-+(like preventing an MSR from being written), others are mere informative
-+(like breakpoint events which can be used for execution tracing).
-+With few exceptions, all events are optional. An application using this
-+subsystem will explicitly register for them.
-+
-+The use case that gave way for the creation of this subsystem is to monitor
-+the guest OS and as such the ABI/API is highly influenced by how the guest
-+software (kernel, applications) sees the world. For example, some events
-+provide information specific for the host CPU architecture
-+(eg. MSR_IA32_SYSENTER_EIP) merely because its leveraged by guest software
-+to implement a critical feature (fast system calls).
-+
-+At the moment, the target audience for KVMI are security software authors
-+that wish to perform forensics on newly discovered threats (exploits) or
-+to implement another layer of security like preventing a large set of
-+kernel rootkits simply by "locking" the kernel image in the shadow page
-+tables (ie. enforce .text r-x, .rodata rw- etc.). It's the latter case that
-+made KVMI a separate subsystem, even though many of these features are
-+available in the device manager (eg. QEMU). The ability to build a security
-+application that does not interfere (in terms of performance) with the
-+guest software asks for a specialized interface that is designed for minimum
-+overhead.
-+
-+API/ABI
-+=======
-+
-+This chapter describes the VMI interface used to monitor and control local
-+guests from a user application.
-+
-+Overview
-+--------
-+
-+The interface is socket based, one connection for every VM. One end is in the
-+host kernel while the other is held by the user application (introspection
-+tool).
-+
-+The initial connection is established by an application running on the host
-+(eg. QEMU) that connects to the introspection tool and after a handshake the
-+socket is passed to the host kernel making all further communication take
-+place between it and the introspection tool. The initiating party (QEMU) can
-+close its end so that any potential exploits cannot take a hold of it.
-+
-+The socket protocol allows for commands and events to be multiplexed over
-+the same connection. As such, it is possible for the introspection tool to
-+receive an event while waiting for the result of a command. Also, it can
-+send a command while the host kernel is waiting for a reply to an event.
-+
-+The kernel side of the socket communication is blocking and will wait for
-+an answer from its peer indefinitely or until the guest is powered off
-+(killed), restarted or the peer goes away, at which point it will wake
-+up and properly cleanup as if the introspection subsystem has never been
-+used on that guest. Obviously, whether the guest can really continue
-+normal execution depends on whether the introspection tool has made any
-+modifications that require an active KVMI channel.
-+
-+Memory access safety
-+--------------------
-+
-+The KVMI API gives access to the entire guest physical address space but
-+provides no information on which parts of it are system RAM and which are
-+device-specific memory (DMA, emulated MMIO, reserved by a passthrough
-+device etc.). It is up to the user to determine, using the guest operating
-+system data structures, the areas that are safe to access (code, stack, heap
-+etc.).
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 72fa955f4a15..f70a6a1b6814 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -96,6 +96,13 @@ config KVM_MMU_AUDIT
- 	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
- 	 auditing of KVM MMU events at runtime.
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 356156f5c52d..28d4429f9ae9 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -3857,6 +3857,56 @@ number of valid entries in the 'entries' array, which is then filled.
+ 'index' and 'flags' fields in 'struct kvm_cpuid_entry2' are currently reserved,
+ userspace should not expect to get any particular value there.
  
-+config KVM_INTROSPECTION
-+	bool "VM Introspection"
-+	depends on KVM && (KVM_INTEL || KVM_AMD)
-+	help
-+	 This option enables functions to control the execution of VM-s, query
-+	 the state of the vCPU-s (GPR-s, MSR-s etc.).
++4.996 KVM_INTROSPECTION_HOOK
 +
- # OK, it's a little counter-intuitive to do this, but it puts it neatly under
- # the virtualization menu.
- source "drivers/vhost/Kconfig"
++Capability: KVM_CAP_INTROSPECTION
++Architectures: x86
++Type: vm ioctl
++Parameters: struct kvm_introspection (in)
++Returns: 0 on success, a negative value on error
++
++This ioctl is used to enable the introspection of the current VM.
++
++struct kvm_introspection {
++	__s32 fd;
++	__u32 padding;
++	__u8 uuid[16];
++};
++
++fd is the file handle of a socket connected to the introspection tool,
++
++padding must be zero (it might be used in the future),
++
++uuid is used for debug and error messages.
++
++It can fail with -EFAULT if:
++ - memory allocation failed
++ - this VM is already introspected
++ - the file handle doesn't correspond to an active socket
++
++It will fail with -EINVAL if padding is not zero.
++
++The KVMI version can be retrieved using the KVM_CAP_INTROSPECTION of
++the KVM_CHECK_EXTENSION ioctl() at run-time.
++
++4.997 KVM_INTROSPECTION_UNHOOK
++
++Capability: KVM_CAP_INTROSPECTION
++Architectures: x86
++Type: vm ioctl
++Parameters: none
++Returns: 0 on success, a negative value on error
++
++This ioctl is used to disable the introspection of the current VM.
++It is useful when the VM is paused/suspended/migrated.
++
++It can fail with -EFAULT if:
++  - the introspection is not enabled
++  - the socket (passed with KVM_INTROSPECTION_HOOK) had an error
++
++If the ioctl is successful, the userspace should give the introspection
++tool a chance to unhook the VM.
++
+ 5. The kvm_run structure
+ ------------------------
+ 
+diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
+index d54caf8d974f..47b7c36d334a 100644
+--- a/Documentation/virtual/kvm/kvmi.rst
++++ b/Documentation/virtual/kvm/kvmi.rst
+@@ -64,6 +64,71 @@ used on that guest. Obviously, whether the guest can really continue
+ normal execution depends on whether the introspection tool has made any
+ modifications that require an active KVMI channel.
+ 
++Handshake
++---------
++
++Although this falls out of the scope of the introspection subsystem, below
++is a proposal of a handshake that can be used by implementors.
++
++Based on the system administration policies, the management tool
++(eg. libvirt) starts device managers (eg. QEMU) with some extra arguments:
++what introspector could monitor/control that specific guest (and how to
++connect to) and what introspection commands/events are allowed.
++
++The device manager will connect to the introspection tool and wait for a
++cryptographic hash of a cookie that should be known by both peers. If the
++hash is correct (the destination has been "authenticated"), the device
++manager will send another cryptographic hash and random salt. The peer
++recomputes the hash of the cookie bytes including the salt and if they match,
++the device manager has been "authenticated" too. This is a rather crude
++system that makes it difficult for device manager exploits to trick the
++introspection tool into believing its working OK.
++
++The cookie would normally be generated by a management tool (eg. libvirt)
++and make it available to the device manager and to a properly authenticated
++client. It is the job of a third party to retrieve the cookie from the
++management application and pass it over a secure channel to the introspection
++tool.
++
++Once the basic "authentication" has taken place, the introspection tool
++can receive information on the guest (its UUID) and other flags (endianness
++or features supported by the host kernel).
++
++In the end, the device manager will pass the file handle (plus the allowed
++commands/events) to KVM, and forget about it. It will be notified by
++KVM when the introspection tool closes the file handle (in case of
++errors), and should reinitiate the handshake.
++
++Unhooking
++---------
++
++During a VMI session it is possible for the guest to be patched and for
++some of these patches to "talk" with the introspection tool. It thus
++becomes necessary to remove them before the guest is suspended, moved
++(migrated) or a snapshot with memory is created.
++
++The actions are normally performed by the device manager. In the case
++of QEMU, it will use the *KVM_INTROSPECTION_UNHOOK* ioctl to trigger
++the *KVMI_EVENT_UNHOOK* event and wait for a limited amount of time (a
++few seconds) for a confirmation from the introspection tool
++that is OK to proceed.
++
++Live migrations
++---------------
++
++Before the live migration takes place, the introspection tool has to be
++notified and have a chance to unhook (see **Unhooking**).
++
++The QEMU instance on the receiving end, if configured for KVMI, will need to
++establish a connection to the introspection tool after the migration has
++completed.
++
++Obviously, this creates a window in which the guest is not introspected. The
++user will need to be aware of this detail. Future introspection
++technologies can choose not to disconnect and instead transfer the necessary
++context to the introspection tool at the migration destination via a separate
++channel.
++
+ Memory access safety
+ --------------------
+ 
 diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 31ecf7a76d5a..312597bd47c7 100644
+index 312597bd47c7..0963e475dbe9 100644
 --- a/arch/x86/kvm/Makefile
 +++ b/arch/x86/kvm/Makefile
-@@ -7,6 +7,7 @@ KVM := ../../../virt/kvm
+@@ -7,7 +7,7 @@ KVM := ../../../virt/kvm
  kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
  				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o
  kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
-+kvm-$(CONFIG_KVM_INTROSPECTION) += $(KVM)/kvmi.o
+-kvm-$(CONFIG_KVM_INTROSPECTION) += $(KVM)/kvmi.o
++kvm-$(CONFIG_KVM_INTROSPECTION) += $(KVM)/kvmi.o $(KVM)/kvmi_msg.o
  
  kvm-y			+= x86.o mmu.o emulate.o i8259.o irq.o lapic.o \
  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index c38cc5eb7e73..582b0187f5a4 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -455,6 +455,10 @@ struct kvm {
- 	struct srcu_struct srcu;
- 	struct srcu_struct irq_srcu;
- 	pid_t userspace_pid;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 941f932373d0..0163e1ad1aaa 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -20,6 +20,8 @@
+  */
+ 
+ #include <linux/kvm_host.h>
++#include <uapi/linux/kvmi.h>
++#include <linux/kvmi.h>
+ #include "irq.h"
+ #include "mmu.h"
+ #include "i8254.h"
+@@ -3083,6 +3085,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = kvm_x86_ops->get_nested_state ?
+ 			kvm_x86_ops->get_nested_state(NULL, 0, 0) : 0;
+ 		break;
++#ifdef CONFIG_KVM_INTROSPECTION
++	case KVM_CAP_INTROSPECTION:
++		r = KVMI_VERSION;
++		break;
++#endif
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/linux/kvmi.h b/include/linux/kvmi.h
+index e36de3f9f3de..4ca9280e4419 100644
+--- a/include/linux/kvmi.h
++++ b/include/linux/kvmi.h
+@@ -10,6 +10,10 @@ int kvmi_init(void);
+ void kvmi_uninit(void);
+ void kvmi_create_vm(struct kvm *kvm);
+ void kvmi_destroy_vm(struct kvm *kvm);
++int kvmi_ioctl_hook(struct kvm *kvm, void __user *argp);
++int kvmi_ioctl_command(struct kvm *kvm, void __user *argp);
++int kvmi_ioctl_event(struct kvm *kvm, void __user *argp);
++int kvmi_ioctl_unhook(struct kvm *kvm, bool force_reset);
+ 
+ #else
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 6d4ea4b6c922..bae37bf37338 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -989,6 +989,8 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
+ #define KVM_CAP_HYPERV_CPUID 167
+ 
++#define KVM_CAP_INTROSPECTION 999
 +
-+	struct completion kvmi_completed;
-+	refcount_t kvmi_ref;
-+	void *kvmi;
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+ struct kvm_irq_routing_irqchip {
+@@ -1520,6 +1522,15 @@ struct kvm_sev_dbg {
+ 	__u32 len;
  };
  
- #define kvm_err(fmt, ...) \
-diff --git a/include/linux/kvmi.h b/include/linux/kvmi.h
-new file mode 100644
-index 000000000000..e36de3f9f3de
---- /dev/null
-+++ b/include/linux/kvmi.h
-@@ -0,0 +1,23 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVMI_H__
-+#define __KVMI_H__
-+
-+#define kvmi_is_present() IS_ENABLED(CONFIG_KVM_INTROSPECTION)
-+
-+#ifdef CONFIG_KVM_INTROSPECTION
-+
-+int kvmi_init(void);
-+void kvmi_uninit(void);
-+void kvmi_create_vm(struct kvm *kvm);
-+void kvmi_destroy_vm(struct kvm *kvm);
-+
-+#else
-+
-+static inline int kvmi_init(void) { return 0; }
-+static inline void kvmi_uninit(void) { }
-+static inline void kvmi_create_vm(struct kvm *kvm) { }
-+static inline void kvmi_destroy_vm(struct kvm *kvm) { }
-+
-+#endif /* CONFIG_KVM_INTROSPECTION */
-+
-+#endif
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-new file mode 100644
-index 000000000000..dbf63ad0862f
---- /dev/null
-+++ b/include/uapi/linux/kvmi.h
-@@ -0,0 +1,68 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef _UAPI__LINUX_KVMI_H
-+#define _UAPI__LINUX_KVMI_H
-+
-+/*
-+ * KVMI structures and definitions
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/types.h>
-+
-+#define KVMI_VERSION 0x00000001
-+
-+enum {
-+	KVMI_EVENT_REPLY           = 0,
-+	KVMI_EVENT                 = 1,
-+
-+	KVMI_FIRST_COMMAND         = 2,
-+
-+	KVMI_GET_VERSION           = 2,
-+	KVMI_CHECK_COMMAND         = 3,
-+	KVMI_CHECK_EVENT           = 4,
-+	KVMI_GET_GUEST_INFO        = 5,
-+	KVMI_GET_VCPU_INFO         = 6,
-+	KVMI_PAUSE_VCPU            = 7,
-+	KVMI_CONTROL_VM_EVENTS     = 8,
-+	KVMI_CONTROL_EVENTS        = 9,
-+	KVMI_CONTROL_CR            = 10,
-+	KVMI_CONTROL_MSR           = 11,
-+	KVMI_CONTROL_VE            = 12,
-+	KVMI_GET_REGISTERS         = 13,
-+	KVMI_SET_REGISTERS         = 14,
-+	KVMI_GET_CPUID             = 15,
-+	KVMI_GET_XSAVE             = 16,
-+	KVMI_READ_PHYSICAL         = 17,
-+	KVMI_WRITE_PHYSICAL        = 18,
-+	KVMI_INJECT_EXCEPTION      = 19,
-+	KVMI_GET_PAGE_ACCESS       = 20,
-+	KVMI_SET_PAGE_ACCESS       = 21,
-+	KVMI_GET_MAP_TOKEN         = 22,
-+	KVMI_GET_MTRR_TYPE         = 23,
-+	KVMI_CONTROL_SPP           = 24,
-+	KVMI_GET_PAGE_WRITE_BITMAP = 25,
-+	KVMI_SET_PAGE_WRITE_BITMAP = 26,
-+	KVMI_CONTROL_CMD_RESPONSE  = 27,
-+
-+	KVMI_NEXT_AVAILABLE_COMMAND,
-+
++struct kvm_introspection {
++	__s32 fd;
++	__u32 padding;
++	__u8 uuid[16];
 +};
++#define KVM_INTROSPECTION_HOOK    _IOW(KVMIO, 0xff, struct kvm_introspection)
++#define KVM_INTROSPECTION_UNHOOK  _IO(KVMIO, 0xfe)
++/* write true on force-reset, false otherwise */
 +
-+enum {
-+	KVMI_EVENT_UNHOOK      = 0,
-+	KVMI_EVENT_CR	       = 1,
-+	KVMI_EVENT_MSR	       = 2,
-+	KVMI_EVENT_XSETBV      = 3,
-+	KVMI_EVENT_BREAKPOINT  = 4,
-+	KVMI_EVENT_HYPERCALL   = 5,
-+	KVMI_EVENT_PF	       = 6,
-+	KVMI_EVENT_TRAP	       = 7,
-+	KVMI_EVENT_DESCRIPTOR  = 8,
-+	KVMI_EVENT_CREATE_VCPU = 9,
-+	KVMI_EVENT_PAUSE_VCPU  = 10,
-+	KVMI_EVENT_SINGLESTEP  = 11,
-+
-+	KVMI_NUM_EVENTS
-+};
-+
-+#endif /* _UAPI__LINUX_KVMI_H */
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 585845203db8..90e432d225ab 100644
+index 90e432d225ab..09a930ac007d 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -51,6 +51,7 @@
- #include <linux/slab.h>
- #include <linux/sort.h>
- #include <linux/bsearch.h>
-+#include <linux/kvmi.h>
- 
- #include <asm/processor.h>
- #include <asm/io.h>
-@@ -680,6 +681,8 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 	if (r)
- 		goto out_err;
- 
-+	kvmi_create_vm(kvm);
-+
- 	spin_lock(&kvm_lock);
- 	list_add(&kvm->vm_list, &vm_list);
- 	spin_unlock(&kvm_lock);
-@@ -725,6 +728,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
- 	int i;
- 	struct mm_struct *mm = kvm->mm;
- 
-+	kvmi_destroy_vm(kvm);
- 	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
- 	kvm_destroy_vm_debugfs(kvm);
- 	kvm_arch_sync_events(kvm);
-@@ -1556,7 +1560,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
- 	 * Whoever called remap_pfn_range is also going to call e.g.
- 	 * unmap_mapping_range before the underlying pages are freed,
- 	 * causing a call to our MMU notifier.
--	 */ 
-+	 */
- 	kvm_get_pfn(pfn);
- 
- 	*p_pfn = pfn;
-@@ -4204,6 +4208,9 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 	r = kvm_vfio_ops_init();
- 	WARN_ON(r);
- 
-+	r = kvmi_init();
-+	WARN_ON(r);
-+
- 	return 0;
- 
- out_unreg:
-@@ -4229,6 +4236,7 @@ EXPORT_SYMBOL_GPL(kvm_init);
- 
- void kvm_exit(void)
- {
-+	kvmi_uninit();
- 	debugfs_remove_recursive(kvm_debugfs_dir);
- 	misc_deregister(&kvm_dev);
- 	kmem_cache_destroy(kvm_vcpu_cache);
+@@ -3266,6 +3266,14 @@ static long kvm_vm_ioctl(struct file *filp,
+ 	case KVM_CHECK_EXTENSION:
+ 		r = kvm_vm_ioctl_check_extension_generic(kvm, arg);
+ 		break;
++#ifdef CONFIG_KVM_INTROSPECTION
++	case KVM_INTROSPECTION_HOOK:
++		r = kvmi_ioctl_hook(kvm, argp);
++		break;
++	case KVM_INTROSPECTION_UNHOOK:
++		r = kvmi_ioctl_unhook(kvm, arg);
++		break;
++#endif /* CONFIG_KVM_INTROSPECTION */
+ 	default:
+ 		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
+ 	}
 diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
-new file mode 100644
-index 000000000000..20638743bd03
---- /dev/null
+index 20638743bd03..591f6ee22135 100644
+--- a/virt/kvm/kvmi.c
 +++ b/virt/kvm/kvmi.c
-@@ -0,0 +1,64 @@
+@@ -7,6 +7,8 @@
+  */
+ #include <uapi/linux/kvmi.h>
+ #include "kvmi_int.h"
++#include <linux/kthread.h>
++#include <linux/bitmap.h>
+ 
+ int kvmi_init(void)
+ {
+@@ -17,6 +19,22 @@ void kvmi_uninit(void)
+ {
+ }
+ 
++static bool alloc_kvmi(struct kvm *kvm, const struct kvm_introspection *qemu)
++{
++	struct kvmi *ikvm;
++
++	ikvm = kzalloc(sizeof(*ikvm), GFP_KERNEL);
++	if (!ikvm)
++		return false;
++
++	memcpy(&ikvm->uuid, &qemu->uuid, sizeof(ikvm->uuid));
++
++	ikvm->kvm = kvm;
++	kvm->kvmi = ikvm;
++
++	return true;
++}
++
+ struct kvmi * __must_check kvmi_get(struct kvm *kvm)
+ {
+ 	if (refcount_inc_not_zero(&kvm->kvmi_ref))
+@@ -27,10 +45,13 @@ struct kvmi * __must_check kvmi_get(struct kvm *kvm)
+ 
+ static void kvmi_destroy(struct kvm *kvm)
+ {
++	kfree(kvm->kvmi);
++	kvm->kvmi = NULL;
+ }
+ 
+ static void kvmi_release(struct kvm *kvm)
+ {
++	kvmi_sock_put(IKVM(kvm));
+ 	kvmi_destroy(kvm);
+ 
+ 	complete(&kvm->kvmi_completed);
+@@ -43,6 +64,111 @@ void kvmi_put(struct kvm *kvm)
+ 		kvmi_release(kvm);
+ }
+ 
++static void kvmi_end_introspection(struct kvmi *ikvm)
++{
++	struct kvm *kvm = ikvm->kvm;
++
++	/* Signal QEMU which is waiting for POLLHUP. */
++	kvmi_sock_shutdown(ikvm);
++
++	/*
++	 * At this moment the socket is shut down, no more commands will come
++	 * from the introspector, and the only way into the introspection is
++	 * thru the event handlers. Make sure the introspection ends.
++	 */
++	kvmi_put(kvm);
++}
++
++static int kvmi_recv(void *arg)
++{
++	struct kvmi *ikvm = arg;
++
++	kvmi_info(ikvm, "Hooking VM\n");
++
++	while (kvmi_msg_process(ikvm))
++		;
++
++	kvmi_info(ikvm, "Unhooking VM\n");
++
++	kvmi_end_introspection(ikvm);
++
++	return 0;
++}
++
++int kvmi_hook(struct kvm *kvm, const struct kvm_introspection *qemu)
++{
++	struct kvmi *ikvm;
++	int err = 0;
++
++	/* wait for the previous introspection to finish */
++	err = wait_for_completion_killable(&kvm->kvmi_completed);
++	if (err)
++		return err;
++
++	/* ensure no VCPU hotplug happens until we set the reference */
++	mutex_lock(&kvm->lock);
++
++	if (!alloc_kvmi(kvm, qemu)) {
++		mutex_unlock(&kvm->lock);
++		return -ENOMEM;
++	}
++	ikvm = IKVM(kvm);
++
++	/* interact with other kernel components after structure allocation */
++	if (!kvmi_sock_get(ikvm, qemu->fd)) {
++		err = -EINVAL;
++		goto err_alloc;
++	}
++
++	/*
++	 * Make sure all the KVM/KVMI structures are linked and no pointer
++	 * is read as NULL after the reference count has been set.
++	 */
++	smp_mb__before_atomic();
++	refcount_set(&kvm->kvmi_ref, 1);
++
++	mutex_unlock(&kvm->lock);
++
++	ikvm->recv = kthread_run(kvmi_recv, ikvm, "kvmi-recv");
++	if (IS_ERR(ikvm->recv)) {
++		kvmi_err(ikvm, "Unable to create receiver thread!\n");
++		err = PTR_ERR(ikvm->recv);
++		goto err_recv;
++	}
++
++	return 0;
++
++err_recv:
++	/*
++	 * introspection has oficially started since reference count has been
++	 * set (and some event handlers may have already acquired it), but
++	 * without the receiver thread; we must emulate its shutdown behavior
++	 */
++	kvmi_end_introspection(ikvm);
++
++	return err;
++
++err_alloc:
++	kvmi_release(kvm);
++
++	mutex_unlock(&kvm->lock);
++
++	return err;
++}
++
++int kvmi_ioctl_hook(struct kvm *kvm, void __user *argp)
++{
++	struct kvm_introspection i;
++
++	if (copy_from_user(&i, argp, sizeof(i)))
++		return -EFAULT;
++
++	if (i.padding)
++		return -EINVAL;
++
++	return kvmi_hook(kvm, &i);
++}
++
+ void kvmi_create_vm(struct kvm *kvm)
+ {
+ 	init_completion(&kvm->kvmi_completed);
+@@ -57,8 +183,27 @@ void kvmi_destroy_vm(struct kvm *kvm)
+ 	if (!ikvm)
+ 		return;
+ 
++	/* trigger socket shutdown - kvmi_recv() will start shutdown process */
++	kvmi_sock_shutdown(ikvm);
++
+ 	kvmi_put(kvm);
+ 
+ 	/* wait for introspection resources to be released */
+ 	wait_for_completion_killable(&kvm->kvmi_completed);
+ }
++
++int kvmi_ioctl_unhook(struct kvm *kvm, bool force_reset)
++{
++	struct kvmi *ikvm;
++	int err = 0;
++
++	ikvm = kvmi_get(kvm);
++	if (!ikvm)
++		return -EFAULT;
++
++	kvm_info("TODO: %s force_reset %d", __func__, force_reset);
++
++	kvmi_put(kvm);
++
++	return err;
++}
+diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
+index ac23ad6fc4df..9bc5205c8714 100644
+--- a/virt/kvm/kvmi_int.h
++++ b/virt/kvm/kvmi_int.h
+@@ -2,11 +2,42 @@
+ #ifndef __KVMI_INT_H__
+ #define __KVMI_INT_H__
+ 
++#include <linux/types.h>
+ #include <linux/kvm_host.h>
+ 
++#include <uapi/linux/kvmi.h>
++
++#define kvmi_debug(ikvm, fmt, ...) \
++	kvm_debug("%pU " fmt, &ikvm->uuid, ## __VA_ARGS__)
++#define kvmi_info(ikvm, fmt, ...) \
++	kvm_info("%pU " fmt, &ikvm->uuid, ## __VA_ARGS__)
++#define kvmi_warn(ikvm, fmt, ...) \
++	kvm_info("%pU WARNING: " fmt, &ikvm->uuid, ## __VA_ARGS__)
++#define kvmi_warn_once(ikvm, fmt, ...) ({                     \
++		static bool __section(.data.once) __warned;   \
++		if (!__warned) {                              \
++			__warned = true;                      \
++			kvmi_warn(ikvm, fmt, ## __VA_ARGS__); \
++		}                                             \
++	})
++#define kvmi_err(ikvm, fmt, ...) \
++	kvm_info("%pU ERROR: " fmt, &ikvm->uuid, ## __VA_ARGS__)
++
+ #define IKVM(kvm) ((struct kvmi *)((kvm)->kvmi))
+ 
+ struct kvmi {
++	struct kvm *kvm;
++
++	struct socket *sock;
++	struct task_struct *recv;
++
++	uuid_t uuid;
+ };
+ 
++/* kvmi_msg.c */
++bool kvmi_sock_get(struct kvmi *ikvm, int fd);
++void kvmi_sock_shutdown(struct kvmi *ikvm);
++void kvmi_sock_put(struct kvmi *ikvm);
++bool kvmi_msg_process(struct kvmi *ikvm);
++
+ #endif
+diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
+new file mode 100644
+index 000000000000..4de012eafb6d
+--- /dev/null
++++ b/virt/kvm/kvmi_msg.c
+@@ -0,0 +1,42 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * KVM introspection
@@ -373,78 +570,38 @@ index 000000000000..20638743bd03
 + * Copyright (C) 2017-2019 Bitdefender S.R.L.
 + *
 + */
-+#include <uapi/linux/kvmi.h>
++#include <linux/net.h>
 +#include "kvmi_int.h"
 +
-+int kvmi_init(void)
++bool kvmi_sock_get(struct kvmi *ikvm, int fd)
 +{
-+	return 0;
++	struct socket *sock;
++	int r;
++
++	sock = sockfd_lookup(fd, &r);
++	if (!sock) {
++		kvmi_err(ikvm, "Invalid file handle: %d\n", fd);
++		return false;
++	}
++
++	ikvm->sock = sock;
++
++	return true;
 +}
 +
-+void kvmi_uninit(void)
++void kvmi_sock_put(struct kvmi *ikvm)
 +{
++	if (ikvm->sock)
++		sockfd_put(ikvm->sock);
 +}
 +
-+struct kvmi * __must_check kvmi_get(struct kvm *kvm)
++void kvmi_sock_shutdown(struct kvmi *ikvm)
 +{
-+	if (refcount_inc_not_zero(&kvm->kvmi_ref))
-+		return kvm->kvmi;
-+
-+	return NULL;
++	kernel_sock_shutdown(ikvm->sock, SHUT_RDWR);
 +}
 +
-+static void kvmi_destroy(struct kvm *kvm)
++bool kvmi_msg_process(struct kvmi *ikvm)
 +{
++	kvmi_info(ikvm, "TODO: %s", __func__);
++	return false;
 +}
-+
-+static void kvmi_release(struct kvm *kvm)
-+{
-+	kvmi_destroy(kvm);
-+
-+	complete(&kvm->kvmi_completed);
-+}
-+
-+/* This function may be called from atomic context and must not sleep */
-+void kvmi_put(struct kvm *kvm)
-+{
-+	if (refcount_dec_and_test(&kvm->kvmi_ref))
-+		kvmi_release(kvm);
-+}
-+
-+void kvmi_create_vm(struct kvm *kvm)
-+{
-+	init_completion(&kvm->kvmi_completed);
-+	complete(&kvm->kvmi_completed);
-+}
-+
-+void kvmi_destroy_vm(struct kvm *kvm)
-+{
-+	struct kvmi *ikvm;
-+
-+	ikvm = kvmi_get(kvm);
-+	if (!ikvm)
-+		return;
-+
-+	kvmi_put(kvm);
-+
-+	/* wait for introspection resources to be released */
-+	wait_for_completion_killable(&kvm->kvmi_completed);
-+}
-diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-new file mode 100644
-index 000000000000..ac23ad6fc4df
---- /dev/null
-+++ b/virt/kvm/kvmi_int.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVMI_INT_H__
-+#define __KVMI_INT_H__
-+
-+#include <linux/kvm_host.h>
-+
-+#define IKVM(kvm) ((struct kvmi *)((kvm)->kvmi))
-+
-+struct kvmi {
-+};
-+
-+#endif
