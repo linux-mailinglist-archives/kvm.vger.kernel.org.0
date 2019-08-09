@@ -2,96 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CD97875DF
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 11:27:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E19C875E5
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 11:28:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406077AbfHIJ1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 05:27:01 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40749 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726078AbfHIJ1B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 05:27:01 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r1so97545050wrl.7
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 02:26:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OLdmDC9KjK8wHYH/YMGOndzUePeH788tGhoJ+JIDrPM=;
-        b=E/Vu0yrEkOThSq9wuddnkRFUhVX217tVcF3EL/LqSZyuKCRyKIxRjF9CXhrEEAHERj
-         Q78KpXScVLFUeq0sJzV1UbMno/4roNOmcTPmtp6LDPxIEZxgoKmDFXbxJsW35JfksSg4
-         up7eANYH6DWzkqrrxbbsvvQMy/Pmr+PbSKNtpjS795l/bRS6ltOGZHD40QmAaTSzoX8+
-         qZrtihKBmIh/EeryTVirjIksEkj1jr2S4QJbSL+HBW6jt70MrpB1de5QbKFjISaqb2UA
-         VuP7HE4kdZjsx0Mjv+N8fjLsV5esiL3mqw89fVOMfZRHQ8T0v9SKQZ4KA/eBMNA/5j1I
-         NVaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OLdmDC9KjK8wHYH/YMGOndzUePeH788tGhoJ+JIDrPM=;
-        b=mRH4GpIwSWQQN86uE+bTTuK+BYiCyO8Cwnwkiw/GXICHBCT29bzaAXZX6S9b5yqHNO
-         34re73ko+A4Bn6Ls9YoaN/ai9t7Ue5bMX1cglrbM1lCYexBbxaCQ9ozm39ASwevE0GQK
-         ZKFQ+HRv0Lr8eZDHtIwvcOBXKqRwsPCcxZ2K4h5OPU5ryQq5x7rE5ps0IGwZF+GvmHm0
-         VzCXpI07FzQ24lCO5K60ONlcyLfZTt+urEr5JS5c+WXMoC2bMQ6lFUpjk/T4cndiIpNG
-         Ves2MpxE8/KFrgM7VNF7l6yMVcGlJ9CtSPxRHlTBgohHqVa6jY9+e1wwpjYUlSzYpiXo
-         p+jQ==
-X-Gm-Message-State: APjAAAV/5gCPM8QiRrHTvVzjIEpqEOUWI+MJN+9oKM4ZPzziKGs5r2NE
-        aAyivIBnMzxmtv9CY2n/z18/jRk/MK283KitoFZvBQ==
-X-Google-Smtp-Source: APXvYqxB1pzR3hxupojw9Egj6YewSb1YvyESNLOa/iAcw0xgJGG8uNiUTWLKLCG/1fQBkubFwECh5h4lkT0KrD5JV44=
-X-Received: by 2002:adf:b1cb:: with SMTP id r11mr21389392wra.328.1565342818831;
- Fri, 09 Aug 2019 02:26:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190807122726.81544-1-anup.patel@wdc.com> <4a991aa3-154a-40b2-a37d-9ee4a4c7a2ca@redhat.com>
- <alpine.DEB.2.21.9999.1908071606560.13971@viisi.sifive.com>
- <df0638d9-e2f4-30f5-5400-9078bf9d1f99@redhat.com> <alpine.DEB.2.21.9999.1908081824500.21111@viisi.sifive.com>
- <2ea0c656-bd7e-ae79-1f8e-6b60374ccc6e@redhat.com> <CAAhSdy1Hn69CxERttqa39wWr1-EYJtUPSG7TZnavZQqnMOHUqA@mail.gmail.com>
- <97987944-b42f-4f51-acfb-f318b41875bc@redhat.com>
-In-Reply-To: <97987944-b42f-4f51-acfb-f318b41875bc@redhat.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 9 Aug 2019 14:56:47 +0530
-Message-ID: <CAAhSdy2-72mJWMyeBrOgp0m=FKRKdDOuj8aoyEwJcTG20tDUtg@mail.gmail.com>
-Subject: Re: [PATCH v4 00/20] KVM RISC-V Support
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        id S2406116AbfHIJ2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 05:28:09 -0400
+Received: from foss.arm.com ([217.140.110.172]:44118 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726233AbfHIJ2J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 05:28:09 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4D7415A2;
+        Fri,  9 Aug 2019 02:28:07 -0700 (PDT)
+Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA7C43F575;
+        Fri,  9 Aug 2019 02:28:02 -0700 (PDT)
+Date:   Fri, 9 Aug 2019 10:28:00 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        dri-devel@lists.freedesktop.org,
+        Kostya Serebryany <kcc@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
         Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v19 00/15] arm64: untag user pointers passed to the kernel
+Message-ID: <20190809092758.GK10425@arm.com>
+References: <CAAeHK+yc0D_nd7nTRsY4=qcSx+eQR0VLut3uXMf4NEiE-VpeCw@mail.gmail.com>
+ <20190724140212.qzvbcx5j2gi5lcoj@willie-the-truck>
+ <CAAeHK+xXzdQHpVXL7f1T2Ef2P7GwFmDMSaBH4VG8fT3=c_OnjQ@mail.gmail.com>
+ <20190724142059.GC21234@fuggles.cambridge.arm.com>
+ <20190806171335.4dzjex5asoertaob@willie-the-truck>
+ <CAAeHK+zF01mxU+PkEYLkoVu-ZZM6jNfL_OwMJKRwLr-sdU4Myg@mail.gmail.com>
+ <201908081410.C16D2BD@keescook>
+ <20190808153300.09d3eb80772515f0ea062833@linux-foundation.org>
+ <201908081608.A4F6711@keescook>
+ <20190809090016.GA23083@arrakis.emea.arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190809090016.GA23083@arrakis.emea.arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 9, 2019 at 2:30 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/08/19 10:22, Anup Patel wrote:
-> >> the L here should be kvm@vger.kernel.org.  arch/riscv/kvm/ files would
-> >> still match RISC-V ARCHITECTURE and therefore
-> >> linux-riscv@lists.infradead.org would be CCed.
-> > In addition to above mentioned lists, we insist of having a separate
-> > KVM RISC-V list which can be CCed for non-kernel patches for projects
-> > such as QEMU, KVMTOOL, and Libvirt. This KVM RISC-V list can also
-> > be used for general queries related to KVM RISCV.
->
-> You can use kvm@vger.kernel.org for that, with CCs to the other
-> appropriate list (qemu-devel, libvir-list, LKML, linux-riscv, etc.).
-> But if you want to have kvm-riscv, go ahead and ask for it.
->
-> In any case, you can send v5 with all R-b and Acked-by and a fixed
-> MAINTAINERS entry (listing kvm@vger for now), and Paul will apply it.
-> For 5.5 you can start sending patches to me, either for direct
-> application to the KVM tree or as pull requests.
+On Fri, Aug 09, 2019 at 10:00:17AM +0100, Catalin Marinas wrote:
+> On Thu, Aug 08, 2019 at 04:09:04PM -0700, Kees Cook wrote:
+> > On Thu, Aug 08, 2019 at 03:33:00PM -0700, Andrew Morton wrote:
+> > > On Thu, 8 Aug 2019 14:12:19 -0700 Kees Cook <keescook@chromium.org> wrote:
+> > > 
+> > > > > The ones that are left are the mm ones: 4, 5, 6, 7 and 8.
+> > > > > 
+> > > > > Andrew, could you take a look and give your Acked-by or pick them up directly?
+> > > > 
+> > > > Given the subsystem Acks, it seems like 3-10 and 12 could all just go
+> > > > via Andrew? I hope he agrees. :)
+> > > 
+> > > I'll grab everything that has not yet appeared in linux-next.  If more
+> > > of these patches appear in linux-next I'll drop those as well.
+> > > 
+> > > The review discussion against " [PATCH v19 02/15] arm64: Introduce
+> > > prctl() options to control the tagged user addresses ABI" has petered
+> > > out inconclusively.  prctl() vs arch_prctl().
+> > 
+> > I've always disliked arch_prctl() existing at all. Given that tagging is
+> > likely to be a multi-architectural feature, it seems like the controls
+> > should live in prctl() to me.
+> 
+> It took a bit of grep'ing to figure out what Dave H meant by
+> arch_prctl(). It's an x86-specific syscall which we do not have on arm64
+> (and possibly any other architecture). Actually, we don't have any arm64
+> specific syscalls, only the generic unistd.h, hence the confusion. For
+> other arm64-specific prctls like SVE we used the generic sys_prctl() and
+> I can see x86 not being consistent either (PR_MPX_ENABLE_MANAGEMENT).
+> 
+> In general I disagree with adding any arm64-specific syscalls but in
+> this instance it can't even be justified. I'd rather see some clean-up
+> similar to arch_ptrace/ptrace_request than introducing new syscall
+> numbers (but as I suggested in my reply to Dave, that's for another
+> patch series).
 
-Sure, I will send v5 early next week.
+I had a go at refactoring this a while ago, but it fell by the wayside.
 
-Regards,
-Anup
+I can try to resurrect it if it's still considered worthwhile.
+
+Cheers
+---Dave
