@@ -2,81 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A719F8731F
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:36:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BF7C87328
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 09:37:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405826AbfHIHgP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 03:36:15 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:45664 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405749AbfHIHgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 03:36:12 -0400
-Received: by mail-lj1-f196.google.com with SMTP id t3so2673382ljj.12
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 00:36:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HXqS2DL68BnoaWC7BPpejArIxz6sqUi2fc/63WuQaUE=;
-        b=QKL0hpgsd+0DNocYhr0sEvnxDUB9OXgs3iaJcewg/PpKtcZDd9q9ztHww7OdRd8K1x
-         EsNY858u9uPhQWSOAVrxpmMIUu5KUzwaV3TsHkDCS1t3TCobq/9PGwCabM7oU8ARaMNf
-         M8TmaT+8j2S7leYm4lrZuMoQyyDppVz5G/6gHWkJamj1HsNdShB8on/i+0uX0I6felNt
-         seus2hiiiuYCV5cZO2OpOQTu+nPXKojbfezQmKNtqns0RTRELCP/y5WoSbMDbCsUQDL7
-         xLOJABYKiF1x5K7QwK36deq4e1LaIpzb8TQQ9upjahFFRuEioMivr1TwvLkKnpeAgCfN
-         PQ/g==
+        id S2405899AbfHIHh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 03:37:26 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55802 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405892AbfHIHhY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 03:37:24 -0400
+Received: by mail-wm1-f68.google.com with SMTP id f72so4669482wmf.5
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 00:37:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HXqS2DL68BnoaWC7BPpejArIxz6sqUi2fc/63WuQaUE=;
-        b=QO2uUTcmc5+lWIUtKd3rGq30KsXFfWnVTdJAI1nkM1SZhuTbNa/+jU+rojV7NhehZU
-         Uv8QJrEV6EfMpzCrGz/+VDW4CFbPa4KfKgrtyJJNcCkDcJm0SqSRgponsyenm4UFmSsY
-         O8rROEZLvWuzyNCsew5UHA4LLMuToQgzv+soR9r+p/XWl9aHhPv/jBYJMIHMR+ANnGrN
-         gikA3USL8dZykk3xG1euR7YtWBmGIf/gfwjyiXj/jV5Bh++PFsJV1AJJIqaHBlvmGl6A
-         zJw3GRRV8Tsti8oup1cXIgphJv5NFiCcKttDCHSmwcamQSyae+CUKnGfV4I7Uwtvr8nZ
-         kGkA==
-X-Gm-Message-State: APjAAAWLCChoF2GoX9oGx8K+NuEFf9cKZMXrXDW7towjegDN3I71aACM
-        XV7uIhz2xYyBbfXKJ1OBU/H9+3AZnpeqog/M7F/ZpSlk6DI=
-X-Google-Smtp-Source: APXvYqzeqLykT6zxNpcnNSzGlO76tabSwRrSF7hhpaCzhGrqiXaDTvhfTN7tkmBVUZHwxkSdgdismvv4yqPs8ykrJOo=
-X-Received: by 2002:a2e:6e0c:: with SMTP id j12mr10467584ljc.123.1565336170583;
- Fri, 09 Aug 2019 00:36:10 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Uupbz8YTA+5+vl0Fvj16ZEysWFtXXYG59jnDaWr/XA8=;
+        b=lnjGbIYw53dlDgSRi9hWImx4R18QWfhBWTwOTwQGkuqPdvByQUIldm7hFHZWkSSsHX
+         eBtp18IRyPfVmYD3CAMrFCqog3mWpQz3qLs8hWQ1Y6GzAM63ZhCOD1gNPfuszbDMW8JS
+         AwRZ3wUPqXit26DEC3m1PODrZAxeSSY9ZLNbYkYg/LEgXgaxDZqGwHXkC6DvH1oSx5TR
+         j3M7wOo9RdQerrz+CpfwujXN5pvg53v7jBGYDOA6nMWv/HKbwIwcuaTvGSZabXPXK//s
+         bs6CV3WLeTrpv15QthooKP7Eu7WvRoKh6WPMnM2qGVMJ1LKrgDC7hx5B2Ct5M2IeXT9H
+         z4Tg==
+X-Gm-Message-State: APjAAAW5ACXxbLPlGDENJpLdp8TVlEPes/gWMz6sOZwKIXW+i0NbzwSi
+        4lbhwRKA7J2phIFOqrE8aK21q4ULyj0=
+X-Google-Smtp-Source: APXvYqxpCCW54J3fN4T1bkdCwN0FL2+ouWimhzANbhGNXOTpOA9eMsxirOHRMFEtnyEluH/UmRwhLQ==
+X-Received: by 2002:a1c:99c6:: with SMTP id b189mr9246872wme.57.1565336242632;
+        Fri, 09 Aug 2019 00:37:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b42d:b492:69df:ed61? ([2001:b07:6468:f312:b42d:b492:69df:ed61])
+        by smtp.gmail.com with ESMTPSA id 4sm227355416wro.78.2019.08.09.00.37.21
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 09 Aug 2019 00:37:22 -0700 (PDT)
+Subject: Re: [PATCH v4 00/20] KVM RISC-V Support
+To:     Paul Walmsley <paul.walmsley@sifive.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Anup Patel <anup@brainfault.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20190807122726.81544-1-anup.patel@wdc.com>
+ <4a991aa3-154a-40b2-a37d-9ee4a4c7a2ca@redhat.com>
+ <alpine.DEB.2.21.9999.1908071606560.13971@viisi.sifive.com>
+ <df0638d9-e2f4-30f5-5400-9078bf9d1f99@redhat.com>
+ <alpine.DEB.2.21.9999.1908081824500.21111@viisi.sifive.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2ea0c656-bd7e-ae79-1f8e-6b60374ccc6e@redhat.com>
+Date:   Fri, 9 Aug 2019 09:37:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190808123140.25583-1-naresh.kamboju@linaro.org>
- <20190808151010.ktbqbfevgcs3bkjy@kamzik.brq.redhat.com> <b34e8232-ccfd-898c-49de-afef4168a165@redhat.com>
-In-Reply-To: <b34e8232-ccfd-898c-49de-afef4168a165@redhat.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Fri, 9 Aug 2019 13:05:59 +0530
-Message-ID: <CA+G9fYv7RZgm36fbQU5yH=58sX84TxgE93SneB_UhRsD1ivGhg@mail.gmail.com>
-Subject: Re: [PATCH v2] selftests: kvm: Adding config fragments
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        sean.j.christopherson@intel.com,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>, kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <alpine.DEB.2.21.9999.1908081824500.21111@viisi.sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 8 Aug 2019 at 21:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 08/08/19 17:10, Andrew Jones wrote:
-> >>
-> > What does the kselftests config file do? I was about to complain that this
-> > would break compiling on non-x86 platforms, but 'make kselftest' and other
-> > forms of invoking the build work fine on aarch64 even with this config
-> > file. So is this just for documentation? If so, then its still obviously
-> > wrong for non-x86 platforms. The only config that makes sense here is KVM.
-> > If the other options need to be documented for x86, then should they get
-> > an additional config file? tools/testing/selftests/kvm/x86_64/config?
->
-> My understanding is that a config file fragment requires some kind of
-> kconfig invocation to create a full .config file.  When you do that,
-> unknown configurations are dropped silently.
+On 09/08/19 03:35, Paul Walmsley wrote:
+> On Thu, 8 Aug 2019, Paolo Bonzini wrote:
+> 
+>> However, for Linux releases after 5.4 I would rather get pull requests 
+>> for arch/riscv/kvm from Anup and Atish without involving the RISC-V 
+>> tree.  Of course, they or I will ask for your ack, or for a topic 
+>> branch, on the occasion that something touches files outside their 
+>> maintainership area.  This is how things are already being handled for 
+>> ARM, POWER and s390 and it allows me to handle conflicts in common KVM 
+>> files before they reach Linus; these are more common than conflicts in 
+>> arch files. If you have further questions on git and maintenance 
+>> workflows, just ask!
+> 
+> In principle, that's fine with me, as long as the arch/riscv maintainers 
+> and mailing lists are kept in the loop.  We already do something similar 
+> to this for the RISC-V BPF JIT.  However, I'd like this to be explicitly 
+> documented in the MAINTAINERS file, as it is for BPF.  It looks like it 
+> isn't for ARM, POWER, or S390, either looking at MAINTAINERS or 
+> spot-checking scripts/get_maintainer.pl:
+> 
+> $ scripts/get_maintainer.pl -f arch/s390/kvm/interrupt.c 
+> Christian Borntraeger <borntraeger@de.ibm.com> (supporter:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> Janosch Frank <frankja@linux.ibm.com> (supporter:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> David Hildenbrand <david@redhat.com> (reviewer:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> Cornelia Huck <cohuck@redhat.com> (reviewer:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> Heiko Carstens <heiko.carstens@de.ibm.com> (supporter:S390)
+> Vasily Gorbik <gor@linux.ibm.com> (supporter:S390)
+> linux-s390@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> linux-kernel@vger.kernel.org (open list)
+> $
+> 
+> Would you be willing to send a MAINTAINERS patch to formalize this 
+> practice?
 
-You are right on this point. As you said, unknown configs getting dropped for
-arm64 cross compilation.
+Ah, I see, in the MAINTAINERS entry
 
-- Naresh
+KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)
+M:	Anup Patel <anup.patel@wdc.com>
+R:	Atish Patra <atish.patra@wdc.com>
+L:	linux-riscv@lists.infradead.org
+T:	git git://github.com/avpatel/linux.git
+S:	Maintained
+F:	arch/riscv/include/uapi/asm/kvm*
+F:	arch/riscv/include/asm/kvm*
+F:	arch/riscv/kvm/
+
+the L here should be kvm@vger.kernel.org.  arch/riscv/kvm/ files would
+still match RISC-V ARCHITECTURE and therefore
+linux-riscv@lists.infradead.org would be CCed.
+
+Unlike other subsystems, for KVM I ask the submaintainers to include the
+patches in their pull requests, which is why you saw no kvm@vger entry
+for KVM/s390.  However, it's probably a good idea to add it and do the
+same for RISC-V.
+
+Is that what you meant?
+
+Paolo
