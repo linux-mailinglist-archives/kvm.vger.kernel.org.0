@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D954687F94
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:20:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FD9A87F5B
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:16:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437015AbfHIQUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:20:03 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53324 "EHLO
+        id S2437147AbfHIQQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:16:09 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52974 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437114AbfHIQUB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:20:01 -0400
+        by vger.kernel.org with ESMTP id S2437050AbfHIQPD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:03 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 99999305D340;
-        Fri,  9 Aug 2019 19:01:04 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 8DA5C305D344;
+        Fri,  9 Aug 2019 19:01:06 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 3DF27305B7AB;
-        Fri,  9 Aug 2019 19:01:04 +0300 (EEST)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 6EC6C305B7A3;
+        Fri,  9 Aug 2019 19:01:05 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -32,10 +32,12 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Weijiang Yang <weijiang.yang@intel.com>, Zhang@vger.kernel.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v6 32/92] kvm: introspection: add KVMI_GET_PAGE_ACCESS
-Date:   Fri,  9 Aug 2019 18:59:47 +0300
-Message-Id: <20190809160047.8319-33-alazar@bitdefender.com>
+        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>,
+        He Chen <he.chen@linux.intel.com>,
+        Zhang Yi <yi.z.zhang@linux.intel.com>
+Subject: [RFC PATCH v6 36/92] KVM: VMX: Implement functions for SPPT paging setup
+Date:   Fri,  9 Aug 2019 18:59:51 +0300
+Message-Id: <20190809160047.8319-37-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -46,247 +48,350 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+From: Yang Weijiang <weijiang.yang@intel.com>
 
-Returns the spte access bits (rwx) for an array of guest physical
-addresses.
+SPPT is a 4-level paging structure similar to EPT, when SPP is
+kicked for target physical page, bit 61 of the corresponding
+EPT enty will be flaged, then SPPT is traversed with the gfn to
+build up entries, the leaf entry of SPPT contains the access
+bitmap for subpages inside the target 4KB physical page, one bit
+per 128-byte subpage.
 
-It does this by checking the radix tree in which only the spte bits
-"enforced" by the introspection tool are saved. This information should
-already be known by the tool. Not to mention that the KVMI_EVENT_PF
-events are sent only for EPT violation caused by these restrictions.
-So, we might drop this command.
+SPPT entries are set up in below cases:
+1. the EPT faulted page is SPP protected.
+2. SPP mis-config induced vmexit is handled.
+3. User configures SPP protected pages via SPP IOCTLs.
 
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
+Co-developed-by: He Chen <he.chen@linux.intel.com>
+Signed-off-by: He Chen <he.chen@linux.intel.com>
+Co-developed-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+Signed-off-by: Zhang Yi <yi.z.zhang@linux.intel.com>
+Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Message-Id: <20190717133751.12910-4-weijiang.yang@intel.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst | 54 ++++++++++++++++++++++++++++++
- arch/x86/kvm/kvmi.c                | 41 +++++++++++++++++++++++
- include/uapi/linux/kvmi.h          | 11 ++++++
- virt/kvm/kvmi.c                    |  9 +++++
- virt/kvm/kvmi_int.h                |  6 ++++
- virt/kvm/kvmi_msg.c                | 17 ++++++++++
- 6 files changed, 138 insertions(+)
+ arch/x86/include/asm/kvm_host.h |   7 +-
+ arch/x86/kvm/mmu.c              | 207 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/mmu.h              |   1 +
+ include/linux/kvm_host.h        |   3 +
+ 4 files changed, 217 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index 0fc51b57b1e8..c27fea73ccfb 100644
---- a/Documentation/virtual/kvm/kvmi.rst
-+++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -509,6 +509,60 @@ by the *KVMI_CONTROL_VM_EVENTS* command.
- * -KVM_EPERM - the access is restricted by the host
- * -KVM_EOPNOTSUPP - one the events can't be intercepted in the current setup
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f1b3d89a0430..c05984f39923 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -271,7 +271,8 @@ union kvm_mmu_page_role {
+ 		unsigned smap_andnot_wp:1;
+ 		unsigned ad_disabled:1;
+ 		unsigned guest_mode:1;
+-		unsigned :6;
++		unsigned spp:1;
++		unsigned reserved:5;
  
-+9. KVMI_GET_PAGE_ACCESS
-+-----------------------
-+
-+:Architectures: all
-+:Versions: >= 1
-+:Parameters:
-+
-+::
-+
-+	struct kvmi_get_page_access {
-+		__u16 view;
-+		__u16 count;
-+		__u32 padding;
-+		__u64 gpa[0];
-+	};
-+
-+:Returns:
-+
-+::
-+
-+	struct kvmi_error_code;
-+	struct kvmi_get_page_access_reply {
-+		__u8 access[0];
-+	};
-+
-+Returns the spte access bits (rwx) for an array of ``count`` guest
-+physical addresses.
-+
-+The valid access bits for *KVMI_GET_PAGE_ACCESS* and *KVMI_SET_PAGE_ACCESS*
-+are::
-+
-+	KVMI_PAGE_ACCESS_R
-+	KVMI_PAGE_ACCESS_W
-+	KVMI_PAGE_ACCESS_X
-+
-+By default, for any guest physical address, the returned access mode will
-+be 'rwx' (all the above bits). If the introspection tool must prevent
-+the code execution from a guest page, for example, it should use the
-+KVMI_SET_PAGE_ACCESS command to set the 'rw' bits for any guest physical
-+addresses contained in that page. Of course, in order to receive
-+page fault events when these violations take place, the KVMI_CONTROL_EVENTS
-+command must be used to enable this type of event (KVMI_EVENT_PF).
-+
-+On Intel hardware with multiple EPT views, the ``view`` argument selects the
-+EPT view (0 is primary). On all other hardware it must be zero.
-+
-+:Errors:
-+
-+* -KVM_EINVAL - the selected SPT view is invalid
-+* -KVM_EINVAL - padding is not zero
-+* -KVM_EOPNOTSUPP - a SPT view was selected but the hardware doesn't support it
-+* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+* -KVM_ENOMEM - not enough memory to allocate the reply
-+
- Events
- ======
+ 		/*
+ 		 * This is left at the top of the word so that
+@@ -1410,6 +1411,10 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
  
-diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 121819f9c487..59cf33127b4b 100644
---- a/arch/x86/kvm/kvmi.c
-+++ b/arch/x86/kvm/kvmi.c
-@@ -183,3 +183,44 @@ void kvmi_arch_update_page_tracking(struct kvm *kvm,
- 		}
- 	}
+ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t gva, u64 error_code,
+ 		       void *insn, int insn_len);
++
++int kvm_mmu_setup_spp_structure(struct kvm_vcpu *vcpu,
++				u32 access_map, gfn_t gfn);
++
+ void kvm_mmu_invlpg(struct kvm_vcpu *vcpu, gva_t gva);
+ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid);
+ void kvm_mmu_new_cr3(struct kvm_vcpu *vcpu, gpa_t new_cr3, bool skip_tlb_flush);
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 810e3e5bd575..8a6287cd2be4 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -206,6 +206,11 @@ static const union kvm_mmu_page_role mmu_base_role_mask = {
+ 		({ spte = mmu_spte_get_lockless(_walker.sptep); 1; });	\
+ 	     __shadow_walk_next(&(_walker), spte))
+ 
++#define for_each_shadow_spp_entry(_vcpu, _addr, _walker)    \
++	for (shadow_spp_walk_init(&(_walker), _vcpu, _addr);	\
++	     shadow_walk_okay(&(_walker));			\
++	     shadow_walk_next(&(_walker)))
++
+ static struct kmem_cache *pte_list_desc_cache;
+ static struct kmem_cache *mmu_page_header_cache;
+ static struct percpu_counter kvm_total_used_mmu_pages;
+@@ -505,6 +510,11 @@ static int is_shadow_present_pte(u64 pte)
+ 	return (pte != 0) && !is_mmio_spte(pte);
  }
-+
-+int kvmi_arch_cmd_get_page_access(struct kvmi *ikvm,
-+				  const struct kvmi_msg_hdr *msg,
-+				  const struct kvmi_get_page_access *req,
-+				  struct kvmi_get_page_access_reply **dest,
-+				  size_t *dest_size)
+ 
++static int is_spp_shadow_present(u64 pte)
 +{
-+	struct kvmi_get_page_access_reply *rpl = NULL;
-+	size_t rpl_size = 0;
-+	size_t k, n = req->count;
-+	int ec = 0;
++	return pte & PT_PRESENT_MASK;
++}
 +
-+	if (req->padding)
-+		return -KVM_EINVAL;
+ static int is_large_pte(u64 pte)
+ {
+ 	return pte & PT_PAGE_SIZE_MASK;
+@@ -524,6 +534,11 @@ static bool is_executable_pte(u64 spte)
+ 	return (spte & (shadow_x_mask | shadow_nx_mask)) == shadow_x_mask;
+ }
+ 
++static bool is_spp_spte(struct kvm_mmu_page *sp)
++{
++	return sp->role.spp;
++}
 +
-+	if (msg->size < sizeof(*req) + req->count * sizeof(req->gpa[0]))
-+		return -KVM_EINVAL;
+ static kvm_pfn_t spte_to_pfn(u64 pte)
+ {
+ 	return (pte & PT64_BASE_ADDR_MASK) >> PAGE_SHIFT;
+@@ -1751,6 +1766,87 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
++static bool __rmap_open_subpage_bit(struct kvm *kvm,
++				    struct kvm_rmap_head *rmap_head)
++{
++	struct rmap_iterator iter;
++	bool flush = false;
++	u64 *sptep;
++	u64 spte;
 +
-+	if (req->view != 0)	/* TODO */
-+		return -KVM_EOPNOTSUPP;
-+
-+	rpl_size = sizeof(*rpl) + sizeof(rpl->access[0]) * n;
-+	rpl = kvmi_msg_alloc_check(rpl_size);
-+	if (!rpl)
-+		return -KVM_ENOMEM;
-+
-+	for (k = 0; k < n && ec == 0; k++)
-+		ec = kvmi_cmd_get_page_access(ikvm, req->gpa[k],
-+					      &rpl->access[k]);
-+
-+	if (ec) {
-+		kvmi_msg_free(rpl);
-+		return ec;
++	for_each_rmap_spte(rmap_head, &iter, sptep) {
++		/*
++		 * SPP works only when the page is write-protected
++		 * and SPP bit is set in EPT leaf entry.
++		 */
++		flush |= spte_write_protect(sptep, false);
++		spte = *sptep | PT_SPP_MASK;
++		flush |= mmu_spte_update(sptep, spte);
 +	}
 +
-+	*dest = rpl;
-+	*dest_size = rpl_size;
++	return flush;
++}
++
++static int kvm_mmu_open_subpage_write_protect(struct kvm *kvm,
++					      struct kvm_memory_slot *slot,
++					      gfn_t gfn)
++{
++	struct kvm_rmap_head *rmap_head;
++	bool flush = false;
++
++	/*
++	 * SPP is only supported with 4KB level1 memory page, check
++	 * if the page is mapped in EPT leaf entry.
++	 */
++	rmap_head = __gfn_to_rmap(gfn, PT_PAGE_TABLE_LEVEL, slot);
++
++	if (!rmap_head->val)
++		return -EFAULT;
++
++	flush |= __rmap_open_subpage_bit(kvm, rmap_head);
++
++	if (flush)
++		kvm_flush_remote_tlbs(kvm);
 +
 +	return 0;
 +}
 +
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 40a5c304c26f..047436a0bdc0 100644
---- a/include/uapi/linux/kvmi.h
-+++ b/include/uapi/linux/kvmi.h
-@@ -116,6 +116,17 @@ struct kvmi_get_guest_info_reply {
- 	__u32 padding[3];
- };
- 
-+struct kvmi_get_page_access {
-+	__u16 view;
-+	__u16 count;
-+	__u32 padding;
-+	__u64 gpa[0];
-+};
-+
-+struct kvmi_get_page_access_reply {
-+	__u8 access[0];
-+};
-+
- struct kvmi_get_vcpu_info_reply {
- 	__u64 tsc_speed;
- };
-diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
-index 0264115a7f4d..20505e4c4b5f 100644
---- a/virt/kvm/kvmi.c
-+++ b/virt/kvm/kvmi.c
-@@ -1072,6 +1072,15 @@ void kvmi_handle_requests(struct kvm_vcpu *vcpu)
- 	kvmi_put(vcpu->kvm);
- }
- 
-+int kvmi_cmd_get_page_access(struct kvmi *ikvm, u64 gpa, u8 *access)
++static bool __rmap_clear_subpage_bit(struct kvm *kvm,
++				     struct kvm_rmap_head *rmap_head)
 +{
-+	gfn_t gfn = gpa_to_gfn(gpa);
++	struct rmap_iterator iter;
++	bool flush = false;
++	u64 *sptep;
++	u64 spte;
 +
-+	kvmi_get_gfn_access(ikvm, gfn, access);
++	for_each_rmap_spte(rmap_head, &iter, sptep) {
++		spte = (*sptep & ~PT_SPP_MASK) | PT_WRITABLE_MASK;
++		flush |= mmu_spte_update(sptep, spte);
++	}
++
++	return flush;
++}
++
++static int kvm_mmu_clear_subpage_write_protect(struct kvm *kvm,
++					       struct kvm_memory_slot *slot,
++					       gfn_t gfn)
++{
++	struct kvm_rmap_head *rmap_head;
++	bool flush = false;
++
++	rmap_head = __gfn_to_rmap(gfn, PT_PAGE_TABLE_LEVEL, slot);
++
++	if (!rmap_head->val)
++		return -EFAULT;
++
++	flush |= __rmap_clear_subpage_bit(kvm, rmap_head);
++
++	if (flush)
++		kvm_flush_remote_tlbs(kvm);
 +
 +	return 0;
 +}
 +
- int kvmi_cmd_control_events(struct kvm_vcpu *vcpu, unsigned int event_id,
- 			    bool enable)
+ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 				    struct kvm_memory_slot *slot, u64 gfn)
  {
-diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-index d478d9a2e769..00dc5cf72f88 100644
---- a/virt/kvm/kvmi_int.h
-+++ b/virt/kvm/kvmi_int.h
-@@ -159,6 +159,7 @@ int kvmi_msg_send_unhook(struct kvmi *ikvm);
- void *kvmi_msg_alloc(void);
- void *kvmi_msg_alloc_check(size_t size);
- void kvmi_msg_free(void *addr);
-+int kvmi_cmd_get_page_access(struct kvmi *ikvm, u64 gpa, u8 *access);
- int kvmi_cmd_control_events(struct kvm_vcpu *vcpu, unsigned int event_id,
- 			    bool enable);
- int kvmi_cmd_control_vm_events(struct kvmi *ikvm, unsigned int event_id,
-@@ -174,6 +175,11 @@ void kvmi_handle_common_event_actions(struct kvm_vcpu *vcpu, u32 action,
- void kvmi_arch_update_page_tracking(struct kvm *kvm,
- 				    struct kvm_memory_slot *slot,
- 				    struct kvmi_mem_access *m);
-+int kvmi_arch_cmd_get_page_access(struct kvmi *ikvm,
-+				  const struct kvmi_msg_hdr *msg,
-+				  const struct kvmi_get_page_access *req,
-+				  struct kvmi_get_page_access_reply **dest,
-+				  size_t *dest_size);
- void kvmi_arch_setup_event(struct kvm_vcpu *vcpu, struct kvmi_event *ev);
- bool kvmi_arch_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
- 			u8 access);
-diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index 0642356d4e04..09ad17479abb 100644
---- a/virt/kvm/kvmi_msg.c
-+++ b/virt/kvm/kvmi_msg.c
-@@ -29,6 +29,7 @@ static const char *const msg_IDs[] = {
- 	[KVMI_EVENT]                 = "KVMI_EVENT",
- 	[KVMI_EVENT_REPLY]           = "KVMI_EVENT_REPLY",
- 	[KVMI_GET_GUEST_INFO]        = "KVMI_GET_GUEST_INFO",
-+	[KVMI_GET_PAGE_ACCESS]       = "KVMI_GET_PAGE_ACCESS",
- 	[KVMI_GET_VCPU_INFO]         = "KVMI_GET_VCPU_INFO",
- 	[KVMI_GET_VERSION]           = "KVMI_GET_VERSION",
- };
-@@ -323,6 +324,21 @@ static int handle_control_cmd_response(struct kvmi *ikvm,
- 	return err;
+@@ -2505,6 +2601,30 @@ static unsigned int kvm_mmu_page_track_acc(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 	return acc;
  }
  
-+static int handle_get_page_access(struct kvmi *ikvm,
-+				  const struct kvmi_msg_hdr *msg,
-+				  const void *req)
++struct kvm_mmu_page *kvm_mmu_get_spp_page(struct kvm_vcpu *vcpu,
++						 gfn_t gfn,
++						 unsigned int level)
++
 +{
-+	struct kvmi_get_page_access_reply *rpl = NULL;
-+	size_t rpl_size = 0;
-+	int err, ec;
++	struct kvm_mmu_page *sp;
++	union kvm_mmu_page_role role;
 +
-+	ec = kvmi_arch_cmd_get_page_access(ikvm, msg, req, &rpl, &rpl_size);
++	role = vcpu->arch.mmu->mmu_role.base;
++	role.level = level;
++	role.direct = true;
++	role.spp = true;
 +
-+	err = kvmi_msg_vm_maybe_reply(ikvm, msg, ec, rpl, rpl_size);
-+	kvmi_msg_free(rpl);
-+	return err;
++	sp = kvm_mmu_alloc_page(vcpu, true);
++	sp->gfn = gfn;
++	sp->role = role;
++	hlist_add_head(&sp->hash_link,
++		       &vcpu->kvm->arch.mmu_page_hash
++		       [kvm_page_table_hashfn(gfn)]);
++	clear_page(sp->spt);
++	return sp;
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_get_spp_page);
++
+ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 					     gfn_t gfn,
+ 					     gva_t gaddr,
+@@ -2632,6 +2752,16 @@ static void shadow_walk_init(struct kvm_shadow_walk_iterator *iterator,
+ 				    addr);
+ }
+ 
++static void shadow_spp_walk_init(struct kvm_shadow_walk_iterator *iterator,
++				 struct kvm_vcpu *vcpu, u64 addr)
++{
++	iterator->addr = addr;
++	iterator->shadow_addr = vcpu->arch.mmu->sppt_root;
++
++	/* SPP Table is a 4-level paging structure */
++	iterator->level = 4;
 +}
 +
- static bool invalid_vcpu_hdr(const struct kvmi_vcpu_hdr *hdr)
+ static bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator)
  {
- 	return hdr->padding1 || hdr->padding2;
-@@ -338,6 +354,7 @@ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
- 	[KVMI_CONTROL_CMD_RESPONSE]  = handle_control_cmd_response,
- 	[KVMI_CONTROL_VM_EVENTS]     = handle_control_vm_events,
- 	[KVMI_GET_GUEST_INFO]        = handle_get_guest_info,
-+	[KVMI_GET_PAGE_ACCESS]       = handle_get_page_access,
- 	[KVMI_GET_VERSION]           = handle_get_version,
- };
+ 	if (iterator->level < PT_PAGE_TABLE_LEVEL)
+@@ -2682,6 +2812,18 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+ 		mark_unsync(sptep);
+ }
  
++static void link_spp_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
++				 struct kvm_mmu_page *sp)
++{
++	u64 spte;
++
++	spte = __pa(sp->spt) | PT_PRESENT_MASK;
++
++	mmu_spte_set(sptep, spte);
++
++	mmu_page_add_parent_pte(vcpu, sp, sptep);
++}
++
+ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 				   unsigned direct_access)
+ {
+@@ -4253,6 +4395,71 @@ static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
+ 	return RET_PF_RETRY;
+ }
+ 
++static u64 format_spp_spte(u32 spp_wp_bitmap)
++{
++	u64 new_spte = 0;
++	int i = 0;
++
++	/*
++	 * One 4K page contains 32 sub-pages, in SPP table L4E, old bits
++	 * are reserved, so we need to transfer u32 subpage write
++	 * protect bitmap to u64 SPP L4E format.
++	 */
++	while (i < 32) {
++		if (spp_wp_bitmap & (1ULL << i))
++			new_spte |= 1ULL << (i * 2);
++
++		i++;
++	}
++
++	return new_spte;
++}
++
++static void mmu_spp_spte_set(u64 *sptep, u64 new_spte)
++{
++	__set_spte(sptep, new_spte);
++}
++
++int kvm_mmu_setup_spp_structure(struct kvm_vcpu *vcpu,
++				u32 access_map, gfn_t gfn)
++{
++	struct kvm_shadow_walk_iterator iter;
++	struct kvm_mmu_page *sp;
++	gfn_t pseudo_gfn;
++	u64 old_spte, spp_spte;
++	int ret = -EFAULT;
++
++	/* direct_map spp start */
++	if (!VALID_PAGE(vcpu->arch.mmu->sppt_root))
++		return -EFAULT;
++
++	for_each_shadow_spp_entry(vcpu, (u64)gfn << PAGE_SHIFT, iter) {
++		if (iter.level == PT_PAGE_TABLE_LEVEL) {
++			spp_spte = format_spp_spte(access_map);
++			old_spte = mmu_spte_get_lockless(iter.sptep);
++			if (old_spte != spp_spte) {
++				mmu_spp_spte_set(iter.sptep, spp_spte);
++				kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
++			}
++
++			ret = 0;
++			break;
++		}
++
++		if (!is_spp_shadow_present(*iter.sptep)) {
++			u64 base_addr = iter.addr;
++
++			base_addr &= PT64_LVL_ADDR_MASK(iter.level);
++			pseudo_gfn = base_addr >> PAGE_SHIFT;
++			sp = kvm_mmu_get_spp_page(vcpu, pseudo_gfn,
++						  iter.level - 1);
++			link_spp_shadow_page(vcpu, iter.sptep, sp);
++		}
++	}
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_setup_spp_structure);
+ static void nonpaging_init_context(struct kvm_vcpu *vcpu,
+ 				   struct kvm_mmu *context)
+ {
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 45948dabe0b6..8c34decd6422 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -26,6 +26,7 @@
+ #define PT_PAGE_SIZE_MASK (1ULL << PT_PAGE_SIZE_SHIFT)
+ #define PT_PAT_MASK (1ULL << 7)
+ #define PT_GLOBAL_MASK (1ULL << 8)
++#define PT_SPP_MASK (1ULL << 61)
+ #define PT64_NX_SHIFT 63
+ #define PT64_NX_MASK (1ULL << PT64_NX_SHIFT)
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e876921938b6..ca7597e429df 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -832,6 +832,9 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+ 
++struct kvm_mmu_page *kvm_mmu_get_spp_page(struct kvm_vcpu *vcpu,
++			gfn_t gfn, unsigned int level);
++
+ #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+ /*
+  * All architectures that want to use vzalloc currently also
