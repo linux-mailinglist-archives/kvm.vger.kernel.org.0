@@ -2,162 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C6D1877B4
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 12:44:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60D5387806
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 12:57:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406130AbfHIKo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 06:44:57 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40307 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406114AbfHIKo5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 06:44:57 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r1so97758825wrl.7
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 03:44:55 -0700 (PDT)
+        id S2406239AbfHIK5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 06:57:19 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52208 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726152AbfHIK5S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 06:57:18 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 207so5271271wma.1
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 03:57:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2MlbsA24Rszqm07Nqr+QNBq64s8U7dZBznf1kxDCc+o=;
+        b=RbvTUxvpSfR7R6gnDAoga/3zvpsIjjCUAIVcI44P10LXPdhdodAKeQteTcJqzM9vwO
+         Cwn8MCM+FFdLkYEXuG11MOnSW4EPKXCYF0UyyGdKWDHtDuZxJW4paQexRYqy6RIcR0rL
+         tQjokoy8wjBysq2bUVIJhs4tsh/fVjDnXP4wqIdtc25EKwCeGxlOURDbPdPTZ0s+kXOB
+         T9PNSrixOtly3+6VfFF1/Wl4MZsvQfSDY++tJpmH4ZRSaJmCdjdv7MzmfinY+h+c/5Fy
+         ebS9KKW+jJ/T0i2/DRx3Q/uUb+rqxRH/I/8aR8Wm02b0lFOT1xyg/uzRDP/kbFHrPy2z
+         Iuwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=9WzyURDH7ESFlnfzMS62H/D7+dda89YOvkjObehxwI4=;
-        b=osNaPMSFjYpEURx2GxrztByNJTzMUrZuFKTC81Zft4wrwI50Qn78qAHCG59zhSuU+w
-         pA2hQAdshw+pbW6xjVaahqBTwwzGvIJQbqZejD5FkIUt0h47HWRCXTEP0nJfRGao3QIU
-         4UdTVYA6ugJt4Cg1v7jCmbub/6BZERDhkruxJQoHEuyNjZ1gALE/0V9gkkREdjEW1GzE
-         bmPi465kVW6PPJkGFGVS40YJwuVB8irkUsTNovmL/5BozvlXEwbP+vC6KTjL5J1qbg0P
-         TgblwNDfj4gih2ghkWMshx8XxHybvWuxqJXQoz2nLVCEYT4VXpxejTW/c70nFfC1xoJT
-         /tqw==
-X-Gm-Message-State: APjAAAWeURz4dRvjhp21gkZRkTcInHJOEbUpwyAySCjpmKcci/TJT6nV
-        TQy6H5x9Yfjjzk0e9+n6Lzs0Hg==
-X-Google-Smtp-Source: APXvYqyShx0+uf7pVce5ZDJOlO/Kcni/X/ot9S5XvNCwawUL4fIjZNa87xwbrVguDjFtFCSkw6VU0g==
-X-Received: by 2002:adf:df8b:: with SMTP id z11mr22569218wrl.62.1565347494857;
-        Fri, 09 Aug 2019 03:44:54 -0700 (PDT)
-Received: from vitty.brq.redhat.com (ip-89-176-127-93.net.upcbroadband.cz. [89.176.127.93])
-        by smtp.gmail.com with ESMTPSA id u1sm5907164wml.14.2019.08.09.03.44.53
+        h=x-gm-message-state:sender:from:to:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=2MlbsA24Rszqm07Nqr+QNBq64s8U7dZBznf1kxDCc+o=;
+        b=kwG7oWpBlFWmezrk3eyoqexBYrtNKFbkqb9qYrhVeqs0h02v8hBz5XVrT76hOykKaS
+         xndGzC35BzkyBxmhlEPQpnW62iEcHEvb6+7zHNE825l5YV4s/RM2wx4yqnBIDg9+czuA
+         I2bScIFdypv7deyQYnS1XWeGn59yzM5iUvvhwMvhgqbld8BFpNRnjCve5gymsbsvlrEr
+         ndHHtrdbruxT1267iaJ4kUGH31rQPFy414w8oI/KG2Pn8EUFVdVcwvFxCjXJoVhep/2G
+         zI1OeEicjL3dC+fw72juhMQaGgNgZfhQo/PVj7TbIxA15Q4UxOGbsj90vtmzSgeihG5j
+         JC5w==
+X-Gm-Message-State: APjAAAWvp6NZxklD30ZLggou3LzIAZwdrzZG61BCT0Q5Bgac7PPAMc0i
+        +J3ww5jRF04375jkl27tzCeLXs61
+X-Google-Smtp-Source: APXvYqzPK1N82hyA9Zq+Sp553xkvn4LCERARaRyHkl6ikf8JcY9dLwjpGx0t81GtdMP1PcKPYPh8MQ==
+X-Received: by 2002:a7b:c202:: with SMTP id x2mr9853564wmi.49.1565348236674;
+        Fri, 09 Aug 2019 03:57:16 -0700 (PDT)
+Received: from donizetti.redhat.com ([2001:b07:6468:f312:b42d:b492:69df:ed61])
+        by smtp.gmail.com with ESMTPSA id o4sm4164314wmh.35.2019.08.09.03.57.15
+        for <kvm@vger.kernel.org>
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 09 Aug 2019 03:44:54 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     lantianyu1986@gmail.com
-Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, corbet@lwn.net, kys@microsoft.com,
-        haiyangz@microsoft.com, sthemmin@microsoft.com, sashal@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, michael.h.kelley@microsoft.com
-Subject: Re: [PATCH 2/3] KVM/Hyper-V: Add new KVM cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH
-In-Reply-To: <20190809094939.76093-3-Tianyu.Lan@microsoft.com>
-References: <20190809094939.76093-1-Tianyu.Lan@microsoft.com> <20190809094939.76093-3-Tianyu.Lan@microsoft.com>
-Date:   Fri, 09 Aug 2019 12:44:52 +0200
-Message-ID: <87r25ubot7.fsf@vitty.brq.redhat.com>
+        Fri, 09 Aug 2019 03:57:16 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] x86: access: avoid undefined behavior
+Date:   Fri,  9 Aug 2019 12:57:14 +0200
+Message-Id: <20190809105714.9450-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-lantianyu1986@gmail.com writes:
+In this test, at->ptep is tested in one argument to ac_test_check
+and dereferenced in another.  The compiler notices that and observes
+that at->ptep cannot be NULL.  The test is indeed broken and has
+been broken for 9+ years: the ac_test_check should not be performed at
+all if there is no PTE.
 
-> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
->
-> This patch adds new KVM cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH and let
-> user space to enable direct tlb flush function when only Hyper-V
-> hypervsior capability is exposed to VM. This patch also adds
-> enable_direct_tlbflush callback in the struct kvm_x86_ops and
-> platforms may use it to implement direct tlb flush support.
->
-> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
-> ---
->  Documentation/virtual/kvm/api.txt | 10 ++++++++++
->  arch/x86/include/asm/kvm_host.h   |  2 ++
->  arch/x86/kvm/x86.c                |  8 ++++++++
->  include/uapi/linux/kvm.h          |  1 +
->  4 files changed, 21 insertions(+)
->
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index 2cd6250b2896..45308ed6dd75 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -5289,3 +5289,13 @@ Architectures: x86
->  This capability indicates that KVM supports paravirtualized Hyper-V IPI send
->  hypercalls:
->  HvCallSendSyntheticClusterIpi, HvCallSendSyntheticClusterIpiEx.
-> +8.21 KVM_CAP_HYPERV_DIRECT_TLBFLUSH
-> +
-> +Architecture: x86
-> +
-> +This capability indicates that KVM supports Hyper-V direct tlb flush function.
-> +User space should enable this feature only when Hyper-V hypervisor capability
-> +is exposed to guest and KVM profile is hided. Both Hyper-V and KVM hypercalls
-> +use RAX and RCX registers to pass parameters. If KVM hypercall is exposed
-> +to L2 guest with direct tlbflush enabled, Hyper-V may mistake KVM hypercall
-> +for Hyper-V tlb flush Hypercall due to paremeter register overlap.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/access.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-First, we need to explicitly state that this is for KVM on Hyper-V and
-second, that this disables normal hypercall handling by KVM.
-
-My take:
-
-This capability indicates that KVM running on top of Hyper-V hypervisor
-enables Direct TLB flush for its guests meaning that TLB flush
-hypercalls are handled by Level 1 hypervisor (Hyper-V) bypassing KVM. 
-Due to the different ABI for hypercall parameters between Hyper-V and
-KVM, enabling this capability effectively disables all hypercall
-handling by KVM (as some KVM hypercall may be mistakenly treated as TLB
-flush hypercalls by Hyper-C) so userspace should disable KVM
-identification in CPUID.
-
-I think we should also enforce this somehow leaving only Hyper-V style
-hypercalls handling (for Windows guests) in place.
-
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 0cc5b611a113..667d154e89d4 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1205,6 +1205,8 @@ struct kvm_x86_ops {
->  	uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
->  
->  	bool (*need_emulation_on_page_fault)(struct kvm_vcpu *vcpu);
-> +
-> +	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
->  };
->  
->  struct kvm_arch_async_pf {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9d7b9e6a0939..a9d8ee7f7bf0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3183,6 +3183,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		r = kvm_x86_ops->get_nested_state ?
->  			kvm_x86_ops->get_nested_state(NULL, NULL, 0) : 0;
->  		break;
-> +	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
-> +		r = kvm_x86_ops->enable_direct_tlbflush ? 1 : 0;
-> +		break;
->  	default:
->  		break;
->  	}
-> @@ -3953,6 +3956,11 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->  				r = -EFAULT;
->  		}
->  		return r;
-> +	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
-> +		if (!kvm_x86_ops->enable_direct_tlbflush)
-> +			return -ENOTTY;
-> +
-> +		return kvm_x86_ops->enable_direct_tlbflush(vcpu);
->  
->  	default:
->  		return -EINVAL;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index a7c19540ce21..cb959bc925b1 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -996,6 +996,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
->  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
->  #define KVM_CAP_PMU_EVENT_FILTER 173
-> +#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 174
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
-
+diff --git a/x86/access.c b/x86/access.c
+index f0d1879..4ec0b0a 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -704,8 +704,9 @@ static int ac_test_do_access(ac_test_t *at)
+                   "unexpected access");
+     ac_test_check(at, &success, fault && e != at->expected_error,
+                   "error code %x expected %x", e, at->expected_error);
+-    ac_test_check(at, &success, at->ptep && *at->ptep != at->expected_pte,
+-                  "pte %x expected %x", *at->ptep, at->expected_pte);
++    if (at->ptep)
++        ac_test_check(at, &success, *at->ptep != at->expected_pte,
++                      "pte %x expected %x", *at->ptep, at->expected_pte);
+     ac_test_check(at, &success,
+                   !pt_match(*at->pdep, at->expected_pde, at->ignore_pde),
+                   "pde %x expected %x", *at->pdep, at->expected_pde);
 -- 
-Vitaly
+2.21.0
+
