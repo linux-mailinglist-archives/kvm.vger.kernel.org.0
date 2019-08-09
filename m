@@ -2,132 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0236F873C2
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 10:07:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4694873EC
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 10:22:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405804AbfHIIHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 04:07:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53198 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405567AbfHIIHU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 04:07:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E6B0869086;
-        Fri,  9 Aug 2019 08:07:19 +0000 (UTC)
-Received: from gondolin (dhcp-192-181.str.redhat.com [10.33.192.181])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B21CE5D9D3;
-        Fri,  9 Aug 2019 08:07:16 +0000 (UTC)
-Date:   Fri, 9 Aug 2019 10:07:14 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Parav Pandit <parav@mellanox.com>, kvm@vger.kernel.org,
-        kwankhede@nvidia.com, linux-kernel@vger.kernel.org, cjia@nvidia.com
-Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-Message-ID: <20190809100714.6b012f41.cohuck@redhat.com>
-In-Reply-To: <20190808170247.1fc2c4c4@x1.home>
-References: <20190802065905.45239-1-parav@mellanox.com>
-        <20190808141255.45236-1-parav@mellanox.com>
-        <20190808170247.1fc2c4c4@x1.home>
-Organization: Red Hat GmbH
+        id S2405671AbfHIIWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 04:22:51 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50398 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726054AbfHIIWv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 04:22:51 -0400
+Received: by mail-wm1-f66.google.com with SMTP id v15so4823355wml.0
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 01:22:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LNp+g/vzuyou+8SOuxEdKIcRZJyNxl5KwEsu62IXuGU=;
+        b=McbvzcBJfP+h0NnjsTTuaoLwxpZGA7dGjabt7my3rltA7R0trFNTKNQComMgOJzJOx
+         slP5Yw4Qdp30DslmvJ4o8MfRdsPKZu9phvRP7U/sYWn9kGp6VKO/MIF8JuIFkVXaa4rf
+         T33OYcFUVPzUdwE8Zg0xFX6KV8MbR6VpklDwVUby0z6XD3f7N7n6DVqUGjbltAFwRRus
+         +kP+FHDnZZ8F2EXny8Pc4toQheMVEfLe1PPkHfByRfJfjJGPfbkT+w9+Mvy2xaagI0zd
+         BFfUkF54ag0sA9pHCm8TDOElD7Y8Luo/9q54gkNIswD/IIk1OXcEqp6R6LGmuh7N9NiU
+         AMGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LNp+g/vzuyou+8SOuxEdKIcRZJyNxl5KwEsu62IXuGU=;
+        b=WVcYRR/Wy6xscaaykU22rJ+vOPeH3APgURazZ04gtzH2iBn+hd1BUQxCIvYy7nWNy/
+         CDcjssNHlQ030KDaKnHBLXdNZzPk5mRdGneUu6NiNrEiCIT0fLNlcmbjxof2X9z5KHGn
+         d8STXuZHe96aoXrZFZXYF0XzIV0AOnquISg4LatOcrIKNIBBWtWzISt5Yq1ITVhUH6Bd
+         P196luES9pf6T6PpwpXIlrhk2l0TXW0OkMCxgXRJA1V4Lr06dOl4h1dDYgAeorvrl1XG
+         90mkaKsGfUjXg/tIu0D547aDHBVnNmFWYG2RBT5HH4q0peoHoA+5PufMLOwJG2cKprSn
+         NgMw==
+X-Gm-Message-State: APjAAAW8UdD4KHUJCf/trE/V4nAua0o2p8A9H3FH626olLtelIvHTAMI
+        CHRL4NB579iXEPXydgnhTr6f219Pnt2ryxJf7U5Wgw==
+X-Google-Smtp-Source: APXvYqwp3nuRKA8dCG1GKtRTblI3EushHwDGCgL1HJWLLG1enXfHuScwMYxlxKAy5IYXAC+HAEaXftvzSe9EONOIJ/E=
+X-Received: by 2002:a1c:be05:: with SMTP id o5mr9482966wmf.52.1565338968612;
+ Fri, 09 Aug 2019 01:22:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 09 Aug 2019 08:07:20 +0000 (UTC)
+References: <20190807122726.81544-1-anup.patel@wdc.com> <4a991aa3-154a-40b2-a37d-9ee4a4c7a2ca@redhat.com>
+ <alpine.DEB.2.21.9999.1908071606560.13971@viisi.sifive.com>
+ <df0638d9-e2f4-30f5-5400-9078bf9d1f99@redhat.com> <alpine.DEB.2.21.9999.1908081824500.21111@viisi.sifive.com>
+ <2ea0c656-bd7e-ae79-1f8e-6b60374ccc6e@redhat.com>
+In-Reply-To: <2ea0c656-bd7e-ae79-1f8e-6b60374ccc6e@redhat.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Fri, 9 Aug 2019 13:52:36 +0530
+Message-ID: <CAAhSdy1Hn69CxERttqa39wWr1-EYJtUPSG7TZnavZQqnMOHUqA@mail.gmail.com>
+Subject: Re: [PATCH v4 00/20] KVM RISC-V Support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 8 Aug 2019 17:02:47 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On Fri, Aug 9, 2019 at 1:07 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 09/08/19 03:35, Paul Walmsley wrote:
+> > On Thu, 8 Aug 2019, Paolo Bonzini wrote:
+> >
+> >> However, for Linux releases after 5.4 I would rather get pull requests
+> >> for arch/riscv/kvm from Anup and Atish without involving the RISC-V
+> >> tree.  Of course, they or I will ask for your ack, or for a topic
+> >> branch, on the occasion that something touches files outside their
+> >> maintainership area.  This is how things are already being handled for
+> >> ARM, POWER and s390 and it allows me to handle conflicts in common KVM
+> >> files before they reach Linus; these are more common than conflicts in
+> >> arch files. If you have further questions on git and maintenance
+> >> workflows, just ask!
+> >
+> > In principle, that's fine with me, as long as the arch/riscv maintainers
+> > and mailing lists are kept in the loop.  We already do something similar
+> > to this for the RISC-V BPF JIT.  However, I'd like this to be explicitly
+> > documented in the MAINTAINERS file, as it is for BPF.  It looks like it
+> > isn't for ARM, POWER, or S390, either looking at MAINTAINERS or
+> > spot-checking scripts/get_maintainer.pl:
+> >
+> > $ scripts/get_maintainer.pl -f arch/s390/kvm/interrupt.c
+> > Christian Borntraeger <borntraeger@de.ibm.com> (supporter:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> > Janosch Frank <frankja@linux.ibm.com> (supporter:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> > David Hildenbrand <david@redhat.com> (reviewer:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> > Cornelia Huck <cohuck@redhat.com> (reviewer:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> > Heiko Carstens <heiko.carstens@de.ibm.com> (supporter:S390)
+> > Vasily Gorbik <gor@linux.ibm.com> (supporter:S390)
+> > linux-s390@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE for s390 (KVM/s390))
+> > linux-kernel@vger.kernel.org (open list)
+> > $
+> >
+> > Would you be willing to send a MAINTAINERS patch to formalize this
+> > practice?
+>
+> Ah, I see, in the MAINTAINERS entry
+>
+> KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)
+> M:      Anup Patel <anup.patel@wdc.com>
+> R:      Atish Patra <atish.patra@wdc.com>
+> L:      linux-riscv@lists.infradead.org
+> T:      git git://github.com/avpatel/linux.git
+> S:      Maintained
+> F:      arch/riscv/include/uapi/asm/kvm*
+> F:      arch/riscv/include/asm/kvm*
+> F:      arch/riscv/kvm/
+>
+> the L here should be kvm@vger.kernel.org.  arch/riscv/kvm/ files would
+> still match RISC-V ARCHITECTURE and therefore
+> linux-riscv@lists.infradead.org would be CCed.
 
-> On Thu,  8 Aug 2019 09:12:53 -0500
-> Parav Pandit <parav@mellanox.com> wrote:
-> 
-> > Currently mtty sample driver uses mdev state and UUID in convoluated way to
-> > generate an interrupt.
-> > It uses several translations from mdev_state to mdev_device to mdev uuid.
-> > After which it does linear search of long uuid comparision to
-> > find out mdev_state in mtty_trigger_interrupt().
-> > mdev_state is already available while generating interrupt from which all
-> > such translations are done to reach back to mdev_state.
-> > 
-> > This translations are done during interrupt generation path.
-> > This is unnecessary and reduandant.  
-> 
-> Is the interrupt handling efficiency of this particular sample driver
-> really relevant, or is its purpose more to illustrate the API and
-> provide a proof of concept?  If we go to the trouble to optimize the
-> sample driver and remove this interface from the API, what do we lose?
+In addition to above mentioned lists, we insist of having a separate
+KVM RISC-V list which can be CCed for non-kernel patches for projects
+such as QEMU, KVMTOOL, and Libvirt. This KVM RISC-V list can also
+be used for general queries related to KVM RISCV.
 
-Not sure how useful the sample driver is as a template; blindly copying
-their interrupt handling is probably not a good idea.
+>
+> Unlike other subsystems, for KVM I ask the submaintainers to include the
+> patches in their pull requests, which is why you saw no kvm@vger entry
+> for KVM/s390.  However, it's probably a good idea to add it and do the
+> same for RISC-V.
 
-> 
-> This interface was added via commit:
-> 
-> 99e3123e3d72 vfio-mdev: Make mdev_device private and abstract interfaces
-> 
-> Where the goal was to create a more formal interface and abstract
-> driver access to the struct mdev_device.  In part this served to make
-> out-of-tree mdev vendor drivers more supportable; the object is
-> considered opaque and access is provided via an API rather than through
-> direct structure fields.
-> 
-> I believe that the NVIDIA GRID mdev driver does make use of this
-> interface and it's likely included in the sample driver specifically so
-> that there is an in-kernel user for it (ie. specifically to avoid it
-> being removed so casually).  An interesting feature of the NVIDIA mdev
-> driver is that I believe it has portions that run in userspace.  As we
-> know, mdevs are named with a UUID, so I can imagine there are some
-> efficiencies to be gained in having direct access to the UUID for a
-> device when interacting with userspace, rather than repeatedly parsing
-> it from a device name.  Is that really something we want to make more
-> difficult in order to optimize a sample driver?  Knowing that an mdev
-> device uses a UUID for it's name, as tools like libvirt and mdevctl
-> expect, is it really worthwhile to remove such a trivial API?
+For KVM RISC-V, we will always CC both kvm@vger.kernel.org and
+linux-riscv@lists.infradead.org.
 
-Ripping out the uuid is a bad idea, I agree. The device name simply is
-no good replacement for that.
-
-If there's a good use case for using the uuid in a vendor driver, let's
-keep the accessor. But then we probably should either leave the sample
-driver alone, or add a more compelling use of the api there.
-
-> 
-> > Hence,
-> > Patch-1 simplifies mtty sample driver to directly use mdev_state.
-> > 
-> > Patch-2, Since no production driver uses mdev_uuid(), simplifies and
-> > removes redandant mdev_uuid() exported symbol.  
-> 
-> s/no production driver/no in-kernel production driver/
-> 
-> I'd be interested to hear how the NVIDIA folks make use of this API
-> interface.  Thanks,
-> 
-> Alex
-> 
-> > ---
-> > Changelog:
-> > v1->v2:
-> >  - Corrected email of Kirti
-> >  - Updated cover letter commit log to address comment from Cornelia
-> >  - Added Reviewed-by tag
-> > v0->v1:
-> >  - Updated commit log
-> > 
-> > Parav Pandit (2):
-> >   vfio-mdev/mtty: Simplify interrupt generation
-> >   vfio/mdev: Removed unused and redundant API for mdev UUID
-> > 
-> >  drivers/vfio/mdev/mdev_core.c |  6 ------
-> >  include/linux/mdev.h          |  1 -
-> >  samples/vfio-mdev/mtty.c      | 39 +++++++----------------------------
-> >  3 files changed, 8 insertions(+), 38 deletions(-)
-> >   
-> 
-
+Regards,
+Anup
