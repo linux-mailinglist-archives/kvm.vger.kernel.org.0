@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DA1E87F3F
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:15:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2957887F49
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:15:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437162AbfHIQPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:15:30 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:52914 "EHLO
+        id S2436958AbfHIQPn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:15:43 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53040 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437159AbfHIQPK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:10 -0400
+        by vger.kernel.org with ESMTP id S2437125AbfHIQPH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:15:07 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 4C2C2305D347;
-        Fri,  9 Aug 2019 19:01:17 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 7BFAD305D348;
+        Fri,  9 Aug 2019 19:01:18 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id 6E75F305B7A3;
-        Fri,  9 Aug 2019 19:01:16 +0300 (EEST)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 3571E305B7A9;
+        Fri,  9 Aug 2019 19:01:17 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -33,9 +33,9 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v6 46/92] kvm: introspection: add KVMI_SET_PAGE_WRITE_BITMAP
-Date:   Fri,  9 Aug 2019 19:00:01 +0300
-Message-Id: <20190809160047.8319-47-alazar@bitdefender.com>
+Subject: [RFC PATCH v6 47/92] kvm: introspection: add KVMI_READ_PHYSICAL and KVMI_WRITE_PHYSICAL
+Date:   Fri,  9 Aug 2019 19:00:02 +0300
+Message-Id: <20190809160047.8319-48-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -46,52 +46,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This command sets the subpage protection (SPP) write bitmap for an array
-of guest physical addresses of 4KB bytes.
+From: Mihai Donțu <mdontu@bitdefender.com>
 
-Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+These commands allows the introspection tool to read/write from/to the
+guest memory.
+
+Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst | 66 ++++++++++++++++++++++++++++++
- arch/x86/kvm/kvmi.c                | 30 ++++++++++++++
- include/uapi/linux/kvmi.h          | 13 ++++++
- virt/kvm/kvmi.c                    | 37 +++++++++++++++++
- virt/kvm/kvmi_int.h                |  4 ++
- virt/kvm/kvmi_msg.c                | 13 ++++++
- 6 files changed, 163 insertions(+)
+ Documentation/virtual/kvm/kvmi.rst |  60 ++++++++++++++++
+ include/uapi/linux/kvmi.h          |  11 +++
+ virt/kvm/kvmi.c                    | 107 +++++++++++++++++++++++++++++
+ virt/kvm/kvmi_int.h                |   7 ++
+ virt/kvm/kvmi_msg.c                |  42 +++++++++++
+ 5 files changed, 227 insertions(+)
 
 diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index 2ffb92b0fa71..69557c63ff94 100644
+index 69557c63ff94..eef32107837a 100644
 --- a/Documentation/virtual/kvm/kvmi.rst
 +++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -694,6 +694,72 @@ EPT view (0 is primary). On all other hardware it must be zero.
+@@ -760,6 +760,66 @@ corresponding bit set to 1.
  * -KVM_EAGAIN - the selected vCPU can't be introspected yet
- * -KVM_ENOMEM - not enough memory to allocate the reply
+ * -KVM_ENOMEM - not enough memory to add the page tracking structures
  
-+13. KVMI_SET_PAGE_WRITE_BITMAP
-+------------------------------
++14. KVMI_READ_PHYSICAL
++----------------------
 +
-+:Architectures: x86
++:Architectures: all
 +:Versions: >= 1
 +:Parameters:
 +
 +::
 +
-+	struct kvmi_set_page_write_bitmap {
-+		__u16 view;
-+		__u16 count;
-+		__u32 padding;
-+		struct kvmi_page_write_bitmap_entry entries[0];
-+	};
-+
-+where::
-+
-+	struct kvmi_page_write_bitmap_entry {
++	struct kvmi_read_physical {
 +		__u64 gpa;
-+		__u32 bitmap;
-+		__u32 padding;
++		__u64 size;
 +	};
 +
 +:Returns:
@@ -99,223 +89,283 @@ index 2ffb92b0fa71..69557c63ff94 100644
 +::
 +
 +	struct kvmi_error_code;
++	__u8 data[0];
 +
-+Sets the subpage protection (SPP) write bitmap for an array of ``count``
-+guest physical addresses of 4KB bytes.
++Reads from the guest memory.
 +
-+The command will make the changes starting with the first entry and
-+it will stop on the first error. The introspection tool should handle
-+the rollback.
-+
-+While the *KVMI_SET_PAGE_ACCESS* command can be used to write-protect a
-+4KB page, this command can write-protect 128-bytes subpages inside of a
-+4KB page by setting the corresponding bit to 1 (write allowed) or to 0
-+(write disallowed). For example, to allow write access to the A and B
-+subpages only, the bitmap must be set to::
-+
-+	BIT(A) | BIT(B)
-+
-+A and B must be a number between 0 (first subpage) and 31 (last subpage).
-+
-+Using this command to set all bits to 1 (allow write access for
-+all subpages) will allow write access to the whole 4KB page (like a
-+*KVMI_SET_PAGE_ACCESS* command with the *KVMI_PAGE_ACCESS_W* flag set)
-+and vice versa.
-+
-+Using this command to set any bit to 0 will write-protect the whole 4KB
-+page (like a *KVMI_SET_PAGE_ACCESS* command with the *KVMI_PAGE_ACCESS_W*
-+flag cleared) and allow write access only for subpages with the
-+corresponding bit set to 1.
++Currently, the size must be non-zero and the read must be restricted to
++one page (offset + size <= PAGE_SIZE).
 +
 +:Errors:
 +
-+* -KVM_EINVAL - the selected SPT view is invalid
-+* -KVM_EOPNOTSUPP - a SPT view was selected but the hardware doesn't support it
-+* -KVM_EOPNOTSUPP - the hardware doesn't support SPP or hasn't been enabled
-+* -KVM_EINVAL - the write access is already allowed for the whole 4KB page
-+* -KVM_EAGAIN - the selected vCPU can't be introspected yet
-+* -KVM_ENOMEM - not enough memory to add the page tracking structures
++* -KVM_EINVAL - the specified gpa is invalid
++
++15. KVMI_WRITE_PHYSICAL
++-----------------------
++
++:Architectures: all
++:Versions: >= 1
++:Parameters:
++
++::
++
++	struct kvmi_write_physical {
++		__u64 gpa;
++		__u64 size;
++		__u8  data[0];
++	};
++
++:Returns:
++
++::
++
++	struct kvmi_error_code
++
++Writes into the guest memory.
++
++Currently, the size must be non-zero and the write must be restricted to
++one page (offset + size <= PAGE_SIZE).
++
++:Errors:
++
++* -KVM_EINVAL - the specified gpa is invalid
 +
  Events
  ======
  
-diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
-index 356ec79936b3..fa290fbf1f75 100644
---- a/arch/x86/kvm/kvmi.c
-+++ b/arch/x86/kvm/kvmi.c
-@@ -304,6 +304,36 @@ int kvmi_arch_cmd_set_page_access(struct kvmi *ikvm,
- 	return ec;
- }
- 
-+int kvmi_arch_cmd_set_page_write_bitmap(struct kvmi *ikvm,
-+					const struct kvmi_msg_hdr *msg,
-+					const struct kvmi_set_page_write_bitmap
-+					*req)
-+{
-+	u16 k, n = req->count;
-+	int ec = 0;
-+
-+	if (req->padding)
-+		return -KVM_EINVAL;
-+
-+	if (msg->size < sizeof(*req) + req->count * sizeof(req->entries[0]))
-+		return -KVM_EINVAL;
-+
-+	if (!kvmi_spp_enabled(ikvm))
-+		return -KVM_EOPNOTSUPP;
-+
-+	if (req->view != 0)	/* TODO */
-+		return -KVM_EOPNOTSUPP;
-+
-+	for (k = 0; k < n && ec == 0; k++) {
-+		u64 gpa = req->entries[k].gpa;
-+		u32 bitmap = req->entries[k].bitmap;
-+
-+		ec = kvmi_cmd_set_page_write_bitmap(ikvm, gpa, bitmap);
-+	}
-+
-+	return ec;
-+}
-+
- int kvmi_arch_cmd_control_spp(struct kvmi *ikvm)
- {
- 	return kvm_arch_init_spp(ikvm->kvm);
 diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 19a6a50df96b..0b3139c52a30 100644
+index 0b3139c52a30..be3f066f314e 100644
 --- a/include/uapi/linux/kvmi.h
 +++ b/include/uapi/linux/kvmi.h
-@@ -160,6 +160,19 @@ struct kvmi_get_page_write_bitmap_reply {
- 	__u32 bitmap[0];
+@@ -191,6 +191,17 @@ struct kvmi_control_vm_events {
+ 	__u32 padding2;
  };
  
-+struct kvmi_page_write_bitmap_entry {
++struct kvmi_read_physical {
 +	__u64 gpa;
-+	__u32 bitmap;
-+	__u32 padding;
++	__u64 size;
 +};
 +
-+struct kvmi_set_page_write_bitmap {
-+	__u16 view;
-+	__u16 count;
-+	__u32 padding;
-+	struct kvmi_page_write_bitmap_entry entries[0];
++struct kvmi_write_physical {
++	__u64 gpa;
++	__u64 size;
++	__u8  data[0];
 +};
 +
- struct kvmi_get_vcpu_info_reply {
- 	__u64 tsc_speed;
- };
+ struct kvmi_vcpu_hdr {
+ 	__u16 vcpu;
+ 	__u16 padding1;
 diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
-index 22e233ca474c..d2bebef98d8d 100644
+index d2bebef98d8d..a84eb150e116 100644
 --- a/virt/kvm/kvmi.c
 +++ b/virt/kvm/kvmi.c
-@@ -99,6 +99,24 @@ static int kvmi_set_gfn_access(struct kvm *kvm, gfn_t gfn, u8 access,
- 	m->access = access;
- 	m->write_bitmap = write_bitmap;
- 
-+	/*
-+	 * Only try to set SPP bitmap when the page is writable.
-+	 * Be careful, kvm_mmu_set_subpages() will enable page write-protection
-+	 * by default when set SPP bitmap. If bitmap contains all 1s, it'll
-+	 * make the page writable by default too.
-+	 */
-+	if (!(access & KVMI_PAGE_ACCESS_W) && kvmi_spp_enabled(ikvm)) {
-+		struct kvm_subpage spp_info;
-+
-+		spp_info.base_gfn = gfn;
-+		spp_info.npages = 1;
-+		spp_info.access_map[0] = write_bitmap;
-+
-+		err = kvm_arch_set_subpages(kvm, &spp_info);
-+		if (err)
-+			goto exit;
-+	}
-+
- 	if (radix_tree_preload(GFP_KERNEL)) {
- 		err = -KVM_ENOMEM;
- 		goto exit;
-@@ -1183,6 +1201,25 @@ int kvmi_cmd_set_page_access(struct kvmi *ikvm, u64 gpa, u8 access)
+@@ -5,6 +5,7 @@
+  * Copyright (C) 2017-2019 Bitdefender S.R.L.
+  *
+  */
++#include <linux/mmu_context.h>
+ #include <uapi/linux/kvmi.h>
+ #include "kvmi_int.h"
+ #include <linux/kthread.h>
+@@ -1220,6 +1221,112 @@ int kvmi_cmd_set_page_write_bitmap(struct kvmi *ikvm, u64 gpa,
  	return kvmi_set_gfn_access(ikvm->kvm, gfn, access, write_bitmap);
  }
  
-+int kvmi_cmd_set_page_write_bitmap(struct kvmi *ikvm, u64 gpa,
-+				   u32 write_bitmap)
++unsigned long gfn_to_hva_safe(struct kvm *kvm, gfn_t gfn)
 +{
-+	bool write_allowed_for_all;
-+	gfn_t gfn = gpa_to_gfn(gpa);
-+	u32 ignored_write_bitmap;
-+	u8 access;
++	unsigned long hva;
++	int srcu_idx;
 +
-+	kvmi_get_gfn_access(ikvm, gfn, &access, &ignored_write_bitmap);
++	srcu_idx = srcu_read_lock(&kvm->srcu);
++	hva = gfn_to_hva(kvm, gfn);
++	srcu_read_unlock(&kvm->srcu, srcu_idx);
 +
-+	write_allowed_for_all = (write_bitmap == (u32)((1ULL << 32) - 1));
-+	if (write_allowed_for_all)
-+		access |= KVMI_PAGE_ACCESS_W;
-+	else
-+		access &= ~KVMI_PAGE_ACCESS_W;
++	return hva;
++}
 +
-+	return kvmi_set_gfn_access(ikvm->kvm, gfn, access, write_bitmap);
++static long get_user_pages_remote_unlocked(struct mm_struct *mm,
++	unsigned long start,
++	unsigned long nr_pages,
++	unsigned int gup_flags,
++	struct page **pages)
++{
++	long ret;
++	struct task_struct *tsk = NULL;
++	struct vm_area_struct **vmas = NULL;
++	int locked = 1;
++
++	down_read(&mm->mmap_sem);
++	ret = get_user_pages_remote(tsk, mm, start, nr_pages, gup_flags,
++		pages, vmas, &locked);
++	if (locked)
++		up_read(&mm->mmap_sem);
++	return ret;
++}
++
++static void *get_page_ptr(struct kvm *kvm, gpa_t gpa, struct page **page,
++			  bool write)
++{
++	unsigned int flags = write ? FOLL_WRITE : 0;
++	unsigned long hva;
++
++	*page = NULL;
++
++	hva = gfn_to_hva_safe(kvm, gpa_to_gfn(gpa));
++
++	if (kvm_is_error_hva(hva)) {
++		kvmi_err(IKVM(kvm), "Invalid gpa %llx\n", gpa);
++		return NULL;
++	}
++
++	if (get_user_pages_remote_unlocked(kvm->mm, hva, 1, flags, page) != 1) {
++		kvmi_err(IKVM(kvm),
++			 "Failed to get the page for hva %lx gpa %llx\n",
++			 hva, gpa);
++		return NULL;
++	}
++
++	return kmap_atomic(*page);
++}
++
++static void put_page_ptr(void *ptr, struct page *page)
++{
++	if (ptr)
++		kunmap_atomic(ptr);
++	if (page)
++		put_page(page);
++}
++
++int kvmi_cmd_read_physical(struct kvm *kvm, u64 gpa, u64 size, int(*send)(
++	struct kvmi *, const struct kvmi_msg_hdr *,
++	int err, const void *buf, size_t),
++	const struct kvmi_msg_hdr *ctx)
++{
++	int err, ec = 0;
++	struct page *page = NULL;
++	void *ptr_page = NULL, *ptr = NULL;
++	size_t ptr_size = 0;
++
++	ptr_page = get_page_ptr(kvm, gpa, &page, false);
++	if (!ptr_page) {
++		ec = -KVM_EINVAL;
++		goto out;
++	}
++
++	ptr = ptr_page + (gpa & ~PAGE_MASK);
++	ptr_size = size;
++
++out:
++	err = send(IKVM(kvm), ctx, ec, ptr, ptr_size);
++
++	put_page_ptr(ptr_page, page);
++	return err;
++}
++
++int kvmi_cmd_write_physical(struct kvm *kvm, u64 gpa, u64 size, const void *buf)
++{
++	struct page *page;
++	void *ptr;
++
++	ptr = get_page_ptr(kvm, gpa, &page, true);
++	if (!ptr)
++		return -KVM_EINVAL;
++
++	memcpy(ptr + (gpa & ~PAGE_MASK), buf, size);
++
++	put_page_ptr(ptr, page);
++
++	return 0;
 +}
 +
  int kvmi_cmd_control_events(struct kvm_vcpu *vcpu, unsigned int event_id,
  			    bool enable)
  {
 diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-index 7243c57be27a..18c00dae0f2f 100644
+index 18c00dae0f2f..7bdff70d4309 100644
 --- a/virt/kvm/kvmi_int.h
 +++ b/virt/kvm/kvmi_int.h
-@@ -173,6 +173,7 @@ void kvmi_msg_free(void *addr);
- int kvmi_cmd_get_page_access(struct kvmi *ikvm, u64 gpa, u8 *access);
+@@ -174,6 +174,13 @@ int kvmi_cmd_get_page_access(struct kvmi *ikvm, u64 gpa, u8 *access);
  int kvmi_cmd_set_page_access(struct kvmi *ikvm, u64 gpa, u8 access);
  int kvmi_cmd_get_page_write_bitmap(struct kvmi *ikvm, u64 gpa, u32 *bitmap);
-+int kvmi_cmd_set_page_write_bitmap(struct kvmi *ikvm, u64 gpa, u32 bitmap);
+ int kvmi_cmd_set_page_write_bitmap(struct kvmi *ikvm, u64 gpa, u32 bitmap);
++int kvmi_cmd_read_physical(struct kvm *kvm, u64 gpa, u64 size,
++			   int (*send)(struct kvmi *,
++					const struct kvmi_msg_hdr*,
++					int err, const void *buf, size_t),
++			   const struct kvmi_msg_hdr *ctx);
++int kvmi_cmd_write_physical(struct kvm *kvm, u64 gpa, u64 size,
++			    const void *buf);
  int kvmi_cmd_control_events(struct kvm_vcpu *vcpu, unsigned int event_id,
  			    bool enable);
  int kvmi_cmd_control_vm_events(struct kvmi *ikvm, unsigned int event_id,
-@@ -202,6 +203,9 @@ int kvmi_arch_cmd_get_page_write_bitmap(struct kvmi *ikvm,
- 					const struct kvmi_get_page_write_bitmap *req,
- 					struct kvmi_get_page_write_bitmap_reply **dest,
- 					size_t *dest_size);
-+int kvmi_arch_cmd_set_page_write_bitmap(struct kvmi *ikvm,
-+					const struct kvmi_msg_hdr *msg,
-+					const struct kvmi_set_page_write_bitmap *req);
- void kvmi_arch_setup_event(struct kvm_vcpu *vcpu, struct kvmi_event *ev);
- bool kvmi_arch_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
- 			u8 access);
 diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index eb247ac3e037..f9efb52d49c3 100644
+index f9efb52d49c3..9c20a9cfda42 100644
 --- a/virt/kvm/kvmi_msg.c
 +++ b/virt/kvm/kvmi_msg.c
-@@ -35,6 +35,7 @@ static const char *const msg_IDs[] = {
+@@ -34,8 +34,10 @@ static const char *const msg_IDs[] = {
+ 	[KVMI_GET_PAGE_WRITE_BITMAP] = "KVMI_GET_PAGE_WRITE_BITMAP",
  	[KVMI_GET_VCPU_INFO]         = "KVMI_GET_VCPU_INFO",
  	[KVMI_GET_VERSION]           = "KVMI_GET_VERSION",
++	[KVMI_READ_PHYSICAL]         = "KVMI_READ_PHYSICAL",
  	[KVMI_SET_PAGE_ACCESS]       = "KVMI_SET_PAGE_ACCESS",
-+	[KVMI_SET_PAGE_WRITE_BITMAP] = "KVMI_SET_PAGE_WRITE_BITMAP",
+ 	[KVMI_SET_PAGE_WRITE_BITMAP] = "KVMI_SET_PAGE_WRITE_BITMAP",
++	[KVMI_WRITE_PHYSICAL]        = "KVMI_WRITE_PHYSICAL",
  };
  
  static bool is_known_message(u16 id)
-@@ -400,6 +401,17 @@ static int handle_get_page_write_bitmap(struct kvmi *ikvm,
- 	return err;
+@@ -303,6 +305,44 @@ static int kvmi_get_vcpu(struct kvmi *ikvm, unsigned int vcpu_idx,
+ 	return 0;
  }
  
-+static int handle_set_page_write_bitmap(struct kvmi *ikvm,
-+					const struct kvmi_msg_hdr *msg,
-+					const void *req)
++static bool invalid_page_access(u64 gpa, u64 size)
 +{
++	u64 off = gpa & ~PAGE_MASK;
++
++	return (size == 0 || size > PAGE_SIZE || off + size > PAGE_SIZE);
++}
++
++static int handle_read_physical(struct kvmi *ikvm,
++				const struct kvmi_msg_hdr *msg,
++				const void *_req)
++{
++	const struct kvmi_read_physical *req = _req;
++
++	if (invalid_page_access(req->gpa, req->size))
++		return -EINVAL;
++
++	return kvmi_cmd_read_physical(ikvm->kvm, req->gpa, req->size,
++				      kvmi_msg_vm_maybe_reply, msg);
++}
++
++static int handle_write_physical(struct kvmi *ikvm,
++				 const struct kvmi_msg_hdr *msg,
++				 const void *_req)
++{
++	const struct kvmi_write_physical *req = _req;
 +	int ec;
 +
-+	ec = kvmi_arch_cmd_set_page_write_bitmap(ikvm, msg, req);
++	if (invalid_page_access(req->gpa, req->size))
++		return -EINVAL;
++
++	if (msg->size < sizeof(*req) + req->size)
++		return -EINVAL;
++
++	ec = kvmi_cmd_write_physical(ikvm->kvm, req->gpa, req->size, req->data);
 +
 +	return kvmi_msg_vm_maybe_reply(ikvm, msg, ec, NULL, 0);
 +}
 +
- static bool invalid_vcpu_hdr(const struct kvmi_vcpu_hdr *hdr)
+ static bool enable_spp(struct kvmi *ikvm)
  {
- 	return hdr->padding1 || hdr->padding2;
-@@ -420,6 +432,7 @@ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
+ 	if (!ikvm->spp.initialized) {
+@@ -431,8 +471,10 @@ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
+ 	[KVMI_GET_PAGE_ACCESS]       = handle_get_page_access,
  	[KVMI_GET_PAGE_WRITE_BITMAP] = handle_get_page_write_bitmap,
  	[KVMI_GET_VERSION]           = handle_get_version,
++	[KVMI_READ_PHYSICAL]         = handle_read_physical,
  	[KVMI_SET_PAGE_ACCESS]       = handle_set_page_access,
-+	[KVMI_SET_PAGE_WRITE_BITMAP] = handle_set_page_write_bitmap,
+ 	[KVMI_SET_PAGE_WRITE_BITMAP] = handle_set_page_write_bitmap,
++	[KVMI_WRITE_PHYSICAL]        = handle_write_physical,
  };
  
  static int handle_event_reply(struct kvm_vcpu *vcpu,
