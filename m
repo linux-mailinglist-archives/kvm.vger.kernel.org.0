@@ -2,138 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 232E18806C
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:44:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 027108827A
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 20:32:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726465AbfHIQo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:44:56 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:54102 "EHLO
-        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726157AbfHIQo4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:44:56 -0400
-Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id E5A0C301AB4A;
-        Fri,  9 Aug 2019 19:00:54 +0300 (EEST)
-Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id A705D305B7A0;
-        Fri,  9 Aug 2019 19:00:54 +0300 (EEST)
-From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
+        id S2407436AbfHISbt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 14:31:49 -0400
+Received: from mga04.intel.com ([192.55.52.120]:7052 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2436791AbfHISbs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 14:31:48 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Aug 2019 11:31:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,366,1559545200"; 
+   d="scan'208";a="374570158"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga005.fm.intel.com with ESMTP; 09 Aug 2019 11:31:47 -0700
+Date:   Fri, 9 Aug 2019 11:31:47 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        =?UTF-8?q?Samuel=20Laur=C3=A9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>, Zhang@vger.kernel.org,
-        Yu C <yu.c.zhang@intel.com>,
-        =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v6 09/92] kvm: introspection: add KVMI_GET_GUEST_INFO
-Date:   Fri,  9 Aug 2019 18:59:24 +0300
-Message-Id: <20190809160047.8319-10-alazar@bitdefender.com>
-In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v3 2/7] x86: kvm: svm: propagate errors from
+ skip_emulated_instruction()
+Message-ID: <20190809183146.GD10541@linux.intel.com>
+References: <20190808173051.6359-1-vkuznets@redhat.com>
+ <20190808173051.6359-3-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190808173051.6359-3-vkuznets@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mihai Donțu <mdontu@bitdefender.com>
+On Thu, Aug 08, 2019 at 07:30:46PM +0200, Vitaly Kuznetsov wrote:
+> On AMD, kvm_x86_ops->skip_emulated_instruction(vcpu) can, in theory,
+> fail: in !nrips case we call kvm_emulate_instruction(EMULTYPE_SKIP).
+> Currently, we only do printk(KERN_DEBUG) when this happens and this
+> is not ideal. Propagate the error up the stack.
+> 
+> On VMX, skip_emulated_instruction() doesn't fail, we have two call
+> sites calling it explicitly: handle_exception_nmi() and
+> handle_task_switch(), we can just ignore the result.
+> 
+> On SVM, we also have two explicit call sites:
+> svm_queue_exception() and it seems we don't need to do anything there as
+> we check if RIP was advanced or not. In task_switch_interception(),
+> however, we are better off not proceeding to kvm_task_switch() in case
+> skip_emulated_instruction() failed.
+> 
+> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
 
-For now, this command returns only the number of online vCPUs.
+...
 
-Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
-Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
----
- Documentation/virtual/kvm/kvmi.rst | 18 ++++++++++++++++++
- include/uapi/linux/kvmi.h          |  5 +++++
- virt/kvm/kvmi_msg.c                | 14 ++++++++++++++
- 3 files changed, 37 insertions(+)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 074385c86c09..2579e7a6d59d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1473,7 +1473,7 @@ static int vmx_rtit_ctl_check(struct kvm_vcpu *vcpu, u64 data)
+>  }
+>  
+>  
+> -static void skip_emulated_instruction(struct kvm_vcpu *vcpu)
+> +static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long rip;
+>  
+> @@ -1483,6 +1483,8 @@ static void skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>  
+>  	/* skipping an emulated instruction also counts */
+>  	vmx_set_interrupt_shadow(vcpu, 0);
+> +
+> +	return EMULATE_DONE;
+>  }
+>  
+>  static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
+> @@ -4547,7 +4549,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>  			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+>  			vcpu->arch.dr6 |= dr6 | DR6_RTM;
+>  			if (is_icebp(intr_info))
+> -				skip_emulated_instruction(vcpu);
+> +				(void)skip_emulated_instruction(vcpu);
+>  
+>  			kvm_queue_exception(vcpu, DB_VECTOR);
+>  			return 1;
+> @@ -5057,7 +5059,7 @@ static int handle_task_switch(struct kvm_vcpu *vcpu)
+>  	if (!idt_v || (type != INTR_TYPE_HARD_EXCEPTION &&
+>  		       type != INTR_TYPE_EXT_INTR &&
+>  		       type != INTR_TYPE_NMI_INTR))
+> -		skip_emulated_instruction(vcpu);
+> +		(void)skip_emulated_instruction(vcpu);
 
-diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index 61cf69aa5d07..2fbe7c28e4f1 100644
---- a/Documentation/virtual/kvm/kvmi.rst
-+++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -362,3 +362,21 @@ This command is always allowed.
- 
- * -KVM_PERM - the event specified by ``id`` is disallowed
- * -KVM_EINVAL - padding is not zero
-+
-+5. KVMI_GET_GUEST_INFO
-+----------------------
-+
-+:Architectures: all
-+:Versions: >= 1
-+:Parameters:: none
-+:Returns:
-+
-+::
-+
-+	struct kvmi_error_code;
-+	struct kvmi_get_guest_info_reply {
-+		__u32 vcpu_count;
-+		__u32 padding[3];
-+	};
-+
-+Returns the number of online vCPUs.
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 7390303371c9..367c8ec28f75 100644
---- a/include/uapi/linux/kvmi.h
-+++ b/include/uapi/linux/kvmi.h
-@@ -102,4 +102,9 @@ struct kvmi_check_event {
- 	__u32 padding2;
- };
- 
-+struct kvmi_get_guest_info_reply {
-+	__u32 vcpu_count;
-+	__u32 padding[3];
-+};
-+
- #endif /* _UAPI__LINUX_KVMI_H */
-diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index e24996611e3a..cf8a120b0eae 100644
---- a/virt/kvm/kvmi_msg.c
-+++ b/virt/kvm/kvmi_msg.c
-@@ -12,6 +12,7 @@ static const char *const msg_IDs[] = {
- 	[KVMI_CHECK_COMMAND]         = "KVMI_CHECK_COMMAND",
- 	[KVMI_CHECK_EVENT]           = "KVMI_CHECK_EVENT",
- 	[KVMI_CONTROL_CMD_RESPONSE]  = "KVMI_CONTROL_CMD_RESPONSE",
-+	[KVMI_GET_GUEST_INFO]        = "KVMI_GET_GUEST_INFO",
- 	[KVMI_GET_VERSION]           = "KVMI_GET_VERSION",
- };
- 
-@@ -213,6 +214,18 @@ static int handle_check_event(struct kvmi *ikvm,
- 	return kvmi_msg_vm_maybe_reply(ikvm, msg, ec, NULL, 0);
- }
- 
-+static int handle_get_guest_info(struct kvmi *ikvm,
-+				 const struct kvmi_msg_hdr *msg,
-+				 const void *req)
-+{
-+	struct kvmi_get_guest_info_reply rpl;
-+
-+	memset(&rpl, 0, sizeof(rpl));
-+	rpl.vcpu_count = atomic_read(&ikvm->kvm->online_vcpus);
-+
-+	return kvmi_msg_vm_maybe_reply(ikvm, msg, 0, &rpl, sizeof(rpl));
-+}
-+
- static int handle_control_cmd_response(struct kvmi *ikvm,
- 					const struct kvmi_msg_hdr *msg,
- 					const void *_req)
-@@ -246,6 +259,7 @@ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
- 	[KVMI_CHECK_COMMAND]         = handle_check_command,
- 	[KVMI_CHECK_EVENT]           = handle_check_event,
- 	[KVMI_CONTROL_CMD_RESPONSE]  = handle_control_cmd_response,
-+	[KVMI_GET_GUEST_INFO]        = handle_get_guest_info,
- 	[KVMI_GET_VERSION]           = handle_get_version,
- };
- 
+Maybe a silly idea, but what if we squash the return value in a dedicated
+helper, with a big "DO NOT USE" comment above the int-returning function, e.g.:
+
+static int __skip_emulated_instruction(struct kvm_vcpu *vcpu)
+{
+	unsigned long rip;
+
+	rip = kvm_rip_read(vcpu);
+	rip += vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
+	kvm_rip_write(vcpu, rip);
+
+	/* skipping an emulated instruction also counts */
+	vmx_set_interrupt_shadow(vcpu, 0);
+
+	return EMULATE_DONE;
+}
+
+static inline void skip_emulated_instruction(struct kvm_vcpu *vcpu)
+{
+	(void)__skip_emulated_instruction(vcpu);
+}
+
+
+Alternatively, the inner function could be void, but on my system that
+adds an extra call in the wrapper, i.e. in the kvm_skip_emulated...()
+path.  The above approach generates the same code as your patch, e.g.
+allows the compiler to decide whether or not to inline the meat of the
+code.
+
+>  	if (kvm_task_switch(vcpu, tss_selector,
+>  			    type == INTR_TYPE_SOFT_INTR ? idt_index : -1, reason,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c6d951cbd76c..a97818b1111d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6383,9 +6383,11 @@ static void kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu, int *r)
+>  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long rflags = kvm_x86_ops->get_rflags(vcpu);
+> -	int r = EMULATE_DONE;
+> +	int r;
+>  
+> -	kvm_x86_ops->skip_emulated_instruction(vcpu);
+> +	r = kvm_x86_ops->skip_emulated_instruction(vcpu);
+> +	if (r != EMULATE_DONE)
+
+This should probably be wrapped with unlikely.
+
+> +		return 0;
+>  
+>  	/*
+>  	 * rflags is the old, "raw" value of the flags.  The new value has
+> -- 
+> 2.20.1
+> 
