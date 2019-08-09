@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 87DA787F90
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:20:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3D0687F8F
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 18:19:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437159AbfHIQT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 12:19:59 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53316 "EHLO
+        id S2437144AbfHIQT6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 12:19:58 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:53294 "EHLO
         mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437000AbfHIQT6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:19:58 -0400
+        by vger.kernel.org with ESMTP id S2407405AbfHIQTz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Aug 2019 12:19:55 -0400
 Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 64B15305D3D1;
-        Fri,  9 Aug 2019 19:00:55 +0300 (EEST)
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id E7272305D3D4;
+        Fri,  9 Aug 2019 19:00:56 +0300 (EEST)
 Received: from localhost.localdomain (unknown [89.136.169.210])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id E3EF1305B7A3;
-        Fri,  9 Aug 2019 19:00:54 +0300 (EEST)
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 67D83305B7A0;
+        Fri,  9 Aug 2019 19:00:56 +0300 (EEST)
 From:   =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -33,9 +33,9 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Yu C <yu.c.zhang@intel.com>,
         =?UTF-8?q?Mihai=20Don=C8=9Bu?= <mdontu@bitdefender.com>,
         =?UTF-8?q?Adalbert=20Laz=C4=83r?= <alazar@bitdefender.com>
-Subject: [RFC PATCH v6 10/92] kvm: introspection: add KVMI_CONTROL_VM_EVENTS
-Date:   Fri,  9 Aug 2019 18:59:25 +0300
-Message-Id: <20190809160047.8319-11-alazar@bitdefender.com>
+Subject: [RFC PATCH v6 13/92] kvm: introspection: make the vCPU wait even when its jobs list is empty
+Date:   Fri,  9 Aug 2019 18:59:28 +0300
+Message-Id: <20190809160047.8319-14-alazar@bitdefender.com>
 In-Reply-To: <20190809160047.8319-1-alazar@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
 MIME-Version: 1.0
@@ -46,185 +46,153 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No introspection event (neither VM event, nor vCPU event) will be sent
-to the introspection tool unless enabled/requested.
+Usually, the vCPU thread will run the functions from its jobs list
+(unless the thread is SIGKILL-ed) and continue to guest when the
+list is empty. But, there are cases when it has to wait for something
+(e.g. another vCPU runs in single-step mode, or the current vCPU waits
+for an event reply from the introspection tool).
 
-This command enables/disables VM events. For now, these events are:
-
-  * KVMI_EVENT_UNHOOK
-  * KVMI_EVENT_CREATE_VCPU
-
-The first event is initiated by userspace/QEMU in order to give the
-introspection tool a chance to remove its hooks in the event of
-pause/suspend/migrate.
-
-The second event is actually a vCPU event, added to cover the case when
-the introspection tool has paused all vCPUs and userspace hotplugs (and
-starts) another one. The event is controlled by this command because its
-status (enabled/disabled) is kept in the VM related structures (as opposed
-to vCPU related structures). I didn't had a better idea. Not to mention
-that, the vCPU events are controlled with commands like "enable/disable
-event X for vCPU Y" and Y is _unknown_ for X=KVMI_EVENT_CREATE_VCPU.
+In these cases, it will append a "wait job" into its own list, which
+will do (a) nothing if the list is not empty or it doesn't have to wait
+any longer or (b) wait (in the same wake-queue used by KVM) until it
+is kicked. It should be OK if the receiving worker appends a new job in
+the same time.
 
 Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 ---
- Documentation/virtual/kvm/kvmi.rst | 39 ++++++++++++++++++++++++++++++
- include/uapi/linux/kvmi.h          |  7 ++++++
- virt/kvm/kvmi.c                    | 11 +++++++++
- virt/kvm/kvmi_int.h                |  3 +++
- virt/kvm/kvmi_msg.c                | 23 ++++++++++++++++++
- 5 files changed, 83 insertions(+)
+ include/linux/swait.h | 11 ++++++
+ virt/kvm/kvmi.c       | 80 +++++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/kvmi_int.h   |  2 ++
+ 3 files changed, 93 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/kvmi.rst b/Documentation/virtual/kvm/kvmi.rst
-index 2fbe7c28e4f1..a660def20b23 100644
---- a/Documentation/virtual/kvm/kvmi.rst
-+++ b/Documentation/virtual/kvm/kvmi.rst
-@@ -380,3 +380,42 @@ This command is always allowed.
- 	};
+diff --git a/include/linux/swait.h b/include/linux/swait.h
+index 73e06e9986d4..2486625e7fb4 100644
+--- a/include/linux/swait.h
++++ b/include/linux/swait.h
+@@ -297,4 +297,15 @@ do {									\
+ 	__ret;								\
+ })
  
- Returns the number of online vCPUs.
++#define __swait_event_killable(wq, condition)				\
++	___swait_event(wq, condition, TASK_KILLABLE, 0,	schedule())	\
 +
-+6. KVMI_CONTROL_VM_EVENTS
-+-------------------------
++#define swait_event_killable(wq, condition)				\
++({									\
++	int __ret = 0;							\
++	if (!(condition))						\
++		__ret = __swait_event_killable(wq, condition);		\
++	__ret;								\
++})
 +
-+:Architectures: all
-+:Versions: >= 1
-+:Parameters:
-+
-+::
-+
-+	struct kvmi_control_vm_events {
-+		__u16 event_id;
-+		__u8 enable;
-+		__u8 padding1;
-+		__u32 padding2;
-+	};
-+
-+:Returns:
-+
-+::
-+
-+	struct kvmi_error_code
-+
-+Enables/disables VM introspection events. This command can be used with
-+the following events::
-+
-+	KVMI_EVENT_CREATE_VCPU
-+	KVMI_EVENT_UNHOOK
-+
-+When an event is enabled, the introspection tool is notified and,
-+in almost all cases, it must reply with: continue, retry, crash, etc.
-+(see **Events** below).
-+
-+:Errors:
-+
-+* -KVM_EINVAL - the event ID is invalid
-+* -KVM_EINVAL - padding is not zero
-+* -KVM_EPERM - the access is restricted by the host
-+
-diff --git a/include/uapi/linux/kvmi.h b/include/uapi/linux/kvmi.h
-index 367c8ec28f75..ff35faabb7ed 100644
---- a/include/uapi/linux/kvmi.h
-+++ b/include/uapi/linux/kvmi.h
-@@ -107,4 +107,11 @@ struct kvmi_get_guest_info_reply {
- 	__u32 padding[3];
- };
- 
-+struct kvmi_control_vm_events {
-+	__u16 event_id;
-+	__u8 enable;
-+	__u8 padding1;
-+	__u32 padding2;
-+};
-+
- #endif /* _UAPI__LINUX_KVMI_H */
+ #endif /* _LINUX_SWAIT_H */
 diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
-index dc1bb8326763..961e6cc13fb6 100644
+index 07ebd1c629b0..3c884dc0e38c 100644
 --- a/virt/kvm/kvmi.c
 +++ b/virt/kvm/kvmi.c
-@@ -338,6 +338,17 @@ void kvmi_destroy_vm(struct kvm *kvm)
+@@ -135,6 +135,19 @@ static void kvmi_free_job(struct kvmi_job *job)
+ 	kmem_cache_free(job_cache, job);
+ }
+ 
++static struct kvmi_job *kvmi_pull_job(struct kvmi_vcpu *ivcpu)
++{
++	struct kvmi_job *job = NULL;
++
++	spin_lock(&ivcpu->job_lock);
++	job = list_first_entry_or_null(&ivcpu->job_list, typeof(*job), link);
++	if (job)
++		list_del(&job->link);
++	spin_unlock(&ivcpu->job_lock);
++
++	return job;
++}
++
+ static bool alloc_ivcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvmi_vcpu *ivcpu;
+@@ -496,6 +509,73 @@ void kvmi_destroy_vm(struct kvm *kvm)
  	wait_for_completion_killable(&kvm->kvmi_completed);
  }
  
-+int kvmi_cmd_control_vm_events(struct kvmi *ikvm, unsigned int event_id,
-+			       bool enable)
++void kvmi_run_jobs(struct kvm_vcpu *vcpu)
 +{
-+	if (enable)
-+		set_bit(event_id, ikvm->vm_ev_mask);
-+	else
-+		clear_bit(event_id, ikvm->vm_ev_mask);
++	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
++	struct kvmi_job *job;
 +
-+	return 0;
++	while ((job = kvmi_pull_job(ivcpu))) {
++		job->fct(vcpu, job->ctx);
++		kvmi_free_job(job);
++	}
 +}
 +
- int kvmi_ioctl_unhook(struct kvm *kvm, bool force_reset)
++static bool done_waiting(struct kvm_vcpu *vcpu)
++{
++	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
++
++	return !list_empty(&ivcpu->job_list);
++}
++
++static void kvmi_job_wait(struct kvm_vcpu *vcpu, void *ctx)
++{
++	struct swait_queue_head *wq = kvm_arch_vcpu_wq(vcpu);
++	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
++	int err;
++
++	err = swait_event_killable(*wq, done_waiting(vcpu));
++
++	if (err)
++		ivcpu->killed = true;
++}
++
++int kvmi_run_jobs_and_wait(struct kvm_vcpu *vcpu)
++{
++	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
++	int err = 0;
++
++	for (;;) {
++		kvmi_run_jobs(vcpu);
++
++		if (ivcpu->killed) {
++			err = -1;
++			break;
++		}
++
++		kvmi_add_job(vcpu, kvmi_job_wait, NULL, NULL);
++	}
++
++	return err;
++}
++
++void kvmi_handle_requests(struct kvm_vcpu *vcpu)
++{
++	struct kvmi *ikvm;
++
++	ikvm = kvmi_get(vcpu->kvm);
++	if (!ikvm)
++		return;
++
++	for (;;) {
++		int err = kvmi_run_jobs_and_wait(vcpu);
++
++		if (err)
++			break;
++	}
++
++	kvmi_put(vcpu->kvm);
++}
++
+ int kvmi_cmd_control_vm_events(struct kvmi *ikvm, unsigned int event_id,
+ 			       bool enable)
  {
- 	struct kvmi *ikvm;
 diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
-index 157f765fb34d..84ba43bd9a9d 100644
+index 97f91a568096..47418e9a86f6 100644
 --- a/virt/kvm/kvmi_int.h
 +++ b/virt/kvm/kvmi_int.h
-@@ -85,6 +85,7 @@ struct kvmi {
- 
- 	DECLARE_BITMAP(cmd_allow_mask, KVMI_NUM_COMMANDS);
- 	DECLARE_BITMAP(event_allow_mask, KVMI_NUM_EVENTS);
-+	DECLARE_BITMAP(vm_ev_mask, KVMI_NUM_EVENTS);
- 
- 	bool cmd_reply_disabled;
- };
-@@ -99,5 +100,7 @@ bool kvmi_msg_process(struct kvmi *ikvm);
- void *kvmi_msg_alloc(void);
- void *kvmi_msg_alloc_check(size_t size);
- void kvmi_msg_free(void *addr);
-+int kvmi_cmd_control_vm_events(struct kvmi *ikvm, unsigned int event_id,
-+			       bool enable);
- 
- #endif
-diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-index cf8a120b0eae..a55c9e35be36 100644
---- a/virt/kvm/kvmi_msg.c
-+++ b/virt/kvm/kvmi_msg.c
-@@ -12,6 +12,7 @@ static const char *const msg_IDs[] = {
- 	[KVMI_CHECK_COMMAND]         = "KVMI_CHECK_COMMAND",
- 	[KVMI_CHECK_EVENT]           = "KVMI_CHECK_EVENT",
- 	[KVMI_CONTROL_CMD_RESPONSE]  = "KVMI_CONTROL_CMD_RESPONSE",
-+	[KVMI_CONTROL_VM_EVENTS]     = "KVMI_CONTROL_VM_EVENTS",
- 	[KVMI_GET_GUEST_INFO]        = "KVMI_GET_GUEST_INFO",
- 	[KVMI_GET_VERSION]           = "KVMI_GET_VERSION",
- };
-@@ -226,6 +227,27 @@ static int handle_get_guest_info(struct kvmi *ikvm,
- 	return kvmi_msg_vm_maybe_reply(ikvm, msg, 0, &rpl, sizeof(rpl));
- }
- 
-+static int handle_control_vm_events(struct kvmi *ikvm,
-+				    const struct kvmi_msg_hdr *msg,
-+				    const void *_req)
-+{
-+	const unsigned long known_events = KVMI_KNOWN_VM_EVENTS;
-+	const struct kvmi_control_vm_events *req = _req;
-+	int ec;
+@@ -85,6 +85,8 @@ struct kvmi_job {
+ struct kvmi_vcpu {
+ 	struct list_head job_list;
+ 	spinlock_t job_lock;
 +
-+	if (req->padding1 || req->padding2)
-+		ec = -KVM_EINVAL;
-+	else if (!test_bit(req->event_id, &known_events))
-+		ec = -KVM_EINVAL;
-+	else if (!is_event_allowed(ikvm, req->event_id))
-+		ec = -KVM_EPERM;
-+	else
-+		ec = kvmi_cmd_control_vm_events(ikvm, req->event_id,
-+						req->enable);
-+
-+	return kvmi_msg_vm_maybe_reply(ikvm, msg, ec, NULL, 0);
-+}
-+
- static int handle_control_cmd_response(struct kvmi *ikvm,
- 					const struct kvmi_msg_hdr *msg,
- 					const void *_req)
-@@ -259,6 +281,7 @@ static int(*const msg_vm[])(struct kvmi *, const struct kvmi_msg_hdr *,
- 	[KVMI_CHECK_COMMAND]         = handle_check_command,
- 	[KVMI_CHECK_EVENT]           = handle_check_event,
- 	[KVMI_CONTROL_CMD_RESPONSE]  = handle_control_cmd_response,
-+	[KVMI_CONTROL_VM_EVENTS]     = handle_control_vm_events,
- 	[KVMI_GET_GUEST_INFO]        = handle_get_guest_info,
- 	[KVMI_GET_VERSION]           = handle_get_version,
++	bool killed;
  };
+ 
+ #define IKVM(kvm) ((struct kvmi *)((kvm)->kvmi))
