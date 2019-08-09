@@ -2,88 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE147879C6
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 14:21:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6A5C87A7C
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2019 14:51:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406782AbfHIMUw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 08:20:52 -0400
-Received: from ozlabs.org ([203.11.71.1]:35801 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406730AbfHIMUw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 08:20:52 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 464kpy5K69z9sBF;
-        Fri,  9 Aug 2019 22:20:42 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?utf-8?B?SsOpcsO0?= =?utf-8?B?bWU=?= Glisse 
-        <jglisse@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christoph Hellwig <hch@lst.de>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v3 38/41] powerpc: convert put_page() to put_user_page*()
-In-Reply-To: <248c9ab2-93cc-6d8b-606d-d85b83e791e5@nvidia.com>
-References: <20190807013340.9706-1-jhubbard@nvidia.com> <20190807013340.9706-39-jhubbard@nvidia.com> <87k1botdpx.fsf@concordia.ellerman.id.au> <248c9ab2-93cc-6d8b-606d-d85b83e791e5@nvidia.com>
-Date:   Fri, 09 Aug 2019 22:20:40 +1000
-Message-ID: <875zn6ttrb.fsf@concordia.ellerman.id.au>
+        id S2406704AbfHIMvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Aug 2019 08:51:35 -0400
+Received: from mail-vs1-f47.google.com ([209.85.217.47]:41321 "EHLO
+        mail-vs1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406273AbfHIMvf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Aug 2019 08:51:35 -0400
+Received: by mail-vs1-f47.google.com with SMTP id 2so65286328vso.8
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2019 05:51:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=esi.dz; s=google;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=5UBzzkBhfhCmXbym9qpOEVHCEWwrUg0+zEd3g0rExwM=;
+        b=HSwUH0BTUo34YZfxX4iXwUvacNioGanXLtPas8yDr4LGQr3t1SSvQHR2D0Nrs3Mj1o
+         RSxBjDl1SwigjKaFFlfsw1m2aPtyAgBxHcNJqC2UudDLz8gFamVWEVvcfuakHN2gzSIJ
+         zRqehYtBYQiZdzAnG09qDnl+XuNeRse2VOr5GqQEjmz0iSMB8zJ4x09VhfI3qrmWynLv
+         cK5fy9brUIQ0X/B7hVX5iEVkuNuA1ANo64+4sr5fStPKhPOKx36ruMnk/RERkTlsO/0R
+         deL6z4zE/+IJcZR9nEBmLKoi4oWt2JSVLzx2kruqEljQdwe/RUGMH4jQa9DlBLlRR7A2
+         i0AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=5UBzzkBhfhCmXbym9qpOEVHCEWwrUg0+zEd3g0rExwM=;
+        b=jj9uygXJ8YZGwmun11jLm40Cswa/UHaXySbZLhdqWhcVaml+6g9s7fuq0EjN9oqIfc
+         fZuLj//dsNAYG5YCRa+ulxWWAFp0NbdtQNZ+YQv8sB8wYE3F9jApzldaw4QCcDwXafy+
+         RWEG5qIczBLS33cmccYqVQyHopnSrOkHr4fK6Ubx+2s5ygdNGdjjrDXme4HaD6+/DgQK
+         fhZ90HybuWwF9tBeIzP8uwl+2VaCDD4/tSe5xUtrtjB25pZCwZaGLINple1/0xn6iHdF
+         RJFTzz0WSL44WNDOZfVGdAYlkpQHriIfvRY1U4oTtVfe3ZPxSlNJ9ki7EWoInUJwHMmA
+         vIRA==
+X-Gm-Message-State: APjAAAVuqIcCtD15cFAF5hkF8aD4m1jJG5zFpoUmHpxKyhQZM8z1E6SK
+        k/3kY0JTh4gQVV7GinqNfG3MePjMdKCYxPgytzqL64CJtCE=
+X-Google-Smtp-Source: APXvYqx0VqWdq7sT5rxWojyy69ujkyd2K0GuieTjlUgY2WijPwFjUlJCDlshVWKULFq7dTfLRh5WlSQW7rwjL422XWg=
+X-Received: by 2002:a67:e419:: with SMTP id d25mr12210434vsf.196.1565355094522;
+ Fri, 09 Aug 2019 05:51:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   HEBBAL Yacine <y_hebbal@esi.dz>
+Date:   Fri, 9 Aug 2019 14:51:23 +0200
+Message-ID: <CACEoar7tDRnNirvgfqEWniG4x8FpunEwnZaO0DzNivepqMOaxQ@mail.gmail.com>
+Subject: [Questions] Building kvm-kmod on 4.0+ or 5.0+ kernels
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-John Hubbard <jhubbard@nvidia.com> writes:
-> On 8/7/19 10:42 PM, Michael Ellerman wrote:
->> Hi John,
->> 
->> john.hubbard@gmail.com writes:
->>> diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s64/iommu_api.c
->>> index b056cae3388b..e126193ba295 100644
->>> --- a/arch/powerpc/mm/book3s64/iommu_api.c
->>> +++ b/arch/powerpc/mm/book3s64/iommu_api.c
->>> @@ -203,6 +202,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
->>>  {
->>>  	long i;
->>>  	struct page *page = NULL;
->>> +	bool dirty = false;
->> 
->> I don't think you need that initialisation do you?
->> 
->
-> Nope, it can go. Fixed locally, thanks.
+Hello,
+I would like to prototype some research systems using kvm-kmod on a
+recent kernel (4.0+ and 5.0+).
+However, available repositories seem to be out dated and do not
+support recent kernels.
+Does anyone have a standalone code of kvm modules that works on recent
+Linux distributions ?
 
-Thanks.
-
-> Did you get a chance to look at enough of the other bits to feel comfortable 
-> with the patch, overall?
-
-Mostly :) It's not really my area, but all the conversions looked
-correct to me as best as I could tell.
-
-So I'm fine for it to go in as part of the series:
-
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
-
-cheers
+Yacine
