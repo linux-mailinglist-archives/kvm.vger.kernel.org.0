@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACB8388639
-	for <lists+kvm@lfdr.de>; Sat, 10 Aug 2019 00:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F5F889DA
+	for <lists+kvm@lfdr.de>; Sat, 10 Aug 2019 10:15:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726557AbfHIWuI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Aug 2019 18:50:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47576 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726137AbfHIWuI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Aug 2019 18:50:08 -0400
-Subject: Re: [GIT PULL] KVM fixes for Linux 5.3-rc4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565391007;
-        bh=oQqqXgtOPPuOYo0t1QlaaD/7YWX1DvrIVWcxq6Qaopk=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=OtoM/9o+BydcTMpvCYrX3cwya0mRQfwaP643UA3Mb3brESmplnb0ssQMI30OcqYEL
-         PhUwEqg21dj0cGCruIjosK40b6icpxYG8YrgRJmLVZQ8zPsCIOL1G8wcZ7ZVMtehLU
-         Ki5avnehTZRk7lrnA5j6Q2dybZGVecie3pWElclM=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1565390195-16920-1-git-send-email-pbonzini@redhat.com>
-References: <1565390195-16920-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1565390195-16920-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
- tags/for-linus
-X-PR-Tracked-Commit-Id: a738b5e75b4c13be3485c82eb62c30047aa9f164
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7f20fd23377ac3356657ce35fcaf19ee2fea8345
-Message-Id: <156539100743.24486.7661572724956295793.pr-tracker-bot@kernel.org>
-Date:   Fri, 09 Aug 2019 22:50:07 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
+        id S1726048AbfHJIPl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Aug 2019 04:15:41 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:41008 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbfHJIPl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Aug 2019 04:15:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=l/8ZpdSjNJGlaMRnpgRX93SKgxcJOiB3tmAP4Xrhmq8=; b=gwp4ceQoYX55nhYbf83A4kSEa
+        aYGw/CmaBlPTk+bOPXYYuEsc3k7qy+jtCjB3ITwKDgZlaXjzhPxMZJQUDTBGzZjvUckXfTn4UtQTV
+        xLXADSc9dfUPJvZeXAiX+W1dlrb40e496u+BcCoRon5bxaDSOD3wAYQYqwNUUVb5r8ZG+yXqKHpA1
+        Xwp4T///NUInyMPkgCBRYjcvI5OLDYCBGHP9jj0HMgkxqtX9h8ZH8nwvvChqQ06Ks8rFCrJFYnW88
+        xqMPStWVoKzp/AJUDXTz61Nl0xufX4u2Vk5boeHYowDlusWWlTUprAJ09GTPQCGlorJXRbf+cKwRy
+        zuFu6rLPQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
+        id 1hwMXM-0000C3-Qu; Sat, 10 Aug 2019 08:15:40 +0000
+Date:   Sat, 10 Aug 2019 01:15:40 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     egranata@chromium.org
+Cc:     linux-kernel@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, trivial@kernel.org, egranata@google.com
+Subject: Re: [PATCH] vhost: do not reference a file that does not exist
+Message-ID: <20190810081540.GA30426@infradead.org>
+References: <20190808005255.106299-1-egranata@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190808005255.106299-1-egranata@chromium.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Sat, 10 Aug 2019 00:36:35 +0200:
+On Wed, Aug 07, 2019 at 05:52:55PM -0700, egranata@chromium.org wrote:
+> From: Enrico Granata <egranata@google.com>
+> 
+> lguest was removed from the mainline kernel in late 2017.
+> 
+> Signed-off-by: Enrico Granata <egranata@google.com>
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7f20fd23377ac3356657ce35fcaf19ee2fea8345
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+But this particular file even has an override in the script looking
+for dead references, which together with the content of the overal
+contents makes me thing the dangling reference is somewhat intentional.
