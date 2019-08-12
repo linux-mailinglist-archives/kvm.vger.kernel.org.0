@@ -2,105 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF3D389966
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 11:06:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 194A689A63
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 11:49:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727401AbfHLJGn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 05:06:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:46194 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727233AbfHLJGn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 05:06:43 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6039915A2;
-        Mon, 12 Aug 2019 02:06:42 -0700 (PDT)
-Received: from localhost (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ACD743F718;
-        Mon, 12 Aug 2019 02:06:41 -0700 (PDT)
-Date:   Mon, 12 Aug 2019 10:06:40 +0100
-From:   Andrew Murray <andrew.murray@arm.com>
-To:     Denis Efremov <efremov@linux.com>
-Cc:     Bjorn Helgaas <bhelgaas@google.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Matt Porter <mporter@kernel.crashing.org>,
-        Alexandre Bounine <alex.bou9@gmail.com>,
-        Peter Jones <pjones@redhat.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        netdev@vger.kernel.org, x86@kernel.org, linux-s390@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/7] Add definition for the number of standard PCI BARs
-Message-ID: <20190812090639.GX56241@e119886-lin.cambridge.arm.com>
-References: <20190811150802.2418-1-efremov@linux.com>
+        id S1727574AbfHLJtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 05:49:16 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:44942 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727540AbfHLJtP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 05:49:15 -0400
+Received: by mail-qk1-f194.google.com with SMTP id d79so76375033qke.11
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2019 02:49:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=TeG3wutKuFLwVY8GXTa6M+xMk4IsoY0IuBgfuWlKI8w=;
+        b=r4rkqzoWjj1uqR8BIBPNSLvHKr8xcsXs/XOh+oaorRsEZx7eCZ3PNvbiifYMEEneYE
+         BZEMHv5nyok+RoOttd4n7HuzSdBBW0M/Qwa36TeHC98jrxObaALAXLQ2gi0fYlyEybvX
+         ZLPJ8fxrZrVNZlxbuTB05R1VFHN13Fa9FgS07bzeXrY89w++e3J/pzfeskYxpnYGe9ht
+         jOOY5WKcFyjmRaT0CO1QvDKOhKPzcVCkVljSFrzjoQXb8rmsN8xzEeVhPbq7qoOojbO0
+         qp/zQ0EOczQVhOsFDNe2Lq9S05rT9P2/uyFWzXnEE9wR1Pk4QLPliFpypLwfSN/UIlyl
+         oPOw==
+X-Gm-Message-State: APjAAAUQxAZgv7q7Ii/wi1tmNjEyoEKlC6es5Lnf4/dZ9KXoYVChykFt
+        y1dLwsioDJrR+djQmRmXkdyqGA==
+X-Google-Smtp-Source: APXvYqxP0GkCXonLtypbly8kLbgJ4TN28n5gWEUnHayGxRExqWLocZL6kaOvmE9QUvNpukx30J3PxA==
+X-Received: by 2002:a37:79c7:: with SMTP id u190mr3917170qkc.26.1565603354162;
+        Mon, 12 Aug 2019 02:49:14 -0700 (PDT)
+Received: from redhat.com ([147.234.38.29])
+        by smtp.gmail.com with ESMTPSA id m27sm52517604qtu.31.2019.08.12.02.49.10
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 12 Aug 2019 02:49:13 -0700 (PDT)
+Date:   Mon, 12 Aug 2019 05:49:08 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, jgg@ziepe.ca
+Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
+Message-ID: <20190812054429-mutt-send-email-mst@kernel.org>
+References: <20190809054851.20118-1-jasowang@redhat.com>
+ <20190810134948-mutt-send-email-mst@kernel.org>
+ <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190811150802.2418-1-efremov@linux.com>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 11, 2019 at 06:07:55PM +0300, Denis Efremov wrote:
-> Code that iterates over all standard PCI BARs typically uses
-> PCI_STD_RESOURCE_END, but this is error-prone because it requires
-> "i <= PCI_STD_RESOURCE_END" rather than something like
-> "i < PCI_STD_NUM_BARS". We could add such a definition and use it the same
-> way PCI_SRIOV_NUM_BARS is used. There is already the definition
-> PCI_BAR_COUNT for s390 only. Thus, this patchset introduces it globally.
+On Mon, Aug 12, 2019 at 10:44:51AM +0800, Jason Wang wrote:
 > 
-> The patch is splitted into 7 parts for different drivers/subsystems for
-> easy readability.
+> On 2019/8/11 上午1:52, Michael S. Tsirkin wrote:
+> > On Fri, Aug 09, 2019 at 01:48:42AM -0400, Jason Wang wrote:
+> > > Hi all:
+> > > 
+> > > This series try to fix several issues introduced by meta data
+> > > accelreation series. Please review.
+> > > 
+> > > Changes from V4:
+> > > - switch to use spinlock synchronize MMU notifier with accessors
+> > > 
+> > > Changes from V3:
+> > > - remove the unnecessary patch
+> > > 
+> > > Changes from V2:
+> > > - use seqlck helper to synchronize MMU notifier with vhost worker
+> > > 
+> > > Changes from V1:
+> > > - try not use RCU to syncrhonize MMU notifier with vhost worker
+> > > - set dirty pages after no readers
+> > > - return -EAGAIN only when we find the range is overlapped with
+> > >    metadata
+> > > 
+> > > Jason Wang (9):
+> > >    vhost: don't set uaddr for invalid address
+> > >    vhost: validate MMU notifier registration
+> > >    vhost: fix vhost map leak
+> > >    vhost: reset invalidate_count in vhost_set_vring_num_addr()
+> > >    vhost: mark dirty pages during map uninit
+> > >    vhost: don't do synchronize_rcu() in vhost_uninit_vq_maps()
+> > >    vhost: do not use RCU to synchronize MMU notifier with worker
+> > >    vhost: correctly set dirty pages in MMU notifiers callback
+> > >    vhost: do not return -EAGAIN for non blocking invalidation too early
+> > > 
+> > >   drivers/vhost/vhost.c | 202 +++++++++++++++++++++++++-----------------
+> > >   drivers/vhost/vhost.h |   6 +-
+> > >   2 files changed, 122 insertions(+), 86 deletions(-)
+> > This generally looks more solid.
+> > 
+> > But this amounts to a significant overhaul of the code.
+> > 
+> > At this point how about we revert 7f466032dc9e5a61217f22ea34b2df932786bbfc
+> > for this release, and then re-apply a corrected version
+> > for the next one?
 > 
-> Denis Efremov (7):
->   PCI: Add define for the number of standard PCI BARs
->   s390/pci: Replace PCI_BAR_COUNT with PCI_STD_NUM_BARS
->   x86/PCI: Use PCI_STD_NUM_BARS in loops instead of PCI_STD_RESOURCE_END
->   PCI/net: Use PCI_STD_NUM_BARS in loops instead of PCI_STD_RESOURCE_END
->   rapidio/tsi721: use PCI_STD_NUM_BARS in loops instead of
->     PCI_STD_RESOURCE_END
->   efifb: Use PCI_STD_NUM_BARS in loops instead of PCI_STD_RESOURCE_END
->   vfio_pci: Use PCI_STD_NUM_BARS in loops instead of
->     PCI_STD_RESOURCE_END
 > 
->  arch/s390/include/asm/pci.h                      |  5 +----
->  arch/s390/include/asm/pci_clp.h                  |  6 +++---
->  arch/s390/pci/pci.c                              | 16 ++++++++--------
->  arch/s390/pci/pci_clp.c                          |  6 +++---
->  arch/x86/pci/common.c                            |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c |  4 ++--
->  drivers/net/ethernet/synopsys/dwc-xlgmac-pci.c   |  2 +-
->  drivers/pci/quirks.c                             |  2 +-
->  drivers/rapidio/devices/tsi721.c                 |  2 +-
->  drivers/vfio/pci/vfio_pci.c                      |  4 ++--
->  drivers/vfio/pci/vfio_pci_config.c               |  2 +-
->  drivers/vfio/pci/vfio_pci_private.h              |  4 ++--
->  drivers/video/fbdev/efifb.c                      |  2 +-
->  include/linux/pci.h                              |  2 +-
->  include/uapi/linux/pci_regs.h                    |  1 +
-
-Hi Denis,
-
-You could also fix up a few cases where the number of BARs is hard coded in
-loops, e.g.
-
-drivers/pci/controller/pci-hyperv.c - look for uses of probed_bar in loops
-drivers/pci/pci.c - pci_release_selected_regions and __pci_request_selected_regions
-drivers/pci/quirks.c - quirk_alder_ioapic
-
-Thanks,
-
-Andrew Murray
-
->  15 files changed, 29 insertions(+), 31 deletions(-)
+> If possible, consider we've actually disabled the feature. How about just
+> queued those patches for next release?
 > 
-> -- 
-> 2.21.0
-> 
+> Thanks
+
+Sorry if I was unclear. My idea is that
+1. I revert the disabled code
+2. You send a patch readding it with all the fixes squashed
+3. Maybe optimizations on top right away?
+4. We queue *that* for next and see what happens.
+
+And the advantage over the patchy approach is that the current patches
+are hard to review. E.g.  it's not reasonable to ask RCU guys to review
+the whole of vhost for RCU usage but it's much more reasonable to ask
+about a specific patch.
+
+
+-- 
+MST
