@@ -2,240 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 69E7C8A97F
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 23:39:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C81328A961
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 23:33:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726879AbfHLVj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 17:39:29 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:50570 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726530AbfHLVj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 17:39:29 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7CLXwIt043320;
-        Mon, 12 Aug 2019 21:39:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2019-08-05; bh=wKzANzeArf+pHxJ0YOpVNV2QTB/B/kf+dVJDoah4JJg=;
- b=BdJHVeXFa2rlKKGEprMqZlDcA9rOOeS0FsdxAyGzwEl7UFXF1ANNrDdzkmZxOTMfl9pI
- bt3R4qCs3eFXwpQ0E47q9Bqgpr2sfS8uN5CUvYWG05oyWKHyy6ylPR0usLzbwCbWjgvs
- cLa/u8dzYZ8blQF0iyzxmsMSR8wtDP3H/9MYqSjswBqaCgdqCmglfqQzywC1aukSmonv
- xQvlbLVsq2zYHTW1GXwoeHA5xWOLhAiN/DgjpqlXy2Jxxbqf0mAZMKyFlXKrczw0xWPZ
- u0J7F4eH9pt9xmCI4ZxeMEu5fe8hRBdBrlN0j1k9nqqBoO2p7F4OyaF90TfjA2bqsjW9 OA== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2018-07-02; bh=wKzANzeArf+pHxJ0YOpVNV2QTB/B/kf+dVJDoah4JJg=;
- b=qbXU3F7NKhjhJPEd2gPDTYJuODL4/TN+d6nrWhDfp0xGhXCd7O+pNZz8FblxNGfUVjTd
- VSS1+AY1YGolqczdTlG6mpnFKveWSsOU8FTnAwL6j0L6d6cc1rhK/gyQHgU7uz/hdzvP
- 1vnkFNu3Xfw1Bcq0hXCtxHjO+DjbqgLnaj+FWu2rNWLad0tYpo0kftlF1ahnI/0QmDtn
- DBK4ERtUIMYDA8xvVL4FmFdxZVqL1d+6vVlXalALKxTFNTJcpnNLcKyo6GZ/qhxB9Drf
- cc4L/AatK4XCORCBduLwfevQNx74SGZl7bOx8qT/F2Ed/PHSF4/bUPwwbTmp4w5ixV0h fA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2u9nvp2a5k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Aug 2019 21:39:06 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7CLboU0133029;
-        Mon, 12 Aug 2019 21:39:05 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2u9n9hc82v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Aug 2019 21:39:05 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7CLd4H1006850;
-        Mon, 12 Aug 2019 21:39:04 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 12 Aug 2019 14:39:03 -0700
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, pbonzini@redhat.com, jmattson@google.com
-Subject: [PATCH] kvm-unit-test: nVMX: Fix 95d6d2c32288 ("nVMX: Test Host Segment Registers and Descriptor Tables on vmentry of nested guests")
-Date:   Mon, 12 Aug 2019 17:11:08 -0400
-Message-Id: <20190812211108.17186-1-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
+        id S1727439AbfHLVdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 17:33:21 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:42721 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726144AbfHLVdV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 17:33:21 -0400
+Received: by mail-pg1-f194.google.com with SMTP id t132so50125559pgb.9;
+        Mon, 12 Aug 2019 14:33:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:date:message-id:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=KTa8+wycQ8v6otm1cx7E8dMkbjnylPTuxFsohuMVZGU=;
+        b=TG77PrygnPJHYs018G1Y4vmMjWMfFU0KIBllkNn/fhq8z9v/GvFYQ79ixTOuIe7IGo
+         cnVMHPFnE9qMVyn7hjZSnTnWnbujTBcsBed1kinRcH9gUUYxISeAWuP3PMP4J57NM/W+
+         318e/+BtVFbW0NODmnx39DtwZYpEH3u8pLA5xx0mBrjtM8AYP+skxLdRPwOhhCqODYFK
+         /6bTQYvTvwq0XLF76UII3RjRgTBGCrUggzDgbnMOgAjFmrsVMedEE+J//WtznAqV1dLY
+         bf+GAj7djo754PYg4T/pW0wjGp1UM7CoV1oKVn7Qvk2OB9itE4LZRA9E7NlEptvIzN39
+         1Gbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=KTa8+wycQ8v6otm1cx7E8dMkbjnylPTuxFsohuMVZGU=;
+        b=crewPpkudt0eq/HJUr8i1rk+8JTAV5q4mZs2ZoY2IxaxvBbdIYYPCHI0oIy+iOmigN
+         RHAJeKFxI82tyocCwxHnY5KOrggjVRCVMTz3OLlCKjvxtcL+jQoo+7/+BCxkhLJSg15/
+         gD8VTn2ONtM7WMZE53mg+Tj9UQUkLNIZhIwfiPhsl62Dse+HrlyF9NFM+EwBBhWN3XIX
+         RbcyeOFopCO6378trz2xpMA4jTZfMX5zwQJ3FTpBIXVnCzsS7mQfZC9PyxWPB8Dv6B6B
+         FeqsT/j6YFP3Qsxuewd+MvEnxRDYsGvfO2ti2FIqPMFiTvxlEiWgmsKBsNsDRDtjF75N
+         3HYQ==
+X-Gm-Message-State: APjAAAUS1wNplpvwUree9Z2XkWwRmTu4tsE4fdOHa5zzWnigibVAXWga
+        xcNTChQafPMtg3COugqk+kg=
+X-Google-Smtp-Source: APXvYqzt8ksLb5uAyzkdXWDnkN3SNBn2VmAoNK4BcK21halKh74KkuUhiEpPWUhkVtVOcuYev4nIRA==
+X-Received: by 2002:a65:680b:: with SMTP id l11mr31944901pgt.35.1565645599868;
+        Mon, 12 Aug 2019 14:33:19 -0700 (PDT)
+Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id w2sm607692pjr.27.2019.08.12.14.33.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 12 Aug 2019 14:33:19 -0700 (PDT)
+Subject: [PATCH v5 0/6] mm / virtio: Provide support for unused page
+ reporting
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+To:     nitesh@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
+        david@redhat.com, dave.hansen@intel.com,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        virtio-dev@lists.oasis-open.org, osalvador@suse.de
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
+Date:   Mon, 12 Aug 2019 14:33:18 -0700
+Message-ID: <20190812213158.22097.30576.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9347 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=13 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=752
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908120208
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9347 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=13 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=806 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908120207
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 95d6d2c32288 added a test for the Segment Selector VMCS field. That test
-sets the "host address-space size" VM-exit control to zero and as a result, on
-VM-exit the guest exits as 32-bit. Since vmx tests are 64-bit, this results in
-a hardware error.
-This patch also cleans up a few other areas in commit 95d6d2c32288, including
-replacing make_non_canonical() with NONCANONICAL.
+This series provides an asynchronous means of reporting to a hypervisor
+that a guest page is no longer in use and can have the data associated
+with it dropped. To do this I have implemented functionality that allows
+for what I am referring to as unused page reporting
 
-Reported-by: Nadav Amit <nadav.amit@gmail.com>
-Signed-off-by: Krish Sadhukhan <kris.sadhukhan@oracle.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+The functionality for this is fairly simple. When enabled it will allocate
+statistics to track the number of reported pages in a given free area.
+When the number of free pages exceeds this value plus a high water value,
+currently 32, it will begin performing page reporting which consists of
+pulling pages off of free list and placing them into a scatter list. The
+scatterlist is then given to the page reporting device and it will perform
+the required action to make the pages "reported", in the case of
+virtio-balloon this results in the pages being madvised as MADV_DONTNEED
+and as such they are forced out of the guest. After this they are placed
+back on the free list, and an additional bit is added if they are not
+merged indicating that they are a reported buddy page instead of a
+standard buddy page. The cycle then repeats with additional non-reported
+pages being pulled until the free areas all consist of reported pages.
+
+I am leaving a number of things hard-coded such as limiting the lowest
+order processed to PAGEBLOCK_ORDER, and have left it up to the guest to
+determine what the limit is on how many pages it wants to allocate to
+process the hints. The upper limit for this is based on the size of the
+queue used to store the scattergather list.
+
+My primary testing has just been to verify the memory is being freed after
+allocation by running memhog 40g on a 40g guest and watching the total
+free memory via /proc/meminfo on the host. With this I have verified most
+of the memory is freed after each iteration. As far as performance I have
+been mainly focusing on the will-it-scale/page_fault1 test running with
+16 vcpus. I have modified it to use Transparent Huge Pages. With this I
+see almost no difference, -0.08%, with the patches applied and the feature
+disabled. I see a regression of -0.86% with the feature enabled, but the
+madvise disabled in the hypervisor due to a device being assigned. With
+the feature fully enabled I see a regression of -3.27% versus the baseline
+without these patches applied. In my testing I found that most of the
+overhead was due to the page zeroing that comes as a result of the pages
+having to be faulted back into the guest.
+
+One side effect of these patches is that the guest becomes much more
+resilient in terms of NUMA locality. With the pages being freed and then
+reallocated when used it allows for the pages to be much closer to the
+active thread, and as a result there can be situations where this patch
+set will out-perform the stock kernel when the guest memory is not local
+to the guest vCPUs. To avoid that in my testing I set the affinity of all
+the vCPUs and QEMU instance to the same node.
+
+Changes from the RFC:
+https://lore.kernel.org/lkml/20190530215223.13974.22445.stgit@localhost.localdomain/
+Moved aeration requested flag out of aerator and into zone->flags.
+Moved boundary out of free_area and into local variables for aeration.
+Moved aeration cycle out of interrupt and into workqueue.
+Left nr_free as total pages instead of splitting it between raw and aerated.
+Combined size and physical address values in virtio ring into one 64b value.
+
+Changes from v1:
+https://lore.kernel.org/lkml/20190619222922.1231.27432.stgit@localhost.localdomain/
+Dropped "waste page treatment" in favor of "page hinting"
+Renamed files and functions from "aeration" to "page_hinting"
+Moved from page->lru list to scatterlist
+Replaced wait on refcnt in shutdown with RCU and cancel_delayed_work_sync
+Virtio now uses scatterlist directly instead of intermediate array
+Moved stats out of free_area, now in separate area and pointed to from zone
+Merged patch 5 into patch 4 to improve review-ability
+Updated various code comments throughout
+
+Changes from v2:
+https://lore.kernel.org/lkml/20190724165158.6685.87228.stgit@localhost.localdomain/
+Dropped "page hinting" in favor of "page reporting"
+Renamed files from "hinting" to "reporting"
+Replaced "Hinted" page type with "Reported" page flag
+Added support for page poisoning while hinting is active
+Add QEMU patch that implements PAGE_POISON feature
+
+Changes from v3:
+https://lore.kernel.org/lkml/20190801222158.22190.96964.stgit@localhost.localdomain/
+Added mutex lock around page reporting startup and shutdown
+Fixed reference to "page aeration" in patch 2
+Split page reporting function bit out into separate QEMU patch
+Limited capacity of scatterlist to vq size - 1 instead of vq size
+Added exception handling for case of virtio descriptor allocation failure
+
+Changes from v4:
+https://lore.kernel.org/lkml/20190807224037.6891.53512.stgit@localhost.localdomain/
+Replaced spin_(un)lock with spin_(un)lock_irq in page_reporting_cycle()
+Dropped if/continue for ternary operator in page_reporting_process()
+Added checks for isolate and cma types to for_each_reporting_migratetype_order
+Added virtio-dev, Michal Hocko, and Oscar Salvador to to:/cc:
+Rebased on latest linux-next and QEMU git trees
+
 ---
- lib/x86/processor.h |  5 ---
- x86/vmx_tests.c     | 76 ++++++++++++++++++++-------------------------
- 2 files changed, 33 insertions(+), 48 deletions(-)
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 8b8bb7a..4fef0bc 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -461,11 +461,6 @@ static inline void write_pkru(u32 pkru)
-         : : "a" (eax), "c" (ecx), "d" (edx));
- }
- 
--static inline u64 make_non_canonical(u64 addr)
--{
--	return (addr | 1ull << 48);
--}
--
- static inline bool is_canonical(u64 addr)
- {
- 	return (s64)(addr << 16) >> 16 == addr;
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 8ad2674..e115e48 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -6952,15 +6952,14 @@ static void test_load_host_pat(void)
- }
- 
- /*
-- * Test a value for the given VMCS field.
-- *
-- *  "field" - VMCS field
-- *  "field_name" - string name of VMCS field
-- *  "bit_start" - starting bit
-- *  "bit_end" - ending bit
-- *  "val" - value that the bit range must or must not contain
-- *  "valid_val" - whether value given in 'val' must be valid or not
-- *  "error" - expected VMCS error when vmentry fails for an invalid value
-+ * test_vmcs_field - test a value for the given VMCS field
-+ * @field: VMCS field
-+ * @field_name: string name of VMCS field
-+ * @bit_start: starting bit
-+ * @bit_end: ending bit
-+ * @val: value that the bit range must or must not contain
-+ * @valid_val: whether value given in 'val' must be valid or not
-+ * @error: expected VMCS error when vmentry fails for an invalid value
-  */
- static void test_vmcs_field(u64 field, const char *field_name, u32 bit_start,
- 			    u32 bit_end, u64 val, bool valid_val, u32 error)
-@@ -7004,16 +7003,14 @@ static void test_vmcs_field(u64 field, const char *field_name, u32 bit_start,
- static void test_canonical(u64 field, const char * field_name)
- {
- 	u64 addr_saved = vmcs_read(field);
--	u64 addr = addr_saved;
- 
--	report_prefix_pushf("%s %lx", field_name, addr);
--	if (is_canonical(addr)) {
-+	report_prefix_pushf("%s %lx", field_name, addr_saved);
-+	if (is_canonical(addr_saved)) {
- 		test_vmx_vmlaunch(0, false);
- 		report_prefix_pop();
- 
--		addr = make_non_canonical(addr);
--		vmcs_write(field, addr);
--		report_prefix_pushf("%s %lx", field_name, addr);
-+		vmcs_write(field, NONCANONICAL);
-+		report_prefix_pushf("%s %llx", field_name, NONCANONICAL);
- 		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
- 				  false);
- 
-@@ -7025,6 +7022,14 @@ static void test_canonical(u64 field, const char * field_name)
- 	report_prefix_pop();
- }
- 
-+#define TEST_RPL_TI_FLAGS(reg, name)				\
-+	test_vmcs_field(reg, name, 0, 2, 0x0, true,		\
-+			VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+
-+#define TEST_CS_TR_FLAGS(reg, name)				\
-+	test_vmcs_field(reg, name, 3, 15, 0x0000, false,	\
-+			VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+
- /*
-  * 1. In the selector field for each of CS, SS, DS, ES, FS, GS and TR, the
-  *    RPL (bits 1:0) and the TI flag (bit 2) must be 0.
-@@ -7036,34 +7041,24 @@ static void test_canonical(u64 field, const char * field_name)
-  */
- static void test_host_segment_regs(void)
- {
--	u32 exit_ctrl_saved = vmcs_read(EXI_CONTROLS);
- 	u16 selector_saved;
- 
- 	/*
- 	 * Test RPL and TI flags
- 	 */
--	test_vmcs_field(HOST_SEL_CS, "HOST_SEL_CS", 0, 2, 0x0, true,
--		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
--	test_vmcs_field(HOST_SEL_SS, "HOST_SEL_SS", 0, 2, 0x0, true,
--		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
--	test_vmcs_field(HOST_SEL_DS, "HOST_SEL_DS", 0, 2, 0x0, true,
--		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
--	test_vmcs_field(HOST_SEL_ES, "HOST_SEL_ES", 0, 2, 0x0, true,
--		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
--	test_vmcs_field(HOST_SEL_FS, "HOST_SEL_FS", 0, 2, 0x0, true,
--		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
--	test_vmcs_field(HOST_SEL_GS, "HOST_SEL_GS", 0, 2, 0x0, true,
--		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
--	test_vmcs_field(HOST_SEL_TR, "HOST_SEL_TR", 0, 2, 0x0, true,
--		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	TEST_RPL_TI_FLAGS(HOST_SEL_CS, "HOST_SEL_CS");
-+	TEST_RPL_TI_FLAGS(HOST_SEL_SS, "HOST_SEL_SS");
-+	TEST_RPL_TI_FLAGS(HOST_SEL_DS, "HOST_SEL_DS");
-+	TEST_RPL_TI_FLAGS(HOST_SEL_ES, "HOST_SEL_ES");
-+	TEST_RPL_TI_FLAGS(HOST_SEL_FS, "HOST_SEL_FS");
-+	TEST_RPL_TI_FLAGS(HOST_SEL_GS, "HOST_SEL_GS");
-+	TEST_RPL_TI_FLAGS(HOST_SEL_TR, "HOST_SEL_TR");
- 
- 	/*
- 	 * Test that CS and TR fields can not be 0x0000
- 	 */
--	test_vmcs_field(HOST_SEL_CS, "HOST_SEL_CS", 3, 15, 0x0000, false,
--			     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
--	test_vmcs_field(HOST_SEL_TR, "HOST_SEL_TR", 3, 15, 0x0000, false,
--			     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	TEST_CS_TR_FLAGS(HOST_SEL_CS, "HOST_SEL_CS");
-+	TEST_CS_TR_FLAGS(HOST_SEL_TR, "HOST_SEL_TR");
- 
- 	/*
- 	 * SS field can not be 0x0000 if "host address-space size" VM-exit
-@@ -7071,20 +7066,15 @@ static void test_host_segment_regs(void)
- 	 */
- 	selector_saved = vmcs_read(HOST_SEL_SS);
- 	vmcs_write(HOST_SEL_SS, 0);
--	if (exit_ctrl_saved & EXI_HOST_64) {
--		report_prefix_pushf("HOST_SEL_SS 0");
-+	report_prefix_pushf("HOST_SEL_SS 0");
-+	if (vmcs_read(EXI_CONTROLS) & EXI_HOST_64) {
- 		test_vmx_vmlaunch(0, false);
--		report_prefix_pop();
--
--		vmcs_write(EXI_CONTROLS, exit_ctrl_saved & ~EXI_HOST_64);
-+	} else {
-+		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD, false);
- 	}
--
--	report_prefix_pushf("HOST_SEL_SS 0");
--	test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD, false);
- 	report_prefix_pop();
- 
- 	vmcs_write(HOST_SEL_SS, selector_saved);
--	vmcs_write(EXI_CONTROLS, exit_ctrl_saved);
- 
- #ifdef __x86_64__
- 	/*
--- 
-2.20.1
+Alexander Duyck (6):
+      mm: Adjust shuffle code to allow for future coalescing
+      mm: Move set/get_pcppage_migratetype to mmzone.h
+      mm: Use zone and order instead of free area in free_list manipulators
+      mm: Introduce Reported pages
+      virtio-balloon: Pull page poisoning config out of free page hinting
+      virtio-balloon: Add support for providing unused page reports to host
 
+
+ drivers/virtio/Kconfig              |    1 
+ drivers/virtio/virtio_balloon.c     |   84 +++++++++-
+ include/linux/mmzone.h              |  116 ++++++++-----
+ include/linux/page-flags.h          |   11 +
+ include/linux/page_reporting.h      |  138 ++++++++++++++++
+ include/uapi/linux/virtio_balloon.h |    1 
+ mm/Kconfig                          |    5 +
+ mm/Makefile                         |    1 
+ mm/internal.h                       |   18 ++
+ mm/memory_hotplug.c                 |    1 
+ mm/page_alloc.c                     |  238 ++++++++++++++++++++-------
+ mm/page_reporting.c                 |  308 +++++++++++++++++++++++++++++++++++
+ mm/shuffle.c                        |   24 ---
+ mm/shuffle.h                        |   32 ++++
+ 14 files changed, 839 insertions(+), 139 deletions(-)
+ create mode 100644 include/linux/page_reporting.h
+ create mode 100644 mm/page_reporting.c
+
+--
