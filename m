@@ -2,169 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F01C28AAB8
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 00:49:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAA9D8AAEA
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 01:02:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727151AbfHLWtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 18:49:42 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:37125 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726568AbfHLWtm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 18:49:42 -0400
-Received: by mail-ot1-f65.google.com with SMTP id f17so29921282otq.4;
-        Mon, 12 Aug 2019 15:49:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nHhlgYEkAMLzpeQp5iTnO0Cc38tccOHo+I1ij6totIw=;
-        b=e92k/bnvuAJZMf7wPi0zDqgrta8CwAOps3mGD4JUI60fT4hHB9sJp+uFferOHrL/dE
-         Qkj3IBwj9c3M+Z9goPvXZ3okY116OnbfFsy262hBGLKLVRlcFMtCToIzXLkcF3oW4NEU
-         K+W1kxnyrB7kVw4a6YVD369pGDT360Oq2BdtEbneY78ShmHCG+ASHvUCcJ+WxV9kMID/
-         vlUqnO9TDNQj2N17N8erBgYGv4ejoo28DxbFZVZi3tIil/Rr8UFv3xFXNJ5y9lc+WESc
-         fg4uhV9qoqTJH6sJrG75GadkGvncgvxVl2k44kY13A2v1MwxFmUfFqx8BQCSacrgMjAh
-         n3dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nHhlgYEkAMLzpeQp5iTnO0Cc38tccOHo+I1ij6totIw=;
-        b=Z+5Nvhoszg1L18O1m/5RLK8an25HMV5o8Tv+5pPqirkMwETOscNoC3Fr9D6Yp1dXFC
-         Q3XNLOxjlfLwPHV7o5zJx9+J++NTiofaQEwPlq022kqGu1TjOrkmAeRojHDa3sDyb75m
-         Tr7aIXd7GO8XTe2en8M4bqzodNmNx5tdx54o6C0fQC4F4eXQzAEK1/waqyV3sZdiLXSi
-         AW9r4+Fot4vPzlr+UFLeUdpv/Y7njTKKFPQA8dC2sKIZyUHeSsnxp/XcQ4HJ/F1nV/eu
-         SjUXGBURRTKJG9L8wxhEz9Ox3754YcI6OKNgFbIQ09WPoNaJ2vytheL70EFjV4OA85Gc
-         Fpug==
-X-Gm-Message-State: APjAAAXRL59gabIJ8XjRujLg6JEWY8iC83Y+UGsH0yRtxDYuGo1Rt5De
-        7Lj2Nhcg1LE9uKd9jzL6bZCzVMUrlUtKODMcj54=
-X-Google-Smtp-Source: APXvYqwZ7pS16vyR1zCPDVdm0U9hbTlyCWAkwYgnJ/4qGi+bBVtiNKv9ffJ5GtcXg9KfgBsSpyc+QqxKgl44sM7rMhI=
-X-Received: by 2002:a5e:8c11:: with SMTP id n17mr142032ioj.64.1565650180999;
- Mon, 12 Aug 2019 15:49:40 -0700 (PDT)
+        id S1726684AbfHLXCF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 19:02:05 -0400
+Received: from mga03.intel.com ([134.134.136.65]:21131 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726296AbfHLXCE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 19:02:04 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 16:02:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,379,1559545200"; 
+   d="scan'208";a="204889364"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga002.fm.intel.com with ESMTP; 12 Aug 2019 16:02:03 -0700
+Date:   Mon, 12 Aug 2019 16:02:03 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com,
+        jmattson@google.com
+Subject: Re: [PATCH v6 7/8] KVM: x86: Load Guest fpu state when accessing
+ MSRs managed by XSAVES
+Message-ID: <20190812230203.GC4996@linux.intel.com>
+References: <20190725031246.8296-1-weijiang.yang@intel.com>
+ <20190725031246.8296-8-weijiang.yang@intel.com>
 MIME-Version: 1.0
-References: <20190812213158.22097.30576.stgit@localhost.localdomain>
- <20190812213324.22097.30886.stgit@localhost.localdomain> <CAPcyv4jEvPL3qQffDsJxKxkCJLo19FN=gd4+LtZ1FnARCr5wBw@mail.gmail.com>
-In-Reply-To: <CAPcyv4jEvPL3qQffDsJxKxkCJLo19FN=gd4+LtZ1FnARCr5wBw@mail.gmail.com>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Mon, 12 Aug 2019 15:49:30 -0700
-Message-ID: <CAKgT0UeHAXCM+aXL=SYXqVym=Vy3av21Vc6VY-rWQYE13-MNKg@mail.gmail.com>
-Subject: Re: [PATCH v5 1/6] mm: Adjust shuffle code to allow for future coalescing
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        virtio-dev@lists.oasis-open.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Rik van Riel <riel@surriel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        lcapitulino@redhat.com, "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190725031246.8296-8-weijiang.yang@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 3:24 PM Dan Williams <dan.j.williams@intel.com> wrote:
->
-> On Mon, Aug 12, 2019 at 2:33 PM Alexander Duyck
-> <alexander.duyck@gmail.com> wrote:
-> >
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> >
-> > This patch is meant to move the head/tail adding logic out of the shuffle
->
-> s/This patch is meant to move/Move/
+On Thu, Jul 25, 2019 at 11:12:45AM +0800, Yang Weijiang wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> A handful of CET MSRs are not context switched through "traditional"
+> methods, e.g. VMCS or manual switching, but rather are passed through
+> to the guest and are saved and restored by XSAVES/XRSTORS, i.e. the
+> guest's FPU state.
+> 
+> Load the guest's FPU state if userspace is accessing MSRs whose values
+> are managed by XSAVES so that the MSR helper, e.g. vmx_{get,set}_msr(),
+> can simply do {RD,WR}MSR to access the guest's value.
+> 
+> Note that guest_cpuid_has() is not queried as host userspace is allowed
+> to access MSRs that have not been exposed to the guest, e.g. it might do
+> KVM_SET_MSRS prior to KVM_SET_CPUID2.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fafd81d2c9ea..c657e6a56527 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -102,6 +102,8 @@ static void enter_smm(struct kvm_vcpu *vcpu);
+>  static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+>  static void store_regs(struct kvm_vcpu *vcpu);
+>  static int sync_regs(struct kvm_vcpu *vcpu);
+> +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
+> +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
+>  
+>  struct kvm_x86_ops *kvm_x86_ops __read_mostly;
+>  EXPORT_SYMBOL_GPL(kvm_x86_ops);
+> @@ -2959,6 +2961,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_get_msr_common);
+>  
+> +static bool is_xsaves_msr(u32 index)
+> +{
+> +	return index == MSR_IA32_U_CET ||
+> +	       (index >= MSR_IA32_PL0_SSP && index <= MSR_IA32_PL3_SSP);
+> +}
+> +
+>  /*
+>   * Read or write a bunch of msrs. All parameters are kernel addresses.
+>   *
+> @@ -2969,11 +2977,30 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
+>  		    int (*do_msr)(struct kvm_vcpu *vcpu,
+>  				  unsigned index, u64 *data))
+>  {
+> +	bool fpu_loaded = false;
+>  	int i;
+> +	u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
 
-I'll update that on next submission.
+Dunno if the compiler will actually generate different code, but this can be a
+const.
 
-> > code and into the __free_one_page function since ultimately that is where
-> > it is really needed anyway. By doing this we should be able to reduce the
-> > overhead
->
-> Is the overhead benefit observable? I would expect the overhead of
-> get_random_u64() dominates.
->
-> > and can consolidate all of the list addition bits in one spot.
->
-> This sounds the better argument.
+> +	u64 host_xss = 0;
+> +
+> +	for (i = 0; i < msrs->nmsrs; ++i) {
+> +		if (!fpu_loaded && is_xsaves_msr(entries[i].index)) {
+> +			if (!kvm_x86_ops->xsaves_supported() ||
+> +			    !kvm_x86_ops->supported_xss())
 
-Actually the overhead is the bit where we have to setup the arguments
-and call the function. There is only one spot where this function is
-ever called and that is in __free_one_page.
+The "!kvm_x86_ops->supported_xss()" is redundant with the host_xss check
+below.
 
-> [..]
-> > diff --git a/mm/shuffle.h b/mm/shuffle.h
-> > index 777a257a0d2f..add763cc0995 100644
-> > --- a/mm/shuffle.h
-> > +++ b/mm/shuffle.h
-> > @@ -3,6 +3,7 @@
-> >  #ifndef _MM_SHUFFLE_H
-> >  #define _MM_SHUFFLE_H
-> >  #include <linux/jump_label.h>
-> > +#include <linux/random.h>
-> >
-> >  /*
-> >   * SHUFFLE_ENABLE is called from the command line enabling path, or by
-> > @@ -43,6 +44,32 @@ static inline bool is_shuffle_order(int order)
-> >                 return false;
-> >         return order >= SHUFFLE_ORDER;
-> >  }
-> > +
-> > +static inline bool shuffle_add_to_tail(void)
-> > +{
-> > +       static u64 rand;
-> > +       static u8 rand_bits;
-> > +       u64 rand_old;
-> > +
-> > +       /*
-> > +        * The lack of locking is deliberate. If 2 threads race to
-> > +        * update the rand state it just adds to the entropy.
-> > +        */
-> > +       if (rand_bits-- == 0) {
-> > +               rand_bits = 64;
-> > +               rand = get_random_u64();
-> > +       }
-> > +
-> > +       /*
-> > +        * Test highest order bit while shifting our random value. This
-> > +        * should result in us testing for the carry flag following the
-> > +        * shift.
-> > +        */
-> > +       rand_old = rand;
-> > +       rand <<= 1;
-> > +
-> > +       return rand < rand_old;
-> > +}
->
-> This function seems too involved to be a static inline and I believe
-> each compilation unit that might call this routine gets it's own copy
-> of 'rand' and 'rand_bits' when the original expectation is that they
-> are global. How about leave this bit to mm/shuffle.c and rename it
-> coin_flip(), or something more generic, since it does not
-> 'add_to_tail'? The 'add_to_tail' action is something the caller
-> decides.
+> +				continue;
 
-The thing is there is only one caller to this function, and that is
-__free_one_page. That is why I made it a static inline since that way
-we can avoid having to call this as a function at all and can just
-inline the code into __free_one_page.
+Hmm, vmx_set_msr() should be checking host_xss, arguably we should call
+do_msr() and let it handle the bad MSR access.  I don't have a strong
+opinion either way, practically speaking the end result will be the same.
 
-As far as making this more generic I guess I can look into that. Maybe
-I will look at trying to implement something like get_random_bool()
-and then just do a macro to point to that. One other things that
-occurs to me now that I am looking over the code is that I am not sure
-the original or this modified version actually provide all that much
-randomness if multiple threads have access to it at the same time. If
-rand_bits races past the 0 you can end up getting streaks of 0s for
-256+ bits.
+If we do want to handle a misbehaving userspace here, this should be
+'break' instead of 'continue'.
+
+> +
+> +			host_xss = kvm_x86_ops->supported_xss();
+>  
+> -	for (i = 0; i < msrs->nmsrs; ++i)
+> +			if ((host_xss & cet_bits) != cet_bits)
+
+I'm pretty sure this should check for either CET bit being set, not both,
+e.g. I assume it's possible to enable and expose XFEATURE_MASK_CET_USER
+but not XFEATURE_MASK_CET_KERNEL.
+
+So something like
+
+	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
+	const bool cet_supported = kvm_x86_ops->xsaves_supported() &&
+				   (kvm_x86_ops->supported_xss() & cet_bits);
+
+	for (i = 0; i < msrs->nmsrs; ++i) {
+		if (!fpu_loaded && cet_supported &&
+		    is_xsaves_msr(entries[i].index)) {
+			kvm_load_guest_fpu(vcpu);
+			fpu_loaded = true;
+		}
+		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+			break;	
+	}
+
+or
+
+	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
+
+	for (i = 0; i < msrs->nmsrs; ++i) {
+		if (!fpu_loaded && is_xsaves_msr(entries[i].index)) {
+			if (!kvm_x86_ops->supported_xss() ||
+			    !(kvm_x86_ops->supported_xss() & cet_bits))
+				break;
+			kvm_load_guest_fpu(vcpu);
+			fpu_loaded = true;
+		}
+		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+			break;	
+	}
+
+
+> +				continue;
+> +
+> +			kvm_load_guest_fpu(vcpu);
+> +			fpu_loaded = true;
+> +		}
+>  		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+>  			break;
+> +	}
+> +	if (fpu_loaded)
+> +		kvm_put_guest_fpu(vcpu);
+>  
+>  	return i;
+>  }
+> -- 
+> 2.17.2
+> 
