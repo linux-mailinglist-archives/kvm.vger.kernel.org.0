@@ -2,147 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 868D389D33
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 13:36:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD0A389F19
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 15:03:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728224AbfHLLfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 07:35:51 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:17672 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727691AbfHLLfv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 07:35:51 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d514f170000>; Mon, 12 Aug 2019 04:35:51 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Mon, 12 Aug 2019 04:35:49 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Mon, 12 Aug 2019 04:35:49 -0700
-Received: from [10.24.70.124] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 12 Aug
- 2019 11:35:44 +0000
-Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Parav Pandit <parav@mellanox.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <cohuck@redhat.com>, <cjia@nvidia.com>
-References: <20190802065905.45239-1-parav@mellanox.com>
- <20190808141255.45236-1-parav@mellanox.com> <20190808170247.1fc2c4c4@x1.home>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <77ffb1f8-e050-fdf5-e306-0a81614f7a88@nvidia.com>
-Date:   Mon, 12 Aug 2019 17:05:35 +0530
+        id S1728552AbfHLNCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 09:02:54 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:42552 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726587AbfHLNCy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 09:02:54 -0400
+Received: by mail-qt1-f195.google.com with SMTP id t12so14061337qtp.9
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2019 06:02:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=I794i5k43EsX/FqVLogBrtzHtLMobYzeCJsdWXiK9Gc=;
+        b=VMgdsQq00foWkXG/3nO+dBstUoK1bGkCBdbj9tS6O2XJlAF+Gd74zMHMUkA+Njtq4M
+         1/R9J5gzrQ28tiWtpEqv2TjemV4M0eUiyIrSXf3PQ8hy0bwMcgJk12CEU13SqDS3og6j
+         JNN5DHxPwGYfzdPhRKhbUFwfch3e+YN+7HQiep9xP8CG++3zdsw5PnkTxkB2wXiq4SvK
+         Jc/cZ3HS14Cb68kj4QXOugj+o8lOW80EABX+K7Y83ls68HVVwPHmyEC64WGA0jWTztDl
+         Bgnp7cqMgeUbOoIkbiXSIXIHXYfgIR+WzAN3wNxJXn3/4k/pz1vaR9bWK24wuzC3Bdl/
+         +Scg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=I794i5k43EsX/FqVLogBrtzHtLMobYzeCJsdWXiK9Gc=;
+        b=gj2HWtqiSHF5/kcDsTyF792HuQDi4Xaq+JHh5+K8O4cikJP6pZIOy17FswyVuIjzeZ
+         0OpxFjKpXluZfa5Ef0QUXGigxFIw9Gnq4/cCd4bvhZ250OFhKRENvQL/NuLlIs3ASgb/
+         CriN2t1/r0AiOyqNyrCD81wbXc5PUdRQyy5pzmrWonM1+GrFLHBEx83ZJnW/kA0K1hv/
+         B75kePHOaU/MxTctpNs2uaqUACtpollLcUzUY8Tak4G2uqGv1p/Silltjd5ITsZXPX/A
+         EJEZ+PWKY+FScyLYhHtHatPGft0Igw/zAhcDCObXVp/90DVQS0Dv15gBklNZlXRGRlZu
+         M9Ng==
+X-Gm-Message-State: APjAAAXOSmO9ZS17pQXWKe1BkHeC+kwpAdrSbjKyr361G54Z6jO6Mwqo
+        XP7+rmgHIdtGURFEzvJmr33dpQ==
+X-Google-Smtp-Source: APXvYqxZv3qaTOwcS5IthcJTSrZw2AL6CRuxLGSASG1s5/gI7k9gv8676nfdtEsaySWFu9y0gecVIg==
+X-Received: by 2002:a0c:f687:: with SMTP id p7mr8778029qvn.160.1565614973155;
+        Mon, 12 Aug 2019 06:02:53 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id f22sm42714130qkk.45.2019.08.12.06.02.52
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 12 Aug 2019 06:02:52 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hx9yO-0007Sg-5c; Mon, 12 Aug 2019 10:02:52 -0300
+Date:   Mon, 12 Aug 2019 10:02:52 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
+Message-ID: <20190812130252.GE24457@ziepe.ca>
+References: <20190809054851.20118-1-jasowang@redhat.com>
+ <20190810134948-mutt-send-email-mst@kernel.org>
+ <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
+ <20190812054429-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190808170247.1fc2c4c4@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1565609751; bh=fpHvHHJL8wyOLDiEfQdubvRYA+qG1k/+C72xvd/LHRQ=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
-         X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=blXKchJTCoja53q4QJ8ExzCyn1pWzmxPHrtImiRE//hESE7MIbP+UxofWHdYsY4Gv
-         GKk3HQN0w6m2V8kLq/xaA7kQIlsVjC5DMdNVsjzr322QbAq5Z+Ggn9Mv1J+sPp2E9A
-         /L9/qQ85m0NiGMMO1hCG2CsXcDUzvobEgyM3ymj+PhX2CZ2p3SqakukpYNKzkvDRWG
-         f+9qKYCSsbtyENegLRTUEyNYBhi8sNgfwYDdK+H6zVzQyNb05z7xgpGAs6F9IRzAB/
-         DhqfBfvnaR2EtmR+WVMSP2icu6D8Z+UY2byAgshKZ0OcA3VRBfeNpa7HXCFXVDEWyA
-         U041fgBWnGoTQ==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190812054429-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Aug 12, 2019 at 05:49:08AM -0400, Michael S. Tsirkin wrote:
+> On Mon, Aug 12, 2019 at 10:44:51AM +0800, Jason Wang wrote:
+> > 
+> > On 2019/8/11 上午1:52, Michael S. Tsirkin wrote:
+> > > On Fri, Aug 09, 2019 at 01:48:42AM -0400, Jason Wang wrote:
+> > > > Hi all:
+> > > > 
+> > > > This series try to fix several issues introduced by meta data
+> > > > accelreation series. Please review.
+> > > > 
+> > > > Changes from V4:
+> > > > - switch to use spinlock synchronize MMU notifier with accessors
+> > > > 
+> > > > Changes from V3:
+> > > > - remove the unnecessary patch
+> > > > 
+> > > > Changes from V2:
+> > > > - use seqlck helper to synchronize MMU notifier with vhost worker
+> > > > 
+> > > > Changes from V1:
+> > > > - try not use RCU to syncrhonize MMU notifier with vhost worker
+> > > > - set dirty pages after no readers
+> > > > - return -EAGAIN only when we find the range is overlapped with
+> > > >    metadata
+> > > > 
+> > > > Jason Wang (9):
+> > > >    vhost: don't set uaddr for invalid address
+> > > >    vhost: validate MMU notifier registration
+> > > >    vhost: fix vhost map leak
+> > > >    vhost: reset invalidate_count in vhost_set_vring_num_addr()
+> > > >    vhost: mark dirty pages during map uninit
+> > > >    vhost: don't do synchronize_rcu() in vhost_uninit_vq_maps()
+> > > >    vhost: do not use RCU to synchronize MMU notifier with worker
+> > > >    vhost: correctly set dirty pages in MMU notifiers callback
+> > > >    vhost: do not return -EAGAIN for non blocking invalidation too early
+> > > > 
+> > > >   drivers/vhost/vhost.c | 202 +++++++++++++++++++++++++-----------------
+> > > >   drivers/vhost/vhost.h |   6 +-
+> > > >   2 files changed, 122 insertions(+), 86 deletions(-)
+> > > This generally looks more solid.
+> > > 
+> > > But this amounts to a significant overhaul of the code.
+> > > 
+> > > At this point how about we revert 7f466032dc9e5a61217f22ea34b2df932786bbfc
+> > > for this release, and then re-apply a corrected version
+> > > for the next one?
+> > 
+> > 
+> > If possible, consider we've actually disabled the feature. How about just
+> > queued those patches for next release?
+> > 
+> > Thanks
+> 
+> Sorry if I was unclear. My idea is that
+> 1. I revert the disabled code
+> 2. You send a patch readding it with all the fixes squashed
+> 3. Maybe optimizations on top right away?
+> 4. We queue *that* for next and see what happens.
+> 
+> And the advantage over the patchy approach is that the current patches
+> are hard to review. E.g.  it's not reasonable to ask RCU guys to review
+> the whole of vhost for RCU usage but it's much more reasonable to ask
+> about a specific patch.
 
+I think there are other problems here too, I don't like that the use
+of mmu notifiers is so different from every other driver, or that GUP
+is called under spinlock.
 
-On 8/9/2019 4:32 AM, Alex Williamson wrote:
-> On Thu,  8 Aug 2019 09:12:53 -0500
-> Parav Pandit <parav@mellanox.com> wrote:
-> 
->> Currently mtty sample driver uses mdev state and UUID in convoluated way to
->> generate an interrupt.
->> It uses several translations from mdev_state to mdev_device to mdev uuid.
->> After which it does linear search of long uuid comparision to
->> find out mdev_state in mtty_trigger_interrupt().
->> mdev_state is already available while generating interrupt from which all
->> such translations are done to reach back to mdev_state.
->>
->> This translations are done during interrupt generation path.
->> This is unnecessary and reduandant.
-> 
-> Is the interrupt handling efficiency of this particular sample driver
-> really relevant, or is its purpose more to illustrate the API and
-> provide a proof of concept?  If we go to the trouble to optimize the
-> sample driver and remove this interface from the API, what do we lose?
-> 
-> This interface was added via commit:
-> 
-> 99e3123e3d72 vfio-mdev: Make mdev_device private and abstract interfaces
-> 
-> Where the goal was to create a more formal interface and abstract
-> driver access to the struct mdev_device.  In part this served to make
-> out-of-tree mdev vendor drivers more supportable; the object is
-> considered opaque and access is provided via an API rather than through
-> direct structure fields.
-> 
-> I believe that the NVIDIA GRID mdev driver does make use of this
-> interface and it's likely included in the sample driver specifically so
-> that there is an in-kernel user for it (ie. specifically to avoid it
-> being removed so casually).  An interesting feature of the NVIDIA mdev
-> driver is that I believe it has portions that run in userspace.  As we
-> know, mdevs are named with a UUID, so I can imagine there are some
-> efficiencies to be gained in having direct access to the UUID for a
-> device when interacting with userspace, rather than repeatedly parsing
-> it from a device name.
+So I favor the revert and try again approach as well. It is hard to
+get a clear picture with these endless bug fix patches
 
-That's right.
-
->  Is that really something we want to make more
-> difficult in order to optimize a sample driver?  Knowing that an mdev
-> device uses a UUID for it's name, as tools like libvirt and mdevctl
-> expect, is it really worthwhile to remove such a trivial API?
-> 
->> Hence,
->> Patch-1 simplifies mtty sample driver to directly use mdev_state.
->>
->> Patch-2, Since no production driver uses mdev_uuid(), simplifies and
->> removes redandant mdev_uuid() exported symbol.
-> 
-> s/no production driver/no in-kernel production driver/
-> 
-> I'd be interested to hear how the NVIDIA folks make use of this API
-> interface.  Thanks,
-> 
-
-Yes, NVIDIA mdev driver do use this interface. I don't agree on removing
-mdev_uuid() interface.
-
-Thanks,
-Kirti
-
-
-> Alex
-> 
->> ---
->> Changelog:
->> v1->v2:
->>  - Corrected email of Kirti
->>  - Updated cover letter commit log to address comment from Cornelia
->>  - Added Reviewed-by tag
->> v0->v1:
->>  - Updated commit log
->>
->> Parav Pandit (2):
->>   vfio-mdev/mtty: Simplify interrupt generation
->>   vfio/mdev: Removed unused and redundant API for mdev UUID
->>
->>  drivers/vfio/mdev/mdev_core.c |  6 ------
->>  include/linux/mdev.h          |  1 -
->>  samples/vfio-mdev/mtty.c      | 39 +++++++----------------------------
->>  3 files changed, 8 insertions(+), 38 deletions(-)
->>
-> 
+Jason
