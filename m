@@ -2,145 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD0A389F19
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 15:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF53689F52
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 15:14:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728552AbfHLNCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 09:02:54 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:42552 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726587AbfHLNCy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 09:02:54 -0400
-Received: by mail-qt1-f195.google.com with SMTP id t12so14061337qtp.9
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2019 06:02:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=I794i5k43EsX/FqVLogBrtzHtLMobYzeCJsdWXiK9Gc=;
-        b=VMgdsQq00foWkXG/3nO+dBstUoK1bGkCBdbj9tS6O2XJlAF+Gd74zMHMUkA+Njtq4M
-         1/R9J5gzrQ28tiWtpEqv2TjemV4M0eUiyIrSXf3PQ8hy0bwMcgJk12CEU13SqDS3og6j
-         JNN5DHxPwGYfzdPhRKhbUFwfch3e+YN+7HQiep9xP8CG++3zdsw5PnkTxkB2wXiq4SvK
-         Jc/cZ3HS14Cb68kj4QXOugj+o8lOW80EABX+K7Y83ls68HVVwPHmyEC64WGA0jWTztDl
-         Bgnp7cqMgeUbOoIkbiXSIXIHXYfgIR+WzAN3wNxJXn3/4k/pz1vaR9bWK24wuzC3Bdl/
-         +Scg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=I794i5k43EsX/FqVLogBrtzHtLMobYzeCJsdWXiK9Gc=;
-        b=gj2HWtqiSHF5/kcDsTyF792HuQDi4Xaq+JHh5+K8O4cikJP6pZIOy17FswyVuIjzeZ
-         0OpxFjKpXluZfa5Ef0QUXGigxFIw9Gnq4/cCd4bvhZ250OFhKRENvQL/NuLlIs3ASgb/
-         CriN2t1/r0AiOyqNyrCD81wbXc5PUdRQyy5pzmrWonM1+GrFLHBEx83ZJnW/kA0K1hv/
-         B75kePHOaU/MxTctpNs2uaqUACtpollLcUzUY8Tak4G2uqGv1p/Silltjd5ITsZXPX/A
-         EJEZ+PWKY+FScyLYhHtHatPGft0Igw/zAhcDCObXVp/90DVQS0Dv15gBklNZlXRGRlZu
-         M9Ng==
-X-Gm-Message-State: APjAAAXOSmO9ZS17pQXWKe1BkHeC+kwpAdrSbjKyr361G54Z6jO6Mwqo
-        XP7+rmgHIdtGURFEzvJmr33dpQ==
-X-Google-Smtp-Source: APXvYqxZv3qaTOwcS5IthcJTSrZw2AL6CRuxLGSASG1s5/gI7k9gv8676nfdtEsaySWFu9y0gecVIg==
-X-Received: by 2002:a0c:f687:: with SMTP id p7mr8778029qvn.160.1565614973155;
-        Mon, 12 Aug 2019 06:02:53 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id f22sm42714130qkk.45.2019.08.12.06.02.52
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 12 Aug 2019 06:02:52 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hx9yO-0007Sg-5c; Mon, 12 Aug 2019 10:02:52 -0300
-Date:   Mon, 12 Aug 2019 10:02:52 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
-Message-ID: <20190812130252.GE24457@ziepe.ca>
-References: <20190809054851.20118-1-jasowang@redhat.com>
- <20190810134948-mutt-send-email-mst@kernel.org>
- <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
- <20190812054429-mutt-send-email-mst@kernel.org>
+        id S1728833AbfHLNNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 09:13:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56230 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728750AbfHLNNL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 09:13:11 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 00B46300C22C;
+        Mon, 12 Aug 2019 13:13:10 +0000 (UTC)
+Received: from virtlab605.virt.lab.eng.bos.redhat.com (virtlab605.virt.lab.eng.bos.redhat.com [10.19.152.201])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8D85E5D6A0;
+        Mon, 12 Aug 2019 13:13:05 +0000 (UTC)
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, virtio-dev@lists.oasis-open.org,
+        pbonzini@redhat.com, lcapitulino@redhat.com, pagupta@redhat.com,
+        wei.w.wang@intel.com, yang.zhang.wz@gmail.com, riel@surriel.com,
+        david@redhat.com, mst@redhat.com, dodgen@google.com,
+        konrad.wilk@oracle.com, dhildenb@redhat.com, aarcange@redhat.com,
+        alexander.duyck@gmail.com, john.starks@microsoft.com,
+        dave.hansen@intel.com, mhocko@suse.com, cohuck@redhat.com
+Subject: [RFC][PATCH v12 0/2] mm: Support for page reporting
+Date:   Mon, 12 Aug 2019 09:12:33 -0400
+Message-Id: <20190812131235.27244-1-nitesh@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190812054429-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 12 Aug 2019 13:13:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 05:49:08AM -0400, Michael S. Tsirkin wrote:
-> On Mon, Aug 12, 2019 at 10:44:51AM +0800, Jason Wang wrote:
-> > 
-> > On 2019/8/11 上午1:52, Michael S. Tsirkin wrote:
-> > > On Fri, Aug 09, 2019 at 01:48:42AM -0400, Jason Wang wrote:
-> > > > Hi all:
-> > > > 
-> > > > This series try to fix several issues introduced by meta data
-> > > > accelreation series. Please review.
-> > > > 
-> > > > Changes from V4:
-> > > > - switch to use spinlock synchronize MMU notifier with accessors
-> > > > 
-> > > > Changes from V3:
-> > > > - remove the unnecessary patch
-> > > > 
-> > > > Changes from V2:
-> > > > - use seqlck helper to synchronize MMU notifier with vhost worker
-> > > > 
-> > > > Changes from V1:
-> > > > - try not use RCU to syncrhonize MMU notifier with vhost worker
-> > > > - set dirty pages after no readers
-> > > > - return -EAGAIN only when we find the range is overlapped with
-> > > >    metadata
-> > > > 
-> > > > Jason Wang (9):
-> > > >    vhost: don't set uaddr for invalid address
-> > > >    vhost: validate MMU notifier registration
-> > > >    vhost: fix vhost map leak
-> > > >    vhost: reset invalidate_count in vhost_set_vring_num_addr()
-> > > >    vhost: mark dirty pages during map uninit
-> > > >    vhost: don't do synchronize_rcu() in vhost_uninit_vq_maps()
-> > > >    vhost: do not use RCU to synchronize MMU notifier with worker
-> > > >    vhost: correctly set dirty pages in MMU notifiers callback
-> > > >    vhost: do not return -EAGAIN for non blocking invalidation too early
-> > > > 
-> > > >   drivers/vhost/vhost.c | 202 +++++++++++++++++++++++++-----------------
-> > > >   drivers/vhost/vhost.h |   6 +-
-> > > >   2 files changed, 122 insertions(+), 86 deletions(-)
-> > > This generally looks more solid.
-> > > 
-> > > But this amounts to a significant overhaul of the code.
-> > > 
-> > > At this point how about we revert 7f466032dc9e5a61217f22ea34b2df932786bbfc
-> > > for this release, and then re-apply a corrected version
-> > > for the next one?
-> > 
-> > 
-> > If possible, consider we've actually disabled the feature. How about just
-> > queued those patches for next release?
-> > 
-> > Thanks
-> 
-> Sorry if I was unclear. My idea is that
-> 1. I revert the disabled code
-> 2. You send a patch readding it with all the fixes squashed
-> 3. Maybe optimizations on top right away?
-> 4. We queue *that* for next and see what happens.
-> 
-> And the advantage over the patchy approach is that the current patches
-> are hard to review. E.g.  it's not reasonable to ask RCU guys to review
-> the whole of vhost for RCU usage but it's much more reasonable to ask
-> about a specific patch.
+This patch series proposes an efficient mechanism for reporting free memory
+from a guest to its hypervisor. It especially enables guests with no page cache
+(e.g., nvdimm, virtio-pmem) or with small page caches (e.g., ram > disk) to
+rapidly hand back free memory to the hypervisor.
+This approach has a minimal impact on the existing core-mm infrastructure.
 
-I think there are other problems here too, I don't like that the use
-of mmu notifiers is so different from every other driver, or that GUP
-is called under spinlock.
+This approach tracks all freed pages of the order MAX_ORDER - 2 in bitmaps.
+A new hook after buddy merging is used to set the bits in the bitmap for a freed 
+page. Each set bit is cleared after they are processed/checked for
+re-allocation.
+Bitmaps are stored on a per-zone basis and are protected by the zone lock. A
+workqueue asynchronously processes the bitmaps as soon as a pre-defined memory
+threshold is met, trying to isolate and report pages that are still free.
+The isolated pages are stored in a scatterlist and are reported via
+virtio-balloon, which is responsible for sending batched pages to the
+hypervisor. Once the hypervisor processed the reporting request, the isolated
+pages are returned back to the buddy.
+The thershold which defines the number of pages which will be isolated and
+reported to the hypervisor at a time is currently hardcoded to 16 in the guest.
 
-So I favor the revert and try again approach as well. It is hard to
-get a clear picture with these endless bug fix patches
+Benefit analysis:
+Number of 5 GB guests (each touching 4 to 5 GB memory) that can be launched on a
+15 GB single NUMA system without using swap space in the host.
 
-Jason
+	    Guest kernel-->	Unmodified		with v12 page reporting
+	Number of guests-->	    2				7
+
+Conclusion: In a page-reporting enabled kernel, the guest is able to report
+most of its unused memory back to the host. Due to this on the same host, I was
+able to launch 7 guests without touching any swap compared to 2 which were
+launched with an unmodified kernel.
+
+Performance Analysis:
+In order to measure the performance impact of this patch-series over an
+unmodified kernel, I am using will-it-scale/page_fault1 on a 30 GB, 24 vcpus
+single NUMA guest which is affined to a single node in the host. Over several
+runs, I observed that with this patch-series there is a degradation of around
+1-3% for certain cases. This degradation could be a result of page-zeroing
+overhead which comes with every page-fault in the guest.
+I also tried this test on a 2 NUMA node host running page reporting
+enabled 60GB guest also having 2 NUMA nodes and 24 vcpus. I observed a similar
+degradation of around 1-3% in most of the cases.
+For certain cases, the variability even with an unmodified kernel was around
+4-6% with every fresh boot. I will continue to investigate this further to find
+the reason behind it.
+
+Ongoing work-items:
+* I have a working prototype for supporting memory hotplug/hotremove with page
+  reporting. However, it still requires more testing and fixes specifically on
+  the hotremove side.
+  Right now, for any memory hotplug or hotremove request bitmap or its
+  respective fields are not changed. Hence, memory added via hotplug is not
+  tracked in the bitmap. Similarly, removed memory is not reported to the
+  hypervisor by using an online memory check. 
+* I will also have to look into the details about how to handle page poisoning
+  scenarios and test with directly assigned devices.
+
+
+Changes from v11:
+https://lkml.org/lkml/2019/7/10/742
+* Moved the fields required to manage bitmap of free pages to 'struct zone'.
+* Replaced the list which was used to hold and report the free pages with
+  scatterlist.
+* Tried to fix the anti-kernel patterns and improve overall code quality.
+* Fixed a few bugs in the code which were reported in the last posting.
+* Moved to use MADV_DONTNEED from MADV_FREE.
+* Replaced page hinting in favor of page reporting.
+* Addressed other comments which I received in the last posting.	
+
+
+Changes from v10:
+https://lkml.org/lkml/2019/6/3/943
+* Added logic to take care of multiple NUMA nodes scenarios.
+* Simplified the logic for reporting isolated pages to the host. (Eg. replaced
+  dynamically allocated arrays with static ones, introduced wait event instead
+  of the loop in order to wait for a response from the host)
+* Added a mutex to prevent race condition when page reporting is enabled by
+  multiple drivers.
+* Simplified the logic responsible for decrementing free page counter for each
+  zone.
+* Simplified code structuring/naming.
+ 
+--
+
+Nitesh Narayan Lal (2):
+  mm: page_reporting: core infrastructure
+  virtio-balloon: interface to support free page reporting
+
+ drivers/virtio/Kconfig              |   1 +
+ drivers/virtio/virtio_balloon.c     |  64 +++++-
+ include/linux/mmzone.h              |  11 +
+ include/linux/page_reporting.h      |  63 ++++++
+ include/uapi/linux/virtio_balloon.h |   1 +
+ mm/Kconfig                          |   6 +
+ mm/Makefile                         |   1 +
+ mm/page_alloc.c                     |  42 +++-
+ mm/page_reporting.c                 | 332 ++++++++++++++++++++++++++++
+ 9 files changed, 513 insertions(+), 8 deletions(-)
+ create mode 100644 include/linux/page_reporting.h
+ create mode 100644 mm/page_reporting.c
+
+-- 
+
+
