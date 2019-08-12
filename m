@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EDD518AAED
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 01:04:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA78E8AB27
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 01:30:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbfHLXEw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 19:04:52 -0400
-Received: from mga12.intel.com ([192.55.52.136]:60121 "EHLO mga12.intel.com"
+        id S1726670AbfHLXaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 19:30:08 -0400
+Received: from mga18.intel.com ([134.134.136.126]:20527 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726316AbfHLXEw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 19:04:52 -0400
+        id S1726358AbfHLXaI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 19:30:08 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 16:04:51 -0700
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 16:29:22 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,379,1559545200"; 
-   d="scan'208";a="376109369"
+   d="scan'208";a="170220211"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga006.fm.intel.com with ESMTP; 12 Aug 2019 16:04:50 -0700
-Date:   Mon, 12 Aug 2019 16:04:50 -0700
+  by orsmga008.jf.intel.com with ESMTP; 12 Aug 2019 16:29:22 -0700
+Date:   Mon, 12 Aug 2019 16:29:21 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -29,7 +29,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         jmattson@google.com
 Subject: Re: [PATCH v6 7/8] KVM: x86: Load Guest fpu state when accessing
  MSRs managed by XSAVES
-Message-ID: <20190812230450.GD4996@linux.intel.com>
+Message-ID: <20190812232921.GE4996@linux.intel.com>
 References: <20190725031246.8296-1-weijiang.yang@intel.com>
  <20190725031246.8296-8-weijiang.yang@intel.com>
  <20190812230203.GC4996@linux.intel.com>
@@ -138,10 +138,6 @@ On Mon, Aug 12, 2019 at 04:02:03PM -0700, Sean Christopherson wrote:
 > 	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
 > 	const bool cet_supported = kvm_x86_ops->xsaves_supported() &&
 > 				   (kvm_x86_ops->supported_xss() & cet_bits);
-
-Oh, and this should use kvm_supported_xss(), which masks ->supported_xss()
-with KVM_SUPPORTED_XSS .
-
 > 
 > 	for (i = 0; i < msrs->nmsrs; ++i) {
 > 		if (!fpu_loaded && cet_supported &&
@@ -152,7 +148,14 @@ with KVM_SUPPORTED_XSS .
 > 		if (do_msr(vcpu, entries[i].index, &entries[i].data))
 > 			break;	
 > 	}
-> 
+
+After looking at patch 8/8, and assuming KVM can actually virtualize
+USER and KERNEL independently, we should go with this version that defers
+to do_msr(), otherwise this code would also need to differentiate between
+USER and KERNEL MSRs.  In other words, have __msr_io() load the guest fpu
+if CET is support and any CET MSRs is being accessed, and let vmx_set_msr()
+do the fine grained fault/error handling.
+
 > or
 > 
 > 	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
