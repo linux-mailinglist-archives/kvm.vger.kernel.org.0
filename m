@@ -2,125 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B88E8AA4A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 00:18:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E50BF8AA5D
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 00:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726530AbfHLWSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 18:18:12 -0400
-Received: from mga12.intel.com ([192.55.52.136]:56539 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726236AbfHLWSM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 18:18:12 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 15:18:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,379,1559545200"; 
-   d="scan'208";a="327494056"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga004.jf.intel.com with ESMTP; 12 Aug 2019 15:18:11 -0700
-Date:   Mon, 12 Aug 2019 15:18:11 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com,
-        jmattson@google.com
-Subject: Re: [PATCH v6 2/8] KVM: x86: Add a helper function for
- CPUID(0xD,n>=1) enumeration
-Message-ID: <20190812221811.GB4996@linux.intel.com>
-References: <20190725031246.8296-1-weijiang.yang@intel.com>
- <20190725031246.8296-3-weijiang.yang@intel.com>
+        id S1726685AbfHLWYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 18:24:22 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:33867 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbfHLWYV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 18:24:21 -0400
+Received: by mail-ot1-f68.google.com with SMTP id n5so165178522otk.1
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2019 15:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FD1szyxYIZRFxBXLh6OsEaGEchmLGdiUNjpQeITxC5M=;
+        b=x0gRCKA2MXc6jwpdoG/TD2IO5bNpn+KvoJBHqbuTFvYsphI9ZOW3AsLFTvGTGaBcYf
+         RXeEQjAS7obV+BaMTdZMP8wgP9cCdfivoRhOSSJlo1Z5CZcFaW9WRf5Nbz2vuEwz9BHO
+         CTPVnpm6p1Svao0hA1gPSbLM8aO2CgSELXaqp4B3NEVb2TYyFBGnZyWvtKuElCmEg9Y9
+         2684+SERAdl0y8BhILj5oAWGrfdVI2IqGuBac1Xq6S8MrelSVVIf8h5B+ZX8xtZ+Y4j8
+         0cIiaBzKvNv833gjthAES+x42kYGE7WEjgb+I7K5IyHz3cyOXJYFYRXUt4EGdLKdJPuu
+         QMeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FD1szyxYIZRFxBXLh6OsEaGEchmLGdiUNjpQeITxC5M=;
+        b=B4cJdwjDDAIFGTudfqE+StwHHjkTnwj7SBkFr4+b42WrF6D0nVXwYS3Rj9wcmUaCJw
+         OYSWb//36urpOpD/iotiglH0yP467DxFRvI0kA2UM9AcNrkjuPYx28F/GlfMDx6w4bAt
+         Ad2+cfiSR9Wdl5ZfYmgcQgAsfQ3Ed099inatT/xSmduxyA0oU4HwtsHzo/Z/kiRVOpRj
+         QZOBXA1kehhZaBLhtB0n8KglqJDBQmU00QpBwa0nQO9h1eWlCSimJlkNxWlm0FGX8PeQ
+         yc9vrSI1Zg0OKIwt4NwPrIxHt7bFNyZd5wA1WxDtShAyorAFeXptTkNVyiLp4pdiH/d/
+         TqSw==
+X-Gm-Message-State: APjAAAU8JuJo9DY+shBLvD8l9IzMg80cRpajGAWUG/obQagSdBOjKkkl
+        3fAMHefoiV0hhNw5lwjOb5e7wSXaWdfFMl9c5Sfwtw==
+X-Google-Smtp-Source: APXvYqyTjBOGgU/+dTdLpyuKWrW67Z3rfVh/4MI7eXiUUJ6wgK016/SnhTUKO42pQZXtyuBZxQKUvdSL/kBmh0RvuUc=
+X-Received: by 2002:aca:be43:: with SMTP id o64mr912541oif.149.1565648660956;
+ Mon, 12 Aug 2019 15:24:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190725031246.8296-3-weijiang.yang@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190812213158.22097.30576.stgit@localhost.localdomain> <20190812213324.22097.30886.stgit@localhost.localdomain>
+In-Reply-To: <20190812213324.22097.30886.stgit@localhost.localdomain>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Mon, 12 Aug 2019 15:24:09 -0700
+Message-ID: <CAPcyv4jEvPL3qQffDsJxKxkCJLo19FN=gd4+LtZ1FnARCr5wBw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/6] mm: Adjust shuffle code to allow for future coalescing
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     nitesh@redhat.com, KVM list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        virtio-dev@lists.oasis-open.org,
+        Oscar Salvador <osalvador@suse.de>, yang.zhang.wz@gmail.com,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Rik van Riel <riel@surriel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        lcapitulino@redhat.com, "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 11:12:40AM +0800, Yang Weijiang wrote:
-> To make the code look clean, wrap CPUID(0xD,n>=1) enumeration
-> code in a helper function now.
-> 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 4992e7c99588..29cbde7538a3 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -313,6 +313,50 @@ static int __do_cpuid_ent_emulated(struct kvm_cpuid_entry2 *entry,
->  	return 0;
+On Mon, Aug 12, 2019 at 2:33 PM Alexander Duyck
+<alexander.duyck@gmail.com> wrote:
+>
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+>
+> This patch is meant to move the head/tail adding logic out of the shuffle
+
+s/This patch is meant to move/Move/
+
+> code and into the __free_one_page function since ultimately that is where
+> it is really needed anyway. By doing this we should be able to reduce the
+> overhead
+
+Is the overhead benefit observable? I would expect the overhead of
+get_random_u64() dominates.
+
+> and can consolidate all of the list addition bits in one spot.
+
+This sounds the better argument.
+
+[..]
+> diff --git a/mm/shuffle.h b/mm/shuffle.h
+> index 777a257a0d2f..add763cc0995 100644
+> --- a/mm/shuffle.h
+> +++ b/mm/shuffle.h
+> @@ -3,6 +3,7 @@
+>  #ifndef _MM_SHUFFLE_H
+>  #define _MM_SHUFFLE_H
+>  #include <linux/jump_label.h>
+> +#include <linux/random.h>
+>
+>  /*
+>   * SHUFFLE_ENABLE is called from the command line enabling path, or by
+> @@ -43,6 +44,32 @@ static inline bool is_shuffle_order(int order)
+>                 return false;
+>         return order >= SHUFFLE_ORDER;
 >  }
->  
-> +static inline int __do_cpuid_dx_leaf(struct kvm_cpuid_entry2 *entry, int *nent,
-
-'dx' makes me think of the generic reference to RDX vs EDX.  Maybe
-__do_cpuid_0xd_leaf()?
-
-> +				     int maxnent, u64 xss_mask, u64 xcr0_mask,
-> +				     u32 eax_mask)
+> +
+> +static inline bool shuffle_add_to_tail(void)
 > +{
-> +	int idx, i;
-> +	u64 mask;
-> +	u64 supported;
+> +       static u64 rand;
+> +       static u8 rand_bits;
+> +       u64 rand_old;
 > +
-> +	for (idx = 1, i = 1; idx < 64; ++idx) {
-
-Rather than loop here, I think it makes sense to loop in the caller to
-make the code consistent with do_cpuid_7_mask() added by commit
-
-  54d360d41211 ("KVM: cpuid: extract do_cpuid_7_mask and support multiple subleafs")
-
-> +		mask = ((u64)1 << idx);
-> +		if (*nent >= maxnent)
-> +			return -EINVAL;
+> +       /*
+> +        * The lack of locking is deliberate. If 2 threads race to
+> +        * update the rand state it just adds to the entropy.
+> +        */
+> +       if (rand_bits-- == 0) {
+> +               rand_bits = 64;
+> +               rand = get_random_u64();
+> +       }
 > +
-> +		do_cpuid_1_ent(&entry[i], 0xD, idx);
-> +		if (idx == 1) {
-> +			entry[i].eax &= eax_mask;
-> +			cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
-> +			supported = xcr0_mask | xss_mask;
-> +			entry[i].ebx = 0;
-> +			entry[i].edx = 0;
-> +			entry[i].ecx &= xss_mask;
-> +			if (entry[i].eax & (F(XSAVES) | F(XSAVEC))) {
-> +				entry[i].ebx =
-> +					xstate_required_size(supported,
-> +							     true);
-> +			}
-> +		} else {
-> +			supported = (entry[i].ecx & 1) ? xss_mask :
-> +				     xcr0_mask;
-> +			if (entry[i].eax == 0 || !(supported & mask))
-> +				continue;
-> +			entry[i].ecx &= 1;
-> +			entry[i].edx = 0;
-> +			if (entry[i].ecx)
-> +				entry[i].ebx = 0;
-> +		}
-> +		entry[i].flags |=
-> +			KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> +		++*nent;
-> +		++i;
-> +	}
-> +	return 0;
+> +       /*
+> +        * Test highest order bit while shifting our random value. This
+> +        * should result in us testing for the carry flag following the
+> +        * shift.
+> +        */
+> +       rand_old = rand;
+> +       rand <<= 1;
+> +
+> +       return rand < rand_old;
 > +}
-> +
 
-Extracting code into a helper should be done in the same patch that the
-existing code is replaced with a call to the helper, i.e. the chunk of the
-next patch that invokes the helper should be squashed with this patch.
-
->  static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
->  				 u32 index, int *nent, int maxnent)
->  {
-> -- 
-> 2.17.2
-> 
+This function seems too involved to be a static inline and I believe
+each compilation unit that might call this routine gets it's own copy
+of 'rand' and 'rand_bits' when the original expectation is that they
+are global. How about leave this bit to mm/shuffle.c and rename it
+coin_flip(), or something more generic, since it does not
+'add_to_tail'? The 'add_to_tail' action is something the caller
+decides.
