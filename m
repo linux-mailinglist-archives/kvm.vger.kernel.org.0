@@ -2,131 +2,586 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E5CF8A89A
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 22:47:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2064B8A8A5
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 22:50:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbfHLUr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 16:47:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3758 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726144AbfHLUrZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Aug 2019 16:47:25 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7CKLgtM086259;
-        Mon, 12 Aug 2019 16:47:21 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ubcdjxqxw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Aug 2019 16:47:21 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x7CKhc0u136880;
-        Mon, 12 Aug 2019 16:47:21 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ubcdjxqxj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Aug 2019 16:47:20 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7CKjQsm022606;
-        Mon, 12 Aug 2019 20:47:20 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma02dal.us.ibm.com with ESMTP id 2u9nj62mcs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Aug 2019 20:47:19 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7CKlFvh50070014
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Aug 2019 20:47:15 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C20BBE04F;
-        Mon, 12 Aug 2019 20:47:15 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7F838BE053;
-        Mon, 12 Aug 2019 20:47:13 +0000 (GMT)
-Received: from akrowiak-ThinkPad-P50.ibm.com (unknown [9.85.204.7])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Mon, 12 Aug 2019 20:47:13 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.ibm.com, david@redhat.com, mjrosato@linux.ibm.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH] s390: vfio-ap: remove unnecessary calls to disable queue interrupts
-Date:   Mon, 12 Aug 2019 16:47:09 -0400
-Message-Id: <1565642829-20157-1-git-send-email-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.7.4
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-12_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908120202
+        id S1726921AbfHLUul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 16:50:41 -0400
+Received: from mga17.intel.com ([192.55.52.151]:48150 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726707AbfHLUul (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 16:50:41 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 13:50:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,378,1559545200"; 
+   d="scan'208";a="183678501"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by FMSMGA003.fm.intel.com with ESMTP; 12 Aug 2019 13:50:39 -0700
+Date:   Mon, 12 Aug 2019 13:50:39 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>
+Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
+        virtualization@lists.linux-foundation.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>, Zhang@linux.intel.com,
+        Yu C <yu.c.zhang@intel.com>,
+        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>,
+        =?utf-8?B?TmljdciZb3IgQ8OuyJt1?= <ncitu@bitdefender.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [RFC PATCH v6 64/92] kvm: introspection: add single-stepping
+Message-ID: <20190812205038.GC1437@linux.intel.com>
+References: <20190809160047.8319-1-alazar@bitdefender.com>
+ <20190809160047.8319-65-alazar@bitdefender.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190809160047.8319-65-alazar@bitdefender.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When an AP queue is reset (zeroized), interrupts are disabled. The queue
-reset function currently tries to disable interrupts unnecessarily. This patch
-removes the unnecessary calls to disable interrupts after queue reset.
+On Fri, Aug 09, 2019 at 07:00:19PM +0300, Adalbert Lazăr wrote:
+> From: Nicușor Cîțu <ncitu@bitdefender.com>
+> 
+> This would be used either if the introspection tool request it as a
+> reply to a KVMI_EVENT_PF event or to cope with instructions that cannot
+> be handled by the x86 emulator during the handling of a VMEXIT. In
+> these situations, all other vCPU-s are kicked and held, the EPT-based
+> protection is removed and the guest is single stepped by the vCPU that
+> triggered the initial VMEXIT. Upon completion the EPT-base protection
+> is reinstalled and all vCPU-s all allowed to return to the guest.
+> 
+> This is a rather slow workaround that kicks in occasionally. In the
+> future, the most frequently single-stepped instructions should be added
+> to the emulator (usually, stores to and from memory - SSE/AVX).
+> 
+> For the moment it works only on Intel.
+> 
+> CC: Jim Mattson <jmattson@google.com>
+> CC: Sean Christopherson <sean.j.christopherson@intel.com>
+> CC: Joerg Roedel <joro@8bytes.org>
+> Signed-off-by: Nicușor Cîțu <ncitu@bitdefender.com>
+> Co-developed-by: Mihai Donțu <mdontu@bitdefender.com>
+> Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
+> Co-developed-by: Adalbert Lazăr <alazar@bitdefender.com>
+> Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |   3 +
+>  arch/x86/kvm/kvmi.c             |  47 ++++++++++-
+>  arch/x86/kvm/svm.c              |   5 ++
+>  arch/x86/kvm/vmx/vmx.c          |  17 ++++
+>  arch/x86/kvm/x86.c              |  19 +++++
+>  include/linux/kvmi.h            |   4 +
+>  virt/kvm/kvmi.c                 | 145 +++++++++++++++++++++++++++++++-
+>  virt/kvm/kvmi_int.h             |  16 ++++
+>  8 files changed, 253 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index ad36a5fc2048..60e2c298d469 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1016,6 +1016,7 @@ struct kvm_x86_ops {
+>  	void (*msr_intercept)(struct kvm_vcpu *vcpu, unsigned int msr,
+>  				bool enable);
+>  	bool (*desc_intercept)(struct kvm_vcpu *vcpu, bool enable);
+> +	void (*set_mtf)(struct kvm_vcpu *vcpu, bool enable);
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+MTF is a VMX specific implementation of single-stepping, this should be
+enable_single_step() or something along those lines.  For example, I assume
+SVM could implement something that is mostly functional via RFLAGS.TF.
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 0604b49a4d32..407c2f0f25f9 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1114,18 +1114,19 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
- 	return NOTIFY_OK;
- }
- 
--static void vfio_ap_irq_disable_apqn(int apqn)
-+static struct vfio_ap_queue *vfio_ap_find_qdev(int apqn)
- {
- 	struct device *dev;
--	struct vfio_ap_queue *q;
-+	struct vfio_ap_queue *q = NULL;
- 
- 	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
- 				 &apqn, match_apqn);
- 	if (dev) {
- 		q = dev_get_drvdata(dev);
--		vfio_ap_irq_disable(q);
- 		put_device(dev);
- 	}
-+
-+	return q;
- }
- 
- int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
-@@ -1164,6 +1165,7 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
- 	int rc = 0;
- 	unsigned long apid, apqi;
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
-+	struct vfio_ap_queue *q;
- 
- 	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm,
- 			     matrix_mdev->matrix.apm_max + 1) {
-@@ -1177,7 +1179,10 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
- 			 */
- 			if (ret)
- 				rc = ret;
--			vfio_ap_irq_disable_apqn(AP_MKQID(apid, apqi));
-+
-+			q = vfio_ap_find_qdev(AP_MKQID(apid, apqi));
-+			if (q)
-+				vfio_ap_free_aqic_resources(q);
- 		}
- 	}
- 
--- 
-2.7.4
+>  	void (*cr3_write_exiting)(struct kvm_vcpu *vcpu, bool enable);
+>  	bool (*nested_pagefault)(struct kvm_vcpu *vcpu);
+>  	bool (*spt_fault)(struct kvm_vcpu *vcpu);
+> @@ -1628,6 +1629,8 @@ void kvm_arch_msr_intercept(struct kvm_vcpu *vcpu, unsigned int msr,
+>  				bool enable);
+>  bool kvm_mmu_nested_pagefault(struct kvm_vcpu *vcpu);
+>  bool kvm_spt_fault(struct kvm_vcpu *vcpu);
+> +void kvm_set_mtf(struct kvm_vcpu *vcpu, bool enable);
+> +void kvm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask);
+>  void kvm_control_cr3_write_exiting(struct kvm_vcpu *vcpu, bool enable);
+>  
+>  #endif /* _ASM_X86_KVM_HOST_H */
+> diff --git a/arch/x86/kvm/kvmi.c b/arch/x86/kvm/kvmi.c
+> index 04cac5b8a4d0..f0ab4bd9eb37 100644
+> --- a/arch/x86/kvm/kvmi.c
+> +++ b/arch/x86/kvm/kvmi.c
+> @@ -520,7 +520,6 @@ bool kvmi_arch_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
+>  	u32 ctx_size;
+>  	u64 ctx_addr;
+>  	u32 action;
+> -	bool singlestep_ignored;
+>  	bool ret = false;
+>  
+>  	if (!kvm_spt_fault(vcpu))
+> @@ -533,7 +532,7 @@ bool kvmi_arch_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
+>  	if (ivcpu->effective_rep_complete)
+>  		return true;
+>  
+> -	action = kvmi_msg_send_pf(vcpu, gpa, gva, access, &singlestep_ignored,
+> +	action = kvmi_msg_send_pf(vcpu, gpa, gva, access, &ivcpu->ss_requested,
+>  				  &ivcpu->rep_complete, &ctx_addr,
+>  				  ivcpu->ctx_data, &ctx_size);
+>  
+> @@ -547,6 +546,8 @@ bool kvmi_arch_pf_event(struct kvm_vcpu *vcpu, gpa_t gpa, gva_t gva,
+>  		ret = true;
+>  		break;
+>  	case KVMI_EVENT_ACTION_RETRY:
+> +		if (ivcpu->ss_requested && !kvmi_start_ss(vcpu, gpa, access))
+> +			ret = true;
+>  		break;
+>  	default:
+>  		kvmi_handle_common_event_actions(vcpu, action, "PF");
+> @@ -758,6 +759,48 @@ int kvmi_arch_cmd_control_cr(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +void kvmi_arch_start_single_step(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_set_mtf(vcpu, true);
+> +
+> +	/*
+> +	 * Set block by STI only if the RFLAGS.IF = 1.
+> +	 * Blocking by both STI and MOV/POP SS is not possible.
+> +	 */
+> +	if (kvm_arch_interrupt_allowed(vcpu))
+> +		kvm_set_interrupt_shadow(vcpu, KVM_X86_SHADOW_INT_STI);
 
+This is wrong, the STI shadow only exists if interrupts were unblocked
+prior to STI.  I'm guessing this is a hack to workaround
+kvmi_arch_stop_single_step() not properly handling the clearing case.
+
+> +
+> +}
+> +
+> +void kvmi_arch_stop_single_step(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_set_mtf(vcpu, false);
+> +	/*
+> +	 * The blocking by STI is cleared after the guest
+> +	 * executes one instruction or incurs an exception.
+> +	 * However we migh stop the SS before entering to guest,
+> +	 * so be sure we are clearing the STI blocking.
+> +	 */
+> +	kvm_set_interrupt_shadow(vcpu, 0);
+
+There are only three callers of kvmi_stop_ss(), it should be possible
+to accurately update interruptibility:
+
+  - kvmi_run_ss() fail, do nothing
+  - VM-Exit that wasn't a single-step - clear interruptibility if the
+    guest executed an instruction (including faulted on an instr).
+  - MTF VM-Exit - do nothing (VMCS should already be up-to-date).
+
+> +}
+> +
+> +u8 kvmi_arch_relax_page_access(u8 old, u8 new)
+> +{
+> +	u8 ret = old | new;
+> +
+> +	/*
+> +	 * An SPTE entry with just the -wx bits set can trigger a
+> +	 * misconfiguration error from the hardware, as it's the case
+> +	 * for x86 where this access mode is used to mark I/O memory.
+> +	 * Thus, we make sure that -wx accesses are translated to rwx.
+> +	 */
+> +	if ((ret & (KVMI_PAGE_ACCESS_W | KVMI_PAGE_ACCESS_X)) ==
+> +	    (KVMI_PAGE_ACCESS_W | KVMI_PAGE_ACCESS_X))
+> +		ret |= KVMI_PAGE_ACCESS_R;
+> +
+> +	return ret;
+> +}
+> +
+>  static const struct {
+>  	unsigned int allow_bit;
+>  	enum kvm_page_track_mode track_mode;
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index b178b8900660..3481c0247680 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7183,6 +7183,10 @@ static bool svm_spt_fault(struct kvm_vcpu *vcpu)
+>  	return (svm->vmcb->control.exit_code == SVM_EXIT_NPF);
+>  }
+>  
+> +static void svm_set_mtf(struct kvm_vcpu *vcpu, bool enable)
+> +{
+> +}
+> +
+>  static void svm_cr3_write_exiting(struct kvm_vcpu *vcpu, bool enable)
+>  {
+>  }
+> @@ -7225,6 +7229,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>  	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
+>  	.has_emulated_msr = svm_has_emulated_msr,
+>  
+> +	.set_mtf = svm_set_mtf,
+>  	.cr3_write_exiting = svm_cr3_write_exiting,
+>  	.msr_intercept = svm_msr_intercept,
+>  	.desc_intercept = svm_desc_intercept,
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 7d1e341b51ad..f0369d0574dc 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5384,6 +5384,7 @@ static int handle_invalid_op(struct kvm_vcpu *vcpu)
+>  
+>  static int handle_monitor_trap(struct kvm_vcpu *vcpu)
+>  {
+> +	kvmi_stop_ss(vcpu);
+>  	return 1;
+>  }
+>  
+> @@ -5992,6 +5993,11 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> +	if (kvmi_vcpu_enabled_ss(vcpu)
+> +			&& exit_reason != EXIT_REASON_EPT_VIOLATION
+> +			&& exit_reason != EXIT_REASON_MONITOR_TRAP_FLAG)
+
+Bad indentation.  This is prevelant through the series.
+
+> +		kvmi_stop_ss(vcpu);
+> +
+>  	if (exit_reason < kvm_vmx_max_exit_handlers
+>  	    && kvm_vmx_exit_handlers[exit_reason])
+>  		return kvm_vmx_exit_handlers[exit_reason](vcpu);
+> @@ -7842,6 +7848,16 @@ static __exit void hardware_unsetup(void)
+>  	free_kvm_area();
+>  }
+>  
+> +static void vmx_set_mtf(struct kvm_vcpu *vcpu, bool enable)
+> +{
+> +	if (enable)
+> +		vmcs_set_bits(CPU_BASED_VM_EXEC_CONTROL,
+> +			      CPU_BASED_MONITOR_TRAP_FLAG);
+> +	else
+> +		vmcs_clear_bits(CPU_BASED_VM_EXEC_CONTROL,
+> +				CPU_BASED_MONITOR_TRAP_FLAG);
+> +}
+> +
+>  static void vmx_msr_intercept(struct kvm_vcpu *vcpu, unsigned int msr,
+>  			      bool enable)
+>  {
+> @@ -7927,6 +7943,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+>  	.cpu_has_accelerated_tpr = report_flexpriority,
+>  	.has_emulated_msr = vmx_has_emulated_msr,
+>  
+> +	.set_mtf = vmx_set_mtf,
+>  	.msr_intercept = vmx_msr_intercept,
+>  	.cr3_write_exiting = vmx_cr3_write_exiting,
+>  	.desc_intercept = vmx_desc_intercept,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 38aaddadb93a..65855340249a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7358,6 +7358,13 @@ static int inject_pending_event(struct kvm_vcpu *vcpu, bool req_int_win)
+>  {
+>  	int r;
+>  
+> +	if (kvmi_vcpu_enabled_ss(vcpu))
+> +		/*
+> +		 * We cannot inject events during single-stepping.
+> +		 * Try again later.
+> +		 */
+> +		return -1;
+> +
+>  	/* try to reinject previous events if any */
+>  
+>  	if (vcpu->arch.exception.injected)
+> @@ -10134,6 +10141,18 @@ void kvm_control_cr3_write_exiting(struct kvm_vcpu *vcpu, bool enable)
+>  }
+>  EXPORT_SYMBOL(kvm_control_cr3_write_exiting);
+>  
+> +void kvm_set_mtf(struct kvm_vcpu *vcpu, bool enable)
+> +{
+> +	kvm_x86_ops->set_mtf(vcpu, enable);
+> +}
+> +EXPORT_SYMBOL(kvm_set_mtf);
+> +
+> +void kvm_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
+> +{
+> +	kvm_x86_ops->set_interrupt_shadow(vcpu, mask);
+> +}
+> +EXPORT_SYMBOL(kvm_set_interrupt_shadow);
+
+Why do these wrappers exist, and why are they exported?  Introspection is
+built into kvm, any reason not to use kvm_x86_ops directly?  The most
+definitely don't need to be exported.
+
+> +
+>  bool kvm_spt_fault(struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_x86_ops->spt_fault(vcpu);
+> diff --git a/include/linux/kvmi.h b/include/linux/kvmi.h
+> index 5d162b9e67f2..1dc90284dc3a 100644
+> --- a/include/linux/kvmi.h
+> +++ b/include/linux/kvmi.h
+> @@ -22,6 +22,8 @@ bool kvmi_queue_exception(struct kvm_vcpu *vcpu);
+>  void kvmi_trap_event(struct kvm_vcpu *vcpu);
+>  bool kvmi_descriptor_event(struct kvm_vcpu *vcpu, u8 descriptor, u8 write);
+>  void kvmi_handle_requests(struct kvm_vcpu *vcpu);
+> +void kvmi_stop_ss(struct kvm_vcpu *vcpu);
+> +bool kvmi_vcpu_enabled_ss(struct kvm_vcpu *vcpu);
+
+Spell out single step, and be consistent between single_step and singlestep.
+That applies to pretty much every variable and function unless doing so
+really makes the verbosity obnoxious.
+
+>  void kvmi_init_emulate(struct kvm_vcpu *vcpu);
+>  void kvmi_activate_rep_complete(struct kvm_vcpu *vcpu);
+>  bool kvmi_bp_intercepted(struct kvm_vcpu *vcpu, u32 dbg);
+> @@ -44,6 +46,8 @@ static inline void kvmi_handle_requests(struct kvm_vcpu *vcpu) { }
+>  static inline bool kvmi_hypercall_event(struct kvm_vcpu *vcpu) { return false; }
+>  static inline bool kvmi_queue_exception(struct kvm_vcpu *vcpu) { return true; }
+>  static inline void kvmi_trap_event(struct kvm_vcpu *vcpu) { }
+> +static inline void kvmi_stop_ss(struct kvm_vcpu *vcpu) { }
+> +static inline bool kvmi_vcpu_enabled_ss(struct kvm_vcpu *vcpu) { return false; }
+>  static inline void kvmi_init_emulate(struct kvm_vcpu *vcpu) { }
+>  static inline void kvmi_activate_rep_complete(struct kvm_vcpu *vcpu) { }
+>  static inline bool kvmi_bp_intercepted(struct kvm_vcpu *vcpu, u32 dbg)
+> diff --git a/virt/kvm/kvmi.c b/virt/kvm/kvmi.c
+> index d47a725a4045..a3a5af9080a9 100644
+> --- a/virt/kvm/kvmi.c
+> +++ b/virt/kvm/kvmi.c
+> @@ -1260,11 +1260,19 @@ void kvmi_run_jobs(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +static bool need_to_wait_for_ss(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
+> +	struct kvmi *ikvm = IKVM(vcpu->kvm);
+> +
+> +	return atomic_read(&ikvm->ss_active) && !ivcpu->ss_owner;
+> +}
+> +
+>  static bool need_to_wait(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
+>  
+> -	return ivcpu->reply_waiting;
+> +	return ivcpu->reply_waiting || need_to_wait_for_ss(vcpu);
+>  }
+>  
+>  static bool done_waiting(struct kvm_vcpu *vcpu)
+> @@ -1572,6 +1580,141 @@ int kvmi_cmd_pause_vcpu(struct kvm_vcpu *vcpu, bool wait)
+>  	return 0;
+>  }
+>  
+> +void kvmi_stop_ss(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct kvmi *ikvm;
+> +	int i;
+> +
+> +	ikvm = kvmi_get(kvm);
+> +	if (!ikvm)
+> +		return;
+> +
+> +	if (unlikely(!ivcpu->ss_owner)) {
+> +		kvmi_warn(ikvm, "%s\n", __func__);
+> +		goto out;
+> +	}
+> +
+> +	for (i = ikvm->ss_level; i--;)
+> +		kvmi_set_gfn_access(kvm,
+> +				    ikvm->ss_context[i].gfn,
+> +				    ikvm->ss_context[i].old_access,
+> +				    ikvm->ss_context[i].old_write_bitmap);
+> +
+> +	ikvm->ss_level = 0;
+> +
+> +	kvmi_arch_stop_single_step(vcpu);
+> +
+> +	atomic_set(&ikvm->ss_active, false);
+> +	/*
+> +	 * Make ss_active update visible
+> +	 * before resuming all the other vCPUs.
+> +	 */
+> +	smp_mb__after_atomic();
+> +	kvm_make_all_cpus_request(kvm, 0);
+> +
+> +	ivcpu->ss_owner = false;
+> +
+> +out:
+> +	kvmi_put(kvm);
+> +}
+> +EXPORT_SYMBOL(kvmi_stop_ss);
+> +
+> +static bool kvmi_acquire_ss(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
+> +	struct kvmi *ikvm = IKVM(vcpu->kvm);
+> +
+> +	if (ivcpu->ss_owner)
+> +		return true;
+> +
+> +	if (atomic_cmpxchg(&ikvm->ss_active, false, true) != false)
+> +		return false;
+> +
+> +	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_INTROSPECTION |
+> +						KVM_REQUEST_WAIT);
+> +
+> +	ivcpu->ss_owner = true;
+> +
+> +	return true;
+> +}
+> +
+> +static bool kvmi_run_ss(struct kvm_vcpu *vcpu, gpa_t gpa, u8 access)
+> +{
+> +	struct kvmi *ikvm = IKVM(vcpu->kvm);
+> +	u8 old_access, new_access;
+> +	u32 old_write_bitmap;
+> +	gfn_t gfn = gpa_to_gfn(gpa);
+> +	int err;
+> +
+> +	kvmi_arch_start_single_step(vcpu);
+> +
+> +	err = kvmi_get_gfn_access(ikvm, gfn, &old_access, &old_write_bitmap);
+> +	/* likely was removed from radix tree due to rwx */
+> +	if (err) {
+> +		kvmi_warn(ikvm, "%s: gfn 0x%llx not found in the radix tree\n",
+> +			  __func__, gfn);
+> +		return true;
+> +	}
+> +
+> +	if (ikvm->ss_level == SINGLE_STEP_MAX_DEPTH - 1) {
+> +		kvmi_err(ikvm, "single step limit reached\n");
+> +		return false;
+> +	}
+> +
+> +	ikvm->ss_context[ikvm->ss_level].gfn = gfn;
+> +	ikvm->ss_context[ikvm->ss_level].old_access = old_access;
+> +	ikvm->ss_context[ikvm->ss_level].old_write_bitmap = old_write_bitmap;
+> +	ikvm->ss_level++;
+> +
+> +	new_access = kvmi_arch_relax_page_access(old_access, access);
+> +
+> +	kvmi_set_gfn_access(vcpu->kvm, gfn, new_access, old_write_bitmap);
+> +
+> +	return true;
+> +}
+> +
+> +bool kvmi_start_ss(struct kvm_vcpu *vcpu, gpa_t gpa, u8 access)
+> +{
+> +	bool ret = false;
+> +
+> +	while (!kvmi_acquire_ss(vcpu)) {
+> +		int err = kvmi_run_jobs_and_wait(vcpu);
+> +
+> +		if (err) {
+> +			kvmi_err(IKVM(vcpu->kvm), "kvmi_acquire_ss() has failed\n");
+> +			goto out;
+> +		}
+> +	}
+> +
+> +	if (kvmi_run_ss(vcpu, gpa, access))
+> +		ret = true;
+> +	else
+> +		kvmi_stop_ss(vcpu);
+> +
+> +out:
+> +	return ret;
+> +}
+> +
+> +bool kvmi_vcpu_enabled_ss(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
+> +	struct kvmi *ikvm;
+> +	bool ret;
+> +
+> +	ikvm = kvmi_get(vcpu->kvm);
+> +	if (!ikvm)
+> +		return false;
+> +
+> +	ret = ivcpu->ss_owner;
+> +
+> +	kvmi_put(vcpu->kvm);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(kvmi_vcpu_enabled_ss);
+> +
+>  static void kvmi_job_abort(struct kvm_vcpu *vcpu, void *ctx)
+>  {
+>  	struct kvmi_vcpu *ivcpu = IVCPU(vcpu);
+> diff --git a/virt/kvm/kvmi_int.h b/virt/kvm/kvmi_int.h
+> index d7f9858d3e97..1550fe33ed48 100644
+> --- a/virt/kvm/kvmi_int.h
+> +++ b/virt/kvm/kvmi_int.h
+> @@ -126,6 +126,9 @@ struct kvmi_vcpu {
+>  		DECLARE_BITMAP(high, KVMI_NUM_MSR);
+>  	} msr_mask;
+>  
+> +	bool ss_owner;
+
+Why is single-stepping mutually exclusive across all vCPUs?  Does that
+always have to be the case?
+
+> +	bool ss_requested;
+> +
+>  	struct list_head job_list;
+>  	spinlock_t job_lock;
+>  
+> @@ -151,6 +154,15 @@ struct kvmi {
+>  	DECLARE_BITMAP(event_allow_mask, KVMI_NUM_EVENTS);
+>  	DECLARE_BITMAP(vm_ev_mask, KVMI_NUM_EVENTS);
+>  
+> +#define SINGLE_STEP_MAX_DEPTH 8
+> +	struct {
+> +		gfn_t gfn;
+> +		u8 old_access;
+> +		u32 old_write_bitmap;
+> +	} ss_context[SINGLE_STEP_MAX_DEPTH];
+> +	u8 ss_level;
+> +	atomic_t ss_active;
+
+Good opportunity for an unnamed struct, e.g.
+
+	struct {
+		struct single_step_context[...];
+		bool owner;
+		bool requested;
+		u8 level
+		atomic_t active;
+	} single_step;
+
+> +
+>  	struct {
+>  		bool initialized;
+>  		atomic_t enabled;
+> @@ -224,6 +236,7 @@ int kvmi_add_job(struct kvm_vcpu *vcpu,
+>  		 void *ctx, void (*free_fct)(void *ctx));
+>  void kvmi_handle_common_event_actions(struct kvm_vcpu *vcpu, u32 action,
+>  				      const char *str);
+> +bool kvmi_start_ss(struct kvm_vcpu *vcpu, gpa_t gpa, u8 access);
+>  
+>  /* arch */
+>  void kvmi_arch_update_page_tracking(struct kvm *kvm,
+> @@ -274,6 +287,9 @@ int kvmi_arch_cmd_inject_exception(struct kvm_vcpu *vcpu, u8 vector,
+>  				   u64 address);
+>  int kvmi_arch_cmd_control_cr(struct kvm_vcpu *vcpu,
+>  			     const struct kvmi_control_cr *req);
+> +void kvmi_arch_start_single_step(struct kvm_vcpu *vcpu);
+> +void kvmi_arch_stop_single_step(struct kvm_vcpu *vcpu);
+> +u8 kvmi_arch_relax_page_access(u8 old, u8 new);
+>  int kvmi_arch_cmd_control_msr(struct kvm_vcpu *vcpu,
+>  			      const struct kvmi_control_msr *req);
+>  int kvmi_arch_cmd_get_mtrr_type(struct kvm_vcpu *vcpu, u64 gpa, u8 *type);
