@@ -2,133 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 103FF8A8AB
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 22:52:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7AF98A8B4
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2019 22:56:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfHLUwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 16:52:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36940 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726707AbfHLUw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 16:52:29 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A1B9E3001C62;
-        Mon, 12 Aug 2019 20:52:29 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C4B980340;
-        Mon, 12 Aug 2019 20:52:29 +0000 (UTC)
-Date:   Mon, 12 Aug 2019 14:52:28 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Denis Efremov <efremov@linux.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 7/7] vfio_pci: Use PCI_STD_NUM_BARS in loops instead of
- PCI_STD_RESOURCE_END
-Message-ID: <20190812145228.0e194a3b@x1.home>
-In-Reply-To: <20190812200234.GE11785@google.com>
-References: <20190811150802.2418-1-efremov@linux.com>
-        <20190811150802.2418-8-efremov@linux.com>
-        <20190812200234.GE11785@google.com>
-Organization: Red Hat
+        id S1726980AbfHLU4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 16:56:07 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:40400 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726743AbfHLU4H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 16:56:07 -0400
+Received: by mail-ot1-f65.google.com with SMTP id c34so24239952otb.7
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2019 13:56:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yEhYtlqx3isPppAlKvPH5QInxYeigAvCLguvPFMHc8U=;
+        b=GvH5lrvIAAKcYun7yRC8SDdua3RI8viU0eBaf+6otOFBpCpzupg3pkPDPUEy/1xrXQ
+         OPqAc6S9iobVBwK5a/Afj+iPegbRa257wSViB6S2zob3GV+yqTaTUsRudTC6kOE/dP2d
+         rUAqbFjYxnpJHQ+HL/c//eTP1JQ8jj/+sZ8dLP1nGltc0R54UGZNetLNCQFvNYGvAgf6
+         QHdoH35fdNjFsTRPNUBHzAz5Wni8BNL0469msCrLu5GMx2oACcBLf2uNZwV/rlxujwWL
+         rQcOOp1gZC/2dYVqK2HspIzHHbarzQf1+k1VcCnoWLDbNO7Im/4ofxUWqlENdr6CIVpU
+         CXXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yEhYtlqx3isPppAlKvPH5QInxYeigAvCLguvPFMHc8U=;
+        b=g8cqVwP9sO4u9ZhS6DLEtdxZKLKjcvtmROl0evY8sIwKa1PRcoHOTlMtuXbl7h5Wan
+         zgo9dpPpGJ2tccUn/NR9wXivNyHIRVccNSnR7ctZI2awrG89tzdpr59U3nFe/0tJBYlO
+         tFV71KndWhKJ5X8SvwDTypWQwryZ73hlNlZHW2Z8CJlj2mcd8DNuPNhinMs01B3oBZrw
+         NQQ6E73uHEi3GYmwwyK2gOptvQ63YtntD38BbFwHDpfG0sv3jbTlK+9SXot8VrBUvuNH
+         EgUHmcoM3/IbrHA3G+6Nohc6eM+QEZaGzq2hrT+cL+0IoHRZcf5JVwYwOMsCmwfIXneE
+         Lu7g==
+X-Gm-Message-State: APjAAAUkxvpG9vYVkytQAmkYhGx6RBKZ+Jv7yvaLRC8TzZUJiWgx8RqG
+        ADd+H9uhqMrClJeCbMrKEMeK3NQae9NYbcFRpUAc4g==
+X-Google-Smtp-Source: APXvYqxwVUDUJKPykTlJoJIAe7teD9eBcVqKjT6eveMf2e+O5c92wWdS07aWZ62aimqSth0qIbY0i9WcKyYJFxWO15s=
+X-Received: by 2002:a02:cb51:: with SMTP id k17mr4219145jap.4.1565643366183;
+ Mon, 12 Aug 2019 13:56:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Mon, 12 Aug 2019 20:52:29 +0000 (UTC)
+References: <20190808005255.106299-1-egranata@chromium.org> <20190810081540.GA30426@infradead.org>
+In-Reply-To: <20190810081540.GA30426@infradead.org>
+From:   Enrico Granata <egranata@google.com>
+Date:   Mon, 12 Aug 2019 13:55:55 -0700
+Message-ID: <CAPR809tiAhWqrNz0E5KrFtn-QrMTKv7vQtYq=_mrOH0VWfi0Eg@mail.gmail.com>
+Subject: Re: [PATCH] vhost: do not reference a file that does not exist
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Enrico Granata <egranata@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        trivial@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 12 Aug 2019 15:02:34 -0500
-Bjorn Helgaas <helgaas@kernel.org> wrote:
+Fair enough, yeah.
 
-> On Sun, Aug 11, 2019 at 06:08:04PM +0300, Denis Efremov wrote:
-> > This patch refactors the loop condition scheme from
-> > 'i <= PCI_STD_RESOURCE_END' to 'i < PCI_STD_NUM_BARS'.
-> > 
-> > Signed-off-by: Denis Efremov <efremov@linux.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci.c         | 4 ++--
-> >  drivers/vfio/pci/vfio_pci_config.c  | 2 +-
-> >  drivers/vfio/pci/vfio_pci_private.h | 4 ++--
-> >  3 files changed, 5 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > index 703948c9fbe1..13f5430e3f3c 100644
-> > --- a/drivers/vfio/pci/vfio_pci.c
-> > +++ b/drivers/vfio/pci/vfio_pci.c
-> > @@ -115,7 +115,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
-> >  
-> >  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
-> >  
-> > -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
-> > +	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
-> >  		res = vdev->pdev->resource + bar;  
-> 
-> PCI_STD_RESOURCES is indeed 0, but since the original went to the
-> trouble of avoiding that assumption, I would probably do this:
-> 
->         for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
->                 res = vdev->pdev->resource + bar + PCI_STD_RESOURCES;
-> 
-> or maybe even this:
-> 
->                 res = &vdev->pdev->resource[bar + PCI_STD_RESOURCES];
-> 
-> which is more common outside vfio.  But I wouldn't change to using the
-> &dev->resource[] form if other vfio code that you're *not* changing
-> uses the dev->resource + bar form.
+I think what I found confusing was that the file had a precise
+(directly actionable in a file browser, if you will) path. If it was
+just listed as a filename, or a project name, it might have been more
+obvious that one shouldn't expect to find it within the kernel tree
+and just go look it up in your favorite search engine.
 
-I don't think we have any other instances like that, so the latter form
-is fine with me if it's more broadly used.  I do spot one use of [bar]
-in drivers/vfio/pci/vfio_pci_rdwr.c that could also take on this form
-to void the same assumption though.  Thanks,
+The right incantation to get your hands on that file is a web search,
+not a local file navigation, and to my perception a full and seemingly
+valid path pointed in the direction of doing the wrong thing.
 
-Alex
+It's not a huge deal, obviously, and it may be that I was the only one
+confused by that. If so, feel free to disregard the patch.
 
-> >  		if (!IS_ENABLED(CONFIG_VFIO_PCI_MMAP))
-> > @@ -399,7 +399,7 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
-> >  
-> >  	vfio_config_free(vdev);
-> >  
-> > -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
-> > +	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
-> >  		if (!vdev->barmap[bar])
-> >  			continue;
-> >  		pci_iounmap(pdev, vdev->barmap[bar]);
-> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> > index f0891bd8444c..6035a2961160 100644
-> > --- a/drivers/vfio/pci/vfio_pci_config.c
-> > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> > @@ -455,7 +455,7 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
-> >  
-> >  	bar = (__le32 *)&vdev->vconfig[PCI_BASE_ADDRESS_0];
-> >  
-> > -	for (i = PCI_STD_RESOURCES; i <= PCI_STD_RESOURCE_END; i++, bar++) {
-> > +	for (i = 0; i < PCI_STD_NUM_BARS; i++, bar++) {
-> >  		if (!pci_resource_start(pdev, i)) {
-> >  			*bar = 0; /* Unmapped by host = unimplemented to user */
-> >  			continue;
-> > diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> > index ee6ee91718a4..8a2c7607d513 100644
-> > --- a/drivers/vfio/pci/vfio_pci_private.h
-> > +++ b/drivers/vfio/pci/vfio_pci_private.h
-> > @@ -86,8 +86,8 @@ struct vfio_pci_reflck {
-> >  
-> >  struct vfio_pci_device {
-> >  	struct pci_dev		*pdev;
-> > -	void __iomem		*barmap[PCI_STD_RESOURCE_END + 1];
-> > -	bool			bar_mmap_supported[PCI_STD_RESOURCE_END + 1];
-> > +	void __iomem		*barmap[PCI_STD_NUM_BARS];
-> > +	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
-> >  	u8			*pci_config_map;
-> >  	u8			*vconfig;
-> >  	struct perm_bits	*msi_perm;
-> > -- 
-> > 2.21.0
-> >   
+Thanks,
+- Enrico
 
+Thanks,
+- Enrico
+
+
+On Sat, Aug 10, 2019 at 1:15 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Wed, Aug 07, 2019 at 05:52:55PM -0700, egranata@chromium.org wrote:
+> > From: Enrico Granata <egranata@google.com>
+> >
+> > lguest was removed from the mainline kernel in late 2017.
+> >
+> > Signed-off-by: Enrico Granata <egranata@google.com>
+>
+> But this particular file even has an override in the script looking
+> for dead references, which together with the content of the overal
+> contents makes me thing the dangling reference is somewhat intentional.
