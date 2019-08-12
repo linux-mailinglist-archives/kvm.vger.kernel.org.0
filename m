@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E50BF8AA5D
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 00:24:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 652E68AA98
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 00:39:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726685AbfHLWYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Aug 2019 18:24:22 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:33867 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726296AbfHLWYV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Aug 2019 18:24:21 -0400
-Received: by mail-ot1-f68.google.com with SMTP id n5so165178522otk.1
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2019 15:24:21 -0700 (PDT)
+        id S1726488AbfHLWjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Aug 2019 18:39:23 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:36209 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727003AbfHLWjX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Aug 2019 18:39:23 -0400
+Received: by mail-ot1-f65.google.com with SMTP id k18so33103528otr.3
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2019 15:39:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=intel-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FD1szyxYIZRFxBXLh6OsEaGEchmLGdiUNjpQeITxC5M=;
-        b=x0gRCKA2MXc6jwpdoG/TD2IO5bNpn+KvoJBHqbuTFvYsphI9ZOW3AsLFTvGTGaBcYf
-         RXeEQjAS7obV+BaMTdZMP8wgP9cCdfivoRhOSSJlo1Z5CZcFaW9WRf5Nbz2vuEwz9BHO
-         CTPVnpm6p1Svao0hA1gPSbLM8aO2CgSELXaqp4B3NEVb2TYyFBGnZyWvtKuElCmEg9Y9
-         2684+SERAdl0y8BhILj5oAWGrfdVI2IqGuBac1Xq6S8MrelSVVIf8h5B+ZX8xtZ+Y4j8
-         0cIiaBzKvNv833gjthAES+x42kYGE7WEjgb+I7K5IyHz3cyOXJYFYRXUt4EGdLKdJPuu
-         QMeA==
+        bh=3aW5whQDJuBeImZ/vm/gZQhI4k4oQ8vroJ1EZoWTTJg=;
+        b=W5RPcjMy2nSOxlc4JEQN/FwtmfGeYjojp9ZODu4ApD4CFAxXskqe+/tMV9edw9LUdx
+         qnlUND2MQlVVlnOu7OGYLgJuZf4cj69zqu/4J89ENTbTDUFhgZrGN1dcouiEGSJDIKTv
+         o/JtrRgZ/xJIsXmeC3F8OwvGykjcnMREp0KRFnpgOCL6zagxsRbC5C54aynLQTRDUqYi
+         jhXMUGbVLruMjszhZFEpIvilTWNyNkBnr6HlHaN1RHkovoMhGAGAv6/rEmt5BZq726Yv
+         kL8Nyzc4obRWZMKrP5ghFcL3rhUa8D/iVtsx1IjYskP+I4BJK7OlaRrKsNReR5wsC6RW
+         hwaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FD1szyxYIZRFxBXLh6OsEaGEchmLGdiUNjpQeITxC5M=;
-        b=B4cJdwjDDAIFGTudfqE+StwHHjkTnwj7SBkFr4+b42WrF6D0nVXwYS3Rj9wcmUaCJw
-         OYSWb//36urpOpD/iotiglH0yP467DxFRvI0kA2UM9AcNrkjuPYx28F/GlfMDx6w4bAt
-         Ad2+cfiSR9Wdl5ZfYmgcQgAsfQ3Ed099inatT/xSmduxyA0oU4HwtsHzo/Z/kiRVOpRj
-         QZOBXA1kehhZaBLhtB0n8KglqJDBQmU00QpBwa0nQO9h1eWlCSimJlkNxWlm0FGX8PeQ
-         yc9vrSI1Zg0OKIwt4NwPrIxHt7bFNyZd5wA1WxDtShAyorAFeXptTkNVyiLp4pdiH/d/
-         TqSw==
-X-Gm-Message-State: APjAAAU8JuJo9DY+shBLvD8l9IzMg80cRpajGAWUG/obQagSdBOjKkkl
-        3fAMHefoiV0hhNw5lwjOb5e7wSXaWdfFMl9c5Sfwtw==
-X-Google-Smtp-Source: APXvYqyTjBOGgU/+dTdLpyuKWrW67Z3rfVh/4MI7eXiUUJ6wgK016/SnhTUKO42pQZXtyuBZxQKUvdSL/kBmh0RvuUc=
-X-Received: by 2002:aca:be43:: with SMTP id o64mr912541oif.149.1565648660956;
- Mon, 12 Aug 2019 15:24:20 -0700 (PDT)
+        bh=3aW5whQDJuBeImZ/vm/gZQhI4k4oQ8vroJ1EZoWTTJg=;
+        b=aNY8Y7SerKQ/jVJOmko/3hq9NNycnXFGDGtqTe1tiPbRopGA9suUpQUJ2UG77u0b5t
+         aU3RQF0BqluVIN4wx/NkhVAvZrI/wBVnugvWg5yuX/dHvLkBohvI7vWJrBkk3JjBNKaz
+         25Cd6AITaHDDuhtvePcKUvkIXFxmb0MFd91TxqlIthWwOAA0MbHCkVMPJwM2rdIN9v1/
+         QlSahHrth9W0ogmgGrwF9OynDoQFCSHO4glmtZjwv4/SfeATMQfedH3tFart2uTgJE1s
+         ldH8GEJYZdk0ou3jTpstT91U7czS1CLc2EE4mzuCbJ0zjToJ/2yCYwoMNUmqHhXRDwEI
+         wOBA==
+X-Gm-Message-State: APjAAAWOHUWoheBCAvv8amoMXrkdRdoTQvUskYzsJAjblVwzj4eQBVr+
+        OAOWmWgcmoaeZq+t7YHG1+7EZc/DA7fr+c5M67Pjiw==
+X-Google-Smtp-Source: APXvYqyZa9vrGETWKw/3K2ZNQJVHXbpz2NU1cLAvQDyLfoeTJYzgNcrQQuvBKjD9GBMcejKS62NxlzuqZX/kdrrVoDI=
+X-Received: by 2002:a9d:7248:: with SMTP id a8mr33233142otk.363.1565649562325;
+ Mon, 12 Aug 2019 15:39:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190812213158.22097.30576.stgit@localhost.localdomain> <20190812213324.22097.30886.stgit@localhost.localdomain>
-In-Reply-To: <20190812213324.22097.30886.stgit@localhost.localdomain>
+References: <20190812213158.22097.30576.stgit@localhost.localdomain> <20190812213337.22097.66780.stgit@localhost.localdomain>
+In-Reply-To: <20190812213337.22097.66780.stgit@localhost.localdomain>
 From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Mon, 12 Aug 2019 15:24:09 -0700
-Message-ID: <CAPcyv4jEvPL3qQffDsJxKxkCJLo19FN=gd4+LtZ1FnARCr5wBw@mail.gmail.com>
-Subject: Re: [PATCH v5 1/6] mm: Adjust shuffle code to allow for future coalescing
+Date:   Mon, 12 Aug 2019 15:39:11 -0700
+Message-ID: <CAPcyv4id6nUNHJxspAWjaLFSPyLM_2jSKAa5PDibqeQXP0yN5w@mail.gmail.com>
+Subject: Re: [PATCH v5 3/6] mm: Use zone and order instead of free area in
+ free_list manipulators
 To:     Alexander Duyck <alexander.duyck@gmail.com>
 Cc:     nitesh@redhat.com, KVM list <kvm@vger.kernel.org>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -77,69 +78,17 @@ On Mon, Aug 12, 2019 at 2:33 PM Alexander Duyck
 >
 > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 >
-> This patch is meant to move the head/tail adding logic out of the shuffle
-
-s/This patch is meant to move/Move/
-
-> code and into the __free_one_page function since ultimately that is where
-> it is really needed anyway. By doing this we should be able to reduce the
-> overhead
-
-Is the overhead benefit observable? I would expect the overhead of
-get_random_u64() dominates.
-
-> and can consolidate all of the list addition bits in one spot.
-
-This sounds the better argument.
-
-[..]
-> diff --git a/mm/shuffle.h b/mm/shuffle.h
-> index 777a257a0d2f..add763cc0995 100644
-> --- a/mm/shuffle.h
-> +++ b/mm/shuffle.h
-> @@ -3,6 +3,7 @@
->  #ifndef _MM_SHUFFLE_H
->  #define _MM_SHUFFLE_H
->  #include <linux/jump_label.h>
-> +#include <linux/random.h>
+> In order to enable the use of the zone from the list manipulator functions
+> I will need access to the zone pointer. As it turns out most of the
+> accessors were always just being directly passed &zone->free_area[order]
+> anyway so it would make sense to just fold that into the function itself
+> and pass the zone and order as arguments instead of the free area.
 >
->  /*
->   * SHUFFLE_ENABLE is called from the command line enabling path, or by
-> @@ -43,6 +44,32 @@ static inline bool is_shuffle_order(int order)
->                 return false;
->         return order >= SHUFFLE_ORDER;
->  }
-> +
-> +static inline bool shuffle_add_to_tail(void)
-> +{
-> +       static u64 rand;
-> +       static u8 rand_bits;
-> +       u64 rand_old;
-> +
-> +       /*
-> +        * The lack of locking is deliberate. If 2 threads race to
-> +        * update the rand state it just adds to the entropy.
-> +        */
-> +       if (rand_bits-- == 0) {
-> +               rand_bits = 64;
-> +               rand = get_random_u64();
-> +       }
-> +
-> +       /*
-> +        * Test highest order bit while shifting our random value. This
-> +        * should result in us testing for the carry flag following the
-> +        * shift.
-> +        */
-> +       rand_old = rand;
-> +       rand <<= 1;
-> +
-> +       return rand < rand_old;
-> +}
+> In order to be able to reference the zone we need to move the declaration
+> of the functions down so that we have the zone defined before we define the
+> list manipulation functions.
 
-This function seems too involved to be a static inline and I believe
-each compilation unit that might call this routine gets it's own copy
-of 'rand' and 'rand_bits' when the original expectation is that they
-are global. How about leave this bit to mm/shuffle.c and rename it
-coin_flip(), or something more generic, since it does not
-'add_to_tail'? The 'add_to_tail' action is something the caller
-decides.
+Independent of the code movement for the zone declaration this looks
+like a nice cleanup of the calling convention.
+
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
