@@ -2,122 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ECD178B81E
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 14:09:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F3968B8A0
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 14:35:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727763AbfHMMJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 08:09:55 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53034 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727391AbfHMMJz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 08:09:55 -0400
-Received: by mail-wm1-f68.google.com with SMTP id o4so1143053wmh.2
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 05:09:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gDECUkDx4MmZTU2TRfkEx9c0GNMHS7ThvPK76SizlZs=;
-        b=sXgHahlV/EZQIoqcH4qjNwV+3KNwlhjmlefugAGZ9Wm6J4WlrgnhUdwPPQsDUnqFp2
-         jFZHPlJpe4RJxtAAvd90p2QMIaaUnDVAWtVqnyhxGT7rv2rI9GA+AnY2he2euzT7HoMK
-         xQHA62eaxPFwY5T7IIkHtqvCfO2SS23qul9yTDX02ttM6vmJP7C5TIed70aPIc/vRRdJ
-         Yr7Fk6OqByR6jpUuF3vFLrnLkr/IQnYA0nd7vprWSOGifEl1p2i0YzsycVhSS1WVstDA
-         5d2Cnz5W9O8YEZTZDCz06jZNiW6v5m0T2VIoaxAwzdMG2lyaSJBomCgLmLwxxue5/Gj1
-         aomQ==
-X-Gm-Message-State: APjAAAVyYQZ2fqqE+v3CLQGpeFHh28OzJyegOy99US1qjnpjp2P7pQLU
-        gkUOew7VvSehp8a736scu5DZqQ==
-X-Google-Smtp-Source: APXvYqzB612TQbc7of6OKwGZTQDBF2YBSrRWlPNUTz0Jo1N+YWu/anTDovRV4uYtYUMMFIBRr0LWzQ==
-X-Received: by 2002:a1c:c00e:: with SMTP id q14mr2852175wmf.142.1565698193218;
-        Tue, 13 Aug 2019 05:09:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5193:b12b:f4df:deb6? ([2001:b07:6468:f312:5193:b12b:f4df:deb6])
-        by smtp.gmail.com with ESMTPSA id g26sm1123736wmh.32.2019.08.13.05.09.51
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Aug 2019 05:09:52 -0700 (PDT)
-Subject: Re: [RFC PATCH v6 01/92] kvm: introduce KVMI (VM introspection
- subsystem)
-To:     =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
-        virtualization@lists.linux-foundation.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        =?UTF-8?Q?Samuel_Laur=c3=a9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>, Zhang@vger.kernel.org,
-        Yu C <yu.c.zhang@intel.com>,
-        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?Q?Mircea_C=c3=aerjaliu?= <mcirjaliu@bitdefender.com>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-2-alazar@bitdefender.com>
- <20190812202030.GB1437@linux.intel.com>
- <5d52a5ae.1c69fb81.5c260.1573SMTPIN_ADDED_BROKEN@mx.google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <5fa6bd89-9d02-22cd-24a8-479abaa4f788@redhat.com>
-Date:   Tue, 13 Aug 2019 14:09:51 +0200
+        id S1727738AbfHMMfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 08:35:09 -0400
+Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:40605 "EHLO
+        8.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726975AbfHMMfJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 08:35:09 -0400
+X-Greylist: delayed 602 seconds by postgrey-1.27 at vger.kernel.org; Tue, 13 Aug 2019 08:35:07 EDT
+Received: from player728.ha.ovh.net (unknown [10.109.159.222])
+        by mo179.mail-out.ovh.net (Postfix) with ESMTP id 5C29A13E876
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 14:18:41 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+        (Authenticated sender: clg@kaod.org)
+        by player728.ha.ovh.net (Postfix) with ESMTPSA id 5823B8BF0F57;
+        Tue, 13 Aug 2019 12:18:35 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] KVM: PPC: Book3S HV: Don't push XIVE context when
+ not using XIVE device
+To:     Paul Mackerras <paulus@ozlabs.org>, linuxppc-dev@ozlabs.org,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+References: <20190813095845.GA9567@blackberry>
+ <20190813100100.GC9567@blackberry>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d8435ea8-cfa5-9a3b-b081-b5541b6052b3@kaod.org>
+Date:   Tue, 13 Aug 2019 14:18:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <5d52a5ae.1c69fb81.5c260.1573SMTPIN_ADDED_BROKEN@mx.google.com>
+In-Reply-To: <20190813100100.GC9567@blackberry>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 12295108461400460262
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddviedggeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/08/19 13:57, Adalbert Lazăr wrote:
->> The refcounting approach seems a bit backwards, and AFAICT is driven by
->> implementing unhook via a message, which also seems backwards.  I assume
->> hook and unhook are relatively rare events and not performance critical,
->> so make those the restricted/slow flows, e.g. force userspace to quiesce
->> the VM by making unhook() mutually exclusive with every vcpu ioctl() and
->> maybe anything that takes kvm->lock. 
->>
->> Then kvmi_ioctl_unhook() can use thread_stop() and kvmi_recv() just needs
->> to check kthread_should_stop().
->>
->> That way kvmi doesn't need to be refcounted since it's guaranteed to be
->> alive if the pointer is non-null.  Eliminating the refcounting will clean
->> up a lot of the code by eliminating calls to kvmi_{get,put}(), e.g.
->> wrappers like kvmi_breakpoint_event() just check vcpu->kvmi, or maybe
->> even get dropped altogether.
+On 13/08/2019 12:01, Paul Mackerras wrote:
+> At present, when running a guest on POWER9 using HV KVM but not using
+> an in-kernel interrupt controller (XICS or XIVE), for example if QEMU
+> is run with the kernel_irqchip=off option, the guest entry code goes
+> ahead and tries to load the guest context into the XIVE hardware, even
+> though no context has been set up.
 > 
-> The unhook event has been added to cover the following case: while the
-> introspection tool runs in another VM, both VMs, the virtual appliance
-> and the introspected VM, could be paused by the user. We needed a way
-> to signal this to the introspection tool and give it time to unhook
-> (the introspected VM has to run and execute the introspection commands
-> during this phase). The receiving threads quits when the socket is closed
-> (by QEMU or by the introspection tool).
+> To fix this, we check that the "CAM word" is non-zero before pushing
+> it to the hardware.  The CAM word is initialized to a non-zero value
+> in kvmppc_xive_connect_vcpu() and kvmppc_xive_native_connect_vcpu(),
+> and is now cleared in kvmppc_xive_{,native_}cleanup_vcpu.
+
+If a "CAM word" is defined, it means the vCPU (VP) was enabled at the
+XIVE HW level. So this is the criteria to consider that a vCPU needs
+to update (push) its XIVE thread interrupt context when scheduled
+to run.
+
+
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
 > 
-> It's a bit unclear how, but we'll try to get ride of the refcount object,
-> which will remove a lot of code, indeed.
-
-You can keep it for now.  It may become clearer how to fix it after the
-event loop is cleaned up.
-
->>
->>> +void kvmi_create_vm(struct kvm *kvm)
->>> +{
->>> +	init_completion(&kvm->kvmi_completed);
->>> +	complete(&kvm->kvmi_completed);
->> Pretty sure you don't want to be calling complete() here.
-> The intention was to stop the hooking ioctl until the VM is
-> created. A better name for 'kvmi_completed' would have been
-> 'ready_to_be_introspected', as kvmi_hook() will wait for it.
+> Cc: stable@vger.kernel.org # v4.11+
+> Reported-by: Cédric Le Goater <clg@kaod.org>
+> Fixes: 5af50993850a ("KVM: PPC: Book3S HV: Native usage of the XIVE interrupt controller")
+> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+> ---
+>  arch/powerpc/kvm/book3s_hv_rmhandlers.S |  2 ++
+>  arch/powerpc/kvm/book3s_xive.c          | 11 ++++++++++-
+>  arch/powerpc/kvm/book3s_xive_native.c   |  3 +++
+>  3 files changed, 15 insertions(+), 1 deletion(-)
 > 
-> We'll see how we can get ride of the completion object.
+> diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> index 2e7e788..07181d0 100644
+> --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
+> @@ -942,6 +942,8 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_ARCH_300)
+>  	ld	r11, VCPU_XIVE_SAVED_STATE(r4)
+>  	li	r9, TM_QW1_OS
+>  	lwz	r8, VCPU_XIVE_CAM_WORD(r4)
+> +	cmpwi	r8, 0
+> +	beq	no_xive
+>  	li	r7, TM_QW1_OS + TM_WORD2
+>  	mfmsr	r0
+>  	andi.	r0, r0, MSR_DR		/* in real mode? */
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index 09f838a..586867e 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -67,8 +67,14 @@ void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu)
+>  	void __iomem *tima = local_paca->kvm_hstate.xive_tima_virt;
+>  	u64 pq;
+>  
+> -	if (!tima)
+> +	/*
+> +	 * Nothing to do if the platform doesn't have a XIVE
+> +	 * or this vCPU doesn't have its own XIVE context
+> +	 * (e.g. because it's not using an in-kernel interrupt controller).
+> +	 */
+> +	if (!tima || !vcpu->arch.xive_cam_word)
+>  		return;
+> +
+>  	eieio();
+>  	__raw_writeq(vcpu->arch.xive_saved_state.w01, tima + TM_QW1_OS);
+>  	__raw_writel(vcpu->arch.xive_cam_word, tima + TM_QW1_OS + TM_WORD2);
+> @@ -1146,6 +1152,9 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
+>  	/* Disable the VP */
+>  	xive_native_disable_vp(xc->vp_id);
+>  
+> +	/* Clear the cam word so guest entry won't try to push context */
+> +	vcpu->arch.xive_cam_word = 0;
+> +
+>  	/* Free the queues */
+>  	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
+>  		struct xive_q *q = &xc->queues[i];
+> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+> index 368427f..11b91b4 100644
+> --- a/arch/powerpc/kvm/book3s_xive_native.c
+> +++ b/arch/powerpc/kvm/book3s_xive_native.c
+> @@ -81,6 +81,9 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
+>  	/* Disable the VP */
+>  	xive_native_disable_vp(xc->vp_id);
+>  
+> +	/* Clear the cam word so guest entry won't try to push context */
+> +	vcpu->arch.xive_cam_word = 0;
+> +
+>  	/* Free the queues */
+>  	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
+>  		kvmppc_xive_native_cleanup_queue(vcpu, i);
+> 
 
-The ioctls are not accessible while kvm_create_vm runs (only after
-kvm_dev_ioctl_create_vm calls fd_install).  Even if it were, however,
-you should have placed init_completion much earlier, otherwise
-wait_for_completion would access uninitialized memory.
-
-Paolo
