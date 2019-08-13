@@ -2,126 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F1D88BB9A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 16:35:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 790148BB9B
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 16:35:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729439AbfHMOfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 10:35:02 -0400
-Received: from mga04.intel.com ([192.55.52.120]:28349 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729404AbfHMOfC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 10:35:02 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Aug 2019 07:35:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,381,1559545200"; 
-   d="scan'208";a="170413157"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga008.jf.intel.com with ESMTP; 13 Aug 2019 07:35:01 -0700
-Date:   Tue, 13 Aug 2019 07:35:01 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Nikita Leshenko <nikita.leshchenko@oracle.com>
-Cc:     kvm@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH] KVM: nVMX: Check that HLT activity state is supported
-Message-ID: <20190813143501.GA13991@linux.intel.com>
-References: <20190813131303.137684-1-nikita.leshchenko@oracle.com>
+        id S1729484AbfHMOfc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 10:35:32 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51302 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726637AbfHMOfc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 10:35:32 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 207so1749538wma.1
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 07:35:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Lqxf8Z0rQTySZp3AWUTugOPDEfv/sn0v4AQtN6QyRsc=;
+        b=gZeDqqhaxagWjfx8Z/UGAbjUTVNDYNPzFQhz2Lmm4z01tC42B0U1LWD4b8aG0j8jCD
+         FT/TwMh5uWm7O/yQLIAvme/u0a94NPkkjfZGIwgeqXytj5El1U55mJh7aniBL0XFOsFH
+         IH4xVLJuQpZmmZsniLV6opmDgV99I3BYbiw1m1ASdWkqaskowwGT7ytZNQIU09h2QZ0k
+         Ei6n9tTpvqWO4EWREn6rYhQdSyh5th2rizlE2GzXXDoiZwuWEIQoeRfniPaQpbcspskn
+         kh80qDnI9VfRzWMJS0iYF/rQBq3QmWWkAj2eW2lMmoOi5pChTcUmod8wX3ZD/IE1JfFt
+         Mxqw==
+X-Gm-Message-State: APjAAAUZIzHdkovh/NiBXFrL7oo0PaiZLqkE96eAL6ML/AbFjNGLKSne
+        vBO4mmAN3crEoDjS3yTExWgE2g==
+X-Google-Smtp-Source: APXvYqyMYCBhf8rY/MB9/wMH1QCr9Vu6nKQhVNm4wEsOIwP/ZmvzsrgT8mr1A8+NWxaviFXBe7iSWQ==
+X-Received: by 2002:a1c:f618:: with SMTP id w24mr3674803wmc.112.1565706930235;
+        Tue, 13 Aug 2019 07:35:30 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id r190sm3362812wmf.0.2019.08.13.07.35.29
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 13 Aug 2019 07:35:29 -0700 (PDT)
+Subject: Re: [RFC PATCH v6 75/92] kvm: x86: disable gpa_available optimization
+ in emulator_read_write_onepage()
+To:     =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        =?UTF-8?Q?Samuel_Laur=c3=a9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C Zhang <yu.c.zhang@intel.com>,
+        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
+References: <20190809160047.8319-1-alazar@bitdefender.com>
+ <20190809160047.8319-76-alazar@bitdefender.com>
+ <eb748e05-8289-0c05-6907-b6c898f6080b@redhat.com>
+ <5d52ca22.1c69fb81.4ceb8.e90bSMTPIN_ADDED_BROKEN@mx.google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5b6f78ca-a5c5-80c4-05af-cbf7fabb96b3@redhat.com>
+Date:   Tue, 13 Aug 2019 16:35:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190813131303.137684-1-nikita.leshchenko@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <5d52ca22.1c69fb81.4ceb8.e90bSMTPIN_ADDED_BROKEN@mx.google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 04:13:03PM +0300, Nikita Leshenko wrote:
-> Fail VM entry if GUEST_ACTIVITY_HLT is unsupported. According to "SDM A.6 -
-> Miscellaneous Data", VM entry should fail if the HLT activity is not marked as
-> supported on IA32_VMX_MISC MSR.
+On 13/08/19 16:33, Adalbert Lazăr wrote:
+> On Tue, 13 Aug 2019 10:47:34 +0200, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 09/08/19 18:00, Adalbert Lazăr wrote:
+>>> If the EPT violation was caused by an execute restriction imposed by the
+>>> introspection tool, gpa_available will point to the instruction pointer,
+>>> not the to the read/write location that has to be used to emulate the
+>>> current instruction.
+>>>
+>>> This optimization should be disabled only when the VM is introspected,
+>>> not just because the introspection subsystem is present.
+>>>
+>>> Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
+>>
+>> The right thing to do is to not set gpa_available for fetch failures in 
+>> kvm_mmu_page_fault instead:
+>>
+>> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+>> index 24843cf49579..1bdca40fa831 100644
+>> --- a/arch/x86/kvm/mmu.c
+>> +++ b/arch/x86/kvm/mmu.c
+>> @@ -5364,8 +5364,12 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u64 error_code,
+>>  	enum emulation_result er;
+>>  	bool direct = vcpu->arch.mmu->direct_map;
+>>  
+>> -	/* With shadow page tables, fault_address contains a GVA or nGPA.  */
+>> -	if (vcpu->arch.mmu->direct_map) {
+>> +	/*
+>> +	 * With shadow page tables, fault_address contains a GVA or nGPA.
+>> +	 * On a fetch fault, fault_address contains the instruction pointer.
+>> +	 */
+>> +	if (vcpu->arch.mmu->direct_map &&
+>> +	    likely(!(error_code & PFERR_FETCH_MASK)) {
+>>  		vcpu->arch.gpa_available = true;
+>>  		vcpu->arch.gpa_val = cr2;
+>>  	}
+>
+> Sure, but I think we'll have to extend the check.
 > 
-> Usermode might disable GUEST_ACTIVITY_HLT support in the vCPU with
-> vmx_restore_vmx_misc(). Before this commit VM entries would have succeeded
-> anyway.
-
-Is there a use case for disabling GUEST_ACTIVITY_HLT?  Or can we simply
-disallow writes to IA32_VMX_MISC that disable GUEST_ACTIVITY_HLT?
-
-To disable GUEST_ACTIVITY_HLT, userspace also has to make
-CPU_BASED_HLT_EXITING a "must be 1" control, otherwise KVM will be
-presenting a bogus model to L1.
-
-The bad model is visible to L1 if CPU_BASED_HLT_EXITING is set by L0,
-i.e. KVM is running without kvm_hlt_in_guest(), and cleared by L1.  In
-that case, a HLT from L2 will be handled in L0.  L0 will set the state to
-KVM_MP_STATE_HALTED and report to L1 (on a nested VM-Exit, e.g. INTR),
-that the activity state is GUEST_ACTIVITY_HLT, which from L1's perspective
-doesn't exist.
-
-> Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 16 ++++++++++++----
->  arch/x86/kvm/vmx/nested.h |  5 +++++
->  2 files changed, 17 insertions(+), 4 deletions(-)
+> Searching the logs I've found:
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 46af3a5e9209..3165e2f7992f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2656,11 +2656,19 @@ static int nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
->  /*
->   * Checks related to Guest Non-register State
->   */
-> -static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
-> +static int nested_check_guest_non_reg_state(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  {
-> -	if (vmcs12->guest_activity_state != GUEST_ACTIVITY_ACTIVE &&
-> -	    vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT)
-> +	switch (vmcs12->guest_activity_state) {
-> +	case GUEST_ACTIVITY_ACTIVE:
-> +		/* Always supported */
-> +		break;
-> +	case GUEST_ACTIVITY_HLT:
-> +		if (!nested_cpu_has_activity_state_hlt(vcpu))
-> +			return -EINVAL;
-> +		break;
-> +	default:
->  		return -EINVAL;
-> +	}
->  
->  	return 0;
->  }
-> @@ -2710,7 +2718,7 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
->  	     (vmcs12->guest_bndcfgs & MSR_IA32_BNDCFGS_RSVD)))
->  		return -EINVAL;
->  
-> -	if (nested_check_guest_non_reg_state(vmcs12))
-> +	if (nested_check_guest_non_reg_state(vcpu, vmcs12))
->  		return -EINVAL;
->  
->  	return 0;
-> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-> index e847ff1019a2..4a294d3ff820 100644
-> --- a/arch/x86/kvm/vmx/nested.h
-> +++ b/arch/x86/kvm/vmx/nested.h
-> @@ -123,6 +123,11 @@ static inline bool nested_cpu_has_zero_length_injection(struct kvm_vcpu *vcpu)
->  	return to_vmx(vcpu)->nested.msrs.misc_low & VMX_MISC_ZERO_LEN_INS;
->  }
->  
-> +static inline bool nested_cpu_has_activity_state_hlt(struct kvm_vcpu *vcpu)
-> +{
-> +	return to_vmx(vcpu)->nested.msrs.misc_low & VMX_MISC_ACTIVITY_HLT;
-> +}
-> +
->  static inline bool nested_cpu_supports_monitor_trap_flag(struct kvm_vcpu *vcpu)
->  {
->  	return to_vmx(vcpu)->nested.msrs.procbased_ctls_high &
-> -- 
-> 2.20.1
+>     kvm/x86: re-translate broken translation that caused EPT violation
+>     
+>     Signed-off-by: Mircea Cirjaliu <mcirjaliu@bitdefender.com>
 > 
+>  arch/x86/kvm/x86.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> /home/b/kvmi@9cad844~1/arch/x86/kvm/x86.c:4757,4762 - /home/b/kvmi@9cad844/arch/x86/kvm/x86.c:4757,4763
+>   	 */
+>   	if (vcpu->arch.gpa_available &&
+>   	    emulator_can_use_gpa(ctxt) &&
+> + 	    (vcpu->arch.error_code & PFERR_GUEST_FINAL_MASK) &&
+>   	    (addr & ~PAGE_MASK) == (vcpu->arch.gpa_val & ~PAGE_MASK)) {
+>   		gpa = vcpu->arch.gpa_val;
+>   		ret = vcpu_is_mmio_gpa(vcpu, addr, gpa, write);
+> 
+
+Yes, adding that check makes sense as well (still in kvm_mmu_page_fault).
+
+Paolo
