@@ -2,193 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A34DA8AF2C
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 08:05:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF6A98AF8A
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 08:13:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727269AbfHMGFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 02:05:15 -0400
-Received: from mga01.intel.com ([192.55.52.88]:23032 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725842AbfHMGFP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 02:05:15 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 23:05:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,380,1559545200"; 
-   d="scan'208";a="178575624"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by orsmga003.jf.intel.com with ESMTP; 12 Aug 2019 23:05:12 -0700
-Date:   Tue, 13 Aug 2019 14:06:55 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com, mst@redhat.com,
-        rkrcmar@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v6 7/8] KVM: x86: Load Guest fpu state when accessing
- MSRs managed by XSAVES
-Message-ID: <20190813060655.GE2432@local-michael-cet-test>
-References: <20190725031246.8296-1-weijiang.yang@intel.com>
- <20190725031246.8296-8-weijiang.yang@intel.com>
- <20190812230203.GC4996@linux.intel.com>
- <20190812232921.GE4996@linux.intel.com>
+        id S1727791AbfHMGMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 02:12:05 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4237 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727772AbfHMGME (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 02:12:04 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id D5DD77C092C7A2CF99D1;
+        Tue, 13 Aug 2019 14:11:58 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 13 Aug 2019
+ 14:11:52 +0800
+Subject: Re: [PATCH 9/9] arm64: Retrieve stolen time as paravirtualized guest
+To:     Steven Price <steven.price@arm.com>
+CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        <linux-doc@vger.kernel.org>, Russell King <linux@armlinux.org.uk>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, <kvmarm@lists.cs.columbia.edu>
+References: <20190802145017.42543-1-steven.price@arm.com>
+ <20190802145017.42543-10-steven.price@arm.com>
+ <5d763c8e-9c06-c448-2644-25bfa0e57e8c@huawei.com>
+ <07075994-3a32-8f20-23d8-1759ec2874e3@arm.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <42698e3c-c382-8621-7d9e-af09398f4aef@huawei.com>
+Date:   Tue, 13 Aug 2019 14:06:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190812232921.GE4996@linux.intel.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <07075994-3a32-8f20-23d8-1759ec2874e3@arm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 04:29:21PM -0700, Sean Christopherson wrote:
-> On Mon, Aug 12, 2019 at 04:02:03PM -0700, Sean Christopherson wrote:
-> > On Thu, Jul 25, 2019 at 11:12:45AM +0800, Yang Weijiang wrote:
-> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > 
-> > > A handful of CET MSRs are not context switched through "traditional"
-> > > methods, e.g. VMCS or manual switching, but rather are passed through
-> > > to the guest and are saved and restored by XSAVES/XRSTORS, i.e. the
-> > > guest's FPU state.
-> > > 
-> > > Load the guest's FPU state if userspace is accessing MSRs whose values
-> > > are managed by XSAVES so that the MSR helper, e.g. vmx_{get,set}_msr(),
-> > > can simply do {RD,WR}MSR to access the guest's value.
-> > > 
-> > > Note that guest_cpuid_has() is not queried as host userspace is allowed
-> > > to access MSRs that have not been exposed to the guest, e.g. it might do
-> > > KVM_SET_MSRS prior to KVM_SET_CPUID2.
-> > > 
-> > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > ---
-> > >  arch/x86/kvm/x86.c | 29 ++++++++++++++++++++++++++++-
-> > >  1 file changed, 28 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index fafd81d2c9ea..c657e6a56527 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -102,6 +102,8 @@ static void enter_smm(struct kvm_vcpu *vcpu);
-> > >  static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
-> > >  static void store_regs(struct kvm_vcpu *vcpu);
-> > >  static int sync_regs(struct kvm_vcpu *vcpu);
-> > > +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
-> > > +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
-> > >  
-> > >  struct kvm_x86_ops *kvm_x86_ops __read_mostly;
-> > >  EXPORT_SYMBOL_GPL(kvm_x86_ops);
-> > > @@ -2959,6 +2961,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(kvm_get_msr_common);
-> > >  
-> > > +static bool is_xsaves_msr(u32 index)
-> > > +{
-> > > +	return index == MSR_IA32_U_CET ||
-> > > +	       (index >= MSR_IA32_PL0_SSP && index <= MSR_IA32_PL3_SSP);
-> > > +}
-> > > +
-> > >  /*
-> > >   * Read or write a bunch of msrs. All parameters are kernel addresses.
-> > >   *
-> > > @@ -2969,11 +2977,30 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
-> > >  		    int (*do_msr)(struct kvm_vcpu *vcpu,
-> > >  				  unsigned index, u64 *data))
-> > >  {
-> > > +	bool fpu_loaded = false;
-> > >  	int i;
-> > > +	u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
-> > 
-> > Dunno if the compiler will actually generate different code, but this can be a
-> > const.
-> > 
-> > > +	u64 host_xss = 0;
-> > > +
-> > > +	for (i = 0; i < msrs->nmsrs; ++i) {
-> > > +		if (!fpu_loaded && is_xsaves_msr(entries[i].index)) {
-> > > +			if (!kvm_x86_ops->xsaves_supported() ||
-> > > +			    !kvm_x86_ops->supported_xss())
-> > 
-> > The "!kvm_x86_ops->supported_xss()" is redundant with the host_xss check
-> > below.
-> > 
-> > > +				continue;
-> > 
-> > Hmm, vmx_set_msr() should be checking host_xss, arguably we should call
-> > do_msr() and let it handle the bad MSR access.  I don't have a strong
-> > opinion either way, practically speaking the end result will be the same.
-> > 
-> > If we do want to handle a misbehaving userspace here, this should be
-> > 'break' instead of 'continue'.
-> > 
-> > > +
-> > > +			host_xss = kvm_x86_ops->supported_xss();
-> > >  
-> > > -	for (i = 0; i < msrs->nmsrs; ++i)
-> > > +			if ((host_xss & cet_bits) != cet_bits)
-> > 
-> > I'm pretty sure this should check for either CET bit being set, not both,
-> > e.g. I assume it's possible to enable and expose XFEATURE_MASK_CET_USER
-> > but not XFEATURE_MASK_CET_KERNEL.
-> > 
-> > So something like
-> > 
-> > 	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
-> > 	const bool cet_supported = kvm_x86_ops->xsaves_supported() &&
-> > 				   (kvm_x86_ops->supported_xss() & cet_bits);
-> > 
-> > 	for (i = 0; i < msrs->nmsrs; ++i) {
-> > 		if (!fpu_loaded && cet_supported &&
-> > 		    is_xsaves_msr(entries[i].index)) {
-> > 			kvm_load_guest_fpu(vcpu);
-> > 			fpu_loaded = true;
-> > 		}
-> > 		if (do_msr(vcpu, entries[i].index, &entries[i].data))
-> > 			break;	
-> > 	}
+On 2019/8/12 18:39, Steven Price wrote:
+> On 09/08/2019 14:51, Zenghui Yu wrote:
+> [...]
+>> Hi Steven,
+>>
+>> Since userspace is not involved yet (right?), no one will create the
+>> PV_TIME device for guest (and no one will specify the IPA of the shared
+>> stolen time region), and I guess we will get a "not supported" error
+>> here.
+>>
+>> So what should we do if we want to test this series now?  Any userspace
+>> tools?  If no, do you have any plans for userspace developing? ;-)
 > 
-> After looking at patch 8/8, and assuming KVM can actually virtualize
-> USER and KERNEL independently, we should go with this version that defers
-> to do_msr(), otherwise this code would also need to differentiate between
-> USER and KERNEL MSRs.  In other words, have __msr_io() load the guest fpu
-> if CET is support and any CET MSRs is being accessed, and let vmx_set_msr()
-> do the fine grained fault/error handling.
->
-Sure, will follow that.
-> > or
-> > 
-> > 	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
-> > 
-> > 	for (i = 0; i < msrs->nmsrs; ++i) {
-> > 		if (!fpu_loaded && is_xsaves_msr(entries[i].index)) {
-> > 			if (!kvm_x86_ops->supported_xss() ||
-> > 			    !(kvm_x86_ops->supported_xss() & cet_bits))
-> > 				break;
-> > 			kvm_load_guest_fpu(vcpu);
-> > 			fpu_loaded = true;
-> > 		}
-> > 		if (do_msr(vcpu, entries[i].index, &entries[i].data))
-> > 			break;	
-> > 	}
-> > 
-> > 
-> > > +				continue;
-> > > +
-> > > +			kvm_load_guest_fpu(vcpu);
-> > > +			fpu_loaded = true;
-> > > +		}
-> > >  		if (do_msr(vcpu, entries[i].index, &entries[i].data))
-> > >  			break;
-> > > +	}
-> > > +	if (fpu_loaded)
-> > > +		kvm_put_guest_fpu(vcpu);
-> > >  
-> > >  	return i;
-> > >  }
-> > > -- 
-> > > 2.17.2
-> > > 
+> At the moment I have the following patch to kvmtool which creates the
+> PV_TIME device - this isn't in a state to go upstream, and Marc has
+> asked that I rework the memory allocation, so this will need to change.
+> 
+> It's a little ugly as it simply reserves the first page of RAM to use
+> for the PV time structures.
+
+Thanks for sharing the code. It's good enough to show what is required
+in user-space.
+
+(I'm not familiar with kvmtool. I will first take some time to move the
+steal time part to Qemu and see what will happen.)
+
+
+Thanks,
+zenghui
+
+> ----8<----
+> diff --git a/Makefile b/Makefile
+> index 3862112..a79956b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -158,7 +158,7 @@ endif
+>   # ARM
+>   OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/gicv2m.o arm/ioport.o \
+>   			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
+> -			   arm/pmu.o
+> +			   arm/pmu.o arm/pvtime.o
+>   HDRS_ARM_COMMON		:= arm/include
+>   ifeq ($(ARCH), arm)
+>   	DEFINES		+= -DCONFIG_ARM
+> diff --git a/arm/fdt.c b/arm/fdt.c
+> index c80e6da..19eccbc 100644
+> --- a/arm/fdt.c
+> +++ b/arm/fdt.c
+> @@ -119,6 +119,7 @@ static int setup_fdt(struct kvm *kvm)
+>   
+>   	/* Create new tree without a reserve map */
+>   	_FDT(fdt_create(fdt, FDT_MAX_SIZE));
+> +	_FDT(fdt_add_reservemap_entry(fdt, kvm->arch.memory_guest_start, 4096));
+>   	_FDT(fdt_finish_reservemap(fdt));
+>   
+>   	/* Header */
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index 1f85fc6..8bbfef1 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -11,6 +11,8 @@
+>   #include <linux/kvm.h>
+>   #include <linux/sizes.h>
+>   
+> +int pvtime_create(struct kvm *kvm);
+> +
+>   struct kvm_ext kvm_req_ext[] = {
+>   	{ DEFINE_KVM_EXT(KVM_CAP_IRQCHIP) },
+>   	{ DEFINE_KVM_EXT(KVM_CAP_ONE_REG) },
+> @@ -86,6 +88,10 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+>   	/* Create the virtual GIC. */
+>   	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+>   		die("Failed to create virtual GIC");
+> +
+> +	/* Setup PV time */
+> +	if (pvtime_create(kvm))
+> +		die("Failed to initialise PV time");
+>   }
+>   
+>   #define FDT_ALIGN	SZ_2M
+> diff --git a/arm/pvtime.c b/arm/pvtime.c
+> new file mode 100644
+> index 0000000..abcaab3
+> --- /dev/null
+> +++ b/arm/pvtime.c
+> @@ -0,0 +1,77 @@
+> +#include "kvm/kvm.h"
+> +
+> +#define KVM_DEV_TYPE_ARM_PV_TIME (KVM_DEV_TYPE_ARM_VGIC_ITS+2)
+> +
+> +/* Device Control API: PV_TIME */
+> +#define KVM_DEV_ARM_PV_TIME_PADDR	0
+> +#define KVM_DEV_ARM_PV_TIME_FREQUENCY	3
+> +
+> +#define KVM_DEV_ARM_PV_TIME_ST		0
+> +#define KVM_DEV_ARM_PV_TIME_LPT		1
+> +
+> +static int pvtime_fd;
+> +
+> +int pvtime_create(struct kvm *kvm);
+> +
+> +int pvtime_create(struct kvm *kvm)
+> +{
+> +	int err;
+> +	u64 lpt_paddr = 0x10000000;
+> +	u64 st_paddr = lpt_paddr + 4096;
+> +	u32 frequency = 100 * 1000 * 1000;
+> +
+> +	printf("lpt_paddr=%llx\n", lpt_paddr);
+> +
+> +	struct kvm_create_device pvtime_device = {
+> +		.type = KVM_DEV_TYPE_ARM_PV_TIME,
+> +		.flags = 0,
+> +	};
+> +
+> +	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
+> +	if (err) {
+> +		printf("Failed to create PV device\n");
+> +		return 0;
+> +	}
+> +
+> +	pvtime_fd = pvtime_device.fd;
+> +
+> +	struct kvm_device_attr lpt_base = {
+> +		.group = KVM_DEV_ARM_PV_TIME_PADDR,
+> +		.attr = KVM_DEV_ARM_PV_TIME_LPT,
+> +		.addr = (u64)(unsigned long)&lpt_paddr
+> +	};
+> +	struct kvm_device_attr st_base = {
+> +		.group = KVM_DEV_ARM_PV_TIME_PADDR,
+> +		.attr = KVM_DEV_ARM_PV_TIME_ST,
+> +		.addr = (u64)(unsigned long)&st_paddr
+> +	};
+> +
+> +	struct kvm_device_attr lpt_freq = {
+> +		.group = KVM_DEV_ARM_PV_TIME_FREQUENCY,
+> +		.attr = KVM_DEV_ARM_PV_TIME_LPT,
+> +		.addr = (u64)(unsigned long)&frequency
+> +	};
+> +
+> +	err = ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &lpt_base);
+> +	if (err) {
+> +		perror("ioctl lpt_base failed");
+> +		printf("Ignoring LPT...\n");
+> +	}
+> +	err = ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
+> +	if (err) {
+> +		perror("ioctl st_base failed");
+> +		goto out_err;
+> +	}
+> +	err = ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &lpt_freq);
+> +	if (err) {
+> +		perror("ioctl lpt_freq failed");
+> +		printf("Ignoring LPT...\n");
+> +	}
+> +
+> +	printf("PV time setup\n");
+> +
+> +	return 0;
+> +out_err:
+> +	close(pvtime_fd);
+> +	return err;
+> +}
+
