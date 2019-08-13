@@ -2,40 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E6818B3D6
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 11:16:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 347628B3F1
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 11:18:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727704AbfHMJQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 05:16:07 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53967 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727817AbfHMJQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 05:16:06 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 10so797566wmp.3
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 02:16:05 -0700 (PDT)
+        id S1727515AbfHMJSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 05:18:02 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40943 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727144AbfHMJSC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 05:18:02 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v19so799374wmj.5
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 02:18:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=rJyEXL/9pmUa8F8Nq9N9p+VTELu7g73JrfbMzEYtsqw=;
-        b=sPWuWuuXiz+q0/CuTqmL+0Isz/DeXE5xwrdGVJFOBcyEw4x8/5qodx+KyD7kTWCAbK
-         h3Ox8Y4DvsYP+WFw7cZIGYBCe+z/pciy1gWLUdezWOYCjpOW36pEPvbcMwjDz/6FpK/m
-         Mwa0gub/xZphhIGU6EzKOrKt4KpkyeqdZAhs1gEbmTX1NsPPGHzhsKWg6AUaMHuD12iz
-         JgUNYUbeUPig8zBCOwkJsPLIKUbdswXP5+mry3GtrpPEv61krMmgjj21luFKLBAinmJ5
-         Ud+Yc69DQbNbKYTQEqHdWTh1Q1ms5jurQpNRfMbGmvIc4wPgzh+UVLEMBsrOlaBANuAC
-         fOUA==
-X-Gm-Message-State: APjAAAU1Dh0LRnKiGb+4ut+dSF5jALwAya7x1IuIVgL2jIV9/8iv94IK
-        2cY58bf7NDp72A7yl+5CRdMCIA==
-X-Google-Smtp-Source: APXvYqwm309us5aZi/frD8eACHl5aijviV3HAVkqCeaBNsVD1mdnoZLmf1PImPsBNT+r6Tg0wB86fA==
-X-Received: by 2002:a7b:cf0b:: with SMTP id l11mr2056631wmg.143.1565687764702;
-        Tue, 13 Aug 2019 02:16:04 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id c15sm59116320wrb.80.2019.08.13.02.16.03
+        bh=jW0tub2UzbL05NcO2bVMEMoWnqz9PpoPHHdwwy4/hhI=;
+        b=meI/ww/E5nAH3xBFVXuTBID2Crwa5CogI2U6z3G5GWvri/5GxsUz4WciBkWD0zVX5a
+         WbFqHISv9uR6TKo2sHO7ubHWEFo5ppkBkErZYB1ZN7Qk6tqwEAz75DQ71Iu79YTbrDNE
+         GEwIN4b9ppOiqAt5PEZAbRdbfphxGRoxSQmknBMrsEvsZsa02DEjx5DwDoHoqCFppTTZ
+         Dcgl/DBAOWtUot9Sil6Cna9V9FxjumvyEtDFD1YbxeZLIJPHfDSyrF0BLdCfvzNxOFmX
+         ib3RjempBERYU8JC6kwl1Y3Hv78w2457NuR0MgX5KpukzCD2tQC/BR0UFTb65tj7rC8H
+         mWNg==
+X-Gm-Message-State: APjAAAW/yfpJPc+hsl0IwY32WM0hGuYBCw7QIFQriT+zK+wZ/qivkX2F
+        vjgW1iUw+IDRphO/FGVr717OTA==
+X-Google-Smtp-Source: APXvYqy54+DaW4YK3FY/VYnqSfCxjCt45GhtNezxaN2179OBpbvne3bv8avk2VnkQaQfREwmbAyE2A==
+X-Received: by 2002:a1c:c747:: with SMTP id x68mr2086476wmf.14.1565687881016;
+        Tue, 13 Aug 2019 02:18:01 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5d12:7fa9:fb2d:7edb? ([2001:b07:6468:f312:5d12:7fa9:fb2d:7edb])
+        by smtp.gmail.com with ESMTPSA id a19sm43628167wra.2.2019.08.13.02.17.59
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Aug 2019 02:16:04 -0700 (PDT)
-Subject: Re: [RFC PATCH v6 07/92] kvm: introspection: honor the reply option
- when handling the KVMI_GET_VERSION command
+        Tue, 13 Aug 2019 02:18:00 -0700 (PDT)
+Subject: Re: [RFC PATCH v6 79/92] kvm: x86: emulate movsd xmm, m64
 To:     =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
         kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -51,15 +50,15 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Yu C Zhang <yu.c.zhang@intel.com>,
         =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-8-alazar@bitdefender.com>
+ <20190809160047.8319-80-alazar@bitdefender.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <a5cdbbd4-6f25-a0a5-054e-5810b5828a48@redhat.com>
-Date:   Tue, 13 Aug 2019 11:16:01 +0200
+Message-ID: <32506209-7b16-4660-664b-4f6c73dc9433@redhat.com>
+Date:   Tue, 13 Aug 2019 11:17:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190809160047.8319-8-alazar@bitdefender.com>
+In-Reply-To: <20190809160047.8319-80-alazar@bitdefender.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -68,35 +67,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/19 17:59, Adalbert Lazăr wrote:
-> Obviously, the KVMI_GET_VERSION command must not be used when the command
-> reply is disabled by a previous KVMI_CONTROL_CMD_RESPONSE command.
+On 09/08/19 18:00, Adalbert Lazăr wrote:
+> From: Mihai Donțu <mdontu@bitdefender.com>
 > 
-> This commit changes the code path in order to check the reply option
-> (enabled/disabled) before trying to reply to this command. If the command
-> reply is disabled it will return an error to the caller. In the end, the
-> receiving worker will finish and the introspection socket will be closed.
+> This is needed in order to be able to support guest code that uses movsd to
+> write into pages that are marked for write tracking.
 > 
+> Signed-off-by: Mihai Donțu <mdontu@bitdefender.com>
 > Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 > ---
->  virt/kvm/kvmi_msg.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/emulate.c | 32 +++++++++++++++++++++++++++-----
+>  1 file changed, 27 insertions(+), 5 deletions(-)
 > 
-> diff --git a/virt/kvm/kvmi_msg.c b/virt/kvm/kvmi_msg.c
-> index ea5c7e23669a..2237a6ed25f6 100644
-> --- a/virt/kvm/kvmi_msg.c
-> +++ b/virt/kvm/kvmi_msg.c
-> @@ -169,7 +169,7 @@ static int handle_get_version(struct kvmi *ikvm,
->  	memset(&rpl, 0, sizeof(rpl));
->  	rpl.version = KVMI_VERSION;
->  
-> -	return kvmi_msg_vm_reply(ikvm, msg, 0, &rpl, sizeof(rpl));
-> +	return kvmi_msg_vm_maybe_reply(ikvm, msg, 0, &rpl, sizeof(rpl));
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 34431cf31f74..9d38f892beea 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -1177,6 +1177,27 @@ static int em_fnstsw(struct x86_emulate_ctxt *ctxt)
+>  	return X86EMUL_CONTINUE;
 >  }
 >  
->  static bool is_command_allowed(struct kvmi *ikvm, int id)
+> +static u8 simd_prefix_to_bytes(const struct x86_emulate_ctxt *ctxt,
+> +			       int simd_prefix)
+> +{
+> +	u8 bytes;
+> +
+> +	switch (ctxt->b) {
+> +	case 0x11:
+> +		/* movsd xmm, m64 */
+> +		/* movups xmm, m128 */
+> +		if (simd_prefix == 0xf2) {
+> +			bytes = 8;
+> +			break;
+> +		}
+> +		/* fallthrough */
+> +	default:
+> +		bytes = 16;
+> +		break;
+> +	}
+> +	return bytes;
+> +}
+> +
+>  static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+>  				    struct operand *op)
+>  {
+> @@ -1187,7 +1208,7 @@ static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+>  
+>  	if (ctxt->d & Sse) {
+>  		op->type = OP_XMM;
+> -		op->bytes = 16;
+> +		op->bytes = ctxt->op_bytes;
+>  		op->addr.xmm = reg;
+>  		read_sse_reg(ctxt, &op->vec_val, reg);
+>  		return;
+> @@ -1238,7 +1259,7 @@ static int decode_modrm(struct x86_emulate_ctxt *ctxt,
+>  				ctxt->d & ByteOp);
+>  		if (ctxt->d & Sse) {
+>  			op->type = OP_XMM;
+> -			op->bytes = 16;
+> +			op->bytes = ctxt->op_bytes;
+>  			op->addr.xmm = ctxt->modrm_rm;
+>  			read_sse_reg(ctxt, &op->vec_val, ctxt->modrm_rm);
+>  			return rc;
+> @@ -4529,7 +4550,7 @@ static const struct gprefix pfx_0f_2b = {
+>  };
+>  
+>  static const struct gprefix pfx_0f_10_0f_11 = {
+> -	I(Unaligned, em_mov), I(Unaligned, em_mov), N, N,
+> +	I(Unaligned, em_mov), I(Unaligned, em_mov), I(Unaligned, em_mov), N,
+>  };
+>  
+>  static const struct gprefix pfx_0f_28_0f_29 = {
+> @@ -5097,7 +5118,7 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
+>  {
+>  	int rc = X86EMUL_CONTINUE;
+>  	int mode = ctxt->mode;
+> -	int def_op_bytes, def_ad_bytes, goffset, simd_prefix;
+> +	int def_op_bytes, def_ad_bytes, goffset, simd_prefix = 0;
+>  	bool op_prefix = false;
+>  	bool has_seg_override = false;
+>  	struct opcode opcode;
+> @@ -5320,7 +5341,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
+>  			ctxt->op_bytes = 4;
+>  
+>  		if (ctxt->d & Sse)
+> -			ctxt->op_bytes = 16;
+> +			ctxt->op_bytes = simd_prefix_to_bytes(ctxt,
+> +							      simd_prefix);
+>  		else if (ctxt->d & Mmx)
+>  			ctxt->op_bytes = 8;
+>  	}
 > 
 
-Go ahead and squash this in the previous patch.
+Please submit all these emulator patches as a separate series, complete
+with testcases for kvm-unit-tests.
 
 Paolo
