@@ -2,432 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F02028B508
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 12:09:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E701C8B59E
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 12:31:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728815AbfHMKJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 06:09:30 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:60165 "EHLO ozlabs.org"
+        id S1727321AbfHMKbB convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 13 Aug 2019 06:31:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57712 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728700AbfHMKJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 06:09:28 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4677jc1097z9sND; Tue, 13 Aug 2019 20:09:24 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1565690964; bh=HKlT+Mes2xw6XsTbFWPbLmap2dd5Pu4lvJ06bw5be/Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HkkBuvd/is/xm24TaEIjbTK9jSNaC4N3TO8g16KKXAa5HV9iZmHc5q8AtMVuhUVin
-         9EXNrDffsAhk09NSJlEuwvcYMCMt90lS8AoNstCybRyy3DvjkIuPgowlcMTGlBonlL
-         5a87ihCdfYCXlF6AWBpmhY1UAqeUTyALNfx6a/Jwmo2CJqGMsfiZlBDUF4I/cUJcHn
-         NGma4pUPzr9Yf+hINewENxv/Ybp4kFLXD5GBi8zscFKHL7+ACAqQyXhkRJVn4AFb94
-         e42KgC8a8T6KJtWJ//7DH0rmnlOVOBSnR7r1X/4+y3HLOmOro1/nch/1ss3t5/BsM5
-         AR8U9oDox5i3w==
-Date:   Tue, 13 Aug 2019 20:06:48 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     linuxppc-dev@ozlabs.org, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v2 3/3] powerpc/xive: Implement get_irqchip_state method for
- XIVE to fix shutdown race
-Message-ID: <20190813100648.GE9567@blackberry>
-References: <20190813095845.GA9567@blackberry>
+        id S1726360AbfHMKbA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 06:31:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 88385C015C30;
+        Tue, 13 Aug 2019 10:30:59 +0000 (UTC)
+Received: from [10.40.204.186] (ovpn-204-186.brq.redhat.com [10.40.204.186])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AE1C786BAE;
+        Tue, 13 Aug 2019 10:30:45 +0000 (UTC)
+Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
+        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+        pagupta@redhat.com, wei.w.wang@intel.com,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Rik van Riel <riel@surriel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
+        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
+        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
+References: <20190812131235.27244-1-nitesh@redhat.com>
+ <20190812131235.27244-2-nitesh@redhat.com>
+ <CAKgT0UcSabyrO=jUwq10KpJKLSuzorHDnKAGrtWVigKVgvD-6Q@mail.gmail.com>
+ <ca362045-9668-18ff-39b0-de91fa72e73c@redhat.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <d39504c9-93bd-b8f7-e119-84baac5a42d4@redhat.com>
+Date:   Tue, 13 Aug 2019 06:30:41 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190813095845.GA9567@blackberry>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <ca362045-9668-18ff-39b0-de91fa72e73c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Tue, 13 Aug 2019 10:30:59 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Testing has revealed the existence of a race condition where a XIVE
-interrupt being shut down can be in one of the XIVE interrupt queues
-(of which there are up to 8 per CPU, one for each priority) at the
-point where free_irq() is called.  If this happens, can return an
-interrupt number which has been shut down.  This can lead to various
-symptoms:
 
-- irq_to_desc(irq) can be NULL.  In this case, no end-of-interrupt
-  function gets called, resulting in the CPU's elevated interrupt
-  priority (numerically lowered CPPR) never gets reset.  That then
-  means that the CPU stops processing interrupts, causing device
-  timeouts and other errors in various device drivers.
+On 8/12/19 4:05 PM, David Hildenbrand wrote:
+>>> ---
+>>>  include/linux/mmzone.h         |  11 ++
+>>>  include/linux/page_reporting.h |  63 +++++++
+>>>  mm/Kconfig                     |   6 +
+>>>  mm/Makefile                    |   1 +
+>>>  mm/page_alloc.c                |  42 ++++-
+>>>  mm/page_reporting.c            | 332 +++++++++++++++++++++++++++++++++
+>>>  6 files changed, 448 insertions(+), 7 deletions(-)
+>>>  create mode 100644 include/linux/page_reporting.h
+>>>  create mode 100644 mm/page_reporting.c
+>>>
+>>> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+>>> index d77d717c620c..ba5f5b508f25 100644
+>>> --- a/include/linux/mmzone.h
+>>> +++ b/include/linux/mmzone.h
+>>> @@ -559,6 +559,17 @@ struct zone {
+>>>         /* Zone statistics */
+>>>         atomic_long_t           vm_stat[NR_VM_ZONE_STAT_ITEMS];
+>>>         atomic_long_t           vm_numa_stat[NR_VM_NUMA_STAT_ITEMS];
+>>> +#ifdef CONFIG_PAGE_REPORTING
+>>> +       /* Pointer to the bitmap in PAGE_REPORTING_MIN_ORDER granularity */
+>>> +       unsigned long *bitmap;
+>>> +       /* Preserve start and end PFN in case they change due to hotplug */
+>>> +       unsigned long base_pfn;
+>>> +       unsigned long end_pfn;
+>>> +       /* Free pages of granularity PAGE_REPORTING_MIN_ORDER */
+>>> +       atomic_t free_pages;
+>>> +       /* Number of bits required in the bitmap */
+>>> +       unsigned long nbits;
+>>> +#endif
+>>>  } ____cacheline_internodealigned_in_smp;
+>> Okay, so the original thing this patch set had going for it was that
+>> it was non-invasive. However, now you are adding a bunch of stuff to
+>> the zone. That kind of loses the non-invasive argument for this patch
+>> set compared to mine.
+>>
+> Adding something to "struct zone" is certainly less invasive than core
+> buddy modifications, just saying (I agree that this is suboptimal. I
+> would have guessed that all that's needed is a pointer to some private
+> structure here). 
 
-- The irq descriptor or related data structures can be in the process
-  of being freed as the interrupt code is using them.  This typically
-  leads to crashes due to bad pointer dereferences.
 
-This race is basically what commit 62e0468650c3 ("genirq: Add optional
-hardware synchronization for shutdown", 2019-06-28) is intended to
-fix, given a get_irqchip_state() method for the interrupt controller
-being used.  It works by polling the interrupt controller when an
-interrupt is being freed until the controller says it is not pending.
+I think having just a pointer to a private structure makes sense here.
+If I am not wrong then I can probably make an allocation for it for each
+populated zone at the time I enable page reporting.
 
-With XIVE, the PQ bits of the interrupt source indicate the state of
-the interrupt source, and in particular the P bit goes from 0 to 1 at
-the point where the hardware writes an entry into the interrupt queue
-that this interrupt is directed towards.  Normally, the code will then
-process the interrupt and do an end-of-interrupt (EOI) operation which
-will reset PQ to 00 (assuming another interrupt hasn't been generated
-in the meantime).  However, there are situations where the code resets
-P even though a queue entry exists (for example, by setting PQ to 01,
-which disables the interrupt source), and also situations where the
-code leaves P at 1 after removing the queue entry (for example, this
-is done for escalation interrupts so they cannot fire again until
-they are explicitly re-enabled).
+> However, the migratetype thingy below looks fishy to me.
+>
+>> If we are going to continue further with this patch set then it might
+>> be worth looking into dynamically allocating the space you need for
+>> this block. At a minimum you could probably look at making the bitmap
+>> an RCU based setup so you could define the base and end along with the
+>> bitmap. It would probably help to resolve the hotplug issues you still
+>> need to address.
+> Yeah, I guess that makes sense.
+>
+> [...]
+>>> +
+>>> +static int process_free_page(struct page *page,
+>>> +                            struct page_reporting_config *phconf, int count)
+>>> +{
+>>> +       int mt, order, ret = 0;
+>>> +
+>>> +       mt = get_pageblock_migratetype(page);
+>>> +       order = page_private(page);
+>>> +       ret = __isolate_free_page(page, order);
+>>> +
+> I just started looking into the wonderful world of
+> isolation/compaction/migration.
+>
+> I don't think saving/restoring the migratetype is correct here. AFAIK,
+> MOVABLE/UNMOVABLE/RECLAIMABLE is just a hint, doesn't mean that e.g.,
+> movable pages and up in UNMOVABLE or ordinary kernel allocations on
+> MOVABLE. So that shouldn't be an issue - I guess.
+>
+> 1. You should never allocate something that is no
+> MOVABLE/UNMOVABLE/RECLAIMABLE. Especially not, if you have ISOLATE or
+> CMA here. There should at least be a !is_migrate_isolate_page() check
+> somewhere
+>
+> 2. set_migratetype_isolate() takes the zone lock, so to avoid racing
+> with isolation code, you have to hold the zone lock. Your code seems to
+> do that, so at least you cannot race against isolation.
+>
+> 3. You could end up temporarily allocating something in the
+> ZONE_MOVABLE. The pages you allocate are, however, not movable. There
+> would have to be a way to make alloc_contig_range()/offlining code
+> properly wait until the pages have been processed. Not sure about the
+> real implications, though - too many details in the code (I wonder if
+> Alex' series has a way of dealing with that)
+>
+> When you restore the migratetype, you could suddenly overwrite e.g.,
+> ISOLATE, which feels wrong.
 
-The code already has a 'saved_p' flag for the interrupt source which
-indicates that a queue entry exists, although it isn't maintained
-consistently.  This patch adds a 'stale_p' flag to indicate that
-P has been left at 1 after processing a queue entry, and adds code
-to set and clear saved_p and stale_p as necessary to maintain a
-consistent indication of whether a queue entry may or may not exist.
 
-With this, we can implement xive_get_irqchip_state() by looking at
-stale_p, saved_p and the ESB PQ bits for the interrupt.
+I was triggering an occasional CPU stall bug earlier, with saving and restoring
+the migratetype I was able to fix it.
+But I will further look into this to figure out if it is really required.
 
-There is some additional code to handle escalation interrupts
-properly; because they are enabled and disabled in KVM assembly code,
-which does not have access to the xive_irq_data struct for the
-escalation interrupt.  Hence, stale_p may be incorrect when the
-escalation interrupt is freed in kvmppc_xive_{,native_}cleanup_vcpu().
-Fortunately, we can fix it up by looking at vcpu->arch.xive_esc_on,
-with some careful attention to barriers in order to ensure the correct
-result if xive_esc_irq() races with kvmppc_xive_cleanup_vcpu().
+> [...]
+>> So as per your comments in the cover page, the two functions above
+>> should also probably be plugged into the zone resizing logic somewhere
+>> so if a zone is resized the bitmap is adjusted.
+>>
+>>> +/**
+>>> + * zone_reporting_init - For each zone initializes the page reporting fields
+>>> + * and allocates the respective bitmap.
+>>> + *
+>>> + * This function returns 0 on successful initialization, -ENOMEM otherwise.
+>>> + */
+>>> +static int zone_reporting_init(void)
+>>> +{
+>>> +       struct zone *zone;
+>>> +       int ret;
+>>> +
+>>> +       for_each_populated_zone(zone) {
+>>> +#ifdef CONFIG_ZONE_DEVICE
+>>> +               /* we can not report pages which are not in the buddy */
+>>> +               if (zone_idx(zone) == ZONE_DEVICE)
+>>> +                       continue;
+>>> +#endif
+>> I'm pretty sure this isn't needed since I don't think the ZONE_DEVICE
+>> zone will be considered "populated".
+>>
+> I think you are right (although it's confusing, we will have present
+> sections part of a zone but the zone has no present_pages - screams like
+> a re factoring - leftover from ZONE_DEVICE introduction).
 
-Finally, this adds code to make noise on the console (pr_crit and
-WARN_ON(1)) if we find an interrupt queue entry for an interrupt
-which does not have a descriptor.  While this won't catch the race
-reliably, if it does get triggered it will be an indication that
-the race is occurring and needs to be debugged.
 
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
----
-v2: call xive_cleanup_single_escalation
-from kvmppc_xive_native_cleanup_vcpu() too.
+I think in that case it is safe to have this check here.
+What do you guys suggest?
 
- arch/powerpc/include/asm/xive.h       |  8 ++++
- arch/powerpc/kvm/book3s_xive.c        | 31 +++++++++++++
- arch/powerpc/kvm/book3s_xive.h        |  2 +
- arch/powerpc/kvm/book3s_xive_native.c |  3 ++
- arch/powerpc/sysdev/xive/common.c     | 87 ++++++++++++++++++++++++++---------
- 5 files changed, 108 insertions(+), 23 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/xive.h b/arch/powerpc/include/asm/xive.h
-index e401698..efb0e59 100644
---- a/arch/powerpc/include/asm/xive.h
-+++ b/arch/powerpc/include/asm/xive.h
-@@ -46,7 +46,15 @@ struct xive_irq_data {
- 
- 	/* Setup/used by frontend */
- 	int target;
-+	/*
-+	 * saved_p means that there is a queue entry for this interrupt
-+	 * in some CPU's queue (not including guest vcpu queues), even
-+	 * if P is not set in the source ESB.
-+	 * stale_p means that there is no queue entry for this interrupt
-+	 * in some CPU's queue, even if P is set in the source ESB.
-+	 */
- 	bool saved_p;
-+	bool stale_p;
- };
- #define XIVE_IRQ_FLAG_STORE_EOI	0x01
- #define XIVE_IRQ_FLAG_LSI	0x02
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 586867e..591bfb4 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -166,6 +166,9 @@ static irqreturn_t xive_esc_irq(int irq, void *data)
- 	 */
- 	vcpu->arch.xive_esc_on = false;
- 
-+	/* This orders xive_esc_on = false vs. subsequent stale_p = true */
-+	smp_wmb();	/* goes with smp_mb() in cleanup_single_escalation */
-+
- 	return IRQ_HANDLED;
- }
- 
-@@ -1119,6 +1122,31 @@ void kvmppc_xive_disable_vcpu_interrupts(struct kvm_vcpu *vcpu)
- 	vcpu->arch.xive_esc_raddr = 0;
- }
- 
-+/*
-+ * In single escalation mode, the escalation interrupt is marked so
-+ * that EOI doesn't re-enable it, but just sets the stale_p flag to
-+ * indicate that the P bit has already been dealt with.  However, the
-+ * assembly code that enters the guest sets PQ to 00 without clearing
-+ * stale_p (because it has no easy way to address it).  Hence we have
-+ * to adjust stale_p before shutting down the interrupt.
-+ */
-+void xive_cleanup_single_escalation(struct kvm_vcpu *vcpu,
-+				    struct kvmppc_xive_vcpu *xc, int irq)
-+{
-+	struct irq_data *d = irq_get_irq_data(irq);
-+	struct xive_irq_data *xd = irq_data_get_irq_handler_data(d);
-+
-+	/*
-+	 * This slightly odd sequence gives the right result
-+	 * (i.e. stale_p set if xive_esc_on is false) even if
-+	 * we race with xive_esc_irq() and xive_irq_eoi().
-+	 */
-+	xd->stale_p = false;
-+	smp_mb();		/* paired with smb_wmb in xive_esc_irq */
-+	if (!vcpu->arch.xive_esc_on)
-+		xd->stale_p = true;
-+}
-+
- void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
- {
- 	struct kvmppc_xive_vcpu *xc = vcpu->arch.xive_vcpu;
-@@ -1143,6 +1171,9 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	/* Free escalations */
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		if (xc->esc_virq[i]) {
-+			if (xc->xive->single_escalation)
-+				xive_cleanup_single_escalation(vcpu, xc,
-+							xc->esc_virq[i]);
- 			free_irq(xc->esc_virq[i], vcpu);
- 			irq_dispose_mapping(xc->esc_virq[i]);
- 			kfree(xc->esc_virq_names[i]);
-diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
-index 50494d0..955b820 100644
---- a/arch/powerpc/kvm/book3s_xive.h
-+++ b/arch/powerpc/kvm/book3s_xive.h
-@@ -282,6 +282,8 @@ int kvmppc_xive_select_target(struct kvm *kvm, u32 *server, u8 prio);
- int kvmppc_xive_attach_escalation(struct kvm_vcpu *vcpu, u8 prio,
- 				  bool single_escalation);
- struct kvmppc_xive *kvmppc_xive_get_device(struct kvm *kvm, u32 type);
-+void xive_cleanup_single_escalation(struct kvm_vcpu *vcpu,
-+				    struct kvmppc_xive_vcpu *xc, int irq);
- 
- #endif /* CONFIG_KVM_XICS */
- #endif /* _KVM_PPC_BOOK3S_XICS_H */
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 11b91b4..f0cab43 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -71,6 +71,9 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		/* Free the escalation irq */
- 		if (xc->esc_virq[i]) {
-+			if (xc->xive->single_escalation)
-+				xive_cleanup_single_escalation(vcpu, xc,
-+							xc->esc_virq[i]);
- 			free_irq(xc->esc_virq[i], vcpu);
- 			irq_dispose_mapping(xc->esc_virq[i]);
- 			kfree(xc->esc_virq_names[i]);
-diff --git a/arch/powerpc/sysdev/xive/common.c b/arch/powerpc/sysdev/xive/common.c
-index 1cdb395..be86fce 100644
---- a/arch/powerpc/sysdev/xive/common.c
-+++ b/arch/powerpc/sysdev/xive/common.c
-@@ -135,7 +135,7 @@ static u32 xive_read_eq(struct xive_q *q, bool just_peek)
- static u32 xive_scan_interrupts(struct xive_cpu *xc, bool just_peek)
- {
- 	u32 irq = 0;
--	u8 prio;
-+	u8 prio = 0;
- 
- 	/* Find highest pending priority */
- 	while (xc->pending_prio != 0) {
-@@ -148,8 +148,19 @@ static u32 xive_scan_interrupts(struct xive_cpu *xc, bool just_peek)
- 		irq = xive_read_eq(&xc->queue[prio], just_peek);
- 
- 		/* Found something ? That's it */
--		if (irq)
--			break;
-+		if (irq) {
-+			if (just_peek || irq_to_desc(irq))
-+				break;
-+			/*
-+			 * We should never get here; if we do then we must
-+			 * have failed to synchronize the interrupt properly
-+			 * when shutting it down.
-+			 */
-+			pr_crit("xive: got interrupt %d without descriptor, dropping\n",
-+				irq);
-+			WARN_ON(1);
-+			continue;
-+		}
- 
- 		/* Clear pending bits */
- 		xc->pending_prio &= ~(1 << prio);
-@@ -307,6 +318,7 @@ static void xive_do_queue_eoi(struct xive_cpu *xc)
-  */
- static void xive_do_source_eoi(u32 hw_irq, struct xive_irq_data *xd)
- {
-+	xd->stale_p = false;
- 	/* If the XIVE supports the new "store EOI facility, use it */
- 	if (xd->flags & XIVE_IRQ_FLAG_STORE_EOI)
- 		xive_esb_write(xd, XIVE_ESB_STORE_EOI, 0);
-@@ -350,7 +362,7 @@ static void xive_do_source_eoi(u32 hw_irq, struct xive_irq_data *xd)
- 	}
- }
- 
--/* irq_chip eoi callback */
-+/* irq_chip eoi callback, called with irq descriptor lock held */
- static void xive_irq_eoi(struct irq_data *d)
- {
- 	struct xive_irq_data *xd = irq_data_get_irq_handler_data(d);
-@@ -366,6 +378,8 @@ static void xive_irq_eoi(struct irq_data *d)
- 	if (!irqd_irq_disabled(d) && !irqd_is_forwarded_to_vcpu(d) &&
- 	    !(xd->flags & XIVE_IRQ_NO_EOI))
- 		xive_do_source_eoi(irqd_to_hwirq(d), xd);
-+	else
-+		xd->stale_p = true;
- 
- 	/*
- 	 * Clear saved_p to indicate that it's no longer occupying
-@@ -397,11 +411,16 @@ static void xive_do_source_set_mask(struct xive_irq_data *xd,
- 	 */
- 	if (mask) {
- 		val = xive_esb_read(xd, XIVE_ESB_SET_PQ_01);
--		xd->saved_p = !!(val & XIVE_ESB_VAL_P);
--	} else if (xd->saved_p)
-+		if (!xd->stale_p && !!(val & XIVE_ESB_VAL_P))
-+			xd->saved_p = true;
-+		xd->stale_p = false;
-+	} else if (xd->saved_p) {
- 		xive_esb_read(xd, XIVE_ESB_SET_PQ_10);
--	else
-+		xd->saved_p = false;
-+	} else {
- 		xive_esb_read(xd, XIVE_ESB_SET_PQ_00);
-+		xd->stale_p = false;
-+	}
- }
- 
- /*
-@@ -541,6 +560,8 @@ static unsigned int xive_irq_startup(struct irq_data *d)
- 	unsigned int hw_irq = (unsigned int)irqd_to_hwirq(d);
- 	int target, rc;
- 
-+	xd->saved_p = false;
-+	xd->stale_p = false;
- 	pr_devel("xive_irq_startup: irq %d [0x%x] data @%p\n",
- 		 d->irq, hw_irq, d);
- 
-@@ -587,6 +608,7 @@ static unsigned int xive_irq_startup(struct irq_data *d)
- 	return 0;
- }
- 
-+/* called with irq descriptor lock held */
- static void xive_irq_shutdown(struct irq_data *d)
- {
- 	struct xive_irq_data *xd = irq_data_get_irq_handler_data(d);
-@@ -602,16 +624,6 @@ static void xive_irq_shutdown(struct irq_data *d)
- 	xive_do_source_set_mask(xd, true);
- 
- 	/*
--	 * The above may have set saved_p. We clear it otherwise it
--	 * will prevent re-enabling later on. It is ok to forget the
--	 * fact that the interrupt might be in a queue because we are
--	 * accounting that already in xive_dec_target_count() and will
--	 * be re-routing it to a new queue with proper accounting when
--	 * it's started up again
--	 */
--	xd->saved_p = false;
--
--	/*
- 	 * Mask the interrupt in HW in the IVT/EAS and set the number
- 	 * to be the "bad" IRQ number
- 	 */
-@@ -797,6 +809,10 @@ static int xive_irq_retrigger(struct irq_data *d)
- 	return 1;
- }
- 
-+/*
-+ * Caller holds the irq descriptor lock, so this won't be called
-+ * concurrently with xive_get_irqchip_state on the same interrupt.
-+ */
- static int xive_irq_set_vcpu_affinity(struct irq_data *d, void *state)
- {
- 	struct xive_irq_data *xd = irq_data_get_irq_handler_data(d);
-@@ -820,6 +836,10 @@ static int xive_irq_set_vcpu_affinity(struct irq_data *d, void *state)
- 
- 		/* Set it to PQ=10 state to prevent further sends */
- 		pq = xive_esb_read(xd, XIVE_ESB_SET_PQ_10);
-+		if (!xd->stale_p) {
-+			xd->saved_p = !!(pq & XIVE_ESB_VAL_P);
-+			xd->stale_p = !xd->saved_p;
-+		}
- 
- 		/* No target ? nothing to do */
- 		if (xd->target == XIVE_INVALID_TARGET) {
-@@ -827,7 +847,7 @@ static int xive_irq_set_vcpu_affinity(struct irq_data *d, void *state)
- 			 * An untargetted interrupt should have been
- 			 * also masked at the source
- 			 */
--			WARN_ON(pq & 2);
-+			WARN_ON(xd->saved_p);
- 
- 			return 0;
- 		}
-@@ -847,9 +867,8 @@ static int xive_irq_set_vcpu_affinity(struct irq_data *d, void *state)
- 		 * This saved_p is cleared by the host EOI, when we know
- 		 * for sure the queue slot is no longer in use.
- 		 */
--		if (pq & 2) {
--			pq = xive_esb_read(xd, XIVE_ESB_SET_PQ_11);
--			xd->saved_p = true;
-+		if (xd->saved_p) {
-+			xive_esb_read(xd, XIVE_ESB_SET_PQ_11);
- 
- 			/*
- 			 * Sync the XIVE source HW to ensure the interrupt
-@@ -862,8 +881,7 @@ static int xive_irq_set_vcpu_affinity(struct irq_data *d, void *state)
- 			 */
- 			if (xive_ops->sync_source)
- 				xive_ops->sync_source(hw_irq);
--		} else
--			xd->saved_p = false;
-+		}
- 	} else {
- 		irqd_clr_forwarded_to_vcpu(d);
- 
-@@ -914,6 +932,23 @@ static int xive_irq_set_vcpu_affinity(struct irq_data *d, void *state)
- 	return 0;
- }
- 
-+/* Called with irq descriptor lock held. */
-+static int xive_get_irqchip_state(struct irq_data *data,
-+				  enum irqchip_irq_state which, bool *state)
-+{
-+	struct xive_irq_data *xd = irq_data_get_irq_handler_data(data);
-+
-+	switch (which) {
-+	case IRQCHIP_STATE_ACTIVE:
-+		*state = !xd->stale_p &&
-+			 (xd->saved_p ||
-+			  !!(xive_esb_read(xd, XIVE_ESB_GET) & XIVE_ESB_VAL_P));
-+		return 0;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- static struct irq_chip xive_irq_chip = {
- 	.name = "XIVE-IRQ",
- 	.irq_startup = xive_irq_startup,
-@@ -925,6 +960,7 @@ static struct irq_chip xive_irq_chip = {
- 	.irq_set_type = xive_irq_set_type,
- 	.irq_retrigger = xive_irq_retrigger,
- 	.irq_set_vcpu_affinity = xive_irq_set_vcpu_affinity,
-+	.irq_get_irqchip_state = xive_get_irqchip_state,
- };
- 
- bool is_xive_irq(struct irq_chip *chip)
-@@ -1338,6 +1374,11 @@ static void xive_flush_cpu_queue(unsigned int cpu, struct xive_cpu *xc)
- 		xd = irq_desc_get_handler_data(desc);
- 
- 		/*
-+		 * Clear saved_p to indicate that it's no longer pending
-+		 */
-+		xd->saved_p = false;
-+
-+		/*
- 		 * For LSIs, we EOI, this will cause a resend if it's
- 		 * still asserted. Otherwise do an MSI retrigger.
- 		 */
+>
 -- 
-2.7.4
+Thanks
+Nitesh
 
