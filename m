@@ -2,101 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D89748BEDD
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 18:43:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6E248BF30
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 19:04:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726810AbfHMQn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 12:43:58 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33446 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726298AbfHMQn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 12:43:58 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n9so108491609wru.0
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 09:43:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=R+TQ2SRZqheh/+m+AgbCNj23H0NoT711BBAwP7NZvNk=;
-        b=LGWTAeSvzO4q8U4Gldr//V00MUKnHFQk1fbJBD/6CZP4oPfa/+3LyocQaArwNOAksf
-         MLI4ucgxNOdSF6VtB8LIjwHVcThA2rUPOjphKUtBrw6wLxEsvNjmKhuVqSqwynQN6SuM
-         v1aJcHxxouzS3Cwmz5DVgLzQ7tXtpuNuqr1Gb9/lcg/xw0TfKNfJfetiDrY9HUYJoCpU
-         lJmeHPD/Ake9vVKOo4PAcs3P2Y4UFINb+trFj45Bv81TEbVKuHuO3k0xENvbsR5z2B1v
-         jWKCrZE0nnVzoSY6kKYjEFNrpXP4SrGe7iVY78aHBe3ELhuqzipqGfYP/24/VrAM9L5c
-         Jhhw==
-X-Gm-Message-State: APjAAAViJODSAk7dLoej50OP/yFWE4XKFvF931ptP0HH7acRhQEogbq/
-        +s39YmduV2uT57WJuX6IchRqig==
-X-Google-Smtp-Source: APXvYqyLJEa/u5ApuHODI1ChbVsHPnV50CLirBt9pvSGLUI9pb/mMfHDZJd6oyXT4LApa3VSEoT/Tw==
-X-Received: by 2002:a5d:568e:: with SMTP id f14mr46435405wrv.167.1565714636124;
-        Tue, 13 Aug 2019 09:43:56 -0700 (PDT)
-Received: from xz-x1 ([195.112.86.171])
-        by smtp.gmail.com with ESMTPSA id o20sm272367456wrh.8.2019.08.13.09.43.55
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 13 Aug 2019 09:43:55 -0700 (PDT)
-Date:   Tue, 13 Aug 2019 18:43:54 +0200
-From:   Peter Xu <peterx@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Peter Xu <zhexu@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 2/3] KVM: X86: Remove tailing newline for tracepoints
-Message-ID: <20190813164354.GA14469@xz-x1>
-References: <20190729053243.9224-1-peterx@redhat.com>
- <20190729053243.9224-3-peterx@redhat.com>
- <CANRm+CxkdBXZ170nXiKiQ-a-xzZObEXZdBgsAx5jrE=aroTR5w@mail.gmail.com>
+        id S1727144AbfHMREm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 13:04:42 -0400
+Received: from mga11.intel.com ([192.55.52.93]:52516 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726993AbfHMREm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 13:04:42 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Aug 2019 10:04:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,382,1559545200"; 
+   d="scan'208";a="181243702"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga006.jf.intel.com with ESMTP; 13 Aug 2019 10:04:41 -0700
+Date:   Tue, 13 Aug 2019 10:04:41 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
+Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
+ removing a memslot
+Message-ID: <20190813170440.GC13991@linux.intel.com>
+References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
+ <20190205210137.1377-11-sean.j.christopherson@intel.com>
+ <20190813100458.70b7d82d@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANRm+CxkdBXZ170nXiKiQ-a-xzZObEXZdBgsAx5jrE=aroTR5w@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190813100458.70b7d82d@x1.home>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 11:39:04AM +0800, Wanpeng Li wrote:
-> On Mon, 29 Jul 2019 at 13:35, Peter Xu <zhexu@redhat.com> wrote:
-> >
-> > It's done by TP_printk() already.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  arch/x86/kvm/trace.h | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> > index 26423d2e45df..76a39bc25b95 100644
-> > --- a/arch/x86/kvm/trace.h
-> > +++ b/arch/x86/kvm/trace.h
-> > @@ -1323,7 +1323,7 @@ TRACE_EVENT(kvm_avic_incomplete_ipi,
-> >                 __entry->index = index;
-> >         ),
-> >
-> > -       TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u\n",
-> > +       TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u",
-> >                   __entry->vcpu, __entry->icrh, __entry->icrl,
-> >                   __entry->id, __entry->index)
-> >  );
-> > @@ -1348,7 +1348,7 @@ TRACE_EVENT(kvm_avic_unaccelerated_access,
-> >                 __entry->vec = vec;
-> >         ),
-> >
-> > -       TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x\n",
-> > +       TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x",
-> >                   __entry->vcpu,
-> >                   __entry->offset,
-> >                   __print_symbolic(__entry->offset, kvm_trace_symbol_apic),
-> > @@ -1368,7 +1368,7 @@ TRACE_EVENT(kvm_hv_timer_state,
-> >                         __entry->vcpu_id = vcpu_id;
-> >                         __entry->hv_timer_in_use = hv_timer_in_use;
-> >                         ),
-> > -               TP_printk("vcpu_id %x hv_timer %x\n",
-> > +               TP_printk("vcpu_id %x hv_timer %x",
-> >                         __entry->vcpu_id,
-> >                         __entry->hv_timer_in_use)
+On Tue, Aug 13, 2019 at 10:04:58AM -0600, Alex Williamson wrote:
+> On Tue,  5 Feb 2019 13:01:21 -0800
+> Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 > 
-> The last one is handled by commit 7be373b6de503 .
+> > Modify kvm_mmu_invalidate_zap_pages_in_memslot(), a.k.a. the x86 MMU's
+> > handler for kvm_arch_flush_shadow_memslot(), to zap only the pages/PTEs
+> > that actually belong to the memslot being removed.  This improves
+> > performance, especially why the deleted memslot has only a few shadow
+> > entries, or even no entries.  E.g. a microbenchmark to access regular
+> > memory while concurrently reading PCI ROM to trigger memslot deletion
+> > showed a 5% improvement in throughput.
+> > 
+> > Cc: Xiao Guangrong <guangrong.xiao@gmail.com>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kvm/mmu.c | 33 ++++++++++++++++++++++++++++++++-
+> >  1 file changed, 32 insertions(+), 1 deletion(-)
+> 
+> A number of vfio users are reporting VM instability issues since v5.1,
+> some have traced it back to this commit 4e103134b862 ("KVM: x86/mmu: Zap
+> only the relevant pages when removing a memslot"), which I've confirmed
+> via bisection of the 5.1 merge window KVM pull (636deed6c0bc) and
+> re-verified on current 5.3-rc4 using the below patch to toggle the
+> broken behavior.
+> 
+> My reproducer is a Windows 10 VM with assigned GeForce GPU running a
+> variety of tests, including FurMark and PassMark Performance Test.
+> With the code enabled as exists in upstream currently, PassMark will
+> generally introduce graphics glitches or hangs.  Sometimes it's
+> necessary to reboot the VM to see these issues.
 
-Right, I'll rebase. Thanks.
+As in, the issue only shows up when the VM is rebooted?  Just want to
+double check that that's not a typo.
 
--- 
-Peter Xu
+> Flipping the 0/1 in the below patch appears to resolve the issue.
+> 
+> I'd appreciate any insights into further debugging this block of code
+> so that we can fix this regression.  Thanks,
+
+If it's not too painful to reproduce, I'd say start by determining whether
+it's a problem with the basic logic or if the cond_resched_lock() handling
+is wrong.  I.e. comment/ifdef out this chunk:
+
+		if (need_resched() || spin_needbreak(&kvm->mmu_lock)) {
+			kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
+			flush = false;
+			cond_resched_lock(&kvm->mmu_lock);
+		}
+
+
+> 
+> Alex
+> 
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 24843cf49579..6a77306940f7 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -5653,6 +5653,9 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+>  			struct kvm_memory_slot *slot,
+>  			struct kvm_page_track_notifier_node *node)
+>  {
+> +#if 0
+> +	kvm_mmu_zap_all(kvm);
+> +#else
+>  	struct kvm_mmu_page *sp;
+>  	LIST_HEAD(invalid_list);
+>  	unsigned long i;
+> @@ -5685,6 +5688,7 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+>  
+>  out_unlock:
+>  	spin_unlock(&kvm->mmu_lock);
+> +#endif
+>  }
+>  
+>  void kvm_mmu_init_vm(struct kvm *kvm)
