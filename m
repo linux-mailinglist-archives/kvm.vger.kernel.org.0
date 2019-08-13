@@ -2,59 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A8418AE51
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 06:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E7618AEB5
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 07:25:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726453AbfHME7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 00:59:12 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50391 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725953AbfHME7L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 00:59:11 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4670qd37Ttz9sNF; Tue, 13 Aug 2019 14:59:09 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1565672349; bh=zEBhVZ6IpXDU4PYZ9P+PigemVld0vncVI7JH/weoHsQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pfdf0QquNKcWiP9FC0OfWcm5hNPpORqt+0lxo3RUcH+SaRi76xamqMtyqHdKIQBNz
-         QfZa70VSnv5bAMZJD38VWzA7Yt2lMzts+TbsO4ftSoT3Lz0AqunsRCQNNpRkWlLyBo
-         06jnKnzdAy3NBe8ftweSiWlGm8BFlvvR5s8iLrGyWfWf8n0pfhXKikSCOq4xn5X1ah
-         ++klMjYhH4FNsq9P007EzLPHCdF+++6qmbkq82X0FYM/p7s0ZSkih+FzXdywu2DuaI
-         8zpvR5nrgqLXX6QpAXIhX6/zrg8rVUDl+7rm1Wy1kTEAzOZtbOk95HYG3QTzbZ3QOb
-         5Z/k0KQiXu3qw==
-Date:   Tue, 13 Aug 2019 14:59:05 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     linuxppc-dev@ozlabs.org, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: Fix race in re-enabling XIVE
- escalation interrupts
-Message-ID: <20190813045905.nsoi7u2ke3mz4qkq@oak.ozlabs.ibm.com>
-References: <20190812050623.ltla46gh5futsqv4@oak.ozlabs.ibm.com>
- <20190812050705.mlszjkatxa635pzh@oak.ozlabs.ibm.com>
+        id S1725981AbfHMFYq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 01:24:46 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:39199 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbfHMFYq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 01:24:46 -0400
+Received: from [192.168.178.60] ([109.104.47.130]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MPGiR-1hevT50O45-00PbYR; Tue, 13 Aug 2019 07:23:46 +0200
+Subject: Re: [PATCH v2 15/34] staging/vc04_services: convert put_page() to
+ put_user_page*()
+To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-fbdev@vger.kernel.org, Jan Kara <jack@suse.cz>,
+        kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        sparclinux@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+        ceph-devel@vger.kernel.org, devel@driverdev.osuosl.org,
+        rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
+        Suniel Mahesh <sunil.m@techveda.org>, x86@kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Mihaela Muraru <mihaela.muraru21@gmail.com>,
+        xen-devel@lists.xenproject.org, devel@lists.orangefs.org,
+        linux-media@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
+        intel-gfx@lists.freedesktop.org,
+        Kishore KP <kishore.p@techveda.org>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        linux-rpi-kernel@lists.infradead.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sidong Yang <realwakka@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
+        Eric Anholt <eric@anholt.net>, netdev@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-xfs@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-fsdevel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>
+References: <20190804224915.28669-1-jhubbard@nvidia.com>
+ <20190804224915.28669-16-jhubbard@nvidia.com>
+From:   Stefan Wahren <stefan.wahren@i2se.com>
+Message-ID: <f92a9b35-072c-a452-3248-ded047a9ee7e@i2se.com>
+Date:   Tue, 13 Aug 2019 07:23:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190812050705.mlszjkatxa635pzh@oak.ozlabs.ibm.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20190804224915.28669-16-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Provags-ID: V03:K1:WLtnGHSdIdsSOgSCw9gLWN/He07a3vhG8P/jw9q/ZsKCLbsJUeS
+ 5llVNlt7KE/tvHn+5EOmDYYv4pX1cHVWKOXHtrw4HQWAHuCkTohFsgxlEY0fExapDm8vR8t
+ zVIsUr/Bms6Kvxj5sCY8IbKiNL01LBum+j6x95pPZHXG9iG9KDUI7QIiVK2/58tc3NB1jnX
+ y7VHJG/KIA+fGCfAbINIQ==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:e2tiG/LoUCE=:MfCllk8c06iYHLUWJWcKAL
+ cdQ1fi1ypP4tC6pu8XAt4M+fU5mGlkjM5ziFPw9nAP5+ICbjFLhxsiDLATVpll3xwUgna69cS
+ Ev9bpFgmBYRqbHsiOVM335kNgAU19xY/LXN/GzEuigzotpDhc5IdC4FGsNTdqmIYi0Bx4dgCw
+ bLM/SrMXG40Mg1UArtxdqWQvHnINj7yK6JacwPswBAo33CV5S5U4U1PS67DpEMKA7dX0oduGb
+ 5fQtkN1kvCZEg2/ekJnnb+PAR6KRS8Eu0zqK7cwQwWxs+nxHFNvcdfFolT7waPuKj24rhpnjW
+ ZntPcErm15w8EJ72vFuARtCUk4Lh4jU+zYNtoDE6B8RJqr/+yxycmwEDucEbNXrujkaPH72RU
+ fWCHjlXjsJS29DRMlBs91cqiKMaK/ktbzSpegz+iLEJq/HkDuPh/jiz/b8w2crkMXTYEXfcIb
+ WqkuI5hHrAdEh99xa/X99FupD8F6iZ52Pv/g2glNHL9WlKL41btCn/KodqBqy/glIqHZeYzq2
+ SXjRol/t4oy36qgSCQmUGiCt1lssYLkBWOzcxjui5lZUL2V9O7wn91tHl7G+DbqjQzgMyVtBP
+ 60iHHkwkWe3su3M3o+o4m8sWd9OG5XIToU/4cSDhBQohrRIKKqoUbXAyCJH96bxaYdq/zseIf
+ oMsHaN/31pBaLs6MtsAa2tu5PRj9qlBX5kso+Y5up4mj5gl7CfIWyGwpM4gPWtVKv1En5k3ZR
+ HR/0MJ6spaP8P86u5+VALfxj2aM5bbcj+ZVczoVE2BIVl4lPQEesVoHHwFc=
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 03:07:05PM +1000, Paul Mackerras wrote:
-
->  	lbz	r5, VCPU_XIVE_ESC_ON(r9)
->  	cmpwi	r5, 0
-> -	beq	1f
-> +	beq	4f
->  	li	r0, 0
->  	stb	r0, VCPU_CEDED(r9)
-> +	li	r6, XIVE_ESB_SET_PQ_10
-> +	b	1f
-> +4:	li	r0, 1
-> +	stb	r0, VCPU_XIVE_ESC_ON(r9)
-
-This ends up setting vcpu->arch.xive_esc_on even on platforms without
-XIVE, which is wrong.  I'll send a v2.
-
-Paul.
+On 05.08.19 00:48, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
+>
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+>
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>
+> Cc: Eric Anholt <eric@anholt.net>
+> Cc: Stefan Wahren <stefan.wahren@i2se.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Mihaela Muraru <mihaela.muraru21@gmail.com>
+> Cc: Suniel Mahesh <sunil.m@techveda.org>
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
+> Cc: Sidong Yang <realwakka@gmail.com>
+> Cc: Kishore KP <kishore.p@techveda.org>
+> Cc: linux-rpi-kernel@lists.infradead.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: devel@driverdev.osuosl.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Acked-by: Stefan Wahren <stefan.wahren@i2se.com>
