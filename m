@@ -2,38 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E1F88B50A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 12:09:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 679918B505
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 12:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728799AbfHMKJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728802AbfHMKJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 13 Aug 2019 06:09:28 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:60443 "EHLO ozlabs.org"
+Received: from bilbo.ozlabs.org ([203.11.71.1]:40441 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728788AbfHMKJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728784AbfHMKJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 13 Aug 2019 06:09:27 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 4677jc3qj4z9sNf; Tue, 13 Aug 2019 20:09:24 +1000 (AEST)
+        id 4677jc1lGMz9sN6; Tue, 13 Aug 2019 20:09:24 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1565690964; bh=kZgv7OR1P+GqwOWODTl3Aikjw+eWl5ULVpu3MPDq2CE=;
+        t=1565690964; bh=BqwFEf1B6kCIBKtH5IBJUpVI6jeZDbf+DZLAvQciEns=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rZz1qy06Jp2CooaZg+BV2Z5CDoKuGYcoUwQ8BjUZeoAt5QEmVEDBxf81r9SDiELux
-         FlVg0JDBqDQ0+FVQpVf2Y9bbYnE37TmuRwDdIdCISgYNvolhTBO51T2bJzxI5mfUxV
-         /sEuNDHY/+6UUZbNUyqs2ds0VBdh1pHmgvXrz26tprCyGte01BpbYLjaJjcYmdZIyO
-         tQ1tdHfHe1g9NAsYhqBHuujqMutOqlw+m0Mozb5hC7KIba8/4cxzNaT/ja4bPSs4R1
-         yAFPI0S/foqmH1q1Hr7tCl/sLla0tjeLsOXZ7NzTBJHaItGMCOAvkmv2Lyv99GU9AD
-         27VsL8ZaMr0wQ==
-Date:   Tue, 13 Aug 2019 20:01:00 +1000
+        b=crUdElltByHccnwmoDmOW13jVQ9/O9qgxrm6gmZ4ZNbHEk1HnxtZgRZ7iPUOfIBaz
+         P1i2b6h7dvQuQDmh7V7c3jx2YbfPhtB1gmHTED2h7244DKRCJUOJs7QZjiiE8UhLUi
+         HNr4FU02+4k19MlkncAhf2cUEV7e5F6A69Pa1CzHs0Zro1cTbA4+UuygBh7vKgFbUA
+         kwWbhcK01GDGBX1KnOsYJJVu/UhAmG9BuUAYBi4zeNJu+9XijoD6yvi7mSFTVK19dm
+         F1vLQDdeBVcxqsA9l4t4QpYv+SaUs1PMbNpwDFnQAOeoO3iv9bhFGbPF9ksWshP1un
+         TMgzq9Usfg+Gg==
+Date:   Tue, 13 Aug 2019 20:03:49 +1000
 From:   Paul Mackerras <paulus@ozlabs.org>
 To:     linuxppc-dev@ozlabs.org, kvm@vger.kernel.org
 Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v2 2/3] KVM: PPC: Book3S HV: Don't push XIVE context when not
- using XIVE device
-Message-ID: <20190813100100.GC9567@blackberry>
+Subject: [PATCH v2 1/3] KVM: PPC: Book3S HV: Fix race in re-enabling XIVE
+ escalation interrupts
+Message-ID: <20190813100349.GD9567@blackberry>
 References: <20190813095845.GA9567@blackberry>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 In-Reply-To: <20190813095845.GA9567@blackberry>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
@@ -41,84 +40,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At present, when running a guest on POWER9 using HV KVM but not using
-an in-kernel interrupt controller (XICS or XIVE), for example if QEMU
-is run with the kernel_irqchip=off option, the guest entry code goes
-ahead and tries to load the guest context into the XIVE hardware, even
-though no context has been set up.
+Escalation interrupts are interrupts sent to the host by the XIVE
+hardware when it has an interrupt to deliver to a guest VCPU but that
+VCPU is not running anywhere in the system.  Hence we disable the
+escalation interrupt for the VCPU being run when we enter the guest
+and re-enable it when the guest does an H_CEDE hypercall indicating
+it is idle.
 
-To fix this, we check that the "CAM word" is non-zero before pushing
-it to the hardware.  The CAM word is initialized to a non-zero value
-in kvmppc_xive_connect_vcpu() and kvmppc_xive_native_connect_vcpu(),
-and is now cleared in kvmppc_xive_{,native_}cleanup_vcpu.
+It is possible that an escalation interrupt gets generated just as we
+are entering the guest.  In that case the escalation interrupt may be
+using a queue entry in one of the interrupt queues, and that queue
+entry may not have been processed when the guest exits with an H_CEDE.
+The existing entry code detects this situation and does not clear the
+vcpu->arch.xive_esc_on flag as an indication that there is a pending
+queue entry (if the queue entry gets processed, xive_esc_irq() will
+clear the flag).  There is a comment in the code saying that if the
+flag is still set on H_CEDE, we have to abort the cede rather than
+re-enabling the escalation interrupt, lest we end up with two
+occurrences of the escalation interrupt in the interrupt queue.
 
-Cc: stable@vger.kernel.org # v4.11+
-Reported-by: Cédric Le Goater <clg@kaod.org>
-Fixes: 5af50993850a ("KVM: PPC: Book3S HV: Native usage of the XIVE interrupt controller")
+However, the exit code doesn't do that; it aborts the cede in the sense
+that vcpu->arch.ceded gets cleared, but it still enables the escalation
+interrupt by setting the source's PQ bits to 00.  Instead we need to
+set the PQ bits to 10, indicating that an interrupt has been triggered.
+We also need to avoid setting vcpu->arch.xive_esc_on in this case
+(i.e. vcpu->arch.xive_esc_on seen to be set on H_CEDE) because
+xive_esc_irq() will run at some point and clear it, and if we race with
+that we may end up with an incorrect result (i.e. xive_esc_on set when
+the escalation interrupt has just been handled).
+
+It is extremely unlikely that having two queue entries would cause
+observable problems; theoretically it could cause queue overflow, but
+the CPU would have to have thousands of interrupts targetted to it for
+that to be possible.  However, this fix will also make it possible to
+determine accurately whether there is an unhandled escalation
+interrupt in the queue, which will be needed by the following patch.
+
+Cc: stable@vger.kernel.org # v4.16+
+Fixes: 9b9b13a6d153 ("KVM: PPC: Book3S HV: Keep XIVE escalation interrupt masked unless ceded")
 Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 ---
- arch/powerpc/kvm/book3s_hv_rmhandlers.S |  2 ++
- arch/powerpc/kvm/book3s_xive.c          | 11 ++++++++++-
- arch/powerpc/kvm/book3s_xive_native.c   |  3 +++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+v2: don't set xive_esc_on if we're not using a XIVE escalation
+interrupt.
+
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 36 +++++++++++++++++++++------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 2e7e788..07181d0 100644
+index 337e644..2e7e788 100644
 --- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
 +++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -942,6 +942,8 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_ARCH_300)
- 	ld	r11, VCPU_XIVE_SAVED_STATE(r4)
- 	li	r9, TM_QW1_OS
- 	lwz	r8, VCPU_XIVE_CAM_WORD(r4)
-+	cmpwi	r8, 0
-+	beq	no_xive
- 	li	r7, TM_QW1_OS + TM_WORD2
+@@ -2831,29 +2831,39 @@ kvm_cede_prodded:
+ kvm_cede_exit:
+ 	ld	r9, HSTATE_KVM_VCPU(r13)
+ #ifdef CONFIG_KVM_XICS
+-	/* Abort if we still have a pending escalation */
++	/* are we using XIVE with single escalation? */
++	ld	r10, VCPU_XIVE_ESC_VADDR(r9)
++	cmpdi	r10, 0
++	beq	3f
++	li	r6, XIVE_ESB_SET_PQ_00
++	/*
++	 * If we still have a pending escalation, abort the cede,
++	 * and we must set PQ to 10 rather than 00 so that we don't
++	 * potentially end up with two entries for the escalation
++	 * interrupt in the XIVE interrupt queue.  In that case
++	 * we also don't want to set xive_esc_on to 1 here in
++	 * case we race with xive_esc_irq().
++	 */
+ 	lbz	r5, VCPU_XIVE_ESC_ON(r9)
+ 	cmpwi	r5, 0
+-	beq	1f
++	beq	4f
+ 	li	r0, 0
+ 	stb	r0, VCPU_CEDED(r9)
+-1:	/* Enable XIVE escalation */
+-	li	r5, XIVE_ESB_SET_PQ_00
++	li	r6, XIVE_ESB_SET_PQ_10
++	b	5f
++4:	li	r0, 1
++	stb	r0, VCPU_XIVE_ESC_ON(r9)
++	/* make sure store to xive_esc_on is seen before xive_esc_irq runs */
++	sync
++5:	/* Enable XIVE escalation */
  	mfmsr	r0
  	andi.	r0, r0, MSR_DR		/* in real mode? */
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 09f838a..586867e 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -67,8 +67,14 @@ void kvmppc_xive_push_vcpu(struct kvm_vcpu *vcpu)
- 	void __iomem *tima = local_paca->kvm_hstate.xive_tima_virt;
- 	u64 pq;
+ 	beq	1f
+-	ld	r10, VCPU_XIVE_ESC_VADDR(r9)
+-	cmpdi	r10, 0
+-	beq	3f
+-	ldx	r0, r10, r5
++	ldx	r0, r10, r6
+ 	b	2f
+ 1:	ld	r10, VCPU_XIVE_ESC_RADDR(r9)
+-	cmpdi	r10, 0
+-	beq	3f
+-	ldcix	r0, r10, r5
++	ldcix	r0, r10, r6
+ 2:	sync
+-	li	r0, 1
+-	stb	r0, VCPU_XIVE_ESC_ON(r9)
+ #endif /* CONFIG_KVM_XICS */
+ 3:	b	guest_exit_cont
  
--	if (!tima)
-+	/*
-+	 * Nothing to do if the platform doesn't have a XIVE
-+	 * or this vCPU doesn't have its own XIVE context
-+	 * (e.g. because it's not using an in-kernel interrupt controller).
-+	 */
-+	if (!tima || !vcpu->arch.xive_cam_word)
- 		return;
-+
- 	eieio();
- 	__raw_writeq(vcpu->arch.xive_saved_state.w01, tima + TM_QW1_OS);
- 	__raw_writel(vcpu->arch.xive_cam_word, tima + TM_QW1_OS + TM_WORD2);
-@@ -1146,6 +1152,9 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	/* Disable the VP */
- 	xive_native_disable_vp(xc->vp_id);
- 
-+	/* Clear the cam word so guest entry won't try to push context */
-+	vcpu->arch.xive_cam_word = 0;
-+
- 	/* Free the queues */
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		struct xive_q *q = &xc->queues[i];
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 368427f..11b91b4 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -81,6 +81,9 @@ void kvmppc_xive_native_cleanup_vcpu(struct kvm_vcpu *vcpu)
- 	/* Disable the VP */
- 	xive_native_disable_vp(xc->vp_id);
- 
-+	/* Clear the cam word so guest entry won't try to push context */
-+	vcpu->arch.xive_cam_word = 0;
-+
- 	/* Free the queues */
- 	for (i = 0; i < KVMPPC_XIVE_Q_COUNT; i++) {
- 		kvmppc_xive_native_cleanup_queue(vcpu, i);
 -- 
 2.7.4
 
