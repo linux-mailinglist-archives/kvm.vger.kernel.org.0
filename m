@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 065CE8B2C1
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 10:44:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13E088B2D5
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 10:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727303AbfHMIod (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 04:44:33 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36562 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725909AbfHMIoc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 04:44:32 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r3so13234727wrt.3
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 01:44:31 -0700 (PDT)
+        id S1727260AbfHMIrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 04:47:40 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55403 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725820AbfHMIrk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 04:47:40 -0400
+Received: by mail-wm1-f67.google.com with SMTP id f72so713664wmf.5
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 01:47:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=blKE7hBPEaF3XcD8274I5hmyBZ0ZERzbpulCfit8yl4=;
-        b=fw+BUVmVAOa37fDeyLWpYVWNQHXKuWXjKW5ZkXX2m8ab+rGgCkZYqLemhLBODraLsT
-         fScyO9Op+/YYKfG2HojD1BzASZZQzIv/I/d3yIKWNjtv+ie6YWRlq0Mr9D0XxWowH77P
-         8UAr/qM+eAuOzHMWxpL7LxJnY7BtHAAFZqqTHLL7xxUTeS3EVm+KlKghMiVx2Pf+A9tr
-         xa2+NrCFclpQ/6Ou0pCRpGyAjYqg4YymHDGhWS6OOn4AfZ+uf7h9lmMKaiIUzVZOXoFS
-         J8ObzGaXos7dPC+hxvy27GnJ7MYRl5IIP6u1T1fljuqI3helV7+TLOizv/dJWP4ZSeXM
-         podg==
-X-Gm-Message-State: APjAAAWWbWVuQku+qkZ8Y71Sde0GXWWepMzG9rKamdLPA3Tcq2xf0YEY
-        L94G9OjAfBfyENdrY1PBlVsBjQ==
-X-Google-Smtp-Source: APXvYqw492WjaEpNzhoTXs/Gd2KelQnitfzJEsecNo1teLr2zcjaHoX7vjpPsoanUMoKR8v6ysgEKw==
-X-Received: by 2002:a5d:490a:: with SMTP id x10mr42031164wrq.152.1565685870989;
-        Tue, 13 Aug 2019 01:44:30 -0700 (PDT)
+        bh=dot1gc/mMlmPmCzz2QNsuI+h9x0oQ5vgk6vGPP9o7BE=;
+        b=RnwQhnztQ4UsSXnho0JnwsScsahp16Beh49wLmrFbt+o/y933+zd9FUPOnoWqNixhL
+         W6G+GVvV3jyxFFToA5uxjoeA0gccM0r8hFED/L67EQWx1l0ExUdkZiRU+3wTAzddKsQi
+         dfNHbosV+sqtf7qs/yWbWZH71Sz2bNHqcGfPfd4hyhJlxSgxymwVz0inbNhfbxCA1Aaz
+         EZKnyJFoNTNIGhAiBA1bTk3dE6nn1dN87hiRpbR4kdXhrKZO5gcgC0AsDqy1b8jZqDx3
+         wTbjLVuG4rbvez+yIGX+sv75GVrCWRe2GoM9NJeNgA4JXIjj69p3pKbJSJobMehJPU2N
+         FP4A==
+X-Gm-Message-State: APjAAAXQqk4D7NRDCBcmQ4UpK8OC+ionat+QFoiADC1UyAgsWFBXj3qb
+        PL73+BC75cEHsFfsC0vTDJLUdQ==
+X-Google-Smtp-Source: APXvYqzu741BNphc7Bkte8hG3txzzfxmRNvj7kUnHgJredomsRJ9fKepXbx6ZmCo5ts7buHZQwE5Qw==
+X-Received: by 2002:a1c:2ec6:: with SMTP id u189mr1791329wmu.67.1565686057680;
+        Tue, 13 Aug 2019 01:47:37 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id o126sm1401625wmo.1.2019.08.13.01.44.29
+        by smtp.gmail.com with ESMTPSA id w15sm832270wmi.19.2019.08.13.01.47.36
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Aug 2019 01:44:30 -0700 (PDT)
-Subject: Re: [RFC PATCH v6 02/92] kvm: introspection: add basic ioctls
- (hook/unhook)
+        Tue, 13 Aug 2019 01:47:37 -0700 (PDT)
+Subject: Re: [RFC PATCH v6 75/92] kvm: x86: disable gpa_available optimization
+ in emulator_read_write_onepage()
 To:     =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
         kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
@@ -49,18 +49,17 @@ Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Weijiang Yang <weijiang.yang@intel.com>,
         Yu C Zhang <yu.c.zhang@intel.com>,
-        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>,
-        =?UTF-8?Q?Mircea_C=c3=aerjaliu?= <mcirjaliu@bitdefender.com>
+        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
 References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-3-alazar@bitdefender.com>
+ <20190809160047.8319-76-alazar@bitdefender.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <58808ef0-57b1-47ac-a115-e1dd64a15b0a@redhat.com>
-Date:   Tue, 13 Aug 2019 10:44:28 +0200
+Message-ID: <eb748e05-8289-0c05-6907-b6c898f6080b@redhat.com>
+Date:   Tue, 13 Aug 2019 10:47:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190809160047.8319-3-alazar@bitdefender.com>
+In-Reply-To: <20190809160047.8319-76-alazar@bitdefender.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -69,56 +68,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/19 17:59, Adalbert Lazăr wrote:
-> +static int kvmi_recv(void *arg)
-> +{
-> +	struct kvmi *ikvm = arg;
-> +
-> +	kvmi_info(ikvm, "Hooking VM\n");
-> +
-> +	while (kvmi_msg_process(ikvm))
-> +		;
-> +
-> +	kvmi_info(ikvm, "Unhooking VM\n");
-> +
-> +	kvmi_end_introspection(ikvm);
-> +
-> +	return 0;
-> +}
-> +
+On 09/08/19 18:00, Adalbert Lazăr wrote:
+> If the EPT violation was caused by an execute restriction imposed by the
+> introspection tool, gpa_available will point to the instruction pointer,
+> not the to the read/write location that has to be used to emulate the
+> current instruction.
+> 
+> This optimization should be disabled only when the VM is introspected,
+> not just because the introspection subsystem is present.
+> 
+> Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
 
-Rename this to kvmi_recv_thread instead, please.
+The right thing to do is to not set gpa_available for fetch failures in 
+kvm_mmu_page_fault instead:
 
-> +
-> +	/*
-> +	 * Make sure all the KVM/KVMI structures are linked and no pointer
-> +	 * is read as NULL after the reference count has been set.
-> +	 */
-> +	smp_mb__before_atomic();
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 24843cf49579..1bdca40fa831 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -5364,8 +5364,12 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u64 error_code,
+ 	enum emulation_result er;
+ 	bool direct = vcpu->arch.mmu->direct_map;
+ 
+-	/* With shadow page tables, fault_address contains a GVA or nGPA.  */
+-	if (vcpu->arch.mmu->direct_map) {
++	/*
++	 * With shadow page tables, fault_address contains a GVA or nGPA.
++	 * On a fetch fault, fault_address contains the instruction pointer.
++	 */
++	if (vcpu->arch.mmu->direct_map &&
++	    likely(!(error_code & PFERR_FETCH_MASK)) {
+ 		vcpu->arch.gpa_available = true;
+ 		vcpu->arch.gpa_val = cr2;
+ 	}
 
-This is an smp_wmb(), not an smp_mb__before_atomic().  Add a comment
-that it pairs with the refcount_inc_not_zero in kvmi_get.
-
-> +	refcount_set(&kvm->kvmi_ref, 1);
-> +
-
-
-> @@ -57,8 +183,27 @@ void kvmi_destroy_vm(struct kvm *kvm)
->  	if (!ikvm)
->  		return;
->  
-> +	/* trigger socket shutdown - kvmi_recv() will start shutdown process */
-> +	kvmi_sock_shutdown(ikvm);
-> +
->  	kvmi_put(kvm);
->  
->  	/* wait for introspection resources to be released */
->  	wait_for_completion_killable(&kvm->kvmi_completed);
->  }
-> +
-
-This addition means that kvmi_destroy_vm should have called
-kvmi_end_introspection instead.  In patch 1, kvmi_end_introspection
-should have been just kvmi_put, now this patch can add kvmi_sock_shutdown.
 
 Paolo
+
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 965c4f0108eb..3975331230b9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5532,7 +5532,7 @@ static int emulator_read_write_onepage(unsigned long addr, void *val,
+>  	 * operation using rep will only have the initial GPA from the NPF
+>  	 * occurred.
+>  	 */
+> -	if (vcpu->arch.gpa_available &&
+> +	if (vcpu->arch.gpa_available && !kvmi_is_present() &&
+>  	    emulator_can_use_gpa(ctxt) &&
+>  	    (addr & ~PAGE_MASK) == (vcpu->arch.gpa_val & ~PAGE_MASK)) {
+>  		gpa = vcpu->arch.gpa_val;
+> 
+
