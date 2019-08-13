@@ -2,125 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 13E088B2D5
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 10:47:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DE568B2F2
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 10:53:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727260AbfHMIrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 04:47:40 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55403 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725820AbfHMIrk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 04:47:40 -0400
-Received: by mail-wm1-f67.google.com with SMTP id f72so713664wmf.5
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 01:47:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dot1gc/mMlmPmCzz2QNsuI+h9x0oQ5vgk6vGPP9o7BE=;
-        b=RnwQhnztQ4UsSXnho0JnwsScsahp16Beh49wLmrFbt+o/y933+zd9FUPOnoWqNixhL
-         W6G+GVvV3jyxFFToA5uxjoeA0gccM0r8hFED/L67EQWx1l0ExUdkZiRU+3wTAzddKsQi
-         dfNHbosV+sqtf7qs/yWbWZH71Sz2bNHqcGfPfd4hyhJlxSgxymwVz0inbNhfbxCA1Aaz
-         EZKnyJFoNTNIGhAiBA1bTk3dE6nn1dN87hiRpbR4kdXhrKZO5gcgC0AsDqy1b8jZqDx3
-         wTbjLVuG4rbvez+yIGX+sv75GVrCWRe2GoM9NJeNgA4JXIjj69p3pKbJSJobMehJPU2N
-         FP4A==
-X-Gm-Message-State: APjAAAXQqk4D7NRDCBcmQ4UpK8OC+ionat+QFoiADC1UyAgsWFBXj3qb
-        PL73+BC75cEHsFfsC0vTDJLUdQ==
-X-Google-Smtp-Source: APXvYqzu741BNphc7Bkte8hG3txzzfxmRNvj7kUnHgJredomsRJ9fKepXbx6ZmCo5ts7buHZQwE5Qw==
-X-Received: by 2002:a1c:2ec6:: with SMTP id u189mr1791329wmu.67.1565686057680;
-        Tue, 13 Aug 2019 01:47:37 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id w15sm832270wmi.19.2019.08.13.01.47.36
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Aug 2019 01:47:37 -0700 (PDT)
-Subject: Re: [RFC PATCH v6 75/92] kvm: x86: disable gpa_available optimization
- in emulator_read_write_onepage()
-To:     =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        =?UTF-8?Q?Samuel_Laur=c3=a9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        Yu C Zhang <yu.c.zhang@intel.com>,
-        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-76-alazar@bitdefender.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <eb748e05-8289-0c05-6907-b6c898f6080b@redhat.com>
-Date:   Tue, 13 Aug 2019 10:47:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727639AbfHMIw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 04:52:58 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4239 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726890AbfHMIw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 04:52:58 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 124E0E3933AC374F08C4;
+        Tue, 13 Aug 2019 16:52:57 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Tue, 13 Aug 2019
+ 16:52:48 +0800
+From:   Zenghui Yu <yuzenghui@huawei.com>
+To:     <kvmarm@lists.cs.columbia.edu>, <qemu-arm@nongnu.org>
+CC:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
+        "James Morse" <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        <suzuki.poulose@arm.com>, <peter.maydell@linaro.org>,
+        <kvm@vger.kernel.org>,
+        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>,
+        <zhang.zhanghailiang@huawei.com>
+Subject: Can we boot a 512U kvm guest?
+Message-ID: <86aa9609-7dc9-1461-ae47-f50897cd0875@huawei.com>
+Date:   Tue, 13 Aug 2019 16:50:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
-In-Reply-To: <20190809160047.8319-76-alazar@bitdefender.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/19 18:00, Adalbert Lazăr wrote:
-> If the EPT violation was caused by an execute restriction imposed by the
-> introspection tool, gpa_available will point to the instruction pointer,
-> not the to the read/write location that has to be used to emulate the
-> current instruction.
-> 
-> This optimization should be disabled only when the VM is introspected,
-> not just because the introspection subsystem is present.
-> 
-> Signed-off-by: Adalbert Lazăr <alazar@bitdefender.com>
+Hi folks,
 
-The right thing to do is to not set gpa_available for fetch failures in 
-kvm_mmu_page_fault instead:
+Since commit e25028c8ded0 ("KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to
+512"), we seemed to be allowed to boot a 512U guest.  But I failed to
+start it up with the latest QEMU.  I guess there are at least *two*
+reasons (limitations).
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 24843cf49579..1bdca40fa831 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -5364,8 +5364,12 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u64 error_code,
- 	enum emulation_result er;
- 	bool direct = vcpu->arch.mmu->direct_map;
- 
--	/* With shadow page tables, fault_address contains a GVA or nGPA.  */
--	if (vcpu->arch.mmu->direct_map) {
-+	/*
-+	 * With shadow page tables, fault_address contains a GVA or nGPA.
-+	 * On a fetch fault, fault_address contains the instruction pointer.
-+	 */
-+	if (vcpu->arch.mmu->direct_map &&
-+	    likely(!(error_code & PFERR_FETCH_MASK)) {
- 		vcpu->arch.gpa_available = true;
- 		vcpu->arch.gpa_val = cr2;
- 	}
+First I got a QEMU abort:
+	"kvm_set_irq: Invalid argument"
+
+Enable the trace_kvm_irq_line() under debugfs, when it comed with
+vcpu-256, I got:
+	"Inject UNKNOWN interrupt (3), vcpu->idx: 0, num: 23, level: 0"
+and kvm_vm_ioctl_irq_line() returns -EINVAL to user-space...
+
+So the thing is that we only have 8 bits for vcpu_index field ([23:16])
+in KVM_IRQ_LINE ioctl.  irq_type field will be corrupted if we inject a
+PPI to vcpu-256, whose vcpu_index will take 9 bits.
+
+I temporarily patched the KVM and QEMU with the following diff:
+
+---8<---
+diff --git a/arch/arm64/include/uapi/asm/kvm.h 
+b/arch/arm64/include/uapi/asm/kvm.h
+index 95516a4..39a0fb1 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -325,10 +325,10 @@ struct kvm_vcpu_events {
+  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+
+  /* KVM_IRQ_LINE irq field index values */
+-#define KVM_ARM_IRQ_TYPE_SHIFT		24
+-#define KVM_ARM_IRQ_TYPE_MASK		0xff
++#define KVM_ARM_IRQ_TYPE_SHIFT		28
++#define KVM_ARM_IRQ_TYPE_MASK		0xf
+  #define KVM_ARM_IRQ_VCPU_SHIFT		16
+-#define KVM_ARM_IRQ_VCPU_MASK		0xff
++#define KVM_ARM_IRQ_VCPU_MASK		0xfff
+  #define KVM_ARM_IRQ_NUM_SHIFT		0
+  #define KVM_ARM_IRQ_NUM_MASK		0xffff
+
+---8<---
+
+It makes things a bit better, it also immediately BREAKs the api with
+old versions.
 
 
-Paolo
+Next comes one more QEMU abort (with the "fix" above):
+	"Failed to set device address: No space left on device"
 
-> ---
->  arch/x86/kvm/x86.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 965c4f0108eb..3975331230b9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5532,7 +5532,7 @@ static int emulator_read_write_onepage(unsigned long addr, void *val,
->  	 * operation using rep will only have the initial GPA from the NPF
->  	 * occurred.
->  	 */
-> -	if (vcpu->arch.gpa_available &&
-> +	if (vcpu->arch.gpa_available && !kvmi_is_present() &&
->  	    emulator_can_use_gpa(ctxt) &&
->  	    (addr & ~PAGE_MASK) == (vcpu->arch.gpa_val & ~PAGE_MASK)) {
->  		gpa = vcpu->arch.gpa_val;
-> 
+We register two io devices (rd_dev and sgi_dev) on KVM_MMIO_BUS for
+each redistributor. 512 vcpus take 1024 io devices, which is beyond the
+maximum limitation of the current kernel - NR_IOBUS_DEVS (1000).
+So we get a ENOSPC error here.
+
+
+I don't know if the similar problems have been discussed before in ML.
+Is it time to really support the 512U guest?
+
+
+Thanks,
+zenghui
 
