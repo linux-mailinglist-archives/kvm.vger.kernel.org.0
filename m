@@ -2,118 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D7DB8C41F
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 00:10:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38CFB8C4AE
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 01:14:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727061AbfHMWKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 18:10:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36356 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726260AbfHMWKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 18:10:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1FB44806A2;
-        Tue, 13 Aug 2019 22:10:16 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AEF7F82E52;
-        Tue, 13 Aug 2019 22:10:15 +0000 (UTC)
-Date:   Tue, 13 Aug 2019 16:10:15 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
-Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Message-ID: <20190813161015.22395e91@x1.home>
-In-Reply-To: <f8119b68-bf75-9e01-e799-0c1cf965ba83@redhat.com>
-References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
-        <20190205210137.1377-11-sean.j.christopherson@intel.com>
-        <20190813100458.70b7d82d@x1.home>
-        <20190813170440.GC13991@linux.intel.com>
-        <20190813115737.5db7d815@x1.home>
-        <20190813133316.6fc6f257@x1.home>
-        <20190813201914.GI13991@linux.intel.com>
-        <cd9e5c9d-a321-b2f3-608d-0b8f74a5075f@redhat.com>
-        <20190813151417.2cf979ca@x1.home>
-        <f8119b68-bf75-9e01-e799-0c1cf965ba83@redhat.com>
-Organization: Red Hat
+        id S1726267AbfHMXOt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 19:14:49 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:43986 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725923AbfHMXOs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 19:14:48 -0400
+Received: by mail-ot1-f67.google.com with SMTP id e12so33817928otp.10;
+        Tue, 13 Aug 2019 16:14:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JfCDYzsbmylRyo21gErMd6dmJhyO/WKByIVYuR2+KCQ=;
+        b=YCRnu82XB51HlJE2bJ2ABN473mPpLvpS1+D+gsZKtfSqkAJWl3J2febSoofC9HVlXv
+         4UpKKuTsjLtc1nCxNACdSMt3GbSMoAADzqfWfvprYprmroYb2/7aES+50BLjnvqQfy84
+         tIvgdL3DxiC5tA9xy1j6FgdZO36ONJYh3B0dzA6NruPx7pfaxtmyeYfORBHPPG5qaY7Y
+         V6FScNDv12Fk33JzrJibueWFzllWA54+7utXKTBA7N9RDlGjTyJv+y/gRE3jLlJ2bAsj
+         UoBEEIKUHtdsSUrYob4u0uXuKBOduX1bCx+nWrKKzk+d/qLtb/KPiIHuG5azLupljFK5
+         YB2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JfCDYzsbmylRyo21gErMd6dmJhyO/WKByIVYuR2+KCQ=;
+        b=n8AU4RBQUQxtfvxfpFCMQvanblXIsi6ryMtcKyLPgULpHuELGTJF9hzmfNz1u3QsGL
+         rz+SETy1KmFbChK+uHUz8AWCarmUJi0Qukm8RrmtNa5gkw3udfOw6+XDzQb9GAvx7HFt
+         PyXP70DQiClSw1bydV0Sz+yea9/Ag2CG0V0UuPdKCANyzklmPwlZkdQgsxQRh3f+drin
+         0dTtrXCWWOPmF+HIT4/avv9T4Vi8k9N8I6yuEO386qRN0Lkfp/3cDvPpDFEjVe5mQxXf
+         XLtwzs+irAnlE/1f9oG9Xs/N336QIYvnjK3Z1IZqwASXu3tYPTUqTYNXxfEKX+5CXyic
+         0/yg==
+X-Gm-Message-State: APjAAAW0wncSOFw8J1/IsaYR6vwZ4AZzmyzlBxW6TZ8zua5sea8XSrAn
+        ErVPKGrRhoTaEE05u7ihH9r37o0GeWt65wUcNxg=
+X-Google-Smtp-Source: APXvYqwLI2Fib9qI+Djp/FJahaxKBV2uh7K8EoSHkO2am5+Zd+BprsaBzWmlkQ135bmDf66SvtJqCocH0IsUZ14QZ88=
+X-Received: by 2002:a5e:8c11:: with SMTP id n17mr5577226ioj.64.1565738087631;
+ Tue, 13 Aug 2019 16:14:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 13 Aug 2019 22:10:16 +0000 (UTC)
+References: <20190812131235.27244-1-nitesh@redhat.com> <20190812131235.27244-2-nitesh@redhat.com>
+ <CAKgT0UcSabyrO=jUwq10KpJKLSuzorHDnKAGrtWVigKVgvD-6Q@mail.gmail.com>
+ <ca362045-9668-18ff-39b0-de91fa72e73c@redhat.com> <d39504c9-93bd-b8f7-e119-84baac5a42d4@redhat.com>
+ <32f61f87-6205-5001-866c-a84e20fc9d85@redhat.com>
+In-Reply-To: <32f61f87-6205-5001-866c-a84e20fc9d85@redhat.com>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Tue, 13 Aug 2019 16:14:36 -0700
+Message-ID: <CAKgT0UfaaHrEaS2wsbdTuzCdCtSrM4Tx79w=dP8HPEnq+T7rtQ@mail.gmail.com>
+Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
+        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+        Pankaj Gupta <pagupta@redhat.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Rik van Riel <riel@surriel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
+        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
+        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Aug 2019 23:15:38 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 13/08/19 23:14, Alex Williamson wrote:
-> >> Do we even need the call to slot_handle_all_level?  The rmap update
-> >> should be done already by kvm_mmu_prepare_zap_page (via
-> >> kvm_mmu_page_unlink_children -> mmu_page_zap_pte -> drop_spte).
+On Tue, Aug 13, 2019 at 3:34 AM David Hildenbrand <david@redhat.com> wrote:
+>
+> >>>> +static int process_free_page(struct page *page,
+> >>>> +                            struct page_reporting_config *phconf, int count)
+> >>>> +{
+> >>>> +       int mt, order, ret = 0;
+> >>>> +
+> >>>> +       mt = get_pageblock_migratetype(page);
+> >>>> +       order = page_private(page);
+> >>>> +       ret = __isolate_free_page(page, order);
+> >>>> +
+> >> I just started looking into the wonderful world of
+> >> isolation/compaction/migration.
 > >>
-> >> Alex, can you replace it with just "flush = false;"?  
-> > Replace the continue w/ flush = false?  I'm not clear on this
-> > suggestion.  Thanks,  
-> 
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 24843cf49579..382b3ee303e3 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -5664,7 +5668,7 @@ kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm
->  	if (list_empty(&kvm->arch.active_mmu_pages))
->  		goto out_unlock;
-> 
-> -	flush = slot_handle_all_level(kvm, slot, kvm_zap_rmapp, false);
-> +	flush = false;
-> 
->  	for (i = 0; i < slot->npages; i++) {
->  		gfn = slot->base_gfn + i;
-> 
+> >> I don't think saving/restoring the migratetype is correct here. AFAIK,
+> >> MOVABLE/UNMOVABLE/RECLAIMABLE is just a hint, doesn't mean that e.g.,
+> >> movable pages and up in UNMOVABLE or ordinary kernel allocations on
+> >> MOVABLE. So that shouldn't be an issue - I guess.
+> >>
+> >> 1. You should never allocate something that is no
+> >> MOVABLE/UNMOVABLE/RECLAIMABLE. Especially not, if you have ISOLATE or
+> >> CMA here. There should at least be a !is_migrate_isolate_page() check
+> >> somewhere
+> >>
+> >> 2. set_migratetype_isolate() takes the zone lock, so to avoid racing
+> >> with isolation code, you have to hold the zone lock. Your code seems to
+> >> do that, so at least you cannot race against isolation.
+> >>
+> >> 3. You could end up temporarily allocating something in the
+> >> ZONE_MOVABLE. The pages you allocate are, however, not movable. There
+> >> would have to be a way to make alloc_contig_range()/offlining code
+> >> properly wait until the pages have been processed. Not sure about the
+> >> real implications, though - too many details in the code (I wonder if
+> >> Alex' series has a way of dealing with that)
+> >>
+> >> When you restore the migratetype, you could suddenly overwrite e.g.,
+> >> ISOLATE, which feels wrong.
+> >
+> >
+> > I was triggering an occasional CPU stall bug earlier, with saving and restoring
+> > the migratetype I was able to fix it.
+> > But I will further look into this to figure out if it is really required.
+> >
+>
+> You should especially look into handling isolated/cma pages. Maybe that
+> was the original issue. Alex seems to have added that in his latest
+> series (skipping isolated/cma pageblocks completely) as well.
 
-Things are not happy with that, it managed to crash the host:
-
-[  871.244789] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[  871.258680] #PF: supervisor read access in kernel mode
-[  871.268939] #PF: error_code(0x0000) - not-present page
-[  871.279202] PGD 0 P4D 0 
-[  871.284264] Oops: 0000 [#1] SMP PTI
-[  871.291232] CPU: 3 PID: 1954 Comm: CPU 0/KVM Not tainted 5.3.0-rc4+ #4
-[  871.304264] Hardware name: System manufacturer System Product Name/P8H67-M PRO, BIOS 3904 04/27/2013
-[  871.322523] RIP: 0010:gfn_to_rmap+0xd9/0x120 [kvm]
-[  871.332085] Code: c7 48 8d 0c 80 48 8d 04 48 4d 8d 14 c0 49 8b 02 48 39 c6 72 15 49 03 42 08 48 39 c6 73 0c 41 89 b9 08 b4 00 00 49 8b 3a eb 0b <48> 8b 3c 25 00 00 00 00 45 31 d2 0f b6 42 24 83 e0 0f 83 e8 01 8d
-[  871.369560] RSP: 0018:ffffc10300a0bb18 EFLAGS: 00010202
-[  871.379995] RAX: 00000000000c1040 RBX: ffffc103007cd000 RCX: 0000000000000014
-[  871.394243] RDX: ffff9b3bbff18130 RSI: 00000000000c1080 RDI: 0000000000000004
-[  871.408491] RBP: ffff9b3bced15400 R08: ffff9b3b94a90008 R09: ffff9b3b94a90000
-[  871.422739] R10: ffff9b3b94a90168 R11: 0000000000000004 R12: ffff9b3bbff18130
-[  871.436986] R13: ffffc103007cd000 R14: 0000000000000000 R15: 00000000000c1000
-[  871.451234] FS:  00007fc27b37d700(0000) GS:ffff9b3f9f4c0000(0000) knlGS:0000000000000000
-[  871.467390] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  871.478865] CR2: 0000000000000000 CR3: 000000003bb2a004 CR4: 00000000001626e0
-[  871.493113] Call Trace:
-[  871.498012]  drop_spte+0x77/0xa0 [kvm]
-[  871.505500]  mmu_page_zap_pte+0xac/0xe0 [kvm]
-[  871.514200]  __kvm_mmu_prepare_zap_page+0x69/0x350 [kvm]
-[  871.524809]  kvm_mmu_invalidate_zap_pages_in_memslot+0xb7/0x130 [kvm]
-[  871.537670]  kvm_page_track_flush_slot+0x55/0x80 [kvm]
-[  871.547928]  __kvm_set_memory_region+0x821/0xaa0 [kvm]
-[  871.558191]  kvm_set_memory_region+0x26/0x40 [kvm]
-[  871.567759]  kvm_vm_ioctl+0x59a/0x940 [kvm]
-[  871.576106]  ? __seccomp_filter+0x7a/0x680
-[  871.584287]  do_vfs_ioctl+0xa4/0x630
-[  871.591430]  ? security_file_ioctl+0x32/0x50
-[  871.599954]  ksys_ioctl+0x60/0x90
-[  871.606575]  __x64_sys_ioctl+0x16/0x20
-[  871.614066]  do_syscall_64+0x5f/0x1a0
-[  871.621379]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-It also failed with the 1 vcpu test.  Thanks,
-
-Alex
+So as far as skipping isolated pageblocks, I get the reason for
+skipping isolated, but why would we need to skip CMA? I had made the
+change I did based on comments you had made earlier. But while working
+on some of the changes to address isolation better and looking over
+several spots in the code it seems like CMA is already being used as
+an allocation fallback for MIGRATE_MOVABLE. If that is the case
+wouldn't it make sense to allow pulling pages and reporting them while
+they are in the free_list?
