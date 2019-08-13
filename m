@@ -2,78 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 76D0A8C31A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 23:05:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6F7E8C363
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 23:14:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727061AbfHMVFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 17:05:49 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40291 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726767AbfHMVFr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 17:05:47 -0400
-Received: by mail-wr1-f68.google.com with SMTP id c3so796087wrd.7
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 14:05:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HJ28iMshNN+NfaYy5xmyO1ZNXjql14U0nhtFiTgokwg=;
-        b=JCcDvud07EgZT1rre6hHEx7B7FPThQCasKRLblktNtT1gUwM/jfVad9QrKv/VupN9K
-         8GOxCzLbK02uKYcE82PTb6owagQLau2l231jxWZpoJxJ10mJYDyc8I3GVxDRSxvPPtZW
-         7jaeJRA/FA9GAbkkIYZNe4+Tg5E/9qTx0FltCYbamxqGMOAd3vZyEq5DJUcmsQXad+11
-         2HTiVQe0GK/FZ/5fY+v/s2ieljKfV9aT0PSJuQwM2XOEZJmmyAs+WtcLf0TT2EJLaGk2
-         0nBixpfQ6LOzNo/ks8JYMdpqCrPmF508pvXQSZHdRshFoFKUYV0gbJ94fjJOIEjz3aV8
-         s+ig==
-X-Gm-Message-State: APjAAAX2G6ZLCkXqe9PO0hTAnLEDiBVMfRX6JTHSxZ6bJe7V2199tdtJ
-        2+ZhdHJguvUJSW5IhWwY/NmgNdNO6E8=
-X-Google-Smtp-Source: APXvYqyZ2jr5qyk4/FAkQ2DyqARV1LTJjfCPOq/HKPV6Qw8yfVvQ3YnqFSIPzkb9wVVggdiMAOhRwQ==
-X-Received: by 2002:adf:fdd0:: with SMTP id i16mr34701233wrs.260.1565730345733;
-        Tue, 13 Aug 2019 14:05:45 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id v65sm3210320wme.31.2019.08.13.14.05.43
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Aug 2019 14:05:44 -0700 (PDT)
-Subject: Re: [RFC PATCH v6 76/92] kvm: x86: disable EPT A/D bits if
- introspection is present
-To:     =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>,
-        KVM list <kvm@vger.kernel.org>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-77-alazar@bitdefender.com>
- <9f8b31c5-2252-ddc5-2371-9c0959ac5a18@redhat.com>
- <0550f8d65bb97486e98d88255ea45d490da6b802.camel@bitdefender.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <662761e1-5709-663f-524f-579f8eba4060@redhat.com>
-Date:   Tue, 13 Aug 2019 23:05:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726604AbfHMVOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 17:14:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49744 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726582AbfHMVOS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 17:14:18 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5AAE6155DB;
+        Tue, 13 Aug 2019 21:14:18 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C049B10016E8;
+        Tue, 13 Aug 2019 21:14:17 +0000 (UTC)
+Date:   Tue, 13 Aug 2019 15:14:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
+Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
+ removing a memslot
+Message-ID: <20190813151417.2cf979ca@x1.home>
+In-Reply-To: <cd9e5c9d-a321-b2f3-608d-0b8f74a5075f@redhat.com>
+References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
+        <20190205210137.1377-11-sean.j.christopherson@intel.com>
+        <20190813100458.70b7d82d@x1.home>
+        <20190813170440.GC13991@linux.intel.com>
+        <20190813115737.5db7d815@x1.home>
+        <20190813133316.6fc6f257@x1.home>
+        <20190813201914.GI13991@linux.intel.com>
+        <cd9e5c9d-a321-b2f3-608d-0b8f74a5075f@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <0550f8d65bb97486e98d88255ea45d490da6b802.camel@bitdefender.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 13 Aug 2019 21:14:18 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/08/19 20:36, Mihai Donțu wrote:
->> Why?
-> When EPT A/D is enabled, all guest page table walks are treated as
-> writes (like AMD's NPT). Thus, an introspection tool hooking the guest
-> page tables would trigger a flood of VMEXITs (EPT write violations)
-> that will get the introspected VM into an unusable state.
+On Tue, 13 Aug 2019 22:37:14 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 13/08/19 22:19, Sean Christopherson wrote:
+> > Yes?  Shadow pages are stored in a hash table, for_each_valid_sp() walks
+> > all entries for a given gfn.  The sp->gfn check is there to skip entries
+> > that hashed to the same list but for a completely different gfn.
+> > 
+> > Skipping the gfn check would be sort of a lightweight zap all in the
+> > sense that it would zap shadow pages that happend to collide with the
+> > target memslot/gfn but are otherwise unrelated.
+> > 
+> > What happens if you give just the GPU BAR at 0x80000000 a pass, i.e.:
+> > 
+> > 	if (sp->gfn != gfn && sp->gfn != 0x80000)
+> > 		continue;
+
+Not having any luck with this yet.  Tried 0x80000, 0x8xxxxx, 0.
+ 
+> > If that doesn't work, it might be worth trying other gfns to see if you
+> > can pinpoint which sp is being zapped as collateral damage.
+> > 
+> > It's possible there is a pre-existing bug somewhere else that was being
+> > hidden because KVM was effectively zapping all SPTEs during (re)boot,
+> > and the hash collision is also hiding the bug by zapping the stale entry.
+> > 
+> > Of course it's also possible this code is wrong, :-)  
 > 
-> Our implementation of such an introspection tool builds a cache of
-> {cr3, gva} -> gpa, which is why it needs to monitor all guest PTs by
-> hooking them for write.
+> Also, can you reproduce it with one vCPU?  This could (though not really
+> 100%) distinguish a missing invalidation from a race condition.
 
-Please include the kvm list too.
+That's a pretty big change, I'll give it a shot, but not sure how
+conclusive it would be.
 
-One issue here is that it changes the nested VMX ABI.  Can you leave EPT
-A/D in place for the shadow EPT MMU, but not for "regular" EPT pages?
+> Do we even need the call to slot_handle_all_level?  The rmap update
+> should be done already by kvm_mmu_prepare_zap_page (via
+> kvm_mmu_page_unlink_children -> mmu_page_zap_pte -> drop_spte).
+> 
+> Alex, can you replace it with just "flush = false;"?
 
-Also, what is the state of introspection support on AMD?
+Replace the continue w/ flush = false?  I'm not clear on this
+suggestion.  Thanks,
 
-Paolo
+Alex
