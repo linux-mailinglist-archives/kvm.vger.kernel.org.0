@@ -2,119 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F8D48AEEE
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 07:48:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71F388AF21
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 08:04:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbfHMFsP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 01:48:15 -0400
-Received: from mga01.intel.com ([192.55.52.88]:21760 "EHLO mga01.intel.com"
+        id S1727129AbfHMGEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 02:04:14 -0400
+Received: from mga07.intel.com ([134.134.136.100]:20968 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725836AbfHMFsP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 01:48:15 -0400
+        id S1725815AbfHMGEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 02:04:14 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 22:48:14 -0700
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Aug 2019 23:03:48 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,380,1559545200"; 
-   d="scan'208";a="376191369"
+   d="scan'208";a="183779909"
 Received: from unknown (HELO localhost) ([10.239.159.128])
-  by fmsmga006.fm.intel.com with ESMTP; 12 Aug 2019 22:48:13 -0700
-Date:   Tue, 13 Aug 2019 13:49:57 +0800
+  by FMSMGA003.fm.intel.com with ESMTP; 12 Aug 2019 23:03:46 -0700
+Date:   Tue, 13 Aug 2019 14:05:29 +0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, pbonzini@redhat.com, mst@redhat.com,
         rkrcmar@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v6 4/8] KVM: VMX: Pass through CET related MSRs to Guest
-Message-ID: <20190813054956.GC2432@local-michael-cet-test>
+Subject: Re: [PATCH v6 7/8] KVM: x86: Load Guest fpu state when accessing
+ MSRs managed by XSAVES
+Message-ID: <20190813060529.GD2432@local-michael-cet-test>
 References: <20190725031246.8296-1-weijiang.yang@intel.com>
- <20190725031246.8296-5-weijiang.yang@intel.com>
- <20190812235341.GG4996@linux.intel.com>
+ <20190725031246.8296-8-weijiang.yang@intel.com>
+ <20190812230203.GC4996@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190812235341.GG4996@linux.intel.com>
+In-Reply-To: <20190812230203.GC4996@linux.intel.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 04:53:41PM -0700, Sean Christopherson wrote:
-> On Thu, Jul 25, 2019 at 11:12:42AM +0800, Yang Weijiang wrote:
-> > CET MSRs pass through Guest directly to enhance performance.
-> > CET runtime control settings are stored in MSR_IA32_{U,S}_CET,
-> > Shadow Stack Pointer(SSP) are stored in MSR_IA32_PL{0,1,2,3}_SSP,
-> > SSP table base address is stored in MSR_IA32_INT_SSP_TAB,
-> > these MSRs are defined in kernel and re-used here.
+On Mon, Aug 12, 2019 at 04:02:03PM -0700, Sean Christopherson wrote:
+> On Thu, Jul 25, 2019 at 11:12:45AM +0800, Yang Weijiang wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
 > > 
-> > MSR_IA32_U_CET and MSR_IA32_PL3_SSP are used for user mode protection,
-> > the contents could differ from process to process, therefore,
-> > kernel needs to save/restore them during context switch, it makes
-> > sense to pass through them so that the guest kernel can
-> > use xsaves/xrstors to operate them efficiently. Other MSRs are used
-> > for non-user mode protection. See CET spec for detailed info.
+> > A handful of CET MSRs are not context switched through "traditional"
+> > methods, e.g. VMCS or manual switching, but rather are passed through
+> > to the guest and are saved and restored by XSAVES/XRSTORS, i.e. the
+> > guest's FPU state.
 > > 
-> > The difference between CET VMCS state fields and xsave components is that,
-> > the former used for CET state storage during VMEnter/VMExit,
-> > whereas the latter used for state retention between Guest task/process
-> > switch.
+> > Load the guest's FPU state if userspace is accessing MSRs whose values
+> > are managed by XSAVES so that the MSR helper, e.g. vmx_{get,set}_msr(),
+> > can simply do {RD,WR}MSR to access the guest's value.
 > > 
-> > Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> > Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> > Note that guest_cpuid_has() is not queried as host userspace is allowed
+> > to access MSRs that have not been exposed to the guest, e.g. it might do
+> > KVM_SET_MSRS prior to KVM_SET_CPUID2.
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
 > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > > ---
-> >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
+> >  arch/x86/kvm/x86.c | 29 ++++++++++++++++++++++++++++-
+> >  1 file changed, 28 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index ce1d6fe21780..ce5d1e45b7a5 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6952,6 +6952,7 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
-> >  static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +	unsigned long *msr_bitmap;
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index fafd81d2c9ea..c657e6a56527 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -102,6 +102,8 @@ static void enter_smm(struct kvm_vcpu *vcpu);
+> >  static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+> >  static void store_regs(struct kvm_vcpu *vcpu);
+> >  static int sync_regs(struct kvm_vcpu *vcpu);
+> > +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
+> > +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
 > >  
-> >  	if (cpu_has_secondary_exec_ctrls()) {
-> >  		vmx_compute_secondary_exec_control(vmx);
-> > @@ -6973,6 +6974,19 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
-> >  	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
-> >  			guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
-> >  		update_intel_pt_cfg(vcpu);
-> > +
-> > +	msr_bitmap = vmx->vmcs01.msr_bitmap;
-> > +
-> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
-> > +	    guest_cpuid_has(vcpu, X86_FEATURE_IBT)) {
-> 
-> These should be exposed to the guest if and only if they're supported in
-> the host and guest, i.e. kvm_supported_xss() needs to be checked.  And,
-> again assuming USER and KERNEL can be virtualized independently, the logic
-> needs to account for exposting USER but KERNEL and vice versa.
->
-this patch serial is supposed to enable both USER and KERNEL mode CET as
-long as platform and host kernel support so. I'll add condition check
-before pass through correspond MSR to guest OS.
-
-> > +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_U_CET, MSR_TYPE_RW);
-> > +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_S_CET, MSR_TYPE_RW);
-> > +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_INT_SSP_TAB, MSR_TYPE_RW);
-> > +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL0_SSP, MSR_TYPE_RW);
-> > +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL1_SSP, MSR_TYPE_RW);
-> > +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL2_SSP, MSR_TYPE_RW);
-> > +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL3_SSP, MSR_TYPE_RW);
-> 
-> The SSP MSRs should only be passed through if the guest has SHSTK, e.g.
-> KVM should intercept RDMSR and WRMSR to inject #GP in those cases.
-> 
-> > +	}
+> >  struct kvm_x86_ops *kvm_x86_ops __read_mostly;
+> >  EXPORT_SYMBOL_GPL(kvm_x86_ops);
+> > @@ -2959,6 +2961,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 > >  }
+> >  EXPORT_SYMBOL_GPL(kvm_get_msr_common);
 > >  
-> >  static void vmx_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
+> > +static bool is_xsaves_msr(u32 index)
+> > +{
+> > +	return index == MSR_IA32_U_CET ||
+> > +	       (index >= MSR_IA32_PL0_SSP && index <= MSR_IA32_PL3_SSP);
+> > +}
+> > +
+> >  /*
+> >   * Read or write a bunch of msrs. All parameters are kernel addresses.
+> >   *
+> > @@ -2969,11 +2977,30 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
+> >  		    int (*do_msr)(struct kvm_vcpu *vcpu,
+> >  				  unsigned index, u64 *data))
+> >  {
+> > +	bool fpu_loaded = false;
+> >  	int i;
+> > +	u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
+> 
+> Dunno if the compiler will actually generate different code, but this can be a
+> const.
+>
+OK, will add it.
+> > +	u64 host_xss = 0;
+> > +
+> > +	for (i = 0; i < msrs->nmsrs; ++i) {
+> > +		if (!fpu_loaded && is_xsaves_msr(entries[i].index)) {
+> > +			if (!kvm_x86_ops->xsaves_supported() ||
+> > +			    !kvm_x86_ops->supported_xss())
+> 
+> The "!kvm_x86_ops->supported_xss()" is redundant with the host_xss check
+> below.
+> 
+> > +				continue;
+> 
+> Hmm, vmx_set_msr() should be checking host_xss, arguably we should call
+> do_msr() and let it handle the bad MSR access.  I don't have a strong
+> opinion either way, practically speaking the end result will be the same.
+> 
+> If we do want to handle a misbehaving userspace here, this should be
+> 'break' instead of 'continue'.
+> 
+> > +
+> > +			host_xss = kvm_x86_ops->supported_xss();
+> >  
+> > -	for (i = 0; i < msrs->nmsrs; ++i)
+> > +			if ((host_xss & cet_bits) != cet_bits)
+> 
+> I'm pretty sure this should check for either CET bit being set, not both,
+> e.g. I assume it's possible to enable and expose XFEATURE_MASK_CET_USER
+> but not XFEATURE_MASK_CET_KERNEL.
+> 
+> So something like
+> 
+> 	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
+> 	const bool cet_supported = kvm_x86_ops->xsaves_supported() &&
+> 				   (kvm_x86_ops->supported_xss() & cet_bits);
+> 
+> 	for (i = 0; i < msrs->nmsrs; ++i) {
+> 		if (!fpu_loaded && cet_supported &&
+> 		    is_xsaves_msr(entries[i].index)) {
+> 			kvm_load_guest_fpu(vcpu);
+> 			fpu_loaded = true;
+> 		}
+> 		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+> 			break;	
+> 	}
+> 
+thanks, will modify the patch.
+> or
+> 
+> 	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
+> 
+> 	for (i = 0; i < msrs->nmsrs; ++i) {
+> 		if (!fpu_loaded && is_xsaves_msr(entries[i].index)) {
+> 			if (!kvm_x86_ops->supported_xss() ||
+> 			    !(kvm_x86_ops->supported_xss() & cet_bits))
+> 				break;
+> 			kvm_load_guest_fpu(vcpu);
+> 			fpu_loaded = true;
+> 		}
+> 		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+> 			break;	
+> 	}
+> 
+> 
+> > +				continue;
+> > +
+> > +			kvm_load_guest_fpu(vcpu);
+> > +			fpu_loaded = true;
+> > +		}
+> >  		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+> >  			break;
+> > +	}
+> > +	if (fpu_loaded)
+> > +		kvm_put_guest_fpu(vcpu);
+> >  
+> >  	return i;
+> >  }
 > > -- 
 > > 2.17.2
 > > 
