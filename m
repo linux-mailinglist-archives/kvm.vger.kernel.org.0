@@ -2,66 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5878C8BED3
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 18:41:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D89748BEDD
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2019 18:43:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727942AbfHMQlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Aug 2019 12:41:08 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:48470 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbfHMQlI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Aug 2019 12:41:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=7HlWwLFzCOZ7QQzVMV27bTyBbuYurJG67TdGyoRs0fo=; b=MG4m3VyHxaBDt/hiB/6nJ65WT
-        b9Emowpcs+4HzgPIxmnraEW2+NFya3pXsJqx0S8UbklD6unAQ440ZPfk/zs9iuo2ojw7YF3XpQNqU
-        iWQLBbQAx3tKFWzwOmMqGdgMqVC4dkSROVMEOa+09M/2vCct8HDQwhsXjUpVAkljtlKuwE1fG20VN
-        HJxyfbbJrM+FgMUi0BFqDeZQGMvItaJU5kREdwtYCZTrNVG98Ys6PLgUbVWzroCggRKDKodRocPuB
-        2a1h94b6GBDUPat/0+u1o1LGSsIScGeECk/QhTkMpWqbOxzKJ6DY4oAmPhzadn3POONzyq6oDZlyI
-        cx9F5vrwg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1hxZr7-0000hw-Tj; Tue, 13 Aug 2019 16:41:05 +0000
-Date:   Tue, 13 Aug 2019 09:41:05 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
-Message-ID: <20190813164105.GD22640@infradead.org>
-References: <20190809054851.20118-1-jasowang@redhat.com>
- <20190810134948-mutt-send-email-mst@kernel.org>
- <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
- <20190812054429-mutt-send-email-mst@kernel.org>
- <20190812130252.GE24457@ziepe.ca>
- <9a9641fe-b48f-f32a-eecc-af9c2f4fbe0e@redhat.com>
- <20190813115707.GC29508@ziepe.ca>
+        id S1726810AbfHMQn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Aug 2019 12:43:58 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33446 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726298AbfHMQn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Aug 2019 12:43:58 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n9so108491609wru.0
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2019 09:43:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=R+TQ2SRZqheh/+m+AgbCNj23H0NoT711BBAwP7NZvNk=;
+        b=LGWTAeSvzO4q8U4Gldr//V00MUKnHFQk1fbJBD/6CZP4oPfa/+3LyocQaArwNOAksf
+         MLI4ucgxNOdSF6VtB8LIjwHVcThA2rUPOjphKUtBrw6wLxEsvNjmKhuVqSqwynQN6SuM
+         v1aJcHxxouzS3Cwmz5DVgLzQ7tXtpuNuqr1Gb9/lcg/xw0TfKNfJfetiDrY9HUYJoCpU
+         lJmeHPD/Ake9vVKOo4PAcs3P2Y4UFINb+trFj45Bv81TEbVKuHuO3k0xENvbsR5z2B1v
+         jWKCrZE0nnVzoSY6kKYjEFNrpXP4SrGe7iVY78aHBe3ELhuqzipqGfYP/24/VrAM9L5c
+         Jhhw==
+X-Gm-Message-State: APjAAAViJODSAk7dLoej50OP/yFWE4XKFvF931ptP0HH7acRhQEogbq/
+        +s39YmduV2uT57WJuX6IchRqig==
+X-Google-Smtp-Source: APXvYqyLJEa/u5ApuHODI1ChbVsHPnV50CLirBt9pvSGLUI9pb/mMfHDZJd6oyXT4LApa3VSEoT/Tw==
+X-Received: by 2002:a5d:568e:: with SMTP id f14mr46435405wrv.167.1565714636124;
+        Tue, 13 Aug 2019 09:43:56 -0700 (PDT)
+Received: from xz-x1 ([195.112.86.171])
+        by smtp.gmail.com with ESMTPSA id o20sm272367456wrh.8.2019.08.13.09.43.55
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 13 Aug 2019 09:43:55 -0700 (PDT)
+Date:   Tue, 13 Aug 2019 18:43:54 +0200
+From:   Peter Xu <peterx@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Peter Xu <zhexu@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 2/3] KVM: X86: Remove tailing newline for tracepoints
+Message-ID: <20190813164354.GA14469@xz-x1>
+References: <20190729053243.9224-1-peterx@redhat.com>
+ <20190729053243.9224-3-peterx@redhat.com>
+ <CANRm+CxkdBXZ170nXiKiQ-a-xzZObEXZdBgsAx5jrE=aroTR5w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190813115707.GC29508@ziepe.ca>
+In-Reply-To: <CANRm+CxkdBXZ170nXiKiQ-a-xzZObEXZdBgsAx5jrE=aroTR5w@mail.gmail.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 08:57:07AM -0300, Jason Gunthorpe wrote:
-> On Tue, Aug 13, 2019 at 04:31:07PM +0800, Jason Wang wrote:
+On Thu, Aug 01, 2019 at 11:39:04AM +0800, Wanpeng Li wrote:
+> On Mon, 29 Jul 2019 at 13:35, Peter Xu <zhexu@redhat.com> wrote:
+> >
+> > It's done by TP_printk() already.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  arch/x86/kvm/trace.h | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> > index 26423d2e45df..76a39bc25b95 100644
+> > --- a/arch/x86/kvm/trace.h
+> > +++ b/arch/x86/kvm/trace.h
+> > @@ -1323,7 +1323,7 @@ TRACE_EVENT(kvm_avic_incomplete_ipi,
+> >                 __entry->index = index;
+> >         ),
+> >
+> > -       TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u\n",
+> > +       TP_printk("vcpu=%u, icrh:icrl=%#010x:%08x, id=%u, index=%u",
+> >                   __entry->vcpu, __entry->icrh, __entry->icrl,
+> >                   __entry->id, __entry->index)
+> >  );
+> > @@ -1348,7 +1348,7 @@ TRACE_EVENT(kvm_avic_unaccelerated_access,
+> >                 __entry->vec = vec;
+> >         ),
+> >
+> > -       TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x\n",
+> > +       TP_printk("vcpu=%u, offset=%#x(%s), %s, %s, vec=%#x",
+> >                   __entry->vcpu,
+> >                   __entry->offset,
+> >                   __print_symbolic(__entry->offset, kvm_trace_symbol_apic),
+> > @@ -1368,7 +1368,7 @@ TRACE_EVENT(kvm_hv_timer_state,
+> >                         __entry->vcpu_id = vcpu_id;
+> >                         __entry->hv_timer_in_use = hv_timer_in_use;
+> >                         ),
+> > -               TP_printk("vcpu_id %x hv_timer %x\n",
+> > +               TP_printk("vcpu_id %x hv_timer %x",
+> >                         __entry->vcpu_id,
+> >                         __entry->hv_timer_in_use)
 > 
-> > What kind of issues do you see? Spinlock is to synchronize GUP with MMU
-> > notifier in this series.
-> 
-> A GUP that can't sleep can't pagefault which makes it a really weird
-> pattern
+> The last one is handled by commit 7be373b6de503 .
 
-get_user_pages/get_user_pages_fast must not be called under a spinlock.
-We have the somewhat misnamed __get_user_page_fast that just does a
-lookup for existing pages and never faults for a few places that need
-to do that lookup from contexts where we can't sleep.
+Right, I'll rebase. Thanks.
+
+-- 
+Peter Xu
