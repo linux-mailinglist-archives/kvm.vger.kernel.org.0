@@ -2,52 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5415D8D4B2
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 15:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 723DE8D4CD
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 15:33:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727958AbfHNN3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Aug 2019 09:29:24 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42582 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727650AbfHNN3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Aug 2019 09:29:24 -0400
-Received: by mail-wr1-f67.google.com with SMTP id b16so14393045wrq.9
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2019 06:29:22 -0700 (PDT)
+        id S1728169AbfHNNdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Aug 2019 09:33:20 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54245 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727650AbfHNNdU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Aug 2019 09:33:20 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 10so4623497wmp.3
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2019 06:33:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Vt6M8evguG8mza7xAGCORpRNGIMSe6MxiCbo5YivOBk=;
-        b=Nz4o7XxH5ZDfV3rc5oZpN4MYoyO9vvdG/xPkDlLAfNNnLMvtBDyL1WBwUJp/Yr+89t
-         4TPrVf45BvCer6GxhUntgjf6cWCeAm8a5UYqnXs3Em6W6mxBKz7cNy8mEA39ycKJJawY
-         fDVrwvX+RhKDiWbt8rVYhSbuZi6aqCFlgXnl872f3MVFq2wNVljCmqvlKJG5vF7kKOXR
-         IgyeZD+YRMaYObLza/tYUverH16I6bu1wCfY2kKs5IrB+e2rasPLvOpxdJFqqKOhfWog
-         xDBOliCilX2aCsp/xUPanp8kegSVR/2gCZyuqfNLQ9GZ0LUKRkAz+kBonQEV9cY/Xm8Z
-         akyA==
-X-Gm-Message-State: APjAAAX3QMH8QaVjikU874QYfwoAFoQ83w7rUalCT3WLYRrDQ43FuIBh
-        8A3Jxw9F8HmdgEMu4oM3n9Rv+L9BjZc=
-X-Google-Smtp-Source: APXvYqwGUCBvQIFvJWsaQjWF1pIdbcTuoqLxKp8M4Us+qFA7PbNgUf7dCVRKH2NabDANH5yzssaA8g==
-X-Received: by 2002:adf:fc87:: with SMTP id g7mr48053642wrr.319.1565789362015;
-        Wed, 14 Aug 2019 06:29:22 -0700 (PDT)
+        bh=StWDmI2leKU54QSXvYjmfmAGy4K9xDCc49w71+uaK+4=;
+        b=XD5BWklTXLoZeecjwihOEadIP5B62UbGVcLXMSzNtjqWvpuEMTyhKPUqT9CrviUcBL
+         TUMxXZo61TfeExnw/2id0dk+11uRYETWKlkh9nJWi1/ibeapI/R25tlZyzVTlZwQL63A
+         e6bMxmfGdO2UlBj94bV0kQGuZ7j2QwdVFmW6aXd5VMZx83y664Gc7AdPz2Dw4exbOZM0
+         ToukdD1qBF6VxLAmYmwPRBqelzr2gMQU4AcJUaW/GKCZO4eWdyppYLJbp3wxE6VnyEUf
+         9hbjiq7yQL3c+anH4DyXNqxvShbXHaxTmkD24oPfl9W2cixmiiuyMLCZBzutD7LMeevB
+         CW2Q==
+X-Gm-Message-State: APjAAAXN2Nf+NbzVxo0uyhZ7x1n1cS4aQrhbOCqUsv1RQon6zDQgVRTK
+        ROd0YH3LxvsvV7pMpoiQJJ51zw==
+X-Google-Smtp-Source: APXvYqxRCG8CIFrb2MV/85J/MZEVigfCoj7dDBh0t2vCtmy4l3mnZa0oimzzNk0UARfbs4djy9dnmw==
+X-Received: by 2002:a1c:9cc5:: with SMTP id f188mr3195983wme.163.1565789598082;
+        Wed, 14 Aug 2019 06:33:18 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:2cae:66cd:dd43:92d9? ([2001:b07:6468:f312:2cae:66cd:dd43:92d9])
-        by smtp.gmail.com with ESMTPSA id f18sm8245770wrx.85.2019.08.14.06.29.21
+        by smtp.gmail.com with ESMTPSA id b26sm4945229wmj.14.2019.08.14.06.33.16
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 14 Aug 2019 06:29:21 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: skip populating logical dest map if apic is not
- sw enabled
-To:     Bandan Das <bsd@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <jpgv9v076ym.fsf@linux.bootlegged.copy>
+        Wed, 14 Aug 2019 06:33:17 -0700 (PDT)
+Subject: Re: [PATCH V2 3/3] KVM/Hyper-V/VMX: Add direct tlb flush support
+To:     lantianyu1986@gmail.com, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        rkrcmar@redhat.com, michael.h.kelley@microsoft.com
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Tianyu Lan <Tianyu.Lan@microsoft.com>
+References: <20190814073447.96141-1-Tianyu.Lan@microsoft.com>
+ <20190814073447.96141-4-Tianyu.Lan@microsoft.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <aee50952-144d-78da-9036-045bd3838b59@redhat.com>
-Date:   Wed, 14 Aug 2019 15:29:20 +0200
+Message-ID: <1a1410a7-e2dc-904e-a271-3e2017d42bae@redhat.com>
+Date:   Wed, 14 Aug 2019 15:33:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <jpgv9v076ym.fsf@linux.bootlegged.copy>
+In-Reply-To: <20190814073447.96141-4-Tianyu.Lan@microsoft.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -56,53 +60,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/08/19 05:37, Bandan Das wrote:
-> 
-> recalculate_apic_map does not santize ldr and it's possible that
-> multiple bits are set. In that case, a previous valid entry
-> can potentially be overwritten by an invalid one.
-> 
-> This condition is hit when booting a 32 bit, >8 CPU, RHEL6 guest and then
-> triggering a crash to boot a kdump kernel. This is the sequence of
-> events:
-> 1. Linux boots in bigsmp mode and enables PhysFlat, however, it still
-> writes to the LDR which probably will never be used.
-> 2. However, when booting into kdump, the stale LDR values remain as
-> they are not cleared by the guest and there isn't a apic reset.
-> 3. kdump boots with 1 cpu, and uses Logical Destination Mode but the
-> logical map has been overwritten and points to an inactive vcpu.
-> 
-> Signed-off-by: Radim Krcmar <rkrcmar@redhat.com>
-> Signed-off-by: Bandan Das <bsd@redhat.com>
-> ---
->  arch/x86/kvm/lapic.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 685d17c11461..e904ff06a83d 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -216,6 +216,9 @@ static void recalculate_apic_map(struct kvm *kvm)
->  		if (!apic_x2apic_mode(apic) && !new->phys_map[xapic_id])
->  			new->phys_map[xapic_id] = apic;
+On 14/08/19 09:34, lantianyu1986@gmail.com wrote:
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index c5da875f19e3..479ad76661e6 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -500,6 +500,7 @@ struct kvm {
+>  	struct srcu_struct srcu;
+>  	struct srcu_struct irq_srcu;
+>  	pid_t userspace_pid;
+> +	struct hv_partition_assist_pg *hv_pa_pg;
+>  };
 >  
-> +		if (!kvm_apic_sw_enabled(apic))
-> +			continue;
-> +
->  		ldr = kvm_lapic_get_reg(apic, APIC_LDR);
->  
->  		if (apic_x2apic_mode(apic)) {
-> @@ -258,6 +261,8 @@ static inline void apic_set_spiv(struct kvm_lapic *apic, u32 val)
->  			static_key_slow_dec_deferred(&apic_sw_disabled);
->  		else
->  			static_key_slow_inc(&apic_sw_disabled.key);
-> +
-> +		recalculate_apic_map(apic->vcpu->kvm);
->  	}
->  }
->  
-> 
+>  #define kvm_err(fmt, ...) \
 
-Queued, thanks.
+This does not exist on non-x86 architectures.  Please move it to struct
+kvm_arch.
 
 Paolo
