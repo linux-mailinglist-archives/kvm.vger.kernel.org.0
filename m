@@ -2,97 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AEF58CEE5
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 10:59:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAD4D8CFB9
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 11:35:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbfHNI76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Aug 2019 04:59:58 -0400
-Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:51554 "EHLO
-        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726132AbfHNI75 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Aug 2019 04:59:57 -0400
-X-Greylist: delayed 391 seconds by postgrey-1.27 at vger.kernel.org; Wed, 14 Aug 2019 04:59:56 EDT
-Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
-        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id EA3D63016E60;
-        Wed, 14 Aug 2019 11:53:24 +0300 (EEST)
-Received: from [10.17.91.220] (unknown [195.210.4.22])
-        by smtp.bitdefender.com (Postfix) with ESMTPSA id D9D8D3011E05;
-        Wed, 14 Aug 2019 11:53:24 +0300 (EEST)
-Message-ID: <3f22404e0d1b7dff45d81516318787c79b7d7eec.camel@bitdefender.com>
-Subject: Re: [RFC PATCH v6 76/92] kvm: x86: disable EPT A/D bits if
- introspection is present
-From:   Mihai =?UTF-8?Q?Don=C8=9Bu?= <mdontu@bitdefender.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        Adalbert =?UTF-8?Q?Laz=C4=83r?= <alazar@bitdefender.com>
-Date:   Wed, 14 Aug 2019 11:53:24 +0300
-In-Reply-To: <662761e1-5709-663f-524f-579f8eba4060@redhat.com>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
-         <20190809160047.8319-77-alazar@bitdefender.com>
-         <9f8b31c5-2252-ddc5-2371-9c0959ac5a18@redhat.com>
-         <0550f8d65bb97486e98d88255ea45d490da6b802.camel@bitdefender.com>
-         <662761e1-5709-663f-524f-579f8eba4060@redhat.com>
-Organization: Bitdefender
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 
+        id S1727157AbfHNJez (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Aug 2019 05:34:55 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50717 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727110AbfHNJez (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Aug 2019 05:34:55 -0400
+Received: by mail-wm1-f66.google.com with SMTP id v15so3973000wml.0
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2019 02:34:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=bCXlW1ZX2x/gE3exfi6QX7hss8Ko8wkhLU8ZZUxwNBU=;
+        b=kVfhcjUcAh+yyO1RTF07wkuDxW0SGDMPwFdCsQ3IMi3id9vWSx/vsMKkBOqShBg5u6
+         eI13+tk9CF2DY42P94sC0gn1YjBBV85OVcWeQPnXQ7Vhrv2W0HUXwzaL5TZ7DxrJ140o
+         UGnlzyaYa0g+KHwGsaKQ3OEyj2CF6T/vquZHxjHDAOtI1wOed01gxDSqrLvTVOvgHqYa
+         KdZB8+9Bjov1txkUAfdjiiEP41zubfe+QzTYK4ttqmJwFgk7Se+g+QmTjD4X3tFf8i6k
+         JerSzlwGZbsFED004XEwMGPa5pq3ueikUtK56UYlottfuBDXbm2K+ibDvo2WYTYhBZLX
+         zSZQ==
+X-Gm-Message-State: APjAAAX668cq28MZMElCEr7n/eRLaaD4QIQoQfuZoqU5cusYx2Zxd6yg
+        SskstlVehAAuwTLjwnHrar7Q6Q==
+X-Google-Smtp-Source: APXvYqxdMrevq9YKa/7FH4WvkgvuQ01+GLfmaHpnbo9WhYxWY4nzsk+EH0+c0Ut6mWws+y50P2sYcw==
+X-Received: by 2002:a7b:c441:: with SMTP id l1mr7293142wmi.170.1565775293031;
+        Wed, 14 Aug 2019 02:34:53 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id i30sm3256274wmb.20.2019.08.14.02.34.52
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 14 Aug 2019 02:34:52 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v4 2/7] x86: kvm: svm: propagate errors from skip_emulated_instruction()
+In-Reply-To: <20190813180759.GF13991@linux.intel.com>
+References: <20190813135335.25197-1-vkuznets@redhat.com> <20190813135335.25197-3-vkuznets@redhat.com> <20190813180759.GF13991@linux.intel.com>
+Date:   Wed, 14 Aug 2019 11:34:52 +0200
+Message-ID: <87d0h89jk3.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2019-08-13 at 23:05 +0200, Paolo Bonzini wrote:
-> On 13/08/19 20:36, Mihai Donțu wrote:
-> > > Why?
-> > When EPT A/D is enabled, all guest page table walks are treated as
-> > writes (like AMD's NPT). Thus, an introspection tool hooking the guest
-> > page tables would trigger a flood of VMEXITs (EPT write violations)
-> > that will get the introspected VM into an unusable state.
-> > 
-> > Our implementation of such an introspection tool builds a cache of
-> > {cr3, gva} -> gpa, which is why it needs to monitor all guest PTs by
-> > hooking them for write.
-> 
-> Please include the kvm list too.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-I apologize. I did not notice I trimmed the CC list.
+> On Tue, Aug 13, 2019 at 03:53:30PM +0200, Vitaly Kuznetsov wrote:
+>> @@ -3899,20 +3898,25 @@ static int task_switch_interception(struct vcpu_svm *svm)
+>>  	if (reason != TASK_SWITCH_GATE ||
+>>  	    int_type == SVM_EXITINTINFO_TYPE_SOFT ||
+>>  	    (int_type == SVM_EXITINTINFO_TYPE_EXEPT &&
+>> -	     (int_vec == OF_VECTOR || int_vec == BP_VECTOR)))
+>> -		skip_emulated_instruction(&svm->vcpu);
+>> +	     (int_vec == OF_VECTOR || int_vec == BP_VECTOR))) {
+>> +		if (skip_emulated_instruction(&svm->vcpu) != EMULATE_DONE)
+>
+> This isn't broken in the current code, but it's flawed in the sense that
+> it assumes skip_emulated_instruction() never returns EMULATE_USER_EXIT.
+>
+> Note, both SVM and VMX make the opposite assumption when handling
+> kvm_task_switch() and kvm_inject_realmode_interrupt().
+>
+> More below...
+>
+>> +			goto fail;
+>> +	}
+>>  
+>>  	if (int_type != SVM_EXITINTINFO_TYPE_SOFT)
+>>  		int_vec = -1;
+>>  
+>>  	if (kvm_task_switch(&svm->vcpu, tss_selector, int_vec, reason,
+>> -				has_error_code, error_code) == EMULATE_FAIL) {
+>> -		svm->vcpu.run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> -		svm->vcpu.run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+>> -		svm->vcpu.run->internal.ndata = 0;
+>> -		return 0;
+>> -	}
+>> +				has_error_code, error_code) == EMULATE_FAIL)
+>> +		goto fail;
+>> +
+>>  	return 1;
+>> +
+>> +fail:
+>> +	svm->vcpu.run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> +	svm->vcpu.run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+>> +	svm->vcpu.run->internal.ndata = 0;
+>> +	return 0;
+>>  }
+>>  
+>>  static int cpuid_interception(struct vcpu_svm *svm)
+>
+> ...
+>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index c6d951cbd76c..e8f797fe9d9e 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -6383,9 +6383,11 @@ static void kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu, int *r)
+>>  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>>  {
+>>  	unsigned long rflags = kvm_x86_ops->get_rflags(vcpu);
+>> -	int r = EMULATE_DONE;
+>> +	int r;
+>>  
+>> -	kvm_x86_ops->skip_emulated_instruction(vcpu);
+>> +	r = kvm_x86_ops->skip_emulated_instruction(vcpu);
+>> +	if (unlikely(r != EMULATE_DONE))
+>> +		return 0;
+>
+> x86_emulate_instruction() doesn't set vcpu->run->exit_reason when emulation
+> fails with EMULTYPE_SKIP, i.e. this will exit to userspace with garbage in
+> the exit_reason.
 
-> One issue here is that it changes the nested VMX ABI.  Can you leave EPT
-> A/D in place for the shadow EPT MMU, but not for "regular" EPT pages?
+Oh, nice catch, will take a look!
 
-I'm not sure I follow. Something like this?
+>
+> handle_ept_misconfig() also has the same (pre-existing) flaw.
+>
+> Given the handle_ept_misconfig() bug and that kvm_emulate_instruction()
+> sets vcpu->run->exit_reason when it returns EMULATE_FAIL in the normal
+> case, I think it makes sense to fix the issue in x86_emulate_instruction().
+> That would also eliminate the need to worry about EMULATE_USER_EXIT in
+> task_switch_interception(), e.g. the SVM code can just return 0 when it
+> gets a non-EMULATE_DONE return type.
+>
+> E.g.:
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 07ab14d73094..73b86f81ed9c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6201,7 +6201,8 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+>         if (emulation_type & EMULTYPE_NO_UD_ON_FAIL)
+>                 return EMULATE_FAIL;
+>
+> -       if (!is_guest_mode(vcpu) && kvm_x86_ops->get_cpl(vcpu) == 0) {
+> +       if ((!is_guest_mode(vcpu) && kvm_x86_ops->get_cpl(vcpu) == 0) ||
+> +           (emulation_type & EMULTYPE_SKIP)) {
+>                 vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>                 vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+>                 vcpu->run->internal.ndata = 0;
+> @@ -6525,8 +6526,6 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
+>                                 return EMULATE_DONE;
+>                         if (ctxt->have_exception && inject_emulated_exception(vcpu))
+>                                 return EMULATE_DONE;
+> -                       if (emulation_type & EMULTYPE_SKIP)
+> -                               return EMULATE_FAIL;
+>                         return handle_emulation_failure(vcpu, emulation_type);
+>                 }
+>         }
+>
+>
+> As for the kvm_task_switch() handling and other cases, I think it's
+> possible to rework all of the functions and callers that return/handle
+> EMULATE_DONE to instead return 0/1, i.e. contain EMULATE_* to x86.c.
+> I'll put together a series, I think you've suffered more than enough scope
+> creep as it is :-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 48e3cdd7b009..569e8f4d5dd7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2853,7 +2853,7 @@ u64 construct_eptp(struct kvm_vcpu *vcpu, unsigned long root_hpa)
-        eptp |= (get_ept_level(vcpu) == 5) ? VMX_EPTP_PWL_5 : VMX_EPTP_PWL_4;
- 
-        if (enable_ept_ad_bits &&
--           (!is_guest_mode(vcpu) || nested_ept_ad_enabled(vcpu)))
-+           ((!is_guest_mode(vcpu) && !kvmi_is_present()) || nested_ept_ad_enabled(vcpu)))
-                eptp |= VMX_EPTP_AD_ENABLE_BIT;
-        eptp |= (root_hpa & PAGE_MASK);
-
-> Also, what is the state of introspection support on AMD?
-
-The way we'd like to do introspection is not currently possible on AMD
-CPUs. The reasons being:
- * the NPT has the behavior I talked above (guest PT walks translate to
-   writes)
- * it is not possible to mark a guest page as execute-only
- * there is no equivalent to Intel's MTF, though it can _probably_ be
-   emulated using a creative trick involving the debug registers
-
-If, however, none of the above are of importance for other users,
-everything else should work. I have to admit, though, we have not done
-any tests.
-
-Regards,
+No problem at all, you seem to have a lot of great ideas on how to
+improve things :-) Thanks for your review!
 
 -- 
-Mihai Donțu
-
-
+Vitaly
