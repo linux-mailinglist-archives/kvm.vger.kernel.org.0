@@ -2,282 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B3E88D6BD
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 16:57:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8E0C8D76B
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 17:49:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727691AbfHNO5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Aug 2019 10:57:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58960 "EHLO mx1.redhat.com"
+        id S1727650AbfHNPt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Aug 2019 11:49:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36156 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726931AbfHNO5t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Aug 2019 10:57:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726166AbfHNPt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Aug 2019 11:49:28 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6B1FC91779;
-        Wed, 14 Aug 2019 14:57:48 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CC12260852;
-        Wed, 14 Aug 2019 14:57:47 +0000 (UTC)
-Date:   Wed, 14 Aug 2019 08:57:46 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-Message-ID: <20190814085746.26b5f2a3@x1.home>
-In-Reply-To: <AM0PR05MB48666CCDFE985A25F42A0259D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190802065905.45239-1-parav@mellanox.com>
-        <20190808141255.45236-1-parav@mellanox.com>
-        <20190808170247.1fc2c4c4@x1.home>
-        <77ffb1f8-e050-fdf5-e306-0a81614f7a88@nvidia.com>
-        <AM0PR05MB4866993536C0C8ACEA2F92DBD1D20@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190813085246.1d642ae5@x1.home>
-        <AM0PR05MB48663579A340E6597B3D01BCD1D20@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190813111149.027c6a3c@x1.home>
-        <AM0PR05MB4866D40F8EBB382C78193C91D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814100135.1f60aa42.cohuck@redhat.com>
-        <AM0PR05MB4866ABFDDD9DDCBC01F6CA90D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814150911.296da78c.cohuck@redhat.com>
-        <AM0PR05MB48666CCDFE985A25F42A0259D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-Organization: Red Hat
+        by mx1.redhat.com (Postfix) with ESMTPS id 760DE30A7BB3;
+        Wed, 14 Aug 2019 15:49:27 +0000 (UTC)
+Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C3B9100EBA3;
+        Wed, 14 Aug 2019 15:49:05 +0000 (UTC)
+Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
+        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+        pagupta@redhat.com, wei.w.wang@intel.com,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Rik van Riel <riel@surriel.com>,
+        David Hildenbrand <david@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
+        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
+        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
+References: <20190812131235.27244-1-nitesh@redhat.com>
+ <20190812131235.27244-2-nitesh@redhat.com>
+ <CAKgT0UcSabyrO=jUwq10KpJKLSuzorHDnKAGrtWVigKVgvD-6Q@mail.gmail.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <6d5b57ca-41ff-5c54-ab20-2b1631a6ce29@redhat.com>
+Date:   Wed, 14 Aug 2019 11:49:04 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAKgT0UcSabyrO=jUwq10KpJKLSuzorHDnKAGrtWVigKVgvD-6Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 14 Aug 2019 14:57:48 +0000 (UTC)
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 14 Aug 2019 15:49:28 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 14 Aug 2019 13:45:49 +0000
-Parav Pandit <parav@mellanox.com> wrote:
 
-> > -----Original Message-----
-> > From: Cornelia Huck <cohuck@redhat.com>
-> > Sent: Wednesday, August 14, 2019 6:39 PM
-> > To: Parav Pandit <parav@mellanox.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>; Kirti Wankhede
-> > <kwankhede@nvidia.com>; kvm@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; cjia@nvidia.com; Jiri Pirko <jiri@mellanox.com>;
-> > netdev@vger.kernel.org
-> > Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-> > 
-> > On Wed, 14 Aug 2019 12:27:01 +0000
-> > Parav Pandit <parav@mellanox.com> wrote:
-> >   
-> > > + Jiri, + netdev
-> > > To get perspective on the ndo->phys_port_name for the representor netdev  
-> > of mdev.  
-> > >
-> > > Hi Cornelia,
-> > >  
-> > > > -----Original Message-----
-> > > > From: Cornelia Huck <cohuck@redhat.com>
-> > > > Sent: Wednesday, August 14, 2019 1:32 PM
-> > > > To: Parav Pandit <parav@mellanox.com>
-> > > > Cc: Alex Williamson <alex.williamson@redhat.com>; Kirti Wankhede
-> > > > <kwankhede@nvidia.com>; kvm@vger.kernel.org; linux-
-> > > > kernel@vger.kernel.org; cjia@nvidia.com
-> > > > Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-> > > >
-> > > > On Wed, 14 Aug 2019 05:54:36 +0000
-> > > > Parav Pandit <parav@mellanox.com> wrote:
-> > > >  
-> > > > > > > I get that part. I prefer to remove the UUID itself from the
-> > > > > > > structure and therefore removing this API makes lot more sense?  
-> > > > > >
-> > > > > > Mdev and support tools around mdev are based on UUIDs because
-> > > > > > it's  
-> > > > defined  
-> > > > > > in the documentation.  
-> > > > > When we introduce newer device naming scheme, it will update the  
-> > > > documentation also.  
-> > > > > May be that is the time to move to .rst format too.  
-> > > >
-> > > > You are aware that there are existing tools that expect a uuid
-> > > > naming scheme, right?
-> > > >  
-> > > Yes, Alex mentioned too.
-> > > The good tool that I am aware of is [1], which is 4 months old. Not sure if it is  
-> > part of any distros yet.  
-> > >
-> > > README also says, that it is in 'early in development. So we have scope to  
-> > improve it for non UUID names, but lets discuss that more below.
-> > 
-> > The up-to-date reference for mdevctl is
-> > https://github.com/mdevctl/mdevctl. There is currently an effort to get this
-> > packaged in Fedora.
-> >   
-> Awesome.
-> 
-> > >  
-> > > > >  
-> > > > > > I don't think it's as simple as saying "voila, UUID dependencies
-> > > > > > are removed, users are free to use arbitrary strings".  We'd
-> > > > > > need to create some kind of naming policy, what characters are
-> > > > > > allows so that we can potentially expand the creation parameters
-> > > > > > as has been proposed a couple times, how do we deal with
-> > > > > > collisions and races, and why should we make such a change when
-> > > > > > a UUID is a perfectly reasonable devices name.  Thanks,
-> > > > > >  
-> > > > > Sure, we should define a policy on device naming to be more relaxed.
-> > > > > We have enough examples in-kernel.
-> > > > > Few that I am aware of are netdev (vxlan, macvlan, ipvlan, lot
-> > > > > more), rdma  
-> > > > etc which has arbitrary device names and ID based device names.  
-> > > > >
-> > > > > Collisions and race is already taken care today in the mdev core.
-> > > > > Same  
-> > > > unique device names continue.
-> > > >
-> > > > I'm still completely missing a rationale _why_ uuids are supposedly
-> > > > bad/restricting/etc.  
-> > > There is nothing bad about uuid based naming.
-> > > Its just too long name to derive phys_port_name of a netdev.
-> > > In details below.
-> > >
-> > > For a given mdev of networking type, we would like to have
-> > > (a) representor netdevice [2]
-> > > (b) associated devlink port [3]
-> > >
-> > > Currently these representor netdevice exist only for the PCIe SR-IOV VFs.
-> > > It is further getting extended for mdev without SR-IOV.
-> > >
-> > > Each of the devlink port is attached to representor netdevice [4].
-> > >
-> > > This netdevice phys_port_name should be a unique derived from some  
-> > property of mdev.  
-> > > Udev/systemd uses phys_port_name to derive unique representor netdev  
-> > name.  
-> > > This netdev name is further use by orchestration and switching software in  
-> > user space.  
-> > > One such distro supported switching software is ovs [4], which relies on the  
-> > persistent device name of the representor netdevice.
-> > 
-> > Ok, let me rephrase this to check that I understand this correctly. I'm not sure
-> > about some of the terms you use here (even after looking at the linked
-> > doc/code), but that's probably still ok.
-> > 
-> > We want to derive an unique (and probably persistent?) netdev name so that
-> > userspace can refer to a representor netdevice. Makes sense.
-> > For generating that name, udev uses the phys_port_name (which represents
-> > the devlink port, IIUC). Also makes sense.
-> >   
-> You understood it correctly.
-> 
-> > >
-> > > phys_port_name has limitation to be only 15 characters long.
-> > > UUID doesn't fit in phys_port_name.  
-> > 
-> > Understood. But why do we need to derive the phys_port_name from the mdev
-> > device name? This netdevice use case seems to be just one use case for using
-> > mdev devices? If this is a specialized mdev type for this setup, why not just
-> > expose a shorter identifier via an extra attribute?
-> >   
-> Representor netdev, represents mdev's switch port (like PCI SRIOV VF's switch port).
-> So user must be able to relate this two objects in similar manner as SRIOV VFs.
-> Phys_port_name is derived from the PCI PF and VF numbering scheme.
-> Similarly mdev's such port should be derived from mdev's id/name/attribute.
-> 
-> > > Longer UUID names are creating snow ball effect, not just in networking stack  
-> > but many user space tools too.
-> > 
-> > This snowball effect mainly comes from the device name -> phys_port_name
-> > setup, IIUC.
-> >   
-> Right.
-> 
-> > > (as opposed to recently introduced mdevctl, are they more mdev tools
-> > > which has dependency on UUID name?)  
-> > 
-> > I am aware that people have written scripts etc. to manage their mdevs.
-> > Given that the mdev infrastructure has been around for quite some time, I'd
-> > say the chance of some of those scripts relying on uuid names is non-zero.
-> >   
-> Ok. but those scripts have never managed networking devices.
-> So those scripts won't break because they will always create mdev devices using UUID.
-> When they use these new networking devices, they need more things than their scripts.
-> So user space upgrade for such mixed mode case is reasonable.
+On 8/12/19 2:47 PM, Alexander Duyck wrote:
+> On Mon, Aug 12, 2019 at 6:13 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+>> This patch introduces the core infrastructure for free page reporting in
+>> virtual environments. It enables the kernel to track the free pages which
+>> can be reported to its hypervisor so that the hypervisor could
+>> free and reuse that memory as per its requirement.
+>>
+>> While the pages are getting processed in the hypervisor (e.g.,
+>> via MADV_DONTNEED), the guest must not use them, otherwise, data loss
+>> would be possible. To avoid such a situation, these pages are
+>> temporarily removed from the buddy. The amount of pages removed
+>> temporarily from the buddy is governed by the backend(virtio-balloon
+>> in our case).
+>>
+>> To efficiently identify free pages that can to be reported to the
+>> hypervisor, bitmaps in a coarse granularity are used. Only fairly big
+>> chunks are reported to the hypervisor - especially, to not break up THP
+>> in the hypervisor - "MAX_ORDER - 2" on x86, and to save space. The bits
+>> in the bitmap are an indication whether a page *might* be free, not a
+>> guarantee. A new hook after buddy merging sets the bits.
+>>
+>> Bitmaps are stored per zone, protected by the zone lock. A workqueue
+>> asynchronously processes the bitmaps, trying to isolate and report pages
+>> that are still free. The backend (virtio-balloon) is responsible for
+>> reporting these batched pages to the host synchronously. Once reporting/
+>> freeing is complete, isolated pages are returned back to the buddy.
+>>
+>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+>
+[...]
+>> +}
+>> +
+>> +/**
+>> + * __page_reporting_enqueue - tracks the freed page in the respective zone's
+>> + * bitmap and enqueues a new page reporting job to the workqueue if possible.
+>> + */
+>> +void __page_reporting_enqueue(struct page *page)
+>> +{
+>> +       struct page_reporting_config *phconf;
+>> +       struct zone *zone;
+>> +
+>> +       rcu_read_lock();
+>> +       /*
+>> +        * We should not process this page if either page reporting is not
+>> +        * yet completely enabled or it has been disabled by the backend.
+>> +        */
+>> +       phconf = rcu_dereference(page_reporting_conf);
+>> +       if (!phconf)
+>> +               return;
+>> +
+>> +       zone = page_zone(page);
+>> +       bitmap_set_bit(page, zone);
+>> +
+>> +       /*
+>> +        * We should not enqueue a job if a previously enqueued reporting work
+>> +        * is in progress or we don't have enough free pages in the zone.
+>> +        */
+>> +       if (atomic_read(&zone->free_pages) >= phconf->max_pages &&
+>> +           !atomic_cmpxchg(&phconf->refcnt, 0, 1))
+> This doesn't make any sense to me. Why are you only incrementing the
+> refcount if it is zero? Combining this with the assignment above, this
+> isn't really a refcnt. It is just an oversized bitflag.
 
-Tools like mdevctl are agnostic of the type of mdev device they're
-managing, it shouldn't matter than they've never managed a networking
-mdev previously, it follows the standards of mdev management.
 
-> > >
-> > > Instead of mdev subsystem creating such effect, one option we are  
-> > considering is to have shorter mdev names.  
-> > > (Similar to netdev, rdma, nvme devices).
-> > > Such as mdev1, mdev2000 etc.
+The intent for having an extra variable was to ensure that at a time only one
+reporting job is enqueued. I do agree that for that purpose I really don't need
+a reference counter and I should have used something like bool
+'page_hinting_active'. But with bool, I think there could be a possible chance
+of race. Maybe I should rename this variable and keep it as atomic.
+Any thoughts?
 
-Note that these are kernel generated names, as are the other examples.
-In the case of mdev, the user is providing the UUID, which becomes the
-device name.  When a user writes to the create attribute, there needs
-to be determinism that the user can identify the device they created vs
-another that may have been created concurrently.  I don't see that we
-can put users in the path of managing device instance numbers.
 
-> > > Second option I was considering is to have an optional alias for UUID based  
-> > mdev.  
-> > > This name alias is given at time of mdev creation.
-> > > Devlink port's phys_port_name is derived out of this shorter mdev name  
-> > alias. 
-> > > This way, mdev remains to be UUID based with optional extension.
-> > > However, I prefer first option to relax mdev naming scheme.  
-> > 
-> > Actually, I think that second option makes much more sense, as you avoid
-> > potentially breaking existing tooling.  
-> Let's first understand of what exactly will break with existing tool
-> if they see non_uuid based device.
+>
+> Also I am pretty sure this results in the opportunity to miss pages
+> because there is nothing to prevent you from possibly missing a ton of
+> pages you could hint on if a large number of pages are pushed out all
+> at once and then the system goes idle in terms of memory allocation
+> and freeing.
 
-Do we really want a mixed namespace of device names, some UUID, some...
-something else?  That seems like a mess.
 
-> Existing tooling continue to work with UUID devices.
-> Do you have example of what can break if they see non_uuid based
-> device name? I think you are clear, but to be sure, UUID based
-> creation will continue to be there. Optionally mdev will be created
-> with alpha-numeric string, if we don't it as additional attribute.
+I was looking at how you are enqueuing/processing reporting jobs for each zone.
+I am wondering if I should also consider something on similar lines as having
+that I might be able to address the concern which you have raised above. But it
+would also mean that I have to add an additional flag in the zone_flags. :)
 
-I'm not onboard with a UUID being just one of the possible naming
-strings via which we can create mdev devices.  I think that becomes
-untenable for userspace.  I don't think a sufficient argument has been
-made against the alias approach, which seems to keep the UUID as a
-canonical name, providing a consistent namespace, augmented with user
-or kernel provided short alias.  Thanks,
-
-Alex
-
-> > >  
-> > > > We want to uniquely identify a device, across different types of
-> > > > vendor drivers. An uuid is a unique identifier and even a
-> > > > well-defined one. Tools (e.g. mdevctl) are relying on it for
-> > > > mdev devices  
-> > today.  
-> > > >
-> > > > What is the problem you're trying to solve?  
-> > > Unique device naming is still achieved without UUID scheme by
-> > > various  
-> > subsystems in kernel using alpha-numeric string.  
-> > > Having such string based continue to provide unique names.
-> > >
-> > > I hope I described the problem and two solutions above.
-> > >
-> > > [1] https://github.com/awilliam/mdevctl
-> > > [2]
-> > > https://elixir.bootlin.com/linux/v5.3-rc4/source/drivers/net/ethernet/
-> > > mellanox/mlx5/core/en_rep.c [3]
-> > > http://man7.org/linux/man-pages/man8/devlink-port.8.html
-> > > [4]
-> > > https://elixir.bootlin.com/linux/v5.3-rc4/source/net/core/devlink.c#L6
-> > > 921
-> > > [5] https://www.openvswitch.org/
-> > >  
-> 
-
+>
+[...]
+>
+>> +EXPORT_SYMBOL_GPL(page_reporting_enable);
+>> --
+>> 2.21.0
+>>
+-- 
+Thanks
+Nitesh
