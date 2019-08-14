@@ -2,78 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E0CA78D7F6
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 18:22:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 550BD8D7F7
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2019 18:23:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728116AbfHNQWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Aug 2019 12:22:39 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40625 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726265AbfHNQWj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Aug 2019 12:22:39 -0400
-Received: by mail-wr1-f66.google.com with SMTP id c3so3410454wrd.7;
-        Wed, 14 Aug 2019 09:22:37 -0700 (PDT)
+        id S1728325AbfHNQWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Aug 2019 12:22:41 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37220 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727110AbfHNQWk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Aug 2019 12:22:40 -0400
+Received: by mail-wm1-f65.google.com with SMTP id z23so4987180wmf.2;
+        Wed, 14 Aug 2019 09:22:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=uzdO+yHR/jswNXYt1APUPkPcgWFUeVIjS1JXB8tO2t4=;
-        b=WOSnETkhAGjZPyZR1x7nnqvzmIqEHs6EjXwis2TgzCMCk7/kluyHYoX5pstlJ0NOgd
-         Z53GH/QsjNT3p0EP+zTlrUCqcjyd9J12BEJUi4NVuNZwkCW2xa12wS7tx/BsjB9BFeo6
-         zH/b2iujpTlTS0ZuzbcfaQjAs1+1a0roWG4YP0Rc6MM4LwCkXgYR7keq1YQjulIJvFKA
-         2vpM9zCW1FhtxECsskpVsUvkmm16xMAQ2SEvl+FgQwB7AH5MXHr8KUeZmMrroFFzDAsR
-         4Pd45bVJn7VW25FA1FmrjPnXl1DsqX5QELy1P445aBx83tij0YBzRWy85I2TbX3tPuJs
-         JkpA==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=wZo+HAsrUj/Kw4UvtL/TEz9wPlQYNsu6PTm1383LfLY=;
+        b=oP51eZQUXMmLRbDeCYOkf4P47J1oJKUutGh4AX/7V34VD3Xz/++eNtMFBLRBZw9tr9
+         OISGpnQoBlkiAkQQxdmCeiL6+jY9KZFfu2Au+q5R6Jt0SygTlPP6rFXcTApEihP1KAt8
+         fG5JxbCNA1bgv9YkQGOmwsYSYYooAz8jfXeQREv0P9tBMZfQBLH5C+LERJDaQUCMV5xc
+         rAKzGqRbesEjbhCO1yf67HHOb7c2d0IB9pULgBEEUi+ze8NfIyufmKx6eDmln4DWt4Mq
+         S8m4OGN0JD8a+TbcjcN4SdCRym4vbNvb569u+hxGcxR34MgRJ9BF6QU7jK1ceWgpJhGl
+         NWPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=uzdO+yHR/jswNXYt1APUPkPcgWFUeVIjS1JXB8tO2t4=;
-        b=IhYnuTCxnqAr0RLKTFR7KesYtfUcyapUNNmwbfbTJKjFt0bE6PgFtbTGGBNnK9v77r
-         NIIFfNacN5ZXyGs9yDIxCsaGBPPNYPzCfB+s/hH5eq/7BQ9wUUiko4Rimb6PLBElBrLc
-         RLg7NansLMsxdE7qBwop2vpnn9+T6DJ3g9uX0hjBhXu01zLP2AQzx+057UUxO2joDYcL
-         OApILTGB6c4xBuOyRXv0F2Dp+Q8LfEXUN35saSaTl9X1zimPaVs7vBWUIUW1cNlASEDi
-         qoAta5XjYPdkEPhOFUwCSc0nyO0WgtsP8lVYWnuUg6455Tr2dah8vES5+dxmKaZ04Gig
-         c1Ew==
-X-Gm-Message-State: APjAAAXQSc6GQHfyDf5x9kvHAkRw9NP2ZvizNkVz4H355cvwZFxBopaU
-        SGwMMzQBf84kqKB/lzfRH8gi+UHf
-X-Google-Smtp-Source: APXvYqxOsIrirQDXJNuCwYZJrfAh7+Vc5YPyCe0aDfXmfiBwTS20tNaMuq7DjVm9362Y4VCfhKPsAA==
-X-Received: by 2002:a05:6000:12c5:: with SMTP id l5mr588007wrx.122.1565799756740;
-        Wed, 14 Aug 2019 09:22:36 -0700 (PDT)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references;
+        bh=wZo+HAsrUj/Kw4UvtL/TEz9wPlQYNsu6PTm1383LfLY=;
+        b=bjwYJe9ePLLtgHg/vX0W9z7tTmybsLM5im5byMc4rqRnta+jP7FaUzzkB3X96V0jmd
+         XfT5CxGjfAC0c+BLfLkNufVFW4K1IarmghdVkqyTq58wfU8jgVkWtA5jbhHzOfIXiPlD
+         BXcn5RO89+4hEHzcSuR+uHRAgY+/k1yn+wUPgRwH2z+bvnEgST0+Egdxbpn8Iv8Dds46
+         KsDfYZSQQg1SZyXQ8MSsm/Dlenj3wPjE9PvWF7V6kLps9sp1UdJRUXhDH72Y7LdRSjbw
+         ZFoF7MBC7EsXI/sM1Pzq3YeS6ve8qayJH9ubi8DWvzM2fqRJh91cgPZaCIdGB/y8eYeT
+         W/9g==
+X-Gm-Message-State: APjAAAU8iso1U15gyvAPF2wAGRiiXH6uoFRxX3kC3/9TWWboKKECFBNz
+        qnIXm+883ibXfVb7YqLMH9+NEx2H
+X-Google-Smtp-Source: APXvYqxQ3LV9hhpjouPQzvw8y3xfnGyfDtK43vIvbpKIweDNLDlYskUTD/ziCK7fN9YRLFpvQz67zg==
+X-Received: by 2002:a05:600c:24cb:: with SMTP id 11mr904685wmu.94.1565799757758;
+        Wed, 14 Aug 2019 09:22:37 -0700 (PDT)
 Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id k124sm191620wmk.47.2019.08.14.09.22.35
+        by smtp.gmail.com with ESMTPSA id k124sm191620wmk.47.2019.08.14.09.22.36
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 14 Aug 2019 09:22:36 -0700 (PDT)
+        Wed, 14 Aug 2019 09:22:37 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     vkuznets@redhat.com
-Subject: [PATCH 0/3] kvm: selftests: fixes for vmx_set_nested_state_test
-Date:   Wed, 14 Aug 2019 18:22:30 +0200
-Message-Id: <1565799753-3006-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 1/3] selftests: kvm: do not try running the VM in vmx_set_nested_state_test
+Date:   Wed, 14 Aug 2019 18:22:31 +0200
+Message-Id: <1565799753-3006-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1565799753-3006-1-git-send-email-pbonzini@redhat.com>
+References: <1565799753-3006-1-git-send-email-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vmx_set_nested_state_test test is failing in the top of the tree, due
-to the change in KVM_STATE_NESTED_EVMCS semantics from commit 323d73a8ecad
-("KVM: nVMX: Change KVM_STATE_NESTED_EVMCS to signal vmcs12 is copied
-from eVMCS", 2019-06-26).  The expected behavior of the kernel has changed
-slightly and the test should be changed to match the fix in the kernel.
+This test is only covering various edge cases of the
+KVM_SET_NESTED_STATE ioctl.  Running the VM does not really
+add anything.
 
-Paolo
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ .../selftests/kvm/x86_64/vmx_set_nested_state_test.c      | 15 ---------------
+ 1 file changed, 15 deletions(-)
 
-Paolo Bonzini (3):
-  selftests: kvm: do not try running the VM in vmx_set_nested_state_test
-  selftests: kvm: provide common function to enable eVMCS
-  selftests: kvm: fix vmx_set_nested_state_test
-
- tools/testing/selftests/kvm/include/evmcs.h        |  2 ++
- tools/testing/selftests/kvm/lib/x86_64/vmx.c       | 20 ++++++++++++++
- tools/testing/selftests/kvm/x86_64/evmcs_test.c    | 15 ++--------
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c  | 12 +++-----
- .../kvm/x86_64/vmx_set_nested_state_test.c         | 32 ++++++++++------------
- 5 files changed, 42 insertions(+), 39 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
+index ed7218d166da..a99fc66dafeb 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
+@@ -27,22 +27,13 @@
+ 
+ void test_nested_state(struct kvm_vm *vm, struct kvm_nested_state *state)
+ {
+-	volatile struct kvm_run *run;
+-
+ 	vcpu_nested_state_set(vm, VCPU_ID, state, false);
+-	run = vcpu_state(vm, VCPU_ID);
+-	vcpu_run(vm, VCPU_ID);
+-	TEST_ASSERT(run->exit_reason == KVM_EXIT_SHUTDOWN,
+-		"Got exit_reason other than KVM_EXIT_SHUTDOWN: %u (%s),\n",
+-		run->exit_reason,
+-		exit_reason_str(run->exit_reason));
+ }
+ 
+ void test_nested_state_expect_errno(struct kvm_vm *vm,
+ 				    struct kvm_nested_state *state,
+ 				    int expected_errno)
+ {
+-	volatile struct kvm_run *run;
+ 	int rv;
+ 
+ 	rv = vcpu_nested_state_set(vm, VCPU_ID, state, true);
+@@ -50,12 +41,6 @@ void test_nested_state_expect_errno(struct kvm_vm *vm,
+ 		"Expected %s (%d) from vcpu_nested_state_set but got rv: %i errno: %s (%d)",
+ 		strerror(expected_errno), expected_errno, rv, strerror(errno),
+ 		errno);
+-	run = vcpu_state(vm, VCPU_ID);
+-	vcpu_run(vm, VCPU_ID);
+-	TEST_ASSERT(run->exit_reason == KVM_EXIT_SHUTDOWN,
+-		"Got exit_reason other than KVM_EXIT_SHUTDOWN: %u (%s),\n",
+-		run->exit_reason,
+-		exit_reason_str(run->exit_reason));
+ }
+ 
+ void test_nested_state_expect_einval(struct kvm_vm *vm,
 -- 
 1.8.3.1
+
 
