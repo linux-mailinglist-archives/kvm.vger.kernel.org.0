@@ -2,139 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A967E8F594
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 22:16:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2717A8F6F8
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2019 00:29:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730723AbfHOUQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 16:16:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58069 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726370AbfHOUQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 16:16:37 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5257BC057EC6;
-        Thu, 15 Aug 2019 20:16:36 +0000 (UTC)
-Received: from redhat.com (unknown [10.20.6.178])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ED628CF81;
-        Thu, 15 Aug 2019 20:16:32 +0000 (UTC)
-Date:   Thu, 15 Aug 2019 16:16:30 -0400
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, virtualization@lists.linux-foundation.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        Yu C <yu.c.zhang@intel.com>,
-        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>,
-        Mircea =?iso-8859-1?Q?C=EErjaliu?= <mcirjaliu@bitdefender.com>
-Subject: Re: DANGER WILL ROBINSON, DANGER
-Message-ID: <20190815201630.GA25517@redhat.com>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-72-alazar@bitdefender.com>
- <20190809162444.GP5482@bombadil.infradead.org>
- <1565694095.D172a51.28640.@15f23d3a749365d981e968181cce585d2dcb3ffa>
- <20190815191929.GA9253@redhat.com>
+        id S1733071AbfHOW3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 18:29:17 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:34766 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726302AbfHOW3R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 18:29:17 -0400
+Received: by mail-io1-f68.google.com with SMTP id s21so2416908ioa.1
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2019 15:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ULp104tsvsKFZNXaoeE0ZQ3dEnDaoYPuoOhtlzPB234=;
+        b=S9VjIK7QsFW6FBdr2df29pXKH/O6wbTFc4Y6CnXnpqCOZKAH6xi+RydGJGJrg+XObk
+         40dhn/MDZ0ksbAV2v+lw9ugKBPXczHO4KVcvzC34HHMkodBCfv/0g2JBsfP/MrH7qtfb
+         EXzyj9MaGfJzbe+7xbUvmOWko5/9U8qN8lMEGYIyRSxMNLoJEaYcNRWZTqH1rG82Meqg
+         fO0ro6xFrMTZ9HgY8oNu3JdMfb2drJLnruS5OQr+9BKqUSwxDQBgXU4uBHSI3UxRHeOq
+         KKORbj1SCa3+nEXyKBPxKRgIGSODHQiovikZAHP0DXCe1F04h5JQMJ+1B18nU/hRX7iY
+         ReWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ULp104tsvsKFZNXaoeE0ZQ3dEnDaoYPuoOhtlzPB234=;
+        b=bhSncc7ZkMatyPGoBpKSsTV1Oh35RgiXygCPkg8Dxs9YLePEvW7nlY9pHlQa0i+dIg
+         oFk4PekrkaIgTBjw+J/1tlVTto4nOIU7D/h7QBOAdOOp5NeWvCdEp8W4NBfGC4zFuPxs
+         DLaD3m/R2zG4tdqQ035VJ06+Utne06Wj3h3yXUKsfw281oJh9sNJDujyC75QukQ4jnmx
+         jDr6wzWj73Fyg4VS+UOLl+GWdXWI+ygRkEhi/DK6tt+UV2N6mOmpqjB23PIfHS3jSdx2
+         rT5Vz2yvfmLZGdwcWiQHK3b+5OnQTNzaH2RAgY26lgwOjb+TPzCynz0PhU3IUxJ5jx9o
+         y5uQ==
+X-Gm-Message-State: APjAAAUBx99mcAU4IxUwtd0thuydrXSFWi/u75tAnswYxOU13xnstMo9
+        Am1SPphAUjC9rzRJTlS4C8fcrPMt7w0vOXMWJFpEcH4RiwLC0A==
+X-Google-Smtp-Source: APXvYqygg16ytk4nPMtye6BCuMedAsBW0zRHWb69nJ1aaZf8TPQ42/cAX/6bJuKFR5mo4Oh3tiOoSawMF+7U5mciofs=
+X-Received: by 2002:a02:a809:: with SMTP id f9mr1076783jaj.111.1565908155845;
+ Thu, 15 Aug 2019 15:29:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190815191929.GA9253@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 15 Aug 2019 20:16:36 +0000 (UTC)
+References: <20190424231724.2014-1-krish.sadhukhan@oracle.com>
+ <20190424231724.2014-4-krish.sadhukhan@oracle.com> <20190513185746.GH28561@linux.intel.com>
+In-Reply-To: <20190513185746.GH28561@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 15 Aug 2019 15:29:04 -0700
+Message-ID: <CALMp9eQ5hrU3-KtS5GbKiyc-Hai7H=3r0RvhA8Fb8aQfWL8dCw@mail.gmail.com>
+Subject: Re: [PATCH 3/8][KVM VMX]: Add a function to check reserved bits in MSR_CORE_PERF_GLOBAL_CTRL
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 03:19:29PM -0400, Jerome Glisse wrote:
-> On Tue, Aug 13, 2019 at 02:01:35PM +0300, Adalbert Lazăr wrote:
-> > On Fri, 9 Aug 2019 09:24:44 -0700, Matthew Wilcox <willy@infradead.org> wrote:
-> > > On Fri, Aug 09, 2019 at 07:00:26PM +0300, Adalbert Lazăr wrote:
-> > > > +++ b/include/linux/page-flags.h
-> > > > @@ -417,8 +417,10 @@ PAGEFLAG(Idle, idle, PF_ANY)
-> > > >   */
-> > > >  #define PAGE_MAPPING_ANON	0x1
-> > > >  #define PAGE_MAPPING_MOVABLE	0x2
-> > > > +#define PAGE_MAPPING_REMOTE	0x4
-> > > 
-> > > Uh.  How do you know page->mapping would otherwise have bit 2 clear?
-> > > Who's guaranteeing that?
-> > > 
-> > > This is an awfully big patch to the memory management code, buried in
-> > > the middle of a gigantic series which almost guarantees nobody would
-> > > look at it.  I call shenanigans.
-> > > 
-> > > > @@ -1021,7 +1022,7 @@ void page_move_anon_rmap(struct page *page, struct vm_area_struct *vma)
-> > > >   * __page_set_anon_rmap - set up new anonymous rmap
-> > > >   * @page:	Page or Hugepage to add to rmap
-> > > >   * @vma:	VM area to add page to.
-> > > > - * @address:	User virtual address of the mapping	
-> > > > + * @address:	User virtual address of the mapping
-> > > 
-> > > And mixing in fluff changes like this is a real no-no.  Try again.
-> > > 
-> > 
-> > No bad intentions, just overzealous.
-> > I didn't want to hide anything from our patches.
-> > Once we advance with the introspection patches related to KVM we'll be
-> > back with the remote mapping patch, split and cleaned.
-> 
-> They are not bit left in struct page ! Looking at the patch it seems
-> you want to have your own pin count just for KVM. This is bad, we are
-> already trying to solve the GUP thing (see all various patchset about
-> GUP posted recently).
-> 
-> You need to rethink how you want to achieve this. Why not simply a
-> remote read()/write() into the process memory ie KVMI would call
-> an ioctl that allow to read or write into a remote process memory
-> like ptrace() but on steroid ...
-> 
-> Adding this whole big complex infrastructure without justification
-> of why we need to avoid round trip is just too much really.
+On Mon, May 13, 2019 at 11:57 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Wed, Apr 24, 2019 at 07:17:19PM -0400, Krish Sadhukhan wrote:
+> > Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h  |  1 +
+> >  arch/x86/include/asm/msr-index.h |  7 +++++++
+> >  arch/x86/kvm/x86.c               | 20 ++++++++++++++++++++
+> >  3 files changed, 28 insertions(+)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 4660ce90de7f..c5b3c63129a6 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1311,6 +1311,7 @@ int kvm_emulate_instruction_from_buffer(struct kvm_vcpu *vcpu,
+> >
+> >  void kvm_enable_efer_bits(u64);
+> >  bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
+> > +bool kvm_valid_perf_global_ctrl(u64 perf_global);
+> >  int kvm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
+> >  int kvm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
+> >
+> > diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> > index 8e40c2446fd1..d10e8d4b2842 100644
+> > --- a/arch/x86/include/asm/msr-index.h
+> > +++ b/arch/x86/include/asm/msr-index.h
+> > @@ -775,6 +775,13 @@
+> >  #define MSR_CORE_PERF_GLOBAL_CTRL    0x0000038f
+> >  #define MSR_CORE_PERF_GLOBAL_OVF_CTRL        0x00000390
+> >
+> > +/* MSR_CORE_PERF_GLOBAL_CTRL bits */
+> > +#define      PERF_GLOBAL_CTRL_PMC0_ENABLE    (1ull << 0)
+>
+> BIT and BIT_ULL
+>
+> > +#define      PERF_GLOBAL_CTRL_PMC1_ENABLE    (1ull << 1)
+> > +#define      PERF_GLOBAL_CTRL_FIXED0_ENABLE  (1ull << 32)
+> > +#define      PERF_GLOBAL_CTRL_FIXED1_ENABLE  (1ull << 33)
+> > +#define      PERF_GLOBAL_CTRL_FIXED2_ENABLE  (1ull << 34)
+> > +
+> >  /* Geode defined MSRs */
+> >  #define MSR_GEODE_BUSCONT_CONF0              0x00001900
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 02c8e095a239..ecddb8baaa7f 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -89,8 +89,19 @@ EXPORT_SYMBOL_GPL(kvm_mce_cap_supported);
+> >  #ifdef CONFIG_X86_64
+> >  static
+> >  u64 __read_mostly efer_reserved_bits = ~((u64)(EFER_SCE | EFER_LME | EFER_LMA));
+> > +static
+> > +u64 __read_mostly perf_global_ctrl_reserved_bits =
+> > +                             ~((u64)(PERF_GLOBAL_CTRL_PMC0_ENABLE    |
+> > +                                     PERF_GLOBAL_CTRL_PMC1_ENABLE    |
+> > +                                     PERF_GLOBAL_CTRL_FIXED0_ENABLE  |
+> > +                                     PERF_GLOBAL_CTRL_FIXED1_ENABLE  |
+> > +                                     PERF_GLOBAL_CTRL_FIXED2_ENABLE));
+> >  #else
+> >  static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+> > +static
+>
+> Why is static on a different line?
+>
+> > +u64 __read_mostly perf_global_ctrl_reserved_bits =
+> > +                             ~((u64)(PERF_GLOBAL_CTRL_PMC0_ENABLE    |
+> > +                                     PERF_GLOBAL_CTRL_PMC1_ENABLE));
+>
+> Why are the fixed bits reserved on a 32-bit build?
+>
+> >  #endif
+> >
+> >  #define VM_STAT(x) offsetof(struct kvm, stat.x), KVM_STAT_VM
+> > @@ -1255,6 +1266,15 @@ static int do_get_msr_feature(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+> >       return 0;
+> >  }
+> >
+> > +bool kvm_valid_perf_global_ctrl(u64 perf_global)
+> > +{
+> > +     if (perf_global & perf_global_ctrl_reserved_bits)
+>
+> If the check were correct, this could be:
+>
+>         return !(perf_blobal & perf_global_ctrl_reserved_bits);
+>
+> But the check isn't correct, the number of counters is variable, i.e. the
+> helper should query the guest's CPUID 0xA (ignoring for the moment the
+> fact that this bypasses the PMU handling of guest vs. host ownership).
 
-Thinking a bit more about this, you can achieve the same thing without
-adding a single line to any mm code. Instead of having mmap with
-PROT_NONE | MAP_LOCKED you have userspace mmap some kvm device file
-(i am assuming this is something you already have and can control
-the mmap callback).
+Aren't the reserved bits already easily calculated as
+~pmu->global_ctrl_mask? Well, there's also bit 48, potentially, I
+guess, but I don't think kvm virtualizes it.
 
-So now kernel side you have a vma with a vm_operations_struct under
-your control this means that everything you want to block mm wise
-from within the inspector process can be block through those call-
-backs (find_special_page() specificaly for which you have to return
-NULL all the time).
+Once we have this concept, shouldn't intel_pmu_set_msr() return
+non-zero if an attempt is made to set a reserved bit of this MSR?
 
-To mirror target process memory you can use hmm_mirror, when you
-populate the inspector process page table you use insert_pfn()
-(mmap of the kvm device file must mark this vma as PFNMAP).
-
-By following the hmm_mirror API, anytime the target process has
-a change in its page table (ie virtual address -> page) you will
-get a callback and all you have to do is clear the page table
-within the inspector process and flush tlb (use zap_page_range).
-
-On page fault within the inspector process the fault callback of
-vm_ops will get call and from there you call hmm_mirror following
-its API.
-
-Oh also mark the vma with VM_WIPEONFORK to avoid any issue if the
-inspector process use fork() (you could support fork but then you
-would need to mark the vma as SHARED and use unmap_mapping_pages
-instead of zap_page_range).
-
-
-There everything you want to do with already upstream mm code.
-
-Cheers,
-Jérôme
+> > +             return false;
+> > +
+> > +     return true;
+> > +}
+> > +EXPORT_SYMBOL_GPL(kvm_valid_perf_global_ctrl);
+> > +
+> >  bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer)
+> >  {
+> >       if (efer & efer_reserved_bits)
+> > --
+> > 2.17.2
+> >
