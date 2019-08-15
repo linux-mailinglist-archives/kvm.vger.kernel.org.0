@@ -2,203 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E9E78E360
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 06:03:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1BE8E362
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 06:05:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726046AbfHOEDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 00:03:49 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:42649 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725440AbfHOEDt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 00:03:49 -0400
-Received: by mail-pf1-f194.google.com with SMTP id i30so686079pfk.9;
-        Wed, 14 Aug 2019 21:03:48 -0700 (PDT)
+        id S1726171AbfHOEFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 00:05:06 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:46387 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725440AbfHOEFG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 00:05:06 -0400
+Received: by mail-ot1-f65.google.com with SMTP id z17so3149624otk.13;
+        Wed, 14 Aug 2019 21:05:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4nUx+PiT1A/UTue4lI0LEVNVOUoj29u0rUjKYH9A9qA=;
-        b=q/uCDiqUBuw3t4/EZc02nEuFb8dsKLNA10EeM9XLk1200ynDcNdeWYMbUnyD14zDam
-         pkLvWY6Q71ESRSLEXVZS/1BB7wf2K1WHV+VffFCYB3ABzVCvuEJ/6VOr0QcGTbvng8yI
-         dqBEwtP1VJvxKWATMe78vViTkdlG9YpiKNFAScAddmzB/8vao8LCU0wRoj4/gHjAHlee
-         u1nrEMU+A3qWPSwPeoJaACFMSPpNnSPdlwry9cgpa3xAGhoMznD44XZ+S0A4gAAEbeHn
-         A6R3mK2htyZdjppXXFAZ5p8MlLI02T83EdaFSrcZHGjY1dvMDv33r4WLI4ClXk+CSuPj
-         1dPQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hhpSNDDdJjVXj/ea1nbfBdH4ileub7FSt2+byXY5COo=;
+        b=dRKfezk6wLD8aeBoV6dH6+vP9uNj1ixyut6Qx2AstL4Y5PpAq14H7YOqmG+p8A+z8D
+         0gN0atNkD5mDPadJCGPyINoFRUtUelAe4iZubONrQYxCCr3LLR3wtDlEaPJeWqYpgTq7
+         +p0D31Tm61pVtELl/nsBAOxhihrjRFr05jvAfhYK0xzAx08R6DUbq+aOHvrPPfIoX7rj
+         y0lDwwgRqbZuCGU4jzX7lF4eYrFNdmvGVKwFbMbjiIrS+0lkRWamMrtacBSuOez0uUvx
+         Txsk6yGwGQGpSX3e9ff2dgxs4xC7ieBwS0Mbf/KVgCM1AIsTDeI4J4y611MQXp1UFq2d
+         j4FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4nUx+PiT1A/UTue4lI0LEVNVOUoj29u0rUjKYH9A9qA=;
-        b=A9xgC7mV4X7iNkcZLRGkwYPDANOsw/Tb1toR61A0T8uRcocFuHd81W1r7XsAAZmxOc
-         UvDgFfCnYANKeqSqhK1G1QOhsbZbP1jgTvXvJPz/YWqd+w05JvKnMaw+mRcGUSFqnGoo
-         iJYoSmObrMEakC60SYuNbjWV4qsCWUUcCPro5e2cqZmlxvPGIrfMLUfnfhgSxBdpH5ji
-         f6OEEcmnuIx9/4r65Ci2YsrRzuphwpz2D6ZKMBHx4YI+sWLRb6wWOwK6m46b7dYeoDM/
-         IXJeXeVZI2M5USMmMPn8nqQ56LA/fkrFPvmVtg4s4DfFRS057Q8r2f7Xm4RUHASoSqIQ
-         G1aQ==
-X-Gm-Message-State: APjAAAVuoilazZFyn4sSusYkNvxVkBgNU8oCYei5AwHSP+alxdxrn4hH
-        zlZvcF3B31tmgWreRU+pQXP35ktE
-X-Google-Smtp-Source: APXvYqy835FwkDxLLTJ8VauChuFS3hewWRet1cBkbwe0sDX7yV1440MiWUfblAwVA1LfS7MhfTNKHA==
-X-Received: by 2002:a17:90a:21eb:: with SMTP id q98mr471321pjc.23.1565841827920;
-        Wed, 14 Aug 2019 21:03:47 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id w11sm259423pjr.15.2019.08.14.21.03.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 14 Aug 2019 21:03:47 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH v2] KVM: LAPIC: Periodically revaluate to get conservative lapic_timer_advance_ns
-Date:   Thu, 15 Aug 2019 12:03:37 +0800
-Message-Id: <1565841817-25982-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hhpSNDDdJjVXj/ea1nbfBdH4ileub7FSt2+byXY5COo=;
+        b=S6Dkd5el8MvSSSy3Rir58l2pobhjt05oABC8VlJap990FZnz19/8E+X1ddACpda8YU
+         k18pGFk6bBzDHzPjM47gI7m94wqwmvqz0h8v09ZG+zSslJeroTH9/bdDGD7bLaFnEMg/
+         ZVV3EOuKRVlEu0NgKfB/15JxwMoVe4RIRyNgjeO1XDo7yO9RaKylYl5xWdcpcIR7XiZ1
+         JkoZCRPsGkGZ9OU65eNqAMVSMXA6XSOFTMq0ow+DGx+gJO8U8H5e4Ch6SFyjfXo++PcQ
+         uskaQoSlKWEJkEBktaQVL1ULdoKQ74ntS2jAHwTgGE0KD36HBluI8/8rC3s5UYXUUylM
+         GjqQ==
+X-Gm-Message-State: APjAAAWsCXIkCTAey4vbwJ1nHucMtUZPvkgSWdZi0aTgQYUOkptgb52L
+        YLMb1BiSAle2w7qSFRz2dRZ7LGxKB+icW8PEdXpWqVDS
+X-Google-Smtp-Source: APXvYqwCRTwWTw7SR/A8Wq6QJdAx2Jdsxrh64E6D2IWQ6kUf7znfSKE12dj2jIshA0cUhR08ojSDKlBLMIXUh1+TZCI=
+X-Received: by 2002:a05:6830:144b:: with SMTP id w11mr2012289otp.185.1565841905602;
+ Wed, 14 Aug 2019 21:05:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1565329531-12327-1-git-send-email-wanpengli@tencent.com>
+ <fad8ceed-8b98-8fc4-5b6a-63bbca4059a8@redhat.com> <CANRm+CwMMUEyZXmiUu5Y8GA=BEUYGLw31CRyZTc2uA+ct4Bamg@mail.gmail.com>
+ <ba07fb02-9b55-15e4-d240-24da59e09369@redhat.com>
+In-Reply-To: <ba07fb02-9b55-15e4-d240-24da59e09369@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 15 Aug 2019 12:04:48 +0800
+Message-ID: <CANRm+CzGNyST4=BtE-eKvjB-PUVVoM-gUC2Np8NH7tm0Gp2_nQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: LAPIC: Periodically revaluate appropriate lapic_timer_advance_ns
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, 14 Aug 2019 at 20:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 12/08/19 11:06, Wanpeng Li wrote:
+> > On Fri, 9 Aug 2019 at 18:24, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 09/08/19 07:45, Wanpeng Li wrote:
+> >>> From: Wanpeng Li <wanpengli@tencent.com>
+> >>>
+> >>> Even if for realtime CPUs, cache line bounces, frequency scaling, presence
+> >>> of higher-priority RT tasks, etc can cause different response. These
+> >>> interferences should be considered and periodically revaluate whether
+> >>> or not the lapic_timer_advance_ns value is the best, do nothing if it is,
+> >>> otherwise recaluate again.
+> >>
+> >> How much fluctuation do you observe between different runs?
+> >
+> > Sometimes can ~1000 cycles after converting to guest tsc freq.
+>
+> Hmm, I wonder if we need some kind of continuous smoothing.  Something like
 
-Even if for realtime CPUs, cache line bounces, frequency scaling, presence 
-of higher-priority RT tasks, etc can still cause different response. These 
-interferences should be considered and periodically revaluate whether 
-or not the lapic_timer_advance_ns value is the best, do nothing if it is,
-otherwise recaluate again. Set lapic_timer_advance_ns to the minimal 
-conservative value from all the estimated values.
+Actually this can fluctuate drastically instead of continuous
+smoothing during testing (running linux guest instead of
+kvm-unit-tests).
 
-Testing on Skylake server, cat vcpu*/lapic_timer_advance_ns, before patch:
-1628
-4161
-4321
-3236
-...
+>
+>         if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE) {
+>                 /* no update for random fluctuations */
+>                 return;
+>         }
+>
+>         if (unlikely(timer_advance_ns > 5000))
+>                 timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
+>         apic->lapic_timer.timer_advance_ns = timer_advance_ns;
+>
+> and removing all the timer_advance_adjust_done stuff.  What do you think?
 
-Testing on Skylake server, cat vcpu*/lapic_timer_advance_ns, after patch:
-1553
-1499
-1509
-1489
-...
+I just sent out v2, periodically revaluate and get a minimal
+conservative value from these revaluate points. Please have a look. :)
 
-Testing on Haswell desktop, cat vcpu*/lapic_timer_advance_ns, before patch:
-4617
-3641
-4102
-4577
-...
-Testing on Haswell desktop, cat vcpu*/lapic_timer_advance_ns, after patch:
-2775
-2892
-2764
-2775
-...
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 34 ++++++++++++++++++++++++++++------
- arch/x86/kvm/lapic.h |  2 ++
- 2 files changed, 30 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index df5cd07..8487d9c 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -69,6 +69,7 @@
- #define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-+#define LAPIC_TIMER_ADVANCE_RECALC_PERIOD (600 * HZ)
- 
- static inline int apic_test_vector(int vec, void *bitmap)
- {
-@@ -1480,10 +1481,21 @@ static inline void __wait_lapic_expire(struct kvm_vcpu *vcpu, u64 guest_cycles)
- static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
- 					      s64 advance_expire_delta)
- {
--	struct kvm_lapic *apic = vcpu->arch.apic;
--	u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
-+	struct kvm_timer *ktimer = &vcpu->arch.apic->lapic_timer;
-+	u32 timer_advance_ns = ktimer->timer_advance_ns;
- 	u64 ns;
- 
-+	/* periodic revaluate */
-+	if (unlikely(ktimer->timer_advance_adjust_done)) {
-+		ktimer->recalc_timer_advance_ns = jiffies +
-+			LAPIC_TIMER_ADVANCE_RECALC_PERIOD;
-+		if (abs(advance_expire_delta) > LAPIC_TIMER_ADVANCE_ADJUST_DONE) {
-+			timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
-+			ktimer->timer_advance_adjust_done = false;
-+		} else
-+			return;
-+	}
-+
- 	/* too early */
- 	if (advance_expire_delta < 0) {
- 		ns = -advance_expire_delta * 1000000ULL;
-@@ -1499,12 +1511,18 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
- 	}
- 
- 	if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
--		apic->lapic_timer.timer_advance_adjust_done = true;
-+		ktimer->timer_advance_adjust_done = true;
- 	if (unlikely(timer_advance_ns > 5000)) {
- 		timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
--		apic->lapic_timer.timer_advance_adjust_done = false;
-+		ktimer->timer_advance_adjust_done = false;
-+	}
-+	ktimer->timer_advance_ns = timer_advance_ns;
-+
-+	if (ktimer->timer_advance_adjust_done) {
-+		if (ktimer->min_timer_advance_ns > timer_advance_ns)
-+			ktimer->min_timer_advance_ns = timer_advance_ns;
-+		ktimer->timer_advance_ns = ktimer->min_timer_advance_ns;
- 	}
--	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
- }
- 
- static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-@@ -1523,7 +1541,8 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
- 	if (guest_tsc < tsc_deadline)
- 		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
- 
--	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-+	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done) ||
-+		time_before(apic->lapic_timer.recalc_timer_advance_ns, jiffies))
- 		adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
- }
- 
-@@ -2301,9 +2320,12 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
- 	if (timer_advance_ns == -1) {
- 		apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
- 		apic->lapic_timer.timer_advance_adjust_done = false;
-+		apic->lapic_timer.recalc_timer_advance_ns = jiffies;
-+		apic->lapic_timer.min_timer_advance_ns = UINT_MAX;
- 	} else {
- 		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
- 		apic->lapic_timer.timer_advance_adjust_done = true;
-+		apic->lapic_timer.recalc_timer_advance_ns = MAX_JIFFY_OFFSET;
- 	}
- 
- 
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 50053d2..56a05eb 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -31,6 +31,8 @@ struct kvm_timer {
- 	u32 timer_mode_mask;
- 	u64 tscdeadline;
- 	u64 expired_tscdeadline;
-+	unsigned long recalc_timer_advance_ns;
-+	u32 min_timer_advance_ns;
- 	u32 timer_advance_ns;
- 	s64 advance_expire_delta;
- 	atomic_t pending;			/* accumulated triggered timers */
--- 
-2.7.4
-
+Regards,
+Wanpeng Li
