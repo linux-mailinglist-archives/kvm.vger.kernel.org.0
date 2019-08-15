@@ -2,59 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 428218E1CA
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 02:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39F9A8E328
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 05:27:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728378AbfHOATx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Aug 2019 20:19:53 -0400
-Received: from mga11.intel.com ([192.55.52.93]:14456 "EHLO mga11.intel.com"
+        id S1728905AbfHOD0z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Aug 2019 23:26:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34900 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726490AbfHOATx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Aug 2019 20:19:53 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Aug 2019 17:19:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,387,1559545200"; 
-   d="scan'208";a="181722979"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga006.jf.intel.com with ESMTP; 14 Aug 2019 17:19:52 -0700
-Date:   Wed, 14 Aug 2019 17:19:52 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v4 2/7] x86: kvm: svm: propagate errors from
- skip_emulated_instruction()
-Message-ID: <20190815001952.GA24750@linux.intel.com>
-References: <20190813135335.25197-1-vkuznets@redhat.com>
- <20190813135335.25197-3-vkuznets@redhat.com>
- <20190813180759.GF13991@linux.intel.com>
- <87d0h89jk3.fsf@vitty.brq.redhat.com>
+        id S1727750AbfHOD0z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Aug 2019 23:26:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C6A76300894D;
+        Thu, 15 Aug 2019 03:26:54 +0000 (UTC)
+Received: from [10.72.12.184] (ovpn-12-184.pek2.redhat.com [10.72.12.184])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CF74A27C2C;
+        Thu, 15 Aug 2019 03:26:49 +0000 (UTC)
+Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+References: <20190809054851.20118-1-jasowang@redhat.com>
+ <20190810134948-mutt-send-email-mst@kernel.org>
+ <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
+ <20190812054429-mutt-send-email-mst@kernel.org>
+ <20190812130252.GE24457@ziepe.ca>
+ <9a9641fe-b48f-f32a-eecc-af9c2f4fbe0e@redhat.com>
+ <20190813115707.GC29508@ziepe.ca>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <74838e61-3a5e-0f51-2092-f4a16d144b45@redhat.com>
+Date:   Thu, 15 Aug 2019 11:26:46 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87d0h89jk3.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190813115707.GC29508@ziepe.ca>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Thu, 15 Aug 2019 03:26:54 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 14, 2019 at 11:34:52AM +0200, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->
-> > x86_emulate_instruction() doesn't set vcpu->run->exit_reason when emulation
-> > fails with EMULTYPE_SKIP, i.e. this will exit to userspace with garbage in
-> > the exit_reason.
-> 
-> Oh, nice catch, will take a look!
 
-Don't worry about addressing this.  Paolo has already queued the series,
-and I've got a patch set waiting that purges emulation_result entirely
-that I'll post once your series hits kvm/queue.
+On 2019/8/13 下午7:57, Jason Gunthorpe wrote:
+> On Tue, Aug 13, 2019 at 04:31:07PM +0800, Jason Wang wrote:
+>
+>> What kind of issues do you see? Spinlock is to synchronize GUP with MMU
+>> notifier in this series.
+> A GUP that can't sleep can't pagefault which makes it a really weird
+> pattern
+
+
+My understanding is __get_user_pages_fast() assumes caller can fail or 
+have fallback. And we have graceful fallback to copy_{to|from}_user().
+
+
+>
+>> Btw, back to the original question. May I know why synchronize_rcu() is not
+>> suitable? Consider:
+> We already went over this. You'd need to determine it doesn't somehow
+> deadlock the mm on reclaim paths. Maybe it is OK, the rcq_gq_wq is
+> marked WQ_MEM_RECLAIM at least..
+
+
+Yes, will take a look at this.
+
+
+>
+> I also think Michael was concerned about the latency spikes a long RCU
+> delay would cause.
+
+
+I don't think it's a real problem consider MMU notifier could be 
+preempted or blocked.
+
+Thanks
+
+
+>
+> Jason
