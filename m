@@ -2,110 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 448DA8F1F2
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 19:19:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD5D58F20E
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 19:22:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731354AbfHORSn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 13:18:43 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36496 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731134AbfHORSn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 13:18:43 -0400
-Received: by mail-pf1-f194.google.com with SMTP id w2so1649299pfi.3;
-        Thu, 15 Aug 2019 10:18:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=O0iU9h/CgsDkbZj91TD8RQDyFQ2IpZ1Yt3QLDe5vqPg=;
-        b=tjAQYIIro/DnauaXI3INnjRJ/TkqSKPI5VSGVznvGeeUcH0xKxwESp9IFecKpept4y
-         +TKAvO8LFDVo2JSUms7f4AHRLykJ3aWjv//YwbFmTCtpmd1PuO44oXTGx27ZPYbp0tCG
-         VHFtbXKcpvCkHkhJ7FmwnWvPHbRKal59zAKDeiIEh51J2Se0/B2fYl1qdhPdYKC+nNtC
-         t+USv/D8HJg3gS+E2b1TsBmCsghRIleh5YAorwhmjPW5URMuroF8cwyorpGyHFwaQPxA
-         9YlgiSCiQOgTwIpD5QzJNmHSKLV1u0SinXcon/R22PEBoOuozKKr1wutxKfgWL+EU/rE
-         i42Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=O0iU9h/CgsDkbZj91TD8RQDyFQ2IpZ1Yt3QLDe5vqPg=;
-        b=T5Fkv0tpFHdJkCOpmCZ78/6wCSoAsPtmrpQKqGUYjAiTgiN01Q696Opanv6K0kZbjp
-         wiwDijmkmx72DDK4TJTFmSptsyzkuJGTZbyjccob/347YdySBVSnnNTs4lScY7PHeqz+
-         kYX95MfYrkOwF29MuXIpyjpWgYr4IeF1Boj955fW+y+c2J9II2CvcDUGWm2M5JUPUJSc
-         8fzN9ibumj664GhaIFYUtElXzu4BbIw59S+hFL65sm6CEy/Zm6idvthRzamCJ5+526sW
-         afmRgTr3B/6FtryKFVNX6GkI3h7ogW14jjJyLGKPrrbcPM7PumYzA1xlfPWdqA4gZviO
-         fGFw==
-X-Gm-Message-State: APjAAAWpxTQU13exDpQBa62DzSTwEC7roJ+op0+1zI9MxFxszHP/wCL3
-        tkiSbwqyQJvOF+yEke9jX+c=
-X-Google-Smtp-Source: APXvYqy7W7kXMKmt5qV1vz6zH8QBZDpT0zmtLNiJOWrKRdx4CqeHfrqqlOkAd7IoFjwEYuU4TVZlEA==
-X-Received: by 2002:aa7:8f2e:: with SMTP id y14mr6509394pfr.113.1565889522309;
-        Thu, 15 Aug 2019 10:18:42 -0700 (PDT)
-Received: from bharath12345-Inspiron-5559 ([103.110.42.34])
-        by smtp.gmail.com with ESMTPSA id d129sm3343983pfc.168.2019.08.15.10.18.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 10:18:41 -0700 (PDT)
-Date:   Thu, 15 Aug 2019 22:48:35 +0530
-From:   Bharath Vedartham <linux.bhar@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        khalid.aziz@oracle.com
-Subject: Re: [Question-kvm] Can hva_to_pfn_fast be executed in interrupt
- context?
-Message-ID: <20190815171834.GA14342@bharath12345-Inspiron-5559>
-References: <20190813191435.GB10228@bharath12345-Inspiron-5559>
- <54182261-88a4-9970-1c3c-8402e130dcda@redhat.com>
+        id S1731772AbfHORWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 13:22:39 -0400
+Received: from mga01.intel.com ([192.55.52.88]:19173 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729931AbfHORWj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 13:22:39 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Aug 2019 10:22:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,389,1559545200"; 
+   d="scan'208";a="179427792"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 15 Aug 2019 10:22:38 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paul Mackerras <paulus@ozlabs.org>, Joerg Roedel <joro@8bytes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: Assert that struct kvm_vcpu is always as offset zero
+Date:   Thu, 15 Aug 2019 10:22:37 -0700
+Message-Id: <20190815172237.10464-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <54182261-88a4-9970-1c3c-8402e130dcda@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 10:17:09PM +0200, Paolo Bonzini wrote:
-> On 13/08/19 21:14, Bharath Vedartham wrote:
-> > Hi all,
-> > 
-> > I was looking at the function hva_to_pfn_fast(in virt/kvm/kvm_main) which is 
-> > executed in an atomic context(even in non-atomic context, since
-> > hva_to_pfn_fast is much faster than hva_to_pfn_slow).
-> > 
-> > My question is can this be executed in an interrupt context? 
-> 
-> No, it cannot for the reason you mention below.
-> 
-> Paolo
-hmm.. Well I expected the answer to be kvm specific. 
-Because I observed a similar use-case for a driver (sgi-gru) where 
-we want to retrive the physical address of a virtual address. This was
-done in atomic and non-atomic context similar to hva_to_pfn_fast and
-hva_to_pfn_slow. __get_user_pages_fast(for atomic case) 
-would not work as the driver could execute in interrupt context.
+KVM implementations that wrap struct kvm_vcpu with a vendor specific
+struct, e.g. struct vcpu_vmx, must place the vcpu member at offset 0,
+otherwise the usercopy region intended to encompass struct kvm_vcpu_arch
+will instead overlap random chunks of the vendor specific struct.
+E.g. padding a large number of bytes before struct kvm_vcpu triggers
+a usercopy warn when running with CONFIG_HARDENED_USERCOPY=y.
 
-The driver manually walked the page tables to handle this issue.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
 
-Since kvm is a widely used piece of code, I asked this question to know
-how kvm handled this issue. 
+Note, the PowerPC change is completely untested.
 
-Thank you for your time.
+ arch/powerpc/kvm/e500.c | 3 +++
+ arch/x86/kvm/svm.c      | 3 +++
+ arch/x86/kvm/vmx/vmx.c  | 3 +++
+ 3 files changed, 9 insertions(+)
 
-Thank you
-Bharath
-> > The motivation for this question is that in an interrupt context, we cannot
-> > assume "current" to be the task_struct of the process of interest.
-> > __get_user_pages_fast assume current->mm when walking the process page
-> > tables. 
-> > 
-> > So if this function hva_to_pfn_fast can be executed in an
-> > interrupt context, it would not be safe to retrive the pfn with
-> > __get_user_pages_fast. 
-> > 
-> > Thoughts on this?
-> > 
-> > Thank you
-> > Bharath
-> > 
-> 
+diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
+index b5a848a55504..00649ca5fa9a 100644
+--- a/arch/powerpc/kvm/e500.c
++++ b/arch/powerpc/kvm/e500.c
+@@ -440,6 +440,9 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_e500(struct kvm *kvm,
+ 	struct kvm_vcpu *vcpu;
+ 	int err;
+ 
++	BUILD_BUG_ON_MSG(offsetof(struct kvmppc_vcpu_e500, vcpu) != 0,
++		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
++
+ 	vcpu_e500 = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
+ 	if (!vcpu_e500) {
+ 		err = -ENOMEM;
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index d685491fce4d..70015ae5fc19 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -2137,6 +2137,9 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	struct page *nested_msrpm_pages;
+ 	int err;
+ 
++	BUILD_BUG_ON_MSG(offsetof(struct vcpu_svm, vcpu) != 0,
++		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
++
+ 	svm = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
+ 	if (!svm) {
+ 		err = -ENOMEM;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 42ed3faa6af8..402cf2fe5cdd 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6615,6 +6615,9 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	unsigned long *msr_bitmap;
+ 	int cpu;
+ 
++	BUILD_BUG_ON_MSG(offsetof(struct vcpu_vmx, vcpu) != 0,
++		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
++
+ 	vmx = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
+ 	if (!vmx)
+ 		return ERR_PTR(-ENOMEM);
+-- 
+2.22.0
+
