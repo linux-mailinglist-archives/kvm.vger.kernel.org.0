@@ -2,72 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CF4BF8F0BD
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 18:38:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B18358F1CA
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 19:15:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732102AbfHOQiq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 12:38:46 -0400
-Received: from mga09.intel.com ([134.134.136.24]:22205 "EHLO mga09.intel.com"
+        id S1731971AbfHORO6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 13:14:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38572 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731913AbfHOQiq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 12:38:46 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Aug 2019 09:38:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,389,1559545200"; 
-   d="scan'208";a="178512101"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga007.fm.intel.com with ESMTP; 15 Aug 2019 09:38:44 -0700
-Date:   Thu, 15 Aug 2019 09:38:44 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        yu.c.zhang@intel.com, alazar@bitdefender.com,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH RESEND v4 5/9] KVM: VMX: Add init/set/get functions for
- SPP
-Message-ID: <20190815163844.GD27076@linux.intel.com>
-References: <20190814070403.6588-1-weijiang.yang@intel.com>
- <20190814070403.6588-6-weijiang.yang@intel.com>
- <87a7cbapdw.fsf@vitty.brq.redhat.com>
- <20190815134329.GA11449@local-michael-cet-test>
- <CALMp9eTGXDDfVspFwFyEhagg9sdnqZqzSQhDksT0bkKzVNGSqw@mail.gmail.com>
+        id S1731965AbfHORO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 13:14:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7306446672;
+        Thu, 15 Aug 2019 17:14:56 +0000 (UTC)
+Received: from localhost (ovpn-116-32.gru2.redhat.com [10.97.116.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 02AB6841E7;
+        Thu, 15 Aug 2019 17:14:55 +0000 (UTC)
+Date:   Thu, 15 Aug 2019 14:14:54 -0300
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Subject: Re: [PATCH 2/2] KVM: x86: always expose VIRT_SSBD to guests
+Message-ID: <20190815171454.GV3908@habkost.net>
+References: <1565854883-27019-1-git-send-email-pbonzini@redhat.com>
+ <1565854883-27019-3-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eTGXDDfVspFwFyEhagg9sdnqZqzSQhDksT0bkKzVNGSqw@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <1565854883-27019-3-git-send-email-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 15 Aug 2019 17:14:56 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 09:25:41AM -0700, Jim Mattson wrote:
-> On Thu, Aug 15, 2019 at 6:41 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
+On Thu, Aug 15, 2019 at 09:41:23AM +0200, Paolo Bonzini wrote:
+> Even though it is preferrable to use SPEC_CTRL (represented by
+> X86_FEATURE_AMD_SSBD) instead of VIRT_SPEC, VIRT_SPEC is always
+> supported anyway because otherwise it would be impossible to
+> migrate from old to new CPUs.  Make this apparent in the
+> result of KVM_GET_SUPPORTED_CPUID as well.
 > 
-> > Hi, Vitaly,
-> > After looked into the issue and others, I feel to make SPP co-existing
-> > with nested VM is not good, the major reason is, L1 pages protected by
-> > SPP are transparent to L1 VM, if it launches L2 VM, probably the
-> > pages would be allocated to L2 VM, and that will bother to L1 and L2.
-> > Given the feature is new and I don't see nested VM can benefit
-> > from it right now, I would like to make SPP and nested feature mutually
-> > exclusive, i.e., detecting if the other part is active before activate one
-> > feature,what do you think of it?
-> > thanks!
+> Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> How do you propose making the features mutually exclusive?
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 145ec050d45d..5865bc73bbb5 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -747,11 +747,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>  		entry->ebx &= kvm_cpuid_8000_0008_ebx_x86_features;
+>  		cpuid_mask(&entry->ebx, CPUID_8000_0008_EBX);
+>  		/*
+> -		 * The preference is to use SPEC CTRL MSR instead of the
+> -		 * VIRT_SPEC MSR.
+> +		 * VIRT_SPEC is only implemented for AMD processors,
+> +		 * but the host could set AMD_SSBD if it wanted even
+> +		 * for Intel processors.
+>  		 */
+> -		if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) &&
+> -		    !boot_cpu_has(X86_FEATURE_AMD_SSBD))
+> +		if ((boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+> +		     boot_cpu_has(X86_FEATURE_AMD_SSBD)) &&
+> +		    boot_cpu_has(X86_FEATURE_SVM))
 
-I haven't looked at the details or the end to end flow, but would it make
-sense to exit to userspace on nested VMLAUNCH/VMRESUME if there are SPP
-mappings?  And have the SPP ioctl() kick vCPUs out of guest.
+Would it be desirable to move this code to
+svm_set_supported_cpuid(), or is there a reason for keeping this
+in cpuid.c?
 
-KVM already exits on SPP violations, so presumably this is something that
-can be punted to userspace.
+
+>  			entry->ebx |= F(VIRT_SSBD);
+>  		break;
+>  	}
+> -- 
+> 1.8.3.1
+> 
+
+-- 
+Eduardo
