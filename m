@@ -2,74 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B5818E81E
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 11:24:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D39778E8A7
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 11:56:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731312AbfHOJY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 05:24:29 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53452 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730073AbfHOJY2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 05:24:28 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 10so730894wmp.3
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2019 02:24:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=x84LMNNTuJo9sta6FIQCvGMribLZzm6UX96aqLVwiNc=;
-        b=HEaH/Foyz9O9FSNig0veHLR8GEmLziwW7t+0vViLn8C5xKzro8ExSalq6/0Maq7SM4
-         rx/deFmDpkKcX0HULJf0F03TQj41/cgNED6PoHlUrux8P0pJD6eznhpvGHXhBfVmwxKW
-         prAhdLhs/BCHSQCDFlI09hNdHMuvZO012PR6IbxRzWtBhRr7sjR5NvRxpmtrBFV4RU7y
-         yBpWrco0A1dXLKsDZW44q067JNeaHj2A/yOAPwSnMLqy1mi7R4F6Fnp0JTgpbn2qHReY
-         EPsTdgOFjJZVUG4euz2mlg/EjCe9y7IBaZHo1gLtJbr/squM7eDNkqwmQygc8ovtgRvx
-         JSRg==
-X-Gm-Message-State: APjAAAUP2X6+h4VA9bHKMy1VXSljvkVoG1wXoEHwMBCAWWH81EQDcYr5
-        /F4xqHliREE2hws12idZ4EOWkQ==
-X-Google-Smtp-Source: APXvYqx8qgEzJjuKDHGRJH3OXvRcljUB1bEcjCi+jKW6Fepk1pJNTIPKClD4tx/zHPFs5fNXuLh86Q==
-X-Received: by 2002:a1c:61d4:: with SMTP id v203mr1865635wmb.164.1565861066691;
-        Thu, 15 Aug 2019 02:24:26 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id p7sm989293wmh.38.2019.08.15.02.24.25
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 15 Aug 2019 02:24:26 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v4 2/7] x86: kvm: svm: propagate errors from skip_emulated_instruction()
-In-Reply-To: <20190815001952.GA24750@linux.intel.com>
-References: <20190813135335.25197-1-vkuznets@redhat.com> <20190813135335.25197-3-vkuznets@redhat.com> <20190813180759.GF13991@linux.intel.com> <87d0h89jk3.fsf@vitty.brq.redhat.com> <20190815001952.GA24750@linux.intel.com>
-Date:   Thu, 15 Aug 2019 11:24:25 +0200
-Message-ID: <87wofe93xy.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S1730715AbfHOJ4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 05:56:36 -0400
+Received: from foss.arm.com ([217.140.110.172]:41404 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726098AbfHOJ4g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 05:56:36 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5B4F28;
+        Thu, 15 Aug 2019 02:56:35 -0700 (PDT)
+Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com [10.1.196.217])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5F25D3F706;
+        Thu, 15 Aug 2019 02:56:34 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     maz@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com,
+        suzuki.poulose@arm.com, julien.grall@arm.com,
+        andre.przywara@arm.com, eric.auger@redhat.com
+Subject: [PATCH] KVM: arm/arm64: vgic: Make function comments match function declarations
+Date:   Thu, 15 Aug 2019 10:56:22 +0100
+Message-Id: <1565862982-9787-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+Since commit 503a62862e8f ("KVM: arm/arm64: vgic: Rely on the GIC driver to
+parse the firmware tables"), the vgic_v{2,3}_probe functions stopped using
+a DT node. Commit 909777324588 ("KVM: arm/arm64: vgic-new: vgic_init:
+implement kvm_vgic_hyp_init") changed the functions again, and now they
+require exactly one argument, a struct gic_kvm_info populated by the GIC
+driver. Unfortunately the comments regressed and state that a DT node is
+used instead. Change the function comments to reflect the current
+prototypes.
 
-> On Wed, Aug 14, 2019 at 11:34:52AM +0200, Vitaly Kuznetsov wrote:
->> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->>
->> > x86_emulate_instruction() doesn't set vcpu->run->exit_reason when emulation
->> > fails with EMULTYPE_SKIP, i.e. this will exit to userspace with garbage in
->> > the exit_reason.
->> 
->> Oh, nice catch, will take a look!
->
-> Don't worry about addressing this.  Paolo has already queued the series,
-> and I've got a patch set waiting that purges emulation_result entirely
-> that I'll post once your series hits kvm/queue.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ virt/kvm/arm/vgic/vgic-v2.c | 7 ++++---
+ virt/kvm/arm/vgic/vgic-v3.c | 7 ++++---
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-Sometimes being slow and lazy pays off :-)
-
-Thanks a lot!
-
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 96aab77d0471..27b1ddf71aa0 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -354,10 +354,11 @@ int vgic_v2_map_resources(struct kvm *kvm)
+ DEFINE_STATIC_KEY_FALSE(vgic_v2_cpuif_trap);
+ 
+ /**
+- * vgic_v2_probe - probe for a GICv2 compatible interrupt controller in DT
+- * @node:	pointer to the DT node
++ * vgic_v2_probe - probe for a VGICv2 compatible interrupt controller
++ * @info:	pointer to the GIC description
+  *
+- * Returns 0 if a GICv2 has been found, returns an error code otherwise
++ * Returns 0 if the VGICv2 has been probed successfully, returns an error code
++ * otherwise
+  */
+ int vgic_v2_probe(const struct gic_kvm_info *info)
+ {
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 0c653a1e5215..4874f3266bea 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -570,10 +570,11 @@ static int __init early_gicv4_enable(char *buf)
+ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
+ 
+ /**
+- * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
+- * @node:	pointer to the DT node
++ * vgic_v3_probe - probe for a VGICv3 compatible interrupt controller
++ * @info:	pointer to the GIC description
+  *
+- * Returns 0 if a GICv3 has been found, returns an error code otherwise
++ * Returns 0 if the VGICv3 has been probed successfully, returns an error code
++ * otherwise
+  */
+ int vgic_v3_probe(const struct gic_kvm_info *info)
+ {
 -- 
-Vitaly
+2.7.4
+
