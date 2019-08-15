@@ -2,117 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB42D8E5B5
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 09:46:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B5818E81E
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 11:24:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730379AbfHOHqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 03:46:14 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54116 "EHLO
+        id S1731312AbfHOJY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 05:24:29 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53452 "EHLO
         mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726865AbfHOHqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 03:46:14 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 10so519239wmp.3;
-        Thu, 15 Aug 2019 00:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=rkW7J4us2wcg8bjWK7lkRGJB3dDndu6H2q1x50ew6oQ=;
-        b=mEH6ZuhEu6yFarO3VDilQMa9XyC1+A49PnkX4edc04GEU6SJc3soZ5GZuZOYJX/uga
-         II44mKnolNeiXF87zZbL4vGOskKrlz0q4PEJhLd6BS+WQM6abl2BI8PSeE5fWyO9jlXw
-         g/9WBLjFHYqekAOpoi6jAaG/HeTWoWaR01qBEZzqd3fYVBlaOveHuVblKB6n/vqnx3Yx
-         Lme/3C4QwErFBZqA1Cs2SYxYNl7WjJsPvK+kfMZcFbq+ae3aUuABineWLqyPDXgaANgP
-         IsHED5ocFcuvRDFGiKI0hJLQajgXkuxQ5NfEIKnnjqNGCn+s9UvWA0yV8qHiXFR8YW5I
-         AN5Q==
+        with ESMTP id S1730073AbfHOJY2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 05:24:28 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 10so730894wmp.3
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2019 02:24:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=rkW7J4us2wcg8bjWK7lkRGJB3dDndu6H2q1x50ew6oQ=;
-        b=AKIqLNqQw7czvsu2nFJCcIqgyjFKPZxu/75qQM5Oy8v4MCV4DZb+WdYzrNKULu66Ys
-         AFCOneVT3P7a9pFvvpcXCFfVdIL9gu6MFAHo5mNwxRMgzy32tFqt7xyDCxDoeaDYFgYv
-         P6xp5Iv4MdnkjaUQU1dtQjmTN9AWGsEzis2pCT7SSUFlISw9b/dZoXSlmnxFiOLxf5kZ
-         3JiEUl2A+JHSi/awOoAm+OubHrMG6itymL96ChbMgO0EMqL0d0iD+UDlkVVFPHyzMplX
-         OJekgfhu7IWlnJsZukLmsN2Sm2lvWCmEPD5AwpMMtrgGjO+itbsGZvGIUSIL1q+CYTi9
-         u1mw==
-X-Gm-Message-State: APjAAAVuvpfFn6h/nEIMGqdPYN+poObir683IJB8UoNW75BuUdsDLDo5
-        Fyg2lVqGZiQ8xM0QntW2UOueHTRr
-X-Google-Smtp-Source: APXvYqxymmS0GKrgkdyJOCRe8wdDwDozO5XtrGBowc+cVXMQQKh1aP+fDBlhuy3PyTrxrIB//ES6fg==
-X-Received: by 2002:a1c:cb0b:: with SMTP id b11mr1398279wmg.95.1565855171497;
-        Thu, 15 Aug 2019 00:46:11 -0700 (PDT)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 91sm6084837wrp.3.2019.08.15.00.46.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 00:46:11 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH] Revert "KVM: x86/mmu: Zap only the relevant pages when removing a memslot"
-Date:   Thu, 15 Aug 2019 09:46:09 +0200
-Message-Id: <1565855169-29491-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=x84LMNNTuJo9sta6FIQCvGMribLZzm6UX96aqLVwiNc=;
+        b=HEaH/Foyz9O9FSNig0veHLR8GEmLziwW7t+0vViLn8C5xKzro8ExSalq6/0Maq7SM4
+         rx/deFmDpkKcX0HULJf0F03TQj41/cgNED6PoHlUrux8P0pJD6eznhpvGHXhBfVmwxKW
+         prAhdLhs/BCHSQCDFlI09hNdHMuvZO012PR6IbxRzWtBhRr7sjR5NvRxpmtrBFV4RU7y
+         yBpWrco0A1dXLKsDZW44q067JNeaHj2A/yOAPwSnMLqy1mi7R4F6Fnp0JTgpbn2qHReY
+         EPsTdgOFjJZVUG4euz2mlg/EjCe9y7IBaZHo1gLtJbr/squM7eDNkqwmQygc8ovtgRvx
+         JSRg==
+X-Gm-Message-State: APjAAAUP2X6+h4VA9bHKMy1VXSljvkVoG1wXoEHwMBCAWWH81EQDcYr5
+        /F4xqHliREE2hws12idZ4EOWkQ==
+X-Google-Smtp-Source: APXvYqx8qgEzJjuKDHGRJH3OXvRcljUB1bEcjCi+jKW6Fepk1pJNTIPKClD4tx/zHPFs5fNXuLh86Q==
+X-Received: by 2002:a1c:61d4:: with SMTP id v203mr1865635wmb.164.1565861066691;
+        Thu, 15 Aug 2019 02:24:26 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id p7sm989293wmh.38.2019.08.15.02.24.25
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 15 Aug 2019 02:24:26 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v4 2/7] x86: kvm: svm: propagate errors from skip_emulated_instruction()
+In-Reply-To: <20190815001952.GA24750@linux.intel.com>
+References: <20190813135335.25197-1-vkuznets@redhat.com> <20190813135335.25197-3-vkuznets@redhat.com> <20190813180759.GF13991@linux.intel.com> <87d0h89jk3.fsf@vitty.brq.redhat.com> <20190815001952.GA24750@linux.intel.com>
+Date:   Thu, 15 Aug 2019 11:24:25 +0200
+Message-ID: <87wofe93xy.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This reverts commit 4e103134b862314dc2f2f18f2fb0ab972adc3f5f.
-Alex Williamson reported regressions with device assignment with
-this patch.  Even though the bug is probably elsewhere and still
-latent, this is needed to fix the regression.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Fixes: 4e103134b862 ("KVM: x86/mmu: Zap only the relevant pages when removing a memslot", 2019-02-05)
-Reported-by: Alex Willamson <alex.williamson@redhat.com>
-Cc: stable@vger.kernel.org
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu.c | 33 +--------------------------------
- 1 file changed, 1 insertion(+), 32 deletions(-)
+> On Wed, Aug 14, 2019 at 11:34:52AM +0200, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <sean.j.christopherson@intel.com> writes:
+>>
+>> > x86_emulate_instruction() doesn't set vcpu->run->exit_reason when emulation
+>> > fails with EMULTYPE_SKIP, i.e. this will exit to userspace with garbage in
+>> > the exit_reason.
+>> 
+>> Oh, nice catch, will take a look!
+>
+> Don't worry about addressing this.  Paolo has already queued the series,
+> and I've got a patch set waiting that purges emulation_result entirely
+> that I'll post once your series hits kvm/queue.
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 8190a195623a..d14656c5407b 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -5656,38 +5656,7 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
- 			struct kvm_memory_slot *slot,
- 			struct kvm_page_track_notifier_node *node)
- {
--	struct kvm_mmu_page *sp;
--	LIST_HEAD(invalid_list);
--	unsigned long i;
--	bool flush;
--	gfn_t gfn;
--
--	spin_lock(&kvm->mmu_lock);
--
--	if (list_empty(&kvm->arch.active_mmu_pages))
--		goto out_unlock;
--
--	flush = slot_handle_all_level(kvm, slot, kvm_zap_rmapp, false);
--
--	for (i = 0; i < slot->npages; i++) {
--		gfn = slot->base_gfn + i;
--
--		for_each_valid_sp(kvm, sp, gfn) {
--			if (sp->gfn != gfn)
--				continue;
--
--			kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
--		}
--		if (need_resched() || spin_needbreak(&kvm->mmu_lock)) {
--			kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
--			flush = false;
--			cond_resched_lock(&kvm->mmu_lock);
--		}
--	}
--	kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
--
--out_unlock:
--	spin_unlock(&kvm->mmu_lock);
-+	kvm_mmu_invalidate_zap_all_pages(kvm);
- }
- 
- void kvm_mmu_init_vm(struct kvm *kvm)
+Sometimes being slow and lazy pays off :-)
+
+Thanks a lot!
+
 -- 
-1.8.3.1
-
+Vitaly
