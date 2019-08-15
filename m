@@ -2,105 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 849238F47B
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 21:25:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E25888F4AA
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 21:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731456AbfHOTZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 15:25:32 -0400
-Received: from mga09.intel.com ([134.134.136.24]:39680 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728979AbfHOTZc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 15:25:32 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Aug 2019 12:25:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,389,1559545200"; 
-   d="scan'208";a="376481353"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga005.fm.intel.com with ESMTP; 15 Aug 2019 12:25:31 -0700
-Date:   Thu, 15 Aug 2019 12:25:31 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
-Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Message-ID: <20190815192531.GE27076@linux.intel.com>
-References: <20190205205443.1059-1-sean.j.christopherson@intel.com>
- <20190205210137.1377-11-sean.j.christopherson@intel.com>
- <20190813100458.70b7d82d@x1.home>
- <20190813170440.GC13991@linux.intel.com>
- <20190813115737.5db7d815@x1.home>
- <20190813133316.6fc6f257@x1.home>
- <20190813201914.GI13991@linux.intel.com>
- <20190815092324.46bb3ac1@x1.home>
- <20190815160006.GC27076@linux.intel.com>
- <20190815121607.29055aa2@x1.home>
+        id S1732511AbfHOTdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 15:33:04 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:41498 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732500AbfHOTdE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 15:33:04 -0400
+Received: by mail-qt1-f195.google.com with SMTP id i4so3533994qtj.8
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2019 12:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=d/Vs2YH0f5xNou4jHOnIZOohEAfDIJUopBMHuRVrEaM=;
+        b=DSQnzP2boVVz05frK9Rf9m+2jw7zFPx+9AUXj2jqSyufMDNrAKls4vo+Fb+WrAEgvO
+         ktfk/TjL4ijraP2CEooza64EfLjaFdcqjeQ5Vv3suWLQE3AFJsd5YcPid89lanEu0ZoG
+         VOQYC/bNeGf1IZi2CVdyacQhQw7JiSZnXckYhCGW/PB/p43g8HasbOXkyAfk/T5vpF3D
+         xiyWjGC5nu7KpcLH5DDONB00uambPQIgUVk3jQbczWBzrPFHJZNpEMI+ZlEgjUg+75rH
+         LjzpVx3i2jLsC6X0ifOF/LcBrXk/+s6IlAd5gRScNQG9jSmLI4mn6ct4mUNoFB6ybWFo
+         /qdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=d/Vs2YH0f5xNou4jHOnIZOohEAfDIJUopBMHuRVrEaM=;
+        b=BCnN4VVyPEeja0TsqdO8j/laWIMIUGSGPqZ9K7X0nFOTnQ7UGDH2idVtBrjnvq0HPt
+         xsvdwwyq2z/84R+z/fxkGfmOFYUPx/pVn9f8T+iHnF51AeFTGz7x9DatpmJn6xfxFnIE
+         2Nw1Q9QSi2f2eU8bQIlbXbG6cCC/HrssUnX5yeF8Dn8hlFEIqkmG9xb+k/4ExDHl41Hh
+         VdTYWq3SJMR4CAqokHSQ/zQMIflzfxhSIrLYIU5A0bEvdJEhxhLVQXtv3En+T3ZyLl5i
+         166sL2Hp085kMbMIzIYgjL8MRn6vNFkob3PY+qgx0g/ETzy92kpZD/XMHL9ke+Y2FG13
+         c2IA==
+X-Gm-Message-State: APjAAAUpbji6tCCau+Si0QF8pjUjDlat64ZsEx9QZFF6VqEiEIAbpSOc
+        t9Onkqk+gklMRU8Ouk8DT4p66w==
+X-Google-Smtp-Source: APXvYqzizPYl2LrtkxXjbmjRPnD30yqIwKDY6KgNsz0NbhIueWjJnIkysTmtYLAdQWA6iei+yUmzJQ==
+X-Received: by 2002:ac8:5343:: with SMTP id d3mr5516461qto.50.1565897583402;
+        Thu, 15 Aug 2019 12:33:03 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id s4sm1862094qkb.130.2019.08.15.12.33.02
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 15 Aug 2019 12:33:03 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hyLUc-0008Aa-AF; Thu, 15 Aug 2019 16:33:02 -0300
+Date:   Thu, 15 Aug 2019 16:33:02 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
+Message-ID: <20190815193302.GT21596@ziepe.ca>
+References: <20190809054851.20118-1-jasowang@redhat.com>
+ <20190810134948-mutt-send-email-mst@kernel.org>
+ <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
+ <20190812054429-mutt-send-email-mst@kernel.org>
+ <20190812130252.GE24457@ziepe.ca>
+ <9a9641fe-b48f-f32a-eecc-af9c2f4fbe0e@redhat.com>
+ <20190813115707.GC29508@ziepe.ca>
+ <74838e61-3a5e-0f51-2092-f4a16d144b45@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190815121607.29055aa2@x1.home>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <74838e61-3a5e-0f51-2092-f4a16d144b45@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 12:16:07PM -0600, Alex Williamson wrote:
-> On Thu, 15 Aug 2019 09:00:06 -0700
-> Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+On Thu, Aug 15, 2019 at 11:26:46AM +0800, Jason Wang wrote:
 > 
-> If I print out the memslot base_gfn, it seems pretty evident that only
-> the assigned device mappings are triggering this branch.  The base_gfns
-> exclusively include:
+> On 2019/8/13 下午7:57, Jason Gunthorpe wrote:
+> > On Tue, Aug 13, 2019 at 04:31:07PM +0800, Jason Wang wrote:
+> > 
+> > > What kind of issues do you see? Spinlock is to synchronize GUP with MMU
+> > > notifier in this series.
+> > A GUP that can't sleep can't pagefault which makes it a really weird
+> > pattern
 > 
->  0x800000
->  0x808000
->  0xc0089
 > 
-> Where the first two clearly match the 64bit BARs and the last is the
-> result of a page that we need to emulate within the BAR @0xc0000000 at
-> offset 0x88000, so the base_gfn is the remaining direct mapping.
+> My understanding is __get_user_pages_fast() assumes caller can fail or have
+> fallback. And we have graceful fallback to copy_{to|from}_user().
 
-That's consistent with my understanding of userspace, e.g. normal memory
-regions aren't deleted until the VM is shut down (barring hot unplug).
+My point is that if you can fall back to copy_user then it is weird to
+call the special non-sleeping GUP under a spinlock.
 
-> I don't know if this implies we're doing something wrong for assigned
-> device slots, but maybe a more targeted workaround would be if we could
-> specifically identify these slots, though there's no special
-> registration of them versus other slots.
+AFAIK the only reason this is done is because of the way the notifier
+is being locked...
 
-What is triggering the memslot removal/update?  Is it possible that
-whatever action is occuring is modifying multiple memslots?  E.g. KVM's
-memslot-only zapping is allowing the guest to access stale entries for
-the unzapped-but-related memslots, whereas the full zap does not.
-
-FYI, my VFIO/GPU/PCI knowledge is abysmal, please speak up if any of my
-ideas are nonsensical.
-
-> Did you have any non-device
-> assignment test cases that took this branch when developing the series?
-
-The primary testing was performance oriented, using a slightly modified
-version of a synthetic benchmark[1] from a previous series[2] that touched
-the memslot flushing flow.  From a functional perspective, I highly doubt
-that test would have been able expose an improper zapping bug.
-
-We do have some amount of coverage via kvm-unit-tests, as an EPT test was
-triggering a slab bug due not actually zapping the collected SPTEs[3].
-
-[1] http://lkml.iu.edu/hypermail/linux/kernel/1305.2/00277/mmtest.tar.bz2
-[2] https://lkml.kernel.org/r/1368706673-8530-1-git-send-email-xiaoguangrong@linux.vnet.ibm.com
-[3] https://patchwork.kernel.org/patch/10899283/
-
-> > One other thought would be to force a call to kvm_flush_remote_tlbs(kvm),
-> > e.g. set flush=true just before the final kvm_mmu_remote_flush_or_zap().
-> > Maybe it's a case where there are no SPTEs for the memslot, but the TLB
-> > flush is needed for some reason.
-> 
-> This doesn't work.  Thanks,
-> 
-> Alex
+Jason
