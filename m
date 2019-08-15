@@ -2,96 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A12E8E5A2
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 09:41:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB42D8E5B5
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 09:46:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730472AbfHOHlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 03:41:31 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52091 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726366AbfHOHla (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 03:41:30 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 207so512886wma.1;
-        Thu, 15 Aug 2019 00:41:29 -0700 (PDT)
+        id S1730379AbfHOHqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 03:46:14 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:54116 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726865AbfHOHqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 03:46:14 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 10so519239wmp.3;
+        Thu, 15 Aug 2019 00:46:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=203QBNRDsU40BweVYIq1zq8GgAZoiZ5+xgte91iuHBU=;
-        b=Ng42SaxJFviZnyyCgxsk/FOSqiD/Sn01vMiC8x4tb1/goIwVrzJkro47ZoVAApjXQO
-         cVg872uh763mngEDr0oshvojOsSdrCoPecllBRuOtSeqVV6G2nR2o8BBEd2wHbzNuL+D
-         igeB8whp1VKXxh1tQ3w2LAd+3gGLCOApgDSnf/bcC94HTnKF6roG+rD0pRgHlc1/2Wb3
-         eRweOeF5Iz3SZOLXcFJu6Biia6d9fE/JmLMUmSkciSMEqO/Xt02DVRr9wzn6rdMSUj/C
-         bNJKur64jHGFLLN44PZfuuGhwqtqrqWHo3low/lETBm7ydfrWVVbEsqRlL6Vk161l9RJ
-         2mfA==
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=rkW7J4us2wcg8bjWK7lkRGJB3dDndu6H2q1x50ew6oQ=;
+        b=mEH6ZuhEu6yFarO3VDilQMa9XyC1+A49PnkX4edc04GEU6SJc3soZ5GZuZOYJX/uga
+         II44mKnolNeiXF87zZbL4vGOskKrlz0q4PEJhLd6BS+WQM6abl2BI8PSeE5fWyO9jlXw
+         g/9WBLjFHYqekAOpoi6jAaG/HeTWoWaR01qBEZzqd3fYVBlaOveHuVblKB6n/vqnx3Yx
+         Lme/3C4QwErFBZqA1Cs2SYxYNl7WjJsPvK+kfMZcFbq+ae3aUuABineWLqyPDXgaANgP
+         IsHED5ocFcuvRDFGiKI0hJLQajgXkuxQ5NfEIKnnjqNGCn+s9UvWA0yV8qHiXFR8YW5I
+         AN5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=203QBNRDsU40BweVYIq1zq8GgAZoiZ5+xgte91iuHBU=;
-        b=fbx4PN9DLrryG+uHzCd59oiMSWvCB24edz4/kw+XaonHjpd/2B3M/3JhEjZ/y+qWwR
-         BaO/x5YnylCOSAVoKEgzGgtp+1uSFYvwUaQesx3J4qCr/5qpLTvsBXkQBBq62ILyjqnU
-         qRXjpOGNTytcXAmQZOwnHfK/RPphCb68hTNLASgNha8K9mcmEsbek9kKXg8Hndgl/RE5
-         XTi0rCztoCcuGx+y9mgFOoJM19iHtzqOgcfgli106rrRiCjRlf+qFujY7bK4AQUYU12W
-         OU+hP3SPaUwaWTLBA4w9rPcvrTWg44AseGlRfVnho1r0JFxLctGRE31uC5QLQH37izxq
-         Ug9A==
-X-Gm-Message-State: APjAAAXWB+xuJ0LzBq7CWswlMmgv6QDNKZ2eWTx6yxj9h3qJwue8qVQN
-        lO/36gRlrdVFaCbZvaT6oVwmqAil
-X-Google-Smtp-Source: APXvYqyBizrggMLtsrNCSp7vAMF2maezD72y4g4CI0QEtyKDHYeZ6fTHFIabzDLHeTwvA098jnLIZA==
-X-Received: by 2002:a1c:6385:: with SMTP id x127mr1374763wmb.140.1565854888194;
-        Thu, 15 Aug 2019 00:41:28 -0700 (PDT)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=rkW7J4us2wcg8bjWK7lkRGJB3dDndu6H2q1x50ew6oQ=;
+        b=AKIqLNqQw7czvsu2nFJCcIqgyjFKPZxu/75qQM5Oy8v4MCV4DZb+WdYzrNKULu66Ys
+         AFCOneVT3P7a9pFvvpcXCFfVdIL9gu6MFAHo5mNwxRMgzy32tFqt7xyDCxDoeaDYFgYv
+         P6xp5Iv4MdnkjaUQU1dtQjmTN9AWGsEzis2pCT7SSUFlISw9b/dZoXSlmnxFiOLxf5kZ
+         3JiEUl2A+JHSi/awOoAm+OubHrMG6itymL96ChbMgO0EMqL0d0iD+UDlkVVFPHyzMplX
+         OJekgfhu7IWlnJsZukLmsN2Sm2lvWCmEPD5AwpMMtrgGjO+itbsGZvGIUSIL1q+CYTi9
+         u1mw==
+X-Gm-Message-State: APjAAAVuvpfFn6h/nEIMGqdPYN+poObir683IJB8UoNW75BuUdsDLDo5
+        Fyg2lVqGZiQ8xM0QntW2UOueHTRr
+X-Google-Smtp-Source: APXvYqxymmS0GKrgkdyJOCRe8wdDwDozO5XtrGBowc+cVXMQQKh1aP+fDBlhuy3PyTrxrIB//ES6fg==
+X-Received: by 2002:a1c:cb0b:: with SMTP id b11mr1398279wmg.95.1565855171497;
+        Thu, 15 Aug 2019 00:46:11 -0700 (PDT)
 Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id m23sm809796wml.41.2019.08.15.00.41.27
+        by smtp.gmail.com with ESMTPSA id 91sm6084837wrp.3.2019.08.15.00.46.10
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 00:41:27 -0700 (PDT)
+        Thu, 15 Aug 2019 00:46:11 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: [PATCH 2/2] KVM: x86: always expose VIRT_SSBD to guests
-Date:   Thu, 15 Aug 2019 09:41:23 +0200
-Message-Id: <1565854883-27019-3-git-send-email-pbonzini@redhat.com>
+Cc:     stable@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH] Revert "KVM: x86/mmu: Zap only the relevant pages when removing a memslot"
+Date:   Thu, 15 Aug 2019 09:46:09 +0200
+Message-Id: <1565855169-29491-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1565854883-27019-1-git-send-email-pbonzini@redhat.com>
-References: <1565854883-27019-1-git-send-email-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Even though it is preferrable to use SPEC_CTRL (represented by
-X86_FEATURE_AMD_SSBD) instead of VIRT_SPEC, VIRT_SPEC is always
-supported anyway because otherwise it would be impossible to
-migrate from old to new CPUs.  Make this apparent in the
-result of KVM_GET_SUPPORTED_CPUID as well.
+This reverts commit 4e103134b862314dc2f2f18f2fb0ab972adc3f5f.
+Alex Williamson reported regressions with device assignment with
+this patch.  Even though the bug is probably elsewhere and still
+latent, this is needed to fix the regression.
 
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+Fixes: 4e103134b862 ("KVM: x86/mmu: Zap only the relevant pages when removing a memslot", 2019-02-05)
+Reported-by: Alex Willamson <alex.williamson@redhat.com>
+Cc: stable@vger.kernel.org
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/cpuid.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ arch/x86/kvm/mmu.c | 33 +--------------------------------
+ 1 file changed, 1 insertion(+), 32 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 145ec050d45d..5865bc73bbb5 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -747,11 +747,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 		entry->ebx &= kvm_cpuid_8000_0008_ebx_x86_features;
- 		cpuid_mask(&entry->ebx, CPUID_8000_0008_EBX);
- 		/*
--		 * The preference is to use SPEC CTRL MSR instead of the
--		 * VIRT_SPEC MSR.
-+		 * VIRT_SPEC is only implemented for AMD processors,
-+		 * but the host could set AMD_SSBD if it wanted even
-+		 * for Intel processors.
- 		 */
--		if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) &&
--		    !boot_cpu_has(X86_FEATURE_AMD_SSBD))
-+		if ((boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
-+		     boot_cpu_has(X86_FEATURE_AMD_SSBD)) &&
-+		    boot_cpu_has(X86_FEATURE_SVM))
- 			entry->ebx |= F(VIRT_SSBD);
- 		break;
- 	}
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 8190a195623a..d14656c5407b 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -5656,38 +5656,7 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+ 			struct kvm_memory_slot *slot,
+ 			struct kvm_page_track_notifier_node *node)
+ {
+-	struct kvm_mmu_page *sp;
+-	LIST_HEAD(invalid_list);
+-	unsigned long i;
+-	bool flush;
+-	gfn_t gfn;
+-
+-	spin_lock(&kvm->mmu_lock);
+-
+-	if (list_empty(&kvm->arch.active_mmu_pages))
+-		goto out_unlock;
+-
+-	flush = slot_handle_all_level(kvm, slot, kvm_zap_rmapp, false);
+-
+-	for (i = 0; i < slot->npages; i++) {
+-		gfn = slot->base_gfn + i;
+-
+-		for_each_valid_sp(kvm, sp, gfn) {
+-			if (sp->gfn != gfn)
+-				continue;
+-
+-			kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
+-		}
+-		if (need_resched() || spin_needbreak(&kvm->mmu_lock)) {
+-			kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
+-			flush = false;
+-			cond_resched_lock(&kvm->mmu_lock);
+-		}
+-	}
+-	kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
+-
+-out_unlock:
+-	spin_unlock(&kvm->mmu_lock);
++	kvm_mmu_invalidate_zap_all_pages(kvm);
+ }
+ 
+ void kvm_mmu_init_vm(struct kvm *kvm)
 -- 
 1.8.3.1
 
