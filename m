@@ -2,109 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E3DFB8F4EA
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 21:42:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA39D8F57A
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2019 22:11:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733071AbfHOTmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 15:42:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47306 "EHLO mx1.redhat.com"
+        id S1732239AbfHOUJp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 16:09:45 -0400
+Received: from mga18.intel.com ([134.134.136.126]:43467 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730148AbfHOTmk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 15:42:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5FC1644FB1;
-        Thu, 15 Aug 2019 19:42:40 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EBB788CBBD;
-        Thu, 15 Aug 2019 19:42:39 +0000 (UTC)
-Date:   Thu, 15 Aug 2019 13:42:39 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/MMU: Zap all when removing memslot if VM has
- assigned device
-Message-ID: <20190815134239.555f3121@x1.home>
-In-Reply-To: <20190815151228.32242-1-sean.j.christopherson@intel.com>
-References: <1565855169-29491-1-git-send-email-pbonzini@redhat.com>
-        <20190815151228.32242-1-sean.j.christopherson@intel.com>
-Organization: Red Hat
+        id S1730338AbfHOUJp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 16:09:45 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Aug 2019 13:09:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,389,1559545200"; 
+   d="scan'208";a="171213182"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by orsmga008.jf.intel.com with ESMTP; 15 Aug 2019 13:09:32 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: VMX: Fix and tweak the comments for VM-Enter
+Date:   Thu, 15 Aug 2019 13:09:31 -0700
+Message-Id: <20190815200931.18260-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 15 Aug 2019 19:42:40 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 15 Aug 2019 08:12:28 -0700
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+Fix an incorrect/stale comment regarding the vmx_vcpu pointer, as guest
+registers are now loaded using a direct pointer to the start of the
+register array.
 
-> Alex Williamson reported regressions with device assignment when KVM
-> changed its memslot removal logic to zap only the SPTEs for the memslot
-> being removed.  The source of the bug is unknown at this time, and root
-> causing the issue will likely be a slow process.  In the short term, fix
-> the regression by zapping all SPTEs when removing a memslot from a VM
-> with assigned device(s).
-> 
-> Fixes: 4e103134b862 ("KVM: x86/mmu: Zap only the relevant pages when removing a memslot", 2019-02-05)
-> Reported-by: Alex Willamson <alex.williamson@redhat.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
-> 
-> An alternative idea to a full revert.  I assume this would be easy to
-> backport, and also easy to revert or quirk depending on where the bug
-> is hiding.
-> 
->  arch/x86/kvm/mmu.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 8f72526e2f68..358b93882ac6 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -5659,6 +5659,17 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
->  	bool flush;
->  	gfn_t gfn;
->  
-> +	/*
-> +	 * Zapping only the removed memslot introduced regressions for VMs with
-> +	 * assigned devices.  It is unknown what piece of code is buggy.  Until
-> +	 * the source of the bug is identified, zap everything if the VM has an
-> +	 * assigned device.
-> +	 */
-> +	if (kvm_arch_has_assigned_device(kvm)) {
-> +		kvm_mmu_zap_all(kvm);
-> +		return;
-> +	}
-> +
->  	spin_lock(&kvm->mmu_lock);
->  
->  	if (list_empty(&kvm->arch.active_mmu_pages))
+Opportunistically add a comment to document why the vmx_vcpu pointer is
+needed, its consumption via 'call vmx_update_host_rsp' is rather subtle.
 
-Though if we want to zoom in a little further, the patch below seems to
-work.  Both versions of these perhaps just highlight that we don't
-really know why the original code doesn't work with device assignment,
-whether it's something special about GPU mapping, or if it hints that
-there's something more generally wrong and difficult to trigger.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/vmenter.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 24843cf49579..3956b5844479 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -5670,7 +5670,8 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
- 		gfn = slot->base_gfn + i;
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 4010d519eb8c..751a384c2eb0 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -94,7 +94,7 @@ ENDPROC(vmx_vmexit)
  
- 		for_each_valid_sp(kvm, sp, gfn) {
--			if (sp->gfn != gfn)
-+			if (sp->gfn != gfn &&
-+			    !kvm_arch_has_assigned_device(kvm))
- 				continue;
+ /**
+  * __vmx_vcpu_run - Run a vCPU via a transition to VMX guest mode
+- * @vmx:	struct vcpu_vmx *
++ * @vmx:	struct vcpu_vmx * (forwarded to vmx_update_host_rsp)
+  * @regs:	unsigned long * (to guest registers)
+  * @launched:	%true if the VMCS has been launched
+  *
+@@ -151,7 +151,7 @@ ENTRY(__vmx_vcpu_run)
+ 	mov VCPU_R14(%_ASM_AX), %r14
+ 	mov VCPU_R15(%_ASM_AX), %r15
+ #endif
+-	/* Load guest RAX.  This kills the vmx_vcpu pointer! */
++	/* Load guest RAX.  This kills the @regs pointer! */
+ 	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
  
- 			kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
+ 	/* Enter guest mode */
+-- 
+2.22.0
+
