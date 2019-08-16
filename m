@@ -2,111 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C75AD8FBED
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2019 09:17:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A4E88FD69
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2019 10:13:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726675AbfHPHQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Aug 2019 03:16:47 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39016 "EHLO
+        id S1726810AbfHPIN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Aug 2019 04:13:27 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42789 "EHLO
         mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726609AbfHPHQr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Aug 2019 03:16:47 -0400
-Received: by mail-wr1-f67.google.com with SMTP id t16so576066wra.6
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2019 00:16:45 -0700 (PDT)
+        with ESMTP id S1726729AbfHPIN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Aug 2019 04:13:26 -0400
+Received: by mail-wr1-f67.google.com with SMTP id b16so696367wrq.9
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2019 01:13:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=PKnHGuT2rnPjBkW9EQAY7K1X3DnykkhGdFcpRkIV3Ss=;
+        b=MgRM3ptwT0HW7CW/o8WSA/HlABlfoIuWRo5ol1NHml1oyn8spJkDF+Zx/KpZZjUQ6m
+         V9i1lSGf9lw0cjVUm5czg4LwdqFktVwL2IysPu10VmJ6KgPeGnUIQVG78CEhosliAWAO
+         B58x5n+joyaieqolJVWUsGvryroQ0lDTBTIfT86u7StTT2D7dcEQ+exxOvAcRWGnrh++
+         cuyJznCtjmodcGWsdUshr8Av/XkOnqSbwt5kOB1knhTTOHdENOv9sk+qswxUYknMaI2e
+         2nnMMFf9Op0zMSCEK7ojU4Bmf9cim24UTQNTs3/3uueNBDg5lXwBYvKCzYb7Nl75glAx
+         PKYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EJIVlcVrChaIchPRvi0VZFSGzF07MglN/xDgbO0U5g8=;
-        b=tcGIdyBdTF3uKqXglRA57PPGJj5ULA4Yk87E0W307Zj+EjKY/6su/nw0HpZG5tYx8c
-         xHGX6maQj38fTtE7qi0kMLLNtsQoUOicyNdxn1H85R9vl0muO+0M/75At6iMWGsVEwoC
-         SOLL9iE86L1NVqJQX8SitOoyDP5BNB2WeJPO33YD8RYBDst6V05OU6h0TohouRvSPKcD
-         pTzCMcBHF6TWQuUEGnri7w0yzcro7hd5ktNSWCU/gwAAMAQv5iVT7bKzTqdhesLshcwe
-         G9ZSLp2L5ZMxVfGYq8OMaWz8F3Tl8Q8cHijwEZ5PnIdWowhfyH31JOrkZmnhwMSqsMAk
-         6Rew==
-X-Gm-Message-State: APjAAAWKfY/phRWHfhF7KcApyrXlNST7VrlOyvKhJ/XfLHG1gLBjhdKz
-        J4GZgw7p7uTXpwXMl41yZd/t7Q==
-X-Google-Smtp-Source: APXvYqzTfq2WpNnyBkTVV943/NPrjFUPf4oiM2s4KVceIdYqfb9LPPM0nQxqCppVTo2b/jit8oFZxQ==
-X-Received: by 2002:adf:9050:: with SMTP id h74mr8738567wrh.191.1565939805105;
-        Fri, 16 Aug 2019 00:16:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:399c:411e:1ccb:f240? ([2001:b07:6468:f312:399c:411e:1ccb:f240])
-        by smtp.gmail.com with ESMTPSA id g26sm3184169wmh.32.2019.08.16.00.16.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2019 00:16:44 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/MMU: Zap all when removing memslot if VM has
- assigned device
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alex Willamson <alex.williamson@redhat.com>
-References: <1565855169-29491-1-git-send-email-pbonzini@redhat.com>
- <20190815151228.32242-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <6c040867-2978-5c57-bbd1-3000593ed538@redhat.com>
-Date:   Fri, 16 Aug 2019 09:16:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=PKnHGuT2rnPjBkW9EQAY7K1X3DnykkhGdFcpRkIV3Ss=;
+        b=kYVVqtmY7hLAxThMVocShk6xq7WIYUQHNZOEaIpCoUxubDE5Mi4c4Xir73o0yR3rul
+         7KXlxABavpOqHezpwxHacmcmjmzPLhLZfwMrMHZk1UJiEGAcV95sixLAzDUGGg8Azzc+
+         AYeW4Oxm341MK8PbQmr7XFG0RzImgYGbJtxS2WG1k2/srgXLSQeRJjMk7IDmJqEVGblg
+         dAWDNnIbZRO+atOzpyeVbEFRGlTJ1sbTQBy/zShWZvaUejZjsuddi91WYq9T+Ro2bies
+         aZXP3fV80wcGfgjfUU1DCJQ3lHB53zZJvM3BxJiwsGK3ZPVsS0z3Y5mqBdhTd+RT/XLE
+         BEJg==
+X-Gm-Message-State: APjAAAXXy64qNEsxjRSvTEitOsLY9NPskPOU20HPyVk4OerEd7VtEieG
+        jej73hWaZNAOOa3J/iCfa+uTTS6e9jH0pDESygNFsQ==
+X-Google-Smtp-Source: APXvYqyx5sQ6GAp7sKI3H3TZ1Ua/t0cwhilHhYgn7O4JO1Q+VFZmGmUSPoEKQzODPUsH1zwIGgDzkEH71dmCehkjrac=
+X-Received: by 2002:a5d:52cc:: with SMTP id r12mr2435872wrv.272.1565943204672;
+ Fri, 16 Aug 2019 01:13:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190815151228.32242-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a1c:9e03:0:0:0:0:0 with HTTP; Fri, 16 Aug 2019 01:13:24
+ -0700 (PDT)
+From:   John W <jwdevel@gmail.com>
+Date:   Fri, 16 Aug 2019 01:13:24 -0700
+Message-ID: <CADO30sqvzGCyxsswhuEJ3qcMs_-f-aNuMiYkKyGUxCTja43yoA@mail.gmail.com>
+Subject: Where to file this KVM/Qemu bug?
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/08/19 17:12, Sean Christopherson wrote:
-> Alex Williamson reported regressions with device assignment when KVM
-> changed its memslot removal logic to zap only the SPTEs for the memslot
-> being removed.  The source of the bug is unknown at this time, and root
-> causing the issue will likely be a slow process.  In the short term, fix
-> the regression by zapping all SPTEs when removing a memslot from a VM
-> with assigned device(s).
-> 
-> Fixes: 4e103134b862 ("KVM: x86/mmu: Zap only the relevant pages when removing a memslot", 2019-02-05)
-> Reported-by: Alex Willamson <alex.williamson@redhat.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
-> 
-> An alternative idea to a full revert.  I assume this would be easy to
-> backport, and also easy to revert or quirk depending on where the bug
-> is hiding.
+I have an issue where I cannot install or run Windows XP using KVM,
+but it is fine under plain QEMU (with "-no-kvm").
 
-We're not sure that it only happens with assigned devices; it's just
-that assigned BARs are the memslots that are more likely to be
-reprogrammed at boot.  So this patch feels unsafe.
+Details here: https://stackoverflow.com/questions/57499661/libvirt-how-to-prevent-accel-kvm
 
-Paolo
+I have found some similar-sounding cases, but they are from ~10 years ago.
 
-> 
->  arch/x86/kvm/mmu.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 8f72526e2f68..358b93882ac6 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -5659,6 +5659,17 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
->  	bool flush;
->  	gfn_t gfn;
->  
-> +	/*
-> +	 * Zapping only the removed memslot introduced regressions for VMs with
-> +	 * assigned devices.  It is unknown what piece of code is buggy.  Until
-> +	 * the source of the bug is identified, zap everything if the VM has an
-> +	 * assigned device.
-> +	 */
-> +	if (kvm_arch_has_assigned_device(kvm)) {
-> +		kvm_mmu_zap_all(kvm);
-> +		return;
-> +	}
-> +
->  	spin_lock(&kvm->mmu_lock);
->  
->  	if (list_empty(&kvm->arch.active_mmu_pages))
-> 
+Assuming this is a valid bug, I am trying to find the right place to file it.
+Perhaps this is the right link?  https://www.linux-kvm.org/page/Bugs
 
+If so, then the instructions there tell me "Even if you use kvm from a
+distribution ... it is important to use the latest sources."
+
+I am indeed using a distribution (Debian 10.0), but I'm not sure what
+is meant by "use the latest sources". Does it mean an up-to-date
+package for my distribution? Or is it suggesting I compile KVM myself
+from source?
+
+Thanks for any advice.
+-John
