@@ -2,102 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D479B8F75B
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2019 01:03:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8939F8F821
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2019 02:47:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731108AbfHOXDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 19:03:09 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:45684 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730150AbfHOXDI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 19:03:08 -0400
-Received: by mail-io1-f68.google.com with SMTP id t3so2560995ioj.12
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2019 16:03:08 -0700 (PDT)
+        id S1726215AbfHPArP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Aug 2019 20:47:15 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44751 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726013AbfHPArP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Aug 2019 20:47:15 -0400
+Received: by mail-pg1-f194.google.com with SMTP id i18so2049187pgl.11
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2019 17:47:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Yw6psdcGgCaSzgG0zQOEf0HAwGHEA1exhWPCNTEeCR0=;
-        b=abkDIVkJZvLpasZ9OPEyxVpdPtEU1ZLGYjnvGbQbx6JpuURdXZ2WR2xrQoPWAgX55d
-         TEWi3WouJsaBDY+tS7FafbLXy2Suvw8BdcVXeJhUOn47ockg2CsjH9HqetisIfZUQrTF
-         ZSD/OSRe3R+XtOhE50Fa5aAciTb+bOtpdC5Ad82OQmntK5qtkUTi90SQ2JnV6Y82RTuG
-         uPpVpGJqOtmvHuuUOp3rkn139fI4xAR8sPCDIVo8TWQAO8k2EadS0zJhKqKBtFmrxTHH
-         mQ5zCo0k/FhhuFLPDnX42DzBJdUwIBouutt5uvX90ljg/LZ8C1p+qH26reSBnve0iLcJ
-         FStQ==
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=f+DKEab44F9AeQ6FXUg5sKUUx2aIFaYp+J+ptKupBqc=;
+        b=pkDZMd72fjY8P2a1OU9edU+9T8WR8jnpneXXE/lAjecduC2TO94bIQgpy2q60gt8Xq
+         lQKXHs2ZdqpksxEPJpXnGOVli9PRo2OUrPH9/KEhFunAV2g8/G3TMG67F3LpsoQQCJq7
+         uXg/Ic5A5I7eccQf7nvV1RvyicUMhlKlzzLU7zLjW9eERh9oXYfWOF65f+DOYrC2v6D8
+         LT6CmgUZEdop2fl2SdBRnzSAWm3sKzZBRDFPdpj3rzS5pFascXPpkhlIA0W4EmucHZo4
+         J6/lEFsxoi95+EWQa/itV+B8DorNpiH3p9I6e3sLlLle0u9tYDIhR1G7FK46HlC/fikN
+         eBpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Yw6psdcGgCaSzgG0zQOEf0HAwGHEA1exhWPCNTEeCR0=;
-        b=epFL+gwCEy5MCLS80/jmsydHqhAJwdb8DkX+2SzlpGKlxds3hfRPstVFWersId615y
-         24UBAuIjVfJsnssDRqddzJG47/PU3+9xKTRXrHCj0TdyV4L7RBzNfCyckPkifce276Mc
-         bStl0mT7QFulRRwq3Ml7x/QUWlpFIM81W3nMRkTTE7BS4dJe7AHBV7FzNr/9nm4EgUar
-         /GaGK6KlYGvxHLuWKriOBUa9PnZVxM4ja6EPiKHIc+ANnBX5FMIsSIl8r1EJ3pKa280j
-         gZK5aQ7LHH95wykCNFDTn8OlhmVI5lYnb+BKrsQVUETopGUqaCRqZ56I9oTcY9rTf8wa
-         e4NA==
-X-Gm-Message-State: APjAAAUbSZJLN0MqlGjlinGlsyJbe/7wJSSvZZdgu9jMX1P66skv8sry
-        zxGRWsxVx6jvdk0RWkcxpEW1IFDBAfqkmDbILYifPA==
-X-Google-Smtp-Source: APXvYqyiBBVtYFil/iszRypJ+tOnipi70kCHabdOQgwwr16cItasYS79ddZUXqCEz/f9FutorigI/J1gNcPLRWAcLLY=
-X-Received: by 2002:a5d:8954:: with SMTP id b20mr8159626iot.118.1565910187642;
- Thu, 15 Aug 2019 16:03:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190424231724.2014-1-krish.sadhukhan@oracle.com>
- <20190424231724.2014-8-krish.sadhukhan@oracle.com> <20190513191254.GJ28561@linux.intel.com>
-In-Reply-To: <20190513191254.GJ28561@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 15 Aug 2019 16:02:56 -0700
-Message-ID: <CALMp9eQy+rf7qvsTd9AfzrUhU_k76vzOZLU4MLpGCFG-fM0fPQ@mail.gmail.com>
-Subject: Re: [PATCH 7/8][KVM nVMX]: Enable "load IA32_PERF_GLOBAL_CTRL
- VM-{entry,exit} controls
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        kvm list <kvm@vger.kernel.org>,
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=f+DKEab44F9AeQ6FXUg5sKUUx2aIFaYp+J+ptKupBqc=;
+        b=HIGeX2A2LEW4kozIVc9IZR20cd/L/PaVWvUu+1KBSvdxL9Jt1Cc20yLTerqZhB4Okk
+         334U5DUc1TpC9skBAOZf7TFddSy53EJ1cK6BP6MdDbfuRxGGtuDXSQpi41tpsT4sl0Qp
+         ke1p7aHGhyEssD+/5lOB9o3I8tPvaYHxuNTf/t82gRqqY0pWfTE0FtCq6MrFG0y12Me4
+         ovjmcV1MJH7pNR3Wm0+7wBKoG2/dSJucupkUVkLtPK8i/cLT2KZJ8I9QQRZg86tmc59o
+         DZrLj9oUdrfNZd8VJ3cjltxYs/0J6jGWb1kXa2NaiskS0OQSpI51nCOBTRBHyMYc0/y5
+         hzYA==
+X-Gm-Message-State: APjAAAUT+Qsuq9hrsWsiVb2hW96H18hGCRTJ//gKMEawdz2Imeg9AnQG
+        omYtjY3JKjyug1iU+pGRdnG1Pw==
+X-Google-Smtp-Source: APXvYqwNaeYJhV1qwV8QIS7K6oGuHB4NlZwPVJRG+Ge0+F0e7oep/DKcI3Rze48O3x9X02y5jv0y7g==
+X-Received: by 2002:a63:dd16:: with SMTP id t22mr5593357pgg.140.1565916434324;
+        Thu, 15 Aug 2019 17:47:14 -0700 (PDT)
+Received: from ?IPv6:2600:1010:b04e:b450:9121:34aa:70f4:e97c? ([2600:1010:b04e:b450:9121:34aa:70f4:e97c])
+        by smtp.gmail.com with ESMTPSA id f205sm4785497pfa.161.2019.08.15.17.47.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Aug 2019 17:47:13 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (1.0)
+Subject: Re: [RFC PATCH 08/21] KVM: x86: Add kvm_x86_ops hook to short circuit emulation
+From:   Andy Lutomirski <luto@amacapital.net>
+X-Mailer: iPhone Mail (16G77)
+In-Reply-To: <20190730024940.GL21120@linux.intel.com>
+Date:   Thu, 15 Aug 2019 17:47:12 -0700
+Cc:     Andy Lutomirski <luto@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        =?utf-8?Q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-sgx@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <25BBDA64-1253-4429-95AF-5D578684F6CC@amacapital.net>
+References: <20190727055214.9282-1-sean.j.christopherson@intel.com> <20190727055214.9282-9-sean.j.christopherson@intel.com> <CALCETrU_51Ae=F9HzUwsUuSkJ1or63p_eG+f3uKkBqFx=bheUA@mail.gmail.com> <20190730024940.GL21120@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 13, 2019 at 12:12 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Wed, Apr 24, 2019 at 07:17:23PM -0400, Krish Sadhukhan wrote:
-> >  ...based on whether the guest CPU supports PMU
-> >
-> > Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> > Suggested-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 4d39f731bc33..fa9c786afcfa 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6964,6 +6964,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
-> >  static void nested_vmx_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +     bool pmu_enabled = guest_cpuid_has_pmu(vcpu);
->
-> A revert has been sent for the patch that added guest_cpuid_has_pmu().
->
-> Regardless, checking only the guest's CPUID 0xA is not sufficient, e.g.
-> at the bare minimum, exposing the controls can be done if and only if
-> cpu_has_load_perf_global_ctrl() is true.
 
-I don't think cpu_has_load_perf_global_ctrl() is required. Support for
-the VM-entry and VM-exit controls, "load IA32_PERF_GLOBAL_CTRL," can
-be completely emulated by kvm, since add_atomic_switch_msr() is
-capable of falling back on the VM-entry and VM-exit MSR-load lists if
-!cpu_has_load_perf_global_ctrl().
 
-The only requirement should be kvm_pmu_is_valid_msr(MSR_CORE_PERF_GLOBAL_CTRL).
+>> On Jul 29, 2019, at 7:49 PM, Sean Christopherson <sean.j.christopherson@i=
+ntel.com> wrote:
+>>=20
+>> On Sat, Jul 27, 2019 at 10:38:03AM -0700, Andy Lutomirski wrote:
+>> On Fri, Jul 26, 2019 at 10:52 PM Sean Christopherson
+>> <sean.j.christopherson@intel.com> wrote:
+>>>=20
+>>> Similar to the existing AMD #NPF case where emulation of the current
+>>> instruction is not possible due to lack of information, virtualization
+>>> of Intel SGX will introduce a scenario where emulation is not possible
+>>> due to the VMExit occurring in an SGX enclave.  And again similar to
+>>> the AMD case, emulation can be initiated by kvm_mmu_page_fault(), i.e.
+>>> outside of the control of the vendor-specific code.
+>>>=20
+>>> While the cause and architecturally visible behavior of the two cases
+>>> is different,  e.g. Intel SGX will inject a #UD whereas AMD #NPF is a
+>>> clean resume or complete shutdown, the impact on the common emulation
+>>> code is identical: KVM must stop emulation immediately and resume the
+>>> guest.
+>>>=20
+>>> Replace the exisiting need_emulation_on_page_fault() with a more generic=
 
-> In general, it's difficult for me to understand exactly what functionality
-> you intend to introduce.  Proper changelogs would be very helpful.
+>>> is_emulatable() kvm_x86_ops callback, which is called unconditionally
+>>> by x86_emulate_instruction().
+>>=20
+>> Having recently noticed that emulate_ud() is broken when the guest's
+>> TF is set, I suppose I should ask: does your new code function
+>> sensibly when TF is set?
+>=20
+> Barring a VMX fault injection interaction I'm not thinking of, yes.  The
+> SGX reaction to the #UD VM-Exit is to inject a #UD and resume the guest,
+> pending breakpoints shouldn't be affected in any way (unless some other
+> part of KVM mucks with them, e.g. when guest single-stepping is enabled).
 
-I concur!
+What I mean is: does the code actually do what you think it does if TF is se=
+t?  Right now, as I understand it, the KVM emulation code has a bug in which=
+ some emulated faults also inject #DB despite the fact that the instruction f=
+aulted, and the #DB seems to take precedence over the original fault.  This c=
+onfuses the guest.=
