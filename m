@@ -2,97 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 016018F97D
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2019 05:34:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C75AD8FBED
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2019 09:17:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbfHPDdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Aug 2019 23:33:55 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36679 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726437AbfHPDdz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Aug 2019 23:33:55 -0400
-Received: by mail-pf1-f195.google.com with SMTP id w2so2403200pfi.3;
-        Thu, 15 Aug 2019 20:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=s1lUchOg7iDiYDCvoYxYUrpcGLcaqdAZGXJKa54+yKY=;
-        b=Xlrq+MEfXEpHfl+xW59Wm0F+k7V5EXtxu4NRlG8AfJxcKQc+2BS0dnj2E1CnLJb0ed
-         tL3Hfj4oGTKsDGyeqA9ghwV8qUikDu+TC1AJf2WzpOnAnNEZPFO37BVO+hkldMNhKzYe
-         A5Xwq3HDpYQyZI+2+HbHj2Ugc/5YXkRfnx7QbQ9SLww9/ejWgLJlQVLjrF0uzeTyw6Fd
-         FG9f6PCbIWmJpoFiCCNSugHSZUUlXxHsCnIl8TCwfu9pKWzQYRZd6+/ZbQdP0NQnYN2b
-         gjOW7jKamORq6TQ2w0ryfg5puD/RbFDPAdMi6/8F1NZm6QIBUYPj7GxlbnJE7/2YZDtt
-         o7hw==
+        id S1726675AbfHPHQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Aug 2019 03:16:47 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39016 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726609AbfHPHQr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Aug 2019 03:16:47 -0400
+Received: by mail-wr1-f67.google.com with SMTP id t16so576066wra.6
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2019 00:16:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=s1lUchOg7iDiYDCvoYxYUrpcGLcaqdAZGXJKa54+yKY=;
-        b=PGnWqo30XEeVP/cblHxAK/QgXOBwSdSquU52qlogWy40uN0tqYVZSX/RecW/d0NmyJ
-         OBF179MY3csItEXzUmAPJtF8+M40uNGK9ufAK5LlojEW3L8KPYwqxlLbwYkjkN+3ziQd
-         BQkmzXPwyPfzDoWXOfwCqo2+7VXKIHRJijV90if56REhdGN3W2KNKPliw2qsICUmrrnv
-         A34Hpf+WN3UOfrjFIYSp+PdO4YQcBqTGa4aTXVar+t9aK2FExbHS29Eclz14SsPq0v3x
-         ZfI2IvVGYHP6PPj3kU3mdMqeqy2mBRhXA1zz/GGg8aNdwl3EyFxCVwb0kig6Wt/gFlP9
-         4sfQ==
-X-Gm-Message-State: APjAAAWseHWdosRxXfwwL17LzExc8jEBt2fQN2mIqQfAI0rBxETf1IG0
-        OpfPxX2m3biAKH+SD3U1l0w=
-X-Google-Smtp-Source: APXvYqzjJFdZFAbFqUmkkN+HsDnh74LnXUr81ataAhNkiO0QNZvrwRdOEknATYQ244Lb3mIC6ffxqA==
-X-Received: by 2002:a17:90a:bc42:: with SMTP id t2mr5157478pjv.121.1565926434689;
-        Thu, 15 Aug 2019 20:33:54 -0700 (PDT)
-Received: from localhost ([61.135.169.81])
-        by smtp.gmail.com with ESMTPSA id 203sm5089675pfz.107.2019.08.15.20.33.53
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 20:33:54 -0700 (PDT)
-From:   hexin <hexin.op@gmail.com>
-X-Google-Original-From: hexin <hexin15@baidu.com>
-To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     hexin <hexin15@baidu.com>, Liu Qi <liuqi16@baidu.com>,
-        Zhang Yu <zhangyu31@baidu.com>
-Subject: [PATCH] vfio_pci: Replace pci_try_reset_function() with __pci_reset_function_locked() to ensure that the pci device configuration space is restored to its original state
-Date:   Fri, 16 Aug 2019 11:33:47 +0800
-Message-Id: <1565926427-21675-1-git-send-email-hexin15@baidu.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=EJIVlcVrChaIchPRvi0VZFSGzF07MglN/xDgbO0U5g8=;
+        b=tcGIdyBdTF3uKqXglRA57PPGJj5ULA4Yk87E0W307Zj+EjKY/6su/nw0HpZG5tYx8c
+         xHGX6maQj38fTtE7qi0kMLLNtsQoUOicyNdxn1H85R9vl0muO+0M/75At6iMWGsVEwoC
+         SOLL9iE86L1NVqJQX8SitOoyDP5BNB2WeJPO33YD8RYBDst6V05OU6h0TohouRvSPKcD
+         pTzCMcBHF6TWQuUEGnri7w0yzcro7hd5ktNSWCU/gwAAMAQv5iVT7bKzTqdhesLshcwe
+         G9ZSLp2L5ZMxVfGYq8OMaWz8F3Tl8Q8cHijwEZ5PnIdWowhfyH31JOrkZmnhwMSqsMAk
+         6Rew==
+X-Gm-Message-State: APjAAAWKfY/phRWHfhF7KcApyrXlNST7VrlOyvKhJ/XfLHG1gLBjhdKz
+        J4GZgw7p7uTXpwXMl41yZd/t7Q==
+X-Google-Smtp-Source: APXvYqzTfq2WpNnyBkTVV943/NPrjFUPf4oiM2s4KVceIdYqfb9LPPM0nQxqCppVTo2b/jit8oFZxQ==
+X-Received: by 2002:adf:9050:: with SMTP id h74mr8738567wrh.191.1565939805105;
+        Fri, 16 Aug 2019 00:16:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:399c:411e:1ccb:f240? ([2001:b07:6468:f312:399c:411e:1ccb:f240])
+        by smtp.gmail.com with ESMTPSA id g26sm3184169wmh.32.2019.08.16.00.16.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Aug 2019 00:16:44 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/MMU: Zap all when removing memslot if VM has
+ assigned device
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alex Willamson <alex.williamson@redhat.com>
+References: <1565855169-29491-1-git-send-email-pbonzini@redhat.com>
+ <20190815151228.32242-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6c040867-2978-5c57-bbd1-3000593ed538@redhat.com>
+Date:   Fri, 16 Aug 2019 09:16:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190815151228.32242-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vfio_pci_enable(), save the device's initial configuration information
-and then restore the configuration in vfio_pci_disable(). However, the
-execution result is not the same. Since the pci_try_reset_function()
-function saves the current state before resetting, the configuration
-information restored by pci_load_and_free_saved_state() will be
-overwritten. The __pci_reset_function_locked() function can be used
-to prevent the configuration space from being overwritten.
+On 15/08/19 17:12, Sean Christopherson wrote:
+> Alex Williamson reported regressions with device assignment when KVM
+> changed its memslot removal logic to zap only the SPTEs for the memslot
+> being removed.  The source of the bug is unknown at this time, and root
+> causing the issue will likely be a slow process.  In the short term, fix
+> the regression by zapping all SPTEs when removing a memslot from a VM
+> with assigned device(s).
+> 
+> Fixes: 4e103134b862 ("KVM: x86/mmu: Zap only the relevant pages when removing a memslot", 2019-02-05)
+> Reported-by: Alex Willamson <alex.williamson@redhat.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+> 
+> An alternative idea to a full revert.  I assume this would be easy to
+> backport, and also easy to revert or quirk depending on where the bug
+> is hiding.
 
-Signed-off-by: hexin <hexin15@baidu.com>
-Signed-off-by: Liu Qi <liuqi16@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
----
- drivers/vfio/pci/vfio_pci.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+We're not sure that it only happens with assigned devices; it's just
+that assigned BARs are the memslots that are more likely to be
+reprogrammed at boot.  So this patch feels unsafe.
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 703948c..3c93492 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -441,8 +441,14 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 	 * Try to reset the device.  The success of this is dependent on
- 	 * being able to lock the device, which is not always possible.
- 	 */
--	if (vdev->reset_works && !pci_try_reset_function(pdev))
--		vdev->needs_reset = false;
-+	if (vdev->reset_works && pci_cfg_access_trylock(pdev)) {
-+		if (device_trylock(&pdev->dev)) {
-+			if (!__pci_reset_function_locked(pdev))
-+				vdev->needs_reset = false;
-+			device_unlock(&pdev->dev);
-+		}
-+		pci_cfg_access_unlock(pdev);
-+	}
- 
- 	pci_restore_state(pdev);
- out:
--- 
-1.8.3.1
+Paolo
+
+> 
+>  arch/x86/kvm/mmu.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 8f72526e2f68..358b93882ac6 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -5659,6 +5659,17 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+>  	bool flush;
+>  	gfn_t gfn;
+>  
+> +	/*
+> +	 * Zapping only the removed memslot introduced regressions for VMs with
+> +	 * assigned devices.  It is unknown what piece of code is buggy.  Until
+> +	 * the source of the bug is identified, zap everything if the VM has an
+> +	 * assigned device.
+> +	 */
+> +	if (kvm_arch_has_assigned_device(kvm)) {
+> +		kvm_mmu_zap_all(kvm);
+> +		return;
+> +	}
+> +
+>  	spin_lock(&kvm->mmu_lock);
+>  
+>  	if (list_empty(&kvm->arch.active_mmu_pages))
+> 
 
