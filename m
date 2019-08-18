@@ -2,106 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E47A91058
-	for <lists+kvm@lfdr.de>; Sat, 17 Aug 2019 13:52:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4477091744
+	for <lists+kvm@lfdr.de>; Sun, 18 Aug 2019 16:07:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726067AbfHQLwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Aug 2019 07:52:23 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41098 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725832AbfHQLwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Aug 2019 07:52:23 -0400
-Received: by mail-wr1-f67.google.com with SMTP id j16so4019290wrr.8;
-        Sat, 17 Aug 2019 04:52:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=Bjg3d+ReGnHwJhKycmU6EiBnA2dCiOLyBl8G9lc4YXw=;
-        b=MjUzhZtIvOWuMwEXuUvrcyL500MH6X249sn8yuDg3Jztsn7xnUBOA3ny9lVWOCnyDD
-         vMidcwz/w6EFcT8DrmV8MXvVTMwJOnik2k2q8JYu4SNGO2xSaBWF5oP4gSGFjZDkIjdl
-         ZM6CIP2jQzohed+N43Xg3PFl6GHApP0TTMjPsdN8YfRTUYh3aEzvWZUf1C6ywpmJ15Qu
-         TDP39Y7cJw7Z+6fcJv8LXo0fCtFs1ziYzxow2pvur3ZBe2q643urBBtneGEOWM3eL1fK
-         HROQyijGZ/Lapeoolj7cvwWQNwEn1QCT5Ky9M4yhQIWUJhgBHmEahrMjmkTSC6eRwG1z
-         6vSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Bjg3d+ReGnHwJhKycmU6EiBnA2dCiOLyBl8G9lc4YXw=;
-        b=NvO/naQLPDtireEjxZpehDvoWLrYWF76vV0EsKPxKkPPyMPiTvcIY09Q+9AxZYaEI3
-         wLbuICUWvgWEUrgOTekx6gCjo8fNQeWpFlwoOC3U5xAShxf3sXLMTzCOv1znznmVtppp
-         oAO+Jd5vl43pqup7xpP+qL9s552zy+9pIwDHHELL913ybCl4Gxfo6G6e4RoxEaV9STZ6
-         TW9Upt1U851eKt+ReHKIVZCtibtlZAehkOv549OjBqpFq5qdjNuZTvChqUfnBq9Gz7DT
-         kBuAsnXnDkEc0pI432IG4fKzluhTHv0H8bBfR+fJuBcQpk4GYdoC96czkbvQhFsrsZLW
-         oXlQ==
-X-Gm-Message-State: APjAAAVsG5J33cRyzWlE8tnChGU2JjfpuEWwiwhcmKzYP79Pr+5/0UCc
-        RCGUYlCkITdyqkR/WoM9fLpakH/C3vHXLg==
-X-Google-Smtp-Source: APXvYqzZGaXfbTdF9IJFmQZYlA2ZtB5E21tF4WhfAav5Dl5+SeKgbR1m2pIUL4fbVFn660E3bcIsSQ==
-X-Received: by 2002:adf:e750:: with SMTP id c16mr16322899wrn.199.1566042740898;
-        Sat, 17 Aug 2019 04:52:20 -0700 (PDT)
-Received: from localhost ([165.22.121.176])
-        by smtp.gmail.com with ESMTPSA id o9sm10352285wrm.88.2019.08.17.04.52.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 17 Aug 2019 04:52:20 -0700 (PDT)
-From:   hexin <hexin.op@gmail.com>
-X-Google-Original-From: hexin <hexin15@baidu.com>
-To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     hexin <hexin15@baidu.com>, Liu Qi <liuqi16@baidu.com>,
-        Zhang Yu <zhangyu31@baidu.com>
-Subject: [PATCH v2] vfio_pci: Replace pci_try_reset_function() with __pci_reset_function_locked() to ensure that the pci device configuration space is restored to its original state
-Date:   Sat, 17 Aug 2019 19:51:03 +0800
-Message-Id: <1566042663-16694-1-git-send-email-hexin15@baidu.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726798AbfHROH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Aug 2019 10:07:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:45798 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726608AbfHROH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Aug 2019 10:07:27 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC8F7337;
+        Sun, 18 Aug 2019 07:07:26 -0700 (PDT)
+Received: from big-swifty.lan (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AAF13F246;
+        Sun, 18 Aug 2019 07:07:24 -0700 (PDT)
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Maydell <peter.maydell@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, qemu-arm@nongnu.org
+Subject: [PATCH] KVM: arm/arm64: vgic: Allow more than 256 vcpus for KVM_IRQ_LINE
+Date:   Sun, 18 Aug 2019 15:07:10 +0100
+Message-Id: <20190818140710.23920-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vfio_pci_enable(), save the device's initial configuration information
-and then restore the configuration in vfio_pci_disable(). However, the
-execution result is not the same. Since the pci_try_reset_function()
-function saves the current state before resetting, the configuration
-information restored by pci_load_and_free_saved_state() will be
-overwritten. The __pci_reset_function_locked() function can be used
-to prevent the configuration space from being overwritten.
+While parts of the VGIC support a large number of vcpus (we
+bravely allow up to 512), other parts are more limited.
 
-Fixes: 890ed578df82 ("vfio-pci: Use pci "try" reset interface")
-Signed-off-by: hexin <hexin15@baidu.com>
-Signed-off-by: Liu Qi <liuqi16@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+One of these limits is visible in the KVM_IRQ_LINE ioctl, which
+only allows 256 vcpus to be signalled when using the CPU or PPI
+types. Unfortunately, we've cornered ourselves badly by allocating
+all the bits in the irq field.
+
+Since the irq_type subfield (8 bit wide) is currently only taking
+the values 0, 1 and 2 (and we have been careful not to allow anything
+else), let's reduce this field to only 4 bits, and allocate the
+remaining 4 bits to a vcpu2_index, which acts as a multiplier:
+
+  vcpu_id = 256 * vcpu2_index + vcpu_index
+
+With that, and a new capability (KVM_CAP_ARM_IRQ_LINE_LAYOUT_2)
+allowing this to be discovered, it becomes possible to inject
+PPIs to up to 4096 vcpus. But please just don't.
+
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/api.txt    | 8 ++++++--
+ arch/arm/include/uapi/asm/kvm.h   | 4 +++-
+ arch/arm64/include/uapi/asm/kvm.h | 4 +++-
+ include/uapi/linux/kvm.h          | 1 +
+ virt/kvm/arm/arm.c                | 2 ++
+ 5 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 703948c..0220616 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -438,11 +438,20 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
+diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+index 2d067767b617..85518bfb2a99 100644
+--- a/Documentation/virt/kvm/api.txt
++++ b/Documentation/virt/kvm/api.txt
+@@ -753,8 +753,8 @@ in-kernel irqchip (GIC), and for in-kernel irqchip can tell the GIC to
+ use PPIs designated for specific cpus.  The irq field is interpreted
+ like this:
  
- 	/*
--	 * Try to reset the device.  The success of this is dependent on
--	 * being able to lock the device, which is not always possible.
-+	 * Try to get the locks ourselves to prevent a deadlock. The
-+	 * success of this is dependent on being able to lock the device,
-+	 * which is not always possible.
-+	 * We can not use the "try" reset interface here, which will
-+	 * overwrite the previously restored configuration information.
- 	 */
--	if (vdev->reset_works && !pci_try_reset_function(pdev))
--		vdev->needs_reset = false;
-+	if (vdev->reset_works && pci_cfg_access_trylock(pdev)) {
-+		if (device_trylock(&pdev->dev)) {
-+			if (!__pci_reset_function_locked(pdev))
-+				vdev->needs_reset = false;
-+			device_unlock(&pdev->dev);
-+		}
-+		pci_cfg_access_unlock(pdev);
-+	}
+-  bits:  | 31 ... 24 | 23  ... 16 | 15    ...    0 |
+-  field: | irq_type  | vcpu_index |     irq_id     |
++  bits:  |  31 ... 28  | 27 ... 24 | 23  ... 16 | 15 ... 0 |
++  field: | vcpu2_index | irq_type  | vcpu_index |  irq_id  |
  
- 	pci_restore_state(pdev);
- out:
+ The irq_type field has the following values:
+ - irq_type[0]: out-of-kernel GIC: irq_id 0 is IRQ, irq_id 1 is FIQ
+@@ -766,6 +766,10 @@ The irq_type field has the following values:
+ 
+ In both cases, level is used to assert/deassert the line.
+ 
++When KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 is supported, the target vcpu is
++identified as (256 * vcpu2_index + vcpu_index). Otherwise, vcpu2_index
++must be zero.
++
+ struct kvm_irq_level {
+ 	union {
+ 		__u32 irq;     /* GSI */
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index a4217c1a5d01..2769360f195c 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -266,8 +266,10 @@ struct kvm_vcpu_events {
+ #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
+ 
+ /* KVM_IRQ_LINE irq field index values */
++#define KVM_ARM_IRQ_VCPU2_SHIFT		28
++#define KVM_ARM_IRQ_VCPU2_MASK		0xf
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+-#define KVM_ARM_IRQ_TYPE_MASK		0xff
++#define KVM_ARM_IRQ_TYPE_MASK		0xf
+ #define KVM_ARM_IRQ_VCPU_SHIFT		16
+ #define KVM_ARM_IRQ_VCPU_MASK		0xff
+ #define KVM_ARM_IRQ_NUM_SHIFT		0
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 9a507716ae2f..67c21f9bdbad 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -325,8 +325,10 @@ struct kvm_vcpu_events {
+ #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+ 
+ /* KVM_IRQ_LINE irq field index values */
++#define KVM_ARM_IRQ_VCPU2_SHIFT		28
++#define KVM_ARM_IRQ_VCPU2_MASK		0xf
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+-#define KVM_ARM_IRQ_TYPE_MASK		0xff
++#define KVM_ARM_IRQ_TYPE_MASK		0xf
+ #define KVM_ARM_IRQ_VCPU_SHIFT		16
+ #define KVM_ARM_IRQ_VCPU_MASK		0xff
+ #define KVM_ARM_IRQ_NUM_SHIFT		0
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e3f12d5359e..5414b6588fbb 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -996,6 +996,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+ #define KVM_CAP_PMU_EVENT_FILTER 173
++#define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 35a069815baf..c1385911de69 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -182,6 +182,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	int r;
+ 	switch (ext) {
+ 	case KVM_CAP_IRQCHIP:
++	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
+ 		r = vgic_present;
+ 		break;
+ 	case KVM_CAP_IOEVENTFD:
+@@ -888,6 +889,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 
+ 	irq_type = (irq >> KVM_ARM_IRQ_TYPE_SHIFT) & KVM_ARM_IRQ_TYPE_MASK;
+ 	vcpu_idx = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
++	vcpu_idx += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
+ 	irq_num = (irq >> KVM_ARM_IRQ_NUM_SHIFT) & KVM_ARM_IRQ_NUM_MASK;
+ 
+ 	trace_kvm_irq_line(irq_type, vcpu_idx, irq_num, irq_level->level);
 -- 
-1.8.3.1
+2.20.1
 
