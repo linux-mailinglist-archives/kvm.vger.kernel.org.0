@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53B5D91A19
+	by mail.lfdr.de (Postfix) with ESMTP id C304191A1A
 	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 00:56:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbfHRWzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 18 Aug 2019 18:55:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43336 "EHLO mx1.redhat.com"
+        id S1726470AbfHRWz7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Aug 2019 18:55:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53942 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726463AbfHRWzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 18 Aug 2019 18:55:54 -0400
+        id S1726458AbfHRWz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Aug 2019 18:55:59 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A836E8980E2;
-        Sun, 18 Aug 2019 22:55:53 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id D0B59A2890A;
+        Sun, 18 Aug 2019 22:55:58 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-33.brq.redhat.com [10.40.204.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FD681D1;
-        Sun, 18 Aug 2019 22:55:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 673A51D1;
+        Sun, 18 Aug 2019 22:55:54 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Eduardo Habkost <ehabkost@redhat.com>,
@@ -32,52 +32,62 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>,
         Christophe de Dinechin <dinechin@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v4 11/15] hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()
-Date:   Mon, 19 Aug 2019 00:54:10 +0200
-Message-Id: <20190818225414.22590-12-philmd@redhat.com>
+Subject: [PATCH v4 12/15] hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument
+Date:   Mon, 19 Aug 2019 00:54:11 +0200
+Message-Id: <20190818225414.22590-13-philmd@redhat.com>
 In-Reply-To: <20190818225414.22590-1-philmd@redhat.com>
 References: <20190818225414.22590-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Sun, 18 Aug 2019 22:55:53 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Sun, 18 Aug 2019 22:55:58 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that the pc_build_smbios() function has been refactored to not
-depend of PC specific types, rename it to a more generic name.
+Pass the FWCfgState object by argument, this will
+allow us to remove the PCMachineState argument later.
 
 Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/i386/pc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/pc.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0bd411de6e..e11ba7efce 100644
+index e11ba7efce..460f55fd09 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -891,7 +891,7 @@ static uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
+@@ -1608,7 +1608,8 @@ void pc_cpus_init(PCMachineState *pcms)
      }
  }
  
--static void pc_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
-+static void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
+-static void pc_build_feature_control_file(PCMachineState *pcms)
++static void pc_build_feature_control_file(PCMachineState *pcms,
++                                          FWCfgState *fw_cfg)
  {
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-@@ -1679,7 +1679,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+     MachineState *ms = MACHINE(pcms);
+     X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
+@@ -1634,7 +1635,7 @@ static void pc_build_feature_control_file(PCMachineState *pcms)
  
+     val = g_malloc(sizeof(*val));
+     *val = cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
+-    fw_cfg_add_file(pcms->fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
++    fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
+ }
+ 
+ static void rtc_set_cpus_count(ISADevice *rtc, uint16_t cpus_count)
+@@ -1680,7 +1681,7 @@ void pc_machine_done(Notifier *notifier, void *data)
      acpi_setup();
      if (pcms->fw_cfg) {
--        pc_build_smbios(MACHINE(pcms), pcms->fw_cfg);
-+        fw_cfg_build_smbios(MACHINE(pcms), pcms->fw_cfg);
-         pc_build_feature_control_file(pcms);
+         fw_cfg_build_smbios(MACHINE(pcms), pcms->fw_cfg);
+-        pc_build_feature_control_file(pcms);
++        pc_build_feature_control_file(pcms, pcms->fw_cfg);
          /* update FW_CFG_NB_CPUS to account for -device added CPUs */
          fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
+     }
 -- 
 2.20.1
 
