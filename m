@@ -2,243 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CABC951B0
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 01:35:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47D6C951CF
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 01:44:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728733AbfHSXfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 19:35:38 -0400
-Received: from mga06.intel.com ([134.134.136.31]:4965 "EHLO mga06.intel.com"
+        id S1728623AbfHSXmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 19:42:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41746 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728730AbfHSXfi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 19:35:38 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 16:35:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,406,1559545200"; 
-   d="scan'208,223";a="329524525"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga004.jf.intel.com with ESMTP; 19 Aug 2019 16:35:37 -0700
-Date:   Mon, 19 Aug 2019 16:35:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Nikita Leshenko <nikita.leshchenko@oracle.com>
-Cc:     kvm@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [PATCH 2/2] KVM: nVMX: Check guest activity state on vmentry of
- nested guests
-Message-ID: <20190819233537.GG1916@linux.intel.com>
-References: <20190819214650.41991-1-nikita.leshchenko@oracle.com>
- <20190819214650.41991-3-nikita.leshchenko@oracle.com>
+        id S1728520AbfHSXmg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 19:42:36 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 31CBEC058CA4
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 23:42:36 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id j10so6024462wrb.16
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 16:42:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=69ss2Y/C9QzM3mjPY4ekjzD1U+tiH56BFsloD4gqX0c=;
+        b=UzvB5o48R72GVC2C4hue4f1fXKvCFoO34uUVsxWrdv5eW1N/qs5kGQFdYPivlaueVj
+         uxf5CgaFaWONYX78c/yxmAFz3+42Inz+v0H9k5gN/oy4xRRcwVW1mObJKMPcXGNhd+kB
+         zEgLvjEHnsc7JcbrWof+jEukyn0m8dvsiZ3NV1uveozmvdVZXcuWs2rJITwUS/YOau74
+         pnVWb9pF0tLroF5+uYcvCnEmFhUajQx9EgtCyg+slziydckm15MAwzPCnTEbHzdUOHrx
+         hwBwC74Tt63IbxcqzEvi7y8mc0RYoTL6T/agYdRFJ5iMEWX4zYAjVcdMfIJvo9+qVgc1
+         CZPg==
+X-Gm-Message-State: APjAAAV2zbuNXp0P2Dkp0dr6Et+FATlayVuHxjITnJ/TiPrN+xLFag+v
+        LxBwsgsGPjXPGCiX5fRjOI2hGIYxyVO0QNL5Fgzfe3RHKQiLmPCYc22DZnXkqir9AZtzz58vlpQ
+        wjSY905xcmH4H
+X-Received: by 2002:a1c:a701:: with SMTP id q1mr21747485wme.72.1566258154688;
+        Mon, 19 Aug 2019 16:42:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwAU1Wua/rzGcsh7W05xcRr3bXazmkGvUnhpMzA3KwkDTB/Y/CTs9lFeFduskXlCNpJTb/9BA==
+X-Received: by 2002:a1c:a701:: with SMTP id q1mr21747474wme.72.1566258154312;
+        Mon, 19 Aug 2019 16:42:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f? ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
+        by smtp.gmail.com with ESMTPSA id b15sm15022473wrt.77.2019.08.19.16.42.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2019 16:42:33 -0700 (PDT)
+Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
+To:     Matt delco <delco@google.com>, rkrcmar@redhat.com
+Cc:     kvm@vger.kernel.org
+References: <20190819230422.244888-1-delco@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
+Date:   Tue, 20 Aug 2019 01:42:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="VbJkn9YxBvnuCH5J"
-Content-Disposition: inline
-In-Reply-To: <20190819214650.41991-3-nikita.leshchenko@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190819230422.244888-1-delco@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---VbJkn9YxBvnuCH5J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, Aug 20, 2019 at 12:46:50AM +0300, Nikita Leshenko wrote:
-> The checks are written in the same order and structure as they appear in "SDM
-> 26.3.1.5 - Checks on Guest Non-Register State", to ease verification.
+On 20/08/19 01:04, Matt delco wrote:
+> From: Matt Delco <delco@google.com>
 > 
-> Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Time seems to eventually stop in a Windows VM when using Skype.
+> Instrumentation shows that the OS is frequently switching the APIC
+> timer between one-shot and periodic mode.  The OS is typically writing
+> to both LVTT and TMICT.  When time stops the sequence observed is that
+> the APIC was in one-shot mode, the timer expired, and the OS writes to
+> LVTT (but not TMICT) to change to periodic mode.  No future timer events
+> are received by the OS since the timer is only re-armed on TMICT writes.
+> 
+> With this change time continues to advance in the VM.  TBD if physical
+> hardware will reset the current count if/when the mode is changed to
+> period and the current count is zero.
+> 
+> Signed-off-by: Matt Delco <delco@google.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 24 ++++++++++++++++++++++++
->  arch/x86/kvm/vmx/vmcs.h   | 13 +++++++++++++
->  2 files changed, 37 insertions(+)
+>  arch/x86/kvm/lapic.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 24734946ec75..e2ee217f8ffe 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2666,10 +2666,34 @@ static int nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
->   */
->  static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
->  {
-> +	/* Activity state must contain supported value */
->  	if (vmcs12->guest_activity_state != GUEST_ACTIVITY_ACTIVE &&
->  	    vmcs12->guest_activity_state != GUEST_ACTIVITY_HLT)
->  		return -EINVAL;
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 685d17c11461..fddd810eeca5 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
 >  
-> +	/* Must not be HLT if SS DPL is not 0 */
-> +	if (VMX_AR_DPL(vmcs12->guest_ss_ar_bytes) != 0 &&
-> +	    vmcs12->guest_activity_state == GUEST_ACTIVITY_HLT)
-> +		return -EINVAL;
-> +
-> +	/* Must be active if blocking by MOV-SS or STI */
-> +	if ((vmcs12->guest_interruptibility_info &
-> +	    (GUEST_INTR_STATE_MOV_SS | GUEST_INTR_STATE_STI)) &&
-> +	    vmcs12->guest_activity_state != GUEST_ACTIVITY_ACTIVE)
+>  		break;
+>  
+> -	case APIC_LVTT:
+> +	case APIC_LVTT: {
+> +		u32 timer_mode = apic->lapic_timer.timer_mode;
+>  		if (!kvm_apic_sw_enabled(apic))
+>  			val |= APIC_LVT_MASKED;
+>  		val &= (apic_lvt_mask[0] | apic->lapic_timer.timer_mode_mask);
+>  		kvm_lapic_set_reg(apic, APIC_LVTT, val);
+>  		apic_update_lvtt(apic);
+> +		if (timer_mode == APIC_LVT_TIMER_ONESHOT &&
+> +		    apic_lvtt_period(apic) &&
+> +		    !hrtimer_active(&apic->lapic_timer.timer))
+> +			start_apic_timer(apic);
 
-IMO, following the SDM verbatim doesn't help readability in this case.
-E.g. filtering out ACTIVE state right away cuts down on the amount of
-code and helps the reader focus on the unique aspects of each check.
+The manual says "A write to the LVT Timer Register that changes the
+timer mode disarms the local APIC timer", but we already know this is
+not true (commit dedf9c5e216902c6d34b5a0d0c40f4acbb3706d8).
 
-	if (vmcs12->guest_activity_state == GUEST_ACTIVITY_ACTIVE)
-		return 0;
+Still, this needs some more explanation.  Can you cover this, as well as
+the oneshot->periodic transition, in kvm-unit-tests' x86/apic.c
+testcase?  Then we could try running it on bare metal and see what happens.
 
-> +		return -EINVAL;
-> +
-> +	/* In HLT, only some interruptions are allowed */
-> +	if (vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK &&
-> +	    vmcs12->guest_activity_state == GUEST_ACTIVITY_HLT) {
-> +		u32 intr_info = vmcs12->vm_entry_intr_info_field;
-> +		if (!is_ext_interrupt(intr_info) &&
-> +		    !is_nmi(intr_info) &&
-> +		    !is_debug(intr_info) &&
-> +		    !is_machine_check(intr_info) &&
-> +		    !is_mtf(intr_info))
-> +		    return -EINVAL;
+Thanks,
 
-Bad indentation.  scripts/checkpatch.pl will catch this.  It'll also
-complain about the changelog running past 75 chars and about "Missing a
-blank line after declarations" for u32 intr_info, both of which are
-easy nits to fix.
+Paolo
 
+
+>  		break;
+> -
 > +	}
-> +
->  	return 0;
->  }
->  
-> diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-> index cb6079f8a227..c5577c40b19d 100644
-> --- a/arch/x86/kvm/vmx/vmcs.h
-> +++ b/arch/x86/kvm/vmx/vmcs.h
-> @@ -102,6 +102,13 @@ static inline bool is_machine_check(u32 intr_info)
->  		(INTR_TYPE_HARD_EXCEPTION | MC_VECTOR | INTR_INFO_VALID_MASK);
->  }
->  
-> +static inline bool is_mtf(u32 intr_info)
-
-We may want to call this is_pending_mtf().  MTF has a dedicated VM-Exit
-type and doesn't populate VM_EXIT_INTRO_INFO, while all of the other
-helpers are valid for both VM-Enter and VM-Exit.
-
-> +{
-> +	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | INTR_INFO_VECTOR_MASK |
-> +			     INTR_INFO_VALID_MASK)) ==
-> +		(INTR_TYPE_OTHER_EVENT | 0 | INTR_INFO_VALID_MASK);
-
-This reminded me a patch I've been meaning to write.  Any objection to
-carrying the attached patch as cleanup and reworking this code accordingly?
-
-> +}
-> +
->  /* Undocumented: icebp/int1 */
->  static inline bool is_icebp(u32 intr_info)
->  {
-> @@ -115,6 +122,12 @@ static inline bool is_nmi(u32 intr_info)
->  		== (INTR_TYPE_NMI_INTR | INTR_INFO_VALID_MASK);
->  }
->  
-> +static inline bool is_ext_interrupt(u32 intr_info)
-> +{
-> +	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | INTR_INFO_VALID_MASK))
-> +		== (INTR_TYPE_EXT_INTR | INTR_INFO_VALID_MASK);
-> +}
-> +
->  enum vmcs_field_width {
->  	VMCS_FIELD_WIDTH_U16 = 0,
->  	VMCS_FIELD_WIDTH_U64 = 1,
-> -- 
-> 2.20.1
+>  	case APIC_TMICT:
+>  		if (apic_lvtt_tscdeadline(apic))
+>  			break;
 > 
 
---VbJkn9YxBvnuCH5J
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="0001-KVM-VMX-Add-helpers-to-identify-interrupt-type-from-.patch"
-
-From 588a85e32e3d2ed71712a21557ba9baf0e3aa25c Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-Date: Mon, 19 Aug 2019 16:14:01 -0700
-Subject: [PATCH] KVM: VMX: Add helpers to identify interrupt type from
- intr_info
-
-Add is_intr_type() and is_intr_type_n() to consolidate the boilerplate
-code for querying a specific type of interrupt given an encoded value
-from VMCS.VM_{ENTER,EXIT}_INTR_INFO, with and without an associated
-vector respectively.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/vmx/vmcs.h | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-index 481ad879197b..dcf21cca160b 100644
---- a/arch/x86/kvm/vmx/vmcs.h
-+++ b/arch/x86/kvm/vmx/vmcs.h
-@@ -72,11 +72,22 @@ struct loaded_vmcs {
- 	struct vmcs_controls_shadow controls_shadow;
- };
- 
-+static inline bool is_intr_type(u32 intr_info, u32 type)
-+{
-+	return (intr_info & (INTR_INFO_VALID_MASK | INTR_INFO_INTR_TYPE_MASK))
-+		== (INTR_INFO_VALID_MASK | type);
-+}
-+
-+static inline bool is_intr_type_n(u32 intr_info, u32 type, u8 vector)
-+{
-+	return (intr_info & (INTR_INFO_VALID_MASK | INTR_INFO_INTR_TYPE_MASK |
-+			     INTR_INFO_VECTOR_MASK)) ==
-+		(INTR_INFO_VALID_MASK | type | vector);
-+}
-+
- static inline bool is_exception_n(u32 intr_info, u8 vector)
- {
--	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | INTR_INFO_VECTOR_MASK |
--			     INTR_INFO_VALID_MASK)) ==
--		(INTR_TYPE_HARD_EXCEPTION | vector | INTR_INFO_VALID_MASK);
-+	return is_intr_type_n(intr_info, INTR_TYPE_HARD_EXCEPTION, vector);
- }
- 
- static inline bool is_debug(u32 intr_info)
-@@ -106,28 +117,23 @@ static inline bool is_gp_fault(u32 intr_info)
- 
- static inline bool is_machine_check(u32 intr_info)
- {
--	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | INTR_INFO_VECTOR_MASK |
--			     INTR_INFO_VALID_MASK)) ==
--		(INTR_TYPE_HARD_EXCEPTION | MC_VECTOR | INTR_INFO_VALID_MASK);
-+	return is_exception_n(intr_info, MC_VECTOR);
- }
- 
- /* Undocumented: icebp/int1 */
- static inline bool is_icebp(u32 intr_info)
- {
--	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | INTR_INFO_VALID_MASK))
--		== (INTR_TYPE_PRIV_SW_EXCEPTION | INTR_INFO_VALID_MASK);
-+	return is_intr_type(intr_info, INTR_TYPE_PRIV_SW_EXCEPTION);
- }
- 
- static inline bool is_nmi(u32 intr_info)
- {
--	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | INTR_INFO_VALID_MASK))
--		== (INTR_TYPE_NMI_INTR | INTR_INFO_VALID_MASK);
-+	return is_intr_type(intr_info, INTR_TYPE_NMI_INTR);
- }
- 
- static inline bool is_external_intr(u32 intr_info)
- {
--	return (intr_info & (INTR_INFO_VALID_MASK | INTR_INFO_INTR_TYPE_MASK))
--		== (INTR_INFO_VALID_MASK | INTR_TYPE_EXT_INTR);
-+	return is_intr_type(intr_info, INTR_TYPE_EXT_INTR);
- }
- 
- enum vmcs_field_width {
--- 
-2.22.0
-
-
---VbJkn9YxBvnuCH5J--
