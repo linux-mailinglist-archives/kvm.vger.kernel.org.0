@@ -2,102 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B9CF91AE8
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 03:59:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 149FC91AF4
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 04:07:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726254AbfHSB66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 18 Aug 2019 21:58:58 -0400
-Received: from ozlabs.ru ([107.173.13.209]:58636 "EHLO ozlabs.ru"
+        id S1726354AbfHSCHA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Aug 2019 22:07:00 -0400
+Received: from mga09.intel.com ([134.134.136.24]:35771 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726103AbfHSB66 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 18 Aug 2019 21:58:58 -0400
-X-Greylist: delayed 457 seconds by postgrey-1.27 at vger.kernel.org; Sun, 18 Aug 2019 21:58:57 EDT
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 0CA6BAE8001C;
-        Sun, 18 Aug 2019 21:51:00 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        Jose Ricardo Ziviani <joserz@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Subject: [PATCH kernel] vfio/spapr_tce: Fix incorrect tce_iommu_group memory free
-Date:   Mon, 19 Aug 2019 11:51:17 +1000
-Message-Id: <20190819015117.94878-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
+        id S1726028AbfHSCHA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Aug 2019 22:07:00 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Aug 2019 19:06:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,403,1559545200"; 
+   d="scan'208";a="180223199"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga003.jf.intel.com with ESMTP; 18 Aug 2019 19:06:57 -0700
+Date:   Mon, 19 Aug 2019 10:08:29 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        yu.c.zhang@intel.com, alazar@bitdefender.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH RESEND v4 5/9] KVM: VMX: Add init/set/get functions for
+ SPP
+Message-ID: <20190819020829.GA27450@local-michael-cet-test>
+References: <20190814070403.6588-1-weijiang.yang@intel.com>
+ <20190814070403.6588-6-weijiang.yang@intel.com>
+ <87a7cbapdw.fsf@vitty.brq.redhat.com>
+ <20190815134329.GA11449@local-michael-cet-test>
+ <CALMp9eTGXDDfVspFwFyEhagg9sdnqZqzSQhDksT0bkKzVNGSqw@mail.gmail.com>
+ <20190815163844.GD27076@linux.intel.com>
+ <20190816133130.GA14380@local-michael-cet-test.sh.intel.com>
+ <CALMp9eRDhbxkFNqY-+GOMtfg+guafdKcCNq1OJt9UgnyFVvSGw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eRDhbxkFNqY-+GOMtfg+guafdKcCNq1OJt9UgnyFVvSGw@mail.gmail.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The @tcegrp variable is used in 1) a loop over attached groups
-2) it stores a pointer to a newly allocated tce_iommu_group if 1) found
-nothing. However the error handler does not distinguish how we got there
-and incorrectly releases memory for a found+incompatible group.
-
-This fixes it by adding another error handling case.
-
-Fixes: 0bd971676e68 ("powerpc/powernv/npu: Add compound IOMMU groups")
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-
-The bug is there since 2157e7b82f3b but it would not appear in practice
-before 0bd971676e68, hence that "Fixes". Or it still should be
-157e7b82f3b ("vfio: powerpc/spapr: Register memory and define IOMMU v2")
-?
-
-Found it when tried adding a "compound PE" (GPU + NPUs) to a container
-with a passed through xHCI host. The compatibility test (->create_table
-should be equal) treats them as incompatible which might a bug (or
-we are just suboptimal here) on its own.
-
----
- drivers/vfio/vfio_iommu_spapr_tce.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-index 8ce9ad21129f..babef8b00daf 100644
---- a/drivers/vfio/vfio_iommu_spapr_tce.c
-+++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-@@ -1234,7 +1234,7 @@ static long tce_iommu_take_ownership_ddw(struct tce_container *container,
- static int tce_iommu_attach_group(void *iommu_data,
- 		struct iommu_group *iommu_group)
- {
--	int ret;
-+	int ret = 0;
- 	struct tce_container *container = iommu_data;
- 	struct iommu_table_group *table_group;
- 	struct tce_iommu_group *tcegrp = NULL;
-@@ -1287,13 +1287,13 @@ static int tce_iommu_attach_group(void *iommu_data,
- 			!table_group->ops->release_ownership) {
- 		if (container->v2) {
- 			ret = -EPERM;
--			goto unlock_exit;
-+			goto free_exit;
- 		}
- 		ret = tce_iommu_take_ownership(container, table_group);
- 	} else {
- 		if (!container->v2) {
- 			ret = -EPERM;
--			goto unlock_exit;
-+			goto free_exit;
- 		}
- 		ret = tce_iommu_take_ownership_ddw(container, table_group);
- 		if (!tce_groups_attached(container) && !container->tables[0])
-@@ -1305,10 +1305,11 @@ static int tce_iommu_attach_group(void *iommu_data,
- 		list_add(&tcegrp->next, &container->group_list);
- 	}
- 
--unlock_exit:
-+free_exit:
- 	if (ret && tcegrp)
- 		kfree(tcegrp);
- 
-+unlock_exit:
- 	mutex_unlock(&container->lock);
- 
- 	return ret;
--- 
-2.17.1
-
+On Fri, Aug 16, 2019 at 11:19:46AM -0700, Jim Mattson wrote:
+> On Fri, Aug 16, 2019 at 6:29 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
+> 
+> > Thanks Jim and Sean! Could we add a new flag in kvm to identify if nested VM is on
+> > or off? That would make things easier. When VMLAUNCH is trapped,
+> > set the flag, if VMXOFF is trapped, clear the flag.
+> 
+> KVM_GET_NESTED_STATE has the requested information. If
+> data.vmx.vmxon_pa is anything other than -1, then the vCPU is in VMX
+> operation. If (flags & KVM_STATE_NESTED_GUEST_MODE), then L2 is
+> active.
+Thanks Jim, I'll reference the code and make necessary change in next
+SPP patch release.
