@@ -2,100 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3744595065
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 00:02:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A3EB95085
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 00:11:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728429AbfHSWBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 18:01:52 -0400
-Received: from mga01.intel.com ([192.55.52.88]:45058 "EHLO mga01.intel.com"
+        id S1728358AbfHSWLC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 18:11:02 -0400
+Received: from mga04.intel.com ([192.55.52.120]:38245 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728136AbfHSWBv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 18:01:51 -0400
+        id S1728136AbfHSWLC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 18:11:02 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 15:01:50 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 15:11:01 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,406,1559545200"; 
-   d="scan'208";a="207147864"
+   d="scan'208";a="353378355"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga002.fm.intel.com with ESMTP; 19 Aug 2019 15:01:50 -0700
-Date:   Mon, 19 Aug 2019 15:01:50 -0700
+  by orsmga005.jf.intel.com with ESMTP; 19 Aug 2019 15:11:01 -0700
+Date:   Mon, 19 Aug 2019 15:11:01 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-sgx@vger.kernel.org
-Subject: Re: [RFC PATCH 08/21] KVM: x86: Add kvm_x86_ops hook to short
- circuit emulation
-Message-ID: <20190819220150.GE1916@linux.intel.com>
-References: <20190727055214.9282-1-sean.j.christopherson@intel.com>
- <20190727055214.9282-9-sean.j.christopherson@intel.com>
- <CALCETrU_51Ae=F9HzUwsUuSkJ1or63p_eG+f3uKkBqFx=bheUA@mail.gmail.com>
- <20190730024940.GL21120@linux.intel.com>
- <25BBDA64-1253-4429-95AF-5D578684F6CC@amacapital.net>
+To:     Nikita Leshenko <nikita.leshchenko@oracle.com>
+Cc:     kvm@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [PATCH 1/2] KVM: nVMX: Always indicate HLT activity support in
+ VMX_MISC MSR
+Message-ID: <20190819221101.GF1916@linux.intel.com>
+References: <20190819214650.41991-1-nikita.leshchenko@oracle.com>
+ <20190819214650.41991-2-nikita.leshchenko@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <25BBDA64-1253-4429-95AF-5D578684F6CC@amacapital.net>
+In-Reply-To: <20190819214650.41991-2-nikita.leshchenko@oracle.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 05:47:12PM -0700, Andy Lutomirski wrote:
+On Tue, Aug 20, 2019 at 12:46:49AM +0300, Nikita Leshenko wrote:
+> Before this commit, userspace could disable the GUEST_ACTIVITY_HLT bit in
+> VMX_MISC yet KVM would happily accept GUEST_ACTIVITY_HLT activity state in
+> VMCS12. We can fix it by either failing VM entries with HLT activity state when
+> it's not supported or by disallowing clearing this bit.
 > 
+> The latter is preferable. If we go with the former, to disable
+> GUEST_ACTIVITY_HLT userspace also has to make CPU_BASED_HLT_EXITING a "must be
+> 1" control, otherwise KVM will be presenting a bogus model to L1.
 > 
-> >> On Jul 29, 2019, at 7:49 PM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> >> 
-> >> On Sat, Jul 27, 2019 at 10:38:03AM -0700, Andy Lutomirski wrote:
-> >> On Fri, Jul 26, 2019 at 10:52 PM Sean Christopherson
-> >> <sean.j.christopherson@intel.com> wrote:
-> >>> 
-> >>> Similar to the existing AMD #NPF case where emulation of the current
-> >>> instruction is not possible due to lack of information, virtualization
-> >>> of Intel SGX will introduce a scenario where emulation is not possible
-> >>> due to the VMExit occurring in an SGX enclave.  And again similar to
-> >>> the AMD case, emulation can be initiated by kvm_mmu_page_fault(), i.e.
-> >>> outside of the control of the vendor-specific code.
-> >>> 
-> >>> While the cause and architecturally visible behavior of the two cases
-> >>> is different,  e.g. Intel SGX will inject a #UD whereas AMD #NPF is a
-> >>> clean resume or complete shutdown, the impact on the common emulation
-> >>> code is identical: KVM must stop emulation immediately and resume the
-> >>> guest.
-> >>> 
-> >>> Replace the exisiting need_emulation_on_page_fault() with a more generic
-> >>> is_emulatable() kvm_x86_ops callback, which is called unconditionally
-> >>> by x86_emulate_instruction().
-> >> 
-> >> Having recently noticed that emulate_ud() is broken when the guest's
-> >> TF is set, I suppose I should ask: does your new code function
-> >> sensibly when TF is set?
-> > 
-> > Barring a VMX fault injection interaction I'm not thinking of, yes.  The
-> > SGX reaction to the #UD VM-Exit is to inject a #UD and resume the guest,
-> > pending breakpoints shouldn't be affected in any way (unless some other
-> > part of KVM mucks with them, e.g. when guest single-stepping is enabled).
-> 
-> What I mean is: does the code actually do what you think it does if TF is
-> set?  Right now, as I understand it, the KVM emulation code has a bug in
-> which some emulated faults also inject #DB despite the fact that the
-> instruction faulted, and the #DB seems to take precedence over the original
-> fault.  This confuses the guest.
+> Don't fail writes that disable GUEST_ACTIVITY_HLT to maintain backwards
+> compatibility.
 
-Yes.  The proposed change is to inject the #UD instead of calling into the
-emulator, and by inspection I've verified that all code that injects a #DB
-is either contained within the emulator or is mutually exclusive with an
-intercepted #UD.  It's a qualified yes because I don't have an actual
-testcase to verify my literacy.  I'll look into adding a test, either to
-the selftest/x86/sgx or to kvm-unit-tests.
+Paolo, do we actually need to maintain backwards compatibility in this
+case?  This seems like a good candidate for "fix the bug and see who yells".
+
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Signed-off-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 46af3a5e9209..24734946ec75 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1102,6 +1102,14 @@ static int vmx_restore_vmx_misc(struct vcpu_vmx *vmx, u64 data)
+>  	if (vmx_misc_mseg_revid(data) != vmx_misc_mseg_revid(vmx_misc))
+>  		return -EINVAL;
+>  
+> +	/*
+> +	 * We always support HLT activity state. In the past it was possible to
+> +	 * turn HLT bit off (without actually turning off HLT activity state
+> +	 * support) so we don't fail vmx_restore_vmx_misc if this bit is turned
+> +	 * off.
+> +	 */
+> +	data |= VMX_MISC_ACTIVITY_HLT;
+> +
+>  	vmx->nested.msrs.misc_low = data;
+>  	vmx->nested.msrs.misc_high = data >> 32;
+>  
+> -- 
+> 2.20.1
+> 
