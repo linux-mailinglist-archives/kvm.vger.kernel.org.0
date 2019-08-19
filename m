@@ -2,71 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 67D7E92605
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 16:06:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5BCB9273C
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 16:43:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727768AbfHSOFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 10:05:14 -0400
-Received: from mga18.intel.com ([134.134.136.126]:30454 "EHLO mga18.intel.com"
+        id S1726670AbfHSOnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 10:43:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48415 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727696AbfHSOFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 10:05:12 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 07:05:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,405,1559545200"; 
-   d="scan'208";a="261853858"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
-  by orsmga001.jf.intel.com with ESMTP; 19 Aug 2019 07:05:09 -0700
-Date:   Mon, 19 Aug 2019 22:06:41 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com, rkrcmar@redhat.com,
-        jmattson@google.com, yu.c.zhang@intel.com, alazar@bitdefender.com,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com
-Subject: Re: [PATCH RESEND v4 5/9] KVM: VMX: Add init/set/get functions for
- SPP
-Message-ID: <20190819140641.GA32099@local-michael-cet-test.sh.intel.com>
+        id S1726211AbfHSOnb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 10:43:31 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D750151EF1
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 14:43:30 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id u13so312482wmm.2
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 07:43:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Vy5qJGgg/EWAtVC39C9kZNd1jY+63gY/oCqRox6uDxE=;
+        b=cL+BtpZnUCeEJruFIwDyw0iHd7FZ/b0shxkAR4MLkiFlMz52K15H+uMF9V/hSWlJHg
+         NnOmc0OmirbYlCMFUuxpVNNnXUPj6ofVqbdvy/XdyW44Ay0CzwZzxbyTg7mUOu2I3QxR
+         sOfecPafUielDpULP/3iZFkD8X656SW0GHCuRXu6RmhpBO4EhYYk0St6o2K4oKR7ST00
+         L/fBUtW90PX21eZAht+miwzp3xdHM83pbrPDasVkleO7nnUE6Mv7p+iVVeBCXvbgddtw
+         MrtHsIKAiUN9AjENTjTxM3B/QtMs0V2puWsQo72Qgkgfy2b5h1gruAN0gAQNhN0xqLy9
+         FRsg==
+X-Gm-Message-State: APjAAAX1QjfrdHZqpy4iEe51mg9ekOziyw5J6xkX3tnx8LOxJ/c4J8Ur
+        w5CSof0iapDwvkjZrL22HZRkOoim98yp2WdHCBIY+6LF0aArCp0O96CgtY0xgRklvq8wcn4ZphW
+        KHGberhvIXkfN
+X-Received: by 2002:adf:fc51:: with SMTP id e17mr27848057wrs.348.1566225809326;
+        Mon, 19 Aug 2019 07:43:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxPD8E4pfzsD6lNAVTvslP3BefYn5k7Fw+gz99Gu/AIMAYkfS55sCrwFQGfa1MWklnzgdSsVw==
+X-Received: by 2002:adf:fc51:: with SMTP id e17mr27848027wrs.348.1566225809018;
+        Mon, 19 Aug 2019 07:43:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f? ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
+        by smtp.gmail.com with ESMTPSA id s19sm16503316wrb.94.2019.08.19.07.43.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2019 07:43:28 -0700 (PDT)
+Subject: Re: [PATCH RESEND v4 7/9] KVM: VMX: Handle SPP induced vmexit and
+ page fault
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com
+Cc:     mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
 References: <20190814070403.6588-1-weijiang.yang@intel.com>
- <20190814070403.6588-6-weijiang.yang@intel.com>
- <87a7cbapdw.fsf@vitty.brq.redhat.com>
- <20190815134329.GA11449@local-michael-cet-test>
- <87o90q8r0s.fsf@vitty.brq.redhat.com>
+ <20190814070403.6588-8-weijiang.yang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5f6ba406-17c4-a552-2352-2ff50569aac0@redhat.com>
+Date:   Mon, 19 Aug 2019 16:43:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o90q8r0s.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20190814070403.6588-8-weijiang.yang@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 04:03:31PM +0200, Vitaly Kuznetsov wrote:
-> Yang Weijiang <weijiang.yang@intel.com> writes:
-> 
-> > After looked into the issue and others, I feel to make SPP co-existing
-> > with nested VM is not good, the major reason is, L1 pages protected by
-> > SPP are transparent to L1 VM, if it launches L2 VM, probably the
-> > pages would be allocated to L2 VM, and that will bother to L1 and L2.
-> > Given the feature is new and I don't see nested VM can benefit
-> > from it right now, I would like to make SPP and nested feature mutually
-> > exclusive, i.e., detecting if the other part is active before activate one
-> > feature,what do you think of it? 
-> 
-> I was mostly worried about creating a loophole (if I understand
-> correctly) for guests to defeat SPP protection: just launching a nested
-> guest and giving it a protected page. I don't see a problem if we limit
-> SPP to non-nested guests as step 1: we, however, need to document this
-> side-effect of the ioctl. Also, if you decide to do this enforecement,
-> I'd suggest you forbid VMLAUCH/VMRESUME and not VMXON as kvm module
-> loads in linux guests automatically when the hardware is suitable.
-> 
-> Thanks,
-> 
-> -- 
-> Vitaly
-OK, I'll follow your suggestion to add the exclusion, thanks!
+On 14/08/19 09:04, Yang Weijiang wrote:
+> +			/*
+> +			 * Record write protect fault caused by
+> +			 * Sub-page Protection, let VMI decide
+> +			 * the next step.
+> +			 */
+> +			if (spte & PT_SPP_MASK) {
+
+Should this be "if (spte & PT_WRITABLE_MASK)" instead?  That is, if the
+page is already writable, the fault must be an SPP fault.
+
+Paolo
+
+> +				fault_handled = true;
+> +				vcpu->run->exit_reason = KVM_EXIT_SPP;
+> +				vcpu->run->spp.addr = gva;
+> +				kvm_skip_emulated_instruction(vcpu);
+> +				break;
+> +			}
+> +
+>  			new_spte |= PT_WRITABLE_MASK;
+
