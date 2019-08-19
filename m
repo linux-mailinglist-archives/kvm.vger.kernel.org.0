@@ -2,86 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A956927DA
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:03:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9A8C927E6
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:04:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726855AbfHSPDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 11:03:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48736 "EHLO mail.kernel.org"
+        id S1727786AbfHSPEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 11:04:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53016 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726295AbfHSPDx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 11:03:53 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727782AbfHSPEW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 11:04:22 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6E95F2082A;
-        Mon, 19 Aug 2019 15:03:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1566227032;
-        bh=r6Qgo/EerA13r1XKtNaY4F+Fih36uuDtTQD1GOLw7VQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0nEyQxrzKySESBGUKFh6Mc7GKgYYTSFMG2ya3Aynwg+mkt7CdHwX1ZGgwWQIBVQNC
-         csQxb4ByJHAcqnYqU7+Fm9Hsps67VrFjc2c/XCKmA+NKVGLnxTKLf6kehDfxn/TIGn
-         4gQpsLvC7laSzTwVSqSMjm+lPXfV7VopH5mFLfEs=
-Date:   Mon, 19 Aug 2019 16:03:43 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH ARM] selftests, arm64: fix uninitialized symbol in
- tags_test.c
-Message-ID: <20190819150342.sxk3zzxvrxhkpp6j@willie-the-truck>
-References: <00eb8ba84205c59cac01b1b47615116a461c302c.1566220355.git.andreyknvl@google.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id AD6CD3CA20
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 15:04:21 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id f9so5387696wrq.14
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 08:04:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HblrU59w7iq0IMa0UwOfQFmKlzPCrtNFnI+Yo74xiP0=;
+        b=sIoaQ7qTx0+dcVqUhvbXBgItoLcmG/BQv4+xdERh5lB9TvxtE2vX4n5WiWexSaLHaJ
+         LDJPjLXffjAJ6QJw5bkK2wM9TYHUVRFC0qr0wb/SouLIMKHUnpEq+OCPEc/ezQxpPhjt
+         y6uIBdRBrX+wAjB6IGiUpcXTlMQX3P4nZ9eTD661uJ676GkiX8TNpEQfXtJjaG9zxrzc
+         tLGJwLTKUf6Fsp0CAkDDRFpt66hhRXn68P5XiLEZIQq81S6qQt4hjkoZcespi7ffHU7k
+         qDbh8ikCu8UyImuGMfW9lLRRCCCdRXP2yQv3eIXBt9X/50DIrr+0RFBB2kz7AltthU6R
+         wopg==
+X-Gm-Message-State: APjAAAXBC/4xjWGNQ6GGLV2GTi4ls0XN4HmZyxyuw3ocIzdPLfJVHQZl
+        EQdrVltEdNk0/QC+uF+oi0O/SelDsDV2mpgqWmbBYmO0yLfWa1+E8g77L4pJxsXsmst1LMURkGz
+        qV27XGpt/EPwn
+X-Received: by 2002:a1c:e487:: with SMTP id b129mr21681022wmh.93.1566227060298;
+        Mon, 19 Aug 2019 08:04:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzc0OtOrqlpeTuYSxWjcfe1kG3/vPGvpzncWKT+VMlrsoY9w3cJ3MW5RDu5K18iSOaFwLnScg==
+X-Received: by 2002:a1c:e487:: with SMTP id b129mr21680981wmh.93.1566227060020;
+        Mon, 19 Aug 2019 08:04:20 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f? ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
+        by smtp.gmail.com with ESMTPSA id r190sm17085048wmf.0.2019.08.19.08.04.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2019 08:04:19 -0700 (PDT)
+Subject: Re: [PATCH RESEND v4 7/9] KVM: VMX: Handle SPP induced vmexit and
+ page fault
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com
+Cc:     mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
+References: <20190814070403.6588-1-weijiang.yang@intel.com>
+ <20190814070403.6588-8-weijiang.yang@intel.com>
+ <5f6ba406-17c4-a552-2352-2ff50569aac0@redhat.com>
+Message-ID: <fb6cd8b4-eee9-6e58-4047-550811bffd58@redhat.com>
+Date:   Mon, 19 Aug 2019 17:04:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00eb8ba84205c59cac01b1b47615116a461c302c.1566220355.git.andreyknvl@google.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <5f6ba406-17c4-a552-2352-2ff50569aac0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 19, 2019 at 03:14:42PM +0200, Andrey Konovalov wrote:
-> Fix tagged_ptr not being initialized when TBI is not enabled.
-> 
-> Dan Carpenter <dan.carpenter@oracle.com>
+On 19/08/19 16:43, Paolo Bonzini wrote:
+>> +			/*
+>> +			 * Record write protect fault caused by
+>> +			 * Sub-page Protection, let VMI decide
+>> +			 * the next step.
+>> +			 */
+>> +			if (spte & PT_SPP_MASK) {
+> Should this be "if (spte & PT_WRITABLE_MASK)" instead?  That is, if the
+> page is already writable, the fault must be an SPP fault.
 
-Guessing this was Reported-by, or has Dan introduced his own tag now? ;)
+Hmm, no I forgot how SPP works; still, this is *not* correct.  For
+example, if SPP marks part of a page as read-write, but KVM wants to
+write-protect the whole page for access or dirty tracking, that should
+not cause an SPP exit.
 
-Got a link to the report?
+So I think that when KVM wants to write-protect the whole page
+(wrprot_ad_disabled_spte) it must also clear PT_SPP_MASK; for example it
+could save it in bit 53 (PT64_SECOND_AVAIL_BITS_SHIFT + 1).  If the
+saved bit is set, fast_page_fault must then set PT_SPP_MASK instead of
+PT_WRITABLE_MASK.  On re-entry this will cause an SPP vmexit;
+fast_page_fault should never trigger an SPP userspace exit on its own,
+all the SPP handling should go through handle_spp.
 
-Will
+Paolo
