@@ -2,110 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4412594E97
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 21:53:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADC7694F90
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 23:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728192AbfHSTxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 15:53:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58766 "EHLO mx1.redhat.com"
+        id S1728458AbfHSVId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 17:08:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32936 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727925AbfHSTxT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 15:53:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1728229AbfHSVId (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 17:08:33 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 63739308449A;
-        Mon, 19 Aug 2019 19:53:19 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C9F6C1CB;
-        Mon, 19 Aug 2019 19:53:18 +0000 (UTC)
-Date:   Mon, 19 Aug 2019 13:53:18 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     hexin <hexin.op@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hexin <hexin15@baidu.com>,
-        Liu Qi <liuqi16@baidu.com>, Zhang Yu <zhangyu31@baidu.com>
-Subject: Re: [PATCH v2] vfio_pci: Replace pci_try_reset_function() with
- __pci_reset_function_locked() to ensure that the pci device configuration
- space is restored to its original state
-Message-ID: <20190819135318.72f64e0d@x1.home>
-In-Reply-To: <1566042663-16694-1-git-send-email-hexin15@baidu.com>
-References: <1566042663-16694-1-git-send-email-hexin15@baidu.com>
-Organization: Red Hat
+        by mx1.redhat.com (Postfix) with ESMTPS id C5D6D7BDAC
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 21:08:32 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id o13so5818825wrx.20
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 14:08:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=LPz289eUqMdVK44r3XmdrIn3iZGWOuftMF6bJgSrgXw=;
+        b=iczRtKUataFH2/2CT840ZuPSJaWFEE3md4rq1IA6QlMAxpGXVOZaYPlQuYK2mwhSqZ
+         f4dLwXNRaQBsGDVRht/wJmcobT8SQWNLZJ9F5y62yAjuGBVcSHOoe/7X8OXy8FglGXha
+         yBmxAI+zNSDoumZnLe4oz6KeDUcq+87JtHV9ElBfG0jxOluF6kYSfY6OEAHxv1iHYnCz
+         q/LQswFdAZO9q73LH+erRP85S0ruzAWchg/KCQmBIe1jh1UwwDxnnNDkWFh4hpPpuZfl
+         E0l7v20SXtH6wDT8hJ8rY0XPTu0jZzOvmKhskz0mfFX2Fivlobf2E5ylMl4MvlO2OLXe
+         De2Q==
+X-Gm-Message-State: APjAAAUuYf4D5vwLrFWrjJ7UMRniRPACz1U9rEckeoOBLbGIOaunjBAy
+        afH8Saqyn2AqNNIH7OZlPmhsqvbEhIRDhbIIGmWiyDMyazHhRMrbaP7Fj76BlWWALjeXxCx/0ak
+        Wx+yIvkxhisVB
+X-Received: by 2002:a1c:1ac2:: with SMTP id a185mr22464974wma.96.1566248911492;
+        Mon, 19 Aug 2019 14:08:31 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzzkGtqGEh4bXvK+QUgFZWjgeN4BxKK01EdaQMhbc46GISjxsEbgjr0J/8MhISgz5u3RfrvFQ==
+X-Received: by 2002:a1c:1ac2:: with SMTP id a185mr22464968wma.96.1566248911216;
+        Mon, 19 Aug 2019 14:08:31 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-62-110.red.bezeqint.net. [79.180.62.110])
+        by smtp.gmail.com with ESMTPSA id 74sm28893350wma.15.2019.08.19.14.08.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Aug 2019 14:08:30 -0700 (PDT)
+Date:   Mon, 19 Aug 2019 17:08:22 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, jgg@ziepe.ca
+Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
+Message-ID: <20190819162733-mutt-send-email-mst@kernel.org>
+References: <20190809054851.20118-1-jasowang@redhat.com>
+ <20190810134948-mutt-send-email-mst@kernel.org>
+ <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
+ <20190812054429-mutt-send-email-mst@kernel.org>
+ <663be71f-f96d-cfbc-95a0-da0ac6b82d9f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Mon, 19 Aug 2019 19:53:19 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <663be71f-f96d-cfbc-95a0-da0ac6b82d9f@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 17 Aug 2019 19:51:03 +0800
-hexin <hexin.op@gmail.com> wrote:
-
-> In vfio_pci_enable(), save the device's initial configuration information
-> and then restore the configuration in vfio_pci_disable(). However, the
-> execution result is not the same. Since the pci_try_reset_function()
-> function saves the current state before resetting, the configuration
-> information restored by pci_load_and_free_saved_state() will be
-> overwritten. The __pci_reset_function_locked() function can be used
-> to prevent the configuration space from being overwritten.
+On Tue, Aug 13, 2019 at 04:12:49PM +0800, Jason Wang wrote:
 > 
-> Fixes: 890ed578df82 ("vfio-pci: Use pci "try" reset interface")
-> Signed-off-by: hexin <hexin15@baidu.com>
-> Signed-off-by: Liu Qi <liuqi16@baidu.com>
-> Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
+> On 2019/8/12 下午5:49, Michael S. Tsirkin wrote:
+> > On Mon, Aug 12, 2019 at 10:44:51AM +0800, Jason Wang wrote:
+> > > On 2019/8/11 上午1:52, Michael S. Tsirkin wrote:
+> > > > On Fri, Aug 09, 2019 at 01:48:42AM -0400, Jason Wang wrote:
+> > > > > Hi all:
+> > > > > 
+> > > > > This series try to fix several issues introduced by meta data
+> > > > > accelreation series. Please review.
+> > > > > 
+> > > > > Changes from V4:
+> > > > > - switch to use spinlock synchronize MMU notifier with accessors
+> > > > > 
+> > > > > Changes from V3:
+> > > > > - remove the unnecessary patch
+> > > > > 
+> > > > > Changes from V2:
+> > > > > - use seqlck helper to synchronize MMU notifier with vhost worker
+> > > > > 
+> > > > > Changes from V1:
+> > > > > - try not use RCU to syncrhonize MMU notifier with vhost worker
+> > > > > - set dirty pages after no readers
+> > > > > - return -EAGAIN only when we find the range is overlapped with
+> > > > >     metadata
+> > > > > 
+> > > > > Jason Wang (9):
+> > > > >     vhost: don't set uaddr for invalid address
+> > > > >     vhost: validate MMU notifier registration
+> > > > >     vhost: fix vhost map leak
+> > > > >     vhost: reset invalidate_count in vhost_set_vring_num_addr()
+> > > > >     vhost: mark dirty pages during map uninit
+> > > > >     vhost: don't do synchronize_rcu() in vhost_uninit_vq_maps()
+> > > > >     vhost: do not use RCU to synchronize MMU notifier with worker
+> > > > >     vhost: correctly set dirty pages in MMU notifiers callback
+> > > > >     vhost: do not return -EAGAIN for non blocking invalidation too early
+> > > > > 
+> > > > >    drivers/vhost/vhost.c | 202 +++++++++++++++++++++++++-----------------
+> > > > >    drivers/vhost/vhost.h |   6 +-
+> > > > >    2 files changed, 122 insertions(+), 86 deletions(-)
+> > > > This generally looks more solid.
+> > > > 
+> > > > But this amounts to a significant overhaul of the code.
+> > > > 
+> > > > At this point how about we revert 7f466032dc9e5a61217f22ea34b2df932786bbfc
+> > > > for this release, and then re-apply a corrected version
+> > > > for the next one?
+> > > 
+> > > If possible, consider we've actually disabled the feature. How about just
+> > > queued those patches for next release?
+> > > 
+> > > Thanks
+> > Sorry if I was unclear. My idea is that
+> > 1. I revert the disabled code
+> > 2. You send a patch readding it with all the fixes squashed
+> > 3. Maybe optimizations on top right away?
+> > 4. We queue *that* for next and see what happens.
+> > 
+> > And the advantage over the patchy approach is that the current patches
+> > are hard to review. E.g.  it's not reasonable to ask RCU guys to review
+> > the whole of vhost for RCU usage but it's much more reasonable to ask
+> > about a specific patch.
+> 
+> 
+> Ok. Then I agree to revert.
+> 
+> Thanks
 
-This looks good, but the subject is too long and I find the commit log
-somewhat confusing.  May I update these as follows?
+Great, so please send the following:
+- revert
+- squashed and fixed patch
 
-    vfio_pci: Restore original state on release
-    
-    vfio_pci_enable() saves the device's initial configuration information
-    with the intent that it is restored in vfio_pci_disable().  However,
-    commit 890ed578df82 ("vfio-pci: Use pci "try" reset interface")
-    replaced the call to __pci_reset_function_locked(), which is not wrapped
-    in a state save and restore, with pci_try_reset_function(), which
-    overwrites the restored device state with the current state before
-    applying it to the device.  Restore use of __pci_reset_function_locked()
-    to return to the desired behavior.
-
-Thanks,
-Alex
-
-
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 703948c..0220616 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -438,11 +438,20 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
->  	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
->  
->  	/*
-> -	 * Try to reset the device.  The success of this is dependent on
-> -	 * being able to lock the device, which is not always possible.
-> +	 * Try to get the locks ourselves to prevent a deadlock. The
-> +	 * success of this is dependent on being able to lock the device,
-> +	 * which is not always possible.
-> +	 * We can not use the "try" reset interface here, which will
-> +	 * overwrite the previously restored configuration information.
->  	 */
-> -	if (vdev->reset_works && !pci_try_reset_function(pdev))
-> -		vdev->needs_reset = false;
-> +	if (vdev->reset_works && pci_cfg_access_trylock(pdev)) {
-> +		if (device_trylock(&pdev->dev)) {
-> +			if (!__pci_reset_function_locked(pdev))
-> +				vdev->needs_reset = false;
-> +			device_unlock(&pdev->dev);
-> +		}
-> +		pci_cfg_access_unlock(pdev);
-> +	}
->  
->  	pci_restore_state(pdev);
->  out:
-
+-- 
+MST
