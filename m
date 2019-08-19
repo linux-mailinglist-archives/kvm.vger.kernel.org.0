@@ -2,100 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D997F92832
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:18:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC45C948A4
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:39:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726670AbfHSPSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 11:18:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52770 "EHLO mx1.redhat.com"
+        id S1727410AbfHSPjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 11:39:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59060 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726343AbfHSPSc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 11:18:32 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726373AbfHSPjH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 11:39:07 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id ADFA283F45
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 15:18:31 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id k8so4286460wrx.19
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 08:18:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0/2t4hS8FqXThVER+v2A5JOFUnGhu/vf2ajPY5A6Uf4=;
-        b=Wb2d8GWdgWBN4UGaPSMItR/D3h3k2YMHJXzxycLB47ZyAzCyx8ZdjNe0JphAXznhb7
-         LlqVOWFOOwnT/FHCI/khigZcK+QIDfMJq90/pFzPI4w4aXQfdab5JVL80bvBf+kd7sjM
-         9ScTAa5JFvGxs7OxacYP9I6XBbOWclesNxThjfons+5nVsQQqjv5vMi22JOoT3Cm25aa
-         FjWkP6zsrBwTGjYpB4vdFl/xzHi4z4gFEn9slywENhIZ5dUdKrb+1eEr0N2HTxziwPNS
-         uVZG9LuL1VBQn0b46gL5cUJhOfA9jFBCiP6CleaLuoKNr0d3V2zl5Qj2qPpeG87We9St
-         IUcg==
-X-Gm-Message-State: APjAAAUkgvDHVSOrfDF0IY62d5H8BqBo9Uv+j7NJuITqBx+Z84xC9EsK
-        345YRKAJZ417F3wcL4qaOx1RadJmauMwPuhm5jRMVstxYFo2w2Yx9wRDOdsZSDwuOGRjqY33Sis
-        EXXQuIsOIaIRr
-X-Received: by 2002:a5d:65ca:: with SMTP id e10mr10917604wrw.267.1566227910391;
-        Mon, 19 Aug 2019 08:18:30 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy2TMYfv7mIazOQe72riCVUkHV+60Qy7yTDJQyIB9kc6T5c0Kk0L1QXICVeLMbYFZlY9buLJA==
-X-Received: by 2002:a5d:65ca:: with SMTP id e10mr10917573wrw.267.1566227910127;
-        Mon, 19 Aug 2019 08:18:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f? ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
-        by smtp.gmail.com with ESMTPSA id f197sm27675081wme.22.2019.08.19.08.18.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Aug 2019 08:18:29 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: Fix x86_decode_insn() return when fetching insn
- bytes fails
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190815162032.6679-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9bf79098-703c-e82b-7e7d-1c0a6a1023c2@redhat.com>
-Date:   Mon, 19 Aug 2019 17:18:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 665E8206BB;
+        Mon, 19 Aug 2019 15:39:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1566229146;
+        bh=mU4ouJkj7NaS3vquiJ3mn2kEexO3/gSWokZg7nn5uQA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QRXT896qGq/WiHyf17lxsprNRQAfPEOU3Z+5CjXNL2fEnpIDD7ajhOWUK4biSQh33
+         2ijToYzNGWeRrOdqqSLtcBmrSdl9BJssStybtDcjEQR6fHT1uFfB6cz07Uv9ONyRWy
+         ioL0yg4XhRdRVMfY281I2aZx/KgI2/YhO+Z/GTZc=
+Date:   Mon, 19 Aug 2019 16:38:57 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH ARM] selftests, arm64: fix uninitialized symbol in
+ tags_test.c
+Message-ID: <20190819153856.odtneqxfxva2wjgu@willie-the-truck>
+References: <00eb8ba84205c59cac01b1b47615116a461c302c.1566220355.git.andreyknvl@google.com>
+ <20190819150342.sxk3zzxvrxhkpp6j@willie-the-truck>
+ <CAAeHK+xP6HnLJt_RKW67x8nbJLJp5A=av57BfwiFrA88eFn60w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190815162032.6679-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAeHK+xP6HnLJt_RKW67x8nbJLJp5A=av57BfwiFrA88eFn60w@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/08/19 18:20, Sean Christopherson wrote:
-> Jump to the common error handling in x86_decode_insn() if
-> __do_insn_fetch_bytes() fails so that its error code is converted to the
-> appropriate return type.  Although the various helpers used by
-> x86_decode_insn() return X86EMUL_* values, x86_decode_insn() itself
-> returns EMULATION_FAILED or EMULATION_OK.
+On Mon, Aug 19, 2019 at 05:16:37PM +0200, Andrey Konovalov wrote:
+> On Mon, Aug 19, 2019 at 5:03 PM Will Deacon <will@kernel.org> wrote:
+> >
+> > On Mon, Aug 19, 2019 at 03:14:42PM +0200, Andrey Konovalov wrote:
+> > > Fix tagged_ptr not being initialized when TBI is not enabled.
+> > >
+> > > Dan Carpenter <dan.carpenter@oracle.com>
+> >
+> > Guessing this was Reported-by, or has Dan introduced his own tag now? ;)
 > 
-> This doesn't cause a functional issue as the sole caller,
-> x86_emulate_instruction(), currently only cares about success vs.
-> failure, and success is indicated by '0' for both types
-> (X86EMUL_CONTINUE and EMULATION_OK).
+> Oops, yes, Reported-by :)
 > 
-> Fixes: 285ca9e948fa ("KVM: emulate: speed up do_insn_fetch")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/emulate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > Got a link to the report?
 > 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 8e409ad448f9..6d2273e71020 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -5126,7 +5126,7 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
->  	else {
->  		rc = __do_insn_fetch_bytes(ctxt, 1);
->  		if (rc != X86EMUL_CONTINUE)
-> -			return rc;
-> +			goto done;
->  	}
->  
->  	switch (mode) {
-> 
+> https://www.spinics.net/lists/linux-kselftest/msg09446.html
 
-Queued, thanks.
+Thanks, I'll fix up the commit message and push this out later on. If you
+get a chance, would you be able to look at the pending changes from
+Catalin[1], please?
 
-Paolo
+Will
+
+[1] https://lkml.kernel.org/r/20190815154403.16473-1-catalin.marinas@arm.com
