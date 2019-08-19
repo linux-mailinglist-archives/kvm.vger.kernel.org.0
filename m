@@ -2,84 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EE8B94D0F
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 20:34:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3355994D10
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 20:36:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728368AbfHSSdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 14:33:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40286 "EHLO mx1.redhat.com"
+        id S1728003AbfHSSgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 14:36:46 -0400
+Received: from mga07.intel.com ([134.134.136.100]:25529 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728379AbfHSSdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 14:33:20 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C75B57E425
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 18:33:19 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id q9so5647234wrc.12
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 11:33:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8jHC20YAO7i3dX79rngQOnV9bwJPBl1SY2fxabeqEHk=;
-        b=pv/M/LXK71QAlgDQrUtN90ELbhNHCvWGHx4z+nnltwFTh9EjMZyQIhNlGxjJLJyUBv
-         nvH5XKX2+CJzvboynAl8xkNZACb4C2sPBYG/PzT5OEfKB1UNZsaJgYJ6Fk03IJB12cJN
-         JucMwsuLiXxLubYMOrNF0HIw6t9H5Bhgo0gctk5mG4oI7QA9rrC0HAYYo+Ijsiv0EpM5
-         Z4LmXgGfR8lfoq35M7P1USOF/fnWP1ABFEjfuuF5RlueGD1zJJQwo4hJt0YXezpYnW9X
-         05U/TcfNa/dGJB7k0F4Vpbke89+oAov40WCMQOqLD0Uwi4tw+b/YUEhjXIBc6XZn9Tsz
-         HTQw==
-X-Gm-Message-State: APjAAAXZFtcksdO8/qZcBr3gIRjlAvDW/20TCdkLD1Mf2v3vE3fMnL9/
-        YFmPQSnm3nPOIeGu/GrO4ipBMu6ILHnRJ8oAEj74OKutHi+UR2QBRmXdr/YU4km5muSwSI/6Ui2
-        Ip7UmZ2TwIQnV
-X-Received: by 2002:adf:fc87:: with SMTP id g7mr28697375wrr.319.1566239598419;
-        Mon, 19 Aug 2019 11:33:18 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwRzgvRxefwBW4gtKRSSnETPE93k3WsITQv4FasqWWtMUx0D0FuzwoHIAa9Z4TfsJ8CTnhFbQ==
-X-Received: by 2002:adf:fc87:: with SMTP id g7mr28697362wrr.319.1566239598177;
-        Mon, 19 Aug 2019 11:33:18 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:399c:411e:1ccb:f240? ([2001:b07:6468:f312:399c:411e:1ccb:f240])
-        by smtp.gmail.com with ESMTPSA id d19sm21489395wrb.7.2019.08.19.11.33.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Aug 2019 11:33:17 -0700 (PDT)
-Subject: Re: [PATCH 1/2] KVM: x86: fix reporting of AMD speculation bug CPUID
- leaf
-To:     Jim Mattson <jmattson@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm list <kvm@vger.kernel.org>
-References: <1565854883-27019-1-git-send-email-pbonzini@redhat.com>
- <1565854883-27019-2-git-send-email-pbonzini@redhat.com>
- <CALMp9eQcRbMjQ_=jQ=qaYmh1Lavc3PYvm4Qcf3zY+N8j3zZe-w@mail.gmail.com>
- <0e29f624-10f5-7ab5-1823-280f32732b68@redhat.com>
- <CALMp9eT2uo+_tbV=Z3-pyzjU76kaEU-BNvVriEHU6yGMsiy5Dw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9097ee53-e681-60ef-b389-6603bcb52041@redhat.com>
-Date:   Mon, 19 Aug 2019 20:33:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727808AbfHSSgp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 14:36:45 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 11:36:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,405,1559545200"; 
+   d="scan'208";a="195592515"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga001.fm.intel.com with ESMTP; 19 Aug 2019 11:36:44 -0700
+Date:   Mon, 19 Aug 2019 11:36:44 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Nicusor CITU <ncitu@bitdefender.com>
+Cc:     Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        "Zhang@vger.kernel.org" <Zhang@vger.kernel.org>,
+        Yu C <yu.c.zhang@intel.com>,
+        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
+Subject: Re: [RFC PATCH v6 55/92] kvm: introspection: add KVMI_CONTROL_MSR
+ and KVMI_EVENT_MSR
+Message-ID: <20190819183643.GB1916@linux.intel.com>
+References: <20190809160047.8319-1-alazar@bitdefender.com>
+ <20190809160047.8319-56-alazar@bitdefender.com>
+ <20190812210501.GD1437@linux.intel.com>
+ <f9e94e9649f072911cc20129c2b633747d5c1df5.camel@bitdefender.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eT2uo+_tbV=Z3-pyzjU76kaEU-BNvVriEHU6yGMsiy5Dw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9e94e9649f072911cc20129c2b633747d5c1df5.camel@bitdefender.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/08/19 20:30, Jim Mattson wrote:
->>> Perhaps there is another patch coming for reporting Intel bits on AMD?
->> I wasn't going to work on it but yes, they should be.  This patch just
->> fixed what was half-implemented.
-> I'm not sure that the original intent was to enumerate the AMD
-> features on Intel hosts, but it seems reasonable to do so.
+On Thu, Aug 15, 2019 at 06:36:44AM +0000, Nicusor CITU wrote:
+> > > +	void (*msr_intercept)(struct kvm_vcpu *vcpu, unsigned int msr,
+> > > +				bool enable);
+> > 
+> > This should be toggle_wrmsr_intercept(), or toggle_msr_intercept()
+> > with a paramter to control RDMSR vs. WRMSR.
 > 
-> Should we also populate the AMD cache topology leaf (0x8000001d) on
-> Intel hosts? And so on? :-)
->
-> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Ok, I can do that.
+> 
+> 
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index 6450c8c44771..0306c7ef3158 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -7784,6 +7784,15 @@ static __exit void hardware_unsetup(void)
+> > >  	free_kvm_area();
+> > >  }
+> > >  
+> > > +static void vmx_msr_intercept(struct kvm_vcpu *vcpu, unsigned int
+> > > msr,
+> > > +			      bool enable)
+> > > +{
+> > > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > > +	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
 
-Thanks.  Note that I plan to send v2 tomorrow, and I've also done the
-part that reports Intel bits unconditionally.
+Is KVMI intended to play nice with nested virtualization?  Unconditionally
+updating vmcs01.msr_bitmap is correct regardless of whether the vCPU is in
+L1 or L2, but if the vCPU is currently in L2 then the effective bitmap,
+i.e. vmcs02.msr_bitmap, won't be updated until the next nested VM-Enter.
 
-Paolo
+> > > +
+> > > +	vmx_set_intercept_for_msr(msr_bitmap, msr, MSR_TYPE_W, enable);
+> > > +}
+> > 
+> > Unless I overlooked a check, this will allow userspace to disable
+> > WRMSR interception for any MSR in the above range, i.e. userspace can
+> > use KVM to gain full write access to pretty much all the interesting
+> > MSRs. This needs to only disable interception if KVM had interception
+> > disabled before introspection started modifying state.
+> 
+> We only need to enable the MSR interception. We never disable it -
+> please see kvmi_arch_cmd_control_msr().
+
+In that case, drop @enable and use enable_wrmsr_intercept() or something
+along those lines for kvm_x86_ops instead of toggle_wrmsr_intercept().
