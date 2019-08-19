@@ -2,152 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 07518921C8
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 13:02:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE7C492478
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 15:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727356AbfHSLAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 07:00:18 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:9741 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726627AbfHSLAS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 07:00:18 -0400
+        id S1727647AbfHSNOw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 09:14:52 -0400
+Received: from mail-yw1-f74.google.com ([209.85.161.74]:52395 "EHLO
+        mail-yw1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727570AbfHSNOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 09:14:52 -0400
+Received: by mail-yw1-f74.google.com with SMTP id d18so3020160ywb.19
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 06:14:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1566212417; x=1597748417;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=aS7WQr72arlTdqWhjKdkAN3a3DGB4dE30x9TuOF7K6g=;
-  b=u9nnLq4y5kVMtb9Im7K81tKgLhh9QYQ61NiHDxodG2tpPTn8jUAd662m
-   cmpjdKZqjAlkDfOs7D8YTC1xRzl1MShmRC8C3yXHV0vPlK2+il/vUx5f6
-   ShscTPwU2ZH9U4aPU7Cl3SkjTYxoul1OOxMpVR1h0KW9zOxL1HJNiQVVQ
-   I=;
-X-IronPort-AV: E=Sophos;i="5.64,403,1559520000"; 
-   d="scan'208";a="821177471"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2b-c300ac87.us-west-2.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 19 Aug 2019 11:00:13 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-c300ac87.us-west-2.amazon.com (Postfix) with ESMTPS id 84FD8A20AA;
-        Mon, 19 Aug 2019 11:00:13 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 19 Aug 2019 11:00:13 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.214) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 19 Aug 2019 11:00:09 +0000
-Subject: Re: [PATCH v2 14/15] kvm: ioapic: Delay update IOAPIC EOI for RTC
-To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-References: <1565886293-115836-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1565886293-115836-15-git-send-email-suravee.suthikulpanit@amd.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <e5556778-105a-bdb3-f118-84fe729d042b@amazon.com>
-Date:   Mon, 19 Aug 2019 13:00:07 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <1565886293-115836-15-git-send-email-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.161.214]
-X-ClientProxiedBy: EX13D08UWB003.ant.amazon.com (10.43.161.186) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=oNoDUi1hsmNzzodU0R6ojKZvjIC3JQAmU+NA/+7Uaps=;
+        b=ouW48h7HGbpdNdCReL1nk2+dvRXfxgklc1nbCP+Q9JJOIGCVyS3fqahBo1S2d8316M
+         OZxTJFVIgB1yHxwjdFezXxDGLz9wKstEmjea5fp8x0waRP2D4PtWy/8cEd94ITbDy+AB
+         ohMM7RCZVEao1hTKwgkNZsuSnXQ52npfKzrCB8hagDJHWUZyqV94tepmovte0/cp0h4L
+         SvPXvaVH6Kvmqsu415sDgkqDdnh0pnuy5EbzAZl/JGrx9UiwjWAucl5+kBCOYUeFDUvr
+         0QJUC5x7f/83eUXVQvxdzpHaeshvsSjN84YEl5sN0EdVOxlMEIgfFzUzZo6IFB3/q633
+         zoEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=oNoDUi1hsmNzzodU0R6ojKZvjIC3JQAmU+NA/+7Uaps=;
+        b=Dj24h+FWP5MFIbw9iYzW0CRrugqgeaKZTt0nZkV+dBOd4/zvzQHjQq3dhYQaOcS0NX
+         WLFI2xMBiD/tZZfUdCXsKMxydfA3XNvRAsV6uqkasFIOm72HYemcqOHBMYuH30ToWp5/
+         vtU3DpHewHt3qC87WZ39Hkg8Y2WyDQsIEM/fLruXwXqOuMbKadbEFpM9fmO8aCwjQowH
+         fLSJXlICOD322ct+Kq55hhdec6lCodgRcjNavcMFIomiS1i21ry243ZXXOnR99cwJ6yI
+         pgMNv3Fw5qA0t6E/wXagXlWABkvnAt5UBPxlgJgaCZWPCnGK3dvbhV8RmLvSg8sjDv4w
+         seYg==
+X-Gm-Message-State: APjAAAV4CvH+6FQphrstapLQr+3Oz6TYQoc2tH6LTaI91onTR7V/PwqI
+        yZrZAl93XjPdQJ4pNb+ZT8fDjMVINkUg4wGR
+X-Google-Smtp-Source: APXvYqwFX5U5jD7RsGf0G3vM/9ehnT3AiWsZaEFsyMkoc/hovIoyUTjRlHyWf2f4E//56cQouSUIEdq8hx31clIz
+X-Received: by 2002:a81:6c85:: with SMTP id h127mr16796224ywc.111.1566220491100;
+ Mon, 19 Aug 2019 06:14:51 -0700 (PDT)
+Date:   Mon, 19 Aug 2019 15:14:42 +0200
+Message-Id: <00eb8ba84205c59cac01b1b47615116a461c302c.1566220355.git.andreyknvl@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.rc1.153.gdeed80330f-goog
+Subject: [PATCH ARM] selftests, arm64: fix uninitialized symbol in tags_test.c
+From:   Andrey Konovalov <andreyknvl@google.com>
+To:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Will Deacon <will.deacon@arm.com>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andrey Konovalov <andreyknvl@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Fix tagged_ptr not being initialized when TBI is not enabled.
 
+Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+---
+ tools/testing/selftests/arm64/tags_test.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-On 15.08.19 18:25, Suthikulpanit, Suravee wrote:
-> In-kernel IOAPIC does not update RTC pending EOI info with AMD SVM /w AVIC
-> when interrupt is delivered as edge-triggered since AMD processors
-> cannot exit on EOI for these interrupts.
-> 
-> Add code to also check LAPIC pending EOI before injecting any new RTC
-> interrupts on AMD SVM when AVIC is activated.
-> 
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->   arch/x86/kvm/ioapic.c | 36 ++++++++++++++++++++++++++++++++----
->   1 file changed, 32 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-> index 1add1bc..45e7bb0 100644
-> --- a/arch/x86/kvm/ioapic.c
-> +++ b/arch/x86/kvm/ioapic.c
-> @@ -39,6 +39,7 @@
->   #include <asm/processor.h>
->   #include <asm/page.h>
->   #include <asm/current.h>
-> +#include <asm/virtext.h>
->   #include <trace/events/kvm.h>
->   
->   #include "ioapic.h"
-> @@ -173,6 +174,7 @@ static bool rtc_irq_check_coalesced(struct kvm_ioapic *ioapic)
->   	return false;
->   }
->   
-> +#define APIC_DEST_NOSHORT		0x0
->   static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
->   		int irq_level, bool line_status)
->   {
-> @@ -201,10 +203,36 @@ static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
->   	 * interrupts lead to time drift in Windows guests.  So we track
->   	 * EOI manually for the RTC interrupt.
->   	 */
-> -	if (irq == RTC_GSI && line_status &&
-> -		rtc_irq_check_coalesced(ioapic)) {
-> -		ret = 0;
-> -		goto out;
-> +	if (irq == RTC_GSI && line_status) {
-> +		struct kvm *kvm = ioapic->kvm;
-> +		union kvm_ioapic_redirect_entry *entry = &ioapic->redirtbl[irq];
-> +
-> +		/*
-> +		 * Since, AMD SVM AVIC accelerates write access to APIC EOI
-> +		 * register for edge-trigger interrupts, IOAPIC will not be
-> +		 * able to receive the EOI. In this case, we do lazy update
-> +		 * of the pending EOI when trying to set IOAPIC irq for RTC.
-> +		 */
-> +		if (cpu_has_svm(NULL) &&
-> +		    (kvm->arch.apicv_state == APICV_ACTIVATED) &&
-> +		    (entry->fields.trig_mode == IOAPIC_EDGE_TRIG)) {
-> +			int i;
-> +			struct kvm_vcpu *vcpu;
-> +
-> +			kvm_for_each_vcpu(i, vcpu, kvm)
-> +				if (kvm_apic_match_dest(vcpu, NULL,
-> +							KVM_APIC_DEST_NOSHORT,
-> +							entry->fields.dest_id,
-> +							entry->fields.dest_mode)) {
-> +					__rtc_irq_eoi_tracking_restore_one(vcpu);
+diff --git a/tools/testing/selftests/arm64/tags_test.c b/tools/testing/selftests/arm64/tags_test.c
+index 22a1b266e373..5701163460ef 100644
+--- a/tools/testing/selftests/arm64/tags_test.c
++++ b/tools/testing/selftests/arm64/tags_test.c
+@@ -14,15 +14,17 @@
+ int main(void)
+ {
+ 	static int tbi_enabled = 0;
+-	struct utsname *ptr, *tagged_ptr;
++	unsigned long tag = 0;
++	struct utsname *ptr;
+ 	int err;
+ 
+ 	if (prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE, 0, 0, 0) == 0)
+ 		tbi_enabled = 1;
+ 	ptr = (struct utsname *)malloc(sizeof(*ptr));
+ 	if (tbi_enabled)
+-		tagged_ptr = (struct utsname *)SET_TAG(ptr, 0x42);
+-	err = uname(tagged_ptr);
++		tag = 0x42;
++	ptr = (struct utsname *)SET_TAG(ptr, tag);
++	err = uname(ptr);
+ 	free(ptr);
+ 
+ 	return err;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
 
-I don't understand why this works. This code just means we're injecting 
-an EOI on the first CPU that has the vector mapped, right when we're 
-setting it to trigger, no?
-
-
-Alex
-
-
-> +					break;
-> +				}
-> +		}
-> +
-> +		if (rtc_irq_check_coalesced(ioapic)) {
-> +			ret = 0;
-> +			goto out;
-> +		}
->   	}
->   
->   	old_irr = ioapic->irr;
-> 
