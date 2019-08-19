@@ -2,125 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2AFC948BC
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:45:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 673A1948EB
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:47:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726810AbfHSPpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 11:45:09 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44761 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726627AbfHSPpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 11:45:09 -0400
-Received: by mail-pf1-f196.google.com with SMTP id c81so1378426pfc.11
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 08:45:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zMGg7ZRNK7NfpqI/Qet9Dxr9rbclh2xtbR4hUTFM6IY=;
-        b=GJoHV9QE4xGJAUCqD7zOGEihP3UiAZjpj3bmVElnV3mGgDu9+IBupxqZo5crTOTBSn
-         9E4KUL6HMvh/OBYUcO8Tpulqz8WiyGQenGKjsASlkTFv2dXi8Y/niM3/Z+P7vnlKNIaZ
-         MtFd0UdR9JYH1Lcgtiq3NMGR7NeTcmBx3BytYCkuY0+Mh6In/PjXGCT7JB+YD1Ki2rnw
-         M/YU/3ABnIwEbCJlH3DAt0qAYIkuPOryLlR92BarOXnc/HJERVegrVcC8hFgAU/vJ7Go
-         FvSFH9zA3QmxP0Me+8WMdbNNwakaShO+N+03UzcmCf/+VKatv8Kx3ZtIc9UnmtYKv3wf
-         5kAg==
+        id S1728171AbfHSPrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 11:47:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12596 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728000AbfHSPrc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 11:47:32 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A83CEC057E16
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 15:47:31 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id r1so4021wmr.1
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 08:47:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zMGg7ZRNK7NfpqI/Qet9Dxr9rbclh2xtbR4hUTFM6IY=;
-        b=GnYWW7NNaOlMBQoVzd2YlgIpaTroG/izdv6O6wxg6zymeomAEhOBdO6CROqgsXcdcN
-         UlAmWt7ZOxu9Z0T0cDFrFTQDBBMYxlbR1EZfi+H7CYCZXbaDIFDUra0oWifA3z4Xd4W5
-         TquHHEt5g/dDRo0z/cKyOyi5ti7l8gC3EpxRQuIQNz11RXAyr+KJbe0Nk57GlzGQglRD
-         s9neQ8EgJtWObi63+9J9lzmK0YZI/DFEX/uCzQPWtL6KK8AMnVKMV63K4JwQSRdH8lOZ
-         Zo+KMbeUuOQV/RHQnu0JiH/RH4HdvfBq/8zN60X5KcDF1xp1blEQNSGyEpcxGhjOX/KY
-         m6XQ==
-X-Gm-Message-State: APjAAAUq/e0DQCOpA61KVVQ5XkETwF364ZTI6pFlLUvThZWIvBj3No/R
-        T04+koliVfJF7Y6uW9CTSFQ4PVcdXuKD8wVfVvfTsA==
-X-Google-Smtp-Source: APXvYqyflWC4oeyk4cX94v5k6CQJ/8FEDGgMF+Kmp2ZaCbPDE8MBxb9njXOAWHJ8AnGwbz7Ioq7XIseAIciXEoaHYEw=
-X-Received: by 2002:a63:3006:: with SMTP id w6mr20727946pgw.440.1566229508161;
- Mon, 19 Aug 2019 08:45:08 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2BwM2gt3XIGDnUE55uPuC8VdXnMb+eICOKFQy2JHSEs=;
+        b=ePC8uwKaQcLkIuWGKmh2LYqSSOeY6PYda4sizCms2jq65+H7XVPZYaAkX8NW4R3gTz
+         qA356wzweUaHVBBGBkYbHRs8/03uwOsx2yfoIrV73khRxK5J3Vu4hGYkI6ciR8qh4FYR
+         U/I1Gmx+hYFfDu9YzqUIDhNdqwRrgCwOwkNxbYELUC7kzgrlmQ1pbxP/UF7K4HDwpB74
+         anfQR3ZgvHACe/sykRQt5z8O5YnVuOcNr//apmJ9VW9unx5ZD3/w8kpgKGr97UgUZFIw
+         r0fZKbvuDxnrRfrlSSaDErNgahIeIjDqp7WcYR64dw9enEMzeoSU7PyQ8I4op06+TaKu
+         e/9Q==
+X-Gm-Message-State: APjAAAVBPJfyL4KFcyezpIiaqUXWPYJ3i/Uk9HEH4OHOp56rkXP6Jdpa
+        OaEQG+GDecxuzaNfkFz2HPkiyVfPgRoHuTbgsupQepeuSgSeOBPukbxE5/1wD9kJ78ccA7+qk/5
+        6i7b1omoWscQV
+X-Received: by 2002:a5d:554e:: with SMTP id g14mr14753995wrw.68.1566229650310;
+        Mon, 19 Aug 2019 08:47:30 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyGMz2v0XkLO/bFG03vaFvUHs7obmKDn0vgSAOYGGIjh7PUOHC2RWmyZLFjgAEMZj4po38oyQ==
+X-Received: by 2002:a5d:554e:: with SMTP id g14mr14753954wrw.68.1566229650010;
+        Mon, 19 Aug 2019 08:47:30 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f? ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
+        by smtp.gmail.com with ESMTPSA id o11sm13245215wmh.46.2019.08.19.08.47.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2019 08:47:29 -0700 (PDT)
+Subject: Re: [PATCH] KVM: VMX: Fix and tweak the comments for VM-Enter
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190815200931.18260-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <aa33f0e1-e999-08b0-8826-0b88f4681561@redhat.com>
+Date:   Mon, 19 Aug 2019 17:47:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <00eb8ba84205c59cac01b1b47615116a461c302c.1566220355.git.andreyknvl@google.com>
- <20190819150342.sxk3zzxvrxhkpp6j@willie-the-truck> <CAAeHK+xP6HnLJt_RKW67x8nbJLJp5A=av57BfwiFrA88eFn60w@mail.gmail.com>
- <20190819153856.odtneqxfxva2wjgu@willie-the-truck>
-In-Reply-To: <20190819153856.odtneqxfxva2wjgu@willie-the-truck>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Mon, 19 Aug 2019 17:44:56 +0200
-Message-ID: <CAAeHK+zf_VKOttBVfZUdp-ra=uNTx_faCmJkrM81BzgEaOZjSQ@mail.gmail.com>
-Subject: Re: [PATCH ARM] selftests, arm64: fix uninitialized symbol in tags_test.c
-To:     Will Deacon <will@kernel.org>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190815200931.18260-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 19, 2019 at 5:39 PM Will Deacon <will@kernel.org> wrote:
->
-> On Mon, Aug 19, 2019 at 05:16:37PM +0200, Andrey Konovalov wrote:
-> > On Mon, Aug 19, 2019 at 5:03 PM Will Deacon <will@kernel.org> wrote:
-> > >
-> > > On Mon, Aug 19, 2019 at 03:14:42PM +0200, Andrey Konovalov wrote:
-> > > > Fix tagged_ptr not being initialized when TBI is not enabled.
-> > > >
-> > > > Dan Carpenter <dan.carpenter@oracle.com>
-> > >
-> > > Guessing this was Reported-by, or has Dan introduced his own tag now? ;)
-> >
-> > Oops, yes, Reported-by :)
-> >
-> > >
-> > > Got a link to the report?
-> >
-> > https://www.spinics.net/lists/linux-kselftest/msg09446.html
->
-> Thanks, I'll fix up the commit message and push this out later on. If you
-> get a chance, would you be able to look at the pending changes from
-> Catalin[1], please?
->
-> Will
->
-> [1] https://lkml.kernel.org/r/20190815154403.16473-1-catalin.marinas@arm.com
+On 15/08/19 22:09, Sean Christopherson wrote:
+> Fix an incorrect/stale comment regarding the vmx_vcpu pointer, as guest
+> registers are now loaded using a direct pointer to the start of the
+> register array.
+> 
+> Opportunistically add a comment to document why the vmx_vcpu pointer is
+> needed, its consumption via 'call vmx_update_host_rsp' is rather subtle.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmenter.S | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> index 4010d519eb8c..751a384c2eb0 100644
+> --- a/arch/x86/kvm/vmx/vmenter.S
+> +++ b/arch/x86/kvm/vmx/vmenter.S
+> @@ -94,7 +94,7 @@ ENDPROC(vmx_vmexit)
+>  
+>  /**
+>   * __vmx_vcpu_run - Run a vCPU via a transition to VMX guest mode
+> - * @vmx:	struct vcpu_vmx *
+> + * @vmx:	struct vcpu_vmx * (forwarded to vmx_update_host_rsp)
+>   * @regs:	unsigned long * (to guest registers)
+>   * @launched:	%true if the VMCS has been launched
+>   *
+> @@ -151,7 +151,7 @@ ENTRY(__vmx_vcpu_run)
+>  	mov VCPU_R14(%_ASM_AX), %r14
+>  	mov VCPU_R15(%_ASM_AX), %r15
+>  #endif
+> -	/* Load guest RAX.  This kills the vmx_vcpu pointer! */
+> +	/* Load guest RAX.  This kills the @regs pointer! */
+>  	mov VCPU_RAX(%_ASM_AX), %_ASM_AX
+>  
+>  	/* Enter guest mode */
+> 
 
-Sure! I didn't realize some actioned is required from me on those.
-I'll add my Acked-by's. Thanks!
+Queued, thanks.
+
+Paolo
