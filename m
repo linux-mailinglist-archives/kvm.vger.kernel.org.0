@@ -2,140 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ADC7694F90
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 23:09:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1D199500F
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 23:47:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728458AbfHSVId (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 17:08:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32936 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728229AbfHSVId (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 17:08:33 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C5D6D7BDAC
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 21:08:32 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id o13so5818825wrx.20
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 14:08:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=LPz289eUqMdVK44r3XmdrIn3iZGWOuftMF6bJgSrgXw=;
-        b=iczRtKUataFH2/2CT840ZuPSJaWFEE3md4rq1IA6QlMAxpGXVOZaYPlQuYK2mwhSqZ
-         f4dLwXNRaQBsGDVRht/wJmcobT8SQWNLZJ9F5y62yAjuGBVcSHOoe/7X8OXy8FglGXha
-         yBmxAI+zNSDoumZnLe4oz6KeDUcq+87JtHV9ElBfG0jxOluF6kYSfY6OEAHxv1iHYnCz
-         q/LQswFdAZO9q73LH+erRP85S0ruzAWchg/KCQmBIe1jh1UwwDxnnNDkWFh4hpPpuZfl
-         E0l7v20SXtH6wDT8hJ8rY0XPTu0jZzOvmKhskz0mfFX2Fivlobf2E5ylMl4MvlO2OLXe
-         De2Q==
-X-Gm-Message-State: APjAAAUuYf4D5vwLrFWrjJ7UMRniRPACz1U9rEckeoOBLbGIOaunjBAy
-        afH8Saqyn2AqNNIH7OZlPmhsqvbEhIRDhbIIGmWiyDMyazHhRMrbaP7Fj76BlWWALjeXxCx/0ak
-        Wx+yIvkxhisVB
-X-Received: by 2002:a1c:1ac2:: with SMTP id a185mr22464974wma.96.1566248911492;
-        Mon, 19 Aug 2019 14:08:31 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzzkGtqGEh4bXvK+QUgFZWjgeN4BxKK01EdaQMhbc46GISjxsEbgjr0J/8MhISgz5u3RfrvFQ==
-X-Received: by 2002:a1c:1ac2:: with SMTP id a185mr22464968wma.96.1566248911216;
-        Mon, 19 Aug 2019 14:08:31 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-62-110.red.bezeqint.net. [79.180.62.110])
-        by smtp.gmail.com with ESMTPSA id 74sm28893350wma.15.2019.08.19.14.08.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2019 14:08:30 -0700 (PDT)
-Date:   Mon, 19 Aug 2019 17:08:22 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, jgg@ziepe.ca
-Subject: Re: [PATCH V5 0/9] Fixes for vhost metadata acceleration
-Message-ID: <20190819162733-mutt-send-email-mst@kernel.org>
-References: <20190809054851.20118-1-jasowang@redhat.com>
- <20190810134948-mutt-send-email-mst@kernel.org>
- <360a3b91-1ac5-84c0-d34b-a4243fa748c4@redhat.com>
- <20190812054429-mutt-send-email-mst@kernel.org>
- <663be71f-f96d-cfbc-95a0-da0ac6b82d9f@redhat.com>
+        id S1728353AbfHSVrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 17:47:08 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:54460 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728014AbfHSVrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 17:47:08 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7JLd19S133381
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 21:47:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : subject :
+ date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=q4B+iWSavjgpiwONyp3kxrqTfAG8hJoijgqc3JeKPBo=;
+ b=lr9Rc/lj/Aaj7O6AYjv7X0yp6T1YiBF6gT4a+a/CHGMJYzPHorKEtaDQ5TN//p42ZZLZ
+ MWncPxedc/WTXGo3vqJkb2kgta0SgOPZCXtBGLZ47+k0iPfNU3IF7emilDLaw6bgkn2g
+ i1NZUYsZb7eZ7l5azM3GfsvuvdM0MiBW6t5sv6xx6gzMfJLO0jDojc+RhUzwcvsX5L8D
+ TCH6vjV1JaZfpFa0oT4Ow4ogepddfQEilBYSATpBmo+chxtctxSFdDwbeHEqKkNfgt5S
+ IDD9cAJUkeo07/ORTRto62rEhC2xcLjzX2PXX6BlWCZGM8zRZEBkwQDiNukwT/rxGFgi wg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2ue90ta9j5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 21:47:06 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7JLcOUM086288
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 21:47:06 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2uejxemsd9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 21:47:06 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7JLl5ep009997
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 21:47:05 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 19 Aug 2019 14:47:05 -0700
+From:   Nikita Leshenko <nikita.leshchenko@oracle.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH 0/2] KVM: nVMX: Improve HLT activity support
+Date:   Tue, 20 Aug 2019 00:46:48 +0300
+Message-Id: <20190819214650.41991-1-nikita.leshchenko@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <663be71f-f96d-cfbc-95a0-da0ac6b82d9f@redhat.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9354 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=516
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908190217
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9354 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=587 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908190217
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 04:12:49PM +0800, Jason Wang wrote:
-> 
-> On 2019/8/12 下午5:49, Michael S. Tsirkin wrote:
-> > On Mon, Aug 12, 2019 at 10:44:51AM +0800, Jason Wang wrote:
-> > > On 2019/8/11 上午1:52, Michael S. Tsirkin wrote:
-> > > > On Fri, Aug 09, 2019 at 01:48:42AM -0400, Jason Wang wrote:
-> > > > > Hi all:
-> > > > > 
-> > > > > This series try to fix several issues introduced by meta data
-> > > > > accelreation series. Please review.
-> > > > > 
-> > > > > Changes from V4:
-> > > > > - switch to use spinlock synchronize MMU notifier with accessors
-> > > > > 
-> > > > > Changes from V3:
-> > > > > - remove the unnecessary patch
-> > > > > 
-> > > > > Changes from V2:
-> > > > > - use seqlck helper to synchronize MMU notifier with vhost worker
-> > > > > 
-> > > > > Changes from V1:
-> > > > > - try not use RCU to syncrhonize MMU notifier with vhost worker
-> > > > > - set dirty pages after no readers
-> > > > > - return -EAGAIN only when we find the range is overlapped with
-> > > > >     metadata
-> > > > > 
-> > > > > Jason Wang (9):
-> > > > >     vhost: don't set uaddr for invalid address
-> > > > >     vhost: validate MMU notifier registration
-> > > > >     vhost: fix vhost map leak
-> > > > >     vhost: reset invalidate_count in vhost_set_vring_num_addr()
-> > > > >     vhost: mark dirty pages during map uninit
-> > > > >     vhost: don't do synchronize_rcu() in vhost_uninit_vq_maps()
-> > > > >     vhost: do not use RCU to synchronize MMU notifier with worker
-> > > > >     vhost: correctly set dirty pages in MMU notifiers callback
-> > > > >     vhost: do not return -EAGAIN for non blocking invalidation too early
-> > > > > 
-> > > > >    drivers/vhost/vhost.c | 202 +++++++++++++++++++++++++-----------------
-> > > > >    drivers/vhost/vhost.h |   6 +-
-> > > > >    2 files changed, 122 insertions(+), 86 deletions(-)
-> > > > This generally looks more solid.
-> > > > 
-> > > > But this amounts to a significant overhaul of the code.
-> > > > 
-> > > > At this point how about we revert 7f466032dc9e5a61217f22ea34b2df932786bbfc
-> > > > for this release, and then re-apply a corrected version
-> > > > for the next one?
-> > > 
-> > > If possible, consider we've actually disabled the feature. How about just
-> > > queued those patches for next release?
-> > > 
-> > > Thanks
-> > Sorry if I was unclear. My idea is that
-> > 1. I revert the disabled code
-> > 2. You send a patch readding it with all the fixes squashed
-> > 3. Maybe optimizations on top right away?
-> > 4. We queue *that* for next and see what happens.
-> > 
-> > And the advantage over the patchy approach is that the current patches
-> > are hard to review. E.g.  it's not reasonable to ask RCU guys to review
-> > the whole of vhost for RCU usage but it's much more reasonable to ask
-> > about a specific patch.
-> 
-> 
-> Ok. Then I agree to revert.
-> 
-> Thanks
+These patches improve various aspects of nested HLT activity state support. The
+first patch prevents usermode from turning off the feature bit in VMX_MISC MSR
+and the second patch adds additional activity state related checks on VMCS12 as
+required by SDM.
 
-Great, so please send the following:
-- revert
-- squashed and fixed patch
+These patches were tested to not cause regressions in kvm-unit-tests.
 
--- 
-MST
+Nikita
+
+
