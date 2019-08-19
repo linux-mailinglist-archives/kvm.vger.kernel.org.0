@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 18A7E92179
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 12:37:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98AA492191
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 12:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726888AbfHSKgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 06:36:14 -0400
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:49384 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726703AbfHSKgO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 06:36:14 -0400
+        id S1727329AbfHSKmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 06:42:42 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:29417 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725790AbfHSKml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 06:42:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1566210972; x=1597746972;
+  t=1566211360; x=1597747360;
   h=subject:to:cc:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=Bfj+goveoEs32SLe7Qst3dXZt6qRhq7vby8Cj53EIrc=;
-  b=XleG4ff7I7apibBux6xMR0lHEVPCputIAJvKl/fHT0w5MDlEmA0pPvXn
-   Nwx3fh7wzryrv8bPDqkTLJQrlidOPNKv74TpHgGqBey56KyoxFRJi7z10
-   VbyBRXifmhfcx0K/EtjXxf9oe5HVnoEao3nyjIZ6kO9A3tTJ/JG0GTwyc
-   Q=;
+  bh=KIcNfCXO8azwMTSRhRB2ZV3cspYnwdK7rin6MX7vsTA=;
+  b=oD+UvkgpspMCe2gWQbhfUVeN1Wr5QX07id92DqIOpIU3NGNXGYx1xYre
+   w2gJTKufK/XfwIGqXhfViSCAVlpexvuC4YgV3tTKBQ4MCbdlYYuz4JYIL
+   1vLmrcGEtFHTbl5mYLRxIvLATjwSf8ryCbAjiMlDk/AgcnA1gbCCdJ5qZ
+   8=;
 X-IronPort-AV: E=Sophos;i="5.64,403,1559520000"; 
-   d="scan'208";a="779890305"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 19 Aug 2019 10:36:06 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com (Postfix) with ESMTPS id E4030A1F99;
-        Mon, 19 Aug 2019 10:36:04 +0000 (UTC)
+   d="scan'208";a="416067907"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-715bee71.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 19 Aug 2019 10:42:39 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1a-715bee71.us-east-1.amazon.com (Postfix) with ESMTPS id 5AEC4A1E11;
+        Mon, 19 Aug 2019 10:42:36 +0000 (UTC)
 Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
  EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 19 Aug 2019 10:36:04 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.244) by
+ id 15.0.1367.3; Mon, 19 Aug 2019 10:42:36 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.191) by
  EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 19 Aug 2019 10:36:01 +0000
-Subject: Re: [PATCH v2 11/15] svm: Temporary deactivate AVIC during ExtINT
- handling
+ id 15.0.1367.3; Mon, 19 Aug 2019 10:42:33 +0000
+Subject: Re: [PATCH v2 12/15] kvm: i8254: Check LAPIC EOI pending when
+ injecting irq on SVM AVIC
 To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
@@ -47,19 +47,19 @@ CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "rimasluk@amazon.com" <rimasluk@amazon.com>,
         "Grimm, Jon" <Jon.Grimm@amd.com>
 References: <1565886293-115836-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1565886293-115836-12-git-send-email-suravee.suthikulpanit@amd.com>
+ <1565886293-115836-13-git-send-email-suravee.suthikulpanit@amd.com>
 From:   Alexander Graf <graf@amazon.com>
-Message-ID: <1ed5bf9c-177e-b41c-b5ac-4c76155ead2a@amazon.com>
-Date:   Mon, 19 Aug 2019 12:35:59 +0200
+Message-ID: <ac9fa8d4-2c25-52a5-3938-3ce373b3c3e0@amazon.com>
+Date:   Mon, 19 Aug 2019 12:42:31 +0200
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
  Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1565886293-115836-12-git-send-email-suravee.suthikulpanit@amd.com>
+In-Reply-To: <1565886293-115836-13-git-send-email-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.161.244]
-X-ClientProxiedBy: EX13D15UWA003.ant.amazon.com (10.43.160.182) To
+X-Originating-IP: [10.43.162.191]
+X-ClientProxiedBy: EX13D25UWC004.ant.amazon.com (10.43.162.201) To
  EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -69,115 +69,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 15.08.19 18:25, Suthikulpanit, Suravee wrote:
-> AMD AVIC does not support ExtINT. Therefore, AVIC must be temporary
-> deactivated and fall back to using legacy interrupt injection via vINTR
-> and interrupt window.
+> ACK notifiers don't work with AMD SVM w/ AVIC when the PIT interrupt
+> is delivered as edge-triggered fixed interrupt since AMD processors
+> cannot exit on EOI for these interrupts.
+> 
+> Add code to check LAPIC pending EOI before injecting any pending PIT
+> interrupt on AMD SVM when AVIC is activated.
 > 
 > Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 > ---
->   arch/x86/kvm/svm.c | 49 +++++++++++++++++++++++++++++++++++++++++++++----
->   1 file changed, 45 insertions(+), 4 deletions(-)
+>   arch/x86/kvm/i8254.c | 31 +++++++++++++++++++++++++------
+>   1 file changed, 25 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index cfa4b13..4690351 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -384,6 +384,7 @@ struct amd_svm_iommu_ir {
->   static void svm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0);
->   static void svm_flush_tlb(struct kvm_vcpu *vcpu, bool invalidate_gpa);
->   static void svm_complete_interrupts(struct vcpu_svm *svm);
-> +static void svm_request_activate_avic(struct kvm_vcpu *vcpu);
->   static bool svm_get_enable_apicv(struct kvm *kvm);
->   static inline void avic_post_state_restore(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+> index 4a6dc54..31c4a9b 100644
+> --- a/arch/x86/kvm/i8254.c
+> +++ b/arch/x86/kvm/i8254.c
+> @@ -34,10 +34,12 @@
 >   
-> @@ -4494,6 +4495,15 @@ static int interrupt_window_interception(struct vcpu_svm *svm)
->   {
->   	kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
->   	svm_clear_vintr(svm);
-> +
-> +	/*
-> +	 * For AVIC, the only reason to end up here is ExtINTs.
-> +	 * In this case AVIC was temporarily disabled for
-> +	 * requesting the IRQ window and we have to re-enable it.
-> +	 */
-> +	if (svm_get_enable_apicv(svm->vcpu.kvm))
-> +		svm_request_activate_avic(&svm->vcpu);
-
-Would it make sense to add a trace point here and to the other call 
-sites, so that it becomes obvious in a trace when and why exactly avic 
-was active/inactive?
-
-The trace point could add additional information on the why.
-
-> +
->   	svm->vmcb->control.int_ctl &= ~V_IRQ_MASK;
->   	mark_dirty(svm->vmcb, VMCB_INTR);
->   	++svm->vcpu.stat.irq_window_exits;
-> @@ -5181,7 +5191,33 @@ static void svm_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
->   {
+>   #include <linux/kvm_host.h>
+>   #include <linux/slab.h>
+> +#include <asm/virtext.h>
+>   
+>   #include "ioapic.h"
+>   #include "irq.h"
+>   #include "i8254.h"
+> +#include "lapic.h"
+>   #include "x86.h"
+>   
+>   #ifndef CONFIG_X86_64
+> @@ -236,6 +238,12 @@ static void destroy_pit_timer(struct kvm_pit *pit)
+>   	kthread_flush_work(&pit->expired);
 >   }
 >   
-> -/* Note: Currently only used by Hyper-V. */
-> +static bool is_avic_active(struct vcpu_svm *svm)
+> +static inline void kvm_pit_reset_reinject(struct kvm_pit *pit)
 > +{
-> +	return (svm_get_enable_apicv(svm->vcpu.kvm) &&
-> +		svm->vmcb->control.int_ctl & AVIC_ENABLE_MASK);
+> +	atomic_set(&pit->pit_state.pending, 0);
+> +	atomic_set(&pit->pit_state.irq_ack, 1);
 > +}
 > +
-> +static void svm_request_activate_avic(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	if (!lapic_in_kernel(vcpu) || is_avic_active(svm))
-> +		return;
-> +
-> +	kvm_make_apicv_activate_request(vcpu);
-> +}
-> +
-> +static void svm_request_deactivate_avic(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	if (!lapic_in_kernel(vcpu) || !is_avic_active(svm))
-> +		return;
-> +
-> +	/* Request temporary deactivate apicv */
-> +	kvm_make_apicv_deactivate_request(vcpu, false);
-> +}
-> +
->   static void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+>   static void pit_do_work(struct kthread_work *work)
 >   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -5522,9 +5558,6 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
+>   	struct kvm_pit *pit = container_of(work, struct kvm_pit, expired);
+> @@ -244,6 +252,23 @@ static void pit_do_work(struct kthread_work *work)
+>   	int i;
+>   	struct kvm_kpit_state *ps = &pit->pit_state;
 >   
-> -	if (kvm_vcpu_apicv_active(vcpu))
-> -		return;
-> -
->   	/*
->   	 * In case GIF=0 we can't rely on the CPU to tell us when GIF becomes
->   	 * 1, because that's a separate STGI/VMRUN intercept.  The next time we
-> @@ -5534,6 +5567,14 @@ static void enable_irq_window(struct kvm_vcpu *vcpu)
->   	 * window under the assumption that the hardware will set the GIF.
->   	 */
->   	if ((vgif_enabled(svm) || gif_set(svm)) && nested_svm_intr(svm)) {
-> +		/*
-> +		 * IRQ window is not needed when AVIC is enabled,
-> +		 * unless we have pending ExtINT since it cannot be injected
-> +		 * via AVIC. In such case, we need to temporarily disable AVIC,
-> +		 * and fallback to injecting IRQ via V_IRQ.
-> +		 */
-> +		if (kvm_vcpu_apicv_active(vcpu))
-> +			svm_request_deactivate_avic(&svm->vcpu);
+> +	/*
+> +	 * Since, AMD SVM AVIC accelerates write access to APIC EOI
+> +	 * register for edge-trigger interrupts. PIT will not be able
+> +	 * to receive the IRQ ACK notifier and will always be zero.
+> +	 * Therefore, we check if any LAPIC EOI pending for vector 0
+> +	 * and reset irq_ack if no pending.
+> +	 */
+> +	if (cpu_has_svm(NULL) && kvm->arch.apicv_state == APICV_ACTIVATED) {
+> +		int eoi = 0;
+> +
+> +		kvm_for_each_vcpu(i, vcpu, kvm)
+> +			if (kvm_apic_pending_eoi(vcpu, 0))
+> +				eoi++;
+> +		if (!eoi)
+> +			kvm_pit_reset_reinject(pit);
 
-Did you test AVIC with nesting? Did you actually run across this issue 
-there?
+In which case would eoi be != 0 when APIC-V is active?
 
 
 Alex
-
->   		svm_set_vintr(svm);
->   		svm_inject_irq(svm, 0x0);
->   	}
-> 
