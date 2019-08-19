@@ -2,106 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC45C948A4
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:39:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D768948A9
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:41:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727410AbfHSPjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 11:39:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59060 "EHLO mail.kernel.org"
+        id S1727505AbfHSPlZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 11:41:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44922 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726373AbfHSPjH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 11:39:07 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726373AbfHSPlX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 11:41:23 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 665E8206BB;
-        Mon, 19 Aug 2019 15:39:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1566229146;
-        bh=mU4ouJkj7NaS3vquiJ3mn2kEexO3/gSWokZg7nn5uQA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QRXT896qGq/WiHyf17lxsprNRQAfPEOU3Z+5CjXNL2fEnpIDD7ajhOWUK4biSQh33
-         2ijToYzNGWeRrOdqqSLtcBmrSdl9BJssStybtDcjEQR6fHT1uFfB6cz07Uv9ONyRWy
-         ioL0yg4XhRdRVMfY281I2aZx/KgI2/YhO+Z/GTZc=
-Date:   Mon, 19 Aug 2019 16:38:57 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH ARM] selftests, arm64: fix uninitialized symbol in
- tags_test.c
-Message-ID: <20190819153856.odtneqxfxva2wjgu@willie-the-truck>
-References: <00eb8ba84205c59cac01b1b47615116a461c302c.1566220355.git.andreyknvl@google.com>
- <20190819150342.sxk3zzxvrxhkpp6j@willie-the-truck>
- <CAAeHK+xP6HnLJt_RKW67x8nbJLJp5A=av57BfwiFrA88eFn60w@mail.gmail.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id D96546CFC3
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 15:41:22 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id w11so5419544wru.17
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 08:41:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+2urDoQQb7wRsJCEAVPq+MCyS4Og2E5SQlROH1kJHAg=;
+        b=r+LONnVFiP8LGlTtiPinddGmdzglCaojjj35vEfQhzonOPQRPpoXBZOribpKvkJ12j
+         f8FVr9GS+V9Np4yv+d5UErtrnRHJ+ANtXfGP8KD9LuYKKH1A6gCBBG6CszV1vli0JXTE
+         vzWop2vFjSdcBCLHmMkK44EK5i43OB/AMWms2lxdSgUCCg1VSjH4OisE4rQNkblMXb5c
+         lABqbvo/neFl1+lgwNKC8d/ULtVuu7vIAn8gPZ5KpyoxK3fEoalOYRR+KvO4OvFaDOhl
+         d+WrU7jkkeanWjy6YCi9jCvuHPGtJ7iBy2j5/qrO1HoTPTkrI5niD2fvpl8p6YhNNOro
+         XtNw==
+X-Gm-Message-State: APjAAAXAyuV7jfypvsHnFRui10JzNT9RWl5QY+cvdqlsElXC7Va6lwAp
+        kWbUJKRS9AKmJMesZ7lUIbsJggVW6cOmBQa11KymQSqC4SbzR4Nkv8+CABysj8m6MDGnuytByKq
+        YVcdOx7lWUOrD
+X-Received: by 2002:a7b:cbd3:: with SMTP id n19mr16884021wmi.112.1566229281277;
+        Mon, 19 Aug 2019 08:41:21 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxXrtziC4pwiiWc6YsHWf6HCM+IBZ85DkcjdCrraoIwl47e8rYcjXkU8W3v5tXs0TOBf6XFbA==
+X-Received: by 2002:a7b:cbd3:: with SMTP id n19mr16883981wmi.112.1566229280992;
+        Mon, 19 Aug 2019 08:41:20 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f? ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
+        by smtp.gmail.com with ESMTPSA id e15sm7249653wrj.74.2019.08.19.08.41.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2019 08:41:20 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: x86: always expose VIRT_SSBD to guests
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+References: <1565854883-27019-1-git-send-email-pbonzini@redhat.com>
+ <1565854883-27019-3-git-send-email-pbonzini@redhat.com>
+ <20190815171454.GV3908@habkost.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <dadab484-68f8-1588-534b-c2a90c3b7fe4@redhat.com>
+Date:   Mon, 19 Aug 2019 17:41:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+xP6HnLJt_RKW67x8nbJLJp5A=av57BfwiFrA88eFn60w@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20190815171454.GV3908@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 19, 2019 at 05:16:37PM +0200, Andrey Konovalov wrote:
-> On Mon, Aug 19, 2019 at 5:03 PM Will Deacon <will@kernel.org> wrote:
-> >
-> > On Mon, Aug 19, 2019 at 03:14:42PM +0200, Andrey Konovalov wrote:
-> > > Fix tagged_ptr not being initialized when TBI is not enabled.
-> > >
-> > > Dan Carpenter <dan.carpenter@oracle.com>
-> >
-> > Guessing this was Reported-by, or has Dan introduced his own tag now? ;)
+On 15/08/19 19:14, Eduardo Habkost wrote:
+> On Thu, Aug 15, 2019 at 09:41:23AM +0200, Paolo Bonzini wrote:
+>> Even though it is preferrable to use SPEC_CTRL (represented by
+>> X86_FEATURE_AMD_SSBD) instead of VIRT_SPEC, VIRT_SPEC is always
+>> supported anyway because otherwise it would be impossible to
+>> migrate from old to new CPUs.  Make this apparent in the
+>> result of KVM_GET_SUPPORTED_CPUID as well.
+>>
+>> Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+>> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  arch/x86/kvm/cpuid.c | 10 ++++++----
+>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 145ec050d45d..5865bc73bbb5 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -747,11 +747,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>>  		entry->ebx &= kvm_cpuid_8000_0008_ebx_x86_features;
+>>  		cpuid_mask(&entry->ebx, CPUID_8000_0008_EBX);
+>>  		/*
+>> -		 * The preference is to use SPEC CTRL MSR instead of the
+>> -		 * VIRT_SPEC MSR.
+>> +		 * VIRT_SPEC is only implemented for AMD processors,
+>> +		 * but the host could set AMD_SSBD if it wanted even
+>> +		 * for Intel processors.
+>>  		 */
+>> -		if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) &&
+>> -		    !boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>> +		if ((boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+>> +		     boot_cpu_has(X86_FEATURE_AMD_SSBD)) &&
+>> +		    boot_cpu_has(X86_FEATURE_SVM))
 > 
-> Oops, yes, Reported-by :)
-> 
-> >
-> > Got a link to the report?
-> 
-> https://www.spinics.net/lists/linux-kselftest/msg09446.html
+> Would it be desirable to move this code to
+> svm_set_supported_cpuid(), or is there a reason for keeping this
+> in cpuid.c?
 
-Thanks, I'll fix up the commit message and push this out later on. If you
-get a chance, would you be able to look at the pending changes from
-Catalin[1], please?
+Yes, of course.  Forgot about it.
 
-Will
+Paolo
 
-[1] https://lkml.kernel.org/r/20190815154403.16473-1-catalin.marinas@arm.com
