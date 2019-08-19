@@ -2,90 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E35E992821
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:15:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F98D92828
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2019 17:16:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726769AbfHSPPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 11:15:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:4403 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725536AbfHSPPA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 11:15:00 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AFDB02A09C3
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 15:14:59 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id g5so89640wmh.1
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 08:14:59 -0700 (PDT)
+        id S1727600AbfHSPQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 11:16:50 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38461 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727086AbfHSPQu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 11:16:50 -0400
+Received: by mail-pl1-f194.google.com with SMTP id m12so1117186plt.5
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 08:16:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GlFmsxpfwLpG5XFQZcDJGrUJIAXAnOONymKIPYeVWy4=;
+        b=GASLs+yZnKXgCHGknNLNo71e6UtRt515EbzdpWYm/Hpg75x/UubNKrVS4Ph4uPK+8D
+         Ti+bZvb7RwZ8Rgn5diZiCZOC7bC9H+dTrKcVTPMW/pFv9U1AucjO/hRKCCkTBhzRIaU3
+         D9sPMjOcAkw+sn0WiouQhRmANU/HoJXNnBPivxMzU2mCd+1bqEU622XIt7CtOkyBUScf
+         CddY5regO8tRNMImraZP3DECenQ45DhILnBAxk2TuQ3iyHoyjpEbXWuF3zSR6z/Z8e3z
+         D8kAaqFBdLd66b1BOwiK9p1SMntN4cI0JAUQgHjwyJ5ye9BNp3phuuPzg6paxdjmOKUJ
+         Bduw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=C7SoejRWRuHJ6BGslNq0HYAXwiWp4/65kEvpnkCVews=;
-        b=Z8Fwn/XqHkvjBibZDQ4/DF5wLMA6hQkt5IF2V9jeZYfRnEaxNiUAN9zhK7QGWTMTQc
-         fZLbmeUHafpHnHi7EShPYj2OlVe974i0oA2Bw/ugaG4DtCl8bP5XgldakBcsnJaaWegw
-         PjxIt2Bl3iH5HGDrZKf7VvQtbD5sAjRINtCC8zEzIkwxU4ZCiKTREkSGNAns+FfXtBm/
-         jZf2v2gmNH0C+2JNoNHXBmMpVEhLoAtcDmx/VlZ5Eez9xY3I2rCsmx6RqMqFwPV1IOVM
-         gFOq/8489XqP1BAD0LbEK8YuVh6Vruy9fe2kCRF+LJ5MN+N39F8grFs7yUJDFHs3GuKz
-         4KLA==
-X-Gm-Message-State: APjAAAWXS+iyweUrqw5lQcIe/II68lQPmufbqgXYmPIoUAEpcoYwtq2K
-        fiZYJliarjDSk3NwhgE24iuYP4r8PVfUsUzekzJ4GFM6Jkb5BOm1GNeSPXuBQP5TKLLGpkdNjgy
-        yJwPQV/ePcY+W
-X-Received: by 2002:a05:6000:4f:: with SMTP id k15mr27459828wrx.221.1566227698368;
-        Mon, 19 Aug 2019 08:14:58 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy9RZQLbX5VJkCPpbScttbojZgMXP2p2KsS260Ym4OCGfKaJxFH1bWjHnvJt9xyKMxddzVfVA==
-X-Received: by 2002:a05:6000:4f:: with SMTP id k15mr27459793wrx.221.1566227698083;
-        Mon, 19 Aug 2019 08:14:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8033:56b6:f047:ba4f? ([2001:b07:6468:f312:8033:56b6:f047:ba4f])
-        by smtp.gmail.com with ESMTPSA id g14sm29413407wrb.38.2019.08.19.08.14.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Aug 2019 08:14:57 -0700 (PDT)
-Subject: Re: [PATCH RESEND v4 5/9] KVM: VMX: Add init/set/get functions for
- SPP
-To:     Yang Weijiang <weijiang.yang@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        yu.c.zhang@intel.com, alazar@bitdefender.com
-References: <20190814070403.6588-1-weijiang.yang@intel.com>
- <20190814070403.6588-6-weijiang.yang@intel.com>
- <87a7cbapdw.fsf@vitty.brq.redhat.com>
- <20190815134329.GA11449@local-michael-cet-test>
- <CALMp9eTGXDDfVspFwFyEhagg9sdnqZqzSQhDksT0bkKzVNGSqw@mail.gmail.com>
- <20190815163844.GD27076@linux.intel.com>
- <20190816133130.GA14380@local-michael-cet-test.sh.intel.com>
- <CALMp9eRDhbxkFNqY-+GOMtfg+guafdKcCNq1OJt9UgnyFVvSGw@mail.gmail.com>
- <20190819020829.GA27450@local-michael-cet-test>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e9a269d8-b410-2489-aaa3-24b487ffd1e2@redhat.com>
-Date:   Mon, 19 Aug 2019 17:15:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GlFmsxpfwLpG5XFQZcDJGrUJIAXAnOONymKIPYeVWy4=;
+        b=e6Cj81QRRXeOSOJ6luevthmD1bQRy+mVr7WXF0H8U6ilZcFd3e7GaZRU16wA09GVJ+
+         wMmPSJVvW2wJAdTbqQBQZ4XKldR5sIeBp5Us9HI76Cn0ce52zTQhQcrAPzCmGaY583Aw
+         MCwFUNM2Q4da1ZR1fcjhagmmRdF+2FQac+OXCTIi7l1BzEGA4vSX0Rq8UEOv1Tly0V2z
+         gVjpdZT8L674hNdog3wi6/HFqIVrCb+PTlLLnfGMbFZC3PCgmK0VopF7ZY6tJZXAbjif
+         C1NOIrcnbh7Ku/x5F9n6ikcv+KunniN7Y8hqHvgv1HwReUZDy2nEqo+COsjLJbVv/Qbq
+         z9ew==
+X-Gm-Message-State: APjAAAWnfop5gOvhCHwbW5AKW3x8m9JJAaDTHfuFZAqZ4D9CgI1FFDCL
+        xiipJEosJSEHLfOmcSvCO/AS6IDcJ/T8eHJW8Yc5TA==
+X-Google-Smtp-Source: APXvYqxAVYv/X47htv2GfhrYLw10pOmVgC147AdMR4amTTESkgYjtOO9fvfN54mImyUI3YtolKb0GRqZDtWypE7Vt8Q=
+X-Received: by 2002:a17:902:ab96:: with SMTP id f22mr23622721plr.147.1566227808825;
+ Mon, 19 Aug 2019 08:16:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190819020829.GA27450@local-michael-cet-test>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <00eb8ba84205c59cac01b1b47615116a461c302c.1566220355.git.andreyknvl@google.com>
+ <20190819150342.sxk3zzxvrxhkpp6j@willie-the-truck>
+In-Reply-To: <20190819150342.sxk3zzxvrxhkpp6j@willie-the-truck>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Mon, 19 Aug 2019 17:16:37 +0200
+Message-ID: <CAAeHK+xP6HnLJt_RKW67x8nbJLJp5A=av57BfwiFrA88eFn60w@mail.gmail.com>
+Subject: Re: [PATCH ARM] selftests, arm64: fix uninitialized symbol in tags_test.c
+To:     Will Deacon <will@kernel.org>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/08/19 04:08, Yang Weijiang wrote:
->> KVM_GET_NESTED_STATE has the requested information. If
->> data.vmx.vmxon_pa is anything other than -1, then the vCPU is in VMX
->> operation. If (flags & KVM_STATE_NESTED_GUEST_MODE), then L2 is
->> active.
-> Thanks Jim, I'll reference the code and make necessary change in next
-> SPP patch release.
+On Mon, Aug 19, 2019 at 5:03 PM Will Deacon <will@kernel.org> wrote:
+>
+> On Mon, Aug 19, 2019 at 03:14:42PM +0200, Andrey Konovalov wrote:
+> > Fix tagged_ptr not being initialized when TBI is not enabled.
+> >
+> > Dan Carpenter <dan.carpenter@oracle.com>
+>
+> Guessing this was Reported-by, or has Dan introduced his own tag now? ;)
 
-Since SPP will not be used very much in the beginning, it would be
-simplest to enable it only if nested==0.
+Oops, yes, Reported-by :)
 
-Paolo
+>
+> Got a link to the report?
+
+https://www.spinics.net/lists/linux-kselftest/msg09446.html
+
+>
+> Will
