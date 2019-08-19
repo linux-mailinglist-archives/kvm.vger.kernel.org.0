@@ -2,171 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 472DE9510A
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 00:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B53095175
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 01:05:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728499AbfHSWo2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 18:44:28 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54400 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728532AbfHSWo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 18:44:27 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7JMi2iC195245
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 22:44:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=IicR5m0csDRmanowDiAwkbhNpjtPmu0dEBWE8obYDyo=;
- b=nIAimbNxkY0HVXNRPuq/X0Ejo/UZvlLrPa0ORsu7IcwYq9go819mrCboGNyD8RU0EyV2
- QSJ+mo7Dq/LJ3YwNvgz4UlFWrSOB5XhoeZLy+A3IwBbFKkQJK0qOfdbe1tHXLB3vZXqD
- 0xx3p8VK9df6HTUGA/2POO1aWDfWBW4x/G4bo/M8UlAGR8DwTYlWTcb1JFRxhj8jYgig
- K5X+cCis2FXZG6VlAR+ZNybE8wCdmmdjh/IXxCBddxCWwviS8MNvWdp5zDUy6sqqWrCe
- aE+LhowSHAQn4aLfwtNHoYlqVM/3ndOxOearAJhFshEbNXenzaUsA5CWos6BW7x4SNzH GA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2uea7qjaar-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 22:44:26 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7JMhVIs137723
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 22:44:26 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2ug267w72w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 22:44:26 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7JMiPdf011074
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 22:44:25 GMT
-Received: from [192.168.14.112] (/79.176.245.100)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 19 Aug 2019 15:44:25 -0700
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 2/2] KVM: nVMX: Check guest activity state on vmentry of
- nested guests
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190819214650.41991-3-nikita.leshchenko@oracle.com>
-Date:   Tue, 20 Aug 2019 01:44:21 +0300
-Cc:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <1227879D-AD99-4EC3-9400-95517729189B@oracle.com>
-References: <20190819214650.41991-1-nikita.leshchenko@oracle.com>
- <20190819214650.41991-3-nikita.leshchenko@oracle.com>
-To:     Nikita Leshenko <nikita.leshchenko@oracle.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9354 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908190225
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9354 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908190226
+        id S1729006AbfHSXEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 19:04:31 -0400
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:35401 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728894AbfHSXE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 19:04:29 -0400
+Received: by mail-pl1-f201.google.com with SMTP id s21so2841457plr.2
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 16:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=yvso1VMUv5HDW/FWRWW4aLcQc7dQhn5xX7myTuMzxOM=;
+        b=Vj3S26QuOjsxQcqWZv2x1d1sJe1SuGuBsGjkgram6TdMUJOBdkigrttT8pumAYozyX
+         cbZOjPfub6CCO9zMBScmBZdDQBxaPkinjmvSpAEJot73Ty883i1IRvl52wcCm+EoBmM4
+         9np7OFo65LbNf1yybsZPcctyKC7N+WkjTavobcwpw/ClTqmgyi2unvGp+6fn6DQa7di4
+         qXFzK4YsQ1J37H2pK7x0FSVakMvvQ8QWh2gRoNefui+YKAsSgNe/71/FHkdFJGnKLrtx
+         W9I3RPv/H+8tdgzCJJBOe7Qb1eCn3BUB2Yvlz3tt5Dv64LN7+xkF4vzqMM2pZZLL9vhO
+         KnLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=yvso1VMUv5HDW/FWRWW4aLcQc7dQhn5xX7myTuMzxOM=;
+        b=ODaZKLM/7oE+msN7XgRVWcIQLErKiSAG8ctgfPkC8pOiKj8jMEQwczn+xI/AF4Qd0z
+         g10nXg9KxXAx0vuo7nJ6hYGc3EEegxY5u1XjWBNwwcePdeNR+8wrvFh3E6rIQC5ApCVU
+         0oa/7qoOLEg7d6xizVkLY4ZPvhUJJTjXd3YrM/bLjIOsknpKM/q0IDT25Tr1z1hQaguK
+         pXnPmZ8ma9DYHyCPhG5MWXEDP7L0SilqWp2ACcMyzhSm6BRkjRK6zenQnT7obJwjJQ26
+         n2poZtrbvAoj6Ur/47QGxz2Fsw3aki2Sn54xf9JxBQ9Wu6Dm8sZfTLjZqOCGMaEhtqhM
+         U/JQ==
+X-Gm-Message-State: APjAAAV59mTfbRz703Sc4Pj0pPdBvU+/v7HDSWq/5pYegL+1yS52eKO/
+        BgzA8YYmf/ZT8fMuwziISbX9U6zmww==
+X-Google-Smtp-Source: APXvYqz17SfaxDarP4cPp/OzAe0kryC+XSYGBc2IGWqxdB/hJbMYggEGwLNS58HQu2HNj1UTKQ39ZjcXZQ==
+X-Received: by 2002:a63:6888:: with SMTP id d130mr21122501pgc.197.1566255868467;
+ Mon, 19 Aug 2019 16:04:28 -0700 (PDT)
+Date:   Mon, 19 Aug 2019 16:04:22 -0700
+Message-Id: <20190819230422.244888-1-delco@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.rc1.153.gdeed80330f-goog
+Subject: [PATCH] KVM: lapic: restart counter on change to periodic mode
+From:   Matt delco <delco@google.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com
+Cc:     kvm@vger.kernel.org, Matt Delco <delco@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Matt Delco <delco@google.com>
 
+Time seems to eventually stop in a Windows VM when using Skype.
+Instrumentation shows that the OS is frequently switching the APIC
+timer between one-shot and periodic mode.  The OS is typically writing
+to both LVTT and TMICT.  When time stops the sequence observed is that
+the APIC was in one-shot mode, the timer expired, and the OS writes to
+LVTT (but not TMICT) to change to periodic mode.  No future timer events
+are received by the OS since the timer is only re-armed on TMICT writes.
 
-> On 20 Aug 2019, at 0:46, Nikita Leshenko =
-<nikita.leshchenko@oracle.com> wrote:
->=20
-> The checks are written in the same order and structure as they appear =
-in "SDM
-> 26.3.1.5 - Checks on Guest Non-Register State", to ease verification.
->=20
-> Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> ---
-> arch/x86/kvm/vmx/nested.c | 24 ++++++++++++++++++++++++
-> arch/x86/kvm/vmx/vmcs.h   | 13 +++++++++++++
-> 2 files changed, 37 insertions(+)
->=20
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 24734946ec75..e2ee217f8ffe 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2666,10 +2666,34 @@ static int =
-nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
->  */
-> static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
-> {
-> +	/* Activity state must contain supported value */
-> 	if (vmcs12->guest_activity_state !=3D GUEST_ACTIVITY_ACTIVE &&
-> 	    vmcs12->guest_activity_state !=3D GUEST_ACTIVITY_HLT)
-> 		return -EINVAL;
->=20
-> +	/* Must not be HLT if SS DPL is not 0 */
-> +	if (VMX_AR_DPL(vmcs12->guest_ss_ar_bytes) !=3D 0 &&
-> +	    vmcs12->guest_activity_state =3D=3D GUEST_ACTIVITY_HLT)
-> +		return -EINVAL;
-> +
-> +	/* Must be active if blocking by MOV-SS or STI */
-> +	if ((vmcs12->guest_interruptibility_info &
-> +	    (GUEST_INTR_STATE_MOV_SS | GUEST_INTR_STATE_STI)) &&
-> +	    vmcs12->guest_activity_state !=3D GUEST_ACTIVITY_ACTIVE)
-> +		return -EINVAL;
-> +
-> +	/* In HLT, only some interruptions are allowed */
-> +	if (vmcs12->vm_entry_intr_info_field & INTR_INFO_VALID_MASK &&
-> +	    vmcs12->guest_activity_state =3D=3D GUEST_ACTIVITY_HLT) {
-> +		u32 intr_info =3D vmcs12->vm_entry_intr_info_field;
-> +		if (!is_ext_interrupt(intr_info) &&
-> +		    !is_nmi(intr_info) &&
-> +		    !is_debug(intr_info) &&
-> +		    !is_machine_check(intr_info) &&
-> +		    !is_mtf(intr_info))
-> +		    return -EINVAL;
-> +	}
-> +
-> 	return 0;
-> }
->=20
-> diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-> index cb6079f8a227..c5577c40b19d 100644
-> --- a/arch/x86/kvm/vmx/vmcs.h
-> +++ b/arch/x86/kvm/vmx/vmcs.h
-> @@ -102,6 +102,13 @@ static inline bool is_machine_check(u32 =
-intr_info)
-> 		(INTR_TYPE_HARD_EXCEPTION | MC_VECTOR | =
-INTR_INFO_VALID_MASK);
-> }
->=20
-> +static inline bool is_mtf(u32 intr_info)
-> +{
-> +	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | =
-INTR_INFO_VECTOR_MASK |
-> +			     INTR_INFO_VALID_MASK)) =3D=3D
-> +		(INTR_TYPE_OTHER_EVENT | 0 | INTR_INFO_VALID_MASK);
-> +}
-> +
-> /* Undocumented: icebp/int1 */
-> static inline bool is_icebp(u32 intr_info)
-> {
-> @@ -115,6 +122,12 @@ static inline bool is_nmi(u32 intr_info)
-> 		=3D=3D (INTR_TYPE_NMI_INTR | INTR_INFO_VALID_MASK);
-> }
->=20
-> +static inline bool is_ext_interrupt(u32 intr_info)
-> +{
-> +	return (intr_info & (INTR_INFO_INTR_TYPE_MASK | =
-INTR_INFO_VALID_MASK))
-> +		=3D=3D (INTR_TYPE_EXT_INTR | INTR_INFO_VALID_MASK);
-> +}
+With this change time continues to advance in the VM.  TBD if physical
+hardware will reset the current count if/when the mode is changed to
+period and the current count is zero.
 
-is_external_intr() already exists. You should just use that.
+Signed-off-by: Matt Delco <delco@google.com>
+---
+ arch/x86/kvm/lapic.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-> +
-> enum vmcs_field_width {
-> 	VMCS_FIELD_WIDTH_U16 =3D 0,
-> 	VMCS_FIELD_WIDTH_U64 =3D 1,
-> --=20
-> 2.20.1
->=20
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 685d17c11461..fddd810eeca5 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ 
+ 		break;
+ 
+-	case APIC_LVTT:
++	case APIC_LVTT: {
++		u32 timer_mode = apic->lapic_timer.timer_mode;
+ 		if (!kvm_apic_sw_enabled(apic))
+ 			val |= APIC_LVT_MASKED;
+ 		val &= (apic_lvt_mask[0] | apic->lapic_timer.timer_mode_mask);
+ 		kvm_lapic_set_reg(apic, APIC_LVTT, val);
+ 		apic_update_lvtt(apic);
++		if (timer_mode == APIC_LVT_TIMER_ONESHOT &&
++		    apic_lvtt_period(apic) &&
++		    !hrtimer_active(&apic->lapic_timer.timer))
++			start_apic_timer(apic);
+ 		break;
+-
++	}
+ 	case APIC_TMICT:
+ 		if (apic_lvtt_tscdeadline(apic))
+ 			break;
+-- 
+2.23.0.rc1.153.gdeed80330f-goog
 
