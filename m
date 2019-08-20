@@ -2,105 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 763339582A
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 09:20:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C3AC95894
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 09:34:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729215AbfHTHUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 03:20:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39010 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726049AbfHTHUe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Aug 2019 03:20:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DD731300BEAD;
-        Tue, 20 Aug 2019 07:20:33 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-60.ams2.redhat.com [10.36.116.60])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2783C608A7;
-        Tue, 20 Aug 2019 07:20:31 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 6338716E2D; Tue, 20 Aug 2019 09:20:30 +0200 (CEST)
-Date:   Tue, 20 Aug 2019 09:20:30 +0200
-From:   "kraxel@redhat.com" <kraxel@redhat.com>
-To:     "Zhang, Tina" <tina.zhang@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
-Subject: Re: [PATCH v5 2/6] vfio: Introduce vGPU display irq type
-Message-ID: <20190820072030.kgjjiysxgs3yj25j@sirius.home.kraxel.org>
-References: <20190816023528.30210-1-tina.zhang@intel.com>
- <20190816023528.30210-3-tina.zhang@intel.com>
- <20190816145148.307408dc@x1.home>
- <237F54289DF84E4997F34151298ABEBC876F9AD3@SHSMSX101.ccr.corp.intel.com>
+        id S1729240AbfHTHed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 03:34:33 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:36284 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729194AbfHTHed (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 03:34:33 -0400
+Received: by mail-io1-f68.google.com with SMTP id o9so10167038iom.3
+        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 00:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sORZs5CqkehDSSjYN2DpG+xZQJMOSuCMbbQp0iKYGJo=;
+        b=LpSUZVzIsQFAdHJUuO5WDCqH5xGbIzzK1Vm7h3U+KSPVUQSifSGSog8rLQTWFBqW1z
+         s5Q9kOWkAlncwiCnk41wFwhASD+HoAgIZao/daNMpg8cg2km9Y+N3RfO0Exvw+Ljnt+v
+         Y2aGe8YxwopUi8zvbckQySfdyH21dZv2lwZ0Yt4R1x72YIMiJ8ljPmzVvsbMd7ZO8hl5
+         1slkPzheDrmq1nyASfj6gCdzuo0r26PB+TDjE4L0cpzV3eGvsEB7WNPuUtiFpjVx2TEM
+         HVmk4ULEu3rDAHZUW4n9JrPo44h2YOinBxkrsdQ4D87fngFiIFTAPfiSIq+ndpn3fmnH
+         3r5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sORZs5CqkehDSSjYN2DpG+xZQJMOSuCMbbQp0iKYGJo=;
+        b=jRS9Dce6naXBVHWiROb7K7OeNyLQIEufWPo/vPpuEtgQN6xndlhwUVQZ/wHicb/2bh
+         zUnfJpGhv7ArK9WQUhRriZi+/0kkz9CI9g5fasA1To3NMev5UvgixddaqBfxmewQxP3f
+         pA7hkKhCavX2cy1VfKmdtXLk29bD2/4DJMSYIxL04Y6QNGYd+bmfe+0TE6dU9aHLxVez
+         kLPRbzbarE8vD18PGiKVTIuitoFSrtu9pssu+50BuLZrPnAJ54+gRHuI+GdLWAglvrZW
+         QX46XWMF2pGzPUICp6E6Bebl3mlqdtgoiqKksMwqhL/JeGDGN5+A2e5ghBLHP3/53EIQ
+         KjVg==
+X-Gm-Message-State: APjAAAUwx/P6i2Uh9PKWnFeZmB9RozlMMmjjLPfoEZTz4n9gX+pvVkPa
+        MNNDZgQn38rBsT+A+xUCsYKQoSBJ0gXpOwananJy/A==
+X-Google-Smtp-Source: APXvYqyNZWUCNM+nTj/mw/bNEUrZsIlwXfmqRM9aCQImN8FONR7U8McG0MkdyThWK2gDLrUh2sTUO28Fh6K+o4ANim0=
+X-Received: by 2002:a02:b713:: with SMTP id g19mr2249813jam.77.1566286471913;
+ Tue, 20 Aug 2019 00:34:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <237F54289DF84E4997F34151298ABEBC876F9AD3@SHSMSX101.ccr.corp.intel.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 20 Aug 2019 07:20:33 +0000 (UTC)
+References: <20190819230422.244888-1-delco@google.com> <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
+ <20190820003700.GH1916@linux.intel.com> <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
+ <20190820015641.GK1916@linux.intel.com> <74C7BC03-99CA-4213-8327-B8D23E3B22AB@gmail.com>
+ <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
+In-Reply-To: <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
+From:   Matt Delco <delco@google.com>
+Date:   Tue, 20 Aug 2019 00:34:20 -0700
+Message-ID: <CAHGX9Vr4HsVowENg8CS9pVWMr2n58H_tJqDX823oAHL++L8yHA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Nadav Amit <nadav.amit@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > +#define VFIO_IRQ_TYPE_GFX				(1)
-> > > +/*
-> > > + * vGPU vendor sub-type
-> > > + * vGPU device display related interrupts e.g. vblank/pageflip  */
-> > > +#define VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ		(1)
-> > 
-> > If this is a GFX/DISPLAY IRQ, why are we talking about a "vGPU" in the
-> > description?  It's not specific to a vGPU implementation, right?  Is this
-> > related to a physical display or a virtual display?  If it's related to the GFX
-> > PLANE ioctls, it should state that.  It's not well specified what this interrupt
-> > signals.  Is it vblank?  Is it pageflip?
-> > Is it both?  Neither?  Something else?
-> 
-> Sorry for the confusion caused here. 
-> 
-> The original idea here was to use VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ to
-> notify user space with the display refresh event. The display refresh
-> event is general. When notified, user space can use
-> VFIO_DEVICE_QUERY_GFX_PLANE and VFIO_DEVICE_GET_GFX_DMABUF to get the
-> updated framebuffer, instead of polling them all the time.
-> 
-> In order to give user space more choice to do the optimization,
-> vfio_irq_info_cap_display_plane_events is proposed to tell user space
-> the different plane refresh event values. So when notified by
-> VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ, user space can get the value of the
-> eventfd counter and understand which plane the event refresh event
-> comes from and choose to get the framebuffer on that plane instead of
-> all the planes.
-> 
-> So, from the VFIO user point of view, there is only the display
-> refresh event (i.e. no other events like vblank, pageflip ...). For
-> GTV-g, this display refresh event is implemented by both vblank and
-> pageflip, which is only the implementation thing and can be
-> transparent to the user space. Again sorry about the confusion cased
-> here, I'll correct the comments in the next version.
+On Mon, Aug 19, 2019 at 10:09 PM Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> On Tue, 20 Aug 2019 at 12:10, Nadav Amit <nadav.amit@gmail.com> wrote:
+> >
+> > > On Aug 19, 2019, at 6:56 PM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+> > >
+> > > +Cc Nadav
+> > >
+> > > On Mon, Aug 19, 2019 at 06:07:01PM -0700, Matt Delco wrote:
+> > >> On Mon, Aug 19, 2019 at 5:37 PM Sean Christopherson <
+> > >> sean.j.christopherson@intel.com> wrote:
+> > >>
+> > >>> On Tue, Aug 20, 2019 at 01:42:37AM +0200, Paolo Bonzini wrote:
+> > >>>> On 20/08/19 01:04, Matt delco wrote:
+> > >>>>> From: Matt Delco <delco@google.com>
+> > >>>>>
+> > >>>>> Time seems to eventually stop in a Windows VM when using Skype.
+> > >>>>> Instrumentation shows that the OS is frequently switching the APIC
+> > >>>>> timer between one-shot and periodic mode.  The OS is typically writing
+> > >>>>> to both LVTT and TMICT.  When time stops the sequence observed is that
+> > >>>>> the APIC was in one-shot mode, the timer expired, and the OS writes to
+> > >>>>> LVTT (but not TMICT) to change to periodic mode.  No future timer
+> > >>> events
+> > >>>>> are received by the OS since the timer is only re-armed on TMICT
+> > >>> writes.
+> > >>>>> With this change time continues to advance in the VM.  TBD if physical
+> > >>>>> hardware will reset the current count if/when the mode is changed to
+> > >>>>> period and the current count is zero.
+> > >>>>>
+> > >>>>> Signed-off-by: Matt Delco <delco@google.com>
+> > >>>>> ---
+> > >>>>> arch/x86/kvm/lapic.c | 9 +++++++--
+> > >>>>> 1 file changed, 7 insertions(+), 2 deletions(-)
+> > >>>>>
+> > >>>>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > >>>>> index 685d17c11461..fddd810eeca5 100644
+> > >>>>> --- a/arch/x86/kvm/lapic.c
+> > >>>>> +++ b/arch/x86/kvm/lapic.c
+> > >>>>> @@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic
+> > >>> *apic, u32 reg, u32 val)
+> > >>>>>            break;
+> > >>>>>
+> > >>>>> -   case APIC_LVTT:
+> > >>>>> +   case APIC_LVTT: {
+> > >>>>> +           u32 timer_mode = apic->lapic_timer.timer_mode;
+> > >>>>>            if (!kvm_apic_sw_enabled(apic))
+> > >>>>>                    val |= APIC_LVT_MASKED;
+> > >>>>>            val &= (apic_lvt_mask[0] |
+> > >>> apic->lapic_timer.timer_mode_mask);
+> > >>>>>            kvm_lapic_set_reg(apic, APIC_LVTT, val);
+> > >>>>>            apic_update_lvtt(apic);
+> > >>>>> +           if (timer_mode == APIC_LVT_TIMER_ONESHOT &&
+> > >>>>> +               apic_lvtt_period(apic) &&
+> > >>>>> +               !hrtimer_active(&apic->lapic_timer.timer))
+> > >>>>> +                   start_apic_timer(apic);
+> > >>>>
+> > >>>> Still, this needs some more explanation.  Can you cover this, as well as
+> > >>>> the oneshot->periodic transition, in kvm-unit-tests' x86/apic.c
+> > >>>> testcase?  Then we could try running it on bare metal and see what
+> > >>> happens.
+> > >>
+> > >> I looked at apic.c and test_apic_change_mode() might already be testing
+> > >> this.  It sets oneshot & TMICT, waits for the current value to get
+> > >> half-way, changes the mode to periodic, and then tries to test that the
+> > >> value wraps back to the upper half.  It then waits again for the half-way
+> > >> point, changes the mode back to oneshot, and waits for zero.  After
+> > >> reaching zero it does:
+> > >>
+> > >> /* now tmcct == 0 and tmict != 0 */
+> > >> apic_change_mode(APIC_LVT_TIMER_PERIODIC);
+> > >> report("TMCCT should stay at zero", !apic_read(APIC_TMCCT));
+> > >>
+> > >> which seems to be testing that oneshot->periodic won't reset the timer if
+> > >> it's already zero.  A possible caveat is there's hardly any delay between
+> > >> the mode change and the timer read.  Emulated hardware will react
+> > >> instantaneously (at least as seen from within the VM), but hardware might
+> > >> need more time to react (though offhand I'd expect HW to be fast enough for
+> > >> this particular timer).
+> > >>
+> > >> So, it looks like the code might already be ready to run on physical
+> > >> hardware, and if it has (or does already as part of a regular test), then
+> > >> that does raise some doubt on what's the appropriate code change to make
+> > >> this work.
+> > >
+> > > Nadav has been running tests on bare metal, maybe he can weigh in on
+> > > whether or not test_apic_change_mode() passes on bare metal.
+> >
+> > These tests pass on bare-metal.
+>
+> Good to know this. In addition, in linux apic driver, during mode
+> switch __setup_APIC_LVTT() always sets lapic_timer_period(number of
+> clock cycles per jiffy)/APIC_DIVISOR to APIC_TMICT which can avoid the
+> issue Matt report. So is it because there is no such stuff in windows
+> or the windows version which Matt testing is too old?
 
-All this should be explained in a comment for the IRQ in the header file.
-
-Key point for the API is that (a) this is a "the display should be
-updated" event and (b) this covers all display updates, i.e. user space
-can stop the display update timer and fully depend on getting
-notifications if an update is needed.
-
-That GTV-g watches guest pageflips is an implementation detail.  Should
-nvidia support this they will probably do something completely
-different.  As far I know they render the guest display to some
-framebuffer at something like 10fps, so it would make sense for them to
-send an event each time they refreshed the framebuffer.
-
-Also note the relationships (cur_event_val is for DRM_PLANE_TYPE_CURSOR
-updates and pri_event_val for DRM_PLANE_TYPE_PRIMARY).
-
-cheers,
-  Gerd
-
+I'm using Windows 10 (May 2019). Multimedia apps on Windows tend to
+request higher frequency clocks, and this in turn can affect how the
+kernel configures HW timers.  I may need to examine how Windows
+typically interacts with the APIC timer and see if/how this changes
+when Skype is used.  The frequent timer mode changes are not something
+I'd expect a reasonably behaved kernel to do.
