@@ -2,133 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FBA3965EA
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 18:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E61679666C
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 18:31:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730346AbfHTQI3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 12:08:29 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:46969 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726981AbfHTQI2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Aug 2019 12:08:28 -0400
-Received: by mail-pl1-f195.google.com with SMTP id c2so2977668plz.13;
-        Tue, 20 Aug 2019 09:08:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=97QLXB8lHOGizWTCYqqOiIcONI9R+7mpmxz57KY9Srs=;
-        b=uP2JVhuMxV1h0sXuG8TvQSUvyglb+0aQSIs3DUtLpW5eW8SrbAiR2xrYLRnYY15NRj
-         q7D/4D25J8LlBz/C6RnMsXOsi13b2VaTivIQv0xUgPTDdqRtI1/gbHWsU45W5t960JkX
-         ER6IrkJKwIuuKomSFKipX7E8Pu8BN6Hvjx1HRbTbD4YpQyvsye3ZuhvFQGiuDkoin46H
-         7yLryJOOI5i3bfMei8EQoDk1b9GcBZCGbzn1B468uhFxvtJoCzQ5uA3v7LzGzS6EyG1d
-         nYOhHMr72jZUhvPxGgFoV2NWDh6cgV+MOa6cfqVowYpRB28/bylUGpZuGRr1fxx05AGB
-         4EPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=97QLXB8lHOGizWTCYqqOiIcONI9R+7mpmxz57KY9Srs=;
-        b=bl1U0Xe5OFZU1BRBETpzqsrQRJKjAR23r17oo6GBDRrAWtrLgLRwJFu9KWxdShVMr6
-         GVYy8XLyjFW/5qyMIrKQ4iLk1UfgzQdTdAmgnsyHwDQ136bqA1bn5noFnBbHQVvu11cK
-         ZLx5AGWOGJDRmMEBV2LltDI90DJ7LJrsK7M5S6XjSlvHzDGKy/bbRFBvEVJNbFaDe/a/
-         IijIX/uYcCVvH3teAlhMQNCKMCpvh2Tg1vr2sVCSXkgqzl01r5fUsEk6x/yj0Fd86Mkg
-         xcXDiQNqSsUYhZtt1XTlwk/Cg11svvsttD53bNZv9ucmj4ZtVB/5UTBnO9s+xGau94h/
-         Ssbw==
-X-Gm-Message-State: APjAAAVWfTM2azao3UFW85htD2rsUhOhn1opvir+5P7koC1VyAJIHHU9
-        /PVdz+p6lSlLW6TgyeWlT0E=
-X-Google-Smtp-Source: APXvYqzms0bu0DnDtue04LyAMdXTKPIxc6JwRX9Jlbp2qQDU1kFArb7iW/pVQapNCXXK1A+YofHCdw==
-X-Received: by 2002:a17:902:2f05:: with SMTP id s5mr29240623plb.170.1566317308032;
-        Tue, 20 Aug 2019 09:08:28 -0700 (PDT)
-Received: from bharath12345-Inspiron-5559 ([103.110.42.36])
-        by smtp.gmail.com with ESMTPSA id e13sm21986232pff.181.2019.08.20.09.08.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Aug 2019 09:08:27 -0700 (PDT)
-Date:   Tue, 20 Aug 2019 21:38:22 +0530
-From:   Bharath Vedartham <linux.bhar@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        khalid.aziz@oracle.com
-Subject: Re: [Question-kvm] Can hva_to_pfn_fast be executed in interrupt
- context?
-Message-ID: <20190820160821.GA5153@bharath12345-Inspiron-5559>
-References: <20190813191435.GB10228@bharath12345-Inspiron-5559>
- <54182261-88a4-9970-1c3c-8402e130dcda@redhat.com>
- <20190815171834.GA14342@bharath12345-Inspiron-5559>
- <CABgObfbQOS28cG_9Ca_2OXbLmDy_hwUkuqPnzJG5=FZ5sEYGfA@mail.gmail.com>
+        id S1730489AbfHTQbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 12:31:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39198 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730033AbfHTQbO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 12:31:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E68BEC057F2E;
+        Tue, 20 Aug 2019 16:31:13 +0000 (UTC)
+Received: from gondolin (ovpn-116-201.ams2.redhat.com [10.36.116.201])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 301329CC9;
+        Tue, 20 Aug 2019 16:31:08 +0000 (UTC)
+Date:   Tue, 20 Aug 2019 18:31:06 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     Christophe de Dinechin <christophe.de.dinechin@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        cjia <cjia@nvidia.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+Message-ID: <20190820183106.1680d0d9.cohuck@redhat.com>
+In-Reply-To: <AM0PR05MB4866EBB51F7019F2E3D9918CD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20190802065905.45239-1-parav@mellanox.com>
+        <77ffb1f8-e050-fdf5-e306-0a81614f7a88@nvidia.com>
+        <AM0PR05MB4866993536C0C8ACEA2F92DBD1D20@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190813085246.1d642ae5@x1.home>
+        <AM0PR05MB48663579A340E6597B3D01BCD1D20@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190813111149.027c6a3c@x1.home>
+        <AM0PR05MB4866D40F8EBB382C78193C91D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190814100135.1f60aa42.cohuck@redhat.com>
+        <AM0PR05MB4866ABFDDD9DDCBC01F6CA90D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190814150911.296da78c.cohuck@redhat.com>
+        <AM0PR05MB48666CCDFE985A25F42A0259D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190814085746.26b5f2a3@x1.home>
+        <AM0PR05MB4866148ABA3C4E48E73E95FCD1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <AM0PR05MB48668B6221E477A873688CDBD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <m1o90kduow.fsf@dinechin.org>
+        <AM0PR05MB4866EBB51F7019F2E3D9918CD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfbQOS28cG_9Ca_2OXbLmDy_hwUkuqPnzJG5=FZ5sEYGfA@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 20 Aug 2019 16:31:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 08:26:43PM +0200, Paolo Bonzini wrote:
-> Oh, I see. Sorry I didn't understand the question. In the case of KVM,
-> there's simply no code that runs in interrupt context and needs to use
-> virtual addresses.
-> 
-> In fact, there's no code that runs in interrupt context at all. The only
-> code that deals with host interrupts in a virtualization host is in VFIO,
-> but all it needs to do is signal an eventfd.
-> 
-> Paolo
-Great, answers my question. Thank you for your time.
+On Tue, 20 Aug 2019 11:25:05 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
-Thank you
-Bharath
+> > -----Original Message-----
+> > From: Christophe de Dinechin <christophe.de.dinechin@gmail.com>
+> > Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+> > 
+> > 
+> > Parav Pandit writes:
+> >   
+> > > + Dave.
+> > >
+> > > Hi Jiri, Dave, Alex, Kirti, Cornelia,
+> > >
+> > > Please provide your feedback on it, how shall we proceed?
+> > >
+> > > Hence, I would like to discuss below options.
+> > >
+> > > Option-1: mdev index
+> > > Introduce an optional mdev index/handle as u32 during mdev create time.
+> > > User passes mdev index/handle as input.
+> > >
+> > > phys_port_name=mIndex=m%u
+> > > mdev_index will be available in sysfs as mdev attribute for udev to name the  
+> > mdev's netdev.  
+> > >
+> > > example mdev create command:
+> > > UUID=$(uuidgen)
+> > > echo $UUID index=10 >
+> > > /sys/class/net/ens2f0/mdev_supported_types/mlx5_core_mdev/create
+> > > example netdevs:
+> > > repnetdev=ens2f0_m10	/*ens2f0 is parent PF's netdevice */
+> > > mdev_netdev=enm10
+> > >
+> > > Pros:
+> > > 1. mdevctl and any other existing tools are unaffected.
+> > > 2. netdev stack, ovs and other switching platforms are unaffected.
+> > > 3. achieves unique phys_port_name for representor netdev 4. achieves
+> > > unique mdev eth netdev name for the mdev using udev/systemd extension.
+> > > 5. Aligns well with mdev and netdev subsystem and similar to existing sriov  
+> > bdf's.  
+> > >
+> > > Option-2: shorter mdev name
+> > > Extend mdev to have shorter mdev device name in addition to UUID.
+> > > such as 'foo', 'bar'.
+> > > Mdev will continue to have UUID.
+
+I fail to understand how 'uses uuid' and 'allow shorter device name'
+are supposed to play together?
+
+> > > phys_port_name=mdev_name
+> > >
+> > > Pros:
+> > > 1. All same as option-1, except mdevctl needs upgrade for newer usage.
+> > > It is common practice to upgrade iproute2 package along with the kernel.
+> > > Similar practice to be done with mdevctl.
+> > > 2. Newer users of mdevctl who wants to work with non_UUID names, will use  
+> > newer mdevctl/tools.  
+> > > Cons:
+> > > 1. Dual naming scheme of mdev might affect some of the existing tools.
+> > > It's unclear how/if it actually affects.
+> > > mdevctl [2] is very recently developed and can be enhanced for dual naming  
+> > scheme.  
+
+The main problem is not tools we know about (i.e. mdevctl), but those we
+don't know about.
+
+IOW, this (and the IFNAMESIZ change, which seems even worse) are the
+options I would not want at all.
+
+> > >
+> > > Option-3: mdev uuid alias
+> > > Instead of shorter mdev name or mdev index, have alpha-numeric name  
+> > alias.  
+> > > Alias is an optional mdev sysfs attribute such as 'foo', 'bar'.
+> > > example mdev create command:
+> > > UUID=$(uuidgen)
+> > > echo $UUID alias=foo >
+> > > /sys/class/net/ens2f0/mdev_supported_types/mlx5_core_mdev/create
+> > > example netdevs:
+> > > examle netdevs:
+> > > repnetdev = ens2f0_mfoo
+> > > mdev_netdev=enmfoo
+> > >
+> > > Pros:
+> > > 1. All same as option-1.
+> > > 2. Doesn't affect existing mdev naming scheme.
+> > > Cons:
+> > > 1. Index scheme of option-1 is better which can number large number of  
+> > mdevs with fewer characters, simplifying the management tool.
+> > 
+> > I believe that Alex pointed out another "Cons" to all three options, which is that
+> > it forces user-space to resolve potential race conditions when creating an index
+> > or short name or alias.
+> >   
+> This race condition exists for at least two subsystems that I know of, i.e. netdev and rdma.
+> If a device with a given name exists, subsystem returns error.
+> When user space gets error code EEXIST, and it can picks up different identifier(s).
+
+If you decouple device creation and setting the alias/index, you make
+the issue visible and thus much more manageable.
+
 > 
-> Il gio 15 ago 2019, 19:18 Bharath Vedartham <linux.bhar@gmail.com> ha
-> scritto:
-> 
-> > On Tue, Aug 13, 2019 at 10:17:09PM +0200, Paolo Bonzini wrote:
-> > > On 13/08/19 21:14, Bharath Vedartham wrote:
-> > > > Hi all,
-> > > >
-> > > > I was looking at the function hva_to_pfn_fast(in virt/kvm/kvm_main)
-> > which is
-> > > > executed in an atomic context(even in non-atomic context, since
-> > > > hva_to_pfn_fast is much faster than hva_to_pfn_slow).
-> > > >
-> > > > My question is can this be executed in an interrupt context?
-> > >
-> > > No, it cannot for the reason you mention below.
-> > >
-> > > Paolo
-> > hmm.. Well I expected the answer to be kvm specific.
-> > Because I observed a similar use-case for a driver (sgi-gru) where
-> > we want to retrive the physical address of a virtual address. This was
-> > done in atomic and non-atomic context similar to hva_to_pfn_fast and
-> > hva_to_pfn_slow. __get_user_pages_fast(for atomic case)
-> > would not work as the driver could execute in interrupt context.
-> >
-> > The driver manually walked the page tables to handle this issue.
-> >
-> > Since kvm is a widely used piece of code, I asked this question to know
-> > how kvm handled this issue.
-> >
-> > Thank you for your time.
-> >
-> > Thank you
-> > Bharath
-> > > > The motivation for this question is that in an interrupt context, we
-> > cannot
-> > > > assume "current" to be the task_struct of the process of interest.
-> > > > __get_user_pages_fast assume current->mm when walking the process page
-> > > > tables.
-> > > >
-> > > > So if this function hva_to_pfn_fast can be executed in an
-> > > > interrupt context, it would not be safe to retrive the pfn with
-> > > > __get_user_pages_fast.
-> > > >
-> > > > Thoughts on this?
-> > > >
-> > > > Thank you
-> > > > Bharath
-> > > >
-> > >
-> >
+> > Also, what happens if `index=10` is not provided on the command-line?
+> > Does that make the device unusable for your purpose?  
+> Yes, it is unusable to an extent.
+> Currently we have DEVLINK_PORT_FLAVOUR_PCI_VF in include/uapi/linux/devlink.h
+> Similar to it, we need to have DEVLINK_PORT_FLAVOUR_MDEV for mdev eswitch ports.
+> This port flavour needs to generate phys_port_name(). This should be user parameter driven.
+> Because representor netdevice name is generated based on this parameter.
+
+I'm also unsure how the extra parameter is supposed to work; writing it
+to the create attribute does not sound right.
+
+mdevctl supports setting additional parameters on an already created
+device (see the examples provided for vfio-ap), so going that route
+would actually work out of the box from the tooling side.
+
+What you would need is some kind of synchronization/locking to make
+sure that you only link up to the other device after the extra
+attribute has been set and that you don't allow to change it as long as
+it is associated with the other side. I do not know enough about the
+actual devices to suggest something here; if you need userspace
+cooperation, maybe uevents would be an option.
