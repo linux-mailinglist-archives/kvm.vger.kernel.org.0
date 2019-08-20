@@ -2,132 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2A0A95727
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 08:14:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38BEF957CE
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 09:04:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729208AbfHTGOC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 02:14:02 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:45652 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728777AbfHTGOC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Aug 2019 02:14:02 -0400
-Received: by mail-pg1-f193.google.com with SMTP id o13so2575954pgp.12;
-        Mon, 19 Aug 2019 23:14:01 -0700 (PDT)
+        id S1729207AbfHTHE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 03:04:27 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:38429 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728657AbfHTHE1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 03:04:27 -0400
+Received: by mail-ot1-f67.google.com with SMTP id r20so4100038ota.5;
+        Tue, 20 Aug 2019 00:04:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=mhB3UhKa2apbmILstVtC2PuBpKp+KIhCo43t5hvhotg=;
-        b=qCrE+7Gv+siL4APdA5TNSgsXbN8MDTadgi8WtA9BzoUSsgHRYilJOs8fJvNB9Ei0KT
-         WitL6q4cCiwUx3de5plYEsnKBcS5MW6CHclZIaJNdrcZF+BrGB5j4gatGs+7ZNW4c3Cp
-         yDT4+SJMw/ZcYoitRjlz3Q8HnrVP6UUrMKVb0CRWGW21ee+MXjrv4MVwp/gMrIt55BZW
-         PFnxMVEIIYa+0vvtSmhJl49Tzvs8ITIGHwW4IE8KL6etlIQzQHnT8kH0l+EW4tLIAFOm
-         IVyWcnQhRbYenh2Jox0+d45itZDeb8uiFOiUwpU/Y14rgIYXPfRt7N7LPo34cjJp/n1D
-         WazQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=k3Y+XVnvt7AU2ChE57m9qKA8qYR/u8KnDS7/D3UW/i8=;
+        b=MSyMxEDmu1xQEQx3124prJwr4JdGq2H8W7B48jktxsNQnPT6bD8qXsv0Tok2UvLD1W
+         Q42m23DCoxd51MypkIBVcTkxPZsW+g9LJpqN8x6rqV0SeAAaH0Jq6WP51nqP6nWb5rWS
+         1raP2Rn0zpkErnXrGzOm9WeaLVmPkOKBuw8siG+MOS5yo91EJjSu8U0cStknC+mo2sAO
+         rdKPGMqoR/wKV1QIwS/lDh17NZtrf9ZXT2M+HkIKqxZgRwE9DVsrCup+i2X8zXisA3xA
+         A51aqdjRhxw7hUL2JTfrl12KF2cqDtfS6abm0uZMIfOSOaxDCagcU7JY1OUIzfzbEPrO
+         AaDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=mhB3UhKa2apbmILstVtC2PuBpKp+KIhCo43t5hvhotg=;
-        b=GoMn920+ZPsDoe+A6gi7ynvdYW969Qy/sOAwiTfPja9hUNTR+NACqEvMdeKMrq04eA
-         FTgiKoKp5phPExFog1dQVMrCz9f1btuOv1Vct2WSjU9/gKRzYP/SVrO2DbqZsgOD9zOV
-         5FljvpAgBavzfN84mVdZe5jK1WmjOQx+e4dL+In5Ronl4EsUKcVn6iYGw8FYAwJdopbW
-         uOWsGl3WCnQ06b86A9OEJXF+KTFOc9Qg7JEcxEkUJ3ji/iAeZil1WkHUL5RKKxU63xwk
-         LcdONblNa7Gp0f/i0YjpXONJDjIoEPcH8p64IjeKwp422fic+niQR3YSXplJ/HtBaOIn
-         BUow==
-X-Gm-Message-State: APjAAAVL18dkCSSA3HRJ7M4SyoVHRolJJQzwJsEQ96+0oB+JO3gMYXOH
-        W58eAnLqe2C/WyhcDAcrNJIyBba1
-X-Google-Smtp-Source: APXvYqwnE1DCcQVDEpP87tHqgAuQNly7+QuZ9z1c9GXF4bR0TCPwj2dU6DdIERh2C5MBaeGgjrl+dQ==
-X-Received: by 2002:aa7:93cc:: with SMTP id y12mr24691671pff.246.1566281641237;
-        Mon, 19 Aug 2019 23:14:01 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id y13sm10276581pfb.48.2019.08.19.23.13.59
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 19 Aug 2019 23:14:00 -0700 (PDT)
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     paulus@ozlabs.org, kvm@vger.kernel.org,
-        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Subject: [PATCH] KVM: PPC: Book3S HV: Define usage types for rmap array in guest memslot
-Date:   Tue, 20 Aug 2019 16:13:49 +1000
-Message-Id: <20190820061349.28995-1-sjitindarsingh@gmail.com>
-X-Mailer: git-send-email 2.13.6
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=k3Y+XVnvt7AU2ChE57m9qKA8qYR/u8KnDS7/D3UW/i8=;
+        b=q72knGYQgFSspErPRd1f92EKPpGnGGweZeMLoBVKREkYqXrZdag+aPPNt3EJtsEaQx
+         k+ucbwnSheDEoRDqf1acodIjCAFbr1sPALBPIqpXAdqDC08tg8nhD5H825PdjbDy7GYf
+         4K/AmMXCjPPM5UsCUTNowDqa4F2m75GOlZFDuiHCHFscCzOJkNPLxfjIrnJOsin2c0Kn
+         c55gsS9KyiR10o5W0dW8TARti6Xz5L32ROy36SVFltf62XOobEqtKphfWtncu6Yqjdqg
+         41pM3usZqxeaN7pHh1mQxu0971hcTGPZh5t+VNEYq1kztZTyvRhF2xB0TPjt8mwrbZ3E
+         +L8A==
+X-Gm-Message-State: APjAAAU+ZL933L61rf+6RnwLZSZOBSrfuPMPDJ2w2TDxML8eisHtDBk6
+        OY8q2tqXN2lDm7llj2wTDMr7CWhJPF/UrdRgToE=
+X-Google-Smtp-Source: APXvYqwh2RLHYfC/r3CQ5ANL6XPMrctZkkd1kU4tgIF2w9uJaOw61hzE0NHEecCsclPkWpxjBr5OeSiWhK0KkpXOZa4=
+X-Received: by 2002:a9d:674c:: with SMTP id w12mr17479137otm.118.1566284665544;
+ Tue, 20 Aug 2019 00:04:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180130013919.GA19959@hori1.linux.bs1.fc.nec.co.jp>
+ <1517284444-18149-1-git-send-email-n-horiguchi@ah.jp.nec.com>
+ <87inbbjx2w.fsf@e105922-lin.cambridge.arm.com> <20180207011455.GA15214@hori1.linux.bs1.fc.nec.co.jp>
+ <87fu6bfytm.fsf@e105922-lin.cambridge.arm.com> <20180208121749.0ac09af2b5a143106f339f55@linux-foundation.org>
+ <87wozhvc49.fsf@concordia.ellerman.id.au> <e673f38a-9e5f-21f6-421b-b3cb4ff02e91@oracle.com>
+ <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
+ <f79d828c-b0b4-8a20-c316-a13430cfb13c@oracle.com> <20190610235045.GB30991@hori.linux.bs1.fc.nec.co.jp>
+In-Reply-To: <20190610235045.GB30991@hori.linux.bs1.fc.nec.co.jp>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 20 Aug 2019 15:03:55 +0800
+Message-ID: <CANRm+CwwPv52k7pWiErYwFHV=_6kCdiyXZkT3QT6ef_UJagt9A@mail.gmail.com>
+Subject: Re: [PATCH v2] mm: hwpoison: disable memory error handling on 1GB hugepage
+To:     Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+Cc:     Mike Kravetz <mike.kravetz@oracle.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Punit Agrawal <punit.agrawal@arm.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Xiao Guangrong <xiaoguangrong@tencent.com>,
+        "lidongchen@tencent.com" <lidongchen@tencent.com>,
+        "yongkaiwu@tencent.com" <yongkaiwu@tencent.com>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        Hugh Dickins <hughd@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The rmap array in the guest memslot is an array of size number of guest
-pages, allocated at memslot creation time. Each rmap entry in this array
-is used to store information about the guest page to which it
-corresponds. For example for a hpt guest it is used to store a lock bit,
-rc bits, a present bit and the index of a hpt entry in the guest hpt
-which maps this page. For a radix guest which is running nested guests
-it is used to store a pointer to a linked list of nested rmap entries
-which store the nested guest physical address which maps this guest
-address and for which there is a pte in the shadow page table.
+Cc Mel Gorman, Kirill, Dave Hansen,
+On Tue, 11 Jun 2019 at 07:51, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com> wrote:
+>
+> On Wed, May 29, 2019 at 04:31:01PM -0700, Mike Kravetz wrote:
+> > On 5/28/19 2:49 AM, Wanpeng Li wrote:
+> > > Cc Paolo,
+> > > Hi all,
+> > > On Wed, 14 Feb 2018 at 06:34, Mike Kravetz <mike.kravetz@oracle.com> wrote:
+> > >>
+> > >> On 02/12/2018 06:48 PM, Michael Ellerman wrote:
+> > >>> Andrew Morton <akpm@linux-foundation.org> writes:
+> > >>>
+> > >>>> On Thu, 08 Feb 2018 12:30:45 +0000 Punit Agrawal <punit.agrawal@arm.com> wrote:
+> > >>>>
+> > >>>>>>
+> > >>>>>> So I don't think that the above test result means that errors are properly
+> > >>>>>> handled, and the proposed patch should help for arm64.
+> > >>>>>
+> > >>>>> Although, the deviation of pud_huge() avoids a kernel crash the code
+> > >>>>> would be easier to maintain and reason about if arm64 helpers are
+> > >>>>> consistent with expectations by core code.
+> > >>>>>
+> > >>>>> I'll look to update the arm64 helpers once this patch gets merged. But
+> > >>>>> it would be helpful if there was a clear expression of semantics for
+> > >>>>> pud_huge() for various cases. Is there any version that can be used as
+> > >>>>> reference?
+> > >>>>
+> > >>>> Is that an ack or tested-by?
+> > >>>>
+> > >>>> Mike keeps plaintively asking the powerpc developers to take a look,
+> > >>>> but they remain steadfastly in hiding.
+> > >>>
+> > >>> Cc'ing linuxppc-dev is always a good idea :)
+> > >>>
+> > >>
+> > >> Thanks Michael,
+> > >>
+> > >> I was mostly concerned about use cases for soft/hard offline of huge pages
+> > >> larger than PMD_SIZE on powerpc.  I know that powerpc supports PGD_SIZE
+> > >> huge pages, and soft/hard offline support was specifically added for this.
+> > >> See, 94310cbcaa3c "mm/madvise: enable (soft|hard) offline of HugeTLB pages
+> > >> at PGD level"
+> > >>
+> > >> This patch will disable that functionality.  So, at a minimum this is a
+> > >> 'heads up'.  If there are actual use cases that depend on this, then more
+> > >> work/discussions will need to happen.  From the e-mail thread on PGD_SIZE
+> > >> support, I can not tell if there is a real use case or this is just a
+> > >> 'nice to have'.
+> > >
+> > > 1GB hugetlbfs pages are used by DPDK and VMs in cloud deployment, we
+> > > encounter gup_pud_range() panic several times in product environment.
+> > > Is there any plan to reenable and fix arch codes?
+> >
+> > I too am aware of slightly more interest in 1G huge pages.  Suspect that as
+> > Intel MMU capacity increases to handle more TLB entries there will be more
+> > and more interest.
+> >
+> > Personally, I am not looking at this issue.  Perhaps Naoya will comment as
+> > he know most about this code.
+>
+> Thanks for forwarding this to me, I'm feeling that memory error handling
+> on 1GB hugepage is demanded as real use case.
+>
+> >
+> > > In addition, https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kvm/mmu.c#n3213
+> > > The memory in guest can be 1GB/2MB/4K, though the host-backed memory
+> > > are 1GB hugetlbfs pages, after above PUD panic is fixed,
+> > > try_to_unmap() which is called in MCA recovery path will mark the PUD
+> > > hwpoison entry. The guest will vmexit and retry endlessly when
+> > > accessing any memory in the guest which is backed by this 1GB poisoned
+> > > hugetlbfs page. We have a plan to split this 1GB hugetblfs page by 2MB
+> > > hugetlbfs pages/4KB pages, maybe file remap to a virtual address range
+> > > which is 2MB/4KB page granularity, also split the KVM MMU 1GB SPTE
+> > > into 2MB/4KB and mark the offensive SPTE w/ a hwpoison flag, a sigbus
+> > > will be delivered to VM at page fault next time for the offensive
+> > > SPTE. Is this proposal acceptable?
+> >
+> > I am not sure of the error handling design, but this does sound reasonable.
+>
+> I agree that that's better.
+>
+> > That block of code which potentially dissolves a huge page on memory error
+> > is hard to understand and I'm not sure if that is even the 'normal'
+> > functionality.  Certainly, we would hate to waste/poison an entire 1G page
+> > for an error on a small subsection.
+>
+> Yes, that's not practical, so we need at first establish the code base for
+> 2GB hugetlb splitting and then extending it to 1GB next.
 
-As there are currently two uses for the rmap array, and the potential
-for this to expand to more in the future, define a type field (being the
-top 8 bits of the rmap entry) to be used to define the type of the rmap
-entry which is currently present and define two values for this field
-for the two current uses of the rmap array.
+I found it is not easy to split. There is a unique hugetlb page size
+that is associated with a mounted hugetlbfs filesystem, file remap to
+2MB/4KB will break this. How about hard offline 1GB hugetlb page as
+what has already done in soft offline, replace the corrupted 1GB page
+by new 1GB page through page migration, the offending/corrupted area
+in the original 1GB page doesn't need to be copied into the new page,
+the offending/corrupted area in new page can keep full zero just as it
+is clear during hugetlb page fault, other sub-pages of the original
+1GB page can be freed to buddy system. The sigbus signal is sent to
+userspace w/ offending/corrupted virtual address, and signal code,
+userspace should take care this.
 
-Since the nested case uses the rmap entry to store a pointer, define
-this type as having the two high bits set as is expected for a pointer.
-Define the hpt entry type as having bit 56 set (bit 7 IBM bit ordering).
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- arch/powerpc/include/asm/kvm_host.h | 22 ++++++++++++++++++----
- arch/powerpc/kvm/book3s_hv_rm_mmu.c |  2 +-
- 2 files changed, 19 insertions(+), 5 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index e6e5f59aaa97..6fb5fb4779e0 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -232,11 +232,25 @@ struct revmap_entry {
- };
- 
- /*
-- * We use the top bit of each memslot->arch.rmap entry as a lock bit,
-- * and bit 32 as a present flag.  The bottom 32 bits are the
-- * index in the guest HPT of a HPTE that points to the page.
-+ * The rmap array of size number of guest pages is allocated for each memslot.
-+ * This array is used to store usage specific information about the guest page.
-+ * Below are the encodings of the various possible usage types.
-  */
--#define KVMPPC_RMAP_LOCK_BIT	63
-+/* Free bits which can be used to define a new usage */
-+#define KVMPPC_RMAP_TYPE_MASK	0xff00000000000000
-+#define KVMPPC_RMAP_NESTED	0xc000000000000000	/* Nested rmap array */
-+#define KVMPPC_RMAP_HPT		0x0100000000000000	/* HPT guest */
-+
-+/*
-+ * rmap usage definition for a hash page table (hpt) guest:
-+ * 0x0000080000000000	Lock bit
-+ * 0x0000018000000000	RC bits
-+ * 0x0000000100000000	Present bit
-+ * 0x00000000ffffffff	HPT index bits
-+ * The bottom 32 bits are the index in the guest HPT of a HPTE that points to
-+ * the page.
-+ */
-+#define KVMPPC_RMAP_LOCK_BIT	43
- #define KVMPPC_RMAP_RC_SHIFT	32
- #define KVMPPC_RMAP_REFERENCED	(HPTE_R_R << KVMPPC_RMAP_RC_SHIFT)
- #define KVMPPC_RMAP_PRESENT	0x100000000ul
-diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-index 63e0ce91e29d..7186c65c61c9 100644
---- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-+++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-@@ -99,7 +99,7 @@ void kvmppc_add_revmap_chain(struct kvm *kvm, struct revmap_entry *rev,
- 	} else {
- 		rev->forw = rev->back = pte_index;
- 		*rmap = (*rmap & ~KVMPPC_RMAP_INDEX) |
--			pte_index | KVMPPC_RMAP_PRESENT;
-+			pte_index | KVMPPC_RMAP_PRESENT | KVMPPC_RMAP_HPT;
- 	}
- 	unlock_rmap(rmap);
- }
--- 
-2.13.6
-
+Regards,
+Wanpeng Li
