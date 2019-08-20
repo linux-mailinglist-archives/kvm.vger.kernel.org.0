@@ -2,125 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 381D2953E7
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 03:56:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 859A095414
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 04:12:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728859AbfHTB4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 21:56:43 -0400
-Received: from mga09.intel.com ([134.134.136.24]:62032 "EHLO mga09.intel.com"
+        id S1728838AbfHTCMP convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 19 Aug 2019 22:12:15 -0400
+Received: from mga04.intel.com ([192.55.52.120]:56067 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728719AbfHTB4n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 21:56:43 -0400
-X-Amp-Result: UNSCANNABLE
+        id S1728627AbfHTCMO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 22:12:14 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 18:56:42 -0700
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 19:12:14 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,407,1559545200"; 
-   d="scan'208";a="195662061"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 19 Aug 2019 18:56:41 -0700
-Date:   Mon, 19 Aug 2019 18:56:41 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Matt Delco <delco@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
-Message-ID: <20190820015641.GK1916@linux.intel.com>
-References: <20190819230422.244888-1-delco@google.com>
- <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
- <20190820003700.GH1916@linux.intel.com>
- <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
+   d="scan'208";a="183045244"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga006.jf.intel.com with ESMTP; 19 Aug 2019 19:12:13 -0700
+Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 19 Aug 2019 19:12:13 -0700
+Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
+ FMSMSX114.amr.corp.intel.com (10.18.116.8) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 19 Aug 2019 19:12:12 -0700
+Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.80]) by
+ SHSMSX107.ccr.corp.intel.com ([169.254.9.65]) with mapi id 14.03.0439.000;
+ Tue, 20 Aug 2019 10:12:11 +0800
+From:   "Zhang, Tina" <tina.zhang@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
+Subject: RE: [PATCH v5 2/6] vfio: Introduce vGPU display irq type
+Thread-Topic: [PATCH v5 2/6] vfio: Introduce vGPU display irq type
+Thread-Index: AQHVU9tUpO+/ySaKfEaxbwCEdeDfRab9uwQAgAWEU9A=
+Date:   Tue, 20 Aug 2019 02:12:10 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC876F9AD3@SHSMSX101.ccr.corp.intel.com>
+References: <20190816023528.30210-1-tina.zhang@intel.com>
+        <20190816023528.30210-3-tina.zhang@intel.com>
+ <20190816145148.307408dc@x1.home>
+In-Reply-To: <20190816145148.307408dc@x1.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTNmZWI2YzMtZDBhNy00ZmFhLTlmZGItMGY2YmQzMDQ3YjIxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoieENzdFN2UVk0WVo3cmtzTGIzNit3bEV5eVQrTzNObkdPZ05VS1lVMFZcL1hud0k1Z3diQkJSUXVVbFZSYUhcL0pVIn0=
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Cc Nadav
 
-On Mon, Aug 19, 2019 at 06:07:01PM -0700, Matt Delco wrote:
-> On Mon, Aug 19, 2019 at 5:37 PM Sean Christopherson <
-> sean.j.christopherson@intel.com> wrote:
+
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Saturday, August 17, 2019 4:52 AM
+> To: Zhang, Tina <tina.zhang@intel.com>
+> Cc: intel-gvt-dev@lists.freedesktop.org; kraxel@redhat.com;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; Yuan, Hang
+> <hang.yuan@intel.com>; Lv, Zhiyuan <zhiyuan.lv@intel.com>
+> Subject: Re: [PATCH v5 2/6] vfio: Introduce vGPU display irq type
 > 
-> > On Tue, Aug 20, 2019 at 01:42:37AM +0200, Paolo Bonzini wrote:
-> > > On 20/08/19 01:04, Matt delco wrote:
-> > > > From: Matt Delco <delco@google.com>
-> > > >
-> > > > Time seems to eventually stop in a Windows VM when using Skype.
-> > > > Instrumentation shows that the OS is frequently switching the APIC
-> > > > timer between one-shot and periodic mode.  The OS is typically writing
-> > > > to both LVTT and TMICT.  When time stops the sequence observed is that
-> > > > the APIC was in one-shot mode, the timer expired, and the OS writes to
-> > > > LVTT (but not TMICT) to change to periodic mode.  No future timer
-> > events
-> > > > are received by the OS since the timer is only re-armed on TMICT
-> > writes.
-> > > >
-> > > > With this change time continues to advance in the VM.  TBD if physical
-> > > > hardware will reset the current count if/when the mode is changed to
-> > > > period and the current count is zero.
-> > > >
-> > > > Signed-off-by: Matt Delco <delco@google.com>
-> > > > ---
-> > > >  arch/x86/kvm/lapic.c | 9 +++++++--
-> > > >  1 file changed, 7 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > > index 685d17c11461..fddd810eeca5 100644
-> > > > --- a/arch/x86/kvm/lapic.c
-> > > > +++ b/arch/x86/kvm/lapic.c
-> > > > @@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic
-> > *apic, u32 reg, u32 val)
-> > > >
-> > > >             break;
-> > > >
-> > > > -   case APIC_LVTT:
-> > > > +   case APIC_LVTT: {
-> > > > +           u32 timer_mode = apic->lapic_timer.timer_mode;
-> > > >             if (!kvm_apic_sw_enabled(apic))
-> > > >                     val |= APIC_LVT_MASKED;
-> > > >             val &= (apic_lvt_mask[0] |
-> > apic->lapic_timer.timer_mode_mask);
-> > > >             kvm_lapic_set_reg(apic, APIC_LVTT, val);
-> > > >             apic_update_lvtt(apic);
-> > > > +           if (timer_mode == APIC_LVT_TIMER_ONESHOT &&
-> > > > +               apic_lvtt_period(apic) &&
-> > > > +               !hrtimer_active(&apic->lapic_timer.timer))
-> > > > +                   start_apic_timer(apic);
-> > >
-> > > Still, this needs some more explanation.  Can you cover this, as well as
-> > > the oneshot->periodic transition, in kvm-unit-tests' x86/apic.c
-> > > testcase?  Then we could try running it on bare metal and see what
-> > happens.
+> On Fri, 16 Aug 2019 10:35:24 +0800
+> Tina Zhang <tina.zhang@intel.com> wrote:
+> 
+> > Introduce vGPU specific irq type VFIO_IRQ_TYPE_GFX, and
+> > VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ as the subtype for vGPU display.
 > >
+> > Introduce vfio_irq_info_cap_display_plane_events capability to notify
+> > user space with the vGPU's plane update events
+> >
+> > v2:
+> > - Add VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ description. (Alex & Kechen)
+> > - Introduce vfio_irq_info_cap_display_plane_events. (Gerd & Alex)
+> >
+> > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+> > ---
+> >  include/uapi/linux/vfio.h | 21 +++++++++++++++++++++
+> >  1 file changed, 21 insertions(+)
+> >
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index d83c9f136a5b..21ac69f0e1a9 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -465,6 +465,27 @@ struct vfio_irq_info_cap_type {
+> >  	__u32 subtype;  /* type specific */
+> >  };
+> >
+> > +#define VFIO_IRQ_TYPE_GFX				(1)
+> > +/*
+> > + * vGPU vendor sub-type
+> > + * vGPU device display related interrupts e.g. vblank/pageflip  */
+> > +#define VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ		(1)
 > 
-> I looked at apic.c and test_apic_change_mode() might already be testing
-> this.  It sets oneshot & TMICT, waits for the current value to get
-> half-way, changes the mode to periodic, and then tries to test that the
-> value wraps back to the upper half.  It then waits again for the half-way
-> point, changes the mode back to oneshot, and waits for zero.  After
-> reaching zero it does:
-> 
-> /* now tmcct == 0 and tmict != 0 */
-> apic_change_mode(APIC_LVT_TIMER_PERIODIC);
-> report("TMCCT should stay at zero", !apic_read(APIC_TMCCT));
-> 
-> which seems to be testing that oneshot->periodic won't reset the timer if
-> it's already zero.  A possible caveat is there's hardly any delay between
-> the mode change and the timer read.  Emulated hardware will react
-> instantaneously (at least as seen from within the VM), but hardware might
-> need more time to react (though offhand I'd expect HW to be fast enough for
-> this particular timer).
-> 
-> So, it looks like the code might already be ready to run on physical
-> hardware, and if it has (or does already as part of a regular test), then
-> that does raise some doubt on what's the appropriate code change to make
-> this work.
+> If this is a GFX/DISPLAY IRQ, why are we talking about a "vGPU" in the
+> description?  It's not specific to a vGPU implementation, right?  Is this
+> related to a physical display or a virtual display?  If it's related to the GFX
+> PLANE ioctls, it should state that.  It's not well specified what this interrupt
+> signals.  Is it vblank?  Is it pageflip?
+> Is it both?  Neither?  Something else?
 
-Nadav has been running tests on bare metal, maybe he can weigh in on
-whether or not test_apic_change_mode() passes on bare metal.
+Sorry for the confusion caused here. 
+
+The original idea here was to use VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ to notify user space with the display refresh event. The display refresh event is general. When notified, user space can use VFIO_DEVICE_QUERY_GFX_PLANE and VFIO_DEVICE_GET_GFX_DMABUF to get the updated framebuffer, instead of polling them all the time.
+
+In order to give user space more choice to do the optimization, vfio_irq_info_cap_display_plane_events is proposed to tell user space the different plane refresh event values. So when notified by VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ, user space can get the value of the eventfd counter and understand which plane the event refresh event comes from and choose to get the framebuffer on that plane instead of all the planes.
+
+So, from the VFIO user point of view, there is only the display refresh event (i.e. no other events like vblank, pageflip ...). For GTV-g, this display refresh event is implemented by both vblank and pageflip, which is only the implementation thing and can be transparent to the user space. Again sorry about the confusion cased here, I'll correct the comments in the next version.
+
+BTW, IIRC, we might also have one question waiting to be replied:
+- Can we just use VFIO_IRQ_TYPE_GFX w/o proposing a new sub type (i.e. VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ)?
+    Well, only if we can agree on that we don't have any other GFX IRQ requirements in future. Otherwise, we might need a sub type to differentiate them.
+
+Thanks.
+
+BR,
+Tina
+> 
+> > +
+> > +/*
+> > + * Display capability of using one eventfd to notify user space with
+> > +the
+> > + * vGPU's plane update events.
+> > + * cur_event_val: eventfd value stands for cursor plane change event.
+> > + * pri_event_val: eventfd value stands for primary plane change event.
+> > + */
+> > +#define VFIO_IRQ_INFO_CAP_DISPLAY	4
+> > +
+> > +struct vfio_irq_info_cap_display_plane_events {
+> > +	struct vfio_info_cap_header header;
+> > +	__u64 cur_event_val;
+> > +	__u64 pri_event_val;
+> > +};
+> 
+> Again, what display?  Does this reference a GFX plane?  The event_val data is
+> not well specified, examples might be necessary.  They seem to be used as a
+> flag bit, so should we simply define a bit index for the flag rather than a u64
+> value?  Where are the actual events per plane defined?
+> 
+> I'm not sure this patch shouldn't be rolled back into 1, I couldn't find the
+> previous discussion that triggered it to be separate.  Perhaps simply for
+> sharing with the work Eric is doing?  If so, that's fine, but maybe make note
+> of it in the cover letter.  Thanks,
+> 
+> Alex
