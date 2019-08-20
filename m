@@ -2,148 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD32F952E3
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 02:58:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A691795373
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 03:34:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728865AbfHTA5Q convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 19 Aug 2019 20:57:16 -0400
-Received: from mga06.intel.com ([134.134.136.31]:10636 "EHLO mga06.intel.com"
+        id S1728959AbfHTBeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Aug 2019 21:34:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52256 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728647AbfHTA5P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 20:57:15 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 17:57:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,407,1559545200"; 
-   d="scan'208";a="189698451"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by orsmga002.jf.intel.com with ESMTP; 19 Aug 2019 17:57:01 -0700
-Received: from fmsmsx102.amr.corp.intel.com (10.18.124.200) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 19 Aug 2019 17:57:00 -0700
-Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
- FMSMSX102.amr.corp.intel.com (10.18.124.200) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 19 Aug 2019 17:57:00 -0700
-Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.80]) by
- SHSMSX154.ccr.corp.intel.com ([169.254.7.249]) with mapi id 14.03.0439.000;
- Tue, 20 Aug 2019 08:56:58 +0800
-From:   "Zhang, Tina" <tina.zhang@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        Eric Auger <eric.auger@redhat.com>
-Subject: RE: [PATCH v5 1/6] vfio: Define device specific irq type capability
-Thread-Topic: [PATCH v5 1/6] vfio: Define device specific irq type capability
-Thread-Index: AQHVU9tUIz4Q7mJ8IEmdvE8aJrot1ab9uvyAgAV/ddA=
-Date:   Tue, 20 Aug 2019 00:56:58 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC876F9935@SHSMSX101.ccr.corp.intel.com>
-References: <20190816023528.30210-1-tina.zhang@intel.com>
-        <20190816023528.30210-2-tina.zhang@intel.com>
- <20190816145141.6e56c6cb@x1.home>
-In-Reply-To: <20190816145141.6e56c6cb@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYWNmMmMzZWItMDVkNC00OTJiLTgxZTAtZDNjYjU4MDgwYTI0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiUW91RGRwMHR6Y1lXeGtJUEE0M2szUDNxVWllUEJOTmI4Qkx1djlqSFkzejdHcGk2bFV0QmlnOXFsTWdFZDFrZSJ9
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1728669AbfHTBeX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 21:34:23 -0400
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id DED5123405
+        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 01:34:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1566264862;
+        bh=t2kfzl1Im6UkgjLX7Fx6EjFHl9UHAnZYRidAq5Pt5wY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=DCSYnGps/sQTNHtTU7NG9vQIqAUmnw1PuIaB5SzjSHQYTUhxU8XQDXYIBHrNGhfdx
+         16C4JRzenLAKrHE3ezskVW7UV330X/xa3+esMEuOUKflR8A/w7sVf1/aoDvffuWGgV
+         jSAxXYlVvPxNGMKnVlaaC3TrJTTH0qkGgGOIDkE0=
+Received: by mail-wr1-f51.google.com with SMTP id q12so10567820wrj.12
+        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 18:34:21 -0700 (PDT)
+X-Gm-Message-State: APjAAAXSinRWYkK0grVbfJ6fNw9DgILm/X8WEljwpaRVmUQLR8WsgYq/
+        cvgRG0Jk247aYjjTaUy0dra+yldefqDlIaEozieBuQ==
+X-Google-Smtp-Source: APXvYqyF+AHDoPN5/wILKp6e1GM8xbws53lsz35ngojNrpFM03bdoLJZliFWjrdNYI+BtT2V0MNJMWR9Fae7uVpz03E=
+X-Received: by 2002:adf:82cd:: with SMTP id 71mr26128200wrc.265.1566264860344;
+ Mon, 19 Aug 2019 18:34:20 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190727055214.9282-1-sean.j.christopherson@intel.com>
+ <20190727055214.9282-9-sean.j.christopherson@intel.com> <CALCETrU_51Ae=F9HzUwsUuSkJ1or63p_eG+f3uKkBqFx=bheUA@mail.gmail.com>
+ <20190730024940.GL21120@linux.intel.com> <25BBDA64-1253-4429-95AF-5D578684F6CC@amacapital.net>
+ <20190819220150.GE1916@linux.intel.com>
+In-Reply-To: <20190819220150.GE1916@linux.intel.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 19 Aug 2019 18:34:07 -0700
+X-Gmail-Original-Message-ID: <CALCETrX6bmhFm62GyCF8Z2DGtb10Ua7xi6h3PoCUiP_es74M8A@mail.gmail.com>
+Message-ID: <CALCETrX6bmhFm62GyCF8Z2DGtb10Ua7xi6h3PoCUiP_es74M8A@mail.gmail.com>
+Subject: Re: [RFC PATCH 08/21] KVM: x86: Add kvm_x86_ops hook to short circuit emulation
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-sgx@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Saturday, August 17, 2019 4:52 AM
-> To: Zhang, Tina <tina.zhang@intel.com>
-> Cc: intel-gvt-dev@lists.freedesktop.org; kraxel@redhat.com;
-> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; Yuan, Hang
-> <hang.yuan@intel.com>; Lv, Zhiyuan <zhiyuan.lv@intel.com>; Eric Auger
-> <eric.auger@redhat.com>
-> Subject: Re: [PATCH v5 1/6] vfio: Define device specific irq type capability
-> 
-> On Fri, 16 Aug 2019 10:35:23 +0800
-> Tina Zhang <tina.zhang@intel.com> wrote:
-> 
-> > Cap the number of irqs with fixed indexes and use capability chains to
-> > chain device specific irqs.
+On Mon, Aug 19, 2019 at 3:01 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Thu, Aug 15, 2019 at 05:47:12PM -0700, Andy Lutomirski wrote:
 > >
-> > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > ---
-> >  include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
-> >  1 file changed, 18 insertions(+), 1 deletion(-)
 > >
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 02bb7ad6e986..d83c9f136a5b 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -444,11 +444,27 @@ struct vfio_irq_info {
-> >  #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
-> >  #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
-> >  #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
-> > +#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info
-> supports caps */
-> >  	__u32	index;		/* IRQ index */
-> >  	__u32	count;		/* Number of IRQs within this index */
-> > +	__u32	cap_offset;	/* Offset within info struct of first cap */
-> >  };
-> >  #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE +
-> 9)
+> > >> On Jul 29, 2019, at 7:49 PM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+> > >>
+> > >> On Sat, Jul 27, 2019 at 10:38:03AM -0700, Andy Lutomirski wrote:
+> > >> On Fri, Jul 26, 2019 at 10:52 PM Sean Christopherson
+> > >> <sean.j.christopherson@intel.com> wrote:
+> > >>>
+> > >>> Similar to the existing AMD #NPF case where emulation of the current
+> > >>> instruction is not possible due to lack of information, virtualization
+> > >>> of Intel SGX will introduce a scenario where emulation is not possible
+> > >>> due to the VMExit occurring in an SGX enclave.  And again similar to
+> > >>> the AMD case, emulation can be initiated by kvm_mmu_page_fault(), i.e.
+> > >>> outside of the control of the vendor-specific code.
+> > >>>
+> > >>> While the cause and architecturally visible behavior of the two cases
+> > >>> is different,  e.g. Intel SGX will inject a #UD whereas AMD #NPF is a
+> > >>> clean resume or complete shutdown, the impact on the common emulation
+> > >>> code is identical: KVM must stop emulation immediately and resume the
+> > >>> guest.
+> > >>>
+> > >>> Replace the exisiting need_emulation_on_page_fault() with a more generic
+> > >>> is_emulatable() kvm_x86_ops callback, which is called unconditionally
+> > >>> by x86_emulate_instruction().
+> > >>
+> > >> Having recently noticed that emulate_ud() is broken when the guest's
+> > >> TF is set, I suppose I should ask: does your new code function
+> > >> sensibly when TF is set?
+> > >
+> > > Barring a VMX fault injection interaction I'm not thinking of, yes.  The
+> > > SGX reaction to the #UD VM-Exit is to inject a #UD and resume the guest,
+> > > pending breakpoints shouldn't be affected in any way (unless some other
+> > > part of KVM mucks with them, e.g. when guest single-stepping is enabled).
 > >
-> > +/*
-> > + * The irq type capability allows irqs unique to a specific device or
-> > + * class of devices to be exposed.
-> > + *
-> > + * The structures below define version 1 of this capability.
-> > + */
-> > +#define VFIO_IRQ_INFO_CAP_TYPE      3
-> 
-> Why 3?  What's using 1 and 2 of this newly defined info cap ID?  Thanks,
-There was an assumption that there were two kinds of CAP_TYPE: VFIO_REGION_INFO_CAP_TYPE and VFIO_IRQ_INFO_CAP_TYPE. Since VFIO_REGION_INFO_CAP_TYPE was defined as 1, VFIO_IRQ_INFO_CAP_TYPE was defined after it.
-OK. I see this isn't a good idea. Let's give VFIO_REGION_INFO_CAP_TYPE a new space. Thanks.
+> > What I mean is: does the code actually do what you think it does if TF is
+> > set?  Right now, as I understand it, the KVM emulation code has a bug in
+> > which some emulated faults also inject #DB despite the fact that the
+> > instruction faulted, and the #DB seems to take precedence over the original
+> > fault.  This confuses the guest.
+>
+> Yes.  The proposed change is to inject the #UD instead of calling into the
+> emulator, and by inspection I've verified that all code that injects a #DB
+> is either contained within the emulator or is mutually exclusive with an
+> intercepted #UD.  It's a qualified yes because I don't have an actual
+> testcase to verify my literacy.  I'll look into adding a test, either to
+> the selftest/x86/sgx or to kvm-unit-tests.
 
-BR,
-Tina
-> 
-> Alex
-> 
-> > +
-> > +struct vfio_irq_info_cap_type {
-> > +	struct vfio_info_cap_header header;
-> > +	__u32 type;     /* global per bus driver */
-> > +	__u32 subtype;  /* type specific */
-> > +};
-> > +
-> >  /**
-> >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct
-> vfio_irq_set)
-> >   *
-> > @@ -550,7 +566,8 @@ enum {
-> >  	VFIO_PCI_MSIX_IRQ_INDEX,
-> >  	VFIO_PCI_ERR_IRQ_INDEX,
-> >  	VFIO_PCI_REQ_IRQ_INDEX,
-> > -	VFIO_PCI_NUM_IRQS
-> > +	VFIO_PCI_NUM_IRQS = 5	/* Fixed user ABI, IRQ indexes >=5
-> use   */
-> > +				/* device specific cap to define content */
-> >  };
-> >
-> >  /*
+I wrote one, and it fails:
 
+# ./tools/testing/selftests/x86/syscall_arg_fault_32
+[RUN]    SYSENTER with invalid state
+[OK]    Seems okay
+[RUN]    SYSCALL with invalid state
+[SKIP]    Illegal instruction
+[RUN]    SYSENTER with TF and invalid state
+[OK]    Seems okay
+[RUN]    SYSCALL with TF and invalid state
+[WARN]    Got stuck single-stepping -- you probably have a KVM bug
+
+emulate_ud() is buggy.
