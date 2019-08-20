@@ -2,118 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A911E95EFE
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 14:38:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EC5C95F43
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 14:56:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729901AbfHTMiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 08:38:22 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:40425 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729383AbfHTMiW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Aug 2019 08:38:22 -0400
-Received: by mail-pg1-f196.google.com with SMTP id w10so3184787pgj.7;
-        Tue, 20 Aug 2019 05:38:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nPEeXkHVugtuWFlIz8GtMsMv1+S0Lha6cbNZpxpRArU=;
-        b=LJOIlwqNYHXD7cHZ6EOsmob8xvknsOMLrMfO5zhrO/hlOWCbl9oRhwtm6GgYdix2xu
-         er230DjbgsQiYIUvGeSCtB/XU+iCevsrploFnAK3HjojGToNX3MeX+f3z/WRg2j1Q7xa
-         vUTX4He41+Um9Hj+tyTyBgDEwdDaMgrIqsgXJom2/xdfqHRguDhVy+xCHIRVJUg35sw2
-         v39oOT5FZyi8moTwiCsatiaiE1FMrKTuHTp/hDmSNmT68FzLGFXSH8cJpKBoqkVfqXIF
-         kN8k2VksGohU40xiIxRPVyFZ9SpWPms3lbT/tIhWAMUB9tF+4pGAzRm8ZMgvLl5RqOOF
-         cEUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nPEeXkHVugtuWFlIz8GtMsMv1+S0Lha6cbNZpxpRArU=;
-        b=rsDxLZB8Ol9Z1JkEpKv7TqgFOIFUX4cgnQormXapeQlUs3p+J3FLlwJG+1Bqsd/b4F
-         5pSJ/xOmZJWEa/I5klFwN3Qyj0W1gee4GIFxuqg5fk1r2mbrPq0aBX0m1CFhCKqzaDjp
-         MWODilI6oa5T4UyWSdyHTSKkWsv8JIwLsHHgezGtibP8u2ZKMQwLuxL6I0wyPIpUWWEX
-         S7LW0blJQTZOCYA3ijcvYPXMEGEuskGuTg+sMcPtsDjnHRwpw1l36FKO0LEdL75Ny28V
-         K+rg2+6zEZIpGSsIE0Qg32lFnILS2VgKyfSj+g4ZW5YiW/rdqfdYylGIC4n+ZmpQpwmQ
-         LwWA==
-X-Gm-Message-State: APjAAAUd3nO+H5mBxAhsL321nsAJBJQlIUzSS98G9UsaVvwEZt3faF5a
-        aMXxrrOM1Y+F8z8IKqnWQJ61qiLin4FDPv1KxnQ=
-X-Google-Smtp-Source: APXvYqwggjmfndZ9vdx+84JSw4dPC+8rQAoRcmAZ/Rgr8ykhjxqa0jdGrCOY5Bb3JWVdr8YvApTm37u9Tm5cVXV+lE4=
-X-Received: by 2002:a65:5043:: with SMTP id k3mr25355913pgo.406.1566304701388;
- Tue, 20 Aug 2019 05:38:21 -0700 (PDT)
+        id S1729768AbfHTMzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 08:55:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45056 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728682AbfHTMza (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 08:55:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 36FD3106BB26;
+        Tue, 20 Aug 2019 12:55:30 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-232.ams2.redhat.com [10.36.116.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DE0D35D9DC;
+        Tue, 20 Aug 2019 12:55:26 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 2/3] s390x: Diag288 test
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com
+References: <20190820105550.4991-1-frankja@linux.ibm.com>
+ <20190820105550.4991-3-frankja@linux.ibm.com>
+ <6f25a51e-136e-1afb-215d-a2639fbd5510@redhat.com>
+ <caf41bc6-6dcf-fa68-6b44-d8bcc1479acb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <7e9f7043-14d9-8fc5-9302-cce8acdd5351@redhat.com>
+Date:   Tue, 20 Aug 2019 14:55:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190819131737.26942-1-Tianyu.Lan@microsoft.com>
- <20190819131737.26942-3-Tianyu.Lan@microsoft.com> <alpine.DEB.2.21.1908191522390.2147@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1908191522390.2147@nanos.tec.linutronix.de>
-From:   Tianyu Lan <lantianyu1986@gmail.com>
-Date:   Tue, 20 Aug 2019 20:38:11 +0800
-Message-ID: <CAOLK0pxPKh3Gr8TVPqGernoHSTY=UyjwjqC4wEyR=Vo500ygFQ@mail.gmail.com>
-Subject: Re: [PATCH V3 2/3] KVM/Hyper-V: Add new KVM cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, corbet@lwn.net,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        michael.h.kelley@microsoft.com,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        kvm <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
-        "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <caf41bc6-6dcf-fa68-6b44-d8bcc1479acb@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Tue, 20 Aug 2019 12:55:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Thomas:
-               Thanks for your review. Will fix your comment in the
-next version.
+On 8/20/19 2:25 PM, Janosch Frank wrote:
+> On 8/20/19 1:59 PM, Thomas Huth wrote:
+>> On 8/20/19 12:55 PM, Janosch Frank wrote:
+>>> A small test for the watchdog via diag288.
+>>>
+>>> Minimum timer value is 15 (seconds) and the only supported action with
+>>> QEMU is restart.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>  s390x/Makefile      |   1 +
+>>>  s390x/diag288.c     | 111 ++++++++++++++++++++++++++++++++++++++++++++
+>>>  s390x/unittests.cfg |   4 ++
+>>>  3 files changed, 116 insertions(+)
+>>>  create mode 100644 s390x/diag288.c
+>>>
+>>> diff --git a/s390x/Makefile b/s390x/Makefile
+>>> index 1f21ddb..b654c56 100644
+>>> --- a/s390x/Makefile
+>>> +++ b/s390x/Makefile
+>>> @@ -11,6 +11,7 @@ tests += $(TEST_DIR)/cmm.elf
+>>>  tests += $(TEST_DIR)/vector.elf
+>>>  tests += $(TEST_DIR)/gs.elf
+>>>  tests += $(TEST_DIR)/iep.elf
+>>> +tests += $(TEST_DIR)/diag288.elf
+>>>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>>  
+>>>  all: directories test_cases test_cases_binary
+>>> diff --git a/s390x/diag288.c b/s390x/diag288.c
+>>> new file mode 100644
+>>> index 0000000..5abcec4
+>>> --- /dev/null
+>>> +++ b/s390x/diag288.c
+>>> @@ -0,0 +1,111 @@
+>>> +/*
+>>> + * Timer Event DIAG288 test
+>>> + *
+>>> + * Copyright (c) 2019 IBM Corp
+>>> + *
+>>> + * Authors:
+>>> + *  Janosch Frank <frankja@linux.ibm.com>
+>>> + *
+>>> + * This code is free software; you can redistribute it and/or modify it
+>>> + * under the terms of the GNU Library General Public License version 2.
+>>> + */
+>>> +
+>>> +#include <libcflat.h>
+>>> +#include <asm/asm-offsets.h>
+>>> +#include <asm/interrupt.h>
+>>> +
+>>> +struct lowcore *lc = (void *)0x0;
+>>
+>> Maybe use "NULL" instead of "(void *)0x0" ?
+> 
+> Well I'd rather have:
+> struct lowcore *lc = (struct lowcore *)0x0;
 
-On Mon, Aug 19, 2019 at 9:27 PM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> On Mon, 19 Aug 2019, lantianyu1986@gmail.com wrote:
->
-> > From: Tianyu Lan <Tianyu.Lan@microsoft.com>
-> >
-> > This patch adds
->
-> Same git grep command as before
->
-> >  new KVM cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH and let
->
-> baseball cap? Please do not use weird acronyms. This is text and there is
-> not limitation on characters.
->
-> > user space to enable direct tlb flush function when only Hyper-V
-> > hypervsior capability is exposed to VM.
->
-> Sorry, but I'm not understanding this sentence.
->
-> > This patch also adds
->
-> Once more
->
-> > enable_direct_tlbflush callback in the struct kvm_x86_ops and
-> > platforms may use it to implement direct tlb flush support.
->
-> Please tell in the changelog WHY you are doing things not what. The what is
-> obviously in the patch.
->
-> So you want to explain what you are trying to achieve and why it is
-> useful. Then you can add a short note about what you are adding, but not at
-> the level of detail which is available from the diff itself.
->
-> Thanks,
->
->         tglx
+Fine for me, too.
 
+>> ... maybe we could also introduce such a variable as a global variable
+>> in lib/s390x/ since this is already the third or fourth time that we use
+>> it in the kvm-unit-tests...
+> 
+> Sure I also thought about that, any particular place?
 
+No clue. Maybe lib/s390x/mmu.c ? Or a new file called lowcore.c ?
 
---
-Best regards
-Tianyu Lan
+>>> +static inline void diag288_uneven(void)
+>>> +{
+>>> +	register unsigned long fc asm("1") = 0;
+>>> +	register unsigned long time asm("1") = 15;
+>>
+>> So you're setting register 1 twice? And "time" is not really used in the
+>> inline assembly below? How's that supposed to work? Looks like a bug to
+>> me... if not, please explain with a comment in the code here.
+> 
+> Well I'm waiting for a spec exception here, so it doesn't have to work.> I'll probably just remove the register variables and do a:
+> 
+> "diag %r1,%r2,0x288"
+
+Yes, I think that's easier to understand.
+
+BTW, is there another documentation of diag 288 beside the "CP
+programming services" manual? At least my version of that specification
+does not say that the fc register has to be even...
+
+>>> +static void test_bite(void)
+>>> +{
+>>> +	if (lc->restart_old_psw.addr) {
+>>> +		report("restart", true);
+>>> +		return;
+>>> +	}
+>>> +	lc->restart_new_psw.addr = (uint64_t)test_bite;
+>>> +	diag288(CODE_INIT, 15, ACTION_RESTART);
+>>> +	while(1) {};
+>>
+>> Should this maybe timeout after a minute or so?
+> 
+> Well run_tests.sh does timeout externally.
+> Do you need it backed into the test?
+
+I sometimes also run the tests without the wrapper script, so in that
+case it would be convenient ... but I can also quit QEMU manually in
+that case, so it's not a big issue.
+
+ Thomas
