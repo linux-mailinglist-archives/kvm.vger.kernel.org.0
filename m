@@ -2,233 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B0549642E
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 17:22:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0F4C96462
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 17:29:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730234AbfHTPV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 11:21:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:65116 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730130AbfHTPV6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Aug 2019 11:21:58 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7KF5ZwQ018089
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 11:21:57 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ugjtsjd2y-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 11:21:56 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Tue, 20 Aug 2019 16:21:54 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 20 Aug 2019 16:21:53 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7KFLqrG56295550
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Aug 2019 15:21:52 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EECDA4C052;
-        Tue, 20 Aug 2019 15:21:51 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C45934C04E;
-        Tue, 20 Aug 2019 15:21:51 +0000 (GMT)
-Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 20 Aug 2019 15:21:51 +0000 (GMT)
+        id S1730298AbfHTP3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 11:29:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35234 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725971AbfHTP3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 11:29:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1A43D308339B;
+        Tue, 20 Aug 2019 15:29:16 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-232.ams2.redhat.com [10.36.116.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CAFED5C206;
+        Tue, 20 Aug 2019 15:29:12 +0000 (UTC)
 Subject: Re: [kvm-unit-tests PATCH 2/3] s390x: Diag288 test
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com
 References: <20190820105550.4991-1-frankja@linux.ibm.com>
  <20190820105550.4991-3-frankja@linux.ibm.com>
  <6f25a51e-136e-1afb-215d-a2639fbd5510@redhat.com>
  <caf41bc6-6dcf-fa68-6b44-d8bcc1479acb@linux.ibm.com>
  <7e9f7043-14d9-8fc5-9302-cce8acdd5351@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
+ <56dad820-ea3c-27e0-c56c-7acc38632296@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Tue, 20 Aug 2019 17:21:51 +0200
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <f07aa0b4-5ac1-ab09-0989-352ee6681436@redhat.com>
+Date:   Tue, 20 Aug 2019 17:29:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <7e9f7043-14d9-8fc5-9302-cce8acdd5351@redhat.com>
+In-Reply-To: <56dad820-ea3c-27e0-c56c-7acc38632296@linux.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="KGIenJggKsyvV3ktyUQxtar3dawNrqlpr"
-X-TM-AS-GCONF: 00
-x-cbid: 19082015-0016-0000-0000-000002A0BE79
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082015-0017-0000-0000-00003300EE7E
-Message-Id: <56dad820-ea3c-27e0-c56c-7acc38632296@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-20_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=4 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908200146
+ boundary="z611oqS51spBhIIZNB9c5A6ps16KGaJhE"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 20 Aug 2019 15:29:16 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KGIenJggKsyvV3ktyUQxtar3dawNrqlpr
-Content-Type: multipart/mixed; boundary="MenTVVnVuYMPd55LzSSs1GcY7NAvaVN7W";
+--z611oqS51spBhIIZNB9c5A6ps16KGaJhE
+Content-Type: multipart/mixed; boundary="xKoALVO9E6hDsP41gbRBNNxuUCLMWjMdg";
  protected-headers="v1"
-From: Janosch Frank <frankja@linux.ibm.com>
-To: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+From: Thomas Huth <thuth@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, david@redhat.com
-Message-ID: <56dad820-ea3c-27e0-c56c-7acc38632296@linux.ibm.com>
+Message-ID: <f07aa0b4-5ac1-ab09-0989-352ee6681436@redhat.com>
 Subject: Re: [kvm-unit-tests PATCH 2/3] s390x: Diag288 test
 References: <20190820105550.4991-1-frankja@linux.ibm.com>
  <20190820105550.4991-3-frankja@linux.ibm.com>
  <6f25a51e-136e-1afb-215d-a2639fbd5510@redhat.com>
  <caf41bc6-6dcf-fa68-6b44-d8bcc1479acb@linux.ibm.com>
  <7e9f7043-14d9-8fc5-9302-cce8acdd5351@redhat.com>
-In-Reply-To: <7e9f7043-14d9-8fc5-9302-cce8acdd5351@redhat.com>
+ <56dad820-ea3c-27e0-c56c-7acc38632296@linux.ibm.com>
+In-Reply-To: <56dad820-ea3c-27e0-c56c-7acc38632296@linux.ibm.com>
 
---MenTVVnVuYMPd55LzSSs1GcY7NAvaVN7W
+--xKoALVO9E6hDsP41gbRBNNxuUCLMWjMdg
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/20/19 2:55 PM, Thomas Huth wrote:
-> On 8/20/19 2:25 PM, Janosch Frank wrote:
->> On 8/20/19 1:59 PM, Thomas Huth wrote:
->>> On 8/20/19 12:55 PM, Janosch Frank wrote:
-[...]
->>> ... maybe we could also introduce such a variable as a global variabl=
-e
->>> in lib/s390x/ since this is already the third or fourth time that we =
-use
->>> it in the kvm-unit-tests...
->>
->> Sure I also thought about that, any particular place?
->=20
-> No clue. Maybe lib/s390x/mmu.c ? Or a new file called lowcore.c ?
->=20
->>>> +static inline void diag288_uneven(void)
->>>> +{
->>>> +	register unsigned long fc asm("1") =3D 0;
->>>> +	register unsigned long time asm("1") =3D 15;
+On 8/20/19 5:21 PM, Janosch Frank wrote:
+> On 8/20/19 2:55 PM, Thomas Huth wrote:
+>> On 8/20/19 2:25 PM, Janosch Frank wrote:
+>>> On 8/20/19 1:59 PM, Thomas Huth wrote:
+>>>> On 8/20/19 12:55 PM, Janosch Frank wrote:
+> [...]
+>>>> ... maybe we could also introduce such a variable as a global variab=
+le
+>>>> in lib/s390x/ since this is already the third or fourth time that we=
+ use
+>>>> it in the kvm-unit-tests...
 >>>
->>> So you're setting register 1 twice? And "time" is not really used in =
-the
->>> inline assembly below? How's that supposed to work? Looks like a bug =
-to
->>> me... if not, please explain with a comment in the code here.
+>>> Sure I also thought about that, any particular place?
 >>
->> Well I'm waiting for a spec exception here, so it doesn't have to work=
-=2E> I'll probably just remove the register variables and do a:
+>> No clue. Maybe lib/s390x/mmu.c ? Or a new file called lowcore.c ?
 >>
->> "diag %r1,%r2,0x288"
->=20
-> Yes, I think that's easier to understand.
->=20
-> BTW, is there another documentation of diag 288 beside the "CP
-> programming services" manual? At least my version of that specification=
-
-> does not say that the fc register has to be even...
-
-I used the non-public lpar documentation...
-
->=20
->>>> +static void test_bite(void)
->>>> +{
->>>> +	if (lc->restart_old_psw.addr) {
->>>> +		report("restart", true);
->>>> +		return;
->>>> +	}
->>>> +	lc->restart_new_psw.addr =3D (uint64_t)test_bite;
->>>> +	diag288(CODE_INIT, 15, ACTION_RESTART);
->>>> +	while(1) {};
+>>>>> +static inline void diag288_uneven(void)
+>>>>> +{
+>>>>> +	register unsigned long fc asm("1") =3D 0;
+>>>>> +	register unsigned long time asm("1") =3D 15;
+>>>>
+>>>> So you're setting register 1 twice? And "time" is not really used in=
+ the
+>>>> inline assembly below? How's that supposed to work? Looks like a bug=
+ to
+>>>> me... if not, please explain with a comment in the code here.
 >>>
->>> Should this maybe timeout after a minute or so?
+>>> Well I'm waiting for a spec exception here, so it doesn't have to wor=
+k.> I'll probably just remove the register variables and do a:
+>>>
+>>> "diag %r1,%r2,0x288"
 >>
->> Well run_tests.sh does timeout externally.
->> Do you need it backed into the test?
+>> Yes, I think that's easier to understand.
+>>
+>> BTW, is there another documentation of diag 288 beside the "CP
+>> programming services" manual? At least my version of that specificatio=
+n
+>> does not say that the fc register has to be even...
 >=20
-> I sometimes also run the tests without the wrapper script, so in that
-> case it would be convenient ... but I can also quit QEMU manually in
-> that case, so it's not a big issue.
+> I used the non-public lpar documentation...
 
-How about setting the clock comparator, that should trigger an
-unexpected external interrupt?
+Ok, if it's specified there, then the check is fine with me.
 
+>>>>> +static void test_bite(void)
+>>>>> +{
+>>>>> +	if (lc->restart_old_psw.addr) {
+>>>>> +		report("restart", true);
+>>>>> +		return;
+>>>>> +	}
+>>>>> +	lc->restart_new_psw.addr =3D (uint64_t)test_bite;
+>>>>> +	diag288(CODE_INIT, 15, ACTION_RESTART);
+>>>>> +	while(1) {};
+>>>>
+>>>> Should this maybe timeout after a minute or so?
+>>>
+>>> Well run_tests.sh does timeout externally.
+>>> Do you need it backed into the test?
+>>
+>> I sometimes also run the tests without the wrapper script, so in that
+>> case it would be convenient ... but I can also quit QEMU manually in
+>> that case, so it's not a big issue.
 >=20
->  Thomas
->=20
+> How about setting the clock comparator, that should trigger an
+> unexpected external interrupt?
+
+Sounds like an idea (if this is not getting too complicated... otherwise
+just leave it as it is).
+
+ Thomas
 
 
 
---MenTVVnVuYMPd55LzSSs1GcY7NAvaVN7W--
+--xKoALVO9E6hDsP41gbRBNNxuUCLMWjMdg--
 
---KGIenJggKsyvV3ktyUQxtar3dawNrqlpr
+--z611oqS51spBhIIZNB9c5A6ps16KGaJhE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl1cEA8ACgkQ41TmuOI4
-ufhoLw/+PBVaPVICGthwlZ0MYf2PxShJtfLYaioSsLKuuQcwezUrrWQwwIX1J4A6
-Ez/fwEWDqh4QghPt+zhgxYYndmA6fT1Kvj80+ye26g8nHshhqlJS7p3/SEqj/Xoz
-27uIRm0uUyZXvx3czYpViL60RqWXk+mgeeD13c5N4hGoPaUQ/3z/bjV/dKNNNeRZ
-iPJkWVmvmHZncJqcdToKbLGRcWxH0Wrvh0P9HOzuMtYim62dWG9iqWgvwyI4gn1P
-1Qf0PTcTtKrxt0zKD+pPoq6E7+KHuMJePsipPS+Fpef/W8163Gw1XILY6JqaiRrN
-5150qoWBdVtriY6q0Y4C9nSbIrjMXPNmLDWRhqvdmPrXb8IpSmNLYTY/OuK+/iOC
-Lfz1zvJS5MXJAT0OCFD4ytfBQhirZ9FNPyFVz5FYfID6HV8KkwsjjEbreltxSRgk
-jT+Mx9aejWNvrTwf3yn6l0/aZTY1r17hNnlsAGJyv9prTZqRXXW/QJ8kfcM6dtx3
-8RusQIOl9wyVoeOzRxMMj6eBrRbRtlktAGHbvSPqIsUaad7REimUtxclEM43kTIT
-DPWls6oby3O2wNIY72B0tpPABq3Y4JbdlB+gXm1dIyGFsviOXK90xHQEVKAVoQMc
-kOI82/wPrBAgvb6a1sFFtBY+L1HTCRDmLcbFOn7rDG5ucHyPPcY=
-=OROU
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl1cEcIACgkQLtnXdP5w
+LbUSqA//avTRXV83gD2C7fHipO/1h+CwVDyWpTb3IROAgKSipiUOrlX3nvLNgps8
+PLV4LW6TpqMkdvN9pgu56br66ylMoXuSaNkVmwj13EfRIzxxajz8RfTf6vDnkQV7
+JJAJAnjRlcpdkiIjoEeETgfgmQ1HR06P1e5P2Y766GVQWuwYceBm0DWQh+wPjXIR
+uMwOVzCle79Jdbhx1wiV/Ev7UEbt7e2WJlHuQtNaU62zxCIlcj+KXWenKIqKzM/d
+SalDiPCq+62cX4IuTrQf9jbGeNeL1oNhUTKN5a6OQgXkToB94GSFkSP7S6oo/OHB
+c6biVYSZ+M1Xv/9Wx8NoMcwoTg4QL/K7hxMoUIDBpir4Dn5cbIE85veAgJakmA8L
+p9w3t5Gwnsye6C9a1QGxe1Y1vBXXSP3/yLt1CCUJrH6Tdy0J1EiOVorQ55Dlr37h
+o6vwHI3bAZsINg8R77LiMWi3nNH4xi0InJxp2Ko1jAbufVLOR8Fi6mR9yttGa3Be
+FCe5Xh8358gh7glQeIr3uo/C6z66hDPA6wa9pUSXWCtpjtKYkJl9jEkarC4kNIlG
+OpqvWatl0XJ2rk5OqhD/Gt0p5SojhIZdcgucvau+dDgEkM2J/IIXJANIR+xkNJ4L
+k0XK4LpiFzW2hdKnPML5MqY6SKZkbhHjxYR5sjTFo3+M2Nyc6lY=
+=j4c8
 -----END PGP SIGNATURE-----
 
---KGIenJggKsyvV3ktyUQxtar3dawNrqlpr--
-
+--z611oqS51spBhIIZNB9c5A6ps16KGaJhE--
