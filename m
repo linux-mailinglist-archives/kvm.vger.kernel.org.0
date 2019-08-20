@@ -2,163 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C3AC95894
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 09:34:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37FDD95978
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 10:29:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729240AbfHTHed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 03:34:33 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:36284 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729194AbfHTHed (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Aug 2019 03:34:33 -0400
-Received: by mail-io1-f68.google.com with SMTP id o9so10167038iom.3
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 00:34:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sORZs5CqkehDSSjYN2DpG+xZQJMOSuCMbbQp0iKYGJo=;
-        b=LpSUZVzIsQFAdHJUuO5WDCqH5xGbIzzK1Vm7h3U+KSPVUQSifSGSog8rLQTWFBqW1z
-         s5Q9kOWkAlncwiCnk41wFwhASD+HoAgIZao/daNMpg8cg2km9Y+N3RfO0Exvw+Ljnt+v
-         Y2aGe8YxwopUi8zvbckQySfdyH21dZv2lwZ0Yt4R1x72YIMiJ8ljPmzVvsbMd7ZO8hl5
-         1slkPzheDrmq1nyASfj6gCdzuo0r26PB+TDjE4L0cpzV3eGvsEB7WNPuUtiFpjVx2TEM
-         HVmk4ULEu3rDAHZUW4n9JrPo44h2YOinBxkrsdQ4D87fngFiIFTAPfiSIq+ndpn3fmnH
-         3r5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sORZs5CqkehDSSjYN2DpG+xZQJMOSuCMbbQp0iKYGJo=;
-        b=jRS9Dce6naXBVHWiROb7K7OeNyLQIEufWPo/vPpuEtgQN6xndlhwUVQZ/wHicb/2bh
-         zUnfJpGhv7ArK9WQUhRriZi+/0kkz9CI9g5fasA1To3NMev5UvgixddaqBfxmewQxP3f
-         pA7hkKhCavX2cy1VfKmdtXLk29bD2/4DJMSYIxL04Y6QNGYd+bmfe+0TE6dU9aHLxVez
-         kLPRbzbarE8vD18PGiKVTIuitoFSrtu9pssu+50BuLZrPnAJ54+gRHuI+GdLWAglvrZW
-         QX46XWMF2pGzPUICp6E6Bebl3mlqdtgoiqKksMwqhL/JeGDGN5+A2e5ghBLHP3/53EIQ
-         KjVg==
-X-Gm-Message-State: APjAAAUwx/P6i2Uh9PKWnFeZmB9RozlMMmjjLPfoEZTz4n9gX+pvVkPa
-        MNNDZgQn38rBsT+A+xUCsYKQoSBJ0gXpOwananJy/A==
-X-Google-Smtp-Source: APXvYqyNZWUCNM+nTj/mw/bNEUrZsIlwXfmqRM9aCQImN8FONR7U8McG0MkdyThWK2gDLrUh2sTUO28Fh6K+o4ANim0=
-X-Received: by 2002:a02:b713:: with SMTP id g19mr2249813jam.77.1566286471913;
- Tue, 20 Aug 2019 00:34:31 -0700 (PDT)
+        id S1729465AbfHTI2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 04:28:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48928 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726049AbfHTI2a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 04:28:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 368D4300180E;
+        Tue, 20 Aug 2019 08:28:30 +0000 (UTC)
+Received: from localhost (ovpn-117-123.ams2.redhat.com [10.36.117.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A490C5D9D5;
+        Tue, 20 Aug 2019 08:28:29 +0000 (UTC)
+Date:   Tue, 20 Aug 2019 09:28:28 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, kvm@vger.kernel.org,
+        Dexuan Cui <decui@microsoft.com>,
+        virtualization@lists.linux-foundation.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 11/11] vsock_test: wait for the remote to close the
+ connection
+Message-ID: <20190820082828.GA9855@stefanha-x1.localdomain>
+References: <20190801152541.245833-1-sgarzare@redhat.com>
+ <20190801152541.245833-12-sgarzare@redhat.com>
 MIME-Version: 1.0
-References: <20190819230422.244888-1-delco@google.com> <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
- <20190820003700.GH1916@linux.intel.com> <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
- <20190820015641.GK1916@linux.intel.com> <74C7BC03-99CA-4213-8327-B8D23E3B22AB@gmail.com>
- <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
-In-Reply-To: <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
-From:   Matt Delco <delco@google.com>
-Date:   Tue, 20 Aug 2019 00:34:20 -0700
-Message-ID: <CAHGX9Vr4HsVowENg8CS9pVWMr2n58H_tJqDX823oAHL++L8yHA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Nadav Amit <nadav.amit@gmail.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
+Content-Disposition: inline
+In-Reply-To: <20190801152541.245833-12-sgarzare@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 20 Aug 2019 08:28:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 19, 2019 at 10:09 PM Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> On Tue, 20 Aug 2019 at 12:10, Nadav Amit <nadav.amit@gmail.com> wrote:
-> >
-> > > On Aug 19, 2019, at 6:56 PM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > +Cc Nadav
-> > >
-> > > On Mon, Aug 19, 2019 at 06:07:01PM -0700, Matt Delco wrote:
-> > >> On Mon, Aug 19, 2019 at 5:37 PM Sean Christopherson <
-> > >> sean.j.christopherson@intel.com> wrote:
-> > >>
-> > >>> On Tue, Aug 20, 2019 at 01:42:37AM +0200, Paolo Bonzini wrote:
-> > >>>> On 20/08/19 01:04, Matt delco wrote:
-> > >>>>> From: Matt Delco <delco@google.com>
-> > >>>>>
-> > >>>>> Time seems to eventually stop in a Windows VM when using Skype.
-> > >>>>> Instrumentation shows that the OS is frequently switching the APIC
-> > >>>>> timer between one-shot and periodic mode.  The OS is typically writing
-> > >>>>> to both LVTT and TMICT.  When time stops the sequence observed is that
-> > >>>>> the APIC was in one-shot mode, the timer expired, and the OS writes to
-> > >>>>> LVTT (but not TMICT) to change to periodic mode.  No future timer
-> > >>> events
-> > >>>>> are received by the OS since the timer is only re-armed on TMICT
-> > >>> writes.
-> > >>>>> With this change time continues to advance in the VM.  TBD if physical
-> > >>>>> hardware will reset the current count if/when the mode is changed to
-> > >>>>> period and the current count is zero.
-> > >>>>>
-> > >>>>> Signed-off-by: Matt Delco <delco@google.com>
-> > >>>>> ---
-> > >>>>> arch/x86/kvm/lapic.c | 9 +++++++--
-> > >>>>> 1 file changed, 7 insertions(+), 2 deletions(-)
-> > >>>>>
-> > >>>>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > >>>>> index 685d17c11461..fddd810eeca5 100644
-> > >>>>> --- a/arch/x86/kvm/lapic.c
-> > >>>>> +++ b/arch/x86/kvm/lapic.c
-> > >>>>> @@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic
-> > >>> *apic, u32 reg, u32 val)
-> > >>>>>            break;
-> > >>>>>
-> > >>>>> -   case APIC_LVTT:
-> > >>>>> +   case APIC_LVTT: {
-> > >>>>> +           u32 timer_mode = apic->lapic_timer.timer_mode;
-> > >>>>>            if (!kvm_apic_sw_enabled(apic))
-> > >>>>>                    val |= APIC_LVT_MASKED;
-> > >>>>>            val &= (apic_lvt_mask[0] |
-> > >>> apic->lapic_timer.timer_mode_mask);
-> > >>>>>            kvm_lapic_set_reg(apic, APIC_LVTT, val);
-> > >>>>>            apic_update_lvtt(apic);
-> > >>>>> +           if (timer_mode == APIC_LVT_TIMER_ONESHOT &&
-> > >>>>> +               apic_lvtt_period(apic) &&
-> > >>>>> +               !hrtimer_active(&apic->lapic_timer.timer))
-> > >>>>> +                   start_apic_timer(apic);
-> > >>>>
-> > >>>> Still, this needs some more explanation.  Can you cover this, as well as
-> > >>>> the oneshot->periodic transition, in kvm-unit-tests' x86/apic.c
-> > >>>> testcase?  Then we could try running it on bare metal and see what
-> > >>> happens.
-> > >>
-> > >> I looked at apic.c and test_apic_change_mode() might already be testing
-> > >> this.  It sets oneshot & TMICT, waits for the current value to get
-> > >> half-way, changes the mode to periodic, and then tries to test that the
-> > >> value wraps back to the upper half.  It then waits again for the half-way
-> > >> point, changes the mode back to oneshot, and waits for zero.  After
-> > >> reaching zero it does:
-> > >>
-> > >> /* now tmcct == 0 and tmict != 0 */
-> > >> apic_change_mode(APIC_LVT_TIMER_PERIODIC);
-> > >> report("TMCCT should stay at zero", !apic_read(APIC_TMCCT));
-> > >>
-> > >> which seems to be testing that oneshot->periodic won't reset the timer if
-> > >> it's already zero.  A possible caveat is there's hardly any delay between
-> > >> the mode change and the timer read.  Emulated hardware will react
-> > >> instantaneously (at least as seen from within the VM), but hardware might
-> > >> need more time to react (though offhand I'd expect HW to be fast enough for
-> > >> this particular timer).
-> > >>
-> > >> So, it looks like the code might already be ready to run on physical
-> > >> hardware, and if it has (or does already as part of a regular test), then
-> > >> that does raise some doubt on what's the appropriate code change to make
-> > >> this work.
-> > >
-> > > Nadav has been running tests on bare metal, maybe he can weigh in on
-> > > whether or not test_apic_change_mode() passes on bare metal.
-> >
-> > These tests pass on bare-metal.
->
-> Good to know this. In addition, in linux apic driver, during mode
-> switch __setup_APIC_LVTT() always sets lapic_timer_period(number of
-> clock cycles per jiffy)/APIC_DIVISOR to APIC_TMICT which can avoid the
-> issue Matt report. So is it because there is no such stuff in windows
-> or the windows version which Matt testing is too old?
 
-I'm using Windows 10 (May 2019). Multimedia apps on Windows tend to
-request higher frequency clocks, and this in turn can affect how the
-kernel configures HW timers.  I may need to examine how Windows
-typically interacts with the APIC timer and see if/how this changes
-when Skype is used.  The frequent timer mode changes are not something
-I'd expect a reasonably behaved kernel to do.
+--0F1p//8PRICkK4MW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Aug 01, 2019 at 05:25:41PM +0200, Stefano Garzarella wrote:
+> +/* Wait for the remote to close the connection */
+> +void vsock_wait_remote_close(int fd)
+> +{
+> +	struct epoll_event ev;
+> +	int epollfd, nfds;
+> +
+> +	epollfd =3D epoll_create1(0);
+> +	if (epollfd =3D=3D -1) {
+> +		perror("epoll_create1");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	ev.events =3D EPOLLRDHUP | EPOLLHUP;
+> +	ev.data.fd =3D fd;
+> +	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev) =3D=3D -1) {
+> +		perror("epoll_ctl");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	nfds =3D epoll_wait(epollfd, &ev, 1, TIMEOUT * 1000);
+> +	if (nfds =3D=3D -1) {
+> +		perror("epoll_wait");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	if (nfds =3D=3D 0) {
+> +		fprintf(stderr, "epoll_wait timed out\n");
+> +		exit(EXIT_FAILURE);
+> +	}
+> +
+> +	assert(nfds =3D=3D 1);
+> +	assert(ev.events & (EPOLLRDHUP | EPOLLHUP));
+> +	assert(ev.data.fd =3D=3D fd);
+> +
+> +	close(epollfd);
+> +}
+
+Please use timeout_begin()/timeout_end() so that the test cannot hang.
+
+> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock=
+_test.c
+> index 64adf45501ca..a664675bec5a 100644
+> --- a/tools/testing/vsock/vsock_test.c
+> +++ b/tools/testing/vsock/vsock_test.c
+> @@ -84,6 +84,11 @@ static void test_stream_client_close_server(const stru=
+ct test_opts *opts)
+> =20
+>  	control_expectln("CLOSED");
+> =20
+> +	/* Wait for the remote to close the connection, before check
+> +	 * -EPIPE error on send.
+> +	 */
+> +	vsock_wait_remote_close(fd);
+
+Is control_expectln("CLOSED") still necessary now that we're waiting for
+the poll event?  The control message was an attempt to wait until the
+other side closed the socket.
+
+--0F1p//8PRICkK4MW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1brywACgkQnKSrs4Gr
+c8he/ggAs417RXraEFHwXmiz0k0MOniGzChyB01FvERBmU5Q3lFaA9yTm3CfBmeM
+dsWmGaQ+UcV0T+BvE+Y+oUV6lspdjNMX2D02+Xfl9SNwKh1CGxmipyRSsITapVXg
+9wFwZzD/+IJ6bSzUxyYpPZhb0n1cZNnMnB0hpTFGSvJMrbk/phSv3NVd7LrJVuM2
+uTYaoaFXQ4QTPnnVO7JonGbeHJuinIleByziLGaCCDgeEan9gf48eQPsN1Pvhf+g
+/YjmlJEqbpekU8wpwggoRFZ9UlkbiLhbCtZdvE7Kzj9PaS1DSF+AWLdL9fOa+N1K
+jNvf8bhepUvIw0MgGeM/Az9vsHfFZw==
+=E1TQ
+-----END PGP SIGNATURE-----
+
+--0F1p//8PRICkK4MW--
