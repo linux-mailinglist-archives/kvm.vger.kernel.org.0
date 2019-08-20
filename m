@@ -2,233 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 189C595CB7
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 12:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 920DE95CF7
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 13:11:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729728AbfHTK4P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 06:56:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12272 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728842AbfHTK4P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Aug 2019 06:56:15 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7KAr2Bg115168
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 06:56:13 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2uge7a40by-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 06:56:13 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Tue, 20 Aug 2019 11:56:11 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 20 Aug 2019 11:56:08 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7KAu8em42598470
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Aug 2019 10:56:08 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5BC94C04E;
-        Tue, 20 Aug 2019 10:56:07 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3ADA14C046;
-        Tue, 20 Aug 2019 10:56:07 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.131])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 20 Aug 2019 10:56:07 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 3/3] s390x: STSI tests
-Date:   Tue, 20 Aug 2019 12:55:50 +0200
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20190820105550.4991-1-frankja@linux.ibm.com>
+        id S1729396AbfHTLLx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 07:11:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42104 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728503AbfHTLLx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 07:11:53 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 587CD3082A49;
+        Tue, 20 Aug 2019 11:11:52 +0000 (UTC)
+Received: from [10.36.117.226] (ovpn-117-226.ams2.redhat.com [10.36.117.226])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4EAC8100195C;
+        Tue, 20 Aug 2019 11:11:51 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 0/3] s390x: More emulation tests
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
 References: <20190820105550.4991-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19082010-0012-0000-0000-00000340AA37
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082010-0013-0000-0000-0000217ACDD4
-Message-Id: <20190820105550.4991-4-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-20_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=938 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908200114
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <cc5291cd-0bd8-73aa-dfdc-f0cf9de4f405@redhat.com>
+Date:   Tue, 20 Aug 2019 13:11:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190820105550.4991-1-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 20 Aug 2019 11:11:52 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For now let's concentrate on the error conditions.
+On 20.08.19 12:55, Janosch Frank wrote:
+> The first patch allows for CECSIM booting via PSW restart.
+> The other ones add diag288 and STSI tests.
+> 
+> I chose to start with these since they are low controversy. My queue
+> still contains the sclp patches and a simple smp library with
+> tests. They will follow later.
+> 
+> Janosch Frank (3):
+>   s390x: Support PSW restart boot
+>   s390x: Diag288 test
+>   s390x: STSI tests
+> 
+>  s390x/Makefile      |   2 +
+>  s390x/diag288.c     | 111 +++++++++++++++++++++++++++++++++++++++
+>  s390x/flat.lds      |  14 +++--
+>  s390x/stsi.c        | 123 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   7 +++
+>  5 files changed, 252 insertions(+), 5 deletions(-)
+>  create mode 100644 s390x/diag288.c
+>  create mode 100644 s390x/stsi.c
+> 
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/stsi.c        | 123 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   5 +-
- 3 files changed, 128 insertions(+), 1 deletion(-)
- create mode 100644 s390x/stsi.c
+Just wondering, did you try them with TCG as well? (or do I have to test)
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index b654c56..311ab77 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -12,6 +12,7 @@ tests += $(TEST_DIR)/vector.elf
- tests += $(TEST_DIR)/gs.elf
- tests += $(TEST_DIR)/iep.elf
- tests += $(TEST_DIR)/diag288.elf
-+tests += $(TEST_DIR)/stsi.elf
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
- 
- all: directories test_cases test_cases_binary
-diff --git a/s390x/stsi.c b/s390x/stsi.c
-new file mode 100644
-index 0000000..005f337
---- /dev/null
-+++ b/s390x/stsi.c
-@@ -0,0 +1,123 @@
-+/*
-+ * Store System Information tests
-+ *
-+ * Copyright (c) 2019 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU Library General Public License version 2.
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/page.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+
-+static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-+
-+static inline unsigned long stsi(unsigned long *addr,
-+				 unsigned long fc, uint8_t sel1, uint8_t sel2)
-+{
-+	register unsigned long r0 asm("0") = (fc << 28) | sel1;
-+	register unsigned long r1 asm("1") = sel2;
-+	int cc;
-+
-+	asm volatile("stsi	0(%3)\n"
-+		     "ipm	 %[cc]\n"
-+		     "srl	 %[cc],28\n"
-+		     : "+d" (r0), [cc] "=d" (cc)
-+		     : "d" (r1), "a" (addr)
-+		     : "cc", "memory");
-+	return cc;
-+}
-+
-+static inline void stsi_zero_r0(unsigned long *addr,
-+				unsigned long fc, uint8_t sel1, uint8_t sel2)
-+{
-+	register unsigned long r0 asm("0") = (fc << 28) | (1 << 8) | sel1;
-+	register unsigned long r1 asm("1") = sel2;
-+
-+
-+	asm volatile("stsi	0(%2)"
-+		     : "+d" (r0)
-+		     : "d" (r1), "a" (addr)
-+		     : "cc", "memory");
-+}
-+
-+static inline void stsi_zero_r1(unsigned long *addr,
-+				unsigned long fc, uint8_t sel1, uint8_t sel2)
-+{
-+	register unsigned long r0 asm("0") = (fc << 28) | sel1;
-+	register unsigned long r1 asm("1") = (1 << 16) | sel2;
-+
-+
-+	asm volatile("stsi	0(%2)"
-+		     : "+d" (r0)
-+		     : "d" (r1), "a" (addr)
-+		     : "cc", "memory");
-+}
-+
-+static inline unsigned long stsi_get_fc(unsigned long *addr)
-+{
-+	register unsigned long r0 asm("0") = 0;
-+	register unsigned long r1 asm("1") = 0;
-+
-+
-+	asm volatile("stsi	0(%2)"
-+		     : "+d" (r0)
-+		     : "d" (r1), "a" (addr)
-+		     : "cc", "memory");
-+	return r0 >> 28;
-+}
-+
-+static void test_specs(void)
-+{
-+	report_prefix_push("spec ex");
-+
-+	report_prefix_push("inv r0");
-+	expect_pgm_int();
-+	stsi_zero_r0((void *)pagebuf, 1, 0, 0);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("inv r1");
-+	expect_pgm_int();
-+	stsi_zero_r1((void *)pagebuf, 1, 0, 0);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_push("unaligned");
-+	expect_pgm_int();
-+	stsi((void *)pagebuf + 42, 1, 0, 0);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+}
-+
-+static void test_priv(void)
-+{
-+	report_prefix_push("privileged");
-+	expect_pgm_int();
-+	enter_pstate();
-+	stsi((void *)pagebuf, 0, 0, 0);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+static void test_fc(void)
-+{
-+	report("cc == 3", stsi((void *)pagebuf, 7, 0, 0));
-+	report("r0 == 3", stsi_get_fc((void *)pagebuf));
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("stsi");
-+	test_priv();
-+	test_specs();
-+	test_fc();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index ca10f38..c56258a 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -64,4 +64,7 @@ file = iep.elf
- 
- [diag288]
- file = diag288.elf
--extra_params=-device diag288,id=watchdog0 --watchdog-action inject-nmi
-\ No newline at end of file
-+extra_params=-device diag288,id=watchdog0 --watchdog-action inject-nmi
-+
-+[stsi]
-+file = stsi.elf
 -- 
-2.17.0
 
+Thanks,
+
+David / dhildenb
