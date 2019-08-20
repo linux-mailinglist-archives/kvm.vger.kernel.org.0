@@ -2,125 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 26C63952CA
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 02:38:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD32F952E3
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 02:58:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728714AbfHTAhC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Aug 2019 20:37:02 -0400
-Received: from mga18.intel.com ([134.134.136.126]:18010 "EHLO mga18.intel.com"
+        id S1728865AbfHTA5Q convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 19 Aug 2019 20:57:16 -0400
+Received: from mga06.intel.com ([134.134.136.31]:10636 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728580AbfHTAhC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Aug 2019 20:37:02 -0400
-X-Amp-Result: UNSCANNABLE
+        id S1728647AbfHTA5P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Aug 2019 20:57:15 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 17:37:01 -0700
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 17:57:15 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,406,1559545200"; 
-   d="scan'208";a="377602884"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga005.fm.intel.com with ESMTP; 19 Aug 2019 17:37:00 -0700
-Date:   Mon, 19 Aug 2019 17:37:00 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Matt delco <delco@google.com>, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
-Message-ID: <20190820003700.GH1916@linux.intel.com>
-References: <20190819230422.244888-1-delco@google.com>
- <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
+X-IronPort-AV: E=Sophos;i="5.64,407,1559545200"; 
+   d="scan'208";a="189698451"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga002.jf.intel.com with ESMTP; 19 Aug 2019 17:57:01 -0700
+Received: from fmsmsx102.amr.corp.intel.com (10.18.124.200) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 19 Aug 2019 17:57:00 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ FMSMSX102.amr.corp.intel.com (10.18.124.200) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 19 Aug 2019 17:57:00 -0700
+Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.80]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.249]) with mapi id 14.03.0439.000;
+ Tue, 20 Aug 2019 08:56:58 +0800
+From:   "Zhang, Tina" <tina.zhang@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
+        Eric Auger <eric.auger@redhat.com>
+Subject: RE: [PATCH v5 1/6] vfio: Define device specific irq type capability
+Thread-Topic: [PATCH v5 1/6] vfio: Define device specific irq type capability
+Thread-Index: AQHVU9tUIz4Q7mJ8IEmdvE8aJrot1ab9uvyAgAV/ddA=
+Date:   Tue, 20 Aug 2019 00:56:58 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC876F9935@SHSMSX101.ccr.corp.intel.com>
+References: <20190816023528.30210-1-tina.zhang@intel.com>
+        <20190816023528.30210-2-tina.zhang@intel.com>
+ <20190816145141.6e56c6cb@x1.home>
+In-Reply-To: <20190816145141.6e56c6cb@x1.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYWNmMmMzZWItMDVkNC00OTJiLTgxZTAtZDNjYjU4MDgwYTI0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiUW91RGRwMHR6Y1lXeGtJUEE0M2szUDNxVWllUEJOTmI4Qkx1djlqSFkzejdHcGk2bFV0QmlnOXFsTWdFZDFrZSJ9
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 01:42:37AM +0200, Paolo Bonzini wrote:
-> On 20/08/19 01:04, Matt delco wrote:
-> > From: Matt Delco <delco@google.com>
-> > 
-> > Time seems to eventually stop in a Windows VM when using Skype.
-> > Instrumentation shows that the OS is frequently switching the APIC
-> > timer between one-shot and periodic mode.  The OS is typically writing
-> > to both LVTT and TMICT.  When time stops the sequence observed is that
-> > the APIC was in one-shot mode, the timer expired, and the OS writes to
-> > LVTT (but not TMICT) to change to periodic mode.  No future timer events
-> > are received by the OS since the timer is only re-armed on TMICT writes.
-> > 
-> > With this change time continues to advance in the VM.  TBD if physical
-> > hardware will reset the current count if/when the mode is changed to
-> > period and the current count is zero.
-> > 
-> > Signed-off-by: Matt Delco <delco@google.com>
+
+
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Saturday, August 17, 2019 4:52 AM
+> To: Zhang, Tina <tina.zhang@intel.com>
+> Cc: intel-gvt-dev@lists.freedesktop.org; kraxel@redhat.com;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; Yuan, Hang
+> <hang.yuan@intel.com>; Lv, Zhiyuan <zhiyuan.lv@intel.com>; Eric Auger
+> <eric.auger@redhat.com>
+> Subject: Re: [PATCH v5 1/6] vfio: Define device specific irq type capability
+> 
+> On Fri, 16 Aug 2019 10:35:23 +0800
+> Tina Zhang <tina.zhang@intel.com> wrote:
+> 
+> > Cap the number of irqs with fixed indexes and use capability chains to
+> > chain device specific irqs.
+> >
+> > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > > ---
-> >  arch/x86/kvm/lapic.c | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 685d17c11461..fddd810eeca5 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >  
-> >  		break;
-> >  
-> > -	case APIC_LVTT:
-> > +	case APIC_LVTT: {
-> > +		u32 timer_mode = apic->lapic_timer.timer_mode;
-> >  		if (!kvm_apic_sw_enabled(apic))
-> >  			val |= APIC_LVT_MASKED;
-> >  		val &= (apic_lvt_mask[0] | apic->lapic_timer.timer_mode_mask);
-> >  		kvm_lapic_set_reg(apic, APIC_LVTT, val);
-> >  		apic_update_lvtt(apic);
-> > +		if (timer_mode == APIC_LVT_TIMER_ONESHOT &&
-> > +		    apic_lvtt_period(apic) &&
-> > +		    !hrtimer_active(&apic->lapic_timer.timer))
-> > +			start_apic_timer(apic);
+> >  include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
+> >  1 file changed, 18 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 02bb7ad6e986..d83c9f136a5b 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -444,11 +444,27 @@ struct vfio_irq_info {
+> >  #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
+> >  #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
+> >  #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
+> > +#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info
+> supports caps */
+> >  	__u32	index;		/* IRQ index */
+> >  	__u32	count;		/* Number of IRQs within this index */
+> > +	__u32	cap_offset;	/* Offset within info struct of first cap */
+> >  };
+> >  #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE +
+> 9)
+> >
+> > +/*
+> > + * The irq type capability allows irqs unique to a specific device or
+> > + * class of devices to be exposed.
+> > + *
+> > + * The structures below define version 1 of this capability.
+> > + */
+> > +#define VFIO_IRQ_INFO_CAP_TYPE      3
 > 
-> The manual says "A write to the LVT Timer Register that changes the
-> timer mode disarms the local APIC timer", but we already know this is
-> not true (commit dedf9c5e216902c6d34b5a0d0c40f4acbb3706d8).
+> Why 3?  What's using 1 and 2 of this newly defined info cap ID?  Thanks,
+There was an assumption that there were two kinds of CAP_TYPE: VFIO_REGION_INFO_CAP_TYPE and VFIO_IRQ_INFO_CAP_TYPE. Since VFIO_REGION_INFO_CAP_TYPE was defined as 1, VFIO_IRQ_INFO_CAP_TYPE was defined after it.
+OK. I see this isn't a good idea. Let's give VFIO_REGION_INFO_CAP_TYPE a new space. Thanks.
 
-That was a confirmed SDM bug that has been fixed as of the May 2019
-version of the SDM.
-
+BR,
+Tina
 > 
-> Still, this needs some more explanation.  Can you cover this, as well as
-> the oneshot->periodic transition, in kvm-unit-tests' x86/apic.c
-> testcase?  Then we could try running it on bare metal and see what happens.
-
-Only transitions to/from deadline should disable the timer, i.e. this
-blurb from the SDM was found to be correct.
-
-  Transitioning between TSC-deadline mode and other timer modes also
-  disarms the timer.
-
-But yeah, tests are in order, at least for oneshot->periodic and vice
-versa.  I can't find any internal code that tests whether transitioning
-between oneshot and periodic actually rearms the timer or if it simply
-doesn't disable it, and the SDM doesn't clarify what constitutes
-"reprogrammed".
-
-If possible, we should also test what happens if APIC_TMCCT != 0, though
-that might be tricky and/or fragile.  If the timer is rearmed on a
-transition between oneshot and periodic, then I would expect it to happen
-for both APIC_TMCCT==0 and APIC_TMCCT!=0.
-
+> Alex
 > 
-> Thanks,
-> 
-> Paolo
-> 
-> 
-> >  		break;
-> > -
-> > +	}
-> >  	case APIC_TMICT:
-> >  		if (apic_lvtt_tscdeadline(apic))
-> >  			break;
-> > 
-> 
+> > +
+> > +struct vfio_irq_info_cap_type {
+> > +	struct vfio_info_cap_header header;
+> > +	__u32 type;     /* global per bus driver */
+> > +	__u32 subtype;  /* type specific */
+> > +};
+> > +
+> >  /**
+> >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct
+> vfio_irq_set)
+> >   *
+> > @@ -550,7 +566,8 @@ enum {
+> >  	VFIO_PCI_MSIX_IRQ_INDEX,
+> >  	VFIO_PCI_ERR_IRQ_INDEX,
+> >  	VFIO_PCI_REQ_IRQ_INDEX,
+> > -	VFIO_PCI_NUM_IRQS
+> > +	VFIO_PCI_NUM_IRQS = 5	/* Fixed user ABI, IRQ indexes >=5
+> use   */
+> > +				/* device specific cap to define content */
+> >  };
+> >
+> >  /*
+
