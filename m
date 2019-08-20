@@ -2,156 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38B059567C
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 07:09:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2A0A95727
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 08:14:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729153AbfHTFJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 01:09:19 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:41727 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727006AbfHTFJT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Aug 2019 01:09:19 -0400
-Received: by mail-ot1-f66.google.com with SMTP id o101so3884260ota.8
-        for <kvm@vger.kernel.org>; Mon, 19 Aug 2019 22:09:18 -0700 (PDT)
+        id S1729208AbfHTGOC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 02:14:02 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:45652 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728777AbfHTGOC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 02:14:02 -0400
+Received: by mail-pg1-f193.google.com with SMTP id o13so2575954pgp.12;
+        Mon, 19 Aug 2019 23:14:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uizXk1R5is/GonizcdRaOsX7oH/zLfVxHKc9VWIu46Q=;
-        b=TBx+fjZllzpwV7UvBZsZDAsS7MmFl0h0lSbiK7txamagFLkKfs3Ku9BASGFR9G1JaI
-         Ly17cylk5w26cOq5yQlMpkAMbHf2s7zssm/iswiw0NLtT/y0c6dhzyRbbDqI/3E62x5v
-         6+Po2UTCY3mQxAnenk/8izvXdE9wIQ0ate4oVLeBADtH7lQihPR7wNeQAxUr/dniJ4bv
-         VgTmRoR1px75Rz0/IlcDc/N7e1jop5qMY1lkVK2BJJpk2bMXWlq3whwDBYx7zfWgiO8D
-         ro6/692oCreNl9P2EXNQxHwSMA44LE77hIjDseyGwEzR21YzFyDaB33ytFEyrzpKZLAu
-         km2w==
+        h=from:to:cc:subject:date:message-id;
+        bh=mhB3UhKa2apbmILstVtC2PuBpKp+KIhCo43t5hvhotg=;
+        b=qCrE+7Gv+siL4APdA5TNSgsXbN8MDTadgi8WtA9BzoUSsgHRYilJOs8fJvNB9Ei0KT
+         WitL6q4cCiwUx3de5plYEsnKBcS5MW6CHclZIaJNdrcZF+BrGB5j4gatGs+7ZNW4c3Cp
+         yDT4+SJMw/ZcYoitRjlz3Q8HnrVP6UUrMKVb0CRWGW21ee+MXjrv4MVwp/gMrIt55BZW
+         PFnxMVEIIYa+0vvtSmhJl49Tzvs8ITIGHwW4IE8KL6etlIQzQHnT8kH0l+EW4tLIAFOm
+         IVyWcnQhRbYenh2Jox0+d45itZDeb8uiFOiUwpU/Y14rgIYXPfRt7N7LPo34cjJp/n1D
+         WazQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uizXk1R5is/GonizcdRaOsX7oH/zLfVxHKc9VWIu46Q=;
-        b=O+Viq4J4kpjbJf7VsCSSvNewONjwJrB6BR30o+dpL9J1YWPKT6MOp7pLwbTQVz30tm
-         z6yhsU8f9sS3CKxeo6Q+UIQ+zqyXwRC+NiBpLlWJi3A2w2Edvn9o2v24yfeS+gxJnY3B
-         0HyfP9byjrxDDDH3TGGtFk1J66lad7ymvizHEpeWbcqUEWKmToEvuNlrt6vA2dS+p91H
-         TUd42SuvyoS+zFNcfxatgxxp4EMiUmMz3RtcHNbc2pKfPsn3PnsjPkNaJ1KH+bmNNapB
-         8y2JYXq5pkFPBUO37o2jmaIn2Ob/hGK4xHdt8RFBW3kWllOPzseZewbZYfIbjaDeAYnV
-         9ktA==
-X-Gm-Message-State: APjAAAXzgm/J3mCRVyj4d32ikenZqR5wym2zBiNfFS9NpZSQhcY20gGr
-        ODwBH/NU+luAFZUPSJT8CUffIcJ5vYXMs7LL4wo=
-X-Google-Smtp-Source: APXvYqxuVhpdh7O8phCAhHNvrsEe3yPmKeGJom9qN2/3Q6S3UmgTyAiSMUcjml8yCaa62DRKgMkWStXBsOPUDZEqeOY=
-X-Received: by 2002:a9d:224b:: with SMTP id o69mr14661233ota.45.1566277758277;
- Mon, 19 Aug 2019 22:09:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190819230422.244888-1-delco@google.com> <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
- <20190820003700.GH1916@linux.intel.com> <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
- <20190820015641.GK1916@linux.intel.com> <74C7BC03-99CA-4213-8327-B8D23E3B22AB@gmail.com>
-In-Reply-To: <74C7BC03-99CA-4213-8327-B8D23E3B22AB@gmail.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 20 Aug 2019 13:08:49 +0800
-Message-ID: <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Matt Delco <delco@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=mhB3UhKa2apbmILstVtC2PuBpKp+KIhCo43t5hvhotg=;
+        b=GoMn920+ZPsDoe+A6gi7ynvdYW969Qy/sOAwiTfPja9hUNTR+NACqEvMdeKMrq04eA
+         FTgiKoKp5phPExFog1dQVMrCz9f1btuOv1Vct2WSjU9/gKRzYP/SVrO2DbqZsgOD9zOV
+         5FljvpAgBavzfN84mVdZe5jK1WmjOQx+e4dL+In5Ronl4EsUKcVn6iYGw8FYAwJdopbW
+         uOWsGl3WCnQ06b86A9OEJXF+KTFOc9Qg7JEcxEkUJ3ji/iAeZil1WkHUL5RKKxU63xwk
+         LcdONblNa7Gp0f/i0YjpXONJDjIoEPcH8p64IjeKwp422fic+niQR3YSXplJ/HtBaOIn
+         BUow==
+X-Gm-Message-State: APjAAAVL18dkCSSA3HRJ7M4SyoVHRolJJQzwJsEQ96+0oB+JO3gMYXOH
+        W58eAnLqe2C/WyhcDAcrNJIyBba1
+X-Google-Smtp-Source: APXvYqwnE1DCcQVDEpP87tHqgAuQNly7+QuZ9z1c9GXF4bR0TCPwj2dU6DdIERh2C5MBaeGgjrl+dQ==
+X-Received: by 2002:aa7:93cc:: with SMTP id y12mr24691671pff.246.1566281641237;
+        Mon, 19 Aug 2019 23:14:01 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id y13sm10276581pfb.48.2019.08.19.23.13.59
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 19 Aug 2019 23:14:00 -0700 (PDT)
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     paulus@ozlabs.org, kvm@vger.kernel.org,
+        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Subject: [PATCH] KVM: PPC: Book3S HV: Define usage types for rmap array in guest memslot
+Date:   Tue, 20 Aug 2019 16:13:49 +1000
+Message-Id: <20190820061349.28995-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 20 Aug 2019 at 12:10, Nadav Amit <nadav.amit@gmail.com> wrote:
->
-> > On Aug 19, 2019, at 6:56 PM, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> >
-> > +Cc Nadav
-> >
-> > On Mon, Aug 19, 2019 at 06:07:01PM -0700, Matt Delco wrote:
-> >> On Mon, Aug 19, 2019 at 5:37 PM Sean Christopherson <
-> >> sean.j.christopherson@intel.com> wrote:
-> >>
-> >>> On Tue, Aug 20, 2019 at 01:42:37AM +0200, Paolo Bonzini wrote:
-> >>>> On 20/08/19 01:04, Matt delco wrote:
-> >>>>> From: Matt Delco <delco@google.com>
-> >>>>>
-> >>>>> Time seems to eventually stop in a Windows VM when using Skype.
-> >>>>> Instrumentation shows that the OS is frequently switching the APIC
-> >>>>> timer between one-shot and periodic mode.  The OS is typically writing
-> >>>>> to both LVTT and TMICT.  When time stops the sequence observed is that
-> >>>>> the APIC was in one-shot mode, the timer expired, and the OS writes to
-> >>>>> LVTT (but not TMICT) to change to periodic mode.  No future timer
-> >>> events
-> >>>>> are received by the OS since the timer is only re-armed on TMICT
-> >>> writes.
-> >>>>> With this change time continues to advance in the VM.  TBD if physical
-> >>>>> hardware will reset the current count if/when the mode is changed to
-> >>>>> period and the current count is zero.
-> >>>>>
-> >>>>> Signed-off-by: Matt Delco <delco@google.com>
-> >>>>> ---
-> >>>>> arch/x86/kvm/lapic.c | 9 +++++++--
-> >>>>> 1 file changed, 7 insertions(+), 2 deletions(-)
-> >>>>>
-> >>>>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> >>>>> index 685d17c11461..fddd810eeca5 100644
-> >>>>> --- a/arch/x86/kvm/lapic.c
-> >>>>> +++ b/arch/x86/kvm/lapic.c
-> >>>>> @@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic
-> >>> *apic, u32 reg, u32 val)
-> >>>>>            break;
-> >>>>>
-> >>>>> -   case APIC_LVTT:
-> >>>>> +   case APIC_LVTT: {
-> >>>>> +           u32 timer_mode = apic->lapic_timer.timer_mode;
-> >>>>>            if (!kvm_apic_sw_enabled(apic))
-> >>>>>                    val |= APIC_LVT_MASKED;
-> >>>>>            val &= (apic_lvt_mask[0] |
-> >>> apic->lapic_timer.timer_mode_mask);
-> >>>>>            kvm_lapic_set_reg(apic, APIC_LVTT, val);
-> >>>>>            apic_update_lvtt(apic);
-> >>>>> +           if (timer_mode == APIC_LVT_TIMER_ONESHOT &&
-> >>>>> +               apic_lvtt_period(apic) &&
-> >>>>> +               !hrtimer_active(&apic->lapic_timer.timer))
-> >>>>> +                   start_apic_timer(apic);
-> >>>>
-> >>>> Still, this needs some more explanation.  Can you cover this, as well as
-> >>>> the oneshot->periodic transition, in kvm-unit-tests' x86/apic.c
-> >>>> testcase?  Then we could try running it on bare metal and see what
-> >>> happens.
-> >>
-> >> I looked at apic.c and test_apic_change_mode() might already be testing
-> >> this.  It sets oneshot & TMICT, waits for the current value to get
-> >> half-way, changes the mode to periodic, and then tries to test that the
-> >> value wraps back to the upper half.  It then waits again for the half-way
-> >> point, changes the mode back to oneshot, and waits for zero.  After
-> >> reaching zero it does:
-> >>
-> >> /* now tmcct == 0 and tmict != 0 */
-> >> apic_change_mode(APIC_LVT_TIMER_PERIODIC);
-> >> report("TMCCT should stay at zero", !apic_read(APIC_TMCCT));
-> >>
-> >> which seems to be testing that oneshot->periodic won't reset the timer if
-> >> it's already zero.  A possible caveat is there's hardly any delay between
-> >> the mode change and the timer read.  Emulated hardware will react
-> >> instantaneously (at least as seen from within the VM), but hardware might
-> >> need more time to react (though offhand I'd expect HW to be fast enough for
-> >> this particular timer).
-> >>
-> >> So, it looks like the code might already be ready to run on physical
-> >> hardware, and if it has (or does already as part of a regular test), then
-> >> that does raise some doubt on what's the appropriate code change to make
-> >> this work.
-> >
-> > Nadav has been running tests on bare metal, maybe he can weigh in on
-> > whether or not test_apic_change_mode() passes on bare metal.
->
-> These tests pass on bare-metal.
+The rmap array in the guest memslot is an array of size number of guest
+pages, allocated at memslot creation time. Each rmap entry in this array
+is used to store information about the guest page to which it
+corresponds. For example for a hpt guest it is used to store a lock bit,
+rc bits, a present bit and the index of a hpt entry in the guest hpt
+which maps this page. For a radix guest which is running nested guests
+it is used to store a pointer to a linked list of nested rmap entries
+which store the nested guest physical address which maps this guest
+address and for which there is a pte in the shadow page table.
 
-Good to know this. In addition, in linux apic driver, during mode
-switch __setup_APIC_LVTT() always sets lapic_timer_period(number of
-clock cycles per jiffy)/APIC_DIVISOR to APIC_TMICT which can avoid the
-issue Matt report. So is it because there is no such stuff in windows
-or the windows version which Matt testing is too old?
+As there are currently two uses for the rmap array, and the potential
+for this to expand to more in the future, define a type field (being the
+top 8 bits of the rmap entry) to be used to define the type of the rmap
+entry which is currently present and define two values for this field
+for the two current uses of the rmap array.
 
-Regards,
-Wanpeng Li
+Since the nested case uses the rmap entry to store a pointer, define
+this type as having the two high bits set as is expected for a pointer.
+Define the hpt entry type as having bit 56 set (bit 7 IBM bit ordering).
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ arch/powerpc/include/asm/kvm_host.h | 22 ++++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c |  2 +-
+ 2 files changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index e6e5f59aaa97..6fb5fb4779e0 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -232,11 +232,25 @@ struct revmap_entry {
+ };
+ 
+ /*
+- * We use the top bit of each memslot->arch.rmap entry as a lock bit,
+- * and bit 32 as a present flag.  The bottom 32 bits are the
+- * index in the guest HPT of a HPTE that points to the page.
++ * The rmap array of size number of guest pages is allocated for each memslot.
++ * This array is used to store usage specific information about the guest page.
++ * Below are the encodings of the various possible usage types.
+  */
+-#define KVMPPC_RMAP_LOCK_BIT	63
++/* Free bits which can be used to define a new usage */
++#define KVMPPC_RMAP_TYPE_MASK	0xff00000000000000
++#define KVMPPC_RMAP_NESTED	0xc000000000000000	/* Nested rmap array */
++#define KVMPPC_RMAP_HPT		0x0100000000000000	/* HPT guest */
++
++/*
++ * rmap usage definition for a hash page table (hpt) guest:
++ * 0x0000080000000000	Lock bit
++ * 0x0000018000000000	RC bits
++ * 0x0000000100000000	Present bit
++ * 0x00000000ffffffff	HPT index bits
++ * The bottom 32 bits are the index in the guest HPT of a HPTE that points to
++ * the page.
++ */
++#define KVMPPC_RMAP_LOCK_BIT	43
+ #define KVMPPC_RMAP_RC_SHIFT	32
+ #define KVMPPC_RMAP_REFERENCED	(HPTE_R_R << KVMPPC_RMAP_RC_SHIFT)
+ #define KVMPPC_RMAP_PRESENT	0x100000000ul
+diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
+index 63e0ce91e29d..7186c65c61c9 100644
+--- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
++++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
+@@ -99,7 +99,7 @@ void kvmppc_add_revmap_chain(struct kvm *kvm, struct revmap_entry *rev,
+ 	} else {
+ 		rev->forw = rev->back = pte_index;
+ 		*rmap = (*rmap & ~KVMPPC_RMAP_INDEX) |
+-			pte_index | KVMPPC_RMAP_PRESENT;
++			pte_index | KVMPPC_RMAP_PRESENT | KVMPPC_RMAP_HPT;
+ 	}
+ 	unlock_rmap(rmap);
+ }
+-- 
+2.13.6
+
