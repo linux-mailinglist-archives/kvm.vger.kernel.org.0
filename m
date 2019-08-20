@@ -2,196 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D29496675
-	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 18:33:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9118096752
+	for <lists+kvm@lfdr.de>; Tue, 20 Aug 2019 19:19:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730241AbfHTQdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Aug 2019 12:33:52 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:38398 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727272AbfHTQdw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Aug 2019 12:33:52 -0400
-Received: by mail-pl1-f195.google.com with SMTP id m12so3024126plt.5
-        for <kvm@vger.kernel.org>; Tue, 20 Aug 2019 09:33:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=bWIGZxxgvl4qFKXxWqPgqd0bBeELRf+xZFJ9UvZDToc=;
-        b=mqdAf+lxrMO3jA4TtPtqh25bbF5dsGXJTmx/44lvQN6RGjrlb8y9+m6Ndi7hBNr1/M
-         VIH+vuRVBRE1Xh5YBa4Occ7otWphwTdCnSdEvKXxpi4kgB010zaMQR+iIwHz9CvqwXXr
-         fZ0SSBZwV8oJd/LgogU7m8S7Q94RjTZJLjDc9wSs0J6eOOQ3Jr4ucvjQC/yo1EHbSIMU
-         Ih2Spn2PG48RTph9FzYLIUppm5O1csTYU1oZff8gvXMe0ZNKwQP3zGKLB4FcBTSSZxbK
-         A3Qw0DTMtiANVytxDh4PFu1Jtm1174MXaHNHso6eQJstsT6qHPixleKSVD+J6mCWwPk0
-         eDWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=bWIGZxxgvl4qFKXxWqPgqd0bBeELRf+xZFJ9UvZDToc=;
-        b=ZyOcxqVk+d5TPe+56Hep/pd69F7M9vqoqHDIGjdck6T6caY1C69mWy5qp1ujf3YFRB
-         Iob+kVDe3WMh78iKTcG003srnkokpsvZejyf2aMoSDyw854VTDK+hJpGZaQ2dbNgeHdd
-         tgIn0jZ2/Mz6y/1XVujPxzQIYaKDmtMI2WsTfjl82bKsrqIBaDbDzKslO+eezQhkotum
-         4qSZDr66XIb+0SyQVgxapu3gKGWe9YVXVE4feavWVad+aNIlAvjLvyIqht8YsSM26gG4
-         6p/XQh91qliS1tLPg8GEORI4v5yZtcKB3TIzyeAFj6K7g7hpzb6ZSTa+uEYbdtyFhHvq
-         eGQw==
-X-Gm-Message-State: APjAAAVlZSg8lqmsbkUXZDcvqa7raOepiPJG45mZxANnW16sRjby1W+S
-        UZBH8x0PwKJsuDQ5Xzy5e5w=
-X-Google-Smtp-Source: APXvYqwIa6skIa//K7AQHga3Qkq4GYwkKMKf6YokYxX+qC3AamfLwEHgFrhTyK7wtd6lAvcWm/74Dg==
-X-Received: by 2002:a17:902:7442:: with SMTP id e2mr18551312plt.315.1566318830946;
-        Tue, 20 Aug 2019 09:33:50 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id y14sm41168633pfq.85.2019.08.20.09.33.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Aug 2019 09:33:50 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
-Date:   Tue, 20 Aug 2019 09:33:46 -0700
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Matt Delco <delco@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7C092342-7A13-406F-8E2D-AB357DC73586@gmail.com>
-References: <20190819230422.244888-1-delco@google.com>
- <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
- <20190820003700.GH1916@linux.intel.com>
- <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
- <20190820015641.GK1916@linux.intel.com>
- <74C7BC03-99CA-4213-8327-B8D23E3B22AB@gmail.com>
- <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1730256AbfHTRTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Aug 2019 13:19:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44882 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725971AbfHTRTG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Aug 2019 13:19:06 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BB4C93175291;
+        Tue, 20 Aug 2019 17:19:05 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 108365C205;
+        Tue, 20 Aug 2019 17:19:05 +0000 (UTC)
+Date:   Tue, 20 Aug 2019 11:19:04 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     Jiri Pirko <jiri@mellanox.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+Message-ID: <20190820111904.75515f58@x1.home>
+In-Reply-To: <AM0PR05MB48668B6221E477A873688CDBD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20190802065905.45239-1-parav@mellanox.com>
+        <20190808141255.45236-1-parav@mellanox.com>
+        <20190808170247.1fc2c4c4@x1.home>
+        <77ffb1f8-e050-fdf5-e306-0a81614f7a88@nvidia.com>
+        <AM0PR05MB4866993536C0C8ACEA2F92DBD1D20@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190813085246.1d642ae5@x1.home>
+        <AM0PR05MB48663579A340E6597B3D01BCD1D20@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190813111149.027c6a3c@x1.home>
+        <AM0PR05MB4866D40F8EBB382C78193C91D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190814100135.1f60aa42.cohuck@redhat.com>
+        <AM0PR05MB4866ABFDDD9DDCBC01F6CA90D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190814150911.296da78c.cohuck@redhat.com>
+        <AM0PR05MB48666CCDFE985A25F42A0259D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190814085746.26b5f2a3@x1.home>
+        <AM0PR05MB4866148ABA3C4E48E73E95FCD1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <AM0PR05MB48668B6221E477A873688CDBD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Tue, 20 Aug 2019 17:19:05 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Aug 19, 2019, at 10:08 PM, Wanpeng Li <kernellwp@gmail.com> wrote:
->=20
-> On Tue, 20 Aug 2019 at 12:10, Nadav Amit <nadav.amit@gmail.com> wrote:
->>> On Aug 19, 2019, at 6:56 PM, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->>>=20
->>> +Cc Nadav
->>>=20
->>> On Mon, Aug 19, 2019 at 06:07:01PM -0700, Matt Delco wrote:
->>>> On Mon, Aug 19, 2019 at 5:37 PM Sean Christopherson <
->>>> sean.j.christopherson@intel.com> wrote:
->>>>=20
->>>>> On Tue, Aug 20, 2019 at 01:42:37AM +0200, Paolo Bonzini wrote:
->>>>>> On 20/08/19 01:04, Matt delco wrote:
->>>>>>> From: Matt Delco <delco@google.com>
->>>>>>>=20
->>>>>>> Time seems to eventually stop in a Windows VM when using Skype.
->>>>>>> Instrumentation shows that the OS is frequently switching the =
-APIC
->>>>>>> timer between one-shot and periodic mode.  The OS is typically =
-writing
->>>>>>> to both LVTT and TMICT.  When time stops the sequence observed =
-is that
->>>>>>> the APIC was in one-shot mode, the timer expired, and the OS =
-writes to
->>>>>>> LVTT (but not TMICT) to change to periodic mode.  No future =
-timer
->>>>> events
->>>>>>> are received by the OS since the timer is only re-armed on TMICT
->>>>> writes.
->>>>>>> With this change time continues to advance in the VM.  TBD if =
-physical
->>>>>>> hardware will reset the current count if/when the mode is =
-changed to
->>>>>>> period and the current count is zero.
->>>>>>>=20
->>>>>>> Signed-off-by: Matt Delco <delco@google.com>
->>>>>>> ---
->>>>>>> arch/x86/kvm/lapic.c | 9 +++++++--
->>>>>>> 1 file changed, 7 insertions(+), 2 deletions(-)
->>>>>>>=20
->>>>>>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->>>>>>> index 685d17c11461..fddd810eeca5 100644
->>>>>>> --- a/arch/x86/kvm/lapic.c
->>>>>>> +++ b/arch/x86/kvm/lapic.c
->>>>>>> @@ -1935,14 +1935,19 @@ int kvm_lapic_reg_write(struct kvm_lapic
->>>>> *apic, u32 reg, u32 val)
->>>>>>>           break;
->>>>>>>=20
->>>>>>> -   case APIC_LVTT:
->>>>>>> +   case APIC_LVTT: {
->>>>>>> +           u32 timer_mode =3D apic->lapic_timer.timer_mode;
->>>>>>>           if (!kvm_apic_sw_enabled(apic))
->>>>>>>                   val |=3D APIC_LVT_MASKED;
->>>>>>>           val &=3D (apic_lvt_mask[0] |
->>>>> apic->lapic_timer.timer_mode_mask);
->>>>>>>           kvm_lapic_set_reg(apic, APIC_LVTT, val);
->>>>>>>           apic_update_lvtt(apic);
->>>>>>> +           if (timer_mode =3D=3D APIC_LVT_TIMER_ONESHOT &&
->>>>>>> +               apic_lvtt_period(apic) &&
->>>>>>> +               !hrtimer_active(&apic->lapic_timer.timer))
->>>>>>> +                   start_apic_timer(apic);
->>>>>>=20
->>>>>> Still, this needs some more explanation.  Can you cover this, as =
-well as
->>>>>> the oneshot->periodic transition, in kvm-unit-tests' x86/apic.c
->>>>>> testcase?  Then we could try running it on bare metal and see =
-what
->>>>> happens.
->>>>=20
->>>> I looked at apic.c and test_apic_change_mode() might already be =
-testing
->>>> this.  It sets oneshot & TMICT, waits for the current value to get
->>>> half-way, changes the mode to periodic, and then tries to test that =
-the
->>>> value wraps back to the upper half.  It then waits again for the =
-half-way
->>>> point, changes the mode back to oneshot, and waits for zero.  After
->>>> reaching zero it does:
->>>>=20
->>>> /* now tmcct =3D=3D 0 and tmict !=3D 0 */
->>>> apic_change_mode(APIC_LVT_TIMER_PERIODIC);
->>>> report("TMCCT should stay at zero", !apic_read(APIC_TMCCT));
->>>>=20
->>>> which seems to be testing that oneshot->periodic won't reset the =
-timer if
->>>> it's already zero.  A possible caveat is there's hardly any delay =
-between
->>>> the mode change and the timer read.  Emulated hardware will react
->>>> instantaneously (at least as seen from within the VM), but hardware =
-might
->>>> need more time to react (though offhand I'd expect HW to be fast =
-enough for
->>>> this particular timer).
->>>>=20
->>>> So, it looks like the code might already be ready to run on =
-physical
->>>> hardware, and if it has (or does already as part of a regular =
-test), then
->>>> that does raise some doubt on what's the appropriate code change to =
-make
->>>> this work.
->>>=20
->>> Nadav has been running tests on bare metal, maybe he can weigh in on
->>> whether or not test_apic_change_mode() passes on bare metal.
->>=20
->> These tests pass on bare-metal.
->=20
-> Good to know this. In addition, in linux apic driver, during mode
-> switch __setup_APIC_LVTT() always sets lapic_timer_period(number of
-> clock cycles per jiffy)/APIC_DIVISOR to APIC_TMICT which can avoid the
-> issue Matt report. So is it because there is no such stuff in windows
-> or the windows version which Matt testing is too old?
+On Tue, 20 Aug 2019 08:58:02 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
-I find it kind of disappointing that you (and others) did not try the
-kvm-unit-tests of bare-metal. :(
+> + Dave.
+> 
+> Hi Jiri, Dave, Alex, Kirti, Cornelia,
+> 
+> Please provide your feedback on it, how shall we proceed?
+> 
+> Short summary of requirements.
+> For a given mdev (mediated device [1]), there is one representor
+> netdevice and devlink port in switchdev mode (similar to SR-IOV VF),
+> And there is one netdevice for the actual mdev when mdev is probed.
+> 
+> (a) representor netdev and devlink port should be able derive
+> phys_port_name(). So that representor netdev name can be built
+> deterministically across reboots.
+> 
+> (b) for mdev's netdevice, mdev's device should have an attribute.
+> This attribute can be used by udev rules/systemd or something else to
+> rename netdev name deterministically.
+> 
+> (c) IFNAMSIZ of 16 bytes is too small to fit whole UUID.
+> A simple grep IFNAMSIZ in stack hints hundreds of users of IFNAMSIZ
+> in drivers, uapi, netlink, boot config area and more. Changing
+> IFNAMSIZ for a mdev bus doesn't really look reasonable option to me.
 
-It should be working, once Paolo (ahem..) applies the one pending patch. =
-You
-do need a serial console though (which is usually available through
-ilo/idrac/etc). It should also work with UEFI/kexec, although I did not =
-run
-such tests.
+How many characters do we really have to work with?  Your examples
+below prepend various characters, ex. option-1 results in ens2f0_m10 or
+enm10.  Do the extra 8 or 3 characters in these count against IFNAMSIZ?
 
+> Hence, I would like to discuss below options.
+> 
+> Option-1: mdev index
+> Introduce an optional mdev index/handle as u32 during mdev create
+> time. User passes mdev index/handle as input.
+> 
+> phys_port_name=mIndex=m%u
+> mdev_index will be available in sysfs as mdev attribute for udev to
+> name the mdev's netdev.
+> 
+> example mdev create command:
+> UUID=$(uuidgen)
+> echo $UUID index=10
+> > /sys/class/net/ens2f0/mdev_supported_types/mlx5_core_mdev/create
+
+Nit, IIRC previous discussions of additional parameters used comma
+separators, ex. echo $UUID,index=10 >...
+
+> > example netdevs:
+> repnetdev=ens2f0_m10	/*ens2f0 is parent PF's netdevice */
+
+Is the parent really relevant in the name?  Tools like mdevctl are
+meant to provide persistence, creating the same mdev devices on the
+same parent, but that's simply the easiest policy decision.  We can
+also imagine that multiple parent devices might support a specified
+mdev type and policies factoring in proximity, load-balancing, power
+consumption, etc might be weighed such that we really don't want to
+promote userspace creating dependencies on the parent association.
+
+> mdev_netdev=enm10
+> 
+> Pros:
+> 1. mdevctl and any other existing tools are unaffected.
+> 2. netdev stack, ovs and other switching platforms are unaffected.
+> 3. achieves unique phys_port_name for representor netdev
+> 4. achieves unique mdev eth netdev name for the mdev using
+> udev/systemd extension. 5. Aligns well with mdev and netdev subsystem
+> and similar to existing sriov bdf's.
+
+A user provided index seems strange to me.  It's not really an index,
+just a user specified instance number.  Presumably you have the user
+providing this because if it really were an index, then the value
+depends on the creation order and persistence is lost.  Now the user
+needs to both avoid uuid collision as well as "index" number
+collision.  The uuid namespace is large enough to mostly ignore this,
+but this is not.  This seems like a burden.
+
+> Option-2: shorter mdev name
+> Extend mdev to have shorter mdev device name in addition to UUID.
+> such as 'foo', 'bar'.
+> Mdev will continue to have UUID.
+> phys_port_name=mdev_name
+> 
+> Pros:
+> 1. All same as option-1, except mdevctl needs upgrade for newer usage.
+> It is common practice to upgrade iproute2 package along with the
+> kernel. Similar practice to be done with mdevctl.
+> 2. Newer users of mdevctl who wants to work with non_UUID names, will
+> use newer mdevctl/tools. Cons:
+> 1. Dual naming scheme of mdev might affect some of the existing tools.
+> It's unclear how/if it actually affects.
+> mdevctl [2] is very recently developed and can be enhanced for dual
+> naming scheme.
+
+I think we've already nak'ed this one, the device namespace becomes
+meaningless if the name becomes just a string where a uuid might be an
+example string.  mdevs are named by uuid.
+ 
+> Option-3: mdev uuid alias
+> Instead of shorter mdev name or mdev index, have alpha-numeric name
+> alias. Alias is an optional mdev sysfs attribute such as 'foo', 'bar'.
+> example mdev create command:
+> UUID=$(uuidgen)
+> echo $UUID alias=foo
+> > /sys/class/net/ens2f0/mdev_supported_types/mlx5_core_mdev/create
+> > example netdevs:
+> examle netdevs:
+> repnetdev = ens2f0_mfoo
+> mdev_netdev=enmfoo
+> 
+> Pros:
+> 1. All same as option-1.
+> 2. Doesn't affect existing mdev naming scheme.
+> Cons:
+> 1. Index scheme of option-1 is better which can number large number
+> of mdevs with fewer characters, simplifying the management tool.
+
+No better than option-1, simply a larger secondary namespace, but still
+requires the user to come up with two independent names for the device.
+
+> Option-4: extend IFNAMESZ to be 64 bytes Extended IFNAMESZ from 16 to
+> 64 bytes phys_port_name=mdev_UUID_string mdev_netdev_name=enmUUID
+> 
+> Pros:
+> 1. Doesn't require mdev extension
+> Cons:
+> 1. netdev stack, driver, uapi, user space, boot config wide changes
+> 2. Possible user space extensions who assumed name size being 16
+> characters 3. Single device type demands namesize change for all
+> netdev types
+
+What about an alias based on the uuid?  For example, we use 160-bit
+sha1s daily with git (uuids are only 128-bit), but we generally don't
+reference git commits with the full 20 character string.  Generally 12
+characters is recommended to avoid ambiguity.  Could mdev automatically
+create an abbreviated sha1 alias for the device?  If so, how many
+characters should we use and what do we do on collision?  The colliding
+device could add enough alias characters to disambiguate (we likely
+couldn't re-alias the existing device to disambiguate, but I'm not sure
+it matters, userspace has sysfs to associate aliases).  Ex.
+
+UUID=$(uuidgen)
+ALIAS=$(echo $UUID | sha1sum | colrm 13)
+
+Since there seems to be some prefix overhead, as I ask about above in
+how many characters we actually have to work with in IFNAMESZ, maybe we
+start with 8 characters (matching your "index" namespace) and expand as
+necessary for disambiguation.  If we can eliminate overhead in
+IFNAMESZ, let's start with 12.  Thanks,
+
+Alex
