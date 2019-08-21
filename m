@@ -2,102 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77B8998794
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 01:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C74B987A0
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 01:05:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731270AbfHUXCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 19:02:03 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:35347 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730339AbfHUXCC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 19:02:02 -0400
-Received: by mail-io1-f68.google.com with SMTP id i22so8085586ioh.2
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 16:02:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=axv1TR5Z104aBOHyWcWWY1GpjEGEg2RCX6x0P6YWyPw=;
-        b=RQujUxJDBHLGw7WJJQqZRoOhao1UMfYivTBtAHRlVxjUC3psYtg+9bCB9hrVuTX7G0
-         eVKK/I64J9cMaNVLhwUZqtJMKOxjWLKGTDXKjwLHNuCbhFJ94N8T5tcM1PvjLr4Ofuzi
-         uFxXUMSQ6YomM17KLSxMv657pEsnFpN/aa9rUcYpWLyxkDqyWNk1fpzC3zlrT+eh8gq0
-         OSxP7uAZ3La6wVGB6l1leZaAi91yIwHgstjxoHY2qS+aioziskwoU33BA+vTAQ/3criS
-         HGBySzp+VkZSr7m9p+w/oFKwKT//bh3r+J1z56LaSyUier3P5lGdcV2jvEoX3sbAuFjX
-         Sh+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=axv1TR5Z104aBOHyWcWWY1GpjEGEg2RCX6x0P6YWyPw=;
-        b=nEdvc9gccp0EZekVdSM6ComouDENsw+H2/A6HISldI5UmffHNYqipfz2EaQeOhg5FB
-         v5MdyAKXAGZOl5tmvibaunJArNbcO/a+uR6akcSbO3ylenuChSfrh08WThG/MXguOLtK
-         e/KEIISqvKdx1bUvTebTf/Dj8yBok8psOsbEnyAeQmm3SGw9zjy1OwbhicJ2vnWWZ7yr
-         RAhqkw3WTr8LyrRlOfSHaaYxCe/NVvdjrH5m+WuK5j1B7sSACtn+WCkoltNeorYcMp8i
-         NZYLBvsqLocQomyICxgwe5nC7hWorfEqzlUEIjriPRRtnKvc16tIhXjnWUuzrSlCqMVa
-         3COQ==
-X-Gm-Message-State: APjAAAXDZSxmymbz2u1YTHwpxq0GgdaxySSnW04KSkVAZjL3+ONotXWl
-        BNw6E2uc9Idi5SF9cBt7WKR9mWdboQHR6h94akSv8Mi8H7RIuA==
-X-Google-Smtp-Source: APXvYqzwE82iA+K0Hj9gL+a3PJfnmWYHyUJXVBk4yQKi6o/c7q5cWLZEWLrPuyb8hMBwQjOpQpbFfyyI5DfZZ6onBU4=
-X-Received: by 2002:a6b:6a15:: with SMTP id x21mr8796055iog.40.1566428521608;
- Wed, 21 Aug 2019 16:02:01 -0700 (PDT)
+        id S1728836AbfHUXFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 19:05:22 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:55472 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727038AbfHUXFW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 19:05:22 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7LN48gM186619;
+        Wed, 21 Aug 2019 23:05:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=QzJqZQAw7CNLcb5AIEfYie7F9fg4e1Zft5yGgFCU+YU=;
+ b=T4Yer8ySNwuP0r/wkAxVYeHxtIJSeujeE1bpF0v3tWuAIqzznnZJ1rU91Fgrk18/6YnM
+ +fbjOyCQKabYHnagu1OY91cl72JgPc5ZiSnztJtCI5E6pt5nbqttlTfqNOSSlI8oDP6m
+ dJ3FsEzYRo0OQULmuxypAH1dhp5uOmpO5UqJQ2WC6RySZ6VvAgf5rydB2JFgyb965Dd8
+ 0ABBVmnkKHSkDteYAtQrPsMrtGcz8iZYIFwSKHGqdCH7Iz0gLMs0xCu9eb/OSl/dhb8G
+ YzACOzreNO2dldSuySD67puZnO1N4avER5Lf9fU6sEIu3XZujG7fyG+P2euNp0XoFzEQ sg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2uea7r10en-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Aug 2019 23:05:08 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7LN3BOH039436;
+        Wed, 21 Aug 2019 23:05:08 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2uh83p8cjd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Aug 2019 23:05:08 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7LN56ha018818;
+        Wed, 21 Aug 2019 23:05:06 GMT
+Received: from [10.159.144.137] (/10.159.144.137)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 21 Aug 2019 16:05:05 -0700
+Subject: Re: [PATCH 6/8][KVM nVMX]: Load IA32_PERF_GLOBAL_CTRL MSR on vmentry
+ of nested guests
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+References: <20190424231724.2014-1-krish.sadhukhan@oracle.com>
+ <20190424231724.2014-7-krish.sadhukhan@oracle.com>
+ <CALMp9eR8u6qPF5Gv-UEXSmB9NX=H=AGb4jh4d=mEm7jyTqBfWg@mail.gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <6d0a81be-1546-2a02-92b3-6b94468de9c6@oracle.com>
+Date:   Wed, 21 Aug 2019 16:05:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190819214650.41991-1-nikita.leshchenko@oracle.com>
- <20190819214650.41991-2-nikita.leshchenko@oracle.com> <20190819221101.GF1916@linux.intel.com>
- <CALMp9eR4zO=BOZKzDowkVSR7O9Y2aqBXEvwepv6j85z4wvSyxA@mail.gmail.com> <20190821222218.GL29345@linux.intel.com>
-In-Reply-To: <20190821222218.GL29345@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 21 Aug 2019 16:01:49 -0700
-Message-ID: <CALMp9eTT9AoytCKN8FmcKhfrsn4Pz=r8yDFe=_CEobpeOG6J6A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: nVMX: Always indicate HLT activity support in
- VMX_MISC MSR
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Nikita Leshenko <nikita.leshchenko@oracle.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CALMp9eR8u6qPF5Gv-UEXSmB9NX=H=AGb4jh4d=mEm7jyTqBfWg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9355 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908210228
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9355 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908210228
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 3:22 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Wed, Aug 21, 2019 at 01:59:20PM -0700, Jim Mattson wrote:
-> > On Mon, Aug 19, 2019 at 3:11 PM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > On Tue, Aug 20, 2019 at 12:46:49AM +0300, Nikita Leshenko wrote:
-> > > > Before this commit, userspace could disable the GUEST_ACTIVITY_HLT bit in
-> > > > VMX_MISC yet KVM would happily accept GUEST_ACTIVITY_HLT activity state in
-> > > > VMCS12. We can fix it by either failing VM entries with HLT activity state when
-> > > > it's not supported or by disallowing clearing this bit.
-> > > >
-> > > > The latter is preferable. If we go with the former, to disable
-> > > > GUEST_ACTIVITY_HLT userspace also has to make CPU_BASED_HLT_EXITING a "must be
-> > > > 1" control, otherwise KVM will be presenting a bogus model to L1.
-> > > >
-> > > > Don't fail writes that disable GUEST_ACTIVITY_HLT to maintain backwards
-> > > > compatibility.
-> > >
-> > > Paolo, do we actually need to maintain backwards compatibility in this
-> > > case?  This seems like a good candidate for "fix the bug and see who yells".
-> >
-> > Google's userspace clears bit 6. Please don't fail that write!
->
-> Booooo.
->
 
-Supporting activity state HLT is on our list of things to do, but I'm
-not convinced that kvm actually handles it properly yet. For
-instance...
+On 8/15/19 3:44 PM, Jim Mattson wrote:
+> On Wed, Apr 24, 2019 at 4:43 PM Krish Sadhukhan
+> <krish.sadhukhan@oracle.com> wrote:
+>> According to section "Loading Guest State" in Intel SDM vol 3C, the
+>> IA32_PERF_GLOBAL_CTRL MSR is loaded on vmentry of nested guests:
+>>
+>>      "If the “load IA32_PERF_GLOBAL_CTRL” VM-entry control is 1, the
+>>       IA32_PERF_GLOBAL_CTRL MSR is loaded from the IA32_PERF_GLOBAL_CTRL
+>>       field."
+>>
+>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Suggested-by: Jim Mattson <jmattson@google.com>
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>> ---
+>>   arch/x86/kvm/vmx/nested.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index a7bf19eaa70b..8177374886a9 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -2300,6 +2300,10 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>>          vcpu->arch.cr0_guest_owned_bits &= ~vmcs12->cr0_guest_host_mask;
+>>          vmcs_writel(CR0_GUEST_HOST_MASK, ~vcpu->arch.cr0_guest_owned_bits);
+>>
+>> +       if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
+>> +               vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL,
+>> +                            vmcs12->guest_ia32_perf_global_ctrl);
+>> +
+>>          if (vmx->nested.nested_run_pending &&
+>>              (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT)) {
+>>                  vmcs_write64(GUEST_IA32_PAT, vmcs12->guest_ia32_pat);
+>> --
+>> 2.17.2
+>>
+> This isn't quite right. The GUEST_IA32_PERF_GLOBAL_CTRL value is just
+> going to get overwritten later by atomic_switch_perf_msrs().
 
-What happens if L1 launches L2 into activity state HLT with a
-zero-valued VMX preemption timer? (Maybe this is fixed now?)
-What happens if "monitor trap flag" is set and "HLT exiting" is clear
-in the vmcs12, and immediately on VM-entry, L2 executes HLT? (Yes,
-this is a special case of MTF being broken when L0 emulates an L2
-instruction.)
 
-I'm sure there are other interesting scenarios that haven't been validated.
+atomic_switch_perf_msrs() gest called from vmx_vcpu_run() which I 
+thought was executing before handle_vmlaunch() stuff that lead to 
+prepare_vmcs02(). Did I miss something in the call-chain ?
+
+
+> Instead of writing the vmcs12 value directly into the vmcs02, you
+> should call kvm_set_msr(), exactly as it would have been called if
+> MSR_CORE_PERF_GLOBAL_CTRL had been in the vmcs12
+> VM-entry MSR-load list. Then, atomic_switch_perf_msrs() will
+> automatically do the right thing.
