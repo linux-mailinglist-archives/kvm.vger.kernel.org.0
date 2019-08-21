@@ -2,129 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 75A53982A4
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 20:24:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AC8D983FF
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 21:09:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728639AbfHUSUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 14:20:16 -0400
-Received: from mail-vs1-f74.google.com ([209.85.217.74]:40743 "EHLO
-        mail-vs1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727099AbfHUSUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 14:20:16 -0400
-Received: by mail-vs1-f74.google.com with SMTP id y7so1060220vsq.7
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 11:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=XOWLAgp0P8npFc8OAOfS4Qa4ZgriqhnGg7/Zma2VF2Y=;
-        b=PL4GW/z+KdvWg8PgiliXgFESGa1f8UQXyd+7ri//f/7ac44KtIJPu57pb7RcP4x5CE
-         YsVSa2XFokfd36Rh9twwQxbLrS3Ean1MUAjsfUqJRtTQhoN3RPycoBF8PZgs00WnpeJq
-         HMqlX5qxJEavzolTIgMKI2L7kfV0sQCfJUngnemvBtwrMDcIgKFkHOt+hgglaLop/d04
-         HOGhzWi6d9qVF+OGKQ4YrGSlX4M79EdWNs3OFWB140ZR6AXTlqvb+tUv9K/YCtB9Q59E
-         HG0qmpwWMcVa4av4G8PBrMgwLS/JzGvZtAXgQD2+soMohQ/y2xXx1jMo4+2s8TmpHGP0
-         piyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=XOWLAgp0P8npFc8OAOfS4Qa4ZgriqhnGg7/Zma2VF2Y=;
-        b=sS8HJPrEeBzUN3YmV9jI22HVEiRS80a65/J/EcK7uRmwM+wDG/BQhenDEm3MhZtQ8a
-         pkUiqejMrPhEkwm16WuH/x9hZuzxqxiskTSF+0VvF9gMl5kyB1fNVKjcdxkvuES83WJl
-         qc571oi4aZvMRBOtofWtt2pRaAweWyiDoOQnHml/cG0/dUrsPYZlp6iGGIWG2jPnZ1TI
-         BD2POrLVUHhX3uKY5y2V8yvoavoXwYVC6HoARHjyvU5g6EtENq9q/h4bPJokE7oDAwpE
-         tKQJNhUuReVC3IQfCBXTbUbJdOjz5M6ceG6BCCgFUor0MGc/IgIC8WXNfh0kaEWyRO3b
-         F4zg==
-X-Gm-Message-State: APjAAAVx4qVHwHvNLFS8ZBTtT+bVob0yETlcCp/Z359UM1AKF99h1dZ5
-        x1ws3q63OLPGrUGJ/waLn6zejJJlXmmWNIX1KV3x41Iu1kM+aP6uvV+zNGCbkkQVseDE39kK/+w
-        jIYUB6Kz2YIViHSRUV+BBXGBtpIwbpGhLPXvXeeZwYWtIR2oMw3aqO3eRy0kgxnI=
-X-Google-Smtp-Source: APXvYqyOtN6QsibogCg7LnU0B3aINk4w+2zic8k4fpKIkx0+JNYB93greEYNIPRkpmXkkZ7gyDjNpsDP9SKReg==
-X-Received: by 2002:ab0:240e:: with SMTP id f14mr3249017uan.26.1566411614472;
- Wed, 21 Aug 2019 11:20:14 -0700 (PDT)
-Date:   Wed, 21 Aug 2019 11:20:04 -0700
-Message-Id: <20190821182004.102768-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-Subject: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>,
-        Eric Hankland <ehankland@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1728949AbfHUTJB convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 21 Aug 2019 15:09:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50814 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727685AbfHUTJA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 15:09:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 73FA9693E7;
+        Wed, 21 Aug 2019 19:09:00 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1266F60BF3;
+        Wed, 21 Aug 2019 19:09:00 +0000 (UTC)
+Date:   Wed, 21 Aug 2019 13:08:59 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
+Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
+ removing a memslot
+Message-ID: <20190821130859.4330bcf4@x1.home>
+In-Reply-To: <20190820210245.GC15808@linux.intel.com>
+References: <20190205210137.1377-11-sean.j.christopherson@intel.com>
+        <20190813100458.70b7d82d@x1.home>
+        <20190813170440.GC13991@linux.intel.com>
+        <20190813115737.5db7d815@x1.home>
+        <20190813133316.6fc6f257@x1.home>
+        <20190813201914.GI13991@linux.intel.com>
+        <20190815092324.46bb3ac1@x1.home>
+        <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
+        <20190820200318.GA15808@linux.intel.com>
+        <20190820144204.161f49e0@x1.home>
+        <20190820210245.GC15808@linux.intel.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Wed, 21 Aug 2019 19:09:00 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These MSRs should be enumerated by KVM_GET_MSR_INDEX_LIST, so that
-userspace knows that these MSRs may be part of the vCPU state.
+On Tue, 20 Aug 2019 14:02:45 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Eric Hankland <ehankland@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
+> On Tue, Aug 20, 2019 at 02:42:04PM -0600, Alex Williamson wrote:
+> > On Tue, 20 Aug 2019 13:03:19 -0700
+> > Sean Christopherson <sean.j.christopherson@intel.com> wrote:  
+> > > All that being said, it doesn't explain why gfns like 0xfec00 and 0xfee00
+> > > were sensitive to (lack of) zapping.  My theory is that zapping what were
+> > > effectively random-but-interesting shadow pages cleaned things up enough
+> > > to avoid noticeable badness.
+> > > 
+> > > 
+> > > Alex,
+> > > 
+> > > Can you please test the attached patch?  It implements a very slimmed down
+> > > version of kvm_mmu_zap_all() to zap only shadow pages that can hold sptes
+> > > pointing at the memslot being removed, which was the original intent of
+> > > kvm_mmu_invalidate_zap_pages_in_memslot().  I apologize in advance if it
+> > > crashes the host.  I'm hopeful it's correct, but given how broken the
+> > > previous version was, I'm not exactly confident.  
+> > 
+> > It doesn't crash the host, but the guest is not happy, failing to boot
+> > the desktop in one case and triggering errors in the guest w/o even
+> > running test programs in another case.  Seems like it might be worse
+> > than previous.  Thanks,  
+> 
+> Hrm, I'm back to being completely flummoxed.
+> 
+> Would you be able to generate a trace of all events/kvmmmu, using the
+> latest patch?  I'd like to rule out a stupid code bug if it's not too
+> much trouble.
 
----
- arch/x86/kvm/x86.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+I tried to simplify the patch, making it closer to zap_all, so I
+removed the max_level calculation and exclusion based on s->role.level,
+as well as the gfn range filtering.  For good measure I even removed
+the sp->root_count test, so any sp not marked invalid is zapped.  This
+works, and I can also add back the sp->root_count test and things
+remain working.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 93b0bd45ac73..ecaaa411538f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1140,6 +1140,42 @@ static u32 msrs_to_save[] = {
- 	MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
- 	MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
- 	MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
-+	MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
-+	MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
-+	MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
-+	MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-+	MSR_ARCH_PERFMON_PERFCTR0, MSR_ARCH_PERFMON_PERFCTR1,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 2, MSR_ARCH_PERFMON_PERFCTR0 + 3,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 4, MSR_ARCH_PERFMON_PERFCTR0 + 5,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 6, MSR_ARCH_PERFMON_PERFCTR0 + 7,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 8, MSR_ARCH_PERFMON_PERFCTR0 + 9,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 10, MSR_ARCH_PERFMON_PERFCTR0 + 11,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 12, MSR_ARCH_PERFMON_PERFCTR0 + 13,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 14, MSR_ARCH_PERFMON_PERFCTR0 + 15,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 16, MSR_ARCH_PERFMON_PERFCTR0 + 17,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 18, MSR_ARCH_PERFMON_PERFCTR0 + 19,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 20, MSR_ARCH_PERFMON_PERFCTR0 + 21,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 22, MSR_ARCH_PERFMON_PERFCTR0 + 23,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 24, MSR_ARCH_PERFMON_PERFCTR0 + 25,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 26, MSR_ARCH_PERFMON_PERFCTR0 + 27,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 28, MSR_ARCH_PERFMON_PERFCTR0 + 29,
-+	MSR_ARCH_PERFMON_PERFCTR0 + 30, MSR_ARCH_PERFMON_PERFCTR0 + 31,
-+	MSR_ARCH_PERFMON_EVENTSEL0, MSR_ARCH_PERFMON_EVENTSEL1,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 2, MSR_ARCH_PERFMON_EVENTSEL0 + 3,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 4, MSR_ARCH_PERFMON_EVENTSEL0 + 5,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 6, MSR_ARCH_PERFMON_EVENTSEL0 + 7,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 8, MSR_ARCH_PERFMON_EVENTSEL0 + 9,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 10, MSR_ARCH_PERFMON_EVENTSEL0 + 11,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 18, MSR_ARCH_PERFMON_EVENTSEL0 + 19,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 20, MSR_ARCH_PERFMON_EVENTSEL0 + 21,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 22, MSR_ARCH_PERFMON_EVENTSEL0 + 23,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 24, MSR_ARCH_PERFMON_EVENTSEL0 + 25,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 26, MSR_ARCH_PERFMON_EVENTSEL0 + 27,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 28, MSR_ARCH_PERFMON_EVENTSEL0 + 29,
-+	MSR_ARCH_PERFMON_EVENTSEL0 + 30, MSR_ARCH_PERFMON_EVENTSEL0 + 31,
- };
- 
- static unsigned num_msrs_to_save;
-@@ -4989,6 +5025,11 @@ static void kvm_init_msr_list(void)
- 	u32 dummy[2];
- 	unsigned i, j;
- 
-+	BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 4,
-+			 "Please update the fixed PMCs in msrs_to_save[]");
-+	BUILD_BUG_ON_MSG(INTEL_PMC_MAX_GENERIC != 32,
-+			 "Please update the generic perfctr/eventsel MSRs in msrs_to_save[]");
-+
- 	for (i = j = 0; i < ARRAY_SIZE(msrs_to_save); i++) {
- 		if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]) < 0)
- 			continue;
--- 
-2.23.0.187.g17f5b7556c-goog
+From there I added back the gfn range test, but I left out the gfn_mask
+because I'm not doing the level filtering and I think(?) this is just
+another optimization.  So essentially I only add:
 
+	if (sp->gfn < slot->base_gfn ||
+            sp->gfn > (slot->base_gfn + slot->npages - 1))
+		continue;
+
+Not only does this not work, the host will sometimes oops:
+
+[  808.541168] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  808.555065] #PF: supervisor read access in kernel mode
+[  808.565326] #PF: error_code(0x0000) - not-present page
+[  808.575588] PGD 0 P4D 0 
+[  808.580649] Oops: 0000 [#1] SMP PTI
+[  808.587617] CPU: 3 PID: 1965 Comm: CPU 0/KVM Not tainted 5.3.0-rc4+ #4
+[  808.600652] Hardware name: System manufacturer System Product Name/P8H67-M PRO, BIOS 3904 04/27/2013
+[  808.618907] RIP: 0010:gfn_to_rmap+0xd9/0x120 [kvm]
+[  808.628472] Code: c7 48 8d 0c 80 48 8d 04 48 4d 8d 14 c0 49 8b 02 48 39 c6 72 15 49 03 42 08 48 39 c6 73 0c 41 89 b9 08 b4 00 00 49 8b 3a eb 0b <48> 8b 3c 25 00 00 00 00 45 31 d2 0f b6 42 24 83 e0 0f 83 e8 01 8d
+[  808.665945] RSP: 0018:ffffa888009a3b20 EFLAGS: 00010202
+[  808.676381] RAX: 00000000000c1040 RBX: ffffa888007d5000 RCX: 0000000000000014
+[  808.690628] RDX: ffff8eadd0708260 RSI: 00000000000c1080 RDI: 0000000000000004
+[  808.704877] RBP: ffff8eadc3d11400 R08: ffff8ead97cf0008 R09: ffff8ead97cf0000
+[  808.719124] R10: ffff8ead97cf0168 R11: 0000000000000004 R12: ffff8eadd0708260
+[  808.733374] R13: ffffa888007d5000 R14: 0000000000000000 R15: 0000000000000004
+[  808.747620] FS:  00007f28dab7c700(0000) GS:ffff8eb19f4c0000(0000) knlGS:0000000000000000
+[  808.763776] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  808.775249] CR2: 0000000000000000 CR3: 000000003f508006 CR4: 00000000001626e0
+[  808.789499] Call Trace:
+[  808.794399]  drop_spte+0x77/0xa0 [kvm]
+[  808.801885]  mmu_page_zap_pte+0xac/0xe0 [kvm]
+[  808.810587]  __kvm_mmu_prepare_zap_page+0x69/0x350 [kvm]
+[  808.821196]  kvm_mmu_invalidate_zap_pages_in_memslot+0x87/0xf0 [kvm]
+[  808.833881]  kvm_page_track_flush_slot+0x55/0x80 [kvm]
+[  808.844140]  __kvm_set_memory_region+0x821/0xaa0 [kvm]
+[  808.854402]  kvm_set_memory_region+0x26/0x40 [kvm]
+[  808.863971]  kvm_vm_ioctl+0x59a/0x940 [kvm]
+[  808.872318]  ? pagevec_lru_move_fn+0xb8/0xd0
+[  808.880846]  ? __seccomp_filter+0x7a/0x680
+[  808.889028]  do_vfs_ioctl+0xa4/0x630
+[  808.896168]  ? security_file_ioctl+0x32/0x50
+[  808.904695]  ksys_ioctl+0x60/0x90
+[  808.911316]  __x64_sys_ioctl+0x16/0x20
+[  808.918807]  do_syscall_64+0x5f/0x1a0
+[  808.926121]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[  808.936209] RIP: 0033:0x7f28ebf2b0fb
+
+Does this suggests something is still fundamentally wrong with the
+premise of this change or have I done something stupid?  Thanks,
+
+Alex
