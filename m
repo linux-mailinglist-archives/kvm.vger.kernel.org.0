@@ -2,189 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D344797DEC
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 17:00:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDD0997E4D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 17:13:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729696AbfHUPAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 11:00:46 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:33271 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728437AbfHUPAp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 11:00:45 -0400
-Received: by mail-pl1-f195.google.com with SMTP id go14so1483077plb.0;
-        Wed, 21 Aug 2019 08:00:45 -0700 (PDT)
+        id S1728242AbfHUPNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 11:13:21 -0400
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:45022 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727395AbfHUPNV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 11:13:21 -0400
+Received: by mail-vk1-f195.google.com with SMTP id 82so629725vkf.11;
+        Wed, 21 Aug 2019 08:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:from:to:cc:date:message-id:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=R9EIePxtKgh7rutMNGBvqWvR/nyIQIv1yBQVlI6lc80=;
-        b=tkfoMKNl6R00u1CGr4goVFrz53AHxoV7hFxDcGeUp0tOZUCo+74t/zt8j+2QopIgxI
-         EZ3M3c24Jl9SrsJM+dTZwK8SGp7tO2O/0yx89/oESAn4+Y33U06VmjCAJUF8WYGRwZeO
-         eKjbkMOiSUf3GOoqrhSS+vgoRMpgqZeesnV5hVjONU4VcpdOzOxTu/6+rYJJelofQ2l3
-         KrIWCI8aXlUCizR5/hSFEMJ0SFD0wRsscqpCzcEa6q+HWASFrKQeuvC0VTIT8+HbR6/e
-         kIbuzlNFr7cnr7aQG0JZ89EPMqXTXef7jzZr4LRARx074pduHcDo0oZ2TTBh+XMIA1it
-         tJhw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=jwGiMo+O0R1n33o38YZSlBCw9qrUKcNVmQ8Fpu4M47Q=;
+        b=EQfRAFasLHyB52Xeg3H2BuQC55nTDJ12s3INgRKvDbvbAayJt1KH+Cm3uuxXGzsjoh
+         IAIkBTdgVsWkwwrH7H28uDBoVqJDfDBlQkNjq6dGUUyarZJqU7aADamGAXQTAvjagURR
+         D8Wxg5mDKiJJS3aDMGNHq0cauST/2W5jDnxogYE0llcgVKVHDBCWiZTZVcWRed6XzDWT
+         ZyQLVT+e5X+Jew/2cQk+03fZ89U7S6Q71Fslbg3CeoZb594vhvCWdE5i0UxB4tY75/2R
+         fXeEK2iDjnJjcASUNjStQAtINYh8x2Soxcz3A1PJbU4jSGtSzX2JqtOUvfoLvBMWRB+M
+         mhEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=R9EIePxtKgh7rutMNGBvqWvR/nyIQIv1yBQVlI6lc80=;
-        b=N8uG4VLyAj2C8zZPu4NrH8iGwhXcdjEiiN5HJmGYr+sm3PFBf/Pyzwt7HlAussmJX5
-         uuh2KCr/NVRpy/FCOi4MwQd/OjeyaG2OR1Prv6rNAAk3VCQa6B55H+LD3STNIPCi1otN
-         ykB7gkK/YLqjz7ob2TZDlZU7vWNgQR9d+qUHujcnJSQdsgcvcGVQE5NLZ6+8G+Hka4+R
-         NgWg86abCUhMb7jJ8pmBCKhxdY64hKNz8X7+E7iSTRQOeM4rCZ5ba3X0eyJNxES/XU/R
-         +KrTvGKM/ZyRferwN3DMFc7JTQDKpqGCiY8HFxFU1wHvGGA1xuJUvu+W0FfDi0C/UOfc
-         68hA==
-X-Gm-Message-State: APjAAAXVraNnOmuk8yYcq4qFXu8idC4wI7b7ymwx4ZYuxqXc9CKUqeu1
-        1PajkZFJpfKCBbJiJUsRzaHgqvXN
-X-Google-Smtp-Source: APXvYqzGZGBxE2Kux8cFfIoXPTej4Y3Rq0bhdauQWIpL/YOuwEUcP9xBJA0wE9MgWkUpeYVOa9xJ2g==
-X-Received: by 2002:a17:902:6843:: with SMTP id f3mr31726895pln.97.1566399645002;
-        Wed, 21 Aug 2019 08:00:45 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id b19sm14248033pgs.10.2019.08.21.08.00.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Aug 2019 08:00:44 -0700 (PDT)
-Subject: [PATCH v6 QEMU 3/3] virtio-balloon: Provide a interface for unused
- page reporting
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-To:     nitesh@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
-        david@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, virtio-dev@lists.oasis-open.org
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
-        konrad.wilk@oracle.com, willy@infradead.org,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, mhocko@kernel.org,
-        alexander.h.duyck@linux.intel.com, osalvador@suse.de
-Date:   Wed, 21 Aug 2019 08:00:43 -0700
-Message-ID: <20190821150043.21485.84756.stgit@localhost.localdomain>
-In-Reply-To: <20190821145806.20926.22448.stgit@localhost.localdomain>
-References: <20190821145806.20926.22448.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=jwGiMo+O0R1n33o38YZSlBCw9qrUKcNVmQ8Fpu4M47Q=;
+        b=ZpxE4OVV/u44YPgny9kx5IVdQLC/niN2BzQcaNKjYf2rRd85u/RxOWpW3xxn10r8k7
+         09UA4dxqa5IvGoX7EpaypCI7OMootNGvx/UlUHl3EVdpRflHRPGbVHXCoHo4FALFhHVK
+         PrS857KF5OgwOinOwi9CcHI+v2AeXWn1AbKSnMeiWsNtV4byY1JZT0dWRafnj2RKjm7H
+         ufYwNiDfQeJHQ5U3cBCSyRSMe0R7ZuwgxG7IG+GQv9zFJJRNid9cZWDmUK7Kq7WO0Ojd
+         U0CYYl+JEzjKJHf1FPR+/kWGq1FPl+voJRzRgkEU1tnAw8eOAv+Szaq9mQKaj5briCX4
+         Lsfw==
+X-Gm-Message-State: APjAAAUi/UFGa/ersID0Mo4HZfLhDrR37PnaumglDZ+4CinY5PUANNSJ
+        Fcr4/WJRtS5hKGmqKaxrBKtQ9g0LA2CKF+d5qT4=
+X-Google-Smtp-Source: APXvYqzYtms+BzTDyssdmKVF9MZHjSB7I37OzbD7+bX41f7u/F7vl3LogYbDFB3NGk4yjxQakq+w8b38L97NS4th6z8=
+X-Received: by 2002:a1f:2192:: with SMTP id h140mr12759993vkh.6.1566400399975;
+ Wed, 21 Aug 2019 08:13:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+References: <1566042663-16694-1-git-send-email-hexin15@baidu.com> <20190819135318.72f64e0d@x1.home>
+In-Reply-To: <20190819135318.72f64e0d@x1.home>
+From:   hexin <hexin.op@gmail.com>
+Date:   Wed, 21 Aug 2019 23:13:08 +0800
+Message-ID: <CAB_WELYZ80FHyjkcXj4WvBVx-N-3ZMURN3OXTqqbELVn90157g@mail.gmail.com>
+Subject: Re: [PATCH v2] vfio_pci: Replace pci_try_reset_function() with
+ __pci_reset_function_locked() to ensure that the pci device configuration
+ space is restored to its original state
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, hexin <hexin15@baidu.com>,
+        Liu Qi <liuqi16@baidu.com>, Zhang Yu <zhangyu31@baidu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Alex Williamson <alex.williamson@redhat.com> =E4=BA=8E2019=E5=B9=B48=E6=9C=
+=8820=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=883:53=E5=86=99=E9=81=93=
+=EF=BC=9A
+>
+> On Sat, 17 Aug 2019 19:51:03 +0800
+> hexin <hexin.op@gmail.com> wrote:
+>
+> > In vfio_pci_enable(), save the device's initial configuration informati=
+on
+> > and then restore the configuration in vfio_pci_disable(). However, the
+> > execution result is not the same. Since the pci_try_reset_function()
+> > function saves the current state before resetting, the configuration
+> > information restored by pci_load_and_free_saved_state() will be
+> > overwritten. The __pci_reset_function_locked() function can be used
+> > to prevent the configuration space from being overwritten.
+> >
+> > Fixes: 890ed578df82 ("vfio-pci: Use pci "try" reset interface")
+> > Signed-off-by: hexin <hexin15@baidu.com>
+> > Signed-off-by: Liu Qi <liuqi16@baidu.com>
+> > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci.c | 17 +++++++++++++----
+> >  1 file changed, 13 insertions(+), 4 deletions(-)
+>
+> This looks good, but the subject is too long and I find the commit log
+> somewhat confusing.  May I update these as follows?
+>
+>     vfio_pci: Restore original state on release
+>
+>     vfio_pci_enable() saves the device's initial configuration informatio=
+n
+>     with the intent that it is restored in vfio_pci_disable().  However,
+>     commit 890ed578df82 ("vfio-pci: Use pci "try" reset interface")
+>     replaced the call to __pci_reset_function_locked(), which is not wrap=
+ped
+>     in a state save and restore, with pci_try_reset_function(), which
+>     overwrites the restored device state with the current state before
+>     applying it to the device.  Restore use of __pci_reset_function_locke=
+d()
+>     to return to the desired behavior.
+>
+> Thanks,
+> Alex
+>
+>
 
-Add support for what I am referring to as "unused page reporting".
-Basically the idea is to function very similar to how the balloon works
-in that we basically end up madvising the page as not being used. However
-we don't really need to bother with any deflate type logic since the page
-will be faulted back into the guest when it is read or written to.
+Thanks for your update, the updated commit log is clearer than before.
+At the same time, when I use checkpatch.pl to detect the patch, there
+will be the
+following error:
 
-This is meant to be a simplification of the existing balloon interface
-to use for providing hints to what memory needs to be freed. I am assuming
-this is safe to do as the deflate logic does not actually appear to do very
-much other than tracking what subpages have been released and which ones
-haven't.
+ERROR: Please use git commit description style 'commit <12+ chars of
+sha1> ("<title line>")'
+- ie: 'commit 890ed578df82 ("vfio-pci: Use pci "try" reset interface")'
 
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
----
- hw/virtio/virtio-balloon.c         |   46 ++++++++++++++++++++++++++++++++++--
- include/hw/virtio/virtio-balloon.h |    2 +-
- 2 files changed, 45 insertions(+), 3 deletions(-)
+Line 2785 ~ 2801 in checkpatch.pl, the script can't handle the commit messa=
+ge
+which contains double quotes because of the expression `([^"]+)`. Like
+the "try" above.
+Maybe checkpatch.pl needs to be modified.
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 003b3ebcfdfb..7a30df63bc77 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -320,6 +320,40 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-     balloon_stats_change_timer(s, 0);
- }
- 
-+static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-+    VirtQueueElement *elem;
-+
-+    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-+    	unsigned int i;
-+
-+        for (i = 0; i < elem->in_num; i++) {
-+            void *addr = elem->in_sg[i].iov_base;
-+            size_t size = elem->in_sg[i].iov_len;
-+            ram_addr_t ram_offset;
-+            size_t rb_page_size;
-+            RAMBlock *rb;
-+
-+            if (qemu_balloon_is_inhibited() || dev->poison_val)
-+                continue;
-+
-+            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-+            rb_page_size = qemu_ram_pagesize(rb);
-+
-+            /* For now we will simply ignore unaligned memory regions */
-+            if ((ram_offset | size) & (rb_page_size - 1))
-+                continue;
-+
-+            ram_block_discard_range(rb, ram_offset, size);
-+        }
-+
-+        virtqueue_push(vq, elem, 0);
-+        virtio_notify(vdev, vq);
-+        g_free(elem);
-+    }
-+}
-+
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-@@ -627,7 +661,8 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-         return sizeof(struct virtio_balloon_config);
-     }
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
--        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_REPORTING)) {
-         return sizeof(struct virtio_balloon_config);
-     }
-     return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-@@ -715,7 +750,8 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
-     VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-     f |= dev->host_features;
-     virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
--    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(f, VIRTIO_BALLOON_F_REPORTING)) {
-         virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
-     }
- 
-@@ -805,6 +841,10 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-     s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-     s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
- 
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-+        s->rvq = virtio_add_queue(vdev, 32, virtio_balloon_handle_report);
-+    }
-+
-     if (virtio_has_feature(s->host_features,
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-@@ -931,6 +971,8 @@ static Property virtio_balloon_properties[] = {
-      */
-     DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
-                      qemu_4_0_config_size, false),
-+    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_REPORTING, true),
-     DEFINE_PROP_LINK("iothread", VirtIOBalloon, iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 7fe78e5c14d7..db5bf7127112 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -42,7 +42,7 @@ enum virtio_balloon_free_page_report_status {
- 
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
--    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-+    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *rvq;
-     uint32_t free_page_report_status;
-     uint32_t num_pages;
-     uint32_t actual;
+Thanks=EF=BC=8C
+HeXin
 
+
+> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> > index 703948c..0220616 100644
+> > --- a/drivers/vfio/pci/vfio_pci.c
+> > +++ b/drivers/vfio/pci/vfio_pci.c
+> > @@ -438,11 +438,20 @@ static void vfio_pci_disable(struct vfio_pci_devi=
+ce *vdev)
+> >       pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE=
+);
+> >
+> >       /*
+> > -      * Try to reset the device.  The success of this is dependent on
+> > -      * being able to lock the device, which is not always possible.
+> > +      * Try to get the locks ourselves to prevent a deadlock. The
+> > +      * success of this is dependent on being able to lock the device,
+> > +      * which is not always possible.
+> > +      * We can not use the "try" reset interface here, which will
+> > +      * overwrite the previously restored configuration information.
+> >        */
+> > -     if (vdev->reset_works && !pci_try_reset_function(pdev))
+> > -             vdev->needs_reset =3D false;
+> > +     if (vdev->reset_works && pci_cfg_access_trylock(pdev)) {
+> > +             if (device_trylock(&pdev->dev)) {
+> > +                     if (!__pci_reset_function_locked(pdev))
+> > +                             vdev->needs_reset =3D false;
+> > +                     device_unlock(&pdev->dev);
+> > +             }
+> > +             pci_cfg_access_unlock(pdev);
+> > +     }
+> >
+> >       pci_restore_state(pdev);
+> >  out:
+>
