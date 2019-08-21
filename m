@@ -2,354 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AB3F97187
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 07:28:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4281971B4
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 07:53:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727857AbfHUF00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 01:26:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49110 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727422AbfHUF0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 01:26:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9AEC63086272;
-        Wed, 21 Aug 2019 05:26:24 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 13BAA2B505;
-        Wed, 21 Aug 2019 05:26:23 +0000 (UTC)
-Date:   Tue, 20 Aug 2019 23:26:22 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     Jiri Pirko <jiri@mellanox.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S1727544AbfHUFxs convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 21 Aug 2019 01:53:48 -0400
+Received: from tyo161.gate.nec.co.jp ([114.179.232.161]:41442 "EHLO
+        tyo161.gate.nec.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725385AbfHUFxr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 01:53:47 -0400
+X-Greylist: delayed 655 seconds by postgrey-1.27 at vger.kernel.org; Wed, 21 Aug 2019 01:53:46 EDT
+Received: from mailgate01.nec.co.jp ([114.179.233.122])
+        by tyo161.gate.nec.co.jp (8.15.1/8.15.1) with ESMTPS id x7L5fP8t013248
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 21 Aug 2019 14:41:25 +0900
+Received: from mailsv01.nec.co.jp (mailgate-v.nec.co.jp [10.204.236.94])
+        by mailgate01.nec.co.jp (8.15.1/8.15.1) with ESMTP id x7L5fPie027570;
+        Wed, 21 Aug 2019 14:41:25 +0900
+Received: from mail01b.kamome.nec.co.jp (mail01b.kamome.nec.co.jp [10.25.43.2])
+        by mailsv01.nec.co.jp (8.15.1/8.15.1) with ESMTP id x7L5fPMY031987;
+        Wed, 21 Aug 2019 14:41:25 +0900
+Received: from bpxc99gp.gisp.nec.co.jp ([10.38.151.151] [10.38.151.151]) by mail02.kamome.nec.co.jp with ESMTP id BT-MMP-7746119; Wed, 21 Aug 2019 14:39:05 +0900
+Received: from BPXM23GP.gisp.nec.co.jp ([10.38.151.215]) by
+ BPXC23GP.gisp.nec.co.jp ([10.38.151.151]) with mapi id 14.03.0439.000; Wed,
+ 21 Aug 2019 14:39:04 +0900
+From:   Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+CC:     Mike Kravetz <mike.kravetz@oracle.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Punit Agrawal" <punit.agrawal@arm.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        cjia <cjia@nvidia.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-Message-ID: <20190820232622.164962d3@x1.home>
-In-Reply-To: <AM0PR05MB4866AE8FC4AA3CC24B08B326D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190802065905.45239-1-parav@mellanox.com>
-        <20190813111149.027c6a3c@x1.home>
-        <AM0PR05MB4866D40F8EBB382C78193C91D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814100135.1f60aa42.cohuck@redhat.com>
-        <AM0PR05MB4866ABFDDD9DDCBC01F6CA90D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814150911.296da78c.cohuck@redhat.com>
-        <AM0PR05MB48666CCDFE985A25F42A0259D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814085746.26b5f2a3@x1.home>
-        <AM0PR05MB4866148ABA3C4E48E73E95FCD1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <AM0PR05MB48668B6221E477A873688CDBD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190820111904.75515f58@x1.home>
-        <AM0PR05MB486686D3C311F3C61BE0997DD1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190820222051.7aeafb69@x1.home>
-        <AM0PR05MB48664CDF05C3D02F9441440DD1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190820225722.237a57d2@x1.home>
-        <AM0PR05MB4866AE8FC4AA3CC24B08B326D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-Organization: Red Hat
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Xiao Guangrong <xiaoguangrong@tencent.com>,
+        "lidongchen@tencent.com" <lidongchen@tencent.com>,
+        "yongkaiwu@tencent.com" <yongkaiwu@tencent.com>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        Hugh Dickins <hughd@google.com>
+Subject: Re: ##freemail## Re: [PATCH v2] mm: hwpoison: disable memory error
+ handling on 1GB hugepage
+Thread-Topic: ##freemail## Re: [PATCH v2] mm: hwpoison: disable memory error
+ handling on 1GB hugepage
+Thread-Index: AQHVFnaoUuMkT7+k5kKGu78GtXiXKKaVCtaAgG58OYCAAXqfAA==
+Date:   Wed, 21 Aug 2019 05:39:04 +0000
+Message-ID: <20190821053904.GA23349@hori.linux.bs1.fc.nec.co.jp>
+References: <87inbbjx2w.fsf@e105922-lin.cambridge.arm.com>
+ <20180207011455.GA15214@hori1.linux.bs1.fc.nec.co.jp>
+ <87fu6bfytm.fsf@e105922-lin.cambridge.arm.com>
+ <20180208121749.0ac09af2b5a143106f339f55@linux-foundation.org>
+ <87wozhvc49.fsf@concordia.ellerman.id.au>
+ <e673f38a-9e5f-21f6-421b-b3cb4ff02e91@oracle.com>
+ <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
+ <f79d828c-b0b4-8a20-c316-a13430cfb13c@oracle.com>
+ <20190610235045.GB30991@hori.linux.bs1.fc.nec.co.jp>
+ <CANRm+CwwPv52k7pWiErYwFHV=_6kCdiyXZkT3QT6ef_UJagt9A@mail.gmail.com>
+In-Reply-To: <CANRm+CwwPv52k7pWiErYwFHV=_6kCdiyXZkT3QT6ef_UJagt9A@mail.gmail.com>
+Accept-Language: en-US, ja-JP
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.34.125.150]
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-ID: <44D254A2BDC35E41B1EA6CD19B17F3BF@gisp.nec.co.jp>
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 21 Aug 2019 05:26:24 +0000 (UTC)
+X-TM-AS-MML: disable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Aug 2019 05:01:52 +0000
-Parav Pandit <parav@mellanox.com> wrote:
-
-> > -----Original Message-----
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Wednesday, August 21, 2019 10:27 AM
-> > To: Parav Pandit <parav@mellanox.com>
-> > Cc: Jiri Pirko <jiri@mellanox.com>; David S . Miller <davem@davemloft.net>;
-> > Kirti Wankhede <kwankhede@nvidia.com>; Cornelia Huck
-> > <cohuck@redhat.com>; kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > cjia <cjia@nvidia.com>; netdev@vger.kernel.org
-> > Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-> > 
-> > On Wed, 21 Aug 2019 04:40:15 +0000
-> > Parav Pandit <parav@mellanox.com> wrote:
-> >   
-> > > > -----Original Message-----
-> > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > Sent: Wednesday, August 21, 2019 9:51 AM
-> > > > To: Parav Pandit <parav@mellanox.com>
-> > > > Cc: Jiri Pirko <jiri@mellanox.com>; David S . Miller
-> > > > <davem@davemloft.net>; Kirti Wankhede <kwankhede@nvidia.com>;
-> > > > Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org;
-> > > > linux-kernel@vger.kernel.org; cjia <cjia@nvidia.com>;
-> > > > netdev@vger.kernel.org
-> > > > Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+On Tue, Aug 20, 2019 at 03:03:55PM +0800, Wanpeng Li wrote:
+> Cc Mel Gorman, Kirill, Dave Hansen,
+> On Tue, 11 Jun 2019 at 07:51, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com> wrote:
+> >
+> > On Wed, May 29, 2019 at 04:31:01PM -0700, Mike Kravetz wrote:
+> > > On 5/28/19 2:49 AM, Wanpeng Li wrote:
+> > > > Cc Paolo,
+> > > > Hi all,
+> > > > On Wed, 14 Feb 2018 at 06:34, Mike Kravetz <mike.kravetz@oracle.com> wrote:
+> > > >>
+> > > >> On 02/12/2018 06:48 PM, Michael Ellerman wrote:
+> > > >>> Andrew Morton <akpm@linux-foundation.org> writes:
+> > > >>>
+> > > >>>> On Thu, 08 Feb 2018 12:30:45 +0000 Punit Agrawal <punit.agrawal@arm.com> wrote:
+> > > >>>>
+> > > >>>>>>
+> > > >>>>>> So I don't think that the above test result means that errors are properly
+> > > >>>>>> handled, and the proposed patch should help for arm64.
+> > > >>>>>
+> > > >>>>> Although, the deviation of pud_huge() avoids a kernel crash the code
+> > > >>>>> would be easier to maintain and reason about if arm64 helpers are
+> > > >>>>> consistent with expectations by core code.
+> > > >>>>>
+> > > >>>>> I'll look to update the arm64 helpers once this patch gets merged. But
+> > > >>>>> it would be helpful if there was a clear expression of semantics for
+> > > >>>>> pud_huge() for various cases. Is there any version that can be used as
+> > > >>>>> reference?
+> > > >>>>
+> > > >>>> Is that an ack or tested-by?
+> > > >>>>
+> > > >>>> Mike keeps plaintively asking the powerpc developers to take a look,
+> > > >>>> but they remain steadfastly in hiding.
+> > > >>>
+> > > >>> Cc'ing linuxppc-dev is always a good idea :)
+> > > >>>
+> > > >>
+> > > >> Thanks Michael,
+> > > >>
+> > > >> I was mostly concerned about use cases for soft/hard offline of huge pages
+> > > >> larger than PMD_SIZE on powerpc.  I know that powerpc supports PGD_SIZE
+> > > >> huge pages, and soft/hard offline support was specifically added for this.
+> > > >> See, 94310cbcaa3c "mm/madvise: enable (soft|hard) offline of HugeTLB pages
+> > > >> at PGD level"
+> > > >>
+> > > >> This patch will disable that functionality.  So, at a minimum this is a
+> > > >> 'heads up'.  If there are actual use cases that depend on this, then more
+> > > >> work/discussions will need to happen.  From the e-mail thread on PGD_SIZE
+> > > >> support, I can not tell if there is a real use case or this is just a
+> > > >> 'nice to have'.
 > > > >
-> > > > On Wed, 21 Aug 2019 03:42:25 +0000
-> > > > Parav Pandit <parav@mellanox.com> wrote:
-> > > >  
-> > > > > > -----Original Message-----
-> > > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > Sent: Tuesday, August 20, 2019 10:49 PM
-> > > > > > To: Parav Pandit <parav@mellanox.com>
-> > > > > > Cc: Jiri Pirko <jiri@mellanox.com>; David S . Miller
-> > > > > > <davem@davemloft.net>; Kirti Wankhede <kwankhede@nvidia.com>;
-> > > > > > Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org;
-> > > > > > linux-kernel@vger.kernel.org; cjia <cjia@nvidia.com>;
-> > > > > > netdev@vger.kernel.org
-> > > > > > Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-> > > > > >
-> > > > > > On Tue, 20 Aug 2019 08:58:02 +0000 Parav Pandit
-> > > > > > <parav@mellanox.com> wrote:
-> > > > > >  
-> > > > > > > + Dave.
-> > > > > > >
-> > > > > > > Hi Jiri, Dave, Alex, Kirti, Cornelia,
-> > > > > > >
-> > > > > > > Please provide your feedback on it, how shall we proceed?
-> > > > > > >
-> > > > > > > Short summary of requirements.
-> > > > > > > For a given mdev (mediated device [1]), there is one
-> > > > > > > representor netdevice and devlink port in switchdev mode
-> > > > > > > (similar to SR-IOV VF), And there is one netdevice for the actual mdev  
-> > when mdev is probed.  
-> > > > > > >
-> > > > > > > (a) representor netdev and devlink port should be able derive
-> > > > > > > phys_port_name(). So that representor netdev name can be built
-> > > > > > > deterministically across reboots.
-> > > > > > >
-> > > > > > > (b) for mdev's netdevice, mdev's device should have an attribute.
-> > > > > > > This attribute can be used by udev rules/systemd or something
-> > > > > > > else to rename netdev name deterministically.
-> > > > > > >
-> > > > > > > (c) IFNAMSIZ of 16 bytes is too small to fit whole UUID.
-> > > > > > > A simple grep IFNAMSIZ in stack hints hundreds of users of
-> > > > > > > IFNAMSIZ in drivers, uapi, netlink, boot config area and more.
-> > > > > > > Changing IFNAMSIZ for a mdev bus doesn't really look
-> > > > > > > reasonable option  
-> > > > to me.  
-> > > > > >
-> > > > > > How many characters do we really have to work with?  Your
-> > > > > > examples below prepend various characters, ex. option-1 results
-> > > > > > in ens2f0_m10 or enm10.  Do the extra 8 or 3 characters in these count  
-> > against IFNAMSIZ?  
-> > > > > >  
-> > > > > Maximum 15. Last is null termination.
-> > > > > Some udev rules setting by user prefix the PF netdev interface. I
-> > > > > took such  
-> > > > example below where ens2f0 netdev named is prefixed.  
-> > > > > Some prefer not to prefix.
-> > > > >  
-> > > > > > > Hence, I would like to discuss below options.
-> > > > > > >
-> > > > > > > Option-1: mdev index
-> > > > > > > Introduce an optional mdev index/handle as u32 during mdev
-> > > > > > > create time. User passes mdev index/handle as input.
-> > > > > > >
-> > > > > > > phys_port_name=mIndex=m%u
-> > > > > > > mdev_index will be available in sysfs as mdev attribute for
-> > > > > > > udev to name the mdev's netdev.
-> > > > > > >
-> > > > > > > example mdev create command:
-> > > > > > > UUID=$(uuidgen)
-> > > > > > > echo $UUID index=10  
-> > > > > > > > /sys/class/net/ens2f0/mdev_supported_types/mlx5_core_mdev/cr
-> > > > > > > > eate  
-> > > > > >
-> > > > > > Nit, IIRC previous discussions of additional parameters used
-> > > > > > comma separators, ex. echo $UUID,index=10 >...
-> > > > > >  
-> > > > > Yes, ok.
-> > > > >  
-> > > > > > > > example netdevs:  
-> > > > > > > repnetdev=ens2f0_m10	/*ens2f0 is parent PF's netdevice */  
-> > > > > >
-> > > > > > Is the parent really relevant in the name?  
-> > > > > No. I just picked one udev example who prefixed the parent netdev name.
-> > > > > But there are users who do not prefix it.
-> > > > >  
-> > > > > > Tools like mdevctl are meant to
-> > > > > > provide persistence, creating the same mdev devices on the same
-> > > > > > parent, but that's simply the easiest policy decision.  We can
-> > > > > > also imagine that multiple parent devices might support a
-> > > > > > specified mdev type and policies factoring in proximity,
-> > > > > > load-balancing, power consumption, etc might be weighed such
-> > > > > > that we really don't want to promote userspace creating dependencies  
-> > on the parent association.  
-> > > > > >  
-> > > > > > > mdev_netdev=enm10
-> > > > > > >
-> > > > > > > Pros:
-> > > > > > > 1. mdevctl and any other existing tools are unaffected.
-> > > > > > > 2. netdev stack, ovs and other switching platforms are unaffected.
-> > > > > > > 3. achieves unique phys_port_name for representor netdev 4.
-> > > > > > > achieves unique mdev eth netdev name for the mdev using
-> > > > > > > udev/systemd  
-> > > > extension.  
-> > > > > > > 5. Aligns well with mdev and netdev subsystem and similar to
-> > > > > > > existing sriov bdf's.  
-> > > > > >
-> > > > > > A user provided index seems strange to me.  It's not really an
-> > > > > > index, just a user specified instance number.  Presumably you
-> > > > > > have the user providing this because if it really were an index,
-> > > > > > then the value depends on the creation order and persistence is
-> > > > > > lost.  Now the user needs to both avoid uuid collision as well as "index"
-> > > > > > number collision.  The uuid namespace is large enough to mostly
-> > > > > > ignore  
-> > > > this, but this is not.  This seems like a burden.  
-> > > > > >  
-> > > > > I liked the term 'instance number', which is lot better way to say
-> > > > > than  
-> > > > index/handle.  
-> > > > > Yes, user needs to avoid both the collision.
-> > > > > UUID collision should not occur in most cases, they way UUID are  
-> > generated.  
-> > > > > So practically users needs to pick unique 'instance number',
-> > > > > similar to how it  
-> > > > picks unique netdev names.  
-> > > > >
-> > > > > Burden to user comes from the requirement to get uniqueness.
-> > > > >  
-> > > > > > > Option-2: shorter mdev name
-> > > > > > > Extend mdev to have shorter mdev device name in addition to UUID.
-> > > > > > > such as 'foo', 'bar'.
-> > > > > > > Mdev will continue to have UUID.
-> > > > > > > phys_port_name=mdev_name
-> > > > > > >
-> > > > > > > Pros:
-> > > > > > > 1. All same as option-1, except mdevctl needs upgrade for newer  
-> > usage.  
-> > > > > > > It is common practice to upgrade iproute2 package along with
-> > > > > > > the kernel. Similar practice to be done with mdevctl.
-> > > > > > > 2. Newer users of mdevctl who wants to work with non_UUID
-> > > > > > > names, will use newer mdevctl/tools. Cons:
-> > > > > > > 1. Dual naming scheme of mdev might affect some of the existing  
-> > tools.  
-> > > > > > > It's unclear how/if it actually affects.
-> > > > > > > mdevctl [2] is very recently developed and can be enhanced for
-> > > > > > > dual naming scheme.  
-> > > > > >
-> > > > > > I think we've already nak'ed this one, the device namespace
-> > > > > > becomes meaningless if the name becomes just a string where a
-> > > > > > uuid might be an example string.  mdevs are named by uuid.
-> > > > > >  
-> > > > > > > Option-3: mdev uuid alias
-> > > > > > > Instead of shorter mdev name or mdev index, have alpha-numeric
-> > > > > > > name alias. Alias is an optional mdev sysfs attribute such as 'foo',  
-> > 'bar'.  
-> > > > > > > example mdev create command:
-> > > > > > > UUID=$(uuidgen)
-> > > > > > > echo $UUID alias=foo  
-> > > > > > > > /sys/class/net/ens2f0/mdev_supported_types/mlx5_core_mdev/cr
-> > > > > > > > eate
-> > > > > > > > example netdevs:  
-> > > > > > > examle netdevs:
-> > > > > > > repnetdev = ens2f0_mfoo
-> > > > > > > mdev_netdev=enmfoo
-> > > > > > >
-> > > > > > > Pros:
-> > > > > > > 1. All same as option-1.
-> > > > > > > 2. Doesn't affect existing mdev naming scheme.
-> > > > > > > Cons:
-> > > > > > > 1. Index scheme of option-1 is better which can number large
-> > > > > > > number of mdevs with fewer characters, simplifying the
-> > > > > > > management  
-> > > > tool.  
-> > > > > >
-> > > > > > No better than option-1, simply a larger secondary namespace,
-> > > > > > but still requires the user to come up with two independent
-> > > > > > names for the  
-> > > > device.  
-> > > > > >  
-> > > > > > > Option-4: extend IFNAMESZ to be 64 bytes Extended IFNAMESZ
-> > > > > > > from 16 to
-> > > > > > > 64 bytes phys_port_name=mdev_UUID_string  
-> > > > mdev_netdev_name=enmUUID  
-> > > > > > >
-> > > > > > > Pros:
-> > > > > > > 1. Doesn't require mdev extension
-> > > > > > > Cons:
-> > > > > > > 1. netdev stack, driver, uapi, user space, boot config wide changes 2.
-> > > > > > > Possible user space extensions who assumed name size being 16
-> > > > > > > characters 3. Single device type demands namesize change for
-> > > > > > > all netdev types  
-> > > > > >
-> > > > > > What about an alias based on the uuid?  For example, we use
-> > > > > > 160-bit sha1s daily with git (uuids are only 128-bit), but we
-> > > > > > generally don't reference git commits with the full 20 character string.
-> > > > > > Generally 12 characters is recommended to avoid ambiguity.
-> > > > > > Could mdev automatically create an  
-> > > >
-> > > > ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
-> > > > > > abbreviated sha1 alias for the device?  If so, how many
-> > > > > > characters should we  
-> > > >     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
-> > > > > > use and what do we do on collision?  The colliding device could
-> > > > > > add enough alias characters to disambiguate (we likely couldn't
-> > > > > > re-alias the existing device to disambiguate, but I'm not sure
-> > > > > > it matters, userspace has sysfs to associate aliases).  Ex.
-> > > > > >
-> > > > > > UUID=$(uuidgen)
-> > > > > > ALIAS=$(echo $UUID | sha1sum | colrm 13)
-> > > > > >  
-> > > > > I explained in previous reply to Cornelia, we should set UUID and
-> > > > > ALIAS at the  
-> > > > same time.  
-> > > > > Setting is via different sysfs attribute is lot code burden with no extra  
-> > benefit.  
-> > > >
-> > > > Just an example of the alias, not proposing how it's set.  In fact,
-> > > > proposing that the user does not set it, mdev-core provides one  
-> > automatically.  
-> > > >  
-> > > > > > Since there seems to be some prefix overhead, as I ask about
-> > > > > > above in how many characters we actually have to work with in
-> > > > > > IFNAMESZ, maybe we start with 8 characters (matching your
-> > > > > > "index" namespace) and expand as necessary for disambiguation.
-> > > > > > If we can eliminate overhead in IFNAMESZ, let's start with 12.
-> > > > > > Thanks,
-> > > > > >  
-> > > > > If user is going to choose the alias, why does it have to be limited to sha1?
-> > > > > Or you just told it as an example?
-> > > > >
-> > > > > It can be an alpha-numeric string.  
-> > > >
-> > > > No, I'm proposing a different solution where mdev-core creates an
-> > > > alias based on an abbreviated sha1.  The user does not provide the alias.
-> > > >  
-> > > > > Instead of mdev imposing number of characters on the alias, it
-> > > > > should be best  
-> > > > left to the user.  
-> > > > > Because in future if netdev improves on the naming scheme, mdev
-> > > > > will be  
-> > > > limiting it, which is not right.  
-> > > > > So not restricting alias size seems right to me.
-> > > > > User configuring mdev for networking devices in a given kernel
-> > > > > knows what  
-> > > > user is doing.  
-> > > > > So user can choose alias name size as it finds suitable.  
-> > > >
-> > > > That's not what I'm proposing, please read again.  Thanks,  
+> > > > 1GB hugetlbfs pages are used by DPDK and VMs in cloud deployment, we
+> > > > encounter gup_pud_range() panic several times in product environment.
+> > > > Is there any plan to reenable and fix arch codes?
 > > >
-> > > I understood your point. But mdev doesn't know how user is going to use  
-> > udev/systemd to name the netdev.  
-> > > So even if mdev chose to pick 12 characters, it could result in collision.
-> > > Hence the proposal to provide the alias by the user, as user know the best  
-> > policy for its use case in the environment its using.  
-> > > So 12 character sha1 method will still work by user.  
-> > 
-> > Haven't you already provided examples where certain drivers or subsystems
-> > have unique netdev prefixes?  If mdev provides a unique alias within the
-> > subsystem, couldn't we simply define a netdev prefix for the mdev subsystem
-> > and avoid all other collisions?  I'm not in favor of the user providing both a uuid
-> > and an alias/instance.  Thanks,
-> >   
-> For a given prefix, say ens2f0, can two UUID->sha1 first 9 characters have collision?
+> > > I too am aware of slightly more interest in 1G huge pages.  Suspect that as
+> > > Intel MMU capacity increases to handle more TLB entries there will be more
+> > > and more interest.
+> > >
+> > > Personally, I am not looking at this issue.  Perhaps Naoya will comment as
+> > > he know most about this code.
+> >
+> > Thanks for forwarding this to me, I'm feeling that memory error handling
+> > on 1GB hugepage is demanded as real use case.
+> >
+> > >
+> > > > In addition, https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kvm/mmu.c#n3213
+> > > > The memory in guest can be 1GB/2MB/4K, though the host-backed memory
+> > > > are 1GB hugetlbfs pages, after above PUD panic is fixed,
+> > > > try_to_unmap() which is called in MCA recovery path will mark the PUD
+> > > > hwpoison entry. The guest will vmexit and retry endlessly when
+> > > > accessing any memory in the guest which is backed by this 1GB poisoned
+> > > > hugetlbfs page. We have a plan to split this 1GB hugetblfs page by 2MB
+> > > > hugetlbfs pages/4KB pages, maybe file remap to a virtual address range
+> > > > which is 2MB/4KB page granularity, also split the KVM MMU 1GB SPTE
+> > > > into 2MB/4KB and mark the offensive SPTE w/ a hwpoison flag, a sigbus
+> > > > will be delivered to VM at page fault next time for the offensive
+> > > > SPTE. Is this proposal acceptable?
+> > >
+> > > I am not sure of the error handling design, but this does sound reasonable.
+> >
+> > I agree that that's better.
+> >
+> > > That block of code which potentially dissolves a huge page on memory error
+> > > is hard to understand and I'm not sure if that is even the 'normal'
+> > > functionality.  Certainly, we would hate to waste/poison an entire 1G page
+> > > for an error on a small subsection.
+> >
+> > Yes, that's not practical, so we need at first establish the code base for
+> > 2GB hugetlb splitting and then extending it to 1GB next.
+> 
+> I found it is not easy to split. There is a unique hugetlb page size
+> that is associated with a mounted hugetlbfs filesystem, file remap to
+> 2MB/4KB will break this. How about hard offline 1GB hugetlb page as
+> what has already done in soft offline, replace the corrupted 1GB page
+> by new 1GB page through page migration, the offending/corrupted area
+> in the original 1GB page doesn't need to be copied into the new page,
+> the offending/corrupted area in new page can keep full zero just as it
+> is clear during hugetlb page fault, other sub-pages of the original
+> 1GB page can be freed to buddy system. The sigbus signal is sent to
+> userspace w/ offending/corrupted virtual address, and signal code,
+> userspace should take care this.
 
-I think it would be a mistake to waste so many chars on a prefix, but 9
-characters of sha1 likely wouldn't have a collision before we have 10s
-of thousands of devices.  Thanks,
+Splitting hugetlb is simply hard, IMHO. THP splitting is done by years
+of effort by many great kernel develpers, and I don't think doing similar
+development on hugetlb is a good idea.  I thought of converting hugetlb
+into thp, but maybe it's not an easy task either.
+"Hard offlining via soft offlining" approach sounds new and promising to me.
+I guess we don't need a large patchset to do this. So, thanks for the idea!
 
-Alex
+- Naoya
