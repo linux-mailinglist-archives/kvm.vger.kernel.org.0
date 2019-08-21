@@ -2,69 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D1C9984C3
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 21:48:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B124C984CE
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 21:52:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730217AbfHUTsp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 15:48:45 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38015 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730014AbfHUTso (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 15:48:44 -0400
-Received: by mail-io1-f66.google.com with SMTP id p12so7090212iog.5
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 12:48:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=W/FKUsI28DeU0RstFXTPREgngr4rJSTzC7of+9eSaSg=;
-        b=q9iDAGEX9A9tYk1Yt2FvedzkSFMe6vss8hgfcenSCqQ6Sq/xtfbroD62XrV9bz39Vp
-         CcANgaPV5Z06k7K7j6rABXBxExeAmH1IeZ1vLnB9AfmKe634584Ovfk8UBtLOLL+0u14
-         07XvYxyW4Z16F8N5HGCK0hs/KTDUNqk5/QH9AfAnETRIEzg3P6xPeCAVHNbq3UcaznZD
-         iTwH3ISsqo397BbsAbq9ZAHNbUohmVc01rbxJdYhE8rsqCBq54VRQHAaWd5+gTC0y6o7
-         Wuq4kAw0YavSoZ2iQ5s8x1lV8J6z0bYravmBVRmujYtpgYrrIELKqXFaq3wW6QUKF83X
-         6JIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=W/FKUsI28DeU0RstFXTPREgngr4rJSTzC7of+9eSaSg=;
-        b=nbuHo7A4qErkyszF1CSy0F7JOEfUaVWLoyhAwFfFwpqS5T1UjAp/DYHZWlbQnPC3Uq
-         FXO8s673X9gO6PgXHC35Z80Vafs1/ryOLqeSf6HmxYV3weHNDK9zil/Qkonf8hRdC9Ma
-         cfU8w5W/hXHBZjQsckCk+Nx7wHReuFxX7+ZlQkML00UBrpZOEKoyGlVnvUBxZcTUkb0L
-         w/MLa8Fko9FrdOg079RemAXze12RULv7PGK9lcH8Hzl7typseeCr3/9gEmuVCeNXtJGG
-         Q5aJmC23h5pIM7Fhl6cfQAFPcBEDOzEfo5yyero/1T+7j3/2nxfQZdkpQZ6jljwTem4/
-         g/6w==
-X-Gm-Message-State: APjAAAVoPV8p9YThISCDMxZF9BHj5Cvs3/Y3cdpO7AYEDaPxa6CydpSf
-        IwBBf/wrxFFsOu0sUB0VPeAUISPtxNneXvIzEMUhFdCsoDrOBQ==
-X-Google-Smtp-Source: APXvYqyza1onGK2ZL65dtOsaHuiPoV4r7myeGa1KIgljwyyjmR/zF9+g47qeVsrR1uxk1j7Drv/nVRXTvqNv7dE/IUY=
-X-Received: by 2002:a02:a809:: with SMTP id f9mr11872478jaj.111.1566416923268;
- Wed, 21 Aug 2019 12:48:43 -0700 (PDT)
+        id S1730081AbfHUTud (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 15:50:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55040 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729608AbfHUTud (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 15:50:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 12DD6300183D;
+        Wed, 21 Aug 2019 19:50:33 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D03FC17D69;
+        Wed, 21 Aug 2019 19:50:31 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc:     maz@kernel.org, mark.rutland@arm.com
+Subject: [PATCH] arm64: KVM: Only skip MMIO insn once
+Date:   Wed, 21 Aug 2019 21:50:30 +0200
+Message-Id: <20190821195030.2569-1-drjones@redhat.com>
 MIME-Version: 1.0
-References: <1566376002-17121-1-git-send-email-pbonzini@redhat.com> <1566376002-17121-4-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1566376002-17121-4-git-send-email-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 21 Aug 2019 12:48:32 -0700
-Message-ID: <CALMp9eQX5m-g=D-J=h86rTrkQCB_BdJi56jGuANrQqv_-gw_Nw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: x86: use Intel speculation bugs and features as
- derived in generic x86 code
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, jmattson@redhat.com,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 21 Aug 2019 19:50:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 1:27 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Similar to AMD bits, set the Intel bits from the vendor-independent
-> feature and bug flags, because KVM_GET_SUPPORTED_CPUID does not care
-> about the vendor and they should be set on AMD processors as well.
->
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+If after an MMIO exit to userspace a VCPU is immediately run with an
+immediate_exit request, such as when a signal is delivered or an MMIO
+emulation completion is needed, then the VCPU completes the MMIO
+emulation and immediately returns to userspace. As the exit_reason
+does not get changed from KVM_EXIT_MMIO in these cases we have to
+be careful not to complete the MMIO emulation again, when the VCPU is
+eventually run again, because the emulation does an instruction skip
+(and doing too many skips would be a waste of guest code :-) We need
+to use additional VCPU state to track if the emulation is complete.
+As luck would have it, we already have 'mmio_needed', which even
+appears to be used in this way by other architectures already.
+
+Fixes: 0d640732dbeb ("arm64: KVM: Skip MMIO insn after emulation")
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ virt/kvm/arm/arm.c  | 3 ++-
+ virt/kvm/arm/mmio.c | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 35a069815baf..322cf9030bbe 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -669,7 +669,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (run->exit_reason == KVM_EXIT_MMIO) {
++	if (vcpu->mmio_needed) {
++		vcpu->mmio_needed = 0;
+ 		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+ 		if (ret)
+ 			return ret;
+diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
+index a8a6a0c883f1..2d9b5e064ae0 100644
+--- a/virt/kvm/arm/mmio.c
++++ b/virt/kvm/arm/mmio.c
+@@ -201,6 +201,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	if (is_write)
+ 		memcpy(run->mmio.data, data_buf, len);
+ 	vcpu->stat.mmio_exit_user++;
++	vcpu->mmio_needed	= 1;
+ 	run->exit_reason	= KVM_EXIT_MMIO;
+ 	return 0;
+ }
+-- 
+2.18.1
+
