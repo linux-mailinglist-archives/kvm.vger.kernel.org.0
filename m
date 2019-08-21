@@ -2,204 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E07CE97236
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 08:23:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C3BB9732C
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 09:15:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727935AbfHUGX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 02:23:29 -0400
-Received: from mail-eopbgr20067.outbound.protection.outlook.com ([40.107.2.67]:12416
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726484AbfHUGX3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 02:23:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N1E9viyvrwV3QTSrU4SWWhK4ldcBBbLTkGbsTv70HCVSrcYBQIa8+29JARbaeMzDCNC51RMkruOLX18Ko7dDSs8pbeelmYfYAcRj33WNiXV5l9RT92XsWBWMgTQ6qdesUhvJjIjdteq/GiOZRyQ7NO2n0hlTVY0blpNIlPerNjbbCgqDWHk6IV3w7//MjoMdynUluivAsIqYEVReMTstHhntMfCnvk3rlj8nP/iBvOSMYB5Ydh7tctDxqJn0y94wEJq0L5RW9Bg90ZFmzkL6Un15eRpHuYBB0HjUAmX16N+K6vE7zL+ld+HUTsXLoUeeJ7Fq5w1kKN4wO0XlQezNQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xLrtGzAFZwx+rlwDtYtjSIJRKtccY3VJ5xXi2w/h4eI=;
- b=gZyt6ALW6VUCfXr23JAXPDN+YDVkOsvT8Vvmz0sjBbL2OdOiulYkn643gFpI4w3zEFDtOhFWMwdDn8O2Zeuv/kIG0WXkzbzMsNGvNDmV9ymjfqAKlkrUy2f7IBm6H6YZSCHVT3ZK2tD6DJOayda/GZE2jyP6PzZRhAy5w2nOmXWAu/xepOSkaCUs/QY3o0sPfdUDS0ngTLV+vK3te2fy5FW+dWVD2f+lLBP2YOAe9QzxhHvB1ZvuzxKaWGmngpy+a4/pwfgACfTkavj8jG3I9hbPyKekFY6TF8juWl8PVXNPOmn2Q6oICvM3pmySofE9vcS9TNP/5CBhOGf+SGKuQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xLrtGzAFZwx+rlwDtYtjSIJRKtccY3VJ5xXi2w/h4eI=;
- b=gKstLjQkoASHFEE9qPBThGSDUeAQy86310vfjUuSB3R+OVCitC2IOqs50hHv6vWgLvLzevsilfB2OA2lr3063RTr94wT9NHdYwdZLPik9VS0HZdBiI8misBmEpHk99Tn/04EaxD8xQCcXTX7YW0h0Q6StduiEBUSSXH+rUb22VA=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6690.eurprd05.prod.outlook.com (10.186.172.21) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.16; Wed, 21 Aug 2019 06:23:17 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea%6]) with mapi id 15.20.2178.020; Wed, 21 Aug 2019
- 06:23:17 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Jiri Pirko <jiri@mellanox.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        cjia <cjia@nvidia.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v2 0/2] Simplify mtty driver and mdev core
-Thread-Topic: [PATCH v2 0/2] Simplify mtty driver and mdev core
-Thread-Index: AQHVTfNxjgfwJJG2ZUiuOAmKCwQvf6bx3uKAgAWJU4CAAcVCEIAABCsAgAAWVtCAABCDgIAAzoewgAAqE4CAAECFQIAAFWyAgAAGbNCAABfqAIAAErcwgAjpulCAAJkHAIAAnVNggAAbk4CAAAOYgIAABpwAgAAAVrCAAAfEAIAADNCg
-Date:   Wed, 21 Aug 2019 06:23:17 +0000
-Message-ID: <AM0PR05MB4866437FAA63C447CACCD7E5D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190802065905.45239-1-parav@mellanox.com>
-        <20190813111149.027c6a3c@x1.home>
-        <AM0PR05MB4866D40F8EBB382C78193C91D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814100135.1f60aa42.cohuck@redhat.com>
-        <AM0PR05MB4866ABFDDD9DDCBC01F6CA90D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814150911.296da78c.cohuck@redhat.com>
-        <AM0PR05MB48666CCDFE985A25F42A0259D1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190814085746.26b5f2a3@x1.home>
-        <AM0PR05MB4866148ABA3C4E48E73E95FCD1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <AM0PR05MB48668B6221E477A873688CDBD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190820111904.75515f58@x1.home>
-        <AM0PR05MB486686D3C311F3C61BE0997DD1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190820222051.7aeafb69@x1.home>
-        <AM0PR05MB48664CDF05C3D02F9441440DD1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190820225722.237a57d2@x1.home>
-        <AM0PR05MB4866AE8FC4AA3CC24B08B326D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190820232622.164962d3@x1.home>
-In-Reply-To: <20190820232622.164962d3@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [106.51.22.188]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3099db11-e4ac-4e1e-483d-08d726000e26
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AM0PR05MB6690;
-x-ms-traffictypediagnostic: AM0PR05MB6690:
-x-ld-processed: a652971c-7d2e-4d9b-a6a4-d149256f461b,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB6690C6D7C6A34EDB04FC4BE8D1AA0@AM0PR05MB6690.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0136C1DDA4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(376002)(366004)(346002)(396003)(13464003)(199004)(189003)(66476007)(66556008)(66946007)(81156014)(64756008)(9456002)(76116006)(7696005)(66446008)(81166006)(76176011)(6506007)(53546011)(229853002)(14444005)(99286004)(14454004)(256004)(478600001)(71190400001)(71200400001)(561944003)(316002)(6436002)(11346002)(476003)(8676002)(486006)(446003)(8936002)(186003)(33656002)(26005)(9686003)(102836004)(55236004)(55016002)(54906003)(5660300002)(7736002)(4326008)(25786009)(305945005)(74316002)(66066001)(6246003)(86362001)(52536014)(53936002)(3846002)(6916009)(2906002)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6690;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ChAaDy/kL9vlBChvaFvW58emvjk2CPXwxtu4IQ0nU3ADPuyoZqZ2UW4qHcRcFO9t82NVCxhJbYGq3qJwC1ovtR5aCTZ0kYyLPeQSTzkzcmXBCCnDLeFZgvJGFGrSg1Ox3pgNHSdqp6BFDvVdMQA0uQZcb9SoawoW3dSTbaN2+jntKCa+qkNG6I/5OsydWoTYY1MQVM2bRlLbBgkyYPLGxPKbLfl1A5oA5NJ9qF7o5HpIfgHhSwbqwbxOgG8O5X8ePpL6v0sDn1NANn7ZBwq2Kb4FraLEv/zDtNIS5NMVeTdpuzGjzuyeZO2sTGhCb45/RAFq+jzOYLbBs0Ma3pqfL5WuJ4HxsbCVu5SKPcXlHBxWs0H+aoJQ1UUembk4cwpdyOM3pidHb+i/APzxochn4kuqYAAzBGTYAk2e5inwA1Q=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727963AbfHUHPt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 03:15:49 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:34675 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727504AbfHUHPs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 03:15:48 -0400
+Received: by mail-ot1-f68.google.com with SMTP id c7so1155522otp.1;
+        Wed, 21 Aug 2019 00:15:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jxVrA9CxsKiHpry0a7lxkK1MkSc5DTM9n5l3rc6J8H4=;
+        b=jdhoHtICe2dI2FIvxxNwDJO/W5Lgr/+yZHISXd4hOER1yMlHqsMfnRny1RvnKH1rtK
+         sK7F9H42Wh0n7poIog3d/lQHiIbqH3j15kS8chxT28zUtgmus/9Jr3OU5erAn9oQVLXf
+         m00i1zqXLMb2SoB4BoyVHVqb2HCBjpSumg7CCNZ/xXq9/Mni5ZxuL0VRtbedP6N9UxnM
+         Z1Yhfmu9M/r9/Olv/nSpp/PMzFFQ6F2c/Xz1MXo7vego2f9iow8Fa2uOPWHDZxEenTwA
+         Hf9Z1c5I/o+D6IbMgR0IVSaHdZd4INEydaLSsgzmN9j9XlNCllmI64soG1HW/IDQVIza
+         iZNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jxVrA9CxsKiHpry0a7lxkK1MkSc5DTM9n5l3rc6J8H4=;
+        b=HgkiIXVwUF4agGmJaY5x6AYofblj4TyzuNCFDUaJxRiRtAQIZ81ib+V/L3Jm7tsZn5
+         6DjK2IkyKOKKaWbvtgQLel+x7zaan4dnFm6JF9oKDw+xDqHCjhjeBrV7PbU5rJXyeKxN
+         vs/4Cnt1YcQ9Hdj14YzBtcoqR0CRWogJpSbkViSChse3M74JjcqNnAd3p7ZL32L2QCXL
+         iaWyFWq3Z9BX6UWOJgP9Jnn0/EfhMEQzYmBkFwtYKSPcYTekjOHbyY0oH9cfhGZc8x2c
+         FIlXvdwST1siOEurXPIemEzlBis8bq5ewHqJZcuusQGHK/p9LI62atTGBClCcz1FaXNz
+         zcKQ==
+X-Gm-Message-State: APjAAAUK8KQWNN9oCWayKNUa/XWO+9jw7YFhh2WpFanOr+m8waF77gud
+        pohQ3lh+Q4P72CbrdlzkD6vFoPb4pIYqzLezSXs=
+X-Google-Smtp-Source: APXvYqxLUwsSfJV3VbPtnGgIvbcaJ7kxCf3byp0ch+vdnLw6VbQJGMVMTusoxKmL21/xyqIFuy22JYrj1wzW5rjZaSI=
+X-Received: by 2002:a9d:4590:: with SMTP id x16mr23501917ote.254.1566371747851;
+ Wed, 21 Aug 2019 00:15:47 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3099db11-e4ac-4e1e-483d-08d726000e26
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Aug 2019 06:23:17.4090
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Ap/TsbHcF6CEpSwNxzkkJmCpMoaC8ArrvzL6Diyup5aOrKJzSLYYMuC6HRdNnWOesoJ5JOYzCwG11aRH5CJBkg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6690
+References: <87inbbjx2w.fsf@e105922-lin.cambridge.arm.com> <20180207011455.GA15214@hori1.linux.bs1.fc.nec.co.jp>
+ <87fu6bfytm.fsf@e105922-lin.cambridge.arm.com> <20180208121749.0ac09af2b5a143106f339f55@linux-foundation.org>
+ <87wozhvc49.fsf@concordia.ellerman.id.au> <e673f38a-9e5f-21f6-421b-b3cb4ff02e91@oracle.com>
+ <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
+ <f79d828c-b0b4-8a20-c316-a13430cfb13c@oracle.com> <20190610235045.GB30991@hori.linux.bs1.fc.nec.co.jp>
+ <CANRm+CwwPv52k7pWiErYwFHV=_6kCdiyXZkT3QT6ef_UJagt9A@mail.gmail.com> <20190821053904.GA23349@hori.linux.bs1.fc.nec.co.jp>
+In-Reply-To: <20190821053904.GA23349@hori.linux.bs1.fc.nec.co.jp>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 21 Aug 2019 15:15:15 +0800
+Message-ID: <CANRm+CxQ8bVBtfkP9Dmysx3C3bgE3UfO8rOuW5BzkQKbf36CRQ@mail.gmail.com>
+Subject: Re: ##freemail## Re: [PATCH v2] mm: hwpoison: disable memory error
+ handling on 1GB hugepage
+To:     Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+Cc:     Mike Kravetz <mike.kravetz@oracle.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Punit Agrawal <punit.agrawal@arm.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Xiao Guangrong <xiaoguangrong@tencent.com>,
+        "lidongchen@tencent.com" <lidongchen@tencent.com>,
+        "yongkaiwu@tencent.com" <yongkaiwu@tencent.com>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        Hugh Dickins <hughd@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Wednesday, August 21, 2019 10:56 AM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: Jiri Pirko <jiri@mellanox.com>; David S . Miller <davem@davemloft.net=
->;
-> Kirti Wankhede <kwankhede@nvidia.com>; Cornelia Huck
-> <cohuck@redhat.com>; kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> cjia <cjia@nvidia.com>; netdev@vger.kernel.org
-> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
->=20
-> > > > > Just an example of the alias, not proposing how it's set.  In
-> > > > > fact, proposing that the user does not set it, mdev-core
-> > > > > provides one
-> > > automatically.
+On Wed, 21 Aug 2019 at 13:41, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com> wrote:
+>
+> On Tue, Aug 20, 2019 at 03:03:55PM +0800, Wanpeng Li wrote:
+> > Cc Mel Gorman, Kirill, Dave Hansen,
+> > On Tue, 11 Jun 2019 at 07:51, Naoya Horiguchi <n-horiguchi@ah.jp.nec.com> wrote:
+> > >
+> > > On Wed, May 29, 2019 at 04:31:01PM -0700, Mike Kravetz wrote:
+> > > > On 5/28/19 2:49 AM, Wanpeng Li wrote:
+> > > > > Cc Paolo,
+> > > > > Hi all,
+> > > > > On Wed, 14 Feb 2018 at 06:34, Mike Kravetz <mike.kravetz@oracle.com> wrote:
+> > > > >>
+> > > > >> On 02/12/2018 06:48 PM, Michael Ellerman wrote:
+> > > > >>> Andrew Morton <akpm@linux-foundation.org> writes:
+> > > > >>>
+> > > > >>>> On Thu, 08 Feb 2018 12:30:45 +0000 Punit Agrawal <punit.agrawal@arm.com> wrote:
+> > > > >>>>
+> > > > >>>>>>
+> > > > >>>>>> So I don't think that the above test result means that errors are properly
+> > > > >>>>>> handled, and the proposed patch should help for arm64.
+> > > > >>>>>
+> > > > >>>>> Although, the deviation of pud_huge() avoids a kernel crash the code
+> > > > >>>>> would be easier to maintain and reason about if arm64 helpers are
+> > > > >>>>> consistent with expectations by core code.
+> > > > >>>>>
+> > > > >>>>> I'll look to update the arm64 helpers once this patch gets merged. But
+> > > > >>>>> it would be helpful if there was a clear expression of semantics for
+> > > > >>>>> pud_huge() for various cases. Is there any version that can be used as
+> > > > >>>>> reference?
+> > > > >>>>
+> > > > >>>> Is that an ack or tested-by?
+> > > > >>>>
+> > > > >>>> Mike keeps plaintively asking the powerpc developers to take a look,
+> > > > >>>> but they remain steadfastly in hiding.
+> > > > >>>
+> > > > >>> Cc'ing linuxppc-dev is always a good idea :)
+> > > > >>>
+> > > > >>
+> > > > >> Thanks Michael,
+> > > > >>
+> > > > >> I was mostly concerned about use cases for soft/hard offline of huge pages
+> > > > >> larger than PMD_SIZE on powerpc.  I know that powerpc supports PGD_SIZE
+> > > > >> huge pages, and soft/hard offline support was specifically added for this.
+> > > > >> See, 94310cbcaa3c "mm/madvise: enable (soft|hard) offline of HugeTLB pages
+> > > > >> at PGD level"
+> > > > >>
+> > > > >> This patch will disable that functionality.  So, at a minimum this is a
+> > > > >> 'heads up'.  If there are actual use cases that depend on this, then more
+> > > > >> work/discussions will need to happen.  From the e-mail thread on PGD_SIZE
+> > > > >> support, I can not tell if there is a real use case or this is just a
+> > > > >> 'nice to have'.
 > > > > >
-> > > > > > > Since there seems to be some prefix overhead, as I ask about
-> > > > > > > above in how many characters we actually have to work with
-> > > > > > > in IFNAMESZ, maybe we start with 8 characters (matching your
-> > > > > > > "index" namespace) and expand as necessary for disambiguation=
-.
-> > > > > > > If we can eliminate overhead in IFNAMESZ, let's start with 12=
-.
-> > > > > > > Thanks,
-> > > > > > >
-> > > > > > If user is going to choose the alias, why does it have to be li=
-mited to
-> sha1?
-> > > > > > Or you just told it as an example?
-> > > > > >
-> > > > > > It can be an alpha-numeric string.
-> > > > >
-> > > > > No, I'm proposing a different solution where mdev-core creates
-> > > > > an alias based on an abbreviated sha1.  The user does not provide=
- the
-> alias.
-> > > > >
-> > > > > > Instead of mdev imposing number of characters on the alias, it
-> > > > > > should be best
-> > > > > left to the user.
-> > > > > > Because in future if netdev improves on the naming scheme,
-> > > > > > mdev will be
-> > > > > limiting it, which is not right.
-> > > > > > So not restricting alias size seems right to me.
-> > > > > > User configuring mdev for networking devices in a given kernel
-> > > > > > knows what
-> > > > > user is doing.
-> > > > > > So user can choose alias name size as it finds suitable.
-> > > > >
-> > > > > That's not what I'm proposing, please read again.  Thanks,
+> > > > > 1GB hugetlbfs pages are used by DPDK and VMs in cloud deployment, we
+> > > > > encounter gup_pud_range() panic several times in product environment.
+> > > > > Is there any plan to reenable and fix arch codes?
 > > > >
-> > > > I understood your point. But mdev doesn't know how user is going
-> > > > to use
-> > > udev/systemd to name the netdev.
-> > > > So even if mdev chose to pick 12 characters, it could result in col=
-lision.
-> > > > Hence the proposal to provide the alias by the user, as user know
-> > > > the best
-> > > policy for its use case in the environment its using.
-> > > > So 12 character sha1 method will still work by user.
+> > > > I too am aware of slightly more interest in 1G huge pages.  Suspect that as
+> > > > Intel MMU capacity increases to handle more TLB entries there will be more
+> > > > and more interest.
+> > > >
+> > > > Personally, I am not looking at this issue.  Perhaps Naoya will comment as
+> > > > he know most about this code.
 > > >
-> > > Haven't you already provided examples where certain drivers or
-> > > subsystems have unique netdev prefixes?  If mdev provides a unique
-> > > alias within the subsystem, couldn't we simply define a netdev
-> > > prefix for the mdev subsystem and avoid all other collisions?  I'm
-> > > not in favor of the user providing both a uuid and an
-> > > alias/instance.  Thanks,
+> > > Thanks for forwarding this to me, I'm feeling that memory error handling
+> > > on 1GB hugepage is demanded as real use case.
 > > >
-> > For a given prefix, say ens2f0, can two UUID->sha1 first 9 characters h=
-ave
-> collision?
->=20
-> I think it would be a mistake to waste so many chars on a prefix, but 9
-> characters of sha1 likely wouldn't have a collision before we have 10s of
-> thousands of devices.  Thanks,
->=20
-> Alex
+> > > >
+> > > > > In addition, https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kvm/mmu.c#n3213
+> > > > > The memory in guest can be 1GB/2MB/4K, though the host-backed memory
+> > > > > are 1GB hugetlbfs pages, after above PUD panic is fixed,
+> > > > > try_to_unmap() which is called in MCA recovery path will mark the PUD
+> > > > > hwpoison entry. The guest will vmexit and retry endlessly when
+> > > > > accessing any memory in the guest which is backed by this 1GB poisoned
+> > > > > hugetlbfs page. We have a plan to split this 1GB hugetblfs page by 2MB
+> > > > > hugetlbfs pages/4KB pages, maybe file remap to a virtual address range
+> > > > > which is 2MB/4KB page granularity, also split the KVM MMU 1GB SPTE
+> > > > > into 2MB/4KB and mark the offensive SPTE w/ a hwpoison flag, a sigbus
+> > > > > will be delivered to VM at page fault next time for the offensive
+> > > > > SPTE. Is this proposal acceptable?
+> > > >
+> > > > I am not sure of the error handling design, but this does sound reasonable.
+> > >
+> > > I agree that that's better.
+> > >
+> > > > That block of code which potentially dissolves a huge page on memory error
+> > > > is hard to understand and I'm not sure if that is even the 'normal'
+> > > > functionality.  Certainly, we would hate to waste/poison an entire 1G page
+> > > > for an error on a small subsection.
+> > >
+> > > Yes, that's not practical, so we need at first establish the code base for
+> > > 2GB hugetlb splitting and then extending it to 1GB next.
+> >
+> > I found it is not easy to split. There is a unique hugetlb page size
+> > that is associated with a mounted hugetlbfs filesystem, file remap to
+> > 2MB/4KB will break this. How about hard offline 1GB hugetlb page as
+> > what has already done in soft offline, replace the corrupted 1GB page
+> > by new 1GB page through page migration, the offending/corrupted area
+> > in the original 1GB page doesn't need to be copied into the new page,
+> > the offending/corrupted area in new page can keep full zero just as it
+> > is clear during hugetlb page fault, other sub-pages of the original
+> > 1GB page can be freed to buddy system. The sigbus signal is sent to
+> > userspace w/ offending/corrupted virtual address, and signal code,
+> > userspace should take care this.
+>
+> Splitting hugetlb is simply hard, IMHO. THP splitting is done by years
+> of effort by many great kernel develpers, and I don't think doing similar
+> development on hugetlb is a good idea.  I thought of converting hugetlb
+> into thp, but maybe it's not an easy task either.
+> "Hard offlining via soft offlining" approach sounds new and promising to me.
+> I guess we don't need a large patchset to do this. So, thanks for the idea!
 
-Jiri, Dave,
-Are you ok with it for devlink/netdev part?
-Mdev core will create an alias from a UUID.
+Good, I will wait a while, and start to cook the patches if there is
+no opposite of voice.
 
-This will be supplied during devlink port attr set such as,
-
-devlink_port_attrs_mdev_set(struct devlink_port *port, const char *mdev_ali=
-as);
-
-This alias is used to generate representor netdev's phys_port_name.
-This alias from the mdev device's sysfs will be used by the udev/systemd to=
- generate predicable netdev's name.
-Example: enm<mdev_alias_first_12_chars>
-I took Ethernet mdev as an example.
-New prefix 'm' stands for mediated device.
-Remaining 12 characters are first 12 chars of the mdev alias.
+Regards,
+Wanpeng Li
