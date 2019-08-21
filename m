@@ -2,79 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D0439859E
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 22:32:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF831985AE
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 22:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728582AbfHUUam (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 16:30:42 -0400
-Received: from mga04.intel.com ([192.55.52.120]:55586 "EHLO mga04.intel.com"
+        id S1730243AbfHUUfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 16:35:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42080 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727014AbfHUUam (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 16:30:42 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Aug 2019 13:30:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,412,1559545200"; 
-   d="scan'208";a="181150811"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga003.jf.intel.com with ESMTP; 21 Aug 2019 13:30:41 -0700
-Date:   Wed, 21 Aug 2019 13:30:41 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
-Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Message-ID: <20190821203041.GJ29345@linux.intel.com>
-References: <20190813115737.5db7d815@x1.home>
- <20190813133316.6fc6f257@x1.home>
- <20190813201914.GI13991@linux.intel.com>
- <20190815092324.46bb3ac1@x1.home>
- <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
- <20190820200318.GA15808@linux.intel.com>
- <20190820144204.161f49e0@x1.home>
- <20190820210245.GC15808@linux.intel.com>
- <20190821130859.4330bcf4@x1.home>
- <20190821133504.79b87767@x1.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190821133504.79b87767@x1.home>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1728485AbfHUUfI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 16:35:08 -0400
+Subject: Re: [GIT PULL] KVM fixes for Linux 5.3-rc6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1566419707;
+        bh=byosRMy9yjMEJVYHDr9LnIWQHMeLco4XAsvQgbkT8HY=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=Ayqb/KU+hHEIHw1CjpGfMeF40sfB+fL/9XSzryNzRObID2ozCvf2MYukfXeMmn95+
+         sq6Etz3BBMqYCdKVHzw7pnldfZH8yRBylaULEecIg3LwO9yNrxIvBjYFWCKlUqRl5J
+         mBx+N2TL/iZyVGHaswHb7d/nrMCR9vQa2YVMe9io=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <1566409010-50104-1-git-send-email-pbonzini@redhat.com>
+References: <1566409010-50104-1-git-send-email-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <1566409010-50104-1-git-send-email-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
+ tags/for-linus
+X-PR-Tracked-Commit-Id: e4427372398c31f57450565de277f861a4db5b3b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: bb7ba8069de933d69cb45dd0a5806b61033796a3
+Message-Id: <156641970785.4116.12918708167716551553.pr-tracker-bot@kernel.org>
+Date:   Wed, 21 Aug 2019 20:35:07 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        rkrcmar@redhat.com, kvm@vger.kernel.org
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 01:35:04PM -0600, Alex Williamson wrote:
-> On Wed, 21 Aug 2019 13:08:59 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> > Does this suggests something is still fundamentally wrong with the
-> > premise of this change or have I done something stupid?
-> 
-> Seems the latter, particularly your comment that we're looking for
-> pages pointing to the gfn range to be removed, not just those in the
-> range.  Slot gfn ranges like ffe00-ffe1f are getting reduced to 0-0 or
-> c0000-c0000, zapping zero or c0000, and I think one of the ones you
-> were looking for c1080-c1083 is reduce to c1000-c1000 and therefore
-> zaps sp->gfn c1000.  I'll keep looking.  Thanks,
+The pull request you sent on Wed, 21 Aug 2019 19:36:50 +0200:
 
-Ya.  As far as where to look, at this point I don't think it's an issue of
-incorrect zapping.  Not because  I'm 100% confident the zapping logic is
-correct, but because many of the tests, e.g. removing 'sp->gfn != gfn' and
-not being able to exclude APIC/IOAPIC ranges, suggest that the badness is
-'fixed' by zapping seemingly unrelated sps.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-In other words, it may be fundamentally wrong to zap only the memslot
-being removed, but I really want to know why.  History isn't helpful as
-KVM has always zapped all pages when removing a memslot (on x86), and the
-introduction of the per-memslot flush hook in commit
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/bb7ba8069de933d69cb45dd0a5806b61033796a3
 
-  2df72e9bc4c5 ("KVM: split kvm_arch_flush_shadow")
+Thank you!
 
-was all about refactoring generic code, and doesn't have any information
-on whether per-memslot flushing was actually tried for x86.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
