@@ -2,104 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E69A97E6C
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 17:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E0FE97EEF
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 17:38:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728350AbfHUPSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 11:18:47 -0400
-Received: from mga09.intel.com ([134.134.136.24]:14540 "EHLO mga09.intel.com"
+        id S1729287AbfHUPhO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 11:37:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:60322 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727683AbfHUPSr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 11:18:47 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Aug 2019 08:18:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,412,1559545200"; 
-   d="scan'208";a="169443350"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga007.jf.intel.com with ESMTP; 21 Aug 2019 08:18:46 -0700
-Date:   Wed, 21 Aug 2019 08:18:46 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
-Cc:     Nicusor CITU <ncitu@bitdefender.com>,
-        Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
+        id S1728848AbfHUPhO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 11:37:14 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C3FB337;
+        Wed, 21 Aug 2019 08:37:13 -0700 (PDT)
+Received: from e112269-lin.arm.com (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 609123F718;
+        Wed, 21 Aug 2019 08:37:11 -0700 (PDT)
+From:   Steven Price <steven.price@arm.com>
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc:     Steven Price <steven.price@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        "Zhang@vger.kernel.org" <Zhang@vger.kernel.org>,
-        Yu C <yu.c.zhang@intel.com>
-Subject: Re: [RFC PATCH v6 55/92] kvm: introspection: add KVMI_CONTROL_MSR
- and KVMI_EVENT_MSR
-Message-ID: <20190821151846.GD29345@linux.intel.com>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-56-alazar@bitdefender.com>
- <20190812210501.GD1437@linux.intel.com>
- <f9e94e9649f072911cc20129c2b633747d5c1df5.camel@bitdefender.com>
- <20190819183643.GB1916@linux.intel.com>
- <6854bfcc2bff3ffdaadad8708bd186a071ad682c.camel@bitdefender.com>
- <72df8b3ea66bb5bc7bb9c17e8bf12e12320358e1.camel@bitdefender.com>
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Russell King <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/10] arm64: Stolen time support
+Date:   Wed, 21 Aug 2019 16:36:46 +0100
+Message-Id: <20190821153656.33429-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <72df8b3ea66bb5bc7bb9c17e8bf12e12320358e1.camel@bitdefender.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 02:43:32PM +0300, Mihai Donțu wrote:
-> On Tue, 2019-08-20 at 08:44 +0000, Nicusor CITU wrote:
-> > > > > > +static void vmx_msr_intercept(struct kvm_vcpu *vcpu, unsigned
-> > > > > > int
-> > > > > > msr,
-> > > > > > +			      bool enable)
-> > > > > > +{
-> > > > > > +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > > > > > +	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
-> > > 
-> > > Is KVMI intended to play nice with nested virtualization? Unconditionally
-> > > updating vmcs01.msr_bitmap is correct regardless of whether the vCPU
-> > > is in L1 or L2, but if the vCPU is currently in L2 then the effective
-> > > bitmap, i.e. vmcs02.msr_bitmap, won't be updated until the next nested VM-
-> > > Enter.
-> > 
-> > Our initial proof of concept was running with success in nested
-> > virtualization. But most of our tests were done on bare-metal.
-> > We do however intend to make it fully functioning on nested systems
-> > too.
-> > 
-> > Even thought, from KVMI point of view, the MSR interception
-> > configuration would be just fine if it gets updated before the vcpu is
-> > actually entering to nested VM.
-> > 
-> 
-> I believe Sean is referring here to the case where the guest being
-> introspected is a hypervisor (eg. Windows 10 with device guard).
+This series add support for paravirtualized time for arm64 guests and
+KVM hosts following the specification in Arm's document DEN 0057A:
 
-Yep.
+https://developer.arm.com/docs/den0057/a
 
-> Even though we are looking at how to approach this scenario, the
-> introspection tools we have built will refuse to attach to a
-> hypervisor.
+It implements support for stolen time, allowing the guest to
+identify time when it is forcibly not executing.
 
-In that case, it's probably a good idea to make KVMI mutually exclusive
-with nested virtualization.  Doing so should, in theory, simplify the
-implementation and expedite upstreaming, e.g. reviewers don't have to
-nitpick edge cases related to nested virt.  My only hesitation in
-disabling KVMI when nested virt is enabled is that it could make it much
-more difficult to (re)enable the combination in the future.
+It doesn't implement support for Live Physical Time (LPT) as there are
+some concerns about the overheads and approach in the above
+specification, and I expect an updated version of the specification to
+be released soon with just the stolen time parts.
+
+NOTE: Patches 8 and 9 will conflict with Mark Rutland's series[1] cleaning
+up the SMCCC conduit. I do feel that the addition of an _invoke() call
+makes a number of call sites cleaner and it should be possible to
+integrate both this and Mark's other cleanups.
+
+[1] https://lore.kernel.org/linux-arm-kernel/20190809132245.43505-1-mark.rutland@arm.com/
+
+Also available as a git tree:
+git://linux-arm.org/linux-sp.git stolen_time/v3
+
+Changes from v2:
+https://lore.kernel.org/lkml/20190819140436.12207-1-steven.price@arm.com/
+ * Switched from using gfn_to_hva_cache to a new macro kvm_put_guest()
+   that can provide the single-copy atomicity required (on arm64). This
+   macro is added in patch 4.
+ * Tidied up the locking for kvm_update_stolen_time().
+   pagefault_disable() was unnecessary and the caller didn't need to
+   take kvm->srcu as the function does it itself.
+ * Removed struct kvm_arch_pvtime from the arm implementation, replaced
+   instead with inline static functions which are empty for arm.
+ * Fixed a few checkpatch --strict warnings.
+
+Changes from v1:
+https://lore.kernel.org/lkml/20190802145017.42543-1-steven.price@arm.com/
+ * Host kernel no longer allocates the stolen time structure, instead it
+   is allocated by user space. This means the save/restore functionality
+   can be removed.
+ * Refactored the code so arm has stub implementations and to avoid
+   initcall
+ * Rebased to pick up Documentation/{virt->virtual} change
+ * Bunch of typo fixes
+
+Christoffer Dall (1):
+  KVM: arm/arm64: Factor out hypercall handling from PSCI code
+
+Steven Price (9):
+  KVM: arm64: Document PV-time interface
+  KVM: arm64: Implement PV_FEATURES call
+  KVM: Implement kvm_put_guest()
+  KVM: arm64: Support stolen time reporting via shared structure
+  KVM: Allow kvm_device_ops to be const
+  KVM: arm64: Provide a PV_TIME device to user space
+  arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+  arm/arm64: Make use of the SMCCC 1.1 wrapper
+  arm64: Retrieve stolen time as paravirtualized guest
+
+ Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++
+ arch/arm/include/asm/kvm_host.h       |  30 +++++
+ arch/arm/kvm/Makefile                 |   2 +-
+ arch/arm/kvm/handle_exit.c            |   2 +-
+ arch/arm/mm/proc-v7-bugs.c            |  13 +-
+ arch/arm64/include/asm/kvm_host.h     |  28 +++-
+ arch/arm64/include/asm/paravirt.h     |   9 +-
+ arch/arm64/include/asm/pvclock-abi.h  |  17 +++
+ arch/arm64/include/uapi/asm/kvm.h     |   8 ++
+ arch/arm64/kernel/cpu_errata.c        |  80 ++++-------
+ arch/arm64/kernel/paravirt.c          | 148 +++++++++++++++++++++
+ arch/arm64/kernel/time.c              |   3 +
+ arch/arm64/kvm/Kconfig                |   1 +
+ arch/arm64/kvm/Makefile               |   2 +
+ arch/arm64/kvm/handle_exit.c          |   4 +-
+ include/kvm/arm_hypercalls.h          |  43 ++++++
+ include/kvm/arm_psci.h                |   2 +-
+ include/linux/arm-smccc.h             |  58 ++++++++
+ include/linux/cpuhotplug.h            |   1 +
+ include/linux/kvm_host.h              |  28 +++-
+ include/linux/kvm_types.h             |   2 +
+ include/uapi/linux/kvm.h              |   2 +
+ virt/kvm/arm/arm.c                    |  11 ++
+ virt/kvm/arm/hypercalls.c             |  68 ++++++++++
+ virt/kvm/arm/psci.c                   |  84 +-----------
+ virt/kvm/arm/pvtime.c                 | 182 ++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c                   |   6 +-
+ 27 files changed, 780 insertions(+), 154 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+ create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+ create mode 100644 include/kvm/arm_hypercalls.h
+ create mode 100644 virt/kvm/arm/hypercalls.c
+ create mode 100644 virt/kvm/arm/pvtime.c
+
+-- 
+2.20.1
+
