@@ -2,114 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF8CA98248
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 20:05:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75A53982A4
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 20:24:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727555AbfHUSDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 14:03:54 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:33549 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727014AbfHUSDx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 14:03:53 -0400
-Received: by mail-io1-f67.google.com with SMTP id z3so6488567iog.0
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 11:03:53 -0700 (PDT)
+        id S1728639AbfHUSUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 14:20:16 -0400
+Received: from mail-vs1-f74.google.com ([209.85.217.74]:40743 "EHLO
+        mail-vs1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727099AbfHUSUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 14:20:16 -0400
+Received: by mail-vs1-f74.google.com with SMTP id y7so1060220vsq.7
+        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 11:20:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rzDwwqgijxGmq79NIp8fz9g7ialyJ+cL6CMDbdqYWnU=;
-        b=PDHTroLMo1ZyG1Wjl7+NwtZTgBLINZTlbjPzVl+Xv4l5PDQ3XvP+43+kJ3PJ+8bpt6
-         rSYxbq5bWQVBVX/ku/NJo48sqsPlSrNE3XvMwade+81AJIMJnW+q+6cqkGC0JO5xl4wO
-         dz+6j6I/tySu92E3spQKiSMZZ6jPdcaN/sQxCKgigVbZKSo27dEqjlSgZLPhnAWFOv7r
-         1Tb1SQuwO7TPkdx/F0xFfb39v48wHlFRoxg4v+X5l2Z0owUCJjMMUMebgNVHC9hY9sOf
-         7F/hg0MgDYtX+5E3Yb+gqkGoRZGLfAFqN1lVfXcNrB77YixanxCZZ36I/5O+4kxBHhjZ
-         PwyQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=XOWLAgp0P8npFc8OAOfS4Qa4ZgriqhnGg7/Zma2VF2Y=;
+        b=PL4GW/z+KdvWg8PgiliXgFESGa1f8UQXyd+7ri//f/7ac44KtIJPu57pb7RcP4x5CE
+         YsVSa2XFokfd36Rh9twwQxbLrS3Ean1MUAjsfUqJRtTQhoN3RPycoBF8PZgs00WnpeJq
+         HMqlX5qxJEavzolTIgMKI2L7kfV0sQCfJUngnemvBtwrMDcIgKFkHOt+hgglaLop/d04
+         HOGhzWi6d9qVF+OGKQ4YrGSlX4M79EdWNs3OFWB140ZR6AXTlqvb+tUv9K/YCtB9Q59E
+         HG0qmpwWMcVa4av4G8PBrMgwLS/JzGvZtAXgQD2+soMohQ/y2xXx1jMo4+2s8TmpHGP0
+         piyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rzDwwqgijxGmq79NIp8fz9g7ialyJ+cL6CMDbdqYWnU=;
-        b=Ou3i8QqGMUOBJHMMoFkapunmPu9L/P0JmTEYB6jMnedJhkijxvph4cOJ/x/niNo81V
-         k7gBAt07ls+4vEkknpbYZ5VR5WkF27aobr9yyqCf4SpNyWTyNo9LLkLG/rmaLsVcGuZ8
-         dHXL6zOOijRA8ku7pVw5TBOZzYaBsX0ytkZpRK60xxxoqNR7goXHbkffXUb8ISeCT6pl
-         NHdjMsPYrdg6PT2D961QPvcQs2+uv/2uieiLihbptDHJgYsCo7FGqrDdeX6ijsMOZk3Z
-         m6I7fCyYc4VM0Y8V9wl0wGS8DB2goOl0fPzFTYIvVpVbyLkBgj/SXw+nvpXx83JEk18A
-         AZfA==
-X-Gm-Message-State: APjAAAWxIUujnhOWoSuxIVNiL67TuO++RiQ9ID8UKs5y5t2bjLFxfcBT
-        xcfrdvt8N1POEvGiyCKHosqfedXH0rKVVTgCnLX2wA==
-X-Google-Smtp-Source: APXvYqxTUaZxJ2ZIMhF5u3xFn9lsf2inlMO9U98DaVaarrMsh1bbIsMJFpYP1w7D/p7xDaHwNmJQ/8b7/t43wsPFFZ4=
-X-Received: by 2002:a6b:6516:: with SMTP id z22mr15806587iob.7.1566410632477;
- Wed, 21 Aug 2019 11:03:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190819230422.244888-1-delco@google.com> <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
- <20190820003700.GH1916@linux.intel.com> <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
- <20190820015641.GK1916@linux.intel.com> <74C7BC03-99CA-4213-8327-B8D23E3B22AB@gmail.com>
- <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
- <CAHGX9Vr4HsVowENg8CS9pVWMr2n58H_tJqDX823oAHL++L8yHA@mail.gmail.com> <20190821171737.GG29345@linux.intel.com>
-In-Reply-To: <20190821171737.GG29345@linux.intel.com>
-From:   Matt Delco <delco@google.com>
-Date:   Wed, 21 Aug 2019 11:03:40 -0700
-Message-ID: <CAHGX9VoDs==RnpO-NL1x3bXj_aCCkvPvfZXa-6_TFsS2-oMBmQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=XOWLAgp0P8npFc8OAOfS4Qa4ZgriqhnGg7/Zma2VF2Y=;
+        b=sS8HJPrEeBzUN3YmV9jI22HVEiRS80a65/J/EcK7uRmwM+wDG/BQhenDEm3MhZtQ8a
+         pkUiqejMrPhEkwm16WuH/x9hZuzxqxiskTSF+0VvF9gMl5kyB1fNVKjcdxkvuES83WJl
+         qc571oi4aZvMRBOtofWtt2pRaAweWyiDoOQnHml/cG0/dUrsPYZlp6iGGIWG2jPnZ1TI
+         BD2POrLVUHhX3uKY5y2V8yvoavoXwYVC6HoARHjyvU5g6EtENq9q/h4bPJokE7oDAwpE
+         tKQJNhUuReVC3IQfCBXTbUbJdOjz5M6ceG6BCCgFUor0MGc/IgIC8WXNfh0kaEWyRO3b
+         F4zg==
+X-Gm-Message-State: APjAAAVx4qVHwHvNLFS8ZBTtT+bVob0yETlcCp/Z359UM1AKF99h1dZ5
+        x1ws3q63OLPGrUGJ/waLn6zejJJlXmmWNIX1KV3x41Iu1kM+aP6uvV+zNGCbkkQVseDE39kK/+w
+        jIYUB6Kz2YIViHSRUV+BBXGBtpIwbpGhLPXvXeeZwYWtIR2oMw3aqO3eRy0kgxnI=
+X-Google-Smtp-Source: APXvYqyOtN6QsibogCg7LnU0B3aINk4w+2zic8k4fpKIkx0+JNYB93greEYNIPRkpmXkkZ7gyDjNpsDP9SKReg==
+X-Received: by 2002:ab0:240e:: with SMTP id f14mr3249017uan.26.1566411614472;
+ Wed, 21 Aug 2019 11:20:14 -0700 (PDT)
+Date:   Wed, 21 Aug 2019 11:20:04 -0700
+Message-Id: <20190821182004.102768-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
+Subject: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>,
+        Eric Hankland <ehankland@google.com>,
+        Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 10:17 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
-> On Tue, Aug 20, 2019 at 12:34:20AM -0700, Matt Delco wrote:
-> > On Mon, Aug 19, 2019 at 10:09 PM Wanpeng Li <kernellwp@gmail.com> wrote:
-> > >
-> > > On Tue, 20 Aug 2019 at 12:10, Nadav Amit <nadav.amit@gmail.com> wrote:
-> > > > These tests pass on bare-metal.
-> > >
-> > > Good to know this. In addition, in linux apic driver, during mode
-> > > switch __setup_APIC_LVTT() always sets lapic_timer_period(number of
-> > > clock cycles per jiffy)/APIC_DIVISOR to APIC_TMICT which can avoid the
-> > > issue Matt report. So is it because there is no such stuff in windows
-> > > or the windows version which Matt testing is too old?
-> >
-> > I'm using Windows 10 (May 2019). Multimedia apps on Windows tend to
-> > request higher frequency clocks, and this in turn can affect how the
-> > kernel configures HW timers.  I may need to examine how Windows
-> > typically interacts with the APIC timer and see if/how this changes
-> > when Skype is used.  The frequent timer mode changes are not something
-> > I'd expect a reasonably behaved kernel to do.
->
-> Have you tried analyzing the guest code?  If we're lucky, doing so might
-> provide insight into what's going awry.
->
-> E.g.:
->
->   Are the LVTT/TMICT writes are coming from a single blob/sequence of code
->   in the guest?
->
->   Is the unpaired LVTT coming from the same code sequence or is it a new
->   rip entirely?
->
->   Can you dump the relevant asm code sequences?
+These MSRs should be enumerated by KVM_GET_MSR_INDEX_LIST, so that
+userspace knows that these MSRs may be part of the vCPU state.
 
-I have changed gears to do runtime behavioral analysis, given the
-reports that the code change I proposed would deviate from hardware.
-The time between writes for TMICT-then-LVTT is typically quite small,
-and much smaller than the average for LVTT-then-TMICT.  On the lead up
-to where time stops there's alternating writes to TMICT and LVTT,
-where each write to LVTT alternates between setting periodic vs.
-one-shot.  The final write to LVTT (which sets periodic) comes more
-than 1.5 ms after the prior TMICT (which is about 100x the typical
-delay), which might mean the kernel opted to not write to TMICT but
-did on the next clock tick.  The host kernel & kvm I've been testing
-with seems to be firing the timer callbacks sooner than requested, so
-if the guest kernel has optimizations based on whether it thinks
-there's time left on the APIC timer then this might be causing
-problems.  I'm going to try to pull in some of the newer kvm changes
-that appear to compensate for the early delivery and see if that also
-makes the time hang symptom disappear (if not then I may start to
-examine things from the guest side).  Thanks.
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Eric Hankland <ehankland@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+
+---
+ arch/x86/kvm/x86.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 93b0bd45ac73..ecaaa411538f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1140,6 +1140,42 @@ static u32 msrs_to_save[] = {
+ 	MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
+ 	MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
+ 	MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
++	MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
++	MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
++	MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
++	MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
++	MSR_ARCH_PERFMON_PERFCTR0, MSR_ARCH_PERFMON_PERFCTR1,
++	MSR_ARCH_PERFMON_PERFCTR0 + 2, MSR_ARCH_PERFMON_PERFCTR0 + 3,
++	MSR_ARCH_PERFMON_PERFCTR0 + 4, MSR_ARCH_PERFMON_PERFCTR0 + 5,
++	MSR_ARCH_PERFMON_PERFCTR0 + 6, MSR_ARCH_PERFMON_PERFCTR0 + 7,
++	MSR_ARCH_PERFMON_PERFCTR0 + 8, MSR_ARCH_PERFMON_PERFCTR0 + 9,
++	MSR_ARCH_PERFMON_PERFCTR0 + 10, MSR_ARCH_PERFMON_PERFCTR0 + 11,
++	MSR_ARCH_PERFMON_PERFCTR0 + 12, MSR_ARCH_PERFMON_PERFCTR0 + 13,
++	MSR_ARCH_PERFMON_PERFCTR0 + 14, MSR_ARCH_PERFMON_PERFCTR0 + 15,
++	MSR_ARCH_PERFMON_PERFCTR0 + 16, MSR_ARCH_PERFMON_PERFCTR0 + 17,
++	MSR_ARCH_PERFMON_PERFCTR0 + 18, MSR_ARCH_PERFMON_PERFCTR0 + 19,
++	MSR_ARCH_PERFMON_PERFCTR0 + 20, MSR_ARCH_PERFMON_PERFCTR0 + 21,
++	MSR_ARCH_PERFMON_PERFCTR0 + 22, MSR_ARCH_PERFMON_PERFCTR0 + 23,
++	MSR_ARCH_PERFMON_PERFCTR0 + 24, MSR_ARCH_PERFMON_PERFCTR0 + 25,
++	MSR_ARCH_PERFMON_PERFCTR0 + 26, MSR_ARCH_PERFMON_PERFCTR0 + 27,
++	MSR_ARCH_PERFMON_PERFCTR0 + 28, MSR_ARCH_PERFMON_PERFCTR0 + 29,
++	MSR_ARCH_PERFMON_PERFCTR0 + 30, MSR_ARCH_PERFMON_PERFCTR0 + 31,
++	MSR_ARCH_PERFMON_EVENTSEL0, MSR_ARCH_PERFMON_EVENTSEL1,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 2, MSR_ARCH_PERFMON_EVENTSEL0 + 3,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 4, MSR_ARCH_PERFMON_EVENTSEL0 + 5,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 6, MSR_ARCH_PERFMON_EVENTSEL0 + 7,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 8, MSR_ARCH_PERFMON_EVENTSEL0 + 9,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 10, MSR_ARCH_PERFMON_EVENTSEL0 + 11,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 18, MSR_ARCH_PERFMON_EVENTSEL0 + 19,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 20, MSR_ARCH_PERFMON_EVENTSEL0 + 21,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 22, MSR_ARCH_PERFMON_EVENTSEL0 + 23,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 24, MSR_ARCH_PERFMON_EVENTSEL0 + 25,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 26, MSR_ARCH_PERFMON_EVENTSEL0 + 27,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 28, MSR_ARCH_PERFMON_EVENTSEL0 + 29,
++	MSR_ARCH_PERFMON_EVENTSEL0 + 30, MSR_ARCH_PERFMON_EVENTSEL0 + 31,
+ };
+ 
+ static unsigned num_msrs_to_save;
+@@ -4989,6 +5025,11 @@ static void kvm_init_msr_list(void)
+ 	u32 dummy[2];
+ 	unsigned i, j;
+ 
++	BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 4,
++			 "Please update the fixed PMCs in msrs_to_save[]");
++	BUILD_BUG_ON_MSG(INTEL_PMC_MAX_GENERIC != 32,
++			 "Please update the generic perfctr/eventsel MSRs in msrs_to_save[]");
++
+ 	for (i = j = 0; i < ARRAY_SIZE(msrs_to_save); i++) {
+ 		if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]) < 0)
+ 			continue;
+-- 
+2.23.0.187.g17f5b7556c-goog
+
