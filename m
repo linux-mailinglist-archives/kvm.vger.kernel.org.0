@@ -2,105 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CEB8E9816D
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 19:37:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A71B3981F3
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 19:58:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729977AbfHURg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 13:36:57 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40612 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728535AbfHURg5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 13:36:57 -0400
-Received: by mail-wm1-f65.google.com with SMTP id c5so2777632wmb.5;
-        Wed, 21 Aug 2019 10:36:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=smhXu1L5t6GuvxXpM02oEkcG3qy/NF91cs0u42tWNQM=;
-        b=Z7SZLu+1OWPt/QYrEf3gyDmxq2SiRh/WlDoNoD9cXWQW8PfO6Bg2S6A72046Wbb69b
-         fuqPMdlWe2O0FipE/J1iPyhMAOp7BTcYSDB51HiqDqy9fDCeQ/seS7z0aTYhrcPhDsEd
-         iK52/paX6q2MJNbM35hzjgnq3X6nebfa9TLxD+KLpSlw+bWeXUQnGfF8nI6xKw+ELGbs
-         wWr5BIRKIPEdW/826poZAbTrS7mUqW9Oh5ixr04Z8t8TXEy3WsIAnUYcBh0THUSdoWWw
-         jwyempdtrYCOpPNfUUkuw4gNXiuA5KV11Ej5F9qL4lZ6DMhAsM7pEZM2igDG2A4aGTO7
-         NdpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=smhXu1L5t6GuvxXpM02oEkcG3qy/NF91cs0u42tWNQM=;
-        b=DKy0LCB2LVqwtAyd4Op0oZW0/X/7GJQ3MPANVt50XikgDRX86eQF8gW5U4i5WZPRoP
-         CXx/kQE7Ae2HkCuputTDqs/y0DKW0tbTa37e22c1nZ70Ly8S7NooJBuCJatfW1fr3SR7
-         aqtXXidLqgBiCVEvo7cpo3Iloxtn9LNwQGocJin1QgB3kTma1VnXi2vssTfDeP+RNUyb
-         YRxVdpb2DT139v/omDBjlB3HE6i7R8vE7lThB+kLw6IvpX2NgnU4sMqgg1An/kgCMEb0
-         DMXniCZM0cBJ9JlAbSUIpIjXAioi1208zHGRMuz5pS3l7oiQwIDW7WA4g8vsGp4vueAh
-         rUWQ==
-X-Gm-Message-State: APjAAAXym44ZtrQwMsbSRPR1pIYK0eOWlpbFv0tIJaKdf+/ZNMHCxrIM
-        19zBqjvHYD4HUwEzkumYua0=
-X-Google-Smtp-Source: APXvYqyXNaXwSC85caOVq0J3S9SmTrgdefplsopEPHCiE6o/zPmn3cLlBkTYVCg6pWayt8sHC4PbyA==
-X-Received: by 2002:a1c:9ad8:: with SMTP id c207mr1246531wme.145.1566409014779;
-        Wed, 21 Aug 2019 10:36:54 -0700 (PDT)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 2sm1109217wmz.16.2019.08.21.10.36.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Aug 2019 10:36:53 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 5.3-rc6
-Date:   Wed, 21 Aug 2019 19:36:50 +0200
-Message-Id: <1566409010-50104-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1730376AbfHUR5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 13:57:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34270 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730356AbfHUR5r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 13:57:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id F156918C426E;
+        Wed, 21 Aug 2019 17:57:46 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.18.25.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 00FC860E1C;
+        Wed, 21 Aug 2019 17:57:33 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 8CD1A223D00; Wed, 21 Aug 2019 13:57:32 -0400 (EDT)
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvdimm@lists.01.org
+Cc:     virtio-fs@redhat.com, vgoyal@redhat.com, miklos@szeredi.hu,
+        stefanha@redhat.com, dgilbert@redhat.com,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        kvm@vger.kernel.org, kbuild test robot <lkp@intel.com>
+Subject: [PATCH 04/19] virtio: Implement get_shm_region for PCI transport
+Date:   Wed, 21 Aug 2019 13:57:05 -0400
+Message-Id: <20190821175720.25901-5-vgoyal@redhat.com>
+In-Reply-To: <20190821175720.25901-1-vgoyal@redhat.com>
+References: <20190821175720.25901-1-vgoyal@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 21 Aug 2019 17:57:47 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+From: Sebastien Boeuf <sebastien.boeuf@intel.com>
 
-The following changes since commit a738b5e75b4c13be3485c82eb62c30047aa9f164:
+On PCI the shm regions are found using capability entries;
+find a region by searching for the capability.
 
-  Merge tag 'kvmarm-fixes-for-5.3-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2019-08-09 16:53:50 +0200)
+Cc: kvm@vger.kernel.org
+Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: kbuild test robot <lkp@intel.com>
+---
+ drivers/virtio/virtio_pci_modern.c | 108 +++++++++++++++++++++++++++++
+ include/uapi/linux/virtio_pci.h    |  11 ++-
+ 2 files changed, 118 insertions(+), 1 deletion(-)
 
-are available in the git repository at:
+diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+index 7abcc50838b8..1cdedd93f42a 100644
+--- a/drivers/virtio/virtio_pci_modern.c
++++ b/drivers/virtio/virtio_pci_modern.c
+@@ -443,6 +443,112 @@ static void del_vq(struct virtio_pci_vq_info *info)
+ 	vring_del_virtqueue(vq);
+ }
+ 
++static int virtio_pci_find_shm_cap(struct pci_dev *dev,
++                                   u8 required_id,
++                                   u8 *bar, u64 *offset, u64 *len)
++{
++	int pos;
++
++        for (pos = pci_find_capability(dev, PCI_CAP_ID_VNDR);
++             pos > 0;
++             pos = pci_find_next_capability(dev, pos, PCI_CAP_ID_VNDR)) {
++		u8 type, cap_len, id;
++                u32 tmp32;
++                u64 res_offset, res_length;
++
++		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
++                                                         cfg_type),
++                                     &type);
++                if (type != VIRTIO_PCI_CAP_SHARED_MEMORY_CFG)
++                        continue;
++
++		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
++                                                         cap_len),
++                                     &cap_len);
++		if (cap_len != sizeof(struct virtio_pci_cap64)) {
++		        printk(KERN_ERR "%s: shm cap with bad size offset: %d size: %d\n",
++                               __func__, pos, cap_len);
++                        continue;
++                }
++
++		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
++                                                         id),
++                                     &id);
++                if (id != required_id)
++                        continue;
++
++                /* Type, and ID match, looks good */
++                pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
++                                                         bar),
++                                     bar);
++
++                /* Read the lower 32bit of length and offset */
++                pci_read_config_dword(dev, pos + offsetof(struct virtio_pci_cap, offset),
++                                      &tmp32);
++                res_offset = tmp32;
++                pci_read_config_dword(dev, pos + offsetof(struct virtio_pci_cap, length),
++                                      &tmp32);
++                res_length = tmp32;
++
++                /* and now the top half */
++                pci_read_config_dword(dev,
++                                      pos + offsetof(struct virtio_pci_cap64,
++                                                     offset_hi),
++                                      &tmp32);
++                res_offset |= ((u64)tmp32) << 32;
++                pci_read_config_dword(dev,
++                                      pos + offsetof(struct virtio_pci_cap64,
++                                                     length_hi),
++                                      &tmp32);
++                res_length |= ((u64)tmp32) << 32;
++
++                *offset = res_offset;
++                *len = res_length;
++
++                return pos;
++        }
++        return 0;
++}
++
++static bool vp_get_shm_region(struct virtio_device *vdev,
++			      struct virtio_shm_region *region, u8 id)
++{
++	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
++	struct pci_dev *pci_dev = vp_dev->pci_dev;
++	u8 bar;
++	u64 offset, len;
++	phys_addr_t phys_addr;
++	size_t bar_len;
++	char *bar_name;
++	int ret;
++
++	if (!virtio_pci_find_shm_cap(pci_dev, id, &bar, &offset, &len)) {
++		return false;
++	}
++
++	ret = pci_request_region(pci_dev, bar, "virtio-pci-shm");
++	if (ret < 0) {
++		dev_err(&pci_dev->dev, "%s: failed to request BAR\n",
++			__func__);
++		return false;
++	}
++
++	phys_addr = pci_resource_start(pci_dev, bar);
++	bar_len = pci_resource_len(pci_dev, bar);
++
++        if (offset + len > bar_len) {
++                dev_err(&pci_dev->dev,
++                        "%s: bar shorter than cap offset+len\n",
++                        __func__);
++                return false;
++        }
++
++	region->len = len;
++	region->addr = (u64) phys_addr + offset;
++
++	return true;
++}
++
+ static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
+ 	.get		= NULL,
+ 	.set		= NULL,
+@@ -457,6 +563,7 @@ static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
+ 	.get_vq_affinity = vp_get_vq_affinity,
++	.get_shm_region  = vp_get_shm_region,
+ };
+ 
+ static const struct virtio_config_ops virtio_pci_config_ops = {
+@@ -473,6 +580,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
+ 	.bus_name	= vp_bus_name,
+ 	.set_vq_affinity = vp_set_vq_affinity,
+ 	.get_vq_affinity = vp_get_vq_affinity,
++	.get_shm_region  = vp_get_shm_region,
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/virtio_pci.h b/include/uapi/linux/virtio_pci.h
+index 90007a1abcab..fe9f43680a1d 100644
+--- a/include/uapi/linux/virtio_pci.h
++++ b/include/uapi/linux/virtio_pci.h
+@@ -113,6 +113,8 @@
+ #define VIRTIO_PCI_CAP_DEVICE_CFG	4
+ /* PCI configuration access */
+ #define VIRTIO_PCI_CAP_PCI_CFG		5
++/* Additional shared memory capability */
++#define VIRTIO_PCI_CAP_SHARED_MEMORY_CFG 8
+ 
+ /* This is the PCI capability header: */
+ struct virtio_pci_cap {
+@@ -121,11 +123,18 @@ struct virtio_pci_cap {
+ 	__u8 cap_len;		/* Generic PCI field: capability length */
+ 	__u8 cfg_type;		/* Identifies the structure. */
+ 	__u8 bar;		/* Where to find it. */
+-	__u8 padding[3];	/* Pad to full dword. */
++	__u8 id;		/* Multiple capabilities of the same type */
++	__u8 padding[2];	/* Pad to full dword. */
+ 	__le32 offset;		/* Offset within bar. */
+ 	__le32 length;		/* Length of the structure, in bytes. */
+ };
+ 
++struct virtio_pci_cap64 {
++       struct virtio_pci_cap cap;
++       __le32 offset_hi;             /* Most sig 32 bits of offset */
++       __le32 length_hi;             /* Most sig 32 bits of length */
++};
++
+ struct virtio_pci_notify_cap {
+ 	struct virtio_pci_cap cap;
+ 	__le32 notify_off_multiplier;	/* Multiplier for queue_notify_off. */
+-- 
+2.20.1
 
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to e4427372398c31f57450565de277f861a4db5b3b:
-
-  selftests/kvm: make platform_info_test pass on AMD (2019-08-21 19:08:18 +0200)
-
-----------------------------------------------------------------
-* A couple bugfixes, and mostly selftests changes.
-
-----------------------------------------------------------------
-Miaohe Lin (1):
-      KVM: x86: svm: remove redundant assignment of var new_entry
-
-Paolo Bonzini (7):
-      MAINTAINERS: change list for KVM/s390
-      MAINTAINERS: add KVM x86 reviewers
-      selftests: kvm: do not try running the VM in vmx_set_nested_state_test
-      selftests: kvm: provide common function to enable eVMCS
-      selftests: kvm: fix vmx_set_nested_state_test
-      selftests: kvm: fix state save/load on processors without XSAVE
-      Revert "KVM: x86/mmu: Zap only the relevant pages when removing a memslot"
-
-Radim Krcmar (1):
-      kvm: x86: skip populating logical dest map if apic is not sw enabled
-
-Vitaly Kuznetsov (1):
-      selftests/kvm: make platform_info_test pass on AMD
-
- MAINTAINERS                                        | 19 +++++++------
- arch/x86/kvm/lapic.c                               |  5 ++++
- arch/x86/kvm/mmu.c                                 | 33 +---------------------
- arch/x86/kvm/svm.c                                 |  1 -
- tools/testing/selftests/kvm/include/evmcs.h        |  2 ++
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 16 +++++++----
- tools/testing/selftests/kvm/lib/x86_64/vmx.c       | 20 +++++++++++++
- tools/testing/selftests/kvm/x86_64/evmcs_test.c    | 15 ++--------
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c  | 12 +++-----
- .../selftests/kvm/x86_64/platform_info_test.c      |  2 +-
- .../kvm/x86_64/vmx_set_nested_state_test.c         | 32 +++++++++------------
- 11 files changed, 69 insertions(+), 88 deletions(-)
