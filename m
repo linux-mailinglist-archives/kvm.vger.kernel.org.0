@@ -2,162 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6720197ABF
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 15:27:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8964D97DD6
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 16:59:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728973AbfHUN1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 09:27:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1319 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727696AbfHUN1O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 09:27:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 506073003715;
-        Wed, 21 Aug 2019 13:27:14 +0000 (UTC)
-Received: from [10.36.118.29] (unknown [10.36.118.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4EA2B5D6B0;
-        Wed, 21 Aug 2019 13:27:13 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 3/4] s390x: Move stsi to library
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20190821104736.1470-1-frankja@linux.ibm.com>
- <20190821104736.1470-4-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <3a5cc77f-8b2b-269e-3939-3280287b470a@redhat.com>
-Date:   Wed, 21 Aug 2019 15:27:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728524AbfHUO72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 10:59:28 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:35666 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726530AbfHUO71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 10:59:27 -0400
+Received: by mail-pf1-f194.google.com with SMTP id d85so1611057pfd.2;
+        Wed, 21 Aug 2019 07:59:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:date:message-id:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=Z5zNV+aGEXnZe0+CPgdtnFJ8dRf/r2ygP8Iohve0Rps=;
+        b=f0fycqMFGS1JWxp1KhvwIftJwqDZPus1tTQemthJDQYeojm77cFV7cVWmH5S1Gac4V
+         EprUkqhJletcvmlAj1qn9J3/X5GtO5Ba1MJjYPyhBg17L3ymOQILNaNynrz322LN9KMn
+         ozCbINmOAl05/syfAkDa8J2ppNOPXR4kQr+k8VytHd+4Bj12QnYc2FtR5jx1lUEu2rFB
+         XLF0YeUfPnVuaBtNPkigEZnTKdzINmRTFb6yG00JjThyNla6wNXxc8xX33tMWJnhVVry
+         xw3dNLW7LJth/U7S71Mdl+g5ukquPnozyRuUpAGh3hQxXfvMgPjg1d4u+jw6e5tUaezs
+         w0WA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=Z5zNV+aGEXnZe0+CPgdtnFJ8dRf/r2ygP8Iohve0Rps=;
+        b=FB193W0gefwKI2s9xOGISxaR8qGojEQfgKkosP6XxPufhYR8bTLmOq1WUkTidVjgxf
+         pKao4j25A6zS+P8kOA+ChQBGK/mpQptjlXf4AatLArBZWNt+pAHEm8NzF6xmBk+D6rbb
+         WXDWdI0R7uJbwE5cUMCXrFFJG1D9X1lKo8lfXAjQ/DaGorKFx0SiuzM5Q6JYk644AqQi
+         v3rdk13Xn/519JuC4zHQW58hzoW0PYbd6F+ue10cpF3A6EWZRUByS+0rFl5OMsvQmOgk
+         bqv2N1DLbQeo8DCUdo76UhiUe2tciSe08obxwIZZl/OiJP63Ca01jtELBjkANFFWJZre
+         JYkw==
+X-Gm-Message-State: APjAAAXOq40iPqsYAFZvRt0JL/4l91dAw005HUy5Ox364YSelRiRbb+U
+        FHiDhW9UBD97Eno+xBpQF2I=
+X-Google-Smtp-Source: APXvYqzrFyVlorWkueXx9HRBuLKcOcy2Opun+O4OOr1HVzfU2JfHa3PQ1/39vsylKSV3Xcp4yieOtQ==
+X-Received: by 2002:a17:90a:8991:: with SMTP id v17mr410994pjn.120.1566399566511;
+        Wed, 21 Aug 2019 07:59:26 -0700 (PDT)
+Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id f12sm22513826pgo.85.2019.08.21.07.59.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Aug 2019 07:59:25 -0700 (PDT)
+Subject: [PATCH v6 0/6] mm / virtio: Provide support for unused page
+ reporting
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+To:     nitesh@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
+        david@redhat.com, dave.hansen@intel.com,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        virtio-dev@lists.oasis-open.org, osalvador@suse.de
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
+Date:   Wed, 21 Aug 2019 07:59:24 -0700
+Message-ID: <20190821145806.20926.22448.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20190821104736.1470-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 21 Aug 2019 13:27:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.08.19 12:47, Janosch Frank wrote:
-> It's needed in multiple tests now.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/asm/arch_def.h | 16 ++++++++++++++++
->  s390x/skey.c             | 18 ------------------
->  2 files changed, 16 insertions(+), 18 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 4bbb428..5f8f45e 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -240,4 +240,20 @@ static inline void enter_pstate(void)
->  	load_psw_mask(mask);
->  }
->  
-> +static inline int stsi(void *addr, int fc, int sel1, int sel2)
-> +{
-> +	register int r0 asm("0") = (fc << 28) | sel1;
-> +	register int r1 asm("1") = sel2;
-> +	int cc;
-> +
-> +	asm volatile(
-> +		"stsi	0(%3)\n"
-> +		"ipm	%[cc]\n"
-> +		"srl	%[cc],28\n"
-> +		: "+d" (r0), [cc] "=d" (cc)
-> +		: "d" (r1), "a" (addr)
-> +		: "cc", "memory");
-> +	return cc;
-> +}
-> +
->  #endif
-> diff --git a/s390x/skey.c b/s390x/skey.c
-> index b1e11af..fd4fcc7 100644
-> --- a/s390x/skey.c
-> +++ b/s390x/skey.c
-> @@ -70,24 +70,6 @@ static void test_set(void)
->  	       skey.str.acc == ret.str.acc && skey.str.fp == ret.str.fp);
->  }
->  
-> -static inline int stsi(void *addr, int fc, int sel1, int sel2)
-> -{
-> -	register int r0 asm("0") = (fc << 28) | sel1;
-> -	register int r1 asm("1") = sel2;
-> -	int rc = 0;
-> -
-> -	asm volatile(
-> -		"	stsi	0(%3)\n"
-> -		"	jz	0f\n"
-> -		"	lhi	%1,-1\n"
-> -		"0:\n"
-> -		: "+d" (r0), "+d" (rc)
-> -		: "d" (r1), "a" (addr)
-> -		: "cc", "memory");
-> -
-> -	return rc;
-> -}
-> -
->  /* Returns true if we are running under z/VM 6.x */
->  static bool check_for_zvm6(void)
->  {
-> 
+This series provides an asynchronous means of reporting to a hypervisor
+that a guest page is no longer in use and can have the data associated
+with it dropped. To do this I have implemented functionality that allows
+for what I am referring to as unused page reporting
 
-You don't simply move, you also modify and change the return value from
-o/-1 to cc. AFAIKs, this should be fine.
+The functionality for this is fairly simple. When enabled it will allocate
+statistics to track the number of reported pages in a given free area.
+When the number of free pages exceeds this value plus a high water value,
+currently 32, it will begin performing page reporting which consists of
+pulling pages off of free list and placing them into a scatter list. The
+scatterlist is then given to the page reporting device and it will perform
+the required action to make the pages "reported", in the case of
+virtio-balloon this results in the pages being madvised as MADV_DONTNEED
+and as such they are forced out of the guest. After this they are placed
+back on the free list, and an additional bit is added if they are not
+merged indicating that they are a reported buddy page instead of a
+standard buddy page. The cycle then repeats with additional non-reported
+pages being pulled until the free areas all consist of reported pages.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I am leaving a number of things hard-coded such as limiting the lowest
+order processed to PAGEBLOCK_ORDER, and have left it up to the guest to
+determine what the limit is on how many pages it wants to allocate to
+process the hints. The upper limit for this is based on the size of the
+queue used to store the scattergather list.
 
--- 
+My primary testing has just been to verify the memory is being freed after
+allocation by running memhog 40g on a 40g guest and watching the total
+free memory via /proc/meminfo on the host. With this I have verified most
+of the memory is freed after each iteration. As far as performance I have
+been mainly focusing on the will-it-scale/page_fault1 test running with
+16 vcpus. I have modified it to use Transparent Huge Pages. With this I
+see almost no difference, -0.08%, with the patches applied and the feature
+disabled. I see a regression of -0.86% with the feature enabled, but the
+madvise disabled in the hypervisor due to a device being assigned. With
+the feature fully enabled I see a regression of -3.27% versus the baseline
+without these patches applied. In my testing I found that most of the
+overhead was due to the page zeroing that comes as a result of the pages
+having to be faulted back into the guest.
 
-Thanks,
+One side effect of these patches is that the guest becomes much more
+resilient in terms of NUMA locality. With the pages being freed and then
+reallocated when used it allows for the pages to be much closer to the
+active thread, and as a result there can be situations where this patch
+set will out-perform the stock kernel when the guest memory is not local
+to the guest vCPUs. To avoid that in my testing I set the affinity of all
+the vCPUs and QEMU instance to the same node.
 
-David / dhildenb
+Changes from the RFC:
+https://lore.kernel.org/lkml/20190530215223.13974.22445.stgit@localhost.localdomain/
+Moved aeration requested flag out of aerator and into zone->flags.
+Moved boundary out of free_area and into local variables for aeration.
+Moved aeration cycle out of interrupt and into workqueue.
+Left nr_free as total pages instead of splitting it between raw and aerated.
+Combined size and physical address values in virtio ring into one 64b value.
+
+Changes from v1:
+https://lore.kernel.org/lkml/20190619222922.1231.27432.stgit@localhost.localdomain/
+Dropped "waste page treatment" in favor of "page hinting"
+Renamed files and functions from "aeration" to "page_hinting"
+Moved from page->lru list to scatterlist
+Replaced wait on refcnt in shutdown with RCU and cancel_delayed_work_sync
+Virtio now uses scatterlist directly instead of intermediate array
+Moved stats out of free_area, now in separate area and pointed to from zone
+Merged patch 5 into patch 4 to improve review-ability
+Updated various code comments throughout
+
+Changes from v2:
+https://lore.kernel.org/lkml/20190724165158.6685.87228.stgit@localhost.localdomain/
+Dropped "page hinting" in favor of "page reporting"
+Renamed files from "hinting" to "reporting"
+Replaced "Hinted" page type with "Reported" page flag
+Added support for page poisoning while hinting is active
+Add QEMU patch that implements PAGE_POISON feature
+
+Changes from v3:
+https://lore.kernel.org/lkml/20190801222158.22190.96964.stgit@localhost.localdomain/
+Added mutex lock around page reporting startup and shutdown
+Fixed reference to "page aeration" in patch 2
+Split page reporting function bit out into separate QEMU patch
+Limited capacity of scatterlist to vq size - 1 instead of vq size
+Added exception handling for case of virtio descriptor allocation failure
+
+Changes from v4:
+https://lore.kernel.org/lkml/20190807224037.6891.53512.stgit@localhost.localdomain/
+Replaced spin_(un)lock with spin_(un)lock_irq in page_reporting_cycle()
+Dropped if/continue for ternary operator in page_reporting_process()
+Added checks for isolate and cma types to for_each_reporting_migratetype_order
+Added virtio-dev, Michal Hocko, and Oscar Salvador to to:/cc:
+Rebased on latest linux-next and QEMU git trees
+
+Changes from v5:
+https://lore.kernel.org/lkml/20190812213158.22097.30576.stgit@localhost.localdomain/
+Replaced spin_(un)lock with spin_(un)lock_irq in page_reporting_startup()
+Updated shuffle code to use "shuffle_pick_tail" and updated patch description
+Dropped storage of order and migratettype while page is being reported
+Used get_pfnblock_migratetype to determine migratetype of page
+Renamed put_reported_page to free_reported_page, added order as argument
+Dropped check for CMA type as I believe we should be reporting those
+Added code to allow moving of reported pages into and out of isolation
+Defined page reporting order as minimum of Huge Page size vs MAX_ORDER - 1
+Cleaned up use of static branch usage for page_reporting_notify_enabled
+
+---
+
+Alexander Duyck (6):
+      mm: Adjust shuffle code to allow for future coalescing
+      mm: Move set/get_pcppage_migratetype to mmzone.h
+      mm: Use zone and order instead of free area in free_list manipulators
+      mm: Introduce Reported pages
+      virtio-balloon: Pull page poisoning config out of free page hinting
+      virtio-balloon: Add support for providing unused page reports to host
+
+
+ drivers/virtio/Kconfig              |    1 
+ drivers/virtio/virtio_balloon.c     |   84 ++++++++-
+ include/linux/mmzone.h              |  124 ++++++++-----
+ include/linux/page-flags.h          |   11 +
+ include/linux/page_reporting.h      |  177 ++++++++++++++++++
+ include/uapi/linux/virtio_balloon.h |    1 
+ mm/Kconfig                          |    5 +
+ mm/Makefile                         |    1 
+ mm/internal.h                       |   18 ++
+ mm/memory_hotplug.c                 |    1 
+ mm/page_alloc.c                     |  216 ++++++++++++++++-------
+ mm/page_reporting.c                 |  336 +++++++++++++++++++++++++++++++++++
+ mm/shuffle.c                        |   40 +++-
+ mm/shuffle.h                        |   12 +
+ 14 files changed, 896 insertions(+), 131 deletions(-)
+ create mode 100644 include/linux/page_reporting.h
+ create mode 100644 mm/page_reporting.c
+
+--
