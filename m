@@ -2,282 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D24497F05
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 17:39:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A91CE97F76
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 17:54:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730228AbfHUPhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 11:37:41 -0400
-Received: from foss.arm.com ([217.140.110.172]:60520 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730208AbfHUPhg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 11:37:36 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E434A360;
-        Wed, 21 Aug 2019 08:37:35 -0700 (PDT)
-Received: from e112269-lin.arm.com (e112269-lin.cambridge.arm.com [10.1.196.133])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1CE13F718;
-        Wed, 21 Aug 2019 08:37:33 -0700 (PDT)
-From:   Steven Price <steven.price@arm.com>
-To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc:     Steven Price <steven.price@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 10/10] arm64: Retrieve stolen time as paravirtualized guest
-Date:   Wed, 21 Aug 2019 16:36:56 +0100
-Message-Id: <20190821153656.33429-11-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190821153656.33429-1-steven.price@arm.com>
-References: <20190821153656.33429-1-steven.price@arm.com>
+        id S1728447AbfHUPyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 11:54:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43330 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727873AbfHUPyf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Aug 2019 11:54:35 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7LFrGuE025764
+        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 11:54:33 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2uh87kjm0h-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 11:54:33 -0400
+Received: from localhost
+        by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
+        Wed, 21 Aug 2019 16:54:32 +0100
+Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+        by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 21 Aug 2019 16:54:29 +0100
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7LFsSS610224040
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Aug 2019 15:54:28 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 45CD96A04D;
+        Wed, 21 Aug 2019 15:54:28 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 975DA6A047;
+        Wed, 21 Aug 2019 15:54:27 +0000 (GMT)
+Received: from [9.80.195.2] (unknown [9.80.195.2])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Aug 2019 15:54:27 +0000 (GMT)
+Subject: Re: [PATCH RFC 1/1] vfio-ccw: add some logging
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20190816151505.9853-1-cohuck@redhat.com>
+ <20190816151505.9853-2-cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Date:   Wed, 21 Aug 2019 11:54:26 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190816151505.9853-2-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19082115-0004-0000-0000-000015377574
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011629; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01250053; UDB=6.00659951; IPR=6.01031607;
+ MB=3.00028262; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-21 15:54:30
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19082115-0005-0000-0000-00008CF52513
+Message-Id: <81414605-c676-6e7e-4ee8-8dbfe7ae0a76@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-21_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908210165
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enable paravirtualization features when running under a hypervisor
-supporting the PV_TIME_ST hypercall.
 
-For each (v)CPU, we ask the hypervisor for the location of a shared
-page which the hypervisor will use to report stolen time to us. We set
-pv_time_ops to the stolen time function which simply reads the stolen
-value from the shared page for a VCPU. We guarantee single-copy
-atomicity using READ_ONCE which means we can also read the stolen
-time for another VCPU than the currently running one while it is
-potentially being updated by the hypervisor.
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/paravirt.h |   9 +-
- arch/arm64/kernel/paravirt.c      | 148 ++++++++++++++++++++++++++++++
- arch/arm64/kernel/time.c          |   3 +
- include/linux/cpuhotplug.h        |   1 +
- 4 files changed, 160 insertions(+), 1 deletion(-)
+On 8/16/19 11:15 AM, Cornelia Huck wrote:
+> Usually, the common I/O layer logs various things into the s390
+> cio debug feature, which has been very helpful in the past when
+> looking at crash dumps. As vfio-ccw devices unbind from the
+> standard I/O subchannel driver, we lose some information there.
+> 
+> Let's introduce some vfio-ccw debug features and log some things
+> there. (Unfortunately we cannot reuse the cio debug feature from
+> a module.)
 
-diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-index 799d9dd6f7cc..125c26c42902 100644
---- a/arch/arm64/include/asm/paravirt.h
-+++ b/arch/arm64/include/asm/paravirt.h
-@@ -21,6 +21,13 @@ static inline u64 paravirt_steal_clock(int cpu)
- {
- 	return pv_ops.time.steal_clock(cpu);
- }
--#endif
-+
-+int __init kvm_guest_init(void);
-+
-+#else
-+
-+#define kvm_guest_init()
-+
-+#endif // CONFIG_PARAVIRT
- 
- #endif
-diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-index 4cfed91fe256..ea8dbbbd3293 100644
---- a/arch/arm64/kernel/paravirt.c
-+++ b/arch/arm64/kernel/paravirt.c
-@@ -6,13 +6,161 @@
-  * Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-  */
- 
-+#define pr_fmt(fmt) "kvmarm-pv: " fmt
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/cpuhotplug.h>
- #include <linux/export.h>
-+#include <linux/io.h>
- #include <linux/jump_label.h>
-+#include <linux/printk.h>
-+#include <linux/psci.h>
-+#include <linux/reboot.h>
-+#include <linux/slab.h>
- #include <linux/types.h>
-+
- #include <asm/paravirt.h>
-+#include <asm/pvclock-abi.h>
-+#include <asm/smp_plat.h>
- 
- struct static_key paravirt_steal_enabled;
- struct static_key paravirt_steal_rq_enabled;
- 
- struct paravirt_patch_template pv_ops;
- EXPORT_SYMBOL_GPL(pv_ops);
-+
-+struct kvmarm_stolen_time_region {
-+	struct pvclock_vcpu_stolen_time *kaddr;
-+};
-+
-+static DEFINE_PER_CPU(struct kvmarm_stolen_time_region, stolen_time_region);
-+
-+static bool steal_acc = true;
-+static int __init parse_no_stealacc(char *arg)
-+{
-+	steal_acc = false;
-+	return 0;
-+}
-+
-+early_param("no-steal-acc", parse_no_stealacc);
-+
-+/* return stolen time in ns by asking the hypervisor */
-+static u64 kvm_steal_clock(int cpu)
-+{
-+	struct kvmarm_stolen_time_region *reg;
-+
-+	reg = per_cpu_ptr(&stolen_time_region, cpu);
-+	if (!reg->kaddr) {
-+		pr_warn_once("stolen time enabled but not configured for cpu %d\n",
-+			     cpu);
-+		return 0;
-+	}
-+
-+	return le64_to_cpu(READ_ONCE(reg->kaddr->stolen_time));
-+}
-+
-+static int disable_stolen_time_current_cpu(void)
-+{
-+	struct kvmarm_stolen_time_region *reg;
-+
-+	reg = this_cpu_ptr(&stolen_time_region);
-+	if (!reg->kaddr)
-+		return 0;
-+
-+	memunmap(reg->kaddr);
-+	memset(reg, 0, sizeof(*reg));
-+
-+	return 0;
-+}
-+
-+static int stolen_time_dying_cpu(unsigned int cpu)
-+{
-+	return disable_stolen_time_current_cpu();
-+}
-+
-+static int init_stolen_time_cpu(unsigned int cpu)
-+{
-+	struct kvmarm_stolen_time_region *reg;
-+	struct arm_smccc_res res;
-+
-+	reg = this_cpu_ptr(&stolen_time_region);
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_TIME_ST, &res);
-+
-+	if ((long)res.a0 < 0)
-+		return -EINVAL;
-+
-+	reg->kaddr = memremap(res.a0,
-+			      sizeof(struct pvclock_vcpu_stolen_time),
-+			      MEMREMAP_WB);
-+
-+	if (!reg->kaddr) {
-+		pr_warn("Failed to map stolen time data structure\n");
-+		return -ENOMEM;
-+	}
-+
-+	if (le32_to_cpu(reg->kaddr->revision) != 0 ||
-+	    le32_to_cpu(reg->kaddr->attributes) != 0) {
-+		pr_warn("Unexpected revision or attributes in stolen time data\n");
-+		return -ENXIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int kvm_arm_init_stolen_time(void)
-+{
-+	int ret;
-+
-+	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVMPV_STARTING,
-+				"hypervisor/kvmarm/pv:starting",
-+				init_stolen_time_cpu, stolen_time_dying_cpu);
-+	if (ret < 0)
-+		return ret;
-+	return 0;
-+}
-+
-+static bool has_kvm_steal_clock(void)
-+{
-+	struct arm_smccc_res res;
-+
-+	/* To detect the presence of PV time support we require SMCCC 1.1+ */
-+	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
-+		return false;
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-+			     ARM_SMCCC_HV_PV_FEATURES, &res);
-+
-+	if (res.a0 != SMCCC_RET_SUCCESS)
-+		return false;
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_FEATURES,
-+			     ARM_SMCCC_HV_PV_TIME_ST, &res);
-+
-+	if (res.a0 != SMCCC_RET_SUCCESS)
-+		return false;
-+
-+	return true;
-+}
-+
-+int __init kvm_guest_init(void)
-+{
-+	int ret = 0;
-+
-+	if (!has_kvm_steal_clock())
-+		return 0;
-+
-+	ret = kvm_arm_init_stolen_time();
-+	if (ret)
-+		return ret;
-+
-+	pv_ops.time.steal_clock = kvm_steal_clock;
-+
-+	static_key_slow_inc(&paravirt_steal_enabled);
-+	if (steal_acc)
-+		static_key_slow_inc(&paravirt_steal_rq_enabled);
-+
-+	pr_info("using stolen time PV\n");
-+
-+	return 0;
-+}
-diff --git a/arch/arm64/kernel/time.c b/arch/arm64/kernel/time.c
-index 0b2946414dc9..a52aea14c6ec 100644
---- a/arch/arm64/kernel/time.c
-+++ b/arch/arm64/kernel/time.c
-@@ -30,6 +30,7 @@
- 
- #include <asm/thread_info.h>
- #include <asm/stacktrace.h>
-+#include <asm/paravirt.h>
- 
- unsigned long profile_pc(struct pt_regs *regs)
- {
-@@ -65,4 +66,6 @@ void __init time_init(void)
- 
- 	/* Calibrate the delay loop directly */
- 	lpj_fine = arch_timer_rate / HZ;
-+
-+	kvm_guest_init();
- }
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 068793a619ca..89d75edb5750 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -136,6 +136,7 @@ enum cpuhp_state {
- 	/* Must be the last timer callback */
- 	CPUHP_AP_DUMMY_TIMER_STARTING,
- 	CPUHP_AP_ARM_XEN_STARTING,
-+	CPUHP_AP_ARM_KVMPV_STARTING,
- 	CPUHP_AP_ARM_CORESIGHT_STARTING,
- 	CPUHP_AP_ARM64_ISNDEP_STARTING,
- 	CPUHP_AP_SMPCFD_DYING,
--- 
-2.20.1
+Boo :(
+
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_drv.c     | 50 ++++++++++++++++++++++++++--
+>  drivers/s390/cio/vfio_ccw_fsm.c     | 51 ++++++++++++++++++++++++++++-
+>  drivers/s390/cio/vfio_ccw_ops.c     | 10 ++++++
+>  drivers/s390/cio/vfio_ccw_private.h | 17 ++++++++++
+>  4 files changed, 124 insertions(+), 4 deletions(-)
+> 
+
+...snip...
+
+> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
+> index 49d9d3da0282..4a1e727c62d9 100644
+> --- a/drivers/s390/cio/vfio_ccw_fsm.c
+> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
+
+...snip...
+
+> @@ -239,18 +258,32 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+>  		/* Don't try to build a cp if transport mode is specified. */
+>  		if (orb->tm.b) {
+>  			io_region->ret_code = -EOPNOTSUPP;
+> +			VFIO_CCW_MSG_EVENT(2,
+> +					   "%pUl (%x.%x.%04x): transport mode\n",
+> +					   mdev_uuid(mdev), schid.cssid,
+> +					   schid.ssid, schid.sch_no);
+>  			errstr = "transport mode";
+>  			goto err_out;
+>  		}
+>  		io_region->ret_code = cp_init(&private->cp, mdev_dev(mdev),
+>  					      orb);
+>  		if (io_region->ret_code) {
+> +			VFIO_CCW_MSG_EVENT(2,
+> +					   "%pUl (%x.%x.%04x): cp_init=%d\n",
+> +					   mdev_uuid(mdev), schid.cssid,
+> +					   schid.ssid, schid.sch_no,
+> +					   io_region->ret_code);
+>  			errstr = "cp init";
+>  			goto err_out;
+>  		}
+>  
+>  		io_region->ret_code = cp_prefetch(&private->cp);
+>  		if (io_region->ret_code) {
+> +			VFIO_CCW_MSG_EVENT(2,
+> +					   "%pUl (%x.%x.%04x): cp_prefetch=%d\n",
+> +					   mdev_uuid(mdev), schid.cssid,
+> +					   schid.ssid, schid.sch_no,
+> +					   io_region->ret_code);
+>  			errstr = "cp prefetch";
+>  			cp_free(&private->cp);
+>  			goto err_out;
+> @@ -259,23 +292,36 @@ static void fsm_io_request(struct vfio_ccw_private *private,
+>  		/* Start channel program and wait for I/O interrupt. */
+>  		io_region->ret_code = fsm_io_helper(private);
+>  		if (io_region->ret_code) {
+> +			VFIO_CCW_MSG_EVENT(2,
+> +					   "%pUl (%x.%x.%04x): fsm_io_helper=%d\n",
+> +					   mdev_uuid(mdev), schid.cssid,
+> +					   schid.ssid, schid.sch_no,
+> +					   io_region->ret_code);
+
+I suppose these ones could be squashed into err_out, and use errstr as
+substitution for the message text.  But this is fine.
+
+>  			errstr = "cp fsm_io_helper";
+>  			cp_free(&private->cp);
+>  			goto err_out;
+>  		}
+>  		return;
+>  	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
+> +		VFIO_CCW_MSG_EVENT(2,
+> +				   "%pUl (%x.%x.%04x): halt on io_region\n",
+> +				   mdev_uuid(mdev), schid.cssid,
+> +				   schid.ssid, schid.sch_no);
+>  		/* halt is handled via the async cmd region */
+>  		io_region->ret_code = -EOPNOTSUPP;
+>  		goto err_out;
+>  	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
+> +		VFIO_CCW_MSG_EVENT(2,
+> +				   "%pUl (%x.%x.%04x): clear on io_region\n",
+> +				   mdev_uuid(mdev), schid.cssid,
+> +				   schid.ssid, schid.sch_no);
+
+The above idea would need errstr to be set to something other than
+"request" here, which maybe isn't a bad thing anyway.  :)
+
+>  		/* clear is handled via the async cmd region */
+>  		io_region->ret_code = -EOPNOTSUPP;
+>  		goto err_out;
+>  	}
+>  
+>  err_out:
+> -	trace_vfio_ccw_io_fctl(scsw->cmd.fctl, get_schid(private),
+> +	trace_vfio_ccw_io_fctl(scsw->cmd.fctl, schid,
+>  			       io_region->ret_code, errstr);
+>  }
+>  
+> @@ -308,6 +354,9 @@ static void fsm_irq(struct vfio_ccw_private *private,
+>  {
+>  	struct irb *irb = this_cpu_ptr(&cio_irb);
+>  
+> +	VFIO_CCW_TRACE_EVENT(6, "IRQ");
+> +	VFIO_CCW_TRACE_EVENT(6, dev_name(&private->sch->dev));
+> +
+>  	memcpy(&private->irb, irb, sizeof(*irb));
+>  
+>  	queue_work(vfio_ccw_work_q, &private->io_work);
+> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+> index 5eb61116ca6f..f0d71ab77c50 100644
+> --- a/drivers/s390/cio/vfio_ccw_ops.c
+> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> @@ -124,6 +124,11 @@ static int vfio_ccw_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>  	private->mdev = mdev;
+>  	private->state = VFIO_CCW_STATE_IDLE;
+>  
+> +	VFIO_CCW_MSG_EVENT(2, "mdev %pUl, sch %x.%x.%04x: create\n",
+> +			   mdev_uuid(mdev), private->sch->schid.cssid,
+> +			   private->sch->schid.ssid,
+> +			   private->sch->schid.sch_no);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -132,6 +137,11 @@ static int vfio_ccw_mdev_remove(struct mdev_device *mdev)
+>  	struct vfio_ccw_private *private =
+>  		dev_get_drvdata(mdev_parent_dev(mdev));
+>  
+> +	VFIO_CCW_MSG_EVENT(2, "mdev %pUl, sch %x.%x.%04x: remove\n",
+> +			   mdev_uuid(mdev), private->sch->schid.cssid,
+> +			   private->sch->schid.ssid,
+> +			   private->sch->schid.sch_no);
+> +
+>  	if ((private->state != VFIO_CCW_STATE_NOT_OPER) &&
+>  	    (private->state != VFIO_CCW_STATE_STANDBY)) {
+>  		if (!vfio_ccw_sch_quiesce(private->sch))
+> diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
+> index f1092c3dc1b1..bbe9babf767b 100644
+> --- a/drivers/s390/cio/vfio_ccw_private.h
+> +++ b/drivers/s390/cio/vfio_ccw_private.h
+> @@ -17,6 +17,7 @@
+>  #include <linux/eventfd.h>
+>  #include <linux/workqueue.h>
+>  #include <linux/vfio_ccw.h>
+> +#include <asm/debug.h>
+>  
+>  #include "css.h"
+>  #include "vfio_ccw_cp.h"
+> @@ -139,4 +140,20 @@ static inline void vfio_ccw_fsm_event(struct vfio_ccw_private *private,
+>  
+>  extern struct workqueue_struct *vfio_ccw_work_q;
+>  
+> +
+> +/* s390 debug feature, similar to base cio */
+> +extern debug_info_t *vfio_ccw_debug_msg_id;
+> +extern debug_info_t *vfio_ccw_debug_trace_id;
+> +
+> +#define VFIO_CCW_TRACE_EVENT(imp, txt) \
+> +		debug_text_event(vfio_ccw_debug_trace_id, imp, txt)
+> +
+> +#define VFIO_CCW_MSG_EVENT(imp, args...) \
+> +		debug_sprintf_event(vfio_ccw_debug_msg_id, imp, ##args)
+> +
+> +static inline void VFIO_CCW_HEX_EVENT(int level, void *data, int length)
+> +{
+> +	debug_event(vfio_ccw_debug_trace_id, level, data, length);
+> +}
+> +
+>  #endif
+> 
+
+This all looks pretty standard compared to the existing cio stuff, and
+would be a good addition for vfio-ccw.
+
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
 
