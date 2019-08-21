@@ -2,208 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 220339762C
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 11:29:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C68999771D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 12:28:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727299AbfHUJ2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 05:28:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51202 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726353AbfHUJ2w (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Aug 2019 05:28:52 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7L9RQou073979
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 05:28:50 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2uh2hat8s3-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 21 Aug 2019 05:28:50 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 21 Aug 2019 10:28:48 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 21 Aug 2019 10:28:47 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7L9SkQM38470052
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Aug 2019 09:28:46 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0364952057;
-        Wed, 21 Aug 2019 09:28:46 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.3.179])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B4FF35204F;
-        Wed, 21 Aug 2019 09:28:45 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 0/3] s390x: More emulation tests
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20190820105550.4991-1-frankja@linux.ibm.com>
- <09b66729-1263-381f-9af5-9f68332c5415@redhat.com>
- <35c4aa37-c0c8-4f27-66e0-23145fe48182@linux.ibm.com>
- <6addbd2b-435b-9367-8a13-152b094707ac@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Wed, 21 Aug 2019 11:28:45 +0200
+        id S1727087AbfHUK14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 06:27:56 -0400
+Received: from foss.arm.com ([217.140.110.172]:55726 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725283AbfHUK1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 06:27:55 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A83B28;
+        Wed, 21 Aug 2019 03:27:55 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B57B3F706;
+        Wed, 21 Aug 2019 03:27:53 -0700 (PDT)
+Subject: Re: [PATCH v2 4/9] KVM: arm64: Support stolen time reporting via
+ shared structure
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Russell King <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190819140436.12207-1-steven.price@arm.com>
+ <20190819140436.12207-5-steven.price@arm.com>
+ <f6fad4fa-323d-306c-c582-de07464f4d00@kernel.org>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <4703baa7-0116-f5d6-291e-1e669a36545d@arm.com>
+Date:   Wed, 21 Aug 2019 11:27:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6addbd2b-435b-9367-8a13-152b094707ac@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="7qH6F8qSQCqrrxCu9OA6ppy3ZqeffagAT"
-X-TM-AS-GCONF: 00
-x-cbid: 19082109-0012-0000-0000-000003410C27
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082109-0013-0000-0000-0000217B32FA
-Message-Id: <6c6fb63c-af8a-ecea-957b-9e5a48edf399@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-21_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908210103
+In-Reply-To: <f6fad4fa-323d-306c-c582-de07464f4d00@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7qH6F8qSQCqrrxCu9OA6ppy3ZqeffagAT
-Content-Type: multipart/mixed; boundary="XPm09mOedldALs5EOtZtOnaj9t24tk4TO";
- protected-headers="v1"
-From: Janosch Frank <frankja@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, thuth@redhat.com
-Message-ID: <6c6fb63c-af8a-ecea-957b-9e5a48edf399@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 0/3] s390x: More emulation tests
-References: <20190820105550.4991-1-frankja@linux.ibm.com>
- <09b66729-1263-381f-9af5-9f68332c5415@redhat.com>
- <35c4aa37-c0c8-4f27-66e0-23145fe48182@linux.ibm.com>
- <6addbd2b-435b-9367-8a13-152b094707ac@redhat.com>
-In-Reply-To: <6addbd2b-435b-9367-8a13-152b094707ac@redhat.com>
-
---XPm09mOedldALs5EOtZtOnaj9t24tk4TO
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/21/19 10:53 AM, David Hildenbrand wrote:
-> On 21.08.19 10:48, Janosch Frank wrote:
->> On 8/20/19 9:04 PM, David Hildenbrand wrote:
->>> On 20.08.19 12:55, Janosch Frank wrote:
->>>> The first patch allows for CECSIM booting via PSW restart.
->>>> The other ones add diag288 and STSI tests.
->>>>
->>>> I chose to start with these since they are low controversy. My queue=
-
->>>> still contains the sclp patches and a simple smp library with
->>>> tests. They will follow later.
->>>
->>> On which branch do these patches apply? I fail to am 2+3 on master (w=
-ell
->>> I didn't try too hard to resolve ;) ). Do you have a branch somewhere=
-?
->>>
+On 19/08/2019 17:40, Marc Zyngier wrote:
+> Hi Steven,
+> 
+> On 19/08/2019 15:04, Steven Price wrote:
+>> Implement the service call for configuring a shared structure between a
+>> VCPU and the hypervisor in which the hypervisor can write the time
+>> stolen from the VCPU's execution time by other tasks on the host.
 >>
->> That is currently on top of master (24efc22), the only merge conflicts=
-
->> might be s390x/Makefile or unittests.conf if your branch is not clean.=
-
->> I'm trying to get a public github account for that and qemu.
+>> The hypervisor allocates memory which is placed at an IPA chosen by user
+>> space. The hypervisor then uses WRITE_ONCE() to update the shared
+>> structure ensuring single copy atomicity of the 64-bit unsigned value
+>> that reports stolen time in nanoseconds.
 >>
->=20
-> t460s: ~/git/kvm-unit-tests master $ git fetch origin
-> t460s: ~/git/kvm-unit-tests master $ git reset --hard origin/master
-> HEAD is now at 03b1e45 x86: Support environments without test-devices
-> t460s: ~/git/kvm-unit-tests master $ git am \[kvm-unit-tests\ PATCH\ *
-> Applying: s390x: Support PSW restart boot
-> Applying: s390x: Diag288 test
-> error: patch failed: s390x/Makefile:11
-> error: s390x/Makefile: patch does not apply
-> error: patch failed: s390x/unittests.cfg:61
-> error: s390x/unittests.cfg: patch does not apply
-> Patch failed at 0002 s390x: Diag288 test
-> hint: Use 'git am --show-current-patch' to see the failed patch
-> When you have resolved this problem, run "git am --continue".
-> If you prefer to skip this patch, run "git am --skip" instead.
-> To restore the original branch and stop patching, run "git am --abort".=
+>> Whenever stolen time is enabled by the guest, the stolen time counter is
+>> reset.
+>>
+>> The stolen time itself is retrieved from the sched_info structure
+>> maintained by the Linux scheduler code. We enable SCHEDSTATS when
+>> selecting KVM Kconfig to ensure this value is meaningful.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  arch/arm/include/asm/kvm_host.h   | 15 +++++++
+>>  arch/arm64/include/asm/kvm_host.h | 16 ++++++-
+>>  arch/arm64/kvm/Kconfig            |  1 +
+>>  include/linux/kvm_types.h         |  2 +
+>>  virt/kvm/arm/arm.c                | 19 +++++++++
+>>  virt/kvm/arm/hypercalls.c         |  3 ++
+>>  virt/kvm/arm/pvtime.c             | 71 +++++++++++++++++++++++++++++++
+>>  7 files changed, 126 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index 369b5d2d54bf..14d61a84c270 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -39,6 +39,7 @@
+>>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
+>>  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
+>> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+>>  
+>>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+>>  
+>> @@ -77,6 +78,12 @@ struct kvm_arch {
+>>  
+>>  	/* Mandated version of PSCI */
+>>  	u32 psci_version;
+>> +
+>> +	struct kvm_arch_pvtime {
+>> +		struct gfn_to_hva_cache st_ghc;
+>> +		gpa_t st_base;
+>> +		u64 st_size;
+>> +	} pvtime;
+> 
+> It'd be good if we could avoid having this in the 32bit vcpu structure,
+> given that it serves no real purpose (other than being able to compile
+> things).
 
->=20
-> Are you sure?
->=20
+Good point - I think I can fix that with a couple more static inline
+functions... It's a little tricky due to header file include order, but
+I think I can make it work.
 
+[...]
+>> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	struct kvm_arch_pvtime *pvtime = &kvm->arch.pvtime;
+>> +	u64 steal;
+>> +	u64 steal_le;
+>> +	u64 offset;
+>> +	int idx;
+>> +	const int stride = sizeof(struct pvclock_vcpu_stolen_time);
+>> +
+>> +	if (pvtime->st_base == GPA_INVALID)
+>> +		return -ENOTSUPP;
+>> +
+>> +	/* Let's do the local bookkeeping */
+>> +	steal = vcpu->arch.steal.steal;
+>> +	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
+>> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
+>> +	vcpu->arch.steal.steal = steal;
+>> +
+>> +	offset = stride * kvm_vcpu_get_idx(vcpu);
+>> +
+>> +	if (unlikely(offset + stride > pvtime->st_size))
+>> +		return -EINVAL;
+>> +
+>> +	steal_le = cpu_to_le64(steal);
+>> +	pagefault_disable();
+> 
+> What's the reason for doing a pagefault_disable()? What I'd expect is
+> for the userspace page to be faulted in and written to, and doing a
+> pagefault_disable() seems to be going against this idea.
 
-The internal mirror did not pick up the changes of the last few days...
+Umm... this is me screwing up the locking...
 
+The current code is very confused about which locks should/can be held
+when kvm_update_stolen_time() is called. vcpu_req_record_steal()
+explicitly takes the kvm->srcu read lock - which is then taken again
+here. But kvm_hypercall_stolen_time doesn't hold any lock. And obviously
+at some point in time I expected this to be called in atomic context...
 
---XPm09mOedldALs5EOtZtOnaj9t24tk4TO--
+In general the page is likely to be faulted in (as a guest which is
+using stolen time is surely looking at the numbers there). But there's
+no need for the pagefault_disable(). It also shouldn't be the callers
+responsibility to hold kvm->srcu.
 
---7qH6F8qSQCqrrxCu9OA6ppy3ZqeffagAT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl1dDs0ACgkQ41TmuOI4
-ufh4hQ/+NC1gfvEtdZamkcJUTvTcCnkrfIMZ70U+Pc0t3L8wWCAtr0ylORLgptoH
-MiJ3qpl4XyZ+AnrdyHhuReZjCJcE2I+FR2ORestd0HUvP9FbP1lVsyuVyUWWD7GE
-nWFhXXH67JH2SzUe0sc5q7/xNOpM0DcAFTzIdPsYE5Ry2XwxLt94JruSOCUa9cGD
-K+qn6KGFNXy8W4w0ben3Isao1D+Y8ZJV+AsoitbWBt8puW0TBAzcdC7MvgRp6WYG
-+doRlmCOZceds4++RymAdhEMmv/AH58L6OhBatpRRrHvyrrE2rD/Ez0tF6/tIC/F
-DhpKhEb+pwpNewAq2DnNodrcWTTQ92d0Pvf1ylDHNmJcpsJS3VkewtBbNqtKAJn5
-VHNnZgTwRn8t3Zv2r62MyiiimWNqW/2aHRXUKTMdsIRhTNdm3OOGG7nMZTlcdSaL
-l9eF5NC4DKe82DV+OQLnaGTFreIiT1uRdUREJG0rmZNcK276V6/aLLjHguElenD4
-/dUoEMIgtRTmP7h4LiLgYqEWI5F16oD3JIBkNLf+13TomATBbI3eKYhBrNBYwflL
-MGaZVqN9ThgWeuOUy9qXN0SyMJHjxwd3CffOM0aTpg1zwq7FiDu4O79CH3dUSVla
-honb3LmK/HSoOkoWs0U98D5LO6eLMbnXdn46fIEm1UVZuqhLvzg=
-=JOFT
------END PGP SIGNATURE-----
-
---7qH6F8qSQCqrrxCu9OA6ppy3ZqeffagAT--
-
+Steve
