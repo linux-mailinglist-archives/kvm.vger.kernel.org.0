@@ -2,79 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE74B9811B
-	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 19:17:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEB8E9816D
+	for <lists+kvm@lfdr.de>; Wed, 21 Aug 2019 19:37:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729457AbfHURRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 13:17:39 -0400
-Received: from mga06.intel.com ([134.134.136.31]:16580 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729309AbfHURRj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 13:17:39 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Aug 2019 10:17:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,412,1559545200"; 
-   d="scan'208";a="180107328"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga007.fm.intel.com with ESMTP; 21 Aug 2019 10:17:38 -0700
-Date:   Wed, 21 Aug 2019 10:17:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Matt Delco <delco@google.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>
-Subject: Re: [PATCH] KVM: lapic: restart counter on change to periodic mode
-Message-ID: <20190821171737.GG29345@linux.intel.com>
-References: <20190819230422.244888-1-delco@google.com>
- <80390180-93a3-4d6e-b62a-d4194eb13106@redhat.com>
- <20190820003700.GH1916@linux.intel.com>
- <CAHGX9VrZyPQ8OxnYnOWg-ES3=kghSx1LSyzrX8i3=O+o0JAsig@mail.gmail.com>
- <20190820015641.GK1916@linux.intel.com>
- <74C7BC03-99CA-4213-8327-B8D23E3B22AB@gmail.com>
- <CANRm+Cz_3g9bUwzMzWffZCSayaEKqbx9=J3E7CWMMbQP224h9g@mail.gmail.com>
- <CAHGX9Vr4HsVowENg8CS9pVWMr2n58H_tJqDX823oAHL++L8yHA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHGX9Vr4HsVowENg8CS9pVWMr2n58H_tJqDX823oAHL++L8yHA@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1729977AbfHURg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 13:36:57 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40612 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728535AbfHURg5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 13:36:57 -0400
+Received: by mail-wm1-f65.google.com with SMTP id c5so2777632wmb.5;
+        Wed, 21 Aug 2019 10:36:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=smhXu1L5t6GuvxXpM02oEkcG3qy/NF91cs0u42tWNQM=;
+        b=Z7SZLu+1OWPt/QYrEf3gyDmxq2SiRh/WlDoNoD9cXWQW8PfO6Bg2S6A72046Wbb69b
+         fuqPMdlWe2O0FipE/J1iPyhMAOp7BTcYSDB51HiqDqy9fDCeQ/seS7z0aTYhrcPhDsEd
+         iK52/paX6q2MJNbM35hzjgnq3X6nebfa9TLxD+KLpSlw+bWeXUQnGfF8nI6xKw+ELGbs
+         wWr5BIRKIPEdW/826poZAbTrS7mUqW9Oh5ixr04Z8t8TXEy3WsIAnUYcBh0THUSdoWWw
+         jwyempdtrYCOpPNfUUkuw4gNXiuA5KV11Ej5F9qL4lZ6DMhAsM7pEZM2igDG2A4aGTO7
+         NdpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=smhXu1L5t6GuvxXpM02oEkcG3qy/NF91cs0u42tWNQM=;
+        b=DKy0LCB2LVqwtAyd4Op0oZW0/X/7GJQ3MPANVt50XikgDRX86eQF8gW5U4i5WZPRoP
+         CXx/kQE7Ae2HkCuputTDqs/y0DKW0tbTa37e22c1nZ70Ly8S7NooJBuCJatfW1fr3SR7
+         aqtXXidLqgBiCVEvo7cpo3Iloxtn9LNwQGocJin1QgB3kTma1VnXi2vssTfDeP+RNUyb
+         YRxVdpb2DT139v/omDBjlB3HE6i7R8vE7lThB+kLw6IvpX2NgnU4sMqgg1An/kgCMEb0
+         DMXniCZM0cBJ9JlAbSUIpIjXAioi1208zHGRMuz5pS3l7oiQwIDW7WA4g8vsGp4vueAh
+         rUWQ==
+X-Gm-Message-State: APjAAAXym44ZtrQwMsbSRPR1pIYK0eOWlpbFv0tIJaKdf+/ZNMHCxrIM
+        19zBqjvHYD4HUwEzkumYua0=
+X-Google-Smtp-Source: APXvYqyXNaXwSC85caOVq0J3S9SmTrgdefplsopEPHCiE6o/zPmn3cLlBkTYVCg6pWayt8sHC4PbyA==
+X-Received: by 2002:a1c:9ad8:: with SMTP id c207mr1246531wme.145.1566409014779;
+        Wed, 21 Aug 2019 10:36:54 -0700 (PDT)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id 2sm1109217wmz.16.2019.08.21.10.36.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Aug 2019 10:36:53 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 5.3-rc6
+Date:   Wed, 21 Aug 2019 19:36:50 +0200
+Message-Id: <1566409010-50104-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 12:34:20AM -0700, Matt Delco wrote:
-> On Mon, Aug 19, 2019 at 10:09 PM Wanpeng Li <kernellwp@gmail.com> wrote:
-> >
-> > On Tue, 20 Aug 2019 at 12:10, Nadav Amit <nadav.amit@gmail.com> wrote:
-> > > These tests pass on bare-metal.
-> >
-> > Good to know this. In addition, in linux apic driver, during mode
-> > switch __setup_APIC_LVTT() always sets lapic_timer_period(number of
-> > clock cycles per jiffy)/APIC_DIVISOR to APIC_TMICT which can avoid the
-> > issue Matt report. So is it because there is no such stuff in windows
-> > or the windows version which Matt testing is too old?
-> 
-> I'm using Windows 10 (May 2019). Multimedia apps on Windows tend to
-> request higher frequency clocks, and this in turn can affect how the
-> kernel configures HW timers.  I may need to examine how Windows
-> typically interacts with the APIC timer and see if/how this changes
-> when Skype is used.  The frequent timer mode changes are not something
-> I'd expect a reasonably behaved kernel to do.
+Linus,
 
-Have you tried analyzing the guest code?  If we're lucky, doing so might
-provide insight into what's going awry.
+The following changes since commit a738b5e75b4c13be3485c82eb62c30047aa9f164:
 
-E.g.:
+  Merge tag 'kvmarm-fixes-for-5.3-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2019-08-09 16:53:50 +0200)
 
-  Are the LVTT/TMICT writes are coming from a single blob/sequence of code
-  in the guest?
+are available in the git repository at:
 
-  Is the unpaired LVTT coming from the same code sequence or is it a new
-  rip entirely?
 
-  Can you dump the relevant asm code sequences?
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to e4427372398c31f57450565de277f861a4db5b3b:
+
+  selftests/kvm: make platform_info_test pass on AMD (2019-08-21 19:08:18 +0200)
+
+----------------------------------------------------------------
+* A couple bugfixes, and mostly selftests changes.
+
+----------------------------------------------------------------
+Miaohe Lin (1):
+      KVM: x86: svm: remove redundant assignment of var new_entry
+
+Paolo Bonzini (7):
+      MAINTAINERS: change list for KVM/s390
+      MAINTAINERS: add KVM x86 reviewers
+      selftests: kvm: do not try running the VM in vmx_set_nested_state_test
+      selftests: kvm: provide common function to enable eVMCS
+      selftests: kvm: fix vmx_set_nested_state_test
+      selftests: kvm: fix state save/load on processors without XSAVE
+      Revert "KVM: x86/mmu: Zap only the relevant pages when removing a memslot"
+
+Radim Krcmar (1):
+      kvm: x86: skip populating logical dest map if apic is not sw enabled
+
+Vitaly Kuznetsov (1):
+      selftests/kvm: make platform_info_test pass on AMD
+
+ MAINTAINERS                                        | 19 +++++++------
+ arch/x86/kvm/lapic.c                               |  5 ++++
+ arch/x86/kvm/mmu.c                                 | 33 +---------------------
+ arch/x86/kvm/svm.c                                 |  1 -
+ tools/testing/selftests/kvm/include/evmcs.h        |  2 ++
+ tools/testing/selftests/kvm/lib/x86_64/processor.c | 16 +++++++----
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c       | 20 +++++++++++++
+ tools/testing/selftests/kvm/x86_64/evmcs_test.c    | 15 ++--------
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c  | 12 +++-----
+ .../selftests/kvm/x86_64/platform_info_test.c      |  2 +-
+ .../kvm/x86_64/vmx_set_nested_state_test.c         | 32 +++++++++------------
+ 11 files changed, 69 insertions(+), 88 deletions(-)
