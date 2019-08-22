@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7595995BB
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 16:01:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44510995D3
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 16:06:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732354AbfHVOBB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 10:01:01 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52061 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732335AbfHVOBA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 10:01:00 -0400
-Received: by mail-wm1-f67.google.com with SMTP id k1so5776511wmi.1
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 07:00:57 -0700 (PDT)
+        id S1732643AbfHVOGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 10:06:18 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37647 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732553AbfHVOGO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 10:06:14 -0400
+Received: by mail-wm1-f65.google.com with SMTP id d16so5934413wme.2
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 07:06:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=BYa6tjL2V3XaMoQE3BhKW3UPDRomuHKgIfVfgHeXWkk=;
-        b=SLoyt31scpRwxQBpNMLbyMa2/JRzuZ/BvQpsmqigUavDoqB3UBrVcOQ2zNbgB93tJY
-         7gmE1ESkIu45NoMKahMGZ6mucJ2K0ER3t14M60WH5wltnZNqZy/sR52AK5Og1ZxvPafC
-         tpatC5C8yYAPSjBPnPPx5L52ONkg0uwedvI/Np7gQqHMvV6taKwsQGI+x4yyHTjrFdOY
-         xGqn79jRZheK7D9l85xO+Jaje7akWcupNQ8OX9Lkftj5kSsriFrZHMdgLwbwY2IQn3VP
-         3k2MDSqvA3TE7le83FB3i3F1gvmxdh1xyTyIAbRxwaUSnoz4kGwz+gbxZIf6TwqrMOyP
-         roWA==
+        bh=UhoJNwk+jD3IPeIWcY04TZ0CQ+4XcqjycjVm4Ee5JqM=;
+        b=aA9ctZLv1KSZzykJqRoxgVFGFR8QZAa8YQnkcKF4MiB5Q0ftjEMtJHhJeTe6IZhRpU
+         GgFZBDuAguqnMKN8CWXPkt+Z+WaDCV/k1cLdewkTeAHjD5BbQCBMayQ8IVXj1Ha34mCM
+         Z7Fa1cdNMMLBSZ7iKjM83NRrNiclr5Oj+hzM9kRdyVNXjLcW95IQmQn9HuPdMvseke0B
+         fupSB091l/7cRMYwfZ6zYJMBZ9WXx2GWgnN9utyXYlLm0v2if0jLIq2nId3u73L26VwB
+         KueBieSDp1TTJeNZIXgmjN1QyDzvcTa4XktsLQgNtneT3LrYWqi39m88TVOvoUPo0h3O
+         T98g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=BYa6tjL2V3XaMoQE3BhKW3UPDRomuHKgIfVfgHeXWkk=;
-        b=mweF3jhzPDB1hMpnuvFOQn6757WK5DkeuBDRyCOLBjMPiOo92VuQZYuZTwz6Df17IA
-         uwHmLIlyz+pXnmIlYZor2oaIrY/9TbNp8X5Sm5t8uJrmons1IKP0XztkGc9e/lhyvzpv
-         0TzlWYlCEAv/d/OH2jpt4blVGfwfq76USLrctuKHXsH++P0FhN7DswORr+Y/STaHgcIE
-         BSCQNzpcJd6dOsK7rBvGXZT+MRsp3F9DT1mMik+ZDQy/RomTt9OC7KFctK/ajgb+aUWY
-         7qAvk6EHKaFwHol9XuX3UPcwmFJpkf4n/VCvP2uqcOMhqoJu1K/H5D7O0s6kYf6v0asN
-         ODKA==
-X-Gm-Message-State: APjAAAWIIaeR/z5aaCZKaXe1SZBnHS0B7GWZt00YRu4/PAcajaJZdMJO
-        9eRwCFUN6O2w29e3SZcRheIdq07ig0LAcGD+YhyFmQ==
-X-Google-Smtp-Source: APXvYqww1WWneVrQ4WkvUlVG34D6g7hmpsx3qbNxfWrjylvCb0bpJgFZDZJaUwFYA8VxxwoXD8Ib3QvAG/0D3LLNp/g=
-X-Received: by 2002:a1c:c909:: with SMTP id f9mr6776316wmb.52.1566482456476;
- Thu, 22 Aug 2019 07:00:56 -0700 (PDT)
+        bh=UhoJNwk+jD3IPeIWcY04TZ0CQ+4XcqjycjVm4Ee5JqM=;
+        b=VkeGQxoJFCM6VzySXidLYVLJ9ybwH5PkCN53j+/Yks+LXz1ni6HXnAuaBJ5RUPu2Ql
+         rdBlt33OlVccwH11PInzzvnxDV6eWsQ+T7CnA+M83QB8iMypHA6qVb35KY4Af9SNv4bq
+         /kSzpBtIv09sOvka09DaLFrdKG0RlmyK5sxVnNkc78LV34HADWntkGRYt4nyMghFSd7q
+         3RG+6y9HQMr2FxTnrzutzviiOfHKLWnW+WpFzdlny/Y5ewMCfSZU56DnT2pE+gGxy8z7
+         GQQFA8wrb5ynx+YZvY9CCfB7YSCIXzJiBkJJDG2+btoZ9wa6Rb9/1XU6Kw2rRoUDjSN9
+         9dWg==
+X-Gm-Message-State: APjAAAXbC7z6iCXmyIyXwwye+wEqSqn/PCO4N+xzBbybvIcB6rs/rx73
+        MNQNNjP/af47+pdOYYqLkFqE7xZ7/6GSksJHt83cgg==
+X-Google-Smtp-Source: APXvYqyrQnFiJb8lAHnaPDWf5G+Ck0+0M5Z1aUnQf8yzsNtKJP+DsVOzfNGS84Yq2DYEOOGkZTCgtv8cYLwXU7yyMyY=
+X-Received: by 2002:a7b:c933:: with SMTP id h19mr6380815wml.177.1566482769663;
+ Thu, 22 Aug 2019 07:06:09 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-9-anup.patel@wdc.com>
  <d306ffaf-c9ac-4a9f-4382-95001487364d@amazon.com>
 In-Reply-To: <d306ffaf-c9ac-4a9f-4382-95001487364d@amazon.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 22 Aug 2019 19:30:45 +0530
-Message-ID: <CAAhSdy0t7P1a_eYmLo9sSYTCbumCqqWcvuv4yJXGCBQOXvw5TQ@mail.gmail.com>
+Date:   Thu, 22 Aug 2019 19:35:58 +0530
+Message-ID: <CAAhSdy1zKY44BGjp0FQrnPpmMFr2AuS9osumCr8BmjF5TPX=gw@mail.gmail.com>
 Subject: Re: [PATCH v5 08/20] RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG
  ioctls
 To:     Alexander Graf <graf@amazon.com>
@@ -121,11 +121,6 @@ On Thu, Aug 22, 2019 at 5:31 PM Alexander Graf <graf@amazon.com> wrote:
 > Is there any particular reason you're reusing kvm_regs and don't invent
 > your own struct? kvm_regs is explicitly meant for the get_regs and
 > set_regs ioctls.
-
-We are implementing only ONE_REG interface so most of these
-structs are unused hence we tried to reuse these struct instead
-of introducing new structs. (Similar to KVM ARM64)
-
 >
 > >   };
 > >
@@ -154,9 +149,6 @@ of introducing new structs. (Similar to KVM ARM64)
 > > +     unsigned long satp;
 >
 > Same comment here.
-
-Same as above, we are trying to use unused struct.
-
 >
 > >   };
 > >
@@ -222,18 +214,9 @@ Same as above, we are trying to use unused struct.
 >
 > What does this reflect? The current guest time hopefully not? An offset?
 > Related to what?
-
-riscv_timebase is the frequency in HZ of the system timer.
-
-The name "timebase" is not appropriate but we have been
-carrying it since quite some time now.
-
 >
 > All ONE_REG registers should be documented in
 > Documentation/virtual/kvm/api.txt. Please add them there.
-
-Sure, I will update in next revision.
-
 >
 > > +             break;
 > > +     default:
@@ -272,13 +255,6 @@ Sure, I will update in next revision.
 > This register definitely needs proper documentation too ;). You may want
 > to reconsider to put a few of the helper bits from patch 02/20 into
 > uapi, so that user space can directly use them.
-
-Sure, I will add details about ISA register in Documentation/virt/kvm/api.txt
-
-Regards,
-Anup
-
-
 >
 > > +             } else {
 > > +                     return -ENOTSUPP;
@@ -409,6 +385,19 @@ Anup
 > > +             WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
 >
 > Why does writing SIP clear all pending interrupts?
+
+irqs_pending_mask represents bits changes in irqs_pending.
+
+Once the SIP CSR is updated by user-space, the changes to
+irqs_pending are no longer valid so we clear irqs_pending_mask.
+
+If we don't clear irqs_pending_mask then value programmed by
+user-space can get overwritten if there were interrupts after
+we saved SIP CSR and before we restored it.
+
+Regards,
+Anup
+
 >
 >
 > Alex
