@@ -2,226 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 571059905D
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 12:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE1F699061
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 12:08:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732959AbfHVKIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 06:08:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53134 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732938AbfHVKIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 06:08:25 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 9F080AC64;
-        Thu, 22 Aug 2019 10:08:23 +0000 (UTC)
-Date:   Thu, 22 Aug 2019 12:08:18 +0200
-From:   Borislav Petkov <bp@suse.de>
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 01/11] KVM: SVM: Add KVM_SEV SEND_START command
-Message-ID: <20190822100818.GB11845@zn.tnic>
-References: <20190710201244.25195-1-brijesh.singh@amd.com>
- <20190710201244.25195-2-brijesh.singh@amd.com>
+        id S1732984AbfHVKIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 06:08:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55688 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731425AbfHVKIj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 06:08:39 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id AF8EF6412E
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 10:08:39 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id l16so2749657wmg.2
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 03:08:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=+QZ6pW149hcLIfsZZS+dKkZglSU+Xi8vHC91tSDHm3c=;
+        b=I4YIAjGUZ5wtgtwWQx0fUfed5fETFcrQ5VCZKoEbh2qPNwzlhT4J8jr4KKl50xqe7c
+         EpN88o4gbIEQr9h4HFaiyCGS9hkzIaV4Ww1UZ4Py88Jref7yYIi+EFXGi7q6XChFzsQP
+         Tlcy8VAvlWlKdBz91ajvAfcxpzd66wLJ0sIJRvYnDbwa4aXkGKhQ49jRy11JBuCp7NCc
+         Cy4IwYsyf7BUILz6vC5ezttnTSZ29n/2TXMznAsauMVMriQ++gXFeNjnMw+FNsrz3eTC
+         DsrHUmN2wes1+24YDNSueprNP499LkAwITwUt0NYrXMZ1y5IzCTBZ0ZUnvQ3eamSSno8
+         sSgg==
+X-Gm-Message-State: APjAAAV2gAvh2uFPx6glf4QJgPUVh3V4oVoLq0vYJg6urbCRGu2Qkzdw
+        2DPS54WzOpPreDqJMz1SF012wwZfosQF66NNOYupuFSXuyMkuDLJyChkljGUiYGcSS32g3qdzoj
+        RhIBmXHQrgBsV
+X-Received: by 2002:a1c:7513:: with SMTP id o19mr5210667wmc.126.1566468518263;
+        Thu, 22 Aug 2019 03:08:38 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx0XnwkglmAIZNRemEqCnbp6/DI7ya5vpk8WBx5UrfbHbyKJgBnEIawFQuaHzBUlbkohxgoxQ==
+X-Received: by 2002:a1c:7513:: with SMTP id o19mr5210642wmc.126.1566468518041;
+        Thu, 22 Aug 2019 03:08:38 -0700 (PDT)
+Received: from steredhat (host80-221-dynamic.18-79-r.retail.telecomitalia.it. [79.18.221.80])
+        by smtp.gmail.com with ESMTPSA id o129sm7596453wmb.41.2019.08.22.03.08.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Aug 2019 03:08:37 -0700 (PDT)
+Date:   Thu, 22 Aug 2019 12:08:35 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Jorgen Hansen <jhansen@vmware.com>
+Cc:     netdev@vger.kernel.org, kvm@vger.kernel.org,
+        Dexuan Cui <decui@microsoft.com>,
+        virtualization@lists.linux-foundation.org,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 10/11] vsock_test: skip read() in test_stream*close
+ tests on a VMCI host
+Message-ID: <20190822100835.7u27ijlaydk72orv@steredhat>
+References: <20190801152541.245833-1-sgarzare@redhat.com>
+ <20190801152541.245833-11-sgarzare@redhat.com>
+ <20190820083203.GB9855@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190710201244.25195-2-brijesh.singh@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190820083203.GB9855@stefanha-x1.localdomain>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 08:13:00PM +0000, Singh, Brijesh wrote:
-> The command is used to create an outgoing SEV guest encryption context.
+On Tue, Aug 20, 2019 at 09:32:03AM +0100, Stefan Hajnoczi wrote:
+> On Thu, Aug 01, 2019 at 05:25:40PM +0200, Stefano Garzarella wrote:
+> > When VMCI transport is used, if the guest closes a connection,
+> > all data is gone and EOF is returned, so we should skip the read
+> > of data written by the peer before closing the connection.
 > 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Borislav Petkov <bp@suse.de>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  .../virtual/kvm/amd-memory-encryption.rst     |  27 +++++
->  arch/x86/kvm/svm.c                            | 105 ++++++++++++++++++
->  include/uapi/linux/kvm.h                      |  12 ++
->  3 files changed, 144 insertions(+)
+> All transports should aim for identical semantics.  I think virtio-vsock
+> should behave the same as VMCI since userspace applications should be
+> transport-independent.
+
+Yes, it is a good point!
+
 > 
-> diff --git a/Documentation/virtual/kvm/amd-memory-encryption.rst b/Documentation/virtual/kvm/amd-memory-encryption.rst
-> index d18c97b4e140..0e9e1e9f9687 100644
-> --- a/Documentation/virtual/kvm/amd-memory-encryption.rst
-> +++ b/Documentation/virtual/kvm/amd-memory-encryption.rst
+> Let's view this as a vsock bug.  Is it feasible to change the VMCI
+> behavior so it's more like TCP sockets?  If not, let's change the
+> virtio-vsock behavior to be compatible with VMCI.
 
-Do a
+I'm not sure it is feasible to change the VMCI behavior. IIUC reading the
+Jorgen's answer [1], this was a decision made during the implementation.
 
-s/virtual/virt/g
+@Jorgen: please, can you confirm? or not :-)
 
-for the next revision because this path got changed recently:
+If it is the case, I'll change virtio-vsock to the same behavior.
 
-2f5947dfcaec ("Documentation: move Documentation/virtual to Documentation/virt")
 
-> @@ -238,6 +238,33 @@ Returns: 0 on success, -negative on error
->                  __u32 trans_len;
->          };
->  
-> +10. KVM_SEV_SEND_START
-> +----------------------
-> +
-> +The KVM_SEV_SEND_START command can be used by the hypervisor to create an
-> +outgoing guest encryption context.
-> +
-> +Parameters (in): struct kvm_sev_send_start
-> +
-> +Returns: 0 on success, -negative on error
-> +
-> +::
-> +        struct kvm_sev_send_start {
-> +                __u32 policy;                 /* guest policy */
-> +
-> +                __u64 pdh_cert_uaddr;         /* platform Diffie-Hellman certificate */
-> +                __u32 pdh_cert_len;
-> +
-> +                __u64 plat_cert_uaddr;        /* platform certificate chain */
-> +                __u32 plat_cert_len;
-> +
-> +                __u64 amd_cert_uaddr;         /* AMD certificate */
-> +                __u32 amd_cert_len;
-> +
-> +                __u64 session_uaddr;         /* Guest session information */
-> +                __u32 session_len;
-> +        };
+Thanks,
+Stefano
 
-SEV API doc has "CERT" for PDH members but "CERTS" for the others.
-Judging by the description, you should do the same here too. Just so that
-there's no discrepancy from the docs.
-
-> +
->  References
->  ==========
->  
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 48c865a4e5dd..0b0937f53520 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -6957,6 +6957,108 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  	return ret;
->  }
->  
-> +static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	void *amd_cert = NULL, *session_data = NULL;
-> +	void *pdh_cert = NULL, *plat_cert = NULL;
-> +	struct sev_data_send_start *data = NULL;
-
-Why are you initializing those to NULL?
-
-Also, SEV API text on SEND_START talks about a bunch of requirements in
-section
-
-"6.8.1 Actions"
-
-like
-
-"The platform must be in the PSTATE.WORKING state.
-The guest must be in the GSTATE.RUNNING state.
-GCTX.POLICY.NOSEND must be zero. Otherwise, an error is returned.
-..."
-
-Where are we checking/verifying those?
-
-> +	struct kvm_sev_send_start params;
-> +	int ret;
-> +
-> +	if (!sev_guest(kvm))
-> +		return -ENOTTY;
-> +
-> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> +				sizeof(struct kvm_sev_send_start)))
-> +		return -EFAULT;
-> +
-> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
-
-Move that allocation...
-
-> +
-> +	/* userspace wants to query the session length */
-> +	if (!params.session_len)
-> +		goto cmd;
-> +
-> +	if (!params.pdh_cert_uaddr || !params.pdh_cert_len ||
-> +	    !params.session_uaddr)
-> +		return -EINVAL;
-> +
-> +	/* copy the certificate blobs from userspace */
-> +	pdh_cert = psp_copy_user_blob(params.pdh_cert_uaddr, params.pdh_cert_len);
-> +	if (IS_ERR(pdh_cert)) {
-> +		ret = PTR_ERR(pdh_cert);
-> +		goto e_free;
-> +	}
-
-... here so that it doesn't happen unnecessarily if the above fail.
-
-> +
-> +	data->pdh_cert_address = __psp_pa(pdh_cert);
-> +	data->pdh_cert_len = params.pdh_cert_len;
-> +
-> +	plat_cert = psp_copy_user_blob(params.plat_cert_uaddr, params.plat_cert_len);
-> +	if (IS_ERR(plat_cert)) {
-> +		ret = PTR_ERR(plat_cert);
-> +		goto e_free_pdh;
-> +	}
-> +
-> +	data->plat_cert_address = __psp_pa(plat_cert);
-> +	data->plat_cert_len = params.plat_cert_len;
-> +
-> +	amd_cert = psp_copy_user_blob(params.amd_cert_uaddr, params.amd_cert_len);
-> +	if (IS_ERR(amd_cert)) {
-> +		ret = PTR_ERR(amd_cert);
-> +		goto e_free_plat_cert;
-> +	}
-> +
-> +	data->amd_cert_address = __psp_pa(amd_cert);
-> +	data->amd_cert_len = params.amd_cert_len;
-> +
-> +	ret = -EINVAL;
-> +	if (params.session_len > SEV_FW_BLOB_MAX_SIZE)
-> +		goto e_free_amd_cert;
-
-That check could go up where the other params.session_len check is
-happening and you can save yourself the cert alloc+freeing.
-
-> +
-> +	ret = -ENOMEM;
-> +	session_data = kmalloc(params.session_len, GFP_KERNEL);
-> +	if (!session_data)
-> +		goto e_free_amd_cert;
-
-Ditto.
-
-...
-
--- 
-Regards/Gruss,
-    Boris.
-
-SUSE Linux GmbH, GF: Felix Imendörffer, Mary Higgins, Sri Rasiah, HRB 21284 (AG Nürnberg)
+[1] https://patchwork.ozlabs.org/cover/847998/#1831400
