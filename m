@@ -2,247 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 259DC99609
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 16:13:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D775996A4
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 16:31:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387464AbfHVOMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 10:12:40 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:15285 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732331AbfHVOMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 10:12:40 -0400
+        id S2388537AbfHVOaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 10:30:35 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33262 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732789AbfHVOaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 10:30:35 -0400
+Received: by mail-pl1-f193.google.com with SMTP id go14so3581696plb.0;
+        Thu, 22 Aug 2019 07:30:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1566483158; x=1598019158;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=8ioN/JPy48toyNhc9jaRO5V8hI5LIKQUVL1VCL1aBl8=;
-  b=AqnGzCDU3WVeuBlI8CdISQJO34yeO5jl/LGO6hkfQRvrtTBQ2AMzmjQ9
-   MdqtTin1BVN0R4WCI/QSARnhUctzkgtHmVxFp7LRj+cyD7l2zTo1XolmX
-   HSOnjqkMUufuVV5nEAEcZfE87SNfokjFAENGrz/R61g7SrgHtnh+gHbQ5
-   g=;
-X-IronPort-AV: E=Sophos;i="5.64,416,1559520000"; 
-   d="scan'208";a="696479885"
-Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com) ([10.47.22.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 22 Aug 2019 14:12:33 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com (Postfix) with ESMTPS id A7360A26E4;
-        Thu, 22 Aug 2019 14:12:28 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 22 Aug 2019 14:12:27 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.67) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 22 Aug 2019 14:12:24 +0000
-Subject: Re: [PATCH v5 08/20] RISC-V: KVM: Implement
- KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
-To:     Anup Patel <anup@brainfault.org>
-CC:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        "Paul Walmsley" <paul.walmsley@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190822084131.114764-1-anup.patel@wdc.com>
- <20190822084131.114764-9-anup.patel@wdc.com>
- <d306ffaf-c9ac-4a9f-4382-95001487364d@amazon.com>
- <CAAhSdy0t7P1a_eYmLo9sSYTCbumCqqWcvuv4yJXGCBQOXvw5TQ@mail.gmail.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <2871ee6a-ae7c-6937-e8ef-38a8c318638a@amazon.com>
-Date:   Thu, 22 Aug 2019 16:12:21 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAAhSdy0t7P1a_eYmLo9sSYTCbumCqqWcvuv4yJXGCBQOXvw5TQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.161.67]
-X-ClientProxiedBy: EX13D24UWB002.ant.amazon.com (10.43.161.159) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=tDRFmgdNOn89BNEOePAuDKx2szX/hZIctu/3Yr6F4SY=;
+        b=GcpWx0alS4jSrHm66E2XU1peda1oBep0K+w9L2px9b14LBgA6xy/ISrhhtK8mg/w/4
+         TnFvf9R3krlEFyZKKwmrRU4OArQX0zpLujT73xRdF9X01F3Cd5zpDgPJxQrmV7DiR/4J
+         CoxdcK/1ItS1/h3ShD4cilXzjv+bV4Nqxqg9i4zmIfntX9EqBFFM3hqTCFxmjil19oKO
+         L51GUnnnMAIqdELQclX+fpHjdEmFZlf/9wsWhQqMab8go17GiyzYwqtG6aFDErp4b2VI
+         D1tQaHItI8JQiK35fs7BLtTxXxpz+UBcujtZihIsLRZH6i+Ri+NRjgwEb22bMgEEkmtH
+         EApA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=tDRFmgdNOn89BNEOePAuDKx2szX/hZIctu/3Yr6F4SY=;
+        b=jpWiTad/eRvYU3L6aIAb8NwbYI8x/qbejtXIGJJSsrUyk7nx9SDe4ouxFoHQDOcVw1
+         44m9DuId2ZYTBCsc/2ln9HOqdPksiZzMpxJq9I5PESMOISggl+E1UGPIzaKoX+361Rzm
+         AYK4/JSWgof7CFrd44Y8lP6FF8WvXoowJza0XloY9w/ZbKWsfellbb+MICwRrd1TTG4d
+         Q5YGr8ufb2pfej4+oeK/ISF2JSLFXOfgaaGvEGnRjipCuEgWJNeB7Mi2ZhBeqRA2HtUh
+         cenJqqBW8Sd4cz3xNZxPC39mPtwHlmIpbBynx5hbaZMqi3QCVw2KnA5REUA7mGyP7+we
+         TQHg==
+X-Gm-Message-State: APjAAAWlLx8wluPJsw8QYf8dVhXC0oNcqeJ/vASyBuvhLt7ZuVQ2C/Ku
+        EQPPr0HW1J4lfDJ0pWx/szc=
+X-Google-Smtp-Source: APXvYqw3uqWAVTZJzp78Lvd64ZCkRs9PAqZfr8g9qiVxMHxM+hHWnzzYrq4pCpeuhee1evkxC8YUiQ==
+X-Received: by 2002:a17:902:8649:: with SMTP id y9mr36937329plt.252.1566484234243;
+        Thu, 22 Aug 2019 07:30:34 -0700 (PDT)
+Received: from localhost.corp.microsoft.com ([167.220.255.114])
+        by smtp.googlemail.com with ESMTPSA id r23sm32263161pfg.10.2019.08.22.07.30.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 22 Aug 2019 07:30:33 -0700 (PDT)
+From:   lantianyu1986@gmail.com
+X-Google-Original-From: Tianyu.Lan@microsoft.com
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
+        kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
+        sashal@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        michael.h.kelley@microsoft.com
+Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org, vkuznets@redhat.com
+Subject: [PATCH V4 0/3] KVM/Hyper-V: Add Hyper-V direct tlb flush support
+Date:   Thu, 22 Aug 2019 22:30:18 +0800
+Message-Id: <20190822143021.7518-1-Tianyu.Lan@microsoft.com>
+X-Mailer: git-send-email 2.14.5
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Tianyu Lan <Tianyu.Lan@microsoft.com>
 
+This patchset is to add Hyper-V direct tlb support in KVM. Hyper-V
+in L0 can delegate L1 hypervisor to handle tlb flush request from
+L2 guest when direct tlb flush is enabled in L1.
 
-On 22.08.19 16:00, Anup Patel wrote:
-> On Thu, Aug 22, 2019 at 5:31 PM Alexander Graf <graf@amazon.com> wrote:
->>
->> On 22.08.19 10:44, Anup Patel wrote:
->>> For KVM RISC-V, we use KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls to access
->>> VCPU config and registers from user-space.
->>>
->>> We have three types of VCPU registers:
->>> 1. CONFIG - these are VCPU config and capabilities
->>> 2. CORE   - these are VCPU general purpose registers
->>> 3. CSR    - these are VCPU control and status registers
->>>
->>> The CONFIG registers available to user-space are ISA and TIMEBASE. Out
->>> of these, TIMEBASE is a read-only register which inform user-space about
->>> VCPU timer base frequency. The ISA register is a read and write register
->>> where user-space can only write the desired VCPU ISA capabilities before
->>> running the VCPU.
->>>
->>> The CORE registers available to user-space are PC, RA, SP, GP, TP, A0-A7,
->>> T0-T6, S0-S11 and MODE. Most of these are RISC-V general registers except
->>> PC and MODE. The PC register represents program counter whereas the MODE
->>> register represent VCPU privilege mode (i.e. S/U-mode).
->>>
->>> The CSRs available to user-space are SSTATUS, SIE, STVEC, SSCRATCH, SEPC,
->>> SCAUSE, STVAL, SIP, and SATP. All of these are read/write registers.
->>>
->>> In future, more VCPU register types will be added (such as FP) for the
->>> KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls.
->>>
->>> Signed-off-by: Anup Patel <anup.patel@wdc.com>
->>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
->>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>>    arch/riscv/include/uapi/asm/kvm.h |  40 ++++-
->>>    arch/riscv/kvm/vcpu.c             | 235 +++++++++++++++++++++++++++++-
->>>    2 files changed, 272 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
->>> index 6dbc056d58ba..024f220eb17e 100644
->>> --- a/arch/riscv/include/uapi/asm/kvm.h
->>> +++ b/arch/riscv/include/uapi/asm/kvm.h
->>> @@ -23,8 +23,15 @@
->>>
->>>    /* for KVM_GET_REGS and KVM_SET_REGS */
->>>    struct kvm_regs {
->>> +     /* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
->>> +     struct user_regs_struct regs;
->>> +     unsigned long mode;
->>
->> Is there any particular reason you're reusing kvm_regs and don't invent
->> your own struct? kvm_regs is explicitly meant for the get_regs and
->> set_regs ioctls.
-> 
-> We are implementing only ONE_REG interface so most of these
-> structs are unused hence we tried to reuse these struct instead
-> of introducing new structs. (Similar to KVM ARM64)
-> 
->>
->>>    };
->>>
->>> +/* Possible privilege modes for kvm_regs */
->>> +#define KVM_RISCV_MODE_S     1
->>> +#define KVM_RISCV_MODE_U     0
->>> +
->>>    /* for KVM_GET_FPU and KVM_SET_FPU */
->>>    struct kvm_fpu {
->>>    };
->>> @@ -41,10 +48,41 @@ struct kvm_guest_debug_arch {
->>>    struct kvm_sync_regs {
->>>    };
->>>
->>> -/* dummy definition */
->>> +/* for KVM_GET_SREGS and KVM_SET_SREGS */
->>>    struct kvm_sregs {
->>> +     unsigned long sstatus;
->>> +     unsigned long sie;
->>> +     unsigned long stvec;
->>> +     unsigned long sscratch;
->>> +     unsigned long sepc;
->>> +     unsigned long scause;
->>> +     unsigned long stval;
->>> +     unsigned long sip;
->>> +     unsigned long satp;
->>
->> Same comment here.
-> 
-> Same as above, we are trying to use unused struct.
-> 
->>
->>>    };
->>>
->>> +#define KVM_REG_SIZE(id)             \
->>> +     (1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
->>> +
->>> +/* If you need to interpret the index values, here is the key: */
->>> +#define KVM_REG_RISCV_TYPE_MASK              0x00000000FF000000
->>> +#define KVM_REG_RISCV_TYPE_SHIFT     24
->>> +
->>> +/* Config registers are mapped as type 1 */
->>> +#define KVM_REG_RISCV_CONFIG         (0x01 << KVM_REG_RISCV_TYPE_SHIFT)
->>> +#define KVM_REG_RISCV_CONFIG_ISA     0x0
->>> +#define KVM_REG_RISCV_CONFIG_TIMEBASE        0x1
->>> +
->>> +/* Core registers are mapped as type 2 */
->>> +#define KVM_REG_RISCV_CORE           (0x02 << KVM_REG_RISCV_TYPE_SHIFT)
->>> +#define KVM_REG_RISCV_CORE_REG(name) \
->>> +             (offsetof(struct kvm_regs, name) / sizeof(unsigned long))
->>
->> I see, you're trying to implicitly use the struct offsets as index.
->>
->> I'm not a really big fan of it, but I can't pinpoint exactly why just
->> yet. It just seems too magical (read: potentially breaking down the
->> road) for me.
->>
->>> +
->>> +/* Control and status registers are mapped as type 3 */
->>> +#define KVM_REG_RISCV_CSR            (0x03 << KVM_REG_RISCV_TYPE_SHIFT)
->>> +#define KVM_REG_RISCV_CSR_REG(name)  \
->>> +             (offsetof(struct kvm_sregs, name) / sizeof(unsigned long))
->>> +
->>>    #endif
->>>
->>>    #endif /* __LINUX_KVM_RISCV_H */
->>> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
->>> index 7f59e85c6af8..9396a83c0611 100644
->>> --- a/arch/riscv/kvm/vcpu.c
->>> +++ b/arch/riscv/kvm/vcpu.c
->>> @@ -164,6 +164,215 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->>>        return VM_FAULT_SIGBUS;
->>>    }
->>>
->>> +static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
->>> +                                      const struct kvm_one_reg *reg)
->>> +{
->>> +     unsigned long __user *uaddr =
->>> +                     (unsigned long __user *)(unsigned long)reg->addr;
->>> +     unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
->>> +                                         KVM_REG_SIZE_MASK |
->>> +                                         KVM_REG_RISCV_CONFIG);
->>> +     unsigned long reg_val;
->>> +
->>> +     if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
->>> +             return -EINVAL;
->>> +
->>> +     switch (reg_num) {
->>> +     case KVM_REG_RISCV_CONFIG_ISA:
->>> +             reg_val = vcpu->arch.isa;
->>> +             break;
->>> +     case KVM_REG_RISCV_CONFIG_TIMEBASE:
->>> +             reg_val = riscv_timebase;
->>
->> What does this reflect? The current guest time hopefully not? An offset?
->> Related to what?
-> 
-> riscv_timebase is the frequency in HZ of the system timer.
-> 
-> The name "timebase" is not appropriate but we have been
-> carrying it since quite some time now.
+Patch 2 introduces new cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH to enable
+feature from user space. User space should enable this feature only
+when Hyper-V hypervisor capability is exposed to guest and KVM profile
+is hided. There is a parameter conflict between KVM and Hyper-V hypercall.
+We hope L2 guest doesn't use KVM hypercall when the feature is
+enabled. Detail please see comment of new API "KVM_CAP_HYPERV_DIRECT_TLBFLUSH"
 
-What do you mean by "some time"? So far I only see a kernel internal 
-variable named after it. That's dramatically different from something 
-exposed via uapi.
+Change since v3:
+       - Update changelog in each patches. 
 
-Just name it tbfreq.
+Change since v2:
+       - Move hv assist page(hv_pa_pg) from struct kvm  to struct kvm_hv.
 
-So if this is the frequency, where is the offset? You will need it on 
-save/restore. If you're saying that's out of scope for now, that's fine 
-with me too :).
+Change since v1:
+       - Fix offset issue in the patch 1.
+       - Update description of KVM KVM_CAP_HYPERV_DIRECT_TLBFLUSH.
 
+Tianyu Lan (2):
+  x86/Hyper-V: Fix definition of struct hv_vp_assist_page
+  KVM/Hyper-V: Add new KVM capability KVM_CAP_HYPERV_DIRECT_TLBFLUSH
 
-Alex
+Vitaly Kuznetsov (1):
+  KVM/Hyper-V/VMX: Add direct tlb flush support
+
+ Documentation/virtual/kvm/api.txt  | 13 +++++++++++++
+ arch/x86/include/asm/hyperv-tlfs.h | 24 ++++++++++++++++++-----
+ arch/x86/include/asm/kvm_host.h    |  4 ++++
+ arch/x86/kvm/vmx/evmcs.h           |  2 ++
+ arch/x86/kvm/vmx/vmx.c             | 39 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c                 |  8 ++++++++
+ include/uapi/linux/kvm.h           |  1 +
+ 7 files changed, 86 insertions(+), 5 deletions(-)
+
+-- 
+2.14.5
+
