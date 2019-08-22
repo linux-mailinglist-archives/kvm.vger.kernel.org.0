@@ -2,228 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 70F3C99436
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:50:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76DAA994AD
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 15:16:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388061AbfHVMuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 08:50:16 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40692 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731556AbfHVMuP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 08:50:15 -0400
-Received: by mail-wr1-f66.google.com with SMTP id c3so5297142wrd.7
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 05:50:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ROB4gx4OGB1CpDcKjvU71ET9FrwtUSFzAVqfUnfvjig=;
-        b=Tjz6zp1luUYbfqgLHs8u1XU3r21rRiuHFjEEE445sTZjPTG1K1TbEO655UT3JDH3uL
-         sC9vFssy7r4wfHsKKF/jvniljfpEfBFwOrQchEZDTPX3FFboKQyRluqtt46Kzkw0x8XG
-         yKutR8H6zkflJqqRKMFoQNCPwDuLl5c3EUDnFRNxl1fIpcQ6/JjEJYLu2fsFzhRNkdkC
-         T6RMZHoZAvxRZ25l7eXoVO73Em9ogqkTFCN2UVljQt/8eRLrTATgzUwrfpw6Zd6lqKRY
-         g9WxpB32AOgs0olEMDJsyZyRztxQnxlRzFtFxz+8PJQyQWvuhTE7hN6yS2Wz9XivJaJq
-         D+sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ROB4gx4OGB1CpDcKjvU71ET9FrwtUSFzAVqfUnfvjig=;
-        b=trCV7130Ffqhr1KjXwImjSe6YRO6Gnwuxx2MwNpQ47PaXLemwNkgeYG+tJq65J37RG
-         7s5nKeBvzdoT6TUs2ICsoN81NOkFdj0RkYf72T4tukSJsfLYfdXiVwgsQoJWrqLWJt2l
-         RvKfe2RbcBUtrqF8qcfCche+HAmU4P6T5vh5JJWwKdwPQbAUv27Nh1jYFmAXqAC7VE4r
-         Shed1VOlmrqoBdZk9tP5zXOfNAOtO4C+TlrIv5ALfGZyVAoX2fFy8IEYPQzWYz6BqUs/
-         LmxAzxW5CLrOSH0BNVko3x+2XTMiE9WUvemsSpld44WEDmelkkZqVAFhiFEzipZd8nut
-         30/w==
-X-Gm-Message-State: APjAAAXgHyoUdAzYB2ZN6cnvlNvmZxWwvoIEpVsojE1ekI+6iLZHJGuQ
-        pARWXiwKewWmd+pjyvUK8ejY0Og32IAhJ41Nl3vqmg==
-X-Google-Smtp-Source: APXvYqzQ1TjSFQOix3vHo2hOrSZgy2endTM2XhjVhF8ByOGg0ehcvHXulptQXEetr33hXvAwYdNbyFGI7JnPGcIt6sU=
-X-Received: by 2002:a05:6000:104c:: with SMTP id c12mr42632777wrx.328.1566478213090;
- Thu, 22 Aug 2019 05:50:13 -0700 (PDT)
+        id S1732081AbfHVNQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 09:16:21 -0400
+Received: from mga12.intel.com ([192.55.52.136]:16964 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727685AbfHVNQV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 09:16:21 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Aug 2019 06:16:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,416,1559545200"; 
+   d="scan'208";a="196245250"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by fmsmga001.fm.intel.com with ESMTP; 22 Aug 2019 06:16:19 -0700
+Date:   Thu, 22 Aug 2019 21:17:45 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
+Subject: Re: [PATCH RESEND v4 7/9] KVM: VMX: Handle SPP induced vmexit and
+ page fault
+Message-ID: <20190822131745.GA20168@local-michael-cet-test>
+References: <20190814070403.6588-1-weijiang.yang@intel.com>
+ <20190814070403.6588-8-weijiang.yang@intel.com>
+ <5f6ba406-17c4-a552-2352-2ff50569aac0@redhat.com>
+ <fb6cd8b4-eee9-6e58-4047-550811bffd58@redhat.com>
+ <20190820134435.GE4828@local-michael-cet-test.sh.intel.com>
 MIME-Version: 1.0
-References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-12-anup.patel@wdc.com>
- <29b8f7c6-4b9d-91fc-61e7-82ecfd26ff88@amazon.com>
-In-Reply-To: <29b8f7c6-4b9d-91fc-61e7-82ecfd26ff88@amazon.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 22 Aug 2019 18:20:01 +0530
-Message-ID: <CAAhSdy2=6gC6fe_VtsnbQVXZnJMm_2Hc_qG3xS3nSnn5j8H1cQ@mail.gmail.com>
-Subject: Re: [PATCH v5 11/20] RISC-V: KVM: Handle WFI exits for VCPU
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190820134435.GE4828@local-michael-cet-test.sh.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 5:49 PM Alexander Graf <graf@amazon.com> wrote:
->
-> On 22.08.19 10:45, Anup Patel wrote:
-> > We get illegal instruction trap whenever Guest/VM executes WFI
-> > instruction.
-> >
-> > This patch handles WFI trap by blocking the trapped VCPU using
-> > kvm_vcpu_block() API. The blocked VCPU will be automatically
-> > resumed whenever a VCPU interrupt is injected from user-space
-> > or from in-kernel IRQCHIP emulation.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >   arch/riscv/kvm/vcpu_exit.c | 88 ++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 88 insertions(+)
-> >
-> > diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> > index efc06198c259..fbc04fe335ad 100644
-> > --- a/arch/riscv/kvm/vcpu_exit.c
-> > +++ b/arch/riscv/kvm/vcpu_exit.c
-> > @@ -12,6 +12,9 @@
-> >   #include <linux/kvm_host.h>
-> >   #include <asm/csr.h>
-> >
-> > +#define INSN_MASK_WFI                0xffffff00
-> > +#define INSN_MATCH_WFI               0x10500000
-> > +
-> >   #define INSN_MATCH_LB               0x3
-> >   #define INSN_MASK_LB                0x707f
-> >   #define INSN_MATCH_LH               0x1003
-> > @@ -179,6 +182,87 @@ static ulong get_insn(struct kvm_vcpu *vcpu)
-> >       return val;
-> >   }
-> >
-> > +typedef int (*illegal_insn_func)(struct kvm_vcpu *vcpu,
-> > +                              struct kvm_run *run,
-> > +                              ulong insn);
-> > +
-> > +static int truly_illegal_insn(struct kvm_vcpu *vcpu,
-> > +                           struct kvm_run *run,
-> > +                           ulong insn)
-> > +{
-> > +     /* TODO: Redirect trap to Guest VCPU */
-> > +     return -ENOTSUPP;
-> > +}
-> > +
-> > +static int system_opcode_insn(struct kvm_vcpu *vcpu,
-> > +                           struct kvm_run *run,
-> > +                           ulong insn)
-> > +{
-> > +     if ((insn & INSN_MASK_WFI) == INSN_MATCH_WFI) {
-> > +             vcpu->stat.wfi_exit_stat++;
-> > +             if (!kvm_arch_vcpu_runnable(vcpu)) {
-> > +                     srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
-> > +                     kvm_vcpu_block(vcpu);
-> > +                     vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> > +                     kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-> > +             }
-> > +             vcpu->arch.guest_context.sepc += INSN_LEN(insn);
-> > +             return 1;
-> > +     }
-> > +
-> > +     return truly_illegal_insn(vcpu, run, insn);
-> > +}
-> > +
-> > +static illegal_insn_func illegal_insn_table[32] = {
->
-> Every time I did experiments on PowerPC with indirect tables like this
-> over switch() in C, the switch() code won. CPUs are pretty good at
-> predicting branches. Predicting indirect jumps however, they are
-> terrible at.
->
-> So unless you consider the jump table more readable / maintainable, I
-> would suggest to use a simple switch() statement. It will be faster and
-> smaller.
-
-Yes, readability was the reason why we choose jump table but
-I see your point. Most of the entries in jump table point to
-truly_illegal_insn() so I guess switch case will be quite simple
-here.
-
-I will update this in next revision.
-
-Regards,
-Anup
-
->
->
-> Alex
->
->
-> > +     truly_illegal_insn, /* 0 */
-> > +     truly_illegal_insn, /* 1 */
-> > +     truly_illegal_insn, /* 2 */
-> > +     truly_illegal_insn, /* 3 */
-> > +     truly_illegal_insn, /* 4 */
-> > +     truly_illegal_insn, /* 5 */
-> > +     truly_illegal_insn, /* 6 */
-> > +     truly_illegal_insn, /* 7 */
-> > +     truly_illegal_insn, /* 8 */
-> > +     truly_illegal_insn, /* 9 */
-> > +     truly_illegal_insn, /* 10 */
-> > +     truly_illegal_insn, /* 11 */
-> > +     truly_illegal_insn, /* 12 */
-> > +     truly_illegal_insn, /* 13 */
-> > +     truly_illegal_insn, /* 14 */
-> > +     truly_illegal_insn, /* 15 */
-> > +     truly_illegal_insn, /* 16 */
-> > +     truly_illegal_insn, /* 17 */
-> > +     truly_illegal_insn, /* 18 */
-> > +     truly_illegal_insn, /* 19 */
-> > +     truly_illegal_insn, /* 20 */
-> > +     truly_illegal_insn, /* 21 */
-> > +     truly_illegal_insn, /* 22 */
-> > +     truly_illegal_insn, /* 23 */
-> > +     truly_illegal_insn, /* 24 */
-> > +     truly_illegal_insn, /* 25 */
-> > +     truly_illegal_insn, /* 26 */
-> > +     truly_illegal_insn, /* 27 */
-> > +     system_opcode_insn, /* 28 */
-> > +     truly_illegal_insn, /* 29 */
-> > +     truly_illegal_insn, /* 30 */
-> > +     truly_illegal_insn  /* 31 */
-> > +};
-> > +
-> > +static int illegal_inst_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> > +                           unsigned long stval)
-> > +{
-> > +     ulong insn = stval;
-> > +
-> > +     if (unlikely((insn & 3) != 3)) {
-> > +             if (insn == 0)
-> > +                     insn = get_insn(vcpu);
-> > +             if ((insn & 3) != 3)
-> > +                     return truly_illegal_insn(vcpu, run, insn);
-> > +     }
-> > +
-> > +     return illegal_insn_table[(insn & 0x7c) >> 2](vcpu, run, insn);
-> > +}
-> > +
-> >   static int emulate_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >                       unsigned long fault_addr)
-> >   {
-> > @@ -439,6 +523,10 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >       ret = -EFAULT;
-> >       run->exit_reason = KVM_EXIT_UNKNOWN;
-> >       switch (scause) {
-> > +     case EXC_INST_ILLEGAL:
-> > +             if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
-> > +                     ret = illegal_inst_fault(vcpu, run, stval);
-> > +             break;
-> >       case EXC_INST_PAGE_FAULT:
-> >       case EXC_LOAD_PAGE_FAULT:
-> >       case EXC_STORE_PAGE_FAULT:
-> >
->
+On Tue, Aug 20, 2019 at 09:44:35PM +0800, Yang Weijiang wrote:
+> On Mon, Aug 19, 2019 at 05:04:23PM +0200, Paolo Bonzini wrote:
+> > On 19/08/19 16:43, Paolo Bonzini wrote:
+> > >> +			/*
+> > >> +			 * Record write protect fault caused by
+> > >> +			 * Sub-page Protection, let VMI decide
+> > >> +			 * the next step.
+> > >> +			 */
+> > >> +			if (spte & PT_SPP_MASK) {
+> > > Should this be "if (spte & PT_WRITABLE_MASK)" instead?  That is, if the
+> > > page is already writable, the fault must be an SPP fault.
+> > 
+> > Hmm, no I forgot how SPP works; still, this is *not* correct.  For
+> > example, if SPP marks part of a page as read-write, but KVM wants to
+> > write-protect the whole page for access or dirty tracking, that should
+> > not cause an SPP exit.
+> > 
+> > So I think that when KVM wants to write-protect the whole page
+> > (wrprot_ad_disabled_spte) it must also clear PT_SPP_MASK; for example it
+> > could save it in bit 53 (PT64_SECOND_AVAIL_BITS_SHIFT + 1).  If the
+> > saved bit is set, fast_page_fault must then set PT_SPP_MASK instead of
+> > PT_WRITABLE_MASK.
+> Sure, will change the processing flow.
+> 
+> > On re-entry this will cause an SPP vmexit;
+> > fast_page_fault should never trigger an SPP userspace exit on its own,
+> > all the SPP handling should go through handle_spp.
+ Hi, Paolo,
+ According to the latest SDM(28.2.4), handle_spp only handles SPPT miss and SPPT
+ misconfig(exit_reason==66), subpage write access violation causes EPT violation,
+ so have to deal with the two cases into handlers.
+> > Paolo
