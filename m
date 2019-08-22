@@ -2,116 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 088DE989DF
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 05:35:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF89398D00
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 10:10:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730172AbfHVDf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 23:35:27 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38823 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728332AbfHVDf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 23:35:27 -0400
-Received: by mail-wm1-f66.google.com with SMTP id m125so4187240wmm.3;
-        Wed, 21 Aug 2019 20:35:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=WsaYFeAkte2NretrOo8yB7eLtn2MeRH7ZtBbeHqK9ss=;
-        b=mRigY60/acd7r9AbKb68l4BZVAfI6iTkq9tIoOCP/NzynKBOPNFtBnMgl88G3vKpv9
-         4nbLjfEHxDEUn+KlYQfPXsu/23xyYA8DfzDkwoT0ssJWXao7V6c1pvw7hol3oKDUdNEQ
-         lJLMOh2e7VXr5Tvep4FUu9ywmFnwGShlGQ7RybJqG+Ey6Ff1b7AqseT0+MqEtDudQHTo
-         HediKQtaQUxtLainWjPbEz7dUfZPht5bp8BB3FRsUN6cgUer1mD35+igZNtL+iZLlbAC
-         DEGVfj5bYxoghKLBjDbg0HMmJKas/B+ZMu+cPtjgLzWgZaQVrqVHIycJstWAUJT4Vd9z
-         6V8A==
+        id S1731390AbfHVIH1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 04:07:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57322 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728645AbfHVIH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 04:07:26 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BF8CDC05AA65
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 08:07:26 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id a17so2835649wrw.3
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 01:07:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=WsaYFeAkte2NretrOo8yB7eLtn2MeRH7ZtBbeHqK9ss=;
-        b=KXW9d8SJejRgTsTIrJZGHVIdm5bed49HCRmXeJwYn8D2rkgAZMlR+wkdGNWx2E8Y57
-         sHDirt0El6N+kJPSsZj+vq+laPt9mMJYfYGQL0e5UH974p5jTn1jdysxb5V49ky1UpU/
-         bHNR2vMMV4ORr0Zxdb436a9GX3e32miYs+nTpALv/B0u6u1/wdExRXvEwjNaL+X5HQZV
-         IhhAACheuMLsbiMf9rSGvsKqKNSmVar5kgXESzoPsUGCiWCsrUMR5VsUNrP1ovjSXgSh
-         Yn8rS5ysRUJ9JxYrgwF12lT6j9tjjASgl0WzWHLPP3B02gU64486erDM8ocsXcO9kFD9
-         f3Sw==
-X-Gm-Message-State: APjAAAUtgtQL3gcgK7Bo6iDiq+BJeZPq6FmRGMroQHAOlj90bmH2TgFb
-        zCvC7YDYjkehtIh/aecwUlw=
-X-Google-Smtp-Source: APXvYqxpplXAscH90uc7IVjMnTI5K8IsuLoHO6ctq9wYYw2C2y4eh3XV0YiP0nw2niEWn1ZjB0odjw==
-X-Received: by 2002:a1c:d108:: with SMTP id i8mr3609222wmg.28.1566444924948;
-        Wed, 21 Aug 2019 20:35:24 -0700 (PDT)
-Received: from localhost ([165.22.121.176])
-        by smtp.gmail.com with ESMTPSA id o11sm17971037wrw.19.2019.08.21.20.35.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Aug 2019 20:35:24 -0700 (PDT)
-From:   hexin <hexin.op@gmail.com>
-X-Google-Original-From: hexin <hexin15@baidu.com>
-To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     hexin <hexin15@baidu.com>, Liu Qi <liuqi16@baidu.com>,
-        Zhang Yu <zhangyu31@baidu.com>
-Subject: [PATCH v3] vfio_pci: Restore original state on release
-Date:   Thu, 22 Aug 2019 11:35:19 +0800
-Message-Id: <1566444919-3331-1-git-send-email-hexin15@baidu.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pF3YGFREgBUzzvAMmFfzZCFDTbGTkVkyO/Xg4NkQLbg=;
+        b=eijCarApFi2xPLx3W0hJzUO1VZhXH0OYmX6mMQYMwgVOouW6BehyRWty66DcrUcif+
+         dIb0T0zACdhgrb/w1a63u09Rfq76Q5tX9EYZPUgCI3DigtC0+S2F+sE0umiNX6fzTM3+
+         b0IIdsuXWwBjLi0N+udzp/mfH3MNVJrEfSVX/jG/L4RtJRjBgtI9IHAcs7rOcj+isjpb
+         9E6Xg7tqyzfAnbaeae364hRJWRobDeux0oCigeq+QLJ4JruHg0eIDk4etbRkKtmPOP4t
+         Pu0EyDjNp4PslzkVL7dmSB3ExZBNLRimiCtgRacA44GFZlRLjrwd5thn/nFWK0O0gFt4
+         X8hA==
+X-Gm-Message-State: APjAAAVH8B2tTXl6Dr7lXs1e012MuROeBaE0rrlpuqwx/ndDxBiDWpfn
+        D/EKfEYARPYiNIlEqPLp/L6tzbhywz0Iw7299Xl5sa5YE8sPpFNdE87rZ02ZttLQ8TBVRFza0qM
+        nvKshu43BLlRs
+X-Received: by 2002:adf:a48f:: with SMTP id g15mr46940530wrb.172.1566461245247;
+        Thu, 22 Aug 2019 01:07:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyKS7i8/l2gsUy685qpa5gOwkc8jiCcEIrrT+YYNuieEQ8e2G096e6ngarBG7s2GxLQuCFHpA==
+X-Received: by 2002:adf:a48f:: with SMTP id g15mr46940485wrb.172.1566461244874;
+        Thu, 22 Aug 2019 01:07:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3? ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
+        by smtp.gmail.com with ESMTPSA id k9sm20260132wrq.15.2019.08.22.01.07.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2019 01:07:24 -0700 (PDT)
+Subject: Re: [PATCH RESEND] i386/kvm: support guest access CORE cstate
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+References: <1563154124-18579-1-git-send-email-wanpengli@tencent.com>
+ <ba3ae595-7f82-d17b-e8ed-6e86e9195ce5@redhat.com>
+ <CANRm+Cx1bEOXBx50K9gv08UWEGadKOCtCbAwVo0CFC-g1gS+Xg@mail.gmail.com>
+ <82a0eb75-5710-3b03-cf8e-a00b156ee275@redhat.com>
+ <CANRm+Cw4V9AT1FOAOiQ5OSYHYcka_CxxKLewsPfZ9+ykTy354w@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <d2c93756-708e-3f8c-d9f2-8b80c73928e7@redhat.com>
+Date:   Thu, 22 Aug 2019 10:07:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CANRm+Cw4V9AT1FOAOiQ5OSYHYcka_CxxKLewsPfZ9+ykTy354w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_pci_enable() saves the device's initial configuration information
-with the intent that it is restored in vfio_pci_disable().  However,
-the commit referenced in Fixes: below replaced the call to
-__pci_reset_function_locked(), which is not wrapped in a state save
-and restore, with pci_try_reset_function(), which overwrites the
-restored device state with the current state before applying it to the
-device.  Reinstate use of __pci_reset_function_locked() to return to
-the desired behavior.
+On 22/08/19 02:31, Wanpeng Li wrote:
+> On Wed, 21 Aug 2019 at 15:55, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 20/08/19 09:16, Wanpeng Li wrote:
+>>> Kindly reminder, :)
+>>
+>> It's already in my pull request from yesterday.
+> 
+> Do you mean this pull
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg638707.html ?
+> This patch is missing.
 
-Fixes: 890ed578df82 ("vfio-pci: Use pci "try" reset interface")
-Signed-off-by: hexin <hexin15@baidu.com>
-Signed-off-by: Liu Qi <liuqi16@baidu.com>
-Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
----
-v2->v3:
-- change commit log 
-v1->v2:
-- add fixes tag
-- add comment to warn 
+Oops, you're right.  I must have removed it by mistake while bisecting a
+failure.  I've added it back now.
 
-[1] https://lore.kernel.org/linux-pci/1565926427-21675-1-git-send-email-hexin15@baidu.com
-[2] https://lore.kernel.org/linux-pci/1566042663-16694-1-git-send-email-hexin15@baidu.com
-
- drivers/vfio/pci/vfio_pci.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 703948c..0220616 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -438,11 +438,20 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
- 
- 	/*
--	 * Try to reset the device.  The success of this is dependent on
--	 * being able to lock the device, which is not always possible.
-+	 * Try to get the locks ourselves to prevent a deadlock. The
-+	 * success of this is dependent on being able to lock the device,
-+	 * which is not always possible.
-+	 * We can not use the "try" reset interface here, which will
-+	 * overwrite the previously restored configuration information.
- 	 */
--	if (vdev->reset_works && !pci_try_reset_function(pdev))
--		vdev->needs_reset = false;
-+	if (vdev->reset_works && pci_cfg_access_trylock(pdev)) {
-+		if (device_trylock(&pdev->dev)) {
-+			if (!__pci_reset_function_locked(pdev))
-+				vdev->needs_reset = false;
-+			device_unlock(&pdev->dev);
-+		}
-+		pci_cfg_access_unlock(pdev);
-+	}
- 
- 	pci_restore_state(pdev);
- out:
--- 
-1.8.3.1
-
+Paolo
