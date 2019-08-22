@@ -2,91 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5146993CA
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D202993F4
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:38:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387719AbfHVMeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 08:34:04 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:36065 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387679AbfHVMeD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 08:34:03 -0400
-Received: by mail-lj1-f195.google.com with SMTP id u15so5394025ljl.3
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 05:34:02 -0700 (PDT)
+        id S1732930AbfHVMiq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 08:38:46 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42119 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729052AbfHVMiq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 08:38:46 -0400
+Received: by mail-wr1-f65.google.com with SMTP id b16so5257572wrq.9
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 05:38:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=aWwEGZ7IKPwlD1SyN53LweuoS+rG8j2WBRgPDxMagPA=;
-        b=Rbh3JsGIh2x+jDuVbneOEsdobwGn2xF3k9KTKgjnK8Dyd2ODu1sdAQZQ15vVyYnqdt
-         7E9K7FhpCx9S2Dr1Ddo93q8TQvnmC/kE524CSoK66UbjC0Keqf53qhQ3yEqx3HAqneCK
-         QJH+OsNLuiNr6NKxEeJtactPjxkq0IA/anzWTZbfxsdGDFNukm8hCNfpT4lameBjcg1P
-         vMEErESY7RDQugMc/b/MZ0+sk5n2uzgwjXg1V0nNdJsVb5O6VyZacEb0HGljYN7+OPri
-         sm6Rp5BE3EkVBy2/1k5KenPYcnLllMAdQCixAZH/6rT6ERxgPTfrELU8FhhN52TrBApt
-         4Cxw==
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BnFwQaeHO9BwaDaPDs30ViOA3PYpNnt8DXjyb7utwWk=;
+        b=Qg8jr2yWOLGcPOOts1J5YDswgaDhv2IKEGB6uG/dpPewlZixUmhziVkFuGIHuajdda
+         gTepf4bkcV/X96wxwDEW5TutP6blq3MrJKOtjDZaDC1hBqeuln5N0N5AaM1mlvedjnd+
+         rmFgPP4Nwn5+CwnFqhI/ogR5nGw7oQ8OxuuuyS1PaNVD+KAdItTbB1ew6xbd+zm2+ocr
+         7CNtzkP3EtQXqybSQFOANXOiBnXZ5tJMUKzRarkt4W3CyvtrM0W/G4eteBzXY9TBDoGs
+         3nTtfpHwAZFZduYVg7KBikEcycQXr2P/BrDUlumgBk84Sa0dK8tqxO0Mt1nnOiGsHUAO
+         Rxfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=aWwEGZ7IKPwlD1SyN53LweuoS+rG8j2WBRgPDxMagPA=;
-        b=sAbCyjr66UgMgqCXuwcY9vd8kUdWgAq1RntlUNd+gQ4tbp3Fzz0twmjVX6+rywnSso
-         +vKZRiReaf4WjATG306y9L7IQBxgUzyi+T/GClYs6XCRqeSZqu12pAu2/l50gVkFxKDV
-         4o6m+UbVZJwqait2jSK9BKuCoQHHK4PVH1lxFOLgWVDU+SzmVAy0Y/3yEu/5l4+/HZaR
-         hP1IwuWq2xjIrhBxsOLjxTmq7h1UZaDvSlJKzl7Xb28/VSpK3eFEMn17Gcq++EfP8871
-         z8M9pkdATtNKzzuBYSsSs69O3VikNz8yAd/pxHMOuOciB7OGFxcGA5sg8g1pOHE8ICSj
-         3HyA==
-X-Gm-Message-State: APjAAAU7E0Goel9eChQfJUjRxQHdalGeLud0a7wExR8pDzkWbN4q/hJw
-        zfw8aujNyvBIhb6rf6bfJsJXNQqhOYbbuyxv278=
-X-Google-Smtp-Source: APXvYqz3MRqWqCJljuYvGs7Z39vR8szuBA98XmfHPUkBGUeOj4vI/x4jHKyZ57W6CcLrF9xDbGoqKi5bbRMPFZ+Cc3Y=
-X-Received: by 2002:a2e:9a44:: with SMTP id k4mr17910876ljj.96.1566477241520;
- Thu, 22 Aug 2019 05:34:01 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BnFwQaeHO9BwaDaPDs30ViOA3PYpNnt8DXjyb7utwWk=;
+        b=tgPH5vm/3E4eARVPFShMJZ4MFVPephtFnJDcl+Mlo+fmNCGY8/vefJaDq0EgDaGtvi
+         HMa0uOagkYendwJsoG6vgEpRhjRuEhs7jfCNHp93FPDH1yg+o5td6JKFSV+AVjjUHfFG
+         Efcezmqm68U6T8yR4C83MO9awiWJe225oqsSAEGpm8TXG5VEgOpBHoiEGJe4aOPu/MF0
+         I5+TNmaxYDbEEKLEVVFgvib89Tcu6Mfzi2zdYmqteHpalYYMuCgNRbJn7BhJxyuE8RS3
+         2IKHzaMfjtf3LBkQLFF0G9lErdab+mtOtpYaAvDlv2J3F7VWsdB54tTZXhWBg/BQr3ga
+         6wkQ==
+X-Gm-Message-State: APjAAAVLUB5U5XJBs8U653sIIQ/FPVuWhF8ktqt0WVGkR0wRsWH5yLe8
+        lvuPIQfH5SypGum+8dwtxz+p2zbi8TFYDdc8PFawew==
+X-Google-Smtp-Source: APXvYqxliBRuaaMcL1lknjwgrVUrKd1aZkJOJwxxfHvTC3naTZb/hSNSUzJP45WaEW+UG6yIhAMbUhJTS+QRL7uN2pc=
+X-Received: by 2002:a5d:4ecb:: with SMTP id s11mr20341742wrv.323.1566477524109;
+ Thu, 22 Aug 2019 05:38:44 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:ab3:6a0f:0:0:0:0:0 with HTTP; Thu, 22 Aug 2019 05:34:01
- -0700 (PDT)
-Reply-To: eku.lawfirm@gmail.com
-From:   "Law firm(Eku and Associates)" <ezeobodo1@gmail.com>
-Date:   Thu, 22 Aug 2019 12:34:01 +0000
-Message-ID: <CAN-_bTZ726ayFtAv4dpjhKOuZFqgxZg3rZFa8VV4nXz4ZvjT-Q@mail.gmail.com>
-Subject: MY $25,000,000.00 INVESTMENT PROPOSAL WITH YOU AND IN YOUR COUNTRY.
-To:     undisclosed-recipients:;
+References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-14-anup.patel@wdc.com>
+ <77b9ff3c-292f-ee17-ddbb-134c0666fde7@amazon.com>
+In-Reply-To: <77b9ff3c-292f-ee17-ddbb-134c0666fde7@amazon.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Thu, 22 Aug 2019 18:08:32 +0530
+Message-ID: <CAAhSdy1h+m0gA2pro-XAb4qhe0Q+8knjW+8+6jaz3efOdKWskA@mail.gmail.com>
+Subject: Re: [PATCH v5 13/20] RISC-V: KVM: Implement stage2 page table programming
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=20
-Dear,
-With due respect this is not spam or Scam mail, because I have
-contacted you before and there was no response from you,I apologise if
-the contents of this mail are contrary to your moral ethics, which I
-feel may be of great disturbance to your person, but please treat this
-with absolute confidentiality, believing that this email reaches you
-in good faith. My contacting you is not a mistake or a coincidence
-because God can use any person known or unknown to accomplish great
-things.
-I am a lawyer and I have an investment business proposal to offer you.
-It is not official but should be considered as legal and confidential
-business. I have a customer's deposit of $US25 million dollars ready
-to be moved for investment if you can partner with us. We are ready to
-offer you 10% of this total amount as your compensation for supporting
-the transaction to completion. If you are interested to help me please
-reply me with your full details as stated below:
-(1) Your full names:
-(2) Your address:
-(3) Your occupation:
-(4) Your mobile telephone number:
-(5) Your nationality:
-(6) Your present location:
-(7) Your age:
-So that I will provide you more details on what to do and what is
-required for successful completion.
-Note: DO NOT REPLY ME IF YOU ARE NOT INTERESTED AND WITHOUT THE ABOVE
-MENTIONED DETAILS
+On Thu, Aug 22, 2019 at 5:58 PM Alexander Graf <graf@amazon.com> wrote:
+>
+> On 22.08.19 10:45, Anup Patel wrote:
+> > This patch implements all required functions for programming
+> > the stage2 page table for each Guest/VM.
+> >
+> > At high-level, the flow of stage2 related functions is similar
+> > from KVM ARM/ARM64 implementation but the stage2 page table
+> > format is quite different for KVM RISC-V.
+> >
+> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >   arch/riscv/include/asm/kvm_host.h     |  10 +
+> >   arch/riscv/include/asm/pgtable-bits.h |   1 +
+> >   arch/riscv/kvm/mmu.c                  | 637 +++++++++++++++++++++++++-
+> >   3 files changed, 638 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> > index 3b09158f80f2..a37775c92586 100644
+> > --- a/arch/riscv/include/asm/kvm_host.h
+> > +++ b/arch/riscv/include/asm/kvm_host.h
+> > @@ -72,6 +72,13 @@ struct kvm_mmio_decode {
+> >       int shift;
+> >   };
+> >
+> > +#define KVM_MMU_PAGE_CACHE_NR_OBJS   32
+> > +
+> > +struct kvm_mmu_page_cache {
+> > +     int nobjs;
+> > +     void *objects[KVM_MMU_PAGE_CACHE_NR_OBJS];
+> > +};
+> > +
+> >   struct kvm_cpu_context {
+> >       unsigned long zero;
+> >       unsigned long ra;
+> > @@ -163,6 +170,9 @@ struct kvm_vcpu_arch {
+> >       /* MMIO instruction details */
+> >       struct kvm_mmio_decode mmio_decode;
+> >
+> > +     /* Cache pages needed to program page tables with spinlock held */
+> > +     struct kvm_mmu_page_cache mmu_page_cache;
+> > +
+> >       /* VCPU power-off state */
+> >       bool power_off;
+> >
+> > diff --git a/arch/riscv/include/asm/pgtable-bits.h b/arch/riscv/include/asm/pgtable-bits.h
+> > index bbaeb5d35842..be49d62fcc2b 100644
+> > --- a/arch/riscv/include/asm/pgtable-bits.h
+> > +++ b/arch/riscv/include/asm/pgtable-bits.h
+> > @@ -26,6 +26,7 @@
+> >
+> >   #define _PAGE_SPECIAL   _PAGE_SOFT
+> >   #define _PAGE_TABLE     _PAGE_PRESENT
+> > +#define _PAGE_LEAF      (_PAGE_READ | _PAGE_WRITE | _PAGE_EXEC)
+> >
+> >   /*
+> >    * _PAGE_PROT_NONE is set on not-present pages (and ignored by the hardware) to
+> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> > index 2b965f9aac07..9e95ab6769f6 100644
+> > --- a/arch/riscv/kvm/mmu.c
+> > +++ b/arch/riscv/kvm/mmu.c
+> > @@ -18,6 +18,432 @@
+> >   #include <asm/page.h>
+> >   #include <asm/pgtable.h>
+> >
+> > +#ifdef CONFIG_64BIT
+> > +#define stage2_have_pmd              true
+> > +#define stage2_gpa_size              ((phys_addr_t)(1ULL << 39))
+> > +#define stage2_cache_min_pages       2
+> > +#else
+> > +#define pmd_index(x)         0
+> > +#define pfn_pmd(x, y)                ({ pmd_t __x = { 0 }; __x; })
+> > +#define stage2_have_pmd              false
+> > +#define stage2_gpa_size              ((phys_addr_t)(1ULL << 32))
+> > +#define stage2_cache_min_pages       1
+> > +#endif
+> > +
+> > +static int stage2_cache_topup(struct kvm_mmu_page_cache *pcache,
+> > +                           int min, int max)
+> > +{
+> > +     void *page;
+> > +
+> > +     BUG_ON(max > KVM_MMU_PAGE_CACHE_NR_OBJS);
+> > +     if (pcache->nobjs >= min)
+> > +             return 0;
+> > +     while (pcache->nobjs < max) {
+> > +             page = (void *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
+> > +             if (!page)
+> > +                     return -ENOMEM;
+> > +             pcache->objects[pcache->nobjs++] = page;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void stage2_cache_flush(struct kvm_mmu_page_cache *pcache)
+> > +{
+> > +     while (pcache && pcache->nobjs)
+> > +             free_page((unsigned long)pcache->objects[--pcache->nobjs]);
+> > +}
+> > +
+> > +static void *stage2_cache_alloc(struct kvm_mmu_page_cache *pcache)
+> > +{
+> > +     void *p;
+> > +
+> > +     if (!pcache)
+> > +             return NULL;
+> > +
+> > +     BUG_ON(!pcache->nobjs);
+> > +     p = pcache->objects[--pcache->nobjs];
+> > +
+> > +     return p;
+> > +}
+> > +
+> > +struct local_guest_tlb_info {
+> > +     struct kvm_vmid *vmid;
+> > +     gpa_t addr;
+> > +};
+> > +
+> > +static void local_guest_tlb_flush_vmid_gpa(void *info)
+> > +{
+> > +     struct local_guest_tlb_info *infop = info;
+> > +
+> > +     __kvm_riscv_hfence_gvma_vmid_gpa(READ_ONCE(infop->vmid->vmid_version),
+> > +                                      infop->addr);
+> > +}
+> > +
+> > +static void stage2_remote_tlb_flush(struct kvm *kvm, gpa_t addr)
+> > +{
+> > +     struct local_guest_tlb_info info;
+> > +     struct kvm_vmid *vmid = &kvm->arch.vmid;
+> > +
+> > +     /* TODO: This should be SBI call */
+> > +     info.vmid = vmid;
+> > +     info.addr = addr;
+> > +     preempt_disable();
+> > +     smp_call_function_many(cpu_all_mask, local_guest_tlb_flush_vmid_gpa,
+> > +                            &info, true);
+>
+> This is all nice and dandy on the toy 4 core systems we have today, but
+> it will become a bottleneck further down the road.
+>
+> How many VMIDs do you have? Could you just allocate a new one every time
+> you switch host CPUs? Then you know exactly which CPUs to flush by
+> looking at all your vcpu structs and a local field that tells you which
+> pCPU they're on at this moment.
+>
+> Either way, it's nothing that should block inclusion. For today, we're fine.
 
-Sinc=C3=A8rement v=C3=B4tre,
-Avocat Etienne Eku Esq.(Lawfirm)
-Procureur principal. De Cabinet d=E2=80=99avocats de l=E2=80=99Afrique de l=
-=E2=80=99ouest.
-Skype:westafricalawfirm
+We are not happy about this either.
+
+Other two options, we have are:
+1. Have SBI calls for remote HFENCEs
+2. Propose RISC-V ISA extension for remote FENCEs
+
+Option1 is mostly extending SBI spec and implementing it in runtime
+firmware.
+
+Option2 is ideal solution but requires consensus among wider audience
+in RISC-V foundation.
+
+At this point, we are fine with a simple solution.
+
+Regards,
+Anup
+
+>
+>
+> Alex
