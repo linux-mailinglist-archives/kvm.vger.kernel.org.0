@@ -2,175 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4D8A98F56
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 11:29:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2330598F57
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 11:29:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733212AbfHVJ3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 05:29:09 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35939 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727910AbfHVJ3H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 05:29:07 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r3so4723878wrt.3
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 02:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=zvZLQm2eReId0SwTyMH9VzRmlkdF2ZdYygKx0uvmAk0=;
-        b=SGase5XAZFg+vTPEPlwvJlx1ym/QLLzp1ud2bXoCHajj5R7wkWDyAY3NQMyW+Fa8yk
-         5TCCIETKfD2hpQpyh+tifopk6nxKPmvbjcRFK1Q7HOAQ+XMIoCYUknmm3EkeolqTHsYm
-         XAE3JtkBJqI9/xyF2u/s0xTJHog+xjFhwlQXOcq63WrxnWnwQa4o79tGYuP2qbab4mpY
-         MubhtDyP2NTE032vF1BczpQQZSJyrKtJMU1BNyw6BjHvG5FaU42RbjCvzhaH9EzhrSHk
-         wkT+7neXomFGGvJMp9BtLhrT5LxpJ/FZKToD9fFKKkk3H9rvhMw06d5uDNaJUDrRpjEF
-         7gUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=zvZLQm2eReId0SwTyMH9VzRmlkdF2ZdYygKx0uvmAk0=;
-        b=YNjBC1z6R/Qg0jzQF4TfpzvhijZH/kbNmfmdrkI1wnDdam7UI70NKFHqwW4IeDKzv/
-         Zv2k4Gezvm6qBV0JOjjdGmoqshwBVr2JnP0FzqfKufU2J0mD474js1X+c+cgIHd74IsM
-         7r87UBKiLwY3A1BoLcXSbeue5SYOilHrkxnoZ8l6bJrzGrk4f0RIct2CljE25C0IjyvN
-         bSrWDM2f8nffdpZdmm25tHvwNh6xLaMYXqd7j2H808RIFuOJg/HrCdOCZ4lY3Ek+zuCb
-         rtvaI39QZHLCyxlROqGZhu4d+CkLpF+NAI/LUjXNWKFEWtLFWpZ5vMKJItNgMEv8ORne
-         Gh1Q==
-X-Gm-Message-State: APjAAAVM4Vm8rSCUe7xaLTE0Pv1Ll+JxFTAmdFI9JWZAnbN+/gI2KUYT
-        QKpFF7KsadJ7rspfXsbFLHSPfA==
-X-Google-Smtp-Source: APXvYqy3MiZfh5jTT4YN2SGl9rGBNzJSpnL2EizF5M0c7ozx13iyKmQrwYFgp8g2hjvLpKPNCjxyIA==
-X-Received: by 2002:adf:f641:: with SMTP id x1mr7145810wrp.179.1566466145132;
-        Thu, 22 Aug 2019 02:29:05 -0700 (PDT)
-Received: from localhost (jirka.pirko.cz. [84.16.102.26])
-        by smtp.gmail.com with ESMTPSA id t19sm4383224wmi.29.2019.08.22.02.29.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2019 02:29:04 -0700 (PDT)
-Date:   Thu, 22 Aug 2019 11:29:03 +0200
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        cjia <cjia@nvidia.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-Message-ID: <20190822092903.GA2276@nanopsycho.orion>
-References: <AM0PR05MB4866148ABA3C4E48E73E95FCD1AD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <AM0PR05MB48668B6221E477A873688CDBD1AB0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190820111904.75515f58@x1.home>
- <AM0PR05MB486686D3C311F3C61BE0997DD1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190820222051.7aeafb69@x1.home>
- <AM0PR05MB48664CDF05C3D02F9441440DD1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190820225722.237a57d2@x1.home>
- <AM0PR05MB4866AE8FC4AA3CC24B08B326D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190820232622.164962d3@x1.home>
- <AM0PR05MB4866437FAA63C447CACCD7E5D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        id S1731609AbfHVJ3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 05:29:23 -0400
+Received: from foss.arm.com ([217.140.110.172]:42122 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731373AbfHVJ3W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 05:29:22 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F9B2360;
+        Thu, 22 Aug 2019 02:29:22 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93FFA3F246;
+        Thu, 22 Aug 2019 02:29:20 -0700 (PDT)
+Subject: Re: Can we boot a 512U kvm guest?
+To:     Auger Eric <eric.auger@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        kvmarm@lists.cs.columbia.edu, qemu-arm@nongnu.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        suzuki.poulose@arm.com, peter.maydell@linaro.org,
+        kvm@vger.kernel.org, "Wanghaibin (D)" <wanghaibin.wang@huawei.com>,
+        zhang.zhanghailiang@huawei.com
+References: <86aa9609-7dc9-1461-ae47-f50897cd0875@huawei.com>
+ <da5c87d6-8b66-75f9-e720-9f1d80a76d7d@redhat.com>
+From:   Marc Zyngier <maz@kernel.org>
+Organization: Approximate
+Message-ID: <fbeb47df-7ea2-04ce-5fe3-a6a6a4751b8b@kernel.org>
+Date:   Thu, 22 Aug 2019 10:29:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM0PR05MB4866437FAA63C447CACCD7E5D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <da5c87d6-8b66-75f9-e720-9f1d80a76d7d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wed, Aug 21, 2019 at 08:23:17AM CEST, parav@mellanox.com wrote:
->
->
->> -----Original Message-----
->> From: Alex Williamson <alex.williamson@redhat.com>
->> Sent: Wednesday, August 21, 2019 10:56 AM
->> To: Parav Pandit <parav@mellanox.com>
->> Cc: Jiri Pirko <jiri@mellanox.com>; David S . Miller <davem@davemloft.net>;
->> Kirti Wankhede <kwankhede@nvidia.com>; Cornelia Huck
->> <cohuck@redhat.com>; kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> cjia <cjia@nvidia.com>; netdev@vger.kernel.org
->> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
->> 
->> > > > > Just an example of the alias, not proposing how it's set.  In
->> > > > > fact, proposing that the user does not set it, mdev-core
->> > > > > provides one
->> > > automatically.
->> > > > >
->> > > > > > > Since there seems to be some prefix overhead, as I ask about
->> > > > > > > above in how many characters we actually have to work with
->> > > > > > > in IFNAMESZ, maybe we start with 8 characters (matching your
->> > > > > > > "index" namespace) and expand as necessary for disambiguation.
->> > > > > > > If we can eliminate overhead in IFNAMESZ, let's start with 12.
->> > > > > > > Thanks,
->> > > > > > >
->> > > > > > If user is going to choose the alias, why does it have to be limited to
->> sha1?
->> > > > > > Or you just told it as an example?
->> > > > > >
->> > > > > > It can be an alpha-numeric string.
->> > > > >
->> > > > > No, I'm proposing a different solution where mdev-core creates
->> > > > > an alias based on an abbreviated sha1.  The user does not provide the
->> alias.
->> > > > >
->> > > > > > Instead of mdev imposing number of characters on the alias, it
->> > > > > > should be best
->> > > > > left to the user.
->> > > > > > Because in future if netdev improves on the naming scheme,
->> > > > > > mdev will be
->> > > > > limiting it, which is not right.
->> > > > > > So not restricting alias size seems right to me.
->> > > > > > User configuring mdev for networking devices in a given kernel
->> > > > > > knows what
->> > > > > user is doing.
->> > > > > > So user can choose alias name size as it finds suitable.
->> > > > >
->> > > > > That's not what I'm proposing, please read again.  Thanks,
->> > > >
->> > > > I understood your point. But mdev doesn't know how user is going
->> > > > to use
->> > > udev/systemd to name the netdev.
->> > > > So even if mdev chose to pick 12 characters, it could result in collision.
->> > > > Hence the proposal to provide the alias by the user, as user know
->> > > > the best
->> > > policy for its use case in the environment its using.
->> > > > So 12 character sha1 method will still work by user.
->> > >
->> > > Haven't you already provided examples where certain drivers or
->> > > subsystems have unique netdev prefixes?  If mdev provides a unique
->> > > alias within the subsystem, couldn't we simply define a netdev
->> > > prefix for the mdev subsystem and avoid all other collisions?  I'm
->> > > not in favor of the user providing both a uuid and an
->> > > alias/instance.  Thanks,
->> > >
->> > For a given prefix, say ens2f0, can two UUID->sha1 first 9 characters have
->> collision?
->> 
->> I think it would be a mistake to waste so many chars on a prefix, but 9
->> characters of sha1 likely wouldn't have a collision before we have 10s of
->> thousands of devices.  Thanks,
->> 
->> Alex
->
->Jiri, Dave,
->Are you ok with it for devlink/netdev part?
->Mdev core will create an alias from a UUID.
->
->This will be supplied during devlink port attr set such as,
->
->devlink_port_attrs_mdev_set(struct devlink_port *port, const char *mdev_alias);
->
->This alias is used to generate representor netdev's phys_port_name.
->This alias from the mdev device's sysfs will be used by the udev/systemd to generate predicable netdev's name.
->Example: enm<mdev_alias_first_12_chars>
+Hi Eric,
 
-What happens in unlikely case of 2 UUIDs collide?
+On 22/08/2019 10:08, Auger Eric wrote:
+> Hi Zenghui,
+> 
+> On 8/13/19 10:50 AM, Zenghui Yu wrote:
+>> Hi folks,
+>>
+>> Since commit e25028c8ded0 ("KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to
+>> 512"), we seemed to be allowed to boot a 512U guest.  But I failed to
+>> start it up with the latest QEMU.  I guess there are at least *two*
+>> reasons (limitations).
+>>
+>> First I got a QEMU abort:
+>>     "kvm_set_irq: Invalid argument"
+>>
+>> Enable the trace_kvm_irq_line() under debugfs, when it comed with
+>> vcpu-256, I got:
+>>     "Inject UNKNOWN interrupt (3), vcpu->idx: 0, num: 23, level: 0"
+>> and kvm_vm_ioctl_irq_line() returns -EINVAL to user-space...
+>>
+>> So the thing is that we only have 8 bits for vcpu_index field ([23:16])
+>> in KVM_IRQ_LINE ioctl.  irq_type field will be corrupted if we inject a
+>> PPI to vcpu-256, whose vcpu_index will take 9 bits.
+>>
+>> I temporarily patched the KVM and QEMU with the following diff:
+>>
+>> ---8<---
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h
+>> b/arch/arm64/include/uapi/asm/kvm.h
+>> index 95516a4..39a0fb1 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -325,10 +325,10 @@ struct kvm_vcpu_events {
+>>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER        1
+>>
+>>  /* KVM_IRQ_LINE irq field index values */
+>> -#define KVM_ARM_IRQ_TYPE_SHIFT        24
+>> -#define KVM_ARM_IRQ_TYPE_MASK        0xff
+>> +#define KVM_ARM_IRQ_TYPE_SHIFT        28
+>> +#define KVM_ARM_IRQ_TYPE_MASK        0xf
+>>  #define KVM_ARM_IRQ_VCPU_SHIFT        16
+>> -#define KVM_ARM_IRQ_VCPU_MASK        0xff
+>> +#define KVM_ARM_IRQ_VCPU_MASK        0xfff
+>>  #define KVM_ARM_IRQ_NUM_SHIFT        0
+>>  #define KVM_ARM_IRQ_NUM_MASK        0xffff
+>>
+>> ---8<---
+>>
+>> It makes things a bit better, it also immediately BREAKs the api with
+>> old versions.
+>>
+>>
+>> Next comes one more QEMU abort (with the "fix" above):
+>>     "Failed to set device address: No space left on device"
+>>
+>> We register two io devices (rd_dev and sgi_dev) on KVM_MMIO_BUS for
+>> each redistributor. 512 vcpus take 1024 io devices, which is beyond the
+>> maximum limitation of the current kernel - NR_IOBUS_DEVS (1000).
+>> So we get a ENOSPC error here.
+> 
+> Do you plan to send a patch for increasing the NR_IOBUS_DEVS? Otherwise
+> I can do it.
 
+I really wonder whether that's a sensible thing to do on its own.
 
->I took Ethernet mdev as an example.
->New prefix 'm' stands for mediated device.
->Remaining 12 characters are first 12 chars of the mdev alias.
+Looking at the implementation of kvm_io_bus_register_dev (which copies
+the whole array each time we insert a device), we have an obvious issue
+with systems that create a large number of device structures, leading to
+large transient memory usage and slow guest start.
 
-Does this resolve the identification of devlink port representor? I
-assume you want to use the same 12(or so) chars, don't you?
+We could also try and reduce the number of devices we insert by making
+the redistributor a single device (which it is in reality). It probably
+means we need to make the MMIO decoding more flexible.
 
+Thanks,
+
+	M.
+-- 
+Jazz is not dead, it just smells funny...
