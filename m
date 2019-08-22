@@ -2,111 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 39CF49A1BD
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 23:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ED8A9A34B
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 00:52:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388778AbfHVVLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 17:11:30 -0400
-Received: from mga07.intel.com ([134.134.136.100]:61963 "EHLO mga07.intel.com"
+        id S2405128AbfHVWwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 18:52:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50230 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730991AbfHVVL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 17:11:29 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Aug 2019 14:11:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,418,1559545200"; 
-   d="scan'208";a="186688734"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 22 Aug 2019 14:11:28 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH] x86/retpoline: Don't clobber RFLAGS during CALL_NOSPEC on i386
-Date:   Thu, 22 Aug 2019 14:11:22 -0700
-Message-Id: <20190822211122.27579-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
+        id S1732657AbfHVWwN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 18:52:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 173A387633;
+        Thu, 22 Aug 2019 22:52:13 +0000 (UTC)
+Received: from localhost (ovpn-116-73.gru2.redhat.com [10.97.116.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D6BB600CD;
+        Thu, 22 Aug 2019 22:52:12 +0000 (UTC)
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Yumei Huang <yuhuang@redhat.com>
+Subject: [PATCH] i386: Omit all-zeroes entries from KVM CPUID table
+Date:   Thu, 22 Aug 2019 19:52:10 -0300
+Message-Id: <20190822225210.32541-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 22 Aug 2019 22:52:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use 'lea' instead of 'add' when adjusting %rsp in CALL_NOSPEC so as to
-avoid clobbering flags.
+KVM has a 80-entry limit at KVM_SET_CPUID2.  With the
+introduction of CPUID[0x1F], it is now possible to hit this limit
+with unusual CPU configurations, e.g.:
 
-KVM's emulator makes indirect calls into a jump table of sorts, where
-the destination of the CALL_NOSPEC is a small blob of code that performs
-fast emulation by executing the target instruction with fixed operands.
+  $ ./x86_64-softmmu/qemu-system-x86_64 \
+    -smp 1,dies=2,maxcpus=2 \
+    -cpu EPYC,check=off,enforce=off \
+    -machine accel=kvm
+  qemu-system-x86_64: kvm_init_vcpu failed: Argument list too long
 
-  adcb_al_dl:
-     0x000339f8 <+0>:   adc    %dl,%al
-     0x000339fa <+2>:   ret
+This happens because QEMU adds a lot of all-zeroes CPUID entries
+for unused CPUID leaves.  In the example above, we end up
+creating 48 all-zeroes CPUID entries.
 
-A major motiviation for doing fast emulation is to leverage the CPU to
-handle consumption and manipulation of arithmetic flags, i.e. RFLAGS is
-both an input and output to the target of CALL_NOSPEC.  Clobbering flags
-results in all sorts of incorrect emulation, e.g. Jcc instructions often
-take the wrong path.  Sans the nops...
+KVM already returns all-zeroes when emulating the CPUID
+instruction if an entry is missing, so the all-zeroes entries are
+redundant.  Skip those entries.  This reduces the CPUID table
+size by half while keeping CPUID output unchanged.
 
-  asm("push %[flags]; popf; " CALL_NOSPEC " ; pushf; pop %[flags]\n"
-     0x0003595a <+58>:  mov    0xc0(%ebx),%eax
-     0x00035960 <+64>:  mov    0x60(%ebx),%edx
-     0x00035963 <+67>:  mov    0x90(%ebx),%ecx
-     0x00035969 <+73>:  push   %edi
-     0x0003596a <+74>:  popf
-     0x0003596b <+75>:  call   *%esi
-     0x000359a0 <+128>: pushf
-     0x000359a1 <+129>: pop    %edi
-     0x000359a2 <+130>: mov    %eax,0xc0(%ebx)
-     0x000359b1 <+145>: mov    %edx,0x60(%ebx)
-
-  ctxt->eflags = (ctxt->eflags & ~EFLAGS_MASK) | (flags & EFLAGS_MASK);
-     0x000359a8 <+136>: mov    -0x10(%ebp),%eax
-     0x000359ab <+139>: and    $0x8d5,%edi
-     0x000359b4 <+148>: and    $0xfffff72a,%eax
-     0x000359b9 <+153>: or     %eax,%edi
-     0x000359bd <+157>: mov    %edi,0x4(%ebx)
-
-For the most part this has gone unnoticed as emulation of guest code
-that can trigger fast emulation is effectively limited to MMIO when
-running on modern hardware, and MMIO is rarely, if ever, accessed by
-instructions that affect or consume flags.
-
-Breakage is almost instantaneous when running with unrestricted guest
-disabled, in which case KVM must emulate all instructions when the guest
-has invalid state, e.g. when the guest is in Big Real Mode during early
-BIOS.
-
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: <kvm@vger.kernel.org>
-Cc: <stable@vger.kernel.org>
-Fixes: 1a29b5b7f347a ("KVM: x86: Make indirect calls in emulator speculation safe")
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reported-by: Yumei Huang <yuhuang@redhat.com>
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1741508
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- arch/x86/include/asm/nospec-branch.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/kvm.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-index 109f974f9835..80bc209c0708 100644
---- a/arch/x86/include/asm/nospec-branch.h
-+++ b/arch/x86/include/asm/nospec-branch.h
-@@ -192,7 +192,7 @@
- 	"    	lfence;\n"					\
- 	"       jmp    902b;\n"					\
- 	"       .align 16\n"					\
--	"903:	addl   $4, %%esp;\n"				\
-+	"903:	lea    4(%%esp), %%esp;\n"			\
- 	"       pushl  %[thunk_target];\n"			\
- 	"       ret;\n"						\
- 	"       .align 16\n"					\
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 8023c679ea..4e3df2867d 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1529,6 +1529,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             c->function = i;
+             c->flags = 0;
+             cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            if (!c->eax && !c->ebx && !c->ecx && !c->edx) {
++                /*
++                 * KVM already returns all zeroes if a CPUID entry is missing,
++                 * so we can omit it and avoid hitting KVM's 80-entry limit.
++                 */
++                cpuid_i--;
++            }
+             break;
+         }
+     }
+@@ -1593,6 +1600,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             c->function = i;
+             c->flags = 0;
+             cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            if (!c->eax && !c->ebx && !c->ecx && !c->edx) {
++                /*
++                 * KVM already returns all zeroes if a CPUID entry is missing,
++                 * so we can omit it and avoid hitting KVM's 80-entry limit.
++                 */
++                cpuid_i--;
++            }
+             break;
+         }
+     }
 -- 
-2.22.0
+2.21.0
 
