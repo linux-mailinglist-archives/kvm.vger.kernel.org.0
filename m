@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73E54992EB
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:11:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B6239930F
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:17:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733249AbfHVMK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 08:10:58 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:57043 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730980AbfHVMK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 08:10:58 -0400
+        id S1733171AbfHVMOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 08:14:38 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:34288 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729716AbfHVMOi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 08:14:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1566475856; x=1598011856;
+  t=1566476076; x=1598012076;
   h=subject:to:cc:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=vzGuqnfOUEFsxt7fROuX+KXEkhbP8AQE/wXmqJj7hwE=;
-  b=QwLnRqbvZ8jZBI4UMzH6RZBEr/dVJuKE//T1Cvyk8sPY2JY7EKkrGwnF
-   bAM3yBYwTkms3gumHS/IizTV04x+uisMVTs7eG0mZ0hgqB6KLN46VS1Ih
-   yibGFl2vg6rQM0S45i9NyK5APD/MPWbK3H1yK52QV0SFSKXZQ7I3BZIFK
-   4=;
+  bh=ZJ4ckYYyF8r8s7slEeqr042gWZQrAlSIM2NHq1YgTxY=;
+  b=aLLvZ9tSq5VFRUUiou0n1RpLQqHqruMMhpD0DGuc/sfVwsJAgm8y3VO2
+   FhStmMWvrAoDNqbSbnNT0do9DesupyxZe7B5vWMAG3ynZrKEH2dwJqx/f
+   mGTevQqYVjCeh8Yt1SvM2WiGvURZcjTwkF7RafszsylKU8dmDeXK8sB00
+   8=;
 X-IronPort-AV: E=Sophos;i="5.64,416,1559520000"; 
-   d="scan'208";a="822653353"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 22 Aug 2019 12:10:56 +0000
+   d="scan'208";a="411093680"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-f14f4a47.us-west-2.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 22 Aug 2019 12:14:33 +0000
 Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (Postfix) with ESMTPS id 7204AA2755;
-        Thu, 22 Aug 2019 12:10:55 +0000 (UTC)
+        by email-inbound-relay-2a-f14f4a47.us-west-2.amazon.com (Postfix) with ESMTPS id 7C2A6A2CA0;
+        Thu, 22 Aug 2019 12:14:32 +0000 (UTC)
 Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
  EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 22 Aug 2019 12:10:54 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.162.67) by
+ id 15.0.1367.3; Thu, 22 Aug 2019 12:14:32 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.160.211) by
  EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 22 Aug 2019 12:10:50 +0000
+ id 15.0.1367.3; Thu, 22 Aug 2019 12:14:28 +0000
 Subject: Re: [PATCH v5 10/20] RISC-V: KVM: Handle MMIO exits for VCPU
 To:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
@@ -53,8 +53,8 @@ CC:     Daniel Lezcano <daniel.lezcano@linaro.org>,
 References: <20190822084131.114764-1-anup.patel@wdc.com>
  <20190822084131.114764-11-anup.patel@wdc.com>
 From:   Alexander Graf <graf@amazon.com>
-Message-ID: <13cf8e10-3f54-a50a-0796-ecb2da4577d2@amazon.com>
-Date:   Thu, 22 Aug 2019 14:10:48 +0200
+Message-ID: <917cea87-42c0-e50a-6508-d5b577c8b702@amazon.com>
+Date:   Thu, 22 Aug 2019 14:14:25 +0200
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
  Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
@@ -62,8 +62,8 @@ In-Reply-To: <20190822084131.114764-11-anup.patel@wdc.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.162.67]
-X-ClientProxiedBy: EX13D28UWC003.ant.amazon.com (10.43.162.48) To
+X-Originating-IP: [10.43.160.211]
+X-ClientProxiedBy: EX13D25UWC001.ant.amazon.com (10.43.162.44) To
  EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -282,6 +282,20 @@ On 22.08.19 10:44, Anup Patel wrote:
 > +	csr_write(CSR_VSSTATUS, __vsstatus | SR_MXR);
 > +	csr_write(CSR_SSTATUS, vcpu->arch.guest_context.sstatus | SR_MXR);
 > +	csr_write(CSR_HSTATUS, vcpu->arch.guest_context.hstatus | HSTATUS_SPRV);
+
+What happens when the insn load triggers a page fault, maybe because the 
+guest was malicious and did
+
+   1) Run on page 0x1000
+   2) Remove map for 0x1000, do *not* flush TLB
+   3) Trigger MMIO
+
+That would DOS the host here, as the host kernel would continue running 
+in guest address space, right?
+
+
+Alex
+
 > +
 > +#ifndef CONFIG_RISCV_ISA_C
 > +	asm ("\n"
@@ -326,169 +340,4 @@ On 22.08.19 10:44, Anup Patel wrote:
 > +
 > +	return val;
 > +}
-> +
-> +static int emulate_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> +			unsigned long fault_addr)
-> +{
-> +	int shift = 0, len = 0;
-> +	ulong insn = get_insn(vcpu);
-> +
-> +	/* Decode length of MMIO and shift */
-> +	if ((insn & INSN_MASK_LW) == INSN_MATCH_LW) {
-> +		len = 4;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +	} else if ((insn & INSN_MASK_LB) == INSN_MATCH_LB) {
-> +		len = 1;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +	} else if ((insn & INSN_MASK_LBU) == INSN_MATCH_LBU) {
-> +		len = 1;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +#ifdef CONFIG_64BIT
-> +	} else if ((insn & INSN_MASK_LD) == INSN_MATCH_LD) {
-> +		len = 8;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +	} else if ((insn & INSN_MASK_LWU) == INSN_MATCH_LWU) {
-> +		len = 4;
-> +#endif
-> +	} else if ((insn & INSN_MASK_LH) == INSN_MATCH_LH) {
-> +		len = 2;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +	} else if ((insn & INSN_MASK_LHU) == INSN_MATCH_LHU) {
-> +		len = 2;
-> +#ifdef CONFIG_RISCV_ISA_C
-> +#ifdef CONFIG_64BIT
-> +	} else if ((insn & INSN_MASK_C_LD) == INSN_MATCH_C_LD) {
-> +		len = 8;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +		insn = RVC_RS2S(insn) << SH_RD;
-> +	} else if ((insn & INSN_MASK_C_LDSP) == INSN_MATCH_C_LDSP &&
-> +		   ((insn >> SH_RD) & 0x1f)) {
-> +		len = 8;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +#endif
-> +	} else if ((insn & INSN_MASK_C_LW) == INSN_MATCH_C_LW) {
-> +		len = 4;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +		insn = RVC_RS2S(insn) << SH_RD;
-> +	} else if ((insn & INSN_MASK_C_LWSP) == INSN_MATCH_C_LWSP &&
-> +		   ((insn >> SH_RD) & 0x1f)) {
-> +		len = 4;
-> +		shift = 8 * (sizeof(ulong) - len);
-> +#endif
-> +	} else {
-> +		return -ENOTSUPP;
-> +	}
-> +
-> +	/* Fault address should be aligned to length of MMIO */
-> +	if (fault_addr & (len - 1))
-> +		return -EIO;
-> +
-> +	/* Save instruction decode info */
-> +	vcpu->arch.mmio_decode.insn = insn;
-> +	vcpu->arch.mmio_decode.shift = shift;
-> +	vcpu->arch.mmio_decode.len = len;
-> +
-> +	/* Exit to userspace for MMIO emulation */
-> +	vcpu->stat.mmio_exit_user++;
-> +	run->exit_reason = KVM_EXIT_MMIO;
-> +	run->mmio.is_write = false;
-> +	run->mmio.phys_addr = fault_addr;
-> +	run->mmio.len = len;
-> +
-> +	/* Move to next instruction */
-> +	vcpu->arch.guest_context.sepc += INSN_LEN(insn);
 
-Doesn't that make more sense on the reentry path? What if you want to 
-inject an MCE on access to unmapped addresses from user space?
-
-> +
-> +	return 0;
-> +}
-> +
-> +static int emulate_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> +			 unsigned long fault_addr)
-> +{
-> +	u8 data8;
-> +	u16 data16;
-> +	u32 data32;
-> +	u64 data64;
-> +	ulong data;
-> +	int len = 0;
-> +	ulong insn = get_insn(vcpu);
-> +
-> +	data = GET_RS2(insn, &vcpu->arch.guest_context);
-> +	data8 = data16 = data32 = data64 = data;
-> +
-> +	if ((insn & INSN_MASK_SW) == INSN_MATCH_SW) {
-> +		len = 4;
-> +	} else if ((insn & INSN_MASK_SB) == INSN_MATCH_SB) {
-> +		len = 1;
-> +#ifdef CONFIG_64BIT
-> +	} else if ((insn & INSN_MASK_SD) == INSN_MATCH_SD) {
-> +		len = 8;
-> +#endif
-> +	} else if ((insn & INSN_MASK_SH) == INSN_MATCH_SH) {
-> +		len = 2;
-> +#ifdef CONFIG_RISCV_ISA_C
-> +#ifdef CONFIG_64BIT
-> +	} else if ((insn & INSN_MASK_C_SD) == INSN_MATCH_C_SD) {
-> +		len = 8;
-> +		data64 = GET_RS2S(insn, &vcpu->arch.guest_context);
-> +	} else if ((insn & INSN_MASK_C_SDSP) == INSN_MATCH_C_SDSP &&
-> +		   ((insn >> SH_RD) & 0x1f)) {
-> +		len = 8;
-> +		data64 = GET_RS2C(insn, &vcpu->arch.guest_context);
-> +#endif
-> +	} else if ((insn & INSN_MASK_C_SW) == INSN_MATCH_C_SW) {
-> +		len = 4;
-> +		data32 = GET_RS2S(insn, &vcpu->arch.guest_context);
-> +	} else if ((insn & INSN_MASK_C_SWSP) == INSN_MATCH_C_SWSP &&
-> +		   ((insn >> SH_RD) & 0x1f)) {
-> +		len = 4;
-> +		data32 = GET_RS2C(insn, &vcpu->arch.guest_context);
-> +#endif
-> +	} else {
-> +		return -ENOTSUPP;
-> +	}
-> +
-> +	/* Fault address should be aligned to length of MMIO */
-> +	if (fault_addr & (len - 1))
-> +		return -EIO;
-> +
-> +	/* Clear instruction decode info */
-> +	vcpu->arch.mmio_decode.insn = 0;
-> +	vcpu->arch.mmio_decode.shift = 0;
-> +	vcpu->arch.mmio_decode.len = 0;
-> +
-> +	/* Copy data to kvm_run instance */
-> +	switch (len) {
-> +	case 1:
-> +		*((u8 *)run->mmio.data) = data8;
-> +		break;
-> +	case 2:
-> +		*((u16 *)run->mmio.data) = data16;
-> +		break;
-> +	case 4:
-> +		*((u32 *)run->mmio.data) = data32;
-> +		break;
-> +	case 8:
-> +		*((u64 *)run->mmio.data) = data64;
-> +		break;
-> +	default:
-> +		return -ENOTSUPP;
-> +	};
-> +
-> +	/* Exit to userspace for MMIO emulation */
-> +	vcpu->stat.mmio_exit_user++;
-> +	run->exit_reason = KVM_EXIT_MMIO;
-> +	run->mmio.is_write = true;
-> +	run->mmio.phys_addr = fault_addr;
-> +	run->mmio.len = len;
-> +
-> +	/* Move to next instruction */
-> +	vcpu->arch.guest_context.sepc += INSN_LEN(insn);
-
-Same comment here.
-
-
-Alex
