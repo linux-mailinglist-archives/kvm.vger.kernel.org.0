@@ -2,42 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FC67990A3
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 12:23:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5167E990CD
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 12:29:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387543AbfHVKXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 06:23:09 -0400
-Received: from foss.arm.com ([217.140.110.172]:43166 "EHLO foss.arm.com"
+        id S1732026AbfHVK2m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 06:28:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40392 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730918AbfHVKXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 06:23:09 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 71380337;
-        Thu, 22 Aug 2019 03:23:08 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 41E723F246;
-        Thu, 22 Aug 2019 03:23:06 -0700 (PDT)
-Subject: Re: Can we boot a 512U kvm guest?
-To:     Auger Eric <eric.auger@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        kvmarm@lists.cs.columbia.edu, qemu-arm@nongnu.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        suzuki.poulose@arm.com, peter.maydell@linaro.org,
-        kvm@vger.kernel.org, "Wanghaibin (D)" <wanghaibin.wang@huawei.com>,
-        zhang.zhanghailiang@huawei.com
-References: <86aa9609-7dc9-1461-ae47-f50897cd0875@huawei.com>
- <da5c87d6-8b66-75f9-e720-9f1d80a76d7d@redhat.com>
- <fbeb47df-7ea2-04ce-5fe3-a6a6a4751b8b@kernel.org>
- <681f59e8-a193-6d3e-0bcc-5e52f4203868@redhat.com>
-From:   Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <dc78b8af-e761-dc87-982e-1885cfb98100@kernel.org>
-Date:   Thu, 22 Aug 2019 11:23:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+        id S1725804AbfHVK2m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 06:28:42 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5DAF3859FB
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 10:28:41 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id i4so2985827wri.1
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 03:28:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4MfO4wwvQsCCexQFrhxhOuZM/VP4L6uDupwMAnNIvjU=;
+        b=iH9NVFgEeacomHrps3YGrR9XLLzzPScB17T0ansiaagua0pKAiCePMlZK+Z4vgzVrZ
+         xfnJH/d7AkrtARj7x/qb4BDBDdr/Ef31g83uc4xAWV9eEybpDDKFvvWKZz5RaAQNDY5C
+         7MPg4oAuahu6enbxzPdmJbN4pNXl6aGJj68smAEa3kosedCE2ILONwqn5mTc4Q17t86L
+         n1/vfN32Lrya7bc2sn4tTaZ4ZXH8guyZX5mxnKGMLMdvYq40GyealJzNmEVfbGray6ft
+         OdCTq93/dqXGnFsxoL3OK6wWVJS7ITztZSQREe18YKW5DKSNYsq4F7ZV8zjzHJp0bQIy
+         x1xQ==
+X-Gm-Message-State: APjAAAVaQtSCfm+60E23tiQ74piW8kDAXEronfJ5tU4ZDbrYqiy+PJVD
+        jfqq7aUSyHiOiVRcCfHQrz/d+gUYNE9gFKJUdMDQGYYRI69aX1dGMiIoLxW+G2X/bbFxnaJ7bGG
+        A/LmghXe8Ea8O
+X-Received: by 2002:adf:fe85:: with SMTP id l5mr43711679wrr.5.1566469719946;
+        Thu, 22 Aug 2019 03:28:39 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzcchmnd2d+Q6n3bl7nL/gok1KRpj0qcau6QT0Jbp5sxK2tyfYxaGdUFQWwvZSt7nt5WzCiag==
+X-Received: by 2002:adf:fe85:: with SMTP id l5mr43711646wrr.5.1566469719615;
+        Thu, 22 Aug 2019 03:28:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3? ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
+        by smtp.gmail.com with ESMTPSA id o2sm3335221wmh.9.2019.08.22.03.28.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2019 03:28:39 -0700 (PDT)
+Subject: Re: [PATCH v4 00/15] hw/i386/pc: Do not restrict the fw_cfg functions
+ to the PC machine
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Samuel Ortiz <sameo@linux.intel.com>, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Rob Bradford <robert.bradford@intel.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>
+References: <20190818225414.22590-1-philmd@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9e7a5fa2-2bf7-f3fe-57d9-680498166bf9@redhat.com>
+Date:   Thu, 22 Aug 2019 12:28:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <681f59e8-a193-6d3e-0bcc-5e52f4203868@redhat.com>
+In-Reply-To: <20190818225414.22590-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -46,94 +72,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/08/2019 10:50, Auger Eric wrote:
-> Hi Marc,
+On 19/08/19 00:53, Philippe Mathieu-Daudé wrote:
+> Hi,
 > 
-> On 8/22/19 11:29 AM, Marc Zyngier wrote:
->> Hi Eric,
->>
->> On 22/08/2019 10:08, Auger Eric wrote:
->>> Hi Zenghui,
->>>
->>> On 8/13/19 10:50 AM, Zenghui Yu wrote:
->>>> Hi folks,
->>>>
->>>> Since commit e25028c8ded0 ("KVM: arm/arm64: Bump VGIC_V3_MAX_CPUS to
->>>> 512"), we seemed to be allowed to boot a 512U guest.  But I failed to
->>>> start it up with the latest QEMU.  I guess there are at least *two*
->>>> reasons (limitations).
->>>>
->>>> First I got a QEMU abort:
->>>>     "kvm_set_irq: Invalid argument"
->>>>
->>>> Enable the trace_kvm_irq_line() under debugfs, when it comed with
->>>> vcpu-256, I got:
->>>>     "Inject UNKNOWN interrupt (3), vcpu->idx: 0, num: 23, level: 0"
->>>> and kvm_vm_ioctl_irq_line() returns -EINVAL to user-space...
->>>>
->>>> So the thing is that we only have 8 bits for vcpu_index field ([23:16])
->>>> in KVM_IRQ_LINE ioctl.  irq_type field will be corrupted if we inject a
->>>> PPI to vcpu-256, whose vcpu_index will take 9 bits.
->>>>
->>>> I temporarily patched the KVM and QEMU with the following diff:
->>>>
->>>> ---8<---
->>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h
->>>> b/arch/arm64/include/uapi/asm/kvm.h
->>>> index 95516a4..39a0fb1 100644
->>>> --- a/arch/arm64/include/uapi/asm/kvm.h
->>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
->>>> @@ -325,10 +325,10 @@ struct kvm_vcpu_events {
->>>>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER        1
->>>>
->>>>  /* KVM_IRQ_LINE irq field index values */
->>>> -#define KVM_ARM_IRQ_TYPE_SHIFT        24
->>>> -#define KVM_ARM_IRQ_TYPE_MASK        0xff
->>>> +#define KVM_ARM_IRQ_TYPE_SHIFT        28
->>>> +#define KVM_ARM_IRQ_TYPE_MASK        0xf
->>>>  #define KVM_ARM_IRQ_VCPU_SHIFT        16
->>>> -#define KVM_ARM_IRQ_VCPU_MASK        0xff
->>>> +#define KVM_ARM_IRQ_VCPU_MASK        0xfff
->>>>  #define KVM_ARM_IRQ_NUM_SHIFT        0
->>>>  #define KVM_ARM_IRQ_NUM_MASK        0xffff
->>>>
->>>> ---8<---
->>>>
->>>> It makes things a bit better, it also immediately BREAKs the api with
->>>> old versions.
->>>>
->>>>
->>>> Next comes one more QEMU abort (with the "fix" above):
->>>>     "Failed to set device address: No space left on device"
->>>>
->>>> We register two io devices (rd_dev and sgi_dev) on KVM_MMIO_BUS for
->>>> each redistributor. 512 vcpus take 1024 io devices, which is beyond the
->>>> maximum limitation of the current kernel - NR_IOBUS_DEVS (1000).
->>>> So we get a ENOSPC error here.
->>>
->>> Do you plan to send a patch for increasing the NR_IOBUS_DEVS? Otherwise
->>> I can do it.
->>
->> I really wonder whether that's a sensible thing to do on its own.
->>
->> Looking at the implementation of kvm_io_bus_register_dev (which copies
->> the whole array each time we insert a device), we have an obvious issue
->> with systems that create a large number of device structures, leading to
->> large transient memory usage and slow guest start.
->>
->> We could also try and reduce the number of devices we insert by making
->> the redistributor a single device (which it is in reality). It probably
->> means we need to make the MMIO decoding more flexible.
+> This is my take at salvaging some NEMU good work.
+> Samuel worked in adding the fw_cfg device to the x86-virt NEMU machine.
+> This series is inspired by NEMU's commit 3cb92d080835 [0] and adapted
+> to upstream style. The result makes the upstream codebase more
+> modularizable.
+> There are very little logical changes, this is mostly a cleanup
+> refactor.
 > 
-> Yes it makes sense. If no objection, I can work on this as I am the
-> source of the mess ;-)
+> Since v3 [3]:
+> - Addressed Christophe suggestion (patch #8)
+> - Rebased patch #15 since Eduardo merged Like Xu's work between.
+> 
+> Since v2 [2]:
+> - Addressed MST comments from v2 (only patch #2 modified)
+>   - do not use unsigned for enum
+>   - do not add unuseful documentation
+> 
+> Since v1 [1]:
+> - Addressed Li and MST comments
+> 
+> $ git backport-diff -u v3
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+> 
+> 001/15:[----] [--] 'hw/i386/pc: Use e820_get_num_entries() to access e820_entries'
+> 002/15:[----] [-C] 'hw/i386/pc: Extract e820 memory layout code'
+> 003/15:[----] [--] 'hw/i386/pc: Use address_space_memory in place'
+> 004/15:[----] [-C] 'hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_arch_create'
+> 005/15:[----] [--] 'hw/i386/pc: Pass the boot_cpus value by argument'
+> 006/15:[----] [--] 'hw/i386/pc: Pass the apic_id_limit value by argument'
+> 007/15:[0002] [FC] 'hw/i386/pc: Pass the CPUArchIdList array by argument'
+> 008/15:[down] 'hw/i386/pc: Remove unused PCMachineState argument in fw_cfg_arch_create'
+> 009/15:[----] [-C] 'hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument'
+> 010/15:[----] [-C] 'hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument'
+> 011/15:[----] [-C] 'hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()'
+> 012/15:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument'
+> 013/15:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a MachineState argument'
+> 014/15:[----] [--] 'hw/i386/pc: Rename pc_build_feature_control() as generic fw_cfg_build_*'
+> 015/15:[0017] [FC] 'hw/i386/pc: Extract the x86 generic fw_cfg code'
+> 
+> Regards,
+> 
+> Phil.
+> 
+> [0] https://github.com/intel/nemu/commit/3cb92d080835ac8d47c8b713156338afa33cff5c
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg05759.html
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg02786.html
+> [3] https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg00193.html
+> 
+> Philippe Mathieu-Daudé (15):
+>   hw/i386/pc: Use e820_get_num_entries() to access e820_entries
+>   hw/i386/pc: Extract e820 memory layout code
+>   hw/i386/pc: Use address_space_memory in place
+>   hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_arch_create
+>   hw/i386/pc: Pass the boot_cpus value by argument
+>   hw/i386/pc: Pass the apic_id_limit value by argument
+>   hw/i386/pc: Pass the CPUArchIdList array by argument
+>   hw/i386/pc: Remove unused PCMachineState argument in
+>     fw_cfg_arch_create
+>   hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument
+>   hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument
+>   hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()
+>   hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument
+>   hw/i386/pc: Let pc_build_feature_control() take a MachineState
+>     argument
+>   hw/i386/pc: Rename pc_build_feature_control() as generic
+>     fw_cfg_build_*
+>   hw/i386/pc: Extract the x86 generic fw_cfg code
+> 
+>  hw/i386/Makefile.objs        |   2 +-
+>  hw/i386/e820_memory_layout.c |  59 ++++++++++
+>  hw/i386/e820_memory_layout.h |  42 ++++++++
+>  hw/i386/fw_cfg.c             | 136 +++++++++++++++++++++++
+>  hw/i386/fw_cfg.h             |   7 ++
+>  hw/i386/pc.c                 | 202 ++---------------------------------
+>  include/hw/i386/pc.h         |  11 --
+>  target/i386/kvm.c            |   1 +
+>  8 files changed, 254 insertions(+), 206 deletions(-)
+>  create mode 100644 hw/i386/e820_memory_layout.c
+>  create mode 100644 hw/i386/e820_memory_layout.h
+> 
 
-Sure, if you have some spare bandwidth, feel free to give it a go. I'd
-certainly like to see the userspace counterpart to my earlier patch, and
-some agreement on the ABI change.
+Queued, thanks.
 
-Thanks,
-
-	M.
--- 
-Jazz is not dead, it just smells funny...
+Paolo
