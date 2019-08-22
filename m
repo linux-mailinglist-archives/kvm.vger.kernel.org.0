@@ -2,96 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 829EC99916
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 18:24:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A04899966
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 18:39:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389901AbfHVQYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 12:24:51 -0400
-Received: from mga11.intel.com ([192.55.52.93]:7457 "EHLO mga11.intel.com"
+        id S2390136AbfHVQiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 12:38:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60806 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389888AbfHVQYu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 12:24:50 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Aug 2019 09:24:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,417,1559545200"; 
-   d="scan'208";a="181437997"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga003.jf.intel.com with ESMTP; 22 Aug 2019 09:24:49 -0700
-Date:   Thu, 22 Aug 2019 09:24:49 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 04/10] KVM: Implement kvm_put_guest()
-Message-ID: <20190822162449.GF25467@linux.intel.com>
-References: <20190821153656.33429-1-steven.price@arm.com>
- <20190821153656.33429-5-steven.price@arm.com>
- <20190822152854.GE25467@linux.intel.com>
- <e2abc69b-74c2-64ef-e270-43d93513eaae@arm.com>
+        id S2390109AbfHVQip (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 12:38:45 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 86A59A707
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 16:38:45 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id k14so3450458wrv.2
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 09:38:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=p5sLbnKK73dG+WxnSvZUshy8YsfyiA1ug3q0iFIQR/I=;
+        b=gQXcnOVZGiizoGQt9Lc218t5T33Qzpv9uWiJ1wwkx889NZ5ocgXcoPch+g59rSV/F0
+         0UIIhizLukHPcdAbuhVORPLumwZMhsrr3KMHzk2JYJ5FvD6pitT2M5OyFMTNq6t4r7z2
+         +xb5SGDV8vUJLvLVdnQhfwelqz+Jj4tQP7RjhYsIfGW5xGJP3Oa8gh/1T2FyMMSqfkSc
+         b5c6JuUzt1B8q/+d61giybFxkGqFvdj5CWhTaIGQY32c3pkHhvCNneruIknPywDpmw7I
+         uBQKWcgUTC8e7bWsON5bbLRKTk5Qk8fOT65KZI9r6eJRw6jS2plU5evGKFFL6p1wv74i
+         LSMw==
+X-Gm-Message-State: APjAAAVxRkUywQMMAnvDZd7qlH1zEq/1UsjPJny6lv0HUMF6ERDXK1mh
+        ijZa3ha4+FxQQh7GyO4BM9EJVLCxe7UJ/j6kC/G7MFIOtgf0mAYTDFIOQy9ca3HtaodW8aqzXvF
+        6AmbIr6REU64V
+X-Received: by 2002:adf:f287:: with SMTP id k7mr48635366wro.183.1566491924174;
+        Thu, 22 Aug 2019 09:38:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxnHZQBEz+AELXL/+aERKQQWBN+cLv9cZ3o9ly5EUJLMLeOXkg28ajJSSLGxuDTGkPLbyHorQ==
+X-Received: by 2002:adf:f287:: with SMTP id k7mr48635337wro.183.1566491923863;
+        Thu, 22 Aug 2019 09:38:43 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3? ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
+        by smtp.gmail.com with ESMTPSA id e11sm355752wrc.4.2019.08.22.09.38.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2019 09:38:43 -0700 (PDT)
+Subject: Re: [PATCH RESEND v4 7/9] KVM: VMX: Handle SPP induced vmexit and
+ page fault
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sean.j.christopherson@intel.com, mst@redhat.com,
+        rkrcmar@redhat.com, jmattson@google.com, yu.c.zhang@intel.com,
+        alazar@bitdefender.com
+References: <20190814070403.6588-1-weijiang.yang@intel.com>
+ <20190814070403.6588-8-weijiang.yang@intel.com>
+ <5f6ba406-17c4-a552-2352-2ff50569aac0@redhat.com>
+ <fb6cd8b4-eee9-6e58-4047-550811bffd58@redhat.com>
+ <20190820134435.GE4828@local-michael-cet-test.sh.intel.com>
+ <20190822131745.GA20168@local-michael-cet-test>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <62748fe8-0a3b-0554-452e-3bb5ebaf0466@redhat.com>
+Date:   Thu, 22 Aug 2019 18:38:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e2abc69b-74c2-64ef-e270-43d93513eaae@arm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190822131745.GA20168@local-michael-cet-test>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 04:46:10PM +0100, Steven Price wrote:
-> On 22/08/2019 16:28, Sean Christopherson wrote:
-> > On Wed, Aug 21, 2019 at 04:36:50PM +0100, Steven Price wrote:
-> >> kvm_put_guest() is analogous to put_user() - it writes a single value to
-> >> the guest physical address. The implementation is built upon put_user()
-> >> and so it has the same single copy atomic properties.
-> > 
-> > What you mean by "single copy atomic"?  I.e. what guarantees does
-> > put_user() provide that __copy_to_user() does not?
-> 
-> Single-copy atomicity is defined by the Arm architecture[1] and I'm not
-> going to try to go into the full details here, so this is a summary.
-> 
-> For the sake of this feature what we care about is that the value
-> written/read cannot be "torn". In other words if there is a read (in
-> this case from another VCPU) that is racing with the write then the read
-> will either get the old value or the new value. It cannot return a
-> mixture. (This is of course assuming that the read is using a
-> single-copy atomic safe method).
+On 22/08/19 15:17, Yang Weijiang wrote:
+> On Tue, Aug 20, 2019 at 09:44:35PM +0800, Yang Weijiang wrote:
+>> On Mon, Aug 19, 2019 at 05:04:23PM +0200, Paolo Bonzini wrote:
+>>> fast_page_fault should never trigger an SPP userspace exit on its own,
+>>> all the SPP handling should go through handle_spp.
+>  Hi, Paolo,
+>  According to the latest SDM(28.2.4), handle_spp only handles SPPT miss and SPPT
+>  misconfig(exit_reason==66), subpage write access violation causes EPT violation,
+>  so have to deal with the two cases into handlers.
 
-Thanks for the explanation.  I assumed that's what you were referring to,
-but wanted to double check.
- 
-> __copy_to_user() is implemented as a memcpy() and as such cannot provide
-> single-copy atomicity in the general case (the buffer could easily be
-> bigger than the architecture can guarantee).
-> 
-> put_user() on the other hand is implemented (on arm64) as an explicit
-> store instruction and therefore is guaranteed by the architecture to be
-> single-copy atomic (i.e. another CPU cannot see a half-written value).
+Ok, so this part has to remain, though you do have to save/restore
+PT_SPP_MASK according to the rest of the email.
 
-I don't think kvm_put_guest() belongs in generic code, at least not with
-the current changelog explanation about it providing single-copy atomic
-semantics.  AFAICT, the single-copy thing is very much an arm64
-implementation detail, e.g. the vast majority of 32-bit architectures,
-including x86, do not provide any guarantees, and x86-64 generates more
-or less the same code for put_user() and __copy_to_user() for 8-byte and
-smaller accesses.
+Paolo
 
-As an alternative to kvm_put_guest() entirely, is it an option to change
-arm64's raw_copy_to_user() to redirect to __put_user() for sizes that are
-constant at compile time and can be handled by __put_user()?  That would
-allow using kvm_write_guest() to update stolen time, albeit with
-arguably an even bigger dependency on the uaccess implementation details.
+>>> So I think that when KVM wants to write-protect the whole page
+>>> (wrprot_ad_disabled_spte) it must also clear PT_SPP_MASK; for example it
+>>> could save it in bit 53 (PT64_SECOND_AVAIL_BITS_SHIFT + 1).  If the
+>>> saved bit is set, fast_page_fault must then set PT_SPP_MASK instead of
+>>> PT_WRITABLE_MASK.
