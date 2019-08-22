@@ -2,220 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E56F398983
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 04:38:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 088DE989DF
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 05:35:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729610AbfHVCi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Aug 2019 22:38:26 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:40124 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729253AbfHVCi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Aug 2019 22:38:26 -0400
-Received: by mail-ot1-f68.google.com with SMTP id c34so4061559otb.7;
-        Wed, 21 Aug 2019 19:38:25 -0700 (PDT)
+        id S1730172AbfHVDf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Aug 2019 23:35:27 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38823 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728332AbfHVDf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Aug 2019 23:35:27 -0400
+Received: by mail-wm1-f66.google.com with SMTP id m125so4187240wmm.3;
+        Wed, 21 Aug 2019 20:35:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=XoRcSwd9u1dvFquimROqhIpVJNTmoeWa7AHYkdDfXy8=;
-        b=JT7F6QMxVN4B3wtJqxMSO5zxKG4hr3gpdGpQPuelpj4Tfy2rbnznaohv1N2plicN2F
-         kQvp/q21vBlXRr9iMKiFRSdk2quEmy0kDA/51vNu6xcyt+zvn7sLdbiZP5rfcuPhJzQB
-         TRb5hevivFa+GDuWRJNguiMZn/bnwD1EkhMk3LHzsPV941XhuXsIgDz7Rn4l9+ZYWxer
-         3cQ/1Mcx5fE+s58uUuvl3rA0dov7v4ymQ629cDOlMq1IXJlp9fDeV9k07PjGY42zm6a0
-         /M7xMmpWHHhci+8jNgpxxFdbKiP8607OrdkHGG4QDmLbZEJbCgU+nS+e07+YCaE6GWl0
-         nEwQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=WsaYFeAkte2NretrOo8yB7eLtn2MeRH7ZtBbeHqK9ss=;
+        b=mRigY60/acd7r9AbKb68l4BZVAfI6iTkq9tIoOCP/NzynKBOPNFtBnMgl88G3vKpv9
+         4nbLjfEHxDEUn+KlYQfPXsu/23xyYA8DfzDkwoT0ssJWXao7V6c1pvw7hol3oKDUdNEQ
+         lJLMOh2e7VXr5Tvep4FUu9ywmFnwGShlGQ7RybJqG+Ey6Ff1b7AqseT0+MqEtDudQHTo
+         HediKQtaQUxtLainWjPbEz7dUfZPht5bp8BB3FRsUN6cgUer1mD35+igZNtL+iZLlbAC
+         DEGVfj5bYxoghKLBjDbg0HMmJKas/B+ZMu+cPtjgLzWgZaQVrqVHIycJstWAUJT4Vd9z
+         6V8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=XoRcSwd9u1dvFquimROqhIpVJNTmoeWa7AHYkdDfXy8=;
-        b=m5acmdQpd2+OeCb9ZvbmlhRiOsc5T8Db96sIZjBMQL7A4GE+DkoyFIqUessFHVZvk3
-         bED7GZs+ptLT7suqQksOZTi5AOh7fmaArjGat+Z5iK2F95kUNGK4gNnAeWSd4NlVk9B8
-         WpuOJpPPWGKD1dJ1SFG55nYPubqZdtOIlk/ULax8AeSClcAB8I0qCDI9+7sGBOVn4Y/y
-         7jgXi92tEBseKL9+/A60zLN7DUfDL9+/8FfceNfFdzKBMTjgpSGwzf9xJJnWj0qZ/Lvj
-         zeboQSmc32ZzbuzyC75AVU3YADqCq/H+1OL6BkLFsuVcRPQ+JjcKAhOGXn/684bRQER7
-         UPJw==
-X-Gm-Message-State: APjAAAW7/YdGpi23CQpbdAo+xzOx62O9RirxcC12h/iMdvi/w2Vgv0fH
-        ozUX2a3rKH8Ymfp40PTGQg5yKICm/9AEreBIbZ01cw==
-X-Google-Smtp-Source: APXvYqxDQSUlQ52MVbQ8uykZaNN2BmBN9SLuEeFvIjqAZXBe0MUJdoP4ZeBSj8C5v6TeF0g0L/+zkj4eEbFWcP6TgbI=
-X-Received: by 2002:a05:6830:144b:: with SMTP id w11mr29690192otp.185.1566441504963;
- Wed, 21 Aug 2019 19:38:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <1565841817-25982-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1565841817-25982-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 22 Aug 2019 10:37:51 +0800
-Message-ID: <CANRm+Cy1kUz_pMGGhvBYmk4EZ07nk5ocBVqigUKoU8-W=tM0RA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: LAPIC: Periodically revaluate to get conservative lapic_timer_advance_ns
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=WsaYFeAkte2NretrOo8yB7eLtn2MeRH7ZtBbeHqK9ss=;
+        b=KXW9d8SJejRgTsTIrJZGHVIdm5bed49HCRmXeJwYn8D2rkgAZMlR+wkdGNWx2E8Y57
+         sHDirt0El6N+kJPSsZj+vq+laPt9mMJYfYGQL0e5UH974p5jTn1jdysxb5V49ky1UpU/
+         bHNR2vMMV4ORr0Zxdb436a9GX3e32miYs+nTpALv/B0u6u1/wdExRXvEwjNaL+X5HQZV
+         IhhAACheuMLsbiMf9rSGvsKqKNSmVar5kgXESzoPsUGCiWCsrUMR5VsUNrP1ovjSXgSh
+         Yn8rS5ysRUJ9JxYrgwF12lT6j9tjjASgl0WzWHLPP3B02gU64486erDM8ocsXcO9kFD9
+         f3Sw==
+X-Gm-Message-State: APjAAAUtgtQL3gcgK7Bo6iDiq+BJeZPq6FmRGMroQHAOlj90bmH2TgFb
+        zCvC7YDYjkehtIh/aecwUlw=
+X-Google-Smtp-Source: APXvYqxpplXAscH90uc7IVjMnTI5K8IsuLoHO6ctq9wYYw2C2y4eh3XV0YiP0nw2niEWn1ZjB0odjw==
+X-Received: by 2002:a1c:d108:: with SMTP id i8mr3609222wmg.28.1566444924948;
+        Wed, 21 Aug 2019 20:35:24 -0700 (PDT)
+Received: from localhost ([165.22.121.176])
+        by smtp.gmail.com with ESMTPSA id o11sm17971037wrw.19.2019.08.21.20.35.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Aug 2019 20:35:24 -0700 (PDT)
+From:   hexin <hexin.op@gmail.com>
+X-Google-Original-From: hexin <hexin15@baidu.com>
+To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     hexin <hexin15@baidu.com>, Liu Qi <liuqi16@baidu.com>,
+        Zhang Yu <zhangyu31@baidu.com>
+Subject: [PATCH v3] vfio_pci: Restore original state on release
+Date:   Thu, 22 Aug 2019 11:35:19 +0800
+Message-Id: <1566444919-3331-1-git-send-email-hexin15@baidu.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ping,
-On Thu, 15 Aug 2019 at 12:03, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> Even if for realtime CPUs, cache line bounces, frequency scaling, presenc=
-e
-> of higher-priority RT tasks, etc can still cause different response. Thes=
-e
-> interferences should be considered and periodically revaluate whether
-> or not the lapic_timer_advance_ns value is the best, do nothing if it is,
-> otherwise recaluate again. Set lapic_timer_advance_ns to the minimal
-> conservative value from all the estimated values.
->
-> Testing on Skylake server, cat vcpu*/lapic_timer_advance_ns, before patch=
-:
-> 1628
-> 4161
-> 4321
-> 3236
-> ...
->
-> Testing on Skylake server, cat vcpu*/lapic_timer_advance_ns, after patch:
-> 1553
-> 1499
-> 1509
-> 1489
-> ...
->
-> Testing on Haswell desktop, cat vcpu*/lapic_timer_advance_ns, before patc=
-h:
-> 4617
-> 3641
-> 4102
-> 4577
-> ...
-> Testing on Haswell desktop, cat vcpu*/lapic_timer_advance_ns, after patch=
-:
-> 2775
-> 2892
-> 2764
-> 2775
-> ...
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 34 ++++++++++++++++++++++++++++------
->  arch/x86/kvm/lapic.h |  2 ++
->  2 files changed, 30 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index df5cd07..8487d9c 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -69,6 +69,7 @@
->  #define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
->  /* step-by-step approximation to mitigate fluctuation */
->  #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-> +#define LAPIC_TIMER_ADVANCE_RECALC_PERIOD (600 * HZ)
->
->  static inline int apic_test_vector(int vec, void *bitmap)
->  {
-> @@ -1480,10 +1481,21 @@ static inline void __wait_lapic_expire(struct kvm=
-_vcpu *vcpu, u64 guest_cycles)
->  static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
->                                               s64 advance_expire_delta)
->  {
-> -       struct kvm_lapic *apic =3D vcpu->arch.apic;
-> -       u32 timer_advance_ns =3D apic->lapic_timer.timer_advance_ns;
-> +       struct kvm_timer *ktimer =3D &vcpu->arch.apic->lapic_timer;
-> +       u32 timer_advance_ns =3D ktimer->timer_advance_ns;
->         u64 ns;
->
-> +       /* periodic revaluate */
-> +       if (unlikely(ktimer->timer_advance_adjust_done)) {
-> +               ktimer->recalc_timer_advance_ns =3D jiffies +
-> +                       LAPIC_TIMER_ADVANCE_RECALC_PERIOD;
-> +               if (abs(advance_expire_delta) > LAPIC_TIMER_ADVANCE_ADJUS=
-T_DONE) {
-> +                       timer_advance_ns =3D LAPIC_TIMER_ADVANCE_ADJUST_I=
-NIT;
-> +                       ktimer->timer_advance_adjust_done =3D false;
-> +               } else
-> +                       return;
-> +       }
-> +
->         /* too early */
->         if (advance_expire_delta < 0) {
->                 ns =3D -advance_expire_delta * 1000000ULL;
-> @@ -1499,12 +1511,18 @@ static inline void adjust_lapic_timer_advance(str=
-uct kvm_vcpu *vcpu,
->         }
->
->         if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
-> -               apic->lapic_timer.timer_advance_adjust_done =3D true;
-> +               ktimer->timer_advance_adjust_done =3D true;
->         if (unlikely(timer_advance_ns > 5000)) {
->                 timer_advance_ns =3D LAPIC_TIMER_ADVANCE_ADJUST_INIT;
-> -               apic->lapic_timer.timer_advance_adjust_done =3D false;
-> +               ktimer->timer_advance_adjust_done =3D false;
-> +       }
-> +       ktimer->timer_advance_ns =3D timer_advance_ns;
-> +
-> +       if (ktimer->timer_advance_adjust_done) {
-> +               if (ktimer->min_timer_advance_ns > timer_advance_ns)
-> +                       ktimer->min_timer_advance_ns =3D timer_advance_ns=
-;
-> +               ktimer->timer_advance_ns =3D ktimer->min_timer_advance_ns=
-;
->         }
-> -       apic->lapic_timer.timer_advance_ns =3D timer_advance_ns;
->  }
->
->  static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> @@ -1523,7 +1541,8 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu=
- *vcpu)
->         if (guest_tsc < tsc_deadline)
->                 __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
->
-> -       if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-> +       if (unlikely(!apic->lapic_timer.timer_advance_adjust_done) ||
-> +               time_before(apic->lapic_timer.recalc_timer_advance_ns, ji=
-ffies))
->                 adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advanc=
-e_expire_delta);
->  }
->
-> @@ -2301,9 +2320,12 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int ti=
-mer_advance_ns)
->         if (timer_advance_ns =3D=3D -1) {
->                 apic->lapic_timer.timer_advance_ns =3D LAPIC_TIMER_ADVANC=
-E_ADJUST_INIT;
->                 apic->lapic_timer.timer_advance_adjust_done =3D false;
-> +               apic->lapic_timer.recalc_timer_advance_ns =3D jiffies;
-> +               apic->lapic_timer.min_timer_advance_ns =3D UINT_MAX;
->         } else {
->                 apic->lapic_timer.timer_advance_ns =3D timer_advance_ns;
->                 apic->lapic_timer.timer_advance_adjust_done =3D true;
-> +               apic->lapic_timer.recalc_timer_advance_ns =3D MAX_JIFFY_O=
-FFSET;
->         }
->
->
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 50053d2..56a05eb 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -31,6 +31,8 @@ struct kvm_timer {
->         u32 timer_mode_mask;
->         u64 tscdeadline;
->         u64 expired_tscdeadline;
-> +       unsigned long recalc_timer_advance_ns;
-> +       u32 min_timer_advance_ns;
->         u32 timer_advance_ns;
->         s64 advance_expire_delta;
->         atomic_t pending;                       /* accumulated triggered =
-timers */
-> --
-> 2.7.4
->
+vfio_pci_enable() saves the device's initial configuration information
+with the intent that it is restored in vfio_pci_disable().  However,
+the commit referenced in Fixes: below replaced the call to
+__pci_reset_function_locked(), which is not wrapped in a state save
+and restore, with pci_try_reset_function(), which overwrites the
+restored device state with the current state before applying it to the
+device.  Reinstate use of __pci_reset_function_locked() to return to
+the desired behavior.
+
+Fixes: 890ed578df82 ("vfio-pci: Use pci "try" reset interface")
+Signed-off-by: hexin <hexin15@baidu.com>
+Signed-off-by: Liu Qi <liuqi16@baidu.com>
+Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+---
+v2->v3:
+- change commit log 
+v1->v2:
+- add fixes tag
+- add comment to warn 
+
+[1] https://lore.kernel.org/linux-pci/1565926427-21675-1-git-send-email-hexin15@baidu.com
+[2] https://lore.kernel.org/linux-pci/1566042663-16694-1-git-send-email-hexin15@baidu.com
+
+ drivers/vfio/pci/vfio_pci.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 703948c..0220616 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -438,11 +438,20 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+ 	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
+ 
+ 	/*
+-	 * Try to reset the device.  The success of this is dependent on
+-	 * being able to lock the device, which is not always possible.
++	 * Try to get the locks ourselves to prevent a deadlock. The
++	 * success of this is dependent on being able to lock the device,
++	 * which is not always possible.
++	 * We can not use the "try" reset interface here, which will
++	 * overwrite the previously restored configuration information.
+ 	 */
+-	if (vdev->reset_works && !pci_try_reset_function(pdev))
+-		vdev->needs_reset = false;
++	if (vdev->reset_works && pci_cfg_access_trylock(pdev)) {
++		if (device_trylock(&pdev->dev)) {
++			if (!__pci_reset_function_locked(pdev))
++				vdev->needs_reset = false;
++			device_unlock(&pdev->dev);
++		}
++		pci_cfg_access_unlock(pdev);
++	}
+ 
+ 	pci_restore_state(pdev);
+ out:
+-- 
+1.8.3.1
+
