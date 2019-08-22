@@ -2,172 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE50C991BE
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 13:11:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4840F991C8
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 13:13:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388084AbfHVLLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 07:11:19 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23030 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388071AbfHVLLT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Aug 2019 07:11:19 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7MB8LmL125110
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 07:11:17 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2uhqy351nn-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 07:11:17 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 22 Aug 2019 12:11:15 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 22 Aug 2019 12:11:11 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7MBAo9K39911880
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Aug 2019 11:10:50 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B593A11C052;
-        Thu, 22 Aug 2019 11:11:10 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ED95D11C05C;
-        Thu, 22 Aug 2019 11:11:09 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.131])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 22 Aug 2019 11:11:09 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH] s390x: Add diag308 subcode 0 testing
-Date:   Thu, 22 Aug 2019 13:11:00 +0200
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20190821104736.1470-1-frankja@linux.ibm.com>
-References: <20190821104736.1470-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19082211-0016-0000-0000-000002A174B7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082211-0017-0000-0000-00003301AD6B
-Message-Id: <20190822111100.4444-1-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-22_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908220120
+        id S2388153AbfHVLL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 07:11:59 -0400
+Received: from foss.arm.com ([217.140.110.172]:44044 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728594AbfHVLL7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 07:11:59 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47D2A344;
+        Thu, 22 Aug 2019 04:11:58 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4DA7D3F246;
+        Thu, 22 Aug 2019 04:11:56 -0700 (PDT)
+Subject: Re: [PATCH v3 07/10] KVM: arm64: Provide a PV_TIME device to user
+ space
+To:     Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Russell King <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20190821153656.33429-1-steven.price@arm.com>
+ <20190821153656.33429-8-steven.price@arm.com>
+ <20190822115722.00005aa7@huawei.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <87bc2a01-8cf5-5161-45f8-00384775cf3a@arm.com>
+Date:   Thu, 22 Aug 2019 12:11:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190822115722.00005aa7@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-By adding a load reset routine to cstart.S we can also test the clear
-reset done by subcode 0, as we now can restore our registers again.
+On 22/08/2019 11:57, Jonathan Cameron wrote:
+> On Wed, 21 Aug 2019 16:36:53 +0100
+> Steven Price <steven.price@arm.com> wrote:
+> 
+>> Allow user space to inform the KVM host where in the physical memory
+>> map the paravirtualized time structures should be located.
+>>
+>> A device is created which provides the base address of an array of
+>> Stolen Time (ST) structures, one for each VCPU. There must be (64 *
+>> total number of VCPUs) bytes of memory available at this location.
+>>
+>> The address is given in terms of the physical address visible to
+>> the guest and must be page aligned. The guest will discover the address
+>> via a hypercall.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+> 
+> Hi Steven,
+> 
+> One general question inline.  I'm not particularly familiar with this area
+> of the kernel, so maybe I'm missing something obvious, but having
+> .destroy free the kvm_device which wasn't created in .create seems
+> 'unusual'. 
+> 
+> Otherwise, FWIW looks good to me.
+> 
+> Jonathan
+> 
+[...]
+>> +static void kvm_arm_pvtime_destroy(struct kvm_device *dev)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +
+>> +	pvtime->st_base = GPA_INVALID;
+>> +	kfree(dev);
+> 
+> Nothing to do with your patch as such... All users do the same.
+> 
+> This seems miss balanced. Why do we need to free the device by hand
+> when we didn't create it in the create function?  I appreciate
+> the comments say this is needed, but as far as I can see every
+> single callback does kfree(dev) at the end which seems an
+> odd thing to do.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
-I managed to extract this from another bigger test, so let's add it to the bunch.
-I'd be very happy about assembly review :-)
----
- s390x/cstart64.S | 27 +++++++++++++++++++++++++++
- s390x/diag308.c  | 31 ++++++++++---------------------
- 2 files changed, 37 insertions(+), 21 deletions(-)
+Yes I think this is odd too - indeed when I initially wrote this I
+missed off the kfree() call and had to track down the memory leak.
 
-diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-index dedfe80..47045e1 100644
---- a/s390x/cstart64.S
-+++ b/s390x/cstart64.S
-@@ -145,6 +145,33 @@ memsetxc:
- 	.endm
- 
- .section .text
-+/*
-+ * load_reset calling convention:
-+ * %r2 subcode (0 or 1)
-+ */
-+.globl load_reset
-+load_reset:
-+	SAVE_REGS
-+	/* Save the first PSW word to the IPL PSW */
-+	epsw	%r0, %r1
-+	st	%r0, 0
-+	/* Store the address and the bit for 31 bit addressing */
-+	larl    %r0, 0f
-+	oilh    %r0, 0x8000
-+	st      %r0, 0x4
-+	/* Do the reset */
-+	diag    %r0,%r2,0x308
-+	/* Failure path */
-+	xgr	%r2, %r2
-+	br	%r14
-+	/* Success path */
-+	/* We lost cr0 due to the reset */
-+0:	larl	%r1, initial_cr0
-+	lctlg	%c0, %c0, 0(%r1)
-+	RESTORE_REGS
-+	lhi	%r2, 1
-+	br	%r14
-+
- pgm_int:
- 	SAVE_REGS
- 	brasl	%r14, handle_pgm_int
-diff --git a/s390x/diag308.c b/s390x/diag308.c
-index f085b1a..baf9fd3 100644
---- a/s390x/diag308.c
-+++ b/s390x/diag308.c
-@@ -21,32 +21,20 @@ static void test_priv(void)
- 	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
- }
- 
-+
- /*
-- * Check that diag308 with subcode 1 loads the PSW at address 0, i.e.
-+ * Check that diag308 with subcode 0 and 1 loads the PSW at address 0, i.e.
-  * that we can put a pointer into address 4 which then gets executed.
-  */
-+extern int load_reset(u64);
-+static void test_subcode0(void)
-+{
-+	report("load modified clear done", load_reset(0));
-+}
-+
- static void test_subcode1(void)
- {
--	uint64_t saved_psw = *(uint64_t *)0;
--	long subcode = 1;
--	long ret, tmp;
--
--	asm volatile (
--		"	epsw	%0,%1\n"
--		"	st	%0,0\n"
--		"	larl	%0,0f\n"
--		"	oilh	%0,0x8000\n"
--		"	st	%0,4\n"
--		"	diag	0,%2,0x308\n"
--		"	lghi	%0,0\n"
--		"	j	1f\n"
--		"0:	lghi	%0,1\n"
--		"1:"
--		: "=&d"(ret), "=&d"(tmp) : "d"(subcode) : "memory");
--
--	*(uint64_t *)0 = saved_psw;
--
--	report("load normal reset done", ret == 1);
-+	report("load normal reset done", load_reset(1));
- }
- 
- /* Expect a specification exception when using an uneven register */
-@@ -107,6 +95,7 @@ static struct {
- 	void (*func)(void);
- } tests[] = {
- 	{ "privileged", test_priv },
-+	{ "subcode 0", test_subcode0 },
- 	{ "subcode 1", test_subcode1 },
- 	{ "subcode 5", test_subcode5 },
- 	{ "subcode 6", test_subcode6 },
--- 
-2.17.0
+When I looked into potentially tiding this up I found some other
+oddities, e.g. "kvm-xive" (arch/powerpc/kvm/book3s_xive.c) doesn't have
+a destroy callback. But I can't see anything in the common code which
+deals with that case. So I decided to just "go with the flow" at the
+moment, since I don't understand how some of these existing devices work
+(perhaps they are already broken?).
+
+Steve
+
+>> +}
+>> +
+>> +static int kvm_arm_pvtime_set_attr(struct kvm_device *dev,
+>> +				   struct kvm_device_attr *attr)
+>> +{
+>> +	struct kvm *kvm = dev->kvm;
+>> +	struct kvm_arch_pvtime *pvtime = &kvm->arch.pvtime;
+>> +	u64 __user *user = (u64 __user *)attr->addr;
+>> +	struct kvm_dev_arm_st_region region;
+>> +
+>> +	switch (attr->group) {
+>> +	case KVM_DEV_ARM_PV_TIME_REGION:
+>> +		if (copy_from_user(&region, user, sizeof(region)))
+>> +			return -EFAULT;
+>> +		if (region.gpa & ~PAGE_MASK)
+>> +			return -EINVAL;
+>> +		if (region.size & ~PAGE_MASK)
+>> +			return -EINVAL;
+>> +		switch (attr->attr) {
+>> +		case KVM_DEV_ARM_PV_TIME_ST:
+>> +			if (pvtime->st_base != GPA_INVALID)
+>> +				return -EEXIST;
+>> +			pvtime->st_base = region.gpa;
+>> +			pvtime->st_size = region.size;
+>> +			return 0;
+>> +		}
+>> +		break;
+>> +	}
+>> +	return -ENXIO;
+>> +}
+>> +
+>> +static int kvm_arm_pvtime_get_attr(struct kvm_device *dev,
+>> +				   struct kvm_device_attr *attr)
+>> +{
+>> +	struct kvm_arch_pvtime *pvtime = &dev->kvm->arch.pvtime;
+>> +	u64 __user *user = (u64 __user *)attr->addr;
+>> +	struct kvm_dev_arm_st_region region;
+>> +
+>> +	switch (attr->group) {
+>> +	case KVM_DEV_ARM_PV_TIME_REGION:
+>> +		switch (attr->attr) {
+>> +		case KVM_DEV_ARM_PV_TIME_ST:
+>> +			region.gpa = pvtime->st_base;
+>> +			region.size = pvtime->st_size;
+>> +			if (copy_to_user(user, &region, sizeof(region)))
+>> +				return -EFAULT;
+>> +			return 0;
+>> +		}
+>> +		break;
+>> +	}
+>> +	return -ENXIO;
+>> +}
+>> +
+>> +static int kvm_arm_pvtime_has_attr(struct kvm_device *dev,
+>> +				   struct kvm_device_attr *attr)
+>> +{
+>> +	switch (attr->group) {
+>> +	case KVM_DEV_ARM_PV_TIME_REGION:
+>> +		switch (attr->attr) {
+>> +		case KVM_DEV_ARM_PV_TIME_ST:
+>> +			return 0;
+>> +		}
+>> +		break;
+>> +	}
+>> +	return -ENXIO;
+>> +}
+>> +
+>> +static const struct kvm_device_ops pvtime_ops = {
+>> +	"Arm PV time",
+>> +	.create = kvm_arm_pvtime_create,
+>> +	.destroy = kvm_arm_pvtime_destroy,
+>> +	.set_attr = kvm_arm_pvtime_set_attr,
+>> +	.get_attr = kvm_arm_pvtime_get_attr,
+>> +	.has_attr = kvm_arm_pvtime_has_attr
+>> +};
+>> +
+>> +void kvm_pvtime_init(void)
+>> +{
+>> +	kvm_register_device_ops(&pvtime_ops, KVM_DEV_TYPE_ARM_PV_TIME);
+>> +}
+> 
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
 
