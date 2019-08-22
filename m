@@ -2,243 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 468CA99327
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:20:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9FAA9932F
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:21:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731398AbfHVMTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 08:19:46 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33587 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730896AbfHVMTk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 08:19:40 -0400
-Received: by mail-wr1-f67.google.com with SMTP id u16so5238535wrr.0
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 05:19:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=23esRf+qutJ/4Zjmjr2DsaAEcc0FSRnxzzaj4f2NFxA=;
-        b=hJut2qKEkjWlJMyeu6kEMusHO5uh0ABejYZzWvr2BXiCgsjRFTUrTFacrJYZcExTLV
-         sOvP/iIp+Vr13p3aJDJBRcvSp0MpCUybvRA6ZdEAmNgp0ZK32Ob9xip9D5MdXqLkr1+x
-         9rHe4mK9NNQrh3kYKR2u1St3mWeUnR7NmXYMtGcWhAF3MFJUghzrHCkz9qJNhkxPfl7y
-         3V0ooz+UKYBIBgvPpPtUWYa6JdxpGEourKYm5Bn0QFO3CMRpDxTqMz46zDnSOGi5vbqd
-         xCVBlQLw3qHQ5EFKGf8cKxWSTPzyxxUxV4CZmOoSyOwmUusjTXM9aSmkAPWs/EqCkLt4
-         8tiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=23esRf+qutJ/4Zjmjr2DsaAEcc0FSRnxzzaj4f2NFxA=;
-        b=p3iJxarKjoXfnoaz7jFez+0xWqHnxH64AmziPyuVUWexnHVG04H6zGjeGZFV65+bPJ
-         1rEtLvjIYRLVyQK/PmgfIVgUnBgEuSwXvuWt0lNqeHGfMd6Yres0Qnzf1hDWLvZ9Bk6B
-         mDrDsWIMD2neXRHiAcwqsPnK04B+DHX5bHvNb8mPx/hht7P4Yfh4a4xYHQbC7z+/X3AJ
-         hWi+pvUB/1CKYaS31OEONmMbqpE99C25M/odJCme6Bx4bN7SZShzJ0NWHHS6/13Jaodh
-         Ah7ExJSzutXPdY2dqX99Fv7UWxb5CGM+VAg5XOJBaUd4HMhW50c+KmoG+iHRCfSSDjSd
-         GlWw==
-X-Gm-Message-State: APjAAAXet00DIZUNvHP65LxWWa/NXn8dPM2B3ARTtymuCfDd8KB5mF9Q
-        i8JQq9yMdmP5OmPlFIpI6AO+Dg==
-X-Google-Smtp-Source: APXvYqz/DpUn+PnTGTXshmgqhmY60Kw+P7T4S7qlIEEW4/LuqC77g22f4ieCvJdEAJh0fO42JfSnRw==
-X-Received: by 2002:adf:e708:: with SMTP id c8mr47467734wrm.25.1566476378070;
-        Thu, 22 Aug 2019 05:19:38 -0700 (PDT)
-Received: from localhost (jirka.pirko.cz. [84.16.102.26])
-        by smtp.gmail.com with ESMTPSA id l14sm38643774wrn.42.2019.08.22.05.19.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2019 05:19:37 -0700 (PDT)
-Date:   Thu, 22 Aug 2019 14:19:36 +0200
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        cjia <cjia@nvidia.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
-Message-ID: <20190822121936.GC2276@nanopsycho.orion>
-References: <20190820222051.7aeafb69@x1.home>
- <AM0PR05MB48664CDF05C3D02F9441440DD1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190820225722.237a57d2@x1.home>
- <AM0PR05MB4866AE8FC4AA3CC24B08B326D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190820232622.164962d3@x1.home>
- <AM0PR05MB4866437FAA63C447CACCD7E5D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190822092903.GA2276@nanopsycho.orion>
- <AM0PR05MB4866A20F831A5D42E6C79EFED1A50@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190822095823.GB2276@nanopsycho.orion>
- <AM0PR05MB4866144FD76C302D04DA04B9D1A50@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        id S1731418AbfHVMV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 08:21:26 -0400
+Received: from foss.arm.com ([217.140.110.172]:45030 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731132AbfHVMV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 08:21:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B1D7C337;
+        Thu, 22 Aug 2019 05:21:25 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E78B13F706;
+        Thu, 22 Aug 2019 05:21:24 -0700 (PDT)
+Subject: Re: [PATCH v2] arm64: KVM: Only skip MMIO insn once
+To:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     mark.rutland@arm.com
+References: <20190822110305.18035-1-drjones@redhat.com>
+From:   Marc Zyngier <maz@kernel.org>
+Organization: Approximate
+Message-ID: <af0737b1-ffe8-1ace-5aab-f08331b6d940@kernel.org>
+Date:   Thu, 22 Aug 2019 13:21:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM0PR05MB4866144FD76C302D04DA04B9D1A50@AM0PR05MB4866.eurprd05.prod.outlook.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190822110305.18035-1-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thu, Aug 22, 2019 at 12:04:02PM CEST, parav@mellanox.com wrote:
->
->
->> -----Original Message-----
->> From: Jiri Pirko <jiri@resnulli.us>
->> Sent: Thursday, August 22, 2019 3:28 PM
->> To: Parav Pandit <parav@mellanox.com>
->> Cc: Alex Williamson <alex.williamson@redhat.com>; Jiri Pirko
->> <jiri@mellanox.com>; David S . Miller <davem@davemloft.net>; Kirti
->> Wankhede <kwankhede@nvidia.com>; Cornelia Huck <cohuck@redhat.com>;
->> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; cjia <cjia@nvidia.com>;
->> netdev@vger.kernel.org
->> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
->> 
->> Thu, Aug 22, 2019 at 11:42:13AM CEST, parav@mellanox.com wrote:
->> >
->> >
->> >> -----Original Message-----
->> >> From: Jiri Pirko <jiri@resnulli.us>
->> >> Sent: Thursday, August 22, 2019 2:59 PM
->> >> To: Parav Pandit <parav@mellanox.com>
->> >> Cc: Alex Williamson <alex.williamson@redhat.com>; Jiri Pirko
->> >> <jiri@mellanox.com>; David S . Miller <davem@davemloft.net>; Kirti
->> >> Wankhede <kwankhede@nvidia.com>; Cornelia Huck
->> <cohuck@redhat.com>;
->> >> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; cjia
->> >> <cjia@nvidia.com>; netdev@vger.kernel.org
->> >> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
->> >>
->> >> Wed, Aug 21, 2019 at 08:23:17AM CEST, parav@mellanox.com wrote:
->> >> >
->> >> >
->> >> >> -----Original Message-----
->> >> >> From: Alex Williamson <alex.williamson@redhat.com>
->> >> >> Sent: Wednesday, August 21, 2019 10:56 AM
->> >> >> To: Parav Pandit <parav@mellanox.com>
->> >> >> Cc: Jiri Pirko <jiri@mellanox.com>; David S . Miller
->> >> >> <davem@davemloft.net>; Kirti Wankhede <kwankhede@nvidia.com>;
->> >> >> Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org;
->> >> >> linux-kernel@vger.kernel.org; cjia <cjia@nvidia.com>;
->> >> >> netdev@vger.kernel.org
->> >> >> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
->> >> >>
->> >> >> > > > > Just an example of the alias, not proposing how it's set.
->> >> >> > > > > In fact, proposing that the user does not set it,
->> >> >> > > > > mdev-core provides one
->> >> >> > > automatically.
->> >> >> > > > >
->> >> >> > > > > > > Since there seems to be some prefix overhead, as I ask
->> >> >> > > > > > > about above in how many characters we actually have to
->> >> >> > > > > > > work with in IFNAMESZ, maybe we start with 8
->> >> >> > > > > > > characters (matching your "index" namespace) and
->> >> >> > > > > > > expand as necessary for
->> >> disambiguation.
->> >> >> > > > > > > If we can eliminate overhead in IFNAMESZ, let's start with 12.
->> >> >> > > > > > > Thanks,
->> >> >> > > > > > >
->> >> >> > > > > > If user is going to choose the alias, why does it have
->> >> >> > > > > > to be limited to
->> >> >> sha1?
->> >> >> > > > > > Or you just told it as an example?
->> >> >> > > > > >
->> >> >> > > > > > It can be an alpha-numeric string.
->> >> >> > > > >
->> >> >> > > > > No, I'm proposing a different solution where mdev-core
->> >> >> > > > > creates an alias based on an abbreviated sha1.  The user
->> >> >> > > > > does not provide the
->> >> >> alias.
->> >> >> > > > >
->> >> >> > > > > > Instead of mdev imposing number of characters on the
->> >> >> > > > > > alias, it should be best
->> >> >> > > > > left to the user.
->> >> >> > > > > > Because in future if netdev improves on the naming
->> >> >> > > > > > scheme, mdev will be
->> >> >> > > > > limiting it, which is not right.
->> >> >> > > > > > So not restricting alias size seems right to me.
->> >> >> > > > > > User configuring mdev for networking devices in a given
->> >> >> > > > > > kernel knows what
->> >> >> > > > > user is doing.
->> >> >> > > > > > So user can choose alias name size as it finds suitable.
->> >> >> > > > >
->> >> >> > > > > That's not what I'm proposing, please read again.  Thanks,
->> >> >> > > >
->> >> >> > > > I understood your point. But mdev doesn't know how user is
->> >> >> > > > going to use
->> >> >> > > udev/systemd to name the netdev.
->> >> >> > > > So even if mdev chose to pick 12 characters, it could result in
->> collision.
->> >> >> > > > Hence the proposal to provide the alias by the user, as user
->> >> >> > > > know the best
->> >> >> > > policy for its use case in the environment its using.
->> >> >> > > > So 12 character sha1 method will still work by user.
->> >> >> > >
->> >> >> > > Haven't you already provided examples where certain drivers or
->> >> >> > > subsystems have unique netdev prefixes?  If mdev provides a
->> >> >> > > unique alias within the subsystem, couldn't we simply define a
->> >> >> > > netdev prefix for the mdev subsystem and avoid all other
->> >> >> > > collisions?  I'm not in favor of the user providing both a
->> >> >> > > uuid and an alias/instance.  Thanks,
->> >> >> > >
->> >> >> > For a given prefix, say ens2f0, can two UUID->sha1 first 9
->> >> >> > characters have
->> >> >> collision?
->> >> >>
->> >> >> I think it would be a mistake to waste so many chars on a prefix,
->> >> >> but
->> >> >> 9 characters of sha1 likely wouldn't have a collision before we
->> >> >> have 10s of thousands of devices.  Thanks,
->> >> >>
->> >> >> Alex
->> >> >
->> >> >Jiri, Dave,
->> >> >Are you ok with it for devlink/netdev part?
->> >> >Mdev core will create an alias from a UUID.
->> >> >
->> >> >This will be supplied during devlink port attr set such as,
->> >> >
->> >> >devlink_port_attrs_mdev_set(struct devlink_port *port, const char
->> >> >*mdev_alias);
->> >> >
->> >> >This alias is used to generate representor netdev's phys_port_name.
->> >> >This alias from the mdev device's sysfs will be used by the
->> >> >udev/systemd to
->> >> generate predicable netdev's name.
->> >> >Example: enm<mdev_alias_first_12_chars>
->> >>
->> >> What happens in unlikely case of 2 UUIDs collide?
->> >>
->> >Since users sees two devices with same phys_port_name, user should destroy
->> recently created mdev and recreate mdev with different UUID?
->> 
->> Driver should make sure phys port name wont collide, 
->So when mdev creation is initiated, mdev core calculates the alias and if there is any other mdev with same alias exist, it returns -EEXIST error before progressing further.
->This way user will get to know upfront in event of collision before the mdev device gets created.
->How about that?
+On 22/08/2019 12:03, Andrew Jones wrote:
+> If after an MMIO exit to userspace a VCPU is immediately run with an
+> immediate_exit request, such as when a signal is delivered or an MMIO
+> emulation completion is needed, then the VCPU completes the MMIO
+> emulation and immediately returns to userspace. As the exit_reason
+> does not get changed from KVM_EXIT_MMIO in these cases we have to
+> be careful not to complete the MMIO emulation again, when the VCPU is
+> eventually run again, because the emulation does an instruction skip
+> (and doing too many skips would be a waste of guest code :-) We need
+> to use additional VCPU state to track if the emulation is complete.
+> As luck would have it, we already have 'mmio_needed', which even
+> appears to be used in this way by other architectures already.
+> 
+> Fixes: 0d640732dbeb ("arm64: KVM: Skip MMIO insn after emulation")
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+> v2: move mmio_needed use closer to other mmio state use [maz]
+> 
+>  virt/kvm/arm/mmio.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-Sounds fine to me. Now the question is how many chars do we want to
-have.
+Applied with Mark's Ack.
 
->
->
->> in this case that it does
->> not provide 2 same attrs for 2 different ports.
->> Hmm, so the order of creation matters. That is not good.
->> 
->> >>
->> >> >I took Ethernet mdev as an example.
->> >> >New prefix 'm' stands for mediated device.
->> >> >Remaining 12 characters are first 12 chars of the mdev alias.
->> >>
->> >> Does this resolve the identification of devlink port representor?
->> >Not sure if I understood your question correctly, attemping to answer below.
->> >phys_port_name of devlink port is defined by the first 12 characters of mdev
->> alias.
->> >> I assume you want to use the same 12(or so) chars, don't you?
->> >Mdev's netdev will also use the same mdev alias from the sysfs to rename
->> netdev name from ethX to enm<mdev_alias>, where en=Etherenet, m=mdev.
->> >
->> >So yes, same 12 characters are use for mdev's netdev and mdev devlink port's
->> phys_port_name.
->> >
->> >Is that what are you asking?
->> 
->> Yes. Then you have 3 chars to handle the rest of the name (pci, pf)...
+Thanks,
+
+	M.
+-- 
+Jazz is not dead, it just smells funny...
