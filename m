@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EA62A995A3
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 15:58:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 440B1995AD
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 15:59:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731911AbfHVN4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 09:56:11 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42300 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726687AbfHVN4K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 09:56:10 -0400
-Received: by mail-wr1-f67.google.com with SMTP id b16so5510755wrq.9
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 06:56:07 -0700 (PDT)
+        id S1732067AbfHVN66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 09:58:58 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54245 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731614AbfHVN65 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 09:58:57 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 10so5747176wmp.3
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 06:58:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=uYYk+VSWs9B+t21aWspakKLUywF9Fl0vAMFkw3Q8uEw=;
-        b=MrTrr3IgiLWKpURbAsdC5kpxZUNMXR8sFUaMTKo0GgP8WEx5bhqaCr/gJIEFAtn75f
-         Q6D0+ODyrqGK5W55o+H44PXrBWmPj1+Izy+CN18yxghXnR/fSlNPGIGhSkb0hq4MvyRu
-         bICm+pYr+p1DlqOtHsP8EDhD8DYlRaj6CqasJpBz67oGk6eCQJmN/kEkJ3Nnp3YBmmBz
-         8yUrvxAiOZCLO1QCD3ggdnPwNTgcboPOeg6UfihyrLqKTdELkgahRXoUqVGBAZ2ovesW
-         mc4Z4EuODlyuwHMnFjsPkGkfkGR5iZxY2XOlPeF3hQWklaT91OOLxpdVdmNNk85cMCMw
-         4yLw==
+        bh=n2ZETo25ZbVRtndwNoCMa7+VCH83yBcVxID8DRYyuKs=;
+        b=SsLoyyE522ywIbe4SxLwD0VKyIDByZrtNPvNWvYLTA4kRAmAWxmfateXO/jFyWaiR7
+         N/itX9bTIxwE4cBf/pxAO9XfvTUPiTk87Kn7jX1/FfAeODsDvA9iBb+yDXkT6oT0Xy87
+         j6wFSjbJKNHrmL8a5RrFX3Avr2XRfpsUngPHa+6HmtmUmq/veGgUq7xtokdA6m06/Zwx
+         ZBDzRi+CKbpMKvw4mVcrjWZIFIig9wMQ5v0YyRwhyXQJj629DruxjxezhbWkStjt9bwb
+         HMJeASWbV8d8wFeuRFJZ7wflqATCIDDFU1GvyIBW4aPzKmMV5aPsafsEqaX9ypjHFtMg
+         OO0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=uYYk+VSWs9B+t21aWspakKLUywF9Fl0vAMFkw3Q8uEw=;
-        b=KqP37lG4sMcgTttMTxXQcUgMrmncq7y5vn2g9C/paSeLvo8Yi2s2h5Ebvjetunltoq
-         Pc252kMsGCdFdYnZfH/uvt/iBSYNDFavsyTUO4w4fEFAmvpZzSd3cpxsRSVFmLg797CE
-         3ReWDacBfLp54wZdQmzM/qn1cIzRc+9VBc6La/QogZGZFKPMEq+U+m2dpvRfds3+TBOU
-         F5PuWszoBplLb0Hf5tlQJLoSdwL/zaVtoYCAltfER+1vWK8ulTpIVbzQg1CPqcrkCQLY
-         Wo8B6GD8aGLVq0CJk4ileVzCvzeWUJKWW4YLWC2KkNrcJ4Tecq+v6+ulfpN8D3gw5N5K
-         hSVA==
-X-Gm-Message-State: APjAAAUJSLgPDKOtUjmzxkVqNve88MDcz2wou58yFOrtjuA2Brg32XU4
-        cckO0Bm+rPxbzgNTmkqRNc+GqCSY/PNxLH3iTl69TA==
-X-Google-Smtp-Source: APXvYqx/84zRL29uUqNeBCV+cfJeS+/Ld1vw57jcfIZYTMt2iOtHDEDLSp2wrHazVnRKAtCnBpaA/dyXQM+isSBaLZM=
-X-Received: by 2002:a05:6000:10cf:: with SMTP id b15mr4508377wrx.180.1566482166147;
- Thu, 22 Aug 2019 06:56:06 -0700 (PDT)
+        bh=n2ZETo25ZbVRtndwNoCMa7+VCH83yBcVxID8DRYyuKs=;
+        b=cuUW1vXrofQBhWAQGEVK3Kh4rFV+YzzGsTF2IAmFX27yllOStp59RNzYe6nLKom+pZ
+         FU8voAXLw4U881ydcxHyI16Osq38obXOspWuEFYo386Qz+NFLfkxTpSZ4HyyNjNCedUs
+         uC9VlLN+DpmvGOE38fUFQMEW+Blkj/y7NLdrFX2JI5pM4DyUVBqUog2OXg7oPcRkDBL4
+         ErGNXxMh1csnuAyue5VkFx0/v7COQGy7PXWKQLzkAkQsfWnO7hTlOnxcruFnr3baelOp
+         nAANfIV/yA7LPIXiZxJBJjHvKORCaGGgDCCjn+/lSp8U2ZKNbLCSb4nCyAxR/F0bJ9Rk
+         D5kw==
+X-Gm-Message-State: APjAAAXC14QLyXGsFROQBmp/i1YxTrdYXKcd+ar9igtEjUi6eAbQbVV5
+        TTz2WSoymTCBo0ZLMb4q8MpoDQMUG3z0vfsSORVh5Q==
+X-Google-Smtp-Source: APXvYqwFCRfHPFhmoCxdnEut9Pl3bieYvMC+ES1WiyQNBcXiQzFQbQv/xowoZF8XsFOFoHrZnrb0cwnjMzew4z2awXs=
+X-Received: by 2002:a1c:c909:: with SMTP id f9mr6765062wmb.52.1566482334676;
+ Thu, 22 Aug 2019 06:58:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-11-anup.patel@wdc.com>
- <917cea87-42c0-e50a-6508-d5b577c8b702@amazon.com> <CAAhSdy2QtZRKvs0Hr-mZuVsb7sVkweeW-RpvhObZR009UbA7KA@mail.gmail.com>
- <4fe83f28-3a55-e74c-0d40-1cd556015fea@amazon.com>
-In-Reply-To: <4fe83f28-3a55-e74c-0d40-1cd556015fea@amazon.com>
+References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-14-anup.patel@wdc.com>
+ <77b9ff3c-292f-ee17-ddbb-134c0666fde7@amazon.com> <CAAhSdy1h+m0gA2pro-XAb4qhe0Q+8knjW+8+6jaz3efOdKWskA@mail.gmail.com>
+ <a44f86ac-8902-0aa3-1eee-013ac97d667b@amazon.com>
+In-Reply-To: <a44f86ac-8902-0aa3-1eee-013ac97d667b@amazon.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 22 Aug 2019 19:25:54 +0530
-Message-ID: <CAAhSdy1DWVcJO0piYxCOcSGXw6Niwm_6=ki91UDbiRCdu-HRkQ@mail.gmail.com>
-Subject: Re: [PATCH v5 10/20] RISC-V: KVM: Handle MMIO exits for VCPU
+Date:   Thu, 22 Aug 2019 19:28:43 +0530
+Message-ID: <CAAhSdy20D=t5hbeWDi=1XmNAe5rwvNyjMth-WUwrVe+HcagVpg@mail.gmail.com>
+Subject: Re: [PATCH v5 13/20] RISC-V: KVM: Implement stage2 page table programming
 To:     Alexander Graf <graf@amazon.com>
 Cc:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
@@ -70,264 +70,182 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 6:55 PM Alexander Graf <graf@amazon.com> wrote:
+On Thu, Aug 22, 2019 at 6:57 PM Alexander Graf <graf@amazon.com> wrote:
 >
 >
 >
-> On 22.08.19 14:33, Anup Patel wrote:
-> > On Thu, Aug 22, 2019 at 5:44 PM Alexander Graf <graf@amazon.com> wrote:
+> On 22.08.19 14:38, Anup Patel wrote:
+> > On Thu, Aug 22, 2019 at 5:58 PM Alexander Graf <graf@amazon.com> wrote:
 > >>
-> >> On 22.08.19 10:44, Anup Patel wrote:
-> >>> We will get stage2 page faults whenever Guest/VM access SW emulated
-> >>> MMIO device or unmapped Guest RAM.
+> >> On 22.08.19 10:45, Anup Patel wrote:
+> >>> This patch implements all required functions for programming
+> >>> the stage2 page table for each Guest/VM.
 > >>>
-> >>> This patch implements MMIO read/write emulation by extracting MMIO
-> >>> details from the trapped load/store instruction and forwarding the
-> >>> MMIO read/write to user-space. The actual MMIO emulation will happen
-> >>> in user-space and KVM kernel module will only take care of register
-> >>> updates before resuming the trapped VCPU.
-> >>>
-> >>> The handling for stage2 page faults for unmapped Guest RAM will be
-> >>> implemeted by a separate patch later.
+> >>> At high-level, the flow of stage2 related functions is similar
+> >>> from KVM ARM/ARM64 implementation but the stage2 page table
+> >>> format is quite different for KVM RISC-V.
 > >>>
 > >>> Signed-off-by: Anup Patel <anup.patel@wdc.com>
 > >>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 > >>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 > >>> ---
-> >>>    arch/riscv/include/asm/kvm_host.h |  11 +
-> >>>    arch/riscv/kvm/mmu.c              |   7 +
-> >>>    arch/riscv/kvm/vcpu_exit.c        | 436 +++++++++++++++++++++++++++++-
-> >>>    3 files changed, 451 insertions(+), 3 deletions(-)
+> >>>    arch/riscv/include/asm/kvm_host.h     |  10 +
+> >>>    arch/riscv/include/asm/pgtable-bits.h |   1 +
+> >>>    arch/riscv/kvm/mmu.c                  | 637 +++++++++++++++++++++++++-
+> >>>    3 files changed, 638 insertions(+), 10 deletions(-)
 > >>>
 > >>> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> >>> index 18f1097f1d8d..4388bace6d70 100644
+> >>> index 3b09158f80f2..a37775c92586 100644
 > >>> --- a/arch/riscv/include/asm/kvm_host.h
 > >>> +++ b/arch/riscv/include/asm/kvm_host.h
-> >>> @@ -53,6 +53,12 @@ struct kvm_arch {
-> >>>        phys_addr_t pgd_phys;
+> >>> @@ -72,6 +72,13 @@ struct kvm_mmio_decode {
+> >>>        int shift;
 > >>>    };
 > >>>
-> >>> +struct kvm_mmio_decode {
-> >>> +     unsigned long insn;
-> >>> +     int len;
-> >>> +     int shift;
+> >>> +#define KVM_MMU_PAGE_CACHE_NR_OBJS   32
+> >>> +
+> >>> +struct kvm_mmu_page_cache {
+> >>> +     int nobjs;
+> >>> +     void *objects[KVM_MMU_PAGE_CACHE_NR_OBJS];
 > >>> +};
 > >>> +
 > >>>    struct kvm_cpu_context {
 > >>>        unsigned long zero;
 > >>>        unsigned long ra;
-> >>> @@ -141,6 +147,9 @@ struct kvm_vcpu_arch {
-> >>>        unsigned long irqs_pending;
-> >>>        unsigned long irqs_pending_mask;
+> >>> @@ -163,6 +170,9 @@ struct kvm_vcpu_arch {
+> >>>        /* MMIO instruction details */
+> >>>        struct kvm_mmio_decode mmio_decode;
 > >>>
-> >>> +     /* MMIO instruction details */
-> >>> +     struct kvm_mmio_decode mmio_decode;
+> >>> +     /* Cache pages needed to program page tables with spinlock held */
+> >>> +     struct kvm_mmu_page_cache mmu_page_cache;
 > >>> +
 > >>>        /* VCPU power-off state */
 > >>>        bool power_off;
 > >>>
-> >>> @@ -160,6 +169,8 @@ static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
-> >>>    int kvm_riscv_setup_vsip(void);
-> >>>    void kvm_riscv_cleanup_vsip(void);
+> >>> diff --git a/arch/riscv/include/asm/pgtable-bits.h b/arch/riscv/include/asm/pgtable-bits.h
+> >>> index bbaeb5d35842..be49d62fcc2b 100644
+> >>> --- a/arch/riscv/include/asm/pgtable-bits.h
+> >>> +++ b/arch/riscv/include/asm/pgtable-bits.h
+> >>> @@ -26,6 +26,7 @@
 > >>>
-> >>> +int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned long hva,
-> >>> +                      bool is_write);
-> >>>    void kvm_riscv_stage2_flush_cache(struct kvm_vcpu *vcpu);
-> >>>    int kvm_riscv_stage2_alloc_pgd(struct kvm *kvm);
-> >>>    void kvm_riscv_stage2_free_pgd(struct kvm *kvm);
+> >>>    #define _PAGE_SPECIAL   _PAGE_SOFT
+> >>>    #define _PAGE_TABLE     _PAGE_PRESENT
+> >>> +#define _PAGE_LEAF      (_PAGE_READ | _PAGE_WRITE | _PAGE_EXEC)
+> >>>
+> >>>    /*
+> >>>     * _PAGE_PROT_NONE is set on not-present pages (and ignored by the hardware) to
 > >>> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> >>> index 04dd089b86ff..2b965f9aac07 100644
+> >>> index 2b965f9aac07..9e95ab6769f6 100644
 > >>> --- a/arch/riscv/kvm/mmu.c
 > >>> +++ b/arch/riscv/kvm/mmu.c
-> >>> @@ -61,6 +61,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> >>>        return 0;
-> >>>    }
+> >>> @@ -18,6 +18,432 @@
+> >>>    #include <asm/page.h>
+> >>>    #include <asm/pgtable.h>
 > >>>
-> >>> +int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned long hva,
-> >>> +                      bool is_write)
+> >>> +#ifdef CONFIG_64BIT
+> >>> +#define stage2_have_pmd              true
+> >>> +#define stage2_gpa_size              ((phys_addr_t)(1ULL << 39))
+> >>> +#define stage2_cache_min_pages       2
+> >>> +#else
+> >>> +#define pmd_index(x)         0
+> >>> +#define pfn_pmd(x, y)                ({ pmd_t __x = { 0 }; __x; })
+> >>> +#define stage2_have_pmd              false
+> >>> +#define stage2_gpa_size              ((phys_addr_t)(1ULL << 32))
+> >>> +#define stage2_cache_min_pages       1
+> >>> +#endif
+> >>> +
+> >>> +static int stage2_cache_topup(struct kvm_mmu_page_cache *pcache,
+> >>> +                           int min, int max)
 > >>> +{
-> >>> +     /* TODO: */
+> >>> +     void *page;
+> >>> +
+> >>> +     BUG_ON(max > KVM_MMU_PAGE_CACHE_NR_OBJS);
+> >>> +     if (pcache->nobjs >= min)
+> >>> +             return 0;
+> >>> +     while (pcache->nobjs < max) {
+> >>> +             page = (void *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
+> >>> +             if (!page)
+> >>> +                     return -ENOMEM;
+> >>> +             pcache->objects[pcache->nobjs++] = page;
+> >>> +     }
+> >>> +
 > >>> +     return 0;
 > >>> +}
 > >>> +
-> >>>    void kvm_riscv_stage2_flush_cache(struct kvm_vcpu *vcpu)
-> >>>    {
-> >>>        /* TODO: */
-> >>> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> >>> index e4d7c8f0807a..efc06198c259 100644
-> >>> --- a/arch/riscv/kvm/vcpu_exit.c
-> >>> +++ b/arch/riscv/kvm/vcpu_exit.c
-> >>> @@ -6,9 +6,371 @@
-> >>>     *     Anup Patel <anup.patel@wdc.com>
-> >>>     */
-> >>>
-> >>> +#include <linux/bitops.h>
-> >>>    #include <linux/errno.h>
-> >>>    #include <linux/err.h>
-> >>>    #include <linux/kvm_host.h>
-> >>> +#include <asm/csr.h>
-> >>> +
-> >>> +#define INSN_MATCH_LB                0x3
-> >>> +#define INSN_MASK_LB         0x707f
-> >>> +#define INSN_MATCH_LH                0x1003
-> >>> +#define INSN_MASK_LH         0x707f
-> >>> +#define INSN_MATCH_LW                0x2003
-> >>> +#define INSN_MASK_LW         0x707f
-> >>> +#define INSN_MATCH_LD                0x3003
-> >>> +#define INSN_MASK_LD         0x707f
-> >>> +#define INSN_MATCH_LBU               0x4003
-> >>> +#define INSN_MASK_LBU                0x707f
-> >>> +#define INSN_MATCH_LHU               0x5003
-> >>> +#define INSN_MASK_LHU                0x707f
-> >>> +#define INSN_MATCH_LWU               0x6003
-> >>> +#define INSN_MASK_LWU                0x707f
-> >>> +#define INSN_MATCH_SB                0x23
-> >>> +#define INSN_MASK_SB         0x707f
-> >>> +#define INSN_MATCH_SH                0x1023
-> >>> +#define INSN_MASK_SH         0x707f
-> >>> +#define INSN_MATCH_SW                0x2023
-> >>> +#define INSN_MASK_SW         0x707f
-> >>> +#define INSN_MATCH_SD                0x3023
-> >>> +#define INSN_MASK_SD         0x707f
-> >>> +
-> >>> +#define INSN_MATCH_C_LD              0x6000
-> >>> +#define INSN_MASK_C_LD               0xe003
-> >>> +#define INSN_MATCH_C_SD              0xe000
-> >>> +#define INSN_MASK_C_SD               0xe003
-> >>> +#define INSN_MATCH_C_LW              0x4000
-> >>> +#define INSN_MASK_C_LW               0xe003
-> >>> +#define INSN_MATCH_C_SW              0xc000
-> >>> +#define INSN_MASK_C_SW               0xe003
-> >>> +#define INSN_MATCH_C_LDSP    0x6002
-> >>> +#define INSN_MASK_C_LDSP     0xe003
-> >>> +#define INSN_MATCH_C_SDSP    0xe002
-> >>> +#define INSN_MASK_C_SDSP     0xe003
-> >>> +#define INSN_MATCH_C_LWSP    0x4002
-> >>> +#define INSN_MASK_C_LWSP     0xe003
-> >>> +#define INSN_MATCH_C_SWSP    0xc002
-> >>> +#define INSN_MASK_C_SWSP     0xe003
-> >>> +
-> >>> +#define INSN_LEN(insn)               ((((insn) & 0x3) < 0x3) ? 2 : 4)
-> >>> +
-> >>> +#ifdef CONFIG_64BIT
-> >>> +#define LOG_REGBYTES         3
-> >>> +#else
-> >>> +#define LOG_REGBYTES         2
-> >>> +#endif
-> >>> +#define REGBYTES             (1 << LOG_REGBYTES)
-> >>> +
-> >>> +#define SH_RD                        7
-> >>> +#define SH_RS1                       15
-> >>> +#define SH_RS2                       20
-> >>> +#define SH_RS2C                      2
-> >>> +
-> >>> +#define RV_X(x, s, n)                (((x) >> (s)) & ((1 << (n)) - 1))
-> >>> +#define RVC_LW_IMM(x)                ((RV_X(x, 6, 1) << 2) | \
-> >>> +                              (RV_X(x, 10, 3) << 3) | \
-> >>> +                              (RV_X(x, 5, 1) << 6))
-> >>> +#define RVC_LD_IMM(x)                ((RV_X(x, 10, 3) << 3) | \
-> >>> +                              (RV_X(x, 5, 2) << 6))
-> >>> +#define RVC_LWSP_IMM(x)              ((RV_X(x, 4, 3) << 2) | \
-> >>> +                              (RV_X(x, 12, 1) << 5) | \
-> >>> +                              (RV_X(x, 2, 2) << 6))
-> >>> +#define RVC_LDSP_IMM(x)              ((RV_X(x, 5, 2) << 3) | \
-> >>> +                              (RV_X(x, 12, 1) << 5) | \
-> >>> +                              (RV_X(x, 2, 3) << 6))
-> >>> +#define RVC_SWSP_IMM(x)              ((RV_X(x, 9, 4) << 2) | \
-> >>> +                              (RV_X(x, 7, 2) << 6))
-> >>> +#define RVC_SDSP_IMM(x)              ((RV_X(x, 10, 3) << 3) | \
-> >>> +                              (RV_X(x, 7, 3) << 6))
-> >>> +#define RVC_RS1S(insn)               (8 + RV_X(insn, SH_RD, 3))
-> >>> +#define RVC_RS2S(insn)               (8 + RV_X(insn, SH_RS2C, 3))
-> >>> +#define RVC_RS2(insn)                RV_X(insn, SH_RS2C, 5)
-> >>> +
-> >>> +#define SHIFT_RIGHT(x, y)            \
-> >>> +     ((y) < 0 ? ((x) << -(y)) : ((x) >> (y)))
-> >>> +
-> >>> +#define REG_MASK                     \
-> >>> +     ((1 << (5 + LOG_REGBYTES)) - (1 << LOG_REGBYTES))
-> >>> +
-> >>> +#define REG_OFFSET(insn, pos)                \
-> >>> +     (SHIFT_RIGHT((insn), (pos) - LOG_REGBYTES) & REG_MASK)
-> >>> +
-> >>> +#define REG_PTR(insn, pos, regs)     \
-> >>> +     (ulong *)((ulong)(regs) + REG_OFFSET(insn, pos))
-> >>> +
-> >>> +#define GET_RM(insn)         (((insn) >> 12) & 7)
-> >>> +
-> >>> +#define GET_RS1(insn, regs)  (*REG_PTR(insn, SH_RS1, regs))
-> >>> +#define GET_RS2(insn, regs)  (*REG_PTR(insn, SH_RS2, regs))
-> >>> +#define GET_RS1S(insn, regs) (*REG_PTR(RVC_RS1S(insn), 0, regs))
-> >>> +#define GET_RS2S(insn, regs) (*REG_PTR(RVC_RS2S(insn), 0, regs))
-> >>> +#define GET_RS2C(insn, regs) (*REG_PTR(insn, SH_RS2C, regs))
-> >>> +#define GET_SP(regs)         (*REG_PTR(2, 0, regs))
-> >>> +#define SET_RD(insn, regs, val)      (*REG_PTR(insn, SH_RD, regs) = (val))
-> >>> +#define IMM_I(insn)          ((s32)(insn) >> 20)
-> >>> +#define IMM_S(insn)          (((s32)(insn) >> 25 << 5) | \
-> >>> +                              (s32)(((insn) >> 7) & 0x1f))
-> >>> +#define MASK_FUNCT3          0x7000
-> >>> +
-> >>> +#define STR(x)                       XSTR(x)
-> >>> +#define XSTR(x)                      #x
-> >>> +
-> >>> +/* TODO: Handle traps due to unpriv load and redirect it back to VS-mode */
-> >>> +static ulong get_insn(struct kvm_vcpu *vcpu)
+> >>> +static void stage2_cache_flush(struct kvm_mmu_page_cache *pcache)
 > >>> +{
-> >>> +     ulong __sepc = vcpu->arch.guest_context.sepc;
-> >>> +     ulong __hstatus, __sstatus, __vsstatus;
-> >>> +#ifdef CONFIG_RISCV_ISA_C
-> >>> +     ulong rvc_mask = 3, tmp;
-> >>> +#endif
-> >>> +     ulong flags, val;
+> >>> +     while (pcache && pcache->nobjs)
+> >>> +             free_page((unsigned long)pcache->objects[--pcache->nobjs]);
+> >>> +}
 > >>> +
-> >>> +     local_irq_save(flags);
+> >>> +static void *stage2_cache_alloc(struct kvm_mmu_page_cache *pcache)
+> >>> +{
+> >>> +     void *p;
 > >>> +
-> >>> +     __vsstatus = csr_read(CSR_VSSTATUS);
-> >>> +     __sstatus = csr_read(CSR_SSTATUS);
-> >>> +     __hstatus = csr_read(CSR_HSTATUS);
+> >>> +     if (!pcache)
+> >>> +             return NULL;
 > >>> +
-> >>> +     csr_write(CSR_VSSTATUS, __vsstatus | SR_MXR);
-> >>> +     csr_write(CSR_SSTATUS, vcpu->arch.guest_context.sstatus | SR_MXR);
-> >>> +     csr_write(CSR_HSTATUS, vcpu->arch.guest_context.hstatus | HSTATUS_SPRV);
+> >>> +     BUG_ON(!pcache->nobjs);
+> >>> +     p = pcache->objects[--pcache->nobjs];
+> >>> +
+> >>> +     return p;
+> >>> +}
+> >>> +
+> >>> +struct local_guest_tlb_info {
+> >>> +     struct kvm_vmid *vmid;
+> >>> +     gpa_t addr;
+> >>> +};
+> >>> +
+> >>> +static void local_guest_tlb_flush_vmid_gpa(void *info)
+> >>> +{
+> >>> +     struct local_guest_tlb_info *infop = info;
+> >>> +
+> >>> +     __kvm_riscv_hfence_gvma_vmid_gpa(READ_ONCE(infop->vmid->vmid_version),
+> >>> +                                      infop->addr);
+> >>> +}
+> >>> +
+> >>> +static void stage2_remote_tlb_flush(struct kvm *kvm, gpa_t addr)
+> >>> +{
+> >>> +     struct local_guest_tlb_info info;
+> >>> +     struct kvm_vmid *vmid = &kvm->arch.vmid;
+> >>> +
+> >>> +     /* TODO: This should be SBI call */
+> >>> +     info.vmid = vmid;
+> >>> +     info.addr = addr;
+> >>> +     preempt_disable();
+> >>> +     smp_call_function_many(cpu_all_mask, local_guest_tlb_flush_vmid_gpa,
+> >>> +                            &info, true);
 > >>
-> >> What happens when the insn load triggers a page fault, maybe because the
-> >> guest was malicious and did
+> >> This is all nice and dandy on the toy 4 core systems we have today, but
+> >> it will become a bottleneck further down the road.
 > >>
-> >>     1) Run on page 0x1000
-> >>     2) Remove map for 0x1000, do *not* flush TLB
-> >>     3) Trigger MMIO
+> >> How many VMIDs do you have? Could you just allocate a new one every time
+> >> you switch host CPUs? Then you know exactly which CPUs to flush by
+> >> looking at all your vcpu structs and a local field that tells you which
+> >> pCPU they're on at this moment.
 > >>
-> >> That would DOS the host here, as the host kernel would continue running
-> >> in guest address space, right?
+> >> Either way, it's nothing that should block inclusion. For today, we're fine.
 > >
-> > Yes, we can certainly fault while accessing Guest instruction. We will
-> > be fixing this issue in a followup series. We have mentioned this in cover
-> > letter as well.
->
-> I don't think the cover letter is the right place for such a comment.
-> Please definitely put it into the code as well, pointing out that this
-> is a known bug. Or even better yet: Fix it up properly :).
->
-> In fact, with a bug that dramatic, I'm not even sure we can safely
-> include the code. We're consciously allowing user space to DOS the kernel.
-
-There is already a TODO comment above get_insn() function.
-
->
+> > We are not happy about this either.
 > >
-> > BTW, RISC-V spec is going to further improve to provide easy
-> > access of faulting instruction to Hypervisor.
-> > (Refer, https://github.com/riscv/riscv-isa-manual/issues/431)
+> > Other two options, we have are:
+> > 1. Have SBI calls for remote HFENCEs
+> > 2. Propose RISC-V ISA extension for remote FENCEs
+> >
+> > Option1 is mostly extending SBI spec and implementing it in runtime
+> > firmware.
+> >
+> > Option2 is ideal solution but requires consensus among wider audience
+> > in RISC-V foundation.
+> >
+> > At this point, we are fine with a simple solution.
 >
-> Yes, we have similar extensions on other archs. Is this going to be an
-> optional addition or a mandatory bit of the hypervisor spec? If it's not
-> mandatory, we can not rely on it, so the current path has to be safe.
+> It's fine to explicitly IPI other CPUs to flush their TLBs. What is not
+> fine is to IPI *all* CPUs to flush their TLBs.
 
-Yes, it's going to be optional so we are certainly going to fix this issue
-here.
+Ahh, this should have been cpu_online_mask instead of cpu_all_mask
 
-This issue discussed in previous patch reviews. We have already
-agreed to fix this in next revision.
+I will update this in next revision.
 
 Regards,
 Anup
