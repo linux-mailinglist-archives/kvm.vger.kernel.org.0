@@ -2,158 +2,355 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 75AA9993BF
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:33:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 744D5993BD
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 14:33:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388632AbfHVMdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2388645AbfHVMdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 08:33:41 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33984 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388627AbfHVMdk (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 22 Aug 2019 08:33:40 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:60302 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388623AbfHVMdk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 08:33:40 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7MCObdR143553;
-        Thu, 22 Aug 2019 12:31:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=8ipepF8fIFfgoy7WBs+ngpSF9Cs8x/q2LfMnzNUB/ck=;
- b=c6VeasvPQc1NQSKzFfMUV3Q9iwsBfVzX7BCmaQyJcM546IjuYiwUPqLvJX2FOh1H/TM2
- TONIPr5h9l8xsSfUs6YdJo83HL+HgEexK2mj/yD3j5mAOJ54h//jkZ6FF9+556qcJR09
- l+2n+BQys+78y/cqGYi31paXsLQqvRANm9lLev1S6SFzPzbjk/WcrRa/6ndjkheE6EbQ
- KmxXtKC0fZxcBhfERzIL3c1VwZv0fYrTCDzrW58KCPFD29N8GNpOzCG+gD6Ch9+c5SpS
- 5QCbfpERA0i+D+J7R0XGsNBPP+5zOJhacSHp38PHiKWWjcwHRpfjtbbXGipLwKlQDUC/ XA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2ue9hpw4w1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Aug 2019 12:31:34 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7MCNnH6051591;
-        Thu, 22 Aug 2019 12:31:33 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2uh83q0uxy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Aug 2019 12:31:33 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7MCVNQI022232;
-        Thu, 22 Aug 2019 12:31:27 GMT
-Received: from [10.166.106.34] (/10.166.106.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 22 Aug 2019 05:31:23 -0700
-Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
-To:     dario.faggioli@linux.it, Peter Zijlstra <peterz@infradead.org>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
-        x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
-        liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
-        rppt@linux.vnet.ibm.com, Paul Turner <pjt@google.com>
-References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
- <20190712114458.GU3402@hirez.programming.kicks-ass.net>
- <1f97f1d9-d209-f2ab-406d-fac765006f91@oracle.com>
- <20190712123653.GO3419@hirez.programming.kicks-ass.net>
- <b1b7f85f-dac3-80a3-c05c-160f58716ce8@oracle.com>
- <20190712130720.GQ3419@hirez.programming.kicks-ass.net>
- <8b84ac05-f639-b708-0f7f-810935b323e8@oracle.com>
- <715155f37708852ea8075190aeb4f2ec9ab158fe.camel@gmail.com>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <062d7de5-2061-f7a6-acf9-8e7f50b78e29@oracle.com>
-Date:   Thu, 22 Aug 2019 14:31:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+Received: by mail-wm1-f68.google.com with SMTP id e8so7010853wme.1
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 05:33:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Jo69w2Y5GpdPAOSdBd76ME+SCr5IL7+9j1PUyEP8Fhw=;
+        b=TTe1RfnhK1hg+QfkErlN2RP9MHIiCIChj7XEEShaahOG92mWO23Dbhf3YTyC2/pYh0
+         1VBHaLDH9Xnpyx9PEy1s0K2y2dE7ZYm9mZTwgvHzID/QSfJ8kwClW/l1376daHt0+Htv
+         ObxFyKLz3AIxqZWEBsOYP8HJRHKCy1B6+8Qez34yOjp6RxXvl3GT9d/HhLsaGGI19bDJ
+         Eg09JMdw/SEjwb52gq+r+YUIUbrcFbpck9l57dKOzSRf/nyaEsx8XsuzQxpYu5dnElRO
+         sS5jcNOlabbvK5YIEMzn4WAYn0jP59mU2UW89Iitm8XGoUToTnxrjOBuEkhhTEcj3Hh3
+         0OEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Jo69w2Y5GpdPAOSdBd76ME+SCr5IL7+9j1PUyEP8Fhw=;
+        b=au8cyunQnkIDuH05SMgc+oAPQ4y02WgfcY7TCq6P2uCnIM/TtLozPJN2zPl7FFY4/H
+         t5Z/9THKq6PC6RfLbd5EwajKpVtfOImD2oIJTG/57iqrdZGq4S8GGsGGg4jTsSsFKgJh
+         Y1cdPCQmXCe9mAAyBgQvuaW32q4lJGdn4OtW/1oQFI/vJxWJdy71XvVlY/DlhEz8zmOJ
+         8MF8+YR4IA8H163vQXeapKa7h0XNhcalvrc1hFf5uc0r2T+bNOtfyC2fXHS809ORMQKf
+         /OiGN5M499fbYpqecGap99XyFAJO+e/9mNtj2qrllPOKPxspgt0WyGA6ryvmjhygdwGn
+         spDg==
+X-Gm-Message-State: APjAAAUlhzrLyGQm98+pmjYdpje8SE2euiEECKDIvm1NWXFX95hFpmqa
+        RkQasWJg9YVr+lJJq2AWdu+te4PLMBJ2g7V8LM5FJQ==
+X-Google-Smtp-Source: APXvYqyvRbS1LTMkIIyQkE/41BHL0/shCFGOpXnrr89IwodQepgzOEABw/zX3m+WQygrU3cuaUl6Z6hqR6nXdBSbcF4=
+X-Received: by 2002:a1c:3d89:: with SMTP id k131mr5691618wma.24.1566477218546;
+ Thu, 22 Aug 2019 05:33:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <715155f37708852ea8075190aeb4f2ec9ab158fe.camel@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9355 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908220134
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9355 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908220134
+References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-11-anup.patel@wdc.com>
+ <917cea87-42c0-e50a-6508-d5b577c8b702@amazon.com>
+In-Reply-To: <917cea87-42c0-e50a-6508-d5b577c8b702@amazon.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Thu, 22 Aug 2019 18:03:27 +0530
+Message-ID: <CAAhSdy2QtZRKvs0Hr-mZuVsb7sVkweeW-RpvhObZR009UbA7KA@mail.gmail.com>
+Subject: Re: [PATCH v5 10/20] RISC-V: KVM: Handle MMIO exits for VCPU
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 7/31/19 6:31 PM, Dario Faggioli wrote:
-> Hello all,
-> 
-> I know this is a bit of an old thread, so apologies for being late to
-> the party. :-)
-
-And sorry for the late reply, I was away for a while.
-
-> I would have a question about this:
-> 
->>>> On 7/12/19 2:36 PM, Peter Zijlstra wrote:
->>>>> On Fri, Jul 12, 2019 at 02:17:20PM +0200, Alexandre Chartre
->>>>> wrote:
->>>>>> On 7/12/19 1:44 PM, Peter Zijlstra wrote:
->>>>>>> AFAIK3 this wants/needs to be combined with core-scheduling
->>>>>>> to be
->>>>>>> useful, but not a single mention of that is anywhere.
->>>>>>
->>>>>> No. This is actually an alternative to core-scheduling.
->>>>>> Eventually, ASI
->>>>>> will kick all sibling hyperthreads when exiting isolation and
->>>>>> it needs to
->>>>>> run with the full kernel page-table (note that's currently
->>>>>> not in these
->>>>>> patches).
->>
-> I.e., about the fact that ASI is presented as an alternative to
-> core-scheduling or, at least, as it will only need integrate a small
-> subset of the logic (and of the code) from core-scheduling, as said
-> here:
-> 
->> I haven't looked at details about what has been done so far.
->> Hopefully, we
->> can do something not too complex, or reuse a (small) part of co-
->> scheduling.
->>
-> Now, sticking to virtualization examples, if you don't have core-
-> scheduling, it means that you can have two vcpus, one from VM A and the
-> other from VM B, running on the same core, one on thread 0 and the
-> other one on thread 1, at the same time.
-> 
-> And if VM A's vcpu, running on thread 0, exits, then VM B's vcpu
-> running in guest more on thread 1 can read host memory, as it is
-> speculatively accessed (either "normally" or because of cache load
-> gadgets) and brought in L1D cache by thread 0. And Indeed I do see how
-> ASI protects us from this attack scenario.
-> 
+On Thu, Aug 22, 2019 at 5:44 PM Alexander Graf <graf@amazon.com> wrote:
 >
-> However, when the two VMs' vcpus are both running in guest mode, each
-> one on a thread of the same core, VM B's vcpu running on thread 1 can
-> exploit L1TF to peek at and steal secrets that VM A's vcpu, running on
-> thread 0, is accessing, as they're brought into L1D cache... can't it?
-> 
-> How can, ASI *without* core-scheduling, prevent this other attack
-> scenario?
+> On 22.08.19 10:44, Anup Patel wrote:
+> > We will get stage2 page faults whenever Guest/VM access SW emulated
+> > MMIO device or unmapped Guest RAM.
+> >
+> > This patch implements MMIO read/write emulation by extracting MMIO
+> > details from the trapped load/store instruction and forwarding the
+> > MMIO read/write to user-space. The actual MMIO emulation will happen
+> > in user-space and KVM kernel module will only take care of register
+> > updates before resuming the trapped VCPU.
+> >
+> > The handling for stage2 page faults for unmapped Guest RAM will be
+> > implemeted by a separate patch later.
+> >
+> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >   arch/riscv/include/asm/kvm_host.h |  11 +
+> >   arch/riscv/kvm/mmu.c              |   7 +
+> >   arch/riscv/kvm/vcpu_exit.c        | 436 +++++++++++++++++++++++++++++-
+> >   3 files changed, 451 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> > index 18f1097f1d8d..4388bace6d70 100644
+> > --- a/arch/riscv/include/asm/kvm_host.h
+> > +++ b/arch/riscv/include/asm/kvm_host.h
+> > @@ -53,6 +53,12 @@ struct kvm_arch {
+> >       phys_addr_t pgd_phys;
+> >   };
+> >
+> > +struct kvm_mmio_decode {
+> > +     unsigned long insn;
+> > +     int len;
+> > +     int shift;
+> > +};
+> > +
+> >   struct kvm_cpu_context {
+> >       unsigned long zero;
+> >       unsigned long ra;
+> > @@ -141,6 +147,9 @@ struct kvm_vcpu_arch {
+> >       unsigned long irqs_pending;
+> >       unsigned long irqs_pending_mask;
+> >
+> > +     /* MMIO instruction details */
+> > +     struct kvm_mmio_decode mmio_decode;
+> > +
+> >       /* VCPU power-off state */
+> >       bool power_off;
+> >
+> > @@ -160,6 +169,8 @@ static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+> >   int kvm_riscv_setup_vsip(void);
+> >   void kvm_riscv_cleanup_vsip(void);
+> >
+> > +int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned long hva,
+> > +                      bool is_write);
+> >   void kvm_riscv_stage2_flush_cache(struct kvm_vcpu *vcpu);
+> >   int kvm_riscv_stage2_alloc_pgd(struct kvm *kvm);
+> >   void kvm_riscv_stage2_free_pgd(struct kvm *kvm);
+> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> > index 04dd089b86ff..2b965f9aac07 100644
+> > --- a/arch/riscv/kvm/mmu.c
+> > +++ b/arch/riscv/kvm/mmu.c
+> > @@ -61,6 +61,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> >       return 0;
+> >   }
+> >
+> > +int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu, gpa_t gpa, unsigned long hva,
+> > +                      bool is_write)
+> > +{
+> > +     /* TODO: */
+> > +     return 0;
+> > +}
+> > +
+> >   void kvm_riscv_stage2_flush_cache(struct kvm_vcpu *vcpu)
+> >   {
+> >       /* TODO: */
+> > diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> > index e4d7c8f0807a..efc06198c259 100644
+> > --- a/arch/riscv/kvm/vcpu_exit.c
+> > +++ b/arch/riscv/kvm/vcpu_exit.c
+> > @@ -6,9 +6,371 @@
+> >    *     Anup Patel <anup.patel@wdc.com>
+> >    */
+> >
+> > +#include <linux/bitops.h>
+> >   #include <linux/errno.h>
+> >   #include <linux/err.h>
+> >   #include <linux/kvm_host.h>
+> > +#include <asm/csr.h>
+> > +
+> > +#define INSN_MATCH_LB                0x3
+> > +#define INSN_MASK_LB         0x707f
+> > +#define INSN_MATCH_LH                0x1003
+> > +#define INSN_MASK_LH         0x707f
+> > +#define INSN_MATCH_LW                0x2003
+> > +#define INSN_MASK_LW         0x707f
+> > +#define INSN_MATCH_LD                0x3003
+> > +#define INSN_MASK_LD         0x707f
+> > +#define INSN_MATCH_LBU               0x4003
+> > +#define INSN_MASK_LBU                0x707f
+> > +#define INSN_MATCH_LHU               0x5003
+> > +#define INSN_MASK_LHU                0x707f
+> > +#define INSN_MATCH_LWU               0x6003
+> > +#define INSN_MASK_LWU                0x707f
+> > +#define INSN_MATCH_SB                0x23
+> > +#define INSN_MASK_SB         0x707f
+> > +#define INSN_MATCH_SH                0x1023
+> > +#define INSN_MASK_SH         0x707f
+> > +#define INSN_MATCH_SW                0x2023
+> > +#define INSN_MASK_SW         0x707f
+> > +#define INSN_MATCH_SD                0x3023
+> > +#define INSN_MASK_SD         0x707f
+> > +
+> > +#define INSN_MATCH_C_LD              0x6000
+> > +#define INSN_MASK_C_LD               0xe003
+> > +#define INSN_MATCH_C_SD              0xe000
+> > +#define INSN_MASK_C_SD               0xe003
+> > +#define INSN_MATCH_C_LW              0x4000
+> > +#define INSN_MASK_C_LW               0xe003
+> > +#define INSN_MATCH_C_SW              0xc000
+> > +#define INSN_MASK_C_SW               0xe003
+> > +#define INSN_MATCH_C_LDSP    0x6002
+> > +#define INSN_MASK_C_LDSP     0xe003
+> > +#define INSN_MATCH_C_SDSP    0xe002
+> > +#define INSN_MASK_C_SDSP     0xe003
+> > +#define INSN_MATCH_C_LWSP    0x4002
+> > +#define INSN_MASK_C_LWSP     0xe003
+> > +#define INSN_MATCH_C_SWSP    0xc002
+> > +#define INSN_MASK_C_SWSP     0xe003
+> > +
+> > +#define INSN_LEN(insn)               ((((insn) & 0x3) < 0x3) ? 2 : 4)
+> > +
+> > +#ifdef CONFIG_64BIT
+> > +#define LOG_REGBYTES         3
+> > +#else
+> > +#define LOG_REGBYTES         2
+> > +#endif
+> > +#define REGBYTES             (1 << LOG_REGBYTES)
+> > +
+> > +#define SH_RD                        7
+> > +#define SH_RS1                       15
+> > +#define SH_RS2                       20
+> > +#define SH_RS2C                      2
+> > +
+> > +#define RV_X(x, s, n)                (((x) >> (s)) & ((1 << (n)) - 1))
+> > +#define RVC_LW_IMM(x)                ((RV_X(x, 6, 1) << 2) | \
+> > +                              (RV_X(x, 10, 3) << 3) | \
+> > +                              (RV_X(x, 5, 1) << 6))
+> > +#define RVC_LD_IMM(x)                ((RV_X(x, 10, 3) << 3) | \
+> > +                              (RV_X(x, 5, 2) << 6))
+> > +#define RVC_LWSP_IMM(x)              ((RV_X(x, 4, 3) << 2) | \
+> > +                              (RV_X(x, 12, 1) << 5) | \
+> > +                              (RV_X(x, 2, 2) << 6))
+> > +#define RVC_LDSP_IMM(x)              ((RV_X(x, 5, 2) << 3) | \
+> > +                              (RV_X(x, 12, 1) << 5) | \
+> > +                              (RV_X(x, 2, 3) << 6))
+> > +#define RVC_SWSP_IMM(x)              ((RV_X(x, 9, 4) << 2) | \
+> > +                              (RV_X(x, 7, 2) << 6))
+> > +#define RVC_SDSP_IMM(x)              ((RV_X(x, 10, 3) << 3) | \
+> > +                              (RV_X(x, 7, 3) << 6))
+> > +#define RVC_RS1S(insn)               (8 + RV_X(insn, SH_RD, 3))
+> > +#define RVC_RS2S(insn)               (8 + RV_X(insn, SH_RS2C, 3))
+> > +#define RVC_RS2(insn)                RV_X(insn, SH_RS2C, 5)
+> > +
+> > +#define SHIFT_RIGHT(x, y)            \
+> > +     ((y) < 0 ? ((x) << -(y)) : ((x) >> (y)))
+> > +
+> > +#define REG_MASK                     \
+> > +     ((1 << (5 + LOG_REGBYTES)) - (1 << LOG_REGBYTES))
+> > +
+> > +#define REG_OFFSET(insn, pos)                \
+> > +     (SHIFT_RIGHT((insn), (pos) - LOG_REGBYTES) & REG_MASK)
+> > +
+> > +#define REG_PTR(insn, pos, regs)     \
+> > +     (ulong *)((ulong)(regs) + REG_OFFSET(insn, pos))
+> > +
+> > +#define GET_RM(insn)         (((insn) >> 12) & 7)
+> > +
+> > +#define GET_RS1(insn, regs)  (*REG_PTR(insn, SH_RS1, regs))
+> > +#define GET_RS2(insn, regs)  (*REG_PTR(insn, SH_RS2, regs))
+> > +#define GET_RS1S(insn, regs) (*REG_PTR(RVC_RS1S(insn), 0, regs))
+> > +#define GET_RS2S(insn, regs) (*REG_PTR(RVC_RS2S(insn), 0, regs))
+> > +#define GET_RS2C(insn, regs) (*REG_PTR(insn, SH_RS2C, regs))
+> > +#define GET_SP(regs)         (*REG_PTR(2, 0, regs))
+> > +#define SET_RD(insn, regs, val)      (*REG_PTR(insn, SH_RD, regs) = (val))
+> > +#define IMM_I(insn)          ((s32)(insn) >> 20)
+> > +#define IMM_S(insn)          (((s32)(insn) >> 25 << 5) | \
+> > +                              (s32)(((insn) >> 7) & 0x1f))
+> > +#define MASK_FUNCT3          0x7000
+> > +
+> > +#define STR(x)                       XSTR(x)
+> > +#define XSTR(x)                      #x
+> > +
+> > +/* TODO: Handle traps due to unpriv load and redirect it back to VS-mode */
+> > +static ulong get_insn(struct kvm_vcpu *vcpu)
+> > +{
+> > +     ulong __sepc = vcpu->arch.guest_context.sepc;
+> > +     ulong __hstatus, __sstatus, __vsstatus;
+> > +#ifdef CONFIG_RISCV_ISA_C
+> > +     ulong rvc_mask = 3, tmp;
+> > +#endif
+> > +     ulong flags, val;
+> > +
+> > +     local_irq_save(flags);
+> > +
+> > +     __vsstatus = csr_read(CSR_VSSTATUS);
+> > +     __sstatus = csr_read(CSR_SSTATUS);
+> > +     __hstatus = csr_read(CSR_HSTATUS);
+> > +
+> > +     csr_write(CSR_VSSTATUS, __vsstatus | SR_MXR);
+> > +     csr_write(CSR_SSTATUS, vcpu->arch.guest_context.sstatus | SR_MXR);
+> > +     csr_write(CSR_HSTATUS, vcpu->arch.guest_context.hstatus | HSTATUS_SPRV);
 >
-> Because I may very well be missing something, but it looks to me that
-> it can't. In which case, I'm not sure we can call it "alternative" to
-> core-scheduling.... Or is the second attack scenario that I tried to
-> describe above, not considered interesting?
-> 
+> What happens when the insn load triggers a page fault, maybe because the
+> guest was malicious and did
+>
+>    1) Run on page 0x1000
+>    2) Remove map for 0x1000, do *not* flush TLB
+>    3) Trigger MMIO
+>
+> That would DOS the host here, as the host kernel would continue running
+> in guest address space, right?
 
-Correct, ASI doesn't prevent this attack scenario. However, this case can
-be prevented by pinning each VM to different CPU cores (for example, using
-cgroups) so that you never have two different VMs running with CPU threads
-from the same CPU core. Of course, this limits the number of VMs you can
-run to the number of CPU cores on the system but we assume this is a
-reasonable configuration when you want to have high performing VM.
+Yes, we can certainly fault while accessing Guest instruction. We will
+be fixing this issue in a followup series. We have mentioned this in cover
+letter as well.
 
-Rgds,
+BTW, RISC-V spec is going to further improve to provide easy
+access of faulting instruction to Hypervisor.
+(Refer, https://github.com/riscv/riscv-isa-manual/issues/431)
 
-alex.
+Regards,
+Anup
+
+>
+>
+> Alex
+>
+> > +
+> > +#ifndef CONFIG_RISCV_ISA_C
+> > +     asm ("\n"
+> > +#ifdef CONFIG_64BIT
+> > +             STR(LWU) " %[insn], (%[addr])\n"
+> > +#else
+> > +             STR(LW) " %[insn], (%[addr])\n"
+> > +#endif
+> > +             : [insn] "=&r" (val) : [addr] "r" (__sepc));
+> > +#else
+> > +     asm ("and %[tmp], %[addr], 2\n"
+> > +             "bnez %[tmp], 1f\n"
+> > +#ifdef CONFIG_64BIT
+> > +             STR(LWU) " %[insn], (%[addr])\n"
+> > +#else
+> > +             STR(LW) " %[insn], (%[addr])\n"
+> > +#endif
+> > +             "and %[tmp], %[insn], %[rvc_mask]\n"
+> > +             "beq %[tmp], %[rvc_mask], 2f\n"
+> > +             "sll %[insn], %[insn], %[xlen_minus_16]\n"
+> > +             "srl %[insn], %[insn], %[xlen_minus_16]\n"
+> > +             "j 2f\n"
+> > +             "1:\n"
+> > +             "lhu %[insn], (%[addr])\n"
+> > +             "and %[tmp], %[insn], %[rvc_mask]\n"
+> > +             "bne %[tmp], %[rvc_mask], 2f\n"
+> > +             "lhu %[tmp], 2(%[addr])\n"
+> > +             "sll %[tmp], %[tmp], 16\n"
+> > +             "add %[insn], %[insn], %[tmp]\n"
+> > +             "2:"
+> > +     : [vsstatus] "+&r" (__vsstatus), [insn] "=&r" (val),
+> > +       [tmp] "=&r" (tmp)
+> > +     : [addr] "r" (__sepc), [rvc_mask] "r" (rvc_mask),
+> > +       [xlen_minus_16] "i" (__riscv_xlen - 16));
+> > +#endif
+> > +
+> > +     csr_write(CSR_HSTATUS, __hstatus);
+> > +     csr_write(CSR_SSTATUS, __sstatus);
+> > +     csr_write(CSR_VSSTATUS, __vsstatus);
+> > +
+> > +     local_irq_restore(flags);
+> > +
+> > +     return val;
+> > +}
+>
