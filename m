@@ -2,34 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C8C598DAE
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 10:30:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BFC698DD0
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 10:35:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732363AbfHVIar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 04:30:47 -0400
-Received: from foss.arm.com ([217.140.110.172]:41110 "EHLO foss.arm.com"
+        id S1732411AbfHVIfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 04:35:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37518 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731051AbfHVIar (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 04:30:47 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3E0D344;
-        Thu, 22 Aug 2019 01:30:46 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E11A33F706;
-        Thu, 22 Aug 2019 01:30:45 -0700 (PDT)
-Subject: Re: [PATCH] arm64: KVM: Only skip MMIO insn once
-To:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     mark.rutland@arm.com
-References: <20190821195030.2569-1-drjones@redhat.com>
-From:   Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <177091d5-2d2c-6a75-472c-92702ee98e86@kernel.org>
-Date:   Thu, 22 Aug 2019 09:30:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+        id S1731854AbfHVIfS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 04:35:18 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 49A5BC05AA65
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 08:35:18 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id k14so2847256wrv.2
+        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 01:35:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=503gwfkLwN2+9M3xVVSL4KHdkFSBybLeuL3BTe28L04=;
+        b=sqnHa6Bxx0SoS5DKAvtRGDdXKlUpyQcEG7SA2ZJQjF21+UXlFpBb4K+shmGrxcWUT4
+         fN99KOX6sEjDIyhm+875tdgOElQqEpwN77RgKHoJMbtf+elFK1eaYemqOoHz+ZEGIYBU
+         xBBZehio3Mc2KJW04odbGWWVidBfvv2bMrPZHoSy6aw/7kLkjvK/AawjLq0JuqAnpd97
+         IEJMAikjvUOVo/BQyXRTrwVQLI2ySF947vV3KSAmrMAeoyc6hTX914tB3i8kbl1isbU8
+         qxXl9iA0WZM2SyJHfQFvvUjYV4HurCiyyijrarAeje/i5CQCeZSphllYYUUaeYcAZ04x
+         vN0w==
+X-Gm-Message-State: APjAAAW7oEQrNZ8PN9YaBl/GSZiwAcqM3mpOeypouRk/z3dwrlayiNrx
+        +c2IwhROjPWF2Y99IQcgkCSgC2KqcrBQ4zt9ai7Hg3fc6r+unAxUJ/v4FX2xeYD4JsgRXLghg6k
+        aHiAsIuU/Iuvu
+X-Received: by 2002:adf:ba4a:: with SMTP id t10mr44274893wrg.325.1566462916909;
+        Thu, 22 Aug 2019 01:35:16 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwy4qQ9wEFJUUnOh9sHeQbZqx7L5OjVN+mhbTK5RA/hJKA8heXCGy6dfXj4prjORXC40B78Sg==
+X-Received: by 2002:adf:ba4a:: with SMTP id t10mr44274867wrg.325.1566462916663;
+        Thu, 22 Aug 2019 01:35:16 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id j17sm20375395wru.24.2019.08.22.01.35.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2019 01:35:15 -0700 (PDT)
+Subject: Re: [PATCH v4 1/6] KVM: Fix leak vCPU's VMCS value into other pCPU
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        "# v3 . 10+" <stable@vger.kernel.org>
+References: <1564970604-10044-1-git-send-email-wanpengli@tencent.com>
+ <9acbc733-442f-0f65-9b56-ff800a3fa0f5@redhat.com>
+ <CANRm+CwH54S555nw-Zik-3NFDH9yqe+SOZrGc3mPoAU_qGxP-A@mail.gmail.com>
+ <e7b84893-42bf-e80e-61c9-ef5d1b200064@redhat.com>
+ <CANRm+CzJf9Or_45frTe9ivFx9QDfx6Nou7uLT6tm1NmcPKDn8A@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <728bf051-02eb-8fe8-042f-9893f23b4a68@redhat.com>
+Date:   Thu, 22 Aug 2019 10:35:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190821195030.2569-1-drjones@redhat.com>
+In-Reply-To: <CANRm+CzJf9Or_45frTe9ivFx9QDfx6Nou7uLT6tm1NmcPKDn8A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -38,89 +70,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
-
-On 21/08/2019 20:50, Andrew Jones wrote:
-> If after an MMIO exit to userspace a VCPU is immediately run with an
-> immediate_exit request, such as when a signal is delivered or an MMIO
-> emulation completion is needed, then the VCPU completes the MMIO
-> emulation and immediately returns to userspace. As the exit_reason
-> does not get changed from KVM_EXIT_MMIO in these cases we have to
-> be careful not to complete the MMIO emulation again, when the VCPU is
-> eventually run again, because the emulation does an instruction skip
-> (and doing too many skips would be a waste of guest code :-) We need
-> to use additional VCPU state to track if the emulation is complete.
-> As luck would have it, we already have 'mmio_needed', which even
-> appears to be used in this way by other architectures already.
+On 22/08/19 02:46, Wanpeng Li wrote:
+> On Tue, 6 Aug 2019 at 14:20, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 06/08/19 02:35, Wanpeng Li wrote:
+>>> Thank you, Paolo! Btw, how about other 5 patches?
+>>
+>> Queued everything else too.
 > 
-> Fixes: 0d640732dbeb ("arm64: KVM: Skip MMIO insn after emulation")
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  virt/kvm/arm/arm.c  | 3 ++-
->  virt/kvm/arm/mmio.c | 1 +
->  2 files changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 35a069815baf..322cf9030bbe 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -669,7 +669,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	if (ret)
->  		return ret;
->  
-> -	if (run->exit_reason == KVM_EXIT_MMIO) {
-> +	if (vcpu->mmio_needed) {
-> +		vcpu->mmio_needed = 0;
->  		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
->  		if (ret)
->  			return ret;
-> diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-> index a8a6a0c883f1..2d9b5e064ae0 100644
-> --- a/virt/kvm/arm/mmio.c
-> +++ b/virt/kvm/arm/mmio.c
-> @@ -201,6 +201,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	if (is_write)
->  		memcpy(run->mmio.data, data_buf, len);
->  	vcpu->stat.mmio_exit_user++;
-> +	vcpu->mmio_needed	= 1;
->  	run->exit_reason	= KVM_EXIT_MMIO;
->  	return 0;
->  }
-> 
+> How about patch 4/6~5/6, they are not in kvm/queue. :)
 
-Thanks for this. That's quite embarrassing. Out of curiosity,
-how was this spotted?
+I queued 4.
 
-Patch wise, I'd have a small preference for the following (untested)
-patch, as it keeps the mmio_needed accesses close together, making
-it easier to read (at least for me). What do you think?
+For patch 5, I don't really see the benefit since the hypercall
+arguments are already traced.
 
-	M.
-
-diff --git a/virt/kvm/arm/mmio.c b/virt/kvm/arm/mmio.c
-index a8a6a0c883f1..6af5c91337f2 100644
---- a/virt/kvm/arm/mmio.c
-+++ b/virt/kvm/arm/mmio.c
-@@ -86,6 +86,12 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	unsigned int len;
- 	int mask;
- 
-+	/* Detect an already handled MMIO return */
-+	if (unlikely(!vcpu->mmio_needed))
-+		return 0;
-+
-+	vcpu->mmio_needed = 0;
-+
- 	if (!run->mmio.is_write) {
- 		len = run->mmio.len;
- 		if (len > sizeof(unsigned long))
-@@ -188,6 +194,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	run->mmio.is_write	= is_write;
- 	run->mmio.phys_addr	= fault_ipa;
- 	run->mmio.len		= len;
-+	vcpu->mmio_needed	= 1;
- 
- 	if (!ret) {
- 		/* We handled the access successfully in the kernel. */
--- 
-Jazz is not dead, it just smells funny...
+Paolo
