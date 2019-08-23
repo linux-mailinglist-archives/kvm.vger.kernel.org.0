@@ -2,144 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B05509A978
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 09:59:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A091B9A999
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 10:06:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387674AbfHWH7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 03:59:48 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:55856 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731700AbfHWH7p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 03:59:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=BVrbQe8ircJFDpKbFl4qSXEUGsJpAUh/e+k1VZjAJUI=; b=gZW3ESVoFjFL0zDVK/0iQpWtP
-        dfR1uRXHdbPXSuB6iaf2NNgYyqus97bt1G8MxATLN1pnNor0iVgDTFP3M5yZP0y/iPOo+UNI7rdGL
-        1qVA/MzvlKPhS+9Slaxz5+FrY5KUh3TRx0Xw/XV9UEraj43gA3xyIeXf4d5alGejiqbhUxToYG2Dc
-        3rFH8tNMvo6kaSTXVuv6WS+rqklt+eeNVMATpbF1k4V23R1+VLis8Z6QVAmoKn3hurFDFso07R2RX
-        FD9C5djUI7ZS43FRU5LV3er7mFf4iOP9BT9dQR+ndyXFv3GRNa0edFsnsuSGSS3P4zpE3VunCBszw
-        AFuuEJ7Iw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1i14Tw-0008EQ-EO; Fri, 23 Aug 2019 07:59:36 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1FA5C30759B;
-        Fri, 23 Aug 2019 09:59:01 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 7E64C20F61BEF; Fri, 23 Aug 2019 09:59:33 +0200 (CEST)
-Date:   Fri, 23 Aug 2019 09:59:33 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] x86/retpoline: Don't clobber RFLAGS during CALL_NOSPEC
- on i386
-Message-ID: <20190823075933.GY2369@hirez.programming.kicks-ass.net>
-References: <20190822211122.27579-1-sean.j.christopherson@intel.com>
+        id S2387906AbfHWIEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 04:04:53 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:10803 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729922AbfHWIEx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 04:04:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1566547492; x=1598083492;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=QH2Lv/LpUhd8u3hbB6A5tS3kD8z+tWSKTxDXj667gvQ=;
+  b=NOXREWx4E9h3aWOsKgcVqZ6BM9gVVmAC2sEN/r7PFDYLfqiVFKggWr20
+   /N8K9/lmkQWXcT8dxuVHRyEA6/rYX850PxeRnNyr6vxlJK2NXzbxoRX7s
+   NU2StXI3L5bSLcFukM7HYssRF19pASm3P6k3ZIKslW/+pyGhwXo5r3Oko
+   A=;
+X-IronPort-AV: E=Sophos;i="5.64,420,1559520000"; 
+   d="scan'208";a="696735630"
+Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com) ([10.47.22.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 23 Aug 2019 08:04:47 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com (Postfix) with ESMTPS id 65D64C08F7;
+        Fri, 23 Aug 2019 08:04:42 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 23 Aug 2019 08:04:41 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.244) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 23 Aug 2019 08:04:37 +0000
+Subject: Re: [PATCH v5 18/20] RISC-V: KVM: Add SBI v0.1 support
+To:     Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        "Paul Walmsley" <paul.walmsley@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Atish Patra" <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+References: <20190822084131.114764-1-anup.patel@wdc.com>
+ <20190822084131.114764-19-anup.patel@wdc.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <40911e08-e0ce-a2b8-24d4-9cf357432850@amazon.com>
+Date:   Fri, 23 Aug 2019 10:04:34 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190822211122.27579-1-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190822084131.114764-19-anup.patel@wdc.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.43.161.244]
+X-ClientProxiedBy: EX13D04UWA001.ant.amazon.com (10.43.160.47) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 02:11:22PM -0700, Sean Christopherson wrote:
-> Use 'lea' instead of 'add' when adjusting %rsp in CALL_NOSPEC so as to
-> avoid clobbering flags.
+On 22.08.19 10:46, Anup Patel wrote:
+> From: Atish Patra <atish.patra@wdc.com>
 > 
-> KVM's emulator makes indirect calls into a jump table of sorts, where
-> the destination of the CALL_NOSPEC is a small blob of code that performs
-> fast emulation by executing the target instruction with fixed operands.
+> The KVM host kernel running in HS-mode needs to handle SBI calls coming
+> from guest kernel running in VS-mode.
 > 
->   adcb_al_dl:
->      0x000339f8 <+0>:   adc    %dl,%al
->      0x000339fa <+2>:   ret
+> This patch adds SBI v0.1 support in KVM RISC-V. All the SBI calls are
+> implemented correctly except remote tlb flushes. For remote TLB flushes,
+> we are doing full TLB flush and this will be optimized in future.
 > 
-> A major motiviation for doing fast emulation is to leverage the CPU to
-> handle consumption and manipulation of arithmetic flags, i.e. RFLAGS is
-> both an input and output to the target of CALL_NOSPEC.  Clobbering flags
-> results in all sorts of incorrect emulation, e.g. Jcc instructions often
-> take the wrong path.  Sans the nops...
-> 
->   asm("push %[flags]; popf; " CALL_NOSPEC " ; pushf; pop %[flags]\n"
->      0x0003595a <+58>:  mov    0xc0(%ebx),%eax
->      0x00035960 <+64>:  mov    0x60(%ebx),%edx
->      0x00035963 <+67>:  mov    0x90(%ebx),%ecx
->      0x00035969 <+73>:  push   %edi
->      0x0003596a <+74>:  popf
->      0x0003596b <+75>:  call   *%esi
->      0x000359a0 <+128>: pushf
->      0x000359a1 <+129>: pop    %edi
->      0x000359a2 <+130>: mov    %eax,0xc0(%ebx)
->      0x000359b1 <+145>: mov    %edx,0x60(%ebx)
-> 
->   ctxt->eflags = (ctxt->eflags & ~EFLAGS_MASK) | (flags & EFLAGS_MASK);
->      0x000359a8 <+136>: mov    -0x10(%ebp),%eax
->      0x000359ab <+139>: and    $0x8d5,%edi
->      0x000359b4 <+148>: and    $0xfffff72a,%eax
->      0x000359b9 <+153>: or     %eax,%edi
->      0x000359bd <+157>: mov    %edi,0x4(%ebx)
-> 
-> For the most part this has gone unnoticed as emulation of guest code
-> that can trigger fast emulation is effectively limited to MMIO when
-> running on modern hardware, and MMIO is rarely, if ever, accessed by
-> instructions that affect or consume flags.
-
-Also, because nobody every uses 32bit anymore, I suspect ;-)
-
-> Breakage is almost instantaneous when running with unrestricted guest
-> disabled, in which case KVM must emulate all instructions when the guest
-> has invalid state, e.g. when the guest is in Big Real Mode during early
-> BIOS.
-> 
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: <kvm@vger.kernel.org>
-> Cc: <stable@vger.kernel.org>
-> Fixes: 1a29b5b7f347a ("KVM: x86: Make indirect calls in emulator speculation safe")
-
-Cute; arguably this is a fix for:
-
-776b043848fd2 ("x86/retpoline: Add initial retpoline support")
-
-The patch you quote just happens to trigger it in KVM, but you're right
-to note that CALL shouldn't frob EFLAGS, and who knows what possible
-other sites care.
-
-Anyway,
-
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/include/asm/nospec-branch.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   arch/riscv/include/asm/kvm_host.h |   2 +
+>   arch/riscv/kvm/Makefile           |   2 +-
+>   arch/riscv/kvm/vcpu_exit.c        |   3 +
+>   arch/riscv/kvm/vcpu_sbi.c         | 119 ++++++++++++++++++++++++++++++
+>   4 files changed, 125 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/riscv/kvm/vcpu_sbi.c
 > 
-> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-> index 109f974f9835..80bc209c0708 100644
-> --- a/arch/x86/include/asm/nospec-branch.h
-> +++ b/arch/x86/include/asm/nospec-branch.h
-> @@ -192,7 +192,7 @@
->  	"    	lfence;\n"					\
->  	"       jmp    902b;\n"					\
->  	"       .align 16\n"					\
-> -	"903:	addl   $4, %%esp;\n"				\
-> +	"903:	lea    4(%%esp), %%esp;\n"			\
->  	"       pushl  %[thunk_target];\n"			\
->  	"       ret;\n"						\
->  	"       .align 16\n"					\
-> -- 
-> 2.22.0
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> index 2af3a179c08e..0b1eceaef59f 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -241,4 +241,6 @@ bool kvm_riscv_vcpu_has_interrupt(struct kvm_vcpu *vcpu);
+>   void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
+>   void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
+>   
+> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu);
+> +
+>   #endif /* __RISCV_KVM_HOST_H__ */
+> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+> index 3e0c7558320d..b56dc1650d2c 100644
+> --- a/arch/riscv/kvm/Makefile
+> +++ b/arch/riscv/kvm/Makefile
+> @@ -9,6 +9,6 @@ ccflags-y := -Ivirt/kvm -Iarch/riscv/kvm
+>   kvm-objs := $(common-objs-y)
+>   
+>   kvm-objs += main.o vm.o vmid.o tlb.o mmu.o
+> -kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o
+> +kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o vcpu_sbi.o
+>   
+>   obj-$(CONFIG_KVM)	+= kvm.o
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index fbc04fe335ad..87b83fcf9a14 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -534,6 +534,9 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>   		    (vcpu->arch.guest_context.hstatus & HSTATUS_STL))
+>   			ret = stage2_page_fault(vcpu, run, scause, stval);
+>   		break;
+> +	case EXC_SUPERVISOR_SYSCALL:
+> +		if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
+> +			ret = kvm_riscv_vcpu_sbi_ecall(vcpu);
+>   	default:
+>   		break;
+>   	};
+> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+> new file mode 100644
+> index 000000000000..5793202eb514
+> --- /dev/null
+> +++ b/arch/riscv/kvm/vcpu_sbi.c
+> @@ -0,0 +1,119 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/**
+> + * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+> + *
+> + * Authors:
+> + *     Atish Patra <atish.patra@wdc.com>
+> + */
+> +
+> +#include <linux/errno.h>
+> +#include <linux/err.h>
+> +#include <linux/kvm_host.h>
+> +#include <asm/csr.h>
+> +#include <asm/kvm_vcpu_timer.h>
+> +
+> +#define SBI_VERSION_MAJOR			0
+> +#define SBI_VERSION_MINOR			1
+> +
+> +/* TODO: Handle traps due to unpriv load and redirect it back to VS-mode */
+
+Ugh, another one of those? Can't you just figure out a way to recover 
+from the page fault? Also, you want to combine this with the instruction 
+load logic, so that we have a single place that guest address space 
+reads go through.
+
+> +static unsigned long kvm_sbi_unpriv_load(const unsigned long *addr,
+> +					 struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long flags, val;
+> +	unsigned long __hstatus, __sstatus;
+> +
+> +	local_irq_save(flags);
+> +	__hstatus = csr_read(CSR_HSTATUS);
+> +	__sstatus = csr_read(CSR_SSTATUS);
+> +	csr_write(CSR_HSTATUS, vcpu->arch.guest_context.hstatus | HSTATUS_SPRV);
+> +	csr_write(CSR_SSTATUS, vcpu->arch.guest_context.sstatus);
+> +	val = *addr;
+> +	csr_write(CSR_HSTATUS, __hstatus);
+> +	csr_write(CSR_SSTATUS, __sstatus);
+> +	local_irq_restore(flags);
+> +
+> +	return val;
+> +}
+> +
+> +static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu, u32 type)
+> +{
+> +	int i;
+> +	struct kvm_vcpu *tmp;
+> +
+> +	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> +		tmp->arch.power_off = true;
+> +	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+> +
+> +	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> +	vcpu->run->system_event.type = type;
+> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> +}
+> +
+> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu)
+> +{
+> +	int ret = 1;
+> +	u64 next_cycle;
+> +	int vcpuid;
+> +	struct kvm_vcpu *remote_vcpu;
+> +	ulong dhart_mask;
+> +	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
+> +
+> +	if (!cp)
+> +		return -EINVAL;
+> +	switch (cp->a7) {
+> +	case SBI_SET_TIMER:
+> +#if __riscv_xlen == 32
+> +		next_cycle = ((u64)cp->a1 << 32) | (u64)cp->a0;
+> +#else
+> +		next_cycle = (u64)cp->a0;
+> +#endif
+> +		kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
+
+Ah, this is where the timer set happens. I still don't understand how 
+this takes the frequency bit into account?
+
+> +		break;
+> +	case SBI_CONSOLE_PUTCHAR:
+> +		/* Not implemented */
+> +		cp->a0 = -ENOTSUPP;
+> +		break;
+> +	case SBI_CONSOLE_GETCHAR:
+> +		/* Not implemented */
+> +		cp->a0 = -ENOTSUPP;
+> +		break;
+
+These two should be covered by the default case.
+
+> +	case SBI_CLEAR_IPI:
+> +		kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_S_SOFT);
+> +		break;
+> +	case SBI_SEND_IPI:
+> +		dhart_mask = kvm_sbi_unpriv_load((unsigned long *)cp->a0, vcpu);
+> +		for_each_set_bit(vcpuid, &dhart_mask, BITS_PER_LONG) {
+> +			remote_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, vcpuid);
+> +			kvm_riscv_vcpu_set_interrupt(remote_vcpu, IRQ_S_SOFT);
+> +		}
+> +		break;
+> +	case SBI_SHUTDOWN:
+> +		kvm_sbi_system_shutdown(vcpu, KVM_SYSTEM_EVENT_SHUTDOWN);
+> +		ret = 0;
+> +		break;
+> +	case SBI_REMOTE_FENCE_I:
+> +		sbi_remote_fence_i(NULL);
+> +		break;
+> +	/*
+> +	 * TODO: There should be a way to call remote hfence.bvma.
+> +	 * Preferred method is now a SBI call. Until then, just flush
+> +	 * all tlbs.
+> +	 */
+> +	case SBI_REMOTE_SFENCE_VMA:
+> +		/*TODO: Parse vma range.*/
+> +		sbi_remote_sfence_vma(NULL, 0, 0);
+> +		break;
+> +	case SBI_REMOTE_SFENCE_VMA_ASID:
+> +		/*TODO: Parse vma range for given ASID */
+> +		sbi_remote_sfence_vma(NULL, 0, 0);
+> +		break;
+> +	default:
+> +		cp->a0 = ENOTSUPP;
+> +		break;
+
+Please just send unsupported SBI events into user space.
+
+Alex
+
+> +	};
+> +
+> +	if (ret >= 0)
+> +		cp->sepc += 4;
+> +
+> +	return ret;
+> +}
 > 
+
