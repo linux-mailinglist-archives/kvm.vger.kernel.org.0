@@ -2,254 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C45C9B176
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 15:56:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0C139B1AE
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 16:13:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405764AbfHWN4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 09:56:19 -0400
-Received: from foss.arm.com ([217.140.110.172]:34904 "EHLO foss.arm.com"
+        id S2389857AbfHWONE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 10:13:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37178 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388949AbfHWN4T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 09:56:19 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBE6B28;
-        Fri, 23 Aug 2019 06:56:17 -0700 (PDT)
-Received: from [10.1.197.50] (e120937-lin.cambridge.arm.com [10.1.197.50])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 310B13F718;
-        Fri, 23 Aug 2019 06:56:13 -0700 (PDT)
-Subject: Re: [PATCH v18 15/15] selftests, arm64: add a selftest for passing
- tagged pointers to kernel
-To:     Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-References: <cover.1561386715.git.andreyknvl@google.com>
- <0999c80cd639b78ae27c0674069d552833227564.1561386715.git.andreyknvl@google.com>
-From:   Cristian Marussi <cristian.marussi@arm.com>
-Message-ID: <6af3f619-4356-2f67-ed76-92beceb1e0a0@arm.com>
-Date:   Fri, 23 Aug 2019 14:56:11 +0100
+        id S1732212AbfHWOND (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 10:13:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 500203084031;
+        Fri, 23 Aug 2019 14:13:03 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-236.ams2.redhat.com [10.36.116.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AAB8F18E39;
+        Fri, 23 Aug 2019 14:12:59 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] s390x: Add diag308 subcode 0 testing
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com
+References: <20190821104736.1470-1-frankja@linux.ibm.com>
+ <20190822111100.4444-1-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <ffc7de14-7960-5423-d984-c18ab1dfa4b2@redhat.com>
+Date:   Fri, 23 Aug 2019 16:12:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <0999c80cd639b78ae27c0674069d552833227564.1561386715.git.andreyknvl@google.com>
+In-Reply-To: <20190822111100.4444-1-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Fri, 23 Aug 2019 14:13:03 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andrey
-
-On 24/06/2019 15:33, Andrey Konovalov wrote:
-> This patch is a part of a series that extends kernel ABI to allow to pass
-> tagged user pointers (with the top byte set to something else other than
-> 0x00) as syscall arguments.
+On 8/22/19 1:11 PM, Janosch Frank wrote:
+> By adding a load reset routine to cstart.S we can also test the clear
+> reset done by subcode 0, as we now can restore our registers again.
 > 
-> This patch adds a simple test, that calls the uname syscall with a
-> tagged user pointer as an argument. Without the kernel accepting tagged
-> user pointers the test fails with EFAULT.
-> 
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  tools/testing/selftests/arm64/.gitignore      |  1 +
->  tools/testing/selftests/arm64/Makefile        | 11 +++++++
->  .../testing/selftests/arm64/run_tags_test.sh  | 12 ++++++++
->  tools/testing/selftests/arm64/tags_test.c     | 29 +++++++++++++++++++
->  4 files changed, 53 insertions(+)
->  create mode 100644 tools/testing/selftests/arm64/.gitignore
->  create mode 100644 tools/testing/selftests/arm64/Makefile
->  create mode 100755 tools/testing/selftests/arm64/run_tags_test.sh
->  create mode 100644 tools/testing/selftests/arm64/tags_test.c
+> I managed to extract this from another bigger test, so let's add it to the bunch.
+> I'd be very happy about assembly review :-)
 
-After building a fresh Kernel from arm64/for-next-core from scratch at:
+FWIW, the assembly code looks fine to me.
 
-commit 239ab658bea3b387424501e7c416640d6752dc0c 
-Merge: 6bfa3134bd3a 42d038c4fb00 1243cb6a676f d55c5f28afaf d06fa5a118f1 34b5560db40d
-Author: Will Deacon <will@kernel.org>
-Date:   Thu Aug 22 18:23:53 2019 +0100
-
-    Merge branches 'for-next/error-injection', 'for-next/tbi', 'for-next/psci-cpuidle', 'for-next/cpu-topology' and 'for-next/52-bit-kva' into for-next/core
-
-
-KSFT arm64 tests build is broken for me, both setting or not KBUILD_OUTPUT=
-
-13:30 $ make TARGETS=arm64 kselftest-clean                       
-make[1]: Entering directory '/home/crimar01/ARM/dev/src/pdsw/out_linux'
-rm -f -r /home/crimar01/ARM/dev/src/pdsw/out_linux//kselftest/arm64/tags_test
-make[1]: Leaving directory '/home/crimar01/ARM/dev/src/pdsw/out_linux'
-
-✔ ~/ARM/dev/src/pdsw/linux [arm64_for_next_core|…8⚑ 23]
-
-13:30 $ make TARGETS=arm64 kselftest                  
-make[1]: Entering directory '/home/crimar01/ARM/dev/src/pdsw/out_linux'
-arch/arm64/Makefile:56: CROSS_COMPILE_COMPAT not defined or empty, the compat vDSO will not be built
-make --no-builtin-rules INSTALL_HDR_PATH=$BUILD/usr \
-        ARCH=arm64 -C ../../.. headers_install             
-  HOSTCC  scripts/basic/fixdep                     
-  HOSTCC  scripts/unifdef                         
-...
-...
-  HDRINST usr/include/asm/msgbuf.h
-  HDRINST usr/include/asm/shmbuf.h
-  INSTALL /home/crimar01/ARM/dev/src/pdsw/out_linux//kselftest/usr/include
-/opt/toolchains/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc     tags_test.c  -o /home/crimar01/ARM/dev/src/pdsw/out_linux//kselftest/arm64/tags_test
-tags_test.c: In function ‘main’:
-tags_test.c:21:12: error: ‘PR_SET_TAGGED_ADDR_CTRL’ undeclared (first use in this function); did you mean ‘PR_GET_TID_ADDRESS’?
-  if (prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE, 0, 0, 0) == 0)
-            ^~~~~~~~~~~~~~~~~~~~~~~
-            PR_GET_TID_ADDRESS
-tags_test.c:21:12: note: each undeclared identifier is reported only once for each function it appears in
-tags_test.c:21:37: error: ‘PR_TAGGED_ADDR_ENABLE’ undeclared (first use in this function); did you mean ‘PR_GET_DUMPABLE’?
-  if (prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE, 0, 0, 0) == 0)
-                                     ^~~~~~~~~~~~~~~~~~~~~
-                                     PR_GET_DUMPABLE
-../lib.mk:138: recipe for target '/home/crimar01/ARM/dev/src/pdsw/out_linux//kselftest/arm64/tags_test' failed
-make[3]: *** [/home/crimar01/ARM/dev/src/pdsw/out_linux//kselftest/arm64/tags_test] Error 1
-Makefile:136: recipe for target 'all' failed
-make[2]: *** [all] Error 2
-/home/crimar01/ARM/dev/src/pdsw/linux/Makefile:1237: recipe for target 'kselftest' failed
-make[1]: *** [kselftest] Error 2
-make[1]: Leaving directory '/home/crimar01/ARM/dev/src/pdsw/out_linux'
-Makefile:179: recipe for target 'sub-make' failed
-make: *** [sub-make] Error 2
-
-Despite seeing KSFT installing Kernel Headers, they cannot be found.
-
-Fixing this patch like this make it work for me:
-
-diff --git a/tools/testing/selftests/arm64/Makefile b/tools/testing/selftests/arm64/Makefile                                                                                        
-index a61b2e743e99..f9f79fb272f0 100644                             
---- a/tools/testing/selftests/arm64/Makefile   
-+++ b/tools/testing/selftests/arm64/Makefile                                                     
-@@ -4,6 +4,7 @@                                                                       
- ARCH ?= $(shell uname -m 2>/dev/null || echo not)                                              
-                                                       
- ifneq (,$(filter $(ARCH),aarch64 arm64))                                            
-+CFLAGS += -I../../../../usr/include/                                                               
- TEST_GEN_PROGS := tags_test                                  
- TEST_PROGS := run_tags_test.sh                                    
- endif                                                             
-
-but is not really a proper fix since it does NOT account for case in which you have
-installed the Kernel Headers in a non standard location like when you use KBUILD_OUTPUT.
-
-Am I missing something ?
-
-Thanks
-
-Cristian
-
+> ---
+>  s390x/cstart64.S | 27 +++++++++++++++++++++++++++
+>  s390x/diag308.c  | 31 ++++++++++---------------------
+>  2 files changed, 37 insertions(+), 21 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
-> new file mode 100644
-> index 000000000000..e8fae8d61ed6
-> --- /dev/null
-> +++ b/tools/testing/selftests/arm64/.gitignore
-> @@ -0,0 +1 @@
-> +tags_test
-> diff --git a/tools/testing/selftests/arm64/Makefile b/tools/testing/selftests/arm64/Makefile
-> new file mode 100644
-> index 000000000000..a61b2e743e99
-> --- /dev/null
-> +++ b/tools/testing/selftests/arm64/Makefile
-> @@ -0,0 +1,11 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +# ARCH can be overridden by the user for cross compiling
-> +ARCH ?= $(shell uname -m 2>/dev/null || echo not)
-> +
-> +ifneq (,$(filter $(ARCH),aarch64 arm64))
-> +TEST_GEN_PROGS := tags_test
-> +TEST_PROGS := run_tags_test.sh
-> +endif
-> +
-> +include ../lib.mk
-> diff --git a/tools/testing/selftests/arm64/run_tags_test.sh b/tools/testing/selftests/arm64/run_tags_test.sh
-> new file mode 100755
-> index 000000000000..745f11379930
-> --- /dev/null
-> +++ b/tools/testing/selftests/arm64/run_tags_test.sh
-> @@ -0,0 +1,12 @@
-> +#!/bin/sh
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +echo "--------------------"
-> +echo "running tags test"
-> +echo "--------------------"
-> +./tags_test
-> +if [ $? -ne 0 ]; then
-> +	echo "[FAIL]"
-> +else
-> +	echo "[PASS]"
-> +fi
-> diff --git a/tools/testing/selftests/arm64/tags_test.c b/tools/testing/selftests/arm64/tags_test.c
-> new file mode 100644
-> index 000000000000..22a1b266e373
-> --- /dev/null
-> +++ b/tools/testing/selftests/arm64/tags_test.c
-> @@ -0,0 +1,29 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <unistd.h>
-> +#include <stdint.h>
-> +#include <sys/prctl.h>
-> +#include <sys/utsname.h>
-> +
-> +#define SHIFT_TAG(tag)		((uint64_t)(tag) << 56)
-> +#define SET_TAG(ptr, tag)	(((uint64_t)(ptr) & ~SHIFT_TAG(0xff)) | \
-> +					SHIFT_TAG(tag))
-> +
-> +int main(void)
-> +{
-> +	static int tbi_enabled = 0;
-> +	struct utsname *ptr, *tagged_ptr;
-> +	int err;
-> +
-> +	if (prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE, 0, 0, 0) == 0)
-> +		tbi_enabled = 1;
-> +	ptr = (struct utsname *)malloc(sizeof(*ptr));
-> +	if (tbi_enabled)
-> +		tagged_ptr = (struct utsname *)SET_TAG(ptr, 0x42);
-> +	err = uname(tagged_ptr);
-> +	free(ptr);
-> +
-> +	return err;
-> +}
-> 
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index dedfe80..47045e1 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -145,6 +145,33 @@ memsetxc:
+>  	.endm
+>  
+>  .section .text
+> +/*
+> + * load_reset calling convention:
+> + * %r2 subcode (0 or 1)
+> + */
+> +.globl load_reset
+> +load_reset:
 
+Maybe rather name the function diag308_load_reset so that it is clear
+that it belongs to the diag308 test?
+Or are you going to re-use this function in other tests later?
+
+Anyway,
+Reviewed-by: Thomas Huth <thuth@redhat.com>
