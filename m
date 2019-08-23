@@ -2,101 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A1AF9B848
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 23:42:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38AF79B856
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 23:55:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436972AbfHWVmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 17:42:50 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:44160 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436967AbfHWVmu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 17:42:50 -0400
-Received: by mail-pg1-f195.google.com with SMTP id i18so6459658pgl.11;
-        Fri, 23 Aug 2019 14:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/Ex0VsF7RcVYV+8v1fpwxXzCTkxEkPv9xKjjFVVJ2VM=;
-        b=dl9v5/lC1J79HPvdEY3hId6g+g516FVcJoG91q99hS3CxeuK7OVqkfNaS2kqI6sO7J
-         RllVY6jeujUR3kHo9noIrlTT7ExguNPNNY4ysmzwRnxOjvAG+iilHfL+4BSnrVTEWKCz
-         DtM7fWBIGngOi7qIgdsenEUZcQcrQfFioegVT6suLp78MOwWfXW+FLj/vH9vNP3Sa3Yq
-         eG7TBe3TCHkf7Q5idJj5lS4r9mzTqXS4iDf4sgSLXm5n+rpSRhvH8lRu+WtURsrXdK3d
-         UmpTdqHBd+bvvt6D/N1s/KkndqNvuEnsqFnoBwk3QvYj+gXg9ey8nDy1MFjoomfzzraq
-         YyCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/Ex0VsF7RcVYV+8v1fpwxXzCTkxEkPv9xKjjFVVJ2VM=;
-        b=U4nJsIctkPbFp2GIjQtPWnJBbuUlJGbX6+m4+6xK5f6hMQxI7GYuzmCisWQFTkKvh+
-         UycLID3guX3ZF2Owyl7Am5iVUIrwii6Q9kBvLmWm9dWx7JGiMPNFarn166gMOz7K1NHJ
-         r4yqMN1jnOedUVY+6TM28e9P8dtZ4bBbezlVFwoNpQaNctMW9CdfZ9Sii55Wt9K22+tZ
-         u4WtHi5AaNnAlz617s0xy0tnF6rUakBBArf+icNrq448xPWQdXIxcHxtK5Fgh/f9grRX
-         IaombdnLGHN8XAp+vS+CWAH65jMdQGr5ajaOoIqJv4eenNos6gB61lNaKea75ZYHbiLo
-         outw==
-X-Gm-Message-State: APjAAAXv+/9ycsYUhw/t0iefs0y7/OFU+KZ8CQEtA8s2eILNShYTivZF
-        3Ts3ZozNT3b0Vy8i1J2lLFQ=
-X-Google-Smtp-Source: APXvYqyRvZ2n7IKYtQC3lJYMrcYDCd6VEgDCQnBID4DkEeadx/+3PzT40FYNFx2wJP0O1brLR6Ksxw==
-X-Received: by 2002:a63:9e54:: with SMTP id r20mr5957518pgo.64.1566596569079;
-        Fri, 23 Aug 2019 14:42:49 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id n28sm3153636pgd.64.2019.08.23.14.42.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Aug 2019 14:42:48 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] KVM: x86: Don't update RIP or do single-step on faulting
- emulation
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20190823205544.24052-1-sean.j.christopherson@intel.com>
-Date:   Fri, 23 Aug 2019 14:42:46 -0700
+        id S2393247AbfHWVzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 17:55:22 -0400
+Received: from mga12.intel.com ([192.55.52.136]:43389 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388000AbfHWVzW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 17:55:22 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Aug 2019 14:55:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,422,1559545200"; 
+   d="scan'208";a="263305949"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga001.jf.intel.com with ESMTP; 23 Aug 2019 14:55:21 -0700
+Date:   Fri, 23 Aug 2019 14:55:21 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Liran Alon <liran.alon@oracle.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Andy Lutomirski <luto@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D49D02CD-4D29-48C0-B61C-FBE50C79D802@gmail.com>
-References: <20190823205544.24052-1-sean.j.christopherson@intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RESEND PATCH 04/13] KVM: x86: Drop EMULTYPE_NO_UD_ON_FAIL as a
+ standalone type
+Message-ID: <20190823215521.GD24772@linux.intel.com>
+References: <20190823010709.24879-1-sean.j.christopherson@intel.com>
+ <20190823010709.24879-5-sean.j.christopherson@intel.com>
+ <4993FDBF-6641-43E9-BCEE-7F5FE58561E9@oracle.com>
+ <CB2B4523-AA0C-4931-BD1E-9F63FA114EF0@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CB2B4523-AA0C-4931-BD1E-9F63FA114EF0@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Aug 23, 2019, at 1:55 PM, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->=20
-> Don't advance RIP or inject a single-step #DB if emulation signals a
-> fault.  This logic applies to all state updates that are conditional =
-on
-> clean retirement of the emulation instruction, e.g. updating RFLAGS =
-was
-> previously handled by commit 38827dbd3fb85 ("KVM: x86: Do not update
-> EFLAGS on faulting emulation").
->=20
-> Not advancing RIP is likely a nop, i.e. ctxt->eip isn't updated with
-> ctxt->_eip until emulation "retires" anyways.  Skipping #DB injection
-> fixes a bug reported by Andy Lutomirski where a #UD on SYSCALL due to
-> invalid state with RFLAGS.RF=3D1 would loop indefinitely due to =
-emulation
-> overwriting the #UD with #DB and thus restarting the bad SYSCALL over
-> and over.
->=20
-> Cc: Nadav Amit <nadav.amit@gmail.com>
-> Cc: stable@vger.kernel.org
-> Reported-by: Andy Lutomirski <luto@kernel.org>
-> Fixes: 663f4c61b803 ("KVM: x86: handle singlestep during emulation")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On Fri, Aug 23, 2019 at 04:32:05PM +0300, Liran Alon wrote:
+> 
+> > On 23 Aug 2019, at 16:21, Liran Alon <liran.alon@oracle.com> wrote:
+> > 
+> >> On 23 Aug 2019, at 4:07, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+> >> 
+> >> The "no #UD on fail" is used only in the VMWare case, and for the VMWare
+> >> scenario it really means "#GP instead of #UD on fail".  Remove the flag
+> >> in preparation for moving all fault injection into the emulation flow
+> >> itself, which in turn will allow eliminating EMULATE_DONE and company.
+> >> 
+> >> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > When I created the commit which introduced this e23661712005 ("KVM: x86:
+> > Add emulation_type to not raise #UD on emulation failure") I intentionally
+> > introduced a new flag to emulation_type instead of using EMULTYPE_VMWARE as
+> > I thought it’s weird to couple this behaviour specifically with VMware
+> > emulation.  As it made sense to me that there could be more scenarios in
+> > which some VMExit handler would like to use the x86 emulator but in case of
+> > failure want to decide what would be the failure handling from the outside.
+> > I also didn’t want the x86 emulator to be aware of VMware interception
+> > internals.
+> > 
+> > Having said that, one could argue that the x86 emulator already knows about
+> > the VMware interception internals because of how x86_emulate_instruction()
+> > use is_vmware_backdoor_opcode() and from the mere existence of
+> > EMULTYPE_VMWARE. So I think it’s legit to decide that we will just move all
+> > the VMware interception logic into the x86 emulator. Including handling
+> > emulation failures. But then, I would make this patch of yours to also
+> > modify handle_emulation_failure() to queue #GP to guest directly instead of
+> > #GP intercept in VMX/SVM to do so.  I see you do it in a later patch "KVM:
+> > x86: Move #GP injection for VMware into x86_emulate_instruction()" but I
+> > think this should just be squashed with this patch to make sense.
+> > 
+> > To sum-up, I agree with your approach but I recommend you squash this patch
+> > and patch 6 of the series to one and change commit message to explain that
+> > you just move entire handling of VMware interception into the x86 emulator.
+> > Instead of providing explanations such as VMware emulation is the only one
+> > that use “no #UD on fail”.
+> 
+> After reading patch 5 as-well, I would recommend to first apply patch 5
+> (filter out #GP with error-code != 0) and only then apply 4+6.
 
-Seems fine. I guess I should=E2=80=99ve found it before=E2=80=A6
-
-Consider running the relevant self-tests (e.g., single_test_syscall) to
-avoid regressions.
-
+Works for me.
