@@ -2,52 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 52BC79AECD
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:10:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45AF49AEDC
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:14:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405222AbfHWMKz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 08:10:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54684 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730989AbfHWMKx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 08:10:53 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5FD972D0FC7
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 12:10:53 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id q18so2916082wmj.8
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 05:10:53 -0700 (PDT)
+        id S2405341AbfHWML2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 08:11:28 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34564 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405323AbfHWML2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 08:11:28 -0400
+Received: by mail-wr1-f68.google.com with SMTP id s18so8451686wrn.1
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 05:11:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iRAIEkmwp6JE/WX2NGJMgDWxiWJMs7wvHv42hCwyQfI=;
+        b=YEpPQAEvWA9shVqsD3mh8d8r/uR1cXm76LWodn7SiQ5pxKz7XzPS/ZenBR9boBZyaG
+         caGIKN8nTkYwxmJT/mzu7KBhHgk4GeQi8KzLsfjZvbcWPNgfjk8U7abtLLKyXdj5Iamh
+         WEsHh//w59EZk4ZHq2zco+dvqKcSqeOpqKfAgAxs24rR3jk7qj70m/eSqghKeO27BCbg
+         57q5BniRpmfS+Onee+Wyw2JZmiPvY2YoeKKMT+7msYpvsBdu8lDwXAgn8HTnnVp8Mqhf
+         ANB5y7OGnpvyOk+4i8bGpz2IwFMlbb8/P8hrdq+BDZUs4bKztK084OcOQFc10fpgUOCS
+         PrkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YmpuoFAf1JV9E3g21xDaHXmAHG9KWMG9xyLy+0tzG68=;
-        b=kB6cxXJtUFSK+UemeG2fcxq19j8GFmvLYkKZmnrQ6CthL5+Y4AofiLcWeL9CjWK7Ib
-         KHF4myByZot5zaMDbimTiW/aKTAiRPmLRxH2RjdJiSWhWWTg981vuppOnOys81V2W9Y2
-         Idjl7cKzXJy49LxLHhrRfD97OiiKqmOqqiprXGbS7sdhIyshZ0yFqWynektUjudKVKzp
-         etMGMGCx+Vf0b0KmVECMSvY5znbBqFKYjqaxHpnmMIrc+ZdNay3dRndFA4BDnRta9an2
-         F6vAgZFdyX8dNoKvjv4Fla717pXKZwT8MU46XXVfP/4Lf+lcVHRwfZ7kcTznGjWaMeoj
-         kmvQ==
-X-Gm-Message-State: APjAAAWPs0l/kuCBsT3aRHKhKsox9m6aYKeqL6l3yEZnT7d7PTYADHAA
-        ui+1FRssVO3GM0iTkn0/SVqV3rLEGgIG56WJSYuGJ7GSfQG+ExQTICwSbycpYDJdoe8iSyzSoQx
-        ZNk+KZ70oyH8v
-X-Received: by 2002:a05:6000:1c8:: with SMTP id t8mr4657572wrx.296.1566562251952;
-        Fri, 23 Aug 2019 05:10:51 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzyVxw1qUQIBTcRkSh95Cdl4gIPkdK+LHTRDd3Xtmfn2XR4EHjMMfyBhL3S7uHbsTcvuBxUtQ==
-X-Received: by 2002:a05:6000:1c8:: with SMTP id t8mr4657537wrx.296.1566562251686;
-        Fri, 23 Aug 2019 05:10:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4566:f1b0:32e7:463f? ([2001:b07:6468:f312:4566:f1b0:32e7:463f])
-        by smtp.gmail.com with ESMTPSA id g197sm2205295wme.30.2019.08.23.05.10.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2019 05:10:51 -0700 (PDT)
-Subject: Re: [PATCH v5 00/20] KVM RISC-V Support
-To:     "Graf (AWS), Alexander" <graf@amazon.com>,
-        Anup Patel <anup@brainfault.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iRAIEkmwp6JE/WX2NGJMgDWxiWJMs7wvHv42hCwyQfI=;
+        b=D1nErf8LIjBCgx3yL+ihh4pZiSCcOXaaFAlvb+Ckf3m/JlUYEvPTaL/aa3UJDutNYI
+         XQkexEbOhKgt7ojPoaU6HYb0g6jPjggtWA4cS6VHWzMUC8Ic5wt4ahC4rsanuhZ20Bsd
+         zeoBPXFTa9tKLB/rRcCiP8XHrUn/E9CyfODhtxYWzw2qCTlpR11wYQXVwo1z/75nTuJE
+         JtGAx2r0s2ZIAX9Q3xIoXQwDC6W35enOTUx/bzsIP3Q/RAveN8iC3nHBs7/xckfco1Lf
+         HmgbCa07Tl9oh1EqeVHcjjwBk7yRLMp2rbJv062UNimERFSBzo14raOJNIjJb5Suvkeh
+         QlJg==
+X-Gm-Message-State: APjAAAXPoeZpmuGbBEBED1Bj6u2Axx4AawaeuDWOdnwoEKXG+CyvopRc
+        RJsXGg2zgfu0YErCMD7xcvRl2BJM3XKhsdkfLTQp2g==
+X-Google-Smtp-Source: APXvYqweuPNty8ifIydMeMGqUfpAmO11I/wuZUHMJ01iiMWWORMqB38dG8e4+ued1WCyfTwxqp2l51dVxUm9msyVfcc=
+X-Received: by 2002:a5d:4ecb:: with SMTP id s11mr4728857wrv.323.1566562285504;
+ Fri, 23 Aug 2019 05:11:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-16-anup.patel@wdc.com>
+ <09d74212-4fa3-d64c-5a63-d556e955b88c@amazon.com> <CAAhSdy36q5-x8cXM=M5S3cnE2nvCMhcsfuQayVt7jahd58HWFw@mail.gmail.com>
+ <CA3A6A8A-0227-4B92-B892-86A0C7CA369E@amazon.com> <CAAhSdy2FFmCZJhNnMojp8QbiD-t6=4XrNtE9KGnCG_-mPb19-A@mail.gmail.com>
+ <e369eba6-e659-2892-9cb9-a631dd10153a@amazon.com>
+In-Reply-To: <e369eba6-e659-2892-9cb9-a631dd10153a@amazon.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Fri, 23 Aug 2019 17:41:13 +0530
+Message-ID: <CAAhSdy2sknED0W5-SpS4cP46cnS6biHYs_jRDgCj_Ucw5PUYzg@mail.gmail.com>
+Subject: Re: [PATCH v5 15/20] RISC-V: KVM: Add timer functionality
+To:     Alexander Graf <graf@amazon.com>
 Cc:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Radim K <rkrcmar@redhat.com>,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -58,41 +65,89 @@ Cc:     Anup Patel <Anup.Patel@wdc.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190822084131.114764-1-anup.patel@wdc.com>
- <8a2a9ea6-5636-e79a-b041-580159e703b2@amazon.com>
- <CAAhSdy2RC6Gw708wZs+FM56UkkyURgbupwdeTak7VcyarY9irg@mail.gmail.com>
- <757C929B-D26C-46D9-98E8-1191E3B86F3C@amazon.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <fda67a5d-6984-c3ef-8125-7805d927f15b@redhat.com>
-Date:   Fri, 23 Aug 2019 14:10:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <757C929B-D26C-46D9-98E8-1191E3B86F3C@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/08/19 13:44, Graf (AWS), Alexander wrote:
->> Overall, I'm quite happy with the code. It's a very clean implementation
->> of a KVM target.
+On Fri, Aug 23, 2019 at 5:19 PM Alexander Graf <graf@amazon.com> wrote:
+>
+>
+>
+> On 23.08.19 13:46, Anup Patel wrote:
+> > On Fri, Aug 23, 2019 at 5:03 PM Graf (AWS), Alexander <graf@amazon.com> wrote:
+> >>
+> >>
+> >>
+> >>> Am 23.08.2019 um 13:05 schrieb Anup Patel <anup@brainfault.org>:
+> >>>
+> >>>> On Fri, Aug 23, 2019 at 1:23 PM Alexander Graf <graf@amazon.com> wrote:
+> >>>>
+> >>>>> On 22.08.19 10:46, Anup Patel wrote:
+> >>>>> From: Atish Patra <atish.patra@wdc.com>
+> >>>>>
+> >>>>> The RISC-V hypervisor specification doesn't have any virtual timer
+> >>>>> feature.
+> >>>>>
+> >>>>> Due to this, the guest VCPU timer will be programmed via SBI calls.
+> >>>>> The host will use a separate hrtimer event for each guest VCPU to
+> >>>>> provide timer functionality. We inject a virtual timer interrupt to
+> >>>>> the guest VCPU whenever the guest VCPU hrtimer event expires.
+> >>>>>
+> >>>>> The following features are not supported yet and will be added in
+> >>>>> future:
+> >>>>> 1. A time offset to adjust guest time from host time
+> >>>>> 2. A saved next event in guest vcpu for vm migration
+> >>>>
+> >>>> Implementing these 2 bits right now should be trivial. Why wait?
+> >>>
+>
+> [...]
+>
+> >>>> ... in fact, I feel like I'm missing something obvious here. How does
+> >>>> the guest trigger the timer event? What is the argument it uses for that
+> >>>> and how does that play with the tbfreq in the earlier patch?
+> >>>
+> >>> We have SBI call inferface between Hypervisor and Guest. One of the
+> >>> SBI call allows Guest to program time event. The next event is specified
+> >>> as absolute cycles. The Guest can read time using TIME CSR which
+> >>> returns system timer value (@ tbfreq freqency).
+> >>>
+> >>> Guest Linux will know the tbfreq from DTB passed by QEMU/KVMTOOL
+> >>> and it has to be same as Host tbfreq.
+> >>>
+> >>> The TBFREQ config register visible to user-space is a read-only CONFIG
+> >>> register which tells user-space tools (QEMU/KVMTOOL) about Host tbfreq.
+> >>
+> >> And it's read-only because you can not trap on TB reads?
+> >
+> > There is no TB registers.
+> >
+> > The tbfreq can only be know through DT/ACPI kind-of HW description
+> > for both Host and Guest.
+> >
+> > The KVM user-space tool needs to know TBFREQ so that it can set correct
+> > value in generated DT for Guest Linux.
+>
+> So what access methods do get influenced by TBFREQ? If it's only the SBI
+> timer, we can control the frequency, which means we can make TBFREQ
+> read/write.
 
-Yup, I said the same even for v1 (I prefer recursive implementation of
-page table walking but that's all I can say).
+There are two things influenced by TBFREQ:
+1. TIME CSR which is a free running counter
+2. SBI calls for programming next timer event
 
->> I will send v6 next week. I will try my best to implement unpriv
->> trap handling in v6 itself.
-> Are you sure unpriv is the only exception that can hit there? What
-> about NMIs? Do you have #MCs yet (ECC errors)? Do you have something
-> like ARM's #SError which can asynchronously hit at any time because
-> of external bus (PCI) errors?
+The Guest TIME CSR will be at same rate as Host TIME CSR so
+we cannot show different TBFREQ to Guest Linux.
 
-As far as I know, all interrupts on RISC-V are disabled by
-local_irq_disable()/local_irq_enable().
+In future, we will be having a dedicated RISC-V timer extension which
+will have all programming done via CSRs but until then we are stuck
+with TIME CSR + SBI call combination.
 
-Paolo
+Regards,
+Anup
+
+>
+>
+> Alex
