@@ -2,245 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 727479B832
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 23:32:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1AF9B848
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 23:42:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436926AbfHWVbT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 17:31:19 -0400
-Received: from mga18.intel.com ([134.134.136.126]:57174 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2436922AbfHWVbS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 17:31:18 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Aug 2019 14:31:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,422,1559545200"; 
-   d="scan'208";a="263302315"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga001.jf.intel.com with ESMTP; 23 Aug 2019 14:31:15 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S2436972AbfHWVmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 17:42:50 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44160 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2436967AbfHWVmu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 17:42:50 -0400
+Received: by mail-pg1-f195.google.com with SMTP id i18so6459658pgl.11;
+        Fri, 23 Aug 2019 14:42:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=/Ex0VsF7RcVYV+8v1fpwxXzCTkxEkPv9xKjjFVVJ2VM=;
+        b=dl9v5/lC1J79HPvdEY3hId6g+g516FVcJoG91q99hS3CxeuK7OVqkfNaS2kqI6sO7J
+         RllVY6jeujUR3kHo9noIrlTT7ExguNPNNY4ysmzwRnxOjvAG+iilHfL+4BSnrVTEWKCz
+         DtM7fWBIGngOi7qIgdsenEUZcQcrQfFioegVT6suLp78MOwWfXW+FLj/vH9vNP3Sa3Yq
+         eG7TBe3TCHkf7Q5idJj5lS4r9mzTqXS4iDf4sgSLXm5n+rpSRhvH8lRu+WtURsrXdK3d
+         UmpTdqHBd+bvvt6D/N1s/KkndqNvuEnsqFnoBwk3QvYj+gXg9ey8nDy1MFjoomfzzraq
+         YyCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=/Ex0VsF7RcVYV+8v1fpwxXzCTkxEkPv9xKjjFVVJ2VM=;
+        b=U4nJsIctkPbFp2GIjQtPWnJBbuUlJGbX6+m4+6xK5f6hMQxI7GYuzmCisWQFTkKvh+
+         UycLID3guX3ZF2Owyl7Am5iVUIrwii6Q9kBvLmWm9dWx7JGiMPNFarn166gMOz7K1NHJ
+         r4yqMN1jnOedUVY+6TM28e9P8dtZ4bBbezlVFwoNpQaNctMW9CdfZ9Sii55Wt9K22+tZ
+         u4WtHi5AaNnAlz617s0xy0tnF6rUakBBArf+icNrq448xPWQdXIxcHxtK5Fgh/f9grRX
+         IaombdnLGHN8XAp+vS+CWAH65jMdQGr5ajaOoIqJv4eenNos6gB61lNaKea75ZYHbiLo
+         outw==
+X-Gm-Message-State: APjAAAXv+/9ycsYUhw/t0iefs0y7/OFU+KZ8CQEtA8s2eILNShYTivZF
+        3Ts3ZozNT3b0Vy8i1J2lLFQ=
+X-Google-Smtp-Source: APXvYqyRvZ2n7IKYtQC3lJYMrcYDCd6VEgDCQnBID4DkEeadx/+3PzT40FYNFx2wJP0O1brLR6Ksxw==
+X-Received: by 2002:a63:9e54:: with SMTP id r20mr5957518pgo.64.1566596569079;
+        Fri, 23 Aug 2019 14:42:49 -0700 (PDT)
+Received: from [10.2.189.129] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id n28sm3153636pgd.64.2019.08.23.14.42.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 23 Aug 2019 14:42:48 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH] KVM: x86: Don't update RIP or do single-step on faulting
+ emulation
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20190823205544.24052-1-sean.j.christopherson@intel.com>
+Date:   Fri, 23 Aug 2019 14:42:46 -0700
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: VMX: Handle single-step #DB for EMULTYPE_SKIP on EPT misconfig
-Date:   Fri, 23 Aug 2019 14:31:15 -0700
-Message-Id: <20190823213115.31908-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andy Lutomirski <luto@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D49D02CD-4D29-48C0-B61C-FBE50C79D802@gmail.com>
+References: <20190823205544.24052-1-sean.j.christopherson@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VMX's EPT misconfig flow to handle fast-MMIO path falls back to decoding
-the instruction to determine the instruction length when running as a
-guest (Hyper-V doesn't fill VMCS.VM_EXIT_INSTRUCTION_LEN because it's
-technically not defined for EPT misconfigs).  Rather than implement the
-slow skip in VMX's generic skip_emulated_instruction(),
-handle_ept_misconfig() directly calls kvm_emulate_instruction() with
-EMULTYPE_SKIP, which intentionally doesn't do single-step detection, and
-so handle_ept_misconfig() misses a single-step #DB.
+> On Aug 23, 2019, at 1:55 PM, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> Don't advance RIP or inject a single-step #DB if emulation signals a
+> fault.  This logic applies to all state updates that are conditional =
+on
+> clean retirement of the emulation instruction, e.g. updating RFLAGS =
+was
+> previously handled by commit 38827dbd3fb85 ("KVM: x86: Do not update
+> EFLAGS on faulting emulation").
+>=20
+> Not advancing RIP is likely a nop, i.e. ctxt->eip isn't updated with
+> ctxt->_eip until emulation "retires" anyways.  Skipping #DB injection
+> fixes a bug reported by Andy Lutomirski where a #UD on SYSCALL due to
+> invalid state with RFLAGS.RF=3D1 would loop indefinitely due to =
+emulation
+> overwriting the #UD with #DB and thus restarting the bad SYSCALL over
+> and over.
+>=20
+> Cc: Nadav Amit <nadav.amit@gmail.com>
+> Cc: stable@vger.kernel.org
+> Reported-by: Andy Lutomirski <luto@kernel.org>
+> Fixes: 663f4c61b803 ("KVM: x86: handle singlestep during emulation")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Rework the EPT misconfig fallback case to route it through
-kvm_skip_emulated_instruction() so that single-step #DBs and interrupt
-shadow updates are handled automatically.  I.e. make VMX's slow skip
-logic match SVM's and have the SVM flow not intentionally avoid the
-shadow update.
+Seems fine. I guess I should=E2=80=99ve found it before=E2=80=A6
 
-Alternatively, the handle_ept_misconfig() could manually handle single-
-step detection, but that results in EMULTYPE_SKIP having split logic for
-the interrupt shadow vs. single-step #DBs, and split emulator logic is
-largely what led to this mess in the first place.
-
-Modifying SVM to mirror VMX flow isn't really an option as SVM's case
-isn't limited to a specific exit reason, i.e. handling the slow skip in
-skip_emulated_instruction() is mandatory for all intents and purposes.
-
-Drop VMX's skip_emulated_instruction() wrapper since it can now fail,
-and instead WARN if it fails unexpectedly, e.g. if exit_reason somehow
-becomes corrupted.
-
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Fixes: d391f12070672 ("x86/kvm/vmx: do not use vm-exit instruction length for fast MMIO when running nested")
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-*** LOOK HERE ***
-
-This patch applies on top my recent emulation cleanup[1][2] as it has
-non-trivial conflicts, dealing with those seemed like a waste of time,
-and this doesn't seem like a candidate for stable.  Let me know if you'd
-prefer it to be respun without the dependency.
-
-Sadly/ironically, this unwinds some of the logic that was recently
-added by Vitaly at my suggestion.  Hindsight is 20/20 and all that...
-
-[1] https://lkml.kernel.org/r/20190823010709.24879-1-sean.j.christopherson@intel.com
-[2] https://patchwork.kernel.org/cover/11110331/
-
- arch/x86/kvm/svm.c     | 17 +++++++-------
- arch/x86/kvm/vmx/vmx.c | 52 ++++++++++++++++++------------------------
- arch/x86/kvm/x86.c     |  6 ++++-
- 3 files changed, 36 insertions(+), 39 deletions(-)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index f374f11358b7..93137d5f71f8 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -777,14 +777,15 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
- 		svm->next_rip = svm->vmcb->control.next_rip;
- 	}
- 
--	if (!svm->next_rip)
--		return kvm_emulate_instruction(vcpu, EMULTYPE_SKIP);
--
--	if (svm->next_rip - kvm_rip_read(vcpu) > MAX_INST_SIZE)
--		printk(KERN_ERR "%s: ip 0x%lx next 0x%llx\n",
--		       __func__, kvm_rip_read(vcpu), svm->next_rip);
--
--	kvm_rip_write(vcpu, svm->next_rip);
-+	if (!svm->next_rip) {
-+		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-+			return 0;
-+	} else {
-+		if (svm->next_rip - kvm_rip_read(vcpu) > MAX_INST_SIZE)
-+			pr_err("%s: ip 0x%lx next 0x%llx\n",
-+			       __func__, kvm_rip_read(vcpu), svm->next_rip);
-+		kvm_rip_write(vcpu, svm->next_rip);
-+	}
- 	svm_set_interrupt_shadow(vcpu, 0);
- 
- 	return 1;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 44d868c49301..4ee1572e1a7e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1472,17 +1472,27 @@ static int vmx_rtit_ctl_check(struct kvm_vcpu *vcpu, u64 data)
- 	return 0;
- }
- 
--/*
-- * Returns an int to be compatible with SVM implementation (which can fail).
-- * Do not use directly, use skip_emulated_instruction() instead.
-- */
--static int __skip_emulated_instruction(struct kvm_vcpu *vcpu)
-+static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
- {
- 	unsigned long rip;
- 
--	rip = kvm_rip_read(vcpu);
--	rip += vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
--	kvm_rip_write(vcpu, rip);
-+	/*
-+	 * Using VMCS.VM_EXIT_INSTRUCTION_LEN on EPT misconfig depends on
-+	 * undefined behavior: Intel's SDM doesn't mandate the VMCS field be
-+	 * set when EPT misconfig occurs.  In practice, real hardware updates
-+	 * VM_EXIT_INSTRUCTION_LEN on EPT misconfig, but other hypervisors
-+	 * (namely Hyper-V) don't set it due to it being undefined behavior,
-+	 * i.e. we end up advancing IP with some random value.
-+	 */
-+	if (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
-+	    to_vmx(vcpu)->exit_reason != EXIT_REASON_EPT_MISCONFIG) {
-+		rip = kvm_rip_read(vcpu);
-+		rip += vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
-+		kvm_rip_write(vcpu, rip);
-+	} else {
-+		if (!kvm_emulate_instruction(vcpu, EMULTYPE_SKIP))
-+			return 0;
-+	}
- 
- 	/* skipping an emulated instruction also counts */
- 	vmx_set_interrupt_shadow(vcpu, 0);
-@@ -1490,11 +1500,6 @@ static int __skip_emulated_instruction(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
--static inline void skip_emulated_instruction(struct kvm_vcpu *vcpu)
--{
--	(void)__skip_emulated_instruction(vcpu);
--}
--
- static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
- {
- 	/*
-@@ -4552,7 +4557,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
- 			vcpu->arch.dr6 |= dr6 | DR6_RTM;
- 			if (is_icebp(intr_info))
--				skip_emulated_instruction(vcpu);
-+				WARN_ON(!skip_emulated_instruction(vcpu));
- 
- 			kvm_queue_exception(vcpu, DB_VECTOR);
- 			return 1;
-@@ -5062,7 +5067,7 @@ static int handle_task_switch(struct kvm_vcpu *vcpu)
- 	if (!idt_v || (type != INTR_TYPE_HARD_EXCEPTION &&
- 		       type != INTR_TYPE_EXT_INTR &&
- 		       type != INTR_TYPE_NMI_INTR))
--		skip_emulated_instruction(vcpu);
-+		WARN_ON(!skip_emulated_instruction(vcpu));
- 
- 	/*
- 	 * TODO: What about debug traps on tss switch?
-@@ -5129,20 +5134,7 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
- 	if (!is_guest_mode(vcpu) &&
- 	    !kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
- 		trace_kvm_fast_mmio(gpa);
--		/*
--		 * Doing kvm_skip_emulated_instruction() depends on undefined
--		 * behavior: Intel's manual doesn't mandate
--		 * VM_EXIT_INSTRUCTION_LEN to be set in VMCS when EPT MISCONFIG
--		 * occurs and while on real hardware it was observed to be set,
--		 * other hypervisors (namely Hyper-V) don't set it, we end up
--		 * advancing IP with some random value. Disable fast mmio when
--		 * running nested and keep it for real hardware in hope that
--		 * VM_EXIT_INSTRUCTION_LEN will always be set correctly.
--		 */
--		if (!static_cpu_has(X86_FEATURE_HYPERVISOR))
--			return kvm_skip_emulated_instruction(vcpu);
--		else
--			return kvm_emulate_instruction(vcpu, EMULTYPE_SKIP);
-+		return kvm_skip_emulated_instruction(vcpu);
- 	}
- 
- 	return kvm_mmu_page_fault(vcpu, gpa, PFERR_RSVD_MASK, NULL, 0);
-@@ -7696,7 +7688,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 
- 	.run = vmx_vcpu_run,
- 	.handle_exit = vmx_handle_exit,
--	.skip_emulated_instruction = __skip_emulated_instruction,
-+	.skip_emulated_instruction = skip_emulated_instruction,
- 	.set_interrupt_shadow = vmx_set_interrupt_shadow,
- 	.get_interrupt_shadow = vmx_get_interrupt_shadow,
- 	.patch_hypercall = vmx_patch_hypercall,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 53a16eb2aba8..9d5a2b77473b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6552,11 +6552,15 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
- 		return 1;
- 	}
- 
-+	/*
-+	 * Note, EMULTYPE_SKIP is intended for use *only* by vendor callbacks
-+	 * for kvm_skip_emulated_instruction().  The caller is responsible for
-+	 * updating interruptibility state and injecting single-step #DBs.
-+	 */
- 	if (emulation_type & EMULTYPE_SKIP) {
- 		kvm_rip_write(vcpu, ctxt->_eip);
- 		if (ctxt->eflags & X86_EFLAGS_RF)
- 			kvm_set_rflags(vcpu, ctxt->eflags & ~X86_EFLAGS_RF);
--		kvm_x86_ops->set_interrupt_shadow(vcpu, 0);
- 		return 1;
- 	}
- 
--- 
-2.22.0
+Consider running the relevant self-tests (e.g., single_test_syscall) to
+avoid regressions.
 
