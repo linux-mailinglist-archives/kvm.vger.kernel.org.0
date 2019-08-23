@@ -2,391 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20C819AF7C
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:30:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BB389AFC6
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:39:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394726AbfHWM3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 08:29:13 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51700 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387663AbfHWM3M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 08:29:12 -0400
-Received: by mail-wm1-f65.google.com with SMTP id k1so8763436wmi.1
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 05:29:10 -0700 (PDT)
+        id S2388363AbfHWMj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 08:39:29 -0400
+Received: from mail-eopbgr10129.outbound.protection.outlook.com ([40.107.1.129]:28993
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731709AbfHWMj2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 08:39:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S8QdPGNrifsMJGEgOIU0nVeFJSt82zjKi27gcTKmWuKsvZ0JnudmJWzzd1F2e1zmOKfqLykp7by/2T2iTAQt1ZohgvG237AkvXtn5SP8v4ftwIH7ORBDsiCrbpsWxlSJGVhh6rRXQHPJ+GIpCFklTukOLZYLCHqDF9IeEv90RGQWwRH00b8ver4sVCSGXDYXnid+mGrLemaWPQJ3o/Lu2N1WvJ+4H7IDGXMOorL6UUxdcTwNqCrCeGaHp0A86cdLD/zJyySBmOyW6XbeJTeNjtKKcltfFHOYaff7j4RcbvOa7IeRzmtXoV5TeTBrFO9AYLoQAg4gGISVpLVsgnAs9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uOrWAl+puiYulIwKcUdj+QGeMze8NCRfGcGJpExpCm8=;
+ b=ec3rr9nv/afCbBsu3yhPWuc2UXqpO1Hpn6lX46/S/26paHpQd8cRLUV8ob5fJYIAtxAJgGkTG3/objmlQOwWFc9UishFJrQeqkQ3e3H8eSdWkZnWogt2C9hoiNqCXiZDO1CDZ2oifxTWh+FyogJpxFK/iKutfi9jQTms+wqDHwXP2JudvXYKnT8r06wPJQij+ecrRLzSkjOkxhdqR5aenVYhTEKDXpyk/xocSASq4enGUqA5Ey70J+dpu4W3V08Vv+QDhMv54VQpHLBiviBu/bzuO+VcEeLdNQBxhg8WCKQRC+1AhWkwob2cIy73Y3umNQhwAF8qlJE2dxvb9dTEQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bitdefender.com; dmarc=pass action=none
+ header.from=bitdefender.com; dkim=pass header.d=bitdefender.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=v3SECXYZMgxemCryQWtmgixga1wgTZLwdqnQ2dtsTnI=;
-        b=COnwfN2DAxkwdACO0pfIBW80uOhqEtE8aoeu479J8M0lSdcDzkZ6KC99XiJQI7Y6/c
-         ktUZvkeRi2IlTM4WJ/UBdQEq74jn/MFGr+M49KtitptIYIzdWpZaJVJ/vQ3ybOuY27lI
-         40aJ1InPnTbY4xiM+8N9uFl2P2Pp2qa4b4iOXsf3kUDA5nb3BnuJiolZOjlVRhDvSOMi
-         0aFnFZW++EKpE04Q3LT9n1peugPvdWOk2nI9h8QszmzyUosOy20KJkCyxXaZVBumAzgE
-         sRKiCJMkp7pAGoaC57VyngFaPktL3UeMUr/kC1aWXKIsXZZ86AKBzHXo20xfBQqJL4kY
-         R+gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=v3SECXYZMgxemCryQWtmgixga1wgTZLwdqnQ2dtsTnI=;
-        b=ESyuAISws6VdTC522vi7H/L4yT082BxjgYC5Ao83gcscrPFSrbN77g2BC9H6TmWw+q
-         kytMdBHViNd0VYc7dcrvOl6QKUCNF1toEtno2MqC1ltgsGKXuQSLSas28MnAwJ06JtXB
-         nXjWeyX+pkbZglDwcVp41ywhdWcAMX7RZBGdB7tC0qubH74G4ZS4cBFwqn+1CIiMV+fE
-         p3hVuYkEnHcih9U8j8blMUR1aupmJmuqQc28SeBoHcMnNs1TirYyMoMo5DNbzePnNwgC
-         jLCmUih83aHnOkflHdErfAcFS/xFTco98dtcSFHtpiXG4wQhjpx96gS3EJ6VlajPlqmu
-         MMMQ==
-X-Gm-Message-State: APjAAAUdj63JFdQvOCeYSKQNLraJCajWVm+IwNrQWg98BQ4ulxYTDJvU
-        RaIuU4nsZvE8XXsgLJWOqeEd26rKMV+ZXq2RIayf7Q==
-X-Google-Smtp-Source: APXvYqwzN1n+opqBm2sBTfI9EMMfBXkbvR1pRl4uEkvFxzT7AooLKj7pDCtEUfvxjROQmu2B+GrWnAQL/gK/9dWCEaE=
-X-Received: by 2002:a7b:c933:: with SMTP id h19mr4734454wml.177.1566563349005;
- Fri, 23 Aug 2019 05:29:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-19-anup.patel@wdc.com>
- <40911e08-e0ce-a2b8-24d4-9cf357432850@amazon.com> <CAAhSdy3CvvYh59c=OomLZgweWREBhJj_eeH80OkU=7MMCwyiCQ@mail.gmail.com>
- <B29D1609-18FC-4327-8B34-33CB914042E7@amazon.com> <CAAhSdy2eVDqCDnFT9WrboQn+ERhwDFU6UtBaCQp_C7HshLZ+Yw@mail.gmail.com>
- <aa686ffb-d70e-2838-6dd9-6a1193470a11@amazon.com>
-In-Reply-To: <aa686ffb-d70e-2838-6dd9-6a1193470a11@amazon.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 23 Aug 2019 17:58:57 +0530
-Message-ID: <CAAhSdy24NdZNFqT3JHca3NhJ+Au0RvpnWN14to_vvx=9w824=w@mail.gmail.com>
-Subject: Re: [PATCH v5 18/20] RISC-V: KVM: Add SBI v0.1 support
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
+ d=bitdefender.onmicrosoft.com; s=selector2-bitdefender-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uOrWAl+puiYulIwKcUdj+QGeMze8NCRfGcGJpExpCm8=;
+ b=JyrEymlkXizEQwer07me0rQOkbF3VGJ97C+aMJ1pukpT1jriyyhI1hHiU2dDC44gWghXDN00gDKgsqXLOLlwuJeX+ZOpbU7BURlv2yIdBaQ3F5ME8xe48IYngmWvvCmBbhy1SdOipcXmlGiKMsnfh75bYyNNbQeTyGt4DQiX8YM=
+Received: from VI1PR02MB3984.eurprd02.prod.outlook.com (20.177.58.97) by
+ VI1PR02MB3888.eurprd02.prod.outlook.com (52.134.25.154) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2178.16; Fri, 23 Aug 2019 12:39:22 +0000
+Received: from VI1PR02MB3984.eurprd02.prod.outlook.com
+ ([fe80::952d:f2ef:cc90:fd7b]) by VI1PR02MB3984.eurprd02.prod.outlook.com
+ ([fe80::952d:f2ef:cc90:fd7b%5]) with mapi id 15.20.2178.020; Fri, 23 Aug 2019
+ 12:39:21 +0000
+From:   Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>
+To:     Jerome Glisse <jglisse@redhat.com>,
+        =?utf-8?B?QWRhbGJlcnQgTGF6xINy?= <alazar@bitdefender.com>
+CC:     Matthew Wilcox <willy@infradead.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        =?utf-8?B?U2FtdWVsIExhdXLDqW4=?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C <yu.c.zhang@intel.com>,
+        =?utf-8?B?TWloYWkgRG9uyJt1?= <mdontu@bitdefender.com>
+Subject: RE: DANGER WILL ROBINSON, DANGER
+Thread-Topic: DANGER WILL ROBINSON, DANGER
+Thread-Index: AQHVTs8soTQpQXiOD0KEAgMKguVJzKb471OAgAOvxoCAAA/uAIAMAODg
+Date:   Fri, 23 Aug 2019 12:39:21 +0000
+Message-ID: <VI1PR02MB398411CA9A56081FF4D1248EBBA40@VI1PR02MB3984.eurprd02.prod.outlook.com>
+References: <20190809160047.8319-1-alazar@bitdefender.com>
+ <20190809160047.8319-72-alazar@bitdefender.com>
+ <20190809162444.GP5482@bombadil.infradead.org>
+ <1565694095.D172a51.28640.@15f23d3a749365d981e968181cce585d2dcb3ffa>
+ <20190815191929.GA9253@redhat.com> <20190815201630.GA25517@redhat.com>
+In-Reply-To: <20190815201630.GA25517@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=mcirjaliu@bitdefender.com; 
+x-originating-ip: [91.199.104.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a98a0a50-e735-440d-8f09-08d727c6ec60
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:VI1PR02MB3888;
+x-ms-traffictypediagnostic: VI1PR02MB3888:|VI1PR02MB3888:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR02MB3888C939D5E68820A02A8A74BBA40@VI1PR02MB3888.eurprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0138CD935C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(136003)(396003)(39860400002)(346002)(366004)(199004)(189003)(76176011)(229853002)(110136005)(53936002)(71190400001)(71200400001)(14454004)(305945005)(86362001)(6246003)(7736002)(107886003)(25786009)(74316002)(6636002)(2906002)(14444005)(256004)(66066001)(5660300002)(6116002)(3846002)(33656002)(54906003)(66574012)(7416002)(316002)(66476007)(66946007)(186003)(66446008)(64756008)(66556008)(52536014)(4326008)(476003)(76116006)(486006)(446003)(11346002)(26005)(81166006)(99286004)(8676002)(81156014)(102836004)(6506007)(6436002)(55016002)(7696005)(9686003)(8936002)(478600001);DIR:OUT;SFP:1102;SCL:1;SRVR:VI1PR02MB3888;H:VI1PR02MB3984.eurprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: bitdefender.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: nNG+XVj/Yra7okDoqQ/RkEUqtXAD0kb1r1NP9eOqrAAZkhzj69G5sv/apx8YWV8sxnmwqvlcYCGCRiCEcA9VK07gMIJvXSlMj8+gh2O/Mgx9YeZ68AN13l3aRuW8lNY0YEHeX8CdbCzYxutyWo9IMAZYXS0BlWc+88037SU+/g4I6QzoN0nFJjd+A6wTl0KzMqnND31kd80ajtp2lQKWC3gsNBjHRCKVLYdKU3fa4tyGZwe+tAFNlQ4QSpsBzS6GvkOnSajBHuchOfUbnU7GT1LqsvgnRTUOLRz893lzA9L5LF8X1QCOq08OV0IOnQQsWG8jRnyd1AXkW+GHoWDH0pVClelnjUV7Dc+15Ilk46kBG6hMkY4DXnxQ2kfEG2uLQk0QRY70a8IL1POITikUIFQCBeue8TPePBHfjOrDo5w=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: bitdefender.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a98a0a50-e735-440d-8f09-08d727c6ec60
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Aug 2019 12:39:21.6597
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 487baf29-f1da-469a-9221-243f830c36f3
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fNZYcyFg+gNnmR52t5/IadYlY4MLnFFolGrlTXaF0SSLSVtrF2fFBpyN+k2lya5JR4udeCkRdckLwG4cXr6E/nZkclocqJ2hRyDm8V1Qzes=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR02MB3888
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 23, 2019 at 5:50 PM Alexander Graf <graf@amazon.com> wrote:
->
->
->
-> On 23.08.19 14:00, Anup Patel wrote:
-> > On Fri, Aug 23, 2019 at 5:09 PM Graf (AWS), Alexander <graf@amazon.com>=
- wrote:
-> >>
-> >>
-> >>
-> >>> Am 23.08.2019 um 13:18 schrieb Anup Patel <anup@brainfault.org>:
-> >>>
-> >>>> On Fri, Aug 23, 2019 at 1:34 PM Alexander Graf <graf@amazon.com> wro=
-te:
-> >>>>
-> >>>>> On 22.08.19 10:46, Anup Patel wrote:
-> >>>>> From: Atish Patra <atish.patra@wdc.com>
-> >>>>>
-> >>>>> The KVM host kernel running in HS-mode needs to handle SBI calls co=
-ming
-> >>>>> from guest kernel running in VS-mode.
-> >>>>>
-> >>>>> This patch adds SBI v0.1 support in KVM RISC-V. All the SBI calls a=
-re
-> >>>>> implemented correctly except remote tlb flushes. For remote TLB flu=
-shes,
-> >>>>> we are doing full TLB flush and this will be optimized in future.
-> >>>>>
-> >>>>> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> >>>>> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> >>>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> >>>>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> >>>>> ---
-> >>>>>   arch/riscv/include/asm/kvm_host.h |   2 +
-> >>>>>   arch/riscv/kvm/Makefile           |   2 +-
-> >>>>>   arch/riscv/kvm/vcpu_exit.c        |   3 +
-> >>>>>   arch/riscv/kvm/vcpu_sbi.c         | 119 +++++++++++++++++++++++++=
-+++++
-> >>>>>   4 files changed, 125 insertions(+), 1 deletion(-)
-> >>>>>   create mode 100644 arch/riscv/kvm/vcpu_sbi.c
-> >>>>>
-> >>>>> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include=
-/asm/kvm_host.h
-> >>>>> index 2af3a179c08e..0b1eceaef59f 100644
-> >>>>> --- a/arch/riscv/include/asm/kvm_host.h
-> >>>>> +++ b/arch/riscv/include/asm/kvm_host.h
-> >>>>> @@ -241,4 +241,6 @@ bool kvm_riscv_vcpu_has_interrupt(struct kvm_vc=
-pu *vcpu);
-> >>>>>   void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
-> >>>>>   void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
-> >>>>>
-> >>>>> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu);
-> >>>>> +
-> >>>>>   #endif /* __RISCV_KVM_HOST_H__ */
-> >>>>> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> >>>>> index 3e0c7558320d..b56dc1650d2c 100644
-> >>>>> --- a/arch/riscv/kvm/Makefile
-> >>>>> +++ b/arch/riscv/kvm/Makefile
-> >>>>> @@ -9,6 +9,6 @@ ccflags-y :=3D -Ivirt/kvm -Iarch/riscv/kvm
-> >>>>>   kvm-objs :=3D $(common-objs-y)
-> >>>>>
-> >>>>>   kvm-objs +=3D main.o vm.o vmid.o tlb.o mmu.o
-> >>>>> -kvm-objs +=3D vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o
-> >>>>> +kvm-objs +=3D vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o vcpu_s=
-bi.o
-> >>>>>
-> >>>>>   obj-$(CONFIG_KVM)   +=3D kvm.o
-> >>>>> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.=
-c
-> >>>>> index fbc04fe335ad..87b83fcf9a14 100644
-> >>>>> --- a/arch/riscv/kvm/vcpu_exit.c
-> >>>>> +++ b/arch/riscv/kvm/vcpu_exit.c
-> >>>>> @@ -534,6 +534,9 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, =
-struct kvm_run *run,
-> >>>>>                   (vcpu->arch.guest_context.hstatus & HSTATUS_STL))
-> >>>>>                       ret =3D stage2_page_fault(vcpu, run, scause, =
-stval);
-> >>>>>               break;
-> >>>>> +     case EXC_SUPERVISOR_SYSCALL:
-> >>>>> +             if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
-> >>>>> +                     ret =3D kvm_riscv_vcpu_sbi_ecall(vcpu);
-> >>>>>       default:
-> >>>>>               break;
-> >>>>>       };
-> >>>>> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> >>>>> new file mode 100644
-> >>>>> index 000000000000..5793202eb514
-> >>>>> --- /dev/null
-> >>>>> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> >>>>> @@ -0,0 +1,119 @@
-> >>>>> +// SPDX-License-Identifier: GPL-2.0
-> >>>>> +/**
-> >>>>> + * Copyright (c) 2019 Western Digital Corporation or its affiliate=
-s.
-> >>>>> + *
-> >>>>> + * Authors:
-> >>>>> + *     Atish Patra <atish.patra@wdc.com>
-> >>>>> + */
-> >>>>> +
-> >>>>> +#include <linux/errno.h>
-> >>>>> +#include <linux/err.h>
-> >>>>> +#include <linux/kvm_host.h>
-> >>>>> +#include <asm/csr.h>
-> >>>>> +#include <asm/kvm_vcpu_timer.h>
-> >>>>> +
-> >>>>> +#define SBI_VERSION_MAJOR                    0
-> >>>>> +#define SBI_VERSION_MINOR                    1
-> >>>>> +
-> >>>>> +/* TODO: Handle traps due to unpriv load and redirect it back to V=
-S-mode */
-> >>>>
-> >>>> Ugh, another one of those? Can't you just figure out a way to recove=
-r
-> >>>> from the page fault? Also, you want to combine this with the instruc=
-tion
-> >>>> load logic, so that we have a single place that guest address space
-> >>>> reads go through.
-> >>>
-> >>> Walking Guest page table would be more expensive compared to implemen=
-ting
-> >>> a trap handling mechanism.
-> >>>
-> >>> We will be adding trap handling mechanism for reading instruction and=
- reading
-> >>> load.
-> >>>
-> >>> Both these operations are different in following ways:
-> >>> 1. RISC-V instructions are variable length. We get to know exact inst=
-ruction
-> >>>     length only after reading first 16bits
-> >>> 2. We need to set VSSTATUS.MXR bit when reading instruction for
-> >>>     execute-only Guest pages.
-> >>
-> >> Yup, sounds like you could solve that with a trivial if() based on "re=
-ad instruction" or not, no? If you want to, feel free to provide short vers=
-ions that do only read ins/data, but I would really like to see the whole "=
-data reads become guest reads" magic to be funneled through a single functi=
-on (in C, can be inline unrolled in asm of course)
-> >>
-> >>>
-> >>>>
-> >>>>> +static unsigned long kvm_sbi_unpriv_load(const unsigned long *addr=
-,
-> >>>>> +                                      struct kvm_vcpu *vcpu)
-> >>>>> +{
-> >>>>> +     unsigned long flags, val;
-> >>>>> +     unsigned long __hstatus, __sstatus;
-> >>>>> +
-> >>>>> +     local_irq_save(flags);
-> >>>>> +     __hstatus =3D csr_read(CSR_HSTATUS);
-> >>>>> +     __sstatus =3D csr_read(CSR_SSTATUS);
-> >>>>> +     csr_write(CSR_HSTATUS, vcpu->arch.guest_context.hstatus | HST=
-ATUS_SPRV);
-> >>>>> +     csr_write(CSR_SSTATUS, vcpu->arch.guest_context.sstatus);
-> >>>>> +     val =3D *addr;
-> >>>>> +     csr_write(CSR_HSTATUS, __hstatus);
-> >>>>> +     csr_write(CSR_SSTATUS, __sstatus);
-> >>>>> +     local_irq_restore(flags);
-> >>>>> +
-> >>>>> +     return val;
-> >>>>> +}
-> >>>>> +
-> >>>>> +static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu, u32 typ=
-e)
-> >>>>> +{
-> >>>>> +     int i;
-> >>>>> +     struct kvm_vcpu *tmp;
-> >>>>> +
-> >>>>> +     kvm_for_each_vcpu(i, tmp, vcpu->kvm)
-> >>>>> +             tmp->arch.power_off =3D true;
-> >>>>> +     kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
-> >>>>> +
-> >>>>> +     memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_=
-event));
-> >>>>> +     vcpu->run->system_event.type =3D type;
-> >>>>> +     vcpu->run->exit_reason =3D KVM_EXIT_SYSTEM_EVENT;
-> >>>>> +}
-> >>>>> +
-> >>>>> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu)
-> >>>>> +{
-> >>>>> +     int ret =3D 1;
-> >>>>> +     u64 next_cycle;
-> >>>>> +     int vcpuid;
-> >>>>> +     struct kvm_vcpu *remote_vcpu;
-> >>>>> +     ulong dhart_mask;
-> >>>>> +     struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
-> >>>>> +
-> >>>>> +     if (!cp)
-> >>>>> +             return -EINVAL;
-> >>>>> +     switch (cp->a7) {
-> >>>>> +     case SBI_SET_TIMER:
-> >>>>> +#if __riscv_xlen =3D=3D 32
-> >>>>> +             next_cycle =3D ((u64)cp->a1 << 32) | (u64)cp->a0;
-> >>>>> +#else
-> >>>>> +             next_cycle =3D (u64)cp->a0;
-> >>>>> +#endif
-> >>>>> +             kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
-> >>>>
-> >>>> Ah, this is where the timer set happens. I still don't understand ho=
-w
-> >>>> this takes the frequency bit into account?
-> >>>
-> >>> Explained it in PATCH17 comments.
-> >>>
-> >>>>
-> >>>>> +             break;
-> >>>>> +     case SBI_CONSOLE_PUTCHAR:
-> >>>>> +             /* Not implemented */
-> >>>>> +             cp->a0 =3D -ENOTSUPP;
-> >>>>> +             break;
-> >>>>> +     case SBI_CONSOLE_GETCHAR:
-> >>>>> +             /* Not implemented */
-> >>>>> +             cp->a0 =3D -ENOTSUPP;
-> >>>>> +             break;
-> >>>>
-> >>>> These two should be covered by the default case.
-> >>>
-> >>> Sure, I will update.
-> >>>
-> >>>>
-> >>>>> +     case SBI_CLEAR_IPI:
-> >>>>> +             kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_S_SOFT);
-> >>>>> +             break;
-> >>>>> +     case SBI_SEND_IPI:
-> >>>>> +             dhart_mask =3D kvm_sbi_unpriv_load((unsigned long *)c=
-p->a0, vcpu);
-> >>>>> +             for_each_set_bit(vcpuid, &dhart_mask, BITS_PER_LONG) =
-{
-> >>>>> +                     remote_vcpu =3D kvm_get_vcpu_by_id(vcpu->kvm,=
- vcpuid);
-> >>>>> +                     kvm_riscv_vcpu_set_interrupt(remote_vcpu, IRQ=
-_S_SOFT);
-> >>>>> +             }
-> >>>>> +             break;
-> >>>>> +     case SBI_SHUTDOWN:
-> >>>>> +             kvm_sbi_system_shutdown(vcpu, KVM_SYSTEM_EVENT_SHUTDO=
-WN);
-> >>>>> +             ret =3D 0;
-> >>>>> +             break;
-> >>>>> +     case SBI_REMOTE_FENCE_I:
-> >>>>> +             sbi_remote_fence_i(NULL);
-> >>>>> +             break;
-> >>>>> +     /*
-> >>>>> +      * TODO: There should be a way to call remote hfence.bvma.
-> >>>>> +      * Preferred method is now a SBI call. Until then, just flush
-> >>>>> +      * all tlbs.
-> >>>>> +      */
-> >>>>> +     case SBI_REMOTE_SFENCE_VMA:
-> >>>>> +             /*TODO: Parse vma range.*/
-> >>>>> +             sbi_remote_sfence_vma(NULL, 0, 0);
-> >>>>> +             break;
-> >>>>> +     case SBI_REMOTE_SFENCE_VMA_ASID:
-> >>>>> +             /*TODO: Parse vma range for given ASID */
-> >>>>> +             sbi_remote_sfence_vma(NULL, 0, 0);
-> >>>>> +             break;
-> >>>>> +     default:
-> >>>>> +             cp->a0 =3D ENOTSUPP;
-> >>>>> +             break;
-> >>>>
-> >>>> Please just send unsupported SBI events into user space.
-> >>>
-> >>> For unsupported SBI calls, we should be returning error to the
-> >>> Guest Linux so that do something about it. This is in accordance
-> >>> with the SBI spec.
-> >>
-> >> That's up to user space (QEMU / kvmtool) to decide. If user space want=
-s to implement the  console functions (like we do on s390), it should have =
-the chance to do so.
-> >
-> > The SBI_CONSOLE_PUTCHAR and SBI_CONSOLE_GETCHAR are
-> > for debugging only. These calls are deprecated in SBI v0.2 onwards
-> > because we now have earlycon for early prints in Linux RISC-V.
-> >
-> > The RISC-V Guest will generally have it's own MMIO based UART
-> > which will be the default console.
-> >
-> > Due to these reasons, we have not implemented these SBI calls.
->
-> I'm not saying we should implement them. I'm saying we should leave a
-> policy decision like that up to user space. By terminating the SBI in
-> kernel space, you can not quickly debug something going wrong.
->
-> > If we still want user-space to implement this then we will require
-> > separate exit reasons and we are trying to avoid adding RISC-V
-> > specific exit reasons/ioctls in KVM user-space ABI.
->
-> Why?
->
-> I had so many occasions where I would have loved to have user space
-> exits for MSR access, SPR access, hypercalls, etc etc. It really makes
-> life so much easier when you can quickly hack something up in user space
-> rather than modify the kernel.
->
-> > The absence of SBI_CONSOLE_PUTCHAR/GETCHAR certainly
-> > does not block anyone in debugging Guest Linux because we have
-> > earlycon support in Linux RISC-V.
->
-> I'm not hung on on the console. What I'm trying to express is a general
-> sentiment that terminating extensible hypervisor <-> guest interfaces in
-> kvm is not a great idea. Some times we can't get around it (like on page
-> tables), but some times we do. And this is a case where we could.
->
-> At the end of the day this is your call though :).
-
-I am not sure about user-space CSRs but having ability to route
-unsupported SBI calls to user-space can be very useful.
-
-For this series, we will continue to return error to Guest Linux for
-unsupported SBI calls.
-
-We will add unsupported SBI routing to user-space in next series.
-
-Regards,
-Anup
-
->
->
-> Alex
+PiBPbiBUaHUsIEF1ZyAxNSwgMjAxOSBhdCAwMzoxOToyOVBNIC0wNDAwLCBKZXJvbWUgR2xpc3Nl
+IHdyb3RlOg0KPiA+IE9uIFR1ZSwgQXVnIDEzLCAyMDE5IGF0IDAyOjAxOjM1UE0gKzAzMDAsIEFk
+YWxiZXJ0IExhesSDciB3cm90ZToNCj4gPiA+IE9uIEZyaSwgOSBBdWcgMjAxOSAwOToyNDo0NCAt
+MDcwMCwgTWF0dGhldyBXaWxjb3ggPHdpbGx5QGluZnJhZGVhZC5vcmc+DQo+IHdyb3RlOg0KPiA+
+ID4gPiBPbiBGcmksIEF1ZyAwOSwgMjAxOSBhdCAwNzowMDoyNlBNICswMzAwLCBBZGFsYmVydCBM
+YXrEg3Igd3JvdGU6DQo+ID4gPiA+ID4gKysrIGIvaW5jbHVkZS9saW51eC9wYWdlLWZsYWdzLmgN
+Cj4gPiA+ID4gPiBAQCAtNDE3LDggKzQxNywxMCBAQCBQQUdFRkxBRyhJZGxlLCBpZGxlLCBQRl9B
+TlkpDQo+ID4gPiA+ID4gICAqLw0KPiA+ID4gPiA+ICAjZGVmaW5lIFBBR0VfTUFQUElOR19BTk9O
+CTB4MQ0KPiA+ID4gPiA+ICAjZGVmaW5lIFBBR0VfTUFQUElOR19NT1ZBQkxFCTB4Mg0KPiA+ID4g
+PiA+ICsjZGVmaW5lIFBBR0VfTUFQUElOR19SRU1PVEUJMHg0DQo+ID4gPiA+DQo+ID4gPiA+IFVo
+LiAgSG93IGRvIHlvdSBrbm93IHBhZ2UtPm1hcHBpbmcgd291bGQgb3RoZXJ3aXNlIGhhdmUgYml0
+IDINCj4gY2xlYXI/DQo+ID4gPiA+IFdobydzIGd1YXJhbnRlZWluZyB0aGF0Pw0KPiA+ID4gPg0K
+PiA+ID4gPiBUaGlzIGlzIGFuIGF3ZnVsbHkgYmlnIHBhdGNoIHRvIHRoZSBtZW1vcnkgbWFuYWdl
+bWVudCBjb2RlLCBidXJpZWQNCj4gPiA+ID4gaW4gdGhlIG1pZGRsZSBvZiBhIGdpZ2FudGljIHNl
+cmllcyB3aGljaCBhbG1vc3QgZ3VhcmFudGVlcyBub2JvZHkNCj4gPiA+ID4gd291bGQgbG9vayBh
+dCBpdC4gIEkgY2FsbCBzaGVuYW5pZ2Fucy4NCj4gPiA+ID4NCj4gPiA+ID4gPiBAQCAtMTAyMSw3
+ICsxMDIyLDcgQEAgdm9pZCBwYWdlX21vdmVfYW5vbl9ybWFwKHN0cnVjdCBwYWdlDQo+ICpwYWdl
+LCBzdHJ1Y3Qgdm1fYXJlYV9zdHJ1Y3QgKnZtYSkNCj4gPiA+ID4gPiAgICogX19wYWdlX3NldF9h
+bm9uX3JtYXAgLSBzZXQgdXAgbmV3IGFub255bW91cyBybWFwDQo+ID4gPiA+ID4gICAqIEBwYWdl
+OglQYWdlIG9yIEh1Z2VwYWdlIHRvIGFkZCB0byBybWFwDQo+ID4gPiA+ID4gICAqIEB2bWE6CVZN
+IGFyZWEgdG8gYWRkIHBhZ2UgdG8uDQo+ID4gPiA+ID4gLSAqIEBhZGRyZXNzOglVc2VyIHZpcnR1
+YWwgYWRkcmVzcyBvZiB0aGUgbWFwcGluZw0KPiA+ID4gPiA+ICsgKiBAYWRkcmVzczoJVXNlciB2
+aXJ0dWFsIGFkZHJlc3Mgb2YgdGhlIG1hcHBpbmcNCj4gPiA+ID4NCj4gPiA+ID4gQW5kIG1peGlu
+ZyBpbiBmbHVmZiBjaGFuZ2VzIGxpa2UgdGhpcyBpcyBhIHJlYWwgbm8tbm8uICBUcnkgYWdhaW4u
+DQo+ID4gPiA+DQo+ID4gPg0KPiA+ID4gTm8gYmFkIGludGVudGlvbnMsIGp1c3Qgb3ZlcnplYWxv
+dXMuDQo+ID4gPiBJIGRpZG4ndCB3YW50IHRvIGhpZGUgYW55dGhpbmcgZnJvbSBvdXIgcGF0Y2hl
+cy4NCj4gPiA+IE9uY2Ugd2UgYWR2YW5jZSB3aXRoIHRoZSBpbnRyb3NwZWN0aW9uIHBhdGNoZXMg
+cmVsYXRlZCB0byBLVk0gd2UnbGwNCj4gPiA+IGJlIGJhY2sgd2l0aCB0aGUgcmVtb3RlIG1hcHBp
+bmcgcGF0Y2gsIHNwbGl0IGFuZCBjbGVhbmVkLg0KPiA+DQo+ID4gVGhleSBhcmUgbm90IGJpdCBs
+ZWZ0IGluIHN0cnVjdCBwYWdlICEgTG9va2luZyBhdCB0aGUgcGF0Y2ggaXQgc2VlbXMNCj4gPiB5
+b3Ugd2FudCB0byBoYXZlIHlvdXIgb3duIHBpbiBjb3VudCBqdXN0IGZvciBLVk0uIFRoaXMgaXMg
+YmFkLCB3ZSBhcmUNCj4gPiBhbHJlYWR5IHRyeWluZyB0byBzb2x2ZSB0aGUgR1VQIHRoaW5nIChz
+ZWUgYWxsIHZhcmlvdXMgcGF0Y2hzZXQgYWJvdXQNCj4gPiBHVVAgcG9zdGVkIHJlY2VudGx5KS4N
+Cj4gPg0KPiA+IFlvdSBuZWVkIHRvIHJldGhpbmsgaG93IHlvdSB3YW50IHRvIGFjaGlldmUgdGhp
+cy4gV2h5IG5vdCBzaW1wbHkgYQ0KPiA+IHJlbW90ZSByZWFkKCkvd3JpdGUoKSBpbnRvIHRoZSBw
+cm9jZXNzIG1lbW9yeSBpZSBLVk1JIHdvdWxkIGNhbGwgYW4NCj4gPiBpb2N0bCB0aGF0IGFsbG93
+IHRvIHJlYWQgb3Igd3JpdGUgaW50byBhIHJlbW90ZSBwcm9jZXNzIG1lbW9yeSBsaWtlDQo+ID4g
+cHRyYWNlKCkgYnV0IG9uIHN0ZXJvaWQgLi4uDQo+ID4NCj4gPiBBZGRpbmcgdGhpcyB3aG9sZSBi
+aWcgY29tcGxleCBpbmZyYXN0cnVjdHVyZSB3aXRob3V0IGp1c3RpZmljYXRpb24gb2YNCj4gPiB3
+aHkgd2UgbmVlZCB0byBhdm9pZCByb3VuZCB0cmlwIGlzIGp1c3QgdG9vIG11Y2ggcmVhbGx5Lg0K
+PiANCj4gVGhpbmtpbmcgYSBiaXQgbW9yZSBhYm91dCB0aGlzLCB5b3UgY2FuIGFjaGlldmUgdGhl
+IHNhbWUgdGhpbmcgd2l0aG91dA0KPiBhZGRpbmcgYSBzaW5nbGUgbGluZSB0byBhbnkgbW0gY29k
+ZS4gSW5zdGVhZCBvZiBoYXZpbmcgbW1hcCB3aXRoDQo+IFBST1RfTk9ORSB8IE1BUF9MT0NLRUQg
+eW91IGhhdmUgdXNlcnNwYWNlIG1tYXAgc29tZSBrdm0gZGV2aWNlDQo+IGZpbGUgKGkgYW0gYXNz
+dW1pbmcgdGhpcyBpcyBzb21ldGhpbmcgeW91IGFscmVhZHkgaGF2ZSBhbmQgY2FuIGNvbnRyb2wg
+dGhlDQo+IG1tYXAgY2FsbGJhY2spLg0KPiANCj4gU28gbm93IGtlcm5lbCBzaWRlIHlvdSBoYXZl
+IGEgdm1hIHdpdGggYSB2bV9vcGVyYXRpb25zX3N0cnVjdCB1bmRlciB5b3VyDQo+IGNvbnRyb2wg
+dGhpcyBtZWFucyB0aGF0IGV2ZXJ5dGhpbmcgeW91IHdhbnQgdG8gYmxvY2sgbW0gd2lzZSBmcm9t
+IHdpdGhpbg0KPiB0aGUgaW5zcGVjdG9yIHByb2Nlc3MgY2FuIGJlIGJsb2NrIHRocm91Z2ggdGhv
+c2UgY2FsbC0gYmFja3MNCj4gKGZpbmRfc3BlY2lhbF9wYWdlKCkgc3BlY2lmaWNhbHkgZm9yIHdo
+aWNoIHlvdSBoYXZlIHRvIHJldHVybiBOVUxMIGFsbCB0aGUNCj4gdGltZSkuDQo+IA0KPiBUbyBt
+aXJyb3IgdGFyZ2V0IHByb2Nlc3MgbWVtb3J5IHlvdSBjYW4gdXNlIGhtbV9taXJyb3IsIHdoZW4g
+eW91DQo+IHBvcHVsYXRlIHRoZSBpbnNwZWN0b3IgcHJvY2VzcyBwYWdlIHRhYmxlIHlvdSB1c2Ug
+aW5zZXJ0X3BmbigpIChtbWFwIG9mDQo+IHRoZSBrdm0gZGV2aWNlIGZpbGUgbXVzdCBtYXJrIHRo
+aXMgdm1hIGFzIFBGTk1BUCkuDQo+IA0KPiBCeSBmb2xsb3dpbmcgdGhlIGhtbV9taXJyb3IgQVBJ
+LCBhbnl0aW1lIHRoZSB0YXJnZXQgcHJvY2VzcyBoYXMgYSBjaGFuZ2UgaW4NCj4gaXRzIHBhZ2Ug
+dGFibGUgKGllIHZpcnR1YWwgYWRkcmVzcyAtPiBwYWdlKSB5b3Ugd2lsbCBnZXQgYSBjYWxsYmFj
+ayBhbmQgYWxsIHlvdQ0KPiBoYXZlIHRvIGRvIGlzIGNsZWFyIHRoZSBwYWdlIHRhYmxlIHdpdGhp
+biB0aGUgaW5zcGVjdG9yIHByb2Nlc3MgYW5kIGZsdXNoIHRsYg0KPiAodXNlIHphcF9wYWdlX3Jh
+bmdlKS4NCj4gDQo+IE9uIHBhZ2UgZmF1bHQgd2l0aGluIHRoZSBpbnNwZWN0b3IgcHJvY2VzcyB0
+aGUgZmF1bHQgY2FsbGJhY2sgb2Ygdm1fb3BzIHdpbGwNCj4gZ2V0IGNhbGwgYW5kIGZyb20gdGhl
+cmUgeW91IGNhbGwgaG1tX21pcnJvciBmb2xsb3dpbmcgaXRzIEFQSS4NCj4gDQo+IE9oIGFsc28g
+bWFyayB0aGUgdm1hIHdpdGggVk1fV0lQRU9ORk9SSyB0byBhdm9pZCBhbnkgaXNzdWUgaWYgdGhl
+DQo+IGluc3BlY3RvciBwcm9jZXNzIHVzZSBmb3JrKCkgKHlvdSBjb3VsZCBzdXBwb3J0IGZvcmsg
+YnV0IHRoZW4geW91IHdvdWxkDQo+IG5lZWQgdG8gbWFyayB0aGUgdm1hIGFzIFNIQVJFRCBhbmQg
+dXNlIHVubWFwX21hcHBpbmdfcGFnZXMgaW5zdGVhZCBvZg0KPiB6YXBfcGFnZV9yYW5nZSkuDQo+
+IA0KPiANCj4gVGhlcmUgZXZlcnl0aGluZyB5b3Ugd2FudCB0byBkbyB3aXRoIGFscmVhZHkgdXBz
+dHJlYW0gbW0gY29kZS4NCg0KSSdtIHRoZSBhdXRob3Igb2YgcmVtb3RlIG1hcHBpbmcsIHNvIEkg
+b3dlIGV2ZXJ5Ym9keSBzb21lIGV4cGxhbmF0aW9ucy4NCk15IHJlcXVpcmVtZW50IHdhcyB0byBt
+YXAgcGFnZXMgZnJvbSBvbmUgUUVNVSBwcm9jZXNzIHRvIGFub3RoZXIgUUVNVSANCnByb2Nlc3Mg
+KG91ciBpbnNwZWN0b3IgcHJvY2VzcyB3b3JrcyBpbiBhIHZpcnR1YWwgbWFjaGluZSBvZiBpdHMg
+b3duKS4gU28gSSBoYWQgDQp0byBpbXBsZW1lbnQgYSBLU00tbGlrZSBwYWdlIHNoYXJpbmcgYmV0
+d2VlbiBwcm9jZXNzZXMsIHdoZXJlIGFuIGFub24gcGFnZQ0KZnJvbSB0aGUgdGFyZ2V0IFFFTVUn
+cyB3b3JraW5nIG1lbW9yeSBpcyBwcm9tb3RlZCB0byBhIHJlbW90ZSBwYWdlIGFuZCANCm1hcHBl
+ZCBpbiB0aGUgaW5zcGVjdG9yIFFFTVUncyB3b3JraW5nIG1lbW9yeSAoYm90aCBhbm9uIFZNQXMp
+LiANClRoZSBleHRyYSBwYWdlIGZsYWcgaXMgZm9yIGRpZmZlcmVudGlhdGluZyB0aGUgcGFnZSBm
+b3Igcm1hcCB3YWxraW5nLg0KDQpUaGUgbWFwcGluZyByZXF1ZXN0cyBjb21lIGF0IFBBR0VfU0la
+RSBncmFudWxhcml0eSBmb3IgcmFuZG9tIGFkZHJlc3NlcyANCndpdGhpbiB0aGUgdGFyZ2V0L2lu
+c3BlY3RvciBRRU1Vcywgc28gSSBjb3VsZG4ndCBkbyBhbnkgbGluZWFyIG1hcHBpbmcgdGhhdA0K
+d291bGQga2VlcCB0aGluZ3Mgc2ltcGxlci4gDQoNCkkgaGF2ZSBhbiBleHRyYSBwYXRjaCB0aGF0
+IGRvZXMgcmVtb3RlIG1hcHBpbmcgYnkgbWlycm9yaW5nIGFuIGVudGlyZSBWTUENCmZyb20gdGhl
+IHRhcmdldCBwcm9jZXNzIGJ5IHdheSBvZiBhIGRldmljZSBmaWxlLiBUaGlzIHRoaW5nIGNyZWF0
+ZXMgYSBzZXBhcmF0ZSANCm1pcnJvciBWTUEgaW4gbXkgaW5zcGVjdG9yIHByb2Nlc3MgKGF0IHRo
+ZSBtb21lbnQgYSBRRU1VKSwgYnV0IHRoZW4gSSANCmJ1bXBlZCBpbnRvIHRoZSBLVk0gaHZhLT5n
+cGEgbWFwcGluZywgd2hpY2ggbWFrZXMgaXQgaGFyZCB0byBvdmVycmlkZSANCm1hcHBpbmdzIHdp
+dGggYWRkcmVzc2VzIG91dHNpZGUgbWVtc2xvdCBhc3NvY2lhdGVkIFZNQXMuDQoNCk1pcmNlYQ0K
