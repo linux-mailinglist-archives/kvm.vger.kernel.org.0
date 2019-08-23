@@ -2,24 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F4B09B498
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 18:36:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31C4E9B522
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 19:09:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436777AbfHWQfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 12:35:40 -0400
-Received: from foss.arm.com ([217.140.110.172]:37024 "EHLO foss.arm.com"
+        id S1732205AbfHWRID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 13:08:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48964 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2436778AbfHWQfj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 12:35:39 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 454FA1570;
-        Fri, 23 Aug 2019 09:35:39 -0700 (PDT)
-Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94A4B3F246;
-        Fri, 23 Aug 2019 09:35:37 -0700 (PDT)
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+        id S1732165AbfHWRIC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 13:08:02 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 40D9F7DD11
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 17:08:02 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id v4so3149827wmh.9
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 10:08:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=L7CFzFZcBTFDB9gXZjKJlWNHgFbguv8P194zUY7iBjo=;
+        b=gg7v2X2CKmYKjdi0fvoQNna5m3BB92aFA2/qNbCdqGb9Dn8poPbm0oA+kRO5BMa3ny
+         kKoNJwJXH5zS0prEs7YQH1NCSXDA2aO8WKmoysRbnUMYv5qfedur/FWzwfaxBomqD6tQ
+         78JRM3NiH/SGALKxl8rBnbbsX7lV2q1Gbn0e/IhAPbJMI1odTs+VnuO8HRE6Ch8aqTBZ
+         j57gGI3jgOyOJ23lTWaEB2Gd5dklihKIeypzaeSq5MLF6MX1m6Hg91zflKHwYGSViDlJ
+         MSPTQvWqYD0bZMcEWMdUG1aaPxTpPGVJIeOfNGcmcK1bLK/SuLByxDoYvcOOvsfpWaaw
+         enIw==
+X-Gm-Message-State: APjAAAX27LJ2STE68c8suEMHSa3vQ8eXda4YheAHxS1n7WSz6cbBU7uO
+        nSDMc6qJNL1z0qo1e3icTkzkgrZ9yGvevus7uH53gcd1WTdz/hRPYpFzMCoMaHKUfBXTPnFjAiP
+        wUCsvXtNabRbF
+X-Received: by 2002:a1c:6145:: with SMTP id v66mr6820121wmb.42.1566580080620;
+        Fri, 23 Aug 2019 10:08:00 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz2VfVqVmbNSKh60msz2D85O4kPeYbsxyx65VFv1ZLWWCCH6sSVLhBJZ0JI2ziJHjDOK7yijA==
+X-Received: by 2002:a1c:6145:: with SMTP id v66mr6820078wmb.42.1566580080242;
+        Fri, 23 Aug 2019 10:08:00 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id n8sm3065205wrw.28.2019.08.23.10.07.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Aug 2019 10:07:59 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm updates for 5.3-rc6
+To:     Marc Zyngier <maz@kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Cc:     Andre Przywara <andre.przywara@arm.com>,
         Andrew Jones <drjones@redhat.com>,
         Dave Martin <dave.martin@arm.com>,
@@ -29,127 +54,69 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/2] KVM: arm/arm64: VGIC: Properly initialise private IRQ affinity
-Date:   Fri, 23 Aug 2019 17:35:16 +0100
-Message-Id: <20190823163516.179768-3-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190823163516.179768-1-maz@kernel.org>
+        kvmarm@lists.cs.columbia.edu,
+        Christian Borntraeger <borntraeger@de.ibm.com>
 References: <20190823163516.179768-1-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <21ae69a2-2546-29d0-bff6-2ea825e3d968@redhat.com>
+Date:   Fri, 23 Aug 2019 19:07:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190823163516.179768-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Andre Przywara <andre.przywara@arm.com>
+On 23/08/19 18:35, Marc Zyngier wrote:
+> Paolo, Radim,
+> 
+> One (hopefully last) set of fixes for KVM/arm for 5.3: an embarassing
+> MMIO emulation regression, and a UBSAN splat. Oh well...
+> 
+> Please pull,
 
-At the moment we initialise the target *mask* of a virtual IRQ to the
-VCPU it belongs to, even though this mask is only defined for GICv2 and
-quickly runs out of bits for many GICv3 guests.
-This behaviour triggers an UBSAN complaint for more than 32 VCPUs:
-------
-[ 5659.462377] UBSAN: Undefined behaviour in virt/kvm/arm/vgic/vgic-init.c:223:21
-[ 5659.471689] shift exponent 32 is too large for 32-bit type 'unsigned int'
-------
-Also for GICv3 guests the reporting of TARGET in the "vgic-state" debugfs
-dump is wrong, due to this very same problem.
+Please send this (and any other changes until the release) through the
+ARM tree---same for s390 if need be.
 
-Because there is no requirement to create the VGIC device before the
-VCPUs (and QEMU actually does it the other way round), we can't safely
-initialise mpidr or targets in kvm_vgic_vcpu_init(). But since we touch
-every private IRQ for each VCPU anyway later (in vgic_init()), we can
-just move the initialisation of those fields into there, where we
-definitely know the VGIC type.
+This way Radim can concentrate on pending 5.4 patches while I am away.
 
-On the way make sure we really have either a VGICv2 or a VGICv3 device,
-since the existing code is just checking for "VGICv3 or not", silently
-ignoring the uninitialised case.
+Paolo
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reported-by: Dave Martin <dave.martin@arm.com>
-Tested-by: Julien Grall <julien.grall@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- virt/kvm/arm/vgic/vgic-init.c | 30 ++++++++++++++++++++----------
- 1 file changed, 20 insertions(+), 10 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index bdbc297d06fb..e621b5d45b27 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -8,6 +8,7 @@
- #include <linux/cpu.h>
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
-+#include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include "vgic.h"
- 
-@@ -164,12 +165,18 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
- 		irq->vcpu = NULL;
- 		irq->target_vcpu = vcpu0;
- 		kref_init(&irq->refcount);
--		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-+		switch (dist->vgic_model) {
-+		case KVM_DEV_TYPE_ARM_VGIC_V2:
- 			irq->targets = 0;
- 			irq->group = 0;
--		} else {
-+			break;
-+		case KVM_DEV_TYPE_ARM_VGIC_V3:
- 			irq->mpidr = 0;
- 			irq->group = 1;
-+			break;
-+		default:
-+			kfree(dist->spis);
-+			return -EINVAL;
- 		}
- 	}
- 	return 0;
-@@ -209,7 +216,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 		irq->intid = i;
- 		irq->vcpu = NULL;
- 		irq->target_vcpu = vcpu;
--		irq->targets = 1U << vcpu->vcpu_id;
- 		kref_init(&irq->refcount);
- 		if (vgic_irq_is_sgi(i)) {
- 			/* SGIs */
-@@ -219,11 +225,6 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 			/* PPIs */
- 			irq->config = VGIC_CONFIG_LEVEL;
- 		}
--
--		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
--			irq->group = 1;
--		else
--			irq->group = 0;
- 	}
- 
- 	if (!irqchip_in_kernel(vcpu->kvm))
-@@ -286,10 +287,19 @@ int vgic_init(struct kvm *kvm)
- 
- 		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
- 			struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
--			if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+			switch (dist->vgic_model) {
-+			case KVM_DEV_TYPE_ARM_VGIC_V3:
- 				irq->group = 1;
--			else
-+				irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-+				break;
-+			case KVM_DEV_TYPE_ARM_VGIC_V2:
- 				irq->group = 0;
-+				irq->targets = 1U << idx;
-+				break;
-+			default:
-+				ret = -EINVAL;
-+				goto out;
-+			}
- 		}
- 	}
- 
--- 
-2.20.1
+>        M.
+> 
+> The following changes since commit 16e604a437c89751dc626c9e90cf88ba93c5be64:
+> 
+>   KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts on enable (2019-08-09 08:07:26 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.3-3
+> 
+> for you to fetch changes up to 2e16f3e926ed48373c98edea85c6ad0ef69425d1:
+> 
+>   KVM: arm/arm64: VGIC: Properly initialise private IRQ affinity (2019-08-23 17:23:01 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM/arm fixes for 5.3, take #3
+> 
+> - Don't overskip instructions on MMIO emulation
+> - Fix UBSAN splat when initializing PPI priorities
+> 
+> ----------------------------------------------------------------
+> Andre Przywara (1):
+>       KVM: arm/arm64: VGIC: Properly initialise private IRQ affinity
+> 
+> Andrew Jones (1):
+>       KVM: arm/arm64: Only skip MMIO insn once
+> 
+>  virt/kvm/arm/mmio.c           |  7 +++++++
+>  virt/kvm/arm/vgic/vgic-init.c | 30 ++++++++++++++++++++----------
+>  2 files changed, 27 insertions(+), 10 deletions(-)
+> 
 
