@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 45AF49AEDC
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32EBF9AF18
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:20:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405341AbfHWML2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 08:11:28 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34564 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405323AbfHWML2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 08:11:28 -0400
-Received: by mail-wr1-f68.google.com with SMTP id s18so8451686wrn.1
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 05:11:26 -0700 (PDT)
+        id S2390358AbfHWMTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 08:19:21 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43178 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731361AbfHWMTT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 08:19:19 -0400
+Received: by mail-wr1-f65.google.com with SMTP id y8so8427367wrn.10
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 05:19:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=iRAIEkmwp6JE/WX2NGJMgDWxiWJMs7wvHv42hCwyQfI=;
-        b=YEpPQAEvWA9shVqsD3mh8d8r/uR1cXm76LWodn7SiQ5pxKz7XzPS/ZenBR9boBZyaG
-         caGIKN8nTkYwxmJT/mzu7KBhHgk4GeQi8KzLsfjZvbcWPNgfjk8U7abtLLKyXdj5Iamh
-         WEsHh//w59EZk4ZHq2zco+dvqKcSqeOpqKfAgAxs24rR3jk7qj70m/eSqghKeO27BCbg
-         57q5BniRpmfS+Onee+Wyw2JZmiPvY2YoeKKMT+7msYpvsBdu8lDwXAgn8HTnnVp8Mqhf
-         ANB5y7OGnpvyOk+4i8bGpz2IwFMlbb8/P8hrdq+BDZUs4bKztK084OcOQFc10fpgUOCS
-         PrkA==
+        bh=OYnKooGAz/mlH//vFYVeCnlGLtd4YMyaR7dMhD5g3Ao=;
+        b=egKRBOY6T+iHEx6i2bpwOVrDK5E+iUy/1Jr2VP37Xdy4TLrla+q4pkZndjdXqnHiHK
+         mtaTLIxuZBDXoLfDMhs4tYjjWnmMGtyl5dLbT1yCedbE7MMf8Mh90hvJdKJp+3qcI/tW
+         MtUpYrMIf91Fd5vQMkm5yeMAHyx2FZ7jSNafbeDlyDfN9gxyJjsa4K1f68DNVX5C0VpA
+         4zzgHgKKf74NPSusdkLYUGCaL7ep7967MErfnLWERuCwcRGWnaSBe7OQYYS/k/DQ+e8I
+         Pj5tnbOCxnwiNxiDgpGICI9Do0qy2STOJpt8GCil1Kr5guweLZFAsmmdrDdHNVzdPm2z
+         iUUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=iRAIEkmwp6JE/WX2NGJMgDWxiWJMs7wvHv42hCwyQfI=;
-        b=D1nErf8LIjBCgx3yL+ihh4pZiSCcOXaaFAlvb+Ckf3m/JlUYEvPTaL/aa3UJDutNYI
-         XQkexEbOhKgt7ojPoaU6HYb0g6jPjggtWA4cS6VHWzMUC8Ic5wt4ahC4rsanuhZ20Bsd
-         zeoBPXFTa9tKLB/rRcCiP8XHrUn/E9CyfODhtxYWzw2qCTlpR11wYQXVwo1z/75nTuJE
-         JtGAx2r0s2ZIAX9Q3xIoXQwDC6W35enOTUx/bzsIP3Q/RAveN8iC3nHBs7/xckfco1Lf
-         HmgbCa07Tl9oh1EqeVHcjjwBk7yRLMp2rbJv062UNimERFSBzo14raOJNIjJb5Suvkeh
-         QlJg==
-X-Gm-Message-State: APjAAAXPoeZpmuGbBEBED1Bj6u2Axx4AawaeuDWOdnwoEKXG+CyvopRc
-        RJsXGg2zgfu0YErCMD7xcvRl2BJM3XKhsdkfLTQp2g==
-X-Google-Smtp-Source: APXvYqweuPNty8ifIydMeMGqUfpAmO11I/wuZUHMJ01iiMWWORMqB38dG8e4+ued1WCyfTwxqp2l51dVxUm9msyVfcc=
-X-Received: by 2002:a5d:4ecb:: with SMTP id s11mr4728857wrv.323.1566562285504;
- Fri, 23 Aug 2019 05:11:25 -0700 (PDT)
+        bh=OYnKooGAz/mlH//vFYVeCnlGLtd4YMyaR7dMhD5g3Ao=;
+        b=PDVkvnfVtbrZ+uAlJHErTQ9uGqsFc7eYytT72uF+LGh1YEZotwAzykYSIbsJN+DPWX
+         KhnPwADW3ul45IE4ysrun95fBVLOUdDRhlO3kStg7aCL5Tqgp7/7d+YBAkkLZcuodWDL
+         VvWU+e2bTuIGZ+zDxW80h9kA/abFm3QOKOSXUBbjSMa//lSHGSt4ZSEKSHxTu6azEXB9
+         ns5LXcg9senUHuGRZCNtDEJyiraf2AnH6snDjW2+EITrriCwWQ/1IYbUcF9YLzHTts/w
+         0+wuFiod8ypdZvlXk957zaA53+07/AsQrNJl2228u4Jve/2cThGujvLEWpHDl0E06zUA
+         gXZg==
+X-Gm-Message-State: APjAAAXV+CaX22iMz9Ao8AO3aw0H7JinlkF+ssUZzcSyFbXG8gkdFc+S
+        2FEZJmtExn/oMqHZbsB7eifNEULfiYnis0hVI/+Ong==
+X-Google-Smtp-Source: APXvYqyiffUPdRbthtoeU5iHSxUcXZATp2nwKI/3hiwIGiM2dZnwJz+txTHd6WA3LOy2smUSPUERZ3sDle/MwMI8wro=
+X-Received: by 2002:adf:f641:: with SMTP id x1mr4992458wrp.179.1566562756752;
+ Fri, 23 Aug 2019 05:19:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190822084131.114764-1-anup.patel@wdc.com> <20190822084131.114764-16-anup.patel@wdc.com>
- <09d74212-4fa3-d64c-5a63-d556e955b88c@amazon.com> <CAAhSdy36q5-x8cXM=M5S3cnE2nvCMhcsfuQayVt7jahd58HWFw@mail.gmail.com>
- <CA3A6A8A-0227-4B92-B892-86A0C7CA369E@amazon.com> <CAAhSdy2FFmCZJhNnMojp8QbiD-t6=4XrNtE9KGnCG_-mPb19-A@mail.gmail.com>
- <e369eba6-e659-2892-9cb9-a631dd10153a@amazon.com>
-In-Reply-To: <e369eba6-e659-2892-9cb9-a631dd10153a@amazon.com>
+References: <20190822084131.114764-1-anup.patel@wdc.com> <8a2a9ea6-5636-e79a-b041-580159e703b2@amazon.com>
+ <CAAhSdy2RC6Gw708wZs+FM56UkkyURgbupwdeTak7VcyarY9irg@mail.gmail.com>
+ <757C929B-D26C-46D9-98E8-1191E3B86F3C@amazon.com> <fda67a5d-6984-c3ef-8125-7805d927f15b@redhat.com>
+In-Reply-To: <fda67a5d-6984-c3ef-8125-7805d927f15b@redhat.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Fri, 23 Aug 2019 17:41:13 +0530
-Message-ID: <CAAhSdy2sknED0W5-SpS4cP46cnS6biHYs_jRDgCj_Ucw5PUYzg@mail.gmail.com>
-Subject: Re: [PATCH v5 15/20] RISC-V: KVM: Add timer functionality
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
+Date:   Fri, 23 Aug 2019 17:49:05 +0530
+Message-ID: <CAAhSdy1k96m8GinxAhcfRL_gOxCzK+ODfyjDxCmr-AF2ycntwA@mail.gmail.com>
+Subject: Re: [PATCH v5 00/20] KVM RISC-V Support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Graf (AWS), Alexander" <graf@amazon.com>,
+        Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Radim K <rkrcmar@redhat.com>,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -71,83 +70,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 23, 2019 at 5:19 PM Alexander Graf <graf@amazon.com> wrote:
+On Fri, Aug 23, 2019 at 5:40 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
+> On 23/08/19 13:44, Graf (AWS), Alexander wrote:
+> >> Overall, I'm quite happy with the code. It's a very clean implementation
+> >> of a KVM target.
 >
+> Yup, I said the same even for v1 (I prefer recursive implementation of
+> page table walking but that's all I can say).
 >
-> On 23.08.19 13:46, Anup Patel wrote:
-> > On Fri, Aug 23, 2019 at 5:03 PM Graf (AWS), Alexander <graf@amazon.com> wrote:
-> >>
-> >>
-> >>
-> >>> Am 23.08.2019 um 13:05 schrieb Anup Patel <anup@brainfault.org>:
-> >>>
-> >>>> On Fri, Aug 23, 2019 at 1:23 PM Alexander Graf <graf@amazon.com> wrote:
-> >>>>
-> >>>>> On 22.08.19 10:46, Anup Patel wrote:
-> >>>>> From: Atish Patra <atish.patra@wdc.com>
-> >>>>>
-> >>>>> The RISC-V hypervisor specification doesn't have any virtual timer
-> >>>>> feature.
-> >>>>>
-> >>>>> Due to this, the guest VCPU timer will be programmed via SBI calls.
-> >>>>> The host will use a separate hrtimer event for each guest VCPU to
-> >>>>> provide timer functionality. We inject a virtual timer interrupt to
-> >>>>> the guest VCPU whenever the guest VCPU hrtimer event expires.
-> >>>>>
-> >>>>> The following features are not supported yet and will be added in
-> >>>>> future:
-> >>>>> 1. A time offset to adjust guest time from host time
-> >>>>> 2. A saved next event in guest vcpu for vm migration
-> >>>>
-> >>>> Implementing these 2 bits right now should be trivial. Why wait?
-> >>>
+> >> I will send v6 next week. I will try my best to implement unpriv
+> >> trap handling in v6 itself.
+> > Are you sure unpriv is the only exception that can hit there? What
+> > about NMIs? Do you have #MCs yet (ECC errors)? Do you have something
+> > like ARM's #SError which can asynchronously hit at any time because
+> > of external bus (PCI) errors?
 >
-> [...]
->
-> >>>> ... in fact, I feel like I'm missing something obvious here. How does
-> >>>> the guest trigger the timer event? What is the argument it uses for that
-> >>>> and how does that play with the tbfreq in the earlier patch?
-> >>>
-> >>> We have SBI call inferface between Hypervisor and Guest. One of the
-> >>> SBI call allows Guest to program time event. The next event is specified
-> >>> as absolute cycles. The Guest can read time using TIME CSR which
-> >>> returns system timer value (@ tbfreq freqency).
-> >>>
-> >>> Guest Linux will know the tbfreq from DTB passed by QEMU/KVMTOOL
-> >>> and it has to be same as Host tbfreq.
-> >>>
-> >>> The TBFREQ config register visible to user-space is a read-only CONFIG
-> >>> register which tells user-space tools (QEMU/KVMTOOL) about Host tbfreq.
-> >>
-> >> And it's read-only because you can not trap on TB reads?
-> >
-> > There is no TB registers.
-> >
-> > The tbfreq can only be know through DT/ACPI kind-of HW description
-> > for both Host and Guest.
-> >
-> > The KVM user-space tool needs to know TBFREQ so that it can set correct
-> > value in generated DT for Guest Linux.
->
-> So what access methods do get influenced by TBFREQ? If it's only the SBI
-> timer, we can control the frequency, which means we can make TBFREQ
-> read/write.
+> As far as I know, all interrupts on RISC-V are disabled by
+> local_irq_disable()/local_irq_enable().
 
-There are two things influenced by TBFREQ:
-1. TIME CSR which is a free running counter
-2. SBI calls for programming next timer event
+Yes, we don't have per-CPU interrupts for async bus errors or
+non-maskable interrupts. The local_irq_disable() and local_irq_enable()
+affect all interrupts (excepts traps).
 
-The Guest TIME CSR will be at same rate as Host TIME CSR so
-we cannot show different TBFREQ to Guest Linux.
-
-In future, we will be having a dedicated RISC-V timer extension which
-will have all programming done via CSRs but until then we are stuck
-with TIME CSR + SBI call combination.
+Although, the async bus errors can certainly be routed to Linux
+via PLIC (interrupt-controller) as regular peripheral interrupts.
 
 Regards,
 Anup
 
 >
->
-> Alex
+> Paolo
