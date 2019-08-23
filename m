@@ -2,165 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 13EDD9A6F7
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 07:17:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C30FF9A723
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 07:32:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391911AbfHWFQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 01:16:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35444 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726283AbfHWFQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 01:16:37 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 642043091754;
-        Fri, 23 Aug 2019 05:16:36 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F3A510016E9;
-        Fri, 23 Aug 2019 05:16:36 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id C84DB4A460;
-        Fri, 23 Aug 2019 05:16:34 +0000 (UTC)
-Date:   Fri, 23 Aug 2019 01:16:34 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Cc:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
-        kvm@vger.kernel.org, mst@redhat.com, david@redhat.com,
-        dave hansen <dave.hansen@intel.com>,
-        linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        virtio-dev@lists.oasis-open.org, osalvador@suse.de,
-        yang zhang wz <yang.zhang.wz@gmail.com>, riel@surriel.com,
-        konrad wilk <konrad.wilk@oracle.com>, lcapitulino@redhat.com,
-        wei w wang <wei.w.wang@intel.com>, aarcange@redhat.com,
-        pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>
-Message-ID: <860165703.10076075.1566537394212.JavaMail.zimbra@redhat.com>
-In-Reply-To: <31b75078d004a1ccf77b710b35b8f847f404de9a.camel@linux.intel.com>
-References: <20190821145806.20926.22448.stgit@localhost.localdomain> <1297409377.9866813.1566470593223.JavaMail.zimbra@redhat.com> <31b75078d004a1ccf77b710b35b8f847f404de9a.camel@linux.intel.com>
-Subject: Re: [PATCH v6 0/6] mm / virtio: Provide support for unused page
- reporting
+        id S2392162AbfHWFaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 01:30:01 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:48256 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387557AbfHWFaB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 01:30:01 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7N5TLTI023002;
+        Fri, 23 Aug 2019 05:29:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=gFWohBOfdKshcZEk5K8mbuk+VusK92nev4qWo3nHYS4=;
+ b=b47nGOmNPKzbECreNwdHU+XZXRgXg6cv5Rrg7fj+gT4jdYTEbT+zcAVv/iRKMLcV5PSY
+ UZuihucIpKi2nyo88YvJUnO2CwBdPJXD+4wg3hylEwNPiQihhtoL7ZNkUfFjvI50VMG5
+ nSK+NtAtYiLm722ZYj60AWis9P+We3D/B7np38RjIpm43t0KritNp6X35HR5lRY6sGsc
+ 4Bq3IaqtaX3hUczKj56Y2x+4FHEM+Lm5i/dwCV6xMYuoE9vTtJDuSaKDYICFQEcLo/sU
+ XTzi2+iAZPtY9ba3sN/jdh1Gw2748p5jRYJVHkEhUpd7Cm0NC0t+PMGQO8G11Rw+e8b/ 3Q== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2ue90u2dk9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Aug 2019 05:29:38 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7N5TIu2071173;
+        Fri, 23 Aug 2019 05:29:38 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2uh83qx02w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Aug 2019 05:29:38 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7N5Tbrm004595;
+        Fri, 23 Aug 2019 05:29:37 GMT
+Received: from [10.159.224.62] (/10.159.224.62)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 22 Aug 2019 22:29:37 -0700
+Subject: Re: [PATCH 6/8][KVM nVMX]: Load IA32_PERF_GLOBAL_CTRL MSR on vmentry
+ of nested guests
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+References: <20190424231724.2014-1-krish.sadhukhan@oracle.com>
+ <20190424231724.2014-7-krish.sadhukhan@oracle.com>
+ <CALMp9eR8u6qPF5Gv-UEXSmB9NX=H=AGb4jh4d=mEm7jyTqBfWg@mail.gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <a2889868-eb62-5843-f3d2-fe066055e80c@oracle.com>
+Date:   Thu, 22 Aug 2019 22:29:36 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.62, 10.4.195.21]
-Thread-Topic: mm / virtio: Provide support for unused page reporting
-Thread-Index: sTNT+EjyPXY4peHrw8rPQkPz8nPuRw==
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 23 Aug 2019 05:16:36 +0000 (UTC)
+In-Reply-To: <CALMp9eR8u6qPF5Gv-UEXSmB9NX=H=AGb4jh4d=mEm7jyTqBfWg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908230059
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908230059
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-> On Thu, 2019-08-22 at 06:43 -0400, Pankaj Gupta wrote:
-> > > This series provides an asynchronous means of reporting to a hypervisor
-> > > that a guest page is no longer in use and can have the data associated
-> > > with it dropped. To do this I have implemented functionality that allows
-> > > for what I am referring to as unused page reporting
-> > > 
-> > > The functionality for this is fairly simple. When enabled it will
-> > > allocate
-> > > statistics to track the number of reported pages in a given free area.
-> > > When the number of free pages exceeds this value plus a high water value,
-> > > currently 32, it will begin performing page reporting which consists of
-> > > pulling pages off of free list and placing them into a scatter list. The
-> > > scatterlist is then given to the page reporting device and it will
-> > > perform
-> > > the required action to make the pages "reported", in the case of
-> > > virtio-balloon this results in the pages being madvised as MADV_DONTNEED
-> > > and as such they are forced out of the guest. After this they are placed
-> > > back on the free list, and an additional bit is added if they are not
-> > > merged indicating that they are a reported buddy page instead of a
-> > > standard buddy page. The cycle then repeats with additional non-reported
-> > > pages being pulled until the free areas all consist of reported pages.
-> > > 
-> > > I am leaving a number of things hard-coded such as limiting the lowest
-> > > order processed to PAGEBLOCK_ORDER, and have left it up to the guest to
-> > > determine what the limit is on how many pages it wants to allocate to
-> > > process the hints. The upper limit for this is based on the size of the
-> > > queue used to store the scattergather list.
-> > > 
-> > > My primary testing has just been to verify the memory is being freed
-> > > after
-> > > allocation by running memhog 40g on a 40g guest and watching the total
-> > > free memory via /proc/meminfo on the host. With this I have verified most
-> > > of the memory is freed after each iteration.
-> > 
-> > I tried to go through the entire patch series. I can see you reported a
-> > -3.27 drop from the baseline. If its because of re-faulting the page after
-> > host has freed them? Can we avoid freeing all the pages from the guest
-> > free_area
-> > and keep some pages(maybe some mixed order), so that next allocation is
-> > done from
-> > the guest itself than faulting to host. This will work with real workload
-> > where
-> > allocation and deallocation happen at regular intervals.
-> > 
-> > This can be further optimized based on other factors like host memory
-> > pressure etc.
-> > 
-> > Thanks,
-> > Pankaj
-> 
-> When I originally started implementing and testing this code I was seeing
-> less than a 1% regression. I didn't feel like that was really an accurate
-> result since it wasn't putting much stress on the changed code so I have
-> modified my tests and kernel so that I have memory shuffting and THP
-> enabled. In addition I have gone out of my way to lock things down to a
-> single NUMA node on my host system as the code I had would sometimes
-> perform better than baseline when running the test due to the fact that
-> memory was being freed back to the hose and then reallocated which
-> actually allowed for better NUMA locality.
-> 
-> The general idea was I wanted to know what the worst case penalty would be
-> for running this code, and it turns out most of that is just the cost of
-> faulting back in the pages. By enabling memory shuffling I am forcing the
-> memory to churn as pages are added to both the head and tail of the
-> free_list. The test itself was modified so that it didn't allocate order 0
-> pages and instead was allocating transparent huge pages so the effects
-> were as visible as possible. Without that the page faulting overhead would
-> mostly fall into the noise of having to allocate the memory as order 0
-> pages, that is what I had essentially seen earlier when I was running the
-> stock page_fault1 test.
+On 8/15/19 3:44 PM, Jim Mattson wrote:
+> On Wed, Apr 24, 2019 at 4:43 PM Krish Sadhukhan
+> <krish.sadhukhan@oracle.com> wrote:
+>> According to section "Loading Guest State" in Intel SDM vol 3C, the
+>> IA32_PERF_GLOBAL_CTRL MSR is loaded on vmentry of nested guests:
+>>
+>>      "If the “load IA32_PERF_GLOBAL_CTRL” VM-entry control is 1, the
+>>       IA32_PERF_GLOBAL_CTRL MSR is loaded from the IA32_PERF_GLOBAL_CTRL
+>>       field."
+>>
+>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Suggested-by: Jim Mattson <jmattson@google.com>
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>> ---
+>>   arch/x86/kvm/vmx/nested.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index a7bf19eaa70b..8177374886a9 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -2300,6 +2300,10 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>>          vcpu->arch.cr0_guest_owned_bits &= ~vmcs12->cr0_guest_host_mask;
+>>          vmcs_writel(CR0_GUEST_HOST_MASK, ~vcpu->arch.cr0_guest_owned_bits);
+>>
+>> +       if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
+>> +               vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL,
+>> +                            vmcs12->guest_ia32_perf_global_ctrl);
+>> +
+>>          if (vmx->nested.nested_run_pending &&
+>>              (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT)) {
+>>                  vmcs_write64(GUEST_IA32_PAT, vmcs12->guest_ia32_pat);
+>> --
+>> 2.17.2
+>>
+> This isn't quite right. The GUEST_IA32_PERF_GLOBAL_CTRL value is just
+> going to get overwritten later by atomic_switch_perf_msrs().
+>
+> Instead of writing the vmcs12 value directly into the vmcs02, you
+> should call kvm_set_msr(), exactly as it would have been called if
+> MSR_CORE_PERF_GLOBAL_CTRL had been in the vmcs12
+> VM-entry MSR-load list. Then, atomic_switch_perf_msrs() will
+> automatically do the right thing.
 
-Right. I think the reason is this test is allocating THP's in guest, host side
-you are still using order 0 pages, I assume?
 
-> 
-> This code does no hinting on anything smaller than either MAX_ORDER - 1 or
-> HUGETLB_PAGE_ORDER pages, and it only starts when there are at least 32 of
-> them available to hint on. This results in us not starting to perform the
-> hinting until there is 64MB to 128MB of memory sitting in the higher order
-> regions of the zone.
+I notice that the existing code for VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL 
+in load_vmcs12_host_state() doesn't use kvm_set_msr():
 
-o.k
+             if (vmcs12->vm_exit_controls & 
+VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
+                 vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL,
+                         vmcs12->host_ia32_perf_global_ctrl);
 
-> 
-> The hinting itself stops as soon as we run out of unhinted pages to pull
-> from. When this occurs we let any pages that are freed after that
-> accumulate until we get back to 32 pages being free in a given order.
-> During this time we should build up the cache of warm pages that you
-> mentioned, assuming that shuffling is not enabled.
+This should also be changed to use kvm_set_msr() then ?
 
-I was thinking about something like retaining pages to a lower watermark here.
-Looks like we still might have few lower order pages in free list if they are
-not merged to orders which are hinted. 
-
-> 
-> As far as further optimizations I don't think there is anything here that
-> prevents us from doing that. For now I am focused on just getting the
-> basics in place so we have a foundation to start from.
-
-Agree. Thanks for explaining.
-
-Best rgards,
-Pankaj
-
-> 
-> Thanks.
-> 
-> - Alex
-> 
-> 
