@@ -2,184 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66C549AD86
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 12:45:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE7229ADB7
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 12:58:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390489AbfHWKpA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 06:45:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36608 "EHLO mx1.redhat.com"
+        id S2389476AbfHWK6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 06:58:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45277 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388010AbfHWKpA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 06:45:00 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S2389135AbfHWK6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 06:58:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9CD3D88306;
-        Fri, 23 Aug 2019 10:44:59 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B4855600CD;
-        Fri, 23 Aug 2019 10:44:58 +0000 (UTC)
-Date:   Fri, 23 Aug 2019 12:44:56 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH RFC 1/1] vfio-ccw: add some logging
-Message-ID: <20190823124456.5230ed70.cohuck@redhat.com>
-In-Reply-To: <81414605-c676-6e7e-4ee8-8dbfe7ae0a76@linux.ibm.com>
-References: <20190816151505.9853-1-cohuck@redhat.com>
-        <20190816151505.9853-2-cohuck@redhat.com>
-        <81414605-c676-6e7e-4ee8-8dbfe7ae0a76@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id 8ADEB308FBA6;
+        Fri, 23 Aug 2019 10:58:03 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-236.ams2.redhat.com [10.36.116.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AE8260933;
+        Fri, 23 Aug 2019 10:57:59 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 4/4] s390x: STSI tests
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com
+References: <20190821104736.1470-1-frankja@linux.ibm.com>
+ <20190821104736.1470-5-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
+ aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
+ QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
+ EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
+ 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
+ eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
+ ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
+ zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
+ tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
+ WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
+ UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
+ BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
+ 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
+ +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
+ 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
+ gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
+ WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
+ VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
+ knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
+ cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
+ X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
+ AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
+ ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
+ fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
+ 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
+ cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
+ ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
+ Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
+ oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
+ IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
+ yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
+Organization: Red Hat
+Message-ID: <3fffb16f-672e-bff1-03cc-475fd2739165@redhat.com>
+Date:   Fri, 23 Aug 2019 12:57:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190821104736.1470-5-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 23 Aug 2019 10:44:59 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Fri, 23 Aug 2019 10:58:03 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Aug 2019 11:54:26 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> On 8/16/19 11:15 AM, Cornelia Huck wrote:
-> > Usually, the common I/O layer logs various things into the s390
-> > cio debug feature, which has been very helpful in the past when
-> > looking at crash dumps. As vfio-ccw devices unbind from the
-> > standard I/O subchannel driver, we lose some information there.
-> > 
-> > Let's introduce some vfio-ccw debug features and log some things
-> > there. (Unfortunately we cannot reuse the cio debug feature from
-> > a module.)  
+On 8/21/19 12:47 PM, Janosch Frank wrote:
+> For now let's concentrate on the error conditions.
 > 
-> Boo :(
-
-Yeah, that would have been even more useful :(
-
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/Makefile      |  1 +
+>  s390x/stsi.c        | 84 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |  3 ++
+>  3 files changed, 88 insertions(+)
+>  create mode 100644 s390x/stsi.c
 > 
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  drivers/s390/cio/vfio_ccw_drv.c     | 50 ++++++++++++++++++++++++++--
-> >  drivers/s390/cio/vfio_ccw_fsm.c     | 51 ++++++++++++++++++++++++++++-
-> >  drivers/s390/cio/vfio_ccw_ops.c     | 10 ++++++
-> >  drivers/s390/cio/vfio_ccw_private.h | 17 ++++++++++
-> >  4 files changed, 124 insertions(+), 4 deletions(-)
-> >   
-> 
-> ...snip...
-> 
-> > diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-> > index 49d9d3da0282..4a1e727c62d9 100644
-> > --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> > +++ b/drivers/s390/cio/vfio_ccw_fsm.c  
-> 
-> ...snip...
-> 
-> > @@ -239,18 +258,32 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >  		/* Don't try to build a cp if transport mode is specified. */
-> >  		if (orb->tm.b) {
-> >  			io_region->ret_code = -EOPNOTSUPP;
-> > +			VFIO_CCW_MSG_EVENT(2,
-> > +					   "%pUl (%x.%x.%04x): transport mode\n",
-> > +					   mdev_uuid(mdev), schid.cssid,
-> > +					   schid.ssid, schid.sch_no);
-> >  			errstr = "transport mode";
-> >  			goto err_out;
-> >  		}
-> >  		io_region->ret_code = cp_init(&private->cp, mdev_dev(mdev),
-> >  					      orb);
-> >  		if (io_region->ret_code) {
-> > +			VFIO_CCW_MSG_EVENT(2,
-> > +					   "%pUl (%x.%x.%04x): cp_init=%d\n",
-> > +					   mdev_uuid(mdev), schid.cssid,
-> > +					   schid.ssid, schid.sch_no,
-> > +					   io_region->ret_code);
-> >  			errstr = "cp init";
-> >  			goto err_out;
-> >  		}
-> >  
-> >  		io_region->ret_code = cp_prefetch(&private->cp);
-> >  		if (io_region->ret_code) {
-> > +			VFIO_CCW_MSG_EVENT(2,
-> > +					   "%pUl (%x.%x.%04x): cp_prefetch=%d\n",
-> > +					   mdev_uuid(mdev), schid.cssid,
-> > +					   schid.ssid, schid.sch_no,
-> > +					   io_region->ret_code);
-> >  			errstr = "cp prefetch";
-> >  			cp_free(&private->cp);
-> >  			goto err_out;
-> > @@ -259,23 +292,36 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >  		/* Start channel program and wait for I/O interrupt. */
-> >  		io_region->ret_code = fsm_io_helper(private);
-> >  		if (io_region->ret_code) {
-> > +			VFIO_CCW_MSG_EVENT(2,
-> > +					   "%pUl (%x.%x.%04x): fsm_io_helper=%d\n",
-> > +					   mdev_uuid(mdev), schid.cssid,
-> > +					   schid.ssid, schid.sch_no,
-> > +					   io_region->ret_code);  
-> 
-> I suppose these ones could be squashed into err_out, and use errstr as
-> substitution for the message text.  But this is fine.
-> 
-> >  			errstr = "cp fsm_io_helper";
-> >  			cp_free(&private->cp);
-> >  			goto err_out;
-> >  		}
-> >  		return;
-> >  	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
-> > +		VFIO_CCW_MSG_EVENT(2,
-> > +				   "%pUl (%x.%x.%04x): halt on io_region\n",
-> > +				   mdev_uuid(mdev), schid.cssid,
-> > +				   schid.ssid, schid.sch_no);
-> >  		/* halt is handled via the async cmd region */
-> >  		io_region->ret_code = -EOPNOTSUPP;
-> >  		goto err_out;
-> >  	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
-> > +		VFIO_CCW_MSG_EVENT(2,
-> > +				   "%pUl (%x.%x.%04x): clear on io_region\n",
-> > +				   mdev_uuid(mdev), schid.cssid,
-> > +				   schid.ssid, schid.sch_no);  
-> 
-> The above idea would need errstr to be set to something other than
-> "request" here, which maybe isn't a bad thing anyway.  :)
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 3453373..76db0bb 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -13,6 +13,7 @@ tests += $(TEST_DIR)/gs.elf
+>  tests += $(TEST_DIR)/iep.elf
+>  tests += $(TEST_DIR)/cpumodel.elf
+>  tests += $(TEST_DIR)/diag288.elf
+> +tests += $(TEST_DIR)/stsi.elf
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  
+>  all: directories test_cases test_cases_binary
+> diff --git a/s390x/stsi.c b/s390x/stsi.c
+> new file mode 100644
+> index 0000000..0f90c9a
+> --- /dev/null
+> +++ b/s390x/stsi.c
+> @@ -0,0 +1,84 @@
+[...]
+> +static inline unsigned long stsi_get_fc(void *addr)
+> +{
+> +	register unsigned long r0 asm("0") = 0;
+> +	register unsigned long r1 asm("1") = 0;
+> +	int cc;
+> +
+> +	asm volatile("stsi	0(%2)\n"
 
-The trace event tries to cover all of the different error cases in one
-go, so it is not quite optimal (but still useful). For the sprintf
-event, I tried to include better error-specific information (also, I'm
-probably a bit paranoid with regard to strings in the sprintf view :)
+Shouldn't that be %3 instead?
 
-We could probably enhance the trace event here, and we should evaluate
-adding more of them, as they and the dbf complement each other.
+> +		     "ipm	%[cc]\n"
+> +		     "srl	%[cc],28\n"
+> +		     : "+d" (r0), [cc] "=d" (cc)
+> +		     : "d" (r1), "a" (addr)
+> +		     : "cc", "memory");
+> +	assert(!cc);
+> +	return r0 >> 28;
+> +}
+> +
+> +static void test_fc(void)
+> +{
+> +	report("cc == 3",  stsi(pagebuf, 7, 0, 0) == 3);
+> +	report("r0 == 3",  stsi_get_fc(pagebuf) >= 2);
 
-> 
-> >  		/* clear is handled via the async cmd region */
-> >  		io_region->ret_code = -EOPNOTSUPP;
-> >  		goto err_out;
-> >  	}
-> >  
-> >  err_out:
-> > -	trace_vfio_ccw_io_fctl(scsw->cmd.fctl, get_schid(private),
-> > +	trace_vfio_ccw_io_fctl(scsw->cmd.fctl, schid,
-> >  			       io_region->ret_code, errstr);
-> >  }
-> >  
+I'd like to suggest to change the string to "r0 >= 2", too.
 
-(...)
-
-> This all looks pretty standard compared to the existing cio stuff, and
-> would be a good addition for vfio-ccw.
-
-I pretty much copied some of the basic stuff over. We can always add
-more later :)
-
-> 
-> Reviewed-by: Eric Farman <farman@linux.ibm.com>
-> 
-
-Thanks!
-
-I'll go ahead and queue this for the next release, unless someone
-objects.
+ Thomas
