@@ -2,163 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CAAD59AAF6
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 11:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B8359AB36
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 11:18:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390258AbfHWJCP convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 23 Aug 2019 05:02:15 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:33189 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725797AbfHWJCP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 05:02:15 -0400
-Received: from LHREML712-CAH.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id 6F78A2E4A07633C5F2BB;
-        Fri, 23 Aug 2019 10:02:13 +0100 (IST)
-Received: from LHREML524-MBS.china.huawei.com ([169.254.2.92]) by
- LHREML712-CAH.china.huawei.com ([10.201.108.35]) with mapi id 14.03.0415.000;
- Fri, 23 Aug 2019 10:02:04 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        John Garry <john.garry@huawei.com>,
-        "xuwei (O)" <xuwei5@huawei.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>
-Subject: RE: [PATCH v8 0/6] vfio/type1: Add support for valid iova list
- management
-Thread-Topic: [PATCH v8 0/6] vfio/type1: Add support for valid iova list
- management
-Thread-Index: AQHVQXDhdShLmk/XY0uPF9nH4SmJKKcIn6ow
-Date:   Fri, 23 Aug 2019 09:02:04 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F396F22@lhreml524-mbs.china.huawei.com>
-References: <20190723160637.8384-1-shameerali.kolothum.thodi@huawei.com>
-In-Reply-To: <20190723160637.8384-1-shameerali.kolothum.thodi@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727381AbfHWJPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 05:15:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59390 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727142AbfHWJPW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 05:15:22 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1C54F859FE
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 09:15:22 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id k14so4536301wrv.2
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 02:15:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Fogl+Xs+eEecVqlA/+UJZO2WdJiNWt+Dkg9XFhlgz2U=;
+        b=DSnDTAJ2rVeS+MBg/3PvWgRZ1kAueCd6d1vW9mdX0CeFRauBWPedGztqkKgdXxBK8N
+         A/Lnh++FyTkCNW+QTzUOD2gvosS7lkDS+InlAouXF8SKIPmn6oDj1yX2LDugPTgYBked
+         QqrqAkDyn8iqnNQVILqoVaR0a4lfMTHLW1v1yOQUaGsO0Sp94pCP+3SYbRFuJ+SK4gRq
+         pI/cI8qRhvemvWIDjok/mx7ozm/rPcPGqfusSoX0SBTiCp1LS2o1bXsgdttCvubdSmU7
+         qtOAvw0I/smGDT+CDHZmBQI5H21nBv9are1raWRJlBa/H5PNokM45eWvZuu20uKaftAj
+         NCJQ==
+X-Gm-Message-State: APjAAAW6aak8FoyPh2J4ey7QWCR8vxdtz3mfS/qkiEI0NgHVjkGEd8Tg
+        bmZsDTSfK/M+tpMvJwJDNOX2Z4V9OZZU0FBsAtTyZeFq/3NKyEMyw+Ao7i+/UIt2dVurzgfeUhx
+        mFWnMgZ6PH1Ao
+X-Received: by 2002:adf:dcc2:: with SMTP id x2mr3492108wrm.295.1566551720233;
+        Fri, 23 Aug 2019 02:15:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzCFMlFThRSbr0p2bFyKMbVO+GhKtybrGNQbyE4KaJLTqw6rB3fsEgDC8WW2wselB1EwGJhig==
+X-Received: by 2002:adf:dcc2:: with SMTP id x2mr3492071wrm.295.1566551719960;
+        Fri, 23 Aug 2019 02:15:19 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id a142sm3258237wme.2.2019.08.23.02.15.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2019 02:15:19 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [RESEND PATCH 01/13] KVM: x86: Relocate MMIO exit stats counting
+In-Reply-To: <20190823010709.24879-2-sean.j.christopherson@intel.com>
+References: <20190823010709.24879-1-sean.j.christopherson@intel.com> <20190823010709.24879-2-sean.j.christopherson@intel.com>
+Date:   Fri, 23 Aug 2019 11:15:18 +0200
+Message-ID: <87d0gwp7ix.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-A gentle ping on this. Please let me know.
+> Move the stat.mmio_exits update into x86_emulate_instruction().  This is
+> both a bug fix, e.g. the current update flows will incorrectly increment
+> mmio_exits on emulation failure, and a preparatory change to set the
+> stage for eliminating EMULATE_DONE and company.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Thanks,
-Shameer
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-> -----Original Message-----
-> From: Shameerali Kolothum Thodi
-> Sent: 23 July 2019 17:07
-> To: alex.williamson@redhat.com; eric.auger@redhat.com
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> iommu@lists.linux-foundation.org; Linuxarm <linuxarm@huawei.com>; John
-> Garry <john.garry@huawei.com>; xuwei (O) <xuwei5@huawei.com>;
-> kevin.tian@intel.com; Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>
-> Subject: [PATCH v8 0/6] vfio/type1: Add support for valid iova list management
-> 
-> This is to revive this series which almost made to 4.18 but got dropped
-> as Alex found an issue[1] with IGD and USB devices RMRR region being
-> reported as reserved regions.
-> 
-> Thanks to Eric for his work here[2]. It provides a way to exclude
-> these regions while reporting the valid iova regions and this respin
-> make use of that.
-> 
-> Please note that I don't have a platform to verify the reported RMRR
-> issue and appreciate testing on those platforms.
-> 
-> Thanks,
-> Shameer
-> 
-> [1] https://lkml.org/lkml/2018/6/5/760
-> [2] https://lore.kernel.org/patchwork/cover/1083072/
-> 
-> v7-->v8
->   -Rebased to 5.3-rc1
->   -Addressed comments from Alex and Eric. Please see
->    individual patch history.
->   -Added Eric's R-by to patches 4/5/6
-> 
-> v6-->v7
->  -Rebased to 5.2-rc6 + Eric's patches
->  -Added logic to exclude IOMMU_RESV_DIRECT_RELAXABLE reserved memory
->   region type(patch #2).
->  -Dropped patch #4 of v6 as it is already part of mainline.
->  -Addressed "container with only an mdev device will have an empty list"
->   case(patches 4/6 & 5/6 - Suggested by Alex)
-> 
-> Old
-> ----
-> This series introduces an iova list associated with a vfio
-> iommu. The list is kept updated taking care of iommu apertures,
-> and reserved regions. Also this series adds checks for any conflict
-> with existing dma mappings whenever a new device group is attached to
-> the domain.
-> 
-> User-space can retrieve valid iova ranges using VFIO_IOMMU_GET_INFO
-> ioctl capability chains. Any dma map request outside the valid iova
-> range will be rejected.
-> 
-> v5 --> v6
-> 
->  -Rebased to 4.17-rc1
->  -Changed the ordering such that previous patch#7 "iommu/dma: Move
->   PCI window region reservation back...")  is now patch #4. This
->   will avoid any bisection issues pointed out by Alex.
->  -Added Robins's Reviewed-by tag for patch#4
-> 
-> v4 --> v5
-> Rebased to next-20180315.
-> 
->  -Incorporated the corner case bug fix suggested by Alex to patch #5.
->  -Based on suggestions by Alex and Robin, added patch#7. This
->   moves the PCI window  reservation back in to DMA specific path.
->   This is to fix the issue reported by Eric[1].
-> 
-> v3 --> v4
->  Addressed comments received for v3.
->  -dma_addr_t instead of phys_addr_t
->  -LIST_HEAD() usage.
->  -Free up iova_copy list in case of error.
->  -updated logic in filling the iova caps info(patch #5)
-> 
-> RFCv2 --> v3
->  Removed RFC tag.
->  Addressed comments from Alex and Eric:
->  - Added comments to make iova list management logic more clear.
->  - Use of iova list copy so that original is not altered in
->    case of failure.
-> 
-> RFCv1 --> RFCv2
->  Addressed comments from Alex:
-> -Introduced IOVA list management and added checks for conflicts with
->  existing dma map entries during attach/detach.
-> 
-> Shameer Kolothum (6):
->   vfio/type1: Introduce iova list and add iommu aperture validity check
->   vfio/type1: Check reserved region conflict and update iova list
->   vfio/type1: Update iova list on detach
->   vfio/type1: check dma map request is within a valid iova range
->   vfio/type1: Add IOVA range capability support
->   vfio/type1: remove duplicate retrieval of reserved regions
-> 
->  drivers/vfio/vfio_iommu_type1.c | 518 +++++++++++++++++++++++++++++++-
->  include/uapi/linux/vfio.h       |  26 +-
->  2 files changed, 531 insertions(+), 13 deletions(-)
-> 
-> --
-> 2.17.1
-> 
+This, however, makes me wonder why this is handled in x86-specific code
+in the first place, can we just count KVM_EXIT_MMIO exits when handling
+KVM_RUN?
 
+> ---
+>  arch/x86/kvm/mmu.c     | 2 --
+>  arch/x86/kvm/vmx/vmx.c | 1 -
+>  arch/x86/kvm/x86.c     | 2 ++
+>  3 files changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 4c45ff0cfbd0..845e39d8a970 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -5437,8 +5437,6 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gva_t cr2, u64 error_code,
+>  	case EMULATE_DONE:
+>  		return 1;
+>  	case EMULATE_USER_EXIT:
+> -		++vcpu->stat.mmio_exits;
+> -		/* fall through */
+>  	case EMULATE_FAIL:
+>  		return 0;
+>  	default:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 570a233e272b..18286e5b5983 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5200,7 +5200,6 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+>  		err = kvm_emulate_instruction(vcpu, 0);
+>  
+>  		if (err == EMULATE_USER_EXIT) {
+> -			++vcpu->stat.mmio_exits;
+>  			ret = 0;
+>  			goto out;
+>  		}
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b4cfd786d0b6..cd425f54096a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6598,6 +6598,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
+>  		}
+>  		r = EMULATE_USER_EXIT;
+>  	} else if (vcpu->mmio_needed) {
+> +		++vcpu->stat.mmio_exits;
+> +
+>  		if (!vcpu->mmio_is_write)
+>  			writeback = false;
+>  		r = EMULATE_USER_EXIT;
+
+-- 
+Vitaly
