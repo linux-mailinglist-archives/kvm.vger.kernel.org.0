@@ -2,256 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 211959AD27
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 12:31:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB0EB9AD29
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 12:31:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403963AbfHWKbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 06:31:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56766 "EHLO mx1.redhat.com"
+        id S2389244AbfHWKbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 06:31:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3293 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390545AbfHWKbB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 06:31:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1733308AbfHWKbe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 06:31:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 698921801590;
-        Fri, 23 Aug 2019 10:31:01 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-236.ams2.redhat.com [10.36.116.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A23D6377B;
-        Fri, 23 Aug 2019 10:30:59 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 2/4] s390x: Diag288 test
+        by mx1.redhat.com (Postfix) with ESMTPS id EA75B3061424;
+        Fri, 23 Aug 2019 10:31:33 +0000 (UTC)
+Received: from [10.36.117.2] (ovpn-117-2.ams2.redhat.com [10.36.117.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EAD731867C;
+        Fri, 23 Aug 2019 10:31:32 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 1/4] s390x: Support PSW restart boot
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
 References: <20190821104736.1470-1-frankja@linux.ibm.com>
- <20190821104736.1470-3-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
+ <20190821104736.1470-2-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
- aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
- QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
- EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
- 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
- eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
- ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
- zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
- tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
- WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
- UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
- BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
- 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
- +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
- 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
- gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
- WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
- VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
- knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
- cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
- X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
- AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
- ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
- fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
- 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
- cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
- ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
- Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
- oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
- IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
- yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-Organization: Red Hat
-Message-ID: <ac96277b-f2ae-3855-639e-9a4e7273aaba@redhat.com>
-Date:   Fri, 23 Aug 2019 12:30:58 +0200
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
+ BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
+ 8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
+ xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
+ jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
+ s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
+ m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
+ MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
+ z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
+ dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
+ UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
+ 7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
+ uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
+ 0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
+ 2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
+ xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
+ 8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
+ hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
+ u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
+ gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
+ rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
+ BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
+ KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
+ NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
+ YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
+ lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
+ qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
+ C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
+ W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
+ TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
+ +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <e03efe10-8271-a8d8-87d1-436c7d3aed01@redhat.com>
+Date:   Fri, 23 Aug 2019 12:31:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190821104736.1470-3-frankja@linux.ibm.com>
+In-Reply-To: <20190821104736.1470-2-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Fri, 23 Aug 2019 10:31:01 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Fri, 23 Aug 2019 10:31:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/21/19 12:47 PM, Janosch Frank wrote:
-> A small test for the watchdog via diag288.
-> 
-> Minimum timer value is 15 (seconds) and the only supported action with
-> QEMU is restart.
+On 21.08.19 12:47, Janosch Frank wrote:
+> Add a boot PSW to PSW restart new, so we can also boot via a PSW
+> restart.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  lib/s390x/asm/arch_def.h |   1 +
->  s390x/Makefile           |   1 +
->  s390x/diag288.c          | 131 +++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg      |   4 ++
->  4 files changed, 137 insertions(+)
->  create mode 100644 s390x/diag288.c
+>  s390x/flat.lds | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 > 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index d2cd727..4bbb428 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -15,6 +15,7 @@ struct psw {
->  	uint64_t	addr;
->  };
->  
-> +#define PSW_MASK_EXT			0x0100000000000000UL
->  #define PSW_MASK_DAT			0x0400000000000000UL
->  #define PSW_MASK_PSTATE			0x0001000000000000UL
->  
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 574a9a2..3453373 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -12,6 +12,7 @@ tests += $(TEST_DIR)/vector.elf
->  tests += $(TEST_DIR)/gs.elf
->  tests += $(TEST_DIR)/iep.elf
->  tests += $(TEST_DIR)/cpumodel.elf
-> +tests += $(TEST_DIR)/diag288.elf
->  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->  
->  all: directories test_cases test_cases_binary
-> diff --git a/s390x/diag288.c b/s390x/diag288.c
-> new file mode 100644
-> index 0000000..c129b6a
-> --- /dev/null
-> +++ b/s390x/diag288.c
-[...]
-> +static void test_specs(void)
-> +{
-> +	report_prefix_push("specification");
-> +
-> +	report_prefix_push("uneven");
-> +	expect_pgm_int();
-> +	asm volatile("diag %r1,%r2,0x288");
-
-Don't you have to use "%%" in that case? ... well, if it also works
-without, I don't mind, but in case you respin better play safe:
-
-    asm volatile("diag %%r1,%%r2,0x288");
-
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("unsupported action");
-> +	expect_pgm_int();
-> +	diag288(CODE_INIT, 15, 42);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("unsupported function");
-> +	expect_pgm_int();
-> +	diag288(42, 15, ACTION_RESTART);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("no init");
-> +	expect_pgm_int();
-> +	diag288(CODE_CANCEL, 15, ACTION_RESTART);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("min timer");
-> +	expect_pgm_int();
-> +	diag288(CODE_INIT, 14, ACTION_RESTART);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_priv(void)
-> +{
-> +	report_prefix_push("privileged");
-> +	expect_pgm_int();
-> +	enter_pstate();
-> +	diag288(CODE_INIT, 15, ACTION_RESTART);
-> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +static inline void get_tod_clock_ext(char *clk)
-> +{
-> +	typedef struct { char _[16]; } addrtype;
-> +
-> +	asm volatile("stcke %0" : "=Q" (*(addrtype *) clk) : : "cc");
-> +}
-> +
-> +static inline unsigned long long get_tod_clock(void)
-> +{
-> +	char clk[16];
-> +
-> +	get_tod_clock_ext(clk);
-> +	return *((unsigned long long *)&clk[1]);
-
-You could use uint64_t instead of "unsigned long long".
-
-> +}
-> +
-> +static void test_bite(void)
-> +{
-> +	unsigned long time;
-> +	uint64_t mask;
-> +
-> +	/* If watchdog doesn't bite, the cpu timer does */
-> +	time = get_tod_clock();
-> +	time += (uint64_t)(16000 * 1000) << 12;
-> +	asm volatile("sckc %0" : : "Q" (time));
-> +	ctl_set_bit(0, 11);
-> +	mask = extract_psw_mask();
-> +	mask |= PSW_MASK_EXT;
-> +	load_psw_mask(mask);
-> +
-> +	/* Arm watchdog */
-> +	lc->restart_new_psw.mask = extract_psw_mask() & ~PSW_MASK_EXT;
-> +	diag288(CODE_INIT, 15, ACTION_RESTART);
-> +	asm volatile("		larl	%r0, 1f\n"
-> +		     "		stg	%r0, 424\n"
-> +		     "0:	nop\n"
-> +		     "		j	0b\n"
-> +		     "1:");
-> +	report("restart", true);
-> +	return;
-
-Superfluous return statement.
-
-> +}
-> +
-> +int main(void)
-> +{
-> +	report_prefix_push("diag288");
-> +	test_priv();
-> +	test_specs();
-> +	test_bite();
-> +	return report_summary();
-> +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index db58bad..9dd288a 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -64,3 +64,7 @@ file = iep.elf
->  
->  [cpumodel]
->  file = cpumodel.elf
-> +
-> +[diag288]
-> +file = diag288.elf
-> +extra_params=-device diag288,id=watchdog0 --watchdog-action inject-nmi
+> diff --git a/s390x/flat.lds b/s390x/flat.lds
+> index 403d967..86dffac 100644
+> --- a/s390x/flat.lds
+> +++ b/s390x/flat.lds
+> @@ -1,14 +1,18 @@
+>  SECTIONS
+>  {
+> -	/*
+> -	 * Initial short psw for disk boot, with 31 bit addressing for
+> -	 * non z/Arch environment compatibility and the instruction
+> -	 * address 0x10000 (cstart64.S .init).
+> -	 */
+>  	.lowcore : {
+> +		/*
+> +		 * Initial short psw for disk boot, with 31 bit addressing for
+> +		 * non z/Arch environment compatibility and the instruction
+> +		 * address 0x10000 (cstart64.S .init).
+> +		 */
+>  		. = 0;
+>  		 LONG(0x00080000)
+>  		 LONG(0x80010000)
+> +		 /* Restart new PSW for booting via PSW restart. */
+> +		 . = 0x1a0;
+> +		 QUAD(0x0000000180000000)
+> +		 QUAD(0x0000000000010000)
+>  	}
+>  	. = 0x10000;
+>  	.text : {
 > 
 
-Apart from the cosmetic nits, looks fine to me.
+Seems you missed my
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David / dhildenb
