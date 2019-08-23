@@ -2,134 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 22F1D9AB6A
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 11:34:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7F999AC6B
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 12:06:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732692AbfHWJed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 05:34:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40572 "EHLO mx1.redhat.com"
+        id S2391873AbfHWKGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 06:06:25 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58623 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730512AbfHWJec (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 05:34:32 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1437D2D0FCE
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 09:34:32 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id b135so2782124wmg.1
-        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 02:34:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=QreUaGjv9CTkutPAtfkHcI/YdY++8wYqEFh96/UbB4c=;
-        b=fK8SL92fl8HXRW00H7KFBz/700UIhbDo7NDc/pZbipn9K/kCj8ebCnZ0KsnevQ7Z/z
-         gzFgZeko6BIfneQoShYiK1jYIzu3fhC94C5Lt7tZjFB0IZ0pN/39kTYTn5iznStuGnpq
-         TzRLtvAq0Omy34dR4mX1gnQZ6yY5yDum1w/JtICslekTfuz7P9qhQAJiBu6j9eRxNG1B
-         mAwIwvV0hSiMri6nbo+I2OsxZ2M1Gs9OWLODi5Is/teB71+jdQLbD3stwSuQvBqjq2BJ
-         RQYlo582w0VwvFEiuoBOulFiK0olURLC90jk3FKXDoDZXuvTHe372MEYNdHFFs+sF6Jt
-         aM7A==
-X-Gm-Message-State: APjAAAUOlE+utkgEA8FJ/hbIVs59sqOJEuIh/69Sfhrp9kCgLlzg1ApS
-        jLaKVhzrVvr1hbqUTS8Io3Z9jdotw0COTfIjiM5AMTnXLjqwjeafdvYr6Hn28OhQIyf2BrbecB0
-        KX9bY8uTqSJ1A
-X-Received: by 2002:a05:600c:292:: with SMTP id 18mr4128441wmk.51.1566552870725;
-        Fri, 23 Aug 2019 02:34:30 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz9X5S2AQSieJq5ssRPSF/b6ABaYvBQm4IqoXFqGxuS8qwxVjSSbMAiXqZKkrNBEM0ZG35lMQ==
-X-Received: by 2002:a05:600c:292:: with SMTP id 18mr4128410wmk.51.1566552870478;
-        Fri, 23 Aug 2019 02:34:30 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id o8sm5085455wma.1.2019.08.23.02.34.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2019 02:34:29 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [RESEND PATCH 04/13] KVM: x86: Drop EMULTYPE_NO_UD_ON_FAIL as a standalone type
-In-Reply-To: <20190823010709.24879-5-sean.j.christopherson@intel.com>
-References: <20190823010709.24879-1-sean.j.christopherson@intel.com> <20190823010709.24879-5-sean.j.christopherson@intel.com>
-Date:   Fri, 23 Aug 2019 11:34:29 +0200
-Message-ID: <874l28p6my.fsf@vitty.brq.redhat.com>
+        id S2391851AbfHWKGX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 06:06:23 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46FH9T5G9Tz9sBp; Fri, 23 Aug 2019 20:06:21 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1566554781; bh=QLQsTAOZE1gGL3/Mhe7B43PHJuPQ9BKbedBn6LgDPLU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AEVd1JcU6F9umiAv1HUNaZtOkH0Ssq6EKNB92AZOJTAlCP3HveF9B1OrbMZy7RUXS
+         MWcymwiBC8XRU74UntlrxHsRI5Ex522imgkFP94b+qeFOk6KvttiKkvq4LjhdyAHWS
+         wF+qkqTPfIub12ItyKTQL4Hn9DjiXHEtKfz9BWSE8AGHM3mFl/XZ+kmRUXKvcmQm1W
+         STx42UsC3fVdVIcwDJb3GBi+U+FaAMnNBmyCHsijmriNGYZs/SU7t+QV3bn10voMQX
+         87QEMHDbeZqeUh28i8uOqvHouYpeo5Scw0uzibG+P1EyT8eh6+wQ+UgdwD3+hS6UmI
+         7o0e+WIaCAzog==
+Date:   Fri, 23 Aug 2019 20:04:54 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: Define usage types for rmap array
+ in guest memslot
+Message-ID: <20190823100454.GA11357@blackberry>
+References: <20190820061349.28995-1-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190820061349.28995-1-sjitindarsingh@gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Tue, Aug 20, 2019 at 04:13:49PM +1000, Suraj Jitindar Singh wrote:
+> The rmap array in the guest memslot is an array of size number of guest
+> pages, allocated at memslot creation time. Each rmap entry in this array
+> is used to store information about the guest page to which it
+> corresponds. For example for a hpt guest it is used to store a lock bit,
+> rc bits, a present bit and the index of a hpt entry in the guest hpt
+> which maps this page. For a radix guest which is running nested guests
+> it is used to store a pointer to a linked list of nested rmap entries
+> which store the nested guest physical address which maps this guest
+> address and for which there is a pte in the shadow page table.
+> 
+> As there are currently two uses for the rmap array, and the potential
+> for this to expand to more in the future, define a type field (being the
+> top 8 bits of the rmap entry) to be used to define the type of the rmap
+> entry which is currently present and define two values for this field
+> for the two current uses of the rmap array.
+> 
+> Since the nested case uses the rmap entry to store a pointer, define
+> this type as having the two high bits set as is expected for a pointer.
+> Define the hpt entry type as having bit 56 set (bit 7 IBM bit ordering).
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-> The "no #UD on fail" is used only in the VMWare case, and for the VMWare
-> scenario it really means "#GP instead of #UD on fail".  Remove the flag
-> in preparation for moving all fault injection into the emulation flow
-> itself, which in turn will allow eliminating EMULATE_DONE and company.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 -
->  arch/x86/kvm/svm.c              | 3 +--
->  arch/x86/kvm/vmx/vmx.c          | 3 +--
->  arch/x86/kvm/x86.c              | 2 +-
->  4 files changed, 3 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 44a5ce57a905..dd6bd9ed0839 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1318,7 +1318,6 @@ enum emulation_result {
->  #define EMULTYPE_TRAP_UD	    (1 << 1)
->  #define EMULTYPE_SKIP		    (1 << 2)
->  #define EMULTYPE_ALLOW_RETRY	    (1 << 3)
-> -#define EMULTYPE_NO_UD_ON_FAIL	    (1 << 4)
->  #define EMULTYPE_VMWARE		    (1 << 5)
->  int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
->  int kvm_emulate_instruction_from_buffer(struct kvm_vcpu *vcpu,
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 1f220a85514f..5a42f9c70014 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -2772,8 +2772,7 @@ static int gp_interception(struct vcpu_svm *svm)
->  
->  	WARN_ON_ONCE(!enable_vmware_backdoor);
->  
-> -	er = kvm_emulate_instruction(vcpu,
-> -		EMULTYPE_VMWARE | EMULTYPE_NO_UD_ON_FAIL);
-> +	er = kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE);
->  	if (er == EMULATE_USER_EXIT)
->  		return 0;
->  	else if (er != EMULATE_DONE)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 18286e5b5983..6ecf773825e2 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4509,8 +4509,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  
->  	if (!vmx->rmode.vm86_active && is_gp_fault(intr_info)) {
->  		WARN_ON_ONCE(!enable_vmware_backdoor);
-> -		er = kvm_emulate_instruction(vcpu,
-> -			EMULTYPE_VMWARE | EMULTYPE_NO_UD_ON_FAIL);
-> +		er = kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE);
->  		if (er == EMULATE_USER_EXIT)
->  			return 0;
->  		else if (er != EMULATE_DONE)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fe847f8eb947..e0f0e14d8fac 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6210,7 +6210,7 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  	++vcpu->stat.insn_emulation_fail;
->  	trace_kvm_emulate_insn_failed(vcpu);
->  
-> -	if (emulation_type & EMULTYPE_NO_UD_ON_FAIL)
-> +	if (emulation_type & EMULTYPE_VMWARE)
->  		return EMULATE_FAIL;
->  
->  	kvm_queue_exception(vcpu, UD_VECTOR);
+Thanks, applied to my kvm-ppc-next branch.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+Paul.
