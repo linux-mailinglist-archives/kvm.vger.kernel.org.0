@@ -2,64 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3B0E9B239
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 16:38:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A48EF9B246
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 16:40:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395371AbfHWOh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 10:37:57 -0400
-Received: from mga02.intel.com ([134.134.136.20]:62650 "EHLO mga02.intel.com"
+        id S2390533AbfHWOkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 10:40:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42286 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393066AbfHWOh5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 10:37:57 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Aug 2019 07:37:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,421,1559545200"; 
-   d="scan'208";a="196492866"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Aug 2019 07:37:55 -0700
-Date:   Fri, 23 Aug 2019 07:37:55 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [RESEND PATCH 01/13] KVM: x86: Relocate MMIO exit stats counting
-Message-ID: <20190823143755.GA6713@linux.intel.com>
-References: <20190823010709.24879-1-sean.j.christopherson@intel.com>
- <20190823010709.24879-2-sean.j.christopherson@intel.com>
- <87d0gwp7ix.fsf@vitty.brq.redhat.com>
+        id S2389691AbfHWOkO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 10:40:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8663C309175F;
+        Fri, 23 Aug 2019 14:40:14 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 515BE5F9D2;
+        Fri, 23 Aug 2019 14:40:13 +0000 (UTC)
+Date:   Fri, 23 Aug 2019 08:40:12 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        linuxppc-dev@lists.ozlabs.org,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        Jose Ricardo Ziviani <joserz@linux.ibm.com>
+Subject: Re: [PATCH kernel] vfio/spapr_tce: Fix incorrect tce_iommu_group
+ memory free
+Message-ID: <20190823084012.202ba70f@x1.home>
+In-Reply-To: <20190823053241.hogc44em2ccwdwq4@oak.ozlabs.ibm.com>
+References: <20190819015117.94878-1-aik@ozlabs.ru>
+        <20190823053241.hogc44em2ccwdwq4@oak.ozlabs.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87d0gwp7ix.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 23 Aug 2019 14:40:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 23, 2019 at 11:15:18AM +0200, Vitaly Kuznetsov wrote:
-> Sean Christopherson <sean.j.christopherson@intel.com> writes:
-> 
-> > Move the stat.mmio_exits update into x86_emulate_instruction().  This is
-> > both a bug fix, e.g. the current update flows will incorrectly increment
-> > mmio_exits on emulation failure, and a preparatory change to set the
-> > stage for eliminating EMULATE_DONE and company.
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> 
-> This, however, makes me wonder why this is handled in x86-specific code
-> in the first place, can we just count KVM_EXIT_MMIO exits when handling
-> KVM_RUN?
+On Fri, 23 Aug 2019 15:32:41 +1000
+Paul Mackerras <paulus@ozlabs.org> wrote:
 
-struct kvm_vcpu_stat is arch specific.  At a glance, everyone is counting
-similar things, but often in slightly different ways.  E.g. PowerPC and
-ARM count MMIO exits, but PowerPC counts all exits, ARM has separate
-counters for in-kernel vs. userspace, and x86 counts only userspace.
+> On Mon, Aug 19, 2019 at 11:51:17AM +1000, Alexey Kardashevskiy wrote:
+> > The @tcegrp variable is used in 1) a loop over attached groups
+> > 2) it stores a pointer to a newly allocated tce_iommu_group if 1) found
+> > nothing. However the error handler does not distinguish how we got there
+> > and incorrectly releases memory for a found+incompatible group.
+> > 
+> > This fixes it by adding another error handling case.
+> > 
+> > Fixes: 0bd971676e68 ("powerpc/powernv/npu: Add compound IOMMU groups")
+> > Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>  
+> 
+> Good catch.  This is potentially nasty since it is a double free.
+> Alex, are you going to take this, or would you prefer it goes via
+> Michael Ellerman's tree?
+> 
+> Reviewed-by: Paul Mackerras <paulus@ozlabs.org>
+
+I can take it, I've got it queued, but was hoping for an ack/review by
+you or David.  I'll add the R-b and push it out to my next branch.
+Thanks,
+
+Alex
