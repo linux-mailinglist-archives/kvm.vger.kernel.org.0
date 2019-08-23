@@ -2,85 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F8669A56D
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 04:25:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13EDD9A6F7
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 07:17:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388641AbfHWCZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 22:25:03 -0400
-Received: from mga14.intel.com ([192.55.52.115]:50237 "EHLO mga14.intel.com"
+        id S2391911AbfHWFQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 01:16:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35444 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729716AbfHWCZC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 22:25:02 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Aug 2019 19:25:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,419,1559545200"; 
-   d="scan'208";a="181581227"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga003.jf.intel.com with ESMTP; 22 Aug 2019 19:25:02 -0700
-Date:   Thu, 22 Aug 2019 19:25:02 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>
-Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Message-ID: <20190823022502.GA4525@linux.intel.com>
-References: <20190813133316.6fc6f257@x1.home>
- <20190813201914.GI13991@linux.intel.com>
- <20190815092324.46bb3ac1@x1.home>
- <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
- <20190820200318.GA15808@linux.intel.com>
- <20190820144204.161f49e0@x1.home>
- <20190820210245.GC15808@linux.intel.com>
- <20190821130859.4330bcf4@x1.home>
- <20190821133504.79b87767@x1.home>
- <20190821203041.GJ29345@linux.intel.com>
+        id S1726283AbfHWFQh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 01:16:37 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 642043091754;
+        Fri, 23 Aug 2019 05:16:36 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F3A510016E9;
+        Fri, 23 Aug 2019 05:16:36 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id C84DB4A460;
+        Fri, 23 Aug 2019 05:16:34 +0000 (UTC)
+Date:   Fri, 23 Aug 2019 01:16:34 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
+        kvm@vger.kernel.org, mst@redhat.com, david@redhat.com,
+        dave hansen <dave.hansen@intel.com>,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        virtio-dev@lists.oasis-open.org, osalvador@suse.de,
+        yang zhang wz <yang.zhang.wz@gmail.com>, riel@surriel.com,
+        konrad wilk <konrad.wilk@oracle.com>, lcapitulino@redhat.com,
+        wei w wang <wei.w.wang@intel.com>, aarcange@redhat.com,
+        pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>
+Message-ID: <860165703.10076075.1566537394212.JavaMail.zimbra@redhat.com>
+In-Reply-To: <31b75078d004a1ccf77b710b35b8f847f404de9a.camel@linux.intel.com>
+References: <20190821145806.20926.22448.stgit@localhost.localdomain> <1297409377.9866813.1566470593223.JavaMail.zimbra@redhat.com> <31b75078d004a1ccf77b710b35b8f847f404de9a.camel@linux.intel.com>
+Subject: Re: [PATCH v6 0/6] mm / virtio: Provide support for unused page
+ reporting
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190821203041.GJ29345@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.62, 10.4.195.21]
+Thread-Topic: mm / virtio: Provide support for unused page reporting
+Thread-Index: sTNT+EjyPXY4peHrw8rPQkPz8nPuRw==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 23 Aug 2019 05:16:36 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 01:30:41PM -0700, Sean Christopherson wrote:
-> On Wed, Aug 21, 2019 at 01:35:04PM -0600, Alex Williamson wrote:
-> > On Wed, 21 Aug 2019 13:08:59 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > > Does this suggests something is still fundamentally wrong with the
-> > > premise of this change or have I done something stupid?
-> > 
-> > Seems the latter, particularly your comment that we're looking for
-> > pages pointing to the gfn range to be removed, not just those in the
-> > range.  Slot gfn ranges like ffe00-ffe1f are getting reduced to 0-0 or
-> > c0000-c0000, zapping zero or c0000, and I think one of the ones you
-> > were looking for c1080-c1083 is reduce to c1000-c1000 and therefore
-> > zaps sp->gfn c1000.  I'll keep looking.  Thanks,
-> 
-> Ya.  As far as where to look, at this point I don't think it's an issue of
-> incorrect zapping.  Not because  I'm 100% confident the zapping logic is
-> correct, but because many of the tests, e.g. removing 'sp->gfn != gfn' and
-> not being able to exclude APIC/IOAPIC ranges, suggest that the badness is
-> 'fixed' by zapping seemingly unrelated sps.
-> 
-> In other words, it may be fundamentally wrong to zap only the memslot
-> being removed, but I really want to know why.  History isn't helpful as
-> KVM has always zapped all pages when removing a memslot (on x86), and the
-> introduction of the per-memslot flush hook in commit
-> 
->   2df72e9bc4c5 ("KVM: split kvm_arch_flush_shadow")
-> 
-> was all about refactoring generic code, and doesn't have any information
-> on whether per-memslot flushing was actually tried for x86.
 
-One semi-random idea would be to zap mmio pages, i.e. don't skip pages
-for which sp->mmio_cached is true, regardless of their gfn or level.  I
-don't expect it to make a difference, but it would shrink the haystack on
-the off change it does "fix" the issues.
+> On Thu, 2019-08-22 at 06:43 -0400, Pankaj Gupta wrote:
+> > > This series provides an asynchronous means of reporting to a hypervisor
+> > > that a guest page is no longer in use and can have the data associated
+> > > with it dropped. To do this I have implemented functionality that allows
+> > > for what I am referring to as unused page reporting
+> > > 
+> > > The functionality for this is fairly simple. When enabled it will
+> > > allocate
+> > > statistics to track the number of reported pages in a given free area.
+> > > When the number of free pages exceeds this value plus a high water value,
+> > > currently 32, it will begin performing page reporting which consists of
+> > > pulling pages off of free list and placing them into a scatter list. The
+> > > scatterlist is then given to the page reporting device and it will
+> > > perform
+> > > the required action to make the pages "reported", in the case of
+> > > virtio-balloon this results in the pages being madvised as MADV_DONTNEED
+> > > and as such they are forced out of the guest. After this they are placed
+> > > back on the free list, and an additional bit is added if they are not
+> > > merged indicating that they are a reported buddy page instead of a
+> > > standard buddy page. The cycle then repeats with additional non-reported
+> > > pages being pulled until the free areas all consist of reported pages.
+> > > 
+> > > I am leaving a number of things hard-coded such as limiting the lowest
+> > > order processed to PAGEBLOCK_ORDER, and have left it up to the guest to
+> > > determine what the limit is on how many pages it wants to allocate to
+> > > process the hints. The upper limit for this is based on the size of the
+> > > queue used to store the scattergather list.
+> > > 
+> > > My primary testing has just been to verify the memory is being freed
+> > > after
+> > > allocation by running memhog 40g on a 40g guest and watching the total
+> > > free memory via /proc/meminfo on the host. With this I have verified most
+> > > of the memory is freed after each iteration.
+> > 
+> > I tried to go through the entire patch series. I can see you reported a
+> > -3.27 drop from the baseline. If its because of re-faulting the page after
+> > host has freed them? Can we avoid freeing all the pages from the guest
+> > free_area
+> > and keep some pages(maybe some mixed order), so that next allocation is
+> > done from
+> > the guest itself than faulting to host. This will work with real workload
+> > where
+> > allocation and deallocation happen at regular intervals.
+> > 
+> > This can be further optimized based on other factors like host memory
+> > pressure etc.
+> > 
+> > Thanks,
+> > Pankaj
+> 
+> When I originally started implementing and testing this code I was seeing
+> less than a 1% regression. I didn't feel like that was really an accurate
+> result since it wasn't putting much stress on the changed code so I have
+> modified my tests and kernel so that I have memory shuffting and THP
+> enabled. In addition I have gone out of my way to lock things down to a
+> single NUMA node on my host system as the code I had would sometimes
+> perform better than baseline when running the test due to the fact that
+> memory was being freed back to the hose and then reallocated which
+> actually allowed for better NUMA locality.
+> 
+> The general idea was I wanted to know what the worst case penalty would be
+> for running this code, and it turns out most of that is just the cost of
+> faulting back in the pages. By enabling memory shuffling I am forcing the
+> memory to churn as pages are added to both the head and tail of the
+> free_list. The test itself was modified so that it didn't allocate order 0
+> pages and instead was allocating transparent huge pages so the effects
+> were as visible as possible. Without that the page faulting overhead would
+> mostly fall into the noise of having to allocate the memory as order 0
+> pages, that is what I had essentially seen earlier when I was running the
+> stock page_fault1 test.
+
+Right. I think the reason is this test is allocating THP's in guest, host side
+you are still using order 0 pages, I assume?
+
+> 
+> This code does no hinting on anything smaller than either MAX_ORDER - 1 or
+> HUGETLB_PAGE_ORDER pages, and it only starts when there are at least 32 of
+> them available to hint on. This results in us not starting to perform the
+> hinting until there is 64MB to 128MB of memory sitting in the higher order
+> regions of the zone.
+
+o.k
+
+> 
+> The hinting itself stops as soon as we run out of unhinted pages to pull
+> from. When this occurs we let any pages that are freed after that
+> accumulate until we get back to 32 pages being free in a given order.
+> During this time we should build up the cache of warm pages that you
+> mentioned, assuming that shuffling is not enabled.
+
+I was thinking about something like retaining pages to a lower watermark here.
+Looks like we still might have few lower order pages in free list if they are
+not merged to orders which are hinted. 
+
+> 
+> As far as further optimizations I don't think there is anything here that
+> prevents us from doing that. For now I am focused on just getting the
+> basics in place so we have a foundation to start from.
+
+Agree. Thanks for explaining.
+
+Best rgards,
+Pankaj
+
+> 
+> Thanks.
+> 
+> - Alex
+> 
+> 
