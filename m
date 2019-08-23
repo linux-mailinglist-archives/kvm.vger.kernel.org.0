@@ -2,365 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C947E9B0AD
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 15:23:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE4689B0C9
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 15:25:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732899AbfHWNXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 09:23:11 -0400
-Received: from foss.arm.com ([217.140.110.172]:34444 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726319AbfHWNXL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 09:23:11 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8C3E28;
-        Fri, 23 Aug 2019 06:23:09 -0700 (PDT)
-Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 240BD3F718;
-        Fri, 23 Aug 2019 06:23:08 -0700 (PDT)
-Subject: Re: [PATCH v3 05/10] KVM: arm64: Support stolen time reporting via
- shared structure
-To:     Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20190821153656.33429-1-steven.price@arm.com>
- <20190821153656.33429-6-steven.price@arm.com>
- <d3c493f0-31e8-2334-0ac3-f27bfe9fa976@huawei.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <5c12ce80-0014-ff92-d6d1-08c81ee8f35b@arm.com>
-Date:   Fri, 23 Aug 2019 14:23:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <d3c493f0-31e8-2334-0ac3-f27bfe9fa976@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+        id S2392760AbfHWNY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 09:24:57 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:45596 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392194AbfHWNY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 09:24:57 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7NDNlFj051828;
+        Fri, 23 Aug 2019 13:23:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=p0RQDgsmP5itMie9wmmg6pNVdSasWpi8POdZFHN0hhQ=;
+ b=Vlayb+W8aI4dB2lk56qdPkGxUESvCY4ymrzNW4pai7a+89Ka5YQw/Kk0E5+AM7vkZ70s
+ RVQe0Y8rVNwaCW3e3v/HDXX+fjP6E48jMxgnSlSWh8muKWkRcVX2GEQpZYn0wWIgS0Av
+ U1+o55AP0hXZq8JULmqHGZyvJIuaNztbqL165VibrrKhPpWmnU3SyUKVFPHyvf8Q+N3W
+ JQPaGWtK0L5o8vk24AIJ9Y4uw5b/2dqhgBeKOjeB7fhnWKEyjQR44L0fPigtqTSiYyZz
+ wois3cP+sgIVu2PR8hZDZN3N/mk6VxXJ/CYXuT6Wq3k/OtOl02AEGQK/4z3o52SqPi0a GA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2uea7rcrpg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Aug 2019 13:23:47 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7NDNRWO138212;
+        Fri, 23 Aug 2019 13:23:45 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2ujca83pee-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Aug 2019 13:23:45 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7NDNhlr023979;
+        Fri, 23 Aug 2019 13:23:43 GMT
+Received: from [192.168.14.112] (/109.64.228.12)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 23 Aug 2019 06:23:43 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [RESEND PATCH 05/13] KVM: x86: Don't attempt VMWare emulation on
+ #GP with non-zero error code
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190823010709.24879-6-sean.j.christopherson@intel.com>
+Date:   Fri, 23 Aug 2019 16:23:38 +0300
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5D23F679-9E64-4BFA-8041-C18952EF0F56@oracle.com>
+References: <20190823010709.24879-1-sean.j.christopherson@intel.com>
+ <20190823010709.24879-6-sean.j.christopherson@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=769
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908230138
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=817 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908230138
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/08/2019 13:07, Zenghui Yu wrote:
-> Hi Steven,
-> 
-> Only one comment, at the bottom.
-> 
-> On 2019/8/21 23:36, Steven Price wrote:
->> Implement the service call for configuring a shared structure between a
->> VCPU and the hypervisor in which the hypervisor can write the time
->> stolen from the VCPU's execution time by other tasks on the host.
->>
->> The hypervisor allocates memory which is placed at an IPA chosen by user
->> space. The hypervisor then updates the shared structure using
->> kvm_put_guest() to ensure single copy atomicity of the 64-bit value
->> reporting the stolen time in nanoseconds.
->>
->> Whenever stolen time is enabled by the guest, the stolen time counter is
->> reset.
->>
->> The stolen time itself is retrieved from the sched_info structure
->> maintained by the Linux scheduler code. We enable SCHEDSTATS when
->> selecting KVM Kconfig to ensure this value is meaningful.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm/include/asm/kvm_host.h   | 20 +++++++++
->>   arch/arm64/include/asm/kvm_host.h | 25 +++++++++++-
->>   arch/arm64/kvm/Kconfig            |  1 +
->>   include/linux/kvm_types.h         |  2 +
->>   virt/kvm/arm/arm.c                | 10 +++++
->>   virt/kvm/arm/hypercalls.c         |  3 ++
->>   virt/kvm/arm/pvtime.c             | 67 +++++++++++++++++++++++++++++++
->>   7 files changed, 127 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_host.h
->> b/arch/arm/include/asm/kvm_host.h
->> index 369b5d2d54bf..47d2ced99421 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -39,6 +39,7 @@
->>       KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->>   #define KVM_REQ_IRQ_PENDING    KVM_ARCH_REQ(1)
->>   #define KVM_REQ_VCPU_RESET    KVM_ARCH_REQ(2)
->> +#define KVM_REQ_RECORD_STEAL    KVM_ARCH_REQ(3)
->>     DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->>   @@ -329,6 +330,25 @@ static inline int
->> kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>       return SMCCC_RET_NOT_SUPPORTED;
->>   }
->>   +static inline int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
->> +{
->> +    return SMCCC_RET_NOT_SUPPORTED;
->> +}
->> +
->> +static inline int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool
->> init)
->> +{
->> +    return -ENOTSUPP;
->> +}
->> +
->> +static inline void kvm_pvtime_init_vm(struct kvm_arch *kvm_arch)
->> +{
->> +}
->> +
->> +static inline bool kvm_is_pvtime_enabled(struct kvm_arch *kvm_arch)
->> +{
->> +    return false;
->> +}
->> +
->>   void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
->>     struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long
->> mpidr);
->> diff --git a/arch/arm64/include/asm/kvm_host.h
->> b/arch/arm64/include/asm/kvm_host.h
->> index 583b3639062a..b6fa7beffd8a 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -44,6 +44,7 @@
->>       KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->>   #define KVM_REQ_IRQ_PENDING    KVM_ARCH_REQ(1)
->>   #define KVM_REQ_VCPU_RESET    KVM_ARCH_REQ(2)
->> +#define KVM_REQ_RECORD_STEAL    KVM_ARCH_REQ(3)
->>     DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->>   @@ -83,6 +84,11 @@ struct kvm_arch {
->>         /* Mandated version of PSCI */
->>       u32 psci_version;
->> +
->> +    struct kvm_arch_pvtime {
->> +        gpa_t st_base;
->> +        u64 st_size;
->> +    } pvtime;
->>   };
->>     #define KVM_NR_MEM_OBJS     40
->> @@ -338,8 +344,13 @@ struct kvm_vcpu_arch {
->>       /* True when deferrable sysregs are loaded on the physical CPU,
->>        * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
->>       bool sysregs_loaded_on_cpu;
->> -};
->>   +    /* Guest PV state */
->> +    struct {
->> +        u64 steal;
->> +        u64 last_steal;
->> +    } steal;
->> +};
->>   /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->>   #define vcpu_sve_pffr(vcpu) ((void *)((char
->> *)((vcpu)->arch.sve_state) + \
->>                         sve_ffr_offset((vcpu)->arch.sve_max_vl)))
->> @@ -479,6 +490,18 @@ int kvm_perf_init(void);
->>   int kvm_perf_teardown(void);
->>     int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
->> +int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
->> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
->> +
->> +static inline void kvm_pvtime_init_vm(struct kvm_arch *kvm_arch)
->> +{
->> +    kvm_arch->pvtime.st_base = GPA_INVALID;
->> +}
->> +
->> +static inline bool kvm_is_pvtime_enabled(struct kvm_arch *kvm_arch)
->> +{
->> +    return (kvm_arch->pvtime.st_base != GPA_INVALID);
->> +}
->>     void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
->>   diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index a67121d419a2..d8b88e40d223 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -39,6 +39,7 @@ config KVM
->>       select IRQ_BYPASS_MANAGER
->>       select HAVE_KVM_IRQ_BYPASS
->>       select HAVE_KVM_VCPU_RUN_PID_CHANGE
->> +    select SCHEDSTATS
->>       ---help---
->>         Support hosting virtualized guest machines.
->>         We don't support KVM with 16K page tables yet, due to the
->> multiple
->> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
->> index bde5374ae021..1c88e69db3d9 100644
->> --- a/include/linux/kvm_types.h
->> +++ b/include/linux/kvm_types.h
->> @@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
->>   typedef u64            gpa_t;
->>   typedef u64            gfn_t;
->>   +#define GPA_INVALID    (~(gpa_t)0)
->> +
->>   typedef unsigned long  hva_t;
->>   typedef u64            hpa_t;
->>   typedef u64            hfn_t;
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 35a069815baf..5e8343e2dd62 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -40,6 +40,10 @@
->>   #include <asm/kvm_coproc.h>
->>   #include <asm/sections.h>
->>   +#include <kvm/arm_hypercalls.h>
->> +#include <kvm/arm_pmu.h>
->> +#include <kvm/arm_psci.h>
->> +
->>   #ifdef REQUIRES_VIRT
->>   __asm__(".arch_extension    virt");
->>   #endif
->> @@ -135,6 +139,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned
->> long type)
->>       kvm->arch.max_vcpus = vgic_present ?
->>                   kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->>   +    kvm_pvtime_init_vm(&kvm->arch);
->>       return ret;
->>   out_free_stage2_pgd:
->>       kvm_free_stage2_pgd(kvm);
->> @@ -379,6 +384,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int
->> cpu)
->>       kvm_vcpu_load_sysregs(vcpu);
->>       kvm_arch_vcpu_load_fp(vcpu);
->>       kvm_vcpu_pmu_restore_guest(vcpu);
->> +    if (kvm_is_pvtime_enabled(&vcpu->kvm->arch))
->> +        kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->>         if (single_task_running())
->>           vcpu_clear_wfe_traps(vcpu);
->> @@ -644,6 +651,9 @@ static void check_vcpu_requests(struct kvm_vcpu
->> *vcpu)
->>            * that a VCPU sees new virtual interrupts.
->>            */
->>           kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
->> +
->> +        if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
->> +            kvm_update_stolen_time(vcpu, false);
->>       }
->>   }
->>   diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
->> index 63ae629c466a..ac678eabf15f 100644
->> --- a/virt/kvm/arm/hypercalls.c
->> +++ b/virt/kvm/arm/hypercalls.c
->> @@ -56,6 +56,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>       case ARM_SMCCC_HV_PV_FEATURES:
->>           val = kvm_hypercall_pv_features(vcpu);
->>           break;
->> +    case ARM_SMCCC_HV_PV_TIME_ST:
->> +        val = kvm_hypercall_stolen_time(vcpu);
->> +        break;
->>       default:
->>           return kvm_psci_call(vcpu);
->>       }
->> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
->> index 6201d71cb1f8..28603689f6e0 100644
->> --- a/virt/kvm/arm/pvtime.c
->> +++ b/virt/kvm/arm/pvtime.c
->> @@ -3,8 +3,51 @@
->>     #include <linux/arm-smccc.h>
->>   +#include <asm/pvclock-abi.h>
->> +
->>   #include <kvm/arm_hypercalls.h>
->>   +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
->> +{
->> +    struct kvm *kvm = vcpu->kvm;
->> +    struct kvm_arch_pvtime *pvtime = &kvm->arch.pvtime;
->> +    u64 steal;
->> +    u64 steal_le;
->> +    u64 offset;
->> +    int idx;
->> +    const int stride = sizeof(struct pvclock_vcpu_stolen_time);
->> +
->> +    if (pvtime->st_base == GPA_INVALID)
->> +        return -ENOTSUPP;
->> +
->> +    /* Let's do the local bookkeeping */
->> +    steal = vcpu->arch.steal.steal;
->> +    steal += current->sched_info.run_delay -
->> vcpu->arch.steal.last_steal;
->> +    vcpu->arch.steal.last_steal = current->sched_info.run_delay;
->> +    vcpu->arch.steal.steal = steal;
->> +
->> +    offset = stride * kvm_vcpu_get_idx(vcpu);
->> +
->> +    if (unlikely(offset + stride > pvtime->st_size))
->> +        return -EINVAL;
->> +
->> +    steal_le = cpu_to_le64(steal);
->> +    idx = srcu_read_lock(&kvm->srcu);
->> +    if (init) {
->> +        struct pvclock_vcpu_stolen_time init_values = {
->> +            .revision = 0,
->> +            .attributes = 0
->> +        };
->> +        kvm_write_guest(kvm, pvtime->st_base + offset, &init_values,
->> +                sizeof(init_values));
->> +    }
->> +    offset += offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
->> +    kvm_put_guest(kvm, pvtime->st_base + offset, steal_le, u64);
->> +    srcu_read_unlock(&kvm->srcu, idx);
->> +
->> +    return 0;
->> +}
->> +
->>   int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>   {
->>       u32 feature = smccc_get_arg1(vcpu);
->> @@ -12,6 +55,7 @@ int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>         switch (feature) {
->>       case ARM_SMCCC_HV_PV_FEATURES:
->> +    case ARM_SMCCC_HV_PV_TIME_ST:
->>           val = SMCCC_RET_SUCCESS;
->>           break;
->>       }
->> @@ -19,3 +63,26 @@ int kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>       return val;
->>   }
->>   +int kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
->> +{
->> +    u64 ret;
->> +    int err;
->> +
->> +    /*
->> +     * Start counting stolen time from the time the guest requests
->> +     * the feature enabled.
->> +     */
->> +    vcpu->arch.steal.steal = 0;
->> +    vcpu->arch.steal.last_steal = current->sched_info.run_delay;
->> +
->> +    err = kvm_update_stolen_time(vcpu, true);
->> +
->> +    if (err)
->> +        ret = SMCCC_RET_NOT_SUPPORTED;
->> +    else
->> +        ret = vcpu->kvm->arch.pvtime.st_base +
->> +            (sizeof(struct pvclock_vcpu_stolen_time) *
->> +             kvm_vcpu_get_idx(vcpu));
->> +
->> +    return ret;
-> 
-> The *type* of the 'ret' here looks a bit messy to me:
-> (1)u64 -> (2)int -> (3)u32 -> (4)unsigned long
-> 
-> (1)->(2): just inside kvm_hypercall_stolen_time()
-> (2)->(3): inside kvm_hvc_call_handler(), assign 'ret' to 'val'
-> (3)->(4): through smccc_set_retval()
-> 
-> I really have seen an issue caused by (2)->(3).
-> 
-> When the PV guest running without PV_TIME device supporting, the result
-> of the ARM_SMCCC_HV_PV_TIME_ST hypercall is expected to be -1 (which
-> means "not supported"), but the actual result I got is 4294967295.
-> Guest continues to run blindly, bad things would happen then...
-> 
-> I think this needs a fix?
 
-Yes you are entirely right. I'm afraid this happened because I
-refactored the functions and apparently forgot to update the return
-type. In a previous version the functions themselves did
-smccc_set_retval() themselves and the return value was always "1" (the
-same as kvm_hvc_call_handler()).
 
-The function should really return a "long" and "val" in
-kvm_hvc_call_handler() should be upgraded to a "long" too - the
-SMC64/HVC64 calling convention requires error codes to be 64-bit signed
-integers.
+> On 23 Aug 2019, at 4:07, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> The VMware backdoor hooks #GP faults on IN{S}, OUT{S}, and RDPMC, none
+> of which generate a non-zero error code for their #GP.  Re-injecting =
+#GP
+> instead of attempting emulation on a non-zero error code will allow a
+> future patch to move #GP injection (for emulation failure) into
+> kvm_emulate_instruction() without having to plumb in the error code.
+>=20
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Thanks for spotting this!
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
 
-Steve
+-Liran
+
+> ---
+> arch/x86/kvm/svm.c     | 6 +++++-
+> arch/x86/kvm/vmx/vmx.c | 7 ++++++-
+> 2 files changed, 11 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 5a42f9c70014..b96a119690f4 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -2772,11 +2772,15 @@ static int gp_interception(struct vcpu_svm =
+*svm)
+>=20
+> 	WARN_ON_ONCE(!enable_vmware_backdoor);
+>=20
+> +	if (error_code) {
+> +		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+> +		return 1;
+> +	}
+> 	er =3D kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE);
+> 	if (er =3D=3D EMULATE_USER_EXIT)
+> 		return 0;
+> 	else if (er !=3D EMULATE_DONE)
+> -		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+> +		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+> 	return 1;
+> }
+>=20
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 6ecf773825e2..3ee0dd304bc7 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4509,11 +4509,16 @@ static int handle_exception_nmi(struct =
+kvm_vcpu *vcpu)
+>=20
+> 	if (!vmx->rmode.vm86_active && is_gp_fault(intr_info)) {
+> 		WARN_ON_ONCE(!enable_vmware_backdoor);
+> +
+> +		if (error_code) {
+> +			kvm_queue_exception_e(vcpu, GP_VECTOR, =
+error_code);
+> +			return 1;
+> +		}
+> 		er =3D kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE);
+> 		if (er =3D=3D EMULATE_USER_EXIT)
+> 			return 0;
+> 		else if (er !=3D EMULATE_DONE)
+> -			kvm_queue_exception_e(vcpu, GP_VECTOR, =
+error_code);
+> +			kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+> 		return 1;
+> 	}
+>=20
+> --=20
+> 2.22.0
+>=20
+
