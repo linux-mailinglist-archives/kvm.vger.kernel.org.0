@@ -2,72 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A12D69AF19
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F36C79AF56
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 14:26:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390744AbfHWMUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 08:20:03 -0400
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:39042 "EHLO
+        id S2392324AbfHWM0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 08:26:04 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:35653 "EHLO
         smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388497AbfHWMUD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 08:20:03 -0400
+        with ESMTP id S1731573AbfHWM0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 08:26:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1566562800; x=1598098800;
+  t=1566563162; x=1598099162;
   h=subject:to:cc:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=oQ3SLOXnyDIrdnDqQtKX12htazF7VCNxY5rdgk07Gms=;
-  b=nk5thbuysXjQt9JdNiSGXErva4UTKF84THXD+iQ3JkxPoOwvBEmgskAu
-   x8iUVni1PSNxocVy/82cCSV6BHBnl/cpK//2uhk5pKpajU3+0coh2g0Xb
-   JDP64xOhZP4ECLgAz85gFuN4DgAAjqBvHK8KG8GmX+ANVyG9fSBvm/1Oz
-   I=;
+  bh=gTCdg8J2VOjRvubNIG/WreNywvWkf7+OZpzbGKuI4Ds=;
+  b=JFyoK31KFnHL4Wb4H8wIkDag8zwWZGfji1MRz3wmQgZSAxQvTX7IHgGx
+   2Hfmuj03GXxNXohrmo41kIeaBeYIiRecN5ED8kedZun02wWs14jFp25C+
+   nqD/DOJ/B2UQuMBWWiQkQ2kz2dyOfIcnSPtVrG2nsR5suLC2yXiyIliJJ
+   8=;
 X-IronPort-AV: E=Sophos;i="5.64,421,1559520000"; 
-   d="scan'208";a="781000484"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 23 Aug 2019 12:19:59 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com (Postfix) with ESMTPS id 597AAA2C68;
-        Fri, 23 Aug 2019 12:19:55 +0000 (UTC)
+   d="scan'208";a="781001403"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-62350142.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 23 Aug 2019 12:26:01 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1e-62350142.us-east-1.amazon.com (Postfix) with ESMTPS id 65A74A2CD2;
+        Fri, 23 Aug 2019 12:25:57 +0000 (UTC)
 Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
  EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 23 Aug 2019 12:19:54 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.214) by
+ id 15.0.1367.3; Fri, 23 Aug 2019 12:25:56 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.191) by
  EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 23 Aug 2019 12:19:50 +0000
-Subject: Re: [PATCH v5 18/20] RISC-V: KVM: Add SBI v0.1 support
+ id 15.0.1367.3; Fri, 23 Aug 2019 12:25:52 +0000
+Subject: Re: [PATCH v5 15/20] RISC-V: KVM: Add timer functionality
 To:     Anup Patel <anup@brainfault.org>
 CC:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
         "Paul Walmsley" <paul.walmsley@sifive.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Radim K <rkrcmar@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Atish Patra" <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 References: <20190822084131.114764-1-anup.patel@wdc.com>
- <20190822084131.114764-19-anup.patel@wdc.com>
- <40911e08-e0ce-a2b8-24d4-9cf357432850@amazon.com>
- <CAAhSdy3CvvYh59c=OomLZgweWREBhJj_eeH80OkU=7MMCwyiCQ@mail.gmail.com>
- <B29D1609-18FC-4327-8B34-33CB914042E7@amazon.com>
- <CAAhSdy2eVDqCDnFT9WrboQn+ERhwDFU6UtBaCQp_C7HshLZ+Yw@mail.gmail.com>
+ <20190822084131.114764-16-anup.patel@wdc.com>
+ <09d74212-4fa3-d64c-5a63-d556e955b88c@amazon.com>
+ <CAAhSdy36q5-x8cXM=M5S3cnE2nvCMhcsfuQayVt7jahd58HWFw@mail.gmail.com>
+ <CA3A6A8A-0227-4B92-B892-86A0C7CA369E@amazon.com>
+ <CAAhSdy2FFmCZJhNnMojp8QbiD-t6=4XrNtE9KGnCG_-mPb19-A@mail.gmail.com>
+ <e369eba6-e659-2892-9cb9-a631dd10153a@amazon.com>
+ <CAAhSdy2sknED0W5-SpS4cP46cnS6biHYs_jRDgCj_Ucw5PUYzg@mail.gmail.com>
 From:   Alexander Graf <graf@amazon.com>
-Message-ID: <aa686ffb-d70e-2838-6dd9-6a1193470a11@amazon.com>
-Date:   Fri, 23 Aug 2019 14:19:48 +0200
+Message-ID: <655b1724-c3ca-9913-328b-59e434d40d96@amazon.com>
+Date:   Fri, 23 Aug 2019 14:25:50 +0200
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
  Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAAhSdy2eVDqCDnFT9WrboQn+ERhwDFU6UtBaCQp_C7HshLZ+Yw@mail.gmail.com>
+In-Reply-To: <CAAhSdy2sknED0W5-SpS4cP46cnS6biHYs_jRDgCj_Ucw5PUYzg@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.161.214]
-X-ClientProxiedBy: EX13D13UWB001.ant.amazon.com (10.43.161.156) To
+X-Originating-IP: [10.43.162.191]
+X-ClientProxiedBy: EX13D25UWB003.ant.amazon.com (10.43.161.33) To
  EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -76,270 +78,93 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 23.08.19 14:00, Anup Patel wrote:
-> On Fri, Aug 23, 2019 at 5:09 PM Graf (AWS), Alexander <graf@amazon.com> wrote:
+On 23.08.19 14:11, Anup Patel wrote:
+> On Fri, Aug 23, 2019 at 5:19 PM Alexander Graf <graf@amazon.com> wrote:
 >>
 >>
 >>
->>> Am 23.08.2019 um 13:18 schrieb Anup Patel <anup@brainfault.org>:
->>>
->>>> On Fri, Aug 23, 2019 at 1:34 PM Alexander Graf <graf@amazon.com> wrote:
+>> On 23.08.19 13:46, Anup Patel wrote:
+>>> On Fri, Aug 23, 2019 at 5:03 PM Graf (AWS), Alexander <graf@amazon.com> wrote:
 >>>>
->>>>> On 22.08.19 10:46, Anup Patel wrote:
->>>>> From: Atish Patra <atish.patra@wdc.com>
->>>>>
->>>>> The KVM host kernel running in HS-mode needs to handle SBI calls coming
->>>>> from guest kernel running in VS-mode.
->>>>>
->>>>> This patch adds SBI v0.1 support in KVM RISC-V. All the SBI calls are
->>>>> implemented correctly except remote tlb flushes. For remote TLB flushes,
->>>>> we are doing full TLB flush and this will be optimized in future.
->>>>>
->>>>> Signed-off-by: Atish Patra <atish.patra@wdc.com>
->>>>> Signed-off-by: Anup Patel <anup.patel@wdc.com>
->>>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
->>>>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->>>>> ---
->>>>>   arch/riscv/include/asm/kvm_host.h |   2 +
->>>>>   arch/riscv/kvm/Makefile           |   2 +-
->>>>>   arch/riscv/kvm/vcpu_exit.c        |   3 +
->>>>>   arch/riscv/kvm/vcpu_sbi.c         | 119 ++++++++++++++++++++++++++++++
->>>>>   4 files changed, 125 insertions(+), 1 deletion(-)
->>>>>   create mode 100644 arch/riscv/kvm/vcpu_sbi.c
->>>>>
->>>>> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
->>>>> index 2af3a179c08e..0b1eceaef59f 100644
->>>>> --- a/arch/riscv/include/asm/kvm_host.h
->>>>> +++ b/arch/riscv/include/asm/kvm_host.h
->>>>> @@ -241,4 +241,6 @@ bool kvm_riscv_vcpu_has_interrupt(struct kvm_vcpu *vcpu);
->>>>>   void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
->>>>>   void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
->>>>>
->>>>> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu);
->>>>> +
->>>>>   #endif /* __RISCV_KVM_HOST_H__ */
->>>>> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
->>>>> index 3e0c7558320d..b56dc1650d2c 100644
->>>>> --- a/arch/riscv/kvm/Makefile
->>>>> +++ b/arch/riscv/kvm/Makefile
->>>>> @@ -9,6 +9,6 @@ ccflags-y := -Ivirt/kvm -Iarch/riscv/kvm
->>>>>   kvm-objs := $(common-objs-y)
->>>>>
->>>>>   kvm-objs += main.o vm.o vmid.o tlb.o mmu.o
->>>>> -kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o
->>>>> +kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o vcpu_sbi.o
->>>>>
->>>>>   obj-$(CONFIG_KVM)   += kvm.o
->>>>> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
->>>>> index fbc04fe335ad..87b83fcf9a14 100644
->>>>> --- a/arch/riscv/kvm/vcpu_exit.c
->>>>> +++ b/arch/riscv/kvm/vcpu_exit.c
->>>>> @@ -534,6 +534,9 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
->>>>>                   (vcpu->arch.guest_context.hstatus & HSTATUS_STL))
->>>>>                       ret = stage2_page_fault(vcpu, run, scause, stval);
->>>>>               break;
->>>>> +     case EXC_SUPERVISOR_SYSCALL:
->>>>> +             if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
->>>>> +                     ret = kvm_riscv_vcpu_sbi_ecall(vcpu);
->>>>>       default:
->>>>>               break;
->>>>>       };
->>>>> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
->>>>> new file mode 100644
->>>>> index 000000000000..5793202eb514
->>>>> --- /dev/null
->>>>> +++ b/arch/riscv/kvm/vcpu_sbi.c
->>>>> @@ -0,0 +1,119 @@
->>>>> +// SPDX-License-Identifier: GPL-2.0
->>>>> +/**
->>>>> + * Copyright (c) 2019 Western Digital Corporation or its affiliates.
->>>>> + *
->>>>> + * Authors:
->>>>> + *     Atish Patra <atish.patra@wdc.com>
->>>>> + */
->>>>> +
->>>>> +#include <linux/errno.h>
->>>>> +#include <linux/err.h>
->>>>> +#include <linux/kvm_host.h>
->>>>> +#include <asm/csr.h>
->>>>> +#include <asm/kvm_vcpu_timer.h>
->>>>> +
->>>>> +#define SBI_VERSION_MAJOR                    0
->>>>> +#define SBI_VERSION_MINOR                    1
->>>>> +
->>>>> +/* TODO: Handle traps due to unpriv load and redirect it back to VS-mode */
 >>>>
->>>> Ugh, another one of those? Can't you just figure out a way to recover
->>>> from the page fault? Also, you want to combine this with the instruction
->>>> load logic, so that we have a single place that guest address space
->>>> reads go through.
->>>
->>> Walking Guest page table would be more expensive compared to implementing
->>> a trap handling mechanism.
->>>
->>> We will be adding trap handling mechanism for reading instruction and reading
->>> load.
->>>
->>> Both these operations are different in following ways:
->>> 1. RISC-V instructions are variable length. We get to know exact instruction
->>>     length only after reading first 16bits
->>> 2. We need to set VSSTATUS.MXR bit when reading instruction for
->>>     execute-only Guest pages.
+>>>>
+>>>>> Am 23.08.2019 um 13:05 schrieb Anup Patel <anup@brainfault.org>:
+>>>>>
+>>>>>> On Fri, Aug 23, 2019 at 1:23 PM Alexander Graf <graf@amazon.com> wrote:
+>>>>>>
+>>>>>>> On 22.08.19 10:46, Anup Patel wrote:
+>>>>>>> From: Atish Patra <atish.patra@wdc.com>
+>>>>>>>
+>>>>>>> The RISC-V hypervisor specification doesn't have any virtual timer
+>>>>>>> feature.
+>>>>>>>
+>>>>>>> Due to this, the guest VCPU timer will be programmed via SBI calls.
+>>>>>>> The host will use a separate hrtimer event for each guest VCPU to
+>>>>>>> provide timer functionality. We inject a virtual timer interrupt to
+>>>>>>> the guest VCPU whenever the guest VCPU hrtimer event expires.
+>>>>>>>
+>>>>>>> The following features are not supported yet and will be added in
+>>>>>>> future:
+>>>>>>> 1. A time offset to adjust guest time from host time
+>>>>>>> 2. A saved next event in guest vcpu for vm migration
+>>>>>>
+>>>>>> Implementing these 2 bits right now should be trivial. Why wait?
+>>>>>
 >>
->> Yup, sounds like you could solve that with a trivial if() based on "read instruction" or not, no? If you want to, feel free to provide short versions that do only read ins/data, but I would really like to see the whole "data reads become guest reads" magic to be funneled through a single function (in C, can be inline unrolled in asm of course)
+>> [...]
 >>
->>>
+>>>>>> ... in fact, I feel like I'm missing something obvious here. How does
+>>>>>> the guest trigger the timer event? What is the argument it uses for that
+>>>>>> and how does that play with the tbfreq in the earlier patch?
+>>>>>
+>>>>> We have SBI call inferface between Hypervisor and Guest. One of the
+>>>>> SBI call allows Guest to program time event. The next event is specified
+>>>>> as absolute cycles. The Guest can read time using TIME CSR which
+>>>>> returns system timer value (@ tbfreq freqency).
+>>>>>
+>>>>> Guest Linux will know the tbfreq from DTB passed by QEMU/KVMTOOL
+>>>>> and it has to be same as Host tbfreq.
+>>>>>
+>>>>> The TBFREQ config register visible to user-space is a read-only CONFIG
+>>>>> register which tells user-space tools (QEMU/KVMTOOL) about Host tbfreq.
 >>>>
->>>>> +static unsigned long kvm_sbi_unpriv_load(const unsigned long *addr,
->>>>> +                                      struct kvm_vcpu *vcpu)
->>>>> +{
->>>>> +     unsigned long flags, val;
->>>>> +     unsigned long __hstatus, __sstatus;
->>>>> +
->>>>> +     local_irq_save(flags);
->>>>> +     __hstatus = csr_read(CSR_HSTATUS);
->>>>> +     __sstatus = csr_read(CSR_SSTATUS);
->>>>> +     csr_write(CSR_HSTATUS, vcpu->arch.guest_context.hstatus | HSTATUS_SPRV);
->>>>> +     csr_write(CSR_SSTATUS, vcpu->arch.guest_context.sstatus);
->>>>> +     val = *addr;
->>>>> +     csr_write(CSR_HSTATUS, __hstatus);
->>>>> +     csr_write(CSR_SSTATUS, __sstatus);
->>>>> +     local_irq_restore(flags);
->>>>> +
->>>>> +     return val;
->>>>> +}
->>>>> +
->>>>> +static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu, u32 type)
->>>>> +{
->>>>> +     int i;
->>>>> +     struct kvm_vcpu *tmp;
->>>>> +
->>>>> +     kvm_for_each_vcpu(i, tmp, vcpu->kvm)
->>>>> +             tmp->arch.power_off = true;
->>>>> +     kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
->>>>> +
->>>>> +     memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
->>>>> +     vcpu->run->system_event.type = type;
->>>>> +     vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->>>>> +}
->>>>> +
->>>>> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu)
->>>>> +{
->>>>> +     int ret = 1;
->>>>> +     u64 next_cycle;
->>>>> +     int vcpuid;
->>>>> +     struct kvm_vcpu *remote_vcpu;
->>>>> +     ulong dhart_mask;
->>>>> +     struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
->>>>> +
->>>>> +     if (!cp)
->>>>> +             return -EINVAL;
->>>>> +     switch (cp->a7) {
->>>>> +     case SBI_SET_TIMER:
->>>>> +#if __riscv_xlen == 32
->>>>> +             next_cycle = ((u64)cp->a1 << 32) | (u64)cp->a0;
->>>>> +#else
->>>>> +             next_cycle = (u64)cp->a0;
->>>>> +#endif
->>>>> +             kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
->>>>
->>>> Ah, this is where the timer set happens. I still don't understand how
->>>> this takes the frequency bit into account?
+>>>> And it's read-only because you can not trap on TB reads?
 >>>
->>> Explained it in PATCH17 comments.
+>>> There is no TB registers.
 >>>
->>>>
->>>>> +             break;
->>>>> +     case SBI_CONSOLE_PUTCHAR:
->>>>> +             /* Not implemented */
->>>>> +             cp->a0 = -ENOTSUPP;
->>>>> +             break;
->>>>> +     case SBI_CONSOLE_GETCHAR:
->>>>> +             /* Not implemented */
->>>>> +             cp->a0 = -ENOTSUPP;
->>>>> +             break;
->>>>
->>>> These two should be covered by the default case.
+>>> The tbfreq can only be know through DT/ACPI kind-of HW description
+>>> for both Host and Guest.
 >>>
->>> Sure, I will update.
->>>
->>>>
->>>>> +     case SBI_CLEAR_IPI:
->>>>> +             kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_S_SOFT);
->>>>> +             break;
->>>>> +     case SBI_SEND_IPI:
->>>>> +             dhart_mask = kvm_sbi_unpriv_load((unsigned long *)cp->a0, vcpu);
->>>>> +             for_each_set_bit(vcpuid, &dhart_mask, BITS_PER_LONG) {
->>>>> +                     remote_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, vcpuid);
->>>>> +                     kvm_riscv_vcpu_set_interrupt(remote_vcpu, IRQ_S_SOFT);
->>>>> +             }
->>>>> +             break;
->>>>> +     case SBI_SHUTDOWN:
->>>>> +             kvm_sbi_system_shutdown(vcpu, KVM_SYSTEM_EVENT_SHUTDOWN);
->>>>> +             ret = 0;
->>>>> +             break;
->>>>> +     case SBI_REMOTE_FENCE_I:
->>>>> +             sbi_remote_fence_i(NULL);
->>>>> +             break;
->>>>> +     /*
->>>>> +      * TODO: There should be a way to call remote hfence.bvma.
->>>>> +      * Preferred method is now a SBI call. Until then, just flush
->>>>> +      * all tlbs.
->>>>> +      */
->>>>> +     case SBI_REMOTE_SFENCE_VMA:
->>>>> +             /*TODO: Parse vma range.*/
->>>>> +             sbi_remote_sfence_vma(NULL, 0, 0);
->>>>> +             break;
->>>>> +     case SBI_REMOTE_SFENCE_VMA_ASID:
->>>>> +             /*TODO: Parse vma range for given ASID */
->>>>> +             sbi_remote_sfence_vma(NULL, 0, 0);
->>>>> +             break;
->>>>> +     default:
->>>>> +             cp->a0 = ENOTSUPP;
->>>>> +             break;
->>>>
->>>> Please just send unsupported SBI events into user space.
->>>
->>> For unsupported SBI calls, we should be returning error to the
->>> Guest Linux so that do something about it. This is in accordance
->>> with the SBI spec.
+>>> The KVM user-space tool needs to know TBFREQ so that it can set correct
+>>> value in generated DT for Guest Linux.
 >>
->> That's up to user space (QEMU / kvmtool) to decide. If user space wants to implement the  console functions (like we do on s390), it should have the chance to do so.
+>> So what access methods do get influenced by TBFREQ? If it's only the SBI
+>> timer, we can control the frequency, which means we can make TBFREQ
+>> read/write.
 > 
-> The SBI_CONSOLE_PUTCHAR and SBI_CONSOLE_GETCHAR are
-> for debugging only. These calls are deprecated in SBI v0.2 onwards
-> because we now have earlycon for early prints in Linux RISC-V.
+> There are two things influenced by TBFREQ:
+> 1. TIME CSR which is a free running counter
+> 2. SBI calls for programming next timer event
 > 
-> The RISC-V Guest will generally have it's own MMIO based UART
-> which will be the default console.
+> The Guest TIME CSR will be at same rate as Host TIME CSR so
+> we cannot show different TBFREQ to Guest Linux.
 > 
-> Due to these reasons, we have not implemented these SBI calls.
+> In future, we will be having a dedicated RISC-V timer extension which
+> will have all programming done via CSRs but until then we are stuck
+> with TIME CSR + SBI call combination.
 
-I'm not saying we should implement them. I'm saying we should leave a 
-policy decision like that up to user space. By terminating the SBI in 
-kernel space, you can not quickly debug something going wrong.
+Please make sure that in a future revision of the spec either
 
-> If we still want user-space to implement this then we will require
-> separate exit reasons and we are trying to avoid adding RISC-V
-> specific exit reasons/ioctls in KVM user-space ABI.
+   a) TIME CSR can be trapped or
+   b) TIME CSR can be virtualized (virtual TIME READ has offset and 
+multiplier on phys TIME READ applied)
 
-Why?
+and the same goes for the timer extension - either make it all trappable 
+or all propery adjustable. You need to be double cautious there that 
+people don't design something that breaks live migration between hosts 
+that have a different TBFREQ.
 
-I had so many occasions where I would have loved to have user space 
-exits for MSR access, SPR access, hypercalls, etc etc. It really makes 
-life so much easier when you can quickly hack something up in user space 
-rather than modify the kernel.
 
-> The absence of SBI_CONSOLE_PUTCHAR/GETCHAR certainly
-> does not block anyone in debugging Guest Linux because we have
-> earlycon support in Linux RISC-V.
-
-I'm not hung on on the console. What I'm trying to express is a general 
-sentiment that terminating extensible hypervisor <-> guest interfaces in 
-kvm is not a great idea. Some times we can't get around it (like on page 
-tables), but some times we do. And this is a case where we could.
-
-At the end of the day this is your call though :).
-
+Thanks,
 
 Alex
