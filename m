@@ -2,112 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84F2E9A9AD
-	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 10:09:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EA879A9C8
+	for <lists+kvm@lfdr.de>; Fri, 23 Aug 2019 10:12:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388241AbfHWIJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Aug 2019 04:09:04 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:2819 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731543AbfHWIJE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Aug 2019 04:09:04 -0400
+        id S2389775AbfHWIM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Aug 2019 04:12:27 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46063 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389659AbfHWIM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Aug 2019 04:12:26 -0400
+Received: by mail-wr1-f67.google.com with SMTP id q12so7755924wrj.12
+        for <kvm@vger.kernel.org>; Fri, 23 Aug 2019 01:12:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1566547743; x=1598083743;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=p8k+BwEXxcgqgLdTcHBDrzbBbly6hFrYYffkrNC6Kj0=;
-  b=nItEzEUZ0LvYapOYyaIiVW79mGqYzro1mPhFZb52LEPqFSPT4gcWIoRu
-   Q6aWHPffJhJ8lcpQJl6vROetnencCFfu+kzQc7fsOOht7kfvMq8LraMZq
-   a1P1JapcFFYa4b2lhfqJFBS/fyf0yBrbHzP8BDAbK6WBJkZhq3QXY9sdK
-   8=;
-X-IronPort-AV: E=Sophos;i="5.64,420,1559520000"; 
-   d="scan'208";a="696736472"
-Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-1e-17c49630.us-east-1.amazon.com) ([10.47.22.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 23 Aug 2019 08:08:54 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-17c49630.us-east-1.amazon.com (Postfix) with ESMTPS id 607BBA0696;
-        Fri, 23 Aug 2019 08:08:49 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 23 Aug 2019 08:08:48 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.214) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 23 Aug 2019 08:08:44 +0000
-Subject: Re: [PATCH v5 00/20] KVM RISC-V Support
-To:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        "Paul Walmsley" <paul.walmsley@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>
-CC:     Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "Christoph Hellwig" <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
+        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=dKj/pD83MW4Pwxebhi9+UdQxS6vGNLOrj+wRbneIIsA=;
+        b=sOo8m/8ifD3Tcw0q8fjWKdMg1ikZywMq2grx9867izD43F/7EXuUPEbKq4YjTbvJbZ
+         Y9DiykDJMuK59f1t4WLf1XiGAzY3s6XbomiQFGHLwU4mv2/DPL9DKv3rbW+mULjW6JtT
+         l2MHQReOjqFxcQ1iSygfxV14fx8VU7AUoipzzS9kYRPsUH9FCfZj4xOhAi8dMBhqEngn
+         bTq7UHrF5IlZeQ0Q1YZIXMuHtmS1PUnMR1oi6V6j9ORXBCxHRrXkOxtAJU+1ogL/8aiP
+         CmE9ruE8ifosgqNsa4lU9NHO6t7i1I4KGIaQR21IPmpsHaBOTRVlQ61E8RXeKZjQyhax
+         kOkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=dKj/pD83MW4Pwxebhi9+UdQxS6vGNLOrj+wRbneIIsA=;
+        b=NEKIx2AcsGqznBgYDmqWGCgm2YKStKKUxtqFiBz60joy95oIt0RzsS/GaH9alzVUt6
+         NzPX0gTJo0YIh5+T/d4NT5LkLyPVNSBEDZ5xbMYtYL9noOcMI1WAQpH3PXk7aZeuJqSe
+         aLhR97l/MaRiAAWakrmzslBopo+cU5nrQsqjp3Ftnr6DZGYEwT4PLBhxtXsz+nTfpJvt
+         4vCIiepCkUubljdioxlnWYC4yurSVUgUPu/WmhhA0bg0xy72qW33Td6ijufad1S7Xqxk
+         uVeceZUAMfcguc98lDCsDCmfca9IxQqz5QwcaO0qGUbkRJCx3w0bBoMDwtkYzm+R4mcA
+         WqEw==
+X-Gm-Message-State: APjAAAU4dZ9WxRCYyOpCB1KL+NuYMPOajgNuZ4/5Tr5AfMMv50wllkKi
+        NeLYEMMb2/FD0MeWg5Ng5g9R7w==
+X-Google-Smtp-Source: APXvYqy6etfjVEnGJ8bO7A2sQvlUY7W/D5fzLORlmdyb4FJgRpPwJPE1Vnv48uAB5OBr5UjYXhaNTQ==
+X-Received: by 2002:a5d:408c:: with SMTP id o12mr3355309wrp.176.1566547942916;
+        Fri, 23 Aug 2019 01:12:22 -0700 (PDT)
+Received: from localhost (jirka.pirko.cz. [84.16.102.26])
+        by smtp.gmail.com with ESMTPSA id h8sm1927467wrq.49.2019.08.23.01.12.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2019 01:12:22 -0700 (PDT)
+Date:   Fri, 23 Aug 2019 10:12:21 +0200
+From:   Jiri Pirko <jiri@resnulli.us>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20190822084131.114764-1-anup.patel@wdc.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <8a2a9ea6-5636-e79a-b041-580159e703b2@amazon.com>
-Date:   Fri, 23 Aug 2019 10:08:42 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.8.0
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        cjia <cjia@nvidia.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+Message-ID: <20190823081221.GG2276@nanopsycho.orion>
+References: <20190820225722.237a57d2@x1.home>
+ <AM0PR05MB4866AE8FC4AA3CC24B08B326D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20190820232622.164962d3@x1.home>
+ <AM0PR05MB4866437FAA63C447CACCD7E5D1AA0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20190822092903.GA2276@nanopsycho.orion>
+ <AM0PR05MB4866A20F831A5D42E6C79EFED1A50@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20190822095823.GB2276@nanopsycho.orion>
+ <AM0PR05MB4866144FD76C302D04DA04B9D1A50@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20190822121936.GC2276@nanopsycho.orion>
+ <AM0PR05MB4866F9650CF73FC671972127D1A50@AM0PR05MB4866.eurprd05.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20190822084131.114764-1-anup.patel@wdc.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.161.214]
-X-ClientProxiedBy: EX13D17UWB002.ant.amazon.com (10.43.161.141) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM0PR05MB4866F9650CF73FC671972127D1A50@AM0PR05MB4866.eurprd05.prod.outlook.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22.08.19 10:42, Anup Patel wrote:
-> This series adds initial KVM RISC-V support. Currently, we are able to boot
-> RISC-V 64bit Linux Guests with multiple VCPUs.
-> 
-> Few key aspects of KVM RISC-V added by this series are:
-> 1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
-> 2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
-> 3. KVM ONE_REG interface for VCPU register access from user-space.
-> 4. PLIC emulation is done in user-space. In-kernel PLIC emulation, will
->     be added in future.
-> 5. Timer and IPI emuation is done in-kernel.
-> 6. MMU notifiers supported.
-> 7. FP lazy save/restore supported.
-> 8. SBI v0.1 emulation for KVM Guest available.
-> 
-> Here's a brief TODO list which we will work upon after this series:
-> 1. Handle trap from unpriv access in reading Guest instruction
-> 2. Handle trap from unpriv access in SBI v0.1 emulation
-> 3. Implement recursive stage2 page table programing
-> 4. SBI v0.2 emulation in-kernel
-> 5. SBI v0.2 hart hotplug emulation in-kernel
-> 6. In-kernel PLIC emulation
-> 7. ..... and more .....
+Thu, Aug 22, 2019 at 03:33:30PM CEST, parav@mellanox.com wrote:
+>
+>
+>> -----Original Message-----
+>> From: Jiri Pirko <jiri@resnulli.us>
+>> Sent: Thursday, August 22, 2019 5:50 PM
+>> To: Parav Pandit <parav@mellanox.com>
+>> Cc: Alex Williamson <alex.williamson@redhat.com>; Jiri Pirko
+>> <jiri@mellanox.com>; David S . Miller <davem@davemloft.net>; Kirti
+>> Wankhede <kwankhede@nvidia.com>; Cornelia Huck <cohuck@redhat.com>;
+>> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; cjia <cjia@nvidia.com>;
+>> netdev@vger.kernel.org
+>> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+>> 
+>> Thu, Aug 22, 2019 at 12:04:02PM CEST, parav@mellanox.com wrote:
+>> >
+>> >
+>> >> -----Original Message-----
+>> >> From: Jiri Pirko <jiri@resnulli.us>
+>> >> Sent: Thursday, August 22, 2019 3:28 PM
+>> >> To: Parav Pandit <parav@mellanox.com>
+>> >> Cc: Alex Williamson <alex.williamson@redhat.com>; Jiri Pirko
+>> >> <jiri@mellanox.com>; David S . Miller <davem@davemloft.net>; Kirti
+>> >> Wankhede <kwankhede@nvidia.com>; Cornelia Huck
+>> <cohuck@redhat.com>;
+>> >> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; cjia
+>> >> <cjia@nvidia.com>; netdev@vger.kernel.org
+>> >> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+>> >>
+>> >> Thu, Aug 22, 2019 at 11:42:13AM CEST, parav@mellanox.com wrote:
+>> >> >
+>> >> >
+>> >> >> -----Original Message-----
+>> >> >> From: Jiri Pirko <jiri@resnulli.us>
+>> >> >> Sent: Thursday, August 22, 2019 2:59 PM
+>> >> >> To: Parav Pandit <parav@mellanox.com>
+>> >> >> Cc: Alex Williamson <alex.williamson@redhat.com>; Jiri Pirko
+>> >> >> <jiri@mellanox.com>; David S . Miller <davem@davemloft.net>; Kirti
+>> >> >> Wankhede <kwankhede@nvidia.com>; Cornelia Huck
+>> >> <cohuck@redhat.com>;
+>> >> >> kvm@vger.kernel.org; linux-kernel@vger.kernel.org; cjia
+>> >> >> <cjia@nvidia.com>; netdev@vger.kernel.org
+>> >> >> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+>> >> >>
+>> >> >> Wed, Aug 21, 2019 at 08:23:17AM CEST, parav@mellanox.com wrote:
+>> >> >> >
+>> >> >> >
+>> >> >> >> -----Original Message-----
+>> >> >> >> From: Alex Williamson <alex.williamson@redhat.com>
+>> >> >> >> Sent: Wednesday, August 21, 2019 10:56 AM
+>> >> >> >> To: Parav Pandit <parav@mellanox.com>
+>> >> >> >> Cc: Jiri Pirko <jiri@mellanox.com>; David S . Miller
+>> >> >> >> <davem@davemloft.net>; Kirti Wankhede <kwankhede@nvidia.com>;
+>> >> >> >> Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org;
+>> >> >> >> linux-kernel@vger.kernel.org; cjia <cjia@nvidia.com>;
+>> >> >> >> netdev@vger.kernel.org
+>> >> >> >> Subject: Re: [PATCH v2 0/2] Simplify mtty driver and mdev core
+>> >> >> >>
+>> >> >> >> > > > > Just an example of the alias, not proposing how it's set.
+>> >> >> >> > > > > In fact, proposing that the user does not set it,
+>> >> >> >> > > > > mdev-core provides one
+>> >> >> >> > > automatically.
+>> >> >> >> > > > >
+>> >> >> >> > > > > > > Since there seems to be some prefix overhead, as I
+>> >> >> >> > > > > > > ask about above in how many characters we actually
+>> >> >> >> > > > > > > have to work with in IFNAMESZ, maybe we start with
+>> >> >> >> > > > > > > 8 characters (matching your "index" namespace) and
+>> >> >> >> > > > > > > expand as necessary for
+>> >> >> disambiguation.
+>> >> >> >> > > > > > > If we can eliminate overhead in IFNAMESZ, let's start with
+>> 12.
+>> >> >> >> > > > > > > Thanks,
+>> >> >> >> > > > > > >
+>> >> >> >> > > > > > If user is going to choose the alias, why does it
+>> >> >> >> > > > > > have to be limited to
+>> >> >> >> sha1?
+>> >> >> >> > > > > > Or you just told it as an example?
+>> >> >> >> > > > > >
+>> >> >> >> > > > > > It can be an alpha-numeric string.
+>> >> >> >> > > > >
+>> >> >> >> > > > > No, I'm proposing a different solution where mdev-core
+>> >> >> >> > > > > creates an alias based on an abbreviated sha1.  The
+>> >> >> >> > > > > user does not provide the
+>> >> >> >> alias.
+>> >> >> >> > > > >
+>> >> >> >> > > > > > Instead of mdev imposing number of characters on the
+>> >> >> >> > > > > > alias, it should be best
+>> >> >> >> > > > > left to the user.
+>> >> >> >> > > > > > Because in future if netdev improves on the naming
+>> >> >> >> > > > > > scheme, mdev will be
+>> >> >> >> > > > > limiting it, which is not right.
+>> >> >> >> > > > > > So not restricting alias size seems right to me.
+>> >> >> >> > > > > > User configuring mdev for networking devices in a
+>> >> >> >> > > > > > given kernel knows what
+>> >> >> >> > > > > user is doing.
+>> >> >> >> > > > > > So user can choose alias name size as it finds suitable.
+>> >> >> >> > > > >
+>> >> >> >> > > > > That's not what I'm proposing, please read again.
+>> >> >> >> > > > > Thanks,
+>> >> >> >> > > >
+>> >> >> >> > > > I understood your point. But mdev doesn't know how user
+>> >> >> >> > > > is going to use
+>> >> >> >> > > udev/systemd to name the netdev.
+>> >> >> >> > > > So even if mdev chose to pick 12 characters, it could
+>> >> >> >> > > > result in
+>> >> collision.
+>> >> >> >> > > > Hence the proposal to provide the alias by the user, as
+>> >> >> >> > > > user know the best
+>> >> >> >> > > policy for its use case in the environment its using.
+>> >> >> >> > > > So 12 character sha1 method will still work by user.
+>> >> >> >> > >
+>> >> >> >> > > Haven't you already provided examples where certain drivers
+>> >> >> >> > > or subsystems have unique netdev prefixes?  If mdev
+>> >> >> >> > > provides a unique alias within the subsystem, couldn't we
+>> >> >> >> > > simply define a netdev prefix for the mdev subsystem and
+>> >> >> >> > > avoid all other collisions?  I'm not in favor of the user
+>> >> >> >> > > providing both a uuid and an alias/instance.  Thanks,
+>> >> >> >> > >
+>> >> >> >> > For a given prefix, say ens2f0, can two UUID->sha1 first 9
+>> >> >> >> > characters have
+>> >> >> >> collision?
+>> >> >> >>
+>> >> >> >> I think it would be a mistake to waste so many chars on a
+>> >> >> >> prefix, but
+>> >> >> >> 9 characters of sha1 likely wouldn't have a collision before we
+>> >> >> >> have 10s of thousands of devices.  Thanks,
+>> >> >> >>
+>> >> >> >> Alex
+>> >> >> >
+>> >> >> >Jiri, Dave,
+>> >> >> >Are you ok with it for devlink/netdev part?
+>> >> >> >Mdev core will create an alias from a UUID.
+>> >> >> >
+>> >> >> >This will be supplied during devlink port attr set such as,
+>> >> >> >
+>> >> >> >devlink_port_attrs_mdev_set(struct devlink_port *port, const char
+>> >> >> >*mdev_alias);
+>> >> >> >
+>> >> >> >This alias is used to generate representor netdev's phys_port_name.
+>> >> >> >This alias from the mdev device's sysfs will be used by the
+>> >> >> >udev/systemd to
+>> >> >> generate predicable netdev's name.
+>> >> >> >Example: enm<mdev_alias_first_12_chars>
+>> >> >>
+>> >> >> What happens in unlikely case of 2 UUIDs collide?
+>> >> >>
+>> >> >Since users sees two devices with same phys_port_name, user should
+>> >> >destroy
+>> >> recently created mdev and recreate mdev with different UUID?
+>> >>
+>> >> Driver should make sure phys port name wont collide,
+>> >So when mdev creation is initiated, mdev core calculates the alias and if there
+>> is any other mdev with same alias exist, it returns -EEXIST error before
+>> progressing further.
+>> >This way user will get to know upfront in event of collision before the mdev
+>> device gets created.
+>> >How about that?
+>> 
+>> Sounds fine to me. Now the question is how many chars do we want to have.
+>> 
+>12 characters from Alex's suggestion similar to git?
 
-Please consider patches I did not comment on as
+Ok.
 
-Reviewed-by: Alexander Graf <graf@amazon.com>
-
-Overall, I'm quite happy with the code. It's a very clean implementation 
-of a KVM target.
-
-The only major nit I have is the guest address space read: I don't think 
-we should pull in code that we know allows user space to DOS the kernel. 
-For that, we need to find an alternative. Either you implement a 
-software page table walker and resolve VAs manually or you find a way to 
-ensure that *any* exception taken during the read does not affect 
-general code execution.
-
-
-Thanks,
-
-Alex
+>
+>> >
+>> >
+>> >> in this case that it does
+>> >> not provide 2 same attrs for 2 different ports.
+>> >> Hmm, so the order of creation matters. That is not good.
+>> >>
+>> >> >>
+>> >> >> >I took Ethernet mdev as an example.
+>> >> >> >New prefix 'm' stands for mediated device.
+>> >> >> >Remaining 12 characters are first 12 chars of the mdev alias.
+>> >> >>
+>> >> >> Does this resolve the identification of devlink port representor?
+>> >> >Not sure if I understood your question correctly, attemping to answer
+>> below.
+>> >> >phys_port_name of devlink port is defined by the first 12 characters
+>> >> >of mdev
+>> >> alias.
+>> >> >> I assume you want to use the same 12(or so) chars, don't you?
+>> >> >Mdev's netdev will also use the same mdev alias from the sysfs to
+>> >> >rename
+>> >> netdev name from ethX to enm<mdev_alias>, where en=Etherenet,
+>> m=mdev.
+>> >> >
+>> >> >So yes, same 12 characters are use for mdev's netdev and mdev
+>> >> >devlink port's
+>> >> phys_port_name.
+>> >> >
+>> >> >Is that what are you asking?
+>> >>
+>> >> Yes. Then you have 3 chars to handle the rest of the name (pci, pf)...
