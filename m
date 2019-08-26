@@ -2,152 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2CB19C70F
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 03:43:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA7C99C915
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 08:17:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbfHZBnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Aug 2019 21:43:20 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5653 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726406AbfHZBnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Aug 2019 21:43:19 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 726897F4357E6411D154;
-        Mon, 26 Aug 2019 09:43:17 +0800 (CST)
-Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Mon, 26 Aug 2019
- 09:43:11 +0800
-Subject: Re: [Virtio-fs] [PATCH 04/19] virtio: Implement get_shm_region for
- PCI transport
-To:     Vivek Goyal <vgoyal@redhat.com>, <linux-fsdevel@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-nvdimm@lists.01.org>
-References: <20190821175720.25901-1-vgoyal@redhat.com>
- <20190821175720.25901-5-vgoyal@redhat.com>
-CC:     kbuild test robot <lkp@intel.com>, <kvm@vger.kernel.org>,
-        <miklos@szeredi.hu>, <virtio-fs@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>
-From:   piaojun <piaojun@huawei.com>
-Message-ID: <5D63392C.3030404@huawei.com>
-Date:   Mon, 26 Aug 2019 09:43:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.2.0
-MIME-Version: 1.0
-In-Reply-To: <20190821175720.25901-5-vgoyal@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.253.249]
-X-CFilter-Loop: Reflected
+        id S1729477AbfHZGRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 02:17:17 -0400
+Received: from ozlabs.ru ([107.173.13.209]:55914 "EHLO ozlabs.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725385AbfHZGRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 02:17:17 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 2CD15AE80011;
+        Mon, 26 Aug 2019 02:16:53 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        Alistair Popple <alistair@popple.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Paul Mackerras <paulus@samba.org>
+Subject: [PATCH kernel v2 0/4] powerpc/powernv/kvm: Invalidate multiple TCEs at once
+Date:   Mon, 26 Aug 2019 16:17:01 +1000
+Message-Id: <20190826061705.92048-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+So far TCE cache updates (IOMMU translation cache on POWER8/9
+PHB/NPU units) were barely noticeable; however with 100+GB guests
+we now see RCU stall warnings in guests because we spend too much
+time in the host system firmware which does actual TCE cache
+updates, hence this patchset.
 
-On 2019/8/22 1:57, Vivek Goyal wrote:
-> From: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> 
-> On PCI the shm regions are found using capability entries;
-> find a region by searching for the capability.
-> 
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: kbuild test robot <lkp@intel.com>
-> ---
->  drivers/virtio/virtio_pci_modern.c | 108 +++++++++++++++++++++++++++++
->  include/uapi/linux/virtio_pci.h    |  11 ++-
->  2 files changed, 118 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-> index 7abcc50838b8..1cdedd93f42a 100644
-> --- a/drivers/virtio/virtio_pci_modern.c
-> +++ b/drivers/virtio/virtio_pci_modern.c
-> @@ -443,6 +443,112 @@ static void del_vq(struct virtio_pci_vq_info *info)
->  	vring_del_virtqueue(vq);
->  }
->  
-> +static int virtio_pci_find_shm_cap(struct pci_dev *dev,
-> +                                   u8 required_id,
-> +                                   u8 *bar, u64 *offset, u64 *len)
-> +{
-> +	int pos;
-> +
-> +        for (pos = pci_find_capability(dev, PCI_CAP_ID_VNDR);
-> +             pos > 0;
-> +             pos = pci_find_next_capability(dev, pos, PCI_CAP_ID_VNDR)) {
-> +		u8 type, cap_len, id;
-> +                u32 tmp32;
-> +                u64 res_offset, res_length;
-> +
-> +		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
-> +                                                         cfg_type),
-> +                                     &type);
-> +                if (type != VIRTIO_PCI_CAP_SHARED_MEMORY_CFG)
-> +                        continue;
-> +
-> +		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
-> +                                                         cap_len),
-> +                                     &cap_len);
-> +		if (cap_len != sizeof(struct virtio_pci_cap64)) {
-> +		        printk(KERN_ERR "%s: shm cap with bad size offset: %d size: %d\n",
-> +                               __func__, pos, cap_len);
-> +                        continue;
-> +                }
-> +
-> +		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
-> +                                                         id),
-> +                                     &id);
-> +                if (id != required_id)
-> +                        continue;
-> +
-> +                /* Type, and ID match, looks good */
-> +                pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
-> +                                                         bar),
-> +                                     bar);
-> +
-> +                /* Read the lower 32bit of length and offset */
-> +                pci_read_config_dword(dev, pos + offsetof(struct virtio_pci_cap, offset),
-> +                                      &tmp32);
-> +                res_offset = tmp32;
-> +                pci_read_config_dword(dev, pos + offsetof(struct virtio_pci_cap, length),
-> +                                      &tmp32);
-> +                res_length = tmp32;
-> +
-> +                /* and now the top half */
-> +                pci_read_config_dword(dev,
-> +                                      pos + offsetof(struct virtio_pci_cap64,
-> +                                                     offset_hi),
-> +                                      &tmp32);
-> +                res_offset |= ((u64)tmp32) << 32;
-> +                pci_read_config_dword(dev,
-> +                                      pos + offsetof(struct virtio_pci_cap64,
-> +                                                     length_hi),
-> +                                      &tmp32);
-> +                res_length |= ((u64)tmp32) << 32;
-> +
-> +                *offset = res_offset;
-> +                *len = res_length;
-> +
-> +                return pos;
-> +        }
-> +        return 0;
-> +}
-> +
-> +static bool vp_get_shm_region(struct virtio_device *vdev,
-> +			      struct virtio_shm_region *region, u8 id)
-> +{
-> +	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-> +	struct pci_dev *pci_dev = vp_dev->pci_dev;
-> +	u8 bar;
-> +	u64 offset, len;
-> +	phys_addr_t phys_addr;
-> +	size_t bar_len;
-> +	char *bar_name;
+This is a rework of https://patchwork.ozlabs.org/patch/1149003/
+This depends on KVM-PPC's bugfix: https://patchwork.ozlabs.org/patch/1152937/
 
-'char *bar_name' should be cleaned up to avoid compiling warning. And I
-wonder if you mix tab and blankspace for code indent? Or it's just my
-email display problem?
+I expect 1/4 to go via the PPC tree, 2/4 via the KVM-PPC tree,
+3/4 via the VFIO tree and 4/4 via the PPC tree so it is a loop.
+There is always a hope it can go via one tree :)
 
-Thanks,
-Jun
+
+This is based on sha1
+42ac26d253eb Santosh Sivaraj "powerpc: add machine check safe copy_to_user".
+
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (4):
+  powerpc/powernv/ioda: Split out TCE invalidation from TCE updates
+  KVM: PPC: Invalidate multiple TCEs at once
+  vfio/spapr_tce: Invalidate multiple TCEs at once
+  powerpc/powernv/ioda: Remove obsolete iommu_table_ops::exchange
+    callbacks
+
+ arch/powerpc/include/asm/iommu.h          | 21 ++++++---
+ arch/powerpc/kernel/iommu.c               | 23 ++++++----
+ arch/powerpc/kvm/book3s_64_vio.c          | 29 ++++++++----
+ arch/powerpc/kvm/book3s_64_vio_hv.c       | 38 +++++++++++----
+ arch/powerpc/platforms/powernv/pci-ioda.c | 56 ++++-------------------
+ drivers/vfio/vfio_iommu_spapr_tce.c       | 18 +++++---
+ 6 files changed, 96 insertions(+), 89 deletions(-)
+
+-- 
+2.17.1
+
