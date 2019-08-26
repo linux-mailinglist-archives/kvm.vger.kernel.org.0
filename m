@@ -2,157 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AFED9D7BC
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 22:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9068D9D7FD
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 23:18:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbfHZUqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Aug 2019 16:46:23 -0400
-Received: from mail-eopbgr780050.outbound.protection.outlook.com ([40.107.78.50]:49664
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726220AbfHZUqX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Aug 2019 16:46:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n+qlZkuYkk3PMvdNMNvzPNGXd/6wxaLG8Zc4jvud+gg3eI9VIVZHA7bBUmrUIaPzegLuNWSnAw6IGfKRqdKsj9UWCp/0B2FRRocKQGKvj2peepIYYX+RCrwZd8JjYay4p09BpQM+0iDc7kX/azmyCnoXoWgOPO3kLQmjppAdwX1KpoEcyECYr5zkk8i/NpaeCDn3ze9t75GbX44A7DmN2uamf4k5tcP2sCeRXrIdG6STYEW8ichB9bng4le/mca+Wm0oklS6h0Z2iQuyDt3r52IrLcWRDTKk9dZf/fxAa44uc+bOL6bUuqjAxtMMWgwmn+NbssGmutbPzWWhH1XxKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d57o0BTpG44I5HhPKKU2fEZQUt9etBkRrbVi3O2mOC8=;
- b=DMVZ+hTcIBcpvkDtpIcnn6tZpDXCv48QSQXwEWfpGOqqcTJjtoG79I8x/KUP6Tu7XuQ/F9rJGzRM8L+XHnOgeKmi3Ip3GCWtULdIJm/m7hMMkctDHsfNdDcGK0HqJBaUzo0W5wwCcz0T/dRySp400VqDG4v1Nf9tfMpcEfRc9yW4EemOUMxPiJ2t9DnYe5etad9RtK2XbxKGy0VH4AXGffw7ssEOOST7Eo2TTPJ0HMiBouLyf1S0RliK44IW4ULswyk3J/SvSlKF7i86Tdx9qvJczUN1qqRiPT3W4vNmpnWaLAzsMybHhuWcbvEfYqRcLPGna3+Ck6gtwyEG9/hpog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1726730AbfHZVSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 17:18:01 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:44880 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725866AbfHZVSB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 17:18:01 -0400
+Received: by mail-io1-f68.google.com with SMTP id j4so32586711iog.11
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 14:17:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d57o0BTpG44I5HhPKKU2fEZQUt9etBkRrbVi3O2mOC8=;
- b=pyvlb0J86PSKtm5ell9nty9X4s2JvKbJklaF09qAI7QoQRuFUIbAdGgKLD18zS+BSXYIVf0yM5DYT8+GFTmm6MOvZQuYZuV6K3Ei39erRQNkXSPTTrXwDdJE2fu0bvQAOFiHaYZev66mm+3hAdGT1J6tORRzwH1aJE3HmTsq1q4=
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com (20.176.117.96) by
- DM6PR12MB3260.namprd12.prod.outlook.com (20.179.105.216) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.19; Mon, 26 Aug 2019 20:46:20 +0000
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::e95a:d3ee:e6a0:2825]) by DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::e95a:d3ee:e6a0:2825%7]) with mapi id 15.20.2178.023; Mon, 26 Aug 2019
- 20:46:20 +0000
-From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-To:     Alexander Graf <graf@amazon.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-Subject: Re: [PATCH v2 12/15] kvm: i8254: Check LAPIC EOI pending when
- injecting irq on SVM AVIC
-Thread-Topic: [PATCH v2 12/15] kvm: i8254: Check LAPIC EOI pending when
- injecting irq on SVM AVIC
-Thread-Index: AQHVU4YGnOwcrgTvnU6R6KE2IzCt16cCTo6AgAupA4A=
-Date:   Mon, 26 Aug 2019 20:46:20 +0000
-Message-ID: <8320fecb-de61-1a01-b90d-a45f224de287@amd.com>
-References: <1565886293-115836-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1565886293-115836-13-git-send-email-suravee.suthikulpanit@amd.com>
- <ac9fa8d4-2c25-52a5-3938-3ce373b3c3e0@amazon.com>
-In-Reply-To: <ac9fa8d4-2c25-52a5-3938-3ce373b3c3e0@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-x-originating-ip: [165.204.77.1]
-x-clientproxiedby: SN4PR0501CA0079.namprd05.prod.outlook.com
- (2603:10b6:803:22::17) To DM6PR12MB2844.namprd12.prod.outlook.com
- (2603:10b6:5:45::32)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fd955b80-c579-42b6-1283-08d72a6672e4
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB3260;
-x-ms-traffictypediagnostic: DM6PR12MB3260:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB3260C1B961D792A43379B47BF3A10@DM6PR12MB3260.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1824;
-x-forefront-prvs: 01415BB535
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(39860400002)(346002)(366004)(376002)(189003)(199004)(3846002)(229853002)(99286004)(102836004)(25786009)(478600001)(76176011)(256004)(14444005)(66946007)(66476007)(66556008)(64756008)(66446008)(6506007)(65806001)(65956001)(66066001)(86362001)(31696002)(486006)(316002)(2616005)(8676002)(11346002)(71190400001)(71200400001)(2906002)(446003)(53546011)(386003)(476003)(2201001)(4326008)(26005)(81166006)(8936002)(81156014)(186003)(6116002)(2501003)(31686004)(58126008)(110136005)(6436002)(53936002)(54906003)(14454004)(6246003)(6512007)(36756003)(5660300002)(305945005)(7736002)(52116002)(6486002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3260;H:DM6PR12MB2844.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: dyOfLKAlpSI+b8Cx0JKJ0h0wtdVQKyYH/90oabYGAb4C6g11AlScmF+W48hYTKbavGssvyXElkO+2lXDCEmMDRXBZloqy1bz8gG9s9kdZpCaQPZImC2GhVi4YLUJsNEjuE+YPkqGSr6DAkUiuo06VrV05wJp9C3ov7yqSPyGz5Hya9CGItSDziCsxPk1rGQF0f5e5jKXVsIzWF2p8DEGkHbocPQtXJcQLvL8e95beUTI+wgN0cLMGDsy7R9KZZBTpKVtO6pX+CaXeOvBuW79OLv0MLSnbBH2sy0U51zEZ0fA7XUW5r6fXbr4l92Cxf4kWx5mCF/xoCulTGYRjTyXkU6ZCqmBMOTaMHMypM6xrWzm59F48ARFEMkKnomLST2jO38/mY6GoeSkeZ31B+pb4K6j6HstwsraVTU8U01yhJ8=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0E60A608E87D5A469BF5BAE2252B5985@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vE8tqbspCoXmKct+M0l7NyulXf44ovq5GP4DgcN/yf4=;
+        b=eYJGWhV+7a+aypWvmqPPmI4THJ1dQQvXz4kTEWiJt8z4XbA+NaUbPZU0s9zg4vZO7v
+         lrz7UE9YzI/xVHps1quixlAN4HoxsSy4Et9KztaYCsZy41PjpifZ6WM/977nl7YiPvA9
+         9ycbRRGi5LBo8v7RZp/x8JWKokYnLIx3o3x37Yiyj8Gvn786JZQvk2RFlXCDTdpWhy4S
+         Keqh4wTu53Viz8SxHpfO7Cdbdz4mt9xzBtcrwMw9qb0AJGhGoItv5r5LNVlKZ4Qq+Qc/
+         kjHXzJeAe34+ZrhlUvjjsz9mRrH4KRM71XdF3WaB+3hDHiek2SRQ43H0sCyfj2QAPyqx
+         rI5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vE8tqbspCoXmKct+M0l7NyulXf44ovq5GP4DgcN/yf4=;
+        b=fQllJrDfzlkDoztEp5ycNBIsAeBUkxZ/zczwpd8ROXgTbHx2aMyvYV427ZtLSsK+9P
+         /ExsfpntFzEWiKab9/GZ4aOXt3o5u7HhyotkfSwiq02MRAZR9dg98MQXf1w55NTmJXxC
+         RfTqpc4/Y9ArZfJeJasYR4AS5jl/RVoQnSEhdh+CsL3EH3Bhc+GGmB3k8nVgsKJdjbc5
+         cN4YO4uo3VVFjM+wP1bWfmoFRhcMBi17d+qDJ7DD1v4Y42zxDn6MNo52W/lDG8Kw9VAT
+         0sbteDVSsQJ/hnh3Lun/Jwh1MTak4++C/DuIsjb4n0GZxKugMe+Q+uEULyWa+aF9JELn
+         1Mkg==
+X-Gm-Message-State: APjAAAUHLf3HDSFf3EJ9G7kDm0Ml8ulh8315CIcNLNlqLr46iNuO79Vd
+        NbdJsLj5XrnZcJt05jbCQJtXSqQnU96IaMQmt5ZRpA==
+X-Google-Smtp-Source: APXvYqyztZjeb97G1eWqbqQ4Itbpv4nWVfvMLGbgysIpeM73PWI5Hee5+wu8mHmV3lQM0oK9unVXvLHGkBPGQF43zJ8=
+X-Received: by 2002:a5e:8f4d:: with SMTP id x13mr10483787iop.118.1566854279237;
+ Mon, 26 Aug 2019 14:17:59 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd955b80-c579-42b6-1283-08d72a6672e4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Aug 2019 20:46:20.0723
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5IPpeFE+b3j88B17/cNU5kwc95LiZAGMa1prMTqjhpQueEOb09kiXsVOBKEEkIMDG0gHeoINEMESX7YgJHKTXA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3260
+References: <20190826102449.142687-1-liran.alon@oracle.com> <20190826102449.142687-3-liran.alon@oracle.com>
+In-Reply-To: <20190826102449.142687-3-liran.alon@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 26 Aug 2019 14:17:47 -0700
+Message-ID: <CALMp9eTDtZo73fCBF+ygPmT2ZmDr5-uSfZrtQSveWQBfMNPnEg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Fix INIT signal handling in various CPU states
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Marc Orr <marcorr@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QWxleCwNCg0KT24gOC8xOS8yMDE5IDU6NDIgQU0sIEFsZXhhbmRlciBHcmFmIHdyb3RlOg0KPiAN
-Cj4gDQo+IE9uwqAxNS4wOC4xOcKgMTg6MjUswqBTdXRoaWt1bHBhbml0LMKgU3VyYXZlZcKgd3Jv
-dGU6DQo+PiBBQ0vCoG5vdGlmaWVyc8KgZG9uJ3TCoHdvcmvCoHdpdGjCoEFNRMKgU1ZNwqB3L8Kg
-QVZJQ8Kgd2hlbsKgdGhlwqBQSVTCoGludGVycnVwdA0KPj4gaXPCoGRlbGl2ZXJlZMKgYXPCoGVk
-Z2UtdHJpZ2dlcmVkwqBmaXhlZMKgaW50ZXJydXB0wqBzaW5jZcKgQU1EwqBwcm9jZXNzb3JzDQo+
-PiBjYW5ub3TCoGV4aXTCoG9uwqBFT0nCoGZvcsKgdGhlc2XCoGludGVycnVwdHMuDQo+Pg0KPj4g
-QWRkwqBjb2RlwqB0b8KgY2hlY2vCoExBUElDwqBwZW5kaW5nwqBFT0nCoGJlZm9yZcKgaW5qZWN0
-aW5nwqBhbnnCoHBlbmRpbmfCoFBJVA0KPj4gaW50ZXJydXB0wqBvbsKgQU1EwqBTVk3CoHdoZW7C
-oEFWSUPCoGlzwqBhY3RpdmF0ZWQuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTrCoFN1cmF2ZWXCoFN1
-dGhpa3VscGFuaXQgPHN1cmF2ZWUuc3V0aGlrdWxwYW5pdEBhbWQuY29tPg0KPj4gLS0tDQo+PiDC
-oMKgYXJjaC94ODYva3ZtL2k4MjU0LmPCoHzCoDMxwqArKysrKysrKysrKysrKysrKysrKysrKysr
-LS0tLS0tDQo+PiDCoMKgMcKgZmlsZcKgY2hhbmdlZCzCoDI1wqBpbnNlcnRpb25zKCspLMKgNsKg
-ZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZsKgLS1naXTCoGEvYXJjaC94ODYva3ZtL2k4MjU0LmPC
-oGIvYXJjaC94ODYva3ZtL2k4MjU0LmMNCj4+IGluZGV4wqA0YTZkYzU0Li4zMWM0YTliwqAxMDA2
-NDQNCj4+IC0tLcKgYS9hcmNoL3g4Ni9rdm0vaTgyNTQuYw0KPj4gKysrwqBiL2FyY2gveDg2L2t2
-bS9pODI1NC5jDQo+PiBAQMKgLTM0LDEwwqArMzQsMTLCoEBADQo+PiDCoMKgI2luY2x1ZGXCoDxs
-aW51eC9rdm1faG9zdC5oPg0KPj4gwqDCoCNpbmNsdWRlwqA8bGludXgvc2xhYi5oPg0KPj4gKyNp
-bmNsdWRlwqA8YXNtL3ZpcnRleHQuaD4NCj4+IMKgwqAjaW5jbHVkZcKgImlvYXBpYy5oIg0KPj4g
-wqDCoCNpbmNsdWRlwqAiaXJxLmgiDQo+PiDCoMKgI2luY2x1ZGXCoCJpODI1NC5oIg0KPj4gKyNp
-bmNsdWRlwqAibGFwaWMuaCINCj4+IMKgwqAjaW5jbHVkZcKgIng4Ni5oIg0KPj4gwqDCoCNpZm5k
-ZWbCoENPTkZJR19YODZfNjQNCj4+IEBAwqAtMjM2LDbCoCsyMzgsMTLCoEBAwqBzdGF0aWPCoHZv
-aWTCoGRlc3Ryb3lfcGl0X3RpbWVyKHN0cnVjdMKga3ZtX3BpdMKgKnBpdCkNCj4+IMKgwqDCoMKg
-wqDCoGt0aHJlYWRfZmx1c2hfd29yaygmcGl0LT5leHBpcmVkKTsNCj4+IMKgwqB9DQo+PiArc3Rh
-dGljwqBpbmxpbmXCoHZvaWTCoGt2bV9waXRfcmVzZXRfcmVpbmplY3Qoc3RydWN0wqBrdm1fcGl0
-wqAqcGl0KQ0KPj4gK3sNCj4+ICvCoMKgwqDCoGF0b21pY19zZXQoJnBpdC0+cGl0X3N0YXRlLnBl
-bmRpbmcswqAwKTsNCj4+ICvCoMKgwqDCoGF0b21pY19zZXQoJnBpdC0+cGl0X3N0YXRlLmlycV9h
-Y2sswqAxKTsNCj4+ICt9DQo+PiArDQo+PiDCoMKgc3RhdGljwqB2b2lkwqBwaXRfZG9fd29yayhz
-dHJ1Y3TCoGt0aHJlYWRfd29ya8KgKndvcmspDQo+PiDCoMKgew0KPj4gwqDCoMKgwqDCoMKgc3Ry
-dWN0wqBrdm1fcGl0wqAqcGl0wqA9wqBjb250YWluZXJfb2Yod29yayzCoHN0cnVjdMKga3ZtX3Bp
-dCzCoGV4cGlyZWQpOw0KPj4gQEDCoC0yNDQsNsKgKzI1MiwyM8KgQEDCoHN0YXRpY8Kgdm9pZMKg
-cGl0X2RvX3dvcmsoc3RydWN0wqBrdGhyZWFkX3dvcmvCoCp3b3JrKQ0KPj4gwqDCoMKgwqDCoMKg
-aW50wqBpOw0KPj4gwqDCoMKgwqDCoMKgc3RydWN0wqBrdm1fa3BpdF9zdGF0ZcKgKnBzwqA9wqAm
-cGl0LT5waXRfc3RhdGU7DQo+PiArwqDCoMKgwqAvKg0KPj4gK8KgwqDCoMKgwqAqwqBTaW5jZSzC
-oEFNRMKgU1ZNwqBBVklDwqBhY2NlbGVyYXRlc8Kgd3JpdGXCoGFjY2Vzc8KgdG/CoEFQSUPCoEVP
-SQ0KPj4gK8KgwqDCoMKgwqAqwqByZWdpc3RlcsKgZm9ywqBlZGdlLXRyaWdnZXLCoGludGVycnVw
-dHMuwqBQSVTCoHdpbGzCoG5vdMKgYmXCoGFibGUNCj4+ICvCoMKgwqDCoMKgKsKgdG/CoHJlY2Vp
-dmXCoHRoZcKgSVJRwqBBQ0vCoG5vdGlmaWVywqBhbmTCoHdpbGzCoGFsd2F5c8KgYmXCoHplcm8u
-DQo+PiArwqDCoMKgwqDCoCrCoFRoZXJlZm9yZSzCoHdlwqBjaGVja8KgaWbCoGFuecKgTEFQSUPC
-oEVPScKgcGVuZGluZ8KgZm9ywqB2ZWN0b3LCoDANCj4+ICvCoMKgwqDCoMKgKsKgYW5kwqByZXNl
-dMKgaXJxX2Fja8KgaWbCoG5vwqBwZW5kaW5nLg0KPj4gK8KgwqDCoMKgwqAqLw0KPj4gK8KgwqDC
-oMKgaWbCoChjcHVfaGFzX3N2bShOVUxMKcKgJibCoGt2bS0+YXJjaC5hcGljdl9zdGF0ZcKgPT3C
-oEFQSUNWX0FDVElWQVRFRCnCoHsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgaW50wqBlb2nCoD3CoDA7
-DQo+PiArDQo+PiArwqDCoMKgwqDCoMKgwqDCoGt2bV9mb3JfZWFjaF92Y3B1KGkswqB2Y3B1LMKg
-a3ZtKQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmwqAoa3ZtX2FwaWNfcGVuZGluZ19l
-b2kodmNwdSzCoDApKQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZW9pKys7
-DQo+PiArwqDCoMKgwqDCoMKgwqDCoGlmwqAoIWVvaSkNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBrdm1fcGl0X3Jlc2V0X3JlaW5qZWN0KHBpdCk7DQo+IA0KPiBJbsKgd2hpY2jCoGNhc2XC
-oHdvdWxkwqBlb2nCoGJlwqAhPcKgMMKgd2hlbsKgQVBJQy1WwqBpc8KgYWN0aXZlPw0KDQpUaGF0
-IHdvdWxkIGJlIHRoZSBjYXNlIHdoZW4gZ3Vlc3QgaGFzIG5vdCBwcm9jZXNzZWQgYW5kL29yIHN0
-aWxsIHByb2Nlc3NpbmcgdGhlIGludGVycnVwdC4NCk9uY2UgdGhlIGd1ZXN0IHdyaXRlcyB0byBB
-UElDIEVPSSByZWdpc3RlciBmb3IgZWRnZS10cmlnZ2VyZWQgaW50ZXJydXB0IGZvciB2ZWN0b3Ig
-MCwNCmFuZCB0aGUgQVZJQyBoYXJkd2FyZSBhY2NlbGVyYXRlZCB0aGUgYWNjZXNzIGJ5IGNsZWFy
-aW5nIHRoZSBoaWdoZXN0IHByaW9yaXR5IElTUiBiaXQsDQp0aGVuIHRoZSBlb2kgc2hvdWxkIGJl
-IHplcm8uDQoNClN1cmF2ZWUNCg==
+On Mon, Aug 26, 2019 at 3:25 AM Liran Alon <liran.alon@oracle.com> wrote:
+>
+> Commit cd7764fe9f73 ("KVM: x86: latch INITs while in system management mode")
+> changed code to latch INIT while vCPU is in SMM and process latched INIT
+> when leaving SMM. It left a subtle remark in commit message that similar
+> treatment should also be done while vCPU is in VMX non-root-mode.
+>
+> However, INIT signals should actually be latched in various vCPU states:
+> (*) For both Intel and AMD, INIT signals should be latched while vCPU
+> is in SMM.
+> (*) For Intel, INIT should also be latched while vCPU is in VMX
+> operation and later processed when vCPU leaves VMX operation by
+> executing VMXOFF.
+> (*) For AMD, INIT should also be latched while vCPU runs with GIF=0
+> or in guest-mode with intercept defined on INIT signal.
+>
+> To fix this:
+> 1) Add kvm_x86_ops->apic_init_signal_blocked() such that each CPU vendor
+> can define the various CPU states in which INIT signals should be
+> blocked and modify kvm_apic_accept_events() to use it.
+> 2) Modify vmx_check_nested_events() to check for pending INIT signal
+> while vCPU in guest-mode. If so, emualte vmexit on
+> EXIT_REASON_INIT_SIGNAL. Note that nSVM should have similar behaviour
+> but is currently left as a TODO comment to implement in the future
+> because nSVM don't yet implement svm_check_nested_events().
+>
+> Note: Currently KVM nVMX implementation don't support VMX wait-for-SIPI
+> activity state as specified in MSR_IA32_VMX_MISC bits 6:8 exposed to
+> guest (See nested_vmx_setup_ctls_msrs()).
+> If and when support for this activity state will be implemented,
+> kvm_check_nested_events() would need to avoid emulating vmexit on
+> INIT signal in case activity-state is wait-for-SIPI. In addition,
+> kvm_apic_accept_events() would need to be modified to avoid discarding
+> SIPI in case VMX activity-state is wait-for-SIPI but instead delay
+> SIPI processing to vmx_check_nested_events() that would clear
+> pending APIC events and emulate vmexit on SIPI.
+>
+> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+> Co-developed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Signed-off-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+
+Thanks for doing this! I asked Marc to take a look at it earlier this
+month, but he's been swamped.
+
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 ++
+>  arch/x86/kvm/lapic.c            | 11 +++++++----
+>  arch/x86/kvm/svm.c              | 20 ++++++++++++++++++++
+>  arch/x86/kvm/vmx/nested.c       | 14 ++++++++++++++
+>  arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+>  5 files changed, 49 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 74e88e5edd9c..158483538181 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1209,6 +1209,8 @@ struct kvm_x86_ops {
+>         uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
+>
+>         bool (*need_emulation_on_page_fault)(struct kvm_vcpu *vcpu);
+> +
+> +       bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
+>  };
+>
+>  struct kvm_arch_async_pf {
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 685d17c11461..9620fe5ce8d1 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2702,11 +2702,14 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+>                 return;
+>
+>         /*
+> -        * INITs are latched while in SMM.  Because an SMM CPU cannot
+> -        * be in KVM_MP_STATE_INIT_RECEIVED state, just eat SIPIs
+> -        * and delay processing of INIT until the next RSM.
+> +        * INITs are latched while CPU is in specific states.
+> +        * Because a CPU cannot be in these states immediately
+> +        * after it have processed an INIT signal (and thus in
+> +        * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
+> +        * and delay processing of INIT until CPU leaves
+> +        * the state which latch INIT signal.
+>          */
+> -       if (is_smm(vcpu)) {
+> +       if (kvm_x86_ops->apic_init_signal_blocked(vcpu)) {
+>                 WARN_ON_ONCE(vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED);
+>                 if (test_bit(KVM_APIC_SIPI, &apic->pending_events))
+>                         clear_bit(KVM_APIC_SIPI, &apic->pending_events);
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 6462c386015d..0e43acf7bea4 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7205,6 +7205,24 @@ static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+>         return false;
+>  }
+>
+> +static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+> +{
+> +       struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +       /*
+> +        * TODO: Last condition latch INIT signals on vCPU when
+> +        * vCPU is in guest-mode and vmcb12 defines intercept on INIT.
+> +        * To properly emulate INIT intercept, SVM should also implement
+> +        * kvm_x86_ops->check_nested_events() and process pending INIT
+> +        * signal to cause nested_svm_vmexit(). As SVM currently don't
+> +        * implement check_nested_events(), this work is delayed
+> +        * for future improvement.
+> +        */
+> +       return is_smm(vcpu) ||
+> +                  !gif_set(svm) ||
+> +                  (svm->vmcb->control.intercept & (1ULL << INTERCEPT_INIT));
+> +}
+> +
+>  static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>         .cpu_has_kvm_support = has_svm,
+>         .disabled_by_bios = is_disabled,
+> @@ -7341,6 +7359,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>         .nested_get_evmcs_version = nested_get_evmcs_version,
+>
+>         .need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
+> +
+> +       .apic_init_signal_blocked = svm_apic_init_signal_blocked,
+>  };
+>
+>  static int __init svm_init(void)
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ced9fba32598..d655fcd04c01 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3401,6 +3401,15 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu, bool external_intr)
+>         unsigned long exit_qual;
+>         bool block_nested_events =
+>             vmx->nested.nested_run_pending || kvm_event_needs_reinjection(vcpu);
+> +       struct kvm_lapic *apic = vcpu->arch.apic;
+> +
+> +       if (lapic_in_kernel(vcpu) &&
+> +               test_bit(KVM_APIC_INIT, &apic->pending_events)) {
+> +               if (block_nested_events)
+> +                       return -EBUSY;
+> +               nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
+> +               return 0;
+> +       }
+
+Suppose that L0 just finished emulating an L2 instruction with
+EFLAGS.TF set. So, we've just queued up a #DB trap in
+vcpu->arch.exception. On this emulated VM-exit from L2 to L1, the
+guest pending debug exceptions field in the vmcs12 should get the
+value of vcpu->arch.exception.payload, and the queued #DB should be
+squashed.
+
+>         if (vcpu->arch.exception.pending &&
+>                 nested_vmx_check_exception(vcpu, &exit_qual)) {
+> @@ -4466,7 +4475,12 @@ static int handle_vmoff(struct kvm_vcpu *vcpu)
+>  {
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+> +
+>         free_nested(vcpu);
+> +
+> +       /* Process a latched INIT during time CPU was in VMX operation */
+> +       kvm_make_request(KVM_REQ_EVENT, vcpu);
+> +
+>         return nested_vmx_succeed(vcpu);
+>  }
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b5b5b2e5dac5..5a1aa0640f2a 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7479,6 +7479,11 @@ static bool vmx_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+>         return false;
+>  }
+>
+> +static bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+> +{
+> +       return is_smm(vcpu) || to_vmx(vcpu)->nested.vmxon;
+> +}
+> +
+>  static __init int hardware_setup(void)
+>  {
+>         unsigned long host_bndcfgs;
+> @@ -7803,6 +7808,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+>         .get_vmcs12_pages = NULL,
+>         .nested_enable_evmcs = NULL,
+>         .need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
+> +       .apic_init_signal_blocked = vmx_apic_init_signal_blocked,
+>  };
+>
+>  static void vmx_cleanup_l1d_flush(void)
+> --
+> 2.20.1
+>
