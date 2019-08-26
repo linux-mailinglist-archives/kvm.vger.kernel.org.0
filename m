@@ -2,195 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 35E389C91D
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 08:17:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB47D9C929
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 08:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729556AbfHZGR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Aug 2019 02:17:27 -0400
-Received: from ozlabs.ru ([107.173.13.209]:56000 "EHLO ozlabs.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729535AbfHZGR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Aug 2019 02:17:26 -0400
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id BD4BBAE805A5;
-        Mon, 26 Aug 2019 02:17:03 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linuxppc-dev@lists.ozlabs.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        Alistair Popple <alistair@popple.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: [PATCH kernel v2 4/4] powerpc/powernv/ioda: Remove obsolete iommu_table_ops::exchange callbacks
-Date:   Mon, 26 Aug 2019 16:17:05 +1000
-Message-Id: <20190826061705.92048-5-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190826061705.92048-1-aik@ozlabs.ru>
-References: <20190826061705.92048-1-aik@ozlabs.ru>
+        id S1729540AbfHZGVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 02:21:17 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:33894 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbfHZGVR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 02:21:17 -0400
+Received: by mail-pl1-f196.google.com with SMTP id d3so9512940plr.1;
+        Sun, 25 Aug 2019 23:21:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=PZm+QjbJpeqBhVMu1MgOUk3rJy79ptucuxQ3qToi7dY=;
+        b=Hm/X9JFGAExB7v8O1zPkr2MP7YgJz3Rq+tx1WCNg56+4Ygck/hNaQd4g220ucrh7tA
+         Va1+RBGcZuLZ54MO0BDbJBUUtMFimlPCl0Jm5SNkSGHHXbQV0+mEtsFbqE6Y0EN15yrA
+         Cfew6qngvpq9DSIXSqtXSmBW8zBroGj7c575FcONqI2YvYywCJj7vWpHDumYLFKIYalM
+         PKczgpO1341w/1ZRQFQ8nVtG6TlJEniMRrVTXQ2qp22PldfDLNdBmFzFsdzVcuxevVaW
+         jcEY2vdYJfQCsdIqbFvYukGLVP/0dLHWaMQ0zO8gXvHqrQ6vrhfwCN2YizeDuYghfzWF
+         UzTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=PZm+QjbJpeqBhVMu1MgOUk3rJy79ptucuxQ3qToi7dY=;
+        b=WCerSDS3HQ+OqDOI0AjwzGtxgOfKpirleBhDzIG69+cf4GGuRy0yxuKi5nTH1r2WcR
+         UH1YVpAIZCoQYtzdUS+W2Eng8cXXsHh8on3iP0pd77T/b0o+Z/V7f0ijRkiiPAAFulbI
+         G1yK0C4tSgW7tWAOT7mHd4e2r3b/P9cTZopc9f0jn6Qeu9kSvVpSLt4/p5KKsuDPnyvb
+         bBnP1p8fvv/YFsHDGLzlrkJPPrp9vpAEOWGjIzLoY9Q8J/9t+16JFxDfIRojkfU1gv5V
+         /WxR2zAWCLzZ+I5R5fC93/CKa42r04P79XSN3SRWAXVYyDOsEeG0H9slfJcw3DwR56vc
+         d8kA==
+X-Gm-Message-State: APjAAAWK536hcK048in4HHj1X2bKSQUavkxCZAqicYkRLWP6C82ZSTIk
+        3uTLvh+fPRPWB0kBWGtHGA/VW8sHdAM=
+X-Google-Smtp-Source: APXvYqy4Pxq8ePvhXfj+ZAEL0ONi8PwLIYEp460xuzoWgKidEAPDA9nf2CvkvUf9XQZ7ySRjIOHSAQ==
+X-Received: by 2002:a17:902:96a:: with SMTP id 97mr10343227plm.264.1566800476205;
+        Sun, 25 Aug 2019 23:21:16 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id f7sm10030353pfd.43.2019.08.25.23.21.14
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 25 Aug 2019 23:21:15 -0700 (PDT)
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     kvm-ppc@vger.kernel.org
+Cc:     paulus@ozlabs.org, kvm@vger.kernel.org,
+        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Subject: [PATCH 00/23] KVM: PPC: BOok3S HV: Support for nested HPT guests
+Date:   Mon, 26 Aug 2019 16:20:46 +1000
+Message-Id: <20190826062109.7573-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As now we have xchg_no_kill/tce_kill, these are not used anymore so
-remove them.
+This patch series adds support for running a nested kvm guest which uses the hpt
+(hash page table) mmu type.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- arch/powerpc/include/asm/iommu.h          | 10 -----
- arch/powerpc/kernel/iommu.c               | 26 +-----------
- arch/powerpc/platforms/powernv/pci-ioda.c | 50 -----------------------
- 3 files changed, 1 insertion(+), 85 deletions(-)
+Patch series based on v5.3-rc6.
 
-diff --git a/arch/powerpc/include/asm/iommu.h b/arch/powerpc/include/asm/iommu.h
-index 837b5122f257..350101e11ddb 100644
---- a/arch/powerpc/include/asm/iommu.h
-+++ b/arch/powerpc/include/asm/iommu.h
-@@ -48,16 +48,6 @@ struct iommu_table_ops {
- 	 * returns old TCE and DMA direction mask.
- 	 * @tce is a physical address.
- 	 */
--	int (*exchange)(struct iommu_table *tbl,
--			long index,
--			unsigned long *hpa,
--			enum dma_data_direction *direction);
--	/* Real mode */
--	int (*exchange_rm)(struct iommu_table *tbl,
--			long index,
--			unsigned long *hpa,
--			enum dma_data_direction *direction);
--
- 	int (*xchg_no_kill)(struct iommu_table *tbl,
- 			long index,
- 			unsigned long *hpa,
-diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
-index 070492f9b46e..9704f3f76e63 100644
---- a/arch/powerpc/kernel/iommu.c
-+++ b/arch/powerpc/kernel/iommu.c
-@@ -1013,30 +1013,6 @@ int iommu_tce_check_gpa(unsigned long page_shift, unsigned long gpa)
- }
- EXPORT_SYMBOL_GPL(iommu_tce_check_gpa);
- 
--long iommu_tce_xchg(struct mm_struct *mm, struct iommu_table *tbl,
--		unsigned long entry, unsigned long *hpa,
--		enum dma_data_direction *direction)
--{
--	long ret;
--	unsigned long size = 0;
--
--	ret = tbl->it_ops->exchange(tbl, entry, hpa, direction);
--
--	if (!ret && ((*direction == DMA_FROM_DEVICE) ||
--			(*direction == DMA_BIDIRECTIONAL)) &&
--			!mm_iommu_is_devmem(mm, *hpa, tbl->it_page_shift,
--					&size))
--		SetPageDirty(pfn_to_page(*hpa >> PAGE_SHIFT));
--
--	/* if (unlikely(ret))
--		pr_err("iommu_tce: %s failed on hwaddr=%lx ioba=%lx kva=%lx ret=%d\n",
--			__func__, hwaddr, entry << tbl->it_page_shift,
--				hwaddr, ret); */
--
--	return ret;
--}
--EXPORT_SYMBOL_GPL(iommu_tce_xchg);
--
- extern long iommu_tce_xchg_no_kill(struct mm_struct *mm,
- 		struct iommu_table *tbl,
- 		unsigned long entry, unsigned long *hpa,
-@@ -1076,7 +1052,7 @@ int iommu_take_ownership(struct iommu_table *tbl)
- 	 * requires exchange() callback defined so if it is not
- 	 * implemented, we disallow taking ownership over the table.
- 	 */
--	if (!tbl->it_ops->exchange)
-+	if (!tbl->it_ops->xchg_no_kill)
- 		return -EINVAL;
- 
- 	spin_lock_irqsave(&tbl->large_pool.lock, flags);
-diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
-index 4e56b2c620ec..c28d0d9b7ee0 100644
---- a/arch/powerpc/platforms/powernv/pci-ioda.c
-+++ b/arch/powerpc/platforms/powernv/pci-ioda.c
-@@ -1946,28 +1946,6 @@ static int pnv_ioda_tce_xchg_no_kill(struct iommu_table *tbl, long index,
- {
- 	return pnv_tce_xchg(tbl, index, hpa, direction, !realmode);
- }
--
--static int pnv_ioda1_tce_xchg(struct iommu_table *tbl, long index,
--		unsigned long *hpa, enum dma_data_direction *direction)
--{
--	long ret = pnv_tce_xchg(tbl, index, hpa, direction, true);
--
--	if (!ret)
--		pnv_pci_p7ioc_tce_invalidate(tbl, index, 1, false);
--
--	return ret;
--}
--
--static int pnv_ioda1_tce_xchg_rm(struct iommu_table *tbl, long index,
--		unsigned long *hpa, enum dma_data_direction *direction)
--{
--	long ret = pnv_tce_xchg(tbl, index, hpa, direction, false);
--
--	if (!ret)
--		pnv_pci_p7ioc_tce_invalidate(tbl, index, 1, true);
--
--	return ret;
--}
- #endif
- 
- static void pnv_ioda1_tce_free(struct iommu_table *tbl, long index,
-@@ -1981,8 +1959,6 @@ static void pnv_ioda1_tce_free(struct iommu_table *tbl, long index,
- static struct iommu_table_ops pnv_ioda1_iommu_ops = {
- 	.set = pnv_ioda1_tce_build,
- #ifdef CONFIG_IOMMU_API
--	.exchange = pnv_ioda1_tce_xchg,
--	.exchange_rm = pnv_ioda1_tce_xchg_rm,
- 	.xchg_no_kill = pnv_ioda_tce_xchg_no_kill,
- 	.tce_kill = pnv_pci_p7ioc_tce_invalidate,
- 	.useraddrptr = pnv_tce_useraddrptr,
-@@ -2113,30 +2089,6 @@ static int pnv_ioda2_tce_build(struct iommu_table *tbl, long index,
- 	return ret;
- }
- 
--#ifdef CONFIG_IOMMU_API
--static int pnv_ioda2_tce_xchg(struct iommu_table *tbl, long index,
--		unsigned long *hpa, enum dma_data_direction *direction)
--{
--	long ret = pnv_tce_xchg(tbl, index, hpa, direction, true);
--
--	if (!ret)
--		pnv_pci_ioda2_tce_invalidate(tbl, index, 1, false);
--
--	return ret;
--}
--
--static int pnv_ioda2_tce_xchg_rm(struct iommu_table *tbl, long index,
--		unsigned long *hpa, enum dma_data_direction *direction)
--{
--	long ret = pnv_tce_xchg(tbl, index, hpa, direction, false);
--
--	if (!ret)
--		pnv_pci_ioda2_tce_invalidate(tbl, index, 1, true);
--
--	return ret;
--}
--#endif
--
- static void pnv_ioda2_tce_free(struct iommu_table *tbl, long index,
- 		long npages)
- {
-@@ -2148,8 +2100,6 @@ static void pnv_ioda2_tce_free(struct iommu_table *tbl, long index,
- static struct iommu_table_ops pnv_ioda2_iommu_ops = {
- 	.set = pnv_ioda2_tce_build,
- #ifdef CONFIG_IOMMU_API
--	.exchange = pnv_ioda2_tce_xchg,
--	.exchange_rm = pnv_ioda2_tce_xchg_rm,
- 	.xchg_no_kill = pnv_ioda_tce_xchg_no_kill,
- 	.tce_kill = pnv_pci_ioda2_tce_invalidate,
- 	.useraddrptr = pnv_tce_useraddrptr,
+The first 8 patches in this series enable a radix guest (L1) running under a
+radix hypervisor (L0) to act as a guest hypervisor for it's own nested (L2)
+guest where the nested guest is using hash page table translation. This mainly
+involved ensuring that the guest hypervisor uses the new run_single_vcpu()
+entry path and ensuring that the appropriate functions which are normally
+called in the real mode entry path in book3s_hv_rmhandlers.S are called on the
+new virtual mode entry path when a hpt guest is being run.
+
+The remainder of the patches enable a (L0) hypervisor to perform hash page
+table translation for a nested (L2) hpt guest which is running under one of
+it's radix (L1) it's which is acting as a guest hypervisor. This primarily
+required changes to the nested guest entry patch to ensure that a shadow hpt
+would be allocated for the nested hpt guest, that the slb was context switched
+and that the real mode entry path in book3s_hv_rmhandlers.S could be used to
+enter/exit a nested hpt guest.
+
+It was also necessary to be able to create translations by inserting ptes into
+the shadow page table which provided the combination of the translation from L2
+virtual address to L1 guest physical address and the translation from L1 guest
+physical address to L0 host real address. Additionally invalidations of these
+translations need to be handled at both levels, by L1 via the H_TLB_INVALIDATE
+hcall to invalidate a L2 virtual address to L1 guest physical address
+translation, and by L0 when paging out a L1 guest page which had been
+subsequently mapped through to L2 thus invalidating the L1 guest physical
+address to L0 host real address translation.
+
+Still lacking support for:
+Passthrough of emulated mmio devices to nested hpt guests since the current
+method of reading nested guest memory relies on using quadrants which are only
+available when using radix translation.
+
+Paul Mackerras (1):
+  KVM: PPC: Book3S HV: Use __gfn_to_pfn_memslot in HPT page fault
+    handler
+
+Suraj Jitindar Singh (22):
+  KVM: PPC: Book3S HV: Increment mmu_notifier_seq when modifying radix
+    pte rc bits
+  KVM: PPC: Book3S HV: Nested: Don't allow hash guests to run nested
+    guests
+  KVM: PPC: Book3S HV: Handle making H_ENTER_NESTED hcall in a separate
+    function
+  KVM: PPC: Book3S HV: Enable calling kvmppc_hpte_hv_fault in virtual
+    mode
+  KVM: PPC: Book3S HV: Allow hpt manipulation hcalls to be called in
+    virtual mode
+  KVM: PPC: Book3S HV: Make kvmppc_invalidate_hpte() take lpid not a kvm
+    struct
+  KVM: PPC: Book3S HV: Nested: Allow pseries hypervisor to run hpt
+    nested guest
+  KVM: PPC: Book3S HV: Nested: Improve comments and naming of nest rmap
+    functions
+  KVM: PPC: Book3S HV: Nested: Increase gpa field in nest rmap to 46
+    bits
+  KVM: PPC: Book3S HV: Nested: Remove single nest rmap entries
+  KVM: PPC: Book3S HV: Nested: add kvmhv_remove_all_nested_rmap_lpid()
+  KVM: PPC: Book3S HV: Nested: Infrastructure for nested hpt guest setup
+  KVM: PPC: Book3S HV: Nested: Context switch slb for nested hpt guest
+  KVM: PPC: Book3S HV: Store lpcr and hdec_exp in the vcpu struct
+  KVM: PPC: Book3S HV: Nested: Make kvmppc_run_vcpu() entry path nested
+    capable
+  KVM: PPC: Book3S HV: Nested: Rename kvmhv_xlate_addr_nested_radix
+  KVM: PPC: Book3S HV: Separate out hashing from
+    kvmppc_hv_find_lock_hpte()
+  KVM: PPC: Book3S HV: Nested: Implement nested hpt mmu translation
+  KVM: PPC: Book3S HV: Nested: Handle tlbie hcall for nested hpt guest
+  KVM: PPC: Book3S HV: Nested: Implement nest rmap invalidations for hpt
+    guests
+  KVM: PPC: Book3S HV: Nested: Enable nested hpt guests
+  KVM: PPC: Book3S HV: Add nested hpt pte information to debugfs
+
+ arch/powerpc/include/asm/book3s/64/mmu-hash.h |   15 +
+ arch/powerpc/include/asm/book3s/64/mmu.h      |    9 +
+ arch/powerpc/include/asm/hvcall.h             |   36 -
+ arch/powerpc/include/asm/kvm_asm.h            |    5 +
+ arch/powerpc/include/asm/kvm_book3s.h         |   30 +-
+ arch/powerpc/include/asm/kvm_book3s_64.h      |   87 +-
+ arch/powerpc/include/asm/kvm_host.h           |   57 +
+ arch/powerpc/include/asm/kvm_ppc.h            |    5 +-
+ arch/powerpc/kernel/asm-offsets.c             |    5 +
+ arch/powerpc/kvm/book3s.c                     |    1 +
+ arch/powerpc/kvm/book3s_64_mmu_hv.c           |  136 ++-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  167 +--
+ arch/powerpc/kvm/book3s_hv.c                  |  327 ++++--
+ arch/powerpc/kvm/book3s_hv_builtin.c          |   33 +-
+ arch/powerpc/kvm/book3s_hv_interrupts.S       |   25 +-
+ arch/powerpc/kvm/book3s_hv_nested.c           | 1381 ++++++++++++++++++++++---
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c           |  298 ++++--
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S       |  126 ++-
+ arch/powerpc/kvm/book3s_xive.h                |   15 +
+ arch/powerpc/kvm/powerpc.c                    |    3 +-
+ 20 files changed, 2136 insertions(+), 625 deletions(-)
+
 -- 
-2.17.1
+2.13.6
 
