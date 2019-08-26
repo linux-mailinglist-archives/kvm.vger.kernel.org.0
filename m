@@ -2,79 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11A339D426
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 18:37:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FAD29D4C6
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 19:14:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732574AbfHZQhq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Aug 2019 12:37:46 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:41137 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729357AbfHZQhq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Aug 2019 12:37:46 -0400
-Received: by mail-io1-f67.google.com with SMTP id j5so38784634ioj.8
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 09:37:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6PBet8kiFCLsyoY5k5933kx3p3updcUzabH4H7FnS/U=;
-        b=kZEZnPxT6pshXHiHmaWOMBBQIfFt0A6n6skg8q03gbcNm1yQ0oZPYGt6SUeA0aW9yj
-         +NoZTwD6etHrAepmKT9Oirhcg0SQdal7YoQrMWposxSoBrsFeHCoNz6XOU0w+vMSnvKf
-         sjkfxythhztMlXWJ3U+db87fiPRvlSBl3N7YYaEhxLs/ivAFRRz39Fn8kAkXNzRv0BR6
-         c+uUWHfk0OuvbJnnx9/Mn391EYWDBvVgwg+NYM8/k2RMfnjV/+7zfNAbnn3HpGCPBtqi
-         LEpO6A6feV9V4cTlUML1Xd4ooyBJ3VMaPDuv6U09aCexNS5eh/1eNewEx+5T9S3Eb7iU
-         BP3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6PBet8kiFCLsyoY5k5933kx3p3updcUzabH4H7FnS/U=;
-        b=oHZ2BC57tfRRMHDyR9Z8/tbeIuDZ0zuDsQ9NHT9+cEISdrsnWXOL7bz8H5dpcQKoeP
-         sGWlWnM4N7ZRZbagKhr2pvf2NtGymwnOWRT8YSjTxadIPx15zOtr+cB0xx5JdwhZr7nc
-         vq0ushQWvFMnQ2tTlDkahQ5PTZ/pA/O7OEBjiiozVW9WaMvpA3C8BMYiZM3GImOXqoz2
-         hacNR6I1eivdk4ylo7duwva2LknO5DE0CHnieB78Kdaa0xuNu3U+QcyXEp5SY8MVvxNn
-         NHLeB2mVIQ06ISejsIJjor3ww4tVl7bXkwy2i6aJ+zmPcgVZPB16mQazXvPJBHWwd5o0
-         z5Rw==
-X-Gm-Message-State: APjAAAWpIsDW/Mb0QHFjsH7EEXIydA5pa3WdyClzdyoLU0kDTIM48EqS
-        TUd2MJi98w6uxb1p/g2ERNaduTbtGKTiHP51AHI34w==
-X-Google-Smtp-Source: APXvYqxfJF1Yzniskkn6Y+VLsEA8+Ldv5wLLTs/6E1dAOMnZSUJHLmE1dIOVzVk8f2v8EDaXEDgV31FqHO7AVNxedME=
-X-Received: by 2002:a6b:6a15:: with SMTP id x21mr16306436iog.40.1566837465281;
- Mon, 26 Aug 2019 09:37:45 -0700 (PDT)
+        id S1732879AbfHZROu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 13:14:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33618 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731490AbfHZROu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 13:14:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 43D93C02832B;
+        Mon, 26 Aug 2019 17:14:49 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-153.ams2.redhat.com [10.36.116.153])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F14D2600C8;
+        Mon, 26 Aug 2019 17:14:45 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 2/5] s390x: Diag288 test
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com
+References: <20190826163502.1298-1-frankja@linux.ibm.com>
+ <20190826163502.1298-3-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <4855e0bd-2808-ff44-482e-ecc96c7e69ed@redhat.com>
+Date:   Mon, 26 Aug 2019 19:14:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190826102449.142687-1-liran.alon@oracle.com> <20190826102449.142687-2-liran.alon@oracle.com>
-In-Reply-To: <20190826102449.142687-2-liran.alon@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 26 Aug 2019 09:37:33 -0700
-Message-ID: <CALMp9eQeB-e0-8-7uvQN37L7aEL6OaXU+5v4-wwCQfqdLQdm2A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: VMX: Introduce exit reason for receiving INIT
- signal on guest-mode
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Bhavesh Davda <bhavesh.davda@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Nikita Leshenko <nikita.leshchenko@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190826163502.1298-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Mon, 26 Aug 2019 17:14:49 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 26, 2019 at 3:25 AM Liran Alon <liran.alon@oracle.com> wrote:
->
-> According to Intel SDM section 25.2 "Other Causes of VM Exits",
-> When INIT signal is received on a CPU that is running in VMX
-> non-root mode it should cause an exit with exit-reason of 3.
-> (See Intel SDM Appendix C "VMX BASIC EXIT REASONS")
->
-> This patch introduce the exit-reason definition.
->
-> Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
-> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
-> Co-developed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> Signed-off-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On 26/08/2019 18.34, Janosch Frank wrote:
+> A small test for the watchdog via diag288.
+> 
+> Minimum timer value is 15 (seconds) and the only supported action with
+> QEMU is restart.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  lib/s390x/asm/arch_def.h |   1 +
+>  s390x/Makefile           |   1 +
+>  s390x/diag288.c          | 130 +++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg      |   4 ++
+>  4 files changed, 136 insertions(+)
+>  create mode 100644 s390x/diag288.c
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index d2cd727..4bbb428 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -15,6 +15,7 @@ struct psw {
+>  	uint64_t	addr;
+>  };
+>  
+> +#define PSW_MASK_EXT			0x0100000000000000UL
+>  #define PSW_MASK_DAT			0x0400000000000000UL
+>  #define PSW_MASK_PSTATE			0x0001000000000000UL
+>  
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 574a9a2..3453373 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -12,6 +12,7 @@ tests += $(TEST_DIR)/vector.elf
+>  tests += $(TEST_DIR)/gs.elf
+>  tests += $(TEST_DIR)/iep.elf
+>  tests += $(TEST_DIR)/cpumodel.elf
+> +tests += $(TEST_DIR)/diag288.elf
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  
+>  all: directories test_cases test_cases_binary
+> diff --git a/s390x/diag288.c b/s390x/diag288.c
+> new file mode 100644
+> index 0000000..a784338
+> --- /dev/null
+> +++ b/s390x/diag288.c
+> @@ -0,0 +1,130 @@
+> +/*
+> + * Timer Event DIAG288 test
+> + *
+> + * Copyright (c) 2019 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + *
+> + * This code is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU Library General Public License version 2.
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +
+> +struct lowcore *lc = (struct lowcore *)0x0;
+> +
+> +#define CODE_INIT	0
+> +#define CODE_CHANGE	1
+> +#define CODE_CANCEL	2
+> +
+> +#define ACTION_RESTART	0
+> +
+> +static inline void diag288(unsigned long code, unsigned long time,
+> +			   unsigned long action)
+> +{
+> +	register unsigned long fc asm("0") = code;
+> +	register unsigned long tm asm("1") = time;
+> +	register unsigned long ac asm("2") = action;
+> +
+> +	asm volatile("diag %0,%2,0x288"
+> +		     : : "d" (fc), "d" (tm), "d" (ac));
+> +}
+> +
+> +static void test_specs(void)
+> +{
+> +	report_prefix_push("specification");
+> +
+> +	report_prefix_push("uneven");
+> +	expect_pgm_int();
+> +	asm volatile("diag 1,2,0x288");
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("unsupported action");
+> +	expect_pgm_int();
+> +	diag288(CODE_INIT, 15, 42);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("unsupported function");
+> +	expect_pgm_int();
+> +	diag288(42, 15, ACTION_RESTART);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("no init");
+> +	expect_pgm_int();
+> +	diag288(CODE_CANCEL, 15, ACTION_RESTART);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("min timer");
+> +	expect_pgm_int();
+> +	diag288(CODE_INIT, 14, ACTION_RESTART);
+> +	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_priv(void)
+> +{
+> +	report_prefix_push("privileged");
+> +	expect_pgm_int();
+> +	enter_pstate();
+> +	diag288(CODE_INIT, 15, ACTION_RESTART);
+> +	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
+> +	report_prefix_pop();
+> +}
+> +
+> +static inline void get_tod_clock_ext(char *clk)
+> +{
+> +	typedef struct { char _[16]; } addrtype;
+> +
+> +	asm volatile("stcke %0" : "=Q" (*(addrtype *) clk) : : "cc");
+> +}
+> +
+> +static inline unsigned long long get_tod_clock(void)
+
+Change the return type to uint64_t, too?
+
+> +{
+> +	char clk[16];
+> +
+> +	get_tod_clock_ext(clk);
+> +	return *((uint64_t *)&clk[1]);
+> +}
+
+While this code seems to compile fine with recent versions of GCC, the
+older version 4.8 complains here:
+
+s390x/diag288.c: In function ‘get_tod_clock’:
+s390x/diag288.c:95:2: error: dereferencing type-punned pointer will
+break strict-aliasing rules [-Werror=strict-aliasing]
+  return *((uint64_t *)&clk[1]);
+  ^
+
+Looking at the whole code again, I think it would be best to simply use
+"stck" here instead of "stcke", what do you think?
+
+ Thomas
