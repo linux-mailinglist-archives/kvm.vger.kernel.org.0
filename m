@@ -2,117 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84E4D9CAB4
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 09:37:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AE969CB1B
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 09:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730141AbfHZHhA convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 26 Aug 2019 03:37:00 -0400
-Received: from mga11.intel.com ([192.55.52.93]:42994 "EHLO mga11.intel.com"
+        id S1730266AbfHZH5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 03:57:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41418 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728168AbfHZHhA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Aug 2019 03:37:00 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Aug 2019 00:37:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,431,1559545200"; 
-   d="scan'208";a="263855796"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by orsmga001.jf.intel.com with ESMTP; 26 Aug 2019 00:36:59 -0700
-Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 26 Aug 2019 00:36:59 -0700
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 26 Aug 2019 00:36:58 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.112]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.19]) with mapi id 14.03.0439.000;
- Mon, 26 Aug 2019 15:36:57 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "Alex Williamson" <alex.williamson@redhat.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?iso-8859-2?Q?Radim_Krcm=E1r?= <rkrcmar@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Xiao Guangrong" <guangrong.xiao@gmail.com>
-Subject: RE: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Thread-Topic: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages
- when removing a memslot
-Thread-Index: AQHVUfDjU54gjhr9+0uHFoEz0u5M8qb4yGaAgAAOyoCAABq6AIAADNcAgALSAgCABlRqgIAB1XSAgAAK0wCAAAXIgIABcouAgAARQICAB4jXMA==
-Date:   Mon, 26 Aug 2019 07:36:56 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D549B7A@SHSMSX104.ccr.corp.intel.com>
-References: <20190813170440.GC13991@linux.intel.com>
- <20190813115737.5db7d815@x1.home> <20190813133316.6fc6f257@x1.home>
- <20190813201914.GI13991@linux.intel.com> <20190815092324.46bb3ac1@x1.home>
- <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
- <20190820200318.GA15808@linux.intel.com> <20190820144204.161f49e0@x1.home>
- <20190820210245.GC15808@linux.intel.com> <20190821130859.4330bcf4@x1.home>
- <20190821201043.GI29345@linux.intel.com>
-In-Reply-To: <20190821201043.GI29345@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiY2ZlMzU1MDgtOWJhZS00OTQ5LTgxMjQtOTA0OTg4ZDJjM2ExIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoienBuM3B5RmlCbEJJNzhUMHo3cEZuU09jcTZ6VmVhVlpDOUlvcjBhRStjSEJKQXJ3aWJEQndOQXdaMmF1Z1wvRjcifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: 8BIT
+        id S1730061AbfHZH5l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 03:57:41 -0400
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E6BB181F0E
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 07:57:40 +0000 (UTC)
+Received: by mail-pf1-f199.google.com with SMTP id 191so5584800pfz.8
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 00:57:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nx/uKVsNPrj4sLskCBDR38LskLWX/kbZNssKjw3uHhE=;
+        b=lLgAhINwLFKpGAFK3YtNF6PLdunYE4SB9T7G023iS6y7b17tj247Y4QjMD4wApDCKl
+         e4T+XWVe8i1THdxfNWg5RTb+FMeM+AzXUeMdQbeb3x1jgwuHeA7Aqo04Q08f0QBojOze
+         rNtBAC7gh7+EVbVpiJ70l7/BLqv8w0wtae75YIrXQdoZyLe8LFdcqAZegJ07K/R8g0r9
+         VEElSX9eb3nWhVI9v55LF0ReMdzhZyLFrnp1pWFCyo4CMvqP0oNAKqMJFMvp4rP1G/F1
+         l3V5IdU5hmSmf68dtOZaGlGd83JqQvno5CPzPidH4FbDksAk7tluSnir/f7uaWOQy61G
+         ZYnQ==
+X-Gm-Message-State: APjAAAVud4y0fHSlhxOFXyu1QdLI9pfftLPELf1mesgtg74+LceWSl35
+        9j6XLOUJTeeZfwuD1RrpbCoipaLn7mgRILqjNcxuCh9ZrjFaTdysqCL4aXPr58Z7TOrTDlQ/eoU
+        4HTk3sMTV5Zld
+X-Received: by 2002:a63:2807:: with SMTP id o7mr15459232pgo.131.1566806260339;
+        Mon, 26 Aug 2019 00:57:40 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqziiG4ZLc+6KzG9IuAf9INJzIEZAmrquQXKtVmCmpvt5i2FFNbVKwAktGcQe/Gl3lvc7Tl0FA==
+X-Received: by 2002:a63:2807:: with SMTP id o7mr15459215pgo.131.1566806259994;
+        Mon, 26 Aug 2019 00:57:39 -0700 (PDT)
+Received: from xz-x1.redhat.com ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id r137sm12038058pfc.145.2019.08.26.00.57.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Aug 2019 00:57:39 -0700 (PDT)
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: [PATCH] KVM: selftests: Detect max PA width from cpuid
+Date:   Mon, 26 Aug 2019 15:57:28 +0800
+Message-Id: <20190826075728.21646-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Sean Christopherson
-> Sent: Thursday, August 22, 2019 4:11 AM
-> 
-[...]
-> 
-> > From there I added back the gfn range test, but I left out the gfn_mask
-> > because I'm not doing the level filtering and I think(?) this is just
-> > another optimization.  So essentially I only add:
-> >
-> > 	if (sp->gfn < slot->base_gfn ||
-> >             sp->gfn > (slot->base_gfn + slot->npages - 1))
-> > 		continue;
-> 
-> This doesn't work because of what sp->gfn contains.  The shadow page is
-> the page/table holding the spt entries, e.g. a level 1 sp refers to a page
-> table for entries defining 4k pages.  sp->gfn holds the base gfn of the
-> range of gfns covered by the sp, which allows finding all parent sps for a
-> given gfn.  E.g. for level 1 sp, sp->gfn is found by masking the gfn of a
-> given page by 0xFFFFFFFFFFFFFE00, level 2 sp by 0xFFFFFFFFFFFC0000, and so
-> on up the chain.
-> 
-> This is what the original code botched, as it would only find all sps for
-> a memslot if the base of the memslot were 2mb aligned for 4k pages, 1gb
-> aligned for 2mb pages, etc...  This just happened to mostly work since
-> memslots are usually aligned to such requirements.  In the original code,
-> removing the "sp->gfn != gfn" check caused KVM to zap random sps that just
-> happened to hash to the same entry.  Likewise, omitting the gfn filter in
-> this code means everything gets zapped.
-> 
-> What I don't understand is why zapping everything, or at least userspace
-> MMIO addresses, is necessary when removing the GPU BAR memslot.  The
-> IOAPIC sp in particular makes no sense.  AIUI, the IOAPIC is always
-> emulated, i.e. not passed through, and its base/size is static (or at
-> least static after init).  Zapping an IOAPIC sp will send KVM down
-> different paths but AFAIK the final outsome should be unaffected.
-> 
+The dirty_log_test is failing on some old machines like Xeon E3-1220
+with tripple faults when writting to the tracked memory region:
 
-I have the same feeling. the base address of IOAPIC is described by
-ACPI MADT thus static. It is possible to reprogram LAPIC base but no
-commodity OS does it today.
+  Test iterations: 32, interval: 10 (ms)
+  Testing guest mode: PA-bits:52, VA-bits:48, 4K pages
+  guest physical test memory offset: 0x7fbffef000
+  ==== Test Assertion Failure ====
+  dirty_log_test.c:138: false
+  pid=6137 tid=6139 - Success
+     1  0x0000000000401ca1: vcpu_worker at dirty_log_test.c:138
+     2  0x00007f3dd9e392dd: ?? ??:0
+     3  0x00007f3dd9b6a132: ?? ??:0
+  Invalid guest sync status: exit_reason=SHUTDOWN
 
-btw I found Alex mentioned gfn 0x100000 in earlier post. This one is
-usually the starting of high memory. If true, it becomes even more
-weird, not just about MMIO thing.
+It's because previously we moved the testing memory region from a
+static place (1G) to the top of the system's physical address space,
+meanwhile we stick to 39 bits PA for all the x86_64 machines.  That's
+not true for machines like Xeon E3-1220 where it only supports 36.
 
-Thanks
-Kevin
+Let's unbreak this test by dynamically detect PA width from CPUID
+0x80000008.  Meanwhile, even allow kvm_get_supported_cpuid_index() to
+fail.  I don't know whether that could be useful because I think
+0x80000008 should be there for all x86_64 hosts, but I also think it's
+not really helpful to assert in the kvm_get_supported_cpuid_index().
+
+Fixes: b442324b581556e
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Andrew Jones <drjones@redhat.com>
+CC: Radim Krčmář <rkrcmar@redhat.com>
+CC: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ tools/testing/selftests/kvm/dirty_log_test.c  | 22 +++++++++++++------
+ .../selftests/kvm/lib/x86_64/processor.c      |  3 ---
+ 2 files changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index ceb52b952637..111592f3a1d7 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -274,18 +274,26 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+ 
+ #ifdef __x86_64__
+-	/*
+-	 * FIXME
+-	 * The x86_64 kvm selftests framework currently only supports a
+-	 * single PML4 which restricts the number of physical address
+-	 * bits we can change to 39.
+-	 */
+-	guest_pa_bits = 39;
++	{
++		struct kvm_cpuid_entry2 *entry;
++
++		entry = kvm_get_supported_cpuid_entry(0x80000008);
++		/*
++		 * Supported PA width can be smaller than 52 even if
++		 * we're with VM_MODE_P52V48_4K mode.  Fetch it from
++		 * the host to update the default value (SDM 4.1.4).
++		 */
++		if (entry)
++			guest_pa_bits = entry->eax & 0xff;
++		else
++			guest_pa_bits = 32;
++	}
+ #endif
+ #ifdef __aarch64__
+ 	if (guest_pa_bits != 40)
+ 		type = KVM_VM_TYPE_ARM_IPA_SIZE(guest_pa_bits);
+ #endif
++	printf("Supported guest physical address width: %d\n", guest_pa_bits);
+ 	max_gfn = (1ul << (guest_pa_bits - guest_page_shift)) - 1;
+ 	guest_page_size = (1ul << guest_page_shift);
+ 	/*
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 6cb34a0fa200..9de2fd310ac8 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -760,9 +760,6 @@ kvm_get_supported_cpuid_index(uint32_t function, uint32_t index)
+ 			break;
+ 		}
+ 	}
+-
+-	TEST_ASSERT(entry, "Guest CPUID entry not found: (EAX=%x, ECX=%x).",
+-		    function, index);
+ 	return entry;
+ }
+ 
+-- 
+2.21.0
+
