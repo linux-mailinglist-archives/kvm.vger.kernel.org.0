@@ -2,191 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 391CC9CE0F
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 13:23:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DF369CE23
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 13:30:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731046AbfHZLW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Aug 2019 07:22:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39682 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726760AbfHZLW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Aug 2019 07:22:57 -0400
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7C6C258
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 11:22:56 +0000 (UTC)
-Received: by mail-pf1-f200.google.com with SMTP id t14so11977773pfq.15
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 04:22:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=Q7zhErdr3zhXTAX3q0cF2SWaKy8PRaJ11xDeRV5rY7A=;
-        b=TwSfoal2Gu+WQotwur1NeG2GNOGQ5WiJ9q9IHxOAtLnEX9AyPB4pCX7w5Xz65rdTTo
-         XRTIE78zk7kTGBYMkWEusAgP+ZSmghbLqddEfaoLRsjWhJ5t78rrDso9+LHiuFYmiinl
-         kjSi/nbvvKBzpMrO7Y5ow3y5XuAaIwnwp3dIgG3SYulxNOpmBHmNYe8cprv1nUdo+yTu
-         +D1kJGrE6cQex+KFmq+82YIjGgilqloag7FgFkeAZwNN6D9DuyW3RgZaVkjPRZKh1jC/
-         OfGiBziN6zxLJsSehhCIc2HXF4dvOg/2gvW0agReAc0KH5B3vDUPABz7sl8oGNkF2Hr+
-         A74A==
-X-Gm-Message-State: APjAAAV4PtVl/tE6+NjJUR2nZAU428JPaXsVOMY3ZtI+UOb1TifHpihQ
-        xMXstw2ghbcco4y4HzI1YjCtrrBvKrLbkh9z7NtlaMRz5g2c5mmUOAwnirP+1W1CuZoTGmSRj70
-        SeYkifeawDQ/D
-X-Received: by 2002:a63:3805:: with SMTP id f5mr15815883pga.272.1566818575950;
-        Mon, 26 Aug 2019 04:22:55 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwMX+p5IaRGSs2L/aHxh7gwyKZJayxi7Y7zFuvX0f/Yk5rH0vZZArHzlXVYl8NrsWhnHBvJtQ==
-X-Received: by 2002:a63:3805:: with SMTP id f5mr15815858pga.272.1566818575581;
-        Mon, 26 Aug 2019 04:22:55 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id x12sm3132579pjt.32.2019.08.26.04.22.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2019 04:22:54 -0700 (PDT)
-Date:   Mon, 26 Aug 2019 19:22:44 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] KVM: selftests: Detect max PA width from cpuid
-Message-ID: <20190826112244.GE1785@xz-x1>
-References: <20190826075728.21646-1-peterx@redhat.com>
- <20190826110958.lyueasf5laypkq2r@kamzik.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190826110958.lyueasf5laypkq2r@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+        id S1731021AbfHZLa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 07:30:27 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:57712 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727487AbfHZLa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 07:30:26 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7QBTG2v040257;
+        Mon, 26 Aug 2019 11:30:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=Knvx/S7g9cRpvsdsj2X2PWu1o78YwISQsNgxO2lWsRM=;
+ b=nfbrexnfQ93eF9K33v7QAGbLW/L/mM28fPLCKW2PWvu2RWW+5KSwEJXv5yFqlHXGYfuL
+ igh75rzZYo4744dIIhBBQCCx7mzyOYIXj+d679yh3jke3Ura2i/6Sn3OV6AMtCxIxG0s
+ dn1nCWVrc147f7O76NirXEqRkVF/bCMQ1P96Zb58Eb1phVD3/N+tOAe0Y9vnCb2tZIir
+ jg7r1HGNfkhfjFEqilrIji/5nzqt5h3aaNoHV3l6mDNjc37gaDHdzuHa5hEQZkeyooN8
+ l6tfqdOinYJ/hvhRZbEDOlP2X3S3w4s2LidiVwN8+8n5n2ZkXD3nZMW9SCPGQb4VpAp8 Yw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2ujw700f2p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 26 Aug 2019 11:30:23 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7QBSFqN062817;
+        Mon, 26 Aug 2019 11:30:23 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2ujw6hpsnv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 26 Aug 2019 11:30:22 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7QBUMuY002982;
+        Mon, 26 Aug 2019 11:30:22 GMT
+Received: from [10.30.3.14] (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 26 Aug 2019 04:30:21 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH 1/2] KVM: nVMX: Always indicate HLT activity support in
+ VMX_MISC MSR
+From:   Nikita Leshenko <nikita.leshchenko@oracle.com>
+In-Reply-To: <CALMp9eR4zO=BOZKzDowkVSR7O9Y2aqBXEvwepv6j85z4wvSyxA@mail.gmail.com>
+Date:   Mon, 26 Aug 2019 14:30:18 +0300
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C11C2844-CC17-436E-B304-57AD7B2C38D0@oracle.com>
+References: <20190819214650.41991-1-nikita.leshchenko@oracle.com>
+ <20190819214650.41991-2-nikita.leshchenko@oracle.com>
+ <20190819221101.GF1916@linux.intel.com>
+ <CALMp9eR4zO=BOZKzDowkVSR7O9Y2aqBXEvwepv6j85z4wvSyxA@mail.gmail.com>
+To:     Jim Mattson <jmattson@google.com>
+X-Mailer: Apple Mail (2.3445.9.1)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9360 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908260128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9360 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908260129
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 26, 2019 at 01:09:58PM +0200, Andrew Jones wrote:
-> On Mon, Aug 26, 2019 at 03:57:28PM +0800, Peter Xu wrote:
-> > The dirty_log_test is failing on some old machines like Xeon E3-1220
-> > with tripple faults when writting to the tracked memory region:
-> > 
-> >   Test iterations: 32, interval: 10 (ms)
-> >   Testing guest mode: PA-bits:52, VA-bits:48, 4K pages
-> >   guest physical test memory offset: 0x7fbffef000
-> >   ==== Test Assertion Failure ====
-> >   dirty_log_test.c:138: false
-> >   pid=6137 tid=6139 - Success
-> >      1  0x0000000000401ca1: vcpu_worker at dirty_log_test.c:138
-> >      2  0x00007f3dd9e392dd: ?? ??:0
-> >      3  0x00007f3dd9b6a132: ?? ??:0
-> >   Invalid guest sync status: exit_reason=SHUTDOWN
-> > 
-> > It's because previously we moved the testing memory region from a
-> > static place (1G) to the top of the system's physical address space,
-> > meanwhile we stick to 39 bits PA for all the x86_64 machines.  That's
-> > not true for machines like Xeon E3-1220 where it only supports 36.
-> > 
-> > Let's unbreak this test by dynamically detect PA width from CPUID
-> > 0x80000008.  Meanwhile, even allow kvm_get_supported_cpuid_index() to
-> > fail.  I don't know whether that could be useful because I think
-> > 0x80000008 should be there for all x86_64 hosts, but I also think it's
-> > not really helpful to assert in the kvm_get_supported_cpuid_index().
-> > 
-> > Fixes: b442324b581556e
-> > CC: Paolo Bonzini <pbonzini@redhat.com>
-> > CC: Andrew Jones <drjones@redhat.com>
-> > CC: Radim Krčmář <rkrcmar@redhat.com>
-> > CC: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  tools/testing/selftests/kvm/dirty_log_test.c  | 22 +++++++++++++------
-> >  .../selftests/kvm/lib/x86_64/processor.c      |  3 ---
-> >  2 files changed, 15 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> > index ceb52b952637..111592f3a1d7 100644
-> > --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> > @@ -274,18 +274,26 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
-> >  	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-> >  
-> >  #ifdef __x86_64__
-> > -	/*
-> > -	 * FIXME
-> > -	 * The x86_64 kvm selftests framework currently only supports a
-> > -	 * single PML4 which restricts the number of physical address
-> > -	 * bits we can change to 39.
-> > -	 */
-> > -	guest_pa_bits = 39;
-> > +	{
-> > +		struct kvm_cpuid_entry2 *entry;
-> > +
-> > +		entry = kvm_get_supported_cpuid_entry(0x80000008);
-> > +		/*
-> > +		 * Supported PA width can be smaller than 52 even if
-> > +		 * we're with VM_MODE_P52V48_4K mode.  Fetch it from
-> 
-> It seems like x86_64 should create modes that actually work, rather than
-> always using one named 'P52', but then needing to probe for the actual
-> number of supported physical bits. Indeed testing all x86_64 supported
-> modes, like aarch64 does, would even make more sense in this test.
 
-Should be true.  I'll think it over again...
 
-> 
-> 
-> > +		 * the host to update the default value (SDM 4.1.4).
-> > +		 */
-> > +		if (entry)
-> > +			guest_pa_bits = entry->eax & 0xff;
-> 
-> Are we sure > 39 bits will work with this test framework? I can't
-> recall what led me to the FIXME above, other than things not working.
-> It seems I was convinced we couldn't have more bits due to how pml4's
-> were allocated, but maybe I misinterpreted it.
+> On 21 Aug 2019, at 23:59, Jim Mattson <jmattson@google.com> wrote:
+>=20
+> On Mon, Aug 19, 2019 at 3:11 PM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+>>=20
+>> On Tue, Aug 20, 2019 at 12:46:49AM +0300, Nikita Leshenko wrote:
+>>> Before this commit, userspace could disable the GUEST_ACTIVITY_HLT =
+bit in
+>>> VMX_MISC yet KVM would happily accept GUEST_ACTIVITY_HLT activity =
+state in
+>>> VMCS12. We can fix it by either failing VM entries with HLT activity =
+state when
+>>> it's not supported or by disallowing clearing this bit.
+>>>=20
+>>> The latter is preferable. If we go with the former, to disable
+>>> GUEST_ACTIVITY_HLT userspace also has to make CPU_BASED_HLT_EXITING =
+a "must be
+>>> 1" control, otherwise KVM will be presenting a bogus model to L1.
+>>>=20
+>>> Don't fail writes that disable GUEST_ACTIVITY_HLT to maintain =
+backwards
+>>> compatibility.
+>>=20
+>> Paolo, do we actually need to maintain backwards compatibility in =
+this
+>> case?  This seems like a good candidate for "fix the bug and see who =
+yells".
+>=20
+> Google's userspace clears bit 6. Please don't fail that write!
+What happens if the guest tries to use HLT activity state regardless of =
+the bit?
+Currently in KVM the guest will succeed, since there are no checks on VM =
+entry for
+that. I previously submitted a patch[1] that adds a check for that, what =
+do you think
+about it?
 
-As mentioned in the IRC - I think I've got a "success case" of
-that... :)  Please see below:
+[1] https://patchwork.kernel.org/patch/11092209/
 
-virtlab423:~ $ lscpu
-Architecture:        x86_64
-CPU op-mode(s):      32-bit, 64-bit
-Byte Order:          Little Endian
-CPU(s):              16
-On-line CPU(s) list: 0-15
-Thread(s) per core:  1
-Core(s) per socket:  8
-Socket(s):           2
-NUMA node(s):        2
-Vendor ID:           GenuineIntel
-CPU family:          6
-Model:               63
-Model name:          Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz
-Stepping:            2
-CPU MHz:             2597.168
-BogoMIPS:            5194.31
-Virtualization:      VT-x
-L1d cache:           32K
-L1i cache:           32K
-L2 cache:            256K
-L3 cache:            20480K
-NUMA node0 CPU(s):   0,2,4,6,8,10,12,14
-NUMA node1 CPU(s):   1,3,5,7,9,11,13,15
-Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm abm cpuid_fault epb invpcid_single pti tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm xsaveopt cqm_llc cqm_occup_llc dtherm arat pln pts
-virtlab423:~ $ ./dirty_log_test 
-Test iterations: 32, interval: 10 (ms)
-Testing guest mode: PA-bits:52, VA-bits:48, 4K pages
-Supported guest physical address width: 46
-guest physical test memory offset: 0x3fffbffef000
-Dirtied 216064 pages
-Total bits checked: dirty (204841), clear (7922119), track_next (60730)
-
-So on above E5-2640 I got PA width==46 and it worked well.  Does this
-mean that 39bits is not really a PA restriction anywhere?  Actually
-that also matches with the other fact that if we look into
-virt_pg_map() it's indeed allocating PML4 entries rather than having
-only one.
-
-Thanks,
-
--- 
-Peter Xu
+Nikita=
