@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 933209C94F
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 08:22:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F4C19C953
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 08:22:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729748AbfHZGWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Aug 2019 02:22:04 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46020 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729740AbfHZGWD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Aug 2019 02:22:03 -0400
-Received: by mail-pf1-f194.google.com with SMTP id w26so11085907pfq.12;
-        Sun, 25 Aug 2019 23:22:02 -0700 (PDT)
+        id S1729740AbfHZGWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 02:22:07 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:42190 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729688AbfHZGWG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 02:22:06 -0400
+Received: by mail-pl1-f196.google.com with SMTP id y1so9465993plp.9;
+        Sun, 25 Aug 2019 23:22:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=0DATG+ESdIgIylqNlYCYOgcqn+Te4S9qCutaSgfzPWw=;
-        b=OPeieG3ruI0W0oNJnp0jOcHJAKjGAWVMTaJuKNKE5f3yk1NDNc3LPmYGy2YKPTM3y0
-         8/WCyrBN+uYQQkiIXVYHwCc7FaAEyFwI70yYN9/Kp8QvmCMYvX/zfkxX0coicehr0VgA
-         4Th6786JOa+QIN0QN05INkbYcu+qC8yuecg4petciChomk+mCDcXzBGERUU9RduW+dS2
-         BFXQhyHqw1d2fvozoyXhSI1T+kvOS64FmjUvirirhCCIFoQqG16gsh/x4ocVZr1B3Yz3
-         fCdushj2u4r5vvpP1yEIf6hHni5/NJ8ArAPoRLZtzcwm1hHcUSxbo2y6n752JjQreVS7
-         NfIA==
+        bh=HUvk266kFnzOilMKwCLAapI0dXHSrJpztln/ktUFQZ8=;
+        b=mWPS8YIF1vv9e1MW57XLXkdogy+FP/F24kADhnSEzCLMq/SJg1qKioEvhtGlF1A+xi
+         86A6pO0Q2h/OwEgBmaiBlyBqIX75Mk7znTfCkHmXpG19LHGzVCmXTb6k8s57UEvzj5Kh
+         ezWA0DdQUuVYqfgtQcnPQonNHvc2m3Jfwtplr+ZrH1DtRw7BUNab4dFvAwmmIYUlYLKp
+         txIBCIlOQ/fqMzg8nBUfDfHn1WzydLMCL14TcxQgik40NIP6WH4J1C2WR5Z2DLx5g0tG
+         0dolIhBGYyONBmdOxDxkLYnoHioRQaBfmXiPLraHvGXFLS9wj7xlrJ77Yc0Jfx0p7AVS
+         FBPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=0DATG+ESdIgIylqNlYCYOgcqn+Te4S9qCutaSgfzPWw=;
-        b=ZdyQMo5pjFVjNbGy6jRC9jB7bSlG3SEyNSDYeRM6kuMF1nkaV0j9V2zNiyP9+3RdvH
-         n/lU0bAHvDYG0ZemYZY1A2d9xn+lOCqwMVzUxUEPluIkX6p0y/baAJbfIYSAgjmHiGFw
-         uT/OMrFU/GoI/6SdCpyhFmSa/Gg8E31itDGfj9IbmMc2sZPVzkg1qolyW/uqK0nCwluq
-         THpmBOVv7XHjUT6Beu4Ow+Ksd87TdrZcZ57KVk6r0A/ub/gl5PLu0o8sBdejtFnhUcBR
-         rgSnPiBUaDOAfePC2HRS4f6LjTTwzaUDbPXyzJerVqEZZSjG/c6d1NFz/19MAd3zGwPw
-         klPg==
-X-Gm-Message-State: APjAAAWEALPyvi/Cq/wW8psLtcILL+I7ZnycJ1/f5sk4SnNsJG72rxrC
-        0tmV75svYtwFjRvCAGSslVwGQJDcBJQ=
-X-Google-Smtp-Source: APXvYqyRx3quUWBIx5MHpUtnPpCCwgBsXHzZkOSEYzpCWbwx8YPaIMcXy53hTWfc3iRbaechYXU5dA==
-X-Received: by 2002:a63:9d8a:: with SMTP id i132mr4773224pgd.410.1566800521969;
-        Sun, 25 Aug 2019 23:22:01 -0700 (PDT)
+        bh=HUvk266kFnzOilMKwCLAapI0dXHSrJpztln/ktUFQZ8=;
+        b=Mpu4p2uZrhbEyeWSqisG03DdPSDp5B8RXc8NdDBZNZCx039+H80n2PNX3UtXnTaCEV
+         09HGuKxdtvAg9Zh8H+UphWUyApCnexwgEMneIbr3D7rsuMDQW67JBx7aLcaq2+2MFcgn
+         Cmx/hvzZ2JqIA9dIP51hpjW/RpnrbO1//jIhW9HLgAZVehY21UyN3FzD36y18H8qhWBy
+         IVc3a1GpvYFN/xGXz5SoC8BteAZZ1V7lGGMKfDfzcz0ZGl9IfHMIybFAYYVsTErqgq1m
+         rYvVLAFE5OfM549GcnruteREr4+2xXwvwr/AMOnyC9CBpTBy4rl4Xin9LWEki8c5R+Xs
+         5YYQ==
+X-Gm-Message-State: APjAAAUgWijWooSPP5uTEkUcExU0vasGXOmFkcphVXLmECoC808tjcAu
+        /szVDTO+HJxDWJDX9raT3gktTbq5Xu0=
+X-Google-Smtp-Source: APXvYqztzo2Rmk0m51OdM4Y8u5MsbMiyn5N1x15Unfm14w0AhWQplLG6BHagUFxizdzr9JLp9Rg7bg==
+X-Received: by 2002:a17:902:a507:: with SMTP id s7mr16712457plq.66.1566800524406;
+        Sun, 25 Aug 2019 23:22:04 -0700 (PDT)
 Received: from surajjs2.ozlabs.ibm.com.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id f7sm10030353pfd.43.2019.08.25.23.21.59
+        by smtp.gmail.com with ESMTPSA id f7sm10030353pfd.43.2019.08.25.23.22.02
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 25 Aug 2019 23:22:01 -0700 (PDT)
+        Sun, 25 Aug 2019 23:22:04 -0700 (PDT)
 From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To:     kvm-ppc@vger.kernel.org
 Cc:     paulus@ozlabs.org, kvm@vger.kernel.org,
         Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Subject: [PATCH 19/23] KVM: PPC: Book3S HV: Nested: Implement nested hpt mmu translation
-Date:   Mon, 26 Aug 2019 16:21:05 +1000
-Message-Id: <20190826062109.7573-20-sjitindarsingh@gmail.com>
+Subject: [PATCH 20/23] KVM: PPC: Book3S HV: Nested: Handle tlbie hcall for nested hpt guest
+Date:   Mon, 26 Aug 2019 16:21:06 +1000
+Message-Id: <20190826062109.7573-21-sjitindarsingh@gmail.com>
 X-Mailer: git-send-email 2.13.6
 In-Reply-To: <20190826062109.7573-1-sjitindarsingh@gmail.com>
 References: <20190826062109.7573-1-sjitindarsingh@gmail.com>
@@ -58,534 +58,461 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement the insertion of nested hpt (hash page table) translations in
-to the shadow hpt. The shadow hpt is used to store ptes (page table
-entries) which provide the translation from nested guest virtual address
-to host real address. The translation from nested guest effective
-address to virtual address is provided by the slb which the nested guest
-can manage itself directly.
+The tlbie instruction is used to invalidate caching of translation
+information derived from the partition and process scoped page tables.
+This instruction is hypervisor privileged when specifying partition
+scoped translations to be invalidated. Thus this interface is
+paravirtualised with the H_TLB_INVALIDATE hcall which is used by a
+pseries hypervisor to perform partition scoped invalidations. This is
+then handled in the hypervisor in kvmhv_emulate_priv_tlbie().
 
-In order to construct this translation the hash page table in L1 memory
-must first be searched to provide a translation from nested guest
-virtual address to L1 guest real address. If no such entry is found then
-an interrupt is provided to the L1 guest hypervisor so that it can
-insert an entry.
+When handling this hcall in the hypervisor it is necessary to invalidate
+caching of partition scoped translations which are in the shadow page
+table (radix) or shadow hpt (hash page table). This functionality
+already exists for radix, so implement it for a hash guest.
 
-The L1 guest real address is then translated to a host real address
-through the radix page tables for the L1 guest, with an entry created
-if one doesn't already exist.
+LPID wide invalidations are already handled and don't differ from the
+radix case. However the case where a single tlb entry corresponding to a
+virtual address is being invalidated needs to be implemented here. The
+information to find the entry is provided as an hcall argument and is
+expected to match the layout of rb specified for the tlbie instruction.
 
-The rc bits are then set for the pte in the L1 guest memory and the host
-radix pte for the L1 guest since these will be set by the hardware in
-the shadow pte automatically and so no interrupt will be provided to
-ensure these can be kept in sync. In fact the rc bits in the shadow hpt
-are set by software here. The c (change) bit is only set if the nested
-guest is writing, otherwise the page is mapped read only so that we can
-fault on a write to set the change bit and upgrade the write
-permissions.
+The rb value provides an abbreviated virtual address, base and actual
+page size and segment size to be used to search for the corresponding
+tlb entry. A hash is computed and this is used to find the pteg which
+needs to be searched. However since only 64 bits of the virtual address
+are supplied and depending on the segment and hpt size up to all 78 bits
+of the virtual address may be needed to compute the hash we have to mask
+out the bits which can't be determined and iterate through all possible
+combinations looking for a matching entry in all of the ptegs which are
+addressed by all of the possible hash values. Although there is in theory a
+1-to-1 relationship between ptes in the shadow hpt and the hpt
+maintained by the guest hypervisor we need to invalidate all matches
+since they can't be differentiated.
 
-The combination of the pte permissions is applied to the entry inserted
-and a nest rmap entry inserted.
+When a matching entry is found it is invalidated if it was valid and the
+corresponding tlbie is issued by the hypervisor, irrespective the pte is
+then zeroed. An optimisation here would be to just make the pte absent and
+extend the rev map to store the host real doubleword since it is still
+valid.
 
-Since we may come in with an existing entry when we just need to upgrade
-the write permissions on a page (in which case the index was found and
-stored in kvmppc_hpte_hv_fault()) we check for this case and just load
-the guest rpte entry from the rev map rather than having to look it up
-in L1 guest memory again.
-
-This doesn't support the invalidation of translations by either the L0
-or L1 hypervisors, this functionality is added in proceeding patches.
+Note: ric == 3 (cluster bombs) are not supported even though the ISA
+technically allows for them, their encoding is implemenatation dependant
+and linux doesn't use them.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- arch/powerpc/include/asm/book3s/64/mmu-hash.h |   2 +
- arch/powerpc/include/asm/kvm_book3s.h         |   4 +
- arch/powerpc/include/asm/kvm_book3s_64.h      |   9 +
- arch/powerpc/kvm/book3s_hv_nested.c           | 385 +++++++++++++++++++++++++-
- arch/powerpc/kvm/book3s_hv_rm_mmu.c           |   6 +-
- 5 files changed, 404 insertions(+), 2 deletions(-)
+ arch/powerpc/include/asm/book3s/64/mmu-hash.h |  11 +
+ arch/powerpc/kvm/book3s_hv_nested.c           | 293 ++++++++++++++++++++++----
+ 2 files changed, 258 insertions(+), 46 deletions(-)
 
 diff --git a/arch/powerpc/include/asm/book3s/64/mmu-hash.h b/arch/powerpc/include/asm/book3s/64/mmu-hash.h
-index c04e37b2c30d..f33dcb84a0bf 100644
+index f33dcb84a0bf..70f4545fecbb 100644
 --- a/arch/powerpc/include/asm/book3s/64/mmu-hash.h
 +++ b/arch/powerpc/include/asm/book3s/64/mmu-hash.h
-@@ -90,6 +90,8 @@
- #define HPTE_R_KEY_HI		ASM_CONST(0x3000000000000000)
- #define HPTE_R_KEY_BIT0		ASM_CONST(0x2000000000000000)
- #define HPTE_R_KEY_BIT1		ASM_CONST(0x1000000000000000)
-+#define HPTE_R_B		ASM_CONST(0x0c00000000000000)
-+#define HPTE_R_B_1T		ASM_CONST(0x0400000000000000)
- #define HPTE_R_RPN_SHIFT	12
- #define HPTE_R_RPN		ASM_CONST(0x0ffffffffffff000)
- #define HPTE_R_RPN_3_0		ASM_CONST(0x01fffffffffff000)
-diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-index f13dab096dad..b43d7f348712 100644
---- a/arch/powerpc/include/asm/kvm_book3s.h
-+++ b/arch/powerpc/include/asm/kvm_book3s.h
-@@ -158,6 +158,10 @@ extern void kvmppc_mmu_flush_segments(struct kvm_vcpu *vcpu);
- extern int kvmppc_book3s_hv_page_fault(struct kvm_run *run,
- 			struct kvm_vcpu *vcpu, unsigned long addr,
- 			unsigned long status);
-+extern unsigned long kvmppc_hv_get_hash_value(struct kvm_hpt_info *hpt,
-+					      gva_t eaddr, unsigned long slb_v,
-+					      unsigned long *avpn,
-+					      unsigned int *pshift_p);
- extern long kvmppc_hv_find_lock_hpte(struct kvm_hpt_info *hpt, gva_t eaddr,
- 			unsigned long slb_v, unsigned long valid);
- extern int kvmppc_hv_emulate_mmio(struct kvm_run *run, struct kvm_vcpu *vcpu,
-diff --git a/arch/powerpc/include/asm/kvm_book3s_64.h b/arch/powerpc/include/asm/kvm_book3s_64.h
-index c874ab3a037e..0db673501110 100644
---- a/arch/powerpc/include/asm/kvm_book3s_64.h
-+++ b/arch/powerpc/include/asm/kvm_book3s_64.h
-@@ -369,6 +369,15 @@ static inline unsigned long hpte_make_readonly(unsigned long ptel)
- 	return ptel;
- }
+@@ -129,6 +129,17 @@
+ #define TLBIEL_INVAL_SET_MASK	0xfff000	/* set number to inval. */
+ #define TLBIEL_INVAL_SET_SHIFT	12
  
-+static inline unsigned long hpte_make_writable(unsigned long ptel)
-+{
-+	if ((ptel & HPTE_R_PP0) || (ptel & HPTE_R_PP) == PP_RWXX)
-+		ptel = (ptel & ~HPTE_R_PPP) | PP_RWXX;
-+	else
-+		ptel = (ptel & ~HPTE_R_PP) | PP_RWRW;
-+	return ptel;
-+}
++/* Fields in the rb registers for the tlbie instruction */
++#define TLBIE_RB_AVA_4K		ASM_CONST(0xfffffffffffff000)
++#define TLBIE_RB_AVA_L		ASM_CONST(0xfffffffffff00000)
++#define TLBIE_RB_LP		ASM_CONST(0x00000000000ff000)
++#define TLBIE_RB_B		ASM_CONST(0x0000000000000300)
++#define TLBIE_RB_B_1T		ASM_CONST(0x0000000000000100)
++#define TLBIE_RB_B_SHIFT	50	/* Shift to match the pte location */
++#define TLBIE_RB_AVAL		ASM_CONST(0x00000000000000fe)
++#define TLBIE_RB_AVAL_SHIFT	12
++#define TLBIE_RB_L		ASM_CONST(0x0000000000000001)
 +
- static inline bool hpte_cache_flags_ok(unsigned long hptel, bool is_ci)
- {
- 	unsigned int wimg = hptel & HPTE_R_WIMG;
+ #define POWER7_TLB_SETS		128	/* # sets in POWER7 TLB */
+ #define POWER8_TLB_SETS		512	/* # sets in POWER8 TLB */
+ #define POWER9_TLB_SETS_HASH	256	/* # sets in POWER9 TLB Hash mode */
 diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index 8ed50d4bd9a6..463745e535c5 100644
+index 463745e535c5..57add167115e 100644
 --- a/arch/powerpc/kvm/book3s_hv_nested.c
 +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -1026,6 +1026,16 @@ static inline u64 gpa_to_n_rmap(u64 gpa)
- 		RMAP_NESTED_GPA_MASK;
+@@ -931,10 +931,10 @@ void kvmhv_release_all_nested(struct kvm *kvm)
  }
  
-+static inline u64 n_rmap_to_index(u64 rmap)
-+{
-+	return (rmap & RMAP_NESTED_GPA_MASK) >> RMAP_NESTED_GPA_SHIFT;
-+}
-+
-+static inline u64 index_to_n_rmap(u64 index)
-+{
-+	return (index << RMAP_NESTED_GPA_SHIFT) & RMAP_NESTED_GPA_MASK;
-+}
-+
- static inline int n_rmap_to_lpid(u64 rmap)
+ /* caller must hold gp->tlb_lock */
+-static void kvmhv_flush_nested(struct kvm_nested_guest *gp)
++static void kvmhv_flush_nested(struct kvm *kvm, struct kvm_nested_guest *gp,
++			       bool invalidate_ptbl)
  {
- 	return (int) ((rmap & RMAP_NESTED_LPID_MASK) >> RMAP_NESTED_LPID_SHIFT);
-@@ -1817,12 +1827,385 @@ static long int __kvmhv_nested_page_fault_radix(struct kvm_run *run,
- 	return RESUME_GUEST;
+-	struct kvm *kvm = gp->l1_host;
+-
++	/* Invalidate (zero) all entries in the shadow pgtable or shadow hpt */
+ 	spin_lock(&kvm->mmu_lock);
+ 	if (gp->radix) {
+ 		kvmppc_free_pgtable_radix(kvm, gp->shadow_pgtable,
+@@ -947,10 +947,15 @@ static void kvmhv_flush_nested(struct kvm_nested_guest *gp)
+ 			sizeof(struct revmap_entry));
+ 	}
+ 	spin_unlock(&kvm->mmu_lock);
++	/* remove all nested rmap entries and perform global invalidation */
++	kvmhv_remove_all_nested_rmap_lpid(kvm, gp->l1_lpid);
+ 	kvmhv_flush_lpid(gp->shadow_lpid, gp->radix);
+-	kvmhv_update_ptbl_cache(gp);
+-	if (gp->l1_gr_to_hr == 0)
+-		kvmhv_remove_nested(gp);
++	/* was caching of the partition table entries also invalidated? */
++	if (invalidate_ptbl) {
++		kvmhv_update_ptbl_cache(gp);
++		if (gp->l1_gr_to_hr == 0)
++			kvmhv_remove_nested(gp);
++	}
  }
  
-+/*
-+ * Used to convert a hash nested guest virtual addr to a L1 guest real addr
-+ * Returns pte index of pte which provided the translation
-+ */
-+static long kvmhv_xlate_addr_nested_hash(struct kvm_vcpu *vcpu,
-+					 struct kvm_nested_guest *gp,
-+					 u64 eaddr, u64 slb_v, bool data,
-+					 bool writing, u64 *v_p, u64 *r_p)
+ struct kvm_nested_guest *kvmhv_get_nested(struct kvm *kvm, int l1_lpid,
+@@ -1296,6 +1301,158 @@ static bool kvmhv_invalidate_shadow_pte_radix(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++/* Called with the hpte locked */
++static void kvmhv_invalidate_shadow_pte_hash(struct kvm_hpt_info *hpt,
++					     unsigned int lpid, __be64 *hptep,
++					     unsigned long index)
 +{
-+	unsigned long v, v_mask, v_match, r, r_mask, r_match;
-+	u64 flags = writing ? DSISR_ISSTORE : 0ULL;
-+	int pshift, i, ret;
-+	u64 hash, pp, key;
-+	u64 pteg[16];
-+
-+	/* NOTE: All handling done in new ISA V3.0 hpte format */
-+
-+	/* Compute the hash */
-+	hash = kvmppc_hv_get_hash_value(&gp->shadow_hpt, eaddr, slb_v, &v_match,
-+					&pshift);
-+	/* Bits which must match */
-+	v_mask = HPTE_V_AVPN_3_0 | HPTE_V_SECONDARY | HPTE_V_VALID;
-+	v_match |= HPTE_V_VALID;
-+	if (slb_v & SLB_VSID_L) {
-+		v_mask |= HPTE_V_LARGE;
-+		v_match |= HPTE_V_LARGE;
-+	}
-+	r_mask = HPTE_R_B;
-+	r_match = (slb_v & SLB_VSID_B_1T) ? HPTE_R_B_1T : 0ULL;
-+
-+	/*
-+	 * Read the pteg from L1 guest memory and search for a matching pte.
-+	 * Note: No need to lock the pte since we hold the tlb_lock meaning
-+	 * that L1 can't complete a tlbie and change the pte out from under us.
-+	 */
-+	while (true) {
-+		u64 pteg_addr = (gp->l1_gr_to_hr & PATB_HTABORG) + (hash << 7);
-+
-+		ret = kvm_vcpu_read_guest(vcpu, pteg_addr, pteg, sizeof(pteg));
-+		if (ret) {
-+			flags |= DSISR_NOHPTE;
-+			goto forward_to_l1;
-+		}
-+
-+		for (i = 0; i < 16; i += 2) {
-+			v = be64_to_cpu(pteg[i]) & ~HPTE_V_HVLOCK;
-+			r = be64_to_cpu(pteg[i + 1]);
-+
-+			if (!((v ^ v_match) & v_mask) &&
-+					!((r ^ r_match) & r_mask) &&
-+					(kvmppc_hpte_base_page_shift(v, r) ==
-+					 pshift))
-+				goto match_found;
-+		}
-+
-+		if (v_match & HPTE_V_SECONDARY) {
-+			flags |= DSISR_NOHPTE;
-+			goto forward_to_l1;
-+		}
-+		/* Try the secondary hash */
-+		v_match |= HPTE_V_SECONDARY;
-+		hash = hash ^ kvmppc_hpt_mask(&gp->shadow_hpt);
-+	}
-+
-+match_found:
-+	/* Match found - check the permissions */
-+	pp = r & HPTE_R_PPP;
-+	key = slb_v & (vcpu->arch.shregs.msr & MSR_PR ? SLB_VSID_KP :
-+							SLB_VSID_KS);
-+	if (!data) {		/* check execute permissions */
-+		if (r & (HPTE_R_N | HPTE_R_G)) {
-+			flags |= SRR1_ISI_N_OR_G;
-+			goto forward_to_l1;
-+		}
-+		if (!hpte_read_permission(pp, key)) {
-+			flags |= SRR1_ISI_PROT;
-+			goto forward_to_l1;
-+		}
-+	} else if (writing) {	/* check write permissions */
-+		if (!hpte_write_permission(pp, key)) {
-+			flags |= DSISR_PROTFAULT;
-+			goto forward_to_l1;
-+		}
-+	} else {		/* check read permissions */
-+		if (!hpte_read_permission(pp, key)) {
-+			flags |= DSISR_PROTFAULT;
-+			goto forward_to_l1;
-+		}
-+	}
-+
-+	*v_p = v & ~HPTE_V_HVLOCK;
-+	*r_p = r;
-+	return (hash << 3) + (i >> 1);
-+
-+forward_to_l1:
-+	vcpu->arch.fault_dsisr = flags;
-+	if (!data) {
-+		vcpu->arch.shregs.msr &= ~0x783f0000ul;
-+		vcpu->arch.shregs.msr |= (flags & 0x783f0000ul);
-+	}
-+	return -1;
-+}
-+
-+static long kvmhv_handle_nested_set_rc_hash(struct kvm_vcpu *vcpu,
-+					    struct kvm_nested_guest *gp,
-+					    unsigned long gpa, u64 index,
-+					    u64 *gr, u64 *hr, bool writing)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	u64 pgflags;
-+	long ret;
-+
-+	pgflags = _PAGE_ACCESSED;
-+	if (writing)
-+		pgflags |= _PAGE_DIRTY;
-+
-+	/* Are the rc bits set in the L1 hash pte? */
-+	if (pgflags & ~(*gr)) {
-+		__be64 gr_be;
-+		u64 addr = (gp->l1_gr_to_hr & PATB_HTABORG) + (index << 4);
-+		addr += sizeof(*gr);	/* Writing second doubleword */
-+
-+		/* Update rc in the L1 guest pte */
-+		(*gr) |= pgflags;
-+		gr_be = cpu_to_be64(*gr);
-+		ret = kvm_write_guest(kvm, addr, &gr_be, sizeof(gr_be));
-+		if (ret)	/* Let the guest try again */
-+			return -EINVAL;
-+	}
-+
-+	/* Set the rc bit in the pte of our (L0) pgtable for the L1 guest */
-+	spin_lock(&kvm->mmu_lock);
-+	ret = kvmppc_hv_handle_set_rc(kvm, kvm->arch.pgtable, writing,
-+				      gpa, kvm->arch.lpid);
-+	spin_unlock(&kvm->mmu_lock);
-+	if (!ret)		/* Let the guest try again */
-+		return -EINVAL;
-+
-+	/* Set the rc bit in the pte of the shadow_hpt for the nest guest */
-+	(*hr) |= pgflags;
-+
-+	return 0;
-+}
-+
- /* called with gp->tlb_lock held */
- static long int __kvmhv_nested_page_fault_hash(struct kvm_run *run,
- 					       struct kvm_vcpu *vcpu,
- 					       struct kvm_nested_guest *gp)
- {
--	return -EINVAL;
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_memory_slot *memslot;
-+	struct rmap_nested *n_rmap;
-+	unsigned long hpte[3] = { 0UL };
-+	unsigned long mmu_seq;
-+	unsigned long dsisr = vcpu->arch.fault_dsisr;
-+	unsigned long ea = vcpu->arch.fault_dar;
-+	long index = vcpu->arch.pgfault_index;
-+	unsigned long psize, *rmapp;
-+	bool data = vcpu->arch.trap == BOOK3S_INTERRUPT_H_DATA_STORAGE;
-+	bool writing = data && (dsisr & DSISR_ISSTORE);
-+	bool kvm_ro = false;
-+	u64 gv = 0ULL, gr = 0ULL, hr = 0ULL;
-+	u64 gpa, gfn, hpa;
-+	int l1_shift, shift, req_perm, h_perm;
-+	pte_t pte, *pte_p;
-+	__be64 *hptep;
-+	long int ret;
-+
-+	/*
-+	 * 1. Translate to a L1 Guest Real Addr
-+	 * If there was no existing entry (pgfault_index < 0) then we need to
-+	 * search for the guest hpte in l1 memory.
-+	 * If we found an entry in kvmppc_hpte_hv_fault() (pgfault_index >= 0)
-+	 * then lock the hpte and check it hasn't changed. If it has (because
-+	 * a tlbie has completed between then and now) let the guest try again.
-+	 * If the entry is valid then we are coming in here to upgrade the write
-+	 * permissions on an existing hpte which we mapped read only to avoid
-+	 * setting the change bit, and now the guest is writing to it.
-+	 * If the entry isn't valid (which means it's absent) then the
-+	 * guest_rpte is still valid, we just made it absent when the host
-+	 * paged out the underlying page which was used to back the guest memory
-+	 * NOTE: Since the shadow_hpt was allocated the same size as the l1 hpt
-+	 * the index is preserved giving a 1-to-1 mapping between the hash page
-+	 * tables, this could be changed in future.
-+	 */
-+	if (index >= 0) {
-+		hptep = (__be64 *)(gp->shadow_hpt.virt + (index << 4));
-+
-+		preempt_disable();
-+		while (!try_lock_hpte(hptep, HPTE_V_HVLOCK))
-+			cpu_relax();
-+		hpte[0] = gv = be64_to_cpu(hptep[0]) & ~HPTE_V_HVLOCK;
-+		hpte[1] = hr = be64_to_cpu(hptep[1]);
-+		hpte[2] = gr = gp->shadow_hpt.rev[index].guest_rpte;
-+		unlock_hpte(hptep, hpte[0]);
-+		preempt_enable();
-+
-+		/* hpt modified under us? */
-+		if (hpte[0] != hpte_old_to_new_v(vcpu->arch.pgfault_hpte[0]) ||
-+		    hpte[1] != hpte_old_to_new_r(vcpu->arch.pgfault_hpte[0],
-+						 vcpu->arch.pgfault_hpte[1]))
-+			return RESUME_GUEST;	/* Let the guest try again */
-+	} else {
-+		/* Note: fault_gpa was used to store the slb_v entry */
-+		index = kvmhv_xlate_addr_nested_hash(vcpu, gp, ea,
-+						     vcpu->arch.fault_gpa, data,
-+						     writing, &gv, &gr);
-+		if (index < 0)
-+			return RESUME_HOST;
-+		hptep = (__be64 *)(gp->shadow_hpt.virt + (index << 4));
-+	}
-+	l1_shift = kvmppc_hpte_actual_page_shift(gv, gr);
-+	psize = (1UL << l1_shift);
-+	gfn = (gr & HPTE_R_RPN_3_0 & ~(psize - 1)) >> PAGE_SHIFT;
-+	gpa = (gfn << PAGE_SHIFT) | (ea & (psize - 1));
-+
-+	/* 2. Find the host memslot */
-+
-+	memslot = gfn_to_memslot(kvm, gfn);
-+	if (!memslot || (memslot->flags & KVM_MEMSLOT_INVALID)) {
-+		/* passthrough of emulated MMIO case */
-+		pr_err("emulated MMIO passthrough?\n");
-+		return -EINVAL;
-+	}
-+	if (memslot->flags & KVM_MEM_READONLY) {
-+		if (writing) {
-+			/* Give the guest a DSI */
-+			kvmhv_inject_nested_storage_int(vcpu, data, ea, writing,
-+							DSISR_PROTFAULT);
-+			return RESUME_GUEST;
-+		}
-+		kvm_ro = true;
-+	}
-+
-+	/* 3. Translate to a L0 Host Real Address through the L0 page table */
-+
-+	/* Used to check for invalidations in progress */
-+	mmu_seq = kvm->mmu_notifier_seq;
-+	smp_rmb();
-+
-+	/* See if can find translation in our partition scoped tables for L1 */
-+	if (!kvm->arch.radix) {
-+		/* only support nested hpt guest under radix l1 guest */
-+		pr_err("nested hpt guest only supported under radix guest\n");
-+		return -EINVAL;
-+	}
-+	pte = __pte(0);
-+	spin_lock(&kvm->mmu_lock);
-+	pte_p = __find_linux_pte(kvm->arch.pgtable, gpa, NULL, &shift);
-+	spin_unlock(&kvm->mmu_lock);
-+
-+	if (!shift)
-+		shift = PAGE_SHIFT;
-+	if (pte_p)
-+		pte = *pte_p;
-+
-+	if (!pte_present(pte) || (writing && !(pte_val(pte) & _PAGE_WRITE))) {
-+		int level;
-+		/* No suitable pte found -> try to insert a mapping */
-+		ret = kvmppc_book3s_instantiate_page(vcpu, gpa, memslot,
-+						writing, kvm_ro, &pte, &level);
-+		if (ret == -EAGAIN)
-+			return RESUME_GUEST;
-+		else if (ret)
-+			return ret;
-+		shift = kvmppc_radix_level_to_shift(level);
-+	}
-+
-+	if (shift < l1_shift)	/* Don't support L1 using larger page than us */
-+		return -EINVAL;
-+	if (!hpte_cache_flags_ok(gr, pte_ci(pte)))
-+		return -EINVAL;
-+	hpa = pte_pfn(pte) << PAGE_SHIFT;
-+	/* Align gfn to the start of the page */
-+	gfn = (gpa & ~((1UL << shift) - 1)) >> PAGE_SHIFT;
-+
-+	/* 4. Compute the PTE we're going to insert */
-+
-+	if (!hr) {	/* Not an existing entry */
-+		hr = gr & ~HPTE_R_RPN_3_0;	/* Copy everything except rpn */
-+		hr |= ((psize - HPTE_R_KEY_BIT2) & gr);	/* psize encoding */
-+		hr |= (hpa & HPTE_R_RPN_3_0 & ~((1UL << shift) - 1));
-+		if (shift > l1_shift)	/* take some bits from the gpa */
-+			hr |= (gpa & ((1UL << shift) - psize));
-+	}
-+
-+	/* Limit permissions based on the L0 pte */
-+	req_perm = data ? (writing ? (_PAGE_READ | _PAGE_WRITE) : _PAGE_READ)
-+			: _PAGE_EXEC;
-+	h_perm = (pte_val(pte) & _PAGE_READ) ? _PAGE_READ : 0;
-+	h_perm |= (pte_val(pte) & _PAGE_WRITE) ? (_PAGE_READ |
-+						 (kvm_ro ? 0 : _PAGE_WRITE))
-+					       : 0;
-+	h_perm |= (pte_val(pte) & _PAGE_EXEC) ? _PAGE_EXEC : 0;
-+	if (req_perm & ~h_perm) {
-+		/* host doesn't provide a required permission -> dsi to guest */
-+		kvmhv_inject_nested_storage_int(vcpu, data, ea, writing,
-+						DSISR_PROTFAULT);
-+		return RESUME_GUEST;
-+	}
-+	if (!(h_perm & _PAGE_EXEC))	/* Make page no execute */
-+		hr |= HPTE_R_N;
-+	if (!(h_perm & _PAGE_WRITE)) {	/* Make page no write */
-+		hr = hpte_make_readonly(hr);
-+		writing = 0;
-+	} else if (!writing) {
-+		/*
-+		 * Make page no write so we can defer setting the change bit.
-+		 * If the guest writes to the page we'll come back in to
-+		 * upgrade the permissions and set the change bit then.
-+		 */
-+		hr = hpte_make_readonly(hr);
-+	} else {	/* _PAGE_WRITE && writing */
-+		hr = hpte_make_writable(hr);
-+	}
-+
-+	/* 5. Update rc bits if required */
-+
-+	ret = kvmhv_handle_nested_set_rc_hash(vcpu, gp, gpa, index, &gr, &hr,
-+					      writing);
-+	if (ret)
-+		return RESUME_GUEST;		/* Let the guest try again */
-+
-+	/* 6. Generate the nest rmap */
-+
-+	n_rmap = kzalloc(sizeof(*n_rmap), GFP_KERNEL);
-+	if (!n_rmap)				/* Let the guest try again */
-+		return RESUME_GUEST;
-+	n_rmap->rmap = index_to_n_rmap(index) | lpid_to_n_rmap(gp->l1_lpid);
-+	rmapp = &memslot->arch.rmap[gfn - memslot->base_gfn];
-+
-+	/* 7. Insert the PTE */
-+
-+	/* Check if we might have been invalidated; let the guest retry if so */
-+	spin_lock(&kvm->mmu_lock);
-+	if (mmu_notifier_retry(kvm, mmu_seq))
-+		goto out_free;
-+
-+	/* Lock the hpte */
-+	preempt_disable();
-+	while (!try_lock_hpte(hptep, HPTE_V_HVLOCK))
-+		cpu_relax();
-+
-+	/* Check that the entry hasn't been changed out from under us */
-+	if ((be64_to_cpu(hptep[0]) & ~HPTE_V_HVLOCK) != hpte[0] ||
-+	     be64_to_cpu(hptep[1]) != hpte[1] ||
-+	     gp->shadow_hpt.rev[index].guest_rpte != hpte[2])
-+		goto out_unlock;		/* Let the guest try again */
-+
-+	/* Ensure valid bit set in hpte */
-+	gv = (gv & ~HPTE_V_ABSENT) | HPTE_V_VALID;
-+
-+	if (be64_to_cpu(hptep[0]) & HPTE_V_VALID) {
++	hpt->rev[index].guest_rpte = 0UL;
++	if (hptep[0] & cpu_to_be64(HPTE_V_VALID)) {
 +		/* HPTE was previously valid, so we need to invalidate it */
 +		hptep[0] |= cpu_to_be64(HPTE_V_ABSENT);
-+		kvmppc_invalidate_hpte(gp->shadow_lpid, hptep, index);
++		kvmppc_invalidate_hpte(lpid, hptep, index);
 +	}
-+
-+	/* Insert the rmap entry */
-+	kvmhv_insert_nest_rmap(rmapp, &n_rmap);
-+
-+	/* Always update guest_rpte in case we updated rc bits */
-+	gp->shadow_hpt.rev[index].guest_rpte = gr;
-+
-+	hptep[1] = cpu_to_be64(hr);
++	hptep[1] = 0ULL;
 +	eieio();
-+	__unlock_hpte(hptep, gv);
-+	preempt_enable();
++	__unlock_hpte(hptep, 0UL);
++}
 +
-+out_free:
-+	spin_unlock(&kvm->mmu_lock);
-+	if (n_rmap)
-+		kfree(n_rmap);
-+	return RESUME_GUEST;
++/* Calculate hash given a virtual address, base page shift, and segment size */
++static unsigned long kvmppc_hv_get_hash_value_va(struct kvm_hpt_info *hpt,
++						 unsigned long va, int pshift,
++						 unsigned long b)
++{
++	unsigned long hash, somask;
 +
-+out_unlock:
-+	__unlock_hpte(hptep, be64_to_cpu(hptep[0]));
-+	preempt_enable();
-+	goto out_free;
++	if (b & HPTE_R_B_1T) {	/* 1T segment */
++		somask = (1UL << 40) - 1;
++		hash = va >> 40;
++		hash ^= hash << 25;
++	} else {		/* 256M segment */
++		somask = (1UL << 28) - 1;
++		hash = va >> 28;
++	}
++	hash ^= ((va & somask) >> pshift);
++	hash &= kvmppc_hpt_mask(hpt);
++
++	return hash;
++}
++
++/* called with gp->tlb_lock held */
++static void kvmhv_tlbie_hpt_addr(struct kvm_nested_guest *gp, unsigned long va,
++				 int base_pshift, int actual_pshift,
++				 unsigned long b)
++{
++	unsigned long mask, hash_incr, num, i;
++	struct kvm_hpt_info *hpt = &gp->shadow_hpt;
++	__be64 *hptep;
++	unsigned long hash, v, v_mask, v_match, r, r_mask, r_match;
++
++	hash = kvmppc_hv_get_hash_value_va(hpt, va, base_pshift, b);
++
++	/*
++	 * The virtual address provided to us in the rb register for tlbie is
++	 * bits 14:77 of the virtual address, however we support a 68 bit
++	 * virtual address on P9. This means that we actually need bits 10:77 of
++	 * the virtual address to calculate all possible hash values for a 68
++	 * bit virtual address space. This means that dependant on the size of
++	 * the hpt (and thus the number of hash bits we actually use to find
++	 * the pteg index) we might have to search up to 16 ptegs (1TB segs) or
++	 * 8 ptegs (256M segs) for a match.
++	 */
++	if (b & HPTE_R_B_1T) {	/* 1T segment */
++		/*
++		 * The hash when using 1T segments uses bits 0:37 of the VA.
++		 * Thus to cover the missing bits of the VA (bits 0:13) we need
++		 * to zero any of these bits being used (as determined by
++		 * kvmppc_hpt_mask()) and then search all possible values.
++		 */
++		hash_incr = 1UL << 24;
++		mask = (0x3ffUL << 24) & kvmppc_hpt_mask(hpt);
++		hash &= ~mask;
++		num = mask >> 24;
++	} else {		/* 256M segment */
++		/*
++		 * The hash when using 256M segments uses bits 11:49 of the VA.
++		 * Thus to cover the missing bits of the VA (bits 11:13) we need
++		 * to zero any of these bits being used (as determined by
++		 * kvmppc_hpt_mask()) and then search all possible values.
++		 */
++		hash_incr = 1UL << 36;
++		mask = (0x7UL << 36) & kvmppc_hpt_mask(hpt);
++		hash &= ~mask;
++		num = mask >> 36;
++	}
++
++	/* Calculate what we're going to match the hpte on */
++	v_match = va >> 16;	/* Align va to ava in the hpte */
++	if (base_pshift >= 24)
++		v_match &= ~((1UL << (base_pshift - 16)) - 1);
++	else
++		v_match &= ~0x7fUL;
++	if (actual_pshift > 12)
++		v_match |= HPTE_V_LARGE;
++	r_match = b;
++	/* We don't have the top 4 bits of the ava to match on */
++	v_mask = (TLBIE_RB_AVA_4K >> 16) & HPTE_V_AVPN_3_0;
++	v_mask |= HPTE_V_LARGE | HPTE_V_SECONDARY;
++	r_mask = HPTE_R_B;
++
++	/* Iterate through the ptegs which we have to search */
++	for (i = 0; i <= num; i++, hash += hash_incr) {
++		unsigned long pteg_addr = hash << 7;
++		v_match &= ~HPTE_V_SECONDARY;
++
++		/* Try both the primary and the secondary hash */
++		while (true) {
++			int j;
++			hptep = (__be64 *)(hpt->virt + pteg_addr);
++
++			/* There are 8 entries in the pteg to search */
++			for (j = 0; j < 16; j += 2) {
++				preempt_disable();
++				/* Lock the pte */
++				while (!try_lock_hpte(&hptep[j], HPTE_V_HVLOCK))
++					cpu_relax();
++				v = be64_to_cpu(hptep[j]) & ~HPTE_V_HVLOCK;
++				r = be64_to_cpu(hptep[j + 1]);
++
++				/*
++				 * Check for a match under the lock
++				 * NOTE: the entry might be valid or absent
++				 */
++				if ((v & (HPTE_V_VALID | HPTE_V_ABSENT)) &&
++				    !((v ^ v_match) & v_mask) &&
++				    !((r ^ r_match) & r_mask) &&
++				    (kvmppc_hpte_base_page_shift(v, r) ==
++				     base_pshift) &&
++				    (kvmppc_hpte_actual_page_shift(v, r) ==
++				     actual_pshift))
++					kvmhv_invalidate_shadow_pte_hash(hpt,
++						gp->shadow_lpid, &hptep[j],
++						(pteg_addr >> 4) + (j >> 1));
++				else
++					__unlock_hpte(&hptep[j], v);
++				preempt_enable();
++				/*
++				 * In theory there is a 1-to-1 mapping between
++				 * entries in the L1 hpt and our shadow hpt,
++				 * however since L1 can't exactly specify a
++				 * hpte (since we're missing some va bits) we
++				 * must invalidate any match which we find and
++				 * continue the search.
++				 */
++			}
++
++			if (v_match & HPTE_V_SECONDARY)
++				break;
++			/* try the secondary hash */
++			v_match |= HPTE_V_SECONDARY;
++			pteg_addr ^= (kvmppc_hpt_mask(hpt) << 7);
++		}
++	}
++}
++
+ static inline int get_ric(unsigned int instr)
+ {
+ 	return (instr >> 18) & 0x3;
+@@ -1331,44 +1488,82 @@ static inline long get_epn(unsigned long r_val)
+ 	return r_val >> 12;
  }
  
- long int kvmhv_nested_page_fault(struct kvm_run *run, struct kvm_vcpu *vcpu)
-diff --git a/arch/powerpc/kvm/book3s_hv_rm_mmu.c b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-index c8a379a6f533..3c01957acb0e 100644
---- a/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-+++ b/arch/powerpc/kvm/book3s_hv_rm_mmu.c
-@@ -1195,6 +1195,7 @@ unsigned long kvmppc_hv_get_hash_value(struct kvm_hpt_info *hpt, gva_t eaddr,
++/* SLB[lp] encodings for base page shifts */
++static int slb_base_page_shift[4] = {
++	24,     /* 16M */
++	16,     /* 64k */
++	34,     /* 16G */
++	20,     /* 1M, unsupported */
++};
++
+ static int kvmhv_emulate_tlbie_tlb_addr(struct kvm_vcpu *vcpu, int lpid,
+-					int ap, long epn)
++					bool radix, unsigned long rbval)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_nested_guest *gp;
+-	long npages;
+-	int shift, shadow_shift;
+-	unsigned long addr;
+ 	int rc = 0;
  
- 	return hash;
- }
-+EXPORT_SYMBOL_GPL(kvmppc_hv_get_hash_value);
+-	shift = ap_to_shift(ap);
+-	addr = epn << 12;
+-	if (shift < 0)
+-		/* Invalid ap encoding */
+-		return -EINVAL;
+-
+-	addr &= ~((1UL << shift) - 1);
+-	npages = 1UL << (shift - PAGE_SHIFT);
+-
+ 	gp = kvmhv_get_nested(kvm, lpid, false);
+ 	if (!gp) /* No such guest -> nothing to do */
+ 		return 0;
+ 	mutex_lock(&gp->tlb_lock);
  
- /* When called from virtmode, this func should be protected by
-  * preempt_disable(), otherwise, the holding of HPTE_V_HVLOCK
-@@ -1291,8 +1292,11 @@ long kvmppc_hpte_hv_fault(struct kvm_vcpu *vcpu, unsigned long addr,
+-	/* XXX TODO hpt */
+-	if (!gp->radix) {
+-		rc = -EINVAL;
+-		goto out_unlock;
+-	}
++	if (radix) {	/* Radix Invalidation */
++		int shift, shadow_shift;
++		unsigned long addr;
++		long npages;
  
- 	hpt = &kvm->arch.hpt;
- 	nested = vcpu->arch.nested;
--	if (nested)
-+	if (nested) {
- 		hpt = &nested->shadow_hpt;
-+		/* reuse fault_gpa field to save slb for nested pgfault funcn */
-+		vcpu->arch.fault_gpa = slb_v;
+-	/* There may be more than one host page backing this single guest pte */
+-	do {
+-		kvmhv_invalidate_shadow_pte_radix(vcpu, gp, addr,
+-						  &shadow_shift);
++		/* Radix invalidation but this is a hpt guest, nothing to do */
++		if (!gp->radix)
++			goto out_unlock;
++
++		shift = ap_to_shift(get_ap(rbval));
++		addr = get_epn(rbval) << 12;
++		if (shift < 0) {	/* Invalid ap encoding */
++			rc = -EINVAL;
++			goto out_unlock;
++		}
++
++		addr &= ~((1UL << shift) - 1);
++		npages = 1UL << (shift - PAGE_SHIFT);
++		/* There may be more than one host page backing this single guest pte */
++		do {
++			kvmhv_invalidate_shadow_pte_radix(vcpu, gp, addr,
++							  &shadow_shift);
++
++			npages -= 1UL << (shadow_shift - PAGE_SHIFT);
++			addr += 1UL << shadow_shift;
++		} while (npages > 0);
++	} else {	/* Hash Invalidation */
++		int base_pshift = 12, actual_pshift = 12;
++		unsigned long ava, b = (rbval & TLBIE_RB_B) << TLBIE_RB_B_SHIFT;
++
++		/* HPT invalidation but this is a radix guest, nothing to do */
++		if (gp->radix)
++			goto out_unlock;
++
++		/* Decode the rbval into ava, b, and base and actual pshifts */
++		if (rbval & TLBIE_RB_L) {	/* large base page size */
++			unsigned long lp = rbval & TLBIE_RB_LP;
++			ava = (rbval & TLBIE_RB_AVA_L) |
++			      ((rbval & TLBIE_RB_AVAL) << TLBIE_RB_AVAL_SHIFT);
++
++			/* base and actual page size encoded in lp field */
++			base_pshift = kvmppc_hpte_base_page_shift(HPTE_V_LARGE,
++								  lp);
++			actual_pshift = kvmppc_hpte_actual_page_shift(HPTE_V_LARGE,
++								      lp);
++		} else {			/* !large base page size */
++			int ap = get_ap(rbval);
++			ava = rbval & TLBIE_RB_AVA_4K;
++
++			/* actual page size encoded in ap field */
++			if (ap & 0x4)
++				actual_pshift = slb_base_page_shift[ap & 0x3];
++		}
+ 
+-		npages -= 1UL << (shadow_shift - PAGE_SHIFT);
+-		addr += 1UL << shadow_shift;
+-	} while (npages > 0);
++		kvmhv_tlbie_hpt_addr(gp, ava, base_pshift, actual_pshift, b);
 +	}
  
- 	/* For protection fault, expect to find a valid HPTE */
- 	valid = HPTE_V_VALID;
+ out_unlock:
+ 	mutex_unlock(&gp->tlb_lock);
+@@ -1381,16 +1576,11 @@ static void kvmhv_emulate_tlbie_lpid(struct kvm_vcpu *vcpu,
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 
+-	/* XXX TODO hpt */
+ 	mutex_lock(&gp->tlb_lock);
+ 	switch (ric) {
+ 	case 0:
+ 		/* Invalidate TLB */
+-		spin_lock(&kvm->mmu_lock);
+-		kvmppc_free_pgtable_radix(kvm, gp->shadow_pgtable,
+-					  gp->shadow_lpid);
+-		spin_unlock(&kvm->mmu_lock);
+-		kvmhv_flush_lpid(gp->shadow_lpid, gp->radix);
++		kvmhv_flush_nested(kvm, gp, false);
+ 		break;
+ 	case 1:
+ 		/*
+@@ -1400,7 +1590,7 @@ static void kvmhv_emulate_tlbie_lpid(struct kvm_vcpu *vcpu,
+ 		break;
+ 	case 2:
+ 		/* Invalidate TLB, PWC and caching of partition table entries */
+-		kvmhv_flush_nested(gp);
++		kvmhv_flush_nested(kvm, gp, true);
+ 		break;
+ 	default:
+ 		break;
+@@ -1431,9 +1621,8 @@ static int kvmhv_emulate_priv_tlbie(struct kvm_vcpu *vcpu, unsigned int instr,
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_nested_guest *gp;
+-	int r, ric, prs, is, ap;
++	int r, ric, prs, is;
+ 	int lpid;
+-	long epn;
+ 	int ret = 0;
+ 
+ 	ric = get_ric(instr);
+@@ -1444,14 +1633,28 @@ static int kvmhv_emulate_priv_tlbie(struct kvm_vcpu *vcpu, unsigned int instr,
+ 
+ 	/*
+ 	 * These cases are invalid and are not handled:
+-	 * r   != 1 -> Only radix supported
++	 *
++	 * Radix:
+ 	 * prs == 1 -> Not HV privileged
+ 	 * ric == 3 -> No cluster bombs for radix
+ 	 * is  == 1 -> Partition scoped translations not associated with pid
+ 	 * (!is) && (ric == 1 || ric == 2) -> Not supported by ISA
++	 *
++	 * HPT:
++	 * prs == 1 && ric != 2	-> Only process scoped caching is process table
++	 * ric == 1		-> No page walk cache for HPT
++	 * (!is) && ric == 2	-> Not supported by ISA
++	 * ric == 3		-> Although cluster bombs are technically
++	 * 			   supported for is == 0, their encoding is
++	 * 			   implementation specific and linux doesn't
++	 * 			   use them, so we don't handle them for now.
++	 * is == 1		-> HPT translations not associated with pid
+ 	 */
+-	if ((!r) || (prs) || (ric == 3) || (is == 1) ||
+-	    ((!is) && (ric == 1 || ric == 2)))
++	if (r && ((prs) || (ric == 3) || (is == 1) ||
++			   ((!is) && (ric == 1 || ric == 2))))
++		return -EINVAL;
++	else if (!r && ((prs && (ric != 2)) || (ric == 1) ||
++			(!is && (ric == 2)) || (is == 1) || (ric == 3)))
+ 		return -EINVAL;
+ 
+ 	switch (is) {
+@@ -1460,9 +1663,7 @@ static int kvmhv_emulate_priv_tlbie(struct kvm_vcpu *vcpu, unsigned int instr,
+ 		 * We know ric == 0
+ 		 * Invalidate TLB for a given target address
+ 		 */
+-		epn = get_epn(rbval);
+-		ap = get_ap(rbval);
+-		ret = kvmhv_emulate_tlbie_tlb_addr(vcpu, lpid, ap, epn);
++		ret = kvmhv_emulate_tlbie_tlb_addr(vcpu, lpid, r, rbval);
+ 		break;
+ 	case 2:
+ 		/* Invalidate matching LPID */
 -- 
 2.13.6
 
