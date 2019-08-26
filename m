@@ -2,144 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ADDED9CDD8
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 13:15:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 391CC9CE0F
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 13:23:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730571AbfHZLP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Aug 2019 07:15:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46010 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726787AbfHZLP2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Aug 2019 07:15:28 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7QBANTJ106657
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 07:15:27 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2umbsx5x7n-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 07:15:27 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 26 Aug 2019 12:15:25 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 26 Aug 2019 12:15:23 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7QBFMgg49217738
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 26 Aug 2019 11:15:22 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 09B7642049;
-        Mon, 26 Aug 2019 11:15:22 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB91942041;
-        Mon, 26 Aug 2019 11:15:21 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.96.21])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 26 Aug 2019 11:15:21 +0000 (GMT)
-Subject: Re: [PATCH] MAINTAINERS: change list for KVM/s390
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com
-References: <1565335156-28660-1-git-send-email-pbonzini@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Mon, 26 Aug 2019 13:15:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731046AbfHZLW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 07:22:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39682 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726760AbfHZLW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 07:22:57 -0400
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7C6C258
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 11:22:56 +0000 (UTC)
+Received: by mail-pf1-f200.google.com with SMTP id t14so11977773pfq.15
+        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 04:22:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=Q7zhErdr3zhXTAX3q0cF2SWaKy8PRaJ11xDeRV5rY7A=;
+        b=TwSfoal2Gu+WQotwur1NeG2GNOGQ5WiJ9q9IHxOAtLnEX9AyPB4pCX7w5Xz65rdTTo
+         XRTIE78zk7kTGBYMkWEusAgP+ZSmghbLqddEfaoLRsjWhJ5t78rrDso9+LHiuFYmiinl
+         kjSi/nbvvKBzpMrO7Y5ow3y5XuAaIwnwp3dIgG3SYulxNOpmBHmNYe8cprv1nUdo+yTu
+         +D1kJGrE6cQex+KFmq+82YIjGgilqloag7FgFkeAZwNN6D9DuyW3RgZaVkjPRZKh1jC/
+         OfGiBziN6zxLJsSehhCIc2HXF4dvOg/2gvW0agReAc0KH5B3vDUPABz7sl8oGNkF2Hr+
+         A74A==
+X-Gm-Message-State: APjAAAV4PtVl/tE6+NjJUR2nZAU428JPaXsVOMY3ZtI+UOb1TifHpihQ
+        xMXstw2ghbcco4y4HzI1YjCtrrBvKrLbkh9z7NtlaMRz5g2c5mmUOAwnirP+1W1CuZoTGmSRj70
+        SeYkifeawDQ/D
+X-Received: by 2002:a63:3805:: with SMTP id f5mr15815883pga.272.1566818575950;
+        Mon, 26 Aug 2019 04:22:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwMX+p5IaRGSs2L/aHxh7gwyKZJayxi7Y7zFuvX0f/Yk5rH0vZZArHzlXVYl8NrsWhnHBvJtQ==
+X-Received: by 2002:a63:3805:: with SMTP id f5mr15815858pga.272.1566818575581;
+        Mon, 26 Aug 2019 04:22:55 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id x12sm3132579pjt.32.2019.08.26.04.22.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Aug 2019 04:22:54 -0700 (PDT)
+Date:   Mon, 26 Aug 2019 19:22:44 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] KVM: selftests: Detect max PA width from cpuid
+Message-ID: <20190826112244.GE1785@xz-x1>
+References: <20190826075728.21646-1-peterx@redhat.com>
+ <20190826110958.lyueasf5laypkq2r@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1565335156-28660-1-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19082611-0008-0000-0000-0000030D7195
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082611-0009-0000-0000-00004A2BA986
-Message-Id: <44d2d6da-e356-6f11-f1cc-125db8b0c94c@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-26_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908260124
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190826110958.lyueasf5laypkq2r@kamzik.brq.redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 09.08.19 09:19, Paolo Bonzini wrote:
-> KVM/s390 does not have a list of its own, and linux-s390 is in the
-> loop anyway thanks to the generic arch/s390 match.  So use the generic
-> KVM list for s390 patches.
+On Mon, Aug 26, 2019 at 01:09:58PM +0200, Andrew Jones wrote:
+> On Mon, Aug 26, 2019 at 03:57:28PM +0800, Peter Xu wrote:
+> > The dirty_log_test is failing on some old machines like Xeon E3-1220
+> > with tripple faults when writting to the tracked memory region:
+> > 
+> >   Test iterations: 32, interval: 10 (ms)
+> >   Testing guest mode: PA-bits:52, VA-bits:48, 4K pages
+> >   guest physical test memory offset: 0x7fbffef000
+> >   ==== Test Assertion Failure ====
+> >   dirty_log_test.c:138: false
+> >   pid=6137 tid=6139 - Success
+> >      1  0x0000000000401ca1: vcpu_worker at dirty_log_test.c:138
+> >      2  0x00007f3dd9e392dd: ?? ??:0
+> >      3  0x00007f3dd9b6a132: ?? ??:0
+> >   Invalid guest sync status: exit_reason=SHUTDOWN
+> > 
+> > It's because previously we moved the testing memory region from a
+> > static place (1G) to the top of the system's physical address space,
+> > meanwhile we stick to 39 bits PA for all the x86_64 machines.  That's
+> > not true for machines like Xeon E3-1220 where it only supports 36.
+> > 
+> > Let's unbreak this test by dynamically detect PA width from CPUID
+> > 0x80000008.  Meanwhile, even allow kvm_get_supported_cpuid_index() to
+> > fail.  I don't know whether that could be useful because I think
+> > 0x80000008 should be there for all x86_64 hosts, but I also think it's
+> > not really helpful to assert in the kvm_get_supported_cpuid_index().
+> > 
+> > Fixes: b442324b581556e
+> > CC: Paolo Bonzini <pbonzini@redhat.com>
+> > CC: Andrew Jones <drjones@redhat.com>
+> > CC: Radim Krčmář <rkrcmar@redhat.com>
+> > CC: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  tools/testing/selftests/kvm/dirty_log_test.c  | 22 +++++++++++++------
+> >  .../selftests/kvm/lib/x86_64/processor.c      |  3 ---
+> >  2 files changed, 15 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> > index ceb52b952637..111592f3a1d7 100644
+> > --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> > @@ -274,18 +274,26 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+> >  	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+> >  
+> >  #ifdef __x86_64__
+> > -	/*
+> > -	 * FIXME
+> > -	 * The x86_64 kvm selftests framework currently only supports a
+> > -	 * single PML4 which restricts the number of physical address
+> > -	 * bits we can change to 39.
+> > -	 */
+> > -	guest_pa_bits = 39;
+> > +	{
+> > +		struct kvm_cpuid_entry2 *entry;
+> > +
+> > +		entry = kvm_get_supported_cpuid_entry(0x80000008);
+> > +		/*
+> > +		 * Supported PA width can be smaller than 52 even if
+> > +		 * we're with VM_MODE_P52V48_4K mode.  Fetch it from
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> It seems like x86_64 should create modes that actually work, rather than
+> always using one named 'P52', but then needing to probe for the actual
+> number of supported physical bits. Indeed testing all x86_64 supported
+> modes, like aarch64 does, would even make more sense in this test.
 
-I see its already in next, but consider this acked.
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 1aec93695040..6498ebaca2f6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -8788,7 +8788,7 @@ M:	Christian Borntraeger <borntraeger@de.ibm.com>
->  M:	Janosch Frank <frankja@linux.ibm.com>
->  R:	David Hildenbrand <david@redhat.com>
->  R:	Cornelia Huck <cohuck@redhat.com>
-> -L:	linux-s390@vger.kernel.org
-> +L:	kvm@vger.kernel.org
->  W:	http://www.ibm.com/developerworks/linux/linux390/
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git
->  S:	Supported
-> 
+Should be true.  I'll think it over again...
 
+> 
+> 
+> > +		 * the host to update the default value (SDM 4.1.4).
+> > +		 */
+> > +		if (entry)
+> > +			guest_pa_bits = entry->eax & 0xff;
+> 
+> Are we sure > 39 bits will work with this test framework? I can't
+> recall what led me to the FIXME above, other than things not working.
+> It seems I was convinced we couldn't have more bits due to how pml4's
+> were allocated, but maybe I misinterpreted it.
+
+As mentioned in the IRC - I think I've got a "success case" of
+that... :)  Please see below:
+
+virtlab423:~ $ lscpu
+Architecture:        x86_64
+CPU op-mode(s):      32-bit, 64-bit
+Byte Order:          Little Endian
+CPU(s):              16
+On-line CPU(s) list: 0-15
+Thread(s) per core:  1
+Core(s) per socket:  8
+Socket(s):           2
+NUMA node(s):        2
+Vendor ID:           GenuineIntel
+CPU family:          6
+Model:               63
+Model name:          Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz
+Stepping:            2
+CPU MHz:             2597.168
+BogoMIPS:            5194.31
+Virtualization:      VT-x
+L1d cache:           32K
+L1i cache:           32K
+L2 cache:            256K
+L3 cache:            20480K
+NUMA node0 CPU(s):   0,2,4,6,8,10,12,14
+NUMA node1 CPU(s):   1,3,5,7,9,11,13,15
+Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm abm cpuid_fault epb invpcid_single pti tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm xsaveopt cqm_llc cqm_occup_llc dtherm arat pln pts
+virtlab423:~ $ ./dirty_log_test 
+Test iterations: 32, interval: 10 (ms)
+Testing guest mode: PA-bits:52, VA-bits:48, 4K pages
+Supported guest physical address width: 46
+guest physical test memory offset: 0x3fffbffef000
+Dirtied 216064 pages
+Total bits checked: dirty (204841), clear (7922119), track_next (60730)
+
+So on above E5-2640 I got PA width==46 and it worked well.  Does this
+mean that 39bits is not really a PA restriction anywhere?  Actually
+that also matches with the other fact that if we look into
+virt_pg_map() it's indeed allocating PML4 entries rather than having
+only one.
+
+Thanks,
+
+-- 
+Peter Xu
