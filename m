@@ -2,172 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63A8E9CC94
-	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 11:28:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DB5D9CD36
+	for <lists+kvm@lfdr.de>; Mon, 26 Aug 2019 12:17:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730888AbfHZJ2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Aug 2019 05:28:44 -0400
-Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:35754 "EHLO
-        6.mo69.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730846AbfHZJ2n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Aug 2019 05:28:43 -0400
-X-Greylist: delayed 603 seconds by postgrey-1.27 at vger.kernel.org; Mon, 26 Aug 2019 05:28:41 EDT
-Received: from player692.ha.ovh.net (unknown [10.108.35.12])
-        by mo69.mail-out.ovh.net (Postfix) with ESMTP id C2B6B619CF
-        for <kvm@vger.kernel.org>; Mon, 26 Aug 2019 11:08:45 +0200 (CEST)
-Received: from kaod.org (lfbn-ren-1-123-36.w83-205.abo.wanadoo.fr [83.205.208.36])
-        (Authenticated sender: clg@kaod.org)
-        by player692.ha.ovh.net (Postfix) with ESMTPSA id 8581F8FD28C2;
-        Mon, 26 Aug 2019 09:08:39 +0000 (UTC)
-Subject: Re: [PATCH] KVM: PPC: Book3S: Enable XIVE native capability only if
- OPAL has required functions
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org,
-        linuxppc-dev@ozlabs.org
-Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-References: <20190826081455.GA7402@blackberry>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <4d31ae7f-9653-9552-ab4f-0c71afee61b7@kaod.org>
-Date:   Mon, 26 Aug 2019 11:08:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1730853AbfHZKRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Aug 2019 06:17:32 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:41536 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730379AbfHZKRb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Aug 2019 06:17:31 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7QAEdQQ140930;
+        Mon, 26 Aug 2019 10:17:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=5TqsifU5bVW0lTygAbeTjhINiSyDVg+Ft396Wv4qiY4=;
+ b=Mv2J7SCFNVUk7pQ1bGZzzejbGMErFD7vUdRB47uthleYnXiTcK0dVoNxBimwbOWQl7X8
+ xnYbEtb5Bs7ibBDU3GLjiqW0i5NT3k/iXSaUoVWbqQzXBskxcbVbi7vXQ0GgzN6RiXjl
+ KLWBsh0nQpOh7nULq9Q+H7k9vHz/EsqRZs9e6NU16VfVN/yam6l00v/wqACGco3vy+dR
+ hsSR8p01auv2FMal64MI9VbixNSj5q5vlzpP9+L70SZumU0DJTTfGdKVC1AHw9eUJivm
+ GVGQTefLQywpbsE2YdH8AI0nSi1fkAd/zwyHDrAchmJNBf+kjwrOVvNevTAh7wsbxrsa 7w== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2ujw7182er-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 26 Aug 2019 10:17:08 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7QADnBf079920;
+        Mon, 26 Aug 2019 10:17:08 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2ujw6hmb0k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 26 Aug 2019 10:17:07 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7QAH6kj028121;
+        Mon, 26 Aug 2019 10:17:06 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 26 Aug 2019 03:17:06 -0700
+From:   Liran Alon <liran.alon@oracle.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Liran Alon <liran.alon@oracle.com>,
+        Mihai Carabas <mihai.carabas@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH] KVM: x86: Return to userspace with internal error on unexpected exit reason
+Date:   Mon, 26 Aug 2019 13:16:43 +0300
+Message-Id: <20190826101643.133750-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190826081455.GA7402@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 11645464212932168678
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrudehgedguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9360 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908260113
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9360 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908260114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/08/2019 10:14, Paul Mackerras wrote:
-> There are some POWER9 machines where the OPAL firmware does not support
-> the OPAL_XIVE_GET_QUEUE_STATE and OPAL_XIVE_SET_QUEUE_STATE calls.
-> The impact of this is that a guest using XIVE natively will not be able
-> to be migrated successfully.  On the source side, the get_attr operation
-> on the KVM native device for the KVM_DEV_XIVE_GRP_EQ_CONFIG attribute
-> will fail; on the destination side, the set_attr operation for the same
-> attribute will fail.
-> 
-> This adds tests for the existence of the OPAL get/set queue state
-> functions, and if they are not supported, the XIVE-native KVM device
-> is not created and the KVM_CAP_PPC_IRQ_XIVE capability returns false.
-> Userspace can then either provide a software emulation of XIVE, or
-> else tell the guest that it does not have a XIVE controller available
-> to it.
-> 
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+Receiving an unexpected exit reason from hardware should be considered
+as a severe bug in KVM. Therefore, instead of just injecting #UD to
+guest and ignore it, exit to userspace on internal error so that
+it could handle it properly (probably by terminating guest).
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+In addition, prefer to use vcpu_unimpl() instead of WARN_ONCE()
+as handling unexpected exit reason should be a rare unexpected
+event (that was expected to never happen) and we prefer to print
+a message on it every time it occurs to guest.
 
-Thanks,
+Furthermore, dump VMCS/VMCB to dmesg to assist diagnosing such cases.
 
-C.
+Reviewed-by: Mihai Carabas <mihai.carabas@oracle.com>
+Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ arch/x86/kvm/svm.c       | 11 ++++++++---
+ arch/x86/kvm/vmx/vmx.c   |  9 +++++++--
+ include/uapi/linux/kvm.h |  2 ++
+ 3 files changed, 17 insertions(+), 5 deletions(-)
 
-
-> ---
->  arch/powerpc/include/asm/kvm_ppc.h    | 1 +
->  arch/powerpc/include/asm/xive.h       | 1 +
->  arch/powerpc/kvm/book3s.c             | 8 +++++---
->  arch/powerpc/kvm/book3s_xive_native.c | 5 +++++
->  arch/powerpc/kvm/powerpc.c            | 3 ++-
->  arch/powerpc/sysdev/xive/native.c     | 7 +++++++
->  6 files changed, 21 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-> index 2484e6a..8e8514e 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -598,6 +598,7 @@ extern int kvmppc_xive_native_get_vp(struct kvm_vcpu *vcpu,
->  				     union kvmppc_one_reg *val);
->  extern int kvmppc_xive_native_set_vp(struct kvm_vcpu *vcpu,
->  				     union kvmppc_one_reg *val);
-> +extern bool kvmppc_xive_native_supported(void);
->  
->  #else
->  static inline int kvmppc_xive_set_xive(struct kvm *kvm, u32 irq, u32 server,
-> diff --git a/arch/powerpc/include/asm/xive.h b/arch/powerpc/include/asm/xive.h
-> index efb0e59..818989e 100644
-> --- a/arch/powerpc/include/asm/xive.h
-> +++ b/arch/powerpc/include/asm/xive.h
-> @@ -135,6 +135,7 @@ extern int xive_native_get_queue_state(u32 vp_id, uint32_t prio, u32 *qtoggle,
->  extern int xive_native_set_queue_state(u32 vp_id, uint32_t prio, u32 qtoggle,
->  				       u32 qindex);
->  extern int xive_native_get_vp_state(u32 vp_id, u64 *out_state);
-> +extern bool xive_native_has_queue_state_support(void);
->  
->  #else
->  
-> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> index 9524d92..d7fcdfa 100644
-> --- a/arch/powerpc/kvm/book3s.c
-> +++ b/arch/powerpc/kvm/book3s.c
-> @@ -1083,9 +1083,11 @@ static int kvmppc_book3s_init(void)
->  	if (xics_on_xive()) {
->  		kvmppc_xive_init_module();
->  		kvm_register_device_ops(&kvm_xive_ops, KVM_DEV_TYPE_XICS);
-> -		kvmppc_xive_native_init_module();
-> -		kvm_register_device_ops(&kvm_xive_native_ops,
-> -					KVM_DEV_TYPE_XIVE);
-> +		if (kvmppc_xive_native_supported()) {
-> +			kvmppc_xive_native_init_module();
-> +			kvm_register_device_ops(&kvm_xive_native_ops,
-> +						KVM_DEV_TYPE_XIVE);
-> +		}
->  	} else
->  #endif
->  		kvm_register_device_ops(&kvm_xics_ops, KVM_DEV_TYPE_XICS);
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index f0cab43..248c1ea 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -1179,6 +1179,11 @@ int kvmppc_xive_native_set_vp(struct kvm_vcpu *vcpu, union kvmppc_one_reg *val)
->  	return 0;
->  }
->  
-> +bool kvmppc_xive_native_supported(void)
-> +{
-> +	return xive_native_has_queue_state_support();
-> +}
-> +
->  static int xive_native_debug_show(struct seq_file *m, void *private)
->  {
->  	struct kvmppc_xive *xive = m->private;
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 0dba7eb..7012dd7 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -566,7 +566,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		 * a POWER9 processor) and the PowerNV platform, as
->  		 * nested is not yet supported.
->  		 */
-> -		r = xive_enabled() && !!cpu_has_feature(CPU_FTR_HVMODE);
-> +		r = xive_enabled() && !!cpu_has_feature(CPU_FTR_HVMODE) &&
-> +			kvmppc_xive_native_supported();
->  		break;
->  #endif
->  
-> diff --git a/arch/powerpc/sysdev/xive/native.c b/arch/powerpc/sysdev/xive/native.c
-> index 2f26b74..37987c8 100644
-> --- a/arch/powerpc/sysdev/xive/native.c
-> +++ b/arch/powerpc/sysdev/xive/native.c
-> @@ -800,6 +800,13 @@ int xive_native_set_queue_state(u32 vp_id, u32 prio, u32 qtoggle, u32 qindex)
->  }
->  EXPORT_SYMBOL_GPL(xive_native_set_queue_state);
->  
-> +bool xive_native_has_queue_state_support(void)
-> +{
-> +	return opal_check_token(OPAL_XIVE_GET_QUEUE_STATE) &&
-> +		opal_check_token(OPAL_XIVE_SET_QUEUE_STATE);
-> +}
-> +EXPORT_SYMBOL_GPL(xive_native_has_queue_state_support);
-> +
->  int xive_native_get_vp_state(u32 vp_id, u64 *out_state)
->  {
->  	__be64 state;
-> 
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index d685491fce4d..6462c386015d 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -5026,9 +5026,14 @@ static int handle_exit(struct kvm_vcpu *vcpu)
+ 
+ 	if (exit_code >= ARRAY_SIZE(svm_exit_handlers)
+ 	    || !svm_exit_handlers[exit_code]) {
+-		WARN_ONCE(1, "svm: unexpected exit reason 0x%x\n", exit_code);
+-		kvm_queue_exception(vcpu, UD_VECTOR);
+-		return 1;
++		vcpu_unimpl(vcpu, "svm: unexpected exit reason 0x%x\n", exit_code);
++		dump_vmcb(vcpu);
++		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++		vcpu->run->internal.suberror =
++			KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
++		vcpu->run->internal.ndata = 1;
++		vcpu->run->internal.data[0] = exit_code;
++		return 0;
+ 	}
+ 
+ 	return svm_exit_handlers[exit_code](svm);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 42ed3faa6af8..b5b5b2e5dac5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5887,8 +5887,13 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
+ 	else {
+ 		vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
+ 				exit_reason);
+-		kvm_queue_exception(vcpu, UD_VECTOR);
+-		return 1;
++		dump_vmcs();
++		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++		vcpu->run->internal.suberror =
++			KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
++		vcpu->run->internal.ndata = 1;
++		vcpu->run->internal.data[0] = exit_reason;
++		return 0;
+ 	}
+ }
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e3f12d5359e..42070aa5f4e6 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -243,6 +243,8 @@ struct kvm_hyperv_exit {
+ #define KVM_INTERNAL_ERROR_SIMUL_EX	2
+ /* Encounter unexpected vm-exit due to delivery event. */
+ #define KVM_INTERNAL_ERROR_DELIVERY_EV	3
++/* Encounter unexpected vm-exit reason */
++#define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
+ 
+ /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+ struct kvm_run {
+-- 
+2.20.1
 
