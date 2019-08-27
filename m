@@ -2,99 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 405539E23F
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 10:21:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BC8E9E2C6
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 10:35:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729355AbfH0IVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 04:21:12 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:20647 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728447AbfH0IVM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 04:21:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1566894071; x=1598430071;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=Pp8hA+F32QXnV3/VDGwJ40qoSaR8Yax8k9gBgAQuFNU=;
-  b=QXGLrCYMKlkULkHubv42BbGMttHJd8bO8uSrbpWyK/0wu/QM7hmU0XYh
-   pOjIb8rSQUyz53IKSiGl6Jm+OHeKmS2IiE1xDogN34XecK85F9i3P+sLf
-   qbr+PtzNvYO3OIWeaOsR7diPImm+Cefvq8lB7zyAjBErQdlevLzqlDa4e
-   c=;
-X-IronPort-AV: E=Sophos;i="5.64,436,1559520000"; 
-   d="scan'208";a="417880360"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-17c49630.us-east-1.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 27 Aug 2019 08:21:05 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-17c49630.us-east-1.amazon.com (Postfix) with ESMTPS id 14CE9A2450;
-        Tue, 27 Aug 2019 08:21:03 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 27 Aug 2019 08:21:02 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.243) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 27 Aug 2019 08:21:00 +0000
-Subject: Re: [PATCH v2 04/15] kvm: x86: Add per-VM APICv state debugfs
-To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-References: <1565886293-115836-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1565886293-115836-5-git-send-email-suravee.suthikulpanit@amd.com>
- <a48080a5-7ece-280d-2c1f-9d3f4c273a8d@amazon.com>
- <049c0f98-bd89-ee3c-7869-92972f2d7c31@amd.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <f9c62280-efb4-197d-1444-fce8f3d15132@amazon.com>
-Date:   Tue, 27 Aug 2019 10:20:57 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.8.0
+        id S1729128AbfH0IfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 04:35:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33420 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727788AbfH0IfK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 04:35:10 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7A1B610C0315;
+        Tue, 27 Aug 2019 08:35:09 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 00F935D6B7;
+        Tue, 27 Aug 2019 08:34:59 +0000 (UTC)
+Date:   Tue, 27 Aug 2019 10:34:57 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvdimm@lists.01.org, virtio-fs@redhat.com, miklos@szeredi.hu,
+        stefanha@redhat.com, dgilbert@redhat.com,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        kvm@vger.kernel.org, kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH 04/19] virtio: Implement get_shm_region for PCI
+ transport
+Message-ID: <20190827103457.35927d9d.cohuck@redhat.com>
+In-Reply-To: <20190821175720.25901-5-vgoyal@redhat.com>
+References: <20190821175720.25901-1-vgoyal@redhat.com>
+        <20190821175720.25901-5-vgoyal@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <049c0f98-bd89-ee3c-7869-92972f2d7c31@amd.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.243]
-X-ClientProxiedBy: EX13D31UWC004.ant.amazon.com (10.43.162.27) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.65]); Tue, 27 Aug 2019 08:35:09 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyNi4wOC4xOSAyMTo0MSwgU3V0aGlrdWxwYW5pdCwgU3VyYXZlZSB3cm90ZToKPiBBbGV4
-LAo+IAo+IE9uIDgvMTkvMjAxOSA0OjU3IEFNLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToKPj4KPj4K
-Pj4gT24gMTUuMDguMTkgMTg6MjUsIFN1dGhpa3VscGFuaXQsIFN1cmF2ZWUgd3JvdGU6Cj4+PiBD
-dXJyZW50bHksIHRoZXJlIGlzIG5vIHdheSB0byB0ZWxsIHdoZXRoZXIgQVBJQ3YgaXMgYWN0aXZl
-Cj4+PiBvbiBhIHBhcnRpY3VsYXIgVk0uIFRoaXMgb2Z0ZW4gY2F1c2UgY29uZnVzaW9uIHNpbmNl
-IEFQSUN2Cj4+PiBjYW4gYmUgZGVhY3RpdmF0ZWQgYXQgcnVudGltZS4KPj4+Cj4+PiBJbnRyb2R1
-Y2UgYSBkZWJ1Z2ZzIGVudHJ5IHRvIHJlcG9ydCBBUElDdiBzdGF0ZSBvZiBhIFZNLgo+Pj4gVGhp
-cyBjcmVhdGVzIGEgcmVhZC1vbmx5IGZpbGU6Cj4+Pgo+Pj4gIMKgwqDCoCAvc3lzL2tlcm5lbC9k
-ZWJ1Zy9rdm0vNzA4NjAtMTQvYXBpY3Ytc3RhdGUKPj4+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBTdXJh
-dmVlIFN1dGhpa3VscGFuaXQgPHN1cmF2ZWUuc3V0aGlrdWxwYW5pdEBhbWQuY29tPgo+Pgo+PiBT
-aG91bGRuJ3QgdGhpcyBmaXJzdCBhbmQgZm9yZW1vc3QgYmUgYSBWTSBpb2N0bCBzbyB0aGF0IHVz
-ZXIgc3BhY2UgY2FuIGlucXVpcmUgaXRzIG93biBzdGF0ZT8KPj4KPj4KPj4gQWxleAo+IAo+IEkg
-aW50cm9kdWNlIHRoaXMgbWFpbmx5IGZvciBkZWJ1Z2dpbmcgc2ltaWxhciB0byBob3cgS1ZNIGlz
-IGN1cnJlbnRseSBwcm92aWRlcwo+IHNvbWUgcGVyLVZDUFUgaW5mb3JtYXRpb246Cj4gCj4gICAg
-ICAgL3N5cy9rZXJuZWwvZGVidWcva3ZtLzE1OTU3LTE0L3ZjcHUwLwo+ICAgICAgICAgICBsYXBp
-Y190aW1lcl9hZHZhbmNlX25zCj4gICAgICAgICAgIHRzYy1vZmZzZXQKPiAgICAgICAgICAgdHNj
-LXNjYWxpbmctcmF0aW8KPiAgICAgICAgICAgdHNjLXNjYWxpbmctcmF0aW8tZnJhYy1iaXRzCj4g
-Cj4gSSdtIG5vdCBzdXJlIGlmIHRoaXMgbmVlZHMgdG8gYmUgVk0gaW9jdGwgYXQgdGhpcyBwb2lu
-dC4gSWYgdGhpcyBpbmZvcm1hdGlvbiBpcwo+IHVzZWZ1bCBmb3IgdXNlci1zcGFjZSB0b29sIHRv
-IGlucXVpcmUgdmlhIGlvY3RsLCB3ZSBjYW4gYWxzbyBwcm92aWRlIGl0LgoKSSdtIG1vc3RseSB0
-aGlua2luZyBvZiBzb21ldGhpbmcgbGlrZSAiaW5mbyBhcGljIiBpbiBRRU1VIHdoaWNoIHRvIG1l
-IApzZWVtcyBsaWtlIHRoZSBuYXR1cmFsIHBsYWNlIGZvciBBUElDIGluZm9ybWF0aW9uIGV4cG9z
-dXJlIHRvIGEgdXNlci4gClRoZSBwcm9ibGVtIHdpdGggZGVidWdmcyBpcyB0aGF0IGl0J3Mgbm90
-IGFjY2Vzc2libGUgdG8gdGhlIHVzZXIgdGhhdCAKY3JlYXRlZCB0aGUgVk0sIGJ1dCBvbmx5IHJv
-b3QsIHJpZ2h0PwoKVGhhdCBzYWlkLCBJIGRvbid0IGZlZWwgdmVyeSBzdHJvbmdseSBoZXJlLgoK
-CkFsZXgKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0
-ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdl
-ciwgUmFsZiBIZXJicmljaApFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVy
-ZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkK
-Cgo=
+On Wed, 21 Aug 2019 13:57:05 -0400
+Vivek Goyal <vgoyal@redhat.com> wrote:
 
+> From: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> 
+> On PCI the shm regions are found using capability entries;
+> find a region by searching for the capability.
+> 
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: kbuild test robot <lkp@intel.com>
+
+An s-o-b by a test robot looks a bit odd.
+
+> ---
+>  drivers/virtio/virtio_pci_modern.c | 108 +++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_pci.h    |  11 ++-
+>  2 files changed, 118 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index 7abcc50838b8..1cdedd93f42a 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -443,6 +443,112 @@ static void del_vq(struct virtio_pci_vq_info *info)
+>  	vring_del_virtqueue(vq);
+>  }
+>  
+> +static int virtio_pci_find_shm_cap(struct pci_dev *dev,
+> +                                   u8 required_id,
+> +                                   u8 *bar, u64 *offset, u64 *len)
+> +{
+> +	int pos;
+> +
+> +        for (pos = pci_find_capability(dev, PCI_CAP_ID_VNDR);
+
+Indentation looks a bit off here.
+
+> +             pos > 0;
+> +             pos = pci_find_next_capability(dev, pos, PCI_CAP_ID_VNDR)) {
+> +		u8 type, cap_len, id;
+> +                u32 tmp32;
+
+Here as well.
+
+> +                u64 res_offset, res_length;
+> +
+> +		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
+> +                                                         cfg_type),
+> +                                     &type);
+> +                if (type != VIRTIO_PCI_CAP_SHARED_MEMORY_CFG)
+
+And here.
+
+> +                        continue;
+> +
+> +		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
+> +                                                         cap_len),
+> +                                     &cap_len);
+> +		if (cap_len != sizeof(struct virtio_pci_cap64)) {
+> +		        printk(KERN_ERR "%s: shm cap with bad size offset: %d size: %d\n",
+> +                               __func__, pos, cap_len);
+
+Probably better to use dev_warn() instead of printk.
+
+> +                        continue;
+> +                }
+
+Indentation looks off again (might be a space vs tabs issue; maybe
+check the whole patch for indentation problems?)
+
+> +
+> +		pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
+> +                                                         id),
+> +                                     &id);
+> +                if (id != required_id)
+> +                        continue;
+> +
+> +                /* Type, and ID match, looks good */
+> +                pci_read_config_byte(dev, pos + offsetof(struct virtio_pci_cap,
+> +                                                         bar),
+> +                                     bar);
+> +
+> +                /* Read the lower 32bit of length and offset */
+> +                pci_read_config_dword(dev, pos + offsetof(struct virtio_pci_cap, offset),
+> +                                      &tmp32);
+> +                res_offset = tmp32;
+> +                pci_read_config_dword(dev, pos + offsetof(struct virtio_pci_cap, length),
+> +                                      &tmp32);
+> +                res_length = tmp32;
+> +
+> +                /* and now the top half */
+> +                pci_read_config_dword(dev,
+> +                                      pos + offsetof(struct virtio_pci_cap64,
+> +                                                     offset_hi),
+> +                                      &tmp32);
+> +                res_offset |= ((u64)tmp32) << 32;
+> +                pci_read_config_dword(dev,
+> +                                      pos + offsetof(struct virtio_pci_cap64,
+> +                                                     length_hi),
+> +                                      &tmp32);
+> +                res_length |= ((u64)tmp32) << 32;
+> +
+> +                *offset = res_offset;
+> +                *len = res_length;
+> +
+> +                return pos;
+> +        }
+> +        return 0;
+> +}
+> +
+> +static bool vp_get_shm_region(struct virtio_device *vdev,
+> +			      struct virtio_shm_region *region, u8 id)
+> +{
+> +	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+
+This whole function looks like it is indented incorrectly.
+
+> +	struct pci_dev *pci_dev = vp_dev->pci_dev;
+> +	u8 bar;
+> +	u64 offset, len;
+> +	phys_addr_t phys_addr;
+> +	size_t bar_len;
+> +	char *bar_name;
+> +	int ret;
+> +
+> +	if (!virtio_pci_find_shm_cap(pci_dev, id, &bar, &offset, &len)) {
+> +		return false;
+> +	}
+
+You can drop the curly braces.
+
+> +
+> +	ret = pci_request_region(pci_dev, bar, "virtio-pci-shm");
+> +	if (ret < 0) {
+> +		dev_err(&pci_dev->dev, "%s: failed to request BAR\n",
+> +			__func__);
+> +		return false;
+> +	}
+> +
+> +	phys_addr = pci_resource_start(pci_dev, bar);
+> +	bar_len = pci_resource_len(pci_dev, bar);
+> +
+> +        if (offset + len > bar_len) {
+> +                dev_err(&pci_dev->dev,
+> +                        "%s: bar shorter than cap offset+len\n",
+> +                        __func__);
+> +                return false;
+> +        }
+> +
+> +	region->len = len;
+> +	region->addr = (u64) phys_addr + offset;
+> +
+> +	return true;
+> +}
+> +
+>  static const struct virtio_config_ops virtio_pci_config_nodev_ops = {
+>  	.get		= NULL,
+>  	.set		= NULL,
+
+Apart from the coding style nits, the logic of the patch looks sane to
+me.
+
+(...)
+
+As does the rest of the patch.
