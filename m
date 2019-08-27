@@ -2,204 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E419C9F2BC
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 20:54:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D81539F2F2
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 21:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730890AbfH0SyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 14:54:21 -0400
-Received: from mail-eopbgr50060.outbound.protection.outlook.com ([40.107.5.60]:64679
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726871AbfH0SyV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 14:54:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LD+P/843vnlcE7Nk5BIa2/xnLfFJPkWUq6IsGP0PvkuoKMaf/fLIQTY1X00orwxvMgC+Q+e3ss7C9y685k+ovoHub2cy23GOLyyZZJy0xAQPtyoEp8re6b+LZkpsfcMnNRYO2WqSzvIAxxp1umt5XneOJZ+PJn+jFwAcEZsuQP3+sBepOko8530wmDXNysMJNCem8vxsE/dYUjdSJ20ORZZuOfc1v7nS6xdS7+4l2yPxu5EffZuEDcM+ELIKER/6sL21l4ksu/LjecuY5EHclAqW1z+jNf+RALirUr0XkubZfyZ7YztiWsF6ODLSqLrUUPdVJ171oQ4KXyFt3jElOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uXcqgDOgotYwMgYoj93UjZFHnCinMA44xEdTZnLZeR0=;
- b=HnJFfnTjXEa4k0GUNxj8lOrXbxkai78RPhwdQhMf8DXDZxorwbvhf9cQT826+M3jt7aFJV2tMqxfut48xENtJDbfUbc0R2sxoH+udwgwp3TsFqcLjxgt3O9tPr3sSoDj3m57f+aHiGhzgactbqr3orRSNBiprfWrnSYwexpaeoZ7OUxsgsPzBKok82xbEhH/ajiI52lk6VLqiT7LQNcsMHZDZjpcuDFFQ72Cte/e9WEEWCIeNIe7TrNW8s77WpWdCEMVENUloPhYaqOoFqvuXy3bTiNXPvX/nMjg9g4lZOJCV8yQrky5Ug1hSuDDySCk6fioqjcc+bTmtR7pB9IkdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uXcqgDOgotYwMgYoj93UjZFHnCinMA44xEdTZnLZeR0=;
- b=iah81Adk8y1ShCltwG+yxk6WGmDU4hwuiC9umtPHM5IqqBeR46jQ2RPEkfqxMG7QBEQXawBfICdcJsg7J7pWx8K5aIGEBuXG/FyinE/Tb4TID4v6Rad2vs3fToMLkYbu8xZ6CbcS8yRIPugH1jaCDUuZrwHcx9CJM2zI23R7b0U=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB5922.eurprd05.prod.outlook.com (20.178.119.142) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2199.21; Tue, 27 Aug 2019 18:54:08 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea%6]) with mapi id 15.20.2199.020; Tue, 27 Aug 2019
- 18:54:07 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH 2/4] mdev: Make mdev alias unique among all mdevs
-Thread-Topic: [PATCH 2/4] mdev: Make mdev alias unique among all mdevs
-Thread-Index: AQHVXE627FcLaFBgXUa8jSc95m92WKcOy/4AgAAKv2CAAAYaAIAAQtGAgAAMQNCAAANOgIAAKbIQ
-Date:   Tue, 27 Aug 2019 18:54:07 +0000
-Message-ID: <AM0PR05MB48669AA6561A70AECEC8A1CFD1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
-        <20190826204119.54386-3-parav@mellanox.com>
-        <20190827122928.752e763b.cohuck@redhat.com>
-        <AM0PR05MB486621458EC71973378CD5A0D1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190827132946.0b92d259.cohuck@redhat.com>     <20190827092855.29702347@x1.home>
-        <AM0PR05MB486671BB1CD562D070F0C0F2D1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190827102435.7bd30ef3@x1.home>
-In-Reply-To: <20190827102435.7bd30ef3@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [106.51.18.188]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a429c88b-3c58-4481-5db9-08d72b1ff0c2
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600166)(711020)(4605104)(1401327)(4618075)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM0PR05MB5922;
-x-ms-traffictypediagnostic: AM0PR05MB5922:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB5922128E2030B55A6944CDCCD1A00@AM0PR05MB5922.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0142F22657
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(376002)(136003)(346002)(396003)(189003)(199004)(13464003)(3846002)(86362001)(256004)(14444005)(7736002)(14454004)(486006)(476003)(6916009)(66066001)(66946007)(64756008)(66476007)(66556008)(66446008)(53936002)(4326008)(6246003)(81166006)(81156014)(8676002)(8936002)(71190400001)(54906003)(99286004)(33656002)(26005)(2906002)(76116006)(186003)(5660300002)(305945005)(25786009)(446003)(9456002)(478600001)(55016002)(229853002)(6436002)(11346002)(9686003)(102836004)(316002)(76176011)(52536014)(71200400001)(7696005)(55236004)(53546011)(6506007)(74316002)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB5922;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: SmnCnVty3ze4OWNY0srslW8qb6+c0PFTBkTbm1lSRUaJsOpJzwrF5teTU4Jw3AzUftldUs2tLOwtQVAVr0lio29ouLFGatwZnDVh/+/EhvCsVyvsB7OBWnQn8Hi/m8JEXBq7sViO1xmwqlIPl4aYBBHGT7yevfNCH8p8mfs5A3p8RaTFs3Zn4lkPPihzPzL3kqyxhDD/mBDB+WhstV0YxdJo4w+Fhiwkf7YdRCRopAZCwMT4DMlhmP2cCryUgB6LMaAjpsOg8lXE/PoYJNiTGk5N3KjCpn9fZ4jqJmZXxGB+DbyZfVrYorCcVsPBXmGfyLU6lqEvj3KbwbbeeaeAoYABhr0Gd2w3an5la4pIkm3vpdr2l98cABynjZo2q9P4KeNvnMiaxCbAcHtm2DrfA//TrY+6NGlcf+2IlmT1tto=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1730467AbfH0TIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 15:08:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37192 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730262AbfH0TIO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 15:08:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 72FD418C8917;
+        Tue, 27 Aug 2019 19:08:14 +0000 (UTC)
+Received: from flask (unknown [10.43.2.55])
+        by smtp.corp.redhat.com (Postfix) with SMTP id A30AE600D1;
+        Tue, 27 Aug 2019 19:08:11 +0000 (UTC)
+Received: by flask (sSMTP sendmail emulation); Tue, 27 Aug 2019 21:08:10 +0200
+Date:   Tue, 27 Aug 2019 21:08:10 +0200
+From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: x86: Only print persistent reasons for kvm disabled
+ once
+Message-ID: <20190827190810.GA21275@flask>
+References: <20190826182320.9089-1-tony.luck@intel.com>
+ <87imqjm8b4.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a429c88b-3c58-4481-5db9-08d72b1ff0c2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Aug 2019 18:54:07.7655
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JNm5L616CEL7KdWA/+RFsTLbZ+s9jaO9pNLVRdjHv3D1GkzWJ29ywE+D8AWMXLfG5DxdyT96G7MUocOzurGn4Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB5922
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87imqjm8b4.fsf@vitty.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Tue, 27 Aug 2019 19:08:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+2019-08-27 08:27+0200, Vitaly Kuznetsov:
+> Tony Luck <tony.luck@intel.com> writes:
+> 
+> > When I boot my server I'm treated to a console log with:
+> >
+> > [   40.520510] kvm: disabled by bios
+> > [   40.551234] kvm: disabled by bios
+> > [   40.607987] kvm: disabled by bios
+> > [   40.659701] kvm: disabled by bios
+> > [   40.691224] kvm: disabled by bios
+> > [   40.718786] kvm: disabled by bios
+> > [   40.750122] kvm: disabled by bios
+> > [   40.797170] kvm: disabled by bios
+> > [   40.828408] kvm: disabled by bios
+> >
+> >  ... many, many more lines, one for every logical CPU
+> 
+> (If I didn't miss anything) we have the following code:
+> 
+> __init vmx_init()
+>         kvm_init();
+>             kvm_arch_init()
+> 
+> and we bail on first error so there should be only 1 message per module
+> load attempt. The question I have is who (and why) is trying to load
+> kvm-intel (or kvm-amd which is not any different) for each CPU? Is it
+> udev? Can this be changed?
 
+I agree that this is a highly suspicious behavior.
 
-> -----Original Message-----
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Tuesday, August 27, 2019 9:55 PM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>; Jiri Pirko <jiri@mellanox.com>;
-> kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
-> linux-kernel@vger.kernel.org; netdev@vger.kernel.org
-> Subject: Re: [PATCH 2/4] mdev: Make mdev alias unique among all mdevs
->=20
-> On Tue, 27 Aug 2019 16:13:27 +0000
-> Parav Pandit <parav@mellanox.com> wrote:
->=20
-> > > -----Original Message-----
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Tuesday, August 27, 2019 8:59 PM
-> > > To: Cornelia Huck <cohuck@redhat.com>
-> > > Cc: Parav Pandit <parav@mellanox.com>; Jiri Pirko
-> > > <jiri@mellanox.com>; kwankhede@nvidia.com; davem@davemloft.net;
-> > > kvm@vger.kernel.org; linux- kernel@vger.kernel.org;
-> > > netdev@vger.kernel.org
-> > > Subject: Re: [PATCH 2/4] mdev: Make mdev alias unique among all
-> > > mdevs
-> > >
-> > > On Tue, 27 Aug 2019 13:29:46 +0200
-> > > Cornelia Huck <cohuck@redhat.com> wrote:
-> > >
-> > > > On Tue, 27 Aug 2019 11:08:59 +0000 Parav Pandit
-> > > > <parav@mellanox.com> wrote:
-> > > >
-> > > > > > -----Original Message-----
-> > > > > > From: Cornelia Huck <cohuck@redhat.com>
-> > > > > > Sent: Tuesday, August 27, 2019 3:59 PM
-> > > > > > To: Parav Pandit <parav@mellanox.com>
-> > > > > > Cc: alex.williamson@redhat.com; Jiri Pirko
-> > > > > > <jiri@mellanox.com>; kwankhede@nvidia.com;
-> > > > > > davem@davemloft.net; kvm@vger.kernel.org;
-> > > > > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > > > > Subject: Re: [PATCH 2/4] mdev: Make mdev alias unique among
-> > > > > > all mdevs
-> > > > > >
-> > > > > > On Mon, 26 Aug 2019 15:41:17 -0500 Parav Pandit
-> > > > > > <parav@mellanox.com> wrote:
-> > > > > >
-> > > > > > > Mdev alias should be unique among all the mdevs, so that
-> > > > > > > when such alias is used by the mdev users to derive other
-> > > > > > > objects, there is no collision in a given system.
-> > > > > > >
-> > > > > > > Signed-off-by: Parav Pandit <parav@mellanox.com>
-> > > > > > > ---
-> > > > > > >  drivers/vfio/mdev/mdev_core.c | 5 +++++
-> > > > > > >  1 file changed, 5 insertions(+)
-> > > > > > >
-> > > > > > > diff --git a/drivers/vfio/mdev/mdev_core.c
-> > > > > > > b/drivers/vfio/mdev/mdev_core.c index
-> > > > > > > e825ff38b037..6eb37f0c6369
-> > > > > > > 100644
-> > > > > > > --- a/drivers/vfio/mdev/mdev_core.c
-> > > > > > > +++ b/drivers/vfio/mdev/mdev_core.c
-> > > > > > > @@ -375,6 +375,11 @@ int mdev_device_create(struct kobject
-> > > > > > > *kobj,
-> > > struct
-> > > > > > device *dev,
-> > > > > > >  			ret =3D -EEXIST;
-> > > > > > >  			goto mdev_fail;
-> > > > > > >  		}
-> > > > > > > +		if (tmp->alias && strcmp(tmp->alias, alias) =3D=3D 0) {
-> > > > > >
-> > > > > > Any way we can relay to the caller that the uuid was fine, but
-> > > > > > that we had a hash collision? Duplicate uuids are much more
-> > > > > > obvious than
-> > > a collision here.
-> > > > > >
-> > > > > How do you want to relay this rare event?
-> > > > > Netlink interface has way to return the error message back, but
-> > > > > sysfs is
-> > > limited due to its error code based interface.
-> > > >
-> > > > I don't know, that's why I asked :)
-> > > >
-> > > > The problem is that "uuid already used" and "hash collision" are
-> > > > indistinguishable. While "use a different uuid" will probably work
-> > > > in both cases, "increase alias length" might be a good alternative
-> > > > in some cases.
-> > > >
-> > > > But if there is no good way to relay the problem, we can live with =
-it.
-> > >
-> > > It's a rare event, maybe just dev_dbg(dev, "Hash collision creating a=
-lias
-> \"%s\"
-> > > for mdev device %pUl\n",...
-> > >
-> > Ok.
-> > dev_dbg_once() to avoid message flood.
->=20
-> I'd suggest a rate-limit rather than a once.  The fact that the kernel ma=
-y have
-> experienced a collision at some time in the past does not help someone
-> debug why they can't create a device now.  The only way we're going to ge=
-t a
-> flood is if a user sufficiently privileged to create mdev devices stumble=
-s onto
-> a collision and continues to repeat the same operation.  That falls into
-> shoot-yourself-in-the-foot behavior imo.
-> Thanks,
->=20
-Ok. Will do.
+It would be really helpful if we found out what is causing it.
+So far, this patch seems to be working around a userspace bug.
+
+> In particular, I'm worried about eVMCS enablement in vmx_init(), we will
+> also get a bunch of "KVM: vmx: using Hyper-V Enlightened VMCS" messages
+> if the consequent kvm_arch_init() fails.
+
+And we can't get rid of this through the printk_once trick, because this
+code lives in kvm_intel module and therefore gets unloaded on every
+failure.
+
+I am also not inclined to apply the patch as we will likely merge the
+kvm and kvm_{svm,intel} modules in the future to take full advantage of
+link time optimizations and this patch would stop working after that.
+
+Thanks.
