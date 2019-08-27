@@ -2,135 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 206FE9F305
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 21:13:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC6C09F30D
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 21:17:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731026AbfH0TND (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 15:13:03 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:44384 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730347AbfH0TND (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 15:13:03 -0400
-Received: by mail-io1-f66.google.com with SMTP id j4so663133iog.11
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2019 12:13:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HQJxEYUXnqkOd54ze0iIvNMwGeKfFiBDRd0wcO9eWqU=;
-        b=igzHCTGUm2FIXir7Dgwr+iAIiv0yRzYRHwvNq3FJv8G+f8PTq8a3cEkP/flze0PhxX
-         +kClsdGCmWfeOe6vb7Q+AfHhBvICvTcSsfm0PryjDTYNTb7xXsarhieOYcUl/Bny8mVz
-         801aUYeI6Bc2lpTY8CUWoyTchr0aCrEOUhZFTxRbsfDw6iY7/eabs8t3yYUdPiok1BdO
-         hm7teUDadvyFKWlIP1bWX9k5A2Ub2Ui5owwP4M8JM61q779G4T/qQWR6xvgSjKfGo1Ma
-         HhIN8Lfhub7wzi+EBSX0Amd8REw9JvzhbVdvTbcsYEBPm0n0kY8n8TD1Wgn3UhkGfcXm
-         vfyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HQJxEYUXnqkOd54ze0iIvNMwGeKfFiBDRd0wcO9eWqU=;
-        b=h56H5IPvQHddoq73FntnOeWUS3gVj1NOk+84MbB6t/YalGKBtdkYkz67Lk/qEv7H5l
-         fCh3k6wMzw6qSt2L/FmhfgAFMMd9jTU9E7VkMMfAPanZ466apjhMkJdMf3sGY3nJQx8J
-         NsQtQ+zqMSlomKuId/t/pkI0loIWUSKgM8HcXcDOqVdO0mjrXrcVNX29OQEGChtHPAVd
-         FQI4EblPXyzL+aAfjsed1wSgRFhHp2UfHFfiA+q8lkWeBRfWM6MQ6O9NPB7bwOYtefA8
-         KS185gCsZ8uhKRJITBWyB8xL2jwV+/U8tAfEfqrhciZegWZftw+cZ3IRp8MOPOUSmI3w
-         jrwQ==
-X-Gm-Message-State: APjAAAWpSXvErlsd2EX4Xaf9nJVsdPMc9JWlcgzPY2lpduOW6qC6C9HU
-        jqLW22ygAkdlsy2ikgBfaNlllGS3cT/j1hJ0FQfTTg==
-X-Google-Smtp-Source: APXvYqzbQzeTcca6N5+3PhjjFP7J6N1VvGjJla1JyuPmLZHf9fNsWCmlU3bY67zfwgYTIvsTzYaEYd0Hn2NWk6j1T0g=
-X-Received: by 2002:a5e:8f4d:: with SMTP id x13mr191724iop.118.1566933182198;
- Tue, 27 Aug 2019 12:13:02 -0700 (PDT)
+        id S1730633AbfH0TRD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 15:17:03 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:38838 "EHLO
+        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728972AbfH0TRC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 15:17:02 -0400
+Received: from Internal Mail-Server by MTLPINE1 (envelope-from parav@mellanox.com)
+        with ESMTPS (AES256-SHA encrypted); 27 Aug 2019 22:16:59 +0300
+Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x7RJGuGq026842;
+        Tue, 27 Aug 2019 22:16:57 +0300
+From:   Parav Pandit <parav@mellanox.com>
+To:     alex.williamson@redhat.com, jiri@mellanox.com,
+        kwankhede@nvidia.com, cohuck@redhat.com, davem@davemloft.net
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, Parav Pandit <parav@mellanox.com>
+Subject: [PATCH v1 0/5] Introduce variable length mdev alias
+Date:   Tue, 27 Aug 2019 14:16:49 -0500
+Message-Id: <20190827191654.41161-1-parav@mellanox.com>
+X-Mailer: git-send-email 2.19.2
+In-Reply-To: <20190826204119.54386-1-parav@mellanox.com>
+References: <20190826204119.54386-1-parav@mellanox.com>
 MIME-Version: 1.0
-References: <20190823205544.24052-1-sean.j.christopherson@intel.com>
-In-Reply-To: <20190823205544.24052-1-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 27 Aug 2019 12:12:51 -0700
-Message-ID: <CALMp9eSwxTdigRkACRgr=avg8HZh+gPXgPnwd7+CaNEEuS2tQA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Don't update RIP or do single-step on faulting emulation
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Andy Lutomirski <luto@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 23, 2019 at 1:55 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Don't advance RIP or inject a single-step #DB if emulation signals a
-> fault.  This logic applies to all state updates that are conditional on
-> clean retirement of the emulation instruction, e.g. updating RFLAGS was
-> previously handled by commit 38827dbd3fb85 ("KVM: x86: Do not update
-> EFLAGS on faulting emulation").
->
-> Not advancing RIP is likely a nop, i.e. ctxt->eip isn't updated with
-> ctxt->_eip until emulation "retires" anyways.  Skipping #DB injection
-> fixes a bug reported by Andy Lutomirski where a #UD on SYSCALL due to
-> invalid state with RFLAGS.RF=1 would loop indefinitely due to emulation
-> overwriting the #UD with #DB and thus restarting the bad SYSCALL over
-> and over.
->
-> Cc: Nadav Amit <nadav.amit@gmail.com>
-> Cc: stable@vger.kernel.org
-> Reported-by: Andy Lutomirski <luto@kernel.org>
-> Fixes: 663f4c61b803 ("KVM: x86: handle singlestep during emulation")
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->
-> Note, this has minor conflict with my recent series to cleanup the
-> emulator return flows[*].  The end result should look something like:
->
->                 if (!ctxt->have_exception ||
->                     exception_type(ctxt->exception.vector) == EXCPT_TRAP) {
->                         kvm_rip_write(vcpu, ctxt->eip);
->                         if (r && ctxt->tf)
->                                 r = kvm_vcpu_do_singlestep(vcpu);
->                         __kvm_set_rflags(vcpu, ctxt->eflags);
->                 }
->
-> [*] https://lkml.kernel.org/r/20190823010709.24879-1-sean.j.christopherson@intel.com
->
->  arch/x86/kvm/x86.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b4cfd786d0b6..d2962671c3d3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6611,12 +6611,13 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
->                 unsigned long rflags = kvm_x86_ops->get_rflags(vcpu);
->                 toggle_interruptibility(vcpu, ctxt->interruptibility);
->                 vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
-> -               kvm_rip_write(vcpu, ctxt->eip);
-> -               if (r == EMULATE_DONE && ctxt->tf)
-> -                       kvm_vcpu_do_singlestep(vcpu, &r);
->                 if (!ctxt->have_exception ||
-> -                   exception_type(ctxt->exception.vector) == EXCPT_TRAP)
-> +                   exception_type(ctxt->exception.vector) == EXCPT_TRAP) {
+To have consistent naming for the netdevice of a mdev and to have
+consistent naming of the devlink port [1] of a mdev, which is formed using
+phys_port_name of the devlink port, current UUID is not usable because
+UUID is too long.
 
-NYC, but...
+UUID in string format is 36-characters long and in binary 128-bit.
+Both formats are not able to fit within 15 characters limit of netdev
+name.
 
-I don't think this check for "exception_type" is quite right.  A
-general detect fault (which can be synthesized by check_dr_read) is
-mischaracterized by exception_type() as a trap. Or maybe I'm missing
-something? (I often am.)
+It is desired to have mdev device naming consistent using UUID.
+So that widely used user space framework such as ovs [2] can make use
+of mdev representor in similar way as PCIe SR-IOV VF and PF representors.
 
-> +                       kvm_rip_write(vcpu, ctxt->eip);
-> +                       if (r == EMULATE_DONE && ctxt->tf)
-> +                               kvm_vcpu_do_singlestep(vcpu, &r);
->                         __kvm_set_rflags(vcpu, ctxt->eflags);
-> +               }
->
->                 /*
->                  * For STI, interrupts are shadowed; so KVM_REQ_EVENT will
-> --
-> 2.22.0
->
+Hence,
+(a) mdev alias is created which is derived using sha1 from the mdev name.
+(b) Vendor driver describes how long an alias should be for the child mdev
+created for a given parent.
+(c) Mdev aliases are unique at system level.
+(d) alias is created optionally whenever parent requested.
+This ensures that non networking mdev parents can function without alias
+creation overhead.
+
+This design is discussed at [3].
+
+An example systemd/udev extension will have,
+
+1. netdev name created using mdev alias available in sysfs.
+
+mdev UUID=83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
+mdev 12 character alias=cd5b146a80a5
+
+netdev name of this mdev = enmcd5b146a80a5
+Here en = Ethernet link
+m = mediated device
+
+2. devlink port phys_port_name created using mdev alias.
+devlink phys_port_name=pcd5b146a80a5
+
+This patchset enables mdev core to maintain unique alias for a mdev.
+
+Patch-1 Introduces mdev alias using sha1.
+Patch-2 Ensures that mdev alias is unique in a system.
+Patch-3 Exposes mdev alias in a sysfs hirerchy.
+Patch-4 Extends mtty driver to optionally provide alias generation.
+This also enables to test UUID based sha1 collision and trigger
+error handling for duplicate sha1 results.
+
+In future when networking driver wants to use mdev alias, mdev_alias()
+API will be added to derive devlink port name.
+
+[1] http://man7.org/linux/man-pages/man8/devlink-port.8.html
+[2] https://docs.openstack.org/os-vif/latest/user/plugins/ovs.html
+[3] https://patchwork.kernel.org/cover/11084231/
+
+---
+Changelog:
+
+v0->v1:
+ - Addressed comments from Alex Williamson, Cornelia Hunk and Mark Bloch
+ - Moved alias length check outside of the parent lock
+ - Moved alias and digest allocation from kvzalloc to kzalloc
+ - &alias[0] changed to alias
+ - alias_length check is nested under get_alias_length callback check
+ - Changed comments to start with an empty line
+ - Added comment where alias memory ownership is handed over to mdev device
+ - Fixed cleaunup of hash if mdev_bus_register() fails
+ - Updated documentation for new sysfs alias file
+ - Improved commit logs to make description more clear
+ - Fixed inclusiong of alias for NULL check
+ - Added ratelimited debug print for sha1 hash collision error
+
+Parav Pandit (5):
+  mdev: Introduce sha1 based mdev alias
+  mdev: Make mdev alias unique among all mdevs
+  mdev: Expose mdev alias in sysfs tree
+  mdev: Update sysfs documentation
+  mtty: Optionally support mtty alias
+
+ .../driver-api/vfio-mediated-device.rst       |   5 +
+ drivers/vfio/mdev/mdev_core.c                 | 117 +++++++++++++++++-
+ drivers/vfio/mdev/mdev_private.h              |   5 +-
+ drivers/vfio/mdev/mdev_sysfs.c                |  26 +++-
+ include/linux/mdev.h                          |   4 +
+ samples/vfio-mdev/mtty.c                      |  10 ++
+ 6 files changed, 157 insertions(+), 10 deletions(-)
+
+-- 
+2.19.2
+
