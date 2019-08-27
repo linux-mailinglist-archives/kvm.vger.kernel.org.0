@@ -2,305 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E79F59F1F2
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 19:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CA5D9F21A
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 20:11:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728711AbfH0R6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 13:58:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56998 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727683AbfH0R6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 13:58:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0DC8830821C2;
-        Tue, 27 Aug 2019 17:58:49 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-79.ams2.redhat.com [10.36.116.79])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F42355D6B0;
-        Tue, 27 Aug 2019 17:58:41 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: Add storage key removal
- facility
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com
-References: <20190827134936.1705-1-frankja@linux.ibm.com>
- <20190827134936.1705-4-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <ea6d114c-9025-2e15-89b8-52b938efc129@redhat.com>
-Date:   Tue, 27 Aug 2019 19:58:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190827134936.1705-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+        id S1729779AbfH0SLj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 14:11:39 -0400
+Received: from mail-eopbgr140080.outbound.protection.outlook.com ([40.107.14.80]:50551
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727887AbfH0SLj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 14:11:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WfyG/8vLVx2pAX6BnBnjn4S+hQPZ2eR/XvWL+SN10evUvnOOqiTnxEAPNHVQHDUy1YY9r7A0tpMT9szqDZZvNRYn6yQrFMK9BYAAUpaysHE3OgpdDgDPFpKwuutnwocB7VcqRkaK64cwyLpd1ABoAA9mKZyJpstlJqMr3xGfyKVEWUbcddZHs4usKIOafJryeXq7it1zRdE/51Dev4jOzMH/EQEDz5pfCAylpUV5KcmGhTd8CvPpNLGpryHNtcu22egV7gInYcxrnk9tHOS/r1l0y6hsBsy9ugdwKY2vFiVXqbo91LI8QxWKADuAfjeyfYVkXwNAECvDDfdGG6MZgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EUXkmyXVak3F7G1Nqv5fB8j/CABnPalvwGpZujIrrAE=;
+ b=VShp5JA+wUrHxcPorZ9re+2jjWT24gBPt0PkOV9ReehaCPYnJgOR8bfRGojOkRt+gwFS0eIwKWJX/s0seSTPIBU+SrVYLAsLGtC+JbNPxu/E+Tl8Co28L4WNIYqbm49g1UD/VmSg5pUS2vIfoIXtoAmnjO1PtuEC2ZufnhoXuyn6f56In8IDxxGbpjTlOlyrkkgpI16RqNRekzGaSMPVyPDd8pniQiiUQJHJ1QgJCBBEPIAt0hqvOEISglSW01d9LqgL9hN4OfuDUjl20sQ4qyqeTz1LnNojRjcT+zIJ73lmMNILA9zGCTM4apMLtnuilRXC5NgzO+UVWfgda9KWfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EUXkmyXVak3F7G1Nqv5fB8j/CABnPalvwGpZujIrrAE=;
+ b=Rq8zqfOeR5q1SUrvdfuh9tOrH+XcSLbNZ9xWcnZ9AfDG7qDGNS/qMyUv8CGt9H+UhaKqnB9X0o8YtRSs1/D3WYBkH2N1FhRBOHMjjXqyzZH8FAAminbew2T/0PoW762vG2+dBaoHBy3cwroWhZN6Sb+ellwNKbURfHdURpkRtb0=
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
+ AM0PR05MB5233.eurprd05.prod.outlook.com (20.178.16.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2178.19; Tue, 27 Aug 2019 18:11:33 +0000
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::216f:f548:1db0:41ea]) by AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::216f:f548:1db0:41ea%6]) with mapi id 15.20.2199.020; Tue, 27 Aug 2019
+ 18:11:33 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Jiri Pirko <jiri@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH 0/4] Introduce variable length mdev alias
+Thread-Topic: [PATCH 0/4] Introduce variable length mdev alias
+Thread-Index: AQHVXE6oE0YRBz0PMky+S05YIDBwe6cO90UwgABPfgCAAASicA==
+Date:   Tue, 27 Aug 2019 18:11:32 +0000
+Message-ID: <AM0PR05MB4866E5EA8D8ABFB1A40F60DCD1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20190826204119.54386-1-parav@mellanox.com>
+        <AM0PR05MB4866A24FF3D283F0F3CB3CDAD1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20190827114852.499dd8cf@x1.home>
+In-Reply-To: <20190827114852.499dd8cf@x1.home>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 27 Aug 2019 17:58:49 +0000 (UTC)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [106.51.18.188]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6bc9e8c4-7d61-4a82-6c7e-08d72b19fde7
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AM0PR05MB5233;
+x-ms-traffictypediagnostic: AM0PR05MB5233:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR05MB52333E976D60D42F02D82069D1A00@AM0PR05MB5233.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0142F22657
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(376002)(396003)(346002)(366004)(189003)(199004)(132844002)(13464003)(76116006)(7736002)(26005)(8936002)(186003)(99286004)(305945005)(9456002)(14454004)(86362001)(76176011)(102836004)(53546011)(6506007)(2906002)(478600001)(7696005)(74316002)(55236004)(6916009)(5660300002)(55016002)(71190400001)(9686003)(66066001)(25786009)(476003)(8676002)(11346002)(446003)(81156014)(81166006)(53936002)(4326008)(66476007)(66556008)(64756008)(66446008)(6246003)(3846002)(6116002)(229853002)(54906003)(52536014)(14444005)(256004)(316002)(6436002)(71200400001)(486006)(33656002)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB5233;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: E1A3i9F/sBmukH2Eq1aSo+eD/J/QBI4P413YDUd8/FSpq41kOK8tx4vonAC2zSUY0TzFFA4/zO0g/1JkHQO2gGmWMebAZGf0+varne9IhosvuEP66eCcc7VAVcMS+jg5fzu+Fl0z9qDTp8Yq/aSUCXNpt5dNBo19uTQug6IfxGywMFu+8Cxa9TKCcnOwh/QEJyxQ5SROQ9+lHiZPKGeCkuN/AXSHDaerC4aHtfj0OFLb7IS5Nt5WZU3QtH9ICKsPL9o0Eop/GQlKTwyCrqFcsfAYucsduI0LF0fKZtyeKJH1Hxo/ks7rWSS071H+1Lc4P7XrVdUDCnBYY7nqZZIwSH7ogApLYo/Krhto6Pmdseio0Gxm8sj73Kf2qIm3Px1UNkTWW//WmF5oki8Nolj/R86GEMiLK3quSkReVOBFnK4=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bc9e8c4-7d61-4a82-6c7e-08d72b19fde7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Aug 2019 18:11:32.8024
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OQCTsUguT7yFpyGaL7bJXDzn6AHasyK7TPuAiZH+ABACAem1e2Q6teXJOehsZbeISjLumoz0Fii63Q40DfqRug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB5233
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/2019 15.49, Janosch Frank wrote:
-> The storage key removal facility (stfle bit 169) makes all key related
-> instructions result in a special operation exception if they handle a
-> key.
-> 
-> Let's make sure that the skey and pfmf tests only run non key code
-> (pfmf) or not at all (skey).
-> 
-> Also let's test this new facility. As lots of instructions are
-> affected by this, only some of them are tested for now.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/Makefile |   1 +
->  s390x/pfmf.c   |  10 ++++
->  s390x/skey.c   |   5 ++
->  s390x/skrf.c   | 130 +++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 146 insertions(+)
->  create mode 100644 s390x/skrf.c
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 76db0bb..007611e 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -14,6 +14,7 @@ tests += $(TEST_DIR)/iep.elf
->  tests += $(TEST_DIR)/cpumodel.elf
->  tests += $(TEST_DIR)/diag288.elf
->  tests += $(TEST_DIR)/stsi.elf
-> +tests += $(TEST_DIR)/skrf.elf
->  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->  
->  all: directories test_cases test_cases_binary
-> diff --git a/s390x/pfmf.c b/s390x/pfmf.c
-> index 2840cf5..78b4a73 100644
-> --- a/s390x/pfmf.c
-> +++ b/s390x/pfmf.c
-> @@ -34,6 +34,10 @@ static void test_4k_key(void)
->  	union skey skey;
->  
->  	report_prefix_push("4K");
-> +	if (test_facility(169)) {
-> +		report_skip("storage key removal facility is active");
-> +		goto out;
-> +	}
->  	r1.val = 0;
->  	r1.reg.sk = 1;
->  	r1.reg.fsc = PFMF_FSC_4K;
-> @@ -42,6 +46,7 @@ static void test_4k_key(void)
->  	skey.val = get_storage_key(pagebuf);
->  	skey.val &= SKEY_ACC | SKEY_FP;
->  	report("set storage keys", skey.val == 0x30);
-> +out:
->  	report_prefix_pop();
->  }
->  
-> @@ -54,6 +59,10 @@ static void test_1m_key(void)
->  	void *addr = pagebuf;
->  
->  	report_prefix_push("1M");
-> +	if (test_facility(169)) {
-> +		report_skip("storage key removal facility is active");
-> +		goto out;
-> +	}
->  	r1.val = 0;
->  	r1.reg.sk = 1;
->  	r1.reg.fsc = PFMF_FSC_1M;
-> @@ -70,6 +79,7 @@ static void test_1m_key(void)
->  		}
->  	}
->  	report("set storage keys", rp);
-> +out:
->  	report_prefix_pop();
->  }
->  
-> diff --git a/s390x/skey.c b/s390x/skey.c
-> index efc4eca..5020e99 100644
-> --- a/s390x/skey.c
-> +++ b/s390x/skey.c
-> @@ -126,10 +126,15 @@ static void test_priv(void)
->  int main(void)
->  {
->  	report_prefix_push("skey");
-> +	if (test_facility(169)) {
-> +		report_skip("storage key removal facility is active");
-> +		goto done;
-> +	}
->  	test_priv();
->  	test_set();
->  	test_set_mb();
->  	test_chg();
-> +done:
->  	report_prefix_pop();
->  	return report_summary();
->  }
-> diff --git a/s390x/skrf.c b/s390x/skrf.c
-> new file mode 100644
-> index 0000000..8e5baea
-> --- /dev/null
-> +++ b/s390x/skrf.c
-> @@ -0,0 +1,130 @@
-> +/*
-> + * Storage key removal facility tests
-> + *
-> + * Copyright (c) 2019 IBM Corp
-> + *
-> + * Authors:
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2.
-> + */
-> +#include <libcflat.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/page.h>
-> +#include <asm/facility.h>
-> +#include <asm/mem.h>
-> +
-> +static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-> +
-> +static void test_facilities(void)
-> +{
-> +	report_prefix_push("facilities");
-> +	report("!10", !test_facility(10));
-> +	report("!14", !test_facility(14));
-> +	report("!66", !test_facility(66));
-> +	report("!145", !test_facility(145));
-> +	report("!149", !test_facility(140));
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_skey(void)
-> +{
-> +	report_prefix_push("(i|s)ske");
-> +	expect_pgm_int();
-> +	set_storage_key(pagebuf, 0x30, 0);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-> +	expect_pgm_int();
-> +	get_storage_key(pagebuf);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-> +	report_prefix_pop();
 
-Wouldn't it be better to have distinct prefixes for the two tests?
 
-> +}
-> +
-> +static void test_pfmf(void)
-> +{
-> +	union pfmf_r1 r1;
-> +
-> +	report_prefix_push("pfmf");
-> +	r1.val = 0;
-> +	r1.reg.sk = 1;
-> +	r1.reg.fsc = PFMF_FSC_4K;
-> +	r1.reg.key = 0x30;
-> +	expect_pgm_int();
-> +	pfmf(r1.val, pagebuf);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_psw_key(void)
-> +{
-> +	uint64_t psw_mask = extract_psw_mask() | 0xF0000000000000UL;
-> +
-> +	report_prefix_push("psw key");
-> +	expect_pgm_int();
-> +	load_psw_mask(psw_mask);
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_mvcos(void)
-> +{
-> +	uint64_t r3 = 64;
-> +	uint8_t *src = pagebuf;
-> +	uint8_t *dst = pagebuf + PAGE_SIZE;
-> +	/* K bit set, as well as keys */
-> +	register unsigned long oac asm("0") = 0xf002f002;
-> +
-> +	report_prefix_push("mvcos");
-> +	expect_pgm_int();
-> +	asm volatile(".machine \"z10\"\n"
-> +		     ".machine \"push\"\n"
+> -----Original Message-----
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Tuesday, August 27, 2019 11:19 PM
+> To: Parav Pandit <parav@mellanox.com>
+> Cc: Jiri Pirko <jiri@mellanox.com>; kwankhede@nvidia.com;
+> cohuck@redhat.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; netdev@vger.kernel.org
+> Subject: Re: [PATCH 0/4] Introduce variable length mdev alias
+>=20
+> On Tue, 27 Aug 2019 13:11:17 +0000
+> Parav Pandit <parav@mellanox.com> wrote:
+>=20
+> > Hi Alex, Cornelia,
+> >
+> > > -----Original Message-----
+> > > From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On
+> > > Behalf Of Parav Pandit
+> > > Sent: Tuesday, August 27, 2019 2:11 AM
+> > > To: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
+> > > kwankhede@nvidia.com; cohuck@redhat.com; davem@davemloft.net
+> > > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > > netdev@vger.kernel.org; Parav Pandit <parav@mellanox.com>
+> > > Subject: [PATCH 0/4] Introduce variable length mdev alias
+> > >
+> > > To have consistent naming for the netdevice of a mdev and to have
+> > > consistent naming of the devlink port [1] of a mdev, which is formed
+> > > using phys_port_name of the devlink port, current UUID is not usable
+> > > because UUID is too long.
+> > >
+> > > UUID in string format is 36-characters long and in binary 128-bit.
+> > > Both formats are not able to fit within 15 characters limit of netdev
+> name.
+> > >
+> > > It is desired to have mdev device naming consistent using UUID.
+> > > So that widely used user space framework such as ovs [2] can make
+> > > use of mdev representor in similar way as PCIe SR-IOV VF and PF
+> representors.
+> > >
+> > > Hence,
+> > > (a) mdev alias is created which is derived using sha1 from the mdev
+> name.
+> > > (b) Vendor driver describes how long an alias should be for the
+> > > child mdev created for a given parent.
+> > > (c) Mdev aliases are unique at system level.
+> > > (d) alias is created optionally whenever parent requested.
+> > > This ensures that non networking mdev parents can function without
+> > > alias creation overhead.
+> > >
+> > > This design is discussed at [3].
+> > >
+> > > An example systemd/udev extension will have,
+> > >
+> > > 1. netdev name created using mdev alias available in sysfs.
+> > >
+> > > mdev UUID=3D83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
+> > > mdev 12 character alias=3Dcd5b146a80a5
+> > >
+> > > netdev name of this mdev =3D enmcd5b146a80a5 Here en =3D Ethernet lin=
+k m
+> > > =3D mediated device
+> > >
+> > > 2. devlink port phys_port_name created using mdev alias.
+> > > devlink phys_port_name=3Dpcd5b146a80a5
+> > >
+> > > This patchset enables mdev core to maintain unique alias for a mdev.
+> > >
+> > > Patch-1 Introduces mdev alias using sha1.
+> > > Patch-2 Ensures that mdev alias is unique in a system.
+> > > Patch-3 Exposes mdev alias in a sysfs hirerchy.
+> > > Patch-4 Extends mtty driver to optionally provide alias generation.
+> > > This also enables to test UUID based sha1 collision and trigger
+> > > error handling for duplicate sha1 results.
+> > >
+> > > In future when networking driver wants to use mdev alias,
+> > > mdev_alias() API will be added to derive devlink port name.
+> > >
+> > Now that majority of above patches looks in shape and I addressed all
+> > comments, In next v1 post, I was considering to include mdev_alias()
+> > and have example use in mtty driver.
+> >
+> > This way, subsequent series of mlx5_core who intents to use
+> > mdev_alias() API makes it easy to review and merge through Dave M,
+> > netdev tree. Is that ok with you?
+>=20
+> What would be the timing for the mlx5_core use case?  Can we coordinate
+> within the same development cycle?  I wouldn't want someone to come
+> clean up the sample driver and remove the API ;)  Thanks,
+>=20
+We targeted it for 5.4. mdev_alias was the only known user interface issue,=
+ which is resolved.
+Some more internal reviews are in progress.
+It might be tight for 5.4, if not 5.4, it should happen in 5.5.
 
-Shouldn't that be the other way round? first push the current one, then
-set the new one?
-
-Anyway, I've now also checked this patch in the CI:
-
-diff a/s390x/Makefile b/s390x/Makefile
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -25,7 +25,7 @@ CFLAGS += -std=gnu99
- CFLAGS += -ffreestanding
- CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/s390x -I lib
- CFLAGS += -O2
--CFLAGS += -march=z900
-+CFLAGS += -march=z10
- CFLAGS += -fno-delete-null-pointer-checks
- LDFLAGS += -nostdlib -Wl,--build-id=none
-
-... and it also seems to work fine with the TCG there:
-
-https://gitlab.com/huth/kvm-unit-tests/-/jobs/281450598
-
-So I think you can simply change it in the Makefile instead.
-
- Thomas
-
-> +		     "mvcos	%[dst],%[src],%[len]\n"
-> +		     ".machine \"pop\"\n"
-> +		     : [dst] "+Q" (*(dst))
-> +		     : [src] "Q" (*(src)), [len] "d" (r3), "d" (oac)
-> +		     : "cc", "memory");
-> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-> +	report_prefix_pop();
-> +}
+I agree, that is why I was holding up to be part of this series.
+Since its very small API, even if there is any merge conflict, it is easy t=
+o resolve.
+If this change can be merged through netdev tree, its better to include it =
+as part of mlx5_core's mdev series.
+So both options are fine, a direction from you is better to have.
