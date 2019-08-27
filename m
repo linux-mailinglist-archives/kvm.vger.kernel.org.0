@@ -2,76 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D9459E4A5
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 11:41:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4FF59E4F3
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 11:53:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729291AbfH0Jlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 05:41:42 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5222 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728806AbfH0Jlm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 05:41:42 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id D708052352A06A23A45C;
-        Tue, 27 Aug 2019 17:41:38 +0800 (CST)
-Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Tue, 27 Aug 2019
- 17:41:38 +0800
-Subject: Re: [Virtio-fs] [PATCH 04/19] virtio: Implement get_shm_region for
- PCI transport
-To:     Vivek Goyal <vgoyal@redhat.com>
-References: <20190821175720.25901-1-vgoyal@redhat.com>
- <20190821175720.25901-5-vgoyal@redhat.com> <5D63392C.3030404@huawei.com>
- <20190826130607.GB3561@redhat.com>
-CC:     <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-nvdimm@lists.01.org>, kbuild test robot <lkp@intel.com>,
-        <kvm@vger.kernel.org>, <miklos@szeredi.hu>, <virtio-fs@redhat.com>,
-        "Sebastien Boeuf" <sebastien.boeuf@intel.com>
-From:   piaojun <piaojun@huawei.com>
-Message-ID: <5D64FAD2.2050906@huawei.com>
-Date:   Tue, 27 Aug 2019 17:41:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.2.0
+        id S1729523AbfH0Jxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 05:53:46 -0400
+Received: from ozlabs.org ([203.11.71.1]:58623 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728883AbfH0Jxp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 05:53:45 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46Hkj34P0Dz9sBF; Tue, 27 Aug 2019 19:53:43 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1566899623; bh=t6/73EjuF6lJD3vndlHCMS7wuROyK8CMl9+AMLeKESY=;
+        h=Date:From:To:Cc:Subject:From;
+        b=drvcqPoXL2O5q/SiHCsJcM00v3xX/xRnF6GtGEbpZR+8fhkU+8EnAxFSaumKWmc/Q
+         7AdQdmdRGr2Xl1yLRuq0kVGQJ/zPB6NXghY8zJmYaJBeBn6BBmxwar02Z0ZFRVMlTJ
+         qjZArhmMIeOig0++PCIr3kV+Q1VzdpLJYSbGkk6k6cJLSqWBp/4tTmlrtcwtazL5lH
+         lm4TYBAu9YPdS+EyuYZwPBAH+7+oH+8I294253uidNQ/fVRqi02pxnnPf1CaAQjoQK
+         bVYu4hoc8mSEFi8OFkx2L2df6gJWcfz7W9Fjfg552ptlZ/1vRix3OGMF3GYxPmkYU5
+         6U2zPqPMKKy8w==
+Date:   Tue, 27 Aug 2019 19:53:38 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.3-1 tag
+Message-ID: <20190827095338.GA22875@blackberry>
 MIME-Version: 1.0
-In-Reply-To: <20190826130607.GB3561@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.253.249]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo or Radim,
 
+Please do a pull from my kvm-ppc-fixes-5.3-1 tag to get one small
+commit which I would like to go to Linus for 5.3 if possible, since it
+fixes a bug where a malicious guest could cause host CPUs to hang
+hard.  The fix is small and obviously correct.
 
-On 2019/8/26 21:06, Vivek Goyal wrote:
-> On Mon, Aug 26, 2019 at 09:43:08AM +0800, piaojun wrote:
-> 
-> [..]
->>> +static bool vp_get_shm_region(struct virtio_device *vdev,
->>> +			      struct virtio_shm_region *region, u8 id)
->>> +{
->>> +	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
->>> +	struct pci_dev *pci_dev = vp_dev->pci_dev;
->>> +	u8 bar;
->>> +	u64 offset, len;
->>> +	phys_addr_t phys_addr;
->>> +	size_t bar_len;
->>> +	char *bar_name;
->>
->> 'char *bar_name' should be cleaned up to avoid compiling warning. And I
->> wonder if you mix tab and blankspace for code indent? Or it's just my
->> email display problem?
-> 
-> Will get rid of now unused bar_name. 
-> 
-OK
+Thanks,
+Paul.
 
-> Generally git flags if there are tab/space issues. I did not see any. So
-> if you see something, point it out and I will fix it.
-> 
+The following changes since commit e4427372398c31f57450565de277f861a4db5b3b:
 
-cohuck found the same indent problem and pointed them in another email.
+  selftests/kvm: make platform_info_test pass on AMD (2019-08-21 19:08:18 +0200)
 
-Jun
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.3-1
+
+for you to fetch changes up to ddfd151f3def9258397fcde7a372205a2d661903:
+
+  KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling (2019-08-27 10:59:30 +1000)
+
+----------------------------------------------------------------
+KVM/PPC fix for 5.3
+
+- Fix bug which could leave locks locked in the host on return
+  to a guest.
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling
+
+ arch/powerpc/kvm/book3s_64_vio.c    | 6 ++++--
+ arch/powerpc/kvm/book3s_64_vio_hv.c | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
