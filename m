@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 521D49EB98
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 16:54:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 509599EBA2
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 16:55:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727306AbfH0OyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 10:54:00 -0400
-Received: from mga07.intel.com ([134.134.136.100]:21708 "EHLO mga07.intel.com"
+        id S1730088AbfH0OzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 10:55:05 -0400
+Received: from mga02.intel.com ([134.134.136.20]:20918 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726333AbfH0Ox7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 10:53:59 -0400
+        id S1725987AbfH0OzE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 10:55:04 -0400
 X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Aug 2019 07:53:59 -0700
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Aug 2019 07:55:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,437,1559545200"; 
-   d="scan'208";a="380943529"
+   d="scan'208";a="192257168"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga006.fm.intel.com with ESMTP; 27 Aug 2019 07:53:58 -0700
-Date:   Tue, 27 Aug 2019 07:53:58 -0700
+  by orsmga002.jf.intel.com with ESMTP; 27 Aug 2019 07:55:03 -0700
+Date:   Tue, 27 Aug 2019 07:55:03 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Jan Dakinevich <jan.dakinevich@virtuozzo.com>
 Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -37,58 +37,96 @@ Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>,
         "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH 2/3] KVM: x86: set ctxt->have_exception in
- x86_decode_insn()
-Message-ID: <20190827145358.GD27459@linux.intel.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Yi Wang <wang.yi59@zte.com.cn>, Peng Hao <peng.hao2@zte.com.cn>
+Subject: Re: [PATCH 3/3] KVM: x86: always stop emulation on page fault
+Message-ID: <20190827145503.GE27459@linux.intel.com>
 References: <1566911210-30059-1-git-send-email-jan.dakinevich@virtuozzo.com>
- <1566911210-30059-3-git-send-email-jan.dakinevich@virtuozzo.com>
+ <1566911210-30059-4-git-send-email-jan.dakinevich@virtuozzo.com>
+ <20190827145030.GC27459@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1566911210-30059-3-git-send-email-jan.dakinevich@virtuozzo.com>
+In-Reply-To: <20190827145030.GC27459@linux.intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 27, 2019 at 01:07:08PM +0000, Jan Dakinevich wrote:
-> x86_emulate_instruction() takes into account ctxt->have_exception flag
-> during instruction decoding, but in practice this flag is never set in
-> x86_decode_insn().
-> 
-> Fixes: 6ea6e84 ("KVM: x86: inject exceptions produced by x86_decode_insn")
-> Cc: Denis Lunev <den@virtuozzo.com>
-> Cc: Roman Kagan <rkagan@virtuozzo.com>
-> Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-> ---
->  arch/x86/kvm/emulate.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 6170ddf..f93880f 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -5395,6 +5395,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
->  					ctxt->memopp->addr.mem.ea + ctxt->_eip);
->  
->  done:
-> +	if (rc == X86EMUL_PROPAGATE_FAULT)
-> +		ctxt->have_exception = true;
+Actually adding Peng Hao and Yi Wang...
 
-We should add a sanity check or two on the vector since the emulator code
-goes all over the place, e.g. #UD should not be injected/propagated, and
-trap-like exceptions should not be handled/encountered during decode.
-Note, exception_type() also warns on illegal vectors.
-
-  WARN_ON_ONCE(ctxt->exception.vector == UD_VECTOR ||
-	       exception_type(ctxt->exception.vector) == EXCPT_TRAP);
-
->  	return (rc != X86EMUL_CONTINUE) ? EMULATION_FAILED : EMULATION_OK;
->  }
->  
-> -- 
-> 2.1.4
+On Tue, Aug 27, 2019 at 07:50:30AM -0700, Sean Christopherson wrote:
+> +Cc Peng Hao and Yi Wang
 > 
+> On Tue, Aug 27, 2019 at 01:07:09PM +0000, Jan Dakinevich wrote:
+> > inject_emulated_exception() returns true if and only if nested page
+> > fault happens. However, page fault can come from guest page tables
+> > walk, either nested or not nested. In both cases we should stop an
+> > attempt to read under RIP and give guest to step over its own page
+> > fault handler.
+> > 
+> > Fixes: 6ea6e84 ("KVM: x86: inject exceptions produced by x86_decode_insn")
+> > Cc: Denis Lunev <den@virtuozzo.com>
+> > Cc: Roman Kagan <rkagan@virtuozzo.com>
+> > Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> > Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 93b0bd4..45caa69 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -6521,8 +6521,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
+> >  			if (reexecute_instruction(vcpu, cr2, write_fault_to_spt,
+> >  						emulation_type))
+> >  				return EMULATE_DONE;
+> > -			if (ctxt->have_exception && inject_emulated_exception(vcpu))
+> > +			if (ctxt->have_exception) {
+> > +				inject_emulated_exception(vcpu);
+> >  				return EMULATE_DONE;
+> > +			}
+> 
+> 
+> Yikes, this patch and the previous have quite the sordid history.
+> 
+> 
+> The non-void return from inject_emulated_exception() was added by commit
+> 
+>   ef54bcfeea6c ("KVM: x86: skip writeback on injection of nested exception")
+> 
+> for the purpose of skipping writeback.  At the time, the above blob in the
+> decode flow didn't exist.
+> 
+> 
+> Decode exception handling was added by commit
+> 
+>   6ea6e84309ca ("KVM: x86: inject exceptions produced by x86_decode_insn")
+> 
+> but it was dead code even then.  The patch discussion[1] even point out that
+> it was dead code, i.e. the change probably should have been reverted.
+> 
+> 
+> Peng Hao and Yi Wang later ran into what appears to be the same bug you're
+> hitting[2][3], and even had patches temporarily queued[4][5], but the
+> patches never made it to mainline as they broke kvm-unit-tests.  Fun side
+> note, Radim even pointed out[4] the bug fixed by patch 1/3.
+> 
+> So, the patches look correct, but there's the open question of why the
+> hypercall test was failing for Paolo.  I've tried to reproduce the #DF to
+> no avail.
+> 
+> [1] https://lore.kernel.org/patchwork/patch/850077/
+> [2] https://lkml.kernel.org/r/1537311828-4547-1-git-send-email-penghao122@sina.com.cn
+> [3] https://lkml.kernel.org/r/20190111133002.GA14852@flask
+> [4] https://lkml.kernel.org/r/20190111133002.GA14852@flask
+> [5] https://lkml.kernel.org/r/9835d255-dd9a-222b-f4a2-93611175b326@redhat.com
+> 
+> >  			if (emulation_type & EMULTYPE_SKIP)
+> >  				return EMULATE_FAIL;
+> >  			return handle_emulation_failure(vcpu, emulation_type);
+> > -- 
+> > 2.1.4
+> > 
