@@ -2,294 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BCAA19EA40
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 16:00:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72EE09EB83
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 16:50:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727306AbfH0OAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 10:00:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27936 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726170AbfH0OAJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Aug 2019 10:00:09 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7RDtMPT050652
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2019 10:00:08 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2un3vux1cx-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2019 10:00:07 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Tue, 27 Aug 2019 14:49:52 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 27 Aug 2019 14:49:51 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7RDnoZ146137464
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 27 Aug 2019 13:49:50 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C57C52050;
-        Tue, 27 Aug 2019 13:49:50 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.131])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7C32652054;
-        Tue, 27 Aug 2019 13:49:49 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 3/3] s390x: Add storage key removal facility
-Date:   Tue, 27 Aug 2019 15:49:36 +0200
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20190827134936.1705-1-frankja@linux.ibm.com>
-References: <20190827134936.1705-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19082713-0008-0000-0000-0000030DDCEA
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082713-0009-0000-0000-00004A2C197B
-Message-Id: <20190827134936.1705-4-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-27_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908270150
+        id S1729985AbfH0Ouc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 10:50:32 -0400
+Received: from mga03.intel.com ([134.134.136.65]:26254 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725811AbfH0Ouc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 10:50:32 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Aug 2019 07:50:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,437,1559545200"; 
+   d="scan'208";a="171219686"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga007.jf.intel.com with ESMTP; 27 Aug 2019 07:50:30 -0700
+Date:   Tue, 27 Aug 2019 07:50:30 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Denis Lunev <den@virtuozzo.com>,
+        Roman Kagan <rkagan@virtuozzo.com>,
+        Denis Plotnikov <dplotnikov@virtuozzo.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 3/3] KVM: x86: always stop emulation on page fault
+Message-ID: <20190827145030.GC27459@linux.intel.com>
+References: <1566911210-30059-1-git-send-email-jan.dakinevich@virtuozzo.com>
+ <1566911210-30059-4-git-send-email-jan.dakinevich@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1566911210-30059-4-git-send-email-jan.dakinevich@virtuozzo.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The storage key removal facility (stfle bit 169) makes all key related
-instructions result in a special operation exception if they handle a
-key.
++Cc Peng Hao and Yi Wang
 
-Let's make sure that the skey and pfmf tests only run non key code
-(pfmf) or not at all (skey).
+On Tue, Aug 27, 2019 at 01:07:09PM +0000, Jan Dakinevich wrote:
+> inject_emulated_exception() returns true if and only if nested page
+> fault happens. However, page fault can come from guest page tables
+> walk, either nested or not nested. In both cases we should stop an
+> attempt to read under RIP and give guest to step over its own page
+> fault handler.
+> 
+> Fixes: 6ea6e84 ("KVM: x86: inject exceptions produced by x86_decode_insn")
+> Cc: Denis Lunev <den@virtuozzo.com>
+> Cc: Roman Kagan <rkagan@virtuozzo.com>
+> Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+> ---
+>  arch/x86/kvm/x86.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 93b0bd4..45caa69 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6521,8 +6521,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
+>  			if (reexecute_instruction(vcpu, cr2, write_fault_to_spt,
+>  						emulation_type))
+>  				return EMULATE_DONE;
+> -			if (ctxt->have_exception && inject_emulated_exception(vcpu))
+> +			if (ctxt->have_exception) {
+> +				inject_emulated_exception(vcpu);
+>  				return EMULATE_DONE;
+> +			}
 
-Also let's test this new facility. As lots of instructions are
-affected by this, only some of them are tested for now.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/Makefile |   1 +
- s390x/pfmf.c   |  10 ++++
- s390x/skey.c   |   5 ++
- s390x/skrf.c   | 130 +++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 146 insertions(+)
- create mode 100644 s390x/skrf.c
+Yikes, this patch and the previous have quite the sordid history.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 76db0bb..007611e 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -14,6 +14,7 @@ tests += $(TEST_DIR)/iep.elf
- tests += $(TEST_DIR)/cpumodel.elf
- tests += $(TEST_DIR)/diag288.elf
- tests += $(TEST_DIR)/stsi.elf
-+tests += $(TEST_DIR)/skrf.elf
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
- 
- all: directories test_cases test_cases_binary
-diff --git a/s390x/pfmf.c b/s390x/pfmf.c
-index 2840cf5..78b4a73 100644
---- a/s390x/pfmf.c
-+++ b/s390x/pfmf.c
-@@ -34,6 +34,10 @@ static void test_4k_key(void)
- 	union skey skey;
- 
- 	report_prefix_push("4K");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+		goto out;
-+	}
- 	r1.val = 0;
- 	r1.reg.sk = 1;
- 	r1.reg.fsc = PFMF_FSC_4K;
-@@ -42,6 +46,7 @@ static void test_4k_key(void)
- 	skey.val = get_storage_key(pagebuf);
- 	skey.val &= SKEY_ACC | SKEY_FP;
- 	report("set storage keys", skey.val == 0x30);
-+out:
- 	report_prefix_pop();
- }
- 
-@@ -54,6 +59,10 @@ static void test_1m_key(void)
- 	void *addr = pagebuf;
- 
- 	report_prefix_push("1M");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+		goto out;
-+	}
- 	r1.val = 0;
- 	r1.reg.sk = 1;
- 	r1.reg.fsc = PFMF_FSC_1M;
-@@ -70,6 +79,7 @@ static void test_1m_key(void)
- 		}
- 	}
- 	report("set storage keys", rp);
-+out:
- 	report_prefix_pop();
- }
- 
-diff --git a/s390x/skey.c b/s390x/skey.c
-index efc4eca..5020e99 100644
---- a/s390x/skey.c
-+++ b/s390x/skey.c
-@@ -126,10 +126,15 @@ static void test_priv(void)
- int main(void)
- {
- 	report_prefix_push("skey");
-+	if (test_facility(169)) {
-+		report_skip("storage key removal facility is active");
-+		goto done;
-+	}
- 	test_priv();
- 	test_set();
- 	test_set_mb();
- 	test_chg();
-+done:
- 	report_prefix_pop();
- 	return report_summary();
- }
-diff --git a/s390x/skrf.c b/s390x/skrf.c
-new file mode 100644
-index 0000000..8e5baea
---- /dev/null
-+++ b/s390x/skrf.c
-@@ -0,0 +1,130 @@
-+/*
-+ * Storage key removal facility tests
-+ *
-+ * Copyright (c) 2019 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+#include <libcflat.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+#include <asm/page.h>
-+#include <asm/facility.h>
-+#include <asm/mem.h>
-+
-+static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-+
-+static void test_facilities(void)
-+{
-+	report_prefix_push("facilities");
-+	report("!10", !test_facility(10));
-+	report("!14", !test_facility(14));
-+	report("!66", !test_facility(66));
-+	report("!145", !test_facility(145));
-+	report("!149", !test_facility(140));
-+	report_prefix_pop();
-+}
-+
-+static void test_skey(void)
-+{
-+	report_prefix_push("(i|s)ske");
-+	expect_pgm_int();
-+	set_storage_key(pagebuf, 0x30, 0);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-+	expect_pgm_int();
-+	get_storage_key(pagebuf);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+static void test_pfmf(void)
-+{
-+	union pfmf_r1 r1;
-+
-+	report_prefix_push("pfmf");
-+	r1.val = 0;
-+	r1.reg.sk = 1;
-+	r1.reg.fsc = PFMF_FSC_4K;
-+	r1.reg.key = 0x30;
-+	expect_pgm_int();
-+	pfmf(r1.val, pagebuf);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+static void test_psw_key(void)
-+{
-+	uint64_t psw_mask = extract_psw_mask() | 0xF0000000000000UL;
-+
-+	report_prefix_push("psw key");
-+	expect_pgm_int();
-+	load_psw_mask(psw_mask);
-+	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+static void test_mvcos(void)
-+{
-+	uint64_t r3 = 64;
-+	uint8_t *src = pagebuf;
-+	uint8_t *dst = pagebuf + PAGE_SIZE;
-+	/* K bit set, as well as keys */
-+	register unsigned long oac asm("0") = 0xf002f002;
-+
-+	report_prefix_push("mvcos");
-+	expect_pgm_int();
-+	asm volatile(".machine \"z10\"\n"
-+		     ".machine \"push\"\n"
-+		     "mvcos	%[dst],%[src],%[len]\n"
-+		     ".machine \"pop\"\n"
-+		     : [dst] "+Q" (*(dst))
-+		     : [src] "Q" (*(src)), [len] "d" (r3), "d" (oac)
-+		     : "cc", "memory");
-+	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+static void test_spka(void)
-+{
-+	report_prefix_push("spka");
-+	expect_pgm_int();
-+	asm volatile("spka	0xf0(0)\n"
-+		     : : : );
-+	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+static void test_tprot(void)
-+{
-+	report_prefix_push("tprot");
-+	expect_pgm_int();
-+	asm volatile("tprot	%[addr],0xf0(0)\n"
-+		     : : [addr] "a" (pagebuf) : );
-+	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("skrf");
-+	if (!test_facility(169)) {
-+		report_skip("storage key removal facility not available\n");
-+		goto done;
-+	}
-+
-+	test_facilities();
-+	test_skey();
-+	test_pfmf();
-+	test_psw_key();
-+	test_mvcos();
-+	test_spka();
-+	test_tprot();
-+
-+done:
-+	report_prefix_pop();
-+	return report_summary();
-+}
--- 
-2.17.0
 
+The non-void return from inject_emulated_exception() was added by commit
+
+  ef54bcfeea6c ("KVM: x86: skip writeback on injection of nested exception")
+
+for the purpose of skipping writeback.  At the time, the above blob in the
+decode flow didn't exist.
+
+
+Decode exception handling was added by commit
+
+  6ea6e84309ca ("KVM: x86: inject exceptions produced by x86_decode_insn")
+
+but it was dead code even then.  The patch discussion[1] even point out that
+it was dead code, i.e. the change probably should have been reverted.
+
+
+Peng Hao and Yi Wang later ran into what appears to be the same bug you're
+hitting[2][3], and even had patches temporarily queued[4][5], but the
+patches never made it to mainline as they broke kvm-unit-tests.  Fun side
+note, Radim even pointed out[4] the bug fixed by patch 1/3.
+
+So, the patches look correct, but there's the open question of why the
+hypercall test was failing for Paolo.  I've tried to reproduce the #DF to
+no avail.
+
+[1] https://lore.kernel.org/patchwork/patch/850077/
+[2] https://lkml.kernel.org/r/1537311828-4547-1-git-send-email-penghao122@sina.com.cn
+[3] https://lkml.kernel.org/r/20190111133002.GA14852@flask
+[4] https://lkml.kernel.org/r/20190111133002.GA14852@flask
+[5] https://lkml.kernel.org/r/9835d255-dd9a-222b-f4a2-93611175b326@redhat.com
+
+>  			if (emulation_type & EMULTYPE_SKIP)
+>  				return EMULATE_FAIL;
+>  			return handle_emulation_failure(vcpu, emulation_type);
+> -- 
+> 2.1.4
+> 
