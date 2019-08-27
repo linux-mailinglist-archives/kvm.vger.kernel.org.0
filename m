@@ -2,99 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C39C79E722
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 13:56:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB63A9E72B
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 13:56:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728653AbfH0LyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 07:54:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42548 "EHLO mx1.redhat.com"
+        id S1729355AbfH0Lze (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 07:55:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57206 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725850AbfH0LyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 07:54:16 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1725850AbfH0Lze (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 07:55:34 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B3CD4308A9E0;
-        Tue, 27 Aug 2019 11:54:15 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.18.25.158])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5774A10018F9;
-        Tue, 27 Aug 2019 11:54:10 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id E37D622017B; Tue, 27 Aug 2019 07:54:09 -0400 (EDT)
-Date:   Tue, 27 Aug 2019 07:54:09 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvdimm@lists.01.org, virtio-fs@redhat.com, miklos@szeredi.hu,
-        stefanha@redhat.com, dgilbert@redhat.com,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 05/19] virtio: Implement get_shm_region for MMIO transport
-Message-ID: <20190827115409.GB30873@redhat.com>
-References: <20190821175720.25901-1-vgoyal@redhat.com>
- <20190821175720.25901-6-vgoyal@redhat.com>
- <20190827103943.4c6c9342.cohuck@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id B9806C057E9F;
+        Tue, 27 Aug 2019 11:55:33 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ECF53194B2;
+        Tue, 27 Aug 2019 11:55:29 +0000 (UTC)
+Date:   Tue, 27 Aug 2019 13:55:27 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 3/4] mdev: Expose mdev alias in sysfs tree
+Message-ID: <20190827135527.7c9d3940.cohuck@redhat.com>
+In-Reply-To: <AM0PR05MB4866FD2DB357C5EB4A7A75ADD1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20190826204119.54386-1-parav@mellanox.com>
+        <20190826204119.54386-4-parav@mellanox.com>
+        <20190827124706.7e726794.cohuck@redhat.com>
+        <AM0PR05MB4866BDA002F2C6566492244ED1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190827133432.156f7db3.cohuck@redhat.com>
+        <AM0PR05MB4866FD2DB357C5EB4A7A75ADD1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190827103943.4c6c9342.cohuck@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Tue, 27 Aug 2019 11:54:15 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 27 Aug 2019 11:55:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 27, 2019 at 10:39:43AM +0200, Cornelia Huck wrote:
-> On Wed, 21 Aug 2019 13:57:06 -0400
-> Vivek Goyal <vgoyal@redhat.com> wrote:
-> 
-> > From: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> > 
-> > On MMIO a new set of registers is defined for finding SHM
-> > regions.  Add their definitions and use them to find the region.
-> > 
-> > Cc: kvm@vger.kernel.org
-> > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> > ---
-> >  drivers/virtio/virtio_mmio.c     | 32 ++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/virtio_mmio.h | 11 +++++++++++
-> >  2 files changed, 43 insertions(+)
-> > 
-> > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> > index e09edb5c5e06..5c07985c8cb8 100644
-> > --- a/drivers/virtio/virtio_mmio.c
-> > +++ b/drivers/virtio/virtio_mmio.c
-> > @@ -500,6 +500,37 @@ static const char *vm_bus_name(struct virtio_device *vdev)
-> >  	return vm_dev->pdev->name;
-> >  }
-> >  
-> > +static bool vm_get_shm_region(struct virtio_device *vdev,
-> > +			      struct virtio_shm_region *region, u8 id)
-> > +{
-> > +	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vdev);
-> > +	u64 len, addr;
-> > +
-> > +	/* Select the region we're interested in */
-> > +	writel(id, vm_dev->base + VIRTIO_MMIO_SHM_SEL);
-> > +
-> > +	/* Read the region size */
-> > +	len = (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_LEN_LOW);
-> > +	len |= (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_LEN_HIGH) << 32;
-> > +
-> > +	region->len = len;
-> > +
-> > +	/* Check if region length is -1. If that's the case, the shared memory
-> > +	 * region does not exist and there is no need to proceed further.
-> > +	 */
-> > +	if (len == ~(u64)0) {
-> > +		return false;
-> > +	}
-> 
-> I think the curly braces should be dropped here.
+On Tue, 27 Aug 2019 11:52:21 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
-Will do.
+> > -----Original Message-----
+> > From: Cornelia Huck <cohuck@redhat.com>
+> > Sent: Tuesday, August 27, 2019 5:05 PM
+> > To: Parav Pandit <parav@mellanox.com>
+> > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
+> > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; netdev@vger.kernel.org
+> > Subject: Re: [PATCH 3/4] mdev: Expose mdev alias in sysfs tree
+> > 
+> > On Tue, 27 Aug 2019 11:07:37 +0000
+> > Parav Pandit <parav@mellanox.com> wrote:
+> >   
+> > > > -----Original Message-----
+> > > > From: Cornelia Huck <cohuck@redhat.com>
+> > > > Sent: Tuesday, August 27, 2019 4:17 PM
+> > > > To: Parav Pandit <parav@mellanox.com>
+> > > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
+> > > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
+> > > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
+> > > > Subject: Re: [PATCH 3/4] mdev: Expose mdev alias in sysfs tree
+> > > >
+> > > > On Mon, 26 Aug 2019 15:41:18 -0500
+> > > > Parav Pandit <parav@mellanox.com> wrote:  
+> >   
+> > > > > +static ssize_t alias_show(struct device *device,
+> > > > > +			  struct device_attribute *attr, char *buf) {
+> > > > > +	struct mdev_device *dev = mdev_from_dev(device);
+> > > > > +
+> > > > > +	if (!dev->alias)
+> > > > > +		return -EOPNOTSUPP;  
+> > > >
+> > > > I'm wondering how to make this consumable by userspace in the easiest  
+> > way.  
+> > > > - As you do now (userspace gets an error when trying to read)?
+> > > > - Returning an empty value (nothing to see here, move along)?  
+> > > No. This is confusing, to return empty value, because it says that there is an  
+> > alias but it is some weird empty string.  
+> > > If there is alias, it shows exactly what it is.
+> > > If no alias it returns an error code = unsupported -> inline with other widely  
+> > used subsystem.  
+> > >  
+> > > > - Or not creating the attribute at all? That would match what userspace
+> > > >   sees on older kernels, so it needs to be able to deal with that  
+> > > New sysfs files can appear. Tool cannot say that I was not expecting this file  
+> > here.  
+> > > User space is supposed to work with the file they are off interest.
+> > > Mdev interface has option to specify vendor specific files, though in usual  
+> > manner it's not recommended.  
+> > > So there is no old user space, new kernel issue here.  
+> > 
+> > I'm not talking about old userspace/new kernel, but new userspace/old kernel.
+> > Code that wants to consume this attribute needs to be able to cope with its
+> > absence anyway.
+> >   
+> Old kernel doesn't have alias file.
+> If some tool tries to read this file it will fail to open non existing file; open() system call is already taking care of it.
 
-Thanks
-Vivek
+Yes, that was exactly my argument?
