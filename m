@@ -2,132 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9AB99E760
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 14:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 376B99E7AF
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 14:19:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729166AbfH0MJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 08:09:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47888 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725850AbfH0MJf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 08:09:35 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 9E816AF19;
-        Tue, 27 Aug 2019 12:09:34 +0000 (UTC)
-Date:   Tue, 27 Aug 2019 14:09:28 +0200
-From:   Borislav Petkov <bp@suse.de>
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 05/11] KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA
- command
-Message-ID: <20190827120928.GC27871@zn.tnic>
-References: <20190710201244.25195-1-brijesh.singh@amd.com>
- <20190710201244.25195-6-brijesh.singh@amd.com>
+        id S1729353AbfH0MRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 08:17:46 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:34969 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726170AbfH0MRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 08:17:46 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n4so12617084pgv.2;
+        Tue, 27 Aug 2019 05:17:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=M1Igxvo01clEvfQnAlKc8g7MH2NPhkoAR4LaSiR0pRs=;
+        b=GKfBKw3D52+Xy/qWzQjGDH3QWIJHODnwZkm1akApr0LkuhNUohI1mb9gGCgPNeUhIb
+         MXncX0VnltPoGAllYM3+i1DN39V3WhwM4okw/0ZZmKgNqbfkrQnk4agg96+GAUVGifOV
+         GU8eIitNuu6MwiWxHjHSm6GILhJXmtCYFaHYeiJEDhViciRubgrXhGGdlufyaMDRIwTI
+         pXv4DhMbx5kMo68fs2EhNGF5CXVRmdm4iEXHL5FpiAphlaDazQb8h62LgsGHuFteLofb
+         LaH36pR9qI06StHW3Eg09JBASsBd2diSWMrfLYqyfqTELAXrfhaTtawN7QTqu79EZVnA
+         FCDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=M1Igxvo01clEvfQnAlKc8g7MH2NPhkoAR4LaSiR0pRs=;
+        b=arIJ4TcfiXfU+2aVhvIzzW1ZtHo3BZz/2/iLsgc+LK3sG8P6QkcBSAwm1qZ42VYWec
+         0FTomBJWxy+rXQNEiePdGEUL/NCwD6nb2qthYZ73ZLPqdSaEhzYCc2pjqvpri1DB7/44
+         moDOzTg2R2Zoz4RVixeJN54XnUzlrarlYktm0IkwVeXaA3PZR5zM6Stn4aG2rvmCAHHg
+         pc2dnfkx3/kYb3lmHpxCHbEl++N+SOLz3glopZVG8KcBScLVXjzW6FdieuUmBgbe6aOf
+         78gEmUomVDhrruQISFaqYyxmSSDcltxktIX9vvafa0oEVyRyCoRpbTP2dtOGzQ6Sacbi
+         DI0Q==
+X-Gm-Message-State: APjAAAUSI4kadpHB5Fn7uVk4LEAKwZH5Z+6dXCyW/4iniKm5TOgHiX6l
+        pVKRHghm//4f3fUef5zCHGkDV0XUTaYVOsxtmMQ=
+X-Google-Smtp-Source: APXvYqyNVP7eTfGHr0vNdXoLRp87VeeH8daldujg3itfkr4XpFs5/WX66QGlRWGswR650VdAPNN74il5q9eRKSXEf08=
+X-Received: by 2002:a65:5043:: with SMTP id k3mr7999171pgo.406.1566908265675;
+ Tue, 27 Aug 2019 05:17:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190710201244.25195-6-brijesh.singh@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190819131737.26942-1-Tianyu.Lan@microsoft.com> <87ftlnm7o8.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87ftlnm7o8.fsf@vitty.brq.redhat.com>
+From:   Tianyu Lan <lantianyu1986@gmail.com>
+Date:   Tue, 27 Aug 2019 20:17:35 +0800
+Message-ID: <CAOLK0pzXPG9tBnQoKGTSNHMwXXrEQ4zZH1uWn2F2mQ2ddVcoFA@mail.gmail.com>
+Subject: Re: [PATCH V3 0/3] KVM/Hyper-V: Add Hyper-V direct tlb flush support
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>, kvm <kvm@vger.kernel.org>,
+        linux-doc@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>, corbet@lwn.net,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        michael.h.kelley@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 08:13:06PM +0000, Singh, Brijesh wrote:
-> The command is used for copying the incoming buffer into the
-> SEV guest memory space.
+On Tue, Aug 27, 2019 at 2:41 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> lantianyu1986@gmail.com writes:
+>
+> > From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+> >
+> > This patchset is to add Hyper-V direct tlb support in KVM. Hyper-V
+> > in L0 can delegate L1 hypervisor to handle tlb flush request from
+> > L2 guest when direct tlb flush is enabled in L1.
+> >
+> > Patch 2 introduces new cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH to enable
+> > feature from user space. User space should enable this feature only
+> > when Hyper-V hypervisor capability is exposed to guest and KVM profile
+> > is hided. There is a parameter conflict between KVM and Hyper-V hypercall.
+> > We hope L2 guest doesn't use KVM hypercall when the feature is
+> > enabled. Detail please see comment of new API
+> > "KVM_CAP_HYPERV_DIRECT_TLBFLUSH"
+>
+> I was thinking about this for awhile and I think I have a better
+> proposal. Instead of adding this new capability let's enable direct TLB
+> flush when KVM guest enables Hyper-V Hypercall page (writes to
+> HV_X64_MSR_HYPERCALL) - this guarantees that the guest doesn't need KVM
+> hypercalls as we can't handle both KVM-style and Hyper-V-style
+> hypercalls simultaneously and kvm_emulate_hypercall() does:
+>
+>         if (kvm_hv_hypercall_enabled(vcpu->kvm))
+>                 return kvm_hv_hypercall(vcpu);
+>
+> What do you think?
+>
+> (and instead of adding the capability we can add kvm.ko module parameter
+> to enable direct tlb flush unconditionally, like
+> 'hv_direct_tlbflush=-1/0/1' with '-1' being the default (autoselect
+> based on Hyper-V hypercall enablement, '0' - permanently disabled, '1' -
+> permanenetly enabled)).
+>
 
-...
-
-> +static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct kvm_sev_receive_update_data params;
-> +	struct sev_data_receive_update_data *data;
-> +	void *hdr = NULL, *trans = NULL;
-> +	struct page **guest_page;
-> +	unsigned long n;
-> +	int ret, offset;
-> +
-> +	if (!sev_guest(kvm))
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> +			sizeof(struct kvm_sev_receive_update_data)))
-> +		return -EFAULT;
-> +
-> +	if (!params.hdr_uaddr || !params.hdr_len ||
-> +	    !params.guest_uaddr || !params.guest_len ||
-> +	    !params.trans_uaddr || !params.trans_len)
-> +		return -EINVAL;
-> +
-> +	/* Check if we are crossing the page boundry */
-
-WARNING: 'boundry' may be misspelled - perhaps 'boundary'?
-
-> +	offset = params.guest_uaddr & (PAGE_SIZE - 1);
-> +	if ((params.guest_len + offset > PAGE_SIZE))
-> +		return -EINVAL;
-> +
-> +	data = kzalloc(sizeof(*data), GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
-> +	if (IS_ERR(hdr)) {
-> +		ret = PTR_ERR(hdr);
-> +		goto e_free;
-> +	}
-> +
-> +	data->hdr_address = __psp_pa(hdr);
-> +	data->hdr_len = params.hdr_len;
-> +
-> +	trans = psp_copy_user_blob(params.trans_uaddr, params.trans_len);
-> +	if (IS_ERR(trans)) {
-> +		ret = PTR_ERR(trans);
-> +		goto e_free;
-> +	}
-> +
-> +	data->trans_address = __psp_pa(trans);
-> +	data->trans_len = params.trans_len;
-> +
-> +	/* Pin guest memory */
-> +	ret = -EFAULT;
-> +	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
-> +				    PAGE_SIZE, &n, 0);
-> +	if (!guest_page)
-> +		goto e_free;
-> +
-> +	/* The RECEIVE_UPDATE_DATA command requires C-bit to be always set. */
-> +	data->guest_address = (page_to_pfn(guest_page[0]) << PAGE_SHIFT) + offset;
-> +	data->guest_address |= sev_me_mask;
-> +	data->guest_len = params.guest_len;
-> +
-> +	data->handle = sev->handle;
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_RECEIVE_UPDATE_DATA, data, &argp->error);
-> +
-> +	sev_unpin_memory(kvm, guest_page, n);
-> +e_free:
-> +	kfree(data);
-> +	kfree(hdr);
-> +	kfree(trans);
-
-Pls add separate labels so that you don't have to init function-local
-vars above to NULL.
+Hi Vitaly::
+     Actually, I had such idea before. But user space should check
+whether hv tlb flush
+is exposed to VM before enabling direct tlb flush. If no, user space
+should not direct
+tlb flush for guest since Hyper-V will do more check for each
+hypercall from nested
+VM with enabling the feauter..
 
 -- 
-Regards/Gruss,
-    Boris.
-
-SUSE Software Solutions Germany GmbH, GF: Felix Imendörffer, HRB 247165, AG München
+Best regards
+Tianyu Lan
