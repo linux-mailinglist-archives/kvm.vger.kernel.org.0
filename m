@@ -2,161 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E57569F0C0
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 18:51:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43CD69F0D4
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 18:54:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730229AbfH0Qu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 12:50:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60266 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727893AbfH0Qu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 12:50:57 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5281E3082B1F;
-        Tue, 27 Aug 2019 16:50:56 +0000 (UTC)
-Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A50DA10016EA;
-        Tue, 27 Aug 2019 16:50:54 +0000 (UTC)
-Date:   Tue, 27 Aug 2019 10:50:54 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Parav Pandit <parav@mellanox.com>, Jiri Pirko <jiri@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 1/4] mdev: Introduce sha1 based mdev alias
-Message-ID: <20190827105054.3702adda@x1.home>
-In-Reply-To: <20190827153510.0bd10437.cohuck@redhat.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
-        <20190826204119.54386-2-parav@mellanox.com>
-        <20190827122428.37442fe1.cohuck@redhat.com>
-        <AM0PR05MB4866B68C9E60E42359BE1F4DD1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190827132404.483a74ad.cohuck@redhat.com>
-        <AM0PR05MB4866CC932630ADD9BDA51371D1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190827134114.01ddd049.cohuck@redhat.com>
-        <AM0PR05MB4866792BEAAB1958BB5A9C4AD1A00@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190827153510.0bd10437.cohuck@redhat.com>
-Organization: Red Hat
+        id S1730385AbfH0Qyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 12:54:53 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:36672 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730255AbfH0Qyw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 12:54:52 -0400
+Received: by mail-io1-f65.google.com with SMTP id o9so47900407iom.3
+        for <kvm@vger.kernel.org>; Tue, 27 Aug 2019 09:54:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BOHjP5tc+yZEVIg0MRWpIDqFx5JGItaQGHN16Joy+r0=;
+        b=LImm1TiukFBu1ne3V7tPK2lDYmzuj4dXh0BahpqBrLhOmjWkDLnm/+5PTe3ynD9tjH
+         3XO3s77urhRAkPCJvyFYH2S/cMFGJGwZxjg2ayfTkmUG2Rivg5KffODDoQFNRXU80j8t
+         d5cfVGq6PNQlHoymLKxlyBXEg+XYcR3YSqC5V4orbtB0uLss5o3lShya2h7UKi8EhK20
+         a6Ie04+q1CTmYyMfDZ/9+cduzuB9Jtw56n677JSg5QmeYjrvThjfFgjahv2w/php93wL
+         ROP+Q6EXNx+KrJf+TpmFmxO2HF+ENHmNFMQv0LMoCbbLTeEfuQXe8TVXTWsyVx9fwNkD
+         b6bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BOHjP5tc+yZEVIg0MRWpIDqFx5JGItaQGHN16Joy+r0=;
+        b=gtwWe53GkLiCq9xus50w/C4yEGVEwMChlGB1cZvHxTzen7gF8YY/tIWjMyBk+j/Fiy
+         Ge69b/2s7jpyksy4OnJzGSbRNesNlfodsfoVJB/mWZBSDud5EkYTkuPGZ027xEaf3IeL
+         vVLU5oOZ5HXICnzTR8Tb0BVbeuhIeddtkcWl9X2oNFQaIClYgL4YbSc1DmbAaxxcJ9iw
+         l9spCK8J1QiLKgXWytPDcknErR9I/NDQ6xZHUYLBF7RjIhpGrPW4jc1qaGby53OzORix
+         TvLqrS4px95NUiGKXjiDkmpFrviHZzY5SjLIeXpWm7KnR8K7areMuTc/cLfXpH6VJjf0
+         9HAQ==
+X-Gm-Message-State: APjAAAV9WtVP85cfBveJPH6UhNn2l6gRw1mmbfbJ+RC96Le7EUo/cZFK
+        EuNjRoNkBgPUZzG8FSgm87SCsS7QyYgvLn+CrzrDdw==
+X-Google-Smtp-Source: APXvYqzBwOW0kq4D3Mw5u/JNKSwavZ6FcPJ53+ULO/GuH3d4BgNMAL73A0JC9I8uiX/MO/BzJqUbGTpEmT9lC18aBec=
+X-Received: by 2002:a6b:6a15:: with SMTP id x21mr23262943iog.40.1566924890982;
+ Tue, 27 Aug 2019 09:54:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 27 Aug 2019 16:50:56 +0000 (UTC)
+References: <20190827160404.14098-1-vkuznets@redhat.com> <20190827160404.14098-4-vkuznets@redhat.com>
+In-Reply-To: <20190827160404.14098-4-vkuznets@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 27 Aug 2019 09:54:39 -0700
+Message-ID: <CALMp9eRyabQA8v5cJ1AwmtFdNFvWQz2jQ+iGTRQjow7r4FV3xA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: x86: announce KVM_CAP_HYPERV_ENLIGHTENED_VMCS
+ support only when it is available
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Roman Kagan <rkagan@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 27 Aug 2019 15:35:10 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Tue, Aug 27, 2019 at 9:04 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> It was discovered that after commit 65efa61dc0d5 ("selftests: kvm: provide
+> common function to enable eVMCS") hyperv_cpuid selftest is failing on AMD.
+> The reason is that the commit changed _vcpu_ioctl() to vcpu_ioctl() in the
+> test and this one can't fail.
+>
+> Instead of fixing the test is seems to make more sense to not announce
+> KVM_CAP_HYPERV_ENLIGHTENED_VMCS support if it is definitely missing
+> (on svm and in case kvm_intel.nested=0).
+>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d1cd0fcff9e7..ef2e8b138300 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3106,7 +3106,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>         case KVM_CAP_HYPERV_EVENTFD:
+>         case KVM_CAP_HYPERV_TLBFLUSH:
+>         case KVM_CAP_HYPERV_SEND_IPI:
+> -       case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+>         case KVM_CAP_HYPERV_CPUID:
+>         case KVM_CAP_PCI_SEGMENT:
+>         case KVM_CAP_DEBUGREGS:
+> @@ -3183,6 +3182,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>                 r = kvm_x86_ops->get_nested_state ?
+>                         kvm_x86_ops->get_nested_state(NULL, NULL, 0) : 0;
+>                 break;
+> +       case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+> +               r = kvm_x86_ops->nested_enable_evmcs != NULL;
 
-> On Tue, 27 Aug 2019 11:57:07 +0000
-> Parav Pandit <parav@mellanox.com> wrote:
-> 
-> > > -----Original Message-----
-> > > From: Cornelia Huck <cohuck@redhat.com>
-> > > Sent: Tuesday, August 27, 2019 5:11 PM
-> > > To: Parav Pandit <parav@mellanox.com>
-> > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> > > kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > Subject: Re: [PATCH 1/4] mdev: Introduce sha1 based mdev alias
-> > > 
-> > > On Tue, 27 Aug 2019 11:33:54 +0000
-> > > Parav Pandit <parav@mellanox.com> wrote:
-> > >     
-> > > > > -----Original Message-----
-> > > > > From: Cornelia Huck <cohuck@redhat.com>
-> > > > > Sent: Tuesday, August 27, 2019 4:54 PM
-> > > > > To: Parav Pandit <parav@mellanox.com>
-> > > > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
-> > > > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > > > Subject: Re: [PATCH 1/4] mdev: Introduce sha1 based mdev alias
-> > > > >
-> > > > > On Tue, 27 Aug 2019 11:12:23 +0000
-> > > > > Parav Pandit <parav@mellanox.com> wrote:
-> > > > >    
-> > > > > > > -----Original Message-----
-> > > > > > > From: Cornelia Huck <cohuck@redhat.com>
-> > > > > > > Sent: Tuesday, August 27, 2019 3:54 PM
-> > > > > > > To: Parav Pandit <parav@mellanox.com>
-> > > > > > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > > > > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
-> > > > > > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > > > > > Subject: Re: [PATCH 1/4] mdev: Introduce sha1 based mdev alias
-> > > > > > >    
-> > >     
-> > > > > > > What about:
-> > > > > > >
-> > > > > > > * @get_alias_length: optional callback to specify length of the
-> > > > > > > alias to    
-> > > > > create    
-> > > > > > > *                    Returns unsigned integer: length of the alias to be created,
-> > > > > > > *                                              0 to not create an alias
-> > > > > > >    
-> > > > > > Ack.
-> > > > > >    
-> > > > > > > I also think it might be beneficial to add a device parameter
-> > > > > > > here now (rather than later); that seems to be something that makes    
-> > > sense.    
-> > > > > > >    
-> > > > > > Without showing the use, it shouldn't be added.    
-> > > > >
-> > > > > It just feels like an omission: Why should the vendor driver only be
-> > > > > able to return one value here, without knowing which device it is for?
-> > > > > If a driver supports different devices, it may have different
-> > > > > requirements for them.
-> > > > >    
-> > > > Sure. Lets first have this requirement to add it.
-> > > > I am against adding this length field itself without an actual vendor use case,    
-> > > which is adding some complexity in code today.    
-> > > > But it was ok to have length field instead of bool.
-> > > >
-> > > > Lets not further add "no-requirement futuristic knobs" which hasn't shown its    
-> > > need yet.    
-> > > > When a vendor driver needs it, there is nothing prevents such addition.    
-> > > 
-> > > Frankly, I do not see how it adds complexity; the other callbacks have device
-> > > arguments already,    
-> > Other ioctls such as create, remove, mmap, likely need to access the parent.
-> > Hence it make sense to have parent pointer in there.
-> > 
-> > I am not against complexity, I am just saying, at present there is no use-case. Let have use case and we add it.
-> >   
-> > > and the vendor driver is free to ignore it if it does not have
-> > > a use for it. I'd rather add the argument before a possible future user tries
-> > > weird hacks to allow multiple values, but I'll leave the decision to the
-> > > maintainers.    
-> > Why would a possible future user tries a weird hack?
-> > If user needs to access parent device, that driver maintainer should ask for it.  
-> 
-> I've seen the situation often enough that folks tried to do hacks
-> instead of enhancing the interface.
-> 
-> Again, let's get a maintainer opinion.
+You should probably have an explicit break here, in case someone later
+adds another case below.
 
-Sure, make someone else have an opinion ;)  I don't have a strong one.
-The argument against a dev arg, as I see it, is that it's unused
-currently, so why should we try to predict a future use case.  The
-argument for, is that we're defining an API between the core and vendor
-driver, where our job in defining that API could certainly be seen as
-anticipating future use cases so as not to unnecessarily churn the
-API.  So do we lean towards a more stable API or do we lean towards
-minimalism?
-
-when called form mdev_register_device(), the arg we'd add seems obvious
-because we really have nothing more to work with than the parent
-device.  But this is only a sanity test and the value there seems
-questionable anyway.  If we look to the real use case in
-mdev_device_create() then clearly dev stands out as a likely useful
-arg, but is the type or kobj also useful?  Would we forfeit the sanity
-test to include those?  I don't have a lot of confidence in being able
-to predict that, so without an obvious set of args, I'm fine with the
-minimalist approach provided.  Thanks,
-
-Alex
+>         default:
+>                 break;
+>         }
+> --
+> 2.20.1
+>
