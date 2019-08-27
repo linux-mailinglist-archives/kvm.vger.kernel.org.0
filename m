@@ -2,115 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED6A39E1EF
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 10:17:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F23C9E10D
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 10:10:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729802AbfH0Hxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 03:53:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49970 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729149AbfH0Hx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 03:53:29 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5B6E43082E25;
-        Tue, 27 Aug 2019 07:53:29 +0000 (UTC)
-Received: from [10.36.116.105] (ovpn-116-105.ams2.redhat.com [10.36.116.105])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B010C600D1;
-        Tue, 27 Aug 2019 07:53:25 +0000 (UTC)
-Subject: Re: [PATCH] KVM: arm/arm64: vgic: Use a single IO device per
- redistributor
-To:     Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
-        maz@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     zhang.zhanghailiang@huawei.com, wanghaibin.wang@huawei.com,
-        james.morse@arm.com, qemu-arm@nongnu.org,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        peter.maydell@linaro.org, andre.przywara@arm.com
-References: <20190823173330.23342-1-eric.auger@redhat.com>
- <f5b47614-de48-f3cb-0e6f-8a667cb951c0@redhat.com>
- <5cdcfe9e-98d8-454e-48e7-992fe3ee5eae@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <ccb49856-f958-8bea-4b27-9a808415c43d@redhat.com>
-Date:   Tue, 27 Aug 2019 09:53:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1732267AbfH0IIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 04:08:39 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:57109 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732836AbfH0IFg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 04:05:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1566893136; x=1598429136;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=Ww95DjpyzDtqH6Txvs4SDUXs7Jnj2PvAwV+1xrWrzaA=;
+  b=uIA3IGwt2rw0/Z5jdXBRHC4sDbv8gI2FLJ13mqboI+IGn0VKG8nPkMPo
+   F+Ksp5N4T1c9E3iKDe6Al6OcHw0ddONBvvi6PwujTrhY3xXsF9C7Sa1hx
+   IBEHj35Db9/1kPEb7Ga4fKGGvaYdyE7rHtNuIxs4m9G+XQ8vQIZOe9kUe
+   4=;
+X-IronPort-AV: E=Sophos;i="5.64,436,1559520000"; 
+   d="scan'208";a="824114378"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2c-168cbb73.us-west-2.amazon.com) ([10.47.22.34])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 27 Aug 2019 08:05:34 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2c-168cbb73.us-west-2.amazon.com (Postfix) with ESMTPS id 84158A1D54;
+        Tue, 27 Aug 2019 08:05:33 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 27 Aug 2019 08:05:32 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.191) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 27 Aug 2019 08:05:29 +0000
+Subject: Re: [PATCH v2 06/15] kvm: x86: Add support for activate/de-activate
+ APICv at runtime
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jschoenh@amazon.de" <jschoenh@amazon.de>,
+        "karahmed@amazon.de" <karahmed@amazon.de>,
+        "rimasluk@amazon.com" <rimasluk@amazon.com>,
+        "Grimm, Jon" <Jon.Grimm@amd.com>
+References: <1565886293-115836-1-git-send-email-suravee.suthikulpanit@amd.com>
+ <1565886293-115836-7-git-send-email-suravee.suthikulpanit@amd.com>
+ <877e6zm5ft.fsf@vitty.brq.redhat.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <58fe156f-1bb8-910e-e9ce-1b6c49945b22@amazon.com>
+Date:   Tue, 27 Aug 2019 10:05:26 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <5cdcfe9e-98d8-454e-48e7-992fe3ee5eae@huawei.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <877e6zm5ft.fsf@vitty.brq.redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 27 Aug 2019 07:53:29 +0000 (UTC)
+X-Originating-IP: [10.43.162.191]
+X-ClientProxiedBy: EX13D07UWA004.ant.amazon.com (10.43.160.32) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
-On 8/27/19 9:49 AM, Zenghui Yu wrote:
-> Hi Eric,
-> 
-> Thanks for this patch!
-> 
-> On 2019/8/24 1:52, Auger Eric wrote:
->> Hi Zenghui, Marc,
->>
->> On 8/23/19 7:33 PM, Eric Auger wrote:
->>> At the moment we use 2 IO devices per GICv3 redistributor: one
->                                                              ^^^
->>> one for the RD_base frame and one for the SGI_base frame.
->   ^^^
->>>
->>> Instead we can use a single IO device per redistributor (the 2
->>> frames are contiguous). This saves slots on the KVM_MMIO_BUS
->>> which is currently limited to NR_IOBUS_DEVS (1000).
->>>
->>> This change allows to instantiate up to 512 redistributors and may
->>> speed the guest boot with a large number of VCPUs.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> I tested this patch with below kernel and QEMU branches:
->> kernel: https://github.com/eauger/linux/tree/256fix-v1
->> (Marc's patch + this patch)
->> https://github.com/eauger/qemu/tree/v4.1.0-256fix-rfc1-rc0
->> (header update + kvm_arm_gic_set_irq modification)
-> 
-> I also tested these three changes on HiSi D05 (with 64 pcpus), and yes,
-> I can get a 512U guest to boot properly now.
+CgpPbiAyNy4wOC4xOSAwOToyOSwgVml0YWx5IEt1em5ldHNvdiB3cm90ZToKPiAiU3V0aGlrdWxw
+YW5pdCwgU3VyYXZlZSIgPFN1cmF2ZWUuU3V0aGlrdWxwYW5pdEBhbWQuY29tPiB3cml0ZXM6Cj4g
+Cj4+IENlcnRhaW4gcnVudGltZSBjb25kaXRpb25zIHJlcXVpcmUgQVBJQ3YgdG8gYmUgdGVtcG9y
+YXJ5IGRlYWN0aXZhdGVkLgo+PiBIb3dldmVyLCBjdXJyZW50IGltcGxlbWVudGF0aW9uIG9ubHkg
+c3VwcG9ydCBwZXJtYW5lbnRseSBkZWFjdGl2YXRlCj4+IEFQSUN2IGF0IHJ1bnRpbWUgKG1haW5s
+eSB1c2VkIHdoZW4gcnVubmluZyBIeXBlci1WIGd1ZXN0KS4KPj4KPj4gSW4gYWRkdGlvbiwgZm9y
+IEFNRCwgd2hlbiBhY3RpdmF0ZSAvIGRlYWN0aXZhdGUgQVBJQ3YgZHVyaW5nIHJ1bnRpbWUsCj4+
+IGFsbCB2Y3B1cyBpbiB0aGUgVk0gaGFzIHRvIGJlIG9wZXJhdGluZyBpbiB0aGUgc2FtZSBBUElD
+diBtb2RlLCB3aGljaAo+PiByZXF1aXJlcyB0aGUgcmVxdWVzdGluZyAobWFpbikgdmNwdSB0byBu
+b3RpZnkgb3RoZXJzLgo+Pgo+PiBTbywgaW50cm9kdWNlIGludGVyZmFjZXMgdG8gcmVxdWVzdCBh
+bGwgdmNwdXMgdG8gYWN0aXZhdGUvZGVhY3RpdmF0ZQo+PiBBUElDdi4KPj4KPj4gU2lnbmVkLW9m
+Zi1ieTogU3VyYXZlZSBTdXRoaWt1bHBhbml0IDxzdXJhdmVlLnN1dGhpa3VscGFuaXRAYW1kLmNv
+bT4KPj4gLS0tCj4+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICA5ICsrKysr
+Cj4+ICAgYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAgICAgICB8IDc2ICsrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrCj4+ICAgMiBmaWxlcyBjaGFuZ2VkLCA4NSBpbnNl
+cnRpb25zKCspCj4+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9z
+dC5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+PiBpbmRleCAwNGQ3MDY2Li5k
+ZmI3YzNkIDEwMDY0NAo+PiAtLS0gYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+
+ICsrKyBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4gQEAgLTc2LDYgKzc2LDEw
+IEBACj4+ICAgI2RlZmluZSBLVk1fUkVRX0hWX1NUSU1FUgkJS1ZNX0FSQ0hfUkVRKDIyKQo+PiAg
+ICNkZWZpbmUgS1ZNX1JFUV9MT0FEX0VPSV9FWElUTUFQCUtWTV9BUkNIX1JFUSgyMykKPj4gICAj
+ZGVmaW5lIEtWTV9SRVFfR0VUX1ZNQ1MxMl9QQUdFUwlLVk1fQVJDSF9SRVEoMjQpCj4+ICsjZGVm
+aW5lIEtWTV9SRVFfQVBJQ1ZfQUNUSVZBVEUJCVwKPj4gKwlLVk1fQVJDSF9SRVFfRkxBR1MoMjUs
+IEtWTV9SRVFVRVNUX1dBSVQgfCBLVk1fUkVRVUVTVF9OT19XQUtFVVApCj4+ICsjZGVmaW5lIEtW
+TV9SRVFfQVBJQ1ZfREVBQ1RJVkFURQlcCj4+ICsJS1ZNX0FSQ0hfUkVRX0ZMQUdTKDI2LCBLVk1f
+UkVRVUVTVF9XQUlUIHwgS1ZNX1JFUVVFU1RfTk9fV0FLRVVQKQo+PiAgIAo+PiAgICNkZWZpbmUg
+Q1IwX1JFU0VSVkVEX0JJVFMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIFwKPj4gICAJKH4odW5zaWduZWQgbG9uZykoWDg2X0NSMF9QRSB8IFg4Nl9DUjBfTVAg
+fCBYODZfQ1IwX0VNIHwgWDg2X0NSMF9UUyBcCj4+IEBAIC0xMDg5LDYgKzEwOTMsNyBAQCBzdHJ1
+Y3Qga3ZtX3g4Nl9vcHMgewo+PiAgIAl2b2lkICgqZW5hYmxlX2lycV93aW5kb3cpKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSk7Cj4+ICAgCXZvaWQgKCp1cGRhdGVfY3I4X2ludGVyY2VwdCkoc3RydWN0
+IGt2bV92Y3B1ICp2Y3B1LCBpbnQgdHByLCBpbnQgaXJyKTsKPj4gICAJYm9vbCAoKmdldF9lbmFi
+bGVfYXBpY3YpKHN0cnVjdCBrdm0gKmt2bSk7Cj4+ICsJdm9pZCAoKnByZV91cGRhdGVfYXBpY3Zf
+ZXhlY19jdHJsKShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJvb2wgYWN0aXZhdGUpOwo+PiAgIAl2
+b2lkICgqcmVmcmVzaF9hcGljdl9leGVjX2N0cmwpKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4+
+ICAgCXZvaWQgKCpod2FwaWNfaXJyX3VwZGF0ZSkoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBpbnQg
+bWF4X2lycik7Cj4+ICAgCXZvaWQgKCpod2FwaWNfaXNyX3VwZGF0ZSkoc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1LCBpbnQgaXNyKTsKPj4gQEAgLTE1NTIsNiArMTU1NywxMCBAQCBpbnQga3ZtX3B2X3Nl
+bmRfaXBpKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQgbG9uZyBpcGlfYml0bWFwX2xvdywKPj4g
+ICAKPj4gICB2b2lkIGt2bV9tYWtlX21jbG9ja19pbnByb2dyZXNzX3JlcXVlc3Qoc3RydWN0IGt2
+bSAqa3ZtKTsKPj4gICB2b2lkIGt2bV9tYWtlX3NjYW5faW9hcGljX3JlcXVlc3Qoc3RydWN0IGt2
+bSAqa3ZtKTsKPj4gK3ZvaWQga3ZtX3ZjcHVfZGVhY3RpdmF0ZV9hcGljdihzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUpOwo+PiArdm9pZCBrdm1fdmNwdV9hY3RpdmF0ZV9hcGljdihzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUpOwo+PiArdm9pZCBrdm1fbWFrZV9hcGljdl9hY3RpdmF0ZV9yZXF1ZXN0KHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSk7Cj4+ICt2b2lkIGt2bV9tYWtlX2FwaWN2X2RlYWN0aXZhdGVfcmVx
+dWVzdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJvb2wgZGlzYWJsZSk7Cj4+ICAgCj4+ICAgdm9p
+ZCBrdm1fYXJjaF9hc3luY19wYWdlX25vdF9wcmVzZW50KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwK
+Pj4gICAJCQkJICAgICBzdHJ1Y3Qga3ZtX2FzeW5jX3BmICp3b3JrKTsKPj4gZGlmZiAtLWdpdCBh
+L2FyY2gveDg2L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYwo+PiBpbmRleCBmOWMzZjYz
+Li40MGEyMGJmIDEwMDY0NAo+PiAtLS0gYS9hcmNoL3g4Ni9rdm0veDg2LmMKPj4gKysrIGIvYXJj
+aC94ODYva3ZtL3g4Ni5jCj4+IEBAIC0yNiw2ICsyNiw3IEBACj4+ICAgI2luY2x1ZGUgImNwdWlk
+LmgiCj4+ICAgI2luY2x1ZGUgInBtdS5oIgo+PiAgICNpbmNsdWRlICJoeXBlcnYuaCIKPj4gKyNp
+bmNsdWRlICJsYXBpYy5oIgo+PiAgIAo+PiAgICNpbmNsdWRlIDxsaW51eC9jbG9ja3NvdXJjZS5o
+Pgo+PiAgICNpbmNsdWRlIDxsaW51eC9pbnRlcnJ1cHQuaD4KPj4gQEAgLTcxNjMsNiArNzE2NCwy
+MiBAQCBzdGF0aWMgdm9pZCBrdm1fcHZfa2lja19jcHVfb3Aoc3RydWN0IGt2bSAqa3ZtLCB1bnNp
+Z25lZCBsb25nIGZsYWdzLCBpbnQgYXBpY2lkKQo+PiAgIAlrdm1faXJxX2RlbGl2ZXJ5X3RvX2Fw
+aWMoa3ZtLCBOVUxMLCAmbGFwaWNfaXJxLCBOVUxMKTsKPj4gICB9Cj4+ICAgCj4+ICt2b2lkIGt2
+bV92Y3B1X2FjdGl2YXRlX2FwaWN2KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gK3sKPj4gKwlp
+ZiAoIWxhcGljX2luX2tlcm5lbCh2Y3B1KSkgewo+PiArCQlXQVJOX09OX09OQ0UoIXZjcHUtPmFy
+Y2guYXBpY3ZfYWN0aXZlKTsKPj4gKwkJcmV0dXJuOwo+PiArCX0KPj4gKwlpZiAodmNwdS0+YXJj
+aC5hcGljdl9hY3RpdmUpCj4+ICsJCXJldHVybjsKPj4gKwo+PiArCXZjcHUtPmFyY2guYXBpY3Zf
+YWN0aXZlID0gdHJ1ZTsKPj4gKwlrdm1fYXBpY191cGRhdGVfYXBpY3YodmNwdSk7Cj4+ICsKPj4g
+Kwlrdm1feDg2X29wcy0+cmVmcmVzaF9hcGljdl9leGVjX2N0cmwodmNwdSk7Cj4+ICt9Cj4+ICtF
+WFBPUlRfU1lNQk9MX0dQTChrdm1fdmNwdV9hY3RpdmF0ZV9hcGljdik7Cj4+ICsKPj4gICB2b2lk
+IGt2bV92Y3B1X2RlYWN0aXZhdGVfYXBpY3Yoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiAgIHsK
+Pj4gICAJaWYgKCFsYXBpY19pbl9rZXJuZWwodmNwdSkpIHsKPj4gQEAgLTcxNzMsOCArNzE5MCwx
+MSBAQCB2b2lkIGt2bV92Y3B1X2RlYWN0aXZhdGVfYXBpY3Yoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+KQo+PiAgIAkJcmV0dXJuOwo+PiAgIAo+PiAgIAl2Y3B1LT5hcmNoLmFwaWN2X2FjdGl2ZSA9IGZh
+bHNlOwo+PiArCWt2bV9hcGljX3VwZGF0ZV9hcGljdih2Y3B1KTsKPj4gKwo+PiAgIAlrdm1feDg2
+X29wcy0+cmVmcmVzaF9hcGljdl9leGVjX2N0cmwodmNwdSk7Cj4+ICAgfQo+PiArRVhQT1JUX1NZ
+TUJPTF9HUEwoa3ZtX3ZjcHVfZGVhY3RpdmF0ZV9hcGljdik7Cj4+ICAgCj4+ICAgaW50IGt2bV9l
+bXVsYXRlX2h5cGVyY2FsbChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICAgewo+PiBAQCAtNzY2
+OCw2ICs3Njg4LDU4IEBAIHZvaWQga3ZtX21ha2Vfc2Nhbl9pb2FwaWNfcmVxdWVzdChzdHJ1Y3Qg
+a3ZtICprdm0pCj4+ICAgCWt2bV9tYWtlX2FsbF9jcHVzX3JlcXVlc3Qoa3ZtLCBLVk1fUkVRX1ND
+QU5fSU9BUElDKTsKPj4gICB9Cj4+ICAgCj4+ICt2b2lkIGt2bV9tYWtlX2FwaWN2X2FjdGl2YXRl
+X3JlcXVlc3Qoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiArewo+PiArCWludCBpOwo+PiArCXN0
+cnVjdCBrdm1fdmNwdSAqdjsKPj4gKwlzdHJ1Y3Qga3ZtICprdm0gPSB2Y3B1LT5rdm07Cj4+ICsK
+Pj4gKwltdXRleF9sb2NrKCZrdm0tPmFyY2guYXBpY3ZfbG9jayk7Cj4+ICsJaWYgKGt2bS0+YXJj
+aC5hcGljdl9zdGF0ZSAhPSBBUElDVl9ERUFDVElWQVRFRCkgewo+PiArCQltdXRleF91bmxvY2so
+Jmt2bS0+YXJjaC5hcGljdl9sb2NrKTsKPj4gKwkJcmV0dXJuOwo+PiArCX0KPj4gKwo+PiArCWt2
+bV9mb3JfZWFjaF92Y3B1KGksIHYsIGt2bSkKPj4gKwkJa3ZtX2NsZWFyX3JlcXVlc3QoS1ZNX1JF
+UV9BUElDVl9ERUFDVElWQVRFLCB2KTsKPj4gKwo+PiArCWlmIChrdm1feDg2X29wcy0+cHJlX3Vw
+ZGF0ZV9hcGljdl9leGVjX2N0cmwpCj4+ICsJCWt2bV94ODZfb3BzLT5wcmVfdXBkYXRlX2FwaWN2
+X2V4ZWNfY3RybCh2Y3B1LCB0cnVlKTsKPj4gKwo+PiArCWt2bS0+YXJjaC5hcGljdl9zdGF0ZSA9
+IEFQSUNWX0FDVElWQVRFRDsKPj4gKwo+PiArCWt2bV9tYWtlX2FsbF9jcHVzX3JlcXVlc3Qoa3Zt
+LCBLVk1fUkVRX0FQSUNWX0FDVElWQVRFKTsKPj4gKwo+PiArCW11dGV4X3VubG9jaygma3ZtLT5h
+cmNoLmFwaWN2X2xvY2spOwo+PiArfQo+PiArRVhQT1JUX1NZTUJPTF9HUEwoa3ZtX21ha2VfYXBp
+Y3ZfYWN0aXZhdGVfcmVxdWVzdCk7Cj4+ICsKPj4gK3ZvaWQga3ZtX21ha2VfYXBpY3ZfZGVhY3Rp
+dmF0ZV9yZXF1ZXN0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgYm9vbCBkaXNhYmxlKQo+PiArewo+
+PiArCWludCBpOwo+PiArCXN0cnVjdCBrdm1fdmNwdSAqdjsKPj4gKwlzdHJ1Y3Qga3ZtICprdm0g
+PSB2Y3B1LT5rdm07Cj4+ICsKPj4gKwltdXRleF9sb2NrKCZrdm0tPmFyY2guYXBpY3ZfbG9jayk7
+Cj4+ICsJaWYgKGt2bS0+YXJjaC5hcGljdl9zdGF0ZSA9PSBBUElDVl9ERUFDVElWQVRFRCkgewo+
+PiArCQltdXRleF91bmxvY2soJmt2bS0+YXJjaC5hcGljdl9sb2NrKTsKPj4gKwkJcmV0dXJuOwo+
+PiArCX0KPj4gKwo+PiArCWt2bV9mb3JfZWFjaF92Y3B1KGksIHYsIGt2bSkKPj4gKwkJa3ZtX2Ns
+ZWFyX3JlcXVlc3QoS1ZNX1JFUV9BUElDVl9BQ1RJVkFURSwgdik7Cj4gCj4gQ291bGQgeW91IHBs
+ZWFzZSBlbGFib3JhdGUgb24gd2hlbiB3ZSBuZWVkIHRvIGVhdCB0aGUKPiBLVk1fUkVRX0FQSUNW
+X0FDVElWQVRFIHJlcXVlc3QgaGVyZSAoYW5kIEtWTV9SRVFfQVBJQ1ZfREVBQ1RJVkFURSBpbgo+
+IGt2bV9tYWtlX2FwaWN2X2FjdGl2YXRlX3JlcXVlc3QoKSByZXNwZWN0aXZlbHkpPyBUbyBtZSwg
+dGhpcyBsb29rcyBsaWtlCj4gYSBwb3NzaWJsZSBzb3VyY2Ugb2YgaGFyZC10by1kZWJ1ZyBwcm9i
+bGVtcyBpbiB0aGUgZnV0dXJlLgoKCUNQVTAJCQkJCUNQVTEKCmt2bV9tYWtlX2FwaWN2X2FjdGl2
+YXRlX3JlcXVlc3QoKQkuLi4KSGFuZGxlIEtWTV9SRVFfQVBJQ1ZfQUNUSVZBVEUJCUtWTV9SRVFf
+QVBJQ1ZfQUNUSVZBVEU9PTEKdmNwdV9ydW4oKQkJCQkuLi4Ka3ZtX21ha2VfYXBpY3ZfZGVhY3Rp
+dmF0ZV9yZXF1ZXN0KCkJLi4uCgpJbiB0aGF0IGNhc2UgQ1BVMSB3b3VsZCBoYXZlIGJvdGggYWN0
+aXZhdGUgYW5kIGRlYWN0aXZhdGUgcmVxdWVzdHMgCnBlbmRpbmcuIFlvdSBjYW4gc2VlIHRoZSBz
+YW1lIGxvZ2ljIGFib3ZlIGluIHRoZSBhY3RpdmF0ZSgpIGZ1bmN0aW9uLCAKanVzdCByZXZlcnNl
+LgoKSSBhZ3JlZSB0aGF0IGl0IHByb2JhYmx5IG5lZWRzIGF0IGxlYXN0IGEgY29tbWVudCB0byBl
+eHBsYWluIHdoeSB3ZSBoYXZlIAppdC4gQnV0IHdoZW4gSSBsb29rZWQgYXQgdGhlIGNvZGUsIEkg
+Y291bGQgbm90IHRoaW5rIG9mIGEgbmljZXIgd2F5IHRvIAppbXBsZW1lbnQgaXQgZWl0aGVyLgoK
+CkFsZXgKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0
+ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdl
+ciwgUmFsZiBIZXJicmljaApFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVy
+ZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkK
+Cgo=
 
-Many thanks for the testing (and the bug report). I will formally post
-the QEMU changes asap.
-
-Thanks
-
-Eric
-> 
-> Tested-by: Zenghui Yu <yuzenghui@huawei.com>
-> 
->> On a machine with 224 pcpus, I was able to boot a 512 vcpu guest.
->>
->> As expected, qemu outputs warnings:
->>
->> qemu-system-aarch64: warning: Number of SMP cpus requested (512) exceeds
->> the recommended cpus supported by KVM (224)
->> qemu-system-aarch64: warning: Number of hotpluggable cpus requested
->> (512) exceeds the recommended cpus supported by KVM (224)
->>
->> on the guest: getconf _NPROCESSORS_ONLN returns 512
->>
->> Then I have no clue about what can be expected of such overcommit config
->> and I have not further exercised the guest at the moment. But at least
->> it seems to boot properly. I also tested without overcommit and it seems
->> to behave as before (boot, migration).
->>
->> I still need to look at the migration of > 256vcpu guest at qemu level.
-> 
-> Let us know if further tests are needed.
-> 
-> 
-> Thanks,
-> zenghui
-> 
