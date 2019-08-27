@@ -2,78 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AB369F313
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 21:17:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 808249F343
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 21:24:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731116AbfH0TRO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 15:17:14 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:38910 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731082AbfH0TRN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 15:17:13 -0400
-Received: from Internal Mail-Server by MTLPINE1 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 27 Aug 2019 22:17:09 +0300
-Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x7RJGuGv026842;
-        Tue, 27 Aug 2019 22:17:08 +0300
-From:   Parav Pandit <parav@mellanox.com>
-To:     alex.williamson@redhat.com, jiri@mellanox.com,
-        kwankhede@nvidia.com, cohuck@redhat.com, davem@davemloft.net
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Parav Pandit <parav@mellanox.com>
-Subject: [PATCH v1 5/5] mtty: Optionally support mtty alias
-Date:   Tue, 27 Aug 2019 14:16:54 -0500
-Message-Id: <20190827191654.41161-6-parav@mellanox.com>
-X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20190827191654.41161-1-parav@mellanox.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
- <20190827191654.41161-1-parav@mellanox.com>
+        id S1731064AbfH0TYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 15:24:18 -0400
+Received: from mga05.intel.com ([192.55.52.43]:38393 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728834AbfH0TYS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 15:24:18 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Aug 2019 12:24:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,438,1559545200"; 
+   d="scan'208";a="192344648"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga002.jf.intel.com with ESMTP; 27 Aug 2019 12:24:16 -0700
+Date:   Tue, 27 Aug 2019 12:24:16 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tony Luck <tony.luck@intel.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: x86: Only print persistent reasons for kvm disabled
+ once
+Message-ID: <20190827192416.GG27459@linux.intel.com>
+References: <20190826182320.9089-1-tony.luck@intel.com>
+ <87imqjm8b4.fsf@vitty.brq.redhat.com>
+ <20190827190810.GA21275@flask>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190827190810.GA21275@flask>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Provide a module parameter to set alias length to optionally generate
-mdev alias.
+On Tue, Aug 27, 2019 at 09:08:10PM +0200, Radim Krčmář wrote:
+> I am also not inclined to apply the patch as we will likely merge the
+> kvm and kvm_{svm,intel} modules in the future to take full advantage of
+> link time optimizations and this patch would stop working after that.
 
-Example to request mdev alias.
-$ modprobe mtty alias_length=12
-
-Signed-off-by: Parav Pandit <parav@mellanox.com>
----
- samples/vfio-mdev/mtty.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-index 92e770a06ea2..92208245b057 100644
---- a/samples/vfio-mdev/mtty.c
-+++ b/samples/vfio-mdev/mtty.c
-@@ -1410,6 +1410,15 @@ static struct attribute_group *mdev_type_groups[] = {
- 	NULL,
- };
- 
-+static unsigned int mtty_alias_length;
-+module_param_named(alias_length, mtty_alias_length, uint, 0444);
-+MODULE_PARM_DESC(alias_length, "mdev alias length; default=0");
-+
-+static unsigned int mtty_get_alias_length(void)
-+{
-+	return mtty_alias_length;
-+}
-+
- static const struct mdev_parent_ops mdev_fops = {
- 	.owner                  = THIS_MODULE,
- 	.dev_attr_groups        = mtty_dev_groups,
-@@ -1422,6 +1431,7 @@ static const struct mdev_parent_ops mdev_fops = {
- 	.read                   = mtty_read,
- 	.write                  = mtty_write,
- 	.ioctl		        = mtty_ioctl,
-+	.get_alias_length	= mtty_get_alias_length
- };
- 
- static void mtty_device_release(struct device *dev)
--- 
-2.19.2
-
+Any chance you can provide additional details on the plan for merging
+modules?  E.g. I assume there would still be kvm_intel and kvm_svm, just
+no vanilla kvm?
