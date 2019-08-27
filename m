@@ -2,75 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4FF59E4F3
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 11:53:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFF529E597
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 12:24:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729523AbfH0Jxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 05:53:46 -0400
-Received: from ozlabs.org ([203.11.71.1]:58623 "EHLO ozlabs.org"
+        id S1727270AbfH0KYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 06:24:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3146 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728883AbfH0Jxp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 05:53:45 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46Hkj34P0Dz9sBF; Tue, 27 Aug 2019 19:53:43 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1566899623; bh=t6/73EjuF6lJD3vndlHCMS7wuROyK8CMl9+AMLeKESY=;
-        h=Date:From:To:Cc:Subject:From;
-        b=drvcqPoXL2O5q/SiHCsJcM00v3xX/xRnF6GtGEbpZR+8fhkU+8EnAxFSaumKWmc/Q
-         7AdQdmdRGr2Xl1yLRuq0kVGQJ/zPB6NXghY8zJmYaJBeBn6BBmxwar02Z0ZFRVMlTJ
-         qjZArhmMIeOig0++PCIr3kV+Q1VzdpLJYSbGkk6k6cJLSqWBp/4tTmlrtcwtazL5lH
-         lm4TYBAu9YPdS+EyuYZwPBAH+7+oH+8I294253uidNQ/fVRqi02pxnnPf1CaAQjoQK
-         bVYu4hoc8mSEFi8OFkx2L2df6gJWcfz7W9Fjfg552ptlZ/1vRix3OGMF3GYxPmkYU5
-         6U2zPqPMKKy8w==
-Date:   Tue, 27 Aug 2019 19:53:38 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
-Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.3-1 tag
-Message-ID: <20190827095338.GA22875@blackberry>
+        id S1726071AbfH0KYe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 06:24:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 84C4118012FA;
+        Tue, 27 Aug 2019 10:24:34 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6BED10018F9;
+        Tue, 27 Aug 2019 10:24:30 +0000 (UTC)
+Date:   Tue, 27 Aug 2019 12:24:28 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     alex.williamson@redhat.com, jiri@mellanox.com,
+        kwankhede@nvidia.com, davem@davemloft.net, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/4] mdev: Introduce sha1 based mdev alias
+Message-ID: <20190827122428.37442fe1.cohuck@redhat.com>
+In-Reply-To: <20190826204119.54386-2-parav@mellanox.com>
+References: <20190826204119.54386-1-parav@mellanox.com>
+        <20190826204119.54386-2-parav@mellanox.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Tue, 27 Aug 2019 10:24:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo or Radim,
+On Mon, 26 Aug 2019 15:41:16 -0500
+Parav Pandit <parav@mellanox.com> wrote:
 
-Please do a pull from my kvm-ppc-fixes-5.3-1 tag to get one small
-commit which I would like to go to Linus for 5.3 if possible, since it
-fixes a bug where a malicious guest could cause host CPUs to hang
-hard.  The fix is small and obviously correct.
+> Whenever a parent requests to generate mdev alias, generate a mdev
+> alias.
+> It is an optional attribute that parent can request to generate
+> for each of its child mdev.
+> mdev alias is generated using sha1 from the mdev name.
 
-Thanks,
-Paul.
+Maybe add some motivation here as well?
 
-The following changes since commit e4427372398c31f57450565de277f861a4db5b3b:
+"Some vendor drivers want an identifier for an mdev device that is
+shorter than the uuid, due to length restrictions in the consumers of
+that identifier.
 
-  selftests/kvm: make platform_info_test pass on AMD (2019-08-21 19:08:18 +0200)
+Add a callback that allows a vendor driver to request an alias of a
+specified length to be generated (via sha1) for an mdev device. If
+generated, that alias is checked for collisions."
 
-are available in the git repository at:
+> 
+> Signed-off-by: Parav Pandit <parav@mellanox.com>
+> ---
+>  drivers/vfio/mdev/mdev_core.c    | 98 +++++++++++++++++++++++++++++++-
+>  drivers/vfio/mdev/mdev_private.h |  5 +-
+>  drivers/vfio/mdev/mdev_sysfs.c   | 13 +++--
+>  include/linux/mdev.h             |  4 ++
+>  4 files changed, 111 insertions(+), 9 deletions(-)
+> 
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.3-1
+(...)
 
-for you to fetch changes up to ddfd151f3def9258397fcde7a372205a2d661903:
+> @@ -406,6 +495,10 @@ EXPORT_SYMBOL(mdev_get_iommu_device);
+>  
+>  static int __init mdev_init(void)
+>  {
+> +	alias_hash = crypto_alloc_shash("sha1", 0, 0);
+> +	if (!alias_hash)
+> +		return -ENOMEM;
+> +
+>  	return mdev_bus_register();
 
-  KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling (2019-08-27 10:59:30 +1000)
+Don't you need to call crypto_free_shash() if mdev_bus_register() fails?
 
-----------------------------------------------------------------
-KVM/PPC fix for 5.3
+>  }
+>  
+> @@ -415,6 +508,7 @@ static void __exit mdev_exit(void)
+>  		class_compat_unregister(mdev_bus_compat_class);
+>  
+>  	mdev_bus_unregister();
+> +	crypto_free_shash(alias_hash);
+>  }
+>  
+>  module_init(mdev_init)
 
-- Fix bug which could leave locks locked in the host on return
-  to a guest.
+(...)
 
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      KVM: PPC: Book3S: Fix incorrect guest-to-user-translation error handling
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 0ce30ca78db0..f036fe9854ee 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -72,6 +72,9 @@ struct device *mdev_get_iommu_device(struct device *dev);
+>   * @mmap:		mmap callback
+>   *			@mdev: mediated device structure
+>   *			@vma: vma structure
+> + * @get_alias_length:	Generate alias for the mdevs of this parent based on the
+> + *			mdev device name when it returns non zero alias length.
+> + *			It is optional.
 
- arch/powerpc/kvm/book3s_64_vio.c    | 6 ++++--
- arch/powerpc/kvm/book3s_64_vio_hv.c | 6 ++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+What about:
+
+* @get_alias_length: optional callback to specify length of the alias to create
+*                    Returns unsigned integer: length of the alias to be created,
+*                                              0 to not create an alias
+
+I also think it might be beneficial to add a device parameter here now
+(rather than later); that seems to be something that makes sense.
+
+>   * Parent device that support mediated device should be registered with mdev
+>   * module with mdev_parent_ops structure.
+>   **/
+> @@ -92,6 +95,7 @@ struct mdev_parent_ops {
+>  	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
+>  			 unsigned long arg);
+>  	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
+> +	unsigned int (*get_alias_length)(void);
+>  };
+>  
+>  /* interface for exporting mdev supported type attributes */
+
