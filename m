@@ -2,52 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43CD69F0D4
-	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 18:54:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9511C9F0F2
+	for <lists+kvm@lfdr.de>; Tue, 27 Aug 2019 18:57:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730385AbfH0Qyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Aug 2019 12:54:53 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36672 "EHLO
+        id S1730461AbfH0Q5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Aug 2019 12:57:38 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46056 "EHLO
         mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730255AbfH0Qyw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Aug 2019 12:54:52 -0400
-Received: by mail-io1-f65.google.com with SMTP id o9so47900407iom.3
-        for <kvm@vger.kernel.org>; Tue, 27 Aug 2019 09:54:51 -0700 (PDT)
+        with ESMTP id S1730379AbfH0Q5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Aug 2019 12:57:37 -0400
+Received: by mail-io1-f65.google.com with SMTP id t3so47828498ioj.12
+        for <kvm@vger.kernel.org>; Tue, 27 Aug 2019 09:57:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=BOHjP5tc+yZEVIg0MRWpIDqFx5JGItaQGHN16Joy+r0=;
-        b=LImm1TiukFBu1ne3V7tPK2lDYmzuj4dXh0BahpqBrLhOmjWkDLnm/+5PTe3ynD9tjH
-         3XO3s77urhRAkPCJvyFYH2S/cMFGJGwZxjg2ayfTkmUG2Rivg5KffODDoQFNRXU80j8t
-         d5cfVGq6PNQlHoymLKxlyBXEg+XYcR3YSqC5V4orbtB0uLss5o3lShya2h7UKi8EhK20
-         a6Ie04+q1CTmYyMfDZ/9+cduzuB9Jtw56n677JSg5QmeYjrvThjfFgjahv2w/php93wL
-         ROP+Q6EXNx+KrJf+TpmFmxO2HF+ENHmNFMQv0LMoCbbLTeEfuQXe8TVXTWsyVx9fwNkD
-         b6bA==
+        bh=bGOUb6qETbWsgAJoalsCTFlAvdsb83uQVVXs/w4mwBE=;
+        b=VBIsrc0k26FUtEar2ReJlFb0cg8xeFC2xexRrOXNtYtYJjLoug03whgz8WJlzMuaDQ
+         7JK4jplpFQZ8tCMjKW8F2AKSdfMe0/ceSV/ixQVYo8W2MIizdFxT8C1GuY3dusICVPE3
+         z9vUBtjOJBJHbjPFAkhEj8hvRBhAV5Tw5YgAnSzqZLgkZnELvo83/PqcA7lmTe/S/ZYP
+         v8XbQGjooZ8kU2BJ7I32GgDLo3l1CeWZUn5JoE5AExetPx0bpdPSN0DF8uknSNTZBYgR
+         FGKhWxbUpCK7/lSfOHMiIVnProPheI9lKMJfp0/Ck1ye3VbZdIJYUJ49YgjOtyEWc1qO
+         GATg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=BOHjP5tc+yZEVIg0MRWpIDqFx5JGItaQGHN16Joy+r0=;
-        b=gtwWe53GkLiCq9xus50w/C4yEGVEwMChlGB1cZvHxTzen7gF8YY/tIWjMyBk+j/Fiy
-         Ge69b/2s7jpyksy4OnJzGSbRNesNlfodsfoVJB/mWZBSDud5EkYTkuPGZ027xEaf3IeL
-         vVLU5oOZ5HXICnzTR8Tb0BVbeuhIeddtkcWl9X2oNFQaIClYgL4YbSc1DmbAaxxcJ9iw
-         l9spCK8J1QiLKgXWytPDcknErR9I/NDQ6xZHUYLBF7RjIhpGrPW4jc1qaGby53OzORix
-         TvLqrS4px95NUiGKXjiDkmpFrviHZzY5SjLIeXpWm7KnR8K7areMuTc/cLfXpH6VJjf0
-         9HAQ==
-X-Gm-Message-State: APjAAAV9WtVP85cfBveJPH6UhNn2l6gRw1mmbfbJ+RC96Le7EUo/cZFK
-        EuNjRoNkBgPUZzG8FSgm87SCsS7QyYgvLn+CrzrDdw==
-X-Google-Smtp-Source: APXvYqzBwOW0kq4D3Mw5u/JNKSwavZ6FcPJ53+ULO/GuH3d4BgNMAL73A0JC9I8uiX/MO/BzJqUbGTpEmT9lC18aBec=
-X-Received: by 2002:a6b:6a15:: with SMTP id x21mr23262943iog.40.1566924890982;
- Tue, 27 Aug 2019 09:54:50 -0700 (PDT)
+        bh=bGOUb6qETbWsgAJoalsCTFlAvdsb83uQVVXs/w4mwBE=;
+        b=tDyx3uFZyOaCZPUYHNzxFFojX0ca4NKW+gVhf7AKGTx5r85GWHGPtFvJWo5uiAa4R8
+         fYHGAIeXCQmhvVIyrmjGWgTEyR42bvhyL36G5FFC5Hwz+MqgxMrZ8i+xI/RsJQf0eCxc
+         z2xQTOWG+kKgT5aX3TjUHfBBZUhH/y+V6VQCIvmEzdQyh/QPAkDakIkMpKAH9wSlyDsr
+         RJ+Sed+vN9hWmS8z2XF3dycNG8v39Iz7/iBaV2lVIrRt3juOJPNolVG/lspPZ+PYhWXS
+         m37DoDKG5fpaIth1iwuj2g+ZhNM7qjCI0KNojZz3Em5hMUTky0Oc6T6VY8zSrk55iQ8c
+         WUww==
+X-Gm-Message-State: APjAAAVB60QAvayeAKCCQ14TkPj7DeIurEoR/WvYroZSnc9KT52pPwMp
+        mkg/aksspxqAF3HxfB6UlxXW9IpfM1V664BV2Sk7Og==
+X-Google-Smtp-Source: APXvYqw5P+1iPQwzpQ0PkMddqAw7dDWHOpCeRE8Gzm38lrWZHgeRKZTaqN/9e3LzgB/+45/Suy7SL7Xu8mCoHsnZz8g=
+X-Received: by 2002:a5e:a811:: with SMTP id c17mr326399ioa.122.1566925056306;
+ Tue, 27 Aug 2019 09:57:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190827160404.14098-1-vkuznets@redhat.com> <20190827160404.14098-4-vkuznets@redhat.com>
-In-Reply-To: <20190827160404.14098-4-vkuznets@redhat.com>
+References: <20190827160404.14098-1-vkuznets@redhat.com> <20190827160404.14098-3-vkuznets@redhat.com>
+In-Reply-To: <20190827160404.14098-3-vkuznets@redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 27 Aug 2019 09:54:39 -0700
-Message-ID: <CALMp9eRyabQA8v5cJ1AwmtFdNFvWQz2jQ+iGTRQjow7r4FV3xA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: x86: announce KVM_CAP_HYPERV_ENLIGHTENED_VMCS
- support only when it is available
+Date:   Tue, 27 Aug 2019 09:57:25 -0700
+Message-ID: <CALMp9eTE4JsUsU2CRE-Y04_nuqpjav1YohuW8SsSdh+m8s=7mw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: x86: svm: remove unneeded nested_enable_evmcs() hook
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -64,45 +63,10 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Aug 27, 2019 at 9:04 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 >
-> It was discovered that after commit 65efa61dc0d5 ("selftests: kvm: provide
-> common function to enable eVMCS") hyperv_cpuid selftest is failing on AMD.
-> The reason is that the commit changed _vcpu_ioctl() to vcpu_ioctl() in the
-> test and this one can't fail.
->
-> Instead of fixing the test is seems to make more sense to not announce
-> KVM_CAP_HYPERV_ENLIGHTENED_VMCS support if it is definitely missing
-> (on svm and in case kvm_intel.nested=0).
+> Since commit 5158917c7b019 ("KVM: x86: nVMX: Allow nested_enable_evmcs to
+> be NULL") the code in x86.c is prepared to see nested_enable_evmcs being
+> NULL and in VMX case it actually is when nesting is disabled. Remove the
+> unneeded stub from SVM code.
 >
 > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d1cd0fcff9e7..ef2e8b138300 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3106,7 +3106,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->         case KVM_CAP_HYPERV_EVENTFD:
->         case KVM_CAP_HYPERV_TLBFLUSH:
->         case KVM_CAP_HYPERV_SEND_IPI:
-> -       case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
->         case KVM_CAP_HYPERV_CPUID:
->         case KVM_CAP_PCI_SEGMENT:
->         case KVM_CAP_DEBUGREGS:
-> @@ -3183,6 +3182,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->                 r = kvm_x86_ops->get_nested_state ?
->                         kvm_x86_ops->get_nested_state(NULL, NULL, 0) : 0;
->                 break;
-> +       case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
-> +               r = kvm_x86_ops->nested_enable_evmcs != NULL;
-
-You should probably have an explicit break here, in case someone later
-adds another case below.
-
->         default:
->                 break;
->         }
-> --
-> 2.20.1
->
+Reviewed-by: Jim Mattson <jmattson@google.com>
