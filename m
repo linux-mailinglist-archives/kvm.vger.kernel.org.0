@@ -2,113 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AC52A0E41
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 01:37:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D8D8A0E4D
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 01:39:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727007AbfH1Xht convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 28 Aug 2019 19:37:49 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:42044 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726935AbfH1Xhs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 19:37:48 -0400
-Received: by mail-ot1-f68.google.com with SMTP id j7so1575123ota.9;
-        Wed, 28 Aug 2019 16:37:48 -0700 (PDT)
+        id S1727171AbfH1Xjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 19:39:37 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:43785 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726926AbfH1Xjg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 19:39:36 -0400
+Received: by mail-oi1-f193.google.com with SMTP id y8so1105136oih.10;
+        Wed, 28 Aug 2019 16:39:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=0WiNNlZ19WAx+O8CTTiGYwNeR0ZDw2Ysbv/e1WoYV9o=;
-        b=NzkWW2rEUGn2hm/+Q47nfXQgS+iditfvHFjoCGWPnNViisDyUh6UvUmPOb65gsI/lF
-         zuaC7Xxrb5ctQXyRUOOyy/h1IwuZvE+zN4e3+oNsKirgxmXjvDpQQXuozaSvDkdVg9Cp
-         yqPjw/dg3dbI5/Ygmw+SLiOVx47+r9hQ2+sKrFCE54kekC0uAUDSjJmNq6a5x6LsTtsu
-         t12qTTd4XdWTL3BcYPeHfY0uNf3s5O6GBh3ASBHgNsaucY/E2wgXzYBjfv4zt9AfAxZN
-         4SVn5aoXJzcyXIZnLGEEcgVqdSk4nwYWL5ekaqJR/FcezLmm0qPxIUvNLOvGGgnXydFk
-         38Lw==
-X-Gm-Message-State: APjAAAXVjpTOUYRSE1sEn6DzPM323ZmQx3fqTW7nN/MexHDcm2EkcxuP
-        D9oo/0mzQclC1WrxeqBTfNX2zuOryNHIvMGHkkM=
-X-Google-Smtp-Source: APXvYqxk5XxurJ7D0mvitMxzIf9FQRgo2vpruN5+wj43N/LYuGLxqqtW3SsJxC+VaDntTllf2UOHc/U87dV9dPOR7W8=
-X-Received: by 2002:a9d:12d1:: with SMTP id g75mr5311313otg.189.1567035467967;
- Wed, 28 Aug 2019 16:37:47 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=PKOOEDeU92y+0iSa7impzejPm6WlaT2B+UMpIRPhzco=;
+        b=lz+U0sp7q612XYEhoMz7ofk4POq9xhQizNvGKF9KfA6aocv0TXZ7xTteQcHUNnvjCj
+         Y+xn47ALWeb2xtMHdhtPgtvIAjLk8gfp5L2ScJe/0oJwlYKePDDsgovOS4nYiVwOwvl/
+         HVfwV2KT8/KnY7Eufe1dDyRNZcB/wFXCvd/+2qdGDJtrpfAjOfhRp6+xJTzL8+3plmYh
+         SWHcOr/7Rx/PiM8Qe1Tv0USnF6TwCyE/Kx5iVNcJ31n0BHQk2R4Qja47BT00hOjkTP9k
+         k9r8NDwACSI51Dx/kpA1wXjFuIBbtVjSN9yVMIGUJKKmZ3LfgYhZzE5FEjUuficewWQu
+         DtbA==
+X-Gm-Message-State: APjAAAVcY34puRVJQyU1Yu3JNHLoAmgGmM3bBoxbjxT9w1sUDDQn2R67
+        EcRK66FT/q4OflJXL6pSPT3nryKpLWwCDRRR7jwGsQ==
+X-Google-Smtp-Source: APXvYqyV0aVPxEJSi1pCuxgzvJqctjmeNgzDPWDh/UeVn441IgCiQykIpHgv/ZEDkhabEALJqRLLuH/n91dgIUjbtio=
+X-Received: by 2002:aca:d586:: with SMTP id m128mr4813386oig.110.1567035575766;
+ Wed, 28 Aug 2019 16:39:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <1564643196-7797-1-git-send-email-wanpengli@tencent.com>
- <7b1e3025-f513-7068-32ac-4830d67b65ac@intel.com> <c3fe182f-627f-88ad-cb4d-a4189202b438@redhat.com>
- <20190803202058.GA9316@amt.cnet> <CANRm+CwtHBOVWFcn+6Z3Ds7dEcNL2JP+b6hLRS=oeUW98A24MQ@mail.gmail.com>
- <20190826204045.GA24697@amt.cnet> <CANRm+Cx0+V67Ek7FhSs61ZqZL3MgV88Wdy17Q6UA369RH7=dgQ@mail.gmail.com>
- <CANRm+CxqYMzgvxYyhZLmEzYd6SLTyHdRzKVaSiHO-4SV+OwZUQ@mail.gmail.com>
- <CAJZ5v0iQc0-WzqeyAh-6m5O-BLraRMj+Z7sqvRgGwh2u2Hp7cg@mail.gmail.com> <20190828143916.GA13725@amt.cnet>
-In-Reply-To: <20190828143916.GA13725@amt.cnet>
+References: <20190828185650.16923-1-joao.m.martins@oracle.com>
+In-Reply-To: <20190828185650.16923-1-joao.m.martins@oracle.com>
 From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Thu, 29 Aug 2019 01:37:35 +0200
-Message-ID: <CAJZ5v0jiBprGrwLAhmLbZKpKUvmKwG9w4_R7+dQVqswptis5Qg@mail.gmail.com>
-Subject: Re: [PATCH] cpuidle-haltpoll: Enable kvm guest polling when dedicated
- physical CPUs are available
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+Date:   Thu, 29 Aug 2019 01:39:23 +0200
+Message-ID: <CAJZ5v0hBgMBSES541FBdZDbZWHOOhuy5JuY+UamOPrCYzNCPmA@mail.gmail.com>
+Subject: Re: [PATCH v1] cpuidle-haltpoll: vcpu hotplug support
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
         Linux PM <linux-pm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 28, 2019 at 4:39 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+On Wed, Aug 28, 2019 at 8:58 PM Joao Martins <joao.m.martins@oracle.com> wrote:
 >
-> On Wed, Aug 28, 2019 at 10:45:44AM +0200, Rafael J. Wysocki wrote:
-> > On Wed, Aug 28, 2019 at 10:34 AM Wanpeng Li <kernellwp@gmail.com> wrote:
-> > >
-> > > On Tue, 27 Aug 2019 at 08:43, Wanpeng Li <kernellwp@gmail.com> wrote:
-> > > >
-> > > > Cc Michael S. Tsirkin,
-> > > > On Tue, 27 Aug 2019 at 04:42, Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> > > > >
-> > > > > On Tue, Aug 13, 2019 at 08:55:29AM +0800, Wanpeng Li wrote:
-> > > > > > On Sun, 4 Aug 2019 at 04:21, Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Thu, Aug 01, 2019 at 06:54:49PM +0200, Paolo Bonzini wrote:
-> > > > > > > > On 01/08/19 18:51, Rafael J. Wysocki wrote:
-> > > > > > > > > On 8/1/2019 9:06 AM, Wanpeng Li wrote:
-> > > > > > > > >> From: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > > >>
-> > > > > > > > >> The downside of guest side polling is that polling is performed even
-> > > > > > > > >> with other runnable tasks in the host. However, even if poll in kvm
-> > > > > > > > >> can aware whether or not other runnable tasks in the same pCPU, it
-> > > > > > > > >> can still incur extra overhead in over-subscribe scenario. Now we can
-> > > > > > > > >> just enable guest polling when dedicated pCPUs are available.
-> > > > > > > > >>
-> > > > > > > > >> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > > > > > > > >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > > > > >> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> > > > > > > > >> Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> > > > > > > > >> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > > >
-> > > > > > > > > Paolo, Marcelo, any comments?
-> > > > > > > >
-> > > > > > > > Yes, it's a good idea.
-> > > > > > > >
-> > > > > > > > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > >
-> > > Hi Marcelo,
-> > >
-> > > If you don't have more concern, I guess Rafael can apply this patch
-> > > now since the merge window is not too far.
-> >
-> > I will likely queue it up later today and it will go to linux-next
-> > early next week.
-> >
-> > Thanks!
+> When cpus != maxcpus cpuidle-haltpoll will fail to register all vcpus
+> past the online ones and thus fail to register the idle driver.
+> This is because cpuidle_add_sysfs() will return with -ENODEV as a
+> consequence from get_cpu_device() return no device for a non-existing
+> CPU.
 >
-> NACK patch.
+> Instead switch to cpuidle_register_driver() and manually register each
+> of the present cpus through cpuhp_setup_state() and future ones that
+> get onlined. This mimics similar logic as intel_idle.
+>
+> Fixes: fa86ee90eb11 ("add cpuidle-haltpoll driver")
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
 
-I got an ACK from Paolo on it, though.  Convince Paolo to withdraw his
-ACK if you want it to not be applied.
+Paolo, what do you think?
 
-> Just don't load the haltpoll driver.
-
-And why would that be better?
+> ---
+>  arch/x86/include/asm/cpuidle_haltpoll.h |  4 +-
+>  arch/x86/kernel/kvm.c                   | 18 +++----
+>  drivers/cpuidle/cpuidle-haltpoll.c      | 65 +++++++++++++++++++++++--
+>  include/linux/cpuidle_haltpoll.h        |  4 +-
+>  4 files changed, 70 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/cpuidle_haltpoll.h b/arch/x86/include/asm/cpuidle_haltpoll.h
+> index ff8607d81526..c8b39c6716ff 100644
+> --- a/arch/x86/include/asm/cpuidle_haltpoll.h
+> +++ b/arch/x86/include/asm/cpuidle_haltpoll.h
+> @@ -2,7 +2,7 @@
+>  #ifndef _ARCH_HALTPOLL_H
+>  #define _ARCH_HALTPOLL_H
+>
+> -void arch_haltpoll_enable(void);
+> -void arch_haltpoll_disable(void);
+> +void arch_haltpoll_enable(unsigned int cpu);
+> +void arch_haltpoll_disable(unsigned int cpu);
+>
+>  #endif
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 8d150e3732d9..a9b6c4e2446d 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -880,32 +880,26 @@ static void kvm_enable_host_haltpoll(void *i)
+>         wrmsrl(MSR_KVM_POLL_CONTROL, 1);
+>  }
+>
+> -void arch_haltpoll_enable(void)
+> +void arch_haltpoll_enable(unsigned int cpu)
+>  {
+>         if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
+> -               printk(KERN_ERR "kvm: host does not support poll control\n");
+> -               printk(KERN_ERR "kvm: host upgrade recommended\n");
+> +               pr_err_once("kvm: host does not support poll control\n");
+> +               pr_err_once("kvm: host upgrade recommended\n");
+>                 return;
+>         }
+>
+> -       preempt_disable();
+>         /* Enable guest halt poll disables host halt poll */
+> -       kvm_disable_host_haltpoll(NULL);
+> -       smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
+> -       preempt_enable();
+> +       smp_call_function_single(cpu, kvm_disable_host_haltpoll, NULL, 1);
+>  }
+>  EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
+>
+> -void arch_haltpoll_disable(void)
+> +void arch_haltpoll_disable(unsigned int cpu)
+>  {
+>         if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
+>                 return;
+>
+> -       preempt_disable();
+>         /* Enable guest halt poll disables host halt poll */
+> -       kvm_enable_host_haltpoll(NULL);
+> -       smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
+> -       preempt_enable();
+> +       smp_call_function_single(cpu, kvm_enable_host_haltpoll, NULL, 1);
+>  }
+>  EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
+>  #endif
+> diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
+> index 9ac093dcbb01..0d1853a7185e 100644
+> --- a/drivers/cpuidle/cpuidle-haltpoll.c
+> +++ b/drivers/cpuidle/cpuidle-haltpoll.c
+> @@ -11,12 +11,15 @@
+>   */
+>
+>  #include <linux/init.h>
+> +#include <linux/cpu.h>
+>  #include <linux/cpuidle.h>
+>  #include <linux/module.h>
+>  #include <linux/sched/idle.h>
+>  #include <linux/kvm_para.h>
+>  #include <linux/cpuidle_haltpoll.h>
+>
+> +static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
+> +
+>  static int default_enter_idle(struct cpuidle_device *dev,
+>                               struct cpuidle_driver *drv, int index)
+>  {
+> @@ -46,6 +49,48 @@ static struct cpuidle_driver haltpoll_driver = {
+>         .state_count = 2,
+>  };
+>
+> +static int haltpoll_cpu_online(unsigned int cpu)
+> +{
+> +       struct cpuidle_device *dev;
+> +
+> +       dev = per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
+> +       if (!dev->registered) {
+> +               dev->cpu = cpu;
+> +               if (cpuidle_register_device(dev)) {
+> +                       pr_notice("cpuidle_register_device %d failed!\n", cpu);
+> +                       return -EIO;
+> +               }
+> +               arch_haltpoll_enable(cpu);
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void haltpoll_uninit(void)
+> +{
+> +       unsigned int cpu;
+> +
+> +       cpus_read_lock();
+> +
+> +       for_each_online_cpu(cpu) {
+> +               struct cpuidle_device *dev =
+> +                       per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
+> +
+> +               if (!dev->registered)
+> +                       continue;
+> +
+> +               arch_haltpoll_disable(cpu);
+> +               cpuidle_unregister_device(dev);
+> +       }
+> +
+> +       cpuidle_unregister(&haltpoll_driver);
+> +
+> +       free_percpu(haltpoll_cpuidle_devices);
+> +       haltpoll_cpuidle_devices = NULL;
+> +
+> +       cpus_read_unlock();
+> +}
+> +
+>  static int __init haltpoll_init(void)
+>  {
+>         int ret;
+> @@ -56,17 +101,27 @@ static int __init haltpoll_init(void)
+>         if (!kvm_para_available())
+>                 return 0;
+>
+> -       ret = cpuidle_register(&haltpoll_driver, NULL);
+> -       if (ret == 0)
+> -               arch_haltpoll_enable();
+> +       ret = cpuidle_register_driver(drv);
+> +       if (ret < 0)
+> +               return ret;
+> +
+> +       haltpoll_cpuidle_devices = alloc_percpu(struct cpuidle_device);
+> +       if (haltpoll_cpuidle_devices == NULL) {
+> +               cpuidle_unregister_driver(drv);
+> +               return -ENOMEM;
+> +       }
+> +
+> +       ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "idle/haltpoll:online",
+> +                               haltpoll_cpu_online, NULL);
+> +       if (ret < 0)
+> +               haltpoll_uninit();
+>
+>         return ret;
+>  }
+>
+>  static void __exit haltpoll_exit(void)
+>  {
+> -       arch_haltpoll_disable();
+> -       cpuidle_unregister(&haltpoll_driver);
+> +       haltpoll_uninit();
+>  }
+>
+>  module_init(haltpoll_init);
+> diff --git a/include/linux/cpuidle_haltpoll.h b/include/linux/cpuidle_haltpoll.h
+> index fe5954c2409e..d50c1e0411a2 100644
+> --- a/include/linux/cpuidle_haltpoll.h
+> +++ b/include/linux/cpuidle_haltpoll.h
+> @@ -5,11 +5,11 @@
+>  #ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
+>  #include <asm/cpuidle_haltpoll.h>
+>  #else
+> -static inline void arch_haltpoll_enable(void)
+> +static inline void arch_haltpoll_enable(unsigned int cpu)
+>  {
+>  }
+>
+> -static inline void arch_haltpoll_disable(void)
+> +static inline void arch_haltpoll_disable(unsigned int cpu)
+>  {
+>  }
+>  #endif
+> --
+> 2.17.1
+>
