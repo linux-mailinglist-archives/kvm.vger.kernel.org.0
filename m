@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4091AA0E54
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 01:41:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC141A0E59
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 01:41:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727096AbfH1Xls (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 19:41:48 -0400
-Received: from mail-qk1-f201.google.com ([209.85.222.201]:53736 "EHLO
-        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727059AbfH1Xls (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 19:41:48 -0400
-Received: by mail-qk1-f201.google.com with SMTP id b13so1706970qkk.20
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 16:41:47 -0700 (PDT)
+        id S1727195AbfH1Xlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 19:41:50 -0400
+Received: from mail-yw1-f73.google.com ([209.85.161.73]:43168 "EHLO
+        mail-yw1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727102AbfH1Xlu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 19:41:50 -0400
+Received: by mail-yw1-f73.google.com with SMTP id a12so1156793ywm.10
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 16:41:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=VgFcL2Mp1HeiHIyPdxyskzuYNm1GUXARDoKyzvhJObs=;
-        b=TyjIpEEsRJDwqQpv+dZADAMH0Va0clQ2rEVIbnMWkoAeMqabLiNXCTQXe3mxPdsy7o
-         GHHoZErTY+lYLC0z/g4UZi0Y4UL+s0bGgnLgb5jK36TIiOzHifZzrP/ZRX+wk4q9VzU4
-         Okx8OjntS4P3/Swavxplr/p+m5Bij7XjXzG1lr5vuREt9Wk9at3SM2sV3ap1mlg68jA/
-         Z4o/Jo7pSXbeJ/j0LLE5zeuAJic9aAym8adpWTSH1iyYbzaRhWg8PbrnKbjl4PSVzZg/
-         hJgXGAs0DP8vjeaiyZ7lPGx/sbv56+AW8M8XRKFxVBf81rAzujFD8rPWiZ7ljtq32U1j
-         8iRw==
+        bh=L7ofrvxz7KTbwrithNZ6hvYCCs95MI4yDOF6MJ9BBSE=;
+        b=AhDx5tuGaT4Z628duiOtdKJQ3m5WBQmiw7/AalHacnoUDKwvDRBEK83GnzQMvwOVmr
+         OccPA+FgEsmU9J7AB5Gu0bvUKScH6RrNtEfciO6l+zz++U6aEbVQAdZslri8fnlvcHpo
+         VHth2s8uSnw045OMuJG8lLMBoA73fmJG0OpLeiV/Euqyr5K1PJZzzEtNJv+EK6gwIY2p
+         XzThVfjCa7gEc/PUBxitgCfIZiySjE7pvZxXoWa0QpqsPOZoy4FVT/mzZUtztAGHjpT5
+         9UtA36UtsjD6OOsyRI9jcN6/mqSEmt4zCWX9aL5d/Z0yM7bL/wUHgYiXteMoEoiFWa5Q
+         /cpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=VgFcL2Mp1HeiHIyPdxyskzuYNm1GUXARDoKyzvhJObs=;
-        b=O0oxHqpRpHKgOFpLhoYdHSImM9bt1vCEVPPT+EPPKfX0IqPWBCbwkw92ZymH6/E0MQ
-         1gfLR2B3IFhY0+U5u5NHNCeMceI4IY9MzHMEzYt8FaMhZEcVgGirbsJIh3pa3dck+9hN
-         Zrudz0pBEpAM/Bs4h70zbj2kI2/3M7y1uxtYb/YFotyb7hSwSNoddI0qstvoiLRn32nG
-         AgrdFsAmWl9yOzdBqo1vcZt1mPAaLZXAPWVsOklkURfDfmJ1ZbbItNjcnj++gwPef21j
-         wCp8E6ciHZmIhMrv4ZbfSS8bbqNc2CNT/gIrIEGTO/C3Jl0/r2tH8zMt3IxBG7pzlueY
-         a47w==
-X-Gm-Message-State: APjAAAX9L0RxduDA9+rGCIhZbGaKDK42JAP89B6vIvPk/JXPb7g9lC4J
-        zffQIl5e5Dx6+5Ocn2L51WgVXxZzKoR3KZzPrZMg8/PEJEMwJzFk6ai/INWTygCMDQLckl8ONUZ
-        6TspLwFI2q9izwPxhcbSMDnxt+V/YlDGYLSh+FAAsPTDXfwmgl2tx2Wy9UA==
-X-Google-Smtp-Source: APXvYqyhniYGmQ+vzgIUBH0MezN+/SIj7g+sxG58psYEMQ6BCNn5R8qq2DArqQqByVcBwOtHbmKj9/nlZ6c=
-X-Received: by 2002:a37:624b:: with SMTP id w72mr7095091qkb.368.1567035706970;
- Wed, 28 Aug 2019 16:41:46 -0700 (PDT)
-Date:   Wed, 28 Aug 2019 16:41:30 -0700
+        bh=L7ofrvxz7KTbwrithNZ6hvYCCs95MI4yDOF6MJ9BBSE=;
+        b=r+fl593thCrVxG9f8sgM1uLOjhPGP4DBfiiIR2qYhPDokCwGh+WTVNi35LdFVXT9Q3
+         H3olzKaw/14n9qVLiuwP9x/GtHXUfIx97lhnHaXxdd1E7pGDto4GhVeyq0tb0JiVJLRI
+         kFRFaiSmh/zmgXIH2Lxogrp5uQkq2FMBubhAtnTtW1lQZX9gAnp8IDbJLkonVhGgXBXJ
+         ImJ6Y45VN3w44gGpAqAq+Qc8609PzfkD4XkjVDfbP9PwU/5S5sIztiYQmYdFRiEgmS56
+         Q6DAFE6SAi0vCd1pyoJkeF+9FWIAesuFy74t9rVdxKOdNMTZqdc0KTgF3wWpBs+glpOD
+         AZFw==
+X-Gm-Message-State: APjAAAXuBgyrKALY++8ZChrOJXr1lnL3T+EjGgFQB8FumSWl2UdIQ3rF
+        hDisGzmvWzrRorGV6I31jTlMAQIH+gjrLteYOd3+1egW9zwxnyeEnaPShWukz4aSkoFqwIfVE1W
+        1FcP9klOoepYLhhOkL2Sb6zXTj69KUJFr0Toi3YIjbkBDvSQsADnstHUE4A==
+X-Google-Smtp-Source: APXvYqzlLRkxJfm2QHJz11jP8GYSPDDDnwkOtEVFxQBOo6dF7SwFgZH5+gCOjXjv3D+u9oB/n69kt3TdhjM=
+X-Received: by 2002:a25:f202:: with SMTP id i2mr4987549ybe.462.1567035709182;
+ Wed, 28 Aug 2019 16:41:49 -0700 (PDT)
+Date:   Wed, 28 Aug 2019 16:41:31 -0700
 In-Reply-To: <20190828234134.132704-1-oupton@google.com>
-Message-Id: <20190828234134.132704-4-oupton@google.com>
+Message-Id: <20190828234134.132704-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20190828234134.132704-1-oupton@google.com>
 X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-Subject: [PATCH 3/7] KVM: VMX: Add helper to check reserved bits in MSR_CORE_PERF_GLOBAL_CTRL
+Subject: [PATCH 4/7] KVM: nVMX: check GUEST_IA32_PERF_GLOBAL_CTRL on VM-Entry
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>
@@ -59,37 +59,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Creating a helper function to check the validity of the
-{HOST,GUEST}_IA32_PERF_GLOBAL_CTRL wrt the PMU's global_ctrl_mask.
+According to the SDM 26.3.1.1, "If the "load IA32_PERF_GLOBAL_CTRL" VM-entry
+control is 1, bits reserved in the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
+field for that register".
+
+Adding condition to nested_vmx_check_guest_state() to check the validity of
+GUEST_IA32_PERF_GLOBAL_CTRL if the "load IA32_PERF_GLOBAL_CTRL" bit is
+set on the VM-entry control.
 
 Suggested-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/pmu.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/x86/kvm/vmx/nested.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 58265f761c3b..b7d9efff208d 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -79,6 +79,17 @@ static inline bool pmc_is_enabled(struct kvm_pmc *pmc)
- 	return kvm_x86_ops->pmu_ops->pmc_is_enabled(pmc);
- }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 9ba90b38d74b..8d6f0144b1bd 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -10,6 +10,7 @@
+ #include "hyperv.h"
+ #include "mmu.h"
+ #include "nested.h"
++#include "pmu.h"
+ #include "trace.h"
+ #include "x86.h"
  
-+static inline bool kvm_is_valid_perf_global_ctrl(struct kvm_vcpu *vcpu,
-+						 u64 global_ctrl)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+@@ -2748,6 +2749,11 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 	}
+ 
++	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL &&
++	    !kvm_is_valid_perf_global_ctrl(vcpu,
++					   vmcs12->guest_ia32_perf_global_ctrl))
++		return -EINVAL;
 +
-+	if (pmu->global_ctrl_mask & global_ctrl)
-+		return false;
-+
-+	return true;
-+}
-+
- /* returns general purpose PMC with the specified MSR. Note that it can be
-  * used for both PERFCTRn and EVNTSELn; that is why it accepts base as a
-  * paramenter to tell them apart.
+ 	/*
+ 	 * If the load IA32_EFER VM-entry control is 1, the following checks
+ 	 * are performed on the field for the IA32_EFER MSR:
 -- 
 2.23.0.187.g17f5b7556c-goog
 
