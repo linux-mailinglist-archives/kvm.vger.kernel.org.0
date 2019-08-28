@@ -2,102 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B2159A068A
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 17:46:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2511A06CA
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 17:57:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726554AbfH1PqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 11:46:07 -0400
-Received: from foss.arm.com ([217.140.110.172]:33514 "EHLO foss.arm.com"
+        id S1726867AbfH1P5U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 11:57:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:65215 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726520AbfH1PqH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 11:46:07 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3365128;
-        Wed, 28 Aug 2019 08:46:06 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 213FF3F59C;
-        Wed, 28 Aug 2019 08:46:05 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 10/16] lib: Add UL and ULL definitions
- to linux/const.h
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, rkrcmar@redhat.com, maz@kernel.org,
-        vladimir.murzin@arm.com, andre.przywara@arm.com
-References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
- <1566999511-24916-11-git-send-email-alexandru.elisei@arm.com>
- <20190828151006.x6bfxlseqp5s55su@kamzik.brq.redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c476a2cc-98d7-6315-a742-df252ff56be5@arm.com>
-Date:   Wed, 28 Aug 2019 16:46:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726713AbfH1P5U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 11:57:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 90F358AC6F9;
+        Wed, 28 Aug 2019 15:57:20 +0000 (UTC)
+Received: from localhost (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E6785C1D6;
+        Wed, 28 Aug 2019 15:57:20 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
+Subject: [PULL 0/1] vfio-ccw patch for next release
+Date:   Wed, 28 Aug 2019 17:57:15 +0200
+Message-Id: <20190828155716.22809-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190828151006.x6bfxlseqp5s55su@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Wed, 28 Aug 2019 15:57:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/28/19 4:10 PM, Andrew Jones wrote:
-> On Wed, Aug 28, 2019 at 02:38:25PM +0100, Alexandru Elisei wrote:
->> The UL macro was previously defined in lib/arm64/asm/pgtable-hwdef.h. Move
->> it to lib/linux/const.h so it can be used in other files. To keep things
->> consistent, also add an ULL macro.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  lib/linux/const.h             | 7 +++++--
->>  lib/arm64/asm/pgtable-hwdef.h | 2 --
->>  2 files changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/lib/linux/const.h b/lib/linux/const.h
->> index c872bfd25e13..e3c7fec3f4b8 100644
->> --- a/lib/linux/const.h
->> +++ b/lib/linux/const.h
->> @@ -21,7 +21,10 @@
->>  #define _AT(T,X)	((T)(X))
->>  #endif
->>  
->> -#define _BITUL(x)	(_AC(1,UL) << (x))
->> -#define _BITULL(x)	(_AC(1,ULL) << (x))
->> +#define UL(x) 		_AC(x, UL)
->> +#define ULL(x)		_AC(x, ULL)
->> +
->> +#define _BITUL(x)	(UL(1) << (x))
->> +#define _BITULL(x)	(ULL(1) << (x))
-> I don't mind this, but if we want to keep this file consistent with
-> Linux's include/uapi/linux/const.h, which is actually the goal, then we
-> should be adding _UL and _ULL instead. But in that case we'd probably
-> want to leave the define below.
->
-> Thanks,
-> drew
+The following changes since commit 416f79c23dbe47e0e223efc06d3487e1d90a92ee:
 
-Hm... The next patch needs the UL define. Consistency is good, so if we want to
-keep it consistent with include/uapi/linux/const.h, then I will change the
-defines (and the uses) to _UL and _ULL, if that's fine with you.
+  s390/paes: Prepare paes functions for large key blobs (2019-08-21 12:58:54 +0200)
 
-Thanks,
-Alex
->
->>  
->>  #endif /* !(_LINUX_CONST_H) */
->> diff --git a/lib/arm64/asm/pgtable-hwdef.h b/lib/arm64/asm/pgtable-hwdef.h
->> index 045a3ce12645..e6f02fae4075 100644
->> --- a/lib/arm64/asm/pgtable-hwdef.h
->> +++ b/lib/arm64/asm/pgtable-hwdef.h
->> @@ -9,8 +9,6 @@
->>   * This work is licensed under the terms of the GNU GPL, version 2.
->>   */
->>  
->> -#define UL(x) _AC(x, UL)
->> -
->>  #define PTRS_PER_PTE		(1 << (PAGE_SHIFT - 3))
->>  
->>  /*
->> -- 
->> 2.7.4
->>
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git tags/vfio-ccw-20190828
+
+for you to fetch changes up to 60e05d1cf0875f0cf73472f7dff71d9933c5b697:
+
+  vfio-ccw: add some logging (2019-08-23 12:53:32 +0200)
+
+----------------------------------------------------------------
+Add some logging into the s390dbf.
+
+----------------------------------------------------------------
+
+Cornelia Huck (1):
+  vfio-ccw: add some logging
+
+ drivers/s390/cio/vfio_ccw_drv.c     | 50 ++++++++++++++++++++++++++--
+ drivers/s390/cio/vfio_ccw_fsm.c     | 51 ++++++++++++++++++++++++++++-
+ drivers/s390/cio/vfio_ccw_ops.c     | 10 ++++++
+ drivers/s390/cio/vfio_ccw_private.h | 17 ++++++++++
+ 4 files changed, 124 insertions(+), 4 deletions(-)
+
+-- 
+2.20.1
+
