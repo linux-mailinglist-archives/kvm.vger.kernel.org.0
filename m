@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2223A036A
+	by mail.lfdr.de (Postfix) with ESMTP id 886AEA0369
 	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 15:39:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726623AbfH1NjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 09:39:01 -0400
-Received: from foss.arm.com ([217.140.110.172]:59582 "EHLO foss.arm.com"
+        id S1726586AbfH1NjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 09:39:02 -0400
+Received: from foss.arm.com ([217.140.110.172]:59592 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726743AbfH1NjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 09:39:00 -0400
+        id S1726616AbfH1NjB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 09:39:01 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82A1528;
-        Wed, 28 Aug 2019 06:38:59 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DEB8815AB;
+        Wed, 28 Aug 2019 06:39:00 -0700 (PDT)
 Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 652D73F246;
-        Wed, 28 Aug 2019 06:38:58 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B75353F246;
+        Wed, 28 Aug 2019 06:38:59 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     drjones@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
         maz@kernel.org, vladimir.murzin@arm.com, andre.przywara@arm.com
-Subject: [kvm-unit-tests RFC PATCH 07/16] arm64: timer: Test behavior when timer disabled or masked
-Date:   Wed, 28 Aug 2019 14:38:22 +0100
-Message-Id: <1566999511-24916-8-git-send-email-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 08/16] lib: arm/arm64: Refuse to disable the MMU with non-identity stack pointer
+Date:   Wed, 28 Aug 2019 14:38:23 +0100
+Message-Id: <1566999511-24916-9-git-send-email-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
 References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
@@ -32,43 +32,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the timer is disabled (the ENABLE bit is clear) or the timer interrupt
-is masked at the timer level (the IMASK bit is set), timer interrupts must
-not be pending or asserted by the VGIC. However, when the timer interrupt
-is masked, we can still check that the timer condition is met by reading
-the ISTATUS bit.
+When the MMU is off, all addresses are physical addresses. If the stack
+pointer is not an identity mapped address (the virtual address is not the
+same as the physical address), then we end up trying to access an invalid
+memory region. This can happen if we call mmu_disable from a secondary CPU,
+which has its stack allocated from the vmalloc region.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
-This test was used to discover the issue fixed by the upstream patch
-16e604a437c8 ("KVM: arm/arm64: vgic: Reevaluate level sensitive interrupts
-on enable").
+ lib/arm/mmu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- arm/timer.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/arm/timer.c b/arm/timer.c
-index 7ae169bd687e..125b9f30ad3c 100644
---- a/arm/timer.c
-+++ b/arm/timer.c
-@@ -230,9 +230,17 @@ static void test_timer(struct timer_info *info)
+diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+index 3d38c8397f5a..161f7a8e607c 100644
+--- a/lib/arm/mmu.c
++++ b/lib/arm/mmu.c
+@@ -66,8 +66,12 @@ void mmu_enable(pgd_t *pgtable)
+ extern void asm_mmu_disable(void);
+ void mmu_disable(void)
+ {
++	unsigned long sp = current_stack_pointer;
+ 	int cpu = current_thread_info()->cpu;
  
- 	/* Disable the timer again and prepare to take interrupts */
- 	info->write_ctl(0);
-+	isb();
-+	info->irq_received = false;
- 	set_timer_irq_enabled(info, true);
-+	report("no interrupt when timer is disabled", !info->irq_received);
- 	report("interrupt signal no longer pending", !gic_timer_pending(info));
- 
-+	info->write_ctl(ARCH_TIMER_CTL_ENABLE | ARCH_TIMER_CTL_IMASK);
-+	isb();
-+	report("interrupt signal not pending", !gic_timer_pending(info));
-+	report("timer condition met", info->read_ctl() & ARCH_TIMER_CTL_ISTATUS);
++	assert_msg(__virt_to_phys(sp) == sp,
++			"Attempting to disable MMU with non-identity mapped stack");
 +
- 	report("latency within 10 ms", test_cval_10msec(info));
- 	report("interrupt received", info->irq_received);
+ 	mmu_mark_disabled(cpu);
  
+ 	asm_mmu_disable();
 -- 
 2.7.4
 
