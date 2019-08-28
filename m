@@ -2,192 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E61DA00A3
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 13:23:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20512A00AA
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 13:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726449AbfH1LXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 07:23:55 -0400
-Received: from foss.arm.com ([217.140.110.172]:57506 "EHLO foss.arm.com"
+        id S1726513AbfH1LYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 07:24:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43280 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726382AbfH1LXy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 07:23:54 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DAD1344;
-        Wed, 28 Aug 2019 04:23:53 -0700 (PDT)
-Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC9EB3F246;
-        Wed, 28 Aug 2019 04:23:51 -0700 (PDT)
-Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
-To:     Christoffer Dall <christoffer.dall@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20190821153656.33429-1-steven.price@arm.com>
- <20190821153656.33429-2-steven.price@arm.com>
- <20190827084407.GA6541@e113682-lin.lund.arm.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <28c3248e-1d63-dac6-d2b0-4422025c1376@arm.com>
-Date:   Wed, 28 Aug 2019 12:23:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726382AbfH1LYE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 07:24:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C5FE8301E136;
+        Wed, 28 Aug 2019 11:24:03 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F9A21001B0B;
+        Wed, 28 Aug 2019 11:23:59 +0000 (UTC)
+Date:   Wed, 28 Aug 2019 13:23:57 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: selftests: Move vm type into _vm_create()
+ internally
+Message-ID: <20190828112357.auyhr3de5reie6hs@kamzik.brq.redhat.com>
+References: <20190827131015.21691-1-peterx@redhat.com>
+ <20190827131015.21691-2-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190827084407.GA6541@e113682-lin.lund.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190827131015.21691-2-peterx@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 28 Aug 2019 11:24:03 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/2019 09:44, Christoffer Dall wrote:
-> On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
->> Introduce a paravirtualization interface for KVM/arm64 based on the
->> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
->>
->> This only adds the details about "Stolen Time" as the details of "Live
->> Physical Time" have not been fully agreed.
->>
->> User space can specify a reserved area of memory for the guest and
->> inform KVM to populate the memory with information on time that the host
->> kernel has stolen from the guest.
->>
->> A hypercall interface is provided for the guest to interrogate the
->> hypervisor's support for this interface and the location of the shared
->> memory structures.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
->>  1 file changed, 100 insertions(+)
->>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
->>
->> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
->> new file mode 100644
->> index 000000000000..1ceb118694e7
->> --- /dev/null
->> +++ b/Documentation/virt/kvm/arm/pvtime.txt
->> @@ -0,0 +1,100 @@
->> +Paravirtualized time support for arm64
->> +======================================
->> +
->> +Arm specification DEN0057/A defined a standard for paravirtualised time
->> +support for AArch64 guests:
->> +
->> +https://developer.arm.com/docs/den0057/a
->> +
->> +KVM/arm64 implements the stolen time part of this specification by providing
->> +some hypervisor service calls to support a paravirtualized guest obtaining a
->> +view of the amount of time stolen from its execution.
->> +
->> +Two new SMCCC compatible hypercalls are defined:
->> +
->> +PV_FEATURES 0xC5000020
->> +PV_TIME_ST  0xC5000022
->> +
->> +These are only available in the SMC64/HVC64 calling convention as
->> +paravirtualized time is not available to 32 bit Arm guests. The existence of
->> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
->> +mechanism before calling it.
->> +
->> +PV_FEATURES
->> +    Function ID:  (uint32)  : 0xC5000020
->> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
->> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->> +                              PV-time feature is supported by the hypervisor.
->> +
->> +PV_TIME_ST
->> +    Function ID:  (uint32)  : 0xC5000022
->> +    Return value: (int64)   : IPA of the stolen time data structure for this
->> +                              (V)CPU. On failure:
->> +                              NOT_SUPPORTED (-1)
->> +
->> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
->> +with inner and outer write back caching attributes, in the inner shareable
->> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
->> +meaningfully filled by the hypervisor (see structure below).
->> +
->> +PV_TIME_ST returns the structure for the calling VCPU.
->> +
->> +Stolen Time
->> +-----------
->> +
->> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
->> +
->> +  Field       | Byte Length | Byte Offset | Description
->> +  ----------- | ----------- | ----------- | --------------------------
->> +  Revision    |      4      |      0      | Must be 0 for version 0.1
->> +  Attributes  |      4      |      4      | Must be 0
->> +  Stolen time |      8      |      8      | Stolen time in unsigned
->> +              |             |             | nanoseconds indicating how
->> +              |             |             | much time this VCPU thread
->> +              |             |             | was involuntarily not
->> +              |             |             | running on a physical CPU.
->> +
->> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
->> +will be present within a reserved region of the normal memory given to the
->> +guest. The guest should not attempt to write into this memory. There is a
->> +structure per VCPU of the guest.
->> +
->> +User space interface
->> +====================
->> +
->> +User space can request that KVM provide the paravirtualized time interface to
->> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
->> +
+On Tue, Aug 27, 2019 at 09:10:12PM +0800, Peter Xu wrote:
+> Rather than passing the vm type from the top level to the end of vm
+> creation, let's simply keep that as an internal of kvm_vm struct and
+> decide the type in _vm_create().  Several reasons for doing this:
 > 
-> I feel it would be more consistent to have the details of this in
-> Documentation/virt/kvm/devices/arm-pv-time.txt and refer to this
-> document from here.
+> - The vm type is only decided by physical address width and currently
+>   only used in aarch64, so we've got enough information as long as
+>   we're passing vm_guest_mode into _vm_create(),
+> 
+> - This removes a loop dependency between the vm->type and creation of
+>   vms.  That's why now we need to parse vm_guest_mode twice sometimes,
+>   once in run_test() and then again in _vm_create().  The follow up
+>   patches will move on to clean up that as well so we can have a
+>   single place to decide guest machine types and so.
+> 
+> Note that this patch will slightly change the behavior of aarch64
+> tests in that previously most vm_create() callers will directly pass
+> in type==0 into _vm_create() but now the type will depend on
+> vm_guest_mode, however it shouldn't affect any user because all
+> vm_create() users of aarch64 will be using VM_MODE_DEFAULT guest
+> mode (which is VM_MODE_P40V48_4K) so at last type will still be zero.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/dirty_log_test.c  | 12 +++--------
+>  .../testing/selftests/kvm/include/kvm_util.h  |  2 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 20 ++++++++++++-------
+>  3 files changed, 17 insertions(+), 17 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> index dc3346e090f5..424efcf8c734 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> @@ -249,14 +249,13 @@ static void vm_dirty_log_verify(unsigned long *bmap)
+>  }
+>  
+>  static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
+> -				uint64_t extra_mem_pages, void *guest_code,
+> -				unsigned long type)
+> +				uint64_t extra_mem_pages, void *guest_code)
+>  {
+>  	struct kvm_vm *vm;
+>  	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
+>  
+>  	vm = _vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages,
+> -			O_RDWR, type);
+> +			O_RDWR);
 
-Fair point - I'll move this lower part of the document and add a reference.
+nit: after removing type can O_RDWR go up a line?
+
+>  	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
+>  #ifdef __x86_64__
+>  	vm_create_irqchip(vm);
+> @@ -273,7 +272,6 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+>  	struct kvm_vm *vm;
+>  	uint64_t max_gfn;
+>  	unsigned long *bmap;
+> -	unsigned long type = 0;
+>  
+>  	switch (mode) {
+>  	case VM_MODE_P52V48_4K:
+> @@ -314,10 +312,6 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+>  	 * bits we can change to 39.
+>  	 */
+>  	guest_pa_bits = 39;
+> -#endif
+> -#ifdef __aarch64__
+> -	if (guest_pa_bits != 40)
+> -		type = KVM_VM_TYPE_ARM_IPA_SIZE(guest_pa_bits);
+>  #endif
+>  	max_gfn = (1ul << (guest_pa_bits - guest_page_shift)) - 1;
+>  	guest_page_size = (1ul << guest_page_shift);
+> @@ -351,7 +345,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+>  	bmap = bitmap_alloc(host_num_pages);
+>  	host_bmap_track = bitmap_alloc(host_num_pages);
+>  
+> -	vm = create_vm(mode, VCPU_ID, guest_num_pages, guest_code, type);
+> +	vm = create_vm(mode, VCPU_ID, guest_num_pages, guest_code);
+>  
+>  #ifdef USE_CLEAR_DIRTY_LOG
+>  	struct kvm_enable_cap cap = {};
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 5463b7896a0a..cfc079f20815 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -61,7 +61,7 @@ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
+>  
+>  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
+>  struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
+> -			  int perm, unsigned long type);
+> +			  int perm);
+
+nit: can perm go up?
+
+>  void kvm_vm_free(struct kvm_vm *vmp);
+>  void kvm_vm_restart(struct kvm_vm *vmp, int perm);
+>  void kvm_vm_release(struct kvm_vm *vmp);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 6e49bb039376..0c7c4368bc14 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -84,7 +84,7 @@ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap)
+>  	return ret;
+>  }
+>  
+> -static void vm_open(struct kvm_vm *vm, int perm, unsigned long type)
+> +static void vm_open(struct kvm_vm *vm, int perm)
+>  {
+>  	vm->kvm_fd = open(KVM_DEV_PATH, perm);
+>  	if (vm->kvm_fd < 0)
+> @@ -95,7 +95,7 @@ static void vm_open(struct kvm_vm *vm, int perm, unsigned long type)
+>  		exit(KSFT_SKIP);
+>  	}
+>  
+> -	vm->fd = ioctl(vm->kvm_fd, KVM_CREATE_VM, type);
+> +	vm->fd = ioctl(vm->kvm_fd, KVM_CREATE_VM, vm->type);
+>  	TEST_ASSERT(vm->fd >= 0, "KVM_CREATE_VM ioctl failed, "
+>  		"rc: %i errno: %i", vm->fd, errno);
+>  }
+> @@ -131,7 +131,7 @@ _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
+>   * given by perm (e.g. O_RDWR).
+>   */
+>  struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
+> -			  int perm, unsigned long type)
+> +			  int perm)
+
+nit: can perm go up?
+
+>  {
+>  	struct kvm_vm *vm;
+>  
+> @@ -139,8 +139,7 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
+>  	TEST_ASSERT(vm != NULL, "Insufficient Memory");
+>  
+>  	vm->mode = mode;
+> -	vm->type = type;
+> -	vm_open(vm, perm, type);
+> +	vm->type = 0;
+>  
+>  	/* Setup mode specific traits. */
+>  	switch (vm->mode) {
+> @@ -190,6 +189,13 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
+>  		TEST_ASSERT(false, "Unknown guest mode, mode: 0x%x", mode);
+>  	}
+>  
+> +#ifdef __aarch64__
+> +	if (vm->pa_bits != 40)
+> +		vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(guest_pa_bits);
+                                                    ^^
+                                                    should be vm->pa_bits
+
+> +#endif
+> +
+> +	vm_open(vm, perm);
+> +
+>  	/* Limit to VA-bit canonical virtual addresses. */
+>  	vm->vpages_valid = sparsebit_alloc();
+>  	sparsebit_set_num(vm->vpages_valid,
+> @@ -212,7 +218,7 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
+>  
+>  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+>  {
+> -	return _vm_create(mode, phy_pages, perm, 0);
+> +	return _vm_create(mode, phy_pages, perm);
+>  }
+>  
+>  /*
+> @@ -232,7 +238,7 @@ void kvm_vm_restart(struct kvm_vm *vmp, int perm)
+>  {
+>  	struct userspace_mem_region *region;
+>  
+> -	vm_open(vmp, perm, vmp->type);
+> +	vm_open(vmp, perm);
+>  	if (vmp->has_irqchip)
+>  		vm_create_irqchip(vmp);
+>  
+> -- 
+> 2.21.0
+> 
 
 Thanks,
-
-Steve
-
->> +    struct kvm_create_device pvtime_device = {
->> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
->> +            .attr = 0,
->> +            .flags = 0,
->> +    };
->> +
->> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
->> +
->> +Creation of the device should be done after creating the vCPUs of the virtual
->> +machine.
->> +
->> +The IPA of the structures must be given to KVM. This is the base address
->> +of an array of stolen time structures (one for each VCPU). The base address
->> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
->> +multiple of PAGE_SIZE.
->> +
->> +The memory for these structures should be added to the guest in the usual
->> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
->> +
->> +For example:
->> +
->> +    struct kvm_dev_arm_st_region region = {
->> +            .gpa = <IPA of guest base address>,
->> +            .size = <size in bytes>
->> +    };
->> +
->> +    struct kvm_device_attr st_base = {
->> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
->> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
->> +            .addr = (u64)&region
->> +    };
->> +
->> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
->> -- 
->> 2.20.1
->>
-> 
-> Thanks,
-> 
->     Christoffer
-> 
-
+drew
