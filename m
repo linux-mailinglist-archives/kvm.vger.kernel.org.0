@@ -2,279 +2,547 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3A029FA80
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 08:26:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC4FD9FAF8
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 08:59:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbfH1G0v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 02:26:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11658 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726146AbfH1G0u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Aug 2019 02:26:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7S6NpNX109707
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 02:26:50 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2unhg9p2we-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 02:26:49 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 28 Aug 2019 07:26:47 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 28 Aug 2019 07:26:43 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7S6Qgh743909252
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Aug 2019 06:26:42 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B5C2711C054;
-        Wed, 28 Aug 2019 06:26:42 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5CB6611C052;
-        Wed, 28 Aug 2019 06:26:42 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.32.236])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Aug 2019 06:26:42 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: Add storage key removal
- facility
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com
-References: <20190827134936.1705-1-frankja@linux.ibm.com>
- <20190827134936.1705-4-frankja@linux.ibm.com>
- <ea6d114c-9025-2e15-89b8-52b938efc129@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Wed, 28 Aug 2019 08:26:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726441AbfH1G7b convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 28 Aug 2019 02:59:31 -0400
+Received: from mga04.intel.com ([192.55.52.120]:25729 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726272AbfH1G7b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 02:59:31 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Aug 2019 23:59:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,440,1559545200"; 
+   d="scan'208";a="356015953"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by orsmga005.jf.intel.com with ESMTP; 27 Aug 2019 23:59:29 -0700
+Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 27 Aug 2019 23:59:29 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 27 Aug 2019 23:59:28 -0700
+Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.80]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.250]) with mapi id 14.03.0439.000;
+ Wed, 28 Aug 2019 14:59:26 +0800
+From:   "Zhang, Tina" <tina.zhang@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "Lu, Kechen" <kechen.lu@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
+Subject: RE: [PATCH v5 4/6] drm/i915/gvt: Deliver vGPU refresh event to
+ userspace
+Thread-Topic: [PATCH v5 4/6] drm/i915/gvt: Deliver vGPU refresh event to
+ userspace
+Thread-Index: AQHVU9tazO9iCJgyMk+DMB6xfv97aKcMmYuAgAK+XYCAAMYRAA==
+Date:   Wed, 28 Aug 2019 06:59:26 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC877030A9@SHSMSX101.ccr.corp.intel.com>
+References: <20190816023528.30210-1-tina.zhang@intel.com>
+ <20190816023528.30210-5-tina.zhang@intel.com>
+ <20190826075553.GC29455@zhen-hp.sh.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D54DF95@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D54DF95@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYTNiMDgzY2YtOWM2MC00OWRmLWFlYTgtOTc2MWFjOGRmYmM1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiTXg1UGJCdU5xVm00aFV1MUNOWXlcL3RlXC81ZGFvRDVkQTZvYm92RDl0N2J3QzhLanhpa1AyM0tZMmVyYU1PMlo5In0=
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <ea6d114c-9025-2e15-89b8-52b938efc129@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="5LvCsyVCQkKunP9t8f7wuow6SOVBqPMgQ"
-X-TM-AS-GCONF: 00
-x-cbid: 19082806-4275-0000-0000-0000035E318B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082806-4276-0000-0000-000038706452
-Message-Id: <f0cddac0-a574-1aeb-69c6-b9d67f2dfd97@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-28_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908280067
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5LvCsyVCQkKunP9t8f7wuow6SOVBqPMgQ
-Content-Type: multipart/mixed; boundary="x23KFKtO0yhRUGcR4Af4Mi12osHKYCEgS";
- protected-headers="v1"
-From: Janosch Frank <frankja@linux.ibm.com>
-To: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, david@redhat.com
-Message-ID: <f0cddac0-a574-1aeb-69c6-b9d67f2dfd97@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 3/3] s390x: Add storage key removal
- facility
-References: <20190827134936.1705-1-frankja@linux.ibm.com>
- <20190827134936.1705-4-frankja@linux.ibm.com>
- <ea6d114c-9025-2e15-89b8-52b938efc129@redhat.com>
-In-Reply-To: <ea6d114c-9025-2e15-89b8-52b938efc129@redhat.com>
-
---x23KFKtO0yhRUGcR4Af4Mi12osHKYCEgS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/27/19 7:58 PM, Thomas Huth wrote:
-> On 27/08/2019 15.49, Janosch Frank wrote:
->> The storage key removal facility (stfle bit 169) makes all key related=
-
->> instructions result in a special operation exception if they handle a
->> key.
->>
->> Let's make sure that the skey and pfmf tests only run non key code
->> (pfmf) or not at all (skey).
->>
->> Also let's test this new facility. As lots of instructions are
->> affected by this, only some of them are tested for now.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
-
->> +static void test_skey(void)
->> +{
->> +	report_prefix_push("(i|s)ske");
->> +	expect_pgm_int();
->> +	set_storage_key(pagebuf, 0x30, 0);
->> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
->> +	expect_pgm_int();
->> +	get_storage_key(pagebuf);
->> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
->> +	report_prefix_pop();
->=20
-> Wouldn't it be better to have distinct prefixes for the two tests?
-
-Will do
-
->=20
->> +}
->> +
->> +static void test_pfmf(void)
->> +{
->> +	union pfmf_r1 r1;
->> +
->> +	report_prefix_push("pfmf");
->> +	r1.val =3D 0;
->> +	r1.reg.sk =3D 1;
->> +	r1.reg.fsc =3D PFMF_FSC_4K;
->> +	r1.reg.key =3D 0x30;
->> +	expect_pgm_int();
->> +	pfmf(r1.val, pagebuf);
->> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
->> +	report_prefix_pop();
->> +}
->> +
->> +static void test_psw_key(void)
->> +{
->> +	uint64_t psw_mask =3D extract_psw_mask() | 0xF0000000000000UL;
->> +
->> +	report_prefix_push("psw key");
->> +	expect_pgm_int();
->> +	load_psw_mask(psw_mask);
->> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
->> +	report_prefix_pop();
->> +}
->> +
->> +static void test_mvcos(void)
->> +{
->> +	uint64_t r3 =3D 64;
->> +	uint8_t *src =3D pagebuf;
->> +	uint8_t *dst =3D pagebuf + PAGE_SIZE;
->> +	/* K bit set, as well as keys */
->> +	register unsigned long oac asm("0") =3D 0xf002f002;
->> +
->> +	report_prefix_push("mvcos");
->> +	expect_pgm_int();
->> +	asm volatile(".machine \"z10\"\n"
->> +		     ".machine \"push\"\n"
->=20
-> Shouldn't that be the other way round? first push the current one, then=
-
-> set the new one?
-
-Yes, I interpreted the documentation in the wrong way and it was a PPC
-documentation anyway :)
-
->=20
-> Anyway, I've now also checked this patch in the CI:
->=20
-> diff a/s390x/Makefile b/s390x/Makefile
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -25,7 +25,7 @@ CFLAGS +=3D -std=3Dgnu99
->  CFLAGS +=3D -ffreestanding
->  CFLAGS +=3D -I $(SRCDIR)/lib -I $(SRCDIR)/lib/s390x -I lib
->  CFLAGS +=3D -O2
-> -CFLAGS +=3D -march=3Dz900
-> +CFLAGS +=3D -march=3Dz10
->  CFLAGS +=3D -fno-delete-null-pointer-checks
->  LDFLAGS +=3D -nostdlib -Wl,--build-id=3Dnone
->=20
-> ... and it also seems to work fine with the TCG there:
->=20
-> https://gitlab.com/huth/kvm-unit-tests/-/jobs/281450598
->=20
-> So I think you can simply change it in the Makefile instead.
-
-z10 or directly something higher?
-
->=20
->  Thomas
->=20
->> +		     "mvcos	%[dst],%[src],%[len]\n"
->> +		     ".machine \"pop\"\n"
->> +		     : [dst] "+Q" (*(dst))
->> +		     : [src] "Q" (*(src)), [len] "d" (r3), "d" (oac)
->> +		     : "cc", "memory");
->> +	check_pgm_int_code(PGM_INT_CODE_SPECIAL_OPERATION);
->> +	report_prefix_pop();
->> +}
 
 
+> -----Original Message-----
+> From: Tian, Kevin
+> Sent: Wednesday, August 28, 2019 9:50 AM
+> To: Zhenyu Wang <zhenyuw@linux.intel.com>; Zhang, Tina
+> <tina.zhang@intel.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org; Yuan, Hang
+> <hang.yuan@intel.com>; alex.williamson@redhat.com; kraxel@redhat.com;
+> Lu, Kechen <kechen.lu@intel.com>; intel-gvt-dev@lists.freedesktop.org; Lv,
+> Zhiyuan <zhiyuan.lv@intel.com>
+> Subject: RE: [PATCH v5 4/6] drm/i915/gvt: Deliver vGPU refresh event to
+> userspace
+> 
+> > From: Zhenyu Wang
+> > Sent: Monday, August 26, 2019 3:56 PM
+> >
+> > On 2019.08.16 10:35:26 +0800, Tina Zhang wrote:
+> > > Deliver the display refresh events to the user land. Userspace can
+> > > use the irq mask/unmask mechanism to disable or enable the event
+> delivery.
+> > >
+> > > As we know, delivering refresh event at each vblank safely avoids
+> > > tearing and unexpected event overwhelming, but there are still
+> > > spaces to optimize.
+> 
+> can you move optimization to another patch?
+OK. I'll try.
+> 
+> > >
+> > > For handling the normal case, deliver the page flip refresh event at
+> > > each vblank, in other words, bounded by vblanks. Skipping some
+> > > events bring performance enhancement while not hurting user
+> experience.
+> 
+> what is the normal case? double buffer? which events are skipped in such
+> scenario?
+Here normal case means >= 2 buffers. In this situation, we have to skip the redundant page flip events between two vblanks and notify user space with one display refresh event (i.e. turn those page flip operations between two vblanks into one display refresh event).
 
---x23KFKtO0yhRUGcR4Af4Mi12osHKYCEgS--
+> 
+> > >
+> > > For single framebuffer case, deliver the refresh events to userspace
+> > > at all vblanks. This heuristic at each vblank leverages
+> > > pageflip_count
+> 
+> at all vblanks? later words said the other way i.e. delivering events only after
+> the threshold is exceeded. Please be consistent in what you try to explain
+> here.
 
---5LvCsyVCQkKunP9t8f7wuow6SOVBqPMgQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Actually, there're two steps: 
+1) single framebuffer case recognition
+The heuristic needs several vblanks to see if vgpu is working in the single front buffer mode.
 
------BEGIN PGP SIGNATURE-----
+2) deliver the display refresh event at all vblanks.
+If vgpu is working in single front buffer mode, the display refresh event will be sent at all vblanks.
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl1mHqEACgkQ41TmuOI4
-ufjBQw//ZkFD4cuhAPzsha0FALFVJ+wAoDvaQEYq5GG9YGIoWcdfGlXdFT//Zyg5
-2kequ4SjnoAL0kp3bNbG7JWOmM1f8BHUx2nsEgyOpgtVW8JjPllRr3Gsf4R9TgS9
-R9jScUcxIMHMG+enh/0TPp29kOxt1cmgErEh4eBoGog+qR8ZgMyR8x3mFJNv8RMN
-Z+fqA5ot35MCygNykZmcPO4uWZit9z/HGHHh7Ub0WmiFh2H1vnkxjYRuUDUDHkF2
-arghq2e+OHPcqqlTAZ01vDR7GP+OUFMp64xJCjAXa4o4/VA28aPFehV0lR7ApJfy
-AJFcXvOp5aFuXY2eJE497HqgE0wKmsGR7YvEh4Q9RIDoELTb/QMJOOGksOnX/ehg
-Fwp0LokEpSICvU/ReSu3+DV4TSdJwXuwnb5pIW5RjCy2UNGo1SftgD7Aw/0RvYw8
-CNmzB+yDxOgvs5b8QGzTfUo34SzdU4QuXxYeiMSoUJV2J4E32jc7S6A9n4xF5ygM
-C9qeVJq80l/W1nkYLsqwzBGsRxINZOdupchWzYL0FfoKHfQSVeSq7ZDimWFvB07P
-YilodqnfRUcg8b+qzUokHsHYuQfTNLNsfxFbEDD9o9gmqqogqv0bdtP9hwkPZPtT
-9VToVCMOMmSmiYjnxJXRIkT+ev0nFoG3a/tETw9mZn4clMKIsFQ=
-=TuBi
------END PGP SIGNATURE-----
+> 
+> > > incresements to determine if there is no page flip happens after a
+> > > certain period and so that the case is regarded as single framebuffer one.
+> > > Although this heuristic makes incorrect decision sometimes and it
+> > > depends
+> 
+> why may the heuristic make incorrect decision? under what condition?
 
---5LvCsyVCQkKunP9t8f7wuow6SOVBqPMgQ--
+E.g. when guest window manager is waiting for user input and there're no window update requests from the apps in guest. In situation, although guest doesn't work in single front buffer mode, the heuristic will consider it does and send the display refresh event at all vblanks. Ideally, in this situation, as guest window manager is working in multi-buffer mode, gvt-g should only send the refresh event when page flip happens. However, it seems there's no simple way for gvt-g to tell this case and the real single front buffer case apart.
 
+> 
+> > > on guest behavior, for example, when no cursor movements happen, the
+> > > user experience does not harm and front buffer is still correctly acquired.
+> > > Meanwhile, in actual single framebuffer case, the user experience is
+> > > enhanced compared with page flip events only.
+> 
+> 'actual' vs. what? a 'faked' single framebuffer case?
+
+I think the 'actual' here means vgpu does work in the single front buffer mode. 
+
+> 
+> > >
+> > > Addtionally, to mitigate the events delivering footprints, one
+> > > eventfd and
+> > > 8 byte eventfd counter partition are leveraged.
+> 
+> footprint? I guess you meant reducing the frequency of delivered events...
+
+Exactly. Thanks.
+
+BR,
+Tina
+> 
+> > >
+> > > v2:
+> > > - Support vfio_irq_info_cap_display_plane_events. (Tina)
+> > >
+> > > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+> > > Signed-off-by: Kechen Lu <kechen.lu@intel.com>
+> > > ---
+> > >  drivers/gpu/drm/i915/gvt/display.c |  22 ++++
+> > >  drivers/gpu/drm/i915/gvt/gvt.h     |   2 +
+> > >  drivers/gpu/drm/i915/gvt/kvmgt.c   | 159
+> +++++++++++++++++++++++++++-
+> > -
+> > >  3 files changed, 174 insertions(+), 9 deletions(-)
+> > >
+> > > diff --git a/drivers/gpu/drm/i915/gvt/display.c
+> > b/drivers/gpu/drm/i915/gvt/display.c
+> > > index 1a0a4ae4826e..616285e4a014 100644
+> > > --- a/drivers/gpu/drm/i915/gvt/display.c
+> > > +++ b/drivers/gpu/drm/i915/gvt/display.c
+> > > @@ -34,6 +34,8 @@
+> > >
+> > >  #include "i915_drv.h"
+> > >  #include "gvt.h"
+> > > +#include <uapi/linux/vfio.h>
+> > > +#include <drm/drm_plane.h>
+> > >
+> > >  static int get_edp_pipe(struct intel_vgpu *vgpu)  { @@ -387,6
+> > > +389,8 @@ void intel_gvt_check_vblank_emulation(struct
+> > intel_gvt *gvt)
+> > >  	mutex_unlock(&gvt->lock);
+> > >  }
+> > >
+> > > +#define PAGEFLIP_DELAY_THR 10
+> > > +
+> > >  static void emulate_vblank_on_pipe(struct intel_vgpu *vgpu, int
+> > > pipe)  {
+> > >  	struct drm_i915_private *dev_priv = vgpu->gvt->dev_priv; @@ -
+> 396,7
+> > > +400,10 @@ static void emulate_vblank_on_pipe(struct
+> > intel_vgpu *vgpu, int pipe)
+> > >  		[PIPE_B] = PIPE_B_VBLANK,
+> > >  		[PIPE_C] = PIPE_C_VBLANK,
+> > >  	};
+> > > +	int pri_flip_event = SKL_FLIP_EVENT(pipe, PLANE_PRIMARY);
+> > >  	int event;
+> > > +	u64 eventfd_signal_val = 0;
+> > > +	static int no_pageflip_count;
+> > >
+> > >  	if (pipe < PIPE_A || pipe > PIPE_C)
+> > >  		return;
+> > > @@ -407,11 +414,26 @@ static void emulate_vblank_on_pipe(struct
+> > intel_vgpu *vgpu, int pipe)
+> > >  		if (!pipe_is_enabled(vgpu, pipe))
+> > >  			continue;
+> > >
+> > > +		if (event == pri_flip_event)
+> > > +			eventfd_signal_val |=
+> > DISPLAY_PRI_REFRESH_EVENT_VAL;
+> > > +
+> > >  		intel_vgpu_trigger_virtual_event(vgpu, event);
+> > >  	}
+> > >
+> > > +	if (eventfd_signal_val)
+> > > +		no_pageflip_count = 0;
+> > > +	else if (!eventfd_signal_val && no_pageflip_count >
+> > PAGEFLIP_DELAY_THR)
+> >
+> > extra !eventfd_signal_val
+> >
+> > > +		eventfd_signal_val |= DISPLAY_PRI_REFRESH_EVENT_VAL;
+> 
+> do you need reset the count to zero here?
+> 
+> > > +	else
+> > > +		no_pageflip_count++;
+> >
+> > no_pageflip_count should be per-vgpu instead of static.
+> >
+> > > +
+> > > +	if (vgpu->vdev.vblank_trigger && !vgpu->vdev.display_event_mask
+> > &&
+> > > +		eventfd_signal_val)
+> 
+> is this mask per vGPU or per plane? If the latter, you need check specific bit
+> here.
+> 
+> > > +		eventfd_signal(vgpu->vdev.vblank_trigger,
+> > eventfd_signal_val);
+> > > +
+> > >  	if (pipe_is_enabled(vgpu, pipe)) {
+> > >  		vgpu_vreg_t(vgpu, PIPE_FRMCOUNT_G4X(pipe))++;
+> > > +
+> >
+> > extra line
+> >
+> > >  		intel_vgpu_trigger_virtual_event(vgpu, vblank_event[pipe]);
+> > >  	}
+> > >  }
+> > > diff --git a/drivers/gpu/drm/i915/gvt/gvt.h
+> > b/drivers/gpu/drm/i915/gvt/gvt.h
+> > > index cd29ea28d7ed..6c8ed030c30b 100644
+> > > --- a/drivers/gpu/drm/i915/gvt/gvt.h
+> > > +++ b/drivers/gpu/drm/i915/gvt/gvt.h
+> > > @@ -205,6 +205,8 @@ struct intel_vgpu {
+> > >  		int num_irqs;
+> > >  		struct eventfd_ctx *intx_trigger;
+> > >  		struct eventfd_ctx *msi_trigger;
+> > > +		struct eventfd_ctx *vblank_trigger;
+> > > +		u32 display_event_mask;
+> > >
+> > >  		/*
+> > >  		 * Two caches are used to avoid mapping duplicated pages
+> > (eg.
+> > > diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> > b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> > > index fd1633342e53..9ace1f4ff9eb 100644
+> > > --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> > > +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> > > @@ -1250,6 +1250,8 @@ static int intel_vgpu_get_irq_count(struct
+> > intel_vgpu *vgpu, int type)
+> > >  {
+> > >  	if (type == VFIO_PCI_INTX_IRQ_INDEX || type ==
+> > VFIO_PCI_MSI_IRQ_INDEX)
+> > >  		return 1;
+> > > +	else if (type < VFIO_PCI_NUM_IRQS + vgpu->vdev.num_irqs)
+> > > +		return vgpu->vdev.irq[type - VFIO_PCI_NUM_IRQS].count;
+> > >
+> > >  	return 0;
+> > >  }
+> > > @@ -1297,7 +1299,60 @@ static int intel_vgpu_set_msi_trigger(struct
+> > intel_vgpu *vgpu,
+> > >  	return 0;
+> > >  }
+> > >
+> > > -static int intel_vgpu_set_irqs(struct intel_vgpu *vgpu, u32 flags,
+> > > +static int intel_vgu_set_display_irq_mask(struct intel_vgpu *vgpu,
+> 
+> vgu -> vgpu
+> 
+> > > +		unsigned int index, unsigned int start, unsigned int count,
+> > > +		u32 flags, void *data)
+> > > +{
+> > > +	if (start != 0 || count > 2)
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (flags & VFIO_IRQ_SET_DATA_NONE)
+> > > +		vgpu->vdev.display_event_mask |= 1;
+> >
+> > see below..
+> >
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static int intel_vgu_set_display_irq_unmask(struct intel_vgpu *vgpu,
+> > > +		unsigned int index, unsigned int start, unsigned int count,
+> > > +		u32 flags, void *data)
+> > > +{
+> > > +	if (start != 0 || count > 2)
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (flags & VFIO_IRQ_SET_DATA_NONE)
+> > > +		vgpu->vdev.display_event_mask &= 0;
+> >
+> > looks display_event_mask is used as flag for enable/disable, just write 1 or
+> 0?
+> 
+> Do we plan to support per-plane mask in the future? If yes, then use bit
+> operation but let's define the bit meaning explicitly now.,
+> 
+> >
+> >
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static int intel_vgpu_set_display_event_trigger(struct intel_vgpu *vgpu,
+> > > +		unsigned int index, unsigned int start, unsigned int count,
+> > > +		u32 flags, void *data)
+> > > +{
+> > > +	struct eventfd_ctx *trigger;
+> > > +
+> > > +	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+> > > +		int fd = *(int *)data;
+> > > +
+> > > +		trigger = eventfd_ctx_fdget(fd);
+> > > +		if (IS_ERR(trigger)) {
+> > > +			gvt_vgpu_err("eventfd_ctx_fdget failed\n");
+> > > +			return PTR_ERR(trigger);
+> > > +		}
+> > > +		vgpu->vdev.vblank_trigger = trigger;
+> > > +		vgpu->vdev.display_event_mask = 0;
+> > > +	} else if ((flags & VFIO_IRQ_SET_DATA_NONE) && !count) {
+> > > +		trigger = vgpu->vdev.vblank_trigger;
+> > > +		if (trigger) {
+> > > +			eventfd_ctx_put(trigger);
+> > > +			vgpu->vdev.vblank_trigger = NULL;
+> > > +		}
+> > > +	}
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +int intel_vgpu_set_irqs(struct intel_vgpu *vgpu, u32 flags,
+> > >  		unsigned int index, unsigned int start, unsigned int count,
+> > >  		void *data)
+> > >  {
+> > > @@ -1330,6 +1385,35 @@ static int intel_vgpu_set_irqs(struct
+> > > intel_vgpu
+> > *vgpu, u32 flags,
+> > >  			break;
+> > >  		}
+> > >  		break;
+> > > +	default:
+> > > +	{
+> > > +		int i;
+> > > +
+> > > +		if (index >= VFIO_PCI_NUM_IRQS +
+> > > +					vgpu->vdev.num_irqs)
+> > > +			return -EINVAL;
+> > > +		index =
+> > > +			array_index_nospec(index,
+> > > +						VFIO_PCI_NUM_IRQS +
+> > > +						vgpu->vdev.num_irqs);
+> > > +
+> > > +		i = index - VFIO_PCI_NUM_IRQS;
+> > > +		if (vgpu->vdev.irq[i].type == VFIO_IRQ_TYPE_GFX &&
+> > > +		    vgpu->vdev.irq[i].subtype ==
+> > > +		    VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ) {
+> > > +			switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK)
+> {
+> > > +			case VFIO_IRQ_SET_ACTION_MASK:
+> > > +				func = intel_vgu_set_display_irq_mask;
+> > > +				break;
+> > > +			case VFIO_IRQ_SET_ACTION_UNMASK:
+> > > +				func = intel_vgu_set_display_irq_unmask;
+> > > +				break;
+> > > +			case VFIO_IRQ_SET_ACTION_TRIGGER:
+> > > +				func = intel_vgpu_set_display_event_trigger;
+> > > +				break;
+> > > +			}
+> > > +		}
+> > > +	}
+> > >  	}
+> > >
+> > >  	if (!func)
+> > > @@ -1361,7 +1445,7 @@ static long intel_vgpu_ioctl(struct
+> > > mdev_device
+> > *mdev, unsigned int cmd,
+> > >  		info.flags |= VFIO_DEVICE_FLAGS_RESET;
+> > >  		info.num_regions = VFIO_PCI_NUM_REGIONS +
+> > >  				vgpu->vdev.num_regions;
+> > > -		info.num_irqs = VFIO_PCI_NUM_IRQS;
+> > > +		info.num_irqs = VFIO_PCI_NUM_IRQS + vgpu-
+> >vdev.num_irqs;
+> > >
+> > >  		return copy_to_user((void __user *)arg, &info, minsz) ?
+> > >  			-EFAULT : 0;
+> > > @@ -1521,32 +1605,88 @@ static long intel_vgpu_ioctl(struct
+> > > mdev_device
+> > *mdev, unsigned int cmd,
+> > >  			-EFAULT : 0;
+> > >  	} else if (cmd == VFIO_DEVICE_GET_IRQ_INFO) {
+> > >  		struct vfio_irq_info info;
+> > > +		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+> > > +		unsigned int i;
+> > > +		int ret;
+> > >
+> > >  		minsz = offsetofend(struct vfio_irq_info, count);
+> > >
+> > >  		if (copy_from_user(&info, (void __user *)arg, minsz))
+> > >  			return -EFAULT;
+> > >
+> > > -		if (info.argsz < minsz || info.index >= VFIO_PCI_NUM_IRQS)
+> > > +		if (info.argsz < minsz)
+> > >  			return -EINVAL;
+> > >
+> > >  		switch (info.index) {
+> > >  		case VFIO_PCI_INTX_IRQ_INDEX:
+> > >  		case VFIO_PCI_MSI_IRQ_INDEX:
+> > > +			info.flags = VFIO_IRQ_INFO_EVENTFD;
+> > >  			break;
+> > > -		default:
+> > > +		case VFIO_PCI_MSIX_IRQ_INDEX:
+> > > +		case VFIO_PCI_ERR_IRQ_INDEX:
+> > > +		case VFIO_PCI_REQ_IRQ_INDEX:
+> > >  			return -EINVAL;
+> > > -		}
+> > > +		default:
+> > > +		{
+> > > +			struct vfio_irq_info_cap_type cap_type = {
+> > > +				.header.id = VFIO_IRQ_INFO_CAP_TYPE,
+> > > +				.header.version = 1 };
+> > >
+> > > -		info.flags = VFIO_IRQ_INFO_EVENTFD;
+> > > +			if (info.index >= VFIO_PCI_NUM_IRQS +
+> > > +					vgpu->vdev.num_irqs)
+> > > +				return -EINVAL;
+> > > +			info.index =
+> > > +				array_index_nospec(info.index,
+> > > +						VFIO_PCI_NUM_IRQS +
+> > > +						vgpu->vdev.num_irqs);
+> > > +
+> > > +			i = info.index - VFIO_PCI_NUM_IRQS;
+> > > +
+> > > +			info.flags = vgpu->vdev.irq[i].flags;
+> > > +			cap_type.type = vgpu->vdev.irq[i].type;
+> > > +			cap_type.subtype = vgpu->vdev.irq[i].subtype;
+> > > +
+> > > +			ret = vfio_info_add_capability(&caps,
+> > > +						&cap_type.header,
+> > > +						sizeof(cap_type));
+> > > +			if (ret)
+> > > +				return ret;
+> > > +
+> > > +			if (vgpu->vdev.irq[i].ops->add_capability) {
+> > > +				ret = vgpu->vdev.irq[i].ops-
+> > >add_capability(vgpu,
+> > > +
+> > &caps);
+> > > +				if (ret)
+> > > +					return ret;
+> > > +			}
+> > > +		}
+> > > +		}
+> > >
+> > >  		info.count = intel_vgpu_get_irq_count(vgpu, info.index);
+> > >
+> > >  		if (info.index == VFIO_PCI_INTX_IRQ_INDEX)
+> > >  			info.flags |= (VFIO_IRQ_INFO_MASKABLE |
+> > >  				       VFIO_IRQ_INFO_AUTOMASKED);
+> > > -		else
+> > > -			info.flags |= VFIO_IRQ_INFO_NORESIZE;
+> > > +
+> > > +		if (caps.size) {
+> > > +			info.flags |= VFIO_IRQ_INFO_FLAG_CAPS;
+> > > +			if (info.argsz < sizeof(info) + caps.size) {
+> > > +				info.argsz = sizeof(info) + caps.size;
+> > > +				info.cap_offset = 0;
+> > > +			} else {
+> > > +				vfio_info_cap_shift(&caps, sizeof(info));
+> > > +				if (copy_to_user((void __user *)arg +
+> > > +						  sizeof(info), caps.buf,
+> > > +						  caps.size)) {
+> > > +					kfree(caps.buf);
+> > > +					return -EFAULT;
+> > > +				}
+> > > +				info.cap_offset = sizeof(info);
+> > > +				if (offsetofend(struct vfio_irq_info,
+> > cap_offset) > minsz)
+> > > +					minsz = offsetofend(struct
+> > vfio_irq_info, cap_offset);
+> > > +			}
+> > > +
+> > > +			kfree(caps.buf);
+> > > +		}
+> > >
+> > >  		return copy_to_user((void __user *)arg, &info, minsz) ?
+> > >  			-EFAULT : 0;
+> > > @@ -1565,7 +1705,8 @@ static long intel_vgpu_ioctl(struct
+> > > mdev_device
+> > *mdev, unsigned int cmd,
+> > >  			int max = intel_vgpu_get_irq_count(vgpu, hdr.index);
+> > >
+> > >  			ret = vfio_set_irqs_validate_and_prepare(&hdr, max,
+> > > -						VFIO_PCI_NUM_IRQS,
+> > &data_size);
+> > > +					VFIO_PCI_NUM_IRQS + vgpu-
+> > >vdev.num_irqs,
+> > > +								 &data_size);
+> > >  			if (ret) {
+> > >
+> > 	gvt_vgpu_err("intel:vfio_set_irqs_validate_and_prepare failed\n");
+> > >  				return -EINVAL;
+> > > --
+> > > 2.17.1
+> > >
+> > > _______________________________________________
+> > > intel-gvt-dev mailing list
+> > > intel-gvt-dev@lists.freedesktop.org
+> > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+> >
+> > --
+> > Open Source Technology Center, Intel ltd.
+> >
+> > $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
