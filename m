@@ -2,212 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFAEAA014B
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 14:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 250E0A01FE
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 14:39:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726428AbfH1MJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 08:09:19 -0400
-Received: from foss.arm.com ([217.140.110.172]:58034 "EHLO foss.arm.com"
+        id S1726454AbfH1Mjv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 08:39:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50676 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726259AbfH1MJT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 08:09:19 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2CA1D344;
-        Wed, 28 Aug 2019 05:09:18 -0700 (PDT)
-Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE7EA3F246;
-        Wed, 28 Aug 2019 05:09:16 -0700 (PDT)
-Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
-To:     Christoffer Dall <christoffer.dall@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20190821153656.33429-1-steven.price@arm.com>
- <20190821153656.33429-2-steven.price@arm.com>
- <20190827085706.GB6541@e113682-lin.lund.arm.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <37eaf54b-8a22-8483-a372-419bfa1475f1@arm.com>
-Date:   Wed, 28 Aug 2019 13:09:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726430AbfH1Mju (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 08:39:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3800218C4267;
+        Wed, 28 Aug 2019 12:39:50 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 707675D9C9;
+        Wed, 28 Aug 2019 12:39:49 +0000 (UTC)
+Date:   Wed, 28 Aug 2019 14:39:47 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH RFC UNTESTED] vfio-ccw: indirect access to translated
+ cps
+Message-ID: <20190828143947.1c6b88e4.cohuck@redhat.com>
+In-Reply-To: <20190816003402.2a52b863.pasic@linux.ibm.com>
+References: <20190726100617.19718-1-cohuck@redhat.com>
+        <20190730174910.47930494.pasic@linux.ibm.com>
+        <20190807132311.5238bc24.cohuck@redhat.com>
+        <20190807160136.178e69de.pasic@linux.ibm.com>
+        <20190808104306.2450bdcf.cohuck@redhat.com>
+        <20190816003402.2a52b863.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20190827085706.GB6541@e113682-lin.lund.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 28 Aug 2019 12:39:50 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/2019 09:57, Christoffer Dall wrote:
-> On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
->> Introduce a paravirtualization interface for KVM/arm64 based on the
->> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
->>
->> This only adds the details about "Stolen Time" as the details of "Live
->> Physical Time" have not been fully agreed.
->>
->> User space can specify a reserved area of memory for the guest and
->> inform KVM to populate the memory with information on time that the host
->> kernel has stolen from the guest.
->>
->> A hypercall interface is provided for the guest to interrogate the
->> hypervisor's support for this interface and the location of the shared
->> memory structures.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
->>  1 file changed, 100 insertions(+)
->>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
->>
->> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
->> new file mode 100644
->> index 000000000000..1ceb118694e7
->> --- /dev/null
->> +++ b/Documentation/virt/kvm/arm/pvtime.txt
->> @@ -0,0 +1,100 @@
->> +Paravirtualized time support for arm64
->> +======================================
->> +
->> +Arm specification DEN0057/A defined a standard for paravirtualised time
->> +support for AArch64 guests:
->> +
->> +https://developer.arm.com/docs/den0057/a
->> +
->> +KVM/arm64 implements the stolen time part of this specification by providing
->> +some hypervisor service calls to support a paravirtualized guest obtaining a
->> +view of the amount of time stolen from its execution.
->> +
->> +Two new SMCCC compatible hypercalls are defined:
->> +
->> +PV_FEATURES 0xC5000020
->> +PV_TIME_ST  0xC5000022
->> +
->> +These are only available in the SMC64/HVC64 calling convention as
->> +paravirtualized time is not available to 32 bit Arm guests. The existence of
->> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
->> +mechanism before calling it.
->> +
->> +PV_FEATURES
->> +    Function ID:  (uint32)  : 0xC5000020
->> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
->> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->> +                              PV-time feature is supported by the hypervisor.
->> +
->> +PV_TIME_ST
->> +    Function ID:  (uint32)  : 0xC5000022
->> +    Return value: (int64)   : IPA of the stolen time data structure for this
->> +                              (V)CPU. On failure:
->> +                              NOT_SUPPORTED (-1)
->> +
->> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
->> +with inner and outer write back caching attributes, in the inner shareable
->> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
->> +meaningfully filled by the hypervisor (see structure below).
->> +
->> +PV_TIME_ST returns the structure for the calling VCPU.
->> +
->> +Stolen Time
->> +-----------
->> +
->> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
->> +
->> +  Field       | Byte Length | Byte Offset | Description
->> +  ----------- | ----------- | ----------- | --------------------------
->> +  Revision    |      4      |      0      | Must be 0 for version 0.1
->> +  Attributes  |      4      |      4      | Must be 0
->> +  Stolen time |      8      |      8      | Stolen time in unsigned
->> +              |             |             | nanoseconds indicating how
->> +              |             |             | much time this VCPU thread
->> +              |             |             | was involuntarily not
->> +              |             |             | running on a physical CPU.
->> +
->> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
->> +will be present within a reserved region of the normal memory given to the
->> +guest. The guest should not attempt to write into this memory. There is a
->> +structure per VCPU of the guest.
->> +
->> +User space interface
->> +====================
->> +
->> +User space can request that KVM provide the paravirtualized time interface to
->> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
->> +
->> +    struct kvm_create_device pvtime_device = {
->> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
->> +            .attr = 0,
->> +            .flags = 0,
->> +    };
->> +
->> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
->> +
->> +Creation of the device should be done after creating the vCPUs of the virtual
->> +machine.
->> +
->> +The IPA of the structures must be given to KVM. This is the base address
->> +of an array of stolen time structures (one for each VCPU). The base address
->> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
->> +multiple of PAGE_SIZE.
->> +
->> +The memory for these structures should be added to the guest in the usual
->> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
->> +
->> +For example:
->> +
->> +    struct kvm_dev_arm_st_region region = {
->> +            .gpa = <IPA of guest base address>,
->> +            .size = <size in bytes>
->> +    };
+On Fri, 16 Aug 2019 00:34:02 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On Thu, 8 Aug 2019 10:43:06 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> This feel fragile; how are you handling userspace creating VCPUs after
-> setting this up,
+> > On Wed, 7 Aug 2019 16:01:36 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:  
 
-In this case as long as the structures all fit within the region created
-VCPUs can be created/destroyed at will. If the VCPU index is too high
-then the kernel will bail out in kvm_update_stolen_time() so the
-structure will not be written. I consider this case as user space
-messing up, so beyond protecting the host from the mess, user space gets
-to keep the pieces.
+> > > > > Besides the only point of converting cp to a pointer seems to be
+> > > > > policing access to cp_area (which used to be cp). I.e. if it is
+> > > > > NULL: don't touch it, otherwise: go ahead. We can do that with a single
+> > > > > bit, we don't need a pointer for that.    
+> > > > 
+> > > > The idea was
+> > > > - do translation etc. on an area only accessed by the thread doing the
+> > > >   translation
+> > > > - switch the pointer to that area once the cp has been submitted
+> > > >   successfully (and it is therefore associated with further interrupts
+> > > >   etc.)
+> > > > The approach in this patch is probably a bit simplistic.
+> > > > 
+> > > > I think one bit is not enough, we have at least three states:
+> > > > - idle; start using the area if you like
+> > > > - translating; i.e. only the translator is touching the area, keep off
+> > > > - submitted; we wait for interrupts, handle them or free if no (more)
+> > > >   interrupts can happen    
+> > > 
+> > > I think your patch assigns the pointer when transitioning from
+> > > translated --> submitted. That can be tracked with a single bit, that's
+> > > what I was trying to say. You seem to have misunderstood: I never
+> > > intended to claim that a single bit is sufficient to get this clean (only
+> > > to accomplish what the pointer accomplishes -- modulo races).
+> > > 
+> > > My impression was that the 'initialized' field is abut the idle -->
+> > > translating transition, but I never fully understood this 'initialized'
+> > > patch.  
+> > 
+> > So we do have three states here, right? (I hope we're not talking past
+> > each other again...)  
+> 
+> Right, AFAIR  and without any consideration to fine details the three
+> states and two state transitions do make sense.
 
-> the GPA overlapping guest memory, etc.
+If we translate the three states to today's states in the fsm, we get:
+- "idle" -> VFIO_CCW_STATE_IDLE
+- "doing translation" -> VFIO_CCW_STATE_CP_PROCESSING
+- "submitted" -> VFIO_CCW_STATE_CP_PENDING
+and the transitions between the three already look fine to me (modulo
+locking). We also seem to handle async requests correctly (-EAGAIN if
+_PROCESSING, else just go ahead).
 
-Again, the (host) kernel is protected against this, but clearly this
-will end badly for the guest.
+So we can probably forget about the approach in this patch, and
+concentrate on eliminating races in state transitions.
 
-> Is the
-> philosophy here that the VMM can mess up the VM if it wants, but that
-> this should never lead attacks on the host (we better hope not) and so
-> we don't care?
+Not sure what the best approach is for tackling these: intermediate
+transit state, a mutex or another lock, running locked and running
+stuff that cannot be done locked on workqueues (and wait for all work
+to finish while disallowing new work while doing the transition)?
 
-Yes. For things like GPA overlapping guest memory it's not really the
-host's position to work out what is "guest memory". It's quite possible
-that user space could decide to place the stolen time structures right
-in the middle of guest memory - it's just up to user space to inform the
-guest what memory is usable. Obviously the expectation is that the
-shared structures would be positioned "out of the way" in GPA space in
-any normal arrangement.
+Clever ideas wanted :)
 
-> It seems to me setting the IPA per vcpu throught the VCPU device would
-> avoid a lot of these issues.  See
-> Documentation/virt/kvm/devices/vcpu.txt.
-
-That is certainly a possibility, I'm not really sure what the benefit is
-though? It would still lead to corner cases:
-
- * What if only some VCPUs had stolen time setup on them?
- * What if multiple VCPUs pointed to the same location?
- * The structures can still overlap with guest memory
-
-It's also more work to setup in user space with the only "benefit" being
-that user space could choose to organise the structures however it sees
-fit (e.g. no need for them to be contiguous in memory). But I'm not sure
-I see a use case for that flexibility.
-
-Perhaps there's some benefit I'm not seeing?
-
-Steve
