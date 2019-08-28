@@ -2,204 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 894C09FF96
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 12:20:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E61DA00A3
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 13:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbfH1KT6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 06:19:58 -0400
-Received: from mail-eopbgr20132.outbound.protection.outlook.com ([40.107.2.132]:40610
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726706AbfH1KT5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 06:19:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WEhlbWiIOOubJrrfFj4YhD1h8Z9vCsjVDHkm3z6kT58jAdGdTAM2svdCuVixh89uN7mX+YA4bDVjFmsJ2or6qpqloA2nLH9HUxM1HUjnHdPeoCXFOwI5qMyp+8QqDBNAcLVnatLYHZx0hAuCRmbrosEQd6Y+iCOwc37q0HIYMPubaseEWcIptD/DGwOnIN4a/OAtpJ4JBxvfKytEhiGfEDlLWJCAc6r5oqDLOxPNnz6mgSwYkuEjNGGCQedjnI4ykc8IKWcPdKcB82UXaAa+Js3/IWbK3at/DVb7virxDqyoJVP8+d75JdFsprYKekOy/LQiXlps+WiF87tbVvKmiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8QlC8HFqHpH/TH0Bz9A2zgF6lEBMi/cWYTIuTGqshz8=;
- b=mg/KGf6xTHaHjnWyJYTINT8wjXaCYCpuBVqU7he+PTvvNnaIM2a1n6kt956vIjorAGP931Gj9DD5vNZeNGNYWphhhkMKaOtwwcNxZJ8HTzOjsYfOmyYt8sH0hGQ8sn36+m3wTPP219DE1nLtA5KU7vkeKS89+Rf1YBjdVkl/eZgmTRJAEbNw2JXCFnxmVUJPLAnKWM6VK79b7Q1W3aschz4f+TUXtUubpalyFeTprMMABovFX0cv7Vx+CiTA/MYazj8A39fTcHLF6ZyZ+Pc+eYFmlwgbUEUDKQoRqpfrouBgS122CN57vmBgNyPhbCFEmu221oi2sCcxj0ZCk0j/MA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8QlC8HFqHpH/TH0Bz9A2zgF6lEBMi/cWYTIuTGqshz8=;
- b=mzhCy0uKhr1wRZLYOfCEluqLQ4vE81ZShfr9xsJJihvOWQByVpGF1rmLdn+7T/O30EhJd2w4yGTRh4kvu4R1tTh2Defz+0EIkhfzkXy24Ket6x5mozgIILignzA6Q5xIcsn0UkIg3KAxXpqKgsVQKg5yCaVklP1Go21psEK1i0k=
-Received: from VI1PR08MB2782.eurprd08.prod.outlook.com (10.170.236.143) by
- VI1PR08MB3760.eurprd08.prod.outlook.com (20.178.14.92) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2178.19; Wed, 28 Aug 2019 10:19:51 +0000
-Received: from VI1PR08MB2782.eurprd08.prod.outlook.com
- ([fe80::2969:e370:fb70:71a]) by VI1PR08MB2782.eurprd08.prod.outlook.com
- ([fe80::2969:e370:fb70:71a%3]) with mapi id 15.20.2178.023; Wed, 28 Aug 2019
- 10:19:51 +0000
-From:   Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Denis Lunev <den@virtuozzo.com>,
-        Roman Kagan <rkagan@virtuozzo.com>,
-        Denis Plotnikov <dplotnikov@virtuozzo.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Yi Wang <wang.yi59@zte.com.cn>, Peng Hao <peng.hao2@zte.com.cn>
-Subject: Re: [PATCH 3/3] KVM: x86: always stop emulation on page fault
-Thread-Topic: [PATCH 3/3] KVM: x86: always stop emulation on page fault
-Thread-Index: AQHVXNhVZAApmqxiJkatpVKQ81RyEacPE9kAgAFGswA=
-Date:   Wed, 28 Aug 2019 10:19:51 +0000
-Message-ID: <20190828131948.cb67f97cab502b9f5f63b1b8@virtuozzo.com>
-References: <1566911210-30059-1-git-send-email-jan.dakinevich@virtuozzo.com>
-        <1566911210-30059-4-git-send-email-jan.dakinevich@virtuozzo.com>
-        <20190827145030.GC27459@linux.intel.com>
-In-Reply-To: <20190827145030.GC27459@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0329.eurprd05.prod.outlook.com
- (2603:10a6:7:92::24) To VI1PR08MB2782.eurprd08.prod.outlook.com
- (2603:10a6:802:19::15)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jan.dakinevich@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: Sylpheed 3.6.0 (GTK+ 2.24.25; x86_64-unknown-linux-gnu)
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a1d772c5-50cd-4a3f-e3e0-08d72ba142d7
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:VI1PR08MB3760;
-x-ms-traffictypediagnostic: VI1PR08MB3760:
-x-ms-exchange-purlcount: 4
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR08MB3760B88880AC97A9DEB8233A8AA30@VI1PR08MB3760.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 014304E855
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(346002)(376002)(39840400004)(396003)(136003)(189003)(199004)(5660300002)(66446008)(64756008)(66556008)(66476007)(86362001)(305945005)(14454004)(7736002)(66946007)(7416002)(3846002)(1076003)(6116002)(966005)(6916009)(478600001)(54906003)(4326008)(11346002)(2616005)(25786009)(476003)(486006)(446003)(66066001)(44832011)(2906002)(53936002)(316002)(71190400001)(71200400001)(6246003)(6436002)(99286004)(6486002)(76176011)(256004)(14444005)(52116002)(6512007)(8936002)(81166006)(81156014)(6306002)(102836004)(229853002)(26005)(386003)(50226002)(186003)(6506007)(36756003)(8676002);DIR:OUT;SFP:1102;SCL:1;SRVR:VI1PR08MB3760;H:VI1PR08MB2782.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ezLjuIjLLdH0fbfX3f2tnPnuWChbpXuPT8SBnWkU+6ErYVhM35Mo48V11HZeCXWZDc9hx3A0WtoxHhFJu3lj+bVST9IxrkxxYf3+KNX2/4wNyJzxGZjBi1zlk7Iv8cZiMZI0An4pu/xx5R3wDllYavNmhaL78rGazy97Erv5DsK//vzKTQAqc5VYAbGkqR6jBm0o6jnlkNZTmYUNjzqLrDdzXv5QeTUvXdyh5tT3PckYZcvg3thX+0ZIvND4LoLhuIXRT+z12MGK6JpIrErwfg38P/52TcydmBbBdTuTO/Cpv9nGNFhObd9IRvNpf4E60Um7wrnYNSwu/ZNHk1LdtwUdFDOvTYnfUg9F0zyUYaMj1/tVEYDhmxxzcrmQyNG6Iu7Ky5HZMBL/ol9T4N3HtyASvmAhipJ9bz8WNovktcg=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-ID: <1DCAE66B3DFBD2448CD311BA47D3DB35@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S1726449AbfH1LXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 07:23:55 -0400
+Received: from foss.arm.com ([217.140.110.172]:57506 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726382AbfH1LXy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 07:23:54 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DAD1344;
+        Wed, 28 Aug 2019 04:23:53 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC9EB3F246;
+        Wed, 28 Aug 2019 04:23:51 -0700 (PDT)
+Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
+To:     Christoffer Dall <christoffer.dall@arm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20190821153656.33429-1-steven.price@arm.com>
+ <20190821153656.33429-2-steven.price@arm.com>
+ <20190827084407.GA6541@e113682-lin.lund.arm.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <28c3248e-1d63-dac6-d2b0-4422025c1376@arm.com>
+Date:   Wed, 28 Aug 2019 12:23:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1d772c5-50cd-4a3f-e3e0-08d72ba142d7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2019 10:19:51.0996
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ofAJYkxUXYtqFoVjr6TemkAfMNAiYRDuKzyYOWBprDRUKVzjRQvNx+1B2xMjE6+Mcwwlu347pqZLhSlR7rr0IRfEeZurN6kU/IM/gPHYjnM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3760
+In-Reply-To: <20190827084407.GA6541@e113682-lin.lund.arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 27 Aug 2019 07:50:30 -0700
-Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+On 27/08/2019 09:44, Christoffer Dall wrote:
+> On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
+>> Introduce a paravirtualization interface for KVM/arm64 based on the
+>> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
+>>
+>> This only adds the details about "Stolen Time" as the details of "Live
+>> Physical Time" have not been fully agreed.
+>>
+>> User space can specify a reserved area of memory for the guest and
+>> inform KVM to populate the memory with information on time that the host
+>> kernel has stolen from the guest.
+>>
+>> A hypercall interface is provided for the guest to interrogate the
+>> hypervisor's support for this interface and the location of the shared
+>> memory structures.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
+>>  1 file changed, 100 insertions(+)
+>>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+>>
+>> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+>> new file mode 100644
+>> index 000000000000..1ceb118694e7
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/arm/pvtime.txt
+>> @@ -0,0 +1,100 @@
+>> +Paravirtualized time support for arm64
+>> +======================================
+>> +
+>> +Arm specification DEN0057/A defined a standard for paravirtualised time
+>> +support for AArch64 guests:
+>> +
+>> +https://developer.arm.com/docs/den0057/a
+>> +
+>> +KVM/arm64 implements the stolen time part of this specification by providing
+>> +some hypervisor service calls to support a paravirtualized guest obtaining a
+>> +view of the amount of time stolen from its execution.
+>> +
+>> +Two new SMCCC compatible hypercalls are defined:
+>> +
+>> +PV_FEATURES 0xC5000020
+>> +PV_TIME_ST  0xC5000022
+>> +
+>> +These are only available in the SMC64/HVC64 calling convention as
+>> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+>> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+>> +mechanism before calling it.
+>> +
+>> +PV_FEATURES
+>> +    Function ID:  (uint32)  : 0xC5000020
+>> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
+>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>> +                              PV-time feature is supported by the hypervisor.
+>> +
+>> +PV_TIME_ST
+>> +    Function ID:  (uint32)  : 0xC5000022
+>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>> +                              (V)CPU. On failure:
+>> +                              NOT_SUPPORTED (-1)
+>> +
+>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>> +with inner and outer write back caching attributes, in the inner shareable
+>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+>> +meaningfully filled by the hypervisor (see structure below).
+>> +
+>> +PV_TIME_ST returns the structure for the calling VCPU.
+>> +
+>> +Stolen Time
+>> +-----------
+>> +
+>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>> +
+>> +  Field       | Byte Length | Byte Offset | Description
+>> +  ----------- | ----------- | ----------- | --------------------------
+>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+>> +  Attributes  |      4      |      4      | Must be 0
+>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+>> +              |             |             | nanoseconds indicating how
+>> +              |             |             | much time this VCPU thread
+>> +              |             |             | was involuntarily not
+>> +              |             |             | running on a physical CPU.
+>> +
+>> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+>> +will be present within a reserved region of the normal memory given to the
+>> +guest. The guest should not attempt to write into this memory. There is a
+>> +structure per VCPU of the guest.
+>> +
+>> +User space interface
+>> +====================
+>> +
+>> +User space can request that KVM provide the paravirtualized time interface to
+>> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
+>> +
+> 
+> I feel it would be more consistent to have the details of this in
+> Documentation/virt/kvm/devices/arm-pv-time.txt and refer to this
+> document from here.
 
-> +Cc Peng Hao and Yi Wang
->=20
-> On Tue, Aug 27, 2019 at 01:07:09PM +0000, Jan Dakinevich wrote:
-> > inject_emulated_exception() returns true if and only if nested page
-> > fault happens. However, page fault can come from guest page tables
-> > walk, either nested or not nested. In both cases we should stop an
-> > attempt to read under RIP and give guest to step over its own page
-> > fault handler.
-> >=20
-> > Fixes: 6ea6e84 ("KVM: x86: inject exceptions produced by x86_decode_ins=
-n")
-> > Cc: Denis Lunev <den@virtuozzo.com>
-> > Cc: Roman Kagan <rkagan@virtuozzo.com>
-> > Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> > Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 93b0bd4..45caa69 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -6521,8 +6521,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcp=
-u,
-> >  			if (reexecute_instruction(vcpu, cr2, write_fault_to_spt,
-> >  						emulation_type))
-> >  				return EMULATE_DONE;
-> > -			if (ctxt->have_exception && inject_emulated_exception(vcpu))
-> > +			if (ctxt->have_exception) {
-> > +				inject_emulated_exception(vcpu);
-> >  				return EMULATE_DONE;
-> > +			}
->=20
->=20
-> Yikes, this patch and the previous have quite the sordid history.
->=20
->=20
-> The non-void return from inject_emulated_exception() was added by commit
->=20
->   ef54bcfeea6c ("KVM: x86: skip writeback on injection of nested exceptio=
-n")
->=20
-> for the purpose of skipping writeback.  At the time, the above blob in th=
-e
-> decode flow didn't exist.
->=20
->=20
-> Decode exception handling was added by commit
->=20
->   6ea6e84309ca ("KVM: x86: inject exceptions produced by x86_decode_insn"=
-)
->=20
-> but it was dead code even then.  The patch discussion[1] even point out t=
-hat
-> it was dead code, i.e. the change probably should have been reverted.
->=20
->=20
-> Peng Hao and Yi Wang later ran into what appears to be the same bug you'r=
-e
-> hitting[2][3], and even had patches temporarily queued[4][5], but the
-> patches never made it to mainline as they broke kvm-unit-tests.  Fun side
-> note, Radim even pointed out[4] the bug fixed by patch 1/3.
->=20
-> So, the patches look correct, but there's the open question of why the
-> hypercall test was failing for Paolo. =20
+Fair point - I'll move this lower part of the document and add a reference.
 
-Sorry, I'm little confused. Could you please, point me which test or tests=
-=20
-were broken? I've just run kvm-unit-test and I see same results with and=20
-without my changes.
+Thanks,
 
-> I've tried to reproduce the #DF to
-> no avail.
->=20
-> [1] https://lore.kernel.org/patchwork/patch/850077/
-> [2] https://lkml.kernel.org/r/1537311828-4547-1-git-send-email-penghao122=
-@sina.com.cn
-> [3] https://lkml.kernel.org/r/20190111133002.GA14852@flask
-> [4] https://lkml.kernel.org/r/20190111133002.GA14852@flask
-> [5] https://lkml.kernel.org/r/9835d255-dd9a-222b-f4a2-93611175b326@redhat=
-.com
->=20
-> >  			if (emulation_type & EMULTYPE_SKIP)
-> >  				return EMULATE_FAIL;
-> >  			return handle_emulation_failure(vcpu, emulation_type);
-> > --=20
-> > 2.1.4
-> >=20
+Steve
 
+>> +    struct kvm_create_device pvtime_device = {
+>> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
+>> +            .attr = 0,
+>> +            .flags = 0,
+>> +    };
+>> +
+>> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
+>> +
+>> +Creation of the device should be done after creating the vCPUs of the virtual
+>> +machine.
+>> +
+>> +The IPA of the structures must be given to KVM. This is the base address
+>> +of an array of stolen time structures (one for each VCPU). The base address
+>> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
+>> +multiple of PAGE_SIZE.
+>> +
+>> +The memory for these structures should be added to the guest in the usual
+>> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
+>> +
+>> +For example:
+>> +
+>> +    struct kvm_dev_arm_st_region region = {
+>> +            .gpa = <IPA of guest base address>,
+>> +            .size = <size in bytes>
+>> +    };
+>> +
+>> +    struct kvm_device_attr st_base = {
+>> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
+>> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
+>> +            .addr = (u64)&region
+>> +    };
+>> +
+>> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
+>> -- 
+>> 2.20.1
+>>
+> 
+> Thanks,
+> 
+>     Christoffer
+> 
 
---=20
-Best regards
-Jan Dakinevich
