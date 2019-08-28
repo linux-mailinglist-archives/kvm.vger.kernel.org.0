@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF29C9FC6A
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 09:59:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D2819FC66
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 09:59:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726614AbfH1H7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 03:59:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46960 "EHLO mx1.redhat.com"
+        id S1726566AbfH1H7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 03:59:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48746 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726341AbfH1H7J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 03:59:09 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        id S1726368AbfH1H7K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 03:59:10 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E56CD882F2
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 07:59:08 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id h8so915751wrb.11
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 00:59:08 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2A3F9C0568FA
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 07:59:10 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id k15so905166wrw.18
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 00:59:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fXBfbXP94FsOpi1v9mBeSf+ahhRJGbCczR40mL5l1g0=;
-        b=U7Tx30lc6gBp0fT27IDbb4TVDcqyQgaphuRJJjLSXofyf3VydY7t9R02lKFSvrSwUj
-         mKuE1OKpg5FcPmUULgqxZwUetY2pcG6hJkYNyULWDZChsqzTG1YmXrf7WmuDFazs8Wcq
-         wZMCrK6QaXZKSrWSPEzz6jL40yun3Ef2cKDicQGTYKk2Gvwb4WABGhIugzYdFGRdCKfl
-         UF5tpzVkOZIujFX7PETdCJ5vo93REp1YIBAmRa9YcIP7Qd4bGkYI5gltSatPTYAdFiBj
-         lKYN4CAWoVtDdE0A05Ah+BcRkiMvjKD4xUUreL+p8o5zck79TgysVQtxvSTPaXUMIggD
-         Bd5w==
-X-Gm-Message-State: APjAAAWC5hoQ3ad9vPUmZwHWoO63B48AuIq0Kah5aMJSmYij8WwVTXVX
-        8rrDiY56GLS9XHGy0vU8Bcb/EaZ27sx5pRQGADjZrJrApdCuRXvl9D4ZRzXDe8d3UlrljN5jlAi
-        dlvALVuFrYRdu
-X-Received: by 2002:adf:db49:: with SMTP id f9mr2912024wrj.112.1566979147477;
-        Wed, 28 Aug 2019 00:59:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw6jeOXWHKp2OBmWJFh9i//W4b2alfBLT0xcTCuk+Wnz7ITWniIoIL5zWUQjKwG1rgsfWp0Gg==
-X-Received: by 2002:adf:db49:: with SMTP id f9mr2912008wrj.112.1566979147295;
-        Wed, 28 Aug 2019 00:59:07 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=lBboHqcZl+GeeqMr+xhVz73awkXrj2sOIO6d13g0iRE=;
+        b=hwAgKVbVCk0yCwvqgeT2jo45OSCNg6Iuww63xF0YVrPMXdt32fNAZ6iI4IfRsrv6/y
+         PYnSI+ZqZf9YgP2zA21x4YH/oFfWtbBaIWAlOChFAj7SbfkOXZQqMQTg2i2fme7IsCR9
+         AHZ84iI2FCJOynlGpyF+UPEDni1j6CY4GJeHY19MOMxXSsA/1cvAlu0Q/JrZQGwhtXoL
+         B474D15tvlFQ7n/Ly8jhgkTUQWrAcLAv+PT22Qf/mQXRaOwS+Es3mPTWtf6S3KZgWWMW
+         rv26LMqjGgFS3ltGBXO2FEqvZtqAFyV7HBvDJ63i8UCz9IEpXkF0hZP//Lk+WBfnls0U
+         B1fw==
+X-Gm-Message-State: APjAAAVfvC2d9GTULm2ZpAXIKHEV8bNWfJxx2MjCugDZdbCDGTmydAMp
+        VKdFPu60cujnujtX7IJwE5umTRVulis1xv2JTHIDodDsjrlIs1h6Tsud6TFsQfYII530O+qEtDa
+        Dwo/d6cKQs2Pn
+X-Received: by 2002:adf:f18c:: with SMTP id h12mr2713824wro.47.1566979148632;
+        Wed, 28 Aug 2019 00:59:08 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyg75w3y/I6ECh2ht91PCD+cPI1HSKMT6eKRHsTiLiLoq2ckp9NA9BsenuangkEk7V6n9c+3A==
+X-Received: by 2002:adf:f18c:: with SMTP id h12mr2713808wro.47.1566979148444;
+        Wed, 28 Aug 2019 00:59:08 -0700 (PDT)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id a190sm2448469wme.8.2019.08.28.00.59.06
+        by smtp.gmail.com with ESMTPSA id a190sm2448469wme.8.2019.08.28.00.59.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2019 00:59:06 -0700 (PDT)
+        Wed, 28 Aug 2019 00:59:07 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,10 +49,12 @@ Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Roman Kagan <rkagan@virtuozzo.com>
-Subject: [PATCH v2 0/2] KVM: x86: don't announce KVM_CAP_HYPERV_ENLIGHTENED_VMCS when it is unavailable
-Date:   Wed, 28 Aug 2019 09:59:03 +0200
-Message-Id: <20190828075905.24744-1-vkuznets@redhat.com>
+Subject: [PATCH v2 1/2] KVM: x86: svm: remove unneeded nested_enable_evmcs() hook
+Date:   Wed, 28 Aug 2019 09:59:04 +0200
+Message-Id: <20190828075905.24744-2-vkuznets@redhat.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190828075905.24744-1-vkuznets@redhat.com>
+References: <20190828075905.24744-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -60,26 +62,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It was discovered that hyperv_cpuid test now fails on AMD as it tries to
-enable KVM_CAP_HYPERV_ENLIGHTENED_VMCS which is (wrongfully) reported as
-available.
+Since commit 5158917c7b019 ("KVM: x86: nVMX: Allow nested_enable_evmcs to
+be NULL") the code in x86.c is prepared to see nested_enable_evmcs being
+NULL and in VMX case it actually is when nesting is disabled. Remove the
+unneeded stub from SVM code.
 
-Changes since v1:
-- This is a v2 for '[PATCH 0/3] KVM: x86: fix a couple of issues with
- Enlightened VMCS enablement' renamed as the first patch of the series
- was already merged.
-- Added Jim's Reviewed-by: to PATCH1
-- Added missing break in PATCH2 [Jim Mattson, Sean Christopherson] 
-
-Vitaly Kuznetsov (2):
-  KVM: x86: svm: remove unneeded nested_enable_evmcs() hook
-  KVM: x86: announce KVM_CAP_HYPERV_ENLIGHTENED_VMCS support only when
-    it is available
-
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+---
  arch/x86/kvm/svm.c | 9 +--------
- arch/x86/kvm/x86.c | 4 +++-
- 2 files changed, 4 insertions(+), 9 deletions(-)
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 40175c42f116..6d52c65d625b 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -7122,13 +7122,6 @@ static int svm_unregister_enc_region(struct kvm *kvm,
+ 	return ret;
+ }
+ 
+-static int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+-				   uint16_t *vmcs_version)
+-{
+-	/* Intel-only feature */
+-	return -ENODEV;
+-}
+-
+ static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long cr4 = kvm_read_cr4(vcpu);
+@@ -7337,7 +7330,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.mem_enc_reg_region = svm_register_enc_region,
+ 	.mem_enc_unreg_region = svm_unregister_enc_region,
+ 
+-	.nested_enable_evmcs = nested_enable_evmcs,
++	.nested_enable_evmcs = NULL,
+ 	.nested_get_evmcs_version = NULL,
+ 
+ 	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
 -- 
 2.20.1
 
