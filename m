@@ -2,122 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 022139FD6A
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 10:47:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E6499FF93
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 12:19:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726440AbfH1IrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 04:47:25 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:34119 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726300AbfH1IrY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 04:47:24 -0400
-Received: by mail-oi1-f193.google.com with SMTP id g128so1503793oib.1;
-        Wed, 28 Aug 2019 01:47:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=wvXkpVgy6884rDBDub7GSrouN3alYy0RjubNjRU4D8c=;
-        b=fF1VTJyoZfOh/nue2zV6YK0gz/XCdIae5JY/qHfApx9B7F2xZT2NBmDMMpguRZNaZD
-         KPxZJa9DWjfbKJxoKa5zhA3DXFM8IWlFPzwTQ4omHTIo5ZCDmX1QCuQgvNTbo09iOvEp
-         yhAV8mM74MNFpQ8ezqwXpcITtWQAyzmryrBqw0digdqAFDZa0jNCBP9xCDw43BBeKr32
-         scty0zVhhc/5xdluSu6mvF6iBiSx+SNFOSlFOCmDhAISSHTA2q7YTEAX76RvzgkV93i+
-         VUUtDnDXVX8C2dqSyd6/tZIjHxJAFnDJqCsLkCK1euNorCqdpODqosOL+9CUkmkk7EXB
-         +NQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wvXkpVgy6884rDBDub7GSrouN3alYy0RjubNjRU4D8c=;
-        b=qiRrWS/VQ3oYacHXTIkzAZ4LWlHDNbh6lE3kcpSSCdgXmQOHlakU3S/31qJF6Dqyvt
-         Up9eZFf8Nxxq+lu/Zefhj1VoANwk1gT0SYGIzrMSmX8ypqpheSY6cRd0r6sqz2E/0xr7
-         dNm+h2pTvHVt9r26vPAcUowXECsaIiiW6lWWLSyw8XXCIa7hMWT1Zy4xvGFvnrwYmpSb
-         0QGeHJ1uxbRJDON1m5gwtu3TAk30zsCuhHynF4+qdi81msPbm7zpZJYwI93mkag4td48
-         tEaNTym/ZI3XIm/woua71mYsS/nec+CQYf9NGAtU2z1/W3ar6SFi5/AnlSEgwRFro8/q
-         MCHg==
-X-Gm-Message-State: APjAAAXgPsFUwWMku4hRauOp8Q6PNBGlbjOZvzkv1cvso2Femtg4w6MV
-        ohXhyS43P+YXQNeLMJMSm2iVB7zT3obt+gwRTlg=
-X-Google-Smtp-Source: APXvYqypLx3K4rWNLLZYA/GQnRqFih0CeElXVoPUwwnmxm+jKccr7fsFsDB0jQwV9ey6FHJU6J/HlaktN6yEMFzdUmE=
-X-Received: by 2002:aca:d410:: with SMTP id l16mr1887721oig.141.1566982043664;
- Wed, 28 Aug 2019 01:47:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <1564643196-7797-1-git-send-email-wanpengli@tencent.com>
- <7b1e3025-f513-7068-32ac-4830d67b65ac@intel.com> <c3fe182f-627f-88ad-cb4d-a4189202b438@redhat.com>
- <20190803202058.GA9316@amt.cnet> <CANRm+CwtHBOVWFcn+6Z3Ds7dEcNL2JP+b6hLRS=oeUW98A24MQ@mail.gmail.com>
- <20190826204045.GA24697@amt.cnet> <CANRm+Cx0+V67Ek7FhSs61ZqZL3MgV88Wdy17Q6UA369RH7=dgQ@mail.gmail.com>
- <CANRm+CxqYMzgvxYyhZLmEzYd6SLTyHdRzKVaSiHO-4SV+OwZUQ@mail.gmail.com> <CAJZ5v0iQc0-WzqeyAh-6m5O-BLraRMj+Z7sqvRgGwh2u2Hp7cg@mail.gmail.com>
-In-Reply-To: <CAJZ5v0iQc0-WzqeyAh-6m5O-BLraRMj+Z7sqvRgGwh2u2Hp7cg@mail.gmail.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 28 Aug 2019 16:48:00 +0800
-Message-ID: <CANRm+CyHwAKDGtEDkKz_u9e5pzrV=h8K5=9CWt7Fv+PzYUheHA@mail.gmail.com>
-Subject: Re: [PATCH] cpuidle-haltpoll: Enable kvm guest polling when dedicated
- physical CPUs are available
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        id S1726882AbfH1KTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 06:19:39 -0400
+Received: from mail-eopbgr130093.outbound.protection.outlook.com ([40.107.13.93]:23438
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726270AbfH1KTi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 06:19:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JwDBm/gOJJw8O0qFGsNZErUa+LO0OP0U+PzqnFuZq2x+NUa6VWudIjKZGGxIYgWYhO8bdtBjb5ljXUwMWiG9WN8r9vgPtSLLCRUgBOo1bsw4eJzCCUXQex9rN6pdx1/Lg9Meg0Ps3m+fEJyng3NjEseDgqnh28LNgfLpXItT50RSvZ2nMEkAzMurlL/gCb0uyNl4yW+toEltZBZzrRIAFC5jVE2RFT4jI+ZOgZ4POrPDXaFtP2l417Pdy9zTNkLSFhV7CYoSFHQtuFWymbhlqQEDCQ+wRiX43hWvqv9v8m1cOPOkSuoCcTC8hX27xrJz3WYWsUeZyza5CP4qTYfM7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tZ6upkmTz0VJ446icbXjeZ8o3D0sFU6LGy+VGq+FlOQ=;
+ b=IYfDdSwqTJgtVlKm8xRYKzT8gIo5b1XLrXapIbAVgTXlAkWipN8pXMFwulRsnen4g5fnCmxFhiupdHL1t1Zw5CczQvg/alki5P+p3lhWT6Mv7Bw/peIIEayqyshcOH9ta7Jv/aZ89z4B9tFCXsb2fO4x8oqBJmHGOVyy3nQh33XhCtCt1oXTRmMAbZ/GoKtF//qFM4lVAJgTNNXb7s+JX9/Ok3Z1gCgPtMSOKTGKgXE7aGh38kas7IHaI6NDlaeOB0QMlkPHEfTWtOnxImJYzWSjR5+N6/JDRTwDfYEKTZji3XCjKPydDluGawjazyieh7VBCA5qgWF96ufLagmGfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tZ6upkmTz0VJ446icbXjeZ8o3D0sFU6LGy+VGq+FlOQ=;
+ b=ddR5wcDuuGdsqob4qAJLjO87iBU82QAdfvsv851VwXmhY1xMmX+2beWX68+9xTBoBBHPu017UHtpKg4mEFOziR83nCCGYN8KbXyVPOVY4lycb4/kEQfXnnE+4tSUIhQ9SYgk3NI47au4CSbw6351aZAGQ03RDS5TvzWpyuWWhWw=
+Received: from VI1PR08MB2782.eurprd08.prod.outlook.com (10.170.236.143) by
+ VI1PR08MB3373.eurprd08.prod.outlook.com (20.177.58.215) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2199.19; Wed, 28 Aug 2019 10:19:30 +0000
+Received: from VI1PR08MB2782.eurprd08.prod.outlook.com
+ ([fe80::2969:e370:fb70:71a]) by VI1PR08MB2782.eurprd08.prod.outlook.com
+ ([fe80::2969:e370:fb70:71a%3]) with mapi id 15.20.2178.023; Wed, 28 Aug 2019
+ 10:19:30 +0000
+From:   Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Denis Lunev <den@virtuozzo.com>,
+        Roman Kagan <rkagan@virtuozzo.com>,
+        Denis Plotnikov <dplotnikov@virtuozzo.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 2/3] KVM: x86: set ctxt->have_exception in
+ x86_decode_insn()
+Thread-Topic: [PATCH 2/3] KVM: x86: set ctxt->have_exception in
+ x86_decode_insn()
+Thread-Index: AQHVXNhUGXqiO0HWykadKGZM7EVsb6cPFNEAgAFFooA=
+Date:   Wed, 28 Aug 2019 10:19:30 +0000
+Message-ID: <20190828131927.8be518098e0690f6e8d39f0c@virtuozzo.com>
+References: <1566911210-30059-1-git-send-email-jan.dakinevich@virtuozzo.com>
+        <1566911210-30059-3-git-send-email-jan.dakinevich@virtuozzo.com>
+        <20190827145358.GD27459@linux.intel.com>
+In-Reply-To: <20190827145358.GD27459@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0045.eurprd04.prod.outlook.com
+ (2603:10a6:7:7c::34) To VI1PR08MB2782.eurprd08.prod.outlook.com
+ (2603:10a6:802:19::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jan.dakinevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: Sylpheed 3.6.0 (GTK+ 2.24.25; x86_64-unknown-linux-gnu)
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6738309f-88f7-429b-37c2-08d72ba13654
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:VI1PR08MB3373;
+x-ms-traffictypediagnostic: VI1PR08MB3373:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR08MB33734F938429C148D539ACF68AA30@VI1PR08MB3373.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 014304E855
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(396003)(346002)(376002)(136003)(39850400004)(189003)(199004)(478600001)(4326008)(1076003)(8936002)(256004)(14444005)(186003)(476003)(102836004)(6246003)(6486002)(44832011)(66066001)(305945005)(6512007)(2906002)(446003)(86362001)(66556008)(76176011)(6116002)(8676002)(66446008)(26005)(6436002)(66946007)(64756008)(66476007)(54906003)(7736002)(81156014)(50226002)(386003)(52116002)(25786009)(14454004)(81166006)(71200400001)(71190400001)(316002)(36756003)(486006)(3846002)(5660300002)(99286004)(11346002)(2616005)(7416002)(6506007)(229853002)(6916009)(53936002);DIR:OUT;SFP:1102;SCL:1;SRVR:VI1PR08MB3373;H:VI1PR08MB2782.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 7k7fuOfEbReztE8vciO6fIGNi91WttF6uHFpnJc1OPSALsGgxJvq9+2ZZDa44t3/9+ejyKy7aqIxUHwNfYvF12TU0ggTWHx5MIX+3c0lWhDkK1W1+pYma5OP4Uj5vTM44OfmL4t+myvKQoc/zGnAvjS9JjnyOFAFAXBPDBODh6aLoHXRHd+Dz7dIseWZrvjtaR/9mo48NNDuI06zUhWgl2Ums0Htb6WfIAWChKw4HwTpyKuZtCZ3q7jb9Haox42RLB31do1b7HI6+d4GKMe7SabB++oxxDgYFPdDOqcEOhyAQBmPRgJz3Vit955PWtnSCq+ZYo8mg0hFjrPrDa/tO69Cc2yTa3giYh0on2EmTix5bznQyNNAGOyCFjmbhegs4drLKFM0xXvf1D5BTm2E1f27klajiNSlv67MbyQmVQI=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-ID: <7B34392635C87445B6ED0D0C17CB529C@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6738309f-88f7-429b-37c2-08d72ba13654
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2019 10:19:30.4428
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XumqkVhD2/YFB99q79v+XyKG13P8Zyv4lWJYB3gjo+vSQh1FstVeUJU+iQov1eSvAKO//2T+H6t3jXdtzswgnR+tgucsCmjuGvUh8Cr0OnE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3373
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 28 Aug 2019 at 16:45, Rafael J. Wysocki <rafael@kernel.org> wrote:
->
-> On Wed, Aug 28, 2019 at 10:34 AM Wanpeng Li <kernellwp@gmail.com> wrote:
-> >
-> > On Tue, 27 Aug 2019 at 08:43, Wanpeng Li <kernellwp@gmail.com> wrote:
-> > >
-> > > Cc Michael S. Tsirkin,
-> > > On Tue, 27 Aug 2019 at 04:42, Marcelo Tosatti <mtosatti@redhat.com> w=
-rote:
-> > > >
-> > > > On Tue, Aug 13, 2019 at 08:55:29AM +0800, Wanpeng Li wrote:
-> > > > > On Sun, 4 Aug 2019 at 04:21, Marcelo Tosatti <mtosatti@redhat.com=
-> wrote:
-> > > > > >
-> > > > > > On Thu, Aug 01, 2019 at 06:54:49PM +0200, Paolo Bonzini wrote:
-> > > > > > > On 01/08/19 18:51, Rafael J. Wysocki wrote:
-> > > > > > > > On 8/1/2019 9:06 AM, Wanpeng Li wrote:
-> > > > > > > >> From: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > >>
-> > > > > > > >> The downside of guest side polling is that polling is perf=
-ormed even
-> > > > > > > >> with other runnable tasks in the host. However, even if po=
-ll in kvm
-> > > > > > > >> can aware whether or not other runnable tasks in the same =
-pCPU, it
-> > > > > > > >> can still incur extra overhead in over-subscribe scenario.=
- Now we can
-> > > > > > > >> just enable guest polling when dedicated pCPUs are availab=
-le.
-> > > > > > > >>
-> > > > > > > >> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > > > > > > >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > > > >> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > > > > > > >> Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> > > > > > > >> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > >
-> > > > > > > > Paolo, Marcelo, any comments?
-> > > > > > >
-> > > > > > > Yes, it's a good idea.
-> > > > > > >
-> > > > > > > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> >
-> > Hi Marcelo,
-> >
-> > If you don't have more concern, I guess Rafael can apply this patch
-> > now since the merge window is not too far.
->
-> I will likely queue it up later today and it will go to linux-next
-> early next week.
+On Tue, 27 Aug 2019 07:53:58 -0700
+Sean Christopherson <sean.j.christopherson@intel.com> wrote:
 
-Thank you, Rafael.
+> On Tue, Aug 27, 2019 at 01:07:08PM +0000, Jan Dakinevich wrote:
+> > x86_emulate_instruction() takes into account ctxt->have_exception flag
+> > during instruction decoding, but in practice this flag is never set in
+> > x86_decode_insn().
+> >=20
+> > Fixes: 6ea6e84 ("KVM: x86: inject exceptions produced by x86_decode_ins=
+n")
+> > Cc: Denis Lunev <den@virtuozzo.com>
+> > Cc: Roman Kagan <rkagan@virtuozzo.com>
+> > Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> > Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+> > ---
+> >  arch/x86/kvm/emulate.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >=20
+> > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> > index 6170ddf..f93880f 100644
+> > --- a/arch/x86/kvm/emulate.c
+> > +++ b/arch/x86/kvm/emulate.c
+> > @@ -5395,6 +5395,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt=
+, void *insn, int insn_len)
+> >  					ctxt->memopp->addr.mem.ea + ctxt->_eip);
+> > =20
+> >  done:
+> > +	if (rc =3D=3D X86EMUL_PROPAGATE_FAULT)
+> > +		ctxt->have_exception =3D true;
+>=20
+> We should add a sanity check or two on the vector since the emulator code
+> goes all over the place, e.g. #UD should not be injected/propagated, and
+> trap-like exceptions should not be handled/encountered during decode.
+> Note, exception_type() also warns on illegal vectors.
+>=20
+>   WARN_ON_ONCE(ctxt->exception.vector =3D=3D UD_VECTOR ||
+> 	       exception_type(ctxt->exception.vector) =3D=3D EXCPT_TRAP);
 
-Regards,
-Wanpeng Li
+Ok.
+
+>=20
+> >  	return (rc !=3D X86EMUL_CONTINUE) ? EMULATION_FAILED : EMULATION_OK;
+> >  }
+> > =20
+> > --=20
+> > 2.1.4
+> >=20
+
+
+--=20
+Best regards
+Jan Dakinevich
