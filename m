@@ -2,206 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE9AFA00C3
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 13:36:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C595A00D3
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 13:39:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726394AbfH1Lgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 07:36:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38576 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726259AbfH1Lga (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Aug 2019 07:36:30 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7SBX72X071257
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 07:36:29 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2unpue563q-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 07:36:28 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 28 Aug 2019 12:36:27 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 28 Aug 2019 12:36:25 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7SBaOqP40501464
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Aug 2019 11:36:24 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 373D5A4064;
-        Wed, 28 Aug 2019 11:36:24 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 75423A405C;
-        Wed, 28 Aug 2019 11:36:23 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.131])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Aug 2019 11:36:23 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 2/4] s390x: Storage key library functions now take void ptr addresses
-Date:   Wed, 28 Aug 2019 13:36:13 +0200
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20190828113615.4769-1-frankja@linux.ibm.com>
+        id S1726315AbfH1Ljm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 07:39:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41796 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726259AbfH1Ljl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 07:39:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id AD3458980EF;
+        Wed, 28 Aug 2019 11:39:41 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-90.ams2.redhat.com [10.36.116.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7BAEB5D9E2;
+        Wed, 28 Aug 2019 11:39:37 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 1/4] s390x: Move pfmf to lib and make
+ address void
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com
 References: <20190828113615.4769-1-frankja@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19082811-4275-0000-0000-0000035E47AA
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082811-4276-0000-0000-000038707B84
-Message-Id: <20190828113615.4769-3-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-28_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908280124
+ <20190828113615.4769-2-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <5b0d11e3-32a3-0207-ca7d-359d246b1a41@redhat.com>
+Date:   Wed, 28 Aug 2019 13:39:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190828113615.4769-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Wed, 28 Aug 2019 11:39:41 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now all mem.h functions are consistent in how they take a memory
-address. Also we have less casting in the future.
+On 28/08/2019 13.36, Janosch Frank wrote:
+> It's needed by other tests soon.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  lib/s390x/asm/mem.h | 31 ++++++++++++++++++++++++
+>  s390x/pfmf.c        | 57 +++++++++++----------------------------------
+>  2 files changed, 44 insertions(+), 44 deletions(-)
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- lib/s390x/asm/mem.h |  9 +++------
- s390x/pfmf.c        |  4 ++--
- s390x/skey.c        | 24 +++++++++++-------------
- 3 files changed, 16 insertions(+), 21 deletions(-)
-
-diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
-index 9b8fd70..c78bfa2 100644
---- a/lib/s390x/asm/mem.h
-+++ b/lib/s390x/asm/mem.h
-@@ -26,9 +26,7 @@ union skey {
- 	uint8_t val;
- };
- 
--static inline void set_storage_key(unsigned long addr,
--				   unsigned char skey,
--				   int nq)
-+static inline void set_storage_key(void *addr, unsigned char skey, int nq)
- {
- 	if (nq)
- 		asm volatile(".insn rrf,0xb22b0000,%0,%1,8,0"
-@@ -37,8 +35,7 @@ static inline void set_storage_key(unsigned long addr,
- 		asm volatile("sske %0,%1" : : "d" (skey), "a" (addr));
- }
- 
--static inline unsigned long set_storage_key_mb(unsigned long addr,
--					       unsigned char skey)
-+static inline void *set_storage_key_mb(void *addr, unsigned char skey)
- {
- 	assert(test_facility(8));
- 
-@@ -47,7 +44,7 @@ static inline unsigned long set_storage_key_mb(unsigned long addr,
- 	return addr;
- }
- 
--static inline unsigned char get_storage_key(unsigned long addr)
-+static inline unsigned char get_storage_key(void *addr)
- {
- 	unsigned char skey;
- 
-diff --git a/s390x/pfmf.c b/s390x/pfmf.c
-index 9986624..0b3e70b 100644
---- a/s390x/pfmf.c
-+++ b/s390x/pfmf.c
-@@ -39,7 +39,7 @@ static void test_4k_key(void)
- 	r1.reg.fsc = PFMF_FSC_4K;
- 	r1.reg.key = 0x30;
- 	pfmf(r1.val, pagebuf);
--	skey.val = get_storage_key((unsigned long) pagebuf);
-+	skey.val = get_storage_key(pagebuf);
- 	skey.val &= SKEY_ACC | SKEY_FP;
- 	report("set storage keys", skey.val == 0x30);
- 	report_prefix_pop();
-@@ -59,7 +59,7 @@ static void test_1m_key(void)
- 	r1.reg.key = 0x30;
- 	pfmf(r1.val, pagebuf);
- 	for (i = 0; i < 256; i++) {
--		skey.val = get_storage_key((unsigned long) pagebuf + i * PAGE_SIZE);
-+		skey.val = get_storage_key(pagebuf + i * PAGE_SIZE);
- 		skey.val &= SKEY_ACC | SKEY_FP;
- 		if (skey.val != 0x30) {
- 			rp = false;
-diff --git a/s390x/skey.c b/s390x/skey.c
-index fd4fcc7..efc4eca 100644
---- a/s390x/skey.c
-+++ b/s390x/skey.c
-@@ -18,14 +18,12 @@
- 
- 
- static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
--const unsigned long page0 = (unsigned long)pagebuf;
--const unsigned long page1 = (unsigned long)(pagebuf + PAGE_SIZE);
- 
- static void test_set_mb(void)
- {
- 	union skey skey, ret1, ret2;
--	unsigned long addr = 0x10000 - 2 * PAGE_SIZE;
--	unsigned long end = 0x10000;
-+	void *addr = (void *)0x10000 - 2 * PAGE_SIZE;
-+	void *end = (void *)0x10000;
- 
- 	/* Multi block support came with EDAT 1 */
- 	if (!test_facility(8))
-@@ -46,10 +44,10 @@ static void test_chg(void)
- 	union skey skey1, skey2;
- 
- 	skey1.val = 0x30;
--	set_storage_key(page0, skey1.val, 0);
--	skey1.val = get_storage_key(page0);
-+	set_storage_key(pagebuf, skey1.val, 0);
-+	skey1.val = get_storage_key(pagebuf);
- 	pagebuf[0] = 3;
--	skey2.val = get_storage_key(page0);
-+	skey2.val = get_storage_key(pagebuf);
- 	report("chg bit test", !skey1.str.ch && skey2.str.ch);
- }
- 
-@@ -58,9 +56,9 @@ static void test_set(void)
- 	union skey skey, ret;
- 
- 	skey.val = 0x30;
--	ret.val = get_storage_key(page0);
--	set_storage_key(page0, skey.val, 0);
--	ret.val = get_storage_key(page0);
-+	ret.val = get_storage_key(pagebuf);
-+	set_storage_key(pagebuf, skey.val, 0);
-+	ret.val = get_storage_key(pagebuf);
- 	/*
- 	 * For all set tests we only test the ACC and FP bits. RF and
- 	 * CH are set by the machine for memory references and changes
-@@ -103,11 +101,11 @@ static void test_priv(void)
- 	report_prefix_push("sske");
- 	expect_pgm_int();
- 	enter_pstate();
--	set_storage_key(page0, 0x30, 0);
-+	set_storage_key(pagebuf, 0x30, 0);
- 	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
- 	report_prefix_pop();
- 
--	skey.val = get_storage_key(page0);
-+	skey.val = get_storage_key(pagebuf);
- 	report("skey did not change on exception", skey.str.acc != 3);
- 
- 	report_prefix_push("iske");
-@@ -117,7 +115,7 @@ static void test_priv(void)
- 	} else {
- 		expect_pgm_int();
- 		enter_pstate();
--		get_storage_key(page0);
-+		get_storage_key(pagebuf);
- 		check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
- 	}
- 	report_prefix_pop();
--- 
-2.17.0
-
