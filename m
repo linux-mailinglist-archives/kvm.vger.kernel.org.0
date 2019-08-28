@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ED63A0366
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 15:39:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3F47A0361
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 15:38:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726554AbfH1Ni4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 09:38:56 -0400
-Received: from foss.arm.com ([217.140.110.172]:59544 "EHLO foss.arm.com"
+        id S1726555AbfH1Ni6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 09:38:58 -0400
+Received: from foss.arm.com ([217.140.110.172]:59558 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726508AbfH1Ni4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 09:38:56 -0400
+        id S1726586AbfH1Ni5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 09:38:57 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7F81F360;
-        Wed, 28 Aug 2019 06:38:55 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0D781570;
+        Wed, 28 Aug 2019 06:38:56 -0700 (PDT)
 Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 616733F246;
-        Wed, 28 Aug 2019 06:38:54 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B33613F246;
+        Wed, 28 Aug 2019 06:38:55 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     drjones@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
         maz@kernel.org, vladimir.murzin@arm.com, andre.przywara@arm.com
-Subject: [kvm-unit-tests RFC PATCH 04/16] arm/arm64: selftest: Add prefetch abort test
-Date:   Wed, 28 Aug 2019 14:38:19 +0100
-Message-Id: <1566999511-24916-5-git-send-email-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 05/16] arm64: timer: Write to ICENABLER to disable timer IRQ
+Date:   Wed, 28 Aug 2019 14:38:20 +0100
+Message-Id: <1566999511-24916-6-git-send-email-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
 References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
@@ -32,188 +32,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a guest tries to execute code from MMIO memory, KVM injects an
-external abort into that guest. We have now fixed the psci test to not
-fetch instructions from the I/O region, and it's not that often that a
-guest misbehaves in such a way. Let's expand our coverage by adding a
-proper test targetting this corner case.
+According the Generic Interrupt Controller versions 2, 3 and 4 architecture
+specifications, a write of 0 to the GIC{D,R}_ISENABLER{,0} registers is
+ignored; this is also how KVM emulates the corresponding register. Write
+instead to the ICENABLER register when disabling the timer interrupt.
+
+Note that fortunately for us, the timer test was still working as intended
+because KVM does the sensible thing and all interrupts are disabled by
+default when creating a VM.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
-The fault injection path is broken for nested guests [1]. You can use the
-last patch from the thread [2] to successfully run the test at EL2.
+ lib/arm/asm/gic-v3.h |  1 +
+ lib/arm/asm/gic.h    |  1 +
+ arm/timer.c          | 22 +++++++++++-----------
+ 3 files changed, 13 insertions(+), 11 deletions(-)
 
-[1] https://www.spinics.net/lists/arm-kernel/msg745391.html
-[2] https://www.spinics.net/lists/arm-kernel/msg750310.html
-
- lib/arm64/asm/esr.h |  3 ++
- arm/selftest.c      | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 96 insertions(+), 3 deletions(-)
-
-diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
-index 8e5af4d90767..8c351631b0a0 100644
---- a/lib/arm64/asm/esr.h
-+++ b/lib/arm64/asm/esr.h
-@@ -44,4 +44,7 @@
- #define ESR_EL1_EC_BKPT32	(0x38)
- #define ESR_EL1_EC_BRK64	(0x3C)
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index 347be2f9da17..0dc838b3ab2d 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -31,6 +31,7 @@
+ /* Re-Distributor registers, offsets from SGI_base */
+ #define GICR_IGROUPR0			GICD_IGROUPR
+ #define GICR_ISENABLER0			GICD_ISENABLER
++#define GICR_ICENABLER0			GICD_ICENABLER
+ #define GICR_IPRIORITYR0		GICD_IPRIORITYR
  
-+#define ESR_EL1_FSC_MASK	(0x3F)
-+#define ESR_EL1_FSC_EXTABT	(0x10)
+ #define ICC_SGI1R_AFFINITY_1_SHIFT	16
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index f6dfb907a7d5..a67111607bcf 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -15,6 +15,7 @@
+ #define GICD_IIDR			0x0008
+ #define GICD_IGROUPR			0x0080
+ #define GICD_ISENABLER			0x0100
++#define GICD_ICENABLER			0x0180
+ #define GICD_ISPENDR			0x0200
+ #define GICD_ICPENDR			0x0280
+ #define GICD_ISACTIVER			0x0300
+diff --git a/arm/timer.c b/arm/timer.c
+index f2f60192ba62..78f0dd870993 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -17,6 +17,9 @@
+ #define ARCH_TIMER_CTL_ISTATUS (1 << 2)
+ 
+ static void *gic_ispendr;
++static void *gic_isenabler;
++static void *gic_icenabler;
 +
- #endif /* _ASMARM64_ESR_H_ */
-diff --git a/arm/selftest.c b/arm/selftest.c
-index 176231f32ee1..18cc0ad8f729 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -16,6 +16,8 @@
- #include <asm/psci.h>
- #include <asm/smp.h>
- #include <asm/barrier.h>
-+#include <asm/mmu.h>
-+#include <asm/pgtable.h>
+ static bool ptimer_unsupported;
  
- static void __user_psci_system_off(void)
+ static void ptimer_unsupported_handler(struct pt_regs *regs, unsigned int esr)
+@@ -132,19 +135,12 @@ static struct timer_info ptimer_info = {
+ 
+ static void set_timer_irq_enabled(struct timer_info *info, bool enabled)
  {
-@@ -60,9 +62,38 @@ static void check_setup(int argc, char **argv)
- 		report_abort("missing input");
+-	u32 val = 0;
++	u32 val = 1 << PPI(info->irq);
+ 
+ 	if (enabled)
+-		val = 1 << PPI(info->irq);
+-
+-	switch (gic_version()) {
+-	case 2:
+-		writel(val, gicv2_dist_base() + GICD_ISENABLER + 0);
+-		break;
+-	case 3:
+-		writel(val, gicv3_sgi_base() + GICR_ISENABLER0);
+-		break;
+-	}
++		writel(val, gic_isenabler);
++	else
++		writel(val, gic_icenabler);
  }
  
-+extern pgd_t *mmu_idmap;
-+static void prep_io_exec(void)
-+{
-+	pgd_t *pgd = pgd_offset(mmu_idmap, 0);
-+	unsigned long sctlr;
-+
-+	/*
-+	 * AArch64 treats all regions writable at EL0 as PXN. Clear the user bit
-+	 * so we can execute code from the bottom I/O space (0G-1G) to simulate
-+	 * a misbehaved guest.
-+	 */
-+	pgd_val(*pgd) &= ~PMD_SECT_USER;
-+	flush_dcache_addr((unsigned long)pgd);
-+	flush_tlb_page(0);
-+
-+	/* Make sure we can actually execute from a writable region */
-+#ifdef __arm__
-+	asm volatile("mrc p15, 0, %0, c1, c0, 0": "=r" (sctlr));
-+	sctlr &= ~CR_ST;
-+	asm volatile("mcr p15, 0, %0, c1, c0, 0" :: "r" (sctlr));
-+#else
-+	sctlr = read_sysreg(sctlr_el1);
-+	sctlr &= ~SCTLR_EL1_WXN;
-+	write_sysreg(sctlr, sctlr_el1);
-+#endif
-+	isb();
-+}
-+
- static struct pt_regs expected_regs;
- static bool und_works;
- static bool svc_works;
-+static bool pabt_works;
- #if defined(__arm__)
- /*
-  * Capture the current register state and execute an instruction
-@@ -86,7 +117,7 @@ static bool svc_works;
- 		"str	r1, [r0, #" xstr(S_PC) "]\n"		\
- 		excptn_insn "\n"				\
- 		post_insns "\n"					\
--	:: "r" (&expected_regs) : "r0", "r1")
-+	:: "r" (&expected_regs) : "r0", "r1", "r2")
+ static void irq_handler(struct pt_regs *regs)
+@@ -305,9 +301,13 @@ static void test_init(void)
+ 	switch (gic_version()) {
+ 	case 2:
+ 		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
++		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
++		gic_icenabler = gicv2_dist_base() + GICD_ICENABLER;
+ 		break;
+ 	case 3:
+ 		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
++		gic_isenabler = gicv3_sgi_base() + GICR_ISENABLER0;
++		gic_icenabler = gicv3_sgi_base() + GICR_ICENABLER0;
+ 		break;
+ 	}
  
- static bool check_regs(struct pt_regs *regs)
- {
-@@ -166,6 +197,32 @@ static void user_psci_system_off(struct pt_regs *regs)
- {
- 	__user_psci_system_off();
- }
-+
-+static void check_pabt_exit(void)
-+{
-+	install_exception_handler(EXCPTN_PABT, NULL);
-+
-+	report("pabt", pabt_works);
-+	exit(report_summary());
-+}
-+
-+static void pabt_handler(struct pt_regs *regs)
-+{
-+	expected_regs.ARM_pc = 0;
-+	pabt_works = check_regs(regs);
-+
-+	regs->ARM_pc = (unsigned long)&check_pabt_exit;
-+}
-+
-+static void check_pabt(void)
-+{
-+	install_exception_handler(EXCPTN_PABT, pabt_handler);
-+
-+	prep_io_exec();
-+
-+	test_exception("mov r2, #0x0", "bx r2", "");
-+	__builtin_unreachable();
-+}
- #elif defined(__aarch64__)
- 
- /*
-@@ -207,7 +264,7 @@ static void user_psci_system_off(struct pt_regs *regs)
- 		"stp	 x0,  x1, [x1]\n"			\
- 	"1:"	excptn_insn "\n"				\
- 		post_insns "\n"					\
--	:: "r" (&expected_regs) : "x0", "x1")
-+	:: "r" (&expected_regs) : "x0", "x1", "x2")
- 
- static bool check_regs(struct pt_regs *regs)
- {
-@@ -279,6 +336,37 @@ static bool check_svc(void)
- 	return svc_works;
- }
- 
-+static void check_pabt_exit(void)
-+{
-+	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
-+
-+	report("pabt", pabt_works);
-+	exit(report_summary());
-+}
-+
-+static void pabt_handler(struct pt_regs *regs, unsigned int esr)
-+{
-+	bool is_extabt;
-+
-+	expected_regs.pc = 0;
-+	is_extabt = (esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT;
-+	pabt_works = check_regs(regs) && is_extabt;
-+
-+	regs->pc = (u64)&check_pabt_exit;
-+}
-+
-+static void check_pabt(void)
-+{
-+	enum vector v = check_vector_prep();
-+
-+	install_exception_handler(v, ESR_EL1_EC_IABT_EL1, pabt_handler);
-+
-+	prep_io_exec();
-+
-+	test_exception("mov x2, xzr", "br x2", "");
-+	__builtin_unreachable();
-+}
-+
- static void user_psci_system_off(struct pt_regs *regs, unsigned int esr)
- {
- 	__user_psci_system_off();
-@@ -289,7 +377,9 @@ static void check_vectors(void *arg __unused)
- {
- 	report("und", check_und());
- 	report("svc", check_svc());
--	if (is_user()) {
-+	if (!is_user()) {
-+		check_pabt();
-+	} else {
- #ifdef __arm__
- 		install_exception_handler(EXCPTN_UND, user_psci_system_off);
- #else
 -- 
 2.7.4
 
