@@ -2,108 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 250E0A01FE
-	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 14:39:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6045EA035B
+	for <lists+kvm@lfdr.de>; Wed, 28 Aug 2019 15:38:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726454AbfH1Mjv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 08:39:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50676 "EHLO mx1.redhat.com"
+        id S1726395AbfH1Niv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 09:38:51 -0400
+Received: from foss.arm.com ([217.140.110.172]:59500 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726430AbfH1Mju (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 08:39:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3800218C4267;
-        Wed, 28 Aug 2019 12:39:50 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 707675D9C9;
-        Wed, 28 Aug 2019 12:39:49 +0000 (UTC)
-Date:   Wed, 28 Aug 2019 14:39:47 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH RFC UNTESTED] vfio-ccw: indirect access to translated
- cps
-Message-ID: <20190828143947.1c6b88e4.cohuck@redhat.com>
-In-Reply-To: <20190816003402.2a52b863.pasic@linux.ibm.com>
-References: <20190726100617.19718-1-cohuck@redhat.com>
-        <20190730174910.47930494.pasic@linux.ibm.com>
-        <20190807132311.5238bc24.cohuck@redhat.com>
-        <20190807160136.178e69de.pasic@linux.ibm.com>
-        <20190808104306.2450bdcf.cohuck@redhat.com>
-        <20190816003402.2a52b863.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 28 Aug 2019 12:39:50 +0000 (UTC)
+        id S1726197AbfH1Niv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 09:38:51 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14E4628;
+        Wed, 28 Aug 2019 06:38:50 -0700 (PDT)
+Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com [10.1.196.217])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E8D313F246;
+        Wed, 28 Aug 2019 06:38:48 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     drjones@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
+        maz@kernel.org, vladimir.murzin@arm.com, andre.przywara@arm.com
+Subject: [kvm-unit-tests RFC PATCH 00/16] arm64: Run at EL2
+Date:   Wed, 28 Aug 2019 14:38:15 +0100
+Message-Id: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 16 Aug 2019 00:34:02 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+ARMv8.3 added support for nested virtualization, which makes it possible
+for a hypervisor to run another hypervisor as a guest. Support for nested
+virtualization is being worked on in KVM [1].
 
-> On Thu, 8 Aug 2019 10:43:06 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Wed, 7 Aug 2019 16:01:36 +0200
-> > Halil Pasic <pasic@linux.ibm.com> wrote:  
+This patch series aims to make it possible for kvm-unit-tests to run at EL2
+under KVM. The focus has been on having all the infrastructure in place to
+run at EL2, and not on adding comprehensive tests for this Exception Level.
+All existing tests that fulfill KVM's requirements for a nested guest (the
+architecture is arm64 and they use GICv3) will be able to be run at EL2.
 
-> > > > > Besides the only point of converting cp to a pointer seems to be
-> > > > > policing access to cp_area (which used to be cp). I.e. if it is
-> > > > > NULL: don't touch it, otherwise: go ahead. We can do that with a single
-> > > > > bit, we don't need a pointer for that.    
-> > > > 
-> > > > The idea was
-> > > > - do translation etc. on an area only accessed by the thread doing the
-> > > >   translation
-> > > > - switch the pointer to that area once the cp has been submitted
-> > > >   successfully (and it is therefore associated with further interrupts
-> > > >   etc.)
-> > > > The approach in this patch is probably a bit simplistic.
-> > > > 
-> > > > I think one bit is not enough, we have at least three states:
-> > > > - idle; start using the area if you like
-> > > > - translating; i.e. only the translator is touching the area, keep off
-> > > > - submitted; we wait for interrupts, handle them or free if no (more)
-> > > >   interrupts can happen    
-> > > 
-> > > I think your patch assigns the pointer when transitioning from
-> > > translated --> submitted. That can be tracked with a single bit, that's
-> > > what I was trying to say. You seem to have misunderstood: I never
-> > > intended to claim that a single bit is sufficient to get this clean (only
-> > > to accomplish what the pointer accomplishes -- modulo races).
-> > > 
-> > > My impression was that the 'initialized' field is abut the idle -->
-> > > translating transition, but I never fully understood this 'initialized'
-> > > patch.  
-> > 
-> > So we do have three states here, right? (I hope we're not talking past
-> > each other again...)  
-> 
-> Right, AFAIR  and without any consideration to fine details the three
-> states and two state transitions do make sense.
+To keep the changes minimal, kvm-unit-tests will run with VHE enabled when
+it detects that has been booted at EL2. Functions for enabling and
+disabling VHE have been added, with the aim to let the user specify to
+disable VHE for a given test via command-line parameters. At the moment,
+only the timer test has been modified to run with VHE disabled.
 
-If we translate the three states to today's states in the fsm, we get:
-- "idle" -> VFIO_CCW_STATE_IDLE
-- "doing translation" -> VFIO_CCW_STATE_CP_PROCESSING
-- "submitted" -> VFIO_CCW_STATE_CP_PENDING
-and the transitions between the three already look fine to me (modulo
-locking). We also seem to handle async requests correctly (-EAGAIN if
-_PROCESSING, else just go ahead).
+The series are firmly an RFC because:
+* The patches that implement KVM nested support are themselves in the RFC
+  phase.
+* Some tests don't complete because of bugs in the current version of the
+  KVM patches. Where appropriate, I will provide fixes to allow the tests
+  to finish, however those fixes are my own have not been reviewed in any
+  way. Use at your own risk.
 
-So we can probably forget about the approach in this patch, and
-concentrate on eliminating races in state transitions.
+To run the tests, one obviously needs KVM with nested virtualization
+support from [2]. These patches have been tested from commit
+78c66132035c ("arm64: KVM: nv: Allow userspace to request
+KVM_ARM_VCPU_NESTED_VIRT"), on top of which the following patches have been
+cherry-picked from upstream Linux:
+* b4a1583abc83 ("KVM: arm/arm64: Fix emulated ptimer irq injection")
+* 16e604a437c8 ("KVM: arm/arm64: vgic: Reevaluate level sensitive
+  interrupts on enable")
 
-Not sure what the best approach is for tackling these: intermediate
-transit state, a mutex or another lock, running locked and running
-stuff that cannot be done locked on workqueues (and wait for all work
-to finish while disallowing new work while doing the transition)?
+Without those two patches some timer tests will fail.
 
-Clever ideas wanted :)
+A version of kvmtool that knows about nested virtualization is also
+needed [3]. The kvmtool --nested parameter is required for releasing a
+guest at EL2. For example, to run the newly added selftest-el2 test:
+
+lkvm -f selftest.flat -c 2 -m 128 -p el2 --nested --console serial \
+	--irqchip gicv3
+
+Summary of the patches:
+* Patches 1-10 are various fixes or enhancements and can be merged without
+  the rest of the series.
+* Patches 11-13 add support for running at EL2. A basic selftest-el2 test
+  is added that targets EL2.
+* Patches 14-16 add support for disabling VHE. The timer and selftest-el2
+  tests are modified to use this feature.
+
+[1] https://www.spinics.net/lists/arm-kernel/msg736687.html
+[2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/nv-wip-5.2-rc5
+[3] git://linux-arm.org/kvmtool.git nv/nv-wip-5.2-rc5
+
+Alexandru Elisei (16):
+  arm: selftest.c: Remove redundant check for Exception Level
+  arm/arm64: psci: Don't run C code without stack or vectors
+  lib: arm/arm64: Add missing include for alloc_page.h in pgtable.h
+  arm/arm64: selftest: Add prefetch abort test
+  arm64: timer: Write to ICENABLER to disable timer IRQ
+  arm64: timer: EOIR the interrupt after masking the timer
+  arm64: timer: Test behavior when timer disabled or masked
+  lib: arm/arm64: Refuse to disable the MMU with non-identity stack
+    pointer
+  lib: arm/arm64: Invalidate TLB before enabling MMU
+  lib: Add UL and ULL definitions to linux/const.h
+  lib: arm64: Run existing tests at EL2
+  arm64: timer: Add test for EL2 timers
+  arm64: selftest: Add basic test for EL2
+  lib: arm64: Add support for disabling and re-enabling VHE
+  arm64: selftest: Expand EL2 test to disable and re-enable VHE
+  arm64: timer: Run tests with VHE disabled
+
+ lib/linux/const.h             |   7 +-
+ lib/arm/asm/gic-v3.h          |   1 +
+ lib/arm/asm/gic.h             |   1 +
+ lib/arm/asm/pgtable.h         |   1 +
+ lib/arm/asm/processor.h       |   8 +
+ lib/arm/asm/psci.h            |   1 +
+ lib/arm64/asm/esr.h           |   5 +
+ lib/arm64/asm/mmu.h           |  11 +-
+ lib/arm64/asm/pgtable-hwdef.h |  55 +++++--
+ lib/arm64/asm/pgtable.h       |   1 +
+ lib/arm64/asm/processor.h     |  53 +++++++
+ lib/arm64/asm/sysreg.h        |  28 ++++
+ lib/arm/mmu.c                 |   5 +-
+ lib/arm/processor.c           |  11 ++
+ lib/arm/psci.c                |  43 +++++-
+ lib/arm/setup.c               |   6 +
+ lib/arm64/processor.c         |  69 ++++++++-
+ arm/cstart.S                  |  11 ++
+ arm/cstart64.S                | 221 ++++++++++++++++++++++++++-
+ arm/micro-bench.c             |  17 ++-
+ arm/psci.c                    |   5 +-
+ arm/selftest.c                | 175 ++++++++++++++++++++--
+ arm/timer.c                   | 340 +++++++++++++++++++++++++++++++++++++-----
+ arm/unittests.cfg             |   8 +
+ 24 files changed, 1010 insertions(+), 73 deletions(-)
+
+-- 
+2.7.4
 
