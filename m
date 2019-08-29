@@ -2,116 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A4A5A25C1
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 20:32:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 035BCA25D0
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 20:32:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728847AbfH2SOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 14:14:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56154 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728836AbfH2SOb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 14:14:31 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 766CE2339E;
-        Thu, 29 Aug 2019 18:14:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567102470;
-        bh=bJlc/+TfIgbgjjmyWhzlBUWdW2bkR1oySzbllaFjg+k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ExstUR2N4UeW5Im0znp1kKz6YpCnKI3yNM+AnQ085ujM+IO87E0Bisf4B6x09hQZ/
-         wXms6Pk/W25mo1vBB/3xPJGRpnefsp9Cauz0bP+oFMfBWXWH1u7XiXQuxY7ZKRCSM/
-         nNPEoltKw2cXnToRXp1+OcgU1tm7qBa+ugE1ITC0=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 34/76] selftests: kvm: fix vmx_set_nested_state_test
-Date:   Thu, 29 Aug 2019 14:12:29 -0400
-Message-Id: <20190829181311.7562-34-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190829181311.7562-1-sashal@kernel.org>
-References: <20190829181311.7562-1-sashal@kernel.org>
+        id S1729261AbfH2Scg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 14:32:36 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:51244 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729208AbfH2Scd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 14:32:33 -0400
+Received: from p5de0b6c5.dip0.t-ipconnect.de ([93.224.182.197] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1i3PDc-0004Xe-Cp; Thu, 29 Aug 2019 20:32:24 +0200
+Date:   Thu, 29 Aug 2019 20:32:23 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Borislav Petkov <bp@suse.de>
+cc:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 10/11] mm: x86: Invoke hypercall when page encryption
+ status is changed
+In-Reply-To: <alpine.DEB.2.21.1908292018500.1938@nanos.tec.linutronix.de>
+Message-ID: <alpine.DEB.2.21.1908292031480.1938@nanos.tec.linutronix.de>
+References: <20190710201244.25195-1-brijesh.singh@amd.com> <20190710201244.25195-11-brijesh.singh@amd.com> <20190829180717.GF2132@zn.tnic> <alpine.DEB.2.21.1908292018500.1938@nanos.tec.linutronix.de>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+On Thu, 29 Aug 2019, Thomas Gleixner wrote:
+> On Thu, 29 Aug 2019, Borislav Petkov wrote:
+> 
+> > On Wed, Jul 10, 2019 at 08:13:11PM +0000, Singh, Brijesh wrote:
+> > > @@ -2060,6 +2067,14 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
+> > >  	 */
+> > >  	cpa_flush(&cpa, 0);
+> > >  
+> > > +	/*
+> > > +	 * When SEV is active, notify hypervisor that a given memory range is mapped
+> > > +	 * encrypted or decrypted. Hypervisor will use this information during
+> > > +	 * the VM migration.
+> > > +	 */
+> > > +	if (sev_active())
+> > > +		set_memory_enc_dec_hypercall(addr, numpages << PAGE_SHIFT, enc);
+> > 
+> > Btw, tglx has a another valid design concern here: why isn't this a
+> > pv_ops thing? So that it is active only when the hypervisor is actually
+> > present?
+> > 
+> > I know, I know, this will run on SEV guests only because it is all
+> > (hopefully) behind "if (sev_active())" checks but the clean and accepted
+> > design is a paravirt call, I'd say.
+> 
+> No. sev_active() has nothing to do with guest mode. It tells whether SEV is
+> active or not. So yes, this calls into this function on both guest and
+> host. The latter is beyond pointless.
 
-[ Upstream commit c930e19790bbbff31c018009907c813fa0925f63 ]
+Oops. sme != sev.
 
-vmx_set_nested_state_test is trying to use the KVM_STATE_NESTED_EVMCS without
-enabling enlightened VMCS first.  Correct the outcome of the test, and actually
-test that it succeeds after the capability is enabled.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- .../kvm/x86_64/vmx_set_nested_state_test.c      | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
-index a99fc66dafeb6..853e370e8a394 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
-@@ -25,6 +25,8 @@
- #define VMCS12_REVISION 0x11e57ed0
- #define VCPU_ID 5
- 
-+bool have_evmcs;
-+
- void test_nested_state(struct kvm_vm *vm, struct kvm_nested_state *state)
- {
- 	vcpu_nested_state_set(vm, VCPU_ID, state, false);
-@@ -75,8 +77,9 @@ void set_default_vmx_state(struct kvm_nested_state *state, int size)
- {
- 	memset(state, 0, size);
- 	state->flags = KVM_STATE_NESTED_GUEST_MODE  |
--			KVM_STATE_NESTED_RUN_PENDING |
--			KVM_STATE_NESTED_EVMCS;
-+			KVM_STATE_NESTED_RUN_PENDING;
-+	if (have_evmcs)
-+		state->flags |= KVM_STATE_NESTED_EVMCS;
- 	state->format = 0;
- 	state->size = size;
- 	state->hdr.vmx.vmxon_pa = 0x1000;
-@@ -126,13 +129,19 @@ void test_vmx_nested_state(struct kvm_vm *vm)
- 	/*
- 	 * Setting vmxon_pa == -1ull and vmcs_pa == -1ull exits early without
- 	 * setting the nested state but flags other than eVMCS must be clear.
-+	 * The eVMCS flag can be set if the enlightened VMCS capability has
-+	 * been enabled.
- 	 */
- 	set_default_vmx_state(state, state_sz);
- 	state->hdr.vmx.vmxon_pa = -1ull;
- 	state->hdr.vmx.vmcs12_pa = -1ull;
- 	test_nested_state_expect_einval(vm, state);
- 
--	state->flags = KVM_STATE_NESTED_EVMCS;
-+	state->flags &= KVM_STATE_NESTED_EVMCS;
-+	if (have_evmcs) {
-+		test_nested_state_expect_einval(vm, state);
-+		vcpu_enable_evmcs(vm, VCPU_ID);
-+	}
- 	test_nested_state(vm, state);
- 
- 	/* It is invalid to have vmxon_pa == -1ull and SMM flags non-zero. */
-@@ -217,6 +226,8 @@ int main(int argc, char *argv[])
- 	struct kvm_nested_state state;
- 	struct kvm_cpuid_entry2 *entry = kvm_get_supported_cpuid_entry(1);
- 
-+	have_evmcs = kvm_check_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS);
-+
- 	if (!kvm_check_cap(KVM_CAP_NESTED_STATE)) {
- 		printf("KVM_CAP_NESTED_STATE not available, skipping test\n");
- 		exit(KSFT_SKIP);
--- 
-2.20.1
-
+But yes, can we please hide that a bit better....
