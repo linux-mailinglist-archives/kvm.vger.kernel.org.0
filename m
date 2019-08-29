@@ -2,78 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 657C5A2506
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 20:27:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA82FA2438
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 20:21:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729306AbfH2SPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 14:15:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57182 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729280AbfH2SP1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 14:15:27 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 04E8323403;
-        Thu, 29 Aug 2019 18:15:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567102526;
-        bh=xhiJezHpjdSXTTeSHRbLmmELwKti5nXh3MfmoKvhZEA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qSE8kO3oXJkV+YykhS3BvrKzN/zpk857a6rL8L68iD3s+k8T3bFeazVF8krL4Vcet
-         xdDSTZCsKG+xOaqyyw+E5UkEgmyZqshoRiN8beRFHoic0CQY0P05fukNClBQwwHv0M
-         h5EU+tJbqhGQVQUEwj0r1YqDy5SQkr9Rw39ylA2U=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S1730023AbfH2SVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 14:21:45 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:51220 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729743AbfH2SVo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 14:21:44 -0400
+Received: from p5de0b6c5.dip0.t-ipconnect.de ([93.224.182.197] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1i3P38-0003sP-Me; Thu, 29 Aug 2019 20:21:34 +0200
+Date:   Thu, 29 Aug 2019 20:21:33 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Borislav Petkov <bp@suse.de>
+cc:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 64/76] selftests/kvm: make platform_info_test pass on AMD
-Date:   Thu, 29 Aug 2019 14:12:59 -0400
-Message-Id: <20190829181311.7562-64-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190829181311.7562-1-sashal@kernel.org>
-References: <20190829181311.7562-1-sashal@kernel.org>
+        =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 10/11] mm: x86: Invoke hypercall when page encryption
+ status is changed
+In-Reply-To: <20190829180717.GF2132@zn.tnic>
+Message-ID: <alpine.DEB.2.21.1908292018500.1938@nanos.tec.linutronix.de>
+References: <20190710201244.25195-1-brijesh.singh@amd.com> <20190710201244.25195-11-brijesh.singh@amd.com> <20190829180717.GF2132@zn.tnic>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Thu, 29 Aug 2019, Borislav Petkov wrote:
 
-[ Upstream commit e4427372398c31f57450565de277f861a4db5b3b ]
+> On Wed, Jul 10, 2019 at 08:13:11PM +0000, Singh, Brijesh wrote:
+> > @@ -2060,6 +2067,14 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
+> >  	 */
+> >  	cpa_flush(&cpa, 0);
+> >  
+> > +	/*
+> > +	 * When SEV is active, notify hypervisor that a given memory range is mapped
+> > +	 * encrypted or decrypted. Hypervisor will use this information during
+> > +	 * the VM migration.
+> > +	 */
+> > +	if (sev_active())
+> > +		set_memory_enc_dec_hypercall(addr, numpages << PAGE_SHIFT, enc);
+> 
+> Btw, tglx has a another valid design concern here: why isn't this a
+> pv_ops thing? So that it is active only when the hypervisor is actually
+> present?
+> 
+> I know, I know, this will run on SEV guests only because it is all
+> (hopefully) behind "if (sev_active())" checks but the clean and accepted
+> design is a paravirt call, I'd say.
 
-test_msr_platform_info_disabled() generates EXIT_SHUTDOWN but VMCB state
-is undefined after that so an attempt to launch this guest again from
-test_msr_platform_info_enabled() fails. Reorder the tests to make test
-pass.
+No. sev_active() has nothing to do with guest mode. It tells whether SEV is
+active or not. So yes, this calls into this function on both guest and
+host. The latter is beyond pointless.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- tools/testing/selftests/kvm/x86_64/platform_info_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks,
 
-diff --git a/tools/testing/selftests/kvm/x86_64/platform_info_test.c b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
-index 40050e44ec0ac..f9334bd3cce9f 100644
---- a/tools/testing/selftests/kvm/x86_64/platform_info_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
-@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
- 	msr_platform_info = vcpu_get_msr(vm, VCPU_ID, MSR_PLATFORM_INFO);
- 	vcpu_set_msr(vm, VCPU_ID, MSR_PLATFORM_INFO,
- 		msr_platform_info | MSR_PLATFORM_INFO_MAX_TURBO_RATIO);
--	test_msr_platform_info_disabled(vm);
- 	test_msr_platform_info_enabled(vm);
-+	test_msr_platform_info_disabled(vm);
- 	vcpu_set_msr(vm, VCPU_ID, MSR_PLATFORM_INFO, msr_platform_info);
- 
- 	kvm_vm_free(vm);
--- 
-2.20.1
+	tglx
+
 
