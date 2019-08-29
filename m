@@ -2,172 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A9AFA10CC
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 07:27:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3971FA10EC
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 07:38:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727328AbfH2F1E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 01:27:04 -0400
-Received: from mga01.intel.com ([192.55.52.88]:2694 "EHLO mga01.intel.com"
+        id S1727307AbfH2Fio (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 01:38:44 -0400
+Received: from mga07.intel.com ([134.134.136.100]:2355 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725970AbfH2F1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 01:27:04 -0400
+        id S1725847AbfH2Fio (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 01:38:44 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Aug 2019 22:27:03 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Aug 2019 22:38:43 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,442,1559545200"; 
-   d="scan'208";a="171783751"
+   d="scan'208";a="210416043"
 Received: from icl-2s.bj.intel.com ([10.240.193.48])
-  by orsmga007.jf.intel.com with ESMTP; 28 Aug 2019 22:27:02 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 28 Aug 2019 22:38:40 -0700
 From:   Luwei Kang <luwei.kang@intel.com>
-To:     pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Luwei Kang <luwei.kang@intel.com>
-Subject: [PATCH 2/2] target/i386: Add support for put/get PEBS registers
-Date:   Thu, 29 Aug 2019 13:22:55 +0800
-Message-Id: <1567056175-14275-2-git-send-email-luwei.kang@intel.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com
+Cc:     sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        x86@kernel.org, ak@linux.intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Luwei Kang <luwei.kang@intel.com>
+Subject: [RFC v1 0/9] PEBS enabling in KVM guest
+Date:   Thu, 29 Aug 2019 13:34:00 +0800
+Message-Id: <1567056849-14608-1-git-send-email-luwei.kang@intel.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1567056175-14275-1-git-send-email-luwei.kang@intel.com>
-References: <1567056175-14275-1-git-send-email-luwei.kang@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch add a new feature words for IA32_PERF_CAPABILITIES (RO)
-register that serve to expose PEBS output Intel PT feature.
-The registers relate with PEBS need to be set/get when PEBS output
-Intel PT is supported in guest.
+Intel new hardware introduces some Precise Event-Based Sampling (PEBS)
+extensions that output the PEBS record to Intel PT stream instead of
+DS area. The PEBS record will be packaged in a specific format when
+outputing to Intel PT.
 
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
----
- target/i386/cpu.c | 20 ++++++++++++++++++++
- target/i386/cpu.h |  4 ++++
- target/i386/kvm.c | 36 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 60 insertions(+)
+This patch set will enable PEBS functionality in KVM Guest by PEBS
+output to Intel PT. The native driver as [1] (still under review).
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 9e0bac3..7fe34c0 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1244,6 +1244,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             },
-         },
-     },
-+    [FEAT_PERF_CAPABILITIES] = {
-+        .type = MSR_FEATURE_WORD,
-+        .feat_names = {
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            "pebs-output-pt", NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+            NULL, NULL, NULL, NULL,
-+        },
-+        .msr = {
-+            .index = MSR_IA32_PERF_CAPABILITIES,
-+            .cpuid_dep = {
-+                FEAT_1_ECX,
-+                CPUID_EXT_PDCM,
-+            },
-+        },
-+    },
- };
- 
- typedef struct X86RegisterInfo32 {
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index d7cec36..0904004 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -347,6 +347,7 @@ typedef enum X86Seg {
- #define MSR_IA32_PRED_CMD               0x49
- #define MSR_IA32_CORE_CAPABILITY        0xcf
- #define MSR_IA32_ARCH_CAPABILITIES      0x10a
-+#define MSR_IA32_PERF_CAPABILITIES      0x345
- #define MSR_IA32_TSCDEADLINE            0x6e0
- 
- #define FEATURE_CONTROL_LOCKED                    (1<<0)
-@@ -503,6 +504,7 @@ typedef enum FeatureWord {
-     FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
-     FEAT_ARCH_CAPABILITIES,
-     FEAT_CORE_CAPABILITY,
-+    FEAT_PERF_CAPABILITIES,
-     FEATURE_WORDS,
- } FeatureWord;
- 
-@@ -754,6 +756,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- 
- #define MSR_CORE_CAP_SPLIT_LOCK_DETECT  (1U << 5)
- 
-+#define MSR_PERF_CAP_PEBS_VIA_PT        (1ULL << 16)
-+
- /* Supported Hyper-V Enlightenments */
- #define HYPERV_FEAT_RELAXED             0
- #define HYPERV_FEAT_VAPIC               1
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 8023c67..c0dcc13 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2651,6 +2651,20 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-                 kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
-                             env->msr_rtit_addrs[i]);
-             }
-+
-+            if (env->features[FEAT_PERF_CAPABILITIES] &
-+                                        MSR_PERF_CAP_PEBS_VIA_PT) {
-+                kvm_msr_entry_add(cpu, MSR_IA32_PEBS_ENABLE,
-+                                env->msr_pebs_enable);
-+                for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-+                    kvm_msr_entry_add(cpu, MSR_RELOAD_FIXED_CTR0 + i,
-+                                env->msr_reload_fixed_ctr[i]);
-+                }
-+                for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-+                    kvm_msr_entry_add(cpu, MSR_RELOAD_PMC0 + i,
-+                                env->msr_reload_pmc[i]);
-+                }
-+            }
-         }
- 
-         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
-@@ -2989,6 +3003,16 @@ static int kvm_get_msrs(X86CPU *cpu)
-         for (i = 0; i < addr_num; i++) {
-             kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
-         }
-+
-+        if (env->features[FEAT_PERF_CAPABILITIES] & MSR_PERF_CAP_PEBS_VIA_PT) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_PEBS_ENABLE, 0);
-+            for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
-+                kvm_msr_entry_add(cpu, MSR_RELOAD_FIXED_CTR0 + i, 0);
-+            }
-+            for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-+                kvm_msr_entry_add(cpu, MSR_RELOAD_PMC0 + i, 0);
-+            }
-+        }
-     }
- 
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-@@ -3268,6 +3292,18 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-             env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-             break;
-+        case MSR_IA32_PEBS_ENABLE:
-+            env->msr_pebs_enable = msrs[i].data;
-+            break;
-+        case MSR_RELOAD_FIXED_CTR0 ...
-+                                MSR_RELOAD_FIXED_CTR0 + MAX_FIXED_COUNTERS - 1:
-+            env->msr_reload_fixed_ctr[index - MSR_RELOAD_FIXED_CTR0] =
-+                                                                msrs[i].data;
-+            break;
-+        case MSR_RELOAD_PMC0 ...
-+                                MSR_RELOAD_PMC0 + MAX_GP_COUNTERS - 1:
-+            env->msr_reload_fixed_ctr[index - MSR_RELOAD_PMC0] = msrs[i].data;
-+            break;
-         }
-     }
- 
+[1] https://www.spinics.net/lists/kernel/msg3215354.html
+
+Luwei Kang (9):
+  KVM: x86: Add base address parameter for get_fixed_pmc function
+  KVM: x86: PEBS via Intel PT HW feature detection
+  KVM: x86: Implement MSR_IA32_PEBS_ENABLE read/write emulation
+  KVM: x86: Implement counter reload MSRs read/write emulation
+  KVM: x86: Allocate performance counter for PEBS event
+  KVM: x86: Add shadow value of PEBS status
+  KVM: X86: Expose PDCM cpuid to guest
+  KVM: X86: MSR_IA32_PERF_CAPABILITIES MSR emulation
+  KVM: x86: Expose PEBS feature to guest
+
+ arch/x86/include/asm/kvm_host.h  |  8 ++++
+ arch/x86/include/asm/msr-index.h | 12 ++++++
+ arch/x86/kvm/cpuid.c             |  3 +-
+ arch/x86/kvm/pmu.c               | 57 ++++++++++++++++++++++----
+ arch/x86/kvm/pmu.h               | 11 ++---
+ arch/x86/kvm/pmu_amd.c           |  2 +-
+ arch/x86/kvm/svm.c               | 12 ++++++
+ arch/x86/kvm/vmx/capabilities.h  | 21 ++++++++++
+ arch/x86/kvm/vmx/pmu_intel.c     | 88 +++++++++++++++++++++++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.c           | 24 ++++++++++-
+ arch/x86/kvm/x86.c               | 22 +++++++---
+ 11 files changed, 229 insertions(+), 31 deletions(-)
+
 -- 
 1.8.3.1
 
