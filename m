@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79846A1830
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 13:20:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC862A1821
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 13:19:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727986AbfH2LUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 07:20:02 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:43760 "EHLO
+        id S1728249AbfH2LT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 07:19:27 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:43792 "EHLO
         mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728166AbfH2LTT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 07:19:19 -0400
+        with ESMTP id S1727189AbfH2LTZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 07:19:25 -0400
 Received: from Internal Mail-Server by MTLPINE1 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 29 Aug 2019 14:19:15 +0300
+        with ESMTPS (AES256-SHA encrypted); 29 Aug 2019 14:19:19 +0300
 Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x7TBJ8v3020002;
-        Thu, 29 Aug 2019 14:19:13 +0300
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x7TBJ8v5020002;
+        Thu, 29 Aug 2019 14:19:18 +0300
 From:   Parav Pandit <parav@mellanox.com>
 To:     alex.williamson@redhat.com, jiri@mellanox.com,
         kwankhede@nvidia.com, cohuck@redhat.com, davem@davemloft.net
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org, Parav Pandit <parav@mellanox.com>
-Subject: [PATCH v2 2/6] mdev: Make mdev alias unique among all mdevs
-Date:   Thu, 29 Aug 2019 06:19:00 -0500
-Message-Id: <20190829111904.16042-3-parav@mellanox.com>
+Subject: [PATCH v2 4/6] mdev: Introduce an API mdev_alias
+Date:   Thu, 29 Aug 2019 06:19:02 -0500
+Message-Id: <20190829111904.16042-5-parav@mellanox.com>
 X-Mailer: git-send-email 2.19.2
 In-Reply-To: <20190829111904.16042-1-parav@mellanox.com>
 References: <20190826204119.54386-1-parav@mellanox.com>
@@ -35,41 +35,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Mdev alias should be unique among all the mdevs, so that when such alias
-is used by the mdev users to derive other objects, there is no
-collision in a given system.
+Introduce an API mdev_alias() to provide access to optionally generated
+alias.
 
 Signed-off-by: Parav Pandit <parav@mellanox.com>
-
 ---
-Changelog:
-v1->v2:
- - Moved alias NULL check at beginning
-v0->v1:
- - Fixed inclusiong of alias for NULL check
- - Added ratelimited debug print for sha1 hash collision error
----
- drivers/vfio/mdev/mdev_core.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/vfio/mdev/mdev_core.c | 12 ++++++++++++
+ include/linux/mdev.h          |  1 +
+ 2 files changed, 13 insertions(+)
 
 diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 3bdff0469607..c9bf2ac362b9 100644
+index c9bf2ac362b9..5399ed6f1612 100644
 --- a/drivers/vfio/mdev/mdev_core.c
 +++ b/drivers/vfio/mdev/mdev_core.c
-@@ -388,6 +388,13 @@ int mdev_device_create(struct kobject *kobj, struct device *dev,
- 			ret = -EEXIST;
- 			goto mdev_fail;
- 		}
-+		if (alias && tmp->alias && strcmp(alias, tmp->alias) == 0) {
-+			mutex_unlock(&mdev_list_lock);
-+			ret = -EEXIST;
-+			dev_dbg_ratelimited(dev, "Hash collision in alias creation for UUID %pUl\n",
-+					    uuid);
-+			goto mdev_fail;
-+		}
- 	}
+@@ -517,6 +517,18 @@ struct device *mdev_get_iommu_device(struct device *dev)
+ }
+ EXPORT_SYMBOL(mdev_get_iommu_device);
  
- 	mdev = kzalloc(sizeof(*mdev), GFP_KERNEL);
++/**
++ * mdev_alias: Return alias string of a mdev device
++ * @mdev:	Pointer to the mdev device
++ * mdev_alias() returns alias string of a mdev device if alias is present,
++ * returns NULL otherwise.
++ */
++const char *mdev_alias(struct mdev_device *mdev)
++{
++	return mdev->alias;
++}
++EXPORT_SYMBOL(mdev_alias);
++
+ static int __init mdev_init(void)
+ {
+ 	int ret;
+diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+index f036fe9854ee..6da82213bc4e 100644
+--- a/include/linux/mdev.h
++++ b/include/linux/mdev.h
+@@ -148,5 +148,6 @@ void mdev_unregister_driver(struct mdev_driver *drv);
+ struct device *mdev_parent_dev(struct mdev_device *mdev);
+ struct device *mdev_dev(struct mdev_device *mdev);
+ struct mdev_device *mdev_from_dev(struct device *dev);
++const char *mdev_alias(struct mdev_device *mdev);
+ 
+ #endif /* MDEV_H */
 -- 
 2.19.2
 
