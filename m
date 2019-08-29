@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 449E1A1826
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 13:19:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55240A183D
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 13:21:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728332AbfH2LTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 07:19:31 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:43819 "EHLO
+        id S1727435AbfH2LUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 07:20:12 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:43766 "EHLO
         mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728300AbfH2LTa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 07:19:30 -0400
+        with ESMTP id S1728171AbfH2LTT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 07:19:19 -0400
 Received: from Internal Mail-Server by MTLPINE1 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 29 Aug 2019 14:19:24 +0300
+        with ESMTPS (AES256-SHA encrypted); 29 Aug 2019 14:19:17 +0300
 Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x7TBJ8v7020002;
-        Thu, 29 Aug 2019 14:19:22 +0300
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x7TBJ8v4020002;
+        Thu, 29 Aug 2019 14:19:15 +0300
 From:   Parav Pandit <parav@mellanox.com>
 To:     alex.williamson@redhat.com, jiri@mellanox.com,
         kwankhede@nvidia.com, cohuck@redhat.com, davem@davemloft.net
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org, Parav Pandit <parav@mellanox.com>
-Subject: [PATCH v2 6/6] mtty: Optionally support mtty alias
-Date:   Thu, 29 Aug 2019 06:19:04 -0500
-Message-Id: <20190829111904.16042-7-parav@mellanox.com>
+Subject: [PATCH v2 3/6] mdev: Expose mdev alias in sysfs tree
+Date:   Thu, 29 Aug 2019 06:19:01 -0500
+Message-Id: <20190829111904.16042-4-parav@mellanox.com>
 X-Mailer: git-send-email 2.19.2
 In-Reply-To: <20190829111904.16042-1-parav@mellanox.com>
 References: <20190826204119.54386-1-parav@mellanox.com>
@@ -35,68 +35,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Provide a module parameter to set alias length to optionally generate
-mdev alias.
-
-Example to request mdev alias.
-$ modprobe mtty alias_length=12
-
-Make use of mtty_alias() API when alias_length module parameter is set.
+Expose the optional alias for an mdev device as a sysfs attribute.
+This way, userspace tools such as udev may make use of the alias, for
+example to create a netdevice name for the mdev.
 
 Signed-off-by: Parav Pandit <parav@mellanox.com>
+
 ---
 Changelog:
-v1->v2:
- - Added mdev_alias() usage sample
+v0->v1:
+ - Addressed comments from Cornelia Huck
+ - Updated commit description
 ---
- samples/vfio-mdev/mtty.c | 13 +++++++++++++
+ drivers/vfio/mdev/mdev_sysfs.c | 13 +++++++++++++
  1 file changed, 13 insertions(+)
 
-diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-index 92e770a06ea2..075d65440bc0 100644
---- a/samples/vfio-mdev/mtty.c
-+++ b/samples/vfio-mdev/mtty.c
-@@ -150,6 +150,10 @@ static const struct file_operations vd_fops = {
- 	.owner          = THIS_MODULE,
- };
+diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
+index 43afe0e80b76..59f4e3cc5233 100644
+--- a/drivers/vfio/mdev/mdev_sysfs.c
++++ b/drivers/vfio/mdev/mdev_sysfs.c
+@@ -246,7 +246,20 @@ static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
  
-+static unsigned int mtty_alias_length;
-+module_param_named(alias_length, mtty_alias_length, uint, 0444);
-+MODULE_PARM_DESC(alias_length, "mdev alias length; default=0");
+ static DEVICE_ATTR_WO(remove);
+ 
++static ssize_t alias_show(struct device *device,
++			  struct device_attribute *attr, char *buf)
++{
++	struct mdev_device *dev = mdev_from_dev(device);
 +
- /* function prototypes */
- 
- static int mtty_trigger_interrupt(const guid_t *uuid);
-@@ -770,6 +774,9 @@ static int mtty_create(struct kobject *kobj, struct mdev_device *mdev)
- 	list_add(&mdev_state->next, &mdev_devices_list);
- 	mutex_unlock(&mdev_list_lock);
- 
-+	if (mtty_alias_length)
-+		dev_dbg(mdev_dev(mdev), "alias is %s\n", mdev_alias(mdev));
++	if (!dev->alias)
++		return -EOPNOTSUPP;
 +
- 	return 0;
- }
- 
-@@ -1410,6 +1417,11 @@ static struct attribute_group *mdev_type_groups[] = {
++	return sprintf(buf, "%s\n", dev->alias);
++}
++static DEVICE_ATTR_RO(alias);
++
+ static const struct attribute *mdev_device_attrs[] = {
++	&dev_attr_alias.attr,
+ 	&dev_attr_remove.attr,
  	NULL,
  };
- 
-+static unsigned int mtty_get_alias_length(void)
-+{
-+	return mtty_alias_length;
-+}
-+
- static const struct mdev_parent_ops mdev_fops = {
- 	.owner                  = THIS_MODULE,
- 	.dev_attr_groups        = mtty_dev_groups,
-@@ -1422,6 +1434,7 @@ static const struct mdev_parent_ops mdev_fops = {
- 	.read                   = mtty_read,
- 	.write                  = mtty_write,
- 	.ioctl		        = mtty_ioctl,
-+	.get_alias_length	= mtty_get_alias_length
- };
- 
- static void mtty_device_release(struct device *dev)
 -- 
 2.19.2
 
