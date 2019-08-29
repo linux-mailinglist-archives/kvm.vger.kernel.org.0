@@ -2,88 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EDFEA1A80
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 14:53:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8858A1AE2
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 15:07:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727063AbfH2Mx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 08:53:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36726 "EHLO mx1.redhat.com"
+        id S1728053AbfH2NHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 09:07:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41016 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725990AbfH2MxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 08:53:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1725990AbfH2NHm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 09:07:42 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7C68B8AB25B;
-        Thu, 29 Aug 2019 12:53:25 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 001706060D;
-        Thu, 29 Aug 2019 12:53:22 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 61ACB10513F;
-        Thu, 29 Aug 2019 09:53:06 -0300 (BRT)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x7TCr42i012268;
-        Thu, 29 Aug 2019 09:53:04 -0300
-Date:   Thu, 29 Aug 2019 09:53:04 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] cpuidle-haltpoll: Enable kvm guest polling when
- dedicated physical CPUs are available
-Message-ID: <20190829125304.GA12214@amt.cnet>
-References: <20190803202058.GA9316@amt.cnet>
- <CANRm+CwtHBOVWFcn+6Z3Ds7dEcNL2JP+b6hLRS=oeUW98A24MQ@mail.gmail.com>
- <20190826204045.GA24697@amt.cnet>
- <CANRm+Cx0+V67Ek7FhSs61ZqZL3MgV88Wdy17Q6UA369RH7=dgQ@mail.gmail.com>
- <CANRm+CxqYMzgvxYyhZLmEzYd6SLTyHdRzKVaSiHO-4SV+OwZUQ@mail.gmail.com>
- <CAJZ5v0iQc0-WzqeyAh-6m5O-BLraRMj+Z7sqvRgGwh2u2Hp7cg@mail.gmail.com>
- <20190828143916.GA13725@amt.cnet>
- <CAJZ5v0jiBprGrwLAhmLbZKpKUvmKwG9w4_R7+dQVqswptis5Qg@mail.gmail.com>
- <20190829120422.GC4949@amt.cnet>
- <CANRm+CwYq7NZeKffioWcHy_oWGyeHqXsygF_cppMD17mHuVgYw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+CwYq7NZeKffioWcHy_oWGyeHqXsygF_cppMD17mHuVgYw@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Thu, 29 Aug 2019 12:53:25 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7AA35308FB82;
+        Thu, 29 Aug 2019 13:07:41 +0000 (UTC)
+Received: from thuth.com (ovpn-116-53.ams2.redhat.com [10.36.116.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3CE1110016EB;
+        Thu, 29 Aug 2019 13:07:35 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH v3] KVM: selftests: Add a test for the KVM_S390_MEM_OP ioctl
+Date:   Thu, 29 Aug 2019 15:07:32 +0200
+Message-Id: <20190829130732.580-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 29 Aug 2019 13:07:41 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 29, 2019 at 08:16:41PM +0800, Wanpeng Li wrote:
-> > Current situation regarding haltpoll driver is:
-> >
-> > overcommit group: haltpoll driver is not loaded by default, they are
-> > happy.
-> >
-> > non overcommit group: boots without "realtime hints" flag, loads haltpoll driver,
-> > happy.
-> >
-> > Situation with patch above:
-> >
-> > overcommit group: haltpoll driver is not loaded by default, they are
-> > happy.
-> >
-> > non overcommit group: boots without "realtime hints" flag, haltpoll driver
-> > cannot be loaded.
-> 
-> non overcommit group, if they don't care latency/performance, they
-> don't need to enable haltpoll, "realtime hints" etc. Otherwise, they
-> should better tune.
+Check that we can write and read the guest memory with this s390x
+ioctl, and that some error cases are handled correctly.
 
-As mentioned before, "being overcommitted" is a property which is transitional.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v3:
+ - Replaced wrong copy-n-pasted report string with a proper one
+ - Check for errno after calling the ioctl with size = 0
+ 
+ tools/testing/selftests/kvm/Makefile      |   1 +
+ tools/testing/selftests/kvm/s390x/memop.c | 166 ++++++++++++++++++++++
+ 2 files changed, 167 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/s390x/memop.c
 
-A static true/false scheme reflects this poorly.
-
-Therefore the OS should detect it and act accordingly.
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 1b48a94b4350..62c591f87dab 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -32,6 +32,7 @@ TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+ TEST_GEN_PROGS_aarch64 += dirty_log_test
+ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+ 
++TEST_GEN_PROGS_s390x = s390x/memop
+ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+ TEST_GEN_PROGS_s390x += dirty_log_test
+ TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+new file mode 100644
+index 000000000000..9edaa9a134ce
+--- /dev/null
++++ b/tools/testing/selftests/kvm/s390x/memop.c
+@@ -0,0 +1,166 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Test for s390x KVM_S390_MEM_OP
++ *
++ * Copyright (C) 2019, Red Hat, Inc.
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
++
++#include "test_util.h"
++#include "kvm_util.h"
++
++#define VCPU_ID 1
++
++static uint8_t mem1[65536];
++static uint8_t mem2[65536];
++
++static void guest_code(void)
++{
++	int i;
++
++	for (;;) {
++		for (i = 0; i < sizeof(mem2); i++)
++			mem2[i] = mem1[i];
++		GUEST_SYNC(0);
++	}
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vm *vm;
++	struct kvm_run *run;
++	struct kvm_s390_mem_op ksmo;
++	int rv, i, maxsize;
++
++	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
++
++	maxsize = kvm_check_cap(KVM_CAP_S390_MEM_OP);
++	if (!maxsize) {
++		fprintf(stderr, "CAP_S390_MEM_OP not supported -> skip test\n");
++		exit(KSFT_SKIP);
++	}
++	if (maxsize > sizeof(mem1))
++		maxsize = sizeof(mem1);
++
++	/* Create VM */
++	vm = vm_create_default(VCPU_ID, 0, guest_code);
++	run = vcpu_state(vm, VCPU_ID);
++
++	for (i = 0; i < sizeof(mem1); i++)
++		mem1[i] = i * i + i;
++
++	/* Set the first array */
++	ksmo.gaddr = addr_gva2gpa(vm, (uintptr_t)mem1);
++	ksmo.flags = 0;
++	ksmo.size = maxsize;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
++	ksmo.buf = (uintptr_t)mem1;
++	ksmo.ar = 0;
++	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++
++	/* Let the guest code copy the first array to the second */
++	vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(run->exit_reason == KVM_EXIT_S390_SIEIC,
++		    "Unexpected exit reason: %u (%s)\n",
++		    run->exit_reason,
++		    exit_reason_str(run->exit_reason));
++
++	memset(mem2, 0xaa, sizeof(mem2));
++
++	/* Get the second array */
++	ksmo.gaddr = (uintptr_t)mem2;
++	ksmo.flags = 0;
++	ksmo.size = maxsize;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_READ;
++	ksmo.buf = (uintptr_t)mem2;
++	ksmo.ar = 0;
++	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++
++	TEST_ASSERT(!memcmp(mem1, mem2, maxsize),
++		    "Memory contents do not match!");
++
++	/* Check error conditions - first bad size: */
++	ksmo.gaddr = (uintptr_t)mem1;
++	ksmo.flags = 0;
++	ksmo.size = -1;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
++	ksmo.buf = (uintptr_t)mem1;
++	ksmo.ar = 0;
++	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
++
++	/* Zero size: */
++	ksmo.gaddr = (uintptr_t)mem1;
++	ksmo.flags = 0;
++	ksmo.size = 0;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
++	ksmo.buf = (uintptr_t)mem1;
++	ksmo.ar = 0;
++	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++	TEST_ASSERT(rv == -1 && (errno == EINVAL || errno == ENOMEM),
++		    "ioctl allows 0 as size");
++
++	/* Bad flags: */
++	ksmo.gaddr = (uintptr_t)mem1;
++	ksmo.flags = -1;
++	ksmo.size = maxsize;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
++	ksmo.buf = (uintptr_t)mem1;
++	ksmo.ar = 0;
++	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags");
++
++	/* Bad operation: */
++	ksmo.gaddr = (uintptr_t)mem1;
++	ksmo.flags = 0;
++	ksmo.size = maxsize;
++	ksmo.op = -1;
++	ksmo.buf = (uintptr_t)mem1;
++	ksmo.ar = 0;
++	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows bad operations");
++
++	/* Bad guest address: */
++	ksmo.gaddr = ~0xfffUL;
++	ksmo.flags = KVM_S390_MEMOP_F_CHECK_ONLY;
++	ksmo.size = maxsize;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
++	ksmo.buf = (uintptr_t)mem1;
++	ksmo.ar = 0;
++	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
++
++	/* Bad host address: */
++	ksmo.gaddr = (uintptr_t)mem1;
++	ksmo.flags = 0;
++	ksmo.size = maxsize;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
++	ksmo.buf = 0;
++	ksmo.ar = 0;
++	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++	TEST_ASSERT(rv == -1 && errno == EFAULT,
++		    "ioctl does not report bad host memory address");
++
++	/* Bad access register: */
++	run->psw_mask &= ~(3UL << (63 - 17));
++	run->psw_mask |= 1UL << (63 - 17);  /* Enable AR mode */
++	vcpu_run(vm, VCPU_ID);              /* To sync new state to SIE block */
++	ksmo.gaddr = (uintptr_t)mem1;
++	ksmo.flags = 0;
++	ksmo.size = maxsize;
++	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
++	ksmo.buf = (uintptr_t)mem1;
++	ksmo.ar = 17;
++	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
++	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows ARs > 15");
++	run->psw_mask &= ~(3UL << (63 - 17));   /* Disable AR mode */
++	vcpu_run(vm, VCPU_ID);                  /* Run to sync new state */
++
++	kvm_vm_free(vm);
++
++	return 0;
++}
+-- 
+2.18.1
 
