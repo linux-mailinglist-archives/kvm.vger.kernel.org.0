@@ -2,116 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E69EA1418
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 10:50:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78F46A1424
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 10:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727136AbfH2IuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 04:50:06 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:38495 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726070AbfH2IuF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 04:50:05 -0400
-Received: by mail-pg1-f195.google.com with SMTP id e11so1232783pga.5;
-        Thu, 29 Aug 2019 01:50:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=llEqJbQquZmg44EVVsIz+rUKn+1paMeV1ggm5tExqbs=;
-        b=it190hsUfuvXSmKudgY2NAWTdypFmbgxNqPExPyVrNNFS0MisuUL9cTukpxI8olh9l
-         UFmT2BD3K1Vkf/Kdj/pZrsvkHOsCS1Z2nkobny+wyXTG43LbF7JNCuhmdlePewYzBUHG
-         XBZCI4fQgeIkafqYzQcG9U0KXkJquef7+a61Nf/IG0mTExZ02Lvr9IDAhYmYJVRNllyL
-         zEH+8LKep0lVzXoRyflI3hpv625uucMeNUFOOOnt5TLtJQ1kNKYyvUVW6VF6LgP8c9IE
-         klPnqnO/3RK4pTexPkiNRdGRpOawGvmiSn+IXtXBexs3gwAgIzsVv1ByY3uCAa4wdMfe
-         6esQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=llEqJbQquZmg44EVVsIz+rUKn+1paMeV1ggm5tExqbs=;
-        b=fpLID5M+NDVyt6TFNrnevbKgBSiG2jLfmT6y6BQX0Iu51/YzuEnovSe+8kGc44EpXp
-         5cFLZnYqiShmSRqU9lIATmWjnrOZXkplD6eHSj2BJ99x6H3W9nV3d1w7tWTeSGKjeHiN
-         C3ulWv2RLhIITCuqZd3JSQ8o/LqUnUsIvkJfdS/gmeWVJH0QOSUFf5C9ZCshtiLfgPon
-         ZUeJwxKx5Qyb7fxkpDglxKRs8aXsniGHk6sS5682ihllAIINZ8pYaS5hcHfOrfCuO4/g
-         ycABbw0rJdgCGsx3fUR+6hh3uIdnD7Pn7Jf01Oy9rihTKOIy1XcZV4HAobev7pr8+tu9
-         JiLg==
-X-Gm-Message-State: APjAAAVga2cKjz32PTrKwE8w6PMKOKnRSx2kfk3Hrtn7DNfeRfIzV4Ai
-        pxVbg0dq9pljPrmlrT80/55B2GjN
-X-Google-Smtp-Source: APXvYqybYVCW4WKSbwOvYFr3ALtr+sJj+BYwgH4cZhlDpcD/yLnjfIWTxgcxAOjUwbQteavkBdSJ3w==
-X-Received: by 2002:a17:90a:e392:: with SMTP id b18mr8352385pjz.140.1567068605013;
-        Thu, 29 Aug 2019 01:50:05 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id t6sm1591693pjy.18.2019.08.29.01.50.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 29 Aug 2019 01:50:04 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
-Subject: [PATCH v2] cpuidle-haltpoll: Enable kvm guest polling when dedicated physical CPUs are available
-Date:   Thu, 29 Aug 2019 16:49:57 +0800
-Message-Id: <1567068597-22419-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        id S1726926AbfH2Iw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 04:52:57 -0400
+Received: from ozlabs.ru ([107.173.13.209]:49750 "EHLO ozlabs.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726009AbfH2Iw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 04:52:57 -0400
+Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 6E65FAE80037;
+        Thu, 29 Aug 2019 04:52:32 -0400 (EDT)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        Alistair Popple <alistair@popple.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: [PATCH kernel v3 0/5] powerpc/powernv/kvm: Invalidate multiple TCEs at once
+Date:   Thu, 29 Aug 2019 18:52:47 +1000
+Message-Id: <20190829085252.72370-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+So far TCE cache updates (IOMMU translation cache on POWER8/9
+PHB/NPU units) were barely noticeable; however with 100+GB guests
+we now see RCU stall warnings in guests because we spend too much
+time in the host system firmware which does actual TCE cache
+updates, hence this patchset.
 
-The downside of guest side polling is that polling is performed even 
-with other runnable tasks in the host. However, even if poll in kvm 
-can aware whether or not other runnable tasks in the same pCPU, it 
-can still incur extra overhead in over-subscribe scenario. Now we can 
-just enable guest polling when dedicated pCPUs are available.
+This is a rework of
+https://patchwork.ozlabs.org/patch/1149003/
+https://patchwork.ozlabs.org/patch/1152985/ (cannot post link to the series
+as it appears empty because of broken patchworks)
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
---
-v1 -> v2:
- * export kvm_arch_para_hints to fix haltpoll driver build as module error
- * just disable haltpoll driver instead of both driver and governor 
-   since KVM_HINTS_REALTIME is not defined in other arches, and governor 
-   doesn't depend on x86, to fix the warning on powerpc
+This depends on KVM-PPC's bugfix: https://patchwork.ozlabs.org/patch/1152937/
 
- arch/x86/kernel/kvm.c              | 1 +
- drivers/cpuidle/cpuidle-haltpoll.c | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+I expect 1/5 to go via the PPC tree, 2/5 via the KVM-PPC tree,
+3/5 via the VFIO tree and the rest via the PPC tree.
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index f48401b..68463c1 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -711,6 +711,7 @@ unsigned int kvm_arch_para_hints(void)
- {
- 	return cpuid_edx(kvm_cpuid_base() | KVM_CPUID_FEATURES);
- }
-+EXPORT_SYMBOL_GPL(kvm_arch_para_hints);
- 
- static uint32_t __init kvm_detect(void)
- {
-diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
-index 9ac093d..7aee38a 100644
---- a/drivers/cpuidle/cpuidle-haltpoll.c
-+++ b/drivers/cpuidle/cpuidle-haltpoll.c
-@@ -53,7 +53,8 @@ static int __init haltpoll_init(void)
- 
- 	cpuidle_poll_state_init(drv);
- 
--	if (!kvm_para_available())
-+	if (!kvm_para_available() ||
-+		!kvm_para_has_hint(KVM_HINTS_REALTIME))
- 		return 0;
- 
- 	ret = cpuidle_register(&haltpoll_driver, NULL);
+Changes:
+v3:
+* added 4/5 to fix compile error from 5/5
+* added "Book3S" to 2/5's subject line
+
+
+This is based on sha1
+42ac26d253eb Santosh Sivaraj "powerpc: add machine check safe copy_to_user".
+
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (5):
+  powerpc/powernv/ioda: Split out TCE invalidation from TCE updates
+  KVM: PPC: Book3S: Invalidate multiple TCEs at once
+  vfio/spapr_tce: Invalidate multiple TCEs at once
+  powerpc/pseries/iommu: Switch to xchg_no_kill
+  powerpc/powernv/ioda: Remove obsolete iommu_table_ops::exchange
+    callbacks
+
+ arch/powerpc/include/asm/iommu.h          | 21 ++++++---
+ arch/powerpc/kernel/iommu.c               | 23 ++++++----
+ arch/powerpc/kvm/book3s_64_vio.c          | 29 ++++++++----
+ arch/powerpc/kvm/book3s_64_vio_hv.c       | 38 +++++++++++----
+ arch/powerpc/platforms/powernv/pci-ioda.c | 56 ++++-------------------
+ arch/powerpc/platforms/pseries/iommu.c    |  5 +-
+ drivers/vfio/vfio_iommu_spapr_tce.c       | 18 +++++---
+ 7 files changed, 99 insertions(+), 91 deletions(-)
+
 -- 
-2.7.4
+2.17.1
 
