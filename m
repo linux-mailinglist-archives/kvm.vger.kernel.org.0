@@ -2,176 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CBD4A2716
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 21:14:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ABDFA277C
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 21:58:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728540AbfH2TOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 15:14:50 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36610 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728227AbfH2TOs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 15:14:48 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TJ40KS034828;
-        Thu, 29 Aug 2019 19:13:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=HDqYptse7XTuOdarL5HzbWxP1cx0etkvW0uT3q6k4FU=;
- b=qMMgBLKYWS0iKRhL+ko4K1YHhAxyLysyywSHqu/wV1PrtGlGMMr/9QKHpqQcek7maxC+
- t23vpJ6L/dbj8DUlwGlBnXIXzA/zAsM/XLlB1B+oq1gYxDdz8Tf20LIBtMxaazvJFQi8
- y/iRS1zILCYEHJC50nhqGWxHJjIXCTz8rXe2+oCggXJqACCUYTrlFTb+m9ZMLPKQ1YXO
- 6Qk2ALVRQkRNywSV8u7vdApi1y2OonMCvLryp77xijaAX04Cuqi7l2mK0qMR3LiSOEeI
- OPHDzMxamPwGQjiqRMGEO3o2fOenNSkaZVfgER81TFoyL5B1wy27xeS8X2bnJggF0Lpf 8g== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2upm94r5jx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Aug 2019 19:13:15 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7TJ3P9e152200;
-        Thu, 29 Aug 2019 19:11:14 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2uphau7cw1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Aug 2019 19:11:14 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7TJBDjY022810;
-        Thu, 29 Aug 2019 19:11:13 GMT
-Received: from [10.175.160.184] (/10.175.160.184)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 29 Aug 2019 12:11:12 -0700
-Subject: Re: Default governor regardless of cpuidle driver
-To:     Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S1727876AbfH2T6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 15:58:47 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:39860 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727108AbfH2T6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 15:58:46 -0400
+Received: by mail-pl1-f194.google.com with SMTP id az1so1110929plb.6
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 12:58:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=+5Kg84p1fqKumOdUNo22sb2fQbwCkGTAtRgR04S7LGI=;
+        b=k6lF2z0kb5fYo5LLwgkq2TiwOSfqasJsGn9m6Rz3w9yQb//Z1hRacNsykepEJs9ICp
+         pLeXLTyqWtujz/ry1eyYnwnyc07tIgNkcQqyPSfaY2agGJx9/kCV00RXNx/7tY8bljch
+         7njR45oIInvNf/sVcCmqyAGxbE5Nbxtfs6ef5U7v1CypRVu9Zam5Qa11Rd/S8F+XXo3o
+         bFJdPy+3Xg/sM5jlfEGPxBUAl4o9arf032HWIbqpU34DoDnmKzrO/WtOa+lYRylEzujx
+         9M9qBpxuffuP7VDD95TbyqVArm3Re+558zC4znaYgkBanOywdPvC0avmIyDNFalYJVdF
+         UPcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=+5Kg84p1fqKumOdUNo22sb2fQbwCkGTAtRgR04S7LGI=;
+        b=AHY3j9Sa0lOAehZRfbbWUott1P45nLB0KFqv7nYC8LaLcZEV8Tw3eNtQ/Jkj+6WEuR
+         Vc8BOjlveiL3tiEYftDRqpg/k4fRgIpJ/aZuW1Qa77YyiDGn1YfnUhcnHSy6PkLZCkgp
+         jxIC7VvV5EXZ1KEE83H0M/7FRYJr2GwdW7wfQ7Vgm1N8xCOqR5YF3kmQ2xPoNnO7gUAE
+         pxEYzW3yhcEzAVGoj75WHrlHjtpwksGrMXsNCt8Eo4PMA2VP9ClBtcDLi2FvCBGzdhS1
+         0udBzi/qIPMnhewwMojrGMQpSz6SCf5e3wABb+0LKlHHFf1dfcsazh2Ul3OAxCg7HKc7
+         ASXQ==
+X-Gm-Message-State: APjAAAXfnMq2tmD3gvQD3s+y7xIBnEVrcQMUyYQ4Z1zcSi1Kof1ZFjka
+        1dDsXgh2KXZ6AqRIYvMh7BHFFQ==
+X-Google-Smtp-Source: APXvYqyXPG3sM8kedXhZpNEU9tNIBXcvca2TX8u8wOqkMeXtxwZzNVNGxlf5ENkpsI7vcRmWCqYHpw==
+X-Received: by 2002:a17:902:a606:: with SMTP id u6mr11713562plq.224.1567108725633;
+        Thu, 29 Aug 2019 12:58:45 -0700 (PDT)
+Received: from google.com ([2620:0:1009:11:73e5:72bd:51c7:44f6])
+        by smtp.gmail.com with ESMTPSA id a15sm3899394pfg.102.2019.08.29.12.58.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2019 12:58:44 -0700 (PDT)
+Date:   Thu, 29 Aug 2019 12:58:41 -0700
+From:   Oliver Upton <oupton@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-pm@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-References: <20190829151027.9930-1-joao.m.martins@oracle.com>
- <c8cf8dcc-76a3-3e15-f514-2cb9df1bbbdc@oracle.com>
- <d1d4ade5-04a5-4288-d994-3963bb80fb6b@linaro.org>
- <6c8816af-934a-5bf7-6fb9-f67c05e2c8aa@oracle.com>
- <901ab688-5548-cf96-1dcb-ce50e617e917@linaro.org>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <722bd6f6-6eee-b24b-9704-c9aecc06302f@oracle.com>
-Date:   Thu, 29 Aug 2019 20:11:08 +0100
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [kvm-unit-tests PATCH 7/7] x86: VMX: Add tests for nested "load
+ IA32_PERF_GLOBAL_CTRL"
+Message-ID: <20190829195841.GA188698@google.com>
+References: <20190828234134.132704-1-oupton@google.com>
+ <20190828234134.132704-8-oupton@google.com>
+ <CALMp9eTsd2YQxqDu9cXfJiMr1DK41oJbnBW3zRAw10k+uNuGmA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <901ab688-5548-cf96-1dcb-ce50e617e917@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9364 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908290191
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9364 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908290191
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eTsd2YQxqDu9cXfJiMr1DK41oJbnBW3zRAw10k+uNuGmA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/29/19 7:28 PM, Daniel Lezcano wrote:
-> On 29/08/2019 20:07, Joao Martins wrote:
->> On 8/29/19 6:42 PM, Daniel Lezcano wrote:
->>> On 29/08/2019 19:16, Joao Martins wrote:
->>>> On 8/29/19 4:10 PM, Joao Martins wrote:
->>>>> When cpus != maxcpus cpuidle-haltpoll will fail to register all vcpus
->>>>> past the online ones and thus fail to register the idle driver.
->>>>> This is because cpuidle_add_sysfs() will return with -ENODEV as a
->>>>> consequence from get_cpu_device() return no device for a non-existing
->>>>> CPU.
->>>>>
->>>>> Instead switch to cpuidle_register_driver() and manually register each
->>>>> of the present cpus through cpuhp_setup_state() callback and future
->>>>> ones that get onlined. This mimmics similar logic that intel_idle does.
->>>>>
->>>>> Fixes: fa86ee90eb11 ("add cpuidle-haltpoll driver")
->>>>> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
->>>>> Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
->>>>> ---
->>>>
->>>> While testing the above, I found out another issue on the haltpoll series.
->>>> But I am not sure what is best suited to cpuidle framework, hence requesting
->>>> some advise if below is a reasonable solution or something else is preferred.
->>>>
->>>> Essentially after haltpoll governor got introduced and regardless of the cpuidle
->>>> driver the default governor is gonna be haltpoll for a guest (given haltpoll
->>>> governor doesn't get registered for baremetal). Right now, for a KVM guest, the
->>>> idle governors have these ratings:
->>>>
->>>>  * ladder            -> 10
->>>>  * teo               -> 19
->>>>  * menu              -> 20
->>>>  * haltpoll          -> 21
->>>>  * ladder + nohz=off -> 25
->>>>
->>>> When a guest is booted with MWAIT and intel_idle is probed and sucessfully
->>>> registered, we will end up with a haltpoll governor being used as opposed to
->>>> 'menu' (which used to be the default case). This would prevent IIUC that other
->>>> C-states get used other than poll_state (state 0) and state 1.
->>>>
->>>> Given that haltpoll governor is largely only useful with a cpuidle-haltpoll
->>>> it doesn't look reasonable to be the default? What about using haltpoll governor
->>>> as default when haltpoll idle driver registers or modload.
->>>
->>> Are the guest and host kernel the same? IOW compiled with the same
->>> kernel config?
->>>
->> You just need to toggle this (regardless off CONFIG_HALTPOLL_CPUIDLE):
->>
->> 	CONFIG_CPU_IDLE_GOV_HALTPOLL=y
->>
->> And *if you are a KVM guest* it will be the default (unless using nohz=off in
->> which case ladder gets the highest rating -- see the listing right above).
->>
->> Host will just behave differently because the haltpoll governor is checking if
->> it is running as kvm guest, and only registering in that case.
+On Thu, Aug 29, 2019 at 10:33:48AM -0700, Jim Mattson wrote:
+> On Wed, Aug 28, 2019 at 4:41 PM Oliver Upton <oupton@google.com> wrote:
+> >
+> > Tests to verify that KVM performs the correct checks on Host/Guest state
+> > at VM-entry, as described in SDM 26.3.1.1 "Checks on Guest Control
+> > Registers, Debug Registers, and MSRs" and SDM 26.2.2 "Checks on Host
+> > Control Registers and MSRs".
+> >
+> > Test that KVM does the following:
+> >
+> >     If the "load IA32_PERF_GLOBAL_CTRL" VM-entry control is 1, the
+> >     reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
+> >     GUEST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
+> >     should fail with an exit reason of "VM-entry failure due to invalid
+> >     guest state" (33).
+> >
+> >     If the "load IA32_PERF_GLOBAL_CTRL" VM-exit control is 1, the
+> >     reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
+> >     HOST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
+> >     should fail with a VM-instruction error of "VM entry with invalid
+> >     host-state field(s)" (8).
 > 
-> I understood the problem. Actually my question was about if the kernels
-> are compiled for host and guest, and can be run indifferently. 
+> Could you add a simple functionality test as well? That is, after a
+> successful nested VM-entry, the L2 guest should be able to observe the
+> GUEST_IA32_PERF_GLOBAL_CTRL value when it reads the
+> IA32_PERF_GLOBAL_CTRL MSR, and after a subsequent nested VM-exit, the
+> L1 guest should be able to observe the HOST_IA32_PERF_GLOBAL_CTRL
+> value when it reads the IA32_PERF_GLOBAL_CTRL MSR.
 
-/nods Correct.
+Definitely should. I think I can just add it as an additional check to
+the common test code for host and guest tests, since we already have the
+guest brought up and configured correctly anyway.
 
-> In this
-> case a runtime detection must be done as you propose, otherwise that can
-> be done at config time. I pretty sure it is the former but before
-> thinking about the runtime side, I wanted to double check.
-> 
-Hmm, but even with separate kernels/configs for guest and host I think we would
-still have the same issue.
-
-What I was trying to convey is that even when running with a config solely for
-KVM guests (that is different than baremetal) you can have today various ways of
-idling. An Intel x86 kvm guest can have no idle driver (but arch-specific),
-intel_idle (like baremetal config) and haltpoll. There are usecases for these
-three, and makes sense to consolidate all.
-
-Say you wanted to have a kvm specific config, you would still see the same
-problem if you happen to compile intel_idle together with haltpoll
-driver+governor. Creating two separate configs here, with and without haltpoll
-for VMs doesn't sound effective for distros. Perhaps decreasing the rating of
-haltpoll governor, but while a short term fix it wouldn't give much sensible
-defaults without the one-off runtime switch.
-
-Unless ofc I am missing something.
-
-> 
->>>> My idea to achieve the above would be to decrease the rating to 9 (before the
->>>> lowest rated governor) and retain old defaults before haltpoll. Then we would
->>>> allow a cpuidle driver to define a preferred governor to switch on idle driver
->>>> registration. Naturally all of would be ignored if overidden by
->>>> cpuidle.governor=.
-> 
-> 
+I have a couple style nits to correct in this patch as well. I'll add
+this to the v2 I'm going to send out for the series.
