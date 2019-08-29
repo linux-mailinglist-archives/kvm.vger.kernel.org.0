@@ -2,236 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E94ACA19B7
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 14:14:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA9F2A19BE
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 14:15:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727454AbfH2MOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 08:14:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64869 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726983AbfH2MOV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 08:14:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6EB8B3082145;
-        Thu, 29 Aug 2019 12:14:20 +0000 (UTC)
-Received: from thuth.com (ovpn-116-53.ams2.redhat.com [10.36.116.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5024060CD0;
-        Thu, 29 Aug 2019 12:14:16 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH v2] KVM: selftests: Add a test for the KVM_S390_MEM_OP ioctl
-Date:   Thu, 29 Aug 2019 14:14:12 +0200
-Message-Id: <20190829121412.30194-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Thu, 29 Aug 2019 12:14:20 +0000 (UTC)
+        id S1727171AbfH2MPY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 08:15:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15180 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727061AbfH2MPY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Aug 2019 08:15:24 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7TC7xAt090385
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 08:15:23 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2updvy1gra-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 08:15:22 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Thu, 29 Aug 2019 13:15:18 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 29 Aug 2019 13:15:17 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7TCFGkK45088842
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 29 Aug 2019 12:15:16 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0C0AF52050;
+        Thu, 29 Aug 2019 12:15:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.55.105])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D2AA652057;
+        Thu, 29 Aug 2019 12:15:14 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH 0/6] s390x: Add multiboot and smp
+Date:   Thu, 29 Aug 2019 14:14:53 +0200
+X-Mailer: git-send-email 2.17.0
+X-TM-AS-GCONF: 00
+x-cbid: 19082912-0012-0000-0000-000003443F0B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19082912-0013-0000-0000-0000217E7F8C
+Message-Id: <20190829121459.1708-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-29_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=775 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908290135
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Check that we can write and read the guest memory with this s390x
-ioctl, and that some error cases are handled correctly.
+Cross testing emulated instructions has in the past brought up some
+issues on all available IBM Z hypervisors. So let's upstream the last
+part of multiboot: sclp interrupts and line mode console.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Check the ioctl also with "size" set to 0
+SMP tests are a great way to excercise external interruptions, cpu
+resets and sigp. The smp library is always initialized and provides
+very rudimentary CPU management for now.
 
- tools/testing/selftests/kvm/Makefile      |   1 +
- tools/testing/selftests/kvm/s390x/memop.c | 165 ++++++++++++++++++++++
- 2 files changed, 166 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/s390x/memop.c
+Janosch Frank (6):
+  s390x: Use interrupts in SCLP and add locking
+  s390x: Add linemode console
+  s390x: Add linemode buffer to fix newline on every print
+  s390x: Add initial smp code
+  s390x: Prepare for external calls
+  s390x: SMP test
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 1b48a94b4350..62c591f87dab 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -32,6 +32,7 @@ TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
- 
-+TEST_GEN_PROGS_s390x = s390x/memop
- TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-new file mode 100644
-index 000000000000..e6a65f9e48ca
---- /dev/null
-+++ b/tools/testing/selftests/kvm/s390x/memop.c
-@@ -0,0 +1,165 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Test for s390x KVM_S390_MEM_OP
-+ *
-+ * Copyright (C) 2019, Red Hat, Inc.
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+
-+#define VCPU_ID 1
-+
-+static uint8_t mem1[65536];
-+static uint8_t mem2[65536];
-+
-+static void guest_code(void)
-+{
-+	int i;
-+
-+	for (;;) {
-+		for (i = 0; i < sizeof(mem2); i++)
-+			mem2[i] = mem1[i];
-+		GUEST_SYNC(0);
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_run *run;
-+	struct kvm_s390_mem_op ksmo;
-+	int rv, i, maxsize;
-+
-+	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
-+
-+	maxsize = kvm_check_cap(KVM_CAP_S390_MEM_OP);
-+	if (!maxsize) {
-+		fprintf(stderr, "CAP_S390_MEM_OP not supported -> skip test\n");
-+		exit(KSFT_SKIP);
-+	}
-+	if (maxsize > sizeof(mem1))
-+		maxsize = sizeof(mem1);
-+
-+	/* Create VM */
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	run = vcpu_state(vm, VCPU_ID);
-+
-+	for (i = 0; i < sizeof(mem1); i++)
-+		mem1[i] = i * i + i;
-+
-+	/* Set the first array */
-+	ksmo.gaddr = addr_gva2gpa(vm, (uintptr_t)mem1);
-+	ksmo.flags = 0;
-+	ksmo.size = maxsize;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
-+	ksmo.buf = (uintptr_t)mem1;
-+	ksmo.ar = 0;
-+	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+
-+	/* Let the guest code copy the first array to the second */
-+	vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_S390_SIEIC,
-+		    "Unexpected exit reason: %u (%s)\n",
-+		    run->exit_reason,
-+		    exit_reason_str(run->exit_reason));
-+
-+	memset(mem2, 0xaa, sizeof(mem2));
-+
-+	/* Get the second array */
-+	ksmo.gaddr = (uintptr_t)mem2;
-+	ksmo.flags = 0;
-+	ksmo.size = maxsize;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_READ;
-+	ksmo.buf = (uintptr_t)mem2;
-+	ksmo.ar = 0;
-+	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+
-+	TEST_ASSERT(!memcmp(mem1, mem2, maxsize),
-+		    "Memory contents do not match!");
-+
-+	/* Check error conditions - first bad size: */
-+	ksmo.gaddr = (uintptr_t)mem1;
-+	ksmo.flags = 0;
-+	ksmo.size = -1;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
-+	ksmo.buf = (uintptr_t)mem1;
-+	ksmo.ar = 0;
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
-+
-+	/* Zero size: */
-+	ksmo.gaddr = (uintptr_t)mem1;
-+	ksmo.flags = 0;
-+	ksmo.size = 0;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
-+	ksmo.buf = (uintptr_t)mem1;
-+	ksmo.ar = 0;
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+	TEST_ASSERT(rv == -1, "ioctl allows 0 as size");
-+
-+	/* Bad flags: */
-+	ksmo.gaddr = (uintptr_t)mem1;
-+	ksmo.flags = -1;
-+	ksmo.size = maxsize;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
-+	ksmo.buf = (uintptr_t)mem1;
-+	ksmo.ar = 0;
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags?");
-+
-+	/* Bad operation: */
-+	ksmo.gaddr = (uintptr_t)mem1;
-+	ksmo.flags = 0;
-+	ksmo.size = maxsize;
-+	ksmo.op = -1;
-+	ksmo.buf = (uintptr_t)mem1;
-+	ksmo.ar = 0;
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags?");
-+
-+	/* Bad guest address: */
-+	ksmo.gaddr = ~0xfffUL;
-+	ksmo.flags = KVM_S390_MEMOP_F_CHECK_ONLY;
-+	ksmo.size = maxsize;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
-+	ksmo.buf = (uintptr_t)mem1;
-+	ksmo.ar = 0;
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
-+
-+	/* Bad host address: */
-+	ksmo.gaddr = (uintptr_t)mem1;
-+	ksmo.flags = 0;
-+	ksmo.size = maxsize;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
-+	ksmo.buf = 0;
-+	ksmo.ar = 0;
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+	TEST_ASSERT(rv == -1 && errno == EFAULT,
-+		    "ioctl does not report bad host memory address");
-+
-+	/* Bad access register: */
-+	run->psw_mask &= ~(3UL << (63 - 17));
-+	run->psw_mask |= 1UL << (63 - 17);  /* Enable AR mode */
-+	vcpu_run(vm, VCPU_ID);              /* To sync new state to SIE block */
-+	ksmo.gaddr = (uintptr_t)mem1;
-+	ksmo.flags = 0;
-+	ksmo.size = maxsize;
-+	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
-+	ksmo.buf = (uintptr_t)mem1;
-+	ksmo.ar = 17;
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
-+	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows ARs > 15");
-+	run->psw_mask &= ~(3UL << (63 - 17));   /* Disable AR mode */
-+	vcpu_run(vm, VCPU_ID);                  /* Run to sync new state */
-+
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
+ lib/s390x/asm/arch_def.h  |  13 ++
+ lib/s390x/asm/interrupt.h |   5 +
+ lib/s390x/asm/sigp.h      |  29 +++-
+ lib/s390x/interrupt.c     |  28 +++-
+ lib/s390x/io.c            |   5 +-
+ lib/s390x/sclp-console.c  | 243 +++++++++++++++++++++++++++++++---
+ lib/s390x/sclp.c          |  54 +++++++-
+ lib/s390x/sclp.h          |  59 ++++++++-
+ lib/s390x/smp.c           | 272 ++++++++++++++++++++++++++++++++++++++
+ lib/s390x/smp.h           |  51 +++++++
+ s390x/Makefile            |   2 +
+ s390x/cstart64.S          |   7 +
+ s390x/smp.c               | 242 +++++++++++++++++++++++++++++++++
+ 13 files changed, 983 insertions(+), 27 deletions(-)
+ create mode 100644 lib/s390x/smp.c
+ create mode 100644 lib/s390x/smp.h
+ create mode 100644 s390x/smp.c
+
 -- 
-2.18.1
+2.17.0
 
