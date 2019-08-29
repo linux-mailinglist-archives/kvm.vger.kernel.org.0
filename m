@@ -2,269 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 39531A1F1A
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 17:28:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86B77A20D9
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 18:26:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727908AbfH2P16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 11:27:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56576 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726283AbfH2P16 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 11:27:58 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A28641089045;
-        Thu, 29 Aug 2019 15:27:57 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-12.gru2.redhat.com [10.97.112.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4324284E2;
-        Thu, 29 Aug 2019 15:27:40 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 84A8B10513F;
-        Thu, 29 Aug 2019 12:27:20 -0300 (BRT)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x7TFRGAF015987;
-        Thu, 29 Aug 2019 12:27:16 -0300
-Date:   Thu, 29 Aug 2019 12:27:16 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S1727691AbfH2Q0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 12:26:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51194 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726973AbfH2Q0t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 12:26:49 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id C48A8AB9B;
+        Thu, 29 Aug 2019 16:26:47 +0000 (UTC)
+Date:   Thu, 29 Aug 2019 18:26:41 +0200
+From:   Borislav Petkov <bp@suse.de>
+To:     "Singh, Brijesh" <brijesh.singh@amd.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        linux-pm@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH v2] cpuidle-haltpoll: vcpu hotplug support
-Message-ID: <20190829152714.GA15616@amt.cnet>
-References: <20190829151027.9930-1-joao.m.martins@oracle.com>
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 09/11] KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP
+ ioctl
+Message-ID: <20190829162641.GB2132@zn.tnic>
+References: <20190710201244.25195-1-brijesh.singh@amd.com>
+ <20190710201244.25195-10-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190829151027.9930-1-joao.m.martins@oracle.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Thu, 29 Aug 2019 15:27:57 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190710201244.25195-10-brijesh.singh@amd.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 29, 2019 at 04:10:27PM +0100, Joao Martins wrote:
-> When cpus != maxcpus cpuidle-haltpoll will fail to register all vcpus
-> past the online ones and thus fail to register the idle driver.
-> This is because cpuidle_add_sysfs() will return with -ENODEV as a
-> consequence from get_cpu_device() return no device for a non-existing
-> CPU.
-> 
-> Instead switch to cpuidle_register_driver() and manually register each
-> of the present cpus through cpuhp_setup_state() callback and future
-> ones that get onlined. This mimmics similar logic that intel_idle does.
-> 
-> Fixes: fa86ee90eb11 ("add cpuidle-haltpoll driver")
-> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> ---
-> v2:
-> * move cpus_read_unlock() right after unregistering all cpuidle_devices;
-> (Marcello Tosatti)
-> * redundant usage of cpuidle_unregister() when only
-> cpuidle_unregister_driver() suffices; (Marcelo Tosatti)
-> * cpuhp_setup_state() returns a state (> 0) on success with CPUHP_AP_ONLINE_DYN
-> thus we set @ret to 0
-> ---
->  arch/x86/include/asm/cpuidle_haltpoll.h |  4 +-
->  arch/x86/kernel/kvm.c                   | 18 +++----
->  drivers/cpuidle/cpuidle-haltpoll.c      | 67 +++++++++++++++++++++++--
->  include/linux/cpuidle_haltpoll.h        |  4 +-
->  4 files changed, 72 insertions(+), 21 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpuidle_haltpoll.h b/arch/x86/include/asm/cpuidle_haltpoll.h
-> index ff8607d81526..c8b39c6716ff 100644
-> --- a/arch/x86/include/asm/cpuidle_haltpoll.h
-> +++ b/arch/x86/include/asm/cpuidle_haltpoll.h
-> @@ -2,7 +2,7 @@
->  #ifndef _ARCH_HALTPOLL_H
->  #define _ARCH_HALTPOLL_H
+On Wed, Jul 10, 2019 at 08:13:10PM +0000, Singh, Brijesh wrote:
+> @@ -7767,7 +7808,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
 >  
-> -void arch_haltpoll_enable(void);
-> -void arch_haltpoll_disable(void);
-> +void arch_haltpoll_enable(unsigned int cpu);
-> +void arch_haltpoll_disable(unsigned int cpu);
+>  	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
 >  
->  #endif
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 8d150e3732d9..a9b6c4e2446d 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -880,32 +880,26 @@ static void kvm_enable_host_haltpoll(void *i)
->  	wrmsrl(MSR_KVM_POLL_CONTROL, 1);
->  }
->  
-> -void arch_haltpoll_enable(void)
-> +void arch_haltpoll_enable(unsigned int cpu)
->  {
->  	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
-> -		printk(KERN_ERR "kvm: host does not support poll control\n");
-> -		printk(KERN_ERR "kvm: host upgrade recommended\n");
-> +		pr_err_once("kvm: host does not support poll control\n");
-> +		pr_err_once("kvm: host upgrade recommended\n");
->  		return;
->  	}
->  
-> -	preempt_disable();
->  	/* Enable guest halt poll disables host halt poll */
-> -	kvm_disable_host_haltpoll(NULL);
-> -	smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
-> -	preempt_enable();
-> +	smp_call_function_single(cpu, kvm_disable_host_haltpoll, NULL, 1);
->  }
->  EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
->  
-> -void arch_haltpoll_disable(void)
-> +void arch_haltpoll_disable(unsigned int cpu)
->  {
->  	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
->  		return;
->  
-> -	preempt_disable();
->  	/* Enable guest halt poll disables host halt poll */
-> -	kvm_enable_host_haltpoll(NULL);
-> -	smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
-> -	preempt_enable();
-> +	smp_call_function_single(cpu, kvm_enable_host_haltpoll, NULL, 1);
->  }
->  EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
->  #endif
-> diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
-> index 9ac093dcbb01..8baade23f8d0 100644
-> --- a/drivers/cpuidle/cpuidle-haltpoll.c
-> +++ b/drivers/cpuidle/cpuidle-haltpoll.c
-> @@ -11,12 +11,15 @@
->   */
->  
->  #include <linux/init.h>
-> +#include <linux/cpu.h>
->  #include <linux/cpuidle.h>
->  #include <linux/module.h>
->  #include <linux/sched/idle.h>
->  #include <linux/kvm_para.h>
->  #include <linux/cpuidle_haltpoll.h>
->  
-> +static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
-> +
->  static int default_enter_idle(struct cpuidle_device *dev,
->  			      struct cpuidle_driver *drv, int index)
->  {
-> @@ -46,6 +49,48 @@ static struct cpuidle_driver haltpoll_driver = {
->  	.state_count = 2,
+> -	.page_enc_status_hc = svm_page_enc_status_hc
+> +	.page_enc_status_hc = svm_page_enc_status_hc,
+> +	.get_page_enc_bitmap = svm_get_page_enc_bitmap
 >  };
 >  
-> +static int haltpoll_cpu_online(unsigned int cpu)
-> +{
-> +	struct cpuidle_device *dev;
+>  static int __init svm_init(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 6baf48ec0ed4..59ae49b1b914 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4927,6 +4927,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  		r = kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
+>  		break;
+>  	}
+> +	case KVM_GET_PAGE_ENC_BITMAP: {
+> +		struct kvm_page_enc_bitmap bitmap;
 > +
-> +	dev = per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
-> +	if (!dev->registered) {
-> +		dev->cpu = cpu;
-> +		if (cpuidle_register_device(dev)) {
-> +			pr_notice("cpuidle_register_device %d failed!\n", cpu);
-> +			return -EIO;
-> +		}
-> +		arch_haltpoll_enable(cpu);
-> +	}
+> +		r = -EFAULT;
+> +		if (copy_from_user(&bitmap, argp, sizeof(bitmap)))
+> +			goto out;
 > +
-> +	return 0;
-> +}
-> +
-> +static void haltpoll_uninit(void)
-> +{
-> +	unsigned int cpu;
-> +
-> +	cpus_read_lock();
-> +
-> +	for_each_online_cpu(cpu) {
-> +		struct cpuidle_device *dev =
-> +			per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
-> +
-> +		if (!dev->registered)
-> +			continue;
-> +
-> +		arch_haltpoll_disable(cpu);
-> +		cpuidle_unregister_device(dev);
-> +	}
-> +
-> +	cpus_read_unlock();
-> +
-> +	cpuidle_unregister_driver(&haltpoll_driver);
-> +
-> +	free_percpu(haltpoll_cpuidle_devices);
-> +	haltpoll_cpuidle_devices = NULL;
-> +}
-> +
->  static int __init haltpoll_init(void)
->  {
->  	int ret;
-> @@ -56,17 +101,29 @@ static int __init haltpoll_init(void)
->  	if (!kvm_para_available())
->  		return 0;
->  
-> -	ret = cpuidle_register(&haltpoll_driver, NULL);
-> -	if (ret == 0)
-> -		arch_haltpoll_enable();
-> +	ret = cpuidle_register_driver(drv);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	haltpoll_cpuidle_devices = alloc_percpu(struct cpuidle_device);
-> +	if (haltpoll_cpuidle_devices == NULL) {
-> +		cpuidle_unregister_driver(drv);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "idle/haltpoll:online",
-> +				haltpoll_cpu_online, NULL);
-> +	if (ret < 0)
-> +		haltpoll_uninit();
-> +	else
-> +		ret = 0;
->  
->  	return ret;
->  }
->  
->  static void __exit haltpoll_exit(void)
->  {
-> -	arch_haltpoll_disable();
-> -	cpuidle_unregister(&haltpoll_driver);
-> +	haltpoll_uninit();
->  }
->  
->  module_init(haltpoll_init);
-> diff --git a/include/linux/cpuidle_haltpoll.h b/include/linux/cpuidle_haltpoll.h
-> index fe5954c2409e..d50c1e0411a2 100644
-> --- a/include/linux/cpuidle_haltpoll.h
-> +++ b/include/linux/cpuidle_haltpoll.h
-> @@ -5,11 +5,11 @@
->  #ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
->  #include <asm/cpuidle_haltpoll.h>
->  #else
-> -static inline void arch_haltpoll_enable(void)
-> +static inline void arch_haltpoll_enable(unsigned int cpu)
->  {
->  }
->  
-> -static inline void arch_haltpoll_disable(void)
-> +static inline void arch_haltpoll_disable(unsigned int cpu)
->  {
->  }
->  #endif
-> -- 
-> 2.17.1
+> +		r = -ENOTTY;
+> +		if (kvm_x86_ops->get_page_enc_bitmap)
+> +			r = kvm_x86_ops->get_page_enc_bitmap(kvm, &bitmap);
 
-Reviewed-by: Marcelo Tosatti <mtosatti@redhat.com>
+I don't know what tree you've done those patches against but against -rc6+, the
+first argument above needs to be vcpu->kvm:
 
+arch/x86/kvm/x86.c: In function ‘kvm_arch_vcpu_ioctl’:
+arch/x86/kvm/x86.c:4343:41: error: ‘kvm’ undeclared (first use in this function)
+    r = kvm_x86_ops->get_page_enc_bitmap(kvm, &bitmap);
+                                         ^~~
+arch/x86/kvm/x86.c:4343:41: note: each undeclared identifier is reported only once for each function it appears in
+make[2]: *** [scripts/Makefile.build:280: arch/x86/kvm/x86.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [scripts/Makefile.build:497: arch/x86/kvm] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:1083: arch/x86] Error 2
+make: *** Waiting for unfinished jobs....
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Software Solutions Germany GmbH, GF: Felix Imendörffer, HRB 247165, AG München
