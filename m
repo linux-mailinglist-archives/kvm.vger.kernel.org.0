@@ -2,88 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7FB5A1A16
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 14:31:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44835A1A44
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 14:40:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727228AbfH2Mbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 08:31:50 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36572 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727069AbfH2Mbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 08:31:50 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 3226DFB200799E2FEAAB;
-        Thu, 29 Aug 2019 20:31:48 +0800 (CST)
-Received: from [127.0.0.1] (10.74.191.121) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Thu, 29 Aug 2019
- 20:31:45 +0800
-Subject: Re: [PATCH v2 2/6] mdev: Make mdev alias unique among all mdevs
-To:     Parav Pandit <parav@mellanox.com>, <alex.williamson@redhat.com>,
-        <jiri@mellanox.com>, <kwankhede@nvidia.com>, <cohuck@redhat.com>,
-        <davem@davemloft.net>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-References: <20190826204119.54386-1-parav@mellanox.com>
- <20190829111904.16042-1-parav@mellanox.com>
- <20190829111904.16042-3-parav@mellanox.com>
-From:   Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <56a88778-c90e-1ac6-9a31-d1aaa5dec97b@huawei.com>
-Date:   Thu, 29 Aug 2019 20:31:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+        id S1727142AbfH2MkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 08:40:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56736 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725782AbfH2MkV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 08:40:21 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A8CCC3083363;
+        Thu, 29 Aug 2019 12:40:20 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F6C66013A;
+        Thu, 29 Aug 2019 12:40:15 +0000 (UTC)
+Date:   Thu, 29 Aug 2019 14:40:13 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: s390: Test for bad access register and size at
+ the start of S390_MEM_OP
+Message-ID: <20190829144013.322edb0a.cohuck@redhat.com>
+In-Reply-To: <20190829122517.31042-1-thuth@redhat.com>
+References: <20190829122517.31042-1-thuth@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20190829111904.16042-3-parav@mellanox.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.74.191.121]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 29 Aug 2019 12:40:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019/8/29 19:19, Parav Pandit wrote:
-> Mdev alias should be unique among all the mdevs, so that when such alias
-> is used by the mdev users to derive other objects, there is no
-> collision in a given system.
+On Thu, 29 Aug 2019 14:25:17 +0200
+Thomas Huth <thuth@redhat.com> wrote:
+
+> If the KVM_S390_MEM_OP ioctl is called with an access register >= 16,
+> then there is certainly a bug in the calling userspace application.
+> We check for wrong access registers, but only if the vCPU was already
+> in the access register mode before (i.e. the SIE block has recorded
+> it). The check is also buried somewhere deep in the calling chain (in
+> the function ar_translation()), so this is somewhat hard to find.
 > 
-> Signed-off-by: Parav Pandit <parav@mellanox.com>
+> It's better to always report an error to the userspace in case this
+> field is set wrong, and it's safer in the KVM code if we block wrong
+> values here early instead of relying on a check somewhere deep down
+> the calling chain, so let's add another check to kvm_s390_guest_mem_op()
+> directly.
 > 
+> We also should check that the "size" is non-zero here (thanks to Janosch
+> Frank for the hint!). If we do not check the size, we could call vmalloc()
+> with this 0 value, and this will cause a kernel warning.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> Changelog:
-> v1->v2:
->  - Moved alias NULL check at beginning
-> v0->v1:
->  - Fixed inclusiong of alias for NULL check
->  - Added ratelimited debug print for sha1 hash collision error
-> ---
->  drivers/vfio/mdev/mdev_core.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  v2: Check mop->size to be non-zero
 > 
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> index 3bdff0469607..c9bf2ac362b9 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -388,6 +388,13 @@ int mdev_device_create(struct kobject *kobj, struct device *dev,
->  			ret = -EEXIST;
->  			goto mdev_fail;
->  		}
-> +		if (alias && tmp->alias && strcmp(alias, tmp->alias) == 0) {
-
-!strcmp(alias, tmp->alias) is a more common kernel pattern.
-
-Also if we limit max len of the alias in patch 1, maybe use that to limit the
-string compare too.
-
-> +			mutex_unlock(&mdev_list_lock);
-> +			ret = -EEXIST;
-> +			dev_dbg_ratelimited(dev, "Hash collision in alias creation for UUID %pUl\n",
-> +					    uuid);
-> +			goto mdev_fail;
-> +		}
->  	}
+>  arch/s390/kvm/kvm-s390.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index f329dcb3f44c..49d7722229ae 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4255,7 +4255,7 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
+>  	const u64 supported_flags = KVM_S390_MEMOP_F_INJECT_EXCEPTION
+>  				    | KVM_S390_MEMOP_F_CHECK_ONLY;
 >  
->  	mdev = kzalloc(sizeof(*mdev), GFP_KERNEL);
-> 
+> -	if (mop->flags & ~supported_flags)
+> +	if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size)
+>  		return -EINVAL;
+>  
+>  	if (mop->size > MEM_OP_MAX_SIZE)
 
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
