@@ -2,168 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 680B8A1381
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 10:18:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19A40A138A
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 10:23:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727026AbfH2ISi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 04:18:38 -0400
-Received: from foss.arm.com ([217.140.110.172]:40498 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726081AbfH2ISi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 04:18:38 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C78728;
-        Thu, 29 Aug 2019 01:18:37 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8D0483F246;
-        Thu, 29 Aug 2019 01:18:36 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 04/16] arm/arm64: selftest: Add
- prefetch abort test
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        andre.przywara@arm.com, pbonzini@redhat.com
-References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
- <1566999511-24916-5-git-send-email-alexandru.elisei@arm.com>
- <20190828140925.GC41023@lakrids.cambridge.arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <e6b8a3c9-2e11-c806-da5b-8b66d8f63ce3@arm.com>
-Date:   Thu, 29 Aug 2019 09:18:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190828140925.GC41023@lakrids.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        id S1726330AbfH2IXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 04:23:21 -0400
+Received: from mail-eopbgr10099.outbound.protection.outlook.com ([40.107.1.99]:44097
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725782AbfH2IXU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 04:23:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M3ZYvM47F2+QioH738DfKf2/2FVmj0r+upFRboI03M8xCG/Q4ZIJM7PTnvg0f4IG6e0gnD315VB1ksMnYK/7ckDOMkaEUrwFpRuR4Q8x29qw1Ld/20QjqLz4h94ZIXQZ3a0wmYFFHKt+1HiODot/YLe13zg33mhTBIb88ODUqTeIzR0eiCn+F9M45eQROlcPZWtfX1wbxmU8w0WJUZV7qDgsPY0agMToWYY5K+FVmpNzaAz2UxwuHJJpMeOof0zDkHUa9npBoJcm7V0M2LtU/wiCy+hPYqK1ySuHw37y8Qvbi1TVwPeubo6fpgGoi5nAvNyy8BoocOne2tdXKjYjVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oOjr3QaL9caWv5QYfhTa9inH921VgNgBHYPoRqxQsqA=;
+ b=YRf0y/U7fQo7cMJlcczVOYzPv5la5y9bgmPSF5A7Y2CGKEtM8dwIoqH6DYeK/EdSkkZX5eRqWo5WDpJIUmHhaGQnfJYxCK0AxtcwUwG1yK7o3+7LZRijNxh7SSHd/CwN0aqQ4mGrIdbOMdWAh3HFX+qvJQsGr3y88Hq3mD9UQyfdP9PazCoONvjWXlY6WIlRCcfEaYC/nYzbg3KHp1KPowlYnJRwX2ons9l2m4Z4Vtlq2H335FKo0VdkVeY1vZthbh2NCh0FV+BwIl6jBHxdIfNDQX3/wBze9qcKLjPsUGiArLN8+W0KNWlk0Un4Eci0frMHzUKqmAIBPwn+JX3/RQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oOjr3QaL9caWv5QYfhTa9inH921VgNgBHYPoRqxQsqA=;
+ b=brQvV7XaeCZZqlQfRUhCIX47h7yw+S0YnuH6dhaSPvNLUoIcmpDpmtL+DjCTwzsDhvrxbjiPJh+EXU7JlJWpliL4XnVPakA3JQtuZfh9TD79Kf146gRr7E6HwoTyxtbalLq6rjTbw0BGDT0Xy/Z371nGvEvtF/Es/UplU2lFvTw=
+Received: from VI1PR08MB2782.eurprd08.prod.outlook.com (10.170.236.143) by
+ VI1PR08MB3342.eurprd08.prod.outlook.com (52.134.31.141) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2220.18; Thu, 29 Aug 2019 08:23:17 +0000
+Received: from VI1PR08MB2782.eurprd08.prod.outlook.com
+ ([fe80::2969:e370:fb70:71a]) by VI1PR08MB2782.eurprd08.prod.outlook.com
+ ([fe80::2969:e370:fb70:71a%3]) with mapi id 15.20.2178.023; Thu, 29 Aug 2019
+ 08:23:16 +0000
+From:   Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Jan Dakinevich <jan.dakinevich@virtuozzo.com>,
+        Denis Lunev <den@virtuozzo.com>,
+        Roman Kagan <rkagan@virtuozzo.com>,
+        Denis Plotnikov <dplotnikov@virtuozzo.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [PATCH v3 0/2] fix emulation error on Windows bootup
+Thread-Topic: [PATCH v3 0/2] fix emulation error on Windows bootup
+Thread-Index: AQHVXkMCmLX7ptsowU6uxciM+lstmw==
+Date:   Thu, 29 Aug 2019 08:23:16 +0000
+Message-ID: <1567066988-23376-1-git-send-email-jan.dakinevich@virtuozzo.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0274.eurprd05.prod.outlook.com
+ (2603:10a6:3:fc::26) To VI1PR08MB2782.eurprd08.prod.outlook.com
+ (2603:10a6:802:19::15)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jan.dakinevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.1.4
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 76af0b90-7fa4-4b8a-6405-08d72c5a2461
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600166)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:VI1PR08MB3342;
+x-ms-traffictypediagnostic: VI1PR08MB3342:
+x-ms-exchange-purlcount: 2
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR08MB3342B6F9234F50F95F0987568AA20@VI1PR08MB3342.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0144B30E41
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(39850400004)(396003)(366004)(376002)(199004)(189003)(66476007)(66946007)(66556008)(966005)(50226002)(64756008)(66446008)(4744005)(2351001)(2501003)(36756003)(14454004)(8936002)(86362001)(66066001)(81156014)(81166006)(6436002)(5640700003)(6512007)(6306002)(71200400001)(71190400001)(44832011)(486006)(476003)(6916009)(5660300002)(52116002)(54906003)(14444005)(53936002)(102836004)(99286004)(2906002)(6486002)(478600001)(8676002)(6506007)(386003)(2616005)(26005)(186003)(7416002)(305945005)(4326008)(3846002)(25786009)(7736002)(256004)(6116002)(316002);DIR:OUT;SFP:1102;SCL:1;SRVR:VI1PR08MB3342;H:VI1PR08MB2782.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: NExFHAo7/g7fLIRFeE6GMtYfmWh94Odxs8IJlWd2zjSDh3Jq5L/f+6+ys98rfJ/ZYzrkSTpX/+5Q1bvKcSHopCv7xMIVjOrFfv5otXJxbomnJRg7d257y64mcSKYhouuMvMS1OhEcOQY2WIRz4ch2/iJJjepUqK8RElXpKiru5OLDncH8G4fCXBOoJtbnNMyVM4Z8bFqIEJ3LPsFAxZNs0QoJFhDuou7dtvBnXjtHXohXpA5/viiyXp7YYbsFvG1sR/QviGNrptykyexS0k/7u10q8j20pR5zioBQjq2Uc7vM76Vo2waz30g9+NW2BrwgWU0KrO5bPWHKBHGg0snDpXtzIaRdx7t/lENlskauZAhZAV/4EjCyg6pTh4QnaxYxREMiV1nSpYa3JCQ6lno7Gdd6FOV864V5/E/bvJI88U=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76af0b90-7fa4-4b8a-6405-08d72c5a2461
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2019 08:23:16.8203
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tsNzXykSfnMB4/apFFWLx1tbrU1YdmJ5+J2pVLZ3iP3LQecUR5NraprvjkPwxueT+ssl0X8JHWWvOHgW5uLgdOtFpFP8QNEP+xUwCTmIj4E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3342
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/28/19 3:09 PM, Mark Rutland wrote:
-> On Wed, Aug 28, 2019 at 02:38:19PM +0100, Alexandru Elisei wrote:
->> When a guest tries to execute code from MMIO memory, KVM injects an
->> external abort into that guest. We have now fixed the psci test to not
->> fetch instructions from the I/O region, and it's not that often that a
->> guest misbehaves in such a way. Let's expand our coverage by adding a
->> proper test targetting this corner case.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->> The fault injection path is broken for nested guests [1]. You can use the
->> last patch from the thread [2] to successfully run the test at EL2.
->>
->> [1] https://www.spinics.net/lists/arm-kernel/msg745391.html
->> [2] https://www.spinics.net/lists/arm-kernel/msg750310.html
->>
->>  lib/arm64/asm/esr.h |  3 ++
->>  arm/selftest.c      | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++--
->>  2 files changed, 96 insertions(+), 3 deletions(-)
->>
->> diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
->> index 8e5af4d90767..8c351631b0a0 100644
->> --- a/lib/arm64/asm/esr.h
->> +++ b/lib/arm64/asm/esr.h
->> @@ -44,4 +44,7 @@
->>  #define ESR_EL1_EC_BKPT32	(0x38)
->>  #define ESR_EL1_EC_BRK64	(0x3C)
->>  
->> +#define ESR_EL1_FSC_MASK	(0x3F)
->> +#define ESR_EL1_FSC_EXTABT	(0x10)
->> +
->>  #endif /* _ASMARM64_ESR_H_ */
->> diff --git a/arm/selftest.c b/arm/selftest.c
->> index 176231f32ee1..18cc0ad8f729 100644
->> --- a/arm/selftest.c
->> +++ b/arm/selftest.c
->> @@ -16,6 +16,8 @@
->>  #include <asm/psci.h>
->>  #include <asm/smp.h>
->>  #include <asm/barrier.h>
->> +#include <asm/mmu.h>
->> +#include <asm/pgtable.h>
->>  
->>  static void __user_psci_system_off(void)
->>  {
->> @@ -60,9 +62,38 @@ static void check_setup(int argc, char **argv)
->>  		report_abort("missing input");
->>  }
->>  
->> +extern pgd_t *mmu_idmap;
->> +static void prep_io_exec(void)
->> +{
->> +	pgd_t *pgd = pgd_offset(mmu_idmap, 0);
->> +	unsigned long sctlr;
->> +
->> +	/*
->> +	 * AArch64 treats all regions writable at EL0 as PXN.
-> I didn't think that was the case, and I can't find wording to that
-> effect in the ARM ARM (looking at ARM DDI 0487E.a). Where is that
-> stated?
+This series intended to fix (again) a bug that was a subject of the=20
+following change:
 
-It's in ARM DDI 0487E.a, table D5-33, footnote c: "Not executable, because
-AArch64 execution treats all regions writable at EL0 as being PXN". I'll update
-the comment to include the quote.
+  6ea6e84 ("KVM: x86: inject exceptions produced by x86_decode_insn")
 
->
->> Clear the user bit
->> +	 * so we can execute code from the bottom I/O space (0G-1G) to simulate
->> +	 * a misbehaved guest.
->> +	 */
->> +	pgd_val(*pgd) &= ~PMD_SECT_USER;
->> +	flush_dcache_addr((unsigned long)pgd);
-> The virtualization extensions imply coherent page table walks, so I
-> don't think the cache maintenance is necessary (provided
-> TCR_EL1.{SH*,ORGN*,IRGN*} are configured appropriately.
+Suddenly, that fix had a couple mistakes. First, ctxt->have_exception was=20
+not set if fault happened during instruction decoding. Second, returning=20
+value of inject_emulated_instruction was used to make the decision to=20
+reenter guest, but this could happen iff on nested page fault, that is not=
+=20
+the scope where this bug could occur.
 
-I was following the pattern from lib/arm/mmu.c. You are correct, and Linux
-doesn't do any dcache maintenance either (judging by looking at both set_pte
-(for arm64) and various implementations for set_pte_ext (for armv7)).
+v1:
+  https://lkml.org/lkml/2019/8/27/881
 
-For future reference, ARM DDI 0487E.a, in section D13.2.72, states about the
-ID_MMFR3_EL1 register:
+v2:
+  https://lkml.org/lkml/2019/8/28/879
 
-"CohWalk, bits [23:20]
+v3:
+  - do sanity check in caller code
+  - drop patch, that moved emulation_type() function
 
-Coherent Walk. Indicates whether Translation table updates require a clean to
-the Point of Unification. Defined values are:
-0b0000 Updates to the translation tables require a clean to the Point of
-Unification to ensure visibility by subsequent translation table walks.
-0b0001 Updates to the translation tables do not require a clean to the Point of
-Unification to ensure visibility by subsequent translation table walks.
+Jan Dakinevich (2):
+  KVM: x86: always stop emulation on page fault
+  KVM: x86: set ctxt->have_exception in x86_decode_insn()
 
-In Armv8-A the only permitted value is 0b0001."
+ arch/x86/kvm/emulate.c | 2 ++
+ arch/x86/kvm/x86.c     | 7 ++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-For armv7, ARM DDI 0406C.d states in section B3.3.1 Translation table walks:
+--=20
+2.1.4
 
-"If an implementation includes the Multiprocessing Extensions, translation table
-walks must access data or unified caches, or data and unified caches, of other
-agents participating in the coherency protocol, according to the shareability
-attributes described in the  TTBR. These shareability attributes must be
-consistent with the shareability attributes for the translation tables themselves."
-
-and in section B1.7 that virtualization extensions require the multiprocessing
-extensions.
-
-So the dcache maintenance operations are not needed, I'll remove them, thank you
-for pointing this out.
-
-Thanks,
-Alex
->
->> +	flush_tlb_page(0);
->> +
->> +	/* Make sure we can actually execute from a writable region */
->> +#ifdef __arm__
->> +	asm volatile("mrc p15, 0, %0, c1, c0, 0": "=r" (sctlr));
->> +	sctlr &= ~CR_ST;
->> +	asm volatile("mcr p15, 0, %0, c1, c0, 0" :: "r" (sctlr));
->> +#else
->> +	sctlr = read_sysreg(sctlr_el1);
->> +	sctlr &= ~SCTLR_EL1_WXN;
->> +	write_sysreg(sctlr, sctlr_el1);
->> +#endif
->> +	isb();
->> +}
-> Thanks,
-> Mark.
