@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33D85A23D1
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 20:18:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28ADBA2501
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 20:27:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbfH2SSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 14:18:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60594 "EHLO mail.kernel.org"
+        id S1729244AbfH2SPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 14:15:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57096 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729679AbfH2SSV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 14:18:21 -0400
+        id S1729216AbfH2SPW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 14:15:22 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 781A62339E;
-        Thu, 29 Aug 2019 18:18:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E9FB823405;
+        Thu, 29 Aug 2019 18:15:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567102700;
-        bh=LUbZq5RNgQvDztv0DBqWpD+rrSm6QAldMQFxXL2DynQ=;
+        s=default; t=1567102521;
+        bh=xZ797pCM1tLIzZS874oxi5NFfTKdvU9VX9OBr3G4RuE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UHnlYSmTTAPOsDWMjFV4CoWajhA2LZRocJPp1ZU1Q+8731NMy5z8+9THQxHCoVioD
-         eZqtN46iWA+JeiGFq9JTHStnMynMHNc9n3UltiWbHxxSvlxG1spg635LMbRUgNI4Kg
-         9TKV+9gjcm5NPFEyjqjtfsbuGR/TfiXdj1LTUwPs=
+        b=U3tnSUA0O2q1Cj+T8u/OHFEJ1TH+mA/jsmO7VFxICH+vICQcdyO0fQn0HcUPFrjh6
+         lCl4QuwuqfZv/ZNI62UIQUdrnnqvQ4nW8KFP1xQOG4AVlg9etVQMJjq5/VWPArnX0h
+         XekDhGP97sJebplOXcBGCkKfDrn3H8OWhYA5Dwgw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Sasha Levin <sashal@kernel.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 15/15] KVM: arm/arm64: Only skip MMIO insn once
-Date:   Thu, 29 Aug 2019 14:18:02 -0400
-Message-Id: <20190829181802.9619-15-sashal@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 63/76] selftests: kvm: fix state save/load on processors without XSAVE
+Date:   Thu, 29 Aug 2019 14:12:58 -0400
+Message-Id: <20190829181311.7562-63-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190829181802.9619-1-sashal@kernel.org>
-References: <20190829181802.9619-1-sashal@kernel.org>
+In-Reply-To: <20190829181311.7562-1-sashal@kernel.org>
+References: <20190829181311.7562-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -44,56 +43,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Andrew Jones <drjones@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-[ Upstream commit 2113c5f62b7423e4a72b890bd479704aa85c81ba ]
+[ Upstream commit 54577e5018a8c0cb79c9a0fa118a55c68715d398 ]
 
-If after an MMIO exit to userspace a VCPU is immediately run with an
-immediate_exit request, such as when a signal is delivered or an MMIO
-emulation completion is needed, then the VCPU completes the MMIO
-emulation and immediately returns to userspace. As the exit_reason
-does not get changed from KVM_EXIT_MMIO in these cases we have to
-be careful not to complete the MMIO emulation again, when the VCPU is
-eventually run again, because the emulation does an instruction skip
-(and doing too many skips would be a waste of guest code :-) We need
-to use additional VCPU state to track if the emulation is complete.
-As luck would have it, we already have 'mmio_needed', which even
-appears to be used in this way by other architectures already.
+state_test and smm_test are failing on older processors that do not
+have xcr0.  This is because on those processor KVM does provide
+support for KVM_GET/SET_XSAVE (to avoid having to rely on the older
+KVM_GET/SET_FPU) but not for KVM_GET/SET_XCRS.
 
-Fixes: 0d640732dbeb ("arm64: KVM: Skip MMIO insn after emulation")
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/arm/kvm/mmio.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ .../testing/selftests/kvm/lib/x86_64/processor.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index ae61e2ea7255b..d2efc033ef8b4 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -98,6 +98,12 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	unsigned int len;
- 	int mask;
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index d2ad85fb01ac0..5f1ba3da2dbd3 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1059,9 +1059,11 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
+         TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_XSAVE, r: %i",
+                 r);
  
-+	/* Detect an already handled MMIO return */
-+	if (unlikely(!vcpu->mmio_needed))
-+		return 0;
-+
-+	vcpu->mmio_needed = 0;
-+
- 	if (!run->mmio.is_write) {
- 		len = run->mmio.len;
- 		if (len > sizeof(unsigned long))
-@@ -206,6 +212,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	run->mmio.is_write	= is_write;
- 	run->mmio.phys_addr	= fault_ipa;
- 	run->mmio.len		= len;
-+	vcpu->mmio_needed	= 1;
+-	r = ioctl(vcpu->fd, KVM_GET_XCRS, &state->xcrs);
+-        TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_XCRS, r: %i",
+-                r);
++	if (kvm_check_cap(KVM_CAP_XCRS)) {
++		r = ioctl(vcpu->fd, KVM_GET_XCRS, &state->xcrs);
++		TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_XCRS, r: %i",
++			    r);
++	}
  
- 	if (!ret) {
- 		/* We handled the access successfully in the kernel. */
+ 	r = ioctl(vcpu->fd, KVM_GET_SREGS, &state->sregs);
+         TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_SREGS, r: %i",
+@@ -1102,9 +1104,11 @@ void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *s
+         TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XSAVE, r: %i",
+                 r);
+ 
+-	r = ioctl(vcpu->fd, KVM_SET_XCRS, &state->xcrs);
+-        TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XCRS, r: %i",
+-                r);
++	if (kvm_check_cap(KVM_CAP_XCRS)) {
++		r = ioctl(vcpu->fd, KVM_SET_XCRS, &state->xcrs);
++		TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_XCRS, r: %i",
++			    r);
++	}
+ 
+ 	r = ioctl(vcpu->fd, KVM_SET_SREGS, &state->sregs);
+         TEST_ASSERT(r == 0, "Unexpected result from KVM_SET_SREGS, r: %i",
 -- 
 2.20.1
 
