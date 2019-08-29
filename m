@@ -2,130 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E325AA0EED
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 03:30:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1727EA0EEF
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 03:33:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726839AbfH2Bay (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Aug 2019 21:30:54 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:32772 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726369AbfH2Bay (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Aug 2019 21:30:54 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7T1TEvJ057977;
-        Thu, 29 Aug 2019 01:30:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=CtMaeqMXyeB1M8q3REz8poHfRL75Pm+1jHwPSY48jlE=;
- b=p/55GI+dIOX0SGnK57KAX1IePGb2Wx+R/BUsxKZwhrFiyx6K7MrLlO7zM46wozq7k/35
- 2XNoj8YuNklRdH4D7sMeDDLynWQgM/BFT4Me5gFEZ+G59weod5zHfQjEeH5bqweGzFlD
- qtJDMxClVvAHrntCNUgCJ1L73hIltE5QRYiBPqjy6ZU2qFCV/o4fe03XRh/DdN9PCaiz
- DP9H/M/PANSjrMdK39Oh61LJAArOOzuDD8rznzXkJrMpVgzh2yIhj/W7POw0l6LIDZvP
- A2EKzC8VFuq97SH4apxYXbPLT++r/JWHB83bqB3k4bQ4h7YcER5jR0s0eB1vqPfFO7Zm pg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2up509012y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Aug 2019 01:30:32 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7T1SvdY045569;
-        Thu, 29 Aug 2019 01:30:31 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2undw82u1q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Aug 2019 01:30:31 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7T1UUAf028280;
-        Thu, 29 Aug 2019 01:30:30 GMT
-Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 28 Aug 2019 18:30:30 -0700
-Subject: Re: [PATCH 1/7] KVM: nVMX: Use kvm_set_msr to load
- IA32_PERF_GLOBAL_CTRL on vmexit
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        id S1727087AbfH2BdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Aug 2019 21:33:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52322 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726279AbfH2BdE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Aug 2019 21:33:04 -0400
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 844C05AFD9
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 01:33:04 +0000 (UTC)
+Received: by mail-pf1-f198.google.com with SMTP id t14so1153535pfq.15
+        for <kvm@vger.kernel.org>; Wed, 28 Aug 2019 18:33:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=aUCBBKPneUXXEuiCVmgIIBKl8aLO0JeDP2Yet2NAVck=;
+        b=mGdbG+gwSqClXJCB3x2t3W7Va0L5uTbFoHAtDZWxsnUh23m7xBXiVFRp3M7P3Aqqwz
+         yXARf2Cyr8RXiemQk8zcJsD/fafuNg7Soy0rydqR7Q6ioENYCfCmd8LMWHhgzpJoaCE/
+         BzEg8zSnF4LTLAOtt1DmHP7OmPqjT4nV30ZjaZcfsa0Dc2qbl3oHPzU1ES+nm06OlZg9
+         6dOb7NlYRLpzhm1p9BbJuWVZr6qRxpBNTpJU07yODrE+D89jAhgYqtdmRp27NKr8OIzm
+         sXtjqk6vi1mPfFUuXnlC72hHqB/LD3nIE0XNbaZ/2My8BHuxmVKGSaGwxoFjf5ijInss
+         FDNw==
+X-Gm-Message-State: APjAAAVQDY02irx8bqQ+bNrXkQngfiz5SuOg3htCGuqZUJFvKaGURSKD
+        vfpIwwUL4rkrTDYhNLJtkWFbTRT7aNI0P2GOo8h1Mq41ZcF+yFkrXOYSXmD/jckEK588w/q+Izm
+        4jsTBuxxGvQkY
+X-Received: by 2002:a17:902:d888:: with SMTP id b8mr7120265plz.115.1567042383972;
+        Wed, 28 Aug 2019 18:33:03 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzXgHT3ZZzOrcgMNnrLHO3EmcsXzSWvv4Jv9HO8bcFJ2YpIj2kFGw8hf4IW9XwifUfnLSU+5Q==
+X-Received: by 2002:a17:902:d888:: with SMTP id b8mr7120255plz.115.1567042383816;
+        Wed, 28 Aug 2019 18:33:03 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id k14sm394261pgi.20.2019.08.28.18.33.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Aug 2019 18:33:03 -0700 (PDT)
+Date:   Thu, 29 Aug 2019 09:32:53 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
-References: <20190828234134.132704-1-oupton@google.com>
- <20190828234134.132704-2-oupton@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <ed9ae8fc-d4d6-3dde-bac3-3c9068f0fc42@oracle.com>
-Date:   Wed, 28 Aug 2019 18:30:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 0/4] KVM: selftests: Introduce VM_MODE_PXXV48_4K
+Message-ID: <20190829013253.GD8729@xz-x1>
+References: <20190827131015.21691-1-peterx@redhat.com>
+ <20190828115106.2j6n7qust7uceds5@kamzik.brq.redhat.com>
+ <20190828115230.7rctfb2w3whkonp7@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190828234134.132704-2-oupton@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9363 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=4 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908290014
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9363 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=4 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908290014
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190828115230.7rctfb2w3whkonp7@kamzik.brq.redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Aug 28, 2019 at 01:52:30PM +0200, Andrew Jones wrote:
+> On Wed, Aug 28, 2019 at 01:51:06PM +0200, Andrew Jones wrote:
+> > On Tue, Aug 27, 2019 at 09:10:11PM +0800, Peter Xu wrote:
+> > > The work is based on Thomas's s390 port for dirty_log_test.
 
+[1]
 
-On 08/28/2019 04:41 PM, Oliver Upton wrote:
-> The existing implementation for loading the IA32_PERF_GLOBAL_CTRL MSR
-> on VM-exit was incorrect, as the next call to atomic_switch_perf_msrs()
-> could cause this value to be overwritten. Instead, call kvm_set_msr()
-> which will allow atomic_switch_perf_msrs() to correctly set the values.
->
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->   arch/x86/kvm/vmx/nested.c | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index ced9fba32598..b0ca34bf4d21 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3724,6 +3724,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
->   				   struct vmcs12 *vmcs12)
->   {
->   	struct kvm_segment seg;
-> +	struct msr_data msr_info;
->   	u32 entry_failure_code;
->   
->   	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_EFER)
-> @@ -3800,9 +3801,15 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
->   		vmcs_write64(GUEST_IA32_PAT, vmcs12->host_ia32_pat);
->   		vcpu->arch.pat = vmcs12->host_ia32_pat;
->   	}
-> -	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
-> -		vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL,
-> -			vmcs12->host_ia32_perf_global_ctrl);
-> +	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL) {
-> +		msr_info.host_initiated = false;
-> +		msr_info.index = MSR_CORE_PERF_GLOBAL_CTRL;
-> +		msr_info.data = vmcs12->host_ia32_perf_global_ctrl;
-> +		if (kvm_set_msr(vcpu, &msr_info))
-> +			pr_debug_ratelimited(
-> +				"%s cannot write MSR (0x%x, 0x%llx)\n",
-> +				__func__, msr_info.index, msr_info.data);
-> +	}
->   
->   	/* Set L1 segment info according to Intel SDM
->   	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
+> > > 
+> > > This series originates from "[PATCH] KVM: selftests: Detect max PA
+> > > width from cpuid" [1] and one of Drew's comments - instead of keeping
+> > > the hackish line to overwrite guest_pa_bits all the time, this series
+> > > introduced the new mode VM_MODE_PXXV48_4K for x86_64 platform.
+> > > 
+> > > The major issue is that even all the x86_64 kvm selftests are
+> > > currently using the guest mode VM_MODE_P52V48_4K, many x86_64 hosts
+> > > are not using 52 bits PA (and in most cases, far less).  If with luck
+> > > we could be having 48 bits hosts, but it's more adhoc (I've observed 3
+> > > x86_64 systems, they are having different PA width of 36, 39, 48).  I
+> > > am not sure whether this is happening to the other archs as well, but
+> > > it probably makes sense to bring the x86_64 tests to the real world on
+> > > always using the correct PA bits.
+> > > 
+> > > A side effect of this series is that it will also fix the crash we've
+> > > encountered on Xeon E3-1220 as mentioned [1] due to the
+> > > differenciation of PA width.
+> > > 
+> > > With [1], we've observed AMD host issues when with NPT=off.  However a
+> > > funny fact is that after I reworked into this series, the tests can
+> > > instead pass on both NPT=on/off.  It could be that the series changes
+> > > vm->pa_bits or other fields so something was affected.  I didn't dig
+> > > more on that though, considering we should not lose anything.
+> > > 
+> > > Any kind of smoke test would be greatly welcomed (especially on s390
+> > > or ARM).  Same to comments.  Thanks,
+> > > 
+> > 
+> > The patches didn't apply cleanly for me on 9e8312f5e160, but once I got
+> > them applied I was able to run the aarch64 tests.
 
-These patches are what I am already working on. I sent the following:
+Right, because I applied Thomas's s390x port as base [1], considering
+that that one should reach kvm/queue earlier (should be in the
+submaintainer's tree and waiting for a pull).  Maybe I should post
+against the current kvm/queue next time?  After all this series does
+not modify anything of the s390x work so the conflict should be
+trivial.
 
-         [KVM nVMX]: Check "load IA32_PERF_GLOBAL_CTRL" on vmentry of 
-nested guests
-         [PATCH 0/4][kvm-unit-test nVMX]: Test "load 
-IA32_PERF_GLOBAL_CONTROL" VM-entry control on vmentry of nested guests
+> 
+> Oh, and after fixing 2/4 (vm->pa_bits) to fix compilation on aarch64 as
+> pointed out on that patch.
 
-a few months back. I got feedback from the alias and am working on v2 
-which I will send soon...
+Thanks for verifying and reviews!  Yes I'll fix that up.
+
+Regards,
+
+-- 
+Peter Xu
