@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB0CFA1B9C
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 15:38:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A513A1BC0
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 15:45:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727235AbfH2Ni5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 09:38:57 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9998 "EHLO
+        id S1727252AbfH2NpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 09:45:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19932 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727063AbfH2Ni5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Aug 2019 09:38:57 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7TDcL8w069439
-        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 09:38:55 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2upfs180u8-1
+        by vger.kernel.org with ESMTP id S1727176AbfH2NpB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Aug 2019 09:45:01 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7TDirFT124228
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 09:45:00 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2upeaq41mu-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 09:38:55 -0400
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 09:44:57 -0400
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 29 Aug 2019 14:38:53 +0100
+        Thu, 29 Aug 2019 14:44:41 +0100
 Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 29 Aug 2019 14:38:50 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7TDcmNd34603160
+        Thu, 29 Aug 2019 14:44:39 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7TDicwQ43450592
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Aug 2019 13:38:48 GMT
+        Thu, 29 Aug 2019 13:44:38 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2FA442042;
-        Thu, 29 Aug 2019 13:38:48 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0CAA042047;
+        Thu, 29 Aug 2019 13:44:38 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D45642049;
-        Thu, 29 Aug 2019 13:38:48 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id AAC1F42049;
+        Thu, 29 Aug 2019 13:44:37 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.51])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 29 Aug 2019 13:38:48 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: improve documentation for S390_MEM_OP
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190829124746.28665-1-cohuck@redhat.com>
+        Thu, 29 Aug 2019 13:44:37 +0000 (GMT)
+Subject: Re: [PATCH v3] KVM: selftests: Add a test for the KVM_S390_MEM_OP
+ ioctl
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+References: <20190829130732.580-1-thuth@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -93,69 +93,231 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Thu, 29 Aug 2019 15:38:48 +0200
+Date:   Thu, 29 Aug 2019 15:44:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190829124746.28665-1-cohuck@redhat.com>
+In-Reply-To: <20190829130732.580-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19082913-0012-0000-0000-0000034445B3
+x-cbid: 19082913-0028-0000-0000-000003954736
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19082913-0013-0000-0000-0000217E8691
-Message-Id: <ee1947e5-f34b-de7f-23b6-a3028c91a9e2@de.ibm.com>
+x-cbparentid: 19082913-0029-0000-0000-0000245787CC
+Message-Id: <0cc74231-d01e-2b2c-5f6d-252f328e547d@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-29_06:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=835 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908290150
+ mlxlogscore=997 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908290151
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks applied. 
+thanks applied. 
 
-On 29.08.19 14:47, Cornelia Huck wrote:
-> Explicitly specify the valid ranges for size and ar, and reword
-> buf requirements a bit.
+On 29.08.19 15:07, Thomas Huth wrote:
+> Check that we can write and read the guest memory with this s390x
+> ioctl, and that some error cases are handled correctly.
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-> supposed to go on top of "KVM: s390: Test for bad access register and
-> size at the start of S390_MEM_OP" (<20190829122517.31042-1-thuth@redhat.com>)
-> ---
->  Documentation/virt/kvm/api.txt | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
+>  v3:
+>  - Replaced wrong copy-n-pasted report string with a proper one
+>  - Check for errno after calling the ioctl with size = 0
+>  
+>  tools/testing/selftests/kvm/Makefile      |   1 +
+>  tools/testing/selftests/kvm/s390x/memop.c | 166 ++++++++++++++++++++++
+>  2 files changed, 167 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/s390x/memop.c
 > 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index 2d067767b617..76c9d6fdbfdb 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -3079,12 +3079,14 @@ This exception is also raised directly at the corresponding VCPU if the
->  flag KVM_S390_MEMOP_F_INJECT_EXCEPTION is set in the "flags" field.
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 1b48a94b4350..62c591f87dab 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -32,6 +32,7 @@ TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
 >  
->  The start address of the memory region has to be specified in the "gaddr"
-> -field, and the length of the region in the "size" field. "buf" is the buffer
-> -supplied by the userspace application where the read data should be written
-> -to for KVM_S390_MEMOP_LOGICAL_READ, or where the data that should be written
-> -is stored for a KVM_S390_MEMOP_LOGICAL_WRITE. "buf" is unused and can be NULL
-> -when KVM_S390_MEMOP_F_CHECK_ONLY is specified. "ar" designates the access
-> -register number to be used.
-> +field, and the length of the region in the "size" field (which must not
-> +be 0). The maximum value for "size" can be obtained by checking the
-> +KVM_CAP_S390_MEM_OP capability. "buf" is the buffer supplied by the
-> +userspace application where the read data should be written to for
-> +KVM_S390_MEMOP_LOGICAL_READ, or where the data that should be written is
-> +stored for a KVM_S390_MEMOP_LOGICAL_WRITE. When KVM_S390_MEMOP_F_CHECK_ONLY
-> +is specified, "buf" is unused and can be NULL. "ar" designates the access
-> +register number to be used; the valid range is 0..15.
->  
->  The "reserved" field is meant for future extensions. It is not used by
->  KVM with the currently defined set of flags.
+> +TEST_GEN_PROGS_s390x = s390x/memop
+>  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>  TEST_GEN_PROGS_s390x += dirty_log_test
+>  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+> new file mode 100644
+> index 000000000000..9edaa9a134ce
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> @@ -0,0 +1,166 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Test for s390x KVM_S390_MEM_OP
+> + *
+> + * Copyright (C) 2019, Red Hat, Inc.
+> + */
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <sys/ioctl.h>
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +
+> +#define VCPU_ID 1
+> +
+> +static uint8_t mem1[65536];
+> +static uint8_t mem2[65536];
+> +
+> +static void guest_code(void)
+> +{
+> +	int i;
+> +
+> +	for (;;) {
+> +		for (i = 0; i < sizeof(mem2); i++)
+> +			mem2[i] = mem1[i];
+> +		GUEST_SYNC(0);
+> +	}
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_run *run;
+> +	struct kvm_s390_mem_op ksmo;
+> +	int rv, i, maxsize;
+> +
+> +	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
+> +
+> +	maxsize = kvm_check_cap(KVM_CAP_S390_MEM_OP);
+> +	if (!maxsize) {
+> +		fprintf(stderr, "CAP_S390_MEM_OP not supported -> skip test\n");
+> +		exit(KSFT_SKIP);
+> +	}
+> +	if (maxsize > sizeof(mem1))
+> +		maxsize = sizeof(mem1);
+> +
+> +	/* Create VM */
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +	run = vcpu_state(vm, VCPU_ID);
+> +
+> +	for (i = 0; i < sizeof(mem1); i++)
+> +		mem1[i] = i * i + i;
+> +
+> +	/* Set the first array */
+> +	ksmo.gaddr = addr_gva2gpa(vm, (uintptr_t)mem1);
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +
+> +	/* Let the guest code copy the first array to the second */
+> +	vcpu_run(vm, VCPU_ID);
+> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_S390_SIEIC,
+> +		    "Unexpected exit reason: %u (%s)\n",
+> +		    run->exit_reason,
+> +		    exit_reason_str(run->exit_reason));
+> +
+> +	memset(mem2, 0xaa, sizeof(mem2));
+> +
+> +	/* Get the second array */
+> +	ksmo.gaddr = (uintptr_t)mem2;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_READ;
+> +	ksmo.buf = (uintptr_t)mem2;
+> +	ksmo.ar = 0;
+> +	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +
+> +	TEST_ASSERT(!memcmp(mem1, mem2, maxsize),
+> +		    "Memory contents do not match!");
+> +
+> +	/* Check error conditions - first bad size: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = -1;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
+> +
+> +	/* Zero size: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = 0;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && (errno == EINVAL || errno == ENOMEM),
+> +		    "ioctl allows 0 as size");
+> +
+> +	/* Bad flags: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = -1;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags");
+> +
+> +	/* Bad operation: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = -1;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows bad operations");
+> +
+> +	/* Bad guest address: */
+> +	ksmo.gaddr = ~0xfffUL;
+> +	ksmo.flags = KVM_S390_MEMOP_F_CHECK_ONLY;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
+> +
+> +	/* Bad host address: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = 0;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EFAULT,
+> +		    "ioctl does not report bad host memory address");
+> +
+> +	/* Bad access register: */
+> +	run->psw_mask &= ~(3UL << (63 - 17));
+> +	run->psw_mask |= 1UL << (63 - 17);  /* Enable AR mode */
+> +	vcpu_run(vm, VCPU_ID);              /* To sync new state to SIE block */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 17;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows ARs > 15");
+> +	run->psw_mask &= ~(3UL << (63 - 17));   /* Disable AR mode */
+> +	vcpu_run(vm, VCPU_ID);                  /* Run to sync new state */
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
 > 
 
