@@ -2,255 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79A09A1C0C
-	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 15:57:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2B80A1C0F
+	for <lists+kvm@lfdr.de>; Thu, 29 Aug 2019 15:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728371AbfH2N53 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 09:57:29 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:1261 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728372AbfH2N52 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 09:57:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1567087047; x=1598623047;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=i0dBuMtm4qYdmPHDPdzjlUG780xav8sFb1mfXlmWgr8=;
-  b=rFE6Sqi7GwIgS/OgWbWpCiOOtWnACdpZRoKhHfMwEwGxen9mFN7Yqndb
-   DkJOiezhOzCYnqOsopHK5n8eCukTHlvanXkketOZquIEpyMTw5IUeTNIH
-   cu3r4ITftImJpVCgqjpWRTFzWW6QpYHt24HTQoJWrP5rR8REfyG7bRGak
-   XRDAXrlx2hduNQ5VvmiJaAmTeN17cB9Rp1FloYkPNrUK930fgmZQe/4h2
-   RGMJsqktqH1p1w+YyBHoYBvuTiwUrr2/hNwmJ/Oh3+PPjsfQ/1Y1zZ0yG
-   o7PjZoGMeQfT6MtyEv/ONPxGJ7Nl3enLhd/ISpVKjc8mG23VKpFmHfn3q
-   g==;
-IronPort-SDR: wIf5S7IsoY6HEDk91Hb754q+ry0sE4X4hwmg4pqwUaFPAOehmO0BhGyjpGp4NhIyEabC5YFLQ0
- ILoWkXPt2pXMJ+zhZQzurPSXtlegEbQdiiu3D3u7aVIz03KZqzhkYuwewwiC9HY9cQRfv+Em3P
- 6zOgsuBVuHi2LkSEvIushigmEtQWv0uSnLx+dqmJGU5s2znks6PBuBwfBUDUpldQ72asNjFKFA
- 6KvVU5JxIIfdiS4AJYmOU/NKBULQO0m9/PCMnbkqzPRCIj1PjZRssu2Ynd1K9o07NpkzTXKoap
- EG0=
-X-IronPort-AV: E=Sophos;i="5.64,443,1559491200"; 
-   d="scan'208";a="117866048"
-Received: from mail-co1nam04lp2059.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.59])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Aug 2019 21:57:26 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XYNNB1guBpzIyQTZ/zqi9zPHoe9HUWXJgLxEKxf7fqLyjwR1dVzDDVFl/PcjnphI24ZQ715kGCfd7FJt1y5oui78uKZMNuC8RRT+sBaolf/BgaJK/Vmc3FrZsAE35waOgnsv4u/erMHY551QAMpOUKMFEL/i2L8caqLTnaHMIQU+uFaXQxM+CBut/BAQCYhQ9dQ9k93acapKQ7WAE4AbdRlLjxC+9ZQS6pdYq2oVk9+MO1YLSgIA27yxGWqXjtNhEEkoK6+7/trimJH2LIkw3F/KRVwce3HV8ZXrMK0OH8EWujAkVb6gzXqJxjfUim6pHXDmvEcy/HjR25Ecz1IJ9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6V1q6hJtlrVrDqgWao5UQv7SJqACoYta45fGWJ5PcbU=;
- b=XHPUClx/uuagQ+juIGBKEwxCFUrR/eqsSEyyC0HCipDunILgb1AST1mEWXYI1qtkiAEbfIPBllcX9Z/VoqfKUTeKGwxGb+mjoE/xn3UqIxb7avCsP2gjt4t052qaOjP2uUPkg9dSV5SYBDcJOBRtiOd9Y+tNPh2SzW3rMlWq8i4n48Zg/6No9M6YinSlhlzWccgNKxgrAGV07Iuxpe4fWX5GQwpX2qSFAYulRoHvBm2hlgHtXCQ+SnDuJZP6Kk6pjPQgvWu5OLISmOrQJTLcUfP1FTMlUdKp0XSLTpYCryJ1YwAmqS8xvceSA096KcBvl7CeIGiX4784f+L/xTpJSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6V1q6hJtlrVrDqgWao5UQv7SJqACoYta45fGWJ5PcbU=;
- b=oLReDMEc5JT5fJNgatdbGsez+NAb55AdL0GzryemUCNXc8v9nPcJs5E+jd7NRFvI0JM3ZSXIYYQETU9rcEiS3mVLBkXZmgL6/u9hZfRdArtPtfCFQh524pmXXdmvXkwpJKBkJvQ8B5b46Sw//k5np9Gc0GN065xml4N4q1r03ao=
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
- MN2PR04MB6255.namprd04.prod.outlook.com (20.178.245.75) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2199.21; Thu, 29 Aug 2019 13:57:25 +0000
-Received: from MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::e1a5:8de2:c3b1:3fb0]) by MN2PR04MB6061.namprd04.prod.outlook.com
- ([fe80::e1a5:8de2:c3b1:3fb0%7]) with mapi id 15.20.2220.013; Thu, 29 Aug 2019
- 13:57:25 +0000
-From:   Anup Patel <Anup.Patel@wdc.com>
-To:     Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>
-CC:     Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Anup Patel <Anup.Patel@wdc.com>
-Subject: [PATCH v6 20/21] RISC-V: Enable VIRTIO drivers in RV64 and RV32
- defconfig
-Thread-Topic: [PATCH v6 20/21] RISC-V: Enable VIRTIO drivers in RV64 and RV32
- defconfig
-Thread-Index: AQHVXnGvxSf/dwB1Z0WFAAkZdKW5Yg==
-Date:   Thu, 29 Aug 2019 13:57:25 +0000
-Message-ID: <20190829135427.47808-21-anup.patel@wdc.com>
-References: <20190829135427.47808-1-anup.patel@wdc.com>
-In-Reply-To: <20190829135427.47808-1-anup.patel@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: MAXPR0101CA0072.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:e::34) To MN2PR04MB6061.namprd04.prod.outlook.com
- (2603:10b6:208:d8::15)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Anup.Patel@wdc.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [49.207.51.114]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1be532b2-fad1-4b0b-6af7-08d72c88d231
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:MN2PR04MB6255;
-x-ms-traffictypediagnostic: MN2PR04MB6255:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB625566EDB7800C69B3558EF98DA20@MN2PR04MB6255.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:238;
-x-forefront-prvs: 0144B30E41
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(39860400002)(366004)(396003)(346002)(376002)(136003)(199004)(189003)(446003)(55236004)(11346002)(76176011)(386003)(2616005)(53936002)(36756003)(25786009)(5660300002)(4326008)(6436002)(316002)(6486002)(99286004)(6506007)(71190400001)(256004)(14444005)(6512007)(486006)(52116002)(2906002)(476003)(1076003)(102836004)(478600001)(81166006)(81156014)(110136005)(8676002)(54906003)(26005)(66446008)(64756008)(66556008)(66476007)(86362001)(7416002)(6116002)(50226002)(7736002)(14454004)(3846002)(66066001)(8936002)(44832011)(71200400001)(66946007)(186003)(305945005);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB6255;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: HQp4zBRKubr6430BQXu9ixiJBDfv8ofyssd+41XkYx18FnvGw7O2v6LBcvovDNi3RSgoEP2I65fTfZFH4BWGIC+OlgeY0VlkbhAOEk7IugrUhG9BzwZHhGkidoHYdp1QpKgcSji96hoCogZWT7KQMG3oqmSW4NTl1Cpno3/WayaIJWw7pKSEBNBJDb9p5guXIwsd2ODcbT7/6K2XpNXJkIcs9JqT4if+otf/B4YcUvJIJdbv4wxmi41nKDYMJDI4cjXXwD38kjAbvRg3VZvWJgYVrO2U2tmPXY26J58MZZ7uIk7mu5ZFoKuEEynpgC5ZC5OVuVtBLVk90rJdEvcgwFv+QywwPYK3mA382hwH+kzy+n4syX3bK256o2noo1AkWBEeq3AYiCnLC62rVs+CNZX2KlAANSWNkTP3mYt34cQ=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        id S1728444AbfH2N5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 09:57:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1515 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728437AbfH2N5a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 09:57:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5BF2C190C027;
+        Thu, 29 Aug 2019 13:57:30 +0000 (UTC)
+Received: from [10.36.117.243] (ovpn-117-243.ams2.redhat.com [10.36.117.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AB1A6060D;
+        Thu, 29 Aug 2019 13:57:28 +0000 (UTC)
+Subject: Re: [PATCH v2] KVM: s390: Test for bad access register and size at
+ the start of S390_MEM_OP
+To:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190829122517.31042-1-thuth@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <36ce3dc8-486b-05ce-b906-6ea6b5584bf7@redhat.com>
+Date:   Thu, 29 Aug 2019 15:57:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1be532b2-fad1-4b0b-6af7-08d72c88d231
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2019 13:57:25.1142
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wEkMGEbeodsh8FcoLIN4brDLTthjn2b1z/FZTJN9JKth8a1fd0hINACizehUkcz9fzfT5uFX/KLyubyiKyinLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6255
+In-Reply-To: <20190829122517.31042-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Thu, 29 Aug 2019 13:57:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch enables more VIRTIO drivers (such as console, rpmsg, 9p,
-rng, etc.) which are usable on KVM RISC-V Guest and Xvisor RISC-V
-Guest.
+On 29.08.19 14:25, Thomas Huth wrote:
+> If the KVM_S390_MEM_OP ioctl is called with an access register >= 16,
+> then there is certainly a bug in the calling userspace application.
+> We check for wrong access registers, but only if the vCPU was already
+> in the access register mode before (i.e. the SIE block has recorded
+> it). The check is also buried somewhere deep in the calling chain (in
+> the function ar_translation()), so this is somewhat hard to find.
+> 
+> It's better to always report an error to the userspace in case this
+> field is set wrong, and it's safer in the KVM code if we block wrong
+> values here early instead of relying on a check somewhere deep down
+> the calling chain, so let's add another check to kvm_s390_guest_mem_op()
+> directly.
+> 
+> We also should check that the "size" is non-zero here (thanks to Janosch
+> Frank for the hint!). If we do not check the size, we could call vmalloc()
+> with this 0 value, and this will cause a kernel warning.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2: Check mop->size to be non-zero
+> 
+>  arch/s390/kvm/kvm-s390.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index f329dcb3f44c..49d7722229ae 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4255,7 +4255,7 @@ static long kvm_s390_guest_mem_op(struct kvm_vcpu *vcpu,
+>  	const u64 supported_flags = KVM_S390_MEMOP_F_INJECT_EXCEPTION
+>  				    | KVM_S390_MEMOP_F_CHECK_ONLY;
+>  
+> -	if (mop->flags & ~supported_flags)
+> +	if (mop->flags & ~supported_flags || mop->ar >= NUM_ACRS || !mop->size)
+>  		return -EINVAL;
+>  
+>  	if (mop->size > MEM_OP_MAX_SIZE)
+> 
 
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alexander Graf <graf@amazon.com>
----
- arch/riscv/configs/defconfig      | 11 +++++++++++
- arch/riscv/configs/rv32_defconfig | 11 +++++++++++
- 2 files changed, 22 insertions(+)
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
-index 3efff552a261..420a0dbef386 100644
---- a/arch/riscv/configs/defconfig
-+++ b/arch/riscv/configs/defconfig
-@@ -29,6 +29,8 @@ CONFIG_IP_PNP_DHCP=3Dy
- CONFIG_IP_PNP_BOOTP=3Dy
- CONFIG_IP_PNP_RARP=3Dy
- CONFIG_NETLINK_DIAG=3Dy
-+CONFIG_NET_9P=3Dy
-+CONFIG_NET_9P_VIRTIO=3Dy
- CONFIG_PCI=3Dy
- CONFIG_PCIEPORTBUS=3Dy
- CONFIG_PCI_HOST_GENERIC=3Dy
-@@ -39,6 +41,7 @@ CONFIG_BLK_DEV_LOOP=3Dy
- CONFIG_VIRTIO_BLK=3Dy
- CONFIG_BLK_DEV_SD=3Dy
- CONFIG_BLK_DEV_SR=3Dy
-+CONFIG_SCSI_VIRTIO=3Dy
- CONFIG_ATA=3Dy
- CONFIG_SATA_AHCI=3Dy
- CONFIG_SATA_AHCI_PLATFORM=3Dy
-@@ -54,6 +57,7 @@ CONFIG_SERIAL_8250_CONSOLE=3Dy
- CONFIG_SERIAL_OF_PLATFORM=3Dy
- CONFIG_SERIAL_EARLYCON_RISCV_SBI=3Dy
- CONFIG_HVC_RISCV_SBI=3Dy
-+CONFIG_VIRTIO_CONSOLE=3Dy
- CONFIG_HW_RANDOM=3Dy
- CONFIG_HW_RANDOM_VIRTIO=3Dy
- CONFIG_SPI=3Dy
-@@ -61,6 +65,7 @@ CONFIG_SPI_SIFIVE=3Dy
- # CONFIG_PTP_1588_CLOCK is not set
- CONFIG_DRM=3Dy
- CONFIG_DRM_RADEON=3Dy
-+CONFIG_DRM_VIRTIO_GPU=3Dy
- CONFIG_FRAMEBUFFER_CONSOLE=3Dy
- CONFIG_USB=3Dy
- CONFIG_USB_XHCI_HCD=3Dy
-@@ -73,7 +78,12 @@ CONFIG_USB_STORAGE=3Dy
- CONFIG_USB_UAS=3Dy
- CONFIG_MMC=3Dy
- CONFIG_MMC_SPI=3Dy
-+CONFIG_VIRTIO_PCI=3Dy
-+CONFIG_VIRTIO_BALLOON=3Dy
-+CONFIG_VIRTIO_INPUT=3Dy
- CONFIG_VIRTIO_MMIO=3Dy
-+CONFIG_RPMSG_CHAR=3Dy
-+CONFIG_RPMSG_VIRTIO=3Dy
- CONFIG_EXT4_FS=3Dy
- CONFIG_EXT4_FS_POSIX_ACL=3Dy
- CONFIG_AUTOFS4_FS=3Dy
-@@ -86,6 +96,7 @@ CONFIG_NFS_V4=3Dy
- CONFIG_NFS_V4_1=3Dy
- CONFIG_NFS_V4_2=3Dy
- CONFIG_ROOT_NFS=3Dy
-+CONFIG_9P_FS=3Dy
- CONFIG_CRYPTO_USER_API_HASH=3Dy
- CONFIG_CRYPTO_DEV_VIRTIO=3Dy
- CONFIG_PRINTK_TIME=3Dy
-diff --git a/arch/riscv/configs/rv32_defconfig b/arch/riscv/configs/rv32_de=
-fconfig
-index 7da93e494445..87ee6e62b64b 100644
---- a/arch/riscv/configs/rv32_defconfig
-+++ b/arch/riscv/configs/rv32_defconfig
-@@ -29,6 +29,8 @@ CONFIG_IP_PNP_DHCP=3Dy
- CONFIG_IP_PNP_BOOTP=3Dy
- CONFIG_IP_PNP_RARP=3Dy
- CONFIG_NETLINK_DIAG=3Dy
-+CONFIG_NET_9P=3Dy
-+CONFIG_NET_9P_VIRTIO=3Dy
- CONFIG_PCI=3Dy
- CONFIG_PCIEPORTBUS=3Dy
- CONFIG_PCI_HOST_GENERIC=3Dy
-@@ -39,6 +41,7 @@ CONFIG_BLK_DEV_LOOP=3Dy
- CONFIG_VIRTIO_BLK=3Dy
- CONFIG_BLK_DEV_SD=3Dy
- CONFIG_BLK_DEV_SR=3Dy
-+CONFIG_SCSI_VIRTIO=3Dy
- CONFIG_ATA=3Dy
- CONFIG_SATA_AHCI=3Dy
- CONFIG_SATA_AHCI_PLATFORM=3Dy
-@@ -54,11 +57,13 @@ CONFIG_SERIAL_8250_CONSOLE=3Dy
- CONFIG_SERIAL_OF_PLATFORM=3Dy
- CONFIG_SERIAL_EARLYCON_RISCV_SBI=3Dy
- CONFIG_HVC_RISCV_SBI=3Dy
-+CONFIG_VIRTIO_CONSOLE=3Dy
- CONFIG_HW_RANDOM=3Dy
- CONFIG_HW_RANDOM_VIRTIO=3Dy
- # CONFIG_PTP_1588_CLOCK is not set
- CONFIG_DRM=3Dy
- CONFIG_DRM_RADEON=3Dy
-+CONFIG_DRM_VIRTIO_GPU=3Dy
- CONFIG_FRAMEBUFFER_CONSOLE=3Dy
- CONFIG_USB=3Dy
- CONFIG_USB_XHCI_HCD=3Dy
-@@ -69,7 +74,12 @@ CONFIG_USB_OHCI_HCD=3Dy
- CONFIG_USB_OHCI_HCD_PLATFORM=3Dy
- CONFIG_USB_STORAGE=3Dy
- CONFIG_USB_UAS=3Dy
-+CONFIG_VIRTIO_PCI=3Dy
-+CONFIG_VIRTIO_BALLOON=3Dy
-+CONFIG_VIRTIO_INPUT=3Dy
- CONFIG_VIRTIO_MMIO=3Dy
-+CONFIG_RPMSG_CHAR=3Dy
-+CONFIG_RPMSG_VIRTIO=3Dy
- CONFIG_SIFIVE_PLIC=3Dy
- CONFIG_EXT4_FS=3Dy
- CONFIG_EXT4_FS_POSIX_ACL=3Dy
-@@ -83,6 +93,7 @@ CONFIG_NFS_V4=3Dy
- CONFIG_NFS_V4_1=3Dy
- CONFIG_NFS_V4_2=3Dy
- CONFIG_ROOT_NFS=3Dy
-+CONFIG_9P_FS=3Dy
- CONFIG_CRYPTO_USER_API_HASH=3Dy
- CONFIG_CRYPTO_DEV_VIRTIO=3Dy
- CONFIG_PRINTK_TIME=3Dy
---=20
-2.17.1
+-- 
 
+Thanks,
+
+David / dhildenb
