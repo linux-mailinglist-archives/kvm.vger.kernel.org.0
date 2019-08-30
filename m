@@ -2,114 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E463A2F93
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 08:15:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 234CAA32B9
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 10:35:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727054AbfH3GPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 02:15:50 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:46690 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbfH3GPu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 02:15:50 -0400
-Received: by mail-pg1-f196.google.com with SMTP id m3so2968695pgv.13;
-        Thu, 29 Aug 2019 23:15:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=YekfysBZuovI4KweYbSp+YMJszBxYODg0IxHNTmJQ8E=;
-        b=Kr+M4nQOtok8bD8+12TPilMjdoBJsFwAsp+b015vBrQIkrHgWTuAfGUfGHqhNiWeqJ
-         pz43SDnYa7KQKzpSTeuTbJEP/EbeDlMZ+sKxIzrdFZQNyKQ2MYGRHSZHo23DWscKbRiC
-         0Ip9sxzljSjj3ET6dEINHOdYMZLgrQ/bIDRLT5wi/62jlumgwyzKIkJNPZH+eTaS8BxK
-         ra9KGpVzDdAJHeqBbADm5KDZhQzz4WcLqwdWVQeNW9RbiHD3cyUX362exKYIVP8YYvUT
-         rORqS2xvu1ZCcJgeU70+tkMaK6zJTfq/Eo+3oYs2ASqHG9+HMfZD6y6hMpEbcP1AlT7g
-         iDFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=YekfysBZuovI4KweYbSp+YMJszBxYODg0IxHNTmJQ8E=;
-        b=DNsMWgh/d69y6M8MkTGWW8gGD+zPTa/P/c4xcYJJiaESiyYqq4hbgZc6GA3VVJXwld
-         xHSrBjI4pwr1VRxLHp6CvheBTZ7AMEDfkeOTs5D/lk9cYJvPOSWqJdUyyWky3S7CjkUm
-         QTTqxSeg1eEh2beUReTqfqvPeCoMG/xYm5626rCTgKZ829glNGjwNyoLvlHr7zvBZn7H
-         2efYY9bfUZn8+jbREYgUah5wSZRtcbfiKR/wL8E7l4wipTBMBNvSWSZSD1Fa5M8kcWH6
-         FPqaco44c0frwJC8gRI2epundWRB+K5MZC78d1AbOh99dFTndxcmWwS6LQbKB3Oy0ujS
-         qXBA==
-X-Gm-Message-State: APjAAAXqoQwKwHZQdazhMQnGMtRXl5aeqADmfwTaPQinUsf/GVJd0Pr4
-        9aF8o0RyVlnoXm2/epZnkryL/FH6uoA=
-X-Google-Smtp-Source: APXvYqwy2fIk8aReh79zAPMFA3zqOX/2l3fVr7CgROjNe57pxsafRfxrGYWtiD4cacLhiz1E8k0eLw==
-X-Received: by 2002:a63:3fc9:: with SMTP id m192mr11884742pga.429.1567145749714;
-        Thu, 29 Aug 2019 23:15:49 -0700 (PDT)
-Received: from localhost.corp.microsoft.com ([167.220.255.52])
-        by smtp.googlemail.com with ESMTPSA id h70sm4291506pgc.36.2019.08.29.23.15.45
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 29 Aug 2019 23:15:49 -0700 (PDT)
-From:   lantianyu1986@gmail.com
-X-Google-Original-From: Tianyu.Lan@microsoft.com
-To:     kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
-        sashal@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        gregkh@linuxfoundation.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, michael.h.kelley@microsoft.com
-Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH] x86/Hyper-V: Fix overflow issue in the fill_gva_list()
-Date:   Fri, 30 Aug 2019 14:15:40 +0800
-Message-Id: <20190830061540.211072-1-Tianyu.Lan@microsoft.com>
-X-Mailer: git-send-email 2.14.5
+        id S1727864AbfH3IfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 04:35:18 -0400
+Received: from foss.arm.com ([217.140.110.172]:56004 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726653AbfH3IfS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 04:35:18 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE18D344;
+        Fri, 30 Aug 2019 01:35:17 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 689183F718;
+        Fri, 30 Aug 2019 01:35:16 -0700 (PDT)
+Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20190821153656.33429-1-steven.price@arm.com>
+ <20190821153656.33429-2-steven.price@arm.com>
+ <20190829171548.xfk7i2bwnwl4w2po@kamzik.brq.redhat.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <22fc60f0-e3d5-900d-c067-007c39485ba9@arm.com>
+Date:   Fri, 30 Aug 2019 09:35:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190829171548.xfk7i2bwnwl4w2po@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+On 29/08/2019 18:15, Andrew Jones wrote:
+> On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
+>> Introduce a paravirtualization interface for KVM/arm64 based on the
+>> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
+>>
+>> This only adds the details about "Stolen Time" as the details of "Live
+>> Physical Time" have not been fully agreed.
+>>
+>> User space can specify a reserved area of memory for the guest and
+>> inform KVM to populate the memory with information on time that the host
+>> kernel has stolen from the guest.
+>>
+>> A hypercall interface is provided for the guest to interrogate the
+>> hypervisor's support for this interface and the location of the shared
+>> memory structures.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
+>>  1 file changed, 100 insertions(+)
+>>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+>>
+>> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+>> new file mode 100644
+>> index 000000000000..1ceb118694e7
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/arm/pvtime.txt
+>> @@ -0,0 +1,100 @@
+>> +Paravirtualized time support for arm64
+>> +======================================
+>> +
+>> +Arm specification DEN0057/A defined a standard for paravirtualised time
+>> +support for AArch64 guests:
+>> +
+>> +https://developer.arm.com/docs/den0057/a
+>> +
+>> +KVM/arm64 implements the stolen time part of this specification by providing
+>> +some hypervisor service calls to support a paravirtualized guest obtaining a
+>> +view of the amount of time stolen from its execution.
+>> +
+>> +Two new SMCCC compatible hypercalls are defined:
+>> +
+>> +PV_FEATURES 0xC5000020
+>> +PV_TIME_ST  0xC5000022
+>> +
+>> +These are only available in the SMC64/HVC64 calling convention as
+>> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+>> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+>> +mechanism before calling it.
+>> +
+>> +PV_FEATURES
+>> +    Function ID:  (uint32)  : 0xC5000020
+>> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
+>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>> +                              PV-time feature is supported by the hypervisor.
+>> +
+>> +PV_TIME_ST
+>> +    Function ID:  (uint32)  : 0xC5000022
+>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>> +                              (V)CPU. On failure:
+> 
+> Why the () around the V in VCPU?
 
-fill_gva_list() populates gva list and adds offset
-HV_TLB_FLUSH_UNIT(0x1000000) to variable "cur"
-in the each loop. When diff between "end" and "cur" is
-less than HV_TLB_FLUSH_UNIT, the gva entry should
-be the last one and the loop should be end.
+There's nothing preventing the same mechanism being used without the
+virtualisation of CPUs. For example a hypervisor like Jailhouse could
+implement this interface even though there the CPU isn't being
+virtualised but is being handed over to the guest. Equally it is
+possible for firmware to provide the same mechanism (using the SMC64
+calling convention).
 
-If cur is equal or greater than 0xFF000000 on 32-bit
-mode, "cur" will be overflow after adding HV_TLB_FLUSH_UNIT.
-Its value will be wrapped and less than "end". fill_gva_list()
-falls into an infinite loop and fill gva list out of
-border finally.
+Admittedly that's a little confusing here because the rest of this
+document is talking about KVM's implementation and normal hypervisors.
+So I'll drop the brackets.
 
-Set "cur" to be "end" to make loop end when diff is
-less than HV_TLB_FLUSH_UNIT and add HV_TLB_FLUSH_UNIT to
-"cur" when diff is equal or greater than HV_TLB_FLUSH_UNIT.
-Fix the overflow issue.
+>> +                              NOT_SUPPORTED (-1)
+>> +
+>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>> +with inner and outer write back caching attributes, in the inner shareable
+>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+>> +meaningfully filled by the hypervisor (see structure below).
+>> +
+>> +PV_TIME_ST returns the structure for the calling VCPU.
+> 
+> The above sentence seems redundant here.
 
-Reported-by: Jong Hyun Park <park.jonghyun@yonsei.ac.kr>
-Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
-Fixes: 2ffd9e33ce4a ("x86/hyper-v: Use hypercall for remote
-TLB flush")
----
- arch/x86/hyperv/mmu.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+It is an important detail that each VCPU must use PV_TIME_ST to fetch
+the address of the structure for that VCPU. E.g. It could have been
+implemented so that the hypercall took a VCPU number. So while redundant
+I do feel it's worth pointing this out explicitly.
 
-diff --git a/arch/x86/hyperv/mmu.c b/arch/x86/hyperv/mmu.c
-index e65d7fe6489f..5208ba49c89a 100644
---- a/arch/x86/hyperv/mmu.c
-+++ b/arch/x86/hyperv/mmu.c
-@@ -37,12 +37,14 @@ static inline int fill_gva_list(u64 gva_list[], int offset,
- 		 * Lower 12 bits encode the number of additional
- 		 * pages to flush (in addition to the 'cur' page).
- 		 */
--		if (diff >= HV_TLB_FLUSH_UNIT)
-+		if (diff >= HV_TLB_FLUSH_UNIT) {
- 			gva_list[gva_n] |= ~PAGE_MASK;
--		else if (diff)
-+			cur += HV_TLB_FLUSH_UNIT;
-+		}  else if (diff) {
- 			gva_list[gva_n] |= (diff - 1) >> PAGE_SHIFT;
-+			cur = end;
-+		}
- 
--		cur += HV_TLB_FLUSH_UNIT;
- 		gva_n++;
- 
- 	} while (cur < end);
--- 
-2.14.5
+>> +
+>> +Stolen Time
+>> +-----------
+>> +
+>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>> +
+>> +  Field       | Byte Length | Byte Offset | Description
+>> +  ----------- | ----------- | ----------- | --------------------------
+>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+>> +  Attributes  |      4      |      4      | Must be 0
+>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+>> +              |             |             | nanoseconds indicating how
+>> +              |             |             | much time this VCPU thread
+>> +              |             |             | was involuntarily not
+>> +              |             |             | running on a physical CPU.
+>> +
+>> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+>> +will be present within a reserved region of the normal memory given to the
+>> +guest. The guest should not attempt to write into this memory. There is a
+>> +structure per VCPU of the guest.
+>> +
+>> +User space interface
+>> +====================
+>> +
+>> +User space can request that KVM provide the paravirtualized time interface to
+>> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
+>> +
+>> +    struct kvm_create_device pvtime_device = {
+>> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
+>> +            .attr = 0,
+>> +            .flags = 0,
+>> +    };
+>> +
+>> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
+> 
+> The ioctl doesn't return the fd. If the ioctl returns zero the fd will be
+> in pvtime_device.fd.
+
+Good catch - I'm not sure quite why I wrote that. Anyway I've agreed to
+change the interface to operate on the VCPU device instead so this text
+is rewritten completely.
+
+>> +
+>> +Creation of the device should be done after creating the vCPUs of the virtual
+>> +machine.
+> 
+> Or else what? Will an error be reported in that case?
+
+This is now enforced by calling the ioctl on the VCPU device, so it's
+impossible to do in the wrong order.
+
+>> +
+>> +The IPA of the structures must be given to KVM. This is the base address
+>> +of an array of stolen time structures (one for each VCPU). The base address
+>> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
+>> +multiple of PAGE_SIZE.
+>> +
+>> +The memory for these structures should be added to the guest in the usual
+>> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
+> 
+> Above it says the guest shouldn't attempt to write the memory. Should
+> KVM_MEM_READONLY be used with KVM_SET_USER_MEMORY_REGION for it?
+
+That is optional - the specification states the guest must not attempt
+to write to it - so marking it read-only for the guest should work fine
+with a conforming guest. But it's not required.
+
+>> +
+>> +For example:
+>> +
+>> +    struct kvm_dev_arm_st_region region = {
+>> +            .gpa = <IPA of guest base address>,
+>> +            .size = <size in bytes>
+>> +    };
+>> +
+>> +    struct kvm_device_attr st_base = {
+>> +            .group = KVM_DEV_ARM_PV_TIME_PADDR,
+> 
+> This is KVM_DEV_ARM_PV_TIME_REGION in the code.
+
+Gah - I obviously missed that when I refactored to define the region
+rather than just the base address. Anyway this has all changed (again)
+because each VCPU has its own base address so the size is no longer
+necessary.
+
+Thanks for the review,
+
+Steve
+
+>> +            .attr = KVM_DEV_ARM_PV_TIME_ST,
+>> +            .addr = (u64)&region
+>> +    };
+>> +
+>> +    ioctl(pvtime_fd, KVM_SET_DEVICE_ATTR, &st_base);
+>> -- 
+>> 2.20.1
+>>
+> 
+> Thanks,
+> drew 
+> 
 
