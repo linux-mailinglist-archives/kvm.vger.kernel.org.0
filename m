@@ -2,335 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 539C1A344A
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 11:43:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D49BAA345C
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 11:45:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbfH3Jmt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 05:42:49 -0400
-Received: from foss.arm.com ([217.140.110.172]:57484 "EHLO foss.arm.com"
+        id S1727883AbfH3JpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 05:45:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34346 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727417AbfH3Jms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 05:42:48 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 722B4344;
-        Fri, 30 Aug 2019 02:42:47 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05BDD3F718;
-        Fri, 30 Aug 2019 02:42:46 -0700 (PDT)
-Date:   Fri, 30 Aug 2019 11:42:45 +0200
-From:   Christoffer Dall <christoffer.dall@arm.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v4 05/10] KVM: arm64: Support stolen time reporting via
- shared structure
-Message-ID: <20190830094245.GB5307@e113682-lin.lund.arm.com>
-References: <20190830084255.55113-1-steven.price@arm.com>
- <20190830084255.55113-6-steven.price@arm.com>
+        id S1727326AbfH3JpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 05:45:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5C72385545;
+        Fri, 30 Aug 2019 09:45:08 +0000 (UTC)
+Received: from [10.36.117.243] (ovpn-117-243.ams2.redhat.com [10.36.117.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 554E660872;
+        Fri, 30 Aug 2019 09:45:05 +0000 (UTC)
+Subject: Re: [PATCH v2] KVM: selftests: Add a test for the KVM_S390_MEM_OP
+ ioctl
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+References: <20190829121412.30194-1-thuth@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <c015592c-34f9-b940-b10d-56e4b201c7ae@redhat.com>
+Date:   Fri, 30 Aug 2019 11:45:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190830084255.55113-6-steven.price@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190829121412.30194-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 30 Aug 2019 09:45:08 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 09:42:50AM +0100, Steven Price wrote:
-> Implement the service call for configuring a shared structure between a
-> VCPU and the hypervisor in which the hypervisor can write the time
-> stolen from the VCPU's execution time by other tasks on the host.
+On 29.08.19 14:14, Thomas Huth wrote:
+> Check that we can write and read the guest memory with this s390x
+> ioctl, and that some error cases are handled correctly.
 > 
-> The hypervisor allocates memory which is placed at an IPA chosen by user
-> space. The hypervisor then updates the shared structure using
-> kvm_put_guest() to ensure single copy atomicity of the 64-bit value
-> reporting the stolen time in nanoseconds.
-> 
-> Whenever stolen time is enabled by the guest, the stolen time counter is
-> reset.
-> 
-> The stolen time itself is retrieved from the sched_info structure
-> maintained by the Linux scheduler code. We enable SCHEDSTATS when
-> selecting KVM Kconfig to ensure this value is meaningful.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  arch/arm/include/asm/kvm_host.h   | 20 +++++++++++
->  arch/arm64/include/asm/kvm_host.h | 21 +++++++++++-
->  arch/arm64/kvm/Kconfig            |  1 +
->  include/linux/kvm_types.h         |  2 ++
->  virt/kvm/arm/arm.c                | 11 ++++++
->  virt/kvm/arm/hypercalls.c         |  3 ++
->  virt/kvm/arm/pvtime.c             | 56 +++++++++++++++++++++++++++++++
->  7 files changed, 113 insertions(+), 1 deletion(-)
+>  v2: Check the ioctl also with "size" set to 0
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 5a0c3569ebde..5c401482d62d 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -39,6 +39,7 @@
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
+>  tools/testing/selftests/kvm/Makefile      |   1 +
+>  tools/testing/selftests/kvm/s390x/memop.c | 165 ++++++++++++++++++++++
+>  2 files changed, 166 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/s390x/memop.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 1b48a94b4350..62c591f87dab 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -32,6 +32,7 @@ TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
 >  
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
-> @@ -329,6 +330,25 @@ static inline long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  	return SMCCC_RET_NOT_SUPPORTED;
->  }
->  
-> +static inline long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
+> +TEST_GEN_PROGS_s390x = s390x/memop
+>  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>  TEST_GEN_PROGS_s390x += dirty_log_test
+>  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+> new file mode 100644
+> index 000000000000..e6a65f9e48ca
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> @@ -0,0 +1,165 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Test for s390x KVM_S390_MEM_OP
+> + *
+> + * Copyright (C) 2019, Red Hat, Inc.
+> + */
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <sys/ioctl.h>
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +
+> +#define VCPU_ID 1
+> +
+> +static uint8_t mem1[65536];
+> +static uint8_t mem2[65536];
+> +
+> +static void guest_code(void)
 > +{
-> +	return SMCCC_RET_NOT_SUPPORTED;
-> +}
+> +	int i;
 > +
-> +static inline int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
-> +{
-> +	return -ENOTSUPP;
-> +}
-> +
-> +static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
-> +{
-> +}
-> +
-> +static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
-> +{
-> +	return false;
-> +}
-> +
->  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
->  
->  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 93b46d9526d0..1697e63f6dd8 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -44,6 +44,7 @@
->  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
-> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->  
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->  
-> @@ -338,8 +339,14 @@ struct kvm_vcpu_arch {
->  	/* True when deferrable sysregs are loaded on the physical CPU,
->  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
->  	bool sysregs_loaded_on_cpu;
-> -};
->  
-> +	/* Guest PV state */
-> +	struct {
-> +		u64 steal;
-> +		u64 last_steal;
-> +		gpa_t base;
-> +	} steal;
-> +};
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
->  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
-> @@ -479,6 +486,18 @@ int kvm_perf_init(void);
->  int kvm_perf_teardown(void);
->  
->  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
-> +long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
-> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
-> +
-> +static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
-> +{
-> +	vcpu_arch->steal.base = GPA_INVALID;
-> +}
-> +
-> +static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
-> +{
-> +	return (vcpu_arch->steal.base != GPA_INVALID);
-> +}
->  
->  void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
->  
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index a67121d419a2..d8b88e40d223 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -39,6 +39,7 @@ config KVM
->  	select IRQ_BYPASS_MANAGER
->  	select HAVE_KVM_IRQ_BYPASS
->  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
-> +	select SCHEDSTATS
->  	---help---
->  	  Support hosting virtualized guest machines.
->  	  We don't support KVM with 16K page tables yet, due to the multiple
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index bde5374ae021..1c88e69db3d9 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
->  typedef u64            gpa_t;
->  typedef u64            gfn_t;
->  
-> +#define GPA_INVALID	(~(gpa_t)0)
-> +
->  typedef unsigned long  hva_t;
->  typedef u64            hpa_t;
->  typedef u64            hfn_t;
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 35a069815baf..eaceb2d0f0c0 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -40,6 +40,10 @@
->  #include <asm/kvm_coproc.h>
->  #include <asm/sections.h>
->  
-> +#include <kvm/arm_hypercalls.h>
-> +#include <kvm/arm_pmu.h>
-> +#include <kvm/arm_psci.h>
-> +
->  #ifdef REQUIRES_VIRT
->  __asm__(".arch_extension	virt");
->  #endif
-> @@ -350,6 +354,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->  
->  	kvm_arm_reset_debug_ptr(vcpu);
->  
-> +	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
-> +
->  	return kvm_vgic_vcpu_init(vcpu);
->  }
->  
-> @@ -379,6 +385,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	kvm_vcpu_load_sysregs(vcpu);
->  	kvm_arch_vcpu_load_fp(vcpu);
->  	kvm_vcpu_pmu_restore_guest(vcpu);
-> +	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
-> +		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->  
->  	if (single_task_running())
->  		vcpu_clear_wfe_traps(vcpu);
-> @@ -644,6 +652,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->  		 * that a VCPU sees new virtual interrupts.
->  		 */
->  		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
-> +
-> +		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
-> +			kvm_update_stolen_time(vcpu, false);
->  	}
->  }
->  
-> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
-> index e2521e0d3978..3091a5d2e842 100644
-> --- a/virt/kvm/arm/hypercalls.c
-> +++ b/virt/kvm/arm/hypercalls.c
-> @@ -56,6 +56,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->  	case ARM_SMCCC_HV_PV_FEATURES:
->  		val = kvm_hypercall_pv_features(vcpu);
->  		break;
-> +	case ARM_SMCCC_HV_PV_TIME_ST:
-> +		val = kvm_hypercall_stolen_time(vcpu);
-> +		break;
->  	default:
->  		return kvm_psci_call(vcpu);
->  	}
-> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
-> index 7887a61651c6..d9d0dbc6994b 100644
-> --- a/virt/kvm/arm/pvtime.c
-> +++ b/virt/kvm/arm/pvtime.c
-> @@ -3,8 +3,45 @@
->  
->  #include <linux/arm-smccc.h>
->  
-> +#include <asm/pvclock-abi.h>
-> +
->  #include <kvm/arm_hypercalls.h>
->  
-> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	u64 steal;
-> +	u64 steal_le;
-> +	u64 offset;
-> +	int idx;
-> +	u64 base = vcpu->arch.steal.base;
-> +
-> +	if (base == GPA_INVALID)
-> +		return -ENOTSUPP;
-> +
-> +	/* Let's do the local bookkeeping */
-> +	steal = vcpu->arch.steal.steal;
-> +	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
-> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +	vcpu->arch.steal.steal = steal;
-> +
-> +	steal_le = cpu_to_le64(steal);
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +	if (init) {
-> +		struct pvclock_vcpu_stolen_time init_values = {
-> +			.revision = 0,
-> +			.attributes = 0
-> +		};
-> +		kvm_write_guest(kvm, base, &init_values,
-> +				sizeof(init_values));
+> +	for (;;) {
+> +		for (i = 0; i < sizeof(mem2); i++)
+> +			mem2[i] = mem1[i];
+> +		GUEST_SYNC(0);
 > +	}
-> +	offset = offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
-> +	kvm_put_guest(kvm, base + offset, steal_le, u64);
-
-Let's hope we don't have thousands of memslots through which we have to
-do a linear scan on every vcpu load after this.  If that were the case,
-I think the memslot search path would have to be updated anyhow.
-
-Otherwise looks reasonable to me.
-
-Thanks,
-
-    Christoffer
-
-> +	srcu_read_unlock(&kvm->srcu, idx);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_run *run;
+> +	struct kvm_s390_mem_op ksmo;
+> +	int rv, i, maxsize;
+> +
+> +	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
+> +
+> +	maxsize = kvm_check_cap(KVM_CAP_S390_MEM_OP);
+> +	if (!maxsize) {
+> +		fprintf(stderr, "CAP_S390_MEM_OP not supported -> skip test\n");
+> +		exit(KSFT_SKIP);
+> +	}
+> +	if (maxsize > sizeof(mem1))
+> +		maxsize = sizeof(mem1);
+> +
+> +	/* Create VM */
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +	run = vcpu_state(vm, VCPU_ID);
+> +
+> +	for (i = 0; i < sizeof(mem1); i++)
+> +		mem1[i] = i * i + i;
+> +
+> +	/* Set the first array */
+> +	ksmo.gaddr = addr_gva2gpa(vm, (uintptr_t)mem1);
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +
+> +	/* Let the guest code copy the first array to the second */
+> +	vcpu_run(vm, VCPU_ID);
+> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_S390_SIEIC,
+> +		    "Unexpected exit reason: %u (%s)\n",
+> +		    run->exit_reason,
+> +		    exit_reason_str(run->exit_reason));
+> +
+> +	memset(mem2, 0xaa, sizeof(mem2));
+> +
+> +	/* Get the second array */
+> +	ksmo.gaddr = (uintptr_t)mem2;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_READ;
+> +	ksmo.buf = (uintptr_t)mem2;
+> +	ksmo.ar = 0;
+> +	vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +
+> +	TEST_ASSERT(!memcmp(mem1, mem2, maxsize),
+> +		    "Memory contents do not match!");
+> +
+> +	/* Check error conditions - first bad size: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = -1;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == E2BIG, "ioctl allows insane sizes");
+> +
+> +	/* Zero size: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = 0;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1, "ioctl allows 0 as size");
+> +
+> +	/* Bad flags: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = -1;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags?");
+> +
+> +	/* Bad operation: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = -1;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows all flags?");
+> +
+> +	/* Bad guest address: */
+> +	ksmo.gaddr = ~0xfffUL;
+> +	ksmo.flags = KVM_S390_MEMOP_F_CHECK_ONLY;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
+> +
+> +	/* Bad host address: */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = 0;
+> +	ksmo.ar = 0;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EFAULT,
+> +		    "ioctl does not report bad host memory address");
+> +
+> +	/* Bad access register: */
+> +	run->psw_mask &= ~(3UL << (63 - 17));
+> +	run->psw_mask |= 1UL << (63 - 17);  /* Enable AR mode */
+> +	vcpu_run(vm, VCPU_ID);              /* To sync new state to SIE block */
+> +	ksmo.gaddr = (uintptr_t)mem1;
+> +	ksmo.flags = 0;
+> +	ksmo.size = maxsize;
+> +	ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+> +	ksmo.buf = (uintptr_t)mem1;
+> +	ksmo.ar = 17;
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_S390_MEM_OP, &ksmo);
+> +	TEST_ASSERT(rv == -1 && errno == EINVAL, "ioctl allows ARs > 15");
+> +	run->psw_mask &= ~(3UL << (63 - 17));   /* Disable AR mode */
+> +	vcpu_run(vm, VCPU_ID);                  /* Run to sync new state */
+> +
+> +	kvm_vm_free(vm);
 > +
 > +	return 0;
 > +}
-> +
->  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  {
->  	u32 feature = smccc_get_arg1(vcpu);
-> @@ -12,6 +49,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  
->  	switch (feature) {
->  	case ARM_SMCCC_HV_PV_FEATURES:
-> +	case ARM_SMCCC_HV_PV_TIME_ST:
->  		val = SMCCC_RET_SUCCESS;
->  		break;
->  	}
-> @@ -19,3 +57,21 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->  	return val;
->  }
->  
-> +long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
-> +{
-> +	int err;
-> +
-> +	/*
-> +	 * Start counting stolen time from the time the guest requests
-> +	 * the feature enabled.
-> +	 */
-> +	vcpu->arch.steal.steal = 0;
-> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> +
-> +	err = kvm_update_stolen_time(vcpu, true);
-> +
-> +	if (err)
-> +		return SMCCC_RET_NOT_SUPPORTED;
-> +
-> +	return vcpu->arch.steal.base;
-> +}
-> -- 
-> 2.20.1
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+Had a quick glimpse and besides the two things Janosch mentioned,
+nothing jumped at me.
+
+-- 
+
+Thanks,
+
+David / dhildenb
