@@ -2,67 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 10BB2A4201
+	by mail.lfdr.de (Postfix) with ESMTP id 8E107A4202
 	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2019 06:01:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725836AbfHaEBJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 31 Aug 2019 00:01:09 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39003 "EHLO
+        id S1725909AbfHaEBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 31 Aug 2019 00:01:11 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36191 "EHLO
         mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbfHaEBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 31 Aug 2019 00:01:09 -0400
-Received: by mail-wm1-f67.google.com with SMTP id n2so7934629wmk.4
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2019 21:01:08 -0700 (PDT)
+        with ESMTP id S1725781AbfHaEBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 31 Aug 2019 00:01:11 -0400
+Received: by mail-wm1-f67.google.com with SMTP id p13so9363279wmh.1
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2019 21:01:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=aFgjEyt2f2xwpTXKSn8usPjTng/v+Jzn84j9AbAhOVc=;
-        b=hjAIOGzffKwpNC1gd4yxe4OA6XabkHYiYGPplxMs/0MmbzNSRqx/N03wLcET7NljSg
-         Vg5kJ/XAav6Kax2LyuxFcqQCX3S6Hego5nSPTmo4NfqEPYTkHdW3Ib/nhAVXchWv08Kh
-         WjOAGT/2Eu7AKiQ59+KaigccehXMs+wUzrAlf1d7ml3p/mjR/apR0WqERK5lrfgnI3uE
-         62xd02sdFCVHxu5FIK46bsN/02gKD1QYYoLOr0gsX52HWPS3NIABm6Jk4Cwh1rrbTsfI
-         JTk959fbI96PEsH+kNDpTepNJtzyY/LPDVxO/ZaTu1xMHNQS6BDPwpyWXdAvVVuuwhX5
-         p72A==
-X-Gm-Message-State: APjAAAULhLtUFpNmXapXPydT7xPAfIz6ZsvcK6vXysgmZFiEiZt2VSba
-        CcN1qNQZv0dgMe0UaA81QBo=
-X-Google-Smtp-Source: APXvYqyYGc+cnUIRt5pN7foGLrxfgMubJ8eMXU2mY/0T1aH5FY8SnJcU6MMiUrT64TGSUxCFPZpUdg==
-X-Received: by 2002:a7b:ca54:: with SMTP id m20mr22270898wml.102.1567224067432;
-        Fri, 30 Aug 2019 21:01:07 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=w+95+WjAN0K6CXfamZriaVlxGVr5jfuNDPza814XqZQ=;
+        b=AsmQY63eTDxmq3DrXHmvY77bvkuISoBkV7VkJVpXgxLzStMgWbLCJvkcc0T3X4k7cO
+         CRQDdYuawX5dorEMWGtRKJzsxW0MkGgSbdDDJuzYbnJModSz8azXDmB/6sBNjeRZGR17
+         Z28vXA3iSre8zIQwR4RVz9ki93uzogtWsUsRYZc1dDewd27gAf0QdEeNYBVKIzUChadq
+         0e9HhmJ5u1nubtGM6iTKkyO+Cd7pZ8AcrhWnxA+bPPRVe7npCatZO16Wf+ETh53yNlkK
+         6aqIUhDaBC1uEE65s7MSlqlbs9fdLHgoRPWXV2z5nsw5Nso/6zQBSdODXJWYwakPyKZX
+         Lp3g==
+X-Gm-Message-State: APjAAAXjc9D2znOEGBAGSsbe9N8zONXaL/ceSyfW21yT/WZMZCtEkRrh
+        vyquOTqBCDcI5DyOuwcK8rY=
+X-Google-Smtp-Source: APXvYqw+n0LzjMqWRWckMdUShFUMfRbdcGvoGkx2tqK9H4wvBR4SC81kXivYX8EPXLjJHihu2DDQgA==
+X-Received: by 2002:a7b:c758:: with SMTP id w24mr11722472wmk.143.1567224069029;
+        Fri, 30 Aug 2019 21:01:09 -0700 (PDT)
 Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id e4sm4656470wro.21.2019.08.30.21.01.05
+        by smtp.gmail.com with ESMTPSA id e4sm4656470wro.21.2019.08.30.21.01.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2019 21:01:06 -0700 (PDT)
+        Fri, 30 Aug 2019 21:01:08 -0700 (PDT)
 From:   Nadav Amit <namit@vmware.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Nadav Amit <namit@vmware.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Marc Orr <marcorr@google.com>
-Subject: [kvm-unit-tests PATCH 0/2] x86: nVMX: Bug fixes
-Date:   Fri, 30 Aug 2019 13:40:29 -0700
-Message-Id: <20190830204031.3100-1-namit@vmware.com>
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: [kvm-unit-tests PATCH 1/2] x86: nVMX: Do not use test_skip() when multiple tests are run
+Date:   Fri, 30 Aug 2019 13:40:30 -0700
+Message-Id: <20190830204031.3100-2-namit@vmware.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190830204031.3100-1-namit@vmware.com>
+References: <20190830204031.3100-1-namit@vmware.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Two bug fixes that were found while running on bare-metal.
+Using test_skip() when multiple tests are run causes all the following
+tests to be skipped. Instead, just print a message and return.
 
-The first one caused the second bug not to be found until now.
-
-The second bug is an SDM bug, and requires KVM to be fixed as well
-(consider it as a bug report on behalf of VMware).
-
+Fixes: 47cc3d85c2fe ("nVMX x86: Check PML and EPT on vmentry of L2 guests")
+Fixes: 7fd449f2ed2e ("nVMX x86: Check VPID value on vmentry of L2 guests")
+Fixes: 181219bfd76b ("x86: Add test for checking NMI controls on vmentry of L2 guests")
+Fixes: 1d70eb823e12 ("nVMX x86: Check EPTP on vmentry of L2 guests")
 Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc: Marc Orr <marcorr@google.com>
+Signed-off-by: Nadav Amit <namit@vmware.com>
+---
+ x86/vmx_tests.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Nadav Amit (2):
-  x86: nVMX: Do not use test_skip() when multiple tests are run
-  x86: nVMX: Fix wrong reserved bits of error-code
-
- x86/vmx_tests.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index f035f24..4ff1570 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -4040,7 +4040,7 @@ static void test_vpid(void)
+ 
+ 	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
+ 	    (ctrl_cpu_rev[1].clr & CPU_VPID))) {
+-		test_skip("Secondary controls and/or VPID not supported");
++		printf("Secondary controls and/or VPID not supported\n");
+ 		return;
+ 	}
+ 
+@@ -4544,7 +4544,7 @@ static void test_nmi_ctrls(void)
+ 
+ 	if ((ctrl_pin_rev.clr & (PIN_NMI | PIN_VIRT_NMI)) !=
+ 	    (PIN_NMI | PIN_VIRT_NMI)) {
+-		test_skip("NMI exiting and Virtual NMIs are not supported !");
++		printf("NMI exiting and Virtual NMIs are not supported !\n");
+ 		return;
+ 	}
+ 
+@@ -4657,7 +4657,7 @@ static void test_ept_eptp(void)
+ 
+ 	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
+ 	    (ctrl_cpu_rev[1].clr & CPU_EPT))) {
+-		test_skip("\"CPU secondary\" and/or \"enable EPT\" execution controls are not supported !");
++		printf("\"CPU secondary\" and/or \"enable EPT\" execution controls are not supported !\n");
+ 		return;
+ 	}
+ 
+@@ -4844,7 +4844,7 @@ static void test_pml(void)
+ 
+ 	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
+ 	    (ctrl_cpu_rev[1].clr & CPU_EPT) && (ctrl_cpu_rev[1].clr & CPU_PML))) {
+-		test_skip("\"Secondary execution\" control or \"enable EPT\" control or \"enable PML\" control is not supported !");
++		printf("\"Secondary execution\" control or \"enable EPT\" control or \"enable PML\" control is not supported !\n");
+ 		return;
+ 	}
+ 
 -- 
 2.17.1
 
