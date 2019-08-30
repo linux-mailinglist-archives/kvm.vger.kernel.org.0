@@ -2,234 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC8C4A3497
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 12:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED42FA356D
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 13:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727781AbfH3KC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 06:02:27 -0400
-Received: from foss.arm.com ([217.140.110.172]:57712 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726480AbfH3KC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 06:02:27 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A7A5344;
-        Fri, 30 Aug 2019 03:02:26 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A37183F718;
-        Fri, 30 Aug 2019 03:02:22 -0700 (PDT)
-Subject: Re: [PATCH v4 07/10] KVM: arm64: Provide VCPU attributes for stolen
- time
-To:     Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S1727992AbfH3LJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 07:09:22 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:47488 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726660AbfH3LJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 07:09:21 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7UB7w6i107234;
+        Fri, 30 Aug 2019 11:08:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=WxH5c0AO/ppWqHS1hPmVJ/ebozPUhe7msAT0OzNYuVE=;
+ b=Y/JS0lJ40hk3QYTWq1xwWGw9rjSc7JoY3MHqcpR00edYeHJQz4RE9GQ+9p4zHs2k7Jdv
+ nichp2/QDARf6t0NwVvKnifdU+W5oWVUNB973KViWooKQbxWfTn9lrOw5UcVbn8YhQZp
+ lVZ//+ojXfrIUd8Nvg/W2VlCNdPBBgW51Szi8oO5zKk4qd6TUW5FQ6B6jvhZzIr+xo/1
+ dsi/ksiwmukPKQn1br8yhX1lIMPVSya+Ss3aJPbHeRo2uP/zBg6W8LLte4WxzAETxAA+
+ tgR8cOqzYD79ftwx3CZwsIOuXRurTWGMcdVOQjegULjC2rkNuZ/jx0QwfW9cXEk4B1zL Tw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2uq2nc0036-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Aug 2019 11:08:11 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7UB40Lb177359;
+        Fri, 30 Aug 2019 11:07:10 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2uphav1gmr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Aug 2019 11:07:10 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7UB750V029324;
+        Fri, 30 Aug 2019 11:07:06 GMT
+Received: from [10.175.203.89] (/10.175.203.89)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 30 Aug 2019 04:07:05 -0700
+Subject: Re: Default governor regardless of cpuidle driver
+To:     Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190830084255.55113-1-steven.price@arm.com>
- <20190830084255.55113-8-steven.price@arm.com>
-From:   Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <36104ec0-2237-fb0e-376f-ab50c23c6101@kernel.org>
-Date:   Fri, 30 Aug 2019 11:02:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-pm@vger.kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+References: <20190829151027.9930-1-joao.m.martins@oracle.com>
+ <c8cf8dcc-76a3-3e15-f514-2cb9df1bbbdc@oracle.com>
+ <d1d4ade5-04a5-4288-d994-3963bb80fb6b@linaro.org>
+ <6c8816af-934a-5bf7-6fb9-f67c05e2c8aa@oracle.com>
+ <901ab688-5548-cf96-1dcb-ce50e617e917@linaro.org>
+ <722bd6f6-6eee-b24b-9704-c9aecc06302f@oracle.com>
+ <2e2a35c8-7f03-d7c8-4701-3bc9d91c1255@linaro.org>
+ <f8c63af5-2509-310d-7ba0-7687b20e3b44@oracle.com>
+ <b759d5a9-f418-817e-eefa-2302d17cb6ea@linaro.org>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <b164bd75-bc9a-0f07-e831-004a0bb5fe1b@oracle.com>
+Date:   Fri, 30 Aug 2019 12:07:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <20190830084255.55113-8-steven.price@arm.com>
+In-Reply-To: <b759d5a9-f418-817e-eefa-2302d17cb6ea@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9364 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908300120
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9364 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908300120
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/08/2019 09:42, Steven Price wrote:
-> Allow user space to inform the KVM host where in the physical memory
-> map the paravirtualized time structures should be located.
+On 8/29/19 10:51 PM, Daniel Lezcano wrote:
+> On 29/08/2019 23:12, Joao Martins wrote:
 > 
-> User space can set an attribute on the VCPU providing the IPA base
-> address of the stolen time structure for that VCPU. This must be
-> repeated for every VCPU in the VM.
+> [ ... ]
 > 
-> The address is given in terms of the physical address visible to
-> the guest and must be 64 byte aligned. The guest will discover the
-> address via a hypercall.
+>>>> Say you wanted to have a kvm specific config, you would still see the same
+>>>> problem if you happen to compile intel_idle together with haltpoll
+>>>> driver+governor. 
+>>>
+>>> Can a guest work with an intel_idle driver?
+>>>
+>> Yes.
+>>
+>> If you use Qemu you would add '-overcommit cpu-pm=on' to try it out. ofc,
+>> assuming you're on a relatively recent Qemu (v3.0+) and a fairly recent kernel
+>> version as host (v4.17+).
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  7 +++++
->  arch/arm64/include/uapi/asm/kvm.h |  2 ++
->  arch/arm64/kvm/guest.c            |  9 ++++++
->  include/uapi/linux/kvm.h          |  2 ++
->  virt/kvm/arm/pvtime.c             | 47 +++++++++++++++++++++++++++++++
->  5 files changed, 67 insertions(+)
+> Ok, thanks for the clarification.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1697e63f6dd8..6af16b29a41f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -489,6 +489,13 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
->  long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
->  int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
->  
-> +int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-> +			    struct kvm_device_attr *attr);
-> +int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-> +			    struct kvm_device_attr *attr);
-> +int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
-> +			    struct kvm_device_attr *attr);
-> +
->  static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
->  {
->  	vcpu_arch->steal.base = GPA_INVALID;
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 9a507716ae2f..bde9f165ad3a 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -323,6 +323,8 @@ struct kvm_vcpu_events {
->  #define KVM_ARM_VCPU_TIMER_CTRL		1
->  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-> +#define KVM_ARM_VCPU_PVTIME_CTRL	2
-> +#define   KVM_ARM_VCPU_PVTIME_SET_IPA	0
->  
->  /* KVM_IRQ_LINE irq field index values */
->  #define KVM_ARM_IRQ_TYPE_SHIFT		24
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index dfd626447482..d3ac9d2fd405 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -858,6 +858,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
->  	case KVM_ARM_VCPU_TIMER_CTRL:
->  		ret = kvm_arm_timer_set_attr(vcpu, attr);
->  		break;
-> +	case KVM_ARM_VCPU_PVTIME_CTRL:
-> +		ret = kvm_arm_pvtime_set_attr(vcpu, attr);
-> +		break;
->  	default:
->  		ret = -ENXIO;
->  		break;
-> @@ -878,6 +881,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->  	case KVM_ARM_VCPU_TIMER_CTRL:
->  		ret = kvm_arm_timer_get_attr(vcpu, attr);
->  		break;
-> +	case KVM_ARM_VCPU_PVTIME_CTRL:
-> +		ret = kvm_arm_pvtime_get_attr(vcpu, attr);
-> +		break;
->  	default:
->  		ret = -ENXIO;
->  		break;
-> @@ -898,6 +904,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->  	case KVM_ARM_VCPU_TIMER_CTRL:
->  		ret = kvm_arm_timer_has_attr(vcpu, attr);
->  		break;
-> +	case KVM_ARM_VCPU_PVTIME_CTRL:
-> +		ret = kvm_arm_pvtime_has_attr(vcpu, attr);
-> +		break;
->  	default:
->  		ret = -ENXIO;
->  		break;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 5e3f12d5359e..265156a984f2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1222,6 +1222,8 @@ enum kvm_device_type {
->  #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
->  	KVM_DEV_TYPE_XIVE,
->  #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
-> +	KVM_DEV_TYPE_ARM_PV_TIME,
-> +#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
->  	KVM_DEV_TYPE_MAX,
->  };
->  
-> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
-> index d9d0dbc6994b..7b1834b98a68 100644
-> --- a/virt/kvm/arm/pvtime.c
-> +++ b/virt/kvm/arm/pvtime.c
-> @@ -2,7 +2,9 @@
->  // Copyright (C) 2019 Arm Ltd.
->  
->  #include <linux/arm-smccc.h>
-> +#include <linux/kvm_host.h>
->  
-> +#include <asm/kvm_mmu.h>
->  #include <asm/pvclock-abi.h>
->  
->  #include <kvm/arm_hypercalls.h>
-> @@ -75,3 +77,48 @@ long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
->  
->  	return vcpu->arch.steal.base;
->  }
-> +
-> +int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
-> +			    struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *user = (u64 __user *)attr->addr;
-> +	u64 ipa;
-> +
-> +	if (attr->attr != KVM_ARM_VCPU_PVTIME_SET_IPA)
-> +		return -ENXIO;
-> +
-> +	if (get_user(ipa, user))
-> +		return -EFAULT;
-> +	if (ipa & 63)
-
-nit: Please express this as !IS_ALIGNED(ipa, 64) instead.
-
-> +		return -EINVAL;
-> +	if (vcpu->arch.steal.base != GPA_INVALID)
-> +		return -EEXIST;
-> +	vcpu->arch.steal.base = ipa;
-
-I'm still worried that you end-up not knowing whether the IPA is valid
-or not at this stage, nor that we check about overlapping vcpus. How do
-we validate that?
-
-I also share Christoffer's concern that the memslot parsing may be
-expensive on a system with multiple memslots. But maybe that can be
-solved by adding some caching capabilities to your kvm_put_guest(),
-should this become a problem.
-
-> +	return 0;
-> +}
-> +
-> +int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
-> +			    struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *user = (u64 __user *)attr->addr;
-> +	u64 ipa;
-> +
-> +	if (attr->attr != KVM_ARM_VCPU_PVTIME_SET_IPA)
-
-It is a bit odd that this is using "SET_IPA" as a way to GET it.
-
-> +		return -ENXIO;
-> +
-> +	ipa = vcpu->arch.steal.base;
-> +
-> +	if (put_user(ipa, user))
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
-> +			    struct kvm_device_attr *attr)
-> +{
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VCPU_PVTIME_SET_IPA:
-> +		return 0;
-> +	}
-> +	return -ENXIO;
-> +}
+>>>> Creating two separate configs here, with and without haltpoll
+>>>> for VMs doesn't sound effective for distros.
+>>>
+>>> Agree
+>>>
+>>>> Perhaps decreasing the rating of
+>>>> haltpoll governor, but while a short term fix it wouldn't give much sensible
+>>>> defaults without the one-off runtime switch.
 > 
+> The rating has little meaning because each governor fits a specific
+> situation (server, desktop, etc...) and it would probably make sense to
+> remove it and add a default governor in the config file like the cpufreq.
+> 
+ICYM, I had attached a patch in the first message of this thread [0] right below
+the scissors mark. It's not based on config file, but it's the same thing you're
+saying (IIUC) but at runtime and thus allowing a driver to state a 'preferred'
+governor to switch to at idle registration -- let me know if you think that
+looks a sensible approach. Note that the intent of that patch follows the
+thinking of leaving all defaults as before haltpoll governor was introduced, but
+once user modloads/uses cpuidle-haltpoll this governor then gets switched on.
 
-Thanks,
+[0] https://lore.kernel.org/kvm/c8cf8dcc-76a3-3e15-f514-2cb9df1bbbdc@oracle.com/
 
-	M.
--- 
-Jazz is not dead, it just smells funny...
+I would think a config-based preference on a governor would be good *if* one
+could actually switch idle governors at runtime like you can with cpufreq -- in
+case userspace wants something else other than the default. Right now we can't
+do that unless you toggle 'cpuidle_sysfs_switch', or picking one at boot with
+'cpuidle.governor='.
+
+> May be I missed the point from some previous discussion but IMHO the
+> problem you are facing is coming from the design: there is no need to
+> create a halt governor but move the code inside the cpuidle-halt driver
+> instead and ignore the state asked by the governor and return the state
+> the driver entered.
+> 
+Marcello's original patch series (first 3 revisions to be exact) actually had
+everything in the idle driver, but after some revisions (v4+) Rafael asked him
+to split the logic into a governor and unify it with poll state[1].
+
+[1]
+https://lore.kernel.org/kvm/CAJZ5v0gPbSXB3r71XaT-4Q7LsiFO_UVymBwOmU8J1W5+COk_1g@mail.gmail.com/
+
+	Joao
