@@ -2,183 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2391FA3A27
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 17:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21FC3A3A49
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 17:25:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727999AbfH3PPo convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 30 Aug 2019 11:15:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37460 "EHLO mx1.redhat.com"
+        id S1728029AbfH3PZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 11:25:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:33962 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727135AbfH3PPn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 11:15:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A6B8C1053E44;
-        Fri, 30 Aug 2019 15:15:42 +0000 (UTC)
-Received: from [10.40.204.151] (ovpn-204-151.brq.redhat.com [10.40.204.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0125C1ED;
-        Fri, 30 Aug 2019 15:15:14 +0000 (UTC)
-Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
-To:     Alexander Duyck <alexander.duyck@gmail.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
-        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-        pagupta@redhat.com, wei.w.wang@intel.com,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Rik van Riel <riel@surriel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
-        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
-        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
-References: <20190812131235.27244-1-nitesh@redhat.com>
- <20190812131235.27244-2-nitesh@redhat.com>
- <CAKgT0UcSabyrO=jUwq10KpJKLSuzorHDnKAGrtWVigKVgvD-6Q@mail.gmail.com>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- VujM7c/b4pps
-Organization: Red Hat Inc,
-Message-ID: <df82bc99-a212-4f5c-dc2e-28665060acb2@redhat.com>
-Date:   Fri, 30 Aug 2019 11:15:11 -0400
+        id S1727135AbfH3PZO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 11:25:14 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A6A8E344;
+        Fri, 30 Aug 2019 08:25:12 -0700 (PDT)
+Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B2653F703;
+        Fri, 30 Aug 2019 08:25:10 -0700 (PDT)
+Subject: Re: [PATCH v4 01/10] KVM: arm64: Document PV-time interface
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20190830084255.55113-1-steven.price@arm.com>
+ <20190830084255.55113-2-steven.price@arm.com>
+ <20190830144734.kvj4dvt32qzmhw32@kamzik.brq.redhat.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <7f459290-9c39-cfba-c514-a07469ff120f@arm.com>
+Date:   Fri, 30 Aug 2019 16:25:08 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UcSabyrO=jUwq10KpJKLSuzorHDnKAGrtWVigKVgvD-6Q@mail.gmail.com>
+In-Reply-To: <20190830144734.kvj4dvt32qzmhw32@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.66]); Fri, 30 Aug 2019 15:15:42 +0000 (UTC)
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 8/12/19 2:47 PM, Alexander Duyck wrote:
-> On Mon, Aug 12, 2019 at 6:13 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
->> This patch introduces the core infrastructure for free page reporting in
->> virtual environments. It enables the kernel to track the free pages which
->> can be reported to its hypervisor so that the hypervisor could
->> free and reuse that memory as per its requirement.
+On 30/08/2019 15:47, Andrew Jones wrote:
+> On Fri, Aug 30, 2019 at 09:42:46AM +0100, Steven Price wrote:
+>> Introduce a paravirtualization interface for KVM/arm64 based on the
+>> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
 >>
->> While the pages are getting processed in the hypervisor (e.g.,
->> via MADV_DONTNEED), the guest must not use them, otherwise, data loss
->> would be possible. To avoid such a situation, these pages are
->> temporarily removed from the buddy. The amount of pages removed
->> temporarily from the buddy is governed by the backend(virtio-balloon
->> in our case).
+>> This only adds the details about "Stolen Time" as the details of "Live
+>> Physical Time" have not been fully agreed.
 >>
->> To efficiently identify free pages that can to be reported to the
->> hypervisor, bitmaps in a coarse granularity are used. Only fairly big
->> chunks are reported to the hypervisor - especially, to not break up THP
->> in the hypervisor - "MAX_ORDER - 2" on x86, and to save space. The bits
->> in the bitmap are an indication whether a page *might* be free, not a
->> guarantee. A new hook after buddy merging sets the bits.
+>> User space can specify a reserved area of memory for the guest and
+>> inform KVM to populate the memory with information on time that the host
+>> kernel has stolen from the guest.
 >>
->> Bitmaps are stored per zone, protected by the zone lock. A workqueue
->> asynchronously processes the bitmaps, trying to isolate and report pages
->> that are still free. The backend (virtio-balloon) is responsible for
->> reporting these batched pages to the host synchronously. Once reporting/
->> freeing is complete, isolated pages are returned back to the buddy.
+>> A hypercall interface is provided for the guest to interrogate the
+>> hypervisor's support for this interface and the location of the shared
+>> memory structures.
 >>
->> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
-[...]
->> +static void scan_zone_bitmap(struct page_reporting_config *phconf,
->> +                            struct zone *zone)
->> +{
->> +       unsigned long setbit;
->> +       struct page *page;
->> +       int count = 0;
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>  Documentation/virt/kvm/arm/pvtime.txt   | 64 +++++++++++++++++++++++++
+>>  Documentation/virt/kvm/devices/vcpu.txt | 14 ++++++
+>>  2 files changed, 78 insertions(+)
+>>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+>>
+>> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+>> new file mode 100644
+>> index 000000000000..dda3f0f855b9
+>> --- /dev/null
+>> +++ b/Documentation/virt/kvm/arm/pvtime.txt
+>> @@ -0,0 +1,64 @@
+>> +Paravirtualized time support for arm64
+>> +======================================
 >> +
->> +       sg_init_table(phconf->sg, phconf->max_pages);
+>> +Arm specification DEN0057/A defined a standard for paravirtualised time
+>> +support for AArch64 guests:
 >> +
->> +       for_each_set_bit(setbit, zone->bitmap, zone->nbits) {
->> +               /* Process only if the page is still online */
->> +               page = pfn_to_online_page((setbit << PAGE_REPORTING_MIN_ORDER) +
->> +                                         zone->base_pfn);
->> +               if (!page)
->> +                       continue;
+>> +https://developer.arm.com/docs/den0057/a
 >> +
-> Shouldn't you be clearing the bit and dropping the reference to
-> free_pages before you move on to the next bit? Otherwise you are going
-> to be stuck with those aren't you?
->
->> +               spin_lock(&zone->lock);
+>> +KVM/arm64 implements the stolen time part of this specification by providing
+>> +some hypervisor service calls to support a paravirtualized guest obtaining a
+>> +view of the amount of time stolen from its execution.
 >> +
->> +               /* Ensure page is still free and can be processed */
->> +               if (PageBuddy(page) && page_private(page) >=
->> +                   PAGE_REPORTING_MIN_ORDER)
->> +                       count = process_free_page(page, phconf, count);
+>> +Two new SMCCC compatible hypercalls are defined:
 >> +
->> +               spin_unlock(&zone->lock);
-> So I kind of wonder just how much overhead you are taking for bouncing
-> the zone lock once per page here. Especially since it can result in
-> you not actually making any progress since the page may have already
-> been reallocated.
->
+>> +PV_FEATURES 0xC5000020
+>> +PV_TIME_ST  0xC5000022
+>> +
+>> +These are only available in the SMC64/HVC64 calling convention as
+>> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+>> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+>> +mechanism before calling it.
+>> +
+>> +PV_FEATURES
+>> +    Function ID:  (uint32)  : 0xC5000020
+>> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
+> 
+> PV_TIME_LPT doesn't exist
 
-I am wondering if there is a way to measure this overhead?
-After thinking about this, I do understand your point.
-One possible way which I can think of to address this is by having a
-page_reporting_dequeue() hook somewhere in the allocation path.
-    
-For some reason, I am not seeing this work as I would have expected
-but I don't have solid reasoning to share yet. It could be simply
-because I am putting my hook at the wrong place. I will continue
-investigating this.
+Thanks, will remove.
 
-In any case, I may be over complicating things here, so please let me
-if there is a better way to do this.
+>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>> +                              PV-time feature is supported by the hypervisor.
+>> +
+>> +PV_TIME_ST
+>> +    Function ID:  (uint32)  : 0xC5000022
+>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+>> +                              VCPU. On failure:
+>> +                              NOT_SUPPORTED (-1)
+>> +
+>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>> +with inner and outer write back caching attributes, in the inner shareable
+>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+>> +meaningfully filled by the hypervisor (see structure below).
+>> +
+>> +PV_TIME_ST returns the structure for the calling VCPU.
+>> +
+>> +Stolen Time
+>> +-----------
+>> +
+>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+>> +
+>> +  Field       | Byte Length | Byte Offset | Description
+>> +  ----------- | ----------- | ----------- | --------------------------
+>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+>> +  Attributes  |      4      |      4      | Must be 0
+> 
+> The above fields don't appear to be exposed to userspace in anyway. How
+> will we handle migration from one KVM with one version of the structure
+> to another?
 
-If this overhead is not significant we can probably live with it.
+Interesting question. User space does have access to them now it is
+providing the memory, but it's not exactly an easy method. In particular
+user space has no (simple) way of probing the kernel's supported version.
 
--- 
-Thanks
-Nitesh
+I guess one solution would be to add an extra attribute on the VCPU
+which would provide the revision information. The current kernel would
+then reject any revision other than 0, but this could then be extended
+to support other revision numbers in the future.
+
+Although there's some logic in saying we could add the extra attribute
+when(/if) there is a new version. Future kernels would then be expected
+to use the current version unless user space explicitly set the new
+attribute.
+
+Do you feel this is something that needs to be addressed now, or can it
+be deferred until another version is proposed?
+
+>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+>> +              |             |             | nanoseconds indicating how
+>> +              |             |             | much time this VCPU thread
+>> +              |             |             | was involuntarily not
+>> +              |             |             | running on a physical CPU.
+>> +
+>> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+>> +will be present within a reserved region of the normal memory given to the
+>> +guest. The guest should not attempt to write into this memory. There is a
+>> +structure per VCPU of the guest.
+> 
+> Should we provide a recommendation as to how that reserved memory is
+> provided? One memslot divided into NR_VCPUS subregions? Should the
+> reserved region be described to the guest kernel with DT/ACPI? Or
+> should userspace ensure the region is not within any DT/ACPI described
+> regions?
+
+I'm open to providing a recommendation, but I'm not entirely sure I know
+enough here to provide one.
+
+There is an obvious efficiency argument for minimizing memslots with the
+current code. But if someone has a reason for using multiple memslots
+then that's probably a good argument for implementing a memslot-caching
+kvm_put_user() rather than to be dis-recommended.
+
+My assumption (and testing) has been with a single memslot divided into
+NR_VCPUS (or more accurately the number of VCPUs in the VM) subregions.
+
+For testing DT I've tested both methods: an explicit reserved region or
+just ensuring it's not in any DT described region. Both seem reasonable,
+but it might be easier to integrate into existing migration mechanisms
+if it's simply a reserved region (then the memory block of the guest is
+just as it always was).
+
+For ACPI the situation should be similar, but my testing has been with DT.
+
+Thanks,
+
+Steve
+
+>> +
+>> +For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
+>> +section "3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL".
+>> +
+>> diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
+>> index 2b5dab16c4f2..896777f76f36 100644
+>> --- a/Documentation/virt/kvm/devices/vcpu.txt
+>> +++ b/Documentation/virt/kvm/devices/vcpu.txt
+>> @@ -60,3 +60,17 @@ time to use the number provided for a given timer, overwriting any previously
+>>  configured values on other VCPUs.  Userspace should configure the interrupt
+>>  numbers on at least one VCPU after creating all VCPUs and before running any
+>>  VCPUs.
+>> +
+>> +3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
+>> +Architectures: ARM64
+>> +
+>> +3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_SET_IPA
+>> +Parameters: 64-bit base address
+>> +Returns: -ENXIO:  Stolen time not implemented
+>> +         -EEXIST: Base address already set for this VCPU
+>> +         -EINVAL: Base address not 64 byte aligned
+>> +
+>> +Specifies the base address of the stolen time structure for this VCPU. The
+>> +base address must be 64 byte aligned and exist within a valid guest memory
+>> +region. See Documentation/virt/kvm/arm/pvtime.txt for more information
+>> +including the layout of the stolen time structure.
+>> -- 
+>> 2.20.1
+>>
+> 
+> Thanks,
+> drew 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
 
