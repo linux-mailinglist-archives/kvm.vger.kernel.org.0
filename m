@@ -2,102 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 413B3A2C2A
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 03:12:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1A8BA2C51
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 03:30:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727938AbfH3BMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 21:12:32 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46506 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727410AbfH3BMc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 21:12:32 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q139so3354535pfc.13
-        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 18:12:32 -0700 (PDT)
+        id S1727328AbfH3BaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 21:30:08 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:38611 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727242AbfH3BaB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 21:30:01 -0400
+Received: by mail-yw1-f68.google.com with SMTP id f187so1844878ywa.5
+        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 18:30:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=kCTRSL9QD9A19TQM7l1DPuOYasStlYMpBTNlp3Cc7WU=;
-        b=kvapemHg9VS6qeap+IOziXN+q8oEYq8ub8oKrqIj9oGbzrFgxIMxYsoxF216sjVDFQ
-         Ah0YP5cyxaBDT7zJakkvNr9u1+TgIg525c0+O61dn/eGAtOwkX5dvqBJeGgz7QWIZJL8
-         PXJkbX7vDqMYs9TUVPeUaSIn3yMp+W8uEgM+eSo8Uhc7JajZUtIfomtm1Rz62yJg+VzF
-         ampMobpFfFbJQt46QPRx9NRRe07ANgG32Ay8+vq5tEv10jZofd1OLwd8y0jkZaydiTjf
-         TirSVz5pN01+fqDHJmRY2waPSqzliG/cx7dpj9utvKeyOdKuY7y118o4u42N+C54ADzK
-         WA3A==
+        d=omnibond-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yDmQxANGbqTJGtO1OhTa4PkciZSXcUVcA6Y2VnUF5Ug=;
+        b=tRuQF9NGsWriwh9rOUGWV/XnpvxEIfrIBLDnzsNlL2DcXYptI5uYx9v9XRgXG9ikj+
+         lAdRFBmN8WWgzpxjYwMBvOBMGH9vQkyzn/bAHiywFTqTy8Rv0zmy7NK3LdyKNjjgvNdr
+         mcLlIarH9lbZWT5t7oU7MIVWXKIhgWd4FFEn+XvtJUHOlIO0rItLGA+Zt6tlzfYijXTt
+         MmEvGy0xnlwDGgt/OUq/OkC9egtS+p7sT3eJ3BcAb9vNf6OatXnbSWZ0hHXVonsgbMVH
+         pMy2zHMasv+EgzYrXDb3idQdrvXUOVYyNS1FKC2EzXUecfAda8U+O/uwCTXSTJ6SOTSm
+         T3ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=kCTRSL9QD9A19TQM7l1DPuOYasStlYMpBTNlp3Cc7WU=;
-        b=sfoPTyKwG/c3h9+n1WyCO+VrpuFLLJzah3h/lqKOue0AfDLpwn7VSMGAXKU9E/Ktoa
-         XllvDkRYOEXenyTrkWSriDLFFnquLLKHcsYR5p9T2TGKM2OZ+ugbTfOZrQAy/ptMoW+7
-         X7jRzyi1iYJ20ltR4UAc9TZLVUXdxtRMSyy/ywT2r5Cmqj7T/5wIO/+vnk3LPxyYHWtQ
-         7wtIs+QlmX1mMpueXQeloGI4uc0T64iYAWdWoBIIeTgKmqYNEN4mio9Qz197TcCDeUg/
-         1rO5S1bU1Gve7hr5Q3vE/CVR8A7TmGi7/TTNuMcryqRrOFFtEoYRulAl36akESsDPCPY
-         g8EA==
-X-Gm-Message-State: APjAAAVosGRtRSuBNm5qeW/+2Ex1T06Pk8DvHBPSKOFuyhEbio/mJca4
-        fR/snJhSHeXJY1J0VZW5yOE=
-X-Google-Smtp-Source: APXvYqxNcvDrzXRtElhf/hua4i0glSYAtHerC+z9mEKDbRpIaStVs65qsfx70podIU2725ealjH0lA==
-X-Received: by 2002:a63:2887:: with SMTP id o129mr10702584pgo.179.1567127551676;
-        Thu, 29 Aug 2019 18:12:31 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id p189sm4371042pfb.112.2019.08.29.18.12.30
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Aug 2019 18:12:30 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 4/4] kvm-unit-test: nVMX: Check GUEST_DEBUGCTL and
- GUEST_DR7 on vmentry of nested guests
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CALMp9eTBwNExJ_7+i6y7XcvQobSbAfhfMCs3u1G0zUZ+nQhkjg@mail.gmail.com>
-Date:   Thu, 29 Aug 2019 18:12:26 -0700
-Cc:     kvm list <kvm@vger.kernel.org>,
-        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AC03372E-DC8C-4494-BFFA-6BB85DC6B896@gmail.com>
-References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
- <20190829205635.20189-5-krish.sadhukhan@oracle.com>
- <CALMp9eTBwNExJ_7+i6y7XcvQobSbAfhfMCs3u1G0zUZ+nQhkjg@mail.gmail.com>
-To:     Jim Mattson <jmattson@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yDmQxANGbqTJGtO1OhTa4PkciZSXcUVcA6Y2VnUF5Ug=;
+        b=Td3caY5m+o/WlE/lDDaItIevBREMayrXZIzlCRu2KWUlwvKsUJ+ZKbBBnjLrPXZPH2
+         BfBly5SvE4v4/mV12gOjGq2ufSxwZ1BQ+P/fRWHb+0Bw3PIVthRbQ/L7tagl47755nEt
+         i+LSSyVhrmXmnF8wlJISL44lP9ji20R8v2zEwj2KrjxoUw/tH7b+m3rooPs0Gva5aWBo
+         VOxCXbAdhIfYWA/upVHr30Us5tJAD3+f8m+oeHvzp4ruhTVr3KgU29EzsHIwyerGOd8e
+         8P90QAxgHPB/sUs9Qavg77wXrZPbXpIPHQVXWlE7ECUMC1sTAF0jpauzvOSqfTJC0OT+
+         MRIg==
+X-Gm-Message-State: APjAAAWn+HzGlzacB33eKWceNmHtvgwOo5QwlWT9DkQRfGlZ6oraMESy
+        7VHf5co+Xvzyc+xjXuxFLP97kbYRz3EXWMMvjAFNxUsWV4RuNX65
+X-Google-Smtp-Source: APXvYqyIDKOrxjb28zWL9kagM4gqNHMvZYp0EWQP/d+eBC6/dEWbXTKwXclpCyHxrYDHzsr0mwrMijbohn/hHGTlziQ=
+X-Received: by 2002:a81:3681:: with SMTP id d123mr9802172ywa.348.1567128600919;
+ Thu, 29 Aug 2019 18:30:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190807013340.9706-1-jhubbard@nvidia.com> <912eb2bd-4102-05c1-5571-c261617ad30b@nvidia.com>
+In-Reply-To: <912eb2bd-4102-05c1-5571-c261617ad30b@nvidia.com>
+From:   Mike Marshall <hubcap@omnibond.com>
+Date:   Thu, 29 Aug 2019 21:29:50 -0400
+Message-ID: <CAOg9mSQKGDywcMde2DE42diUS7J8m74Hdv+xp_PJhC39EXZQuw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/39] put_user_pages(): miscellaneous call sites
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-media@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        linux-rdma@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+        linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
+        rds-devel@oss.oracle.com, sparclinux@vger.kernel.org,
+        x86@kernel.org, xen-devel@lists.xenproject.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Aug 29, 2019, at 4:17 PM, Jim Mattson <jmattson@google.com> wrote:
->=20
-> On Thu, Aug 29, 2019 at 2:30 PM Krish Sadhukhan
-> <krish.sadhukhan@oracle.com> wrote:
->> According to section "Checks on Guest Control Registers, Debug =
-Registers, and
->> and MSRs" in Intel SDM vol 3C, the following checks are performed on =
-vmentry
->> of nested guests:
->>=20
->>    If the "load debug controls" VM-entry control is 1,
->>=20
->>       - bits reserved in the IA32_DEBUGCTL MSR must be 0 in the field =
-for
->>         that register. The first processors to support the =
-virtual-machine
->>         extensions supported only the 1-setting of this control and =
-thus
->>         performed this check unconditionally.
->>=20
->>       - bits 63:32 in the DR7 field must be 0.
->>=20
->> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
->> ---
->> ...
->> +#define        DEBUGCTL_RESERVED_BITS  0xFFFFFFFFFFFF203C
->=20
-> For the virtual CPU implemented by kvm today, only bits 0 and 1 are =
-allowed.
+Hi John...
 
-Please build the tests so they would pass on bare-metal.
+I added this patch series on top of Linux 5.3rc6 and ran
+xfstests with no regressions...
 
+Acked-by: Mike Marshall <hubcap@omnibond.com>
+
+-Mike
+
+On Tue, Aug 6, 2019 at 9:50 PM John Hubbard <jhubbard@nvidia.com> wrote:
+>
+> On 8/6/19 6:32 PM, john.hubbard@gmail.com wrote:
+> > From: John Hubbard <jhubbard@nvidia.com>
+> > ...
+> >
+> > John Hubbard (38):
+> >   mm/gup: add make_dirty arg to put_user_pages_dirty_lock()
+> ...
+> >  54 files changed, 191 insertions(+), 323 deletions(-)
+> >
+> ahem, yes, apparently this is what happens if I add a few patches while editing
+> the cover letter... :)
+>
+> The subject line should read "00/41", and the list of files affected here is
+> therefore under-reported in this cover letter. However, the patch series itself is
+> intact and ready for submission.
+>
+> thanks,
+> --
+> John Hubbard
+> NVIDIA
