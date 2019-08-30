@@ -2,98 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C665A3DC8
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 20:37:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CF4CA3DDD
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 20:45:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728079AbfH3ShF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 14:37:05 -0400
-Received: from mga14.intel.com ([192.55.52.115]:52021 "EHLO mga14.intel.com"
+        id S1727959AbfH3SpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 14:45:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52704 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727914AbfH3ShE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 14:37:04 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Aug 2019 11:37:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,447,1559545200"; 
-   d="scan'208";a="382100406"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga006.fm.intel.com with ESMTP; 30 Aug 2019 11:37:04 -0700
-Date:   Fri, 30 Aug 2019 11:37:03 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH 4/7] KVM: nVMX: check GUEST_IA32_PERF_GLOBAL_CTRL on
- VM-Entry
-Message-ID: <20190830183703.GG15405@linux.intel.com>
-References: <20190828234134.132704-1-oupton@google.com>
- <20190828234134.132704-5-oupton@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190828234134.132704-5-oupton@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1727883AbfH3SpT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 14:45:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E19FF300BEA5;
+        Fri, 30 Aug 2019 18:45:18 +0000 (UTC)
+Received: from thuth.com (unknown [10.36.118.111])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7609760872;
+        Fri, 30 Aug 2019 18:45:14 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Drew Jones <drjones@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH] travis.yml: Enable running of tests with TCG
+Date:   Fri, 30 Aug 2019 20:45:09 +0200
+Message-Id: <20190830184509.15240-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 30 Aug 2019 18:45:18 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 28, 2019 at 04:41:31PM -0700, Oliver Upton wrote:
-> According to the SDM 26.3.1.1, "If the "load IA32_PERF_GLOBAL_CTRL" VM-entry
-> control is 1, bits reserved in the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
-> field for that register".
-> 
-> Adding condition to nested_vmx_check_guest_state() to check the validity of
-> GUEST_IA32_PERF_GLOBAL_CTRL if the "load IA32_PERF_GLOBAL_CTRL" bit is
-> set on the VM-entry control.
+Currently the tests at the end of the .travis.yml script are ignored,
+since we can not use KVM in the Travis containers. But we can actually
+run of some of the kvm-unit-tests with TCG instead, to make sure that
+the binaries are not completely broken.
+Thus introduce a new TESTS variable that lists the tests which we can
+run with TCG. Unfortunately, the ppc64 and s390x QEMUs in Ubuntu also
+need some extra love: The ppc64 version only works with the additional
+"cap-htm=off" setting. And the s390x package lacks the firmware and
+refuses to work unless we provide a fake firmware file here. Any file
+works since the firmware is skipped when "-kernel" is used, so we can
+simply use one of the pre-existing files in the source tree.
 
-Same comment on mood.  And for this case, it's probably overkill to
-give a play-by-play of the code, just state that you're adding a check
-as described in the SDM, e.g.:
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .travis.yml | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-Add a nested VM-Enter consistency check when loading the guest's
-IA32_PERF_GLOBAL_CTRL MSR from vmcs12.  Per Intel's SDM:
+diff --git a/.travis.yml b/.travis.yml
+index a4a165d..6c14953 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -20,24 +20,40 @@ env:
+   matrix:
+     - CONFIG=""
+       BUILD_DIR="."
++      TESTS="vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ipi
++             vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed"
+     - CONFIG=""
+       BUILD_DIR="x86-builddir"
++      TESTS="ioapic-split ioapic smptest smptest3 eventinj msr port80 syscall
++             tsc rmap_chain umip intel_iommu vmexit_inl_pmtimer vmexit_ipi_halt"
+     - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+       BUILD_DIR="."
++      TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
+     - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+       BUILD_DIR="arm-buildir"
++      TESTS="pci-test pmu gicv2-active gicv3-active psci selftest-setup"
+     - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
+       BUILD_DIR="."
++      TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
+     - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
+       BUILD_DIR="arm64-buildir"
++      TESTS="pci-test pmu gicv2-active gicv3-active psci timer selftest-setup"
+     - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+       BUILD_DIR="."
++      TESTS="spapr_hcall emulator rtas-set-time-of-day"
++      ACCEL="tcg,cap-htm=off"
+     - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+       BUILD_DIR="ppc64le-buildir"
++      TESTS="rtas-get-time-of-day rtas-get-time-of-day-base"
++      ACCEL="tcg,cap-htm=off"
+     - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+       BUILD_DIR="."
++      TESTS="diag10 diag308"
++      ACCEL="tcg,firmware=s390x/run"
+     - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+       BUILD_DIR="s390x-builddir"
++      TESTS="sieve"
++      ACCEL="tcg,firmware=s390x/run"
+ 
+ before_script:
+   - mkdir -p $BUILD_DIR && cd $BUILD_DIR
+@@ -45,4 +61,5 @@ before_script:
+   - if [ -e ../configure ]; then ../configure $CONFIG ; fi
+ script:
+   - make -j3
+-  - ./run_tests.sh || true
++  - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
++  - if grep -q FAIL results.txt ; then exit 1 ; fi
+-- 
+2.18.1
 
-  If the "load IA32_PERF_GLOBAL_CTRL" VM-entry control is 1, bits
-  reserved in the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the field for
-  that register.
-
-> 
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 9ba90b38d74b..8d6f0144b1bd 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -10,6 +10,7 @@
->  #include "hyperv.h"
->  #include "mmu.h"
->  #include "nested.h"
-> +#include "pmu.h"
->  #include "trace.h"
->  #include "x86.h"
->  
-> @@ -2748,6 +2749,11 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
->  		return -EINVAL;
->  	}
->  
-> +	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL &&
-> +	    !kvm_is_valid_perf_global_ctrl(vcpu,
-> +					   vmcs12->guest_ia32_perf_global_ctrl))
-> +		return -EINVAL;
-> +
->  	/*
->  	 * If the load IA32_EFER VM-entry control is 1, the following checks
->  	 * are performed on the field for the IA32_EFER MSR:
-> -- 
-> 2.23.0.187.g17f5b7556c-goog
-> 
