@@ -2,152 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24C20A38BA
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 16:03:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2AA9A3982
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 16:47:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727924AbfH3OCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 10:02:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19836 "EHLO mx1.redhat.com"
+        id S1727888AbfH3Orl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 10:47:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44968 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727135AbfH3OCa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 10:02:30 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1727135AbfH3Ork (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 10:47:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 62C7FC075BD2;
-        Fri, 30 Aug 2019 14:02:30 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 35E8D3DE1;
-        Fri, 30 Aug 2019 14:02:26 +0000 (UTC)
-Date:   Fri, 30 Aug 2019 16:02:23 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
-Message-ID: <20190830160223.332fd81f.cohuck@redhat.com>
-In-Reply-To: <AM0PR05MB486621283F935B673455DA63D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
-        <20190829111904.16042-1-parav@mellanox.com>
-        <20190829111904.16042-2-parav@mellanox.com>
-        <20190830111720.04aa54e9.cohuck@redhat.com>
-        <AM0PR05MB48660877881F7A2D757A9C82D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190830143927.163d13a7.cohuck@redhat.com>
-        <AM0PR05MB486621283F935B673455DA63D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id A80B5307D962;
+        Fri, 30 Aug 2019 14:47:39 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A90BA5DC18;
+        Fri, 30 Aug 2019 14:47:36 +0000 (UTC)
+Date:   Fri, 30 Aug 2019 16:47:34 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Steven Price <steven.price@arm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Russell King <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 01/10] KVM: arm64: Document PV-time interface
+Message-ID: <20190830144734.kvj4dvt32qzmhw32@kamzik.brq.redhat.com>
+References: <20190830084255.55113-1-steven.price@arm.com>
+ <20190830084255.55113-2-steven.price@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 30 Aug 2019 14:02:30 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190830084255.55113-2-steven.price@arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Fri, 30 Aug 2019 14:47:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 30 Aug 2019 12:58:04 +0000
-Parav Pandit <parav@mellanox.com> wrote:
+On Fri, Aug 30, 2019 at 09:42:46AM +0100, Steven Price wrote:
+> Introduce a paravirtualization interface for KVM/arm64 based on the
+> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
+> 
+> This only adds the details about "Stolen Time" as the details of "Live
+> Physical Time" have not been fully agreed.
+> 
+> User space can specify a reserved area of memory for the guest and
+> inform KVM to populate the memory with information on time that the host
+> kernel has stolen from the guest.
+> 
+> A hypercall interface is provided for the guest to interrogate the
+> hypervisor's support for this interface and the location of the shared
+> memory structures.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  Documentation/virt/kvm/arm/pvtime.txt   | 64 +++++++++++++++++++++++++
+>  Documentation/virt/kvm/devices/vcpu.txt | 14 ++++++
+>  2 files changed, 78 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+> 
+> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+> new file mode 100644
+> index 000000000000..dda3f0f855b9
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/pvtime.txt
+> @@ -0,0 +1,64 @@
+> +Paravirtualized time support for arm64
+> +======================================
+> +
+> +Arm specification DEN0057/A defined a standard for paravirtualised time
+> +support for AArch64 guests:
+> +
+> +https://developer.arm.com/docs/den0057/a
+> +
+> +KVM/arm64 implements the stolen time part of this specification by providing
+> +some hypervisor service calls to support a paravirtualized guest obtaining a
+> +view of the amount of time stolen from its execution.
+> +
+> +Two new SMCCC compatible hypercalls are defined:
+> +
+> +PV_FEATURES 0xC5000020
+> +PV_TIME_ST  0xC5000022
+> +
+> +These are only available in the SMC64/HVC64 calling convention as
+> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+> +mechanism before calling it.
+> +
+> +PV_FEATURES
+> +    Function ID:  (uint32)  : 0xC5000020
+> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
 
-> > -----Original Message-----
-> > From: Cornelia Huck <cohuck@redhat.com>
-> > Sent: Friday, August 30, 2019 6:09 PM
-> > To: Parav Pandit <parav@mellanox.com>
-> > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; netdev@vger.kernel.org
-> > Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
-> > 
-> > On Fri, 30 Aug 2019 12:33:22 +0000
-> > Parav Pandit <parav@mellanox.com> wrote:
-> >   
-> > > > -----Original Message-----
-> > > > From: Cornelia Huck <cohuck@redhat.com>
-> > > > Sent: Friday, August 30, 2019 2:47 PM
-> > > > To: Parav Pandit <parav@mellanox.com>
-> > > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
-> > > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > > Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
-> > > >
-> > > > On Thu, 29 Aug 2019 06:18:59 -0500
-> > > > Parav Pandit <parav@mellanox.com> wrote:
-> > > >  
-> > > > > Some vendor drivers want an identifier for an mdev device that is
-> > > > > shorter than the UUID, due to length restrictions in the consumers
-> > > > > of that identifier.
-> > > > >
-> > > > > Add a callback that allows a vendor driver to request an alias of
-> > > > > a specified length to be generated for an mdev device. If
-> > > > > generated, that alias is checked for collisions.
-> > > > >
-> > > > > It is an optional attribute.
-> > > > > mdev alias is generated using sha1 from the mdev name.
-> > > > >
-> > > > > Signed-off-by: Parav Pandit <parav@mellanox.com>
-> > > > >
-> > > > > ---
-> > > > > Changelog:
-> > > > > v1->v2:
-> > > > >  - Kept mdev_device naturally aligned
-> > > > >  - Added error checking for crypt_*() calls
-> > > > >  - Corrected a typo from 'and' to 'an'
-> > > > >  - Changed return type of generate_alias() from int to char*
-> > > > > v0->v1:
-> > > > >  - Moved alias length check outside of the parent lock
-> > > > >  - Moved alias and digest allocation from kvzalloc to kzalloc
-> > > > >  - &alias[0] changed to alias
-> > > > >  - alias_length check is nested under get_alias_length callback
-> > > > > check
-> > > > >  - Changed comments to start with an empty line
-> > > > >  - Fixed cleaunup of hash if mdev_bus_register() fails
-> > > > >  - Added comment where alias memory ownership is handed over to
-> > > > > mdev device
-> > > > >  - Updated commit log to indicate motivation for this feature
-> > > > > ---
-> > > > >  drivers/vfio/mdev/mdev_core.c    | 123  
-> > > > ++++++++++++++++++++++++++++++-  
-> > > > >  drivers/vfio/mdev/mdev_private.h |   5 +-
-> > > > >  drivers/vfio/mdev/mdev_sysfs.c   |  13 ++--
-> > > > >  include/linux/mdev.h             |   4 +
-> > > > >  4 files changed, 135 insertions(+), 10 deletions(-)  
-> >   
-> > > > ...and detached from the local variable here. Who is freeing it? The
-> > > > comment states that it is done by the mdev, but I don't see it?
-> > > >  
-> > > mdev_device_free() frees it.  
-> > 
-> > Ah yes, I overlooked the kfree().
-> >   
-> > > once its assigned to mdev, mdev is the owner of it.
-> > >  
-> > > > This detour via the local variable looks weird to me. Can you either
-> > > > create the alias directly in the mdev (would need to happen later in
-> > > > the function, but I'm not sure why you generate the alias before
-> > > > checking for duplicates anyway), or do an explicit copy?  
-> > > Alias duplicate check is done after generating it, because duplicate alias are  
-> > not allowed.  
-> > > The probability of collision is rare.
-> > > So it is speculatively generated without hold the lock, because there is no  
-> > need to hold the lock.  
-> > > It is compared along with guid while mutex lock is held in single loop.
-> > > And if it is duplicate, there is no need to allocate mdev.
-> > >
-> > > It will be sub optimal to run through the mdev list 2nd time after mdev  
-> > creation and after generating alias for duplicate check.
-> > 
-> > Ok, but what about copying it? I find this "set local variable to NULL after
-> > ownership is transferred" pattern a bit unintuitive. Copying it to the mdev (and
-> > then unconditionally freeing it) looks more obvious to me.  
-> Its not unconditionally freed. 
+PV_TIME_LPT doesn't exist
 
-That's not what I have been saying :(
+> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+> +                              PV-time feature is supported by the hypervisor.
+> +
+> +PV_TIME_ST
+> +    Function ID:  (uint32)  : 0xC5000022
+> +    Return value: (int64)   : IPA of the stolen time data structure for this
+> +                              VCPU. On failure:
+> +                              NOT_SUPPORTED (-1)
+> +
+> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+> +with inner and outer write back caching attributes, in the inner shareable
+> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+> +meaningfully filled by the hypervisor (see structure below).
+> +
+> +PV_TIME_ST returns the structure for the calling VCPU.
+> +
+> +Stolen Time
+> +-----------
+> +
+> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+> +
+> +  Field       | Byte Length | Byte Offset | Description
+> +  ----------- | ----------- | ----------- | --------------------------
+> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+> +  Attributes  |      4      |      4      | Must be 0
 
-> Its freed in the error unwinding path.
-> I think its ok along with the comment that describes this error path area.
+The above fields don't appear to be exposed to userspace in anyway. How
+will we handle migration from one KVM with one version of the structure
+to another?
 
-It is not wrong, but I'm not sure I like it.
+> +  Stolen time |      8      |      8      | Stolen time in unsigned
+> +              |             |             | nanoseconds indicating how
+> +              |             |             | much time this VCPU thread
+> +              |             |             | was involuntarily not
+> +              |             |             | running on a physical CPU.
+> +
+> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+> +will be present within a reserved region of the normal memory given to the
+> +guest. The guest should not attempt to write into this memory. There is a
+> +structure per VCPU of the guest.
+
+Should we provide a recommendation as to how that reserved memory is
+provided? One memslot divided into NR_VCPUS subregions? Should the
+reserved region be described to the guest kernel with DT/ACPI? Or
+should userspace ensure the region is not within any DT/ACPI described
+regions?
+
+> +
+> +For the user space interface see Documentation/virt/kvm/devices/vcpu.txt
+> +section "3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL".
+> +
+> diff --git a/Documentation/virt/kvm/devices/vcpu.txt b/Documentation/virt/kvm/devices/vcpu.txt
+> index 2b5dab16c4f2..896777f76f36 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.txt
+> +++ b/Documentation/virt/kvm/devices/vcpu.txt
+> @@ -60,3 +60,17 @@ time to use the number provided for a given timer, overwriting any previously
+>  configured values on other VCPUs.  Userspace should configure the interrupt
+>  numbers on at least one VCPU after creating all VCPUs and before running any
+>  VCPUs.
+> +
+> +3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
+> +Architectures: ARM64
+> +
+> +3.1 ATTRIBUTE: KVM_ARM_VCPU_PVTIME_SET_IPA
+> +Parameters: 64-bit base address
+> +Returns: -ENXIO:  Stolen time not implemented
+> +         -EEXIST: Base address already set for this VCPU
+> +         -EINVAL: Base address not 64 byte aligned
+> +
+> +Specifies the base address of the stolen time structure for this VCPU. The
+> +base address must be 64 byte aligned and exist within a valid guest memory
+> +region. See Documentation/virt/kvm/arm/pvtime.txt for more information
+> +including the layout of the stolen time structure.
+> -- 
+> 2.20.1
+>
+
+Thanks,
+drew 
