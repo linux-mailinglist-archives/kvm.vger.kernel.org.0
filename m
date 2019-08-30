@@ -2,83 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A50C4A40D3
-	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2019 01:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D60F7A4105
+	for <lists+kvm@lfdr.de>; Sat, 31 Aug 2019 01:27:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728237AbfH3XPU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 19:15:20 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38103 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727708AbfH3XPU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 19:15:20 -0400
-Received: by mail-io1-f68.google.com with SMTP id p12so17409552iog.5
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2019 16:15:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p5BdbNptKoZ5RdUVPmAaMERbP6sEWIzDqViEwn1vBHA=;
-        b=EWr3JWoWn/5gqytNAlNslwWTCpaaq1DSWFsXBGvmocCuyWYXSZZIRdcMsselYzhN8q
-         FFYu8waFyygEZEl27QIcKuAOfB+f8jNT/cVrkRaS8W5TL6D++p1A+22y9W9WK6Q0BH6O
-         fFUaplGXfAZUqeBOdJAJn8v3aVF7FzOfuUmZgHLM0FKRl8qb8U2upGllrPxcJUErvYd3
-         L60JfPdAhVl5Zs58HolSb1jSTK99NjGrVxf2j/ABitbCBC/4H0D8TvukIUuUAd1MWz1f
-         NLSsNjMHVZ45OAsKhWj46B7RkE5vbSXtg9ZX23UMnTzQcgupoXUtwWniAWvYfOuSBhoe
-         xO4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p5BdbNptKoZ5RdUVPmAaMERbP6sEWIzDqViEwn1vBHA=;
-        b=kAtOeUYsamvtrH0z/0cKB21A3YxiIXgvJWypol+HpaFkx2V+hthGmyQMTJFBUzeODB
-         GIjUZxP6n6F+zj+Ys586dSnpTlgRcLnBZpip9PDrFMi+4G//O1MyjkFFJMXC125/EbyY
-         p3e4OoldlIxyy8O+le1Gj5e7zGx1Ze2RvYFiKyQho9eDHezO9zFwhrRLl3mLjv39MZ+Y
-         u8gLLTSvOnRnoL32Lkn/WQx0W8zTvQ/rIQ/D8JItfc9Pu1gAMTNRwrReZhiJcNNa+Zug
-         QL1OsgJ7J1qctUOa5a2sJ7fTIOn4+8ZjiT8vMT3aRkTblsqKgd1+RdpLFNRPZTQljzIe
-         fPNw==
-X-Gm-Message-State: APjAAAVi7yu9HjAdJ7MtWDTQzllJIC97lWTvcBJGaxYoG2jDEJt7W4f5
-        EZGCDt6lQpFPuBF772NS6ts8/FgMkkXGiPcc333D0/ylYyo=
-X-Google-Smtp-Source: APXvYqw/WzB05K39kYChSpyMEzIYT/wPkpA16/sSmFJS96wUVdRz7O41ubYzYiW4M8AtKiVGW871dHBDHw1krA9+UWQ=
-X-Received: by 2002:a05:6602:103:: with SMTP id s3mr12639605iot.119.1567206918934;
- Fri, 30 Aug 2019 16:15:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
- <20190829205635.20189-3-krish.sadhukhan@oracle.com> <CALMp9eSekWEvvgwhMXWOtRZG1saQDOaKr+_4AacuM9JtH5guww@mail.gmail.com>
- <a4882749-a5cc-f8cd-4641-dd61314e6312@oracle.com>
-In-Reply-To: <a4882749-a5cc-f8cd-4641-dd61314e6312@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 30 Aug 2019 16:15:06 -0700
-Message-ID: <CALMp9eTBPRT+Re9rZzmutAiy62qSMQRfMrnyiYkNHkCKDy-KPQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+        id S1728240AbfH3X1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 19:27:00 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47784 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727304AbfH3X1A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 19:27:00 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7UNNmWj153195;
+        Fri, 30 Aug 2019 23:26:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=ngtg4yHQ9M+IZvk9vsX6CV0kQrDljgS/M+sOckzc5hc=;
+ b=JfGcjOgd4XUKYEQEUMlkVycNCzryYymkHc59a2MqoZmIhnsDEMRM94druYA6UHW8SmdG
+ HimQNZ21TFwrXjF5UcUMErBtbDtiRH/LSQToa9um3LRjB26IaMHLLPwD0fztJH9JA1JR
+ 6zqj3tbhH2JGGzd6Un0Lkiqp573dEMXe3KN3xEtkXtSBkkEy6pHLJhFeslW9h0/wYlhw
+ SvEvB8PZrHKenstow9+QkavwqYHVLZRgYlGIJf1KRqVre6FUOvQTvNS7dzDMJGgbyrVp
+ MT5NUOAjyFMmAFiv1CZJlf9TdOGbAfqDZlfcAm2uGPyYdJksBbAhYK40Ikdnbt8cyzCf Yw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2uqdah00yu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Aug 2019 23:26:52 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7UNN4n6031578;
+        Fri, 30 Aug 2019 23:26:52 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2uqd1vgppy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 30 Aug 2019 23:26:51 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7UNQpI3003246;
+        Fri, 30 Aug 2019 23:26:51 GMT
+Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 30 Aug 2019 16:26:50 -0700
+Subject: Re: [PATCH 1/4] KVM: nVMX: Check GUEST_DEBUGCTL on vmentry of nested
+ guests
+To:     Jim Mattson <jmattson@google.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
+ <20190829205635.20189-2-krish.sadhukhan@oracle.com>
+ <CALMp9eQxdF5tJLWaWu+0t0NjhSiJfowo1U6MDkjB_zYNRKiyKw@mail.gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <e35e7c1f-e5c8-5f98-771e-302cf8dfba7f@oracle.com>
+Date:   Fri, 30 Aug 2019 16:26:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eQxdF5tJLWaWu+0t0NjhSiJfowo1U6MDkjB_zYNRKiyKw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9365 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908300229
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9365 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908300229
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 4:07 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
->
-> On 08/29/2019 03:26 PM, Jim Mattson wrote:
-> > On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
-> > <krish.sadhukhan@oracle.com> wrote:
-> >> According to section "Checks on Guest Control Registers, Debug Registers, and
-> >> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
-> >> of nested guests:
-> >>
-> >>      If the "load debug controls" VM-entry control is 1, bits 63:32 in the DR7
-> >>      field must be 0.
-> > Can't we just let the hardware check guest DR7? This results in
-> > "VM-entry failure due to invalid guest state," right? And we just
-> > reflect that to L1?
->
-> Just trying to understand the reason why this particular check can be
-> deferred to the hardware.
 
-The vmcs02 field has the same value as the vmcs12 field, and the
-physical CPU has the same requirements as the virtual CPU.
+
+On 08/29/2019 03:12 PM, Jim Mattson wrote:
+> On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
+> <krish.sadhukhan@oracle.com> wrote:
+>> According to section "Checks on Guest Control Registers, Debug Registers, and
+>> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
+>> of nested guests:
+>>
+>>      If the "load debug controls" VM-entry control is 1, bits reserved in the
+>>      IA32_DEBUGCTL MSR must be 0 in the field for that register. The first
+>>      processors to support the virtual-machine extensions supported only the
+>>      1-setting of this control and thus performed this check unconditionally.
+>>
+>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>> ---
+>>   arch/x86/kvm/vmx/nested.c | 4 ++++
+>>   arch/x86/kvm/x86.h        | 6 ++++++
+>>   2 files changed, 10 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 46af3a5e9209..0b234e95e0ed 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -2677,6 +2677,10 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+>>              !nested_guest_cr4_valid(vcpu, vmcs12->guest_cr4))
+>>                  return -EINVAL;
+>>
+>> +       if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
+>> +           !kvm_debugctl_valid(vmcs12->guest_ia32_debugctl))
+>> +               return -EINVAL;
+>> +
+>>          if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
+>>              !kvm_pat_valid(vmcs12->guest_ia32_pat))
+>>                  return -EINVAL;
+>> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>> index a470ff0868c5..28ba6d0c359f 100644
+>> --- a/arch/x86/kvm/x86.h
+>> +++ b/arch/x86/kvm/x86.h
+>> @@ -354,6 +354,12 @@ static inline bool kvm_pat_valid(u64 data)
+>>          return (data | ((data & 0x0202020202020202ull) << 1)) == data;
+>>   }
+>>
+>> +static inline bool kvm_debugctl_valid(u64 data)
+>> +{
+>> +       /* Bits 2, 3, 4, 5, 13 and [31:16] are reserved */
+>> +       return ((data & 0xFFFFFFFFFFFF203Cull) ? false : true);
+>> +}
+> This should actually be consistent with the constraints in kvm_set_msr_common:
+>
+> case MSR_IA32_DEBUGCTLMSR:
+>          if (!data) {
+>                  /* We support the non-activated case already */
+>                  break;
+>          } else if (data & ~(DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF)) {
+>                  /* Values other than LBR and BTF are vendor-specific,
+>                     thus reserved and should throw a #GP */
+>                  return 1;
+>          }
+>
+> Also, as I said earlier...
+>
+> I'd rather see this built on an interface like:
+>
+> bool kvm_valid_msr_value(u32 msr_index, u64 value);
+
+Yes, I forgot to do it. Will send a patch for this...
+
+>
+> Strange that we allow IA32_DEBUGCTL.BTF, since kvm_vcpu_do_singlestep
+> ignores it. And vLBR still isn't a thing, is it?
+
+Yes, DEBUGCTLMSR_LBR isn't used.
+Good catch !
+
+>
+> It's a bit scary to me that we allow any architecturally legal
+> IA32_DEBUGCTL bits to be set today. There's probably a CVE in there
+> somewhere.
+Is it appropriate to disable those two bits as well, then ?
