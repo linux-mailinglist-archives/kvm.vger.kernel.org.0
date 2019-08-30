@@ -2,228 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72B67A33B9
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 11:22:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EE1AA343A
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 11:41:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727770AbfH3JWn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 05:22:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:56928 "EHLO foss.arm.com"
+        id S1727883AbfH3JlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 05:41:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42878 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726461AbfH3JWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 05:22:43 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB8EC344;
-        Fri, 30 Aug 2019 02:22:41 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5E6983F718;
-        Fri, 30 Aug 2019 02:22:41 -0700 (PDT)
-Date:   Fri, 30 Aug 2019 11:22:40 +0200
-From:   Christoffer Dall <christoffer.dall@arm.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 01/10] KVM: arm64: Document PV-time interface
-Message-ID: <20190830092240.GA5307@e113682-lin.lund.arm.com>
-References: <20190821153656.33429-1-steven.price@arm.com>
- <20190821153656.33429-2-steven.price@arm.com>
- <20190827085706.GB6541@e113682-lin.lund.arm.com>
- <37eaf54b-8a22-8483-a372-419bfa1475f1@arm.com>
+        id S1727620AbfH3JlG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 05:41:06 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 46268C007351
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2019 09:41:05 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id a17so3983365wrr.10
+        for <kvm@vger.kernel.org>; Fri, 30 Aug 2019 02:41:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=kV8MoK4zo74Y5DGCQJLGcYeGhPzzvX5u0gV32d1E+3k=;
+        b=X2sWUClvdimt9i/GvlbKJ+CFGa374QxgY7GgCpgseXhuudXfoZuI7X2LCMLtystd8v
+         JzaR4t8AKbQNAPAbV+wKskT/hIvXdlJwNfP35QIScSGuvEaJwfRo4vD9M7Oc8ilqUcC+
+         QySAZBEX8KAyd61UsA7aeOXVkCNoZhxGqsgjR1GRKRrBrRGpOvoz6EDaMzE2V1zw+y0t
+         zWcfK8v7WhkkY/AitHP/sllWIC8Ah5evaZgFw6sTr9mCYZLk4v2sfU23vAfP82Z/nfXI
+         BGeL2p6lnWRgaZMe8Mxj/Jg1wRqXkr6lAwQ5O+2F1WJn56hfK509OgVp82HMwHlS8AD9
+         EUVA==
+X-Gm-Message-State: APjAAAUHfXSIWWCMgb7J6oqIVL3AT+78/PJuxLQJtC0T55jDAKIQtGQ4
+        vquuA/T57KyqnU3UYse/yDPPPDEsv2qizFRT7c+ghuNWRcRb8jWdyiPwr3+VU58c6sHDKDqUcmf
+        SMrm8zQSxdhJx
+X-Received: by 2002:a05:6000:1002:: with SMTP id a2mr5516587wrx.28.1567158063830;
+        Fri, 30 Aug 2019 02:41:03 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzM/jUL1y2rI43opYvOASgV8Zt/IRRsHiQXSp3BkM+SWkgtSeboge6QBt/hSUqVBlcs47bGGA==
+X-Received: by 2002:a05:6000:1002:: with SMTP id a2mr5516548wrx.28.1567158063481;
+        Fri, 30 Aug 2019 02:41:03 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it. [79.13.201.122])
+        by smtp.gmail.com with ESMTPSA id w13sm12490070wre.44.2019.08.30.02.41.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2019 02:41:02 -0700 (PDT)
+Date:   Fri, 30 Aug 2019 11:40:59 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
+Message-ID: <20190830094059.c7qo5cxrp2nkrncd@steredhat>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190717113030.163499-2-sgarzare@redhat.com>
+ <20190729095956-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <37eaf54b-8a22-8483-a372-419bfa1475f1@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190729095956-mutt-send-email-mst@kernel.org>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 28, 2019 at 01:09:15PM +0100, Steven Price wrote:
-> On 27/08/2019 09:57, Christoffer Dall wrote:
-> > On Wed, Aug 21, 2019 at 04:36:47PM +0100, Steven Price wrote:
-> >> Introduce a paravirtualization interface for KVM/arm64 based on the
-> >> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
-> >>
-> >> This only adds the details about "Stolen Time" as the details of "Live
-> >> Physical Time" have not been fully agreed.
-> >>
-> >> User space can specify a reserved area of memory for the guest and
-> >> inform KVM to populate the memory with information on time that the host
-> >> kernel has stolen from the guest.
-> >>
-> >> A hypercall interface is provided for the guest to interrogate the
-> >> hypervisor's support for this interface and the location of the shared
-> >> memory structures.
-> >>
-> >> Signed-off-by: Steven Price <steven.price@arm.com>
-> >> ---
-> >>  Documentation/virt/kvm/arm/pvtime.txt | 100 ++++++++++++++++++++++++++
-> >>  1 file changed, 100 insertions(+)
-> >>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
-> >>
-> >> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
-> >> new file mode 100644
-> >> index 000000000000..1ceb118694e7
-> >> --- /dev/null
-> >> +++ b/Documentation/virt/kvm/arm/pvtime.txt
-> >> @@ -0,0 +1,100 @@
-> >> +Paravirtualized time support for arm64
-> >> +======================================
-> >> +
-> >> +Arm specification DEN0057/A defined a standard for paravirtualised time
-> >> +support for AArch64 guests:
-> >> +
-> >> +https://developer.arm.com/docs/den0057/a
-> >> +
-> >> +KVM/arm64 implements the stolen time part of this specification by providing
-> >> +some hypervisor service calls to support a paravirtualized guest obtaining a
-> >> +view of the amount of time stolen from its execution.
-> >> +
-> >> +Two new SMCCC compatible hypercalls are defined:
-> >> +
-> >> +PV_FEATURES 0xC5000020
-> >> +PV_TIME_ST  0xC5000022
-> >> +
-> >> +These are only available in the SMC64/HVC64 calling convention as
-> >> +paravirtualized time is not available to 32 bit Arm guests. The existence of
-> >> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
-> >> +mechanism before calling it.
-> >> +
-> >> +PV_FEATURES
-> >> +    Function ID:  (uint32)  : 0xC5000020
-> >> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
-> >> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
-> >> +                              PV-time feature is supported by the hypervisor.
-> >> +
-> >> +PV_TIME_ST
-> >> +    Function ID:  (uint32)  : 0xC5000022
-> >> +    Return value: (int64)   : IPA of the stolen time data structure for this
-> >> +                              (V)CPU. On failure:
-> >> +                              NOT_SUPPORTED (-1)
-> >> +
-> >> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
-> >> +with inner and outer write back caching attributes, in the inner shareable
-> >> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
-> >> +meaningfully filled by the hypervisor (see structure below).
-> >> +
-> >> +PV_TIME_ST returns the structure for the calling VCPU.
-> >> +
-> >> +Stolen Time
-> >> +-----------
-> >> +
-> >> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
-> >> +
-> >> +  Field       | Byte Length | Byte Offset | Description
-> >> +  ----------- | ----------- | ----------- | --------------------------
-> >> +  Revision    |      4      |      0      | Must be 0 for version 0.1
-> >> +  Attributes  |      4      |      4      | Must be 0
-> >> +  Stolen time |      8      |      8      | Stolen time in unsigned
-> >> +              |             |             | nanoseconds indicating how
-> >> +              |             |             | much time this VCPU thread
-> >> +              |             |             | was involuntarily not
-> >> +              |             |             | running on a physical CPU.
-> >> +
-> >> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
-> >> +will be present within a reserved region of the normal memory given to the
-> >> +guest. The guest should not attempt to write into this memory. There is a
-> >> +structure per VCPU of the guest.
-> >> +
-> >> +User space interface
-> >> +====================
-> >> +
-> >> +User space can request that KVM provide the paravirtualized time interface to
-> >> +a guest by creating a KVM_DEV_TYPE_ARM_PV_TIME device, for example:
-> >> +
-> >> +    struct kvm_create_device pvtime_device = {
-> >> +            .type = KVM_DEV_TYPE_ARM_PV_TIME,
-> >> +            .attr = 0,
-> >> +            .flags = 0,
-> >> +    };
-> >> +
-> >> +    pvtime_fd = ioctl(vm_fd, KVM_CREATE_DEVICE, &pvtime_device);
-> >> +
-> >> +Creation of the device should be done after creating the vCPUs of the virtual
-> >> +machine.
-> >> +
-> >> +The IPA of the structures must be given to KVM. This is the base address
-> >> +of an array of stolen time structures (one for each VCPU). The base address
-> >> +must be page aligned. The size must be at least 64 * number of VCPUs and be a
-> >> +multiple of PAGE_SIZE.
-> >> +
-> >> +The memory for these structures should be added to the guest in the usual
-> >> +manner (e.g. using KVM_SET_USER_MEMORY_REGION).
-> >> +
-> >> +For example:
-> >> +
-> >> +    struct kvm_dev_arm_st_region region = {
-> >> +            .gpa = <IPA of guest base address>,
-> >> +            .size = <size in bytes>
-> >> +    };
+On Mon, Jul 29, 2019 at 10:04:29AM -0400, Michael S. Tsirkin wrote:
+> On Wed, Jul 17, 2019 at 01:30:26PM +0200, Stefano Garzarella wrote:
+> > Since virtio-vsock was introduced, the buffers filled by the host
+> > and pushed to the guest using the vring, are directly queued in
+> > a per-socket list. These buffers are preallocated by the guest
+> > with a fixed size (4 KB).
 > > 
-> > This feel fragile; how are you handling userspace creating VCPUs after
-> > setting this up,
+> > The maximum amount of memory used by each socket should be
+> > controlled by the credit mechanism.
+> > The default credit available per-socket is 256 KB, but if we use
+> > only 1 byte per packet, the guest can queue up to 262144 of 4 KB
+> > buffers, using up to 1 GB of memory per-socket. In addition, the
+> > guest will continue to fill the vring with new 4 KB free buffers
+> > to avoid starvation of other sockets.
+> > 
+> > This patch mitigates this issue copying the payload of small
+> > packets (< 128 bytes) into the buffer of last packet queued, in
+> > order to avoid wasting memory.
+> > 
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> In this case as long as the structures all fit within the region created
-> VCPUs can be created/destroyed at will. If the VCPU index is too high
-> then the kernel will bail out in kvm_update_stolen_time() so the
-> structure will not be written. I consider this case as user space
-> messing up, so beyond protecting the host from the mess, user space gets
-> to keep the pieces.
-> 
-> > the GPA overlapping guest memory, etc.
-> 
-> Again, the (host) kernel is protected against this, but clearly this
-> will end badly for the guest.
-> 
-> > Is the
-> > philosophy here that the VMM can mess up the VM if it wants, but that
-> > this should never lead attacks on the host (we better hope not) and so
-> > we don't care?
-> 
-> Yes. For things like GPA overlapping guest memory it's not really the
-> host's position to work out what is "guest memory". It's quite possible
-> that user space could decide to place the stolen time structures right
-> in the middle of guest memory - it's just up to user space to inform the
-> guest what memory is usable. Obviously the expectation is that the
-> shared structures would be positioned "out of the way" in GPA space in
-> any normal arrangement.
-> 
-> > It seems to me setting the IPA per vcpu throught the VCPU device would
-> > avoid a lot of these issues.  See
-> > Documentation/virt/kvm/devices/vcpu.txt.
-> 
-> That is certainly a possibility, I'm not really sure what the benefit is
-> though? It would still lead to corner cases:
-> 
->  * What if only some VCPUs had stolen time setup on them?
->  * What if multiple VCPUs pointed to the same location?
->  * The structures can still overlap with guest memory
-> 
-> It's also more work to setup in user space with the only "benefit" being
-> that user space could choose to organise the structures however it sees
-> fit (e.g. no need for them to be contiguous in memory). But I'm not sure
-> I see a use case for that flexibility.
-> 
-> Perhaps there's some benefit I'm not seeing?
+> This is good enough for net-next, but for net I think we
+> should figure out how to address the issue completely.
+> Can we make the accounting precise? What happens to
+> performance if we do?
 > 
 
-So this is now mostly moot as you said you were going to change this,
-but overall I think the assumption that it's trivial to maintain an
-interface such the one proposed here to never be an attack vector for
-the host is not as easy as it may sound.  In the past, we've had
-numerous bugs related to things like calculating an offset into some
-region based on some index and a size, because suddenly someone changed
-how an index is calculated, and it had unintended side-effects etc.
+Since I'm back from holidays, I'm restarting this thread to figure out
+how to address the issue completely.
 
-So if an API is used to specify something which is effectively per-CPU,
-it's better to use the per-CPU handles (VCPU fds) to directly describe
-this relationship.
+I did a better analysis of the credit mechanism that we implemented in
+virtio-vsock to get a clearer view and I'd share it with you:
 
+    This issue affect only the "host->guest" path. In this case, when the
+    host wants to send a packet to the guest, it uses a "free" buffer
+    allocated by the guest (4KB).
+    The "free" buffers available for the host are shared between all
+    sockets, instead, the credit mechanism is per-socket, I think to
+    avoid the starvation of others sockets.
+    The guests re-fill the "free" queue when the available buffers are
+    less than half.
 
-Thanks,
+    Each peer have these variables in the per-socket state:
+       /* local vars */
+       buf_alloc        /* max bytes usable by this socket
+                           [exposed to the other peer] */
+       fwd_cnt          /* increased when RX packet is consumed by the
+                           user space [exposed to the other peer] */
+       tx_cnt 	        /* increased when TX packet is sent to the other peer */
 
-    Christoffer
+       /* remote vars  */
+       peer_buf_alloc   /* peer's buf_alloc */
+       peer_fwd_cnt     /* peer's fwd_cnt */
+
+    When a peer sends a packet, it increases the 'tx_cnt'; when the
+    receiver consumes the packet (copy it to the user-space buffer), it
+    increases the 'fwd_cnt'.
+    Note: increments are made considering the payload length and not the
+    buffer length.
+
+    The value of 'buf_alloc' and 'fwd_cnt' are sent to the other peer in
+    all packet headers or with an explicit CREDIT_UPDATE packet.
+
+    The local 'buf_alloc' value can be modified by the user space using
+    setsockopt() with optname=SO_VM_SOCKETS_BUFFER_SIZE.
+
+    Before to send a packet, the peer checks the space available:
+    	credit_available = peer_buf_alloc - (tx_cnt - peer_fwd_cnt)
+    and it will send up to credit_available bytes to the other peer.
+
+Possible solutions considering Michael's advice:
+1. Use the buffer length instead of the payload length when we increment
+   the counters:
+  - This approach will account precisely the memory used per socket.
+  - This requires changes in both guest and host.
+  - It is not compatible with old drivers, so a feature should be negotiated.
+
+2. Decrease the advertised 'buf_alloc' taking count of bytes queued in
+   the socket queue but not used. (e.g. 256 byte used on 4K available in
+   the buffer)
+  - pkt->hdr.buf_alloc = buf_alloc - bytes_not_used.
+  - This should be compatible also with old drivers.
+
+Maybe the second is less invasive, but will it be too tricky?
+Any other advice or suggestions?
+
+Thanks in advance,
+Stefano
