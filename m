@@ -2,180 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C27E5A378F
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 15:11:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24C20A38BA
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 16:03:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727820AbfH3NLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 09:11:01 -0400
-Received: from mail-eopbgr10063.outbound.protection.outlook.com ([40.107.1.63]:39652
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727751AbfH3NLB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 09:11:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nuDZ9UGrciKrberWuKOlIOLpo+PsDnMFyTm1oCYsNI5SaGMiEsRM0eyGoPpwoPWrfT7pAiLuzB+ZN3nJ5KJeewYGKzhGhL92gvC9ldeStZ2z6Wegx4eYJCvZPI+SHgaGYe/qZmC/5+h7FeKDSzJpalBJ8lHgi3GVQiz4lypnOdg+1Dh38r5SdV69UKThqCpg2ZnvQ/NPK7Y2CwOOhKNgHhC2hdzw1eBN9Kp6BoJFNLXvsX/ky/shBMiwEv1WWH97UFXdpHeR51GvAi1r6G8i2C6hGg0hn9WpxzmotTGRTRvaks8SKdn9SWLOVdehurRJkPkK0Bfi4asib9F/u7T1cA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SSHQiijsYk7Hp4UQ+bO7Cj0N18ZZq58Cem3IMtsqI8Q=;
- b=Di+dobaZ7TETCm9Qo/0+Gs45K+R8S9f0+ajK9h+8ZSTgNUwTEZQ14mX8bAfB79GBcH2eyF6PEeuE2Wgw7eWo0spbotDlN6FmrcmU91hhZb2A/oZ7mzBmy9TNbi7aFdXSpAUi+XKTtm8Q4bwqzq/lH36Ry2kjOdKwIXgzJtD8Ft7p3GRBZb8XGTGwlnooDHa3W9LySdXgbkDQMnY01vrk4OVvZevvkdhNP6qEG1TAUl2bPULcrNq0xKctcJOnw7DQOY0vMQFLnE+YFvju8mjOobdTtpd34WFLFxHlzdJ5cua1g+EQ6i5fs8+WQSgIDsUKHfwD0htYo2n+FMqUH1y9ww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SSHQiijsYk7Hp4UQ+bO7Cj0N18ZZq58Cem3IMtsqI8Q=;
- b=iU9HIVLDSVXH9CO16LVhGyGET3yAM60JifxhrG1qmxTKeubMo0/hC5rRWnYNHwVFOy4nJSRoYgW2aZ8gzwvWB3VzIFkQZq80I/jqgAKQEMMJgLCZoLjMygMgIycECoEkTI4KEM2tXP0eOCBGnAJyWdVtZRzvtd0M0/lFF3M5TFE=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB4946.eurprd05.prod.outlook.com (20.177.40.11) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2220.18; Fri, 30 Aug 2019 13:10:17 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea%6]) with mapi id 15.20.2199.021; Fri, 30 Aug 2019
- 13:10:17 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        id S1727924AbfH3OCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Aug 2019 10:02:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19836 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727135AbfH3OCa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 10:02:30 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 62C7FC075BD2;
+        Fri, 30 Aug 2019 14:02:30 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 35E8D3DE1;
+        Fri, 30 Aug 2019 14:02:26 +0000 (UTC)
+Date:   Fri, 30 Aug 2019 16:02:23 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         Jiri Pirko <jiri@mellanox.com>,
         "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v2 5/6] mdev: Update sysfs documentation
-Thread-Topic: [PATCH v2 5/6] mdev: Update sysfs documentation
-Thread-Index: AQHVXlukaBbEcdZ2I0ipQhJUiMmPLacTpf+AgAADNNA=
-Date:   Fri, 30 Aug 2019 13:10:17 +0000
-Message-ID: <AM0PR05MB4866372C521F59491838C8E4D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
+Message-ID: <20190830160223.332fd81f.cohuck@redhat.com>
+In-Reply-To: <AM0PR05MB486621283F935B673455DA63D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
 References: <20190826204119.54386-1-parav@mellanox.com>
         <20190829111904.16042-1-parav@mellanox.com>
-        <20190829111904.16042-6-parav@mellanox.com>
- <20190830144927.7961193e.cohuck@redhat.com>
-In-Reply-To: <20190830144927.7961193e.cohuck@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [106.51.18.188]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4e31d88f-f207-4000-283f-08d72d4b676a
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AM0PR05MB4946;
-x-ms-traffictypediagnostic: AM0PR05MB4946:|AM0PR05MB4946:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB49464A17E6575452374DF59FD1BD0@AM0PR05MB4946.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0145758B1D
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(376002)(346002)(396003)(366004)(199004)(13464003)(189003)(33656002)(52536014)(66446008)(6436002)(66556008)(64756008)(66476007)(316002)(66946007)(55236004)(76116006)(53546011)(6506007)(99286004)(76176011)(25786009)(7696005)(54906003)(4326008)(53936002)(9686003)(6246003)(55016002)(86362001)(15650500001)(66066001)(14454004)(508600001)(229853002)(5660300002)(8676002)(7736002)(305945005)(81156014)(81166006)(9456002)(8936002)(6916009)(74316002)(102836004)(14444005)(26005)(256004)(6116002)(186003)(2906002)(71200400001)(3846002)(71190400001)(486006)(11346002)(446003)(476003)(79990200002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4946;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 1oDx4PzQftkKT7BVZL5EcFswbxy5P3q2Sv0j9eN5rUv3Av58DzqW4E6E6cXnzeAZOOI3+5/xUaq65On94MnrQVFbHrEYd5OpaJsTLNSAF6Ry9e1cNSS0yKXTpSlYB+SP56A0ecxjJD+JDTHMzO9Hp7cDFNjvyOmgKKc7NWYcsghOzO3oOpJmDcmwyHIns5YR3cypLGcSw98hUcg137jtveLpJ/Ctikrh8oSzHhDl1DB7t1cInOJCDca1WFE88clUCdTbBMw1cMe2b3jG+BzvTp+HhFPfmoYjnGaPN+FeHrDSHbq5YlU9zVmcJ+xtHngWPnQsQmKh7DT2YSQV58Hxbev9+6q8qJd2U3/2cgFQBBRX563ojxu1KutJ5CS0ZBkJaa446Ub0IPmRLfU+SxWvbwwiaZxHHs/K/BSro+pDHWD3wDXbbmainvouzMhsKkbZswy1TOw5W9RNkrUFnOn4Yw==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        <20190829111904.16042-2-parav@mellanox.com>
+        <20190830111720.04aa54e9.cohuck@redhat.com>
+        <AM0PR05MB48660877881F7A2D757A9C82D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190830143927.163d13a7.cohuck@redhat.com>
+        <AM0PR05MB486621283F935B673455DA63D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e31d88f-f207-4000-283f-08d72d4b676a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Aug 2019 13:10:17.6692
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0rrRMRBTJNk+LdLPThS/IIJSjinOcMaBqTsOJT769blfDUotU5167sSgLs2V6YjEZ6fqcebLhZYrJfLR96bA+A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4946
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 30 Aug 2019 14:02:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 30 Aug 2019 12:58:04 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
+> > -----Original Message-----
+> > From: Cornelia Huck <cohuck@redhat.com>
+> > Sent: Friday, August 30, 2019 6:09 PM
+> > To: Parav Pandit <parav@mellanox.com>
+> > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
+> > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; netdev@vger.kernel.org
+> > Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
+> > 
+> > On Fri, 30 Aug 2019 12:33:22 +0000
+> > Parav Pandit <parav@mellanox.com> wrote:
+> >   
+> > > > -----Original Message-----
+> > > > From: Cornelia Huck <cohuck@redhat.com>
+> > > > Sent: Friday, August 30, 2019 2:47 PM
+> > > > To: Parav Pandit <parav@mellanox.com>
+> > > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
+> > > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
+> > > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
+> > > > Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
+> > > >
+> > > > On Thu, 29 Aug 2019 06:18:59 -0500
+> > > > Parav Pandit <parav@mellanox.com> wrote:
+> > > >  
+> > > > > Some vendor drivers want an identifier for an mdev device that is
+> > > > > shorter than the UUID, due to length restrictions in the consumers
+> > > > > of that identifier.
+> > > > >
+> > > > > Add a callback that allows a vendor driver to request an alias of
+> > > > > a specified length to be generated for an mdev device. If
+> > > > > generated, that alias is checked for collisions.
+> > > > >
+> > > > > It is an optional attribute.
+> > > > > mdev alias is generated using sha1 from the mdev name.
+> > > > >
+> > > > > Signed-off-by: Parav Pandit <parav@mellanox.com>
+> > > > >
+> > > > > ---
+> > > > > Changelog:
+> > > > > v1->v2:
+> > > > >  - Kept mdev_device naturally aligned
+> > > > >  - Added error checking for crypt_*() calls
+> > > > >  - Corrected a typo from 'and' to 'an'
+> > > > >  - Changed return type of generate_alias() from int to char*
+> > > > > v0->v1:
+> > > > >  - Moved alias length check outside of the parent lock
+> > > > >  - Moved alias and digest allocation from kvzalloc to kzalloc
+> > > > >  - &alias[0] changed to alias
+> > > > >  - alias_length check is nested under get_alias_length callback
+> > > > > check
+> > > > >  - Changed comments to start with an empty line
+> > > > >  - Fixed cleaunup of hash if mdev_bus_register() fails
+> > > > >  - Added comment where alias memory ownership is handed over to
+> > > > > mdev device
+> > > > >  - Updated commit log to indicate motivation for this feature
+> > > > > ---
+> > > > >  drivers/vfio/mdev/mdev_core.c    | 123  
+> > > > ++++++++++++++++++++++++++++++-  
+> > > > >  drivers/vfio/mdev/mdev_private.h |   5 +-
+> > > > >  drivers/vfio/mdev/mdev_sysfs.c   |  13 ++--
+> > > > >  include/linux/mdev.h             |   4 +
+> > > > >  4 files changed, 135 insertions(+), 10 deletions(-)  
+> >   
+> > > > ...and detached from the local variable here. Who is freeing it? The
+> > > > comment states that it is done by the mdev, but I don't see it?
+> > > >  
+> > > mdev_device_free() frees it.  
+> > 
+> > Ah yes, I overlooked the kfree().
+> >   
+> > > once its assigned to mdev, mdev is the owner of it.
+> > >  
+> > > > This detour via the local variable looks weird to me. Can you either
+> > > > create the alias directly in the mdev (would need to happen later in
+> > > > the function, but I'm not sure why you generate the alias before
+> > > > checking for duplicates anyway), or do an explicit copy?  
+> > > Alias duplicate check is done after generating it, because duplicate alias are  
+> > not allowed.  
+> > > The probability of collision is rare.
+> > > So it is speculatively generated without hold the lock, because there is no  
+> > need to hold the lock.  
+> > > It is compared along with guid while mutex lock is held in single loop.
+> > > And if it is duplicate, there is no need to allocate mdev.
+> > >
+> > > It will be sub optimal to run through the mdev list 2nd time after mdev  
+> > creation and after generating alias for duplicate check.
+> > 
+> > Ok, but what about copying it? I find this "set local variable to NULL after
+> > ownership is transferred" pattern a bit unintuitive. Copying it to the mdev (and
+> > then unconditionally freeing it) looks more obvious to me.  
+> Its not unconditionally freed. 
 
-> -----Original Message-----
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Friday, August 30, 2019 6:19 PM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; netdev@vger.kernel.org
-> Subject: Re: [PATCH v2 5/6] mdev: Update sysfs documentation
->=20
-> On Thu, 29 Aug 2019 06:19:03 -0500
-> Parav Pandit <parav@mellanox.com> wrote:
->=20
-> > Updated documentation for optional read only sysfs attribute.
->=20
-> I'd probably merge this into the patch introducing the attribute.
->=20
-Ok. I will spin v3.
+That's not what I have been saying :(
 
-> >
-> > Signed-off-by: Parav Pandit <parav@mellanox.com>
-> > ---
-> >  Documentation/driver-api/vfio-mediated-device.rst | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/Documentation/driver-api/vfio-mediated-device.rst
-> > b/Documentation/driver-api/vfio-mediated-device.rst
-> > index 25eb7d5b834b..0ab03d3f5629 100644
-> > --- a/Documentation/driver-api/vfio-mediated-device.rst
-> > +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> > @@ -270,6 +270,7 @@ Directories and Files Under the sysfs for Each mdev
-> Device
-> >           |--- remove
-> >           |--- mdev_type {link to its type}
-> >           |--- vendor-specific-attributes [optional]
-> > +         |--- alias [optional]
->=20
-> "optional" implies "not always present" to me, not "might return a read e=
-rror if
-> not available". Don't know if there's a better way to tag this? Or make i=
-t really
-> optional? :)
+> Its freed in the error unwinding path.
+> I think its ok along with the comment that describes this error path area.
 
-May be write it as,
-
-alias [ optional when requested by parent ]
-
->=20
-> >
-> >  * remove (write only)
-> >
-> > @@ -281,6 +282,10 @@ Example::
-> >
-> >  	# echo 1 > /sys/bus/mdev/devices/$mdev_UUID/remove
-> >
-> > +* alias (read only)
-> > +Whenever a parent requested to generate an alias, each mdev is
-> > +assigned a unique alias by the mdev core. This file shows the alias of=
- the
-> mdev device.
->=20
-> It's not really the parent, but the vendor driver requesting this, right?=
- Also,
-At mdev level, it only knows parent->ops structure, whether parent is regis=
-tered by vendor driver or something else.
-
-> "each mdev" is a bit ambiguous,=20
-It is in context of the parent. Sentence is not starting with "each mdev".
-But may be more verbosely written as,
-
-Whenever a parent requested to generate an alias, Each mdev device of such =
-parent is assigned=20
-unique alias by the mdev core. This file shows the alias of the mdev device=
-.
-
-> created via that driver. Lastly, if we stick with the "returns an error i=
-f not
-> implemented" approach, that should also be mentioned here.
-Ok. Will spin v3 to describe it.
-
->=20
-> > +
-> >  Mediated device Hot plug
-> >  ------------------------
-> >
-
+It is not wrong, but I'm not sure I like it.
