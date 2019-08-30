@@ -2,209 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3237A2C68
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 03:37:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E91AAA2CC1
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 04:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727887AbfH3Bgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 21:36:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51930 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727729AbfH3Bgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 21:36:50 -0400
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2C3ACC05AA52
-        for <kvm@vger.kernel.org>; Fri, 30 Aug 2019 01:36:50 +0000 (UTC)
-Received: by mail-pf1-f198.google.com with SMTP id r130so4023103pfc.0
-        for <kvm@vger.kernel.org>; Thu, 29 Aug 2019 18:36:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=wO2GMpLb1bdxi4bwIo0mHdhRTE5FQJFDOzBJpObz9Ms=;
-        b=GPF+I+N0kvzwMnHP98Q3Q0NwMGOs7X1lmRFY6buDvA5KCedtNQJ9aUocWZ+rd0db2w
-         mLpBRavIfqWPKIcoduVOaYyV1yiLh2rtONSLdqkyk18UC/fknXoQxULAC2HRpqJ5hM33
-         Rkwle8ABLFgQ7lYQoD+lVu7BnKSC1JbvE61O3KobKp5oiVFdSno7YpVonCCcz4STrObU
-         dlZJSP5hZnuWArKJrQ+J7n6VgBHqn3GZiefLc4E8P0VqX+ItWqsgCEW21MUbY0W+Jrsz
-         jg++15TWgiSVRjxUlf6Z2TAXXcpUqvKaJwJVEhaLE4SUx8ofQi3j3d2RsY1jwObmIihY
-         4oJA==
-X-Gm-Message-State: APjAAAUWap6mLuiTn3Nf8SVIqrHkj7jediU45M7v7oPMgdVpAqJecDv+
-        FrTa82ioFxkXriFGr9wCm55QC1uzAgUK+VznXlFfTO23nIbovNYOAXYzzBaALzWv/CYkGGwYf6X
-        Oqshyg0UrTEri
-X-Received: by 2002:a62:4e05:: with SMTP id c5mr15114399pfb.66.1567129009610;
-        Thu, 29 Aug 2019 18:36:49 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxxaqylATIJy8c3slsQVqewhoSYe10uh4TIWa/vhS9CJbzx7epJD9YpbPR2k2cd0sISm1WeEg==
-X-Received: by 2002:a62:4e05:: with SMTP id c5mr15114380pfb.66.1567129009365;
-        Thu, 29 Aug 2019 18:36:49 -0700 (PDT)
-Received: from xz-x1.redhat.com ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id l3sm3426323pjq.24.2019.08.29.18.36.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2019 18:36:48 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Andrew Jones <drjones@redhat.com>, peterx@redhat.com
-Subject: [PATCH v3 4/4] KVM: selftests: Remove duplicate guest mode handling
-Date:   Fri, 30 Aug 2019 09:36:19 +0800
-Message-Id: <20190830013619.18867-5-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190830013619.18867-1-peterx@redhat.com>
-References: <20190830013619.18867-1-peterx@redhat.com>
+        id S1727487AbfH3CVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 22:21:07 -0400
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:15443 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727351AbfH3CVH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 22:21:07 -0400
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d6888110001>; Thu, 29 Aug 2019 19:21:05 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Thu, 29 Aug 2019 19:21:04 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Thu, 29 Aug 2019 19:21:04 -0700
+Received: from [10.110.48.201] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 30 Aug
+ 2019 02:21:03 +0000
+Subject: Re: [PATCH v3 00/39] put_user_pages(): miscellaneous call sites
+To:     Mike Marshall <hubcap@omnibond.com>
+CC:     <john.hubbard@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        <amd-gfx@lists.freedesktop.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
+        <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
+        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
+References: <20190807013340.9706-1-jhubbard@nvidia.com>
+ <912eb2bd-4102-05c1-5571-c261617ad30b@nvidia.com>
+ <CAOg9mSQKGDywcMde2DE42diUS7J8m74Hdv+xp_PJhC39EXZQuw@mail.gmail.com>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <d453f865-2224-ed53-a2f4-f43d574c130a@nvidia.com>
+Date:   Thu, 29 Aug 2019 19:21:03 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOg9mSQKGDywcMde2DE42diUS7J8m74Hdv+xp_PJhC39EXZQuw@mail.gmail.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1567131665; bh=ws5caXaEY0X3GX3egw6JsJDC0L7OwnIAHkDMK9ZQcE4=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=dIUKOH913DAYlocN1x3OWKU66rYzbsvcqMg6XurXOtfsQm0mTaQq0ufL9HiRQjmKf
+         MYeR8XR6MbUy9f2nOHFjitJW5jxjU59hEwD2KYzGMRBc0+P+o4b2mkzUliEchFZQzm
+         D0OR0ZfFBCp6cKpnoBGakw3Ch1supTeIz+DcDxFqgzxBAMqXWQoRbk0Sq3VWx6u9tp
+         6uURi8FKe6XveWY1U9zok9s2um/SF43+51Cnxqw5q2h2Dtp4kEwxNonMDqxzAcZjDx
+         HfyaHZc2XUvwuRV5WZb7Ki3OlH/mp5QHGx5CtmwXtp2TNme1r3iXAZgXDKrycQZylt
+         qlPWiGD9ap9bQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the duplication code in run_test() of dirty_log_test because
-after some reordering of functions now we can directly use the outcome
-of vm_create().
+On 8/29/2019 6:29 PM, Mike Marshall wrote:
+> Hi John...
+> 
+> I added this patch series on top of Linux 5.3rc6 and ran
+> xfstests with no regressions...
+> 
+> Acked-by: Mike Marshall <hubcap@omnibond.com>
+> 
 
-Meanwhile, with the new VM_MODE_PXXV48_4K, we can safely revert
-b442324b58 too where we stick the x86_64 PA width to 39 bits for
-dirty_log_test.
+Hi Mike (and I hope Ira and others are reading as well, because
+I'm making a bunch of claims further down),
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c  | 52 ++-----------------
- .../testing/selftests/kvm/include/kvm_util.h  |  4 ++
- tools/testing/selftests/kvm/lib/kvm_util.c    | 17 ++++++
- 3 files changed, 26 insertions(+), 47 deletions(-)
+That's great news, thanks for running that test suite and for
+the report and the ACK.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index c86f83cb33e5..89fac11733a5 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -234,10 +234,8 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
- static void run_test(enum vm_guest_mode mode, unsigned long iterations,
- 		     unsigned long interval, uint64_t phys_offset)
- {
--	unsigned int guest_pa_bits, guest_page_shift;
- 	pthread_t vcpu_thread;
- 	struct kvm_vm *vm;
--	uint64_t max_gfn;
- 	unsigned long *bmap;
- 
- 	/*
-@@ -252,60 +250,20 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
- 		       2ul << (DIRTY_MEM_BITS - PAGE_SHIFT_4K),
- 		       guest_code);
- 
--	switch (mode) {
--	case VM_MODE_P52V48_4K:
--	case VM_MODE_PXXV48_4K:
--		guest_pa_bits = 52;
--		guest_page_shift = 12;
--		break;
--	case VM_MODE_P52V48_64K:
--		guest_pa_bits = 52;
--		guest_page_shift = 16;
--		break;
--	case VM_MODE_P48V48_4K:
--		guest_pa_bits = 48;
--		guest_page_shift = 12;
--		break;
--	case VM_MODE_P48V48_64K:
--		guest_pa_bits = 48;
--		guest_page_shift = 16;
--		break;
--	case VM_MODE_P40V48_4K:
--		guest_pa_bits = 40;
--		guest_page_shift = 12;
--		break;
--	case VM_MODE_P40V48_64K:
--		guest_pa_bits = 40;
--		guest_page_shift = 16;
--		break;
--	default:
--		TEST_ASSERT(false, "Unknown guest mode, mode: 0x%x", mode);
--	}
--
--	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
--
--#ifdef __x86_64__
--	/*
--	 * FIXME
--	 * The x86_64 kvm selftests framework currently only supports a
--	 * single PML4 which restricts the number of physical address
--	 * bits we can change to 39.
--	 */
--	guest_pa_bits = 39;
--#endif
--	max_gfn = (1ul << (guest_pa_bits - guest_page_shift)) - 1;
--	guest_page_size = (1ul << guest_page_shift);
-+	guest_page_size = vm_get_page_size(vm);
- 	/*
- 	 * A little more than 1G of guest page sized pages.  Cover the
- 	 * case where the size is not aligned to 64 pages.
- 	 */
--	guest_num_pages = (1ul << (DIRTY_MEM_BITS - guest_page_shift)) + 16;
-+	guest_num_pages = (1ul << (DIRTY_MEM_BITS -
-+				   vm_get_page_shift(vm))) + 16;
- 	host_page_size = getpagesize();
- 	host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
- 			 !!((guest_num_pages * guest_page_size) % host_page_size);
- 
- 	if (!phys_offset) {
--		guest_test_phys_mem = (max_gfn - guest_num_pages) * guest_page_size;
-+		guest_test_phys_mem = (vm_get_max_gfn(vm) -
-+				       guest_num_pages) * guest_page_size;
- 		guest_test_phys_mem &= ~(host_page_size - 1);
- 	} else {
- 		guest_test_phys_mem = phys_offset;
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 8c71ec886aab..e7ee55853616 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -154,6 +154,10 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code);
- 
- bool vm_is_unrestricted_guest(struct kvm_vm *vm);
- 
-+unsigned int vm_get_page_size(struct kvm_vm *vm);
-+unsigned int vm_get_page_shift(struct kvm_vm *vm);
-+unsigned int vm_get_max_gfn(struct kvm_vm *vm);
-+
- struct kvm_userspace_memory_region *
- kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
- 				 uint64_t end);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index bb8f993b25fb..80a338b5403c 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -136,6 +136,8 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
- {
- 	struct kvm_vm *vm;
- 
-+	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-+
- 	vm = calloc(1, sizeof(*vm));
- 	TEST_ASSERT(vm != NULL, "Insufficient Memory");
- 
-@@ -1650,3 +1652,18 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
- 
- 	return val == 'Y';
- }
-+
-+unsigned int vm_get_page_size(struct kvm_vm *vm)
-+{
-+	return vm->page_size;
-+}
-+
-+unsigned int vm_get_page_shift(struct kvm_vm *vm)
-+{
-+	return vm->page_shift;
-+}
-+
-+unsigned int vm_get_max_gfn(struct kvm_vm *vm)
-+{
-+	return vm->max_gfn;
-+}
+There is an interesting pause right now, due to the fact that
+we've made some tentative decisions about gup pinning, that affect
+the call sites. A key decision is that only pages that were
+requested via FOLL_PIN, will require put_user_page*() to release
+them. There are 4 main cases, which were first explained by Jan
+Kara and Vlastimil Babka, and are now written up in my FOLL_PIN
+patch [1].
+
+So, what that means for this series is that:
+
+1. Some call sites (mlock.c for example, and a lot of the mm/ files
+in fact, and more) will not be converted: some of these patches will
+get dropped, especially in mm/.
+
+2. Call sites that do DirectIO or RDMA will need to set FOLL_PIN, and
+will also need to call put_user_page().
+
+3. Call sites that do RDMA will need to set FOLL_LONGTERM *and* FOLL_PIN,
+
+    3.a. ...and will at least in some cases need to provide a link to a
+    vaddr_pin object, and thus back to a struct file*...maybe. Still
+    under discussion.
+
+4. It's desirable to keep FOLL_* flags (or at least FOLL_PIN) internal
+to the gup() calls. That implies using a wrapper call such as Ira's
+vaddr_pin_[user]_pages(), instead of gup(), and vaddr_unpin_[user]_pages()
+instead of put_user_page*().
+
+5. We don't want to churn the call sites unnecessarily.
+
+With that in mind, I've taken another pass through all these patches
+and narrowed it down to:
+
+     a) 12 call sites that I'd like to convert soon, but even those
+        really look cleaner with a full conversion to a wrapper call
+        similar to (identical to?) vaddr_pin_[user]_pages(), probably
+        just the FOLL_PIN only variant (not FOLL_LONGTERM). That
+        wrapper call is not ready yet, though.
+
+     b) Some more call sites that require both FOLL_PIN and FOLL_LONGTERM.
+        Definitely will wait to use the wrapper calls for these, because
+        they may also require hooking up to a struct file*.
+
+     c) A few more that were already applied, which is fine, because they
+        show where to convert, and simplify a few sites anyway. But they'll
+        need follow-on changes to, one way or another, set FOLL_PIN.
+
+     d) And of course a few sites whose patches get dropped, as mentioned
+        above.
+
+[1] https://lore.kernel.org/r/20190821040727.19650-3-jhubbard@nvidia.com
+
+thanks,
 -- 
-2.21.0
-
+John Hubbard
+NVIDIA
