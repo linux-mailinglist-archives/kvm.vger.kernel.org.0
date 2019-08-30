@@ -2,234 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ABBFA3AC6
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 17:46:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A10C9A3B57
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 18:05:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728333AbfH3PqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Aug 2019 11:46:01 -0400
-Received: from mail-eopbgr140057.outbound.protection.outlook.com ([40.107.14.57]:43854
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727926AbfH3PqA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Aug 2019 11:46:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nOdhYW27chN8dxlotY6X0Mb/ZaDrzep+Fvc7/QmF0/kio+eheLBAToIZVcaNNz8QtRPdlI9dhJxcv0/gbu4E6rxnIqAWyF1iZhvwsn4RXbxMUuX6puxHDppRMmkUqgl5t6/bFrPfHWwcByQOx9h3nhCnmImLBkdtye5gDJI5bp3pih+SKB1fUd1TlSUpWW6wbDEUO/BFFjvBZVJiQWXLWLOlRuJodnkxLvzLQkebhWdmVK2qhmk1J7g3DKZ6rTFtnRpt+a6QZ/kWbxlFT4SjsOkpBtfV2itPgW7/9Wp0pebU/N0nfDEV3B1cNeI220zLaZoTML3R3Hn70SwPtyvRpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Jc1CaDtWbRSFPJOIhWmJwMrDNYcMA+l49BwcXnIZYBM=;
- b=IxUkYKttllNOqdSwNo7s3MLcbftc+HCAI66X5l9Rvdy+aEuSn9e8ZLbHiSqLoNTR+n6fjpL30uugyHJFdzUzK0g1UGxj3Tc5JHLLIjVIoFMTKiMBvkzd6p2Q6+nF97nbrdPpMvRHyHQqPjpQpYvvulpkBpQut1RM/zvcpPX63JzpFtjawrPOybcSAyslErvbO5fTTBq0PqZ+KJcDMnseySpsbs3bvMy02wDOLSSYXh5ZsfyLXduu6WiupS8BU13qRD1dPDUzwG2eL8urGW7eohi9hA6u68p4B9SYn3ilTHPy1kCEok0AwA96HXkGBS/OSXMaqWtDsyDNR+1Q0cq1Tw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Jc1CaDtWbRSFPJOIhWmJwMrDNYcMA+l49BwcXnIZYBM=;
- b=UGDcPAKzK/ts1YoGbFHAK/yf4fYIdIY43VV6wdvS/UMm2NAS+RtfMIIIW8sjGHb74TLgU9aTfTn13gcX2OPKpDn4kLAhRQnsBIWnc85HodlFtMAgqaMW3i6t65n+HxfQOxOWKHvpgOlowWzL+DdGG9YvtsSh1jrmWtNcxeDVh2c=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB4291.eurprd05.prod.outlook.com (52.134.91.153) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2199.19; Fri, 30 Aug 2019 15:45:13 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::216f:f548:1db0:41ea%6]) with mapi id 15.20.2199.021; Fri, 30 Aug 2019
- 15:45:13 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
-Thread-Topic: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
-Thread-Index: AQHVXluia2ak8fbBtkW+HkGgDQ+zpacTarsAgAA0s9CAAAPGgIAAA/owgAATMoCAABuDUA==
-Date:   Fri, 30 Aug 2019 15:45:13 +0000
-Message-ID: <AM0PR05MB48661F9608F284AB5C9BAEB5D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
-        <20190829111904.16042-1-parav@mellanox.com>
-        <20190829111904.16042-2-parav@mellanox.com>
-        <20190830111720.04aa54e9.cohuck@redhat.com>
-        <AM0PR05MB48660877881F7A2D757A9C82D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190830143927.163d13a7.cohuck@redhat.com>
-        <AM0PR05MB486621283F935B673455DA63D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190830160223.332fd81f.cohuck@redhat.com>
-In-Reply-To: <20190830160223.332fd81f.cohuck@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [106.51.18.188]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 86de96dd-214b-4fbf-8b67-08d72d610c48
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AM0PR05MB4291;
-x-ms-traffictypediagnostic: AM0PR05MB4291:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB4291AF03ADDD001C96DBE9BCD1BD0@AM0PR05MB4291.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0145758B1D
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(39860400002)(396003)(346002)(376002)(136003)(199004)(189003)(54534003)(13464003)(81156014)(446003)(66556008)(64756008)(8676002)(66446008)(66476007)(54906003)(66946007)(6436002)(55016002)(76116006)(11346002)(305945005)(476003)(6916009)(486006)(6506007)(99286004)(74316002)(26005)(52536014)(102836004)(55236004)(186003)(2906002)(53546011)(86362001)(76176011)(9686003)(7736002)(14444005)(316002)(71200400001)(14454004)(3846002)(6116002)(81166006)(7696005)(8936002)(5660300002)(25786009)(33656002)(508600001)(4326008)(9456002)(66066001)(6246003)(256004)(71190400001)(53936002)(229853002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4291;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 2/v3vvVdj8GqZyRYO9eZkf2FT/xy8eyLqNwdhmtPoD1ku1Tz/kTNrak9maKA5dP8iW4ZsV+s01efG5fNtzTnyXqogXCPdSOxUtxMdX1eAd59O/8KeYVe/e804oHyffF/JDbIclvGmoUYbUpacTqvPEo68z06bXYVRCjR1GBnvlt6nOiifSWUXvBFj8F44/betxeNqn+BRHwVIyKXwY28xFwdycB31Uqng9j6aZORjjjIm3L+tGDqvhSx854QziVRcP53v3Oqr2sSlnYvxm6zJTpnYX1YxB2d6X8p0zNq5UCJRbLpBpWSrJAYcfOtcZu+5G0tLjsyfVpZq5VpmBXe/ir8YebkT302Sz1CWREA5ZH6rDAFpbhcHyRRNS9J+JtOxFXVX06/v8aBA//q3zPNXV9kAXAjXas4F16oqyBwgMI=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1728447AbfH3QF3 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 30 Aug 2019 12:05:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40826 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727820AbfH3QF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Aug 2019 12:05:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4D469C08EC04;
+        Fri, 30 Aug 2019 16:05:28 +0000 (UTC)
+Received: from [10.40.204.151] (ovpn-204-151.brq.redhat.com [10.40.204.151])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 740CA3784;
+        Fri, 30 Aug 2019 16:05:07 +0000 (UTC)
+Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
+        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+        Pankaj Gupta <pagupta@redhat.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Rik van Riel <riel@surriel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
+        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
+        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
+References: <20190812131235.27244-1-nitesh@redhat.com>
+ <20190812131235.27244-2-nitesh@redhat.com>
+ <CAKgT0UcSabyrO=jUwq10KpJKLSuzorHDnKAGrtWVigKVgvD-6Q@mail.gmail.com>
+ <df82bc99-a212-4f5c-dc2e-28665060acb2@redhat.com>
+ <CAKgT0Ueqok+bxANVtB1DdYorcEHN7+Grzb8MAxTzSk8uS81pRA@mail.gmail.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <9a2ffed8-a8a7-a0a6-ec2d-4234b4e11e3e@redhat.com>
+Date:   Fri, 30 Aug 2019 12:05:04 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86de96dd-214b-4fbf-8b67-08d72d610c48
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Aug 2019 15:45:13.5953
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PckDReLwRGDAdCFucYnwmWtRVeZjQzgl4xi9gtIbdLOXHF9dNDMCpGrPjZiwbB5RpjNIqXt0t+Fmo4lx5zVmNw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4291
+In-Reply-To: <CAKgT0Ueqok+bxANVtB1DdYorcEHN7+Grzb8MAxTzSk8uS81pRA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 30 Aug 2019 16:05:28 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 8/30/19 11:31 AM, Alexander Duyck wrote:
+> On Fri, Aug 30, 2019 at 8:15 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+>>
+>> On 8/12/19 2:47 PM, Alexander Duyck wrote:
+>>> On Mon, Aug 12, 2019 at 6:13 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+>>>> This patch introduces the core infrastructure for free page reporting in
+>>>> virtual environments. It enables the kernel to track the free pages which
+>>>> can be reported to its hypervisor so that the hypervisor could
+>>>> free and reuse that memory as per its requirement.
+>>>>
+>>>> While the pages are getting processed in the hypervisor (e.g.,
+>>>> via MADV_DONTNEED), the guest must not use them, otherwise, data loss
+>>>> would be possible. To avoid such a situation, these pages are
+>>>> temporarily removed from the buddy. The amount of pages removed
+>>>> temporarily from the buddy is governed by the backend(virtio-balloon
+>>>> in our case).
+>>>>
+>>>> To efficiently identify free pages that can to be reported to the
+>>>> hypervisor, bitmaps in a coarse granularity are used. Only fairly big
+>>>> chunks are reported to the hypervisor - especially, to not break up THP
+>>>> in the hypervisor - "MAX_ORDER - 2" on x86, and to save space. The bits
+>>>> in the bitmap are an indication whether a page *might* be free, not a
+>>>> guarantee. A new hook after buddy merging sets the bits.
+>>>>
+>>>> Bitmaps are stored per zone, protected by the zone lock. A workqueue
+>>>> asynchronously processes the bitmaps, trying to isolate and report pages
+>>>> that are still free. The backend (virtio-balloon) is responsible for
+>>>> reporting these batched pages to the host synchronously. Once reporting/
+>>>> freeing is complete, isolated pages are returned back to the buddy.
+>>>>
+>>>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+>> [...]
+>>>> +static void scan_zone_bitmap(struct page_reporting_config *phconf,
+>>>> +                            struct zone *zone)
+>>>> +{
+>>>> +       unsigned long setbit;
+>>>> +       struct page *page;
+>>>> +       int count = 0;
+>>>> +
+>>>> +       sg_init_table(phconf->sg, phconf->max_pages);
+>>>> +
+>>>> +       for_each_set_bit(setbit, zone->bitmap, zone->nbits) {
+>>>> +               /* Process only if the page is still online */
+>>>> +               page = pfn_to_online_page((setbit << PAGE_REPORTING_MIN_ORDER) +
+>>>> +                                         zone->base_pfn);
+>>>> +               if (!page)
+>>>> +                       continue;
+>>>> +
+>>> Shouldn't you be clearing the bit and dropping the reference to
+>>> free_pages before you move on to the next bit? Otherwise you are going
+>>> to be stuck with those aren't you?
+>>>
+>>>> +               spin_lock(&zone->lock);
+>>>> +
+>>>> +               /* Ensure page is still free and can be processed */
+>>>> +               if (PageBuddy(page) && page_private(page) >=
+>>>> +                   PAGE_REPORTING_MIN_ORDER)
+>>>> +                       count = process_free_page(page, phconf, count);
+>>>> +
+>>>> +               spin_unlock(&zone->lock);
+>>> So I kind of wonder just how much overhead you are taking for bouncing
+>>> the zone lock once per page here. Especially since it can result in
+>>> you not actually making any progress since the page may have already
+>>> been reallocated.
+>>>
+>> I am wondering if there is a way to measure this overhead?
+>> After thinking about this, I do understand your point.
+>> One possible way which I can think of to address this is by having a
+>> page_reporting_dequeue() hook somewhere in the allocation path.
+> Really in order to stress this you probably need to have a lot of
+> CPUs, a lot of memory, and something that forces a lot of pages to get
+> hit such as the memory shuffling feature.
 
-> -----Original Message-----
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Friday, August 30, 2019 7:32 PM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; netdev@vger.kernel.org
-> Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
->=20
-> On Fri, 30 Aug 2019 12:58:04 +0000
-> Parav Pandit <parav@mellanox.com> wrote:
->=20
-> > > -----Original Message-----
-> > > From: Cornelia Huck <cohuck@redhat.com>
-> > > Sent: Friday, August 30, 2019 6:09 PM
-> > > To: Parav Pandit <parav@mellanox.com>
-> > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
-> > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
-> > >
-> > > On Fri, 30 Aug 2019 12:33:22 +0000
-> > > Parav Pandit <parav@mellanox.com> wrote:
-> > >
-> > > > > -----Original Message-----
-> > > > > From: Cornelia Huck <cohuck@redhat.com>
-> > > > > Sent: Friday, August 30, 2019 2:47 PM
-> > > > > To: Parav Pandit <parav@mellanox.com>
-> > > > > Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > > > kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
-> > > > > linux- kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > > > Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev
-> > > > > alias
-> > > > >
-> > > > > On Thu, 29 Aug 2019 06:18:59 -0500 Parav Pandit
-> > > > > <parav@mellanox.com> wrote:
-> > > > >
-> > > > > > Some vendor drivers want an identifier for an mdev device that
-> > > > > > is shorter than the UUID, due to length restrictions in the
-> > > > > > consumers of that identifier.
-> > > > > >
-> > > > > > Add a callback that allows a vendor driver to request an alias
-> > > > > > of a specified length to be generated for an mdev device. If
-> > > > > > generated, that alias is checked for collisions.
-> > > > > >
-> > > > > > It is an optional attribute.
-> > > > > > mdev alias is generated using sha1 from the mdev name.
-> > > > > >
-> > > > > > Signed-off-by: Parav Pandit <parav@mellanox.com>
-> > > > > >
-> > > > > > ---
-> > > > > > Changelog:
-> > > > > > v1->v2:
-> > > > > >  - Kept mdev_device naturally aligned
-> > > > > >  - Added error checking for crypt_*() calls
-> > > > > >  - Corrected a typo from 'and' to 'an'
-> > > > > >  - Changed return type of generate_alias() from int to char*
-> > > > > > v0->v1:
-> > > > > >  - Moved alias length check outside of the parent lock
-> > > > > >  - Moved alias and digest allocation from kvzalloc to kzalloc
-> > > > > >  - &alias[0] changed to alias
-> > > > > >  - alias_length check is nested under get_alias_length
-> > > > > > callback check
-> > > > > >  - Changed comments to start with an empty line
-> > > > > >  - Fixed cleaunup of hash if mdev_bus_register() fails
-> > > > > >  - Added comment where alias memory ownership is handed over
-> > > > > > to mdev device
-> > > > > >  - Updated commit log to indicate motivation for this feature
-> > > > > > ---
-> > > > > >  drivers/vfio/mdev/mdev_core.c    | 123
-> > > > > ++++++++++++++++++++++++++++++-
-> > > > > >  drivers/vfio/mdev/mdev_private.h |   5 +-
-> > > > > >  drivers/vfio/mdev/mdev_sysfs.c   |  13 ++--
-> > > > > >  include/linux/mdev.h             |   4 +
-> > > > > >  4 files changed, 135 insertions(+), 10 deletions(-)
-> > >
-> > > > > ...and detached from the local variable here. Who is freeing it?
-> > > > > The comment states that it is done by the mdev, but I don't see i=
-t?
-> > > > >
-> > > > mdev_device_free() frees it.
-> > >
-> > > Ah yes, I overlooked the kfree().
-> > >
-> > > > once its assigned to mdev, mdev is the owner of it.
-> > > >
-> > > > > This detour via the local variable looks weird to me. Can you
-> > > > > either create the alias directly in the mdev (would need to
-> > > > > happen later in the function, but I'm not sure why you generate
-> > > > > the alias before checking for duplicates anyway), or do an explic=
-it copy?
-> > > > Alias duplicate check is done after generating it, because
-> > > > duplicate alias are
-> > > not allowed.
-> > > > The probability of collision is rare.
-> > > > So it is speculatively generated without hold the lock, because
-> > > > there is no
-> > > need to hold the lock.
-> > > > It is compared along with guid while mutex lock is held in single l=
-oop.
-> > > > And if it is duplicate, there is no need to allocate mdev.
-> > > >
-> > > > It will be sub optimal to run through the mdev list 2nd time after
-> > > > mdev
-> > > creation and after generating alias for duplicate check.
-> > >
-> > > Ok, but what about copying it? I find this "set local variable to
-> > > NULL after ownership is transferred" pattern a bit unintuitive.
-> > > Copying it to the mdev (and then unconditionally freeing it) looks mo=
-re
-> obvious to me.
-> > Its not unconditionally freed.
->=20
-> That's not what I have been saying :(
->=20
-Ah I see. You want to allocate alias memory twice; once inside mdev device =
-and another one in _create() function.
-_create() one you want to free unconditionally.
+I will think about it, thanks for the suggestion.
 
-Well, passing pointer is fine.
-mdev_register_device() has similar little tricky pattern that makes parent =
-=3D NULL on __find_parent_device() finds duplicate one.
+>
+>> For some reason, I am not seeing this work as I would have expected
+>> but I don't have solid reasoning to share yet. It could be simply
+>> because I am putting my hook at the wrong place. I will continue
+>> investigating this.
+>>
+>> In any case, I may be over complicating things here, so please let me
+>> if there is a better way to do this.
+> I have already been demonstrating the "better way" I think there is to
+> do this. I will push v7 of it early next week unless there is some
+> other feedback. By putting the bit in the page and controlling what
+> comes into and out of the lists it makes most of this quite a bit
+> easier. The only limitation is you have to modify where things get
+> placed in the lists so you don't create a "vapor lock" that would
+> stall the feed of pages into the reporting engine.
+>
+>> If this overhead is not significant we can probably live with it.
+> You have bigger issues you still have to overcome as I recall. Didn't
+> you still need to sort out hotplu
 
-Ownership transfer is more straight forward code.
+For memory hotplug, my impression is that it should
+not be a blocker for taking the first step (in case we do decide to
+go ahead with this approach). Another reason why I am considering
+this as future work is that memory hot(un)plug is still under
+development and requires fixing. (Specifically, issue such as zone
+shrinking which will directly impact the bitmap approach is still
+under discussion).
 
-It is similar to device_initialize(), device init sequence code, where once=
- device_initialize is done, freeing the device memory will be left to the p=
-ut_device(), we don't call kfree() on mdev device.
+> g and a sparse map with a wide span
+> in a zone? Without those resolved the bitmap approach is still a no-go
+> regardless of performance.
 
-> > Its freed in the error unwinding path.
-> > I think its ok along with the comment that describes this error path ar=
-ea.
->=20
-> It is not wrong, but I'm not sure I like it.
-Ok.
+For sparsity, the memory wastage should not be significant as I
+am tracking pages on the granularity of (MAX_ORDER - 2) and maintaining
+the bitmaps on a per-zone basis (which was not the case earlier).
+
+However, if you do consider this as a block I will think about it and try to fix it.
+In the worst case, if I don't find a solution I will add this as a known limitation
+for this approach in my cover.
+
+> - Alex
+-- 
+Thanks
+Nitesh
+
