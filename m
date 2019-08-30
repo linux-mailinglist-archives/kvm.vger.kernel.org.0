@@ -2,25 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB1AA2C0B
-	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 03:06:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 217CEA2C11
+	for <lists+kvm@lfdr.de>; Fri, 30 Aug 2019 03:08:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727294AbfH3BGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Aug 2019 21:06:17 -0400
-Received: from mga03.intel.com ([134.134.136.65]:39895 "EHLO mga03.intel.com"
+        id S1727544AbfH3BIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Aug 2019 21:08:41 -0400
+Received: from mga12.intel.com ([192.55.52.136]:29749 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726825AbfH3BGR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Aug 2019 21:06:17 -0400
-X-Amp-Result: UNSCANNABLE
+        id S1726991AbfH3BIk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Aug 2019 21:08:40 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Aug 2019 18:06:16 -0700
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Aug 2019 18:08:40 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,445,1559545200"; 
-   d="scan'208";a="381844739"
+   d="scan'208";a="186148955"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga006.fm.intel.com with ESMTP; 29 Aug 2019 18:06:15 -0700
-Date:   Thu, 29 Aug 2019 18:06:15 -0700
+  by orsmga006.jf.intel.com with ESMTP; 29 Aug 2019 18:08:40 -0700
+Date:   Thu, 29 Aug 2019 18:08:40 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Jan Dakinevich <jan.dakinevich@virtuozzo.com>
 Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -38,71 +39,57 @@ Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>,
         "x86@kernel.org" <x86@kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v3 1/2] KVM: x86: always stop emulation on page fault
-Message-ID: <20190830010615.GC27970@linux.intel.com>
+Subject: Re: [PATCH v3 2/2] KVM: x86: set ctxt->have_exception in
+ x86_decode_insn()
+Message-ID: <20190830010840.GD27970@linux.intel.com>
 References: <1567066988-23376-1-git-send-email-jan.dakinevich@virtuozzo.com>
- <1567066988-23376-2-git-send-email-jan.dakinevich@virtuozzo.com>
+ <1567066988-23376-3-git-send-email-jan.dakinevich@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1567066988-23376-2-git-send-email-jan.dakinevich@virtuozzo.com>
+In-Reply-To: <1567066988-23376-3-git-send-email-jan.dakinevich@virtuozzo.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 29, 2019 at 08:23:18AM +0000, Jan Dakinevich wrote:
-> inject_emulated_exception() returns true if and only if nested page
-> fault happens. However, page fault can come from guest page tables
-> walk, either nested or not nested. In both cases we should stop an
-> attempt to read under RIP and give guest to step over its own page
-> fault handler.
+On Thu, Aug 29, 2019 at 08:23:20AM +0000, Jan Dakinevich wrote:
+> x86_emulate_instruction() takes into account ctxt->have_exception flag
+> during instruction decoding, but in practice this flag is never set in
+> x86_decode_insn().
 > 
 > Fixes: 6ea6e84 ("KVM: x86: inject exceptions produced by x86_decode_insn")
-
-Commit ids should be at least 12 chars, the full tag should be
-
-  Fixes: 6ea6e84309ca ("KVM: x86: inject exceptions produced by x86_decode_insn")
-
-You can force this in your git config, e.g.
-
-  git config --global core.abbrev 12
-
-Both patches in this series should probably have
-
-  Cc: <stable@vger.kernel.org>
-
-
-Reviewed-and-tested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
 > Cc: Denis Lunev <den@virtuozzo.com>
 > Cc: Roman Kagan <rkagan@virtuozzo.com>
 > Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>
 > Signed-off-by: Jan Dakinevich <jan.dakinevich@virtuozzo.com>
+
+Same nits as last patch:
+
+  Cc: <stable@vger.kernel.org>
+  Fixes: 6ea6e84309ca ("KVM: x86: inject exceptions produced by x86_decode_insn")
+
+Reviewed-and-tested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+
 > ---
->  arch/x86/kvm/x86.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/emulate.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b4cfd78..6bf7b55 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6537,8 +6537,13 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
->  			if (reexecute_instruction(vcpu, cr2, write_fault_to_spt,
->  						emulation_type))
->  				return EMULATE_DONE;
-> -			if (ctxt->have_exception && inject_emulated_exception(vcpu))
-> +			if (ctxt->have_exception) {
-> +				WARN_ON_ONCE(ctxt->exception.vector == UD_VECTOR);
-> +				WARN_ON_ONCE(exception_type(ctxt->exception.vector)
-> +					== EXCPT_TRAP);
-> +				inject_emulated_exception(vcpu);
->  				return EMULATE_DONE;
-> +			}
->  			if (emulation_type & EMULTYPE_SKIP)
->  				return EMULATE_FAIL;
->  			return handle_emulation_failure(vcpu, emulation_type);
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index bef3c3c..698efb8 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -5416,6 +5416,8 @@ int x86_decode_insn(struct x86_emulate_ctxt *ctxt, void *insn, int insn_len)
+>  					ctxt->memopp->addr.mem.ea + ctxt->_eip);
+>  
+>  done:
+> +	if (rc == X86EMUL_PROPAGATE_FAULT)
+> +		ctxt->have_exception = true;
+>  	return (rc != X86EMUL_CONTINUE) ? EMULATION_FAILED : EMULATION_OK;
+>  }
+>  
 > -- 
 > 2.1.4
 > 
