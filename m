@@ -2,82 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD611A4C39
-	for <lists+kvm@lfdr.de>; Sun,  1 Sep 2019 23:13:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DB37A4CC5
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 01:56:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729181AbfIAVNC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 Sep 2019 17:13:02 -0400
-Received: from foss.arm.com ([217.140.110.172]:46442 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729173AbfIAVNB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 1 Sep 2019 17:13:01 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E29DE15A2;
-        Sun,  1 Sep 2019 14:13:00 -0700 (PDT)
-Received: from why.lan (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ABBDD3F77D;
-        Sun,  1 Sep 2019 14:12:59 -0700 (PDT)
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 3/3] arm64: KVM: Kill hyp_alternate_select()
-Date:   Sun,  1 Sep 2019 22:12:37 +0100
-Message-Id: <20190901211237.11673-4-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190901211237.11673-1-maz@kernel.org>
-References: <20190901211237.11673-1-maz@kernel.org>
+        id S1729222AbfIAXzm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 1 Sep 2019 19:55:42 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44957 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729213AbfIAXzl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 1 Sep 2019 19:55:41 -0400
+Received: by mail-io1-f65.google.com with SMTP id j4so25711277iog.11
+        for <kvm@vger.kernel.org>; Sun, 01 Sep 2019 16:55:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q3IPluDPUhxJYqHllocfAsB4f1zm+9hu2o+uKDYOSHI=;
+        b=IYup7NpoVS1+GCDE/ltmxhIMglSD4iM+H7q4GhF0QRRVUmODPAgyUhEPhoGRHdmTl7
+         4g425S/DvvfnQMd87plnXjs+o/0TJTyFt04iuUZYF47IrLF9ukblBXRRvhiVsEWr3AJc
+         eZ8BtvLkSUXGaBkkduRAKjRrPhDyRoBjxDugY5YF/F1EgX02CPJFHFW4o/yywddHtCT+
+         U9FqckQ3QBU5NL1d1UpA3PbuHIJHzOWAAtbCIGDkfXiZhpuoQD2cU4CvtM+o2AarmZWs
+         RN/Flp0Bc7ACuku3R0KGRhIrUniDJSyPeoX/lsj64iVo5DcCG8cfR/uJ5UOp7jRGVQdN
+         ugzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q3IPluDPUhxJYqHllocfAsB4f1zm+9hu2o+uKDYOSHI=;
+        b=AJ3Bd1DSVEgjHx+CtvRLoL69sKGC+Q5ZDyoW68n/26qdy3MjggsUolSvARCMI2MDjI
+         H2oQLq6jgrigcmF8WB3A3mMt2c7JmybIJ7X5PrEUkyC2U1IVZtFFmaNrLhqGultZbX4o
+         QLO8dE5C2lqEbgWC27skumTWkwgPSIWWtAHgF8zJUwbO/91CE+mUVLUq4YuuxpBgDYqZ
+         GihRhU0RnelGPgqZyw3z1xGh3mQKDe3CypjEXdr/ocVmscDm5SiXgp5Nv9xxhsZTnMLZ
+         7i5IA3nh3fNSSTtD3mOOZsvOyp2Rh/P6JS+w49l7gd+n2BrhthL/pebUgEphIvRF5qy+
+         Bg7g==
+X-Gm-Message-State: APjAAAVcFfoi/R2qtFrLb+sW71/zjaUwmxBiNiG7InJUig8XGBg35Epn
+        hh0mr1x4FGUkHGIAvdK4BhkPcz3xtgniD2KgBUxvqw==
+X-Google-Smtp-Source: APXvYqxTkwZ01OsvKp5POMJgG8brPnCS/z1LiMEve3lTX+I6AXjCUsmJ/UaJSCMRbDa15s8J57UmRKIvuJvpmhqTsho=
+X-Received: by 2002:a5d:8e15:: with SMTP id e21mr9476421iod.296.1567382140544;
+ Sun, 01 Sep 2019 16:55:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
+ <20190829205635.20189-2-krish.sadhukhan@oracle.com> <CALMp9eQxdF5tJLWaWu+0t0NjhSiJfowo1U6MDkjB_zYNRKiyKw@mail.gmail.com>
+ <e35e7c1f-e5c8-5f98-771e-302cf8dfba7f@oracle.com>
+In-Reply-To: <e35e7c1f-e5c8-5f98-771e-302cf8dfba7f@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Sun, 1 Sep 2019 16:55:27 -0700
+Message-ID: <CALMp9eQedgJLP9iFW+L3sWZTZmC7aMtg5HBoAbSVMCGax3D==A@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: nVMX: Check GUEST_DEBUGCTL on vmentry of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-hyp_alternate_select() is now completely unused. Goodbye.
+On Fri, Aug 30, 2019 at 4:26 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+>
+>
+> On 08/29/2019 03:12 PM, Jim Mattson wrote:
+> > On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
+> > <krish.sadhukhan@oracle.com> wrote:
+> >> According to section "Checks on Guest Control Registers, Debug Registers, and
+> >> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
+> >> of nested guests:
+> >>
+> >>      If the "load debug controls" VM-entry control is 1, bits reserved in the
+> >>      IA32_DEBUGCTL MSR must be 0 in the field for that register. The first
+> >>      processors to support the virtual-machine extensions supported only the
+> >>      1-setting of this control and thus performed this check unconditionally.
+> >>
+> >> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> >> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> >> ---
+> >>   arch/x86/kvm/vmx/nested.c | 4 ++++
+> >>   arch/x86/kvm/x86.h        | 6 ++++++
+> >>   2 files changed, 10 insertions(+)
+> >>
+> >> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> >> index 46af3a5e9209..0b234e95e0ed 100644
+> >> --- a/arch/x86/kvm/vmx/nested.c
+> >> +++ b/arch/x86/kvm/vmx/nested.c
+> >> @@ -2677,6 +2677,10 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+> >>              !nested_guest_cr4_valid(vcpu, vmcs12->guest_cr4))
+> >>                  return -EINVAL;
+> >>
+> >> +       if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
+> >> +           !kvm_debugctl_valid(vmcs12->guest_ia32_debugctl))
+> >> +               return -EINVAL;
+> >> +
+> >>          if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
+> >>              !kvm_pat_valid(vmcs12->guest_ia32_pat))
+> >>                  return -EINVAL;
+> >> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> >> index a470ff0868c5..28ba6d0c359f 100644
+> >> --- a/arch/x86/kvm/x86.h
+> >> +++ b/arch/x86/kvm/x86.h
+> >> @@ -354,6 +354,12 @@ static inline bool kvm_pat_valid(u64 data)
+> >>          return (data | ((data & 0x0202020202020202ull) << 1)) == data;
+> >>   }
+> >>
+> >> +static inline bool kvm_debugctl_valid(u64 data)
+> >> +{
+> >> +       /* Bits 2, 3, 4, 5, 13 and [31:16] are reserved */
+> >> +       return ((data & 0xFFFFFFFFFFFF203Cull) ? false : true);
+> >> +}
+> > This should actually be consistent with the constraints in kvm_set_msr_common:
+> >
+> > case MSR_IA32_DEBUGCTLMSR:
+> >          if (!data) {
+> >                  /* We support the non-activated case already */
+> >                  break;
+> >          } else if (data & ~(DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF)) {
+> >                  /* Values other than LBR and BTF are vendor-specific,
+> >                     thus reserved and should throw a #GP */
+> >                  return 1;
+> >          }
+> >
+> > Also, as I said earlier...
+> >
+> > I'd rather see this built on an interface like:
+> >
+> > bool kvm_valid_msr_value(u32 msr_index, u64 value);
+>
+> Yes, I forgot to do it. Will send a patch for this...
+>
+> >
+> > Strange that we allow IA32_DEBUGCTL.BTF, since kvm_vcpu_do_singlestep
+> > ignores it. And vLBR still isn't a thing, is it?
+>
+> Yes, DEBUGCTLMSR_LBR isn't used.
+> Good catch !
+>
+> >
+> > It's a bit scary to me that we allow any architecturally legal
+> > IA32_DEBUGCTL bits to be set today. There's probably a CVE in there
+> > somewhere.
+> Is it appropriate to disable those two bits as well, then ?
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_hyp.h | 24 ------------------------
- 1 file changed, 24 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 86825aa20852..97f21cc66657 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -47,30 +47,6 @@
- #define read_sysreg_el2(r)	read_sysreg_elx(r, _EL2, _EL1)
- #define write_sysreg_el2(v,r)	write_sysreg_elx(v, r, _EL2, _EL1)
- 
--/**
-- * hyp_alternate_select - Generates patchable code sequences that are
-- * used to switch between two implementations of a function, depending
-- * on the availability of a feature.
-- *
-- * @fname: a symbol name that will be defined as a function returning a
-- * function pointer whose type will match @orig and @alt
-- * @orig: A pointer to the default function, as returned by @fname when
-- * @cond doesn't hold
-- * @alt: A pointer to the alternate function, as returned by @fname
-- * when @cond holds
-- * @cond: a CPU feature (as described in asm/cpufeature.h)
-- */
--#define hyp_alternate_select(fname, orig, alt, cond)			\
--typeof(orig) * __hyp_text fname(void)					\
--{									\
--	typeof(alt) *val = orig;					\
--	asm volatile(ALTERNATIVE("nop		\n",			\
--				 "mov	%0, %1	\n",			\
--				 cond)					\
--		     : "+r" (val) : "r" (alt));				\
--	return val;							\
--}
--
- int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
- 
- void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
--- 
-2.20.1
-
+IA32_DEBUGCTL.BTF is just broken, and should be fixed.
+IA32_DEBUGCTL.LBR is probably a long way from actually working, but
+IIRC, Windows gets cranky if it can't set the bit.
