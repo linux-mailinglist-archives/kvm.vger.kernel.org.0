@@ -2,34 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE46EA5093
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 10:01:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AEB9A51CD
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 10:35:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729916AbfIBIA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 04:00:57 -0400
-Received: from foss.arm.com ([217.140.110.172]:49626 "EHLO foss.arm.com"
+        id S1730067AbfIBIeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 04:34:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37396 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729535AbfIBIA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 04:00:57 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E19D728;
-        Mon,  2 Sep 2019 01:00:56 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73D583F71A;
-        Mon,  2 Sep 2019 01:00:56 -0700 (PDT)
-Date:   Mon, 2 Sep 2019 10:00:55 +0200
-From:   Christoffer Dall <christoffer.dall@arm.com>
+        id S1729722AbfIBIeH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 04:34:07 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5E2C237E79;
+        Mon,  2 Sep 2019 08:34:07 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC9681000337;
+        Mon,  2 Sep 2019 08:34:05 +0000 (UTC)
+Date:   Mon, 2 Sep 2019 10:34:03 +0200
+From:   Andrew Jones <drjones@redhat.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
 Subject: Re: [PATCH 0/3] arm64: KVM: Kiss hyp_alternate_select() goodbye
-Message-ID: <20190902080055.GA4320@e113682-lin.lund.arm.com>
+Message-ID: <20190902083403.ujiilcurhzrbc4ph@kamzik.brq.redhat.com>
 References: <20190901211237.11673-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190901211237.11673-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 02 Sep 2019 08:34:07 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -50,8 +56,22 @@ On Sun, Sep 01, 2019 at 10:12:34PM +0100, Marc Zyngier wrote:
 > has_vhe().
 > 
 > So off it goes.
+> 
+> Marc Zyngier (3):
+>   arm64: KVM: Drop hyp_alternate_select for checking for
+>     ARM64_WORKAROUND_834220
+>   arm64: KVM: Replace hyp_alternate_select with has_vhe()
+>   arm64: KVM: Kill hyp_alternate_select()
+> 
+>  arch/arm64/include/asm/kvm_hyp.h | 24 ---------------------
+>  arch/arm64/kvm/hyp/switch.c      | 17 ++-------------
+>  arch/arm64/kvm/hyp/tlb.c         | 36 +++++++++++++++++++-------------
+>  3 files changed, 24 insertions(+), 53 deletions(-)
+> 
+> -- 
+> 2.20.1
+>
 
-I'm not sure I want to kiss hyp_alternate_select() at all, but away it
-must go!
+Yay! The 'func()(...)' stuff always gave me cross-eyes.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
