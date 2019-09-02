@@ -2,425 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 00E40A5AAD
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 17:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDC5CA5D23
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 22:34:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725848AbfIBPkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 11:40:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52914 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725807AbfIBPkF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 11:40:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E324D877A66;
-        Mon,  2 Sep 2019 15:40:04 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-48.ams2.redhat.com [10.36.116.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EAA160603;
-        Mon,  2 Sep 2019 15:40:00 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 6/6] s390x: SMP test
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com
-References: <20190829121459.1708-1-frankja@linux.ibm.com>
- <20190829121459.1708-7-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <50b70561-f39d-6edc-600a-ccb707fe5b92@redhat.com>
-Date:   Mon, 2 Sep 2019 17:40:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727371AbfIBUeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 16:34:20 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:43652 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727143AbfIBUeU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 16:34:20 -0400
+Received: by mail-ot1-f65.google.com with SMTP id 90so10719390otg.10;
+        Mon, 02 Sep 2019 13:34:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6G6AS6XS3p/KIg4D7nyim/ZMWHQ7MYM3kjpkD7nrEyY=;
+        b=qWLvSoSDq6U9Gv6LftB/S6oDow1WF5fsLI52QWOPwNEPDmHSa2Ro2UiBZ0mKppB11Y
+         hCUmS8cQkMARXY1Ww/JoEVazaSGUtbaR2uJ+OrbXdSImPrQuLDDWV9VEVpwW8oQu/TyC
+         mfa3w3p42jgZVVztxZhXwjDKIr8i9ANhC+1f0QTbvCDsz8JWACwjuzXKGPPiftbguei6
+         60hIAAEZxrrUY0biL1GG5feTvhJ0pWuAg1lGKkbyEwrzinm0k00Stp/XaxHdJMsZTicK
+         1SM4kphfz1+CdZRfy7jsgIpSuNf/faa79vtWD8xHm8e0bW7h32v/ri9tdtZiOXn4swhc
+         /Vzw==
+X-Gm-Message-State: APjAAAXgIf1H7o2YE1CkBGvWlkWtZPkPZkCuPMQEVMCAsDqXZuidN5To
+        lq6Jw6uGgqrKHfnVc1w8bjVFMrt1+Jre7403GIE=
+X-Google-Smtp-Source: APXvYqxUIQV3WQsGmCE3GIxh+18n9dg371Li+tohb8yPs0eMKXw90b8X2cbhkj4IQ5hwAT/cRceEnDBw3eKj2TrWs8M=
+X-Received: by 2002:a9d:65ca:: with SMTP id z10mr18799233oth.167.1567456458519;
+ Mon, 02 Sep 2019 13:34:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190829121459.1708-7-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Mon, 02 Sep 2019 15:40:05 +0000 (UTC)
+References: <20190902104031.9296-1-joao.m.martins@oracle.com>
+In-Reply-To: <20190902104031.9296-1-joao.m.martins@oracle.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Mon, 2 Sep 2019 22:34:07 +0200
+Message-ID: <CAJZ5v0g1rjRsaC1R2xvtn4WtCaWtedFQk+oNUgB5sPAc6cU8rA@mail.gmail.com>
+Subject: Re: [PATCH v3] cpuidle-haltpoll: vcpu hotplug support
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/08/2019 14.14, Janosch Frank wrote:
-> Testing SIGP emulation for the following order codes:
-> * start
-> * stop
-> * restart
-> * set prefix
-> * store status
-> * stop and store status
-> * reset
-> * initial reset
-> * external call
-> * emegergency call
-> 
-> restart and set prefix are part of the library and needed to start
-> other cpus.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+On Mon, Sep 2, 2019 at 12:43 PM Joao Martins <joao.m.martins@oracle.com> wrote:
+>
+> When cpus != maxcpus cpuidle-haltpoll will fail to register all vcpus
+> past the online ones and thus fail to register the idle driver.
+> This is because cpuidle_add_sysfs() will return with -ENODEV as a
+> consequence from get_cpu_device() return no device for a non-existing
+> CPU.
+>
+> Instead switch to cpuidle_register_driver() and manually register each
+> of the present cpus through cpuhp_setup_state() callbacks and future
+> ones that get onlined or offlined. This mimmics similar logic that
+> intel_idle does.
+>
+> Fixes: fa86ee90eb11 ("add cpuidle-haltpoll driver")
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
 > ---
->  s390x/Makefile |   1 +
->  s390x/smp.c    | 242 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 243 insertions(+)
->  create mode 100644 s390x/smp.c
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index d83dd0b..3744372 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -15,6 +15,7 @@ tests += $(TEST_DIR)/cpumodel.elf
->  tests += $(TEST_DIR)/diag288.elf
->  tests += $(TEST_DIR)/stsi.elf
->  tests += $(TEST_DIR)/skrf.elf
-> +tests += $(TEST_DIR)/smp.elf
->  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->  
->  all: directories test_cases test_cases_binary
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> new file mode 100644
-> index 0000000..9363cd2
-> --- /dev/null
-> +++ b/s390x/smp.c
-> @@ -0,0 +1,242 @@
-> +/*
-> + * Tests sigp emulation
-> + *
-> + * Copyright 2019 IBM Corp.
-> + *
-> + * Authors:
-> + *    Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2.
-> + */
-> +#include <libcflat.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/page.h>
-> +#include <asm/facility.h>
-> +#include <asm-generic/barrier.h>
-> +#include <asm/sigp.h>
-> +
-> +#include <smp.h>
-> +#include <alloc_page.h>
-> +
-> +static int t = 0;
+> v3:
+> * register the teardown callback for correct handling of hotunplug
+> and error cases. In case cpuhp_setup_state calls fails (e.g. in one of
+> the cpus that it invoked the callback) it will then call the teardown of
+> the previously enabled devices; so no need to handle that manually in
+> haltpoll_uninit().
+> * use the cpuhp_setup_state() returned dyn allocated state when it
+> succeeds. And use that state in haltpoll_unint() to call
+> cpuhp_remove_state() instead of looping online cpus manually. This
+> is because cpuhp_remove_state() invokes the teardown/offline callback.
+> * fix subsystem name to 'cpuidle' instead of 'idle' in cpuhp_setup_state()
 
-Single letter variables that are used accross functions are a little bit
-ugly. I'd maybe give this a better name, like "testflag" or something
-similar?
+Marcelo, is the R-by still applicable?
 
-> +static void cpu_loop(void)
+Paolo, any comments?
+
+>
+> v2:
+> * move cpus_read_unlock() after unregistering all cpuidle_devices;
+> (Marcello Tosatti)
+> * redundant usage of cpuidle_unregister() when only
+> cpuidle_unregister_driver() suffices; (Marcelo Tosatti)
+> * cpuhp_setup_state() returns a state (> 0) for CPUHP_AP_ONLINE_DYN
+> ---
+>  arch/x86/include/asm/cpuidle_haltpoll.h |  4 +-
+>  arch/x86/kernel/kvm.c                   | 18 +++----
+>  drivers/cpuidle/cpuidle-haltpoll.c      | 68 +++++++++++++++++++++++--
+>  include/linux/cpuidle_haltpoll.h        |  4 +-
+>  4 files changed, 73 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/cpuidle_haltpoll.h b/arch/x86/include/asm/cpuidle_haltpoll.h
+> index ff8607d81526..c8b39c6716ff 100644
+> --- a/arch/x86/include/asm/cpuidle_haltpoll.h
+> +++ b/arch/x86/include/asm/cpuidle_haltpoll.h
+> @@ -2,7 +2,7 @@
+>  #ifndef _ARCH_HALTPOLL_H
+>  #define _ARCH_HALTPOLL_H
+>
+> -void arch_haltpoll_enable(void);
+> -void arch_haltpoll_disable(void);
+> +void arch_haltpoll_enable(unsigned int cpu);
+> +void arch_haltpoll_disable(unsigned int cpu);
+>
+>  #endif
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 8d150e3732d9..a9b6c4e2446d 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -880,32 +880,26 @@ static void kvm_enable_host_haltpoll(void *i)
+>         wrmsrl(MSR_KVM_POLL_CONTROL, 1);
+>  }
+>
+> -void arch_haltpoll_enable(void)
+> +void arch_haltpoll_enable(unsigned int cpu)
+>  {
+>         if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
+> -               printk(KERN_ERR "kvm: host does not support poll control\n");
+> -               printk(KERN_ERR "kvm: host upgrade recommended\n");
+> +               pr_err_once("kvm: host does not support poll control\n");
+> +               pr_err_once("kvm: host upgrade recommended\n");
+>                 return;
+>         }
+>
+> -       preempt_disable();
+>         /* Enable guest halt poll disables host halt poll */
+> -       kvm_disable_host_haltpoll(NULL);
+> -       smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
+> -       preempt_enable();
+> +       smp_call_function_single(cpu, kvm_disable_host_haltpoll, NULL, 1);
+>  }
+>  EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
+>
+> -void arch_haltpoll_disable(void)
+> +void arch_haltpoll_disable(unsigned int cpu)
+>  {
+>         if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
+>                 return;
+>
+> -       preempt_disable();
+>         /* Enable guest halt poll disables host halt poll */
+> -       kvm_enable_host_haltpoll(NULL);
+> -       smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
+> -       preempt_enable();
+> +       smp_call_function_single(cpu, kvm_enable_host_haltpoll, NULL, 1);
+>  }
+>  EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
+>  #endif
+> diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
+> index 9ac093dcbb01..56d8ab814466 100644
+> --- a/drivers/cpuidle/cpuidle-haltpoll.c
+> +++ b/drivers/cpuidle/cpuidle-haltpoll.c
+> @@ -11,12 +11,16 @@
+>   */
+>
+>  #include <linux/init.h>
+> +#include <linux/cpu.h>
+>  #include <linux/cpuidle.h>
+>  #include <linux/module.h>
+>  #include <linux/sched/idle.h>
+>  #include <linux/kvm_para.h>
+>  #include <linux/cpuidle_haltpoll.h>
+>
+> +static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
+> +static enum cpuhp_state haltpoll_hp_state;
+> +
+>  static int default_enter_idle(struct cpuidle_device *dev,
+>                               struct cpuidle_driver *drv, int index)
+>  {
+> @@ -46,6 +50,46 @@ static struct cpuidle_driver haltpoll_driver = {
+>         .state_count = 2,
+>  };
+>
+> +static int haltpoll_cpu_online(unsigned int cpu)
 > +{
-> +	for (;;) {}
+> +       struct cpuidle_device *dev;
+> +
+> +       dev = per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
+> +       if (!dev->registered) {
+> +               dev->cpu = cpu;
+> +               if (cpuidle_register_device(dev)) {
+> +                       pr_notice("cpuidle_register_device %d failed!\n", cpu);
+> +                       return -EIO;
+> +               }
+> +               arch_haltpoll_enable(cpu);
+> +       }
+> +
+> +       return 0;
 > +}
 > +
-> +static void test_func(void)
+> +static int haltpoll_cpu_offline(unsigned int cpu)
 > +{
-> +	t = 1;
-
-I think I'd rather place a mb() here, just to be sure...?
-
-> +	cpu_loop();
+> +       struct cpuidle_device *dev;
+> +
+> +       dev = per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
+> +       if (dev->registered) {
+> +               arch_haltpoll_disable(cpu);
+> +               cpuidle_unregister_device(dev);
+> +       }
+> +
+> +       return 0;
 > +}
 > +
-> +static void test_start(void)
+> +static void haltpoll_uninit(void)
 > +{
-> +	struct psw psw;
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)test_func;
+> +       if (haltpoll_hp_state)
+> +               cpuhp_remove_state(haltpoll_hp_state);
+> +       cpuidle_unregister_driver(&haltpoll_driver);
 > +
-> +	smp_cpu_setup(1, psw);
-> +	while (!t) {
-> +		mb();
-> +	}
-> +	report("start", 1);
+> +       free_percpu(haltpoll_cpuidle_devices);
+> +       haltpoll_cpuidle_devices = NULL;
 > +}
 > +
-> +static void test_stop(void)
-> +{
-> +	int i = 0;
+>  static int __init haltpoll_init(void)
+>  {
+>         int ret;
+> @@ -56,17 +100,31 @@ static int __init haltpoll_init(void)
+>         if (!kvm_para_available())
+>                 return 0;
+>
+> -       ret = cpuidle_register(&haltpoll_driver, NULL);
+> -       if (ret == 0)
+> -               arch_haltpoll_enable();
+> +       ret = cpuidle_register_driver(drv);
+> +       if (ret < 0)
+> +               return ret;
 > +
-> +	smp_cpu_stop(1);
-> +	/*
-> +	 * The smp library waits for the CPU to shut down, but let's
-> +	 * also do it here, so we don't rely on the library
-> +	 * implementation
-> +	 */
-> +	while (!smp_cpu_stopped(1)) {}
-> +	t = 0;
-> +	/* Let's leave some time for cpu #2 to change t */
-
-CPU #2 ? Where? Why?
-
-> +	for (; i < 0x100000; i++) {}
-
-I'm pretty sure the compiler optimizes empty loops away.
-
-> +	report("stop", !t);
-> +}
+> +       haltpoll_cpuidle_devices = alloc_percpu(struct cpuidle_device);
+> +       if (haltpoll_cpuidle_devices == NULL) {
+> +               cpuidle_unregister_driver(drv);
+> +               return -ENOMEM;
+> +       }
 > +
-> +static void test_stop_store_status(void)
-> +{
-> +	struct cpu *cpu = smp_cpu_from_addr(1);
-> +	struct lowcore *lc = (void *)0x0;
-
-Do you want to erase the values in the save area before calling the
-"store_status"? ... just to be sure that we don't see old values there?
-
-> +	smp_cpu_stop_store_status(1);
-> +	mb();
-> +	report("stop store status",
-> +	       lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore);
-
-That confused me. Why does the prefix_sa of the lowcore of CPU 0 match
-the prefix of CPU 1 ? I'd rather expect cpu->lowcore->prefix_sa to
-contain this value?
-
-Maybe you could also check that at least the stack pointer GPR is != 0
-in the save area?
-
-> +}
-> +
-> +static void test_store_status(void)
-> +{
-> +	struct cpu_status *status = alloc_pages(0);
-> +	uint32_t r;
-> +
-> +	report_prefix_push("status");
-> +	memset(status, 0, PAGE_SIZE);
-> +
-> +	smp_cpu_restart(1);
-> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, &r);
-> +	report("not stopped", r == SIGP_STATUS_INCORRECT_STATE);
-
-Maybe also check that the save are is still 0?
-
-> +	memset(status, 0, PAGE_SIZE);
-> +	smp_cpu_stop(1);
-> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
-> +	while (!status->prefix) {}
-
-status->prefix is not marked as volatile, so please put a "mb()" into
-the curly braces here.
-
-> +	report("store status", 1);
-> +	free_pages(status, PAGE_SIZE);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void ecall(void)
-> +{
-> +	unsigned long mask;
-> +	struct lowcore *lc = (void *)0x0;
-> +
-> +	ctl_set_bit(0, 13);
-> +	mask = extract_psw_mask();
-> +	mask |= PSW_MASK_EXT;
-> +	load_psw_mask(mask);
-> +	expect_ext_int();
-
-I think you should move the expect_ext_int() before the enablement of
-the interrupt, to avoid races?
-
-> +	t = 1;
-> +	while (lc->ext_int_code != 0x1202) {mb();}
-
-Spaces around the "mb();", please.
-
-> +	report("ecall", 1);
-> +	t = 1;
-> +}
-> +
-> +static void test_ecall(void)
-> +{
-> +	struct psw psw;
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)ecall;
-> +
-> +	report_prefix_push("ecall");
-> +	t = 0;
-> +	smp_cpu_destroy(1);
-> +
-> +	mb();
-
-Why this mb() here?
-
-> +	smp_cpu_setup(1, psw);
-> +	while (!t) {
-> +		mb();
-> +	}
-> +	t = 0;
-> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
-> +	while(!t) {mb();}
-
-Spaces, please.
-
-> +	smp_cpu_stop(1);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void emcall(void)
-> +{
-> +	unsigned long mask;
-> +	struct lowcore *lc = (void *)0x0;
-> +
-> +	ctl_set_bit(0, 14);
-> +	mask = extract_psw_mask();
-> +	mask |= PSW_MASK_EXT;
-> +	load_psw_mask(mask);
-> +	expect_ext_int();
-
-I think you should move the expect_ext_int() before the enablement of
-the interrupt, to avoid races?
-
-> +	t = 1;
-> +	while (lc->ext_int_code != 0x1201) {mb();}
-
-Spaces.
-
-> +	report("ecall", 1);
-> +	t = 1;
-> +}
-> +
-> +static void test_emcall(void)
-> +{
-> +	struct psw psw;
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)emcall;
-> +
-> +	report_prefix_push("emcall");
-> +	t = 0;
-> +	smp_cpu_destroy(1);
-> +
-> +	mb();
-> +	smp_cpu_setup(1, psw);
-> +	while (!t) {
-> +		mb();
-> +	}
-> +	t = 0;
-> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
-> +	while(!t) {mb();}
-
-Spaces.
-
-> +	smp_cpu_stop(1);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_reset_initial(void)
-> +{
-> +	struct cpu_status *status = alloc_pages(0);
-> +	struct psw psw;
-> +
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)test_func;
-> +
-> +	report_prefix_push("reset initial");
-> +	smp_cpu_setup(1, psw);
-> +
-> +	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
-> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
-> +
-> +	report_prefix_push("clear");
-> +	report("psw", !status->psw.mask && !status->psw.addr);
-> +	report("prefix", !status->prefix);
-> +	report("fpc", !status->fpc);
-> +	report("cpu timer", !status->cputm);
-> +	report("todpr", !status->todpr);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("initialized");
-> +	report("cr0 == 0xE0", status->crs[0] == 0xE0UL);
-> +	report("cr14 == 0xC2000000", status->crs[14] == 0xC2000000UL);
-> +	report_prefix_pop();
-> +
-> +	report("cpu stopped", smp_cpu_stopped(1));
-> +	free_pages(status, PAGE_SIZE);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_reset(void)
-> +{
-> +	struct psw psw;
-> +
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)test_func;
-> +
-> +	report_prefix_push("cpu reset");
-> +	smp_cpu_setup(1, psw);
-> +
-> +	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
-> +	report("cpu stopped", smp_cpu_stopped(1));
-> +	report_prefix_pop();
-> +}
-> +
-> +int main(void)
-> +{
-> +	report_prefix_push("smp");
-> +
-> +	if (smp_query_num_cpus() == 1) {
-> +		report_abort("need at least 2 cpus for this test");
-> +		goto done;
-> +	}
-> +
-> +	test_start();
-> +	test_stop();
-> +	test_stop_store_status();
-> +	test_store_status();
-> +	test_ecall();
-> +	test_emcall();
-> +	test_reset();
-> +	test_reset_initial();
-> +
-> +done:
-> +	report_prefix_pop();
-> +	return report_summary();
-> +}
-> 
-
- Thomas
+> +       ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "cpuidle/haltpoll:online",
+> +                               haltpoll_cpu_online, haltpoll_cpu_offline);
+> +       if (ret < 0) {
+> +               haltpoll_uninit();
+> +       } else {
+> +               haltpoll_hp_state = ret;
+> +               ret = 0;
+> +       }
+>
+>         return ret;
+>  }
+>
+>  static void __exit haltpoll_exit(void)
+>  {
+> -       arch_haltpoll_disable();
+> -       cpuidle_unregister(&haltpoll_driver);
+> +       haltpoll_uninit();
+>  }
+>
+>  module_init(haltpoll_init);
+> diff --git a/include/linux/cpuidle_haltpoll.h b/include/linux/cpuidle_haltpoll.h
+> index fe5954c2409e..d50c1e0411a2 100644
+> --- a/include/linux/cpuidle_haltpoll.h
+> +++ b/include/linux/cpuidle_haltpoll.h
+> @@ -5,11 +5,11 @@
+>  #ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
+>  #include <asm/cpuidle_haltpoll.h>
+>  #else
+> -static inline void arch_haltpoll_enable(void)
+> +static inline void arch_haltpoll_enable(unsigned int cpu)
+>  {
+>  }
+>
+> -static inline void arch_haltpoll_disable(void)
+> +static inline void arch_haltpoll_disable(unsigned int cpu)
+>  {
+>  }
+>  #endif
+> --
+> 2.17.1
+>
