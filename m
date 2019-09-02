@@ -2,219 +2,425 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB437A5A86
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 17:26:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00E40A5AAD
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 17:40:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731984AbfIBPYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 11:24:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39748 "EHLO mx1.redhat.com"
+        id S1725848AbfIBPkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 11:40:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52914 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726394AbfIBPYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 11:24:01 -0400
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1725807AbfIBPkF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 11:40:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1831A3A206
-        for <kvm@vger.kernel.org>; Mon,  2 Sep 2019 15:24:01 +0000 (UTC)
-Received: by mail-qt1-f199.google.com with SMTP id n59so4450873qtd.8
-        for <kvm@vger.kernel.org>; Mon, 02 Sep 2019 08:24:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0dOE/s5aGMTaYQho5LnEBg+diYxedKuGjy+hs3paf9w=;
-        b=oyQM+E4HiM98fFf40z1tl7CP1Z6CfcBSPJqXxM/dXHlSpuDA8W1yXT7opKbS0uAy4/
-         ZRd8D37qfmS++90l0K+2zm/2LWxm63wqzg0rQXsGagqg2bpu77RLirmWI4urrdmRL7N8
-         hLroiOammciliSjCVTAI50JZy4tRWvvhKhZ8dP5Jtq9Bekxkm6w5mefcynDOLavmViQh
-         t4oLMWkfsvTJAbTh5h/RT8n/QOZykvHN1nRERSSBnGtB92nVKCIjs/SKS6vqKz6gC2B0
-         oBIjc2k6rf+3N1Xmw8Iozt/IQqdxpFqExiMWZg40fRO/5bQ9RrIVoLPCgn30aMrj50ro
-         OgQg==
-X-Gm-Message-State: APjAAAXMjrjbFbhvuSWjDYfocuPtVz8GqtHBHayN6Ckg+s/HSlEVR05v
-        71iIrDV1UsTh8VpaH95LK+DWZgMTuofRXEJD4T4ZfO0lmsdWZ3ICvZ9hgpzqiw6kSQ4miTXK5Qs
-        e7VQkKIgFgbGh
-X-Received: by 2002:a37:a902:: with SMTP id s2mr7484049qke.239.1567437840442;
-        Mon, 02 Sep 2019 08:24:00 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzdrmSh6InBMfIaGf/YSE3mcHFndLjsfUZ2b3BKi/lKrrfRBzrj9Xma+aSpsn1+nw5QdrjzxQ==
-X-Received: by 2002:a37:a902:: with SMTP id s2mr7484034qke.239.1567437840277;
-        Mon, 02 Sep 2019 08:24:00 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-62-110.red.bezeqint.net. [79.180.62.110])
-        by smtp.gmail.com with ESMTPSA id l206sm7034136qke.33.2019.09.02.08.23.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Sep 2019 08:23:59 -0700 (PDT)
-Date:   Mon, 2 Sep 2019 11:23:54 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
-Message-ID: <20190902112317-mutt-send-email-mst@kernel.org>
-References: <20190729165056.r32uzj6om3o6vfvp@steredhat>
- <20190729143622-mutt-send-email-mst@kernel.org>
- <20190730093539.dcksure3vrykir3g@steredhat>
- <20190730163807-mutt-send-email-mst@kernel.org>
- <20190801104754.lb3ju5xjfmnxioii@steredhat>
- <20190801091106-mutt-send-email-mst@kernel.org>
- <20190801133616.sik5drn6ecesukbb@steredhat>
- <20190901025815-mutt-send-email-mst@kernel.org>
- <20190901061707-mutt-send-email-mst@kernel.org>
- <20190902095723.6vuvp73fdunmiogo@steredhat>
+        by mx1.redhat.com (Postfix) with ESMTPS id E324D877A66;
+        Mon,  2 Sep 2019 15:40:04 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-48.ams2.redhat.com [10.36.116.48])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EAA160603;
+        Mon,  2 Sep 2019 15:40:00 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 6/6] s390x: SMP test
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com
+References: <20190829121459.1708-1-frankja@linux.ibm.com>
+ <20190829121459.1708-7-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <50b70561-f39d-6edc-600a-ccb707fe5b92@redhat.com>
+Date:   Mon, 2 Sep 2019 17:40:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190902095723.6vuvp73fdunmiogo@steredhat>
+In-Reply-To: <20190829121459.1708-7-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Mon, 02 Sep 2019 15:40:05 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 02, 2019 at 11:57:23AM +0200, Stefano Garzarella wrote:
-> On Sun, Sep 01, 2019 at 06:17:58AM -0400, Michael S. Tsirkin wrote:
-> > On Sun, Sep 01, 2019 at 04:26:19AM -0400, Michael S. Tsirkin wrote:
-> > > On Thu, Aug 01, 2019 at 03:36:16PM +0200, Stefano Garzarella wrote:
-> > > > On Thu, Aug 01, 2019 at 09:21:15AM -0400, Michael S. Tsirkin wrote:
-> > > > > On Thu, Aug 01, 2019 at 12:47:54PM +0200, Stefano Garzarella wrote:
-> > > > > > On Tue, Jul 30, 2019 at 04:42:25PM -0400, Michael S. Tsirkin wrote:
-> > > > > > > On Tue, Jul 30, 2019 at 11:35:39AM +0200, Stefano Garzarella wrote:
-> > > > > > 
-> > > > > > (...)
-> > > > > > 
-> > > > > > > > 
-> > > > > > > > The problem here is the compatibility. Before this series virtio-vsock
-> > > > > > > > and vhost-vsock modules had the RX buffer size hard-coded
-> > > > > > > > (VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE = 4K). So, if we send a buffer smaller
-> > > > > > > > of 4K, there might be issues.
-> > > > > > > 
-> > > > > > > Shouldn't be if they are following the spec. If not let's fix
-> > > > > > > the broken parts.
-> > > > > > > 
-> > > > > > > > 
-> > > > > > > > Maybe it is the time to add add 'features' to virtio-vsock device.
-> > > > > > > > 
-> > > > > > > > Thanks,
-> > > > > > > > Stefano
-> > > > > > > 
-> > > > > > > Why would a remote care about buffer sizes?
-> > > > > > > 
-> > > > > > > Let's first see what the issues are. If they exist
-> > > > > > > we can either fix the bugs, or code the bug as a feature in spec.
-> > > > > > > 
-> > > > > > 
-> > > > > > The vhost_transport '.stream_enqueue' callback
-> > > > > > [virtio_transport_stream_enqueue()] calls the virtio_transport_send_pkt_info(),
-> > > > > > passing the user message. This function allocates a new packet, copying
-> > > > > > the user message, but (before this series) it limits the packet size to
-> > > > > > the VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE (4K):
-> > > > > > 
-> > > > > > static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> > > > > > 					  struct virtio_vsock_pkt_info *info)
-> > > > > > {
-> > > > > >  ...
-> > > > > > 	/* we can send less than pkt_len bytes */
-> > > > > > 	if (pkt_len > VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE)
-> > > > > > 		pkt_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
-> > > > > > 
-> > > > > > 	/* virtio_transport_get_credit might return less than pkt_len credit */
-> > > > > > 	pkt_len = virtio_transport_get_credit(vvs, pkt_len);
-> > > > > > 
-> > > > > > 	/* Do not send zero length OP_RW pkt */
-> > > > > > 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
-> > > > > > 		return pkt_len;
-> > > > > >  ...
-> > > > > > }
-> > > > > > 
-> > > > > > then it queues the packet for the TX worker calling .send_pkt()
-> > > > > > [vhost_transport_send_pkt() in the vhost_transport case]
-> > > > > > 
-> > > > > > The main function executed by the TX worker is
-> > > > > > vhost_transport_do_send_pkt() that picks up a buffer from the virtqueue
-> > > > > > and it tries to copy the packet (up to 4K) on it.  If the buffer
-> > > > > > allocated from the guest will be smaller then 4K, I think here it will
-> > > > > > be discarded with an error:
-> > > > > > 
-> > > > 
-> > > > I'm adding more lines to explain better.
-> > > > 
-> > > > > > static void
-> > > > > > vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> > > > > > 				struct vhost_virtqueue *vq)
-> > > > > > {
-> > > > 		...
-> > > > 
-> > > > 		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
-> > > > 					 &out, &in, NULL, NULL);
-> > > > 
-> > > > 		...
-> > > > 
-> > > > 		len = iov_length(&vq->iov[out], in);
-> > > > 		iov_iter_init(&iov_iter, READ, &vq->iov[out], in, len);
-> > > > 
-> > > > 		nbytes = copy_to_iter(&pkt->hdr, sizeof(pkt->hdr), &iov_iter);
-> > > > 		if (nbytes != sizeof(pkt->hdr)) {
-> > > > 			virtio_transport_free_pkt(pkt);
-> > > > 			vq_err(vq, "Faulted on copying pkt hdr\n");
-> > > > 			break;
-> > > > 		}
-> > > > 
-> > > > > >  ...
-> > > > > > 		nbytes = copy_to_iter(pkt->buf, pkt->len, &iov_iter);
-> > > > > 
-> > > > > isn't pck len the actual length though?
-> > > > > 
-> > > > 
-> > > > It is the length of the packet that we are copying in the guest RX
-> > > > buffers pointed by the iov_iter. The guest allocates an iovec with 2
-> > > > buffers, one for the header and one for the payload (4KB).
-> > > 
-> > > BTW at the moment that forces another kmalloc within virtio core. Maybe
-> > > vsock needs a flag to skip allocation in this case.  Worth benchmarking.
-> > > See virtqueue_use_indirect which just does total_sg > 1.
+On 29/08/2019 14.14, Janosch Frank wrote:
+> Testing SIGP emulation for the following order codes:
+> * start
+> * stop
+> * restart
+> * set prefix
+> * store status
+> * stop and store status
+> * reset
+> * initial reset
+> * external call
+> * emegergency call
 > 
-> Okay, I'll take a look at virtqueue_use_indirect and I'll do some
-> benchmarking.
+> restart and set prefix are part of the library and needed to start
+> other cpus.
 > 
-> > > 
-> > > > 
-> > > > > > 		if (nbytes != pkt->len) {
-> > > > > > 			virtio_transport_free_pkt(pkt);
-> > > > > > 			vq_err(vq, "Faulted on copying pkt buf\n");
-> > > > > > 			break;
-> > > > > > 		}
-> > > > > >  ...
-> > > > > > }
-> > > > > > 
-> > > > > > 
-> > > > > > This series changes this behavior since now we will split the packet in
-> > > > > > vhost_transport_do_send_pkt() depending on the buffer found in the
-> > > > > > virtqueue.
-> > > > > > 
-> > > > > > We didn't change the buffer size in this series, so we still backward
-> > > > > > compatible, but if we will use buffers smaller than 4K, we should
-> > > > > > encounter the error described above.
-> > > 
-> > > So that's an implementation bug then? It made an assumption
-> > > of a 4K sized buffer? Or even PAGE_SIZE sized buffer?
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/Makefile |   1 +
+>  s390x/smp.c    | 242 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 243 insertions(+)
+>  create mode 100644 s390x/smp.c
 > 
-> Yes, I think it made an assumption and it used this macro as a limit:
-> 
-> include/linux/virtio_vsock.h:13:
->     #define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE        (1024 * 4)
-> 
-> > 
-> > Assuming we miss nothing and buffers < 4K are broken,
-> > I think we need to add this to the spec, possibly with
-> > a feature bit to relax the requirement that all buffers
-> > are at least 4k in size.
-> > 
-> 
-> Okay, should I send a proposal to virtio-dev@lists.oasis-open.org?
-> 
-> Thanks,
-> Stefano
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index d83dd0b..3744372 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -15,6 +15,7 @@ tests += $(TEST_DIR)/cpumodel.elf
+>  tests += $(TEST_DIR)/diag288.elf
+>  tests += $(TEST_DIR)/stsi.elf
+>  tests += $(TEST_DIR)/skrf.elf
+> +tests += $(TEST_DIR)/smp.elf
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  
+>  all: directories test_cases test_cases_binary
+> diff --git a/s390x/smp.c b/s390x/smp.c
+> new file mode 100644
+> index 0000000..9363cd2
+> --- /dev/null
+> +++ b/s390x/smp.c
+> @@ -0,0 +1,242 @@
+> +/*
+> + * Tests sigp emulation
+> + *
+> + * Copyright 2019 IBM Corp.
+> + *
+> + * Authors:
+> + *    Janosch Frank <frankja@linux.ibm.com>
+> + *
+> + * This code is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License version 2.
+> + */
+> +#include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/page.h>
+> +#include <asm/facility.h>
+> +#include <asm-generic/barrier.h>
+> +#include <asm/sigp.h>
+> +
+> +#include <smp.h>
+> +#include <alloc_page.h>
+> +
+> +static int t = 0;
 
-virtio-comment is more appropriate for this.
+Single letter variables that are used accross functions are a little bit
+ugly. I'd maybe give this a better name, like "testflag" or something
+similar?
 
--- 
-MST
+> +static void cpu_loop(void)
+> +{
+> +	for (;;) {}
+> +}
+> +
+> +static void test_func(void)
+> +{
+> +	t = 1;
+
+I think I'd rather place a mb() here, just to be sure...?
+
+> +	cpu_loop();
+> +}
+> +
+> +static void test_start(void)
+> +{
+> +	struct psw psw;
+> +	psw.mask =  extract_psw_mask();
+> +	psw.addr = (unsigned long)test_func;
+> +
+> +	smp_cpu_setup(1, psw);
+> +	while (!t) {
+> +		mb();
+> +	}
+> +	report("start", 1);
+> +}
+> +
+> +static void test_stop(void)
+> +{
+> +	int i = 0;
+> +
+> +	smp_cpu_stop(1);
+> +	/*
+> +	 * The smp library waits for the CPU to shut down, but let's
+> +	 * also do it here, so we don't rely on the library
+> +	 * implementation
+> +	 */
+> +	while (!smp_cpu_stopped(1)) {}
+> +	t = 0;
+> +	/* Let's leave some time for cpu #2 to change t */
+
+CPU #2 ? Where? Why?
+
+> +	for (; i < 0x100000; i++) {}
+
+I'm pretty sure the compiler optimizes empty loops away.
+
+> +	report("stop", !t);
+> +}
+> +
+> +static void test_stop_store_status(void)
+> +{
+> +	struct cpu *cpu = smp_cpu_from_addr(1);
+> +	struct lowcore *lc = (void *)0x0;
+
+Do you want to erase the values in the save area before calling the
+"store_status"? ... just to be sure that we don't see old values there?
+
+> +	smp_cpu_stop_store_status(1);
+> +	mb();
+> +	report("stop store status",
+> +	       lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore);
+
+That confused me. Why does the prefix_sa of the lowcore of CPU 0 match
+the prefix of CPU 1 ? I'd rather expect cpu->lowcore->prefix_sa to
+contain this value?
+
+Maybe you could also check that at least the stack pointer GPR is != 0
+in the save area?
+
+> +}
+> +
+> +static void test_store_status(void)
+> +{
+> +	struct cpu_status *status = alloc_pages(0);
+> +	uint32_t r;
+> +
+> +	report_prefix_push("status");
+> +	memset(status, 0, PAGE_SIZE);
+> +
+> +	smp_cpu_restart(1);
+> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, &r);
+> +	report("not stopped", r == SIGP_STATUS_INCORRECT_STATE);
+
+Maybe also check that the save are is still 0?
+
+> +	memset(status, 0, PAGE_SIZE);
+> +	smp_cpu_stop(1);
+> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> +	while (!status->prefix) {}
+
+status->prefix is not marked as volatile, so please put a "mb()" into
+the curly braces here.
+
+> +	report("store status", 1);
+> +	free_pages(status, PAGE_SIZE);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void ecall(void)
+> +{
+> +	unsigned long mask;
+> +	struct lowcore *lc = (void *)0x0;
+> +
+> +	ctl_set_bit(0, 13);
+> +	mask = extract_psw_mask();
+> +	mask |= PSW_MASK_EXT;
+> +	load_psw_mask(mask);
+> +	expect_ext_int();
+
+I think you should move the expect_ext_int() before the enablement of
+the interrupt, to avoid races?
+
+> +	t = 1;
+> +	while (lc->ext_int_code != 0x1202) {mb();}
+
+Spaces around the "mb();", please.
+
+> +	report("ecall", 1);
+> +	t = 1;
+> +}
+> +
+> +static void test_ecall(void)
+> +{
+> +	struct psw psw;
+> +	psw.mask =  extract_psw_mask();
+> +	psw.addr = (unsigned long)ecall;
+> +
+> +	report_prefix_push("ecall");
+> +	t = 0;
+> +	smp_cpu_destroy(1);
+> +
+> +	mb();
+
+Why this mb() here?
+
+> +	smp_cpu_setup(1, psw);
+> +	while (!t) {
+> +		mb();
+> +	}
+> +	t = 0;
+> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
+> +	while(!t) {mb();}
+
+Spaces, please.
+
+> +	smp_cpu_stop(1);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void emcall(void)
+> +{
+> +	unsigned long mask;
+> +	struct lowcore *lc = (void *)0x0;
+> +
+> +	ctl_set_bit(0, 14);
+> +	mask = extract_psw_mask();
+> +	mask |= PSW_MASK_EXT;
+> +	load_psw_mask(mask);
+> +	expect_ext_int();
+
+I think you should move the expect_ext_int() before the enablement of
+the interrupt, to avoid races?
+
+> +	t = 1;
+> +	while (lc->ext_int_code != 0x1201) {mb();}
+
+Spaces.
+
+> +	report("ecall", 1);
+> +	t = 1;
+> +}
+> +
+> +static void test_emcall(void)
+> +{
+> +	struct psw psw;
+> +	psw.mask =  extract_psw_mask();
+> +	psw.addr = (unsigned long)emcall;
+> +
+> +	report_prefix_push("emcall");
+> +	t = 0;
+> +	smp_cpu_destroy(1);
+> +
+> +	mb();
+> +	smp_cpu_setup(1, psw);
+> +	while (!t) {
+> +		mb();
+> +	}
+> +	t = 0;
+> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
+> +	while(!t) {mb();}
+
+Spaces.
+
+> +	smp_cpu_stop(1);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_reset_initial(void)
+> +{
+> +	struct cpu_status *status = alloc_pages(0);
+> +	struct psw psw;
+> +
+> +	psw.mask =  extract_psw_mask();
+> +	psw.addr = (unsigned long)test_func;
+> +
+> +	report_prefix_push("reset initial");
+> +	smp_cpu_setup(1, psw);
+> +
+> +	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
+> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
+> +
+> +	report_prefix_push("clear");
+> +	report("psw", !status->psw.mask && !status->psw.addr);
+> +	report("prefix", !status->prefix);
+> +	report("fpc", !status->fpc);
+> +	report("cpu timer", !status->cputm);
+> +	report("todpr", !status->todpr);
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("initialized");
+> +	report("cr0 == 0xE0", status->crs[0] == 0xE0UL);
+> +	report("cr14 == 0xC2000000", status->crs[14] == 0xC2000000UL);
+> +	report_prefix_pop();
+> +
+> +	report("cpu stopped", smp_cpu_stopped(1));
+> +	free_pages(status, PAGE_SIZE);
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_reset(void)
+> +{
+> +	struct psw psw;
+> +
+> +	psw.mask =  extract_psw_mask();
+> +	psw.addr = (unsigned long)test_func;
+> +
+> +	report_prefix_push("cpu reset");
+> +	smp_cpu_setup(1, psw);
+> +
+> +	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
+> +	report("cpu stopped", smp_cpu_stopped(1));
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("smp");
+> +
+> +	if (smp_query_num_cpus() == 1) {
+> +		report_abort("need at least 2 cpus for this test");
+> +		goto done;
+> +	}
+> +
+> +	test_start();
+> +	test_stop();
+> +	test_stop_store_status();
+> +	test_store_status();
+> +	test_ecall();
+> +	test_emcall();
+> +	test_reset();
+> +	test_reset_initial();
+> +
+> +done:
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> 
+
+ Thomas
