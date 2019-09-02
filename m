@@ -2,99 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A33E7A5241
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 10:56:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C220CA537B
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 11:57:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730809AbfIBIzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 04:55:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43766 "EHLO mx1.redhat.com"
+        id S1730844AbfIBJ5a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 05:57:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35406 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730658AbfIBIzH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 04:55:07 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        id S1730527AbfIBJ53 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 05:57:29 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 00E2C19CF89
-        for <kvm@vger.kernel.org>; Mon,  2 Sep 2019 08:55:07 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id z2so8494455wrt.6
-        for <kvm@vger.kernel.org>; Mon, 02 Sep 2019 01:55:06 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 53A19C002966
+        for <kvm@vger.kernel.org>; Mon,  2 Sep 2019 09:57:28 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id x12so8590267wrw.0
+        for <kvm@vger.kernel.org>; Mon, 02 Sep 2019 02:57:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Zn38zF8kCwg/Vx1WwgH4NCJKhUG8AC5IPLG4wa1Ab7U=;
-        b=hmFzvheUaT0x1E3oMw4PE+MsdHiTrDdr6MR07Fh17FfDto/WvYpQ40PXdpsaT3firV
-         30j0MY5n+SfXovWmmj8LdLNFF7/Og5+uYsfRsaazkaxV9HtWsUR8b/uh6C+6H0OITtda
-         4JuagYc3pOvjOkSWV8bm7Q/rsivikDU60GKQYtodH/mf/9CqchiccqxzzuJu2CFYL94q
-         NidU60D7C25CUX7B+ZJgZ5d2oOns4Ebo1pmx2BbAzIrHBJ6wUQ/2eM4AG5KM1JJKHo2q
-         fpR7LGYX7YSNJNyQr99uXezvjBIqASGjbmc+B5oyD08ZfoFoEEL87QtKzz7/n20UoB18
-         SFWg==
-X-Gm-Message-State: APjAAAUMwbKfyRnDV/XjBK0P4xcddXrozPjbqC+9FmMsCDEFeZTEMlj4
-        xbuajZADqrfWvAEPzaD0eGxUT2C3nMtq5EgH9DpcmI0eIe8Zhvdao+z7BN60wN+MXhkemSVcjSd
-        RS7Ad2/3/d1S4
-X-Received: by 2002:adf:e710:: with SMTP id c16mr35878952wrm.292.1567414505724;
-        Mon, 02 Sep 2019 01:55:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxRv2dxDp5HY9Bd5yGXlGV+SOSiRsI1AgF+9hTAgXTKirFFUPOo1BMgb+sEqhfw0/g7IncCmA==
-X-Received: by 2002:adf:e710:: with SMTP id c16mr35878922wrm.292.1567414505448;
-        Mon, 02 Sep 2019 01:55:05 -0700 (PDT)
+        bh=WDevdaBosm9IP59YXQ5PBEgCvGxheFOgazAH5VfCs4o=;
+        b=kp8jMDmSQz14lG/9/4s1pR55loQ8RTfzq0BDASBAEk1RxpV+IDi30+ULAkLO+NT26i
+         2aK8GvAxSTyBg0WP11ADCYCS2jRfDhrAjIu+WOuQjFT5okDt8ER4uey90/xzLDpLKskN
+         oYJO7THTVu7wlViRsU81v0NH+IEiLzD3sV0IUsRcyMBQAYEUAkbTkv7mIMl2qXAoleIY
+         k+0PQDD8qC6UJl86d7oDG0mrl47zYbqENO0DzJAwLcYnvoxHCxVrFT8ZLiEb/SSu/Gbm
+         hqj6ZbLEJPlnxHBiuYMD/rcPVHcWkAENkXKgBgOa/K2mYeNxV4FB25aDg3g1mlFuvzKf
+         m1/Q==
+X-Gm-Message-State: APjAAAUF5mxax26ov84/BwY70Imh1NE4CWzo0lrS75PfO1p1cUEVPF7M
+        HPlFdld5HHYQ3vkENVjKehLtm7q7O1+Qss8YaJDZAFr7GACfYPVaCnC/4ZzmmgAPYEGae/Rw2E1
+        TVjB5kRgxWA9g
+X-Received: by 2002:a1c:d142:: with SMTP id i63mr21191931wmg.53.1567418247011;
+        Mon, 02 Sep 2019 02:57:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyg+RAP0js1Vo03Ra9YxraQR+IAo1sL6e9A4NgBUV8fPrcSW2fs99+bbKn+eospQqqxWt7qgA==
+X-Received: by 2002:a1c:d142:: with SMTP id i63mr21191907wmg.53.1567418246729;
+        Mon, 02 Sep 2019 02:57:26 -0700 (PDT)
 Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it. [79.36.61.170])
-        by smtp.gmail.com with ESMTPSA id r5sm12305474wmh.35.2019.09.02.01.55.04
+        by smtp.gmail.com with ESMTPSA id b18sm18252458wro.34.2019.09.02.02.57.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Sep 2019 01:55:04 -0700 (PDT)
-Date:   Mon, 2 Sep 2019 10:55:02 +0200
+        Mon, 02 Sep 2019 02:57:26 -0700 (PDT)
+Date:   Mon, 2 Sep 2019 11:57:23 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
 Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
-Message-ID: <20190902085502.jlfo36aoka7lwi2u@steredhat>
-References: <20190717113030.163499-1-sgarzare@redhat.com>
- <20190717113030.163499-2-sgarzare@redhat.com>
- <20190729095956-mutt-send-email-mst@kernel.org>
- <20190830094059.c7qo5cxrp2nkrncd@steredhat>
- <20190901024525-mutt-send-email-mst@kernel.org>
- <20190902083912.GA9069@stefanha-x1.localdomain>
+Message-ID: <20190902095723.6vuvp73fdunmiogo@steredhat>
+References: <20190729161903.yhaj5rfcvleexkhc@steredhat>
+ <20190729165056.r32uzj6om3o6vfvp@steredhat>
+ <20190729143622-mutt-send-email-mst@kernel.org>
+ <20190730093539.dcksure3vrykir3g@steredhat>
+ <20190730163807-mutt-send-email-mst@kernel.org>
+ <20190801104754.lb3ju5xjfmnxioii@steredhat>
+ <20190801091106-mutt-send-email-mst@kernel.org>
+ <20190801133616.sik5drn6ecesukbb@steredhat>
+ <20190901025815-mutt-send-email-mst@kernel.org>
+ <20190901061707-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190902083912.GA9069@stefanha-x1.localdomain>
+In-Reply-To: <20190901061707-mutt-send-email-mst@kernel.org>
 User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 02, 2019 at 09:39:12AM +0100, Stefan Hajnoczi wrote:
-> On Sun, Sep 01, 2019 at 02:56:44AM -0400, Michael S. Tsirkin wrote:
+On Sun, Sep 01, 2019 at 06:17:58AM -0400, Michael S. Tsirkin wrote:
+> On Sun, Sep 01, 2019 at 04:26:19AM -0400, Michael S. Tsirkin wrote:
+> > On Thu, Aug 01, 2019 at 03:36:16PM +0200, Stefano Garzarella wrote:
+> > > On Thu, Aug 01, 2019 at 09:21:15AM -0400, Michael S. Tsirkin wrote:
+> > > > On Thu, Aug 01, 2019 at 12:47:54PM +0200, Stefano Garzarella wrote:
+> > > > > On Tue, Jul 30, 2019 at 04:42:25PM -0400, Michael S. Tsirkin wrote:
+> > > > > > On Tue, Jul 30, 2019 at 11:35:39AM +0200, Stefano Garzarella wrote:
+> > > > > 
+> > > > > (...)
+> > > > > 
+> > > > > > > 
+> > > > > > > The problem here is the compatibility. Before this series virtio-vsock
+> > > > > > > and vhost-vsock modules had the RX buffer size hard-coded
+> > > > > > > (VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE = 4K). So, if we send a buffer smaller
+> > > > > > > of 4K, there might be issues.
+> > > > > > 
+> > > > > > Shouldn't be if they are following the spec. If not let's fix
+> > > > > > the broken parts.
+> > > > > > 
+> > > > > > > 
+> > > > > > > Maybe it is the time to add add 'features' to virtio-vsock device.
+> > > > > > > 
+> > > > > > > Thanks,
+> > > > > > > Stefano
+> > > > > > 
+> > > > > > Why would a remote care about buffer sizes?
+> > > > > > 
+> > > > > > Let's first see what the issues are. If they exist
+> > > > > > we can either fix the bugs, or code the bug as a feature in spec.
+> > > > > > 
+> > > > > 
+> > > > > The vhost_transport '.stream_enqueue' callback
+> > > > > [virtio_transport_stream_enqueue()] calls the virtio_transport_send_pkt_info(),
+> > > > > passing the user message. This function allocates a new packet, copying
+> > > > > the user message, but (before this series) it limits the packet size to
+> > > > > the VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE (4K):
+> > > > > 
+> > > > > static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> > > > > 					  struct virtio_vsock_pkt_info *info)
+> > > > > {
+> > > > >  ...
+> > > > > 	/* we can send less than pkt_len bytes */
+> > > > > 	if (pkt_len > VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE)
+> > > > > 		pkt_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
+> > > > > 
+> > > > > 	/* virtio_transport_get_credit might return less than pkt_len credit */
+> > > > > 	pkt_len = virtio_transport_get_credit(vvs, pkt_len);
+> > > > > 
+> > > > > 	/* Do not send zero length OP_RW pkt */
+> > > > > 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+> > > > > 		return pkt_len;
+> > > > >  ...
+> > > > > }
+> > > > > 
+> > > > > then it queues the packet for the TX worker calling .send_pkt()
+> > > > > [vhost_transport_send_pkt() in the vhost_transport case]
+> > > > > 
+> > > > > The main function executed by the TX worker is
+> > > > > vhost_transport_do_send_pkt() that picks up a buffer from the virtqueue
+> > > > > and it tries to copy the packet (up to 4K) on it.  If the buffer
+> > > > > allocated from the guest will be smaller then 4K, I think here it will
+> > > > > be discarded with an error:
+> > > > > 
+> > > 
+> > > I'm adding more lines to explain better.
+> > > 
+> > > > > static void
+> > > > > vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> > > > > 				struct vhost_virtqueue *vq)
+> > > > > {
+> > > 		...
+> > > 
+> > > 		head = vhost_get_vq_desc(vq, vq->iov, ARRAY_SIZE(vq->iov),
+> > > 					 &out, &in, NULL, NULL);
+> > > 
+> > > 		...
+> > > 
+> > > 		len = iov_length(&vq->iov[out], in);
+> > > 		iov_iter_init(&iov_iter, READ, &vq->iov[out], in, len);
+> > > 
+> > > 		nbytes = copy_to_iter(&pkt->hdr, sizeof(pkt->hdr), &iov_iter);
+> > > 		if (nbytes != sizeof(pkt->hdr)) {
+> > > 			virtio_transport_free_pkt(pkt);
+> > > 			vq_err(vq, "Faulted on copying pkt hdr\n");
+> > > 			break;
+> > > 		}
+> > > 
+> > > > >  ...
+> > > > > 		nbytes = copy_to_iter(pkt->buf, pkt->len, &iov_iter);
+> > > > 
+> > > > isn't pck len the actual length though?
+> > > > 
+> > > 
+> > > It is the length of the packet that we are copying in the guest RX
+> > > buffers pointed by the iov_iter. The guest allocates an iovec with 2
+> > > buffers, one for the header and one for the payload (4KB).
 > > 
-> > OK let me try to clarify.  The idea is this:
-> > 
-> > Let's say we queue a buffer of 4K, and we copy if len < 128 bytes.  This
-> > means that in the worst case (128 byte packets), each byte of credit in
-> > the socket uses up 4K/128 = 16 bytes of kernel memory. In fact we need
-> > to also account for the virtio_vsock_pkt since I think it's kept around
-> > until userspace consumes it.
-> > 
-> > Thus given X buf alloc allowed in the socket, we should publish X/16
-> > credits to the other side. This will ensure the other side does not send
-> > more than X/16 bytes for a given socket and thus we won't need to
-> > allocate more than X bytes to hold the data.
-> > 
-> > We can play with the copy break value to tweak this.
+> > BTW at the moment that forces another kmalloc within virtio core. Maybe
+> > vsock needs a flag to skip allocation in this case.  Worth benchmarking.
+> > See virtqueue_use_indirect which just does total_sg > 1.
 
-Thanks Michael, now it is perfectly clear. It seems an excellent solution and
-easy to implement. I'll work on that.
+Okay, I'll take a look at virtqueue_use_indirect and I'll do some
+benchmarking.
+
+> > 
+> > > 
+> > > > > 		if (nbytes != pkt->len) {
+> > > > > 			virtio_transport_free_pkt(pkt);
+> > > > > 			vq_err(vq, "Faulted on copying pkt buf\n");
+> > > > > 			break;
+> > > > > 		}
+> > > > >  ...
+> > > > > }
+> > > > > 
+> > > > > 
+> > > > > This series changes this behavior since now we will split the packet in
+> > > > > vhost_transport_do_send_pkt() depending on the buffer found in the
+> > > > > virtqueue.
+> > > > > 
+> > > > > We didn't change the buffer size in this series, so we still backward
+> > > > > compatible, but if we will use buffers smaller than 4K, we should
+> > > > > encounter the error described above.
+> > 
+> > So that's an implementation bug then? It made an assumption
+> > of a 4K sized buffer? Or even PAGE_SIZE sized buffer?
+
+Yes, I think it made an assumption and it used this macro as a limit:
+
+include/linux/virtio_vsock.h:13:
+    #define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE        (1024 * 4)
 
 > 
-> This seems like a reasonable solution.  Hopefully the benchmark results
-> will come out okay too.
+> Assuming we miss nothing and buffers < 4K are broken,
+> I think we need to add this to the spec, possibly with
+> a feature bit to relax the requirement that all buffers
+> are at least 4k in size.
+> 
 
-Yes, as Michael suggested I'll play with the copy break value to see as
-benchmark has affected.
+Okay, should I send a proposal to virtio-dev@lists.oasis-open.org?
 
-Thank you very much,
+Thanks,
 Stefano
