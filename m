@@ -2,108 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C595A5675
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 14:42:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B479A5684
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 14:45:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730515AbfIBMmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 08:42:03 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37745 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729844AbfIBMmC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 08:42:02 -0400
-Received: by mail-pl1-f194.google.com with SMTP id b10so1489648plr.4;
-        Mon, 02 Sep 2019 05:42:02 -0700 (PDT)
+        id S1730538AbfIBMpq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 08:45:46 -0400
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:45013 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729571AbfIBMpq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 08:45:46 -0400
+Received: by mail-lj1-f182.google.com with SMTP id u14so6174040ljj.11
+        for <kvm@vger.kernel.org>; Mon, 02 Sep 2019 05:45:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=6bMBJGLXpJhft8Uqn8LI3hEGKJdQ2rbX77O2fwCWI2E=;
-        b=Wl35b6Q2vhQOwMbHRjRpL84HFK8WhqSwlYtxUV+0x2B3gqQ03umc3iEHozseCfzpOp
-         4P3fbqiqSRS3obSnqmP9B/FpYu3hmibxC/sZwM/rhee086SZtgvQmvo9eaUg69WkVFIx
-         wbdCcRK6vOsSeTMJUHgHlWXRaYojtAFYN7tduaAutWDdDrJjxTpuQ6yKda8o1YywuIxM
-         r/lR41obOtSjX/jBaqKjMKP4e3RqEg7lJ4068KAycK1Zn6zf024uXHWRcDXxja0V2uOB
-         Dj4XYxuH7MzniF4f/glaRRgR1xuTMqDd3i2UggJ3lKJ8MWgVOIhkCu5nHYjsmE1iZE1d
-         is9Q==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=NzNhTv97ocb1btJLZ5/87Ps57YM4E7GBGFrOG0ccvdg=;
+        b=jdCyrmkNelBQ228O9sNNXwFle/G1bJjZNLtYBqudKbtC/nx0ZIHorPSiYBNcIZywI8
+         xNoNAZdSOGTzXlsZn3Zh9FcbjCGbyqwYkMWoPFYbeeTmrKezNldJalgzdpb9KYii4gDw
+         b10c6JBETYkZvforYoEQpkYir3AJ7/uaSciENwVqQ51gkFC0IrL9rMHvF2m23qHplbZN
+         oAjzY1R6VyqXhgwFDiZg3p8C3HLsY6ni0hn/WNsd1tZriGWCKhqm7ribf6RSkzKwbbGo
+         IjphdTrqNpD4jKlj7or+rBfu/tDNDyf9X6SkXuWO7NVvflP5fwT010GM8Dxy5OopMQUR
+         tEMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=6bMBJGLXpJhft8Uqn8LI3hEGKJdQ2rbX77O2fwCWI2E=;
-        b=dtmzixKKqAQL5rLJcXzQGYEhmOQ0qfXC5SLc1bvByNiW+PbsL/4xVbea/+B+aFxf4t
-         VPV6rcXkDFKW7Ft5swSJqH9zWyC37dqzv+QF4VcvyJmlb31HYrziOSwfr4AKGq+6Ry8Q
-         VD5GhUfEJ9gAFy2/FImG0q2OfKK7FQ13PeOXZg1snbMwk77zA3WbgzAbFxG6wDFIAGj3
-         vUVO+p80smJSxL2/oFhH7IimETKBF0eC+I/KNr0TU1cdPz/zAfpbdXUbO0qli+FsBTj1
-         LNNzCYHNnXxSZ2fWLuGTt9PoytmE5cuQgACNmTELtoXqX10jIltdmIzb6Uyfv0ZtFcql
-         mWSA==
-X-Gm-Message-State: APjAAAXqkAywDoQMZ7oV6BkatUcIGAWQ5N1nzW956gsHGeT44POAxDxN
-        f0h0xTNz0fQWy5dgG0BzxYw=
-X-Google-Smtp-Source: APXvYqwL8FuvpT89PhUcwAWXg2lJsDj/gqyiSZZDDqJbgrkM/4x/NHTlG0g63mGuez68xRVcnuk+jQ==
-X-Received: by 2002:a17:902:346:: with SMTP id 64mr29692851pld.151.1567428122261;
-        Mon, 02 Sep 2019 05:42:02 -0700 (PDT)
-Received: from localhost.corp.microsoft.com ([167.220.255.52])
-        by smtp.googlemail.com with ESMTPSA id y194sm15942600pfg.116.2019.09.02.05.41.57
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 02 Sep 2019 05:42:01 -0700 (PDT)
-From:   lantianyu1986@gmail.com
-X-Google-Original-From: Tianyu.Lan@microsoft.com
-To:     kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
-        sashal@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        michael.h.kelley@microsoft.com
-Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH V2] x86/Hyper-V: Fix overflow issue in the fill_gva_list()
-Date:   Mon,  2 Sep 2019 20:41:43 +0800
-Message-Id: <20190902124143.119478-1-Tianyu.Lan@microsoft.com>
-X-Mailer: git-send-email 2.14.5
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=NzNhTv97ocb1btJLZ5/87Ps57YM4E7GBGFrOG0ccvdg=;
+        b=axVelLba4rQo5HgKTrN66I8tBI1yvPeMB7N7Y2HeZEsmf9pfJrYWHnXQtal11OqfKZ
+         IPwsb+PavyQl7SiMvax1gef8VHVFzP/pwnU/W3WRyWlwN2HyUGvzSAR4MiqrtG+ODbTq
+         7uY+E6NdskL0tN1ATuPM1/8IwMhIzryHyV1uqfs7bm/tW7WFXujRv/okxsvV49YHZsWL
+         7gMmKzaq7e9Dia9iAkv+dIFFXUPm2FIsMMyI7mPw55fveLdEWVqltMkwrYDyYW2FDTzV
+         syCY4YPnGTtmfyXP5ZdNTCfVGLH1fhrPY1IBNtBZeLYh+1uKe9r6q5vcoyLImlb71aTl
+         yhJw==
+X-Gm-Message-State: APjAAAVQAfFpa+cueb9YYiktq3sMcUWWa2mHTdBI6XyEIfNkXVVKoZg5
+        YE3zyPY6QiY+X/3NeiLaShTqwuBvo4GPo4LAskUeygzB
+X-Google-Smtp-Source: APXvYqzhSCgmRzY1cV8X1kKiDQ1kzaVeHHcxhbFDKhP6UrcguCad54nxNPi9vaiZpInzPsNjsawWcDgg2SaKu5RVr68=
+X-Received: by 2002:a2e:819:: with SMTP id 25mr16231679lji.142.1567428343778;
+ Mon, 02 Sep 2019 05:45:43 -0700 (PDT)
+MIME-Version: 1.0
+From:   Turritopsis Dohrnii Teo En Ming <teo.en.ming.smartphone@gmail.com>
+Date:   Mon, 2 Sep 2019 20:45:29 +0800
+Message-ID: <CA+5xKD5OAypyrB4qiob4ZRnHAyVG+r-o2-7qgAFjRVFN1SNDNA@mail.gmail.com>
+Subject: Singapore Citizen Mr. Teo En Ming's Refugee Seeking Attempts, In The
+ Search of a Substantially Better Life
+To:     kvm@vger.kernel.org
+Cc:     Turritopsis Dohrnii Teo En Ming <teo.en.ming.smartphone@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+Subject: Singapore Citizen Mr. Teo En Ming's Refugee Seeking Attempts,
+In The Search of a Substantially Better Life
 
-When the 'start' parameter is >=  0xFF000000 on 32-bit
-systems, or >= 0xFFFFFFFF'FF000000 on 64-bit systems,
-fill_gva_list gets into an infinite loop.  With such inputs,
-'cur' overflows after adding HV_TLB_FLUSH_UNIT and always
-compares as less than end.  Memory is filled with guest virtual
-addresses until the system crashes
+In reverse chronological order:
 
-Fix this by never incrementing 'cur' to be larger than 'end'.
+[1] Petition to the Government of Taiwan for Refugee Status, 5th
+August 2019 Monday
 
-Reported-by: Jong Hyun Park <park.jonghyun@yonsei.ac.kr>
-Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
-Fixes: 2ffd9e33ce4a ("x86/hyper-v: Use hypercall for remote TLB flush")
----
-Change since v1:
-     - Simply the commit message 
+Photo #1: At the building of the National Immigration Agency, Ministry
+of the Interior, Taipei, Taiwan, 5th August 2019
 
- arch/x86/hyperv/mmu.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Photo #2: Queue ticket no. 515 at the National Immigration Agency,
+Ministry of the Interior, Taipei, Taiwan, 5th August 2019
 
-diff --git a/arch/x86/hyperv/mmu.c b/arch/x86/hyperv/mmu.c
-index e65d7fe6489f..5208ba49c89a 100644
---- a/arch/x86/hyperv/mmu.c
-+++ b/arch/x86/hyperv/mmu.c
-@@ -37,12 +37,14 @@ static inline int fill_gva_list(u64 gva_list[], int offset,
- 		 * Lower 12 bits encode the number of additional
- 		 * pages to flush (in addition to the 'cur' page).
- 		 */
--		if (diff >= HV_TLB_FLUSH_UNIT)
-+		if (diff >= HV_TLB_FLUSH_UNIT) {
- 			gva_list[gva_n] |= ~PAGE_MASK;
--		else if (diff)
-+			cur += HV_TLB_FLUSH_UNIT;
-+		}  else if (diff) {
- 			gva_list[gva_n] |= (diff - 1) >> PAGE_SHIFT;
-+			cur = end;
-+		}
- 
--		cur += HV_TLB_FLUSH_UNIT;
- 		gva_n++;
- 
- 	} while (cur < end);
--- 
-2.14.5
+Photo #3: Submission of documents/petition to the National Immigration
+Agency, Ministry of the Interior, Taipei, Taiwan, 5th August 2019
 
+Photos #4 and #5: Acknowledgement of Receipt (no. 03142) for the
+submission of documents/petition from the National Immigration Agency,
+Ministry of the Interior, Taipei, Taiwan, 5th August 2019, 10:00 AM
+
+References:
+
+(a) Petition to the Government of Taiwan for Refugee Status, 5th
+August 2019 Monday (Blogspot blog)
+
+Link: https://tdtemcerts.blogspot.sg/2019/08/petition-to-government-of-taiwan-for.html
+
+(b) Petition to the Government of Taiwan for Refugee Status, 5th
+August 2019 Monday (Wordpress blog)
+
+Link: https://tdtemcerts.wordpress.com/2019/08/23/petition-to-the-government-of-taiwan-for-refugee-status/
+
+[2] Application for Refugee Status at the United Nations Refugee
+Agency, Bangkok, Thailand, 21st March 2017 Tuesday
+
+References:
+
+(a) [YOUTUBE] Vlog: The Road to Application for Refugee Status at the
+United Nations High Commissioner for Refugees, Bangkok
+
+Link: https://www.youtube.com/watch?v=utpuAa1eUNI
+
+YouTube video Published on March 22nd, 2017
+
+Views as at 31st August 2019: 593
+
+YouTube Channel: Turritopsis Dohrnii Teo En Ming
+Subscribers as at 31st August 2019: 2815
+Link: https://www.youtube.com/channel/UC__F2hzlqNEEGx-IXxQi3hA
+
+
+
+
+
+-----BEGIN EMAIL SIGNATURE-----
+
+The Gospel for all Targeted Individuals (TIs):
+
+[The New York Times] Microwave Weapons Are Prime Suspect in Ills of
+U.S. Embassy Workers
+
+Link: https://www.nytimes.com/2018/09/01/science/sonic-attack-cuba-microwave.html
+
+********************************************************************************************
+
+Singaporean Mr. Turritopsis Dohrnii Teo En Ming's Academic
+Qualifications as at 14 Feb 2019
+
+[1] https://tdtemcerts.wordpress.com/
+
+[2] https://tdtemcerts.blogspot.sg/
+
+[3] https://www.scribd.com/user/270125049/Teo-En-Ming
+
+-----END EMAIL SIGNATURE-----
