@@ -2,123 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF76AA5697
-	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 14:47:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49F3FA56B1
+	for <lists+kvm@lfdr.de>; Mon,  2 Sep 2019 14:53:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731010AbfIBMqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 08:46:24 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41583 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729878AbfIBMqX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 08:46:23 -0400
-Received: by mail-pg1-f196.google.com with SMTP id x15so7432678pgg.8;
-        Mon, 02 Sep 2019 05:46:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pgpliINIcPhRc7BoPrS9B0ow1dlVmDoEwaS8EkZIGsk=;
-        b=iKcHDACooIYXG12YqobbLfwrs0m9jJ0g9pUEG/yHkkVSUkM+4P2KHKsylGwM7IFasO
-         77lLo5fMqVvA1ZyFcVvUs9kp97t7EYK9xLbVze9DNahb00gwgfTrT7i6NftOA7WOFszY
-         BQm26EUDi9RHFXHYXMgnFfZYRopoBYYZK8p+sd3Koqh5TbLKd5wi0n/Mm7UtAsrQjeFs
-         n/Z6jMYgcDOvMn+KGep5g5kdw5Ct9tg4tfK6fPPf2dY9tnz3iF+t0SiGmHqnQXI+tZpJ
-         AovmJaUzEHmO+HmLgO+yqXmIDkrKWIfHx51iUR3DplGeOYQ4uQ3QwGCr8/TqhGJH/6IK
-         vf4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pgpliINIcPhRc7BoPrS9B0ow1dlVmDoEwaS8EkZIGsk=;
-        b=A4KOY9h4wtF2HQWMuvaAf9cuKlr319RZKVSNpARiKbY7nWf9nZ8JmNUre4CDHEIWa9
-         7+zbNz0H5DnN69u9SKvLo6RQlc/ESScLtat52W63O343jOn5vkqRf+meHJknOsjQxIFq
-         7MvyGaniDT7s/RUfg1SJHqUYRh8lQV9KgYw5cUzuQ7fOPrkslKt0TpYaqOYKb7TM7HT4
-         1htSiJFYPcECnit2mky8Wm6NrEZ5i5Og2saTLw3fpOm22+AtpV7WIk2PL+Uo6e6FOR1y
-         wW7FJkwLMGow8TreHaKz48DVPp3MIIC54hp1/EcP2EUIn8z5/JErysJAWunrXqp8d2hG
-         NJRA==
-X-Gm-Message-State: APjAAAW4xTMRFH1gBaxZPDbsvIHe5dCUoTQlAWBiseVmkH15nzbx1vtv
-        jOULevzs0UEt96w535bqIc7dBe2ESo222mHhAQA=
-X-Google-Smtp-Source: APXvYqxXfUfYYlSHCGT8QWcRuQ7m0TRU6YfPCzIJqacGx9wipMEOCpcJgFUg1vZ65kU4tE0DEW8M4geXJQCCfGj37x8=
-X-Received: by 2002:aa7:8219:: with SMTP id k25mr34409763pfi.72.1567428382975;
- Mon, 02 Sep 2019 05:46:22 -0700 (PDT)
+        id S1730774AbfIBMxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 08:53:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41966 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729571AbfIBMxB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 08:53:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DA6F9190C004;
+        Mon,  2 Sep 2019 12:52:59 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A723E608AB;
+        Mon,  2 Sep 2019 12:52:56 +0000 (UTC)
+Date:   Mon, 2 Sep 2019 14:52:54 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Steven Price <steven.price@arm.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 01/10] KVM: arm64: Document PV-time interface
+Message-ID: <20190902125254.3w6lnvcbs7sfhjz7@kamzik.brq.redhat.com>
+References: <20190830084255.55113-1-steven.price@arm.com>
+ <20190830084255.55113-2-steven.price@arm.com>
+ <20190830144734.kvj4dvt32qzmhw32@kamzik.brq.redhat.com>
+ <7f459290-9c39-cfba-c514-a07469ff120f@arm.com>
 MIME-Version: 1.0
-References: <20190830061540.211072-1-Tianyu.Lan@microsoft.com> <DM5PR21MB0137B7C2AAD0FC65CB3E1306D7BD0@DM5PR21MB0137.namprd21.prod.outlook.com>
-In-Reply-To: <DM5PR21MB0137B7C2AAD0FC65CB3E1306D7BD0@DM5PR21MB0137.namprd21.prod.outlook.com>
-From:   Tianyu Lan <lantianyu1986@gmail.com>
-Date:   Mon, 2 Sep 2019 20:46:15 +0800
-Message-ID: <CAOLK0pwEMg7kSsRNfKa6=uQ1eVGa-HdNG=qMBernoe7XwS-0_w@mail.gmail.com>
-Subject: Re: [PATCH] x86/Hyper-V: Fix overflow issue in the fill_gva_list()
-To:     Michael Kelley <mikelley@microsoft.com>
-Cc:     KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "sashal@kernel.org" <sashal@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f459290-9c39-cfba-c514-a07469ff120f@arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Mon, 02 Sep 2019 12:53:00 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Aug 31, 2019 at 1:41 AM Michael Kelley <mikelley@microsoft.com> wrote:
->
-> From: lantianyu1986@gmail.com  Sent: Thursday, August 29, 2019 11:16 PM
-> >
-> > From: Tianyu Lan <Tianyu.Lan@microsoft.com>
-> >
-> > fill_gva_list() populates gva list and adds offset
-> > HV_TLB_FLUSH_UNIT(0x1000000) to variable "cur"
-> > in the each loop. When diff between "end" and "cur" is
-> > less than HV_TLB_FLUSH_UNIT, the gva entry should
-> > be the last one and the loop should be end.
-> >
-> > If cur is equal or greater than 0xFF000000 on 32-bit
-> > mode, "cur" will be overflow after adding HV_TLB_FLUSH_UNIT.
-> > Its value will be wrapped and less than "end". fill_gva_list()
-> > falls into an infinite loop and fill gva list out of
-> > border finally.
-> >
-> > Set "cur" to be "end" to make loop end when diff is
-> > less than HV_TLB_FLUSH_UNIT and add HV_TLB_FLUSH_UNIT to
-> > "cur" when diff is equal or greater than HV_TLB_FLUSH_UNIT.
-> > Fix the overflow issue.
->
-> Let me suggest simplifying the commit message a bit.  It
-> doesn't need to describe every line of the code change.   I think
-> it should also make clear that the same problem could occur on
-> 64-bit systems with the right "start" address.  My suggestion:
->
-> When the 'start' parameter is >=  0xFF000000 on 32-bit
-> systems, or >= 0xFFFFFFFF'FF000000 on 64-bit systems,
-> fill_gva_list gets into an infinite loop.  With such inputs,
-> 'cur' overflows after adding HV_TLB_FLUSH_UNIT and always
-> compares as less than end.  Memory is filled with guest virtual
-> addresses until the system crashes
->
-> Fix this by never incrementing 'cur' to be larger than 'end'.
->
-> >
-> > Reported-by: Jong Hyun Park <park.jonghyun@yonsei.ac.kr>
-> > Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
-> > Fixes: 2ffd9e33ce4a ("x86/hyper-v: Use hypercall for remote
-> > TLB flush")
->
-> The "Fixes:" line needs to not wrap.  It's exempt from the
-> "wrap at 75 columns" rule in order to simplify parsing scripts.
->
-> The code itself looks good.
+On Fri, Aug 30, 2019 at 04:25:08PM +0100, Steven Price wrote:
+> On 30/08/2019 15:47, Andrew Jones wrote:
+> > On Fri, Aug 30, 2019 at 09:42:46AM +0100, Steven Price wrote:
+> >> Introduce a paravirtualization interface for KVM/arm64 based on the
+> >> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
+> >>
+> >> This only adds the details about "Stolen Time" as the details of "Live
+> >> Physical Time" have not been fully agreed.
+> >>
+> >> User space can specify a reserved area of memory for the guest and
+> >> inform KVM to populate the memory with information on time that the host
+> >> kernel has stolen from the guest.
+> >>
+> >> A hypercall interface is provided for the guest to interrogate the
+> >> hypervisor's support for this interface and the location of the shared
+> >> memory structures.
+> >>
+> >> Signed-off-by: Steven Price <steven.price@arm.com>
+> >> ---
+> >>  Documentation/virt/kvm/arm/pvtime.txt   | 64 +++++++++++++++++++++++++
+> >>  Documentation/virt/kvm/devices/vcpu.txt | 14 ++++++
+> >>  2 files changed, 78 insertions(+)
+> >>  create mode 100644 Documentation/virt/kvm/arm/pvtime.txt
+> >>
+> >> diff --git a/Documentation/virt/kvm/arm/pvtime.txt b/Documentation/virt/kvm/arm/pvtime.txt
+> >> new file mode 100644
+> >> index 000000000000..dda3f0f855b9
+> >> --- /dev/null
+> >> +++ b/Documentation/virt/kvm/arm/pvtime.txt
+> >> @@ -0,0 +1,64 @@
+> >> +Paravirtualized time support for arm64
+> >> +======================================
+> >> +
+> >> +Arm specification DEN0057/A defined a standard for paravirtualised time
+> >> +support for AArch64 guests:
+> >> +
+> >> +https://developer.arm.com/docs/den0057/a
+> >> +
+> >> +KVM/arm64 implements the stolen time part of this specification by providing
+> >> +some hypervisor service calls to support a paravirtualized guest obtaining a
+> >> +view of the amount of time stolen from its execution.
+> >> +
+> >> +Two new SMCCC compatible hypercalls are defined:
+> >> +
+> >> +PV_FEATURES 0xC5000020
+> >> +PV_TIME_ST  0xC5000022
+> >> +
+> >> +These are only available in the SMC64/HVC64 calling convention as
+> >> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+> >> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+> >> +mechanism before calling it.
+> >> +
+> >> +PV_FEATURES
+> >> +    Function ID:  (uint32)  : 0xC5000020
+> >> +    PV_func_id:   (uint32)  : Either PV_TIME_LPT or PV_TIME_ST
+> > 
+> > PV_TIME_LPT doesn't exist
+> 
+> Thanks, will remove.
+> 
+> >> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+> >> +                              PV-time feature is supported by the hypervisor.
+> >> +
+> >> +PV_TIME_ST
+> >> +    Function ID:  (uint32)  : 0xC5000022
+> >> +    Return value: (int64)   : IPA of the stolen time data structure for this
+> >> +                              VCPU. On failure:
+> >> +                              NOT_SUPPORTED (-1)
+> >> +
+> >> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+> >> +with inner and outer write back caching attributes, in the inner shareable
+> >> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+> >> +meaningfully filled by the hypervisor (see structure below).
+> >> +
+> >> +PV_TIME_ST returns the structure for the calling VCPU.
+> >> +
+> >> +Stolen Time
+> >> +-----------
+> >> +
+> >> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+> >> +
+> >> +  Field       | Byte Length | Byte Offset | Description
+> >> +  ----------- | ----------- | ----------- | --------------------------
+> >> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+> >> +  Attributes  |      4      |      4      | Must be 0
+> > 
+> > The above fields don't appear to be exposed to userspace in anyway. How
+> > will we handle migration from one KVM with one version of the structure
+> > to another?
+> 
+> Interesting question. User space does have access to them now it is
+> providing the memory, but it's not exactly an easy method. In particular
+> user space has no (simple) way of probing the kernel's supported version.
+> 
+> I guess one solution would be to add an extra attribute on the VCPU
+> which would provide the revision information. The current kernel would
+> then reject any revision other than 0, but this could then be extended
+> to support other revision numbers in the future.
+> 
+> Although there's some logic in saying we could add the extra attribute
+> when(/if) there is a new version. Future kernels would then be expected
+> to use the current version unless user space explicitly set the new
+> attribute.
+> 
+> Do you feel this is something that needs to be addressed now, or can it
+> be deferred until another version is proposed?
 
-Hi Michael:
-       Thanks for suggestion. Update commit log in V2.
--- 
-Best regards
-Tianyu Lan
+Assuming we'll want userspace to have the option of choosing version=0,
+and that we're fine with version=0 being the implicit choice, when nothing
+is selected, then I guess it can be left as is for now. If, OTOH, we just
+want migration to fail when attempting to migrate to another host with
+an incompatible stolen-time structure (i.e. version=0 is not selectable
+on hosts that implement later versions), then we should expose the version
+in some way now. Perhaps a VCPU's "PV config" should be described in a
+set of pseudo registers?
+
+> 
+> >> +  Stolen time |      8      |      8      | Stolen time in unsigned
+> >> +              |             |             | nanoseconds indicating how
+> >> +              |             |             | much time this VCPU thread
+> >> +              |             |             | was involuntarily not
+> >> +              |             |             | running on a physical CPU.
+> >> +
+> >> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+> >> +will be present within a reserved region of the normal memory given to the
+> >> +guest. The guest should not attempt to write into this memory. There is a
+> >> +structure per VCPU of the guest.
+> > 
+> > Should we provide a recommendation as to how that reserved memory is
+> > provided? One memslot divided into NR_VCPUS subregions? Should the
+> > reserved region be described to the guest kernel with DT/ACPI? Or
+> > should userspace ensure the region is not within any DT/ACPI described
+> > regions?
+> 
+> I'm open to providing a recommendation, but I'm not entirely sure I know
+> enough here to provide one.
+> 
+> There is an obvious efficiency argument for minimizing memslots with the
+> current code. But if someone has a reason for using multiple memslots
+> then that's probably a good argument for implementing a memslot-caching
+> kvm_put_user() rather than to be dis-recommended.
+
+Actually even if a single memslot is used for all the PV structures for
+all VCPUs, but it's separate from the slot(s) used for main memory, then
+we'll likely see performance issues with memslot searches (even though
+it's a binary search). This is because memslots already have caching. The
+last used slot is stored in the memslots' lru_slot member (the "lru" name
+is confusing, but it means "last used" somehow). This means we could get
+thrashing on that slot cache if we're searching for the PV structure
+memslot on each vcpu load after searching for the main memory slot on each
+page fault.
+
+> 
+> My assumption (and testing) has been with a single memslot divided into
+> NR_VCPUS (or more accurately the number of VCPUs in the VM) subregions.
+> 
+> For testing DT I've tested both methods: an explicit reserved region or
+> just ensuring it's not in any DT described region. Both seem reasonable,
+> but it might be easier to integrate into existing migration mechanisms
+> if it's simply a reserved region (then the memory block of the guest is
+> just as it always was).
+> 
+> For ACPI the situation should be similar, but my testing has been with DT.
+
+I also can't think of any reason why we'd have to describe it in DT/ACPI,
+but I get this feeling that if we don't, then we'll hit some issue that
+will make us wish we had...
+
+Thanks,
+drew
