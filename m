@@ -2,43 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0386A6ED8
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 18:29:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F143A7070
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 18:39:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731298AbfICQ3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 12:29:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51650 "EHLO mail.kernel.org"
+        id S1730632AbfICQjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 12:39:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45970 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731240AbfICQ3G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:29:06 -0400
+        id S1729953AbfICQZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:25:43 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2422B23431;
-        Tue,  3 Sep 2019 16:29:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4B20D23774;
+        Tue,  3 Sep 2019 16:25:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567528145;
-        bh=tnVLq7a7jxRTB5YJZXORkqMQ2cdNrV82uH7qfoFQdFk=;
+        s=default; t=1567527943;
+        bh=XrNnbLr9bHij3PQYDFs3z2nmGwg3/XIHzeadN+sRjEU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qBZ87DteyCVjTIzaY7d/r/TGyky05qgzeh7Iz9P1hXTgogB9M0gaJcnmYoH+YsqJl
-         M5d8rS8vd9KW290eW9QT0vM/TWu+/EJA+VWJaTXpO/3vCvYufpB15qXBtSM/4tqUka
-         ojhCk/+QRweM0yZAYbDBgGW4iWiaoBWUc2CE3Ano=
+        b=sKX2hBuwO9wX5KMxb8ZFJW42JWWAkA7uYWw9ZcVvcmp2G6xcr7k1e/TXh2ghbwULO
+         1iaHsEBq7DpcGdKdLxbS0k1RvbMTNxy5o1eg5Tps/AV9uq/o/FZQi5mVwxKBI7VGqP
+         b+t/LN9Jsdg5dSscNqJVY0BFUSBCXn+aW5NkgnLM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Xiaoyao Li <xiaoyao.li@linux.intel.com>,
-        Tao Xu <tao3.xu@intel.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Roman Kagan <rkagan@virtuozzo.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 135/167] KVM: VMX: check CPUID before allowing read/write of IA32_XSS
-Date:   Tue,  3 Sep 2019 12:24:47 -0400
-Message-Id: <20190903162519.7136-135-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 011/167] KVM: x86: hyperv: enforce vp_index < KVM_MAX_VCPUS
+Date:   Tue,  3 Sep 2019 12:22:43 -0400
+Message-Id: <20190903162519.7136-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
 References: <20190903162519.7136-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -47,54 +44,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-[ Upstream commit 4d763b168e9c5c366b05812c7bba7662e5ea3669 ]
+[ Upstream commit 9170200ec0ebad70e5b9902bc93e2b1b11456a3b ]
 
-Raise #GP when guest read/write IA32_XSS, but the CPUID bits
-say that it shouldn't exist.
+Hyper-V TLFS (5.0b) states:
 
-Fixes: 203000993de5 (kvm: vmx: add MSR logic for XSAVES)
-Reported-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
-Reported-by: Tao Xu <tao3.xu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> Virtual processors are identified by using an index (VP index). The
+> maximum number of virtual processors per partition supported by the
+> current implementation of the hypervisor can be obtained through CPUID
+> leaf 0x40000005. A virtual processor index must be less than the
+> maximum number of virtual processors per partition.
+
+Forbid userspace to set VP_INDEX above KVM_MAX_VCPUS. get_vcpu_by_vpidx()
+can now be optimized to bail early when supplied vpidx is >= KVM_MAX_VCPUS.
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/vmx.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/kvm/hyperv.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index 82253d31842a2..2938b4bcc9684 100644
---- a/arch/x86/kvm/vmx.c
-+++ b/arch/x86/kvm/vmx.c
-@@ -4135,7 +4135,10 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		return vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
- 				       &msr_info->data);
- 	case MSR_IA32_XSS:
--		if (!vmx_xsaves_supported())
-+		if (!vmx_xsaves_supported() ||
-+		    (!msr_info->host_initiated &&
-+		     !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-+		       guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 229d996051653..73fa074b9089a 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -132,8 +132,10 @@ static struct kvm_vcpu *get_vcpu_by_vpidx(struct kvm *kvm, u32 vpidx)
+ 	struct kvm_vcpu *vcpu = NULL;
+ 	int i;
+ 
+-	if (vpidx < KVM_MAX_VCPUS)
+-		vcpu = kvm_get_vcpu(kvm, vpidx);
++	if (vpidx >= KVM_MAX_VCPUS)
++		return NULL;
++
++	vcpu = kvm_get_vcpu(kvm, vpidx);
+ 	if (vcpu && vcpu_to_hv_vcpu(vcpu)->vp_index == vpidx)
+ 		return vcpu;
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+@@ -1044,7 +1046,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+ 
+ 	switch (msr) {
+ 	case HV_X64_MSR_VP_INDEX:
+-		if (!host)
++		if (!host || (u32)data >= KVM_MAX_VCPUS)
  			return 1;
- 		msr_info->data = vcpu->arch.ia32_xss;
+ 		hv->vp_index = (u32)data;
  		break;
-@@ -4302,7 +4305,10 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		return vmx_set_vmx_msr(vcpu, msr_index, data);
- 	case MSR_IA32_XSS:
--		if (!vmx_xsaves_supported())
-+		if (!vmx_xsaves_supported() ||
-+		    (!msr_info->host_initiated &&
-+		     !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-+		       guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
- 			return 1;
- 		/*
- 		 * The only supported bit as of Skylake is bit 8, but
 -- 
 2.20.1
 
