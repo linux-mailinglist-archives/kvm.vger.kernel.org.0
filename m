@@ -2,146 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C933AA6286
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 09:31:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D0B8A6290
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 09:32:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727864AbfICHb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 03:31:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57418 "EHLO mx1.redhat.com"
+        id S1727700AbfICHcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 03:32:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49396 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726698AbfICHb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 03:31:26 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        id S1726062AbfICHcU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 03:32:20 -0400
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BD5D785543
-        for <kvm@vger.kernel.org>; Tue,  3 Sep 2019 07:31:25 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id c1so9962146wrb.12
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 00:31:25 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 089DC356DC
+        for <kvm@vger.kernel.org>; Tue,  3 Sep 2019 07:32:20 +0000 (UTC)
+Received: by mail-qk1-f198.google.com with SMTP id d9so18123479qko.8
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 00:32:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=vIdlVo3wzaAg7+E51hvuCmhSjy3lqZ2GvkawXNng+DY=;
-        b=TVHi+JjA2wfP/uP508Hqz+kT/JQjYmR88eMT6/dSgp/lnGjHeZWhpuxXn3jxoCwX4m
-         tkrPOZAUfR06FQNjsy5rEnD7I7TIKXOJfgsLL6HgpGyR8UcMwtRBI7J3AKttuUpC3kRi
-         wJ8duB9ErWt3LYcLDCcmGWOssx4D+Ue0MvDBU2WJzdJBMf3lhTj+4bBvDzg9vs2MuXI8
-         w6CApzEI98R3fUjvGSIggaGHJkRC60Sv8I1q2Et5N6NxlIccyLkYCkazA7K5ggdSjdr1
-         Yt2aNja0Fy/Eld5lFoWajBe5cNmFwWbLhs5RNg3ZrvG449fo4OzmH19IzteABuz4Tn1X
-         9shQ==
-X-Gm-Message-State: APjAAAXosEkmWThizom7umaA7BUsDTiAPMguuUgYzvvTcLLJxVhs6r4v
-        I/fSZrQdivofUNMfpsPuYRAT5QLb2vxxCMJ0AfmzX4CPrcyfWcW+OmRpfm+TILol1FLC3Xibg25
-        MstlcdwiD/0fH
-X-Received: by 2002:adf:8043:: with SMTP id 61mr35027588wrk.115.1567495884505;
-        Tue, 03 Sep 2019 00:31:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyeFTpVz+dse95eWq0nocs/IG2NKjpvXX30eGt/rJU82VMrZ0Bsyy+QcPwkIDLVpATtIdNOPA==
-X-Received: by 2002:adf:8043:: with SMTP id 61mr35027562wrk.115.1567495884199;
-        Tue, 03 Sep 2019 00:31:24 -0700 (PDT)
-Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it. [79.36.61.170])
-        by smtp.gmail.com with ESMTPSA id v8sm34676506wra.79.2019.09.03.00.31.22
+         :mime-version:content-disposition:in-reply-to;
+        bh=YKJ/17m0nY3+PfopzWmNRULBrW/5r9BKa8USWY7P99Y=;
+        b=JFSndsVCKCV032Hr2JPIfrSCQw81ZoAkW5A0OEiXNOlMJ2O8B772z5qVY/gfRHqSyh
+         5EtbfgcFBezHlwg+DWC2jIUwGTfJCk3sUy3hsNRD0P/97jaX0W7QtQlTnKhB4woqc96J
+         75AMN1dwgo5hl2XlFIPoKHyzKMGXUp2xFQRVKDtGYK+dHEaKm9d4f24NfMN9PEgkdjkn
+         OCO3CguuQlxLMv22iEGlf0ZT7rQMdUPmf635Ex6R6xruxC/QAEcAknROcrtfmWXhOn8l
+         lDennEg/EXdViblEeqsPxEMI89ElfEfgYrx3c9Rcew8ENL84mJ+EPU3U5GFp7oLBE4iU
+         HObA==
+X-Gm-Message-State: APjAAAVcdD2MeQu/0a5th1BBkTWWcdBq+8xOnYmUc+JaLDWyVhhkHwY8
+        K7i1gJ0VIKKWgQXz1rmdWZSg/Hf8sj3vgQ7ZtnwCmFH7TutfeV5orni95BdyqeNq6YEEzXLRBJ4
+        pzgEqgQ2qXNN+
+X-Received: by 2002:a05:620a:234:: with SMTP id u20mr10853601qkm.11.1567495939311;
+        Tue, 03 Sep 2019 00:32:19 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwBD33tlOTzZP8VA84/vyopsm4vvDT4u6GJo95GdpFHS9UdnFj15rANJyBZtbYAXvKG/zCLwA==
+X-Received: by 2002:a05:620a:234:: with SMTP id u20mr10853568qkm.11.1567495939082;
+        Tue, 03 Sep 2019 00:32:19 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-62-110.red.bezeqint.net. [79.180.62.110])
+        by smtp.gmail.com with ESMTPSA id e7sm7324858qtp.91.2019.09.03.00.32.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2019 00:31:23 -0700 (PDT)
-Date:   Tue, 3 Sep 2019 09:31:20 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 2/5] vsock/virtio: reduce credit update messages
-Message-ID: <20190903073120.kefllalytkvidcvh@steredhat>
-References: <20190717113030.163499-1-sgarzare@redhat.com>
- <20190717113030.163499-3-sgarzare@redhat.com>
- <20190903003050-mutt-send-email-mst@kernel.org>
+        Tue, 03 Sep 2019 00:32:18 -0700 (PDT)
+Date:   Tue, 3 Sep 2019 03:32:10 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
+        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, virtio-dev@lists.oasis-open.org,
+        osalvador@suse.de, yang.zhang.wz@gmail.com, pagupta@redhat.com,
+        riel@surriel.com, konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
+Subject: Re: [PATCH v5 6/6] virtio-balloon: Add support for providing unused
+ page reports to host
+Message-ID: <20190903032759-mutt-send-email-mst@kernel.org>
+References: <20190812213158.22097.30576.stgit@localhost.localdomain>
+ <20190812213356.22097.20751.stgit@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190903003050-mutt-send-email-mst@kernel.org>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190812213356.22097.20751.stgit@localhost.localdomain>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 03, 2019 at 12:38:02AM -0400, Michael S. Tsirkin wrote:
-> On Wed, Jul 17, 2019 at 01:30:27PM +0200, Stefano Garzarella wrote:
-> > In order to reduce the number of credit update messages,
-> > we send them only when the space available seen by the
-> > transmitter is less than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
-> > 
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> >  include/linux/virtio_vsock.h            |  1 +
-> >  net/vmw_vsock/virtio_transport_common.c | 16 +++++++++++++---
-> >  2 files changed, 14 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> > index 7d973903f52e..49fc9d20bc43 100644
-> > --- a/include/linux/virtio_vsock.h
-> > +++ b/include/linux/virtio_vsock.h
-> > @@ -41,6 +41,7 @@ struct virtio_vsock_sock {
-> >  
-> >  	/* Protected by rx_lock */
-> >  	u32 fwd_cnt;
-> > +	u32 last_fwd_cnt;
-> >  	u32 rx_bytes;
-> >  	struct list_head rx_queue;
-> >  };
-> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > index 095221f94786..a85559d4d974 100644
-> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > @@ -211,6 +211,7 @@ static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
-> >  void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct virtio_vsock_pkt *pkt)
-> >  {
-> >  	spin_lock_bh(&vvs->tx_lock);
-> > +	vvs->last_fwd_cnt = vvs->fwd_cnt;
-> >  	pkt->hdr.fwd_cnt = cpu_to_le32(vvs->fwd_cnt);
-> >  	pkt->hdr.buf_alloc = cpu_to_le32(vvs->buf_alloc);
-> >  	spin_unlock_bh(&vvs->tx_lock);
-> > @@ -261,6 +262,7 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> >  	struct virtio_vsock_sock *vvs = vsk->trans;
-> >  	struct virtio_vsock_pkt *pkt;
-> >  	size_t bytes, total = 0;
-> > +	u32 free_space;
-> >  	int err = -EFAULT;
-> >  
-> >  	spin_lock_bh(&vvs->rx_lock);
-> > @@ -291,11 +293,19 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> >  			virtio_transport_free_pkt(pkt);
-> >  		}
-> >  	}
-> > +
-> > +	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
-> > +
-> >  	spin_unlock_bh(&vvs->rx_lock);
-> >  
-> > -	/* Send a credit pkt to peer */
-> > -	virtio_transport_send_credit_update(vsk, VIRTIO_VSOCK_TYPE_STREAM,
-> > -					    NULL);
-> > +	/* We send a credit update only when the space available seen
-> > +	 * by the transmitter is less than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE
+On Mon, Aug 12, 2019 at 02:33:56PM -0700, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > 
-> This is just repeating what code does though.
-> Please include the *reason* for the condition.
-> E.g. here's a better comment:
+> Add support for the page reporting feature provided by virtio-balloon.
+> Reporting differs from the regular balloon functionality in that is is
+> much less durable than a standard memory balloon. Instead of creating a
+> list of pages that cannot be accessed the pages are only inaccessible
+> while they are being indicated to the virtio interface. Once the
+> interface has acknowledged them they are placed back into their respective
+> free lists and are once again accessible by the guest system.
 > 
-> 	/* To reduce number of credit update messages,
-> 	 * don't update credits as long as lots of space is available.
-> 	 * Note: the limit chosen here is arbitrary. Setting the limit
-> 	 * too high causes extra messages. Too low causes transmitter
-> 	 * stalls. As stalls are in theory more expensive than extra
-> 	 * messages, we set the limit to a high value. TODO: experiment
-> 	 * with different values.
-> 	 */
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> ---
+>  drivers/virtio/Kconfig              |    1 +
+>  drivers/virtio/virtio_balloon.c     |   65 +++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_balloon.h |    1 +
+>  3 files changed, 67 insertions(+)
 > 
+> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> index 078615cf2afc..4b2dd8259ff5 100644
+> --- a/drivers/virtio/Kconfig
+> +++ b/drivers/virtio/Kconfig
+> @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
+>  	tristate "Virtio balloon driver"
+>  	depends on VIRTIO
+>  	select MEMORY_BALLOON
+> +	select PAGE_REPORTING
+>  	---help---
+>  	 This driver supports increasing and decreasing the amount
+>  	 of memory within a KVM guest.
+> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+> index 2c19457ab573..52f9eeda1877 100644
+> --- a/drivers/virtio/virtio_balloon.c
+> +++ b/drivers/virtio/virtio_balloon.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/mount.h>
+>  #include <linux/magic.h>
+>  #include <linux/pseudo_fs.h>
+> +#include <linux/page_reporting.h>
+>  
+>  /*
+>   * Balloon device works in 4K page units.  So each page is pointed to by
+> @@ -37,6 +38,9 @@
+>  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
+>  	(1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
+>  
+> +/*  limit on the number of pages that can be on the reporting vq */
+> +#define VIRTIO_BALLOON_VRING_HINTS_MAX	16
+> +
+>  #ifdef CONFIG_BALLOON_COMPACTION
+>  static struct vfsmount *balloon_mnt;
+>  #endif
+> @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
+>  	VIRTIO_BALLOON_VQ_DEFLATE,
+>  	VIRTIO_BALLOON_VQ_STATS,
+>  	VIRTIO_BALLOON_VQ_FREE_PAGE,
+> +	VIRTIO_BALLOON_VQ_REPORTING,
+>  	VIRTIO_BALLOON_VQ_MAX
+>  };
+>  
+> @@ -113,6 +118,10 @@ struct virtio_balloon {
+>  
+>  	/* To register a shrinker to shrink memory upon memory pressure */
+>  	struct shrinker shrinker;
+> +
+> +	/* Unused page reporting device */
+> +	struct virtqueue *reporting_vq;
+> +	struct page_reporting_dev_info ph_dev_info;
+>  };
+>  
+>  static struct virtio_device_id id_table[] = {
+> @@ -152,6 +161,32 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
+>  
+>  }
+>  
+> +void virtballoon_unused_page_report(struct page_reporting_dev_info *ph_dev_info,
+> +				    unsigned int nents)
+> +{
+> +	struct virtio_balloon *vb =
+> +		container_of(ph_dev_info, struct virtio_balloon, ph_dev_info);
+> +	struct virtqueue *vq = vb->reporting_vq;
+> +	unsigned int unused, err;
+> +
+> +	/* We should always be able to add these buffers to an empty queue. */
+> +	err = virtqueue_add_inbuf(vq, ph_dev_info->sg, nents, vb,
+> +				  GFP_NOWAIT | __GFP_NOWARN);
+> +
+> +	/*
+> +	 * In the extremely unlikely case that something has changed and we
+> +	 * are able to trigger an error we will simply display a warning
+> +	 * and exit without actually processing the pages.
+> +	 */
+> +	if (WARN_ON(err))
+> +		return;
+> +
+> +	virtqueue_kick(vq);
+> +
+> +	/* When host has read buffer, this completes via balloon_ack */
+> +	wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
+> +}
+> +
+>  static void set_page_pfns(struct virtio_balloon *vb,
+>  			  __virtio32 pfns[], struct page *page)
+>  {
+> @@ -476,6 +511,7 @@ static int init_vqs(struct virtio_balloon *vb)
+>  	names[VIRTIO_BALLOON_VQ_DEFLATE] = "deflate";
+>  	names[VIRTIO_BALLOON_VQ_STATS] = NULL;
+>  	names[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
+> +	names[VIRTIO_BALLOON_VQ_REPORTING] = NULL;
+>  
+>  	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+>  		names[VIRTIO_BALLOON_VQ_STATS] = "stats";
+> @@ -487,11 +523,19 @@ static int init_vqs(struct virtio_balloon *vb)
+>  		callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
+>  	}
+>  
+> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
+> +		names[VIRTIO_BALLOON_VQ_REPORTING] = "reporting_vq";
+> +		callbacks[VIRTIO_BALLOON_VQ_REPORTING] = balloon_ack;
+> +	}
+> +
+>  	err = vb->vdev->config->find_vqs(vb->vdev, VIRTIO_BALLOON_VQ_MAX,
+>  					 vqs, callbacks, names, NULL, NULL);
+>  	if (err)
+>  		return err;
+>  
+> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
+> +		vb->reporting_vq = vqs[VIRTIO_BALLOON_VQ_REPORTING];
+> +
+>  	vb->inflate_vq = vqs[VIRTIO_BALLOON_VQ_INFLATE];
+>  	vb->deflate_vq = vqs[VIRTIO_BALLOON_VQ_DEFLATE];
+>  	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> @@ -931,12 +975,30 @@ static int virtballoon_probe(struct virtio_device *vdev)
+>  		if (err)
+>  			goto out_del_balloon_wq;
+>  	}
+> +
+> +	vb->ph_dev_info.report = virtballoon_unused_page_report;
+> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
+> +		unsigned int capacity;
+> +
+> +		capacity = min_t(unsigned int,
+> +				 virtqueue_get_vring_size(vb->reporting_vq) - 1,
+> +				 VIRTIO_BALLOON_VRING_HINTS_MAX);
 
-Yes, it is better, sorry for that. I'll try to avoid unnecessary comments,
-explaining the reason for certain changes.
+Hmm why - 1 exactly?
+This might end up being 0 in the unusual configuration of vq size 1.
+Also, VIRTIO_BALLOON_VRING_HINTS_MAX is a power of 2 but
+virtqueue_get_vring_size(vb->reporting_vq) - 1 won't
+be if we are using split rings - donnu if that matters.
 
-Since this patch is already queued in net-next, should I send another
-patch to fix the comment?
-
-Thanks,
-Stefano
+> +		vb->ph_dev_info.capacity = capacity;
+> +
+> +		err = page_reporting_startup(&vb->ph_dev_info);
+> +		if (err)
+> +			goto out_unregister_shrinker;
+> +	}
+> +
+>  	virtio_device_ready(vdev);
+>  
+>  	if (towards_target(vb))
+>  		virtballoon_changed(vdev);
+>  	return 0;
+>  
+> +out_unregister_shrinker:
+> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+> +		virtio_balloon_unregister_shrinker(vb);
+>  out_del_balloon_wq:
+>  	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
+>  		destroy_workqueue(vb->balloon_wq);
+> @@ -965,6 +1027,8 @@ static void virtballoon_remove(struct virtio_device *vdev)
+>  {
+>  	struct virtio_balloon *vb = vdev->priv;
+>  
+> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
+> +		page_reporting_shutdown(&vb->ph_dev_info);
+>  	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+>  		virtio_balloon_unregister_shrinker(vb);
+>  	spin_lock_irq(&vb->stop_update_lock);
+> @@ -1034,6 +1098,7 @@ static int virtballoon_validate(struct virtio_device *vdev)
+>  	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+>  	VIRTIO_BALLOON_F_FREE_PAGE_HINT,
+>  	VIRTIO_BALLOON_F_PAGE_POISON,
+> +	VIRTIO_BALLOON_F_REPORTING,
+>  };
+>  
+>  static struct virtio_driver virtio_balloon_driver = {
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> index a1966cd7b677..19974392d324 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -36,6 +36,7 @@
+>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+>  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free pages */
+>  #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
+> +#define VIRTIO_BALLOON_F_REPORTING	5 /* Page reporting virtqueue */
+>  
+>  /* Size of a PFN in the balloon interface. */
+>  #define VIRTIO_BALLOON_PFN_SHIFT 12
