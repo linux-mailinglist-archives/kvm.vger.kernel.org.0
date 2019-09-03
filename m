@@ -2,298 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D4ACA6617
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 11:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E028FA6661
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 12:15:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728623AbfICJxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 05:53:43 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43385 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728546AbfICJxn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 05:53:43 -0400
-Received: by mail-wr1-f68.google.com with SMTP id y8so16719673wrn.10
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 02:53:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MgXnM5PtLLeZR4goT8pEjOEmDwznieCs/oR5Oy3fuSo=;
-        b=mC+xMiASacXX5Uk14z3V94sf/GweT8FVxSnDjFgNxflc+SESaM+kJtWD7A4gHXeOVw
-         IS4nM7LmLSn0eMs4n6RyWTsiB5dYrRpod1s9zlnwBlH+SYDW3H6mAyUd+GskjPPjDYg/
-         aoy79/mGZRoMqacGUmZyfZu9zd/QaWVrWzZiQ1Td4pz7gcUbVI9Nbf6H8yf75QYrcLfg
-         JLcXAe8v45vL2Udit4uIwMGnC8Zr6LOuIgXi3uoKdum4/dJo114l4ya5YCY68jAKkQI0
-         d1yQcFMKTB+q4eWM05V/8lVB0V9eACtMUlJ9aPvcYN2H46Dk5vkMBJbteUZ871iJvfOF
-         O6RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MgXnM5PtLLeZR4goT8pEjOEmDwznieCs/oR5Oy3fuSo=;
-        b=LLGPu2VTNZcM9eHQ9rqknWVCAryH6tFIXdE6RWw/LayJ2Ej7OXciqz6uASQt9YZk8i
-         jHqy9Oulx1qauH2JRrLVAsh/iLtOYhJlxcCg2t7TkWKux73USi/Mj0rnK6yridDFoSsU
-         +p9SB1BZT3AVxiHrDgqCu6yw1UlWWhQT10qxTDbvFa4shQmflYgeGIGvFjA++dY+uMxX
-         0zVXd1HmvTiaf4eqtC2tZEI/+35GpVkIf4PiOXTxwLCc7LKI14OvA1oX/9Rybc+FI3dv
-         eUrawur3IJI9DgpWBYmQl/9vinVqG1C33edxJu7yJiJQDIeH/G4lyNkXChazR4xmjToQ
-         0q+Q==
-X-Gm-Message-State: APjAAAWcjyjeJ0XCj65WpsPayCORmU7/khsRWQLqQfxLoPgGAuYyrpcg
-        UMFGfSCvS+bvkIPMVyaV57LpGdAPmQtX79rTjhGJRw==
-X-Google-Smtp-Source: APXvYqycePSqD+xZkUq3liN2M817pw47hXAQodFDEYagVeYhgTTX3a0PlLUiIzLP1hWxxrx++aWFnSwGmEJ5WYAkNl8=
-X-Received: by 2002:a5d:5444:: with SMTP id w4mr26076311wrv.180.1567504420046;
- Tue, 03 Sep 2019 02:53:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190829135427.47808-1-anup.patel@wdc.com> <20190829135427.47808-20-anup.patel@wdc.com>
-In-Reply-To: <20190829135427.47808-20-anup.patel@wdc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 3 Sep 2019 15:23:29 +0530
-Message-ID: <CAAhSdy2jd79-=bPN0gwm8iTg2BqzLgamTqO5TDXswPc29VPrCQ@mail.gmail.com>
-Subject: Re: [PATCH v6 19/21] RISC-V: KVM: Document RISC-V specific parts of
- KVM API.
-To:     Anup Patel <Anup.Patel@wdc.com>
-Cc:     Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
+        id S1728600AbfICKPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 06:15:44 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:40990 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727667AbfICKPo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 06:15:44 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83AD7kj076681;
+        Tue, 3 Sep 2019 10:13:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=+anirc1ufKGxJEU4Z3PGmZS+/UggyBKlolV/D6idGx4=;
+ b=oJ6IszhCYg8UZZC98Psi/7dz6TtNj0ADinKqQ/cZM2pOQMV2oOgl8VGH4KJ+8Cz0n5sb
+ kqlLMUqnLuENqbMfLHtxRIDqXqRzI91bNGm13xds4bQAzV5R3kbXuXbjPosV7d6YzSZ4
+ wPCeqtSLCf2WxjxAQXzP+E7ujZue6950wH/pwJ6+hFC7ERmmOmGAASN3kUAmGkcJH/Io
+ 92vuoOk6yI21GTh+L/b5B0BVI88dRO83ayVo1XLmKRgqfsfQG9SbBVL7Mn+EqonKec84
+ 6ZfDcHWenf0DaVnX6WOaxw6Le1quHVlLHNGCr5ZhsNmuJYAKo4lD6kQi5MEL7zM+vcUp jg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2usnssr4ft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 Sep 2019 10:13:41 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83ADM9u145634;
+        Tue, 3 Sep 2019 10:13:40 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2us4wdmpev-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 Sep 2019 10:13:40 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x83ADa4O013873;
+        Tue, 3 Sep 2019 10:13:36 GMT
+Received: from [10.175.205.235] (/10.175.205.235)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 03 Sep 2019 03:13:36 -0700
+Subject: Re: Is: Default governor regardless of cpuidle driver Was: [PATCH v2]
+ cpuidle-haltpoll: vcpu hotplug support
+To:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Linux PM <linux-pm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+References: <20190829151027.9930-1-joao.m.martins@oracle.com>
+ <c8cf8dcc-76a3-3e15-f514-2cb9df1bbbdc@oracle.com>
+ <20190829172343.GA18825@amt.cnet>
+ <CAJZ5v0j8BEjdNyAn=ut9BxSH5Gphs_AivADPwXX=rJ1TF1+88A@mail.gmail.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <457e8ca1-beb3-ca39-b257-e7bc6bb35d4d@oracle.com>
+Date:   Tue, 3 Sep 2019 11:13:31 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAJZ5v0j8BEjdNyAn=ut9BxSH5Gphs_AivADPwXX=rJ1TF1+88A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9368 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909030106
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9368 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909030105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 29, 2019 at 7:27 PM Anup Patel <Anup.Patel@wdc.com> wrote:
->
-> Document RISC-V specific parts of the KVM API, such as:
->  - The interrupt numbers passed to the KVM_INTERRUPT ioctl.
->  - The states supported by the KVM_{GET,SET}_MP_STATE ioctls.
->  - The registers supported by the KVM_{GET,SET}_ONE_REG interface
->    and the encoding of those register ids.
->
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> ---
->  Documentation/virt/kvm/api.txt | 140 +++++++++++++++++++++++++++++++--
->  1 file changed, 133 insertions(+), 7 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index 2d067767b617..80c4ffad8bd7 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -471,7 +471,7 @@ struct kvm_translation {
->  4.16 KVM_INTERRUPT
->
->  Capability: basic
-> -Architectures: x86, ppc, mips
-> +Architectures: x86, ppc, mips, riscv
->  Type: vcpu ioctl
->  Parameters: struct kvm_interrupt (in)
->  Returns: 0 on success, negative on failure.
-> @@ -531,6 +531,22 @@ interrupt number dequeues the interrupt.
->
->  This is an asynchronous vcpu ioctl and can be invoked from any thread.
->
-> +RISC-V:
-> +
-> +Queues an external interrupt to be injected into the virutal CPU. This ioctl
-> +is overloaded with 2 different irq values:
-> +
-> +a) KVM_INTERRUPT_SET
-> +
-> +  This sets external interrupt for a virtual CPU and it will receive
-> +  once it is ready.
-> +
-> +b) KVM_INTERRUPT_UNSET
-> +
-> +  This clears pending external interrupt for a virtual CPU.
-> +
-> +This is an asynchronous vcpu ioctl and can be invoked from any thread.
-> +
->
->  4.17 KVM_DEBUG_GUEST
->
-> @@ -1206,7 +1222,7 @@ for vm-wide capabilities.
->  4.38 KVM_GET_MP_STATE
->
->  Capability: KVM_CAP_MP_STATE
-> -Architectures: x86, s390, arm, arm64
-> +Architectures: x86, s390, arm, arm64, riscv
->  Type: vcpu ioctl
->  Parameters: struct kvm_mp_state (out)
->  Returns: 0 on success; -1 on error
-> @@ -1220,7 +1236,8 @@ uniprocessor guests).
->
->  Possible values are:
->
-> - - KVM_MP_STATE_RUNNABLE:        the vcpu is currently running [x86,arm/arm64]
-> + - KVM_MP_STATE_RUNNABLE:        the vcpu is currently running
-> +                                 [x86,arm/arm64,riscv]
->   - KVM_MP_STATE_UNINITIALIZED:   the vcpu is an application processor (AP)
->                                   which has not yet received an INIT signal [x86]
->   - KVM_MP_STATE_INIT_RECEIVED:   the vcpu has received an INIT signal, and is
-> @@ -1229,7 +1246,7 @@ Possible values are:
->                                   is waiting for an interrupt [x86]
->   - KVM_MP_STATE_SIPI_RECEIVED:   the vcpu has just received a SIPI (vector
->                                   accessible via KVM_GET_VCPU_EVENTS) [x86]
-> - - KVM_MP_STATE_STOPPED:         the vcpu is stopped [s390,arm/arm64]
-> + - KVM_MP_STATE_STOPPED:         the vcpu is stopped [s390,arm/arm64,riscv]
->   - KVM_MP_STATE_CHECK_STOP:      the vcpu is in a special error state [s390]
->   - KVM_MP_STATE_OPERATING:       the vcpu is operating (running or halted)
->                                   [s390]
-> @@ -1240,7 +1257,7 @@ On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
->  in-kernel irqchip, the multiprocessing state must be maintained by userspace on
->  these architectures.
->
-> -For arm/arm64:
-> +For arm/arm64/riscv:
->
->  The only states that are valid are KVM_MP_STATE_STOPPED and
->  KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
-> @@ -1248,7 +1265,7 @@ KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
->  4.39 KVM_SET_MP_STATE
->
->  Capability: KVM_CAP_MP_STATE
-> -Architectures: x86, s390, arm, arm64
-> +Architectures: x86, s390, arm, arm64, riscv
->  Type: vcpu ioctl
->  Parameters: struct kvm_mp_state (in)
->  Returns: 0 on success; -1 on error
-> @@ -1260,7 +1277,7 @@ On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
->  in-kernel irqchip, the multiprocessing state must be maintained by userspace on
->  these architectures.
->
-> -For arm/arm64:
-> +For arm/arm64/riscv:
->
->  The only states that are valid are KVM_MP_STATE_STOPPED and
->  KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
-> @@ -2269,6 +2286,115 @@ following id bit patterns:
->    0x7020 0000 0003 02 <0:3> <reg:5>
->
->
-> +RISC-V registers are mapped using the lower 32 bits. The upper 8 bits of
-> +that is the register group type.
-> +
-> +RISC-V config registers are meant for configuring a Guest VCPU and it has
-> +the following id bit patterns:
-> +  0x8020 0000 01 <index into the kvm_riscv_config struct:24> (32bit Host)
-> +  0x8030 0000 01 <index into the kvm_riscv_config struct:24> (64bit Host)
-> +
-> +Following are the RISC-V config registers:
-> +
-> +    Encoding            Register  Description
-> +------------------------------------------------------------------
-> +  0x80x0 0000 0100 0000 isa       ISA feature bitmap of Guest VCPU
-> +  0x80x0 0000 0100 0001 tbfreq    Time base frequency
-> +
-> +The isa config register can be read anytime but can only be written before
-> +a Guest VCPU runs. It will have ISA feature bits matching underlying host
-> +set by default. The tbfreq config register is a read-only register and it
-> +will return host timebase frequenc.
-> +
-> +RISC-V core registers represent the general excution state of a Guest VCPU
-> +and it has the following id bit patterns:
-> +  0x8020 0000 02 <index into the kvm_regs struct:24> (32bit Host)
-> +  0x8030 0000 02 <index into the kvm_regs struct:24> (64bit Host)
-> +
-> +Following are the RISC-V core registers:
-> +
-> +    Encoding            Register  Description
-> +------------------------------------------------------------------
-> +  0x80x0 0000 0200 0000 regs.pc   Program counter
-> +  0x80x0 0000 0200 0001 regs.ra   Return address
-> +  0x80x0 0000 0200 0002 regs.sp   Stack pointer
-> +  0x80x0 0000 0200 0003 regs.gp   Global pointer
-> +  0x80x0 0000 0200 0004 regs.tp   Task pointer
-> +  0x80x0 0000 0200 0005 regs.t0   Caller saved register 0
-> +  0x80x0 0000 0200 0006 regs.t1   Caller saved register 1
-> +  0x80x0 0000 0200 0007 regs.t2   Caller saved register 2
-> +  0x80x0 0000 0200 0008 regs.s0   Callee saved register 0
-> +  0x80x0 0000 0200 0009 regs.s1   Callee saved register 1
-> +  0x80x0 0000 0200 000a regs.a0   Function argument (or return value) 0
-> +  0x80x0 0000 0200 000b regs.a1   Function argument (or return value) 1
-> +  0x80x0 0000 0200 000c regs.a2   Function argument 2
-> +  0x80x0 0000 0200 000d regs.a3   Function argument 3
-> +  0x80x0 0000 0200 000e regs.a4   Function argument 4
-> +  0x80x0 0000 0200 000f regs.a5   Function argument 5
-> +  0x80x0 0000 0200 0010 regs.a6   Function argument 6
-> +  0x80x0 0000 0200 0011 regs.a7   Function argument 7
-> +  0x80x0 0000 0200 0012 regs.s2   Callee saved register 2
-> +  0x80x0 0000 0200 0013 regs.s3   Callee saved register 3
-> +  0x80x0 0000 0200 0014 regs.s4   Callee saved register 4
-> +  0x80x0 0000 0200 0015 regs.s5   Callee saved register 5
-> +  0x80x0 0000 0200 0016 regs.s6   Callee saved register 6
-> +  0x80x0 0000 0200 0017 regs.s7   Callee saved register 7
-> +  0x80x0 0000 0200 0018 regs.s8   Callee saved register 8
-> +  0x80x0 0000 0200 0019 regs.s9   Callee saved register 9
-> +  0x80x0 0000 0200 001a regs.s10  Callee saved register 10
-> +  0x80x0 0000 0200 001b regs.s11  Callee saved register 11
-> +  0x80x0 0000 0200 001c regs.t3   Caller saved register 3
-> +  0x80x0 0000 0200 001d regs.t4   Caller saved register 4
-> +  0x80x0 0000 0200 001e regs.t5   Caller saved register 5
-> +  0x80x0 0000 0200 001f regs.t6   Caller saved register 6
+On 9/2/19 10:55 PM, Rafael J. Wysocki wrote:
+> On Thu, Aug 29, 2019 at 7:24 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+>>
+>> On Thu, Aug 29, 2019 at 06:16:05PM +0100, Joao Martins wrote:
+>>> On 8/29/19 4:10 PM, Joao Martins wrote:
+>>>> When cpus != maxcpus cpuidle-haltpoll will fail to register all vcpus
+>>>> past the online ones and thus fail to register the idle driver.
+>>>> This is because cpuidle_add_sysfs() will return with -ENODEV as a
+>>>> consequence from get_cpu_device() return no device for a non-existing
+>>>> CPU.
+>>>>
+>>>> Instead switch to cpuidle_register_driver() and manually register each
+>>>> of the present cpus through cpuhp_setup_state() callback and future
+>>>> ones that get onlined. This mimmics similar logic that intel_idle does.
+>>>>
+>>>> Fixes: fa86ee90eb11 ("add cpuidle-haltpoll driver")
+>>>> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+>>>> Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+>>>> ---
+>>>
+>>> While testing the above, I found out another issue on the haltpoll series.
+>>> But I am not sure what is best suited to cpuidle framework, hence requesting
+>>> some advise if below is a reasonable solution or something else is preferred.
+>>>
+>>> Essentially after haltpoll governor got introduced and regardless of the cpuidle
+>>> driver the default governor is gonna be haltpoll for a guest (given haltpoll
+>>> governor doesn't get registered for baremetal).
+>>
+>> Right.
+>>
+>>> Right now, for a KVM guest, the
+>>> idle governors have these ratings:
+>>>
+>>>  * ladder            -> 10
+>>>  * teo               -> 19
+>>>  * menu              -> 20
+>>>  * haltpoll          -> 21
+>>>  * ladder + nohz=off -> 25
+>>
+>> Yes. PowerPC KVM guests crash currently due to the use of the haltpoll
+>> governor (have a patch in my queue to fix this, but your solution
+>> embraces more cases).
+>>
+>>> When a guest is booted with MWAIT and intel_idle is probed and sucessfully
+>>> registered, we will end up with a haltpoll governor being used as opposed to
+>>> 'menu' (which used to be the default case). This would prevent IIUC that other
+>>> C-states get used other than poll_state (state 0) and state 1.
+>>>
+>>> Given that haltpoll governor is largely only useful with a cpuidle-haltpoll
+>>> it doesn't look reasonable to be the default? What about using haltpoll governor
+>>> as default when haltpoll idle driver registers or modloads.
+>>>
+>>> My idea to achieve the above would be to decrease the rating to 9 (before the
+>>> lowest rated governor) and retain old defaults before haltpoll. Then we would
+>>> allow a cpuidle driver to define a preferred governor to switch on idle driver
+>>> registration. Naturally all of would be ignored if overidden by
+>>> cpuidle.governor=.
+>>>
+>>> The diff below the scissors line is an example of that.
+>>>
+>>> Thoughts?
+>>
+>> Works for me. Rafael?
+> 
+> It works for me too, basically, except that I would rename
+> cpuidle_default_governor in the patch to cpuidle_prev_governor.
+> 
 
-I missed documenting "mode" register here. I will update it in v7.
+Great! I'll send over a series with this then (splitted accordingly).
 
-Regards,
-Anup
+Also, In the course of hotplug/hotunplug testing, I found two small issues with
+modload/modunload -- regardless of the hotplug patch. So I am gonna add that to
+the series too.
 
-> +
-> +RISC-V csr registers represent the supervisor mode control/status registers
-> +of a Guest VCPU and it has the following id bit patterns:
-> +  0x8020 0000 03 <index into the kvm_sregs struct:24> (32bit Host)
-> +  0x8030 0000 03 <index into the kvm_sregs struct:24> (64bit Host)
-> +
-> +Following are the RISC-V csr registers:
-> +
-> +    Encoding            Register  Description
-> +------------------------------------------------------------------
-> +  0x80x0 0000 0300 0000 sstatus   Supervisor status
-> +  0x80x0 0000 0300 0001 sie       Supervisor interrupt enable
-> +  0x80x0 0000 0300 0002 stvec     Supervisor trap vector base
-> +  0x80x0 0000 0300 0003 sscratch  Supervisor scratch register
-> +  0x80x0 0000 0300 0004 sepc      Supervisor exception program counter
-> +  0x80x0 0000 0300 0005 scause    Supervisor trap cause
-> +  0x80x0 0000 0300 0006 stval     Supervisor bad address or instruction
-> +  0x80x0 0000 0300 0007 sip       Supervisor interrupt pending
-> +  0x80x0 0000 0300 0008 satp      Supervisor address translation and protection
-> +
-> +RISC-V F extension registers represent the single precision floating point
-> +state of a Guest VCPU and it has the following id bit patterns:
-> +  0x8020 0000 04 <index into the __riscv_f_ext_state struct:24>
-> +
-> +Following are the RISC-V F extension registers:
-> +
-> +    Encoding            Register  Description
-> +------------------------------------------------------------------
-> +  0x8020 0000 0400 0000 f[0]      Floating point register 0
-> +  ...
-> +  0x8020 0000 0400 001f f[31]     Floating point register 31
-> +  0x8020 0000 0400 0020 fcsr      Floating point control and status register
-> +
-> +RISC-V D extension registers represent the double precision floating point
-> +state of a Guest VCPU and it has the following id bit patterns:
-> +  0x8020 0000 05 <index into the __riscv_d_ext_state struct:24> (fcsr)
-> +  0x8030 0000 05 <index into the __riscv_d_ext_state struct:24> (non-fcsr)
-> +
-> +Following are the RISC-V D extension registers:
-> +
-> +    Encoding            Register  Description
-> +------------------------------------------------------------------
-> +  0x8030 0000 0500 0000 f[0]      Floating point register 0
-> +  ...
-> +  0x8030 0000 0500 001f f[31]     Floating point register 31
-> +  0x8020 0000 0500 0020 fcsr      Floating point control and status register
-> +
-> +
->  4.69 KVM_GET_ONE_REG
->
->  Capability: KVM_CAP_ONE_REG
-> --
-> 2.17.1
->
+	Joao
