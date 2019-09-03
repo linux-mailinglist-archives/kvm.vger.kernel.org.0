@@ -2,108 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E8FEA71A2
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 19:28:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2E2DA71E7
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 19:44:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730102AbfICR2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 13:28:41 -0400
-Received: from mga07.intel.com ([134.134.136.100]:21969 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728571AbfICR2k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 13:28:40 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Sep 2019 10:28:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,463,1559545200"; 
-   d="scan'208";a="184830312"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga003.jf.intel.com with ESMTP; 03 Sep 2019 10:28:40 -0700
-Date:   Tue, 3 Sep 2019 10:28:40 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        id S1730087AbfICRoC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 13:44:02 -0400
+Received: from mail-eopbgr720051.outbound.protection.outlook.com ([40.107.72.51]:45951
+        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729877AbfICRoC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 13:44:02 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hp6hbLxahvRz/g5QlqX/dtVuTVKYgaMhn10vkvMWoCiTa0myCNCX0We0UouhQ6TmVF4ndxPX2lVy1KPQ0mmxRayELsjCSoZnW3G6k2DUwI2UXL6VKl3ADAkC2YIhugD5hnjP14H1XONEBJp1Pd5SpSbRfQ1dD9bFUpQNnIS9fA767RpJlEPdeePJgIPkDvTasbIauzVPMgJ3GSfCtri123XP4lXdp0lRBJ23J2MEN7sAKL01yQBysVtkxHZL4vrDmhaOGk/8owFcs9DRELdDBHgCuVJN99ZZ84lb1MFQ/j8jmAgoX5/SDSiLQstBRIxLs0XflpZKXEUdeERCwR0k6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aQri4cJJULQc9GihiE9Pu2GRvk4hKgUtgAZQso+Hn8I=;
+ b=oJKofScrbwcfcU5jpb2zt6QbSn+LjRM/xe7Oh2fMShJuNjBuGh+OjbnVGfP0Ko/clNXtTZJTm+Remamr7ixkAAgb0mW6cKD0TgimD1uTEpgjROZqDX0AUWo3FQkZja1yJPG+K7ySOK4rhzWfl7XVTK1J8JW9utUzkeoQwddt4dxqLCkdTau6y5waMkcHx54tFBNzC47tWve/SPNeanvTGfmY0cyWS9gH33u56cRpCcLZGuHWPmQLkQNCd46jlzj9hPM2l6wVegmGecq2F/b0p+KjdpNeJjpVUrlB7vvMmwRVUy7M6M2uLrYq8JarHBRbQSxdYRcmyJTjbE0kxKDWhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aQri4cJJULQc9GihiE9Pu2GRvk4hKgUtgAZQso+Hn8I=;
+ b=WiGcHCjbH+omyYn86RFJbWjmlZEPkY+hmRWeGRWgZ0V6le6IS97naIGivUBQVZ1wSz0R2CD7sNgNmOFTBloeOxmx1lmtHJU7SDbNg76wbrWHvhKin7XoJOPI/CCfECe+ii6idpq9hCeMfxTGRvUkBZaXshrnzKRfpOYgjJJe/bg=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (52.135.233.146) by
+ BYAPR05MB6022.namprd05.prod.outlook.com (20.178.53.151) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2241.12; Tue, 3 Sep 2019 17:44:00 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::b5c9:9c17:bcf1:1310]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::b5c9:9c17:bcf1:1310%5]) with mapi id 15.20.2241.011; Tue, 3 Sep 2019
+ 17:44:00 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [kvm-unit-tests PATCH 1/2] x86: nVMX: Do not use test_skip()
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: nVMX: Do not use test_skip() when
+ multiple tests are run
+Thread-Topic: [kvm-unit-tests PATCH 1/2] x86: nVMX: Do not use test_skip()
  when multiple tests are run
-Message-ID: <20190903172840.GJ10768@linux.intel.com>
+Thread-Index: AQHVX7C+p2lf87FZvEm9fMlumjMjOKcaOqsAgAAESIA=
+Date:   Tue, 3 Sep 2019 17:44:00 +0000
+Message-ID: <62FE01A3-810C-4254-92F2-D7047865752B@vmware.com>
 References: <20190830204031.3100-1-namit@vmware.com>
  <20190830204031.3100-2-namit@vmware.com>
+ <20190903172840.GJ10768@linux.intel.com>
+In-Reply-To: <20190903172840.GJ10768@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=namit@vmware.com; 
+x-originating-ip: [66.170.99.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4a91edb8-d60c-4b0b-f23f-08d730964dc1
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:BYAPR05MB6022;
+x-ms-traffictypediagnostic: BYAPR05MB6022:
+x-microsoft-antispam-prvs: <BYAPR05MB6022575F42A566B493E26232D0B90@BYAPR05MB6022.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2089;
+x-forefront-prvs: 01494FA7F7
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(39860400002)(136003)(376002)(346002)(396003)(199004)(189003)(86362001)(8676002)(81156014)(81166006)(6436002)(476003)(6506007)(5660300002)(3846002)(6116002)(229853002)(11346002)(53936002)(53546011)(446003)(76116006)(486006)(99286004)(66066001)(66446008)(66946007)(6486002)(64756008)(66556008)(66476007)(2616005)(71200400001)(71190400001)(305945005)(26005)(186003)(316002)(6512007)(14454004)(4326008)(6916009)(8936002)(478600001)(54906003)(76176011)(2906002)(6246003)(33656002)(36756003)(7736002)(102836004)(25786009)(14444005)(256004);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR05MB6022;H:BYAPR05MB4776.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: vmware.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: veL/2M12t0JX30oubbqDPHQ3+14yg74TMzMnHMnkJn2WYyJPehTRqlqKVXC5s+B2biuhSLlXxllUAYT+g75oLwiFfWY9lbSFnJrVtaOsDqSECCmj/uBznzntHW1R0dQs7KdP+AApYN0IDYbkRU6vvC+VsxjHuyE+phlu2Ab4hTvnpN3MZrYnADvRV9lyyr1KqxpesJZZqmKVYpq3YUhEQJreFAeRBlgHS/0vIB82nhHcDV1WMg07b6fXanAOdVomCa+HQo9KhTPtKLT+oVQ2ZzH9WOYHtrWYshLk+sXNuCr+r2x5SRvYRV3wPIzg/OR65nJAnPrX5lVYbHDkhYj/dpdtr69HWSOc18WU1NuYJANcfW0nmzkzjTGYWaRd7REiIcRDmHdEArJy+niXcOhm13hI8vFR9NKhAO3sN6DdiIk=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <01AF5E1CA97912408AC266C4D2A02C69@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190830204031.3100-2-namit@vmware.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a91edb8-d60c-4b0b-f23f-08d730964dc1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Sep 2019 17:44:00.2479
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yAjgPZ8EBwzdEsDwr16yz8k5HNx/EaRF3QKBnm3xmO5xhcs5tP1WUYlFAND/E+YjlrxqOC3sS0H5UV+FYnPm8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB6022
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 01:40:30PM -0700, Nadav Amit wrote:
-> Using test_skip() when multiple tests are run causes all the following
-> tests to be skipped. Instead, just print a message and return.
-> 
-> Fixes: 47cc3d85c2fe ("nVMX x86: Check PML and EPT on vmentry of L2 guests")
-> Fixes: 7fd449f2ed2e ("nVMX x86: Check VPID value on vmentry of L2 guests")
-> Fixes: 181219bfd76b ("x86: Add test for checking NMI controls on vmentry of L2 guests")
-> Fixes: 1d70eb823e12 ("nVMX x86: Check EPTP on vmentry of L2 guests")
-> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Nadav Amit <namit@vmware.com>
-
-invvpid_test_v2() also has a bunch of bad calls to test_skip().
-
-What about removing test_skip() entirely?  The code for in_guest looks
-suspect, e.g. at a glance it should use HYPERCALL_VMSKIP instead of
-HYPERCALL_VMABORT.  The only somewhat legit usage is the ept tests, and
-only then because the ept tests are all at the end of the array.
-Returning success/failure from ept_access_test_setup() seems like a
-better solution than test_skip.
-
-> ---
->  x86/vmx_tests.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index f035f24..4ff1570 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -4040,7 +4040,7 @@ static void test_vpid(void)
->  
->  	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
->  	    (ctrl_cpu_rev[1].clr & CPU_VPID))) {
-> -		test_skip("Secondary controls and/or VPID not supported");
-> +		printf("Secondary controls and/or VPID not supported\n");
->  		return;
->  	}
->  
-> @@ -4544,7 +4544,7 @@ static void test_nmi_ctrls(void)
->  
->  	if ((ctrl_pin_rev.clr & (PIN_NMI | PIN_VIRT_NMI)) !=
->  	    (PIN_NMI | PIN_VIRT_NMI)) {
-> -		test_skip("NMI exiting and Virtual NMIs are not supported !");
-> +		printf("NMI exiting and Virtual NMIs are not supported !\n");
->  		return;
->  	}
->  
-> @@ -4657,7 +4657,7 @@ static void test_ept_eptp(void)
->  
->  	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
->  	    (ctrl_cpu_rev[1].clr & CPU_EPT))) {
-> -		test_skip("\"CPU secondary\" and/or \"enable EPT\" execution controls are not supported !");
-> +		printf("\"CPU secondary\" and/or \"enable EPT\" execution controls are not supported !\n");
->  		return;
->  	}
->  
-> @@ -4844,7 +4844,7 @@ static void test_pml(void)
->  
->  	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
->  	    (ctrl_cpu_rev[1].clr & CPU_EPT) && (ctrl_cpu_rev[1].clr & CPU_PML))) {
-> -		test_skip("\"Secondary execution\" control or \"enable EPT\" control or \"enable PML\" control is not supported !");
-> +		printf("\"Secondary execution\" control or \"enable EPT\" control or \"enable PML\" control is not supported !\n");
->  		return;
->  	}
->  
-> -- 
-> 2.17.1
-> 
+PiBPbiBTZXAgMywgMjAxOSwgYXQgMTA6MjggQU0sIFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW4u
+ai5jaHJpc3RvcGhlcnNvbkBpbnRlbC5jb20+IHdyb3RlOg0KPiANCj4gT24gRnJpLCBBdWcgMzAs
+IDIwMTkgYXQgMDE6NDA6MzBQTSAtMDcwMCwgTmFkYXYgQW1pdCB3cm90ZToNCj4+IFVzaW5nIHRl
+c3Rfc2tpcCgpIHdoZW4gbXVsdGlwbGUgdGVzdHMgYXJlIHJ1biBjYXVzZXMgYWxsIHRoZSBmb2xs
+b3dpbmcNCj4+IHRlc3RzIHRvIGJlIHNraXBwZWQuIEluc3RlYWQsIGp1c3QgcHJpbnQgYSBtZXNz
+YWdlIGFuZCByZXR1cm4uDQo+PiANCj4+IEZpeGVzOiA0N2NjM2Q4NWMyZmUgKCJuVk1YIHg4Njog
+Q2hlY2sgUE1MIGFuZCBFUFQgb24gdm1lbnRyeSBvZiBMMiBndWVzdHMiKQ0KPj4gRml4ZXM6IDdm
+ZDQ0OWYyZWQyZSAoIm5WTVggeDg2OiBDaGVjayBWUElEIHZhbHVlIG9uIHZtZW50cnkgb2YgTDIg
+Z3Vlc3RzIikNCj4+IEZpeGVzOiAxODEyMTliZmQ3NmIgKCJ4ODY6IEFkZCB0ZXN0IGZvciBjaGVj
+a2luZyBOTUkgY29udHJvbHMgb24gdm1lbnRyeSBvZiBMMiBndWVzdHMiKQ0KPj4gRml4ZXM6IDFk
+NzBlYjgyM2UxMiAoIm5WTVggeDg2OiBDaGVjayBFUFRQIG9uIHZtZW50cnkgb2YgTDIgZ3Vlc3Rz
+IikNCj4+IENjOiBLcmlzaCBTYWRodWtoYW4gPGtyaXNoLnNhZGh1a2hhbkBvcmFjbGUuY29tPg0K
+Pj4gU2lnbmVkLW9mZi1ieTogTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4NCj4gDQo+IGlu
+dnZwaWRfdGVzdF92MigpIGFsc28gaGFzIGEgYnVuY2ggb2YgYmFkIGNhbGxzIHRvIHRlc3Rfc2tp
+cCgpLg0KDQpJbiB0aGUgY2FzZSBvZiBpbnZ2cGlkX3Rlc3RfdjIoKSB0aGUgdXNlIHNlZW1zIGNv
+cnJlY3QsIGFzIHRoZSBjYWxsIGlzIG5vdA0KZW5jYXBzdWxhdGVkIHdpdGhpbiBhIGdyb3VwIG9m
+IHRlc3RzLiBZb3Ugd2FudCB0byBza2lwIGFsbCB0aGUgdGVzdHMgaWYNCmludnZwaWQgaXMgbm90
+IHN1cHBvcnRlZCBmb3Igc29tZSByZWFzb24uDQoNCj4gV2hhdCBhYm91dCByZW1vdmluZyB0ZXN0
+X3NraXAoKSBlbnRpcmVseT8gIFRoZSBjb2RlIGZvciBpbl9ndWVzdCBsb29rcw0KPiBzdXNwZWN0
+LCBlLmcuIGF0IGEgZ2xhbmNlIGl0IHNob3VsZCB1c2UgSFlQRVJDQUxMX1ZNU0tJUCBpbnN0ZWFk
+IG9mDQo+IEhZUEVSQ0FMTF9WTUFCT1JULiAgVGhlIG9ubHkgc29tZXdoYXQgbGVnaXQgdXNhZ2Ug
+aXMgdGhlIGVwdCB0ZXN0cywgYW5kDQo+IG9ubHkgdGhlbiBiZWNhdXNlIHRoZSBlcHQgdGVzdHMg
+YXJlIGFsbCBhdCB0aGUgZW5kIG9mIHRoZSBhcnJheS4NCj4gUmV0dXJuaW5nIHN1Y2Nlc3MvZmFp
+bHVyZSBmcm9tIGVwdF9hY2Nlc3NfdGVzdF9zZXR1cCgpIHNlZW1zIGxpa2UgYQ0KPiBiZXR0ZXIg
+c29sdXRpb24gdGhhbiB0ZXN0X3NraXAuDQoNCkkgZG9u4oCZdCBrbm93LiB0ZXN0X3NraXAoKSBk
+b2VzIHNlZW0g4oCcbmljZeKAnSBpbiB0aGVvcnkgKGFzIGxvbmcgYXMgaXQgaXMgbm90DQp1c2Vk
+IGltcHJvcGVybHkpLiBIYXZpbmcgc2FpZCB0aGF0LCB0aGUgZmFjdCB0aGF0IGl0IHVzZXMgSFlQ
+RVJDQUxMX1ZNQUJPUlQNCmRvZXMgc2VlbSB3cm9uZy4gSSB0aGluayBpdCBzaG91bGQgYmUgYSBz
+ZXBhcmF0ZSBjaGFuZ2UgdGhvdWdoLg==
