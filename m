@@ -2,334 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6B4EA76A1
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 23:58:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECC88A777E
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 01:17:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727168AbfICV6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 17:58:24 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:38546 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727223AbfICV6X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 17:58:23 -0400
-Received: by mail-pf1-f202.google.com with SMTP id b8so15070885pfd.5
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 14:58:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=JeYG/CdRS4FJjwc/zJdCeh9ANv77iaZ4013EMkx3oLc=;
-        b=kjRIvuf3TT05qpCoJZz3m6GnD21RCJMM3Bd/+ZtkPvMqD7S9TnY4qRRFUyUtc0y0Yb
-         vAaiAiHIqIG5AnEbhg/cTGb5Xnmbn27A3xkto0sEXBAODg1vUEwCfZTSjejXrYNEVOaU
-         c2x5q1ca5I8YQwyw7guhXlPBFaqecwNLkfuufT29fT8J2lK/xCJBTlTSWoDmUzgyKXdI
-         6/LnNL6AoodzxyvI4uYB0aun9vV+CuymkhbJPGEV7fxZ0nLnU321QykHleBqQcs1Wm1/
-         489HG81/2W12AY7feeipSnNnVyJR+8qBsRM3naE3mkbb0NiX0WRRaZxZSt3hyBpeiYkF
-         plpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=JeYG/CdRS4FJjwc/zJdCeh9ANv77iaZ4013EMkx3oLc=;
-        b=uMoPblCS5z0lUP5ZlqovCsvaUWZH+ywqvun3fO46nFE7FHi54P96SZTE9v29uPtzDt
-         1GGMDIMJnoVgn3Mhy4JFK0e40Xcvh7wITWF5zb2MGuF8dbuLQGkBRw0+I9bLuYxmYPJA
-         pl/bjopDLLGvQPqdcDOUyKbY0uXBQc0k4v/T5KdOdkchn6BY9+NlHXIs3/B7G/pD2rM0
-         tbSlK8hHxjr0GNHdvKxiR7kGnDcqN8BpvYZLG1j/E9HlJBzlI76H0zkvhBvWtVpCq8CY
-         0tJKG388GLANCNitqsthsvTwOYZXy/SgScuiX9hoMlnHKJJxwo0AU4NWPE9ksUICESmd
-         iopQ==
-X-Gm-Message-State: APjAAAUqzWdxkKERbt8v6icJmNWbNMCcN0vXG6liFTb0KhC+QC+BtSHr
-        svxG7wgEwCX54L7P5WpIkWlJR3YFRKpZzaeMS/LcZwHWaNJgTzm3+usXUo6KrxLhrI4Z13IYEGr
-        YpVIbj2joFynjo7HhHy3ehTd39PHd3JAFKQJse/WxtWM1QpCCuFlIUagtiQ==
-X-Google-Smtp-Source: APXvYqzQfbtzpiE1Fxt81iHH3MXI0nVspsJZ78h0qdIHqnX78tz5Y224aXK2JaiOpic/zakYJROit9XfpW4=
-X-Received: by 2002:a63:3805:: with SMTP id f5mr31966106pga.272.1567547902783;
- Tue, 03 Sep 2019 14:58:22 -0700 (PDT)
-Date:   Tue,  3 Sep 2019 14:58:01 -0700
-In-Reply-To: <20190903215801.183193-1-oupton@google.com>
-Message-Id: <20190903215801.183193-9-oupton@google.com>
-Mime-Version: 1.0
-References: <20190903215801.183193-1-oupton@google.com>
-X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-Subject: [kvm-unit-tests PATCH v3 8/8] x86: VMX: Add tests for nested "load IA32_PERF_GLOBAL_CTRL"
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        id S1727364AbfICXRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 19:17:00 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:51306 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727109AbfICXRA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 19:17:00 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83NEJdl191442;
+        Tue, 3 Sep 2019 23:15:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=apk+8zl3WQsli6AHIRTsGckTHw0kmW1CShKTDWmKzjQ=;
+ b=EFvw3n4xr0LOWxxydZaYQfX2ND2r+ecMEWhnYcf6O6MT1Q+UF1ZteJUqYzVEo6u+1L9p
+ qflEABL0zK9aUKITdwg27KgwgxesCcdKMSxq1MyKbypl1v7BiYILALapQNxvp0bOXxZM
+ wUfCqqUyqI2PtGa98MrANruuJjriFsdMP1BCmq/eOdPVudUIkRglp/SRjDUs24KAXl/W
+ t1xqsTpJ5y66rENUT4Bmzd0DrAIYsaOA3N65xQs2C4c2cG95AGPmzxiuO7UuISz9vKNl
+ 9Q4b3NJ6MOfLSsJQf8XyMcaYMDEFWZxpoh9kDHc9tgzJxKuq1DOBIYsroxUNXCCw7O9g Fg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2ut1mc80c3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 Sep 2019 23:15:34 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83NEQnD072712;
+        Tue, 3 Sep 2019 23:15:33 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2usu5215td-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 Sep 2019 23:15:33 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x83NFSMj028467;
+        Tue, 3 Sep 2019 23:15:28 GMT
+Received: from [192.168.14.112] (/79.176.230.160)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 03 Sep 2019 16:15:28 -0700
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 1/2] KVM: VMX: Disable posted interrupts for odd IRQs
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190903142954.3429-2-graf@amazon.com>
+Date:   Wed, 4 Sep 2019 02:15:23 +0300
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AD5685B6-E633-4875-AD9A-4E2822D358DD@oracle.com>
+References: <20190903142954.3429-1-graf@amazon.com>
+ <20190903142954.3429-2-graf@amazon.com>
+To:     Alexander Graf <graf@amazon.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909030233
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909030233
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tests to verify that KVM performs the correct checks on Host/Guest state
-at VM-entry, as described in SDM 26.3.1.1 "Checks on Guest Control
-Registers, Debug Registers, and MSRs" and SDM 26.2.2 "Checks on Host
-Control Registers and MSRs".
 
-Test that KVM does the following:
 
-    If the "load IA32_PERF_GLOBAL_CTRL" VM-entry control is 1, the
-    reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
-    GUEST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
-    should fail with an exit reason of "VM-entry failure due to invalid
-    guest state" (33). On a successful VM-entry, the correct value
-    should be observed when the nested VM performs an RDMSR on
-    IA32_PERF_GLOBAL_CTRL.
+> On 3 Sep 2019, at 17:29, Alexander Graf <graf@amazon.com> wrote:
+>=20
+> We can easily route hardware interrupts directly into VM context when
+> they target the "Fixed" or "LowPriority" delivery modes.
+>=20
+> However, on modes such as "SMI" or "Init", we need to go via KVM code
+> to actually put the vCPU into a different mode of operation, so we can
+> not post the interrupt
 
-    If the "load IA32_PERF_GLOBAL_CTRL" VM-exit control is 1, the
-    reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
-    HOST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
-    should fail with a VM-instruction error of "VM entry with invalid
-    host-state field(s)" (8). On a successful VM-exit, the correct value
-    should be observed when L1 performs an RDMSR on
-    IA32_PERF_GLOBAL_CTRL.
+I would also mention in commit message that one can see this is also
+true in KVM=E2=80=99s vLAPIC code. i.e. __apic_accept_irq() can call
+kvm_x86_ops->deliver_posted_interrupt() only in case deliver-mode is
+either =E2=80=9CFixed=E2=80=9D or =E2=80=9CLowPriority=E2=80=9D.=20
 
-Suggested-by: Jim Mattson <jmattson@google.com>
-Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- x86/vmx_tests.c | 199 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 197 insertions(+), 2 deletions(-)
+>=20
+> Add code in the VMX PI logic to explicitly refuse to establish posted
+> mappings for advanced IRQ deliver modes.
+>=20
+> This fixes a bug I have with code which configures real hardware to
+> inject virtual SMIs into my guest.
+>=20
+> Signed-off-by: Alexander Graf <graf@amazon.com>
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index b72a27583793..73c46eba6be9 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -5033,7 +5033,7 @@ static void guest_state_test_main(void)
- 			break;
- 
- 		if (data->enabled) {
--			obs = rdmsr(obs);
-+			obs = rdmsr(data->msr);
- 			report("Guest state is 0x%lx (expected 0x%lx)",
- 			       data->exp == obs, obs, data->exp);
- 		}
-@@ -6854,6 +6854,200 @@ static void test_host_efer(void)
- 	test_efer(HOST_EFER, "HOST_EFER", EXI_CONTROLS, EXI_LOAD_EFER);
- }
- 
-+union cpuid10_eax {
-+	struct {
-+		unsigned int version_id:8;
-+		unsigned int num_counters:8;
-+		unsigned int bit_width:8;
-+		unsigned int mask_length:8;
-+	} split;
-+	unsigned int full;
-+};
-+
-+union cpuid10_edx {
-+	struct {
-+		unsigned int num_counters_fixed:5;
-+		unsigned int bit_width_fixed:8;
-+		unsigned int reserved:19;
-+	} split;
-+	unsigned int full;
-+};
-+
-+static bool valid_pgc(u64 val)
-+{
-+	struct cpuid id;
-+	union cpuid10_eax eax;
-+	union cpuid10_edx edx;
-+	u64 mask;
-+
-+	id = cpuid(0xA);
-+	eax.full = id.a;
-+	edx.full = id.d;
-+	mask = ~(((1ull << eax.split.num_counters) - 1) |
-+		(((1ull << edx.split.num_counters_fixed) - 1) << 32));
-+
-+	return !(val & mask);
-+}
-+
-+static void test_pgc_vmlaunch(u32 xerror, bool xfail, bool host)
-+{
-+	u32 inst_err;
-+	u64 guest_rip, inst_len, obs;
-+	bool success;
-+	struct load_state_test_data *data = &load_state_test_data;
-+
-+	if (host) {
-+		success = vmlaunch_succeeds();
-+		obs = rdmsr(data->msr);
-+		if (data->enabled && success)
-+			report("Host state is 0x%lx (expected 0x%lx)",
-+			       data->exp == obs, obs, data->exp);
-+	} else {
-+		if (xfail)
-+			enter_guest_with_invalid_guest_state();
-+		else
-+			enter_guest();
-+		success = VMX_VMCALL == (vmcs_read(EXI_REASON) & 0xff);
-+		guest_rip = vmcs_read(GUEST_RIP);
-+		inst_len = vmcs_read(EXI_INST_LEN);
-+		if (success)
-+			vmcs_write(GUEST_RIP, guest_rip + inst_len);
-+	}
-+	if (!success) {
-+		inst_err = vmcs_read(VMX_INST_ERROR);
-+		report("vmlaunch failed, VMX Inst Error is %d (expected %d)",
-+		       xerror == inst_err, inst_err, xerror);
-+	} else {
-+		report("vmlaunch succeeded", success != xfail);
-+	}
-+}
-+
-+/*
-+ * test_load_pgc is a generic function for testing the
-+ * "load IA32_PERF_GLOBAL_CTRL" VM-{entry,exit} control. This test function
-+ * will test the provided ctrl_val disabled and enabled.
-+ *
-+ * @nr - VMCS field number corresponding to the Host/Guest state field
-+ * @name - Name of the above VMCS field for printing in test report
-+ * @ctrl_nr - VMCS field number corresponding to the VM-{entry,exit} control
-+ * @ctrl_val - Bit to set on the ctrl field.
-+ */
-+static void test_load_pgc(u32 nr, const char *name, u32 ctrl_nr,
-+			  const char *ctrl_name, u64 ctrl_val)
-+{
-+	u64 ctrl_saved = vmcs_read(ctrl_nr);
-+	u64 pgc_saved = vmcs_read(nr);
-+	u64 i, val;
-+	bool host = nr == HOST_PERF_GLOBAL_CTRL;
-+	struct load_state_test_data *data = &load_state_test_data;
-+
-+	data->msr = MSR_CORE_PERF_GLOBAL_CTRL;
-+	msr_bmp_init();
-+	if (!host) {
-+		vmx_set_test_stage(1);
-+		test_set_guest(guest_state_test_main);
-+	}
-+	vmcs_write(ctrl_nr, ctrl_saved & ~ctrl_val);
-+	data->enabled = false;
-+	report_prefix_pushf("\"load IA32_PERF_GLOBAL_CTRL\"=0 on %s",
-+			    ctrl_name);
-+	for (i = 0; i < 64; i++) {
-+		val = 1ull << i;
-+		vmcs_write(nr, val);
-+		report_prefix_pushf("%s = 0x%lx", name, val);
-+		/*
-+		 * If the "load IA32_PERF_GLOBAL_CTRL" bit is 0 then
-+		 * the {HOST,GUEST}_IA32_PERF_GLOBAL_CTRL field is ignored,
-+		 * thus setting reserved bits in this field does not cause
-+		 * vmlaunch to fail.
-+		 */
-+		test_pgc_vmlaunch(0, false, host);
-+		report_prefix_pop();
-+	}
-+	report_prefix_pop();
-+
-+	vmcs_write(ctrl_nr, ctrl_saved | ctrl_val);
-+	data->enabled = true;
-+	report_prefix_pushf("\"load IA32_PERF_GLOBAL_CTRL\"=1 on %s",
-+			    ctrl_name);
-+	for (i = 0; i < 64; i++) {
-+		val = 1ull << i;
-+		data->exp = val;
-+		vmcs_write(nr, val);
-+		report_prefix_pushf("%s = 0x%lx", name, val);
-+		if (valid_pgc(val)) {
-+			test_pgc_vmlaunch(0, false, host);
-+		} else {
-+			/*
-+			 * [SDM 30.4]
-+			 *
-+			 * Invalid host state fields result in an VM
-+			 * instruction error with error number 8
-+			 * (VMXERR_ENTRY_INVALID_HOST_STATE_FIELD)
-+			 */
-+			if (host) {
-+				test_pgc_vmlaunch(
-+					VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
-+					true, host);
-+			/*
-+			 * [SDM 26.1]
-+			 *
-+			 * If a VM-Entry fails according to one of
-+			 * the guest-state checks, the exit reason on the VMCS
-+			 * will be set to reason number 33 (VMX_FAIL_STATE)
-+			 */
-+			} else {
-+				test_pgc_vmlaunch(
-+					0,
-+					true, host);
-+				TEST_ASSERT_EQ(
-+					VMX_ENTRY_FAILURE | VMX_FAIL_STATE,
-+					vmcs_read(EXI_REASON));
-+			}
-+		}
-+		report_prefix_pop();
-+	}
-+
-+	report_prefix_pop();
-+
-+	if (nr == GUEST_PERF_GLOBAL_CTRL) {
-+		/*
-+		 * Let the guest finish execution
-+		 */
-+		vmx_set_test_stage(2);
-+		vmcs_write(ctrl_nr, ctrl_saved);
-+		vmcs_write(nr, pgc_saved);
-+		enter_guest();
-+	}
-+
-+	vmcs_write(ctrl_nr, ctrl_saved);
-+	vmcs_write(nr, pgc_saved);
-+}
-+
-+static void test_load_host_pgc(void)
-+{
-+	if (!(ctrl_exit_rev.clr & EXI_LOAD_PERF)) {
-+		printf("\"load IA32_PERF_GLOBAL_CTRL\" "
-+		       "exit control not supported\n");
-+		return;
-+	}
-+
-+	test_load_pgc(HOST_PERF_GLOBAL_CTRL, "HOST_PERF_GLOBAL_CTRL",
-+		      EXI_CONTROLS, "EXI_CONTROLS", EXI_LOAD_PERF);
-+}
-+
-+
-+static void test_load_guest_pgc(void)
-+{
-+	if (!(ctrl_enter_rev.clr & ENT_LOAD_PERF)) {
-+		printf("\"load IA32_PERF_GLOBAL_CTRL\" "
-+		       "entry control not supported\n");
-+	}
-+
-+	test_load_pgc(GUEST_PERF_GLOBAL_CTRL, "GUEST_PERF_GLOBAL_CTRL",
-+		      ENT_CONTROLS, "ENT_CONTROLS", ENT_LOAD_PERF);
-+}
-+
- /*
-  * PAT values higher than 8 are uninteresting since they're likely lumped
-  * in with "8". We only test values above 8 one bit at a time,
-@@ -7147,6 +7341,7 @@ static void vmx_host_state_area_test(void)
- 	test_sysenter_field(HOST_SYSENTER_EIP, "HOST_SYSENTER_EIP");
- 
- 	test_host_efer();
-+	test_load_host_pgc();
- 	test_load_host_pat();
- 	test_host_segment_regs();
- 	test_host_desc_tables();
-@@ -8587,7 +8782,6 @@ static int invalid_msr_entry_failure(struct vmentry_failure *failure)
- 	return VMX_TEST_VMEXIT;
- }
- 
--
- #define TEST(name) { #name, .v2 = name }
- 
- /* name/init/guest_main/exit_handler/syscall_handler/guest_regs */
-@@ -8637,6 +8831,7 @@ struct vmx_test vmx_tests[] = {
- 	TEST(vmx_host_state_area_test),
- 	TEST(vmx_guest_state_area_test),
- 	TEST(vmentry_movss_shadow_test),
-+	TEST(test_load_guest_pgc),
- 	/* APICv tests */
- 	TEST(vmx_eoi_bitmap_ioapic_scan_test),
- 	TEST(vmx_hlt_with_rvi_test),
--- 
-2.23.0.187.g17f5b7556c-goog
+With some small improvements I written inline below:
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+
+> ---
+> arch/x86/kvm/vmx/vmx.c | 22 ++++++++++++++++++++++
+> 1 file changed, 22 insertions(+)
+>=20
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 570a233e272b..d16c4ae8f685 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7401,6 +7401,28 @@ static int vmx_update_pi_irte(struct kvm *kvm, =
+unsigned int host_irq,
+> 			continue;
+> 		}
+>=20
+> +		switch (irq.delivery_mode) {
+> +		case dest_Fixed:
+> +		case dest_LowestPrio:
+> +			break;
+> +		default:
+> +			/*
+> +			 * For non-trivial interrupt events, we need to =
+go
+> +			 * through the full KVM IRQ code, so refuse to =
+take
+> +			 * any direct PI assignments here.
+> +			 */
+> +
+> +			ret =3D irq_set_vcpu_affinity(host_irq, NULL);
+> +			if (ret < 0) {
+> +				printk(KERN_INFO
+> +				   "failed to back to remapped mode, =
+irq: %u\n",
+> +				   host_irq);
+> +				goto out;
+
+I recommend we will chose to print here a string that is different than =
+the !kvm_intr_is_single_vcpu()
+case to make it easier to diagnose which case exactly failed.
+
+-Liran
+
+> +			}
+> +
+> +			continue;
+> +		}
+> +
+> 		vcpu_info.pi_desc_addr =3D __pa(vcpu_to_pi_desc(vcpu));
+> 		vcpu_info.vector =3D irq.vector;
+>=20
+> --=20
+> 2.17.1
+>=20
+>=20
+>=20
+>=20
+> Amazon Development Center Germany GmbH
+> Krausenstr. 38
+> 10117 Berlin
+> Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+> Sitz: Berlin
+> Ust-ID: DE 289 237 879
+>=20
+>=20
+>=20
 
