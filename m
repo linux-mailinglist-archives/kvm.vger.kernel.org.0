@@ -2,144 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46805A6199
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 08:37:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C933AA6286
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 09:31:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727369AbfICGh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 02:37:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51178 "EHLO mx1.redhat.com"
+        id S1727864AbfICHb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 03:31:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57418 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725878AbfICGh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 02:37:27 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726698AbfICHb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 03:31:26 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A54827E422;
-        Tue,  3 Sep 2019 06:37:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B68EA1001284;
-        Tue,  3 Sep 2019 06:37:23 +0000 (UTC)
-Date:   Tue, 3 Sep 2019 08:37:21 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, rkrcmar@redhat.com, maz@kernel.org,
-        vladimir.murzin@arm.com, andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests RFC PATCH 02/16] arm/arm64: psci: Don't run C
- code without stack or vectors
-Message-ID: <20190903063721.hzyz7kshwoqnuj5l@kamzik.brq.redhat.com>
-References: <1566999511-24916-1-git-send-email-alexandru.elisei@arm.com>
- <1566999511-24916-3-git-send-email-alexandru.elisei@arm.com>
- <20190828144522.qkmckjcmrdayfq7r@kamzik.brq.redhat.com>
- <a2da5efd-b466-3fc2-f8a3-eb9a852f2fdc@arm.com>
- <1ed80409-aaf2-162f-b84a-3c9d88cd8bc8@arm.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id BD5D785543
+        for <kvm@vger.kernel.org>; Tue,  3 Sep 2019 07:31:25 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id c1so9962146wrb.12
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 00:31:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=vIdlVo3wzaAg7+E51hvuCmhSjy3lqZ2GvkawXNng+DY=;
+        b=TVHi+JjA2wfP/uP508Hqz+kT/JQjYmR88eMT6/dSgp/lnGjHeZWhpuxXn3jxoCwX4m
+         tkrPOZAUfR06FQNjsy5rEnD7I7TIKXOJfgsLL6HgpGyR8UcMwtRBI7J3AKttuUpC3kRi
+         wJ8duB9ErWt3LYcLDCcmGWOssx4D+Ue0MvDBU2WJzdJBMf3lhTj+4bBvDzg9vs2MuXI8
+         w6CApzEI98R3fUjvGSIggaGHJkRC60Sv8I1q2Et5N6NxlIccyLkYCkazA7K5ggdSjdr1
+         Yt2aNja0Fy/Eld5lFoWajBe5cNmFwWbLhs5RNg3ZrvG449fo4OzmH19IzteABuz4Tn1X
+         9shQ==
+X-Gm-Message-State: APjAAAXosEkmWThizom7umaA7BUsDTiAPMguuUgYzvvTcLLJxVhs6r4v
+        I/fSZrQdivofUNMfpsPuYRAT5QLb2vxxCMJ0AfmzX4CPrcyfWcW+OmRpfm+TILol1FLC3Xibg25
+        MstlcdwiD/0fH
+X-Received: by 2002:adf:8043:: with SMTP id 61mr35027588wrk.115.1567495884505;
+        Tue, 03 Sep 2019 00:31:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyeFTpVz+dse95eWq0nocs/IG2NKjpvXX30eGt/rJU82VMrZ0Bsyy+QcPwkIDLVpATtIdNOPA==
+X-Received: by 2002:adf:8043:: with SMTP id 61mr35027562wrk.115.1567495884199;
+        Tue, 03 Sep 2019 00:31:24 -0700 (PDT)
+Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it. [79.36.61.170])
+        by smtp.gmail.com with ESMTPSA id v8sm34676506wra.79.2019.09.03.00.31.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2019 00:31:23 -0700 (PDT)
+Date:   Tue, 3 Sep 2019 09:31:20 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 2/5] vsock/virtio: reduce credit update messages
+Message-ID: <20190903073120.kefllalytkvidcvh@steredhat>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190717113030.163499-3-sgarzare@redhat.com>
+ <20190903003050-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1ed80409-aaf2-162f-b84a-3c9d88cd8bc8@arm.com>
+In-Reply-To: <20190903003050-mutt-send-email-mst@kernel.org>
 User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 03 Sep 2019 06:37:26 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 02, 2019 at 03:55:48PM +0100, Alexandru Elisei wrote:
-> On 8/28/19 4:14 PM, Alexandru Elisei wrote:
+On Tue, Sep 03, 2019 at 12:38:02AM -0400, Michael S. Tsirkin wrote:
+> On Wed, Jul 17, 2019 at 01:30:27PM +0200, Stefano Garzarella wrote:
+> > In order to reduce the number of credit update messages,
+> > we send them only when the space available seen by the
+> > transmitter is less than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
+> > 
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >  include/linux/virtio_vsock.h            |  1 +
+> >  net/vmw_vsock/virtio_transport_common.c | 16 +++++++++++++---
+> >  2 files changed, 14 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > index 7d973903f52e..49fc9d20bc43 100644
+> > --- a/include/linux/virtio_vsock.h
+> > +++ b/include/linux/virtio_vsock.h
+> > @@ -41,6 +41,7 @@ struct virtio_vsock_sock {
+> >  
+> >  	/* Protected by rx_lock */
+> >  	u32 fwd_cnt;
+> > +	u32 last_fwd_cnt;
+> >  	u32 rx_bytes;
+> >  	struct list_head rx_queue;
+> >  };
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index 095221f94786..a85559d4d974 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -211,6 +211,7 @@ static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
+> >  void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct virtio_vsock_pkt *pkt)
+> >  {
+> >  	spin_lock_bh(&vvs->tx_lock);
+> > +	vvs->last_fwd_cnt = vvs->fwd_cnt;
+> >  	pkt->hdr.fwd_cnt = cpu_to_le32(vvs->fwd_cnt);
+> >  	pkt->hdr.buf_alloc = cpu_to_le32(vvs->buf_alloc);
+> >  	spin_unlock_bh(&vvs->tx_lock);
+> > @@ -261,6 +262,7 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >  	struct virtio_vsock_sock *vvs = vsk->trans;
+> >  	struct virtio_vsock_pkt *pkt;
+> >  	size_t bytes, total = 0;
+> > +	u32 free_space;
+> >  	int err = -EFAULT;
+> >  
+> >  	spin_lock_bh(&vvs->rx_lock);
+> > @@ -291,11 +293,19 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >  			virtio_transport_free_pkt(pkt);
+> >  		}
+> >  	}
+> > +
+> > +	free_space = vvs->buf_alloc - (vvs->fwd_cnt - vvs->last_fwd_cnt);
+> > +
+> >  	spin_unlock_bh(&vvs->rx_lock);
+> >  
+> > -	/* Send a credit pkt to peer */
+> > -	virtio_transport_send_credit_update(vsk, VIRTIO_VSOCK_TYPE_STREAM,
+> > -					    NULL);
+> > +	/* We send a credit update only when the space available seen
+> > +	 * by the transmitter is less than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE
 > 
-> > On 8/28/19 3:45 PM, Andrew Jones wrote:
-> >> On Wed, Aug 28, 2019 at 02:38:17PM +0100, Alexandru Elisei wrote:
-> >>> The psci test performs a series of CPU_ON/CPU_OFF cycles for CPU 1. This is
-> >>> done by setting the entry point for the CPU_ON call to the physical address
-> >>> of the C function cpu_psci_cpu_die.
-> >>>
-> >>> The compiler is well within its rights to use the stack when generating
-> >>> code for cpu_psci_cpu_die.  However, because no stack initialization has
-> >>> been done, the stack pointer is zero, as set by KVM when creating the VCPU.
-> >>> This causes a data abort without a change in exception level. The VBAR_EL1
-> >>> register is also zero (the KVM reset value for VBAR_EL1), the MMU is off,
-> >>> and we end up trying to fetch instructions from address 0x200.
-> >>>
-> >>> At this point, a stage 2 instruction abort is generated which is taken to
-> >>> KVM. KVM interprets this as an instruction fetch from an I/O region, and
-> >>> injects a prefetch abort into the guest. Prefetch abort is a synchronous
-> >>> exception, and on guest return the VCPU PC will be set to VBAR_EL1 + 0x200,
-> >>> which is...  0x200. The VCPU ends up in an infinite loop causing a prefetch
-> >>> abort while fetching the instruction to service the said abort.
-> >>>
-> >>> cpu_psci_cpu_die is basically a wrapper over the HVC instruction, so
-> >>> provide an assembly implementation for the function which will serve as the
-> >>> entry point for CPU_ON.
-> >>>
-> >>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >>> ---
-> >>>  arm/cstart.S   | 7 +++++++
-> >>>  arm/cstart64.S | 7 +++++++
-> >>>  arm/psci.c     | 5 +++--
-> >>>  3 files changed, 17 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/arm/cstart.S b/arm/cstart.S
-> >>> index 114726feab82..5d4fe4b1570b 100644
-> >>> --- a/arm/cstart.S
-> >>> +++ b/arm/cstart.S
-> >>> @@ -7,6 +7,7 @@
-> >>>   */
-> >>>  #define __ASSEMBLY__
-> >>>  #include <auxinfo.h>
-> >>> +#include <linux/psci.h>
-> >>>  #include <asm/thread_info.h>
-> >>>  #include <asm/asm-offsets.h>
-> >>>  #include <asm/ptrace.h>
-> >>> @@ -138,6 +139,12 @@ secondary_entry:
-> >>>  	blx	r0
-> >>>  	b	do_idle
-> >>>  
-> >>> +.global asm_cpu_psci_cpu_die
-> >>> +asm_cpu_psci_cpu_die:
-> >>> +	ldr	r0, =PSCI_0_2_FN_CPU_OFF
-> >>> +	hvc	#0
-> >>> +	b	halt
-> >> Shouldn't we load PSCI_POWER_STATE_TYPE_POWER_DOWN into r1 and
-> >> zero out r2 and r3, as cpu_psci_cpu_die() does? And maybe we
-> >> should just do a 'b .' here instead of 'b halt' in order to
-> >> avoid confusion as to how we ended up in halt(), if the psci
-> >> invocation were to ever fail.
-> > Not really, I'm not really sure where the extra parameter in cpu_psci_cpu_die
-> > comes from. I have looked at ARM DEN 0022D, section 5.1.3, and the CPU_OFFcall
-> > has exactly one parameter, the function id. I've also looked at how KVM handles
-> > this call, and it doesn't use anything else other than the function id. Please
-> > correct me if I missed something.
+> This is just repeating what code does though.
+> Please include the *reason* for the condition.
+> E.g. here's a better comment:
 > 
-> Did some digging, apparently the power state parameter was required for the very
-> first version of PSCI. ARM DEN 0022D states that it has been removed in PSCIv0.2:
+> 	/* To reduce number of credit update messages,
+> 	 * don't update credits as long as lots of space is available.
+> 	 * Note: the limit chosen here is arbitrary. Setting the limit
+> 	 * too high causes extra messages. Too low causes transmitter
+> 	 * stalls. As stalls are in theory more expensive than extra
+> 	 * messages, we set the limit to a high value. TODO: experiment
+> 	 * with different values.
+> 	 */
 > 
-> "7.3 Changes in PSCIv0.2 from first proposal
-> 
-> [..]
-> 
-> Removed power_state parameter for CPU_OFF."
-> 
-> The kvm-unit-tests implementation of psci uses fixed function ids (as opposed to
-> first psci version, where the ids were taken from the DT), so I think that we
-> can drop the PSCI_POWER_STATE_TYPE_POWER_DOWN parameter in cpu_psci_cpu_die
-> altogether. What do you think?
 
-Sounds good to me. Thanks for the digging.
+Yes, it is better, sorry for that. I'll try to avoid unnecessary comments,
+explaining the reason for certain changes.
 
-drew
+Since this patch is already queued in net-next, should I send another
+patch to fix the comment?
 
-> 
-> Thanks,
-> Alex
-> > As for zero'ing the extra registers, this is not part of the SMC calling
-> > convention, this is just something that the C code for psci does. The SMC
-> > calling convention states that registers 0-3 will be modified after the call, so
-> > having 4 arguments to the psci_invoke function will tell the compiler to
-> > save/restore the registers in the caller.
-> >
-> > As for doing 'b .' instead of branching to halt, that's a good idea, I'll do
-> > that. But it will only be useful if the last CPU_OFF call fails.
-> >
-> > Thanks,
-> > Alex
+Thanks,
+Stefano
