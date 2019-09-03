@@ -2,97 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8C78A62F8
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 09:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C177A6308
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 09:47:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727894AbfICHqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 03:46:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41118 "EHLO mx1.redhat.com"
+        id S1728094AbfICHrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 03:47:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42506 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725888AbfICHqA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 03:46:00 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        id S1728063AbfICHri (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 03:47:38 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A0AA7C057E16
-        for <kvm@vger.kernel.org>; Tue,  3 Sep 2019 07:45:59 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id c1so9979034wrb.12
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 00:45:59 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6F3717BDA6
+        for <kvm@vger.kernel.org>; Tue,  3 Sep 2019 07:47:38 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id r21so6612919wme.5
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 00:47:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=afLRR+Y6/XWNAyGbBu630m0eglXDmP7UhfuV7wpot38=;
-        b=PNMY4wpCTd9KabDufyGlrDJxBLmPq0uuQTYBsWR6bqpq15k9jf5cdS0DA8UBXJY17/
-         55nsf3F1lMkreZ5RQzGhx6UHGZQ0KKPDKv9LEhXfevjsw4AKVUR1jtUGv+scYXsWssGA
-         +0hVimhIxQdxPgc/9ThutIlD5AYeVxUW+2gXrOBByKNCJnoyPQFRX2hJfue3ggzi5R0P
-         QchDViTO+ivQpqC5gpgn/9DkhZB9IGSnqQmPsSfqrUeSMbsJHdnIjrffLKb1QgzZCC9m
-         LQB2Vh7HnOCUBYNtONMknAlahlxsWZChp51uNb1kW4KEtymOHD/Ntw1xLvS+fn6Qfwa2
-         lFWg==
-X-Gm-Message-State: APjAAAWOkuIIUQIciP2UP71P5PP6bY4dg9lf53hC3IjKAxEL6Pq3KPkf
-        2NCTg96+FQ95jHsAJMzWkx/Wb/Yn29iqcqsdwmb25XEz4mIdtK+Rn0cG8gOnlzMd/gN6jRP/IfY
-        rrgzlNMWOC3Ma
-X-Received: by 2002:a1c:984b:: with SMTP id a72mr15750245wme.149.1567496758381;
-        Tue, 03 Sep 2019 00:45:58 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx9640LTLNpf5tgrM8awc95gC1ytFwievAzkPz7D7FKlbtNZiw8m+0po4nQhhx9AFdnL0h8rA==
-X-Received: by 2002:a1c:984b:: with SMTP id a72mr15750224wme.149.1567496758176;
-        Tue, 03 Sep 2019 00:45:58 -0700 (PDT)
+        bh=CnmnWhc2qfmsJ3pZ+ytXKy1jqPtAf/8RAcu/rZxBpOA=;
+        b=rdlFssTABczs03bdtkBw/4HsvrDA4XJ9ZpiCOE4H4gZ+iOETUgEruItiWUHwdai2P8
+         vv8GuViR3ueyf/dUC/xN85NgOAKgv8eLuMz6a03pr+KYvqCxg4lZGuLSI7u55Kdnw7BB
+         y/D87iAnMv6VXHwIkWBKEb6V9MS10ryxcb8ejL/ZUucxwP6L3zClePYIgmChcGXKkINK
+         bHUr2V6iJTj2llWWQblz36/euAOlNXPDZCLnRUcXQAAnINv/w1vuTaxXhjKWBHgNgqCe
+         Ni8djIGhwKtxMJWNEh39tu1ru1q8AiffXWF7Dz3YLVhT426U+OUXGZCUDnkY4mXhJ1a+
+         xpqg==
+X-Gm-Message-State: APjAAAXUtel0T8bt+8c6O5hulWXUJg5Rmw6Yxy5VtA+Tk0axTFh9LPtn
+        5qFzqhceBDfaZ2mwGQ+MJn7QdALjQA57fAzwgNyuNnWSkUWGl5KS6cul5mK4KMlzw1chP5l/n+u
+        qOBPb5bAQ+4nY
+X-Received: by 2002:adf:8444:: with SMTP id 62mr40065116wrf.202.1567496856833;
+        Tue, 03 Sep 2019 00:47:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxtF6KOYuQGW6Yd+ADmoPQoTuiB5O/upqyGyY9YWt/HZCmo1caE/75ccLGalCenEsB8+yq/Dg==
+X-Received: by 2002:adf:8444:: with SMTP id 62mr40065094wrf.202.1567496856630;
+        Tue, 03 Sep 2019 00:47:36 -0700 (PDT)
 Received: from steredhat (host170-61-dynamic.36-79-r.retail.telecomitalia.it. [79.36.61.170])
-        by smtp.gmail.com with ESMTPSA id l62sm41378400wml.13.2019.09.03.00.45.56
+        by smtp.gmail.com with ESMTPSA id x15sm11040612wmc.16.2019.09.03.00.47.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2019 00:45:57 -0700 (PDT)
-Date:   Tue, 3 Sep 2019 09:45:54 +0200
+        Tue, 03 Sep 2019 00:47:36 -0700 (PDT)
+Date:   Tue, 3 Sep 2019 09:47:33 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc:     linux-kernel@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
-Message-ID: <20190903074554.mq6spyivftuodahy@steredhat>
-References: <20190729143622-mutt-send-email-mst@kernel.org>
- <20190730093539.dcksure3vrykir3g@steredhat>
- <20190730163807-mutt-send-email-mst@kernel.org>
- <20190801104754.lb3ju5xjfmnxioii@steredhat>
- <20190801091106-mutt-send-email-mst@kernel.org>
- <20190801133616.sik5drn6ecesukbb@steredhat>
- <20190901025815-mutt-send-email-mst@kernel.org>
- <20190901061707-mutt-send-email-mst@kernel.org>
- <20190902095723.6vuvp73fdunmiogo@steredhat>
- <20190903003823-mutt-send-email-mst@kernel.org>
+        "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] vsock/virtio: a better comment on credit update
+Message-ID: <20190903074733.dg55ucs7jh5zvfbh@steredhat>
+References: <20190903073748.25214-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190903003823-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190903073748.25214-1-mst@redhat.com>
 User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 03, 2019 at 12:39:19AM -0400, Michael S. Tsirkin wrote:
-> On Mon, Sep 02, 2019 at 11:57:23AM +0200, Stefano Garzarella wrote:
-> > > 
-> > > Assuming we miss nothing and buffers < 4K are broken,
-> > > I think we need to add this to the spec, possibly with
-> > > a feature bit to relax the requirement that all buffers
-> > > are at least 4k in size.
-> > > 
-> > 
-> > Okay, should I send a proposal to virtio-dev@lists.oasis-open.org?
+On Tue, Sep 03, 2019 at 03:38:16AM -0400, Michael S. Tsirkin wrote:
+> The comment we have is just repeating what the code does.
+> Include the *reason* for the condition instead.
 > 
-> How about we also fix the bug for now?
+> Cc: Stefano Garzarella <sgarzare@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 94cc0fa3e848..5bb70c692b1e 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -307,8 +307,13 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>  
+>  	spin_unlock_bh(&vvs->rx_lock);
+>  
+> -	/* We send a credit update only when the space available seen
+> -	 * by the transmitter is less than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE
+> +	/* To reduce the number of credit update messages,
+> +	 * don't update credits as long as lots of space is available.
+> +	 * Note: the limit chosen here is arbitrary. Setting the limit
+> +	 * too high causes extra messages. Too low causes transmitter
+> +	 * stalls. As stalls are in theory more expensive than extra
+> +	 * messages, we set the limit to a high value. TODO: experiment
+> +	 * with different values.
+>  	 */
+>  	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE) {
+>  		virtio_transport_send_credit_update(vsk,
 
-This series unintentionally fix the bug because we are introducing a way
-to split the packet depending on the buffer size ([PATCH 4/5] vhost/vsock:
-split packets to send using multiple buffers) and we removed the limit
-to 4K buffers ([PATCH 5/5] vsock/virtio: change the maximum packet size
-allowed).
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-I discovered that there was a bug while we discussed memory accounting.
 
-Do you think it's enough while we introduce the feature bit in the spec?
-
-Thanks,
-Stefano
