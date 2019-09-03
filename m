@@ -2,156 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D1E4A5ED0
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 03:26:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9F5BA5F03
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 03:59:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725999AbfICB0l convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 2 Sep 2019 21:26:41 -0400
-Received: from mga06.intel.com ([134.134.136.31]:40447 "EHLO mga06.intel.com"
+        id S1726408AbfICB6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 21:58:32 -0400
+Received: from mga04.intel.com ([192.55.52.120]:28616 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725807AbfICB0l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 21:26:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1725306AbfICB6c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 21:58:32 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Sep 2019 18:26:40 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Sep 2019 18:58:31 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,461,1559545200"; 
-   d="scan'208";a="181984609"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Sep 2019 18:26:40 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 2 Sep 2019 18:26:40 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 2 Sep 2019 18:26:38 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Mon, 2 Sep 2019 18:26:38 -0700
-Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.92]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.86]) with mapi id 14.03.0439.000;
- Tue, 3 Sep 2019 09:26:37 +0800
-From:   "Zhang, Tina" <tina.zhang@intel.com>
-To:     "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
-Subject: RE: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
-Thread-Topic: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
-Thread-Index: AQHVU9tUM+mrk1EK3UW2FOPyJRIR1KcZNxag
-Date:   Tue, 3 Sep 2019 01:26:36 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC8771E7AE@SHSMSX101.ccr.corp.intel.com>
-References: <20190816023528.30210-1-tina.zhang@intel.com>
-In-Reply-To: <20190816023528.30210-1-tina.zhang@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzMwZmIxMjYtMzQzMC00MjllLTk2MjItZjc5ZjJhMzNiNjFkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibUlvalB4MW1UUGIrSlwvSXZMV2VpdVV0VldVTXh4ZW40a00xM2NSNjExUWo2XC9sdEdPNjFkXC9UNFB4V3hqc1dSaiJ9
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+   d="scan'208";a="181988659"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.71])
+  by fmsmga008.fm.intel.com with ESMTP; 02 Sep 2019 18:58:29 -0700
+Date:   Tue, 3 Sep 2019 09:56:02 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+Subject: Re: [RFC v3] vhost: introduce mdev based hardware vhost backend
+Message-ID: <20190903015602.GA11404@___>
+References: <20190828053712.26106-1-tiwei.bie@intel.com>
+ <b91820c4-2fe2-55ee-5089-5f7c94322521@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b91820c4-2fe2-55ee-5089-5f7c94322521@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-Some people are asking whether the display refresh irq could be provided by qemu vfio display?
-
-Some background: currently, we have two display timers. One is provided by QEMU UI and the other one is provided by the vgpu. The vgpu display framebuffer consumers (i.e. QEMU UIs) depend on the UI timer to consume the contents in the vgpu display framebuffer, meanwhile the display framebuffer producer (e.g. gvt-g display model) updates the framebuffer content according to the vblank timer provided by gpu vendor driver. Since these two timers are not synced, tearing could be noticed. 
-
-So, theoretically to solve this tearing problem, we could have two options:
-
-Option 1: Like what we have in this patch set: stop the QEMU UI timer and let both the framebuffer consumers and the framebuffer producer sync to the display refresh event provided by vendor driver. So, QEMU UI can do the refresh depending on this display refresh event to make sure to have a tear-free framebuffer.
-
-Option 2: QEMU provides the emulated display refresh event to the vgpus provided by vendor driver. For vgpus, the display refresh event can be considered as the vblank event which is leveraged by guest window manager to do the plane update or mode-setting.
-
-People are asking if option 2 could be a better choice.
-
-Thanks.
-
-BR,
-Tina
-
-> -----Original Message-----
-> From: Zhang, Tina
-> Sent: Friday, August 16, 2019 10:35 AM
-> To: intel-gvt-dev@lists.freedesktop.org
-> Cc: Zhang, Tina <tina.zhang@intel.com>; kraxel@redhat.com;
-> alex.williamson@redhat.com; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; Yuan, Hang <hang.yuan@intel.com>; Lv, Zhiyuan
-> <zhiyuan.lv@intel.com>
-> Subject: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
+On Mon, Sep 02, 2019 at 12:15:05PM +0800, Jason Wang wrote:
+> On 2019/8/28 下午1:37, Tiwei Bie wrote:
+> > Details about this can be found here:
+> > 
+> > https://lwn.net/Articles/750770/
+> > 
+> > What's new in this version
+> > ==========================
+> > 
+> > There are three choices based on the discussion [1] in RFC v2:
+> > 
+> > > #1. We expose a VFIO device, so we can reuse the VFIO container/group
+> > >      based DMA API and potentially reuse a lot of VFIO code in QEMU.
+> > > 
+> > >      But in this case, we have two choices for the VFIO device interface
+> > >      (i.e. the interface on top of VFIO device fd):
+> > > 
+> > >      A) we may invent a new vhost protocol (as demonstrated by the code
+> > >         in this RFC) on VFIO device fd to make it work in VFIO's way,
+> > >         i.e. regions and irqs.
+> > > 
+> > >      B) Or as you proposed, instead of inventing a new vhost protocol,
+> > >         we can reuse most existing vhost ioctls on the VFIO device fd
+> > >         directly. There should be no conflicts between the VFIO ioctls
+> > >         (type is 0x3B) and VHOST ioctls (type is 0xAF) currently.
+> > > 
+> > > #2. Instead of exposing a VFIO device, we may expose a VHOST device.
+> > >      And we will introduce a new mdev driver vhost-mdev to do this.
+> > >      It would be natural to reuse the existing kernel vhost interface
+> > >      (ioctls) on it as much as possible. But we will need to invent
+> > >      some APIs for DMA programming (reusing VHOST_SET_MEM_TABLE is a
+> > >      choice, but it's too heavy and doesn't support vIOMMU by itself).
+> > This version is more like a quick PoC to try Jason's proposal on
+> > reusing vhost ioctls. And the second way (#1/B) in above three
+> > choices was chosen in this version to demonstrate the idea quickly.
+> > 
+> > Now the userspace API looks like this:
+> > 
+> > - VFIO's container/group based IOMMU API is used to do the
+> >    DMA programming.
+> > 
+> > - Vhost's existing ioctls are used to setup the device.
+> > 
+> > And the device will report device_api as "vfio-vhost".
+> > 
+> > Note that, there are dirty hacks in this version. If we decide to
+> > go this way, some refactoring in vhost.c/vhost.h may be needed.
+> > 
+> > PS. The direct mapping of the notify registers isn't implemented
+> >      in this version.
+> > 
+> > [1] https://lkml.org/lkml/2019/7/9/101
 > 
-> This series tries to send the vGPU display refresh event to user land.
 > 
-> Instead of delivering page flip events only or vblank events only, we choose
-> to combine two of them, i.e. post display refresh event at vblanks and skip
-> some of them when no page flip happens. Vblanks as upper bound are safe
-> and skipping no-page-flip vblanks guarantees both trivial performance
-> impacts and good user experience without screen tearing. Plus, we have the
-> mask/unmask mechansim providing user space flexibility to switch between
-> event-notified refresh and classic timer-based refresh.
+> Thanks for the patch, see comments inline.
 > 
-> In addition, there are some cases that guest app only uses one framebuffer
-> for both drawing and display. In such case, guest OS won't do the plane page
-> flip when the framebuffer is updated, thus the user land won't be notified
-> about the updated framebuffer. Hence, in single framebuffer case, we apply
-> a heuristic to determine whether it is the case or not. If it is, notify user land
-> when each vblank event triggers.
 > 
-> v5:
-> - Introduce a vGPU display irq cap which can notify user space with
->   both primary and cursor plane update events through one eventfd. (Gerd &
-> Alex)
-> v4:
-> - Deliver page flip event and single framebuffer refresh event bounded by
-> display vblanks. (Kechen)
-> v3:
-> - Deliver display vblank event instead of page flip event. (Zhenyu)
-> v2:
-> - Use VFIO irq chain to get eventfds from userspace instead of adding a new
-> ABI. (Alex)
-> v1:
-> - https://patchwork.kernel.org/cover/10962341/
+> > 
+> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > ---
+> >   drivers/vhost/Kconfig      |   9 +
+> >   drivers/vhost/Makefile     |   3 +
+> >   drivers/vhost/mdev.c       | 382 +++++++++++++++++++++++++++++++++++++
+> >   include/linux/vhost_mdev.h |  58 ++++++
+> >   include/uapi/linux/vfio.h  |   2 +
+> >   include/uapi/linux/vhost.h |   8 +
+> >   6 files changed, 462 insertions(+)
+> >   create mode 100644 drivers/vhost/mdev.c
+> >   create mode 100644 include/linux/vhost_mdev.h
+[...]
+> > +
+> > +		break;
+> > +	}
+> > +	case VFIO_DEVICE_GET_REGION_INFO:
+> > +	case VFIO_DEVICE_GET_IRQ_INFO:
+> > +	case VFIO_DEVICE_SET_IRQS:
+> > +	case VFIO_DEVICE_RESET:
+> > +		ret = -EINVAL;
+> > +		break;
+> > +
+> > +	case VHOST_MDEV_SET_STATE:
+> > +		ret = vhost_set_state(vdpa, argp);
+> > +		break;
 > 
-> Kechen Lu (2):
->   drm/i915/gvt: Deliver async primary plane page flip events at vblank
->   drm/i915/gvt: Add cursor plane reg update trap emulation handler
 > 
-> Tina Zhang (4):
->   vfio: Define device specific irq type capability
->   vfio: Introduce vGPU display irq type
->   drm/i915/gvt: Register vGPU display event irq
->   drm/i915/gvt: Deliver vGPU refresh event to userspace
-> 
->  drivers/gpu/drm/i915/gvt/cmd_parser.c |   6 +-
->  drivers/gpu/drm/i915/gvt/display.c    |  49 +++++-
->  drivers/gpu/drm/i915/gvt/display.h    |   3 +
->  drivers/gpu/drm/i915/gvt/gvt.h        |   6 +
->  drivers/gpu/drm/i915/gvt/handlers.c   |  32 +++-
->  drivers/gpu/drm/i915/gvt/hypercall.h  |   1 +
->  drivers/gpu/drm/i915/gvt/interrupt.c  |   7 +
->  drivers/gpu/drm/i915/gvt/interrupt.h  |   3 +
->  drivers/gpu/drm/i915/gvt/kvmgt.c      | 230 +++++++++++++++++++++++++-
->  drivers/gpu/drm/i915/gvt/mpt.h        |  17 ++
->  include/uapi/linux/vfio.h             |  40 ++++-
->  11 files changed, 375 insertions(+), 19 deletions(-)
-> 
-> --
-> 2.17.1
+> So this is used to start or stop the device. This means if userspace want to
+> drive a network device, the API is not 100% compatible. Any blocker for
+> this? E.g for SET_BACKEND, we can pass a fd and then identify the type of
+> backend.
 
+This is a legacy from the previous RFC code. I didn't try to
+get rid of it while getting this POC to work. I can try to make
+the vhost ioctls fully compatible with the existing userspace
+if possible.
+
+> 
+> Another question is, how can user know the type of a device?
+
+Maybe we can introduce an attribute in $UUID/ to tell the type.
+
+> 
+> 
+> > +	case VHOST_GET_FEATURES:
+> > +		ret = vhost_get_features(vdpa, argp);
+> > +		break;
+> > +	case VHOST_SET_FEATURES:
+> > +		ret = vhost_set_features(vdpa, argp);
+> > +		break;
+> > +	case VHOST_GET_VRING_BASE:
+> > +		ret = vhost_get_vring_base(vdpa, argp);
+> > +		break;
+> > +	default:
+> > +		ret = vhost_dev_ioctl(&vdpa->dev, cmd, argp);
+> > +		if (ret == -ENOIOCTLCMD)
+> > +			ret = vhost_vring_ioctl(&vdpa->dev, cmd, argp);
+> > +	}
+> > +
+> > +	return ret;
+> > +}
+[...]
+> > +struct mdev_device;
+> > +struct vhost_mdev;
+> > +
+> > +typedef int (*vhost_mdev_start_device_t)(struct vhost_mdev *vdpa);
+> > +typedef int (*vhost_mdev_stop_device_t)(struct vhost_mdev *vdpa);
+> > +typedef int (*vhost_mdev_set_features_t)(struct vhost_mdev *vdpa);
+> > +typedef void (*vhost_mdev_notify_device_t)(struct vhost_mdev *vdpa, int queue_id);
+> > +typedef u64 (*vhost_mdev_get_notify_addr_t)(struct vhost_mdev *vdpa, int queue_id);
+> > +typedef u16 (*vhost_mdev_get_vring_base_t)(struct vhost_mdev *vdpa, int queue_id);
+> > +typedef void (*vhost_mdev_features_changed_t)(struct vhost_mdev *vdpa);
+> > +
+> > +struct vhost_mdev_device_ops {
+> > +	vhost_mdev_start_device_t	start;
+> > +	vhost_mdev_stop_device_t	stop;
+> > +	vhost_mdev_notify_device_t	notify;
+> > +	vhost_mdev_get_notify_addr_t	get_notify_addr;
+> > +	vhost_mdev_get_vring_base_t	get_vring_base;
+> > +	vhost_mdev_features_changed_t	features_changed;
+> > +};
+> 
+> 
+> Consider we want to implement a network device, who is going to implement
+> the device configuration space? I believe it's not good to invent another
+> set of API for doing this. So I believe we want something like
+> read_config/write_config here.
+> 
+> Then I came up an idea:
+> 
+> 1) introduce a new mdev bus transport, and a new mdev driver virtio_mdev
+> 2) vDPA (either software or hardware) can register as a device of virtio
+> mdev device
+> 3) then we can use kernel virtio driver to drive vDPA device and utilize
+> kernel networking/storage stack
+> 4) for userspace driver like vhost-mdev, it could be built of top of mdev
+> transport
+> 
+> Having a full new transport for virtio, the advantages are obvious:
+> 
+> 1) A generic solution for both kernel and userspace driver and support
+> configuration space access
+> 2) For kernel driver, exist kernel networking/storage stack could be reused,
+> and so did fast path implementation (e.g XDP, io_uring etc).
+> 2) For userspace driver, the function of virtio transport is a superset of
+> vhost, any API could be built on top easily (e.g vhost ioctl).
+> 
+> What's your thought?
+
+This sounds interesting to me! ;)
+
+But I'm not quite sure whether it's the best choice to abstract
+vhost accelerators as virtio device in vDPA. Virtio device is
+the frontend device. There are some backend features missing in
+virtio currently. E.g. there is no way to tell the virtio device
+to do dirty page logging. Besides, e.g. the control vq in network
+case seems not a quite good interface for a backend device. In
+this case, the userspace virtio-mdev driver in QEMU will do the
+DMA mapping to allow guest driver to be able to use GPA/IOVA to
+access the Rx/Tx queues of the virtio-mdev device directly, but
+I'm wondering will this userspace virtio-mdev driver in QEMU use
+similar IOVA to access the software based control vq of the same
+virtio-mdev device at the same time?
+
+Thanks,
+Tiwei
+
+> 
+> Thanks
+> 
+> 
+> > +
+> > +struct vhost_mdev *vhost_mdev_alloc(struct mdev_device *mdev,
+> > +		void *private, int nvqs);
+> > +void vhost_mdev_free(struct vhost_mdev *vdpa);
+> > +
+> > +ssize_t vhost_mdev_read(struct mdev_device *mdev, char __user *buf,
+> > +		size_t count, loff_t *ppos);
+> > +ssize_t vhost_mdev_write(struct mdev_device *mdev, const char __user *buf,
+> > +		size_t count, loff_t *ppos);
+> > +long vhost_mdev_ioctl(struct mdev_device *mdev, unsigned int cmd,
+> > +		unsigned long arg);
+> > +int vhost_mdev_mmap(struct mdev_device *mdev, struct vm_area_struct *vma);
+> > +int vhost_mdev_open(struct mdev_device *mdev);
+> > +void vhost_mdev_close(struct mdev_device *mdev);
+> > +
+> > +int vhost_mdev_set_device_ops(struct vhost_mdev *vdpa,
+> > +		const struct vhost_mdev_device_ops *ops);
+> > +int vhost_mdev_set_features(struct vhost_mdev *vdpa, u64 features);
+> > +struct eventfd_ctx *vhost_mdev_get_call_ctx(struct vhost_mdev *vdpa,
+> > +		int queue_id);
+> > +int vhost_mdev_get_acked_features(struct vhost_mdev *vdpa, u64 *features);
+> > +int vhost_mdev_get_vring_num(struct vhost_mdev *vdpa, int queue_id, u16 *num);
+> > +int vhost_mdev_get_vring_base(struct vhost_mdev *vdpa, int queue_id, u16 *base);
+> > +int vhost_mdev_get_vring_addr(struct vhost_mdev *vdpa, int queue_id,
+> > +		struct vhost_vring_addr *addr);
+> > +int vhost_mdev_get_log_base(struct vhost_mdev *vdpa, int queue_id,
+> > +		void **log_base, u64 *log_size);
+> > +struct mdev_device *vhost_mdev_get_mdev(struct vhost_mdev *vdpa);
+> > +void *vhost_mdev_get_private(struct vhost_mdev *vdpa);
+> > +
+> > +#endif /* _VHOST_MDEV_H */
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 8f10748dac79..0300d6831cc5 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -201,6 +201,7 @@ struct vfio_device_info {
+> >   #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+> >   #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
+> >   #define VFIO_DEVICE_FLAGS_AP	(1 << 5)	/* vfio-ap device */
+> > +#define VFIO_DEVICE_FLAGS_VHOST	(1 << 6)	/* vfio-vhost device */
+> >   	__u32	num_regions;	/* Max region index + 1 */
+> >   	__u32	num_irqs;	/* Max IRQ index + 1 */
+> >   };
+> > @@ -217,6 +218,7 @@ struct vfio_device_info {
+> >   #define VFIO_DEVICE_API_AMBA_STRING		"vfio-amba"
+> >   #define VFIO_DEVICE_API_CCW_STRING		"vfio-ccw"
+> >   #define VFIO_DEVICE_API_AP_STRING		"vfio-ap"
+> > +#define VFIO_DEVICE_API_VHOST_STRING		"vfio-vhost"
+> >   /**
+> >    * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index 40d028eed645..5afbc2f08fa3 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -116,4 +116,12 @@
+> >   #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
+> >   #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
+> > +/* VHOST_MDEV specific defines */
+> > +
+> > +#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
+> > +
+> > +#define VHOST_MDEV_S_STOPPED	0
+> > +#define VHOST_MDEV_S_RUNNING	1
+> > +#define VHOST_MDEV_S_MAX	2
+> > +
+> >   #endif
