@@ -2,97 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 26189A6F52
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 18:32:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D982A6F9A
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 18:35:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731423AbfICQcN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 12:32:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55654 "EHLO mail.kernel.org"
+        id S1731259AbfICQdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 12:33:39 -0400
+Received: from mga12.intel.com ([192.55.52.136]:59971 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727069AbfICQcM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:32:12 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F155E2343A;
-        Tue,  3 Sep 2019 16:32:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567528332;
-        bh=WG6uoZmxjfAMieB1hpPCkzQG0SYx+aPlTDuHzoGfSrQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=wFYVmPzOyQlXoAIe6NC0ZRfHzRXIYqZ7OMl666m40GM/YNLqY1AP4fd1LbRjjtiM+
-         eGJpduduePWnyNwKH70EngrkA5d5VjUMdWVbwZgpmb24B1+wtNG/sVdctENmdQFzPn
-         kIgPZHsdYBa0EZEjVt2P2XbNkEVlI2hs6NUrWiwE=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 162/167] virtio/s390: fix race on airq_areas[]
-Date:   Tue,  3 Sep 2019 12:25:14 -0400
-Message-Id: <20190903162519.7136-162-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
-References: <20190903162519.7136-1-sashal@kernel.org>
+        id S1730658AbfICQdi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:33:38 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Sep 2019 09:33:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,463,1559545200"; 
+   d="scan'208";a="173263755"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga007.jf.intel.com with ESMTP; 03 Sep 2019 09:33:32 -0700
+Date:   Tue, 3 Sep 2019 09:33:32 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] doc: kvm: fix return description of KVM_SET_MSRS
+Message-ID: <20190903163332.GF10768@linux.intel.com>
+References: <20190902101214.77833-1-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190902101214.77833-1-xiaoyao.li@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Halil Pasic <pasic@linux.ibm.com>
+On Mon, Sep 02, 2019 at 06:12:14PM +0800, Xiaoyao Li wrote:
 
-[ Upstream commit 4f419eb14272e0698e8c55bb5f3f266cc2a21c81 ]
+It may seem silly, but a proper changelog would be helpful even here,
+e.g. to explain how and when a positive return value can diverge from the
+number of MSRs specific in struct kvm_msrs.
 
-The access to airq_areas was racy ever since the adapter interrupts got
-introduced to virtio-ccw, but since commit 39c7dcb15892 ("virtio/s390:
-make airq summary indicators DMA") this became an issue in practice as
-well. Namely before that commit the airq_info that got overwritten was
-still functional. After that commit however the two infos share a
-summary_indicator, which aggravates the situation. Which means
-auto-online mechanism occasionally hangs the boot with virtio_blk.
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  Documentation/virt/kvm/api.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+> index 2d067767b617..a2efc19e0f4e 100644
+> --- a/Documentation/virt/kvm/api.txt
+> +++ b/Documentation/virt/kvm/api.txt
+> @@ -586,7 +586,7 @@ Capability: basic
+>  Architectures: x86
+>  Type: vcpu ioctl
+>  Parameters: struct kvm_msrs (in)
+> -Returns: 0 on success, -1 on error
+> +Returns: number of msrs successfully set, -1 on error
 
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Cc: stable@vger.kernel.org
-Fixes: 96b14536d935 ("virtio-ccw: virtio-ccw adapter interrupt support.")
-Signed-off-by: Heiko Carstens <heiko.carstens@de.ibm.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/s390/virtio/virtio_ccw.c | 3 +++
- 1 file changed, 3 insertions(+)
+Similar to the changelong comment, it'd be helpful to elaborate on the
+positive return value, e.g.:
 
-diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-index ec54538f7ae1c..67efdf25657f3 100644
---- a/drivers/s390/virtio/virtio_ccw.c
-+++ b/drivers/s390/virtio/virtio_ccw.c
-@@ -132,6 +132,7 @@ struct airq_info {
- 	struct airq_iv *aiv;
- };
- static struct airq_info *airq_areas[MAX_AIRQ_AREAS];
-+static DEFINE_MUTEX(airq_areas_lock);
- 
- #define CCW_CMD_SET_VQ 0x13
- #define CCW_CMD_VDEV_RESET 0x33
-@@ -244,9 +245,11 @@ static unsigned long get_airq_indicator(struct virtqueue *vqs[], int nvqs,
- 	unsigned long bit, flags;
- 
- 	for (i = 0; i < MAX_AIRQ_AREAS && !indicator_addr; i++) {
-+		mutex_lock(&airq_areas_lock);
- 		if (!airq_areas[i])
- 			airq_areas[i] = new_airq_info();
- 		info = airq_areas[i];
-+		mutex_unlock(&airq_areas_lock);
- 		if (!info)
- 			return 0;
- 		write_lock_irqsave(&info->lock, flags);
--- 
-2.20.1
+  Returns: number of msrs successfully set (see below), -1 on error
 
+and then something in the free form text explaining how the ioctl stops
+processing MSRs if setting an MSR fails.
+
+>  Writes model-specific registers to the vcpu.  See KVM_GET_MSRS for the
+>  data structures.
+> -- 
+> 2.19.1
+> 
