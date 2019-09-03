@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 28458A7636
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 23:31:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A053A7637
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 23:31:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727065AbfICVbM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 17:31:12 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:49834 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726441AbfICVbM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 17:31:12 -0400
-Received: by mail-pf1-f202.google.com with SMTP id i28so8942279pfq.16
-        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 14:31:12 -0700 (PDT)
+        id S1727113AbfICVbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 17:31:15 -0400
+Received: from mail-yb1-f201.google.com ([209.85.219.201]:38636 "EHLO
+        mail-yb1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726441AbfICVbO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 17:31:14 -0400
+Received: by mail-yb1-f201.google.com with SMTP id h189so9305411ybc.5
+        for <kvm@vger.kernel.org>; Tue, 03 Sep 2019 14:31:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=fni4sbTk3PDo/Mafy67bUGgpDjVb3g2Zd09Nxf1c4FY=;
-        b=JbYTNAMfo2u1zQ9YMFr6fcRZRUrhZBU7wJv7DCi+dRJaewbehbh0Xacf2Cx/+YfKdA
-         CP9UwevzmmZR10VkqCd2iVURcn5tK/MsEdXVp7MrlYSB1EFro0v8x0merGSxbdwniNS9
-         mcENNy3n/OThC5XfJ2Ir061qXohiK3CuxRMJ32BlEX3vGlpOaIhD/vXiVPWJWyp4cVOn
-         GH97rWltADTH13uBmGGi7Sw2R1pbYuB0FThVp7a4k9cmhrIS+xG+0Et/+cMB2qDUbYOP
-         zvzcDHNM+HH/nd/CIrvojGgDm/vspbgUL4KoiGG7SVI+dT6FGk0Wkl/ptrOz8URIuoEq
-         +iqQ==
+        bh=Opg5K1QfrL8nEMY8t4QOtAKo0xuR0xFxDl5Hh7Z9H/0=;
+        b=wJsF5wiqkwDo/VU8kEbu+p977nudq6pCWyWe41pRvirGJnJaUzOw7HthPtkspz8/6U
+         RMxmstQlA5l9WVs6IJ+Li6SZRdUAL/nXFDbc+qNc6TeKMiQnb3aY5TWn7TICTiAmAz1g
+         ISFidWuoGsoO5yOZpFSWzBgaC+pbYfg6defnT82T2E9GMc5bLSW/HJA3FDce85UonaJ2
+         WG78PWsng7x/HbHb5HxU4+CYVUq7PkyegjhIUNFkljfXJpjB1061z5zsuxvhvBKxCzoR
+         4DyXsDFPoxMXnjeTu8MhLI821zo93Td+/TU82DVLwOzisdCaUT4V54P5LcRZeyrnG4Z7
+         7DZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=fni4sbTk3PDo/Mafy67bUGgpDjVb3g2Zd09Nxf1c4FY=;
-        b=nvm7N6lTjCkqLJpzYkFtULUltggUgaQeEszaDm6F/Fcf/1aTVKywmDqgO+v8a4OKAm
-         8cw3mvlKewIqf07VjfpHzTYXEPjL5xdM1YI1WK8MH7ZidZaqDM3xqi/3Pl/C005BHoHb
-         XFZOkk0Cgx0qgXzYlCKgKBe+Nk+sUEc6QNezoMppJ7RdaOlUZcVR6f+wS33z56HTH06b
-         q3gEuqUD85tmzT92oSE2oARI4gamCCGHmI7aryoZdmAKpY4/tT94VfPgpddEuMOnJk7F
-         3dEl7nbub9tp7bw1T86rfvn4W4G3C5SrznIS3f8tVXBEU2NKGJP8qukAlrV37NBKFfUd
-         aAFA==
-X-Gm-Message-State: APjAAAV/026nxkQdV5F7iKR3KYD/7SWOYVtUDbjJKv7DQENwbKv3yJQE
-        fH/9Nf3IaDDOr0gF6fZdojLVe75E0TxNigumvO8zCpTPwWbHohvjJYOb14BAL7CSnAH5Y21Ewwr
-        yMoFfQZHV61ZTYDbzdQfcFDY/z8OPmAUcWMf3LvzEUDY4OgIPCDfd5axNiw==
-X-Google-Smtp-Source: APXvYqw0k0hIQrYZT7goF8yKV9HAziZqZMQ+SrmvBzDftKhJ7dYfENRVx1oBCpF6ht3GE/ZKZOjeJcYHkaU=
-X-Received: by 2002:a63:fe15:: with SMTP id p21mr32407276pgh.149.1567546271062;
- Tue, 03 Sep 2019 14:31:11 -0700 (PDT)
-Date:   Tue,  3 Sep 2019 14:30:39 -0700
+        bh=Opg5K1QfrL8nEMY8t4QOtAKo0xuR0xFxDl5Hh7Z9H/0=;
+        b=rpZ7OiJ1L8xAoTBlHUrALNHZGcBBd1KMkm/tEEDnE+PsSAdiiHq3LvQGAvF65Ew8q9
+         LXA0ZwGWkzo+gToAFUMiMpJYILNLv5M/Y/Ct9iLYGw5+NQsmoxo3VRU2IiEwtKwCeS1N
+         YMDlw5AJl1ephX0XXBvG8h1VIZ8RE7uy7MMJI7lvSTNBOetLJ+YumLlOu6HTCBMdYCot
+         D4ntH468EPlHy7QRufRjIYk1T80IAFp8OwE1glIRjYi3ukF9GMuk+L7y/Mseqcu7gzJe
+         dkNZED4fkKHO0vNYDXOTX28ldF2hy/W4gA42E1ZpAP3aC4H8SPYh8cb4yV023NaukXMz
+         CZ8g==
+X-Gm-Message-State: APjAAAXcdbz/YkcULga5VgHJXrlreRlDeu0A9XK5Fe6HHBd8rJ1In2or
+        tdnq4QZaCLrbNdRKFCjlvhQrxcvbbBIxTgz7/wYxrtcON9h5XY5MFQ82V3oYc6cHZGP7gO0uWXO
+        +XJDQU6BvgAuONDVT36UNhRZnmeNDfDwtMTaLGp4OgzVdYTIg5+PRBKK8nw==
+X-Google-Smtp-Source: APXvYqzboWHGWDNuSGO7hb8QTKTL3v4rt6etY3vc85pFdmKqWKlB9IGvS5WPk3Ns6EOiwGsELbj8+z6d00Q=
+X-Received: by 2002:a81:280b:: with SMTP id o11mr12422297ywo.251.1567546273674;
+ Tue, 03 Sep 2019 14:31:13 -0700 (PDT)
+Date:   Tue,  3 Sep 2019 14:30:40 -0700
 In-Reply-To: <20190903213044.168494-1-oupton@google.com>
-Message-Id: <20190903213044.168494-4-oupton@google.com>
+Message-Id: <20190903213044.168494-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20190903213044.168494-1-oupton@google.com>
 X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-Subject: [PATCH v2 3/8] KVM: VMX: Add helper to check reserved bits in IA32_PERF_GLOBAL_CTRL
+Subject: [PATCH v2 4/8] KVM: nVMX: check GUEST_IA32_PERF_GLOBAL_CTRL on VM-Entry
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>
@@ -61,48 +61,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create a helper function to check the validity of a proposed value for
-IA32_PERF_GLOBAL_CTRL from the existing check in intel_pmu_set_msr().
+Add condition to nested_vmx_check_guest_state() to check the validity of
+GUEST_IA32_PERF_GLOBAL_CTRL. Per Intel's SDM Vol 3 26.3.1.1:
+
+  If the "load IA32_PERF_GLOBAL_CTRL" VM-entry control is 1, bits
+  reserved in the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the field for that
+  register.
 
 Suggested-by: Jim Mattson <jmattson@google.com>
 Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/x86/kvm/pmu.h           | 6 ++++++
- arch/x86/kvm/vmx/pmu_intel.c | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 58265f761c3b..779427b44c2f 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -79,6 +79,12 @@ static inline bool pmc_is_enabled(struct kvm_pmc *pmc)
- 	return kvm_x86_ops->pmu_ops->pmc_is_enabled(pmc);
- }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 9ba90b38d74b..6c3aa3bcede3 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -10,6 +10,7 @@
+ #include "hyperv.h"
+ #include "mmu.h"
+ #include "nested.h"
++#include "pmu.h"
+ #include "trace.h"
+ #include "x86.h"
  
-+static inline bool kvm_is_valid_perf_global_ctrl(struct kvm_pmu *pmu,
-+						 u64 data)
-+{
-+	return pmu->global_ctrl == data || !(pmu->global_ctrl_mask & data);
-+}
+@@ -2732,6 +2733,7 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 					u32 *exit_qual)
+ {
+ 	bool ia32e;
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 
+ 	*exit_qual = ENTRY_FAIL_DEFAULT;
+ 
+@@ -2748,6 +2750,11 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 	}
+ 
++	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL &&
++	    !kvm_is_valid_perf_global_ctrl(pmu,
++					   vmcs12->guest_ia32_perf_global_ctrl))
++		return -EINVAL;
 +
- /* returns general purpose PMC with the specified MSR. Note that it can be
-  * used for both PERFCTRn and EVNTSELn; that is why it accepts base as a
-  * paramenter to tell them apart.
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 4dea0e0e7e39..963766d631ad 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -223,7 +223,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_CORE_PERF_GLOBAL_CTRL:
- 		if (pmu->global_ctrl == data)
- 			return 0;
--		if (!(data & pmu->global_ctrl_mask)) {
-+		if (kvm_is_valid_perf_global_ctrl(pmu, data)) {
- 			global_ctrl_changed(pmu, data);
- 			return 0;
- 		}
+ 	/*
+ 	 * If the load IA32_EFER VM-entry control is 1, the following checks
+ 	 * are performed on the field for the IA32_EFER MSR:
 -- 
 2.23.0.187.g17f5b7556c-goog
 
