@@ -2,353 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65705A5F7D
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 04:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24E19A5FE2
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 05:47:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726844AbfICCva (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 22:51:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39452 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725981AbfICCva (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 22:51:30 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 852D1C0568FA;
-        Tue,  3 Sep 2019 02:51:28 +0000 (UTC)
-Received: from [10.72.12.109] (ovpn-12-109.pek2.redhat.com [10.72.12.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E7FEF19D70;
-        Tue,  3 Sep 2019 02:51:16 +0000 (UTC)
-Subject: Re: [RFC v3] vhost: introduce mdev based hardware vhost backend
-To:     Tiwei Bie <tiwei.bie@intel.com>
-Cc:     mst@redhat.com, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-References: <20190828053712.26106-1-tiwei.bie@intel.com>
- <b91820c4-2fe2-55ee-5089-5f7c94322521@redhat.com>
- <20190903015602.GA11404@___>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <61e80c3a-ec9e-ab34-3d63-dfbe126d5051@redhat.com>
-Date:   Tue, 3 Sep 2019 10:51:15 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190903015602.GA11404@___>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S1726341AbfICDrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Sep 2019 23:47:40 -0400
+Received: from mail-eopbgr20086.outbound.protection.outlook.com ([40.107.2.86]:43526
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725854AbfICDrk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 23:47:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=akY6Ht57UaLe9mUHB89fqEwsPpFuthlc0smCtVKADDGqrFMqslYo6zcs07t2LU7XVisHtMh5NRKUrX7QMRatmy7t0c5PiydBPQl6qNALXElDmO1QLbHKLdYi5lfiLwWRGT7tSuqET05QPCcAFUJ7CopBsleE3NiuLotg+ePWAyjoXXtyjR6nCZ4VdDZK4pf4xs/xuSqwb7+3I10D1Jwn8oedU3eJsfGcwdOlnDUDtuqSg7DVC4qowPPX2s4oMOgdYE6DCKMKhsnyRAaoikpLXkxlE/fm8XTGB//mfym8HTd98wzik5z3CSEYIG7FZG6M6nDRCnJrGqMrUbGzO3QVbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vWhQXdv/lsPLcFVXdKKkPX7qk52sHE5hAZxR+rcE7nY=;
+ b=RlLtj/cWwRyl8cLvuU+88Oi1XpqVnwwzQH8ovroq+Q8dDxx8nqvkaL5EdMpSHcdxX/BvQDBvrAgxewT0SkTdrXJIrmRJ2vDDGhUA9/lTABcUU7C9sdpwO5c9w/T0EucbeMmkgnir2/LvOKRJJ9uJzGbJ+HLmAftOBXwv+IyHvl73Cf2o6Tq/YVmGgOvR8Wge2l1Tf5ONMjWrDc528IHtBDj5AdEQy3NZ39HaxalDUFlRLQBfYjQk/TgjI72373OTokGm/YyC8CzRp6qvEXNGtNI17341lVZhbV3LS+krhhc3ZJhz+HWkZ1KUrtlqAJZPjO1tXIi0DOLSJCoFiw2sEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vWhQXdv/lsPLcFVXdKKkPX7qk52sHE5hAZxR+rcE7nY=;
+ b=Jiu2bgyKmMEOf5fFkGqdT8tmNVc9qvu1LWXCiNLD1bH7N7EN0NPMy8h5wnKitmgAGurYUkNoXof5ITSpZ8NDuqA7swlCkkvmIVaSOFWwFt6Ik0TNoXzSp3nNVtFaWIxMiQKWXVF3ldoCCQHh+S0JxmRleZWGkpr5n24zx7n2S34=
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
+ AM0PR05MB4161.eurprd05.prod.outlook.com (52.134.91.15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2220.20; Tue, 3 Sep 2019 03:47:35 +0000
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::bc4c:7c4c:d3e2:8b28]) by AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::bc4c:7c4c:d3e2:8b28%6]) with mapi id 15.20.2220.022; Tue, 3 Sep 2019
+ 03:47:35 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
+Thread-Topic: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
+Thread-Index: AQHVXluia2ak8fbBtkW+HkGgDQ+zpacTarsAgAA0s9CAAAPGgIAAA/owgAATMoCAABuDUIAEp7AAgADYuGA=
+Date:   Tue, 3 Sep 2019 03:47:35 +0000
+Message-ID: <AM0PR05MB4866B62A2EDFE341AC4EA1B5D1B90@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20190826204119.54386-1-parav@mellanox.com>
+        <20190829111904.16042-1-parav@mellanox.com>
+        <20190829111904.16042-2-parav@mellanox.com>
+        <20190830111720.04aa54e9.cohuck@redhat.com>
+        <AM0PR05MB48660877881F7A2D757A9C82D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190830143927.163d13a7.cohuck@redhat.com>
+        <AM0PR05MB486621283F935B673455DA63D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190830160223.332fd81f.cohuck@redhat.com>
+        <AM0PR05MB48661F9608F284AB5C9BAEB5D1BD0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20190902164604.1d04614f.cohuck@redhat.com>
+In-Reply-To: <20190902164604.1d04614f.cohuck@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 03 Sep 2019 02:51:28 +0000 (UTC)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [106.51.18.188]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c0ec3a94-1851-42fd-bdd3-08d73021751f
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AM0PR05MB4161;
+x-ms-traffictypediagnostic: AM0PR05MB4161:|AM0PR05MB4161:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR05MB4161022081014823305F6C92D1B90@AM0PR05MB4161.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 01494FA7F7
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(396003)(136003)(366004)(39860400002)(13464003)(189003)(199004)(6916009)(71190400001)(71200400001)(66066001)(53936002)(11346002)(52536014)(486006)(476003)(6436002)(6246003)(5660300002)(446003)(6116002)(14444005)(256004)(55016002)(55236004)(86362001)(76116006)(102836004)(478600001)(26005)(66556008)(66476007)(64756008)(66446008)(9686003)(53546011)(6506007)(74316002)(316002)(3846002)(186003)(9456002)(99286004)(2906002)(8936002)(7736002)(76176011)(305945005)(33656002)(229853002)(54906003)(4326008)(8676002)(66946007)(7696005)(25786009)(81166006)(81156014)(14454004);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4161;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: kO1uJPcuA2vgGWiyUsjiJ31l7bGKDBUpLj+3ElhFo3SzHg2s7eoR2GSQFU0i4j+MaYj/v3TUuPLriq3doaGVhPy+5wxW5zF1PS5x1px+lxLKRkYUtXxWVPF3CvS+/LUBmglZEW4efy5C478oGgHg3MqwHZceGa0YVK9Z/eFDhs7Dpnor0EQDDWQI8u0WSjraIZfmlToAaIlBiNFpokqMHHDM5SpA+yLvZThd3RgLPqr7lrtSb+xs+/VhqJvGRZ7xSl7eI0TaNVFU6N645uoOjecVyEcxxcdCDnZLQ4nRf3uVmxErVglBOGkooM7SeKdn+9CFskGlc6VqX5wk9Smtoru4H0OQQuTSBPNLF0Q1pteVn3ArU67lIOljJVGynj7cx0nfu1JpkhpNt5fxqPW04ajAHV2TgwMsE1ER2OpejnE=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0ec3a94-1851-42fd-bdd3-08d73021751f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Sep 2019 03:47:35.1783
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: S03fps6uhwNC9+ZOM8j+Gb28xIf2kkCa/OZDDBXrJtLRKBLH+Mn1DJlvxzk27eZuuBNfNftFhu9Gi1pW/OjgZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4161
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/9/3 上午9:56, Tiwei Bie wrote:
-> On Mon, Sep 02, 2019 at 12:15:05PM +0800, Jason Wang wrote:
->> On 2019/8/28 下午1:37, Tiwei Bie wrote:
->>> Details about this can be found here:
->>>
->>> https://lwn.net/Articles/750770/
->>>
->>> What's new in this version
->>> ==========================
->>>
->>> There are three choices based on the discussion [1] in RFC v2:
->>>
->>>> #1. We expose a VFIO device, so we can reuse the VFIO container/group
->>>>       based DMA API and potentially reuse a lot of VFIO code in QEMU.
->>>>
->>>>       But in this case, we have two choices for the VFIO device interface
->>>>       (i.e. the interface on top of VFIO device fd):
->>>>
->>>>       A) we may invent a new vhost protocol (as demonstrated by the code
->>>>          in this RFC) on VFIO device fd to make it work in VFIO's way,
->>>>          i.e. regions and irqs.
->>>>
->>>>       B) Or as you proposed, instead of inventing a new vhost protocol,
->>>>          we can reuse most existing vhost ioctls on the VFIO device fd
->>>>          directly. There should be no conflicts between the VFIO ioctls
->>>>          (type is 0x3B) and VHOST ioctls (type is 0xAF) currently.
->>>>
->>>> #2. Instead of exposing a VFIO device, we may expose a VHOST device.
->>>>       And we will introduce a new mdev driver vhost-mdev to do this.
->>>>       It would be natural to reuse the existing kernel vhost interface
->>>>       (ioctls) on it as much as possible. But we will need to invent
->>>>       some APIs for DMA programming (reusing VHOST_SET_MEM_TABLE is a
->>>>       choice, but it's too heavy and doesn't support vIOMMU by itself).
->>> This version is more like a quick PoC to try Jason's proposal on
->>> reusing vhost ioctls. And the second way (#1/B) in above three
->>> choices was chosen in this version to demonstrate the idea quickly.
->>>
->>> Now the userspace API looks like this:
->>>
->>> - VFIO's container/group based IOMMU API is used to do the
->>>     DMA programming.
->>>
->>> - Vhost's existing ioctls are used to setup the device.
->>>
->>> And the device will report device_api as "vfio-vhost".
->>>
->>> Note that, there are dirty hacks in this version. If we decide to
->>> go this way, some refactoring in vhost.c/vhost.h may be needed.
->>>
->>> PS. The direct mapping of the notify registers isn't implemented
->>>       in this version.
->>>
->>> [1] https://lkml.org/lkml/2019/7/9/101
->>
->> Thanks for the patch, see comments inline.
->>
->>
->>> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
->>> ---
->>>    drivers/vhost/Kconfig      |   9 +
->>>    drivers/vhost/Makefile     |   3 +
->>>    drivers/vhost/mdev.c       | 382 +++++++++++++++++++++++++++++++++++++
->>>    include/linux/vhost_mdev.h |  58 ++++++
->>>    include/uapi/linux/vfio.h  |   2 +
->>>    include/uapi/linux/vhost.h |   8 +
->>>    6 files changed, 462 insertions(+)
->>>    create mode 100644 drivers/vhost/mdev.c
->>>    create mode 100644 include/linux/vhost_mdev.h
-> [...]
->>> +
->>> +		break;
->>> +	}
->>> +	case VFIO_DEVICE_GET_REGION_INFO:
->>> +	case VFIO_DEVICE_GET_IRQ_INFO:
->>> +	case VFIO_DEVICE_SET_IRQS:
->>> +	case VFIO_DEVICE_RESET:
->>> +		ret = -EINVAL;
->>> +		break;
->>> +
->>> +	case VHOST_MDEV_SET_STATE:
->>> +		ret = vhost_set_state(vdpa, argp);
->>> +		break;
->>
->> So this is used to start or stop the device. This means if userspace want to
->> drive a network device, the API is not 100% compatible. Any blocker for
->> this? E.g for SET_BACKEND, we can pass a fd and then identify the type of
->> backend.
-> This is a legacy from the previous RFC code. I didn't try to
-> get rid of it while getting this POC to work. I can try to make
-> the vhost ioctls fully compatible with the existing userspace
-> if possible.
 
+> -----Original Message-----
+> From: Cornelia Huck <cohuck@redhat.com>
+> Sent: Monday, September 2, 2019 8:16 PM
+> To: Parav Pandit <parav@mellanox.com>
+> Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
+> kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org;
+> linux-kernel@vger.kernel.org; netdev@vger.kernel.org
+> Subject: Re: [PATCH v2 1/6] mdev: Introduce sha1 based mdev alias
+>=20
+> On Fri, 30 Aug 2019 15:45:13 +0000
+> Parav Pandit <parav@mellanox.com> wrote:
+>=20
+> > > > > > > This detour via the local variable looks weird to me. Can
+> > > > > > > you either create the alias directly in the mdev (would need
+> > > > > > > to happen later in the function, but I'm not sure why you
+> > > > > > > generate the alias before checking for duplicates anyway), or=
+ do
+> an explicit copy?
+> > > > > > Alias duplicate check is done after generating it, because
+> > > > > > duplicate alias are
+> > > > > not allowed.
+> > > > > > The probability of collision is rare.
+> > > > > > So it is speculatively generated without hold the lock,
+> > > > > > because there is no
+> > > > > need to hold the lock.
+> > > > > > It is compared along with guid while mutex lock is held in sing=
+le
+> loop.
+> > > > > > And if it is duplicate, there is no need to allocate mdev.
+> > > > > >
+> > > > > > It will be sub optimal to run through the mdev list 2nd time
+> > > > > > after mdev
+> > > > > creation and after generating alias for duplicate check.
+> > > > >
+> > > > > Ok, but what about copying it? I find this "set local variable
+> > > > > to NULL after ownership is transferred" pattern a bit unintuitive=
+.
+> > > > > Copying it to the mdev (and then unconditionally freeing it)
+> > > > > looks more
+> > > obvious to me.
+> > > > Its not unconditionally freed.
+> > >
+> > > That's not what I have been saying :(
+> > >
+> > Ah I see. You want to allocate alias memory twice; once inside mdev dev=
+ice
+> and another one in _create() function.
+> > _create() one you want to free unconditionally.
+> >
+> > Well, passing pointer is fine.
+>=20
+> It's not that it doesn't work, but it feels fragile due to its non-obviou=
+sness.
+And its well commented as Alex asked.
 
-That would be fine.
-
-
+>=20
+> > mdev_register_device() has similar little tricky pattern that makes par=
+ent =3D
+> NULL on __find_parent_device() finds duplicate one.
+>=20
+> I don't think that the two are comparable.
 >
->> Another question is, how can user know the type of a device?
-> Maybe we can introduce an attribute in $UUID/ to tell the type.
+They are very similar.
+Why parent should be marked null otherwise.
 
-
-Yes, something like this or using mdev types and identify through 
-something similar to get_socket() etc.
-
-
+ > >
+> > Ownership transfer is more straight forward code.
+>=20
+> I have to disagree here.
 >
->>
->>> +	case VHOST_GET_FEATURES:
->>> +		ret = vhost_get_features(vdpa, argp);
->>> +		break;
->>> +	case VHOST_SET_FEATURES:
->>> +		ret = vhost_set_features(vdpa, argp);
->>> +		break;
->>> +	case VHOST_GET_VRING_BASE:
->>> +		ret = vhost_get_vring_base(vdpa, argp);
->>> +		break;
->>> +	default:
->>> +		ret = vhost_dev_ioctl(&vdpa->dev, cmd, argp);
->>> +		if (ret == -ENOIOCTLCMD)
->>> +			ret = vhost_vring_ioctl(&vdpa->dev, cmd, argp);
->>> +	}
->>> +
->>> +	return ret;
->>> +}
-> [...]
->>> +struct mdev_device;
->>> +struct vhost_mdev;
->>> +
->>> +typedef int (*vhost_mdev_start_device_t)(struct vhost_mdev *vdpa);
->>> +typedef int (*vhost_mdev_stop_device_t)(struct vhost_mdev *vdpa);
->>> +typedef int (*vhost_mdev_set_features_t)(struct vhost_mdev *vdpa);
->>> +typedef void (*vhost_mdev_notify_device_t)(struct vhost_mdev *vdpa, int queue_id);
->>> +typedef u64 (*vhost_mdev_get_notify_addr_t)(struct vhost_mdev *vdpa, int queue_id);
->>> +typedef u16 (*vhost_mdev_get_vring_base_t)(struct vhost_mdev *vdpa, int queue_id);
->>> +typedef void (*vhost_mdev_features_changed_t)(struct vhost_mdev *vdpa);
->>> +
->>> +struct vhost_mdev_device_ops {
->>> +	vhost_mdev_start_device_t	start;
->>> +	vhost_mdev_stop_device_t	stop;
->>> +	vhost_mdev_notify_device_t	notify;
->>> +	vhost_mdev_get_notify_addr_t	get_notify_addr;
->>> +	vhost_mdev_get_vring_base_t	get_vring_base;
->>> +	vhost_mdev_features_changed_t	features_changed;
->>> +};
->>
->> Consider we want to implement a network device, who is going to implement
->> the device configuration space? I believe it's not good to invent another
->> set of API for doing this. So I believe we want something like
->> read_config/write_config here.
->>
->> Then I came up an idea:
->>
->> 1) introduce a new mdev bus transport, and a new mdev driver virtio_mdev
->> 2) vDPA (either software or hardware) can register as a device of virtio
->> mdev device
->> 3) then we can use kernel virtio driver to drive vDPA device and utilize
->> kernel networking/storage stack
->> 4) for userspace driver like vhost-mdev, it could be built of top of mdev
->> transport
->>
->> Having a full new transport for virtio, the advantages are obvious:
->>
->> 1) A generic solution for both kernel and userspace driver and support
->> configuration space access
->> 2) For kernel driver, exist kernel networking/storage stack could be reused,
->> and so did fast path implementation (e.g XDP, io_uring etc).
->> 2) For userspace driver, the function of virtio transport is a superset of
->> vhost, any API could be built on top easily (e.g vhost ioctl).
->>
->> What's your thought?
-> This sounds interesting to me! ;)
->
-> But I'm not quite sure whether it's the best choice to abstract
-> vhost accelerators as virtio device in vDPA. Virtio device is
-> the frontend device. There are some backend features missing in
-> virtio currently. E.g. there is no way to tell the virtio device
-> to do dirty page logging.
-
-
-This could be extended via new mdev transport. E.g set an memory region 
-for logging dirty pages.
-
-
-> Besides, e.g. the control vq in network
-> case seems not a quite good interface for a backend device.
-
-
-Yes, it was not implemented in current vhost-net. Having a new transport 
-will solve this issue.
-
-
->   In
-> this case, the userspace virtio-mdev driver in QEMU will do the
-> DMA mapping to allow guest driver to be able to use GPA/IOVA to
-> access the Rx/Tx queues of the virtio-mdev device directly, but
-> I'm wondering will this userspace virtio-mdev driver in QEMU use
-> similar IOVA to access the software based control vq of the same
-> virtio-mdev device at the same time?
-
-
-Let me clarify.
-
-- The first thing is to introduce a new mdev based transport, this could 
-something similar to virtio MMIO but the command was set through mdev bus.
-- Next step is to implement a mdev based transport for kernel driver, 
-this allow kernel virtio driver work with mdev device that implements 
-mdev transport. Then kernel networking or storage stack could be reused. 
-It work as, register a new mdev driver and a new mdev virtio transport, 
-then what it does is basically translate virtio_config_ops to mdev bus 
-command.
-- The third step is to implement virtio mdev device (mdev transport). 
-Then kernel virtio driver can drive those device without any modification.
-- The last part is to implement another mdev driver (e.g vhost-mdev), 
-this is for userspace driver. It did translation between userspace mdev 
-API (ioctl, etc) to mdev bus command.
-
-
-For the question of IOVA, in mdev transport, we will have a command like:
-
-#define VIRTIO_MDEV_QUEUE_DESC_LOW    0x080
-#define VIRTIO_MDEV_QUEUE_DESC_HIGH    0x084
-
-There's no need for the device know about what kind of address it is 
-(kernel or userspace, GPA or IOVA). It's the responsibility of parent 
-(mdev device) to do proper mapping. And mdev device implementation can 
-choose to emulate control vq, offloaded it fully to hardware or even 
-claim it was not supported.
-
-
-Thanks
-
->
-> Thanks,
-> Tiwei
->
->> Thanks
->>
->>
->>> +
->>> +struct vhost_mdev *vhost_mdev_alloc(struct mdev_device *mdev,
->>> +		void *private, int nvqs);
->>> +void vhost_mdev_free(struct vhost_mdev *vdpa);
->>> +
->>> +ssize_t vhost_mdev_read(struct mdev_device *mdev, char __user *buf,
->>> +		size_t count, loff_t *ppos);
->>> +ssize_t vhost_mdev_write(struct mdev_device *mdev, const char __user *buf,
->>> +		size_t count, loff_t *ppos);
->>> +long vhost_mdev_ioctl(struct mdev_device *mdev, unsigned int cmd,
->>> +		unsigned long arg);
->>> +int vhost_mdev_mmap(struct mdev_device *mdev, struct vm_area_struct *vma);
->>> +int vhost_mdev_open(struct mdev_device *mdev);
->>> +void vhost_mdev_close(struct mdev_device *mdev);
->>> +
->>> +int vhost_mdev_set_device_ops(struct vhost_mdev *vdpa,
->>> +		const struct vhost_mdev_device_ops *ops);
->>> +int vhost_mdev_set_features(struct vhost_mdev *vdpa, u64 features);
->>> +struct eventfd_ctx *vhost_mdev_get_call_ctx(struct vhost_mdev *vdpa,
->>> +		int queue_id);
->>> +int vhost_mdev_get_acked_features(struct vhost_mdev *vdpa, u64 *features);
->>> +int vhost_mdev_get_vring_num(struct vhost_mdev *vdpa, int queue_id, u16 *num);
->>> +int vhost_mdev_get_vring_base(struct vhost_mdev *vdpa, int queue_id, u16 *base);
->>> +int vhost_mdev_get_vring_addr(struct vhost_mdev *vdpa, int queue_id,
->>> +		struct vhost_vring_addr *addr);
->>> +int vhost_mdev_get_log_base(struct vhost_mdev *vdpa, int queue_id,
->>> +		void **log_base, u64 *log_size);
->>> +struct mdev_device *vhost_mdev_get_mdev(struct vhost_mdev *vdpa);
->>> +void *vhost_mdev_get_private(struct vhost_mdev *vdpa);
->>> +
->>> +#endif /* _VHOST_MDEV_H */
->>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->>> index 8f10748dac79..0300d6831cc5 100644
->>> --- a/include/uapi/linux/vfio.h
->>> +++ b/include/uapi/linux/vfio.h
->>> @@ -201,6 +201,7 @@ struct vfio_device_info {
->>>    #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
->>>    #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
->>>    #define VFIO_DEVICE_FLAGS_AP	(1 << 5)	/* vfio-ap device */
->>> +#define VFIO_DEVICE_FLAGS_VHOST	(1 << 6)	/* vfio-vhost device */
->>>    	__u32	num_regions;	/* Max region index + 1 */
->>>    	__u32	num_irqs;	/* Max IRQ index + 1 */
->>>    };
->>> @@ -217,6 +218,7 @@ struct vfio_device_info {
->>>    #define VFIO_DEVICE_API_AMBA_STRING		"vfio-amba"
->>>    #define VFIO_DEVICE_API_CCW_STRING		"vfio-ccw"
->>>    #define VFIO_DEVICE_API_AP_STRING		"vfio-ap"
->>> +#define VFIO_DEVICE_API_VHOST_STRING		"vfio-vhost"
->>>    /**
->>>     * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
->>> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
->>> index 40d028eed645..5afbc2f08fa3 100644
->>> --- a/include/uapi/linux/vhost.h
->>> +++ b/include/uapi/linux/vhost.h
->>> @@ -116,4 +116,12 @@
->>>    #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
->>>    #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
->>> +/* VHOST_MDEV specific defines */
->>> +
->>> +#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
->>> +
->>> +#define VHOST_MDEV_S_STOPPED	0
->>> +#define VHOST_MDEV_S_RUNNING	1
->>> +#define VHOST_MDEV_S_MAX	2
->>> +
->>>    #endif
+Ok. It is better than allocating memory twice. So I prefer to stick to this=
+ method.
+=20
+> >
+> > It is similar to device_initialize(), device init sequence code, where =
+once
+> device_initialize is done, freeing the device memory will be left to the
+> put_device(), we don't call kfree() on mdev device.
+>=20
+> This does not really look similar to me: devices are refcounted structure=
+s,
+> while strings aren't; you transfer a local pointer to a refcounted struct=
+ure
+> and then discard the local reference.
