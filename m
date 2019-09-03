@@ -2,294 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23A4DA5DC1
-	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 00:18:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D1E4A5ED0
+	for <lists+kvm@lfdr.de>; Tue,  3 Sep 2019 03:26:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727541AbfIBWSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Sep 2019 18:18:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47818 "EHLO mx1.redhat.com"
+        id S1725999AbfICB0l convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 2 Sep 2019 21:26:41 -0400
+Received: from mga06.intel.com ([134.134.136.31]:40447 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727438AbfIBWSC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Sep 2019 18:18:02 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B93CC3083394;
-        Mon,  2 Sep 2019 22:18:01 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-6.gru2.redhat.com [10.97.112.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EB0ED600C6;
-        Mon,  2 Sep 2019 22:18:00 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 7FF51105155;
-        Mon,  2 Sep 2019 19:17:17 -0300 (BRT)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x82MH9Tx007313;
-        Mon, 2 Sep 2019 19:17:09 -0300
-Date:   Mon, 2 Sep 2019 19:17:05 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     Joao Martins <joao.m.martins@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH v3] cpuidle-haltpoll: vcpu hotplug support
-Message-ID: <20190902221701.GA31730@amt.cnet>
-References: <20190902104031.9296-1-joao.m.martins@oracle.com>
- <CAJZ5v0g1rjRsaC1R2xvtn4WtCaWtedFQk+oNUgB5sPAc6cU8rA@mail.gmail.com>
+        id S1725807AbfICB0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Sep 2019 21:26:41 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Sep 2019 18:26:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,461,1559545200"; 
+   d="scan'208";a="181984609"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga008.fm.intel.com with ESMTP; 02 Sep 2019 18:26:40 -0700
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 2 Sep 2019 18:26:40 -0700
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 2 Sep 2019 18:26:38 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 2 Sep 2019 18:26:38 -0700
+Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.92]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.86]) with mapi id 14.03.0439.000;
+ Tue, 3 Sep 2019 09:26:37 +0800
+From:   "Zhang, Tina" <tina.zhang@intel.com>
+To:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kraxel@redhat.com" <kraxel@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
+Subject: RE: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
+Thread-Topic: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
+Thread-Index: AQHVU9tUM+mrk1EK3UW2FOPyJRIR1KcZNxag
+Date:   Tue, 3 Sep 2019 01:26:36 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC8771E7AE@SHSMSX101.ccr.corp.intel.com>
+References: <20190816023528.30210-1-tina.zhang@intel.com>
+In-Reply-To: <20190816023528.30210-1-tina.zhang@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzMwZmIxMjYtMzQzMC00MjllLTk2MjItZjc5ZjJhMzNiNjFkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibUlvalB4MW1UUGIrSlwvSXZMV2VpdVV0VldVTXh4ZW40a00xM2NSNjExUWo2XC9sdEdPNjFkXC9UNFB4V3hqc1dSaiJ9
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJZ5v0g1rjRsaC1R2xvtn4WtCaWtedFQk+oNUgB5sPAc6cU8rA@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 02 Sep 2019 22:18:01 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 02, 2019 at 10:34:07PM +0200, Rafael J. Wysocki wrote:
-> On Mon, Sep 2, 2019 at 12:43 PM Joao Martins <joao.m.martins@oracle.com> wrote:
-> >
-> > When cpus != maxcpus cpuidle-haltpoll will fail to register all vcpus
-> > past the online ones and thus fail to register the idle driver.
-> > This is because cpuidle_add_sysfs() will return with -ENODEV as a
-> > consequence from get_cpu_device() return no device for a non-existing
-> > CPU.
-> >
-> > Instead switch to cpuidle_register_driver() and manually register each
-> > of the present cpus through cpuhp_setup_state() callbacks and future
-> > ones that get onlined or offlined. This mimmics similar logic that
-> > intel_idle does.
-> >
-> > Fixes: fa86ee90eb11 ("add cpuidle-haltpoll driver")
-> > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> > Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> > ---
-> > v3:
-> > * register the teardown callback for correct handling of hotunplug
-> > and error cases. In case cpuhp_setup_state calls fails (e.g. in one of
-> > the cpus that it invoked the callback) it will then call the teardown of
-> > the previously enabled devices; so no need to handle that manually in
-> > haltpoll_uninit().
-> > * use the cpuhp_setup_state() returned dyn allocated state when it
-> > succeeds. And use that state in haltpoll_unint() to call
-> > cpuhp_remove_state() instead of looping online cpus manually. This
-> > is because cpuhp_remove_state() invokes the teardown/offline callback.
-> > * fix subsystem name to 'cpuidle' instead of 'idle' in cpuhp_setup_state()
-> 
-> Marcelo, is the R-by still applicable?
-> 
-> Paolo, any comments?
-> 
-> >
-> > v2:
-> > * move cpus_read_unlock() after unregistering all cpuidle_devices;
-> > (Marcello Tosatti)
-> > * redundant usage of cpuidle_unregister() when only
-> > cpuidle_unregister_driver() suffices; (Marcelo Tosatti)
-> > * cpuhp_setup_state() returns a state (> 0) for CPUHP_AP_ONLINE_DYN
-> > ---
-> >  arch/x86/include/asm/cpuidle_haltpoll.h |  4 +-
-> >  arch/x86/kernel/kvm.c                   | 18 +++----
-> >  drivers/cpuidle/cpuidle-haltpoll.c      | 68 +++++++++++++++++++++++--
-> >  include/linux/cpuidle_haltpoll.h        |  4 +-
-> >  4 files changed, 73 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/cpuidle_haltpoll.h b/arch/x86/include/asm/cpuidle_haltpoll.h
-> > index ff8607d81526..c8b39c6716ff 100644
-> > --- a/arch/x86/include/asm/cpuidle_haltpoll.h
-> > +++ b/arch/x86/include/asm/cpuidle_haltpoll.h
-> > @@ -2,7 +2,7 @@
-> >  #ifndef _ARCH_HALTPOLL_H
-> >  #define _ARCH_HALTPOLL_H
-> >
-> > -void arch_haltpoll_enable(void);
-> > -void arch_haltpoll_disable(void);
-> > +void arch_haltpoll_enable(unsigned int cpu);
-> > +void arch_haltpoll_disable(unsigned int cpu);
-> >
-> >  #endif
-> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> > index 8d150e3732d9..a9b6c4e2446d 100644
-> > --- a/arch/x86/kernel/kvm.c
-> > +++ b/arch/x86/kernel/kvm.c
-> > @@ -880,32 +880,26 @@ static void kvm_enable_host_haltpoll(void *i)
-> >         wrmsrl(MSR_KVM_POLL_CONTROL, 1);
-> >  }
-> >
-> > -void arch_haltpoll_enable(void)
-> > +void arch_haltpoll_enable(unsigned int cpu)
-> >  {
-> >         if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
-> > -               printk(KERN_ERR "kvm: host does not support poll control\n");
-> > -               printk(KERN_ERR "kvm: host upgrade recommended\n");
-> > +               pr_err_once("kvm: host does not support poll control\n");
-> > +               pr_err_once("kvm: host upgrade recommended\n");
-> >                 return;
-> >         }
-> >
-> > -       preempt_disable();
-> >         /* Enable guest halt poll disables host halt poll */
-> > -       kvm_disable_host_haltpoll(NULL);
-> > -       smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
-> > -       preempt_enable();
-> > +       smp_call_function_single(cpu, kvm_disable_host_haltpoll, NULL, 1);
-> >  }
-> >  EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
-> >
-> > -void arch_haltpoll_disable(void)
-> > +void arch_haltpoll_disable(unsigned int cpu)
-> >  {
-> >         if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
-> >                 return;
-> >
-> > -       preempt_disable();
-> >         /* Enable guest halt poll disables host halt poll */
-> > -       kvm_enable_host_haltpoll(NULL);
-> > -       smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
-> > -       preempt_enable();
-> > +       smp_call_function_single(cpu, kvm_enable_host_haltpoll, NULL, 1);
-> >  }
-> >  EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
-> >  #endif
-> > diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
-> > index 9ac093dcbb01..56d8ab814466 100644
-> > --- a/drivers/cpuidle/cpuidle-haltpoll.c
-> > +++ b/drivers/cpuidle/cpuidle-haltpoll.c
-> > @@ -11,12 +11,16 @@
-> >   */
-> >
-> >  #include <linux/init.h>
-> > +#include <linux/cpu.h>
-> >  #include <linux/cpuidle.h>
-> >  #include <linux/module.h>
-> >  #include <linux/sched/idle.h>
-> >  #include <linux/kvm_para.h>
-> >  #include <linux/cpuidle_haltpoll.h>
-> >
-> > +static struct cpuidle_device __percpu *haltpoll_cpuidle_devices;
-> > +static enum cpuhp_state haltpoll_hp_state;
-> > +
-> >  static int default_enter_idle(struct cpuidle_device *dev,
-> >                               struct cpuidle_driver *drv, int index)
-> >  {
-> > @@ -46,6 +50,46 @@ static struct cpuidle_driver haltpoll_driver = {
-> >         .state_count = 2,
-> >  };
-> >
-> > +static int haltpoll_cpu_online(unsigned int cpu)
-> > +{
-> > +       struct cpuidle_device *dev;
-> > +
-> > +       dev = per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
-> > +       if (!dev->registered) {
-> > +               dev->cpu = cpu;
-> > +               if (cpuidle_register_device(dev)) {
-> > +                       pr_notice("cpuidle_register_device %d failed!\n", cpu);
-> > +                       return -EIO;
-> > +               }
-> > +               arch_haltpoll_enable(cpu);
-> > +       }
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static int haltpoll_cpu_offline(unsigned int cpu)
-> > +{
-> > +       struct cpuidle_device *dev;
-> > +
-> > +       dev = per_cpu_ptr(haltpoll_cpuidle_devices, cpu);
-> > +       if (dev->registered) {
-> > +               arch_haltpoll_disable(cpu);
-> > +               cpuidle_unregister_device(dev);
-> > +       }
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static void haltpoll_uninit(void)
-> > +{
-> > +       if (haltpoll_hp_state)
-> > +               cpuhp_remove_state(haltpoll_hp_state);
-> > +       cpuidle_unregister_driver(&haltpoll_driver);
-> > +
-> > +       free_percpu(haltpoll_cpuidle_devices);
-> > +       haltpoll_cpuidle_devices = NULL;
-> > +}
-> > +
-> >  static int __init haltpoll_init(void)
-> >  {
-> >         int ret;
-> > @@ -56,17 +100,31 @@ static int __init haltpoll_init(void)
-> >         if (!kvm_para_available())
-> >                 return 0;
-> >
-> > -       ret = cpuidle_register(&haltpoll_driver, NULL);
-> > -       if (ret == 0)
-> > -               arch_haltpoll_enable();
-> > +       ret = cpuidle_register_driver(drv);
-> > +       if (ret < 0)
-> > +               return ret;
-> > +
-> > +       haltpoll_cpuidle_devices = alloc_percpu(struct cpuidle_device);
-> > +       if (haltpoll_cpuidle_devices == NULL) {
-> > +               cpuidle_unregister_driver(drv);
-> > +               return -ENOMEM;
-> > +       }
-> > +
-> > +       ret = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "cpuidle/haltpoll:online",
-> > +                               haltpoll_cpu_online, haltpoll_cpu_offline);
-> > +       if (ret < 0) {
-> > +               haltpoll_uninit();
-> > +       } else {
-> > +               haltpoll_hp_state = ret;
-> > +               ret = 0;
-> > +       }
-> >
-> >         return ret;
-> >  }
-> >
-> >  static void __exit haltpoll_exit(void)
-> >  {
-> > -       arch_haltpoll_disable();
-> > -       cpuidle_unregister(&haltpoll_driver);
-> > +       haltpoll_uninit();
-> >  }
-> >
-> >  module_init(haltpoll_init);
-> > diff --git a/include/linux/cpuidle_haltpoll.h b/include/linux/cpuidle_haltpoll.h
-> > index fe5954c2409e..d50c1e0411a2 100644
-> > --- a/include/linux/cpuidle_haltpoll.h
-> > +++ b/include/linux/cpuidle_haltpoll.h
-> > @@ -5,11 +5,11 @@
-> >  #ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
-> >  #include <asm/cpuidle_haltpoll.h>
-> >  #else
-> > -static inline void arch_haltpoll_enable(void)
-> > +static inline void arch_haltpoll_enable(unsigned int cpu)
-> >  {
-> >  }
-> >
-> > -static inline void arch_haltpoll_disable(void)
-> > +static inline void arch_haltpoll_disable(unsigned int cpu)
-> >  {
-> >  }
-> >  #endif
-> > --
-> > 2.17.1
-> >
+Hi,
 
-Reviewed-by: Marcelo Tosatti <mtosatti@redhat.com>
+Some people are asking whether the display refresh irq could be provided by qemu vfio display?
 
+Some background: currently, we have two display timers. One is provided by QEMU UI and the other one is provided by the vgpu. The vgpu display framebuffer consumers (i.e. QEMU UIs) depend on the UI timer to consume the contents in the vgpu display framebuffer, meanwhile the display framebuffer producer (e.g. gvt-g display model) updates the framebuffer content according to the vblank timer provided by gpu vendor driver. Since these two timers are not synced, tearing could be noticed. 
+
+So, theoretically to solve this tearing problem, we could have two options:
+
+Option 1: Like what we have in this patch set: stop the QEMU UI timer and let both the framebuffer consumers and the framebuffer producer sync to the display refresh event provided by vendor driver. So, QEMU UI can do the refresh depending on this display refresh event to make sure to have a tear-free framebuffer.
+
+Option 2: QEMU provides the emulated display refresh event to the vgpus provided by vendor driver. For vgpus, the display refresh event can be considered as the vblank event which is leveraged by guest window manager to do the plane update or mode-setting.
+
+People are asking if option 2 could be a better choice.
+
+Thanks.
+
+BR,
+Tina
+
+> -----Original Message-----
+> From: Zhang, Tina
+> Sent: Friday, August 16, 2019 10:35 AM
+> To: intel-gvt-dev@lists.freedesktop.org
+> Cc: Zhang, Tina <tina.zhang@intel.com>; kraxel@redhat.com;
+> alex.williamson@redhat.com; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Yuan, Hang <hang.yuan@intel.com>; Lv, Zhiyuan
+> <zhiyuan.lv@intel.com>
+> Subject: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
+> 
+> This series tries to send the vGPU display refresh event to user land.
+> 
+> Instead of delivering page flip events only or vblank events only, we choose
+> to combine two of them, i.e. post display refresh event at vblanks and skip
+> some of them when no page flip happens. Vblanks as upper bound are safe
+> and skipping no-page-flip vblanks guarantees both trivial performance
+> impacts and good user experience without screen tearing. Plus, we have the
+> mask/unmask mechansim providing user space flexibility to switch between
+> event-notified refresh and classic timer-based refresh.
+> 
+> In addition, there are some cases that guest app only uses one framebuffer
+> for both drawing and display. In such case, guest OS won't do the plane page
+> flip when the framebuffer is updated, thus the user land won't be notified
+> about the updated framebuffer. Hence, in single framebuffer case, we apply
+> a heuristic to determine whether it is the case or not. If it is, notify user land
+> when each vblank event triggers.
+> 
+> v5:
+> - Introduce a vGPU display irq cap which can notify user space with
+>   both primary and cursor plane update events through one eventfd. (Gerd &
+> Alex)
+> v4:
+> - Deliver page flip event and single framebuffer refresh event bounded by
+> display vblanks. (Kechen)
+> v3:
+> - Deliver display vblank event instead of page flip event. (Zhenyu)
+> v2:
+> - Use VFIO irq chain to get eventfds from userspace instead of adding a new
+> ABI. (Alex)
+> v1:
+> - https://patchwork.kernel.org/cover/10962341/
+> 
+> Kechen Lu (2):
+>   drm/i915/gvt: Deliver async primary plane page flip events at vblank
+>   drm/i915/gvt: Add cursor plane reg update trap emulation handler
+> 
+> Tina Zhang (4):
+>   vfio: Define device specific irq type capability
+>   vfio: Introduce vGPU display irq type
+>   drm/i915/gvt: Register vGPU display event irq
+>   drm/i915/gvt: Deliver vGPU refresh event to userspace
+> 
+>  drivers/gpu/drm/i915/gvt/cmd_parser.c |   6 +-
+>  drivers/gpu/drm/i915/gvt/display.c    |  49 +++++-
+>  drivers/gpu/drm/i915/gvt/display.h    |   3 +
+>  drivers/gpu/drm/i915/gvt/gvt.h        |   6 +
+>  drivers/gpu/drm/i915/gvt/handlers.c   |  32 +++-
+>  drivers/gpu/drm/i915/gvt/hypercall.h  |   1 +
+>  drivers/gpu/drm/i915/gvt/interrupt.c  |   7 +
+>  drivers/gpu/drm/i915/gvt/interrupt.h  |   3 +
+>  drivers/gpu/drm/i915/gvt/kvmgt.c      | 230 +++++++++++++++++++++++++-
+>  drivers/gpu/drm/i915/gvt/mpt.h        |  17 ++
+>  include/uapi/linux/vfio.h             |  40 ++++-
+>  11 files changed, 375 insertions(+), 19 deletions(-)
+> 
+> --
+> 2.17.1
 
