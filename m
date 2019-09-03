@@ -2,173 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A16D4A778A
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 01:24:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EF79A779D
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 01:36:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727428AbfICXXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Sep 2019 19:23:55 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:60478 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727312AbfICXXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Sep 2019 19:23:55 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83NJ1Vl190771;
-        Tue, 3 Sep 2019 23:22:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=UJw1Y7uj9g+SZ5DNCrU6LVe85QHvYGaiIqcF/IakMzU=;
- b=EIQPFezCGZombwumJIllsao9P3vulQ05xy4KvTAHKiCCFloSPNeEKHi5OlHoGrv1KywI
- oEjbyHmiYhG44mYXPnuwylFQ1PzN52amHke/Zqanyf1DeLJs33cQ6c6sQsWUJi6B0oRQ
- Drv2yt+TAm6pTYcek0KfqBPYO68mTLgiaot870Q9pRx0VwCHt2BXwhNyJPg/ILYlstTz
- dHS9ipoRL3q3zFEds5pVEeot46kL4vk7FwkCLqaVvmtonqeSjWLha6eU2qfLzqTt5vVV
- 3oHXFMY1QDUKJMIrPl8SG4xS0YyxidZue22yDHP8mmwjkwJPZQoA39+sbrFauYHxrsKK zA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2ut1qf80je-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 Sep 2019 23:22:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x83NJNdf003211;
-        Tue, 3 Sep 2019 23:20:19 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2us5phdxgm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 Sep 2019 23:20:19 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x83NKGsT015382;
-        Tue, 3 Sep 2019 23:20:16 GMT
-Received: from [192.168.14.112] (/79.176.230.160)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 03 Sep 2019 16:20:16 -0700
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 2/2] KVM: SVM: Disable posted interrupts for odd IRQs
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190903142954.3429-3-graf@amazon.com>
-Date:   Wed, 4 Sep 2019 02:20:08 +0300
-Cc:     kvm list <kvm@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S1726953AbfICXgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Sep 2019 19:36:50 -0400
+Received: from mga07.intel.com ([134.134.136.100]:50861 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726090AbfICXgu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Sep 2019 19:36:50 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Sep 2019 16:36:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,464,1559545200"; 
+   d="scan'208";a="357911314"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by orsmga005.jf.intel.com with ESMTP; 03 Sep 2019 16:36:49 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7AEDDBE7-138A-455F-957C-C2DE64BD8B06@oracle.com>
-References: <20190903142954.3429-1-graf@amazon.com>
- <20190903142954.3429-3-graf@amazon.com>
-To:     Alexander Graf <graf@amazon.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909030234
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9369 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909030234
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+        Doug Reiland <doug.reiland@intel.com>
+Subject: [PATCH] KVM: x86: Manually calculate reserved bits when loading PDPTRS
+Date:   Tue,  3 Sep 2019 16:36:45 -0700
+Message-Id: <20190903233645.21125-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Manually generate the PDPTR reserved bit mask when explicitly loading
+PDPTRs.  The reserved bits that are being tracked by the MMU reflect the
+current paging mode, which is unlikely to be PAE paging in the vast
+majority of flows that use load_pdptrs(), e.g. CR0 and CR4 emulation,
+__set_sregs(), etc...  This can cause KVM to incorrectly signal a bad
+PDPTR, or more likely, miss a reserved bit check and subsequently fail
+a VM-Enter due to a bad VMCS.GUEST_PDPTR.
 
+Add a one off helper to generate the reserved bits instead of sharing
+code across the MMU's calculations and the PDPTR emulation.  The PDPTR
+reserved bits are basically set in stone, and pushing a helper into
+the MMU's calculation adds unnecessary complexity without improving
+readability.
 
-> On 3 Sep 2019, at 17:29, Alexander Graf <graf@amazon.com> wrote:
->=20
-> We can easily route hardware interrupts directly into VM context when
-> they target the "Fixed" or "LowPriority" delivery modes.
->=20
-> However, on modes such as "SMI" or "Init", we need to go via KVM code
-> to actually put the vCPU into a different mode of operation, so we can
-> not post the interrupt
->=20
-> Add code in the SVM PI logic to explicitly refuse to establish posted
-> mappings for advanced IRQ deliver modes.
->=20
-> This fixes a bug I have with code which configures real hardware to
-> inject virtual SMIs into my guest.
->=20
-> Signed-off-by: Alexander Graf <graf@amazon.com>
+Oppurtunistically fix/update the comment for load_pdptrs().
 
-Nit: I prefer to squash both commits into one that change both VMX & =
-SVM.
-As it=E2=80=99s exactly the same change.
+Note, the buggy commit also introduced a deliberate functional change,
+"Also remove bit 5-6 from rsvd_bits_mask per latest SDM.", which was
+effectively (and correctly) reverted by commit cd9ae5fe47df ("KVM: x86:
+Fix page-tables reserved bits").  A bit of SDM archaeology shows that
+the SDM from late 2008 had a bug (likely a copy+paste error) where it
+listed bits 6:5 as AVL and A for PDPTEs used for 4k entries but reserved
+for 2mb entries.  I.e. the SDM contradicted itself, and bits 6:5 are and
+always have been reserved.
 
-> ---
-> arch/x86/kvm/svm.c | 16 ++++++++++++++++
-> 1 file changed, 16 insertions(+)
->=20
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 1f220a85514f..9a6ea78c3239 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5266,6 +5266,21 @@ get_pi_vcpu_info(struct kvm *kvm, struct =
-kvm_kernel_irq_routing_entry *e,
-> 		return -1;
-> 	}
->=20
-> +	switch (irq.delivery_mode) {
-> +	case dest_Fixed:
-> +	case dest_LowestPrio:
-> +		break;
-> +	default:
-> +		/*
-> +		 * For non-trivial interrupt events, we need to go
-> +		 * through the full KVM IRQ code, so refuse to take
-> +		 * any direct PI assignments here.
-> +		 */
-> +		pr_debug("SVM: %s: use legacy intr remap mode for irq =
-%u\n",
-> +			 __func__, irq.vector);
-> +		return -1;
-> +	}
-> +
+Fixes: 20c466b56168d ("KVM: Use rsvd_bits_mask in load_pdptrs()")
+Cc: stable@vger.kernel.org
+Cc: Nadav Amit <nadav.amit@gmail.com>
+Reported-by: Doug Reiland <doug.reiland@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/x86.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-Prefer changing printed string to something different than the =
-!kvm_intr_is_single_vcpu() case.
-To assist debugging.
-
-Having said that,
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-
--Liran
-
-> 	pr_debug("SVM: %s: use GA mode for irq %u\n", __func__,
-> 		 irq.vector);
-> 	*svm =3D to_svm(vcpu);
-> @@ -5314,6 +5329,7 @@ static int svm_update_pi_irte(struct kvm *kvm, =
-unsigned int host_irq,
-> 		 * 1. When cannot target interrupt to a specific vcpu.
-> 		 * 2. Unsetting posted interrupt.
-> 		 * 3. APIC virtialization is disabled for the vcpu.
-> +		 * 4. IRQ has extended delivery mode (SMI, INIT, etc)
-> 		 */
-> 		if (!get_pi_vcpu_info(kvm, e, &vcpu_info, &svm) && set =
-&&
-> 		    kvm_vcpu_apicv_active(&svm->vcpu)) {
-> --=20
-> 2.17.1
->=20
->=20
->=20
->=20
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
->=20
->=20
->=20
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 290c3c3efb87..548cc6ef5408 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -674,8 +674,14 @@ static int kvm_read_nested_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 				       data, offset, len, access);
+ }
+ 
++static inline u64 pdptr_rsvd_bits(struct kvm_vcpu *vcpu)
++{
++	return rsvd_bits(cpuid_maxphyaddr(vcpu), 63) | rsvd_bits(5, 8) |
++	       rsvd_bits(1, 2);
++}
++
+ /*
+- * Load the pae pdptrs.  Return true is they are all valid.
++ * Load the pae pdptrs.  Return 1 if they are all valid, 0 otherwise.
+  */
+ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
+ {
+@@ -694,8 +700,7 @@ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
+ 	}
+ 	for (i = 0; i < ARRAY_SIZE(pdpte); ++i) {
+ 		if ((pdpte[i] & PT_PRESENT_MASK) &&
+-		    (pdpte[i] &
+-		     vcpu->arch.mmu->guest_rsvd_check.rsvd_bits_mask[0][2])) {
++		    (pdpte[i] & pdptr_rsvd_bits(vcpu))) {
+ 			ret = 0;
+ 			goto out;
+ 		}
+-- 
+2.22.0
 
