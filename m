@@ -2,84 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F72BA7B65
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 08:15:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 043C7A7C5E
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 09:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728849AbfIDGP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 02:15:56 -0400
-Received: from mga05.intel.com ([192.55.52.43]:60359 "EHLO mga05.intel.com"
+        id S1728796AbfIDHNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 03:13:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37176 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725938AbfIDGP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 02:15:56 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Sep 2019 23:15:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,465,1559545200"; 
-   d="scan'208";a="173462883"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.43.44])
-  by orsmga007.jf.intel.com with ESMTP; 03 Sep 2019 23:15:53 -0700
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        id S1725938AbfIDHNP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 03:13:15 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D88157CBB1;
+        Wed,  4 Sep 2019 07:13:14 +0000 (UTC)
+Received: from thuth.com (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0339D1001B1A;
+        Wed,  4 Sep 2019 07:13:12 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2] doc: kvm: Fix return description of KVM_SET_MSRS
-Date:   Wed,  4 Sep 2019 14:01:18 +0800
-Message-Id: <20190904060118.43851-1-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.19.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH] KVM: s390: Disallow invalid bits in kvm_valid_regs and kvm_dirty_regs
+Date:   Wed,  4 Sep 2019 09:13:08 +0200
+Message-Id: <20190904071308.25683-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 04 Sep 2019 07:13:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Userspace can use ioctl KVM_SET_MSRS to update a set of MSRs of guest.
-This ioctl sets specified MSRs one by one. Once it fails to set an MSR
-due to setting reserved bits, the MSR is not supported/emulated by kvm,
-or violating other restrictions, it stops further processing and returns
-the number of MSRs have been set successfully.
+If unknown bits are set in kvm_valid_regs or kvm_dirty_regs, this
+clearly indicates that something went wrong in the KVM userspace
+application. The x86 variant of KVM already contains a check for
+bad bits (and the corresponding kselftest checks this), so let's
+do the same on s390x now, too.
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
-v2:
-  elaborate the changelog and description of ioctl KVM_SET_MSRS based on
-  Sean's comments.
+ arch/s390/include/uapi/asm/kvm.h              |  6 ++++
+ arch/s390/kvm/kvm-s390.c                      |  4 +++
+ .../selftests/kvm/s390x/sync_regs_test.c      | 30 +++++++++++++++++++
+ 3 files changed, 40 insertions(+)
 
----
- Documentation/virt/kvm/api.txt | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-index 2d067767b617..4638e893dec0 100644
---- a/Documentation/virt/kvm/api.txt
-+++ b/Documentation/virt/kvm/api.txt
-@@ -586,7 +586,7 @@ Capability: basic
- Architectures: x86
- Type: vcpu ioctl
- Parameters: struct kvm_msrs (in)
--Returns: 0 on success, -1 on error
-+Returns: number of msrs successfully set (see below), -1 on error
- 
- Writes model-specific registers to the vcpu.  See KVM_GET_MSRS for the
- data structures.
-@@ -595,6 +595,11 @@ Application code should set the 'nmsrs' member (which indicates the
- size of the entries array), and the 'index' and 'data' members of each
- array entry.
- 
-+It tries to set the MSRs in array entries[] one by one. Once failing to
-+set an MSR (due to setting reserved bits, the MSR is not supported/emulated
-+by kvm, or violating other restrctions), it stops setting following MSRs
-+and returns the number of MSRs have been set successfully.
+diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+index 47104e5b47fd..436ec7636927 100644
+--- a/arch/s390/include/uapi/asm/kvm.h
++++ b/arch/s390/include/uapi/asm/kvm.h
+@@ -231,6 +231,12 @@ struct kvm_guest_debug_arch {
+ #define KVM_SYNC_GSCB   (1UL << 9)
+ #define KVM_SYNC_BPBC   (1UL << 10)
+ #define KVM_SYNC_ETOKEN (1UL << 11)
 +
++#define KVM_SYNC_S390_VALID_FIELDS \
++	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
++	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | \
++	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
++
+ /* length and alignment of the sdnx as a power of two */
+ #define SDNXC 8
+ #define SDNXL (1UL << SDNXC)
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 49d7722229ae..a7d7dedfe527 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -3998,6 +3998,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kvm_run)
+ 	if (kvm_run->immediate_exit)
+ 		return -EINTR;
  
- 4.20 KVM_SET_CPUID
++	if (kvm_run->kvm_valid_regs & ~KVM_SYNC_S390_VALID_FIELDS ||
++	    kvm_run->kvm_dirty_regs & ~KVM_SYNC_S390_VALID_FIELDS)
++		return -EINVAL;
++
+ 	vcpu_load(vcpu);
  
+ 	if (guestdbg_exit_pending(vcpu)) {
+diff --git a/tools/testing/selftests/kvm/s390x/sync_regs_test.c b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+index bbc93094519b..d5290b4ad636 100644
+--- a/tools/testing/selftests/kvm/s390x/sync_regs_test.c
++++ b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+@@ -85,6 +85,36 @@ int main(int argc, char *argv[])
+ 
+ 	run = vcpu_state(vm, VCPU_ID);
+ 
++	/* Request reading invalid register set from VCPU. */
++	run->kvm_valid_regs = INVALID_SYNC_FIELD;
++	rv = _vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(rv < 0 && errno == EINVAL,
++		    "Invalid kvm_valid_regs did not cause expected KVM_RUN error: %d\n",
++		    rv);
++	vcpu_state(vm, VCPU_ID)->kvm_valid_regs = 0;
++
++	run->kvm_valid_regs = INVALID_SYNC_FIELD | TEST_SYNC_FIELDS;
++	rv = _vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(rv < 0 && errno == EINVAL,
++		    "Invalid kvm_valid_regs did not cause expected KVM_RUN error: %d\n",
++		    rv);
++	vcpu_state(vm, VCPU_ID)->kvm_valid_regs = 0;
++
++	/* Request setting invalid register set into VCPU. */
++	run->kvm_dirty_regs = INVALID_SYNC_FIELD;
++	rv = _vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(rv < 0 && errno == EINVAL,
++		    "Invalid kvm_dirty_regs did not cause expected KVM_RUN error: %d\n",
++		    rv);
++	vcpu_state(vm, VCPU_ID)->kvm_dirty_regs = 0;
++
++	run->kvm_dirty_regs = INVALID_SYNC_FIELD | TEST_SYNC_FIELDS;
++	rv = _vcpu_run(vm, VCPU_ID);
++	TEST_ASSERT(rv < 0 && errno == EINVAL,
++		    "Invalid kvm_dirty_regs did not cause expected KVM_RUN error: %d\n",
++		    rv);
++	vcpu_state(vm, VCPU_ID)->kvm_dirty_regs = 0;
++
+ 	/* Request and verify all valid register sets. */
+ 	run->kvm_valid_regs = TEST_SYNC_FIELDS;
+ 	rv = _vcpu_run(vm, VCPU_ID);
 -- 
-2.19.1
+2.18.1
 
