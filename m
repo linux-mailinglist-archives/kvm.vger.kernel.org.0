@@ -2,143 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2D8AA8498
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 15:50:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB190A84B5
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 15:50:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730476AbfIDNfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 09:35:55 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:41964 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730142AbfIDNfy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 09:35:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1567604153; x=1599140153;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=DvXyQ/caPYxtunrlbeZWX70rlOc+ISFPg6+8zaGxv5U=;
-  b=ekzGnjDVP7ivdpkxGC1jeSbxe2eE/JwHFydSJked49i4iZeraubOdmh/
-   FGaQ2JrPJwks87464YApw80gEV+I6coNR4KuT1mYEDaAuzegkhcdR5x3E
-   b4ODJtAkHZR/ZAqx0ySx88q5RQi8nupSh8enKJQWh0guKHeLvcanAkjNx
-   g=;
-X-IronPort-AV: E=Sophos;i="5.64,467,1559520000"; 
-   d="scan'208";a="827208758"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-1a-821c648d.us-east-1.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 04 Sep 2019 13:35:34 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1a-821c648d.us-east-1.amazon.com (Postfix) with ESMTPS id 77910A25E5;
-        Wed,  4 Sep 2019 13:35:29 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 4 Sep 2019 13:35:29 +0000
-Received: from u79c5a0a55de558.ant.amazon.com (10.43.160.160) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 4 Sep 2019 13:35:25 +0000
-From:   Alexander Graf <graf@amazon.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Sean Christopherson" <sean.j.christopherson@intel.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH v2 2/2] KVM: SVM: Disable posted interrupts for odd IRQs
-Date:   Wed, 4 Sep 2019 15:35:11 +0200
-Message-ID: <20190904133511.17540-3-graf@amazon.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190904133511.17540-1-graf@amazon.com>
-References: <20190904133511.17540-1-graf@amazon.com>
+        id S1729895AbfIDNs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 09:48:27 -0400
+Received: from mga05.intel.com ([192.55.52.43]:31668 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728941AbfIDNs1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 09:48:27 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 06:48:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,467,1559545200"; 
+   d="scan'208";a="212397283"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
+  by fmsmga002.fm.intel.com with ESMTP; 04 Sep 2019 06:48:23 -0700
+Date:   Wed, 4 Sep 2019 21:49:25 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
+Subject: Re: [PATCH RESEND v4 8/9] KVM: MMU: Enable Lazy mode SPPT setup
+Message-ID: <20190904134925.GA25149@local-michael-cet-test.sh.intel.com>
+References: <20190814070403.6588-1-weijiang.yang@intel.com>
+ <20190814070403.6588-9-weijiang.yang@intel.com>
+ <63f8952b-2497-16ec-ff55-1da017c50a8c@redhat.com>
+ <20190820131214.GD4828@local-michael-cet-test.sh.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.160.160]
-X-ClientProxiedBy: EX13D31UWA002.ant.amazon.com (10.43.160.82) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190820131214.GD4828@local-michael-cet-test.sh.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We can easily route hardware interrupts directly into VM context when
-they target the "Fixed" or "LowPriority" delivery modes.
+On Tue, Aug 20, 2019 at 09:12:14PM +0800, Yang Weijiang wrote:
+> On Mon, Aug 19, 2019 at 04:46:54PM +0200, Paolo Bonzini wrote:
+> > On 14/08/19 09:04, Yang Weijiang wrote:
+> > > +
+> > > +	if (vcpu->kvm->arch.spp_active && level == PT_PAGE_TABLE_LEVEL)
+> > > +		kvm_enable_spp_protection(vcpu->kvm, gfn);
+> > > +
+> > 
+> > This would not enable SPP if the guest is backed by huge pages.
+> > Instead, either the PT_PAGE_TABLE_LEVEL level must be forced for all
+> > pages covered by SPP ranges, or (better) kvm_enable_spp_protection must
+> > be able to cover multiple pages at once.
+> > 
+> > Paolo
+> OK, I'll figure out how to make it, thanks!
+Hi, Paolo,
+Regarding this change, I have some concerns, splitting EPT huge page
+entries(e.g., 1GB page)will take long time compared with normal EPT page
+fault processing, especially for multiple vcpus/pages,so the in-flight time increases,
+but HW walks EPT for translations in the meantime, would it bring any side effect? 
+or there's a way to mitigate it?
 
-However, on modes such as "SMI" or "Init", we need to go via KVM code
-to actually put the vCPU into a different mode of operation, so we can
-not post the interrupt
-
-Add code in the SVM PI logic to explicitly refuse to establish posted
-mappings for advanced IRQ deliver modes. This reflects the logic in
-__apic_accept_irq() which also only ever passes Fixed and LowPriority
-interrupts as posted interrupts into the guest.
-
-This fixes a bug I have with code which configures real hardware to
-inject virtual SMIs into my guest.
-
-Signed-off-by: Alexander Graf <graf@amazon.com>
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-
----
-
-v1 -> v2:
-
-  - Make error message more unique
-  - Update commit message to point to __apic_accept_irq()
----
- arch/x86/kvm/svm.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 1f220a85514f..b86b45b85da8 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -5266,6 +5266,21 @@ get_pi_vcpu_info(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
- 		return -1;
- 	}
- 
-+	switch (irq.delivery_mode) {
-+	case dest_Fixed:
-+	case dest_LowestPrio:
-+		break;
-+	default:
-+		/*
-+		 * For non-trivial interrupt events, we need to go
-+		 * through the full KVM IRQ code, so refuse to take
-+		 * any direct PI assignments here.
-+		 */
-+		pr_debug("SVM: %s: use legacy intr mode for non-std irq %u\n",
-+			 __func__, irq.vector);
-+		return -1;
-+	}
-+
- 	pr_debug("SVM: %s: use GA mode for irq %u\n", __func__,
- 		 irq.vector);
- 	*svm = to_svm(vcpu);
-@@ -5314,6 +5329,7 @@ static int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
- 		 * 1. When cannot target interrupt to a specific vcpu.
- 		 * 2. Unsetting posted interrupt.
- 		 * 3. APIC virtialization is disabled for the vcpu.
-+		 * 4. IRQ has extended delivery mode (SMI, INIT, etc)
- 		 */
- 		if (!get_pi_vcpu_info(kvm, e, &vcpu_info, &svm) && set &&
- 		    kvm_vcpu_apicv_active(&svm->vcpu)) {
--- 
-2.17.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+Thanks!
 
