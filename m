@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7314A92DD
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 22:15:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF716A93C2
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 22:32:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728238AbfIDUPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 16:15:10 -0400
-Received: from mga03.intel.com ([134.134.136.65]:46955 "EHLO mga03.intel.com"
+        id S1730225AbfIDUcq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 16:32:46 -0400
+Received: from mga12.intel.com ([192.55.52.136]:55227 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726495AbfIDUPJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 16:15:09 -0400
+        id S1727125AbfIDUcq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 16:32:46 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 13:15:08 -0700
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 13:32:45 -0700
 X-IronPort-AV: E=Sophos;i="5.64,468,1559545200"; 
-   d="scan'208";a="187738920"
+   d="scan'208";a="177069505"
 Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 13:15:07 -0700
-Message-ID: <d451a4b08bfe5fc6ccc60b85d229baf011a37809.camel@linux.intel.com>
-Subject: Re: [PATCH v7 6/6] virtio-balloon: Add support for providing unused
- page reports to host
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 13:32:44 -0700
+Message-ID: <a6a0770adc5c5d593e407e26589cb2bc552f4cbb.camel@linux.intel.com>
+Subject: Re: [virtio-dev] Re: [PATCH v7 5/6] virtio-balloon: Pull page
+ poisoning config out of free page hinting
 From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
 To:     "Michael S. Tsirkin" <mst@redhat.com>,
         Alexander Duyck <alexander.duyck@gmail.com>
@@ -33,11 +33,11 @@ Cc:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
         riel@surriel.com, konrad.wilk@oracle.com, lcapitulino@redhat.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com
-Date:   Wed, 04 Sep 2019 13:15:07 -0700
-In-Reply-To: <20190904151506-mutt-send-email-mst@kernel.org>
+Date:   Wed, 04 Sep 2019 13:32:44 -0700
+In-Reply-To: <20190904152244-mutt-send-email-mst@kernel.org>
 References: <20190904150920.13848.32271.stgit@localhost.localdomain>
-         <20190904151102.13848.65770.stgit@localhost.localdomain>
-         <20190904151506-mutt-send-email-mst@kernel.org>
+         <20190904151055.13848.27351.stgit@localhost.localdomain>
+         <20190904152244-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
@@ -47,119 +47,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2019-09-04 at 15:17 -0400, Michael S. Tsirkin wrote:
-> On Wed, Sep 04, 2019 at 08:11:02AM -0700, Alexander Duyck wrote:
+On Wed, 2019-09-04 at 15:28 -0400, Michael S. Tsirkin wrote:
+> On Wed, Sep 04, 2019 at 08:10:55AM -0700, Alexander Duyck wrote:
 > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > > 
-> > Add support for the page reporting feature provided by virtio-balloon.
-> > Reporting differs from the regular balloon functionality in that is is
-> > much less durable than a standard memory balloon. Instead of creating a
-> > list of pages that cannot be accessed the pages are only inaccessible
-> > while they are being indicated to the virtio interface. Once the
-> > interface has acknowledged them they are placed back into their respective
-> > free lists and are once again accessible by the guest system.
+> > Currently the page poisoning setting wasn't being enabled unless free page
+> > hinting was enabled. However we will need the page poisoning tracking logic
+> > as well for unused page reporting. As such pull it out and make it a
+> > separate bit of config in the probe function.
+> > 
+> > In addition we can actually wrap the code in a check for NO_SANITY. If we
+> > don't care what is actually in the page we can just default to 0 and leave
+> > it there.
 > > 
 > > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > > ---
-> >  drivers/virtio/Kconfig              |    1 +
-> >  drivers/virtio/virtio_balloon.c     |   65 +++++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/virtio_balloon.h |    1 +
-> >  3 files changed, 67 insertions(+)
+> >  drivers/virtio/virtio_balloon.c |   19 +++++++++++++------
+> >  mm/page_reporting.c             |    4 ++++
+> >  2 files changed, 17 insertions(+), 6 deletions(-)
 > > 
-> > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > index 078615cf2afc..4b2dd8259ff5 100644
-> > --- a/drivers/virtio/Kconfig
-> > +++ b/drivers/virtio/Kconfig
-> > @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
-> >  	tristate "Virtio balloon driver"
-> >  	depends on VIRTIO
-> >  	select MEMORY_BALLOON
-> > +	select PAGE_REPORTING
-> >  	---help---
-> >  	 This driver supports increasing and decreasing the amount
-> >  	 of memory within a KVM guest.
 > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> > index 2c19457ab573..0b400bb382c0 100644
+> > index 226fbb995fb0..2c19457ab573 100644
 > > --- a/drivers/virtio/virtio_balloon.c
 > > +++ b/drivers/virtio/virtio_balloon.c
-> > @@ -19,6 +19,7 @@
-> >  #include <linux/mount.h>
-> >  #include <linux/magic.h>
-> >  #include <linux/pseudo_fs.h>
-> > +#include <linux/page_reporting.h>
+> > @@ -842,7 +842,6 @@ static int virtio_balloon_register_shrinker(struct virtio_balloon *vb)
+> >  static int virtballoon_probe(struct virtio_device *vdev)
+> >  {
+> >  	struct virtio_balloon *vb;
+> > -	__u32 poison_val;
+> >  	int err;
 > >  
-> >  /*
-> >   * Balloon device works in 4K page units.  So each page is pointed to by
-> > @@ -37,6 +38,9 @@
-> >  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
-> >  	(1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
-> >  
-> > +/*  limit on the number of pages that can be on the reporting vq */
-> > +#define VIRTIO_BALLOON_VRING_HINTS_MAX	16
+> >  	if (!vdev->config->get) {
+> > @@ -909,11 +908,19 @@ static int virtballoon_probe(struct virtio_device *vdev)
+> >  						  VIRTIO_BALLOON_CMD_ID_STOP);
+> >  		spin_lock_init(&vb->free_page_list_lock);
+> >  		INIT_LIST_HEAD(&vb->free_page_list);
+> > -		if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)) {
+> > -			memset(&poison_val, PAGE_POISON, sizeof(poison_val));
+> > -			virtio_cwrite(vb->vdev, struct virtio_balloon_config,
+> > -				      poison_val, &poison_val);
+> > -		}
+> > +	}
+> > +	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)) {
+> > +		__u32 poison_val = 0;
 > > +
-> >  #ifdef CONFIG_BALLOON_COMPACTION
-> >  static struct vfsmount *balloon_mnt;
-> >  #endif
-> > @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
-> >  	VIRTIO_BALLOON_VQ_DEFLATE,
-> >  	VIRTIO_BALLOON_VQ_STATS,
-> >  	VIRTIO_BALLOON_VQ_FREE_PAGE,
-> > +	VIRTIO_BALLOON_VQ_REPORTING,
-> >  	VIRTIO_BALLOON_VQ_MAX
-> >  };
-> >  
-> > @@ -113,6 +118,10 @@ struct virtio_balloon {
-> >  
-> >  	/* To register a shrinker to shrink memory upon memory pressure */
-> >  	struct shrinker shrinker;
-> > +
-> > +	/* Unused page reporting device */
-> > +	struct virtqueue *reporting_vq;
-> > +	struct page_reporting_dev_info ph_dev_info;
-> >  };
-> >  
-> >  static struct virtio_device_id id_table[] = {
-> > @@ -152,6 +161,32 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
-> >  
-> >  }
-> >  
-> > +void virtballoon_unused_page_report(struct page_reporting_dev_info *ph_dev_info,
-> > +				    unsigned int nents)
-> > +{
-> > +	struct virtio_balloon *vb =
-> > +		container_of(ph_dev_info, struct virtio_balloon, ph_dev_info);
-> > +	struct virtqueue *vq = vb->reporting_vq;
-> > +	unsigned int unused, err;
-> > +
-> > +	/* We should always be able to add these buffers to an empty queue. */
-> > +	err = virtqueue_add_inbuf(vq, ph_dev_info->sg, nents, vb,
-> > +				  GFP_NOWAIT | __GFP_NOWARN);
-> > +
-> > +	/*
-> > +	 * In the extremely unlikely case that something has changed and we
-> > +	 * are able to trigger an error we will simply display a warning
-> > +	 * and exit without actually processing the pages.
-> > +	 */
-> > +	if (WARN_ON(err))
-> > +		return;
-> > +
-> > +	virtqueue_kick(vq);
-> > +
-> > +	/* When host has read buffer, this completes via balloon_ack */
-> > +	wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
-> > +}
-> > +
+> > +#if !defined(CONFIG_PAGE_POISONING_NO_SANITY)
+> > +		/*
+> > +		 * Let hypervisor know that we are expecting a specific
+> > +		 * value to be written back in unused pages.
+> > +		 */
+> > +		memset(&poison_val, PAGE_POISON, sizeof(poison_val));
+> > +#endif
+> > +		virtio_cwrite(vb->vdev, struct virtio_balloon_config,
+> > +			      poison_val, &poison_val);
+> >  	}
+> >  	/*
+> >  	 * We continue to use VIRTIO_BALLOON_F_DEFLATE_ON_OOM to decide if a
 > 
-> So just to make sure I understand, this always passes a single
-> buf to the vq and then waits until that completes, correct?
+> I'm a bit confused by this part. Should we not just clear
+> VIRTIO_BALLOON_F_PAGE_POISON completely?
+> 
+> In my mind the value written should be what guest puts in
+> free pages - and possibly what it expects to find there later.
 
-Correct.
+I thought it better to err on the side of more information rather than
+less. With this the host knows that page poisoning is enabled, but that 0
+is an acceptable value.
 
-> Thus there are never outstanding bufs on the vq and this
-> is why we don't need e.g. any cleanup.
+> If it doesn't expect anything there then it makes sense
+> to clear VIRTIO_BALLOON_F_PAGE_POISON so that host does
+> not try to put the poison value there.
 
-Yes. Basically this will wait until the queue has been processed by the
-host before we process any additional pages. We can't have the pages in an
-unknown state when we put them back so we have to wait here until we know
-they have been fully reported to the host.
+That makes sense.
+
+> But I think that it does not make sense to lie to host about the poison
+> value - I think that if we do send poison value to
+> host it's reasonable for host to expect free pages
+> have that value - and even possibly to validate that.
+> 
+> So I think that the hack belongs in virtballoon_validate,
+> near the page_poisoning_enabled check.
+
+Yeah, I will move that for v8. I will just add an IS_ENABLED check to the
+!page_poisoning_enabled check in virtballoon_validate and can drop the
+#ifdef check.
+
+Thanks.
+
+- Alex
 
