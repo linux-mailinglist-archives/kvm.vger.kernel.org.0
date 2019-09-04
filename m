@@ -2,168 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D24FAA8783
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 21:20:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F81FA88B5
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 21:22:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730271AbfIDN6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 09:58:19 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21280 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729677AbfIDN6S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Sep 2019 09:58:18 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x84DvhEd099460
-        for <kvm@vger.kernel.org>; Wed, 4 Sep 2019 09:58:18 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2usu17h0q5-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 04 Sep 2019 09:58:14 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 4 Sep 2019 14:58:07 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 4 Sep 2019 14:58:05 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x84Dw3fp53543122
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Sep 2019 13:58:03 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 935EA4C044;
-        Wed,  4 Sep 2019 13:58:03 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3BD3E4C040;
-        Wed,  4 Sep 2019 13:58:03 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.96.163])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  4 Sep 2019 13:58:03 +0000 (GMT)
-Subject: Re: [PATCH -next] vfio-ccw: fix error return code in
- vfio_ccw_sch_init()
-To:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-References: <20190904083315.105600-1-weiyongjun1@huawei.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Wed, 4 Sep 2019 15:58:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1730943AbfIDOXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 10:23:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60838 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727544AbfIDOW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 10:22:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 68E2A30842B0;
+        Wed,  4 Sep 2019 14:22:59 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 970235D9E2;
+        Wed,  4 Sep 2019 14:22:52 +0000 (UTC)
+Date:   Wed, 4 Sep 2019 16:22:50 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Steven Price <steven.price@arm.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 01/10] KVM: arm64: Document PV-time interface
+Message-ID: <20190904142250.ohnkunb5ocwbnx6z@kamzik.brq.redhat.com>
+References: <20190830084255.55113-1-steven.price@arm.com>
+ <20190830084255.55113-2-steven.price@arm.com>
+ <20190830144734.kvj4dvt32qzmhw32@kamzik.brq.redhat.com>
+ <7f459290-9c39-cfba-c514-a07469ff120f@arm.com>
+ <20190902125254.3w6lnvcbs7sfhjz7@kamzik.brq.redhat.com>
+ <118ceeea-5501-05b6-7232-e66a175d5fae@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190904083315.105600-1-weiyongjun1@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19090413-0016-0000-0000-000002A6A506
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19090413-0017-0000-0000-0000330712E3
-Message-Id: <1ceef8c5-f5c1-79e5-7442-beb38b94f6f6@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-04_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909040139
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <118ceeea-5501-05b6-7232-e66a175d5fae@arm.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 04 Sep 2019 14:22:59 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 04.09.19 10:33, Wei Yongjun wrote:
-> Fix to return negative error code -ENOMEM from the memory alloc failed
-> error handling case instead of 0, as done elsewhere in this function.
+On Wed, Sep 04, 2019 at 02:55:15PM +0100, Steven Price wrote:
+> On 02/09/2019 13:52, Andrew Jones wrote:
+> > On Fri, Aug 30, 2019 at 04:25:08PM +0100, Steven Price wrote:
+> >> On 30/08/2019 15:47, Andrew Jones wrote:
+> >>> On Fri, Aug 30, 2019 at 09:42:46AM +0100, Steven Price wrote:
+> [...]
+> >>>> +    Return value: (int32)   : NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+> >>>> +                              PV-time feature is supported by the hypervisor.
+> >>>> +
+> >>>> +PV_TIME_ST
+> >>>> +    Function ID:  (uint32)  : 0xC5000022
+> >>>> +    Return value: (int64)   : IPA of the stolen time data structure for this
+> >>>> +                              VCPU. On failure:
+> >>>> +                              NOT_SUPPORTED (-1)
+> >>>> +
+> >>>> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+> >>>> +with inner and outer write back caching attributes, in the inner shareable
+> >>>> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+> >>>> +meaningfully filled by the hypervisor (see structure below).
+> >>>> +
+> >>>> +PV_TIME_ST returns the structure for the calling VCPU.
+> >>>> +
+> >>>> +Stolen Time
+> >>>> +-----------
+> >>>> +
+> >>>> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+> >>>> +
+> >>>> +  Field       | Byte Length | Byte Offset | Description
+> >>>> +  ----------- | ----------- | ----------- | --------------------------
+> >>>> +  Revision    |      4      |      0      | Must be 0 for version 0.1
+> >>>> +  Attributes  |      4      |      4      | Must be 0
+> >>>
+> >>> The above fields don't appear to be exposed to userspace in anyway. How
+> >>> will we handle migration from one KVM with one version of the structure
+> >>> to another?
+> >>
+> >> Interesting question. User space does have access to them now it is
+> >> providing the memory, but it's not exactly an easy method. In particular
+> >> user space has no (simple) way of probing the kernel's supported version.
+> >>
+> >> I guess one solution would be to add an extra attribute on the VCPU
+> >> which would provide the revision information. The current kernel would
+> >> then reject any revision other than 0, but this could then be extended
+> >> to support other revision numbers in the future.
+> >>
+> >> Although there's some logic in saying we could add the extra attribute
+> >> when(/if) there is a new version. Future kernels would then be expected
+> >> to use the current version unless user space explicitly set the new
+> >> attribute.
+> >>
+> >> Do you feel this is something that needs to be addressed now, or can it
+> >> be deferred until another version is proposed?
+> > 
+> > Assuming we'll want userspace to have the option of choosing version=0,
+> > and that we're fine with version=0 being the implicit choice, when nothing
+> > is selected, then I guess it can be left as is for now. If, OTOH, we just
+> > want migration to fail when attempting to migrate to another host with
+> > an incompatible stolen-time structure (i.e. version=0 is not selectable
+> > on hosts that implement later versions), then we should expose the version
+> > in some way now. Perhaps a VCPU's "PV config" should be described in a
+> > set of pseudo registers?
 > 
-> Fixes: 60e05d1cf087 ("vfio-ccw: add some logging")
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> I wouldn't have thought making migration fail if/when the host upgrades
+> to a new version would be particularly helpful - we'd want to provide
+> backwards compatibility. In particular for the suspend/resume case (I
+> want to be able to save my VM to disk, upgrade the host kernel and then
+> resume the VM).
+> 
+> The only potential issue I see is the implicit "version=0 if not
+> specified". That seems solvable by rejecting setting the stolen time
+> base address if no version has been specified and the host kernel
+> doesn't support version=0.
 
-thanks applied to s390 tree. 
+I think that's the same failure I was trying avoid by failing the
+migration instead. Maybe it's equivalent to fail at this vcpu-ioctl
+time though?
 
-> ---
->  drivers/s390/cio/vfio_ccw_drv.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-> index 45e792f6afd0..e401a3d0aa57 100644
-> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> @@ -317,15 +317,19 @@ static int __init vfio_ccw_sch_init(void)
->  					sizeof(struct ccw_io_region), 0,
->  					SLAB_ACCOUNT, 0,
->  					sizeof(struct ccw_io_region), NULL);
-> -	if (!vfio_ccw_io_region)
-> +	if (!vfio_ccw_io_region) {
-> +		ret = -ENOMEM;
->  		goto out_err;
-> +	}
->  
->  	vfio_ccw_cmd_region = kmem_cache_create_usercopy("vfio_ccw_cmd_region",
->  					sizeof(struct ccw_cmd_region), 0,
->  					SLAB_ACCOUNT, 0,
->  					sizeof(struct ccw_cmd_region), NULL);
-> -	if (!vfio_ccw_cmd_region)
-> +	if (!vfio_ccw_cmd_region) {
-> +		ret = -ENOMEM;
->  		goto out_err;
-> +	}
->  
->  	isc_register(VFIO_CCW_ISC);
->  	ret = css_driver_register(&vfio_ccw_sch_driver);
+> >>
+> >>>> +  Stolen time |      8      |      8      | Stolen time in unsigned
+> >>>> +              |             |             | nanoseconds indicating how
+> >>>> +              |             |             | much time this VCPU thread
+> >>>> +              |             |             | was involuntarily not
+> >>>> +              |             |             | running on a physical CPU.
+> >>>> +
+> >>>> +The structure will be updated by the hypervisor prior to scheduling a VCPU. It
+> >>>> +will be present within a reserved region of the normal memory given to the
+> >>>> +guest. The guest should not attempt to write into this memory. There is a
+> >>>> +structure per VCPU of the guest.
+> >>>
+> >>> Should we provide a recommendation as to how that reserved memory is
+> >>> provided? One memslot divided into NR_VCPUS subregions? Should the
+> >>> reserved region be described to the guest kernel with DT/ACPI? Or
+> >>> should userspace ensure the region is not within any DT/ACPI described
+> >>> regions?
+> >>
+> >> I'm open to providing a recommendation, but I'm not entirely sure I know
+> >> enough here to provide one.
+> >>
+> >> There is an obvious efficiency argument for minimizing memslots with the
+> >> current code. But if someone has a reason for using multiple memslots
+> >> then that's probably a good argument for implementing a memslot-caching
+> >> kvm_put_user() rather than to be dis-recommended.
+> > 
+> > Actually even if a single memslot is used for all the PV structures for
+> > all VCPUs, but it's separate from the slot(s) used for main memory, then
+> > we'll likely see performance issues with memslot searches (even though
+> > it's a binary search). This is because memslots already have caching. The
+> > last used slot is stored in the memslots' lru_slot member (the "lru" name
+> > is confusing, but it means "last used" somehow). This means we could get
+> > thrashing on that slot cache if we're searching for the PV structure
+> > memslot on each vcpu load after searching for the main memory slot on each
+> > page fault.
 > 
+> True - a dedicated memslot for stolen time wouldn't be great if a VM is
+> needing to fault pages (which would obviously be in a different
+> memslot). I don't have a good idea of the overhead of missing in the
+> lru_slot cache. The main reason I stopped using a dedicated cache was
+> because I discovered that my initial implementation using
+> kvm_write_guest_offset_cached() (which wasn't single-copy atomic safe)
+> was actually failing to use the cache because the buffer crossed a page
+> boundary (see __kvm_gfn_to_hva_cache_init()). So switching away from the
+> "_cached" variant was actually avoiding the extra walks of the memslots.
 > 
+> I can look at reintroducing the caching for kvm_put_guest().
 > 
+> >>
+> >> My assumption (and testing) has been with a single memslot divided into
+> >> NR_VCPUS (or more accurately the number of VCPUs in the VM) subregions.
+> >>
+> >> For testing DT I've tested both methods: an explicit reserved region or
+> >> just ensuring it's not in any DT described region. Both seem reasonable,
+> >> but it might be easier to integrate into existing migration mechanisms
+> >> if it's simply a reserved region (then the memory block of the guest is
+> >> just as it always was).
+> >>
+> >> For ACPI the situation should be similar, but my testing has been with DT.
+> > 
+> > I also can't think of any reason why we'd have to describe it in DT/ACPI,
+> > but I get this feeling that if we don't, then we'll hit some issue that
+> > will make us wish we had...
+> 
+> Without knowing why we need it it's hard to justify what should go in
+> the bindings. But the idea of having the hypercalls is that the
+> description is returned via hypercalls rather than explicitly in
+> DT/ACPI. In theory we wouldn't need the hypercalls if it was fully
+> described in DT/ACPI.
+>
 
+Fair enough
+
+Thanks,
+drew
