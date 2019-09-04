@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AFD3A7EF3
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 11:12:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DD75A7F0E
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 11:15:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729503AbfIDJMA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 05:12:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56562 "EHLO mx1.redhat.com"
+        id S1728526AbfIDJPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 05:15:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48046 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726943AbfIDJMA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 05:12:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1726045AbfIDJPd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 05:15:33 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 97FC818C4264;
-        Wed,  4 Sep 2019 09:11:59 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id CC5D330842A8;
+        Wed,  4 Sep 2019 09:15:32 +0000 (UTC)
 Received: from [10.36.118.26] (unknown [10.36.118.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1929360BFB;
-        Wed,  4 Sep 2019 09:11:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D543B600CD;
+        Wed,  4 Sep 2019 09:15:30 +0000 (UTC)
 Subject: Re: [PATCH v2 1/2] KVM: s390: Disallow invalid bits in kvm_valid_regs
  and kvm_dirty_regs
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
         Janosch Frank <frankja@linux.ibm.com>
 Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20190904085200.29021-1-thuth@redhat.com>
  <20190904085200.29021-2-thuth@redhat.com>
  <b34a237f-77a5-2939-624d-0240451f2976@redhat.com>
- <79e5e0a4-78f3-8a61-7311-b711cf4bcd9f@redhat.com>
+ <8f48d9dd-1464-75aa-2011-b15adc5a4eab@de.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -76,24 +76,26 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <27189f65-3c8c-91ed-1f20-5e19ef4e6f38@redhat.com>
-Date:   Wed, 4 Sep 2019 11:11:57 +0200
+Message-ID: <b7f51ff1-8f87-896a-0a8a-dd9a714173d0@redhat.com>
+Date:   Wed, 4 Sep 2019 11:15:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <79e5e0a4-78f3-8a61-7311-b711cf4bcd9f@redhat.com>
+In-Reply-To: <8f48d9dd-1464-75aa-2011-b15adc5a4eab@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 04 Sep 2019 09:11:59 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 04 Sep 2019 09:15:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.09.19 11:10, Thomas Huth wrote:
-> On 04/09/2019 11.05, David Hildenbrand wrote:
+On 04.09.19 11:11, Christian Borntraeger wrote:
+> 
+> 
+> On 04.09.19 11:05, David Hildenbrand wrote:
 >> On 04.09.19 10:51, Thomas Huth wrote:
 >>> If unknown bits are set in kvm_valid_regs or kvm_dirty_regs, this
 >>> clearly indicates that something went wrong in the KVM userspace
@@ -126,17 +128,13 @@ On 04.09.19 11:10, Thomas Huth wrote:
 >>
 >> We didn't care about the S390 for the actual flags, why care now?
 > 
-> x86 does the same, and we don't want to be worse than x86, do we? ;-)
+> I think it makes sense to have the interface as defined as possible. If for some
+> reason userspace sets a wrong bit this would be undetected. If we at a later point
+> in time use that bit this would resultin strange problems.
 
-Yeah, but they do have X86 in every flag - in contrast to us.
-
-> 
-> Honestly, this was just one of the differences that I noticed while
-> porting the sync_regs_test from x86 to s390x.
-> 
->  Thomas
-> 
-
+Not arguing about the concept of checking for valid bits. Was just
+wondering if the "S390" part in the name makes sense at all. But you
+guys seem to have a consent here.
 
 -- 
 
