@@ -2,50 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A52AA8952
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 21:23:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCBD9A8954
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 21:23:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731294AbfIDPKd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 11:10:33 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:34824 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731197AbfIDPKc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 11:10:32 -0400
-Received: by mail-pf1-f195.google.com with SMTP id 205so10982268pfw.2;
-        Wed, 04 Sep 2019 08:10:32 -0700 (PDT)
+        id S1731225AbfIDPKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 11:10:39 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38799 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730714AbfIDPKj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 11:10:39 -0400
+Received: by mail-pf1-f194.google.com with SMTP id h195so6883765pfe.5;
+        Wed, 04 Sep 2019 08:10:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=HfMW8t+zdh/41N+suI9EkE4FGx0gR/oItAxCFwjZTI4=;
-        b=FIPxE9Sc5P0KKx5FESIFqty+P+8FgJSSXdiHClQPAjNZ0IylFkpF3PL3gx4cTRHMBx
-         Kmhr/yrySOO82rST2kSWcn4SUt0BHhBQ3Tnd0pdAeGk2wXelDgBRmHvHT/RcrkXqLYL7
-         vBuHpvFrUBR2c1hz8rdnX5W7GApOqPPnMZgAzPlyusQkg2SGIUDVdFyCcMzGhaSdJY4e
-         0dVv+u6K9+aX0lq3zyO2vZnaew4v96dHGlCyFeGq0Ao0uBEFOWsAU8FuSwkv2cGBOI6O
-         f+mhMjeTz0s3+IfwZrTsbP/N8T92SSRcBjm0H6xFDubiGdUy3rRI5Vobxa8yEnGxteeV
-         oYGA==
+        bh=p6kpa+V/mOCw2Z+/w4fmfqemmfT1IhqWlu84Sk3ejgg=;
+        b=UFkLFQpC7E14Ptl4qhmREGp8b+BS/boPhGg+O4m+5ArD6kZf3FfjmAiTLZuUmkI9Ty
+         OZGjg3C0zJnk4XgjOsLLfFKed7k3HdgxKtDtveiknbYQRkBFjfuYYrVB+kI8mX3tc0YF
+         3gyE136VMmMvaCZhCWqAA1f0NuTsdCQL/n9hMLMCmC/yyNcUO7rzgc6bBfuSYVQn7QO4
+         4xfcHLLp9fjwzH5U/MDqPGMleIl53/lI+O/0ubte1uyIFmU+nYcd8R9VSVkwaet4v8lc
+         xPSSdiyMlPiEooJhGOKIrRD23sse/vHSBlGXXWob+PZTqG0xKym5Z7Xfx+mPx4Sn4C11
+         j4Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=HfMW8t+zdh/41N+suI9EkE4FGx0gR/oItAxCFwjZTI4=;
-        b=qx7pHZyxBep+MHGIUmtYZTthShiFzpb58ECqhuXBG5tx9ROeU49SzAYKZMoTsY9tfN
-         VfbNITFJAFZo2G3HfKL/nYrCSA5uiDJQR3CUyeTpWawU3LIISaVMYwkXxzutfjGzJ6yk
-         VUc1pNOnvfxg4JqZkR0VmmaJMZHXf8YpqOxkpI5MOJKMfLaikNL2AqvKo9S0pIXJFcOQ
-         /W/3KGRsR/9NtpuGJO4IWxwW6h2iQQcdqTKf2XbpyikqMuztEB8T6stI+7moW+fxNlO6
-         39DQ9TQB4eZt3Iw31fweChSWIcnr/H3Cc4idtQjalgHTaEQsjU28SbhZOibJVe9TZPzp
-         PmCw==
-X-Gm-Message-State: APjAAAWBLw39zkVi663j7UlExbkRiuF091Kq+kWCYl7Q9wxhuXAMbcc+
-        0Ati1b7TWgaDXghwUrbxm+I=
-X-Google-Smtp-Source: APXvYqzfbf/ibco0qw0nwX2XuMugKIU3VWc4ZLn3x5GCY1E/khF+szbl2j8u5PpmmtjSz4dmwE7zfQ==
-X-Received: by 2002:a62:115:: with SMTP id 21mr21430403pfb.110.1567609831783;
-        Wed, 04 Sep 2019 08:10:31 -0700 (PDT)
+        bh=p6kpa+V/mOCw2Z+/w4fmfqemmfT1IhqWlu84Sk3ejgg=;
+        b=FZyZ2Z7c18l2CTsOb8eYCJumWxLdvH127Gm/Q95njIgV0Ju6bMzwgQy1h7sj7GcQTf
+         xurDrCpoceSV/znMXgX1a42VVYXF/93t2cv3cjZ1FT2Qm3aMKng/W9GkSrg3Nf2Uu7Qe
+         9fIbBtqYZ8M/O3FRBPRyIR2yHPWvYJ65fQE14rqz/KAH2ZCe0yMUK4aeM9VtCN5MJXKf
+         4yjJUHZmVz5vUhH5ifLe/ik+LxzXHF3gR2kUFIaCh3ntmerrEhDS7DsSiDLuxSUosh8v
+         +02QHwuaX91MgrGmScn53BXnTD/g8t4AWqR1PfuK79DL6rnyucfWLOkRqRyo+C7y7ww/
+         13+Q==
+X-Gm-Message-State: APjAAAWmYLFk94eIfiyp/NXCHKBtpvjztTpSelRZp6ksLvzf+jdg9PsN
+        Gok99nyCCGX1yfYgIsBN+Rs=
+X-Google-Smtp-Source: APXvYqwrcq8XegDQKGDNlpLz9ievgPZeY+21HMDXgAdbxzbLSVIJ4dp0rvcd/C0zGXp9pDll7JlPZg==
+X-Received: by 2002:aa7:9343:: with SMTP id 3mr15433820pfn.145.1567609838132;
+        Wed, 04 Sep 2019 08:10:38 -0700 (PDT)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id x22sm5160594pfi.139.2019.09.04.08.10.30
+        by smtp.gmail.com with ESMTPSA id u69sm25695517pgu.77.2019.09.04.08.10.37
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Sep 2019 08:10:31 -0700 (PDT)
-Subject: [PATCH v7 1/6] mm: Adjust shuffle code to allow for future
- coalescing
+        Wed, 04 Sep 2019 08:10:37 -0700 (PDT)
+Subject: [PATCH v7 2/6] mm: Move set/get_pcppage_migratetype to mmzone.h
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     nitesh@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
         david@redhat.com, dave.hansen@intel.com,
@@ -56,8 +55,8 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
         konrad.wilk@oracle.com, lcapitulino@redhat.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
-Date:   Wed, 04 Sep 2019 08:10:30 -0700
-Message-ID: <20190904151030.13848.25822.stgit@localhost.localdomain>
+Date:   Wed, 04 Sep 2019 08:10:36 -0700
+Message-ID: <20190904151036.13848.36062.stgit@localhost.localdomain>
 In-Reply-To: <20190904150920.13848.32271.stgit@localhost.localdomain>
 References: <20190904150920.13848.32271.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -71,247 +70,73 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-Move the head/tail adding logic out of the shuffle code and into the
-__free_one_page function since ultimately that is where it is really
-needed anyway. By doing this we should be able to reduce the overhead
-and can consolidate all of the list addition bits in one spot.
-
-While changing out the code I also opted to go for a bit more thread safe
-approach to getting the boolean value. This way we can avoid possible cache
-line bouncing of the batched entropy between CPUs.
+In order to support page reporting it will be necessary to store and
+retrieve the migratetype of a page. To enable that I am moving the set and
+get operations for pcppage_migratetype into the mm/internal.h header so
+that they can be used outside of the page_alloc.c file.
 
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- include/linux/mmzone.h |   12 --------
- mm/page_alloc.c        |   70 +++++++++++++++++++++++++++---------------------
- mm/shuffle.c           |   40 ++++++++++++++++-----------
- mm/shuffle.h           |   12 ++++++++
- 4 files changed, 75 insertions(+), 59 deletions(-)
+ mm/internal.h   |   18 ++++++++++++++++++
+ mm/page_alloc.c |   18 ------------------
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index bda20282746b..125f300981c6 100644
---- a/include/linux/mmzone.h
-+++ b/include/linux/mmzone.h
-@@ -116,18 +116,6 @@ static inline void add_to_free_area_tail(struct page *page, struct free_area *ar
- 	area->nr_free++;
+diff --git a/mm/internal.h b/mm/internal.h
+index 0d5f720c75ab..e4a1a57bbd40 100644
+--- a/mm/internal.h
++++ b/mm/internal.h
+@@ -549,6 +549,24 @@ static inline bool is_migrate_highatomic_page(struct page *page)
+ 	return get_pageblock_migratetype(page) == MIGRATE_HIGHATOMIC;
  }
  
--#ifdef CONFIG_SHUFFLE_PAGE_ALLOCATOR
--/* Used to preserve page allocation order entropy */
--void add_to_free_area_random(struct page *page, struct free_area *area,
--		int migratetype);
--#else
--static inline void add_to_free_area_random(struct page *page,
--		struct free_area *area, int migratetype)
--{
--	add_to_free_area(page, area, migratetype);
--}
--#endif
--
- /* Used for pages which are on another list */
- static inline void move_to_free_area(struct page *page, struct free_area *area,
- 			     int migratetype)
++/*
++ * A cached value of the page's pageblock's migratetype, used when the page is
++ * put on a pcplist. Used to avoid the pageblock migratetype lookup when
++ * freeing from pcplists in most cases, at the cost of possibly becoming stale.
++ * Also the migratetype set in the page does not necessarily match the pcplist
++ * index, e.g. page might have MIGRATE_CMA set but be on a pcplist with any
++ * other index - this ensures that it will be put on the correct CMA freelist.
++ */
++static inline int get_pcppage_migratetype(struct page *page)
++{
++	return page->index;
++}
++
++static inline void set_pcppage_migratetype(struct page *page, int migratetype)
++{
++	page->index = migratetype;
++}
++
+ void setup_zone_pageset(struct zone *zone);
+ extern struct page *alloc_new_node_page(struct page *page, unsigned long node);
+ #endif	/* __MM_INTERNAL_H */
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index c5d62f1c2851..4e4356ba66c7 100644
+index 4e4356ba66c7..a791f2baeeeb 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -878,6 +878,36 @@ static inline struct capture_control *task_capc(struct zone *zone)
- #endif /* CONFIG_COMPACTION */
+@@ -185,24 +185,6 @@ static int __init early_init_on_free(char *buf)
+ }
+ early_param("init_on_free", early_init_on_free);
  
- /*
-+ * If this is not the largest possible page, check if the buddy
-+ * of the next-highest order is free. If it is, it's possible
-+ * that pages are being freed that will coalesce soon. In case,
-+ * that is happening, add the free page to the tail of the list
-+ * so it's less likely to be used soon and more likely to be merged
-+ * as a higher order page
-+ */
-+static inline bool
-+buddy_merge_likely(unsigned long pfn, unsigned long buddy_pfn,
-+		   struct page *page, unsigned int order)
-+{
-+	struct page *higher_page, *higher_buddy;
-+	unsigned long combined_pfn;
-+
-+	if (order >= MAX_ORDER - 2)
-+		return false;
-+
-+	if (!pfn_valid_within(buddy_pfn))
-+		return false;
-+
-+	combined_pfn = buddy_pfn & pfn;
-+	higher_page = page + (combined_pfn - pfn);
-+	buddy_pfn = __find_buddy_pfn(combined_pfn, order + 1);
-+	higher_buddy = higher_page + (buddy_pfn - combined_pfn);
-+
-+	return pfn_valid_within(buddy_pfn) &&
-+	       page_is_buddy(higher_page, higher_buddy, order + 1);
-+}
-+
-+/*
-  * Freeing function for a buddy system allocator.
-  *
-  * The concept of a buddy system is to maintain direct-mapped table
-@@ -906,11 +936,12 @@ static inline void __free_one_page(struct page *page,
- 		struct zone *zone, unsigned int order,
- 		int migratetype)
- {
--	unsigned long combined_pfn;
-+	struct capture_control *capc = task_capc(zone);
- 	unsigned long uninitialized_var(buddy_pfn);
--	struct page *buddy;
-+	unsigned long combined_pfn;
-+	struct free_area *area;
- 	unsigned int max_order;
--	struct capture_control *capc = task_capc(zone);
-+	struct page *buddy;
- 
- 	max_order = min_t(unsigned int, MAX_ORDER, pageblock_order + 1);
- 
-@@ -979,35 +1010,12 @@ static inline void __free_one_page(struct page *page,
- done_merging:
- 	set_page_order(page, order);
- 
--	/*
--	 * If this is not the largest possible page, check if the buddy
--	 * of the next-highest order is free. If it is, it's possible
--	 * that pages are being freed that will coalesce soon. In case,
--	 * that is happening, add the free page to the tail of the list
--	 * so it's less likely to be used soon and more likely to be merged
--	 * as a higher order page
--	 */
--	if ((order < MAX_ORDER-2) && pfn_valid_within(buddy_pfn)
--			&& !is_shuffle_order(order)) {
--		struct page *higher_page, *higher_buddy;
--		combined_pfn = buddy_pfn & pfn;
--		higher_page = page + (combined_pfn - pfn);
--		buddy_pfn = __find_buddy_pfn(combined_pfn, order + 1);
--		higher_buddy = higher_page + (buddy_pfn - combined_pfn);
--		if (pfn_valid_within(buddy_pfn) &&
--		    page_is_buddy(higher_page, higher_buddy, order + 1)) {
--			add_to_free_area_tail(page, &zone->free_area[order],
--					      migratetype);
--			return;
--		}
--	}
+-/*
+- * A cached value of the page's pageblock's migratetype, used when the page is
+- * put on a pcplist. Used to avoid the pageblock migratetype lookup when
+- * freeing from pcplists in most cases, at the cost of possibly becoming stale.
+- * Also the migratetype set in the page does not necessarily match the pcplist
+- * index, e.g. page might have MIGRATE_CMA set but be on a pcplist with any
+- * other index - this ensures that it will be put on the correct CMA freelist.
+- */
+-static inline int get_pcppage_migratetype(struct page *page)
+-{
+-	return page->index;
+-}
 -
--	if (is_shuffle_order(order))
--		add_to_free_area_random(page, &zone->free_area[order],
--				migratetype);
-+	area = &zone->free_area[order];
-+	if (is_shuffle_order(order) ? shuffle_pick_tail() :
-+	    buddy_merge_likely(pfn, buddy_pfn, page, order))
-+		add_to_free_area_tail(page, area, migratetype);
- 	else
--		add_to_free_area(page, &zone->free_area[order], migratetype);
+-static inline void set_pcppage_migratetype(struct page *page, int migratetype)
+-{
+-	page->index = migratetype;
+-}
 -
-+		add_to_free_area(page, area, migratetype);
- }
- 
+ #ifdef CONFIG_PM_SLEEP
  /*
-diff --git a/mm/shuffle.c b/mm/shuffle.c
-index 3ce12481b1dc..345cb4347455 100644
---- a/mm/shuffle.c
-+++ b/mm/shuffle.c
-@@ -4,7 +4,6 @@
- #include <linux/mm.h>
- #include <linux/init.h>
- #include <linux/mmzone.h>
--#include <linux/random.h>
- #include <linux/moduleparam.h>
- #include "internal.h"
- #include "shuffle.h"
-@@ -183,25 +182,34 @@ void __meminit __shuffle_free_memory(pg_data_t *pgdat)
- 		shuffle_zone(z);
- }
- 
--void add_to_free_area_random(struct page *page, struct free_area *area,
--		int migratetype)
-+struct batched_bit_entropy {
-+	unsigned long entropy_bool;
-+	int position;
-+};
-+
-+static DEFINE_PER_CPU(struct batched_bit_entropy, batched_entropy_bool);
-+
-+bool __shuffle_pick_tail(void)
- {
--	static u64 rand;
--	static u8 rand_bits;
-+	struct batched_bit_entropy *batch;
-+	unsigned long entropy;
-+	int position;
- 
- 	/*
--	 * The lack of locking is deliberate. If 2 threads race to
--	 * update the rand state it just adds to the entropy.
-+	 * We shouldn't need to disable IRQs as the only caller is
-+	 * __free_one_page and it should only be called with the zone lock
-+	 * held and either from IRQ context or with local IRQs disabled.
- 	 */
--	if (rand_bits == 0) {
--		rand_bits = 64;
--		rand = get_random_u64();
-+	batch = raw_cpu_ptr(&batched_entropy_bool);
-+	position = batch->position;
-+
-+	if (--position < 0) {
-+		batch->entropy_bool = get_random_long();
-+		position = BITS_PER_LONG - 1;
- 	}
- 
--	if (rand & 1)
--		add_to_free_area(page, area, migratetype);
--	else
--		add_to_free_area_tail(page, area, migratetype);
--	rand_bits--;
--	rand >>= 1;
-+	batch->position = position;
-+	entropy = batch->entropy_bool;
-+
-+	return 1ul & (entropy >> position);
- }
-diff --git a/mm/shuffle.h b/mm/shuffle.h
-index 777a257a0d2f..0723eb97f22f 100644
---- a/mm/shuffle.h
-+++ b/mm/shuffle.h
-@@ -3,6 +3,7 @@
- #ifndef _MM_SHUFFLE_H
- #define _MM_SHUFFLE_H
- #include <linux/jump_label.h>
-+#include <linux/random.h>
- 
- /*
-  * SHUFFLE_ENABLE is called from the command line enabling path, or by
-@@ -22,6 +23,7 @@ enum mm_shuffle_ctl {
- DECLARE_STATIC_KEY_FALSE(page_alloc_shuffle_key);
- extern void page_alloc_shuffle(enum mm_shuffle_ctl ctl);
- extern void __shuffle_free_memory(pg_data_t *pgdat);
-+extern bool __shuffle_pick_tail(void);
- static inline void shuffle_free_memory(pg_data_t *pgdat)
- {
- 	if (!static_branch_unlikely(&page_alloc_shuffle_key))
-@@ -43,6 +45,11 @@ static inline bool is_shuffle_order(int order)
- 		return false;
- 	return order >= SHUFFLE_ORDER;
- }
-+
-+static inline bool shuffle_pick_tail(void)
-+{
-+	return __shuffle_pick_tail();
-+}
- #else
- static inline void shuffle_free_memory(pg_data_t *pgdat)
- {
-@@ -60,5 +67,10 @@ static inline bool is_shuffle_order(int order)
- {
- 	return false;
- }
-+
-+static inline bool shuffle_pick_tail(void)
-+{
-+	return false;
-+}
- #endif
- #endif /* _MM_SHUFFLE_H */
+  * The following functions are used by the suspend/hibernate code to temporarily
 
