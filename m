@@ -2,189 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8133CA8962
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 21:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 217CEA899B
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 21:24:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731316AbfIDPL6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 11:11:58 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40429 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731212AbfIDPL6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 11:11:58 -0400
-Received: by mail-pf1-f196.google.com with SMTP id x127so745688pfb.7;
-        Wed, 04 Sep 2019 08:11:57 -0700 (PDT)
+        id S1731371AbfIDPhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 11:37:32 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:62904 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731360AbfIDPhb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 11:37:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:from:to:cc:date:message-id:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=R9EIePxtKgh7rutMNGBvqWvR/nyIQIv1yBQVlI6lc80=;
-        b=Icdioip/LrE7zC1LjFhruymYKz5CChvFweZFNaQHSt0elL4kf0rEcwoiDnrDAo4wsd
-         lculUOTKABzUpllh/6JcZEK1C9+szQUevDm2233hJRsBXFMqL+lPRscj3lXDE/HHlbPc
-         IBQXiIFzd2gHcYCAeLDhNUCB6KcdFk+xudcysNTpWBn1q0+V0ZbnDtTTKUv4dZtnXFTF
-         SDeiUW0XA4dD6JYzcDZrrCDgkttwlOmQb5RhC2E0bY2x7KP9gIYZHnqGku9VfUVUpUzw
-         weh3WeDoEkbWkXv/rneDrEogXrWTovdbhvtRNFXL0460yxwc4bSW4ENUncFhf71IfM/p
-         s5zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=R9EIePxtKgh7rutMNGBvqWvR/nyIQIv1yBQVlI6lc80=;
-        b=biJkbAYVTCLJT2t288O0Xzi4TBwUdQXD7EUJTsg82kb3u168n54OOKv/RXQk8cCnhE
-         5iWHUdxvSwZRKkp1hp0ogU0RM0R1oINOZl1oQlhjdX1NXA4RgoXnImAIuxcwz2H9bYYz
-         usUSSZVWPzMCJeF5RSZWlVXpvIBqIsNGaLCI9MtN5UYZAWN4tyFOJjrKFZ3px+FI71Sk
-         r8A6v1cD9strkNxViDqLjjFE9QBRx8YMSy0Lq5LuGMh9mq+IqD5xE0D2r4GRgZrWB/Mm
-         fGJC7wimp1MGEIn0jueSd5G5AhnPRcZIMtfY3z9WaPNVocBNFO/AjHq4eFj7PHnX4QY4
-         GYzg==
-X-Gm-Message-State: APjAAAXwQW3IySmrSuO9W53fgT79Yz796fVF51GkUMB012Lc0MiZF4/e
-        DeQW89dygcAWX1qbQFy99zM=
-X-Google-Smtp-Source: APXvYqz8hxh9LJuvHBkIwHPd7Zgipkz7Ryft0mOHwrXV6Llo7seFR+xT4mPT1M5fYnrbzjbkIZxxvQ==
-X-Received: by 2002:a65:4505:: with SMTP id n5mr21223408pgq.301.1567609917279;
-        Wed, 04 Sep 2019 08:11:57 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id q186sm11375401pfb.47.2019.09.04.08.11.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Sep 2019 08:11:56 -0700 (PDT)
-Subject: [PATCH v7 QEMU 3/3] virtio-balloon: Provide a interface for unused
- page reporting
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-To:     nitesh@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
-        david@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, virtio-dev@lists.oasis-open.org
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
-        konrad.wilk@oracle.com, willy@infradead.org,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, mhocko@kernel.org,
-        alexander.h.duyck@linux.intel.com, osalvador@suse.de
-Date:   Wed, 04 Sep 2019 08:11:56 -0700
-Message-ID: <20190904151156.14270.25192.stgit@localhost.localdomain>
-In-Reply-To: <20190904150920.13848.32271.stgit@localhost.localdomain>
-References: <20190904150920.13848.32271.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1567611449; x=1599147449;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=TSJJMr2XeybrWUSFKXm2GdaxGOMjsJphUCuZr5birTk=;
+  b=QOhrnZlzbpyOpzd/geXpUCL74G7KNd88XecpMtAc/hCAcM5J1LBQ0lWz
+   qAdil1nML5O4IIClmApAA0Qgy6uUnAHdlFw7PmsFEgK8WmKI8xLrNEkQq
+   zbzshxZv5bYzjIaxYA5Xu/9kaG2DpEvtqLHhKmK1sCqu2KtHJxco1wvCf
+   0=;
+X-IronPort-AV: E=Sophos;i="5.64,467,1559520000"; 
+   d="scan'208";a="700703240"
+Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-1a-807d4a99.us-east-1.amazon.com) ([10.47.22.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 04 Sep 2019 15:36:53 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1a-807d4a99.us-east-1.amazon.com (Postfix) with ESMTPS id 82E05A21E7;
+        Wed,  4 Sep 2019 15:36:45 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 4 Sep 2019 15:36:44 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.243) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 4 Sep 2019 15:36:41 +0000
+Subject: Re: [PATCH v2 1/2] KVM: VMX: Disable posted interrupts for odd IRQs
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>
+References: <20190904133511.17540-1-graf@amazon.com>
+ <20190904133511.17540-2-graf@amazon.com>
+ <20190904144045.GA24079@linux.intel.com>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <fcaefade-16c1-6480-aeab-413bcd16dc52@amazon.com>
+Date:   Wed, 4 Sep 2019 17:36:39 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190904144045.GA24079@linux.intel.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.243]
+X-ClientProxiedBy: EX13D08UWB001.ant.amazon.com (10.43.161.104) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-
-Add support for what I am referring to as "unused page reporting".
-Basically the idea is to function very similar to how the balloon works
-in that we basically end up madvising the page as not being used. However
-we don't really need to bother with any deflate type logic since the page
-will be faulted back into the guest when it is read or written to.
-
-This is meant to be a simplification of the existing balloon interface
-to use for providing hints to what memory needs to be freed. I am assuming
-this is safe to do as the deflate logic does not actually appear to do very
-much other than tracking what subpages have been released and which ones
-haven't.
-
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
----
- hw/virtio/virtio-balloon.c         |   46 ++++++++++++++++++++++++++++++++++--
- include/hw/virtio/virtio-balloon.h |    2 +-
- 2 files changed, 45 insertions(+), 3 deletions(-)
-
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 003b3ebcfdfb..7a30df63bc77 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -320,6 +320,40 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-     balloon_stats_change_timer(s, 0);
- }
- 
-+static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-+    VirtQueueElement *elem;
-+
-+    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-+    	unsigned int i;
-+
-+        for (i = 0; i < elem->in_num; i++) {
-+            void *addr = elem->in_sg[i].iov_base;
-+            size_t size = elem->in_sg[i].iov_len;
-+            ram_addr_t ram_offset;
-+            size_t rb_page_size;
-+            RAMBlock *rb;
-+
-+            if (qemu_balloon_is_inhibited() || dev->poison_val)
-+                continue;
-+
-+            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-+            rb_page_size = qemu_ram_pagesize(rb);
-+
-+            /* For now we will simply ignore unaligned memory regions */
-+            if ((ram_offset | size) & (rb_page_size - 1))
-+                continue;
-+
-+            ram_block_discard_range(rb, ram_offset, size);
-+        }
-+
-+        virtqueue_push(vq, elem, 0);
-+        virtio_notify(vdev, vq);
-+        g_free(elem);
-+    }
-+}
-+
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-@@ -627,7 +661,8 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-         return sizeof(struct virtio_balloon_config);
-     }
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
--        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_REPORTING)) {
-         return sizeof(struct virtio_balloon_config);
-     }
-     return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-@@ -715,7 +750,8 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
-     VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-     f |= dev->host_features;
-     virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
--    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(f, VIRTIO_BALLOON_F_REPORTING)) {
-         virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
-     }
- 
-@@ -805,6 +841,10 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-     s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-     s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
- 
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-+        s->rvq = virtio_add_queue(vdev, 32, virtio_balloon_handle_report);
-+    }
-+
-     if (virtio_has_feature(s->host_features,
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-@@ -931,6 +971,8 @@ static Property virtio_balloon_properties[] = {
-      */
-     DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
-                      qemu_4_0_config_size, false),
-+    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_REPORTING, true),
-     DEFINE_PROP_LINK("iothread", VirtIOBalloon, iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 7fe78e5c14d7..db5bf7127112 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -42,7 +42,7 @@ enum virtio_balloon_free_page_report_status {
- 
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
--    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-+    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *rvq;
-     uint32_t free_page_report_status;
-     uint32_t num_pages;
-     uint32_t actual;
+CgpPbiAwNC4wOS4xOSAxNjo0MCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToKPiBPbiBXZWQs
+IFNlcCAwNCwgMjAxOSBhdCAwMzozNToxMFBNICswMjAwLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToK
+Pj4gV2UgY2FuIGVhc2lseSByb3V0ZSBoYXJkd2FyZSBpbnRlcnJ1cHRzIGRpcmVjdGx5IGludG8g
+Vk0gY29udGV4dCB3aGVuCj4+IHRoZXkgdGFyZ2V0IHRoZSAiRml4ZWQiIG9yICJMb3dQcmlvcml0
+eSIgZGVsaXZlcnkgbW9kZXMuCj4+Cj4+IEhvd2V2ZXIsIG9uIG1vZGVzIHN1Y2ggYXMgIlNNSSIg
+b3IgIkluaXQiLCB3ZSBuZWVkIHRvIGdvIHZpYSBLVk0gY29kZQo+PiB0byBhY3R1YWxseSBwdXQg
+dGhlIHZDUFUgaW50byBhIGRpZmZlcmVudCBtb2RlIG9mIG9wZXJhdGlvbiwgc28gd2UgY2FuCj4+
+IG5vdCBwb3N0IHRoZSBpbnRlcnJ1cHQKPj4KPj4gQWRkIGNvZGUgaW4gdGhlIFZNWCBQSSBsb2dp
+YyB0byBleHBsaWNpdGx5IHJlZnVzZSB0byBlc3RhYmxpc2ggcG9zdGVkCj4+IG1hcHBpbmdzIGZv
+ciBhZHZhbmNlZCBJUlEgZGVsaXZlciBtb2Rlcy4gVGhpcyByZWZsZWN0cyB0aGUgbG9naWMgaW4K
+Pj4gX19hcGljX2FjY2VwdF9pcnEoKSB3aGljaCBhbHNvIG9ubHkgZXZlciBwYXNzZXMgRml4ZWQg
+YW5kIExvd1ByaW9yaXR5Cj4+IGludGVycnVwdHMgYXMgcG9zdGVkIGludGVycnVwdHMgaW50byB0
+aGUgZ3Vlc3QuCj4+Cj4+IFRoaXMgZml4ZXMgYSBidWcgSSBoYXZlIHdpdGggY29kZSB3aGljaCBj
+b25maWd1cmVzIHJlYWwgaGFyZHdhcmUgdG8KPj4gaW5qZWN0IHZpcnR1YWwgU01JcyBpbnRvIG15
+IGd1ZXN0Lgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4YW5kZXIgR3JhZiA8Z3JhZkBhbWF6b24u
+Y29tPgo+PiBSZXZpZXdlZC1ieTogTGlyYW4gQWxvbiA8bGlyYW4uYWxvbkBvcmFjbGUuY29tPgo+
+Pgo+PiAtLS0KPj4KPj4gdjEgLT4gdjI6Cj4+Cj4+ICAgIC0gTWFrZSBlcnJvciBtZXNzYWdlIG1v
+cmUgdW5pcXVlCj4+ICAgIC0gVXBkYXRlIGNvbW1pdCBtZXNzYWdlIHRvIHBvaW50IHRvIF9fYXBp
+Y19hY2NlcHRfaXJxKCkKPj4gLS0tCj4+ICAgYXJjaC94ODYva3ZtL3ZteC92bXguYyB8IDIyICsr
+KysrKysrKysrKysrKysrKysrKysKPj4gICAxIGZpbGUgY2hhbmdlZCwgMjIgaW5zZXJ0aW9ucygr
+KQo+Pgo+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3ZteC92bXguYyBiL2FyY2gveDg2L2t2
+bS92bXgvdm14LmMKPj4gaW5kZXggNTcwYTIzM2UyNzJiLi44MDI5ZmU2NThjMzAgMTAwNjQ0Cj4+
+IC0tLSBhL2FyY2gveDg2L2t2bS92bXgvdm14LmMKPj4gKysrIGIvYXJjaC94ODYva3ZtL3ZteC92
+bXguYwo+PiBAQCAtNzQwMSw2ICs3NDAxLDI4IEBAIHN0YXRpYyBpbnQgdm14X3VwZGF0ZV9waV9p
+cnRlKHN0cnVjdCBrdm0gKmt2bSwgdW5zaWduZWQgaW50IGhvc3RfaXJxLAo+PiAgIAkJCWNvbnRp
+bnVlOwo+PiAgIAkJfQo+PiAgIAo+PiArCQlzd2l0Y2ggKGlycS5kZWxpdmVyeV9tb2RlKSB7Cj4+
+ICsJCWNhc2UgZGVzdF9GaXhlZDoKPj4gKwkJY2FzZSBkZXN0X0xvd2VzdFByaW86Cj4+ICsJCQli
+cmVhazsKPj4gKwkJZGVmYXVsdDoKPj4gKwkJCS8qCj4+ICsJCQkgKiBGb3Igbm9uLXRyaXZpYWwg
+aW50ZXJydXB0IGV2ZW50cywgd2UgbmVlZCB0byBnbwo+PiArCQkJICogdGhyb3VnaCB0aGUgZnVs
+bCBLVk0gSVJRIGNvZGUsIHNvIHJlZnVzZSB0byB0YWtlCj4+ICsJCQkgKiBhbnkgZGlyZWN0IFBJ
+IGFzc2lnbm1lbnRzIGhlcmUuCj4+ICsJCQkgKi8KPiAKPiBJTU8sIGEgYmVlZnkgY29tbWVudCBp
+cyB1bm5lY2Vzc2FyeSwgYW55b25lIHRoYXQgaXMgZGlnZ2luZyB0aHJvdWdoIHRoaXMKPiBjb2Rl
+IGhhcyBob3BlZnVsbHkgcmVhZCB0aGUgUEkgc3BlYyBvciBhdCBsZWFzdCB1bmRlcnN0YW5kcyB0
+aGUgYmFzaWMKPiBjb25jZXB0cy4gIEkuZS4gaXQgc2hvdWxkIGJlIG9idmlvdXMgdGhhdCBQSSBj
+YW4ndCBiZSB1c2VkIGZvciBTTUksIGV0Yy4uLgo+IAo+PiArCQkJcmV0ID0gaXJxX3NldF92Y3B1
+X2FmZmluaXR5KGhvc3RfaXJxLCBOVUxMKTsKPj4gKwkJCWlmIChyZXQgPCAwKSB7Cj4+ICsJCQkJ
+cHJpbnRrKEtFUk5fSU5GTwo+PiArCQkJCSAgICAibm9uLXN0ZCBJUlEgZmFpbGVkIHRvIHJlY292
+ZXIsIGlycTogJXVcbiIsCj4+ICsJCQkJICAgIGhvc3RfaXJxKTsKPj4gKwkJCQlnb3RvIG91dDsK
+Pj4gKwkJCX0KPj4gKwo+PiArCQkJY29udGludWU7Cj4gCj4gVXNpbmcgYSBzd2l0Y2ggdG8gZmls
+dGVyIG91dCB0d28gdHlwZXMgaXMgYSBiaXQgb2Ygb3ZlcmtpbGwuICBJdCBhbHNvCgpUaGUgc3dp
+dGNoIHNob3VsZCBjb21waWxlIGludG8gdGhlIHNhbWUgYXMgdGhlIGlmKCkgYmVsb3csIGl0J3Mg
+anVzdCBhIAptYXR0ZXIgb2YgYmVpbmcgbW9yZSB2ZXJib3NlIGluIGNvZGUuCgo+IHByb2JhYmx5
+IG1ha2VzIHNlbnNlIHRvIHBlcmZvcm0gdGhlIGRlbGl2ZXJfbW9kZSBjaGVja3MgYmVmb3JlIGNh
+bGxpbmcKPiBrdm1faW50cl9pc19zaW5nbGVfdmNwdSgpLiAgV2h5IG5vdCBzaW1wbHkgc29tZXRo
+aW5nIGxpa2UgdGhpcz8gIFRoZQo+IGV4aXN0aW5nIGNvbW1lbnQgYW5kIGVycm9yIG1lc3NhZ2Ug
+YXJlIGV2ZW4gZ2VuZXJpYyBlbm91Z2ggdG8ga2VlcCBhcyBpcy4KCk9rLCBzbyBob3cgYWJvdXQg
+dGhpcywgZXZlbiB0aG91Z2ggaXQgZ29lcyBhZ2FpbnN0IExpcmFuJ3MgY29tbWVudCBvbiAKdGhl
+IGNvbWJpbmVkIGRlYnVnIHByaW50PwoKSWYgeW91IHRoaW5rIGl0J3MgcmVhc29uYWJsZSBkZXNw
+aXRlIHRoZSBicm9rZW4gZm9ybWF0dGluZywgSSdsbCBiZSAKaGFwcHkgdG8gZm9sZCB0aGUgcGF0
+Y2hlcyBhbmQgc3VibWl0IGFzIHYzLgoKCkFsZXgKCgpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5j
+bHVkZS9hc20va3ZtX2hvc3QuaCAKYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCmlu
+ZGV4IDQ0YTVjZTU3YTkwNS4uNTVmNjhmYjBkNzkxIDEwMDY0NAotLS0gYS9hcmNoL3g4Ni9pbmNs
+dWRlL2FzbS9rdm1faG9zdC5oCisrKyBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgK
+QEAgLTE1ODEsNiArMTU4MSwxMiBAQCBib29sIGt2bV9pbnRyX2lzX3NpbmdsZV92Y3B1KHN0cnVj
+dCBrdm0gKmt2bSwgCnN0cnVjdCBrdm1fbGFwaWNfaXJxICppcnEsCiAgdm9pZCBrdm1fc2V0X21z
+aV9pcnEoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3QgCmt2bV9rZXJuZWxfaXJxX3JvdXRpbmdfZW50
+cnkgKmUsCiAgCQkgICAgIHN0cnVjdCBrdm1fbGFwaWNfaXJxICppcnEpOwoKK3N0YXRpYyBpbmxp
+bmUgYm9vbCBrdm1faXJxX2lzX2dlbmVyaWMoc3RydWN0IGt2bV9sYXBpY19pcnEgKmlycSkKK3sK
+KwlyZXR1cm4gKGlycS0+ZGVsaXZlcnlfbW9kZSA9PSBkZXN0X0ZpeGVkIHx8CisJCWlycS0+ZGVs
+aXZlcnlfbW9kZSA9PSBkZXN0X0xvd2VzdFByaW8pOworfQorCiAgc3RhdGljIGlubGluZSB2b2lk
+IGt2bV9hcmNoX3ZjcHVfYmxvY2tpbmcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogIHsKICAJaWYg
+KGt2bV94ODZfb3BzLT52Y3B1X2Jsb2NraW5nKQpkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3N2
+bS5jIGIvYXJjaC94ODYva3ZtL3N2bS5jCmluZGV4IDFmMjIwYTg1NTE0Zi4uMzRjYzU5NTE4Y2Ji
+IDEwMDY0NAotLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtLmMKKysrIGIvYXJjaC94ODYva3ZtL3N2bS5j
+CkBAIC01MjYwLDcgKzUyNjAsOCBAQCBnZXRfcGlfdmNwdV9pbmZvKHN0cnVjdCBrdm0gKmt2bSwg
+c3RydWN0IAprdm1fa2VybmVsX2lycV9yb3V0aW5nX2VudHJ5ICplLAoKICAJa3ZtX3NldF9tc2lf
+aXJxKGt2bSwgZSwgJmlycSk7CgotCWlmICgha3ZtX2ludHJfaXNfc2luZ2xlX3ZjcHUoa3ZtLCAm
+aXJxLCAmdmNwdSkpIHsKKwlpZiAoIWt2bV9pbnRyX2lzX3NpbmdsZV92Y3B1KGt2bSwgJmlycSwg
+JnZjcHUpIHx8CisJICAgICFrdm1faXJxX2lzX2dlbmVyaWMoJmlycSkpIHsKICAJCXByX2RlYnVn
+KCJTVk06ICVzOiB1c2UgbGVnYWN5IGludHIgcmVtYXAgbW9kZSBmb3IgaXJxICV1XG4iLAogIAkJ
+CSBfX2Z1bmNfXywgaXJxLnZlY3Rvcik7CiAgCQlyZXR1cm4gLTE7CkBAIC01MzE0LDYgKzUzMTUs
+NyBAQCBzdGF0aWMgaW50IHN2bV91cGRhdGVfcGlfaXJ0ZShzdHJ1Y3Qga3ZtICprdm0sIAp1bnNp
+Z25lZCBpbnQgaG9zdF9pcnEsCiAgCQkgKiAxLiBXaGVuIGNhbm5vdCB0YXJnZXQgaW50ZXJydXB0
+IHRvIGEgc3BlY2lmaWMgdmNwdS4KICAJCSAqIDIuIFVuc2V0dGluZyBwb3N0ZWQgaW50ZXJydXB0
+LgogIAkJICogMy4gQVBJQyB2aXJ0aWFsaXphdGlvbiBpcyBkaXNhYmxlZCBmb3IgdGhlIHZjcHUu
+CisJCSAqIDQuIElSUSBoYXMgZXh0ZW5kZWQgZGVsaXZlcnkgbW9kZSAoU01JLCBJTklULCBldGMp
+CiAgCQkgKi8KICAJCWlmICghZ2V0X3BpX3ZjcHVfaW5mbyhrdm0sIGUsICZ2Y3B1X2luZm8sICZz
+dm0pICYmIHNldCAmJgogIAkJICAgIGt2bV92Y3B1X2FwaWN2X2FjdGl2ZSgmc3ZtLT52Y3B1KSkg
+ewpkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3ZteC92bXguYyBiL2FyY2gveDg2L2t2bS92bXgv
+dm14LmMKaW5kZXggNTcwYTIzM2UyNzJiLi42OWY1MzgwOWM3YmIgMTAwNjQ0Ci0tLSBhL2FyY2gv
+eDg2L2t2bS92bXgvdm14LmMKKysrIGIvYXJjaC94ODYva3ZtL3ZteC92bXguYwpAQCAtNzM4Miwx
+MCArNzM4MiwxNCBAQCBzdGF0aWMgaW50IHZteF91cGRhdGVfcGlfaXJ0ZShzdHJ1Y3Qga3ZtICpr
+dm0sIAp1bnNpZ25lZCBpbnQgaG9zdF9pcnEsCiAgCQkgKiBpcnFiYWxhbmNlIHRvIG1ha2UgdGhl
+IGludGVycnVwdHMgc2luZ2xlLUNQVS4KICAJCSAqCiAgCQkgKiBXZSB3aWxsIHN1cHBvcnQgZnVs
+bCBsb3dlc3QtcHJpb3JpdHkgaW50ZXJydXB0IGxhdGVyLgorCQkgKgorCQkgKiBJbiBhZGRpdGlv
+biwgd2UgY2FuIG9ubHkgaW5qZWN0IGdlbmVyaWMgaW50ZXJydXB0cyB1c2luZworCQkgKiB0aGUg
+UEkgbWVjaGFuaXNtLCByZWZ1c2UgdG8gcm91dGUgb3RoZXJzIHRocm91Z2ggaXQuCiAgCQkgKi8K
+CiAgCQlrdm1fc2V0X21zaV9pcnEoa3ZtLCBlLCAmaXJxKTsKLQkJaWYgKCFrdm1faW50cl9pc19z
+aW5nbGVfdmNwdShrdm0sICZpcnEsICZ2Y3B1KSkgeworCQlpZiAoIWt2bV9pbnRyX2lzX3Npbmds
+ZV92Y3B1KGt2bSwgJmlycSwgJnZjcHUpIHx8CisJCSAgICAha3ZtX2lycV9pc19nZW5lcmljKCZp
+cnEpKSB7CiAgCQkJLyoKICAJCQkgKiBNYWtlIHN1cmUgdGhlIElSVEUgaXMgaW4gcmVtYXBwZWQg
+bW9kZSBpZgogIAkJCSAqIHdlIGRvbid0IGhhbmRsZSBpdCBpbiBwb3N0ZWQgbW9kZS4KCgoKCkFt
+YXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3
+IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIFJhbGYgSGVy
+YnJpY2gKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJC
+IDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
