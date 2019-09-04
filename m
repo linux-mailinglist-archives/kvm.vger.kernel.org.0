@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C092FA9489
-	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 23:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3954A948B
+	for <lists+kvm@lfdr.de>; Wed,  4 Sep 2019 23:11:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730546AbfIDVK3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 17:10:29 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:37767 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727900AbfIDVK2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 17:10:28 -0400
-Received: by mail-ot1-f66.google.com with SMTP id s28so414337otd.4
-        for <kvm@vger.kernel.org>; Wed, 04 Sep 2019 14:10:28 -0700 (PDT)
+        id S1730720AbfIDVLS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 17:11:18 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:35662 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730391AbfIDVLR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 17:11:17 -0400
+Received: by mail-ot1-f67.google.com with SMTP id 100so22201258otn.2
+        for <kvm@vger.kernel.org>; Wed, 04 Sep 2019 14:11:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=intel-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=wPMWwNSvV9eb5rCu0YMNtiK3/0cR200eFpdZP8tToms=;
-        b=cr/2pcTab+KUWoDNVNzO2zJ+8zFyfJbc3u75JTwJU8kJ7gWl3gxzG5ENnPPSyVrSCq
-         SuBqAQ8RzhaV2a/HxduSt7ppLV/eWGTtUx/a6wNjIODvqE88o+7S1ZWGc6I6GW/lWSco
-         ugSco9IMYbUbbhVhb7LB51QAUisJGNylBc2XTRY+ofuMS4mtW7yB+nBDwcC8Eflg+DIh
-         C47efgC6cD78+M5RvB3gTx+JoWSmjAvaaa2GqDhJjsgLFt59c15hiEh1Ur3QDfAToi1y
-         ZJezHfiZrelD2BcNYDQu3jmZ72RSuDo/vns5bY+ZuJ10WxhXfVOcTURaAUZLAfLH4A1T
-         NulQ==
+        bh=DOJXX029rLk7A9iwm08b8/Tl49pqEw9N8S7iikumjN8=;
+        b=V7EVPD+fthp2Q80ZJwJy+hxX6duKEdu7/VTcx6YCk7q0HWNV0qSkz0sS9fajCv9YLt
+         kZ7Fmdk++yNzXS4WboBmvS9IZXHfPN+px0XZmekfpGt0/v+IMmaJXO3lW9jhZA9ffiyC
+         MPCKZ1ratNZUFYN5RMYbhqOF5wbt25Pw2FFNks7TFpiuxNqkYnlebEOfluG1zKezJgib
+         35GgMnC6P6PF2XOMZp8gk//4CUwUh0NXqzem0UlUM6zKjJEuBAaF0TdbOoTqwGnUr4OX
+         hYqx6+7zIYDjo/zUUndobyd6up0UDtz1acNvOWuwmD906+9+y6Y7iiFn576BF/OZAfMP
+         457A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=wPMWwNSvV9eb5rCu0YMNtiK3/0cR200eFpdZP8tToms=;
-        b=V3oeTMgc3FRdFYLnCgDJHQRRusVzbwvBpxtgdtemtFZppgNqw+sRgC8CDI1stUF4Ej
-         Ep36w7157nYiLxm5rzijWqYZx0wMISD+zQ5MFkuCKttNjTuxSqCCm3pEx8X5vilMGUG1
-         qL+2hmpyq5YpE/z0G+HsqvfGs/ZaakKjoJiyQ9U3ekf0AdUfjklRU/KmI5NllrTdv294
-         4GXH4g1+zYYDfA/wtpsw4kQCQNdUfLTcXdWZlo6tWwXPlUtINlgcGySQu6p2VqsAAGP3
-         M7h2mGG8YGjSju6AHzvFQWazSVfFVszYahuHOah7PaYU2LQIWPY+1m6UB5dzpzcd6/11
-         LUhg==
-X-Gm-Message-State: APjAAAUunHlUzFHMTu36uGiqLqhxga2Ch0VcstJoCAH84zoMzj+VYrf5
-        6xFYUHoSzRZvmNu70eI0k3Nzhti9qdlUAAyVnPtHvw==
-X-Google-Smtp-Source: APXvYqzFh8uueHK+qUmQpwTm/TlKG431AzcbA3p2O6x4cql8knUN37kiD/jGqwHTO7K8qxaIQLqXw5St076KjdfoMnU=
-X-Received: by 2002:a9d:6d15:: with SMTP id o21mr9381251otp.363.1567631427871;
- Wed, 04 Sep 2019 14:10:27 -0700 (PDT)
+        bh=DOJXX029rLk7A9iwm08b8/Tl49pqEw9N8S7iikumjN8=;
+        b=VyGZs2i+YM3lvNgh3aUiXq7LBMvigeo8ydkLbMROX5QvKWiIlThvYoXQPymWISgASA
+         2edz/Swpy4rpW6BrgjNW6nExe/z0eerMM7uNFLzU4U4HcCkazkrm9ryY/z3U2T7glNE/
+         dpfm+vgGEuk8tQvU59aiw3Q3SabLkP7Y6yAGtY3DeRgUtO5mzwCLJpVtcwyJ/XNQVXdS
+         cdZ1CPN3YUGpm675PfpCloE4My+ebNr9bYVv7JCebysk7Lr+my8Mc55c+HJ8CIX+ohB1
+         hzQKXTTbz6h/hEtSnZz6I9jXYpc0ZcnyS7s++x+HFi4jQ4wcjJb2Us7MtNWoCLqm71OH
+         OTbw==
+X-Gm-Message-State: APjAAAWO/XXfUuBKHalB7xVJWZVwdRJiO2aOXJSyopnlemcOjBGt85mm
+        9FXUJxCX1Qi7yO41Py20s47IzVQgRK4CqSldhY2PAw==
+X-Google-Smtp-Source: APXvYqx9jKkBHnd+DQIWXHwkuc52sRnnbaAsQKgvUKsZGTAH48zPPbXcKFWapnRn7Rw3Hu49a3/TdCstzgRe3NrlpAw=
+X-Received: by 2002:a9d:2642:: with SMTP id a60mr9252305otb.247.1567631476902;
+ Wed, 04 Sep 2019 14:11:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190904150920.13848.32271.stgit@localhost.localdomain> <20190904151030.13848.25822.stgit@localhost.localdomain>
-In-Reply-To: <20190904151030.13848.25822.stgit@localhost.localdomain>
+References: <20190904150920.13848.32271.stgit@localhost.localdomain> <20190904151036.13848.36062.stgit@localhost.localdomain>
+In-Reply-To: <20190904151036.13848.36062.stgit@localhost.localdomain>
 From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Wed, 4 Sep 2019 14:10:17 -0700
-Message-ID: <CAPcyv4jZVoztoRA7hEq5xzbwg0QJ+UVASuk5XQmB5KHQrvAmfA@mail.gmail.com>
-Subject: Re: [PATCH v7 1/6] mm: Adjust shuffle code to allow for future coalescing
+Date:   Wed, 4 Sep 2019 14:11:06 -0700
+Message-ID: <CAPcyv4hHdRbb2pLgeAYep8fXRxYwG3QixFBVfsO9FNtAzvo6mg@mail.gmail.com>
+Subject: Re: [PATCH v7 2/6] mm: Move set/get_pcppage_migratetype to mmzone.h
 To:     Alexander Duyck <alexander.duyck@gmail.com>
 Cc:     nitesh@redhat.com, KVM list <kvm@vger.kernel.org>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -72,25 +72,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 4, 2019 at 8:10 AM Alexander Duyck
+On Wed, Sep 4, 2019 at 8:11 AM Alexander Duyck
 <alexander.duyck@gmail.com> wrote:
 >
 > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 >
-> Move the head/tail adding logic out of the shuffle code and into the
-> __free_one_page function since ultimately that is where it is really
-> needed anyway. By doing this we should be able to reduce the overhead
-> and can consolidate all of the list addition bits in one spot.
+> In order to support page reporting it will be necessary to store and
+> retrieve the migratetype of a page. To enable that I am moving the set and
+> get operations for pcppage_migratetype into the mm/internal.h header so
+> that they can be used outside of the page_alloc.c file.
 >
-> While changing out the code I also opted to go for a bit more thread safe
-> approach to getting the boolean value. This way we can avoid possible cache
-> line bouncing of the batched entropy between CPUs.
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-The original version of this patch just did the movement, but now the
-patch also does the percpu optimization. At this point it warrants
-being split into a "move" patch and then "rework". Otherwise the bulk
-of the patch is not really well described by the patch title. With the
-split there's a commit id for each of the performance improvement
-claims.
-
-Other than that the percpu logic changes look good to me.
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
