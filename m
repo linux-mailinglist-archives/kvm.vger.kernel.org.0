@@ -2,145 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 706AFA9863
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 04:36:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33202A9AA8
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 08:26:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730778AbfIECgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 22:36:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33210 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730776AbfIECgo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 22:36:44 -0400
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DD2687F769
-        for <kvm@vger.kernel.org>; Thu,  5 Sep 2019 02:36:43 +0000 (UTC)
-Received: by mail-pf1-f199.google.com with SMTP id w16so701298pfj.9
-        for <kvm@vger.kernel.org>; Wed, 04 Sep 2019 19:36:43 -0700 (PDT)
+        id S1731558AbfIEG0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 02:26:34 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38958 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731359AbfIEG0e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 02:26:34 -0400
+Received: by mail-pl1-f194.google.com with SMTP id bd8so779437plb.6;
+        Wed, 04 Sep 2019 23:26:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PasM8GCX7mEGAVRsf1zB0IrqtOMIBNlDj4wL+XfNBQQ=;
+        b=kRp8zzhOm5SwgB5xlXbVKho0JVc6ZWWmJPaXU3biT8N/Z1tGE/7OpGVVuQ2bNJoZYU
+         tx0B6NC7jaChCi/dEexhFFmcodCd/ZbF52yx+bmH8oUkuLE/IasxU2DjjMLI4XmluW9Y
+         834BzA1UwGTqG/YmBHYjZJ0XtRv9rI5yshrUIdfxMgBNYu43lU84IR+3F+5AzzrZmJvH
+         /RXzxHdyF9zzvPmPWFyjIqR7YbmFRhHNE32i6jqzZTCpw0CL1VyffHLBJjO6Y/hllGzn
+         1ZBrJepkYMUmS7HaN6/oT/ywknBpthdrSskr7gW9zA6DVgX5WRtT90Xe4H7sgY48V8io
+         Dqsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=HxjOgu8AuJ4sFURxg4u+BP/uqk7UsSBU+RsKI6Kus/8=;
-        b=ntjKcR443uxxn0MfH/YtverIn7quPdsfvGF6lHnjgnIYY023aZReWOqpTRl5QO9DwZ
-         8jHz01QuVozR2UFW6W3tL9LFFIg4NoN2v685J2lNSR8+GiwPAJxZBvssHSk4YOhClAON
-         Rl5KeIvyijcOEYXi+Kq3D9hFfcMU6rWANuz9wrEptsXJQPtEUh8IKzxOXqPwTIFbbsc7
-         YrSeaijSyqulU0SygaYVsArZiTz3A2fbFU4N59oEUbTGE4bnwcYxo5e8/SuOAwoqq/Cf
-         0FBqQPL92SssiICf8Z7jTj2aObr/UXiuvZHfYpk5uqnAovXJPeqtX8wi8KwXkTu/xwUQ
-         ciiw==
-X-Gm-Message-State: APjAAAX+NJlz4BROnnF/4CxfoyYHeeZ51HbpuXPEBsOEt/Wrcma8iHua
-        OieImzCJcigfGIJna/JKKalz/l5oqOotvqwbeosO+cZLhCKnO/HOEGxsazaM6Gs8WUcZ0Xd1nDM
-        EvGWF51vDkCuc
-X-Received: by 2002:a17:90a:b393:: with SMTP id e19mr1397015pjr.118.1567651002913;
-        Wed, 04 Sep 2019 19:36:42 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwZ0TFaCjzAlYeNNt4S7xfs89HxwHt1HZNbm3+6W2xlASC3ZtcGi1Xf0DuojA+RX/RV0YQECQ==
-X-Received: by 2002:a17:90a:b393:: with SMTP id e19mr1396996pjr.118.1567651002693;
-        Wed, 04 Sep 2019 19:36:42 -0700 (PDT)
-Received: from xz-x1.redhat.com ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id v10sm326504pjk.23.2019.09.04.19.36.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2019 19:36:41 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, peterx@redhat.com
-Subject: [PATCH v3 4/4] KVM: VMX: Change ple_window type to unsigned int
-Date:   Thu,  5 Sep 2019 10:36:16 +0800
-Message-Id: <20190905023616.29082-5-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190905023616.29082-1-peterx@redhat.com>
-References: <20190905023616.29082-1-peterx@redhat.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PasM8GCX7mEGAVRsf1zB0IrqtOMIBNlDj4wL+XfNBQQ=;
+        b=Fiq/jkFkycJBAP7bzksAq1r7uxE5gPimD/DesiI+ngLMzV+9s/koeWkcBQvgJeHB3G
+         3nNrj5vsFqpJPBs1LVtbm4PccfozQ/Lcs5X3lgYd0PFZGLe2MUCAc85PgqZ17oYQ24yv
+         SnuMzny30XhGesi+8Nrs8u1G23qb5lTysykposJQjahBurcbI+Xpa9nI4jv4BTrxBwI5
+         k1JfrWd97lsG2GnJUmd32Mlp9iHaMWXVJkTMgykNLqbmXECwo4hDjQ9YDzhm3OKQJf0d
+         S9QM2ky4/tlfIkYMM+OYRmma9a9SJG8ToJTEZU8lpCujMD0PV3A8c4hq1rwhshriN5F0
+         wuuQ==
+X-Gm-Message-State: APjAAAVfOQyHSqJZSMGOv6ljaJL4v+DckudvR9APJefEMAJtXQiBrwsO
+        LkiQQ4ChjAwSO2oDsiN3FBtd1MtO
+X-Google-Smtp-Source: APXvYqz4fC9DNjfuhuH7Hjj+nAevfg1kox4DNRRwCcn4H7thFDoDqy4ad16301wTifH750eAd6bD5g==
+X-Received: by 2002:a17:902:a983:: with SMTP id bh3mr1616757plb.311.1567664793115;
+        Wed, 04 Sep 2019 23:26:33 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id d69sm1102941pfd.175.2019.09.04.23.26.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 04 Sep 2019 23:26:32 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH 1/2] KVM: LAPIC: Micro optimize IPI latency
+Date:   Thu,  5 Sep 2019 14:26:27 +0800
+Message-Id: <1567664788-10249-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The VMX ple_window is 32 bits wide, so logically it can overflow with
-an int.  The module parameter is declared as unsigned int which is
-good, however the dynamic variable is not.  Switching all the
-ple_window references to use unsigned int.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-The tracepoint changes will also affect SVM, but SVM is using an even
-smaller width (16 bits) so it's always fine.
+This patch optimizes the virtual IPI emulation sequence:
 
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
+write ICR2                     write ICR2
+write ICR                      read ICR2
+read ICR            ==>        send virtual IPI
+read ICR2                      write ICR
+send virtual IPI
+
+It can reduce kvm-unit-tests/vmexit.flat IPI testing latency(from sender
+send IPI to sender receive the ACK) from 3319 cycles to 3203 cycles on
+SKylake server.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/trace.h   | 8 ++++----
- arch/x86/kvm/vmx/vmx.c | 4 ++--
- arch/x86/kvm/vmx/vmx.h | 2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/kvm/lapic.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index f1177e03768f..ae924566c401 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -891,13 +891,13 @@ TRACE_EVENT(kvm_pml_full,
- );
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 12ade70..34fd299 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1200,10 +1200,8 @@ void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector)
+ }
+ EXPORT_SYMBOL_GPL(kvm_apic_set_eoi_accelerated);
  
- TRACE_EVENT(kvm_ple_window_update,
--	TP_PROTO(unsigned int vcpu_id, int new, int old),
-+	TP_PROTO(unsigned int vcpu_id, unsigned int new, unsigned int old),
- 	TP_ARGS(vcpu_id, new, old),
- 
- 	TP_STRUCT__entry(
- 		__field(        unsigned int,   vcpu_id         )
--		__field(                 int,       new         )
--		__field(                 int,       old         )
-+		__field(        unsigned int,       new         )
-+		__field(        unsigned int,       old         )
- 	),
- 
- 	TP_fast_assign(
-@@ -906,7 +906,7 @@ TRACE_EVENT(kvm_ple_window_update,
- 		__entry->old            = old;
- 	),
- 
--	TP_printk("vcpu %u old %d new %d (%s)",
-+	TP_printk("vcpu %u old %u new %u (%s)",
- 	          __entry->vcpu_id, __entry->old, __entry->new,
- 		  __entry->old < __entry->new ? "growed" : "shrinked")
- );
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 469c4134a4a7..1dbb63ffdd6d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5227,7 +5227,7 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
- static void grow_ple_window(struct kvm_vcpu *vcpu)
+-static void apic_send_ipi(struct kvm_lapic *apic)
++static void apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	int old = vmx->ple_window;
-+	unsigned int old = vmx->ple_window;
+-	u32 icr_low = kvm_lapic_get_reg(apic, APIC_ICR);
+-	u32 icr_high = kvm_lapic_get_reg(apic, APIC_ICR2);
+ 	struct kvm_lapic_irq irq;
  
- 	vmx->ple_window = __grow_ple_window(old, ple_window,
- 					    ple_window_grow,
-@@ -5243,7 +5243,7 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
- static void shrink_ple_window(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	int old = vmx->ple_window;
-+	unsigned int old = vmx->ple_window;
+ 	irq.vector = icr_low & APIC_VECTOR_MASK;
+@@ -1940,8 +1938,9 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ 	}
+ 	case APIC_ICR:
+ 		/* No delay here, so we always clear the pending bit */
+-		kvm_lapic_set_reg(apic, APIC_ICR, val & ~(1 << 12));
+-		apic_send_ipi(apic);
++		val &= ~(1 << 12);
++		apic_send_ipi(apic, val, kvm_lapic_get_reg(apic, APIC_ICR2));
++		kvm_lapic_set_reg(apic, APIC_ICR, val);
+ 		break;
  
- 	vmx->ple_window = __shrink_ple_window(old, ple_window,
- 					      ple_window_shrink,
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 82d0bc3a4d52..64d5a4890aa9 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -253,7 +253,7 @@ struct vcpu_vmx {
- 	struct nested_vmx nested;
- 
- 	/* Dynamic PLE window. */
--	int ple_window;
-+	unsigned int ple_window;
- 	bool ple_window_dirty;
- 
- 	bool req_immediate_exit;
+ 	case APIC_ICR2:
 -- 
-2.21.0
+2.7.4
 
