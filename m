@@ -2,91 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F769A9AA6
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 08:26:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F838A9C2D
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 09:49:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731582AbfIEG0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 02:26:36 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:39792 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731570AbfIEG0f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Sep 2019 02:26:35 -0400
-Received: by mail-pg1-f194.google.com with SMTP id u17so813798pgi.6;
-        Wed, 04 Sep 2019 23:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=AziVDiNsJfWSoLEyeTjoxxBYGSeB6j2LvcpA2gkjX9Y=;
-        b=snr+7JsvbIfvpSDRxAoAa9XtG8kcTu0x20sFyZBuc1LG+RRbdITGufDsg2QRL2gKJk
-         J1twKplySDIR+kI5oIOg7h8eNBU7eLxVKx7tP//i4EKH5THVSXOukQZUGh7v9M1WiuBF
-         jOL36ziqYZWkeWM0vVgdMzpqGSKLH+YTsKgEYMEiBLwPROMsHUVps1xQMv4EW2yEDVHZ
-         FJMZXitwdr3OstV2sTa5gBJaEDtKI65Mbk4ya6WAzhyT5rcNCgW0y+5T7ZWrU5NsM158
-         Ur+SDe3iGpjrEZUI2L2jbCMdFOV0nnZb+uelqlpFIuz2R5ypKllyP9MQ2I7r+CH5IMlj
-         9yxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=AziVDiNsJfWSoLEyeTjoxxBYGSeB6j2LvcpA2gkjX9Y=;
-        b=HQp8DhO0L8fjiLHRnw/PDGSknJHIxC3c5scbr03OUNDIIjqFjBGobTdIcB4KxQBgB6
-         /eJg5r0YkxXGmzxmKE1pgfFrxKHvFe7HS1ZWs1Z7C95qMI3mtOxvdnl8b9MqDrtF1OIa
-         TRBMgp9p6GSjOc/lET4xf2vsRimrp3eCgsf/+TK4x0iha+AffEfkXdm/9zAWfuFx/lMs
-         6uqC1/XLtJJ1JEM27Uw1W0AbnsMVEab7ZIX/cJnW0MAyXvLptlG75fSQ5gMXU/L652SU
-         jLAzDGhIhtqt5qzl9J9Syf33uooTNzr0Vzt28cYyN0y/BgtYbbByXYQLDBx4appE1htz
-         8+iA==
-X-Gm-Message-State: APjAAAWyVe3IcvSUeC3H4hXv/QN3k3/1j8QOH+xByh9ESD6avPe/Pmd+
-        q/nvdMkk2ttrDIy1ExiojUgIUhvN
-X-Google-Smtp-Source: APXvYqxSMXgpLfyQpBqsSE4U5weR8hDwgwbVXZkW1nsGMJzKXWjlgiKGN5qy4WA2vqDOIJGNUfWwMA==
-X-Received: by 2002:a62:e50c:: with SMTP id n12mr1879416pff.206.1567664795032;
-        Wed, 04 Sep 2019 23:26:35 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id d69sm1102941pfd.175.2019.09.04.23.26.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 04 Sep 2019 23:26:34 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 2/2] KVM: VMX: Stop the preemption timer during vCPU reset
-Date:   Thu,  5 Sep 2019 14:26:28 +0800
-Message-Id: <1567664788-10249-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1567664788-10249-1-git-send-email-wanpengli@tencent.com>
-References: <1567664788-10249-1-git-send-email-wanpengli@tencent.com>
+        id S1731458AbfIEHtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 03:49:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51136 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725921AbfIEHtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 03:49:01 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8233630044CE;
+        Thu,  5 Sep 2019 07:49:01 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-72.ams2.redhat.com [10.36.117.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C87695C219;
+        Thu,  5 Sep 2019 07:48:58 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id 066DE937E; Thu,  5 Sep 2019 09:48:58 +0200 (CEST)
+Date:   Thu, 5 Sep 2019 09:48:57 +0200
+From:   "kraxel@redhat.com" <kraxel@redhat.com>
+To:     "Zhang, Tina" <tina.zhang@intel.com>
+Cc:     "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>
+Subject: Re: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
+Message-ID: <20190905074857.n3akutnoarnfvg4y@sirius.home.kraxel.org>
+References: <20190816023528.30210-1-tina.zhang@intel.com>
+ <237F54289DF84E4997F34151298ABEBC8771E7AE@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <237F54289DF84E4997F34151298ABEBC8771E7AE@SHSMSX101.ccr.corp.intel.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Thu, 05 Sep 2019 07:49:01 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+  Hi,
 
-The hrtimer which is used to emulate lapic timer is stopped during 
-vcpu reset, preemption timer should do the same.
+> Option 2: QEMU provides the emulated display refresh event to the
+> vgpus provided by vendor driver. For vgpus, the display refresh event
+> can be considered as the vblank event which is leveraged by guest
+> window manager to do the plane update or mode-setting.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/vmx/vmx.c | 1 +
- 1 file changed, 1 insertion(+)
+> People are asking if option 2 could be a better choice.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 570a233..f794929 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4162,6 +4162,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 
- 	vcpu->arch.microcode_version = 0x100000000ULL;
- 	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
-+	vmx->hv_deadline_tsc = -1;
- 	kvm_set_cr8(vcpu, 0);
- 
- 	if (!init_event) {
--- 
-2.7.4
+Certainly worth trying, maybe it even makes sense to implement both and
+let qemu pick one, possibly even switch them at runtime.
+
+qemu can change the refresh rate.  vnc and sdl use that to reduce the
+refresh rate in case nobody is looking (no vnc client connected, sdl
+window minimized).  It surely makes sense to make that visible to the
+guest so it can throttle display updates too.  I'm not sure vblank is
+the way to go though, guests might run into vblank irq timeouts in case
+the refresh rate is very low ...
+
+cheers,
+  Gerd
 
