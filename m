@@ -2,89 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 87984A978C
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 02:16:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C6F7A979F
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 02:26:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729635AbfIEAP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 20:15:57 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:42388 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727156AbfIEAP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 20:15:57 -0400
-Received: by mail-oi1-f193.google.com with SMTP id o6so300936oic.9;
-        Wed, 04 Sep 2019 17:15:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=sifjxETRYiP3/dI94LWW+EPsjWJBvoBD1awu87P5YhM=;
-        b=CX6NCYFoE0gXba0Ao/upp+gvt8TOaazyHEYHn3cYWF3MLq614j1a2vlELwKOyGPX8V
-         nFH8Do2s50msebXYbJwxi5oc6EMtv5NfIPNFb7frNHMkUc4hTKlfBbUoWfS/FBJz2oWO
-         e+cW5DJOl4CF7bsHkuqwOOtQagDsAglF+05dxJCxSQkVPoOGNqZ3+UjW8w/I3vG9URgZ
-         tQ9GzOEyDl7ROQAi/nXPca5VscXKhlr8n+ILWCX8g4OyeQt6ZEaOvd9VuuojxuF0y9HW
-         WhtM2va9pY/NHejYj9+nZz7dn0krZZg8GyzcUvjDmWTKTd3Hfxfz+NrYLaT/9MOW1neY
-         dh+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=sifjxETRYiP3/dI94LWW+EPsjWJBvoBD1awu87P5YhM=;
-        b=Rr0hKdHUpzXWZZx5oi9QVNXgtX0f0c6an/cZnKnOdKEHE9TmKmshZrNyeTz/ZakAsj
-         RbBDrdX7jyeGytKQtlNw/c7XQd+xw9cuipVe/tG9ZWmAwAMOtvEQlnMQ9vPy/pTmS14p
-         qRNpx8TIpeDIZo0AU6zAXAVGHD9qN6Hp3d711xEx8koF+B56t+5qATx51S9MsJLz4+f0
-         Md6+LOBVuv/1vLgQjs3R0b6SfMvXJjaTUW1tfBKeT5a0bEOKstXxaYWGDqv4EPKJma3x
-         IkxsT1LaV2EIDcRG2CnsF5HThOlUoX9GfIQP6eb0w/rca+90tgNiAZ4QvkONbprckmEE
-         nqAA==
-X-Gm-Message-State: APjAAAUJXB/LAcoI0K0YM7gaELC7rCfp254NP4Juv1neb/rNIMdVQvLE
-        fTzJ+FgV/j8B5oINe6fQvSZRaDzmjMZ/1WN4QWE=
-X-Google-Smtp-Source: APXvYqy6DO2HoL48JbpGVvb47rr337PM1oVuO/LS/a0NiV3grYCFIM824yV6VZ5S2cHKBMOzEOEfD71uHAnVuFBsewY=
-X-Received: by 2002:aca:5a84:: with SMTP id o126mr564762oib.5.1567642556538;
- Wed, 04 Sep 2019 17:15:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <1567068597-22419-1-git-send-email-wanpengli@tencent.com> <a70aeec2-1572-ea09-a0c5-299cd70ddc8a@intel.com>
-In-Reply-To: <a70aeec2-1572-ea09-a0c5-299cd70ddc8a@intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 5 Sep 2019 08:15:44 +0800
-Message-ID: <CANRm+Czb07GGy7pP2NRLhaXV4yy01ozdqH34CTSMCSJPR1ZfPw@mail.gmail.com>
-Subject: Re: [PATCH v2] cpuidle-haltpoll: Enable kvm guest polling when
- dedicated physical CPUs are available
-To:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        id S1728196AbfIEA0D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 20:26:03 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52112 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726240AbfIEA0D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 20:26:03 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x850Nxh7097571;
+        Thu, 5 Sep 2019 00:25:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=XoOxQgv9dHeTA6suQ7C74cyVUbDjVwa3hBIpu49UkPY=;
+ b=CoLTWhqt+C7QITjEz9xdRwYDftGolnq7MfkxtdbNmoLHOKe66m/UM7cgzWQlh1M2eywG
+ 4IIts+TZrzl1+BmivVEa6I8KcGU9SGe0VLb7hz8nwbCJSH3SxbmCVVuTScPo66kBYjbX
+ s/9qvSZRK64EdzgspKSeqG5eABpwYJCURA23mc7WsbgTG1oU/VHZH0CXYVDVbkJsCnW5
+ IiDWvDUQsMzaNVAaPDAlEWStVI8ZRAkCJ/X2YQu36kEfDBxwx2JbNkklWQ+4k/wgrbDP
+ +HC0bgqs8LT8SVq8Nd+Xk4BKVokd0rqKB5Ta6DyYho2kk1E/Oedci3ehqgfNAqpTfXEH IQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2utqfgg24t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 05 Sep 2019 00:25:49 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x850NwvU133399;
+        Thu, 5 Sep 2019 00:25:49 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2ut1hpay3h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 05 Sep 2019 00:25:48 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x850PlKW020131;
+        Thu, 5 Sep 2019 00:25:48 GMT
+Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 04 Sep 2019 17:25:47 -0700
+Subject: Re: [kvm-unit-tests PATCH v3 7/8] x86: VMX: Make
+ guest_state_test_main() check state from nested VM
+To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Linux PM <linux-pm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190903215801.183193-1-oupton@google.com>
+ <20190903215801.183193-8-oupton@google.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <1fb19467-a743-1886-de52-a63bd19b0b00@oracle.com>
+Date:   Wed, 4 Sep 2019 17:25:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
+MIME-Version: 1.0
+In-Reply-To: <20190903215801.183193-8-oupton@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9370 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909050001
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9370 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909050001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 4 Sep 2019 at 17:48, Rafael J. Wysocki
-<rafael.j.wysocki@intel.com> wrote:
->
-> On 8/29/2019 10:49 AM, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > The downside of guest side polling is that polling is performed even
-> > with other runnable tasks in the host. However, even if poll in kvm
-> > can aware whether or not other runnable tasks in the same pCPU, it
-> > can still incur extra overhead in over-subscribe scenario. Now we can
-> > just enable guest polling when dedicated pCPUs are available.
-> >
-> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->
-> As stated before, I'm going to queue up this change for 5.4, with the
-> Paolo's ACK.
->
-> BTW, in the future please CC power management changes to
-> linux-pm@vger.kernel.org for easier handling.
 
-Ok, thanks.
 
-Wanpeng
+On 09/03/2019 02:58 PM, Oliver Upton wrote:
+> The current tests for guest state do not yet check the validity of
+> loaded state from within the nested VM. Introduce the
+> load_state_test_data struct to share data with the nested VM.
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>   x86/vmx_tests.c | 23 ++++++++++++++++++++---
+>   1 file changed, 20 insertions(+), 3 deletions(-)
+>
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index f035f24a771a..b72a27583793 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -5017,13 +5017,28 @@ static void test_entry_msr_load(void)
+>   	test_vmx_valid_controls(false);
+>   }
+>   
+> +static struct load_state_test_data {
+> +	u32 msr;
+> +	u64 exp;
+> +	bool enabled;
+> +} load_state_test_data;
+
+A better name is probably 'loaded_state_test_data'  as you are checking 
+the validity of the loaded MSR in the guest.
+
+> +
+>   static void guest_state_test_main(void)
+>   {
+> +	u64 obs;
+> +	struct load_state_test_data *data = &load_state_test_data;
+> +
+>   	while (1) {
+> -		if (vmx_get_test_stage() != 2)
+> -			vmcall();
+> -		else
+> +		if (vmx_get_test_stage() == 2)
+>   			break;
+> +
+> +		if (data->enabled) {
+> +			obs = rdmsr(obs);
+
+Although you fixed it in the next patch, why not use  'data->msr' in 
+place of 'obs' as the parameter to rdmsr() in this patch only ?
+
+> +			report("Guest state is 0x%lx (expected 0x%lx)",
+> +			       data->exp == obs, obs, data->exp);
+> +		}
+> +
+> +		vmcall();
+>   	}
+>   
+>   	asm volatile("fnop");
+> @@ -6854,7 +6869,9 @@ static void test_pat(u32 field, const char * field_name, u32 ctrl_field,
+>   	u64 i, val;
+>   	u32 j;
+>   	int error;
+> +	struct load_state_test_data *data = &load_state_test_data;
+>   
+> +	data->enabled = false;
+>   	vmcs_clear_bits(ctrl_field, ctrl_bit);
+>   	if (field == GUEST_PAT) {
+>   		vmx_set_test_stage(1);
+
