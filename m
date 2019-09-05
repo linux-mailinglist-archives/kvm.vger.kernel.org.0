@@ -2,130 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A56CEAA373
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 14:46:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 877DDAA39D
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 14:58:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389527AbfIEMqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 08:46:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39412 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731418AbfIEMqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Sep 2019 08:46:05 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id EEE1B81DE3
-        for <kvm@vger.kernel.org>; Thu,  5 Sep 2019 12:46:04 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id v4so393450wmh.9
-        for <kvm@vger.kernel.org>; Thu, 05 Sep 2019 05:46:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=cqNmM0Hwlmyj9h/MG6Wvpgg7kXXsJp+5V5Vxs9mhcqU=;
-        b=UPSjVX0pHRIhCjTIT0VuwnlytQriDTf98gdH974Tc9ycNqz6JZE9CaN75UAyVkLvWU
-         xFdgHclJCHVBjpSkOgZeYP3ywywdYK59ywGgIuwDln9kKmPV6iv7dV/GpY1Q+CQVELy+
-         LtzdTQnbq3bOvGfuMyv7CTzH9ZBgaK/e2C7I2kQEnoFfwSA98QO0HKnZ+PIYi47vM130
-         pu2UEzJFrhLbcz7XwkZhVY4aO42n+TmAVfcdd/l/1LI3wo1OF5e2saQeuxvgQM6pBxj8
-         RsIq/YUS1vGHYqTrn2Q0At3FKG8+ydgWkCfqyN0Pio5LNu2B2gsyWeaWQ6SuTR0ocXx/
-         3JKw==
-X-Gm-Message-State: APjAAAWh/jMn08ka1amt+o1Ruf39IgYU1HAFmBzDM1tlqX89WiJZ9jcb
-        LbYohmh5/r2x1x5+JT9tjMK4KN5k/QOVn4V44gcteva7Nwqs7AuiPrhTftpkkzIgyIuuYud1guG
-        AK87NcViJKtB4
-X-Received: by 2002:a1c:4c14:: with SMTP id z20mr2107252wmf.28.1567687563648;
-        Thu, 05 Sep 2019 05:46:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzgtgVR58GvkPJGffN4yMMmTnq2ROMqNATyP3acVJ3IWAV928JpOT2ZB2k3lytPDOM6Bd3rjA==
-X-Received: by 2002:a1c:4c14:: with SMTP id z20mr2107237wmf.28.1567687563438;
-        Thu, 05 Sep 2019 05:46:03 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id n1sm2673924wrg.67.2019.09.05.05.46.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2019 05:46:02 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, Janakarajan.Natarajan@amd.com,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [Patch] KVM: SVM: Fix svm_xsaves_supported
-In-Reply-To: <CAAAPnDFwMWcbnQt7-dWety5UXU3sJSwd8=j5SFqJHK0PEmkFsg@mail.gmail.com>
-References: <20190904001422.11809-1-aaronlewis@google.com> <87o900j98f.fsf@vitty.brq.redhat.com> <CAAAPnDFwMWcbnQt7-dWety5UXU3sJSwd8=j5SFqJHK0PEmkFsg@mail.gmail.com>
-Date:   Thu, 05 Sep 2019 14:46:01 +0200
-Message-ID: <87lfv2kj1y.fsf@vitty.brq.redhat.com>
+        id S2387580AbfIEM6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 08:58:34 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:13534 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726968AbfIEM6d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 08:58:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1567688312; x=1599224312;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=ETZlDN4IdF0kxziLoR9hjkO844T65juEVcnxEPAUrBo=;
+  b=YSuQ5o6P52iMHkPH4XY/9D7nyNN8jJvFLoBQdTsQ6xvrV7/9vYGjPf+A
+   VAXbT3z7RE0+H3yxl9LuAM1lbjQGlqCneYsp4qgi/nU4ayJAHAriTy91X
+   U1gnl/XwtCfspVut5kl/sGoSW2xjAZVrlVHTvV+rybqTIPppJAucPoSDI
+   s=;
+X-IronPort-AV: E=Sophos;i="5.64,470,1559520000"; 
+   d="scan'208";a="827706210"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2c-2225282c.us-west-2.amazon.com) ([10.47.22.34])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 05 Sep 2019 12:58:30 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2c-2225282c.us-west-2.amazon.com (Postfix) with ESMTPS id DB0B4A2822;
+        Thu,  5 Sep 2019 12:58:29 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 5 Sep 2019 12:58:29 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.161.243) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 5 Sep 2019 12:58:26 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Sean Christopherson" <sean.j.christopherson@intel.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>
+Subject: [PATCH v3] KVM: x86: Disable posted interrupts for odd IRQs
+Date:   Thu, 5 Sep 2019 14:58:18 +0200
+Message-ID: <20190905125818.22395-1-graf@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
 Content-Type: text/plain
+X-Originating-IP: [10.43.161.243]
+X-ClientProxiedBy: EX13D07UWA003.ant.amazon.com (10.43.160.35) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Aaron Lewis <aaronlewis@google.com> writes:
+We can easily route hardware interrupts directly into VM context when
+they target the "Fixed" or "LowPriority" delivery modes.
 
-> On Wed, Sep 4, 2019 at 9:51 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>
->> Aaron Lewis <aaronlewis@google.com> writes:
->>
->> > AMD allows guests to execute XSAVES/XRSTORS if supported by the host.  This is different than Intel as they have an additional control bit that determines if XSAVES/XRSTORS can be used by the guest. Intel also has intercept bits that might prevent the guest from intercepting the instruction as well. AMD has none of that, not even an Intercept mechanism.  AMD simply allows XSAVES/XRSTORS to be executed by the guest if also supported by the host.
->> >
->>
->> WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
->>
->> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
->> > ---
->> >  arch/x86/kvm/svm.c | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
->> > index 1f220a85514f..b681a89f4f7e 100644
->> > --- a/arch/x86/kvm/svm.c
->> > +++ b/arch/x86/kvm/svm.c
->> > @@ -5985,7 +5985,7 @@ static bool svm_mpx_supported(void)
->> >
->> >  static bool svm_xsaves_supported(void)
->> >  {
->> > -     return false;
->> > +     return boot_cpu_has(X86_FEATURE_XSAVES);
->> >  }
->> >
->> >  static bool svm_umip_emulated(void)
->>
->> I had a similar patch in my stash when I tried to debug Hyper-V 2016
->> not being able to boot on KVM. I may have forgotten some important
->> details, but if I'm not mistaken XSAVES comes paired with MSR_IA32_XSS
->> and some OSes may actually try to write there, in particular I've
->> observed Hyper-V 2016 trying to write '0'. Currently, we only support
->> MSR_IA32_XSS in vmx code, this will need to be extended to SVM.
->>
->> Currently, VMX code only supports writing '0' to MSR_IA32_XSS:
->>
->>         case MSR_IA32_XSS:
->>                 if (!vmx_xsaves_supported() ||
->>                     (!msr_info->host_initiated &&
->>                      !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
->>                        guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
->>                         return 1;
->>                 /*
->>                  * The only supported bit as of Skylake is bit 8, but
->>                  * it is not supported on KVM.
->>                  */
->>                 if (data != 0)
->>                         return 1;
->>
->>
->> we will probably need the same limitation for SVM, however, I'd vote for
->> creating separate kvm_x86_ops->set_xss() implementations.
->>
->> --
->> Vitaly
->
-> Fixed the unwrapped description in v2.
->
-> As for extending VMX behavior to SVM for MSR_IA_32_XSS; I will do this
-> in a follow up patch.  Thanks for calling this out.
+However, on modes such as "SMI" or "Init", we need to go via KVM code
+to actually put the vCPU into a different mode of operation, so we can
+not post the interrupt
 
-Doing this in a separate patch is fine, however, I think this patch
-should come before we start announcing XSAVES support on AMD: both
-MSR_IA_32_XSS and XSAVES/XRSTORS instructions are enumerated by
-CPUID.(EAX=0DH, ECX=1).EAX[bit 3] so an unprepared guest may try
-accessing MSR_IA_32_XSS and get #GP.
+Add code in the VMX and SVM PI logic to explicitly refuse to establish
+posted mappings for advanced IRQ deliver modes. This reflects the logic
+in __apic_accept_irq() which also only ever passes Fixed and LowPriority
+interrupts as posted interrupts into the guest.
 
+This fixes a bug I have with code which configures real hardware to
+inject virtual SMIs into my guest.
+
+Signed-off-by: Alexander Graf <graf@amazon.com>
+
+---
+
+v1 -> v2:
+
+  - Make error message more unique
+  - Update commit message to point to __apic_accept_irq()
+
+v2 -> v3:
+
+  - Use if() rather than switch()
+  - Move abort logic into existing if() branch for broadcast irqs
+  -> remove the updated error message again (thus remove R-B tag from Liran)
+  - Fold VMX and SVM changes into single commit
+  - Combine postability check into helper function kvm_irq_is_postable()
+---
+ arch/x86/include/asm/kvm_host.h | 7 +++++++
+ arch/x86/kvm/svm.c              | 4 +++-
+ arch/x86/kvm/vmx/vmx.c          | 6 +++++-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 44a5ce57a905..5b14aa1fbeeb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1581,6 +1581,13 @@ bool kvm_intr_is_single_vcpu(struct kvm *kvm, struct kvm_lapic_irq *irq,
+ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
+ 		     struct kvm_lapic_irq *irq);
+ 
++static inline bool kvm_irq_is_postable(struct kvm_lapic_irq *irq)
++{
++	/* We can only post Fixed and LowPrio IRQs */
++	return (irq->delivery_mode == dest_Fixed ||
++		irq->delivery_mode == dest_LowestPrio);
++}
++
+ static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+ 	if (kvm_x86_ops->vcpu_blocking)
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 1f220a85514f..f5b03d0c9bc6 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -5260,7 +5260,8 @@ get_pi_vcpu_info(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
+ 
+ 	kvm_set_msi_irq(kvm, e, &irq);
+ 
+-	if (!kvm_intr_is_single_vcpu(kvm, &irq, &vcpu)) {
++	if (!kvm_intr_is_single_vcpu(kvm, &irq, &vcpu) ||
++	    !kvm_irq_is_postable(&irq)) {
+ 		pr_debug("SVM: %s: use legacy intr remap mode for irq %u\n",
+ 			 __func__, irq.vector);
+ 		return -1;
+@@ -5314,6 +5315,7 @@ static int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+ 		 * 1. When cannot target interrupt to a specific vcpu.
+ 		 * 2. Unsetting posted interrupt.
+ 		 * 3. APIC virtialization is disabled for the vcpu.
++		 * 4. IRQ has incompatible delivery mode (SMI, INIT, etc)
+ 		 */
+ 		if (!get_pi_vcpu_info(kvm, e, &vcpu_info, &svm) && set &&
+ 		    kvm_vcpu_apicv_active(&svm->vcpu)) {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 570a233e272b..63f3d88b36cc 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7382,10 +7382,14 @@ static int vmx_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+ 		 * irqbalance to make the interrupts single-CPU.
+ 		 *
+ 		 * We will support full lowest-priority interrupt later.
++		 *
++		 * In addition, we can only inject generic interrupts using
++		 * the PI mechanism, refuse to route others through it.
+ 		 */
+ 
+ 		kvm_set_msi_irq(kvm, e, &irq);
+-		if (!kvm_intr_is_single_vcpu(kvm, &irq, &vcpu)) {
++		if (!kvm_intr_is_single_vcpu(kvm, &irq, &vcpu) ||
++		    !kvm_irq_is_postable(&irq)) {
+ 			/*
+ 			 * Make sure the IRTE is in remapped mode if
+ 			 * we don't handle it in posted mode.
 -- 
-Vitaly
+2.17.1
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
