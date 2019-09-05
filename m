@@ -2,99 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 06D0EA9842
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 04:15:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 086E8A9852
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 04:25:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728072AbfIECP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Sep 2019 22:15:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40656 "EHLO mx1.redhat.com"
+        id S1728072AbfIECZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Sep 2019 22:25:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53332 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727544AbfIECP1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Sep 2019 22:15:27 -0400
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+        id S1727162AbfIECZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Sep 2019 22:25:42 -0400
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 276653CA11
-        for <kvm@vger.kernel.org>; Thu,  5 Sep 2019 02:15:27 +0000 (UTC)
-Received: by mail-pl1-f198.google.com with SMTP id j9so510295plt.18
-        for <kvm@vger.kernel.org>; Wed, 04 Sep 2019 19:15:27 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 48A4519CF89
+        for <kvm@vger.kernel.org>; Thu,  5 Sep 2019 02:25:42 +0000 (UTC)
+Received: by mail-pf1-f197.google.com with SMTP id b204so677955pfb.11
+        for <kvm@vger.kernel.org>; Wed, 04 Sep 2019 19:25:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=/wGnUBIR2mfWMs6dphZaf2dS32/dT6Xx2bsTzrR2AR4=;
-        b=qCIINuCD32kMXg5NcoeL6W9HvYbF5LMbsd++Dp3Gawwx8mQrh5Ghoj2LcDX3bkxUwX
-         Q9DjCkzhzsPtQOqK5AV2oRXEQp/V4qGNWvHwEmFQ7PoP73E/puOpuvyK5Nhc/5i32Oo1
-         GpKZ6tLCWYrD7tUyq8SDw8VH3kLn5Ns1vU909IZtCzmHryhzT+lnP9CqEudekjy7OssP
-         jf23cKrs8tMNlC0O3GT64hdjGgzuCXosPDMALMwYgAj2Rgp8/d8Bd4LL5Tmrv124fSPs
-         FkVBqfIwjPMtz0H6ReIv3rjD3gdB5rbaXFGMJu/JGpp8hAizVhqnjGfozWMyqXEhaXMK
-         rQoQ==
-X-Gm-Message-State: APjAAAXGBAuT+Q31HjWc9LSIvNgv89Z0Rxfr89WyLAxRPXxDH6PlmNxj
-        fthOhGlk4zOgXo4HveNTk/fNvsOuKRQhiPnqS+AVV+pchHfo9AmLhFRU8AWnc96y5z0Dnm7cIrI
-        KMOfsn+pY6pDd
-X-Received: by 2002:a17:902:8644:: with SMTP id y4mr842189plt.333.1567649726484;
-        Wed, 04 Sep 2019 19:15:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwM07DnJUteMkxqTS3RpeAzLhEU6/t3VAcuUfhRGhUxn4lk1ZnSL8ha9Iwapy5RvByV9K8edg==
-X-Received: by 2002:a17:902:8644:: with SMTP id y4mr842175plt.333.1567649726297;
-        Wed, 04 Sep 2019 19:15:26 -0700 (PDT)
+        bh=vtvo/zeS44XluKA6UrZH1GDURsTqvZOY2i7CAT/mFAA=;
+        b=M7LnaEhArjYc1X06SeZvIAD6uOFYNph88VZJPpGih01LGvF1iwE1RlPIcuiakg2WF/
+         xuqlMNLUOh/+wUYAU8jYRRTBbIhpLIti+vvRLKCdEXLsFeUD9ScjCvvtACO6nYr/x5nL
+         dYPPlrf7NnNEHQOHiuTRmPgRAHCDHAuf5shLkWmKZF1b4h0Mi2E96NySTnluSz0ooSk1
+         5qraH8GyPCElXUnxiVYtoH1D+pZvHR2QcQQtR49G3wb5CBoZ08Kra670XzSKgadoaYhs
+         Y19chCI90ByBNdtzHKlTXYAkuNdwcX9PmfvwQyx3bQlqQYNFtJXbmRrta5bTClR14gB0
+         ac1Q==
+X-Gm-Message-State: APjAAAURzC4GNEKej1oTgAuXGngbwLRz1nUNpfkB934yhR9PmxdxlE93
+        a6W/W7q5ZkqBOQPT9xaaA38yIpxpLSL+QjvthVBOFsUmXmjE4xZUOrjsc7AkrmUv6XxdW1M+SQN
+        fcHNvlauz1pkz
+X-Received: by 2002:a63:460c:: with SMTP id t12mr1005946pga.69.1567650341745;
+        Wed, 04 Sep 2019 19:25:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy8oF1G7awMLXh4TzNS/cU/1V6EzGkRmuf0tlRNLypxOEGgHRKOah4LkWJ577VOa4hXWDEClg==
+X-Received: by 2002:a63:460c:: with SMTP id t12mr1005935pga.69.1567650341496;
+        Wed, 04 Sep 2019 19:25:41 -0700 (PDT)
 Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id i1sm415740pfg.2.2019.09.04.19.15.23
+        by smtp.gmail.com with ESMTPSA id f128sm452756pfg.143.2019.09.04.19.25.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2019 19:15:25 -0700 (PDT)
-Date:   Thu, 5 Sep 2019 10:15:15 +0800
+        Wed, 04 Sep 2019 19:25:40 -0700 (PDT)
+Date:   Thu, 5 Sep 2019 10:25:31 +0800
 From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <kernellwp@gmail.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [PATCH v2 1/3] KVM: X86: Trace vcpu_id for vmexit
-Message-ID: <20190905021515.GD31707@xz-x1>
+Subject: Re: [PATCH v2 3/3] KVM: X86: Tune PLE Window tracepoint
+Message-ID: <20190905022531.GE31707@xz-x1>
 References: <20190815103458.23207-1-peterx@redhat.com>
- <20190815103458.23207-2-peterx@redhat.com>
- <20190904172658.GH24079@linux.intel.com>
+ <20190815103458.23207-4-peterx@redhat.com>
+ <20190904173254.GJ24079@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190904172658.GH24079@linux.intel.com>
+In-Reply-To: <20190904173254.GJ24079@linux.intel.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 04, 2019 at 10:26:58AM -0700, Sean Christopherson wrote:
-> On Thu, Aug 15, 2019 at 06:34:56PM +0800, Peter Xu wrote:
-> > Tracing the ID helps to pair vmenters and vmexits for guests with
-> > multiple vCPUs.
+On Wed, Sep 04, 2019 at 10:32:54AM -0700, Sean Christopherson wrote:
+> On Thu, Aug 15, 2019 at 06:34:58PM +0800, Peter Xu wrote:
+> > The PLE window tracepoint triggers even if the window is not changed,
+> > and the wording can be a bit confusing too.  One example line:
 > > 
-> > Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> >   kvm_ple_window: vcpu 0: ple_window 4096 (shrink 4096)
+> > 
+> > It easily let people think of "the window now is 4096 which is
+> > shrinked", but the truth is the value actually didn't change (4096).
+> > 
+> > Let's only dump this message if the value really changed, and we make
+> > the message even simpler like:
+> > 
+> >   kvm_ple_window: vcpu 4 old 4096 new 8192 (growed)
+> > 
 > > Signed-off-by: Peter Xu <peterx@redhat.com>
 > > ---
-> >  arch/x86/kvm/trace.h | 5 ++++-
-> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >  arch/x86/kvm/svm.c     | 16 ++++++++--------
+> >  arch/x86/kvm/trace.h   | 21 ++++++---------------
+> >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++------
+> >  arch/x86/kvm/x86.c     |  2 +-
+> >  4 files changed, 23 insertions(+), 30 deletions(-)
 > > 
+> > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> > index d685491fce4d..d5cb6b5a9254 100644
+> > --- a/arch/x86/kvm/svm.c
+> > +++ b/arch/x86/kvm/svm.c
+> > @@ -1269,11 +1269,11 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
+> >  							pause_filter_count_grow,
+> >  							pause_filter_count_max);
+> >  
+> > -	if (control->pause_filter_count != old)
+> > +	if (control->pause_filter_count != old) {
+> >  		mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
+> > -
+> > -	trace_kvm_ple_window_grow(vcpu->vcpu_id,
+> > -				  control->pause_filter_count, old);
+> > +		trace_kvm_ple_window_update(vcpu->vcpu_id,
+> > +					    control->pause_filter_count, old);
+> > +	}
+> >  }
+> >  
+> >  static void shrink_ple_window(struct kvm_vcpu *vcpu)
+> > @@ -1287,11 +1287,11 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+> >  						    pause_filter_count,
+> >  						    pause_filter_count_shrink,
+> >  						    pause_filter_count);
+> > -	if (control->pause_filter_count != old)
+> > +	if (control->pause_filter_count != old) {
+> >  		mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
+> > -
+> > -	trace_kvm_ple_window_shrink(vcpu->vcpu_id,
+> > -				    control->pause_filter_count, old);
+> > +		trace_kvm_ple_window_update(vcpu->vcpu_id,
+> > +					    control->pause_filter_count, old);
+> > +	}
+> >  }
+> >  
+> >  static __init int svm_hardware_setup(void)
 > > diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> > index b5c831e79094..c682f3f7f998 100644
+> > index 76a39bc25b95..97df9d7cae71 100644
 > > --- a/arch/x86/kvm/trace.h
 > > +++ b/arch/x86/kvm/trace.h
-> > @@ -232,17 +232,20 @@ TRACE_EVENT(kvm_exit,
-> >  		__field(	u32,	        isa             )
-> >  		__field(	u64,	        info1           )
-> >  		__field(	u64,	        info2           )
-> > +		__field(	int,	        vcpu_id         )
+> > @@ -890,36 +890,27 @@ TRACE_EVENT(kvm_pml_full,
+> >  	TP_printk("vcpu %d: PML full", __entry->vcpu_id)
+> >  );
+> >  
+> > -TRACE_EVENT(kvm_ple_window,
+> > -	TP_PROTO(bool grow, unsigned int vcpu_id, int new, int old),
+> > -	TP_ARGS(grow, vcpu_id, new, old),
+> > +TRACE_EVENT(kvm_ple_window_update,
+> > +	TP_PROTO(unsigned int vcpu_id, int new, int old),
+> > +	TP_ARGS(vcpu_id, new, old),
+> >  
+> >  	TP_STRUCT__entry(
+> > -		__field(                bool,      grow         )
+> >  		__field(        unsigned int,   vcpu_id         )
+> >  		__field(                 int,       new         )
+> >  		__field(                 int,       old         )
 > 
-> It doesn't actually affect anything, but vcpu_id is stored and printed as
-> an 'unsigned int' everywhere else in the trace code.  Stylistically I like
-> that approach even though struct kvm_vcpu holds it as a signed int.
+> Not your code, but these should really be 'unsigned int', especially now
+> that they are directly compared when printing "growed" versus "shrinked".
+> For SVM it doesn't matter since the underlying hardware fields are only
+> 16 bits, but on VMX they're 32 bits, e.g. theoretically userspace could
+> set ple_window and ple_window_max to a negative value.
+> 
+> The ple_window variable in struct vcpu_vmx and local snapshots of the
+> field should also be updated, but that can be done separately.
 
-True.  I can switch to unsigned int to get aligned with the rest if
-there's other comment to address.  Though from codebase-wise I would
-even prefer signed because it gives us a chance to set an invalid vcpu
-id (-1) where necessary, or notice something severly wrong when <-1.
-After all it should far cover our usage (IIUC max vcpu id should be
-512 cross archs).
-
-Thanks,
+Indeed.  Let me add a separated patch.  Thanks,
 
 -- 
 Peter Xu
