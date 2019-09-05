@@ -2,138 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B881CAA9DF
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 19:21:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A64A7AAA0D
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 19:33:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389581AbfIERV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 13:21:27 -0400
-Received: from foss.arm.com ([217.140.110.172]:47908 "EHLO foss.arm.com"
+        id S2388860AbfIERdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 13:33:12 -0400
+Received: from mga03.intel.com ([134.134.136.65]:17592 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389544AbfIERV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Sep 2019 13:21:27 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1EE5337;
-        Thu,  5 Sep 2019 10:21:26 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 100D33F718;
-        Thu,  5 Sep 2019 10:21:25 -0700 (PDT)
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>
-Subject: [PATCH kvm-unit-tests] arm: gic: enable GIC MMIO tests for GICv3 as well
-Date:   Thu,  5 Sep 2019 18:21:14 +0100
-Message-Id: <20190905172114.215380-1-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726600AbfIERdM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 13:33:12 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Sep 2019 10:33:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,470,1559545200"; 
+   d="scan'208";a="383936241"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga006.fm.intel.com with ESMTP; 05 Sep 2019 10:33:10 -0700
+Date:   Thu, 5 Sep 2019 10:33:10 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v3] KVM: x86: Disable posted interrupts for odd IRQs
+Message-ID: <20190905173310.GA16071@linux.intel.com>
+References: <20190905125818.22395-1-graf@amazon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190905125818.22395-1-graf@amazon.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-So far the GIC MMIO tests were only enabled for a GICv2 guest. Modern
-machines tend to have a GICv3-only GIC, so can't run those guests.
-It turns out that most GIC distributor registers we test in the unit
-tests are actually the same in GICv3, so we can just enable those tests
-for GICv3 guests as well.
-The only exception is the CPU number in the TYPER register, which we
-just protect against running on a GICv3 guest.
+On Thu, Sep 05, 2019 at 02:58:18PM +0200, Alexander Graf wrote:
+> We can easily route hardware interrupts directly into VM context when
+> they target the "Fixed" or "LowPriority" delivery modes.
+> 
+> However, on modes such as "SMI" or "Init", we need to go via KVM code
+> to actually put the vCPU into a different mode of operation, so we can
+> not post the interrupt
+> 
+> Add code in the VMX and SVM PI logic to explicitly refuse to establish
+> posted mappings for advanced IRQ deliver modes. This reflects the logic
+> in __apic_accept_irq() which also only ever passes Fixed and LowPriority
+> interrupts as posted interrupts into the guest.
+> 
+> This fixes a bug I have with code which configures real hardware to
+> inject virtual SMIs into my guest.
+> 
+> Signed-off-by: Alexander Graf <graf@amazon.com>
+> 
+> ---
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/gic.c         | 13 +++++++++++--
- arm/unittests.cfg | 16 +++++++++++-----
- lib/arm/asm/gic.h |  2 ++
- 3 files changed, 24 insertions(+), 7 deletions(-)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index ed5642e..bd3c027 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -6,6 +6,7 @@
-  *   + MMIO access tests
-  * GICv3
-  *   + test sending/receiving IPIs
-+ *   + MMIO access tests
-  *
-  * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-  *
-@@ -483,7 +484,14 @@ static void gic_test_mmio(void)
- 		idreg = gic_dist_base + GICD_ICPIDR2;
- 		break;
- 	case 0x3:
--		report_abort("GICv3 MMIO tests NYI");
-+		/*
-+		 * We only test generic registers or those affecting
-+		 * SPIs, so don't need to consider the SGI base in
-+		 * the redistributor here.
-+		 */
-+		gic_dist_base = gicv3_dist_base();
-+		idreg = gic_dist_base + GICD_PIDR2;
-+		break;
- 	default:
- 		report_abort("GIC version %d not supported", gic_version());
- 	}
-@@ -492,7 +500,8 @@ static void gic_test_mmio(void)
- 	nr_irqs = GICD_TYPER_IRQS(reg);
- 	report_info("number of implemented SPIs: %d", nr_irqs - GIC_FIRST_SPI);
- 
--	test_typer_v2(reg);
-+	if (gic_version() == 0x2)
-+		test_typer_v2(reg);
- 
- 	report_info("IIDR: 0x%08x", readl(gic_dist_base + GICD_IIDR));
- 
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 6d3df92..3fd5b04 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -86,22 +86,28 @@ smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
- extra_params = -machine gic-version=2 -append 'ipi'
- groups = gic
- 
--[gicv2-mmio]
-+[gicv2-max-mmio]
- file = gic.flat
- smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
- extra_params = -machine gic-version=2 -append 'mmio'
- groups = gic
- 
--[gicv2-mmio-up]
-+[gicv3-max-mmio]
-+file = gic.flat
-+smp = $MAX_SMP
-+extra_params = -machine gic-version=3 -append 'mmio'
-+groups = gic
-+
-+[gic-mmio-up]
- file = gic.flat
- smp = 1
--extra_params = -machine gic-version=2 -append 'mmio'
-+extra_params = -append 'mmio'
- groups = gic
- 
--[gicv2-mmio-3p]
-+[gic-mmio-3p]
- file = gic.flat
- smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
--extra_params = -machine gic-version=2 -append 'mmio'
-+extra_params = -append 'mmio'
- groups = gic
- 
- [gicv3-ipi]
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index f6dfb90..ffed025 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -23,6 +23,8 @@
- #define GICD_ITARGETSR			0x0800
- #define GICD_SGIR			0x0f00
- #define GICD_ICPIDR2			0x0fe8
-+/* only in GICv3 */
-+#define GICD_PIDR2			0xffe8
- 
- #define GICD_TYPER_IRQS(typer)		((((typer) & 0x1f) + 1) * 32)
- #define GICD_INT_EN_SET_SGI		0x0000ffff
--- 
-2.17.1
-
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
