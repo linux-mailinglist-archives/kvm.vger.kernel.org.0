@@ -2,363 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD798A9FFF
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 12:40:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9258BAA002
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 12:40:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387994AbfIEKkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 06:40:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13626 "EHLO
+        id S2388007AbfIEKkM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 06:40:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48684 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387989AbfIEKkK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Sep 2019 06:40:10 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x85AbHax126121
-        for <kvm@vger.kernel.org>; Thu, 5 Sep 2019 06:40:09 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2utwptgkbj-1
+        by vger.kernel.org with ESMTP id S2387999AbfIEKkL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Sep 2019 06:40:11 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x85Acuht075185
+        for <kvm@vger.kernel.org>; Thu, 5 Sep 2019 06:40:11 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2utwrv87sx-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 05 Sep 2019 06:40:08 -0400
+        for <kvm@vger.kernel.org>; Thu, 05 Sep 2019 06:40:10 -0400
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 5 Sep 2019 11:40:06 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 5 Sep 2019 11:40:08 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 5 Sep 2019 11:40:04 +0100
+        Thu, 5 Sep 2019 11:40:05 +0100
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x85Ae3A344892404
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x85Ae4ov55312596
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Sep 2019 10:40:03 GMT
+        Thu, 5 Sep 2019 10:40:04 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22F6E52067;
-        Thu,  5 Sep 2019 10:40:03 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 11D005204E;
+        Thu,  5 Sep 2019 10:40:04 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.152.224.131])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 641145204F;
-        Thu,  5 Sep 2019 10:40:02 +0000 (GMT)
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5260352063;
+        Thu,  5 Sep 2019 10:40:03 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 2/6] s390x: Add linemode console
-Date:   Thu,  5 Sep 2019 12:39:47 +0200
+Subject: [kvm-unit-tests PATCH v2 3/6] s390x: Add linemode buffer to fix newline on every print
+Date:   Thu,  5 Sep 2019 12:39:48 +0200
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20190905103951.36522-1-frankja@linux.ibm.com>
 References: <20190905103951.36522-1-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19090510-0020-0000-0000-000003680666
+x-cbid: 19090510-0012-0000-0000-000003470348
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19090510-0021-0000-0000-000021BD7A18
-Message-Id: <20190905103951.36522-3-frankja@linux.ibm.com>
+x-cbparentid: 19090510-0013-0000-0000-000021815908
+Message-Id: <20190905103951.36522-4-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-05_03:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=828 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1906280000 definitions=main-1909050106
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-z/VM isn't fond of vt220, so we need line mode when running under
-z/VM.
+Linemode seems to add a newline for each sent message which makes
+reading rather hard. Hence we add a small buffer and only print if
+it's full or a newline is encountered. Except for when the string is
+longer than the buffer, then we flush the buffer and print directly.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Acked-by: David Hildenbrand <david@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- lib/s390x/sclp-console.c | 181 +++++++++++++++++++++++++++++++++++----
- lib/s390x/sclp.h         |  55 +++++++++++-
- 2 files changed, 218 insertions(+), 18 deletions(-)
+ lib/s390x/sclp-console.c | 70 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 66 insertions(+), 4 deletions(-)
 
 diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-index a5ef45f..19416b5 100644
+index 19416b5..7397dc1 100644
 --- a/lib/s390x/sclp-console.c
 +++ b/lib/s390x/sclp-console.c
-@@ -11,21 +11,165 @@
- #include <libcflat.h>
- #include <string.h>
+@@ -13,6 +13,7 @@
  #include <asm/page.h>
-+#include <asm/arch_def.h>
-+#include <asm/io.h>
+ #include <asm/arch_def.h>
+ #include <asm/io.h>
++#include <asm/spinlock.h>
  #include "sclp.h"
  
+ /*
+@@ -87,6 +88,10 @@ static uint8_t _ascebc[256] = {
+      0x90, 0x3F, 0x3F, 0x3F, 0x3F, 0xEA, 0x3F, 0xFF
+ };
+ 
++static char lm_buff[120];
++static unsigned char lm_buff_off;
++static struct spinlock lm_buff_lock;
++
+ static void sclp_print_ascii(const char *str)
+ {
+ 	int len = strlen(str);
+@@ -103,10 +108,10 @@ static void sclp_print_ascii(const char *str)
+ 	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+ }
+ 
+-static void sclp_print_lm(const char *str)
++static void lm_print(const char *buff, int len)
+ {
+ 	unsigned char *ptr, *end, ch;
+-	unsigned int count, offset, len;
++	unsigned int count, offset;
+ 	struct WriteEventData *sccb;
+ 	struct mdb *mdb;
+ 	struct mto *mto;
+@@ -117,11 +122,10 @@ static void sclp_print_lm(const char *str)
+ 	end = (unsigned char *) sccb + 4096 - 1;
+ 	memset(sccb, 0, sizeof(*sccb));
+ 	ptr = (unsigned char *) &sccb->msg.mdb.mto;
+-	len = strlen(str);
+ 	offset = 0;
+ 	do {
+ 		for (count = sizeof(*mto); offset < len; count++) {
+-			ch = str[offset++];
++			ch = buff[offset++];
+ 			if (ch == 0x0a || ptr + count > end)
+ 				break;
+ 			ptr[count] = _ascebc[ch];
+@@ -148,6 +152,64 @@ static void sclp_print_lm(const char *str)
+ 	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+ }
+ 
++
 +/*
-+ * ASCII (IBM PC 437) -> EBCDIC 037
++ * In contrast to the ascii console, linemode produces a new
++ * line with every write of data. The report() function uses
++ * several printf() calls to generate a line of data which
++ * would all end up on different lines.
++ *
++ * Hence we buffer here until we encounter a \n or the buffer
++ * is full. That means that linemode output can look a bit
++ * different from ascii and that it takes a bit longer for
++ * lines to appear.
 + */
-+static uint8_t _ascebc[256] = {
-+ /*00 NUL   SOH   STX   ETX   EOT   ENQ   ACK   BEL */
-+     0x00, 0x01, 0x02, 0x03, 0x37, 0x2D, 0x2E, 0x2F,
-+ /*08  BS    HT    LF    VT    FF    CR    SO    SI */
-+ /*              ->NL                               */
-+     0x16, 0x05, 0x15, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
-+ /*10 DLE   DC1   DC2   DC3   DC4   NAK   SYN   ETB */
-+     0x10, 0x11, 0x12, 0x13, 0x3C, 0x3D, 0x32, 0x26,
-+ /*18 CAN    EM   SUB   ESC    FS    GS    RS    US */
-+ /*                               ->IGS ->IRS ->IUS */
-+     0x18, 0x19, 0x3F, 0x27, 0x22, 0x1D, 0x1E, 0x1F,
-+ /*20  SP     !     "     #     $     %     &     ' */
-+     0x40, 0x5A, 0x7F, 0x7B, 0x5B, 0x6C, 0x50, 0x7D,
-+ /*28   (     )     *     +     ,     -    .      / */
-+     0x4D, 0x5D, 0x5C, 0x4E, 0x6B, 0x60, 0x4B, 0x61,
-+ /*30   0     1     2     3     4     5     6     7 */
-+     0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,
-+ /*38   8     9     :     ;     <     =     >     ? */
-+     0xF8, 0xF9, 0x7A, 0x5E, 0x4C, 0x7E, 0x6E, 0x6F,
-+ /*40   @     A     B     C     D     E     F     G */
-+     0x7C, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
-+ /*48   H     I     J     K     L     M     N     O */
-+     0xC8, 0xC9, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6,
-+ /*50   P     Q     R     S     T     U     V     W */
-+     0xD7, 0xD8, 0xD9, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6,
-+ /*58   X     Y     Z     [     \     ]     ^     _ */
-+     0xE7, 0xE8, 0xE9, 0xBA, 0xE0, 0xBB, 0xB0, 0x6D,
-+ /*60   `     a     b     c     d     e     f     g */
-+     0x79, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
-+ /*68   h     i     j     k     l     m     n     o */
-+     0x88, 0x89, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96,
-+ /*70   p     q     r     s     t     u     v     w */
-+     0x97, 0x98, 0x99, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6,
-+ /*78   x     y     z     {     |     }     ~    DL */
-+     0xA7, 0xA8, 0xA9, 0xC0, 0x4F, 0xD0, 0xA1, 0x07,
-+ /*80*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*88*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*90*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*98*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*A0*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*A8*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*B0*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*B8*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*C0*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*C8*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*D0*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*D8*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*E0        sz	*/
-+     0x3F, 0x59, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*E8*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*F0*/
-+     0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-+ /*F8*/
-+     0x90, 0x3F, 0x3F, 0x3F, 0x3F, 0xEA, 0x3F, 0xFF
-+};
-+
-+static void sclp_print_ascii(const char *str)
-+{
-+	int len = strlen(str);
-+	WriteEventData *sccb = (void *)_sccb;
-+
-+	sclp_mark_busy();
-+	memset(sccb, 0, sizeof(*sccb));
-+	sccb->h.length = offsetof(WriteEventData, msg) + len;
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	sccb->ebh.length = sizeof(EventBufferHeader) + len;
-+	sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
-+	memcpy(&sccb->msg, str, len);
-+
-+	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
-+}
-+
 +static void sclp_print_lm(const char *str)
 +{
-+	unsigned char *ptr, *end, ch;
-+	unsigned int count, offset, len;
-+	struct WriteEventData *sccb;
-+	struct mdb *mdb;
-+	struct mto *mto;
-+	struct go *go;
++	int len;
++	char *nl;
 +
-+	sclp_mark_busy();
-+	sccb = (struct WriteEventData *) _sccb;
-+	end = (unsigned char *) sccb + 4096 - 1;
-+	memset(sccb, 0, sizeof(*sccb));
-+	ptr = (unsigned char *) &sccb->msg.mdb.mto;
++	spin_lock(&lm_buff_lock);
++
 +	len = strlen(str);
-+	offset = 0;
-+	do {
-+		for (count = sizeof(*mto); offset < len; count++) {
-+			ch = str[offset++];
-+			if (ch == 0x0a || ptr + count > end)
-+				break;
-+			ptr[count] = _ascebc[ch];
-+		}
-+		mto = (struct mto *) ptr;
-+		mto->length = count;
-+		mto->type = 4;
-+		mto->line_type_flags = LNTPFLGS_ENDTEXT;
-+		ptr += count;
-+	} while (offset < len && ptr + sizeof(*mto) <= end);
-+	len = ptr - (unsigned char *) sccb;
-+	sccb->h.length = len - offsetof(struct WriteEventData, h);
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	sccb->ebh.type = EVTYP_MSG;
-+	sccb->ebh.length = len - offsetof(struct WriteEventData, ebh);
-+	mdb = &sccb->msg.mdb;
-+	mdb->header.type = 1;
-+	mdb->header.tag = 0xD4C4C240;
-+	mdb->header.revision_code = 1;
-+	mdb->header.length = len - offsetof(struct WriteEventData, msg.mdb.header);
-+	go = &mdb->go;
-+	go->length = sizeof(*go);
-+	go->type = 1;
-+	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
++	/*
++	 * No use in copying into lm_buff, its time to flush the
++	 * buffer and print str until finished.
++	 */
++	if (len > sizeof(lm_buff)) {
++		if (lm_buff_off)
++			lm_print(lm_buff, lm_buff_off);
++		lm_print(str, len);
++		memset(lm_buff, 0 , sizeof(lm_buff));
++		lm_buff_off = 0;
++		goto out;
++	}
++
++fill:
++	len = len < (sizeof(lm_buff) - lm_buff_off) ? len : (sizeof(lm_buff) - lm_buff_off);
++	if ((lm_buff_off < sizeof(lm_buff) - 1)) {
++		memcpy(&lm_buff[lm_buff_off], str, len);
++		lm_buff_off += len;
++	}
++	/* Buffer not full and no newline */
++	nl = strchr(lm_buff, '\n');
++	if (lm_buff_off != sizeof(lm_buff) - 1 && !nl)
++		goto out;
++
++	lm_print(lm_buff, lm_buff_off);
++	memset(lm_buff, 0 , sizeof(lm_buff));
++	lm_buff_off = 0;
++
++	if (len < strlen(str)) {
++		str = &str[len];
++		len = strlen(str);
++		goto fill;
++	}
++
++out:
++	spin_unlock(&lm_buff_lock);
 +}
 +
-+/*
-+ * SCLP needs to be initialized by setting a send and receive mask,
-+ * indicating which messages the control program (we) want(s) to
-+ * send/receive.
-+ */
- static void sclp_set_write_mask(void)
- {
- 	WriteEventMask *sccb = (void *)_sccb;
- 
- 	sclp_mark_busy();
-+	memset(_sccb, 0, sizeof(*sccb));
- 	sccb->h.length = sizeof(WriteEventMask);
--	sccb->mask_length = sizeof(unsigned int);
--	sccb->receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--	sccb->cp_receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
--	sccb->send_mask = SCLP_EVENT_MASK_MSG_ASCII;
--	sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII;
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	sccb->mask_length = sizeof(sccb_mask_t);
-+
-+	/* For now we don't process sclp input. */
-+	sccb->cp_receive_mask = 0;
-+	/* We send ASCII and line mode. */
-+	sccb->cp_send_mask = SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_MASK_MSG;
- 
- 	sclp_service_call(SCLP_CMD_WRITE_EVENT_MASK, sccb);
-+	assert(sccb->h.response_code == SCLP_RC_NORMAL_COMPLETION);
- }
- 
- void sclp_console_setup(void)
-@@ -35,16 +179,19 @@ void sclp_console_setup(void)
- 
- void sclp_print(const char *str)
- {
--	int len = strlen(str);
--	WriteEventData *sccb = (void *)_sccb;
--
--	sclp_mark_busy();
--	sccb->h.length = sizeof(WriteEventData) + len;
--	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
--	sccb->ebh.length = sizeof(EventBufferHeader) + len;
--	sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
--	sccb->ebh.flags = 0;
--	memcpy(sccb->data, str, len);
--
--	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
-+	/*
-+	 * z/VM advertises a vt220 console which is not functional:
-+	 * (response code 05F0, "not active because of the state of
-+	 * the machine"). Hence testing the masks would only work if
-+	 * we also use stsi data to distinguish z/VM.
-+	 *
-+	 * Let's rather print on all available consoles.
-+	 */
-+	if (strlen(str) > (PAGE_SIZE / 2)) {
-+		sclp_print_ascii("Warning: Printing is limited to 2KB of data.");
-+		sclp_print_lm("Warning: Printing is limited to 2KB of data.");
-+		return;
-+	}
-+	sclp_print_ascii(str);
-+	sclp_print_lm(str);
- }
-diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-index 63cf609..98c482a 100644
---- a/lib/s390x/sclp.h
-+++ b/lib/s390x/sclp.h
-@@ -179,6 +179,7 @@ typedef struct SCCB {
- /* SCLP event masks */
- #define SCLP_EVENT_MASK_SIGNAL_QUIESCE          0x00000008
- #define SCLP_EVENT_MASK_MSG_ASCII               0x00000040
-+#define SCLP_EVENT_MASK_MSG          		0x40000000
- 
- #define SCLP_UNCONDITIONAL_READ                 0x00
- #define SCLP_SELECTIVE_READ                     0x01
-@@ -193,6 +194,55 @@ typedef struct WriteEventMask {
-     uint32_t receive_mask;
- } __attribute__((packed)) WriteEventMask;
- 
-+#define MDBTYP_GO               0x0001
-+#define MDBTYP_MTO              0x0004
-+#define EVTYP_MSG               0x02
-+#define LNTPFLGS_CNTLTEXT       0x8000
-+#define LNTPFLGS_LABELTEXT      0x4000
-+#define LNTPFLGS_DATATEXT       0x2000
-+#define LNTPFLGS_ENDTEXT        0x1000
-+#define LNTPFLGS_PROMPTTEXT     0x0800
-+
-+typedef uint32_t sccb_mask_t;
-+
-+/* SCLP line mode console related structures. */
-+
-+struct mto {
-+	u16 length;
-+	u16 type;
-+	u16 line_type_flags;
-+	u8  alarm_control;
-+	u8  _reserved[3];
-+} __attribute__((packed));
-+
-+struct go {
-+	u16 length;
-+	u16 type;
-+	u32 domid;
-+	u8  hhmmss_time[8];
-+	u8  th_time[3];
-+	u8  reserved_0;
-+	u8  dddyyyy_date[7];
-+	u8  _reserved_1;
-+	u16 general_msg_flags;
-+	u8  _reserved_2[10];
-+	u8  originating_system_name[8];
-+	u8  job_guest_name[8];
-+} __attribute__((packed));
-+
-+struct mdb_header {
-+	u16 length;
-+	u16 type;
-+	u32 tag;
-+	u32 revision_code;
-+} __attribute__((packed));
-+
-+struct mdb {
-+	struct mdb_header header;
-+	struct go go;
-+	struct mto mto;
-+} __attribute__((packed));
-+
- typedef struct EventBufferHeader {
-     uint16_t length;
-     uint8_t  type;
-@@ -203,7 +253,10 @@ typedef struct EventBufferHeader {
- typedef struct WriteEventData {
-     SCCBHeader h;
-     EventBufferHeader ebh;
--    char data[0];
-+    union {
-+	char data[0];
-+	struct mdb mdb;
-+    } msg;
- } __attribute__((packed)) WriteEventData;
- 
- typedef struct ReadEventData {
+ /*
+  * SCLP needs to be initialized by setting a send and receive mask,
+  * indicating which messages the control program (we) want(s) to
 -- 
 2.17.0
 
