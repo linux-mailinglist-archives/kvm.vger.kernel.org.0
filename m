@@ -2,362 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BB01AA3D5
-	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 15:04:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CF64AA3EA
+	for <lists+kvm@lfdr.de>; Thu,  5 Sep 2019 15:11:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389719AbfIENEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 09:04:15 -0400
-Received: from foss.arm.com ([217.140.110.172]:44726 "EHLO foss.arm.com"
+        id S1733090AbfIENLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 09:11:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41958 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726097AbfIENEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Sep 2019 09:04:14 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7892B28;
-        Thu,  5 Sep 2019 06:04:13 -0700 (PDT)
-Received: from localhost (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E37BC3F718;
-        Thu,  5 Sep 2019 06:04:12 -0700 (PDT)
-Date:   Thu, 5 Sep 2019 14:04:11 +0100
-From:   Andrew Murray <andrew.murray@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        James Morse <james.morse@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Andre Przywara <Andre.Przywara@arm.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
- driven by vcpu_load/put
-Message-ID: <20190905130410.GA9720@e119886-lin.cambridge.arm.com>
-References: <20190903155747.219802-1-maz@kernel.org>
+        id S1730785AbfIENLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 09:11:37 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C55B0C0578F4
+        for <kvm@vger.kernel.org>; Thu,  5 Sep 2019 13:11:36 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id b15so965990wrp.21
+        for <kvm@vger.kernel.org>; Thu, 05 Sep 2019 06:11:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=9ANyZ4dBkBOltXnKi+WoWQpmuFWiDil0u88wFq4AYQY=;
+        b=P71rV5iNbOrqmqExcdHZkFocv+c9TOtGiH8v5mhg6/Hp/BhoDLm3dERO/lAEgogvIM
+         DGx8px5SU2UDA/NxrbOHHUCiHbqCwzhD/IzxqasvJ0kvCIcdGIMnjZewT0zFEPzkghOK
+         4hTt7OqBSlEKzegIZXmU4eIYXjSDjYxnEsJ9KVDoBjIH2gF3vzJP3b+yuGdO1Vt9JLK1
+         JmSIwkZpP70FqFo7lDHExkx3b8IYxY3GOcI2tGuBMVyGtMX+Q6HaXvcCyR3lA5iECxka
+         T2Fl0Oq6v3b7UfNYnCY6Pih/YG8+O5Utqpy4JM8Qcwz5k223pKTrtOfkq8Sw83bMmpBn
+         bl7A==
+X-Gm-Message-State: APjAAAU93E4YNC5eJuqrgl6ff4hC0S+MjsQeRDS2LPVEVWYx7DBcGC41
+        3t1E97lzQ2c4GLPAq7Iq31NuZD7pzLGRJyk1RNHIb+W0npkmPtNee4U042L8pN7G5+Cz44xLZPg
+        OpknMwWCun/FL
+X-Received: by 2002:a1c:80ca:: with SMTP id b193mr2630525wmd.171.1567689095193;
+        Thu, 05 Sep 2019 06:11:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyKbK6O+n/cVqLS49y3v2z3Wc3ajQWQx/waHdOI+hpMRHK7GNQBFj0JYwrQL53NYvHAotP2eA==
+X-Received: by 2002:a1c:80ca:: with SMTP id b193mr2630501wmd.171.1567689094909;
+        Thu, 05 Sep 2019 06:11:34 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id x5sm3093960wrg.69.2019.09.05.06.11.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2019 06:11:34 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>,
+        syzbot <syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com>
+Cc:     Borislav Petkov <bp@alien8.de>, devel@linuxdriverproject.org,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        LKML <linux-kernel@vger.kernel.org>, mikelley@microsoft.com,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        syzkaller-bugs@googlegroups.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        the arch/x86 maintainers <x86@kernel.org>
+Subject: Re: general protection fault in __apic_accept_irq
+In-Reply-To: <CANRm+CxBdFjVrYzAe_Rs=v6BMSq9Gx+ngDrEitK6aez=kMq2XQ@mail.gmail.com>
+References: <000000000000e3072b0591ca1937@google.com> <CANRm+CxBdFjVrYzAe_Rs=v6BMSq9Gx+ngDrEitK6aez=kMq2XQ@mail.gmail.com>
+Date:   Thu, 05 Sep 2019 15:11:33 +0200
+Message-ID: <87imq6khve.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190903155747.219802-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Wanpeng Li <kernellwp@gmail.com> writes:
 
-Some feedback below, but mostly questions to aid my understanding...
+> On Thu, 5 Sep 2019 at 16:53, syzbot
+> <syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com> wrote:
+>>
+>> Hello,
+>>
+>> syzbot found the following crash on:
+>>
+>> HEAD commit:    3b47fd5c Merge tag 'nfs-for-5.3-4' of git://git.linux-nfs...
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=124af12a600000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=144488c6c6c6d2b6
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=dff25ee91f0c7d5c1695
+>> compiler:       clang version 9.0.0 (/home/glider/llvm/clang
+>> 80fee25776c2fb61e74c1ecb1a523375c2500b69)
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10954676600000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1752fe0a600000
+>>
+>> The bug was bisected to:
+>>
+>> commit 0aa67255f54df192d29aec7ac6abb1249d45bda7
+>> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Date:   Mon Nov 26 15:47:29 2018 +0000
+>>
+>>      x86/hyper-v: move synic/stimer control structures definitions to
+>> hyperv-tlfs.h
+>>
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=156128c1600000
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=136128c1600000
+>>
+>> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+>> Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
+>> Fixes: 0aa67255f54d ("x86/hyper-v: move synic/stimer control structures
+>> definitions to hyperv-tlfs.h")
+>>
+>> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000004 data
+>> 0x94
+>> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000004 data
+>> 0x48c
+>> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000004 data
+>> 0x4ac
+>> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000005 data
+>> 0x1520
+>> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000006 data
+>> 0x15d4
+>> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000007 data
+>> 0x15c4
+>> kasan: CONFIG_KASAN_INLINE enabled
+>> kasan: GPF could be caused by NULL-ptr deref or user memory access
+>> general protection fault: 0000 [#1] PREEMPT SMP KASAN
+>> CPU: 0 PID: 9347 Comm: syz-executor665 Not tainted 5.3.0-rc7+ #0
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>> Google 01/01/2011
+>> RIP: 0010:__apic_accept_irq+0x46/0x740 arch/x86/kvm/lapic.c:1029
+>
+> Thanks for the report, I found the root cause, will send a patch soon.
+>
 
-On Tue, Sep 03, 2019 at 04:57:47PM +0100, Marc Zyngier wrote:
-> When the VHE code was reworked, a lot of the vgic stuff was moved around,
-> but the GICv4 residency code did stay untouched, meaning that we come
-> in and out of residency on each flush/sync, which is obviously suboptimal.
-> 
-> To address this, let's move things around a bit:
-> 
-> - Residency entry (flush) moves to vcpu_load
-> - Residency exit (sync) moves to vcpu_put
-> - On blocking (entry to WFI), we "put"
-> - On unblocking (exit from WFI, we "load"
-> 
-> Because these can nest (load/block/put/load/unblock/put, for example),
-> we now have per-VPE tracking of the residency state.
-> 
-> Additionally, vgic_v4_put gains a "need doorbell" parameter, which only
-> gets set to true when blocking because of a WFI. This allows a finer
-> control of the doorbell, which now also gets disabled as soon as
-> it gets signaled.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  drivers/irqchip/irq-gic-v4.c       |  7 +++-
->  include/kvm/arm_vgic.h             |  4 +--
->  include/linux/irqchip/arm-gic-v4.h |  2 ++
->  virt/kvm/arm/arm.c                 | 12 ++++---
->  virt/kvm/arm/vgic/vgic-v3.c        |  4 +++
->  virt/kvm/arm/vgic/vgic-v4.c        | 55 ++++++++++++++----------------
->  virt/kvm/arm/vgic/vgic.c           |  4 ---
->  virt/kvm/arm/vgic/vgic.h           |  2 --
->  8 files changed, 48 insertions(+), 42 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-> index 563e87ed0766..45969927cc81 100644
-> --- a/drivers/irqchip/irq-gic-v4.c
-> +++ b/drivers/irqchip/irq-gic-v4.c
-> @@ -141,12 +141,17 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
->  int its_schedule_vpe(struct its_vpe *vpe, bool on)
->  {
->  	struct its_cmd_info info;
-> +	int ret;
->  
->  	WARN_ON(preemptible());
->  
->  	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
->  
-> -	return its_send_vpe_cmd(vpe, &info);
-> +	ret = its_send_vpe_cmd(vpe, &info);
-> +	if (!ret)
-> +		vpe->resident = on;
-> +
+I'm really interested in how any issue can be caused by 0aa67255f54d as
+we just moved some definitions from a c file to a common header... (ok,
+we did more than that, some structures gained '__packed' but it all
+still seems legitimate to me and I can't recall any problems with
+genuine Hyper-V...)
 
-We make an assumption here that its_schedule_vpe is the only caller of
-its_send_vpe_cmd where we may pass SCHEDULE_VPE. I guess this is currently
-the case.
-
-Why do we also set the residency flag for DESCHEDULE_VPE?
-
-And by residency we mean that interrupts are delivered to VM, instead of
-doorbell?
-
-> +	return ret;
->  }
->  
->  int its_invall_vpe(struct its_vpe *vpe)
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index af4f09c02bf1..4dc58d7a0010 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -396,7 +396,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
->  int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
->  				 struct kvm_kernel_irq_routing_entry *irq_entry);
->  
-> -void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
-> -void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
-> +int vgic_v4_load(struct kvm_vcpu *vcpu);
-> +int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
->  
->  #endif /* __KVM_ARM_VGIC_H */
-> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-> index e6b155713b47..ab1396afe08a 100644
-> --- a/include/linux/irqchip/arm-gic-v4.h
-> +++ b/include/linux/irqchip/arm-gic-v4.h
-> @@ -35,6 +35,8 @@ struct its_vpe {
->  	/* Doorbell interrupt */
->  	int			irq;
->  	irq_hw_number_t		vpe_db_lpi;
-> +	/* VPE resident */
-> +	bool			resident;
->  	/* VPE proxy mapping */
->  	int			vpe_proxy_event;
->  	/*
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 35a069815baf..4e69268621b6 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -321,20 +321,24 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
->  	/*
->  	 * If we're about to block (most likely because we've just hit a
->  	 * WFI), we need to sync back the state of the GIC CPU interface
-> -	 * so that we have the lastest PMR and group enables. This ensures
-> +	 * so that we have the latest PMR and group enables. This ensures
->  	 * that kvm_arch_vcpu_runnable has up-to-date data to decide
->  	 * whether we have pending interrupts.
-> +	 *
-> +	 * For the same reason, we want to tell GICv4 that we need
-> +	 * doorbells to be signalled, should an interrupt become pending.
-
-As I understand, and as indicated by removal of kvm_vgic_v4_enable_doorbell
-below, we've now abstracted enabling the doorbell behind the concept of a
-v4_put.
-
-Why then, do we break that abstraction by adding this comment? Surely we just
-want to indicate that we're done with ITS for now - do whatever you need to do.
-
-This would have made more sense to me if the comment above was removed in this
-patch rather than added.
-
->  	 */
->  	preempt_disable();
->  	kvm_vgic_vmcr_sync(vcpu);
-> +	vgic_v4_put(vcpu, true);
->  	preempt_enable();
-> -
-> -	kvm_vgic_v4_enable_doorbell(vcpu);
->  }
->  
->  void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
->  {
-> -	kvm_vgic_v4_disable_doorbell(vcpu);
-> +	preempt_disable();
-> +	vgic_v4_load(vcpu);
-> +	preempt_enable();
->  }
->  
->  int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
-> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> index 8d69f007dd0c..48307a9eb1d8 100644
-> --- a/virt/kvm/arm/vgic/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> @@ -664,6 +664,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
->  
->  	if (has_vhe())
->  		__vgic_v3_activate_traps(vcpu);
-> +
-> +	WARN_ON(vgic_v4_load(vcpu));
->  }
->  
->  void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
-> @@ -676,6 +678,8 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
->  
->  void vgic_v3_put(struct kvm_vcpu *vcpu)
->  {
-> +	WARN_ON(vgic_v4_put(vcpu, false));
-> +
->  	vgic_v3_vmcr_sync(vcpu);
->  
->  	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
-> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-> index 477af6aebb97..3a8a28854b13 100644
-> --- a/virt/kvm/arm/vgic/vgic-v4.c
-> +++ b/virt/kvm/arm/vgic/vgic-v4.c
-> @@ -85,6 +85,10 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
->  {
->  	struct kvm_vcpu *vcpu = info;
->  
-> +	/* We got the message, no need to fire again */
-> +	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
-> +		disable_irq_nosync(irq);
-> +
->  	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
->  	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
->  	kvm_vcpu_kick(vcpu);
-
-This is because the doorbell will fire each time any guest device interrupts,
-however we only need to tell the guest just once that something has happened
-right?
-
-> @@ -192,20 +196,30 @@ void vgic_v4_teardown(struct kvm *kvm)
->  	its_vm->vpes = NULL;
->  }
->  
-> -int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
-> +int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
->  {
-> -	if (!vgic_supports_direct_msis(vcpu->kvm))
-> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-> +	struct irq_desc *desc = irq_to_desc(vpe->irq);
-> +
-> +	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
->  		return 0;
-
-Are we using !vpe->resident to avoid pointlessly doing work we've
-already done?
-
->  
-> -	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
-> +	/*
-> +	 * If blocking, a doorbell is required. Undo the nested
-> +	 * disable_irq() calls...
-> +	 */
-> +	while (need_db && irqd_irq_disabled(&desc->irq_data))
-> +		enable_irq(vpe->irq);
-> +
-> +	return its_schedule_vpe(vpe, false);
->  }
->  
-> -int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
-> +int vgic_v4_load(struct kvm_vcpu *vcpu)
->  {
-> -	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
->  	int err;
->  
-> -	if (!vgic_supports_direct_msis(vcpu->kvm))
-> +	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
->  		return 0;
->  
->  	/*
-> @@ -214,11 +228,14 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
->  	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
->  	 * turns into a VMOVP command at the ITS level.
->  	 */
-> -	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
-> +	err = irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
->  	if (err)
->  		return err;
->  
-> -	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
-> +	/* Disabled the doorbell, as we're about to enter the guest */
-> +	disable_irq(vpe->irq);
-> +
-> +	err = its_schedule_vpe(vpe, true);
->  	if (err)
->  		return err;
-
-Given that the doorbell corresponds with vpe residency, it could make sense
-to add a helper here that calls its_schedule_vpe and [disable,enable]_irq.
-Though I see that vgic_v3_put calls vgic_v4_put with need_db=false. I wonder
-what effect setting that to true would be for vgic_v3_put? Could it be known
-that v3 won't set need_db to true?
-
-Thanks,
-
-Andrew Murray
-
->  
-> @@ -226,9 +243,7 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
->  	 * Now that the VPE is resident, let's get rid of a potential
->  	 * doorbell interrupt that would still be pending.
->  	 */
-> -	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
-> -
-> -	return err;
-> +	return irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
->  }
->  
->  static struct vgic_its *vgic_get_its(struct kvm *kvm,
-> @@ -335,21 +350,3 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
->  	mutex_unlock(&its->its_lock);
->  	return ret;
->  }
-> -
-> -void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
-> -{
-> -	if (vgic_supports_direct_msis(vcpu->kvm)) {
-> -		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-> -		if (irq)
-> -			enable_irq(irq);
-> -	}
-> -}
-> -
-> -void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
-> -{
-> -	if (vgic_supports_direct_msis(vcpu->kvm)) {
-> -		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
-> -		if (irq)
-> -			disable_irq(irq);
-> -	}
-> -}
-> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> index 45a870cb63f5..99b02ca730a8 100644
-> --- a/virt/kvm/arm/vgic/vgic.c
-> +++ b/virt/kvm/arm/vgic/vgic.c
-> @@ -857,8 +857,6 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  
-> -	WARN_ON(vgic_v4_sync_hwstate(vcpu));
-> -
->  	/* An empty ap_list_head implies used_lrs == 0 */
->  	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
->  		return;
-> @@ -882,8 +880,6 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
->  /* Flush our emulation state into the GIC hardware before entering the guest. */
->  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->  {
-> -	WARN_ON(vgic_v4_flush_hwstate(vcpu));
-> -
->  	/*
->  	 * If there are no virtual interrupts active or pending for this
->  	 * VCPU, then there is no work to do and we can bail out without
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 83066a81b16a..c7fefd6b1c80 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -316,7 +316,5 @@ void vgic_its_invalidate_cache(struct kvm *kvm);
->  bool vgic_supports_direct_msis(struct kvm *kvm);
->  int vgic_v4_init(struct kvm *kvm);
->  void vgic_v4_teardown(struct kvm *kvm);
-> -int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
-> -int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
->  
->  #endif
-> -- 
-> 2.20.1
-> 
+-- 
+Vitaly
