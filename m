@@ -2,108 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EFFAAB087
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 04:12:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 253E0AB08D
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 04:17:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391109AbfIFCMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 22:12:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:16927 "EHLO mx1.redhat.com"
+        id S2387741AbfIFCRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 22:17:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55786 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728507AbfIFCMY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Sep 2019 22:12:24 -0400
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+        id S1728628AbfIFCRd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 22:17:33 -0400
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1CAEE81F22
-        for <kvm@vger.kernel.org>; Fri,  6 Sep 2019 02:12:24 +0000 (UTC)
-Received: by mail-pl1-f198.google.com with SMTP id v22so2620031ply.19
-        for <kvm@vger.kernel.org>; Thu, 05 Sep 2019 19:12:24 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 98B6B7FDFF
+        for <kvm@vger.kernel.org>; Fri,  6 Sep 2019 02:17:33 +0000 (UTC)
+Received: by mail-pf1-f199.google.com with SMTP id i187so3361357pfc.10
+        for <kvm@vger.kernel.org>; Thu, 05 Sep 2019 19:17:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=4+KRqgnMyWTJLeEvyGcJg55Gu2c2sD0q/0wWLjB74gM=;
-        b=nMActTxiT6AL9b3Yhr6YM7CNVTTNFkLvJpbV7wVMAZg3bgedkLA70e3Ijv3H23AedD
-         b9+WOtsd23H+fZ5iGihgdrIPB34hWOuAjWIa1ZnodR/v2gZEWjgejX466b7ksk/j0muo
-         0ufyhlBQdP28IL42XGOcd/G0n+vimHVMouliG47oFTXkCoA+JbKXhgPxd+LDbCmXzoLW
-         T/CFAE7hzruW/2I9ysxOf+sCGe3pVlsrK23GOZ/vnzXa6QMyP1s3ZRmAWG5GcjJEMJCn
-         7LaqW6zAEj8bqWW4nGD+6oXYgL7P0FxCJewh0pqn7BFyEkcZx2aD8e8kat1IXF2tkX8S
-         LasQ==
-X-Gm-Message-State: APjAAAUqPddk3iFdNiZj8FaZZUd27F0KKjBpCO9hXIDLB5nj7YF0mCWS
-        Et4C0PK6w6W3ktu5wa2cRm1v4rmvsJlAh06zZRTVD64+nWAnJkojuAVqyPrq7epnprXGTwWwBQy
-        ZS7nQQLMmWJcx
-X-Received: by 2002:a17:902:a5c5:: with SMTP id t5mr6548263plq.316.1567735943667;
-        Thu, 05 Sep 2019 19:12:23 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw+wV1cRvk7aHfxCCtDNaVlygGcT48TrKBmE+UDjiPNzq/x8IGW5zpov+5Q43i/2E8YHGSv2g==
-X-Received: by 2002:a17:902:a5c5:: with SMTP id t5mr6548243plq.316.1567735943382;
-        Thu, 05 Sep 2019 19:12:23 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id x22sm6613698pfo.180.2019.09.05.19.12.20
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aBUS+fgsamAUOZtSEp++jlkJB5YgKT1csWUc+zQUKS4=;
+        b=SAK4GanL7UBxn5aJIEWoEdSWWjzycKKhl5Ts40P+9Ld5JDqxIujeBnn/DrVwRLwp5C
+         odmeiM77Z/88n8sJBWN4fAoOvrRMGobpp9NP1IcWdJrn3AYs3MTOT+kKxo4HvUp54mz4
+         UlGx5wWMljWpcO918Dsx72pZTHPuGzww8o8ALsaYIT53jpPwavW3a5vkrbAeM88USOjq
+         juLRMLe7tn3vDzkxn/NfnkA3kl1KeIXl232Uas1BOruxi3pwBUkCxn5XQNAQrCKsO6iG
+         t76LLqg8FZdcNCTAJLsfkOrhZnmg30xST3wYugvwlNPeKluUa06Chdy2ratUhhvk6HNX
+         VpmA==
+X-Gm-Message-State: APjAAAU0VzotCI0xi3M3oI2fbq4qcvIu+m9qrKxJcHgvqNOJYmYaUV8Y
+        FzwFGpl+BdJ5lqOhHSs8tcBl3p/6tV0pckjCWbv4d77NDgX3BB3NQWqsB/kH1UoFZmmWeZiiIMS
+        QmKfrdt9bzdNF
+X-Received: by 2002:a62:e717:: with SMTP id s23mr7759987pfh.71.1567736253137;
+        Thu, 05 Sep 2019 19:17:33 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzCQJM/WuwJ79nbWX4bQwimjvaO+Ug+0hsWoiE4Vf9iu3itMcfU3iYer2r464k1bCxIb1dlRA==
+X-Received: by 2002:a62:e717:: with SMTP id s23mr7759963pfh.71.1567736252846;
+        Thu, 05 Sep 2019 19:17:32 -0700 (PDT)
+Received: from xz-x1.redhat.com ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id a11sm8212359pfg.94.2019.09.05.19.17.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2019 19:12:22 -0700 (PDT)
-Date:   Fri, 6 Sep 2019 10:12:13 +0800
+        Thu, 05 Sep 2019 19:17:32 -0700 (PDT)
 From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <kernellwp@gmail.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [PATCH v3 4/4] KVM: VMX: Change ple_window type to unsigned int
-Message-ID: <20190906021213.GB10917@xz-x1>
-References: <20190905023616.29082-1-peterx@redhat.com>
- <20190905023616.29082-5-peterx@redhat.com>
- <20190905155823.GB29019@linux.intel.com>
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>, peterx@redhat.com
+Subject: [PATCH v4 0/4] KVM: X86: Some tracepoint enhancements
+Date:   Fri,  6 Sep 2019 10:17:18 +0800
+Message-Id: <20190906021722.2095-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190905155823.GB29019@linux.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 05, 2019 at 08:58:23AM -0700, Sean Christopherson wrote:
-> On Thu, Sep 05, 2019 at 10:36:16AM +0800, Peter Xu wrote:
-> > The VMX ple_window is 32 bits wide, so logically it can overflow with
-> > an int.  The module parameter is declared as unsigned int which is
-> > good, however the dynamic variable is not.  Switching all the
-> > ple_window references to use unsigned int.
-> > 
-> > The tracepoint changes will also affect SVM, but SVM is using an even
-> > smaller width (16 bits) so it's always fine.
-> > 
-> > Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  arch/x86/kvm/trace.h   | 8 ++++----
-> >  arch/x86/kvm/vmx/vmx.c | 4 ++--
-> >  arch/x86/kvm/vmx/vmx.h | 2 +-
-> >  3 files changed, 7 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> > index f1177e03768f..ae924566c401 100644
-> > --- a/arch/x86/kvm/trace.h
-> > +++ b/arch/x86/kvm/trace.h
-> > @@ -891,13 +891,13 @@ TRACE_EVENT(kvm_pml_full,
-> >  );
-> >  
-> >  TRACE_EVENT(kvm_ple_window_update,
-> > -	TP_PROTO(unsigned int vcpu_id, int new, int old),
-> > +	TP_PROTO(unsigned int vcpu_id, unsigned int new, unsigned int old),
-> >  	TP_ARGS(vcpu_id, new, old),
-> >  
-> >  	TP_STRUCT__entry(
-> >  		__field(        unsigned int,   vcpu_id         )
-> > -		__field(                 int,       new         )
-> > -		__field(                 int,       old         )
-> > +		__field(        unsigned int,       new         )
-> > +		__field(        unsigned int,       old         )
-> 
-> Changing the trace event storage needs to be done in patch 3/4, otherwise
-> we're knowingly introducing a bug (for one commit).  Alternatively, swap
-> the order of the patches.
+v4:
+- pick r-b
+- swap the last two patches [Sean]
 
-I'll swap.  Thanks,
+v3:
+- use unsigned int for vcpu id [Sean]
+- a new patch to fix ple_window type [Sean]
+
+v2:
+- fix commit messages, change format of ple window tracepoint [Sean]
+- rebase [Wanpeng]
+
+Each small patch explains itself.  I noticed them when I'm tracing
+some IRQ paths and I found them helpful at least to me.
+
+Please have a look.  Thanks,
+
+Peter Xu (4):
+  KVM: X86: Trace vcpu_id for vmexit
+  KVM: X86: Remove tailing newline for tracepoints
+  KVM: VMX: Change ple_window type to unsigned int
+  KVM: X86: Tune PLE Window tracepoint
+
+ arch/x86/kvm/svm.c     | 16 ++++++++--------
+ arch/x86/kvm/trace.h   | 34 ++++++++++++++--------------------
+ arch/x86/kvm/vmx/vmx.c | 18 ++++++++++--------
+ arch/x86/kvm/vmx/vmx.h |  2 +-
+ arch/x86/kvm/x86.c     |  2 +-
+ 5 files changed, 34 insertions(+), 38 deletions(-)
 
 -- 
-Peter Xu
+2.21.0
+
