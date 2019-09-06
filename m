@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B7C4AC1D0
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 23:03:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5466BAC1D1
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 23:03:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390220AbfIFVDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 17:03:34 -0400
-Received: from mail-vk1-f201.google.com ([209.85.221.201]:40994 "EHLO
-        mail-vk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389992AbfIFVDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 17:03:33 -0400
-Received: by mail-vk1-f201.google.com with SMTP id g11so2905682vkm.8
-        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 14:03:33 -0700 (PDT)
+        id S2390242AbfIFVDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 17:03:36 -0400
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:43365 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389873AbfIFVDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 17:03:36 -0400
+Received: by mail-pl1-f201.google.com with SMTP id y6so4232117plt.10
+        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 14:03:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=dD9/QUSmDVRmfW0CVBGqk/cZBNT81Sw0iddXqsAQmTY=;
-        b=M5CwszVmgz+Bt5N6QVnMzVxf6VoUJJWGtB83ZktLk8efqkccfcpdXKNjHK4ZHNs3h4
-         /Q4FsDolFe5e3XW71ZvtoHPoKv1lqSWqEX+AWYO//YL1sPpvaA3iHToI+kLDPcsKFzwE
-         F3X1dmywF1M0Y8i32BeFXI9Mr4BwFPm1gcLHde3VN/GCeJc2dNl5OIpfOMijnWZ8xGb1
-         KqRwh+Sp3ZpL9nUo+de5C681HmCp+XtaRwBj3mGJldHPXDnURlG3+hClvKQbFV4NaRNf
-         Tv5zQSoZQb3CiFXkbcNqF5uy+SFpEpdNr8OEzqgNXgws77NL0Wp9nZ0hMy3cPkFsITTw
-         GZTw==
+        bh=rCyhoUdaGrgN67UpXBGLGCttQlRMLbm+Q6DEjZauY84=;
+        b=hhESJAZvy2HG7/31mOJLJuvF+Ps6wzjzmmeuX3qtBzFGL8q2UA1Z8PWr8kNg2yFmSC
+         8JxY/Z77JU2EbIRPiBK/YrPX91nwrczc6E5MgX+LjRhFiRomLXHhJ3j11ctH2+XBfsSV
+         PWig60VXsO4NCBG2soNeUYVKydwtA1sgG5I/lAOft1MoVt5E6wlerflIe4B8ylvvoPHq
+         Kyx9BoR5JPcZQXhOPdZhQkB7+Sx/sbWEWd8bORtEeYZC6OSXcuWw7yjigzepz2ijTYxY
+         6nEF3xCxp949vyHcDR3XzcLnCpedb+uQkR17L8pUx5isVyFyMK5EiJ4nscDa4CU1NVBm
+         Vw5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=dD9/QUSmDVRmfW0CVBGqk/cZBNT81Sw0iddXqsAQmTY=;
-        b=sTdCt6XPqJVhGD4WF1rd4q5BSE9VTJuc2d5/C8lcMkyp29YWgBkGU5iqhByvfuxmfy
-         druKU6oFy9dopcLS4O4+cdh0FTtR76bj6Oh5z5nmmQT5+In3CD8OSQGeGpl+wTocXwdC
-         iXVJhyJK4sjVdRmK8CGbVBjGq7F3DCumARr6P9wDkATHG+MCosD1L+Eu6+dhhRDhuazO
-         DKMF280d8GPv2yli+Rt2SJ7l7DrStBQ8HaQopH74TPlxE2UsJZlix0vmGivgtBKcs7dk
-         TAEpFIRBun8yroHP24fsR1FGUk0hMeNluznqVumchCq29e5b5r3Qsw0qz6Q0qaTk6Bck
-         lWYA==
-X-Gm-Message-State: APjAAAVINiCAivlQPb7bnTh8UUXBk729ll+qq4savmme7weovdDO8lrS
-        coJi70lptMY/6EEyx3faXynjF8xoych5Hn5urt63pHvFL70ykw7nUQ9NI+0wyK0eRSGE0po1adO
-        noN4BNiRBjG5gnJMbpocJB8vmBFifzd7TdUuMqGfmhwXCxG9RIsOLD/sIsg==
-X-Google-Smtp-Source: APXvYqwfb1dirayUPI07Y7v5vtb7lFJuHxddFuQJveMdvRiQCUCpayDXnSsDHWGDYZlDcHjr2z7sbhY9C0M=
-X-Received: by 2002:a1f:b994:: with SMTP id j142mr5569970vkf.62.1567803812447;
- Fri, 06 Sep 2019 14:03:32 -0700 (PDT)
-Date:   Fri,  6 Sep 2019 14:03:09 -0700
+        bh=rCyhoUdaGrgN67UpXBGLGCttQlRMLbm+Q6DEjZauY84=;
+        b=emu6nq0XDfP33gPRspik7S9v5O/2dbUxJIgiL63+5qX4AiBwT079ng1VbWswQM9Xfv
+         LaS7UmacpxD1bQpgXEhM9JuUBvt3Nod+rjmgH9QJuwJQ9RZXyWrq7guu23jhMd1nOPUG
+         ykHvi0fFlVvzZl7SWkCaFQnD/aa/WNRdQi11ZDyvAsbavVQBS0b6sqqqhRwdFbfz2T8U
+         WWknQ2JevSdgwZz38XVOMhbduUCHoYWGF1cTn5yWrlvMjl4WhAqm7/beCJDBIXGBRwZ+
+         FVefLmiPWWifRfoyeRUMz53iFiERq6qP1thcCiBBth3GP3I9ngqEQ0caODuEqxX7urFS
+         lsZg==
+X-Gm-Message-State: APjAAAW7loop4FkcF7IL3J31bz9hDrc/AKM7RrS1LDsXz9jiEkcCOOHb
+        wvjLpXnjJYgxeAZBpUlmzP3xXxiIXv3aqKqXRQCO496KAG9Oy0do0Xh5lY6ps2OWvbPf31NHLkW
+        l3BNUQQMGO1hX18VfcObJoh6qFRkOfAu+6cf4pEHoOjFNLwpCF/6Ic3fdYg==
+X-Google-Smtp-Source: APXvYqxBq39FP9hTwCe1ZG+9e4AU8CuDz+HMenwLIQ0RgG+MBLBYB583zs0OhmyElHLn19ewUTSLWGthJNw=
+X-Received: by 2002:a65:6108:: with SMTP id z8mr9630680pgu.289.1567803814582;
+ Fri, 06 Sep 2019 14:03:34 -0700 (PDT)
+Date:   Fri,  6 Sep 2019 14:03:10 -0700
 In-Reply-To: <20190906210313.128316-1-oupton@google.com>
-Message-Id: <20190906210313.128316-6-oupton@google.com>
+Message-Id: <20190906210313.128316-7-oupton@google.com>
 Mime-Version: 1.0
 References: <20190906210313.128316-1-oupton@google.com>
 X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-Subject: [PATCH v4 5/9] KVM: nVMX: Check HOST_IA32_PERF_GLOBAL_CTRL on VM-entry
+Subject: [PATCH v4 6/9] KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL vm
+ control if supported
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>
@@ -61,12 +62,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a consistency check on nested vm-entry for host's
-IA32_PERF_GLOBAL_CTRL from vmcs12. Per Intel's SDM Vol 3 26.2.2:
-
-  If the "load IA32_PERF_GLOBAL_CTRL"
-  VM-exit control is 1, bits reserved in the IA32_PERF_GLOBAL_CTRL
-  MSR must be 0 in the field for that register"
+The "load IA32_PERF_GLOBAL_CTRL" bit for VM-entry and VM-exit should
+only be exposed to the guest if IA32_PERF_GLOBAL_CTRL is a valid MSR.
+Create a new helper to allow pmu_refresh() to update the VM-entry and
+VM-exit controls to ensure PMU values are initialized when performing
+the is_valid_msr() check.
 
 Suggested-by: Jim Mattson <jmattson@google.com>
 Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
@@ -75,33 +75,76 @@ Signed-off-by: Oliver Upton <oupton@google.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/kvm/vmx/pmu_intel.c |  3 +++
+ arch/x86/kvm/vmx/vmx.c       | 21 +++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h       |  1 +
+ 3 files changed, 25 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 6c3aa3bcede3..e2baa9ca562f 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2636,6 +2636,7 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
- 				       struct vmcs12 *vmcs12)
- {
- 	bool ia32e;
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 963766d631ad..2dc7be724321 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -16,6 +16,7 @@
+ #include "cpuid.h"
+ #include "lapic.h"
+ #include "pmu.h"
++#include "vmx.h"
  
- 	if (!nested_host_cr0_valid(vcpu, vmcs12->host_cr0) ||
- 	    !nested_host_cr4_valid(vcpu, vmcs12->host_cr4) ||
-@@ -2650,6 +2651,11 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
- 	    !kvm_pat_valid(vmcs12->host_ia32_pat))
- 		return -EINVAL;
- 
-+	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL &&
-+	    !kvm_is_valid_perf_global_ctrl(pmu,
-+					   vmcs12->host_ia32_perf_global_ctrl))
-+		return -EINVAL;
+ static struct kvm_event_hw_type_mapping intel_arch_events[] = {
+ 	/* Index must match CPUID 0x0A.EBX bit vector */
+@@ -314,6 +315,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	    (boot_cpu_has(X86_FEATURE_HLE) || boot_cpu_has(X86_FEATURE_RTM)) &&
+ 	    (entry->ebx & (X86_FEATURE_HLE|X86_FEATURE_RTM)))
+ 		pmu->reserved_bits ^= HSW_IN_TX|HSW_IN_TX_CHECKPOINTED;
 +
- 	ia32e = (vmcs12->vm_exit_controls &
- 		 VM_EXIT_HOST_ADDR_SPACE_SIZE) != 0;
++	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
+ }
  
+ static void intel_pmu_init(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 570a233e272b..5b0664bff23b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6417,6 +6417,27 @@ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
+ 	}
+ }
+ 
++void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx;
++
++	if (!nested_vmx_allowed(vcpu))
++		return;
++
++	vmx = to_vmx(vcpu);
++	if (intel_pmu_ops.is_valid_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL)) {
++		vmx->nested.msrs.entry_ctls_high |=
++				VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
++		vmx->nested.msrs.exit_ctls_high |=
++				VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
++	} else {
++		vmx->nested.msrs.entry_ctls_high &=
++				~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
++		vmx->nested.msrs.exit_ctls_high &=
++				~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
++	}
++}
++
+ bool __vmx_vcpu_run(struct vcpu_vmx *vmx, unsigned long *regs, bool launched);
+ 
+ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 82d0bc3a4d52..e06884cf88ad 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -331,6 +331,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ struct shared_msr_entry *find_msr_entry(struct vcpu_vmx *vmx, u32 msr);
+ void pt_update_intercept_for_msr(struct vcpu_vmx *vmx);
+ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
++void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu);
+ 
+ #define POSTED_INTR_ON  0
+ #define POSTED_INTR_SN  1
 -- 
 2.23.0.187.g17f5b7556c-goog
 
