@@ -2,48 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83285AC1CB
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 23:03:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 960CFAC1CC
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 23:03:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388468AbfIFVDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 17:03:22 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:41568 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725872AbfIFVDW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 17:03:22 -0400
-Received: by mail-pf1-f202.google.com with SMTP id g15so5515057pfb.8
-        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 14:03:21 -0700 (PDT)
+        id S2389254AbfIFVDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 17:03:24 -0400
+Received: from mail-pf1-f201.google.com ([209.85.210.201]:55779 "EHLO
+        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725872AbfIFVDY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 17:03:24 -0400
+Received: by mail-pf1-f201.google.com with SMTP id w126so4233465pfd.22
+        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 14:03:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=X3p9IC5KMyfjhH2AJpSb8AsD49T286nJ6y+FEn+DgIo=;
-        b=GI+HZU3FqRbK5SdtZUfHusMTRh1WpfgISUCBrFbWcaPpoZgJPX5Z7t3uBt5nLLgqK5
-         aNBnENRONB9tv5WaQi88o21skDUjlyPVI0PxTF6MmhQP/LgQfLPBLvbJcQ890Qw+htRl
-         11ESH4eCtSItC074pgr9PMNtTr5g3HjEwmSDffGLxeNnUgXkIhMPW90L176Md/O2rkvE
-         Ziol6ves4U4EjCbAhdqWZPZ1lGdI+f7VbEVBczn2hwa312MpBsRmtlIeZRBvyZat6H7q
-         nJ5+L5TQdVDBzAuNuS0e3z6YyPkrnJiiYUaMZcOPPQcVhTl7Fo6qgy4WheFq14P3y03F
-         PCIw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=CNdrlb0ULLVdEI+amDkztM5kVgEihq12ic/7nJruJWA=;
+        b=eQfLtdvRyr1zcRwiuY/gGorUEG/JtUGoXsYHtT760bxrpeVvhvwIZpAiedupv8u9eg
+         Rpt+Du45VehsyyTfohyp4Mi+qgArouJaudAkf7maOixuKTwqfW8EJZoRWSY958De95sI
+         wzCyzmtG5S6F7IDZRnViUQojSMhvN7J0KkZrHxPKb6fshTEbkhVwrsZeTbhIjiNi1wYB
+         amHtYP3/Len52v57QMfYA+msg8c157rIVhlYcpFDlXyCwhXRqni+3gux0rcSFJkx8Nq9
+         wFWBLgtlORbvAIIFaXde/xgflOUREqGP7ddW5wFL9wfZy2XpxABtNmoglZaWthi59BSi
+         cLSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=X3p9IC5KMyfjhH2AJpSb8AsD49T286nJ6y+FEn+DgIo=;
-        b=SMTme3F1/SYCrxxt53JJqtoRIqG2VTXvsb/pOQCbfq5fANSete66X+4zakkJrc4xAR
-         xIRzQ5SpbO8j5oqhQiQL01ri8WpkSqo97CM6uQOZaYYhppNnC0Bs5Uz9qBwh30OURNab
-         AEE14nnCQmjGSuzqjsjuBUfFp34TgqH0nqecEDOKVP2Sh/2NT4JzJ2xYQniYPXlimsd8
-         GoSVUNPAJJeEatGifYP8s3y2Z9rQqzxsAZ0bsmyBeuPzgDM4eHK+YPbmuAFYv+EMhS98
-         6RJh3gJcXyX86zrsorjH3gg9V7gLXW7SvmXr61ALXFFts1MTCTqP++irgbMfP7Iy/ehe
-         TDPQ==
-X-Gm-Message-State: APjAAAWcdaydO3ihYjtCLuZXk5yA3R4CkzWkQE2rnWaITHjw4D6m+Wrq
-        uOCq8isSbW+9qpv8u3cBkmsdAPxcVeca8hL1AohLnjqaSY8aSKzqNfYx+ds3O4xapZqWT6gzEkw
-        f+QuCcGz+JMD/H5TWXiOsoNU8db5axiwRfxNlAmdoLgsG3aoHNiyQY2yRQg==
-X-Google-Smtp-Source: APXvYqxNdG4S1T4ON0y0OCcJPNj355A2BQvW+t+xyIbLenbmjjeNG/CrY53WlrKas2Lf8IVcIQY0nUA5d3Y=
-X-Received: by 2002:a63:5b52:: with SMTP id l18mr9683664pgm.21.1567803801063;
- Fri, 06 Sep 2019 14:03:21 -0700 (PDT)
-Date:   Fri,  6 Sep 2019 14:03:04 -0700
-Message-Id: <20190906210313.128316-1-oupton@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=CNdrlb0ULLVdEI+amDkztM5kVgEihq12ic/7nJruJWA=;
+        b=HS6WsDn1IlVnz5JWMoWUjXnBXFIvo2+maDswhQSK8fWmzUVsqhKlSfE+vuWWd70Vli
+         GNqaEe6wvkrGjoG8lgFEhaBPcraXwue5fHGlVxVz9gMa6e5qM2XmZKLBjJRbDMrYcZt/
+         xH5pJFVMOr5KkmHM7/dGZ1OKLqZhBNv8vGwkz+HuteZBO3mhGsxXjcSbDmUa3E2/UsaV
+         6HGRlDsPWFnqEv9/xp7NNRZOL1q6xRQf/Gp+KIrSfutR2jUzz6lxk9gBj8AYutEV5T+r
+         /r5rjVECuVRBPiKyB8y+h//LvbZjWcK1X2XrchVkHoauV98t06qA2/4osKNL3kXBIVdK
+         CJKg==
+X-Gm-Message-State: APjAAAW04Q3K8KEyYzAV1Xae/uNjS9JVCpyObn6HSpTvPuzbLuhw9vfg
+        NDgNxD+oSRb82uKOT/YtP3kDWczHerMzq7Pl6kKoOsgv73aBGVycmprUst5lenx9cgFXu0Ljn/X
+        mpGOvr+KmjWwyAAggVgEv/q9wW2CCuc8Dm5MKoZCxUxAfFGT8e8V8he8FIA==
+X-Google-Smtp-Source: APXvYqxal6kWb12vc5ZYGfvikIizmgLlOf/F6n8mtymbjl8QQRHHARbD3za9szERunWq135iI4LNGp0Ygrc=
+X-Received: by 2002:a63:b919:: with SMTP id z25mr9563029pge.201.1567803803148;
+ Fri, 06 Sep 2019 14:03:23 -0700 (PDT)
+Date:   Fri,  6 Sep 2019 14:03:05 -0700
+In-Reply-To: <20190906210313.128316-1-oupton@google.com>
+Message-Id: <20190906210313.128316-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20190906210313.128316-1-oupton@google.com>
 X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-Subject: [PATCH v4 0/9] KVM: VMX: Add full nested support for IA32_PERF_GLOBAL_CTRL
+Subject: [PATCH v4 1/9] KVM: nVMX: Use kvm_set_msr to load IA32_PERF_GLOBAL_CTRL
+ on vmexit
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>
@@ -57,67 +62,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[v1] https://lore.kernel.org/r/20190828234134.132704-1-oupton@google.com
-[v2] https://lore.kernel.org/r/20190903213044.168494-1-oupton@google.com
-[v3] https://lore.kernel.org/r/20190903215801.183193-1-oupton@google.com
+The existing implementation for loading the IA32_PERF_GLOBAL_CTRL MSR
+on VM-exit was incorrect, as the next call to atomic_switch_perf_msrs()
+could cause this value to be overwritten. Instead, call kvm_set_msr()
+which will allow atomic_switch_perf_msrs() to correctly set the values.
 
-v1 => v2:
- - Add Krish's Co-developed-by and Signed-off-by tags.
- - Fix minor nit to kvm-unit-tests to use 'host' local variable
-   throughout test_load_pgc()
- - Teach guest_state_test_main() to check guest state from within nested
-   VM
- - Update proposed tests to use guest/host state checks, wherein the
-   value is checked from MSR_CORE_PERF_GLOBAL_CTRL.
- - Changelog line wrapping
+Suggested-by: Jim Mattson <jmattson@google.com>
+Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+---
+ arch/x86/kvm/vmx/nested.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-v2 => v3:
- - Remove the value unchanged condition from
-   kvm_is_valid_perf_global_ctrl
- - Add line to changelog for patch 3/8
-
-v3 => v4:
- - Allow tests to set the guest func multiple times
- - Style fixes throughout kvm-unit-tests patches, per Krish's review
-
-This patchset exposes the "load IA32_PERF_GLOBAL_CTRL" to guests for nested
-VM-entry and VM-exit. There already was some existing code that supported
-the VM-exit ctrl, though it had an issue and was not exposed to the guest
-anyway. These patches are based on the original set that Krish Sadhukhan
-sent out earlier this year.
-
-Purpose of each patch:
-
-(1) Change the existing code that implemented the VM-exit functionality
-    to use kvm_set_msr() to avoid being overwritten by
-    atomic_perf_switch_msrs().
-(2) Update prepare_vmcs02() to implement the VM-entry functionality,
-    again using kvm_set_msr().
-(3) Create a helper function for checking the validity of an
-    IA32_PERF_GLOBAL_CTRL value against pmu->global_ctrl_mask.
-(4) Check guest state on VM-entry as described in the SDM.
-(5) Check host state on VM-entry as described in the SDM.
-(6) Expose the "load IA32_PERF_GLOBAL_CTRL" VM-entry and VM-exit
-    controls if IA32_PERF_GLOBAL_CTRL is a valid MSR.
-(7) Modify guest_state_test_main() to check guest state MSRs
-(8) Tests in kvm-unit-tests to check the VM-entry and VM-exit controls
-    work properly
-
-Oliver Upton (6):
-  KVM: nVMX: Use kvm_set_msr to load IA32_PERF_GLOBAL_CTRL on vmexit
-  KVM: nVMX: Load GUEST_IA32_PERF_GLOBAL_CTRL MSR on vm-entry
-  KVM: VMX: Add helper to check reserved bits in IA32_PERF_GLOBAL_CTRL
-  KVM: nVMX: check GUEST_IA32_PERF_GLOBAL_CTRL on VM-Entry
-  KVM: nVMX: Check HOST_IA32_PERF_GLOBAL_CTRL on VM-entry
-  KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL vm control if supported
-
- arch/x86/kvm/pmu.h           |  6 ++++++
- arch/x86/kvm/vmx/nested.c    | 37 +++++++++++++++++++++++++++++++++---
- arch/x86/kvm/vmx/pmu_intel.c |  5 ++++-
- arch/x86/kvm/vmx/vmx.c       | 21 ++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.h       |  1 +
- 5 files changed, 66 insertions(+), 4 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index ced9fba32598..b0ca34bf4d21 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3724,6 +3724,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 				   struct vmcs12 *vmcs12)
+ {
+ 	struct kvm_segment seg;
++	struct msr_data msr_info;
+ 	u32 entry_failure_code;
+ 
+ 	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_EFER)
+@@ -3800,9 +3801,15 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 		vmcs_write64(GUEST_IA32_PAT, vmcs12->host_ia32_pat);
+ 		vcpu->arch.pat = vmcs12->host_ia32_pat;
+ 	}
+-	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
+-		vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL,
+-			vmcs12->host_ia32_perf_global_ctrl);
++	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL) {
++		msr_info.host_initiated = false;
++		msr_info.index = MSR_CORE_PERF_GLOBAL_CTRL;
++		msr_info.data = vmcs12->host_ia32_perf_global_ctrl;
++		if (kvm_set_msr(vcpu, &msr_info))
++			pr_debug_ratelimited(
++				"%s cannot write MSR (0x%x, 0x%llx)\n",
++				__func__, msr_info.index, msr_info.data);
++	}
+ 
+ 	/* Set L1 segment info according to Intel SDM
+ 	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
 -- 
 2.23.0.187.g17f5b7556c-goog
 
