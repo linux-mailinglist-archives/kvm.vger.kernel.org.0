@@ -2,31 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4EFAAB4B3
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 11:13:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66F91AB514
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 11:43:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388083AbfIFJNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 05:13:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38756 "EHLO mx1.redhat.com"
+        id S2391218AbfIFJnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 05:43:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47290 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730704AbfIFJNV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 05:13:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1730471AbfIFJnb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 05:43:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F260A80038D
-        for <kvm@vger.kernel.org>; Fri,  6 Sep 2019 09:13:20 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 06261308FC20;
+        Fri,  6 Sep 2019 09:43:31 +0000 (UTC)
 Received: from [10.36.117.162] (ovpn-117-162.ams2.redhat.com [10.36.117.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FAA260BF1;
-        Fri,  6 Sep 2019 09:13:19 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] Update travis.yml to use bionic instead of
- trusty
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F5855D9CA;
+        Fri,  6 Sep 2019 09:43:29 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] travis.yml: Enable running of tests with
+ TCG
 To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Drew Jones <drjones@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-References: <20190829062650.19325-1-thuth@redhat.com>
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Drew Jones <drjones@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190830184509.15240-1-thuth@redhat.com>
 From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -73,47 +74,107 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <2184c503-098b-6111-df38-cfe0c3e22f74@redhat.com>
-Date:   Fri, 6 Sep 2019 11:13:18 +0200
+Message-ID: <b94ed46f-7e50-daae-321c-c01b473ca0ea@redhat.com>
+Date:   Fri, 6 Sep 2019 11:43:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190829062650.19325-1-thuth@redhat.com>
+In-Reply-To: <20190830184509.15240-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Fri, 06 Sep 2019 09:13:21 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Fri, 06 Sep 2019 09:43:31 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29.08.19 08:26, Thomas Huth wrote:
-> Ubuntu "trusty" is out of service, and at least for me, the Travis
-> jobs for kvm-unit-tests are failing because they can not find the
-> repositories anymore. Thus use a newer version of Ubuntu to do the
-> CI testing.
+On 30.08.19 20:45, Thomas Huth wrote:
+> Currently the tests at the end of the .travis.yml script are ignored,
+> since we can not use KVM in the Travis containers. But we can actually
+> run of some of the kvm-unit-tests with TCG instead, to make sure that
+> the binaries are not completely broken.
+> Thus introduce a new TESTS variable that lists the tests which we can
+> run with TCG. Unfortunately, the ppc64 and s390x QEMUs in Ubuntu also
+> need some extra love: The ppc64 version only works with the additional
+> "cap-htm=off" setting. And the s390x package lacks the firmware and
+> refuses to work unless we provide a fake firmware file here. Any file
+> works since the firmware is skipped when "-kernel" is used, so we can
+> simply use one of the pre-existing files in the source tree.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  .travis.yml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  .travis.yml | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
 > 
 > diff --git a/.travis.yml b/.travis.yml
-> index b06c33c..a4a165d 100644
+> index a4a165d..6c14953 100644
 > --- a/.travis.yml
 > +++ b/.travis.yml
-> @@ -1,5 +1,5 @@
->  sudo: false
-> -dist: trusty
-> +dist: bionic
->  language: c
->  compiler:
->    - gcc
+> @@ -20,24 +20,40 @@ env:
+>    matrix:
+>      - CONFIG=""
+>        BUILD_DIR="."
+> +      TESTS="vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ipi
+> +             vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed"
+>      - CONFIG=""
+>        BUILD_DIR="x86-builddir"
+> +      TESTS="ioapic-split ioapic smptest smptest3 eventinj msr port80 syscall
+> +             tsc rmap_chain umip intel_iommu vmexit_inl_pmtimer vmexit_ipi_halt"
+>      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+>        BUILD_DIR="."
+> +      TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
+>      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+>        BUILD_DIR="arm-buildir"
+> +      TESTS="pci-test pmu gicv2-active gicv3-active psci selftest-setup"
+>      - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
+>        BUILD_DIR="."
+> +      TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
+>      - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
+>        BUILD_DIR="arm64-buildir"
+> +      TESTS="pci-test pmu gicv2-active gicv3-active psci timer selftest-setup"
+>      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+>        BUILD_DIR="."
+> +      TESTS="spapr_hcall emulator rtas-set-time-of-day"
+> +      ACCEL="tcg,cap-htm=off"
+>      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+>        BUILD_DIR="ppc64le-buildir"
+> +      TESTS="rtas-get-time-of-day rtas-get-time-of-day-base"
+> +      ACCEL="tcg,cap-htm=off"
+>      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+>        BUILD_DIR="."
+> +      TESTS="diag10 diag308"
+> +      ACCEL="tcg,firmware=s390x/run"
+>      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+>        BUILD_DIR="s390x-builddir"
+> +      TESTS="sieve"
+> +      ACCEL="tcg,firmware=s390x/run"
+
+What about the other s390x tests? (is the QEMU binary too old to make
+them pass?)
+
+The issue with TCG is that you can easily get false negatives in case
+the QEMU binary changes (e.g., new Ubuntu release).
+
+"to make sure that the binaries are not completely broken" - while I
+understand the intuition behind that, I wonder if this is relevant in
+practice (especially, somebody committing changes without testing them,
+especially, under KVM). As long as the false negatives here don't hurt,
+I guess this change is fine.
+
+>  
+>  before_script:
+>    - mkdir -p $BUILD_DIR && cd $BUILD_DIR
+> @@ -45,4 +61,5 @@ before_script:
+>    - if [ -e ../configure ]; then ../configure $CONFIG ; fi
+>  script:
+>    - make -j3
+> -  - ./run_tests.sh || true
+> +  - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
+> +  - if grep -q FAIL results.txt ; then exit 1 ; fi
 > 
 
-Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
 
