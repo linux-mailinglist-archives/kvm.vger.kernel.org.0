@@ -2,55 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 30FBCABD44
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 18:05:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4B3FABDB1
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 18:27:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395078AbfIFQFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 12:05:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36870 "EHLO mail.kernel.org"
+        id S2388768AbfIFQ11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 12:27:27 -0400
+Received: from mga02.intel.com ([134.134.136.20]:8671 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392102AbfIFQFH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 12:05:07 -0400
-Subject: Re: [PULL] vhost, virtio: last minute fixes
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567785907;
-        bh=6dKqhgHm+LF4MKNxNOJfMbZ8mldeK+fKzvmBs20KYGA=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=sxSJKpT53C48cNP3QTWWR1YL/uamT1Lq4S08NoR3g7HXAvQoRBBd89dr28qJOujuT
-         WGMEVQDUyboqrradEl1dLNmYucJNt51UkPP1w9LmXd2dl2TnBCvkWykPnG1ly63RNy
-         99/8h9vVmlPyvqckxH/tOkJdMsPJUzCJmxdIz0I4=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190906094103-mutt-send-email-mst@kernel.org>
-References: <20190906094103-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190906094103-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 02fa5d7b17a761f53ef1eedfc254e1f33bd226b0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9d098a6234c135c3fd1692fc451908b5c2a43244
-Message-Id: <156778590706.8517.1772605570873720347.pr-tracker-bot@kernel.org>
-Date:   Fri, 06 Sep 2019 16:05:07 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jasowang@redhat.com, jiangkidd@hotmail.com, linyunsheng@huawei.com,
-        mst@redhat.com, namit@vmware.com, tiwei.bie@intel.com
+        id S1725871AbfIFQ11 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 12:27:27 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Sep 2019 09:27:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,473,1559545200"; 
+   d="scan'208";a="174325372"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga007.jf.intel.com with ESMTP; 06 Sep 2019 09:27:26 -0700
+Date:   Fri, 6 Sep 2019 09:27:26 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Evgeny Yakovlev <eyakovlev3@gmail.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        yc-core@yandex-team.ru, wrfsh@yandex-team.ru
+Subject: Re: [kvm-unit-tests RESEND PATCH] x86: Fix id_map buffer overflow
+ and PT corruption
+Message-ID: <20190906162726.GC29496@linux.intel.com>
+References: <1567756159-512600-1-git-send-email-wrfsh@yandex-team.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1567756159-512600-1-git-send-email-wrfsh@yandex-team.ru>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri, 6 Sep 2019 09:41:03 -0400:
+On Fri, Sep 06, 2019 at 10:49:19AM +0300, Evgeny Yakovlev wrote:
+> Commit 18a34cce introduced init_apic_map. It iterates over
+> sizeof(online_cpus) * 8 items and sets APIC ids in id_map.
+> However, online_cpus is defined (in x86/cstart[64].S) as a 64-bit
+> variable. After i >= 64, init_apic_map begins to read out of bounds of
+> online_cpus. If it finds a non-zero value there enough times,
+> it then proceeds to potentially overflow id_map in assignment.
+> 
+> In our test case id_map was linked close to pg_base. As a result page
+> table was corrupted and we've seen sporadic failures of ioapic test.
+> 
+> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
+> ---
+>  lib/x86/apic.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/lib/x86/apic.c b/lib/x86/apic.c
+> index 504299e..1ed8bab 100644
+> --- a/lib/x86/apic.c
+> +++ b/lib/x86/apic.c
+> @@ -228,14 +228,17 @@ void mask_pic_interrupts(void)
+>      outb(0xff, 0xa1);
+>  }
+>  
+> -extern unsigned char online_cpus[256 / 8];
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+The immediate issue can be resolved simply by fixing this definition.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9d098a6234c135c3fd1692fc451908b5c2a43244
+> +/* Should hold MAX_TEST_CPUS bits */
+> +extern uint64_t online_cpus;
+>  
+>  void init_apic_map(void)
+>  {
+>  	unsigned int i, j = 0;
+>  
+> -	for (i = 0; i < sizeof(online_cpus) * 8; i++) {
+> -		if ((1ul << (i % 8)) & (online_cpus[i / 8]))
+> +	assert(MAX_TEST_CPUS <= sizeof(online_cpus) * 8);
+> +
+> +	for (i = 0; i < MAX_TEST_CPUS; i++) {
+> +		if (online_cpus & ((uint64_t)1 << i))
 
-Thank you!
+This is functionally correct, but it's just as easy to have online_cpus
+sized based on MAX_TEST_CPUS, i.e. to allow MAX_TEST_CPUS to be changed
+at will (within reason).  I'll send patches.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+>  			id_map[j++] = i;
+>  	}
+>  }
+> -- 
+> 2.7.4
+> 
