@@ -2,189 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBD18ABB85
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 16:56:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D00CABC3B
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 17:23:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405670AbfIFOyv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 10:54:51 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45554 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394700AbfIFOyv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 10:54:51 -0400
-Received: by mail-pf1-f194.google.com with SMTP id y72so4626481pfb.12;
-        Fri, 06 Sep 2019 07:54:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:from:to:cc:date:message-id:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=R9EIePxtKgh7rutMNGBvqWvR/nyIQIv1yBQVlI6lc80=;
-        b=K7Hb+8Hh6OGFNptrd3xhs0dSBGL89ydD/TEtpjhiu9tPxvrsGW3oZrKONgKiu45x/P
-         dAbz7znolXERw89jByTZcAJWibJCzG0jedqFEGgpoJoUBO8qpsB7BBgraJiTg8Ry2NjA
-         cFWicLV2bexuIOGZulOA00dHHT+tzHPWjOnL3X8puT4y/bCgbfvETE/JpOryD+JF7qb6
-         f4DJmu/f0YRPuc0T7TkL7ScmlDt8nGyn0uxI7SXUFtPtXo01hwiAi1PxcFeYZTMEZcxU
-         nse6Vg4Q57o1ncXt/v2IDpjPPRvRkrAZoEnIkkaUX6KReSNrAhmG/BdcGcpJCeov5gII
-         nPDQ==
+        id S2394751AbfIFPXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 11:23:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51740 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2394745AbfIFPXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 11:23:13 -0400
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 84744369CC
+        for <kvm@vger.kernel.org>; Fri,  6 Sep 2019 15:23:13 +0000 (UTC)
+Received: by mail-qk1-f198.google.com with SMTP id t6so6821919qkm.7
+        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 08:23:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=R9EIePxtKgh7rutMNGBvqWvR/nyIQIv1yBQVlI6lc80=;
-        b=oPlorYZOg+/dMDI2y8KWunxDTdl3FJdc/9qzOZYBDxhR9PHxTT/jvTB6CS6NRnW+cC
-         heRVfzBIhAHC12LynP9LYqfAMiNUD9qj34hquQuh5b+YXVeCntT/5SIedvinnOU4hCB0
-         Nd00XoV+iyYvavyxXQidZxKt/DzOMW4m5CFNIInwFMDoeG1bsbdlyrkh/VfRw+eFtFXn
-         xCTHt+Y3Gs2TsOa0yaxzYCjzUUa8TDYVTQISkFv9hjj/9RVeF3QwEO0+066+Gb58VTKa
-         XY/5az66XMrM1+nw+flMmaHhvs3Q11f4sbNINKXbEu1M8BbQRoPRyS7s9Teh4DDcNfhO
-         /MLw==
-X-Gm-Message-State: APjAAAWrTR/+lLDpW7Vsqt6/pngP1biaCgW0Ygc1uv9QxYnXaAvO0cQe
-        2VsR8ZZUlGgUd78Z3b2Q7Cc=
-X-Google-Smtp-Source: APXvYqyR/D4tsD7rhNX2PQcMu+Gyd4kcgZa1BS+hYcFptabaRpV4hgMyTPouaYkRi3vtvC8wwpCvOQ==
-X-Received: by 2002:a17:90a:c20c:: with SMTP id e12mr10459302pjt.14.1567781690374;
-        Fri, 06 Sep 2019 07:54:50 -0700 (PDT)
-Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id v7sm3096573pjr.29.2019.09.06.07.54.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 07:54:49 -0700 (PDT)
-Subject: [PATCH v8 QEMU 3/3] virtio-balloon: Provide a interface for unused
- page reporting
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-To:     nitesh@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
-        david@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, virtio-dev@lists.oasis-open.org
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
-        konrad.wilk@oracle.com, willy@infradead.org,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, mhocko@kernel.org,
-        alexander.h.duyck@linux.intel.com, osalvador@suse.de
-Date:   Fri, 06 Sep 2019 07:54:49 -0700
-Message-ID: <20190906145449.574.85741.stgit@localhost.localdomain>
-In-Reply-To: <20190906145213.32552.30160.stgit@localhost.localdomain>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+0qfYdENvJZS+7XOB5nUvg22BeaGDp5RFB+PXPHe2sA=;
+        b=rFI7oogUPjH2WxRuY6Rf9P17+CoEmfys6mHR7n6ZjVeQHa5yDKgtmn0msRjB4roqdr
+         /4zZYijM6LNBiPWHt99HcPev711z4EWUpep6yXrj6GXdXjmCVYRlMfuYmC2/JXtD6LHF
+         7kEvDjWeKZABBkAuud6/jRswr7kpp/BJ+dabrMAO/qJnDS3/B/sdwWx72/u7B9v/LO2f
+         OhEe/CMGiwxMOTRHedZnlR++qYcbPkkxn6dSuM/cGNsw5dsEa3xXB2Mm+M3sdzLvCcfI
+         cjAAWuOJqN9t0VQOvT5cS32jnuI7UrobnppqA8B7akMbIQvQJdWGPi1A2qsM1tZvxCXv
+         GiKg==
+X-Gm-Message-State: APjAAAXnjbrPmdg/d0QY7uDh4asJUFkjtZyy80vOa0TRD6xkYjZ8RAYp
+        +8jZeOopGq/TK3NUj61+8czhDtByKVAEnrpoa/049tHNY3UWs+sHwUF0b+iN4+xQLeVwckrA8jJ
+        TMcPlIbJ3R/5i
+X-Received: by 2002:aed:2a3d:: with SMTP id c58mr2413008qtd.263.1567783392768;
+        Fri, 06 Sep 2019 08:23:12 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqysRIOzKDov+VLJzuU+1EVJ6lS9gwz44EHckhRXGPrzep783X6xQjMVtNeoDnVh5QAs4+gXfA==
+X-Received: by 2002:aed:2a3d:: with SMTP id c58mr2412982qtd.263.1567783392541;
+        Fri, 06 Sep 2019 08:23:12 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+        by smtp.gmail.com with ESMTPSA id o67sm788480qkf.8.2019.09.06.08.23.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2019 08:23:11 -0700 (PDT)
+Date:   Fri, 6 Sep 2019 11:23:03 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
+        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, virtio-dev@lists.oasis-open.org,
+        osalvador@suse.de, yang.zhang.wz@gmail.com, pagupta@redhat.com,
+        riel@surriel.com, konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
+Subject: Re: [PATCH v8 0/7] mm / virtio: Provide support for unused page
+ reporting
+Message-ID: <20190906112155-mutt-send-email-mst@kernel.org>
 References: <20190906145213.32552.30160.stgit@localhost.localdomain>
-User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190906145213.32552.30160.stgit@localhost.localdomain>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On Fri, Sep 06, 2019 at 07:53:21AM -0700, Alexander Duyck wrote:
+> This series provides an asynchronous means of reporting to a hypervisor
+> that a guest page is no longer in use and can have the data associated
+> with it dropped. To do this I have implemented functionality that allows
+> for what I am referring to as unused page reporting
+> 
+> The functionality for this is fairly simple. When enabled it will allocate
+> statistics to track the number of reported pages in a given free area.
+> When the number of free pages exceeds this value plus a high water value,
+> currently 32, it will begin performing page reporting which consists of
+> pulling pages off of free list and placing them into a scatter list. The
+> scatterlist is then given to the page reporting device and it will perform
+> the required action to make the pages "reported", in the case of
+> virtio-balloon this results in the pages being madvised as MADV_DONTNEED
+> and as such they are forced out of the guest. After this they are placed
+> back on the free list, and an additional bit is added if they are not
+> merged indicating that they are a reported buddy page instead of a
+> standard buddy page. The cycle then repeats with additional non-reported
+> pages being pulled until the free areas all consist of reported pages.
+> 
+> I am leaving a number of things hard-coded such as limiting the lowest
+> order processed to PAGEBLOCK_ORDER, and have left it up to the guest to
+> determine what the limit is on how many pages it wants to allocate to
+> process the hints. The upper limit for this is based on the size of the
+> queue used to store the scattergather list.
 
-Add support for what I am referring to as "unused page reporting".
-Basically the idea is to function very similar to how the balloon works
-in that we basically end up madvising the page as not being used. However
-we don't really need to bother with any deflate type logic since the page
-will be faulted back into the guest when it is read or written to.
+I queued this  so this gets tested on linux-next but the mm core changes
+need acks from appropriate people.
 
-This is meant to be a simplification of the existing balloon interface
-to use for providing hints to what memory needs to be freed. I am assuming
-this is safe to do as the deflate logic does not actually appear to do very
-much other than tracking what subpages have been released and which ones
-haven't.
-
-Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
----
- hw/virtio/virtio-balloon.c         |   46 ++++++++++++++++++++++++++++++++++--
- include/hw/virtio/virtio-balloon.h |    2 +-
- 2 files changed, 45 insertions(+), 3 deletions(-)
-
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 003b3ebcfdfb..7a30df63bc77 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -320,6 +320,40 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-     balloon_stats_change_timer(s, 0);
- }
- 
-+static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-+    VirtQueueElement *elem;
-+
-+    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-+    	unsigned int i;
-+
-+        for (i = 0; i < elem->in_num; i++) {
-+            void *addr = elem->in_sg[i].iov_base;
-+            size_t size = elem->in_sg[i].iov_len;
-+            ram_addr_t ram_offset;
-+            size_t rb_page_size;
-+            RAMBlock *rb;
-+
-+            if (qemu_balloon_is_inhibited() || dev->poison_val)
-+                continue;
-+
-+            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-+            rb_page_size = qemu_ram_pagesize(rb);
-+
-+            /* For now we will simply ignore unaligned memory regions */
-+            if ((ram_offset | size) & (rb_page_size - 1))
-+                continue;
-+
-+            ram_block_discard_range(rb, ram_offset, size);
-+        }
-+
-+        virtqueue_push(vq, elem, 0);
-+        virtio_notify(vdev, vq);
-+        g_free(elem);
-+    }
-+}
-+
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-@@ -627,7 +661,8 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-         return sizeof(struct virtio_balloon_config);
-     }
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
--        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_REPORTING)) {
-         return sizeof(struct virtio_balloon_config);
-     }
-     return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-@@ -715,7 +750,8 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
-     VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-     f |= dev->host_features;
-     virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
--    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(f, VIRTIO_BALLOON_F_REPORTING)) {
-         virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
-     }
- 
-@@ -805,6 +841,10 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-     s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-     s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
- 
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-+        s->rvq = virtio_add_queue(vdev, 32, virtio_balloon_handle_report);
-+    }
-+
-     if (virtio_has_feature(s->host_features,
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-@@ -931,6 +971,8 @@ static Property virtio_balloon_properties[] = {
-      */
-     DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
-                      qemu_4_0_config_size, false),
-+    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_REPORTING, true),
-     DEFINE_PROP_LINK("iothread", VirtIOBalloon, iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 7fe78e5c14d7..db5bf7127112 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -42,7 +42,7 @@ enum virtio_balloon_free_page_report_status {
- 
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
--    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-+    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *rvq;
-     uint32_t free_page_report_status;
-     uint32_t num_pages;
-     uint32_t actual;
-
+> My primary testing has just been to verify the memory is being freed after
+> allocation by running memhog 40g on a 40g guest and watching the total
+> free memory via /proc/meminfo on the host. With this I have verified most
+> of the memory is freed after each iteration. As far as performance I have
+> been mainly focusing on the will-it-scale/page_fault1 test running with
+> 16 vcpus. I have modified it to use Transparent Huge Pages. With this I
+> see almost no difference, -0.08%, with the patches applied and the feature
+> disabled. I see a regression of -0.86% with the feature enabled, but the
+> madvise disabled in the hypervisor due to a device being assigned. With
+> the feature fully enabled I see a regression of -3.27% versus the baseline
+> without these patches applied. In my testing I found that most of the
+> overhead was due to the page zeroing that comes as a result of the pages
+> having to be faulted back into the guest.
+> 
+> One side effect of these patches is that the guest becomes much more
+> resilient in terms of NUMA locality. With the pages being freed and then
+> reallocated when used it allows for the pages to be much closer to the
+> active thread, and as a result there can be situations where this patch
+> set will out-perform the stock kernel when the guest memory is not local
+> to the guest vCPUs. To avoid that in my testing I set the affinity of all
+> the vCPUs and QEMU instance to the same node.
+> 
+> Changes from the RFC:
+> https://lore.kernel.org/lkml/20190530215223.13974.22445.stgit@localhost.localdomain/
+> Moved aeration requested flag out of aerator and into zone->flags.
+> Moved boundary out of free_area and into local variables for aeration.
+> Moved aeration cycle out of interrupt and into workqueue.
+> Left nr_free as total pages instead of splitting it between raw and aerated.
+> Combined size and physical address values in virtio ring into one 64b value.
+> 
+> Changes from v1:
+> https://lore.kernel.org/lkml/20190619222922.1231.27432.stgit@localhost.localdomain/
+> Dropped "waste page treatment" in favor of "page hinting"
+> Renamed files and functions from "aeration" to "page_hinting"
+> Moved from page->lru list to scatterlist
+> Replaced wait on refcnt in shutdown with RCU and cancel_delayed_work_sync
+> Virtio now uses scatterlist directly instead of intermediate array
+> Moved stats out of free_area, now in separate area and pointed to from zone
+> Merged patch 5 into patch 4 to improve review-ability
+> Updated various code comments throughout
+> 
+> Changes from v2:
+> https://lore.kernel.org/lkml/20190724165158.6685.87228.stgit@localhost.localdomain/
+> Dropped "page hinting" in favor of "page reporting"
+> Renamed files from "hinting" to "reporting"
+> Replaced "Hinted" page type with "Reported" page flag
+> Added support for page poisoning while hinting is active
+> Add QEMU patch that implements PAGE_POISON feature
+> 
+> Changes from v3:
+> https://lore.kernel.org/lkml/20190801222158.22190.96964.stgit@localhost.localdomain/
+> Added mutex lock around page reporting startup and shutdown
+> Fixed reference to "page aeration" in patch 2
+> Split page reporting function bit out into separate QEMU patch
+> Limited capacity of scatterlist to vq size - 1 instead of vq size
+> Added exception handling for case of virtio descriptor allocation failure
+> 
+> Changes from v4:
+> https://lore.kernel.org/lkml/20190807224037.6891.53512.stgit@localhost.localdomain/
+> Replaced spin_(un)lock with spin_(un)lock_irq in page_reporting_cycle()
+> Dropped if/continue for ternary operator in page_reporting_process()
+> Added checks for isolate and cma types to for_each_reporting_migratetype_order
+> Added virtio-dev, Michal Hocko, and Oscar Salvador to to:/cc:
+> Rebased on latest linux-next and QEMU git trees
+> 
+> Changes from v5:
+> https://lore.kernel.org/lkml/20190812213158.22097.30576.stgit@localhost.localdomain/
+> Replaced spin_(un)lock with spin_(un)lock_irq in page_reporting_startup()
+> Updated shuffle code to use "shuffle_pick_tail" and updated patch description
+> Dropped storage of order and migratettype while page is being reported
+> Used get_pfnblock_migratetype to determine migratetype of page
+> Renamed put_reported_page to free_reported_page, added order as argument
+> Dropped check for CMA type as I believe we should be reporting those
+> Added code to allow moving of reported pages into and out of isolation
+> Defined page reporting order as minimum of Huge Page size vs MAX_ORDER - 1
+> Cleaned up use of static branch usage for page_reporting_notify_enabled
+> 
+> Changes from v6:
+> https://lore.kernel.org/lkml/20190821145806.20926.22448.stgit@localhost.localdomain/
+> Rebased on linux-next for 20190903
+> Added jump label to __page_reporting_request so we release RCU read lock
+> Removed "- 1" from capacity limit based on virtio ring
+> Added code to verify capacity is non-zero or return error on startup
+> 
+> Changes from v7:
+> https://lore.kernel.org/lkml/20190904150920.13848.32271.stgit@localhost.localdomain/
+> Updated poison fixes to clear flag if "nosanity" is enabled in kernel config
+> Split shuffle per-cpu optimization into seperate patch
+> Moved check for !phdev->capacity into reporting patch where it belongs
+> Added Reviewed-by tags received for v7
+> 
+> ---
+> 
+> Alexander Duyck (7):
+>       mm: Add per-cpu logic to page shuffling
+>       mm: Adjust shuffle code to allow for future coalescing
+>       mm: Move set/get_pcppage_migratetype to mmzone.h
+>       mm: Use zone and order instead of free area in free_list manipulators
+>       mm: Introduce Reported pages
+>       virtio-balloon: Pull page poisoning config out of free page hinting
+>       virtio-balloon: Add support for providing unused page reports to host
+> 
+> 
+>  drivers/virtio/Kconfig              |    1 
+>  drivers/virtio/virtio_balloon.c     |   87 ++++++++-
+>  include/linux/mmzone.h              |  124 ++++++++-----
+>  include/linux/page-flags.h          |   11 +
+>  include/linux/page_reporting.h      |  177 ++++++++++++++++++
+>  include/uapi/linux/virtio_balloon.h |    1 
+>  mm/Kconfig                          |    5 +
+>  mm/Makefile                         |    1 
+>  mm/internal.h                       |   18 ++
+>  mm/memory_hotplug.c                 |    1 
+>  mm/page_alloc.c                     |  216 ++++++++++++++++------
+>  mm/page_reporting.c                 |  340 +++++++++++++++++++++++++++++++++++
+>  mm/shuffle.c                        |   40 ++--
+>  mm/shuffle.h                        |   12 +
+>  14 files changed, 902 insertions(+), 132 deletions(-)
+>  create mode 100644 include/linux/page_reporting.h
+>  create mode 100644 mm/page_reporting.c
+> 
+> --
