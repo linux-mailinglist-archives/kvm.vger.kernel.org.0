@@ -2,138 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 132FEAB028
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 03:31:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3B39AB070
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 03:54:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404182AbfIFBa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 21:30:27 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:34445 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403979AbfIFBa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Sep 2019 21:30:27 -0400
-Received: by mail-pf1-f196.google.com with SMTP id r12so3191236pfh.1;
-        Thu, 05 Sep 2019 18:30:26 -0700 (PDT)
+        id S2390965AbfIFByh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 21:54:37 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:46955 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730991AbfIFByh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 21:54:37 -0400
+Received: by mail-ot1-f67.google.com with SMTP id g19so4230236otg.13;
+        Thu, 05 Sep 2019 18:54:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=lzU0KnwlLwZRT/00/44UaOi16RS92F7Mftz12Dneqw0=;
-        b=BFmak78KIEynzF4dsEtKE2pyq+InTsB0IwkxiZIhXyCANQaY+y2RNUcjNY+eQP0297
-         /3bxyIm1pAnXXCbWwE3pCwQRcnvtI3Jmki9dxQ0VJa43AFWsgjsMuvdUSPpGRY3ulEW3
-         DiR14PUuuB4xDypIGY3uwsdDa1BaQNohXBqlcK1Evci2KZ+M7e4DdhmeLho9Qo36fHQu
-         qf52Vsjaw5jOXPCKwVPc7a9Y0rglI3z9Agc/2+zHYlhnfh6/nDBNQ8GVn5pp9QdwA1kS
-         m7AosbQmRSdZjhmb/vrTF1zwu898BZn74VD1veuFFLUc5sAGhavFEtrFxBEs3UnvSVeN
-         28jw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=K4IFwD6VM+XLab7BYsbQN6PVDmVS6cIQkZE+YPWUOPU=;
+        b=WrLJm/MW5tbyw7TlKFFlM2O2CiNTHVtwpxcgm0nmNCI9be7PPZbHhtNkHYn5/eceZT
+         A0IRWAJAZEa4Ipem66aHvsFLLW6NXJmX4xS/n7twVXWUkCkeXvdo8HEC/P37Lqt9SuC2
+         qXDv22KnGWOp/mtuGE3/V0MzR9ukygUrBvFf1xzoPk/xVsEGGFjQppAt+oMHfXB9KDON
+         W+9fT6k7bWM7GwPOFjJSYkUVDHS3+8ZNGcflYJD0p7tGgYotZzTGrq6KRsE0kn54e4NH
+         tA0fbfg4JMPSLMmBzpVDuSUuAYht/fuFECkkNVZixWIGPFfHrAJ974GDQ6YgfI6GWf3Y
+         xh+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=lzU0KnwlLwZRT/00/44UaOi16RS92F7Mftz12Dneqw0=;
-        b=su8StgWMqC/QPPxj+xvWYabG+CHx9tzAgDVOY49wNMM2NFZU/siZPYQLNhc0NqhfIY
-         KrNeebwkkmSY41K4uNvMYA1mp+YB2pXblk7rJZ1uKbt0QWsBfrF0FPT54Tr+PkiejYZr
-         ZQKzDk0d8TwQWxX2+mzB6l6Mh4KPo7ZsSpdZJa/fnAj5/Q8Obk4e11u2d0Z7a8eSEBUH
-         IO0YlYV1vKIsVR2K0IXSdusG1ka+J6YLVCXhwEIBDV3kMizv+I3iJ/f7SPtQE1ohqVak
-         JcnL2+WM85O5mCscj8etE6RJgyzO5jgpQXcAQn1EfLQ1RrlPYAmqjcVX2feUhLiYmsJi
-         SraQ==
-X-Gm-Message-State: APjAAAUthm0foSjuszinybBxNXnYRU9Z2S/yrsp4z1MsWc8yhGxk9/9s
-        lq5VT8qhcQyjmD0E885u1qOR8Hjk
-X-Google-Smtp-Source: APXvYqyPzRoAay3eF3jG73d8xyiw9BP2olD/7SS7dUF38q/pUW5/uylf1N/SvNnzddQ3nZ3DoHyg2A==
-X-Received: by 2002:a65:5a8c:: with SMTP id c12mr5706037pgt.73.1567733426195;
-        Thu, 05 Sep 2019 18:30:26 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id g11sm3332294pgu.11.2019.09.05.18.30.23
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 05 Sep 2019 18:30:25 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2 5/5] KVM: hyperv: Fix Direct Synthetic timers assert an interrupt w/o lapic_in_kernel
-Date:   Fri,  6 Sep 2019 09:30:04 +0800
-Message-Id: <1567733404-7759-5-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1567733404-7759-1-git-send-email-wanpengli@tencent.com>
-References: <1567733404-7759-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=K4IFwD6VM+XLab7BYsbQN6PVDmVS6cIQkZE+YPWUOPU=;
+        b=eIxoqjMHbsHhbE+dIEVC+8umb7s9nQYd+IBwIMNlPNXqkgokv+bjgDFAKHxA5+Vr+e
+         +gdoqrhYlkLcT6PGn67/bdes+pFKpzWNprxaDTXuFaSMtnQVGec4Tg+avJoKiVow/lEe
+         WiTj3o/KYwAuolnzJb767AWhywQQ1gStM5nfOGsqYqL7zq5nOI9A0mJxQUCKSqWnfqf8
+         hsb9EEEGCbAtgJp6ISwbU8a1qV8GLIWhYV56djD5PqqlGKiGyM/Qe+qxj2sCfmBjmDol
+         XRqhJwI+FtZkH/2H7JRj0VF4mFrap9DErS0ujlQyRKZIPRxm1xojlZkMSXCfBBkO8nax
+         1s9g==
+X-Gm-Message-State: APjAAAUSFwF7Le7L+cp4oNcgHelt+Wrsvn5sgBd8KF2eBkJF+h8Z5PWy
+        eEkr6VCBDhRN6LDuwCzW64sdqsytkGsiV1JwMu4=
+X-Google-Smtp-Source: APXvYqyfziUSAkRNvffX8M48//3wAYR9dKmOeDSPAKVir2eFp79YrLdsxiD2iIxxWfguu0ZSJzJmQ2d0M3HpFcgZcKE=
+X-Received: by 2002:a9d:3ae:: with SMTP id f43mr4081296otf.254.1567734875909;
+ Thu, 05 Sep 2019 18:54:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1567680270-14022-1-git-send-email-wanpengli@tencent.com> <87ftlakhn6.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87ftlakhn6.fsf@vitty.brq.redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 6 Sep 2019 09:54:23 +0800
+Message-ID: <CANRm+CyPxb+ZY2cTdbLL_LBKMJSOaMqnPGKc_ATc6-TMHW-rJw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: LAPIC: Fix SynIC Timers inject timer interrupt w/o
+ LAPIC present
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, 5 Sep 2019 at 21:16, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Wanpeng Li <kernellwp@gmail.com> writes:
+>
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Reported by syzkaller:
+> >
+> >       kasan: GPF could be caused by NULL-ptr deref or user memory acces=
+s
+> >       general protection fault: 0000 [#1] PREEMPT SMP KASAN
+> >       RIP: 0010:__apic_accept_irq+0x46/0x740 arch/x86/kvm/lapic.c:1029
+> >       Call Trace:
+> >       kvm_apic_set_irq+0xb4/0x140 arch/x86/kvm/lapic.c:558
+> >       stimer_notify_direct arch/x86/kvm/hyperv.c:648 [inline]
+> >       stimer_expiration arch/x86/kvm/hyperv.c:659 [inline]
+> >       kvm_hv_process_stimers+0x594/0x1650 arch/x86/kvm/hyperv.c:686
+> >       vcpu_enter_guest+0x2b2a/0x54b0 arch/x86/kvm/x86.c:7896
+> >       vcpu_run+0x393/0xd40 arch/x86/kvm/x86.c:8152
+> >       kvm_arch_vcpu_ioctl_run+0x636/0x900 arch/x86/kvm/x86.c:8360
+> >       kvm_vcpu_ioctl+0x6cf/0xaf0 arch/x86/kvm/../../../virt/kvm/kvm_mai=
+n.c:2765
+> >
+> > The testcase programs HV_X64_MSR_STIMERn_CONFIG/HV_X64_MSR_STIMERn_COUN=
+T,
+> > in addition, there is no lapic in the kernel, the counters value are sm=
+all
+> > enough in order that kvm_hv_process_stimers() inject this already-expir=
+ed
+> > timer interrupt into the guest through lapic in the kernel which trigge=
+rs
+> > the NULL deferencing. This patch fixes it by checking lapic_in_kernel,
+> > discarding the inject if it is 0.
+> >
+> > Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> >  arch/x86/kvm/hyperv.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> > index c10a8b1..461fcc5 100644
+> > --- a/arch/x86/kvm/hyperv.c
+> > +++ b/arch/x86/kvm/hyperv.c
+> > @@ -645,7 +645,9 @@ static int stimer_notify_direct(struct kvm_vcpu_hv_=
+stimer *stimer)
+> >               .vector =3D stimer->config.apic_vector
+> >       };
+> >
+> > -     return !kvm_apic_set_irq(vcpu, &irq, NULL);
+> > +     if (lapic_in_kernel(vcpu))
+> > +             return !kvm_apic_set_irq(vcpu, &irq, NULL);
+> > +     return 0;
+> >  }
+> >
+> >  static void stimer_expiration(struct kvm_vcpu_hv_stimer *stimer)
+>
+> Hm, but this basically means direct mode synthetic timers won't work
+> when LAPIC is not in kernel but the feature will still be advertised to
+> the guest, not good. Shall we stop advertizing it? Something like
+> (completely untested):
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 3f5ad84853fb..1dfa594eaab6 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1856,7 +1856,13 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *v=
+cpu, struct kvm_cpuid2 *cpuid,
+>
+>                         ent->edx |=3D HV_FEATURE_FREQUENCY_MSRS_AVAILABLE=
+;
+>                         ent->edx |=3D HV_FEATURE_GUEST_CRASH_MSR_AVAILABL=
+E;
+> -                       ent->edx |=3D HV_STIMER_DIRECT_MODE_AVAILABLE;
+> +
+> +                       /*
+> +                        * Direct Synthetic timers only make sense with i=
+n-kernel
+> +                        * LAPIC
+> +                        */
+> +                       if (lapic_in_kernel(vcpu))
+> +                               ent->edx |=3D HV_STIMER_DIRECT_MODE_AVAIL=
+ABLE;
+>
+>                         break;
 
-Reported by syzkaller:
+Thanks, I fold this into v2, syzkaller even didn't check the cpuid, so
+I still keep the discard inject part.
 
-	kasan: GPF could be caused by NULL-ptr deref or user memory access
-	general protection fault: 0000 [#1] PREEMPT SMP KASAN
-	RIP: 0010:__apic_accept_irq+0x46/0x740 arch/x86/kvm/lapic.c:1029
-	Call Trace:
-	kvm_apic_set_irq+0xb4/0x140 arch/x86/kvm/lapic.c:558
-	stimer_notify_direct arch/x86/kvm/hyperv.c:648 [inline]
-	stimer_expiration arch/x86/kvm/hyperv.c:659 [inline]
-	kvm_hv_process_stimers+0x594/0x1650 arch/x86/kvm/hyperv.c:686
-	vcpu_enter_guest+0x2b2a/0x54b0 arch/x86/kvm/x86.c:7896
-	vcpu_run+0x393/0xd40 arch/x86/kvm/x86.c:8152
-	kvm_arch_vcpu_ioctl_run+0x636/0x900 arch/x86/kvm/x86.c:8360
-	kvm_vcpu_ioctl+0x6cf/0xaf0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2765
-
-The testcase programs HV_X64_MSR_STIMERn_CONFIG/HV_X64_MSR_STIMERn_COUNT,
-in addition, there is no lapic in the kernel, the counters value are small
-enough in order that kvm_hv_process_stimers() inject this already-expired
-timer interrupt into the guest through lapic in the kernel which triggers
-the NULL deferencing. This patch fixes it by don't advertise direct mode 
-synthetic timers and discarding the inject when lapic is not in kernel.
-
-Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-v1 -> v2:
- * don't advertise direct mode synthetic timers when lapic is not in kernel
-
- arch/x86/kvm/hyperv.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index c10a8b1..069e655 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -645,7 +645,9 @@ static int stimer_notify_direct(struct kvm_vcpu_hv_stimer *stimer)
- 		.vector = stimer->config.apic_vector
- 	};
- 
--	return !kvm_apic_set_irq(vcpu, &irq, NULL);
-+	if (lapic_in_kernel(vcpu))
-+		return !kvm_apic_set_irq(vcpu, &irq, NULL);
-+	return 0;
- }
- 
- static void stimer_expiration(struct kvm_vcpu_hv_stimer *stimer)
-@@ -1849,7 +1851,13 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
- 			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
--			ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
-+
-+			/*
-+			 * Direct Synthetic timers only make sense with in-kernel
-+			 * LAPIC
-+			 */
-+			if (lapic_in_kernel(vcpu))
-+				ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
- 
- 			break;
- 
--- 
-2.7.4
-
+                                                                   Wanpeng
