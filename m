@@ -2,92 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A4B3FABDB1
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 18:27:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 628CEABDC6
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 18:33:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388768AbfIFQ11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 12:27:27 -0400
-Received: from mga02.intel.com ([134.134.136.20]:8671 "EHLO mga02.intel.com"
+        id S2390324AbfIFQdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 12:33:45 -0400
+Received: from foss.arm.com ([217.140.110.172]:59086 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725871AbfIFQ11 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 12:27:27 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Sep 2019 09:27:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,473,1559545200"; 
-   d="scan'208";a="174325372"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga007.jf.intel.com with ESMTP; 06 Sep 2019 09:27:26 -0700
-Date:   Fri, 6 Sep 2019 09:27:26 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Evgeny Yakovlev <eyakovlev3@gmail.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
-        yc-core@yandex-team.ru, wrfsh@yandex-team.ru
-Subject: Re: [kvm-unit-tests RESEND PATCH] x86: Fix id_map buffer overflow
- and PT corruption
-Message-ID: <20190906162726.GC29496@linux.intel.com>
-References: <1567756159-512600-1-git-send-email-wrfsh@yandex-team.ru>
+        id S1725871AbfIFQdo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 12:33:44 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F00031570;
+        Fri,  6 Sep 2019 09:33:43 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 48DAB3F59C;
+        Fri,  6 Sep 2019 09:33:43 -0700 (PDT)
+Date:   Fri, 6 Sep 2019 17:32:51 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvm-unit-tests] arm: gic: enable GIC MMIO tests for
+ GICv3 as well
+Message-ID: <20190906173251.66795717@donnerap.cambridge.arm.com>
+In-Reply-To: <20190906064837.6afynobk3p6a64hv@kamzik.brq.redhat.com>
+References: <20190905172114.215380-1-andre.przywara@arm.com>
+        <20190906064837.6afynobk3p6a64hv@kamzik.brq.redhat.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1567756159-512600-1-git-send-email-wrfsh@yandex-team.ru>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 06, 2019 at 10:49:19AM +0300, Evgeny Yakovlev wrote:
-> Commit 18a34cce introduced init_apic_map. It iterates over
-> sizeof(online_cpus) * 8 items and sets APIC ids in id_map.
-> However, online_cpus is defined (in x86/cstart[64].S) as a 64-bit
-> variable. After i >= 64, init_apic_map begins to read out of bounds of
-> online_cpus. If it finds a non-zero value there enough times,
-> it then proceeds to potentially overflow id_map in assignment.
-> 
-> In our test case id_map was linked close to pg_base. As a result page
-> table was corrupted and we've seen sporadic failures of ioapic test.
-> 
-> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-> ---
->  lib/x86/apic.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/lib/x86/apic.c b/lib/x86/apic.c
-> index 504299e..1ed8bab 100644
-> --- a/lib/x86/apic.c
-> +++ b/lib/x86/apic.c
-> @@ -228,14 +228,17 @@ void mask_pic_interrupts(void)
->      outb(0xff, 0xa1);
->  }
->  
-> -extern unsigned char online_cpus[256 / 8];
+On Fri, 6 Sep 2019 08:48:37 +0200
+Andrew Jones <drjones@redhat.com> wrote:
 
-The immediate issue can be resolved simply by fixing this definition.
+Hi,
 
-> +/* Should hold MAX_TEST_CPUS bits */
-> +extern uint64_t online_cpus;
->  
->  void init_apic_map(void)
->  {
->  	unsigned int i, j = 0;
->  
-> -	for (i = 0; i < sizeof(online_cpus) * 8; i++) {
-> -		if ((1ul << (i % 8)) & (online_cpus[i / 8]))
-> +	assert(MAX_TEST_CPUS <= sizeof(online_cpus) * 8);
-> +
-> +	for (i = 0; i < MAX_TEST_CPUS; i++) {
-> +		if (online_cpus & ((uint64_t)1 << i))
-
-This is functionally correct, but it's just as easy to have online_cpus
-sized based on MAX_TEST_CPUS, i.e. to allow MAX_TEST_CPUS to be changed
-at will (within reason).  I'll send patches.
-
->  			id_map[j++] = i;
->  	}
->  }
-> -- 
-> 2.7.4
+> On Thu, Sep 05, 2019 at 06:21:14PM +0100, Andre Przywara wrote:
+> > So far the GIC MMIO tests were only enabled for a GICv2 guest. Modern
+> > machines tend to have a GICv3-only GIC, so can't run those guests.
+> > It turns out that most GIC distributor registers we test in the unit
+> > tests are actually the same in GICv3, so we can just enable those tests
+> > for GICv3 guests as well.
+> > The only exception is the CPU number in the TYPER register, which we
+> > just protect against running on a GICv3 guest.
+> > 
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  arm/gic.c         | 13 +++++++++++--
+> >  arm/unittests.cfg | 16 +++++++++++-----
+> >  lib/arm/asm/gic.h |  2 ++
+> >  3 files changed, 24 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arm/gic.c b/arm/gic.c
+> > index ed5642e..bd3c027 100644
+> > --- a/arm/gic.c
+> > +++ b/arm/gic.c
+> > @@ -6,6 +6,7 @@
+> >   *   + MMIO access tests
+> >   * GICv3
+> >   *   + test sending/receiving IPIs
+> > + *   + MMIO access tests
+> >   *
+> >   * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> >   *
+> > @@ -483,7 +484,14 @@ static void gic_test_mmio(void)
+> >  		idreg = gic_dist_base + GICD_ICPIDR2;
+> >  		break;
+> >  	case 0x3:
+> > -		report_abort("GICv3 MMIO tests NYI");
+> > +		/*
+> > +		 * We only test generic registers or those affecting
+> > +		 * SPIs, so don't need to consider the SGI base in
+> > +		 * the redistributor here.
+> > +		 */
+> > +		gic_dist_base = gicv3_dist_base();
+> > +		idreg = gic_dist_base + GICD_PIDR2;
+> > +		break;
+> >  	default:
+> >  		report_abort("GIC version %d not supported", gic_version());
+> >  	}
+> > @@ -492,7 +500,8 @@ static void gic_test_mmio(void)
+> >  	nr_irqs = GICD_TYPER_IRQS(reg);
+> >  	report_info("number of implemented SPIs: %d", nr_irqs - GIC_FIRST_SPI);
+> >  
+> > -	test_typer_v2(reg);
+> > +	if (gic_version() == 0x2)
+> > +		test_typer_v2(reg);
+> >  
+> >  	report_info("IIDR: 0x%08x", readl(gic_dist_base + GICD_IIDR));
+> >  
+> > diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> > index 6d3df92..3fd5b04 100644
+> > --- a/arm/unittests.cfg
+> > +++ b/arm/unittests.cfg
+> > @@ -86,22 +86,28 @@ smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> >  extra_params = -machine gic-version=2 -append 'ipi'
+> >  groups = gic
+> >  
+> > -[gicv2-mmio]
+> > +[gicv2-max-mmio]
+> >  file = gic.flat
+> >  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+> >  extra_params = -machine gic-version=2 -append 'mmio'
+> >  groups = gic
+> >  
+> > -[gicv2-mmio-up]
+> > +[gicv3-max-mmio]
+> > +file = gic.flat
+> > +smp = $MAX_SMP
+> > +extra_params = -machine gic-version=3 -append 'mmio'
+> > +groups = gic
+> > +
+> > +[gic-mmio-up]
+> >  file = gic.flat
+> >  smp = 1
+> > -extra_params = -machine gic-version=2 -append 'mmio'
+> > +extra_params = -append 'mmio'
+> >  groups = gic
+> >  
+> > -[gicv2-mmio-3p]
+> > +[gic-mmio-3p]
+> >  file = gic.flat
+> >  smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
+> > -extra_params = -machine gic-version=2 -append 'mmio'
+> > +extra_params = -append 'mmio'
+> >  groups = gic
+> >  
+> >  [gicv3-ipi]
+> > diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> > index f6dfb90..ffed025 100644
+> > --- a/lib/arm/asm/gic.h
+> > +++ b/lib/arm/asm/gic.h
+> > @@ -23,6 +23,8 @@
+> >  #define GICD_ITARGETSR			0x0800
+> >  #define GICD_SGIR			0x0f00
+> >  #define GICD_ICPIDR2			0x0fe8
+> > +/* only in GICv3 */
+> > +#define GICD_PIDR2			0xffe8  
 > 
+> If this is gicv3-only, then shouldn't it go to lib/arm/asm/gic-v3.h ?
+
+Ah, true, I missed that file.
+
+Added it there, I will send a reworked version as part of now some bigger series to test GICD_IROUTER and SPIs as well.
+
+> 
+> >  
+> >  #define GICD_TYPER_IRQS(typer)		((((typer) & 0x1f) + 1) * 32)
+> >  #define GICD_INT_EN_SET_SGI		0x0000ffff
+> > -- 
+> > 2.17.1
+> >   
+> 
+> Otherwise
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks!
+
+Cheers,
+Andre.
