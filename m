@@ -2,32 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66F91AB514
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 11:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2466AB51F
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 11:52:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391218AbfIFJnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 05:43:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47290 "EHLO mx1.redhat.com"
+        id S2388119AbfIFJv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 05:51:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47882 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730471AbfIFJnb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 05:43:31 -0400
+        id S1726073AbfIFJv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 05:51:57 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 06261308FC20;
-        Fri,  6 Sep 2019 09:43:31 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1162C30917AF;
+        Fri,  6 Sep 2019 09:51:57 +0000 (UTC)
 Received: from [10.36.117.162] (ovpn-117-162.ams2.redhat.com [10.36.117.162])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F5855D9CA;
-        Fri,  6 Sep 2019 09:43:29 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] travis.yml: Enable running of tests with
- TCG
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Drew Jones <drjones@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190830184509.15240-1-thuth@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 54E2E5D9CA;
+        Fri,  6 Sep 2019 09:51:43 +0000 (UTC)
+Subject: Re: [PATCH v7 3/6] mm: Use zone and order instead of free area in
+ free_list manipulators
+To:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
+        kvm@vger.kernel.org, mst@redhat.com, dave.hansen@intel.com,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        virtio-dev@lists.oasis-open.org, osalvador@suse.de
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
+References: <20190904150920.13848.32271.stgit@localhost.localdomain>
+ <20190904151043.13848.23471.stgit@localhost.localdomain>
 From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -74,107 +78,274 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <b94ed46f-7e50-daae-321c-c01b473ca0ea@redhat.com>
-Date:   Fri, 6 Sep 2019 11:43:28 +0200
+Message-ID: <ce85c93e-f655-2255-8f1d-07825f3fb0dd@redhat.com>
+Date:   Fri, 6 Sep 2019 11:51:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190830184509.15240-1-thuth@redhat.com>
+In-Reply-To: <20190904151043.13848.23471.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Fri, 06 Sep 2019 09:43:31 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 06 Sep 2019 09:51:57 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30.08.19 20:45, Thomas Huth wrote:
-> Currently the tests at the end of the .travis.yml script are ignored,
-> since we can not use KVM in the Travis containers. But we can actually
-> run of some of the kvm-unit-tests with TCG instead, to make sure that
-> the binaries are not completely broken.
-> Thus introduce a new TESTS variable that lists the tests which we can
-> run with TCG. Unfortunately, the ppc64 and s390x QEMUs in Ubuntu also
-> need some extra love: The ppc64 version only works with the additional
-> "cap-htm=off" setting. And the s390x package lacks the firmware and
-> refuses to work unless we provide a fake firmware file here. Any file
-> works since the firmware is skipped when "-kernel" is used, so we can
-> simply use one of the pre-existing files in the source tree.
+On 04.09.19 17:10, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> In order to enable the use of the zone from the list manipulator functions
+> I will need access to the zone pointer. As it turns out most of the
+> accessors were always just being directly passed &zone->free_area[order]
+> anyway so it would make sense to just fold that into the function itself
+> and pass the zone and order as arguments instead of the free area.
+> 
+> In order to be able to reference the zone we need to move the declaration
+> of the functions down so that we have the zone defined before we define the
+> list manipulation functions.
+> 
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > ---
->  .travis.yml | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+>  include/linux/mmzone.h |   70 ++++++++++++++++++++++++++----------------------
+>  mm/page_alloc.c        |   30 ++++++++-------------
+>  2 files changed, 49 insertions(+), 51 deletions(-)
 > 
-> diff --git a/.travis.yml b/.travis.yml
-> index a4a165d..6c14953 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -20,24 +20,40 @@ env:
->    matrix:
->      - CONFIG=""
->        BUILD_DIR="."
-> +      TESTS="vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ipi
-> +             vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed"
->      - CONFIG=""
->        BUILD_DIR="x86-builddir"
-> +      TESTS="ioapic-split ioapic smptest smptest3 eventinj msr port80 syscall
-> +             tsc rmap_chain umip intel_iommu vmexit_inl_pmtimer vmexit_ipi_halt"
->      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
->        BUILD_DIR="."
-> +      TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
->      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
->        BUILD_DIR="arm-buildir"
-> +      TESTS="pci-test pmu gicv2-active gicv3-active psci selftest-setup"
->      - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
->        BUILD_DIR="."
-> +      TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
->      - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
->        BUILD_DIR="arm64-buildir"
-> +      TESTS="pci-test pmu gicv2-active gicv3-active psci timer selftest-setup"
->      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
->        BUILD_DIR="."
-> +      TESTS="spapr_hcall emulator rtas-set-time-of-day"
-> +      ACCEL="tcg,cap-htm=off"
->      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
->        BUILD_DIR="ppc64le-buildir"
-> +      TESTS="rtas-get-time-of-day rtas-get-time-of-day-base"
-> +      ACCEL="tcg,cap-htm=off"
->      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
->        BUILD_DIR="."
-> +      TESTS="diag10 diag308"
-> +      ACCEL="tcg,firmware=s390x/run"
->      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
->        BUILD_DIR="s390x-builddir"
-> +      TESTS="sieve"
-> +      ACCEL="tcg,firmware=s390x/run"
-
-What about the other s390x tests? (is the QEMU binary too old to make
-them pass?)
-
-The issue with TCG is that you can easily get false negatives in case
-the QEMU binary changes (e.g., new Ubuntu release).
-
-"to make sure that the binaries are not completely broken" - while I
-understand the intuition behind that, I wonder if this is relevant in
-practice (especially, somebody committing changes without testing them,
-especially, under KVM). As long as the false negatives here don't hurt,
-I guess this change is fine.
-
+> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+> index 125f300981c6..2ddf1f1971c0 100644
+> --- a/include/linux/mmzone.h
+> +++ b/include/linux/mmzone.h
+> @@ -100,29 +100,6 @@ struct free_area {
+>  	unsigned long		nr_free;
+>  };
 >  
->  before_script:
->    - mkdir -p $BUILD_DIR && cd $BUILD_DIR
-> @@ -45,4 +61,5 @@ before_script:
->    - if [ -e ../configure ]; then ../configure $CONFIG ; fi
->  script:
->    - make -j3
-> -  - ./run_tests.sh || true
-> +  - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
-> +  - if grep -q FAIL results.txt ; then exit 1 ; fi
+> -/* Used for pages not on another list */
+> -static inline void add_to_free_area(struct page *page, struct free_area *area,
+> -			     int migratetype)
+> -{
+> -	list_add(&page->lru, &area->free_list[migratetype]);
+> -	area->nr_free++;
+> -}
+> -
+> -/* Used for pages not on another list */
+> -static inline void add_to_free_area_tail(struct page *page, struct free_area *area,
+> -				  int migratetype)
+> -{
+> -	list_add_tail(&page->lru, &area->free_list[migratetype]);
+> -	area->nr_free++;
+> -}
+> -
+> -/* Used for pages which are on another list */
+> -static inline void move_to_free_area(struct page *page, struct free_area *area,
+> -			     int migratetype)
+> -{
+> -	list_move(&page->lru, &area->free_list[migratetype]);
+> -}
+> -
+>  static inline struct page *get_page_from_free_area(struct free_area *area,
+>  					    int migratetype)
+>  {
+> @@ -130,15 +107,6 @@ static inline struct page *get_page_from_free_area(struct free_area *area,
+>  					struct page, lru);
+>  }
+>  
+> -static inline void del_page_from_free_area(struct page *page,
+> -		struct free_area *area)
+> -{
+> -	list_del(&page->lru);
+> -	__ClearPageBuddy(page);
+> -	set_page_private(page, 0);
+> -	area->nr_free--;
+> -}
+> -
+>  static inline bool free_area_empty(struct free_area *area, int migratetype)
+>  {
+>  	return list_empty(&area->free_list[migratetype]);
+> @@ -796,6 +764,44 @@ static inline bool pgdat_is_empty(pg_data_t *pgdat)
+>  	return !pgdat->node_start_pfn && !pgdat->node_spanned_pages;
+>  }
+>  
+> +/* Used for pages not on another list */
+> +static inline void add_to_free_list(struct page *page, struct zone *zone,
+> +				    unsigned int order, int migratetype)
+> +{
+> +	struct free_area *area = &zone->free_area[order];
+> +
+> +	list_add(&page->lru, &area->free_list[migratetype]);
+> +	area->nr_free++;
+> +}
+> +
+> +/* Used for pages not on another list */
+> +static inline void add_to_free_list_tail(struct page *page, struct zone *zone,
+> +					 unsigned int order, int migratetype)
+> +{
+> +	struct free_area *area = &zone->free_area[order];
+> +
+> +	list_add_tail(&page->lru, &area->free_list[migratetype]);
+> +	area->nr_free++;
+> +}
+> +
+> +/* Used for pages which are on another list */
+> +static inline void move_to_free_list(struct page *page, struct zone *zone,
+> +				     unsigned int order, int migratetype)
+> +{
+> +	struct free_area *area = &zone->free_area[order];
+> +
+> +	list_move(&page->lru, &area->free_list[migratetype]);
+> +}
+> +
+> +static inline void del_page_from_free_list(struct page *page, struct zone *zone,
+> +					   unsigned int order)
+> +{
+> +	list_del(&page->lru);
+> +	__ClearPageBuddy(page);
+> +	set_page_private(page, 0);
+> +	zone->free_area[order].nr_free--;
+> +}
+> +
+>  #include <linux/memory_hotplug.h>
+>  
+>  void build_all_zonelists(pg_data_t *pgdat);
+> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> index a791f2baeeeb..f85dc1561b85 100644
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -921,7 +921,6 @@ static inline void __free_one_page(struct page *page,
+>  	struct capture_control *capc = task_capc(zone);
+>  	unsigned long uninitialized_var(buddy_pfn);
+>  	unsigned long combined_pfn;
+> -	struct free_area *area;
+>  	unsigned int max_order;
+>  	struct page *buddy;
+>  
+> @@ -958,7 +957,7 @@ static inline void __free_one_page(struct page *page,
+>  		if (page_is_guard(buddy))
+>  			clear_page_guard(zone, buddy, order, migratetype);
+>  		else
+> -			del_page_from_free_area(buddy, &zone->free_area[order]);
+> +			del_page_from_free_list(buddy, zone, order);
+>  		combined_pfn = buddy_pfn & pfn;
+>  		page = page + (combined_pfn - pfn);
+>  		pfn = combined_pfn;
+> @@ -992,12 +991,11 @@ static inline void __free_one_page(struct page *page,
+>  done_merging:
+>  	set_page_order(page, order);
+>  
+> -	area = &zone->free_area[order];
+>  	if (is_shuffle_order(order) ? shuffle_pick_tail() :
+>  	    buddy_merge_likely(pfn, buddy_pfn, page, order))
+> -		add_to_free_area_tail(page, area, migratetype);
+> +		add_to_free_list_tail(page, zone, order, migratetype);
+>  	else
+> -		add_to_free_area(page, area, migratetype);
+> +		add_to_free_list(page, zone, order, migratetype);
+>  }
+>  
+>  /*
+> @@ -2001,13 +1999,11 @@ void __init init_cma_reserved_pageblock(struct page *page)
+>   * -- nyc
+>   */
+>  static inline void expand(struct zone *zone, struct page *page,
+> -	int low, int high, struct free_area *area,
+> -	int migratetype)
+> +	int low, int high, int migratetype)
+>  {
+>  	unsigned long size = 1 << high;
+>  
+>  	while (high > low) {
+> -		area--;
+>  		high--;
+>  		size >>= 1;
+>  		VM_BUG_ON_PAGE(bad_range(zone, &page[size]), &page[size]);
+> @@ -2021,7 +2017,7 @@ static inline void expand(struct zone *zone, struct page *page,
+>  		if (set_page_guard(zone, &page[size], high, migratetype))
+>  			continue;
+>  
+> -		add_to_free_area(&page[size], area, migratetype);
+> +		add_to_free_list(&page[size], zone, high, migratetype);
+>  		set_page_order(&page[size], high);
+>  	}
+>  }
+> @@ -2179,8 +2175,8 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
+>  		page = get_page_from_free_area(area, migratetype);
+>  		if (!page)
+>  			continue;
+> -		del_page_from_free_area(page, area);
+> -		expand(zone, page, order, current_order, area, migratetype);
+> +		del_page_from_free_list(page, zone, current_order);
+> +		expand(zone, page, order, current_order, migratetype);
+>  		set_pcppage_migratetype(page, migratetype);
+>  		return page;
+>  	}
+> @@ -2188,7 +2184,6 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
+>  	return NULL;
+>  }
+>  
+> -
+>  /*
+>   * This array describes the order lists are fallen back to when
+>   * the free lists for the desirable migrate type are depleted
+> @@ -2254,7 +2249,7 @@ static int move_freepages(struct zone *zone,
+>  		VM_BUG_ON_PAGE(page_zone(page) != zone, page);
+>  
+>  		order = page_order(page);
+> -		move_to_free_area(page, &zone->free_area[order], migratetype);
+> +		move_to_free_list(page, zone, order, migratetype);
+>  		page += 1 << order;
+>  		pages_moved += 1 << order;
+>  	}
+> @@ -2370,7 +2365,6 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
+>  		unsigned int alloc_flags, int start_type, bool whole_block)
+>  {
+>  	unsigned int current_order = page_order(page);
+> -	struct free_area *area;
+>  	int free_pages, movable_pages, alike_pages;
+>  	int old_block_type;
+>  
+> @@ -2441,8 +2435,7 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
+>  	return;
+>  
+>  single_page:
+> -	area = &zone->free_area[current_order];
+> -	move_to_free_area(page, area, start_type);
+> +	move_to_free_list(page, zone, current_order, start_type);
+>  }
+>  
+>  /*
+> @@ -3113,7 +3106,6 @@ void split_page(struct page *page, unsigned int order)
+>  
+>  int __isolate_free_page(struct page *page, unsigned int order)
+>  {
+> -	struct free_area *area = &page_zone(page)->free_area[order];
+>  	unsigned long watermark;
+>  	struct zone *zone;
+>  	int mt;
+> @@ -3139,7 +3131,7 @@ int __isolate_free_page(struct page *page, unsigned int order)
+>  
+>  	/* Remove page from free list */
+>  
+> -	del_page_from_free_area(page, area);
+> +	del_page_from_free_list(page, zone, order);
+>  
+>  	/*
+>  	 * Set the pageblock if the isolated page is at least half of a
+> @@ -8560,7 +8552,7 @@ void zone_pcp_reset(struct zone *zone)
+>  		pr_info("remove from free list %lx %d %lx\n",
+>  			pfn, 1 << order, end_pfn);
+>  #endif
+> -		del_page_from_free_area(page, &zone->free_area[order]);
+> +		del_page_from_free_list(page, zone, order);
+>  		for (i = 0; i < (1 << order); i++)
+>  			SetPageReserved((page+i));
+>  		pfn += (1 << order);
 > 
 
+Looks like a nice cleanup to me.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 
