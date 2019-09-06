@@ -2,134 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38FE7ABE05
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 18:49:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 996CCABED1
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 19:34:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405934AbfIFQtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 12:49:10 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38959 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726687AbfIFQtI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 12:49:08 -0400
-Received: by mail-io1-f68.google.com with SMTP id d25so14199106iob.6
-        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 09:49:08 -0700 (PDT)
+        id S2395212AbfIFRdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 13:33:55 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:43260 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727381AbfIFRdy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 13:33:54 -0400
+Received: by mail-oi1-f194.google.com with SMTP id t84so5604681oih.10
+        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 10:33:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=faOgYAGnpk9YzEf2PpC5o+37WCB6ODxfEk9TQc/WXH0=;
-        b=NlEqQ7sPv38dImf2fEqQ9+r4ag0SwchnFXfXLRBxS7HdV2w0EEyZsM2Hkd6mphOZBX
-         1aCMH+n0c6BTvgnXX6jDw4UE0mTguRXx56tO0Zk1H8WT570TlcOrC7cQZMeGvNIhxGbS
-         wBI3apDI0z47iasp//HO/cIepkfevAIwAwKZK5GS8pVYeNd8owY38fI/yVBjfimIizla
-         hE/6KJlpRwptpXpobkzX9I+HwAxZK2iBJz9efqISKzN6xI97bzspcjhOb8U4Wnx8HT6C
-         Y5RrD/dPiQWSFFzIXJy8VrsTECz7pFHoyM4OO+2jK6IgVyINFljPPmmvjZQ0cr9nPwTa
-         r87g==
+        bh=qpDnR/GYJ/XrBLmzSIYUWPDpRlqXVwU8hq/PPEapHXQ=;
+        b=B5lMPpGHxIofgZL10Pn92uDG8MnE3nHQtXDzubuDNUxCRt56k31Zr5/4pBbkv4ywfp
+         k2B9yLhvs+CQZolGYvrtvi/f3xzxDtXhUuaaFUh5Dvv21CfjE/LNyLRZb+x7i5PmiS1D
+         ZIUPTbM+K/3hH0G5jF0Ehvp/Yz/ZSAz34z7I9miMnRsfe9zcMJiYCJBadW8maOBNVufF
+         LcFtXZOm1s1HhJLXNF5PKER+f1vQe8CZv1SdFAlPsTrPBHjyL4m5sSnEEtuWzr+dME/d
+         yPglC9Vp78a/MAqamkHBU5HxSM1bZk6G1BF35zRlxhELkYuQGhMHkWrK/kqOJOKhXYXT
+         WCAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=faOgYAGnpk9YzEf2PpC5o+37WCB6ODxfEk9TQc/WXH0=;
-        b=oHbZp7u2a43xy/Nbfg1+Y6BQyHXStgsLhY0f0ib0m96SNM8s+g56Rl1Z5K7vbWazCp
-         etzRZ14cm2I6+Ij3Qj1HoewBmNO2HefqImrWUzlVeQ+p/zXpDU6PzkebtAf1E6cGoA+v
-         dUsOcOe+vGbSNb7+BlzRm6Eyl6B3e9PIOHwVf8TS+faBur6pOIh9oCHiZ7paeTZpPGtF
-         XX7K++HxxGhQ5hdB3BVtKxG2ViqEWiVGYcm90PxEhaKRTXXnTtXr4j60TEaLxR3t1bUE
-         OoepHVF/8sCvtQVyt0hZomvk3AJHNXGP5cEdVVybqBE+uiGj/V8hvMerdV0WN/MPfRbJ
-         4GEw==
-X-Gm-Message-State: APjAAAWKWRxsWKwQ0e9PXDz4/EH+52vf+yp5TttLdnWePnc7GDpKaQmi
-        KylWfSCvSy3UUbOYwQgO2kpSRP+Y7czGdQXAPDnbGsKk7p4=
-X-Google-Smtp-Source: APXvYqzwvU1DXcRL3lQH7HqXCfiXoNKWRHA9eVELLnq+DJ2JSpQkJXZJ5PCu6iR/pl89NhOKONqCqW9eyvHuio1BTtA=
-X-Received: by 2002:a02:5205:: with SMTP id d5mr9723316jab.31.1567788546939;
- Fri, 06 Sep 2019 09:49:06 -0700 (PDT)
+        bh=qpDnR/GYJ/XrBLmzSIYUWPDpRlqXVwU8hq/PPEapHXQ=;
+        b=Dffwm2/fTF02J4Oua+9EVllHU6Wngep/uz3aE4Ml/Ep+1irCpWkN4VCyqBVYdTZFiq
+         CadTsF0TQf5FcTys9nSUqaaAl6u0zKJjpN0Nsb2gnul1GO/i7PcTzn/Uv3FJ9AbK8oj6
+         2dmCyFIiC6E/uqa9ZR6t2YtnPFHqGn/2/+wqyMLUQVsqFl4LcXNFy8TaJxx2FMUFN7CA
+         IAZRzMDkF3qCj8z8gdwkjdKLpH1W89znMe3JgFKrBb32nXzFrpH0TkwhKIUUc1l5jIqp
+         miSSfJcFUrLbOUFtVMlgUtWO8Z1GruV+9J1DQSb9Kqrha1IwMSNVxeoVdFRk1eMlUgeR
+         Mx7A==
+X-Gm-Message-State: APjAAAV5OAm2zkYx69YaRs29NYmNq2E8U8xqk5cIpFUKiU/9pTqyVeP8
+        kIBCn0GanN6ElyOQ2ZH43n+iTCGBv14S7nkiI6J6BQ==
+X-Google-Smtp-Source: APXvYqxs26WaI4nMH81FCrmErnLZVB0v+f8/lt+3MTncxWG87yVQW0BSOxASyAFc+69JKSrfI3WlFVqe6CUueDct1rs=
+X-Received: by 2002:aca:5dc3:: with SMTP id r186mr7672240oib.73.1567791233988;
+ Fri, 06 Sep 2019 10:33:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190821182004.102768-1-jmattson@google.com>
-In-Reply-To: <20190821182004.102768-1-jmattson@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 6 Sep 2019 09:48:55 -0700
-Message-ID: <CALMp9eTtA5ZXJyWcOpe-pQ66X3sTgCR4-BHec_R3e1-j1FZyZw@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-To:     kvm list <kvm@vger.kernel.org>
-Cc:     Eric Hankland <ehankland@google.com>,
-        Peter Shier <pshier@google.com>
+References: <20190906145213.32552.30160.stgit@localhost.localdomain> <20190906145327.32552.39455.stgit@localhost.localdomain>
+In-Reply-To: <20190906145327.32552.39455.stgit@localhost.localdomain>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Fri, 6 Sep 2019 10:33:42 -0700
+Message-ID: <CAPcyv4i_LPrYvenhzcM_Ji6nviZWHqTDWQDDusv5pCXv0Bi7QA@mail.gmail.com>
+Subject: Re: [PATCH v8 1/7] mm: Add per-cpu logic to page shuffling
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     nitesh@redhat.com, KVM list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        virtio-dev@lists.oasis-open.org,
+        Oscar Salvador <osalvador@suse.de>, yang.zhang.wz@gmail.com,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Rik van Riel <riel@surriel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        lcapitulino@redhat.com, "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 11:20 AM Jim Mattson <jmattson@google.com> wrote:
+On Fri, Sep 6, 2019 at 7:53 AM Alexander Duyck
+<alexander.duyck@gmail.com> wrote:
 >
-> These MSRs should be enumerated by KVM_GET_MSR_INDEX_LIST, so that
-> userspace knows that these MSRs may be part of the vCPU state.
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 >
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Eric Hankland <ehankland@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
+> Change the logic used to generate randomness in the suffle path so that we
+> can avoid cache line bouncing. The previous logic was sharing the offset
+> and entropy word between all CPUs. As such this can result in cache line
+> bouncing and will ultimately hurt performance when enabled.
 >
-> ---
->  arch/x86/kvm/x86.c | 41 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 41 insertions(+)
+> To resolve this I have moved to a per-cpu logic for maintaining a unsigned
+> long containing some amount of bits, and an offset value for which bit we
+> can use for entropy with each call.
 >
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 93b0bd45ac73..ecaaa411538f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1140,6 +1140,42 @@ static u32 msrs_to_save[] = {
->         MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
->         MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
->         MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
-> +       MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
-> +       MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
-> +       MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
-> +       MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-> +       MSR_ARCH_PERFMON_PERFCTR0, MSR_ARCH_PERFMON_PERFCTR1,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 2, MSR_ARCH_PERFMON_PERFCTR0 + 3,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 4, MSR_ARCH_PERFMON_PERFCTR0 + 5,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 6, MSR_ARCH_PERFMON_PERFCTR0 + 7,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 8, MSR_ARCH_PERFMON_PERFCTR0 + 9,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 10, MSR_ARCH_PERFMON_PERFCTR0 + 11,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 12, MSR_ARCH_PERFMON_PERFCTR0 + 13,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 14, MSR_ARCH_PERFMON_PERFCTR0 + 15,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 16, MSR_ARCH_PERFMON_PERFCTR0 + 17,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 18, MSR_ARCH_PERFMON_PERFCTR0 + 19,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 20, MSR_ARCH_PERFMON_PERFCTR0 + 21,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 22, MSR_ARCH_PERFMON_PERFCTR0 + 23,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 24, MSR_ARCH_PERFMON_PERFCTR0 + 25,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 26, MSR_ARCH_PERFMON_PERFCTR0 + 27,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 28, MSR_ARCH_PERFMON_PERFCTR0 + 29,
-> +       MSR_ARCH_PERFMON_PERFCTR0 + 30, MSR_ARCH_PERFMON_PERFCTR0 + 31,
-> +       MSR_ARCH_PERFMON_EVENTSEL0, MSR_ARCH_PERFMON_EVENTSEL1,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 2, MSR_ARCH_PERFMON_EVENTSEL0 + 3,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 4, MSR_ARCH_PERFMON_EVENTSEL0 + 5,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 6, MSR_ARCH_PERFMON_EVENTSEL0 + 7,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 8, MSR_ARCH_PERFMON_EVENTSEL0 + 9,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 10, MSR_ARCH_PERFMON_EVENTSEL0 + 11,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 18, MSR_ARCH_PERFMON_EVENTSEL0 + 19,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 20, MSR_ARCH_PERFMON_EVENTSEL0 + 21,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 22, MSR_ARCH_PERFMON_EVENTSEL0 + 23,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 24, MSR_ARCH_PERFMON_EVENTSEL0 + 25,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 26, MSR_ARCH_PERFMON_EVENTSEL0 + 27,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 28, MSR_ARCH_PERFMON_EVENTSEL0 + 29,
-> +       MSR_ARCH_PERFMON_EVENTSEL0 + 30, MSR_ARCH_PERFMON_EVENTSEL0 + 31,
->  };
->
->  static unsigned num_msrs_to_save;
-> @@ -4989,6 +5025,11 @@ static void kvm_init_msr_list(void)
->         u32 dummy[2];
->         unsigned i, j;
->
-> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 4,
-> +                        "Please update the fixed PMCs in msrs_to_save[]");
-> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_GENERIC != 32,
-> +                        "Please update the generic perfctr/eventsel MSRs in msrs_to_save[]");
-> +
->         for (i = j = 0; i < ARRAY_SIZE(msrs_to_save); i++) {
->                 if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]) < 0)
->                         continue;
-> --
-> 2.23.0.187.g17f5b7556c-goog
 
-
-Ping.
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
