@@ -2,216 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2300AB093
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 04:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1155AB14B
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 05:41:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404384AbfIFCRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Sep 2019 22:17:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54246 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404380AbfIFCRr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Sep 2019 22:17:47 -0400
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AD52E2A09D2
-        for <kvm@vger.kernel.org>; Fri,  6 Sep 2019 02:17:46 +0000 (UTC)
-Received: by mail-pl1-f199.google.com with SMTP id d11so2645570plo.6
-        for <kvm@vger.kernel.org>; Thu, 05 Sep 2019 19:17:46 -0700 (PDT)
+        id S2404454AbfIFDli (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Sep 2019 23:41:38 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:45294 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388477AbfIFDlh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Sep 2019 23:41:37 -0400
+Received: by mail-oi1-f193.google.com with SMTP id v12so3792993oic.12;
+        Thu, 05 Sep 2019 20:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/UWj5FYLQqxX8OK3sv5wN+QK4oOfih0NXrF9rNtYsag=;
+        b=Jwso5vdA/lIl8N41TCTTc1ljotibPSixhzpLha9iSRNu+QyBOWBJ4/Et7LNSW0G7cZ
+         +UfTt0OOYNLi88obnLjjcXPTaavTrdpi8bwR1Bqr33m/UD2YpKnxPe0t9I0tVfK58vRd
+         DAitJHEtN3qkUTh4NyI6DmY0CWHgrQzf+dTiLzSeYFwLnW2CWm93fFe3sjRJBdk38Nu9
+         8HCULpK/SLYYKQETess/USE8k3HoJ4nuAuUriZhMLzNNeqjE83pu5k1IW9MB41IwlmRP
+         yHGvnnrRFvJpx0LJ9o9RbU5UXxIDLKxoR1GHv56DNKI+eQLhcG9YzlbvNfgzFSFgTe3R
+         PyOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=HBNEjbH++Cplr+hlTTIn2gJ2guzKt/zMnh4i7J+yi14=;
-        b=aQcbHZrVPW89iTlIYpeV6LKgwiAsdVPtlOcVUpvVt4aD/GyMNQanz1rYL86Ekgo3pi
-         5YC3Tr1G5QNsvYRPE06sTstiBWljMhFX/OblWR2ACQw4fRNiTZ0qnFKoppaBTV/XBEeG
-         6859xab+bklTcUFS+bDnEBvjsKgt+Pi5IbNwYBpanlVSUbNECLs13Gc3KlbMpvYpxNNc
-         TgPO6PAJEVC6v2RV4fhupwAfT7pOxYI9/5vocrKCIpil8khchKMIplzPRYqZj1cuMDAM
-         3StcEC5N9qZs8pta6sr+K+DA2eQ2PqheOAdV0QjVcg0lbxLEj2ILCgQmJZ8wKmnYxqUh
-         o3GQ==
-X-Gm-Message-State: APjAAAUqIJWb6Hfu8wS7RGjsfcVWnrzCSStirfKRdSS/L0saqwzsBKX2
-        fCkCOE8Ec4+Gz6jeD4gxl5bkykUvo47gzpOZgb1eQ+6fmBHrlAUiksHwH6uM3N4dktG/kUsX+yt
-        ePJ8Q5AOxMi0d
-X-Received: by 2002:a63:2043:: with SMTP id r3mr5988064pgm.311.1567736266117;
-        Thu, 05 Sep 2019 19:17:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxUec44Alg2d7GbiXyFGAxolQO9nJYnvLN4s2Tf/cBHafByYGpQiuLIicL/1aLfJIR/cNmAwQ==
-X-Received: by 2002:a63:2043:: with SMTP id r3mr5988045pgm.311.1567736265811;
-        Thu, 05 Sep 2019 19:17:45 -0700 (PDT)
-Received: from xz-x1.redhat.com ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id a11sm8212359pfg.94.2019.09.05.19.17.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2019 19:17:45 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>, peterx@redhat.com
-Subject: [PATCH v4 4/4] KVM: X86: Tune PLE Window tracepoint
-Date:   Fri,  6 Sep 2019 10:17:22 +0800
-Message-Id: <20190906021722.2095-5-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190906021722.2095-1-peterx@redhat.com>
-References: <20190906021722.2095-1-peterx@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/UWj5FYLQqxX8OK3sv5wN+QK4oOfih0NXrF9rNtYsag=;
+        b=i0NogMve4jq3cL6+FeWIuOquvf01KExfGI1QIDO6FeRwP/dvpkm2GG6XSJOnA1csag
+         RCzpWTHrFR5t4fGX5w1Po0nX8fG00wtbPKzoGvMKpPb1boGOPgl/YwFllApeL6KRjKZI
+         7OVqGvyeo8HrzdF0Q2o4L5eZgbFR5eh3rkg/qjUToNmkmA7yDszHrquu+1tin0kJ9p8f
+         arU+l5kkm/F4XFdFvb1JS8NeFpiTy8x7Liypq1rNak9L/vfdgFdw1jFg0oo3SdgebSW5
+         JjpXCnjxQQWlO89GPxAWOP2mDZZO6p+GLUTSEYvnj42oHqslMGAsOgyFkG8Jv/qDGCH8
+         ZWBw==
+X-Gm-Message-State: APjAAAXxWwV6ozyNZRUPJGvWSpYRTnoyZGvLpwIxZp872Pm52dx5WkfG
+        3LHrgGRavhswB4dludQoz/z0DRN4tCxF7VAo8Dw=
+X-Google-Smtp-Source: APXvYqymERoKyHwQliD27rahQ8CUHy8GwvwRRgkUWzWzRpIGHhyNOVA+Ajrg2UQ28xLhSQ4dtMlYAuV8JJL/TO5v3GE=
+X-Received: by 2002:a54:4814:: with SMTP id j20mr5337898oij.33.1567741296954;
+ Thu, 05 Sep 2019 20:41:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <000000000000e3072b0591ca1937@google.com> <CANRm+CxBdFjVrYzAe_Rs=v6BMSq9Gx+ngDrEitK6aez=kMq2XQ@mail.gmail.com>
+ <87imq6khve.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87imq6khve.fsf@vitty.brq.redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 6 Sep 2019 11:41:24 +0800
+Message-ID: <CANRm+CwCncK=ZUg9PwT2tgrg3-7MO40n+b0HnShhNwBp2PQH3A@mail.gmail.com>
+Subject: Re: general protection fault in __apic_accept_irq
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     syzbot <syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com>,
+        Borislav Petkov <bp@alien8.de>, devel@linuxdriverproject.org,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        LKML <linux-kernel@vger.kernel.org>, mikelley@microsoft.com,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        syzkaller-bugs@googlegroups.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The PLE window tracepoint triggers even if the window is not changed,
-and the wording can be a bit confusing too.  One example line:
+On Thu, 5 Sep 2019 at 21:11, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Wanpeng Li <kernellwp@gmail.com> writes:
+>
+> > On Thu, 5 Sep 2019 at 16:53, syzbot
+> > <syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com> wrote:
+> >>
+> >> Hello,
+> >>
+> >> syzbot found the following crash on:
+> >>
+> >> HEAD commit:    3b47fd5c Merge tag 'nfs-for-5.3-4' of git://git.linux-nfs...
+> >> git tree:       upstream
+> >> console output: https://syzkaller.appspot.com/x/log.txt?x=124af12a600000
+> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=144488c6c6c6d2b6
+> >> dashboard link: https://syzkaller.appspot.com/bug?extid=dff25ee91f0c7d5c1695
+> >> compiler:       clang version 9.0.0 (/home/glider/llvm/clang
+> >> 80fee25776c2fb61e74c1ecb1a523375c2500b69)
+> >> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10954676600000
+> >> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1752fe0a600000
+> >>
+> >> The bug was bisected to:
+> >>
+> >> commit 0aa67255f54df192d29aec7ac6abb1249d45bda7
+> >> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >> Date:   Mon Nov 26 15:47:29 2018 +0000
+> >>
+> >>      x86/hyper-v: move synic/stimer control structures definitions to
+> >> hyperv-tlfs.h
+> >>
+> >> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=156128c1600000
+> >> console output: https://syzkaller.appspot.com/x/log.txt?x=136128c1600000
+> >>
+> >> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> >> Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
+> >> Fixes: 0aa67255f54d ("x86/hyper-v: move synic/stimer control structures
+> >> definitions to hyperv-tlfs.h")
+> >>
+> >> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000004 data
+> >> 0x94
+> >> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000004 data
+> >> 0x48c
+> >> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000004 data
+> >> 0x4ac
+> >> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000005 data
+> >> 0x1520
+> >> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000006 data
+> >> 0x15d4
+> >> kvm [9347]: vcpu0, guest rIP: 0xcc Hyper-V uhandled wrmsr: 0x40000007 data
+> >> 0x15c4
+> >> kasan: CONFIG_KASAN_INLINE enabled
+> >> kasan: GPF could be caused by NULL-ptr deref or user memory access
+> >> general protection fault: 0000 [#1] PREEMPT SMP KASAN
+> >> CPU: 0 PID: 9347 Comm: syz-executor665 Not tainted 5.3.0-rc7+ #0
+> >> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> >> Google 01/01/2011
+> >> RIP: 0010:__apic_accept_irq+0x46/0x740 arch/x86/kvm/lapic.c:1029
+> >
+> > Thanks for the report, I found the root cause, will send a patch soon.
+> >
+>
+> I'm really interested in how any issue can be caused by 0aa67255f54d as
+> we just moved some definitions from a c file to a common header... (ok,
+> we did more than that, some structures gained '__packed' but it all
+> still seems legitimate to me and I can't recall any problems with
+> genuine Hyper-V...)
 
-  kvm_ple_window: vcpu 0: ple_window 4096 (shrink 4096)
+Yes, the bisect is false positive, we can focus on fixing the bug.
 
-It easily let people think of "the window now is 4096 which is
-shrinked", but the truth is the value actually didn't change (4096).
-
-Let's only dump this message if the value really changed, and we make
-the message even simpler like:
-
-  kvm_ple_window: vcpu 4 old 4096 new 8192 (growed)
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- arch/x86/kvm/svm.c     | 16 ++++++++--------
- arch/x86/kvm/trace.h   | 22 ++++++----------------
- arch/x86/kvm/vmx/vmx.c | 14 ++++++++------
- arch/x86/kvm/x86.c     |  2 +-
- 4 files changed, 23 insertions(+), 31 deletions(-)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index d685491fce4d..d5cb6b5a9254 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -1269,11 +1269,11 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
- 							pause_filter_count_grow,
- 							pause_filter_count_max);
- 
--	if (control->pause_filter_count != old)
-+	if (control->pause_filter_count != old) {
- 		mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
--
--	trace_kvm_ple_window_grow(vcpu->vcpu_id,
--				  control->pause_filter_count, old);
-+		trace_kvm_ple_window_update(vcpu->vcpu_id,
-+					    control->pause_filter_count, old);
-+	}
- }
- 
- static void shrink_ple_window(struct kvm_vcpu *vcpu)
-@@ -1287,11 +1287,11 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
- 						    pause_filter_count,
- 						    pause_filter_count_shrink,
- 						    pause_filter_count);
--	if (control->pause_filter_count != old)
-+	if (control->pause_filter_count != old) {
- 		mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
--
--	trace_kvm_ple_window_shrink(vcpu->vcpu_id,
--				    control->pause_filter_count, old);
-+		trace_kvm_ple_window_update(vcpu->vcpu_id,
-+					    control->pause_filter_count, old);
-+	}
- }
- 
- static __init int svm_hardware_setup(void)
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index afe8d269c16c..ae924566c401 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -890,37 +890,27 @@ TRACE_EVENT(kvm_pml_full,
- 	TP_printk("vcpu %d: PML full", __entry->vcpu_id)
- );
- 
--TRACE_EVENT(kvm_ple_window,
--	TP_PROTO(bool grow, unsigned int vcpu_id, unsigned int new,
--		 unsigned int old),
--	TP_ARGS(grow, vcpu_id, new, old),
-+TRACE_EVENT(kvm_ple_window_update,
-+	TP_PROTO(unsigned int vcpu_id, unsigned int new, unsigned int old),
-+	TP_ARGS(vcpu_id, new, old),
- 
- 	TP_STRUCT__entry(
--		__field(                bool,      grow         )
- 		__field(        unsigned int,   vcpu_id         )
- 		__field(        unsigned int,       new         )
- 		__field(        unsigned int,       old         )
- 	),
- 
- 	TP_fast_assign(
--		__entry->grow           = grow;
- 		__entry->vcpu_id        = vcpu_id;
- 		__entry->new            = new;
- 		__entry->old            = old;
- 	),
- 
--	TP_printk("vcpu %u: ple_window %u (%s %u)",
--	          __entry->vcpu_id,
--	          __entry->new,
--	          __entry->grow ? "grow" : "shrink",
--	          __entry->old)
-+	TP_printk("vcpu %u old %u new %u (%s)",
-+	          __entry->vcpu_id, __entry->old, __entry->new,
-+		  __entry->old < __entry->new ? "growed" : "shrinked")
- );
- 
--#define trace_kvm_ple_window_grow(vcpu_id, new, old) \
--	trace_kvm_ple_window(true, vcpu_id, new, old)
--#define trace_kvm_ple_window_shrink(vcpu_id, new, old) \
--	trace_kvm_ple_window(false, vcpu_id, new, old)
--
- TRACE_EVENT(kvm_pvclock_update,
- 	TP_PROTO(unsigned int vcpu_id, struct pvclock_vcpu_time_info *pvclock),
- 	TP_ARGS(vcpu_id, pvclock),
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b172b675d420..1dbb63ffdd6d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5233,10 +5233,11 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
- 					    ple_window_grow,
- 					    ple_window_max);
- 
--	if (vmx->ple_window != old)
-+	if (vmx->ple_window != old) {
- 		vmx->ple_window_dirty = true;
--
--	trace_kvm_ple_window_grow(vcpu->vcpu_id, vmx->ple_window, old);
-+		trace_kvm_ple_window_update(vcpu->vcpu_id,
-+					    vmx->ple_window, old);
-+	}
- }
- 
- static void shrink_ple_window(struct kvm_vcpu *vcpu)
-@@ -5248,10 +5249,11 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
- 					      ple_window_shrink,
- 					      ple_window);
- 
--	if (vmx->ple_window != old)
-+	if (vmx->ple_window != old) {
- 		vmx->ple_window_dirty = true;
--
--	trace_kvm_ple_window_shrink(vcpu->vcpu_id, vmx->ple_window, old);
-+		trace_kvm_ple_window_update(vcpu->vcpu_id,
-+					    vmx->ple_window, old);
-+	}
- }
- 
- /*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 93b0bd45ac73..69ad184edc90 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10082,7 +10082,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_invlpga);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_skinit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_intercepts);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_write_tsc_offset);
--EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ple_window);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ple_window_update);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_pml_full);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_pi_irte_update);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_avic_unaccelerated_access);
--- 
-2.21.0
-
+         Wanpeng
