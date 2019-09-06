@@ -2,193 +2,367 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20DB9AC190
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 22:43:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA107AC1A6
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 22:52:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389747AbfIFUny (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 16:43:54 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:38130 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732085AbfIFUny (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 16:43:54 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86KYnnf147820;
-        Fri, 6 Sep 2019 20:43:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=GarEwQV/q5HH7Od2Cal8C5S+M8JWXoKzec+ORCS2vWk=;
- b=ZSfhfTJGRJ71v96r7/fsD6RFzFBGA9t6xZdolzdPhT2R5ZKy5849kTNbCKP/3hf5alwP
- baTGAtz5eb0I3yyTe/WZuawaFCxbcT0LwKkuMIiprdVMBVC2uTJ4VkdpiK+iBHryTjfA
- 6rU0PnBUPMWdvan/C/f8ndvegDS6jtNMQFgVIQ8Yluv8k8MLc54nKUaVNUVKTFoKVj6j
- beqiqmaxYVCgDx/n8+SFzcGhc9WnEJ6RhVP81VojYywz6ZVcEYV89qfsprsWgGaZtsQ5
- NMazL2poGW63V4uNHOfxuGieKFBk51+Z5Bi+iLhW9cCSKXoTMorm50dGymuUHQMCGd8s yw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2uuxm1g15q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 06 Sep 2019 20:43:51 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86Kh6ke062686;
-        Fri, 6 Sep 2019 20:43:51 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2uud7pwhkn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 06 Sep 2019 20:43:51 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x86KhoLr029934;
-        Fri, 6 Sep 2019 20:43:50 GMT
-Received: from [10.159.158.81] (/10.159.158.81)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 06 Sep 2019 13:43:50 -0700
-Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Eric Hankland <ehankland@google.com>,
-        Peter Shier <pshier@google.com>
-References: <20190821182004.102768-1-jmattson@google.com>
- <CALMp9eTtA5ZXJyWcOpe-pQ66X3sTgCR4-BHec_R3e1-j1FZyZw@mail.gmail.com>
- <8907173e-9f27-6769-09fc-0b82c22d6352@oracle.com>
- <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com>
-Date:   Fri, 6 Sep 2019 13:43:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S2390886AbfIFUwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 16:52:30 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:39398 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728590AbfIFUwa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 16:52:30 -0400
+Received: by mail-io1-f66.google.com with SMTP id d25so15849308iob.6
+        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 13:52:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bTjo78vqhwMBZgJ6Hgx7/qj6Lj/2xdHUHyQrTbN2gOQ=;
+        b=dlXcWpfB+Nqg/sp16+XAdiWhPTE43lkiErBb1jOSk2FSbJaT+oFUK2coh89Qb9q/te
+         b8LOHu37n9PGIcAtZTvDN3aZSWHSOXGL7vU/E4WneUJ5f2EM0LgMom+TjeYeeea0bOkj
+         LDbwtuoo49RroHwqUnYN8/HH0muKA3fFo6FIdbnmJNEM/TsaDFGXXwYsFTpK7yzYINHv
+         fYsCK0cAPldQJU98fZ4P2Hv8GEuKISQVsjgwu9NVVwFZ/0Txh/KSvZboZzoL9dpln3/o
+         xd5FKBIUz9msmLeEbvsVUaN2KjU5LI6SXwEG3+VUQXeBtxdqKfMacokDKJRAjjTQx3B8
+         q8+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bTjo78vqhwMBZgJ6Hgx7/qj6Lj/2xdHUHyQrTbN2gOQ=;
+        b=kPAFlSGQTS8QGt+ncCHpbqrUhlHEPDuR7BFeyGPP0f4MkIK980lHtuh62DaqpnvPJS
+         Ek5zmd9ZQNgcYBky9eJQzUmYl00rq+dvkPzO7BT4fhtqP1Ph7m7PAeEbPcD8KSR5thjd
+         wmlM/Q8lqSM81NrIH5HThR31R4nXbGtlv0bvoECTFt8bRcmcJngzrMSZL9gBhX9DxjEe
+         LI0Ktjfy8rA+2QWTji/piVNNp6jG6ZxbjRKah8KqI/6r8Vjhpb+MJaxspBjW3NNU8ZaQ
+         pkGPAb2dEkZABqvJb81PTnHC+6rWUP8O4LbYduz6l0L6bZw7196SDxVplvwDz12mvgrc
+         bnDQ==
+X-Gm-Message-State: APjAAAXOy8sK/yKONP+7XDdPL8NkqwTL0VisfblFWlNmJuDpQVzTQP0F
+        sVve66QFVUidToVqkg9kCPKR8ymEXYC3PaFuKEGIhw==
+X-Google-Smtp-Source: APXvYqy8zrd8bZuB7oDl0jI3T9ZdEXErRmlNfqBWyQtfSruufNlSEhuJyeZRlu8KPXlnjiLuVafhciAMuX9LkE/tiCs=
+X-Received: by 2002:a02:5205:: with SMTP id d5mr10902341jab.31.1567803149066;
+ Fri, 06 Sep 2019 13:52:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9372 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909060211
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9372 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909060210
+References: <20190906185945.230946-1-jmattson@google.com> <E9EFDCFC-9B30-4CC2-ADD8-ED756ECE37CC@oracle.com>
+In-Reply-To: <E9EFDCFC-9B30-4CC2-ADD8-ED756ECE37CC@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 6 Sep 2019 13:52:18 -0700
+Message-ID: <CALMp9eQBZ9yZ+MMNpmuDZVAO=0VNuBwFo28MkXO901LosozM-A@mail.gmail.com>
+Subject: Re: [RFC][PATCH] KVM: nVMX: Don't leak L1 MMIO regions to L2
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Dan Cross <dcross@google.com>,
+        Marc Orr <marcorr@google.com>, Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 9/6/19 1:30 PM, Jim Mattson wrote:
-> On Fri, Sep 6, 2019 at 12:59 PM Krish Sadhukhan
-> <krish.sadhukhan@oracle.com> wrote:
->>
->> On 9/6/19 9:48 AM, Jim Mattson wrote:
->>
->> On Wed, Aug 21, 2019 at 11:20 AM Jim Mattson <jmattson@google.com> wrote:
->>
->> These MSRs should be enumerated by KVM_GET_MSR_INDEX_LIST, so that
->> userspace knows that these MSRs may be part of the vCPU state.
->>
->> Signed-off-by: Jim Mattson <jmattson@google.com>
->> Reviewed-by: Eric Hankland <ehankland@google.com>
->> Reviewed-by: Peter Shier <pshier@google.com>
->>
->> ---
->>   arch/x86/kvm/x86.c | 41 +++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 41 insertions(+)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 93b0bd45ac73..ecaaa411538f 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1140,6 +1140,42 @@ static u32 msrs_to_save[] = {
->>          MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
->>          MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
->>          MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
->> +       MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
->> +       MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
->> +       MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
->> +       MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
->> +       MSR_ARCH_PERFMON_PERFCTR0, MSR_ARCH_PERFMON_PERFCTR1,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 2, MSR_ARCH_PERFMON_PERFCTR0 + 3,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 4, MSR_ARCH_PERFMON_PERFCTR0 + 5,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 6, MSR_ARCH_PERFMON_PERFCTR0 + 7,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 8, MSR_ARCH_PERFMON_PERFCTR0 + 9,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 10, MSR_ARCH_PERFMON_PERFCTR0 + 11,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 12, MSR_ARCH_PERFMON_PERFCTR0 + 13,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 14, MSR_ARCH_PERFMON_PERFCTR0 + 15,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 16, MSR_ARCH_PERFMON_PERFCTR0 + 17,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 18, MSR_ARCH_PERFMON_PERFCTR0 + 19,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 20, MSR_ARCH_PERFMON_PERFCTR0 + 21,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 22, MSR_ARCH_PERFMON_PERFCTR0 + 23,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 24, MSR_ARCH_PERFMON_PERFCTR0 + 25,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 26, MSR_ARCH_PERFMON_PERFCTR0 + 27,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 28, MSR_ARCH_PERFMON_PERFCTR0 + 29,
->> +       MSR_ARCH_PERFMON_PERFCTR0 + 30, MSR_ARCH_PERFMON_PERFCTR0 + 31,
->> +       MSR_ARCH_PERFMON_EVENTSEL0, MSR_ARCH_PERFMON_EVENTSEL1,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 2, MSR_ARCH_PERFMON_EVENTSEL0 + 3,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 4, MSR_ARCH_PERFMON_EVENTSEL0 + 5,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 6, MSR_ARCH_PERFMON_EVENTSEL0 + 7,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 8, MSR_ARCH_PERFMON_EVENTSEL0 + 9,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 10, MSR_ARCH_PERFMON_EVENTSEL0 + 11,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 + 13,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 + 15,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 18, MSR_ARCH_PERFMON_EVENTSEL0 + 19,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 20, MSR_ARCH_PERFMON_EVENTSEL0 + 21,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 22, MSR_ARCH_PERFMON_EVENTSEL0 + 23,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 24, MSR_ARCH_PERFMON_EVENTSEL0 + 25,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 26, MSR_ARCH_PERFMON_EVENTSEL0 + 27,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 28, MSR_ARCH_PERFMON_EVENTSEL0 + 29,
->> +       MSR_ARCH_PERFMON_EVENTSEL0 + 30, MSR_ARCH_PERFMON_EVENTSEL0 + 31,
->>   };
->>
->>
->> Should we have separate #defines for the MSRs that are at offset from the base MSR?
-> How about macros that take an offset argument, rather than a whole
-> slew of new macros?
-
-
-Yes, that works too.
-
-
+On Fri, Sep 6, 2019 at 1:06 PM Liran Alon <liran.alon@oracle.com> wrote:
 >
->>   static unsigned num_msrs_to_save;
->> @@ -4989,6 +5025,11 @@ static void kvm_init_msr_list(void)
->>          u32 dummy[2];
->>          unsigned i, j;
->>
->> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 4,
->> +                        "Please update the fixed PMCs in msrs_to_save[]");
->> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_GENERIC != 32,
->> +                        "Please update the generic perfctr/eventsel MSRs in msrs_to_save[]");
->>
->>
->> Just curious how the condition can ever become false because we are comparing two static numbers here.
-> Someone just has to change the macros. In fact, I originally developed
-> this change on a version of the kernel where INTEL_PMC_MAX_FIXED was
-> 3, and so I had:
 >
->> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 3,
->> +                        "Please update the fixed PMCs in msrs_to_save[]")
-> When I cherry-picked the change to Linux tip, the BUILD_BUG_ON fired,
-> and I updated the fixed PMCs in msrs_to_save[].
 >
->> +
->>          for (i = j = 0; i < ARRAY_SIZE(msrs_to_save); i++) {
->>                  if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]) < 0)
->>                          continue;
->> --
->> 2.23.0.187.g17f5b7556c-goog
->>
->> Ping.
->>
->>
->> Also, since these MSRs are Intel-specific, should these be enumerated via 'intel_pmu_ops' ?
-> msrs_to_save[] is filtered to remove MSRs that aren't supported on the
-> host. Or are you asking something else?
+> > On 6 Sep 2019, at 21:59, Jim Mattson <jmattson@google.com> wrote:
+> >
+> > If the "virtualize APIC accesses" VM-execution control is set in the
+> > VMCS, the APIC virtualization hardware is triggered when a page walk
+> > in VMX non-root mode terminates at a PTE wherein the address of the 4k
+> > page frame matches the APIC-access address specified in the VMCS. On
+> > hardware, the APIC-access address may be any valid 4k-aligned physical
+> > address.
+> >
+> > KVM's nVMX implementation enforces the additional constraint that the
+> > APIC-access address specified in the vmcs12 must be backed by
+> > cacheable memory in L1. If not, L0 will simply clear the "virtualize
+> > APIC accesses" VM-execution control in the vmcs02.
+> >
+> > The problem with this approach is that the L1 guest has arranged the
+> > vmcs12 EPT tables--or shadow page tables, if the "enable EPT"
+> > VM-execution control is clear in the vmcs12--so that the L2 guest
+> > physical address(es)--or L2 guest linear address(es)--that reference
+> > the L2 APIC map to the APIC-access address specified in the
+> > vmcs12. Without the "virtualize APIC accesses" VM-execution control in
+> > the vmcs02, the APIC accesses in the L2 guest will directly access the
+> > APIC-access page in L1.
+> >
+> > When L0 has no mapping whatsoever for the APIC-access address in L1,
+> > the L2 VM just loses the intended APIC virtualization. However, when
+> > the L2 APIC-access address is mapped to an MMIO region in L1, the L2
+> > guest gets direct access to the L1 MMIO device. For example, if the
+> > APIC-access address specified in the vmcs12 is 0xfee00000, then L2
+> > gets direct access to L1's APIC.
+> >
+> > Fixing this correctly is complicated. Since this vmcs12 configuration
+> > is something that KVM cannot faithfully emulate, the appropriate
+> > response is to exit to userspace with
+> > KVM_INTERNAL_ERROR_EMULATION. Sadly, the kvm-unit-tests fail, so I'm
+> > posting this as an RFC.
+> >
+> > Note that the 'Code' line emitted by qemu in response to this error
+> > shows the guest %rip two instructions after the
+> > vmlaunch/vmresume. Hmmm.
+> >
+> > Fixes: fe3ef05c7572 ("KVM: nVMX: Prepare vmcs02 from vmcs01 and vmcs12"=
+)
+> > Reported-by: Dan Cross <dcross@google.com>
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Reviewed-by: Marc Orr <marcorr@google.com>
+> > Reviewed-by: Peter Shier <pshier@google.com>
+> > Reviewed-by: Dan Cross <dcross@google.com>
+>
+> The idea of the patch and the functionality of it seems correct to me.
+> However, I have some small code comments below.
 
+You're not bothered by the fact that the vmx kvm-unit-test now dies
+early? Should I just comment out the APIC-access address tests that
+are currently xfail?
 
-I am referring to the fact that we are enumerating Intel-specific MSRs 
-in the generic KVM code. Should there be some sort of #define guard to 
-not compile the code on AMD ?
+> > ---
+> > arch/x86/include/asm/kvm_host.h |  2 +-
+> > arch/x86/kvm/vmx/nested.c       | 55 ++++++++++++++++++++++-----------
+> > arch/x86/kvm/x86.c              |  9 ++++--
+> > 3 files changed, 45 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index 74e88e5edd9cf..e95acf8c82b47 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1191,7 +1191,7 @@ struct kvm_x86_ops {
+> >       int (*set_nested_state)(struct kvm_vcpu *vcpu,
+> >                               struct kvm_nested_state __user *user_kvm_=
+nested_state,
+> >                               struct kvm_nested_state *kvm_state);
+> > -     void (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
+> > +     int (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
+> >
+> >       int (*smi_allowed)(struct kvm_vcpu *vcpu);
+> >       int (*pre_enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index ced9fba32598d..bdf5a11816fa4 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -2871,7 +2871,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm=
+_vcpu *vcpu)
+> > static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+> >                                                struct vmcs12 *vmcs12);
+> >
+> > -static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> > +static int nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> > {
+> >       struct vmcs12 *vmcs12 =3D get_vmcs12(vcpu);
+> >       struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+> > @@ -2891,19 +2891,31 @@ static void nested_get_vmcs12_pages(struct kvm_=
+vcpu *vcpu)
+> >                       vmx->nested.apic_access_page =3D NULL;
+> >               }
+> >               page =3D kvm_vcpu_gpa_to_page(vcpu, vmcs12->apic_access_a=
+ddr);
+> > -             /*
+> > -              * If translation failed, no matter: This feature asks
+> > -              * to exit when accessing the given address, and if it
+> > -              * can never be accessed, this feature won't do
+> > -              * anything anyway.
+> > -              */
+> >               if (!is_error_page(page)) {
+> >                       vmx->nested.apic_access_page =3D page;
+> >                       hpa =3D page_to_phys(vmx->nested.apic_access_page=
+);
+> >                       vmcs_write64(APIC_ACCESS_ADDR, hpa);
+> >               } else {
+> > -                     secondary_exec_controls_clearbit(vmx,
+> > -                             SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES);
+> > +                     /*
+> > +                      * Since there is no backing page, we can't
+> > +                      * just rely on the usual L1 GPA -> HPA
+> > +                      * translation mechanism to do the right
+> > +                      * thing. We'd have to assign an appropriate
+> > +                      * HPA for the L1 APIC-access address, and
+> > +                      * then we'd have to modify the MMU to ensure
+> > +                      * that the L1 APIC-access address is mapped
+> > +                      * to the assigned HPA if and only if an L2 VM
+> > +                      * with that APIC-access address and the
+> > +                      * "virtualize APIC accesses" VM-execution
+> > +                      * control set in the vmcs12 is running. For
+> > +                      * now, just admit defeat.
+> > +                      */
+> > +                     pr_warn_ratelimited("Unsupported vmcs12 APIC-acce=
+ss address\n");
+> > +                     vcpu->run->exit_reason =3D KVM_EXIT_INTERNAL_ERRO=
+R;
+> > +                     vcpu->run->internal.suberror =3D
+> > +                             KVM_INTERNAL_ERROR_EMULATION;
+> > +                     vcpu->run->internal.ndata =3D 0;
+>
+> I think it is wise to pass here vmcs12->apic_access_addr value to userspa=
+ce.
+> In addition, also print it in pr_warn_ratelimited() call.
+> To aid debugging.
 
+SGTM
 
+> > +                     return -ENOTSUPP;
+> >               }
+> >       }
+> >
+> > @@ -2948,6 +2960,7 @@ static void nested_get_vmcs12_pages(struct kvm_vc=
+pu *vcpu)
+> >               exec_controls_setbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
+> >       else
+> >               exec_controls_clearbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
+> > +     return 0;
+> > }
+> >
+> > /*
+> > @@ -2986,11 +2999,12 @@ static void load_vmcs12_host_state(struct kvm_v=
+cpu *vcpu,
+> > /*
+> >  * If from_vmentry is false, this is being called from state restore (e=
+ither RSM
+> >  * or KVM_SET_NESTED_STATE).  Otherwise it's called from vmlaunch/vmres=
+ume.
+> > -+ *
+> > -+ * Returns:
+> > -+ *   0 - success, i.e. proceed with actual VMEnter
+> > -+ *   1 - consistency check VMExit
+> > -+ *  -1 - consistency check VMFail
+> > + *
+> > + * Returns:
+> > + * < 0 - error
+> > + *   0 - success, i.e. proceed with actual VMEnter
+> > + *   1 - consistency check VMExit
+> > + *   2 - consistency check VMFail
+>
+> Whenever we start having non-trivial return values, I believe adding an e=
+num
+> is in place. It makes code easier to read and less confusing.
+
+Yeah. This is ugly, but look what I had to work with!
+
+> >  */
+> > int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vme=
+ntry)
+> > {
+> > @@ -2999,6 +3013,7 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcp=
+u *vcpu, bool from_vmentry)
+> >       bool evaluate_pending_interrupts;
+> >       u32 exit_reason =3D EXIT_REASON_INVALID_STATE;
+> >       u32 exit_qual;
+> > +     int r;
+> >
+> >       evaluate_pending_interrupts =3D exec_controls_get(vmx) &
+> >               (CPU_BASED_VIRTUAL_INTR_PENDING | CPU_BASED_VIRTUAL_NMI_P=
+ENDING);
+> > @@ -3035,11 +3050,13 @@ int nested_vmx_enter_non_root_mode(struct kvm_v=
+cpu *vcpu, bool from_vmentry)
+> >       prepare_vmcs02_early(vmx, vmcs12);
+> >
+> >       if (from_vmentry) {
+> > -             nested_get_vmcs12_pages(vcpu);
+> > +             r =3D nested_get_vmcs12_pages(vcpu);
+> > +             if (unlikely(r))
+>
+> It makes sense to also mark !is_error_page(page) as likely() in nested_ge=
+t_vmcs12_pages().
+
+The use of static branch prediction hints in kvm seems pretty ad hoc
+to me, but I'll go ahead and add one to the referenced code path.
+
+> > +                     return r;
+> >
+> >               if (nested_vmx_check_vmentry_hw(vcpu)) {
+> >                       vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+> > -                     return -1;
+> > +                     return 2;
+> >               }
+> >
+> >               if (nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual=
+))
+> > @@ -3200,9 +3217,11 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu,=
+ bool launch)
+> >       vmx->nested.nested_run_pending =3D 1;
+> >       ret =3D nested_vmx_enter_non_root_mode(vcpu, true);
+> >       vmx->nested.nested_run_pending =3D !ret;
+> > -     if (ret > 0)
+> > +     if (ret < 0)
+> > +             return 0;
+> > +     if (ret =3D=3D 1)
+> >               return 1;
+> > -     else if (ret)
+> > +     if (ret)
+>
+> All these checks for of "ret" are not really readable.
+> They also implicitly define any ret value which is >1 as consistency chec=
+k VMFail instead of just ret=3D=3D2.
+
+Previously, any value less than 0 was consistency check VMFail instead
+of just ret=3D=3D-1. :-)
+
+> I prefer to have something like:
+>
+> switch (ret) {
+>     case VMEXIT_ON_INVALID_STATE:
+>         return 1;
+>     case VMFAIL_ON_INVALID_STATE:
+>         return nested_vmx_failValid(vcpu, VMXERR_ENTRY_INVALID_CONTROL_FI=
+ELD);
+>     default:
+>         /* Return to userspace on error */
+>         if (ret < 0)
+>             return 0;
+> }
+
+You and me both. On the other hand, I also dislike code churn. It
+complicates release engineering.
+
+> In addition, can you remind me why we call nested_vmx_failValid() at nest=
+ed_vmx_run()
+> instead of inside nested_vmx_enter_non_root_mode() when nested_vmx_check_=
+vmentry_hw() fails?
+
+I assume this is because of the call to
+nested_vmx_enter_non_root_mode() from vmx_pre_leave_smm(), but we do
+have that from_vmentry argument that I despise, so we may as well use
+it.
+
+> Then code could have indeed simply be:
+> if (ret < 0)
+>     return 0;
+> if (ret)
+>     return 1;
+> =E2=80=A6.
+>
+> Which is easy to understand.
+> i.e. First case return to userspace on error, second report error to gues=
+t and rest continue as usual
+> now assuming vCPU is non-root mode.
+>
+> -Liran
+>
+> >               return nested_vmx_failValid(vcpu,
+> >                       VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 290c3c3efb877..5ddbf16c8b108 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7803,8 +7803,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcp=
+u)
+> >       bool req_immediate_exit =3D false;
+> >
+> >       if (kvm_request_pending(vcpu)) {
+> > -             if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu))
+> > -                     kvm_x86_ops->get_vmcs12_pages(vcpu);
+> > +             if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
+> > +                     r =3D kvm_x86_ops->get_vmcs12_pages(vcpu);
+> > +                     if (unlikely(r)) {
+> > +                             r =3D 0;
+> > +                             goto out;
+> > +                     }
+> > +             }
+> >               if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu))
+> >                       kvm_mmu_unload(vcpu);
+> >               if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
+> > --
+> > 2.23.0.187.g17f5b7556c-goog
+> >
+>
