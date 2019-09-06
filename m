@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4C1DAC1D3
-	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 23:03:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EB9EAC1D4
+	for <lists+kvm@lfdr.de>; Fri,  6 Sep 2019 23:03:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390659AbfIFVDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Sep 2019 17:03:40 -0400
-Received: from mail-vs1-f74.google.com ([209.85.217.74]:41204 "EHLO
-        mail-vs1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389992AbfIFVDk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Sep 2019 17:03:40 -0400
-Received: by mail-vs1-f74.google.com with SMTP id z10so1171524vsq.8
-        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 14:03:39 -0700 (PDT)
+        id S2391195AbfIFVDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Sep 2019 17:03:43 -0400
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:34746 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390971AbfIFVDn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Sep 2019 17:03:43 -0400
+Received: by mail-vk1-f202.google.com with SMTP id v72so2842956vkv.1
+        for <kvm@vger.kernel.org>; Fri, 06 Sep 2019 14:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=MtHBm0pGseMAAYkSQEaTbeZbYbnsK4eOlFYiZZOX+dQ=;
-        b=fcK+aAHkR8sBJUMKcFcUGxb5l/t/wotm+PdMsX6pjKWKUENJH7O6FBUb/x2xeXW1Li
-         ylEC3mjSzM2NUuqPs0E15sx58drIaa6mKwPaclC7usEzctYAysZ+XuLiDRHMdEgOQo6y
-         DO95QL10aMbnAOh3o+r8clHCPc5YzCvVW2PM4mW85Ru3rdKekHo8YDomDuxk4cON3r5k
-         hVD5yNqU+xoh7ov+DzRRyEor+VJNHJf6PadPoFmo9dUIXyyQc+x1pjBKTm8dMEmuHKSM
-         6ypHd4ZkGq8oPdYN/7WpcFrwqMPMxHdMHFvdNqgjd3bsQIkiavSjT36ZnN4/RHTV+hEn
-         No+w==
+        bh=6o/Tmg2c7YTP90Ofm0aXe06LJ8nMJyFr26MyqVY35So=;
+        b=ZBvtFPxGbAIugHUFtvHJouvhNlzLeR18MP2OblfcPpq4rhuJZefRRXny/+Q1kSEZ9H
+         L3yTivcMHHn0dSpUWGVOsLOnge/jsr6T4zlkzIAP12YiTytO7aVkBZzqsn8QzV49Bw/P
+         FpWxRlDIFczKQytf+u0aMku9YFWOLJCI/2V5CdzvI81SmsbHipzxChceu7EBC6byoEm5
+         QBWTMUrtsowsEd4EyfV7a5iRtEO8nLI/SCLjvHC5VFa4KSrV6yfOnB3gOOBxcWjEAt8H
+         +qVafODgvHDKzTcKezplBnzlNJVGIUWFo6/KRK66F1I35qK6Gsg4z6wW0Y5kSJVPmuoi
+         hPQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=MtHBm0pGseMAAYkSQEaTbeZbYbnsK4eOlFYiZZOX+dQ=;
-        b=bQd4oC1a5fYRCvQLCnSysTdo0jLC7Asy3lv2WQoTegDveWqX4vPQ45hm403VjwgU2p
-         i4JlHDlhrVNKBfPc8yF9atUO1uBlASVb7giHd8PZRr/R91HsROxsvWiscugOT3ac6znm
-         HLa5KusdSJxmr/ariqocsH7uZL4mXsZnukuQDm8xYrVYysag5yvxgtWEvIspvFTaCBCd
-         yUtrBU5TL4i2uqiFye7pOGYJt4vYWUTmxMWkYXT3DnSFhEylgl/IACCyQzce1RCXxJ17
-         2AS68/nIsTiwpQy5WUm7unw6mfVfW8LT6PSl7y02bxRmd1iE0KT/E9Yt2Pf/IUnrNVbT
-         OWKQ==
-X-Gm-Message-State: APjAAAVCiur44dE9wNBrY1BalF/J3aoMrOKJotH9YdEW+MWcwQEnOatZ
-        KMMO4tJRDSpDxhJ754GQ5KfcUGtQxmCfZ21U7rMt5obDizST+yibARvr9QDz/gHemFNQaf08SKV
-        qlcg7wLgndFN06E7wLrhYxThDQXu5/hlvG+C/pNkYQV+oNuYGfixv0id7yw==
-X-Google-Smtp-Source: APXvYqz35UE0/DzWxqG58PNyj1ppHDgRP4IXzFvWX9mKn3mnpCfx3cSr1tqEujxcCsZ31+9Hh+quXjixcwg=
-X-Received: by 2002:a1f:d1c3:: with SMTP id i186mr5548587vkg.26.1567803819036;
- Fri, 06 Sep 2019 14:03:39 -0700 (PDT)
-Date:   Fri,  6 Sep 2019 14:03:12 -0700
+        bh=6o/Tmg2c7YTP90Ofm0aXe06LJ8nMJyFr26MyqVY35So=;
+        b=pPPs052hpRVboSomvUIvahVnDzLR1OuwXUl1mddh9HsK7QKk7UbhutBFJeI3JDv32a
+         9DSGe2/xMxD4bTLAADXtGG9JWnmD8v0o8I6eIMDR6eVWoEWpL+4R9BVDja4xtAalNZRM
+         kZyzACO6sjkWeML3fpB+sTm5dg6Kh5Xl3tAvPXHoNAegjf27leAPHvW2B44+Hm8VGFl8
+         fRJPzFgQmp0h1c/fQYjx8NjzWcc5Va/L8w24/rTSIg3OeMnIKWEm0VLy2tKhoQ+estCB
+         BPwgcN7B5eaetMLRY6tEancpbRxmRA9OYqH3FBsqMSSTyOrVTW2AWoPMsTC8uFCI/Yij
+         3VUQ==
+X-Gm-Message-State: APjAAAW8Y/0a9aTWQrVv/9WnWcfaqgVYfBoWpDv/qwS+G4LgAGGkxf9G
+        LRt3lo6ttoxsLQ6BSgz/m+XPkxs9guoNjqsM4xc4WidZFl7LpfdlEwchr+IkBHfyY5xYYZvowBE
+        400ND8p07OQd+f7RpzAIRIoUWY/3yI8KtjY0KPRqscmr1ZcdPrFT0UMu5sg==
+X-Google-Smtp-Source: APXvYqxVbMD8oxJt9upQSmcu9uLyMoRqDyb4OSsluSOY6WKy839PfdeUpXkB2HBDeJTnbxJwbiWIkyMTzuY=
+X-Received: by 2002:a67:fbc8:: with SMTP id o8mr3321182vsr.173.1567803821273;
+ Fri, 06 Sep 2019 14:03:41 -0700 (PDT)
+Date:   Fri,  6 Sep 2019 14:03:13 -0700
 In-Reply-To: <20190906210313.128316-1-oupton@google.com>
-Message-Id: <20190906210313.128316-9-oupton@google.com>
+Message-Id: <20190906210313.128316-10-oupton@google.com>
 Mime-Version: 1.0
 References: <20190906210313.128316-1-oupton@google.com>
 X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
-Subject: [kvm-unit-tests PATCH v4 8/9] x86: VMX: Make guest_state_test_main()
- check state from nested VM
+Subject: [kvm-unit-tests PATCH v4 9/9] x86: VMX: Add tests for nested "load IA32_PERF_GLOBAL_CTRL"
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>
@@ -62,61 +61,234 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The current tests for guest state do not yet check the validity of
-loaded state from within the nested VM. Introduce the
-load_state_test_data struct to share data with the nested VM.
+Tests to verify that KVM performs the correct checks on Host/Guest state
+at VM-entry, as described in SDM 26.3.1.1 "Checks on Guest Control
+Registers, Debug Registers, and MSRs" and SDM 26.2.2 "Checks on Host
+Control Registers and MSRs".
 
+Test that KVM does the following:
+
+    If the "load IA32_PERF_GLOBAL_CTRL" VM-entry control is 1, the
+    reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
+    GUEST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
+    should fail with an exit reason of "VM-entry failure due to invalid
+    guest state" (33). On a successful VM-entry, the correct value
+    should be observed when the nested VM performs an RDMSR on
+    IA32_PERF_GLOBAL_CTRL.
+
+    If the "load IA32_PERF_GLOBAL_CTRL" VM-exit control is 1, the
+    reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
+    HOST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
+    should fail with a VM-instruction error of "VM entry with invalid
+    host-state field(s)" (8). On a successful VM-exit, the correct value
+    should be observed when L1 performs an RDMSR on
+    IA32_PERF_GLOBAL_CTRL.
+
+Suggested-by: Jim Mattson <jmattson@google.com>
+Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- x86/vmx_tests.c | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
+ x86/vmx_tests.c | 172 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 172 insertions(+)
 
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 6f46c7759c85..84e1a7935aa1 100644
+index 84e1a7935aa1..86424dab615a 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -5017,13 +5017,28 @@ static void test_entry_msr_load(void)
- 	test_vmx_valid_controls(false);
+@@ -6854,6 +6854,176 @@ static void test_host_efer(void)
+ 	test_efer(HOST_EFER, "HOST_EFER", EXI_CONTROLS, EXI_LOAD_EFER);
  }
  
-+static struct vmx_state_area_test_data {
-+	u32 msr;
-+	u64 exp;
-+	bool enabled;
-+} vmx_state_area_test_data;
++union cpuidA_eax {
++	struct {
++		unsigned int version_id:8;
++		unsigned int num_counters_gp:8;
++		unsigned int bit_width:8;
++		unsigned int mask_length:8;
++	} split;
++	unsigned int full;
++};
 +
- static void guest_state_test_main(void)
- {
++union cpuidA_edx {
++	struct {
++		unsigned int num_counters_fixed:5;
++		unsigned int bit_width_fixed:8;
++		unsigned int reserved:19;
++	} split;
++	unsigned int full;
++};
++
++static bool valid_pgc(u64 val)
++{
++	struct cpuid id;
++	union cpuidA_eax eax;
++	union cpuidA_edx edx;
++	u64 mask;
++
++	id = cpuid(0xA);
++	eax.full = id.a;
++	edx.full = id.d;
++	mask = ~(((1ull << eax.split.num_counters_gp) - 1) |
++		(((1ull << edx.split.num_counters_fixed) - 1) << 32));
++
++	return !(val & mask);
++}
++
++static void test_pgc_vmlaunch(u32 xerror, u32 xreason, bool xfail, bool host)
++{
++	u32 inst_err;
 +	u64 obs;
++	bool success;
 +	struct vmx_state_area_test_data *data = &vmx_state_area_test_data;
 +
- 	while (1) {
--		if (vmx_get_test_stage() != 2)
--			vmcall();
--		else
-+		if (vmx_get_test_stage() == 2)
- 			break;
-+
-+		if (data->enabled) {
-+			obs = rdmsr(data->msr);
-+			report("Guest state is 0x%lx (expected 0x%lx)",
-+			       data->exp == obs, obs, data->exp);
++	if (host) {
++		success = vmlaunch_succeeds();
++		obs = rdmsr(data->msr);
++		if (!success) {
++			inst_err = vmcs_read(VMX_INST_ERROR);
++			report("vmlaunch failed, VMX Inst Error is %d (expected %d)",
++			       xerror == inst_err, inst_err, xerror);
++		} else {
++			report("Host state is 0x%lx (expected 0x%lx)",
++			       !data->enabled || data->exp == obs, obs, data->exp);
++			report("vmlaunch succeeded", success != xfail);
 +		}
++	} else {
++		if (xfail) {
++			enter_guest_with_invalid_guest_state();
++		} else {
++			enter_guest();
++		}
++		report_guest_state_test("load GUEST_PERF_GLOBAL_CTRL",
++					xreason, GUEST_PERF_GLOBAL_CTRL,
++					"GUEST_PERF_GLOBAL_CTRL");
++	}
++}
 +
-+		vmcall();
- 	}
- 
- 	asm volatile("fnop");
-@@ -6854,7 +6869,9 @@ static void test_pat(u32 field, const char * field_name, u32 ctrl_field,
- 	u64 i, val;
- 	u32 j;
- 	int error;
++/*
++ * test_load_perf_global_ctrl is a generic function for testing the
++ * "load IA32_PERF_GLOBAL_CTRL" VM-{entry,exit} control. This test function
++ * will test the provided ctrl_val disabled and enabled.
++ *
++ * @nr - VMCS field number corresponding to the Host/Guest state field
++ * @name - Name of the above VMCS field for printing in test report
++ * @ctrl_nr - VMCS field number corresponding to the VM-{entry,exit} control
++ * @ctrl_val - Bit to set on the ctrl field.
++ */
++static void test_load_perf_global_ctrl(u32 nr, const char *name, u32 ctrl_nr,
++				       const char *ctrl_name, u64 ctrl_val)
++{
++	u64 ctrl_saved = vmcs_read(ctrl_nr);
++	u64 pgc_saved = vmcs_read(nr);
++	u64 i, val;
++	bool host = nr == HOST_PERF_GLOBAL_CTRL;
 +	struct vmx_state_area_test_data *data = &vmx_state_area_test_data;
- 
++
++	if (!host) {
++		vmx_set_test_stage(1);
++		test_reset_guest(guest_state_test_main);
++	}
++	data->msr = MSR_CORE_PERF_GLOBAL_CTRL;
++	msr_bmp_init();
++	vmcs_write(ctrl_nr, ctrl_saved & ~ctrl_val);
 +	data->enabled = false;
- 	vmcs_clear_bits(ctrl_field, ctrl_bit);
- 	if (field == GUEST_PAT) {
- 		vmx_set_test_stage(1);
++	report_prefix_pushf("\"load IA32_PERF_GLOBAL_CTRL\"=0 on %s",
++			    ctrl_name);
++	for (i = 0; i < 64; i++) {
++		val = 1ull << i;
++		vmcs_write(nr, val);
++		report_prefix_pushf("%s = 0x%lx", name, val);
++		test_pgc_vmlaunch(0, VMX_VMCALL, false, host);
++		report_prefix_pop();
++	}
++	report_prefix_pop();
++
++	vmcs_write(ctrl_nr, ctrl_saved | ctrl_val);
++	data->enabled = true;
++	report_prefix_pushf("\"load IA32_PERF_GLOBAL_CTRL\"=1 on %s",
++			    ctrl_name);
++	for (i = 0; i < 64; i++) {
++		val = 1ull << i;
++		data->exp = val;
++		vmcs_write(nr, val);
++		report_prefix_pushf("%s = 0x%lx", name, val);
++		if (valid_pgc(val)) {
++			test_pgc_vmlaunch(0, VMX_VMCALL, false, host);
++		} else {
++			if (host)
++				test_pgc_vmlaunch(
++					VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
++					0,
++					true, host);
++			else
++				test_pgc_vmlaunch(
++					0,
++					VMX_ENTRY_FAILURE | VMX_FAIL_STATE,
++					true, host);
++		}
++		report_prefix_pop();
++	}
++
++	report_prefix_pop();
++
++	if (nr == GUEST_PERF_GLOBAL_CTRL) {
++		/*
++		 * Let the guest finish execution
++		 */
++		vmx_set_test_stage(2);
++		vmcs_write(ctrl_nr, ctrl_saved);
++		vmcs_write(nr, pgc_saved);
++		enter_guest();
++	}
++
++	vmcs_write(ctrl_nr, ctrl_saved);
++	vmcs_write(nr, pgc_saved);
++}
++
++static void test_load_host_perf_global_ctrl(void)
++{
++	if (!(ctrl_exit_rev.clr & EXI_LOAD_PERF)) {
++		printf("\"load IA32_PERF_GLOBAL_CTRL\" "
++		       "exit control not supported\n");
++		return;
++	}
++
++	test_load_perf_global_ctrl(HOST_PERF_GLOBAL_CTRL, "HOST_PERF_GLOBAL_CTRL",
++		      EXI_CONTROLS, "EXI_CONTROLS", EXI_LOAD_PERF);
++}
++
++
++static void test_load_guest_perf_global_ctrl(void)
++{
++	if (!(ctrl_enter_rev.clr & ENT_LOAD_PERF)) {
++		printf("\"load IA32_PERF_GLOBAL_CTRL\" "
++		       "entry control not supported\n");
++	}
++
++	test_load_perf_global_ctrl(GUEST_PERF_GLOBAL_CTRL, "GUEST_PERF_GLOBAL_CTRL",
++		      ENT_CONTROLS, "ENT_CONTROLS", ENT_LOAD_PERF);
++}
++
+ /*
+  * PAT values higher than 8 are uninteresting since they're likely lumped
+  * in with "8". We only test values above 8 one bit at a time,
+@@ -7147,6 +7317,7 @@ static void vmx_host_state_area_test(void)
+ 	test_sysenter_field(HOST_SYSENTER_EIP, "HOST_SYSENTER_EIP");
+ 
+ 	test_host_efer();
++	test_load_host_perf_global_ctrl();
+ 	test_load_host_pat();
+ 	test_host_segment_regs();
+ 	test_host_desc_tables();
+@@ -7181,6 +7352,7 @@ static void test_load_guest_pat(void)
+ static void vmx_guest_state_area_test(void)
+ {
+ 	test_load_guest_pat();
++	test_load_guest_perf_global_ctrl();
+ }
+ 
+ static bool valid_vmcs_for_vmentry(void)
 -- 
 2.23.0.187.g17f5b7556c-goog
 
