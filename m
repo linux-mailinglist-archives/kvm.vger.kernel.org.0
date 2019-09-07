@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7706BAC816
-	for <lists+kvm@lfdr.de>; Sat,  7 Sep 2019 19:25:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A839AC818
+	for <lists+kvm@lfdr.de>; Sat,  7 Sep 2019 19:25:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395182AbfIGRZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Sep 2019 13:25:42 -0400
-Received: from mail-ot1-f46.google.com ([209.85.210.46]:45162 "EHLO
-        mail-ot1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2395136AbfIGRZm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Sep 2019 13:25:42 -0400
-Received: by mail-ot1-f46.google.com with SMTP id 41so4935592oti.12;
-        Sat, 07 Sep 2019 10:25:41 -0700 (PDT)
+        id S2403994AbfIGRZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Sep 2019 13:25:49 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:34089 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2395132AbfIGRZt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Sep 2019 13:25:49 -0400
+Received: by mail-oi1-f194.google.com with SMTP id g128so7595751oib.1;
+        Sat, 07 Sep 2019 10:25:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=jkU/gjmufsqRmx2ewcmEVgVxHQ2U0aGjpCpcoEVZSho=;
-        b=OmGksZEM7ixIW/QCDmsZguFQztOtlYx2tEVTcwxG9qqQ98r86c4LrCDtRcy89vUgQS
-         4vVYn0QwTbEEOIaYLhwDrIzRotnkHvGOUPisbAb1Cft36guggCr0OuoMHXVRsVaI78Q9
-         pFrDU3p49x+bM3JifECHySku5edO6svOe8PAsKYZXGFDOvumR51V8+RbCVPR6nxt6axG
-         ByqAF2zrntS5ZQ6TIlzdCNe8A69o9zF9IKNvw4UpBTuETzsixOFXMiJIX5Mhea76XTc9
-         K7F73LJeJITEFqkG91R3EjM2u/UuaqnekN4Uky8CPhO5eWtZfuM2TvsUwDuSORON3JMw
-         lWHg==
+        bh=kSopJtjN0Bct/j9/oVkg8pXbs8bfoPtfq3tp15cWbFA=;
+        b=GP196UxhtesI4DpzLroLGitq6AT3yCg6JIv7eHeX5bE512Bt2rY5UX8Owl6UWaLuqS
+         KBU4alhzy/RjfOR2TD2kzxNOol1Dd7elx6QeLBSjvXAWYZ6J72Ui7zxbgwBqcpRN3GUw
+         HM+GqbVngxARkCzWLz6bcneox7MpCZMhaZa7BbElkS22E1/H9BVwFHjSHB7D8HdTnNB8
+         s9D7U+SPL6HVQH4GdqLxg+X1sIFEo1PwYNdUecPhL42WU/f2CPZGoIfUWj2ABQ0FomHv
+         p1CyrMS2490/kosLr9EtAAYUk6zgj+NGlrqlwd2lM4GhpruzQf8L1+BRJ/tGzqsdCmoi
+         ndmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=jkU/gjmufsqRmx2ewcmEVgVxHQ2U0aGjpCpcoEVZSho=;
-        b=itQ00OmashP+9ZNKjObl9EY62v5FYvRx+jQhDLoceFc/CrM0irgAN1ALhnUaEzIpwS
-         uxRzmAzejiKGnsekJ2FhlEtux3C3tu+BpWrtzhxTLYwVFpXGfM6DfpnV1UzkPuQI4IDt
-         WnluSKMJ9EUHGXhCWEdSHjgw8nDIHqdFOepbgMh1SixFe2C8batQWgAXMToOSdSrrYKw
-         OXmM+PNkXO0P3J1EiXGKdLNSU3e41cVS7QO0j/XxL6zbEeBmm+DMUF0HqxQRP4B7jJUq
-         9USe9hdYqtL6Y6muGQl59grWSJ8QWeh0oyb4FkR2hTYt0UwfniGpeOgSzst1cr6jx1M9
-         2q3A==
-X-Gm-Message-State: APjAAAVNGQvOQEVYXnTacUtcGILIxrd59+1SFBfpCARWxHGGjVhZLiKf
-        uTJP+4GKpjMmmfyOW1awb8k=
-X-Google-Smtp-Source: APXvYqxv8VdrI45ugA7nGP3LH48/ayysmkT749yGxvmbnULvZ38cLMdB/WEIwG9/h5RwWRxRFispDA==
-X-Received: by 2002:a9d:a63:: with SMTP id 90mr9559445otg.164.1567877140021;
-        Sat, 07 Sep 2019 10:25:40 -0700 (PDT)
+        bh=kSopJtjN0Bct/j9/oVkg8pXbs8bfoPtfq3tp15cWbFA=;
+        b=Nl27ysNru90fZ2hpaMtHlbX0S0pT6Iqa8OOzxZ3BMMxhQ+8NJu0HwEvAxxQmQaT7tL
+         EFxOnvC7AAD5lw1RiXpPOCXs4HPsSVt08gab9hStD3aFr3b+e3QvDKTnv7kHlPSZulm+
+         MbNcsOcafDx9vZylUZIHfcAJfc0g6oK2skISF53zBoXUEr/FrXTy/77SUVfNy0xEKUfL
+         s2gj1eJBPqqF9G0meo2Xdxr/fiasKfAUJ5HlHn6AGUVrbB18kD38QqZNdpvg/9RBxvxf
+         bVVInHZkGwaORXu3xkZj8u+EPydfhEE5oJInZyE8n5OjiBSXRbOdxksp/B62CV8wXYpf
+         tZsw==
+X-Gm-Message-State: APjAAAWekbYXtPRGL6Nz+Llc3nKWPxMQPau+WGTETVZA/KvLl1rLjEsQ
+        1APuWpchm7wNUT5ECTekxUU=
+X-Google-Smtp-Source: APXvYqx2weNfO8K71L99snv6nx65rVmU19IskIQeolfUre8SXryHDBsQbX2DReh7lqCg7Zl0p2XdAA==
+X-Received: by 2002:aca:2105:: with SMTP id 5mr9598351oiz.84.1567877148171;
+        Sat, 07 Sep 2019 10:25:48 -0700 (PDT)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id e52sm3733620ote.39.2019.09.07.10.25.37
+        by smtp.gmail.com with ESMTPSA id x6sm4135651ote.69.2019.09.07.10.25.45
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 07 Sep 2019 10:25:39 -0700 (PDT)
-Subject: [PATCH v9 4/8] mm: Use zone and order instead of free area in
- free_list manipulators
+        Sat, 07 Sep 2019 10:25:47 -0700 (PDT)
+Subject: [PATCH v9 5/8] arm64: Move hugetlb related definitions out of
+ pgtable.h to page-defs.h
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
         mst@redhat.com, catalin.marinas@arm.com, david@redhat.com,
@@ -59,8 +59,8 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
         ying.huang@intel.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, fengguang.wu@intel.com,
         alexander.h.duyck@linux.intel.com, kirill.shutemov@linux.intel.com
-Date:   Sat, 07 Sep 2019 10:25:36 -0700
-Message-ID: <20190907172536.10910.99561.stgit@localhost.localdomain>
+Date:   Sat, 07 Sep 2019 10:25:45 -0700
+Message-ID: <20190907172545.10910.88045.stgit@localhost.localdomain>
 In-Reply-To: <20190907172225.10910.34302.stgit@localhost.localdomain>
 References: <20190907172225.10910.34302.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -74,250 +74,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-In order to enable the use of the zone from the list manipulator functions
-I will need access to the zone pointer. As it turns out most of the
-accessors were always just being directly passed &zone->free_area[order]
-anyway so it would make sense to just fold that into the function itself
-and pass the zone and order as arguments instead of the free area.
+Move the static definition for things such as HUGETLB_PAGE_ORDER out of
+asm/pgtable.h and place it in page-defs.h. By doing this the includes
+become much easier to deal with as currently arm64 is the only architecture
+that didn't include this definition in the asm/page.h file or a file
+included by it.
 
-In order to be able to reference the zone we need to move the declaration
-of the functions down so that we have the zone defined before we define the
-list manipulation functions.
+It also makes logical sense as PAGE_SHIFT was already defined in
+page-defs.h so now we also have HPAGE_SHIFT defined there as well.
 
-Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- include/linux/mmzone.h |   70 ++++++++++++++++++++++++++----------------------
- mm/page_alloc.c        |   30 ++++++++-------------
- 2 files changed, 49 insertions(+), 51 deletions(-)
+ arch/arm64/include/asm/page-def.h |    9 +++++++++
+ arch/arm64/include/asm/pgtable.h  |    9 ---------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index 125f300981c6..2ddf1f1971c0 100644
---- a/include/linux/mmzone.h
-+++ b/include/linux/mmzone.h
-@@ -100,29 +100,6 @@ struct free_area {
- 	unsigned long		nr_free;
- };
+diff --git a/arch/arm64/include/asm/page-def.h b/arch/arm64/include/asm/page-def.h
+index f99d48ecbeef..1c5b079e2482 100644
+--- a/arch/arm64/include/asm/page-def.h
++++ b/arch/arm64/include/asm/page-def.h
+@@ -20,4 +20,13 @@
+ #define CONT_SIZE		(_AC(1, UL) << (CONT_SHIFT + PAGE_SHIFT))
+ #define CONT_MASK		(~(CONT_SIZE-1))
  
--/* Used for pages not on another list */
--static inline void add_to_free_area(struct page *page, struct free_area *area,
--			     int migratetype)
--{
--	list_add(&page->lru, &area->free_list[migratetype]);
--	area->nr_free++;
--}
--
--/* Used for pages not on another list */
--static inline void add_to_free_area_tail(struct page *page, struct free_area *area,
--				  int migratetype)
--{
--	list_add_tail(&page->lru, &area->free_list[migratetype]);
--	area->nr_free++;
--}
--
--/* Used for pages which are on another list */
--static inline void move_to_free_area(struct page *page, struct free_area *area,
--			     int migratetype)
--{
--	list_move(&page->lru, &area->free_list[migratetype]);
--}
--
- static inline struct page *get_page_from_free_area(struct free_area *area,
- 					    int migratetype)
- {
-@@ -130,15 +107,6 @@ static inline struct page *get_page_from_free_area(struct free_area *area,
- 					struct page, lru);
- }
- 
--static inline void del_page_from_free_area(struct page *page,
--		struct free_area *area)
--{
--	list_del(&page->lru);
--	__ClearPageBuddy(page);
--	set_page_private(page, 0);
--	area->nr_free--;
--}
--
- static inline bool free_area_empty(struct free_area *area, int migratetype)
- {
- 	return list_empty(&area->free_list[migratetype]);
-@@ -796,6 +764,44 @@ static inline bool pgdat_is_empty(pg_data_t *pgdat)
- 	return !pgdat->node_start_pfn && !pgdat->node_spanned_pages;
- }
- 
-+/* Used for pages not on another list */
-+static inline void add_to_free_list(struct page *page, struct zone *zone,
-+				    unsigned int order, int migratetype)
-+{
-+	struct free_area *area = &zone->free_area[order];
++/*
++ * Hugetlb definitions.
++ */
++#define HUGE_MAX_HSTATE		4
++#define HPAGE_SHIFT		PMD_SHIFT
++#define HPAGE_SIZE		(_AC(1, UL) << HPAGE_SHIFT)
++#define HPAGE_MASK		(~(HPAGE_SIZE - 1))
++#define HUGETLB_PAGE_ORDER	(HPAGE_SHIFT - PAGE_SHIFT)
 +
-+	list_add(&page->lru, &area->free_list[migratetype]);
-+	area->nr_free++;
-+}
-+
-+/* Used for pages not on another list */
-+static inline void add_to_free_list_tail(struct page *page, struct zone *zone,
-+					 unsigned int order, int migratetype)
-+{
-+	struct free_area *area = &zone->free_area[order];
-+
-+	list_add_tail(&page->lru, &area->free_list[migratetype]);
-+	area->nr_free++;
-+}
-+
-+/* Used for pages which are on another list */
-+static inline void move_to_free_list(struct page *page, struct zone *zone,
-+				     unsigned int order, int migratetype)
-+{
-+	struct free_area *area = &zone->free_area[order];
-+
-+	list_move(&page->lru, &area->free_list[migratetype]);
-+}
-+
-+static inline void del_page_from_free_list(struct page *page, struct zone *zone,
-+					   unsigned int order)
-+{
-+	list_del(&page->lru);
-+	__ClearPageBuddy(page);
-+	set_page_private(page, 0);
-+	zone->free_area[order].nr_free--;
-+}
-+
- #include <linux/memory_hotplug.h>
- 
- void build_all_zonelists(pg_data_t *pgdat);
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index a791f2baeeeb..f85dc1561b85 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -921,7 +921,6 @@ static inline void __free_one_page(struct page *page,
- 	struct capture_control *capc = task_capc(zone);
- 	unsigned long uninitialized_var(buddy_pfn);
- 	unsigned long combined_pfn;
--	struct free_area *area;
- 	unsigned int max_order;
- 	struct page *buddy;
- 
-@@ -958,7 +957,7 @@ static inline void __free_one_page(struct page *page,
- 		if (page_is_guard(buddy))
- 			clear_page_guard(zone, buddy, order, migratetype);
- 		else
--			del_page_from_free_area(buddy, &zone->free_area[order]);
-+			del_page_from_free_list(buddy, zone, order);
- 		combined_pfn = buddy_pfn & pfn;
- 		page = page + (combined_pfn - pfn);
- 		pfn = combined_pfn;
-@@ -992,12 +991,11 @@ static inline void __free_one_page(struct page *page,
- done_merging:
- 	set_page_order(page, order);
- 
--	area = &zone->free_area[order];
- 	if (is_shuffle_order(order) ? shuffle_pick_tail() :
- 	    buddy_merge_likely(pfn, buddy_pfn, page, order))
--		add_to_free_area_tail(page, area, migratetype);
-+		add_to_free_list_tail(page, zone, order, migratetype);
- 	else
--		add_to_free_area(page, area, migratetype);
-+		add_to_free_list(page, zone, order, migratetype);
- }
- 
- /*
-@@ -2001,13 +1999,11 @@ void __init init_cma_reserved_pageblock(struct page *page)
-  * -- nyc
+ #endif /* __ASM_PAGE_DEF_H */
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index 7576df00eb50..06a376de9bd6 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -305,15 +305,6 @@ static inline int pte_same(pte_t pte_a, pte_t pte_b)
   */
- static inline void expand(struct zone *zone, struct page *page,
--	int low, int high, struct free_area *area,
--	int migratetype)
-+	int low, int high, int migratetype)
- {
- 	unsigned long size = 1 << high;
+ #define pte_mkhuge(pte)		(__pte(pte_val(pte) & ~PTE_TABLE_BIT))
  
- 	while (high > low) {
--		area--;
- 		high--;
- 		size >>= 1;
- 		VM_BUG_ON_PAGE(bad_range(zone, &page[size]), &page[size]);
-@@ -2021,7 +2017,7 @@ static inline void expand(struct zone *zone, struct page *page,
- 		if (set_page_guard(zone, &page[size], high, migratetype))
- 			continue;
- 
--		add_to_free_area(&page[size], area, migratetype);
-+		add_to_free_list(&page[size], zone, high, migratetype);
- 		set_page_order(&page[size], high);
- 	}
- }
-@@ -2179,8 +2175,8 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
- 		page = get_page_from_free_area(area, migratetype);
- 		if (!page)
- 			continue;
--		del_page_from_free_area(page, area);
--		expand(zone, page, order, current_order, area, migratetype);
-+		del_page_from_free_list(page, zone, current_order);
-+		expand(zone, page, order, current_order, migratetype);
- 		set_pcppage_migratetype(page, migratetype);
- 		return page;
- 	}
-@@ -2188,7 +2184,6 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
- 	return NULL;
- }
- 
+-/*
+- * Hugetlb definitions.
+- */
+-#define HUGE_MAX_HSTATE		4
+-#define HPAGE_SHIFT		PMD_SHIFT
+-#define HPAGE_SIZE		(_AC(1, UL) << HPAGE_SHIFT)
+-#define HPAGE_MASK		(~(HPAGE_SIZE - 1))
+-#define HUGETLB_PAGE_ORDER	(HPAGE_SHIFT - PAGE_SHIFT)
 -
- /*
-  * This array describes the order lists are fallen back to when
-  * the free lists for the desirable migrate type are depleted
-@@ -2254,7 +2249,7 @@ static int move_freepages(struct zone *zone,
- 		VM_BUG_ON_PAGE(page_zone(page) != zone, page);
- 
- 		order = page_order(page);
--		move_to_free_area(page, &zone->free_area[order], migratetype);
-+		move_to_free_list(page, zone, order, migratetype);
- 		page += 1 << order;
- 		pages_moved += 1 << order;
- 	}
-@@ -2370,7 +2365,6 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
- 		unsigned int alloc_flags, int start_type, bool whole_block)
+ static inline pte_t pgd_pte(pgd_t pgd)
  {
- 	unsigned int current_order = page_order(page);
--	struct free_area *area;
- 	int free_pages, movable_pages, alike_pages;
- 	int old_block_type;
- 
-@@ -2441,8 +2435,7 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
- 	return;
- 
- single_page:
--	area = &zone->free_area[current_order];
--	move_to_free_area(page, area, start_type);
-+	move_to_free_list(page, zone, current_order, start_type);
- }
- 
- /*
-@@ -3113,7 +3106,6 @@ void split_page(struct page *page, unsigned int order)
- 
- int __isolate_free_page(struct page *page, unsigned int order)
- {
--	struct free_area *area = &page_zone(page)->free_area[order];
- 	unsigned long watermark;
- 	struct zone *zone;
- 	int mt;
-@@ -3139,7 +3131,7 @@ int __isolate_free_page(struct page *page, unsigned int order)
- 
- 	/* Remove page from free list */
- 
--	del_page_from_free_area(page, area);
-+	del_page_from_free_list(page, zone, order);
- 
- 	/*
- 	 * Set the pageblock if the isolated page is at least half of a
-@@ -8560,7 +8552,7 @@ void zone_pcp_reset(struct zone *zone)
- 		pr_info("remove from free list %lx %d %lx\n",
- 			pfn, 1 << order, end_pfn);
- #endif
--		del_page_from_free_area(page, &zone->free_area[order]);
-+		del_page_from_free_list(page, zone, order);
- 		for (i = 0; i < (1 << order); i++)
- 			SetPageReserved((page+i));
- 		pfn += (1 << order);
+ 	return __pte(pgd_val(pgd));
 
