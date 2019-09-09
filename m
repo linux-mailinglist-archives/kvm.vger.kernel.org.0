@@ -2,119 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D05BADC68
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 17:47:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03F7CADC86
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 17:56:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388903AbfIIPrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 11:47:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49506 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729586AbfIIPrY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 11:47:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 78E643172D8B;
-        Mon,  9 Sep 2019 15:47:23 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-85.ams2.redhat.com [10.36.116.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D8065C1D8;
-        Mon,  9 Sep 2019 15:47:22 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 5/6] s390x: Prepare for external calls
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com
-References: <20190905103951.36522-1-frankja@linux.ibm.com>
- <20190905103951.36522-6-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
- aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
- QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
- EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
- 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
- eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
- ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
- zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
- tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
- WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
- UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
- BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
- 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
- +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
- 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
- gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
- WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
- VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
- knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
- cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
- X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
- AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
- ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
- fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
- 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
- cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
- ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
- Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
- oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
- IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
- yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-Organization: Red Hat
-Message-ID: <093802cb-519b-144a-0c36-8faa2cbd08d8@redhat.com>
-Date:   Mon, 9 Sep 2019 17:47:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1730149AbfIIP4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 11:56:35 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:40817 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729209AbfIIP4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 11:56:35 -0400
+Received: by mail-io1-f68.google.com with SMTP id h144so29829476iof.7
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 08:56:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eCPj62l3A6REMyrmpXQABp9kXimmH8PW2Uyv0frDZaE=;
+        b=XJB9fVvDLdRPArIUafpoI/zRxhZk1aErpNQxSes8qdjTudUdpV3MBne703FGW+C42S
+         a03RgkI+96nFkeyN5ZIanyNTpjBN1pJZsaQvMEIoLLrwnElGs671lvwztDrTxn3HjNzK
+         MM5dd+KzK1VY5LCBD2xhPKXLuJ/wzWW0rSG8X4bRmzbyHh0jZ/q8WNeoqfPj27ViU3Xn
+         Gx3GVqiJd3ZqMGv0PAbnzQn+dG/seM4Ehs7PZd/g6LdzGABUQCweusx3Y1jm7XbiwvJ0
+         qU2gYy6mCy1XNY8QvpFHidJJxdcnpttnYk1zkVFLLQL77Wseto1pEfmcPCL1Kh1xgeGg
+         SCew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eCPj62l3A6REMyrmpXQABp9kXimmH8PW2Uyv0frDZaE=;
+        b=kUNlvooUXgw2SeHTsM+gtXE5Efrzxz2Kk+rl11nHzN/yx29JoGYV23aEDvxfvapufL
+         NvCxlM5FOcDH/UmDRJBsmaY5mvQ65JqnsEs+2DoI5Z5+wdSFn8PRcCeaq7uQN57KV+YV
+         rd8YIlHl1CM9idQBBTDR7CqcOKbaUELwoe8lUK4SuhvoAoJjL4acRsyAq6X4Vt+7o6XQ
+         5gryWLUBxImMlAl0OWqTI434dFaOQk88qjGacKj0DqD+IsYNc+z9PMGN8ZIpnk6lwhAX
+         /eQNugJshLDbbk+CRnfPPJd3EEyobRoXyGMXKVbZ88LpJourbmQ+/RR7MjRjj2tk//TI
+         Lu3w==
+X-Gm-Message-State: APjAAAXtennECm4lpuP44YOmdM3yGz4PgofwX0DSHIA+m9JK4YAftKpz
+        DAnV9NOnHdut/zAuZjgK3rRkbLkdaqvtoGUgCNTtNg==
+X-Google-Smtp-Source: APXvYqwCX+twuMgs6KR0dK/OCLs2NRQnBfy6rVNDWAapzXt69+FdQ3PX1WRt+DO4rYft4QskSKza3QB64YqKJYROH8M=
+X-Received: by 2002:a5e:d616:: with SMTP id w22mr14398618iom.118.1568044594249;
+ Mon, 09 Sep 2019 08:56:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190905103951.36522-6-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Mon, 09 Sep 2019 15:47:23 +0000 (UTC)
+References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
+ <20190829205635.20189-3-krish.sadhukhan@oracle.com> <CALMp9eSekWEvvgwhMXWOtRZG1saQDOaKr+_4AacuM9JtH5guww@mail.gmail.com>
+ <a4882749-a5cc-f8cd-4641-dd61314e6312@oracle.com> <CALMp9eTBPRT+Re9rZzmutAiy62qSMQRfMrnyiYkNHkCKDy-KPQ@mail.gmail.com>
+ <CALMp9eRWSvg22JPUKOssOHwOq=uXn6GumXP1-LB2ZiYbd0N6bQ@mail.gmail.com>
+ <e229bea2-acb2-e268-6281-d8e467c3282e@oracle.com> <CALMp9eTObQkBrKpN-e=ejD8E5w3WpbcNkXt2gJ46xboYwR+b7Q@mail.gmail.com>
+ <e8a4477c-b3a9-b4e4-1283-99bdaf7aa29b@oracle.com> <CALMp9eTO_ChOHQ4paR1SgmxnpSGZrMjHTa2aUWHSCn0+tCGvAA@mail.gmail.com>
+ <9eb99666-7af8-6a59-51ee-f5285d9a67f0@oracle.com>
+In-Reply-To: <9eb99666-7af8-6a59-51ee-f5285d9a67f0@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 9 Sep 2019 08:56:23 -0700
+Message-ID: <CALMp9eQ-eJEusJnhDuVzxnF6Fa4VHdzx+dw5fMmRSFSB5DUthg@mail.gmail.com>
+Subject: Re: [PATCH 2/4] KVM: nVMX: Check GUEST_DR7 on vmentry of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/09/2019 12.39, Janosch Frank wrote:
-> With SMP we also get new external interrupts like external call and
-> emergency call. Let's make them known.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
-[...]
-> @@ -108,15 +116,23 @@ void handle_pgm_int(void)
->  
->  void handle_ext_int(void)
->  {
-> -	if (lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
-> +	if (!ext_int_expected &&
-> +	    lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
->  		report_abort("Unexpected external call interrupt: at %#lx",
->  			     lc->ext_old_psw.addr);
-> -	} else {
-> -		lc->ext_old_psw.mask &= ~PSW_MASK_EXT;
-> +		return;
-> +	}
-> +
-> +	if (lc->ext_int_code == EXT_IRQ_SERVICE_SIG) {
->  		lc->sw_int_cr0 &= ~(1UL << 9);
->  		sclp_handle_ext();
-> -		lc->ext_int_code = 0;
->  	}
-> +	if (lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
+On Sun, Sep 8, 2019 at 9:11 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
 
-I think you could simplify above line to "else {" ?
+> It seems like a good solution. The only problem I see in this is that
+> using the reserved bits is not guaranteed to work forever as the
+> hardware vendors can decide to use them anytime.
 
-With that change:
+Unlikely, but point taken.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Instead, I was wondering whether we could set bits 31:0 in the first
+> entry in the VM-entry MSR-load area of vmcs02 to a value of C0000100H.
+> According to Intel SDM, this will cause VM-entry to fail:
+>
+>             "The value of bits 31:0 is either C0000100H (the
+> IA32_FS_BASE MSR) or C0000101 (the IA32_GS_BASE MSR)."
+>
+> We can use bits 127:64 of that entry to indicate which MSR entry in the
+> vmcs12 MSR-load area had an error and then we synthesize an exit
+> qualification from that information.
+
+That seems reasonable to me.
