@@ -2,24 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FE12AD4BF
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 10:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC3DAAD519
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 10:52:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389225AbfIIIWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 04:22:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21345 "EHLO mx1.redhat.com"
+        id S1727669AbfIIIwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 04:52:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46758 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726996AbfIIIWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 04:22:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1727298AbfIIIwV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 04:52:21 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0DBA318CB511;
-        Mon,  9 Sep 2019 08:22:43 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 07CB630860DA;
+        Mon,  9 Sep 2019 08:52:20 +0000 (UTC)
 Received: from [10.36.116.173] (ovpn-116-173.ams2.redhat.com [10.36.116.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CE40600C1;
-        Mon,  9 Sep 2019 08:22:30 +0000 (UTC)
-Subject: Re: [PATCH v9 3/8] mm: Move set/get_pcppage_migratetype to mmzone.h
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45A7B5D9D6;
+        Mon,  9 Sep 2019 08:52:07 +0000 (UTC)
+Subject: Re: [PATCH v9 5/8] arm64: Move hugetlb related definitions out of
+ pgtable.h to page-defs.h
 To:     Alexander Duyck <alexander.duyck@gmail.com>,
         virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
         mst@redhat.com, catalin.marinas@arm.com, dave.hansen@intel.com,
@@ -34,7 +35,7 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
         dan.j.williams@intel.com, fengguang.wu@intel.com,
         alexander.h.duyck@linux.intel.com, kirill.shutemov@linux.intel.com
 References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190907172528.10910.37051.stgit@localhost.localdomain>
+ <20190907172545.10910.88045.stgit@localhost.localdomain>
 From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -81,17 +82,17 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <98c05446-84f6-97f1-b246-1ad9595cc230@redhat.com>
-Date:   Mon, 9 Sep 2019 10:22:29 +0200
+Message-ID: <90785d30-cde9-f380-5f4a-8af989b11729@redhat.com>
+Date:   Mon, 9 Sep 2019 10:52:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190907172528.10910.37051.stgit@localhost.localdomain>
+In-Reply-To: <20190907172545.10910.88045.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Mon, 09 Sep 2019 08:22:43 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 09 Sep 2019 08:52:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -100,83 +101,42 @@ X-Mailing-List: kvm@vger.kernel.org
 On 07.09.19 19:25, Alexander Duyck wrote:
 > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > 
-> In order to support page reporting it will be necessary to store and
-> retrieve the migratetype of a page. To enable that I am moving the set and
-> get operations for pcppage_migratetype into the mm/internal.h header so
-> that they can be used outside of the page_alloc.c file.
+> Move the static definition for things such as HUGETLB_PAGE_ORDER out of
+> asm/pgtable.h and place it in page-defs.h. By doing this the includes
+> become much easier to deal with as currently arm64 is the only architecture
+> that didn't include this definition in the asm/page.h file or a file
+> included by it.
 > 
-> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> It also makes logical sense as PAGE_SHIFT was already defined in
+> page-defs.h so now we also have HPAGE_SHIFT defined there as well.
+> 
 > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > ---
->  mm/internal.h   |   18 ++++++++++++++++++
->  mm/page_alloc.c |   18 ------------------
->  2 files changed, 18 insertions(+), 18 deletions(-)
+>  arch/arm64/include/asm/page-def.h |    9 +++++++++
+>  arch/arm64/include/asm/pgtable.h  |    9 ---------
+>  2 files changed, 9 insertions(+), 9 deletions(-)
 > 
-> diff --git a/mm/internal.h b/mm/internal.h
-> index 0d5f720c75ab..e4a1a57bbd40 100644
-> --- a/mm/internal.h
-> +++ b/mm/internal.h
-> @@ -549,6 +549,24 @@ static inline bool is_migrate_highatomic_page(struct page *page)
->  	return get_pageblock_migratetype(page) == MIGRATE_HIGHATOMIC;
->  }
+> diff --git a/arch/arm64/include/asm/page-def.h b/arch/arm64/include/asm/page-def.h
+> index f99d48ecbeef..1c5b079e2482 100644
+> --- a/arch/arm64/include/asm/page-def.h
+> +++ b/arch/arm64/include/asm/page-def.h
+> @@ -20,4 +20,13 @@
+>  #define CONT_SIZE		(_AC(1, UL) << (CONT_SHIFT + PAGE_SHIFT))
+>  #define CONT_MASK		(~(CONT_SIZE-1))
 >  
 > +/*
-> + * A cached value of the page's pageblock's migratetype, used when the page is
-> + * put on a pcplist. Used to avoid the pageblock migratetype lookup when
-> + * freeing from pcplists in most cases, at the cost of possibly becoming stale.
-> + * Also the migratetype set in the page does not necessarily match the pcplist
-> + * index, e.g. page might have MIGRATE_CMA set but be on a pcplist with any
-> + * other index - this ensures that it will be put on the correct CMA freelist.
+> + * Hugetlb definitions.
 > + */
-> +static inline int get_pcppage_migratetype(struct page *page)
-> +{
-> +	return page->index;
-> +}
+> +#define HUGE_MAX_HSTATE		4
+> +#define HPAGE_SHIFT		PMD_SHIFT
+> +#define HPAGE_SIZE		(_AC(1, UL) << HPAGE_SHIFT)
+> +#define HPAGE_MASK		(~(HPAGE_SIZE - 1))
+> +#define HUGETLB_PAGE_ORDER	(HPAGE_SHIFT - PAGE_SHIFT)
 > +
-> +static inline void set_pcppage_migratetype(struct page *page, int migratetype)
-> +{
-> +	page->index = migratetype;
-> +}
-> +
->  void setup_zone_pageset(struct zone *zone);
->  extern struct page *alloc_new_node_page(struct page *page, unsigned long node);
->  #endif	/* __MM_INTERNAL_H */
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index 4e4356ba66c7..a791f2baeeeb 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -185,24 +185,6 @@ static int __init early_init_on_free(char *buf)
->  }
->  early_param("init_on_free", early_init_on_free);
->  
-> -/*
-> - * A cached value of the page's pageblock's migratetype, used when the page is
-> - * put on a pcplist. Used to avoid the pageblock migratetype lookup when
-> - * freeing from pcplists in most cases, at the cost of possibly becoming stale.
-> - * Also the migratetype set in the page does not necessarily match the pcplist
-> - * index, e.g. page might have MIGRATE_CMA set but be on a pcplist with any
-> - * other index - this ensures that it will be put on the correct CMA freelist.
-> - */
-> -static inline int get_pcppage_migratetype(struct page *page)
-> -{
-> -	return page->index;
-> -}
-> -
-> -static inline void set_pcppage_migratetype(struct page *page, int migratetype)
-> -{
-> -	page->index = migratetype;
-> -}
-> -
->  #ifdef CONFIG_PM_SLEEP
->  /*
->   * The following functions are used by the suspend/hibernate code to temporarily
-> 
-> 
 
-Still have to understand in detail how this will be used, but the change
-certainly looks ok :)
-
-Acked-by: David Hildenbrand <david@redhat.com>
+I wonder if you should initially limit "config PAGE_REPORTING" to x86
+only and unlock it for the other targets once we actually test it there.
+Or did you test PAGE_REPORTING on other architectures as well?
 
 -- 
 
