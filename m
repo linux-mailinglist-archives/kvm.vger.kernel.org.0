@@ -2,247 +2,858 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B130AD275
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 06:11:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 320E3AD2B8
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 06:45:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726298AbfIIELk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 00:11:40 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:49258 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725710AbfIIELk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 00:11:40 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8948qB7135869;
-        Mon, 9 Sep 2019 04:11:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=JMrdK52K9PARqv84F90Wswmck2rEKuIjCTh0GdHJUqU=;
- b=cL0bz+ZcM5SScSACmqrZWaqgvLwEFbnCbZzgv/FtnEd/AyLEatgshzxNHAneN9l8y6Zs
- oCc8HyYJl4Kdrbn5K40MZfdc1hofzrBi8Xf4mmaFOm9IbvxCFTPFJ0gR2y6SxA7NMwgr
- 59TKaXRwtUz7MNi31OumD8HfcoXomR06rKuD4mNN14GZK7acSocxelONU8pRC27xk7ML
- bd+KOB+1sXhY7llmTO0oyupnDpSZyuAmLW77yTKfEWQRpVSnX4H+O4Bkiq0lkf1Zm0bE
- 91Z+aHmtEaDzhqw+Zp52D8qrE9XTK5KQ2Vwp1KM6MyVYpJez8aHQ0md45MfKECm52NiY 0Q== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2uw1jxsg5j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 09 Sep 2019 04:11:23 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8949BtA168270;
-        Mon, 9 Sep 2019 04:11:22 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2uv3wkyf8x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 09 Sep 2019 04:11:22 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x894BLgx019484;
-        Mon, 9 Sep 2019 04:11:21 GMT
-Received: from [10.159.150.228] (/10.159.150.228)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 08 Sep 2019 21:11:21 -0700
-Subject: Re: [PATCH 2/4] KVM: nVMX: Check GUEST_DR7 on vmentry of nested
- guests
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
- <20190829205635.20189-3-krish.sadhukhan@oracle.com>
- <CALMp9eSekWEvvgwhMXWOtRZG1saQDOaKr+_4AacuM9JtH5guww@mail.gmail.com>
- <a4882749-a5cc-f8cd-4641-dd61314e6312@oracle.com>
- <CALMp9eTBPRT+Re9rZzmutAiy62qSMQRfMrnyiYkNHkCKDy-KPQ@mail.gmail.com>
- <CALMp9eRWSvg22JPUKOssOHwOq=uXn6GumXP1-LB2ZiYbd0N6bQ@mail.gmail.com>
- <e229bea2-acb2-e268-6281-d8e467c3282e@oracle.com>
- <CALMp9eTObQkBrKpN-e=ejD8E5w3WpbcNkXt2gJ46xboYwR+b7Q@mail.gmail.com>
- <e8a4477c-b3a9-b4e4-1283-99bdaf7aa29b@oracle.com>
- <CALMp9eTO_ChOHQ4paR1SgmxnpSGZrMjHTa2aUWHSCn0+tCGvAA@mail.gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <9eb99666-7af8-6a59-51ee-f5285d9a67f0@oracle.com>
-Date:   Sun, 8 Sep 2019 21:11:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726694AbfIIEpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 00:45:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38912 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726491AbfIIEpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 00:45:50 -0400
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7FE6B765A5
+        for <kvm@vger.kernel.org>; Mon,  9 Sep 2019 04:45:49 +0000 (UTC)
+Received: by mail-qk1-f197.google.com with SMTP id b67so14944185qkc.1
+        for <kvm@vger.kernel.org>; Sun, 08 Sep 2019 21:45:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=iB48hXcXpGU7Iq2m1FjCmrhpGPEFpvytzAMMWWi50Ww=;
+        b=AqiOxlaC7iAj46HcrWUJrVroGbMUxbJxUFuxuU6J8MGabCXLP+z1JD68JYHNloTx5+
+         EahsmJfGN0/vRIUhavyVoCKm/BCBCpM9DHtojSnx0aYthsxmmX3HAXMLLPZD1xIF+TJa
+         rx2fTcERNYltqAEYZvjthC7ENIWXNi7Po/VoqDE8KtlqYnge0SL0Q2Av35/LVZ4m+oTw
+         trkvAn7GQqGhkw1Ew6LiGJr/gZMqkNbSUut3ddWmT8R3c1pwhdxm6Zdes7hCGzBv1DYr
+         d1JsiOYRYdDHRfxpZnFiuzY6VjyLpGAZuh2uPLI74XrCBI4tMCaH/YWDx5ylo+MPb4Hk
+         Rdaw==
+X-Gm-Message-State: APjAAAWDcXluq0Nf8lCkJLi6Slavm1M60omljXlzQCwByvDFQBe84RAs
+        NoKEDsMGOMwqQODfvj5sxtxCbKBjH/aAOZAXqta0ih5YT0T5JBaZPHTdLtw02z/nK4yHdAFPSZ9
+        UWS2XrcGscmiM
+X-Received: by 2002:a37:2784:: with SMTP id n126mr20483675qkn.302.1568004348679;
+        Sun, 08 Sep 2019 21:45:48 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwKv5r3xmUKjWg5ItQ6gaEjnsLCSV8+bI0kHu7oxJWx6McvARtSMSpIt18J1iiDSODbVsjriQ==
+X-Received: by 2002:a37:2784:: with SMTP id n126mr20483655qkn.302.1568004348275;
+        Sun, 08 Sep 2019 21:45:48 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+        by smtp.gmail.com with ESMTPSA id h4sm5600584qtn.62.2019.09.08.21.45.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Sep 2019 21:45:47 -0700 (PDT)
+Date:   Mon, 9 Sep 2019 00:45:40 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jgg@mellanox.com, aarcange@redhat.com, jglisse@redhat.com,
+        linux-mm@kvack.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        David Miller <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org, linux-parisc@vger.kernel.org
+Subject: Re: [PATCH 2/2] vhost: re-introducing metadata acceleration through
+ kernel virtual address
+Message-ID: <20190909004504-mutt-send-email-mst@kernel.org>
+References: <20190905122736.19768-1-jasowang@redhat.com>
+ <20190905122736.19768-3-jasowang@redhat.com>
+ <20190908063618-mutt-send-email-mst@kernel.org>
+ <1cb5aa8d-6213-5fce-5a77-fcada572c882@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eTO_ChOHQ4paR1SgmxnpSGZrMjHTa2aUWHSCn0+tCGvAA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9374 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909090044
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9374 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909090044
+In-Reply-To: <1cb5aa8d-6213-5fce-5a77-fcada572c882@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 09, 2019 at 10:18:57AM +0800, Jason Wang wrote:
+> 
+> On 2019/9/8 下午7:05, Michael S. Tsirkin wrote:
+> > On Thu, Sep 05, 2019 at 08:27:36PM +0800, Jason Wang wrote:
+> > > This is a rework on the commit 7f466032dc9e ("vhost: access vq
+> > > metadata through kernel virtual address").
+> > > 
+> > > It was noticed that the copy_to/from_user() friends that was used to
+> > > access virtqueue metdata tends to be very expensive for dataplane
+> > > implementation like vhost since it involves lots of software checks,
+> > > speculation barriers,
+> > So if we drop speculation barrier,
+> > there's a problem here in access will now be speculated.
+> > This effectively disables the defence in depth effect of
+> > b3bbfb3fb5d25776b8e3f361d2eedaabb0b496cd
+> >      x86: Introduce __uaccess_begin_nospec() and uaccess_try_nospec
+> > 
+> > 
+> > So now we need to sprinkle array_index_nospec or barrier_nospec over the
+> > code whenever we use an index we got from userspace.
+> > See below for some examples.
+> > 
+> > 
+> > > hardware feature toggling (e.g SMAP). The
+> > > extra cost will be more obvious when transferring small packets since
+> > > the time spent on metadata accessing become more significant.
+> > > 
+> > > This patch tries to eliminate those overheads by accessing them
+> > > through direct mapping of those pages. Invalidation callbacks is
+> > > implemented for co-operation with general VM management (swap, KSM,
+> > > THP or NUMA balancing). We will try to get the direct mapping of vq
+> > > metadata before each round of packet processing if it doesn't
+> > > exist. If we fail, we will simplely fallback to copy_to/from_user()
+> > > friends.
+> > > 
+> > > This invalidation, direct mapping access and set are synchronized
+> > > through spinlock. This takes a step back from the original commit
+> > > 7f466032dc9e ("vhost: access vq metadata through kernel virtual
+> > > address") which tries to RCU which is suspicious and hard to be
+> > > reviewed. This won't perform as well as RCU because of the atomic,
+> > > this could be addressed by the future optimization.
+> > > 
+> > > This method might does not work for high mem page which requires
+> > > temporary mapping so we just fallback to normal
+> > > copy_to/from_user() and may not for arch that has virtual tagged cache
+> > > since extra cache flushing is needed to eliminate the alias. This will
+> > > result complex logic and bad performance. For those archs, this patch
+> > > simply go for copy_to/from_user() friends. This is done by ruling out
+> > > kernel mapping codes through ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE.
+> > > 
+> > > Note that this is only done when device IOTLB is not enabled. We
+> > > could use similar method to optimize IOTLB in the future.
+> > > 
+> > > Tests shows at most about 22% improvement on TX PPS when using
+> > > virtio-user + vhost_net + xdp1 + TAP on 4.0GHz Kaby Lake.
+> > > 
+> > >          SMAP on | SMAP off
+> > > Before: 4.9Mpps | 6.9Mpps
+> > > After:  6.0Mpps | 7.5Mpps
+> > > 
+> > > On a elder CPU Sandy Bridge without SMAP support. TX PPS doesn't see
+> > > any difference.
+> > Why is not Kaby Lake with SMAP off the same as Sandy Bridge?
+> 
+> 
+> I don't know, I guess it was because the atomic is l
+> 
+> 
+> > 
+> > 
+> > > Cc: Andrea Arcangeli <aarcange@redhat.com>
+> > > Cc: James Bottomley <James.Bottomley@hansenpartnership.com>
+> > > Cc: Christoph Hellwig <hch@infradead.org>
+> > > Cc: David Miller <davem@davemloft.net>
+> > > Cc: Jerome Glisse <jglisse@redhat.com>
+> > > Cc: Jason Gunthorpe <jgg@mellanox.com>
+> > > Cc: linux-mm@kvack.org
+> > > Cc: linux-arm-kernel@lists.infradead.org
+> > > Cc: linux-parisc@vger.kernel.org
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > >   drivers/vhost/vhost.c | 551 +++++++++++++++++++++++++++++++++++++++++-
+> > >   drivers/vhost/vhost.h |  41 ++++
+> > >   2 files changed, 589 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > index 791562e03fe0..f98155f28f02 100644
+> > > --- a/drivers/vhost/vhost.c
+> > > +++ b/drivers/vhost/vhost.c
+> > > @@ -298,6 +298,182 @@ static void vhost_vq_meta_reset(struct vhost_dev *d)
+> > >   		__vhost_vq_meta_reset(d->vqs[i]);
+> > >   }
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +static void vhost_map_unprefetch(struct vhost_map *map)
+> > > +{
+> > > +	kfree(map->pages);
+> > > +	kfree(map);
+> > > +}
+> > > +
+> > > +static void vhost_set_map_dirty(struct vhost_virtqueue *vq,
+> > > +				struct vhost_map *map, int index)
+> > > +{
+> > > +	struct vhost_uaddr *uaddr = &vq->uaddrs[index];
+> > > +	int i;
+> > > +
+> > > +	if (uaddr->write) {
+> > > +		for (i = 0; i < map->npages; i++)
+> > > +			set_page_dirty(map->pages[i]);
+> > > +	}
+> > > +}
+> > > +
+> > > +static void vhost_uninit_vq_maps(struct vhost_virtqueue *vq)
+> > > +{
+> > > +	struct vhost_map *map[VHOST_NUM_ADDRS];
+> > > +	int i;
+> > > +
+> > > +	spin_lock(&vq->mmu_lock);
+> > > +	for (i = 0; i < VHOST_NUM_ADDRS; i++) {
+> > > +		map[i] = vq->maps[i];
+> > > +		if (map[i]) {
+> > > +			vhost_set_map_dirty(vq, map[i], i);
+> > > +			vq->maps[i] = NULL;
+> > > +		}
+> > > +	}
+> > > +	spin_unlock(&vq->mmu_lock);
+> > > +
+> > > +	/* No need for synchronization since we are serialized with
+> > > +	 * memory accessors (e.g vq mutex held).
+> > > +	 */
+> > > +
+> > > +	for (i = 0; i < VHOST_NUM_ADDRS; i++)
+> > > +		if (map[i])
+> > > +			vhost_map_unprefetch(map[i]);
+> > > +
+> > > +}
+> > > +
+> > > +static void vhost_reset_vq_maps(struct vhost_virtqueue *vq)
+> > > +{
+> > > +	int i;
+> > > +
+> > > +	vhost_uninit_vq_maps(vq);
+> > > +	for (i = 0; i < VHOST_NUM_ADDRS; i++)
+> > > +		vq->uaddrs[i].size = 0;
+> > > +}
+> > > +
+> > > +static bool vhost_map_range_overlap(struct vhost_uaddr *uaddr,
+> > > +				     unsigned long start,
+> > > +				     unsigned long end)
+> > > +{
+> > > +	if (unlikely(!uaddr->size))
+> > > +		return false;
+> > > +
+> > > +	return !(end < uaddr->uaddr || start > uaddr->uaddr - 1 + uaddr->size);
+> > > +}
+> > > +
+> > > +static void inline vhost_vq_access_map_begin(struct vhost_virtqueue *vq)
+> > > +{
+> > > +	spin_lock(&vq->mmu_lock);
+> > > +}
+> > > +
+> > > +static void inline vhost_vq_access_map_end(struct vhost_virtqueue *vq)
+> > > +{
+> > > +	spin_unlock(&vq->mmu_lock);
+> > > +}
+> > > +
+> > > +static int vhost_invalidate_vq_start(struct vhost_virtqueue *vq,
+> > > +				     int index,
+> > > +				     unsigned long start,
+> > > +				     unsigned long end,
+> > > +				     bool blockable)
+> > > +{
+> > > +	struct vhost_uaddr *uaddr = &vq->uaddrs[index];
+> > > +	struct vhost_map *map;
+> > > +
+> > > +	if (!vhost_map_range_overlap(uaddr, start, end))
+> > > +		return 0;
+> > > +	else if (!blockable)
+> > > +		return -EAGAIN;
+> > > +
+> > > +	spin_lock(&vq->mmu_lock);
+> > > +	++vq->invalidate_count;
+> > > +
+> > > +	map = vq->maps[index];
+> > > +	if (map)
+> > > +		vq->maps[index] = NULL;
+> > > +	spin_unlock(&vq->mmu_lock);
+> > > +
+> > > +	if (map) {
+> > > +		vhost_set_map_dirty(vq, map, index);
+> > > +		vhost_map_unprefetch(map);
+> > > +	}
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static void vhost_invalidate_vq_end(struct vhost_virtqueue *vq,
+> > > +				    int index,
+> > > +				    unsigned long start,
+> > > +				    unsigned long end)
+> > > +{
+> > > +	if (!vhost_map_range_overlap(&vq->uaddrs[index], start, end))
+> > > +		return;
+> > > +
+> > > +	spin_lock(&vq->mmu_lock);
+> > > +	--vq->invalidate_count;
+> > > +	spin_unlock(&vq->mmu_lock);
+> > > +}
+> > > +
+> > > +static int vhost_invalidate_range_start(struct mmu_notifier *mn,
+> > > +					const struct mmu_notifier_range *range)
+> > > +{
+> > > +	struct vhost_dev *dev = container_of(mn, struct vhost_dev,
+> > > +					     mmu_notifier);
+> > > +	bool blockable = mmu_notifier_range_blockable(range);
+> > > +	int i, j, ret;
+> > > +
+> > > +	for (i = 0; i < dev->nvqs; i++) {
+> > > +		struct vhost_virtqueue *vq = dev->vqs[i];
+> > > +
+> > > +		for (j = 0; j < VHOST_NUM_ADDRS; j++) {
+> > > +			ret = vhost_invalidate_vq_start(vq, j,
+> > > +							range->start,
+> > > +							range->end, blockable);
+> > > +			if (ret)
+> > > +				return ret;
+> > > +		}
+> > > +	}
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static void vhost_invalidate_range_end(struct mmu_notifier *mn,
+> > > +				       const struct mmu_notifier_range *range)
+> > > +{
+> > > +	struct vhost_dev *dev = container_of(mn, struct vhost_dev,
+> > > +					     mmu_notifier);
+> > > +	int i, j;
+> > > +
+> > > +	for (i = 0; i < dev->nvqs; i++) {
+> > > +		struct vhost_virtqueue *vq = dev->vqs[i];
+> > > +
+> > > +		for (j = 0; j < VHOST_NUM_ADDRS; j++)
+> > > +			vhost_invalidate_vq_end(vq, j,
+> > > +						range->start,
+> > > +						range->end);
+> > > +	}
+> > > +}
+> > > +
+> > > +static const struct mmu_notifier_ops vhost_mmu_notifier_ops = {
+> > > +	.invalidate_range_start = vhost_invalidate_range_start,
+> > > +	.invalidate_range_end = vhost_invalidate_range_end,
+> > > +};
+> > > +
+> > > +static void vhost_init_maps(struct vhost_dev *dev)
+> > > +{
+> > > +	struct vhost_virtqueue *vq;
+> > > +	int i, j;
+> > > +
+> > > +	dev->mmu_notifier.ops = &vhost_mmu_notifier_ops;
+> > > +
+> > > +	for (i = 0; i < dev->nvqs; ++i) {
+> > > +		vq = dev->vqs[i];
+> > > +		for (j = 0; j < VHOST_NUM_ADDRS; j++)
+> > > +			vq->maps[j] = NULL;
+> > > +	}
+> > > +}
+> > > +#endif
+> > > +
+> > >   static void vhost_vq_reset(struct vhost_dev *dev,
+> > >   			   struct vhost_virtqueue *vq)
+> > >   {
+> > > @@ -326,7 +502,11 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+> > >   	vq->busyloop_timeout = 0;
+> > >   	vq->umem = NULL;
+> > >   	vq->iotlb = NULL;
+> > > +	vq->invalidate_count = 0;
+> > >   	__vhost_vq_meta_reset(vq);
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	vhost_reset_vq_maps(vq);
+> > > +#endif
+> > >   }
+> > >   static int vhost_worker(void *data)
+> > > @@ -471,12 +651,15 @@ void vhost_dev_init(struct vhost_dev *dev,
+> > >   	dev->iov_limit = iov_limit;
+> > >   	dev->weight = weight;
+> > >   	dev->byte_weight = byte_weight;
+> > > +	dev->has_notifier = false;
+> > >   	init_llist_head(&dev->work_list);
+> > >   	init_waitqueue_head(&dev->wait);
+> > >   	INIT_LIST_HEAD(&dev->read_list);
+> > >   	INIT_LIST_HEAD(&dev->pending_list);
+> > >   	spin_lock_init(&dev->iotlb_lock);
+> > > -
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	vhost_init_maps(dev);
+> > > +#endif
+> > >   	for (i = 0; i < dev->nvqs; ++i) {
+> > >   		vq = dev->vqs[i];
+> > > @@ -485,6 +668,7 @@ void vhost_dev_init(struct vhost_dev *dev,
+> > >   		vq->heads = NULL;
+> > >   		vq->dev = dev;
+> > >   		mutex_init(&vq->mutex);
+> > > +		spin_lock_init(&vq->mmu_lock);
+> > >   		vhost_vq_reset(dev, vq);
+> > >   		if (vq->handle_kick)
+> > >   			vhost_poll_init(&vq->poll, vq->handle_kick,
+> > > @@ -564,7 +748,19 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
+> > >   	if (err)
+> > >   		goto err_cgroup;
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	err = mmu_notifier_register(&dev->mmu_notifier, dev->mm);
+> > > +	if (err)
+> > > +		goto err_mmu_notifier;
+> > > +#endif
+> > > +	dev->has_notifier = true;
+> > > +
+> > >   	return 0;
+> > > +
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +err_mmu_notifier:
+> > > +	vhost_dev_free_iovecs(dev);
+> > > +#endif
+> > >   err_cgroup:
+> > >   	kthread_stop(worker);
+> > >   	dev->worker = NULL;
+> > > @@ -655,6 +851,107 @@ static void vhost_clear_msg(struct vhost_dev *dev)
+> > >   	spin_unlock(&dev->iotlb_lock);
+> > >   }
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +static void vhost_setup_uaddr(struct vhost_virtqueue *vq,
+> > > +			      int index, unsigned long uaddr,
+> > > +			      size_t size, bool write)
+> > > +{
+> > > +	struct vhost_uaddr *addr = &vq->uaddrs[index];
+> > > +
+> > > +	addr->uaddr = uaddr;
+> > > +	addr->size = size;
+> > > +	addr->write = write;
+> > > +}
+> > > +
+> > > +static void vhost_setup_vq_uaddr(struct vhost_virtqueue *vq)
+> > > +{
+> > > +	vhost_setup_uaddr(vq, VHOST_ADDR_DESC,
+> > > +			  (unsigned long)vq->desc,
+> > > +			  vhost_get_desc_size(vq, vq->num),
+> > > +			  false);
+> > > +	vhost_setup_uaddr(vq, VHOST_ADDR_AVAIL,
+> > > +			  (unsigned long)vq->avail,
+> > > +			  vhost_get_avail_size(vq, vq->num),
+> > > +			  false);
+> > > +	vhost_setup_uaddr(vq, VHOST_ADDR_USED,
+> > > +			  (unsigned long)vq->used,
+> > > +			  vhost_get_used_size(vq, vq->num),
+> > > +			  true);
+> > > +}
+> > > +
+> > > +static int vhost_map_prefetch(struct vhost_virtqueue *vq,
+> > > +			       int index)
+> > > +{
+> > > +	struct vhost_map *map;
+> > > +	struct vhost_uaddr *uaddr = &vq->uaddrs[index];
+> > > +	struct page **pages;
+> > > +	int npages = DIV_ROUND_UP(uaddr->size, PAGE_SIZE);
+> > > +	int npinned;
+> > > +	void *vaddr, *v;
+> > > +	int err;
+> > > +	int i;
+> > > +
+> > > +	spin_lock(&vq->mmu_lock);
+> > > +
+> > > +	err = -EFAULT;
+> > > +	if (vq->invalidate_count)
+> > > +		goto err;
+> > > +
+> > > +	err = -ENOMEM;
+> > > +	map = kmalloc(sizeof(*map), GFP_ATOMIC);
+> > > +	if (!map)
+> > > +		goto err;
+> > > +
+> > > +	pages = kmalloc_array(npages, sizeof(struct page *), GFP_ATOMIC);
+> > > +	if (!pages)
+> > > +		goto err_pages;
+> > > +
+> > > +	err = EFAULT;
+> > > +	npinned = __get_user_pages_fast(uaddr->uaddr, npages,
+> > > +					uaddr->write, pages);
+> > > +	if (npinned > 0)
+> > > +		release_pages(pages, npinned);
+> > > +	if (npinned != npages)
+> > > +		goto err_gup;
+> > > +
+> > > +	for (i = 0; i < npinned; i++)
+> > > +		if (PageHighMem(pages[i]))
+> > > +			goto err_gup;
+> > > +
+> > > +	vaddr = v = page_address(pages[0]);
+> > > +
+> > > +	/* For simplicity, fallback to userspace address if VA is not
+> > > +	 * contigious.
+> > > +	 */
+> > > +	for (i = 1; i < npinned; i++) {
+> > > +		v += PAGE_SIZE;
+> > > +		if (v != page_address(pages[i]))
+> > > +			goto err_gup;
+> > > +	}
+> > > +
+> > > +	map->addr = vaddr + (uaddr->uaddr & (PAGE_SIZE - 1));
+> > > +	map->npages = npages;
+> > > +	map->pages = pages;
+> > > +
+> > > +	vq->maps[index] = map;
+> > > +	/* No need for a synchronize_rcu(). This function should be
+> > > +	 * called by dev->worker so we are serialized with all
+> > > +	 * readers.
+> > > +	 */
+> > > +	spin_unlock(&vq->mmu_lock);
+> > > +
+> > > +	return 0;
+> > > +
+> > > +err_gup:
+> > > +	kfree(pages);
+> > > +err_pages:
+> > > +	kfree(map);
+> > > +err:
+> > > +	spin_unlock(&vq->mmu_lock);
+> > > +	return err;
+> > > +}
+> > > +#endif
+> > > +
+> > >   void vhost_dev_cleanup(struct vhost_dev *dev)
+> > >   {
+> > >   	int i;
+> > > @@ -684,8 +981,20 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+> > >   		kthread_stop(dev->worker);
+> > >   		dev->worker = NULL;
+> > >   	}
+> > > -	if (dev->mm)
+> > > +	if (dev->mm) {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +		if (dev->has_notifier) {
+> > > +			mmu_notifier_unregister(&dev->mmu_notifier,
+> > > +						dev->mm);
+> > > +			dev->has_notifier = false;
+> > > +		}
+> > > +#endif
+> > >   		mmput(dev->mm);
+> > > +	}
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	for (i = 0; i < dev->nvqs; i++)
+> > > +		vhost_uninit_vq_maps(dev->vqs[i]);
+> > > +#endif
+> > >   	dev->mm = NULL;
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(vhost_dev_cleanup);
+> > > @@ -914,6 +1223,26 @@ static inline void __user *__vhost_get_user(struct vhost_virtqueue *vq,
+> > >   static inline int vhost_put_avail_event(struct vhost_virtqueue *vq)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_used *used;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_USED];
+> > > +		if (likely(map)) {
+> > > +			used = map->addr;
+> > > +			*((__virtio16 *)&used->ring[vq->num]) =
+> > > +				cpu_to_vhost16(vq, vq->avail_idx);
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_put_user(vq, cpu_to_vhost16(vq, vq->avail_idx),
+> > >   			      vhost_avail_event(vq));
+> > >   }
+> > > @@ -922,6 +1251,27 @@ static inline int vhost_put_used(struct vhost_virtqueue *vq,
+> > >   				 struct vring_used_elem *head, int idx,
+> > >   				 int count)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_used *used;
+> > > +	size_t size;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_USED];
+> > > +		if (likely(map)) {
+> > > +			used = map->addr;
+> > > +			size = count * sizeof(*head);
+> > > +			memcpy(used->ring + idx, head, size);
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_copy_to_user(vq, vq->used->ring + idx, head,
+> > >   				  count * sizeof(*head));
+> > >   }
+> > > @@ -929,6 +1279,25 @@ static inline int vhost_put_used(struct vhost_virtqueue *vq,
+> > >   static inline int vhost_put_used_flags(struct vhost_virtqueue *vq)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_used *used;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_USED];
+> > > +		if (likely(map)) {
+> > > +			used = map->addr;
+> > > +			used->flags = cpu_to_vhost16(vq, vq->used_flags);
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_put_user(vq, cpu_to_vhost16(vq, vq->used_flags),
+> > >   			      &vq->used->flags);
+> > >   }
+> > > @@ -936,6 +1305,25 @@ static inline int vhost_put_used_flags(struct vhost_virtqueue *vq)
+> > >   static inline int vhost_put_used_idx(struct vhost_virtqueue *vq)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_used *used;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_USED];
+> > > +		if (likely(map)) {
+> > > +			used = map->addr;
+> > > +			used->idx = cpu_to_vhost16(vq, vq->last_used_idx);
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_put_user(vq, cpu_to_vhost16(vq, vq->last_used_idx),
+> > >   			      &vq->used->idx);
+> > >   }
+> > > @@ -981,12 +1369,50 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
+> > >   static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq,
+> > >   				      __virtio16 *idx)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_avail *avail;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_AVAIL];
+> > > +		if (likely(map)) {
+> > > +			avail = map->addr;
+> > > +			*idx = avail->idx;
+> > index can now be speculated.
+> 
+> [...]
+> 
+> 
+> > +		vhost_vq_access_map_begin(vq);
+> > +
+> > +		map = vq->maps[VHOST_ADDR_AVAIL];
+> > +		if (likely(map)) {
+> > +			avail = map->addr;
+> > +			*head = avail->ring[idx & (vq->num - 1)];
+> > 
+> > Since idx can be speculated, I guess we need array_index_nospec here?
+> 
+> 
+> So we have
+> 
+> ACQUIRE(mmu_lock)
+> 
+> get idx
+> 
+> RELEASE(mmu_lock)
+> 
+> ACQUIRE(mmu_lock)
+> 
+> read array[idx]
+> 
+> RELEASE(mmu_lock)
+> 
+> Then I think idx can't be speculated consider we've passed RELEASE +
+> ACQUIRE?
 
-On 9/4/19 11:20 AM, Jim Mattson wrote:
-> On Wed, Sep 4, 2019 at 11:07 AM Krish Sadhukhan
-> <krish.sadhukhan@oracle.com> wrote:
->>
->> On 9/4/19 9:44 AM, Jim Mattson wrote:
->>> On Tue, Sep 3, 2019 at 5:59 PM Krish Sadhukhan
->>> <krish.sadhukhan@oracle.com> wrote:
->>>>
->>>> On 09/01/2019 05:33 PM, Jim Mattson wrote:
->>>>
->>>> On Fri, Aug 30, 2019 at 4:15 PM Jim Mattson <jmattson@google.com> wrote:
->>>>
->>>> On Fri, Aug 30, 2019 at 4:07 PM Krish Sadhukhan
->>>> <krish.sadhukhan@oracle.com> wrote:
->>>>
->>>> On 08/29/2019 03:26 PM, Jim Mattson wrote:
->>>>
->>>> On Thu, Aug 29, 2019 at 2:25 PM Krish Sadhukhan
->>>> <krish.sadhukhan@oracle.com> wrote:
->>>>
->>>> According to section "Checks on Guest Control Registers, Debug Registers, and
->>>> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
->>>> of nested guests:
->>>>
->>>>        If the "load debug controls" VM-entry control is 1, bits 63:32 in the DR7
->>>>        field must be 0.
->>>>
->>>> Can't we just let the hardware check guest DR7? This results in
->>>> "VM-entry failure due to invalid guest state," right? And we just
->>>> reflect that to L1?
->>>>
->>>> Just trying to understand the reason why this particular check can be
->>>> deferred to the hardware.
->>>>
->>>> The vmcs02 field has the same value as the vmcs12 field, and the
->>>> physical CPU has the same requirements as the virtual CPU.
->>>>
->>>> Actually, you're right. There is a problem. With the current
->>>> implementation, there's a priority inversion if the vmcs12 contains
->>>> both illegal guest state for which the checks are deferred to
->>>> hardware, and illegal entries in the VM-entry MSR-load area. In this
->>>> case, we will synthesize a "VM-entry failure due to MSR loading"
->>>> rather than a "VM-entry failure due to invalid guest state."
->>>>
->>>> There are so many checks on guest state that it's really compelling to
->>>> defer as many as possible to hardware. However, we need to fix the
->>>> aforesaid priority inversion. Instead of returning early from
->>>> nested_vmx_enter_non_root_mode() with EXIT_REASON_MSR_LOAD_FAIL, we
->>>> could induce a "VM-entry failure due to MSR loading" for the next
->>>> VM-entry of vmcs02 and continue with the attempted vmcs02 VM-entry. If
->>>> hardware exits with EXIT_REASON_INVALID_STATE, we reflect that to L1,
->>>> and if hardware exits with EXIT_REASON_INVALID_STATE, we reflect that
->>>> to L1 (along with the appropriate exit qualification).
->>>>
->>>>
->>>> Looking at nested_vmx_exit_reflected(), it seems we do return to L1 if the error is EXIT_REASON_INVALID_STATE. So if we fix the priority inversion, this should work then ?
->>> Yes.
->>>
->>>> The tricky part is in undoing the successful MSR writes if we reflect
->>>> EXIT_REASON_INVALID_STATE to L1. Some MSR writes can't actually be
->>>> undone (e.g. writes to IA32_PRED_CMD), but maybe we can get away with
->>>> those. (Fortunately, it's illegal to put x2APIC MSRs in the VM-entry
->>>> MSR-load area!) Other MSR writes are just a bit tricky to undo (e.g.
->>>> writes to IA32_TIME_STAMP_COUNTER).
->>>>
->>>>
->>>> Let's say that the priority inversion issue is fixed. In the scenario in which the Guest state is fine but the VM-entry MSR-Load area contains an illegal entry,  you are saying that the induced "VM-entry failure due to MSR loading"  will be caught during the next VM-entry of vmcs02. So how far does the attempted VM-entry of vmcs02  continue with an illegal MSR-Load entry and how do get to the next VM-entry of vmcs02 ?
->>> Sorry; I don't understand the questions.
->>
->> Let's say that all guest state checks are deferred to hardware and that
->> they all will pass. Now, the VM-entry MSR-load area contains an illegal
->> entry and we modify nested_vmx_enter_non_root_mode() to induce a
->> "VM-entry failure due to MSR loading" for the next VM-entry of vmcs02. I
->> wanted to understand how that induced error ultimately leads to a
->> VM-entry failure ?
-> One possible implementation is as follows:
->
-> While nested_vmx_load_msr() is processing the vmcs12 VM-entry MSR-load
-> area, it finds an error in entry <i>. We could set up the vmcs02
-> VM-entry MSR-load area so that the first entry has <i+1> in the
-> reserved bits, and the VM-entry MSR-load count is greater than 0.
-> Since the reserved bits must be one, when we try to launch/resume the
-> vmcs02 in vmx_vcpu_run(), it will result in "VM-entry failure due to
-> MSR loading." We can then reflect that to the guest, setting the
-> vmcs12 exit qualification field from the reserved bits in the first
-> entry of the vmcs02 VM-entry MSR-load area, rather than passing on the
-> exit qualification field from the vmcs02. Of course, this doesn't work
-> if <i> is MAX_UINT32, but I suspect you've already got bigger problems
-> in that case.
+I don't think memory barriers have anything to do with speculation,
+they are architectural.
 
-
-It seems like a good solution. The only problem I see in this is that 
-using the reserved bits is not guaranteed to work forever as the 
-hardware vendors can decide to use them anytime.
-
-Instead, I was wondering whether we could set bits 31:0 in the first 
-entry in the VM-entry MSR-load area of vmcs02 to a value of C0000100H. 
-According to Intel SDM, this will cause VM-entry to fail:
-
-            "The value of bits 31:0 is either C0000100H (the 
-IA32_FS_BASE MSR) or C0000101 (the IA32_GS_BASE MSR)."
-
-We can use bits 127:64 of that entry to indicate which MSR entry in the 
-vmcs12 MSR-load area had an error and then we synthesize an exit 
-qualification from that information.
-
-
->
->>>> There are two other scenarios there:
->>>>
->>>>       1. Guest state is illegal and VM-entry MSR-Load area contains an illegal entry
->>>>       2. Guest state is illegal but VM-entry MSR-Load area is fine
->>>>
->>>> In these scenarios, L2 will exit to L1 with EXIT_REASON_INVALID_STATE and finally this will be returned to L1 userspace. Right ?  If so, we do we care about reverting MSR-writes  because the SDM section 26.8 say,
->>>>
->>>>           "Processor state is loaded as would be done on a VM exit (see Section 27.5)"
->>> I'm not sure how the referenced section of the SDM is relevant. Are
->>> you assuming that every MSR in the VM-entry MSR load area also appears
->>> in the VM-exit MSR load area? That certainly isn't the case.
->>>
->>>> Alternatively, we could perform validity checks on the entire vmcs12
->>>> VM-entry MSR-load area before writing any of the MSRs. This may be
->>>> easier, but it would certainly be slower. We would have to be wary of
->>>> situations where processing an earlier entry affects the validity of a
->>>> later entry. (If we take this route, then we would also have to
->>>> process the valid prefix of the VM-entry MSR-load area when we reflect
->>>> EXIT_REASON_MSR_LOAD_FAIL to L1.)
->>> Forget this paragraph. Even if all of the checks pass, we still have
->>> to undo all of the MSR-writes in the event of a deferred "VM-entry
->>> failure due to invalid guest state."
->>>
->>>> Note that this approach could be extended to permit the deferral of
->>>> some control field checks to hardware as well.
->>>>
->>>>
->>>> Why can't the first approach be used for VM-entry controls as well ?
->>> Sorry; I don't understand this question either.
->>
->> Since you mentioned,
->>
->>       "Note that this approach could be extended to permit the deferral
->> of some control field checks..."
->>
->> So it seemed that only the second approach was applicable to deferring
->> VM-entry control checks to hardware. Hence I asked why the first
->> approach can't be used.
-> By "this approach," I meant the deferred delivery of an error
-> discovered in software.
->
->>>>    As long as the control
->>>> field is copied verbatim from vmcs12 to vmcs02 and the virtual CPU
->>>> enforces the same constraints as the physical CPU, deferral should be
->>>> fine. We just have to make sure that we induce a "VM-entry failure due
->>>> to invalid guest state" for the next VM-entry of vmcs02 if any
->>>> software checks on guest state fail, rather than immediately
->>>> synthesizing an "VM-entry failure due to invalid guest state" during
->>>> the construction of vmcs02.
->>>>
->>>>
->>>> Is it OK to keep this Guest check in software for now and then remove it once we have a solution in place ?
->>> Why do you feel that getting the priority correct is so important for
->>> this one check in particular? I'd be surprised if any hypervisor ever
->>> assembled a VMCS that failed this check.
+> 
+> > 
+> > 
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_get_avail(vq, *head,
+> > >   			       &vq->avail->ring[idx & (vq->num - 1)]);
+> > >   }
+> > > @@ -994,24 +1420,98 @@ static inline int vhost_get_avail_head(struct vhost_virtqueue *vq,
+> > >   static inline int vhost_get_avail_flags(struct vhost_virtqueue *vq,
+> > >   					__virtio16 *flags)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_avail *avail;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_AVAIL];
+> > > +		if (likely(map)) {
+> > > +			avail = map->addr;
+> > > +			*flags = avail->flags;
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_get_avail(vq, *flags, &vq->avail->flags);
+> > >   }
+> > >   static inline int vhost_get_used_event(struct vhost_virtqueue *vq,
+> > >   				       __virtio16 *event)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_avail *avail;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +		map = vq->maps[VHOST_ADDR_AVAIL];
+> > > +		if (likely(map)) {
+> > > +			avail = map->addr;
+> > > +			*event = (__virtio16)avail->ring[vq->num];
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_get_avail(vq, *event, vhost_used_event(vq));
+> > >   }
+> > >   static inline int vhost_get_used_idx(struct vhost_virtqueue *vq,
+> > >   				     __virtio16 *idx)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_used *used;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_USED];
+> > > +		if (likely(map)) {
+> > > +			used = map->addr;
+> > > +			*idx = used->idx;
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_get_used(vq, *idx, &vq->used->idx);
+> > >   }
+> > 
+> > This seems to be used during init. Why do we bother
+> > accelerating this?
+> 
+> 
+> Ok, I can remove this part in next version.
+> 
+> 
+> > 
+> > 
+> > >   static inline int vhost_get_desc(struct vhost_virtqueue *vq,
+> > >   				 struct vring_desc *desc, int idx)
+> > >   {
+> > > +#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> > > +	struct vhost_map *map;
+> > > +	struct vring_desc *d;
+> > > +
+> > > +	if (!vq->iotlb) {
+> > > +		vhost_vq_access_map_begin(vq);
+> > > +
+> > > +		map = vq->maps[VHOST_ADDR_DESC];
+> > > +		if (likely(map)) {
+> > > +			d = map->addr;
+> > > +			*desc = *(d + idx);
+> > 
+> > Since idx can be speculated, I guess we need array_index_nospec here?
+> 
+> 
+> This is similar to the above avail idx case.
+> 
+> 
+> > 
+> > 
+> > > +			vhost_vq_access_map_end(vq);
+> > > +			return 0;
+> > > +		}
+> > > +
+> > > +		vhost_vq_access_map_end(vq);
+> > > +	}
+> > > +#endif
+> > > +
+> > >   	return vhost_copy_from_user(vq, desc, vq->desc + idx, sizeof(*desc));
+> > >   }
+> > I also wonder about the userspace address we get eventualy.
+> > It would seem that we need to prevent that from speculating -
+> > and that seems like a good idea even if this patch isn't
+> > applied. As you are playing with micro-benchmarks, maybe
+> > you could the below patch?
+> 
+> 
+> Let me test it.
+> 
+> Thanks
+> 
+> 
+> > It's unfortunately untested.
+> > Thanks a lot in advance!
+> > 
+> > ===>
+> > vhost: block speculation of translated descriptors
+> > 
+> > iovec addresses coming from vhost are assumed to be
+> > pre-validated, but in fact can be speculated to a value
+> > out of range.
+> > 
+> > Userspace address are later validated with array_index_nospec so we can
+> > be sure kernel info does not leak through these addresses, but vhost
+> > must also not leak userspace info outside the allowed memory table to
+> > guests.
+> > 
+> > Following the defence in depth principle, make sure
+> > the address is not validated out of node range.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > ---
+> > 
+> > 
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index 5dc174ac8cac..863e25011ef6 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -2072,7 +2076,9 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
+> >   		size = node->size - addr + node->start;
+> >   		_iov->iov_len = min((u64)len - s, size);
+> >   		_iov->iov_base = (void __user *)(unsigned long)
+> > -			(node->userspace_addr + addr - node->start);
+> > +			(node->userspace_addr +
+> > +			 array_index_nospec(addr - node->start,
+> > +					    node->size));
+> >   		s += size;
+> >   		addr += size;
+> >   		++ret;
