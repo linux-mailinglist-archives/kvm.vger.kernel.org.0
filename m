@@ -2,40 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3B67AD52F
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 10:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD2A2AD539
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 11:02:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727390AbfIII7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 04:59:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50410 "EHLO mx1.redhat.com"
+        id S1727525AbfIIJCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 05:02:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37550 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726891AbfIII7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 04:59:31 -0400
+        id S1726847AbfIIJCj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 05:02:39 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 686AA11A14;
-        Mon,  9 Sep 2019 08:59:30 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1B3A7191865B;
+        Mon,  9 Sep 2019 09:02:39 +0000 (UTC)
 Received: from [10.36.116.173] (ovpn-116-173.ams2.redhat.com [10.36.116.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 450A85D9D6;
-        Mon,  9 Sep 2019 08:59:09 +0000 (UTC)
-Subject: Re: [PATCH v9 7/8] virtio-balloon: Pull page poisoning config out of
- free page hinting
-To:     Alexander Duyck <alexander.duyck@gmail.com>,
-        virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
-        mst@redhat.com, catalin.marinas@arm.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        will@kernel.org, linux-arm-kernel@lists.infradead.org,
-        osalvador@suse.de
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
-        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        ying.huang@intel.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, fengguang.wu@intel.com,
-        alexander.h.duyck@linux.intel.com, kirill.shutemov@linux.intel.com
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190907172601.10910.95355.stgit@localhost.localdomain>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 17A3D5DA5B;
+        Mon,  9 Sep 2019 09:02:37 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 3/6] s390x: Add linemode buffer to fix
+ newline on every print
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
+References: <20190905103951.36522-1-frankja@linux.ibm.com>
+ <20190905103951.36522-4-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -82,95 +71,151 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <4dfcf372-97be-65ab-1349-75f24aa4f98a@redhat.com>
-Date:   Mon, 9 Sep 2019 10:59:08 +0200
+Message-ID: <d68e6371-e0a2-22d3-9443-0b54cb7337ca@redhat.com>
+Date:   Mon, 9 Sep 2019 11:02:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190907172601.10910.95355.stgit@localhost.localdomain>
+In-Reply-To: <20190905103951.36522-4-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 09 Sep 2019 08:59:30 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Mon, 09 Sep 2019 09:02:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.09.19 19:26, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On 05.09.19 12:39, Janosch Frank wrote:
+> Linemode seems to add a newline for each sent message which makes
+> reading rather hard. Hence we add a small buffer and only print if
+> it's full or a newline is encountered. Except for when the string is
+> longer than the buffer, then we flush the buffer and print directly.
 > 
-> Currently the page poisoning setting wasn't being enabled unless free page
-> hinting was enabled. However we will need the page poisoning tracking logic
-> as well for unused page reporting. As such pull it out and make it a
-> separate bit of config in the probe function.
-> 
-> In addition we can actually wrap the code in a check for NO_SANITY. If we
-> don't care what is actually in the page we can just default to 0 and leave
-> it there.
-> 
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  drivers/virtio/virtio_balloon.c |   22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
+>  lib/s390x/sclp-console.c | 70 +++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 66 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> index 226fbb995fb0..d2547df7de93 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -842,7 +842,6 @@ static int virtio_balloon_register_shrinker(struct virtio_balloon *vb)
->  static int virtballoon_probe(struct virtio_device *vdev)
->  {
->  	struct virtio_balloon *vb;
-> -	__u32 poison_val;
->  	int err;
+> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
+> index 19416b5..7397dc1 100644
+> --- a/lib/s390x/sclp-console.c
+> +++ b/lib/s390x/sclp-console.c
+> @@ -13,6 +13,7 @@
+>  #include <asm/page.h>
+>  #include <asm/arch_def.h>
+>  #include <asm/io.h>
+> +#include <asm/spinlock.h>
+>  #include "sclp.h"
 >  
->  	if (!vdev->config->get) {
-> @@ -909,11 +908,18 @@ static int virtballoon_probe(struct virtio_device *vdev)
->  						  VIRTIO_BALLOON_CMD_ID_STOP);
->  		spin_lock_init(&vb->free_page_list_lock);
->  		INIT_LIST_HEAD(&vb->free_page_list);
-> -		if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)) {
-> -			memset(&poison_val, PAGE_POISON, sizeof(poison_val));
-> -			virtio_cwrite(vb->vdev, struct virtio_balloon_config,
-> -				      poison_val, &poison_val);
-> -		}
+>  /*
+> @@ -87,6 +88,10 @@ static uint8_t _ascebc[256] = {
+>       0x90, 0x3F, 0x3F, 0x3F, 0x3F, 0xEA, 0x3F, 0xFF
+>  };
+>  
+> +static char lm_buff[120];
+> +static unsigned char lm_buff_off;
+> +static struct spinlock lm_buff_lock;
+> +
+>  static void sclp_print_ascii(const char *str)
+>  {
+>  	int len = strlen(str);
+> @@ -103,10 +108,10 @@ static void sclp_print_ascii(const char *str)
+>  	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+>  }
+>  
+> -static void sclp_print_lm(const char *str)
+> +static void lm_print(const char *buff, int len)
+>  {
+>  	unsigned char *ptr, *end, ch;
+> -	unsigned int count, offset, len;
+> +	unsigned int count, offset;
+>  	struct WriteEventData *sccb;
+>  	struct mdb *mdb;
+>  	struct mto *mto;
+> @@ -117,11 +122,10 @@ static void sclp_print_lm(const char *str)
+>  	end = (unsigned char *) sccb + 4096 - 1;
+>  	memset(sccb, 0, sizeof(*sccb));
+>  	ptr = (unsigned char *) &sccb->msg.mdb.mto;
+> -	len = strlen(str);
+>  	offset = 0;
+>  	do {
+>  		for (count = sizeof(*mto); offset < len; count++) {
+> -			ch = str[offset++];
+> +			ch = buff[offset++];
+>  			if (ch == 0x0a || ptr + count > end)
+>  				break;
+>  			ptr[count] = _ascebc[ch];
+> @@ -148,6 +152,64 @@ static void sclp_print_lm(const char *str)
+>  	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+>  }
+>  
+> +
+> +/*
+> + * In contrast to the ascii console, linemode produces a new
+> + * line with every write of data. The report() function uses
+> + * several printf() calls to generate a line of data which
+> + * would all end up on different lines.
+> + *
+> + * Hence we buffer here until we encounter a \n or the buffer
+> + * is full. That means that linemode output can look a bit
+> + * different from ascii and that it takes a bit longer for
+> + * lines to appear.
+> + */
+> +static void sclp_print_lm(const char *str)
+> +{
+> +	int len;
+> +	char *nl;
+> +
+> +	spin_lock(&lm_buff_lock);
+> +
+> +	len = strlen(str);
+> +	/*
+> +	 * No use in copying into lm_buff, its time to flush the
+> +	 * buffer and print str until finished.
+> +	 */
+> +	if (len > sizeof(lm_buff)) {
+> +		if (lm_buff_off)
+> +			lm_print(lm_buff, lm_buff_off);
+> +		lm_print(str, len);
+> +		memset(lm_buff, 0 , sizeof(lm_buff));
+> +		lm_buff_off = 0;
+> +		goto out;
 > +	}
-> +	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)) {
-> +		__u32 poison_val;
 > +
-> +		/*
-> +		 * Let hypervisor know that we are expecting a specific
-> +		 * value to be written back in unused pages.
-> +		 */
-
-"Let the hypervisor know" ... ?
-
-> +		memset(&poison_val, PAGE_POISON, sizeof(poison_val));
+> +fill:
+> +	len = len < (sizeof(lm_buff) - lm_buff_off) ? len : (sizeof(lm_buff) - lm_buff_off);
+> +	if ((lm_buff_off < sizeof(lm_buff) - 1)) {
+> +		memcpy(&lm_buff[lm_buff_off], str, len);
+> +		lm_buff_off += len;
+> +	}
+> +	/* Buffer not full and no newline */
+> +	nl = strchr(lm_buff, '\n');
+> +	if (lm_buff_off != sizeof(lm_buff) - 1 && !nl)
+> +		goto out;
 > +
-> +		virtio_cwrite(vb->vdev, struct virtio_balloon_config,
-> +			      poison_val, &poison_val);
->  	}
->  	/*
->  	 * We continue to use VIRTIO_BALLOON_F_DEFLATE_ON_OOM to decide if a
-> @@ -1014,7 +1020,9 @@ static int virtballoon_restore(struct virtio_device *vdev)
->  
->  static int virtballoon_validate(struct virtio_device *vdev)
->  {
-> -	if (!page_poisoning_enabled())
-> +	/* Notify host if we care about poison value */
-
-"Tell the host whether we care about poisoned pages." ?
-
-> +	if (IS_ENABLED(CONFIG_PAGE_POISONING_NO_SANITY) ||
-> +	    !page_poisoning_enabled())
->  		__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_PAGE_POISON);
->  
->  	__virtio_clear_bit(vdev, VIRTIO_F_IOMMU_PLATFORM);
+> +	lm_print(lm_buff, lm_buff_off);
+> +	memset(lm_buff, 0 , sizeof(lm_buff));
+> +	lm_buff_off = 0;
+> +
+> +	if (len < strlen(str)) {
+> +		str = &str[len];
+> +		len = strlen(str);
+> +		goto fill;
+> +	}
+> +
+> +out:
+> +	spin_unlock(&lm_buff_lock);
+> +}
+> +
+>  /*
+>   * SCLP needs to be initialized by setting a send and receive mask,
+>   * indicating which messages the control program (we) want(s) to
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
 
