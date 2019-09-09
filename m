@@ -2,223 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD2A2AD539
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 11:02:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CCCAAD541
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 11:07:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727525AbfIIJCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 05:02:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37550 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726847AbfIIJCj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 05:02:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1B3A7191865B;
-        Mon,  9 Sep 2019 09:02:39 +0000 (UTC)
-Received: from [10.36.116.173] (ovpn-116-173.ams2.redhat.com [10.36.116.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 17A3D5DA5B;
-        Mon,  9 Sep 2019 09:02:37 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 3/6] s390x: Add linemode buffer to fix
- newline on every print
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20190905103951.36522-1-frankja@linux.ibm.com>
- <20190905103951.36522-4-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <d68e6371-e0a2-22d3-9443-0b54cb7337ca@redhat.com>
-Date:   Mon, 9 Sep 2019 11:02:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727997AbfIIJHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 05:07:06 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:45983 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726585AbfIIJHF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 05:07:05 -0400
+Received: by mail-ed1-f66.google.com with SMTP id f19so12195648eds.12
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 02:07:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=4SKyZYA96ZSRssF5bkYvn8/ZaoQgr/75nnF3v6r+aa4=;
+        b=v8w3omLdQptz1DFzG6nBTgRTann5rTwOgCIpzFAUG6tuIXQysQUnfXsX6/y/3pY3P9
+         uuS7yln7izn8sa95u0TM8CxgbGe80u+X7t+BlonTv/Ols4bkZ2vzfkF1DV9YLxLMbFWT
+         xMTJREdPJWH3jVZBD9E+ZKhbm9fxBa7VvxrMdRD31hii4MCogV1JmJclv2q1d2hOR8mU
+         ZmP3pZ6SwqNXdDC1we1lskq5l3t193Mkb/3/NHR7WEDq49Askf9VlLY7UIB/Uu8JTBTS
+         Nb6KVgXuECh0+jAIrDzxGYdOgJP/buaC0u2KcFllDTZyMTRwGgl/GCSf7CPvpXRD1ygX
+         8PnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=4SKyZYA96ZSRssF5bkYvn8/ZaoQgr/75nnF3v6r+aa4=;
+        b=Vftj5OOdcHbZzqpmdWtO0sdD92ICEVKD89zM2dcu+AAicAGA23sgObrZSCIKOwTKIG
+         l202uGWY9BQcaQex16Oxz5VyRVwyJXG0iI7+ABaecTwlUCi0TAEHmWNCcSr1NlOrHGaY
+         kj00SNUeiJEyEsQob0vbBiPAx9SjrD3C2SQr+JCtAtRK/vbeMaGIyDb1tUZ+YTt3CPR8
+         vrdtmdr2dphFzE/KRK3OvQ4yoheXcy6a6CKpbvUrQK7jzdPTywhWzRcymQJt/cmbRu3Z
+         tmIdmSg2OAwXHh2HxQyMVS8kdGYOnQ/tGwNXRb9p4bu1yA9iaYVY4W/vsqGHktXYjtUm
+         SQCw==
+X-Gm-Message-State: APjAAAWpH/J/rhavkCj0F2oabCAMe/mpUVA18wX+Ci91Mk8aokDZcyLB
+        ZKBBgUbz8OuxNDnHYv8tNhzoDQ==
+X-Google-Smtp-Source: APXvYqyy8JsEYXIXPZAEHqSPlkNj11nYxwtRGAlvmsF3QvGEid/LtADgJQP/uhTJkNkMTa1lQpdZXQ==
+X-Received: by 2002:a17:906:af98:: with SMTP id mj24mr18377781ejb.199.1568020023846;
+        Mon, 09 Sep 2019 02:07:03 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id t21sm1658127ejs.37.2019.09.09.02.07.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Sep 2019 02:07:03 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 94FB410022D; Mon,  9 Sep 2019 12:07:01 +0300 (+03)
+Date:   Mon, 9 Sep 2019 12:07:01 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
+        mst@redhat.com, catalin.marinas@arm.com, david@redhat.com,
+        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, osalvador@suse.de,
+        yang.zhang.wz@gmail.com, pagupta@redhat.com,
+        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        ying.huang@intel.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, fengguang.wu@intel.com,
+        alexander.h.duyck@linux.intel.com, kirill.shutemov@linux.intel.com
+Subject: Re: [PATCH v9 1/8] mm: Add per-cpu logic to page shuffling
+Message-ID: <20190909090701.7ebz4foxyu3rxzvc@box>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190907172512.10910.74435.stgit@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190905103951.36522-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Mon, 09 Sep 2019 09:02:39 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190907172512.10910.74435.stgit@localhost.localdomain>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.09.19 12:39, Janosch Frank wrote:
-> Linemode seems to add a newline for each sent message which makes
-> reading rather hard. Hence we add a small buffer and only print if
-> it's full or a newline is encountered. Except for when the string is
-> longer than the buffer, then we flush the buffer and print directly.
+On Sat, Sep 07, 2019 at 10:25:12AM -0700, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  lib/s390x/sclp-console.c | 70 +++++++++++++++++++++++++++++++++++++---
->  1 file changed, 66 insertions(+), 4 deletions(-)
-> 
-> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-> index 19416b5..7397dc1 100644
-> --- a/lib/s390x/sclp-console.c
-> +++ b/lib/s390x/sclp-console.c
-> @@ -13,6 +13,7 @@
->  #include <asm/page.h>
->  #include <asm/arch_def.h>
->  #include <asm/io.h>
-> +#include <asm/spinlock.h>
->  #include "sclp.h"
->  
->  /*
-> @@ -87,6 +88,10 @@ static uint8_t _ascebc[256] = {
->       0x90, 0x3F, 0x3F, 0x3F, 0x3F, 0xEA, 0x3F, 0xFF
->  };
->  
-> +static char lm_buff[120];
-> +static unsigned char lm_buff_off;
-> +static struct spinlock lm_buff_lock;
-> +
->  static void sclp_print_ascii(const char *str)
->  {
->  	int len = strlen(str);
-> @@ -103,10 +108,10 @@ static void sclp_print_ascii(const char *str)
->  	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
->  }
->  
-> -static void sclp_print_lm(const char *str)
-> +static void lm_print(const char *buff, int len)
->  {
->  	unsigned char *ptr, *end, ch;
-> -	unsigned int count, offset, len;
-> +	unsigned int count, offset;
->  	struct WriteEventData *sccb;
->  	struct mdb *mdb;
->  	struct mto *mto;
-> @@ -117,11 +122,10 @@ static void sclp_print_lm(const char *str)
->  	end = (unsigned char *) sccb + 4096 - 1;
->  	memset(sccb, 0, sizeof(*sccb));
->  	ptr = (unsigned char *) &sccb->msg.mdb.mto;
-> -	len = strlen(str);
->  	offset = 0;
->  	do {
->  		for (count = sizeof(*mto); offset < len; count++) {
-> -			ch = str[offset++];
-> +			ch = buff[offset++];
->  			if (ch == 0x0a || ptr + count > end)
->  				break;
->  			ptr[count] = _ascebc[ch];
-> @@ -148,6 +152,64 @@ static void sclp_print_lm(const char *str)
->  	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
->  }
->  
-> +
-> +/*
-> + * In contrast to the ascii console, linemode produces a new
-> + * line with every write of data. The report() function uses
-> + * several printf() calls to generate a line of data which
-> + * would all end up on different lines.
-> + *
-> + * Hence we buffer here until we encounter a \n or the buffer
-> + * is full. That means that linemode output can look a bit
-> + * different from ascii and that it takes a bit longer for
-> + * lines to appear.
-> + */
-> +static void sclp_print_lm(const char *str)
-> +{
-> +	int len;
-> +	char *nl;
-> +
-> +	spin_lock(&lm_buff_lock);
-> +
-> +	len = strlen(str);
-> +	/*
-> +	 * No use in copying into lm_buff, its time to flush the
-> +	 * buffer and print str until finished.
-> +	 */
-> +	if (len > sizeof(lm_buff)) {
-> +		if (lm_buff_off)
-> +			lm_print(lm_buff, lm_buff_off);
-> +		lm_print(str, len);
-> +		memset(lm_buff, 0 , sizeof(lm_buff));
-> +		lm_buff_off = 0;
-> +		goto out;
-> +	}
-> +
-> +fill:
-> +	len = len < (sizeof(lm_buff) - lm_buff_off) ? len : (sizeof(lm_buff) - lm_buff_off);
-> +	if ((lm_buff_off < sizeof(lm_buff) - 1)) {
-> +		memcpy(&lm_buff[lm_buff_off], str, len);
-> +		lm_buff_off += len;
-> +	}
-> +	/* Buffer not full and no newline */
-> +	nl = strchr(lm_buff, '\n');
-> +	if (lm_buff_off != sizeof(lm_buff) - 1 && !nl)
-> +		goto out;
-> +
-> +	lm_print(lm_buff, lm_buff_off);
-> +	memset(lm_buff, 0 , sizeof(lm_buff));
-> +	lm_buff_off = 0;
-> +
-> +	if (len < strlen(str)) {
-> +		str = &str[len];
-> +		len = strlen(str);
-> +		goto fill;
-> +	}
-> +
-> +out:
-> +	spin_unlock(&lm_buff_lock);
-> +}
-> +
->  /*
->   * SCLP needs to be initialized by setting a send and receive mask,
->   * indicating which messages the control program (we) want(s) to
-> 
+> Change the logic used to generate randomness in the suffle path so that we
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Typo.
+
+> can avoid cache line bouncing. The previous logic was sharing the offset
+> and entropy word between all CPUs. As such this can result in cache line
+> bouncing and will ultimately hurt performance when enabled.
+> 
+> To resolve this I have moved to a per-cpu logic for maintaining a unsigned
+> long containing some amount of bits, and an offset value for which bit we
+> can use for entropy with each call.
+> 
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> ---
+>  mm/shuffle.c |   33 +++++++++++++++++++++++----------
+>  1 file changed, 23 insertions(+), 10 deletions(-)
+> 
+> diff --git a/mm/shuffle.c b/mm/shuffle.c
+> index 3ce12481b1dc..9ba542ecf335 100644
+> --- a/mm/shuffle.c
+> +++ b/mm/shuffle.c
+> @@ -183,25 +183,38 @@ void __meminit __shuffle_free_memory(pg_data_t *pgdat)
+>  		shuffle_zone(z);
+>  }
+>  
+> +struct batched_bit_entropy {
+> +	unsigned long entropy_bool;
+> +	int position;
+> +};
+> +
+> +static DEFINE_PER_CPU(struct batched_bit_entropy, batched_entropy_bool);
+> +
+>  void add_to_free_area_random(struct page *page, struct free_area *area,
+>  		int migratetype)
+>  {
+> -	static u64 rand;
+> -	static u8 rand_bits;
+> +	struct batched_bit_entropy *batch;
+> +	unsigned long entropy;
+> +	int position;
+>  
+>  	/*
+> -	 * The lack of locking is deliberate. If 2 threads race to
+> -	 * update the rand state it just adds to the entropy.
+> +	 * We shouldn't need to disable IRQs as the only caller is
+> +	 * __free_one_page and it should only be called with the zone lock
+> +	 * held and either from IRQ context or with local IRQs disabled.
+>  	 */
+> -	if (rand_bits == 0) {
+> -		rand_bits = 64;
+> -		rand = get_random_u64();
+> +	batch = raw_cpu_ptr(&batched_entropy_bool);
+> +	position = batch->position;
+> +
+> +	if (--position < 0) {
+> +		batch->entropy_bool = get_random_long();
+> +		position = BITS_PER_LONG - 1;
+>  	}
+>  
+> -	if (rand & 1)
+> +	batch->position = position;
+> +	entropy = batch->entropy_bool;
+> +
+> +	if (1ul & (entropy >> position))
+
+Maybe something like this would be more readble:
+
+	if (entropy & BIT(position))
+
+>  		add_to_free_area(page, area, migratetype);
+>  	else
+>  		add_to_free_area_tail(page, area, migratetype);
+> -	rand_bits--;
+> -	rand >>= 1;
+>  }
+> 
+> 
 
 -- 
-
-Thanks,
-
-David / dhildenb
+ Kirill A. Shutemov
