@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BB54BAE01C
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 23:00:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B27E5AE02C
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 23:09:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729450AbfIIVAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 17:00:49 -0400
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:34461 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727265AbfIIVAt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 17:00:49 -0400
-Received: by mail-ua1-f65.google.com with SMTP id f25so4822158uap.1
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 14:00:47 -0700 (PDT)
+        id S1731720AbfIIVJ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 17:09:58 -0400
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:41554 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727483AbfIIVJ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 17:09:58 -0400
+Received: by mail-vk1-f195.google.com with SMTP id 70so2171492vkz.8
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 14:09:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to;
-        bh=iVGgwSWwHmexfKVbElUaVodcVwvI7SqR7HiFZZHgimI=;
-        b=smvs3ouhvA0YvTEpruQ7DAxHZ6sC05J8+PvDKiJ09NEgLC7y8UmM7oXJg/Y896OEi3
-         lKLhbCLTGUgXTIkLOxNaZD3QuVqY4P1Qze4wUWuh1B7RI0/7BVEI3HlPb/5rUszemnxl
-         eJeN/F8NuoN8XmqCOmqOulRYwXOB8WjLcPUV8hHJXpxY8oK0VVAWGEo3fw6/90oFK0oi
-         Hgf/1A1YrpH2paMfvqa4fbf7gIPP59e6ULhv8nZ/ufU83rzyi6JiBpLLAD6Ii6ozWlQY
-         m9bsil2Na4tMU1ws8Ig105mHd4c8lAnqXwdMEsB51GGlpNtCMQ7pD8v36aOB1YwjE7wm
-         hPxw==
+        bh=IUKaCUxjYc5VcvRzjcVT6xODxoxaXR4KZGQsmHyhhiM=;
+        b=WSu0jxdmORs+9mSLcb4D2+ZNSYtAfNfVY2E0+MTf60v37RGn//6Ojef19CC5H+LXD/
+         YCvcLCrFai/KBaddWH0F4VXzEyN1BD0dxBN+y0KLiNp2knRSjYsnGC7KOJ940zAXoqv3
+         hylYyO32YaX2Y3zlxz/DgNlX1FmjiAKj62KCAmwSd5MB6y9MaAaVvG1W6xW6Hw5wvPqb
+         NZITi4gsbfnyK3XKvyd8spyV1zMb3Jufpmtd343wvjXppLGFMHnOtCYO4Wifaqx3XA8b
+         h7mMrP0FKPelCVKa94rKfP5xJb+kMCUbBR2oZleOhs/l9dBWg7jqbGj9bQd1zB7WIq9K
+         QbmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=iVGgwSWwHmexfKVbElUaVodcVwvI7SqR7HiFZZHgimI=;
-        b=MOfrZ2nx7leAxSEkG7hOwCT5dRhl/8pfsEeDAxzPMZf9pC4dwgNUyZbC3XqhX6yBrr
-         BH3o8NQyvnnXlHmE1VGV2hxd/DX87Q0idynF9HmMaIiPcgZ1zF8rPYOcIX+5iY1pxCRh
-         MAogiAP8F6ePkbNEsA8/Bo3btASnrF+ht0ogrL9MUcfj5kjIGrxWF4G5CVhTAu52CrdF
-         KuKEUrs9opEQsVyFom7V3U3yUd23JlBRcaCD95SPkl35I31a5yJycNji9of4VWlxDvoG
-         20gcGntfM1hXI++8pvD/a05qg5fpBuPe4pwGLtZ38eLYH5kCB9mMhR4PKLhyfCzjgZox
-         NtmQ==
-X-Gm-Message-State: APjAAAX1zfsBH1RQfYaYL0ImTQRJSS9hKk1qHTdKYFyZeOoZ4ljsGjio
-        1hRQXTcE1fouNgxC02svJ7WGdq9W/YUleeRxXbGatLiHfKxg
-X-Google-Smtp-Source: APXvYqx05tpDmPNJFOG1Q1CFqnMLxIiwOgvv06S0sUxIRp2N/gCHHelerm93DNej+jYdMQl8T2gwhG0Du8PgZeGLIw0=
-X-Received: by 2002:ab0:2a8c:: with SMTP id h12mr12223915uar.106.1568062846203;
- Mon, 09 Sep 2019 14:00:46 -0700 (PDT)
+        bh=IUKaCUxjYc5VcvRzjcVT6xODxoxaXR4KZGQsmHyhhiM=;
+        b=ZekU4hKbGGdhB2ePUFkzaitmSPFzt5o0/R9vcAUpjVQGRQICVV7fXb/kxq0dl42nn1
+         fn1xc1iS4ObNVxDZKxiMPmepynwrIYo1Dnz18neKcTHQuOaKeylnIVGgcPhGbdT8QODQ
+         4N6bvTTQMeRR17zu+m8kePeMKNvgeCUkuFoYFDb5fbu9nBSc4moCzdpKPODqx3OJsau1
+         2vtLB0oFljm4Uqg04qhRwx2fcmgz+VIDu+ppc3+zc1LR4p3fQEvmKdMJjlOU99FM3zw1
+         T9xlKnWobrAo+JNOlAmorIl9Nis5gTaIH5XZ18ccIGePdyQo3JcDJMzfeTPL/j8jvAgn
+         3jpg==
+X-Gm-Message-State: APjAAAVpgpwc9LUKTOVReZPHo8NosTHYv3y0PxlMJ6ZcxlyMqMPedxEj
+        /1WoaNehKG21ndqisrSi2OhRkIISw2Nj9BK4KY71lzr+CDqY
+X-Google-Smtp-Source: APXvYqz6iuI0gHDPymXkyuF36GFsOXPnaOj7f1ySw5rN2X+wZ5DTN7ubaQKok7I1pyA5NGOVo9nWeAI0aFDOt6z2Agg=
+X-Received: by 2002:a1f:3cc9:: with SMTP id j192mr12284618vka.58.1568063394809;
+ Mon, 09 Sep 2019 14:09:54 -0700 (PDT)
 MIME-Version: 1.0
 From:   Bill Wendling <morbo@google.com>
-Date:   Mon, 9 Sep 2019 14:00:35 -0700
-Message-ID: <CAGG=3QUHwHsVtrc3UYhhbkBX5WOp4Am=beFnn7yyxh6ykTe_Fw@mail.gmail.com>
-Subject: [kvm-unit-tests PATCH] x86: debug: use a constraint that doesn't
- allow a memory operand
+Date:   Mon, 9 Sep 2019 14:09:43 -0700
+Message-ID: <CAGG=3QWNQKejpwhbgDy-WSV1C2sw9Ms0TUGwVk8fgEbg9n0ryg@mail.gmail.com>
+Subject: [kvm-unit-tests PATCH] x86: setjmp: ignore clang's
+ "-Wsomtimes-uninitialized" flag
 To:     kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
@@ -51,27 +51,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "lea" instruction cannot load the effective address into a memory
-location. The "g" constraint allows a compiler to use a memory location.
-A compiler that uses a register destination does so only because one is
-available. Use a general register constraint to make sure it always uses
-a register.
+Clang complains that "i" might be uninitialized in the "printf"
+statement. This is a false negative, because it's set in the "if"
+statement and then incremented in the loop created by the "longjmp".
 
 Signed-off-by: Bill Wendling <morbo@google.com>
 ---
- x86/debug.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ x86/setjmp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/x86/debug.c b/x86/debug.c
-index f66d1d0..2327dac 100644
---- a/x86/debug.c
-+++ b/x86/debug.c
-@@ -113,7 +113,7 @@ int main(int ac, char **av)
-  "and $~(1<<8),%%rax\n\t"
-  "push %%rax\n\t"
-  "popf\n\t"
-- : "=g" (start) : : "rax");
-+ : "=r" (start) : : "rax");
-  report("single step",
-         n == 3 &&
-         db_addr[0] == start+1+6 && dr6[0] == 0xffff4ff0 &&
+diff --git a/x86/setjmp.c b/x86/setjmp.c
+index 976a632..cf9adcb 100644
+--- a/x86/setjmp.c
++++ b/x86/setjmp.c
+@@ -1,6 +1,10 @@
+ #include "libcflat.h"
+ #include "setjmp.h"
+
++#ifdef __clang__
++#pragma clang diagnostic ignored "-Wsometimes-uninitialized"
++#endif
++
+ int main(void)
+ {
+     volatile int i;
