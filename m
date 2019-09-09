@@ -2,29 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 05F25AD75E
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 12:56:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 109E9AD7A0
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 13:06:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729692AbfIIK4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 06:56:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39330 "EHLO mx1.redhat.com"
+        id S2403847AbfIILGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 07:06:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57104 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729084AbfIIK4K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 06:56:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1730420AbfIILGM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 07:06:12 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3B376C049E10;
-        Mon,  9 Sep 2019 10:56:10 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-120-141.rdu2.redhat.com [10.10.120.141])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 121D760623;
-        Mon,  9 Sep 2019 10:56:01 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 05A8D8830E
+        for <kvm@vger.kernel.org>; Mon,  9 Sep 2019 11:06:11 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id 124so4408578wmz.1
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 04:06:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7P1L82Hvd2CHZtV3y3+DuSRQWJRg8V37be+Beu7AiBw=;
+        b=lp6O/c1iFdddMjaOYvIK1YwjeTr3v3IUB5Fq3md6/V6bYmvlsFJpcVuCC2MP1m93tW
+         uy1jtBlSudWzTe2m3kmNtixAB3zGS/oh9NNYhSYLidVFGP9+7zApRPdjKTBUyHCVTcCi
+         E/cs+XJm0+GrT66pLqQxSXcmTv0xUaQfhGSxYUaDOMM5Bojw6T9cSWvrCa+zb+YeOCqM
+         QkXX6vczJnj0/NqG6ic1ulbBIoosZ8wASgIXZ7/bNAnMv0iFSKqrxyjVmYJOyRVRY66X
+         I4PIFPiv6Dy3g01SFETtAPmOCUPoC2XKZx5Sc2ni9Qp3pvMAcBeQ85cYOkrKHiaSl7qh
+         GljQ==
+X-Gm-Message-State: APjAAAWhvxlW3sYty9zjsEvER8OzVgdLJPWv/OgukXqwN8nPkJBdsaoj
+        8bsIfhhken4lG5lCriBXWLfLsr8cp6V93UoNAxstDeIpU7fRFzJNK8iIkT/io7kDHv5JQ9Xlfbs
+        oIzT3ckpQTR6x
+X-Received: by 2002:adf:f284:: with SMTP id k4mr3118593wro.294.1568027169599;
+        Mon, 09 Sep 2019 04:06:09 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwpJObjRb41D20LhnQ/9bC6pyQl1DWX1ZWggr3xyk6OHo4dXPNZEDXNgLaeWrw8SqEtwG9mSQ==
+X-Received: by 2002:adf:f284:: with SMTP id k4mr3118569wro.294.1568027169308;
+        Mon, 09 Sep 2019 04:06:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:8dc1:ce1e:4b83:3ab7? ([2001:b07:6468:f312:8dc1:ce1e:4b83:3ab7])
+        by smtp.gmail.com with ESMTPSA id x5sm19207918wrg.69.2019.09.09.04.06.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Sep 2019 04:06:08 -0700 (PDT)
 Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is
  preempted"
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+To:     Waiman Long <longman@redhat.com>, Wanpeng Li <kernellwp@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -35,94 +57,158 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
         stable@vger.kernel.org
 References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
-Date:   Mon, 9 Sep 2019 11:56:00 +0100
+ <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <fbf152a5-134b-0540-3345-cb6b0b66f1a1@redhat.com>
+Date:   Mon, 9 Sep 2019 13:06:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Mon, 09 Sep 2019 10:56:10 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/9/19 2:40 AM, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if 
-> vCPU is preempted), we found great regression caused by this commit.
->
-> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
-> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800 
-> records/s with this commit.
->
->           Host                       Guest                score
->
-> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
-> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
-> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
-> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
->
-> Exit from aggressive wait-early mechanism can result in yield premature and 
-> incur extra scheduling latency in over-subscribe scenario.
->
-> kvm optimizes:
-> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
-> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
->
-> Tested-by: loobinliu@tencent.com
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@kernel.org>
-> Cc: Waiman Long <longman@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: loobinliu@tencent.com
-> Cc: stable@vger.kernel.org 
-> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  kernel/locking/qspinlock_paravirt.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
-> index 89bab07..e84d21a 100644
-> --- a/kernel/locking/qspinlock_paravirt.h
-> +++ b/kernel/locking/qspinlock_paravirt.h
-> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
->  	if ((loop & PV_PREV_CHECK_MASK) != 0)
->  		return false;
->  
-> -	return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
-> +	return READ_ONCE(prev->state) != vcpu_running;
->  }
->  
->  /*
+On 09/09/19 12:56, Waiman Long wrote:
+> On 9/9/19 2:40 AM, Wanpeng Li wrote:
+>> From: Wanpeng Li <wanpengli@tencent.com>
+>>
+>> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if 
+>> vCPU is preempted), we found great regression caused by this commit.
+>>
+>> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
+>> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800 
+>> records/s with this commit.
+>>
+>>           Host                       Guest                score
+>>
+>> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
+>> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
+>> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
+>> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
+>>
+>> Exit from aggressive wait-early mechanism can result in yield premature and 
+>> incur extra scheduling latency in over-subscribe scenario.
+>>
+>> kvm optimizes:
+>> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
+>> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
+>>
+>> Tested-by: loobinliu@tencent.com
+>> Cc: Peter Zijlstra <peterz@infradead.org>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Ingo Molnar <mingo@kernel.org>
+>> Cc: Waiman Long <longman@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Radim Krčmář <rkrcmar@redhat.com>
+>> Cc: loobinliu@tencent.com
+>> Cc: stable@vger.kernel.org 
+>> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
+>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>> ---
+>>  kernel/locking/qspinlock_paravirt.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
+>> index 89bab07..e84d21a 100644
+>> --- a/kernel/locking/qspinlock_paravirt.h
+>> +++ b/kernel/locking/qspinlock_paravirt.h
+>> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
+>>  	if ((loop & PV_PREV_CHECK_MASK) != 0)
+>>  		return false;
+>>  
+>> -	return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
+>> +	return READ_ONCE(prev->state) != vcpu_running;
+>>  }
+>>  
+>>  /*
+> 
+> There are several possibilities for this performance regression:
+> 
+> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
+> cacheline contention issue depending on how that callback is implemented.
 
-There are several possibilities for this performance regression:
+Unlikely, it is a single percpu read.
 
-1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
-cacheline contention issue depending on how that callback is implemented.
+> 2) KVM may set the preempt flag for a short period whenver an vmexit
+> happens even if a vmenter is executed shortly after. In this case, we
+> may want to use a more durable vcpu suspend flag that indicates the vcpu
+> won't get a real vcpu back for a longer period of time.
 
-2) KVM may set the preempt flag for a short period whenver an vmexit
-happens even if a vmenter is executed shortly after. In this case, we
-may want to use a more durable vcpu suspend flag that indicates the vcpu
-won't get a real vcpu back for a longer period of time.
+It sets it for exits to userspace, but they shouldn't really happen on a 
+properly-configured system.
 
-Perhaps you can add a lock event counter to count the number of
-wait_early events caused by vcpu_is_preempted() being true to see if it
-really cause a lot more wait_early than without the vcpu_is_preempted()
-call.
+However, it's easy to test this theory:
 
-I have no objection to this, I just want to find out the root cause of it.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2e302e977dac..feb6c75a7a88 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3368,26 +3368,28 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ {
+ 	int idx;
+ 
+-	if (vcpu->preempted)
++	if (vcpu->preempted) {
+ 		vcpu->arch.preempted_in_kernel = !kvm_x86_ops->get_cpl(vcpu);
+ 
+-	/*
+-	 * Disable page faults because we're in atomic context here.
+-	 * kvm_write_guest_offset_cached() would call might_fault()
+-	 * that relies on pagefault_disable() to tell if there's a
+-	 * bug. NOTE: the write to guest memory may not go through if
+-	 * during postcopy live migration or if there's heavy guest
+-	 * paging.
+-	 */
+-	pagefault_disable();
+-	/*
+-	 * kvm_memslots() will be called by
+-	 * kvm_write_guest_offset_cached() so take the srcu lock.
+-	 */
+-	idx = srcu_read_lock(&vcpu->kvm->srcu);
+-	kvm_steal_time_set_preempted(vcpu);
+-	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+-	pagefault_enable();
++		/*
++		 * Disable page faults because we're in atomic context here.
++		 * kvm_write_guest_offset_cached() would call might_fault()
++		 * that relies on pagefault_disable() to tell if there's a
++		 * bug. NOTE: the write to guest memory may not go through if
++		 * during postcopy live migration or if there's heavy guest
++		 * paging.
++		 */
++		pagefault_disable();
++		/*
++		 * kvm_memslots() will be called by
++		 * kvm_write_guest_offset_cached() so take the srcu lock.
++		 */
++		idx = srcu_read_lock(&vcpu->kvm->srcu);
++		kvm_steal_time_set_preempted(vcpu);
++		srcu_read_unlock(&vcpu->kvm->srcu, idx);
++		pagefault_enable();
++	}
++
+ 	kvm_x86_ops->vcpu_put(vcpu);
+ 	vcpu->arch.last_host_tsc = rdtsc();
+ 	/*
 
-Cheers,
-Longman
+Wanpeng, can you try?
+
+Paolo
+
+> Perhaps you can add a lock event counter to count the number of
+> wait_early events caused by vcpu_is_preempted() being true to see if it
+> really cause a lot more wait_early than without the vcpu_is_preempted()
+> call.
+> 
+> I have no objection to this, I just want to find out the root cause of it.
+> 
+> Cheers,
+> Longman
+> 
 
