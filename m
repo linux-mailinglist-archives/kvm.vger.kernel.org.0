@@ -2,72 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DEB0AE049
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 23:30:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2485AE102
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 00:28:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731619AbfIIV2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 17:28:36 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:40859 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726823AbfIIV2g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 17:28:36 -0400
-Received: by mail-vs1-f66.google.com with SMTP id v10so6574139vsc.7
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 14:28:34 -0700 (PDT)
+        id S1728320AbfIIW2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 18:28:18 -0400
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:48678 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728057AbfIIW2R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 18:28:17 -0400
+Received: by mail-pg1-f202.google.com with SMTP id k20so9404892pgg.15
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 15:28:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=e2ktFZF09JWLvJgyosojNipCBqZF/U6ANeFGH386vZY=;
-        b=DqmJDzLVtc5n3gFDdkT4xNhlH7aB8uCN+EUtM505vt+oBK3bojBx5gsOP2hhjLyF64
-         GstoTU5ulX60fo3wrs4+Nc6WN+Wi5dozDJwmJyAn7nTEeQ1Fu75IGIG9dltPwryZMwWF
-         rYn3iaSbuTU4JbipfjtyBhwyOp4n85MHdTUKrnCB/uL6ctYndEwAG1i/uIaEwUcisd+l
-         0ZvzKAX25ttBV4JSZTW4W2m6HfJSuTelMUu4FJZly11lGcp+Qn3jvPOsUzlXWs/pQTxP
-         FQpyN9aZDZK7OOHUwUIkT/kpWwbBSedseQNmC5c/D4Q4iBrd5HVsrVvPpK9jD+wu0PyR
-         Qo8A==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Iz9jz/iVq+CJnK4VQZV34GfLHmhhBlr0EH0H9C9Yi84=;
+        b=HqyG6F/Dmzw6n/NTAEF9grljGv7cgKsXekFbrv0qEwztgtL99y5EM9JazRUDSjfISS
+         24jJsgUX98rpZm9R8w3X/eZIfFUFXmgFWdGIfDGdbASJXzyoS4DvmuQSqcg1je9awAHj
+         1Q2kgXzOsS7COraZxPAptKHMehLAFY7RB3heLw5codhW2W6pNV6sssmcdToLZxWaFxbU
+         r6kMQbEQ/fY3b+9/bl+0WIRGafxQl+uszy9/D5Q7cxYPbbkGjEq9oNY+GuO63isiii7c
+         NwG7n1PB7C6gEkvNA1ar0/eL1mlGwOJKYvPgpXU4QKOlsrZWxf9m0EjGh7UTIDzhsPCf
+         auiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=e2ktFZF09JWLvJgyosojNipCBqZF/U6ANeFGH386vZY=;
-        b=ImKfaprVidOriM0OapQ0rtf+M/i+ETmOzfrYPgfY6G8EBMLGXTXJwUlUqgX5he3dWA
-         fMsvnCTiMCNa6edwbH/eFxZVznevPlGJO60ZsxLHtaWTpQa/mPExkwgcMwYek07uw1xz
-         KcParLZfgenb9D9wY3tWOhUNfGnPjQuJoxEzg9+TvL9WcIxeNZmWYWdVd3HnXz6sWrwy
-         aqECOvQvZ0+XZrY7gDGiSE+k6wynZqpCO9Vv5TfYmjAZ+NhfgP2rrIjg4I7L4S7X7VdZ
-         9dyhWLwBc8GqWGYwaH9gqaY7iieFzGvVncKAjOcREon7YwnFz6CD25zNIQ5MeYXiyeuL
-         pAxQ==
-X-Gm-Message-State: APjAAAWnlI2QGSY/L8JGe9oTN7PgpF1omd1tAO6e/BUj528S+2lADf+3
-        ujxhbD5PrKSuEbu9z/fiAt3Tc54pH/uoufTLcqc1/IXG2YDv
-X-Google-Smtp-Source: APXvYqxdOt+tN+BcSksjGDxpPNwLV3d8M7uVFuEMzG3E/geIkgYUNmWTOeLa8LB1m950yVTPfbE6mNcNWpFb9Uz3Di4=
-X-Received: by 2002:a67:ec18:: with SMTP id d24mr11152565vso.80.1568064513635;
- Mon, 09 Sep 2019 14:28:33 -0700 (PDT)
-MIME-Version: 1.0
-From:   Bill Wendling <morbo@google.com>
-Date:   Mon, 9 Sep 2019 14:28:22 -0700
-Message-ID: <CAGG=3QV-0hPrWx8dFptjqbKMNfne+iTfq2e-KL89ebecO8Ta1w@mail.gmail.com>
-Subject: [kvm-unit-tests PATCH] x86: emulator: use "q" operand modifier
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Iz9jz/iVq+CJnK4VQZV34GfLHmhhBlr0EH0H9C9Yi84=;
+        b=Y17BuDFHHOZJ6OJjirTD5ssSrIpumJ0cNRvBg37sU/hG6gUpWLwfakBkXsnrRUorfc
+         Re27gnLq9kLB5kuA014B07fMw2UoZa30C01uCelPzhSgIiZrZ10k13Pxaq5Qot5bkbVE
+         sOCAgm/2HYIYuIGh5kT0ZvI8gLquyRc1h3VUBoTMjXcuplBAd/gGWo9VG7Hh77ld6/zr
+         xHAA8P55DSjkf8HqMtwEtcrST1yPsNgFqclsbVIFn7A7WPWv3/GQTUC70tVmJ4Aa3kZr
+         Uhhy9No5x4DmLxf79MOdkMEZJmsrhN+m/urBFNXhp76eiRp4nw/UiEBLzA3jrAXXsfgd
+         j52g==
+X-Gm-Message-State: APjAAAVhPzshbpjO8YfwGeZcw8V7s9PGx1R06bre8vJYA4R/fJOkJT4K
+        Khy9ZfkbsYw4kyL6TJYEsbBBJXdF0J8F97JzbFsFHLRJO2LvJzKieJzxjUWKpl+o+j9lDaPOknw
+        F0fLp83TZcwBWvQ8tPfWIXEGLgNGKJZgjJn6XwYdD5Ms5NyMp6HKVCJI5F7lbDSY=
+X-Google-Smtp-Source: APXvYqwVb79LTLsPstFw/1Fd6uc2v+r4OS1ajk/opBoxG8VykkcvKPcz6iE2UfNW8bFbQb21JiMZPdxvKF/iCQ==
+X-Received: by 2002:a63:89c2:: with SMTP id v185mr24124918pgd.241.1568068096048;
+ Mon, 09 Sep 2019 15:28:16 -0700 (PDT)
+Date:   Mon,  9 Sep 2019 15:28:11 -0700
+Message-Id: <20190909222812.232690-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.162.g0b9fbb3734-goog
+Subject: [RFC][PATCH v2 0/1] KVM: nVMX: Don't leak L1 MMIO regions to L2
+From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The extended assembly documentation list only "q" as an operand modifier
-for DImode registers. The "d" seems to be an AMD-ism, which appears to
-be only begrudgingly supported by gcc.
+v1->v2:
+* Added static branch prediction hint to nested_get_vmcs12_pages.
+* Added vmcs12->apic_access_addr to pr_warn and vcpu->run->internal.data.
+* Sunk call to nested_vmx_failValid from nested_vmx_run to
+  nested_vmx_enter_non_root_mode.
+* Simplified return codes from nested_vmx_enter_non_root_mode.
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- x86/emulator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Jim Mattson (1):
+  KVM: nVMX: Don't leak L1 MMIO regions to L2
 
-diff --git a/x86/emulator.c b/x86/emulator.c
-index b132b90..621caf9 100644
---- a/x86/emulator.c
-+++ b/x86/emulator.c
-@@ -799,7 +799,7 @@ static void test_smsw_reg(uint64_t *mem)
-  asm(KVM_FEP "smswl %k0\n\t" : "=a" (rax) : "0" (in_rax));
-  report("32-bit smsw reg", rax == (u32)cr0);
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/vmx/nested.c       | 65 +++++++++++++++++++++------------
+ arch/x86/kvm/x86.c              |  9 ++++-
+ 3 files changed, 49 insertions(+), 27 deletions(-)
 
-- asm(KVM_FEP "smswq %d0\n\t" : "=a" (rax) : "0" (in_rax));
-+ asm(KVM_FEP "smswq %q0\n\t" : "=a" (rax) : "0" (in_rax));
-  report("64-bit smsw reg", rax == cr0);
- }
+-- 
+2.23.0.162.g0b9fbb3734-goog
+
