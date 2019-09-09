@@ -2,94 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41A69AD61E
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 11:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05F25AD75E
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 12:56:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390054AbfIIJ4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 05:56:12 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:36085 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388179AbfIIJ4M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 05:56:12 -0400
-Received: by mail-ed1-f68.google.com with SMTP id f2so6021024edw.3
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 02:56:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=TkcuSrktiec/3aeNNPIPbr3CY/ViMiJEbi8XPnPDeFE=;
-        b=y4Aem2zdEw/0MY0GP//C3Dw/NpPHTs0qKqdBb4xrcHA1pZ0xHXXvj9eCql7CFteyRf
-         y4akVA0lJFLoGkrZCPbFNlfznQs3ZbJ9CWr+JuD8Z3kSt7xxylldudDPRN/rQfgO+vW6
-         4Pivn2PbcNEY2vN6cCwbQCaHwbvuTKNjsJxKXF06Q624NzL3x+QwiZ8yNorQ6D5vsCJf
-         L8tqOz85eAHvcZKFkHNZDRJXs1a4nwiMxGa5yAOxiQQ8VFLx+6VaURSLOJbM9dRa4N2k
-         Yb/2g2O7SVOnxZ7wb4kdBg3Pqci3bFH370K9sGIEGhXDnJaqKth32tPYECQ2HLF3tGdq
-         JTsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=TkcuSrktiec/3aeNNPIPbr3CY/ViMiJEbi8XPnPDeFE=;
-        b=IuY/kuCnShLqzdlFTH3xR2HiC9F28nZwJKfa5/exBTXQB1s333hA2RKO09EvHrSK4/
-         teY7jphZOr9hy2tD9kBL5x8+2x0lsxaqTWSxd/m5eH3LSX/r3MWKeku77gdmV78Pycsh
-         /kF8hUF+OJN3JdVzU0hvUaeyPcLgu304wrQ5kNay0Zip651ZbOc7UNfZl32T79GWmkN/
-         iE0xHftih6Tbv5TX+rBC9Cs7H+lohRy8uyFtAyvAPqGklCfQBjplDASeKNPj8Q0Grxv6
-         VCkak2VT1ZoVLhH35IQ5ECK8WZvkI3F8JCzbByoRUnEMs/PPFISys0DixN9o/BUiFKDq
-         cldQ==
-X-Gm-Message-State: APjAAAWWYFjXlR3eMURxS5no3wMdnyK+mT4ZtJJ29Hyi4iJV+aABNKWg
-        Ces5enUc+/PPH/NOuCMD+v7/ZQ==
-X-Google-Smtp-Source: APXvYqyRn+kl2/TWZQY25cP+eDKMrBVhD4QUydeucAx1gsJCDQV6FE+USGZXHlRVlnYWQyI9ItE3Qw==
-X-Received: by 2002:a17:906:5a8d:: with SMTP id l13mr18691711ejq.219.1568022970390;
-        Mon, 09 Sep 2019 02:56:10 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id d24sm2946102edp.88.2019.09.09.02.56.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Sep 2019 02:56:09 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 7D24A1003B5; Mon,  9 Sep 2019 12:56:08 +0300 (+03)
-Date:   Mon, 9 Sep 2019 12:56:08 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
-        mst@redhat.com, catalin.marinas@arm.com, david@redhat.com,
-        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org, osalvador@suse.de,
-        yang.zhang.wz@gmail.com, pagupta@redhat.com,
-        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        ying.huang@intel.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, fengguang.wu@intel.com,
-        alexander.h.duyck@linux.intel.com, kirill.shutemov@linux.intel.com
-Subject: Re: [PATCH v9 3/8] mm: Move set/get_pcppage_migratetype to mmzone.h
-Message-ID: <20190909095608.jwachx3womhqmjbl@box>
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190907172528.10910.37051.stgit@localhost.localdomain>
+        id S1729692AbfIIK4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 06:56:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39330 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729084AbfIIK4K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 06:56:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3B376C049E10;
+        Mon,  9 Sep 2019 10:56:10 +0000 (UTC)
+Received: from llong.remote.csb (ovpn-120-141.rdu2.redhat.com [10.10.120.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 121D760623;
+        Mon,  9 Sep 2019 10:56:01 +0000 (UTC)
+Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is
+ preempted"
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
+        stable@vger.kernel.org
+References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
+Date:   Mon, 9 Sep 2019 11:56:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190907172528.10910.37051.stgit@localhost.localdomain>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Mon, 09 Sep 2019 10:56:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 07, 2019 at 10:25:28AM -0700, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> 
-> In order to support page reporting it will be necessary to store and
-> retrieve the migratetype of a page. To enable that I am moving the set and
-> get operations for pcppage_migratetype into the mm/internal.h header so
-> that they can be used outside of the page_alloc.c file.
-> 
-> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On 9/9/19 2:40 AM, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if 
+> vCPU is preempted), we found great regression caused by this commit.
+>
+> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
+> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800 
+> records/s with this commit.
+>
+>           Host                       Guest                score
+>
+> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
+> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
+> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
+> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
+>
+> Exit from aggressive wait-early mechanism can result in yield premature and 
+> incur extra scheduling latency in over-subscribe scenario.
+>
+> kvm optimizes:
+> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
+> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
+>
+> Tested-by: loobinliu@tencent.com
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: Waiman Long <longman@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Cc: loobinliu@tencent.com
+> Cc: stable@vger.kernel.org 
+> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  kernel/locking/qspinlock_paravirt.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
+> index 89bab07..e84d21a 100644
+> --- a/kernel/locking/qspinlock_paravirt.h
+> +++ b/kernel/locking/qspinlock_paravirt.h
+> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
+>  	if ((loop & PV_PREV_CHECK_MASK) != 0)
+>  		return false;
+>  
+> -	return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
+> +	return READ_ONCE(prev->state) != vcpu_running;
+>  }
+>  
+>  /*
 
-I'm not sure that it's great idea to export this functionality beyond
-mm/page_alloc.c without any additional safeguards. How would we avoid to
-messing with ->index when the page is not in the right state of its
-life-cycle. Can we add some VM_BUG_ON()s here?
+There are several possibilities for this performance regression:
 
--- 
- Kirill A. Shutemov
+1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
+cacheline contention issue depending on how that callback is implemented.
+
+2) KVM may set the preempt flag for a short period whenver an vmexit
+happens even if a vmenter is executed shortly after. In this case, we
+may want to use a more durable vcpu suspend flag that indicates the vcpu
+won't get a real vcpu back for a longer period of time.
+
+Perhaps you can add a lock event counter to count the number of
+wait_early events caused by vcpu_is_preempted() being true to see if it
+really cause a lot more wait_early than without the vcpu_is_preempted()
+call.
+
+I have no objection to this, I just want to find out the root cause of it.
+
+Cheers,
+Longman
+
