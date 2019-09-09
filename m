@@ -2,330 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC052AE16A
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 01:14:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC80DAE17C
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 01:28:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388050AbfIIXOt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 19:14:49 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:42190 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732642AbfIIXOs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 19:14:48 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x89NEDcv007626;
-        Mon, 9 Sep 2019 23:14:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=8QvXJ4uDPptlbaaKFjAfrkFMb3w4Xl4zp5x4jtBGAvg=;
- b=AEM9WDXnmUQtbJvtNPGKovwt12Jk0e5h8wAyzAajL7/9nD6rGM25oymo5jj//UYi/yf4
- I2KhAnQNj7otE+aXSHPDwvhFUk+SwYocLZlvPN+BG9Bt3Hv5A9eXde/Ttx1oTDJQRGVU
- wMmCvoPLj+lraxT1ieRqx/YhYo2gltQpM/ZtLYypEHuKHk9B8e2XWxShAl3YJpCdNqHn
- EE+70oE9dxkDeYBqzUIcUZ988wMtE+lr7DvVZRlJJc6tPVFo5EV3tIq/ypjIktZDAkmX
- iIOhDvHsUbhyisOBXYbosHNFYoarWfNBO0wPZVRYOEHrZNberWf3fMI4lm29kvejsGFR Bw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2uw1m8qgpq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 09 Sep 2019 23:14:45 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x89NE9t5111973;
-        Mon, 9 Sep 2019 23:14:44 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2uwpjv4sdx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 09 Sep 2019 23:14:44 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x89NEhJ8020680;
-        Mon, 9 Sep 2019 23:14:43 GMT
-Received: from [192.168.14.112] (/109.66.230.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 09 Sep 2019 16:14:43 -0700
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [RFC][PATCH v2 1/1] KVM: nVMX: Don't leak L1 MMIO regions to L2
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190909222812.232690-2-jmattson@google.com>
-Date:   Tue, 10 Sep 2019 02:14:40 +0300
-Cc:     kvm@vger.kernel.org, Dan Cross <dcross@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Shier <pshier@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <5BE804DD-8E71-4C45-91E7-648D2295ADBF@oracle.com>
-References: <20190909222812.232690-1-jmattson@google.com>
- <20190909222812.232690-2-jmattson@google.com>
-To:     Jim Mattson <jmattson@google.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9375 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909090219
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9375 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909090219
+        id S2390034AbfIIX24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 19:28:56 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34927 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390012AbfIIX24 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 19:28:56 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n4so8749580pgv.2
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 16:28:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qVl7cQbHqivg+5+bjZkAPrH4/YkagYFqBsqHpTn7Ee4=;
+        b=WRsagKgPHRVWRodqOxjFyH3SxApwemVrFs+C4fnZP36b/kGtMnwy18biKBGghKT4FY
+         r3mwmnzylOimTxzwHNfkTtS+xJnFwvv8FVNYNNX3Yjj1QLWsXXMboecQJftGZkj6H3gm
+         H1XRadrTmtfTPOBhRNNf82rThU+sJ4lN+9Y7MUmctoEa4sImtm6/tJJjFoB/4eOIF8LI
+         gl3ZYpUdOt1KjT1meUv58ZQJHA4S7wCWk91e9+ku7WGZmXEue+VVya7Q+00O6Yq6yWR3
+         G9KdJLg3g/SQJ0h0nxsK8WBk9BNmfHE5vMWQaWz9q+6euy0HQCtfxh5AC4AwcXWr3/oF
+         dtTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qVl7cQbHqivg+5+bjZkAPrH4/YkagYFqBsqHpTn7Ee4=;
+        b=gnX3x0AzEXcZosekvz5ag3LrkMX8ulqKG9SLJJL2X/iK77PdwJzOqbfW0p9XORbaI5
+         n5T0LfvZLeT471VL+Fu8ImK566MsSYExa0MVKXIrsGTrLAt+SNTzekcGSLWxoNdXQDPN
+         xC2a886ZPu039sjehPE+7B+e+zwrE8rkkYKp0oeuNrGKCJt2DZu9OMfUabuJW7AVth68
+         Tb7QfC3SG6SaRhZ7L5vSgMvmYGzgew4HzlMK4tigEpbjTSFcr8sQv+EbepJFVPzSlEqu
+         b+henGuAegUFY78WpjPIDMMSjpKneM4omX1FLft0c2bhj56uHiEQh9bJYij1XzwDv2Vh
+         s9Sw==
+X-Gm-Message-State: APjAAAVH31nJMfiPW2pChrBru59uYrrnfcwygHULZyJJP76BWMB6mt/Q
+        Akc84mEXWoACaDBO1a3RroU=
+X-Google-Smtp-Source: APXvYqy74ypbCbkeOd3DP0v0kuCuTg9ctzC3gCjVLeu7UnM8pah7J4FtODCIU/4r47JUwH7t6E+DOQ==
+X-Received: by 2002:a63:dd16:: with SMTP id t22mr24577946pgg.140.1568071734456;
+        Mon, 09 Sep 2019 16:28:54 -0700 (PDT)
+Received: from localhost ([47.88.172.238])
+        by smtp.gmail.com with ESMTPSA id d14sm24833225pfh.36.2019.09.09.16.28.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2019 16:28:53 -0700 (PDT)
+From:   Haozhong Zhang <hzzhan9@gmail.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com
+Cc:     kvm@vger.kernel.org, Haozhong Zhang <hzzhan9@gmail.com>,
+        Haozhong Zhang <hzhongzhang@tencent.com>
+Subject: [kvm-unit-tests PATCH] Makefile: do not pass non-c++ warning options to g++
+Date:   Tue, 10 Sep 2019 07:28:23 +0800
+Message-Id: <20190909232823.24513-1-hzzhan9@gmail.com>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Haozhong Zhang <hzhongzhang@tencent.com>
 
+-Wmissing-prototypes and -Wstrict-prototypes are C and Obj-C only
+warning options. If passing them to g++ (e.g., when compiling api/),
+following warning messages will be produced:
+  cc1plus: warning: command line option ‘-Wmissing-prototypes’ is valid for C/ObjC but not for C++[enabled by default]
+  cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++ [enabled by default]
 
-> On 10 Sep 2019, at 1:28, Jim Mattson <jmattson@google.com> wrote:
->=20
-> If the "virtualize APIC accesses" VM-execution control is set in the
-> VMCS, the APIC virtualization hardware is triggered when a page walk
-> in VMX non-root mode terminates at a PTE wherein the address of the 4k
-> page frame matches the APIC-access address specified in the VMCS. On
-> hardware, the APIC-access address may be any valid 4k-aligned physical
-> address.
->=20
-> KVM's nVMX implementation enforces the additional constraint that the
-> APIC-access address specified in the vmcs12 must be backed by
-> cacheable memory in L1. If not, L0 will simply clear the "virtualize
-> APIC accesses" VM-execution control in the vmcs02.
->=20
-> The problem with this approach is that the L1 guest has arranged the
-> vmcs12 EPT tables--or shadow page tables, if the "enable EPT"
-> VM-execution control is clear in the vmcs12--so that the L2 guest
-> physical address(es)--or L2 guest linear address(es)--that reference
-> the L2 APIC map to the APIC-access address specified in the
-> vmcs12. Without the "virtualize APIC accesses" VM-execution control in
-> the vmcs02, the APIC accesses in the L2 guest will directly access the
-> APIC-access page in L1.
->=20
-> When L0 has no mapping whatsoever for the APIC-access address in L1,
-> the L2 VM just loses the intended APIC virtualization. However, when
-> the L2 APIC-access address is mapped to an MMIO region in L1, the L2
-> guest gets direct access to the L1 MMIO device. For example, if the
-> APIC-access address specified in the vmcs12 is 0xfee00000, then L2
-> gets direct access to L1's APIC.
->=20
-> Fixing this correctly is complicated. Since this vmcs12 configuration
-> is something that KVM cannot faithfully emulate, the appropriate
-> response is to exit to userspace with
-> KVM_INTERNAL_ERROR_EMULATION. Sadly, the kvm-unit-tests fail, so I'm
-> posting this as an RFC.
->=20
-> Note that the 'Code' line emitted by qemu in response to this error
-> shows the guest %rip two instructions after the
-> vmlaunch/vmresume. Hmmm.
->=20
-> Fixes: fe3ef05c7572 ("KVM: nVMX: Prepare vmcs02 from vmcs01 and =
-vmcs12")
-> Reported-by: Dan Cross <dcross@google.com>
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Reviewed-by: Dan Cross <dcross@google.com>
+Move those options from COMMON_CFLAGS to CFLAGS so as to mute above
+warning messages.
 
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
+Signed-off-by: Haozhong Zhang <hzhongzhang@tencent.com>
+---
+ Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> ---
-> arch/x86/include/asm/kvm_host.h |  2 +-
-> arch/x86/kvm/vmx/nested.c       | 65 +++++++++++++++++++++------------
-> arch/x86/kvm/x86.c              |  9 ++++-
-> 3 files changed, 49 insertions(+), 27 deletions(-)
->=20
-> diff --git a/arch/x86/include/asm/kvm_host.h =
-b/arch/x86/include/asm/kvm_host.h
-> index 74e88e5edd9cf..e95acf8c82b47 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1191,7 +1191,7 @@ struct kvm_x86_ops {
-> 	int (*set_nested_state)(struct kvm_vcpu *vcpu,
-> 				struct kvm_nested_state __user =
-*user_kvm_nested_state,
-> 				struct kvm_nested_state *kvm_state);
-> -	void (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
-> +	int (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
->=20
-> 	int (*smi_allowed)(struct kvm_vcpu *vcpu);
-> 	int (*pre_enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index ced9fba32598d..04b5069d4a9b3 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2871,7 +2871,7 @@ static int nested_vmx_check_vmentry_hw(struct =
-kvm_vcpu *vcpu)
-> static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu =
-*vcpu,
-> 						 struct vmcs12 *vmcs12);
->=20
-> -static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-> +static int nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-> {
-> 	struct vmcs12 *vmcs12 =3D get_vmcs12(vcpu);
-> 	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-> @@ -2891,19 +2891,33 @@ static void nested_get_vmcs12_pages(struct =
-kvm_vcpu *vcpu)
-> 			vmx->nested.apic_access_page =3D NULL;
-> 		}
-> 		page =3D kvm_vcpu_gpa_to_page(vcpu, =
-vmcs12->apic_access_addr);
-> -		/*
-> -		 * If translation failed, no matter: This feature asks
-> -		 * to exit when accessing the given address, and if it
-> -		 * can never be accessed, this feature won't do
-> -		 * anything anyway.
-> -		 */
-> -		if (!is_error_page(page)) {
-> +		if (likely(!is_error_page(page))) {
-> 			vmx->nested.apic_access_page =3D page;
-> 			hpa =3D =
-page_to_phys(vmx->nested.apic_access_page);
-> 			vmcs_write64(APIC_ACCESS_ADDR, hpa);
-> 		} else {
-> -			secondary_exec_controls_clearbit(vmx,
-> -				=
-SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES);
-> +			/*
-> +			 * Since there is no backing page, we can't
-> +			 * just rely on the usual L1 GPA -> HPA
-> +			 * translation mechanism to do the right
-> +			 * thing. We'd have to assign an appropriate
-> +			 * HPA for the L1 APIC-access address, and
-> +			 * then we'd have to modify the MMU to ensure
-> +			 * that the L1 APIC-access address is mapped
-> +			 * to the assigned HPA if and only if an L2 VM
-> +			 * with that APIC-access address and the
-> +			 * "virtualize APIC accesses" VM-execution
-> +			 * control set in the vmcs12 is running. For
-> +			 * now, just admit defeat.
-> +			 */
-> +			pr_warn_ratelimited("Unsupported vmcs12 =
-APIC-access address 0x%llx\n",
-> +				vmcs12->apic_access_addr);
-> +			vcpu->run->exit_reason =3D =
-KVM_EXIT_INTERNAL_ERROR;
-> +			vcpu->run->internal.suberror =3D
-> +				KVM_INTERNAL_ERROR_EMULATION;
-> +			vcpu->run->internal.ndata =3D 1;
-> +			vcpu->run->internal.data[0] =3D =
-vmcs12->apic_access_addr;
-> +			return -EINTR;
-> 		}
-> 	}
->=20
-> @@ -2948,6 +2962,7 @@ static void nested_get_vmcs12_pages(struct =
-kvm_vcpu *vcpu)
-> 		exec_controls_setbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
-> 	else
-> 		exec_controls_clearbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
-> +	return 0;
-> }
->=20
-> /*
-> @@ -2986,11 +3001,11 @@ static void load_vmcs12_host_state(struct =
-kvm_vcpu *vcpu,
-> /*
->  * If from_vmentry is false, this is being called from state restore =
-(either RSM
->  * or KVM_SET_NESTED_STATE).  Otherwise it's called from =
-vmlaunch/vmresume.
-> -+ *
-> -+ * Returns:
-> -+ *   0 - success, i.e. proceed with actual VMEnter
-> -+ *   1 - consistency check VMExit
-> -+ *  -1 - consistency check VMFail
-> + *
-> + * Returns:
-> + * -EINTR  - exit to userspace
-> + * -EINVAL - VMentry failure; continue
-> + *  0      - success, i.e. proceed with actual VMEnter
->  */
-> int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool =
-from_vmentry)
-> {
-> @@ -2999,6 +3014,7 @@ int nested_vmx_enter_non_root_mode(struct =
-kvm_vcpu *vcpu, bool from_vmentry)
-> 	bool evaluate_pending_interrupts;
-> 	u32 exit_reason =3D EXIT_REASON_INVALID_STATE;
-> 	u32 exit_qual;
-> +	int r;
->=20
-> 	evaluate_pending_interrupts =3D exec_controls_get(vmx) &
-> 		(CPU_BASED_VIRTUAL_INTR_PENDING | =
-CPU_BASED_VIRTUAL_NMI_PENDING);
-> @@ -3035,11 +3051,15 @@ int nested_vmx_enter_non_root_mode(struct =
-kvm_vcpu *vcpu, bool from_vmentry)
-> 	prepare_vmcs02_early(vmx, vmcs12);
->=20
-> 	if (from_vmentry) {
-> -		nested_get_vmcs12_pages(vcpu);
-> +		r =3D nested_get_vmcs12_pages(vcpu);
-> +		if (unlikely(r))
-> +			return r;
->=20
-> 		if (nested_vmx_check_vmentry_hw(vcpu)) {
-> 			vmx_switch_vmcs(vcpu, &vmx->vmcs01);
-> -			return -1;
-> +			r =3D nested_vmx_failValid(vcpu,
-> +						 =
-VMXERR_ENTRY_INVALID_CONTROL_FIELD);
-> +			return r ? -EINVAL : -EINTR;
-> 		}
->=20
-> 		if (nested_vmx_check_guest_state(vcpu, vmcs12, =
-&exit_qual))
-> @@ -3119,14 +3139,14 @@ int nested_vmx_enter_non_root_mode(struct =
-kvm_vcpu *vcpu, bool from_vmentry)
-> 	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
->=20
-> 	if (!from_vmentry)
-> -		return 1;
-> +		return -EINVAL;
->=20
-> 	load_vmcs12_host_state(vcpu, vmcs12);
-> 	vmcs12->vm_exit_reason =3D exit_reason | =
-VMX_EXIT_REASONS_FAILED_VMENTRY;
-> 	vmcs12->exit_qualification =3D exit_qual;
-> 	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
-> 		vmx->nested.need_vmcs12_to_shadow_sync =3D true;
-> -	return 1;
-> +	return -EINVAL;
-> }
->=20
-> /*
-> @@ -3200,11 +3220,8 @@ static int nested_vmx_run(struct kvm_vcpu =
-*vcpu, bool launch)
-> 	vmx->nested.nested_run_pending =3D 1;
-> 	ret =3D nested_vmx_enter_non_root_mode(vcpu, true);
-> 	vmx->nested.nested_run_pending =3D !ret;
-> -	if (ret > 0)
-> -		return 1;
-> -	else if (ret)
-> -		return nested_vmx_failValid(vcpu,
-> -			VMXERR_ENTRY_INVALID_CONTROL_FIELD);
-> +	if (ret)
-> +		return ret !=3D -EINTR;
->=20
-> 	/* Hide L1D cache contents from the nested guest.  */
-> 	vmx->vcpu.arch.l1tf_flush_l1d =3D true;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 290c3c3efb877..5ddbf16c8b108 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7803,8 +7803,13 @@ static int vcpu_enter_guest(struct kvm_vcpu =
-*vcpu)
-> 	bool req_immediate_exit =3D false;
->=20
-> 	if (kvm_request_pending(vcpu)) {
-> -		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu))
-> -			kvm_x86_ops->get_vmcs12_pages(vcpu);
-> +		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
-> +			r =3D kvm_x86_ops->get_vmcs12_pages(vcpu);
-> +			if (unlikely(r)) {
-> +				r =3D 0;
-> +				goto out;
-> +			}
-> +		}
-> 		if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu))
-> 			kvm_mmu_unload(vcpu);
-> 		if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
-> --=20
-> 2.23.0.162.g0b9fbb3734-goog
->=20
+diff --git a/Makefile b/Makefile
+index 643af05..32414dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,3 @@
+-
+ SHELL := /usr/bin/env bash
+ 
+ ifeq ($(wildcard config.mak),)
+@@ -53,7 +52,6 @@ cc-option = $(shell if $(CC) $(1) -S -o /dev/null -xc /dev/null \
+ COMMON_CFLAGS += -g $(autodepend-flags)
+ COMMON_CFLAGS += -Wall -Wwrite-strings -Wclobbered -Wempty-body -Wuninitialized
+ COMMON_CFLAGS += -Wignored-qualifiers -Wunused-but-set-parameter
+-COMMON_CFLAGS += -Wmissing-prototypes -Wstrict-prototypes
+ COMMON_CFLAGS += -Werror
+ frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
+ fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
+@@ -71,6 +69,7 @@ COMMON_CFLAGS += $(fno_pic) $(no_pie)
+ 
+ CFLAGS += $(COMMON_CFLAGS)
+ CFLAGS += -Wmissing-parameter-type -Wold-style-declaration -Woverride-init
++CFLAGS += -Wmissing-prototypes -Wstrict-prototypes
+ 
+ CXXFLAGS += $(COMMON_CFLAGS)
+ 
+-- 
+2.23.0
 
