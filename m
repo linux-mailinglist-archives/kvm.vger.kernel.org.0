@@ -2,213 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 109E9AD7A0
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 13:06:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44DDBAD816
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 13:42:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403847AbfIILGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 07:06:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57104 "EHLO mx1.redhat.com"
+        id S2404286AbfIILlu convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Sep 2019 07:41:50 -0400
+Received: from mga09.intel.com ([134.134.136.24]:15678 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730420AbfIILGM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 07:06:12 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 05A8D8830E
-        for <kvm@vger.kernel.org>; Mon,  9 Sep 2019 11:06:11 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id 124so4408578wmz.1
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 04:06:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7P1L82Hvd2CHZtV3y3+DuSRQWJRg8V37be+Beu7AiBw=;
-        b=lp6O/c1iFdddMjaOYvIK1YwjeTr3v3IUB5Fq3md6/V6bYmvlsFJpcVuCC2MP1m93tW
-         uy1jtBlSudWzTe2m3kmNtixAB3zGS/oh9NNYhSYLidVFGP9+7zApRPdjKTBUyHCVTcCi
-         E/cs+XJm0+GrT66pLqQxSXcmTv0xUaQfhGSxYUaDOMM5Bojw6T9cSWvrCa+zb+YeOCqM
-         QkXX6vczJnj0/NqG6ic1ulbBIoosZ8wASgIXZ7/bNAnMv0iFSKqrxyjVmYJOyRVRY66X
-         I4PIFPiv6Dy3g01SFETtAPmOCUPoC2XKZx5Sc2ni9Qp3pvMAcBeQ85cYOkrKHiaSl7qh
-         GljQ==
-X-Gm-Message-State: APjAAAWhvxlW3sYty9zjsEvER8OzVgdLJPWv/OgukXqwN8nPkJBdsaoj
-        8bsIfhhken4lG5lCriBXWLfLsr8cp6V93UoNAxstDeIpU7fRFzJNK8iIkT/io7kDHv5JQ9Xlfbs
-        oIzT3ckpQTR6x
-X-Received: by 2002:adf:f284:: with SMTP id k4mr3118593wro.294.1568027169599;
-        Mon, 09 Sep 2019 04:06:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwpJObjRb41D20LhnQ/9bC6pyQl1DWX1ZWggr3xyk6OHo4dXPNZEDXNgLaeWrw8SqEtwG9mSQ==
-X-Received: by 2002:adf:f284:: with SMTP id k4mr3118569wro.294.1568027169308;
-        Mon, 09 Sep 2019 04:06:09 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8dc1:ce1e:4b83:3ab7? ([2001:b07:6468:f312:8dc1:ce1e:4b83:3ab7])
-        by smtp.gmail.com with ESMTPSA id x5sm19207918wrg.69.2019.09.09.04.06.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Sep 2019 04:06:08 -0700 (PDT)
-Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is
- preempted"
-To:     Waiman Long <longman@redhat.com>, Wanpeng Li <kernellwp@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
-        stable@vger.kernel.org
-References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
- <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <fbf152a5-134b-0540-3345-cb6b0b66f1a1@redhat.com>
-Date:   Mon, 9 Sep 2019 13:06:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
-Content-Type: text/plain; charset=utf-8
+        id S2404284AbfIILlt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 07:41:49 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Sep 2019 04:41:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,484,1559545200"; 
+   d="scan'208";a="359463132"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by orsmga005.jf.intel.com with ESMTP; 09 Sep 2019 04:41:48 -0700
+Received: from fmsmsx124.amr.corp.intel.com (10.18.125.39) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 9 Sep 2019 04:41:47 -0700
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx124.amr.corp.intel.com (10.18.125.39) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 9 Sep 2019 04:41:47 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.92]) with mapi id 14.03.0439.000;
+ Mon, 9 Sep 2019 19:41:45 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "Xia, Chenbo" <chenbo.xia@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: mdev live migration support with vfio-mdev-pci
+Thread-Topic: mdev live migration support with vfio-mdev-pci
+Thread-Index: AdVnA09V4FzczbJgRN2UKw0Ev4Ijjg==
+Date:   Mon, 9 Sep 2019 11:41:45 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A08FC3F@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjNkNzYxNDgtZmE5Yy00M2EyLWE4ZjMtOTk1M2YzNTNmNDNlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibmd5QWZRMVdldVwva285aWpkYVliYjhkcWwwbzVJYXdBQ2hWUVpuZmlGN3Q0UnU4d0g3emJBTzNoYzBEb2NtWlUifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/09/19 12:56, Waiman Long wrote:
-> On 9/9/19 2:40 AM, Wanpeng Li wrote:
->> From: Wanpeng Li <wanpengli@tencent.com>
->>
->> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if 
->> vCPU is preempted), we found great regression caused by this commit.
->>
->> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
->> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800 
->> records/s with this commit.
->>
->>           Host                       Guest                score
->>
->> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
->> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
->> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
->> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
->>
->> Exit from aggressive wait-early mechanism can result in yield premature and 
->> incur extra scheduling latency in over-subscribe scenario.
->>
->> kvm optimizes:
->> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
->> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
->>
->> Tested-by: loobinliu@tencent.com
->> Cc: Peter Zijlstra <peterz@infradead.org>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Ingo Molnar <mingo@kernel.org>
->> Cc: Waiman Long <longman@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Radim Krčmář <rkrcmar@redhat.com>
->> Cc: loobinliu@tencent.com
->> Cc: stable@vger.kernel.org 
->> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
->> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->> ---
->>  kernel/locking/qspinlock_paravirt.h | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
->> index 89bab07..e84d21a 100644
->> --- a/kernel/locking/qspinlock_paravirt.h
->> +++ b/kernel/locking/qspinlock_paravirt.h
->> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
->>  	if ((loop & PV_PREV_CHECK_MASK) != 0)
->>  		return false;
->>  
->> -	return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
->> +	return READ_ONCE(prev->state) != vcpu_running;
->>  }
->>  
->>  /*
-> 
-> There are several possibilities for this performance regression:
-> 
-> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
-> cacheline contention issue depending on how that callback is implemented.
+Hi Alex,
 
-Unlikely, it is a single percpu read.
+Recently, we had an internal discussion on mdev live migration support
+for SR-IOV. The usage is to wrap VF as mdev and make it migrate-able
+when passthru to VMs. It is very alike with the vfio-mdev-pci sample
+driver work which also wraps PF/VF as mdev. But there is gap. Current
+vfio-mdev-pci driver is a generic driver which has no ability to support
+customized regions. e.g. state save/restore or dirty page region which is
+important in live migration. To support the usage, there are two directions:
 
-> 2) KVM may set the preempt flag for a short period whenver an vmexit
-> happens even if a vmenter is executed shortly after. In this case, we
-> may want to use a more durable vcpu suspend flag that indicates the vcpu
-> won't get a real vcpu back for a longer period of time.
+1) extend vfio-mdev-pci driver to expose interface, let vendor specific
+in-kernel module (not driver) to register some ops for live migration.
+Thus to support customized regions. In this direction, vfio-mdev-pci
+driver will be in charge of the hardware. The in-kernel vendor specific
+module is just to provide customized region emulation.
+- Pros: it will be helpful if we want to expose some user-space ABI in
+        future since it is a generic driver.
+- Cons: no apparent cons per me, may keep me honest, my folks.
 
-It sets it for exits to userspace, but they shouldn't really happen on a 
-properly-configured system.
+2) further abstract out the generic parts in vfio-mdev-driver to be a library
+and let vendor driver to call the interfaces exposed by this library. e.g.
+provides APIs to wrap a VF as mdev and make a non-singleton iommu
+group to be vfio viable when a vendor driver wants to wrap a VF as a
+mdev. In this direction, device driver still in charge of hardware.
+- Pros: devices driver still owns the device, which looks to be more
+        "reasonable".
+- Cons: no apparent cons, may be unable to have unified user space ABI if
+        it's needed in future.
 
-However, it's easy to test this theory:
+Any thoughts on the above usage and the two directions? Also, Kevin, Yan,
+Shaopeng could keep me honest if anything missed.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2e302e977dac..feb6c75a7a88 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3368,26 +3368,28 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	int idx;
- 
--	if (vcpu->preempted)
-+	if (vcpu->preempted) {
- 		vcpu->arch.preempted_in_kernel = !kvm_x86_ops->get_cpl(vcpu);
- 
--	/*
--	 * Disable page faults because we're in atomic context here.
--	 * kvm_write_guest_offset_cached() would call might_fault()
--	 * that relies on pagefault_disable() to tell if there's a
--	 * bug. NOTE: the write to guest memory may not go through if
--	 * during postcopy live migration or if there's heavy guest
--	 * paging.
--	 */
--	pagefault_disable();
--	/*
--	 * kvm_memslots() will be called by
--	 * kvm_write_guest_offset_cached() so take the srcu lock.
--	 */
--	idx = srcu_read_lock(&vcpu->kvm->srcu);
--	kvm_steal_time_set_preempted(vcpu);
--	srcu_read_unlock(&vcpu->kvm->srcu, idx);
--	pagefault_enable();
-+		/*
-+		 * Disable page faults because we're in atomic context here.
-+		 * kvm_write_guest_offset_cached() would call might_fault()
-+		 * that relies on pagefault_disable() to tell if there's a
-+		 * bug. NOTE: the write to guest memory may not go through if
-+		 * during postcopy live migration or if there's heavy guest
-+		 * paging.
-+		 */
-+		pagefault_disable();
-+		/*
-+		 * kvm_memslots() will be called by
-+		 * kvm_write_guest_offset_cached() so take the srcu lock.
-+		 */
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		kvm_steal_time_set_preempted(vcpu);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-+		pagefault_enable();
-+	}
-+
- 	kvm_x86_ops->vcpu_put(vcpu);
- 	vcpu->arch.last_host_tsc = rdtsc();
- 	/*
-
-Wanpeng, can you try?
-
-Paolo
-
-> Perhaps you can add a lock event counter to count the number of
-> wait_early events caused by vcpu_is_preempted() being true to see if it
-> really cause a lot more wait_early than without the vcpu_is_preempted()
-> call.
-> 
-> I have no objection to this, I just want to find out the root cause of it.
-> 
-> Cheers,
-> Longman
-> 
-
+Best Wishes,
+Yi Liu
