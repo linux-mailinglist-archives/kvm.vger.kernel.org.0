@@ -2,111 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DC9EADB63
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 16:45:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76B65ADBE1
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 17:11:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730909AbfIIOpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 10:45:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58860 "EHLO mx1.redhat.com"
+        id S2387909AbfIIPLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 11:11:38 -0400
+Received: from mga07.intel.com ([134.134.136.100]:37550 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730690AbfIIOpP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 10:45:15 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id EE4442F366E
-        for <kvm@vger.kernel.org>; Mon,  9 Sep 2019 14:45:14 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id f63so4554300wma.7
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 07:45:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=TIU8l9uNtqi5N363chjsQODAD8NExttwuYVEnSx0c3k=;
-        b=TH1V1RcW9KfiqsR3xzBiGJ/CbUSktkaBXPbY1CTjcXXqDHrrCGSfK28d+SDs+yx/bP
-         zrRiSV8nvz9XQiF2Doj26udGwbo3y7l56KLgrlwwM2sOLGrc23HeLxERHHtHAW5KHx2k
-         grzhCJYz/e0kp3ori3T1cKjviHrBGVn2zZDAC+oBMBFq7HbGMi0NzFhoNVwnLMEOYWmv
-         YRE8usKmk25XmRjVo/m4ftKTvgzzwc062WsERgCI5NFl4VgfvzMrWp7MBTHZ5l+fkmjj
-         cmdXv5YlgJ4NqCUFp9jwDvdmvSavoOAVGl7eJSN1UBSaV4IhcO1HOp6J2/Wh/E2kSWZE
-         DtrQ==
-X-Gm-Message-State: APjAAAWBliI0UUjFhdfJPe1qTHbZ7fWXnM5mKhiu2BZoTqUP/Jtj12mC
-        4HzjSkh2YGx87FuI8VU7nuVowaA+Nt2i/Zw9r3oXU6YPyS4G5KPhb4JVBqIChvqpm6R7n+UiQ77
-        JmUuNjFNwSzLG
-X-Received: by 2002:adf:eb4b:: with SMTP id u11mr12031966wrn.121.1568040313765;
-        Mon, 09 Sep 2019 07:45:13 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzcqag+ERBvSjIm6CpVOwAwyVlX8Vd50VjCvuAgwQi1q8tVVx/gSm4B5gLVsG6xNkiMwg2Qkg==
-X-Received: by 2002:adf:eb4b:: with SMTP id u11mr12031946wrn.121.1568040313584;
-        Mon, 09 Sep 2019 07:45:13 -0700 (PDT)
-Received: from redhat.com ([80.74.107.118])
-        by smtp.gmail.com with ESMTPSA id y14sm26560796wrd.84.2019.09.09.07.45.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2019 07:45:12 -0700 (PDT)
-Date:   Mon, 9 Sep 2019 10:45:10 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH untested] vhost: block speculation of translated
- descriptors
-Message-ID: <20190909104355-mutt-send-email-mst@kernel.org>
-References: <20190908110521.4031-1-mst@redhat.com>
- <db4d77d7-c467-935d-b4ae-1da7635e9b6b@redhat.com>
+        id S1727674AbfIIPLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 11:11:37 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Sep 2019 08:11:36 -0700
+X-IronPort-AV: E=Sophos;i="5.64,486,1559545200"; 
+   d="scan'208";a="175007390"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Sep 2019 08:11:36 -0700
+Message-ID: <0ca58fea280b51b83e7b42e2087128789bc9448d.camel@linux.intel.com>
+Subject: Re: [PATCH v9 1/8] mm: Add per-cpu logic to page shuffling
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
+        mst@redhat.com, catalin.marinas@arm.com, dave.hansen@intel.com,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        will@kernel.org, linux-arm-kernel@lists.infradead.org,
+        osalvador@suse.de
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
+        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        ying.huang@intel.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, fengguang.wu@intel.com,
+        kirill.shutemov@linux.intel.com
+Date:   Mon, 09 Sep 2019 08:11:36 -0700
+In-Reply-To: <0df2e5d0-af92-04b4-aa7d-891387874039@redhat.com>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+         <20190907172512.10910.74435.stgit@localhost.localdomain>
+         <0df2e5d0-af92-04b4-aa7d-891387874039@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <db4d77d7-c467-935d-b4ae-1da7635e9b6b@redhat.com>
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 09, 2019 at 03:19:55PM +0800, Jason Wang wrote:
-> 
-> On 2019/9/8 下午7:05, Michael S. Tsirkin wrote:
-> > iovec addresses coming from vhost are assumed to be
-> > pre-validated, but in fact can be speculated to a value
-> > out of range.
+On Mon, 2019-09-09 at 10:14 +0200, David Hildenbrand wrote:
+> On 07.09.19 19:25, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > > 
-> > Userspace address are later validated with array_index_nospec so we can
-> > be sure kernel info does not leak through these addresses, but vhost
-> > must also not leak userspace info outside the allowed memory table to
-> > guests.
-> > 
-> > Following the defence in depth principle, make sure
-> > the address is not validated out of node range.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >   drivers/vhost/vhost.c | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 5dc174ac8cac..0ee375fb7145 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -2072,7 +2072,9 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
-> >   		size = node->size - addr + node->start;
-> >   		_iov->iov_len = min((u64)len - s, size);
-> >   		_iov->iov_base = (void __user *)(unsigned long)
-> > -			(node->userspace_addr + addr - node->start);
-> > +			(node->userspace_addr +
-> > +			 array_index_nospec(addr - node->start,
-> > +					    node->size));
-> >   		s += size;
-> >   		addr += size;
-> >   		++ret;
+> > Change the logic used to generate randomness in the suffle path so that we
+> > can avoid cache line bouncing. The previous logic was sharing the offset
+> > and entropy word between all CPUs. As such this can result in cache line
+> > bouncing and will ultimately hurt performance when enabled.
 > 
-> 
-> I've tried this on Kaby Lake smap off metadata acceleration off using
-> testpmd (virtio-user) + vhost_net. I don't see obvious performance
-> difference with TX PPS.
-> 
-> Thanks
+> So, usually we perform such changes if there is real evidence. Do you
+> have any such performance numbers to back your claims?
 
-Should I push this to Linus right now then? It's a security thing so
-maybe we better do it ASAP ... what's your opinion?
+I'll have to go rerun the test to get the exact numbers. The reason this
+came up is that my original test was spanning NUMA nodes and that made
+this more expensive as a result since the memory was both not local to the
+CPU and was being updated by multiple sockets.
 
--- 
-MST
+I will try building a pair of host kernels with shuffling enabled and this
+patch applied to one and can add that data to the patch description.
+
+- Alex
+
+
