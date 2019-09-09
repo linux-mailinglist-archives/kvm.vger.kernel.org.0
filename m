@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B78BADA61
-	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 15:49:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88C30ADA64
+	for <lists+kvm@lfdr.de>; Mon,  9 Sep 2019 15:49:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404947AbfIINtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 09:49:33 -0400
-Received: from foss.arm.com ([217.140.110.172]:50802 "EHLO foss.arm.com"
+        id S2404951AbfIINtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 09:49:36 -0400
+Received: from foss.arm.com ([217.140.110.172]:50818 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404915AbfIINtc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 09:49:32 -0400
+        id S2404915AbfIINtf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 09:49:35 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 492301BB2;
-        Mon,  9 Sep 2019 06:49:32 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF3461C01;
+        Mon,  9 Sep 2019 06:49:34 -0700 (PDT)
 Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 085343F59C;
-        Mon,  9 Sep 2019 06:49:29 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A9FD53F59C;
+        Mon,  9 Sep 2019 06:49:32 -0700 (PDT)
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -27,54 +27,148 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Mark Rutland <mark.rutland@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 16/17] arm64: KVM: Device mappings should be execute-never
-Date:   Mon,  9 Sep 2019 14:48:06 +0100
-Message-Id: <20190909134807.27978-17-maz@kernel.org>
+Subject: [PATCH 17/17] KVM: arm/arm64: vgic: Allow more than 256 vcpus for KVM_IRQ_LINE
+Date:   Mon,  9 Sep 2019 14:48:07 +0100
+Message-Id: <20190909134807.27978-18-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190909134807.27978-1-maz@kernel.org>
 References: <20190909134807.27978-1-maz@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: James Morse <james.morse@arm.com>
+While parts of the VGIC support a large number of vcpus (we
+bravely allow up to 512), other parts are more limited.
 
-Since commit 2f6ea23f63cca ("arm64: KVM: Avoid marking pages as XN in
-Stage-2 if CTR_EL0.DIC is set"), KVM has stopped marking normal memory
-as execute-never at stage2 when the system supports D->I Coherency at
-the PoU. This avoids KVM taking a trap when the page is first executed,
-in order to clean it to PoU.
+One of these limits is visible in the KVM_IRQ_LINE ioctl, which
+only allows 256 vcpus to be signalled when using the CPU or PPI
+types. Unfortunately, we've cornered ourselves badly by allocating
+all the bits in the irq field.
 
-The patch that added this change also wrapped PAGE_S2_DEVICE mappings
-up in this too. The upshot is, if your CPU caches support DIC ...
-you can execute devices.
+Since the irq_type subfield (8 bit wide) is currently only taking
+the values 0, 1 and 2 (and we have been careful not to allow anything
+else), let's reduce this field to only 4 bits, and allocate the
+remaining 4 bits to a vcpu2_index, which acts as a multiplier:
 
-Revert the PAGE_S2_DEVICE change so PTE_S2_XN is always used
-directly.
+  vcpu_id = 256 * vcpu2_index + vcpu_index
 
-Fixes: 2f6ea23f63cca ("arm64: KVM: Avoid marking pages as XN in Stage-2 if CTR_EL0.DIC is set")
-Signed-off-by: James Morse <james.morse@arm.com>
+With that, and a new capability (KVM_CAP_ARM_IRQ_LINE_LAYOUT_2)
+allowing this to be discovered, it becomes possible to inject
+PPIs to up to 4096 vcpus. But please just don't.
+
+Whilst we're there, add a clarification about the use of KVM_IRQ_LINE
+on arm, which is not completely conditionned by KVM_CAP_IRQCHIP.
+
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/pgtable-prot.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Documentation/virt/kvm/api.txt    | 12 ++++++++++--
+ arch/arm/include/uapi/asm/kvm.h   |  4 +++-
+ arch/arm64/include/uapi/asm/kvm.h |  4 +++-
+ include/uapi/linux/kvm.h          |  1 +
+ virt/kvm/arm/arm.c                |  2 ++
+ 5 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-index 92d2e9f28f28..9a21b84536f2 100644
---- a/arch/arm64/include/asm/pgtable-prot.h
-+++ b/arch/arm64/include/asm/pgtable-prot.h
-@@ -77,7 +77,7 @@
- 	})
+diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+index 2d067767b617..25931ca1cb38 100644
+--- a/Documentation/virt/kvm/api.txt
++++ b/Documentation/virt/kvm/api.txt
+@@ -753,8 +753,8 @@ in-kernel irqchip (GIC), and for in-kernel irqchip can tell the GIC to
+ use PPIs designated for specific cpus.  The irq field is interpreted
+ like this:
  
- #define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
--#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PAGE_S2_XN)
-+#define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_S2_XN)
+-  bits:  | 31 ... 24 | 23  ... 16 | 15    ...    0 |
+-  field: | irq_type  | vcpu_index |     irq_id     |
++  bits:  |  31 ... 28  | 27 ... 24 | 23  ... 16 | 15 ... 0 |
++  field: | vcpu2_index | irq_type  | vcpu_index |  irq_id  |
  
- #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
- #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
+ The irq_type field has the following values:
+ - irq_type[0]: out-of-kernel GIC: irq_id 0 is IRQ, irq_id 1 is FIQ
+@@ -766,6 +766,14 @@ The irq_type field has the following values:
+ 
+ In both cases, level is used to assert/deassert the line.
+ 
++When KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 is supported, the target vcpu is
++identified as (256 * vcpu2_index + vcpu_index). Otherwise, vcpu2_index
++must be zero.
++
++Note that on arm/arm64, the KVM_CAP_IRQCHIP capability only conditions
++injection of interrupts for the in-kernel irqchip. KVM_IRQ_LINE can always
++be used for a userspace interrupt controller.
++
+ struct kvm_irq_level {
+ 	union {
+ 		__u32 irq;     /* GSI */
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index a4217c1a5d01..2769360f195c 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -266,8 +266,10 @@ struct kvm_vcpu_events {
+ #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
+ 
+ /* KVM_IRQ_LINE irq field index values */
++#define KVM_ARM_IRQ_VCPU2_SHIFT		28
++#define KVM_ARM_IRQ_VCPU2_MASK		0xf
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+-#define KVM_ARM_IRQ_TYPE_MASK		0xff
++#define KVM_ARM_IRQ_TYPE_MASK		0xf
+ #define KVM_ARM_IRQ_VCPU_SHIFT		16
+ #define KVM_ARM_IRQ_VCPU_MASK		0xff
+ #define KVM_ARM_IRQ_NUM_SHIFT		0
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 9a507716ae2f..67c21f9bdbad 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -325,8 +325,10 @@ struct kvm_vcpu_events {
+ #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+ 
+ /* KVM_IRQ_LINE irq field index values */
++#define KVM_ARM_IRQ_VCPU2_SHIFT		28
++#define KVM_ARM_IRQ_VCPU2_MASK		0xf
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+-#define KVM_ARM_IRQ_TYPE_MASK		0xff
++#define KVM_ARM_IRQ_TYPE_MASK		0xf
+ #define KVM_ARM_IRQ_VCPU_SHIFT		16
+ #define KVM_ARM_IRQ_VCPU_MASK		0xff
+ #define KVM_ARM_IRQ_NUM_SHIFT		0
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e3f12d5359e..5414b6588fbb 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -996,6 +996,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+ #define KVM_CAP_PMU_EVENT_FILTER 173
++#define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 35a069815baf..86c6aa1cb58e 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -196,6 +196,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MP_STATE:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
+ 	case KVM_CAP_VCPU_EVENTS:
++	case KVM_CAP_ARM_IRQ_LINE_LAYOUT_2:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+@@ -888,6 +889,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 
+ 	irq_type = (irq >> KVM_ARM_IRQ_TYPE_SHIFT) & KVM_ARM_IRQ_TYPE_MASK;
+ 	vcpu_idx = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
++	vcpu_idx += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
+ 	irq_num = (irq >> KVM_ARM_IRQ_NUM_SHIFT) & KVM_ARM_IRQ_NUM_MASK;
+ 
+ 	trace_kvm_irq_line(irq_type, vcpu_idx, irq_num, irq_level->level);
 -- 
 2.20.1
 
