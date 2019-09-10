@@ -2,105 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AE45AE3D6
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 08:36:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB31AAE3FB
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 08:49:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393522AbfIJGgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 02:36:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58066 "EHLO mx1.redhat.com"
+        id S2390932AbfIJGtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 02:49:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33122 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729627AbfIJGgE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 02:36:04 -0400
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+        id S1729747AbfIJGtC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 02:49:02 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E22F6C056807
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 06:36:03 +0000 (UTC)
-Received: by mail-pl1-f199.google.com with SMTP id p8so9246921plo.16
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 23:36:03 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id D2DD2C05975D
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 06:49:01 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id b2so18708325qtt.10
+        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 23:49:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oY3Ce/5Kbiwb4uUtpEcG5bKndL/d68YsWBrf+ZfdEUg=;
-        b=N3HbWu4f4p1Cz2eCMCFm7rlconHm9DsxmiXcWeQe4TczWQE2XE6izcJ+0U5z60wL5l
-         u/nKp1V7gfxQYocuMxBiSA5s+MXqIKoihatUzb8hgUAp4niW/zw27ZR4B2HBoOxsPuss
-         7pGDMt9LYqghEPK3FFXZSBY177eI7jMwT5/YO1VM5h2MFjsoDecaw37976uk1YD8FT/w
-         S45rZSPNUzz5cCEEu6NpiX3IcbeVd0prHP2XRsQg1RhNEgG+g6j+y5jxJ9sQXh/W0gcs
-         E0bHfjjoKD2Q2pHZzSg6MUsVfzG/08MOUYhG759oOVH1eLanCuRekudUUjLITfH2u2fv
-         n7cw==
-X-Gm-Message-State: APjAAAXx02QfAeJdmwb47cEpCynPb12yuYd6vCo3ZZO9hQU2zIH+TnCS
-        I3DQuBoF/jMWKpodHZA+8LWfuHhj76OuTYxWoa02jvM+oN3AJQkobuKVWOFkVv4PQAybNsYhVHG
-        L+UMR/IrKLWWz
-X-Received: by 2002:a62:cf82:: with SMTP id b124mr32811077pfg.159.1568097363356;
-        Mon, 09 Sep 2019 23:36:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzBN6NUbe6QHosEJOHGq8wA7M68Xro9xrRVctByU6UK/vg6Yda0DomOLpqVHL7ahH1j5pqomg==
-X-Received: by 2002:a62:cf82:: with SMTP id b124mr32811050pfg.159.1568097363109;
-        Mon, 09 Sep 2019 23:36:03 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id a29sm30436883pfr.152.2019.09.09.23.35.59
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=dfiQALXz5+7KOgf5kpTvYt6Xu5cXYJTwms28arJUb+Y=;
+        b=GnyASOv7rPeBrr8zLzwArl9yCJig0/iYDo/53zQ5GAwMZiYcoHPIu8yXoGg26YgCvX
+         BEEnx8jqH2E8ieW+0VHU9EMrylZPzk4x/FSm9ZwPQTrDs3oJiULZHq7yEelHxu4e5gbj
+         IEt9k2edWZWr3iyhcHaw3hVU4ueOIK6fL8NapiL0evzm598ObAR6NtkakgI8tKtVF0w+
+         5mH+LnPUn8Kolo8jgxUnpfNezurnYQoECwCh6dS6w82kis4M2OWMcT+J8vbFbUHmoSlp
+         Wm+p61zqC4lCfts0FcCe4wptEkaAYoTBY0sEpDt5UkxYnkZkQbBnDexxZH+f7u4NwtTP
+         G3Ug==
+X-Gm-Message-State: APjAAAWHFcCn/gXUGdEhL3vwZiAMq+gRqdou450Dt2BzrpduSlWmX8QS
+        wC9K51LvgIA82rlCs2+AIChK/yV+RhDfSl9nJjPRdbPPCG/UCNujVHi3G7eNxgoPe/r3xccVy7j
+        1j2ZvjQlR7W/n
+X-Received: by 2002:ac8:718c:: with SMTP id w12mr27618507qto.235.1568098141169;
+        Mon, 09 Sep 2019 23:49:01 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzv6IYVdd0f5WQVUeM0vPrOJIlCYkZC8iTVcIPS0hC3pXejSbPr3ajEFZbHAbLF59dsjfyt7g==
+X-Received: by 2002:ac8:718c:: with SMTP id w12mr27618495qto.235.1568098141014;
+        Mon, 09 Sep 2019 23:49:01 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+        by smtp.gmail.com with ESMTPSA id l7sm8266259qke.67.2019.09.09.23.48.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2019 23:36:02 -0700 (PDT)
-Date:   Tue, 10 Sep 2019 14:35:52 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Doug Reiland <doug.reiland@intel.com>
-Subject: Re: [PATCH] KVM: x86: Manually calculate reserved bits when loading
- PDPTRS
-Message-ID: <20190910063552.GB8696@xz-x1>
-References: <20190903233645.21125-1-sean.j.christopherson@intel.com>
+        Mon, 09 Sep 2019 23:49:00 -0700 (PDT)
+Date:   Tue, 10 Sep 2019 02:48:55 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH untested] vhost: block speculation of translated
+ descriptors
+Message-ID: <20190910024814-mutt-send-email-mst@kernel.org>
+References: <20190908110521.4031-1-mst@redhat.com>
+ <db4d77d7-c467-935d-b4ae-1da7635e9b6b@redhat.com>
+ <20190909104355-mutt-send-email-mst@kernel.org>
+ <9ab48e0f-50a9-bed4-1801-73c37a7da27c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190903233645.21125-1-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9ab48e0f-50a9-bed4-1801-73c37a7da27c@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 03, 2019 at 04:36:45PM -0700, Sean Christopherson wrote:
-> Manually generate the PDPTR reserved bit mask when explicitly loading
-> PDPTRs.  The reserved bits that are being tracked by the MMU reflect the
-> current paging mode, which is unlikely to be PAE paging in the vast
-> majority of flows that use load_pdptrs(), e.g. CR0 and CR4 emulation,
-> __set_sregs(), etc...  This can cause KVM to incorrectly signal a bad
-> PDPTR, or more likely, miss a reserved bit check and subsequently fail
-> a VM-Enter due to a bad VMCS.GUEST_PDPTR.
+On Tue, Sep 10, 2019 at 09:52:10AM +0800, Jason Wang wrote:
 > 
-> Add a one off helper to generate the reserved bits instead of sharing
-> code across the MMU's calculations and the PDPTR emulation.  The PDPTR
-> reserved bits are basically set in stone, and pushing a helper into
-> the MMU's calculation adds unnecessary complexity without improving
-> readability.
+> On 2019/9/9 下午10:45, Michael S. Tsirkin wrote:
+> > On Mon, Sep 09, 2019 at 03:19:55PM +0800, Jason Wang wrote:
+> > > On 2019/9/8 下午7:05, Michael S. Tsirkin wrote:
+> > > > iovec addresses coming from vhost are assumed to be
+> > > > pre-validated, but in fact can be speculated to a value
+> > > > out of range.
+> > > > 
+> > > > Userspace address are later validated with array_index_nospec so we can
+> > > > be sure kernel info does not leak through these addresses, but vhost
+> > > > must also not leak userspace info outside the allowed memory table to
+> > > > guests.
+> > > > 
+> > > > Following the defence in depth principle, make sure
+> > > > the address is not validated out of node range.
+> > > > 
+> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > ---
+> > > >    drivers/vhost/vhost.c | 4 +++-
+> > > >    1 file changed, 3 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > > index 5dc174ac8cac..0ee375fb7145 100644
+> > > > --- a/drivers/vhost/vhost.c
+> > > > +++ b/drivers/vhost/vhost.c
+> > > > @@ -2072,7 +2072,9 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
+> > > >    		size = node->size - addr + node->start;
+> > > >    		_iov->iov_len = min((u64)len - s, size);
+> > > >    		_iov->iov_base = (void __user *)(unsigned long)
+> > > > -			(node->userspace_addr + addr - node->start);
+> > > > +			(node->userspace_addr +
+> > > > +			 array_index_nospec(addr - node->start,
+> > > > +					    node->size));
+> > > >    		s += size;
+> > > >    		addr += size;
+> > > >    		++ret;
+> > > 
+> > > I've tried this on Kaby Lake smap off metadata acceleration off using
+> > > testpmd (virtio-user) + vhost_net. I don't see obvious performance
+> > > difference with TX PPS.
+> > > 
+> > > Thanks
+> > Should I push this to Linus right now then? It's a security thing so
+> > maybe we better do it ASAP ... what's your opinion?
 > 
-> Oppurtunistically fix/update the comment for load_pdptrs().
 > 
-> Note, the buggy commit also introduced a deliberate functional change,
-> "Also remove bit 5-6 from rsvd_bits_mask per latest SDM.", which was
-> effectively (and correctly) reverted by commit cd9ae5fe47df ("KVM: x86:
-> Fix page-tables reserved bits").  A bit of SDM archaeology shows that
-> the SDM from late 2008 had a bug (likely a copy+paste error) where it
-> listed bits 6:5 as AVL and A for PDPTEs used for 4k entries but reserved
-> for 2mb entries.  I.e. the SDM contradicted itself, and bits 6:5 are and
-> always have been reserved.
+> Yes, you can.
 > 
-> Fixes: 20c466b56168d ("KVM: Use rsvd_bits_mask in load_pdptrs()")
-> Cc: stable@vger.kernel.org
-> Cc: Nadav Amit <nadav.amit@gmail.com>
-> Reported-by: Doug Reiland <doug.reiland@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
 
-Maybe with a test case would be even better?  FWIW:
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+And should I include
 
--- 
-Peter Xu
+Tested-by: Jason Wang <jasowang@redhat.com>
+
+?
+
+> 
+> 
+> > 
