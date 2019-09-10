@@ -2,99 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6C2EAED84
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93953AED9E
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:48:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388310AbfIJOo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 10:44:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36326 "EHLO mx1.redhat.com"
+        id S2404787AbfIJOqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:46:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54822 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725935AbfIJOoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 10:44:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2404683AbfIJOqv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:46:51 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 96B5A10C696B;
-        Tue, 10 Sep 2019 14:44:25 +0000 (UTC)
-Received: from gondolin (ovpn-117-116.ams2.redhat.com [10.36.117.116])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E2E560BF7;
-        Tue, 10 Sep 2019 14:44:19 +0000 (UTC)
-Date:   Tue, 10 Sep 2019 16:44:15 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
-        david@redhat.com, frankja@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, imbrenda@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: s390: kvm_s390_vm_start_migration: check
- dirty_bitmap before using it as target for memset()
-Message-ID: <20190910164415.3ef74c39.cohuck@redhat.com>
-In-Reply-To: <20190910130215.23647-1-imammedo@redhat.com>
-References: <20190910130215.23647-1-imammedo@redhat.com>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id 1D5867BDA5
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 14:46:51 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id f11so9064592wrt.18
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 07:46:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=l65DH9YU8mGm5SKX7d473lQ/ogVgAEFpiCQPfaq4s9w=;
+        b=LL9VG0Ae0gYGI1a9rMfeU+yEquXDZayg3urOVuO3+UeKwLZJjMsRfbAbsbK2CUPnnK
+         EVrPiB907ry4YjNGZcH1CKgxoo8toMyZ9x5glHBlDQgP/CvhJ9pc2LcrGZpMRJRU9a44
+         HV0l2tLa2SiLHQitfQaFFkIyYw4qoXJZZMtFmHLD1C2tNjeNHwP3L/1jVGwNj1dW3fXk
+         2W3MMwEc8Bq1R9vDkKaRBcRFipB+D+cHru29hvcef6vzGtGBcx5801SqSsPG9iNWJ0rG
+         O3MAdTIc20ZjL48S+Gkh0W6Ue+H2RI5I4NUjsTNqsIjiflw1iPumR7v/bLBfxectJ2Ob
+         lbFQ==
+X-Gm-Message-State: APjAAAX5H+pBYAlseCsoziT7ins9qi8/MeyTZNzHWaWlQ+SsNcMPJSy9
+        hJJmNrwDcZSp7aUgH1SUyYm8q03zdDJCsn9kBkvPaOQ2SM9nMeEoZCVaG2xCPKGkAkOIehJnZqZ
+        0rXDjQoo7ObH9
+X-Received: by 2002:adf:a415:: with SMTP id d21mr29253255wra.94.1568126809755;
+        Tue, 10 Sep 2019 07:46:49 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyEtqpz9+QHudRI7ZuVLKmH9ZYfUdB3RnY01oSb+YAktsbq6ibE/u2+TUEOXFJ5W8JaXy6TkQ==
+X-Received: by 2002:adf:a415:: with SMTP id d21mr29253228wra.94.1568126809497;
+        Tue, 10 Sep 2019 07:46:49 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id u83sm4830710wme.0.2019.09.10.07.46.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Sep 2019 07:46:49 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Bump max number of test CPUs to
+ 255
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, Evgeny Yakovlev <wrfsh@yandex-team.ru>
+References: <20190906163450.30797-1-sean.j.christopherson@intel.com>
+ <20190906163450.30797-4-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <35a43a76-205c-48f3-a06e-c9883dd75c3f@redhat.com>
+Date:   Tue, 10 Sep 2019 16:46:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190906163450.30797-4-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.65]); Tue, 10 Sep 2019 14:44:25 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Sep 2019 09:02:15 -0400
-Igor Mammedov <imammedo@redhat.com> wrote:
-
-> If userspace doesn't set KVM_MEM_LOG_DIRTY_PAGES on memslot before calling
-> kvm_s390_vm_start_migration(), kernel will oops with:
+On 06/09/19 18:34, Sean Christopherson wrote:
+> The max number of CPUs is not actually enforced anywhere, e.g. manually
+> setting '-smp 240' when running a unit test will cause random corruption
+> and hangs during smp initialization.  Increase the max number of test
+> CPUs to 255, which is the true max kvm-unit-tests can support without
+> significant changes, e.g. it would need to boot with x2APIC enabled,
+> support interrupt remapping, etc...
 > 
->   Unable to handle kernel pointer dereference in virtual kernel address space
->   Failing address: 0000000000000000 TEID: 0000000000000483
->   Fault in home space mode while using kernel ASCE.
->   AS:0000000002a2000b R2:00000001bff8c00b R3:00000001bff88007 S:00000001bff91000 P:000000000000003d
->   Oops: 0004 ilc:2 [#1] SMP
->   ...
->   Call Trace:
->   ([<001fffff804ec552>] kvm_s390_vm_set_attr+0x347a/0x3828 [kvm])
->    [<001fffff804ecfc0>] kvm_arch_vm_ioctl+0x6c0/0x1998 [kvm]
->    [<001fffff804b67e4>] kvm_vm_ioctl+0x51c/0x11a8 [kvm]
->    [<00000000008ba572>] do_vfs_ioctl+0x1d2/0xe58
->    [<00000000008bb284>] ksys_ioctl+0x8c/0xb8
->    [<00000000008bb2e2>] sys_ioctl+0x32/0x40
->    [<000000000175552c>] system_call+0x2b8/0x2d8
->   INFO: lockdep is turned off.
->   Last Breaking-Event-Address:
->    [<0000000000dbaf60>] __memset+0xc/0xa0
+> There is no known use case for running with more than 64 CPUs, but the
+> cost of supporting 255 is minimal, e.g. increases the size of each test
+> binary by a few kbs and burns a few extra cycles in init_apic_map().
 > 
-> due to ms->dirty_bitmap being NULL, which might crash the host.
-> 
-> Make sure that ms->dirty_bitmap is set before using it or
-> print a warning and return -ENIVAL otherwise.
-> 
-> Fixes: afdad61615cc ("KVM: s390: Fix storage attributes migration with memory slots")
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
-> Cc: stable@vger.kernel.org # v4.19+
+>  lib/x86/apic-defs.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> v2:
->    - drop WARN()
+> diff --git a/lib/x86/apic-defs.h b/lib/x86/apic-defs.h
+> index 7107f0f..b2014de 100644
+> --- a/lib/x86/apic-defs.h
+> +++ b/lib/x86/apic-defs.h
+> @@ -6,7 +6,7 @@
+>   * both in C and ASM
+>   */
+>  
+> -#define MAX_TEST_CPUS (64)
+> +#define MAX_TEST_CPUS (255)
+>  
+>  /*
+>   * Constants for various Intel APICs. (local APIC, IOAPIC, etc.)
 > 
->  arch/s390/kvm/kvm-s390.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index f329dcb3f44c..2a40cd3e40b4 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -1018,6 +1018,8 @@ static int kvm_s390_vm_start_migration(struct kvm *kvm)
->  	/* mark all the pages in active slots as dirty */
->  	for (slotnr = 0; slotnr < slots->used_slots; slotnr++) {
->  		ms = slots->memslots + slotnr;
-> +		if (!ms->dirty_bitmap)
-> +			return -EINVAL;
->  		/*
->  		 * The second half of the bitmap is only used on x86,
->  		 * and would be wasted otherwise, so we put it to good
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Since this is not a multiple of 8 anymore, the previous patch should
+have used (max_cpus + 7) / 8.  Fixed that and queued.
+
+Paolo
