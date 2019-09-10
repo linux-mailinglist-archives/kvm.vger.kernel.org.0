@@ -2,53 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7750AEDA1
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:48:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6DF7AEDA3
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405415AbfIJOrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 10:47:04 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:33653 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405395AbfIJOrC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 10:47:02 -0400
-Received: by mail-io1-f68.google.com with SMTP id m11so38140099ioo.0;
-        Tue, 10 Sep 2019 07:47:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=83TThgQAjkQ0ae/WfN2rozL6NZ6sFqo/tzTJieGwWhY=;
-        b=bctqj0dIEQG02DidTblEEKKmlRq95iuCrJbWTEZEFy6f4ldmknD9AC82Hjp7WtIcUL
-         wdtgqANYPFpfuqN9RWFoV81S+TL4TZWcW/eRB1zbwCnI4axFiqpnKB/4F9Vb1ASsBmwM
-         MoGeD5V7oPXNrI0TLfR8qwBLS/a5rmpBqaVS40yQVLdcqID59aFUJKp3thzSPP4Ym5fo
-         oUxnlGZ+RikUHkghsxU4t9MUOUJM1V923cataTV37iHuaUS8taTW2ilbXf8zuGBL2rrr
-         GFcYtmHJkRVPpjaQYbMNqFd6Z6x57kRfzb33fCPJ6liqZh8sZLRJMVMsx0Mc0ssKXqB7
-         m1dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=83TThgQAjkQ0ae/WfN2rozL6NZ6sFqo/tzTJieGwWhY=;
-        b=W9N7gezhQNg1WG4oLf0K+lRaR7fEVZLBCpgY6d7YqL7EIUxwwd5lF+yRrnldvMTA6i
-         XaS/bfqnVmrB85wRDp9NRmCrEtT7WuNy0e5vyb0G8eWkkwUgIV5E6TlxnDMRWBaK4XOv
-         pgOmkyAaoudtzyp2v6rXn81jpTS1vNue8vtPwL4JvaICatc5WbsWlgZ+WUogQG6NI2Cl
-         aWf4AfbJ52AVTTKqdFKK6eMJxiqdSGyn4Y8n0e0dMNfCiM+A5P+Xl2W4ZfXHNWyT6H/J
-         unjia/KY650Km/BSdiA0ShdB9J3Sqsugy2NDAwXR6LgM5ti++sgy0ef9dMKGpN2ba4q2
-         yj0Q==
-X-Gm-Message-State: APjAAAV3mDU/E7CQnDy/X6dpky4LggsUGMCV29Vir2KS+0cNn1ORT2+y
-        0iMtS4vSfO+BioA6pX29mZ/tNQpOaK2BovOgkjg=
-X-Google-Smtp-Source: APXvYqxrAgxnAGDouzK82zOnS/FEXuQVFFiHhPiHvEJcvMSKDH7nqj7q9uv+1GUDlOR7M4uUZTjdaBK0SNIGv69duNM=
-X-Received: by 2002:a5d:8f86:: with SMTP id l6mr20769278iol.270.1568126821359;
- Tue, 10 Sep 2019 07:47:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190907172528.10910.37051.stgit@localhost.localdomain> <20190910122313.GW2063@dhcp22.suse.cz>
-In-Reply-To: <20190910122313.GW2063@dhcp22.suse.cz>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Tue, 10 Sep 2019 07:46:50 -0700
-Message-ID: <CAKgT0Ud1xqhEy_LL4AfMgreP0uXrkF-fSDn=6uDXfn7Pvj5AAw@mail.gmail.com>
-Subject: Re: [PATCH v9 3/8] mm: Move set/get_pcppage_migratetype to mmzone.h
-To:     Michal Hocko <mhocko@kernel.org>
+        id S2393607AbfIJOrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:47:17 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48628 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726132AbfIJOrR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:47:17 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id AA491ABD2;
+        Tue, 10 Sep 2019 14:47:14 +0000 (UTC)
+Date:   Tue, 10 Sep 2019 16:47:13 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
 Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
@@ -72,34 +41,65 @@ Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
         Fengguang Wu <fengguang.wu@intel.com>,
         Alexander Duyck <alexander.h.duyck@linux.intel.com>,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
+Message-ID: <20190910144713.GF2063@dhcp22.suse.cz>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190910124209.GY2063@dhcp22.suse.cz>
+ <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 10, 2019 at 5:23 AM Michal Hocko <mhocko@kernel.org> wrote:
->
-> On Sat 07-09-19 10:25:28, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+On Tue 10-09-19 07:42:43, Alexander Duyck wrote:
+> On Tue, Sep 10, 2019 at 5:42 AM Michal Hocko <mhocko@kernel.org> wrote:
 > >
-> > In order to support page reporting it will be necessary to store and
-> > retrieve the migratetype of a page. To enable that I am moving the set and
-> > get operations for pcppage_migratetype into the mm/internal.h header so
-> > that they can be used outside of the page_alloc.c file.
->
-> Please describe who is the user and why does it needs this interface.
-> This is really important because migratetype is an MM internal thing and
-> external users shouldn't really care about it at all. We really do not
-> want a random code to call those, especially the set_pcppage_migratetype.
+> > I wanted to review "mm: Introduce Reported pages" just realize that I
+> > have no clue on what is going on so returned to the cover and it didn't
+> > really help much. I am completely unfamiliar with virtio so please bear
+> > with me.
+> >
+> > On Sat 07-09-19 10:25:03, Alexander Duyck wrote:
+> > [...]
+> > > This series provides an asynchronous means of reporting to a hypervisor
+> > > that a guest page is no longer in use and can have the data associated
+> > > with it dropped. To do this I have implemented functionality that allows
+> > > for what I am referring to as unused page reporting
+> > >
+> > > The functionality for this is fairly simple. When enabled it will allocate
+> > > statistics to track the number of reported pages in a given free area.
+> > > When the number of free pages exceeds this value plus a high water value,
+> > > currently 32, it will begin performing page reporting which consists of
+> > > pulling pages off of free list and placing them into a scatter list. The
+> > > scatterlist is then given to the page reporting device and it will perform
+> > > the required action to make the pages "reported", in the case of
+> > > virtio-balloon this results in the pages being madvised as MADV_DONTNEED
+> > > and as such they are forced out of the guest. After this they are placed
+> > > back on the free list,
+> >
+> > And here I am reallly lost because "forced out of the guest" makes me
+> > feel that those pages are no longer usable by the guest. So how come you
+> > can add them back to the free list. I suspect understanding this part
+> > will allow me to understand why we have to mark those pages and prevent
+> > merging.
+> 
+> Basically as the paragraph above mentions "forced out of the guest"
+> really is just the hypervisor calling MADV_DONTNEED on the page in
+> question. So the behavior is the same as any userspace application
+> that calls MADV_DONTNEED where the contents are no longer accessible
+> from userspace and attempting to access them will result in a fault
+> and the page being populated with a zero fill on-demand page, or a
+> copy of the file contents if the memory is file backed.
 
-I was using it to store the migratetype of the page so that I could
-find the boundary list that contained the reported page as the array
-is indexed based on page order and migratetype. However on further
-discussion I am thinking I may just use page->index directly to index
-into the boundary array. Doing that I should be able to get a very
-slight improvement in lookup time since I am not having to pull order
-and migratetype and then compute the index based on that. In addition
-it becomes much more clear as to what is going on, and if needed I
-could add debug checks to verify the page is "Reported" and that the
-"Buddy" page type is set.
+As I've said I have no idea about virt so this doesn't really tell me
+much. Does that mean that if somebody allocates such a page and tries to
+access it then virt will handle a fault and bring it back?
+
+-- 
+Michal Hocko
+SUSE Labs
