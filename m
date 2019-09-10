@@ -2,135 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 713C2AEDAD
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:49:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1F2BAED4C
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:41:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392988AbfIJOtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 10:49:01 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:48450 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732434AbfIJOtB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 10:49:01 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8AENkGG131485;
-        Tue, 10 Sep 2019 14:25:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to : content-transfer-encoding; s=corp-2019-08-05;
- bh=NHdeAPKmmXhs2gh53Ao/iY+rl0IHNTcE9ceoYzmW3PA=;
- b=eTl3Ht16X9k57STX22Nfse1q1i+nAE2TOCTXC5ruD8NFqq1ebwh84ldhbSzISgmnssuF
- bZIfi3jJldDUhk95HDI8Qd7vioZqIgsTPuYAJmJmPMMhEmrPrpnfOh22bWYYwfdvPQ0W
- 5AsHTQqRr9rI0b5wOBdrcZw9xuTuRG07TVcmSqgR2hpE7BFSph8b9enoTeIcAerW5cCB
- MUJWN4L+0WArFfdjI4p38FksHxgCerqViUcWoGVEtdoSJk+8+JEyW4ldrL6DbwPH/ZHW
- sBwq1gi3p5aaqVp2L//aIpV1VGxmbF2cRKlZoK8+zPUvKfHfPO9l4u4RIOqNoXrolw3h Jw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2uw1jy3swg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Sep 2019 14:25:03 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8AENt39128686;
-        Tue, 10 Sep 2019 14:25:02 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2uxd6ch563-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Sep 2019 14:25:02 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8AEOwoJ025439;
-        Tue, 10 Sep 2019 14:24:58 GMT
-Received: from char.us.oracle.com (/10.152.32.25)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 10 Sep 2019 07:24:58 -0700
-Received: by char.us.oracle.com (Postfix, from userid 1000)
-        id D9F686A010E; Tue, 10 Sep 2019 10:26:42 -0400 (EDT)
-Date:   Tue, 10 Sep 2019 10:26:42 -0400
-From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To:     Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>
-Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
-        virtualization@lists.linux-foundation.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>, Zhang@pps.reinject,
-        Yu C <yu.c.zhang@intel.com>,
-        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
-Subject: Re: [RFC PATCH v6 69/92] kvm: x86: keep the page protected if
- tracked by the introspection tool
-Message-ID: <20190910142642.GC5879@char.us.oracle.com>
-References: <20190809160047.8319-1-alazar@bitdefender.com>
- <20190809160047.8319-70-alazar@bitdefender.com>
+        id S1731393AbfIJOlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:41:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42358 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725957AbfIJOlC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:41:02 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 66A2FC04B940
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 14:41:02 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id c188so1435199wmd.9
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 07:41:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cJrLJhg77HdXITw7W6jWRWxQLFrh8FY3brtGhslg/yU=;
+        b=TkviZXdBbfTAZ8YTVa1sFqOkjUp7vt4WMxCA6vxwzHJowm0eUyPc1sGFH+a72kD1pw
+         4cIQ4dH30XCh+XOl1EtRtF0EJjAFBYu7TI0dpnUS1BuB+RiTXPgEYM9YMua6MCJVkoUW
+         nrWzOMe7YrBBXEB4gRQnoqMsSfYBzWdkg4b5j1/T7dYJ2LkxOuqV7qaJTCxhnp+nxZVg
+         t9HgqwBaej7U7uAGTKG4X1rkQlWIaHXxJBdMxgvQdsz8hYj+loCNhhP/69i9x1AWZs+4
+         rVBoBWcYHsaQLX7/k0Lgm6miHy6Pjps53mfF3sKSSaWk76tZC6UV9PbysMfAja/3d/x/
+         SZBg==
+X-Gm-Message-State: APjAAAXdiuQxLMpyfcwnYcHqSpVzQtWsY+asWF5DKHKbTTd7GSwo9ZXd
+        MejsNVchvst0fw5K5gkNZYmV//voe5/TNetuSCH4TWZrmr52YpkXKN8HV0XHV4ZbaLLR51dRJlM
+        WboofLqvrZr+L
+X-Received: by 2002:adf:fc05:: with SMTP id i5mr21459279wrr.134.1568126461120;
+        Tue, 10 Sep 2019 07:41:01 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy7r22ycaiyIAOgheL4k6r1Mn72f2EGSPwZkUVY5WoV3EEGyJTIURDBq8k7n4jtyP6PoMsfpw==
+X-Received: by 2002:adf:fc05:: with SMTP id i5mr21459245wrr.134.1568126460876;
+        Tue, 10 Sep 2019 07:41:00 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id i9sm3720112wmf.14.2019.09.10.07.40.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Sep 2019 07:41:00 -0700 (PDT)
+Subject: Re: [PATCH v3] KVM: x86: Disable posted interrupts for odd IRQs
+To:     Christoph Hellwig <hch@infradead.org>,
+        Alexander Graf <graf@amazon.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>
+References: <20190905125818.22395-1-graf@amazon.com>
+ <20190910061554.GD10968@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <1cc51fa5-ee1c-88a4-c935-c293c947f240@redhat.com>
+Date:   Tue, 10 Sep 2019 16:40:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190910061554.GD10968@infradead.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190809160047.8319-70-alazar@bitdefender.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9376 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909100140
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9376 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909100140
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 09, 2019 at 07:00:24PM +0300, Adalbert Laz=C4=83r wrote:
-> This patch might be obsolete thanks to single-stepping.
+On 10/09/19 08:15, Christoph Hellwig wrote:
+> And what about even ones? :)
+> 
+> Sorry, just joking, but the "odd" qualifier here looks a little weird,
+> maybe something like "non-standard develiry modes" might make sense
+> here.
 
-sooo should it be skipped from this large patchset to easy
-review?
+Indeed, folded this into the commit message.  Thanks Christoph.
 
->=20
-> Signed-off-by: Adalbert Laz=C4=83r <alazar@bitdefender.com>
-> ---
->  arch/x86/kvm/x86.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2c06de73a784..06f44ce8ed07 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6311,7 +6311,8 @@ static bool reexecute_instruction(struct kvm_vcpu=
- *vcpu, gva_t cr2,
->  		indirect_shadow_pages =3D vcpu->kvm->arch.indirect_shadow_pages;
->  		spin_unlock(&vcpu->kvm->mmu_lock);
-> =20
-> -		if (indirect_shadow_pages)
-> +		if (indirect_shadow_pages
-> +		    && !kvmi_tracked_gfn(vcpu, gpa_to_gfn(gpa)))
->  			kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
-> =20
->  		return true;
-> @@ -6322,7 +6323,8 @@ static bool reexecute_instruction(struct kvm_vcpu=
- *vcpu, gva_t cr2,
->  	 * and it failed try to unshadow page and re-enter the
->  	 * guest to let CPU execute the instruction.
->  	 */
-> -	kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
-> +	if (!kvmi_tracked_gfn(vcpu, gpa_to_gfn(gpa)))
-> +		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
-> =20
->  	/*
->  	 * If the access faults on its page table, it can not
-> @@ -6374,6 +6376,9 @@ static bool retry_instruction(struct x86_emulate_=
-ctxt *ctxt,
->  	if (!vcpu->arch.mmu->direct_map)
->  		gpa =3D kvm_mmu_gva_to_gpa_write(vcpu, cr2, NULL);
-> =20
-> +	if (kvmi_tracked_gfn(vcpu, gpa_to_gfn(gpa)))
-> +		return false;
-> +
->  	kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
-> =20
->  	return true;
+Alex, I queued the patch but I don't think I'll include it in 5.3.
+
+Paolo
+
