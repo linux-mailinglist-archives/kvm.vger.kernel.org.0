@@ -2,147 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 129C3AF0ED
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 20:15:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 198D4AF114
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 20:32:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730544AbfIJSPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 14:15:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20055 "EHLO mx1.redhat.com"
+        id S1726710AbfIJSc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 14:32:57 -0400
+Received: from mga02.intel.com ([134.134.136.20]:5908 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730233AbfIJSPX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 14:15:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A254C300413C;
-        Tue, 10 Sep 2019 18:15:22 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-98.ams2.redhat.com [10.36.117.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D92416012C;
-        Tue, 10 Sep 2019 18:15:20 +0000 (UTC)
-Subject: Re: [PATCH kvm-unit-tests] arm: prevent compiler from using unaligned
- accesses
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
+        id S1725875AbfIJSc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 14:32:57 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Sep 2019 11:32:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,490,1559545200"; 
+   d="scan'208";a="209416047"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga004.fm.intel.com with ESMTP; 10 Sep 2019 11:32:55 -0700
+Date:   Tue, 10 Sep 2019 11:32:55 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     James Harvey <jamespharvey20@gmail.com>
+Cc:     kvm@vger.kernel.org, Alex Willamson <alex.williamson@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-References: <20190905171502.215183-1-andre.przywara@arm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <d41649bc-5061-3c65-146c-d7dff3f086e7@redhat.com>
-Date:   Tue, 10 Sep 2019 20:15:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Subject: Re: 5.2.11+ Regression: > nproc/2 lockups during initramfs
+Message-ID: <20190910183255.GB11151@linux.intel.com>
+References: <CA+X5Wn4CbU305tDeu4UM=rBEzVyVgf0+YLsx70RtUJMZCFhXXw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190905171502.215183-1-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 10 Sep 2019 18:15:22 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+X5Wn4CbU305tDeu4UM=rBEzVyVgf0+YLsx70RtUJMZCFhXXw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/09/2019 19.15, Andre Przywara wrote:
-> The ARM architecture requires all accesses to device memory to be
-> naturally aligned[1][2]. Normal memory does not have this strict
-> requirement, and in fact many systems do ignore unaligned accesses
-> (by the means of clearing the A bit in SCTLR and accessing normal
-> memory). So the default behaviour of GCC assumes that unaligned accesses
-> are fine, at least if happening on the stack.
+On Sun, Sep 08, 2019 at 06:37:43AM -0400, James Harvey wrote:
+> Host is up to date Arch Linux, with exception of downgrading linux to
+> track this down to 5.2.11 - 5.2.13.  QEMU 4.1.0, but have also
+> downgraded to 4.0.0 to confirm no change.
 > 
-> Now kvm-unit-tests runs some C code with the MMU off, which degrades the
-> whole system memory to device memory. Now every unaligned access will
-> fault, regardless of the A bit.
-> In fact there is at least one place in lib/printf.c where GCC merges
-> two consecutive char* accesses into one "strh" instruction, writing to
-> a potentially unaligned address.
-> This can be reproduced by configuring kvm-unit-tests for kvmtool, but
-> running it on QEMU, which triggers an early printf that exercises this
-> particular code path.
+> Host is dual E5-2690 v1 Xeons.  With hyperthreading, 32 logical cores.
+> I've always been able to boot qemu with "-smp
+> cpus=30,cores=15,threads=1,sockets=2".  I leave 2 free for host
+> responsiveness.
 > 
-> Add the -mstrict-align compiler option to the arm64 CFLAGS to fix this
-> problem. Also add the respective -mno-unaligned-access flag for arm.
+> Upgrading from 5.2.10 to 5.2.11 causes the VM to lock up while loading
+> the initramfs about 90-95% of the time.  (Probably a slight race
+> condition.)  On host, QEMU shows as nVmCPUs*100% CPU usage, so around
+> 3000% for 30 cpus.
 > 
-> Thanks to Alexandru for helping debugging this.
+> If I back down to "cpus=16,cores=8", it always boots.  If I increase
+> to "cpus=18,cores=9", it goes back to locking up 90-95% of the time.
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Omitting "-accel=kvm" allows 5.2.11 to work on the host without issue,
+> so combined with that the only package needing to be downgraded is
+> linux to 5.2.10 to prevent the issue with KVM, I think this must be a
+> KVM issue.
 > 
-> [1] ARMv8 ARM DDI 0487E.a, B2.5.2
-> [2] ARMv7 ARM DDI 0406C.d, A3.2.1
-> ---
->  arm/Makefile.arm   | 1 +
->  arm/Makefile.arm64 | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-> index a625267..43b4be1 100644
-> --- a/arm/Makefile.arm
-> +++ b/arm/Makefile.arm
-> @@ -12,6 +12,7 @@ KEEP_FRAME_POINTER := y
->  
->  CFLAGS += $(machine)
->  CFLAGS += -mcpu=$(PROCESSOR)
-> +CFLAGS += -mno-unaligned-access
->  
->  arch_LDFLAGS = -Ttext=40010000
->  
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 02c24e8..35de5ea 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -7,6 +7,7 @@ bits = 64
->  ldarch = elf64-littleaarch64
->  
->  arch_LDFLAGS = -pie -n
-> +CFLAGS += -mstrict-align
+> Using version of QEMU with debug symbols gives:
+> * gdb backtrace: http://ix.io/1UyO
 
-Instead of adding it to both, Makefile.arm and Makefile.arm64, you could
-also simply add it to Makefile.common instead.
+Fudge.
 
- Thomas
+One of the threads is deleting a memory region, and v5.2.11 reverted a
+change related to flushing sptes on memory region deletion.
+
+Can you try reverting the following commit?  Reverting the revert isn't a
+viable solution, but it'll at least be helpful to confirm this it's the
+source of your troubles.
+
+commit 2ad350fb4c924f611d174e2b0da4edba8a6e430a
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu Aug 15 09:43:32 2019 +0200
+
+    Revert "KVM: x86/mmu: Zap only the relevant pages when removing a memslot"
+    
+    commit d012a06ab1d23178fc6856d8d2161fbcc4dd8ebd upstream.
+    
+    This reverts commit 4e103134b862314dc2f2f18f2fb0ab972adc3f5f.
+    Alex Williamson reported regressions with device assignment with
+    this patch.  Even though the bug is probably elsewhere and still
+    latent, this is needed to fix the regression.
+    
+    Fixes: 4e103134b862 ("KVM: x86/mmu: Zap only the relevant pages when removing a memslot", 2019-02-05)
+    Reported-by: Alex Willamson <alex.williamson@redhat.com>
+    Cc: stable@vger.kernel.org
+    Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+
+Thread 10 (Thread 0x7ff72fdff700 (LWP 4507)):
+#1  0x000055c976c411a4 in kvm_vm_ioctl
+#2  0x000055c976c3c6bf in kvm_set_user_memory_region
+#3  0x000055c976c3dbb6 in kvm_set_phys_mem
+#4  0x000055c976c3dd68 in kvm_region_del
+#5  0x000055c976c272c8 in address_space_update_topology_pass
+#6  0x000055c976c27897 in address_space_set_flatview
+#7  0x000055c976c27a5d in memory_region_transaction_commit
+#8  0x000055c976c2b3b5 in memory_region_del_subregion
+#9  0x000055c976f267d6 in pci_update_mappings
+#10 0x000055c976f26bb6 in pci_default_write_config
+#11 0x000055c976fd9baa in virtio_write_config
+#12 0x000055c976f30453 in pci_host_config_write_common
+#13 0x000055c976f305b0 in pci_data_write
+#14 0x000055c976f306dc in pci_host_data_write
+#15 0x000055c976c25887 in memory_region_write_accessor
+#16 0x000055c976c25aa7 in access_with_adjusted_size
+#17 0x000055c976c28ad0 in memory_region_dispatch_write
+#18 0x000055c976bc6b30 in flatview_write_continue
+#19 0x000055c976bc6c77 in flatview_write
+#20 0x000055c976bc6f82 in address_space_write
+#21 0x000055c976bc6fd4 in address_space_rw
+#22 0x000055c976c4059a in kvm_handle_io
+#23 0x000055c976c40d33 in kvm_cpu_exec
+#24 0x000055c976c166df in qemu_kvm_cpu_thread_fn
+#25 0x000055c9771d3bd8 in qemu_thread_start
+#26 0x00007ff73892357f in start_thread
+#27 0x00007ff7388510e3 in clone
+
+> * 11 seconds of attaching strace to locked up qemu (167K): http://ix.io/1UyP
+> * strace from the beginning of starting a qemu that locks up (8MB):
+> https://filebin.ca/4uI15ztGAarw/strace.qemu.from.start
+> ** This definitely changed timings, and it became harder to replicate,
+> to where I'd guess 20-30% of boots hang
+> ** Interestingly, the strace only collected data for 5 seconds, even
+> though qemu continued at full CPU usage much longer.  Don't know what
+> to make of that, especially because the first strace was attached to
+> an already locked up qemu that had gone well past 5 seconds.
+> 
+> Like how the strace changed timings, I have seen attaching GDB to a
+> running qemu which pauses it, then simply running continue, has gotten
+> it "unstuck" immediately.
+> 
+> I've let this go 14 hours, but once it goes into complete CPU usage,
+> it never comes out.
+> 
+> If booting from the September 2019 Arch ISO, it hangs right after the
+> ISO's UEFI bootloader selects Arch Linux, then the screen goes black.
+> 
+> If booting from grub/systemd, it hangs right after "Loading Initial Ramdisk..."
