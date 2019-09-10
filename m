@@ -2,118 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33005AF034
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 19:14:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0718BAF04F
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 19:16:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394235AbfIJROM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 13:14:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51514 "EHLO mx1.redhat.com"
+        id S2437079AbfIJRP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 13:15:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34016 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2394162AbfIJROL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 13:14:11 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        id S1730225AbfIJRP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 13:15:57 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C9021356DC
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 17:14:10 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id h6so6799898wrh.6
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 10:14:10 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1E46658
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 17:15:56 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id f18so9326412wro.19
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 10:15:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BCqrYLSI1x2vXUSlIGEoq1ChjiQwc4Zws90ZJqi8ccI=;
-        b=EyCgawve/AZaMt55d1CpIEr6NYbaAFbYNjsK6DLxOsU8oDuFMaxNNVAU+BN1sI0rv+
-         XGSVXJAvnCow/WAxJ66SfzfJIUOrp7zN8cj/BLFKYSRwR+pD09zUIVT6MM+Mp0xHD+tD
-         zgmkxmMGIjFzAye4eDTLJXUPq8Fa/d83i0ctFl3fVXfEsHg8haEY1OicTiqcLbzTo3EJ
-         vfKb8Q2PaV1SHLxC8GnKLlWucbCHL1lzJlsuDbiJkOw1xbZDyEOVetWpvgfm6UcdG5wX
-         0/Sk0kW3pgmf6xTw3G0RORKMBumRDgZgTkixWW286S+rwYHLXpkXl+dn3Jvhg/Y//Kno
-         v5TQ==
-X-Gm-Message-State: APjAAAXBBWQDVf70vJQoPNJyOZVjcf2P44M/KOHOEUS2Pz+qYAc6YkeL
-        +M3FEE2UQdTpgNU6jVBVn/veD8/D+wuerDrvvpDQt2BUZ45YjVyMPWinHYCHUpKtpxT9dXwVd0k
-        MSXfCW5iu33D+
-X-Received: by 2002:adf:ec49:: with SMTP id w9mr21262642wrn.130.1568135649154;
-        Tue, 10 Sep 2019 10:14:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwxuHBW8Sghnoq2IMRwlRuvA2mK/kxks8RiqabkQT0RFMAX/1ZPWVVqWjntSC5HdNc7inQLdg==
-X-Received: by 2002:adf:ec49:: with SMTP id w9mr21262621wrn.130.1568135648872;
-        Tue, 10 Sep 2019 10:14:08 -0700 (PDT)
+        bh=eOSlZvBN2Ca83BiWTP8n+uA4/rhpoJrl/QSiHK9ZrVo=;
+        b=dhHg9z5te9IeMgHftU+0ku2S3WDjKDOKMScadBdxgOhvJ7/QynUJ6z/73UJeUcfNeI
+         AstU5z2h3/jGjrfVIUtbVOOfmbHcU8F+DOqSj1QeLQFJu0QcKYpDAlcPRVylfsJkMLGJ
+         Ef3cQ1hO6Gm/eUncX/uVJ6CCtEF5+7G9xX+Y4V0I4PgeGK/JQwWaMHmCibAGH1tTHJrE
+         x1FPdaMmL7VrRt3aFgCFF4nD4h0ODXU07d3CnreZW/i+duOkKAY7iDIk8J7wyd2kaCEq
+         ItEV4rO0yqneM51cExX2AHLSSTbo95QplqLAhLyKAbpZHFSWIqs0zh1ied+zzV2IdTbd
+         lL7A==
+X-Gm-Message-State: APjAAAUPBeOSsUxuoVcU9MYYNFhgn31BwHhup9Zm9SIaHF89Wgx3Szb+
+        wfLV0UzlBa1wSInNFvgf5fzLzRHs0fDDE5dDUS0cH750uWXEbMtSSx12kd8MY+uYn+xb0hXHnQj
+        NGoE2aUYq8azi
+X-Received: by 2002:a1c:7414:: with SMTP id p20mr446119wmc.68.1568135754725;
+        Tue, 10 Sep 2019 10:15:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzLjatH2HoTUhtKdkw1BHN68vuXVqluXyaYtbmsYYvaw5QPP0gKenYj2w89mEdSi1fEy0k+jw==
+X-Received: by 2002:a1c:7414:: with SMTP id p20mr446104wmc.68.1568135754464;
+        Tue, 10 Sep 2019 10:15:54 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:1435:25df:c911:3338? ([2001:b07:6468:f312:1435:25df:c911:3338])
-        by smtp.gmail.com with ESMTPSA id l1sm21635551wrb.1.2019.09.10.10.14.08
+        by smtp.gmail.com with ESMTPSA id a190sm477474wme.8.2019.09.10.10.15.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2019 10:14:08 -0700 (PDT)
-Subject: Re: [PATCH v3] doc: kvm: Fix return description of KVM_SET_MSRS
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190905005737.131067-1-xiaoyao.li@intel.com>
+        Tue, 10 Sep 2019 10:15:53 -0700 (PDT)
+Subject: Re: [PATCH v2] cpuidle-haltpoll: Enable kvm guest polling when
+ dedicated physical CPUs are available
+To:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Linux PM <linux-pm@vger.kernel.org>
+References: <1567068597-22419-1-git-send-email-wanpengli@tencent.com>
+ <a70aeec2-1572-ea09-a0c5-299cd70ddc8a@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <0f4d8b77-2c42-f5b5-1cba-9cc26c5fd935@redhat.com>
-Date:   Tue, 10 Sep 2019 19:14:07 +0200
+Message-ID: <84a0c1b3-4590-6fdb-0b01-915c3f109e65@redhat.com>
+Date:   Tue, 10 Sep 2019 19:15:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190905005737.131067-1-xiaoyao.li@intel.com>
+In-Reply-To: <a70aeec2-1572-ea09-a0c5-299cd70ddc8a@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/09/19 02:57, Xiaoyao Li wrote:
-> Userspace can use ioctl KVM_SET_MSRS to update a set of MSRs of guest.
-> This ioctl set specified MSRs one by one. If it fails to set an MSR,
-> e.g., due to setting reserved bits, the MSR is not supported/emulated by
-> KVM, etc..., it stops processing the MSR list and returns the number of
-> MSRs have been set successfully.
+On 04/09/19 11:48, Rafael J. Wysocki wrote:
+> On 8/29/2019 10:49 AM, Wanpeng Li wrote:
+>> From: Wanpeng Li <wanpengli@tencent.com>
+>>
+>> The downside of guest side polling is that polling is performed even
+>> with other runnable tasks in the host. However, even if poll in kvm
+>> can aware whether or not other runnable tasks in the same pCPU, it
+>> can still incur extra overhead in over-subscribe scenario. Now we can
+>> just enable guest polling when dedicated pCPUs are available.
+>>
+>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Radim Krčmář <rkrcmar@redhat.com>
+>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> As stated before, I'm going to queue up this change for 5.4, with the
+> Paolo's ACK.
+> 
+> BTW, in the future please CC power management changes to
+> linux-pm@vger.kernel.org for easier handling.
 
-Queued, thanks.
+Thanks.  This patch makes sense to me and I don't know what
+"limitations" are there in KVM_HINTS_REALTIME that Marcelo mentioned.
+
+Any improvements that Marcelo can discuss can be made on top of this
+during the 5.4 merge window, via the KVM tree.
+
+Thanks Rafael for handling the reviewing and merging of this series.
 
 Paolo
 
-> ---
-> v3:
->   refine the description based on Sean's comment.  
 > 
-> v2:
->   elaborate the changelog and description of ioctl KVM_SET_MSRS based on
->   Sean's comments.
-> ---
->  Documentation/virt/kvm/api.txt | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>> -- 
+>> v1 -> v2:
+>>   * export kvm_arch_para_hints to fix haltpoll driver build as module
+>> error
+>>   * just disable haltpoll driver instead of both driver and governor
+>>     since KVM_HINTS_REALTIME is not defined in other arches, and governor
+>>     doesn't depend on x86, to fix the warning on powerpc
+>>
+>>   arch/x86/kernel/kvm.c              | 1 +
+>>   drivers/cpuidle/cpuidle-haltpoll.c | 3 ++-
+>>   2 files changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>> index f48401b..68463c1 100644
+>> --- a/arch/x86/kernel/kvm.c
+>> +++ b/arch/x86/kernel/kvm.c
+>> @@ -711,6 +711,7 @@ unsigned int kvm_arch_para_hints(void)
+>>   {
+>>       return cpuid_edx(kvm_cpuid_base() | KVM_CPUID_FEATURES);
+>>   }
+>> +EXPORT_SYMBOL_GPL(kvm_arch_para_hints);
+>>     static uint32_t __init kvm_detect(void)
+>>   {
+>> diff --git a/drivers/cpuidle/cpuidle-haltpoll.c
+>> b/drivers/cpuidle/cpuidle-haltpoll.c
+>> index 9ac093d..7aee38a 100644
+>> --- a/drivers/cpuidle/cpuidle-haltpoll.c
+>> +++ b/drivers/cpuidle/cpuidle-haltpoll.c
+>> @@ -53,7 +53,8 @@ static int __init haltpoll_init(void)
+>>         cpuidle_poll_state_init(drv);
+>>   -    if (!kvm_para_available())
+>> +    if (!kvm_para_available() ||
+>> +        !kvm_para_has_hint(KVM_HINTS_REALTIME))
+>>           return 0;
+>>         ret = cpuidle_register(&haltpoll_driver, NULL);
 > 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index 2d067767b617..24541e52e96e 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -586,7 +586,7 @@ Capability: basic
->  Architectures: x86
->  Type: vcpu ioctl
->  Parameters: struct kvm_msrs (in)
-> -Returns: 0 on success, -1 on error
-> +Returns: number of msrs successfully set (see below), -1 on error
->  
->  Writes model-specific registers to the vcpu.  See KVM_GET_MSRS for the
->  data structures.
-> @@ -595,6 +595,11 @@ Application code should set the 'nmsrs' member (which indicates the
->  size of the entries array), and the 'index' and 'data' members of each
->  array entry.
->  
-> +It tries to set the MSRs in array entries[] one by one. If setting an MSR
-> +fails, e.g., due to setting reserved bits, the MSR isn't supported/emulated
-> +by KVM, etc..., it stops processing the MSR list and returns the number of
-> +MSRs that have been set successfully.
-> +
->  
->  4.20 KVM_SET_CPUID
->  
 > 
 
