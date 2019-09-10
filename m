@@ -2,22 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6DF7AEDA3
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:48:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 038E8AEDAC
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:49:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393607AbfIJOrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 10:47:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48628 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726132AbfIJOrR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 10:47:17 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id AA491ABD2;
-        Tue, 10 Sep 2019 14:47:14 +0000 (UTC)
-Date:   Tue, 10 Sep 2019 16:47:13 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
+        id S1732423AbfIJOsy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:48:54 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:43872 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726132AbfIJOsy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:48:54 -0400
+Received: by mail-io1-f68.google.com with SMTP id r8so13156316iol.10;
+        Tue, 10 Sep 2019 07:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=y51Wmq0LRgJPRQu0wESyACMKgIN3oGN4hPyCwS8B9Fw=;
+        b=PzcNTtgFRZmzMv0K1KK0mg45o4Yljkgb90mn498QkmecMBhhZ5hVU/NDRq0XyRodXv
+         oqt8Gfa8DdtOS8BNXSn78trtFzo/cG4x2Q3hTi0E8/87ACzQRuE0GaG6NPFNj2w7i5hz
+         d9eH/XfpdFJ4ZsSIItHV5fPjLK39IDFhjDsIgyoeiWYb/OgukBbYhH7k63i7aX9m43JY
+         B2q7D5PGC8y5aL/e8xurQByjUcIrfbOUk1u3uk1YXpi2aKIq2f9GOVhCzAD0nNiZ6KBc
+         mxNmVjxT2XEjrQHY1egt7O+EREMCd1qYYvBFoCb6XuBlHZGCELCMyobbvgTykr1X77AJ
+         JGUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=y51Wmq0LRgJPRQu0wESyACMKgIN3oGN4hPyCwS8B9Fw=;
+        b=jUjXbcwCx+FQJvXSp97hvAgMMT5MvCcmQR8TxZUPgWJkk5Ygpz0qpZJNhU3RP6xRv9
+         1ugbaLGR1Mnd5ZRQzgwSNTODWTsIPZ4WkQooqlvM2VKjKhCFnlnLhTl1YIIrcJzQCTRl
+         JFBCaVf1n0bEURuCHgIyb9gGo2/ZhDpGOl2bU6dsVvhgz0E+EJIjF7SNdaf7QUgELmks
+         fzmqRNW+jg14azlr8BKN7Lxh5JZQ5vqYedSyqB9/G7pQdNgw16MNR2f7gq1A7+ebjsFU
+         QjmGfQEGdufyHH2IXHZKzG0EBwewGfnXVxqp1iCkdtuw6i/c/dfzEX/Q2SwGyvxoXmT7
+         aH6A==
+X-Gm-Message-State: APjAAAVwhWPDTStoyJZUXEmTAu1seJaMmiwTih5Ii94zwtC/veit2yyt
+        NuvupbHSCU4HqJenLjPaSDFm8CxYGv+HHwJEBmY=
+X-Google-Smtp-Source: APXvYqwN74shiAyKliNs3JxV0dTTuWrOoxH7hX54E/H8prvfohDIALH6Vobq+JG8UlF+hibP/Y2WKvw7cp3R4NGGfXs=
+X-Received: by 2002:a5d:8908:: with SMTP id b8mr1353105ion.237.1568126932604;
+ Tue, 10 Sep 2019 07:48:52 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190907172520.10910.83100.stgit@localhost.localdomain> <20190910122030.GV2063@dhcp22.suse.cz>
+In-Reply-To: <20190910122030.GV2063@dhcp22.suse.cz>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Tue, 10 Sep 2019 07:48:41 -0700
+Message-ID: <CAKgT0Ufw1h45q9H5jraOJkRwvnrxfVNe99bVF1VWCLrzxCrMmg@mail.gmail.com>
+Subject: Re: [PATCH v9 2/8] mm: Adjust shuffle code to allow for future coalescing
+To:     Michal Hocko <mhocko@kernel.org>
 Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
@@ -41,65 +72,56 @@ Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
         Fengguang Wu <fengguang.wu@intel.com>,
         Alexander Duyck <alexander.h.duyck@linux.intel.com>,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
-Message-ID: <20190910144713.GF2063@dhcp22.suse.cz>
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190910124209.GY2063@dhcp22.suse.cz>
- <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue 10-09-19 07:42:43, Alexander Duyck wrote:
-> On Tue, Sep 10, 2019 at 5:42 AM Michal Hocko <mhocko@kernel.org> wrote:
+On Tue, Sep 10, 2019 at 5:20 AM Michal Hocko <mhocko@kernel.org> wrote:
+>
+> On Sat 07-09-19 10:25:20, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 > >
-> > I wanted to review "mm: Introduce Reported pages" just realize that I
-> > have no clue on what is going on so returned to the cover and it didn't
-> > really help much. I am completely unfamiliar with virtio so please bear
-> > with me.
-> >
-> > On Sat 07-09-19 10:25:03, Alexander Duyck wrote:
-> > [...]
-> > > This series provides an asynchronous means of reporting to a hypervisor
-> > > that a guest page is no longer in use and can have the data associated
-> > > with it dropped. To do this I have implemented functionality that allows
-> > > for what I am referring to as unused page reporting
-> > >
-> > > The functionality for this is fairly simple. When enabled it will allocate
-> > > statistics to track the number of reported pages in a given free area.
-> > > When the number of free pages exceeds this value plus a high water value,
-> > > currently 32, it will begin performing page reporting which consists of
-> > > pulling pages off of free list and placing them into a scatter list. The
-> > > scatterlist is then given to the page reporting device and it will perform
-> > > the required action to make the pages "reported", in the case of
-> > > virtio-balloon this results in the pages being madvised as MADV_DONTNEED
-> > > and as such they are forced out of the guest. After this they are placed
-> > > back on the free list,
-> >
-> > And here I am reallly lost because "forced out of the guest" makes me
-> > feel that those pages are no longer usable by the guest. So how come you
-> > can add them back to the free list. I suspect understanding this part
-> > will allow me to understand why we have to mark those pages and prevent
-> > merging.
-> 
-> Basically as the paragraph above mentions "forced out of the guest"
-> really is just the hypervisor calling MADV_DONTNEED on the page in
-> question. So the behavior is the same as any userspace application
-> that calls MADV_DONTNEED where the contents are no longer accessible
-> from userspace and attempting to access them will result in a fault
-> and the page being populated with a zero fill on-demand page, or a
-> copy of the file contents if the memory is file backed.
+> > Move the head/tail adding logic out of the shuffle code and into the
+> > __free_one_page function since ultimately that is where it is really
+> > needed anyway. By doing this we should be able to reduce the overhead
+> > and can consolidate all of the list addition bits in one spot.
+>
+> This changelog doesn't really explain why we want this. You are
+> reshuffling the code, allright, but why do we want to reshuffle? Is the
+> result readability a better code reuse or something else? Where
+> does the claimed reduced overhead coming from?
+>
+> From a quick look buddy_merge_likely looks nicer than the code splat
+> we have. Good.
+>
+> But then
+>
+> > Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+>
+> [...]
+>
+> > -     if (is_shuffle_order(order))
+> > -             add_to_free_area_random(page, &zone->free_area[order],
+> > -                             migratetype);
+> > +     area = &zone->free_area[order];
+> > +     if (is_shuffle_order(order) ? shuffle_pick_tail() :
+> > +         buddy_merge_likely(pfn, buddy_pfn, page, order))
+>
+> Ouch this is just awful don't you think?
 
-As I've said I have no idea about virt so this doesn't really tell me
-much. Does that mean that if somebody allocates such a page and tries to
-access it then virt will handle a fault and bring it back?
+Yeah. I am going to go with Kirill's suggestion and probably do
+something more along the lines of:
+       bool to_tail;
+        ...
+        if (is_shuffle_order(order))
+                to_tail = shuffle_pick_tail();
+       else
+                to_tail = buddy_merge_likely(pfn, buddy_pfn, page, order);
 
--- 
-Michal Hocko
-SUSE Labs
+        if (to_tail)
+                add_to_free_area_tail(page, area, migratetype);
+        else
+                add_to_free_area(page, area, migratetype);
