@@ -2,126 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 038E8AEDAC
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:49:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0017AEDB5
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:50:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732423AbfIJOsy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 10:48:54 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:43872 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726132AbfIJOsy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 10:48:54 -0400
-Received: by mail-io1-f68.google.com with SMTP id r8so13156316iol.10;
-        Tue, 10 Sep 2019 07:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=y51Wmq0LRgJPRQu0wESyACMKgIN3oGN4hPyCwS8B9Fw=;
-        b=PzcNTtgFRZmzMv0K1KK0mg45o4Yljkgb90mn498QkmecMBhhZ5hVU/NDRq0XyRodXv
-         oqt8Gfa8DdtOS8BNXSn78trtFzo/cG4x2Q3hTi0E8/87ACzQRuE0GaG6NPFNj2w7i5hz
-         d9eH/XfpdFJ4ZsSIItHV5fPjLK39IDFhjDsIgyoeiWYb/OgukBbYhH7k63i7aX9m43JY
-         B2q7D5PGC8y5aL/e8xurQByjUcIrfbOUk1u3uk1YXpi2aKIq2f9GOVhCzAD0nNiZ6KBc
-         mxNmVjxT2XEjrQHY1egt7O+EREMCd1qYYvBFoCb6XuBlHZGCELCMyobbvgTykr1X77AJ
-         JGUw==
+        id S2388310AbfIJOuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:50:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14486 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726060AbfIJOub (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:50:31 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 66DECC08EC17
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 14:50:31 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id m9so863734wrs.13
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 07:50:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=y51Wmq0LRgJPRQu0wESyACMKgIN3oGN4hPyCwS8B9Fw=;
-        b=jUjXbcwCx+FQJvXSp97hvAgMMT5MvCcmQR8TxZUPgWJkk5Ygpz0qpZJNhU3RP6xRv9
-         1ugbaLGR1Mnd5ZRQzgwSNTODWTsIPZ4WkQooqlvM2VKjKhCFnlnLhTl1YIIrcJzQCTRl
-         JFBCaVf1n0bEURuCHgIyb9gGo2/ZhDpGOl2bU6dsVvhgz0E+EJIjF7SNdaf7QUgELmks
-         fzmqRNW+jg14azlr8BKN7Lxh5JZQ5vqYedSyqB9/G7pQdNgw16MNR2f7gq1A7+ebjsFU
-         QjmGfQEGdufyHH2IXHZKzG0EBwewGfnXVxqp1iCkdtuw6i/c/dfzEX/Q2SwGyvxoXmT7
-         aH6A==
-X-Gm-Message-State: APjAAAVwhWPDTStoyJZUXEmTAu1seJaMmiwTih5Ii94zwtC/veit2yyt
-        NuvupbHSCU4HqJenLjPaSDFm8CxYGv+HHwJEBmY=
-X-Google-Smtp-Source: APXvYqwN74shiAyKliNs3JxV0dTTuWrOoxH7hX54E/H8prvfohDIALH6Vobq+JG8UlF+hibP/Y2WKvw7cp3R4NGGfXs=
-X-Received: by 2002:a5d:8908:: with SMTP id b8mr1353105ion.237.1568126932604;
- Tue, 10 Sep 2019 07:48:52 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MoGY/Df12iBG2KQwm2nU8Su4Txh8+DskZO6VJHzV8rs=;
+        b=bzdhf4Ty9jw6XY7A3i8uVpcM1YZ9/vIr98yPrED95waLM8Bm6UlZrN5wOIo0ZUoj78
+         P6PSda98x6hpLzBeaaJrQWBJnQ4KR1VeQal9JPr7SbatBssxHVmEoBlYdkv4QhjLUWJd
+         O1y9BI7CoGzqQCcdHxPB0d4KTjW7fHZ2J1/26M5/Yc2GXzlqYedToLVy2UYY4bV4hbNc
+         GBjUr3VB3PCpgP5TBGIYHN6krP7K/TkZxZtL7K12FjiKUh56al/UQb226LGnKf0r/m7/
+         1cyYej/KdOJn5vjp6rjTQ7m/IL3/OG+Wtt7O7jDrAzSKSiD0adDDeRq8qhbGFJvxn8Ud
+         8b7A==
+X-Gm-Message-State: APjAAAUn9+2M278jqcwP7DLGK5WAVVhYpe3IUPUzAKbsCPisPfvZDKo/
+        tqUBd3JQnWn/FSHMztgESb1Nk+WIQrTENV26bCDso6wnuGsXhEHrsYLLIdETWj2yld4dF0Zza2m
+        cnGcJaeURBnmt
+X-Received: by 2002:adf:c58b:: with SMTP id m11mr4918761wrg.252.1568127029954;
+        Tue, 10 Sep 2019 07:50:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwc2+S1L0tnPvf/WPew8tmrt7xfcEUdU+NWJyfQUl1CpACey7jRMZ3gEkYeD1N/EWJIng0NpQ==
+X-Received: by 2002:adf:c58b:: with SMTP id m11mr4918728wrg.252.1568127029713;
+        Tue, 10 Sep 2019 07:50:29 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id s12sm25229307wra.82.2019.09.10.07.50.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Sep 2019 07:50:29 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] Update travis.yml to use bionic instead of
+ trusty
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Drew Jones <drjones@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20190829062650.19325-1-thuth@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <191ddc6e-e3b7-5cac-54f8-6844deb68d73@redhat.com>
+Date:   Tue, 10 Sep 2019 16:50:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190907172520.10910.83100.stgit@localhost.localdomain> <20190910122030.GV2063@dhcp22.suse.cz>
-In-Reply-To: <20190910122030.GV2063@dhcp22.suse.cz>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Tue, 10 Sep 2019 07:48:41 -0700
-Message-ID: <CAKgT0Ufw1h45q9H5jraOJkRwvnrxfVNe99bVF1VWCLrzxCrMmg@mail.gmail.com>
-Subject: Re: [PATCH v9 2/8] mm: Adjust shuffle code to allow for future coalescing
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fengguang Wu <fengguang.wu@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190829062650.19325-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 10, 2019 at 5:20 AM Michal Hocko <mhocko@kernel.org> wrote:
->
-> On Sat 07-09-19 10:25:20, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> >
-> > Move the head/tail adding logic out of the shuffle code and into the
-> > __free_one_page function since ultimately that is where it is really
-> > needed anyway. By doing this we should be able to reduce the overhead
-> > and can consolidate all of the list addition bits in one spot.
->
-> This changelog doesn't really explain why we want this. You are
-> reshuffling the code, allright, but why do we want to reshuffle? Is the
-> result readability a better code reuse or something else? Where
-> does the claimed reduced overhead coming from?
->
-> From a quick look buddy_merge_likely looks nicer than the code splat
-> we have. Good.
->
-> But then
->
-> > Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->
-> [...]
->
-> > -     if (is_shuffle_order(order))
-> > -             add_to_free_area_random(page, &zone->free_area[order],
-> > -                             migratetype);
-> > +     area = &zone->free_area[order];
-> > +     if (is_shuffle_order(order) ? shuffle_pick_tail() :
-> > +         buddy_merge_likely(pfn, buddy_pfn, page, order))
->
-> Ouch this is just awful don't you think?
+On 29/08/19 08:26, Thomas Huth wrote:
+> Ubuntu "trusty" is out of service, and at least for me, the Travis
+> jobs for kvm-unit-tests are failing because they can not find the
+> repositories anymore. Thus use a newer version of Ubuntu to do the
+> CI testing.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .travis.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index b06c33c..a4a165d 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -1,5 +1,5 @@
+>  sudo: false
+> -dist: trusty
+> +dist: bionic
+>  language: c
+>  compiler:
+>    - gcc
+> 
 
-Yeah. I am going to go with Kirill's suggestion and probably do
-something more along the lines of:
-       bool to_tail;
-        ...
-        if (is_shuffle_order(order))
-                to_tail = shuffle_pick_tail();
-       else
-                to_tail = buddy_merge_likely(pfn, buddy_pfn, page, order);
+Queued, thanks.
 
-        if (to_tail)
-                add_to_free_area_tail(page, area, migratetype);
-        else
-                add_to_free_area(page, area, migratetype);
+Paolo
