@@ -2,167 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90780AE35C
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 07:57:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 875D1AE394
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 08:16:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404481AbfIJF45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 01:56:57 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:40608 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404458AbfIJF45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 01:56:57 -0400
-Received: by mail-ot1-f66.google.com with SMTP id y39so16600330ota.7;
-        Mon, 09 Sep 2019 22:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=0XATUhsdQn5yqTbpQ/1BUB6xCeZGaj0TH98YB5SG9oU=;
-        b=oCMOO8R6/kKvrjUStyeavGPpRtNy0Dwuh6F+xyLQoXRIcfitiTG+odj7t08oIO06X6
-         P4XKosuQ/HQeHIbaUni/6qOtihRSMqdpkaeTVp/aeBOtJpdEa6oPcB9Fu9AVsSqPJPJP
-         AWNgznp0krKLL31ePuwYE3vCenU5X95171Pwa/4UtcFXG0SjqGJuMuEu3uG0//E3jq8k
-         pGYDtTUI5SVuoS4S9OONj1eUdR0kLI0KEfKMDcPDruEdauCCJgmQfIt3fa8UwpqQRMNz
-         oqjj+7lbfQaetyanGCQZOKQBNsdPVcdGJborG9PFDrNr47wYi3S+DkinbroG72wTHczi
-         rrqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=0XATUhsdQn5yqTbpQ/1BUB6xCeZGaj0TH98YB5SG9oU=;
-        b=paCju2f2Wxocqd3qhj8LTOWEJx2tiwXPov/uHKPfUzRu+yq1AtSAPkFU4aLhmMgRnT
-         q+/4zvkHPlvQnIUUoUMCg1dU3+I1dfVcOYECK/34WLqajksKP8mhxSJobT1MMECJOH8N
-         uj/Ps/MoIQ7360b7OvONRLGany3niowleKj81OovKctK2LCRpvhbjeH0vDRxkZeYOPj4
-         8wWionzwTE8g7zAPfuCIkmjzxJM7IfHWAab45SQ8MBZ5zcJ4KSLlqY/DJBrd2ar8mQnz
-         zJIrAJctzSLRaPjdKeHhBTFEJW/6cFbGY20DgqP71Ue3CurAnjcDVJUlqjzxM5ZO/dyD
-         kNgw==
-X-Gm-Message-State: APjAAAWBy6PkFvmvQgGlEQyWTKrx24FtOkxTMmpUPVROdjBAiqcLIhfu
-        cCxMctDZuefcby+9LreThwQUyyK3EZk8vBCXusE+3oBD
-X-Google-Smtp-Source: APXvYqwGsg4LpHe0jcnmOm2G3S6bnupTBUCqRr8W2oCOwE6/KPn+D7OimxRhO0Drj4EydRZXX++kTSLNpqtPCtJMKK4=
-X-Received: by 2002:a9d:3ae:: with SMTP id f43mr21330286otf.254.1568095016004;
- Mon, 09 Sep 2019 22:56:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com> <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
-In-Reply-To: <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 10 Sep 2019 13:56:42 +0800
-Message-ID: <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
-Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is preempted"
-To:     Waiman Long <longman@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
+        id S2393359AbfIJGQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 02:16:03 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:45510 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725916AbfIJGQD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 02:16:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=ykZkUPCZEJJWvilRQ1BONPpE0r1rcbx/nKZazkyDSHw=; b=lFQeo0aM7GCKBBrlQycyYru89
+        qrMJu2JN2IS87y3oAeYRTpulYPgeV46dW7Koefkme7/ongnLkvhjeoObWBkjL9p6XxlHmXX7DOoHr
+        dSqbNH+cjQyEjac3OSm3bRojGFwTWHu1gOUXDu/DF6/F/CW8DwBlDQzKNjJpSYDFKcR2+GHd2vXAR
+        Tizsz3b2nmGD/V5niDX7v/+o48HwXlWSvOz7GzqHDUbCxw1VwPYEDL1+k2YwjCVvh+NiP2L3tKyTC
+        LBZO/XQXMf+Ag4WJSH6dALKrkQeehKQX6TiCHhBNA0R9P/Dn+6qYZwqTAB8GKtr/5QWU6wmE07J+8
+        7woE9W+yw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
+        id 1i7ZRS-0007Dx-H6; Tue, 10 Sep 2019 06:15:54 +0000
+Date:   Mon, 9 Sep 2019 23:15:54 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
-        "# v3 . 10+" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v3] KVM: x86: Disable posted interrupts for odd IRQs
+Message-ID: <20190910061554.GD10968@infradead.org>
+References: <20190905125818.22395-1-graf@amazon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190905125818.22395-1-graf@amazon.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 9 Sep 2019 at 18:56, Waiman Long <longman@redhat.com> wrote:
->
-> On 9/9/19 2:40 AM, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wai=
-t if
-> > vCPU is preempted), we found great regression caused by this commit.
-> >
-> > Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 8=
-0 vCPUs.
-> > The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-18=
-00
-> > records/s with this commit.
-> >
-> >           Host                       Guest                score
-> >
-> > vanilla + w/o kvm optimizes     vanilla               1700-1800 records=
-/s
-> > vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 recor=
-ds/s
-> > vanilla + w/ kvm optimizes      vanilla               4500-5000 records=
-/s
-> > vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 recor=
-ds/s
-> >
-> > Exit from aggressive wait-early mechanism can result in yield premature=
- and
-> > incur extra scheduling latency in over-subscribe scenario.
-> >
-> > kvm optimizes:
-> > [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts=
-)
-> > [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate loc=
-k waiter preemption)
-> >
-> > Tested-by: loobinliu@tencent.com
-> > Cc: Peter Zijlstra <peterz@infradead.org>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ingo Molnar <mingo@kernel.org>
-> > Cc: Waiman Long <longman@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > Cc: loobinliu@tencent.com
-> > Cc: stable@vger.kernel.org
-> > Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preemp=
-ted)
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  kernel/locking/qspinlock_paravirt.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspin=
-lock_paravirt.h
-> > index 89bab07..e84d21a 100644
-> > --- a/kernel/locking/qspinlock_paravirt.h
-> > +++ b/kernel/locking/qspinlock_paravirt.h
-> > @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
-> >       if ((loop & PV_PREV_CHECK_MASK) !=3D 0)
-> >               return false;
-> >
-> > -     return READ_ONCE(prev->state) !=3D vcpu_running || vcpu_is_preemp=
-ted(prev->cpu);
-> > +     return READ_ONCE(prev->state) !=3D vcpu_running;
-> >  }
-> >
-> >  /*
->
-> There are several possibilities for this performance regression:
->
-> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
-> cacheline contention issue depending on how that callback is implemented.
->
-> 2) KVM may set the preempt flag for a short period whenver an vmexit
-> happens even if a vmenter is executed shortly after. In this case, we
-> may want to use a more durable vcpu suspend flag that indicates the vcpu
-> won't get a real vcpu back for a longer period of time.
->
-> Perhaps you can add a lock event counter to count the number of
-> wait_early events caused by vcpu_is_preempted() being true to see if it
-> really cause a lot more wait_early than without the vcpu_is_preempted()
-> call.
+And what about even ones? :)
 
-pv_wait_again:1:179
-pv_wait_early:1:189429
-pv_wait_head:1:263
-pv_wait_node:1:189429
-pv_vcpu_is_preempted:1:45588
-=3D=3D=3D=3D=3D=3D=3D=3D=3Dsleep 5=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-pv_wait_again:1:181
-pv_wait_early:1:202574
-pv_wait_head:1:267
-pv_wait_node:1:202590
-pv_vcpu_is_preempted:1:46336
-
-The sampling period is 5s, 6% of wait_early events caused by
-vcpu_is_preempted() being true.
-
-                Wanpeng
+Sorry, just joking, but the "odd" qualifier here looks a little weird,
+maybe something like "non-standard develiry modes" might make sense
+here.
