@@ -2,219 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 723E3AEC5B
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 15:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 713C2AEDAD
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:49:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727624AbfIJNw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 09:52:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52440 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726231AbfIJNw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 09:52:57 -0400
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 07BE659465
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 13:52:56 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id h18so19830811qto.18
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 06:52:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=vKjBadJZsVZtUGd3WVckVL2DIAFF4FA1DCNgRycmkBI=;
-        b=odkx4MIiYdw9/D3hxsrbPBmiu/ZiDb1+1ll6Qlj1U3pxY0+Vqd9FpsrkzcDGDLnR6h
-         /t0ASQ1w8cyjQrLuSRaYyI/bZjcbfBq3UZWntZW4MCno03yZkbvbixywFAxZ28g98dKl
-         S2m2TJ+kav5q04CJDr/4KklVaMyoj6WSnzuur26m7Wbfj6hBEtj2b2EuqRXT4LyRDT4R
-         BBiG1Z0SUO/sQGD/GB9D1wDNnjG4/zNZ9v6BMfQaH+2X84/eExgC9Z8AGPPHdbC94UXK
-         FhCFw/KDDE5XkImMhJ5VtmVVI2lHALJ7UVUZ/Rr1t0tFKAf63l6XBIHYkuvKlg9+VIi8
-         fByw==
-X-Gm-Message-State: APjAAAW67Xht4u1Yw5B0DR5n2ZBYOUNawlO+KjKAaZO0og1se+9sAC9E
-        sHJy4zf3YDCRncwpm2WiL6JMCi5i7d0XPwgLKkvyJrHbgrY4BFHX4PJYkby/urSMgFfAWI2R7Ee
-        p8/CU5zqjFvmM
-X-Received: by 2002:a0c:e811:: with SMTP id y17mr7641978qvn.68.1568123575198;
-        Tue, 10 Sep 2019 06:52:55 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy87Xk8h9CwEg4tdqy4DXt/JFYQLpQHouOJ6fOEiaMkub6yelg6yVSS11xTwQ5fJFutl2Pk0A==
-X-Received: by 2002:a0c:e811:: with SMTP id y17mr7641951qvn.68.1568123574950;
-        Tue, 10 Sep 2019 06:52:54 -0700 (PDT)
-Received: from redhat.com ([80.74.107.118])
-        by smtp.gmail.com with ESMTPSA id n42sm10807604qta.31.2019.09.10.06.52.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2019 06:52:53 -0700 (PDT)
-Date:   Tue, 10 Sep 2019 09:52:46 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kwankhede@nvidia.com, alex.williamson@redhat.com,
-        cohuck@redhat.com, tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, idos@mellanox.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com
-Subject: Re: [RFC PATCH 3/4] virtio: introudce a mdev based transport
-Message-ID: <20190910094807-mutt-send-email-mst@kernel.org>
-References: <20190910081935.30516-1-jasowang@redhat.com>
- <20190910081935.30516-4-jasowang@redhat.com>
- <20190910055744-mutt-send-email-mst@kernel.org>
- <572ffc34-3081-8503-d3cc-192edc9b5311@redhat.com>
+        id S2392988AbfIJOtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:49:01 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:48450 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732434AbfIJOtB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:49:01 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8AENkGG131485;
+        Tue, 10 Sep 2019 14:25:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to : content-transfer-encoding; s=corp-2019-08-05;
+ bh=NHdeAPKmmXhs2gh53Ao/iY+rl0IHNTcE9ceoYzmW3PA=;
+ b=eTl3Ht16X9k57STX22Nfse1q1i+nAE2TOCTXC5ruD8NFqq1ebwh84ldhbSzISgmnssuF
+ bZIfi3jJldDUhk95HDI8Qd7vioZqIgsTPuYAJmJmPMMhEmrPrpnfOh22bWYYwfdvPQ0W
+ 5AsHTQqRr9rI0b5wOBdrcZw9xuTuRG07TVcmSqgR2hpE7BFSph8b9enoTeIcAerW5cCB
+ MUJWN4L+0WArFfdjI4p38FksHxgCerqViUcWoGVEtdoSJk+8+JEyW4ldrL6DbwPH/ZHW
+ sBwq1gi3p5aaqVp2L//aIpV1VGxmbF2cRKlZoK8+zPUvKfHfPO9l4u4RIOqNoXrolw3h Jw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2uw1jy3swg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Sep 2019 14:25:03 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8AENt39128686;
+        Tue, 10 Sep 2019 14:25:02 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2uxd6ch563-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Sep 2019 14:25:02 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8AEOwoJ025439;
+        Tue, 10 Sep 2019 14:24:58 GMT
+Received: from char.us.oracle.com (/10.152.32.25)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 10 Sep 2019 07:24:58 -0700
+Received: by char.us.oracle.com (Postfix, from userid 1000)
+        id D9F686A010E; Tue, 10 Sep 2019 10:26:42 -0400 (EDT)
+Date:   Tue, 10 Sep 2019 10:26:42 -0400
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>
+Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
+        virtualization@lists.linux-foundation.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>, Zhang@pps.reinject,
+        Yu C <yu.c.zhang@intel.com>,
+        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
+Subject: Re: [RFC PATCH v6 69/92] kvm: x86: keep the page protected if
+ tracked by the introspection tool
+Message-ID: <20190910142642.GC5879@char.us.oracle.com>
+References: <20190809160047.8319-1-alazar@bitdefender.com>
+ <20190809160047.8319-70-alazar@bitdefender.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <572ffc34-3081-8503-d3cc-192edc9b5311@redhat.com>
+In-Reply-To: <20190809160047.8319-70-alazar@bitdefender.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9376 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909100140
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9376 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909100140
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 10, 2019 at 09:13:02PM +0800, Jason Wang wrote:
-> 
-> On 2019/9/10 下午6:01, Michael S. Tsirkin wrote:
-> > > +#ifndef _LINUX_VIRTIO_MDEV_H
-> > > +#define _LINUX_VIRTIO_MDEV_H
-> > > +
-> > > +#include <linux/interrupt.h>
-> > > +#include <linux/vringh.h>
-> > > +#include <uapi/linux/virtio_net.h>
-> > > +
-> > > +/*
-> > > + * Ioctls
-> > > + */
-> > Pls add a bit more content here. It's redundant to state these
-> > are ioctls. Much better to document what does each one do.
-> 
-> 
-> Ok.
-> 
-> 
-> > 
-> > > +
-> > > +struct virtio_mdev_callback {
-> > > +	irqreturn_t (*callback)(void *);
-> > > +	void *private;
-> > > +};
-> > > +
-> > > +#define VIRTIO_MDEV 0xAF
-> > > +#define VIRTIO_MDEV_SET_VQ_CALLBACK _IOW(VIRTIO_MDEV, 0x00, \
-> > > +					 struct virtio_mdev_callback)
-> > > +#define VIRTIO_MDEV_SET_CONFIG_CALLBACK _IOW(VIRTIO_MDEV, 0x01, \
-> > > +					struct virtio_mdev_callback)
-> > Function pointer in an ioctl parameter? How does this ever make sense?
-> 
-> 
-> I admit this is hacky (casting).
-> 
-> 
-> > And can't we use a couple of registers for this, and avoid ioctls?
-> 
-> 
-> Yes, how about something like interrupt numbers for each virtqueue and
-> config?
+On Fri, Aug 09, 2019 at 07:00:24PM +0300, Adalbert Laz=C4=83r wrote:
+> This patch might be obsolete thanks to single-stepping.
 
-Should we just reuse VIRTIO_PCI_COMMON_Q_XXX then?
+sooo should it be skipped from this large patchset to easy
+review?
 
-
-> 
-> > 
-> > > +
-> > > +#define VIRTIO_MDEV_DEVICE_API_STRING		"virtio-mdev"
-> > > +
-> > > +/*
-> > > + * Control registers
-> > > + */
-> > > +
-> > > +/* Magic value ("virt" string) - Read Only */
-> > > +#define VIRTIO_MDEV_MAGIC_VALUE		0x000
-> > > +
-> > > +/* Virtio device version - Read Only */
-> > > +#define VIRTIO_MDEV_VERSION		0x004
-> > > +
-> > > +/* Virtio device ID - Read Only */
-> > > +#define VIRTIO_MDEV_DEVICE_ID		0x008
-> > > +
-> > > +/* Virtio vendor ID - Read Only */
-> > > +#define VIRTIO_MDEV_VENDOR_ID		0x00c
-> > > +
-> > > +/* Bitmask of the features supported by the device (host)
-> > > + * (32 bits per set) - Read Only */
-> > > +#define VIRTIO_MDEV_DEVICE_FEATURES	0x010
-> > > +
-> > > +/* Device (host) features set selector - Write Only */
-> > > +#define VIRTIO_MDEV_DEVICE_FEATURES_SEL	0x014
-> > > +
-> > > +/* Bitmask of features activated by the driver (guest)
-> > > + * (32 bits per set) - Write Only */
-> > > +#define VIRTIO_MDEV_DRIVER_FEATURES	0x020
-> > > +
-> > > +/* Activated features set selector - Write Only */
-> > > +#define VIRTIO_MDEV_DRIVER_FEATURES_SEL	0x024
-> > > +
-> > > +/* Queue selector - Write Only */
-> > > +#define VIRTIO_MDEV_QUEUE_SEL		0x030
-> > > +
-> > > +/* Maximum size of the currently selected queue - Read Only */
-> > > +#define VIRTIO_MDEV_QUEUE_NUM_MAX	0x034
-> > > +
-> > > +/* Queue size for the currently selected queue - Write Only */
-> > > +#define VIRTIO_MDEV_QUEUE_NUM		0x038
-> > > +
-> > > +/* Ready bit for the currently selected queue - Read Write */
-> > > +#define VIRTIO_MDEV_QUEUE_READY		0x044
-> > Is this same as started?
-> 
-> 
-> Do you mean "status"?
-
-I really meant "enabled", didn't remember the correct name.
-As in:  VIRTIO_PCI_COMMON_Q_ENABLE
-
-> 
-> > 
-> > > +
-> > > +/* Alignment of virtqueue - Read Only */
-> > > +#define VIRTIO_MDEV_QUEUE_ALIGN		0x048
-> > > +
-> > > +/* Queue notifier - Write Only */
-> > > +#define VIRTIO_MDEV_QUEUE_NOTIFY	0x050
-> > > +
-> > > +/* Device status register - Read Write */
-> > > +#define VIRTIO_MDEV_STATUS		0x060
-> > > +
-> > > +/* Selected queue's Descriptor Table address, 64 bits in two halves */
-> > > +#define VIRTIO_MDEV_QUEUE_DESC_LOW	0x080
-> > > +#define VIRTIO_MDEV_QUEUE_DESC_HIGH	0x084
-> > > +
-> > > +/* Selected queue's Available Ring address, 64 bits in two halves */
-> > > +#define VIRTIO_MDEV_QUEUE_AVAIL_LOW	0x090
-> > > +#define VIRTIO_MDEV_QUEUE_AVAIL_HIGH	0x094
-> > > +
-> > > +/* Selected queue's Used Ring address, 64 bits in two halves */
-> > > +#define VIRTIO_MDEV_QUEUE_USED_LOW	0x0a0
-> > > +#define VIRTIO_MDEV_QUEUE_USED_HIGH	0x0a4
-> > > +
-> > > +/* Configuration atomicity value */
-> > > +#define VIRTIO_MDEV_CONFIG_GENERATION	0x0fc
-> > > +
-> > > +/* The config space is defined by each driver as
-> > > + * the per-driver configuration space - Read Write */
-> > > +#define VIRTIO_MDEV_CONFIG		0x100
-> > Mixing device and generic config space is what virtio pci did,
-> > caused lots of problems with extensions.
-> > It would be better to reserve much more space.
-> 
-> 
-> I see, will do this.
-> 
-> Thanks
-> 
-> 
-> > 
-> > 
-> > > +
-> > > +#endif
-> > > +
-> > > +
-> > > +/* Ready bit for the currently selected queue - Read Write */
-> > > -- 
-> > > 2.19.1
+>=20
+> Signed-off-by: Adalbert Laz=C4=83r <alazar@bitdefender.com>
+> ---
+>  arch/x86/kvm/x86.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2c06de73a784..06f44ce8ed07 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6311,7 +6311,8 @@ static bool reexecute_instruction(struct kvm_vcpu=
+ *vcpu, gva_t cr2,
+>  		indirect_shadow_pages =3D vcpu->kvm->arch.indirect_shadow_pages;
+>  		spin_unlock(&vcpu->kvm->mmu_lock);
+> =20
+> -		if (indirect_shadow_pages)
+> +		if (indirect_shadow_pages
+> +		    && !kvmi_tracked_gfn(vcpu, gpa_to_gfn(gpa)))
+>  			kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
+> =20
+>  		return true;
+> @@ -6322,7 +6323,8 @@ static bool reexecute_instruction(struct kvm_vcpu=
+ *vcpu, gva_t cr2,
+>  	 * and it failed try to unshadow page and re-enter the
+>  	 * guest to let CPU execute the instruction.
+>  	 */
+> -	kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
+> +	if (!kvmi_tracked_gfn(vcpu, gpa_to_gfn(gpa)))
+> +		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
+> =20
+>  	/*
+>  	 * If the access faults on its page table, it can not
+> @@ -6374,6 +6376,9 @@ static bool retry_instruction(struct x86_emulate_=
+ctxt *ctxt,
+>  	if (!vcpu->arch.mmu->direct_map)
+>  		gpa =3D kvm_mmu_gva_to_gpa_write(vcpu, cr2, NULL);
+> =20
+> +	if (kvmi_tracked_gfn(vcpu, gpa_to_gfn(gpa)))
+> +		return false;
+> +
+>  	kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
+> =20
+>  	return true;
