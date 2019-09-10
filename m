@@ -2,145 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B561AAEF21
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 18:06:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B056FAEF67
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 18:18:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394084AbfIJQF5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 12:05:57 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:45882 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730821AbfIJQF5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 12:05:57 -0400
-Received: by mail-io1-f65.google.com with SMTP id f12so38662932iog.12;
-        Tue, 10 Sep 2019 09:05:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VOHRoq+5f0zDDmoxjc5LrcCUbX6pSA5aom1GvfEBdqM=;
-        b=Fo10nVgCGjb967s2Gvy7rNbxLGvFQyPQai3LMMHk9zZedD+veZSBvOOmwQSJubz6ZP
-         tuAujd3bbR/kbJcDxXxLq07MStOXSHX/1qIcFO49nAb5M62AjF0b3yFVjA+XNCCqoEEB
-         WliSdoQPWIq+66wv7Qo/0/p4xMBLyrD1BdExRd2/35+zdhIjOeD0flz03I1Oe76aoV9A
-         h+0xDFdQGW2HNoXAad189kM9G4aREr7hFK4BN7X8BoO7QW2AnAzdEzWlRlvTAn+IAgFx
-         h/DxKukXVR4eBj0Ryq0xnwI+x6E+5VbdcoJjA04pKpMjf4S2U4shxqFiG3xCBT0kEmIU
-         vdQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VOHRoq+5f0zDDmoxjc5LrcCUbX6pSA5aom1GvfEBdqM=;
-        b=hqQajM4ZBNf7g0egwVAEugl6PfMe+NFt59M82F5g9YdTyhClf2gI6njEgDREPukxZt
-         l6v7oCxa4U3GN73Srea43CJ+AYZIHQJJy76LCS+rMgOygpn1mjtN0GeQjevZjxYvocS1
-         gjSfrRGJcpCD2qTsy1XhMnbl9NWABMa+N2SrcQ8+I/5YfJiZiuPgosDebqrOR064+bdS
-         SHDi/a1yzBwk79OTwkO9pYnBj1S0ZsTUQ+DKJ6f73Ad1JyNe2VdjRcPl/2RHGslnPHLN
-         VCqhqErlvY+gOHBJpGPNPzonp6eVO1w9YyfDitQthtPr+ymuCC08XLP6zDv35yVLZIJu
-         7/Ww==
-X-Gm-Message-State: APjAAAW0LNT3tbQ2n7h/CY7IaVUFIT0Skw6InghF5EIW04FaXfvukWDF
-        ghLORvydbjPmmc5Dc7AvQ++SvpoTb1z7gttPWVI=
-X-Google-Smtp-Source: APXvYqwuv/pHVCWexKpkprqv1+Ti4casdnv0H37FsG/aFQFyd9UW76zxHfgdVDSoAnHjOav423k8D+xgBCR6S09zUQ4=
-X-Received: by 2002:a6b:ac85:: with SMTP id v127mr4562969ioe.97.1568131554878;
- Tue, 10 Sep 2019 09:05:54 -0700 (PDT)
+        id S2394173AbfIJQSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 12:18:45 -0400
+Received: from 2.mo5.mail-out.ovh.net ([178.33.109.111]:60144 "EHLO
+        2.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729971AbfIJQSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 12:18:44 -0400
+X-Greylist: delayed 7799 seconds by postgrey-1.27 at vger.kernel.org; Tue, 10 Sep 2019 12:18:43 EDT
+Received: from player789.ha.ovh.net (unknown [10.109.146.1])
+        by mo5.mail-out.ovh.net (Postfix) with ESMTP id 794BF24BDA5
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 15:49:31 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+        (Authenticated sender: clg@kaod.org)
+        by player789.ha.ovh.net (Postfix) with ESMTPSA id AD28C99B6E00;
+        Tue, 10 Sep 2019 13:49:24 +0000 (UTC)
+Subject: Re: [PATCH 2/2] KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when
+ VPs are allocated
+To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
+Cc:     David Gibson <david@gibson.dropbear.id.au>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+References: <156812303847.1865227.3495698285729698782.stgit@bahia.tls.ibm.com>
+ <156812304395.1865227.18344810689034056117.stgit@bahia.tls.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6712150c-5d55-8e36-28ae-bf078a405ea6@kaod.org>
+Date:   Tue, 10 Sep 2019 15:49:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190910124209.GY2063@dhcp22.suse.cz> <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
- <20190910144713.GF2063@dhcp22.suse.cz>
-In-Reply-To: <20190910144713.GF2063@dhcp22.suse.cz>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Tue, 10 Sep 2019 09:05:43 -0700
-Message-ID: <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
-Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fengguang Wu <fengguang.wu@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <156812304395.1865227.18344810689034056117.stgit@bahia.tls.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 12243880013991938951
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtddtgdegiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 10, 2019 at 7:47 AM Michal Hocko <mhocko@kernel.org> wrote:
->
-> On Tue 10-09-19 07:42:43, Alexander Duyck wrote:
-> > On Tue, Sep 10, 2019 at 5:42 AM Michal Hocko <mhocko@kernel.org> wrote:
-> > >
-> > > I wanted to review "mm: Introduce Reported pages" just realize that I
-> > > have no clue on what is going on so returned to the cover and it didn't
-> > > really help much. I am completely unfamiliar with virtio so please bear
-> > > with me.
-> > >
-> > > On Sat 07-09-19 10:25:03, Alexander Duyck wrote:
-> > > [...]
-> > > > This series provides an asynchronous means of reporting to a hypervisor
-> > > > that a guest page is no longer in use and can have the data associated
-> > > > with it dropped. To do this I have implemented functionality that allows
-> > > > for what I am referring to as unused page reporting
-> > > >
-> > > > The functionality for this is fairly simple. When enabled it will allocate
-> > > > statistics to track the number of reported pages in a given free area.
-> > > > When the number of free pages exceeds this value plus a high water value,
-> > > > currently 32, it will begin performing page reporting which consists of
-> > > > pulling pages off of free list and placing them into a scatter list. The
-> > > > scatterlist is then given to the page reporting device and it will perform
-> > > > the required action to make the pages "reported", in the case of
-> > > > virtio-balloon this results in the pages being madvised as MADV_DONTNEED
-> > > > and as such they are forced out of the guest. After this they are placed
-> > > > back on the free list,
-> > >
-> > > And here I am reallly lost because "forced out of the guest" makes me
-> > > feel that those pages are no longer usable by the guest. So how come you
-> > > can add them back to the free list. I suspect understanding this part
-> > > will allow me to understand why we have to mark those pages and prevent
-> > > merging.
-> >
-> > Basically as the paragraph above mentions "forced out of the guest"
-> > really is just the hypervisor calling MADV_DONTNEED on the page in
-> > question. So the behavior is the same as any userspace application
-> > that calls MADV_DONTNEED where the contents are no longer accessible
-> > from userspace and attempting to access them will result in a fault
-> > and the page being populated with a zero fill on-demand page, or a
-> > copy of the file contents if the memory is file backed.
->
-> As I've said I have no idea about virt so this doesn't really tell me
-> much. Does that mean that if somebody allocates such a page and tries to
-> access it then virt will handle a fault and bring it back?
+On 10/09/2019 15:44, Greg Kurz wrote:
+> If we cannot allocate the XIVE VPs in OPAL, the creation of a XIVE or
+> XICS-on-XIVE device is aborted as expected, but we leave kvm->arch.xive
+> set forever since the relase method isn't called in this case. Any
+> subsequent tentative to create a XIVE or XICS-on-XIVE for this VM will
+> thus always fail. This is a problem for QEMU since it destroys and
+> re-creates these devices when the VM is reset: the VM would be
+> restricted to using the emulated XIVE or XICS forever.
+> 
+> As an alternative to adding rollback, do not assign kvm->arch.xive before
+> making sure the XIVE VPs are allocated in OPAL.
+> 
+> Fixes: 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method")
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Actually I am probably describing too much as the MADV_DONTNEED is the
-hypervisor behavior in response to the virtio-balloon notification. A
-more thorough explanation of it can be found by just running "man
-madvise", probably best just to leave it at that since I am probably
-confusing things by describing hypervisor behavior in a kernel patch
-set.
 
-For the most part all the page reporting really does is provide a way
-to incrementally identify unused regions of memory in the buddy
-allocator. That in turn is used by virtio-balloon in a polling thread
-to report to the hypervisor what pages are not in use so that it can
-make a decision on what to do with the pages now that it knows they
-are unused.
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-All this is providing is just a report and it is optional if the
-hypervisor will act on it or not. If the hypervisor takes some sort of
-action on the page, then the expectation is that the hypervisor will
-use some sort of mechanism such as a page fault to discover when the
-page is used again.
+Thanks,
+
+C.
+
+> ---
+>  arch/powerpc/kvm/book3s_xive.c        |   11 +++++------
+>  arch/powerpc/kvm/book3s_xive_native.c |    2 +-
+>  2 files changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index cd2006bfcd3e..2ef43d037a4f 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -2006,6 +2006,10 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>  
+>  	pr_devel("Creating xive for partition\n");
+>  
+> +	/* Already there ? */
+> +	if (kvm->arch.xive)
+> +		return -EEXIST;
+> +
+>  	xive = kvmppc_xive_get_device(kvm, type);
+>  	if (!xive)
+>  		return -ENOMEM;
+> @@ -2014,12 +2018,6 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>  	xive->kvm = kvm;
+>  	mutex_init(&xive->lock);
+>  
+> -	/* Already there ? */
+> -	if (kvm->arch.xive)
+> -		ret = -EEXIST;
+> -	else
+> -		kvm->arch.xive = xive;
+> -
+>  	/* We use the default queue size set by the host */
+>  	xive->q_order = xive_native_default_eq_shift();
+>  	if (xive->q_order < PAGE_SHIFT)
+> @@ -2040,6 +2038,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
+>  		return ret;
+>  
+>  	dev->private = xive;
+> +	kvm->arch.xive = xive;
+>  	return 0;
+>  }
+>  
+> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+> index e9cbb42de424..84a354b90f60 100644
+> --- a/arch/powerpc/kvm/book3s_xive_native.c
+> +++ b/arch/powerpc/kvm/book3s_xive_native.c
+> @@ -1087,7 +1087,6 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+>  
+>  	xive->dev = dev;
+>  	xive->kvm = kvm;
+> -	kvm->arch.xive = xive;
+>  	mutex_init(&xive->mapping_lock);
+>  	mutex_init(&xive->lock);
+>  
+> @@ -1109,6 +1108,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
+>  		return ret;
+>  
+>  	dev->private = xive;
+> +	kvm->arch.xive = xive;
+>  	return 0;
+>  }
+>  
+> 
+
