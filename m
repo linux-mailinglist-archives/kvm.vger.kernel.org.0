@@ -2,79 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08C4BAF0CE
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 20:00:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FF78AF0EA
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 20:10:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbfIJSAa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 14:00:30 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50772 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726421AbfIJSAa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 14:00:30 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 0FCC7AF8D;
-        Tue, 10 Sep 2019 18:00:28 +0000 (UTC)
-Date:   Tue, 10 Sep 2019 20:00:26 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fengguang Wu <fengguang.wu@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
-Message-ID: <20190910180026.GE4023@dhcp22.suse.cz>
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190910124209.GY2063@dhcp22.suse.cz>
- <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
- <20190910144713.GF2063@dhcp22.suse.cz>
- <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
- <20190910175213.GD4023@dhcp22.suse.cz>
+        id S1731980AbfIJSKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 14:10:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7876 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728317AbfIJSKy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Sep 2019 14:10:54 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8AHuwca142863
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 14:10:53 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2uxfh72yp5-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 14:10:53 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+        Tue, 10 Sep 2019 19:10:51 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 10 Sep 2019 19:10:46 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8AIAjNQ39321930
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Sep 2019 18:10:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 17C32AE06A;
+        Tue, 10 Sep 2019 18:10:45 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A3DD3AE059;
+        Tue, 10 Sep 2019 18:10:44 +0000 (GMT)
+Received: from osiris (unknown [9.145.57.86])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 10 Sep 2019 18:10:44 +0000 (GMT)
+Date:   Tue, 10 Sep 2019 20:10:43 +0200
+From:   Heiko Carstens <heiko.carstens@de.ibm.com>
+To:     Igor Mammedov <imammedo@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        david@redhat.com, cohuck@redhat.com, frankja@linux.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: s390: kvm_s390_vm_start_migration: check
+ dirty_bitmap before using it as target for memset()
+References: <20190910130215.23647-1-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190910175213.GD4023@dhcp22.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190910130215.23647-1-imammedo@redhat.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19091018-0028-0000-0000-0000039A9C5F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091018-0029-0000-0000-0000245D0143
+Message-Id: <20190910181043.GB4313@osiris>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-10_11:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=492 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909100172
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue 10-09-19 19:52:13, Michal Hocko wrote:
-> On Tue 10-09-19 09:05:43, Alexander Duyck wrote:
-[...]
-> > All this is providing is just a report and it is optional if the
-> > hypervisor will act on it or not. If the hypervisor takes some sort of
-> > action on the page, then the expectation is that the hypervisor will
-> > use some sort of mechanism such as a page fault to discover when the
-> > page is used again.
-> 
-> OK so the baloon driver is in charge of this metadata and the allocator
-> has to live with that. Isn't that a layer violation?
+On Tue, Sep 10, 2019 at 09:02:15AM -0400, Igor Mammedov wrote:
+> Make sure that ms->dirty_bitmap is set before using it or
+> print a warning and return -ENIVAL otherwise.
+...
+> v2:
+>    - drop WARN()
+...
+> +		if (!ms->dirty_bitmap)
+> +			return -EINVAL;
 
-Another thing that is not clear to me is how these marked pages are
-different from any other free pages. All of them are unused and you are
-losing your metadata as soon as the page gets allocated because the page
-changes its owner and the struct page belongs to it.
--- 
-Michal Hocko
-SUSE Labs
+The patch description needs an update. ;)
+
