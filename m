@@ -2,81 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EAF61AEABE
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 14:42:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 844A5AEB04
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 15:02:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390174AbfIJMmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 08:42:12 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36414 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726869AbfIJMmM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 08:42:12 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id DADE5AC2E;
-        Tue, 10 Sep 2019 12:42:09 +0000 (UTC)
-Date:   Tue, 10 Sep 2019 14:42:09 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
-        mst@redhat.com, catalin.marinas@arm.com, david@redhat.com,
-        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        will@kernel.org, linux-arm-kernel@lists.infradead.org,
-        osalvador@suse.de, yang.zhang.wz@gmail.com, pagupta@redhat.com,
-        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        ying.huang@intel.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, fengguang.wu@intel.com,
-        alexander.h.duyck@linux.intel.com, kirill.shutemov@linux.intel.com
-Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
-Message-ID: <20190910124209.GY2063@dhcp22.suse.cz>
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190907172225.10910.34302.stgit@localhost.localdomain>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S2392914AbfIJNCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 09:02:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55264 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726192AbfIJNC3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 09:02:29 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 58E75309BF21;
+        Tue, 10 Sep 2019 13:02:29 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DF245196B2;
+        Tue, 10 Sep 2019 13:02:18 +0000 (UTC)
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: [PATCH] KVM: s390: kvm_s390_vm_start_migration: check dirty_bitmap before using it as target for memset()
+Date:   Tue, 10 Sep 2019 09:02:15 -0400
+Message-Id: <20190910130215.23647-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 10 Sep 2019 13:02:29 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I wanted to review "mm: Introduce Reported pages" just realize that I
-have no clue on what is going on so returned to the cover and it didn't
-really help much. I am completely unfamiliar with virtio so please bear
-with me.
+If userspace doesn't set KVM_MEM_LOG_DIRTY_PAGES on memslot before calling
+kvm_s390_vm_start_migration(), kernel will oops with:
 
-On Sat 07-09-19 10:25:03, Alexander Duyck wrote:
-[...]
-> This series provides an asynchronous means of reporting to a hypervisor
-> that a guest page is no longer in use and can have the data associated
-> with it dropped. To do this I have implemented functionality that allows
-> for what I am referring to as unused page reporting
-> 
-> The functionality for this is fairly simple. When enabled it will allocate
-> statistics to track the number of reported pages in a given free area.
-> When the number of free pages exceeds this value plus a high water value,
-> currently 32, it will begin performing page reporting which consists of
-> pulling pages off of free list and placing them into a scatter list. The
-> scatterlist is then given to the page reporting device and it will perform
-> the required action to make the pages "reported", in the case of
-> virtio-balloon this results in the pages being madvised as MADV_DONTNEED
-> and as such they are forced out of the guest. After this they are placed
-> back on the free list,
+  Unable to handle kernel pointer dereference in virtual kernel address space
+  Failing address: 0000000000000000 TEID: 0000000000000483
+  Fault in home space mode while using kernel ASCE.
+  AS:0000000002a2000b R2:00000001bff8c00b R3:00000001bff88007 S:00000001bff91000 P:000000000000003d
+  Oops: 0004 ilc:2 [#1] SMP
+  ...
+  Call Trace:
+  ([<001fffff804ec552>] kvm_s390_vm_set_attr+0x347a/0x3828 [kvm])
+   [<001fffff804ecfc0>] kvm_arch_vm_ioctl+0x6c0/0x1998 [kvm]
+   [<001fffff804b67e4>] kvm_vm_ioctl+0x51c/0x11a8 [kvm]
+   [<00000000008ba572>] do_vfs_ioctl+0x1d2/0xe58
+   [<00000000008bb284>] ksys_ioctl+0x8c/0xb8
+   [<00000000008bb2e2>] sys_ioctl+0x32/0x40
+   [<000000000175552c>] system_call+0x2b8/0x2d8
+  INFO: lockdep is turned off.
+  Last Breaking-Event-Address:
+   [<0000000000dbaf60>] __memset+0xc/0xa0
 
-And here I am reallly lost because "forced out of the guest" makes me
-feel that those pages are no longer usable by the guest. So how come you
-can add them back to the free list. I suspect understanding this part
-will allow me to understand why we have to mark those pages and prevent
-merging.
+due to ms->dirty_bitmap being NULL, which might crash the host.
 
-> and an additional bit is added if they are not
-> merged indicating that they are a reported buddy page instead of a
-> standard buddy page. The cycle then repeats with additional non-reported
-> pages being pulled until the free areas all consist of reported pages.
+Make sure that ms->dirty_bitmap is set before using it or
+print a warning and return -ENIVAL otherwise.
 
+Fixes: afdad61615cc ("KVM: s390: Fix storage attributes migration with memory slots")
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+Cc: stable@vger.kernel.org # v4.19+
 
+v2:
+   - drop WARN()
+
+ arch/s390/kvm/kvm-s390.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index f329dcb3f44c..2a40cd3e40b4 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -1018,6 +1018,8 @@ static int kvm_s390_vm_start_migration(struct kvm *kvm)
+ 	/* mark all the pages in active slots as dirty */
+ 	for (slotnr = 0; slotnr < slots->used_slots; slotnr++) {
+ 		ms = slots->memslots + slotnr;
++		if (!ms->dirty_bitmap)
++			return -EINVAL;
+ 		/*
+ 		 * The second half of the bitmap is only used on x86,
+ 		 * and would be wasted otherwise, so we put it to good
 -- 
-Michal Hocko
-SUSE Labs
+2.18.1
+
