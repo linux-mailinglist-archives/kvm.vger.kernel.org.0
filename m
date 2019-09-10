@@ -2,213 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16357AEFE8
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 18:49:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FDD8AF014
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 19:00:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436815AbfIJQtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 12:49:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27230 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2436760AbfIJQtm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Sep 2019 12:49:42 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8AGmswl125259
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 12:49:40 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2uxcj37qh3-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 12:49:40 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <groug@kaod.org>;
-        Tue, 10 Sep 2019 17:49:38 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 10 Sep 2019 17:49:35 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8AGnYPm31261136
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Sep 2019 16:49:34 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 80C704203F;
-        Tue, 10 Sep 2019 16:49:34 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3565042049;
-        Tue, 10 Sep 2019 16:49:34 +0000 (GMT)
-Received: from bahia.tls.ibm.com (unknown [9.101.4.41])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Sep 2019 16:49:34 +0000 (GMT)
-Subject: [PATCH] KVM: PPC: Book3S HV: Tunable to configure maximum # of
- vCPUs per VM
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Date:   Tue, 10 Sep 2019 18:49:34 +0200
-User-Agent: StGit/unknown-version
+        id S2436963AbfIJRAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 13:00:52 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:45716 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2436774AbfIJRAw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 13:00:52 -0400
+Received: by mail-io1-f65.google.com with SMTP id f12so39079320iog.12
+        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 10:00:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=e/wKK4pR1IPzIADuhE0+1yCd5a4oIbInBjCrfx1I+Jw=;
+        b=W5oC2LPD0wnV7ofReDFjic1201bPVbXGmFpKObNq2mOHosJgQTI1RmKBg/X1b7Q/W7
+         nycfeVidOOSUkq7MxmjNIH3sH/g5HGkOKQ7XQBNcXlSpzE4y3zEsXeUqyb2fU2D1wYFb
+         iS5p1EhoxnD2PQjHFtn4ENp7+RJpNeqSXZmjt+rPjz4lIK8wvAsJb5ii9cHair37VvaM
+         r1sD52JLRi/dB4ER3heChPsP3ejVD2Fi/2VTPZTrZ6WUMiP9crUp7R//HW15ee1EOAi/
+         ZQKO6zFuMKYv9+blEeeAZTcgLqTsNll3cfrmTU0UaFEXDRO2mWzXm4QmTe7pV3tPmDdB
+         kBCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=e/wKK4pR1IPzIADuhE0+1yCd5a4oIbInBjCrfx1I+Jw=;
+        b=LthxRho7e8aNKJrP4W02B0GBX5sj9eIV0i/gdXaEeRBaIy058iamDzA/UUmJttAWD/
+         NsfKwFTxFHGCpgLhUVR+b9utifOVv9+90+Gzb4UmQk6yuZ+f7wlPXV8Aj4un+ylvyv7Y
+         yb2EIVwcLziYnnsVl17PZmpWak7ntz/KK3o82e7WzYy6HhdBQIg1guBms4fULssSw8St
+         dj5EB2nyn1uqFKjcNJwuXBgtYD8PwhKLBoe41+mBJvtvGiSnjsuua42LspGqb5l1Dn//
+         NlhwlWyS5cHypMYjeG0op9+bNqFsE7d+/4Fh7q0bipyzItyfyapUXBs6J1GlPetqZztZ
+         hACw==
+X-Gm-Message-State: APjAAAWmmVlFyVyQxwmHCt5yg8gROXN98FMX4pkTOdaKlgNoS+uH+/Ni
+        RlZbJA80wMQGFJJlhv1MimNK0OryfPy+McVMyF26vA==
+X-Google-Smtp-Source: APXvYqyxewMYXH3KcB6C/MA1XWPwuDKLZvEtXgTnTWR4ugm63O2VWTzfGanbobzuWtzukjsTpuUXWcOVIseUsrbcYPk=
+X-Received: by 2002:a02:cad1:: with SMTP id f17mr19032212jap.18.1568134850830;
+ Tue, 10 Sep 2019 10:00:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19091016-4275-0000-0000-000003640AE4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091016-4276-0000-0000-000038766001
-Message-Id: <156813417397.1880979.6162333671088177553.stgit@bahia.tls.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-10_11:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909100161
+References: <20190910102742.47729-1-xiaoyao.li@intel.com> <20190910102742.47729-2-xiaoyao.li@intel.com>
+In-Reply-To: <20190910102742.47729-2-xiaoyao.li@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 10 Sep 2019 10:00:39 -0700
+Message-ID: <CALMp9eRUW_N8uaJm8Mz-fkmNE=qpd5=FpKyKahQx4RiCKOLZKA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: CPUID: Check limit first when emulating CPUID instruction
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Each vCPU of a VM allocates a XIVE VP in OPAL which is associated with
-8 event queue (EQ) descriptors, one for each priority. A POWER9 socket
-can handle a maximum of 1M event queues.
+On Tue, Sep 10, 2019 at 3:42 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>
+> When limit checking is required, it should be executed first, which is
+> consistent with the CPUID specification.
+>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+> v2:
+>   - correctly set entry_found in no limit checking case.
+>
+> ---
+>  arch/x86/kvm/cpuid.c | 51 ++++++++++++++++++++++++++------------------
+>  1 file changed, 30 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 22c2720cd948..67fa44ab87af 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -952,23 +952,36 @@ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
+>  EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry);
+>
+>  /*
+> - * If no match is found, check whether we exceed the vCPU's limit
+> - * and return the content of the highest valid _standard_ leaf instead.
+> - * This is to satisfy the CPUID specification.
+> + * Based on CPUID specification, if leaf number exceeds the vCPU's limit,
+> + * it should return the content of the highest valid _standard_ leaf instead.
+> + * Note: *found is set true only means the queried leaf number doesn't exceed
+> + * the maximum leaf number of basic or extented leaf.
 
-The powernv platform allocates NR_CPUS (== 2048) VPs for the hypervisor,
-and each XIVE KVM device allocates KVM_MAX_VCPUS (== 2048) VPs. This means
-that on a bi-socket system, we can create at most:
+Nit: "extented" should be "extended."
 
-(2 * 1M) / (8 * 2048) - 1 == 127 XIVE or XICS-on-XIVE KVM devices
+A more serious problem is that the CPUID specification you quote is
+Intel's specification. AMD CPUs return zeroes in EAX, EBX, ECX, and
+EDX for all undefined leaves, whatever the input value for EAX. This
+code is supposed to be vendor-agnostic, right?
 
-ie, start at most 127 VMs benefiting from an in-kernel interrupt controller.
-Subsequent VMs need to rely on much slower userspace emulated XIVE device in
-QEMU.
-
-This is problematic as one can legitimately expect to start the same
-number of mono-CPU VMs as the number of HW threads available on the
-system (eg, 144 on Witherspoon).
-
-I'm not aware of any userspace supporting more that 1024 vCPUs. It thus
-seem overkill to consume that many VPs per VM. Ideally we would even
-want userspace to be able to tell KVM about the maximum number of vCPUs
-when creating the VM.
-
-For now, provide a module parameter to configure the maximum number of
-vCPUs per VM. While here, reduce the default value to 1024 to match the
-current limit in QEMU. This number is only used by the XIVE KVM devices,
-but some more users of KVM_MAX_VCPUS could possibly be converted.
-
-With this change, I could successfully run 230 mono-CPU VMs on a
-Witherspoon system using the official skiboot-6.3.
-
-I could even run more VMs by using upstream skiboot containing this
-fix, that allows to better spread interrupts between sockets:
-
-e97391ae2bb5 ("xive: fix return value of opal_xive_allocate_irq()")
-
-MAX VPCUS | MAX VMS
-----------+---------
-     1024 |     255
-      512 |     511
-      256 |    1023 (*)
-
-(*) the system was barely usable because of the extreme load and
-    memory exhaustion but the VMs did start.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- arch/powerpc/include/asm/kvm_host.h   |    1 +
- arch/powerpc/kvm/book3s_hv.c          |   32 ++++++++++++++++++++++++++++++++
- arch/powerpc/kvm/book3s_xive.c        |    2 +-
- arch/powerpc/kvm/book3s_xive_native.c |    2 +-
- 4 files changed, 35 insertions(+), 2 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 6fb5fb4779e0..17582ce38788 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -335,6 +335,7 @@ struct kvm_arch {
- 	struct kvm_nested_guest *nested_guests[KVM_MAX_NESTED_GUESTS];
- 	/* This array can grow quite large, keep it at the end */
- 	struct kvmppc_vcore *vcores[KVM_MAX_VCORES];
-+	unsigned int max_vcpus;
- #endif
- };
- 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index f8975c620f41..393d8a1ce9d8 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -125,6 +125,36 @@ static bool nested = true;
- module_param(nested, bool, S_IRUGO | S_IWUSR);
- MODULE_PARM_DESC(nested, "Enable nested virtualization (only on POWER9)");
- 
-+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-+
-+static unsigned int max_vcpus = MIN(KVM_MAX_VCPUS, 1024);
-+
-+static int set_max_vcpus(const char *val, const struct kernel_param *kp)
-+{
-+	unsigned int new_max_vcpus;
-+	int ret;
-+
-+	ret = kstrtouint(val, 0, &new_max_vcpus);
-+	if (ret)
-+		return ret;
-+
-+	if (new_max_vcpus > KVM_MAX_VCPUS)
-+		return -EINVAL;
-+
-+	max_vcpus = new_max_vcpus;
-+
-+	return 0;
-+}
-+
-+static struct kernel_param_ops max_vcpus_ops = {
-+	.set = set_max_vcpus,
-+	.get = param_get_uint,
-+};
-+
-+module_param_cb(max_vcpus, &max_vcpus_ops, &max_vcpus, S_IRUGO | S_IWUSR);
-+MODULE_PARM_DESC(max_vcpus, "Maximum number of vCPUS per VM (max = "
-+		 __stringify(KVM_MAX_VCPUS) ")");
-+
- static inline bool nesting_enabled(struct kvm *kvm)
- {
- 	return kvm->arch.nested_enable && kvm_is_radix(kvm);
-@@ -4918,6 +4948,8 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
- 	if (radix_enabled())
- 		kvmhv_radix_debugfs_init(kvm);
- 
-+	kvm->arch.max_vcpus = max_vcpus;
-+
- 	return 0;
- }
- 
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 2ef43d037a4f..0fea31b64564 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -2026,7 +2026,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
- 		xive->q_page_order = xive->q_order - PAGE_SHIFT;
- 
- 	/* Allocate a bunch of VPs */
--	xive->vp_base = xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-+	xive->vp_base = xive_native_alloc_vp_block(kvm->arch.max_vcpus);
- 	pr_devel("VP_Base=%x\n", xive->vp_base);
- 
- 	if (xive->vp_base == XIVE_INVALID_VP)
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 84a354b90f60..20314010da56 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -1095,7 +1095,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
- 	 * a default. Getting the max number of CPUs the VM was
- 	 * configured with would improve our usage of the XIVE VP space.
- 	 */
--	xive->vp_base = xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-+	xive->vp_base = xive_native_alloc_vp_block(kvm->arch.max_vcpus);
- 	pr_devel("VP_Base=%x\n", xive->vp_base);
- 
- 	if (xive->vp_base == XIVE_INVALID_VP)
-
+>   */
+> -static struct kvm_cpuid_entry2* check_cpuid_limit(struct kvm_vcpu *vcpu,
+> -                                                  u32 function, u32 index)
+> +static struct kvm_cpuid_entry2* cpuid_check_limit(struct kvm_vcpu *vcpu,
+> +                                                  u32 function, u32 index,
+> +                                                 bool *found)
+>  {
+>         struct kvm_cpuid_entry2 *maxlevel;
+>
+> +       if (found)
+> +               *found = false;
+> +
+>         maxlevel = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
+> -       if (!maxlevel || maxlevel->eax >= function)
+> +       if (!maxlevel)
+>                 return NULL;
+> -       if (function & 0x80000000) {
+> -               maxlevel = kvm_find_cpuid_entry(vcpu, 0, 0);
+> -               if (!maxlevel)
+> -                       return NULL;
+> +
+> +       if (maxlevel->eax >= function) {
+> +               if (found)
+> +                       *found = true;
+> +               return kvm_find_cpuid_entry(vcpu, function, index);
+>         }
+> +
+> +       if (function & 0x80000000)
+> +               maxlevel = kvm_find_cpuid_entry(vcpu, 0, 0);
+> +
+> +       if (!maxlevel)
+> +               return NULL;
+> +
+>         return kvm_find_cpuid_entry(vcpu, maxlevel->eax, index);
+>  }
+>
+> @@ -979,24 +992,20 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>         struct kvm_cpuid_entry2 *best;
+>         bool entry_found = true;
+>
+> -       best = kvm_find_cpuid_entry(vcpu, function, index);
+> -
+> -       if (!best) {
+> -               entry_found = false;
+> -               if (!check_limit)
+> -                       goto out;
+> -
+> -               best = check_cpuid_limit(vcpu, function, index);
+> -       }
+> +       if (check_limit)
+> +               best = cpuid_check_limit(vcpu, function, index, &entry_found);
+> +       else
+> +               best = kvm_find_cpuid_entry(vcpu, function, index);
+>
+> -out:
+>         if (best) {
+>                 *eax = best->eax;
+>                 *ebx = best->ebx;
+>                 *ecx = best->ecx;
+>                 *edx = best->edx;
+> -       } else
+> +       } else {
+> +               entry_found = false;
+>                 *eax = *ebx = *ecx = *edx = 0;
+> +       }
+>         trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, entry_found);
+>         return entry_found;
+>  }
+> --
+> 2.19.1
+>
