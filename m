@@ -2,105 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC80DAE17C
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 01:28:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DC1EAE223
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 03:52:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390034AbfIIX24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Sep 2019 19:28:56 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34927 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390012AbfIIX24 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Sep 2019 19:28:56 -0400
-Received: by mail-pg1-f194.google.com with SMTP id n4so8749580pgv.2
-        for <kvm@vger.kernel.org>; Mon, 09 Sep 2019 16:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qVl7cQbHqivg+5+bjZkAPrH4/YkagYFqBsqHpTn7Ee4=;
-        b=WRsagKgPHRVWRodqOxjFyH3SxApwemVrFs+C4fnZP36b/kGtMnwy18biKBGghKT4FY
-         r3mwmnzylOimTxzwHNfkTtS+xJnFwvv8FVNYNNX3Yjj1QLWsXXMboecQJftGZkj6H3gm
-         H1XRadrTmtfTPOBhRNNf82rThU+sJ4lN+9Y7MUmctoEa4sImtm6/tJJjFoB/4eOIF8LI
-         gl3ZYpUdOt1KjT1meUv58ZQJHA4S7wCWk91e9+ku7WGZmXEue+VVya7Q+00O6Yq6yWR3
-         G9KdJLg3g/SQJ0h0nxsK8WBk9BNmfHE5vMWQaWz9q+6euy0HQCtfxh5AC4AwcXWr3/oF
-         dtTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qVl7cQbHqivg+5+bjZkAPrH4/YkagYFqBsqHpTn7Ee4=;
-        b=gnX3x0AzEXcZosekvz5ag3LrkMX8ulqKG9SLJJL2X/iK77PdwJzOqbfW0p9XORbaI5
-         n5T0LfvZLeT471VL+Fu8ImK566MsSYExa0MVKXIrsGTrLAt+SNTzekcGSLWxoNdXQDPN
-         xC2a886ZPu039sjehPE+7B+e+zwrE8rkkYKp0oeuNrGKCJt2DZu9OMfUabuJW7AVth68
-         Tb7QfC3SG6SaRhZ7L5vSgMvmYGzgew4HzlMK4tigEpbjTSFcr8sQv+EbepJFVPzSlEqu
-         b+henGuAegUFY78WpjPIDMMSjpKneM4omX1FLft0c2bhj56uHiEQh9bJYij1XzwDv2Vh
-         s9Sw==
-X-Gm-Message-State: APjAAAVH31nJMfiPW2pChrBru59uYrrnfcwygHULZyJJP76BWMB6mt/Q
-        Akc84mEXWoACaDBO1a3RroU=
-X-Google-Smtp-Source: APXvYqy74ypbCbkeOd3DP0v0kuCuTg9ctzC3gCjVLeu7UnM8pah7J4FtODCIU/4r47JUwH7t6E+DOQ==
-X-Received: by 2002:a63:dd16:: with SMTP id t22mr24577946pgg.140.1568071734456;
-        Mon, 09 Sep 2019 16:28:54 -0700 (PDT)
-Received: from localhost ([47.88.172.238])
-        by smtp.gmail.com with ESMTPSA id d14sm24833225pfh.36.2019.09.09.16.28.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2019 16:28:53 -0700 (PDT)
-From:   Haozhong Zhang <hzzhan9@gmail.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com
-Cc:     kvm@vger.kernel.org, Haozhong Zhang <hzzhan9@gmail.com>,
-        Haozhong Zhang <hzhongzhang@tencent.com>
-Subject: [kvm-unit-tests PATCH] Makefile: do not pass non-c++ warning options to g++
-Date:   Tue, 10 Sep 2019 07:28:23 +0800
-Message-Id: <20190909232823.24513-1-hzzhan9@gmail.com>
-X-Mailer: git-send-email 2.23.0
+        id S2392638AbfIJBwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Sep 2019 21:52:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53176 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726903AbfIJBwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Sep 2019 21:52:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C4F82A3769A;
+        Tue, 10 Sep 2019 01:52:15 +0000 (UTC)
+Received: from [10.72.12.185] (ovpn-12-185.pek2.redhat.com [10.72.12.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 73D585D9D6;
+        Tue, 10 Sep 2019 01:52:11 +0000 (UTC)
+Subject: Re: [RFC PATCH untested] vhost: block speculation of translated
+ descriptors
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20190908110521.4031-1-mst@redhat.com>
+ <db4d77d7-c467-935d-b4ae-1da7635e9b6b@redhat.com>
+ <20190909104355-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <9ab48e0f-50a9-bed4-1801-73c37a7da27c@redhat.com>
+Date:   Tue, 10 Sep 2019 09:52:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20190909104355-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Tue, 10 Sep 2019 01:52:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Haozhong Zhang <hzhongzhang@tencent.com>
 
--Wmissing-prototypes and -Wstrict-prototypes are C and Obj-C only
-warning options. If passing them to g++ (e.g., when compiling api/),
-following warning messages will be produced:
-  cc1plus: warning: command line option ‘-Wmissing-prototypes’ is valid for C/ObjC but not for C++[enabled by default]
-  cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++ [enabled by default]
+On 2019/9/9 下午10:45, Michael S. Tsirkin wrote:
+> On Mon, Sep 09, 2019 at 03:19:55PM +0800, Jason Wang wrote:
+>> On 2019/9/8 下午7:05, Michael S. Tsirkin wrote:
+>>> iovec addresses coming from vhost are assumed to be
+>>> pre-validated, but in fact can be speculated to a value
+>>> out of range.
+>>>
+>>> Userspace address are later validated with array_index_nospec so we can
+>>> be sure kernel info does not leak through these addresses, but vhost
+>>> must also not leak userspace info outside the allowed memory table to
+>>> guests.
+>>>
+>>> Following the defence in depth principle, make sure
+>>> the address is not validated out of node range.
+>>>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>    drivers/vhost/vhost.c | 4 +++-
+>>>    1 file changed, 3 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>>> index 5dc174ac8cac..0ee375fb7145 100644
+>>> --- a/drivers/vhost/vhost.c
+>>> +++ b/drivers/vhost/vhost.c
+>>> @@ -2072,7 +2072,9 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
+>>>    		size = node->size - addr + node->start;
+>>>    		_iov->iov_len = min((u64)len - s, size);
+>>>    		_iov->iov_base = (void __user *)(unsigned long)
+>>> -			(node->userspace_addr + addr - node->start);
+>>> +			(node->userspace_addr +
+>>> +			 array_index_nospec(addr - node->start,
+>>> +					    node->size));
+>>>    		s += size;
+>>>    		addr += size;
+>>>    		++ret;
+>>
+>> I've tried this on Kaby Lake smap off metadata acceleration off using
+>> testpmd (virtio-user) + vhost_net. I don't see obvious performance
+>> difference with TX PPS.
+>>
+>> Thanks
+> Should I push this to Linus right now then? It's a security thing so
+> maybe we better do it ASAP ... what's your opinion?
 
-Move those options from COMMON_CFLAGS to CFLAGS so as to mute above
-warning messages.
 
-Signed-off-by: Haozhong Zhang <hzhongzhang@tencent.com>
----
- Makefile | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Yes, you can.
 
-diff --git a/Makefile b/Makefile
-index 643af05..32414dc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1,4 +1,3 @@
--
- SHELL := /usr/bin/env bash
- 
- ifeq ($(wildcard config.mak),)
-@@ -53,7 +52,6 @@ cc-option = $(shell if $(CC) $(1) -S -o /dev/null -xc /dev/null \
- COMMON_CFLAGS += -g $(autodepend-flags)
- COMMON_CFLAGS += -Wall -Wwrite-strings -Wclobbered -Wempty-body -Wuninitialized
- COMMON_CFLAGS += -Wignored-qualifiers -Wunused-but-set-parameter
--COMMON_CFLAGS += -Wmissing-prototypes -Wstrict-prototypes
- COMMON_CFLAGS += -Werror
- frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
- fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
-@@ -71,6 +69,7 @@ COMMON_CFLAGS += $(fno_pic) $(no_pie)
- 
- CFLAGS += $(COMMON_CFLAGS)
- CFLAGS += -Wmissing-parameter-type -Wold-style-declaration -Woverride-init
-+CFLAGS += -Wmissing-prototypes -Wstrict-prototypes
- 
- CXXFLAGS += $(COMMON_CFLAGS)
- 
--- 
-2.23.0
+Acked-by: Jason Wang <jasowang@redhat.com>
 
+
+
+>
