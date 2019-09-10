@@ -2,102 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 93953AED9E
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:48:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7750AEDA1
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:48:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404787AbfIJOqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 10:46:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54822 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404683AbfIJOqv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 10:46:51 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1D5867BDA5
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 14:46:51 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id f11so9064592wrt.18
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 07:46:51 -0700 (PDT)
+        id S2405415AbfIJOrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:47:04 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:33653 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405395AbfIJOrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:47:02 -0400
+Received: by mail-io1-f68.google.com with SMTP id m11so38140099ioo.0;
+        Tue, 10 Sep 2019 07:47:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=83TThgQAjkQ0ae/WfN2rozL6NZ6sFqo/tzTJieGwWhY=;
+        b=bctqj0dIEQG02DidTblEEKKmlRq95iuCrJbWTEZEFy6f4ldmknD9AC82Hjp7WtIcUL
+         wdtgqANYPFpfuqN9RWFoV81S+TL4TZWcW/eRB1zbwCnI4axFiqpnKB/4F9Vb1ASsBmwM
+         MoGeD5V7oPXNrI0TLfR8qwBLS/a5rmpBqaVS40yQVLdcqID59aFUJKp3thzSPP4Ym5fo
+         oUxnlGZ+RikUHkghsxU4t9MUOUJM1V923cataTV37iHuaUS8taTW2ilbXf8zuGBL2rrr
+         GFcYtmHJkRVPpjaQYbMNqFd6Z6x57kRfzb33fCPJ6liqZh8sZLRJMVMsx0Mc0ssKXqB7
+         m1dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=l65DH9YU8mGm5SKX7d473lQ/ogVgAEFpiCQPfaq4s9w=;
-        b=LL9VG0Ae0gYGI1a9rMfeU+yEquXDZayg3urOVuO3+UeKwLZJjMsRfbAbsbK2CUPnnK
-         EVrPiB907ry4YjNGZcH1CKgxoo8toMyZ9x5glHBlDQgP/CvhJ9pc2LcrGZpMRJRU9a44
-         HV0l2tLa2SiLHQitfQaFFkIyYw4qoXJZZMtFmHLD1C2tNjeNHwP3L/1jVGwNj1dW3fXk
-         2W3MMwEc8Bq1R9vDkKaRBcRFipB+D+cHru29hvcef6vzGtGBcx5801SqSsPG9iNWJ0rG
-         O3MAdTIc20ZjL48S+Gkh0W6Ue+H2RI5I4NUjsTNqsIjiflw1iPumR7v/bLBfxectJ2Ob
-         lbFQ==
-X-Gm-Message-State: APjAAAX5H+pBYAlseCsoziT7ins9qi8/MeyTZNzHWaWlQ+SsNcMPJSy9
-        hJJmNrwDcZSp7aUgH1SUyYm8q03zdDJCsn9kBkvPaOQ2SM9nMeEoZCVaG2xCPKGkAkOIehJnZqZ
-        0rXDjQoo7ObH9
-X-Received: by 2002:adf:a415:: with SMTP id d21mr29253255wra.94.1568126809755;
-        Tue, 10 Sep 2019 07:46:49 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyEtqpz9+QHudRI7ZuVLKmH9ZYfUdB3RnY01oSb+YAktsbq6ibE/u2+TUEOXFJ5W8JaXy6TkQ==
-X-Received: by 2002:adf:a415:: with SMTP id d21mr29253228wra.94.1568126809497;
-        Tue, 10 Sep 2019 07:46:49 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id u83sm4830710wme.0.2019.09.10.07.46.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2019 07:46:49 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Bump max number of test CPUs to
- 255
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, Evgeny Yakovlev <wrfsh@yandex-team.ru>
-References: <20190906163450.30797-1-sean.j.christopherson@intel.com>
- <20190906163450.30797-4-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <35a43a76-205c-48f3-a06e-c9883dd75c3f@redhat.com>
-Date:   Tue, 10 Sep 2019 16:46:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=83TThgQAjkQ0ae/WfN2rozL6NZ6sFqo/tzTJieGwWhY=;
+        b=W9N7gezhQNg1WG4oLf0K+lRaR7fEVZLBCpgY6d7YqL7EIUxwwd5lF+yRrnldvMTA6i
+         XaS/bfqnVmrB85wRDp9NRmCrEtT7WuNy0e5vyb0G8eWkkwUgIV5E6TlxnDMRWBaK4XOv
+         pgOmkyAaoudtzyp2v6rXn81jpTS1vNue8vtPwL4JvaICatc5WbsWlgZ+WUogQG6NI2Cl
+         aWf4AfbJ52AVTTKqdFKK6eMJxiqdSGyn4Y8n0e0dMNfCiM+A5P+Xl2W4ZfXHNWyT6H/J
+         unjia/KY650Km/BSdiA0ShdB9J3Sqsugy2NDAwXR6LgM5ti++sgy0ef9dMKGpN2ba4q2
+         yj0Q==
+X-Gm-Message-State: APjAAAV3mDU/E7CQnDy/X6dpky4LggsUGMCV29Vir2KS+0cNn1ORT2+y
+        0iMtS4vSfO+BioA6pX29mZ/tNQpOaK2BovOgkjg=
+X-Google-Smtp-Source: APXvYqxrAgxnAGDouzK82zOnS/FEXuQVFFiHhPiHvEJcvMSKDH7nqj7q9uv+1GUDlOR7M4uUZTjdaBK0SNIGv69duNM=
+X-Received: by 2002:a5d:8f86:: with SMTP id l6mr20769278iol.270.1568126821359;
+ Tue, 10 Sep 2019 07:47:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190906163450.30797-4-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190907172528.10910.37051.stgit@localhost.localdomain> <20190910122313.GW2063@dhcp22.suse.cz>
+In-Reply-To: <20190910122313.GW2063@dhcp22.suse.cz>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Tue, 10 Sep 2019 07:46:50 -0700
+Message-ID: <CAKgT0Ud1xqhEy_LL4AfMgreP0uXrkF-fSDn=6uDXfn7Pvj5AAw@mail.gmail.com>
+Subject: Re: [PATCH v9 3/8] mm: Move set/get_pcppage_migratetype to mmzone.h
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fengguang Wu <fengguang.wu@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/09/19 18:34, Sean Christopherson wrote:
-> The max number of CPUs is not actually enforced anywhere, e.g. manually
-> setting '-smp 240' when running a unit test will cause random corruption
-> and hangs during smp initialization.  Increase the max number of test
-> CPUs to 255, which is the true max kvm-unit-tests can support without
-> significant changes, e.g. it would need to boot with x2APIC enabled,
-> support interrupt remapping, etc...
-> 
-> There is no known use case for running with more than 64 CPUs, but the
-> cost of supporting 255 is minimal, e.g. increases the size of each test
-> binary by a few kbs and burns a few extra cycles in init_apic_map().
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  lib/x86/apic-defs.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/x86/apic-defs.h b/lib/x86/apic-defs.h
-> index 7107f0f..b2014de 100644
-> --- a/lib/x86/apic-defs.h
-> +++ b/lib/x86/apic-defs.h
-> @@ -6,7 +6,7 @@
->   * both in C and ASM
->   */
->  
-> -#define MAX_TEST_CPUS (64)
-> +#define MAX_TEST_CPUS (255)
->  
->  /*
->   * Constants for various Intel APICs. (local APIC, IOAPIC, etc.)
-> 
+On Tue, Sep 10, 2019 at 5:23 AM Michal Hocko <mhocko@kernel.org> wrote:
+>
+> On Sat 07-09-19 10:25:28, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> >
+> > In order to support page reporting it will be necessary to store and
+> > retrieve the migratetype of a page. To enable that I am moving the set and
+> > get operations for pcppage_migratetype into the mm/internal.h header so
+> > that they can be used outside of the page_alloc.c file.
+>
+> Please describe who is the user and why does it needs this interface.
+> This is really important because migratetype is an MM internal thing and
+> external users shouldn't really care about it at all. We really do not
+> want a random code to call those, especially the set_pcppage_migratetype.
 
-Since this is not a multiple of 8 anymore, the previous patch should
-have used (max_cpus + 7) / 8.  Fixed that and queued.
-
-Paolo
+I was using it to store the migratetype of the page so that I could
+find the boundary list that contained the reported page as the array
+is indexed based on page order and migratetype. However on further
+discussion I am thinking I may just use page->index directly to index
+into the boundary array. Doing that I should be able to get a very
+slight improvement in lookup time since I am not having to pull order
+and migratetype and then compute the index based on that. In addition
+it becomes much more clear as to what is going on, and if needed I
+could add debug checks to verify the page is "Reported" and that the
+"Buddy" page type is set.
