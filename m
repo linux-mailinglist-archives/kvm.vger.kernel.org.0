@@ -2,791 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C0DF8AE777
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 12:01:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF5C5AE7B4
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 12:14:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405387AbfIJKB3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 06:01:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42592 "EHLO mx1.redhat.com"
+        id S2392243AbfIJKOf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 06:14:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33352 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388655AbfIJKB2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 06:01:28 -0400
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726084AbfIJKOf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 06:14:35 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 631E4356DC
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 10:01:27 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id n135so19963568qke.23
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 03:01:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tbcmN/RnB5dUd7YK5hLhBlA03p9rdl/jQ1SSsTzClYw=;
-        b=dWYO/reiaBDMTss8um/7gAx5Dak9XSqT6uq8PiZ3HDQOXiKKuAPYZ6mOI/IzPPE+Jx
-         xm+/iFwXNuhTCtNSwrQDP6gGOy9EWvOF/nJYfHyLrvxwzxTBUYSOpZkG2MKv7OgemUMz
-         fZB5RDN0/hQdPBigUsm+2QnWFg7E3ixIdgN6wFnGlURQw8ovtbBPAs+0XHrFInyJcAo6
-         JNC47NLcgGbzeAJSakS3xTCGV+66Aav1bdepmbrhJNFnPpMLbm/YQ0MEhAv32oe0EPJN
-         11EZEwtv0CveWxw9gwk5MDQByNhudsuPoPDfAEY/oJ8Xi0DVI+ARJsBpszcuzzgdRJBf
-         UJvA==
-X-Gm-Message-State: APjAAAVM1zG59N8BvFPlaAyAsYrubdLYZsmabIREh1bniKhRpmMnGU8s
-        6R6PP9uNPRMVIfmfVQrE1xrAFNbVkTBPQxdQeeTFAnhG3/2ow1Nhn3RjdrMek06MU1GXDx0MfCD
-        n+TyLzi27+BmA
-X-Received: by 2002:ac8:51c4:: with SMTP id d4mr28777609qtn.17.1568109685857;
-        Tue, 10 Sep 2019 03:01:25 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxHY+8CA5E30bwDQiY/bFYfUKTjW2J9NkZJnXv6ulB8p08vgcfXE4FklRcRnqTWKrClTccQSA==
-X-Received: by 2002:ac8:51c4:: with SMTP id d4mr28777551qtn.17.1568109685369;
-        Tue, 10 Sep 2019 03:01:25 -0700 (PDT)
-Received: from redhat.com ([80.74.107.118])
-        by smtp.gmail.com with ESMTPSA id x2sm7354038qkf.83.2019.09.10.03.01.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2019 03:01:24 -0700 (PDT)
-Date:   Tue, 10 Sep 2019 06:01:16 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kwankhede@nvidia.com, alex.williamson@redhat.com,
-        cohuck@redhat.com, tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, idos@mellanox.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com
-Subject: Re: [RFC PATCH 3/4] virtio: introudce a mdev based transport
-Message-ID: <20190910055744-mutt-send-email-mst@kernel.org>
-References: <20190910081935.30516-1-jasowang@redhat.com>
- <20190910081935.30516-4-jasowang@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 9FE0481DE1;
+        Tue, 10 Sep 2019 10:14:34 +0000 (UTC)
+Received: from [10.36.118.106] (unknown [10.36.118.106])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D3D15C226;
+        Tue, 10 Sep 2019 10:14:33 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 1/6] s390x: Use interrupts in SCLP and
+ add locking
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
+References: <20190905103951.36522-1-frankja@linux.ibm.com>
+ <20190905103951.36522-2-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <bc431c45-3cb5-8f8e-e8ec-2f0011f454b2@redhat.com>
+Date:   Tue, 10 Sep 2019 12:14:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190910081935.30516-4-jasowang@redhat.com>
+In-Reply-To: <20190905103951.36522-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Tue, 10 Sep 2019 10:14:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 10, 2019 at 04:19:34PM +0800, Jason Wang wrote:
-> This path introduces a new mdev transport for virtio. This is used to
-> use kernel virtio driver to drive the mediated device that is capable
-> of populating virtqueue directly.
+On 05.09.19 12:39, Janosch Frank wrote:
+> We need to properly implement interrupt handling for SCLP, because on
+> z/VM and LPAR SCLP calls are not synchronous!
 > 
-> A new virtio-mdev driver will be registered to the mdev bus, when a
-> new virtio-mdev device is probed, it will register the device with
-> mdev based config ops. This means, unlike the exist hardware
-> transport, this is a software transport between mdev driver and mdev
-> device. The transport was implemented through:
+> Also with smp CPUs have to compete for sclp. Let's add some locking,
+> so they execute sclp calls in an orderly fashion and don't compete for
+> the data buffer.
 > 
-> - configuration access was implemented through parent_ops->read()/write()
-> - vq/config callback was implemented through parent_ops->ioctl()
-> 
-> This transport is derived from virtio MMIO protocol and was wrote for
-> kernel driver. But for the transport itself, but the design goal is to
-> be generic enough to support userspace driver (this part will be added
-> in the future).
-> 
-> Note:
-> - current mdev assume all the parameter of parent_ops was from
->   userspace. This prevents us from implementing the kernel mdev
->   driver. For a quick POC, this patch just abuse those parameter and
->   assume the mdev device implementation will treat them as kernel
->   pointer. This should be addressed in the formal series by extending
->   mdev_parent_ops.
-> - for a quick POC, I just drive the transport from MMIO, I'm pretty
->   there's lot of optimization space for this.
-> 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  drivers/vfio/mdev/Kconfig        |   7 +
->  drivers/vfio/mdev/Makefile       |   1 +
->  drivers/vfio/mdev/virtio_mdev.c  | 500 +++++++++++++++++++++++++++++++
->  include/uapi/linux/virtio_mdev.h | 131 ++++++++
->  4 files changed, 639 insertions(+)
->  create mode 100644 drivers/vfio/mdev/virtio_mdev.c
->  create mode 100644 include/uapi/linux/virtio_mdev.h
+>  lib/s390x/asm/interrupt.h |  2 ++
+>  lib/s390x/interrupt.c     | 12 +++++++--
+>  lib/s390x/sclp-console.c  |  2 ++
+>  lib/s390x/sclp.c          | 55 +++++++++++++++++++++++++++++++++++++--
+>  lib/s390x/sclp.h          |  3 +++
+>  5 files changed, 70 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/vfio/mdev/Kconfig b/drivers/vfio/mdev/Kconfig
-> index 5da27f2100f9..c488c31fc137 100644
-> --- a/drivers/vfio/mdev/Kconfig
-> +++ b/drivers/vfio/mdev/Kconfig
-> @@ -16,3 +16,10 @@ config VFIO_MDEV_DEVICE
->  	default n
->  	help
->  	  VFIO based driver for Mediated devices.
-> +
-> +config VIRTIO_MDEV_DEVICE
-> +	tristate "VIRTIO driver for Mediated devices"
-> +	depends on VFIO_MDEV && VIRTIO
-> +	default n
-> +	help
-> +	  VIRTIO based driver for Mediated devices.
-> diff --git a/drivers/vfio/mdev/Makefile b/drivers/vfio/mdev/Makefile
-> index 101516fdf375..99d31e29c23e 100644
-> --- a/drivers/vfio/mdev/Makefile
-> +++ b/drivers/vfio/mdev/Makefile
-> @@ -4,3 +4,4 @@ mdev-y := mdev_core.o mdev_sysfs.o mdev_driver.o
+> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+> index 013709f..f485e96 100644
+> --- a/lib/s390x/asm/interrupt.h
+> +++ b/lib/s390x/asm/interrupt.h
+> @@ -11,6 +11,8 @@
+>  #define _ASMS390X_IRQ_H_
+>  #include <asm/arch_def.h>
 >  
->  obj-$(CONFIG_VFIO_MDEV) += mdev.o
->  obj-$(CONFIG_VFIO_MDEV_DEVICE) += vfio_mdev.o
-> +obj-$(CONFIG_VIRTIO_MDEV_DEVICE) += virtio_mdev.o
-> diff --git a/drivers/vfio/mdev/virtio_mdev.c b/drivers/vfio/mdev/virtio_mdev.c
-> new file mode 100644
-> index 000000000000..5ff09089297e
-> --- /dev/null
-> +++ b/drivers/vfio/mdev/virtio_mdev.c
-> @@ -0,0 +1,500 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * VIRTIO based driver for Mediated device
-> + *
-> + * Copyright (c) 2019, Red Hat. All rights reserved.
-> + *     Author: Jason Wang <jasowang@redhat.com>
-> + *
-> + * Based on Virtio MMIO driver.
-> + */
+> +#define EXT_IRQ_SERVICE_SIG	0x2401
 > +
-> +#include <linux/init.h>
-> +#include <linux/module.h>
-> +#include <linux/device.h>
-> +#include <linux/kernel.h>
-> +#include <linux/slab.h>
-> +#include <linux/uuid.h>
-> +#include <linux/mdev.h>
-> +#include <linux/virtio.h>
-> +#include <linux/virtio_config.h>
-> +#include <linux/virtio_ring.h>
-> +#include <uapi/linux/virtio_mdev.h>
-> +#include "mdev_private.h"
-> +
-> +#define DRIVER_VERSION  "0.1"
-> +#define DRIVER_AUTHOR   "Red Hat Corporation"
-> +#define DRIVER_DESC     "VIRTIO based driver for Mediated device"
-> +
-> +#define to_virtio_mdev_device(dev) \
-> +	container_of(dev, struct virtio_mdev_device, vdev)
-> +
-> +struct virtio_mdev_device {
-> +	struct virtio_device vdev;
-> +	struct mdev_device *mdev;
-> +	unsigned long version;
-> +
-> +	struct virtqueue **vqs;
-> +	spinlock_t lock;
-> +};
-> +
-> +struct virtio_mdev_vq_info {
-> +	/* the actual virtqueue */
-> +	struct virtqueue *vq;
-> +
-> +	/* the list node for the virtqueues list */
-> +	struct list_head node;
-> +};
-> +
-> +static u32 virtio_mdev_readl(struct mdev_device *mdev,
-> +			     loff_t off)
-> +{
-> +	struct mdev_parent *parent = mdev->parent;
-> +	ssize_t len;
-> +	u32 val;
-> +
-> +	if (unlikely(!parent->ops->read))
-> +		return 0xFFFFFFFF;
-> +
-> +	len = parent->ops->read(mdev, (char *)&val, 4, &off);
-> +	if (len != 4)
-> +		return 0xFFFFFFFF;
-> +
-> +	return val;
-> +}
-> +
-> +static void virtio_mdev_writel(struct mdev_device *mdev,
-> +			       loff_t off, u32 val)
-> +{
-> +	struct mdev_parent *parent = mdev->parent;
-> +
-> +	if (unlikely(!parent->ops->write))
-> +		return;
-> +
-> +	parent->ops->write(mdev, (char *)&val, 4, &off);
-> +
-> +	return;
-> +}
-> +
-> +static void virtio_mdev_get(struct virtio_device *vdev, unsigned offset,
-> +			    void *buf, unsigned len)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +	struct mdev_device *mdev = vm_dev->mdev;
-> +	struct mdev_parent *parent = mdev->parent;
-> +
-> +	loff_t off = offset + VIRTIO_MDEV_CONFIG;
-> +
-> +	switch (len) {
-> +	case 1:
-> +		*(u8 *)buf = parent->ops->read(mdev, buf, 1, &off);
-> +		break;
-> +	case 2:
-> +		*(u16 *)buf = parent->ops->read(mdev, buf, 2, &off);
-> +		break;
-> +	case 4:
-> +		*(u32 *)buf = parent->ops->read(mdev, buf, 4, &off);
-> +		break;
-> +	case 8:
-> +		*(u32 *)buf = parent->ops->read(mdev, buf, 4, &off);
-> +		*((u32 *)buf + 1) = parent->ops->read(mdev, buf, 4, &off);
-> +		break;
-> +	default:
-> +		BUG();
+>  void handle_pgm_int(void);
+>  void handle_ext_int(void);
+>  void handle_mcck_int(void);
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index cf0a794..7832711 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -12,6 +12,7 @@
+>  #include <libcflat.h>
+>  #include <asm/interrupt.h>
+>  #include <asm/barrier.h>
+> +#include <sclp.h>
+>  
+>  static bool pgm_int_expected;
+>  static struct lowcore *lc;
+> @@ -107,8 +108,15 @@ void handle_pgm_int(void)
+>  
+>  void handle_ext_int(void)
+>  {
+> -	report_abort("Unexpected external call interrupt: at %#lx",
+> -		     lc->ext_old_psw.addr);
+> +	if (lc->ext_int_code != EXT_IRQ_SERVICE_SIG) {
+> +		report_abort("Unexpected external call interrupt: at %#lx",
+> +			     lc->ext_old_psw.addr);
+> +	} else {
+> +		lc->ext_old_psw.mask &= ~PSW_MASK_EXT;
+> +		lc->sw_int_cr0 &= ~(1UL << 9);
+> +		sclp_handle_ext();
+> +		lc->ext_int_code = 0;
 > +	}
+>  }
+>  
+>  void handle_mcck_int(void)
+> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
+> index bc01f41..a5ef45f 100644
+> --- a/lib/s390x/sclp-console.c
+> +++ b/lib/s390x/sclp-console.c
+> @@ -17,6 +17,7 @@ static void sclp_set_write_mask(void)
+>  {
+>  	WriteEventMask *sccb = (void *)_sccb;
+>  
+> +	sclp_mark_busy();
+>  	sccb->h.length = sizeof(WriteEventMask);
+>  	sccb->mask_length = sizeof(unsigned int);
+>  	sccb->receive_mask = SCLP_EVENT_MASK_MSG_ASCII;
+> @@ -37,6 +38,7 @@ void sclp_print(const char *str)
+>  	int len = strlen(str);
+>  	WriteEventData *sccb = (void *)_sccb;
+>  
+> +	sclp_mark_busy();
+>  	sccb->h.length = sizeof(WriteEventData) + len;
+>  	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
+>  	sccb->ebh.length = sizeof(EventBufferHeader) + len;
+> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+> index b60f7a4..56fca0c 100644
+> --- a/lib/s390x/sclp.c
+> +++ b/lib/s390x/sclp.c
+> @@ -14,6 +14,8 @@
+>  #include <asm/page.h>
+>  #include <asm/arch_def.h>
+>  #include <asm/interrupt.h>
+> +#include <asm/barrier.h>
+> +#include <asm/spinlock.h>
+>  #include "sclp.h"
+>  #include <alloc_phys.h>
+>  #include <alloc_page.h>
+> @@ -25,6 +27,8 @@ static uint64_t max_ram_size;
+>  static uint64_t ram_size;
+>  
+>  char _sccb[PAGE_SIZE] __attribute__((__aligned__(4096)));
+> +static volatile bool sclp_busy;
+> +static struct spinlock sclp_lock;
+>  
+>  static void mem_init(phys_addr_t mem_end)
+>  {
+> @@ -41,17 +45,62 @@ static void mem_init(phys_addr_t mem_end)
+>  	page_alloc_ops_enable();
+>  }
+>  
+> +static void sclp_setup_int(void)
+> +{
+> +	uint64_t mask;
 > +
-> +	return;
+> +	ctl_set_bit(0, 9);
+> +
+> +	mask = extract_psw_mask();
+> +	mask |= PSW_MASK_EXT;
+> +	load_psw_mask(mask);
 > +}
 > +
-> +static void virtio_mdev_set(struct virtio_device *vdev, unsigned offset,
-> +			    const void *buf, unsigned len)
+> +void sclp_handle_ext(void)
 > +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +	struct mdev_device *mdev = vm_dev->mdev;
-> +	struct mdev_parent *parent = mdev->parent;
-> +	loff_t off = offset + VIRTIO_MDEV_CONFIG;
-> +
-> +	switch (len) {
-> +	case 1:
-> +	case 2:
-> +	case 4:
-> +	case 8:
-> +		break;
-> +	default:
-> +		BUG();
-> +	}
-> +
-> +	parent->ops->write(mdev, buf, len, &off);
-> +
-> +	return;
+> +	ctl_clear_bit(0, 9);
+> +	spin_lock(&sclp_lock);
+> +	sclp_busy = false;
+> +	spin_unlock(&sclp_lock);
 > +}
 > +
-> +static u32 virtio_mdev_generation(struct virtio_device *vdev)
+> +void sclp_wait_busy(void)
 > +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +
-> +	if (vm_dev->version == 1)
-> +		return 0;
-> +	else
-> +		return virtio_mdev_readl(vm_dev->mdev,
-> +					 VIRTIO_MDEV_CONFIG_GENERATION);
+> +	while (sclp_busy)
+> +		mb();
 > +}
 > +
-> +static u8 virtio_mdev_get_status(struct virtio_device *vdev)
+> +void sclp_mark_busy(void)
 > +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +
-> +	return virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_STATUS) & 0xff;
-> +}
-> +
-> +static void virtio_mdev_set_status(struct virtio_device *vdev, u8 status)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_STATUS, status);
-> +}
-> +
-> +static void virtio_mdev_reset(struct virtio_device *vdev)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_STATUS, 0);
-> +}
-> +
-> +static bool virtio_mdev_notify(struct virtqueue *vq)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vq->vdev);
-> +
-> +	/* We write the queue's selector into the notification register to
-> +	 * signal the other end */
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_NOTIFY,
-> +			   vq->index);
-> +	return true;
-> +}
-> +
-> +static irqreturn_t virtio_mdev_config_cb(void *private)
-> +{
-> +	struct virtio_mdev_device *vm_dev = private;
-> +
-> +	virtio_config_changed(&vm_dev->vdev);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static irqreturn_t virtio_mdev_virtqueue_cb(void *private)
-> +{
-> +	struct virtio_mdev_vq_info *info = private;
-> +
-> +	return vring_interrupt(0, info->vq);
-> +}
-> +
-> +static struct virtqueue *
-> +virtio_mdev_setup_vq(struct virtio_device *vdev, unsigned index,
-> +		     void (*callback)(struct virtqueue *vq),
-> +		     const char *name, bool ctx)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +	struct mdev_device *mdev= vm_dev->mdev;
-> +	struct mdev_parent *parent = mdev->parent;
-> +	struct virtio_mdev_vq_info *info;
-> +	struct virtio_mdev_callback cb;
-> +	struct virtqueue *vq;
-> +	unsigned long flags;
-> +	u32 align, num;
-> +	u64 addr;
-> +	int err;
-> +
-> +	if (!name)
-> +		return NULL;
-> +
-> +	/* Select the queue we're interested in */
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_SEL, index);
-> +
-> +	/* Queue shouldn't already be set up. */
-> +	if (virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_QUEUE_READY)) {
-> +		err = -ENOENT;
-> +		goto error_available;
-> +	}
-> +
-> +	/* Allocate and fill out our active queue description */
-> +	info = kmalloc(sizeof(*info), GFP_KERNEL);
-> +	if (!info) {
-> +		err = -ENOMEM;
-> +		goto error_kmalloc;
-> +	}
-> +
-> +	num = virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_QUEUE_NUM_MAX);
-> +	if (num == 0) {
-> +		err = -ENOENT;
-> +		goto error_new_virtqueue;
-> +	}
-> +
-> +	/* Create the vring */
-> +	align = virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_QUEUE_ALIGN);
-> +	vq = vring_create_virtqueue(index, num, align, vdev,
-> +				    true, true, ctx,
-> +				    virtio_mdev_notify, callback, name);
-> +	if (!vq) {
-> +		err = -ENOMEM;
-> +		goto error_new_virtqueue;
-> +	}
-> +
-> +	/* Setup virtqueue callback */
-> +	cb.callback = virtio_mdev_virtqueue_cb;
-> +	cb.private = info;
-> +	err = parent->ops->ioctl(mdev, VIRTIO_MDEV_SET_VQ_CALLBACK,
-> +				 (unsigned long)&cb);
-> +	if (err) {
-> +		err = -EINVAL;
-> +		goto error_callback;
-> +	}
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_NUM,
-> +			   virtqueue_get_vring_size(vq));
-> +	addr = virtqueue_get_desc_addr(vq);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_DESC_LOW, (u32)addr);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_DESC_HIGH,
-> +			   (u32)(addr >> 32));
-> +
-> +	addr = virtqueue_get_avail_addr(vq);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_AVAIL_LOW, (u32)addr);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_AVAIL_HIGH,
-> +			   (u32)(addr >> 32));
-> +
-> +	addr = virtqueue_get_used_addr(vq);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_USED_LOW, (u32)addr);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_USED_HIGH, (u32)(addr >> 32));
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_READY, 1);
-> +
-> +	vq->priv = info;
-> +	info->vq = vq;
-> +
-> +	return vq;
-> +
-> +error_callback:
-> +	vring_del_virtqueue(vq);
-> +error_new_virtqueue:
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_READY, 0);
-> +	WARN_ON(virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_QUEUE_READY));
-> +	kfree(info);
-> +error_kmalloc:
-> +error_available:
-> +	return ERR_PTR(err);
-> +
-> +}
-> +
-> +static void virtio_mdev_del_vq(struct virtqueue *vq)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vq->vdev);
-> +	struct virtio_mdev_vq_info *info = vq->priv;
-> +	unsigned long flags;
-> +	unsigned int index = vq->index;
-> +
-> +	/* Select and deactivate the queue */
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_QUEUE_SEL, index);
-> +	virtio_mdev_writel(vm_dev->mdev,VIRTIO_MDEV_QUEUE_READY, 0);
-> +	WARN_ON(virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_QUEUE_READY));
-> +
-> +	vring_del_virtqueue(vq);
-> +
-> +	kfree(info);
-> +}
-> +
-> +static void virtio_mdev_del_vqs(struct virtio_device *vdev)
-> +{
-> +	struct virtqueue *vq, *n;
-> +
-> +	list_for_each_entry_safe(vq, n, &vdev->vqs, list)
-> +		virtio_mdev_del_vq(vq);
-> +
-> +	return;
-> +}
-> +
-> +static int virtio_mdev_find_vqs(struct virtio_device *vdev, unsigned nvqs,
-> +				struct virtqueue *vqs[],
-> +				vq_callback_t *callbacks[],
-> +				const char * const names[],
-> +				const bool *ctx,
-> +				struct irq_affinity *desc)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +	struct mdev_device *mdev = vm_dev->mdev;
-> +	struct mdev_parent *parent = mdev->parent;
-> +	struct virtio_mdev_callback cb;
-> +	int i, err, queue_idx = 0;
-> +	vm_dev->vqs = kmalloc_array(queue_idx, sizeof(*vm_dev->vqs),
-> +				    GFP_KERNEL);
-> +	if (!vm_dev->vqs)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < nvqs; ++i) {
-> +		if (!names[i]) {
-> +			vqs[i] = NULL;
-> +			continue;
+> +	/*
+> +	 * With multiple CPUs we might need to wait for another CPU's
+> +	 * request before grabbing the busy indication.
+> +	 */
+> +	while (true) {
+> +		sclp_wait_busy();
+> +		spin_lock(&sclp_lock);
+> +		if (!sclp_busy) {
+> +			sclp_busy = true;
+> +			spin_unlock(&sclp_lock);
+> +			return;
 > +		}
-> +
-> +		vqs[i] = virtio_mdev_setup_vq(vdev, queue_idx++,
-> +					      callbacks[i], names[i], ctx ?
-> +					      ctx[i] : false);
-> +		if (IS_ERR(vqs[i])) {
-> +			err = PTR_ERR(vqs[i]);
-> +			goto err_setup_vq;
-> +		}
+> +		spin_unlock(&sclp_lock);
 > +	}
-> +
-> +	cb.callback = virtio_mdev_config_cb;
-> +	cb.private = vm_dev;
-> +	err = parent->ops->ioctl(mdev, VIRTIO_MDEV_SET_CONFIG_CALLBACK,
-> +				 (unsigned long)&cb);
-> +	if (err)
-> +		goto err_setup_vq;
-> +
-> +	return 0;
-> +
-> +err_setup_vq:
-> +	kfree(vm_dev->vqs);
-> +	virtio_mdev_del_vqs(vdev);
-> +	return err;
 > +}
 > +
-> +static u64 virtio_mdev_get_features(struct virtio_device *vdev)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +	u64 features;
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_DEVICE_FEATURES_SEL, 1);
-> +	features = virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_DEVICE_FEATURES);
-> +	features <<= 32;
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_DEVICE_FEATURES_SEL, 0);
-> +	features |= virtio_mdev_readl(vm_dev->mdev, VIRTIO_MDEV_DEVICE_FEATURES);
-> +
-> +	return features;
-> +}
-> +
-> +static int virtio_mdev_finalize_features(struct virtio_device *vdev)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +
-> +	/* Give virtio_ring a chance to accept features. */
-> +	vring_transport_features(vdev);
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_DRIVER_FEATURES_SEL, 1);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_DRIVER_FEATURES,
-> +			   (u32)(vdev->features >> 32));
-> +
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_DRIVER_FEATURES_SEL, 0);
-> +	virtio_mdev_writel(vm_dev->mdev, VIRTIO_MDEV_DRIVER_FEATURES,
-> +			   (u32)vdev->features);
-> +
-> +	return 0;
-> +}
-> +
-> +static const char *virtio_mdev_bus_name(struct virtio_device *vdev)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +	struct mdev_device *mdev = vm_dev->mdev;
-> +
-> +	return dev_name(&mdev->dev);
-> +}
-> +
-> +static const struct virtio_config_ops virtio_mdev_config_ops = {
-> +	.get		= virtio_mdev_get,
-> +	.set		= virtio_mdev_set,
-> +	.generation	= virtio_mdev_generation,
-> +	.get_status	= virtio_mdev_get_status,
-> +	.set_status	= virtio_mdev_set_status,
-> +	.reset		= virtio_mdev_reset,
-> +	.find_vqs	= virtio_mdev_find_vqs,
-> +	.del_vqs	= virtio_mdev_del_vqs,
-> +	.get_features	= virtio_mdev_get_features,
-> +	.finalize_features = virtio_mdev_finalize_features,
-> +	.bus_name	= virtio_mdev_bus_name,
-> +};
-> +
-> +static void virtio_mdev_release_dev(struct device *_d)
-> +{
-> +	struct virtio_device *vdev =
-> +	       container_of(_d, struct virtio_device, dev);
-> +	struct virtio_mdev_device *vm_dev =
-> +	       container_of(vdev, struct virtio_mdev_device, vdev);
-> +
-> +	devm_kfree(_d, vm_dev);
-> +}
-> +
-> +static int virtio_mdev_probe(struct device *dev)
-> +{
-> +	struct mdev_device *mdev = to_mdev_device(dev);
-> +	struct virtio_mdev_device *vm_dev;
-> +	unsigned long magic;
-> +	int rc;
-> +
-> +	magic = virtio_mdev_readl(mdev, VIRTIO_MDEV_MAGIC_VALUE);
-> +	if (magic != ('v' | 'i' << 8 | 'r' << 16 | 't' << 24)) {
-> +		dev_warn(dev, "Wrong magic value 0x%08lx!\n", magic);
-> +		return -ENODEV;
-> +	}
-> +
-> +	vm_dev = devm_kzalloc(dev, sizeof(*vm_dev), GFP_KERNEL);
-> +	if (!vm_dev)
-> +		return -ENOMEM;
-> +
-> +	vm_dev->vdev.dev.parent = dev;
-> +	vm_dev->vdev.dev.release = virtio_mdev_release_dev;
-> +	vm_dev->vdev.config = &virtio_mdev_config_ops;
-> +	vm_dev->mdev = mdev;
-> +	vm_dev->vqs = NULL;
-> +	spin_lock_init(&vm_dev->lock);
-> +
-> +	vm_dev->version = virtio_mdev_readl(mdev, VIRTIO_MDEV_VERSION);
-> +	if (vm_dev->version != 1) {
-> +		dev_err(dev, "Version %ld not supported!\n",
-> +			vm_dev->version);
-> +		return -ENXIO;
-> +	}
-> +
-> +	vm_dev->vdev.id.device = virtio_mdev_readl(mdev, VIRTIO_MDEV_DEVICE_ID);
-> +	if (vm_dev->vdev.id.device == 0)
-> +		return -ENODEV;
-> +
-> +	vm_dev->vdev.id.vendor = virtio_mdev_readl(mdev, VIRTIO_MDEV_VENDOR_ID);
-> +	rc = register_virtio_device(&vm_dev->vdev);
-> +	if (rc)
-> +		put_device(dev);
-> +
-> +	dev_set_drvdata(dev, vm_dev);
-> +
-> +	return rc;
-> +
-> +}
-> +
-> +static void virtio_mdev_remove(struct device *dev)
-> +{
-> +	struct virtio_mdev_device *vm_dev = dev_get_drvdata(dev);
-> +
-> +	unregister_virtio_device(&vm_dev->vdev);
-> +}
-> +
-> +static struct mdev_driver virtio_mdev_driver = {
-> +	.name	= "virtio_mdev",
-> +	.probe	= virtio_mdev_probe,
-> +	.remove	= virtio_mdev_remove,
-> +};
-> +
-> +static int __init virtio_mdev_init(void)
-> +{
-> +	return mdev_register_driver(&virtio_mdev_driver, THIS_MODULE);
-> +}
-> +
-> +static void __exit virtio_mdev_exit(void)
-> +{
-> +	mdev_unregister_driver(&virtio_mdev_driver);
-> +}
-> +
-> +module_init(virtio_mdev_init)
-> +module_exit(virtio_mdev_exit)
-> +
-> +MODULE_VERSION(DRIVER_VERSION);
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_AUTHOR(DRIVER_AUTHOR);
-> +MODULE_DESCRIPTION(DRIVER_DESC);
-> diff --git a/include/uapi/linux/virtio_mdev.h b/include/uapi/linux/virtio_mdev.h
-> new file mode 100644
-> index 000000000000..8040de6b960a
-> --- /dev/null
-> +++ b/include/uapi/linux/virtio_mdev.h
-> @@ -0,0 +1,131 @@
-> +/*
-> + * Virtio mediated device driver
-> + *
-> + * Copyright 2019, Red Hat Corp.
-> + *
-> + * Based on Virtio MMIO driver by ARM Ltd, copyright ARM Ltd. 2011
-> + *
-> + * This header is BSD licensed so anyone can use the definitions to implement
-> + * compatible drivers/servers.
-> + *
-> + * Redistribution and use in source and binary forms, with or without
-> + * modification, are permitted provided that the following conditions
-> + * are met:
-> + * 1. Redistributions of source code must retain the above copyright
-> + *    notice, this list of conditions and the following disclaimer.
-> + * 2. Redistributions in binary form must reproduce the above copyright
-> + *    notice, this list of conditions and the following disclaimer in the
-> + *    documentation and/or other materials provided with the distribution.
-> + * 3. Neither the name of IBM nor the names of its contributors
-> + *    may be used to endorse or promote products derived from this software
-> + *    without specific prior written permission.
-> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
-> + * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-> + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-> + * ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR CONTRIBUTORS BE LIABLE
-> + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-> + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-> + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-> + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-> + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-> + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-> + * SUCH DAMAGE.
-> + */
-> +#ifndef _LINUX_VIRTIO_MDEV_H
-> +#define _LINUX_VIRTIO_MDEV_H
-> +
-> +#include <linux/interrupt.h>
-> +#include <linux/vringh.h>
-> +#include <uapi/linux/virtio_net.h>
-> +
-> +/*
-> + * Ioctls
-> + */
+>  static void sclp_read_scp_info(ReadInfo *ri, int length)
+>  {
+>  	unsigned int commands[] = { SCLP_CMDW_READ_SCP_INFO_FORCED,
+>  				    SCLP_CMDW_READ_SCP_INFO };
+> -	int i;
+> +	int i, cc;
+>  
+>  	for (i = 0; i < ARRAY_SIZE(commands); i++) {
+> +		sclp_mark_busy();
+>  		memset(&ri->h, 0, sizeof(ri->h));
+>  		ri->h.length = length;
+>  
+> -		if (sclp_service_call(commands[i], ri))
+> +		cc = sclp_service_call(commands[i], ri);
+> +		if (cc)
+>  			break;
+>  		if (ri->h.response_code == SCLP_RC_NORMAL_READ_COMPLETION)
+>  			return;
+> @@ -66,12 +115,14 @@ int sclp_service_call(unsigned int command, void *sccb)
+>  {
+>  	int cc;
+>  
+> +	sclp_setup_int();
+>  	asm volatile(
+>  		"       .insn   rre,0xb2200000,%1,%2\n"  /* servc %1,%2 */
+>  		"       ipm     %0\n"
+>  		"       srl     %0,28"
+>  		: "=&d" (cc) : "d" (command), "a" (__pa(sccb))
+>  		: "cc", "memory");
+> +	sclp_wait_busy();
+>  	if (cc == 3)
+>  		return -1;
+>  	if (cc == 2)
+> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+> index 583c4e5..63cf609 100644
+> --- a/lib/s390x/sclp.h
+> +++ b/lib/s390x/sclp.h
+> @@ -213,6 +213,9 @@ typedef struct ReadEventData {
+>  } __attribute__((packed)) ReadEventData;
+>  
+>  extern char _sccb[];
+> +void sclp_handle_ext(void);
+> +void sclp_wait_busy(void);
+> +void sclp_mark_busy(void);
+>  void sclp_console_setup(void);
+>  void sclp_print(const char *str);
+>  int sclp_service_call(unsigned int command, void *sccb);
+> 
 
+I was wondering whether it would make sense to enable sclp interrupts as
+default for all CPUs (once in a reasonable state after brought up), and
+simply let any CPU process the request. Initially, we could only let the
+boot CPU handle them.
 
-Pls add a bit more content here. It's redundant to state these
-are ioctls. Much better to document what does each one do.
+You already decoupled sclp_mark_busy() and sclp_setup_int() already. The
+part would have to be moved to the CPU init stage and sclp_handle_ext()
+would simply not clear the interrupt-enable flag.
 
-> +
-> +struct virtio_mdev_callback {
-> +	irqreturn_t (*callback)(void *);
-> +	void *private;
-> +};
-> +
-> +#define VIRTIO_MDEV 0xAF
-> +#define VIRTIO_MDEV_SET_VQ_CALLBACK _IOW(VIRTIO_MDEV, 0x00, \
-> +					 struct virtio_mdev_callback)
-> +#define VIRTIO_MDEV_SET_CONFIG_CALLBACK _IOW(VIRTIO_MDEV, 0x01, \
-> +					struct virtio_mdev_callback)
+Opinions?
 
-Function pointer in an ioctl parameter? How does this ever make sense?
-And can't we use a couple of registers for this, and avoid ioctls?
+-- 
 
-> +
-> +#define VIRTIO_MDEV_DEVICE_API_STRING		"virtio-mdev"
-> +
-> +/*
-> + * Control registers
-> + */
-> +
-> +/* Magic value ("virt" string) - Read Only */
-> +#define VIRTIO_MDEV_MAGIC_VALUE		0x000
-> +
-> +/* Virtio device version - Read Only */
-> +#define VIRTIO_MDEV_VERSION		0x004
-> +
-> +/* Virtio device ID - Read Only */
-> +#define VIRTIO_MDEV_DEVICE_ID		0x008
-> +
-> +/* Virtio vendor ID - Read Only */
-> +#define VIRTIO_MDEV_VENDOR_ID		0x00c
-> +
-> +/* Bitmask of the features supported by the device (host)
-> + * (32 bits per set) - Read Only */
-> +#define VIRTIO_MDEV_DEVICE_FEATURES	0x010
-> +
-> +/* Device (host) features set selector - Write Only */
-> +#define VIRTIO_MDEV_DEVICE_FEATURES_SEL	0x014
-> +
-> +/* Bitmask of features activated by the driver (guest)
-> + * (32 bits per set) - Write Only */
-> +#define VIRTIO_MDEV_DRIVER_FEATURES	0x020
-> +
-> +/* Activated features set selector - Write Only */
-> +#define VIRTIO_MDEV_DRIVER_FEATURES_SEL	0x024
-> +
-> +/* Queue selector - Write Only */
-> +#define VIRTIO_MDEV_QUEUE_SEL		0x030
-> +
-> +/* Maximum size of the currently selected queue - Read Only */
-> +#define VIRTIO_MDEV_QUEUE_NUM_MAX	0x034
-> +
-> +/* Queue size for the currently selected queue - Write Only */
-> +#define VIRTIO_MDEV_QUEUE_NUM		0x038
-> +
-> +/* Ready bit for the currently selected queue - Read Write */
-> +#define VIRTIO_MDEV_QUEUE_READY		0x044
+Thanks,
 
-Is this same as started?
-
-> +
-> +/* Alignment of virtqueue - Read Only */
-> +#define VIRTIO_MDEV_QUEUE_ALIGN		0x048
-> +
-> +/* Queue notifier - Write Only */
-> +#define VIRTIO_MDEV_QUEUE_NOTIFY	0x050
-> +
-> +/* Device status register - Read Write */
-> +#define VIRTIO_MDEV_STATUS		0x060
-> +
-> +/* Selected queue's Descriptor Table address, 64 bits in two halves */
-> +#define VIRTIO_MDEV_QUEUE_DESC_LOW	0x080
-> +#define VIRTIO_MDEV_QUEUE_DESC_HIGH	0x084
-> +
-> +/* Selected queue's Available Ring address, 64 bits in two halves */
-> +#define VIRTIO_MDEV_QUEUE_AVAIL_LOW	0x090
-> +#define VIRTIO_MDEV_QUEUE_AVAIL_HIGH	0x094
-> +
-> +/* Selected queue's Used Ring address, 64 bits in two halves */
-> +#define VIRTIO_MDEV_QUEUE_USED_LOW	0x0a0
-> +#define VIRTIO_MDEV_QUEUE_USED_HIGH	0x0a4
-> +
-> +/* Configuration atomicity value */
-> +#define VIRTIO_MDEV_CONFIG_GENERATION	0x0fc
-> +
-> +/* The config space is defined by each driver as
-> + * the per-driver configuration space - Read Write */
-> +#define VIRTIO_MDEV_CONFIG		0x100
-
-Mixing device and generic config space is what virtio pci did,
-caused lots of problems with extensions.
-It would be better to reserve much more space.
-
-
-> +
-> +#endif
-> +
-> +
-> +/* Ready bit for the currently selected queue - Read Write */
-> -- 
-> 2.19.1
+David / dhildenb
