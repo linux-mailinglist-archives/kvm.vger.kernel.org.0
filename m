@@ -2,140 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C65AAED70
-	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:44:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE1D9AED77
+	for <lists+kvm@lfdr.de>; Tue, 10 Sep 2019 16:44:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392988AbfIJOmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 10:42:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52692 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392981AbfIJOmC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 10:42:02 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BF56E2A09CE
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 14:42:01 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id b9so9057989wrt.5
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 07:42:01 -0700 (PDT)
+        id S2393424AbfIJOmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 10:42:55 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:34360 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732465AbfIJOmz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 10:42:55 -0400
+Received: by mail-io1-f68.google.com with SMTP id k13so22848847ioj.1;
+        Tue, 10 Sep 2019 07:42:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qwfqdrsthj6wGMKbVfq9KS+2D4+bl2wd+HAoXgrqGpM=;
+        b=mdlhWpzQsILASMQ7+1ikwT0fUSiwI9Yno2A8k95yLHD6P9eV0S05kOW5Jv6prsMvSt
+         iBXlVLmgNneBJJPewyY1Iz+eUwtz//m6IWYeMweTFXG1suDqKgsSJ2xCT/kZ1HcGuX4Y
+         n5DFuajmtetj/LpA2LEgEC9oiE4MlkG9fH5vD+eWjaUxrS6bT4PmDA2aOayknXG3RXII
+         9e0AvcNoE4ZxbCtIxiI/lT91HGh0dhQFb9BVLzxS7z4Bakuzjqvda8OJvgMc4cNBYsKq
+         JywENk314egMFnOMmeOVAlHQzPFr5FrWB11JMPxvnyAvp/9VaOr3lB+4BYVwvWI0USRT
+         DKkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bT12KRgZOTisqUXhqBmZuyXHkuoI5E2VzJwdrt5Ywu0=;
-        b=UvdaX9eNM7kBYfTiDM8kkhVuABRDnUL89C4utQ6Btd/I+5eM3uEY4WCgnxsjsOb/Pn
-         oidqY2M9YdDM6/TIymauD0VKQ6F0k2pYUNUCADJ5rrybL7bUaAoCnFBQ7jNazlJQO480
-         eEGr23BTNxO+DsUnS2kQe1BigdujXrCdG3bJVBkiuS9GYXG2L9odFtYGvmj9DInuW6gi
-         CfaYBFF8jtsW47wxHozI9pj4NFhZItaPyPlyU4KtMl1HexDVuVzcahVTwBexUYsCfDUV
-         m/p4QT0B/XNVOmoMbutd+xfSMXMQqx+6Zne7CrMhoiiknh2/azLC2grhg/E68NGVz1p3
-         MKGw==
-X-Gm-Message-State: APjAAAXhp5sFIOhR5waRbO5UjEFcyzY3xgtrD8tecHCVK6lEUStrw4VV
-        BzzNbBA3W7cDV7q6+14aax93LXDv5ZMISgtMPL8PhDzGoEQ46N12kOV8sOsVXssgqLKXakPvvA1
-        nOdpr/HpOjDPg
-X-Received: by 2002:adf:ef12:: with SMTP id e18mr26533945wro.65.1568126520273;
-        Tue, 10 Sep 2019 07:42:00 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxYCnJJYgIX4oew9IGSu9sfnNhgnO8lhKUywmdsYpWsRh5l50jOQx3zkdI6kX5X1a2V2STQFw==
-X-Received: by 2002:adf:ef12:: with SMTP id e18mr26533909wro.65.1568126520007;
-        Tue, 10 Sep 2019 07:42:00 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 189sm5004427wma.6.2019.09.10.07.41.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2019 07:41:59 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: Manually calculate reserved bits when loading
- PDPTRS
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Doug Reiland <doug.reiland@intel.com>
-References: <20190903233645.21125-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7a83d8a7-b751-1232-a35f-38f8d9b660f3@redhat.com>
-Date:   Tue, 10 Sep 2019 16:41:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qwfqdrsthj6wGMKbVfq9KS+2D4+bl2wd+HAoXgrqGpM=;
+        b=Z9LPZMhsolBeT8q3jBZpNieT2wYdkoa/4VTmTXMcfGuh2Y6jsWSoYgTaxevanmkA/k
+         1Q3SR6D2IVWgmcWBJumyvlN+SD0PWYd0PZeLkHQUVHz5xdwVcsm+IV/cMaowhPw9j14v
+         ftQ+3bWVwMvJ/rYd8bR92mNuZRDRTXPA0H0M7394VUrW1HnWrKe1/7C2L2xYZu4jrqGP
+         Q5Ehx5hdBngM+1emZFoaN0k/jc7QEeT1nIU0OcJ8kWa949foPkFugkL9uBSngWz3RFcJ
+         PPx1kVfzyJh+PqvbHNjGkE+QuHLBqMcAJiPQB6ZYg1BdfcsvMW0bXdFKzhgjEtDAoRWY
+         Up0g==
+X-Gm-Message-State: APjAAAWbYmT0uoHevvdwytI1PNgAz8HRx7+MufoYxRvNI6BXe/wNl6Dt
+        7VGbILc/Y59ylpi6KcXH+rgac/wt/0SFsRstpbQ=
+X-Google-Smtp-Source: APXvYqw25PAt3681VzSp2aKtn4HION8cnSVVgIaDxDN4t5As0qF4aUf02XL+Yw/GC74k1NJX1qc/ljlh1hZcV/Ap7TM=
+X-Received: by 2002:a02:9f16:: with SMTP id z22mr31770205jal.83.1568126574433;
+ Tue, 10 Sep 2019 07:42:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190903233645.21125-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190907172225.10910.34302.stgit@localhost.localdomain> <20190910124209.GY2063@dhcp22.suse.cz>
+In-Reply-To: <20190910124209.GY2063@dhcp22.suse.cz>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Tue, 10 Sep 2019 07:42:43 -0700
+Message-ID: <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fengguang Wu <fengguang.wu@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/09/19 01:36, Sean Christopherson wrote:
-> Manually generate the PDPTR reserved bit mask when explicitly loading
-> PDPTRs.  The reserved bits that are being tracked by the MMU reflect the
-> current paging mode, which is unlikely to be PAE paging in the vast
-> majority of flows that use load_pdptrs(), e.g. CR0 and CR4 emulation,
-> __set_sregs(), etc...  This can cause KVM to incorrectly signal a bad
-> PDPTR, or more likely, miss a reserved bit check and subsequently fail
-> a VM-Enter due to a bad VMCS.GUEST_PDPTR.
-> 
-> Add a one off helper to generate the reserved bits instead of sharing
-> code across the MMU's calculations and the PDPTR emulation.  The PDPTR
-> reserved bits are basically set in stone, and pushing a helper into
-> the MMU's calculation adds unnecessary complexity without improving
-> readability.
-> 
-> Oppurtunistically fix/update the comment for load_pdptrs().
-> 
-> Note, the buggy commit also introduced a deliberate functional change,
-> "Also remove bit 5-6 from rsvd_bits_mask per latest SDM.", which was
-> effectively (and correctly) reverted by commit cd9ae5fe47df ("KVM: x86:
-> Fix page-tables reserved bits").  A bit of SDM archaeology shows that
-> the SDM from late 2008 had a bug (likely a copy+paste error) where it
-> listed bits 6:5 as AVL and A for PDPTEs used for 4k entries but reserved
-> for 2mb entries.  I.e. the SDM contradicted itself, and bits 6:5 are and
-> always have been reserved.
-> 
-> Fixes: 20c466b56168d ("KVM: Use rsvd_bits_mask in load_pdptrs()")
-> Cc: stable@vger.kernel.org
-> Cc: Nadav Amit <nadav.amit@gmail.com>
-> Reported-by: Doug Reiland <doug.reiland@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/x86.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 290c3c3efb87..548cc6ef5408 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -674,8 +674,14 @@ static int kvm_read_nested_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn,
->  				       data, offset, len, access);
->  }
->  
-> +static inline u64 pdptr_rsvd_bits(struct kvm_vcpu *vcpu)
-> +{
-> +	return rsvd_bits(cpuid_maxphyaddr(vcpu), 63) | rsvd_bits(5, 8) |
-> +	       rsvd_bits(1, 2);
-> +}
-> +
->  /*
-> - * Load the pae pdptrs.  Return true is they are all valid.
-> + * Load the pae pdptrs.  Return 1 if they are all valid, 0 otherwise.
->   */
->  int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
->  {
-> @@ -694,8 +700,7 @@ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
->  	}
->  	for (i = 0; i < ARRAY_SIZE(pdpte); ++i) {
->  		if ((pdpte[i] & PT_PRESENT_MASK) &&
-> -		    (pdpte[i] &
-> -		     vcpu->arch.mmu->guest_rsvd_check.rsvd_bits_mask[0][2])) {
-> +		    (pdpte[i] & pdptr_rsvd_bits(vcpu))) {
->  			ret = 0;
->  			goto out;
->  		}
-> 
+On Tue, Sep 10, 2019 at 5:42 AM Michal Hocko <mhocko@kernel.org> wrote:
+>
+> I wanted to review "mm: Introduce Reported pages" just realize that I
+> have no clue on what is going on so returned to the cover and it didn't
+> really help much. I am completely unfamiliar with virtio so please bear
+> with me.
+>
+> On Sat 07-09-19 10:25:03, Alexander Duyck wrote:
+> [...]
+> > This series provides an asynchronous means of reporting to a hypervisor
+> > that a guest page is no longer in use and can have the data associated
+> > with it dropped. To do this I have implemented functionality that allows
+> > for what I am referring to as unused page reporting
+> >
+> > The functionality for this is fairly simple. When enabled it will allocate
+> > statistics to track the number of reported pages in a given free area.
+> > When the number of free pages exceeds this value plus a high water value,
+> > currently 32, it will begin performing page reporting which consists of
+> > pulling pages off of free list and placing them into a scatter list. The
+> > scatterlist is then given to the page reporting device and it will perform
+> > the required action to make the pages "reported", in the case of
+> > virtio-balloon this results in the pages being madvised as MADV_DONTNEED
+> > and as such they are forced out of the guest. After this they are placed
+> > back on the free list,
+>
+> And here I am reallly lost because "forced out of the guest" makes me
+> feel that those pages are no longer usable by the guest. So how come you
+> can add them back to the free list. I suspect understanding this part
+> will allow me to understand why we have to mark those pages and prevent
+> merging.
 
-Queued, thanks.
-
-Paolo
+Basically as the paragraph above mentions "forced out of the guest"
+really is just the hypervisor calling MADV_DONTNEED on the page in
+question. So the behavior is the same as any userspace application
+that calls MADV_DONTNEED where the contents are no longer accessible
+from userspace and attempting to access them will result in a fault
+and the page being populated with a zero fill on-demand page, or a
+copy of the file contents if the memory is file backed.
