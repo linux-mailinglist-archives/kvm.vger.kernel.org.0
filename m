@@ -2,255 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D347AAFAA5
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 12:43:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F21FCAFB70
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 13:36:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726724AbfIKKnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 06:43:19 -0400
-Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:60867 "EHLO
-        8.mo68.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726696AbfIKKnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 06:43:19 -0400
-X-Greylist: delayed 599 seconds by postgrey-1.27 at vger.kernel.org; Wed, 11 Sep 2019 06:43:16 EDT
-Received: from player159.ha.ovh.net (unknown [10.108.42.168])
-        by mo68.mail-out.ovh.net (Postfix) with ESMTP id 342FF142E73
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 12:25:34 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player159.ha.ovh.net (Postfix) with ESMTPSA id 6E9FA9989941;
-        Wed, 11 Sep 2019 10:25:26 +0000 (UTC)
-Date:   Wed, 11 Sep 2019 12:25:24 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Tunable to configure maximum # of
- vCPUs per VM
-Message-ID: <20190911122524.008d03d5@bahia.lan>
-In-Reply-To: <20190911023048.GI30740@umbus.fritz.box>
-References: <156813417397.1880979.6162333671088177553.stgit@bahia.tls.ibm.com>
-        <20190911023048.GI30740@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727576AbfIKLgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 07:36:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51928 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727302AbfIKLgX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 07:36:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 038DEAD08;
+        Wed, 11 Sep 2019 11:36:20 +0000 (UTC)
+Date:   Wed, 11 Sep 2019 13:36:19 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fengguang Wu <fengguang.wu@intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
+Message-ID: <20190911113619.GP4023@dhcp22.suse.cz>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190910124209.GY2063@dhcp22.suse.cz>
+ <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+ <20190910144713.GF2063@dhcp22.suse.cz>
+ <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
+ <20190910175213.GD4023@dhcp22.suse.cz>
+ <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/lnbvmABaUkvZBmQnfvgnyTi"; protocol="application/pgp-signature"
-X-Ovh-Tracer-Id: 14672164636565019110
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrtdefgddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/lnbvmABaUkvZBmQnfvgnyTi
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue 10-09-19 14:23:40, Alexander Duyck wrote:
+[...]
+> We don't put any limitations on the allocator other then that it needs to
+> clean up the metadata on allocation, and that it cannot allocate a page
+> that is in the process of being reported since we pulled it from the
+> free_list. If the page is a "Reported" page then it decrements the
+> reported_pages count for the free_area and makes sure the page doesn't
+> exist in the "Boundary" array pointer value, if it does it moves the
+> "Boundary" since it is pulling the page.
 
-On Wed, 11 Sep 2019 12:30:48 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This is still a non-trivial limitation on the page allocation from an
+external code IMHO. I cannot give any explicit reason why an ordering on
+the free list might matter (well except for page shuffling which uses it
+to make physical memory pattern allocation more random) but the
+architecture seems hacky and dubious to be honest. It shoulds like the
+whole interface has been developed around a very particular and single
+purpose optimization.
 
-> On Tue, Sep 10, 2019 at 06:49:34PM +0200, Greg Kurz wrote:
-> > Each vCPU of a VM allocates a XIVE VP in OPAL which is associated with
-> > 8 event queue (EQ) descriptors, one for each priority. A POWER9 socket
-> > can handle a maximum of 1M event queues.
-> >=20
-> > The powernv platform allocates NR_CPUS (=3D=3D 2048) VPs for the hyperv=
-isor,
-> > and each XIVE KVM device allocates KVM_MAX_VCPUS (=3D=3D 2048) VPs. Thi=
-s means
-> > that on a bi-socket system, we can create at most:
-> >=20
-> > (2 * 1M) / (8 * 2048) - 1 =3D=3D 127 XIVE or XICS-on-XIVE KVM devices
-> >=20
-> > ie, start at most 127 VMs benefiting from an in-kernel interrupt contro=
-ller.
-> > Subsequent VMs need to rely on much slower userspace emulated XIVE devi=
-ce in
-> > QEMU.
-> >=20
-> > This is problematic as one can legitimately expect to start the same
-> > number of mono-CPU VMs as the number of HW threads available on the
-> > system (eg, 144 on Witherspoon).
-> >=20
-> > I'm not aware of any userspace supporting more that 1024 vCPUs. It thus
-> > seem overkill to consume that many VPs per VM. Ideally we would even
-> > want userspace to be able to tell KVM about the maximum number of vCPUs
-> > when creating the VM.
-> >=20
-> > For now, provide a module parameter to configure the maximum number of
-> > vCPUs per VM. While here, reduce the default value to 1024 to match the
-> > current limit in QEMU. This number is only used by the XIVE KVM devices,
-> > but some more users of KVM_MAX_VCPUS could possibly be converted.
-> >=20
-> > With this change, I could successfully run 230 mono-CPU VMs on a
-> > Witherspoon system using the official skiboot-6.3.
-> >=20
-> > I could even run more VMs by using upstream skiboot containing this
-> > fix, that allows to better spread interrupts between sockets:
-> >=20
-> > e97391ae2bb5 ("xive: fix return value of opal_xive_allocate_irq()")
-> >=20
-> > MAX VPCUS | MAX VMS
-> > ----------+---------
-> >      1024 |     255
-> >       512 |     511
-> >       256 |    1023 (*)
-> >=20
-> > (*) the system was barely usable because of the extreme load and
-> >     memory exhaustion but the VMs did start.
->=20
-> Hrm.  I don't love the idea of using a global tunable for this,
-> although I guess it could have some use.  It's another global system
-> property that admins have to worry about.
->=20
+I remember that there was an attempt to report free memory that provided
+a callback mechanism [1], which was much less intrusive to the internals
+of the allocator yet it should provide a similar functionality. Did you
+see that approach? How does this compares to it? Or am I completely off
+when comparing them?
 
-Well, they have to worry only if they're unhappy with the new
-1024 default FWIW.
+[1] mostly likely not the latest version of the patchset
+http://lkml.kernel.org/r/1502940416-42944-5-git-send-email-wei.w.wang@intel.com
 
-> A better approach would seem to be a way for userspace to be able to
-> hint the maximum number of cpus for a specific VM to the kernel.
->=20
-
-Yes and it's mentioned in the changelog. Since this requires to add
-a new API in KVM and the corresponding changes in QEMU, I was thinking
-that having a way to change the limit in KVM would be an acceptable
-solution for the short term.
-
-Anyway, I'll start looking into the better approach.
-
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  arch/powerpc/include/asm/kvm_host.h   |    1 +
-> >  arch/powerpc/kvm/book3s_hv.c          |   32 +++++++++++++++++++++++++=
-+++++++
-> >  arch/powerpc/kvm/book3s_xive.c        |    2 +-
-> >  arch/powerpc/kvm/book3s_xive_native.c |    2 +-
-> >  4 files changed, 35 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include=
-/asm/kvm_host.h
-> > index 6fb5fb4779e0..17582ce38788 100644
-> > --- a/arch/powerpc/include/asm/kvm_host.h
-> > +++ b/arch/powerpc/include/asm/kvm_host.h
-> > @@ -335,6 +335,7 @@ struct kvm_arch {
-> >  	struct kvm_nested_guest *nested_guests[KVM_MAX_NESTED_GUESTS];
-> >  	/* This array can grow quite large, keep it at the end */
-> >  	struct kvmppc_vcore *vcores[KVM_MAX_VCORES];
-> > +	unsigned int max_vcpus;
-> >  #endif
-> >  };
-> > =20
-> > diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> > index f8975c620f41..393d8a1ce9d8 100644
-> > --- a/arch/powerpc/kvm/book3s_hv.c
-> > +++ b/arch/powerpc/kvm/book3s_hv.c
-> > @@ -125,6 +125,36 @@ static bool nested =3D true;
-> >  module_param(nested, bool, S_IRUGO | S_IWUSR);
-> >  MODULE_PARM_DESC(nested, "Enable nested virtualization (only on POWER9=
-)");
-> > =20
-> > +#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-> > +
-> > +static unsigned int max_vcpus =3D MIN(KVM_MAX_VCPUS, 1024);
-> > +
-> > +static int set_max_vcpus(const char *val, const struct kernel_param *k=
-p)
-> > +{
-> > +	unsigned int new_max_vcpus;
-> > +	int ret;
-> > +
-> > +	ret =3D kstrtouint(val, 0, &new_max_vcpus);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	if (new_max_vcpus > KVM_MAX_VCPUS)
-> > +		return -EINVAL;
-> > +
-> > +	max_vcpus =3D new_max_vcpus;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static struct kernel_param_ops max_vcpus_ops =3D {
-> > +	.set =3D set_max_vcpus,
-> > +	.get =3D param_get_uint,
-> > +};
-> > +
-> > +module_param_cb(max_vcpus, &max_vcpus_ops, &max_vcpus, S_IRUGO | S_IWU=
-SR);
-> > +MODULE_PARM_DESC(max_vcpus, "Maximum number of vCPUS per VM (max =3D "
-> > +		 __stringify(KVM_MAX_VCPUS) ")");
-> > +
-> >  static inline bool nesting_enabled(struct kvm *kvm)
-> >  {
-> >  	return kvm->arch.nested_enable && kvm_is_radix(kvm);
-> > @@ -4918,6 +4948,8 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
-> >  	if (radix_enabled())
-> >  		kvmhv_radix_debugfs_init(kvm);
-> > =20
-> > +	kvm->arch.max_vcpus =3D max_vcpus;
-> > +
-> >  	return 0;
-> >  }
-> > =20
-> > diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_x=
-ive.c
-> > index 2ef43d037a4f..0fea31b64564 100644
-> > --- a/arch/powerpc/kvm/book3s_xive.c
-> > +++ b/arch/powerpc/kvm/book3s_xive.c
-> > @@ -2026,7 +2026,7 @@ static int kvmppc_xive_create(struct kvm_device *=
-dev, u32 type)
-> >  		xive->q_page_order =3D xive->q_order - PAGE_SHIFT;
-> > =20
-> >  	/* Allocate a bunch of VPs */
-> > -	xive->vp_base =3D xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-> > +	xive->vp_base =3D xive_native_alloc_vp_block(kvm->arch.max_vcpus);
-> >  	pr_devel("VP_Base=3D%x\n", xive->vp_base);
-> > =20
-> >  	if (xive->vp_base =3D=3D XIVE_INVALID_VP)
-> > diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/b=
-ook3s_xive_native.c
-> > index 84a354b90f60..20314010da56 100644
-> > --- a/arch/powerpc/kvm/book3s_xive_native.c
-> > +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> > @@ -1095,7 +1095,7 @@ static int kvmppc_xive_native_create(struct kvm_d=
-evice *dev, u32 type)
-> >  	 * a default. Getting the max number of CPUs the VM was
-> >  	 * configured with would improve our usage of the XIVE VP space.
-> >  	 */
-> > -	xive->vp_base =3D xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-> > +	xive->vp_base =3D xive_native_alloc_vp_block(kvm->arch.max_vcpus);
-> >  	pr_devel("VP_Base=3D%x\n", xive->vp_base);
-> > =20
-> >  	if (xive->vp_base =3D=3D XIVE_INVALID_VP)
-> >=20
->=20
-
-
---Sig_/lnbvmABaUkvZBmQnfvgnyTi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl14y5QACgkQcdTV5YIv
-c9bjLhAAsvFlsZZet3Jsq5C2JQq/Y3ideStBFdFP9P71GSJEA1j5XSGDiSqGtYWR
-AZTRxm5XIab4YRQ/Fujuj9lPxb7rTiqZI9OMLIAC4bgzTdLW7L91sxGUS1im5Ayz
-wnCS5yN15mtAz8+zwBMisr8/oI+yzMndl1JumlnXjmFos3ylpxNTdP7RV2yrzb9+
-bVGac7u0sqdEgh0kjl2AOfn+IXf72z/0FKz2tEnk4mWcy0yGy6QBr3Lfj1o/ucBF
-FOcwbejfyzfVilDG1i/U2biiWAy7rwsYQTXRuuquENaBLcKt+BsSyavAAJ68Wy41
-LH0pGoVWBxvfFvbKZnxff36poWhmKtqp5YlMVDxx0iT3wEmSsXi6ZQpHaEbuHVrx
-/CQUGfFZxoLLIyGDDZoP3KqZiTtYiiUvoEVUQn8Mrz5iLAABFdqlhx5jVIJaKop9
-474NODpfEO7rLWfiqStUBDwWa+tEg+jlZ7pPL7OwdaZqqT5/aTjdO3/4buNm9Ho1
-ZTRnskXg6qq6lmKacPiHBb0m82WhqRFiyzT6Mnu72mF+a0cZ8FdKZHpSyc6Jfu12
-hFPkgytGfw/OY1Wxy+P82P1CEgAagDF1QqpRUVXcijAZ5SZZMqE+G6yVZMQU9EFL
-Y0QDisfzAo3+lCPAAYQliQnV+xPyiauYTybQ6hx9aCgRfD8im0I=
-=F1qe
------END PGP SIGNATURE-----
-
---Sig_/lnbvmABaUkvZBmQnfvgnyTi--
+-- 
+Michal Hocko
+SUSE Labs
