@@ -2,101 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23B71AFC5F
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 14:19:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04C2DAFC7E
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 14:25:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727093AbfIKMTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 08:19:45 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58008 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726911AbfIKMTp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 08:19:45 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 2C828B667;
-        Wed, 11 Sep 2019 12:19:42 +0000 (UTC)
-Date:   Wed, 11 Sep 2019 14:19:41 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fengguang Wu <fengguang.wu@intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
-Message-ID: <20190911121941.GU4023@dhcp22.suse.cz>
-References: <20190907172225.10910.34302.stgit@localhost.localdomain>
- <20190910124209.GY2063@dhcp22.suse.cz>
- <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
- <20190910144713.GF2063@dhcp22.suse.cz>
- <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
- <20190910175213.GD4023@dhcp22.suse.cz>
- <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
- <20190911113619.GP4023@dhcp22.suse.cz>
- <20190911080804-mutt-send-email-mst@kernel.org>
+        id S1727786AbfIKMZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 08:25:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60772 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726341AbfIKMZK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 08:25:10 -0400
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2A1E93E2D3
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 12:25:10 +0000 (UTC)
+Received: by mail-qt1-f198.google.com with SMTP id o1so23597970qtp.3
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 05:25:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hxqdd7sLD0IIJEG1yv3oLsELLYkxr9dTgSFMh9qjyAM=;
+        b=OKP1ie/plc0vtWmUT8GNCef/atppkpL/pNRfMfJCwNWR4F28+wvbFuw1SGON7hFpxk
+         M0L5nzW7nRk/5/IxbTNLWRTBebqAYVzjwxVplj/7mq/uuLjZHZmzKHfQlTzuMp6o2YS1
+         BspoPbgqn4szXJN2cihjN+6LxU9cOcmBJhypuJ4jzDr+IDIHlaNSKy2mUz/gBRNBnI8i
+         q5OinDpWH40wuCyUCXVwUE5h0Wrfq8KprfoPb2U2VRJOVqcR3fcvn/sQHe/gWIpUx/tR
+         Q+rewds0ck/wk4XgGjFHLYvVBrSAd+kOGUpZyPfFepbX9bDoV2mBx0b3SoMGkUML/brz
+         0QRQ==
+X-Gm-Message-State: APjAAAUxrBHiYrAL3upff1DQyGowUMr7/pEHDVXGuGCBxrsZnIEvgz5O
+        NRZ1qjCraI5HUx1VqOLk1q9SPKzZPtpYyHaBFnyYpdE0hCa+lCt9IIrDJozObJEoan/Ccr3cPoQ
+        JOx7USIlQEdH4
+X-Received: by 2002:a37:a858:: with SMTP id r85mr20448440qke.394.1568204709488;
+        Wed, 11 Sep 2019 05:25:09 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqydIpMhvodySW7CTJrCuCWEytvXXGQbmEf5VStZ8nkcJ6t3BKc9d/kPejtfhSjav5sm2yl2eg==
+X-Received: by 2002:a37:a858:: with SMTP id r85mr20448417qke.394.1568204709315;
+        Wed, 11 Sep 2019 05:25:09 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+        by smtp.gmail.com with ESMTPSA id w126sm9508107qkd.68.2019.09.11.05.25.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2019 05:25:08 -0700 (PDT)
+Date:   Wed, 11 Sep 2019 08:25:03 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v2] vhost: block speculation of translated descriptors
+Message-ID: <20190911082236-mutt-send-email-mst@kernel.org>
+References: <20190911120908.28410-1-mst@redhat.com>
+ <20190911121628.GT4023@dhcp22.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190911080804-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190911121628.GT4023@dhcp22.suse.cz>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed 11-09-19 08:08:38, Michael S. Tsirkin wrote:
-> On Wed, Sep 11, 2019 at 01:36:19PM +0200, Michal Hocko wrote:
-> > On Tue 10-09-19 14:23:40, Alexander Duyck wrote:
-> > [...]
-> > > We don't put any limitations on the allocator other then that it needs to
-> > > clean up the metadata on allocation, and that it cannot allocate a page
-> > > that is in the process of being reported since we pulled it from the
-> > > free_list. If the page is a "Reported" page then it decrements the
-> > > reported_pages count for the free_area and makes sure the page doesn't
-> > > exist in the "Boundary" array pointer value, if it does it moves the
-> > > "Boundary" since it is pulling the page.
+On Wed, Sep 11, 2019 at 02:16:28PM +0200, Michal Hocko wrote:
+> On Wed 11-09-19 08:10:00, Michael S. Tsirkin wrote:
+> > iovec addresses coming from vhost are assumed to be
+> > pre-validated, but in fact can be speculated to a value
+> > out of range.
 > > 
-> > This is still a non-trivial limitation on the page allocation from an
-> > external code IMHO. I cannot give any explicit reason why an ordering on
-> > the free list might matter (well except for page shuffling which uses it
-> > to make physical memory pattern allocation more random) but the
-> > architecture seems hacky and dubious to be honest. It shoulds like the
-> > whole interface has been developed around a very particular and single
-> > purpose optimization.
+> > Userspace address are later validated with array_index_nospec so we can
+> > be sure kernel info does not leak through these addresses, but vhost
+> > must also not leak userspace info outside the allowed memory table to
+> > guests.
 > > 
-> > I remember that there was an attempt to report free memory that provided
-> > a callback mechanism [1], which was much less intrusive to the internals
-> > of the allocator yet it should provide a similar functionality. Did you
-> > see that approach? How does this compares to it? Or am I completely off
-> > when comparing them?
+> > Following the defence in depth principle, make sure
+> > the address is not validated out of node range.
 > > 
-> > [1] mostly likely not the latest version of the patchset
-> > http://lkml.kernel.org/r/1502940416-42944-5-git-send-email-wei.w.wang@intel.com
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > Acked-by: Jason Wang <jasowang@redhat.com>
+> > Tested-by: Jason Wang <jasowang@redhat.com>
 > 
-> Linus nacked that one. He thinks invoking callbacks with lots of
-> internal mm locks is too fragile.
+> no need to mark fo stable? Other spectre fixes tend to be backported
+> even when the security implications are not really clear. The risk
+> should be low and better to be covered in case.
 
-I would be really curious how much he would be happy about injecting
-other restrictions on the allocator like this patch proposes. This is
-more intrusive as it has a higher maintenance cost longterm IMHO.
--- 
-Michal Hocko
-SUSE Labs
+This is not really a fix - more a defence in depth thing,
+quite similar to e.g.  commit b3bbfb3fb5d25776b8e3f361d2eedaabb0b496cd
+x86: Introduce __uaccess_begin_nospec() and uaccess_try_nospec
+in scope.
+
+That one doesn't seem to be tagged for stable. Was it queued
+there in practice?
+
+> > ---
+> > 
+> > changes from v1: fix build on 32 bit
+> > 
+> >  drivers/vhost/vhost.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index 5dc174ac8cac..34ea219936e3 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -2071,8 +2071,10 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
+> >  		_iov = iov + ret;
+> >  		size = node->size - addr + node->start;
+> >  		_iov->iov_len = min((u64)len - s, size);
+> > -		_iov->iov_base = (void __user *)(unsigned long)
+> > -			(node->userspace_addr + addr - node->start);
+> > +		_iov->iov_base = (void __user *)
+> > +			((unsigned long)node->userspace_addr +
+> > +			 array_index_nospec((unsigned long)(addr - node->start),
+> > +					    node->size));
+> >  		s += size;
+> >  		addr += size;
+> >  		++ret;
+> > -- 
+> > MST
+> 
+> -- 
+> Michal Hocko
+> SUSE Labs
