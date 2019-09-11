@@ -2,102 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B9A3AAF416
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 03:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25071AF419
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 03:50:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726426AbfIKBmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Sep 2019 21:42:23 -0400
-Received: from mail-vk1-f196.google.com ([209.85.221.196]:35101 "EHLO
-        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726245AbfIKBmX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Sep 2019 21:42:23 -0400
-Received: by mail-vk1-f196.google.com with SMTP id d66so4015390vka.2
-        for <kvm@vger.kernel.org>; Tue, 10 Sep 2019 18:42:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=750Rb175/c6zbUjfPT8KwrDDZd6pHNy6vpgdr/FmZA8=;
-        b=N8F31FmWi1yQGHxZGPbTmGhMXS5R8mA3mHh6F/zkkduBaJdNmo+xYxdMMmhkZ5kD/e
-         jnGea9vprPJiODg8mABuFn0be2pSXouxWQ4Ae/TFF7bIC5Bzsgz0Wl+HUHS0RZYnLueS
-         u8aS+SnCFjR7LwI2oEDLqUtCFyISrgfyRzR/kbUuLuRtvWrrAjFJIm6psMFOXEXJyabl
-         R9FLkTZOefPyTnkZTu3ZWCPPGEe5aUZTkCzcEgSrxaN9Ot3s3YBoUoRyqgQsxKcfr0bQ
-         35bYzUVXXJUDaTCuwonfQjBMhn/u9rdFsXeKUyPuLTuNuTUQY1gT3xg1GFDBXyVJeHh4
-         61og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=750Rb175/c6zbUjfPT8KwrDDZd6pHNy6vpgdr/FmZA8=;
-        b=rwkvdzGJ4IifrNULj0vYCHXr91hrHqRN52HUt+9REJEuBV6p0L+nBjZntQ2SNtF67f
-         hTsU7+srdqU5xrHXndAK48ESZ/I+AfYMxBVn8c7k/jwG2RmsAATYYlYmSf3AHko/OTcl
-         k2eAdT1Fhs0QSZh7VC4H9GbjUZVd6a7J75hKYn3tiqnf2qE71h5P6B7eXDPASkHyzExs
-         5tv3aJcWr2zOzycFUQbsqVZgsHsyHGQ2R9LjESrrShekUZ4CL+7ODw00AYKisGJnLIfD
-         5pAKYMKh/7ByhgT+AcScT7EHIiqeTkh9KYN9Vxq+g57wIpc6g/FjzRjlb0bT2m62+PJm
-         ASKA==
-X-Gm-Message-State: APjAAAVzAKW/GfWQBhKg1byXxGr3bdpWLOcKGOEtBHXAGJlkuWElEz8D
-        omZ2K62HuJBtKOlOSEXR5Cbeo60Msi2mzhmY42Q9
-X-Google-Smtp-Source: APXvYqyiItWoHRDfutR/0jQD4JlhUnrf2kFdKRRSBTW0TZ5SGKtqtlwZLzu4PCIRHC5F1Y79ez4UmPQvhjfFs/U4UUA=
-X-Received: by 2002:a1f:5243:: with SMTP id g64mr179370vkb.26.1568166141225;
- Tue, 10 Sep 2019 18:42:21 -0700 (PDT)
+        id S1726555AbfIKBt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Sep 2019 21:49:59 -0400
+Received: from mga04.intel.com ([192.55.52.120]:8450 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726479AbfIKBt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Sep 2019 21:49:59 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Sep 2019 18:49:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,491,1559545200"; 
+   d="scan'208";a="189527651"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.71])
+  by orsmga006.jf.intel.com with ESMTP; 10 Sep 2019 18:49:54 -0700
+Date:   Wed, 11 Sep 2019 09:47:26 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com, idos@mellanox.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com
+Subject: Re: [RFC PATCH 3/4] virtio: introudce a mdev based transport
+Message-ID: <20190911014726.GA14798@___>
+References: <20190910081935.30516-1-jasowang@redhat.com>
+ <20190910081935.30516-4-jasowang@redhat.com>
 MIME-Version: 1.0
-References: <CAGG=3QWNQKejpwhbgDy-WSV1C2sw9Ms0TUGwVk8fgEbg9n0ryg@mail.gmail.com>
- <CALMp9eSWpCWDSCgownxsMVTmJNjMvYMiH0K2ybD6yzGqJNiZrg@mail.gmail.com> <20190910175924.GA11151@linux.intel.com>
-In-Reply-To: <20190910175924.GA11151@linux.intel.com>
-From:   Bill Wendling <morbo@google.com>
-Date:   Tue, 10 Sep 2019 20:42:09 -0500
-Message-ID: <CAGG=3QVzO_Cu-TqyddbXZ5CrtPkqxsUHUVdCPHwFTm1BfLgQ0g@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: setjmp: ignore clang's
- "-Wsomtimes-uninitialized" flag
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190910081935.30516-4-jasowang@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 10, 2019 at 12:59 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Tue, Sep 10, 2019 at 09:46:36AM -0700, Jim Mattson wrote:
-> > On Mon, Sep 9, 2019 at 2:10 PM Bill Wendling <morbo@google.com> wrote:
-> > >
-> > > Clang complains that "i" might be uninitialized in the "printf"
-> > > statement. This is a false negative, because it's set in the "if"
-> > > statement and then incremented in the loop created by the "longjmp".
-> > >
-> > > Signed-off-by: Bill Wendling <morbo@google.com>
-> > > ---
-> > >  x86/setjmp.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > >
-> > > diff --git a/x86/setjmp.c b/x86/setjmp.c
-> > > index 976a632..cf9adcb 100644
-> > > --- a/x86/setjmp.c
-> > > +++ b/x86/setjmp.c
-> > > @@ -1,6 +1,10 @@
-> > >  #include "libcflat.h"
-> > >  #include "setjmp.h"
-> > >
-> > > +#ifdef __clang__
-> > > +#pragma clang diagnostic ignored "-Wsometimes-uninitialized"
-> > > +#endif
-> > > +
-> > >  int main(void)
-> > >  {
-> > >      volatile int i;
-> >
-> > Can we just add an initializer here instead?
->
-> Doing so would also be a good opportunity to actually report on the
-> expected vs. actual value of 'i' instead of printing numbers that are
-> meaningless without diving into the code.
+On Tue, Sep 10, 2019 at 04:19:34PM +0800, Jason Wang wrote:
+> This path introduces a new mdev transport for virtio. This is used to
+> use kernel virtio driver to drive the mediated device that is capable
+> of populating virtqueue directly.
+> 
+> A new virtio-mdev driver will be registered to the mdev bus, when a
+> new virtio-mdev device is probed, it will register the device with
+> mdev based config ops. This means, unlike the exist hardware
+> transport, this is a software transport between mdev driver and mdev
+> device. The transport was implemented through:
+> 
+> - configuration access was implemented through parent_ops->read()/write()
+> - vq/config callback was implemented through parent_ops->ioctl()
+> 
+> This transport is derived from virtio MMIO protocol and was wrote for
+> kernel driver. But for the transport itself, but the design goal is to
+> be generic enough to support userspace driver (this part will be added
+> in the future).
+> 
+> Note:
+> - current mdev assume all the parameter of parent_ops was from
+>   userspace. This prevents us from implementing the kernel mdev
+>   driver. For a quick POC, this patch just abuse those parameter and
+>   assume the mdev device implementation will treat them as kernel
+>   pointer. This should be addressed in the formal series by extending
+>   mdev_parent_ops.
+> - for a quick POC, I just drive the transport from MMIO, I'm pretty
+>   there's lot of optimization space for this.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/vfio/mdev/Kconfig        |   7 +
+>  drivers/vfio/mdev/Makefile       |   1 +
+>  drivers/vfio/mdev/virtio_mdev.c  | 500 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_mdev.h | 131 ++++++++
+>  4 files changed, 639 insertions(+)
+>  create mode 100644 drivers/vfio/mdev/virtio_mdev.c
+>  create mode 100644 include/uapi/linux/virtio_mdev.h
+> 
+[...]
+> diff --git a/include/uapi/linux/virtio_mdev.h b/include/uapi/linux/virtio_mdev.h
+> new file mode 100644
+> index 000000000000..8040de6b960a
+> --- /dev/null
+> +++ b/include/uapi/linux/virtio_mdev.h
+> @@ -0,0 +1,131 @@
+> +/*
+> + * Virtio mediated device driver
+> + *
+> + * Copyright 2019, Red Hat Corp.
+> + *
+> + * Based on Virtio MMIO driver by ARM Ltd, copyright ARM Ltd. 2011
+> + *
+> + * This header is BSD licensed so anyone can use the definitions to implement
+> + * compatible drivers/servers.
+> + *
+> + * Redistribution and use in source and binary forms, with or without
+> + * modification, are permitted provided that the following conditions
+> + * are met:
+> + * 1. Redistributions of source code must retain the above copyright
+> + *    notice, this list of conditions and the following disclaimer.
+> + * 2. Redistributions in binary form must reproduce the above copyright
+> + *    notice, this list of conditions and the following disclaimer in the
+> + *    documentation and/or other materials provided with the distribution.
+> + * 3. Neither the name of IBM nor the names of its contributors
+> + *    may be used to endorse or promote products derived from this software
+> + *    without specific prior written permission.
+> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
+> + * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> + * ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR CONTRIBUTORS BE LIABLE
+> + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+> + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+> + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+> + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+> + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+> + * SUCH DAMAGE.
+> + */
+> +#ifndef _LINUX_VIRTIO_MDEV_H
+> +#define _LINUX_VIRTIO_MDEV_H
+> +
+> +#include <linux/interrupt.h>
+> +#include <linux/vringh.h>
+> +#include <uapi/linux/virtio_net.h>
+> +
+> +/*
+> + * Ioctls
+> + */
+> +
+> +struct virtio_mdev_callback {
+> +	irqreturn_t (*callback)(void *);
+> +	void *private;
+> +};
+> +
+> +#define VIRTIO_MDEV 0xAF
+> +#define VIRTIO_MDEV_SET_VQ_CALLBACK _IOW(VIRTIO_MDEV, 0x00, \
+> +					 struct virtio_mdev_callback)
+> +#define VIRTIO_MDEV_SET_CONFIG_CALLBACK _IOW(VIRTIO_MDEV, 0x01, \
+> +					struct virtio_mdev_callback)
+> +
+> +#define VIRTIO_MDEV_DEVICE_API_STRING		"virtio-mdev"
+> +
+> +/*
+> + * Control registers
+> + */
+> +
+> +/* Magic value ("virt" string) - Read Only */
+> +#define VIRTIO_MDEV_MAGIC_VALUE		0x000
+> +
+> +/* Virtio device version - Read Only */
+> +#define VIRTIO_MDEV_VERSION		0x004
+> +
+> +/* Virtio device ID - Read Only */
+> +#define VIRTIO_MDEV_DEVICE_ID		0x008
+> +
+> +/* Virtio vendor ID - Read Only */
+> +#define VIRTIO_MDEV_VENDOR_ID		0x00c
+> +
+> +/* Bitmask of the features supported by the device (host)
+> + * (32 bits per set) - Read Only */
+> +#define VIRTIO_MDEV_DEVICE_FEATURES	0x010
+> +
+> +/* Device (host) features set selector - Write Only */
+> +#define VIRTIO_MDEV_DEVICE_FEATURES_SEL	0x014
+> +
+> +/* Bitmask of features activated by the driver (guest)
+> + * (32 bits per set) - Write Only */
+> +#define VIRTIO_MDEV_DRIVER_FEATURES	0x020
+> +
+> +/* Activated features set selector - Write Only */
+> +#define VIRTIO_MDEV_DRIVER_FEATURES_SEL	0x024
+> +
+> +/* Queue selector - Write Only */
+> +#define VIRTIO_MDEV_QUEUE_SEL		0x030
+> +
+> +/* Maximum size of the currently selected queue - Read Only */
+> +#define VIRTIO_MDEV_QUEUE_NUM_MAX	0x034
+> +
+> +/* Queue size for the currently selected queue - Write Only */
+> +#define VIRTIO_MDEV_QUEUE_NUM		0x038
+> +
+> +/* Ready bit for the currently selected queue - Read Write */
+> +#define VIRTIO_MDEV_QUEUE_READY		0x044
+> +
+> +/* Alignment of virtqueue - Read Only */
+> +#define VIRTIO_MDEV_QUEUE_ALIGN		0x048
+> +
+> +/* Queue notifier - Write Only */
+> +#define VIRTIO_MDEV_QUEUE_NOTIFY	0x050
+> +
+> +/* Device status register - Read Write */
+> +#define VIRTIO_MDEV_STATUS		0x060
+> +
+> +/* Selected queue's Descriptor Table address, 64 bits in two halves */
+> +#define VIRTIO_MDEV_QUEUE_DESC_LOW	0x080
+> +#define VIRTIO_MDEV_QUEUE_DESC_HIGH	0x084
+> +
+> +/* Selected queue's Available Ring address, 64 bits in two halves */
+> +#define VIRTIO_MDEV_QUEUE_AVAIL_LOW	0x090
+> +#define VIRTIO_MDEV_QUEUE_AVAIL_HIGH	0x094
+> +
+> +/* Selected queue's Used Ring address, 64 bits in two halves */
+> +#define VIRTIO_MDEV_QUEUE_USED_LOW	0x0a0
+> +#define VIRTIO_MDEV_QUEUE_USED_HIGH	0x0a4
+> +
+> +/* Configuration atomicity value */
+> +#define VIRTIO_MDEV_CONFIG_GENERATION	0x0fc
+> +
+> +/* The config space is defined by each driver as
+> + * the per-driver configuration space - Read Write */
+> +#define VIRTIO_MDEV_CONFIG		0x100
 
-My initial thought about adding an initializer was that the original
-test wanted to ensure that "i" was initialized after the "setjmp"
-call. But if we report the expected/actual value instead it wouldn't
-be an issue as we can set it to something not expected, etc... I'll
-create a patch.
+IIUC, we can use above registers with virtio-mdev parent's
+read()/write() to access the mdev device from kernel driver.
+As you suggested, it's a choice to build vhost-mdev on top
+of this abstraction as well. But virtio is the frontend
+device which lacks some vhost backend features, e.g. get
+vring base, set vring base, negotiate vhost features, etc.
+So I'm wondering, does it make sense to reserve some space
+for vhost-mdev in kernel to do vhost backend specific setups?
+Or do you have any other thoughts?
 
--bw
+Besides, I'm also wondering, what's the purpose of making
+above registers part of UAPI? And if we make them part
+of UAPI, do we also need to make them part of virtio spec?
+
+Thanks!
+Tiwei
+
+> +
+> +#endif
+> +
+> +
+> +/* Ready bit for the currently selected queue - Read Write */
+> -- 
+> 2.19.1
+> 
