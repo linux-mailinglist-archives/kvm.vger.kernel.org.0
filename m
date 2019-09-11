@@ -2,143 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03E60B019E
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 18:26:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A306B01A9
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 18:30:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729214AbfIKQ0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 12:26:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51382 "EHLO mx1.redhat.com"
+        id S1728950AbfIKQaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 12:30:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48342 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729002AbfIKQ0V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 12:26:21 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727839AbfIKQaO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 12:30:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A1ABDC058CB8
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 16:26:20 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id s5so10651791wrv.23
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 09:26:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eyaijbgIkayhX4PjBUU3nGz4VJDOHf43oHAeZt11sYU=;
-        b=MA2D5EpOwzKNCFtS0CzRJb2PpzPZlWdoREiQbmXgWEbCfisfrPS8+UWPfTBJVH+CLV
-         /+4CTpnquvXEEYLI0k+43H1Yz02bIHueXwlt84DymQbAfJ2ZezlsR4+KHA06hxC4Kn2D
-         b3TbZo+WAeKTtxYupX2IY60OTCJ3dB77K/rJeWyhlp1BpuTCI1/4NjEArUStRoXs/3k1
-         1emwad7nQalcvy2DssL64B1kcXRDSyl9L28MEcJS7DAlzs3Ka8qiPcV8QZKftFwPYZbU
-         2V0BSoNs61M9wV0rYdcoBBeub37qTVv86gIH/+Df0Xr+Bz/f3M25XyQkbn+koN7ZCj5g
-         j0aQ==
-X-Gm-Message-State: APjAAAVKVFCXRlRMzvjdk07r8HIi/ea8XjkKx+XvnGq16bWBswfQCVQw
-        WdXEfW5sVvP7tu5fDmBxFD2XO6S4xs3tYJPXMBcimwjAubELsRWgVcU7gblDkDzAPxNKQFnioQ2
-        LvLCc2J9ahK13
-X-Received: by 2002:a7b:c764:: with SMTP id x4mr4315434wmk.134.1568219179296;
-        Wed, 11 Sep 2019 09:26:19 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwOAVygTquC9Ou/lQms9cBy79Ajfv+C5hPogGsEA3YLASjZm7mPMsJdoVNRdV9fJe20qtNpDg==
-X-Received: by 2002:a7b:c764:: with SMTP id x4mr4315419wmk.134.1568219179035;
-        Wed, 11 Sep 2019 09:26:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:102b:3795:6714:7df6? ([2001:b07:6468:f312:102b:3795:6714:7df6])
-        by smtp.gmail.com with ESMTPSA id 17sm16247400wrl.15.2019.09.11.09.26.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Sep 2019 09:26:18 -0700 (PDT)
-Subject: Re: [PATCH v2 5/5] KVM: hyperv: Fix Direct Synthetic timers assert an
- interrupt w/o lapic_in_kernel
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1567733404-7759-1-git-send-email-wanpengli@tencent.com>
- <1567733404-7759-5-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9d244f84-93d3-5e1b-7222-aebb270f3f29@redhat.com>
-Date:   Wed, 11 Sep 2019 18:26:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 64779306E171;
+        Wed, 11 Sep 2019 16:30:13 +0000 (UTC)
+Received: from gondolin (ovpn-116-29.ams2.redhat.com [10.36.116.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DCF460C5E;
+        Wed, 11 Sep 2019 16:30:03 +0000 (UTC)
+Date:   Wed, 11 Sep 2019 18:29:58 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 0/5] Introduce variable length mdev alias
+Message-ID: <20190911182958.042cd03a.cohuck@redhat.com>
+In-Reply-To: <AM0PR05MB48668DFF8E816F0D2D3041BFD1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20190826204119.54386-1-parav@mellanox.com>
+        <20190902042436.23294-1-parav@mellanox.com>
+        <AM0PR05MB4866F76F807409ED887537D7D1B70@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20190911145610.453b32ec@x1.home>
+        <AM0PR05MB48668DFF8E816F0D2D3041BFD1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <1567733404-7759-5-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 11 Sep 2019 16:30:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/09/19 03:30, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Reported by syzkaller:
-> 
-> 	kasan: GPF could be caused by NULL-ptr deref or user memory access
-> 	general protection fault: 0000 [#1] PREEMPT SMP KASAN
-> 	RIP: 0010:__apic_accept_irq+0x46/0x740 arch/x86/kvm/lapic.c:1029
-> 	Call Trace:
-> 	kvm_apic_set_irq+0xb4/0x140 arch/x86/kvm/lapic.c:558
-> 	stimer_notify_direct arch/x86/kvm/hyperv.c:648 [inline]
-> 	stimer_expiration arch/x86/kvm/hyperv.c:659 [inline]
-> 	kvm_hv_process_stimers+0x594/0x1650 arch/x86/kvm/hyperv.c:686
-> 	vcpu_enter_guest+0x2b2a/0x54b0 arch/x86/kvm/x86.c:7896
-> 	vcpu_run+0x393/0xd40 arch/x86/kvm/x86.c:8152
-> 	kvm_arch_vcpu_ioctl_run+0x636/0x900 arch/x86/kvm/x86.c:8360
-> 	kvm_vcpu_ioctl+0x6cf/0xaf0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2765
-> 
-> The testcase programs HV_X64_MSR_STIMERn_CONFIG/HV_X64_MSR_STIMERn_COUNT,
-> in addition, there is no lapic in the kernel, the counters value are small
-> enough in order that kvm_hv_process_stimers() inject this already-expired
-> timer interrupt into the guest through lapic in the kernel which triggers
-> the NULL deferencing. This patch fixes it by don't advertise direct mode 
-> synthetic timers and discarding the inject when lapic is not in kernel.
-> 
-> Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v1 -> v2:
->  * don't advertise direct mode synthetic timers when lapic is not in kernel
-> 
->  arch/x86/kvm/hyperv.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index c10a8b1..069e655 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -645,7 +645,9 @@ static int stimer_notify_direct(struct kvm_vcpu_hv_stimer *stimer)
->  		.vector = stimer->config.apic_vector
->  	};
->  
-> -	return !kvm_apic_set_irq(vcpu, &irq, NULL);
-> +	if (lapic_in_kernel(vcpu))
-> +		return !kvm_apic_set_irq(vcpu, &irq, NULL);
-> +	return 0;
->  }
->  
->  static void stimer_expiration(struct kvm_vcpu_hv_stimer *stimer)
-> @@ -1849,7 +1851,13 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  
->  			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
->  			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
-> -			ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
-> +
-> +			/*
-> +			 * Direct Synthetic timers only make sense with in-kernel
-> +			 * LAPIC
-> +			 */
-> +			if (lapic_in_kernel(vcpu))
-> +				ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
->  
->  			break;
->  
-> 
+On Wed, 11 Sep 2019 15:30:40 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
-See replies to the previous version of the individual patches.
+> Hi Alex,
+> 
+> > -----Original Message-----
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, September 11, 2019 8:56 AM
+> > To: Parav Pandit <parav@mellanox.com>
+> > Cc: Jiri Pirko <jiri@mellanox.com>; kwankhede@nvidia.com;
+> > cohuck@redhat.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; netdev@vger.kernel.org
+> > Subject: Re: [PATCH v3 0/5] Introduce variable length mdev alias
+> > 
+> > On Mon, 9 Sep 2019 20:42:32 +0000
+> > Parav Pandit <parav@mellanox.com> wrote:
+> >   
+> > > Hi Alex,
+> > >  
+> > > > -----Original Message-----
+> > > > From: Parav Pandit <parav@mellanox.com>
+> > > > Sent: Sunday, September 1, 2019 11:25 PM
+> > > > To: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
+> > > > kwankhede@nvidia.com; cohuck@redhat.com; davem@davemloft.net
+> > > > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > > > netdev@vger.kernel.org; Parav Pandit <parav@mellanox.com>
+> > > > Subject: [PATCH v3 0/5] Introduce variable length mdev alias
+> > > >
+> > > > To have consistent naming for the netdevice of a mdev and to have
+> > > > consistent naming of the devlink port [1] of a mdev, which is formed
+> > > > using phys_port_name of the devlink port, current UUID is not usable
+> > > > because UUID is too long.
+> > > >
+> > > > UUID in string format is 36-characters long and in binary 128-bit.
+> > > > Both formats are not able to fit within 15 characters limit of netdev  
+> > name.  
+> > > >
+> > > > It is desired to have mdev device naming consistent using UUID.
+> > > > So that widely used user space framework such as ovs [2] can make
+> > > > use of mdev representor in similar way as PCIe SR-IOV VF and PF  
+> > representors.  
+> > > >
+> > > > Hence,
+> > > > (a) mdev alias is created which is derived using sha1 from the mdev  
+> > name.  
+> > > > (b) Vendor driver describes how long an alias should be for the
+> > > > child mdev created for a given parent.
+> > > > (c) Mdev aliases are unique at system level.
+> > > > (d) alias is created optionally whenever parent requested.
+> > > > This ensures that non networking mdev parents can function without
+> > > > alias creation overhead.
+> > > >
+> > > > This design is discussed at [3].
+> > > >
+> > > > An example systemd/udev extension will have,
+> > > >
+> > > > 1. netdev name created using mdev alias available in sysfs.
+> > > >
+> > > > mdev UUID=83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
+> > > > mdev 12 character alias=cd5b146a80a5
+> > > >
+> > > > netdev name of this mdev = enmcd5b146a80a5 Here en = Ethernet link m
+> > > > = mediated device
+> > > >
+> > > > 2. devlink port phys_port_name created using mdev alias.
+> > > > devlink phys_port_name=pcd5b146a80a5
+> > > >
+> > > > This patchset enables mdev core to maintain unique alias for a mdev.
+> > > >
+> > > > Patch-1 Introduces mdev alias using sha1.
+> > > > Patch-2 Ensures that mdev alias is unique in a system.
+> > > > Patch-3 Exposes mdev alias in a sysfs hirerchy, update Documentation
+> > > > Patch-4 Introduces mdev_alias() API.
+> > > > Patch-5 Extends mtty driver to optionally provide alias generation.
+> > > > This also enables to test UUID based sha1 collision and trigger
+> > > > error handling for duplicate sha1 results.
+> > > >
+> > > > [1] http://man7.org/linux/man-pages/man8/devlink-port.8.html
+> > > > [2] https://docs.openstack.org/os-vif/latest/user/plugins/ovs.html
+> > > > [3] https://patchwork.kernel.org/cover/11084231/
+> > > >
+> > > > ---
+> > > > Changelog:
+> > > > v2->v3:
+> > > >  - Addressed comment from Yunsheng Lin
+> > > >  - Changed strcmp() ==0 to !strcmp()
+> > > >  - Addressed comment from Cornelia Hunk
+> > > >  - Merged sysfs Documentation patch with syfs patch
+> > > >  - Added more description for alias return value  
+> > >
+> > > Did you get a chance review this updated series?
+> > > I addressed Cornelia's and yours comment.
+> > > I do not think allocating alias memory twice, once for comparison and
+> > > once for storing is good idea or moving alias generation logic inside
+> > > the mdev_list_lock(). So I didn't address that suggestion of Cornelia.  
+> > 
+> > Sorry, I'm at LPC this week.  I agree, I don't think the double allocation is
+> > necessary, I thought the comment was sufficient to clarify null'ing the
+> > variable.  It's awkward, but seems correct.
 
-Paolo
+Not hot about it, but no real complaints.
+
+However, please give me some more time, as I'm at LPC as well.
+
+> > 
+> > I'm not sure what we do with this patch series though, has the real
+> > consumer of this even been proposed?  It feels optimistic to include at this
+> > point.  We've used the sample driver as a placeholder in the past for
+> > mdev_uuid(), but we arrived at that via a conversion rather than explicitly
+> > adding the API.  Please let me know where the consumer patches stand,
+> > perhaps it would make more sense for them to go in together rather than
+> > risk adding an unused API.  Thanks,
+> >   
+> Given that consumer patch series is relatively large (around 15+ patches), I was considering to merge this one as pre-series to it.
+> Its ok to combine this with consumer patch series.
+> But wanted to have it reviewed beforehand, so that churn is less in actual consumer series which is more mlx5_core and devlink/netdev centric.
+> So if you can add Review-by, it will be easier to combine with consumer series.
+> 
+> And if we merge it with consumer series, it will come through Dave Miller's tree instead of your tree.
+> Would that work for you?
+
+It would be easier to see what to do here if we could see the consumer
+for this. If those patches are fine, we could maybe queue this series
+via both trees?
