@@ -2,241 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C7C78AF4C9
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 06:04:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0AADAF50D
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 06:26:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725906AbfIKEE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 00:04:58 -0400
-Received: from ozlabs.org ([203.11.71.1]:51795 "EHLO ozlabs.org"
+        id S1726381AbfIKEZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 00:25:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53382 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725379AbfIKEE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 00:04:58 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 46SpFg44ZJz9sNF; Wed, 11 Sep 2019 14:04:55 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1568174695;
-        bh=ayfI3+83K7LVh3gr6R9z9ZZTmmQBatKbBg3rQx13JJI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SpchflrTxM3DzIq+3riwfeJgRn8TQa+mUik6YCiG7pI/h3ChXWcjqWOC8wjYoQWWC
-         lLLJqyIv7CwSSYB95Q1jq1yRj5YuLTwoq2AG0/xC2qdzS5I1LJdlg2DG/rZL9GDwtv
-         M0gola/ncTJb8kMbdjXqxZ4IzEQ+hO/fI6B0mQu4=
-Date:   Wed, 11 Sep 2019 12:30:48 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Tunable to configure maximum # of
- vCPUs per VM
-Message-ID: <20190911023048.GI30740@umbus.fritz.box>
-References: <156813417397.1880979.6162333671088177553.stgit@bahia.tls.ibm.com>
+        id S1725798AbfIKEZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 00:25:59 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 343C718CB511;
+        Wed, 11 Sep 2019 04:25:58 +0000 (UTC)
+Received: from llong.remote.csb (ovpn-120-46.rdu2.redhat.com [10.10.120.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 42E6119C6A;
+        Wed, 11 Sep 2019 04:25:54 +0000 (UTC)
+Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is
+ preempted"
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
+        "# v3 . 10+" <stable@vger.kernel.org>
+References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
+ <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
+ <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <2dda32db-5662-f7a6-f52d-b835df1f45f1@redhat.com>
+Date:   Wed, 11 Sep 2019 05:25:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="nO3oAMapP4dBpMZi"
-Content-Disposition: inline
-In-Reply-To: <156813417397.1880979.6162333671088177553.stgit@bahia.tls.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 11 Sep 2019 04:25:58 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 9/10/19 6:56 AM, Wanpeng Li wrote:
+> On Mon, 9 Sep 2019 at 18:56, Waiman Long <longman@redhat.com> wrote:
+>> On 9/9/19 2:40 AM, Wanpeng Li wrote:
+>>> From: Wanpeng Li <wanpengli@tencent.com>
+>>>
+>>> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if
+>>> vCPU is preempted), we found great regression caused by this commit.
+>>>
+>>> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
+>>> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800
+>>> records/s with this commit.
+>>>
+>>>           Host                       Guest                score
+>>>
+>>> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
+>>> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
+>>> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
+>>> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
+>>>
+>>> Exit from aggressive wait-early mechanism can result in yield premature and
+>>> incur extra scheduling latency in over-subscribe scenario.
+>>>
+>>> kvm optimizes:
+>>> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
+>>> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
+>>>
+>>> Tested-by: loobinliu@tencent.com
+>>> Cc: Peter Zijlstra <peterz@infradead.org>
+>>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>>> Cc: Ingo Molnar <mingo@kernel.org>
+>>> Cc: Waiman Long <longman@redhat.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: Radim Krčmář <rkrcmar@redhat.com>
+>>> Cc: loobinliu@tencent.com
+>>> Cc: stable@vger.kernel.org
+>>> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
+>>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>>> ---
+>>>  kernel/locking/qspinlock_paravirt.h | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
+>>> index 89bab07..e84d21a 100644
+>>> --- a/kernel/locking/qspinlock_paravirt.h
+>>> +++ b/kernel/locking/qspinlock_paravirt.h
+>>> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
+>>>       if ((loop & PV_PREV_CHECK_MASK) != 0)
+>>>               return false;
+>>>
+>>> -     return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
+>>> +     return READ_ONCE(prev->state) != vcpu_running;
+>>>  }
+>>>
+>>>  /*
+>> There are several possibilities for this performance regression:
+>>
+>> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
+>> cacheline contention issue depending on how that callback is implemented.
+>>
+>> 2) KVM may set the preempt flag for a short period whenver an vmexit
+>> happens even if a vmenter is executed shortly after. In this case, we
+>> may want to use a more durable vcpu suspend flag that indicates the vcpu
+>> won't get a real vcpu back for a longer period of time.
+>>
+>> Perhaps you can add a lock event counter to count the number of
+>> wait_early events caused by vcpu_is_preempted() being true to see if it
+>> really cause a lot more wait_early than without the vcpu_is_preempted()
+>> call.
+> pv_wait_again:1:179
+> pv_wait_early:1:189429
+> pv_wait_head:1:263
+> pv_wait_node:1:189429
+> pv_vcpu_is_preempted:1:45588
+> =========sleep 5============
+> pv_wait_again:1:181
+> pv_wait_early:1:202574
+> pv_wait_head:1:267
+> pv_wait_node:1:202590
+> pv_vcpu_is_preempted:1:46336
+>
+> The sampling period is 5s, 6% of wait_early events caused by
+> vcpu_is_preempted() being true.
 
---nO3oAMapP4dBpMZi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+6% isn't that high. However, when one vCPU voluntarily releases its
+vCPU, all the subsequently waiters in the queue will do the same. It is
+a cascading effect. Perhaps we wait early too aggressive with the
+original patch.
 
-On Tue, Sep 10, 2019 at 06:49:34PM +0200, Greg Kurz wrote:
-> Each vCPU of a VM allocates a XIVE VP in OPAL which is associated with
-> 8 event queue (EQ) descriptors, one for each priority. A POWER9 socket
-> can handle a maximum of 1M event queues.
->=20
-> The powernv platform allocates NR_CPUS (=3D=3D 2048) VPs for the hypervis=
-or,
-> and each XIVE KVM device allocates KVM_MAX_VCPUS (=3D=3D 2048) VPs. This =
-means
-> that on a bi-socket system, we can create at most:
->=20
-> (2 * 1M) / (8 * 2048) - 1 =3D=3D 127 XIVE or XICS-on-XIVE KVM devices
->=20
-> ie, start at most 127 VMs benefiting from an in-kernel interrupt controll=
-er.
-> Subsequent VMs need to rely on much slower userspace emulated XIVE device=
- in
-> QEMU.
->=20
-> This is problematic as one can legitimately expect to start the same
-> number of mono-CPU VMs as the number of HW threads available on the
-> system (eg, 144 on Witherspoon).
->=20
-> I'm not aware of any userspace supporting more that 1024 vCPUs. It thus
-> seem overkill to consume that many VPs per VM. Ideally we would even
-> want userspace to be able to tell KVM about the maximum number of vCPUs
-> when creating the VM.
->=20
-> For now, provide a module parameter to configure the maximum number of
-> vCPUs per VM. While here, reduce the default value to 1024 to match the
-> current limit in QEMU. This number is only used by the XIVE KVM devices,
-> but some more users of KVM_MAX_VCPUS could possibly be converted.
->=20
-> With this change, I could successfully run 230 mono-CPU VMs on a
-> Witherspoon system using the official skiboot-6.3.
->=20
-> I could even run more VMs by using upstream skiboot containing this
-> fix, that allows to better spread interrupts between sockets:
->=20
-> e97391ae2bb5 ("xive: fix return value of opal_xive_allocate_irq()")
->=20
-> MAX VPCUS | MAX VMS
-> ----------+---------
->      1024 |     255
->       512 |     511
->       256 |    1023 (*)
->=20
-> (*) the system was barely usable because of the extreme load and
->     memory exhaustion but the VMs did start.
+I also look up the email chain of the original commit. The patch
+submitter did not provide any performance data to support this change.
+The patch just looked reasonable at that time. So there was no
+objection. Given that we now have hard evidence that this was not a good
+idea. I think we should revert it.
 
-Hrm.  I don't love the idea of using a global tunable for this,
-although I guess it could have some use.  It's another global system
-property that admins have to worry about.
+Reviewed-by: Waiman Long <longman@redhat.com>
 
-A better approach would seem to be a way for userspace to be able to
-hint the maximum number of cpus for a specific VM to the kernel.
+Thanks,
+Longman
 
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  arch/powerpc/include/asm/kvm_host.h   |    1 +
->  arch/powerpc/kvm/book3s_hv.c          |   32 +++++++++++++++++++++++++++=
-+++++
->  arch/powerpc/kvm/book3s_xive.c        |    2 +-
->  arch/powerpc/kvm/book3s_xive_native.c |    2 +-
->  4 files changed, 35 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/a=
-sm/kvm_host.h
-> index 6fb5fb4779e0..17582ce38788 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -335,6 +335,7 @@ struct kvm_arch {
->  	struct kvm_nested_guest *nested_guests[KVM_MAX_NESTED_GUESTS];
->  	/* This array can grow quite large, keep it at the end */
->  	struct kvmppc_vcore *vcores[KVM_MAX_VCORES];
-> +	unsigned int max_vcpus;
->  #endif
->  };
-> =20
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index f8975c620f41..393d8a1ce9d8 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -125,6 +125,36 @@ static bool nested =3D true;
->  module_param(nested, bool, S_IRUGO | S_IWUSR);
->  MODULE_PARM_DESC(nested, "Enable nested virtualization (only on POWER9)"=
-);
-> =20
-> +#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-> +
-> +static unsigned int max_vcpus =3D MIN(KVM_MAX_VCPUS, 1024);
-> +
-> +static int set_max_vcpus(const char *val, const struct kernel_param *kp)
-> +{
-> +	unsigned int new_max_vcpus;
-> +	int ret;
-> +
-> +	ret =3D kstrtouint(val, 0, &new_max_vcpus);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (new_max_vcpus > KVM_MAX_VCPUS)
-> +		return -EINVAL;
-> +
-> +	max_vcpus =3D new_max_vcpus;
-> +
-> +	return 0;
-> +}
-> +
-> +static struct kernel_param_ops max_vcpus_ops =3D {
-> +	.set =3D set_max_vcpus,
-> +	.get =3D param_get_uint,
-> +};
-> +
-> +module_param_cb(max_vcpus, &max_vcpus_ops, &max_vcpus, S_IRUGO | S_IWUSR=
-);
-> +MODULE_PARM_DESC(max_vcpus, "Maximum number of vCPUS per VM (max =3D "
-> +		 __stringify(KVM_MAX_VCPUS) ")");
-> +
->  static inline bool nesting_enabled(struct kvm *kvm)
->  {
->  	return kvm->arch.nested_enable && kvm_is_radix(kvm);
-> @@ -4918,6 +4948,8 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
->  	if (radix_enabled())
->  		kvmhv_radix_debugfs_init(kvm);
-> =20
-> +	kvm->arch.max_vcpus =3D max_vcpus;
-> +
->  	return 0;
->  }
-> =20
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xiv=
-e.c
-> index 2ef43d037a4f..0fea31b64564 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -2026,7 +2026,7 @@ static int kvmppc_xive_create(struct kvm_device *de=
-v, u32 type)
->  		xive->q_page_order =3D xive->q_order - PAGE_SHIFT;
-> =20
->  	/* Allocate a bunch of VPs */
-> -	xive->vp_base =3D xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-> +	xive->vp_base =3D xive_native_alloc_vp_block(kvm->arch.max_vcpus);
->  	pr_devel("VP_Base=3D%x\n", xive->vp_base);
-> =20
->  	if (xive->vp_base =3D=3D XIVE_INVALID_VP)
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/boo=
-k3s_xive_native.c
-> index 84a354b90f60..20314010da56 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -1095,7 +1095,7 @@ static int kvmppc_xive_native_create(struct kvm_dev=
-ice *dev, u32 type)
->  	 * a default. Getting the max number of CPUs the VM was
->  	 * configured with would improve our usage of the XIVE VP space.
->  	 */
-> -	xive->vp_base =3D xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-> +	xive->vp_base =3D xive_native_alloc_vp_block(kvm->arch.max_vcpus);
->  	pr_devel("VP_Base=3D%x\n", xive->vp_base);
-> =20
->  	if (xive->vp_base =3D=3D XIVE_INVALID_VP)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---nO3oAMapP4dBpMZi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl14XFYACgkQbDjKyiDZ
-s5IFsRAAgy6R1DwU7WVddFGEwpnAvkt0Pv5vHxTLWg9V0Ou/fPUI1O+T8LJsfWiG
-YicahJSElFhI/LW+nPZJvRB/5ekoUDsf8Y2QeOWaJitunbUgbE225ppTTR6xH3HN
-VuoeoqBC8zq3bKS3SXJjk+pE0nejxtfrPINvQD7z0Zz78rRr6P3vwTVhbKN8UzwB
-ZhUnEK1cIc0CpjUK6AjSiSvBFmzyE56b7z5mFTXHaktT+k1RfeKPRPhhIN+Hptu7
-2LZ4kk81SwyjlC04xiyU7iLNkH6hqLrW9Lg0RQQgMYSeCiX/Ee+tPiGn54PefnRn
-4qKnsiYBdX4ceMt3l9VUs+jzwNvVu4mMeVPCQ0otYVtQM22pVR6FBj+iHm+4nkdl
-VdheBG3v8e6w3LnNry4MyXTqS868mcKJXQjIdq/jD25aWobxUSEQVkCAYe6lmm6G
-AR3rqdTvrWj7SLI4lVl3OqhZEJnteTW6Xoj3b/BKUiatgyILw/4gffQEEeLzbjSC
-1Vcl0YMT64ChouJbuDypE3L9q+OX70sXL1Q16iDtG12rEQA7VaR74vE87ZI1XOP0
-DQ3w9nCdDZjiPhehywM7oCYtuSxAte8NpsTBbfRrkK6DvBhplbCrLoTEkyRGLKjc
-jWHFOr5LA8E1kmnxUANxykTWOUqPy7LU6cFWrM32wXmlCZTeJyg=
-=QW/y
------END PGP SIGNATURE-----
-
---nO3oAMapP4dBpMZi--
