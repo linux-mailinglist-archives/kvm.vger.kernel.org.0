@@ -2,181 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAFC3AFD59
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 15:04:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 765D0AFD76
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 15:12:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728092AbfIKNEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 09:04:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39112 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727093AbfIKNEh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 09:04:37 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 58AD185363
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 13:04:36 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id v16so10444540wrt.17
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 06:04:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5cZwRFkPnBfvd9KKrvlsF0v7o7pc2TdTfWhZUtnofjs=;
-        b=GyfOV4RF/TrOqhsxJsPPtl6ColJ0jwUqMcv7C6lx5KcTpwwxt3frN64U3a/GvlJRK9
-         KOY7KpPiRpel6BRt6GLf9Vrkl+ReS/5Fnj+ySTD/lzn5T5BTUjOqmEia5C3mK4e/spf2
-         S8rwoajXarZx+JdHWwLAffa7LrM94vTEgX3Wfg9fRbxWEQlz6paZ56k5WbMl2JLnCroD
-         kZDKvjU3O17yKspcITgNXSxiU2Su8UT31u8lAQLBwjL3CXl+1SRfpGGTHJnWx9SyKKLo
-         S5OUw5uk1oUl3C6dCzZN9we0l5EhGnLK5cphhtfdEfolYIJUfFUzScr/tgrUGsVnBrII
-         Yocg==
-X-Gm-Message-State: APjAAAU0w7niOt3q4eR7QkDcfXVSOpNPZAGSptCgy4bQAm8+SDYuEjWl
-        I3Kl93FKsNWsiKm30DaP5uMqM/39NIOhpfVnLsOS1H9rI4AutsZ/0lUU6nRHw+8Q6u7dbvV6/t7
-        8e6yy/byowptB
-X-Received: by 2002:adf:f48e:: with SMTP id l14mr29136123wro.234.1568207074753;
-        Wed, 11 Sep 2019 06:04:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzBF20UcHxsYOQf/lES4ZO/bVViSm+7jzfEb91Ml+VtQ6z82mrGbxsV6Pa7Uej4nDz/PD+EEQ==
-X-Received: by 2002:adf:f48e:: with SMTP id l14mr29136106wro.234.1568207074435;
-        Wed, 11 Sep 2019 06:04:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:102b:3795:6714:7df6? ([2001:b07:6468:f312:102b:3795:6714:7df6])
-        by smtp.gmail.com with ESMTPSA id y13sm42446736wrg.8.2019.09.11.06.04.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Sep 2019 06:04:33 -0700 (PDT)
-Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is
- preempted"
-To:     Waiman Long <longman@redhat.com>, Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
-        "# v3 . 10+" <stable@vger.kernel.org>
-References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
- <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
- <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
- <2dda32db-5662-f7a6-f52d-b835df1f45f1@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9ef778df-c34a-897c-bcfa-780256fb78ff@redhat.com>
-Date:   Wed, 11 Sep 2019 15:04:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728057AbfIKNMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 09:12:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45572 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727302AbfIKNMi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 09:12:38 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 0B042B687;
+        Wed, 11 Sep 2019 13:12:36 +0000 (UTC)
+Date:   Wed, 11 Sep 2019 15:12:35 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v2] vhost: block speculation of translated descriptors
+Message-ID: <20190911131235.GZ4023@dhcp22.suse.cz>
+References: <20190911120908.28410-1-mst@redhat.com>
+ <20190911121628.GT4023@dhcp22.suse.cz>
+ <20190911082236-mutt-send-email-mst@kernel.org>
+ <20190911123316.GX4023@dhcp22.suse.cz>
+ <20190911085807-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2dda32db-5662-f7a6-f52d-b835df1f45f1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190911085807-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/09/19 06:25, Waiman Long wrote:
-> On 9/10/19 6:56 AM, Wanpeng Li wrote:
->> On Mon, 9 Sep 2019 at 18:56, Waiman Long <longman@redhat.com> wrote:
->>> On 9/9/19 2:40 AM, Wanpeng Li wrote:
->>>> From: Wanpeng Li <wanpengli@tencent.com>
->>>>
->>>> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if
->>>> vCPU is preempted), we found great regression caused by this commit.
->>>>
->>>> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
->>>> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800
->>>> records/s with this commit.
->>>>
->>>>           Host                       Guest                score
->>>>
->>>> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
->>>> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
->>>> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
->>>> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
->>>>
->>>> Exit from aggressive wait-early mechanism can result in yield premature and
->>>> incur extra scheduling latency in over-subscribe scenario.
->>>>
->>>> kvm optimizes:
->>>> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
->>>> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
->>>>
->>>> Tested-by: loobinliu@tencent.com
->>>> Cc: Peter Zijlstra <peterz@infradead.org>
->>>> Cc: Thomas Gleixner <tglx@linutronix.de>
->>>> Cc: Ingo Molnar <mingo@kernel.org>
->>>> Cc: Waiman Long <longman@redhat.com>
->>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>>> Cc: Radim Krčmář <rkrcmar@redhat.com>
->>>> Cc: loobinliu@tencent.com
->>>> Cc: stable@vger.kernel.org
->>>> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
->>>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->>>> ---
->>>>  kernel/locking/qspinlock_paravirt.h | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
->>>> index 89bab07..e84d21a 100644
->>>> --- a/kernel/locking/qspinlock_paravirt.h
->>>> +++ b/kernel/locking/qspinlock_paravirt.h
->>>> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
->>>>       if ((loop & PV_PREV_CHECK_MASK) != 0)
->>>>               return false;
->>>>
->>>> -     return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
->>>> +     return READ_ONCE(prev->state) != vcpu_running;
->>>>  }
->>>>
->>>>  /*
->>> There are several possibilities for this performance regression:
->>>
->>> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
->>> cacheline contention issue depending on how that callback is implemented.
->>>
->>> 2) KVM may set the preempt flag for a short period whenver an vmexit
->>> happens even if a vmenter is executed shortly after. In this case, we
->>> may want to use a more durable vcpu suspend flag that indicates the vcpu
->>> won't get a real vcpu back for a longer period of time.
->>>
->>> Perhaps you can add a lock event counter to count the number of
->>> wait_early events caused by vcpu_is_preempted() being true to see if it
->>> really cause a lot more wait_early than without the vcpu_is_preempted()
->>> call.
->> pv_wait_again:1:179
->> pv_wait_early:1:189429
->> pv_wait_head:1:263
->> pv_wait_node:1:189429
->> pv_vcpu_is_preempted:1:45588
->> =========sleep 5============
->> pv_wait_again:1:181
->> pv_wait_early:1:202574
->> pv_wait_head:1:267
->> pv_wait_node:1:202590
->> pv_vcpu_is_preempted:1:46336
->>
->> The sampling period is 5s, 6% of wait_early events caused by
->> vcpu_is_preempted() being true.
+On Wed 11-09-19 09:03:10, Michael S. Tsirkin wrote:
+> On Wed, Sep 11, 2019 at 02:33:16PM +0200, Michal Hocko wrote:
+> > On Wed 11-09-19 08:25:03, Michael S. Tsirkin wrote:
+> > > On Wed, Sep 11, 2019 at 02:16:28PM +0200, Michal Hocko wrote:
+> > > > On Wed 11-09-19 08:10:00, Michael S. Tsirkin wrote:
+> > > > > iovec addresses coming from vhost are assumed to be
+> > > > > pre-validated, but in fact can be speculated to a value
+> > > > > out of range.
+> > > > > 
+> > > > > Userspace address are later validated with array_index_nospec so we can
+> > > > > be sure kernel info does not leak through these addresses, but vhost
+> > > > > must also not leak userspace info outside the allowed memory table to
+> > > > > guests.
+> > > > > 
+> > > > > Following the defence in depth principle, make sure
+> > > > > the address is not validated out of node range.
+> > > > > 
+> > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > Tested-by: Jason Wang <jasowang@redhat.com>
+> > > > 
+> > > > no need to mark fo stable? Other spectre fixes tend to be backported
+> > > > even when the security implications are not really clear. The risk
+> > > > should be low and better to be covered in case.
+> > > 
+> > > This is not really a fix - more a defence in depth thing,
+> > > quite similar to e.g.  commit b3bbfb3fb5d25776b8e3f361d2eedaabb0b496cd
+> > > x86: Introduce __uaccess_begin_nospec() and uaccess_try_nospec
+> > > in scope.
+> > >
+> > > That one doesn't seem to be tagged for stable. Was it queued
+> > > there in practice?
+> > 
+> > not marked for stable but it went in. At least to 4.4.
 > 
-> 6% isn't that high. However, when one vCPU voluntarily releases its
-> vCPU, all the subsequently waiters in the queue will do the same. It is
-> a cascading effect. Perhaps we wait early too aggressive with the
-> original patch.
-> 
-> I also look up the email chain of the original commit. The patch
-> submitter did not provide any performance data to support this change.
-> The patch just looked reasonable at that time. So there was no
-> objection. Given that we now have hard evidence that this was not a good
-> idea. I think we should revert it.
-> 
-> Reviewed-by: Waiman Long <longman@redhat.com>
-> 
-> Thanks,
-> Longman
-> 
+> So I guess the answer is I don't know. If you feel it's
+> justified, then sure, feel free to forward.
 
-Queued, thanks.
+Well, that obviously depends on you as a maintainer but the point is
+that spectre gatgets are quite hard to find. There is a smack check
+AFAIK but that generates quite some false possitives and it is PITA to
+crawl through those. If you want an interesting (I am not saying
+vulnerable on purpose) gatget then it would be great to mark it for
+stable so all stable consumers (disclaimer: I am not one of those) and
+add that really great feeling of safety ;)
 
-Paolo
+So take this as my 2c
+-- 
+Michal Hocko
+SUSE Labs
