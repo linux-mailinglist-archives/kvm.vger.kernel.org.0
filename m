@@ -2,198 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C9EC8AF810
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 10:36:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87ABCAF8D4
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 11:23:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727178AbfIKIgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 04:36:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27274 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727138AbfIKIgq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Sep 2019 04:36:46 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8B8VeJB064395
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 04:36:45 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2uxv6mavsj-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 04:36:45 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 11 Sep 2019 09:36:43 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 11 Sep 2019 09:36:40 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8B8adlH56229922
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Sep 2019 08:36:39 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0FE1BAE051;
-        Wed, 11 Sep 2019 08:36:39 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ACAD3AE057;
-        Wed, 11 Sep 2019 08:36:38 +0000 (GMT)
-Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Sep 2019 08:36:38 +0000 (GMT)
-Subject: Re: [PATCH v2] KVM: s390: kvm_s390_vm_start_migration: check
- dirty_bitmap before using it as target for memset()
-To:     Igor Mammedov <imammedo@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        imbrenda@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-References: <20190911075218.29153-1-imammedo@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Wed, 11 Sep 2019 10:36:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1727138AbfIKJXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 05:23:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56984 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726911AbfIKJXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 05:23:53 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3857A11A24
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 09:23:52 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id o13so17473734qtr.15
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 02:23:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mYSD9hRnX/6v3ywsydqfkpFUdOIKRrBI76zwVnPyG4o=;
+        b=eTVRPIEF1k7xz8M0/Fjjjo8s5usKFhmR6RhRFs1VXFIUCGakKLKpkbktD1vQiTu/bq
+         OHAZ8bkuAhG8bN8tRxqfuEJBGs2e+0yaM9S9II09Zfqsg+zlkTTsUqLQTT1yQxyZ/h5X
+         V7b6ZE9MV+grrRhg10a3sQz6rrbuulDYpO5nZ+Q0AYBizRAGIi2wEwWn53PUx3y9s9KH
+         YDQa64E12SqcNQhYxOySCRmH9iYOLYz8OiMC3N2Z5H5yk2luwail2PtEB5q0lWDvfhD3
+         ghY6Q5E0wrOSuWiRmXOMdzipoFm7pUIg7P/fbDYYVaENh0i5J2AAGsXhGAvnWJIGHB3w
+         j6nw==
+X-Gm-Message-State: APjAAAWDfUlyrqHU9hE8/6AT+V93mNz5CuYsAEvlWH1oHJy+UP8QO0BW
+        WZY9BleyEeYFF4NaSUHhJjlGc50Z3168SAyeyRu9XNtLOLX/7v5eW6HDdpECBUAr+1zGc4EDQV5
+        cXpKfGztzbxQW
+X-Received: by 2002:a37:a503:: with SMTP id o3mr33610734qke.115.1568193831418;
+        Wed, 11 Sep 2019 02:23:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz8QR5cKcd/uXRYlQ318mPxE6jSP+97aQIMCCQ/RUZeDP873f/PJ5B1bFEAkiTG92ijMAd8cg==
+X-Received: by 2002:a37:a503:: with SMTP id o3mr33610704qke.115.1568193831205;
+        Wed, 11 Sep 2019 02:23:51 -0700 (PDT)
+Received: from redhat.com ([80.74.107.118])
+        by smtp.gmail.com with ESMTPSA id r13sm5657063qkm.48.2019.09.11.02.23.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2019 02:23:50 -0700 (PDT)
+Date:   Wed, 11 Sep 2019 05:23:40 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fengguang Wu <fengguang.wu@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [virtio-dev] Re: [PATCH v9 0/8] stg mail -e --version=v9 \
+Message-ID: <20190911051819-mutt-send-email-mst@kernel.org>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190910124209.GY2063@dhcp22.suse.cz>
+ <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+ <20190910144713.GF2063@dhcp22.suse.cz>
+ <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
+ <20190910161818.GF2797@work-vm>
+ <f74117db-225d-92cb-9476-22c0f752659d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190911075218.29153-1-imammedo@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="vRyjy3CQeEKOH3G9VNNkmYEGONAMZRI1Y"
-X-TM-AS-GCONF: 00
-x-cbid: 19091108-0016-0000-0000-000002A9EF85
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091108-0017-0000-0000-0000330A7A92
-Message-Id: <19baa04d-0d77-7a80-65e2-e00b0d096811@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-11_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=832 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909110081
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f74117db-225d-92cb-9476-22c0f752659d@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vRyjy3CQeEKOH3G9VNNkmYEGONAMZRI1Y
-Content-Type: multipart/mixed; boundary="dzBoqpYyJe1rGZE0BD3rqKHntsX41AMyO";
- protected-headers="v1"
-From: Janosch Frank <frankja@linux.ibm.com>
-To: Igor Mammedov <imammedo@redhat.com>, linux-kernel@vger.kernel.org
-Cc: borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
- heiko.carstens@de.ibm.com, gor@linux.ibm.com, imbrenda@linux.ibm.com,
- linux-s390@vger.kernel.org, kvm@vger.kernel.org, stable@vger.kernel.org
-Message-ID: <19baa04d-0d77-7a80-65e2-e00b0d096811@linux.ibm.com>
-Subject: Re: [PATCH v2] KVM: s390: kvm_s390_vm_start_migration: check
- dirty_bitmap before using it as target for memset()
-References: <20190911075218.29153-1-imammedo@redhat.com>
-In-Reply-To: <20190911075218.29153-1-imammedo@redhat.com>
+On Tue, Sep 10, 2019 at 06:22:37PM +0200, David Hildenbrand wrote:
+> On 10.09.19 18:18, Dr. David Alan Gilbert wrote:
+> > * Alexander Duyck (alexander.duyck@gmail.com) wrote:
+> >> On Tue, Sep 10, 2019 at 7:47 AM Michal Hocko <mhocko@kernel.org> wrote:
+> >>>
+> >>> On Tue 10-09-19 07:42:43, Alexander Duyck wrote:
+> >>>> On Tue, Sep 10, 2019 at 5:42 AM Michal Hocko <mhocko@kernel.org> wrote:
+> >>>>>
+> >>>>> I wanted to review "mm: Introduce Reported pages" just realize that I
+> >>>>> have no clue on what is going on so returned to the cover and it didn't
+> >>>>> really help much. I am completely unfamiliar with virtio so please bear
+> >>>>> with me.
+> >>>>>
+> >>>>> On Sat 07-09-19 10:25:03, Alexander Duyck wrote:
+> >>>>> [...]
+> >>>>>> This series provides an asynchronous means of reporting to a hypervisor
+> >>>>>> that a guest page is no longer in use and can have the data associated
+> >>>>>> with it dropped. To do this I have implemented functionality that allows
+> >>>>>> for what I am referring to as unused page reporting
+> >>>>>>
+> >>>>>> The functionality for this is fairly simple. When enabled it will allocate
+> >>>>>> statistics to track the number of reported pages in a given free area.
+> >>>>>> When the number of free pages exceeds this value plus a high water value,
+> >>>>>> currently 32, it will begin performing page reporting which consists of
+> >>>>>> pulling pages off of free list and placing them into a scatter list. The
+> >>>>>> scatterlist is then given to the page reporting device and it will perform
+> >>>>>> the required action to make the pages "reported", in the case of
+> >>>>>> virtio-balloon this results in the pages being madvised as MADV_DONTNEED
+> >>>>>> and as such they are forced out of the guest. After this they are placed
+> >>>>>> back on the free list,
+> >>>>>
+> >>>>> And here I am reallly lost because "forced out of the guest" makes me
+> >>>>> feel that those pages are no longer usable by the guest. So how come you
+> >>>>> can add them back to the free list. I suspect understanding this part
+> >>>>> will allow me to understand why we have to mark those pages and prevent
+> >>>>> merging.
+> >>>>
+> >>>> Basically as the paragraph above mentions "forced out of the guest"
+> >>>> really is just the hypervisor calling MADV_DONTNEED on the page in
+> >>>> question. So the behavior is the same as any userspace application
+> >>>> that calls MADV_DONTNEED where the contents are no longer accessible
+> >>>> from userspace and attempting to access them will result in a fault
+> >>>> and the page being populated with a zero fill on-demand page, or a
+> >>>> copy of the file contents if the memory is file backed.
+> >>>
+> >>> As I've said I have no idea about virt so this doesn't really tell me
+> >>> much. Does that mean that if somebody allocates such a page and tries to
+> >>> access it then virt will handle a fault and bring it back?
+> >>
+> >> Actually I am probably describing too much as the MADV_DONTNEED is the
+> >> hypervisor behavior in response to the virtio-balloon notification. A
+> >> more thorough explanation of it can be found by just running "man
+> >> madvise", probably best just to leave it at that since I am probably
+> >> confusing things by describing hypervisor behavior in a kernel patch
+> >> set.
+> >>
+> >> For the most part all the page reporting really does is provide a way
+> >> to incrementally identify unused regions of memory in the buddy
+> >> allocator. That in turn is used by virtio-balloon in a polling thread
+> >> to report to the hypervisor what pages are not in use so that it can
+> >> make a decision on what to do with the pages now that it knows they
+> >> are unused.
+> >>
+> >> All this is providing is just a report and it is optional if the
+> >> hypervisor will act on it or not. If the hypervisor takes some sort of
+> >> action on the page, then the expectation is that the hypervisor will
+> >> use some sort of mechanism such as a page fault to discover when the
+> >> page is used again.
+> > 
+> > OK, that's interestingly different (but OK) from some other schemes that
+> > hav ebeen described which *require* the guest to somehow indicate the
+> > page is in use before starting to use the page again.
+> > 
+> 
+> virtio-balloon also has a mode where the guest would not have to
+> indicate to the host before re-using a page. Only
+> VIRTIO_BALLOON_F_MUST_TELL_HOST enforces this. So it's not completely new.
 
---dzBoqpYyJe1rGZE0BD3rqKHntsX41AMyO
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 9/11/19 9:52 AM, Igor Mammedov wrote:
-> If userspace doesn't set KVM_MEM_LOG_DIRTY_PAGES on memslot before call=
-ing
-> kvm_s390_vm_start_migration(), kernel will oops with:
->=20
->   Unable to handle kernel pointer dereference in virtual kernel address=
- space
->   Failing address: 0000000000000000 TEID: 0000000000000483
->   Fault in home space mode while using kernel ASCE.
->   AS:0000000002a2000b R2:00000001bff8c00b R3:00000001bff88007 S:0000000=
-1bff91000 P:000000000000003d
->   Oops: 0004 ilc:2 [#1] SMP
->   ...
->   Call Trace:
->   ([<001fffff804ec552>] kvm_s390_vm_set_attr+0x347a/0x3828 [kvm])
->    [<001fffff804ecfc0>] kvm_arch_vm_ioctl+0x6c0/0x1998 [kvm]
->    [<001fffff804b67e4>] kvm_vm_ioctl+0x51c/0x11a8 [kvm]
->    [<00000000008ba572>] do_vfs_ioctl+0x1d2/0xe58
->    [<00000000008bb284>] ksys_ioctl+0x8c/0xb8
->    [<00000000008bb2e2>] sys_ioctl+0x32/0x40
->    [<000000000175552c>] system_call+0x2b8/0x2d8
->   INFO: lockdep is turned off.
->   Last Breaking-Event-Address:
->    [<0000000000dbaf60>] __memset+0xc/0xa0
->=20
-> due to ms->dirty_bitmap being NULL, which might crash the host.
->=20
-> Make sure that ms->dirty_bitmap is set before using it or
-> return -ENIVAL otherwise.
-
-Fixed that while picking and added my reviewed-by, as well as the others
-you removed.
-Thanks for your patch.
+VIRTIO_BALLOON_F_MUST_TELL_HOST is a bit different.
+When it's not set, guest still must tell host about
+pages in use, it just can batch these notifications
+sending them possibly after page has been used.
+So even with VIRTIO_BALLOON_F_MUST_TELL_HOST off you don't
+skip the notification.
 
 
---dzBoqpYyJe1rGZE0BD3rqKHntsX41AMyO--
+From hypervisor point of view, this feature is very much like adding
+page to the balloon and immediately taking it out of the balloon again,
+just doing it in one operation.
 
---vRyjy3CQeEKOH3G9VNNkmYEGONAMZRI1Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The main difference is the contents of the page, which matters
+with poisoning: in that case hypervisor is expected to hand
+back page with the poisoning content. Not so with regular
+deflate where page contents is undefined.
 
------BEGIN PGP SIGNATURE-----
+Well and also the new interface is optimized for large chunks
+of memory since we'll likely be dealing with such.
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl14shYACgkQ41TmuOI4
-ufhBAhAAoOSaWNtX+nzRWC/HmJHPpeav8+63Qo91vK6EVOpXq/A4mKa1Hcb/IMbg
-wrXMAxEg3ODpSBTHJzp9t9MjQwdHO8SKfJvcMAJhGHzeEuLycUSBbBdOns1UFwtl
-xa1Xcxlk3j8jVCqeQZCQHayj2iSKVlCeF6BVhvmtbMjMBwlUdrkjG3Fc1nX0XngU
-BrE+Of03FCmOe0PBa6OU5IsWyGDb6hO30uY7rdf79jPeb15TQqyEJtzSfoLcc4qh
-3+6z9QVmJfC/he2kb7KB7K8KDzBTIp8QQUan4R/XGDKqVGkoIB/WPdkkVXNxoGSf
-Zy7i531iDZ8eexEwWP2dUSC681r7fermJUS7JWGmvuR15iGhfIvEkliQKG2kmQQ8
-U9aeCtrW6hC2/zXbfJ3RZUl4/Km668cUMolgn2lSbta2p2ASsKZ/YsNFkVQYX9t2
-cowNHv59ClN87LHRRzQDJj5lUVvncLG8oc7BK9o4Azo3y2iT8Hko7J2TJx1rHXjZ
-yUgSTsVOVhMXEdcGCmwgIZ964EAW0L2NnqXFrf8qUfo04yMgWwOPbThDYwx2o4XI
-mT6XsfiqUo+TIrqxJObH9cJEWJHT6ld3+AWqyWuApnZ/11lLT7Ue1Y2PO/xhLhHE
-qhUXYZgF1gQyRY2N1LD5w+GqZWtclRDf+/hA0d2tJrpzf49dKd4=
-=6bmL
------END PGP SIGNATURE-----
-
---vRyjy3CQeEKOH3G9VNNkmYEGONAMZRI1Y--
-
+> > Dave
+> 
+> 
+> -- 
+> 
+> Thanks,
+> 
+> David / dhildenb
