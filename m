@@ -2,94 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 62854B01CE
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 18:40:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 428BBB01DA
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 18:43:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729201AbfIKQke (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 12:40:34 -0400
-Received: from mail-eopbgr130045.outbound.protection.outlook.com ([40.107.13.45]:19938
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728794AbfIKQke (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 12:40:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I+ko8AggwGvNInEXoWOvqefVR9guaUtvViNSq0heQCf+1M+MVx+RARWI0msVrRFbf8bnkqC1MVsr4WbSqDC/5bYm2R85PnDmQjlUuFVmdV0ruTwFuchhH5+2mDZkN9JYSonblsDzBWrp3v7/dC5AjPWyu3QUhUM+XRMecH5bVewbnIOh6n1oB2CA76h6qR7ITdJKtCGNV/dz0XvA7j13dGm4icAvMax/WlAM+XyRCNi67h6H1NrT0yvL0Cv4JM8AmvdTZMyoi4e9qZUhWp1X2YqBhW77bNBClpP4D6EA032PNfht6pDDsodFdIC5EvnckJm5yNVaM05/d9jZ1sdm7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gKs8tz1Ilj5YSp6Cr+wPxtHLLXOVeI+umVS1qr6dcCY=;
- b=FaPMKMfJxCzI3t09yL2phtecl2ihpCkF32lVIiGp/+CmFmklUKOPnEaR2RWUEbq1i44DEkbJk1XxF8t3MmG52rUv5IicGZXzzE4sccAFgAVbqHpi6RCJJqmZs5uKB6EXuL/pn5RWO7xnYmxKyRtpYIElMX3jtsrqLZ+yvYQMftWdRn1GBRC250B8O9dspFXemDtNncNnTguGK75fPOAS5PpdQgjDEcj6NaM2LBK63ijsX601PyUuixaHDp1ebOnvqYmEQ8npZG/qkW0umi0nOSltfXz/tfmV1bYhWV7cHMr6n8/qtLOMKyULoKcr64ZD97FZLG3rLc6IXmSPbZ3BqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gKs8tz1Ilj5YSp6Cr+wPxtHLLXOVeI+umVS1qr6dcCY=;
- b=W7fFHP1i5GMEshfHN6LlX9epKcq3WdLMVZ3jioyedKLp4xLJ3e3G778Dhyqe+B7I0eAV0UVsCrsou6buJt3eLuHUJkfuhWLg0omPpUXo+8u10ciIKqK08c7EbFaiiISxWaBHUt3oGNwRMVNqtOsF+vU1uIFLEM00I3v6rlignJg=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6129.eurprd05.prod.outlook.com (20.178.117.14) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2241.20; Wed, 11 Sep 2019 16:38:49 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::bc4c:7c4c:d3e2:8b28]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::bc4c:7c4c:d3e2:8b28%6]) with mapi id 15.20.2241.018; Wed, 11 Sep 2019
- 16:38:49 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Parav Pandit <parav@mellanox.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Jiri Pirko <jiri@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v3 0/5] Introduce variable length mdev alias
-Thread-Topic: [PATCH v3 0/5] Introduce variable length mdev alias
-Thread-Index: AQHVYUZdAS6KYIr8SUO1vQ8myuXcNacjy68wgALDGQCAABfpQIAAEvsA
-Date:   Wed, 11 Sep 2019 16:38:49 +0000
-Message-ID: <AM0PR05MB48667E374853D485788D8159D1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
-        <20190902042436.23294-1-parav@mellanox.com>
-        <AM0PR05MB4866F76F807409ED887537D7D1B70@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20190911145610.453b32ec@x1.home>
- <AM0PR05MB48668DFF8E816F0D2D3041BFD1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
-In-Reply-To: <AM0PR05MB48668DFF8E816F0D2D3041BFD1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 00ec339f-cacd-449b-e11e-08d736d685e6
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AM0PR05MB6129;
-x-ms-traffictypediagnostic: AM0PR05MB6129:|AM0PR05MB6129:
-x-ms-exchange-purlcount: 4
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB6129A38C71988C208F2E679BD1B10@AM0PR05MB6129.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0157DEB61B
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(396003)(39860400002)(366004)(346002)(376002)(13464003)(54534003)(189003)(199004)(256004)(229853002)(2940100002)(11346002)(446003)(74316002)(76176011)(81166006)(6436002)(7736002)(53546011)(102836004)(76116006)(8676002)(8936002)(966005)(81156014)(110136005)(478600001)(54906003)(71200400001)(71190400001)(14444005)(6506007)(305945005)(14454004)(316002)(99286004)(86362001)(66946007)(52536014)(66476007)(66556008)(64756008)(66446008)(55016002)(7696005)(5660300002)(3846002)(2906002)(6116002)(4326008)(476003)(66066001)(53936002)(186003)(6246003)(53376002)(9686003)(6306002)(486006)(33656002)(26005)(25786009);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6129;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 40Y1SuZyZgBfow1zPJKsIDjK8+IJ+KxBWcxw8ZVzKwrRAomDAwIyYsYnCKjgsZ580OTAzCXhCNk/XXcU9zvGrHdCsCV19+tTPg3JjIndhT5djuCGFUJ0piZysOnr75je/vKFirXxnkavZFCz8I+l6f/7YhRQicUoGspAtGbb8Qqu4+5+OQWDkcyFLw1ZeehkwOyAr9lq1Gva4fWQT0qIrDm/PuOCp6jIBaFXVBpvdVuux5SIAW1CMR7Lo23zvVH3PWRfC6iwIC35PlaELTS/typfXeraYkEZ4hSXk8Upw596HF3BxgIRLNzs767uprcINk2xewmZBygPgq5+Q267OlgpfVTjuHcqXA4pQJlBcPW68xnV7lv/v9OUwrqek22gQJc7vvFZnD4JoM0FjkiQaJJm4XZbrzc8IHSYhhObaUc=
-Content-Type: text/plain; charset="us-ascii"
+        id S1729298AbfIKQmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 12:42:42 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:39170 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728896AbfIKQmm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 12:42:42 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8BGd566141126;
+        Wed, 11 Sep 2019 16:42:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=Ytv3HM0UuqPmk1T50ByaaO0uZWIycidEklTQAsV36C4=;
+ b=AvzJEfmNCiesG6usjVNtOPOOxVuTAhOILViW92T3A+V1V7rM0UBA8FFTo5RmQ/vYwCix
+ KW+uAPZcWSx6m1434odFjEeKkERoLU4AvKjIzntbtNzOTrJIV8iBYmEAh0v4lXjYVfN0
+ qtIZzaskyyB+vfIHQwkypCpTWM3rEweTEDsNHg6vYPmc09AM/vGp6d0p38yUTuo0bYGB
+ RfKCPaQ7FYISlES3Z0I8OUjCKjIPuvD8pqwE3lP3J3AW7/5quIu/IIE7sCe35MEh07gZ
+ j0vNmKMbangBA0Kr4oiXzPqFtw+NovF5hU21ovQ3WNzcR3GTiA/lIVczbn05JDwYQOoV gw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2uw1m93ec5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Sep 2019 16:42:13 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8BGcx9x078319;
+        Wed, 11 Sep 2019 16:42:12 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2uxj890148-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Sep 2019 16:42:12 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8BGgCRd032640;
+        Wed, 11 Sep 2019 16:42:12 GMT
+Received: from [192.168.14.112] (/109.66.230.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 11 Sep 2019 09:42:12 -0700
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 2/2] KVM: x86: Fix INIT signal handling in various CPU
+ states
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <2a36ca45-56fa-5d4e-7b8c-157190f29f82@redhat.com>
+Date:   Wed, 11 Sep 2019 19:42:08 +0300
+Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00ec339f-cacd-449b-e11e-08d736d685e6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2019 16:38:49.2856
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 754g59yC8m3Qdoo1fKZTCX/ZLdQ/5B2AXw2Po1NNNonty2DHUfJ5pfv512urUVypzpt7RZvzorpP3VguugeHzA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6129
+Message-Id: <5253F0DE-D2E3-4475-9B02-092B7A44D776@oracle.com>
+References: <20190826102449.142687-1-liran.alon@oracle.com>
+ <20190826102449.142687-3-liran.alon@oracle.com>
+ <2a36ca45-56fa-5d4e-7b8c-157190f29f82@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9377 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909110153
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9377 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909110154
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -97,151 +77,192 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-> -----Original Message-----
-> From: linux-kernel-owner@vger.kernel.org <linux-kernel-
-> owner@vger.kernel.org> On Behalf Of Parav Pandit
-> Sent: Wednesday, September 11, 2019 10:31 AM
-> To: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Jiri Pirko <jiri@mellanox.com>; kwankhede@nvidia.com;
-> cohuck@redhat.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; netdev@vger.kernel.org
-> Subject: RE: [PATCH v3 0/5] Introduce variable length mdev alias
+> On 11 Sep 2019, at 19:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >=20
-> Hi Alex,
+> On 26/08/19 12:24, Liran Alon wrote:
+>> 	/*
+>> -	 * INITs are latched while in SMM.  Because an SMM CPU cannot
+>> -	 * be in KVM_MP_STATE_INIT_RECEIVED state, just eat SIPIs
+>> -	 * and delay processing of INIT until the next RSM.
+>> +	 * INITs are latched while CPU is in specific states.
+>> +	 * Because a CPU cannot be in these states immediately
+>> +	 * after it have processed an INIT signal (and thus in
+>> +	 * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
+>> +	 * and delay processing of INIT until CPU leaves
+>> +	 * the state which latch INIT signal.
+>> 	 */
+>> -	if (is_smm(vcpu)) {
+>> +	if (kvm_x86_ops->apic_init_signal_blocked(vcpu)) {
 >=20
-> > -----Original Message-----
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Wednesday, September 11, 2019 8:56 AM
-> > To: Parav Pandit <parav@mellanox.com>
-> > Cc: Jiri Pirko <jiri@mellanox.com>; kwankhede@nvidia.com;
-> > cohuck@redhat.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; netdev@vger.kernel.org
-> > Subject: Re: [PATCH v3 0/5] Introduce variable length mdev alias
-> >
-> > On Mon, 9 Sep 2019 20:42:32 +0000
-> > Parav Pandit <parav@mellanox.com> wrote:
-> >
-> > > Hi Alex,
-> > >
-> > > > -----Original Message-----
-> > > > From: Parav Pandit <parav@mellanox.com>
-> > > > Sent: Sunday, September 1, 2019 11:25 PM
-> > > > To: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > > kwankhede@nvidia.com; cohuck@redhat.com; davem@davemloft.net
-> > > > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > > > netdev@vger.kernel.org; Parav Pandit <parav@mellanox.com>
-> > > > Subject: [PATCH v3 0/5] Introduce variable length mdev alias
-> > > >
-> > > > To have consistent naming for the netdevice of a mdev and to have
-> > > > consistent naming of the devlink port [1] of a mdev, which is
-> > > > formed using phys_port_name of the devlink port, current UUID is
-> > > > not usable because UUID is too long.
-> > > >
-> > > > UUID in string format is 36-characters long and in binary 128-bit.
-> > > > Both formats are not able to fit within 15 characters limit of
-> > > > netdev
-> > name.
-> > > >
-> > > > It is desired to have mdev device naming consistent using UUID.
-> > > > So that widely used user space framework such as ovs [2] can make
-> > > > use of mdev representor in similar way as PCIe SR-IOV VF and PF
-> > representors.
-> > > >
-> > > > Hence,
-> > > > (a) mdev alias is created which is derived using sha1 from the
-> > > > mdev
-> > name.
-> > > > (b) Vendor driver describes how long an alias should be for the
-> > > > child mdev created for a given parent.
-> > > > (c) Mdev aliases are unique at system level.
-> > > > (d) alias is created optionally whenever parent requested.
-> > > > This ensures that non networking mdev parents can function without
-> > > > alias creation overhead.
-> > > >
-> > > > This design is discussed at [3].
-> > > >
-> > > > An example systemd/udev extension will have,
-> > > >
-> > > > 1. netdev name created using mdev alias available in sysfs.
-> > > >
-> > > > mdev UUID=3D83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
-> > > > mdev 12 character alias=3Dcd5b146a80a5
-> > > >
-> > > > netdev name of this mdev =3D enmcd5b146a80a5 Here en =3D Ethernet l=
-ink
-> > > > m =3D mediated device
-> > > >
-> > > > 2. devlink port phys_port_name created using mdev alias.
-> > > > devlink phys_port_name=3Dpcd5b146a80a5
-> > > >
-> > > > This patchset enables mdev core to maintain unique alias for a mdev=
-.
-> > > >
-> > > > Patch-1 Introduces mdev alias using sha1.
-> > > > Patch-2 Ensures that mdev alias is unique in a system.
-> > > > Patch-3 Exposes mdev alias in a sysfs hirerchy, update
-> > > > Documentation
-> > > > Patch-4 Introduces mdev_alias() API.
-> > > > Patch-5 Extends mtty driver to optionally provide alias generation.
-> > > > This also enables to test UUID based sha1 collision and trigger
-> > > > error handling for duplicate sha1 results.
-> > > >
-> > > > [1] http://man7.org/linux/man-pages/man8/devlink-port.8.html
-> > > > [2] https://docs.openstack.org/os-vif/latest/user/plugins/ovs.html
-> > > > [3] https://patchwork.kernel.org/cover/11084231/
-> > > >
-> > > > ---
-> > > > Changelog:
-> > > > v2->v3:
-> > > >  - Addressed comment from Yunsheng Lin
-> > > >  - Changed strcmp() =3D=3D0 to !strcmp()
-> > > >  - Addressed comment from Cornelia Hunk
-> > > >  - Merged sysfs Documentation patch with syfs patch
-> > > >  - Added more description for alias return value
-> > >
-> > > Did you get a chance review this updated series?
-> > > I addressed Cornelia's and yours comment.
-> > > I do not think allocating alias memory twice, once for comparison
-> > > and once for storing is good idea or moving alias generation logic
-> > > inside the mdev_list_lock(). So I didn't address that suggestion of
-> Cornelia.
-> >
-> > Sorry, I'm at LPC this week.  I agree, I don't think the double
-> > allocation is necessary, I thought the comment was sufficient to
-> > clarify null'ing the variable.  It's awkward, but seems correct.
-> >
-> > I'm not sure what we do with this patch series though, has the real
-> > consumer of this even been proposed? =20
-
-Jiri already acked to use mdev_alias() to generate phys_port_name several d=
-ays back in the discussion we had in [1].
-After concluding in the thread [1], I proceed with mdev_alias().
-mlx5_core patches are not yet present on netdev mailing list, but we all ag=
-ree to use it in mdev_alias() in devlink phys_port_name generation.
-So we have collective agreement on how to proceed forward.
-I wasn't probably clear enough in previous email reply about it, so adding =
-link here.
-
-[1] https://patchwork.kernel.org/cover/11084231/#22838955
-
-> It feels optimistic to include
-> > at this point.  We've used the sample driver as a placeholder in the
-> > past for mdev_uuid(), but we arrived at that via a conversion rather
-> > than explicitly adding the API.  Please let me know where the consumer
-> > patches stand, perhaps it would make more sense for them to go in
-> > together rather than risk adding an unused API.  Thanks,
-> >
-> Given that consumer patch series is relatively large (around 15+ patches)=
-, I
-> was considering to merge this one as pre-series to it.
-> Its ok to combine this with consumer patch series.
-> But wanted to have it reviewed beforehand, so that churn is less in actua=
-l
-> consumer series which is more mlx5_core and devlink/netdev centric.
-> So if you can add Review-by, it will be easier to combine with consumer
-> series.
+> I'd prefer keeping is_smm(vcpu) here, since that is not =
+vendor-specific.
 >=20
-> And if we merge it with consumer series, it will come through Dave Miller=
-'s
-> tree instead of your tree.
-> Would that work for you?
+> Together with some edits to the comments, this is what I got.
+> Let me know if you prefer to have the latched_init changes
+> on top, or you'd like to post v2 with everything.
+>=20
+> Thanks,
+>=20
+> Paolo
+
+The code change below seems good to me.
+(The only thing you changed is moving is_smm(vcpu) to the non-vendor =
+specific part and rephrased comments right?)
+
+I plan to submit a patch for the latched_init changes soon. (And =
+respective kvm-unit-test which I already have ready and working).
+We also have another small patch on top to add support for wait-for-SIPI =
+activity-state which I will submit soon as-well.
+So I=E2=80=99m fine with either option of you first applying this change =
+and then I submit another patch on top,
+or me just submitting a new v2 patch series with a new version for this =
+patch and the rest of the changes.
+I don=E2=80=99t have strong preference. Whatever you prefer is fine by =
+me. :)
+
+-Liran
+
+>=20
+> diff --git a/arch/x86/include/asm/kvm_host.h =
+b/arch/x86/include/asm/kvm_host.h
+> index c4f271a9b306..b523949a8df8 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1209,6 +1209,8 @@ struct kvm_x86_ops {
+> 	uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
+>=20
+> 	bool (*need_emulation_on_page_fault)(struct kvm_vcpu *vcpu);
+> +
+> +	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
+> };
+>=20
+> struct kvm_arch_async_pf {
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 559e1c4c0832..dbbe4781fbb2 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2706,11 +2706,14 @@ void kvm_apic_accept_events(struct kvm_vcpu =
+*vcpu)
+> 		return;
+>=20
+> 	/*
+> -	 * INITs are latched while in SMM.  Because an SMM CPU cannot
+> -	 * be in KVM_MP_STATE_INIT_RECEIVED state, just eat SIPIs
+> -	 * and delay processing of INIT until the next RSM.
+> +	 * INITs are latched while CPU is in specific states
+> +	 * (SMM, VMX non-root mode, SVM with GIF=3D0).
+> +	 * Because a CPU cannot be in these states immediately
+> +	 * after it has processed an INIT signal (and thus in
+> +	 * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
+> +	 * and leave the INIT pending.
+> 	 */
+> -	if (is_smm(vcpu)) {
+> +	if (is_smm(vcpu) || kvm_x86_ops->apic_init_signal_blocked(vcpu)) =
+{
+> 		WARN_ON_ONCE(vcpu->arch.mp_state =3D=3D =
+KVM_MP_STATE_INIT_RECEIVED);
+> 		if (test_bit(KVM_APIC_SIPI, &apic->pending_events))
+> 			clear_bit(KVM_APIC_SIPI, &apic->pending_events);
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 2854aafc489e..d24050b647c7 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7170,6 +7170,21 @@ static bool =
+svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+> 	return false;
+> }
+>=20
+> +static bool svm_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_svm *svm =3D to_svm(vcpu);
+> +
+> +	/*
+> +	 * TODO: Last condition latch INIT signals on vCPU when
+> +	 * vCPU is in guest-mode and vmcb12 defines intercept on INIT.
+> +	 * To properly emulate the INIT intercept, SVM should implement
+> +	 * kvm_x86_ops->check_nested_events() and call =
+nested_svm_vmexit()
+> +	 * there if an INIT signal is pending.
+> +	 */
+> +	return !gif_set(svm) ||
+> +		   (svm->vmcb->control.intercept & (1ULL << =
+INTERCEPT_INIT));
+> +}
+> +
+> static struct kvm_x86_ops svm_x86_ops __ro_after_init =3D {
+> 	.cpu_has_kvm_support =3D has_svm,
+> 	.disabled_by_bios =3D is_disabled,
+> @@ -7306,6 +7321,8 @@ static bool =
+svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+> 	.nested_get_evmcs_version =3D nested_get_evmcs_version,
+>=20
+> 	.need_emulation_on_page_fault =3D =
+svm_need_emulation_on_page_fault,
+> +
+> +	.apic_init_signal_blocked =3D svm_apic_init_signal_blocked,
+> };
+>=20
+> static int __init svm_init(void)
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ad2453317c4b..6ce83c602e7f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3409,6 +3409,15 @@ static int vmx_check_nested_events(struct =
+kvm_vcpu *vcpu, bool external_intr)
+> 	unsigned long exit_qual;
+> 	bool block_nested_events =3D
+> 	    vmx->nested.nested_run_pending || =
+kvm_event_needs_reinjection(vcpu);
+> +	struct kvm_lapic *apic =3D vcpu->arch.apic;
+> +
+> +	if (lapic_in_kernel(vcpu) &&
+> +		test_bit(KVM_APIC_INIT, &apic->pending_events)) {
+> +		if (block_nested_events)
+> +			return -EBUSY;
+> +		nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
+> +		return 0;
+> +	}
+>=20
+> 	if (vcpu->arch.exception.pending &&
+> 		nested_vmx_check_exception(vcpu, &exit_qual)) {
+> @@ -4470,7 +4479,12 @@ static int handle_vmoff(struct kvm_vcpu *vcpu)
+> {
+> 	if (!nested_vmx_check_permission(vcpu))
+> 		return 1;
+> +
+> 	free_nested(vcpu);
+> +
+> +	/* Process a latched INIT during time CPU was in VMX operation =
+*/
+> +	kvm_make_request(KVM_REQ_EVENT, vcpu);
+> +
+> 	return nested_vmx_succeed(vcpu);
+> }
+>=20
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 99f52f8c969a..73bf9a2e6fb6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7470,6 +7470,11 @@ static bool =
+vmx_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+> 	return false;
+> }
+>=20
+> +static bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+> +{
+> +	return to_vmx(vcpu)->nested.vmxon;
+> +}
+> +
+> static __init int hardware_setup(void)
+> {
+> 	unsigned long host_bndcfgs;
+> @@ -7794,6 +7799,7 @@ static __exit void hardware_unsetup(void)
+> 	.get_vmcs12_pages =3D NULL,
+> 	.nested_enable_evmcs =3D NULL,
+> 	.need_emulation_on_page_fault =3D =
+vmx_need_emulation_on_page_fault,
+> +	.apic_init_signal_blocked =3D vmx_apic_init_signal_blocked,
+> };
+>=20
+> static void vmx_cleanup_l1d_flush(void)
+
