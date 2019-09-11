@@ -2,219 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FC48AFD57
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 15:04:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAFC3AFD59
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 15:04:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728068AbfIKND7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 09:03:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42242 "EHLO mx1.redhat.com"
+        id S1728092AbfIKNEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 09:04:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39112 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727976AbfIKND6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 09:03:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727093AbfIKNEh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 09:04:37 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A49701918654;
-        Wed, 11 Sep 2019 13:03:57 +0000 (UTC)
-Received: from [10.36.117.155] (ovpn-117-155.ams2.redhat.com [10.36.117.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 389E75DC18;
-        Wed, 11 Sep 2019 13:03:40 +0000 (UTC)
-Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fengguang Wu <fengguang.wu@intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
- <20190910144713.GF2063@dhcp22.suse.cz>
- <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
- <20190910175213.GD4023@dhcp22.suse.cz>
- <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
- <20190911113619.GP4023@dhcp22.suse.cz>
- <20190911080804-mutt-send-email-mst@kernel.org>
- <20190911121941.GU4023@dhcp22.suse.cz> <20190911122526.GV4023@dhcp22.suse.cz>
- <4748a572-57b3-31da-0dde-30138e550c3a@redhat.com>
- <20190911125413.GY4023@dhcp22.suse.cz>
-From:   David Hildenbrand <david@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 58AD185363
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 13:04:36 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id v16so10444540wrt.17
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 06:04:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5cZwRFkPnBfvd9KKrvlsF0v7o7pc2TdTfWhZUtnofjs=;
+        b=GyfOV4RF/TrOqhsxJsPPtl6ColJ0jwUqMcv7C6lx5KcTpwwxt3frN64U3a/GvlJRK9
+         KOY7KpPiRpel6BRt6GLf9Vrkl+ReS/5Fnj+ySTD/lzn5T5BTUjOqmEia5C3mK4e/spf2
+         S8rwoajXarZx+JdHWwLAffa7LrM94vTEgX3Wfg9fRbxWEQlz6paZ56k5WbMl2JLnCroD
+         kZDKvjU3O17yKspcITgNXSxiU2Su8UT31u8lAQLBwjL3CXl+1SRfpGGTHJnWx9SyKKLo
+         S5OUw5uk1oUl3C6dCzZN9we0l5EhGnLK5cphhtfdEfolYIJUfFUzScr/tgrUGsVnBrII
+         Yocg==
+X-Gm-Message-State: APjAAAU0w7niOt3q4eR7QkDcfXVSOpNPZAGSptCgy4bQAm8+SDYuEjWl
+        I3Kl93FKsNWsiKm30DaP5uMqM/39NIOhpfVnLsOS1H9rI4AutsZ/0lUU6nRHw+8Q6u7dbvV6/t7
+        8e6yy/byowptB
+X-Received: by 2002:adf:f48e:: with SMTP id l14mr29136123wro.234.1568207074753;
+        Wed, 11 Sep 2019 06:04:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzBF20UcHxsYOQf/lES4ZO/bVViSm+7jzfEb91Ml+VtQ6z82mrGbxsV6Pa7Uej4nDz/PD+EEQ==
+X-Received: by 2002:adf:f48e:: with SMTP id l14mr29136106wro.234.1568207074435;
+        Wed, 11 Sep 2019 06:04:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:102b:3795:6714:7df6? ([2001:b07:6468:f312:102b:3795:6714:7df6])
+        by smtp.gmail.com with ESMTPSA id y13sm42446736wrg.8.2019.09.11.06.04.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Sep 2019 06:04:33 -0700 (PDT)
+Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is
+ preempted"
+To:     Waiman Long <longman@redhat.com>, Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
+        "# v3 . 10+" <stable@vger.kernel.org>
+References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
+ <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
+ <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
+ <2dda32db-5662-f7a6-f52d-b835df1f45f1@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <736594d6-b9ae-ddb9-2b96-85648728ef33@redhat.com>
-Date:   Wed, 11 Sep 2019 15:03:39 +0200
+Message-ID: <9ef778df-c34a-897c-bcfa-780256fb78ff@redhat.com>
+Date:   Wed, 11 Sep 2019 15:04:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190911125413.GY4023@dhcp22.suse.cz>
+In-Reply-To: <2dda32db-5662-f7a6-f52d-b835df1f45f1@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Wed, 11 Sep 2019 13:03:58 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11.09.19 14:54, Michal Hocko wrote:
-> On Wed 11-09-19 14:42:41, David Hildenbrand wrote:
->> On 11.09.19 14:25, Michal Hocko wrote:
->>> On Wed 11-09-19 14:19:41, Michal Hocko wrote:
->>>> On Wed 11-09-19 08:08:38, Michael S. Tsirkin wrote:
->>>>> On Wed, Sep 11, 2019 at 01:36:19PM +0200, Michal Hocko wrote:
->>>>>> On Tue 10-09-19 14:23:40, Alexander Duyck wrote:
->>>>>> [...]
->>>>>>> We don't put any limitations on the allocator other then that it needs to
->>>>>>> clean up the metadata on allocation, and that it cannot allocate a page
->>>>>>> that is in the process of being reported since we pulled it from the
->>>>>>> free_list. If the page is a "Reported" page then it decrements the
->>>>>>> reported_pages count for the free_area and makes sure the page doesn't
->>>>>>> exist in the "Boundary" array pointer value, if it does it moves the
->>>>>>> "Boundary" since it is pulling the page.
->>>>>>
->>>>>> This is still a non-trivial limitation on the page allocation from an
->>>>>> external code IMHO. I cannot give any explicit reason why an ordering on
->>>>>> the free list might matter (well except for page shuffling which uses it
->>>>>> to make physical memory pattern allocation more random) but the
->>>>>> architecture seems hacky and dubious to be honest. It shoulds like the
->>>>>> whole interface has been developed around a very particular and single
->>>>>> purpose optimization.
->>>>>>
->>>>>> I remember that there was an attempt to report free memory that provided
->>>>>> a callback mechanism [1], which was much less intrusive to the internals
->>>>>> of the allocator yet it should provide a similar functionality. Did you
->>>>>> see that approach? How does this compares to it? Or am I completely off
->>>>>> when comparing them?
->>>>>>
->>>>>> [1] mostly likely not the latest version of the patchset
->>>>>> http://lkml.kernel.org/r/1502940416-42944-5-git-send-email-wei.w.wang@intel.com
->>>>>
->>>>> Linus nacked that one. He thinks invoking callbacks with lots of
->>>>> internal mm locks is too fragile.
+On 11/09/19 06:25, Waiman Long wrote:
+> On 9/10/19 6:56 AM, Wanpeng Li wrote:
+>> On Mon, 9 Sep 2019 at 18:56, Waiman Long <longman@redhat.com> wrote:
+>>> On 9/9/19 2:40 AM, Wanpeng Li wrote:
+>>>> From: Wanpeng Li <wanpengli@tencent.com>
 >>>>
->>>> I would be really curious how much he would be happy about injecting
->>>> other restrictions on the allocator like this patch proposes. This is
->>>> more intrusive as it has a higher maintenance cost longterm IMHO.
+>>>> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if
+>>>> vCPU is preempted), we found great regression caused by this commit.
+>>>>
+>>>> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
+>>>> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800
+>>>> records/s with this commit.
+>>>>
+>>>>           Host                       Guest                score
+>>>>
+>>>> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
+>>>> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
+>>>> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
+>>>> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
+>>>>
+>>>> Exit from aggressive wait-early mechanism can result in yield premature and
+>>>> incur extra scheduling latency in over-subscribe scenario.
+>>>>
+>>>> kvm optimizes:
+>>>> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
+>>>> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
+>>>>
+>>>> Tested-by: loobinliu@tencent.com
+>>>> Cc: Peter Zijlstra <peterz@infradead.org>
+>>>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>>>> Cc: Ingo Molnar <mingo@kernel.org>
+>>>> Cc: Waiman Long <longman@redhat.com>
+>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Cc: Radim Krčmář <rkrcmar@redhat.com>
+>>>> Cc: loobinliu@tencent.com
+>>>> Cc: stable@vger.kernel.org
+>>>> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
+>>>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>>>> ---
+>>>>  kernel/locking/qspinlock_paravirt.h | 2 +-
+>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
+>>>> index 89bab07..e84d21a 100644
+>>>> --- a/kernel/locking/qspinlock_paravirt.h
+>>>> +++ b/kernel/locking/qspinlock_paravirt.h
+>>>> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
+>>>>       if ((loop & PV_PREV_CHECK_MASK) != 0)
+>>>>               return false;
+>>>>
+>>>> -     return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
+>>>> +     return READ_ONCE(prev->state) != vcpu_running;
+>>>>  }
+>>>>
+>>>>  /*
+>>> There are several possibilities for this performance regression:
 >>>
->>> Btw. I do agree that callbacks with internal mm locks are not great
->>> either. We do have a model for that in mmu_notifiers and it is something
->>> I do consider PITA, on the other hand it is mostly sleepable part of the
->>> interface which makes it the real pain. The above callback mechanism was
->>> explicitly documented with restrictions and that the context is
->>> essentially atomic with no access to particular struct pages and no
->>> expensive operations possible. So in the end I've considered it
->>> acceptably painful. Not that I want to override Linus' nack but if
->>> virtualization usecases really require some form of reporting and no
->>> other way to do that push people to invent even more interesting
->>> approaches then we should simply give them/you something reasonable
->>> and least intrusive to our internals.
+>>> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
+>>> cacheline contention issue depending on how that callback is implemented.
 >>>
+>>> 2) KVM may set the preempt flag for a short period whenver an vmexit
+>>> happens even if a vmenter is executed shortly after. In this case, we
+>>> may want to use a more durable vcpu suspend flag that indicates the vcpu
+>>> won't get a real vcpu back for a longer period of time.
+>>>
+>>> Perhaps you can add a lock event counter to count the number of
+>>> wait_early events caused by vcpu_is_preempted() being true to see if it
+>>> really cause a lot more wait_early than without the vcpu_is_preempted()
+>>> call.
+>> pv_wait_again:1:179
+>> pv_wait_early:1:189429
+>> pv_wait_head:1:263
+>> pv_wait_node:1:189429
+>> pv_vcpu_is_preempted:1:45588
+>> =========sleep 5============
+>> pv_wait_again:1:181
+>> pv_wait_early:1:202574
+>> pv_wait_head:1:267
+>> pv_wait_node:1:202590
+>> pv_vcpu_is_preempted:1:46336
 >>
->> The issue with "[PATCH v14 4/5] mm: support reporting free page blocks"
->>  is that it cannot really handle the use case we have here if I am not
->> wrong. While a page is getting processed by the hypervisor (e.g.
->> MADV_DONTNEED), it must not get reused.
+>> The sampling period is 5s, 6% of wait_early events caused by
+>> vcpu_is_preempted() being true.
 > 
-> What prevents to use the callback to get a list of pfn ranges to work on
-> and then use something like start_isolate_page_range on the collected
-> pfn ranges to make sure nobody steals pages from under your feet, do
-> your thing and drop the isolated state afterwards.
+> 6% isn't that high. However, when one vCPU voluntarily releases its
+> vCPU, all the subsequently waiters in the queue will do the same. It is
+> a cascading effect. Perhaps we wait early too aggressive with the
+> original patch.
 > 
-> I am saying somethig like because you wouldn't really want a generic
-> has_unmovable_pages but rather
->                 if (!page_ref_count(page)) {
->                         if (PageBuddy(page))
->                                 iter += (1 << page_order(page)) - 1;
->                         continue;
->                 }
-> subset of it.
+> I also look up the email chain of the original commit. The patch
+> submitter did not provide any performance data to support this change.
+> The patch just looked reasonable at that time. So there was no
+> objection. Given that we now have hard evidence that this was not a good
+> idea. I think we should revert it.
+> 
+> Reviewed-by: Waiman Long <longman@redhat.com>
+> 
+> Thanks,
+> Longman
 > 
 
-Something slightly similar is being performed by Nitesh's patch set. On
-every free of a certain granularity, he records it in the bitmap. These
-bits are "hints of free pages".
+Queued, thanks.
 
-A thread then walks over the bitmap and tries to allocate the "hints".
-If the pages were already reused, the bit is silently cleared.
-
-Instead of allocating/freeing, we could only try to isolate the
-pageblock, then test if free. (One of the usual issues to work around is
-MAX_ORDER-1 crossing pageblocks, that might need special care)
-
-I think you should have a look at the rough idea of Nitesh's patch set
-to see if something like that is going into a better direction. The
-bitmap part is in place to do bulk reporting and avoid duplicate reports.
-
-I think main points we want (and what I am missing from callback idea
-being discussed) are
-1. Do bulk reporting only when a certain threshold is reached
-2. Report only bigger granularities (especially, avoid THP splits in the
-hypervisor - >= 2MB proofed to be effective)
-3. Avoid reporting what has just been reported.
-4. Continuously report, not the "one time report everything" approach.
-
--- 
-
-Thanks,
-
-David / dhildenb
+Paolo
