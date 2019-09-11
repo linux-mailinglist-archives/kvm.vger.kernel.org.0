@@ -2,60 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 87C66B0024
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 17:34:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17FF9B003A
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 17:37:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728561AbfIKPe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 11:34:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46738 "EHLO mx1.redhat.com"
+        id S1728289AbfIKPhq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 11:37:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47988 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728555AbfIKPe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 11:34:29 -0400
+        id S1728576AbfIKPhp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 11:37:45 -0400
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 438A27E428
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 15:34:28 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id f10so1388054wmh.8
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 08:34:28 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4FED281127
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 15:37:45 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id k67so1399987wmf.3
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 08:37:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=doOgwhqpGJ6h2kDCt8VV25zYE+uHv9a72Mxi7Wlmd0E=;
-        b=MZnS2qhSV9YdnRGf+XLj27znUOL1pjUzN7xcF2Uk1aGZo9p7vDUPrMOqeUCC/qyVx8
-         caXMYc2BjYTWgAxkH/5pvxIsnJ1y3Og6JmGxQ1VRaB/XGiRnMnPvLKF5sp7psvQrpdxp
-         bRx6kaxAQdfurgQwLmkJ5vOaOTLLTNgkWbg3vbFk0Ar60nyhAa9yXCtlKPvVNAMy3YYM
-         C/PrYgA5WYpDr2VyxAW0WnWRNGVgdbTkX7Jb8I6P4CTPdqUfNhTmjmT7pTgxprkvXLbD
-         Jq/fo0MQ47DFmFDyxlWWaOtJ9LIURYVmT1CXGKk8qpbJtPEea0oo1Tnus9pHFFlY5BgG
-         Pekw==
-X-Gm-Message-State: APjAAAWsX+Cx59sfMl6p1IcCClq9Wdwp0uRSe6yx7VKQrHmOaRsuGNIk
-        eCju52Ef5wYsTlXZrrvQpVYEctQ1x/i0JC732dwW0M4KA43woAKoV59cDrDCA75GpuZWawXCsxK
-        cW/yyjMXJC3CC
-X-Received: by 2002:a1c:7406:: with SMTP id p6mr4392504wmc.30.1568216066804;
-        Wed, 11 Sep 2019 08:34:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzNPAY5Ask35xXOydsH2uP+v4bBIL3vHASVSD3rPvWjqEPhzVpPf81scJaZWc5yvPe7FBEjYA==
-X-Received: by 2002:a1c:7406:: with SMTP id p6mr4392482wmc.30.1568216066530;
-        Wed, 11 Sep 2019 08:34:26 -0700 (PDT)
+        bh=3XLJ7eZ1CQ0PWL5ZEqS5Y8lsWjbNW3IqaUi1I6ulBVI=;
+        b=GTrgLe7/500/lvLP7UV04STreAFr4qyA+0KwN1kncSn6pKIb/4dnfNpLUs+2PGkTu0
+         ORhcmbDKMjf5cT5PqOKhVP5osC7DFjzYswL5lw59+x05kWtDZAdEdXEYeAVC46P8EFvr
+         SpZVACb2sZTFEJ74QrkzPjIuokMfOFxD1c0tlWTqgYGh3O4XmkpjqB2BAsBnkhZgk3wf
+         P90XOr4CGAZ6Nh3bSVsB/JggmE3+g57ncjYRA3jCi/2pQ9H2nW+pFX64LbsBAaI8xOwx
+         ZmC5qIlRkv8lRfTH6GWNPpjeITyvlfnhY5D5WoW1/ZO7NAH8/cGK0Is5ZkJ3unUNOCcA
+         QvWw==
+X-Gm-Message-State: APjAAAVMuPhVwqOqY5RZKxRKgQwS6XpFS7vidY0G5qVnRvxVwuynApLB
+        7otU9pACTBURuG2f0EYm/DBiLJStni22b+k5DuVVTRWRROzAA/Kt4BP/7FUqz06fnlS1e8sj18L
+        ktqI2jXBVz+/Y
+X-Received: by 2002:adf:ef49:: with SMTP id c9mr12842164wrp.122.1568216263852;
+        Wed, 11 Sep 2019 08:37:43 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzqCXK2KnvaIutrGXCWZzmXZzAIvSvCoAoo/FnD+ib++sl3jZhQPRUlbGb3479dw2aXXotChQ==
+X-Received: by 2002:adf:ef49:: with SMTP id c9mr12842148wrp.122.1568216263598;
+        Wed, 11 Sep 2019 08:37:43 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:102b:3795:6714:7df6? ([2001:b07:6468:f312:102b:3795:6714:7df6])
-        by smtp.gmail.com with ESMTPSA id i26sm2911551wmd.37.2019.09.11.08.34.25
+        by smtp.gmail.com with ESMTPSA id m62sm4138179wmm.35.2019.09.11.08.37.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Sep 2019 08:34:25 -0700 (PDT)
-Subject: Re: [PATCH v3 0/2] KVM: nVMX: add tracepoints for nested VM-Enter
- failures
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20190711155830.15178-1-sean.j.christopherson@intel.com>
+        Wed, 11 Sep 2019 08:37:43 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RESEND PATCH] x86: Fix id_map buffer overflow and
+ PT corruption
+To:     Evgeny Yakovlev <wrfsh@yandex-team.ru>, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, yc-core@yandex-team.ru
+References: <1566979099-23628-1-git-send-email-wrfsh@yandex-team.ru>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <7745e928-da33-fcee-0c26-63862675ec71@redhat.com>
-Date:   Wed, 11 Sep 2019 17:34:23 +0200
+Message-ID: <e121f8a3-32c3-5923-1cdc-f8d96de4b59c@redhat.com>
+Date:   Wed, 11 Sep 2019 17:37:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190711155830.15178-1-sean.j.christopherson@intel.com>
+In-Reply-To: <1566979099-23628-1-git-send-email-wrfsh@yandex-team.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,39 +63,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/07/19 17:58, Sean Christopherson wrote:
-> Debugging VM-Enter failures has been the bane of my existence for years.
-> Seeing KVM's VMCS dump format pop up on a console triggers a Pavlovian
-> response of swear words and sighs.  As KVM's coverage of VM-Enter checks
-> improve, so too do the odds of being able to triage/debug a KVM (or any
-> other hypervisor) bug by running the bad KVM build as an L1 guest.
+On 28/08/19 09:58, Evgeny Yakovlev wrote:
+> Commit 18a34cce introduced init_apic_map. It iterates over
+> sizeof(online_cpus) * 8 items and sets APIC ids in id_map.
+> However, online_cpus is defined (in x86/cstart[64].S) as a 64-bit
+> variable. After i >= 64, init_apic_map begins to read out of bounds of
+> online_cpus. If it finds a non-zero value there enough times,
+> it then proceeds to potentially overflow id_map in assignment.
 > 
-> Improve support for using KVM to debug a buggy VMM by adding tracepoints
-> to capture the basic gist of a VM-Enter failure so that extracting said
-> information from KVM doesn't require attaching a debugger or modifying
-> L0 KVM to manually log failures.
+> In our test case id_map was linked close to pg_base. As a result page
+> table was corrupted and we've seen sporadic failures of ioapic test.
 > 
-> The captured information is by no means complete or perfect, e.g. I'd
-> love to capture *exactly* why a consistency check failed, but logging
-> that level of detail would require invasive code changes and might even
-> act as a deterrent to adding more checks in KVM.
-> 
-> v3: Fix a minor snafu in the v2 rebase, and re-rebase to kvm/next
->     (a45ff5994c9c, "Merge tag 'kvm-arm-for-5.3'...")
-> 
-> v2: Rebase to kvm/queue.
-> 
-> Sean Christopherson (2):
->   KVM: nVMX: add tracepoint for failed nested VM-Enter
->   KVM: nVMX: trace nested VM-Enter failures detected by H/W
-> 
->  arch/x86/include/asm/vmx.h |  14 ++
->  arch/x86/kvm/trace.h       |  22 +++
->  arch/x86/kvm/vmx/nested.c  | 269 ++++++++++++++++++++-----------------
->  arch/x86/kvm/x86.c         |   1 +
->  4 files changed, 179 insertions(+), 127 deletions(-)
-> 
+> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
 
-Queued, thanks.
+Superseded by
+
+[PATCH] x86: Fix out of bounds access when processing online_cpus
+[PATCH] x86: Declare online_cpus based on MAX_TEST_CPUS
+[PATCH] x86: Bump max number of test CPUs to 255
+
+
+Thanks,
 
 Paolo
+
+> ---
+>  lib/x86/apic.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/lib/x86/apic.c b/lib/x86/apic.c
+> index 504299e..1ed8bab 100644
+> --- a/lib/x86/apic.c
+> +++ b/lib/x86/apic.c
+> @@ -228,14 +228,17 @@ void mask_pic_interrupts(void)
+>      outb(0xff, 0xa1);
+>  }
+>  
+> -extern unsigned char online_cpus[256 / 8];
+> +/* Should hold MAX_TEST_CPUS bits */
+> +extern uint64_t online_cpus;
+>  
+>  void init_apic_map(void)
+>  {
+>  	unsigned int i, j = 0;
+>  
+> -	for (i = 0; i < sizeof(online_cpus) * 8; i++) {
+> -		if ((1ul << (i % 8)) & (online_cpus[i / 8]))
+> +	assert(MAX_TEST_CPUS <= sizeof(online_cpus) * 8);
+> +
+> +	for (i = 0; i < MAX_TEST_CPUS; i++) {
+> +		if (online_cpus & ((uint64_t)1 << i))
+>  			id_map[j++] = i;
+>  	}
+>  }
+> 
+
