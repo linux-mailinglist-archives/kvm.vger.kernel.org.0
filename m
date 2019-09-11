@@ -2,120 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F5D8AFE18
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 15:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDAE6AFE1F
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 15:52:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728238AbfIKNv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 09:51:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44350 "EHLO mx1.redhat.com"
+        id S1728067AbfIKNwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 09:52:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53114 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728223AbfIKNv1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 09:51:27 -0400
+        id S1727576AbfIKNwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 09:52:32 -0400
 Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 456712DA981
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 13:51:27 +0000 (UTC)
-Received: by mail-qt1-f197.google.com with SMTP id l23so23852188qtp.4
-        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 06:51:27 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 67907C059B7A
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 13:52:31 +0000 (UTC)
+Received: by mail-qt1-f197.google.com with SMTP id f19so23865257qtq.1
+        for <kvm@vger.kernel.org>; Wed, 11 Sep 2019 06:52:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=152d67FF4RV7HTf/TX16nav3+dbWDhuM37ZTXxyyvyE=;
-        b=VlzUAJ5odweFWnanwZiV4/9pyS7hPJRt2dpCx4HmyUqPkFzUR/cP2Yt0limHwFjCIZ
-         diOOvSCYFYTso3B5SQIMu37wuBMASFgssfVdWjKfnLxeouowEoM0cASxRbkTIcsAqVMF
-         1Mr7zRrmZKNDQ5Rzrvka4Lae8IFl19Nutjtn8QDLNLJvwmrFRhbhBRjb1GoSPIIJoNF9
-         fNwenT4Z02yIBGPFr52PZgyzPPdRScj+hZDTIXKuKd0l3Vva6eWGuQPZzotkVgolh9lb
-         PkOEl3y9nrVay+uLSWCLsGHYVL9kAjjuO2t7TBZMrq0pS3v953cc3SGlyGEgVWGW8bcV
-         yu2Q==
-X-Gm-Message-State: APjAAAUQC65GqQoMnx57qtJXe5ik1HLV5QIVtVCocEHY4mJxtIoDtoyn
-        dCHXWmIr5/en/fBaUF4uoKp7IKHQaKK4czzimGJZ9+adZW4VVqYQSl1mmr5kZsHKCxkSaTli+oJ
-        s9mrS1yIcidRW
-X-Received: by 2002:ac8:6706:: with SMTP id e6mr2563895qtp.143.1568209886591;
-        Wed, 11 Sep 2019 06:51:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwaO6d0va5B79pj+BVvjOJY7I7L3GALGaTfXtlaBYWZSZUc9ffvRmXeRRX5Y4F/HwVRR5aQWQ==
-X-Received: by 2002:ac8:6706:: with SMTP id e6mr2563882qtp.143.1568209886370;
-        Wed, 11 Sep 2019 06:51:26 -0700 (PDT)
+        bh=bTpTDYaW4L1Gk4pQTaJgOsQGofG8+keatPi5K+boUSM=;
+        b=kD21bfRSlq36d9s67ZMM/4oF+Qf3bHWDn29FeDhx5ifoLDbx+F9Jmbyp16R4FuczZP
+         tNOkPGeILXsHa0F5IPfEVO8WG7fusnEOW7zKmQSfuL/b8OE8tud3cBN7YofybSzlNlC9
+         LGVhf4NbjMPYAuXNYAwnQiSyXqpxn+tc5Ke+oV0RR9H/CqLDUOxX1AxpPwaF6EWsyWV/
+         Hr9cJfH8O7qGnkPuE+f9KDxdM2D9Jbm/M5RR/ObopXlck13jM4aJV7ZuQEFhlL1IOe2X
+         QNXZ8rmAOpLER+Z1GBBeb/QymwjOcxCxwjLIbZgtOMd4FmKfIW3fINVmUNKeUF6G3zAj
+         wHSg==
+X-Gm-Message-State: APjAAAU5jl1vFQBDNtn0QV0wic8AXGc697IR/UblWdg4YKRETZL9TeuG
+        1dXImkHVKpLQ5/tqpAEBTNaYjUnS5kTCitkZjR86DjzXBqqi0fbwRsfLusXZKWNatw/5fScEMT2
+        p4paDelDCjrHl
+X-Received: by 2002:a37:4651:: with SMTP id t78mr35308378qka.259.1568209950747;
+        Wed, 11 Sep 2019 06:52:30 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzAArEKuceihQtc6r95FHhQta9AhTzn+LrxDRMztlrzqQf2WbTHO7axIccFjavXyHt6DHiEWw==
+X-Received: by 2002:a37:4651:: with SMTP id t78mr35308358qka.259.1568209950581;
+        Wed, 11 Sep 2019 06:52:30 -0700 (PDT)
 Received: from redhat.com ([80.74.107.118])
-        by smtp.gmail.com with ESMTPSA id y58sm5426960qta.1.2019.09.11.06.51.22
+        by smtp.gmail.com with ESMTPSA id n62sm9969475qkd.124.2019.09.11.06.52.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2019 06:51:25 -0700 (PDT)
-Date:   Wed, 11 Sep 2019 09:51:20 -0400
+        Wed, 11 Sep 2019 06:52:29 -0700 (PDT)
+Date:   Wed, 11 Sep 2019 09:52:25 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
+To:     linux-kernel@vger.kernel.org
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        security@kernel.org
 Subject: Re: [PATCH v2] vhost: block speculation of translated descriptors
-Message-ID: <20190911092544-mutt-send-email-mst@kernel.org>
+Message-ID: <20190911095147-mutt-send-email-mst@kernel.org>
 References: <20190911120908.28410-1-mst@redhat.com>
- <20190911121628.GT4023@dhcp22.suse.cz>
- <20190911082236-mutt-send-email-mst@kernel.org>
- <20190911123316.GX4023@dhcp22.suse.cz>
- <20190911085807-mutt-send-email-mst@kernel.org>
- <20190911131235.GZ4023@dhcp22.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190911131235.GZ4023@dhcp22.suse.cz>
+In-Reply-To: <20190911120908.28410-1-mst@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 11, 2019 at 03:12:35PM +0200, Michal Hocko wrote:
-> On Wed 11-09-19 09:03:10, Michael S. Tsirkin wrote:
-> > On Wed, Sep 11, 2019 at 02:33:16PM +0200, Michal Hocko wrote:
-> > > On Wed 11-09-19 08:25:03, Michael S. Tsirkin wrote:
-> > > > On Wed, Sep 11, 2019 at 02:16:28PM +0200, Michal Hocko wrote:
-> > > > > On Wed 11-09-19 08:10:00, Michael S. Tsirkin wrote:
-> > > > > > iovec addresses coming from vhost are assumed to be
-> > > > > > pre-validated, but in fact can be speculated to a value
-> > > > > > out of range.
-> > > > > > 
-> > > > > > Userspace address are later validated with array_index_nospec so we can
-> > > > > > be sure kernel info does not leak through these addresses, but vhost
-> > > > > > must also not leak userspace info outside the allowed memory table to
-> > > > > > guests.
-> > > > > > 
-> > > > > > Following the defence in depth principle, make sure
-> > > > > > the address is not validated out of node range.
-> > > > > > 
-> > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > > > Tested-by: Jason Wang <jasowang@redhat.com>
-> > > > > 
-> > > > > no need to mark fo stable? Other spectre fixes tend to be backported
-> > > > > even when the security implications are not really clear. The risk
-> > > > > should be low and better to be covered in case.
-> > > > 
-> > > > This is not really a fix - more a defence in depth thing,
-> > > > quite similar to e.g.  commit b3bbfb3fb5d25776b8e3f361d2eedaabb0b496cd
-> > > > x86: Introduce __uaccess_begin_nospec() and uaccess_try_nospec
-> > > > in scope.
-> > > >
-> > > > That one doesn't seem to be tagged for stable. Was it queued
-> > > > there in practice?
-> > > 
-> > > not marked for stable but it went in. At least to 4.4.
-> > 
-> > So I guess the answer is I don't know. If you feel it's
-> > justified, then sure, feel free to forward.
+On Wed, Sep 11, 2019 at 08:10:00AM -0400, Michael S. Tsirkin wrote:
+> iovec addresses coming from vhost are assumed to be
+> pre-validated, but in fact can be speculated to a value
+> out of range.
 > 
-> Well, that obviously depends on you as a maintainer but the point is
-> that spectre gatgets are quite hard to find. There is a smack check
-> AFAIK but that generates quite some false possitives and it is PITA to
-> crawl through those. If you want an interesting (I am not saying
-> vulnerable on purpose) gatget then it would be great to mark it for
-> stable so all stable consumers (disclaimer: I am not one of those) and
-> add that really great feeling of safety ;)
+> Userspace address are later validated with array_index_nospec so we can
+> be sure kernel info does not leak through these addresses, but vhost
+> must also not leak userspace info outside the allowed memory table to
+> guests.
 > 
-> So take this as my 2c
+> Following the defence in depth principle, make sure
+> the address is not validated out of node range.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> Tested-by: Jason Wang <jasowang@redhat.com>
+> ---
 
-OK it seems security@kernel.org is the way to handle these things.
-I'll try that.
+Cc: security@kernel.org
 
+Pls advise on whether you'd like me to merge this directly,
+Cc stable, or handle it in some other way.
+
+> changes from v1: fix build on 32 bit
+> 
+>  drivers/vhost/vhost.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 5dc174ac8cac..34ea219936e3 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2071,8 +2071,10 @@ static int translate_desc(struct vhost_virtqueue *vq, u64 addr, u32 len,
+>  		_iov = iov + ret;
+>  		size = node->size - addr + node->start;
+>  		_iov->iov_len = min((u64)len - s, size);
+> -		_iov->iov_base = (void __user *)(unsigned long)
+> -			(node->userspace_addr + addr - node->start);
+> +		_iov->iov_base = (void __user *)
+> +			((unsigned long)node->userspace_addr +
+> +			 array_index_nospec((unsigned long)(addr - node->start),
+> +					    node->size));
+>  		s += size;
+>  		addr += size;
+>  		++ret;
 > -- 
-> Michal Hocko
-> SUSE Labs
+> MST
