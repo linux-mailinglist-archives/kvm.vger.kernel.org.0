@@ -2,155 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0AADAF50D
-	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 06:26:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02CE9AF72B
+	for <lists+kvm@lfdr.de>; Wed, 11 Sep 2019 09:51:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726381AbfIKEZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Sep 2019 00:25:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53382 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725798AbfIKEZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Sep 2019 00:25:59 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 343C718CB511;
-        Wed, 11 Sep 2019 04:25:58 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-120-46.rdu2.redhat.com [10.10.120.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 42E6119C6A;
-        Wed, 11 Sep 2019 04:25:54 +0000 (UTC)
-Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is
- preempted"
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
-        "# v3 . 10+" <stable@vger.kernel.org>
-References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
- <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com>
- <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <2dda32db-5662-f7a6-f52d-b835df1f45f1@redhat.com>
-Date:   Wed, 11 Sep 2019 05:25:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726842AbfIKHvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Sep 2019 03:51:23 -0400
+Received: from [110.188.70.11] ([110.188.70.11]:20877 "EHLO spam1.hygon.cn"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725616AbfIKHvX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Sep 2019 03:51:23 -0400
+Received: from MK-DB.hygon.cn ([172.23.18.60])
+        by spam1.hygon.cn with ESMTP id x8B7mu9d087318;
+        Wed, 11 Sep 2019 15:48:56 +0800 (GMT-8)
+        (envelope-from fanjinke@hygon.cn)
+Received: from cncheex01.Hygon.cn ([172.23.18.10])
+        by MK-DB.hygon.cn with ESMTP id x8B7mid8071103;
+        Wed, 11 Sep 2019 15:48:44 +0800 (GMT-8)
+        (envelope-from fanjinke@hygon.cn)
+Received: from bogon.hygon.cn (172.23.18.44) by cncheex01.Hygon.cn
+ (172.23.18.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1466.3; Wed, 11 Sep
+ 2019 15:48:46 +0800
+From:   Jinke Fan <fanjinke@hygon.cn>
+To:     <fanjinke@hygon.cn>
+CC:     Pu Wen <puwen@hygon.cn>, Borislav Petkov <bp@suse.de>,
+        <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <hpa@zytor.com>, <x86@kernel.org>,
+        <thomas.lendacky@amd.com>, <kvm@vger.kernel.org>
+Subject: [PATCH 12/16] x86/kvm: Add Hygon Dhyana support to KVM
+Date:   Wed, 11 Sep 2019 15:48:39 +0800
+Message-ID: <20190911074839.69650-1-fanjinke@hygon.cn>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 11 Sep 2019 04:25:58 +0000 (UTC)
+Content-Type: text/plain
+X-Originating-IP: [172.23.18.44]
+X-ClientProxiedBy: cncheex02.Hygon.cn (172.23.18.12) To cncheex01.Hygon.cn
+ (172.23.18.10)
+X-MAIL: spam1.hygon.cn x8B7mu9d087318
+X-DNSRBL: 
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/10/19 6:56 AM, Wanpeng Li wrote:
-> On Mon, 9 Sep 2019 at 18:56, Waiman Long <longman@redhat.com> wrote:
->> On 9/9/19 2:40 AM, Wanpeng Li wrote:
->>> From: Wanpeng Li <wanpengli@tencent.com>
->>>
->>> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't wait if
->>> vCPU is preempted), we found great regression caused by this commit.
->>>
->>> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each is 80 vCPUs.
->>> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700-1800
->>> records/s with this commit.
->>>
->>>           Host                       Guest                score
->>>
->>> vanilla + w/o kvm optimizes     vanilla               1700-1800 records/s
->>> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 records/s
->>> vanilla + w/ kvm optimizes      vanilla               4500-5000 records/s
->>> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 records/s
->>>
->>> Exit from aggressive wait-early mechanism can result in yield premature and
->>> incur extra scheduling latency in over-subscribe scenario.
->>>
->>> kvm optimizes:
->>> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interrupts)
->>> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate lock waiter preemption)
->>>
->>> Tested-by: loobinliu@tencent.com
->>> Cc: Peter Zijlstra <peterz@infradead.org>
->>> Cc: Thomas Gleixner <tglx@linutronix.de>
->>> Cc: Ingo Molnar <mingo@kernel.org>
->>> Cc: Waiman Long <longman@redhat.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Radim Krčmář <rkrcmar@redhat.com>
->>> Cc: loobinliu@tencent.com
->>> Cc: stable@vger.kernel.org
->>> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is preempted)
->>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->>> ---
->>>  kernel/locking/qspinlock_paravirt.h | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qspinlock_paravirt.h
->>> index 89bab07..e84d21a 100644
->>> --- a/kernel/locking/qspinlock_paravirt.h
->>> +++ b/kernel/locking/qspinlock_paravirt.h
->>> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
->>>       if ((loop & PV_PREV_CHECK_MASK) != 0)
->>>               return false;
->>>
->>> -     return READ_ONCE(prev->state) != vcpu_running || vcpu_is_preempted(prev->cpu);
->>> +     return READ_ONCE(prev->state) != vcpu_running;
->>>  }
->>>
->>>  /*
->> There are several possibilities for this performance regression:
->>
->> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause some
->> cacheline contention issue depending on how that callback is implemented.
->>
->> 2) KVM may set the preempt flag for a short period whenver an vmexit
->> happens even if a vmenter is executed shortly after. In this case, we
->> may want to use a more durable vcpu suspend flag that indicates the vcpu
->> won't get a real vcpu back for a longer period of time.
->>
->> Perhaps you can add a lock event counter to count the number of
->> wait_early events caused by vcpu_is_preempted() being true to see if it
->> really cause a lot more wait_early than without the vcpu_is_preempted()
->> call.
-> pv_wait_again:1:179
-> pv_wait_early:1:189429
-> pv_wait_head:1:263
-> pv_wait_node:1:189429
-> pv_vcpu_is_preempted:1:45588
-> =========sleep 5============
-> pv_wait_again:1:181
-> pv_wait_early:1:202574
-> pv_wait_head:1:267
-> pv_wait_node:1:202590
-> pv_vcpu_is_preempted:1:46336
->
-> The sampling period is 5s, 6% of wait_early events caused by
-> vcpu_is_preempted() being true.
+From: Pu Wen <puwen@hygon.cn>
 
-6% isn't that high. However, when one vCPU voluntarily releases its
-vCPU, all the subsequently waiters in the queue will do the same. It is
-a cascading effect. Perhaps we wait early too aggressive with the
-original patch.
+The Hygon Dhyana CPU has the SVM feature as AMD family 17h does.
+So enable the KVM infrastructure support to it.
 
-I also look up the email chain of the original commit. The patch
-submitter did not provide any performance data to support this change.
-The patch just looked reasonable at that time. So there was no
-objection. Given that we now have hard evidence that this was not a good
-idea. I think we should revert it.
+Signed-off-by: Pu Wen <puwen@hygon.cn>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Reviewed-by: Borislav Petkov <bp@suse.de>
+Cc: pbonzini@redhat.com
+Cc: rkrcmar@redhat.com
+Cc: tglx@linutronix.de
+Cc: mingo@redhat.com
+Cc: hpa@zytor.com
+Cc: x86@kernel.org
+Cc: thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org
+Link: https://lkml.kernel.org/r/654dd12876149fba9561698eaf9fc15d030301f8.1537533369.git.puwen@hygon.cn
+---
+ arch/x86/include/asm/kvm_emulate.h |  4 ++++
+ arch/x86/include/asm/virtext.h     |  5 +++--
+ arch/x86/kvm/emulate.c             | 11 ++++++++++-
+ 3 files changed, 17 insertions(+), 3 deletions(-)
 
-Reviewed-by: Waiman Long <longman@redhat.com>
-
-Thanks,
-Longman
+diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
+index 0f82cd91cd3c..93c4bf598fb0 100644
+--- a/arch/x86/include/asm/kvm_emulate.h
++++ b/arch/x86/include/asm/kvm_emulate.h
+@@ -364,6 +364,10 @@ struct x86_emulate_ctxt {
+ #define X86EMUL_CPUID_VENDOR_AMDisbetterI_ecx 0x21726574
+ #define X86EMUL_CPUID_VENDOR_AMDisbetterI_edx 0x74656273
+ 
++#define X86EMUL_CPUID_VENDOR_HygonGenuine_ebx 0x6f677948
++#define X86EMUL_CPUID_VENDOR_HygonGenuine_ecx 0x656e6975
++#define X86EMUL_CPUID_VENDOR_HygonGenuine_edx 0x6e65476e
++
+ #define X86EMUL_CPUID_VENDOR_GenuineIntel_ebx 0x756e6547
+ #define X86EMUL_CPUID_VENDOR_GenuineIntel_ecx 0x6c65746e
+ #define X86EMUL_CPUID_VENDOR_GenuineIntel_edx 0x49656e69
+diff --git a/arch/x86/include/asm/virtext.h b/arch/x86/include/asm/virtext.h
+index 0116b2ee9e64..e05e0d309244 100644
+--- a/arch/x86/include/asm/virtext.h
++++ b/arch/x86/include/asm/virtext.h
+@@ -83,9 +83,10 @@ static inline void cpu_emergency_vmxoff(void)
+  */
+ static inline int cpu_has_svm(const char **msg)
+ {
+-	if (boot_cpu_data.x86_vendor != X86_VENDOR_AMD) {
++	if (boot_cpu_data.x86_vendor != X86_VENDOR_AMD &&
++	    boot_cpu_data.x86_vendor != X86_VENDOR_HYGON) {
+ 		if (msg)
+-			*msg = "not amd";
++			*msg = "not amd or hygon";
+ 		return 0;
+ 	}
+ 
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 106482da6388..34edf198708f 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -2711,7 +2711,16 @@ static bool em_syscall_is_enabled(struct x86_emulate_ctxt *ctxt)
+ 	    edx == X86EMUL_CPUID_VENDOR_AMDisbetterI_edx)
+ 		return true;
+ 
+-	/* default: (not Intel, not AMD), apply Intel's stricter rules... */
++	/* Hygon ("HygonGenuine") */
++	if (ebx == X86EMUL_CPUID_VENDOR_HygonGenuine_ebx &&
++	    ecx == X86EMUL_CPUID_VENDOR_HygonGenuine_ecx &&
++	    edx == X86EMUL_CPUID_VENDOR_HygonGenuine_edx)
++		return true;
++
++	/*
++	 * default: (not Intel, not AMD, not Hygon), apply Intel's
++	 * stricter rules...
++	 */
+ 	return false;
+ }
+ 
+-- 
+2.17.1
 
