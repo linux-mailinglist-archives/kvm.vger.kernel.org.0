@@ -2,51 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC47FB0D28
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 12:47:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 405A5B0D40
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 12:53:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731158AbfILKrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 06:47:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28750 "EHLO
+        id S1731211AbfILKxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 06:53:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53688 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730680AbfILKrW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Sep 2019 06:47:22 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8CAjasN077994
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 06:47:21 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2uyjw13ywj-1
+        by vger.kernel.org with ESMTP id S1730023AbfILKw7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Sep 2019 06:52:59 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8CAqKEG115044
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 06:52:59 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2uyhn6q4av-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 06:47:21 -0400
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 06:52:58 -0400
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 12 Sep 2019 11:47:19 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 12 Sep 2019 11:52:56 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Sep 2019 11:47:15 +0100
+        Thu, 12 Sep 2019 11:52:53 +0100
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8CAlE2941549858
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8CAqqlt31588814
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Sep 2019 10:47:14 GMT
+        Thu, 12 Sep 2019 10:52:52 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57DD8A4055;
-        Thu, 12 Sep 2019 10:47:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 9CE0EA4053;
+        Thu, 12 Sep 2019 10:52:52 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 14210A4040;
-        Thu, 12 Sep 2019 10:47:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 55498A4059;
+        Thu, 12 Sep 2019 10:52:52 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.133])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Sep 2019 10:47:14 +0000 (GMT)
+        Thu, 12 Sep 2019 10:52:52 +0000 (GMT)
 Subject: Re: [PATCH] KVM: s390: Do not leak kernel stack data in the
  KVM_S390_INTERRUPT ioctl
 To:     Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20190912090050.20295-1-thuth@redhat.com>
+ <6905df78-95f0-3d6d-aaae-910cd2d7a232@redhat.com>
+ <253e67f6-0a41-13e8-4ca2-c651d5fcdb69@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -92,26 +94,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Thu, 12 Sep 2019 12:47:13 +0200
+Date:   Thu, 12 Sep 2019 12:52:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190912090050.20295-1-thuth@redhat.com>
+In-Reply-To: <253e67f6-0a41-13e8-4ca2-c651d5fcdb69@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19091210-0008-0000-0000-00000314BFB3
+x-cbid: 19091210-0016-0000-0000-000002AA6273
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091210-0009-0000-0000-00004A332EBF
-Message-Id: <4ed0c815-c598-bb0f-9841-d579fc62877f@de.ibm.com>
+x-cbparentid: 19091210-0017-0000-0000-0000330AF337
+Message-Id: <f9d07b66-a048-6626-e209-9fe455a2bed3@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-12_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120114
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909120116
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -119,73 +121,89 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12.09.19 11:00, Thomas Huth wrote:
-> When the userspace program runs the KVM_S390_INTERRUPT ioctl to inject
-> an interrupt, we convert them from the legacy struct kvm_s390_interrupt
-> to the new struct kvm_s390_irq via the s390int_to_s390irq() function.
-> However, this function does not take care of all types of interrupts
-> that we can inject into the guest later (see do_inject_vcpu()). Since we
-> do not clear out the s390irq values before calling s390int_to_s390irq(),
-> there is a chance that we copy unwanted data from the kernel stack
-> into the guest memory later if the interrupt data has not been properly
-> initialized by s390int_to_s390irq().
-
-You mean by using the migration callbacks to get all interrupts back to 
-userspace?
-
-
-
+On 12.09.19 11:20, Thomas Huth wrote:
+> On 12/09/2019 11.14, David Hildenbrand wrote:
+>> On 12.09.19 11:00, Thomas Huth wrote:
+>>> When the userspace program runs the KVM_S390_INTERRUPT ioctl to inject
+>>> an interrupt, we convert them from the legacy struct kvm_s390_interrupt
+>>> to the new struct kvm_s390_irq via the s390int_to_s390irq() function.
+>>> However, this function does not take care of all types of interrupts
+>>> that we can inject into the guest later (see do_inject_vcpu()). Since we
+>>> do not clear out the s390irq values before calling s390int_to_s390irq(),
+>>> there is a chance that we copy unwanted data from the kernel stack
+>>> into the guest memory later if the interrupt data has not been properly
+>>> initialized by s390int_to_s390irq().
+>>>
+>>> Specifically, the problem exists with the KVM_S390_INT_PFAULT_INIT
+>>> interrupt: s390int_to_s390irq() does not handle it, but the function
+>>> __deliver_pfault_init() will later copy the uninitialized stack data
+>>> from the ext.ext_params2 into the guest memory.
+>>>
+>>> Fix it by handling that interrupt type in s390int_to_s390irq(), too.
+>>> And while we're at it, make sure that s390int_to_s390irq() now
+>>> directly returns -EINVAL for unknown interrupt types, so that we
+>>> do not run into this problem again in case we add more interrupt
+>>> types to do_inject_vcpu() sometime in the future.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  arch/s390/kvm/interrupt.c | 10 ++++++++++
+>>>  1 file changed, 10 insertions(+)
+>>>
+>>> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+>>> index 3e7efdd9228a..165dea4c7f19 100644
+>>> --- a/arch/s390/kvm/interrupt.c
+>>> +++ b/arch/s390/kvm/interrupt.c
+>>> @@ -1960,6 +1960,16 @@ int s390int_to_s390irq(struct kvm_s390_interrupt *s390int,
+>>>  	case KVM_S390_MCHK:
+>>>  		irq->u.mchk.mcic = s390int->parm64;
+>>>  		break;
+>>> +	case KVM_S390_INT_PFAULT_INIT:
+>>> +		irq->u.ext.ext_params = s390int->parm;
+>>> +		irq->u.ext.ext_params2 = s390int->parm64;
+>>> +		break;
+>>> +	case KVM_S390_RESTART:
+>>> +	case KVM_S390_INT_CLOCK_COMP:
+>>> +	case KVM_S390_INT_CPU_TIMER:
+>>> +		break;
+>>> +	default:
+>>> +		return -EINVAL;
+>>>  	}
+>>>  	return 0;
+>>>  }
+>>>
+>>
+>> Wouldn't a safe fix be to initialize the struct to zero in the caller?
 > 
-> Specifically, the problem exists with the KVM_S390_INT_PFAULT_INIT
-> interrupt: s390int_to_s390irq() does not handle it, but the function
-> __deliver_pfault_init() will later copy the uninitialized stack data
-> from the ext.ext_params2 into the guest memory.
+> That's of course possible, too. But that means that we always have to
+> zero out the whole structure, so that's a little bit more of overhead
+> (well, it likely doesn't matter for such a legacy ioctl).
 
+Yes doing something like
 
-Shouldnt we add some more detailed description how this can happen?
-Something like
-"By using the KVM_S390_INTERRUPT ioctl with a KVM_S390_INT_PFAULT_INIT
-interrupt followed by the KVM_S390_GET_IRQ_STATE ioctl the user can
-extract a value from the kernel stack."
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index c19a24e940a1..b1f6f434af5d 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4332,7 +4332,7 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
+        }
+        case KVM_S390_INTERRUPT: {
+                struct kvm_s390_interrupt s390int;
+-               struct kvm_s390_irq s390irq;
++               struct kvm_s390_irq s390irq = {};
+ 
+                if (copy_from_user(&s390int, argp, sizeof(s390int)))
+                        return -EFAULT;
 
+would certainly be ok as well, but
 
-> 
-> Fix it by handling that interrupt type in s390int_to_s390irq(), too.
-> And while we're at it, make sure that s390int_to_s390irq() now
-> directly returns -EINVAL for unknown interrupt types, so that we
-> do not run into this problem again in case we add more interrupt
-> types to do_inject_vcpu() sometime in the future.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> But the more important question: Do we then still care of fixing the
+> PFAULT_INIT interrupt here? Since it requires a parameter, the "case
+> KVM_S390_INT_PFAULT_INIT:" part would be required here anyway.
 
-Cc: stable
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-> ---
->  arch/s390/kvm/interrupt.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 3e7efdd9228a..165dea4c7f19 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -1960,6 +1960,16 @@ int s390int_to_s390irq(struct kvm_s390_interrupt *s390int,
->  	case KVM_S390_MCHK:
->  		irq->u.mchk.mcic = s390int->parm64;
->  		break;
-> +	case KVM_S390_INT_PFAULT_INIT:
-> +		irq->u.ext.ext_params = s390int->parm;
-> +		irq->u.ext.ext_params2 = s390int->parm64;
-> +		break;
-> +	case KVM_S390_RESTART:
-> +	case KVM_S390_INT_CLOCK_COMP:
-> +	case KVM_S390_INT_CPU_TIMER:
-> +		break;
-> +	default:
-> +		return -EINVAL;
->  	}
->  	return 0;
->  }
-> 
+as long as we we this interface we should fix it and we should do the
+pfault thing correctly. 
+Maybe we should start to deprecate this interface and remove it.
+For the time being Thomas fix is certainly good enough. We might want to
+add the designated initializer as an additional safety barrier. 
 
