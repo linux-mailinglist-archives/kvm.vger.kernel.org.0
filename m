@@ -2,147 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D0032B0B09
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 11:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6DDFB0B23
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 11:19:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730593AbfILJOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 05:14:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46784 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730434AbfILJOO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Sep 2019 05:14:14 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 53D073086246;
-        Thu, 12 Sep 2019 09:14:13 +0000 (UTC)
-Received: from [10.36.117.168] (ovpn-117-168.ams2.redhat.com [10.36.117.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CAE75600C4;
-        Thu, 12 Sep 2019 09:14:11 +0000 (UTC)
-Subject: Re: [PATCH] KVM: s390: Do not leak kernel stack data in the
- KVM_S390_INTERRUPT ioctl
-To:     Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190912090050.20295-1-thuth@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <6905df78-95f0-3d6d-aaae-910cd2d7a232@redhat.com>
-Date:   Thu, 12 Sep 2019 11:14:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1730675AbfILJTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 05:19:30 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50108 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730428AbfILJT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Sep 2019 05:19:29 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 6E344B61F;
+        Thu, 12 Sep 2019 09:19:27 +0000 (UTC)
+Date:   Thu, 12 Sep 2019 11:19:25 +0200
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fengguang Wu <fengguang.wu@intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Mel Gorman <mgorman@suse.de>, Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
+Message-ID: <20190912091925.GM4023@dhcp22.suse.cz>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190910124209.GY2063@dhcp22.suse.cz>
+ <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+ <20190910144713.GF2063@dhcp22.suse.cz>
+ <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
+ <20190910175213.GD4023@dhcp22.suse.cz>
+ <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
+ <20190911113619.GP4023@dhcp22.suse.cz>
+ <CAKgT0UfOp1c+ov=3pBD72EkSB9Vm7mG5G6zJj4=j=UH7zCgg2Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190912090050.20295-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 12 Sep 2019 09:14:13 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UfOp1c+ov=3pBD72EkSB9Vm7mG5G6zJj4=j=UH7zCgg2Q@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12.09.19 11:00, Thomas Huth wrote:
-> When the userspace program runs the KVM_S390_INTERRUPT ioctl to inject
-> an interrupt, we convert them from the legacy struct kvm_s390_interrupt
-> to the new struct kvm_s390_irq via the s390int_to_s390irq() function.
-> However, this function does not take care of all types of interrupts
-> that we can inject into the guest later (see do_inject_vcpu()). Since we
-> do not clear out the s390irq values before calling s390int_to_s390irq(),
-> there is a chance that we copy unwanted data from the kernel stack
-> into the guest memory later if the interrupt data has not been properly
-> initialized by s390int_to_s390irq().
+On Wed 11-09-19 08:12:03, Alexander Duyck wrote:
+> On Wed, Sep 11, 2019 at 4:36 AM Michal Hocko <mhocko@kernel.org> wrote:
+> >
+> > On Tue 10-09-19 14:23:40, Alexander Duyck wrote:
+> > [...]
+> > > We don't put any limitations on the allocator other then that it needs to
+> > > clean up the metadata on allocation, and that it cannot allocate a page
+> > > that is in the process of being reported since we pulled it from the
+> > > free_list. If the page is a "Reported" page then it decrements the
+> > > reported_pages count for the free_area and makes sure the page doesn't
+> > > exist in the "Boundary" array pointer value, if it does it moves the
+> > > "Boundary" since it is pulling the page.
+> >
+> > This is still a non-trivial limitation on the page allocation from an
+> > external code IMHO. I cannot give any explicit reason why an ordering on
+> > the free list might matter (well except for page shuffling which uses it
+> > to make physical memory pattern allocation more random) but the
+> > architecture seems hacky and dubious to be honest. It shoulds like the
+> > whole interface has been developed around a very particular and single
+> > purpose optimization.
 > 
-> Specifically, the problem exists with the KVM_S390_INT_PFAULT_INIT
-> interrupt: s390int_to_s390irq() does not handle it, but the function
-> __deliver_pfault_init() will later copy the uninitialized stack data
-> from the ext.ext_params2 into the guest memory.
-> 
-> Fix it by handling that interrupt type in s390int_to_s390irq(), too.
-> And while we're at it, make sure that s390int_to_s390irq() now
-> directly returns -EINVAL for unknown interrupt types, so that we
-> do not run into this problem again in case we add more interrupt
-> types to do_inject_vcpu() sometime in the future.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  arch/s390/kvm/interrupt.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 3e7efdd9228a..165dea4c7f19 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -1960,6 +1960,16 @@ int s390int_to_s390irq(struct kvm_s390_interrupt *s390int,
->  	case KVM_S390_MCHK:
->  		irq->u.mchk.mcic = s390int->parm64;
->  		break;
-> +	case KVM_S390_INT_PFAULT_INIT:
-> +		irq->u.ext.ext_params = s390int->parm;
-> +		irq->u.ext.ext_params2 = s390int->parm64;
-> +		break;
-> +	case KVM_S390_RESTART:
-> +	case KVM_S390_INT_CLOCK_COMP:
-> +	case KVM_S390_INT_CPU_TIMER:
-> +		break;
-> +	default:
-> +		return -EINVAL;
->  	}
->  	return 0;
->  }
-> 
+> How is this any different then the code that moves a page that will
+> likely be merged to the tail though?
 
-Wouldn't a safe fix be to initialize the struct to zero in the caller?
+I guess you are referring to the page shuffling. If that is the case
+then this is an integral part of the allocator for a reason and it is
+very well obvious in the code including the consequences. I do not
+really like an idea of hiding similar constrains behind a generic
+looking feature which is completely detached from the allocator and so
+any future change of the allocator might subtly break it.
 
+> In our case the "Reported" page is likely going to be much more
+> expensive to allocate and use then a standard page because it will be
+> faulted back in. In such a case wouldn't it make sense for us to want
+> to keep the pages that don't require faults ahead of those pages in
+> the free_list so that they are more likely to be allocated?
+
+OK, I was suspecting this would pop out. And this is exactly why I
+didn't like an idea of an external code imposing a non obvious constrains
+to the allocator. You simply cannot count with any ordering with the
+page allocator. We used to distinguish cache hot/cold pages in the past
+and pushed pages to the specific end of the free list but that has been
+removed. There are other potential changes like that possible. Shuffling
+is a good recent example.
+
+Anyway I am not a maintainer of this code. I would really like to hear
+opinions from Mel and Vlastimil here (now CCed - the thread starts
+http://lkml.kernel.org/r/20190907172225.10910.34302.stgit@localhost.localdomain.
 -- 
-
-Thanks,
-
-David / dhildenb
+Michal Hocko
+SUSE Labs
