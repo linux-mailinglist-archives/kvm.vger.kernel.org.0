@@ -2,191 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B657B0EAD
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 14:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5050B0ED5
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 14:25:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731503AbfILMOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 08:14:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44630 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730454AbfILMOh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Sep 2019 08:14:37 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8CCECUv054092
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 08:14:36 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2uykr7n9cv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 08:14:36 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 12 Sep 2019 13:14:34 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Sep 2019 13:14:30 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8CCEUk023330860
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Sep 2019 12:14:30 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E71A311C052;
-        Thu, 12 Sep 2019 12:14:29 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D8A411C05E;
-        Thu, 12 Sep 2019 12:14:29 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.133])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Sep 2019 12:14:29 +0000 (GMT)
-Subject: Re: [PATCH v2] KVM: s390: Do not leak kernel stack data in the
- KVM_S390_INTERRUPT ioctl
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20190912115438.25761-1-thuth@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Thu, 12 Sep 2019 14:14:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731611AbfILMZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 08:25:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60930 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731508AbfILMZb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Sep 2019 08:25:31 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E7C6B20693;
+        Thu, 12 Sep 2019 12:25:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1568291130;
+        bh=pHyd+nIsTmA2wA+QeNN7PdGQXRqiG7bZ7/rvxr2VSr4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hpEYhpG3oOFGP98/XEo4NhOKemvj4vVMdN3B1jXO+VMXlySsK6dx3bL29Gx4D+EeZ
+         erm9I+3OoUEF1zGQrodlWwYQopt5BoDbW3R7DyIHd50R1PyUPT4kb1oe8KoTBhxNIm
+         5QAJuLsBHjqCNdY2zkdH3zAJvTOJFhHMyLobOJQQ=
+Date:   Thu, 12 Sep 2019 13:25:21 +0100
+From:   Will Deacon <will@kernel.org>
+To:     syzbot <syzbot+46f1dd7dbbe2bfb98b10@syzkaller.appspotmail.com>
+Cc:     bp@alien8.de, carlo@caione.org, catalin.marinas@arm.com,
+        devicetree@vger.kernel.org, hpa@zytor.com, jmattson@google.com,
+        joro@8bytes.org, khilman@baylibre.com, kvm@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        mark.rutland@arm.com, mingo@redhat.com, narmstrong@baylibre.com,
+        pbonzini@redhat.com, rkrcmar@redhat.com, robh+dt@kernel.org,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        will.deacon@arm.com, x86@kernel.org
+Subject: Re: KASAN: slab-out-of-bounds Read in handle_vmptrld
+Message-ID: <20190912122521.lchqtye24tfol4an@willie-the-truck>
+References: <000000000000a9d4f705924cff7a@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20190912115438.25761-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19091212-0012-0000-0000-0000034A67FD
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091212-0013-0000-0000-00002184D461
-Message-Id: <aee51ff7-010c-42ed-b528-e479bba44b94@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-12_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120131
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000a9d4f705924cff7a@google.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-thanks, applied and queued for 5.3 (need to do some regression testing before
-sending out)
+On Wed, Sep 11, 2019 at 01:38:08PM -0700, syzbot wrote:
+> syzbot found the following crash on:
+> 
+> HEAD commit:    1e3778cb Merge tag 'scsi-fixes' of git://git.kernel.org/pu..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15bdfc5e600000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b89bb446a3faaba4
+> dashboard link: https://syzkaller.appspot.com/bug?extid=46f1dd7dbbe2bfb98b10
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1709421a600000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=168fc4b2600000
+> 
+> The bug was bisected to:
+> 
+> commit a87f854ddcf7ff7e044d72db0aa6da82f26d69a6
+> Author: Neil Armstrong <narmstrong@baylibre.com>
+> Date:   Wed Oct 11 15:39:40 2017 +0000
+> 
+>     ARM64: dts: meson-gx: remove unnecessary uart compatible
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17e78a6e600000
+> final crash:    https://syzkaller.appspot.com/x/report.txt?x=14178a6e600000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10178a6e600000
 
-On 12.09.19 13:54, Thomas Huth wrote:
-> When the userspace program runs the KVM_S390_INTERRUPT ioctl to inject
-> an interrupt, we convert them from the legacy struct kvm_s390_interrupt
-> to the new struct kvm_s390_irq via the s390int_to_s390irq() function.
-> However, this function does not take care of all types of interrupts
-> that we can inject into the guest later (see do_inject_vcpu()). Since we
-> do not clear out the s390irq values before calling s390int_to_s390irq(),
-> there is a chance that we copy random data from the kernel stack which
-> could be leaked to the userspace later.
+Unfortunately, I think the bisect must be bogus, since I can't see how a
+devicetree change for an arm64 file can affect the x86 KVM instruction
+emulation.
+
+Maybe somebody from the x86 KVM side could have a look at the KASAN splat?
+
+Will
+
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+46f1dd7dbbe2bfb98b10@syzkaller.appspotmail.com
+> Fixes: a87f854ddcf7 ("ARM64: dts: meson-gx: remove unnecessary uart
+> compatible")
 > 
-> Specifically, the problem exists with the KVM_S390_INT_PFAULT_INIT
-> interrupt: s390int_to_s390irq() does not handle it, and the function
-> __inject_pfault_init() later copies irq->u.ext which contains the
-> random kernel stack data. This data can then be leaked either to
-> the guest memory in __deliver_pfault_init(), or the userspace might
-> retrieve it directly with the KVM_S390_GET_IRQ_STATE ioctl.
+> L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and
+> https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for
+> details.
+> ==================================================================
+> BUG: KASAN: slab-out-of-bounds in handle_vmptrld
+> arch/x86/kvm/vmx/nested.c:4789 [inline]
+> BUG: KASAN: slab-out-of-bounds in handle_vmptrld+0x777/0x800
+> arch/x86/kvm/vmx/nested.c:4749
+> Read of size 4 at addr ffff888091e10000 by task syz-executor758/10006
 > 
-> Fix it by handling that interrupt type in s390int_to_s390irq(), too,
-> and by making sure that the s390irq struct is properly pre-initialized.
-> And while we're at it, make sure that s390int_to_s390irq() now
-> directly returns -EINVAL for unknown interrupt types, so that we
-> immediately get a proper error code in case we add more interrupt
-> types to do_inject_vcpu() without updating s390int_to_s390irq()
-> sometime in the future.
+> CPU: 1 PID: 10006 Comm: syz-executor758 Not tainted 5.3.0-rc7+ #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 01/01/2011
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+>  print_address_description.cold+0xd4/0x306 mm/kasan/report.c:351
+>  __kasan_report.cold+0x1b/0x36 mm/kasan/report.c:482
+>  kasan_report+0x12/0x17 mm/kasan/common.c:618
+>  __asan_report_load_n_noabort+0xf/0x20 mm/kasan/generic_report.c:142
+>  handle_vmptrld arch/x86/kvm/vmx/nested.c:4789 [inline]
+>  handle_vmptrld+0x777/0x800 arch/x86/kvm/vmx/nested.c:4749
+>  vmx_handle_exit+0x299/0x15e0 arch/x86/kvm/vmx/vmx.c:5886
+>  vcpu_enter_guest+0x1087/0x5e90 arch/x86/kvm/x86.c:8088
+>  vcpu_run arch/x86/kvm/x86.c:8152 [inline]
+>  kvm_arch_vcpu_ioctl_run+0x464/0x1750 arch/x86/kvm/x86.c:8360
+>  kvm_vcpu_ioctl+0x4dc/0xfd0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2765
+>  vfs_ioctl fs/ioctl.c:46 [inline]
+>  file_ioctl fs/ioctl.c:509 [inline]
+>  do_vfs_ioctl+0xdb6/0x13e0 fs/ioctl.c:696
+>  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
+>  __do_sys_ioctl fs/ioctl.c:720 [inline]
+>  __se_sys_ioctl fs/ioctl.c:718 [inline]
+>  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
+>  do_syscall_64+0xfd/0x6a0 arch/x86/entry/common.c:296
+>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> RIP: 0033:0x447269
+> Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7
+> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff
+> 0f 83 3b d0 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+> RSP: 002b:00007ffd58df6ad8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 00007ffd58df6ae0 RCX: 0000000000447269
+> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+> RBP: 0000000000000000 R08: 0000000020003800 R09: 0000000000400e80
+> R10: 00007ffd58df4f20 R11: 0000000000000246 R12: 0000000000404730
+> R13: 00000000004047c0 R14: 0000000000000000 R15: 0000000000000000
 > 
-> Cc: stable@vger.kernel.org
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Allocated by task 10006:
+>  save_stack+0x23/0x90 mm/kasan/common.c:69
+>  set_track mm/kasan/common.c:77 [inline]
+>  __kasan_kmalloc mm/kasan/common.c:493 [inline]
+>  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:466
+>  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:507
+>  __do_kmalloc mm/slab.c:3655 [inline]
+>  __kmalloc+0x163/0x770 mm/slab.c:3664
+>  kmalloc include/linux/slab.h:557 [inline]
+>  hcd_buffer_alloc+0x1c6/0x260 drivers/usb/core/buffer.c:132
+>  usb_alloc_coherent+0x62/0x90 drivers/usb/core/usb.c:910
+>  usbdev_mmap+0x1ce/0x790 drivers/usb/core/devio.c:224
+>  call_mmap include/linux/fs.h:1875 [inline]
+>  mmap_region+0xc35/0x1760 mm/mmap.c:1788
+>  do_mmap+0x82e/0x1090 mm/mmap.c:1561
+>  do_mmap_pgoff include/linux/mm.h:2374 [inline]
+>  vm_mmap_pgoff+0x1c5/0x230 mm/util.c:391
+>  ksys_mmap_pgoff+0x4aa/0x630 mm/mmap.c:1611
+>  __do_sys_mmap arch/x86/kernel/sys_x86_64.c:100 [inline]
+>  __se_sys_mmap arch/x86/kernel/sys_x86_64.c:91 [inline]
+>  __x64_sys_mmap+0xe9/0x1b0 arch/x86/kernel/sys_x86_64.c:91
+>  do_syscall_64+0xfd/0x6a0 arch/x86/entry/common.c:296
+>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> Freed by task 9516:
+>  save_stack+0x23/0x90 mm/kasan/common.c:69
+>  set_track mm/kasan/common.c:77 [inline]
+>  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:455
+>  kasan_slab_free+0xe/0x10 mm/kasan/common.c:463
+>  __cache_free mm/slab.c:3425 [inline]
+>  kfree+0x10a/0x2c0 mm/slab.c:3756
+>  tomoyo_init_log+0x15ba/0x2070 security/tomoyo/audit.c:293
+>  tomoyo_supervisor+0x33f/0xef0 security/tomoyo/common.c:2095
+>  tomoyo_audit_env_log security/tomoyo/environ.c:36 [inline]
+>  tomoyo_env_perm+0x18e/0x210 security/tomoyo/environ.c:63
+>  tomoyo_environ security/tomoyo/domain.c:670 [inline]
+>  tomoyo_find_next_domain+0x1354/0x1f6c security/tomoyo/domain.c:876
+>  tomoyo_bprm_check_security security/tomoyo/tomoyo.c:107 [inline]
+>  tomoyo_bprm_check_security+0x124/0x1b0 security/tomoyo/tomoyo.c:97
+>  security_bprm_check+0x63/0xb0 security/security.c:750
+>  search_binary_handler+0x71/0x570 fs/exec.c:1645
+>  exec_binprm fs/exec.c:1701 [inline]
+>  __do_execve_file.isra.0+0x1333/0x2340 fs/exec.c:1821
+>  do_execveat_common fs/exec.c:1868 [inline]
+>  do_execve fs/exec.c:1885 [inline]
+>  __do_sys_execve fs/exec.c:1961 [inline]
+>  __se_sys_execve fs/exec.c:1956 [inline]
+>  __x64_sys_execve+0x8f/0xc0 fs/exec.c:1956
+>  do_syscall_64+0xfd/0x6a0 arch/x86/entry/common.c:296
+>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> The buggy address belongs to the object at ffff888091e109c0
+>  which belongs to the cache kmalloc-8k of size 8192
+> The buggy address is located 2496 bytes to the left of
+>  8192-byte region [ffff888091e109c0, ffff888091e129c0)
+> The buggy address belongs to the page:
+> page:ffffea0002478400 refcount:2 mapcount:0 mapping:ffff8880aa4021c0
+> index:0x0 compound_mapcount: 0
+> flags: 0x1fffc0000010200(slab|head)
+> raw: 01fffc0000010200 ffffea000242e608 ffffea0002436708 ffff8880aa4021c0
+> raw: 0000000000000000 ffff888091e109c0 0000000200000001 0000000000000000
+> page dumped because: kasan: bad access detected
+> 
+> Memory state around the buggy address:
+>  ffff888091e0ff00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff888091e0ff80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> > ffff888091e10000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>                    ^
+>  ffff888091e10080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff888091e10100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> ==================================================================
+> 
+> 
 > ---
->  arch/s390/kvm/interrupt.c | 10 ++++++++++
->  arch/s390/kvm/kvm-s390.c  |  2 +-
->  2 files changed, 11 insertions(+), 1 deletion(-)
+> This bug is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
 > 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 3e7efdd9228a..165dea4c7f19 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -1960,6 +1960,16 @@ int s390int_to_s390irq(struct kvm_s390_interrupt *s390int,
->  	case KVM_S390_MCHK:
->  		irq->u.mchk.mcic = s390int->parm64;
->  		break;
-> +	case KVM_S390_INT_PFAULT_INIT:
-> +		irq->u.ext.ext_params = s390int->parm;
-> +		irq->u.ext.ext_params2 = s390int->parm64;
-> +		break;
-> +	case KVM_S390_RESTART:
-> +	case KVM_S390_INT_CLOCK_COMP:
-> +	case KVM_S390_INT_CPU_TIMER:
-> +		break;
-> +	default:
-> +		return -EINVAL;
->  	}
->  	return 0;
->  }
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index f329dcb3f44c..082eac2abc88 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4323,7 +4323,7 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
->  	}
->  	case KVM_S390_INTERRUPT: {
->  		struct kvm_s390_interrupt s390int;
-> -		struct kvm_s390_irq s390irq;
-> +		struct kvm_s390_irq s390irq = {};
->  
->  		if (copy_from_user(&s390int, argp, sizeof(s390int)))
->  			return -EFAULT;
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> syzbot can test patches for this bug, for details see:
+> https://goo.gl/tpsmEJ#testing-patches
 > 
-
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
