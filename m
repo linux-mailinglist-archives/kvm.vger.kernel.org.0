@@ -2,106 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C19CB0D4C
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 12:54:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 529A6B0D58
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 12:58:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731306AbfILKxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 06:53:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52750 "EHLO mx1.redhat.com"
+        id S1731253AbfILK6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 06:58:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:11824 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731301AbfILKxz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Sep 2019 06:53:55 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1730811AbfILK6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Sep 2019 06:58:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E186B81DE7
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 10:53:54 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id r21so2440066wme.5
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 03:53:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=F2/22McNqXu2675zlE4drufzM0q9TuqFfPiUeK7sLs8=;
-        b=jePvHcH/BhwbvvoWFnsuzdPH3GFRXaDtCPE3G3VH07LddV1NGd7NxCl77mE80W7IKs
-         rBJd+0AGQoi30ZieEn6RZSy88tEaxsTk2jrL8Ukj3l5xoaNu4hbTBgW9lbX+vHmIMUda
-         AM0+OjAev9aILbCiKbIg0koOTwnrc7JVJr245dbi+CzpS9rd/ZLllCP/PmPzTLvaBg21
-         DY1+R34QHJz4UIjNTO+ZXYn+8oj9p5IjCxQsF8DSKC/Wbxt50SVEm00t48bKA8Lkt1Aa
-         zpGcwhR4uejQtw02qTsWQXLbh8qZIDHTcIAnjMinUH4TUa3D/G3My8dMkQ7M5YDVtHMl
-         yvaA==
-X-Gm-Message-State: APjAAAW6Y5Xl2mESRws5I+VNrCAAxN+lH7sqG5vsQsrGRmZY5KuigjX3
-        NXCcf9Xldyhhd/9l709hQ+yhe2K+pa5zHmQrW6G/OWii0Si3vQqcCI5JiLpN7OIWu5sM+REmjDA
-        JxhQArU1IMVoi
-X-Received: by 2002:adf:9c81:: with SMTP id d1mr18127705wre.123.1568285633423;
-        Thu, 12 Sep 2019 03:53:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxxKcoyAmyDMGRGzHyI3ySQclYgNKAb2uu8KJpoZguHmsq7+ZolY8KGFJv9C6/WKJVkStMPqw==
-X-Received: by 2002:adf:9c81:: with SMTP id d1mr18127684wre.123.1568285633189;
-        Thu, 12 Sep 2019 03:53:53 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id c132sm6786713wme.27.2019.09.12.03.53.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2019 03:53:52 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Fuqian Huang <huangfq.daxian@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86: work around leak of uninitialized stack contents
-In-Reply-To: <CABXRUiTD=yRRQFfSdS=2e9QaO-PEgvZ=LBar927rL04G59nHxQ@mail.gmail.com>
-References: <20190912041817.23984-1-huangfq.daxian@gmail.com> <87tv9hew2k.fsf@vitty.brq.redhat.com> <CABXRUiTD=yRRQFfSdS=2e9QaO-PEgvZ=LBar927rL04G59nHxQ@mail.gmail.com>
-Date:   Thu, 12 Sep 2019 12:53:51 +0200
-Message-ID: <87r24leqf4.fsf@vitty.brq.redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 6AE28300DA6E;
+        Thu, 12 Sep 2019 10:58:33 +0000 (UTC)
+Received: from [10.36.117.168] (ovpn-117-168.ams2.redhat.com [10.36.117.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E1BC25C22C;
+        Thu, 12 Sep 2019 10:58:31 +0000 (UTC)
+Subject: Re: [PATCH] KVM: s390: Do not leak kernel stack data in the
+ KVM_S390_INTERRUPT ioctl
+To:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190912090050.20295-1-thuth@redhat.com>
+ <6905df78-95f0-3d6d-aaae-910cd2d7a232@redhat.com>
+ <253e67f6-0a41-13e8-4ca2-c651d5fcdb69@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <982f703f-73f1-30c2-031f-a430de7dc6a9@redhat.com>
+Date:   Thu, 12 Sep 2019 12:58:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <253e67f6-0a41-13e8-4ca2-c651d5fcdb69@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Thu, 12 Sep 2019 10:58:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fuqian Huang <huangfq.daxian@gmail.com> writes:
+On 12.09.19 11:20, Thomas Huth wrote:
+> On 12/09/2019 11.14, David Hildenbrand wrote:
+>> On 12.09.19 11:00, Thomas Huth wrote:
+>>> When the userspace program runs the KVM_S390_INTERRUPT ioctl to inject
+>>> an interrupt, we convert them from the legacy struct kvm_s390_interrupt
+>>> to the new struct kvm_s390_irq via the s390int_to_s390irq() function.
+>>> However, this function does not take care of all types of interrupts
+>>> that we can inject into the guest later (see do_inject_vcpu()). Since we
+>>> do not clear out the s390irq values before calling s390int_to_s390irq(),
+>>> there is a chance that we copy unwanted data from the kernel stack
+>>> into the guest memory later if the interrupt data has not been properly
+>>> initialized by s390int_to_s390irq().
+>>>
+>>> Specifically, the problem exists with the KVM_S390_INT_PFAULT_INIT
+>>> interrupt: s390int_to_s390irq() does not handle it, but the function
+>>> __deliver_pfault_init() will later copy the uninitialized stack data
+>>> from the ext.ext_params2 into the guest memory.
+>>>
+>>> Fix it by handling that interrupt type in s390int_to_s390irq(), too.
+>>> And while we're at it, make sure that s390int_to_s390irq() now
+>>> directly returns -EINVAL for unknown interrupt types, so that we
+>>> do not run into this problem again in case we add more interrupt
+>>> types to do_inject_vcpu() sometime in the future.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  arch/s390/kvm/interrupt.c | 10 ++++++++++
+>>>  1 file changed, 10 insertions(+)
+>>>
+>>> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+>>> index 3e7efdd9228a..165dea4c7f19 100644
+>>> --- a/arch/s390/kvm/interrupt.c
+>>> +++ b/arch/s390/kvm/interrupt.c
+>>> @@ -1960,6 +1960,16 @@ int s390int_to_s390irq(struct kvm_s390_interrupt *s390int,
+>>>  	case KVM_S390_MCHK:
+>>>  		irq->u.mchk.mcic = s390int->parm64;
+>>>  		break;
+>>> +	case KVM_S390_INT_PFAULT_INIT:
+>>> +		irq->u.ext.ext_params = s390int->parm;
+>>> +		irq->u.ext.ext_params2 = s390int->parm64;
+>>> +		break;
+>>> +	case KVM_S390_RESTART:
+>>> +	case KVM_S390_INT_CLOCK_COMP:
+>>> +	case KVM_S390_INT_CPU_TIMER:
+>>> +		break;
+>>> +	default:
+>>> +		return -EINVAL;
+>>>  	}
+>>>  	return 0;
+>>>  }
+>>>
+>>
+>> Wouldn't a safe fix be to initialize the struct to zero in the caller?
+> 
+> That's of course possible, too. But that means that we always have to
+> zero out the whole structure, so that's a little bit more of overhead
+> (well, it likely doesn't matter for such a legacy ioctl).
 
-> Vitaly Kuznetsov <vkuznets@redhat.com> 於 2019年9月12日週四 下午4:51寫道：
->>
->> Fuqian Huang <huangfq.daxian@gmail.com> writes:
->>
->> > Emulation of VMPTRST can incorrectly inject a page fault
->> > when passed an operand that points to an MMIO address.
->> > The page fault will use uninitialized kernel stack memory
->> > as the CR2 and error code.
->> >
->> > The right behavior would be to abort the VM with a KVM_EXIT_INTERNAL_ERROR
->> > exit to userspace;
->>
->> Hm, why so? KVM_EXIT_INTERNAL_ERROR is basically an error in KVM, this
->> is not a proper reaction to a userspace-induced condition (or ever).
->>
->> I also looked at VMPTRST's description in Intel's manual and I can't
->> find and explicit limitation like "this must be normal memory". We're
->> just supposed to inject #PF "If a page fault occurs in accessing the
->> memory destination operand."
->>
->> In case it seems to be too cumbersome to handle VMPTRST to MMIO and we
->> think that nobody should be doing that I'd rather prefer injecting #GP.
->>
->> Please tell me what I'm missing :-)
->
-> I found it during the code review, and it looks like the problem the
-> commit 353c0956a618 ("KVM: x86: work around leak of uninitialized
-> stack contents (CVE-2019-7222)")
-> mentions. So I fixed it in a similar way.
->
+I would vote for doing this as well.
 
-Oh, yes, I'm not against the fix at all, I was just wondering about why
-you think we need to kill the guest in this case.
+> 
+> But the more important question: Do we then still care of fixing the
+> PFAULT_INIT interrupt here? Since it requires a parameter, the "case
+> KVM_S390_INT_PFAULT_INIT:" part would be required here anyway.
+> 
+
+That's indeed true.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+>  Thomas
+> 
+
 
 -- 
-Vitaly
+
+Thanks,
+
+David / dhildenb
