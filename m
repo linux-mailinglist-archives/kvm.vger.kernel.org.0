@@ -2,112 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68F93B0D9B
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 13:11:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E727B0DB8
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 13:23:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731278AbfILLLz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 07:11:55 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55794 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730268AbfILLLy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Sep 2019 07:11:54 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1AB9AB764;
-        Thu, 12 Sep 2019 11:11:52 +0000 (UTC)
-Date:   Thu, 12 Sep 2019 13:11:50 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     Alexander Duyck <alexander.duyck@gmail.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
+        id S1731211AbfILLXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 07:23:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32834 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730982AbfILLXp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Sep 2019 07:23:45 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C44018A1C83;
+        Thu, 12 Sep 2019 11:23:44 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-204-41.brq.redhat.com [10.40.204.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 83F051001944;
+        Thu, 12 Sep 2019 11:23:39 +0000 (UTC)
+Subject: Re: [PATCH] KVM: s390: Do not leak kernel stack data in the
+ KVM_S390_INTERRUPT ioctl
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Fengguang Wu <fengguang.wu@intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Mel Gorman <mgorman@suse.de>, Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
-Message-ID: <20190912111150.GQ4023@dhcp22.suse.cz>
-References: <20190910124209.GY2063@dhcp22.suse.cz>
- <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
- <20190910144713.GF2063@dhcp22.suse.cz>
- <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
- <20190910175213.GD4023@dhcp22.suse.cz>
- <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
- <20190911113619.GP4023@dhcp22.suse.cz>
- <CAKgT0UfOp1c+ov=3pBD72EkSB9Vm7mG5G6zJj4=j=UH7zCgg2Q@mail.gmail.com>
- <20190912091925.GM4023@dhcp22.suse.cz>
- <20190912102425.wzhhe6ygfgg64sma@box>
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190912090050.20295-1-thuth@redhat.com>
+ <6905df78-95f0-3d6d-aaae-910cd2d7a232@redhat.com>
+ <253e67f6-0a41-13e8-4ca2-c651d5fcdb69@redhat.com>
+ <f9d07b66-a048-6626-e209-9fe455a2bed3@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
+ aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
+ QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
+ EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
+ 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
+ eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
+ ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
+ zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
+ tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
+ WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
+ UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
+ BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
+ 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
+ +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
+ 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
+ gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
+ WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
+ VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
+ knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
+ cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
+ X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
+ AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
+ ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
+ fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
+ 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
+ cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
+ ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
+ Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
+ oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
+ IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
+ yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
+Organization: Red Hat
+Message-ID: <239c8d0f-40fb-264a-bc10-445931a3cd9a@redhat.com>
+Date:   Thu, 12 Sep 2019 13:23:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190912102425.wzhhe6ygfgg64sma@box>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <f9d07b66-a048-6626-e209-9fe455a2bed3@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Thu, 12 Sep 2019 11:23:44 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 12-09-19 13:24:25, Kirill A. Shutemov wrote:
-> On Thu, Sep 12, 2019 at 11:19:25AM +0200, Michal Hocko wrote:
-> > On Wed 11-09-19 08:12:03, Alexander Duyck wrote:
-> > > On Wed, Sep 11, 2019 at 4:36 AM Michal Hocko <mhocko@kernel.org> wrote:
-> > > >
-> > > > On Tue 10-09-19 14:23:40, Alexander Duyck wrote:
-> > > > [...]
-> > > > > We don't put any limitations on the allocator other then that it needs to
-> > > > > clean up the metadata on allocation, and that it cannot allocate a page
-> > > > > that is in the process of being reported since we pulled it from the
-> > > > > free_list. If the page is a "Reported" page then it decrements the
-> > > > > reported_pages count for the free_area and makes sure the page doesn't
-> > > > > exist in the "Boundary" array pointer value, if it does it moves the
-> > > > > "Boundary" since it is pulling the page.
-> > > >
-> > > > This is still a non-trivial limitation on the page allocation from an
-> > > > external code IMHO. I cannot give any explicit reason why an ordering on
-> > > > the free list might matter (well except for page shuffling which uses it
-> > > > to make physical memory pattern allocation more random) but the
-> > > > architecture seems hacky and dubious to be honest. It shoulds like the
-> > > > whole interface has been developed around a very particular and single
-> > > > purpose optimization.
-> > > 
-> > > How is this any different then the code that moves a page that will
-> > > likely be merged to the tail though?
-> > 
-> > I guess you are referring to the page shuffling. If that is the case
-> > then this is an integral part of the allocator for a reason and it is
-> > very well obvious in the code including the consequences. I do not
-> > really like an idea of hiding similar constrains behind a generic
-> > looking feature which is completely detached from the allocator and so
-> > any future change of the allocator might subtly break it.
+On 12/09/2019 12.52, Christian Borntraeger wrote:
 > 
-> I don't necessary follow why shuffling is more integral to page allocator
-> than reporting would be. It's next to shutffle.c under mm/ and integrated
-> in a simillar way.
+> 
+> On 12.09.19 11:20, Thomas Huth wrote:
+>> On 12/09/2019 11.14, David Hildenbrand wrote:
+>>> On 12.09.19 11:00, Thomas Huth wrote:
+>>>> When the userspace program runs the KVM_S390_INTERRUPT ioctl to inject
+>>>> an interrupt, we convert them from the legacy struct kvm_s390_interrupt
+>>>> to the new struct kvm_s390_irq via the s390int_to_s390irq() function.
+>>>> However, this function does not take care of all types of interrupts
+>>>> that we can inject into the guest later (see do_inject_vcpu()). Since we
+>>>> do not clear out the s390irq values before calling s390int_to_s390irq(),
+>>>> there is a chance that we copy unwanted data from the kernel stack
+>>>> into the guest memory later if the interrupt data has not been properly
+>>>> initialized by s390int_to_s390irq().
+>>>>
+>>>> Specifically, the problem exists with the KVM_S390_INT_PFAULT_INIT
+>>>> interrupt: s390int_to_s390irq() does not handle it, but the function
+>>>> __deliver_pfault_init() will later copy the uninitialized stack data
+>>>> from the ext.ext_params2 into the guest memory.
+>>>>
+>>>> Fix it by handling that interrupt type in s390int_to_s390irq(), too.
+>>>> And while we're at it, make sure that s390int_to_s390irq() now
+>>>> directly returns -EINVAL for unknown interrupt types, so that we
+>>>> do not run into this problem again in case we add more interrupt
+>>>> types to do_inject_vcpu() sometime in the future.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  arch/s390/kvm/interrupt.c | 10 ++++++++++
+>>>>  1 file changed, 10 insertions(+)
+>>>>
+>>>> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+>>>> index 3e7efdd9228a..165dea4c7f19 100644
+>>>> --- a/arch/s390/kvm/interrupt.c
+>>>> +++ b/arch/s390/kvm/interrupt.c
+>>>> @@ -1960,6 +1960,16 @@ int s390int_to_s390irq(struct kvm_s390_interrupt *s390int,
+>>>>  	case KVM_S390_MCHK:
+>>>>  		irq->u.mchk.mcic = s390int->parm64;
+>>>>  		break;
+>>>> +	case KVM_S390_INT_PFAULT_INIT:
+>>>> +		irq->u.ext.ext_params = s390int->parm;
+>>>> +		irq->u.ext.ext_params2 = s390int->parm64;
+>>>> +		break;
+>>>> +	case KVM_S390_RESTART:
+>>>> +	case KVM_S390_INT_CLOCK_COMP:
+>>>> +	case KVM_S390_INT_CPU_TIMER:
+>>>> +		break;
+>>>> +	default:
+>>>> +		return -EINVAL;
+>>>>  	}
+>>>>  	return 0;
+>>>>  }
+>>>>
+>>>
+>>> Wouldn't a safe fix be to initialize the struct to zero in the caller?
+>>
+>> That's of course possible, too. But that means that we always have to
+>> zero out the whole structure, so that's a little bit more of overhead
+>> (well, it likely doesn't matter for such a legacy ioctl).
+> 
+> Yes doing something like
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index c19a24e940a1..b1f6f434af5d 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4332,7 +4332,7 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
+>         }
+>         case KVM_S390_INTERRUPT: {
+>                 struct kvm_s390_interrupt s390int;
+> -               struct kvm_s390_irq s390irq;
+> +               struct kvm_s390_irq s390irq = {};
+>  
+>                 if (copy_from_user(&s390int, argp, sizeof(s390int)))
+>                         return -EFAULT;
+> 
+> would certainly be ok as well, but
 
-The main difference from my understanding is that the page reporting is
-a more generic looking feature which might grow different users over
-time yet there is a hardcoded set of restrictions to the allocator. Page
-shuffling is an integral part of the allocator without any other
-visibility outside.
+I don't think that it's urgently necessary, but ok, if you all prefer to
+have it, too, I can add it to my patch.
 
--- 
-Michal Hocko
-SUSE Labs
+>> But the more important question: Do we then still care of fixing the
+>> PFAULT_INIT interrupt here? Since it requires a parameter, the "case
+>> KVM_S390_INT_PFAULT_INIT:" part would be required here anyway.
+> 
+> as long as we we this interface we should fix it and we should do the
+> pfault thing correctly. 
+> Maybe we should start to deprecate this interface and remove it.
+
+Hmm, we already talked about deprecating support for pre-3.15 kernel
+stuff in the past (see
+https://wiki.qemu.org/ChangeLog/2.12#Future_incompatible_changes for
+example), since this has been broken in QEMU since quite a while, but
+the new KVM_S390_IRQ replacement has just been introduced with kernel
+4.1 ... so removing this KVM_S390_INTERRUPT ioctl any time soon sounds
+wrong to me, we might break some userspace programs that are still there
+in the wild...
+
+ Thomas
