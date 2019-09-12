@@ -2,346 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CDDCCB12C8
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 18:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C82AB12E4
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 18:42:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730476AbfILQ3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 12:29:04 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:35691 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730233AbfILQ3E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Sep 2019 12:29:04 -0400
-Received: by mail-io1-f68.google.com with SMTP id f4so55500774ion.2
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 09:29:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/bUM2dznk3XwWgKl0HE7RE3gTJxY3w5pUDNSto2T69A=;
-        b=PzPlon00TN4IAlMrf/8lncLToLzYqJ6JwX3+81T/8d4Vk0jMztmj3LWhYFyept2EdF
-         oa+M2QMNUuFwCCtDu3S45XuEoAVDx1OeY77pUE8lCiPeMO4YtMPcI3tN2VMvuT23z1dG
-         2RbDKPL36z1+Q2ACQphSUWToSAAK02M7RmIwHIrcOPoSJiVkGzQniUUAdA8LnJ0l+H4t
-         QMhMqF5YJwf44lXOs3+HoYIZ2EocIvEmQVyMxAFlI+Z+WtCTfogbgzT4KoKJg9Mgrs8n
-         abynkkw2vkrpmx1cTDJTAst9QvkCsfPPqR1g3EDWWrUL8ixkGjxtso6hsZlXAG0ysqDT
-         5eyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/bUM2dznk3XwWgKl0HE7RE3gTJxY3w5pUDNSto2T69A=;
-        b=D4iNgFfUyXTEZNn/PVAti8UT6rtNjL5r9fcODaVUhuLXZmrTugdXD65kH5zAzBm/if
-         hWojDb2vUBIXPAZgWil6bnOw9UnaDuGd/iAFgOa6xeBfUz4cmsFljSi2TxHaFnIjjrcw
-         Dp+kUq+vGanIwl+xrkDgDB8w6sRkh5g3ICkLmIbBOILQQLLwU9LZLycxQDyRdgZdO5Sc
-         w9RUpKWxZffT81kbZtEl07ZBiKO1GCnnsuS241gR+a1s5HsbZBX83/0jVhrfEQ22/Ky8
-         GW11L8cZA1gxGSEW+NYow5wg/oQ8xhlCw6WmiFWHmIVB3nQm+fUj9Wkq0ekfw6/3lmL2
-         hKNA==
-X-Gm-Message-State: APjAAAWJm6fXqPhuhH7Mh17fzmY6s7WJ4pQHvu3pRr9wlNvUKvdn2r4T
-        Mxxq1+JKs6j/uRQz7h7CJvXGEdGoBWAebIweDLnS2Q==
-X-Google-Smtp-Source: APXvYqyyriBHQj7Wx4nFxArqtGOZtLxRDDbpeaOq6GK1TeKXXD+ixW2nNj3gKjd0hzVkqplCOjUfANLbqIG6lLRofnQ=
-X-Received: by 2002:a02:3b21:: with SMTP id c33mr45717550jaa.54.1568305742046;
- Thu, 12 Sep 2019 09:29:02 -0700 (PDT)
+        id S1727245AbfILQm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 12:42:28 -0400
+Received: from outbound-smtp13.blacknight.com ([46.22.139.230]:55450 "EHLO
+        outbound-smtp13.blacknight.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725972AbfILQm2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Sep 2019 12:42:28 -0400
+X-Greylist: delayed 417 seconds by postgrey-1.27 at vger.kernel.org; Thu, 12 Sep 2019 12:42:25 EDT
+Received: from mail.blacknight.com (unknown [81.17.254.11])
+        by outbound-smtp13.blacknight.com (Postfix) with ESMTPS id DCA671C3855
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 17:35:26 +0100 (IST)
+Received: (qmail 8291 invoked from network); 12 Sep 2019 16:35:26 -0000
+Received: from unknown (HELO techsingularity.net) (mgorman@techsingularity.net@[84.203.19.210])
+  by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated); 12 Sep 2019 16:35:26 -0000
+Date:   Thu, 12 Sep 2019 17:35:25 +0100
+From:   Mel Gorman <mgorman@techsingularity.net>
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fengguang Wu <fengguang.wu@intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Mel Gorman <mgorman@suse.de>, Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
+Message-ID: <20190912163525.GV2739@techsingularity.net>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190910124209.GY2063@dhcp22.suse.cz>
+ <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+ <20190910144713.GF2063@dhcp22.suse.cz>
+ <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
+ <20190910175213.GD4023@dhcp22.suse.cz>
+ <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
+ <20190911113619.GP4023@dhcp22.suse.cz>
+ <CAKgT0UfOp1c+ov=3pBD72EkSB9Vm7mG5G6zJj4=j=UH7zCgg2Q@mail.gmail.com>
+ <20190912091925.GM4023@dhcp22.suse.cz>
 MIME-Version: 1.0
-References: <20190909222812.232690-1-jmattson@google.com> <20190909222812.232690-2-jmattson@google.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D571502@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D571502@SHSMSX104.ccr.corp.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 12 Sep 2019 09:28:50 -0700
-Message-ID: <CALMp9eRHpyGz=o6K66UZLnGVmJDZKY5HRb0X4Srq9CmVxzRfZA@mail.gmail.com>
-Subject: Re: [RFC][PATCH v2 1/1] KVM: nVMX: Don't leak L1 MMIO regions to L2
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dan Cross <dcross@google.com>, Marc Orr <marcorr@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+In-Reply-To: <20190912091925.GM4023@dhcp22.suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 12, 2019 at 12:48 AM Tian, Kevin <kevin.tian@intel.com> wrote:
->
-> > From: Jim Mattson
-> > Sent: Tuesday, September 10, 2019 6:28 AM
-> >
-> > If the "virtualize APIC accesses" VM-execution control is set in the
-> > VMCS, the APIC virtualization hardware is triggered when a page walk
-> > in VMX non-root mode terminates at a PTE wherein the address of the 4k
-> > page frame matches the APIC-access address specified in the VMCS. On
-> > hardware, the APIC-access address may be any valid 4k-aligned physical
-> > address.
-> >
-> > KVM's nVMX implementation enforces the additional constraint that the
-> > APIC-access address specified in the vmcs12 must be backed by
-> > cacheable memory in L1. If not, L0 will simply clear the "virtualize
-> > APIC accesses" VM-execution control in the vmcs02.
-> >
-> > The problem with this approach is that the L1 guest has arranged the
-> > vmcs12 EPT tables--or shadow page tables, if the "enable EPT"
-> > VM-execution control is clear in the vmcs12--so that the L2 guest
-> > physical address(es)--or L2 guest linear address(es)--that reference
-> > the L2 APIC map to the APIC-access address specified in the
-> > vmcs12. Without the "virtualize APIC accesses" VM-execution control in
-> > the vmcs02, the APIC accesses in the L2 guest will directly access the
-> > APIC-access page in L1.
-> >
-> > When L0 has no mapping whatsoever for the APIC-access address in L1,
-> > the L2 VM just loses the intended APIC virtualization. However, when
-> > the L2 APIC-access address is mapped to an MMIO region in L1, the L2
-> > guest gets direct access to the L1 MMIO device. For example, if the
-> > APIC-access address specified in the vmcs12 is 0xfee00000, then L2
-> > gets direct access to L1's APIC.
->
-> 'direct access to L1 APIC' is conceptually correct but won't happen
-> in current KVM design. Above either leads to direct access to L0's
-> APIC-access page (if L0 VMM enables "virtualized APIC accesses"
-> and maps L1 0xfee00000 to L0 APIC-access page), which doesn't
-> really hold L1's APIC state, or cause nested EPT violation fault into
-> L1 VMM (if L0 VMM disables "virtualized APIC accesses", thus L1
-> 0xfee00000 has no valid mapping in L0 EPT). Of course either way
-> is still broken. The former cannot properly virtualize the L2 APIC,
-> while the latter may confuse the L1 VMM if only APIC-access
-> VM exit is expected. But there is not direct L2 access to L1's APIC
-> state anyway. :-)
->
-> >
-> > Fixing this correctly is complicated. Since this vmcs12 configuration
-> > is something that KVM cannot faithfully emulate, the appropriate
->
-> Why cannot it be faithfully emulated? At least your comments in
-> below code already represents a feasible option. Although, yes, it
-> is possibly complicated...
+On Thu, Sep 12, 2019 at 11:19:25AM +0200, Michal Hocko wrote:
+> On Wed 11-09-19 08:12:03, Alexander Duyck wrote:
+> > On Wed, Sep 11, 2019 at 4:36 AM Michal Hocko <mhocko@kernel.org> wrote:
+> > >
+> > > On Tue 10-09-19 14:23:40, Alexander Duyck wrote:
+> > > [...]
+> > > > We don't put any limitations on the allocator other then that it needs to
+> > > > clean up the metadata on allocation, and that it cannot allocate a page
+> > > > that is in the process of being reported since we pulled it from the
+> > > > free_list. If the page is a "Reported" page then it decrements the
+> > > > reported_pages count for the free_area and makes sure the page doesn't
+> > > > exist in the "Boundary" array pointer value, if it does it moves the
+> > > > "Boundary" since it is pulling the page.
+> > >
+> > > This is still a non-trivial limitation on the page allocation from an
+> > > external code IMHO. I cannot give any explicit reason why an ordering on
+> > > the free list might matter (well except for page shuffling which uses it
+> > > to make physical memory pattern allocation more random) but the
+> > > architecture seems hacky and dubious to be honest. It shoulds like the
+> > > whole interface has been developed around a very particular and single
+> > > purpose optimization.
+> > 
+> > How is this any different then the code that moves a page that will
+> > likely be merged to the tail though?
+> 
+> I guess you are referring to the page shuffling. If that is the case
+> then this is an integral part of the allocator for a reason and it is
+> very well obvious in the code including the consequences. I do not
+> really like an idea of hiding similar constrains behind a generic
+> looking feature which is completely detached from the allocator and so
+> any future change of the allocator might subtly break it.
+> 
 
-Right. It can be done. It just can't be done with KVM as it is today.
-It's a lot harder than just moving the APIC base address, for
-instance, and KVM punts on even that simple operation, because the KVM
-MMU isn't designed to handle the case where pieces of the extended
-page tables can't be shared among all vCPUs in a VM.
+It's not just that, compaction pokes into the free_area information as
+well and directly takes pages from the free list without going through
+the page allocator itself. It assumes that a free page is a free page
+and only takes the zone and migratetype into account.
 
-> > response is to exit to userspace with
-> > KVM_INTERNAL_ERROR_EMULATION. Sadly, the kvm-unit-tests fail, so I'm
-> > posting this as an RFC.
-> >
-> > Note that the 'Code' line emitted by qemu in response to this error
-> > shows the guest %rip two instructions after the
-> > vmlaunch/vmresume. Hmmm.
-> >
-> > Fixes: fe3ef05c7572 ("KVM: nVMX: Prepare vmcs02 from vmcs01 and
-> > vmcs12")
-> > Reported-by: Dan Cross <dcross@google.com>
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Marc Orr <marcorr@google.com>
-> > Reviewed-by: Peter Shier <pshier@google.com>
-> > Reviewed-by: Dan Cross <dcross@google.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  2 +-
-> >  arch/x86/kvm/vmx/nested.c       | 65 +++++++++++++++++++++------------
-> >  arch/x86/kvm/x86.c              |  9 ++++-
-> >  3 files changed, 49 insertions(+), 27 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h
-> > b/arch/x86/include/asm/kvm_host.h
-> > index 74e88e5edd9cf..e95acf8c82b47 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1191,7 +1191,7 @@ struct kvm_x86_ops {
-> >       int (*set_nested_state)(struct kvm_vcpu *vcpu,
-> >                               struct kvm_nested_state __user
-> > *user_kvm_nested_state,
-> >                               struct kvm_nested_state *kvm_state);
-> > -     void (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
-> > +     int (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
-> >
-> >       int (*smi_allowed)(struct kvm_vcpu *vcpu);
-> >       int (*pre_enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index ced9fba32598d..04b5069d4a9b3 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -2871,7 +2871,7 @@ static int nested_vmx_check_vmentry_hw(struct
-> > kvm_vcpu *vcpu)
-> >  static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu
-> > *vcpu,
-> >                                                struct vmcs12 *vmcs12);
-> >
-> > -static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-> > +static int nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-> >       struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > @@ -2891,19 +2891,33 @@ static void nested_get_vmcs12_pages(struct
-> > kvm_vcpu *vcpu)
-> >                       vmx->nested.apic_access_page = NULL;
-> >               }
-> >               page = kvm_vcpu_gpa_to_page(vcpu, vmcs12-
-> > >apic_access_addr);
-> > -             /*
-> > -              * If translation failed, no matter: This feature asks
-> > -              * to exit when accessing the given address, and if it
-> > -              * can never be accessed, this feature won't do
-> > -              * anything anyway.
-> > -              */
-> > -             if (!is_error_page(page)) {
-> > +             if (likely(!is_error_page(page))) {
-> >                       vmx->nested.apic_access_page = page;
-> >                       hpa = page_to_phys(vmx-
-> > >nested.apic_access_page);
-> >                       vmcs_write64(APIC_ACCESS_ADDR, hpa);
-> >               } else {
-> > -                     secondary_exec_controls_clearbit(vmx,
-> > -
-> >       SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES);
-> > +                     /*
-> > +                      * Since there is no backing page, we can't
-> > +                      * just rely on the usual L1 GPA -> HPA
-> > +                      * translation mechanism to do the right
-> > +                      * thing. We'd have to assign an appropriate
-> > +                      * HPA for the L1 APIC-access address, and
-> > +                      * then we'd have to modify the MMU to ensure
-> > +                      * that the L1 APIC-access address is mapped
-> > +                      * to the assigned HPA if and only if an L2 VM
-> > +                      * with that APIC-access address and the
-> > +                      * "virtualize APIC accesses" VM-execution
-> > +                      * control set in the vmcs12 is running. For
-> > +                      * now, just admit defeat.
-> > +                      */
-> > +                     pr_warn_ratelimited("Unsupported vmcs12 APIC-
-> > access address 0x%llx\n",
-> > +                             vmcs12->apic_access_addr);
-> > +                     vcpu->run->exit_reason =
-> > KVM_EXIT_INTERNAL_ERROR;
-> > +                     vcpu->run->internal.suberror =
-> > +                             KVM_INTERNAL_ERROR_EMULATION;
-> > +                     vcpu->run->internal.ndata = 1;
-> > +                     vcpu->run->internal.data[0] = vmcs12-
-> > >apic_access_addr;
-> > +                     return -EINTR;
->
-> What about always using L0 APIC-access address in vmcs02 and mapping
->
->
-> >               }
-> >       }
-> >
-> > @@ -2948,6 +2962,7 @@ static void nested_get_vmcs12_pages(struct
-> > kvm_vcpu *vcpu)
-> >               exec_controls_setbit(vmx,
-> > CPU_BASED_USE_MSR_BITMAPS);
-> >       else
-> >               exec_controls_clearbit(vmx,
-> > CPU_BASED_USE_MSR_BITMAPS);
-> > +     return 0;
-> >  }
-> >
-> >  /*
-> > @@ -2986,11 +3001,11 @@ static void load_vmcs12_host_state(struct
-> > kvm_vcpu *vcpu,
-> >  /*
-> >   * If from_vmentry is false, this is being called from state restore (either
-> > RSM
-> >   * or KVM_SET_NESTED_STATE).  Otherwise it's called from
-> > vmlaunch/vmresume.
-> > -+ *
-> > -+ * Returns:
-> > -+ *   0 - success, i.e. proceed with actual VMEnter
-> > -+ *   1 - consistency check VMExit
-> > -+ *  -1 - consistency check VMFail
-> > + *
-> > + * Returns:
-> > + * -EINTR  - exit to userspace
-> > + * -EINVAL - VMentry failure; continue
-> > + *  0      - success, i.e. proceed with actual VMEnter
-> >   */
-> >  int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool
-> > from_vmentry)
-> >  {
-> > @@ -2999,6 +3014,7 @@ int nested_vmx_enter_non_root_mode(struct
-> > kvm_vcpu *vcpu, bool from_vmentry)
-> >       bool evaluate_pending_interrupts;
-> >       u32 exit_reason = EXIT_REASON_INVALID_STATE;
-> >       u32 exit_qual;
-> > +     int r;
-> >
-> >       evaluate_pending_interrupts = exec_controls_get(vmx) &
-> >               (CPU_BASED_VIRTUAL_INTR_PENDING |
-> > CPU_BASED_VIRTUAL_NMI_PENDING);
-> > @@ -3035,11 +3051,15 @@ int nested_vmx_enter_non_root_mode(struct
-> > kvm_vcpu *vcpu, bool from_vmentry)
-> >       prepare_vmcs02_early(vmx, vmcs12);
-> >
-> >       if (from_vmentry) {
-> > -             nested_get_vmcs12_pages(vcpu);
-> > +             r = nested_get_vmcs12_pages(vcpu);
-> > +             if (unlikely(r))
-> > +                     return r;
-> >
-> >               if (nested_vmx_check_vmentry_hw(vcpu)) {
-> >                       vmx_switch_vmcs(vcpu, &vmx->vmcs01);
-> > -                     return -1;
-> > +                     r = nested_vmx_failValid(vcpu,
-> > +
-> > VMXERR_ENTRY_INVALID_CONTROL_FIELD);
-> > +                     return r ? -EINVAL : -EINTR;
-> >               }
-> >
-> >               if (nested_vmx_check_guest_state(vcpu, vmcs12,
-> > &exit_qual))
-> > @@ -3119,14 +3139,14 @@ int nested_vmx_enter_non_root_mode(struct
-> > kvm_vcpu *vcpu, bool from_vmentry)
-> >       vmx_switch_vmcs(vcpu, &vmx->vmcs01);
-> >
-> >       if (!from_vmentry)
-> > -             return 1;
-> > +             return -EINVAL;
-> >
-> >       load_vmcs12_host_state(vcpu, vmcs12);
-> >       vmcs12->vm_exit_reason = exit_reason |
-> > VMX_EXIT_REASONS_FAILED_VMENTRY;
-> >       vmcs12->exit_qualification = exit_qual;
-> >       if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
-> >               vmx->nested.need_vmcs12_to_shadow_sync = true;
-> > -     return 1;
-> > +     return -EINVAL;
-> >  }
-> >
-> >  /*
-> > @@ -3200,11 +3220,8 @@ static int nested_vmx_run(struct kvm_vcpu
-> > *vcpu, bool launch)
-> >       vmx->nested.nested_run_pending = 1;
-> >       ret = nested_vmx_enter_non_root_mode(vcpu, true);
-> >       vmx->nested.nested_run_pending = !ret;
-> > -     if (ret > 0)
-> > -             return 1;
-> > -     else if (ret)
-> > -             return nested_vmx_failValid(vcpu,
-> > -                     VMXERR_ENTRY_INVALID_CONTROL_FIELD);
-> > +     if (ret)
-> > +             return ret != -EINTR;
-> >
-> >       /* Hide L1D cache contents from the nested guest.  */
-> >       vmx->vcpu.arch.l1tf_flush_l1d = true;
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 290c3c3efb877..5ddbf16c8b108 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -7803,8 +7803,13 @@ static int vcpu_enter_guest(struct kvm_vcpu
-> > *vcpu)
-> >       bool req_immediate_exit = false;
-> >
-> >       if (kvm_request_pending(vcpu)) {
-> > -             if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES,
-> > vcpu))
-> > -                     kvm_x86_ops->get_vmcs12_pages(vcpu);
-> > +             if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES,
-> > vcpu)) {
-> > +                     r = kvm_x86_ops->get_vmcs12_pages(vcpu);
-> > +                     if (unlikely(r)) {
-> > +                             r = 0;
-> > +                             goto out;
-> > +                     }
-> > +             }
-> >               if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu))
-> >                       kvm_mmu_unload(vcpu);
-> >               if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
-> > --
-> > 2.23.0.162.g0b9fbb3734-goog
->
+> > In our case the "Reported" page is likely going to be much more
+> > expensive to allocate and use then a standard page because it will be
+> > faulted back in. In such a case wouldn't it make sense for us to want
+> > to keep the pages that don't require faults ahead of those pages in
+> > the free_list so that they are more likely to be allocated?
+> 
+> OK, I was suspecting this would pop out. And this is exactly why I
+> didn't like an idea of an external code imposing a non obvious constrains
+> to the allocator. You simply cannot count with any ordering with the
+> page allocator.
+
+Indeed not. It can be arbitrary and compaction can interfere with the
+ordering as well. While in theory that could be addressed by always
+going through an interface maintained by the page allocator, it would be
+tricky to test the virtio case in particular.
+
+> We used to distinguish cache hot/cold pages in the past
+> and pushed pages to the specific end of the free list but that has been
+> removed.
+
+That was always best effort too, not a hard guarantee. It was eventually
+removed as the cost of figuring out the ordering exceeded the benefit.
+
+> There are other potential changes like that possible. Shuffling
+> is a good recent example.
+> 
+> Anyway I am not a maintainer of this code. I would really like to hear
+> opinions from Mel and Vlastimil here (now CCed - the thread starts
+> http://lkml.kernel.org/r/20190907172225.10910.34302.stgit@localhost.localdomain.
+
+I worry that poking too much into the internal state of the allocator
+will be fragile long-term. There is the arch alloc/free hooks but they
+are typically about protections only and does not interfere with the
+internal state of the allocator. Compaction pokes in as well but once
+the page is off the free list, the page allocator no longer cares so
+again there is on interference with the internal state. If the state is
+interefered with externally, it becomes unclear what happens if things
+like page merging is deferred in a way the allocator cannot control as
+high-order allocation requests may fail for example. For THP, it would
+not matter but failed allocation reports when pages are on the freelist,
+but unsuitable for allocation because of the reported state, would be
+hard to debug. Similarly, latency issues due to a reported page being
+picked for allocation but requiring communication with the hypervisor
+will be difficult to debug and atomic allocations may fail entirely.
+Finally, if merging was broken for reported/unreported pages, it could
+be a long time before such bugs were fixed.
+
+That's a lot of caveats to optimise communication about unused free
+pages to the allocator. I didn't read the patches particularly carefully
+but it was not clear why a best effort was not made to track free pages
+and if the metadata maintenance for that fills then do exhaustive
+searches for remaining pages. It might be difficult to stabilise that as
+the metadata may overflow again while the exhaustive search takes place.
+Much would depend on the frequency that pages are entering/leaving
+reported state.
+
+-- 
+Mel Gorman
+SUSE Labs
