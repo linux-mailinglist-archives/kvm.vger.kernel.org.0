@@ -2,149 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24A3BB1022
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 15:39:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 579F6B104B
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 15:48:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732195AbfILNja (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 09:39:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28512 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732084AbfILNja (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Sep 2019 09:39:30 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8CDWEcK058919
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 09:39:29 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2uyp3famp3-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 09:39:29 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 12 Sep 2019 14:39:27 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Sep 2019 14:39:23 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8CDdMDw29229114
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Sep 2019 13:39:23 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DB0EFA405C;
-        Thu, 12 Sep 2019 13:39:22 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C6EEFA4054;
-        Thu, 12 Sep 2019 13:39:22 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 12 Sep 2019 13:39:22 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 8986AE0435; Thu, 12 Sep 2019 15:39:22 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+        id S1731759AbfILNsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 09:48:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38594 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731786AbfILNsA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Sep 2019 09:48:00 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D6C332A09B3
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 13:47:59 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id 1so14622wmk.4
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 06:47:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xzNw99jxEnIn2C2qOEKRvRaD87jmfzIh56BZ8T38JHI=;
+        b=g+shImutt8GkqlGq4L1mfsF/TF9kZ2RN87a+yN906syexRSWcUf6qd418fEUi1GmoA
+         liSIBflghtc3JHaW3COnZ1emzqIpJLK5995tk564Y5XymOSx2+6Tvq5Ozkqg7b9Oe10Z
+         AoJIC7nx7fKbrzUScgZoAeYl9PdKl7gYRXckOnFw16zq+CUl5xv5cEfKbAzVA0THQmng
+         03o8Ekx/COBpjgGc3ZWLWtuFtabiYp2ofS7zhSW3AZp/CAzDtqjClYOOwp26swasSYNj
+         OdoU6GlIhuWlCbS3rd0sOuJjOZBw+GJ3Hf6OS6cWAXdN067Vh6dvocHvcmOfZ+VcALrh
+         cimQ==
+X-Gm-Message-State: APjAAAVOdn2oDtAh8J6tNuQx5Bbwv3qSm9YP7r0TaZswo2qwdAyM+IsX
+        UZmWmYdB3mzsZTB4R9/fntaiy2F0KmGOKHWoB5pQ4Zae2LSG6DJWTjFijZFfEzBubU7Ax0tDoKr
+        cpU9EnsndZWn7
+X-Received: by 2002:a05:6000:1281:: with SMTP id f1mr21687158wrx.247.1568296078543;
+        Thu, 12 Sep 2019 06:47:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz+M/n5hIxegDbetVZMCKqPkNBW+2nAMB37M5VeK+GsMI2smzcMhJ052+Vim4txa6aJX6q9kQ==
+X-Received: by 2002:a05:6000:1281:: with SMTP id f1mr21687130wrx.247.1568296078214;
+        Thu, 12 Sep 2019 06:47:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3166:d768:e1a7:aab8? ([2001:b07:6468:f312:3166:d768:e1a7:aab8])
+        by smtp.gmail.com with ESMTPSA id q19sm34965289wra.89.2019.09.12.06.47.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Sep 2019 06:47:57 -0700 (PDT)
+Subject: Re: [GIT PULL 0/2] KVM: s390: Fixes for 5.3
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
         linux-s390 <linux-s390@vger.kernel.org>,
         Janosch Frank <frankja@linux.vnet.ibm.com>,
         David Hildenbrand <david@redhat.com>
-Subject: [GIT PULL 2/2] KVM: s390: Do not leak kernel stack data in the KVM_S390_INTERRUPT ioctl
-Date:   Thu, 12 Sep 2019 15:39:21 +0200
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190912133921.6886-1-borntraeger@de.ibm.com>
 References: <20190912133921.6886-1-borntraeger@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5801e7ea-84f6-011f-82fb-167302d95814@redhat.com>
+Date:   Thu, 12 Sep 2019 15:47:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19091213-0020-0000-0000-0000036B6D94
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091213-0021-0000-0000-000021C0FFE7
-Message-Id: <20190912133921.6886-3-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-12_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120143
+In-Reply-To: <20190912133921.6886-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Thomas Huth <thuth@redhat.com>
+On 12/09/19 15:39, Christian Borntraeger wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.3-1
 
-When the userspace program runs the KVM_S390_INTERRUPT ioctl to inject
-an interrupt, we convert them from the legacy struct kvm_s390_interrupt
-to the new struct kvm_s390_irq via the s390int_to_s390irq() function.
-However, this function does not take care of all types of interrupts
-that we can inject into the guest later (see do_inject_vcpu()). Since we
-do not clear out the s390irq values before calling s390int_to_s390irq(),
-there is a chance that we copy random data from the kernel stack which
-could be leaked to the userspace later.
+Pulled, thanks.
 
-Specifically, the problem exists with the KVM_S390_INT_PFAULT_INIT
-interrupt: s390int_to_s390irq() does not handle it, and the function
-__inject_pfault_init() later copies irq->u.ext which contains the
-random kernel stack data. This data can then be leaked either to
-the guest memory in __deliver_pfault_init(), or the userspace might
-retrieve it directly with the KVM_S390_GET_IRQ_STATE ioctl.
-
-Fix it by handling that interrupt type in s390int_to_s390irq(), too,
-and by making sure that the s390irq struct is properly pre-initialized.
-And while we're at it, make sure that s390int_to_s390irq() now
-directly returns -EINVAL for unknown interrupt types, so that we
-immediately get a proper error code in case we add more interrupt
-types to do_inject_vcpu() without updating s390int_to_s390irq()
-sometime in the future.
-
-Cc: stable@vger.kernel.org
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Link: https://lore.kernel.org/kvm/20190912115438.25761-1-thuth@redhat.com
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- arch/s390/kvm/interrupt.c | 10 ++++++++++
- arch/s390/kvm/kvm-s390.c  |  2 +-
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index b5fd6e85657c..d1ccc168c071 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -1961,6 +1961,16 @@ int s390int_to_s390irq(struct kvm_s390_interrupt *s390int,
- 	case KVM_S390_MCHK:
- 		irq->u.mchk.mcic = s390int->parm64;
- 		break;
-+	case KVM_S390_INT_PFAULT_INIT:
-+		irq->u.ext.ext_params = s390int->parm;
-+		irq->u.ext.ext_params2 = s390int->parm64;
-+		break;
-+	case KVM_S390_RESTART:
-+	case KVM_S390_INT_CLOCK_COMP:
-+	case KVM_S390_INT_CPU_TIMER:
-+		break;
-+	default:
-+		return -EINVAL;
- 	}
- 	return 0;
- }
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index b298fcc9ec56..0d697b436f2b 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4335,7 +4335,7 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
- 	}
- 	case KVM_S390_INTERRUPT: {
- 		struct kvm_s390_interrupt s390int;
--		struct kvm_s390_irq s390irq;
-+		struct kvm_s390_irq s390irq = {};
- 
- 		if (copy_from_user(&s390int, argp, sizeof(s390int)))
- 			return -EFAULT;
--- 
-2.21.0
-
+Paolo
