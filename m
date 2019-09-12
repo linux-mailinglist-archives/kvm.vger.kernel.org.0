@@ -2,154 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E0A8B0CC0
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 12:21:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86613B0CCC
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 12:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730998AbfILKUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 06:20:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11422 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730936AbfILKUw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Sep 2019 06:20:52 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8CAHT4N008496
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 06:20:52 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2uyjnwukg0-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 06:20:51 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 12 Sep 2019 11:20:49 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Sep 2019 11:20:47 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8CAKkxo52101228
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Sep 2019 10:20:46 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C1AAA404D;
-        Thu, 12 Sep 2019 10:20:46 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA671A4040;
-        Thu, 12 Sep 2019 10:20:45 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.133])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Sep 2019 10:20:45 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: Remove unused parameter from
- __inject_sigp_restart()
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190912070250.15131-1-thuth@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Thu, 12 Sep 2019 12:20:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1731082AbfILKY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 06:24:27 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:34879 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730811AbfILKY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Sep 2019 06:24:27 -0400
+Received: by mail-ed1-f66.google.com with SMTP id f24so5847399edv.2
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 03:24:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=+mmfaBX0Np9W/b7Q5MqD32lbNina1cQ/FOr9Xbx+2SA=;
+        b=rjY82Sy3etyc/lURHAAH5Zl+/VTkVL1QfiSGIjGFzaoW/tFRFM+zEYupBdTECALHrG
+         yPnD/zet+9v/0zbzm/E5VjxIC4kHBGoI6fG6y3ZudVWE1Fqr5jUEFHOhmpHGUgJBjFLR
+         Pp4qZYYyCBsVXmvAX8dVxq7xFDjWJd+exfdSoleHOrbAKfryXx1FyZtARD7dR7tAJFzo
+         JrefYLyjWx+Ptmb0NQyHMPY02QIUK5RaU1NoX/BBPIIVc7yZpU9xVdpA7vqiSPpdXXbt
+         d5OJ8VA03djK7lmxCv6oPg+S+/UFNoBoSlbJXwZ5azlQ2uo9F1xXDa4+5x33RZHpoQkO
+         TV/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=+mmfaBX0Np9W/b7Q5MqD32lbNina1cQ/FOr9Xbx+2SA=;
+        b=E7iKzuaKHIaemnUi+yl9RTpAKb1WBEUx3+zqiWDxXZqH617bQ5fiYFp/2OAe4rPXmB
+         GNk2fDgsKVtY5VAl1s5Yip1hjKnzGjPY61BRqxEGWb4dRbYrxlhdPX2GRWdQMovNIbCR
+         P6xc6uTiaVESgdNMhVNvqpjfQlQEf7unJUT0ErY2Jw+6QABG0jUgEJ1F1UOpgwok8sx2
+         Rh3dOkmi7EitwzNVUQvP7PyLLdyt2MJmd6weP8hpSsCbsrVA6/f0VeVJhPWIc87oU9xS
+         xHgPyHFY7phlTvGHc2T2EIgQJnBLU8PJg3N2R9K3kT3ve8BGOWi7i6d4fsHlQUPy9cq2
+         rA3Q==
+X-Gm-Message-State: APjAAAUYZMHmNDJ/COZ/yhl1/N/z7qyxlMHcP9PnQMNtFI8csjHxTWP9
+        ZkcyyVcQ7/UlOSo15H7BnJcQfw==
+X-Google-Smtp-Source: APXvYqxqQuNiTjkjaC8Hs02PHF+LHAOwtw4KJLDqhBlQ3F6XmLygJAqZUw/cEZVOIq4hY2vxi9be2Q==
+X-Received: by 2002:a50:8961:: with SMTP id f30mr40528236edf.144.1568283865271;
+        Thu, 12 Sep 2019 03:24:25 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id qt5sm2710889ejb.11.2019.09.12.03.24.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 12 Sep 2019 03:24:24 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 04633100B4A; Thu, 12 Sep 2019 13:24:26 +0300 (+03)
+Date:   Thu, 12 Sep 2019 13:24:25 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Michal Hocko <mhocko@kernel.org>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, ying.huang@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Fengguang Wu <fengguang.wu@intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Mel Gorman <mgorman@suse.de>, Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH v9 0/8] stg mail -e --version=v9 \
+Message-ID: <20190912102425.wzhhe6ygfgg64sma@box>
+References: <20190907172225.10910.34302.stgit@localhost.localdomain>
+ <20190910124209.GY2063@dhcp22.suse.cz>
+ <CAKgT0Udr6nYQFTRzxLbXk41SiJ-pcT_bmN1j1YR4deCwdTOaUQ@mail.gmail.com>
+ <20190910144713.GF2063@dhcp22.suse.cz>
+ <CAKgT0UdB4qp3vFGrYEs=FwSXKpBEQ7zo7DV55nJRO2C-KCEOrw@mail.gmail.com>
+ <20190910175213.GD4023@dhcp22.suse.cz>
+ <1d7de9f9f4074f67c567dbb4cc1497503d739e30.camel@linux.intel.com>
+ <20190911113619.GP4023@dhcp22.suse.cz>
+ <CAKgT0UfOp1c+ov=3pBD72EkSB9Vm7mG5G6zJj4=j=UH7zCgg2Q@mail.gmail.com>
+ <20190912091925.GM4023@dhcp22.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20190912070250.15131-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19091210-0020-0000-0000-0000036B5FAF
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091210-0021-0000-0000-000021C0F0D5
-Message-Id: <31218beb-f7e8-af61-2228-ee6f0727a4da@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-12_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1909120109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190912091925.GM4023@dhcp22.suse.cz>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12.09.19 09:02, Thomas Huth wrote:
-> It's not required, so drop it to make it clear that this interrupt
-> does not have any extra parameters.
+On Thu, Sep 12, 2019 at 11:19:25AM +0200, Michal Hocko wrote:
+> On Wed 11-09-19 08:12:03, Alexander Duyck wrote:
+> > On Wed, Sep 11, 2019 at 4:36 AM Michal Hocko <mhocko@kernel.org> wrote:
+> > >
+> > > On Tue 10-09-19 14:23:40, Alexander Duyck wrote:
+> > > [...]
+> > > > We don't put any limitations on the allocator other then that it needs to
+> > > > clean up the metadata on allocation, and that it cannot allocate a page
+> > > > that is in the process of being reported since we pulled it from the
+> > > > free_list. If the page is a "Reported" page then it decrements the
+> > > > reported_pages count for the free_area and makes sure the page doesn't
+> > > > exist in the "Boundary" array pointer value, if it does it moves the
+> > > > "Boundary" since it is pulling the page.
+> > >
+> > > This is still a non-trivial limitation on the page allocation from an
+> > > external code IMHO. I cannot give any explicit reason why an ordering on
+> > > the free list might matter (well except for page shuffling which uses it
+> > > to make physical memory pattern allocation more random) but the
+> > > architecture seems hacky and dubious to be honest. It shoulds like the
+> > > whole interface has been developed around a very particular and single
+> > > purpose optimization.
+> > 
+> > How is this any different then the code that moves a page that will
+> > likely be merged to the tail though?
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> I guess you are referring to the page shuffling. If that is the case
+> then this is an integral part of the allocator for a reason and it is
+> very well obvious in the code including the consequences. I do not
+> really like an idea of hiding similar constrains behind a generic
+> looking feature which is completely detached from the allocator and so
+> any future change of the allocator might subtly break it.
 
-makes sense. Thanks applied. 
-> ---
->  arch/s390/kvm/interrupt.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index b5fd6e85657c..3e7efdd9228a 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -1477,8 +1477,7 @@ static int __inject_sigp_stop(struct kvm_vcpu *vcpu, struct kvm_s390_irq *irq)
->  	return 0;
->  }
->  
-> -static int __inject_sigp_restart(struct kvm_vcpu *vcpu,
-> -				 struct kvm_s390_irq *irq)
-> +static int __inject_sigp_restart(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
->  
-> @@ -1997,7 +1996,7 @@ static int do_inject_vcpu(struct kvm_vcpu *vcpu, struct kvm_s390_irq *irq)
->  		rc = __inject_sigp_stop(vcpu, irq);
->  		break;
->  	case KVM_S390_RESTART:
-> -		rc = __inject_sigp_restart(vcpu, irq);
-> +		rc = __inject_sigp_restart(vcpu);
->  		break;
->  	case KVM_S390_INT_CLOCK_COMP:
->  		rc = __inject_ckc(vcpu);
-> 
+I don't necessary follow why shuffling is more integral to page allocator
+than reporting would be. It's next to shutffle.c under mm/ and integrated
+in a simillar way.
 
+-- 
+ Kirill A. Shutemov
