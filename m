@@ -2,308 +2,346 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A583B12CA
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 18:29:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDDCCB12C8
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 18:29:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733216AbfILQ3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 12:29:38 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:41666 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730310AbfILQ3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Sep 2019 12:29:38 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8CGScFI136545;
-        Thu, 12 Sep 2019 16:29:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=J243/MYMpsG7T06FaCo2avTrkWCRXyky4fIhhXtFhmw=;
- b=MSO3D3gtMd56lordTN+o1Okb1s/BprCW1x2LqTw8yWxjEk1vaG2KscMUOtqXxNy4+Y6h
- JdLmOLpN7Ly/xM2L6gc6U9feRHCj5ytTwY81l+Dir8sodmwx1X5+I61dEA5B5e5Uznhn
- G6/j6PtNNwZNcwD6Zuph4W+QQxN/2ohwwA3Xp4O3P9u2DFW3N2DmLTGVJ/XZ3vo2IVED
- LF/1ncl5E8nyhXNof4qhNLlymg6IVb48tApndQTUA9/unnjDhIAedtthnbp9CGkMCrGt
- 03JVArycb+nHkboHG0inHgVmQV5rxP/lf/f+NSuAZB4bruQyRLF5uo/YjEMd7mFGtcx4 Kw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2uw1m99p8f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Sep 2019 16:29:13 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8CGSm74167634;
-        Thu, 12 Sep 2019 16:29:13 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2uy8wa9wdt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Sep 2019 16:29:13 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8CGSGdx008158;
-        Thu, 12 Sep 2019 16:28:16 GMT
-Received: from [10.159.229.118] (/10.159.229.118)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 12 Sep 2019 09:28:16 -0700
-Subject: Re: [kvm-unit-tests PATCH v4 9/9] x86: VMX: Add tests for nested
- "load IA32_PERF_GLOBAL_CTRL"
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20190906210313.128316-1-oupton@google.com>
- <20190906210313.128316-10-oupton@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <94c97f67-7dc7-110a-5289-7ca23aafa654@oracle.com>
-Date:   Thu, 12 Sep 2019 09:28:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1730476AbfILQ3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 12:29:04 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:35691 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730233AbfILQ3E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Sep 2019 12:29:04 -0400
+Received: by mail-io1-f68.google.com with SMTP id f4so55500774ion.2
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 09:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/bUM2dznk3XwWgKl0HE7RE3gTJxY3w5pUDNSto2T69A=;
+        b=PzPlon00TN4IAlMrf/8lncLToLzYqJ6JwX3+81T/8d4Vk0jMztmj3LWhYFyept2EdF
+         oa+M2QMNUuFwCCtDu3S45XuEoAVDx1OeY77pUE8lCiPeMO4YtMPcI3tN2VMvuT23z1dG
+         2RbDKPL36z1+Q2ACQphSUWToSAAK02M7RmIwHIrcOPoSJiVkGzQniUUAdA8LnJ0l+H4t
+         QMhMqF5YJwf44lXOs3+HoYIZ2EocIvEmQVyMxAFlI+Z+WtCTfogbgzT4KoKJg9Mgrs8n
+         abynkkw2vkrpmx1cTDJTAst9QvkCsfPPqR1g3EDWWrUL8ixkGjxtso6hsZlXAG0ysqDT
+         5eyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/bUM2dznk3XwWgKl0HE7RE3gTJxY3w5pUDNSto2T69A=;
+        b=D4iNgFfUyXTEZNn/PVAti8UT6rtNjL5r9fcODaVUhuLXZmrTugdXD65kH5zAzBm/if
+         hWojDb2vUBIXPAZgWil6bnOw9UnaDuGd/iAFgOa6xeBfUz4cmsFljSi2TxHaFnIjjrcw
+         Dp+kUq+vGanIwl+xrkDgDB8w6sRkh5g3ICkLmIbBOILQQLLwU9LZLycxQDyRdgZdO5Sc
+         w9RUpKWxZffT81kbZtEl07ZBiKO1GCnnsuS241gR+a1s5HsbZBX83/0jVhrfEQ22/Ky8
+         GW11L8cZA1gxGSEW+NYow5wg/oQ8xhlCw6WmiFWHmIVB3nQm+fUj9Wkq0ekfw6/3lmL2
+         hKNA==
+X-Gm-Message-State: APjAAAWJm6fXqPhuhH7Mh17fzmY6s7WJ4pQHvu3pRr9wlNvUKvdn2r4T
+        Mxxq1+JKs6j/uRQz7h7CJvXGEdGoBWAebIweDLnS2Q==
+X-Google-Smtp-Source: APXvYqyyriBHQj7Wx4nFxArqtGOZtLxRDDbpeaOq6GK1TeKXXD+ixW2nNj3gKjd0hzVkqplCOjUfANLbqIG6lLRofnQ=
+X-Received: by 2002:a02:3b21:: with SMTP id c33mr45717550jaa.54.1568305742046;
+ Thu, 12 Sep 2019 09:29:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190906210313.128316-10-oupton@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9378 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909120171
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9378 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909120171
+References: <20190909222812.232690-1-jmattson@google.com> <20190909222812.232690-2-jmattson@google.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D571502@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D571502@SHSMSX104.ccr.corp.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 12 Sep 2019 09:28:50 -0700
+Message-ID: <CALMp9eRHpyGz=o6K66UZLnGVmJDZKY5HRb0X4Srq9CmVxzRfZA@mail.gmail.com>
+Subject: Re: [RFC][PATCH v2 1/1] KVM: nVMX: Don't leak L1 MMIO regions to L2
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dan Cross <dcross@google.com>, Marc Orr <marcorr@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Sep 12, 2019 at 12:48 AM Tian, Kevin <kevin.tian@intel.com> wrote:
+>
+> > From: Jim Mattson
+> > Sent: Tuesday, September 10, 2019 6:28 AM
+> >
+> > If the "virtualize APIC accesses" VM-execution control is set in the
+> > VMCS, the APIC virtualization hardware is triggered when a page walk
+> > in VMX non-root mode terminates at a PTE wherein the address of the 4k
+> > page frame matches the APIC-access address specified in the VMCS. On
+> > hardware, the APIC-access address may be any valid 4k-aligned physical
+> > address.
+> >
+> > KVM's nVMX implementation enforces the additional constraint that the
+> > APIC-access address specified in the vmcs12 must be backed by
+> > cacheable memory in L1. If not, L0 will simply clear the "virtualize
+> > APIC accesses" VM-execution control in the vmcs02.
+> >
+> > The problem with this approach is that the L1 guest has arranged the
+> > vmcs12 EPT tables--or shadow page tables, if the "enable EPT"
+> > VM-execution control is clear in the vmcs12--so that the L2 guest
+> > physical address(es)--or L2 guest linear address(es)--that reference
+> > the L2 APIC map to the APIC-access address specified in the
+> > vmcs12. Without the "virtualize APIC accesses" VM-execution control in
+> > the vmcs02, the APIC accesses in the L2 guest will directly access the
+> > APIC-access page in L1.
+> >
+> > When L0 has no mapping whatsoever for the APIC-access address in L1,
+> > the L2 VM just loses the intended APIC virtualization. However, when
+> > the L2 APIC-access address is mapped to an MMIO region in L1, the L2
+> > guest gets direct access to the L1 MMIO device. For example, if the
+> > APIC-access address specified in the vmcs12 is 0xfee00000, then L2
+> > gets direct access to L1's APIC.
+>
+> 'direct access to L1 APIC' is conceptually correct but won't happen
+> in current KVM design. Above either leads to direct access to L0's
+> APIC-access page (if L0 VMM enables "virtualized APIC accesses"
+> and maps L1 0xfee00000 to L0 APIC-access page), which doesn't
+> really hold L1's APIC state, or cause nested EPT violation fault into
+> L1 VMM (if L0 VMM disables "virtualized APIC accesses", thus L1
+> 0xfee00000 has no valid mapping in L0 EPT). Of course either way
+> is still broken. The former cannot properly virtualize the L2 APIC,
+> while the latter may confuse the L1 VMM if only APIC-access
+> VM exit is expected. But there is not direct L2 access to L1's APIC
+> state anyway. :-)
+>
+> >
+> > Fixing this correctly is complicated. Since this vmcs12 configuration
+> > is something that KVM cannot faithfully emulate, the appropriate
+>
+> Why cannot it be faithfully emulated? At least your comments in
+> below code already represents a feasible option. Although, yes, it
+> is possibly complicated...
 
-On 9/6/19 2:03 PM, Oliver Upton wrote:
-> Tests to verify that KVM performs the correct checks on Host/Guest state
-> at VM-entry, as described in SDM 26.3.1.1 "Checks on Guest Control
-> Registers, Debug Registers, and MSRs" and SDM 26.2.2 "Checks on Host
-> Control Registers and MSRs".
->
-> Test that KVM does the following:
->
->      If the "load IA32_PERF_GLOBAL_CTRL" VM-entry control is 1, the
->      reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
->      GUEST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
->      should fail with an exit reason of "VM-entry failure due to invalid
->      guest state" (33). On a successful VM-entry, the correct value
->      should be observed when the nested VM performs an RDMSR on
->      IA32_PERF_GLOBAL_CTRL.
->
->      If the "load IA32_PERF_GLOBAL_CTRL" VM-exit control is 1, the
->      reserved bits of the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the
->      HOST_IA32_PERF_GLOBAL_CTRL VMCS field. Otherwise, the VM-entry
->      should fail with a VM-instruction error of "VM entry with invalid
->      host-state field(s)" (8). On a successful VM-exit, the correct value
->      should be observed when L1 performs an RDMSR on
->      IA32_PERF_GLOBAL_CTRL.
->
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->   x86/vmx_tests.c | 172 ++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 172 insertions(+)
->
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 84e1a7935aa1..86424dab615a 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -6854,6 +6854,176 @@ static void test_host_efer(void)
->   	test_efer(HOST_EFER, "HOST_EFER", EXI_CONTROLS, EXI_LOAD_EFER);
->   }
->   
-> +union cpuidA_eax {
-> +	struct {
-> +		unsigned int version_id:8;
-> +		unsigned int num_counters_gp:8;
-> +		unsigned int bit_width:8;
-> +		unsigned int mask_length:8;
-> +	} split;
-> +	unsigned int full;
-> +};
-> +
-> +union cpuidA_edx {
-> +	struct {
-> +		unsigned int num_counters_fixed:5;
-> +		unsigned int bit_width_fixed:8;
-> +		unsigned int reserved:19;
-> +	} split;
-> +	unsigned int full;
-> +};
-> +
-> +static bool valid_pgc(u64 val)
-> +{
-> +	struct cpuid id;
-> +	union cpuidA_eax eax;
-> +	union cpuidA_edx edx;
-> +	u64 mask;
-> +
-> +	id = cpuid(0xA);
-> +	eax.full = id.a;
-> +	edx.full = id.d;
-> +	mask = ~(((1ull << eax.split.num_counters_gp) - 1) |
-> +		(((1ull << edx.split.num_counters_fixed) - 1) << 32));
-> +
-> +	return !(val & mask);
-> +}
-> +
-> +static void test_pgc_vmlaunch(u32 xerror, u32 xreason, bool xfail, bool host)
-> +{
-> +	u32 inst_err;
-> +	u64 obs;
-> +	bool success;
-> +	struct vmx_state_area_test_data *data = &vmx_state_area_test_data;
-> +
-> +	if (host) {
-> +		success = vmlaunch_succeeds();
-> +		obs = rdmsr(data->msr);
-> +		if (!success) {
-> +			inst_err = vmcs_read(VMX_INST_ERROR);
-> +			report("vmlaunch failed, VMX Inst Error is %d (expected %d)",
-> +			       xerror == inst_err, inst_err, xerror);
-> +		} else {
-> +			report("Host state is 0x%lx (expected 0x%lx)",
-> +			       !data->enabled || data->exp == obs, obs, data->exp);
-> +			report("vmlaunch succeeded", success != xfail);
-> +		}
-> +	} else {
-> +		if (xfail) {
-> +			enter_guest_with_invalid_guest_state();
-> +		} else {
-> +			enter_guest();
-> +		}
-> +		report_guest_state_test("load GUEST_PERF_GLOBAL_CTRL",
-> +					xreason, GUEST_PERF_GLOBAL_CTRL,
-> +					"GUEST_PERF_GLOBAL_CTRL");
-> +	}
-> +}
-> +
-> +/*
-> + * test_load_perf_global_ctrl is a generic function for testing the
-> + * "load IA32_PERF_GLOBAL_CTRL" VM-{entry,exit} control. This test function
-> + * will test the provided ctrl_val disabled and enabled.
-> + *
-> + * @nr - VMCS field number corresponding to the Host/Guest state field
-> + * @name - Name of the above VMCS field for printing in test report
-> + * @ctrl_nr - VMCS field number corresponding to the VM-{entry,exit} control
-> + * @ctrl_val - Bit to set on the ctrl field.
-> + */
-> +static void test_load_perf_global_ctrl(u32 nr, const char *name, u32 ctrl_nr,
-> +				       const char *ctrl_name, u64 ctrl_val)
-> +{
-> +	u64 ctrl_saved = vmcs_read(ctrl_nr);
-> +	u64 pgc_saved = vmcs_read(nr);
-> +	u64 i, val;
-> +	bool host = nr == HOST_PERF_GLOBAL_CTRL;
-> +	struct vmx_state_area_test_data *data = &vmx_state_area_test_data;
-> +
-> +	if (!host) {
-> +		vmx_set_test_stage(1);
-> +		test_reset_guest(guest_state_test_main);
-> +	}
-> +	data->msr = MSR_CORE_PERF_GLOBAL_CTRL;
-> +	msr_bmp_init();
-> +	vmcs_write(ctrl_nr, ctrl_saved & ~ctrl_val);
-> +	data->enabled = false;
-> +	report_prefix_pushf("\"load IA32_PERF_GLOBAL_CTRL\"=0 on %s",
-> +			    ctrl_name);
-> +	for (i = 0; i < 64; i++) {
-> +		val = 1ull << i;
-> +		vmcs_write(nr, val);
-> +		report_prefix_pushf("%s = 0x%lx", name, val);
-> +		test_pgc_vmlaunch(0, VMX_VMCALL, false, host);
-> +		report_prefix_pop();
-> +	}
-> +	report_prefix_pop();
-> +
-> +	vmcs_write(ctrl_nr, ctrl_saved | ctrl_val);
-> +	data->enabled = true;
-> +	report_prefix_pushf("\"load IA32_PERF_GLOBAL_CTRL\"=1 on %s",
-> +			    ctrl_name);
-> +	for (i = 0; i < 64; i++) {
-> +		val = 1ull << i;
-> +		data->exp = val;
-> +		vmcs_write(nr, val);
-> +		report_prefix_pushf("%s = 0x%lx", name, val);
-> +		if (valid_pgc(val)) {
-> +			test_pgc_vmlaunch(0, VMX_VMCALL, false, host);
-> +		} else {
-> +			if (host)
-> +				test_pgc_vmlaunch(
-> +					VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
-> +					0,
-> +					true, host);
-> +			else
-> +				test_pgc_vmlaunch(
-> +					0,
-> +					VMX_ENTRY_FAILURE | VMX_FAIL_STATE,
-> +					true, host);
-> +		}
-> +		report_prefix_pop();
-> +	}
-> +
-> +	report_prefix_pop();
-> +
-> +	if (nr == GUEST_PERF_GLOBAL_CTRL) {
-> +		/*
-> +		 * Let the guest finish execution
-> +		 */
-> +		vmx_set_test_stage(2);
-> +		vmcs_write(ctrl_nr, ctrl_saved);
-> +		vmcs_write(nr, pgc_saved);
-> +		enter_guest();
-> +	}
-> +
-> +	vmcs_write(ctrl_nr, ctrl_saved);
-> +	vmcs_write(nr, pgc_saved);
-> +}
-> +
-> +static void test_load_host_perf_global_ctrl(void)
-> +{
-> +	if (!(ctrl_exit_rev.clr & EXI_LOAD_PERF)) {
-> +		printf("\"load IA32_PERF_GLOBAL_CTRL\" "
-> +		       "exit control not supported\n");
-> +		return;
-> +	}
-> +
-> +	test_load_perf_global_ctrl(HOST_PERF_GLOBAL_CTRL, "HOST_PERF_GLOBAL_CTRL",
-> +		      EXI_CONTROLS, "EXI_CONTROLS", EXI_LOAD_PERF);
-> +}
-> +
-> +
-> +static void test_load_guest_perf_global_ctrl(void)
-> +{
-> +	if (!(ctrl_enter_rev.clr & ENT_LOAD_PERF)) {
-> +		printf("\"load IA32_PERF_GLOBAL_CTRL\" "
-> +		       "entry control not supported\n");
-> +	}
-> +
-> +	test_load_perf_global_ctrl(GUEST_PERF_GLOBAL_CTRL, "GUEST_PERF_GLOBAL_CTRL",
-> +		      ENT_CONTROLS, "ENT_CONTROLS", ENT_LOAD_PERF);
-> +}
-> +
->   /*
->    * PAT values higher than 8 are uninteresting since they're likely lumped
->    * in with "8". We only test values above 8 one bit at a time,
-> @@ -7147,6 +7317,7 @@ static void vmx_host_state_area_test(void)
->   	test_sysenter_field(HOST_SYSENTER_EIP, "HOST_SYSENTER_EIP");
->   
->   	test_host_efer();
-> +	test_load_host_perf_global_ctrl();
->   	test_load_host_pat();
->   	test_host_segment_regs();
->   	test_host_desc_tables();
-> @@ -7181,6 +7352,7 @@ static void test_load_guest_pat(void)
->   static void vmx_guest_state_area_test(void)
->   {
->   	test_load_guest_pat();
-> +	test_load_guest_perf_global_ctrl();
->   }
->   
->   static bool valid_vmcs_for_vmentry(void)
+Right. It can be done. It just can't be done with KVM as it is today.
+It's a lot harder than just moving the APIC base address, for
+instance, and KVM punts on even that simple operation, because the KVM
+MMU isn't designed to handle the case where pieces of the extended
+page tables can't be shared among all vCPUs in a VM.
 
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > response is to exit to userspace with
+> > KVM_INTERNAL_ERROR_EMULATION. Sadly, the kvm-unit-tests fail, so I'm
+> > posting this as an RFC.
+> >
+> > Note that the 'Code' line emitted by qemu in response to this error
+> > shows the guest %rip two instructions after the
+> > vmlaunch/vmresume. Hmmm.
+> >
+> > Fixes: fe3ef05c7572 ("KVM: nVMX: Prepare vmcs02 from vmcs01 and
+> > vmcs12")
+> > Reported-by: Dan Cross <dcross@google.com>
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Reviewed-by: Marc Orr <marcorr@google.com>
+> > Reviewed-by: Peter Shier <pshier@google.com>
+> > Reviewed-by: Dan Cross <dcross@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  2 +-
+> >  arch/x86/kvm/vmx/nested.c       | 65 +++++++++++++++++++++------------
+> >  arch/x86/kvm/x86.c              |  9 ++++-
+> >  3 files changed, 49 insertions(+), 27 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h
+> > b/arch/x86/include/asm/kvm_host.h
+> > index 74e88e5edd9cf..e95acf8c82b47 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1191,7 +1191,7 @@ struct kvm_x86_ops {
+> >       int (*set_nested_state)(struct kvm_vcpu *vcpu,
+> >                               struct kvm_nested_state __user
+> > *user_kvm_nested_state,
+> >                               struct kvm_nested_state *kvm_state);
+> > -     void (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
+> > +     int (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
+> >
+> >       int (*smi_allowed)(struct kvm_vcpu *vcpu);
+> >       int (*pre_enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index ced9fba32598d..04b5069d4a9b3 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -2871,7 +2871,7 @@ static int nested_vmx_check_vmentry_hw(struct
+> > kvm_vcpu *vcpu)
+> >  static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu
+> > *vcpu,
+> >                                                struct vmcs12 *vmcs12);
+> >
+> > -static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> > +static int nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> >  {
+> >       struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+> >       struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > @@ -2891,19 +2891,33 @@ static void nested_get_vmcs12_pages(struct
+> > kvm_vcpu *vcpu)
+> >                       vmx->nested.apic_access_page = NULL;
+> >               }
+> >               page = kvm_vcpu_gpa_to_page(vcpu, vmcs12-
+> > >apic_access_addr);
+> > -             /*
+> > -              * If translation failed, no matter: This feature asks
+> > -              * to exit when accessing the given address, and if it
+> > -              * can never be accessed, this feature won't do
+> > -              * anything anyway.
+> > -              */
+> > -             if (!is_error_page(page)) {
+> > +             if (likely(!is_error_page(page))) {
+> >                       vmx->nested.apic_access_page = page;
+> >                       hpa = page_to_phys(vmx-
+> > >nested.apic_access_page);
+> >                       vmcs_write64(APIC_ACCESS_ADDR, hpa);
+> >               } else {
+> > -                     secondary_exec_controls_clearbit(vmx,
+> > -
+> >       SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES);
+> > +                     /*
+> > +                      * Since there is no backing page, we can't
+> > +                      * just rely on the usual L1 GPA -> HPA
+> > +                      * translation mechanism to do the right
+> > +                      * thing. We'd have to assign an appropriate
+> > +                      * HPA for the L1 APIC-access address, and
+> > +                      * then we'd have to modify the MMU to ensure
+> > +                      * that the L1 APIC-access address is mapped
+> > +                      * to the assigned HPA if and only if an L2 VM
+> > +                      * with that APIC-access address and the
+> > +                      * "virtualize APIC accesses" VM-execution
+> > +                      * control set in the vmcs12 is running. For
+> > +                      * now, just admit defeat.
+> > +                      */
+> > +                     pr_warn_ratelimited("Unsupported vmcs12 APIC-
+> > access address 0x%llx\n",
+> > +                             vmcs12->apic_access_addr);
+> > +                     vcpu->run->exit_reason =
+> > KVM_EXIT_INTERNAL_ERROR;
+> > +                     vcpu->run->internal.suberror =
+> > +                             KVM_INTERNAL_ERROR_EMULATION;
+> > +                     vcpu->run->internal.ndata = 1;
+> > +                     vcpu->run->internal.data[0] = vmcs12-
+> > >apic_access_addr;
+> > +                     return -EINTR;
+>
+> What about always using L0 APIC-access address in vmcs02 and mapping
+>
+>
+> >               }
+> >       }
+> >
+> > @@ -2948,6 +2962,7 @@ static void nested_get_vmcs12_pages(struct
+> > kvm_vcpu *vcpu)
+> >               exec_controls_setbit(vmx,
+> > CPU_BASED_USE_MSR_BITMAPS);
+> >       else
+> >               exec_controls_clearbit(vmx,
+> > CPU_BASED_USE_MSR_BITMAPS);
+> > +     return 0;
+> >  }
+> >
+> >  /*
+> > @@ -2986,11 +3001,11 @@ static void load_vmcs12_host_state(struct
+> > kvm_vcpu *vcpu,
+> >  /*
+> >   * If from_vmentry is false, this is being called from state restore (either
+> > RSM
+> >   * or KVM_SET_NESTED_STATE).  Otherwise it's called from
+> > vmlaunch/vmresume.
+> > -+ *
+> > -+ * Returns:
+> > -+ *   0 - success, i.e. proceed with actual VMEnter
+> > -+ *   1 - consistency check VMExit
+> > -+ *  -1 - consistency check VMFail
+> > + *
+> > + * Returns:
+> > + * -EINTR  - exit to userspace
+> > + * -EINVAL - VMentry failure; continue
+> > + *  0      - success, i.e. proceed with actual VMEnter
+> >   */
+> >  int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool
+> > from_vmentry)
+> >  {
+> > @@ -2999,6 +3014,7 @@ int nested_vmx_enter_non_root_mode(struct
+> > kvm_vcpu *vcpu, bool from_vmentry)
+> >       bool evaluate_pending_interrupts;
+> >       u32 exit_reason = EXIT_REASON_INVALID_STATE;
+> >       u32 exit_qual;
+> > +     int r;
+> >
+> >       evaluate_pending_interrupts = exec_controls_get(vmx) &
+> >               (CPU_BASED_VIRTUAL_INTR_PENDING |
+> > CPU_BASED_VIRTUAL_NMI_PENDING);
+> > @@ -3035,11 +3051,15 @@ int nested_vmx_enter_non_root_mode(struct
+> > kvm_vcpu *vcpu, bool from_vmentry)
+> >       prepare_vmcs02_early(vmx, vmcs12);
+> >
+> >       if (from_vmentry) {
+> > -             nested_get_vmcs12_pages(vcpu);
+> > +             r = nested_get_vmcs12_pages(vcpu);
+> > +             if (unlikely(r))
+> > +                     return r;
+> >
+> >               if (nested_vmx_check_vmentry_hw(vcpu)) {
+> >                       vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+> > -                     return -1;
+> > +                     r = nested_vmx_failValid(vcpu,
+> > +
+> > VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+> > +                     return r ? -EINVAL : -EINTR;
+> >               }
+> >
+> >               if (nested_vmx_check_guest_state(vcpu, vmcs12,
+> > &exit_qual))
+> > @@ -3119,14 +3139,14 @@ int nested_vmx_enter_non_root_mode(struct
+> > kvm_vcpu *vcpu, bool from_vmentry)
+> >       vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+> >
+> >       if (!from_vmentry)
+> > -             return 1;
+> > +             return -EINVAL;
+> >
+> >       load_vmcs12_host_state(vcpu, vmcs12);
+> >       vmcs12->vm_exit_reason = exit_reason |
+> > VMX_EXIT_REASONS_FAILED_VMENTRY;
+> >       vmcs12->exit_qualification = exit_qual;
+> >       if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
+> >               vmx->nested.need_vmcs12_to_shadow_sync = true;
+> > -     return 1;
+> > +     return -EINVAL;
+> >  }
+> >
+> >  /*
+> > @@ -3200,11 +3220,8 @@ static int nested_vmx_run(struct kvm_vcpu
+> > *vcpu, bool launch)
+> >       vmx->nested.nested_run_pending = 1;
+> >       ret = nested_vmx_enter_non_root_mode(vcpu, true);
+> >       vmx->nested.nested_run_pending = !ret;
+> > -     if (ret > 0)
+> > -             return 1;
+> > -     else if (ret)
+> > -             return nested_vmx_failValid(vcpu,
+> > -                     VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+> > +     if (ret)
+> > +             return ret != -EINTR;
+> >
+> >       /* Hide L1D cache contents from the nested guest.  */
+> >       vmx->vcpu.arch.l1tf_flush_l1d = true;
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 290c3c3efb877..5ddbf16c8b108 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7803,8 +7803,13 @@ static int vcpu_enter_guest(struct kvm_vcpu
+> > *vcpu)
+> >       bool req_immediate_exit = false;
+> >
+> >       if (kvm_request_pending(vcpu)) {
+> > -             if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES,
+> > vcpu))
+> > -                     kvm_x86_ops->get_vmcs12_pages(vcpu);
+> > +             if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES,
+> > vcpu)) {
+> > +                     r = kvm_x86_ops->get_vmcs12_pages(vcpu);
+> > +                     if (unlikely(r)) {
+> > +                             r = 0;
+> > +                             goto out;
+> > +                     }
+> > +             }
+> >               if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu))
+> >                       kvm_mmu_unload(vcpu);
+> >               if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
+> > --
+> > 2.23.0.162.g0b9fbb3734-goog
+>
