@@ -2,113 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02163B0EEF
-	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 14:37:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DD4BB1025
+	for <lists+kvm@lfdr.de>; Thu, 12 Sep 2019 15:39:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731642AbfILMhs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 08:37:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41408 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730454AbfILMhs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Sep 2019 08:37:48 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 41C1FC010925
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 12:37:48 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id x1so11925019wrn.11
-        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 05:37:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pTZv96VgCJM8wv+X/QLpv4XlW1A0G4Xstp3NDxBDKyo=;
-        b=nzAIc2MREbSFKbM5eXtmLGlBk0/dsJeWrUcbB0L7XlN8hcmVWL7SNQX45dwWd/+pHL
-         lj3LWudyCgnyveiMpoYGXW9Prtsk5pqJSIV4enymCeXy5IJa9BT/YEn7GeDvSsMZQatD
-         wDb4oJwtnv1u2w+QpWJhDFbA0ig271ugXmD0j1mI7aLIO0on4Y641bDK+q8tLQtcR5s3
-         pRndm70lzGnLP0bn9g8VqmpBwVpYBuvkf6O23Xz4bfxR5dsHZ0gk7xPO3xfP8b4IBr6R
-         //A3P2+GlVHUNg/4YM8rnWGzgm97d2PHZoA4NTGJMmNyEMbicvsEs1UFAzvlxpoLV31Z
-         Ku2g==
-X-Gm-Message-State: APjAAAUimdqAs61MHmVSvjSNBIDP8bIdtZONWDgdjeGstiKkIHcfnnK9
-        dqv9Taaqbui3BkZ/k38O+XrQ6lnddDbpnlN7ESvEyx7GSoh2Vzi2Cbe6z8sYD23yPI/VYtuxTvV
-        une9nAGUWmhHO
-X-Received: by 2002:adf:d4c5:: with SMTP id w5mr34308604wrk.280.1568291866878;
-        Thu, 12 Sep 2019 05:37:46 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw1mhu4LnobJt1OA0eB+e58fTNMsmy0X4vUrwR5SrILpKjnRo959U2YZY9ItQtIR8LbFYrB3Q==
-X-Received: by 2002:adf:d4c5:: with SMTP id w5mr34308589wrk.280.1568291866654;
-        Thu, 12 Sep 2019 05:37:46 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id m18sm33245834wrg.97.2019.09.12.05.37.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Sep 2019 05:37:46 -0700 (PDT)
-Subject: Re: [PATCH v3 1/2] KVM: LAPIC: Tune lapic_timer_advance_ns smoothly
-To:     Wanpeng Li <wanpeng.li@hotmail.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <1566980342-22045-1-git-send-email-wanpengli@tencent.com>
- <a1c6c974-a6f2-aa71-aa2e-4c987447f419@redhat.com>
- <TY2PR02MB4160421A8C88D96C8BCB971180B00@TY2PR02MB4160.apcprd02.prod.outlook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8054e73d-1e09-0f98-4beb-3caa501f2ac7@redhat.com>
-Date:   Thu, 12 Sep 2019 14:37:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1732140AbfILNja (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 09:39:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3590 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731283AbfILNj3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Sep 2019 09:39:29 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8CDXJ0x020741
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 09:39:28 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2uyp6qt8n0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 12 Sep 2019 09:39:28 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 12 Sep 2019 14:39:26 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 12 Sep 2019 14:39:23 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8CDdMbq58785806
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Sep 2019 13:39:22 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A1CE42047;
+        Thu, 12 Sep 2019 13:39:22 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 23C0942042;
+        Thu, 12 Sep 2019 13:39:22 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 12 Sep 2019 13:39:22 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id CA256E0435; Thu, 12 Sep 2019 15:39:21 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: [GIT PULL 0/2] KVM: s390: Fixes for 5.3
+Date:   Thu, 12 Sep 2019 15:39:19 +0200
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <TY2PR02MB4160421A8C88D96C8BCB971180B00@TY2PR02MB4160.apcprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19091213-0016-0000-0000-000002AA6E77
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091213-0017-0000-0000-0000330B004E
+Message-Id: <20190912133921.6886-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-12_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=407 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1909120143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/09/19 02:34, Wanpeng Li wrote:
->>> -        timer_advance_ns -= min((u32)ns,
->>> -            timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
->>> +        timer_advance_ns -= ns;
+Paolo, Radim,
 
-Looking more closely, this assignment...
+the following changes since commit 609488bc979f99f805f34e9a32c1e3b71179d10b:
 
->>>    } else {
->>>    /* too late */
->>>        ns = advance_expire_delta * 1000000ULL;
->>>        do_div(ns, vcpu->arch.virtual_tsc_khz);
->>> -        timer_advance_ns += min((u32)ns,
->>> -            timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
->>> +        timer_advance_ns += ns;
+  Linux 5.3-rc2 (2019-07-28 12:47:02 -0700)
 
-... and this one are dead code now.  However...
+are available in the Git repository at:
 
->>>    }
->>>
->>> +    timer_advance_ns = (apic->lapic_timer.timer_advance_ns *
->>> +        (LAPIC_TIMER_ADVANCE_ADJUST_STEP - 1) + advance_expire_delta) /
->>> +        LAPIC_TIMER_ADVANCE_ADJUST_STEP;
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.3-1
 
-... you should instead remove this new assignment and just make the
-assignments above just
+for you to fetch changes up to 53936b5bf35e140ae27e4bbf0447a61063f400da:
 
-	timer_advance -= ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP;
+  KVM: s390: Do not leak kernel stack data in the KVM_S390_INTERRUPT ioctl (2019-09-12 14:12:21 +0200)
 
-and
+----------------------------------------------------------------
+KVM: s390: Fixes for 5.3
 
-	timer_advance -= ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP;
+- prevent a user triggerable oops in the migration code
+- do not leak kernel stack content
 
-In fact this whole last assignment is buggy, since advance_expire_delta
-is in TSC units rather than nanoseconds.
+----------------------------------------------------------------
+Igor Mammedov (1):
+      KVM: s390: kvm_s390_vm_start_migration: check dirty_bitmap before using it as target for memset()
 
->>>    if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
->>>        apic->lapic_timer.timer_advance_adjust_done = true;
->>>    if (unlikely(timer_advance_ns > 5000)) {
->> This looks great.  But instead of patch 2, why not remove
->> timer_advance_adjust_done altogether?
-> It can fluctuate w/o stop.
+Thomas Huth (1):
+      KVM: s390: Do not leak kernel stack data in the KVM_S390_INTERRUPT ioctl
 
-Possibly because of the wrong calculation of timer_advance_ns?
+ arch/s390/kvm/interrupt.c | 10 ++++++++++
+ arch/s390/kvm/kvm-s390.c  |  4 +++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-Paolo
