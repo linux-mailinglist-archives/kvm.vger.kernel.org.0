@@ -2,86 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3929DB237D
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 17:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F193DB23AF
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 17:54:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389293AbfIMPgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Sep 2019 11:36:31 -0400
-Received: from iolanthe.rowland.org ([192.131.102.54]:53670 "HELO
-        iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S1727405AbfIMPga (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Sep 2019 11:36:30 -0400
-Received: (qmail 3387 invoked by uid 2102); 13 Sep 2019 11:36:30 -0400
-Received: from localhost (sendmail-bs@127.0.0.1)
-  by localhost with SMTP; 13 Sep 2019 11:36:30 -0400
-Date:   Fri, 13 Sep 2019 11:36:30 -0400 (EDT)
-From:   Alan Stern <stern@rowland.harvard.edu>
-X-X-Sender: stern@iolanthe.rowland.org
-To:     Paolo Bonzini <pbonzini@redhat.com>
-cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
-        <bp@alien8.de>, <carlo@caione.org>, <catalin.marinas@arm.com>,
-        <devicetree@vger.kernel.org>, <hpa@zytor.com>,
-        <jmattson@google.com>, <joro@8bytes.org>, <khilman@baylibre.com>,
-        <linux-amlogic@lists.infradead.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <mark.rutland@arm.com>,
-        <mingo@redhat.com>, <narmstrong@baylibre.com>,
-        <rkrcmar@redhat.com>, <robh+dt@kernel.org>,
-        <sean.j.christopherson@intel.com>,
-        <syzkaller-bugs@googlegroups.com>, <tglx@linutronix.de>,
-        <wanpengli@tencent.com>, <will.deacon@arm.com>, <x86@kernel.org>,
-        syzbot <syzbot+46f1dd7dbbe2bfb98b10@syzkaller.appspotmail.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        USB list <linux-usb@vger.kernel.org>
-Subject: Re: KASAN: slab-out-of-bounds Read in handle_vmptrld
-In-Reply-To: <6a0ec3a2-2a52-f67a-6140-e0a60874538a@redhat.com>
-Message-ID: <Pine.LNX.4.44L0.1909131129390.1466-100000@iolanthe.rowland.org>
+        id S2388208AbfIMPyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Sep 2019 11:54:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60812 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387739AbfIMPyb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Sep 2019 11:54:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9C5963058DAA;
+        Fri, 13 Sep 2019 15:54:30 +0000 (UTC)
+Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C98B60600;
+        Fri, 13 Sep 2019 15:54:30 +0000 (UTC)
+Date:   Fri, 13 Sep 2019 09:54:29 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "Xia, Chenbo" <chenbo.xia@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: mdev live migration support with vfio-mdev-pci
+Message-ID: <20190913095429.19f9e080@x1.home>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D5721C8@SHSMSX104.ccr.corp.intel.com>
+References: <A2975661238FB949B60364EF0F2C25743A08FC3F@SHSMSX104.ccr.corp.intel.com>
+        <20190912154127.04ed3951@x1.home>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D5721C8@SHSMSX104.ccr.corp.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Fri, 13 Sep 2019 15:54:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 Sep 2019, Paolo Bonzini wrote:
+On Fri, 13 Sep 2019 00:28:25 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-> On 13/09/19 15:02, Greg Kroah-Hartman wrote:
-> > Look at linux-next, we "should" have fixed up hcd_buffer_alloc() now to
-> > not need this type of thing.  If we got it wrong, please let us know and
-> > then yes, a fix like this would be most appreciated :)
+> > From: Alex Williamson
+> > Sent: Thursday, September 12, 2019 10:41 PM
+> > 
+> > On Mon, 9 Sep 2019 11:41:45 +0000
+> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> >   
+> > > Hi Alex,
+> > >
+> > > Recently, we had an internal discussion on mdev live migration support
+> > > for SR-IOV. The usage is to wrap VF as mdev and make it migrate-able
+> > > when passthru to VMs. It is very alike with the vfio-mdev-pci sample
+> > > driver work which also wraps PF/VF as mdev. But there is gap. Current
+> > > vfio-mdev-pci driver is a generic driver which has no ability to support
+> > > customized regions. e.g. state save/restore or dirty page region which is
+> > > important in live migration. To support the usage, there are two  
+> > directions:  
+> > >
+> > > 1) extend vfio-mdev-pci driver to expose interface, let vendor specific
+> > > in-kernel module (not driver) to register some ops for live migration.
+> > > Thus to support customized regions. In this direction, vfio-mdev-pci
+> > > driver will be in charge of the hardware. The in-kernel vendor specific
+> > > module is just to provide customized region emulation.
+> > > - Pros: it will be helpful if we want to expose some user-space ABI in
+> > >         future since it is a generic driver.
+> > > - Cons: no apparent cons per me, may keep me honest, my folks.
+> > >
+> > > 2) further abstract out the generic parts in vfio-mdev-driver to be a library
+> > > and let vendor driver to call the interfaces exposed by this library. e.g.
+> > > provides APIs to wrap a VF as mdev and make a non-singleton iommu
+> > > group to be vfio viable when a vendor driver wants to wrap a VF as a
+> > > mdev. In this direction, device driver still in charge of hardware.
+> > > - Pros: devices driver still owns the device, which looks to be more
+> > >         "reasonable".
+> > > - Cons: no apparent cons, may be unable to have unified user space ABI if
+> > >         it's needed in future.
+> > >
+> > > Any thoughts on the above usage and the two directions? Also, Kevin, Yan,
+> > > Shaopeng could keep me honest if anything missed.  
+> > 
+> > A concern with 1) is that we specifically made the vfio-mdev-pci driver
+> > a sample driver to avoid user confusion over when to use vfio-pci vs
+> > when to use vfio-mdev-pci.  This use case suggests vfio-mdev-pci
+> > becoming a peer of vfio-pci when really I think it was meant only as a
+> > demo of IOMMU backed mdev devices and perhaps a starting point for
+> > vendors wanting to create an mdev wrapper around real hardware.  I
+> > had assumed that in the latter case, the sample driver would be forked.
+> > Do these new suggestions indicate we're deprecating vfio-pci?  I'm not
+> > necessarily in favor of that. Couldn't we also have device specific
+> > extensions of vfio-pci that could provide migration support for a
+> > physical device?  Do we really want to add the usage burden of the mdev
+> > sysfs interface if we're only adding migration to a VF?  Maybe instead
+> > we should add common helpers for migration that could be used by either
+> > vfio-pci or vendor specific mdev drivers.  Ideally I think that if
+> > we're not trying to multiplex a device into multiple mdevs or trying
+> > to supplement a device that would be incomplete without mdev, and only
+> > want to enable migration for a PF/VF, we'd bind it to vfio-pci and those
+> > features would simply appear for device we've enlightened vfio-pci to
+> > migrate.  Thanks,
+> >   
 > 
-> I still see
-> 
-> 	/* some USB hosts just use PIO */
-> 	if (!hcd_uses_dma(hcd)) {
-> 		*dma = ~(dma_addr_t) 0;
-> 		return kmalloc(size, mem_flags);
-> 	}
-> 
-> in linux-next's hcd_buffer_alloc and also in usb.git's usb-next branch.
->  I also see the same
-> 
-> 	if (remap_pfn_range(vma, vma->vm_start,
-> 			virt_to_phys(usbm->mem) >> PAGE_SHIFT,
-> 			size, vma->vm_page_prot) < 0) {
-> 		...
-> 	}
-> 
-> in usbdev_mmap.  Of course it's possible that I'm looking at the wrong
-> branch, or just being dense.
+> That would be better and simpler. We thought you may want to keep 
+> current vfio-pci intact. :-) btw do you prefer to putting device specific 
+> migration logic within VFIO, or building some mechanism for PF/VF driver 
+> to register and handle? The former is fully constrained with VFIO but
+> moving forward may get complex. The latter keeps the VFIO clean and
+> reuses existing driver logic thus simpler, just that PF/VF driver enters
+> a special mode in which it's not bound to the PF/VF device (vfio-pci is
+> the actual driver) and simply acts as callbacks to handler device specific
+> migration request.
 
-Have you seen
+I'm not sure how this native device driver registration would work, is
+seems troublesome for the user.  vfio-pci already has optional support
+for IGD extensions.  I imagine it would be similar to that, but we may
+try to modularize it within vfio-pci, perhaps similar to how Eric
+supports resets on vfio-platform.  There's also an issue with using the
+native driver that users cannot then blacklist the native driver if
+they only intend to use the device with vfio-pci.  It's probably best
+to keep it contained, but modular within vfio-pci.  Thanks,
 
-	https://marc.info/?l=linux-usb&m=156758511218419&w=2
-
-?  It certainly is relevant, although Greg hasn't replied to it.
-
-There have been other messages on the mailing list about this issue,
-but I haven't tried to keep track of them.
-
-Also, just warning about a non-page-aligned allocation doesn't really 
-help.  It would be better to fix the misbehaving allocator.
-
-Alan Stern
-
+Alex
