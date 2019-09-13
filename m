@@ -2,117 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D0DFB2595
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 21:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 144CDB26BF
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 22:38:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389217AbfIMTBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Sep 2019 15:01:19 -0400
-Received: from mail-eopbgr710060.outbound.protection.outlook.com ([40.107.71.60]:62364
-        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389163AbfIMTBS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Sep 2019 15:01:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OEUdDPsewtL9YI47FhOYWf9m2RKSP6oqYsKVCCzrd69LVmqimwFK41KCS7ZDx6D2d7VIfxKDs+Z5xv1E458jrbXUY1LH3k7RDE/TFMsksiYeZx0FnEL8jx2LiDwOMupIhAaLaO4Z746LPS16R54t49ZR/EUDuwOkYle6OEoIMdOliKuKoaDylkvAEH8wQvTtUFu0OcfU93eBuyJZbJElTWk8zE3Emtm2IneUrk1eq/MwYo9CUT5RgJaF4xE2SnrFwFAH4ZWOJPOCjjf8OHXCSjACo045OdTvjB91qO28JJ8ltHHj/XH+uVXY+JHu4x7VPauNvw4BL1ROofZL8udYlw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jJPIwFhdWsP3d/i29F4g9Mxq2BKGJCh2LO/dIM8UVT0=;
- b=mWFbZ4l5oK+3YvOdrJ8MkH3cjfbnHcfwiVbfBUgGNnXxGN7CgpGMZSOGonz3iGOtU85BlKLSouMvRXZua3FPxqxXNf8tX7frzA8g5Le5eMzabh5JDMz4LCuV2jYfV7e8GrpEX0YfYuYZua0yGRk2x8vPjLxvrz7Zt1tyCfluXqzc4Ub8mwSDZYBupsmzp92ntTdtsHCRhX8bG0EKBbdjW8Ebupp9j1+GUsQ65IlfhyK1i/JFnD7WaE8/XsINqE5o1tbztn0lf1F2CEcxcSvJT/WNAtAw+1Au8CeN+Yhn5MzfPQRmRhLyL8MDH+RKedtUiShMiF8f1cU4ketf8Wgypg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jJPIwFhdWsP3d/i29F4g9Mxq2BKGJCh2LO/dIM8UVT0=;
- b=bjTlNzUMGcdzxHKema6J0VV54NctgJx/UCET27/Ko2cUBlbq1TiF0cP7ZnTQF37yJkQt4xNVMRotHWDM53KinNyOCBdxj/z2yIBXsfx9GvPE76MQzrRR1RZhMBVNjvZoHkrRt982IodNlfXrbbgJf9sPJXVxt6eNC2b0Js7btQE=
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com (20.176.117.96) by
- DM6PR12MB3596.namprd12.prod.outlook.com (20.178.199.83) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2241.18; Fri, 13 Sep 2019 19:01:11 +0000
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::201f:ac0f:4576:e997]) by DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::201f:ac0f:4576:e997%3]) with mapi id 15.20.2241.022; Fri, 13 Sep 2019
- 19:01:11 +0000
-From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>,
-        "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-Subject: [PATCH v3 16/16] svm: Allow AVIC with in-kernel irqchip mode
-Thread-Topic: [PATCH v3 16/16] svm: Allow AVIC with in-kernel irqchip mode
-Thread-Index: AQHVamWbPsANoSEXBkO4BBRG/d09aQ==
-Date:   Fri, 13 Sep 2019 19:01:11 +0000
-Message-ID: <1568401242-260374-17-git-send-email-suravee.suthikulpanit@amd.com>
-References: <1568401242-260374-1-git-send-email-suravee.suthikulpanit@amd.com>
-In-Reply-To: <1568401242-260374-1-git-send-email-suravee.suthikulpanit@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [165.204.78.1]
-x-clientproxiedby: SN6PR08CA0021.namprd08.prod.outlook.com
- (2603:10b6:805:66::34) To DM6PR12MB2844.namprd12.prod.outlook.com
- (2603:10b6:5:45::32)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 1.8.3.1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a68276d7-4167-4078-c277-08d7387cbe45
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB3596;
-x-ms-traffictypediagnostic: DM6PR12MB3596:
-x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB35963FEB098826A9BC4CD62DF3B30@DM6PR12MB3596.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4125;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(346002)(396003)(366004)(376002)(189003)(199004)(66066001)(7416002)(3846002)(6116002)(81156014)(186003)(8676002)(81166006)(54906003)(6436002)(52116002)(110136005)(316002)(4744005)(76176011)(53936002)(5660300002)(71200400001)(71190400001)(6506007)(386003)(102836004)(6512007)(486006)(26005)(66946007)(66574012)(8936002)(66476007)(66556008)(64756008)(66446008)(4720700003)(2906002)(99286004)(50226002)(6486002)(446003)(256004)(14444005)(25786009)(305945005)(478600001)(11346002)(36756003)(476003)(7736002)(14454004)(4326008)(2616005)(2501003)(86362001);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3596;H:DM6PR12MB2844.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: bvg4JvStfWszZEDVEY2XxQNku6xswA22F3bW+Y/C7ccKAICDSA3r9kJvGhPp0B1xd5JZ+9Emo3hK1lX9S5VKkqrzV1E2cA3KoXJy8SYwzEYzHIDNQKKSGmP0FGbLyRjaxtuFKbl+3BGnGd6nc3jqArcU0UdrSquDO2jZ/2wrBVaElJjda/18gK9av2d77vmlEVn5iTftHSrIO27f/6rb5p3U6Sg61roDAOCDTACNEJY7wU/g9i5E0782r9En7/1Qtufp6twDRu+ZA7QFYdzDMEpCNuWjuYNCNGqUne/hHV2HmidprcGqO2bWYiOlGbJuDAPH/zV1BQ9qvYuJgPPo0W7tZGae5MXfEzvv2xK1G7lbRW8J7St+PeaRe/x2qlry6yoBeR9OhMmFmyNfwiPPAkD8MVaAWmMwE+O61p/3lco=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AC110F5A11FF8D49A0018830CC974F21@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S2388871AbfIMUiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Sep 2019 16:38:12 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:46140 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388167AbfIMUiM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Sep 2019 16:38:12 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8DKTXWB111543;
+        Fri, 13 Sep 2019 20:37:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=UnHv8GsPRMvPYvkuE3GfiVzOkpVWk1Oi2pxkcI2+QNs=;
+ b=ltUFe5j6111wxw0O2auNMY0/mBG3bdsmvDMr38NPMobx59m+ZDYP9sWalKoHgaFp9aQ7
+ +yg1ME6BjRwQZHlbhSPBwJ4Kz1Us/i4oxZn8/IhbolSR5qXx1flPVV/tcEOstlMTMMwg
+ eikhoztXcSjjS9K5CGO7QWTZxLkOnbqfiRodNcFkar6LUflzE8cyhARsfap2hD3y2pyG
+ WQ+SUOV7Zl/qX10S4zEjWDyljm/1A7Oj0SSrkRFWKdIoS3f6QyimfXGxM0mwWYriVoXU
+ pr5I7LFPvmkL5fKejP9636KwgC+RJjF70TZOxpFzIvkdw1D0YZqSFpwUEW5TrFYP2shA nA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2uytd36x92-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Sep 2019 20:37:59 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8DKTSsq131242;
+        Fri, 13 Sep 2019 20:37:58 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2uytdna7jx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Sep 2019 20:37:58 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8DKbulk013241;
+        Fri, 13 Sep 2019 20:37:56 GMT
+Received: from [10.159.133.236] (/10.159.133.236)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 13 Sep 2019 13:37:56 -0700
+Subject: Re: [PATCH 3/4] kvm-unit-test: nVMX: __enter_guest() should not set
+ "launched" state when VM-entry fails
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, rkrcmar@redhat.com, pbonzini@redhat.com,
+        jmattson@google.com
+References: <20190829205635.20189-1-krish.sadhukhan@oracle.com>
+ <20190829205635.20189-4-krish.sadhukhan@oracle.com>
+ <20190904154231.GB24079@linux.intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <a2268863-e554-4547-5196-3509bda3ace3@oracle.com>
+Date:   Fri, 13 Sep 2019 13:37:55 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a68276d7-4167-4078-c277-08d7387cbe45
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 19:01:11.7696
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bO7gNvsJuA9Z5QL2gpClDA4KdcxFTCJq57+ExBua3A7n9j+Tlc0Lagp9au0Tk/Imk4VVv5cIyr8m7t/KmSaCiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3596
+In-Reply-To: <20190904154231.GB24079@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9379 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909130208
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9379 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909130208
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T25jZSBydW4tdGltZSBBVklDIGFjdGl2YXRlL2RlYWN0aXZhdGUgaXMgc3VwcG9ydGVkLCBhbmQg
-RU9JIHdvcmthcm91bmQNCmZvciBBVklDIGlzIGltcGxlbWVudGVkLCB3ZSBjYW4gcmVtb3ZlIHRo
-ZSBrZXJuZWwgaXJxY2hpcCBzcGxpdCBtb2RlDQpyZXF1aXJlbWVudCBmb3IgQVZJQy4NCg0KSGVu
-Y2UsIHJlbW92ZSB0aGUgY2hlY2sgZm9yIGlycWNoaXAgc3BsaXQgbW9kZSB3aGVuIGVuYWJsaW5n
-IEFWSUMuDQoNCkNjOiBSYWRpbSBLcsSNbcOhxZkgPHJrcmNtYXJAcmVkaGF0LmNvbT4NCkNjOiBQ
-YW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KU2lnbmVkLW9mZi1ieTogU3VyYXZl
-ZSBTdXRoaWt1bHBhbml0IDxzdXJhdmVlLnN1dGhpa3VscGFuaXRAYW1kLmNvbT4NCi0tLQ0KIGFy
-Y2gveDg2L2t2bS9zdm0uYyB8IDIgKy0NCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyks
-IDEgZGVsZXRpb24oLSkNCg0KZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9zdm0uYyBiL2FyY2gv
-eDg2L2t2bS9zdm0uYw0KaW5kZXggNDU3ZmZlMS4uNGM2NDljMCAxMDA2NDQNCi0tLSBhL2FyY2gv
-eDg2L2t2bS9zdm0uYw0KKysrIGIvYXJjaC94ODYva3ZtL3N2bS5jDQpAQCAtNTIwMyw3ICs1MjAz
-LDcgQEAgc3RhdGljIHZvaWQgc3ZtX3NldF92aXJ0dWFsX2FwaWNfbW9kZShzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpDQogDQogc3RhdGljIGJvb2wgc3ZtX2dldF9lbmFibGVfYXBpY3Yoc3RydWN0IGt2
-bSAqa3ZtKQ0KIHsNCi0JcmV0dXJuIGF2aWMgJiYgaXJxY2hpcF9zcGxpdChrdm0pOw0KKwlyZXR1
-cm4gYXZpYzsNCiB9DQogDQogc3RhdGljIHZvaWQgc3ZtX2h3YXBpY19pcnJfdXBkYXRlKHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwgaW50IG1heF9pcnIpDQotLSANCjEuOC4zLjENCg0K
+
+On 9/4/19 8:42 AM, Sean Christopherson wrote:
+> On Thu, Aug 29, 2019 at 04:56:34PM -0400, Krish Sadhukhan wrote:
+>> Bit# 31 in VM-exit reason is set by hardware in both cases of early VM-entry
+>> failures and VM-entry failures due to invalid guest state.
+> This is incorrect, VMCS.EXIT_REASON is not written on a VM-Fail.  If the
+> tests are passing, you're probably consuming a stale EXIT_REASON.
+
+In vmx_vcpu_run(),
+
+         if (vmx->fail || (vmx->exit_reason & 
+VMX_EXIT_REASONS_FAILED_VMENTRY))
+                 return;
+
+         vmx->loaded_vmcs->launched = 1;
+
+we return without setting "launched" whenever bit# 31 is set in Exit 
+Reason. If VM-entry fails due to invalid guest state or due to errors in 
+VM-entry MSR-loading area, bit#31 is set.  As a result, L2 is not in 
+"launched" state when we return to L1.  Tests that want to VMRESUME L2 
+after fixing the bad guest state or the bad MSR-loading area, fail with 
+VM-Instruction Error 5,
+
+         "Early vmresume failure: error number is 5. See Intel 30.4."
+
+>
+>> Whenever VM-entry
+>> fails, the nested VMCS is not in "launched" state any more. Hence,
+>> __enter_guest() should not set the "launched" state when a VM-entry fails.
+>>
+>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>> ---
+>>   x86/vmx.c | 9 +++++----
+>>   1 file changed, 5 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/x86/vmx.c b/x86/vmx.c
+>> index 872ba11..183d11b 100644
+>> --- a/x86/vmx.c
+>> +++ b/x86/vmx.c
+>> @@ -1805,6 +1805,8 @@ static void check_for_guest_termination(void)
+>>    */
+>>   static void __enter_guest(u8 abort_flag, struct vmentry_failure *failure)
+>>   {
+>> +	bool vm_entry_failure;
+>> +
+>>   	TEST_ASSERT_MSG(v2_guest_main,
+>>   			"Never called test_set_guest_func!");
+>>   
+>> @@ -1812,15 +1814,14 @@ static void __enter_guest(u8 abort_flag, struct vmentry_failure *failure)
+>>   			"Called enter_guest() after guest returned.");
+>>   
+>>   	vmx_enter_guest(failure);
+>> +	vm_entry_failure = vmcs_read(EXI_REASON) & VMX_ENTRY_FAILURE;
+> Rather than duplicating the code in vmx_run(), what if we move this check
+> into vmx_enter_guest() and rework struct vmentry_failure?  The code was
+> originally designed to handle only VM-Fail conditions, we should clean it
+> up instead of bolting more stuff on top.  E.g.:
+>
+> struct vmentry_status {
+> 	/* Did we attempt VMLAUNCH or VMRESUME */
+> 	bool vmlaunch;
+> 	/* Instruction mnemonic (for convenience). */
+> 	const char *instr;
+> 	/* VM-Enter passed all consistency checks, i.e. did not fail. */
+> 	bool succeeded;
+> 	/* VM-Enter failed before loading guest state, i.e. VM-Fail. */
+> 	bool vm_fail;
+> 	/* Contents of RFLAGS on VM-Fail, EXIT_REASON on VM-Exit.  */
+> 	union {
+> 		unsigned long vm_fail_flags;
+> 		unsigned long vm_exit_reason;
+> 	};
+> };
+>
+> static void vmx_enter_guest(struct vmentry_status *status)
+> {
+> 	status->vm_fail = 0;
+>
+> 	in_guest = 1;
+> 	asm volatile (
+> 		"mov %[HOST_RSP], %%rdi\n\t"
+> 		"vmwrite %%rsp, %%rdi\n\t"
+> 		LOAD_GPR_C
+> 		"cmpb $0, %[launched]\n\t"
+> 		"jne 1f\n\t"
+> 		"vmlaunch\n\t"
+> 		"jmp 2f\n\t"
+> 		"1: "
+> 		"vmresume\n\t"
+> 		"2: "
+> 		SAVE_GPR_C
+> 		"pushf\n\t"
+> 		"pop %%rdi\n\t"
+> 		"mov %%rdi, %[vm_fail_flags]\n\t"
+> 		"movl $1, %[vm_fail]\n\t"
+> 		"jmp 3f\n\t"
+> 		"vmx_return:\n\t"
+> 		SAVE_GPR_C
+> 		"3: \n\t"
+> 		: [vm_fail]"+m"(status->vm_fail),
+> 		  [vm_fail_flags]"=m"(status->vm_fail_flags)
+> 		: [launched]"m"(launched), [HOST_RSP]"i"(HOST_RSP)
+> 		: "rdi", "memory", "cc"
+> 	);
+> 	in_guest = 0;
+>
+> 	if (!status->vm_fail)
+> 		status->vm_exit_reason = vmcs_read(EXI_REASON);
+> 		
+> 	status->succeeded = !status->vm_fail &&
+> 			    !(status->vm_exit_reason & VMX_ENTRY_FAILURE);
+>
+> 	status->vmlaunch = !launched;
+> 	status->instr = launched ? "vmresume" : "vmlaunch";
+>
+> 	if (status->succeeded)
+> 		launched = 1;
+> }
+
+
+This looks good. Do you want to send a patch or you want me to add it to 
+the current set ?
+
+
+>
+>>   	if ((abort_flag & ABORT_ON_EARLY_VMENTRY_FAIL && failure->early) ||
+>> -	    (abort_flag & ABORT_ON_INVALID_GUEST_STATE &&
+>> -	    vmcs_read(EXI_REASON) & VMX_ENTRY_FAILURE)) {
+>> -
+>> +	    (abort_flag & ABORT_ON_INVALID_GUEST_STATE && vm_entry_failure)) {
+>>   		print_vmentry_failure_info(failure);
+>>   		abort();
+>>   	}
+>>   
+>> -	if (!failure->early) {
+>> +	if (!vm_entry_failure) {
+>>   		launched = 1;
+>>   		check_for_guest_termination();
+>>   	}
+>> -- 
+>> 2.20.1
+>>
