@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E6F04B175A
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 04:47:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7438B175C
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 04:47:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726313AbfIMCqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 22:46:14 -0400
+        id S1728416AbfIMCrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 22:47:13 -0400
 Received: from mga07.intel.com ([134.134.136.100]:58605 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726032AbfIMCqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726074AbfIMCqO (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 12 Sep 2019 22:46:14 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Sep 2019 19:46:13 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,492,1559545200"; 
-   d="scan'208";a="176159507"
+   d="scan'208";a="176159510"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga007.jf.intel.com with ESMTP; 12 Sep 2019 19:46:13 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -31,9 +31,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         linux-kernel@vger.kernel.org,
         James Harvey <jamespharvey20@gmail.com>,
         Alex Willamson <alex.williamson@redhat.com>
-Subject: [PATCH 02/11] KVM: x86/mmu: Treat invalid shadow pages as obsolete
-Date:   Thu, 12 Sep 2019 19:46:03 -0700
-Message-Id: <20190913024612.28392-3-sean.j.christopherson@intel.com>
+Subject: [PATCH 03/11] KVM: x86/mmu: Use fast invalidate mechanism to zap MMIO sptes
+Date:   Thu, 12 Sep 2019 19:46:04 -0700
+Message-Id: <20190913024612.28392-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190913024612.28392-1-sean.j.christopherson@intel.com>
 References: <20190913024612.28392-1-sean.j.christopherson@intel.com>
@@ -44,52 +44,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Treat invalid shadow pages as obsolete to fix a bug where an obsolete
-and invalid page with a non-zero root count could become non-obsolete
-due to mmu_valid_gen wrapping.  The bug is largely theoretical with the
-current code base, as an unsigned long will effectively never wrap on
-64-bit KVM, and userspace would have to deliberately stall a vCPU in
-order to keep an obsolete invalid page on the active list while
-simultaneously modifying memslots billions of times to trigger a wrap.
+Use the fast invalidate mechasim to zap MMIO sptes on a MMIO generation
+wrap.  The fast invalidate flow was reintroduced to fix a livelock bug
+in kvm_mmu_zap_all() that can occur if kvm_mmu_zap_all() is invoked when
+the guest has live vCPUs.  I.e. using kvm_mmu_zap_all() to handle the
+MMIO generation wrap is theoretically susceptible to the livelock bug.
 
-The obvious alternative is to use a 64-bit value for mmu_valid_gen,
-but it's actually desirable to go in the opposite direction, i.e. using
-a smaller 8-bit value to reduce KVM's memory footprint by 8 bytes per
-shadow page, and relying on proper treatment of invalid pages instead of
-preventing the generation from wrapping.
+This effectively reverts commit 4771450c345dc ("Revert "KVM: MMU: drop
+kvm_mmu_zap_mmio_sptes""), i.e. restores the behavior of commit
+a8eca9dcc656a ("KVM: MMU: drop kvm_mmu_zap_mmio_sptes").
 
-Note, "Fixes" points at a commit that was at one point reverted, but has
-since been restored.
+Note, this actually fixes commit 571c5af06e303 ("KVM: x86/mmu:
+Voluntarily reschedule as needed when zapping MMIO sptes"), but there
+is no need to incrementally revert back to using fast invalidate, e.g.
+doing so doesn't provide any bisection or stability benefits.
 
-Fixes: 5304b8d37c2a5 ("KVM: MMU: fast invalidate all pages")
+Fixes: 571c5af06e303 ("KVM: x86/mmu: Voluntarily reschedule as needed when zapping MMIO sptes")
+Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 -
+ arch/x86/kvm/mmu.c              | 17 +++--------------
+ 2 files changed, 3 insertions(+), 15 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index fc279b513446..ef378abac00f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -320,7 +320,6 @@ struct kvm_mmu_page {
+ 	struct list_head link;
+ 	struct hlist_node hash_link;
+ 	bool unsync;
+-	bool mmio_cached;
+ 
+ 	/*
+ 	 * The following two entries are used to key the shadow page in the
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 5ac5e3f50f92..373e6f052f9f 100644
+index 373e6f052f9f..8d3fbc48d1be 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -2252,7 +2252,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- #define for_each_valid_sp(_kvm, _sp, _gfn)				\
- 	hlist_for_each_entry(_sp,					\
- 	  &(_kvm)->arch.mmu_page_hash[kvm_page_table_hashfn(_gfn)], hash_link) \
--		if (is_obsolete_sp((_kvm), (_sp)) || (_sp)->role.invalid) {    \
-+		if (is_obsolete_sp((_kvm), (_sp))) {			\
- 		} else
+@@ -403,8 +403,6 @@ static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+ 	mask |= (gpa & shadow_nonpresent_or_rsvd_mask)
+ 		<< shadow_nonpresent_or_rsvd_mask_len;
  
- #define for_each_gfn_indirect_valid_sp(_kvm, _sp, _gfn)			\
-@@ -2311,7 +2311,8 @@ static void mmu_audit_disable(void) { }
+-	page_header(__pa(sptep))->mmio_cached = true;
+-
+ 	trace_mark_mmio_spte(sptep, gfn, access, gen);
+ 	mmu_spte_set(sptep, mask);
+ }
+@@ -5947,7 +5945,7 @@ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
  
- static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+-static void __kvm_mmu_zap_all(struct kvm *kvm, bool mmio_only)
++void kvm_mmu_zap_all(struct kvm *kvm)
  {
--	return unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
-+	return sp->role.invalid ||
-+	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
+ 	struct kvm_mmu_page *sp, *node;
+ 	LIST_HEAD(invalid_list);
+@@ -5956,14 +5954,10 @@ static void __kvm_mmu_zap_all(struct kvm *kvm, bool mmio_only)
+ 	spin_lock(&kvm->mmu_lock);
+ restart:
+ 	list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
+-		if (mmio_only && !sp->mmio_cached)
+-			continue;
+ 		if (sp->role.invalid && sp->root_count)
+ 			continue;
+-		if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign)) {
+-			WARN_ON_ONCE(mmio_only);
++		if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
+ 			goto restart;
+-		}
+ 		if (cond_resched_lock(&kvm->mmu_lock))
+ 			goto restart;
+ 	}
+@@ -5972,11 +5966,6 @@ static void __kvm_mmu_zap_all(struct kvm *kvm, bool mmio_only)
+ 	spin_unlock(&kvm->mmu_lock);
  }
  
- static bool kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-void kvm_mmu_zap_all(struct kvm *kvm)
+-{
+-	return __kvm_mmu_zap_all(kvm, false);
+-}
+-
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+ {
+ 	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
+@@ -5998,7 +5987,7 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+ 	 */
+ 	if (unlikely(gen == 0)) {
+ 		kvm_debug_ratelimited("kvm: zapping shadow pages for mmio generation wraparound\n");
+-		__kvm_mmu_zap_all(kvm, true);
++		kvm_mmu_zap_all_fast(kvm);
+ 	}
+ }
+ 
 -- 
 2.22.0
 
