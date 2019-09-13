@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83385B174F
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 04:47:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7B73B1754
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 04:47:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727952AbfIMCqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 22:46:37 -0400
-Received: from mga07.intel.com ([134.134.136.100]:58605 "EHLO mga07.intel.com"
+        id S1728179AbfIMCqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Sep 2019 22:46:51 -0400
+Received: from mga07.intel.com ([134.134.136.100]:58611 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727301AbfIMCqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727311AbfIMCqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 12 Sep 2019 22:46:16 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Sep 2019 19:46:13 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,492,1559545200"; 
-   d="scan'208";a="176159521"
+   d="scan'208";a="176159525"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga007.jf.intel.com with ESMTP; 12 Sep 2019 19:46:13 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -31,9 +31,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         linux-kernel@vger.kernel.org,
         James Harvey <jamespharvey20@gmail.com>,
         Alex Willamson <alex.williamson@redhat.com>
-Subject: [PATCH 07/11] KVM: x86/mmu: Revert "Revert "KVM: MMU: collapse TLB flushes when zap all pages""
-Date:   Thu, 12 Sep 2019 19:46:08 -0700
-Message-Id: <20190913024612.28392-8-sean.j.christopherson@intel.com>
+Subject: [PATCH 08/11] KVM: x86/mmu: Revert "Revert "KVM: MMU: reclaim the zapped-obsolete page first""
+Date:   Thu, 12 Sep 2019 19:46:09 -0700
+Message-Id: <20190913024612.28392-9-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190913024612.28392-1-sean.j.christopherson@intel.com>
 References: <20190913024612.28392-1-sean.j.christopherson@intel.com>
@@ -50,76 +50,113 @@ removal.
 
 Paraphrashing the original changelog:
 
-  Reload the mmu on all vCPUs after updating the generation number so
-  that obsolete pages are not used by any vCPUs.  This allows collapsing
-  all TLB flushes during obsolete page zapping into a single flush, as
-  there is no need to flush when dropping mmu_lock (to reschedule).
+  Introduce a per-VM list to track obsolete shadow pages, i.e. pages
+  which have been deleted from the mmu cache but haven't yet been freed.
+  When page reclaiming is needed, zap/free the deleted pages first.
 
-  Note: a remote TLB flush is still needed before freeing the pages as
-  other vCPUs may be doing a lockless shadow page walk.
-
-Opportunstically improve the comments restored by the revert (the
-code itself is a true revert).
-
-This reverts commit f34d251d66ba263c077ed9d2bbd1874339a4c887.
+This reverts commit 52d5dedc79bdcbac2976159a172069618cf31be5.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/mmu.c              | 22 +++++++++++++++++-----
+ arch/x86/kvm/x86.c              |  1 +
+ 3 files changed, 19 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ef378abac00f..6e4fa75351fd 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -862,6 +862,7 @@ struct kvm_arch {
+ 	 * Hash table of struct kvm_mmu_page.
+ 	 */
+ 	struct list_head active_mmu_pages;
++	struct list_head zapped_obsolete_pages;
+ 	struct kvm_page_track_notifier_node mmu_sp_tracker;
+ 	struct kvm_page_track_notifier_head track_notifier_head;
+ 
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 827414b12dbd..8c0648bbc7c1 100644
+index 8c0648bbc7c1..84d916674529 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -5695,11 +5695,15 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
- 		if (sp->role.invalid)
- 			continue;
+@@ -5674,7 +5674,6 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+ {
+ 	struct kvm_mmu_page *sp, *node;
+-	LIST_HEAD(invalid_list);
+ 	int nr_zapped, batch = 0;
  
-+		/*
-+		 * No need to flush the TLB since we're only zapping shadow
-+		 * pages with an obsolete generation number and all vCPUS have
-+		 * loaded a new root, i.e. the shadow pages being zapped cannot
-+		 * be in active use by the guest.
-+		 */
- 		if (batch >= BATCH_ZAP_PAGES &&
--		    (need_resched() || spin_needbreak(&kvm->mmu_lock))) {
-+		    cond_resched_lock(&kvm->mmu_lock)) {
- 			batch = 0;
--			kvm_mmu_commit_zap_page(kvm, &invalid_list);
--			cond_resched_lock(&kvm->mmu_lock);
+ restart:
+@@ -5707,8 +5706,8 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
  			goto restart;
  		}
  
-@@ -5710,6 +5714,11 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+-		if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list,
+-					       &nr_zapped)) {
++		if (__kvm_mmu_prepare_zap_page(kvm, sp,
++				&kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
+ 			batch += nr_zapped;
+ 			goto restart;
  		}
- 	}
- 
-+	/*
-+	 * Trigger a remote TLB flush before freeing the page tables to ensure
-+	 * KVM is not in the middle of a lockless shadow page table walk, which
-+	 * may reference the pages.
-+	 */
- 	kvm_mmu_commit_zap_page(kvm, &invalid_list);
+@@ -5719,7 +5718,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+ 	 * KVM is not in the middle of a lockless shadow page table walk, which
+ 	 * may reference the pages.
+ 	 */
+-	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++	kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
  }
  
-@@ -5728,6 +5737,16 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 	trace_kvm_mmu_zap_all_fast(kvm);
- 	kvm->arch.mmu_valid_gen++;
- 
-+	/*
-+	 * Notify all vcpus to reload its shadow page table and flush TLB.
-+	 * Then all vcpus will switch to new shadow page table with the new
-+	 * mmu_valid_gen.
-+	 *
-+	 * Note: we need to do this under the protection of mmu_lock,
-+	 * otherwise, vcpu would purge shadow page but miss tlb flush.
-+	 */
-+	kvm_reload_remote_mmus(kvm);
-+
- 	kvm_zap_obsolete_pages(kvm);
+ /*
+@@ -5751,6 +5750,11 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
  	spin_unlock(&kvm->mmu_lock);
  }
+ 
++static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
++{
++	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
++}
++
+ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+ 			struct kvm_memory_slot *slot,
+ 			struct kvm_page_track_notifier_node *node)
+@@ -6021,16 +6025,24 @@ mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
+ 		 * want to shrink a VM that only started to populate its MMU
+ 		 * anyway.
+ 		 */
+-		if (!kvm->arch.n_used_mmu_pages)
++		if (!kvm->arch.n_used_mmu_pages &&
++		    !kvm_has_zapped_obsolete_pages(kvm))
+ 			continue;
+ 
+ 		idx = srcu_read_lock(&kvm->srcu);
+ 		spin_lock(&kvm->mmu_lock);
+ 
++		if (kvm_has_zapped_obsolete_pages(kvm)) {
++			kvm_mmu_commit_zap_page(kvm,
++			      &kvm->arch.zapped_obsolete_pages);
++			goto unlock;
++		}
++
+ 		if (prepare_zap_oldest_mmu_page(kvm, &invalid_list))
+ 			freed++;
+ 		kvm_mmu_commit_zap_page(kvm, &invalid_list);
+ 
++unlock:
+ 		spin_unlock(&kvm->mmu_lock);
+ 		srcu_read_unlock(&kvm->srcu, idx);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b4cfd786d0b6..3d092b0f6bcb 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9306,6 +9306,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 
+ 	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
+ 	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
++	INIT_LIST_HEAD(&kvm->arch.zapped_obsolete_pages);
+ 	INIT_LIST_HEAD(&kvm->arch.assigned_dev_head);
+ 	atomic_set(&kvm->arch.noncoherent_dma_count, 0);
+ 
 -- 
 2.22.0
 
