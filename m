@@ -2,187 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 19764B2759
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 23:33:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D24C5B275F
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 23:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389867AbfIMVcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Sep 2019 17:32:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35002 "EHLO mx1.redhat.com"
+        id S2390121AbfIMVjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Sep 2019 17:39:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59576 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388719AbfIMVct (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Sep 2019 17:32:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2389867AbfIMVjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Sep 2019 17:39:09 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 06AA11DA4;
-        Fri, 13 Sep 2019 21:32:49 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 590CE5D71C;
-        Fri, 13 Sep 2019 21:32:48 +0000 (UTC)
-Date:   Fri, 13 Sep 2019 15:32:47 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     Jiri Pirko <jiri@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3 0/5] Introduce variable length mdev alias
-Message-ID: <20190913153247.0309d016@x1.home>
-In-Reply-To: <AM0PR05MB48667E374853D485788D8159D1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
-        <20190902042436.23294-1-parav@mellanox.com>
-        <AM0PR05MB4866F76F807409ED887537D7D1B70@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20190911145610.453b32ec@x1.home>
-        <AM0PR05MB48668DFF8E816F0D2D3041BFD1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <AM0PR05MB48667E374853D485788D8159D1B10@AM0PR05MB4866.eurprd05.prod.outlook.com>
-Organization: Red Hat
+        by mx1.redhat.com (Postfix) with ESMTPS id 05F0B80F7C
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2019 21:39:09 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id f23so1734807wmh.9
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2019 14:39:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=H/HgiF+ormPJec9ucKfvq3B1GbgLkHD6NvKq1m15REE=;
+        b=pE06FOrf1+K8lMyWrTCWc9FSNRJQ+s4xR+HMe78K7pXW291F74s6YwurxdvupmeBUq
+         0bUTN6Sh4hOlv2exOsPa/KyrvaDFJFLUVeyHiH4Nle9OM6xpdtjvw0IszApfXI7CIFzi
+         /LBQvCBVmf5HywnMedwr+tyIysCJX95mFut+MLa0t8J0swI8nV3Ziuq3X34dpWAAZazO
+         njHTHmsh+UCjg6L+sIsQFDZoBQkL//Xd1YQYdJnIiHkekHy8TexhZ92TzHkCeJNy/0cp
+         L/R+NmwgZzSjnXoxQZa1CAmW7E86yp3HAyhB1nziGR4DXFimHNo05AACIVukUnmtwyzq
+         YuwQ==
+X-Gm-Message-State: APjAAAXXxbd06ga76FlG0U0wU4hLNj1JPuWau99B2wwJSJiBadjDchvt
+        AVrZ5Z3vpx0TL9AiMcYXiQx1gB35thIa79jy+KlHq7CYHb78DquYGFLKsWQu2O0HhPjIzkdIdD1
+        f35g5b102j84m
+X-Received: by 2002:a1c:a54a:: with SMTP id o71mr5188546wme.51.1568410747388;
+        Fri, 13 Sep 2019 14:39:07 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx8xng5YAyNbwPHIzedIu8ZCTqFN32yL3gtxtyPP/chrRkzUD4Hr9V7c5rHI5vdwgEV7dIuVQ==
+X-Received: by 2002:a1c:a54a:: with SMTP id o71mr5188535wme.51.1568410747142;
+        Fri, 13 Sep 2019 14:39:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3166:d768:e1a7:aab8? ([2001:b07:6468:f312:3166:d768:e1a7:aab8])
+        by smtp.gmail.com with ESMTPSA id n2sm2788701wmc.1.2019.09.13.14.39.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Sep 2019 14:39:06 -0700 (PDT)
+Subject: Re: KASAN: slab-out-of-bounds Read in handle_vmptrld
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     mark.rutland@arm.com, x86@kernel.org, wanpengli@tencent.com,
+        kvm@vger.kernel.org, narmstrong@baylibre.com,
+        catalin.marinas@arm.com, will.deacon@arm.com, hpa@zytor.com,
+        khilman@baylibre.com, joro@8bytes.org, rkrcmar@redhat.com,
+        mingo@redhat.com, Dmitry Vyukov <dvyukov@google.com>,
+        syzbot <syzbot+46f1dd7dbbe2bfb98b10@syzkaller.appspotmail.com>,
+        devicetree@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        robh+dt@kernel.org, bp@alien8.de,
+        linux-amlogic@lists.infradead.org, tglx@linutronix.de,
+        linux-arm-kernel@lists.infradead.org, jmattson@google.com,
+        USB list <linux-usb@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        carlo@caione.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <000000000000a9d4f705924cff7a@google.com>
+ <87lfutei1j.fsf@vitty.brq.redhat.com>
+ <5218e70e-8a80-7c5f-277b-01d9ab70692a@redhat.com>
+ <20190913044614.GA120223@kroah.com>
+ <db02a285-ad1d-6094-6359-ba80e6d3f2e0@redhat.com>
+ <20190913130226.GB403359@kroah.com>
+ <6a0ec3a2-2a52-f67a-6140-e0a60874538a@redhat.com>
+ <462660f4-1537-cece-b55f-0ceba0269eb8@arm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <a85cee75-99f9-7de3-6e5c-86f9bb41bca5@redhat.com>
+Date:   Fri, 13 Sep 2019 23:39:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <462660f4-1537-cece-b55f-0ceba0269eb8@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.71]); Fri, 13 Sep 2019 21:32:49 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 11 Sep 2019 16:38:49 +0000
-Parav Pandit <parav@mellanox.com> wrote:
+On 13/09/19 17:32, Robin Murphy wrote:
+> Oh, that bit of usbdev_mmap() is already known to be pretty much totally
+> bogus for various reasons - there have been a few threads about it, of
+> which I think [1] is both the most recent and the most informative.
+> There was another patch[2], but that might have stalled (and might need
+> reworking with additional hcd_uses_dma() checks anyway).
 
-> > -----Original Message-----
-> > From: linux-kernel-owner@vger.kernel.org <linux-kernel-  
-> > owner@vger.kernel.org> On Behalf Of Parav Pandit  
-> > Sent: Wednesday, September 11, 2019 10:31 AM
-> > To: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Jiri Pirko <jiri@mellanox.com>; kwankhede@nvidia.com;
-> > cohuck@redhat.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; netdev@vger.kernel.org
-> > Subject: RE: [PATCH v3 0/5] Introduce variable length mdev alias
-> > 
-> > Hi Alex,
-> >   
-> > > -----Original Message-----
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Wednesday, September 11, 2019 8:56 AM
-> > > To: Parav Pandit <parav@mellanox.com>
-> > > Cc: Jiri Pirko <jiri@mellanox.com>; kwankhede@nvidia.com;
-> > > cohuck@redhat.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> > > kernel@vger.kernel.org; netdev@vger.kernel.org
-> > > Subject: Re: [PATCH v3 0/5] Introduce variable length mdev alias
-> > >
-> > > On Mon, 9 Sep 2019 20:42:32 +0000
-> > > Parav Pandit <parav@mellanox.com> wrote:
-> > >  
-> > > > Hi Alex,
-> > > >  
-> > > > > -----Original Message-----
-> > > > > From: Parav Pandit <parav@mellanox.com>
-> > > > > Sent: Sunday, September 1, 2019 11:25 PM
-> > > > > To: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> > > > > kwankhede@nvidia.com; cohuck@redhat.com; davem@davemloft.net
-> > > > > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > > > > netdev@vger.kernel.org; Parav Pandit <parav@mellanox.com>
-> > > > > Subject: [PATCH v3 0/5] Introduce variable length mdev alias
-> > > > >
-> > > > > To have consistent naming for the netdevice of a mdev and to have
-> > > > > consistent naming of the devlink port [1] of a mdev, which is
-> > > > > formed using phys_port_name of the devlink port, current UUID is
-> > > > > not usable because UUID is too long.
-> > > > >
-> > > > > UUID in string format is 36-characters long and in binary 128-bit.
-> > > > > Both formats are not able to fit within 15 characters limit of
-> > > > > netdev  
-> > > name.  
-> > > > >
-> > > > > It is desired to have mdev device naming consistent using UUID.
-> > > > > So that widely used user space framework such as ovs [2] can make
-> > > > > use of mdev representor in similar way as PCIe SR-IOV VF and PF  
-> > > representors.  
-> > > > >
-> > > > > Hence,
-> > > > > (a) mdev alias is created which is derived using sha1 from the
-> > > > > mdev  
-> > > name.  
-> > > > > (b) Vendor driver describes how long an alias should be for the
-> > > > > child mdev created for a given parent.
-> > > > > (c) Mdev aliases are unique at system level.
-> > > > > (d) alias is created optionally whenever parent requested.
-> > > > > This ensures that non networking mdev parents can function without
-> > > > > alias creation overhead.
-> > > > >
-> > > > > This design is discussed at [3].
-> > > > >
-> > > > > An example systemd/udev extension will have,
-> > > > >
-> > > > > 1. netdev name created using mdev alias available in sysfs.
-> > > > >
-> > > > > mdev UUID=83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
-> > > > > mdev 12 character alias=cd5b146a80a5
-> > > > >
-> > > > > netdev name of this mdev = enmcd5b146a80a5 Here en = Ethernet link
-> > > > > m = mediated device
-> > > > >
-> > > > > 2. devlink port phys_port_name created using mdev alias.
-> > > > > devlink phys_port_name=pcd5b146a80a5
-> > > > >
-> > > > > This patchset enables mdev core to maintain unique alias for a mdev.
-> > > > >
-> > > > > Patch-1 Introduces mdev alias using sha1.
-> > > > > Patch-2 Ensures that mdev alias is unique in a system.
-> > > > > Patch-3 Exposes mdev alias in a sysfs hirerchy, update
-> > > > > Documentation
-> > > > > Patch-4 Introduces mdev_alias() API.
-> > > > > Patch-5 Extends mtty driver to optionally provide alias generation.
-> > > > > This also enables to test UUID based sha1 collision and trigger
-> > > > > error handling for duplicate sha1 results.
-> > > > >
-> > > > > [1] http://man7.org/linux/man-pages/man8/devlink-port.8.html
-> > > > > [2] https://docs.openstack.org/os-vif/latest/user/plugins/ovs.html
-> > > > > [3] https://patchwork.kernel.org/cover/11084231/
-> > > > >
-> > > > > ---
-> > > > > Changelog:
-> > > > > v2->v3:
-> > > > >  - Addressed comment from Yunsheng Lin
-> > > > >  - Changed strcmp() ==0 to !strcmp()
-> > > > >  - Addressed comment from Cornelia Hunk
-> > > > >  - Merged sysfs Documentation patch with syfs patch
-> > > > >  - Added more description for alias return value  
-> > > >
-> > > > Did you get a chance review this updated series?
-> > > > I addressed Cornelia's and yours comment.
-> > > > I do not think allocating alias memory twice, once for comparison
-> > > > and once for storing is good idea or moving alias generation logic
-> > > > inside the mdev_list_lock(). So I didn't address that suggestion of  
-> > Cornelia.  
-> > >
-> > > Sorry, I'm at LPC this week.  I agree, I don't think the double
-> > > allocation is necessary, I thought the comment was sufficient to
-> > > clarify null'ing the variable.  It's awkward, but seems correct.
-> > >
-> > > I'm not sure what we do with this patch series though, has the real
-> > > consumer of this even been proposed?    
-> 
-> Jiri already acked to use mdev_alias() to generate phys_port_name several days back in the discussion we had in [1].
-> After concluding in the thread [1], I proceed with mdev_alias().
-> mlx5_core patches are not yet present on netdev mailing list, but we
-> all agree to use it in mdev_alias() in devlink phys_port_name
-> generation. So we have collective agreement on how to proceed
-> forward. I wasn't probably clear enough in previous email reply about
-> it, so adding link here.
-> 
-> [1] https://patchwork.kernel.org/cover/11084231/#22838955
+Neither is enough, see my reply to Alan.  Memory from kmalloc just
+*cannot* be passed down to remap_pfn_range, dma_mmap_coherent or
+anything like that.  It's a simple alignment issue.
 
-Jiri may have agreed to the concept, but without patches on the list
-proving an end to end solution, I think it's too early for us to commit
-to this by preemptively adding it to our API.  "Acked" and "collective
-agreement" seem like they overstate something that seems not to have
-seen the light of day yet.  Instead I'll say, it looks reasonable, come
-back when the real consumer has actually been proposed upstream and has
-more buy-in from the community and we'll see if it still looks like the
-right approach from an mdev perspective then.  Thanks,
-
-Alex
+Paolo
