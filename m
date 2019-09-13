@@ -2,80 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB69BB174A
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 04:46:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 779AAB17CA
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 06:46:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727781AbfIMCqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Sep 2019 22:46:20 -0400
-Received: from mga07.intel.com ([134.134.136.100]:58611 "EHLO mga07.intel.com"
+        id S1726747AbfIMEqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Sep 2019 00:46:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44036 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727614AbfIMCqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Sep 2019 22:46:17 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Sep 2019 19:46:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,492,1559545200"; 
-   d="scan'208";a="176159533"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga007.jf.intel.com with ESMTP; 12 Sep 2019 19:46:13 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        James Harvey <jamespharvey20@gmail.com>,
-        Alex Willamson <alex.williamson@redhat.com>
-Subject: [PATCH 11/11] KVM: x86/mmu: Skip invalid pages during zapping iff root_count is zero
-Date:   Thu, 12 Sep 2019 19:46:12 -0700
-Message-Id: <20190913024612.28392-12-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190913024612.28392-1-sean.j.christopherson@intel.com>
-References: <20190913024612.28392-1-sean.j.christopherson@intel.com>
+        id S1725817AbfIMEqU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Sep 2019 00:46:20 -0400
+Received: from localhost (unknown [84.241.200.49])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E110E20644;
+        Fri, 13 Sep 2019 04:46:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1568349979;
+        bh=t3fz3+C+Rszs5v117iwBq01Z8XVjIxQhv9Gun6u8tMU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nAxqE1jeHzcBqj7vt2s31JX2mZM36TzeeTNCnxyL124j8DT8qYynyf9uvPTX1WWBE
+         C75UMsP2UwpAl28q5wSIIUIlBB6QPBGHaqSDmsd2y2Zh6WjEoo/yKgvSstp7N1vntj
+         xDZK3JeX1rIm8lqy0gvUtH0FvxXLVy4WRzEMdS+c=
+Date:   Fri, 13 Sep 2019 05:46:14 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        bp@alien8.de, carlo@caione.org, catalin.marinas@arm.com,
+        devicetree@vger.kernel.org, hpa@zytor.com, jmattson@google.com,
+        joro@8bytes.org, khilman@baylibre.com,
+        linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        mark.rutland@arm.com, mingo@redhat.com, narmstrong@baylibre.com,
+        rkrcmar@redhat.com, robh+dt@kernel.org,
+        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, wanpengli@tencent.com, will.deacon@arm.com,
+        x86@kernel.org,
+        syzbot <syzbot+46f1dd7dbbe2bfb98b10@syzkaller.appspotmail.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        USB list <linux-usb@vger.kernel.org>
+Subject: Re: KASAN: slab-out-of-bounds Read in handle_vmptrld
+Message-ID: <20190913044614.GA120223@kroah.com>
+References: <000000000000a9d4f705924cff7a@google.com>
+ <87lfutei1j.fsf@vitty.brq.redhat.com>
+ <5218e70e-8a80-7c5f-277b-01d9ab70692a@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5218e70e-8a80-7c5f-277b-01d9ab70692a@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do not skip invalid shadow pages when zapping obsolete pages if the
-pages' root_count has reached zero, in which case the page can be
-immediately zapped and freed.
+On Thu, Sep 12, 2019 at 06:49:26PM +0200, Paolo Bonzini wrote:
+> [tl;dr: there could be a /dev/usb bug only affecting KASAN
+> configurations, jump to the end to skip the analysis and get to the bug
+> details]
+> 
+> On 12/09/19 15:54, Vitaly Kuznetsov wrote:
+> > Hm, the bisection seems bogus but the stack points us to the following
+> > piece of code:
+> > 
+> >  4776)              if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmptr), &map)) {
+> > <skip>
+> >  4783)                      return nested_vmx_failValid(vcpu,
+> >  4784)                              VMXERR_VMPTRLD_INCORRECT_VMCS_REVISION_ID);
+> >  4785)              }
+> >  4786) 
+> >  4787)              new_vmcs12 = map.hva;
+> >  4788) 
+> > *4789)              if (new_vmcs12->hdr.revision_id != VMCS12_REVISION ||
+> >  4790)                  (new_vmcs12->hdr.shadow_vmcs &&
+> >  4791)                   !nested_cpu_has_vmx_shadow_vmcs(vcpu))) {
+> > 
+> > the reported problem seems to be on VMCS12 region access but it's part
+> > of guest memory and we successfuly managed to map it. We're definitely
+> > within 1-page range. Maybe KASAN is just wrong here?
+> 
+> Here is the relevant part of the syzkaller repro:
+> 
+> syz_kvm_setup_cpu$x86(r1, 0xffffffffffffffff,
+> &(0x7f0000000000/0x18000)=nil, 0x0, 0x133, 0x0, 0x0, 0xff7d)
+> r3 = syz_open_dev$usb(&(0x7f0000000080)='/dev/bus/usb/00#/00#\x00',
+> 0x40000fffffd, 0x200800000000042)
+> mmap$IORING_OFF_SQES(&(0x7f0000007000/0x2000)=nil, 0x2000, 0x4, 0x13,
+> r3, 0x10000000)
+> syz_kvm_setup_cpu$x86(0xffffffffffffffff, r2,
+> &(0x7f0000000000/0x18000)=nil, 0x0, 0xfefd, 0x40, 0x0, 0xfffffffffffffdd4)
+> ioctl$KVM_RUN(r2, 0xae80, 0x0)
+> 
+> The mmap$IORING_OFF_SQES is just a normal mmap from a device, which
+> replaces the previous mapping for guest memory and in particular
+> 0x7f0000007000 which is the VMCS (from the C reproducer: "#define
+> ADDR_VAR_VMCS 0x7000").
+> 
+> The previous mapping is freed with do_munmap and then repopulated in
+> usbdev_mmap with remap_pfn_range.  In KVM this means that kvm_vcpu_map
+> goes through hva_to_pfn_remapped, which correctly calls get_page via
+> kvm_get_pfn.  (Note that although drivers/usb/core/devio.c's usbdev_mmap
+> sets VM_IO *after* calling remap_pfn_range, remap_pfn_range itself
+> helpfully sets it before calling remap_p4d_range.  And anyway KVM is
+> looking at vma->vm_flags under mmap_sem, which is held during mmap).
+> 
+> So, KVM should be doing the right thing.  Now, the error is:
+> 
+> > Read of size 4 at addr ffff888091e10000 by task syz-executor758/10006
+> > The buggy address belongs to the object at ffff888091e109c0 
+> > The buggy address is located 2496 bytes to the left of
+> >  8192-byte region [ffff888091e109c0, ffff888091e129c0) 
+> 
+> And given the use of remap_pfn_range in devusb_mmap, the simplest
+> explanation could be that USB expects kmalloc-8k to return 8k-aligned
+> values, but this is not true anymore with KASAN.  CCing Dmitry, Greg and
+> linux-usb.
 
-Update the comment accordingly.
+USB drivers expect kmalloc to return DMA-able memory.  I don't know
+about specific alignment issues, that should only an issue for the host
+controller being used here, which you do not say in the above list.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/mmu.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+We have had some reports that usbdev_mmap() does not do the "correct
+thing" for all host controllers, but a lot of the DMA work that is in
+linux-next for 5.4-rc1 should have helped resolve those issues.  What
+tree are you seeing these bug reports happening from?
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index a7b14750cde9..5e41b1f77a6d 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -5692,11 +5692,12 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
- 			break;
- 
- 		/*
--		 * Since we are reversely walking the list and the invalid
--		 * list will be moved to the head, skip the invalid page
--		 * can help us to avoid the infinity list walking.
-+		 * Skip invalid pages with a non-zero root count, zapping pages
-+		 * with a non-zero root count will never succeed, i.e. the page
-+		 * will get thrown back on active_mmu_pages and we'll get stuck
-+		 * in an infinite loop.
- 		 */
--		if (sp->role.invalid)
-+		if (sp->role.invalid && sp->root_count)
- 			continue;
- 
- 		/*
--- 
-2.22.0
+thanks,
 
+greg k-h
