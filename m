@@ -2,95 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D24C5B275F
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 23:39:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EA81B2796
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 23:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390121AbfIMVjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Sep 2019 17:39:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59576 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389867AbfIMVjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Sep 2019 17:39:09 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 05F0B80F7C
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2019 21:39:09 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id f23so1734807wmh.9
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2019 14:39:08 -0700 (PDT)
+        id S1731231AbfIMV4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Sep 2019 17:56:10 -0400
+Received: from mail-wr1-f47.google.com ([209.85.221.47]:46203 "EHLO
+        mail-wr1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbfIMV4K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Sep 2019 17:56:10 -0400
+Received: by mail-wr1-f47.google.com with SMTP id o18so2214777wrv.13
+        for <kvm@vger.kernel.org>; Fri, 13 Sep 2019 14:56:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BBsZ4JWMNaV4EH0SCRq5e+QYsznn+tUuDwYGzEjYpmQ=;
+        b=fsdep+1JH2kKJz3BfpY9RawUSS/+w2Xxhg/rd/l4VwL7KD+N9oFynJEdmvcmDl75iA
+         UpN0trBvunSg06lR57zAhiHr/mRQclxY46pjFL1X5ykvX6ar/awpAvurT9tr44BJQ5hk
+         tqe0IGYqIOYJ7GakO/DK5c6kjFB/fzhcqlqpji5nY1d7s7wSGt+TIJNWNun7oEAkDIaj
+         luK3bmybPgZX8pViZXNkE0AXt/Lj4Yf0HHlz9XKZIAhhIy7Q4KXCiufCrLldWmRTv5U/
+         J3R7c1Ou+5fI0iS8J1XaeL3I/3vpwkJHY3Eo6h8jG9x5ENfMtbkfVKan1/2IIHu4jCyo
+         aagg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H/HgiF+ormPJec9ucKfvq3B1GbgLkHD6NvKq1m15REE=;
-        b=pE06FOrf1+K8lMyWrTCWc9FSNRJQ+s4xR+HMe78K7pXW291F74s6YwurxdvupmeBUq
-         0bUTN6Sh4hOlv2exOsPa/KyrvaDFJFLUVeyHiH4Nle9OM6xpdtjvw0IszApfXI7CIFzi
-         /LBQvCBVmf5HywnMedwr+tyIysCJX95mFut+MLa0t8J0swI8nV3Ziuq3X34dpWAAZazO
-         njHTHmsh+UCjg6L+sIsQFDZoBQkL//Xd1YQYdJnIiHkekHy8TexhZ92TzHkCeJNy/0cp
-         L/R+NmwgZzSjnXoxQZa1CAmW7E86yp3HAyhB1nziGR4DXFimHNo05AACIVukUnmtwyzq
-         YuwQ==
-X-Gm-Message-State: APjAAAXXxbd06ga76FlG0U0wU4hLNj1JPuWau99B2wwJSJiBadjDchvt
-        AVrZ5Z3vpx0TL9AiMcYXiQx1gB35thIa79jy+KlHq7CYHb78DquYGFLKsWQu2O0HhPjIzkdIdD1
-        f35g5b102j84m
-X-Received: by 2002:a1c:a54a:: with SMTP id o71mr5188546wme.51.1568410747388;
-        Fri, 13 Sep 2019 14:39:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx8xng5YAyNbwPHIzedIu8ZCTqFN32yL3gtxtyPP/chrRkzUD4Hr9V7c5rHI5vdwgEV7dIuVQ==
-X-Received: by 2002:a1c:a54a:: with SMTP id o71mr5188535wme.51.1568410747142;
-        Fri, 13 Sep 2019 14:39:07 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:3166:d768:e1a7:aab8? ([2001:b07:6468:f312:3166:d768:e1a7:aab8])
-        by smtp.gmail.com with ESMTPSA id n2sm2788701wmc.1.2019.09.13.14.39.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Sep 2019 14:39:06 -0700 (PDT)
-Subject: Re: KASAN: slab-out-of-bounds Read in handle_vmptrld
-To:     Robin Murphy <robin.murphy@arm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     mark.rutland@arm.com, x86@kernel.org, wanpengli@tencent.com,
-        kvm@vger.kernel.org, narmstrong@baylibre.com,
-        catalin.marinas@arm.com, will.deacon@arm.com, hpa@zytor.com,
-        khilman@baylibre.com, joro@8bytes.org, rkrcmar@redhat.com,
-        mingo@redhat.com, Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+46f1dd7dbbe2bfb98b10@syzkaller.appspotmail.com>,
-        devicetree@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        robh+dt@kernel.org, bp@alien8.de,
-        linux-amlogic@lists.infradead.org, tglx@linutronix.de,
-        linux-arm-kernel@lists.infradead.org, jmattson@google.com,
-        USB list <linux-usb@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
-        carlo@caione.org, Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <000000000000a9d4f705924cff7a@google.com>
- <87lfutei1j.fsf@vitty.brq.redhat.com>
- <5218e70e-8a80-7c5f-277b-01d9ab70692a@redhat.com>
- <20190913044614.GA120223@kroah.com>
- <db02a285-ad1d-6094-6359-ba80e6d3f2e0@redhat.com>
- <20190913130226.GB403359@kroah.com>
- <6a0ec3a2-2a52-f67a-6140-e0a60874538a@redhat.com>
- <462660f4-1537-cece-b55f-0ceba0269eb8@arm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <a85cee75-99f9-7de3-6e5c-86f9bb41bca5@redhat.com>
-Date:   Fri, 13 Sep 2019 23:39:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BBsZ4JWMNaV4EH0SCRq5e+QYsznn+tUuDwYGzEjYpmQ=;
+        b=kCQcfbb1MJtfSbQICjol5V2+glp0Ezbcf3JY5y48m9CU+DZf8Q6SED1KHUm9hZHJo6
+         04Pvhmr5AfPN3uL32oR/Lcan5LkwLTbbKPIhrdEuKYscrLErOlYIfe4a4rJegDphZtcn
+         1qUoAPkbzL9CjrzKge5Ci9Gn8JxoHRMUpEU+HYKkmbca+SH0/IjfwN9QyInITJ6KkOgz
+         c5A1ngQ2dzYePXdTb7TMOd0wGfiueEq6tYYoumFH6Fs4oAU/EB8+l0zT6/rZkkS2x9OP
+         vU5doAo7/jaxznF+ro5KR3/J53HG8WbVYXEY1FYoQEXnM6ZHJf24nYnzWy2U61iUiwKt
+         0qUA==
+X-Gm-Message-State: APjAAAV3e+JVNuRVCebaYelA8zWnWzNwYG7ZtksolHqPEgj7mVMcXY60
+        I0YFitbsKMwZtryhIPQY1fq5BuOedAyyfPclH+0V+0rXDrk=
+X-Google-Smtp-Source: APXvYqxMWNNXXpLxF4UZ9eITlaS9Zfi8S3pZABNmhunfzPSdSC3oVJMFXXef6wuJGkBZo0u/E1W+0lvONnTggjvX21g=
+X-Received: by 2002:a05:6000:1081:: with SMTP id y1mr40589425wrw.53.1568411767420;
+ Fri, 13 Sep 2019 14:56:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <462660f4-1537-cece-b55f-0ceba0269eb8@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190912180928.123660-1-marcorr@google.com> <20190913152442.GC31125@linux.intel.com>
+ <CAA03e5F3SNxcYxdeOg6ZUfxRA5gBe7qaMxSATL13sq1cUL63KQ@mail.gmail.com> <20190913183040.GA8904@linux.intel.com>
+In-Reply-To: <20190913183040.GA8904@linux.intel.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Fri, 13 Sep 2019 14:55:56 -0700
+Message-ID: <CAA03e5E28QaDAHjCg5J0_aPoY8pNnUiUQVvrZSHsEj0dq6-q7w@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: nvmx: test max atomic switch MSRs
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/09/19 17:32, Robin Murphy wrote:
-> Oh, that bit of usbdev_mmap() is already known to be pretty much totally
-> bogus for various reasons - there have been a few threads about it, of
-> which I think [1] is both the most recent and the most informative.
-> There was another patch[2], but that might have stalled (and might need
-> reworking with additional hcd_uses_dma() checks anyway).
+Thanks for the review! I'll get to work on v2 now.
 
-Neither is enough, see my reply to Alan.  Memory from kmalloc just
-*cannot* be passed down to remap_pfn_range, dma_mmap_coherent or
-anything like that.  It's a simple alignment issue.
+> > I'll happily apply what you've suggested in v2. But I don't see why
+> > it's so terrible to over-allocate here. Leveraging a generic 2 MB page
+> > allocator can be reused going forward, and encourages uniformity
+> > across tests.
+>
+> My main concern is avoiding setting 6mb+ of memory.  I like to run the
+> tests in L1 and L2 and would prefer to keep overhead at a minimum.
+>
+> As for the allocation itself, being precise in the allocation size is a
+> form of documentation, e.g. it conveys that the size/order was chosen to
+> ensure enough space for the maximum theoretical list size.  A purely
+> arbitrary size, especially one that corresponds with a large page size,
+> can lead to people looking for things that don't exist, e.g. the 2mb size
+> is partially what led me to believe that this test was deliberately
+> exceeding the limit, otherwise why allocate such a large amount of memory?
+> I also didn't know if 2mb was sufficient to handle the maximum theoretical
+> list size.
 
-Paolo
+SGTM. I'll make this change in v2.
+
+> > > Distilling things down to the bare minimum yields something like the
+> > > following.
+> >
+> > Looks excellent overall. Still not clear what the consensus is on
+> > whether or not to test the VM-entry failure. I think a flag seems like
+> > a reasonable compromise. I've never added a flag to a kvm-unit-test,
+> > so I'll see if I can figure that out.
+>
+> No need for a flag if you want to go that route, just put it in a separate
+> VMX subtest and exclude said test from the [vmx] config, i.e. make the
+> test opt-in.
+
+SGTM, thanks!
