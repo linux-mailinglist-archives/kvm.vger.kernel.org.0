@@ -2,107 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B30EB22CF
-	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 17:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12A6AB2342
+	for <lists+kvm@lfdr.de>; Fri, 13 Sep 2019 17:24:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390368AbfIMPBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Sep 2019 11:01:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55632 "EHLO mx1.redhat.com"
+        id S2390808AbfIMPYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Sep 2019 11:24:43 -0400
+Received: from mga14.intel.com ([192.55.52.115]:45794 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388170AbfIMPBa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Sep 2019 11:01:30 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E842A69086
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2019 15:01:29 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id m9so5579158wrs.13
-        for <kvm@vger.kernel.org>; Fri, 13 Sep 2019 08:01:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zuzwEhDdM8nFD/eqeUMdkZbahAvWuck1YuH/cdNiv9o=;
-        b=PjxXhMbxa+xSYoXxLItV6eH6SJvgk/3UwuGViptFDFGpHPLloerz7KikrWse4dg4BB
-         WFko1n0aCobLTo85rLUXxZGU8Dexc4HDdiMe9kpH0JFRIBvvNsfAIe3fPw68Oh0kJ47j
-         LY/aaHfHJoVS5FbbV2BgW+tAt8lzgjlDFtdyhSficwa9k97bwgPVfDX1CzY436a0Y9ba
-         6qaoL2QuX0bzq+RORTdXHu0hQpkAwFkog8J5PnjZrxjMQZ400t6w2BG3vFPq6wR0usOg
-         pjldtopUR+3wSThHKYKAGm1WEcQfZdsEkQe0hq0icJ+9MPIajYv4DTPaMRSTnmelPcBT
-         QtJA==
-X-Gm-Message-State: APjAAAURRaWIfkbDx/fvyLzSLKPZDrS00IU+jyF1dWcbblIf+pmey72B
-        +OiBysWCVtoSMq0kQ5uZptRQO0FsD5u3xbwDhoWGLyfpaNPZcyAw1iJ6P07kY2vztcTm5bvGeM5
-        DODnLMIoTYw0m
-X-Received: by 2002:a1c:c013:: with SMTP id q19mr3447798wmf.87.1568386884926;
-        Fri, 13 Sep 2019 08:01:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxVmkhicWbX9sM2V6LPnr+xLUUrZU9HvAJMzAOfyJJVoRtNarvooFR4sjG8yibYs2ccdb68wg==
-X-Received: by 2002:a1c:c013:: with SMTP id q19mr3447762wmf.87.1568386884662;
-        Fri, 13 Sep 2019 08:01:24 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c5d2:4bb2:a923:3a9a? ([2001:b07:6468:f312:c5d2:4bb2:a923:3a9a])
-        by smtp.gmail.com with ESMTPSA id y15sm1949532wmj.32.2019.09.13.08.01.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Sep 2019 08:01:24 -0700 (PDT)
-Subject: Re: KASAN: slab-out-of-bounds Read in handle_vmptrld
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        bp@alien8.de, carlo@caione.org, catalin.marinas@arm.com,
-        devicetree@vger.kernel.org, hpa@zytor.com, jmattson@google.com,
-        joro@8bytes.org, khilman@baylibre.com,
-        linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        mark.rutland@arm.com, mingo@redhat.com, narmstrong@baylibre.com,
-        rkrcmar@redhat.com, robh+dt@kernel.org,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, wanpengli@tencent.com, will.deacon@arm.com,
-        x86@kernel.org,
-        syzbot <syzbot+46f1dd7dbbe2bfb98b10@syzkaller.appspotmail.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        USB list <linux-usb@vger.kernel.org>
-References: <000000000000a9d4f705924cff7a@google.com>
- <87lfutei1j.fsf@vitty.brq.redhat.com>
- <5218e70e-8a80-7c5f-277b-01d9ab70692a@redhat.com>
- <20190913044614.GA120223@kroah.com>
- <db02a285-ad1d-6094-6359-ba80e6d3f2e0@redhat.com>
- <20190913130226.GB403359@kroah.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <6a0ec3a2-2a52-f67a-6140-e0a60874538a@redhat.com>
-Date:   Fri, 13 Sep 2019 17:01:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2388354AbfIMPYn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Sep 2019 11:24:43 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Sep 2019 08:24:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,489,1559545200"; 
+   d="scan'208";a="360789583"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga005.jf.intel.com with ESMTP; 13 Sep 2019 08:24:42 -0700
+Date:   Fri, 13 Sep 2019 08:24:42 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Marc Orr <marcorr@google.com>
+Cc:     kvm@vger.kernel.org, jmattson@google.com, pshier@google.com
+Subject: Re: [kvm-unit-tests PATCH] x86: nvmx: test max atomic switch MSRs
+Message-ID: <20190913152442.GC31125@linux.intel.com>
+References: <20190912180928.123660-1-marcorr@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20190913130226.GB403359@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190912180928.123660-1-marcorr@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/09/19 15:02, Greg Kroah-Hartman wrote:
-> Look at linux-next, we "should" have fixed up hcd_buffer_alloc() now to
-> not need this type of thing.  If we got it wrong, please let us know and
-> then yes, a fix like this would be most appreciated :)
+On Thu, Sep 12, 2019 at 11:09:28AM -0700, Marc Orr wrote:
+> Excerise nested VMX's atomic MSR switch code (e.g., VM-entry MSR-load
+> list) at the maximum number of MSRs supported, as described in the SDM,
+> in the appendix chapter titled "MISCELLANEOUS DATA".
+> 
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Marc Orr <marcorr@google.com>
+> ---
+>  x86/vmx_tests.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 139 insertions(+)
+> 
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index f035f24a771a..b3b4d5f7cc8f 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -2718,6 +2718,11 @@ static void ept_reserved_bit(int bit)
+>  #define PAGE_2M_ORDER 9
+>  #define PAGE_1G_ORDER 18
+>  
+> +static void *alloc_2m_page(void)
+> +{
+> +	return alloc_pages(PAGE_2M_ORDER);
+> +}
 
-I still see
+Allocating 2mb pages is complete overkill.  The absolute theoretical max
+for the number of MSRs is (8 * 512) = 4096, for a total of 32kb per list.
+We can even show the math so that it's obvious how the size is calculated.
+Plus one order so we can test overrun.
 
-	/* some USB hosts just use PIO */
-	if (!hcd_uses_dma(hcd)) {
-		*dma = ~(dma_addr_t) 0;
-		return kmalloc(size, mem_flags);
+/*
+ * The max number of MSRs is specified in 3 bits bits, plus 1. I.e. 7+1==8.
+ * Allocate 64k bytes of data to cover max_msr_list_size and then some.
+ */
+static const u32 msr_list_page_order = 4;
+
+> +
+>  static void *get_1g_page(void)
+>  {
+>  	static void *alloc;
+> @@ -8570,6 +8575,138 @@ static int invalid_msr_entry_failure(struct vmentry_failure *failure)
+>  	return VMX_TEST_VMEXIT;
+>  }
+>  
+> +enum atomic_switch_msr_scenario {
+> +	VM_ENTER_LOAD,
+> +	VM_EXIT_LOAD,
+> +	VM_EXIT_STORE,
+> +	ATOMIC_SWITCH_MSR_SCENARIO_END,
+> +};
+
+How about:
+
+enum atomic_switch_msr_lists {
+	VM_ENTER_LOAD,
+	VM_EXIT_LOAD,
+	VM_EXIT_STORE,
+	NR_ATOMIC_SWITCH_MSR_LISTS,
+};
+
+IMO that yields a much more intuitive test loop:
+
+	for (i = 0; i < NR_ATOMIC_SWITCH_MSR_LISTS; i++) {
 	}
 
-in linux-next's hcd_buffer_alloc and also in usb.git's usb-next branch.
- I also see the same
+But we probably don't even need a loop...
 
-	if (remap_pfn_range(vma, vma->vm_start,
-			virt_to_phys(usbm->mem) >> PAGE_SHIFT,
-			size, vma->vm_page_prot) < 0) {
-		...
-	}
+> +
+> +static void atomic_switch_msr_limit_test_guest(void)
+> +{
+> +	vmcall();
+> +}
+> +
+> +static void populate_msr_list(struct vmx_msr_entry *msr_list, int count)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < count; i++) {
+> +		msr_list[i].index = MSR_IA32_TSC;
+> +		msr_list[i].reserved = 0;
+> +		msr_list[i].value = 0x1234567890abcdef;
 
-in usbdev_mmap.  Of course it's possible that I'm looking at the wrong
-branch, or just being dense.
+Maybe overkill, but we can use a fast string op for this.  I think
+I got the union right?
 
-Paolo
+static void populate_msr_list(struct vmx_msr_entry *msr_list, int count)
+{
+	union {
+		struct vmx_msr_entry msr;
+		u64 val;
+	} tmp;
+
+	tmp.msr.index = MSR_IA32_TSC;
+	tmp.msr.reserved = 0;
+	tmp.msr.value = 0x1234567890abcdef;
+
+	asm volatile (
+		"rep stosq\n\t"
+		: "=c"(count), "=D"(msr_list)
+		: "a"(tmp.val), "c"(count), "D"(msr_list)
+		: "memory"
+	);
+}
+
+> +	}
+> +}
+> +
+> +static void configure_atomic_switch_msr_limit_test(
+> +		struct vmx_msr_entry *test_msr_list, int count)
+> +{
+> +	struct vmx_msr_entry *msr_list;
+> +	const u32 two_mb = 1 << 21;
+> +	enum atomic_switch_msr_scenario s;
+> +	enum Encoding addr_field;
+> +	enum Encoding cnt_field;
+> +
+> +	for (s = 0; s < ATOMIC_SWITCH_MSR_SCENARIO_END; s++) {
+> +		switch (s) {
+> +		case VM_ENTER_LOAD:
+> +			addr_field = ENTER_MSR_LD_ADDR;
+> +			cnt_field = ENT_MSR_LD_CNT;
+> +			break;
+> +		case VM_EXIT_LOAD:
+> +			addr_field = EXIT_MSR_LD_ADDR;
+> +			cnt_field = EXI_MSR_LD_CNT;
+> +			break;
+> +		case VM_EXIT_STORE:
+> +			addr_field = EXIT_MSR_ST_ADDR;
+> +			cnt_field = EXI_MSR_ST_CNT;
+> +			break;
+> +		default:
+> +			TEST_ASSERT(false);
+> +		}
+> +
+> +		msr_list = (struct vmx_msr_entry *)vmcs_read(addr_field);
+> +		memset(msr_list, 0xff, two_mb);
+
+Writing 8mb of data for each test is a waste of time, i.e. 6mb to reset
+each list, and another 2mb to populate the target list.
+
+The for-loop in the helper is also confusing and superfluous.
+
+> +		if (msr_list == test_msr_list) {
+> +			populate_msr_list(msr_list, count);
+> +			vmcs_write(cnt_field, count);
+> +		} else {
+> +			vmcs_write(cnt_field, 0);
+> +		}
+> +	}
+> +}
+> +
+> +static int max_msr_list_size(void)
+> +{
+> +	u32 vmx_misc = rdmsr(MSR_IA32_VMX_MISC);
+> +	u32 factor = ((vmx_misc & GENMASK(27, 25)) >> 25) + 1;
+> +
+> +	return factor * 512;
+> +}
+> +
+> +static void atomic_switch_msr_limit_test(void)
+> +{
+> +	struct vmx_msr_entry *msr_list;
+> +	enum atomic_switch_msr_scenario s;
+> +
+> +	/*
+> +	 * Check for the IA32_TSC MSR,
+> +	 * available with the "TSC flag" and used to populate the MSR lists.
+> +	 */
+> +	if (!(cpuid(1).d & (1 << 4))) {
+> +		report_skip(__func__);
+> +		return;
+> +	}
+> +
+> +	/* Set L2 guest. */
+> +	test_set_guest(atomic_switch_msr_limit_test_guest);
+> +
+> +	/* Setup atomic MSR switch lists. */
+> +	msr_list = alloc_2m_page();
+> +	vmcs_write(ENTER_MSR_LD_ADDR, virt_to_phys(msr_list));
+> +	msr_list = alloc_2m_page();
+> +	vmcs_write(EXIT_MSR_LD_ADDR, virt_to_phys(msr_list));
+> +	msr_list = alloc_2m_page();
+> +	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(msr_list));
+
+This memory should really be freed.  Not holding pointers for each list
+also seems silly, e.g. requires a VMREAD just to get a pointer.
+
+> +
+> +	/* Execute each test case. */
+> +	for (s = 0; s < ATOMIC_SWITCH_MSR_SCENARIO_END; s++) {
+
+Since you're testing the passing case, why not test all three at once?
+I.e. hammer KVM while also consuming less test cycles.  The "MSR switch"
+test already verifies the correctness of each list.
+
+> +		struct vmx_msr_entry *msr_list;
+> +		int count = max_msr_list_size();
+> +
+> +		switch (s) {
+> +		case VM_ENTER_LOAD:
+> +			msr_list = (struct vmx_msr_entry *)vmcs_read(
+> +					ENTER_MSR_LD_ADDR);
+
+These should use phys_to_virt() since virt_to_phys() is used to write them.
+
+> +			break;
+> +		case VM_EXIT_LOAD:
+> +			msr_list = (struct vmx_msr_entry *)vmcs_read(
+> +					EXIT_MSR_LD_ADDR);
+> +			break;
+> +		case VM_EXIT_STORE:
+> +			msr_list = (struct vmx_msr_entry *)vmcs_read(
+> +					EXIT_MSR_ST_ADDR);
+> +			break;
+> +		default:
+> +			report("Bad test scenario, %d.", false, s);
+> +			continue;
+> +		}
+> +
+> +		configure_atomic_switch_msr_limit_test(msr_list, count);
+
+Again, feeding the list into a helper that also iterates over the lists
+is not intuitive in terms of understanding what is being tested.
+
+> +		enter_guest();
+> +		assert_exit_reason(VMX_VMCALL);
+> +	}
+> +
+> +	/* Reset the atomic MSR switch count to 0 for all three lists. */
+> +	configure_atomic_switch_msr_limit_test(0, 0);
+> +	/* Proceed past guest's single vmcall instruction. */
+> +	enter_guest();
+> +	skip_exit_vmcall();
+> +	/* Terminate the guest. */
+> +	enter_guest();
+> +	skip_exit_vmcall();
+> +}
+> +
+>  
+>  #define TEST(name) { #name, .v2 = name }
+>  
+> @@ -8660,5 +8797,7 @@ struct vmx_test vmx_tests[] = {
+>  	TEST(ept_access_test_paddr_read_execute_ad_enabled),
+>  	TEST(ept_access_test_paddr_not_present_page_fault),
+>  	TEST(ept_access_test_force_2m_page),
+> +	/* Atomic MSR switch tests. */
+> +	TEST(atomic_switch_msr_limit_test),
+
+This is a misleading name, e.g. it took me quite a while to realize this
+is testing only the passing scenario.  For me, "limit test" implies that
+it'd be deliberately exceeding the limit, or at least testing both the
+passing and failing cases.  I suppose we can't easily test the VMX abort
+cases, but we can at least test VM_ENTER_LOAD.
+
+Distilling things down to the bare minimum yields something like the
+following.
+
+	struct vmx_msr_entry *vm_enter_load;
+	struct vmx_msr_entry *vm_exit_load;
+	struct vmx_msr_entry *vm_exit_store;
+	u32 i, max_allowed;
+
+	max_allowed = max_msr_list_size();
+
+	/* Setup atomic MSR switch lists. */
+	vm_enter_load = alloc_pages(msr_list_page_order);
+	vm_exit_load = alloc_pages(msr_list_page_order);
+	vm_exit_store = alloc_pages(msr_list_page_order);
+
+	populate_msr_list(vm_enter_load, max_allowed + 1);
+	populate_msr_list(vm_exit_load,  max_allowed + 1);
+	populate_msr_list(vm_exit_store, max_allowed + 1);
+
+	vmcs_write(ENTER_MSR_LD_ADDR, virt_to_phys(vm_enter_load));
+	vmcs_write(EXIT_MSR_LD_ADDR, virt_to_phys(vm_exit_load));
+	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(vm_exit_store));
+
+	/*
+	 * VM-Enter should fail when exceeing max number of MSRs. The VM-Exit
+	 * lists cause VMX abort, so those are currently not tested.
+	 */
+	vmcs_write(ENT_MSR_LD_CNT, max_allowed + 1);
+	vmcs_write(EXI_MSR_LD_CNT, max_allowed);
+	vmcs_write(EXI_MSR_ST_CNT, max_allowed);
+
+	helper_function_to_verify_vm_fail();
+
+	/*
+	 * VM-Enter should succeed up to the max number of MSRs per list, and
+	 * should not consume junk beyond the last entry.
+	 */
+	vmcs_write(ENT_MSR_LD_CNT, max_allowed);
+
+	/* This pointer arithmetic is probably wrong. */
+	memset(vm_enter_load + max_allowed + 1, 0xff, sizeof(*vm_enter_load);
+	memset(vm_exit_load  + max_allowed + 1, 0xff, sizeof(*vm_exit_load);
+	memset(vm_exit_store + max_allowed + 1, 0xff, sizeof(*vm_exit_store);
+
+	enter_guest();
+	assert_exit_reason(VMX_VMCALL);
+
+	<clean up>
+
+>  	{ NULL, NULL, NULL, NULL, NULL, {0} },
+>  };
+> -- 
+> 2.23.0.237.gc6a4ce50a0-goog
+> 
