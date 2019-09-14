@@ -2,89 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5FEEB2CBC
-	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2019 21:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65193B2CE2
+	for <lists+kvm@lfdr.de>; Sat, 14 Sep 2019 22:32:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731327AbfINTjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Sep 2019 15:39:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56330 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730230AbfINTjF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Sep 2019 15:39:05 -0400
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3C03D8553A
-        for <kvm@vger.kernel.org>; Sat, 14 Sep 2019 19:39:05 +0000 (UTC)
-Received: by mail-qk1-f200.google.com with SMTP id h4so17494043qkd.18
-        for <kvm@vger.kernel.org>; Sat, 14 Sep 2019 12:39:05 -0700 (PDT)
+        id S1726125AbfINUbw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Sep 2019 16:31:52 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40526 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725904AbfINUbv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Sep 2019 16:31:51 -0400
+Received: by mail-wr1-f66.google.com with SMTP id l3so12432649wru.7;
+        Sat, 14 Sep 2019 13:31:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=zmjqwoEujswmzOMWnrm7/sgwjAMLZkcd4FdRC15UyXQ=;
+        b=XfZcs/S7s6Wkz+SP+k7XiOOcO3Ob7J+ME8H3ClAbfpUsOlk+7e+XmJoYJ90uymJLBG
+         E6AoEGjZO28yWGhXnXrbo58MzCaKJeSCPiGvuYX1S4m4A+lr0HvC345t2whx0TInLmDY
+         c0weyaoKtdWTy/R4TVOWJEnty8CJIci3DE/GkN0bxFz7XMAHGh4SjaYSlxK4f/SrnmF3
+         G7wrLvV/65X3YUqhHO/jXOaT9IdTyCjLc8aJzBHhqjp95xkE1b17hEsBMScePyIY0rmq
+         3u5o9rtpLwhn7Cbwzzg0dAxfB9t7XtxoMDT2XydW+QiNgrpTRACNWOVwn7c2trTgSMLO
+         SZaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=vaylEgrlIg+lPjH544xVFYytAlsLACbCpY321J/9g4E=;
-        b=Y8qyZCYblRDuyfLuFVCRskwd3D2UvbWedBK/L69ta6e6sPN5NMpqD56ZtEjvjD8PCu
-         B7jWDSqbvs3XDIzKfkaCuzfiVexNnQYEAyXSpmvo7TyH7YPMPeYnyQ78XyKxMxADbGN1
-         UhSwhQTlFsx6IB38A/U11uHDcJ4m7rOty1WxJV35gWOdBgI/eA1smq+rIZkWgzQmT5vV
-         WJMGwINFikfn294N9ucevAfR5U6k4zR0P6kOIOAkFgnoErO38OFpTpeWvDdNRNaEChHg
-         7tFDYMe/bYHrOA2hDhFJXb3Hek2C0hoorjVAC5TDb/eM5yCxQjiWmtoEAnW39Wm8Tsm2
-         ZVJQ==
-X-Gm-Message-State: APjAAAWKAyqlBBji4Dgon128dHXb4B4tf7IOC8nXYMiP2CwO+4ynsiJy
-        z0UVh7X4IC2lMHTx0FbdIr9f1d8nRfEJuNq74CmJGCtDqlvVTQ8LPP6O+IruUqGb7YABWBkPXlX
-        UTGJgypKtRJ6f
-X-Received: by 2002:a37:4b97:: with SMTP id y145mr53500321qka.310.1568489944596;
-        Sat, 14 Sep 2019 12:39:04 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwD6rz0Xz1EID/JFGdbYv8ZxwisBunlJJE5csAnnPdoREA9Pde8LY2vagubbz6rBIS1caMDgg==
-X-Received: by 2002:a37:4b97:: with SMTP id y145mr53500312qka.310.1568489944423;
-        Sat, 14 Sep 2019 12:39:04 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
-        by smtp.gmail.com with ESMTPSA id y17sm17211975qtb.82.2019.09.14.12.39.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Sep 2019 12:39:03 -0700 (PDT)
-Date:   Sat, 14 Sep 2019 15:38:59 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, mst@redhat.com
-Subject: [PULL] vhost: a last minute revert
-Message-ID: <20190914153859-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=zmjqwoEujswmzOMWnrm7/sgwjAMLZkcd4FdRC15UyXQ=;
+        b=HsjSC3mywkQurikIN+yMdZz2x056gUZU7x5Ug0NIwqKvg9GReJV58ICF9yA0LwcDt5
+         cWhMvLpYCbMhH2EGGmkWIj1d4DR6EgB2Fwumfka192FIIn4Ld71PLGKh6eGAPWn2xyLD
+         5mJhKSkEeQB+Gp4knIl6CukxvgMVRb/W0UNb1itILuVyDIZhpWicp8eooJ9cjPLmlHUH
+         2RbDHBOS5CebnLUb5axqdbCYiVSahjxu2EZSlSnjf3J6BY5q7p/5Lbf87Tfu4YWBl/6o
+         db4+1sth+2JuydQp67OAYLj1CKwGKrLwz7mMwLXQCBWT7BgA/qy1jlJe5GRw1hTqrDbL
+         v63A==
+X-Gm-Message-State: APjAAAUMR39bWh5UVkt+qiR3LZ1W6IdwhFCO2Oepuv3D9yddI6BAdzs9
+        +4oQISLDh8WNclthNU66epkvVI2e
+X-Google-Smtp-Source: APXvYqzfMRYOJEbOogXLihWhheBsIKNRktkWoeiG2QV8DfVt0dnArXXm7xWZCRmkHxUocGYnQZok9g==
+X-Received: by 2002:a5d:6b0b:: with SMTP id v11mr41860769wrw.10.1568493109388;
+        Sat, 14 Sep 2019 13:31:49 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id h17sm12126785wme.6.2019.09.14.13.31.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 14 Sep 2019 13:31:48 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] Final batch of KVM changes for Linux 5.3.
+Date:   Sat, 14 Sep 2019 22:31:41 +0200
+Message-Id: <1568493101-32728-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-So I made a mess of it. Sent a pull before making sure it works on 32
-bit too. Hope it's not too late to revert. Will teach me to be way more
-careful in the near future.
+Linus,
 
-The following changes since commit 060423bfdee3f8bc6e2c1bac97de24d5415e2bc4:
+The following changes since commit a7f89616b7376495424f682b6086e0c391a89a1d:
 
-  vhost: make sure log_num < in_num (2019-09-11 15:15:26 -0400)
+  Merge branch 'for-5.3-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup (2019-09-13 09:52:01 +0100)
 
-are available in the Git repository at:
+are available in the git repository at:
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-for you to fetch changes up to 0d4a3f2abbef73b9e5bb5f12213c275565473588:
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-  Revert "vhost: block speculation of translated descriptors" (2019-09-14 15:21:51 -0400)
+for you to fetch changes up to a9c20bb0206ae9384bd470a6832dd8913730add9:
 
-----------------------------------------------------------------
-virtio: a last minute revert
-
-32 bit build got broken by the latest defence in depth patch.
-Revert and we'll try again in the next cycle.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+  Merge tag 'kvm-s390-master-5.3-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-master (2019-09-14 09:25:30 +0200)
 
 ----------------------------------------------------------------
-Michael S. Tsirkin (1):
-      Revert "vhost: block speculation of translated descriptors"
 
- drivers/vhost/vhost.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+The main change here is a revert of reverts.  We recently simplified some
+code that was thought unnecessary; however, since then KVM has grown quite
+a few cond_resched()s and for that reason the simplified code is prone to
+livelocks---one CPUs tries to empty a list of guest page tables while the
+others keep adding to them.  This adds back the generation-based zapping of
+guest page tables, which was not unnecessary after all.
+
+On top of this, there is a fix for a kernel memory leak and a couple of
+s390 fixlets as well.
+
+----------------------------------------------------------------
+Fuqian Huang (1):
+      KVM: x86: work around leak of uninitialized stack contents
+
+Igor Mammedov (1):
+      KVM: s390: kvm_s390_vm_start_migration: check dirty_bitmap before using it as target for memset()
+
+Paolo Bonzini (2):
+      KVM: nVMX: handle page fault in vmread
+      Merge tag 'kvm-s390-master-5.3-1' of git://git.kernel.org/.../kvms390/linux into kvm-master
+
+Sean Christopherson (1):
+      KVM: x86/mmu: Reintroduce fast invalidate/zap for flushing memslot
+
+Thomas Huth (1):
+      KVM: s390: Do not leak kernel stack data in the KVM_S390_INTERRUPT ioctl
+
+ arch/s390/kvm/interrupt.c       |  10 ++++
+ arch/s390/kvm/kvm-s390.c        |   4 +-
+ arch/x86/include/asm/kvm_host.h |   2 +
+ arch/x86/kvm/mmu.c              | 101 +++++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/nested.c       |   4 +-
+ arch/x86/kvm/x86.c              |   7 +++
+ 6 files changed, 124 insertions(+), 4 deletions(-)
