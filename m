@@ -2,78 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F24FB42C9
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2019 23:14:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A11C9B42DE
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2019 23:17:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391647AbfIPVOI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Sep 2019 17:14:08 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43501 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391594AbfIPVOI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Sep 2019 17:14:08 -0400
-Received: by mail-wr1-f65.google.com with SMTP id q17so865517wrx.10
-        for <kvm@vger.kernel.org>; Mon, 16 Sep 2019 14:14:06 -0700 (PDT)
+        id S2387936AbfIPVRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Sep 2019 17:17:48 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:37967 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728810AbfIPVRs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Sep 2019 17:17:48 -0400
+Received: by mail-pg1-f193.google.com with SMTP id x10so704200pgi.5
+        for <kvm@vger.kernel.org>; Mon, 16 Sep 2019 14:17:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=aJQBtttQb/9gppC0RS5BroTu8sD1MvrCpTBBP2JR2WE=;
-        b=dHy+OyPIeQopiDqL06E2feYFy7NdPJeLoj3hKTVcp07q1js5jS/4Cpy7yelvUkkUJN
-         9f4ZGm6jFqS145NiSBaYriCbsb7RpOheVYwYbRoLx7vUAiDlQfJegxzhwR1IXOxnZLDt
-         HvSz3fErSjbZMQNDNVgpYK20X24TZ5N7h97tcLAUXxJgPthrVTEzn0yZFFbHYD31nk/k
-         QjakocVgrmqKP6KA1XaiYOiGxD2n4eql/MGeLxYBYD+VkGnCKWziAI9yitn7KiVdOfx8
-         GBQ2AeoMlVvpIszR/NgTRKXxukXFoqVhaKcrEPjIyJzg3dZl+KcleHR/hAszCcfdMZok
-         xwCA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=DUEm44CJ4MKeIi+5HtpZQadj3xFULJmnpjD5XuqmloQ=;
+        b=KgzW5qxAyMtZJa12o2aGJGsvvNx8f61seMcyiOiN52mP18PFxAv6VNnJOVCdqYKfok
+         xAszVeiJDUEuyfOw3Hhclrw0pJ0SEpB3FbScC6rbYw35i/VhJycqKOrpy159TBDO5vAJ
+         bxqQxAuIBCuWpAA+DC9G3E7vBv1GhQ+Fe/TNxLf0yAd98D+mOXC/vViehsFdH+0kqSmF
+         69qbmrnwk1ESOK1gzRNyayfZlHBprhUxOAEMZ+PXMbyqYanZDcleA6+cz25cOjr6WFa2
+         AoKqzkqwSRLOwXEvnZGLZhygfkASCI8BLk6S3Scb2BEkeUKjdc5xgBgIrAGmAYTL4N/u
+         zpFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=aJQBtttQb/9gppC0RS5BroTu8sD1MvrCpTBBP2JR2WE=;
-        b=nv9lIPNhF7c00Iue2MqJzUXl95oJQfrLj9WFkSRGpLS1R3BHRtZysCfe2qUFsV6IVM
-         a5SVGtq6OY/5fScb+Wjubd51wxTfSYMvztnPZJmQXnHoDK2JhqQ4qjztOzRmZMARuKIZ
-         BuRvbwZ0S8B/vzX2sRlmNywiGJM/cjQ6fQV+7tE52qtaTG3upH3IexiErT8nmXwK09Il
-         99J5N2na5UJlfGGUOE5Cd5jpw8+xqIO3TGtqfD3RHMl/cj+44kuyRSsritpUguux2ngs
-         4AP0JaSQXCg8mBJuS98VA73fWisIvwtzGIhyaDno00erBW/xmw+akbsVdb1tvMfrnnrF
-         qv2Q==
-X-Gm-Message-State: APjAAAWhVYIejOe9KhpSimHYCc0SQBL7gJA7YGtN0R9KDmMlw0mmSYNi
-        7fbQhSGXBJ7VAeBPhRKjCyaM7ACE7MTK1/k8M02pFMJShvg=
-X-Google-Smtp-Source: APXvYqwVddoR/+GX0HxGxMGHE5So/k+Cjp2Ro42J1TkJgChvlotfeKqKq5fhBHOz2dxKSTVU+zTLk02nJRiiyewZ7iM=
-X-Received: by 2002:a05:6000:1281:: with SMTP id f1mr232785wrx.247.1568668445549;
- Mon, 16 Sep 2019 14:14:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190914003940.203636-1-marcorr@google.com>
-In-Reply-To: <20190914003940.203636-1-marcorr@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Mon, 16 Sep 2019 14:13:54 -0700
-Message-ID: <CAA03e5EECP=FBscuzmxCswRtoBu0fSmnTjUd++WHjCE=rLm3mw@mail.gmail.com>
-Subject: Re: [PATCH v2] kvm: nvmx: limit atomic switch MSRs
-To:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=DUEm44CJ4MKeIi+5HtpZQadj3xFULJmnpjD5XuqmloQ=;
+        b=jTXOl8SIFfATEab9+EKvB2O2XgkeU/R/Q87h56vv2M44d+M3BLkaNbiq/qZ4prwfi3
+         SQdQO5SA4aAWmHE2RAg+Cy/mW0EGYOIUOPpvQcoi9Sgj+oCbMvxOMvvJDFA1R7kOqGpH
+         tl0zY+DM7CYIWKaFdI4IOppbXSJkYBAENUJ3tQIxzghg1K95XrwbO/q9uOzHWwyADmBd
+         RgXeRR4rNXH8lcZADywmV3vBCB0Ka3Y5N85MwJnKhK5EJyQbtE7QEXQ/t98YLK9s7zqE
+         LUFP5MRJPu2OB9pcxXlo6ULEtnGmQmSF3FQch5GqJp8y/9xKd0kzTSifG9CgU2QeDOss
+         Z+Vw==
+X-Gm-Message-State: APjAAAUS/eOeiGJf/aIMyQiWUbonWDX66cL3t/8wGwGRPSAi6Jm1DSh3
+        BD7csykyWMgetuDKvMTWv5GMtw==
+X-Google-Smtp-Source: APXvYqyRIjlMfj91qphmULZ06gB7ijwvAUv+DkkE8r4gyoTACfmYaFk8KxWc1F66X9jLAQ3Ec8vwpw==
+X-Received: by 2002:a17:90a:21a9:: with SMTP id q38mr1271896pjc.23.1568668666871;
+        Mon, 16 Sep 2019 14:17:46 -0700 (PDT)
+Received: from google.com ([2620:0:1009:11:73e5:72bd:51c7:44f6])
+        by smtp.gmail.com with ESMTPSA id h14sm20700pfo.15.2019.09.16.14.17.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Sep 2019 14:17:46 -0700 (PDT)
+Date:   Mon, 16 Sep 2019 14:17:42 -0700
+From:   Oliver Upton <oupton@google.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
         Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [PATCH v4 2/9] KVM: nVMX: Load GUEST_IA32_PERF_GLOBAL_CTRL MSR
+ on vm-entry
+Message-ID: <20190916211742.GA221782@google.com>
+References: <20190906210313.128316-1-oupton@google.com>
+ <20190906210313.128316-3-oupton@google.com>
+ <20190916180614.GF18871@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190916180614.GF18871@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> +{
-> +       return fixed_bits_valid(control, low, high);
-> +}
-> +
-> +static inline u64 vmx_control_msr(u32 low, u32 high)
-> +{
-> +       return low | ((u64)high << 32);
-> +}
-> +
->  static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
->  {
->         secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
-> @@ -856,6 +866,17 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static u64 vmx_control_msr(u32 low, u32 high);
+On Mon, Sep 16, 2019 at 11:06:14AM -0700, Sean Christopherson wrote:
+> On Fri, Sep 06, 2019 at 02:03:06PM -0700, Oliver Upton wrote:
+> > Add condition to prepare_vmcs02 which loads IA32_PERF_GLOBAL_CTRL on
+> > VM-entry if the "load IA32_PERF_GLOBAL_CTRL" bit on the VM-entry control
+> > is set. Use kvm_set_msr() rather than directly writing to the field to
+> > avoid overwrite by atomic_switch_perf_msrs().
+> > 
+> > Suggested-by: Jim Mattson <jmattson@google.com>
+> > Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > Reviewed-by: Jim Mattson <jmattson@google.com>
+> > Reviewed-by: Peter Shier <pshier@google.com>
+> > ---
+> >  arch/x86/kvm/vmx/nested.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index b0ca34bf4d21..9ba90b38d74b 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -2281,6 +2281,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+> >  {
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >  	struct hv_enlightened_vmcs *hv_evmcs = vmx->nested.hv_evmcs;
+> > +	struct msr_data msr_info;
+> >  	bool load_guest_pdptrs_vmcs12 = false;
+> >  
+> >  	if (vmx->nested.dirty_vmcs12 || hv_evmcs) {
+> > @@ -2404,6 +2405,16 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+> >  	if (!enable_ept)
+> >  		vcpu->arch.walk_mmu->inject_page_fault = vmx_inject_page_fault_nested;
+> >  
+> > +	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) {
+> > +		msr_info.host_initiated = false;
+> > +		msr_info.index = MSR_CORE_PERF_GLOBAL_CTRL;
+> > +		msr_info.data = vmcs12->guest_ia32_perf_global_ctrl;
+> > +		if (kvm_set_msr(vcpu, &msr_info))
+> > +			pr_debug_ratelimited(
+> > +				"%s cannot write MSR (0x%x, 0x%llx)\n",
+> > +				__func__, msr_info.index, msr_info.data);
+> 
+> Same comment on printing the name.  Might be work adding a helper function
+> or macro?  That'd also avoid blasting past the 80-column guideline.
 
-Oops, I forgot to delete this declaration, which is no longer needed
-after applying Sean's suggestions, in v2. I can send out a v3 with
-this line removed after folks comment on this version.
+Thanks for the review, Sean. I believe that in one of the prior sets I
+mailed out you had mentioned a macro for this as well, but was a fix
+throughout KVM. Shall I introduce the macro as part of this series, but
+only apply it to my changes (and fix other call sites later on)?
+
+> > +	}
+> > +
+> >  	kvm_rsp_write(vcpu, vmcs12->guest_rsp);
+> >  	kvm_rip_write(vcpu, vmcs12->guest_rip);
+> >  	return 0;
+> > -- 
+> > 2.23.0.187.g17f5b7556c-goog
+> > 
