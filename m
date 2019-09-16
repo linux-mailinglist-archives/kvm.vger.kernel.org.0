@@ -2,234 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 492EDB33D7
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2019 06:03:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BACFBB355A
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2019 09:12:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725853AbfIPEDC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Sep 2019 00:03:02 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:42637 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725730AbfIPEDC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Sep 2019 00:03:02 -0400
-Received: by mail-ot1-f66.google.com with SMTP id c10so34357754otd.9;
-        Sun, 15 Sep 2019 21:03:01 -0700 (PDT)
+        id S1729172AbfIPHMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Sep 2019 03:12:55 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:38644 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726084AbfIPHMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Sep 2019 03:12:55 -0400
+Received: by mail-pg1-f193.google.com with SMTP id x10so1373716pgi.5;
+        Mon, 16 Sep 2019 00:12:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MO99i9mXaEOJiKYYZONOtDCqaLIAO0yEzXnTE3xFd9w=;
-        b=axVUIv6tfRpmCQypOp3Nufj7NSNtRNUeb9NufEPHAGxJ8SgNj6UdRWuWFtLsXSFNnT
-         7ZaiW+4NvLUY2+hdrgMM1tJRxLt18fJhxmDyBBHMtfsHe8YAxRAJNRCDfSZxVFfLF1Di
-         /iWmIyQd7QdGuj5kaQKG9c816QfBhnpuM1PcovlSNK+rCG/Zxm5bdViHQEuVGlP5NjaK
-         6AuUq2ILZfd9YWFQaKOVhsiDYKCgNeUTrKFjokX4hqhS0z5s+yjz6bCKV2HvJPfO9jIN
-         mgnmyWcsxgksSx71IbPiCPWQTHk1yw8pYzz2/M9JBJv0gwBX17Uzk76vci9c+p2/Gcqp
-         kqqA==
+        h=from:to:cc:subject:date:message-id;
+        bh=0RlJ05uTroP58LEheLIV/N0JmFk4uyJbV6/x+X7o6VI=;
+        b=khSq9uAQ+4px8pQprdT33SHwhZgIWiE6QQUqn6A1d4BRFQ4fUYWlxSPGffYM4n6t3b
+         UO61+6G0TxDA8N2CIe/MqWg5GRELfVfZiwr6LHdo3yRQORIjapdOFylqeIO/WN9l9+ND
+         Ok2SQDvWaFXUmUYkDOsurn6olRrcGoJa0O+KR10nzwxI3SzTBCxvl7Tx9zKUyiTg1Q/0
+         r17BWqvhAbp/TnW0dfK8GlSSI2AM4xFt23VwJrOTFAtK1jEn8f6QSdGURkmvxwSL91QE
+         mcll2iyR8el5VnorIOVh9bznDxdST7Eebso4EWC+nvJc+Gg/kF93WP3u+KHBtr+JEbTD
+         /21A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MO99i9mXaEOJiKYYZONOtDCqaLIAO0yEzXnTE3xFd9w=;
-        b=S5VgOErPQ8OswcVGdo6++c4dYPYtL+JGeAaAPFM5nw6Zyr5x9fFUQJ+Z3kICIEFf27
-         83WQ9u8hhA4lt+m9/ZNF1Z9HMf9SLscII2jErUXbtOtHYuvmNnXlNr4Wa5eY1yn5P0hJ
-         2krGtDFDcYXS/id7HwpzAEurwdLy0eH/4+QDjVeKAxpQFugCbVywc3CU7YWUchxFKUKX
-         eoizv4qU5o3igRhscUvL9C1t2kzsacFPalnQxy4SZOCvhHubcMwyN1n3dysTE0Xy0Snq
-         Om74K+XTUDKixzYzrxs5A6sjXsNOCetUFrU3guQ50ajqjSfvS9VriIl9GsrThOFlwIuI
-         FL2g==
-X-Gm-Message-State: APjAAAVDN26kJUgUdfNQZUAfrhjGE4pSqbeZsQDnGECZ/3obpMSCmn5I
-        NGkze3xVjXr9HUxwbBZfWBrqCuCJ7eBssKg/90w=
-X-Google-Smtp-Source: APXvYqz1THClfa3II9z8tDk6V/d875qMpiUs/xIoWf8/qmW7KQU7arC18V1uI5yIs3jrYcLpWxnEnmMtTXHhv84129A=
-X-Received: by 2002:a9d:4597:: with SMTP id x23mr31647946ote.185.1568606580868;
- Sun, 15 Sep 2019 21:03:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <1566980342-22045-1-git-send-email-wanpengli@tencent.com>
- <a1c6c974-a6f2-aa71-aa2e-4c987447f419@redhat.com> <TY2PR02MB4160421A8C88D96C8BCB971180B00@TY2PR02MB4160.apcprd02.prod.outlook.com>
- <8054e73d-1e09-0f98-4beb-3caa501f2ac7@redhat.com>
-In-Reply-To: <8054e73d-1e09-0f98-4beb-3caa501f2ac7@redhat.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=0RlJ05uTroP58LEheLIV/N0JmFk4uyJbV6/x+X7o6VI=;
+        b=V0h2bCWJvwrWNPcGiEbWVICF0vrCNHF8YIQc51O2ltQSvumvbqKeXQA4Plds26YgSi
+         wflS1K+X/pu7SLq+W0coe/YJMmvL2POFQv2SGut+zC0hGjHu1f+e59yKMTqryDVuLo65
+         bfikrcldWaDA3BToLa1aFeOX71UdC4K0Kns/v+TjmK7HCdjMTjiBCpCa3TWCBzZ8RRGR
+         RjSBiJfAmBFBgmvP0QaLOvnpY8GaJ7TG1LaVk7hQyZLBejz1ll7HG/ZDWq67QiSbZiVz
+         hQoPRICfXIA/22WCFgFACU1tMtT0fYgTtY3Zco2NjwRS+IuSKlABgH6xJ4uZQHl5CntG
+         SBgQ==
+X-Gm-Message-State: APjAAAWMyvQ7d2GW01NJV75yeTc79Pr9hK45zzssMPlNWhVD7KbVgZ1o
+        jBhbZ6mpBC+L9UtQ0Emrv4sTGYYJ
+X-Google-Smtp-Source: APXvYqyK591X0S54vFzFEbUbk6IDBXuo3c1uMvTcq3UQZ7Dodoxn009XsU9TRj0u8Y3ekjlI7Z+w7Q==
+X-Received: by 2002:aa7:8e08:: with SMTP id c8mr64793973pfr.238.1568617974784;
+        Mon, 16 Sep 2019 00:12:54 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id r23sm8603061pjo.22.2019.09.16.00.12.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 16 Sep 2019 00:12:54 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 16 Sep 2019 12:02:49 +0800
-Message-ID: <CANRm+Cy+5pompcDDS2C9YnxvE_-87i24gbBfc53Qa1tcWNck2Q@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] KVM: LAPIC: Tune lapic_timer_advance_ns smoothly
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <wanpeng.li@hotmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
+Subject: [PATCH] KVM: X86: Fix warning in handle_desc
+Date:   Mon, 16 Sep 2019 15:12:49 +0800
+Message-Id: <1568617969-6934-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Sep 2019 at 20:37, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 12/09/19 02:34, Wanpeng Li wrote:
-> >>> -        timer_advance_ns -= min((u32)ns,
-> >>> -            timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-> >>> +        timer_advance_ns -= ns;
->
-> Looking more closely, this assignment...
->
-> >>>    } else {
-> >>>    /* too late */
-> >>>        ns = advance_expire_delta * 1000000ULL;
-> >>>        do_div(ns, vcpu->arch.virtual_tsc_khz);
-> >>> -        timer_advance_ns += min((u32)ns,
-> >>> -            timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-> >>> +        timer_advance_ns += ns;
->
-> ... and this one are dead code now.  However...
->
-> >>>    }
-> >>>
-> >>> +    timer_advance_ns = (apic->lapic_timer.timer_advance_ns *
-> >>> +        (LAPIC_TIMER_ADVANCE_ADJUST_STEP - 1) + advance_expire_delta) /
-> >>> +        LAPIC_TIMER_ADVANCE_ADJUST_STEP;
->
-> ... you should instead remove this new assignment and just make the
-> assignments above just
->
->         timer_advance -= ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP;
->
-> and
->
->         timer_advance -= ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP;
->
-> In fact this whole last assignment is buggy, since advance_expire_delta
-> is in TSC units rather than nanoseconds.
->
-> >>>    if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
-> >>>        apic->lapic_timer.timer_advance_adjust_done = true;
-> >>>    if (unlikely(timer_advance_ns > 5000)) {
-> >> This looks great.  But instead of patch 2, why not remove
-> >> timer_advance_adjust_done altogether?
-> > It can fluctuate w/o stop.
->
-> Possibly because of the wrong calculation of timer_advance_ns?
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Hi Paolo,
+Reported by syzkaller:
 
-Something like below? It still fluctuate when running complex guest os
-like linux. Removing timer_advance_adjust_done will hinder introduce
-patch v3 2/2 since there is no adjust done flag in each round
-evaluation. I have two questions here, best-effort tune always as
-below or periodically revaluate to get conservative value and get
-best-effort value in each round evaluation as patch v3 2/2, which one
-do you prefer? The former one can wast time to wait sometimes and the
-later one can not get the best latency. In addition, can the adaptive
-tune algorithm be using in all the scenarios contain
-RT/over-subscribe?
+	WARNING: CPU: 0 PID: 6544 at /home/kernel/data/kvm/arch/x86/kvm//vmx/vmx.c:4689 handle_desc+0x37/0x40 [kvm_intel]
+	CPU: 0 PID: 6544 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
+	RIP: 0010:handle_desc+0x37/0x40 [kvm_intel]
+	Call Trace:
+	 vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
+	 vcpu_enter_guest+0x4dc/0x18d0 [kvm]
+	 kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
+	 kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
+	 do_vfs_ioctl+0xa2/0x690
+	 ksys_ioctl+0x6d/0x80
+	 __x64_sys_ioctl+0x1a/0x20
+	 do_syscall_64+0x74/0x720
+	 entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
----8<---
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 685d17c..895735b 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -69,6 +69,7 @@
- #define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-+#define LAPIC_TIMER_ADVANCE_FILTER 5000
+When CR4.UMIP is set, guest should have UMIP cpuid flag. Current 
+kvm set_sregs function doesn't have such check when userspace inputs 
+sregs values. SECONDARY_EXEC_DESC is enabled on writes to CR4.UMIP in 
+vmx_set_cr4 though guest doesn't have UMIP cpuid flag. The testcast 
+triggers handle_desc warning when executing ltr instruction since guest 
+architectural CR4 doesn't set UMIP. This patch fixes it by adding check 
+for guest UMIP cpuid flag when get sreg inputs from userspace.
 
- static inline int apic_test_vector(int vec, void *bitmap)
- {
-@@ -1479,29 +1480,28 @@ static inline void
-adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
-                           s64 advance_expire_delta)
- {
-     struct kvm_lapic *apic = vcpu->arch.apic;
--    u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
--    u64 ns;
-+    u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns, ns;
-+
-+    if (abs(advance_expire_delta) > LAPIC_TIMER_ADVANCE_FILTER ||
-+        abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE) {
-+        /* filter out random fluctuations */
-+        return;
-+    }
+Reported-by: syzbot+0f1819555fbdce992df9@syzkaller.appspotmail.com
+Fixes: 0367f205a3b7 ("KVM: vmx: add support for emulating UMIP")
+Cc: stable@vger.kernel.org
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+Note: syzbot report link https://lkml.org/lkml/2019/9/11/799
 
-     /* too early */
-     if (advance_expire_delta < 0) {
-         ns = -advance_expire_delta * 1000000ULL;
-         do_div(ns, vcpu->arch.virtual_tsc_khz);
--        timer_advance_ns -= min((u32)ns,
--            timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-+        timer_advance_ns -= ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
-     } else {
-     /* too late */
-         ns = advance_expire_delta * 1000000ULL;
-         do_div(ns, vcpu->arch.virtual_tsc_khz);
--        timer_advance_ns += min((u32)ns,
--            timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-+        timer_advance_ns += ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
-     }
+ arch/x86/kvm/x86.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
--    if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
--        apic->lapic_timer.timer_advance_adjust_done = true;
--    if (unlikely(timer_advance_ns > 5000)) {
-+    if (unlikely(timer_advance_ns > 5000))
-         timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
--        apic->lapic_timer.timer_advance_adjust_done = false;
--    }
-     apic->lapic_timer.timer_advance_ns = timer_advance_ns;
- }
-
-@@ -1521,7 +1521,7 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-     if (guest_tsc < tsc_deadline)
-         __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-
--    if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-+    if (lapic_timer_advance_ns == -1)
-         adjust_lapic_timer_advance(vcpu,
-apic->lapic_timer.advance_expire_delta);
- }
-
-@@ -2298,10 +2298,8 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int
-timer_advance_ns)
-     apic->lapic_timer.timer.function = apic_timer_fn;
-     if (timer_advance_ns == -1) {
-         apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
--        apic->lapic_timer.timer_advance_adjust_done = false;
-     } else {
-         apic->lapic_timer.timer_advance_ns = timer_advance_ns;
--        apic->lapic_timer.timer_advance_adjust_done = true;
-     }
-
-
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 50053d2..2aad7e2 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -35,7 +35,6 @@ struct kvm_timer {
-     s64 advance_expire_delta;
-     atomic_t pending;            /* accumulated triggered timers */
-     bool hv_timer_in_use;
--    bool timer_advance_adjust_done;
- };
-
- struct kvm_lapic {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 93b0bd4..4f65ef1 100644
+index f7cfd8e..83288ba 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -141,7 +141,7 @@
-  * advancement entirely.  Any other value is used as-is and disables adaptive
-  * tuning, i.e. allows priveleged userspace to set an exact advancement time.
-  */
--static int __read_mostly lapic_timer_advance_ns = -1;
-+int __read_mostly lapic_timer_advance_ns = -1;
- module_param(lapic_timer_advance_ns, int, S_IRUGO | S_IWUSR);
+@@ -8645,6 +8645,10 @@ static int kvm_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+ 			(sregs->cr4 & X86_CR4_OSXSAVE))
+ 		return  -EINVAL;
+ 
++	if (!guest_cpuid_has(vcpu, X86_FEATURE_UMIP) &&
++			(sregs->cr4 & X86_CR4_UMIP))
++		return -EINVAL;
++
+ 	if ((sregs->efer & EFER_LME) && (sregs->cr0 & X86_CR0_PG)) {
+ 		/*
+ 		 * When EFER.LME and CR0.PG are set, the processor is in
+-- 
+2.7.4
 
- static bool __read_mostly vector_hashing = true;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 6594020..2c6ba86 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -301,6 +301,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
-unsigned long cr2,
-
- extern bool enable_vmware_backdoor;
-
-+extern int lapic_timer_advance_ns;
- extern int pi_inject_timer;
-
- extern struct static_key kvm_no_apic_vcpu;
