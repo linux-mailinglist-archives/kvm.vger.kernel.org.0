@@ -2,46 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BACFBB355A
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2019 09:12:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EE17B35D9
+	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2019 09:42:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729172AbfIPHMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Sep 2019 03:12:55 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:38644 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726084AbfIPHMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Sep 2019 03:12:55 -0400
-Received: by mail-pg1-f193.google.com with SMTP id x10so1373716pgi.5;
-        Mon, 16 Sep 2019 00:12:55 -0700 (PDT)
+        id S1730071AbfIPHmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Sep 2019 03:42:38 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40283 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726074AbfIPHmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Sep 2019 03:42:37 -0400
+Received: by mail-pf1-f195.google.com with SMTP id x127so22462117pfb.7;
+        Mon, 16 Sep 2019 00:42:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=0RlJ05uTroP58LEheLIV/N0JmFk4uyJbV6/x+X7o6VI=;
-        b=khSq9uAQ+4px8pQprdT33SHwhZgIWiE6QQUqn6A1d4BRFQ4fUYWlxSPGffYM4n6t3b
-         UO61+6G0TxDA8N2CIe/MqWg5GRELfVfZiwr6LHdo3yRQORIjapdOFylqeIO/WN9l9+ND
-         Ok2SQDvWaFXUmUYkDOsurn6olRrcGoJa0O+KR10nzwxI3SzTBCxvl7Tx9zKUyiTg1Q/0
-         r17BWqvhAbp/TnW0dfK8GlSSI2AM4xFt23VwJrOTFAtK1jEn8f6QSdGURkmvxwSL91QE
-         mcll2iyR8el5VnorIOVh9bznDxdST7Eebso4EWC+nvJc+Gg/kF93WP3u+KHBtr+JEbTD
-         /21A==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iElSScH0z0U2B9GLYDqzyiyFEddhdSl2+XmoY+CYnvk=;
+        b=TdKgVm1KSuoUuweHXf8nrFV8eIYyOvfvBAR8TLSN5mcZF5YfmIOuzIWlWf+QDdiZT1
+         Ale/7tQIDRV+uk8ED/zr3/6d/4w19egG0pabScUjISNOlnBQ4FfeF3D600tfcaE2q/0l
+         w7CZMnm8p0iweES607fM/k/pSviFZKC1MpTkj6fF1VA2ppgJRsnQ8bZs6s0IrSMiBkuR
+         ALU2cFMahLZEPcaRhglEOAQrE2Y0AeUvBdmMsnfaH65r6PT0M7yylkEw4isUnDW0cPyr
+         L8F5e4YyNYDgUX7qnsRFY3UBOg55Mknax+rVLM8BMM/i8QxaUlx+Zt/siwIwmefmIdEb
+         84VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=0RlJ05uTroP58LEheLIV/N0JmFk4uyJbV6/x+X7o6VI=;
-        b=V0h2bCWJvwrWNPcGiEbWVICF0vrCNHF8YIQc51O2ltQSvumvbqKeXQA4Plds26YgSi
-         wflS1K+X/pu7SLq+W0coe/YJMmvL2POFQv2SGut+zC0hGjHu1f+e59yKMTqryDVuLo65
-         bfikrcldWaDA3BToLa1aFeOX71UdC4K0Kns/v+TjmK7HCdjMTjiBCpCa3TWCBzZ8RRGR
-         RjSBiJfAmBFBgmvP0QaLOvnpY8GaJ7TG1LaVk7hQyZLBejz1ll7HG/ZDWq67QiSbZiVz
-         hQoPRICfXIA/22WCFgFACU1tMtT0fYgTtY3Zco2NjwRS+IuSKlABgH6xJ4uZQHl5CntG
-         SBgQ==
-X-Gm-Message-State: APjAAAWMyvQ7d2GW01NJV75yeTc79Pr9hK45zzssMPlNWhVD7KbVgZ1o
-        jBhbZ6mpBC+L9UtQ0Emrv4sTGYYJ
-X-Google-Smtp-Source: APXvYqyK591X0S54vFzFEbUbk6IDBXuo3c1uMvTcq3UQZ7Dodoxn009XsU9TRj0u8Y3ekjlI7Z+w7Q==
-X-Received: by 2002:aa7:8e08:: with SMTP id c8mr64793973pfr.238.1568617974784;
-        Mon, 16 Sep 2019 00:12:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iElSScH0z0U2B9GLYDqzyiyFEddhdSl2+XmoY+CYnvk=;
+        b=A4tDtL+Zd8k+IukmuLYdvvCW9Z7P4tV5L2yMnoRs9Ww80nG420henJDtDUBONN25al
+         z2pKGIb1ini6fJal2dTBSCKqH5fASQoJur0MuAviux/fSqIGyY9p8b4iE9pL4i9nyrED
+         BZIlwupfyqxKXZ6QTpGuez57jT4BZ41JmoqhKPYe6WzqaOQLeyAiv7I/ef/td/cA8rc9
+         PJ7MyJetaZShRH/2Ino4WEvMw3e1oGoTwf+nmj7K1Kf62TYdZpsMG1mWkbZqf+t9/Rrp
+         QwYRuh1XiiGpEovtBnM8y11AEmcIlxXlsjBDJC5jsvJTZJv1H3GBpuM08GNgTpfM5xl6
+         3I/w==
+X-Gm-Message-State: APjAAAXSdNHE6taCRxnGMjCQedGOt3OIXhgoxZG0m0a+GlVqC1eniPI0
+        1Qs2z+PTKlczZgcJ0veAtiurMhws
+X-Google-Smtp-Source: APXvYqz6UXb+1m2RY5wgCOKMbqJoz8UuUxUz1PwKGU2byU6AGn21tsVQ4b9kP+cucwWs52QAxFK4wg==
+X-Received: by 2002:a63:ef4d:: with SMTP id c13mr17809326pgk.200.1568619757028;
+        Mon, 16 Sep 2019 00:42:37 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id r23sm8603061pjo.22.2019.09.16.00.12.52
+        by smtp.googlemail.com with ESMTPSA id s19sm36531063pfe.86.2019.09.16.00.42.34
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 16 Sep 2019 00:12:54 -0700 (PDT)
+        Mon, 16 Sep 2019 00:42:36 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -51,11 +53,14 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
-Subject: [PATCH] KVM: X86: Fix warning in handle_desc
-Date:   Mon, 16 Sep 2019 15:12:49 +0800
-Message-Id: <1568617969-6934-1-git-send-email-wanpengli@tencent.com>
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH v3] KVM: hyperv: Fix Direct Synthetic timers assert an interrupt w/o lapic_in_kernel
+Date:   Mon, 16 Sep 2019 15:42:32 +0800
+Message-Id: <1568619752-3885-1-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -65,53 +70,72 @@ From: Wanpeng Li <wanpengli@tencent.com>
 
 Reported by syzkaller:
 
-	WARNING: CPU: 0 PID: 6544 at /home/kernel/data/kvm/arch/x86/kvm//vmx/vmx.c:4689 handle_desc+0x37/0x40 [kvm_intel]
-	CPU: 0 PID: 6544 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
-	RIP: 0010:handle_desc+0x37/0x40 [kvm_intel]
+	kasan: GPF could be caused by NULL-ptr deref or user memory access
+	general protection fault: 0000 [#1] PREEMPT SMP KASAN
+	RIP: 0010:__apic_accept_irq+0x46/0x740 arch/x86/kvm/lapic.c:1029
 	Call Trace:
-	 vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
-	 vcpu_enter_guest+0x4dc/0x18d0 [kvm]
-	 kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
-	 kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
-	 do_vfs_ioctl+0xa2/0x690
-	 ksys_ioctl+0x6d/0x80
-	 __x64_sys_ioctl+0x1a/0x20
-	 do_syscall_64+0x74/0x720
-	 entry_SYSCALL_64_after_hwframe+0x49/0xbe
+	kvm_apic_set_irq+0xb4/0x140 arch/x86/kvm/lapic.c:558
+	stimer_notify_direct arch/x86/kvm/hyperv.c:648 [inline]
+	stimer_expiration arch/x86/kvm/hyperv.c:659 [inline]
+	kvm_hv_process_stimers+0x594/0x1650 arch/x86/kvm/hyperv.c:686
+	vcpu_enter_guest+0x2b2a/0x54b0 arch/x86/kvm/x86.c:7896
+	vcpu_run+0x393/0xd40 arch/x86/kvm/x86.c:8152
+	kvm_arch_vcpu_ioctl_run+0x636/0x900 arch/x86/kvm/x86.c:8360
+	kvm_vcpu_ioctl+0x6cf/0xaf0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2765
 
-When CR4.UMIP is set, guest should have UMIP cpuid flag. Current 
-kvm set_sregs function doesn't have such check when userspace inputs 
-sregs values. SECONDARY_EXEC_DESC is enabled on writes to CR4.UMIP in 
-vmx_set_cr4 though guest doesn't have UMIP cpuid flag. The testcast 
-triggers handle_desc warning when executing ltr instruction since guest 
-architectural CR4 doesn't set UMIP. This patch fixes it by adding check 
-for guest UMIP cpuid flag when get sreg inputs from userspace.
+The testcase programs HV_X64_MSR_STIMERn_CONFIG/HV_X64_MSR_STIMERn_COUNT,
+in addition, there is no lapic in the kernel, the counters value are small
+enough in order that kvm_hv_process_stimers() inject this already-expired
+timer interrupt into the guest through lapic in the kernel which triggers
+the NULL deferencing. This patch fixes it by don't advertise direct mode 
+synthetic timers and discarding the inject when lapic is not in kernel.
 
-Reported-by: syzbot+0f1819555fbdce992df9@syzkaller.appspotmail.com
-Fixes: 0367f205a3b7 ("KVM: vmx: add support for emulating UMIP")
-Cc: stable@vger.kernel.org
+syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=1752fe0a600000
+
+Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
-Note: syzbot report link https://lkml.org/lkml/2019/9/11/799
+v2 -> v3:
+ * add the link of syzkaller source
+v1 -> v2:
+ * don't advertise direct mode synthetic timers when lapic is not in kernel
 
- arch/x86/kvm/x86.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/x86/kvm/hyperv.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f7cfd8e..83288ba 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8645,6 +8645,10 @@ static int kvm_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 			(sregs->cr4 & X86_CR4_OSXSAVE))
- 		return  -EINVAL;
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index c10a8b1..069e655 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -645,7 +645,9 @@ static int stimer_notify_direct(struct kvm_vcpu_hv_stimer *stimer)
+ 		.vector = stimer->config.apic_vector
+ 	};
  
-+	if (!guest_cpuid_has(vcpu, X86_FEATURE_UMIP) &&
-+			(sregs->cr4 & X86_CR4_UMIP))
-+		return -EINVAL;
+-	return !kvm_apic_set_irq(vcpu, &irq, NULL);
++	if (lapic_in_kernel(vcpu))
++		return !kvm_apic_set_irq(vcpu, &irq, NULL);
++	return 0;
+ }
+ 
+ static void stimer_expiration(struct kvm_vcpu_hv_stimer *stimer)
+@@ -1849,7 +1851,13 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+ 
+ 			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
+ 			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
+-			ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
 +
- 	if ((sregs->efer & EFER_LME) && (sregs->cr0 & X86_CR0_PG)) {
- 		/*
- 		 * When EFER.LME and CR0.PG are set, the processor is in
++			/*
++			 * Direct Synthetic timers only make sense with in-kernel
++			 * LAPIC
++			 */
++			if (lapic_in_kernel(vcpu))
++				ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
+ 
+ 			break;
+ 
 -- 
 2.7.4
 
