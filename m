@@ -2,130 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D60A6B42E0
-	for <lists+kvm@lfdr.de>; Mon, 16 Sep 2019 23:19:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AF6CB443C
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 00:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388001AbfIPVTN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Sep 2019 17:19:13 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:45197 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387869AbfIPVTN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Sep 2019 17:19:13 -0400
-Received: by mail-pl1-f195.google.com with SMTP id x3so445417plr.12
-        for <kvm@vger.kernel.org>; Mon, 16 Sep 2019 14:19:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=NTduAprQpf5BXIgR32H4KO/vbajnVfJjK6aJJRIlN0w=;
-        b=iyPY2Ly1eK2T24BnIP1wlwM6NBvQ4F/DRKK7sDnD1OdFualxmn9Y6f5NvB6hRxsIfY
-         pqjoYo35pXwLMEzw+rDxoztmfaczxTOLUnU5qr40SzzX+f2h3UGBLplCy+XlLmZOJ+jC
-         reohdtal9260EwNsLtaHTk6Z2jkUbPrkmxPxd85+GPdwt+4FqPgsPNsUD2W9m52Ul5pl
-         9bIBQVv01ebfXbZThj1m6ICXi9QT0lTum/AWMB3PQc4PA3inh9OsuwXtVWHW8EMg9pFn
-         dFcwp84m9PNwYMHbZyhfhnl2WJkOp2Hp/qyYgsSxIjza3miAZDeFYK+pxuvidK1HTutn
-         15KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=NTduAprQpf5BXIgR32H4KO/vbajnVfJjK6aJJRIlN0w=;
-        b=ZFCb/8pHA3TJGucdeq+6w0O+mVllBCjZuHdtxCoR9sqy/A0L5x8J/2hs0WPIHsgO5a
-         MlROVpQdUYbxxPHOwkqzycOxRqwk+ors2VEzRoA5yrGgdx51X6YedoNhCM7UIqk1mX7g
-         ZcA1yl1A596CMhdKdb8PtlIP6GcJ0F5AXQ8sMk8SJcULJbzpVJOdamlZlT1CsrxF4Fd9
-         fnn0GpW07K3jpV0LudPXIitzpLnsavxP5ESdoW011dT9AwWwEf9nuJjDYPzwaC3uu6UY
-         +Msq4DUrAYDw4tAzN1qxyhjzvnYK28TKO7yxlFfL1Q5eiD414mhyjH9i0bRiWU27G+En
-         cl6Q==
-X-Gm-Message-State: APjAAAWBLfDzl/xZ7PnGx2x21oW6Dm2teOeewlmcwQdQAs7UieiQXEa1
-        oF5atQBfVQSwrJV0sJIdS3ntxQ==
-X-Google-Smtp-Source: APXvYqz9okX614M5//F969Ugh3JuP1pBtvDHPEEzjXYH4z4nxY8Ps/UcwYY7RuSNqjpKk2odEp//Ag==
-X-Received: by 2002:a17:902:23:: with SMTP id 32mr172110pla.214.1568668752188;
-        Mon, 16 Sep 2019 14:19:12 -0700 (PDT)
-Received: from google.com ([2620:0:1009:11:73e5:72bd:51c7:44f6])
-        by smtp.gmail.com with ESMTPSA id m9sm86056pjf.11.2019.09.16.14.19.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2019 14:19:11 -0700 (PDT)
-Date:   Mon, 16 Sep 2019 14:19:08 -0700
-From:   Oliver Upton <oupton@google.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1732405AbfIPWuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Sep 2019 18:50:51 -0400
+Received: from mga01.intel.com ([192.55.52.88]:46876 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726968AbfIPWuu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Sep 2019 18:50:50 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Sep 2019 15:50:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,514,1559545200"; 
+   d="scan'208";a="387364387"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga006.fm.intel.com with ESMTP; 16 Sep 2019 15:50:50 -0700
+Date:   Mon, 16 Sep 2019 15:50:50 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Oliver Upton <oupton@google.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Peter Shier <pshier@google.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [PATCH v4 4/9] KVM: nVMX: check GUEST_IA32_PERF_GLOBAL_CTRL on
- VM-Entry
-Message-ID: <20190916211908.GB221782@google.com>
+Subject: Re: [PATCH v4 2/9] KVM: nVMX: Load GUEST_IA32_PERF_GLOBAL_CTRL MSR
+ on vm-entry
+Message-ID: <20190916225050.GN18871@linux.intel.com>
 References: <20190906210313.128316-1-oupton@google.com>
- <20190906210313.128316-5-oupton@google.com>
- <20190916181003.GG18871@linux.intel.com>
+ <20190906210313.128316-3-oupton@google.com>
+ <20190916180614.GF18871@linux.intel.com>
+ <20190916211742.GA221782@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190916181003.GG18871@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190916211742.GA221782@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 16, 2019 at 11:10:03AM -0700, Sean Christopherson wrote:
-> On Fri, Sep 06, 2019 at 02:03:08PM -0700, Oliver Upton wrote:
-> > Add condition to nested_vmx_check_guest_state() to check the validity of
-> > GUEST_IA32_PERF_GLOBAL_CTRL. Per Intel's SDM Vol 3 26.3.1.1:
+On Mon, Sep 16, 2019 at 02:17:42PM -0700, Oliver Upton wrote:
+> On Mon, Sep 16, 2019 at 11:06:14AM -0700, Sean Christopherson wrote:
+> > On Fri, Sep 06, 2019 at 02:03:06PM -0700, Oliver Upton wrote:
+> > > Add condition to prepare_vmcs02 which loads IA32_PERF_GLOBAL_CTRL on
+> > > VM-entry if the "load IA32_PERF_GLOBAL_CTRL" bit on the VM-entry control
+> > > is set. Use kvm_set_msr() rather than directly writing to the field to
+> > > avoid overwrite by atomic_switch_perf_msrs().
+> > > 
+> > > Suggested-by: Jim Mattson <jmattson@google.com>
+> > > Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > > Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > Reviewed-by: Jim Mattson <jmattson@google.com>
+> > > Reviewed-by: Peter Shier <pshier@google.com>
+> > > ---
+> > >  arch/x86/kvm/vmx/nested.c | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > index b0ca34bf4d21..9ba90b38d74b 100644
+> > > --- a/arch/x86/kvm/vmx/nested.c
+> > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > @@ -2281,6 +2281,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+> > >  {
+> > >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > >  	struct hv_enlightened_vmcs *hv_evmcs = vmx->nested.hv_evmcs;
+> > > +	struct msr_data msr_info;
+> > >  	bool load_guest_pdptrs_vmcs12 = false;
+> > >  
+> > >  	if (vmx->nested.dirty_vmcs12 || hv_evmcs) {
+> > > @@ -2404,6 +2405,16 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+> > >  	if (!enable_ept)
+> > >  		vcpu->arch.walk_mmu->inject_page_fault = vmx_inject_page_fault_nested;
+> > >  
+> > > +	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) {
+> > > +		msr_info.host_initiated = false;
+> > > +		msr_info.index = MSR_CORE_PERF_GLOBAL_CTRL;
+> > > +		msr_info.data = vmcs12->guest_ia32_perf_global_ctrl;
+> > > +		if (kvm_set_msr(vcpu, &msr_info))
+> > > +			pr_debug_ratelimited(
+> > > +				"%s cannot write MSR (0x%x, 0x%llx)\n",
+> > > +				__func__, msr_info.index, msr_info.data);
 > > 
-> >   If the "load IA32_PERF_GLOBAL_CTRL" VM-entry control is 1, bits
-> >   reserved in the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the field for that
-> >   register.
-> > 
-> > Suggested-by: Jim Mattson <jmattson@google.com>
-> > Co-developed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> > Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > Reviewed-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Peter Shier <pshier@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 9ba90b38d74b..6c3aa3bcede3 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -10,6 +10,7 @@
-> >  #include "hyperv.h"
-> >  #include "mmu.h"
-> >  #include "nested.h"
-> > +#include "pmu.h"
-> >  #include "trace.h"
-> >  #include "x86.h"
-> >  
-> > @@ -2732,6 +2733,7 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
-> >  					u32 *exit_qual)
-> >  {
-> >  	bool ia32e;
-> > +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> > Same comment on printing the name.  Might be work adding a helper function
+> > or macro?  That'd also avoid blasting past the 80-column guideline.
 > 
-> Nit: I wouldn't bother with a local variable, just call vcpu_to_pmu() when
-> invoking kvm_is_valid_perf_global_ctrl(), especially since you need a line
-> break anyways.
+> Thanks for the review, Sean. I believe that in one of the prior sets I
+> mailed out you had mentioned a macro for this as well, but was a fix
+> throughout KVM. Shall I introduce the macro as part of this series, but
+> only apply it to my changes (and fix other call sites later on)?
 
-Ack to both (here and on 5/9).
+Heh, I'm not sure if by "KVM wide" I was thinking just interface to
+kvm_set_msr() and kvm_get_msr(), or if I was thiking this specific
+pr_debug line as well.
 
-> >  
-> >  	*exit_qual = ENTRY_FAIL_DEFAULT;
-> >  
-> > @@ -2748,6 +2750,11 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > +	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL &&
-> > +	    !kvm_is_valid_perf_global_ctrl(pmu,
-> > +					   vmcs12->guest_ia32_perf_global_ctrl))
-> > +		return -EINVAL;
-> > +
-> >  	/*
-> >  	 * If the load IA32_EFER VM-entry control is 1, the following checks
-> >  	 * are performed on the field for the IA32_EFER MSR:
-> > -- 
-> > 2.23.0.187.g17f5b7556c-goog
-> > 
+But, it's a moot point if we can pre-check the vmcs12 value and thus
+WARN on failure here.
