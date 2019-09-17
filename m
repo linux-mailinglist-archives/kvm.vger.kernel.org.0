@@ -2,165 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C8F9B53DB
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 19:18:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EEB5B544D
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 19:32:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730876AbfIQRSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 13:18:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46529 "EHLO mx1.redhat.com"
+        id S1731202AbfIQRbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 13:31:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41468 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730851AbfIQRSh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 13:18:37 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726125AbfIQRbf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 13:31:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9C41AC049E10
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 17:18:36 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id z205so1508080wmb.7
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 10:18:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CzdzjDs1PS5s1r26tWjnHvjUliGuiGe3yhX4kLQL7+c=;
-        b=Weltwlgf7xKrEMi8MQKTbGlAs5hee+i4jxsKiWRAxm858TLhGyhQc6W5s5J8fbRX8O
-         iENqwHaX7S343ok/FPZJm4erOLr66crGvTeefIyzSvlTIaXQMgfwzea5mO3G6B/VTCkw
-         SyN7g0vd2wA9d/n23TGSGFr8ERXP6P9ZCJAxncCFHe8WwWM8752lB27fCI7DJC88qhMb
-         hDdTCEq1PAUzQFALeMI/B8kXpevUfTlzarXYhkV4CHEXEwxGc/AWIfHTXijKgM0d5vzn
-         d+sAWdsYfO8Rp2rDG/i7NroreY26PDThWRJgLc4N9DwTClp1tD278pkZDtOkzSgil+hq
-         AWOw==
-X-Gm-Message-State: APjAAAXjBDq8o2r+eXtAuB0g2wFj9e5nXt2Z1CRtqbh0ay2ciI79PyL9
-        f//VXBSnjqoGmom+M8BNKOZWHPrgH9pCugtkjTI7890MLNwUhn8jPnIQ+DxcvQ6zp65or5puLqI
-        aWKA3PwbSMZi2
-X-Received: by 2002:a05:600c:2052:: with SMTP id p18mr4341225wmg.13.1568740714968;
-        Tue, 17 Sep 2019 10:18:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyZJ8SQPxCUeDeSltgjjv/+2lWN6pyzNKs4z2B/WxLTQIkeThwpFZrZjf+Y9TYVkv4mFihBKg==
-X-Received: by 2002:a05:600c:2052:: with SMTP id p18mr4341206wmg.13.1568740714697;
-        Tue, 17 Sep 2019 10:18:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
-        by smtp.gmail.com with ESMTPSA id s12sm4981466wra.82.2019.09.17.10.18.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2019 10:18:34 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: Use DEFINE_DEBUGFS_ATTRIBUTE for debugfs files
-To:     Yi Wang <wang.yi59@zte.com.cn>
-Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        up2wing@gmail.com, wang.liang82@zte.com.cn,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <1563780839-14739-1-git-send-email-wang.yi59@zte.com.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <31eec57f-2bc8-0ea0-e5fb-6b21ce902aae@redhat.com>
-Date:   Tue, 17 Sep 2019 19:18:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 88C9E10C0932;
+        Tue, 17 Sep 2019 17:31:34 +0000 (UTC)
+Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3ABBC60852;
+        Tue, 17 Sep 2019 17:31:26 +0000 (UTC)
+Date:   Tue, 17 Sep 2019 11:31:25 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        mst@redhat.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        cohuck@redhat.com, farman@linux.ibm.com, pasic@linux.ibm.com,
+        sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        pmorel@linux.ibm.com, freude@linux.ibm.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com, idos@mellanox.com,
+        xiao.w.wang@intel.com, lingshan.zhu@intel.com,
+        Parav Pandit <parav@mellanox.com>
+Subject: Re: [RFC PATCH 0/2] Mdev: support mutiple kinds of devices
+Message-ID: <20190917113125.6b2970e5@x1.home>
+In-Reply-To: <20190912094012.29653-1-jasowang@redhat.com>
+References: <20190912094012.29653-1-jasowang@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <1563780839-14739-1-git-send-email-wang.yi59@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.66]); Tue, 17 Sep 2019 17:31:35 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/07/19 09:33, Yi Wang wrote:
-> We got these coccinelle warning:
-> ./arch/x86/kvm/debugfs.c:23:0-23: WARNING: vcpu_timer_advance_ns_fops
-> should be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> ./arch/x86/kvm/debugfs.c:32:0-23: WARNING: vcpu_tsc_offset_fops should
-> be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> ./arch/x86/kvm/debugfs.c:41:0-23: WARNING: vcpu_tsc_scaling_fops should
-> be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> ./arch/x86/kvm/debugfs.c:49:0-23: WARNING: vcpu_tsc_scaling_frac_fops
-> should be defined with DEFINE_DEBUGFS_ATTRIBUTE
+[cc +Parav]
+
+On Thu, 12 Sep 2019 17:40:10 +0800
+Jason Wang <jasowang@redhat.com> wrote:
+
+> Hi all:
 > 
-> Use DEFINE_DEBUGFS_ATTRIBUTE() rather than DEFINE_SIMPLE_ATTRIBUTE()
-> to fix this.
+> During the development of virtio-mdev[1]. I find that mdev needs to be
+> extended to support devices other than vfio mdev device. So this
+> series tries to extend the mdev to be able to differ from different
+> devices by:
 > 
-> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-
-It sucks though that you have to use a function with "unsafe" in the name.
-
-Greg, is the patch doing the right thing?
-
-Paolo
-
-> ---
->  arch/x86/kvm/debugfs.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+> - device id and matching for mdev bus
+> - device speicfic callbacks and move vfio callbacks there
 > 
-> diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-> index 329361b..24016fb 100644
-> --- a/arch/x86/kvm/debugfs.c
-> +++ b/arch/x86/kvm/debugfs.c
-> @@ -20,7 +20,7 @@ static int vcpu_get_timer_advance_ns(void *data, u64 *val)
->  	return 0;
->  }
->  
-> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_timer_advance_ns_fops, vcpu_get_timer_advance_ns, NULL, "%llu\n");
-> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_timer_advance_ns_fops, vcpu_get_timer_advance_ns, NULL, "%llu\n");
->  
->  static int vcpu_get_tsc_offset(void *data, u64 *val)
->  {
-> @@ -29,7 +29,7 @@ static int vcpu_get_tsc_offset(void *data, u64 *val)
->  	return 0;
->  }
->  
-> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_offset_fops, vcpu_get_tsc_offset, NULL, "%lld\n");
-> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_offset_fops, vcpu_get_tsc_offset, NULL, "%lld\n");
->  
->  static int vcpu_get_tsc_scaling_ratio(void *data, u64 *val)
->  {
-> @@ -38,7 +38,7 @@ static int vcpu_get_tsc_scaling_ratio(void *data, u64 *val)
->  	return 0;
->  }
->  
-> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL, "%llu\n");
-> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL, "%llu\n");
->  
->  static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
->  {
-> @@ -46,20 +46,20 @@ static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
->  	return 0;
->  }
->  
-> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_frac_fops, vcpu_get_tsc_scaling_frac_bits, NULL, "%llu\n");
-> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_scaling_frac_fops, vcpu_get_tsc_scaling_frac_bits, NULL, "%llu\n");
->  
->  int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
->  {
->  	struct dentry *ret;
->  
-> -	ret = debugfs_create_file("tsc-offset", 0444,
-> +	ret = debugfs_create_file_unsafe("tsc-offset", 0444,
->  							vcpu->debugfs_dentry,
->  							vcpu, &vcpu_tsc_offset_fops);
->  	if (!ret)
->  		return -ENOMEM;
->  
->  	if (lapic_in_kernel(vcpu)) {
-> -		ret = debugfs_create_file("lapic_timer_advance_ns", 0444,
-> +		ret = debugfs_create_file_unsafe("lapic_timer_advance_ns", 0444,
->  								vcpu->debugfs_dentry,
->  								vcpu, &vcpu_timer_advance_ns_fops);
->  		if (!ret)
-> @@ -67,12 +67,12 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
->  	}
->  
->  	if (kvm_has_tsc_control) {
-> -		ret = debugfs_create_file("tsc-scaling-ratio", 0444,
-> +		ret = debugfs_create_file_unsafe("tsc-scaling-ratio", 0444,
->  							vcpu->debugfs_dentry,
->  							vcpu, &vcpu_tsc_scaling_fops);
->  		if (!ret)
->  			return -ENOMEM;
-> -		ret = debugfs_create_file("tsc-scaling-ratio-frac-bits", 0444,
-> +		ret = debugfs_create_file_unsafe("tsc-scaling-ratio-frac-bits", 0444,
->  							vcpu->debugfs_dentry,
->  							vcpu, &vcpu_tsc_scaling_frac_fops);
->  		if (!ret)
+> Sent for early reivew, compile test only!
+> 
+> Thanks
+> 
+> [1] https://lkml.org/lkml/2019/9/10/135
+
+I expect Parav must have something similar in the works for their
+in-kernel networking mdev support.  Link to discussion so far:
+
+https://lore.kernel.org/kvm/20190912094012.29653-1-jasowang@redhat.com/T/#t
+
+Thanks,
+Alex
+
+
+> Jason Wang (2):
+>   mdev: device id support
+>   mdev: introduce device specific ops
+> 
+>  drivers/gpu/drm/i915/gvt/kvmgt.c  | 16 ++++---
+>  drivers/s390/cio/vfio_ccw_ops.c   | 16 ++++---
+>  drivers/s390/crypto/vfio_ap_ops.c | 13 ++++--
+>  drivers/vfio/mdev/mdev_core.c     | 14 +++++-
+>  drivers/vfio/mdev/mdev_driver.c   | 14 ++++++
+>  drivers/vfio/mdev/mdev_private.h  |  1 +
+>  drivers/vfio/mdev/vfio_mdev.c     | 36 ++++++++++-----
+>  include/linux/mdev.h              | 76 +++++++++++++++++++------------
+>  include/linux/mod_devicetable.h   |  6 +++
+>  samples/vfio-mdev/mbochs.c        | 18 +++++---
+>  samples/vfio-mdev/mdpy.c          | 18 +++++---
+>  samples/vfio-mdev/mtty.c          | 16 ++++---
+>  12 files changed, 163 insertions(+), 81 deletions(-)
 > 
 
