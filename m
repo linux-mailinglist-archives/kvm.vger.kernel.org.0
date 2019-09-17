@@ -2,137 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24324B50E1
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 16:59:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B05B5101
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 17:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728859AbfIQO7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 10:59:03 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:46437 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727751AbfIQO7D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 10:59:03 -0400
-Received: by mail-io1-f65.google.com with SMTP id d17so8221499ios.13
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 07:59:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4N/btWkhdRtAkLwnNEi3JvgTHWUB7am8sFUWn4QTMHo=;
-        b=Vl+iO5Psm3owdP69GO+WOZQtnoLDGAdiMyy8AlEs6zj4KE57ayqKDns6d5FrJn5ROq
-         IGhwt1lh/vRUdyTt+CFCXnyKqmikSQqVhZXIEOj2KHwNr6k0Xuwx51HzaNHP8+vLH9rn
-         QxW4R+EVLL/5PivNA1qKPwAUzPWQ2jRsKoE9rxXNAtD8q3PcuUO9CR38EFV/4XMqqSnF
-         W7PTBHS/61nGVwhiw6EBQvCwO9ZxJq7pnVSmcp/9howaygFWPLKfe/DeMe9slMlkiwXm
-         f4jbaxLXZjDlgut4uJnT0u08GS7ZjP/PxosvoKtce/aPB6MMWEEQ8LBRv5MQpTwzzR6s
-         w6yQ==
+        id S1728940AbfIQPHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 11:07:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33302 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727962AbfIQPHW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 11:07:22 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D9D6185540
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 15:07:21 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id 32so1414804wrk.15
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 08:07:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4N/btWkhdRtAkLwnNEi3JvgTHWUB7am8sFUWn4QTMHo=;
-        b=bmsikg0lV/TVxJohtzCUhwB3QQYp6MubcrEIrJ5o11RjOU6hF0blwKJ+lVxkyppGoX
-         qeyf4pZwf0Em7QKfI3/+Dn9PsxE0qKZGegN/up6A1M0ExjS8djX3k/3i3+5uA6YHls3r
-         lnJCJXcAn+em+/1oDsanb60LLrc/NnDHZEKbjcW/PePbTweCyb1NB/m16C7m4Zzre+zE
-         Bfk5PsX8NivqNVVqlfRqRlT/j9OIFRsGFpDTtbSSbjG5syJAjefyXcXSk+mI3V1t0YSi
-         BkzypZ6xVFXdWcXPCSs5ETNba3bGBLLf/YxwjBg/oed244RIcT+Utm9fWnkreETJvVuo
-         Hr5w==
-X-Gm-Message-State: APjAAAULq8Tvw6k/i1OsiSFGtj2rx4GMDkr8pXPc/+mSMZr0fYnizin9
-        XOgzwyq9FDZI9SRuAkLyA2Xv1kmbqFc5Pa1ST3G0o2rfj9g=
-X-Google-Smtp-Source: APXvYqz9DvHQNg9JiUWZur8kh4NHVWmxIc5OJSKjAK0NEC6eFvWeXKcUfTuQH1pek1NBrEZiHfP0dJlLdiC+XjpI0K0=
-X-Received: by 2002:a05:6602:115:: with SMTP id s21mr3306650iot.122.1568732342359;
- Tue, 17 Sep 2019 07:59:02 -0700 (PDT)
-MIME-Version: 1.0
-References: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 17 Sep 2019 07:58:51 -0700
-Message-ID: <CALMp9eSNTvHsSn55iNfF1tUAdAihz_2d5-Hac1H6TnvHyos-SQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: Fix coalesced mmio ring buffer out-of-bounds access
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=M2ROnRjQ6XpEbY6C1uWSxsB5sbZASsuQ60ehBi16Vdg=;
+        b=jeoL+nLehqKw0OG5A71ZgX1Z6RJlhNR37igEtMB0DBMaF5g41BH7rm3bACjGUxMquZ
+         t+JBFrJrDJcuRJ44fe6ZS7v2Qz48fbE/yKOPpBY2vUWi5g3/fG8SFZQaSsLSnGn6qAo9
+         7gGq7fBxWDE04A+7PpAuO6O2eTDRuThNSMVvIx8FNkSatzMP4VrLjQRry49LcRDgpa+C
+         SXQPb7jxbxSbK/jdqOsk9TIV5tYPZAPBPYYXhx/M455lEz1Q9TD6Tf90D1yu5BqMUiys
+         lb08fwcDroRyaVHWjgVnPUKc3mh5ZO2bMJvNZIzwOaMvWvTzO0mukHmwQDZMwQKAaMM6
+         PAXA==
+X-Gm-Message-State: APjAAAWXUrxFCmFv0QozYUfHhiv4BJDN+WxRnfDkBjqxUxnx9gS23cgx
+        A2kUHaz9ewcyttYsLSSxBk5oxq8q+erDDOA4JouWYKBgbJauqTXyjhwIUeGwEuzDxyFNRJibdXa
+        OVDV7i1lLpGwx
+X-Received: by 2002:a1c:4945:: with SMTP id w66mr3879982wma.40.1568732840417;
+        Tue, 17 Sep 2019 08:07:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzfBL68muJMrD+6aSC2mEoAARgymHATsfuDq2EeQrj/3TNTzPyXY2MqroywfTD46hCjM2QDFA==
+X-Received: by 2002:a1c:4945:: with SMTP id w66mr3879960wma.40.1568732840153;
+        Tue, 17 Sep 2019 08:07:20 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
+        by smtp.gmail.com with ESMTPSA id h17sm4388192wme.6.2019.09.17.08.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Sep 2019 08:07:19 -0700 (PDT)
+Subject: Re: [PATCH v2 03/14] KVM: x86: Refactor kvm_vcpu_do_singlestep() to
+ remove out param
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org,
-        Matt Delco <delco@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
+References: <20190827214040.18710-1-sean.j.christopherson@intel.com>
+ <20190827214040.18710-4-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4a49e819-08bf-7824-f6e1-2f37f2b1a4a4@redhat.com>
+Date:   Tue, 17 Sep 2019 17:07:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190827214040.18710-4-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 1:16 AM Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> Reported by syzkaller:
->
->         #PF: supervisor write access in kernel mode
->         #PF: error_code(0x0002) - not-present page
->         PGD 403c01067 P4D 403c01067 PUD 0
->         Oops: 0002 [#1] SMP PTI
->         CPU: 1 PID: 12564 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
->         RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
->         Call Trace:
->          __kvm_io_bus_write+0x91/0xe0 [kvm]
->          kvm_io_bus_write+0x79/0xf0 [kvm]
->          write_mmio+0xae/0x170 [kvm]
->          emulator_read_write_onepage+0x252/0x430 [kvm]
->          emulator_read_write+0xcd/0x180 [kvm]
->          emulator_write_emulated+0x15/0x20 [kvm]
->          segmented_write+0x59/0x80 [kvm]
->          writeback+0x113/0x250 [kvm]
->          x86_emulate_insn+0x78c/0xd80 [kvm]
->          x86_emulate_instruction+0x386/0x7c0 [kvm]
->          kvm_mmu_page_fault+0xf9/0x9e0 [kvm]
->          handle_ept_violation+0x10a/0x220 [kvm_intel]
->          vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
->          vcpu_enter_guest+0x4dc/0x18d0 [kvm]
->          kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
->          kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
->          do_vfs_ioctl+0xa2/0x690
->          ksys_ioctl+0x6d/0x80
->          __x64_sys_ioctl+0x1a/0x20
->          do_syscall_64+0x74/0x720
->          entry_SYSCALL_64_after_hwframe+0x49/0xbe
->         RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
->
-> Both the coalesced_mmio ring buffer indexs ring->first and ring->last are
-> bigger than KVM_COALESCED_MMIO_MAX from the testcase, array out-of-bounds
-> access triggers by ring->coalesced_mmio[ring->last].phys_addr = addr;
-> assignment. This patch fixes it by mod indexs by KVM_COALESCED_MMIO_MAX.
->
-> syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134b2826a00000
->
-> Reported-by: syzbot+983c866c3dd6efa3662a@syzkaller.appspotmail.com
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+On 27/08/19 23:40, Sean Christopherson wrote:
+> Return the single-step emulation result directly instead of via an out
+> param.  Presumably at some point in the past kvm_vcpu_do_singlestep()
+> could be called with *r==EMULATE_USER_EXIT, but that is no longer the
+> case, i.e. all callers are happy to overwrite their own return variable.
+
+It was actually done for consistency with kvm_vcpu_check_breakpoint.
+It's okay to change it.
+
+Paolo
+
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  virt/kvm/coalesced_mmio.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-> index 5294abb..cff1ec9 100644
-> --- a/virt/kvm/coalesced_mmio.c
-> +++ b/virt/kvm/coalesced_mmio.c
-> @@ -73,6 +73,8 @@ static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
->
->         spin_lock(&dev->kvm->ring_lock);
->
-> +       ring->first = ring->first % KVM_COALESCED_MMIO_MAX;
-> +       ring->last = ring->last % KVM_COALESCED_MMIO_MAX;
+>  arch/x86/kvm/x86.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c6de5bc4fa5e..fe847f8eb947 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6377,7 +6377,7 @@ static int kvm_vcpu_check_hw_bp(unsigned long addr, u32 type, u32 dr7,
+>  	return dr6;
+>  }
+>  
+> -static void kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu, int *r)
+> +static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_run *kvm_run = vcpu->run;
+>  
+> @@ -6386,10 +6386,10 @@ static void kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu, int *r)
+>  		kvm_run->debug.arch.pc = vcpu->arch.singlestep_rip;
+>  		kvm_run->debug.arch.exception = DB_VECTOR;
+>  		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+> -		*r = EMULATE_USER_EXIT;
+> -	} else {
+> -		kvm_queue_exception_p(vcpu, DB_VECTOR, DR6_BS);
+> +		return EMULATE_USER_EXIT;
+>  	}
+> +	kvm_queue_exception_p(vcpu, DB_VECTOR, DR6_BS);
+> +	return EMULATE_DONE;
+>  }
+>  
+>  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+> @@ -6410,7 +6410,7 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>  	 * that sets the TF flag".
+>  	 */
+>  	if (unlikely(rflags & X86_EFLAGS_TF))
+> -		kvm_vcpu_do_singlestep(vcpu, &r);
+> +		r = kvm_vcpu_do_singlestep(vcpu);
+>  	return r == EMULATE_DONE;
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_skip_emulated_instruction);
+> @@ -6613,7 +6613,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
+>  		vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
+>  		kvm_rip_write(vcpu, ctxt->eip);
+>  		if (r == EMULATE_DONE && ctxt->tf)
+> -			kvm_vcpu_do_singlestep(vcpu, &r);
+> +			r = kvm_vcpu_do_singlestep(vcpu);
+>  		if (!ctxt->have_exception ||
+>  		    exception_type(ctxt->exception.vector) == EXCPT_TRAP)
+>  			__kvm_set_rflags(vcpu, ctxt->eflags);
+> 
 
-I don't think this is sufficient, since the memory that ring points to
-is shared with userspace. Userspace can overwrite your corrected
-values with illegal ones before they are used. Not exactly a TOCTTOU
-issue, since there isn't technically a 'check' here, but the same
-idea.
-
->         if (!coalesced_mmio_has_room(dev)) {
->                 spin_unlock(&dev->kvm->ring_lock);
->                 return -EOPNOTSUPP;
-> --
-> 2.7.4
->
