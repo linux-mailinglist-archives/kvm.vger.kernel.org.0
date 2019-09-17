@@ -2,91 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 62344B49E4
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:53:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD335B4A72
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 11:27:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726359AbfIQIw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 04:52:57 -0400
-Received: from mga18.intel.com ([134.134.136.126]:37165 "EHLO mga18.intel.com"
+        id S1727469AbfIQJ1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 05:27:13 -0400
+Received: from mga11.intel.com ([192.55.52.93]:6874 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726081AbfIQIwo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 04:52:44 -0400
+        id S1727447AbfIQJ1N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 05:27:13 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 01:52:43 -0700
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 02:27:12 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,515,1559545200"; 
-   d="scan'208";a="193695550"
-Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Sep 2019 01:52:41 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com
-Cc:     mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
-        yu.c.zhang@intel.com, alazar@bitdefender.com,
-        Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v5 9/9] mmu: spp: Handle SPP protected pages when VM memory changes
-Date:   Tue, 17 Sep 2019 16:53:04 +0800
-Message-Id: <20190917085304.16987-10-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20190917085304.16987-1-weijiang.yang@intel.com>
-References: <20190917085304.16987-1-weijiang.yang@intel.com>
+   d="scan'208";a="270483217"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga001.jf.intel.com with ESMTP; 17 Sep 2019 02:27:11 -0700
+Received: from FMSMSX109.amr.corp.intel.com (10.18.116.9) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 17 Sep 2019 02:27:11 -0700
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ fmsmsx109.amr.corp.intel.com (10.18.116.9) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 17 Sep 2019 02:27:10 -0700
+Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.92]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.195]) with mapi id 14.03.0439.000;
+ Tue, 17 Sep 2019 17:27:08 +0800
+From:   "Zhang, Tina" <tina.zhang@intel.com>
+To:     "kraxel@redhat.com" <kraxel@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>
+Subject: RE: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
+Thread-Topic: [PATCH v5 0/6] Deliver vGPU display refresh event to userspace
+Thread-Index: AQHVU9tUM+mrk1EK3UW2FOPyJRIR1KcZNxaggAMX1YCAE3M5kA==
+Date:   Tue, 17 Sep 2019 09:27:08 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC87734BB6@SHSMSX101.ccr.corp.intel.com>
+References: <20190816023528.30210-1-tina.zhang@intel.com>
+ <237F54289DF84E4997F34151298ABEBC8771E7AE@SHSMSX101.ccr.corp.intel.com>
+ <20190905074857.n3akutnoarnfvg4y@sirius.home.kraxel.org>
+In-Reply-To: <20190905074857.n3akutnoarnfvg4y@sirius.home.kraxel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNmNhNzQ0MTctZjBjNy00ZmI3LThiMzItYTg0MTBiNDJkN2U3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibmc3aVwvMmlTQnVoYkwwVzRseHlpd3pEUFZcLzh1VHlzcEk0ZlRPMEl3UCtQZ08xYlhQejQ0ejZ6WHdcL3lENWtWeCJ9
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Host page swapping/migration may change the translation in
-EPT leaf entry, if the target page is SPP protected,
-re-enable SPP protection in MMU notifier. If SPPT shadow
-page is reclaimed, the level1 pages don't have rmap to clear.
-
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/kvm/mmu.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index c9c430d2c7e3..c1c744ab05c9 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -1828,6 +1828,24 @@ static int kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 			new_spte &= ~PT_WRITABLE_MASK;
- 			new_spte &= ~SPTE_HOST_WRITEABLE;
- 
-+			/*
-+			 * if it's EPT leaf entry and the physical page is
-+			 * SPP protected, then re-enable SPP protection for
-+			 * the page.
-+			 */
-+			if (kvm->arch.spp_active &&
-+			    level == PT_PAGE_TABLE_LEVEL) {
-+				struct kvm_subpage spp_info = {0};
-+				int i;
-+
-+				spp_info.base_gfn = gfn;
-+				spp_info.npages = 1;
-+				i = kvm_spp_get_permission(kvm, &spp_info);
-+				if (i == 1 &&
-+				    spp_info.access_map[0] != FULL_SPP_ACCESS)
-+					new_spte |= PT_SPP_MASK;
-+			}
-+
- 			new_spte = mark_spte_for_access_track(new_spte);
- 
- 			mmu_spte_clear_track_bits(sptep);
-@@ -2677,6 +2695,10 @@ static bool mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
- 	pte = *spte;
- 	if (is_shadow_present_pte(pte)) {
- 		if (is_last_spte(pte, sp->role.level)) {
-+			/* SPPT leaf entries don't have rmaps*/
-+			if (sp->role.level == PT_PAGE_TABLE_LEVEL &&
-+			    is_spp_spte(sp))
-+				return true;
- 			drop_spte(kvm, spte);
- 			if (is_large_pte(pte))
- 				--kvm->stat.lpages;
--- 
-2.17.2
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogaW50ZWwtZ3Z0LWRldiBb
+bWFpbHRvOmludGVsLWd2dC1kZXYtYm91bmNlc0BsaXN0cy5mcmVlZGVza3RvcC5vcmddIE9uDQo+
+IEJlaGFsZiBPZiBrcmF4ZWxAcmVkaGF0LmNvbQ0KPiBTZW50OiBUaHVyc2RheSwgU2VwdGVtYmVy
+IDUsIDIwMTkgMzo0OSBQTQ0KPiBUbzogWmhhbmcsIFRpbmEgPHRpbmEuemhhbmdAaW50ZWwuY29t
+Pg0KPiBDYzoga3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9y
+ZzsgWXVhbiwgSGFuZw0KPiA8aGFuZy55dWFuQGludGVsLmNvbT47IGFsZXgud2lsbGlhbXNvbkBy
+ZWRoYXQuY29tOyBMdiwgWmhpeXVhbg0KPiA8emhpeXVhbi5sdkBpbnRlbC5jb20+OyBpbnRlbC1n
+dnQtZGV2QGxpc3RzLmZyZWVkZXNrdG9wLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHY1IDAv
+Nl0gRGVsaXZlciB2R1BVIGRpc3BsYXkgcmVmcmVzaCBldmVudCB0byB1c2Vyc3BhY2UNCj4gDQo+
+ICAgSGksDQo+IA0KPiA+IE9wdGlvbiAyOiBRRU1VIHByb3ZpZGVzIHRoZSBlbXVsYXRlZCBkaXNw
+bGF5IHJlZnJlc2ggZXZlbnQgdG8gdGhlDQo+ID4gdmdwdXMgcHJvdmlkZWQgYnkgdmVuZG9yIGRy
+aXZlci4gRm9yIHZncHVzLCB0aGUgZGlzcGxheSByZWZyZXNoIGV2ZW50DQo+ID4gY2FuIGJlIGNv
+bnNpZGVyZWQgYXMgdGhlIHZibGFuayBldmVudCB3aGljaCBpcyBsZXZlcmFnZWQgYnkgZ3Vlc3QN
+Cj4gPiB3aW5kb3cgbWFuYWdlciB0byBkbyB0aGUgcGxhbmUgdXBkYXRlIG9yIG1vZGUtc2V0dGlu
+Zy4NCj4gDQo+ID4gUGVvcGxlIGFyZSBhc2tpbmcgaWYgb3B0aW9uIDIgY291bGQgYmUgYSBiZXR0
+ZXIgY2hvaWNlLg0KPiANCj4gQ2VydGFpbmx5IHdvcnRoIHRyeWluZywgbWF5YmUgaXQgZXZlbiBt
+YWtlcyBzZW5zZSB0byBpbXBsZW1lbnQgYm90aCBhbmQNCj4gbGV0IHFlbXUgcGljayBvbmUsIHBv
+c3NpYmx5IGV2ZW4gc3dpdGNoIHRoZW0gYXQgcnVudGltZS4NCj4gDQo+IHFlbXUgY2FuIGNoYW5n
+ZSB0aGUgcmVmcmVzaCByYXRlLiAgdm5jIGFuZCBzZGwgdXNlIHRoYXQgdG8gcmVkdWNlIHRoZQ0K
+PiByZWZyZXNoIHJhdGUgaW4gY2FzZSBub2JvZHkgaXMgbG9va2luZyAobm8gdm5jIGNsaWVudCBj
+b25uZWN0ZWQsIHNkbCB3aW5kb3cNCj4gbWluaW1pemVkKS4gIEl0IHN1cmVseSBtYWtlcyBzZW5z
+ZSB0byBtYWtlIHRoYXQgdmlzaWJsZSB0byB0aGUgZ3Vlc3Qgc28gaXQgY2FuDQo+IHRocm90dGxl
+IGRpc3BsYXkgdXBkYXRlcyB0b28uICBJJ20gbm90IHN1cmUgdmJsYW5rIGlzIHRoZSB3YXkgdG8g
+Z28gdGhvdWdoLA0KPiBndWVzdHMgbWlnaHQgcnVuIGludG8gdmJsYW5rIGlycSB0aW1lb3V0cyBp
+biBjYXNlIHRoZSByZWZyZXNoIHJhdGUgaXMgdmVyeQ0KPiBsb3cgLi4uDQoNCkluZGVlZCwgbG93
+IHZibGFuayByYXRlIGlzbid0IGV4cGVjdGVkIGJ5IGd1ZXN0IGdmeCBkcml2ZXIuIEl0IGNvbXBs
+YWlucyBhYm91dCB0aGUgdGltZW91dCBlcnJvciBhbGwgdGhlIHRpbWUsIHdoZW4gdGhlIHZibGFu
+ayBpcyBsb3cuIA0KDQpDdXJyZW50bHksIGd2dC1nIHByb3ZpZGVzIGZ1bGwgdmlydHVhbGl6ZWQg
+ZGlzcGxheSBtb2RlbCAoYS5rLmEuIG5vdCBwdikuIEFuZCB0aGUgb3B0aW9uIDIgaXMgbW9yZSBs
+aWtlIGEgcHYgc29sdXRpb24gZm9yIHBlcmZvcm1hbmNlIG9wdGltaXphdGlvbiwgd2hpY2ggaXMg
+b2YgY291cnNlIGEgdmVyeSBnb29kIHByb3Bvc2FsLiBTaW5jZSB0aGUgdHdvIG9wdGlvbnMgaGF2
+ZSBubyBkZXBlbmRlbmN5LCB0aGlzIHBhdGNoLXNldCBsaW1pdHMgaXRzIHNjb3BlIHRvIG9ubHkg
+aW5jbHVkZSBvcHRpb24gMS4gVGhhbmtzLg0KDQoNCkJSLA0KVGluYQ0KDQo+IA0KPiBjaGVlcnMs
+DQo+ICAgR2VyZA0KPiANCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18NCj4gaW50ZWwtZ3Z0LWRldiBtYWlsaW5nIGxpc3QNCj4gaW50ZWwtZ3Z0LWRldkBs
+aXN0cy5mcmVlZGVza3RvcC5vcmcNCj4gaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFp
+bG1hbi9saXN0aW5mby9pbnRlbC1ndnQtZGV2DQo=
