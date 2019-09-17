@@ -2,106 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E146B55DA
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 21:00:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC35DB5603
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 21:15:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729795AbfIQTAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 15:00:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53760 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729728AbfIQTAv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 15:00:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5C53AA3D38C;
-        Tue, 17 Sep 2019 19:00:51 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 541C160852;
-        Tue, 17 Sep 2019 19:00:45 +0000 (UTC)
-Date:   Tue, 17 Sep 2019 13:00:44 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kwankhede@nvidia.com,
-        cohuck@redhat.com, tiwei.bie@intel.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, idos@mellanox.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com
-Subject: Re: [RFC PATCH 2/4] mdev: introduce helper to set per device dma
- ops
-Message-ID: <20190917130044.4fb97637@x1.home>
-In-Reply-To: <20190910081935.30516-3-jasowang@redhat.com>
-References: <20190910081935.30516-1-jasowang@redhat.com>
-        <20190910081935.30516-3-jasowang@redhat.com>
-Organization: Red Hat
+        id S1729999AbfIQTO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 15:14:59 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52934 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725865AbfIQTO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 15:14:59 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HJEFt4183679;
+        Tue, 17 Sep 2019 19:14:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=QMx50CQcBGdEDrZ4txMSMGEDsuF+A3iWP5uwy7rYvNw=;
+ b=e1K4rHyPQNg/i38t3qhg1dJAtk9CvCOoVIIux2YawmsyG7HUUkKImyH8DlejGOy1BW21
+ h2TNvIMFp6GW/EXLUtiFICcVNPsXALcqGGZSjEJ1m6Y+G0H8sm0zkGQJjxSKzcRWgNkY
+ 5qs2uaRX+28IItHoFyvKWlCJd4HBAICv80BgvLeotZia0l+6GGK7uXCcnhrjP31QQgEM
+ l39sqoco4FlF3CSLnkvCJANxvLVE9ayLAub7P8PEAe1zhcqgnRy0Ji+r8pa6ZWHMdAq9
+ KPPAJHgzX9XV7iCRHdd08FITTZezQp0/JMR2m481J4KRiwQxM4MBAsPfVO8O+dFWpT6b Cw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2v2bx30stn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Sep 2019 19:14:54 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HJCbDF152086;
+        Tue, 17 Sep 2019 19:14:54 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2v2jjtqc56-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Sep 2019 19:14:53 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8HJErqn021224;
+        Tue, 17 Sep 2019 19:14:53 GMT
+Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 17 Sep 2019 12:14:53 -0700
+Subject: Re: [kvm-unit-tests PATCH v3 1/2] x86: nvmx: fix bug in
+ __enter_guest()
+To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
+        jmattson@google.com, pshier@google.com,
+        sean.j.christopherson@intel.com
+References: <20190917185753.256039-1-marcorr@google.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <1393a5ea-3103-7f5c-7ea7-c6d9244efdff@oracle.com>
+Date:   Tue, 17 Sep 2019 12:14:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190917185753.256039-1-marcorr@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Tue, 17 Sep 2019 19:00:51 +0000 (UTC)
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909170183
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909170183
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Sep 2019 16:19:33 +0800
-Jason Wang <jasowang@redhat.com> wrote:
 
-> This patch introduces mdev_set_dma_ops() which allows parent to set
-> per device DMA ops. This help for the kernel driver to setup a correct
-> DMA mappings.
-> 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+
+On 09/17/2019 11:57 AM, Marc Orr wrote:
+> __enter_guest() should only set the launched flag when a launch has
+> succeeded. Thus, don't set the launched flag when the VMX_ENTRY_FAILURE,
+> bit 31, is set in the VMCS exit reason.
+>
+> Signed-off-by: Marc Orr <marcorr@google.com>
 > ---
->  drivers/vfio/mdev/mdev_core.c | 7 +++++++
->  include/linux/mdev.h          | 2 ++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> index b558d4cfd082..eb28552082d7 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -13,6 +13,7 @@
->  #include <linux/uuid.h>
->  #include <linux/sysfs.h>
->  #include <linux/mdev.h>
-> +#include <linux/dma-mapping.h>
->  
->  #include "mdev_private.h"
->  
-> @@ -27,6 +28,12 @@ static struct class_compat *mdev_bus_compat_class;
->  static LIST_HEAD(mdev_list);
->  static DEFINE_MUTEX(mdev_list_lock);
->  
-> +void mdev_set_dma_ops(struct mdev_device *mdev, struct dma_map_ops *ops)
-> +{
-> +	set_dma_ops(&mdev->dev, ops);
-> +}
-> +EXPORT_SYMBOL(mdev_set_dma_ops);
-> +
-
-Why does mdev need to be involved here?  Your sample driver in 4/4 calls
-this from its create callback, where it could just as easily call:
-
-  set_dma_ops(mdev_dev(mdev), ops);
-
-Thanks,
-Alex
-
->  struct device *mdev_parent_dev(struct mdev_device *mdev)
->  {
->  	return mdev->parent->dev;
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index 0ce30ca78db0..7195f40bf8bf 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -145,4 +145,6 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
->  struct device *mdev_dev(struct mdev_device *mdev);
->  struct mdev_device *mdev_from_dev(struct device *dev);
->  
-> +void mdev_set_dma_ops(struct mdev_device *mdev, struct dma_map_ops *ops);
-> +
->  #endif /* MDEV_H */
-
+>   x86/vmx.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/x86/vmx.c b/x86/vmx.c
+> index 6079420db33a..7313c78f15c2 100644
+> --- a/x86/vmx.c
+> +++ b/x86/vmx.c
+> @@ -1820,7 +1820,7 @@ static void __enter_guest(u8 abort_flag, struct vmentry_failure *failure)
+>   		abort();
+>   	}
+>   
+> -	if (!failure->early) {
+> +	if (!failure->early && !(vmcs_read(EXI_REASON) & VMX_ENTRY_FAILURE)) {
+>   		launched = 1;
+>   		check_for_guest_termination();
+>   	}
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
