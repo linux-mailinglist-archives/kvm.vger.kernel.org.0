@@ -2,181 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 402A4B4E32
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 14:43:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE414B4E99
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 14:58:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728551AbfIQMm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 08:42:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52494 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728117AbfIQMm5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 08:42:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6C6F54E83C;
-        Tue, 17 Sep 2019 12:42:56 +0000 (UTC)
-Received: from gondolin (dhcp-192-230.str.redhat.com [10.33.192.230])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CEC546012E;
-        Tue, 17 Sep 2019 12:42:42 +0000 (UTC)
-Date:   Tue, 17 Sep 2019 14:42:40 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        alex.williamson@redhat.com, mst@redhat.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
-        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
-        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        pmorel@linux.ibm.com, freude@linux.ibm.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org,
-        maxime.coquelin@redhat.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, rob.miller@broadcom.com, idos@mellanox.com,
-        xiao.w.wang@intel.com, lingshan.zhu@intel.com
-Subject: Re: [RFC PATCH 2/2] mdev: introduce device specific ops
-Message-ID: <20190917144240.6a59b65f.cohuck@redhat.com>
-In-Reply-To: <20190912094012.29653-3-jasowang@redhat.com>
-References: <20190912094012.29653-1-jasowang@redhat.com>
-        <20190912094012.29653-3-jasowang@redhat.com>
-Organization: Red Hat GmbH
+        id S1727478AbfIQM6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 08:58:02 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:47412 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725972AbfIQM6C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 08:58:02 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HCrhbx194702;
+        Tue, 17 Sep 2019 12:57:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=X3h8WdecAL4SUItO2C5rQjl2a1G1qeQ7InT8kFdPrJw=;
+ b=ZtL8AAUe9SJrL2u4PhUmr2MBSwb0D5Q1aJnKS5xEHkzr1rr6mACXeyecia06B1pcqIRO
+ DKgC6zzNYk4eCJYdKnxEUolrQS+bwJOTPpsb1CrUqNtwE4uAluvYoBgekU90S9UI3+WA
+ iuiMmKaAXa2qDEAZP3T2OYr/6vIMwJMYReUkQk1E90QAQhBU3HrXMFHTbgggUFiLxPvk
+ TN/3P40xMS6VMfFxKaIKvsmE2VhPQcvFIbY8+XkRhLbAoTYsKKWHi/kDSjEdznRZIaJ/
+ sXE8itgTbWZLeYMWXu9TrnWhS5qFpTiJrUL4R2iRlBeczcNC3HEstfrqqd1h/ymCy0Bq Pw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2v0ruqp4tn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Sep 2019 12:57:25 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HCsBhL042493;
+        Tue, 17 Sep 2019 12:57:24 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2v2tmsphp6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Sep 2019 12:57:24 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8HCvLwj025859;
+        Tue, 17 Sep 2019 12:57:22 GMT
+Received: from char.us.oracle.com (/10.152.32.25)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 17 Sep 2019 05:57:21 -0700
+Received: by char.us.oracle.com (Postfix, from userid 1000)
+        id D019E6A00EE; Tue, 17 Sep 2019 08:59:04 -0400 (EDT)
+Date:   Tue, 17 Sep 2019 08:59:04 -0400
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
+Subject: Re: [PATCH v5 0/9] Enable Sub-page Write Protection Support
+Message-ID: <20190917125904.GB22162@char.us.oracle.com>
+References: <20190917085304.16987-1-weijiang.yang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 17 Sep 2019 12:42:56 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190917085304.16987-1-weijiang.yang@intel.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9382 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909170129
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9382 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909170129
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Sep 2019 17:40:12 +0800
-Jason Wang <jasowang@redhat.com> wrote:
-
-> Currently, except for the crate and remove. The rest fields of
-> mdev_parent_ops is just designed for vfio-mdev driver and may not help
-> for kernel mdev driver. So follow the device id support by previous
-> patch, this patch introduces device specific ops which points to
-> device specific ops (e.g vfio ops). This allows the future drivers
-> like virtio-mdev to implement its own device specific ops.
+On Tue, Sep 17, 2019 at 04:52:55PM +0800, Yang Weijiang wrote:
+> EPT-Based Sub-Page write Protection(SPP)is a HW capability which allows
+> Virtual Machine Monitor(VMM) to specify write-permission for guest
+> physical memory at a sub-page(128 byte) granularity. When this
+> capability is enabled, the CPU enforces write-access check for sub-pages
+> within a 4KB page.
 > 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/gpu/drm/i915/gvt/kvmgt.c  | 14 +++---
->  drivers/s390/cio/vfio_ccw_ops.c   | 14 +++---
->  drivers/s390/crypto/vfio_ap_ops.c | 10 +++--
->  drivers/vfio/mdev/vfio_mdev.c     | 30 +++++++------
->  include/linux/mdev.h              | 72 ++++++++++++++++++-------------
->  samples/vfio-mdev/mbochs.c        | 16 ++++---
->  samples/vfio-mdev/mdpy.c          | 16 ++++---
->  samples/vfio-mdev/mtty.c          | 14 +++---
->  8 files changed, 113 insertions(+), 73 deletions(-)
+> The feature is targeted to provide fine-grained memory protection for
+> usages such as device virtualization, memory check-point and VM
+> introspection etc.
+> 
+> SPP is active when the "sub-page write protection" (bit 23) is 1 in
+> Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+> Permission Table(SPPT), SPPT is referenced via a 64-bit control field
+> called Sub-Page Permission Table Pointer (SPPTP) which contains a
+> 4K-aligned physical address.
+> 
+> To enable SPP for certain physical page, the gfn should be first mapped
+> to a 4KB entry, then set bit 61 of the corresponding EPT leaf entry. 
+> While HW walks EPT, if bit 61 is set, it traverses SPPT with the guset
+> physical address to find out the sub-page permissions at the leaf entry.
+> If the corresponding bit is set, write to sub-page is permitted,
+> otherwise, SPP induced EPT violation is generated.
+> 
+> This patch serial passed SPP function test and selftest on Ice-Lake platform.
+> 
+> Please refer to the SPP introduction document in this patch set and
+> Intel SDM for details:
+> 
+> Intel SDM:
+> https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+> 
+> SPP selftest patch:
+> https://lkml.org/lkml/2019/6/18/1197
+> 
+> Previous patch:
+> https://lkml.org/lkml/2019/8/14/97
 
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index f85045392120..3b8a76bc69cf 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -27,27 +27,9 @@ int mdev_set_iommu_device(struct device *dev, struct device *iommu_device);
->  struct device *mdev_get_iommu_device(struct device *dev);
->  
->  /**
-> - * struct mdev_parent_ops - Structure to be registered for each parent device to
-> - * register the device to mdev module.
-> + * struct vfio_mdev_parent_ops - Structure to be registered for each
-> + * parent device to register the device to vfio-mdev module.
->   *
-> - * @owner:		The module owner.
-> - * @dev_attr_groups:	Attributes of the parent device.
-> - * @mdev_attr_groups:	Attributes of the mediated device.
-> - * @supported_type_groups: Attributes to define supported types. It is mandatory
-> - *			to provide supported types.
-> - * @create:		Called to allocate basic resources in parent device's
-> - *			driver for a particular mediated device. It is
-> - *			mandatory to provide create ops.
-> - *			@kobj: kobject of type for which 'create' is called.
-> - *			@mdev: mdev_device structure on of mediated device
-> - *			      that is being created
-> - *			Returns integer: success (0) or error (< 0)
-> - * @remove:		Called to free resources in parent device's driver for a
-> - *			a mediated device. It is mandatory to provide 'remove'
-> - *			ops.
-> - *			@mdev: mdev_device device structure which is being
-> - *			       destroyed
-> - *			Returns integer: success (0) or error (< 0)
->   * @open:		Open mediated device.
->   *			@mdev: mediated device.
->   *			Returns integer: success (0) or error (< 0)
-> @@ -72,6 +54,43 @@ struct device *mdev_get_iommu_device(struct device *dev);
->   * @mmap:		mmap callback
->   *			@mdev: mediated device structure
->   *			@vma: vma structure
-> + */
-> +struct vfio_mdev_parent_ops {
-> +	int     (*open)(struct mdev_device *mdev);
-> +	void    (*release)(struct mdev_device *mdev);
-> +	ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
-> +			size_t count, loff_t *ppos);
-> +	ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
-> +			 size_t count, loff_t *ppos);
-> +	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
-> +			 unsigned long arg);
-> +	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
-> +};
-> +
-> +/**
-> + * struct mdev_parent_ops - Structure to be registered for each parent device to
-> + * register the device to mdev module.
-> + *
-> + * @owner:		The module owner.
-> + * @dev_attr_groups:	Attributes of the parent device.
-> + * @mdev_attr_groups:	Attributes of the mediated device.
-> + * @supported_type_groups: Attributes to define supported types. It is mandatory
-> + *			to provide supported types.
-> + * @create:		Called to allocate basic resources in parent device's
-> + *			driver for a particular mediated device. It is
-> + *			mandatory to provide create ops.
-> + *			@kobj: kobject of type for which 'create' is called.
-> + *			@mdev: mdev_device structure on of mediated device
-> + *			      that is being created
-> + *			Returns integer: success (0) or error (< 0)
-> + * @remove:		Called to free resources in parent device's driver for a
-> + *			a mediated device. It is mandatory to provide 'remove'
-> + *			ops.
-> + *			@mdev: mdev_device device structure which is being
-> + *			       destroyed
-> + *			Returns integer: success (0) or error (< 0)
-> + * @device_ops:         Device specific emulation callback.
-> + *
->   * Parent device that support mediated device should be registered with mdev
->   * module with mdev_parent_ops structure.
->   **/
-> @@ -83,15 +102,7 @@ struct mdev_parent_ops {
->  
->  	int     (*create)(struct kobject *kobj, struct mdev_device *mdev);
->  	int     (*remove)(struct mdev_device *mdev);
-> -	int     (*open)(struct mdev_device *mdev);
-> -	void    (*release)(struct mdev_device *mdev);
-> -	ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
-> -			size_t count, loff_t *ppos);
-> -	ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
-> -			 size_t count, loff_t *ppos);
-> -	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
-> -			 unsigned long arg);
-> -	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct *vma);
-> +	const void *device_ops;
->  };
->  
->  /* interface for exporting mdev supported type attributes */
+I saw the patches as part of the introspection patch-set.
+Are you all working together on this?
 
-This basically looks like a split between stuff that is always
-triggered from userspace (create and the like) and stuff that is
-triggered from userspace for vfio mdevs, but not necessarily for other
-mdevs. Seems reasonable at a glance.
+Would it be possible for some of the bitdefender folks who depend on this
+to provide Tested-by adn could they also take the time to review this patch-set?
 
-If we decide to go forward with this, we should also update the
-documentation (split out stuff from driver-api/vfio-mediated-device.rst
-etc.)
+Thanks.
