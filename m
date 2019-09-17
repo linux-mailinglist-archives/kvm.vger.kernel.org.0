@@ -2,284 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C7CF5B4C76
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 13:00:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8E6DB4D6F
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 14:07:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbfIQLAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 07:00:48 -0400
-Received: from mga03.intel.com ([134.134.136.65]:44039 "EHLO mga03.intel.com"
+        id S1727334AbfIQMHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 08:07:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56592 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726243AbfIQLAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 07:00:48 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 04:00:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,516,1559545200"; 
-   d="scan'208";a="193720429"
-Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.71])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Sep 2019 04:00:44 -0700
-Date:   Tue, 17 Sep 2019 18:58:02 +0800
-From:   Tiwei Bie <tiwei.bie@intel.com>
+        id S1726918AbfIQMHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 08:07:36 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 20D9A30820C9;
+        Tue, 17 Sep 2019 12:07:36 +0000 (UTC)
+Received: from gondolin (dhcp-192-230.str.redhat.com [10.33.192.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F455100197A;
+        Tue, 17 Sep 2019 12:07:22 +0000 (UTC)
+Date:   Tue, 17 Sep 2019 14:07:20 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-Subject: Re: [RFC v4 0/3] vhost: introduce mdev based hardware backend
-Message-ID: <20190917105801.GA24855@___>
-References: <20190917010204.30376-1-tiwei.bie@intel.com>
- <993841ed-942e-c90b-8016-8e7dc76bf13a@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        pmorel@linux.ibm.com, freude@linux.ibm.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com, idos@mellanox.com,
+        xiao.w.wang@intel.com, lingshan.zhu@intel.com
+Subject: Re: [RFC PATCH 1/2] mdev: device id support
+Message-ID: <20190917140720.3686e0cc.cohuck@redhat.com>
+In-Reply-To: <20190912094012.29653-2-jasowang@redhat.com>
+References: <20190912094012.29653-1-jasowang@redhat.com>
+        <20190912094012.29653-2-jasowang@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <993841ed-942e-c90b-8016-8e7dc76bf13a@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 17 Sep 2019 12:07:36 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 11:32:03AM +0800, Jason Wang wrote:
-> On 2019/9/17 上午9:02, Tiwei Bie wrote:
-> > This RFC is to demonstrate below ideas,
-> > 
-> > a) Build vhost-mdev on top of the same abstraction defined in
-> >     the virtio-mdev series [1];
-> > 
-> > b) Introduce /dev/vhost-mdev to do vhost ioctls and support
-> >     setting mdev device as backend;
-> > 
-> > Now the userspace API looks like this:
-> > 
-> > - Userspace generates a compatible mdev device;
-> > 
-> > - Userspace opens this mdev device with VFIO API (including
-> >    doing IOMMU programming for this mdev device with VFIO's
-> >    container/group based interface);
-> > 
-> > - Userspace opens /dev/vhost-mdev and gets vhost fd;
-> > 
-> > - Userspace uses vhost ioctls to setup vhost (userspace should
-> >    do VHOST_MDEV_SET_BACKEND ioctl with VFIO group fd and device
-> >    fd first before doing other vhost ioctls);
-> > 
-> > Only compile test has been done for this series for now.
-> 
-> 
-> Have a hard thought on the architecture:
+On Thu, 12 Sep 2019 17:40:11 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-Thanks a lot! Do appreciate it!
+> Mdev bus only support vfio driver right now, so it doesn't implement
+> match method. But in the future, we may add drivers other than vfio,
+> one example is virtio-mdev[1] driver. This means we need to add device
+> id support in bus match method to pair the mdev device and mdev driver
+> correctly.
+
+Sounds reasonable.
 
 > 
-> 1) Create a vhost char device and pass vfio mdev device fd to it as a
-> backend and translate vhost-mdev ioctl to virtio mdev transport (e.g
-> read/write). DMA was done through the VFIO DMA mapping on the container that
-> is attached.
-
-Yeah, that's what we are doing in this series.
-
+> So this patch add id_table to mdev_driver and id for mdev parent, and
+> implement the match method for mdev bus.
 > 
-> We have two more choices:
+> [1] https://lkml.org/lkml/2019/9/10/135
 > 
-> 2) Use vfio-mdev but do not create vhost-mdev device, instead, just
-> implement vhost ioctl on vfio_device_ops, and translate them into
-> virtio-mdev transport or just pass ioctl to parent.
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c  |  2 +-
+>  drivers/s390/cio/vfio_ccw_ops.c   |  2 +-
+>  drivers/s390/crypto/vfio_ap_ops.c |  3 ++-
+>  drivers/vfio/mdev/mdev_core.c     | 14 ++++++++++++--
+>  drivers/vfio/mdev/mdev_driver.c   | 14 ++++++++++++++
+>  drivers/vfio/mdev/mdev_private.h  |  1 +
+>  drivers/vfio/mdev/vfio_mdev.c     |  6 ++++++
+>  include/linux/mdev.h              |  6 +++++-
+>  include/linux/mod_devicetable.h   |  6 ++++++
+>  samples/vfio-mdev/mbochs.c        |  2 +-
+>  samples/vfio-mdev/mdpy.c          |  2 +-
+>  samples/vfio-mdev/mtty.c          |  2 +-
+>  12 files changed, 51 insertions(+), 9 deletions(-)
 
-Yeah. Instead of introducing /dev/vhost-mdev char device, do
-vhost ioctls on VFIO device fd directly. That's what we did
-in RFC v3.
+(...)
 
-> 
-> 3) Don't use vfio-mdev, create a new vhost-mdev driver, during probe still
-> try to add dev to vfio group and talk to parent with device specific ops
+The transformations of the vendor drivers and the new interface look
+sane.
 
-If my understanding is correct, this means we need to introduce
-a new VFIO device driver to replace the existing vfio-mdev driver
-in our case. Below is a quick draft just to show my understanding:
+(...)
 
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/device.h>
-#include <linux/kernel.h>
-#include <linux/slab.h>
-#include <linux/vfio.h>
-#include <linux/mdev.h>
+> diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+> index 5714fd35a83c..f1fc143df042 100644
+> --- a/include/linux/mod_devicetable.h
+> +++ b/include/linux/mod_devicetable.h
+> @@ -821,4 +821,10 @@ struct wmi_device_id {
+>  	const void *context;
+>  };
+>  
+> +/* MDEV */
+> +
 
-#include "mdev_private.h"
+Maybe add some kerneldoc and give vfio as an example of what we're
+matching here?
 
-/* XXX: we need a proper way to include below vhost header. */
-#include "../../vhost/vhost.h"
+> +struct mdev_device_id {
+> +	__u8 id;
 
-static int vfio_vhost_mdev_open(void *device_data)
-{
-	if (!try_module_get(THIS_MODULE))
-		return -ENODEV;
+I agree with the suggestion to rename this to 'class_id'.
 
-	/* ... */
-	vhost_dev_init(...);
-
-	return 0;
-}
-
-static void vfio_vhost_mdev_release(void *device_data)
-{
-	/* ... */
-	module_put(THIS_MODULE);
-}
-
-static long vfio_vhost_mdev_unlocked_ioctl(void *device_data,
-					   unsigned int cmd, unsigned long arg)
-{
-	struct mdev_device *mdev = device_data;
-	struct mdev_parent *parent = mdev->parent;
-
-	/*
-	 * Use vhost ioctls.
-	 *
-	 * We will have a different parent_ops design.
-	 * And potentially, we can share the same parent_ops
-	 * with virtio_mdev.
-	 */
-	switch (cmd) {
-	case VHOST_GET_FEATURES:
-		parent->ops->get_features(mdev, ...);
-		break;
-	/* ... */
-	}
-
-	return 0;
-}
-
-static ssize_t vfio_vhost_mdev_read(void *device_data, char __user *buf,
-				    size_t count, loff_t *ppos)
-{
-	/* ... */
-	return 0;
-}
-
-static ssize_t vfio_vhost_mdev_write(void *device_data, const char __user *buf,
-				     size_t count, loff_t *ppos)
-{
-	/* ... */
-	return 0;
-}
-
-static int vfio_vhost_mdev_mmap(void *device_data, struct vm_area_struct *vma)
-{
-	/* ... */
-	return 0;
-}
-
-static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
-	.name		= "vfio-vhost-mdev",
-	.open		= vfio_vhost_mdev_open,
-	.release	= vfio_vhost_mdev_release,
-	.ioctl		= vfio_vhost_mdev_unlocked_ioctl,
-	.read		= vfio_vhost_mdev_read,
-	.write		= vfio_vhost_mdev_write,
-	.mmap		= vfio_vhost_mdev_mmap,
-};
-
-static int vfio_vhost_mdev_probe(struct device *dev)
-{
-	struct mdev_device *mdev = to_mdev_device(dev);
-
-	/* ... */
-	return vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, mdev);
-}
-
-static void vfio_vhost_mdev_remove(struct device *dev)
-{
-	/* ... */
-	vfio_del_group_dev(dev);
-}
-
-static struct mdev_driver vfio_vhost_mdev_driver = {
-	.name	= "vfio_vhost_mdev",
-	.probe	= vfio_vhost_mdev_probe,
-	.remove	= vfio_vhost_mdev_remove,
-};
-
-static int __init vfio_vhost_mdev_init(void)
-{
-	return mdev_register_driver(&vfio_vhost_mdev_driver, THIS_MODULE);
-}
-module_init(vfio_vhost_mdev_init)
-
-static void __exit vfio_vhost_mdev_exit(void)
-{
-	mdev_unregister_driver(&vfio_vhost_mdev_driver);
-}
-module_exit(vfio_vhost_mdev_exit)
-
-> 
-> So I have some questions:
-> 
-> 1) Compared to method 2, what's the advantage of creating a new vhost char
-> device? I guess it's for keep the API compatibility?
-
-One benefit is that we can avoid doing vhost ioctls on
-VFIO device fd.
-
-> 
-> 2) For method 2, is there any easy way for user/admin to distinguish e.g
-> ordinary vfio-mdev for vhost from ordinary vfio-mdev?
-
-I think device-api could be a choice.
-
-> I saw you introduce
-> ops matching helper but it's not friendly to management.
-
-The ops matching helper is just to check whether a given
-vfio-device is based on a mdev device.
-
-> 
-> 3) A drawback of 1) and 2) is that it must follow vfio_device_ops that
-> assumes the parameter comes from userspace, it prevents support kernel
-> virtio drivers.
-> 
-> 4) So comes the idea of method 3, since it register a new vhost-mdev driver,
-> we can use device specific ops instead of VFIO ones, then we can have a
-> common API between vDPA parent and vhost-mdev/virtio-mdev drivers.
-
-As the above draft shows, this requires introducing a new
-VFIO device driver. I think Alex's opinion matters here.
-
-Thanks,
-Tiwei
-
-> 
-> What's your thoughts?
-> 
-> Thanks
-> 
-> 
-> > 
-> > RFCv3: https://patchwork.kernel.org/patch/11117785/
-> > 
-> > [1] https://lkml.org/lkml/2019/9/10/135
-> > 
-> > Tiwei Bie (3):
-> >    vfio: support getting vfio device from device fd
-> >    vfio: support checking vfio driver by device ops
-> >    vhost: introduce mdev based hardware backend
-> > 
-> >   drivers/vfio/mdev/vfio_mdev.c    |   3 +-
-> >   drivers/vfio/vfio.c              |  32 +++
-> >   drivers/vhost/Kconfig            |   9 +
-> >   drivers/vhost/Makefile           |   3 +
-> >   drivers/vhost/mdev.c             | 462 +++++++++++++++++++++++++++++++
-> >   drivers/vhost/vhost.c            |  39 ++-
-> >   drivers/vhost/vhost.h            |   6 +
-> >   include/linux/vfio.h             |  11 +
-> >   include/uapi/linux/vhost.h       |  10 +
-> >   include/uapi/linux/vhost_types.h |   5 +
-> >   10 files changed, 573 insertions(+), 7 deletions(-)
-> >   create mode 100644 drivers/vhost/mdev.c
-> > 
+> +};
+> +
+>  #endif /* LINUX_MOD_DEVICETABLE_H */
