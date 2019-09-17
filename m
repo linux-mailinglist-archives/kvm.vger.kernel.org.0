@@ -2,254 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B51F3B4E06
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 14:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BBB6B4E01
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 14:40:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728175AbfIQMkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 08:40:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49694 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728168AbfIQMkz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 08:40:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1568724052;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=fZFqB/vEzGAt7ktglfnPM4EYstI/gJ/8iaZDYhzdYVo=;
-        b=L3IbdnoUbOgdgR+USa6bZZDT5GBJt95Z4OIJubLOZNoeZ3WGPY18Kf2xhTkBCtfz10bCAc
-        C+hXS0fwioGFvvSdmfXJFkUcfbR5lBK4dN3h48dLmRUkRrf8MEt91Dw/x6ITyyW2BwcY9k
-        Bnz0YiloItU3kiPsFd5KVIQF7wmSLSE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-_XDUxOUkO4i1avFpWfZXhA-1; Tue, 17 Sep 2019 08:39:44 -0400
-Received: by mail-wr1-f70.google.com with SMTP id w10so1273533wrl.5
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 05:39:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=r4IenELIElJC+2Y89jzdksnturr4HnfpL2WsX+2BBtg=;
-        b=kA2WOOEMCwsgCJrcjZKN+GIzPz12sIs6QaUXPQ0mqFAUu8kJ2yWNK4MDYHNrT2kluW
-         X0cvTMMsq6yCyVesNcy3lmnk7jw6brrsQdk6qtViDI8zL1PqJs4Jnmz9LrKas1fscHDS
-         CGU0e5dTGK+eGWfrm12IfwNfYXAc5BGpoLXh5cP2d2iZBI1NNxRVxdtVyq48ZTOYerpk
-         fnPs5egdsRRxQfWZf1M0BLj3gDH6lcWViFrh4WzHwBj5VJI9G6dimg6Zr+ddpn0XbHDJ
-         qBQGSG2r8Gd5C78knkkPAjBRm5KnlhndloQx3fEOv/tn8EkWdUPNefQTKY+vnmGiePP2
-         0YlA==
-X-Gm-Message-State: APjAAAVnoGXIEP3QHbWCnkKcbQBp65vqDIJ/tuNvSU5mVh5O4CUujtP3
-        yBNOOZnfEbW3rCdKW9+hgZKzeFM+OL+0iG59RJxTAAwaRjsMBliUyprXwN+AKShXrm3bTlwNUGZ
-        R284kmiX1bBXH
-X-Received: by 2002:a05:6000:12:: with SMTP id h18mr2728927wrx.156.1568723983487;
-        Tue, 17 Sep 2019 05:39:43 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzaBnDTsPNA5kf0yTT7L440FDa6rgwuYYGO5egrbPg4F3ClVwsnCFs5WG83eXzF1/KNJ2PjtA==
-X-Received: by 2002:a05:6000:12:: with SMTP id h18mr2728911wrx.156.1568723983152;
-        Tue, 17 Sep 2019 05:39:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
-        by smtp.gmail.com with ESMTPSA id e17sm2447445wma.15.2019.09.17.05.39.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2019 05:39:42 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Eric Hankland <ehankland@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-References: <20190821182004.102768-1-jmattson@google.com>
- <CALMp9eTtA5ZXJyWcOpe-pQ66X3sTgCR4-BHec_R3e1-j1FZyZw@mail.gmail.com>
- <8907173e-9f27-6769-09fc-0b82c22d6352@oracle.com>
- <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
- <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com>
- <CALMp9eQULvr5wKt1Aw3MR+tbeNgvA_4p__6n1YTkWjMHCaEmLw@mail.gmail.com>
- <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com>
-Date:   Tue, 17 Sep 2019 14:39:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727814AbfIQMkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 08:40:24 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2287 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727534AbfIQMkX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 08:40:23 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id D6BF79037DC9BDF6755F;
+        Tue, 17 Sep 2019 20:40:19 +0800 (CST)
+Received: from [127.0.0.1] (10.177.29.32) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 17 Sep 2019
+ 20:40:10 +0800
+Subject: Re: [PATCH v18 0/6] Add ARMv8 RAS virtualization support in QEMU
+To:     <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>,
+        <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, <rth@twiddle.net>,
+        <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+        <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <linuxarm@huawei.com>
+CC:     <wanghaibin.wang@huawei.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <997a7f78-9ade-a107-8f83-de5dde85e483@huawei.com>
+Date:   Tue, 17 Sep 2019 20:39:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com>
+In-Reply-To: <20190906083152.25716-1-zhengxiang9@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-MC-Unique: _XDUxOUkO4i1avFpWfZXhA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.29.32]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/09/19 22:43, Jim Mattson wrote:
-> On Fri, Sep 6, 2019 at 2:08 PM Jim Mattson <jmattson@google.com> wrote:
->>
->> On Fri, Sep 6, 2019 at 1:43 PM Krish Sadhukhan
->> <krish.sadhukhan@oracle.com> wrote:
->>>
->>>
->>> On 9/6/19 1:30 PM, Jim Mattson wrote:
->>>> On Fri, Sep 6, 2019 at 12:59 PM Krish Sadhukhan
->>>> <krish.sadhukhan@oracle.com> wrote:
->>>>>
->>>>> On 9/6/19 9:48 AM, Jim Mattson wrote:
->>>>>
->>>>> On Wed, Aug 21, 2019 at 11:20 AM Jim Mattson <jmattson@google.com> wr=
-ote:
->>>>>
->>>>> These MSRs should be enumerated by KVM_GET_MSR_INDEX_LIST, so that
->>>>> userspace knows that these MSRs may be part of the vCPU state.
->>>>>
->>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>>>> Reviewed-by: Eric Hankland <ehankland@google.com>
->>>>> Reviewed-by: Peter Shier <pshier@google.com>
->>>>>
->>>>> ---
->>>>>   arch/x86/kvm/x86.c | 41 +++++++++++++++++++++++++++++++++++++++++
->>>>>   1 file changed, 41 insertions(+)
->>>>>
->>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>>>> index 93b0bd45ac73..ecaaa411538f 100644
->>>>> --- a/arch/x86/kvm/x86.c
->>>>> +++ b/arch/x86/kvm/x86.c
->>>>> @@ -1140,6 +1140,42 @@ static u32 msrs_to_save[] =3D {
->>>>>          MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
->>>>>          MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
->>>>>          MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
->>>>> +       MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
->>>>> +       MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 =
-+ 3,
->>>>> +       MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
->>>>> +       MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0, MSR_ARCH_PERFMON_PERFCTR1,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 2, MSR_ARCH_PERFMON_PERFCTR0 + 3,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 4, MSR_ARCH_PERFMON_PERFCTR0 + 5,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 6, MSR_ARCH_PERFMON_PERFCTR0 + 7,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 8, MSR_ARCH_PERFMON_PERFCTR0 + 9,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 10, MSR_ARCH_PERFMON_PERFCTR0 + 1=
-1,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 12, MSR_ARCH_PERFMON_PERFCTR0 + 1=
-3,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 14, MSR_ARCH_PERFMON_PERFCTR0 + 1=
-5,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 16, MSR_ARCH_PERFMON_PERFCTR0 + 1=
-7,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 18, MSR_ARCH_PERFMON_PERFCTR0 + 1=
-9,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 20, MSR_ARCH_PERFMON_PERFCTR0 + 2=
-1,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 22, MSR_ARCH_PERFMON_PERFCTR0 + 2=
-3,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 24, MSR_ARCH_PERFMON_PERFCTR0 + 2=
-5,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 26, MSR_ARCH_PERFMON_PERFCTR0 + 2=
-7,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 28, MSR_ARCH_PERFMON_PERFCTR0 + 2=
-9,
->>>>> +       MSR_ARCH_PERFMON_PERFCTR0 + 30, MSR_ARCH_PERFMON_PERFCTR0 + 3=
-1,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0, MSR_ARCH_PERFMON_EVENTSEL1,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 2, MSR_ARCH_PERFMON_EVENTSEL0 + =
-3,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 4, MSR_ARCH_PERFMON_EVENTSEL0 + =
-5,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 6, MSR_ARCH_PERFMON_EVENTSEL0 + =
-7,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 8, MSR_ARCH_PERFMON_EVENTSEL0 + =
-9,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 10, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 11,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 12, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 13,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 14, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 15,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 17,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 18, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 19,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 20, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 21,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 22, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 23,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 24, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 25,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 26, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 27,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 28, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 29,
->>>>> +       MSR_ARCH_PERFMON_EVENTSEL0 + 30, MSR_ARCH_PERFMON_EVENTSEL0 +=
- 31,
->>>>>   };
->>>>>
->>>>>
->>>>> Should we have separate #defines for the MSRs that are at offset from=
- the base MSR?
->>>> How about macros that take an offset argument, rather than a whole
->>>> slew of new macros?
->>>
->>>
->>> Yes, that works too.
->>>
->>>
->>>>
->>>>>   static unsigned num_msrs_to_save;
->>>>> @@ -4989,6 +5025,11 @@ static void kvm_init_msr_list(void)
->>>>>          u32 dummy[2];
->>>>>          unsigned i, j;
->>>>>
->>>>> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED !=3D 4,
->>>>> +                        "Please update the fixed PMCs in msrs_to_sav=
-e[]");
->>>>> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_GENERIC !=3D 32,
->>>>> +                        "Please update the generic perfctr/eventsel =
-MSRs in msrs_to_save[]");
->>>>>
->>>>>
->>>>> Just curious how the condition can ever become false because we are c=
-omparing two static numbers here.
->>>> Someone just has to change the macros. In fact, I originally developed
->>>> this change on a version of the kernel where INTEL_PMC_MAX_FIXED was
->>>> 3, and so I had:
->>>>
->>>>> +       BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED !=3D 3,
->>>>> +                        "Please update the fixed PMCs in msrs_to_sav=
-e[]")
->>>> When I cherry-picked the change to Linux tip, the BUILD_BUG_ON fired,
->>>> and I updated the fixed PMCs in msrs_to_save[].
->>>>
->>>>> +
->>>>>          for (i =3D j =3D 0; i < ARRAY_SIZE(msrs_to_save); i++) {
->>>>>                  if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]=
-) < 0)
->>>>>                          continue;
->>>>> --
->>>>> 2.23.0.187.g17f5b7556c-goog
->>>>>
->>>>> Ping.
->>>>>
->>>>>
->>>>> Also, since these MSRs are Intel-specific, should these be enumerated=
- via 'intel_pmu_ops' ?
->>>> msrs_to_save[] is filtered to remove MSRs that aren't supported on the
->>>> host. Or are you asking something else?
->>>
->>>
->>> I am referring to the fact that we are enumerating Intel-specific MSRs
->>> in the generic KVM code. Should there be some sort of #define guard to
->>> not compile the code on AMD ?
->>
->> No. msrs_to_save[] contains *all* MSRs that may be relevant on some
->> platform. Notice that it already includes AMD-only MSRs (e.g.
->> MSR_VM_HSAVE_PA) and Intel-only MSRs (e.g. MSR_IA32_BNDCFGS). The MSRs
->> that are not relevant are filtered out in kvm_init_msr_list().
->>
->> This list probably should include the AMD equivalents as well, but I
->> haven't looked into the AMD vPMU yet.
->=20
-> Ping.
->=20
+Hi all,
 
-Queued, thanks.
+This patch series has been tested for both TCG and KVM scenes.
 
-Paolo
+1) Test for TCG:
+   - Re-compile qemu after applying the patch refered to https://patchwork.kernel.org/cover/10942757/#22640271).
+   - Use command line shown below to start qemu:
+        ./qemu-system-aarch64 \
+                -name guest=ras \
+                -machine virt,gic-version=3,ras=on \
+                -cpu cortex-a57 \
+                -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
+                -nodefaults \
+                -kernel ${GUEST_KERNEL} \
+                -initrd ${GUEST_FS} \
+                -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
+                -m 8192 \
+                -smp 4 \
+                -serial stdio \
+
+   - Send a signal to one of the VCPU threads:
+        kill -s SIGBUS 71571
+
+   - The result of test is shown below:
+
+    [   41.194753] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
+    [   41.197329] {1}[Hardware Error]: event severity: recoverable
+    [   41.199078] {1}[Hardware Error]:  Error 0, type: recoverable
+    [   41.200829] {1}[Hardware Error]:   section_type: memory error
+    [   41.202603] {1}[Hardware Error]:   physical_address: 0x00000000400a1000
+    [   41.204649] {1}[Hardware Error]:   error_type: 0, unknown
+    [   41.206328] EDAC MC0: 1 UE Unknown on unknown label ( page:0x400a1 offset:0x0 grain:0)
+    [   41.208788] Internal error: synchronous external abort: 96000410 [#1] SMP
+    [   41.210879] Modules linked in:
+    [   41.211823] CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.19.0+ #8
+    [   41.213698] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
+    [   41.215812] pstate: 60c00085 (nZCv daIf +PAN +UAO)
+    [   41.217296] pc : cpu_do_idle+0x8/0xc
+    [   41.218400] lr : arch_cpu_idle+0x2c/0x1b8
+    [   41.219629] sp : ffff000009f9bf00
+    [   41.220649] x29: ffff000009f9bf00 x28: 0000000000000000
+    [   41.222310] x27: 0000000000000000 x26: ffff8001fe471d80
+    [   41.223945] x25: 0000000000000000 x24: ffff00000937ba38
+    [   41.225581] x23: ffff0000090b3338 x22: ffff000009379000
+    [   41.227220] x21: ffff00000937b000 x20: 0000000000000004
+    [   41.228871] x19: ffff0000090a6000 x18: 0000000000000000
+    [   41.230517] x17: 0000000000000000 x16: 0000000000000000
+    [   41.232165] x15: 0000000000000000 x14: 0000000000000000
+    [   41.233810] x13: ffff0000089f4da8 x12: 000000000000000e
+    [   41.235448] x11: ffff0000089f4d80 x10: 0000000000000af0
+    [   41.237101] x9 : ffff000009f9be80 x8 : ffff8001fe4728d0
+    [   41.238738] x7 : 0000000000000004 x6 : ffff8001fffbaf30
+    [   41.240380] x5 : ffff00000c43b940 x4 : 00008001f6f0c000
+    [   41.242030] x3 : 0000000000000001 x2 : ffff000009f9bf00
+    [   41.243666] x1 : ffff8001fffb82c8 x0 : ffff0000090a6018
+    [   41.245306] Process swapper/2 (pid: 0, stack limit = 0x(____ptrval____))
+    [   41.247378] Call trace:
+    [   41.248117]  cpu_do_idle+0x8/0xc
+    [   41.249111]  do_idle+0x1dc/0x2a8
+    [   41.250111]  cpu_startup_entry+0x28/0x30
+    [   41.251319]  secondary_start_kernel+0x180/0x1c8
+    [   41.252725] Code: a8c17bfd d65f03c0 d5033f9f d503207f (d65f03c0)
+    [   41.254606] ---[ end trace 221bc8a614fb5a1d ]---
+    [   41.256030] Kernel panic - not syncing: Fatal exception
+    [   41.257644] SMP: stopping secondary CPUs
+    [   41.258912] Kernel Offset: disabled
+    [   41.260011] CPU features: 0x0,22a00238
+    [   41.261178] Memory Limit: none
+    [   41.262122] ---[ end Kernel panic - not syncing: Fatal exception ]---
+
+2) Test for KVM:
+   - Use command line shown below to start qemu:
+        ./qemu-system-aarch64 \
+            -name guest=ras \
+            -machine virt,accel=kvm,gic-version=3,ras=on \
+            -cpu host \
+            -bios /usr/share/edk2/aarch64/QEMU_EFI.fd \
+            -nodefaults \
+            -kernel ${GUEST_KERNEL} \
+            -initrd ${GUEST_FS} \
+            -append "rdinit=init console=ttyAMA0 earlycon=pl011,0x9000000" \
+            -m 8192 \
+            -smp 4 \
+            -serial stdio \
+
+   - Run mca-recover and get the GPA(IPA) of allocated page which would be corrupted on the later.
+   - Convert the GPA to HPA and corrupt this HPA via APEI/EINJ.
+   - Go back to guest and continue to read this page.
+
+   - The result of test is shown below:
+
+    root@genericarmv8:~/tools# ./mca-recover
+    pagesize: 0x1000
+    before clear cache
+    flags for page 0x2317b2: uptodate active mmap anon swapbacked
+    vtop(0xffff9c9e8000) = 0x2317b2000
+    Hit any key to access: before read
+
+    after read
+    Access at Tue Sep 17 01:41:14 2019
+
+    flags for page 0x2317b2: uptodate active mmap anon swapbacked
+    [  403.298539] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 0
+    [  403.301421] {1}[Hardware Error]: event severity: recoverable
+    [  403.303217] {1}[Hardware Error]:  Error 0, type: recoverable
+    [  403.304920] {1}[Hardware Error]:   section_type: memory error
+    [  403.306645] {1}[Hardware Error]:   physical_address: 0x00000002317b2000
+    [  403.308947] {1}[Hardware Error]:   error_type: 0, unknown
+    [  403.310630] WARNING: CPU: 0 PID: 510 at drivers/edac/ghes_edac.c:202 ghes_edac_report_mem_error+0x648/0xb20
+    [  403.310630] Modules linked in:
+    [  403.310631] CPU: 0 PID: 510 Comm: mca-recover Not tainted 4.19.0+ #8
+    [  403.310632] Hardware name: QEMU KVM Virtual Machine, BIOS 0.0.0 02/06/2015
+    [  403.310632] pstate: 60000005 (nZCv daif -PAN -UAO)
+    [  403.310632] pc : ghes_edac_report_mem_error+0x648/0xb20
+    [  403.310633] lr : ghes_proc+0x3d8/0x950
+    [  403.310633] sp : ffff00000c543b20
+    [  403.310633] x29: ffff00000c543b50 x28: ffff8001f5918014
+    [  403.310634] x27: 0000000000000000 x26: b1837ced833e63b8
+    [  403.310635] x25: 430fbbc1d995e954 x24: 0000000000000002
+    [  403.310636] x23: 0000000000000002 x22: ffff0000096ec000
+    [  403.310637] x21: ffff000009379000 x20: ffff8001f591805c
+    [  403.310638] x19: ffff8001f591e71c x18: ffffffffffffffff
+    [  403.310638] x17: 0000000000000000 x16: 0000000000000000
+    [  403.310639] x15: ffff000009379708 x14: 0000000000000000
+    [  403.310640] x13: 0000000000000002 x12: 317b200000000000
+    [  403.310641] x11: 0000000000000000 x10: 0000400200000000
+    [  403.310642] x9 : 0000000000000000 x8 : 00000002540be3ff
+    [  403.310642] x7 : 0000000000000000 x6 : ffff0000096dce30
+    [  403.310643] x5 : 4ede6f64a5bc1114 x4 : 0000000000000000
+    [  403.310644] x3 : ffff0000096ec4f0 x2 : ffff8001f591805c
+    [  403.310645] x1 : 0000000000000000 x0 : 0000000000110000
+    [  403.310646] Call trace:
+    [  403.310646]  ghes_edac_report_mem_error+0x648/0xb20
+    [  403.310646]  ghes_proc+0x3d8/0x950
+    [  403.310647]  ghes_notify_sea+0x3c/0x68
+    [  403.310647]  do_sea+0x9c/0x188
+    [  403.310647]  do_mem_abort+0x74/0x140
+    [  403.310648]  el0_da+0x24/0x28
+    [  403.310648] ---[ end trace 651f1abaa6b1de2d ]---
+    Recover: sig=7 si=0xffffc9bc5640 v=0xffffc9bc56c0[  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
+    [  403.364295] Memory failure: 0x2317b2: recovery action for dirty LRU page: Recovered
+
+    Platform memory error at 0x(nil)
+    Addr = (nil) lsb=0
+    Recovery allocated new page at physical 0x232563000
+    Got 2a2a2a2a
+
+
+-- 
+
+Thanks,
+Xiang
 
