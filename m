@@ -2,99 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC35DB5603
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 21:15:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84186B5632
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 21:34:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729999AbfIQTO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 15:14:59 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52934 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725865AbfIQTO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 15:14:59 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HJEFt4183679;
-        Tue, 17 Sep 2019 19:14:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=QMx50CQcBGdEDrZ4txMSMGEDsuF+A3iWP5uwy7rYvNw=;
- b=e1K4rHyPQNg/i38t3qhg1dJAtk9CvCOoVIIux2YawmsyG7HUUkKImyH8DlejGOy1BW21
- h2TNvIMFp6GW/EXLUtiFICcVNPsXALcqGGZSjEJ1m6Y+G0H8sm0zkGQJjxSKzcRWgNkY
- 5qs2uaRX+28IItHoFyvKWlCJd4HBAICv80BgvLeotZia0l+6GGK7uXCcnhrjP31QQgEM
- l39sqoco4FlF3CSLnkvCJANxvLVE9ayLAub7P8PEAe1zhcqgnRy0Ji+r8pa6ZWHMdAq9
- KPPAJHgzX9XV7iCRHdd08FITTZezQp0/JMR2m481J4KRiwQxM4MBAsPfVO8O+dFWpT6b Cw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2v2bx30stn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Sep 2019 19:14:54 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HJCbDF152086;
-        Tue, 17 Sep 2019 19:14:54 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2v2jjtqc56-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Sep 2019 19:14:53 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8HJErqn021224;
-        Tue, 17 Sep 2019 19:14:53 GMT
-Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 17 Sep 2019 12:14:53 -0700
-Subject: Re: [kvm-unit-tests PATCH v3 1/2] x86: nvmx: fix bug in
- __enter_guest()
-To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
-        jmattson@google.com, pshier@google.com,
-        sean.j.christopherson@intel.com
-References: <20190917185753.256039-1-marcorr@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <1393a5ea-3103-7f5c-7ea7-c6d9244efdff@oracle.com>
-Date:   Tue, 17 Sep 2019 12:14:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1726648AbfIQTeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 15:34:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41184 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726565AbfIQTeN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 15:34:13 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9AF49368CF
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 19:34:12 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id o188so1651941wmo.5
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 12:34:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oyRZ9yRbWvPLYJ7xJ/RWX6c9dvFuQeGVTO5kSpbtosY=;
+        b=QH74/1n2q3VhnWJC+y8OvrgeQZKOvyFQt9F4q3F5k6LEkGuOzEdUUHfFXbotvMOsn1
+         wmBqCePLyynIoWItSlbqwc1M8Lqb72GgHmx/7Llwp2ouY4WCph1gJeBoi1jGdG2sCnOU
+         4ig+Zwgf4ztOjK2dupX/AkPhhphSk20RmXR1kL4/cZIZpeVeQoQeZ4QHzqkpGfu7mfqj
+         vZzaFDpKxxE2Utv9HihBBgFU7Ojy9GGLKURQHwzEkTy2XqwQuMwUH3VFt37JGNBMHRfc
+         Y3vFHG/td0EDYjhC7nVydQ5M86eI+CT/xVa46WibvRK0loAsydmuG6Dhvvrby1CQ18m7
+         jf+w==
+X-Gm-Message-State: APjAAAUwA5xj0k6c3WcqlHlLTaLbC06h1M1HojaURTu8Q0FKD+xXuD4Z
+        90RDrNO0b8GWC/7HEMJru6jpwZxuB4+uy/erMP3z/d91uNVgCsuSgpE0D+xj0g27EaIQXkKPLhV
+        fiLcSLooihd3G
+X-Received: by 2002:a1c:f30d:: with SMTP id q13mr4415670wmq.60.1568748851292;
+        Tue, 17 Sep 2019 12:34:11 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx3xHb0JukXUbTTMqcE+trhGmnmjzDMa5Z3XBlqh10WpRucLlMRP54wV5iwJ6ivbZUAj4q45A==
+X-Received: by 2002:a1c:f30d:: with SMTP id q13mr4415656wmq.60.1568748850969;
+        Tue, 17 Sep 2019 12:34:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c111:7acd:8e1e:ee6f? ([2001:b07:6468:f312:c111:7acd:8e1e:ee6f])
+        by smtp.gmail.com with ESMTPSA id a18sm6896472wrh.25.2019.09.17.12.34.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Sep 2019 12:34:10 -0700 (PDT)
+Subject: Re: [PATCH] kvm: x86: Use DEFINE_DEBUGFS_ATTRIBUTE for debugfs files
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Yi Wang <wang.yi59@zte.com.cn>, rkrcmar@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        xue.zhihong@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
+References: <1563780839-14739-1-git-send-email-wang.yi59@zte.com.cn>
+ <31eec57f-2bc8-0ea0-e5fb-6b21ce902aae@redhat.com>
+ <20190917181240.GA1572563@kroah.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <533b250a-56c4-34c9-c294-15ee19ed4e65@redhat.com>
+Date:   Tue, 17 Sep 2019 21:34:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190917185753.256039-1-marcorr@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190917181240.GA1572563@kroah.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1909170183
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909170183
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 17/09/19 20:12, Greg Kroah-Hartman wrote:
+> On Tue, Sep 17, 2019 at 07:18:33PM +0200, Paolo Bonzini wrote:
+>> On 22/07/19 09:33, Yi Wang wrote:
+>>> We got these coccinelle warning:
+>>> ./arch/x86/kvm/debugfs.c:23:0-23: WARNING: vcpu_timer_advance_ns_fops
+>>> should be defined with DEFINE_DEBUGFS_ATTRIBUTE
+>>> ./arch/x86/kvm/debugfs.c:32:0-23: WARNING: vcpu_tsc_offset_fops should
+>>> be defined with DEFINE_DEBUGFS_ATTRIBUTE
+>>> ./arch/x86/kvm/debugfs.c:41:0-23: WARNING: vcpu_tsc_scaling_fops should
+>>> be defined with DEFINE_DEBUGFS_ATTRIBUTE
+>>> ./arch/x86/kvm/debugfs.c:49:0-23: WARNING: vcpu_tsc_scaling_frac_fops
+>>> should be defined with DEFINE_DEBUGFS_ATTRIBUTE
+>>>
+>>> Use DEFINE_DEBUGFS_ATTRIBUTE() rather than DEFINE_SIMPLE_ATTRIBUTE()
+>>> to fix this.
+>>>
+>>> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+>>
+>> It sucks though that you have to use a function with "unsafe" in the name.
+> 
+> I agree, why make this change?
+> 
+>> Greg, is the patch doing the right thing?
+> 
+> I can't tell.  What coccinelle script generated this patch?
 
+Seems to be scripts/coccinelle/api/debugfs/debugfs_simple_attr.cocci.
 
-On 09/17/2019 11:57 AM, Marc Orr wrote:
-> __enter_guest() should only set the launched flag when a launch has
-> succeeded. Thus, don't set the launched flag when the VMX_ENTRY_FAILURE,
-> bit 31, is set in the VMCS exit reason.
->
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> ---
->   x86/vmx.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/x86/vmx.c b/x86/vmx.c
-> index 6079420db33a..7313c78f15c2 100644
-> --- a/x86/vmx.c
-> +++ b/x86/vmx.c
-> @@ -1820,7 +1820,7 @@ static void __enter_guest(u8 abort_flag, struct vmentry_failure *failure)
->   		abort();
->   	}
->   
-> -	if (!failure->early) {
-> +	if (!failure->early && !(vmcs_read(EXI_REASON) & VMX_ENTRY_FAILURE)) {
->   		launched = 1;
->   		check_for_guest_termination();
->   	}
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+//# Rationale: DEFINE_SIMPLE_ATTRIBUTE + debugfs_create_file()
+//# imposes some significant overhead as compared to
+//# DEFINE_DEBUGFS_ATTRIBUTE + debugfs_create_file_unsafe().
+
+Paolo
+
+> thanks,
+> 
+> greg k-h
+> 
+
