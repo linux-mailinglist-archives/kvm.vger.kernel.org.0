@@ -2,167 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E3180B4902
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:16:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C11DEB4915
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:18:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387401AbfIQIQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 04:16:41 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:44219 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbfIQIQk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 04:16:40 -0400
-Received: by mail-pl1-f193.google.com with SMTP id k24so347723pll.11;
-        Tue, 17 Sep 2019 01:16:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=mgukzCtnclCW/hH0uFMjnqXIijt7Mvy5DsHXeaPWECE=;
-        b=aY+iFmHYIF6t7XIv33dW0IGxufDOC4JFNAtk94pzw3JQrwBFs9vJdyD6pJjIBE2LKR
-         O1EecKgPXResbqetQCjLqch20H+MWmr+FYQHtg1NAC9/jOi6902463MXTIqk822fwbHd
-         xbYLoDlLJdKCiFb3Zndd60LWYkFgf8IfTWkqxPR05TDyExYQJ2wxTncnHEZDsZz301oY
-         z8SlDDsZFLBSEMQIYHj8Zlos6PYzC6UcDlAbYC8tzSt23STldWChc27x5yZAJPL9fbpI
-         RK82f14lTEwSfz1jhcSv7I+uJUMB9xVc4P3ApKhnOp0d7MKrPpFpPfkLrnmn8MkTGaNL
-         ABAg==
+        id S1732986AbfIQISU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 04:18:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36826 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732005AbfIQISU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 04:18:20 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8BD8D83F42
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 08:18:19 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id 124so469436wmz.1
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 01:18:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=mgukzCtnclCW/hH0uFMjnqXIijt7Mvy5DsHXeaPWECE=;
-        b=kyDojjPeZVmDH1HWh2r/PZ6eKjy/6RGA+wdyGvApCTquGivRFB0L5/1lLHGz44REH0
-         8ignW2OI/IlpXn053kTFVtV6ewhpVl1OfoYJ9iFL8YuzBwbIWQ88tQx0PIUgEOAxRqoC
-         xfcVfy1dj5yaHhzgQfjlVmCgsr81aZ3KGRaTzy90kEMawIOFUvBGZFRJFDPAIOdfJDGX
-         cSFaupI2RNRPJhxUTNTK/j0d3bugsyPg+3Pq8HTaAio5zIIoRvjVjEus+XKQBVQLTygT
-         Jw1WJ0GSsRkn7dwzEhcOma2vhh2muiPViguv4eFbfHx+SKEapbBZGDHoWkkrSxha+qSA
-         dfjg==
-X-Gm-Message-State: APjAAAVqpJg1hJlMmw4ic6+FpHEEStyKp28+tuehGlcp8VxOTDoxUczS
-        w/4bciDWePZORX6yGjPtiK4oW1Ti
-X-Google-Smtp-Source: APXvYqzGqOXY+sIUFWupOkrIA0xrZ4XOZ746IgCkW0V7c3zoO9XbpqMSLA+PA/hpRbm2meAV2xArtw==
-X-Received: by 2002:a17:902:9a92:: with SMTP id w18mr2345703plp.255.1568708199199;
-        Tue, 17 Sep 2019 01:16:39 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id j10sm1924142pfh.137.2019.09.17.01.16.36
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 17 Sep 2019 01:16:38 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v5 3/3] KVM: LAPIC: Tune lapic_timer_advance_ns smoothly
-Date:   Tue, 17 Sep 2019 16:16:26 +0800
-Message-Id: <1568708186-20260-3-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qRyrFKgOm48KkKg55Dl+vUukfxK99uW3Zie+F4GtPtQ=;
+        b=PTb0hxFysnLCjlH1Wx302yyaU1Gxx6TX4gHMqhV5biZ+BGeXasiyEPAx7PZ3WWWI7k
+         yC1lWmWk7wFnY+yQVqTfQQB6+JCFUvcDKUSp8pfRNmW3SyanVcKR/n0aRrMjJA9DsVOZ
+         m8kUR6ECXzTwlNTOgDpjxOA78qMBGZvgS6oOlCzB9r7eT+enmcvEmc+cTNaaGE2n1kgB
+         LxKuA3DjFAhcB7BowgDRJwvTV6RqIxP8pPqkDciTm9Y3bHUhKAp0fWxaDP1C8tVAHaFi
+         QNlPLK4SzAnI9V7CJAWdM301QBIJqr++avGdiyAqr6fK5omdKLaA/fb/zhJr1wrSS/Yx
+         UZAQ==
+X-Gm-Message-State: APjAAAWwyxeGnKOy3hXqaPsAcHTYloU4OH5PF3xYLsnMFOxE0+3ecd+Q
+        lijhkdjvnzAl6FrYOCU+imC/WZmx5/xi7eHS+Qrr7OhCouLIMkbuZQ50DcSn0it1tKrg9A4ksAS
+        br7ozYenm6Ovf
+X-Received: by 2002:adf:e548:: with SMTP id z8mr1879068wrm.324.1568708298091;
+        Tue, 17 Sep 2019 01:18:18 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwCfHMrixhy4NM9wsotuqqspSjFXXw/P/RLA2EqCwu+G5IRiXW42RqN3pEaaPcqbfI2jIW1UQ==
+X-Received: by 2002:adf:e548:: with SMTP id z8mr1879043wrm.324.1568708297784;
+        Tue, 17 Sep 2019 01:18:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
+        by smtp.gmail.com with ESMTPSA id y186sm2997074wmb.41.2019.09.17.01.18.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Sep 2019 01:18:17 -0700 (PDT)
+Subject: Re: [PATCH 1/3] KVM: Fix coalesced mmio ring buffer out-of-bounds
+ access
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     P J P <ppandit@redhat.com>, Jim Mattson <jmattson@google.com>
 References: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f4549d5a-d948-f1d1-2a29-8c4621dae1b0@redhat.com>
+Date:   Tue, 17 Sep 2019 10:18:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+I think we should consider the embargo for CVE-2019-14821 to be broken.
+ Since your patch is better, I'll push that one instead as soon as I get
+confirmation.
 
-Filter out drastic fluctuation and random fluctuation, remove
-timer_advance_adjust_done altogether, the adjustment would be
-continuous.
+Paolo
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 28 ++++++++++++++--------------
- arch/x86/kvm/lapic.h |  1 -
- 2 files changed, 14 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index dbbe478..323bdca 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -65,7 +65,9 @@
- #define APIC_BROADCAST			0xFF
- #define X2APIC_BROADCAST		0xFFFFFFFFul
- 
--#define LAPIC_TIMER_ADVANCE_ADJUST_DONE 100
-+static bool dynamically_adjust_timer_advance __read_mostly;
-+#define LAPIC_TIMER_ADVANCE_ADJUST_MIN 100
-+#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 5000
- #define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-@@ -1485,26 +1487,25 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
- 	u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
- 	u64 ns;
- 
-+	/* Do not adjust for tiny fluctuations or large random spikes. */
-+	if (abs(advance_expire_delta) > LAPIC_TIMER_ADVANCE_ADJUST_MAX ||
-+	    abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_MIN)
-+		return;
-+
- 	/* too early */
- 	if (advance_expire_delta < 0) {
- 		ns = -advance_expire_delta * 1000000ULL;
- 		do_div(ns, vcpu->arch.virtual_tsc_khz);
--		timer_advance_ns -= min((u32)ns,
--			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-+		timer_advance_ns -= ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
- 	} else {
- 	/* too late */
- 		ns = advance_expire_delta * 1000000ULL;
- 		do_div(ns, vcpu->arch.virtual_tsc_khz);
--		timer_advance_ns += min((u32)ns,
--			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-+		timer_advance_ns += ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
- 	}
- 
--	if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
--		apic->lapic_timer.timer_advance_adjust_done = true;
--	if (unlikely(timer_advance_ns > 5000)) {
-+	if (unlikely(timer_advance_ns > LAPIC_TIMER_ADVANCE_ADJUST_MAX))
- 		timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
--		apic->lapic_timer.timer_advance_adjust_done = false;
--	}
- 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
- }
- 
-@@ -1524,7 +1525,7 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
- 	if (guest_tsc < tsc_deadline)
- 		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
- 
--	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-+	if (dynamically_adjust_timer_advance)
- 		adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
- }
- 
-@@ -2302,13 +2303,12 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
- 	apic->lapic_timer.timer.function = apic_timer_fn;
- 	if (timer_advance_ns == -1) {
- 		apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
--		apic->lapic_timer.timer_advance_adjust_done = false;
-+		dynamically_adjust_timer_advance = true;
- 	} else {
- 		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
--		apic->lapic_timer.timer_advance_adjust_done = true;
-+		dynamically_adjust_timer_advance = false;
- 	}
- 
--
- 	/*
- 	 * APIC is created enabled. This will prevent kvm_lapic_set_base from
- 	 * thinking that APIC state has changed.
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 50053d2..2aad7e2 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -35,7 +35,6 @@ struct kvm_timer {
- 	s64 advance_expire_delta;
- 	atomic_t pending;			/* accumulated triggered timers */
- 	bool hv_timer_in_use;
--	bool timer_advance_adjust_done;
- };
- 
- struct kvm_lapic {
--- 
-2.7.4
+On 17/09/19 10:16, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> Reported by syzkaller:
+> 
+> 	#PF: supervisor write access in kernel mode
+> 	#PF: error_code(0x0002) - not-present page
+> 	PGD 403c01067 P4D 403c01067 PUD 0
+> 	Oops: 0002 [#1] SMP PTI
+> 	CPU: 1 PID: 12564 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
+> 	RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
+> 	Call Trace:
+> 	 __kvm_io_bus_write+0x91/0xe0 [kvm]
+> 	 kvm_io_bus_write+0x79/0xf0 [kvm]
+> 	 write_mmio+0xae/0x170 [kvm]
+> 	 emulator_read_write_onepage+0x252/0x430 [kvm]
+> 	 emulator_read_write+0xcd/0x180 [kvm]
+> 	 emulator_write_emulated+0x15/0x20 [kvm]
+> 	 segmented_write+0x59/0x80 [kvm]
+> 	 writeback+0x113/0x250 [kvm]
+> 	 x86_emulate_insn+0x78c/0xd80 [kvm]
+> 	 x86_emulate_instruction+0x386/0x7c0 [kvm]
+> 	 kvm_mmu_page_fault+0xf9/0x9e0 [kvm]
+> 	 handle_ept_violation+0x10a/0x220 [kvm_intel]
+> 	 vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
+> 	 vcpu_enter_guest+0x4dc/0x18d0 [kvm]
+> 	 kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
+> 	 kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
+> 	 do_vfs_ioctl+0xa2/0x690
+> 	 ksys_ioctl+0x6d/0x80
+> 	 __x64_sys_ioctl+0x1a/0x20
+> 	 do_syscall_64+0x74/0x720
+> 	 entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 	RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
+> 
+> Both the coalesced_mmio ring buffer indexs ring->first and ring->last are 
+> bigger than KVM_COALESCED_MMIO_MAX from the testcase, array out-of-bounds 
+> access triggers by ring->coalesced_mmio[ring->last].phys_addr = addr; 
+> assignment. This patch fixes it by mod indexs by KVM_COALESCED_MMIO_MAX.
+> 
+> syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134b2826a00000
+> 
+> Reported-by: syzbot+983c866c3dd6efa3662a@syzkaller.appspotmail.com
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  virt/kvm/coalesced_mmio.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+> index 5294abb..cff1ec9 100644
+> --- a/virt/kvm/coalesced_mmio.c
+> +++ b/virt/kvm/coalesced_mmio.c
+> @@ -73,6 +73,8 @@ static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
+>  
+>  	spin_lock(&dev->kvm->ring_lock);
+>  
+> +	ring->first = ring->first % KVM_COALESCED_MMIO_MAX;
+> +	ring->last = ring->last % KVM_COALESCED_MMIO_MAX;
+>  	if (!coalesced_mmio_has_room(dev)) {
+>  		spin_unlock(&dev->kvm->ring_lock);
+>  		return -EOPNOTSUPP;
+> 
 
