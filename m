@@ -2,193 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15462B4460
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 01:02:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F022B4518
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 03:05:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388372AbfIPXCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Sep 2019 19:02:30 -0400
-Received: from mga01.intel.com ([192.55.52.88]:47684 "EHLO mga01.intel.com"
+        id S1733257AbfIQBE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Sep 2019 21:04:59 -0400
+Received: from mga04.intel.com ([192.55.52.120]:34819 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730434AbfIPXCa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Sep 2019 19:02:30 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727996AbfIQBE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Sep 2019 21:04:59 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Sep 2019 16:02:29 -0700
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Sep 2019 18:04:58 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,514,1559545200"; 
-   d="scan'208";a="270345856"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga001.jf.intel.com with ESMTP; 16 Sep 2019 16:02:29 -0700
-Date:   Mon, 16 Sep 2019 16:02:29 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Marc Orr <marcorr@google.com>
-Cc:     kvm@vger.kernel.org, jmattson@google.com, pshier@google.com
-Subject: Re: [PATCH v2] kvm: nvmx: limit atomic switch MSRs
-Message-ID: <20190916230229.GO18871@linux.intel.com>
-References: <20190914003940.203636-1-marcorr@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190914003940.203636-1-marcorr@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+   d="scan'208";a="180611926"
+Received: from dpdk-virtio-tbie-2.sh.intel.com ([10.67.104.71])
+  by orsmga008.jf.intel.com with ESMTP; 16 Sep 2019 18:04:55 -0700
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, lingshan.zhu@intel.com, tiwei.bie@intel.com
+Subject: [RFC v4 0/3] vhost: introduce mdev based hardware backend
+Date:   Tue, 17 Sep 2019 09:02:01 +0800
+Message-Id: <20190917010204.30376-1-tiwei.bie@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 13, 2019 at 05:39:40PM -0700, Marc Orr wrote:
-> Allowing an unlimited number of MSRs to be specified via the VMX
-> load/store MSR lists (e.g., vm-entry MSR load list) is bad for two
-> reasons. First, a guest can specify an unreasonable number of MSRs,
-> forcing KVM to process all of them in software. Second, the SDM bounds
-> the number of MSRs allowed to be packed into the atomic switch MSR lists.
-> Quoting the "Miscellaneous Data" section in the "VMX Capability
-> Reporting Facility" appendix:
-> 
-> "Bits 27:25 is used to compute the recommended maximum number of MSRs
-> that should appear in the VM-exit MSR-store list, the VM-exit MSR-load
-> list, or the VM-entry MSR-load list. Specifically, if the value bits
-> 27:25 of IA32_VMX_MISC is N, then 512 * (N + 1) is the recommended
-> maximum number of MSRs to be included in each list. If the limit is
-> exceeded, undefined processor behavior may result (including a machine
-> check during the VMX transition)."
-> 
-> Thus, force a VM-entry to fail due to MSR loading when the MSR load
-> list is too large. Similarly, trigger an abort during a VM exit that
-> encounters an MSR load list or MSR store list that is too large.
+This RFC is to demonstrate below ideas,
 
-It's probably redundant/obvious, but I think it's worth calling out that
-this is arbitrary KVM behavior, e.g. replace "Thus," with something like:
+a) Build vhost-mdev on top of the same abstraction defined in
+   the virtio-mdev series [1];
 
-  Because KVM needs to protect itself and can't model "undefined processor
-  behavior", arbitrarily
+b) Introduce /dev/vhost-mdev to do vhost ioctls and support
+   setting mdev device as backend;
 
-The changelog (and maybe a comment in the code) should also state that
-the count is intentionally not pre-checked so as to maintain compability
-with hardware inasmuch as possible.  That's a subtlety that's likely to
-lead to "cleanup" in the future :-)
+Now the userspace API looks like this:
 
-Code itself looks good, with the spurious vmx_control_msr() removed.
+- Userspace generates a compatible mdev device;
 
-> Test these new checks with the kvm-unit-test "x86: nvmx: test max atomic
-> switch MSRs".
-> 
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> ---
-> v1 -> v2
-> * Updated description to distinguish the relevant appendix.
-> * Renamed VMX_MISC_MSR_LIST_INCREMENT to VMX_MISC_MSR_LIST_MULTIPLIER.
-> * Moved vmx_control_msr() and vmx_control_verify() up in the source.
-> * Modified nested_vmx_store_msr() to fail lazily, like
->   nested_vmx_load_msr().
-> 
->  arch/x86/include/asm/vmx.h |  1 +
->  arch/x86/kvm/vmx/nested.c  | 41 ++++++++++++++++++++++++++++----------
->  2 files changed, 31 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index a39136b0d509..a1f6ed187ccd 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -110,6 +110,7 @@
->  #define VMX_MISC_SAVE_EFER_LMA			0x00000020
->  #define VMX_MISC_ACTIVITY_HLT			0x00000040
->  #define VMX_MISC_ZERO_LEN_INS			0x40000000
-> +#define VMX_MISC_MSR_LIST_MULTIPLIER		512
->  
->  /* VMFUNC functions */
->  #define VMX_VMFUNC_EPTP_SWITCHING               0x00000001
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index ced9fba32598..bca0167b8bdd 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -190,6 +190,16 @@ static void nested_vmx_abort(struct kvm_vcpu *vcpu, u32 indicator)
->  	pr_debug_ratelimited("kvm: nested vmx abort, indicator %d\n", indicator);
->  }
->  
-> +static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> +{
-> +	return fixed_bits_valid(control, low, high);
-> +}
-> +
-> +static inline u64 vmx_control_msr(u32 low, u32 high)
-> +{
-> +	return low | ((u64)high << 32);
-> +}
-> +
->  static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
->  {
->  	secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
-> @@ -856,6 +866,17 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static u64 vmx_control_msr(u32 low, u32 high);
-> +
-> +static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +	u64 vmx_misc = vmx_control_msr(vmx->nested.msrs.misc_low,
-> +				       vmx->nested.msrs.misc_high);
-> +
-> +	return (vmx_miscd_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIER;
-> +}
-> +
->  /*
->   * Load guest's/host's msr at nested entry/exit.
->   * return 0 for success, entry index for failure.
-> @@ -865,9 +886,13 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
->  	u32 i;
->  	struct vmx_msr_entry e;
->  	struct msr_data msr;
-> +	u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
->  
->  	msr.host_initiated = false;
->  	for (i = 0; i < count; i++) {
-> +		if (unlikely(i >= max_msr_list_size))
-> +			goto fail;
-> +
->  		if (kvm_vcpu_read_guest(vcpu, gpa + i * sizeof(e),
->  					&e, sizeof(e))) {
->  			pr_debug_ratelimited(
-> @@ -899,9 +924,14 @@ static int nested_vmx_store_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
->  {
->  	u32 i;
->  	struct vmx_msr_entry e;
-> +	u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
->  
->  	for (i = 0; i < count; i++) {
->  		struct msr_data msr_info;
-> +
-> +		if (unlikely(i >= max_msr_list_size))
-> +			return -EINVAL;
-> +
->  		if (kvm_vcpu_read_guest(vcpu,
->  					gpa + i * sizeof(e),
->  					&e, 2 * sizeof(u32))) {
-> @@ -1009,17 +1039,6 @@ static u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
->  	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
->  }
->  
-> -
-> -static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> -{
-> -	return fixed_bits_valid(control, low, high);
-> -}
-> -
-> -static inline u64 vmx_control_msr(u32 low, u32 high)
-> -{
-> -	return low | ((u64)high << 32);
-> -}
-> -
->  static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
->  {
->  	superset &= mask;
-> -- 
-> 2.23.0.237.gc6a4ce50a0-goog
-> 
+- Userspace opens this mdev device with VFIO API (including
+  doing IOMMU programming for this mdev device with VFIO's
+  container/group based interface);
+
+- Userspace opens /dev/vhost-mdev and gets vhost fd;
+
+- Userspace uses vhost ioctls to setup vhost (userspace should
+  do VHOST_MDEV_SET_BACKEND ioctl with VFIO group fd and device
+  fd first before doing other vhost ioctls);
+
+Only compile test has been done for this series for now.
+
+RFCv3: https://patchwork.kernel.org/patch/11117785/
+
+[1] https://lkml.org/lkml/2019/9/10/135
+
+Tiwei Bie (3):
+  vfio: support getting vfio device from device fd
+  vfio: support checking vfio driver by device ops
+  vhost: introduce mdev based hardware backend
+
+ drivers/vfio/mdev/vfio_mdev.c    |   3 +-
+ drivers/vfio/vfio.c              |  32 +++
+ drivers/vhost/Kconfig            |   9 +
+ drivers/vhost/Makefile           |   3 +
+ drivers/vhost/mdev.c             | 462 +++++++++++++++++++++++++++++++
+ drivers/vhost/vhost.c            |  39 ++-
+ drivers/vhost/vhost.h            |   6 +
+ include/linux/vfio.h             |  11 +
+ include/uapi/linux/vhost.h       |  10 +
+ include/uapi/linux/vhost_types.h |   5 +
+ 10 files changed, 573 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/vhost/mdev.c
+
+-- 
+2.17.1
+
