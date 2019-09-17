@@ -2,104 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A156B4995
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:35:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0687B49DA
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:53:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387419AbfIQIfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 04:35:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:52906 "EHLO foss.arm.com"
+        id S1726178AbfIQIwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 04:52:51 -0400
+Received: from mga18.intel.com ([134.134.136.126]:37165 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726283AbfIQIfm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 04:35:42 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2856928;
-        Tue, 17 Sep 2019 01:35:42 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 725C53F575;
-        Tue, 17 Sep 2019 01:35:41 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
- driven by vcpu_load/put
-To:     Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <Andre.Przywara@arm.com>
-References: <20190903155747.219802-1-maz@kernel.org>
- <5ab75fec-6014-e3b4-92a3-63d5015814c1@huawei.com>
-From:   Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <07ddb304-9a7a-64a3-386a-96eea4516346@kernel.org>
-Date:   Tue, 17 Sep 2019 09:35:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <5ab75fec-6014-e3b4-92a3-63d5015814c1@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1725811AbfIQIw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 04:52:28 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 01:52:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,515,1559545200"; 
+   d="scan'208";a="193695456"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by FMSMGA003.fm.intel.com with ESMTP; 17 Sep 2019 01:52:25 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com
+Cc:     mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com, alazar@bitdefender.com,
+        Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v5 0/9] Enable Sub-page Write Protection Support
+Date:   Tue, 17 Sep 2019 16:52:55 +0800
+Message-Id: <20190917085304.16987-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+EPT-Based Sub-Page write Protection(SPP)is a HW capability which allows
+Virtual Machine Monitor(VMM) to specify write-permission for guest
+physical memory at a sub-page(128 byte) granularity. When this
+capability is enabled, the CPU enforces write-access check for sub-pages
+within a 4KB page.
 
-On 17/09/2019 09:10, Zenghui Yu wrote:
-> Hi Marc,
-> 
-> I've run this patch on my box and got the following messages:
-> 
-> ---8<
-> 
-> [ 2258.490030] BUG: sleeping function called from invalid context at 
-> kernel/irq/manage.c:138
-> [ 2258.490034] in_atomic(): 1, irqs_disabled(): 0, pid: 59278, name: CPU 
-> 0/KVM
-> [ 2258.490039] CPU: 32 PID: 59278 Comm: CPU 0/KVM Kdump: loaded Tainted: 
-> G        W         5.3.0+ #26
-> [ 2258.490041] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 
-> 10/29/2018
-> [ 2258.490043] Call trace:
-> [ 2258.490056]  dump_backtrace+0x0/0x188
-> [ 2258.490060]  show_stack+0x24/0x30
-> [ 2258.490066]  dump_stack+0xb0/0xf4
-> [ 2258.490072]  ___might_sleep+0x10c/0x130
-> [ 2258.490074]  __might_sleep+0x58/0x90
-> [ 2258.490078]  synchronize_irq+0x58/0xd8
-> [ 2258.490079]  disable_irq+0x2c/0x38
-> [ 2258.490083]  vgic_v4_load+0x9c/0xc0
-> [ 2258.490084]  vgic_v3_load+0x94/0x170
-> [ 2258.490088]  kvm_vgic_load+0x3c/0x60
-> [ 2258.490092]  kvm_arch_vcpu_load+0xd4/0x1d0
-> [ 2258.490095]  vcpu_load+0x50/0x70
-> [ 2258.490097]  kvm_arch_vcpu_ioctl_run+0x94/0x978
-> [ 2258.490098]  kvm_vcpu_ioctl+0x3d8/0xa28
-> [ 2258.490104]  do_vfs_ioctl+0xc4/0x8e8
-> [ 2258.490106]  ksys_ioctl+0x8c/0xa0
-> [ 2258.490108]  __arm64_sys_ioctl+0x28/0x58
-> [ 2258.490112]  el0_svc_common.constprop.0+0x7c/0x188
-> [ 2258.490114]  el0_svc_handler+0x34/0xb8
-> [ 2258.490117]  el0_svc+0x8/0xc
-> [ 2259.497070] BUG: sleeping function called from invalid context at 
-> kernel/irq/manage.c:138
+The feature is targeted to provide fine-grained memory protection for
+usages such as device virtualization, memory check-point and VM
+introspection etc.
 
-Thanks for reporting this.
+SPP is active when the "sub-page write protection" (bit 23) is 1 in
+Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+Permission Table(SPPT), SPPT is referenced via a 64-bit control field
+called Sub-Page Permission Table Pointer (SPPTP) which contains a
+4K-aligned physical address.
 
-[...]
+To enable SPP for certain physical page, the gfn should be first mapped
+to a 4KB entry, then set bit 61 of the corresponding EPT leaf entry. 
+While HW walks EPT, if bit 61 is set, it traverses SPPT with the guset
+physical address to find out the sub-page permissions at the leaf entry.
+If the corresponding bit is set, write to sub-page is permitted,
+otherwise, SPP induced EPT violation is generated.
 
-> The logic of disabling the doorbell interrupt in vgic_v4_load() might
-> need a fix?
+This patch serial passed SPP function test and selftest on Ice-Lake platform.
 
-The logic itself looks OK, but doing a full blown disable_irq() is both
-counter productive (if we race against a doorbell, there is not much we
-can do about it and waiting for it to end is pointless) and wrong
-(despite the comment that this can be called in IRQ context, it is
-pretty unsafe to do so).
+Please refer to the SPP introduction document in this patch set and
+Intel SDM for details:
 
-Can you try turning it into a disable_irq_nosync() and let me know if
-that helps?
+Intel SDM:
+https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
 
-Thanks,
+SPP selftest patch:
+https://lkml.org/lkml/2019/6/18/1197
 
-	M.
+Previous patch:
+https://lkml.org/lkml/2019/8/14/97
+
+Patch 1: Introduction to SPP.
+Patch 2: Add SPP related flags and control bits.
+Patch 3: Functions for SPPT setup.
+Patch 4: Add SPP access bitmaps for memslots.
+Patch 5: Introduce SPP {init,set,get} functions
+Patch 6: Implement User space access IOCTLs.
+Patch 7: Set up SPP paging table at vm-entry/exit.
+Patch 8: Enable lazy mode SPPT setup.
+Patch 9: Handle SPP protected pages when VM memory changes
+
+
+Change logs:
+
+V5 -> V4:
+  1. Enable SPP support for Hugepage(1GB/2MB) to extend application.
+  2. Make SPP miss vm-exit handler as the unified place to set up SPPT.
+  3. If SPP protected pages are access-tracked or dirty-page-tracked,
+     store SPP flag in reserved address bit, restore it in
+     fast_page_fault() handler.
+  4. Move SPP specific functions to vmx/spp.c and vmx/spp.h
+  5. Rebased code to kernel v5.3
+  6. Other change suggested by KVM community.
+  
+V3 -> V4:
+  1. Modified documentation to make it consistent with patches.
+  2. Allocated SPPT root page in init_spp() instead of vmx_set_cr3() to
+     avoid SPPT miss error.
+  3. Added back co-developers and sign-offs.
+
+V2 -> V3:                                                                
+  1. Rebased patches to kernel 5.1 release                                
+  2. Deferred SPPT setup to EPT fault handler if the page is not
+     available while set_subpage() is being called.
+  3. Added init IOCTL to reduce extra cost if SPP is not used.
+  4. Refactored patch structure, cleaned up cross referenced functions.
+  5. Added code to deal with memory swapping/migration/shrinker cases.
+
+V2 -> V1:
+  1. Rebased to 4.20-rc1
+  2. Move VMCS change to a separated patch.
+  3. Code refine and Bug fix 
+
+
+Yang Weijiang (9):
+  Documentation: Introduce EPT based Subpage Protection
+  vmx: spp: Add control flags for Sub-Page Protection(SPP)
+  mmu: spp: Add SPP Table setup functions
+  mmu: spp: Add functions to create/destroy SPP bitmap block
+  mmu: spp: Introduce SPP {init,set,get} functions
+  x86: spp: Introduce user-space SPP IOCTLs
+  vmx: spp: Set up SPP paging table at vm-entry/exit
+  mmu: spp: Enable Lazy mode SPP protection
+  mmu: spp: Handle SPP protected pages when VM memory changes
+
+ Documentation/virtual/kvm/spp_kvm.txt | 178 +++++++
+ arch/x86/include/asm/cpufeatures.h    |   1 +
+ arch/x86/include/asm/kvm_host.h       |  10 +-
+ arch/x86/include/asm/vmx.h            |  10 +
+ arch/x86/include/uapi/asm/vmx.h       |   2 +
+ arch/x86/kernel/cpu/intel.c           |   4 +
+ arch/x86/kvm/mmu.c                    |  78 ++-
+ arch/x86/kvm/mmu.h                    |   2 +
+ arch/x86/kvm/vmx/capabilities.h       |   5 +
+ arch/x86/kvm/vmx/spp.c                | 651 ++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/spp.h                |  27 ++
+ arch/x86/kvm/vmx/vmx.c                |  99 ++++
+ arch/x86/kvm/x86.c                    |  51 ++
+ include/uapi/linux/kvm.h              |  17 +
+ 14 files changed, 1133 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
+ create mode 100644 arch/x86/kvm/vmx/spp.c
+ create mode 100644 arch/x86/kvm/vmx/spp.h
+
 -- 
-Jazz is not dead, it just smells funny...
+2.17.2
+
