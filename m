@@ -2,568 +2,396 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BF6FB48CF
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEDD7B48E6
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:12:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404655AbfIQIJ2 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 17 Sep 2019 04:09:28 -0400
-Received: from mga01.intel.com ([192.55.52.88]:54378 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728126AbfIQIJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 04:09:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 01:09:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,515,1559545200"; 
-   d="scan'208";a="177312486"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by orsmga007.jf.intel.com with ESMTP; 17 Sep 2019 01:09:26 -0700
-Received: from fmsmsx154.amr.corp.intel.com (10.18.116.70) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 17 Sep 2019 01:09:26 -0700
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- FMSMSX154.amr.corp.intel.com (10.18.116.70) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 17 Sep 2019 01:09:25 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.23]) with mapi id 14.03.0439.000;
- Tue, 17 Sep 2019 16:09:23 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "airlied@linux.ie" <airlied@linux.ie>,
-        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
-        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "idos@mellanox.com" <idos@mellanox.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-        "Wang, Xiao W" <xiao.w.wang@intel.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "daniel@ffwll.ch" <daniel@ffwll.ch>,
-        "Wang, Zhihong" <zhihong.wang@intel.com>
-Subject: RE: [RFC PATCH 2/2] mdev: introduce device specific ops
-Thread-Topic: [RFC PATCH 2/2] mdev: introduce device specific ops
-Thread-Index: AQHVaU5C7SWjfMEZZESkIQks0N60NKcviCqA
-Date:   Tue, 17 Sep 2019 08:09:22 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D579F71@SHSMSX104.ccr.corp.intel.com>
-References: <20190912094012.29653-1-jasowang@redhat.com>
- <20190912094012.29653-3-jasowang@redhat.com>
-In-Reply-To: <20190912094012.29653-3-jasowang@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTcyY2ZlNGItNWNiMi00NWYyLWE3NmItNjI5MzMwYTgzYjE0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSGwzcVZLR3BzWnhxYThcL3N1eHVUT2xUNklhWVdndTJFcElFZFN3eW40OXRGMk14UDBmcVwvSlRqNHZDMk5vK1NtIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S2388047AbfIQIMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 04:12:46 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:35340 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728802AbfIQIMq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 04:12:46 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 0C3B6269A6DB47ECD602;
+        Tue, 17 Sep 2019 16:12:43 +0800 (CST)
+Received: from [127.0.0.1] (10.184.12.158) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 17 Sep 2019
+ 16:12:36 +0800
+Subject: Re: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
+ driven by vcpu_load/put
+To:     Marc Zyngier <maz@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
+CC:     Andre Przywara <Andre.Przywara@arm.com>
+References: <20190903155747.219802-1-maz@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <5ab75fec-6014-e3b4-92a3-63d5015814c1@huawei.com>
+Date:   Tue, 17 Sep 2019 16:10:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
+ Thunderbird/64.0
 MIME-Version: 1.0
+In-Reply-To: <20190903155747.219802-1-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.12.158]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Wang
-> Sent: Thursday, September 12, 2019 5:40 PM
-> 
-> Currently, except for the crate and remove. The rest fields of
-> mdev_parent_ops is just designed for vfio-mdev driver and may not help
-> for kernel mdev driver. So follow the device id support by previous
-> patch, this patch introduces device specific ops which points to
-> device specific ops (e.g vfio ops). This allows the future drivers
-> like virtio-mdev to implement its own device specific ops.
+Hi Marc,
 
-Can you give an example about what ops might be required to support
-kernel mdev driver? I know you posted a link earlier, but putting a small
-example here can save time and avoid inconsistent understanding. Then
-it will help whether the proposed split makes sense or there is a 
-possibility of redefining the callbacks to meet the both requirements.
-imo those callbacks fulfill some basic requirements when mediating
-a device...
+I've run this patch on my box and got the following messages:
 
+---8<
+
+[ 2258.490030] BUG: sleeping function called from invalid context at 
+kernel/irq/manage.c:138
+[ 2258.490034] in_atomic(): 1, irqs_disabled(): 0, pid: 59278, name: CPU 
+0/KVM
+[ 2258.490039] CPU: 32 PID: 59278 Comm: CPU 0/KVM Kdump: loaded Tainted: 
+G        W         5.3.0+ #26
+[ 2258.490041] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 
+10/29/2018
+[ 2258.490043] Call trace:
+[ 2258.490056]  dump_backtrace+0x0/0x188
+[ 2258.490060]  show_stack+0x24/0x30
+[ 2258.490066]  dump_stack+0xb0/0xf4
+[ 2258.490072]  ___might_sleep+0x10c/0x130
+[ 2258.490074]  __might_sleep+0x58/0x90
+[ 2258.490078]  synchronize_irq+0x58/0xd8
+[ 2258.490079]  disable_irq+0x2c/0x38
+[ 2258.490083]  vgic_v4_load+0x9c/0xc0
+[ 2258.490084]  vgic_v3_load+0x94/0x170
+[ 2258.490088]  kvm_vgic_load+0x3c/0x60
+[ 2258.490092]  kvm_arch_vcpu_load+0xd4/0x1d0
+[ 2258.490095]  vcpu_load+0x50/0x70
+[ 2258.490097]  kvm_arch_vcpu_ioctl_run+0x94/0x978
+[ 2258.490098]  kvm_vcpu_ioctl+0x3d8/0xa28
+[ 2258.490104]  do_vfs_ioctl+0xc4/0x8e8
+[ 2258.490106]  ksys_ioctl+0x8c/0xa0
+[ 2258.490108]  __arm64_sys_ioctl+0x28/0x58
+[ 2258.490112]  el0_svc_common.constprop.0+0x7c/0x188
+[ 2258.490114]  el0_svc_handler+0x34/0xb8
+[ 2258.490117]  el0_svc+0x8/0xc
+[ 2259.497070] BUG: sleeping function called from invalid context at 
+kernel/irq/manage.c:138
+[ 2259.497077] in_atomic(): 1, irqs_disabled(): 0, pid: 59278, name: CPU 
+0/KVM
+[ 2259.497082] CPU: 33 PID: 59278 Comm: CPU 0/KVM Kdump: loaded Tainted: 
+G        W         5.3.0+ #26
+[ 2259.497083] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.58 
+10/29/2018
+[ 2259.497086] Call trace:
+[ 2259.497098]  dump_backtrace+0x0/0x188
+[ 2259.497101]  show_stack+0x24/0x30
+[ 2259.497109]  dump_stack+0xb0/0xf4
+[ 2259.497115]  ___might_sleep+0x10c/0x130
+[ 2259.497117]  __might_sleep+0x58/0x90
+[ 2259.497120]  synchronize_irq+0x58/0xd8
+[ 2259.497122]  disable_irq+0x2c/0x38
+[ 2259.497126]  vgic_v4_load+0x9c/0xc0
+[ 2259.497127]  vgic_v3_load+0x94/0x170
+[ 2259.497130]  kvm_vgic_load+0x3c/0x60
+[ 2259.497134]  kvm_arch_vcpu_load+0xd4/0x1d0
+[ 2259.497137]  kvm_sched_in+0x30/0x40
+[ 2259.497139]  finish_task_switch+0x134/0x258
+[ 2259.497142]  __schedule+0x33c/0x780
+[ 2259.497144]  schedule+0x48/0xd8
+[ 2259.497147]  kvm_vcpu_block+0xb8/0x390
+[ 2259.497148]  kvm_handle_wfx+0xa0/0x230
+[ 2259.497150]  handle_exit+0x14c/0x1c8
+[ 2259.497152]  kvm_arch_vcpu_ioctl_run+0x354/0x978
+[ 2259.497154]  kvm_vcpu_ioctl+0x3d8/0xa28
+[ 2259.497161]  do_vfs_ioctl+0xc4/0x8e8
+[ 2259.497163]  ksys_ioctl+0x8c/0xa0
+[ 2259.497165]  __arm64_sys_ioctl+0x28/0x58
+[ 2259.497168]  el0_svc_common.constprop.0+0x7c/0x188
+[ 2259.497171]  el0_svc_handler+0x34/0xb8
+[ 2259.497175]  el0_svc+0x8/0xc
+
+
+The logic of disabling the doorbell interrupt in vgic_v4_load() might
+need a fix?
+
+
+Thanks,
+zenghui
+
+On 2019/9/3 23:57, Marc Zyngier wrote:
+> When the VHE code was reworked, a lot of the vgic stuff was moved around,
+> but the GICv4 residency code did stay untouched, meaning that we come
+> in and out of residency on each flush/sync, which is obviously suboptimal.
 > 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> To address this, let's move things around a bit:
+> 
+> - Residency entry (flush) moves to vcpu_load
+> - Residency exit (sync) moves to vcpu_put
+> - On blocking (entry to WFI), we "put"
+> - On unblocking (exit from WFI, we "load"
+> 
+> Because these can nest (load/block/put/load/unblock/put, for example),
+> we now have per-VPE tracking of the residency state.
+> 
+> Additionally, vgic_v4_put gains a "need doorbell" parameter, which only
+> gets set to true when blocking because of a WFI. This allows a finer
+> control of the doorbell, which now also gets disabled as soon as
+> it gets signaled.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  drivers/gpu/drm/i915/gvt/kvmgt.c  | 14 +++---
->  drivers/s390/cio/vfio_ccw_ops.c   | 14 +++---
->  drivers/s390/crypto/vfio_ap_ops.c | 10 +++--
->  drivers/vfio/mdev/vfio_mdev.c     | 30 +++++++------
->  include/linux/mdev.h              | 72 ++++++++++++++++++-------------
->  samples/vfio-mdev/mbochs.c        | 16 ++++---
->  samples/vfio-mdev/mdpy.c          | 16 ++++---
->  samples/vfio-mdev/mtty.c          | 14 +++---
->  8 files changed, 113 insertions(+), 73 deletions(-)
+>   drivers/irqchip/irq-gic-v4.c       |  7 +++-
+>   include/kvm/arm_vgic.h             |  4 +--
+>   include/linux/irqchip/arm-gic-v4.h |  2 ++
+>   virt/kvm/arm/arm.c                 | 12 ++++---
+>   virt/kvm/arm/vgic/vgic-v3.c        |  4 +++
+>   virt/kvm/arm/vgic/vgic-v4.c        | 55 ++++++++++++++----------------
+>   virt/kvm/arm/vgic/vgic.c           |  4 ---
+>   virt/kvm/arm/vgic/vgic.h           |  2 --
+>   8 files changed, 48 insertions(+), 42 deletions(-)
 > 
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> index 19d51a35f019..64823998fd58 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -1600,20 +1600,22 @@ static const struct attribute_group
-> *intel_vgpu_groups[] = {
->  	NULL,
->  };
-> 
-> -static struct mdev_parent_ops intel_vgpu_ops = {
-> -	.mdev_attr_groups       = intel_vgpu_groups,
-> -	.create			= intel_vgpu_create,
-> -	.remove			= intel_vgpu_remove,
+> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+> index 563e87ed0766..45969927cc81 100644
+> --- a/drivers/irqchip/irq-gic-v4.c
+> +++ b/drivers/irqchip/irq-gic-v4.c
+> @@ -141,12 +141,17 @@ static int its_send_vpe_cmd(struct its_vpe *vpe, struct its_cmd_info *info)
+>   int its_schedule_vpe(struct its_vpe *vpe, bool on)
+>   {
+>   	struct its_cmd_info info;
+> +	int ret;
+>   
+>   	WARN_ON(preemptible());
+>   
+>   	info.cmd_type = on ? SCHEDULE_VPE : DESCHEDULE_VPE;
+>   
+> -	return its_send_vpe_cmd(vpe, &info);
+> +	ret = its_send_vpe_cmd(vpe, &info);
+> +	if (!ret)
+> +		vpe->resident = on;
+> +
+> +	return ret;
+>   }
+>   
+>   int its_invall_vpe(struct its_vpe *vpe)
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index af4f09c02bf1..4dc58d7a0010 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -396,7 +396,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int irq,
+>   int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
+>   				 struct kvm_kernel_irq_routing_entry *irq_entry);
+>   
+> -void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu);
+> -void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu);
+> +int vgic_v4_load(struct kvm_vcpu *vcpu);
+> +int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
+>   
+>   #endif /* __KVM_ARM_VGIC_H */
+> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+> index e6b155713b47..ab1396afe08a 100644
+> --- a/include/linux/irqchip/arm-gic-v4.h
+> +++ b/include/linux/irqchip/arm-gic-v4.h
+> @@ -35,6 +35,8 @@ struct its_vpe {
+>   	/* Doorbell interrupt */
+>   	int			irq;
+>   	irq_hw_number_t		vpe_db_lpi;
+> +	/* VPE resident */
+> +	bool			resident;
+>   	/* VPE proxy mapping */
+>   	int			vpe_proxy_event;
+>   	/*
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 35a069815baf..4e69268621b6 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -321,20 +321,24 @@ void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+>   	/*
+>   	 * If we're about to block (most likely because we've just hit a
+>   	 * WFI), we need to sync back the state of the GIC CPU interface
+> -	 * so that we have the lastest PMR and group enables. This ensures
+> +	 * so that we have the latest PMR and group enables. This ensures
+>   	 * that kvm_arch_vcpu_runnable has up-to-date data to decide
+>   	 * whether we have pending interrupts.
+> +	 *
+> +	 * For the same reason, we want to tell GICv4 that we need
+> +	 * doorbells to be signalled, should an interrupt become pending.
+>   	 */
+>   	preempt_disable();
+>   	kvm_vgic_vmcr_sync(vcpu);
+> +	vgic_v4_put(vcpu, true);
+>   	preempt_enable();
 > -
-> +static struct vfio_mdev_parent_ops intel_vfio_vgpu_ops = {
->  	.open			= intel_vgpu_open,
->  	.release		= intel_vgpu_release,
+> -	kvm_vgic_v4_enable_doorbell(vcpu);
+>   }
+>   
+>   void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>   {
+> -	kvm_vgic_v4_disable_doorbell(vcpu);
+> +	preempt_disable();
+> +	vgic_v4_load(vcpu);
+> +	preempt_enable();
+>   }
+>   
+>   int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+> index 8d69f007dd0c..48307a9eb1d8 100644
+> --- a/virt/kvm/arm/vgic/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+> @@ -664,6 +664,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
+>   
+>   	if (has_vhe())
+>   		__vgic_v3_activate_traps(vcpu);
+> +
+> +	WARN_ON(vgic_v4_load(vcpu));
+>   }
+>   
+>   void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
+> @@ -676,6 +678,8 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
+>   
+>   void vgic_v3_put(struct kvm_vcpu *vcpu)
+>   {
+> +	WARN_ON(vgic_v4_put(vcpu, false));
+> +
+>   	vgic_v3_vmcr_sync(vcpu);
+>   
+>   	kvm_call_hyp(__vgic_v3_save_aprs, vcpu);
+> diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+> index 477af6aebb97..3a8a28854b13 100644
+> --- a/virt/kvm/arm/vgic/vgic-v4.c
+> +++ b/virt/kvm/arm/vgic/vgic-v4.c
+> @@ -85,6 +85,10 @@ static irqreturn_t vgic_v4_doorbell_handler(int irq, void *info)
+>   {
+>   	struct kvm_vcpu *vcpu = info;
+>   
+> +	/* We got the message, no need to fire again */
+> +	if (!irqd_irq_disabled(&irq_to_desc(irq)->irq_data))
+> +		disable_irq_nosync(irq);
+> +
+>   	vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last = true;
+>   	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>   	kvm_vcpu_kick(vcpu);
+> @@ -192,20 +196,30 @@ void vgic_v4_teardown(struct kvm *kvm)
+>   	its_vm->vpes = NULL;
+>   }
+>   
+> -int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu)
+> +int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
+>   {
+> -	if (!vgic_supports_direct_msis(vcpu->kvm))
+> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+> +	struct irq_desc *desc = irq_to_desc(vpe->irq);
+> +
+> +	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
+>   		return 0;
+>   
+> -	return its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, false);
+> +	/*
+> +	 * If blocking, a doorbell is required. Undo the nested
+> +	 * disable_irq() calls...
+> +	 */
+> +	while (need_db && irqd_irq_disabled(&desc->irq_data))
+> +		enable_irq(vpe->irq);
+> +
+> +	return its_schedule_vpe(vpe, false);
+>   }
+>   
+> -int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
+> +int vgic_v4_load(struct kvm_vcpu *vcpu)
+>   {
+> -	int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
+> +	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+>   	int err;
+>   
+> -	if (!vgic_supports_direct_msis(vcpu->kvm))
+> +	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
+>   		return 0;
+>   
+>   	/*
+> @@ -214,11 +228,14 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
+>   	 * doc in drivers/irqchip/irq-gic-v4.c to understand how this
+>   	 * turns into a VMOVP command at the ITS level.
+>   	 */
+> -	err = irq_set_affinity(irq, cpumask_of(smp_processor_id()));
+> +	err = irq_set_affinity(vpe->irq, cpumask_of(smp_processor_id()));
+>   	if (err)
+>   		return err;
+>   
+> -	err = its_schedule_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe, true);
+> +	/* Disabled the doorbell, as we're about to enter the guest */
+> +	disable_irq(vpe->irq);
+> +
+> +	err = its_schedule_vpe(vpe, true);
+>   	if (err)
+>   		return err;
+>   
+> @@ -226,9 +243,7 @@ int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu)
+>   	 * Now that the VPE is resident, let's get rid of a potential
+>   	 * doorbell interrupt that would still be pending.
+>   	 */
+> -	err = irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, false);
 > -
->  	.read			= intel_vgpu_read,
->  	.write			= intel_vgpu_write,
->  	.mmap			= intel_vgpu_mmap,
->  	.ioctl			= intel_vgpu_ioctl,
->  };
+> -	return err;
+> +	return irq_set_irqchip_state(vpe->irq, IRQCHIP_STATE_PENDING, false);
+>   }
+>   
+>   static struct vgic_its *vgic_get_its(struct kvm *kvm,
+> @@ -335,21 +350,3 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+>   	mutex_unlock(&its->its_lock);
+>   	return ret;
+>   }
+> -
+> -void kvm_vgic_v4_enable_doorbell(struct kvm_vcpu *vcpu)
+> -{
+> -	if (vgic_supports_direct_msis(vcpu->kvm)) {
+> -		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
+> -		if (irq)
+> -			enable_irq(irq);
+> -	}
+> -}
+> -
+> -void kvm_vgic_v4_disable_doorbell(struct kvm_vcpu *vcpu)
+> -{
+> -	if (vgic_supports_direct_msis(vcpu->kvm)) {
+> -		int irq = vcpu->arch.vgic_cpu.vgic_v3.its_vpe.irq;
+> -		if (irq)
+> -			disable_irq(irq);
+> -	}
+> -}
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index 45a870cb63f5..99b02ca730a8 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -857,8 +857,6 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>   {
+>   	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>   
+> -	WARN_ON(vgic_v4_sync_hwstate(vcpu));
+> -
+>   	/* An empty ap_list_head implies used_lrs == 0 */
+>   	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+>   		return;
+> @@ -882,8 +880,6 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+>   /* Flush our emulation state into the GIC hardware before entering the guest. */
+>   void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>   {
+> -	WARN_ON(vgic_v4_flush_hwstate(vcpu));
+> -
+>   	/*
+>   	 * If there are no virtual interrupts active or pending for this
+>   	 * VCPU, then there is no work to do and we can bail out without
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 83066a81b16a..c7fefd6b1c80 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -316,7 +316,5 @@ void vgic_its_invalidate_cache(struct kvm *kvm);
+>   bool vgic_supports_direct_msis(struct kvm *kvm);
+>   int vgic_v4_init(struct kvm *kvm);
+>   void vgic_v4_teardown(struct kvm *kvm);
+> -int vgic_v4_sync_hwstate(struct kvm_vcpu *vcpu);
+> -int vgic_v4_flush_hwstate(struct kvm_vcpu *vcpu);
+>   
+>   #endif
 > 
-> +static struct mdev_parent_ops intel_vgpu_ops = {
-> +	.mdev_attr_groups       = intel_vgpu_groups,
-> +	.create			= intel_vgpu_create,
-> +	.remove			= intel_vgpu_remove,
-> +	.device_ops	        = &intel_vfio_vgpu_ops,
-> +};
-> +
->  static int kvmgt_host_init(struct device *dev, void *gvt, const void *ops)
->  {
->  	struct attribute **kvm_type_attrs;
-> diff --git a/drivers/s390/cio/vfio_ccw_ops.c
-> b/drivers/s390/cio/vfio_ccw_ops.c
-> index f87d9409e290..96e9f18100ae 100644
-> --- a/drivers/s390/cio/vfio_ccw_ops.c
-> +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> @@ -564,11 +564,7 @@ static ssize_t vfio_ccw_mdev_ioctl(struct
-> mdev_device *mdev,
->  	}
->  }
-> 
-> -static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
-> -	.owner			= THIS_MODULE,
-> -	.supported_type_groups  = mdev_type_groups,
-> -	.create			= vfio_ccw_mdev_create,
-> -	.remove			= vfio_ccw_mdev_remove,
-> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
->  	.open			= vfio_ccw_mdev_open,
->  	.release		= vfio_ccw_mdev_release,
->  	.read			= vfio_ccw_mdev_read,
-> @@ -576,6 +572,14 @@ static const struct mdev_parent_ops
-> vfio_ccw_mdev_ops = {
->  	.ioctl			= vfio_ccw_mdev_ioctl,
->  };
-> 
-> +static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
-> +	.owner			= THIS_MODULE,
-> +	.supported_type_groups  = mdev_type_groups,
-> +	.create			= vfio_ccw_mdev_create,
-> +	.remove			= vfio_ccw_mdev_remove,
-> +	.device_ops		= &vfio_mdev_ops,
-> +};
-> +
->  int vfio_ccw_mdev_reg(struct subchannel *sch)
->  {
->  	return mdev_register_vfio_device(&sch->dev,
-> &vfio_ccw_mdev_ops);
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
-> b/drivers/s390/crypto/vfio_ap_ops.c
-> index eacbde3c7a97..a48282bff066 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -1280,15 +1280,19 @@ static ssize_t vfio_ap_mdev_ioctl(struct
-> mdev_device *mdev,
->  	return ret;
->  }
-> 
-> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
-> +	.open			= vfio_ap_mdev_open,
-> +	.release		= vfio_ap_mdev_release,
-> +	.ioctl			= vfio_ap_mdev_ioctl,
-> +};
-> +
->  static const struct mdev_parent_ops vfio_ap_matrix_ops = {
->  	.owner			= THIS_MODULE,
->  	.supported_type_groups	= vfio_ap_mdev_type_groups,
->  	.mdev_attr_groups	= vfio_ap_mdev_attr_groups,
->  	.create			= vfio_ap_mdev_create,
->  	.remove			= vfio_ap_mdev_remove,
-> -	.open			= vfio_ap_mdev_open,
-> -	.release		= vfio_ap_mdev_release,
-> -	.ioctl			= vfio_ap_mdev_ioctl,
-> +	.device_ops		= &vfio_mdev_ops,
->  };
-> 
->  int vfio_ap_mdev_register(void)
-> diff --git a/drivers/vfio/mdev/vfio_mdev.c
-> b/drivers/vfio/mdev/vfio_mdev.c
-> index 887c57f10880..1196fbb6c3d2 100644
-> --- a/drivers/vfio/mdev/vfio_mdev.c
-> +++ b/drivers/vfio/mdev/vfio_mdev.c
-> @@ -25,15 +25,16 @@ static int vfio_mdev_open(void *device_data)
->  {
->  	struct mdev_device *mdev = device_data;
->  	struct mdev_parent *parent = mdev->parent;
-> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
-> >device_ops;
->  	int ret;
-> 
-> -	if (unlikely(!parent->ops->open))
-> +	if (unlikely(!ops->open))
->  		return -EINVAL;
-> 
->  	if (!try_module_get(THIS_MODULE))
->  		return -ENODEV;
-> 
-> -	ret = parent->ops->open(mdev);
-> +	ret = ops->open(mdev);
->  	if (ret)
->  		module_put(THIS_MODULE);
-> 
-> @@ -44,9 +45,10 @@ static void vfio_mdev_release(void *device_data)
->  {
->  	struct mdev_device *mdev = device_data;
->  	struct mdev_parent *parent = mdev->parent;
-> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
-> >device_ops;
-> 
-> -	if (likely(parent->ops->release))
-> -		parent->ops->release(mdev);
-> +	if (likely(ops->release))
-> +		ops->release(mdev);
-> 
->  	module_put(THIS_MODULE);
->  }
-> @@ -56,11 +58,12 @@ static long vfio_mdev_unlocked_ioctl(void
-> *device_data,
->  {
->  	struct mdev_device *mdev = device_data;
->  	struct mdev_parent *parent = mdev->parent;
-> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
-> >device_ops;
-> 
-> -	if (unlikely(!parent->ops->ioctl))
-> +	if (unlikely(!ops->ioctl))
->  		return -EINVAL;
-> 
-> -	return parent->ops->ioctl(mdev, cmd, arg);
-> +	return ops->ioctl(mdev, cmd, arg);
->  }
-> 
->  static ssize_t vfio_mdev_read(void *device_data, char __user *buf,
-> @@ -68,11 +71,12 @@ static ssize_t vfio_mdev_read(void *device_data,
-> char __user *buf,
->  {
->  	struct mdev_device *mdev = device_data;
->  	struct mdev_parent *parent = mdev->parent;
-> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
-> >device_ops;
-> 
-> -	if (unlikely(!parent->ops->read))
-> +	if (unlikely(!ops->read))
->  		return -EINVAL;
-> 
-> -	return parent->ops->read(mdev, buf, count, ppos);
-> +	return ops->read(mdev, buf, count, ppos);
->  }
-> 
->  static ssize_t vfio_mdev_write(void *device_data, const char __user *buf,
-> @@ -80,22 +84,24 @@ static ssize_t vfio_mdev_write(void *device_data,
-> const char __user *buf,
->  {
->  	struct mdev_device *mdev = device_data;
->  	struct mdev_parent *parent = mdev->parent;
-> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
-> >device_ops;
-> 
-> -	if (unlikely(!parent->ops->write))
-> +	if (unlikely(!ops->write))
->  		return -EINVAL;
-> 
-> -	return parent->ops->write(mdev, buf, count, ppos);
-> +	return ops->write(mdev, buf, count, ppos);
->  }
-> 
->  static int vfio_mdev_mmap(void *device_data, struct vm_area_struct
-> *vma)
->  {
->  	struct mdev_device *mdev = device_data;
->  	struct mdev_parent *parent = mdev->parent;
-> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
-> >device_ops;
-> 
-> -	if (unlikely(!parent->ops->mmap))
-> +	if (unlikely(!ops->mmap))
->  		return -EINVAL;
-> 
-> -	return parent->ops->mmap(mdev, vma);
-> +	return ops->mmap(mdev, vma);
->  }
-> 
->  static const struct vfio_device_ops vfio_mdev_dev_ops = {
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index f85045392120..3b8a76bc69cf 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -27,27 +27,9 @@ int mdev_set_iommu_device(struct device *dev,
-> struct device *iommu_device);
->  struct device *mdev_get_iommu_device(struct device *dev);
-> 
->  /**
-> - * struct mdev_parent_ops - Structure to be registered for each parent
-> device to
-> - * register the device to mdev module.
-> + * struct vfio_mdev_parent_ops - Structure to be registered for each
-> + * parent device to register the device to vfio-mdev module.
->   *
-> - * @owner:		The module owner.
-> - * @dev_attr_groups:	Attributes of the parent device.
-> - * @mdev_attr_groups:	Attributes of the mediated device.
-> - * @supported_type_groups: Attributes to define supported types. It is
-> mandatory
-> - *			to provide supported types.
-> - * @create:		Called to allocate basic resources in parent device's
-> - *			driver for a particular mediated device. It is
-> - *			mandatory to provide create ops.
-> - *			@kobj: kobject of type for which 'create' is called.
-> - *			@mdev: mdev_device structure on of mediated
-> device
-> - *			      that is being created
-> - *			Returns integer: success (0) or error (< 0)
-> - * @remove:		Called to free resources in parent device's driver for
-> a
-> - *			a mediated device. It is mandatory to provide
-> 'remove'
-> - *			ops.
-> - *			@mdev: mdev_device device structure which is
-> being
-> - *			       destroyed
-> - *			Returns integer: success (0) or error (< 0)
->   * @open:		Open mediated device.
->   *			@mdev: mediated device.
->   *			Returns integer: success (0) or error (< 0)
-> @@ -72,6 +54,43 @@ struct device *mdev_get_iommu_device(struct
-> device *dev);
->   * @mmap:		mmap callback
->   *			@mdev: mediated device structure
->   *			@vma: vma structure
-> + */
-> +struct vfio_mdev_parent_ops {
-> +	int     (*open)(struct mdev_device *mdev);
-> +	void    (*release)(struct mdev_device *mdev);
-> +	ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
-> +			size_t count, loff_t *ppos);
-> +	ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
-> +			 size_t count, loff_t *ppos);
-> +	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
-> +			 unsigned long arg);
-> +	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct
-> *vma);
-> +};
-> +
-> +/**
-> + * struct mdev_parent_ops - Structure to be registered for each parent
-> device to
-> + * register the device to mdev module.
-> + *
-> + * @owner:		The module owner.
-> + * @dev_attr_groups:	Attributes of the parent device.
-> + * @mdev_attr_groups:	Attributes of the mediated device.
-> + * @supported_type_groups: Attributes to define supported types. It is
-> mandatory
-> + *			to provide supported types.
-> + * @create:		Called to allocate basic resources in parent device's
-> + *			driver for a particular mediated device. It is
-> + *			mandatory to provide create ops.
-> + *			@kobj: kobject of type for which 'create' is called.
-> + *			@mdev: mdev_device structure on of mediated
-> device
-> + *			      that is being created
-> + *			Returns integer: success (0) or error (< 0)
-> + * @remove:		Called to free resources in parent device's driver for
-> a
-> + *			a mediated device. It is mandatory to provide
-> 'remove'
-> + *			ops.
-> + *			@mdev: mdev_device device structure which is
-> being
-> + *			       destroyed
-> + *			Returns integer: success (0) or error (< 0)
-> + * @device_ops:         Device specific emulation callback.
-> + *
->   * Parent device that support mediated device should be registered with
-> mdev
->   * module with mdev_parent_ops structure.
->   **/
-> @@ -83,15 +102,7 @@ struct mdev_parent_ops {
-> 
->  	int     (*create)(struct kobject *kobj, struct mdev_device *mdev);
->  	int     (*remove)(struct mdev_device *mdev);
-> -	int     (*open)(struct mdev_device *mdev);
-> -	void    (*release)(struct mdev_device *mdev);
-> -	ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
-> -			size_t count, loff_t *ppos);
-> -	ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
-> -			 size_t count, loff_t *ppos);
-> -	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
-> -			 unsigned long arg);
-> -	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct
-> *vma);
-> +	const void *device_ops;
->  };
-> 
->  /* interface for exporting mdev supported type attributes */
-> @@ -137,7 +148,8 @@ const guid_t *mdev_uuid(struct mdev_device
-> *mdev);
-> 
->  extern struct bus_type mdev_bus_type;
-> 
-> -int mdev_register_vfio_device(struct device *dev, const struct
-> mdev_parent_ops *ops);
-> +int mdev_register_vfio_device(struct device *dev,
-> +                              const struct mdev_parent_ops *ops);
->  void mdev_unregister_device(struct device *dev);
-> 
->  int mdev_register_driver(struct mdev_driver *drv, struct module *owner);
-> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-> index 71a4469be85d..53ceb357f152 100644
-> --- a/samples/vfio-mdev/mbochs.c
-> +++ b/samples/vfio-mdev/mbochs.c
-> @@ -1418,12 +1418,7 @@ static struct attribute_group
-> *mdev_type_groups[] = {
->  	NULL,
->  };
-> 
-> -static const struct mdev_parent_ops mdev_fops = {
-> -	.owner			= THIS_MODULE,
-> -	.mdev_attr_groups	= mdev_dev_groups,
-> -	.supported_type_groups	= mdev_type_groups,
-> -	.create			= mbochs_create,
-> -	.remove			= mbochs_remove,
-> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
->  	.open			= mbochs_open,
->  	.release		= mbochs_close,
->  	.read			= mbochs_read,
-> @@ -1432,6 +1427,15 @@ static const struct mdev_parent_ops mdev_fops
-> = {
->  	.mmap			= mbochs_mmap,
->  };
-> 
-> +static const struct mdev_parent_ops mdev_fops = {
-> +	.owner			= THIS_MODULE,
-> +	.mdev_attr_groups	= mdev_dev_groups,
-> +	.supported_type_groups	= mdev_type_groups,
-> +	.create			= mbochs_create,
-> +	.remove			= mbochs_remove,
-> +	.device_ops		= &vfio_mdev_ops,
-> +};
-> +
->  static const struct file_operations vd_fops = {
->  	.owner		= THIS_MODULE,
->  };
-> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-> index d3029dd27d91..4ba285a5768f 100644
-> --- a/samples/vfio-mdev/mdpy.c
-> +++ b/samples/vfio-mdev/mdpy.c
-> @@ -725,12 +725,7 @@ static struct attribute_group *mdev_type_groups[]
-> = {
->  	NULL,
->  };
-> 
-> -static const struct mdev_parent_ops mdev_fops = {
-> -	.owner			= THIS_MODULE,
-> -	.mdev_attr_groups	= mdev_dev_groups,
-> -	.supported_type_groups	= mdev_type_groups,
-> -	.create			= mdpy_create,
-> -	.remove			= mdpy_remove,
-> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
->  	.open			= mdpy_open,
->  	.release		= mdpy_close,
->  	.read			= mdpy_read,
-> @@ -739,6 +734,15 @@ static const struct mdev_parent_ops mdev_fops =
-> {
->  	.mmap			= mdpy_mmap,
->  };
-> 
-> +static const struct mdev_parent_ops mdev_fops = {
-> +	.owner			= THIS_MODULE,
-> +	.mdev_attr_groups	= mdev_dev_groups,
-> +	.supported_type_groups	= mdev_type_groups,
-> +	.create			= mdpy_create,
-> +	.remove			= mdpy_remove,
-> +	.device_ops		= &vfio_mdev_ops,
-> +};
-> +
->  static const struct file_operations vd_fops = {
->  	.owner		= THIS_MODULE,
->  };
-> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-> index 744c88a6b22c..a468904ec626 100644
-> --- a/samples/vfio-mdev/mtty.c
-> +++ b/samples/vfio-mdev/mtty.c
-> @@ -1410,6 +1410,14 @@ static struct attribute_group
-> *mdev_type_groups[] = {
->  	NULL,
->  };
-> 
-> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
-> +	.open                   = mtty_open,
-> +	.release                = mtty_close,
-> +	.read                   = mtty_read,
-> +	.write                  = mtty_write,
-> +	.ioctl		        = mtty_ioctl,
-> +};
-> +
->  static const struct mdev_parent_ops mdev_fops = {
->  	.owner                  = THIS_MODULE,
->  	.dev_attr_groups        = mtty_dev_groups,
-> @@ -1417,11 +1425,7 @@ static const struct mdev_parent_ops mdev_fops
-> = {
->  	.supported_type_groups  = mdev_type_groups,
->  	.create                 = mtty_create,
->  	.remove			= mtty_remove,
-> -	.open                   = mtty_open,
-> -	.release                = mtty_close,
-> -	.read                   = mtty_read,
-> -	.write                  = mtty_write,
-> -	.ioctl		        = mtty_ioctl,
-> +	.device_ops             = &vfio_mdev_ops,
->  };
-> 
->  static void mtty_device_release(struct device *dev)
-> --
-> 2.19.1
-> 
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+
