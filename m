@@ -2,65 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 976D6B53A4
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 19:08:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C8F9B53DB
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 19:18:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730759AbfIQRHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 13:07:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43668 "EHLO mx1.redhat.com"
+        id S1730876AbfIQRSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 13:18:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46529 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727903AbfIQRHT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 13:07:19 -0400
+        id S1730851AbfIQRSh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 13:18:37 -0400
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7D12E81DE1
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 17:07:18 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id k9so1510765wmb.0
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 10:07:18 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9C41AC049E10
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 17:18:36 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id z205so1508080wmb.7
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 10:18:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=1ruT4jB1gaysYVDNCjFP18hxGY2r2nsdaAmRUQTyfVE=;
-        b=jL//VWgpokpTQzwcwSd7MkZoM5e0FJvnR97LBgSvubLyZh/5OCUMOAc1UwFvOmQeVh
-         7xejhzUg0iN1HSu2+pws+6VLntFC01vzbaGRooR5K236Y6IlfCgesOPnHX2B46PB2dAg
-         8jfK5gFWsHROy+zbB0au2WRlHMKqwFeKA6WrK4O3xwvkL+hXoVMyMCd2hocwr3Nxv9XN
-         VVcRC694iZ40t9byO4fiBvckdTL/O9p2EtgnxdpAteoRX0kaUYm9HTn5Lk5cTRA4fIpJ
-         +7QHR+/2GTmk4HijoaoqihnY0QbtD3CWFoZE/AQlR7RuD0kzoL+1Xxk83OUVraisxfx4
-         gaEA==
-X-Gm-Message-State: APjAAAWEgqyfON2PdbJLpcl1XoAhEekjNDMQJwTwqdeW7alkkjnHLQEx
-        SooOZu9etozbIGos0Eua4xw8Yx6uX2q7yti/Wvmo+B0nyHDd70Bg52szqx9uXv/REBHeGBs/Ogn
-        JHLXUC65n2d0V
-X-Received: by 2002:a1c:6143:: with SMTP id v64mr4423956wmb.79.1568740037112;
-        Tue, 17 Sep 2019 10:07:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwIbFrwvol5OymNPikmzOF8yYlM2jDAoFYT60aSA6jpyo8zcnIn7QqaDqNF8TOdzR1saASRcw==
-X-Received: by 2002:a1c:6143:: with SMTP id v64mr4423932wmb.79.1568740036822;
-        Tue, 17 Sep 2019 10:07:16 -0700 (PDT)
+        bh=CzdzjDs1PS5s1r26tWjnHvjUliGuiGe3yhX4kLQL7+c=;
+        b=Weltwlgf7xKrEMi8MQKTbGlAs5hee+i4jxsKiWRAxm858TLhGyhQc6W5s5J8fbRX8O
+         iENqwHaX7S343ok/FPZJm4erOLr66crGvTeefIyzSvlTIaXQMgfwzea5mO3G6B/VTCkw
+         SyN7g0vd2wA9d/n23TGSGFr8ERXP6P9ZCJAxncCFHe8WwWM8752lB27fCI7DJC88qhMb
+         hDdTCEq1PAUzQFALeMI/B8kXpevUfTlzarXYhkV4CHEXEwxGc/AWIfHTXijKgM0d5vzn
+         d+sAWdsYfO8Rp2rDG/i7NroreY26PDThWRJgLc4N9DwTClp1tD278pkZDtOkzSgil+hq
+         AWOw==
+X-Gm-Message-State: APjAAAXjBDq8o2r+eXtAuB0g2wFj9e5nXt2Z1CRtqbh0ay2ciI79PyL9
+        f//VXBSnjqoGmom+M8BNKOZWHPrgH9pCugtkjTI7890MLNwUhn8jPnIQ+DxcvQ6zp65or5puLqI
+        aWKA3PwbSMZi2
+X-Received: by 2002:a05:600c:2052:: with SMTP id p18mr4341225wmg.13.1568740714968;
+        Tue, 17 Sep 2019 10:18:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyZJ8SQPxCUeDeSltgjjv/+2lWN6pyzNKs4z2B/WxLTQIkeThwpFZrZjf+Y9TYVkv4mFihBKg==
+X-Received: by 2002:a05:600c:2052:: with SMTP id p18mr4341206wmg.13.1568740714697;
+        Tue, 17 Sep 2019 10:18:34 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
-        by smtp.gmail.com with ESMTPSA id d12sm3670731wme.33.2019.09.17.10.07.15
+        by smtp.gmail.com with ESMTPSA id s12sm4981466wra.82.2019.09.17.10.18.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2019 10:07:16 -0700 (PDT)
-Subject: Re: [PATCH v5 3/3] KVM: LAPIC: Tune lapic_timer_advance_ns smoothly
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
- <1568708186-20260-3-git-send-email-wanpengli@tencent.com>
+        Tue, 17 Sep 2019 10:18:34 -0700 (PDT)
+Subject: Re: [PATCH] kvm: x86: Use DEFINE_DEBUGFS_ATTRIBUTE for debugfs files
+To:     Yi Wang <wang.yi59@zte.com.cn>
+Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        up2wing@gmail.com, wang.liang82@zte.com.cn,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <1563780839-14739-1-git-send-email-wang.yi59@zte.com.cn>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <879b1950-3ca7-0a53-9e4f-508fd5db4bd4@redhat.com>
-Date:   Tue, 17 Sep 2019 19:07:15 +0200
+Message-ID: <31eec57f-2bc8-0ea0-e5fb-6b21ce902aae@redhat.com>
+Date:   Tue, 17 Sep 2019 19:18:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1568708186-20260-3-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1563780839-14739-1-git-send-email-wang.yi59@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -69,112 +66,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/09/19 10:16, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 22/07/19 09:33, Yi Wang wrote:
+> We got these coccinelle warning:
+> ./arch/x86/kvm/debugfs.c:23:0-23: WARNING: vcpu_timer_advance_ns_fops
+> should be defined with DEFINE_DEBUGFS_ATTRIBUTE
+> ./arch/x86/kvm/debugfs.c:32:0-23: WARNING: vcpu_tsc_offset_fops should
+> be defined with DEFINE_DEBUGFS_ATTRIBUTE
+> ./arch/x86/kvm/debugfs.c:41:0-23: WARNING: vcpu_tsc_scaling_fops should
+> be defined with DEFINE_DEBUGFS_ATTRIBUTE
+> ./arch/x86/kvm/debugfs.c:49:0-23: WARNING: vcpu_tsc_scaling_frac_fops
+> should be defined with DEFINE_DEBUGFS_ATTRIBUTE
 > 
-> Filter out drastic fluctuation and random fluctuation, remove
-> timer_advance_adjust_done altogether, the adjustment would be
-> continuous.
+> Use DEFINE_DEBUGFS_ATTRIBUTE() rather than DEFINE_SIMPLE_ATTRIBUTE()
+> to fix this.
 > 
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 
-Queued, thanks (I renamed the new variable to lapic_timer_advance_dynamic).
+It sucks though that you have to use a function with "unsafe" in the name.
 
-Thanks,
+Greg, is the patch doing the right thing?
 
 Paolo
 
 > ---
->  arch/x86/kvm/lapic.c | 28 ++++++++++++++--------------
->  arch/x86/kvm/lapic.h |  1 -
->  2 files changed, 14 insertions(+), 15 deletions(-)
+>  arch/x86/kvm/debugfs.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index dbbe478..323bdca 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -65,7 +65,9 @@
->  #define APIC_BROADCAST			0xFF
->  #define X2APIC_BROADCAST		0xFFFFFFFFul
->  
-> -#define LAPIC_TIMER_ADVANCE_ADJUST_DONE 100
-> +static bool dynamically_adjust_timer_advance __read_mostly;
-> +#define LAPIC_TIMER_ADVANCE_ADJUST_MIN 100
-> +#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 5000
->  #define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
->  /* step-by-step approximation to mitigate fluctuation */
->  #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-> @@ -1485,26 +1487,25 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
->  	u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
->  	u64 ns;
->  
-> +	/* Do not adjust for tiny fluctuations or large random spikes. */
-> +	if (abs(advance_expire_delta) > LAPIC_TIMER_ADVANCE_ADJUST_MAX ||
-> +	    abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_MIN)
-> +		return;
-> +
->  	/* too early */
->  	if (advance_expire_delta < 0) {
->  		ns = -advance_expire_delta * 1000000ULL;
->  		do_div(ns, vcpu->arch.virtual_tsc_khz);
-> -		timer_advance_ns -= min((u32)ns,
-> -			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-> +		timer_advance_ns -= ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
->  	} else {
->  	/* too late */
->  		ns = advance_expire_delta * 1000000ULL;
->  		do_div(ns, vcpu->arch.virtual_tsc_khz);
-> -		timer_advance_ns += min((u32)ns,
-> -			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-> +		timer_advance_ns += ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
->  	}
->  
-> -	if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
-> -		apic->lapic_timer.timer_advance_adjust_done = true;
-> -	if (unlikely(timer_advance_ns > 5000)) {
-> +	if (unlikely(timer_advance_ns > LAPIC_TIMER_ADVANCE_ADJUST_MAX))
->  		timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
-> -		apic->lapic_timer.timer_advance_adjust_done = false;
-> -	}
->  	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
+> diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
+> index 329361b..24016fb 100644
+> --- a/arch/x86/kvm/debugfs.c
+> +++ b/arch/x86/kvm/debugfs.c
+> @@ -20,7 +20,7 @@ static int vcpu_get_timer_advance_ns(void *data, u64 *val)
+>  	return 0;
 >  }
 >  
-> @@ -1524,7 +1525,7 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
->  	if (guest_tsc < tsc_deadline)
->  		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
+> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_timer_advance_ns_fops, vcpu_get_timer_advance_ns, NULL, "%llu\n");
+> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_timer_advance_ns_fops, vcpu_get_timer_advance_ns, NULL, "%llu\n");
 >  
-> -	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-> +	if (dynamically_adjust_timer_advance)
->  		adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
+>  static int vcpu_get_tsc_offset(void *data, u64 *val)
+>  {
+> @@ -29,7 +29,7 @@ static int vcpu_get_tsc_offset(void *data, u64 *val)
+>  	return 0;
 >  }
 >  
-> @@ -2302,13 +2303,12 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
->  	apic->lapic_timer.timer.function = apic_timer_fn;
->  	if (timer_advance_ns == -1) {
->  		apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
-> -		apic->lapic_timer.timer_advance_adjust_done = false;
-> +		dynamically_adjust_timer_advance = true;
->  	} else {
->  		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
-> -		apic->lapic_timer.timer_advance_adjust_done = true;
-> +		dynamically_adjust_timer_advance = false;
+> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_offset_fops, vcpu_get_tsc_offset, NULL, "%lld\n");
+> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_offset_fops, vcpu_get_tsc_offset, NULL, "%lld\n");
+>  
+>  static int vcpu_get_tsc_scaling_ratio(void *data, u64 *val)
+>  {
+> @@ -38,7 +38,7 @@ static int vcpu_get_tsc_scaling_ratio(void *data, u64 *val)
+>  	return 0;
+>  }
+>  
+> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL, "%llu\n");
+> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_scaling_fops, vcpu_get_tsc_scaling_ratio, NULL, "%llu\n");
+>  
+>  static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
+>  {
+> @@ -46,20 +46,20 @@ static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
+>  	return 0;
+>  }
+>  
+> -DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_frac_fops, vcpu_get_tsc_scaling_frac_bits, NULL, "%llu\n");
+> +DEFINE_DEBUGFS_ATTRIBUTE(vcpu_tsc_scaling_frac_fops, vcpu_get_tsc_scaling_frac_bits, NULL, "%llu\n");
+>  
+>  int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+>  {
+>  	struct dentry *ret;
+>  
+> -	ret = debugfs_create_file("tsc-offset", 0444,
+> +	ret = debugfs_create_file_unsafe("tsc-offset", 0444,
+>  							vcpu->debugfs_dentry,
+>  							vcpu, &vcpu_tsc_offset_fops);
+>  	if (!ret)
+>  		return -ENOMEM;
+>  
+>  	if (lapic_in_kernel(vcpu)) {
+> -		ret = debugfs_create_file("lapic_timer_advance_ns", 0444,
+> +		ret = debugfs_create_file_unsafe("lapic_timer_advance_ns", 0444,
+>  								vcpu->debugfs_dentry,
+>  								vcpu, &vcpu_timer_advance_ns_fops);
+>  		if (!ret)
+> @@ -67,12 +67,12 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
 >  	}
 >  
-> -
->  	/*
->  	 * APIC is created enabled. This will prevent kvm_lapic_set_base from
->  	 * thinking that APIC state has changed.
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 50053d2..2aad7e2 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -35,7 +35,6 @@ struct kvm_timer {
->  	s64 advance_expire_delta;
->  	atomic_t pending;			/* accumulated triggered timers */
->  	bool hv_timer_in_use;
-> -	bool timer_advance_adjust_done;
->  };
->  
->  struct kvm_lapic {
+>  	if (kvm_has_tsc_control) {
+> -		ret = debugfs_create_file("tsc-scaling-ratio", 0444,
+> +		ret = debugfs_create_file_unsafe("tsc-scaling-ratio", 0444,
+>  							vcpu->debugfs_dentry,
+>  							vcpu, &vcpu_tsc_scaling_fops);
+>  		if (!ret)
+>  			return -ENOMEM;
+> -		ret = debugfs_create_file("tsc-scaling-ratio-frac-bits", 0444,
+> +		ret = debugfs_create_file_unsafe("tsc-scaling-ratio-frac-bits", 0444,
+>  							vcpu->debugfs_dentry,
+>  							vcpu, &vcpu_tsc_scaling_frac_fops);
+>  		if (!ret)
 > 
 
