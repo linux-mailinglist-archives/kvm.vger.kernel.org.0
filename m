@@ -2,40 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 01E56B4EEB
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 15:14:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC498B4F27
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 15:27:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727383AbfIQNOX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 09:14:23 -0400
-Received: from foss.arm.com ([217.140.110.172]:55752 "EHLO foss.arm.com"
+        id S1728258AbfIQN1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 09:27:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51224 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726131AbfIQNOW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 09:14:22 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6957F28;
-        Tue, 17 Sep 2019 06:14:22 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6A843F575;
-        Tue, 17 Sep 2019 06:14:21 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: vgic-v4: Move the GICv4 residency flow to be
- driven by vcpu_load/put
-To:     Zenghui Yu <yuzenghui@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <Andre.Przywara@arm.com>
-References: <20190903155747.219802-1-maz@kernel.org>
- <5ab75fec-6014-e3b4-92a3-63d5015814c1@huawei.com>
- <07ddb304-9a7a-64a3-386a-96eea4516346@kernel.org>
- <dcc5a10b-c9ca-f833-4a60-e5d3726fa0b9@huawei.com>
- <3b2d4a15-5658-f50f-0214-1da708cd4923@huawei.com>
-From:   Marc Zyngier <maz@kernel.org>
-Organization: Approximate
-Message-ID: <c068036a-e9e2-0cb1-d1b5-9cf6d53e963f@kernel.org>
-Date:   Tue, 17 Sep 2019 14:14:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+        id S1727534AbfIQN1s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 09:27:48 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E2560C057F2E
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 13:27:47 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id s25so876866wmh.1
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 06:27:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1P0dSGUS+WWJgIEsGv0bzVV8obUlEtzj+cS48y+KeEY=;
+        b=Dr2JA+STORzppHY2hfIwazKsQb49+crhnTLpLRrHWwJAL8BZ+tQoYg7AGnFhgrtwi9
+         DXWUh02pEvu788WcxmIbcw/uI/iOot2r+2RIyAgy6N3cpuixDxJ6H+/Y/vtivnZe6Xwb
+         0O6fP4RXF0CcOhm0g7kin1vAbSJR2WOZcPxC8pcnhYbyarohQYyxXEgh/nu6l6wcbuOs
+         FhtKl565LosyjOuIDzHEGuVZ5Px4rmWppoFa84PdsugvzV3++XA/472e7EE3YihzrvzB
+         9yZl7Oz/PKL0LKVmPqEsqoCTFFwulwtgZSYgUjQ/GA/kGMgfnpcXtxhGT6ShUoeJCqHf
+         WwEg==
+X-Gm-Message-State: APjAAAWf9f6ebAbgcLdSToZSDATSBrL8UvGTE1qN8DocSe0zszdIHzWx
+        bdz+yTODjKZCesX6/W+hzyd0ED6ajax43zByT+Erm6q/tXH3me4uGKsiOAFNK5DodV7iAxEMTlm
+        pEVLD5uI7GWtC
+X-Received: by 2002:adf:f303:: with SMTP id i3mr3196349wro.242.1568726866531;
+        Tue, 17 Sep 2019 06:27:46 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxFU9EERU1lbrrSdMwmejNG+OkwH4Dchh8n9cZ1MOq5r+sDWbio0dFe9hnBTYw15bHDvn+q+Q==
+X-Received: by 2002:adf:f303:: with SMTP id i3mr3196322wro.242.1568726866217;
+        Tue, 17 Sep 2019 06:27:46 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
+        by smtp.gmail.com with ESMTPSA id 33sm4277057wra.41.2019.09.17.06.27.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Sep 2019 06:27:45 -0700 (PDT)
+Subject: Re: [PATCH V4 0/3] KVM/Hyper-V: Add Hyper-V direct tlb flush support
+To:     lantianyu1986@gmail.com, rkrcmar@redhat.com, corbet@lwn.net,
+        kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
+        sashal@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        michael.h.kelley@microsoft.com
+Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org, vkuznets@redhat.com
+References: <20190822143021.7518-1-Tianyu.Lan@microsoft.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <7ea7fa06-f100-1507-8507-1c701877c8ab@redhat.com>
+Date:   Tue, 17 Sep 2019 15:27:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <3b2d4a15-5658-f50f-0214-1da708cd4923@huawei.com>
+In-Reply-To: <20190822143021.7518-1-Tianyu.Lan@microsoft.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -44,19 +68,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/09/2019 11:17, Zenghui Yu wrote:
-> Hi Marc,
+On 22/08/19 16:30, lantianyu1986@gmail.com wrote:
+> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
 > 
-> On 2019/9/17 17:31, Zenghui Yu wrote:
->>
->> But this time I got the following WARNING:
+> This patchset is to add Hyper-V direct tlb support in KVM. Hyper-V
+> in L0 can delegate L1 hypervisor to handle tlb flush request from
+> L2 guest when direct tlb flush is enabled in L1.
 > 
-> Please ignore it. I think this is mostly caused by my local buggy
-> patch... Sorry for the noise.
+> Patch 2 introduces new cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH to enable
+> feature from user space. User space should enable this feature only
+> when Hyper-V hypervisor capability is exposed to guest and KVM profile
+> is hided. There is a parameter conflict between KVM and Hyper-V hypercall.
+> We hope L2 guest doesn't use KVM hypercall when the feature is
+> enabled. Detail please see comment of new API "KVM_CAP_HYPERV_DIRECT_TLBFLUSH"
+> 
+> Change since v3:
+>        - Update changelog in each patches. 
+> 
+> Change since v2:
+>        - Move hv assist page(hv_pa_pg) from struct kvm  to struct kvm_hv.
+> 
+> Change since v1:
+>        - Fix offset issue in the patch 1.
+>        - Update description of KVM KVM_CAP_HYPERV_DIRECT_TLBFLUSH.
+> 
+> Tianyu Lan (2):
+>   x86/Hyper-V: Fix definition of struct hv_vp_assist_page
+>   KVM/Hyper-V: Add new KVM capability KVM_CAP_HYPERV_DIRECT_TLBFLUSH
+> 
+> Vitaly Kuznetsov (1):
+>   KVM/Hyper-V/VMX: Add direct tlb flush support
+> 
+>  Documentation/virtual/kvm/api.txt  | 13 +++++++++++++
+>  arch/x86/include/asm/hyperv-tlfs.h | 24 ++++++++++++++++++-----
+>  arch/x86/include/asm/kvm_host.h    |  4 ++++
+>  arch/x86/kvm/vmx/evmcs.h           |  2 ++
+>  arch/x86/kvm/vmx/vmx.c             | 39 ++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c                 |  8 ++++++++
+>  include/uapi/linux/kvm.h           |  1 +
+>  7 files changed, 86 insertions(+), 5 deletions(-)
+> 
 
-Right. I couldn't quite figure out how this could happen with the
-current state of the code...
+Queued, thanks.
 
-	M.
--- 
-Jazz is not dead, it just smells funny...
+Paolo
