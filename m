@@ -2,116 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90D16B5179
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 17:28:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80C4DB52DE
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 18:23:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729556AbfIQP2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 11:28:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51228 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729543AbfIQP2Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 11:28:24 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C08B08667D
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 15:28:23 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id n18so1444372wro.11
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 08:28:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=7mnmRgUCgAlAXrxHwhjTLW45iyiMz5FPUKvdpngF3+I=;
-        b=YPMp8NKhSKXIhOXNbY4u9FsHg6DXhXTPd6LqZIZyyKhprHRuboYc0+ij83sMXSC6EL
-         vkFBX+EY9FegzMw/i9cmZwFPSlIpGyoh/XFWzEDCWRUaP3yBbYnOEhxKjdEOp+ldRDko
-         Q0kqq3AEb84EYjXPEm+QkNL0O3W9Cn/rv8WOGkTUdxxtC0rwWM5wPPFPVStbm3aZgGlC
-         1f24e2KExZ3hhI4GYzQa74aVeA1us3t8BaDuAWnm9P+CiB8XZlS72M6qS9o/NVF0JfGI
-         OgVX+whG2J0TL3bxA522TPZ0FgqnMkYKIz39bz5lyk5T1Rv9IWabsigS96qCxFvcCNLl
-         rJKA==
-X-Gm-Message-State: APjAAAX8bUz5eLEamyNpmXuE1qE4LASW9/bf6Po6K79xAaOiwCk5+NI7
-        KIa1lMWasjTFB2kTwYS+FIKqrS3sFam655FQNcQU8Z8P3vJ3yOZ+x/rZsygOycyeelfEGtWCzWU
-        a2HNW0AH74sGG
-X-Received: by 2002:a5d:6a09:: with SMTP id m9mr3378968wru.12.1568734102266;
-        Tue, 17 Sep 2019 08:28:22 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy4pW4zgxABH6kbq9g/jw+pZm3IOziyF8pDsnqSMITDPGieP+H8bXoz+/FldIxghopVjWcUqg==
-X-Received: by 2002:a5d:6a09:: with SMTP id m9mr3378931wru.12.1568734101878;
-        Tue, 17 Sep 2019 08:28:21 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id u68sm3597043wmu.12.2019.09.17.08.28.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Sep 2019 08:28:21 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lantianyu1986@gmail.com,
-        rkrcmar@redhat.com, corbet@lwn.net, kys@microsoft.com,
-        haiyangz@microsoft.com, sthemmin@microsoft.com, sashal@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, michael.h.kelley@microsoft.com
-Subject: Re: [PATCH V4 0/3] KVM/Hyper-V: Add Hyper-V direct tlb flush support
-In-Reply-To: <7ea7fa06-f100-1507-8507-1c701877c8ab@redhat.com>
-References: <20190822143021.7518-1-Tianyu.Lan@microsoft.com> <7ea7fa06-f100-1507-8507-1c701877c8ab@redhat.com>
-Date:   Tue, 17 Sep 2019 17:28:20 +0200
-Message-ID: <874l1baqnf.fsf@vitty.brq.redhat.com>
+        id S1726857AbfIQQXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 12:23:51 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:46258 "EHLO
+        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726741AbfIQQXv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 17 Sep 2019 12:23:51 -0400
+Received: from smtp.bitdefender.com (smtp01.buh.bitdefender.com [10.17.80.75])
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id B7930307489B;
+        Tue, 17 Sep 2019 19:23:48 +0300 (EEST)
+Received: from localhost (unknown [195.210.4.22])
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 9F14130BC822;
+        Tue, 17 Sep 2019 19:23:48 +0300 (EEST)
+From:   Adalbert =?iso-8859-2?b?TGF643I=?= <alazar@bitdefender.com>
+Subject: Re: [PATCH v5 0/9] Enable Sub-page Write Protection Support
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        yu.c.zhang@intel.com
+In-Reply-To: <20190917125904.GB22162@char.us.oracle.com>
+References: <20190917085304.16987-1-weijiang.yang@intel.com>
+        <20190917125904.GB22162@char.us.oracle.com>
+Date:   Tue, 17 Sep 2019 19:24:15 +0300
+Message-ID: <15687374550.b5d3c.30742@host>
+User-agent: void
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Tue, 17 Sep 2019 08:59:04 -0400, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com> wrote:
+> On Tue, Sep 17, 2019 at 04:52:55PM +0800, Yang Weijiang wrote:
+> > EPT-Based Sub-Page write Protection(SPP)is a HW capability which allows
+> > Virtual Machine Monitor(VMM) to specify write-permission for guest
+> > physical memory at a sub-page(128 byte) granularity. When this
+> > capability is enabled, the CPU enforces write-access check for sub-pages
+> > within a 4KB page.
+> > 
+> > The feature is targeted to provide fine-grained memory protection for
+> > usages such as device virtualization, memory check-point and VM
+> > introspection etc.
+> > 
+> > SPP is active when the "sub-page write protection" (bit 23) is 1 in
+> > Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+> > Permission Table(SPPT), SPPT is referenced via a 64-bit control field
+> > called Sub-Page Permission Table Pointer (SPPTP) which contains a
+> > 4K-aligned physical address.
+> > 
+> > To enable SPP for certain physical page, the gfn should be first mapped
+> > to a 4KB entry, then set bit 61 of the corresponding EPT leaf entry. 
+> > While HW walks EPT, if bit 61 is set, it traverses SPPT with the guset
+> > physical address to find out the sub-page permissions at the leaf entry.
+> > If the corresponding bit is set, write to sub-page is permitted,
+> > otherwise, SPP induced EPT violation is generated.
+> > 
+> > This patch serial passed SPP function test and selftest on Ice-Lake platform.
+> > 
+> > Please refer to the SPP introduction document in this patch set and
+> > Intel SDM for details:
+> > 
+> > Intel SDM:
+> > https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+> > 
+> > SPP selftest patch:
+> > https://lkml.org/lkml/2019/6/18/1197
+> > 
+> > Previous patch:
+> > https://lkml.org/lkml/2019/8/14/97
+> 
+> I saw the patches as part of the introspection patch-set.
+> Are you all working together on this?
 
-> On 22/08/19 16:30, lantianyu1986@gmail.com wrote:
->> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
->> 
->> This patchset is to add Hyper-V direct tlb support in KVM. Hyper-V
->> in L0 can delegate L1 hypervisor to handle tlb flush request from
->> L2 guest when direct tlb flush is enabled in L1.
->> 
->> Patch 2 introduces new cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH to enable
->> feature from user space. User space should enable this feature only
->> when Hyper-V hypervisor capability is exposed to guest and KVM profile
->> is hided. There is a parameter conflict between KVM and Hyper-V hypercall.
->> We hope L2 guest doesn't use KVM hypercall when the feature is
->> enabled. Detail please see comment of new API "KVM_CAP_HYPERV_DIRECT_TLBFLUSH"
->> 
->> Change since v3:
->>        - Update changelog in each patches. 
->> 
->> Change since v2:
->>        - Move hv assist page(hv_pa_pg) from struct kvm  to struct kvm_hv.
->> 
->> Change since v1:
->>        - Fix offset issue in the patch 1.
->>        - Update description of KVM KVM_CAP_HYPERV_DIRECT_TLBFLUSH.
->> 
->> Tianyu Lan (2):
->>   x86/Hyper-V: Fix definition of struct hv_vp_assist_page
->>   KVM/Hyper-V: Add new KVM capability KVM_CAP_HYPERV_DIRECT_TLBFLUSH
->> 
->> Vitaly Kuznetsov (1):
->>   KVM/Hyper-V/VMX: Add direct tlb flush support
->> 
->>  Documentation/virtual/kvm/api.txt  | 13 +++++++++++++
->>  arch/x86/include/asm/hyperv-tlfs.h | 24 ++++++++++++++++++-----
->>  arch/x86/include/asm/kvm_host.h    |  4 ++++
->>  arch/x86/kvm/vmx/evmcs.h           |  2 ++
->>  arch/x86/kvm/vmx/vmx.c             | 39 ++++++++++++++++++++++++++++++++++++++
->>  arch/x86/kvm/x86.c                 |  8 ++++++++
->>  include/uapi/linux/kvm.h           |  1 +
->>  7 files changed, 86 insertions(+), 5 deletions(-)
->> 
->
-> Queued, thanks.
->
+Weijiang helped us to start using the SPP feature with the introspection
+API and tested the integration when we didn't had the hardware
+available. I've included the SPP patches in the introspection patch
+series in order to "show the full picture".
 
-I had a suggestion how we can get away without the new capability (like
-direct tlb flush gets automatically enabled when Hyper-V hypercall page
-is activated and we know we can't handle KVM hypercalls any more)
-but this can probably be done as a follow-up.
+> Would it be possible for some of the bitdefender folks who depend on this
+> to provide Tested-by adn could they also take the time to review this patch-set?
 
--- 
-Vitaly
+Sure. Once we rebase the introspection patches on 5.3, we'll replace
+the previous version this new one in our tree and test it.
