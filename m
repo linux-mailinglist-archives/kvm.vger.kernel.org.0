@@ -2,84 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A72C0B580E
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 00:35:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D36EB585E
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 01:05:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727700AbfIQWfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 18:35:30 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53585 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbfIQWfa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 18:35:30 -0400
-Received: by mail-wm1-f66.google.com with SMTP id i16so260295wmd.3
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 15:35:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xjDLB8B4MIKoUTerILhTWVvgolMpZ9+qop2CkrYrPKY=;
-        b=XyETs6Gg+WGhzuW2N8MEC9GYaX16h6WWDZ9YeFY/gtdmrCO+2xw5pu/zmv891vIxUf
-         8g5HA955nr52FVEuDkAD7n7D8sbfSxvRsE0v1OLmGKA1tGM7Rtjx3GfTk+eCslCQpzc9
-         FbXc0cZVGY6ft7ga9Xmx8WUfSJVR66508QerQKZZ8vgYX5/BNm87uDrVBar+WyBpTCNY
-         8ghgF9Qx2D82pGSoquUGPVdFiU8XlaSuN5Ns7AVhZW2OHIqnTLnx/6vdpuDq9NUvZvfr
-         o3kXqEE1yl4KJpUJF3Xdz7jPHaJvTrO0LiFGT0GUB7stXF9TeofM5Ii2gqYKD2InTDRx
-         pWyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xjDLB8B4MIKoUTerILhTWVvgolMpZ9+qop2CkrYrPKY=;
-        b=NkRHrnJxjJNHV1xxs3VZ/Qc0YCjibJU0nsGqF5KvxZqx7UHnQVo4zZIX6iio24fbt+
-         E6z5pAXQ4a0vODVg7NNAEng+5MeYDY9564+BU7039tERkpjr1LnuCfliu8iBp5Ncmsjo
-         bNvkEHdcNeEmpV7G49KDmf2YfkMh210Q5vrlpQ/jHj0gFo25LCqbOeF3Jb2J8UnKoaWB
-         cL0yW7oNy/7W0XcACogEbtbZJDy3P1leaFpUXqA4WFLR7IVHSWrgn9xRq0jCtdxaLe0K
-         prIrF544MsegR/osdqwwOm4+btSjBVgZgM0Gmu64irG9Old5YyJmeE8DBgVgDWF44tni
-         nOhw==
-X-Gm-Message-State: APjAAAV8mj1ppHEepIps4Nalo7Vc1AXIASw6S44EY79DUU1sy+XsV9mM
-        2s/dAvCPRlyw7OpkTwWLU77mIIzWVzM0m0cdGvpymw==
-X-Google-Smtp-Source: APXvYqxD/zhJdTX9uZv/2zqZELoglA/JzuTjQY8RxcMgjGltxaAmDOha9hlU2T8fxOv44li3YewEH+k/lkuX5rYj8Rg=
-X-Received: by 2002:a7b:c40c:: with SMTP id k12mr250775wmi.151.1568759727717;
- Tue, 17 Sep 2019 15:35:27 -0700 (PDT)
+        id S1728071AbfIQXFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 19:05:47 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:33894 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725801AbfIQXFr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 19:05:47 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HN31Wt150645;
+        Tue, 17 Sep 2019 23:05:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=pN+3VoxlmlzDUU08KLv0Low6pKH8lIWHgycr8NU4pGE=;
+ b=BjsWKLqOpG9FDqqapZZt0BlzsvyXzS5B9VEqBgNsdGZ/cLuCDuvkVJgH+VSYD5HIrdZT
+ 4G2qzUbAaOHFH21kOB8+H82V0X3t5bMv5B/RlnU/x8qbTx6bFky/hagCXJrVKBIOj9ht
+ zEg5P1r/CDGq9p919wBhlvwB0nxfgN1lre62D4MC7dC7ETXZQBIyn+6eeBE7dZNGN1w3
+ iNrdqkwfbPcYztn5jC7PW/B3KU9yD/xWaP9/Pr0Coy/TyrXSP3/CyWlCo1HM5Srrpdy4
+ GDTZj68amTNaI5/3uywrTiFCuwvt97TwoxLdAuY4H2BiSLukL2vw3FnYVpmg5FlsP8Tc KA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2v385dr4m0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Sep 2019 23:05:42 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HN3ZUo022462;
+        Tue, 17 Sep 2019 23:05:41 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2v37m92qwa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Sep 2019 23:05:41 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8HN5esj017034;
+        Tue, 17 Sep 2019 23:05:40 GMT
+Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 17 Sep 2019 16:05:40 -0700
+Subject: Re: [PATCH v3] kvm: nvmx: limit atomic switch MSRs
+To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
+        jmattson@google.com, pshier@google.com,
+        sean.j.christopherson@intel.com
+References: <20190917185057.224221-1-marcorr@google.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <2dce168f-edab-8c56-6d29-dc73aace8b63@oracle.com>
+Date:   Tue, 17 Sep 2019 16:05:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-References: <20190917185753.256039-1-marcorr@google.com> <20190917185753.256039-2-marcorr@google.com>
- <20190917194738.GD8804@linux.intel.com> <CAA03e5G94nbVj9vfOr5Gc7x89B6afh3HmxHnMMijtn8SzqgjTA@mail.gmail.com>
- <20190917222818.GB10319@linux.intel.com>
-In-Reply-To: <20190917222818.GB10319@linux.intel.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Tue, 17 Sep 2019 15:35:16 -0700
-Message-ID: <CAA03e5ErKKDJayq02xT8mSpJND=mUCD96dctjPcxgAZKixDX-g@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 2/2] x86: nvmx: test max atomic switch MSRs
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190917185057.224221-1-marcorr@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909170215
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909170215
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > > +     /* Cleanup. */
-> > > > +     vmcs_write(ENT_MSR_LD_CNT, 0);
-> > > > +     vmcs_write(EXI_MSR_LD_CNT, 0);
-> > > > +     vmcs_write(EXI_MSR_ST_CNT, 0);
-> > > > +     for (i = 0; i < cleanup_count; i++) {
-> > > > +             enter_guest();
-> > > > +             skip_exit_vmcall();
-> > > > +     }
-> > >
-> > > I'm missing something, why do we need to reenter the guest after setting
-> > > the count to 0?
-> >
-> > It's for the failure code path, which fails to get into the guest and
-> > skip the single vmcall(). I've refactored the code to make this clear.
-> > Let me know what you think.
->
-> Why is not entering the guest a problem?
 
-The vmx tests check that the L2 guest has completed. So we need to
-advance the L2 RIP past the single vmcall. Technically, we don't need
-to enter the guest to do that. Entering the guest and calling
-skip_exit_vmcall() feels like a convenient, clean way to do this. But
-I'm happy to directly advance the RIP if you think that's better. Let
-me know what you think.
+
+On 09/17/2019 11:50 AM, Marc Orr wrote:
+> Allowing an unlimited number of MSRs to be specified via the VMX
+> load/store MSR lists (e.g., vm-entry MSR load list) is bad for two
+> reasons. First, a guest can specify an unreasonable number of MSRs,
+> forcing KVM to process all of them in software. Second, the SDM bounds
+> the number of MSRs allowed to be packed into the atomic switch MSR lists.
+> Quoting the "Miscellaneous Data" section in the "VMX Capability
+> Reporting Facility" appendix:
+>
+> "Bits 27:25 is used to compute the recommended maximum number of MSRs
+> that should appear in the VM-exit MSR-store list, the VM-exit MSR-load
+> list, or the VM-entry MSR-load list. Specifically, if the value bits
+> 27:25 of IA32_VMX_MISC is N, then 512 * (N + 1) is the recommended
+> maximum number of MSRs to be included in each list. If the limit is
+> exceeded, undefined processor behavior may result (including a machine
+> check during the VMX transition)."
+>
+> Because KVM needs to protect itself and can't model "undefined processor
+> behavior", arbitrarily force a VM-entry to fail due to MSR loading when
+> the MSR load list is too large. Similarly, trigger an abort during a VM
+> exit that encounters an MSR load list or MSR store list that is too large.
+>
+> The MSR list size is intentionally not pre-checked so as to maintain
+> compatibility with hardware inasmuch as possible.
+>
+> Test these new checks with the kvm-unit-test "x86: nvmx: test max atomic
+> switch MSRs".
+>
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> Signed-off-by: Marc Orr <marcorr@google.com>
+> ---
+> v2 -> v3
+> * Updated commit message.
+> * Removed superflous function declaration.
+> * Expanded in-line comment.
+>
+>   arch/x86/include/asm/vmx.h |  1 +
+>   arch/x86/kvm/vmx/nested.c  | 44 ++++++++++++++++++++++++++++----------
+>   2 files changed, 34 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index a39136b0d509..a1f6ed187ccd 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -110,6 +110,7 @@
+>   #define VMX_MISC_SAVE_EFER_LMA			0x00000020
+>   #define VMX_MISC_ACTIVITY_HLT			0x00000040
+>   #define VMX_MISC_ZERO_LEN_INS			0x40000000
+> +#define VMX_MISC_MSR_LIST_MULTIPLIER		512
+>   
+>   /* VMFUNC functions */
+>   #define VMX_VMFUNC_EPTP_SWITCHING               0x00000001
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ced9fba32598..0e29882bb45f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -190,6 +190,16 @@ static void nested_vmx_abort(struct kvm_vcpu *vcpu, u32 indicator)
+>   	pr_debug_ratelimited("kvm: nested vmx abort, indicator %d\n", indicator);
+>   }
+>   
+> +static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
+> +{
+> +	return fixed_bits_valid(control, low, high);
+> +}
+> +
+> +static inline u64 vmx_control_msr(u32 low, u32 high)
+> +{
+> +	return low | ((u64)high << 32);
+> +}
+> +
+>   static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
+>   {
+>   	secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
+> @@ -856,18 +866,36 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
+>   	return 0;
+>   }
+>   
+> +static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> +	u64 vmx_misc = vmx_control_msr(vmx->nested.msrs.misc_low,
+> +				       vmx->nested.msrs.misc_high);
+> +
+> +	return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIER;
+> +}
+> +
+>   /*
+>    * Load guest's/host's msr at nested entry/exit.
+>    * return 0 for success, entry index for failure.
+> + *
+> + * One of the failure modes for MSR load/store is when a list exceeds the
+> + * virtual hardware's capacity. To maintain compatibility with hardware inasmuch
+> + * as possible, process all valid entries before failing rather than precheck
+> + * for a capacity violation.
+>    */
+>   static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
+>   {
+>   	u32 i;
+>   	struct vmx_msr_entry e;
+>   	struct msr_data msr;
+> +	u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
+>   
+>   	msr.host_initiated = false;
+>   	for (i = 0; i < count; i++) {
+> +		if (unlikely(i >= max_msr_list_size))
+> +			goto fail;
+> +
+>   		if (kvm_vcpu_read_guest(vcpu, gpa + i * sizeof(e),
+>   					&e, sizeof(e))) {
+>   			pr_debug_ratelimited(
+> @@ -899,9 +927,14 @@ static int nested_vmx_store_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
+>   {
+>   	u32 i;
+>   	struct vmx_msr_entry e;
+> +	u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
+>   
+>   	for (i = 0; i < count; i++) {
+>   		struct msr_data msr_info;
+> +
+> +		if (unlikely(i >= max_msr_list_size))
+> +			return -EINVAL;
+> +
+>   		if (kvm_vcpu_read_guest(vcpu,
+>   					gpa + i * sizeof(e),
+>   					&e, 2 * sizeof(u32))) {
+> @@ -1009,17 +1042,6 @@ static u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
+>   	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
+>   }
+>   
+> -
+> -static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
+> -{
+> -	return fixed_bits_valid(control, low, high);
+> -}
+> -
+> -static inline u64 vmx_control_msr(u32 low, u32 high)
+> -{
+> -	return low | ((u64)high << 32);
+> -}
+> -
+>   static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
+>   {
+>   	superset &= mask;
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
