@@ -2,136 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F3C3B512F
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 17:14:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0805B5146
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 17:19:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729295AbfIQPOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 11:14:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45392 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727454AbfIQPOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 11:14:09 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CF583C058CB8
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 15:14:08 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id 190so1385368wme.4
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 08:14:08 -0700 (PDT)
+        id S1729394AbfIQPS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 11:18:59 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:41447 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729366AbfIQPS6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 11:18:58 -0400
+Received: by mail-io1-f66.google.com with SMTP id r26so8448386ioh.8
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 08:18:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OLxBIlQyxrLFa2Qvi0hK9z3GQL1Q3TAk/k+jAOzgd/o=;
+        b=cwBsJ/H4vxSQHHmLCpi/9RIFxzfQvARALmVrMaGC845CP0l3lbj5zqsIo04hnoV78N
+         CM2VlR8pgp0KRKSUKKC0AqwTDtnhUaRrvKvpGbTG5DlogI7YPpE/lKtoTkn+nb2HjdXQ
+         XvmJcyyx1dDP3jFOy97JAh2guvkqe62RRfBRo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=I4PB1FbT5VkDhYHBq97VeVQ0522bZ0vraJdaFOAhJuo=;
-        b=IS9Pa45S3Tv5DqD8U570IBTzMnh/7H7r7ux2N4BFw4zny4qC8qo3nywnHu0wTULLfB
-         c1OxJeg8NbTBUzoIYRZCA7uZv8vuq1h+McmwugMvAk62Q1y+Syjh/xPm/Pk83sMD0oQq
-         MsHT9SIZMhPGsjAF2gZc6LBEdXes4Juz/RCoiUrIl7FW6ZiEyL4Oi6R6QdJxeF0y/G4f
-         H2eMeFtbWWj7fzZDs/NfIEB7sE70/Iq5HAXnciBzHMTkxNVNU8RU18NJc2BBP9SNthA3
-         TEzrH60FP4dyY19bPyIwUmpb2NPX0lBhH1Xs9+S8NLCyKKDZIO4d0fpVtioGTevD6BlO
-         9K1Q==
-X-Gm-Message-State: APjAAAVEjyccRNDTiGfKwleegs21ehVOdYgXy4VTElfqtY4S00C3+H4z
-        MYfX9+9uXPcXpvayb7y2Mrtn/YwhMyAnyIl9x3sFiJrqg1sfvkSz6QJNIgnhv/LlayBrHBlnCQq
-        deoZRt1/t6q7r
-X-Received: by 2002:a05:600c:a:: with SMTP id g10mr3816314wmc.71.1568733247247;
-        Tue, 17 Sep 2019 08:14:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwF9YRZou9rba0jj+36aOHC5cKqqWC2RMuT6lv4mHM7Undu6Vtwyk71MMpvH3Xf+0DWBq3Sxg==
-X-Received: by 2002:a05:600c:a:: with SMTP id g10mr3816284wmc.71.1568733246955;
-        Tue, 17 Sep 2019 08:14:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
-        by smtp.gmail.com with ESMTPSA id r28sm3553198wrr.94.2019.09.17.08.14.05
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OLxBIlQyxrLFa2Qvi0hK9z3GQL1Q3TAk/k+jAOzgd/o=;
+        b=MoP6o9cDb3b+ZHJK1g8XHdBawfsZqAZpOve4ovpmdaFni6+Ruonlqu9BluPwnKsix6
+         ZI59J0+pn3/B+rDaEqbzglv/Kxy69vaRMT1YLXlTOUW5mCXD5kKfAdKHq4L66AsLhSEv
+         jkSeXPSyNxZ57sVhqUy1Pkn6+zzSa6JsT/98oGpTs2220uI0a4F/jTUShIgfZfR4EDPR
+         5pBJUDKiQCCnJSzRmRXWKZq0KAtKGAeOgPxe5ShUORcDKptC32ymKJRqrBpSejwquEbY
+         5BWXESF3xTmt4a9u6d1MtsdP/kmAFVnHVDYN7VqEPoLZp1dBzENOcovtEhjz//EQqBPL
+         Ivbw==
+X-Gm-Message-State: APjAAAX6oIvwCpKyh9+H9MCFYJoEgneFITgB2OFWboDnyG6GcoWyAsQ5
+        e+kRSrSOUVvnXSpNb80L/8tXeLwEPlTYQQ==
+X-Google-Smtp-Source: APXvYqzmda5qOpswaOOAP4wLtzDmQDPVrprW8Ev5siXD19yDggXHEnCSRbUexIK1bppc4g+obLU8dQ==
+X-Received: by 2002:a5e:8404:: with SMTP id h4mr4466240ioj.170.1568733535648;
+        Tue, 17 Sep 2019 08:18:55 -0700 (PDT)
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com. [209.85.166.50])
+        by smtp.gmail.com with ESMTPSA id m21sm1984632iob.82.2019.09.17.08.18.54
+        for <kvm@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2019 08:14:06 -0700 (PDT)
-Subject: Re: [PATCH v2 00/14] KVM: x86: Remove emulation_result enums
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
-References: <20190827214040.18710-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8dec39ac-7d69-b1fd-d07c-cf9d014c4af3@redhat.com>
-Date:   Tue, 17 Sep 2019 17:14:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 17 Sep 2019 08:18:54 -0700 (PDT)
+Received: by mail-io1-f50.google.com with SMTP id a1so8520945ioc.6
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 08:18:54 -0700 (PDT)
+X-Received: by 2002:a6b:b714:: with SMTP id h20mr4141152iof.302.1568733533872;
+ Tue, 17 Sep 2019 08:18:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190827214040.18710-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1568708186-20260-1-git-send-email-wanpengli@tencent.com> <CALMp9eSNTvHsSn55iNfF1tUAdAihz_2d5-Hac1H6TnvHyos-SQ@mail.gmail.com>
+In-Reply-To: <CALMp9eSNTvHsSn55iNfF1tUAdAihz_2d5-Hac1H6TnvHyos-SQ@mail.gmail.com>
+From:   Matt Delco <delco@chromium.org>
+Date:   Tue, 17 Sep 2019 08:18:42 -0700
+X-Gmail-Original-Message-ID: <CAHGX9VoAnfFZYVmVw0AukXPhPTsVssPwofjOvmZqFfOube9SQg@mail.gmail.com>
+Message-ID: <CAHGX9VoAnfFZYVmVw0AukXPhPTsVssPwofjOvmZqFfOube9SQg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: Fix coalesced mmio ring buffer out-of-bounds access
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/19 23:40, Sean Christopherson wrote:
-> Rework the emulator and its users to handle failure scenarios entirely
-> within the emulator.
-> 
-> {x86,kvm}_emulate_instruction() currently returns a tri-state value to
-> indicate success/continue, userspace exit needed, and failure.  The
-> intent of returning EMULATE_FAIL is to let the caller handle failure in
-> a manner that is appropriate for the current context.  In practice,
-> the emulator has ended up with a mixture of failure handling, i.e.
-> whether or not the emulator takes action on failure is dependent on the
-> specific flavor of emulation.
-> 
-> The mixed handling has proven to be rather fragile, e.g. many flows
-> incorrectly assume their specific flavor of emulation cannot fail or
-> that the emulator sets state to report the failure back to userspace.
-> 
-> Move everything inside the emulator, piece by piece, so that the
-> emulation routines can return '0' for exit to userspace and '1' for
-> resume the guest, just like every other VM-Exit handler.
-> 
-> Patch 13/14 is a tangentially related bug fix that conflicts heavily with
-> this series, so I tacked it on here.
-> 
-> Patch 14/14 documents the emulation types.  I added it as a separate
-> patch at the very end so that the comments could reference the final
-> state of the code base, e.g. incorporate the rule change for using
-> EMULTYPE_SKIP that is introduced in patch 13/14.
-> 
-> v1:
->   - https://patchwork.kernel.org/cover/11110331/
-> 
-> v2:
->   - Collect reviews. [Vitaly and Liran]
->   - Squash VMware emultype changes into a single patch. [Liran]
->   - Add comments in VMX/SVM for VMware #GP handling. [Vitaly]
->   - Tack on the EPT misconfig bug fix.
->   - Add a patch to comment/document the emultypes. [Liran]
-> 
-> Sean Christopherson (14):
->   KVM: x86: Relocate MMIO exit stats counting
->   KVM: x86: Clean up handle_emulation_failure()
->   KVM: x86: Refactor kvm_vcpu_do_singlestep() to remove out param
->   KVM: x86: Don't attempt VMWare emulation on #GP with non-zero error
->     code
->   KVM: x86: Move #GP injection for VMware into x86_emulate_instruction()
->   KVM: x86: Add explicit flag for forced emulation on #UD
->   KVM: x86: Move #UD injection for failed emulation into emulation code
->   KVM: x86: Exit to userspace on emulation skip failure
->   KVM: x86: Handle emulation failure directly in kvm_task_switch()
->   KVM: x86: Move triple fault request into RM int injection
->   KVM: VMX: Remove EMULATE_FAIL handling in handle_invalid_guest_state()
->   KVM: x86: Remove emulation_result enums, EMULATE_{DONE,FAIL,USER_EXIT}
->   KVM: VMX: Handle single-step #DB for EMULTYPE_SKIP on EPT misconfig
->   KVM: x86: Add comments to document various emulation types
-> 
->  arch/x86/include/asm/kvm_host.h |  40 +++++++--
->  arch/x86/kvm/mmu.c              |  16 +---
->  arch/x86/kvm/svm.c              |  62 ++++++--------
->  arch/x86/kvm/vmx/vmx.c          | 147 +++++++++++++-------------------
->  arch/x86/kvm/x86.c              | 133 ++++++++++++++++-------------
->  arch/x86/kvm/x86.h              |   2 +-
->  6 files changed, 195 insertions(+), 205 deletions(-)
-> 
+On Tue, Sep 17, 2019 at 7:59 AM Jim Mattson <jmattson@google.com> wrote:
+> On Tue, Sep 17, 2019 at 1:16 AM Wanpeng Li <kernellwp@gmail.com> wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Reported by syzkaller:
+> >
+> >         #PF: supervisor write access in kernel mode
+> >         #PF: error_code(0x0002) - not-present page
+> >         PGD 403c01067 P4D 403c01067 PUD 0
+> >         Oops: 0002 [#1] SMP PTI
+> >         CPU: 1 PID: 12564 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
+> >         RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
+> >         Call Trace:
+> >          __kvm_io_bus_write+0x91/0xe0 [kvm]
+> >          kvm_io_bus_write+0x79/0xf0 [kvm]
+> >          write_mmio+0xae/0x170 [kvm]
+> >          emulator_read_write_onepage+0x252/0x430 [kvm]
+> >          emulator_read_write+0xcd/0x180 [kvm]
+> >          emulator_write_emulated+0x15/0x20 [kvm]
+> >          segmented_write+0x59/0x80 [kvm]
+> >          writeback+0x113/0x250 [kvm]
+> >          x86_emulate_insn+0x78c/0xd80 [kvm]
+> >          x86_emulate_instruction+0x386/0x7c0 [kvm]
+> >          kvm_mmu_page_fault+0xf9/0x9e0 [kvm]
+> >          handle_ept_violation+0x10a/0x220 [kvm_intel]
+> >          vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
+> >          vcpu_enter_guest+0x4dc/0x18d0 [kvm]
+> >          kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
+> >          kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
+> >          do_vfs_ioctl+0xa2/0x690
+> >          ksys_ioctl+0x6d/0x80
+> >          __x64_sys_ioctl+0x1a/0x20
+> >          do_syscall_64+0x74/0x720
+> >          entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> >         RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
+> >
+> > Both the coalesced_mmio ring buffer indexs ring->first and ring->last are
+> > bigger than KVM_COALESCED_MMIO_MAX from the testcase, array out-of-bounds
+> > access triggers by ring->coalesced_mmio[ring->last].phys_addr = addr;
+> > assignment. This patch fixes it by mod indexs by KVM_COALESCED_MMIO_MAX.
+> >
+> > syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134b2826a00000
+> >
+> > Reported-by: syzbot+983c866c3dd6efa3662a@syzkaller.appspotmail.com
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> >  virt/kvm/coalesced_mmio.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+> > index 5294abb..cff1ec9 100644
+> > --- a/virt/kvm/coalesced_mmio.c
+> > +++ b/virt/kvm/coalesced_mmio.c
+> > @@ -73,6 +73,8 @@ static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
+> >
+> >         spin_lock(&dev->kvm->ring_lock);
+> >
+> > +       ring->first = ring->first % KVM_COALESCED_MMIO_MAX;
 
-Queued, thanks (a couple conflicts had to be sorted out, but nothing
-requiring a respin).
+This update to first doesn't provide any worthwhile benefit (it's not
+used to compute the address of a write) and likely adds the overhead
+cost of a 2nd divide operation (via the non-power-of-2 modulus).  If
+first is invalid then the app and/or kernel will be confused about
+whether the ring is empty or full, but no serious harm will occur (and
+since the only write to first is by an app the app is only causing
+harm to itself).
 
-Paolo
+> > +       ring->last = ring->last % KVM_COALESCED_MMIO_MAX;
+>
+> I don't think this is sufficient, since the memory that ring points to
+> is shared with userspace. Userspace can overwrite your corrected
+> values with illegal ones before they are used. Not exactly a TOCTTOU
+> issue, since there isn't technically a 'check' here, but the same
+> idea.
+>
+> >         if (!coalesced_mmio_has_room(dev)) {
+> >                 spin_unlock(&dev->kvm->ring_lock);
+> >                 return -EOPNOTSUPP;
+> > --
+> > 2.7.4
+> >
