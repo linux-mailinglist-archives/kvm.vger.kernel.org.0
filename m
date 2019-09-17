@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D335B453F
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 03:30:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20851B4605
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 05:32:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391247AbfIQB34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Sep 2019 21:29:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36924 "EHLO mx1.redhat.com"
+        id S2392227AbfIQDcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Sep 2019 23:32:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58840 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730648AbfIQB34 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Sep 2019 21:29:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1730000AbfIQDcR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Sep 2019 23:32:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BDC728980E8;
-        Tue, 17 Sep 2019 01:29:55 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6592F10CC1E4;
+        Tue, 17 Sep 2019 03:32:17 +0000 (UTC)
 Received: from [10.72.12.121] (ovpn-12-121.pek2.redhat.com [10.72.12.121])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F41F05C1D6;
-        Tue, 17 Sep 2019 01:29:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB54460126;
+        Tue, 17 Sep 2019 03:32:05 +0000 (UTC)
 Subject: Re: [RFC v4 0/3] vhost: introduce mdev based hardware backend
 To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
         alex.williamson@redhat.com, maxime.coquelin@redhat.com
@@ -28,8 +28,8 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         zhihong.wang@intel.com, lingshan.zhu@intel.com
 References: <20190917010204.30376-1-tiwei.bie@intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <980958b0-b541-6e37-830e-f2b82358845b@redhat.com>
-Date:   Tue, 17 Sep 2019 09:29:42 +0800
+Message-ID: <993841ed-942e-c90b-8016-8e7dc76bf13a@redhat.com>
+Date:   Tue, 17 Sep 2019 11:32:03 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
@@ -37,8 +37,8 @@ In-Reply-To: <20190917010204.30376-1-tiwei.bie@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Tue, 17 Sep 2019 01:29:55 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.65]); Tue, 17 Sep 2019 03:32:17 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -69,19 +69,51 @@ On 2019/9/17 上午9:02, Tiwei Bie wrote:
 >    fd first before doing other vhost ioctls);
 >
 > Only compile test has been done for this series for now.
+
+
+Have a hard thought on the architecture:
+
+1) Create a vhost char device and pass vfio mdev device fd to it as a 
+backend and translate vhost-mdev ioctl to virtio mdev transport (e.g 
+read/write). DMA was done through the VFIO DMA mapping on the container 
+that is attached.
+
+We have two more choices:
+
+2) Use vfio-mdev but do not create vhost-mdev device, instead, just 
+implement vhost ioctl on vfio_device_ops, and translate them into 
+virtio-mdev transport or just pass ioctl to parent.
+
+3) Don't use vfio-mdev, create a new vhost-mdev driver, during probe 
+still try to add dev to vfio group and talk to parent with device 
+specific ops
+
+So I have some questions:
+
+1) Compared to method 2, what's the advantage of creating a new vhost 
+char device? I guess it's for keep the API compatibility?
+
+2) For method 2, is there any easy way for user/admin to distinguish e.g 
+ordinary vfio-mdev for vhost from ordinary vfio-mdev?  I saw you 
+introduce ops matching helper but it's not friendly to management.
+
+3) A drawback of 1) and 2) is that it must follow vfio_device_ops that 
+assumes the parameter comes from userspace, it prevents support kernel 
+virtio drivers.
+
+4) So comes the idea of method 3, since it register a new vhost-mdev 
+driver, we can use device specific ops instead of VFIO ones, then we can 
+have a common API between vDPA parent and vhost-mdev/virtio-mdev drivers.
+
+What's your thoughts?
+
+Thanks
+
+
 >
 > RFCv3: https://patchwork.kernel.org/patch/11117785/
 >
 > [1] https://lkml.org/lkml/2019/9/10/135
-
-
-Thanks a lot for the patches.
-
-Per Michael request, the API in [1] might need some tweak, I want to 
-introduce some device specific parent_ops instead of vfio specific one. 
-This RFC has been posted at https://lkml.org/lkml/2019/9/12/151.
-
-
 >
 > Tiwei Bie (3):
 >    vfio: support getting vfio device from device fd
