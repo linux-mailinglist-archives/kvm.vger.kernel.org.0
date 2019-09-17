@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3A44B489F
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 09:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BF6FB48CF
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:09:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732226AbfIQH4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 03:56:05 -0400
-Received: from mga02.intel.com ([134.134.136.20]:41457 "EHLO mga02.intel.com"
+        id S2404655AbfIQIJ2 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 17 Sep 2019 04:09:28 -0400
+Received: from mga01.intel.com ([192.55.52.88]:54378 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727321AbfIQH4F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 03:56:05 -0400
+        id S1728126AbfIQIJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 04:09:28 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 00:56:04 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 01:09:27 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,515,1559545200"; 
-   d="scan'208";a="198613151"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-  by orsmga002.jf.intel.com with ESMTP; 17 Sep 2019 00:56:00 -0700
-Received: from FMSMSX109.amr.corp.intel.com (10.18.116.9) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 17 Sep 2019 00:56:00 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- fmsmsx109.amr.corp.intel.com (10.18.116.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 17 Sep 2019 00:55:59 -0700
+   d="scan'208";a="177312486"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga007.jf.intel.com with ESMTP; 17 Sep 2019 01:09:26 -0700
+Received: from fmsmsx154.amr.corp.intel.com (10.18.116.70) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 17 Sep 2019 01:09:26 -0700
+Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
+ FMSMSX154.amr.corp.intel.com (10.18.116.70) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 17 Sep 2019 01:09:25 -0700
 Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.146]) with mapi id 14.03.0439.000;
- Tue, 17 Sep 2019 15:55:58 +0800
+ SHSMSX105.ccr.corp.intel.com ([169.254.11.23]) with mapi id 14.03.0439.000;
+ Tue, 17 Sep 2019 16:09:23 +0800
 From:   "Tian, Kevin" <kevin.tian@intel.com>
 To:     Jason Wang <jasowang@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -54,7 +54,6 @@ CC:     "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
         "farman@linux.ibm.com" <farman@linux.ibm.com>,
         "idos@mellanox.com" <idos@mellanox.com>,
         "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "Liang, Cunming" <cunming.liang@intel.com>,
         "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
         "Wang, Xiao W" <xiao.w.wang@intel.com>,
         "freude@linux.ibm.com" <freude@linux.ibm.com>,
@@ -62,216 +61,509 @@ CC:     "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
         "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
         "Zhu, Lingshan" <lingshan.zhu@intel.com>,
         "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "Bie, Tiwei" <tiwei.bie@intel.com>,
         "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
         "cohuck@redhat.com" <cohuck@redhat.com>,
         "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
         "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
         "daniel@ffwll.ch" <daniel@ffwll.ch>,
         "Wang, Zhihong" <zhihong.wang@intel.com>
-Subject: RE: [RFC PATCH 1/2] mdev: device id support
-Thread-Topic: [RFC PATCH 1/2] mdev: device id support
-Thread-Index: AQHVaU43yYRO2jFY+0WKxy+p3wCayqcvhaCg
-Date:   Tue, 17 Sep 2019 07:55:57 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D579F2F@SHSMSX104.ccr.corp.intel.com>
+Subject: RE: [RFC PATCH 2/2] mdev: introduce device specific ops
+Thread-Topic: [RFC PATCH 2/2] mdev: introduce device specific ops
+Thread-Index: AQHVaU5C7SWjfMEZZESkIQks0N60NKcviCqA
+Date:   Tue, 17 Sep 2019 08:09:22 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D579F71@SHSMSX104.ccr.corp.intel.com>
 References: <20190912094012.29653-1-jasowang@redhat.com>
- <20190912094012.29653-2-jasowang@redhat.com>
-In-Reply-To: <20190912094012.29653-2-jasowang@redhat.com>
+ <20190912094012.29653-3-jasowang@redhat.com>
+In-Reply-To: <20190912094012.29653-3-jasowang@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiODNhYjAxYmMtYmYzYi00ZmRhLWE0ODItOTlkM2MzNGM5N2NkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQ25HV1hBMTFGbG1oXC9QRml1MmRvb2xtWitHYUw0ckd3VVF2TDhJcHFIb1lhZFFtRVVTTjZOcEFwSkRBKzdNYk4ifQ==
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTcyY2ZlNGItNWNiMi00NWYyLWE3NmItNjI5MzMwYTgzYjE0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSGwzcVZLR3BzWnhxYThcL3N1eHVUT2xUNklhWVdndTJFcElFZFN3eW40OXRGMk14UDBmcVwvSlRqNHZDMk5vK1NtIn0=
 dlp-product: dlpe-windows
 dlp-version: 11.0.400.15
 dlp-reaction: no-action
 x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBKYXNvbiBXYW5nDQo+IFNlbnQ6IFRodXJzZGF5LCBTZXB0ZW1iZXIgMTIsIDIwMTkg
-NTo0MCBQTQ0KPiANCj4gTWRldiBidXMgb25seSBzdXBwb3J0IHZmaW8gZHJpdmVyIHJpZ2h0IG5v
-dywgc28gaXQgZG9lc24ndCBpbXBsZW1lbnQNCj4gbWF0Y2ggbWV0aG9kLiBCdXQgaW4gdGhlIGZ1
-dHVyZSwgd2UgbWF5IGFkZCBkcml2ZXJzIG90aGVyIHRoYW4gdmZpbywNCj4gb25lIGV4YW1wbGUg
-aXMgdmlydGlvLW1kZXZbMV0gZHJpdmVyLiBUaGlzIG1lYW5zIHdlIG5lZWQgdG8gYWRkIGRldmlj
-ZQ0KPiBpZCBzdXBwb3J0IGluIGJ1cyBtYXRjaCBtZXRob2QgdG8gcGFpciB0aGUgbWRldiBkZXZp
-Y2UgYW5kIG1kZXYgZHJpdmVyDQo+IGNvcnJlY3RseS4NCg0KImRldmljZSBpZCIgc291bmQgYSBi
-aXQgY29uZnVzaW5nIHRvIG1lIC0gaXQgdXN1YWxseSBtZWFucyBzb21ldGhpbmcNCnVuaXF1ZSB0
-byBlYWNoIGRldmljZSwgd2hpbGUgaGVyZSBpdCBpcyB1c2VkIHRvIGluZGljYXRlIGV4cGVjdGVk
-IGRyaXZlcg0KdHlwZXMgKHZmaW8sIHZpcnRpbywgZXRjLikuIGJ1dCB1c2luZyAiYnVzIGlkIiBp
-cyBhbHNvIG5vdCBnb29kIC0gd2UgaGF2ZQ0Kb25seSBvbmUgbWRldiBidXMgaGVyZS4gVGhlbiB3
-aGF0IGFib3V0ICJjbGFzcyBpZCI/DQoNCj4gDQo+IFNvIHRoaXMgcGF0Y2ggYWRkIGlkX3RhYmxl
-IHRvIG1kZXZfZHJpdmVyIGFuZCBpZCBmb3IgbWRldiBwYXJlbnQsIGFuZA0KPiBpbXBsZW1lbnQg
-dGhlIG1hdGNoIG1ldGhvZCBmb3IgbWRldiBidXMuDQo+IA0KPiBbMV0gaHR0cHM6Ly9sa21sLm9y
-Zy9sa21sLzIwMTkvOS8xMC8xMzUNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEphc29uIFdhbmcgPGph
-c293YW5nQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9ncHUvZHJtL2k5MTUvZ3Z0L2t2
-bWd0LmMgIHwgIDIgKy0NCj4gIGRyaXZlcnMvczM5MC9jaW8vdmZpb19jY3dfb3BzLmMgICB8ICAy
-ICstDQo+ICBkcml2ZXJzL3MzOTAvY3J5cHRvL3ZmaW9fYXBfb3BzLmMgfCAgMyArKy0NCj4gIGRy
-aXZlcnMvdmZpby9tZGV2L21kZXZfY29yZS5jICAgICB8IDE0ICsrKysrKysrKysrKy0tDQo+ICBk
-cml2ZXJzL3ZmaW8vbWRldi9tZGV2X2RyaXZlci5jICAgfCAxNCArKysrKysrKysrKysrKw0KPiAg
-ZHJpdmVycy92ZmlvL21kZXYvbWRldl9wcml2YXRlLmggIHwgIDEgKw0KPiAgZHJpdmVycy92Zmlv
-L21kZXYvdmZpb19tZGV2LmMgICAgIHwgIDYgKysrKysrDQo+ICBpbmNsdWRlL2xpbnV4L21kZXYu
-aCAgICAgICAgICAgICAgfCAgNiArKysrKy0NCj4gIGluY2x1ZGUvbGludXgvbW9kX2RldmljZXRh
-YmxlLmggICB8ICA2ICsrKysrKw0KPiAgc2FtcGxlcy92ZmlvLW1kZXYvbWJvY2hzLmMgICAgICAg
-IHwgIDIgKy0NCj4gIHNhbXBsZXMvdmZpby1tZGV2L21kcHkuYyAgICAgICAgICB8ICAyICstDQo+
-ICBzYW1wbGVzL3ZmaW8tbWRldi9tdHR5LmMgICAgICAgICAgfCAgMiArLQ0KPiAgMTIgZmlsZXMg
-Y2hhbmdlZCwgNTEgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1n
-aXQgYS9kcml2ZXJzL2dwdS9kcm0vaTkxNS9ndnQva3ZtZ3QuYw0KPiBiL2RyaXZlcnMvZ3B1L2Ry
-bS9pOTE1L2d2dC9rdm1ndC5jDQo+IGluZGV4IDIzYWEzZTUwY2JmOC4uMTlkNTFhMzVmMDE5IDEw
-MDY0NA0KPiAtLS0gYS9kcml2ZXJzL2dwdS9kcm0vaTkxNS9ndnQva3ZtZ3QuYw0KPiArKysgYi9k
-cml2ZXJzL2dwdS9kcm0vaTkxNS9ndnQva3ZtZ3QuYw0KPiBAQCAtMTYyNSw3ICsxNjI1LDcgQEAg
-c3RhdGljIGludCBrdm1ndF9ob3N0X2luaXQoc3RydWN0IGRldmljZSAqZGV2LCB2b2lkDQo+ICpn
-dnQsIGNvbnN0IHZvaWQgKm9wcykNCj4gIAkJcmV0dXJuIC1FRkFVTFQ7DQo+ICAJaW50ZWxfdmdw
-dV9vcHMuc3VwcG9ydGVkX3R5cGVfZ3JvdXBzID0ga3ZtX3ZncHVfdHlwZV9ncm91cHM7DQo+IA0K
-PiAtCXJldHVybiBtZGV2X3JlZ2lzdGVyX2RldmljZShkZXYsICZpbnRlbF92Z3B1X29wcyk7DQo+
-ICsJcmV0dXJuIG1kZXZfcmVnaXN0ZXJfdmZpb19kZXZpY2UoZGV2LCAmaW50ZWxfdmdwdV9vcHMp
-Ow0KPiAgfQ0KPiANCj4gIHN0YXRpYyB2b2lkIGt2bWd0X2hvc3RfZXhpdChzdHJ1Y3QgZGV2aWNl
-ICpkZXYpDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3MzOTAvY2lvL3ZmaW9fY2N3X29wcy5jDQo+
-IGIvZHJpdmVycy9zMzkwL2Npby92ZmlvX2Njd19vcHMuYw0KPiBpbmRleCA1ZWI2MTExNmNhNmYu
-LmY4N2Q5NDA5ZTI5MCAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9zMzkwL2Npby92ZmlvX2Njd19v
-cHMuYw0KPiArKysgYi9kcml2ZXJzL3MzOTAvY2lvL3ZmaW9fY2N3X29wcy5jDQo+IEBAIC01Nzgs
-NyArNTc4LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBtZGV2X3BhcmVudF9vcHMNCj4gdmZpb19j
-Y3dfbWRldl9vcHMgPSB7DQo+IA0KPiAgaW50IHZmaW9fY2N3X21kZXZfcmVnKHN0cnVjdCBzdWJj
-aGFubmVsICpzY2gpDQo+ICB7DQo+IC0JcmV0dXJuIG1kZXZfcmVnaXN0ZXJfZGV2aWNlKCZzY2gt
-PmRldiwgJnZmaW9fY2N3X21kZXZfb3BzKTsNCj4gKwlyZXR1cm4gbWRldl9yZWdpc3Rlcl92Zmlv
-X2RldmljZSgmc2NoLT5kZXYsDQo+ICZ2ZmlvX2Njd19tZGV2X29wcyk7DQo+ICB9DQo+IA0KPiAg
-dm9pZCB2ZmlvX2Njd19tZGV2X3VucmVnKHN0cnVjdCBzdWJjaGFubmVsICpzY2gpDQo+IGRpZmYg
-LS1naXQgYS9kcml2ZXJzL3MzOTAvY3J5cHRvL3ZmaW9fYXBfb3BzLmMNCj4gYi9kcml2ZXJzL3Mz
-OTAvY3J5cHRvL3ZmaW9fYXBfb3BzLmMNCj4gaW5kZXggMDYwNGI0OWE0ZDMyLi5lYWNiZGUzYzdh
-OTcgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvczM5MC9jcnlwdG8vdmZpb19hcF9vcHMuYw0KPiAr
-KysgYi9kcml2ZXJzL3MzOTAvY3J5cHRvL3ZmaW9fYXBfb3BzLmMNCj4gQEAgLTEyOTUsNyArMTI5
-NSw4IEBAIGludCB2ZmlvX2FwX21kZXZfcmVnaXN0ZXIodm9pZCkNCj4gIHsNCj4gIAlhdG9taWNf
-c2V0KCZtYXRyaXhfZGV2LT5hdmFpbGFibGVfaW5zdGFuY2VzLA0KPiBNQVhfWkRFVl9FTlRSSUVT
-X0VYVCk7DQo+IA0KPiAtCXJldHVybiBtZGV2X3JlZ2lzdGVyX2RldmljZSgmbWF0cml4X2Rldi0+
-ZGV2aWNlLA0KPiAmdmZpb19hcF9tYXRyaXhfb3BzKTsNCj4gKwlyZXR1cm4gbWRldl9yZWdpc3Rl
-cl92ZmlvX2RldmljZSgmbWF0cml4X2Rldi0+ZGV2aWNlLA0KPiArCQkJCQkgJnZmaW9fYXBfbWF0
-cml4X29wcyk7DQo+ICB9DQo+IA0KPiAgdm9pZCB2ZmlvX2FwX21kZXZfdW5yZWdpc3Rlcih2b2lk
-KQ0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL21kZXYvbWRldl9jb3JlLmMNCj4gYi9kcml2
-ZXJzL3ZmaW8vbWRldi9tZGV2X2NvcmUuYw0KPiBpbmRleCBiNTU4ZDRjZmQwODIuLmZjMDdmZjNl
-YmU5NiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy92ZmlvL21kZXYvbWRldl9jb3JlLmMNCj4gKysr
-IGIvZHJpdmVycy92ZmlvL21kZXYvbWRldl9jb3JlLmMNCj4gQEAgLTEzNSwxMSArMTM1LDE0IEBA
-IHN0YXRpYyBpbnQgbWRldl9kZXZpY2VfcmVtb3ZlX2NiKHN0cnVjdCBkZXZpY2UNCj4gKmRldiwg
-dm9pZCAqZGF0YSkNCj4gICAqIG1kZXZfcmVnaXN0ZXJfZGV2aWNlIDogUmVnaXN0ZXIgYSBkZXZp
-Y2UNCj4gICAqIEBkZXY6IGRldmljZSBzdHJ1Y3R1cmUgcmVwcmVzZW50aW5nIHBhcmVudCBkZXZp
-Y2UuDQo+ICAgKiBAb3BzOiBQYXJlbnQgZGV2aWNlIG9wZXJhdGlvbiBzdHJ1Y3R1cmUgdG8gYmUg
-cmVnaXN0ZXJlZC4NCj4gKyAqIEBpZDogZGV2aWNlIGlkLg0KPiAgICoNCj4gICAqIEFkZCBkZXZp
-Y2UgdG8gbGlzdCBvZiByZWdpc3RlcmVkIHBhcmVudCBkZXZpY2VzLg0KPiAgICogUmV0dXJucyBh
-IG5lZ2F0aXZlIHZhbHVlIG9uIGVycm9yLCBvdGhlcndpc2UgMC4NCj4gICAqLw0KPiAtaW50IG1k
-ZXZfcmVnaXN0ZXJfZGV2aWNlKHN0cnVjdCBkZXZpY2UgKmRldiwgY29uc3Qgc3RydWN0DQo+IG1k
-ZXZfcGFyZW50X29wcyAqb3BzKQ0KPiAraW50IG1kZXZfcmVnaXN0ZXJfZGV2aWNlKHN0cnVjdCBk
-ZXZpY2UgKmRldiwNCj4gKwkJCSBjb25zdCBzdHJ1Y3QgbWRldl9wYXJlbnRfb3BzICpvcHMsDQo+
-ICsJCQkgdTggaWQpDQo+ICB7DQo+ICAJaW50IHJldDsNCj4gIAlzdHJ1Y3QgbWRldl9wYXJlbnQg
-KnBhcmVudDsNCj4gQEAgLTE3NSw2ICsxNzgsNyBAQCBpbnQgbWRldl9yZWdpc3Rlcl9kZXZpY2Uo
-c3RydWN0IGRldmljZSAqZGV2LCBjb25zdA0KPiBzdHJ1Y3QgbWRldl9wYXJlbnRfb3BzICpvcHMp
-DQo+IA0KPiAgCXBhcmVudC0+ZGV2ID0gZGV2Ow0KPiAgCXBhcmVudC0+b3BzID0gb3BzOw0KPiAr
-CXBhcmVudC0+ZGV2aWNlX2lkID0gaWQ7DQo+IA0KPiAgCWlmICghbWRldl9idXNfY29tcGF0X2Ns
-YXNzKSB7DQo+ICAJCW1kZXZfYnVzX2NvbXBhdF9jbGFzcyA9DQo+IGNsYXNzX2NvbXBhdF9yZWdp
-c3RlcigibWRldl9idXMiKTsNCj4gQEAgLTIwOCw3ICsyMTIsMTMgQEAgaW50IG1kZXZfcmVnaXN0
-ZXJfZGV2aWNlKHN0cnVjdCBkZXZpY2UgKmRldiwgY29uc3QNCj4gc3RydWN0IG1kZXZfcGFyZW50
-X29wcyAqb3BzKQ0KPiAgCQlwdXRfZGV2aWNlKGRldik7DQo+ICAJcmV0dXJuIHJldDsNCj4gIH0N
-Cj4gLUVYUE9SVF9TWU1CT0wobWRldl9yZWdpc3Rlcl9kZXZpY2UpOw0KPiArDQo+ICtpbnQgbWRl
-dl9yZWdpc3Rlcl92ZmlvX2RldmljZShzdHJ1Y3QgZGV2aWNlICpkZXYsDQo+ICsJCQkgICAgICBj
-b25zdCBzdHJ1Y3QgbWRldl9wYXJlbnRfb3BzICpvcHMpDQo+ICt7DQo+ICsJcmV0dXJuIG1kZXZf
-cmVnaXN0ZXJfZGV2aWNlKGRldiwgb3BzLCBNREVWX0lEX1ZGSU8pOw0KPiArfQ0KPiArRVhQT1JU
-X1NZTUJPTChtZGV2X3JlZ2lzdGVyX3ZmaW9fZGV2aWNlKTsNCj4gDQo+ICAvKg0KPiAgICogbWRl
-dl91bnJlZ2lzdGVyX2RldmljZSA6IFVucmVnaXN0ZXIgYSBwYXJlbnQgZGV2aWNlDQo+IGRpZmYg
-LS1naXQgYS9kcml2ZXJzL3ZmaW8vbWRldi9tZGV2X2RyaXZlci5jDQo+IGIvZHJpdmVycy92Zmlv
-L21kZXYvbWRldl9kcml2ZXIuYw0KPiBpbmRleCAwZDMyMjNhZWUyMGIuLmZkNWU5NTQxZDE4ZSAx
-MDA2NDQNCj4gLS0tIGEvZHJpdmVycy92ZmlvL21kZXYvbWRldl9kcml2ZXIuYw0KPiArKysgYi9k
-cml2ZXJzL3ZmaW8vbWRldi9tZGV2X2RyaXZlci5jDQo+IEBAIC02OSw4ICs2OSwyMiBAQCBzdGF0
-aWMgaW50IG1kZXZfcmVtb3ZlKHN0cnVjdCBkZXZpY2UgKmRldikNCj4gIAlyZXR1cm4gMDsNCj4g
-IH0NCj4gDQo+ICtzdGF0aWMgaW50IG1kZXZfbWF0Y2goc3RydWN0IGRldmljZSAqZGV2LCBzdHJ1
-Y3QgZGV2aWNlX2RyaXZlciAqZHJ2KQ0KPiArew0KPiArCXVuc2lnbmVkIGludCBpOw0KPiArCXN0
-cnVjdCBtZGV2X2RldmljZSAqbWRldiA9IHRvX21kZXZfZGV2aWNlKGRldik7DQo+ICsJc3RydWN0
-IG1kZXZfZHJpdmVyICptZHJ2ID0gdG9fbWRldl9kcml2ZXIoZHJ2KTsNCj4gKwljb25zdCBzdHJ1
-Y3QgbWRldl9kZXZpY2VfaWQgKmlkcyA9IG1kcnYtPmlkX3RhYmxlOw0KPiArDQo+ICsJZm9yIChp
-ID0gMDsgaWRzW2ldLmlkOyBpKyspDQo+ICsJCWlmIChpZHNbaV0uaWQgPT0gbWRldi0+cGFyZW50
-LT5kZXZpY2VfaWQpDQo+ICsJCQlyZXR1cm4gMTsNCj4gKwlyZXR1cm4gMDsNCj4gK30NCj4gKw0K
-PiAgc3RydWN0IGJ1c190eXBlIG1kZXZfYnVzX3R5cGUgPSB7DQo+ICAJLm5hbWUJCT0gIm1kZXYi
-LA0KPiArCS5tYXRjaAkJPSBtZGV2X21hdGNoLA0KPiAgCS5wcm9iZQkJPSBtZGV2X3Byb2JlLA0K
-PiAgCS5yZW1vdmUJCT0gbWRldl9yZW1vdmUsDQo+ICB9Ow0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVy
-cy92ZmlvL21kZXYvbWRldl9wcml2YXRlLmgNCj4gYi9kcml2ZXJzL3ZmaW8vbWRldi9tZGV2X3By
-aXZhdGUuaA0KPiBpbmRleCA3ZDkyMjk1MGNhYWYuLjdmYzgxNTM2NzFlMCAxMDA2NDQNCj4gLS0t
-IGEvZHJpdmVycy92ZmlvL21kZXYvbWRldl9wcml2YXRlLmgNCj4gKysrIGIvZHJpdmVycy92Zmlv
-L21kZXYvbWRldl9wcml2YXRlLmgNCj4gQEAgLTIyLDYgKzIyLDcgQEAgc3RydWN0IG1kZXZfcGFy
-ZW50IHsNCj4gIAlzdHJ1Y3QgbGlzdF9oZWFkIHR5cGVfbGlzdDsNCj4gIAkvKiBTeW5jaHJvbml6
-ZSBkZXZpY2UgY3JlYXRpb24vcmVtb3ZhbCB3aXRoIHBhcmVudCB1bnJlZ2lzdHJhdGlvbg0KPiAq
-Lw0KPiAgCXN0cnVjdCByd19zZW1hcGhvcmUgdW5yZWdfc2VtOw0KPiArCXU4IGRldmljZV9pZDsN
-Cj4gIH07DQo+IA0KPiAgc3RydWN0IG1kZXZfZGV2aWNlIHsNCj4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvdmZpby9tZGV2L3ZmaW9fbWRldi5jDQo+IGIvZHJpdmVycy92ZmlvL21kZXYvdmZpb19tZGV2
-LmMNCj4gaW5kZXggMzA5NjRhNGUwYTI4Li44ODdjNTdmMTA4ODAgMTAwNjQ0DQo+IC0tLSBhL2Ry
-aXZlcnMvdmZpby9tZGV2L3ZmaW9fbWRldi5jDQo+ICsrKyBiL2RyaXZlcnMvdmZpby9tZGV2L3Zm
-aW9fbWRldi5jDQo+IEBAIC0xMjAsMTAgKzEyMCwxNiBAQCBzdGF0aWMgdm9pZCB2ZmlvX21kZXZf
-cmVtb3ZlKHN0cnVjdCBkZXZpY2UgKmRldikNCj4gIAl2ZmlvX2RlbF9ncm91cF9kZXYoZGV2KTsN
-Cj4gIH0NCj4gDQo+ICtzdGF0aWMgc3RydWN0IG1kZXZfZGV2aWNlX2lkIGlkX3RhYmxlW10gPSB7
-DQo+ICsJeyBNREVWX0lEX1ZGSU8gfSwNCj4gKwl7IDAgfSwNCj4gK307DQo+ICsNCj4gIHN0YXRp
-YyBzdHJ1Y3QgbWRldl9kcml2ZXIgdmZpb19tZGV2X2RyaXZlciA9IHsNCj4gIAkubmFtZQk9ICJ2
-ZmlvX21kZXYiLA0KPiAgCS5wcm9iZQk9IHZmaW9fbWRldl9wcm9iZSwNCj4gIAkucmVtb3ZlCT0g
-dmZpb19tZGV2X3JlbW92ZSwNCj4gKwkuaWRfdGFibGUgPSBpZF90YWJsZSwNCj4gIH07DQo+IA0K
-PiAgc3RhdGljIGludCBfX2luaXQgdmZpb19tZGV2X2luaXQodm9pZCkNCj4gZGlmZiAtLWdpdCBh
-L2luY2x1ZGUvbGludXgvbWRldi5oIGIvaW5jbHVkZS9saW51eC9tZGV2LmgNCj4gaW5kZXggMGNl
-MzBjYTc4ZGIwLi5mODUwNDUzOTIxMjAgMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvbGludXgvbWRl
-di5oDQo+ICsrKyBiL2luY2x1ZGUvbGludXgvbWRldi5oDQo+IEBAIC0xMTgsNiArMTE4LDcgQEAg
-c3RydWN0IG1kZXZfdHlwZV9hdHRyaWJ1dGUNCj4gbWRldl90eXBlX2F0dHJfIyNfbmFtZSA9CQlc
-DQo+ICAgKiBAcHJvYmU6IGNhbGxlZCB3aGVuIG5ldyBkZXZpY2UgY3JlYXRlZA0KPiAgICogQHJl
-bW92ZTogY2FsbGVkIHdoZW4gZGV2aWNlIHJlbW92ZWQNCj4gICAqIEBkcml2ZXI6IGRldmljZSBk
-cml2ZXIgc3RydWN0dXJlDQo+ICsgKiBAaWRfdGFibGU6IHRoZSBpZHMgc2VydmljZWQgYnkgdGhp
-cyBkcml2ZXIuDQo+ICAgKg0KPiAgICoqLw0KPiAgc3RydWN0IG1kZXZfZHJpdmVyIHsNCj4gQEAg
-LTEyNSw2ICsxMjYsNyBAQCBzdHJ1Y3QgbWRldl9kcml2ZXIgew0KPiAgCWludCAgKCpwcm9iZSko
-c3RydWN0IGRldmljZSAqZGV2KTsNCj4gIAl2b2lkICgqcmVtb3ZlKShzdHJ1Y3QgZGV2aWNlICpk
-ZXYpOw0KPiAgCXN0cnVjdCBkZXZpY2VfZHJpdmVyIGRyaXZlcjsNCj4gKwljb25zdCBzdHJ1Y3Qg
-bWRldl9kZXZpY2VfaWQgKmlkX3RhYmxlOw0KPiAgfTsNCj4gDQo+ICAjZGVmaW5lIHRvX21kZXZf
-ZHJpdmVyKGRydikJY29udGFpbmVyX29mKGRydiwgc3RydWN0IG1kZXZfZHJpdmVyLCBkcml2ZXIp
-DQo+IEBAIC0xMzUsNyArMTM3LDcgQEAgY29uc3QgZ3VpZF90ICptZGV2X3V1aWQoc3RydWN0IG1k
-ZXZfZGV2aWNlDQo+ICptZGV2KTsNCj4gDQo+ICBleHRlcm4gc3RydWN0IGJ1c190eXBlIG1kZXZf
-YnVzX3R5cGU7DQo+IA0KPiAtaW50IG1kZXZfcmVnaXN0ZXJfZGV2aWNlKHN0cnVjdCBkZXZpY2Ug
-KmRldiwgY29uc3Qgc3RydWN0DQo+IG1kZXZfcGFyZW50X29wcyAqb3BzKTsNCj4gK2ludCBtZGV2
-X3JlZ2lzdGVyX3ZmaW9fZGV2aWNlKHN0cnVjdCBkZXZpY2UgKmRldiwgY29uc3Qgc3RydWN0DQo+
-IG1kZXZfcGFyZW50X29wcyAqb3BzKTsNCj4gIHZvaWQgbWRldl91bnJlZ2lzdGVyX2RldmljZShz
-dHJ1Y3QgZGV2aWNlICpkZXYpOw0KPiANCj4gIGludCBtZGV2X3JlZ2lzdGVyX2RyaXZlcihzdHJ1
-Y3QgbWRldl9kcml2ZXIgKmRydiwgc3RydWN0IG1vZHVsZSAqb3duZXIpOw0KPiBAQCAtMTQ1LDQg
-KzE0Nyw2IEBAIHN0cnVjdCBkZXZpY2UgKm1kZXZfcGFyZW50X2RldihzdHJ1Y3QNCj4gbWRldl9k
-ZXZpY2UgKm1kZXYpOw0KPiAgc3RydWN0IGRldmljZSAqbWRldl9kZXYoc3RydWN0IG1kZXZfZGV2
-aWNlICptZGV2KTsNCj4gIHN0cnVjdCBtZGV2X2RldmljZSAqbWRldl9mcm9tX2RldihzdHJ1Y3Qg
-ZGV2aWNlICpkZXYpOw0KPiANCj4gKyNkZWZpbmUgTURFVl9JRF9WRklPIDEgLyogVkZJTyBkZXZp
-Y2UgKi8NCj4gKw0KPiAgI2VuZGlmIC8qIE1ERVZfSCAqLw0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9saW51eC9tb2RfZGV2aWNldGFibGUuaA0KPiBiL2luY2x1ZGUvbGludXgvbW9kX2RldmljZXRh
-YmxlLmgNCj4gaW5kZXggNTcxNGZkMzVhODNjLi5mMWZjMTQzZGYwNDIgMTAwNjQ0DQo+IC0tLSBh
-L2luY2x1ZGUvbGludXgvbW9kX2RldmljZXRhYmxlLmgNCj4gKysrIGIvaW5jbHVkZS9saW51eC9t
-b2RfZGV2aWNldGFibGUuaA0KPiBAQCAtODIxLDQgKzgyMSwxMCBAQCBzdHJ1Y3Qgd21pX2Rldmlj
-ZV9pZCB7DQo+ICAJY29uc3Qgdm9pZCAqY29udGV4dDsNCj4gIH07DQo+IA0KPiArLyogTURFViAq
-Lw0KPiArDQo+ICtzdHJ1Y3QgbWRldl9kZXZpY2VfaWQgew0KPiArCV9fdTggaWQ7DQo+ICt9Ow0K
-PiArDQo+ICAjZW5kaWYgLyogTElOVVhfTU9EX0RFVklDRVRBQkxFX0ggKi8NCj4gZGlmZiAtLWdp
-dCBhL3NhbXBsZXMvdmZpby1tZGV2L21ib2Nocy5jIGIvc2FtcGxlcy92ZmlvLW1kZXYvbWJvY2hz
-LmMNCj4gaW5kZXggYWM1YzhjMTdiMWZmLi43MWE0NDY5YmU4NWQgMTAwNjQ0DQo+IC0tLSBhL3Nh
-bXBsZXMvdmZpby1tZGV2L21ib2Nocy5jDQo+ICsrKyBiL3NhbXBsZXMvdmZpby1tZGV2L21ib2No
-cy5jDQo+IEBAIC0xNDY4LDcgKzE0NjgsNyBAQCBzdGF0aWMgaW50IF9faW5pdCBtYm9jaHNfZGV2
-X2luaXQodm9pZCkNCj4gIAlpZiAocmV0KQ0KPiAgCQlnb3RvIGZhaWxlZDI7DQo+IA0KPiAtCXJl
-dCA9IG1kZXZfcmVnaXN0ZXJfZGV2aWNlKCZtYm9jaHNfZGV2LCAmbWRldl9mb3BzKTsNCj4gKwly
-ZXQgPSBtZGV2X3JlZ2lzdGVyX3ZmaW9fZGV2aWNlKCZtYm9jaHNfZGV2LCAmbWRldl9mb3BzKTsN
-Cj4gIAlpZiAocmV0KQ0KPiAgCQlnb3RvIGZhaWxlZDM7DQo+IA0KPiBkaWZmIC0tZ2l0IGEvc2Ft
-cGxlcy92ZmlvLW1kZXYvbWRweS5jIGIvc2FtcGxlcy92ZmlvLW1kZXYvbWRweS5jDQo+IGluZGV4
-IGNjODZiZjY1NjZlNC4uZDMwMjlkZDI3ZDkxIDEwMDY0NA0KPiAtLS0gYS9zYW1wbGVzL3ZmaW8t
-bWRldi9tZHB5LmMNCj4gKysrIGIvc2FtcGxlcy92ZmlvLW1kZXYvbWRweS5jDQo+IEBAIC03NzUs
-NyArNzc1LDcgQEAgc3RhdGljIGludCBfX2luaXQgbWRweV9kZXZfaW5pdCh2b2lkKQ0KPiAgCWlm
-IChyZXQpDQo+ICAJCWdvdG8gZmFpbGVkMjsNCj4gDQo+IC0JcmV0ID0gbWRldl9yZWdpc3Rlcl9k
-ZXZpY2UoJm1kcHlfZGV2LCAmbWRldl9mb3BzKTsNCj4gKwlyZXQgPSBtZGV2X3JlZ2lzdGVyX3Zm
-aW9fZGV2aWNlKCZtZHB5X2RldiwgJm1kZXZfZm9wcyk7DQo+ICAJaWYgKHJldCkNCj4gIAkJZ290
-byBmYWlsZWQzOw0KPiANCj4gZGlmZiAtLWdpdCBhL3NhbXBsZXMvdmZpby1tZGV2L210dHkuYyBi
-L3NhbXBsZXMvdmZpby1tZGV2L210dHkuYw0KPiBpbmRleCA5MmU3NzBhMDZlYTIuLjc0NGM4OGE2
-YjIyYyAxMDA2NDQNCj4gLS0tIGEvc2FtcGxlcy92ZmlvLW1kZXYvbXR0eS5jDQo+ICsrKyBiL3Nh
-bXBsZXMvdmZpby1tZGV2L210dHkuYw0KPiBAQCAtMTQ2OCw3ICsxNDY4LDcgQEAgc3RhdGljIGlu
-dCBfX2luaXQgbXR0eV9kZXZfaW5pdCh2b2lkKQ0KPiAgCWlmIChyZXQpDQo+ICAJCWdvdG8gZmFp
-bGVkMjsNCj4gDQo+IC0JcmV0ID0gbWRldl9yZWdpc3Rlcl9kZXZpY2UoJm10dHlfZGV2LmRldiwg
-Jm1kZXZfZm9wcyk7DQo+ICsJcmV0ID0gbWRldl9yZWdpc3Rlcl92ZmlvX2RldmljZSgmbXR0eV9k
-ZXYuZGV2LCAmbWRldl9mb3BzKTsNCj4gIAlpZiAocmV0KQ0KPiAgCQlnb3RvIGZhaWxlZDM7DQo+
-IA0KPiAtLQ0KPiAyLjE5LjENCj4gDQo+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fDQo+IGludGVsLWd2dC1kZXYgbWFpbGluZyBsaXN0DQo+IGludGVsLWd2
-dC1kZXZAbGlzdHMuZnJlZWRlc2t0b3Aub3JnDQo+IGh0dHBzOi8vbGlzdHMuZnJlZWRlc2t0b3Au
-b3JnL21haWxtYW4vbGlzdGluZm8vaW50ZWwtZ3Z0LWRldg0K
+> From: Jason Wang
+> Sent: Thursday, September 12, 2019 5:40 PM
+> 
+> Currently, except for the crate and remove. The rest fields of
+> mdev_parent_ops is just designed for vfio-mdev driver and may not help
+> for kernel mdev driver. So follow the device id support by previous
+> patch, this patch introduces device specific ops which points to
+> device specific ops (e.g vfio ops). This allows the future drivers
+> like virtio-mdev to implement its own device specific ops.
+
+Can you give an example about what ops might be required to support
+kernel mdev driver? I know you posted a link earlier, but putting a small
+example here can save time and avoid inconsistent understanding. Then
+it will help whether the proposed split makes sense or there is a 
+possibility of redefining the callbacks to meet the both requirements.
+imo those callbacks fulfill some basic requirements when mediating
+a device...
+
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c  | 14 +++---
+>  drivers/s390/cio/vfio_ccw_ops.c   | 14 +++---
+>  drivers/s390/crypto/vfio_ap_ops.c | 10 +++--
+>  drivers/vfio/mdev/vfio_mdev.c     | 30 +++++++------
+>  include/linux/mdev.h              | 72 ++++++++++++++++++-------------
+>  samples/vfio-mdev/mbochs.c        | 16 ++++---
+>  samples/vfio-mdev/mdpy.c          | 16 ++++---
+>  samples/vfio-mdev/mtty.c          | 14 +++---
+>  8 files changed, 113 insertions(+), 73 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 19d51a35f019..64823998fd58 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -1600,20 +1600,22 @@ static const struct attribute_group
+> *intel_vgpu_groups[] = {
+>  	NULL,
+>  };
+> 
+> -static struct mdev_parent_ops intel_vgpu_ops = {
+> -	.mdev_attr_groups       = intel_vgpu_groups,
+> -	.create			= intel_vgpu_create,
+> -	.remove			= intel_vgpu_remove,
+> -
+> +static struct vfio_mdev_parent_ops intel_vfio_vgpu_ops = {
+>  	.open			= intel_vgpu_open,
+>  	.release		= intel_vgpu_release,
+> -
+>  	.read			= intel_vgpu_read,
+>  	.write			= intel_vgpu_write,
+>  	.mmap			= intel_vgpu_mmap,
+>  	.ioctl			= intel_vgpu_ioctl,
+>  };
+> 
+> +static struct mdev_parent_ops intel_vgpu_ops = {
+> +	.mdev_attr_groups       = intel_vgpu_groups,
+> +	.create			= intel_vgpu_create,
+> +	.remove			= intel_vgpu_remove,
+> +	.device_ops	        = &intel_vfio_vgpu_ops,
+> +};
+> +
+>  static int kvmgt_host_init(struct device *dev, void *gvt, const void *ops)
+>  {
+>  	struct attribute **kvm_type_attrs;
+> diff --git a/drivers/s390/cio/vfio_ccw_ops.c
+> b/drivers/s390/cio/vfio_ccw_ops.c
+> index f87d9409e290..96e9f18100ae 100644
+> --- a/drivers/s390/cio/vfio_ccw_ops.c
+> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> @@ -564,11 +564,7 @@ static ssize_t vfio_ccw_mdev_ioctl(struct
+> mdev_device *mdev,
+>  	}
+>  }
+> 
+> -static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
+> -	.owner			= THIS_MODULE,
+> -	.supported_type_groups  = mdev_type_groups,
+> -	.create			= vfio_ccw_mdev_create,
+> -	.remove			= vfio_ccw_mdev_remove,
+> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
+>  	.open			= vfio_ccw_mdev_open,
+>  	.release		= vfio_ccw_mdev_release,
+>  	.read			= vfio_ccw_mdev_read,
+> @@ -576,6 +572,14 @@ static const struct mdev_parent_ops
+> vfio_ccw_mdev_ops = {
+>  	.ioctl			= vfio_ccw_mdev_ioctl,
+>  };
+> 
+> +static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
+> +	.owner			= THIS_MODULE,
+> +	.supported_type_groups  = mdev_type_groups,
+> +	.create			= vfio_ccw_mdev_create,
+> +	.remove			= vfio_ccw_mdev_remove,
+> +	.device_ops		= &vfio_mdev_ops,
+> +};
+> +
+>  int vfio_ccw_mdev_reg(struct subchannel *sch)
+>  {
+>  	return mdev_register_vfio_device(&sch->dev,
+> &vfio_ccw_mdev_ops);
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
+> b/drivers/s390/crypto/vfio_ap_ops.c
+> index eacbde3c7a97..a48282bff066 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1280,15 +1280,19 @@ static ssize_t vfio_ap_mdev_ioctl(struct
+> mdev_device *mdev,
+>  	return ret;
+>  }
+> 
+> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
+> +	.open			= vfio_ap_mdev_open,
+> +	.release		= vfio_ap_mdev_release,
+> +	.ioctl			= vfio_ap_mdev_ioctl,
+> +};
+> +
+>  static const struct mdev_parent_ops vfio_ap_matrix_ops = {
+>  	.owner			= THIS_MODULE,
+>  	.supported_type_groups	= vfio_ap_mdev_type_groups,
+>  	.mdev_attr_groups	= vfio_ap_mdev_attr_groups,
+>  	.create			= vfio_ap_mdev_create,
+>  	.remove			= vfio_ap_mdev_remove,
+> -	.open			= vfio_ap_mdev_open,
+> -	.release		= vfio_ap_mdev_release,
+> -	.ioctl			= vfio_ap_mdev_ioctl,
+> +	.device_ops		= &vfio_mdev_ops,
+>  };
+> 
+>  int vfio_ap_mdev_register(void)
+> diff --git a/drivers/vfio/mdev/vfio_mdev.c
+> b/drivers/vfio/mdev/vfio_mdev.c
+> index 887c57f10880..1196fbb6c3d2 100644
+> --- a/drivers/vfio/mdev/vfio_mdev.c
+> +++ b/drivers/vfio/mdev/vfio_mdev.c
+> @@ -25,15 +25,16 @@ static int vfio_mdev_open(void *device_data)
+>  {
+>  	struct mdev_device *mdev = device_data;
+>  	struct mdev_parent *parent = mdev->parent;
+> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
+> >device_ops;
+>  	int ret;
+> 
+> -	if (unlikely(!parent->ops->open))
+> +	if (unlikely(!ops->open))
+>  		return -EINVAL;
+> 
+>  	if (!try_module_get(THIS_MODULE))
+>  		return -ENODEV;
+> 
+> -	ret = parent->ops->open(mdev);
+> +	ret = ops->open(mdev);
+>  	if (ret)
+>  		module_put(THIS_MODULE);
+> 
+> @@ -44,9 +45,10 @@ static void vfio_mdev_release(void *device_data)
+>  {
+>  	struct mdev_device *mdev = device_data;
+>  	struct mdev_parent *parent = mdev->parent;
+> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
+> >device_ops;
+> 
+> -	if (likely(parent->ops->release))
+> -		parent->ops->release(mdev);
+> +	if (likely(ops->release))
+> +		ops->release(mdev);
+> 
+>  	module_put(THIS_MODULE);
+>  }
+> @@ -56,11 +58,12 @@ static long vfio_mdev_unlocked_ioctl(void
+> *device_data,
+>  {
+>  	struct mdev_device *mdev = device_data;
+>  	struct mdev_parent *parent = mdev->parent;
+> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
+> >device_ops;
+> 
+> -	if (unlikely(!parent->ops->ioctl))
+> +	if (unlikely(!ops->ioctl))
+>  		return -EINVAL;
+> 
+> -	return parent->ops->ioctl(mdev, cmd, arg);
+> +	return ops->ioctl(mdev, cmd, arg);
+>  }
+> 
+>  static ssize_t vfio_mdev_read(void *device_data, char __user *buf,
+> @@ -68,11 +71,12 @@ static ssize_t vfio_mdev_read(void *device_data,
+> char __user *buf,
+>  {
+>  	struct mdev_device *mdev = device_data;
+>  	struct mdev_parent *parent = mdev->parent;
+> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
+> >device_ops;
+> 
+> -	if (unlikely(!parent->ops->read))
+> +	if (unlikely(!ops->read))
+>  		return -EINVAL;
+> 
+> -	return parent->ops->read(mdev, buf, count, ppos);
+> +	return ops->read(mdev, buf, count, ppos);
+>  }
+> 
+>  static ssize_t vfio_mdev_write(void *device_data, const char __user *buf,
+> @@ -80,22 +84,24 @@ static ssize_t vfio_mdev_write(void *device_data,
+> const char __user *buf,
+>  {
+>  	struct mdev_device *mdev = device_data;
+>  	struct mdev_parent *parent = mdev->parent;
+> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
+> >device_ops;
+> 
+> -	if (unlikely(!parent->ops->write))
+> +	if (unlikely(!ops->write))
+>  		return -EINVAL;
+> 
+> -	return parent->ops->write(mdev, buf, count, ppos);
+> +	return ops->write(mdev, buf, count, ppos);
+>  }
+> 
+>  static int vfio_mdev_mmap(void *device_data, struct vm_area_struct
+> *vma)
+>  {
+>  	struct mdev_device *mdev = device_data;
+>  	struct mdev_parent *parent = mdev->parent;
+> +	const struct vfio_mdev_parent_ops *ops = parent->ops-
+> >device_ops;
+> 
+> -	if (unlikely(!parent->ops->mmap))
+> +	if (unlikely(!ops->mmap))
+>  		return -EINVAL;
+> 
+> -	return parent->ops->mmap(mdev, vma);
+> +	return ops->mmap(mdev, vma);
+>  }
+> 
+>  static const struct vfio_device_ops vfio_mdev_dev_ops = {
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index f85045392120..3b8a76bc69cf 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -27,27 +27,9 @@ int mdev_set_iommu_device(struct device *dev,
+> struct device *iommu_device);
+>  struct device *mdev_get_iommu_device(struct device *dev);
+> 
+>  /**
+> - * struct mdev_parent_ops - Structure to be registered for each parent
+> device to
+> - * register the device to mdev module.
+> + * struct vfio_mdev_parent_ops - Structure to be registered for each
+> + * parent device to register the device to vfio-mdev module.
+>   *
+> - * @owner:		The module owner.
+> - * @dev_attr_groups:	Attributes of the parent device.
+> - * @mdev_attr_groups:	Attributes of the mediated device.
+> - * @supported_type_groups: Attributes to define supported types. It is
+> mandatory
+> - *			to provide supported types.
+> - * @create:		Called to allocate basic resources in parent device's
+> - *			driver for a particular mediated device. It is
+> - *			mandatory to provide create ops.
+> - *			@kobj: kobject of type for which 'create' is called.
+> - *			@mdev: mdev_device structure on of mediated
+> device
+> - *			      that is being created
+> - *			Returns integer: success (0) or error (< 0)
+> - * @remove:		Called to free resources in parent device's driver for
+> a
+> - *			a mediated device. It is mandatory to provide
+> 'remove'
+> - *			ops.
+> - *			@mdev: mdev_device device structure which is
+> being
+> - *			       destroyed
+> - *			Returns integer: success (0) or error (< 0)
+>   * @open:		Open mediated device.
+>   *			@mdev: mediated device.
+>   *			Returns integer: success (0) or error (< 0)
+> @@ -72,6 +54,43 @@ struct device *mdev_get_iommu_device(struct
+> device *dev);
+>   * @mmap:		mmap callback
+>   *			@mdev: mediated device structure
+>   *			@vma: vma structure
+> + */
+> +struct vfio_mdev_parent_ops {
+> +	int     (*open)(struct mdev_device *mdev);
+> +	void    (*release)(struct mdev_device *mdev);
+> +	ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
+> +			size_t count, loff_t *ppos);
+> +	ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
+> +			 size_t count, loff_t *ppos);
+> +	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
+> +			 unsigned long arg);
+> +	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct
+> *vma);
+> +};
+> +
+> +/**
+> + * struct mdev_parent_ops - Structure to be registered for each parent
+> device to
+> + * register the device to mdev module.
+> + *
+> + * @owner:		The module owner.
+> + * @dev_attr_groups:	Attributes of the parent device.
+> + * @mdev_attr_groups:	Attributes of the mediated device.
+> + * @supported_type_groups: Attributes to define supported types. It is
+> mandatory
+> + *			to provide supported types.
+> + * @create:		Called to allocate basic resources in parent device's
+> + *			driver for a particular mediated device. It is
+> + *			mandatory to provide create ops.
+> + *			@kobj: kobject of type for which 'create' is called.
+> + *			@mdev: mdev_device structure on of mediated
+> device
+> + *			      that is being created
+> + *			Returns integer: success (0) or error (< 0)
+> + * @remove:		Called to free resources in parent device's driver for
+> a
+> + *			a mediated device. It is mandatory to provide
+> 'remove'
+> + *			ops.
+> + *			@mdev: mdev_device device structure which is
+> being
+> + *			       destroyed
+> + *			Returns integer: success (0) or error (< 0)
+> + * @device_ops:         Device specific emulation callback.
+> + *
+>   * Parent device that support mediated device should be registered with
+> mdev
+>   * module with mdev_parent_ops structure.
+>   **/
+> @@ -83,15 +102,7 @@ struct mdev_parent_ops {
+> 
+>  	int     (*create)(struct kobject *kobj, struct mdev_device *mdev);
+>  	int     (*remove)(struct mdev_device *mdev);
+> -	int     (*open)(struct mdev_device *mdev);
+> -	void    (*release)(struct mdev_device *mdev);
+> -	ssize_t (*read)(struct mdev_device *mdev, char __user *buf,
+> -			size_t count, loff_t *ppos);
+> -	ssize_t (*write)(struct mdev_device *mdev, const char __user *buf,
+> -			 size_t count, loff_t *ppos);
+> -	long	(*ioctl)(struct mdev_device *mdev, unsigned int cmd,
+> -			 unsigned long arg);
+> -	int	(*mmap)(struct mdev_device *mdev, struct vm_area_struct
+> *vma);
+> +	const void *device_ops;
+>  };
+> 
+>  /* interface for exporting mdev supported type attributes */
+> @@ -137,7 +148,8 @@ const guid_t *mdev_uuid(struct mdev_device
+> *mdev);
+> 
+>  extern struct bus_type mdev_bus_type;
+> 
+> -int mdev_register_vfio_device(struct device *dev, const struct
+> mdev_parent_ops *ops);
+> +int mdev_register_vfio_device(struct device *dev,
+> +                              const struct mdev_parent_ops *ops);
+>  void mdev_unregister_device(struct device *dev);
+> 
+>  int mdev_register_driver(struct mdev_driver *drv, struct module *owner);
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index 71a4469be85d..53ceb357f152 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -1418,12 +1418,7 @@ static struct attribute_group
+> *mdev_type_groups[] = {
+>  	NULL,
+>  };
+> 
+> -static const struct mdev_parent_ops mdev_fops = {
+> -	.owner			= THIS_MODULE,
+> -	.mdev_attr_groups	= mdev_dev_groups,
+> -	.supported_type_groups	= mdev_type_groups,
+> -	.create			= mbochs_create,
+> -	.remove			= mbochs_remove,
+> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
+>  	.open			= mbochs_open,
+>  	.release		= mbochs_close,
+>  	.read			= mbochs_read,
+> @@ -1432,6 +1427,15 @@ static const struct mdev_parent_ops mdev_fops
+> = {
+>  	.mmap			= mbochs_mmap,
+>  };
+> 
+> +static const struct mdev_parent_ops mdev_fops = {
+> +	.owner			= THIS_MODULE,
+> +	.mdev_attr_groups	= mdev_dev_groups,
+> +	.supported_type_groups	= mdev_type_groups,
+> +	.create			= mbochs_create,
+> +	.remove			= mbochs_remove,
+> +	.device_ops		= &vfio_mdev_ops,
+> +};
+> +
+>  static const struct file_operations vd_fops = {
+>  	.owner		= THIS_MODULE,
+>  };
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index d3029dd27d91..4ba285a5768f 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -725,12 +725,7 @@ static struct attribute_group *mdev_type_groups[]
+> = {
+>  	NULL,
+>  };
+> 
+> -static const struct mdev_parent_ops mdev_fops = {
+> -	.owner			= THIS_MODULE,
+> -	.mdev_attr_groups	= mdev_dev_groups,
+> -	.supported_type_groups	= mdev_type_groups,
+> -	.create			= mdpy_create,
+> -	.remove			= mdpy_remove,
+> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
+>  	.open			= mdpy_open,
+>  	.release		= mdpy_close,
+>  	.read			= mdpy_read,
+> @@ -739,6 +734,15 @@ static const struct mdev_parent_ops mdev_fops =
+> {
+>  	.mmap			= mdpy_mmap,
+>  };
+> 
+> +static const struct mdev_parent_ops mdev_fops = {
+> +	.owner			= THIS_MODULE,
+> +	.mdev_attr_groups	= mdev_dev_groups,
+> +	.supported_type_groups	= mdev_type_groups,
+> +	.create			= mdpy_create,
+> +	.remove			= mdpy_remove,
+> +	.device_ops		= &vfio_mdev_ops,
+> +};
+> +
+>  static const struct file_operations vd_fops = {
+>  	.owner		= THIS_MODULE,
+>  };
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index 744c88a6b22c..a468904ec626 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -1410,6 +1410,14 @@ static struct attribute_group
+> *mdev_type_groups[] = {
+>  	NULL,
+>  };
+> 
+> +static const struct vfio_mdev_parent_ops vfio_mdev_ops = {
+> +	.open                   = mtty_open,
+> +	.release                = mtty_close,
+> +	.read                   = mtty_read,
+> +	.write                  = mtty_write,
+> +	.ioctl		        = mtty_ioctl,
+> +};
+> +
+>  static const struct mdev_parent_ops mdev_fops = {
+>  	.owner                  = THIS_MODULE,
+>  	.dev_attr_groups        = mtty_dev_groups,
+> @@ -1417,11 +1425,7 @@ static const struct mdev_parent_ops mdev_fops
+> = {
+>  	.supported_type_groups  = mdev_type_groups,
+>  	.create                 = mtty_create,
+>  	.remove			= mtty_remove,
+> -	.open                   = mtty_open,
+> -	.release                = mtty_close,
+> -	.read                   = mtty_read,
+> -	.write                  = mtty_write,
+> -	.ioctl		        = mtty_ioctl,
+> +	.device_ops             = &vfio_mdev_ops,
+>  };
+> 
+>  static void mtty_device_release(struct device *dev)
+> --
+> 2.19.1
+> 
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
