@@ -2,234 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1234B50C5
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 16:52:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24324B50E1
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 16:59:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728716AbfIQOwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 10:52:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55602 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727315AbfIQOwh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 10:52:37 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id EDC593B46C
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 14:52:36 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id f23so1351377wmh.9
-        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 07:52:36 -0700 (PDT)
+        id S1728859AbfIQO7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 10:59:03 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46437 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727751AbfIQO7D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 10:59:03 -0400
+Received: by mail-io1-f65.google.com with SMTP id d17so8221499ios.13
+        for <kvm@vger.kernel.org>; Tue, 17 Sep 2019 07:59:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4N/btWkhdRtAkLwnNEi3JvgTHWUB7am8sFUWn4QTMHo=;
+        b=Vl+iO5Psm3owdP69GO+WOZQtnoLDGAdiMyy8AlEs6zj4KE57ayqKDns6d5FrJn5ROq
+         IGhwt1lh/vRUdyTt+CFCXnyKqmikSQqVhZXIEOj2KHwNr6k0Xuwx51HzaNHP8+vLH9rn
+         QxW4R+EVLL/5PivNA1qKPwAUzPWQ2jRsKoE9rxXNAtD8q3PcuUO9CR38EFV/4XMqqSnF
+         W7PTBHS/61nGVwhiw6EBQvCwO9ZxJq7pnVSmcp/9howaygFWPLKfe/DeMe9slMlkiwXm
+         f4jbaxLXZjDlgut4uJnT0u08GS7ZjP/PxosvoKtce/aPB6MMWEEQ8LBRv5MQpTwzzR6s
+         w6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/BRtmnJaTBcY1q7Q3sXH0JTFKywo+VFEF2e2gU6YlgA=;
-        b=YXxWEn4t7Z8l8Ry4zfuIYQDc/cNbTVPd9uoxIM52AUMuEDAfWbGMWBBshXgvqQFqIR
-         wVOLxY1L8Qn0lfnslXwrTy+ozq7e+ii5TX2QtufCj+w/QV8vmMcQhEHEdyUEJnsHRSjX
-         8wBZ/mapMB5AHmXqEJ9cUvZIJVMzU4MRKSzrGmm4X/El5FVk+LL4dvKs3ch6itl1dFso
-         UgeUlSD4uJ7ry9DkQqkMi4bpuZ4tlPl44+655hvjYyJL8m/uPkEjp4MxZv44UblWPsL5
-         zhuPctRM9lGxbU0ECHsEBg4J21XFgHHa9dke0/DBfmStJ2Acn52xOWUOIgfnaQS+LB4Q
-         Rpyg==
-X-Gm-Message-State: APjAAAUaaEze14WWSQ0sWiluVUNkueBrcULwqntDRzEDsJfNLlwtXMGS
-        Ysb9RdYfV37fIOaJlbRXK1sAbSGlScsOpui6cAdWFXjEOGlSJhX0ixtAKovvk4yMfKyG3s4VFo+
-        tV8L+7r7fe/If
-X-Received: by 2002:a1c:a74f:: with SMTP id q76mr4142631wme.16.1568731955581;
-        Tue, 17 Sep 2019 07:52:35 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy1moraRCyDyItbCxs9M2x3+FNzu0aonVBdoRjgHQa0s+kSEhxXexpCwA5AllwUK/rr/yI/iQ==
-X-Received: by 2002:a1c:a74f:: with SMTP id q76mr4142608wme.16.1568731955291;
-        Tue, 17 Sep 2019 07:52:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
-        by smtp.gmail.com with ESMTPSA id f17sm2822453wru.29.2019.09.17.07.52.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2019 07:52:34 -0700 (PDT)
-Subject: Re: [PATCH] kvm-unit-test: nVMX: Fix 95d6d2c32288 ("nVMX: Test Host
- Segment Registers and Descriptor Tables on vmentry of nested guests")
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, jmattson@google.com
-References: <20190812211108.17186-1-krish.sadhukhan@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <48ae03df-e06e-d1f2-ccb6-a618cc2e840a@redhat.com>
-Date:   Tue, 17 Sep 2019 16:52:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4N/btWkhdRtAkLwnNEi3JvgTHWUB7am8sFUWn4QTMHo=;
+        b=bmsikg0lV/TVxJohtzCUhwB3QQYp6MubcrEIrJ5o11RjOU6hF0blwKJ+lVxkyppGoX
+         qeyf4pZwf0Em7QKfI3/+Dn9PsxE0qKZGegN/up6A1M0ExjS8djX3k/3i3+5uA6YHls3r
+         lnJCJXcAn+em+/1oDsanb60LLrc/NnDHZEKbjcW/PePbTweCyb1NB/m16C7m4Zzre+zE
+         Bfk5PsX8NivqNVVqlfRqRlT/j9OIFRsGFpDTtbSSbjG5syJAjefyXcXSk+mI3V1t0YSi
+         BkzypZ6xVFXdWcXPCSs5ETNba3bGBLLf/YxwjBg/oed244RIcT+Utm9fWnkreETJvVuo
+         Hr5w==
+X-Gm-Message-State: APjAAAULq8Tvw6k/i1OsiSFGtj2rx4GMDkr8pXPc/+mSMZr0fYnizin9
+        XOgzwyq9FDZI9SRuAkLyA2Xv1kmbqFc5Pa1ST3G0o2rfj9g=
+X-Google-Smtp-Source: APXvYqz9DvHQNg9JiUWZur8kh4NHVWmxIc5OJSKjAK0NEC6eFvWeXKcUfTuQH1pek1NBrEZiHfP0dJlLdiC+XjpI0K0=
+X-Received: by 2002:a05:6602:115:: with SMTP id s21mr3306650iot.122.1568732342359;
+ Tue, 17 Sep 2019 07:59:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190812211108.17186-1-krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 17 Sep 2019 07:58:51 -0700
+Message-ID: <CALMp9eSNTvHsSn55iNfF1tUAdAihz_2d5-Hac1H6TnvHyos-SQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: Fix coalesced mmio ring buffer out-of-bounds access
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org,
+        Matt Delco <delco@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/08/19 23:11, Krish Sadhukhan wrote:
-> Commit 95d6d2c32288 added a test for the Segment Selector VMCS field. That test
-> sets the "host address-space size" VM-exit control to zero and as a result, on
-> VM-exit the guest exits as 32-bit. Since vmx tests are 64-bit, this results in
-> a hardware error.
-> This patch also cleans up a few other areas in commit 95d6d2c32288, including
-> replacing make_non_canonical() with NONCANONICAL.
-> 
-> Reported-by: Nadav Amit <nadav.amit@gmail.com>
-> Signed-off-by: Krish Sadhukhan <kris.sadhukhan@oracle.com>
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+On Tue, Sep 17, 2019 at 1:16 AM Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> Reported by syzkaller:
+>
+>         #PF: supervisor write access in kernel mode
+>         #PF: error_code(0x0002) - not-present page
+>         PGD 403c01067 P4D 403c01067 PUD 0
+>         Oops: 0002 [#1] SMP PTI
+>         CPU: 1 PID: 12564 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
+>         RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
+>         Call Trace:
+>          __kvm_io_bus_write+0x91/0xe0 [kvm]
+>          kvm_io_bus_write+0x79/0xf0 [kvm]
+>          write_mmio+0xae/0x170 [kvm]
+>          emulator_read_write_onepage+0x252/0x430 [kvm]
+>          emulator_read_write+0xcd/0x180 [kvm]
+>          emulator_write_emulated+0x15/0x20 [kvm]
+>          segmented_write+0x59/0x80 [kvm]
+>          writeback+0x113/0x250 [kvm]
+>          x86_emulate_insn+0x78c/0xd80 [kvm]
+>          x86_emulate_instruction+0x386/0x7c0 [kvm]
+>          kvm_mmu_page_fault+0xf9/0x9e0 [kvm]
+>          handle_ept_violation+0x10a/0x220 [kvm_intel]
+>          vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
+>          vcpu_enter_guest+0x4dc/0x18d0 [kvm]
+>          kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
+>          kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
+>          do_vfs_ioctl+0xa2/0x690
+>          ksys_ioctl+0x6d/0x80
+>          __x64_sys_ioctl+0x1a/0x20
+>          do_syscall_64+0x74/0x720
+>          entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>         RIP: 0010:coalesced_mmio_write+0xcc/0x130 [kvm]
+>
+> Both the coalesced_mmio ring buffer indexs ring->first and ring->last are
+> bigger than KVM_COALESCED_MMIO_MAX from the testcase, array out-of-bounds
+> access triggers by ring->coalesced_mmio[ring->last].phys_addr = addr;
+> assignment. This patch fixes it by mod indexs by KVM_COALESCED_MMIO_MAX.
+>
+> syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=134b2826a00000
+>
+> Reported-by: syzbot+983c866c3dd6efa3662a@syzkaller.appspotmail.com
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
->  lib/x86/processor.h |  5 ---
->  x86/vmx_tests.c     | 76 ++++++++++++++++++++-------------------------
->  2 files changed, 33 insertions(+), 48 deletions(-)
-> 
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index 8b8bb7a..4fef0bc 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -461,11 +461,6 @@ static inline void write_pkru(u32 pkru)
->          : : "a" (eax), "c" (ecx), "d" (edx));
->  }
->  
-> -static inline u64 make_non_canonical(u64 addr)
-> -{
-> -	return (addr | 1ull << 48);
-> -}
-> -
->  static inline bool is_canonical(u64 addr)
->  {
->  	return (s64)(addr << 16) >> 16 == addr;
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 8ad2674..e115e48 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -6952,15 +6952,14 @@ static void test_load_host_pat(void)
->  }
->  
->  /*
-> - * Test a value for the given VMCS field.
-> - *
-> - *  "field" - VMCS field
-> - *  "field_name" - string name of VMCS field
-> - *  "bit_start" - starting bit
-> - *  "bit_end" - ending bit
-> - *  "val" - value that the bit range must or must not contain
-> - *  "valid_val" - whether value given in 'val' must be valid or not
-> - *  "error" - expected VMCS error when vmentry fails for an invalid value
-> + * test_vmcs_field - test a value for the given VMCS field
-> + * @field: VMCS field
-> + * @field_name: string name of VMCS field
-> + * @bit_start: starting bit
-> + * @bit_end: ending bit
-> + * @val: value that the bit range must or must not contain
-> + * @valid_val: whether value given in 'val' must be valid or not
-> + * @error: expected VMCS error when vmentry fails for an invalid value
->   */
->  static void test_vmcs_field(u64 field, const char *field_name, u32 bit_start,
->  			    u32 bit_end, u64 val, bool valid_val, u32 error)
-> @@ -7004,16 +7003,14 @@ static void test_vmcs_field(u64 field, const char *field_name, u32 bit_start,
->  static void test_canonical(u64 field, const char * field_name)
->  {
->  	u64 addr_saved = vmcs_read(field);
-> -	u64 addr = addr_saved;
->  
-> -	report_prefix_pushf("%s %lx", field_name, addr);
-> -	if (is_canonical(addr)) {
-> +	report_prefix_pushf("%s %lx", field_name, addr_saved);
-> +	if (is_canonical(addr_saved)) {
->  		test_vmx_vmlaunch(0, false);
->  		report_prefix_pop();
->  
-> -		addr = make_non_canonical(addr);
-> -		vmcs_write(field, addr);
-> -		report_prefix_pushf("%s %lx", field_name, addr);
-> +		vmcs_write(field, NONCANONICAL);
-> +		report_prefix_pushf("%s %llx", field_name, NONCANONICAL);
->  		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
->  				  false);
->  
-> @@ -7025,6 +7022,14 @@ static void test_canonical(u64 field, const char * field_name)
->  	report_prefix_pop();
->  }
->  
-> +#define TEST_RPL_TI_FLAGS(reg, name)				\
-> +	test_vmcs_field(reg, name, 0, 2, 0x0, true,		\
-> +			VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> +
-> +#define TEST_CS_TR_FLAGS(reg, name)				\
-> +	test_vmcs_field(reg, name, 3, 15, 0x0000, false,	\
-> +			VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> +
->  /*
->   * 1. In the selector field for each of CS, SS, DS, ES, FS, GS and TR, the
->   *    RPL (bits 1:0) and the TI flag (bit 2) must be 0.
-> @@ -7036,34 +7041,24 @@ static void test_canonical(u64 field, const char * field_name)
->   */
->  static void test_host_segment_regs(void)
->  {
-> -	u32 exit_ctrl_saved = vmcs_read(EXI_CONTROLS);
->  	u16 selector_saved;
->  
->  	/*
->  	 * Test RPL and TI flags
->  	 */
-> -	test_vmcs_field(HOST_SEL_CS, "HOST_SEL_CS", 0, 2, 0x0, true,
-> -		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> -	test_vmcs_field(HOST_SEL_SS, "HOST_SEL_SS", 0, 2, 0x0, true,
-> -		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> -	test_vmcs_field(HOST_SEL_DS, "HOST_SEL_DS", 0, 2, 0x0, true,
-> -		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> -	test_vmcs_field(HOST_SEL_ES, "HOST_SEL_ES", 0, 2, 0x0, true,
-> -		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> -	test_vmcs_field(HOST_SEL_FS, "HOST_SEL_FS", 0, 2, 0x0, true,
-> -		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> -	test_vmcs_field(HOST_SEL_GS, "HOST_SEL_GS", 0, 2, 0x0, true,
-> -		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> -	test_vmcs_field(HOST_SEL_TR, "HOST_SEL_TR", 0, 2, 0x0, true,
-> -		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> +	TEST_RPL_TI_FLAGS(HOST_SEL_CS, "HOST_SEL_CS");
-> +	TEST_RPL_TI_FLAGS(HOST_SEL_SS, "HOST_SEL_SS");
-> +	TEST_RPL_TI_FLAGS(HOST_SEL_DS, "HOST_SEL_DS");
-> +	TEST_RPL_TI_FLAGS(HOST_SEL_ES, "HOST_SEL_ES");
-> +	TEST_RPL_TI_FLAGS(HOST_SEL_FS, "HOST_SEL_FS");
-> +	TEST_RPL_TI_FLAGS(HOST_SEL_GS, "HOST_SEL_GS");
-> +	TEST_RPL_TI_FLAGS(HOST_SEL_TR, "HOST_SEL_TR");
->  
->  	/*
->  	 * Test that CS and TR fields can not be 0x0000
->  	 */
-> -	test_vmcs_field(HOST_SEL_CS, "HOST_SEL_CS", 3, 15, 0x0000, false,
-> -			     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> -	test_vmcs_field(HOST_SEL_TR, "HOST_SEL_TR", 3, 15, 0x0000, false,
-> -			     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-> +	TEST_CS_TR_FLAGS(HOST_SEL_CS, "HOST_SEL_CS");
-> +	TEST_CS_TR_FLAGS(HOST_SEL_TR, "HOST_SEL_TR");
->  
->  	/*
->  	 * SS field can not be 0x0000 if "host address-space size" VM-exit
-> @@ -7071,20 +7066,15 @@ static void test_host_segment_regs(void)
->  	 */
->  	selector_saved = vmcs_read(HOST_SEL_SS);
->  	vmcs_write(HOST_SEL_SS, 0);
-> -	if (exit_ctrl_saved & EXI_HOST_64) {
-> -		report_prefix_pushf("HOST_SEL_SS 0");
-> +	report_prefix_pushf("HOST_SEL_SS 0");
-> +	if (vmcs_read(EXI_CONTROLS) & EXI_HOST_64) {
->  		test_vmx_vmlaunch(0, false);
-> -		report_prefix_pop();
-> -
-> -		vmcs_write(EXI_CONTROLS, exit_ctrl_saved & ~EXI_HOST_64);
-> +	} else {
-> +		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD, false);
->  	}
-> -
-> -	report_prefix_pushf("HOST_SEL_SS 0");
-> -	test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD, false);
->  	report_prefix_pop();
->  
->  	vmcs_write(HOST_SEL_SS, selector_saved);
-> -	vmcs_write(EXI_CONTROLS, exit_ctrl_saved);
->  
->  #ifdef __x86_64__
->  	/*
-> 
+>  virt/kvm/coalesced_mmio.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+> index 5294abb..cff1ec9 100644
+> --- a/virt/kvm/coalesced_mmio.c
+> +++ b/virt/kvm/coalesced_mmio.c
+> @@ -73,6 +73,8 @@ static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
+>
+>         spin_lock(&dev->kvm->ring_lock);
+>
+> +       ring->first = ring->first % KVM_COALESCED_MMIO_MAX;
+> +       ring->last = ring->last % KVM_COALESCED_MMIO_MAX;
 
-Queued, thanks.
+I don't think this is sufficient, since the memory that ring points to
+is shared with userspace. Userspace can overwrite your corrected
+values with illegal ones before they are used. Not exactly a TOCTTOU
+issue, since there isn't technically a 'check' here, but the same
+idea.
 
-Paolo
+>         if (!coalesced_mmio_has_room(dev)) {
+>                 spin_unlock(&dev->kvm->ring_lock);
+>                 return -EOPNOTSUPP;
+> --
+> 2.7.4
+>
