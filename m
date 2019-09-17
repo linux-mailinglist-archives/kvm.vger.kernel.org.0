@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8992FB48FF
-	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:16:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3180B4902
+	for <lists+kvm@lfdr.de>; Tue, 17 Sep 2019 10:16:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732420AbfIQIQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 04:16:38 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:38983 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbfIQIQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 04:16:37 -0400
-Received: by mail-pf1-f196.google.com with SMTP id i1so1689712pfa.6;
-        Tue, 17 Sep 2019 01:16:36 -0700 (PDT)
+        id S2387401AbfIQIQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 04:16:41 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:44219 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725798AbfIQIQk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 04:16:40 -0400
+Received: by mail-pl1-f193.google.com with SMTP id k24so347723pll.11;
+        Tue, 17 Sep 2019 01:16:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=flYRSMt8pIOAP3TA8EAVhdOF1+uRuM0MoI3dzcIAOic=;
-        b=lUYe/HN8N3La1GQJ554woX+0srWbLV+S94trrY+6GwRi+jUkdvybgbHGxOeCa7k2Op
-         NBOEUxvOVzshmU394xTkfz5PCGSmBdGZaw4OUeMorK6sfdN/p9YfRla/dZ/eommEb50S
-         XFoZnqEbH84ddJC/KndIgnGvscspqD0VCEquGKxTNWfxEUEUQ/YGK8nzW9yC4Wehp6jC
-         O9u0Zhoy1PMRAswOo0GXMeRi/Wbu5pobkKPwmZrG0IXQ9eivymKXRo99Joz4fjSavyAC
-         VZqRKTGZdX9ruHK2RmPi6uoKrUiD3NI+vVqhdntCGqaXMnG+iT99OP6IlReYyNtNFi36
-         BJ5A==
+        bh=mgukzCtnclCW/hH0uFMjnqXIijt7Mvy5DsHXeaPWECE=;
+        b=aY+iFmHYIF6t7XIv33dW0IGxufDOC4JFNAtk94pzw3JQrwBFs9vJdyD6pJjIBE2LKR
+         O1EecKgPXResbqetQCjLqch20H+MWmr+FYQHtg1NAC9/jOi6902463MXTIqk822fwbHd
+         xbYLoDlLJdKCiFb3Zndd60LWYkFgf8IfTWkqxPR05TDyExYQJ2wxTncnHEZDsZz301oY
+         z8SlDDsZFLBSEMQIYHj8Zlos6PYzC6UcDlAbYC8tzSt23STldWChc27x5yZAJPL9fbpI
+         RK82f14lTEwSfz1jhcSv7I+uJUMB9xVc4P3ApKhnOp0d7MKrPpFpPfkLrnmn8MkTGaNL
+         ABAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=flYRSMt8pIOAP3TA8EAVhdOF1+uRuM0MoI3dzcIAOic=;
-        b=rj8o9wOgJDq4EiSln2IK2jmPw+yf4aVL3MvNObhpZh+R805p7btuwp8A/ja+r4N0L7
-         4aC7W5FxCQd7hQx0FHezNCltd32Ky+dSUAFTHxGcUO3rb+LE+FHpnk0LVWWnXrTblPUw
-         I37eZiYOQlfnVQE8z1KDTyR2kszbh5aEpBvYQh+8H9bc2Wsx1O0UPh7f5zeJ8WZEXr8N
-         AQqAzyJHvahVLXh7eyKYTZuhfisqNcB423A3A6n/fr8K1g7cBOf7WujEmr+AS4+zt3zR
-         ZYdAFrV2bcCz16GMugjt9IePbxP9RgBKytHd0s/ybbKcElQb4VMpHZ0WxthTk9UtcPlS
-         gO+g==
-X-Gm-Message-State: APjAAAVRGPk6nQkajipNo4tkbwmpAHNVdia1Bbu6ysEr5N9hmIqupcKC
-        llKn4E71mHlgIHuADqdihi7CzOad
-X-Google-Smtp-Source: APXvYqz3ie3yVwYKkCr/8naCaiieW3a+kAzHMAbDb6B2dHhP8we0iuGsW39wpjQ+/OgbzMnP9231Hg==
-X-Received: by 2002:a63:d301:: with SMTP id b1mr2127747pgg.379.1568708196244;
-        Tue, 17 Sep 2019 01:16:36 -0700 (PDT)
+        bh=mgukzCtnclCW/hH0uFMjnqXIijt7Mvy5DsHXeaPWECE=;
+        b=kyDojjPeZVmDH1HWh2r/PZ6eKjy/6RGA+wdyGvApCTquGivRFB0L5/1lLHGz44REH0
+         8ignW2OI/IlpXn053kTFVtV6ewhpVl1OfoYJ9iFL8YuzBwbIWQ88tQx0PIUgEOAxRqoC
+         xfcVfy1dj5yaHhzgQfjlVmCgsr81aZ3KGRaTzy90kEMawIOFUvBGZFRJFDPAIOdfJDGX
+         cSFaupI2RNRPJhxUTNTK/j0d3bugsyPg+3Pq8HTaAio5zIIoRvjVjEus+XKQBVQLTygT
+         Jw1WJ0GSsRkn7dwzEhcOma2vhh2muiPViguv4eFbfHx+SKEapbBZGDHoWkkrSxha+qSA
+         dfjg==
+X-Gm-Message-State: APjAAAVqpJg1hJlMmw4ic6+FpHEEStyKp28+tuehGlcp8VxOTDoxUczS
+        w/4bciDWePZORX6yGjPtiK4oW1Ti
+X-Google-Smtp-Source: APXvYqzGqOXY+sIUFWupOkrIA0xrZ4XOZ746IgCkW0V7c3zoO9XbpqMSLA+PA/hpRbm2meAV2xArtw==
+X-Received: by 2002:a17:902:9a92:: with SMTP id w18mr2345703plp.255.1568708199199;
+        Tue, 17 Sep 2019 01:16:39 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id j10sm1924142pfh.137.2019.09.17.01.16.33
+        by smtp.googlemail.com with ESMTPSA id j10sm1924142pfh.137.2019.09.17.01.16.36
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 17 Sep 2019 01:16:35 -0700 (PDT)
+        Tue, 17 Sep 2019 01:16:38 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -52,10 +52,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
-Subject: [PATCH v2 2/3] KVM: X86: Fix userspace set broken combinations of CPUID and CR4
-Date:   Tue, 17 Sep 2019 16:16:25 +0800
-Message-Id: <1568708186-20260-2-git-send-email-wanpengli@tencent.com>
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH v5 3/3] KVM: LAPIC: Tune lapic_timer_advance_ns smoothly
+Date:   Tue, 17 Sep 2019 16:16:26 +0800
+Message-Id: <1568708186-20260-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
 References: <1568708186-20260-1-git-send-email-wanpengli@tencent.com>
@@ -66,110 +66,103 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Reported by syzkaller:
+Filter out drastic fluctuation and random fluctuation, remove
+timer_advance_adjust_done altogether, the adjustment would be
+continuous.
 
-	WARNING: CPU: 0 PID: 6544 at /home/kernel/data/kvm/arch/x86/kvm//vmx/vmx.c:4689 handle_desc+0x37/0x40 [kvm_intel]
-	CPU: 0 PID: 6544 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
-	RIP: 0010:handle_desc+0x37/0x40 [kvm_intel]
-	Call Trace:
-	 vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
-	 vcpu_enter_guest+0x4dc/0x18d0 [kvm]
-	 kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
-	 kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
-	 do_vfs_ioctl+0xa2/0x690
-	 ksys_ioctl+0x6d/0x80
-	 __x64_sys_ioctl+0x1a/0x20
-	 do_syscall_64+0x74/0x720
-	 entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-When CR4.UMIP is set, guest should have UMIP cpuid flag. Current
-kvm set_sregs function doesn't have such check when userspace inputs
-sregs values. SECONDARY_EXEC_DESC is enabled on writes to CR4.UMIP
-in vmx_set_cr4 though guest doesn't have UMIP cpuid flag. The testcast
-triggers handle_desc warning when executing ltr instruction since
-guest architectural CR4 doesn't set UMIP. This patch fixes it by
-adding valid CR4 and CPUID combination checking in __set_sregs.
-
-syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=138efb99600000
-
-Reported-by: syzbot+0f1819555fbdce992df9@syzkaller.appspotmail.com
-Cc: stable@vger.kernel.org
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/x86.c | 39 ++++++++++++++++++++++++---------------
- 1 file changed, 24 insertions(+), 15 deletions(-)
+ arch/x86/kvm/lapic.c | 28 ++++++++++++++--------------
+ arch/x86/kvm/lapic.h |  1 -
+ 2 files changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f7cfd8e..cafb4d4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -884,34 +884,42 @@ int kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index dbbe478..323bdca 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -65,7 +65,9 @@
+ #define APIC_BROADCAST			0xFF
+ #define X2APIC_BROADCAST		0xFFFFFFFFul
+ 
+-#define LAPIC_TIMER_ADVANCE_ADJUST_DONE 100
++static bool dynamically_adjust_timer_advance __read_mostly;
++#define LAPIC_TIMER_ADVANCE_ADJUST_MIN 100
++#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 5000
+ #define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
+ /* step-by-step approximation to mitigate fluctuation */
+ #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
+@@ -1485,26 +1487,25 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
+ 	u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
+ 	u64 ns;
+ 
++	/* Do not adjust for tiny fluctuations or large random spikes. */
++	if (abs(advance_expire_delta) > LAPIC_TIMER_ADVANCE_ADJUST_MAX ||
++	    abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_MIN)
++		return;
++
+ 	/* too early */
+ 	if (advance_expire_delta < 0) {
+ 		ns = -advance_expire_delta * 1000000ULL;
+ 		do_div(ns, vcpu->arch.virtual_tsc_khz);
+-		timer_advance_ns -= min((u32)ns,
+-			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
++		timer_advance_ns -= ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
+ 	} else {
+ 	/* too late */
+ 		ns = advance_expire_delta * 1000000ULL;
+ 		do_div(ns, vcpu->arch.virtual_tsc_khz);
+-		timer_advance_ns += min((u32)ns,
+-			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
++		timer_advance_ns += ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
+ 	}
+ 
+-	if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
+-		apic->lapic_timer.timer_advance_adjust_done = true;
+-	if (unlikely(timer_advance_ns > 5000)) {
++	if (unlikely(timer_advance_ns > LAPIC_TIMER_ADVANCE_ADJUST_MAX))
+ 		timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
+-		apic->lapic_timer.timer_advance_adjust_done = false;
+-	}
+ 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
  }
- EXPORT_SYMBOL_GPL(kvm_set_xcr);
  
--int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
-+static int kvm_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- {
--	unsigned long old_cr4 = kvm_read_cr4(vcpu);
--	unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE | X86_CR4_PAE |
--				   X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE;
+@@ -1524,7 +1525,7 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+ 	if (guest_tsc < tsc_deadline)
+ 		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
+ 
+-	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
++	if (dynamically_adjust_timer_advance)
+ 		adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
+ }
+ 
+@@ -2302,13 +2303,12 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+ 	apic->lapic_timer.timer.function = apic_timer_fn;
+ 	if (timer_advance_ns == -1) {
+ 		apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
+-		apic->lapic_timer.timer_advance_adjust_done = false;
++		dynamically_adjust_timer_advance = true;
+ 	} else {
+ 		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
+-		apic->lapic_timer.timer_advance_adjust_done = true;
++		dynamically_adjust_timer_advance = false;
+ 	}
+ 
 -
--	if (cr4 & CR4_RESERVED_BITS)
--		return 1;
--
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) && (cr4 & X86_CR4_OSXSAVE))
--		return 1;
-+		return -EINVAL;
+ 	/*
+ 	 * APIC is created enabled. This will prevent kvm_lapic_set_base from
+ 	 * thinking that APIC state has changed.
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 50053d2..2aad7e2 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -35,7 +35,6 @@ struct kvm_timer {
+ 	s64 advance_expire_delta;
+ 	atomic_t pending;			/* accumulated triggered timers */
+ 	bool hv_timer_in_use;
+-	bool timer_advance_adjust_done;
+ };
  
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_SMEP) && (cr4 & X86_CR4_SMEP))
--		return 1;
-+		return -EINVAL;
- 
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_SMAP) && (cr4 & X86_CR4_SMAP))
--		return 1;
-+		return -EINVAL;
- 
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_FSGSBASE) && (cr4 & X86_CR4_FSGSBASE))
--		return 1;
-+		return -EINVAL;
- 
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_PKU) && (cr4 & X86_CR4_PKE))
--		return 1;
-+		return -EINVAL;
- 
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_LA57) && (cr4 & X86_CR4_LA57))
--		return 1;
-+		return -EINVAL;
- 
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_UMIP) && (cr4 & X86_CR4_UMIP))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
-+{
-+	unsigned long old_cr4 = kvm_read_cr4(vcpu);
-+	unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE | X86_CR4_PAE |
-+				   X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE;
-+
-+	if (cr4 & CR4_RESERVED_BITS)
-+		return 1;
-+
-+	if (kvm_valid_cr4(vcpu, cr4))
- 		return 1;
- 
- 	if (is_long_mode(vcpu)) {
-@@ -8675,7 +8683,8 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	struct desc_ptr dt;
- 	int ret = -EINVAL;
- 
--	if (kvm_valid_sregs(vcpu, sregs))
-+	if (kvm_valid_sregs(vcpu, sregs) ||
-+		kvm_valid_cr4(vcpu, sregs->cr4))
- 		goto out;
- 
- 	apic_base_msr.data = sregs->apic_base;
+ struct kvm_lapic {
 -- 
 2.7.4
 
