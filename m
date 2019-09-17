@@ -2,74 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC88EB57F2
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 00:27:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 100F4B57F6
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 00:29:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726201AbfIQWY0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 18:24:26 -0400
-Received: from mga11.intel.com ([192.55.52.93]:63482 "EHLO mga11.intel.com"
+        id S1726883AbfIQW2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 18:28:19 -0400
+Received: from mga17.intel.com ([192.55.52.151]:26639 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725865AbfIQWY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 18:24:26 -0400
+        id S1726283AbfIQW2T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 18:28:19 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 15:24:25 -0700
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Sep 2019 15:28:18 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,518,1559545200"; 
-   d="scan'208";a="193880518"
+   d="scan'208";a="386695694"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Sep 2019 15:24:25 -0700
-Date:   Tue, 17 Sep 2019 15:24:25 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 17 Sep 2019 15:28:18 -0700
+Date:   Tue, 17 Sep 2019 15:28:18 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Marc Orr <marcorr@google.com>
-Cc:     kvm@vger.kernel.org, jmattson@google.com, pshier@google.com,
-        krish.sadhukhan@oracle.com
-Subject: Re: [kvm-unit-tests PATCH v4 1/2] x86: nvmx: fix bug in
- __enter_guest()
-Message-ID: <20190917222424.GA10319@linux.intel.com>
-References: <20190917201602.113133-1-marcorr@google.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [kvm-unit-tests PATCH v3 2/2] x86: nvmx: test max atomic switch
+ MSRs
+Message-ID: <20190917222818.GB10319@linux.intel.com>
+References: <20190917185753.256039-1-marcorr@google.com>
+ <20190917185753.256039-2-marcorr@google.com>
+ <20190917194738.GD8804@linux.intel.com>
+ <CAA03e5G94nbVj9vfOr5Gc7x89B6afh3HmxHnMMijtn8SzqgjTA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190917201602.113133-1-marcorr@google.com>
+In-Reply-To: <CAA03e5G94nbVj9vfOr5Gc7x89B6afh3HmxHnMMijtn8SzqgjTA@mail.gmail.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 01:16:01PM -0700, Marc Orr wrote:
-> __enter_guest() should only set the launched flag when a launch has
-> succeeded. Thus, don't set the launched flag when the VMX_ENTRY_FAILURE,
-> bit 31, is set in the VMCS exit reason.
+On Tue, Sep 17, 2019 at 01:16:27PM -0700, Marc Orr wrote:
+> > > +     /* Cleanup. */
+> > > +     vmcs_write(ENT_MSR_LD_CNT, 0);
+> > > +     vmcs_write(EXI_MSR_LD_CNT, 0);
+> > > +     vmcs_write(EXI_MSR_ST_CNT, 0);
+> > > +     for (i = 0; i < cleanup_count; i++) {
+> > > +             enter_guest();
+> > > +             skip_exit_vmcall();
+> > > +     }
+> >
+> > I'm missing something, why do we need to reenter the guest after setting
+> > the count to 0?
 > 
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> ---
->  x86/vmx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/x86/vmx.c b/x86/vmx.c
-> index 6079420db33a..7313c78f15c2 100644
-> --- a/x86/vmx.c
-> +++ b/x86/vmx.c
-> @@ -1820,7 +1820,7 @@ static void __enter_guest(u8 abort_flag, struct vmentry_failure *failure)
->  		abort();
->  	}
->  
-> -	if (!failure->early) {
-> +	if (!failure->early && !(vmcs_read(EXI_REASON) & VMX_ENTRY_FAILURE)) {
+> It's for the failure code path, which fails to get into the guest and
+> skip the single vmcall(). I've refactored the code to make this clear.
+> Let me know what you think.
 
-Good enough for now, but struct vmentry_failure really needs to be cleaned
-up and renamed.
-
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
->  		launched = 1;
->  		check_for_guest_termination();
->  	}
-> -- 
-> 2.23.0.237.gc6a4ce50a0-goog
-> 
+Why is not entering the guest a problem?
