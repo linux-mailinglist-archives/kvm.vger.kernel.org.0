@@ -2,84 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2BF3B65D3
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 16:22:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D1F9B661F
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 16:31:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729301AbfIROWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 10:22:37 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36588 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726484AbfIROWh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 10:22:37 -0400
-Received: by mail-wm1-f67.google.com with SMTP id t3so285986wmj.1;
-        Wed, 18 Sep 2019 07:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=6nKowSJkmj6y8SDyX3nXm1VDFEY4+KARvCaZgONZgTY=;
-        b=sHvaxBqPoh9HdPutDdOHYNG2SiQafQqOoadtmSUHyz4TErj7HkOAVFdD3fLxc1PVw1
-         lpqaAH51OsWTKx8X84zmbkSqZgFQhhFGjJqKE1ov9OuP6FIXbGEBwQQhqy8+1Ce5pAf3
-         VUaUWu3i8/CW+QmemKXDsJM/WfwkC/bBbjxlz9kKSZgeMwwINkDivaEp/HfTCGuvTU14
-         4jB4VoH5Wqsfbf+Xqg3kURDJ4nT6Xjkv1KHFx0VF1wgXnjlXpclZbq4U6UVvmz/qKd3Z
-         JbGq8HyiiCxAtqGObSJ2bAXe6jge6XbJrNNTO5AmIu41RCgeXFXFN8BYojJddSg1kv8v
-         poUA==
+        id S1729847AbfIRObj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 10:31:39 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:40985 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726671AbfIRObi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 10:31:38 -0400
+Received: by mail-ed1-f67.google.com with SMTP id f20so173553edv.8;
+        Wed, 18 Sep 2019 07:31:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=6nKowSJkmj6y8SDyX3nXm1VDFEY4+KARvCaZgONZgTY=;
-        b=SDCwECkup0cPakP6adTzco2rnMk4zoPguBFBEpQVKJT9ztkYhIi7zq/14TQwZNVP6M
-         DcNWxNZpBQDdSAiBgTZIwDNTh9HBs+wehvpB0dUwKBr+Xw9z99l371SqBasnulrDvprq
-         ACjZBwessEHjnGcqwajR6OtH8jnigiwqsTbYRD985zBQRRjspakqWER4Oi7hUXgG/tQf
-         2GFJKx5AoaAWJGUHHYIynHDZ83SkBMejBuSfbfTMpXtHDUpCClrCY1tkVwaLrMJ1MjVZ
-         WFcoVysgCTJZuHfKeJl9IjLdaCtSPWdSRdrW9IqSUAdEUlL2b8b/MhkZDt7DpES4rZs/
-         4BLg==
-X-Gm-Message-State: APjAAAVSXOrFSk7xxAXOuBmPKkf9qzn86mrA6T3f9JsV9ttonVwSVJv8
-        MCZXY15juoYa6AjolEGPklpHtV9A
-X-Google-Smtp-Source: APXvYqzCiXXfMRBxI/rS2G2gjm1hhgWe8jjxTZ2GV+783JJXtxbjxzg3RbvVoB2WwI7yT9MKS+K5RA==
-X-Received: by 2002:a1c:1d85:: with SMTP id d127mr3358148wmd.14.1568816555351;
-        Wed, 18 Sep 2019 07:22:35 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id q19sm10849959wra.89.2019.09.18.07.22.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Sep 2019 07:22:34 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] Urgent KVM fix
-Date:   Wed, 18 Sep 2019 16:22:33 +0200
-Message-Id: <1568816553-26210-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=aBUovupIahAYGyBEbJJYQYWcKpMNigDli6Z35qgINDE=;
+        b=mjn3b2enW4qX6stNbo9qA/NxjOZ3QMb7e7LrrJOie2XYKHF567UrUnDDKgIz15xnOM
+         HksasiaeLUQD805q/Ehr5LPN7e7tQ6/vCtvf+ku2g9hTWAY8TUwrbsCGScqxUbS2/yUJ
+         gTzMvhM1V+cLM6zhxs8mpcxh/fUTgNAMFL/UMIzQjHy7DjFcL9G4ZiQWdJu8MIAw/+Bc
+         ujcTMZM/k7EaSAdrOm6chfAlJzBCdOafn5fT0RDtH/n1BfKmger5myUXBx8qDF3PXHXl
+         U+THzWNJhrwqMeza1khZkmNMOgmdHUUsR2H7RV7/zRfK4cHl0iI86WllAbycp6hKEhcA
+         T4pA==
+X-Gm-Message-State: APjAAAX5aOcTwpF7NDuwRulr+mIhruwTrgChErC5LidNu0aaby/Sq6la
+        v24KQXJSMofUrftHQ4YXcVo=
+X-Google-Smtp-Source: APXvYqzulPQd+vXUmWQEoMmxOk1mnx72mvpjn9QFdJLMa0AZcxKDkZ8k3fLyh2+OiPOCGjv4otwHNQ==
+X-Received: by 2002:aa7:cdd6:: with SMTP id h22mr8762631edw.132.1568817095172;
+        Wed, 18 Sep 2019 07:31:35 -0700 (PDT)
+Received: from [10.10.2.174] (bran.ispras.ru. [83.149.199.196])
+        by smtp.gmail.com with ESMTPSA id i7sm1065817edk.42.2019.09.18.07.31.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Sep 2019 07:31:34 -0700 (PDT)
+Reply-To: efremov@linux.com
+Subject: Re: [PATCH v3 17/26] vfio_pci: Loop using PCI_STD_NUM_BARS
+To:     Andrew Murray <andrew.murray@arm.com>
+Cc:     Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+References: <20190916204158.6889-1-efremov@linux.com>
+ <20190916204158.6889-18-efremov@linux.com>
+ <20190918091719.GA9720@e119886-lin.cambridge.arm.com>
+From:   Denis Efremov <efremov@linux.com>
+Message-ID: <b2783460-1d70-f4f0-17fd-c7a901c41670@linux.com>
+Date:   Wed, 18 Sep 2019 17:31:33 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190918091719.GA9720@e119886-lin.cambridge.arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On 9/18/19 12:17 PM, Andrew Murray wrote:
+> On Mon, Sep 16, 2019 at 11:41:49PM +0300, Denis Efremov wrote:
+>> Refactor loops to use idiomatic C style and avoid the fencepost error
+>> of using "i < PCI_STD_RESOURCE_END" when "i <= PCI_STD_RESOURCE_END"
+>> is required, e.g., commit 2f686f1d9bee ("PCI: Correct PCI_STD_RESOURCE_END
+>> usage").
+>>
+>> To iterate through all possible BARs, loop conditions changed to the
+>> *number* of BARs "i < PCI_STD_NUM_BARS", instead of the index of the last
+>> valid BAR "i <= PCI_STD_RESOURCE_END".
+>>
+>> Cc: Cornelia Huck <cohuck@redhat.com>
+>> Cc: Alex Williamson <alex.williamson@redhat.com>
+>> Signed-off-by: Denis Efremov <efremov@linux.com>
+>> ---
+>>  drivers/vfio/pci/vfio_pci.c         | 11 ++++++----
+>>  drivers/vfio/pci/vfio_pci_config.c  | 32 +++++++++++++++--------------
+>>  drivers/vfio/pci/vfio_pci_private.h |  4 ++--
+>>  3 files changed, 26 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+>> index 703948c9fbe1..cb7d220d3246 100644
+>> --- a/drivers/vfio/pci/vfio_pci.c
+>> +++ b/drivers/vfio/pci/vfio_pci.c
+>> @@ -110,13 +110,15 @@ static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
+>>  static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
+>>  {
+>>  	struct resource *res;
+>> -	int bar;
+>> +	int i;
+>>  	struct vfio_pci_dummy_resource *dummy_res;
+>>  
+>>  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+>>  
+>> -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
+>> -		res = vdev->pdev->resource + bar;
+>> +	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+>> +		int bar = i + PCI_STD_RESOURCES;
+>> +
+>> +		res = &vdev->pdev->resource[bar];
+> 
+> Why can't we just drop PCI_STD_RESOURCES and replace it was 0. I understand
+> the abstraction here, but we don't do it elsewhere across the kernel. Is this
+> necessary?
 
-this pull request is independent of the merge window.  Please pull it as it
-fixes a longstanding bug that was recently found by both Google humans
-and bots (syzkaller).
+There was a discussion about this particular case:
+https://lkml.org/lkml/2019/8/12/999
 
-The following changes since commit a9c20bb0206ae9384bd470a6832dd8913730add9:
+It was decided to save the original style for vfio drivers.
 
-  Merge tag 'kvm-s390-master-5.3-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-master (2019-09-14 09:25:30 +0200)
+> 
+> Thanks,
+> 
+> Andrew Murray
+> 
+>>  
+>>  		if (!IS_ENABLED(CONFIG_VFIO_PCI_MMAP))
+>>  			goto no_mmap;
+>> @@ -399,7 +401,8 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+>>  
+>>  	vfio_config_free(vdev);
+>>  
+>> -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
+>> +	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+>> +		bar = i + PCI_STD_RESOURCES;
+>>  		if (!vdev->barmap[bar])
+>>  			continue;
+>>  		pci_iounmap(pdev, vdev->barmap[bar]);
+>> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+>> index f0891bd8444c..90c0b80f8acf 100644
+>> --- a/drivers/vfio/pci/vfio_pci_config.c
+>> +++ b/drivers/vfio/pci/vfio_pci_config.c
+>> @@ -450,30 +450,32 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
+>>  {
+>>  	struct pci_dev *pdev = vdev->pdev;
+>>  	int i;
+>> -	__le32 *bar;
+>> +	__le32 *vbar;
+>>  	u64 mask;
+>>  
+>> -	bar = (__le32 *)&vdev->vconfig[PCI_BASE_ADDRESS_0];
+>> +	vbar = (__le32 *)&vdev->vconfig[PCI_BASE_ADDRESS_0];
+>>  
+>> -	for (i = PCI_STD_RESOURCES; i <= PCI_STD_RESOURCE_END; i++, bar++) {
+>> -		if (!pci_resource_start(pdev, i)) {
+>> -			*bar = 0; /* Unmapped by host = unimplemented to user */
+>> +	for (i = 0; i < PCI_STD_NUM_BARS; i++, vbar++) {
+>> +		int bar = i + PCI_STD_RESOURCES;
+>> +
+>> +		if (!pci_resource_start(pdev, bar)) {
+>> +			*vbar = 0; /* Unmapped by host = unimplemented to user */
+>>  			continue;
+>>  		}
+>>  
+>> -		mask = ~(pci_resource_len(pdev, i) - 1);
+>> +		mask = ~(pci_resource_len(pdev, bar) - 1);
+>>  
+>> -		*bar &= cpu_to_le32((u32)mask);
+>> -		*bar |= vfio_generate_bar_flags(pdev, i);
+>> +		*vbar &= cpu_to_le32((u32)mask);
+>> +		*vbar |= vfio_generate_bar_flags(pdev, bar);
+>>  
+>> -		if (*bar & cpu_to_le32(PCI_BASE_ADDRESS_MEM_TYPE_64)) {
+>> -			bar++;
+>> -			*bar &= cpu_to_le32((u32)(mask >> 32));
+>> +		if (*vbar & cpu_to_le32(PCI_BASE_ADDRESS_MEM_TYPE_64)) {
+>> +			vbar++;
+>> +			*vbar &= cpu_to_le32((u32)(mask >> 32));
+>>  			i++;
+>>  		}
+>>  	}
+>>  
+>> -	bar = (__le32 *)&vdev->vconfig[PCI_ROM_ADDRESS];
+>> +	vbar = (__le32 *)&vdev->vconfig[PCI_ROM_ADDRESS];
+>>  
+>>  	/*
+>>  	 * NB. REGION_INFO will have reported zero size if we weren't able
+>> @@ -483,14 +485,14 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
+>>  	if (pci_resource_start(pdev, PCI_ROM_RESOURCE)) {
+>>  		mask = ~(pci_resource_len(pdev, PCI_ROM_RESOURCE) - 1);
+>>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+>> -		*bar &= cpu_to_le32((u32)mask);
+>> +		*vbar &= cpu_to_le32((u32)mask);
+>>  	} else if (pdev->resource[PCI_ROM_RESOURCE].flags &
+>>  					IORESOURCE_ROM_SHADOW) {
+>>  		mask = ~(0x20000 - 1);
+>>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+>> -		*bar &= cpu_to_le32((u32)mask);
+>> +		*vbar &= cpu_to_le32((u32)mask);
+>>  	} else
+>> -		*bar = 0;
+>> +		*vbar = 0;
+>>  
+>>  	vdev->bardirty = false;
+>>  }
+>> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+>> index ee6ee91718a4..8a2c7607d513 100644
+>> --- a/drivers/vfio/pci/vfio_pci_private.h
+>> +++ b/drivers/vfio/pci/vfio_pci_private.h
+>> @@ -86,8 +86,8 @@ struct vfio_pci_reflck {
+>>  
+>>  struct vfio_pci_device {
+>>  	struct pci_dev		*pdev;
+>> -	void __iomem		*barmap[PCI_STD_RESOURCE_END + 1];
+>> -	bool			bar_mmap_supported[PCI_STD_RESOURCE_END + 1];
+>> +	void __iomem		*barmap[PCI_STD_NUM_BARS];
+>> +	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
+>>  	u8			*pci_config_map;
+>>  	u8			*vconfig;
+>>  	struct perm_bits	*msi_perm;
+>> -- 
+>> 2.21.0
+>>
 
-are available in the git repository at:
-
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus-urgent
-
-for you to fetch changes up to b60fe990c6b07ef6d4df67bc0530c7c90a62623a:
-
-  KVM: coalesced_mmio: add bounds checking (2019-09-18 15:56:55 +0200)
-
-----------------------------------------------------------------
-Fix missing bounds-checking in coalesced_mmio (CVE-2019-14821).
-
-----------------------------------------------------------------
-Matt Delco (1):
-      KVM: coalesced_mmio: add bounds checking
-
- virt/kvm/coalesced_mmio.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
