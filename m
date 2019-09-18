@@ -2,106 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A724B6595
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 16:11:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2BF3B65D3
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 16:22:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727858AbfIROLk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 10:11:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48936 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730334AbfIROLk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 10:11:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1568815898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=eYfolJm2ctgBFFzn1+Uof+Aznt2DY6/Wj6EoPA4iY/8=;
-        b=VNIxg56/J01TI5FBfLcMlLZEgmJ76faD0zu7xfSlGAXTJ0xwCfi/9cxfqwm0jxlvWvzTtx
-        NLMVNuMjFpqSXaA94y4abF9tB9hIcSa5+xbgdHeSZX+bvrbjvxsO4iMdmyVqpwFRciGhEa
-        cndN8vWSm/jFZ3DUz6JwqsBlFXEdzU8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-Jchx3TCYOxa9inRLGTe8lA-1; Wed, 18 Sep 2019 10:11:37 -0400
-Received: by mail-wm1-f69.google.com with SMTP id s25so80569wmh.1
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2019 07:11:36 -0700 (PDT)
+        id S1729301AbfIROWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 10:22:37 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36588 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726484AbfIROWh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 10:22:37 -0400
+Received: by mail-wm1-f67.google.com with SMTP id t3so285986wmj.1;
+        Wed, 18 Sep 2019 07:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=6nKowSJkmj6y8SDyX3nXm1VDFEY4+KARvCaZgONZgTY=;
+        b=sHvaxBqPoh9HdPutDdOHYNG2SiQafQqOoadtmSUHyz4TErj7HkOAVFdD3fLxc1PVw1
+         lpqaAH51OsWTKx8X84zmbkSqZgFQhhFGjJqKE1ov9OuP6FIXbGEBwQQhqy8+1Ce5pAf3
+         VUaUWu3i8/CW+QmemKXDsJM/WfwkC/bBbjxlz9kKSZgeMwwINkDivaEp/HfTCGuvTU14
+         4jB4VoH5Wqsfbf+Xqg3kURDJ4nT6Xjkv1KHFx0VF1wgXnjlXpclZbq4U6UVvmz/qKd3Z
+         JbGq8HyiiCxAtqGObSJ2bAXe6jge6XbJrNNTO5AmIu41RCgeXFXFN8BYojJddSg1kv8v
+         poUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gU04MhQdP4BkI/L+RLwBCZzg4I06FO6JtiKrPkqToDk=;
-        b=L7pSOKu22+NW+05GFLWR3PvEQTLHLnDAg2NsSI5pFnIf7hak4lQlJDHqPrPzg96Y1z
-         +yD4UACE0VOLgaGSJ3ztdgdD5DCHA3m65StPHtQf7r2r6VOQFS9zi2nCIlcakmyGn16C
-         fpY0WZFNqAgOPBpzrCS18YDqz8z8iV4hFeVj/0gzaYK+dL0pSI33CQPqzgQLNt3es5CG
-         hpDKHADUtX3y4ViyHdJ4X/BXH+8GmR4cGvVoG4OLavOWhfKCQNuiuNvsvV6KpN3+BGs2
-         ZMj8CtShgzqwS4iTTR2gshMIh3ZXoGM0jFHwSv7Uhqof6wE6+IUMgtoC2WtDddVeZCbi
-         dk+Q==
-X-Gm-Message-State: APjAAAWekCZrIPEfSX0QNnLPM1NfKCY+gV2DGV544eJbs//rNMkvdiqq
-        kT0I0UdSRwHiJGk/emgipsiC/yTx5HU58p0DwRVJazOP5aVJzRs2jaQVtVwDCjGMpWk1T5hEFDT
-        v0zHw6uZ/KE2w
-X-Received: by 2002:a05:600c:248:: with SMTP id 8mr2919687wmj.110.1568815895842;
-        Wed, 18 Sep 2019 07:11:35 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwQ7SmyPYoi9WAyE6yYB72cOtIdytEHLz51MBDl9qoydpi05HPbf1c9N+yvJBiOtjRJNGI5XQ==
-X-Received: by 2002:a05:600c:248:: with SMTP id 8mr2919664wmj.110.1568815895603;
-        Wed, 18 Sep 2019 07:11:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
-        by smtp.gmail.com with ESMTPSA id q25sm2592045wmq.27.2019.09.18.07.11.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Sep 2019 07:11:35 -0700 (PDT)
-Subject: Re: [PATCH] kvm: Ensure writes to the coalesced MMIO ring are within
- bounds
-To:     Will Deacon <will@kernel.org>
-Cc:     kvm@vger.kernel.org, kernellwp@gmail.com,
-        linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "# 5 . 2 . y" <stable@kernel.org>
-References: <20190918131545.6405-1-will@kernel.org>
- <9d993b71-4f2d-4d6e-39c9-f2ef849f5e5f@redhat.com>
- <20190918135932.aitmvncwujmjnwyr@willie-the-truck>
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=6nKowSJkmj6y8SDyX3nXm1VDFEY4+KARvCaZgONZgTY=;
+        b=SDCwECkup0cPakP6adTzco2rnMk4zoPguBFBEpQVKJT9ztkYhIi7zq/14TQwZNVP6M
+         DcNWxNZpBQDdSAiBgTZIwDNTh9HBs+wehvpB0dUwKBr+Xw9z99l371SqBasnulrDvprq
+         ACjZBwessEHjnGcqwajR6OtH8jnigiwqsTbYRD985zBQRRjspakqWER4Oi7hUXgG/tQf
+         2GFJKx5AoaAWJGUHHYIynHDZ83SkBMejBuSfbfTMpXtHDUpCClrCY1tkVwaLrMJ1MjVZ
+         WFcoVysgCTJZuHfKeJl9IjLdaCtSPWdSRdrW9IqSUAdEUlL2b8b/MhkZDt7DpES4rZs/
+         4BLg==
+X-Gm-Message-State: APjAAAVSXOrFSk7xxAXOuBmPKkf9qzn86mrA6T3f9JsV9ttonVwSVJv8
+        MCZXY15juoYa6AjolEGPklpHtV9A
+X-Google-Smtp-Source: APXvYqzCiXXfMRBxI/rS2G2gjm1hhgWe8jjxTZ2GV+783JJXtxbjxzg3RbvVoB2WwI7yT9MKS+K5RA==
+X-Received: by 2002:a1c:1d85:: with SMTP id d127mr3358148wmd.14.1568816555351;
+        Wed, 18 Sep 2019 07:22:35 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id q19sm10849959wra.89.2019.09.18.07.22.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 18 Sep 2019 07:22:34 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <281758dd-e400-f99c-b2e2-d32bca9f371e@redhat.com>
-Date:   Wed, 18 Sep 2019 16:11:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190918135932.aitmvncwujmjnwyr@willie-the-truck>
-Content-Language: en-US
-X-MC-Unique: Jchx3TCYOxa9inRLGTe8lA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] Urgent KVM fix
+Date:   Wed, 18 Sep 2019 16:22:33 +0200
+Message-Id: <1568816553-26210-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/09/19 15:59, Will Deacon wrote:
-> Okey doke, as long as it gets fixed! My minor concerns with the error-che=
-cking
-> variant are:
->=20
->   * Whether or not you need a READ_ONCE to prevent the compiler potential=
-ly
->     reloading 'ring->last' after validation
+Linus,
 
-Yes, it certainly needs READ_ONCE.  I had already added it locally, indeed.
+this pull request is independent of the merge window.  Please pull it as it
+fixes a longstanding bug that was recently found by both Google humans
+and bots (syzkaller).
 
->   * Whether or not this could be part of a spectre-v1 gadget
+The following changes since commit a9c20bb0206ae9384bd470a6832dd8913730add9:
 
-I think not, the spectrev1 gadget require a load that is indexed from
-the contents of ring->coalesced_mmio[insert], but there's none.
+  Merge tag 'kvm-s390-master-5.3-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into kvm-master (2019-09-14 09:25:30 +0200)
 
-Paolo
+are available in the git repository at:
 
-> so, given that I don't think the malicious host deserves an error code if=
- it
-> starts writing the 'last' index, I went with the "obviously safe" version=
-.
-> But up to you.
->=20
-> Will
->=20
 
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus-urgent
+
+for you to fetch changes up to b60fe990c6b07ef6d4df67bc0530c7c90a62623a:
+
+  KVM: coalesced_mmio: add bounds checking (2019-09-18 15:56:55 +0200)
+
+----------------------------------------------------------------
+Fix missing bounds-checking in coalesced_mmio (CVE-2019-14821).
+
+----------------------------------------------------------------
+Matt Delco (1):
+      KVM: coalesced_mmio: add bounds checking
+
+ virt/kvm/coalesced_mmio.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
