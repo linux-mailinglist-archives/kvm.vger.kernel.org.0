@@ -2,59 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DFD2B5E2C
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 09:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4155B5EA7
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 10:07:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbfIRHgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 03:36:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44836 "EHLO mx1.redhat.com"
+        id S1729484AbfIRIHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 04:07:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:36748 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726296AbfIRHgY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 03:36:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E264E308427C;
-        Wed, 18 Sep 2019 07:36:24 +0000 (UTC)
-Received: from redhat.com (ovpn-117-227.ams2.redhat.com [10.36.117.227])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 29DF85C1B2;
-        Wed, 18 Sep 2019 07:36:20 +0000 (UTC)
-From:   Juan Quintela <quintela@redhat.com>
-To:     qemu-devel@nongnu.org, kvm-devel <kvm@vger.kernel.org>
-Subject: KVM call for 2019-09-24
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Wed, 18 Sep 2019 09:36:13 +0200
-Message-ID: <87r24exdhu.fsf@trasno.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 18 Sep 2019 07:36:24 +0000 (UTC)
+        id S1725298AbfIRIHb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 04:07:31 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD95828;
+        Wed, 18 Sep 2019 01:07:30 -0700 (PDT)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8EAE63F59C;
+        Wed, 18 Sep 2019 01:07:25 -0700 (PDT)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com,
+        Will.Deacon@arm.com, suzuki.poulose@arm.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        jianyong.wu@arm.com, nd@arm.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: [RFC PATCH v3 0/6] Enable ptp_kvm for arm64
+Date:   Wed, 18 Sep 2019 04:07:10 -0400
+Message-Id: <20190918080716.64242-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+kvm ptp targets to provide high precision time sync between guest
+and host in virtualization environment. This patch enable kvm ptp
+for arm64.
+This patch set base on [1][2][3]
 
-Hi
+change log:
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
 
-Please, send any topic that you are interested in covering.
+[1]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=125ea89e4a21e2fc5235410f966a996a1a7148bf
+[2]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
+[3]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=6597490e005d0eeca8ed8c1c1d7b4318ee014681
 
-At the end of Monday I will send an email with the agenda or the
-cancellation of the call, so hurry up.
+Jianyong Wu (6):
+  psci: Export psci_ops.conduit symbol as modules will use it.
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  timekeeping: Expose API allowing retrival of current clocksource and
+    counter value
+  psci: Add hvc call service for ptp_kvm.
+  ptp: arm64: Enable ptp_kvm for arm64
+  kvm: arm64: Add capability check extension for ptp_kvm
 
-After discussions on the QEMU Summit, we are going to have always open a
-KVM call where you can add topics.
+ drivers/firmware/psci/psci.c         |  6 ++
+ drivers/ptp/Kconfig                  |  2 +-
+ drivers/ptp/Makefile                 |  1 +
+ drivers/ptp/{ptp_kvm.c => kvm_ptp.c} | 77 ++++++------------------
+ drivers/ptp/ptp_kvm_arm64.c          | 82 ++++++++++++++++++++++++++
+ drivers/ptp/ptp_kvm_x86.c            | 87 ++++++++++++++++++++++++++++
+ include/asm-generic/ptp_kvm.h        | 12 ++++
+ include/linux/arm-smccc.h            | 14 ++++-
+ include/linux/psci.h                 |  1 +
+ include/linux/timekeeping.h          |  3 +
+ include/uapi/linux/kvm.h             |  1 +
+ kernel/time/timekeeping.c            | 13 +++++
+ virt/kvm/arm/arm.c                   |  1 +
+ virt/kvm/arm/psci.c                  | 17 ++++++
+ 14 files changed, 256 insertions(+), 61 deletions(-)
+ rename drivers/ptp/{ptp_kvm.c => kvm_ptp.c} (63%)
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/asm-generic/ptp_kvm.h
 
- Call details:
+-- 
+2.17.1
 
-By popular demand, a google calendar public entry with it
-
-  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you need phone number details,  contact me privately
-
-Thanks, Juan.
