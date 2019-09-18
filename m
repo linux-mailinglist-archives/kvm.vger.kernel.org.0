@@ -2,220 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D36EB585E
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 01:05:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 716EFB5975
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 03:56:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728071AbfIQXFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Sep 2019 19:05:47 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:33894 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725801AbfIQXFr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Sep 2019 19:05:47 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HN31Wt150645;
-        Tue, 17 Sep 2019 23:05:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=pN+3VoxlmlzDUU08KLv0Low6pKH8lIWHgycr8NU4pGE=;
- b=BjsWKLqOpG9FDqqapZZt0BlzsvyXzS5B9VEqBgNsdGZ/cLuCDuvkVJgH+VSYD5HIrdZT
- 4G2qzUbAaOHFH21kOB8+H82V0X3t5bMv5B/RlnU/x8qbTx6bFky/hagCXJrVKBIOj9ht
- zEg5P1r/CDGq9p919wBhlvwB0nxfgN1lre62D4MC7dC7ETXZQBIyn+6eeBE7dZNGN1w3
- iNrdqkwfbPcYztn5jC7PW/B3KU9yD/xWaP9/Pr0Coy/TyrXSP3/CyWlCo1HM5Srrpdy4
- GDTZj68amTNaI5/3uywrTiFCuwvt97TwoxLdAuY4H2BiSLukL2vw3FnYVpmg5FlsP8Tc KA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2v385dr4m0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Sep 2019 23:05:42 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8HN3ZUo022462;
-        Tue, 17 Sep 2019 23:05:41 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2v37m92qwa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Sep 2019 23:05:41 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8HN5esj017034;
-        Tue, 17 Sep 2019 23:05:40 GMT
-Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 17 Sep 2019 16:05:40 -0700
-Subject: Re: [PATCH v3] kvm: nvmx: limit atomic switch MSRs
-To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
-        jmattson@google.com, pshier@google.com,
-        sean.j.christopherson@intel.com
-References: <20190917185057.224221-1-marcorr@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <2dce168f-edab-8c56-6d29-dc73aace8b63@oracle.com>
-Date:   Tue, 17 Sep 2019 16:05:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1726340AbfIRBzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Sep 2019 21:55:47 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:40355 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725884AbfIRBzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Sep 2019 21:55:46 -0400
+Received: by mail-pf1-f193.google.com with SMTP id x127so3296983pfb.7;
+        Tue, 17 Sep 2019 18:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=WpdhIb/HVSs710LcKaJm7aGI4UYk0FgZtLy6pHU/E7I=;
+        b=bEkFHto9bgaJFozXvPcDAP9sOziRJ1a39ytrGCFhceycWTnUGuL0tEG1zjySa4ko86
+         1i99GxosJphUChFuLilgBo87ghBxrZxeAynAvfEUM8u4ToDb+zwG+fYQSD+iXK17xKtX
+         o8iNbNy4DkE7f5ZWcMdVww7NvF13UoswzJ2edSzkuwBhrAUvPq6ers4z4SpUbNKrCliE
+         lomkueb9TlI4/6m2QkcUpJ8+vXUJhEvOgbrtahh7ahAJiImLYcWH0q7wMMAmdFJnIQPF
+         LodRcKlngsVu/fC1AbR4sV7HTx5SLuF4CBfL791oxHGBRDE/CvgExsp8A4AMMkr0CVGS
+         KMNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WpdhIb/HVSs710LcKaJm7aGI4UYk0FgZtLy6pHU/E7I=;
+        b=d5ROzrnRvOLjnNNqJmbokGjd8UA1ynieJhIFOAiDvAg3BN/IqYcNevQHjEcBVHzcaY
+         ReDzvRrFAmU69eKBcsbVUAkv+1tWu6fRy4B+Icp5RZSvJG4UVHWIJe6XRleJP0M5dw9N
+         HF/EdDhfWlr8ZUCLmhcXgMmcrMlmbSULW8QliWWGHI8zlbpq40GCTwfXkjAQLwMKbDtu
+         X4RIVou38dUmoebyF5ZzHi5I08O8+IGSZWEqzRRkl/f82+h/3lsr2TD3CZbfTMeLsheO
+         02WSmhHiyRlXmk+j/2icPU38sj9mEuzrXb2c6ggO2JVJ6bqAUgSt7dHxctqTyXu3lO0V
+         7MMg==
+X-Gm-Message-State: APjAAAV4DspkUhGmExUSMccWFnHzM7qvOucImZUpuCeemixwx7B3GZxV
+        CdBywVu1XybhLIdXA/V3gZ1ijwjVMMlbjkf+j1M=
+X-Google-Smtp-Source: APXvYqxs/XhVQtC4blrL5qTFdZH54Ew9KrJli2WIUrwrFhceMsYhJ26PzdUTFTJyPTei56tlVCraIzbJQpD7L7nc7tk=
+X-Received: by 2002:a65:5043:: with SMTP id k3mr1752884pgo.406.1568771745985;
+ Tue, 17 Sep 2019 18:55:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190917185057.224221-1-marcorr@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1909170215
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9383 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909170215
+References: <20190822143021.7518-1-Tianyu.Lan@microsoft.com>
+ <7ea7fa06-f100-1507-8507-1c701877c8ab@redhat.com> <874l1baqnf.fsf@vitty.brq.redhat.com>
+In-Reply-To: <874l1baqnf.fsf@vitty.brq.redhat.com>
+From:   Tianyu Lan <lantianyu1986@gmail.com>
+Date:   Wed, 18 Sep 2019 09:55:34 +0800
+Message-ID: <CAOLK0pzVGT2hV=OgJf0pJ5ih2AHN9N8pk1WC38835A-WZD0EMA@mail.gmail.com>
+Subject: Re: [PATCH V4 0/3] KVM/Hyper-V: Add Hyper-V direct tlb flush support
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        kvm <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
+        linux-hyperv@vger.kernel.org,
+        "linux-kernel@vger kernel org" <linux-kernel@vger.kernel.org>,
+        Radim Krcmar <rkrcmar@redhat.com>, corbet@lwn.net,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        michael.h.kelley@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Sep 17, 2019 at 11:28 PM Vitaly Kuznetsov <vkuznets@redhat.com> wro=
+te:
+>
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>
+> > On 22/08/19 16:30, lantianyu1986@gmail.com wrote:
+> >> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+> >>
+> >> This patchset is to add Hyper-V direct tlb support in KVM. Hyper-V
+> >> in L0 can delegate L1 hypervisor to handle tlb flush request from
+> >> L2 guest when direct tlb flush is enabled in L1.
+> >>
+> >> Patch 2 introduces new cap KVM_CAP_HYPERV_DIRECT_TLBFLUSH to enable
+> >> feature from user space. User space should enable this feature only
+> >> when Hyper-V hypervisor capability is exposed to guest and KVM profile
+> >> is hided. There is a parameter conflict between KVM and Hyper-V hyperc=
+all.
+> >> We hope L2 guest doesn't use KVM hypercall when the feature is
+> >> enabled. Detail please see comment of new API "KVM_CAP_HYPERV_DIRECT_T=
+LBFLUSH"
+> >>
+> >> Change since v3:
+> >>        - Update changelog in each patches.
+> >>
+> >> Change since v2:
+> >>        - Move hv assist page(hv_pa_pg) from struct kvm  to struct kvm_=
+hv.
+> >>
+> >> Change since v1:
+> >>        - Fix offset issue in the patch 1.
+> >>        - Update description of KVM KVM_CAP_HYPERV_DIRECT_TLBFLUSH.
+> >>
+> >> Tianyu Lan (2):
+> >>   x86/Hyper-V: Fix definition of struct hv_vp_assist_page
+> >>   KVM/Hyper-V: Add new KVM capability KVM_CAP_HYPERV_DIRECT_TLBFLUSH
+> >>
+> >> Vitaly Kuznetsov (1):
+> >>   KVM/Hyper-V/VMX: Add direct tlb flush support
+> >>
+> >>  Documentation/virtual/kvm/api.txt  | 13 +++++++++++++
+> >>  arch/x86/include/asm/hyperv-tlfs.h | 24 ++++++++++++++++++-----
+> >>  arch/x86/include/asm/kvm_host.h    |  4 ++++
+> >>  arch/x86/kvm/vmx/evmcs.h           |  2 ++
+> >>  arch/x86/kvm/vmx/vmx.c             | 39 +++++++++++++++++++++++++++++=
++++++++++
+> >>  arch/x86/kvm/x86.c                 |  8 ++++++++
+> >>  include/uapi/linux/kvm.h           |  1 +
+> >>  7 files changed, 86 insertions(+), 5 deletions(-)
+> >>
+> >
+> > Queued, thanks.
+> >
+>
+> I had a suggestion how we can get away without the new capability (like
+> direct tlb flush gets automatically enabled when Hyper-V hypercall page
+> is activated and we know we can't handle KVM hypercalls any more)
+> but this can probably be done as a follow-up.
+>
 
-
-On 09/17/2019 11:50 AM, Marc Orr wrote:
-> Allowing an unlimited number of MSRs to be specified via the VMX
-> load/store MSR lists (e.g., vm-entry MSR load list) is bad for two
-> reasons. First, a guest can specify an unreasonable number of MSRs,
-> forcing KVM to process all of them in software. Second, the SDM bounds
-> the number of MSRs allowed to be packed into the atomic switch MSR lists.
-> Quoting the "Miscellaneous Data" section in the "VMX Capability
-> Reporting Facility" appendix:
->
-> "Bits 27:25 is used to compute the recommended maximum number of MSRs
-> that should appear in the VM-exit MSR-store list, the VM-exit MSR-load
-> list, or the VM-entry MSR-load list. Specifically, if the value bits
-> 27:25 of IA32_VMX_MISC is N, then 512 * (N + 1) is the recommended
-> maximum number of MSRs to be included in each list. If the limit is
-> exceeded, undefined processor behavior may result (including a machine
-> check during the VMX transition)."
->
-> Because KVM needs to protect itself and can't model "undefined processor
-> behavior", arbitrarily force a VM-entry to fail due to MSR loading when
-> the MSR load list is too large. Similarly, trigger an abort during a VM
-> exit that encounters an MSR load list or MSR store list that is too large.
->
-> The MSR list size is intentionally not pre-checked so as to maintain
-> compatibility with hardware inasmuch as possible.
->
-> Test these new checks with the kvm-unit-test "x86: nvmx: test max atomic
-> switch MSRs".
->
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> ---
-> v2 -> v3
-> * Updated commit message.
-> * Removed superflous function declaration.
-> * Expanded in-line comment.
->
->   arch/x86/include/asm/vmx.h |  1 +
->   arch/x86/kvm/vmx/nested.c  | 44 ++++++++++++++++++++++++++++----------
->   2 files changed, 34 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index a39136b0d509..a1f6ed187ccd 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -110,6 +110,7 @@
->   #define VMX_MISC_SAVE_EFER_LMA			0x00000020
->   #define VMX_MISC_ACTIVITY_HLT			0x00000040
->   #define VMX_MISC_ZERO_LEN_INS			0x40000000
-> +#define VMX_MISC_MSR_LIST_MULTIPLIER		512
->   
->   /* VMFUNC functions */
->   #define VMX_VMFUNC_EPTP_SWITCHING               0x00000001
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index ced9fba32598..0e29882bb45f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -190,6 +190,16 @@ static void nested_vmx_abort(struct kvm_vcpu *vcpu, u32 indicator)
->   	pr_debug_ratelimited("kvm: nested vmx abort, indicator %d\n", indicator);
->   }
->   
-> +static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> +{
-> +	return fixed_bits_valid(control, low, high);
-> +}
-> +
-> +static inline u64 vmx_control_msr(u32 low, u32 high)
-> +{
-> +	return low | ((u64)high << 32);
-> +}
-> +
->   static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
->   {
->   	secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
-> @@ -856,18 +866,36 @@ static int nested_vmx_store_msr_check(struct kvm_vcpu *vcpu,
->   	return 0;
->   }
->   
-> +static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +	u64 vmx_misc = vmx_control_msr(vmx->nested.msrs.misc_low,
-> +				       vmx->nested.msrs.misc_high);
-> +
-> +	return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIER;
-> +}
-> +
->   /*
->    * Load guest's/host's msr at nested entry/exit.
->    * return 0 for success, entry index for failure.
-> + *
-> + * One of the failure modes for MSR load/store is when a list exceeds the
-> + * virtual hardware's capacity. To maintain compatibility with hardware inasmuch
-> + * as possible, process all valid entries before failing rather than precheck
-> + * for a capacity violation.
->    */
->   static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
->   {
->   	u32 i;
->   	struct vmx_msr_entry e;
->   	struct msr_data msr;
-> +	u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
->   
->   	msr.host_initiated = false;
->   	for (i = 0; i < count; i++) {
-> +		if (unlikely(i >= max_msr_list_size))
-> +			goto fail;
-> +
->   		if (kvm_vcpu_read_guest(vcpu, gpa + i * sizeof(e),
->   					&e, sizeof(e))) {
->   			pr_debug_ratelimited(
-> @@ -899,9 +927,14 @@ static int nested_vmx_store_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
->   {
->   	u32 i;
->   	struct vmx_msr_entry e;
-> +	u32 max_msr_list_size = nested_vmx_max_atomic_switch_msrs(vcpu);
->   
->   	for (i = 0; i < count; i++) {
->   		struct msr_data msr_info;
-> +
-> +		if (unlikely(i >= max_msr_list_size))
-> +			return -EINVAL;
-> +
->   		if (kvm_vcpu_read_guest(vcpu,
->   					gpa + i * sizeof(e),
->   					&e, 2 * sizeof(u32))) {
-> @@ -1009,17 +1042,6 @@ static u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
->   	return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
->   }
->   
-> -
-> -static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> -{
-> -	return fixed_bits_valid(control, low, high);
-> -}
-> -
-> -static inline u64 vmx_control_msr(u32 low, u32 high)
-> -{
-> -	return low | ((u64)high << 32);
-> -}
-> -
->   static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
->   {
->   	superset &= mask;
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Hi Vital'y=EF=BC=9A
+              Actually, I have tried your proposal but it turns out
+KVM in L1 fails to
+enable direct tlb flush most time after nested VM starts.
+"hv_enlightenments_control.
+nested_flush_hypercall" flag in evmcs is cleared by Hyper-V after run
+nested VM. I still
+wait answer from Hyper-V team. So far, it looks like enabling direct
+tlb flush before start
+nested VM is a safe way.Once get more infomration from Hyper-V team and we =
+may
+have a look to how to enable your proposal.
+--=20
+Best regards
+Tianyu Lan
