@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38AC1B69E5
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:52:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68194B69EA
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:53:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729506AbfIRRwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 13:52:39 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:42808 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726369AbfIRRwj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 13:52:39 -0400
-Received: by mail-ot1-f67.google.com with SMTP id c10so618266otd.9;
-        Wed, 18 Sep 2019 10:52:36 -0700 (PDT)
+        id S1729681AbfIRRwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 13:52:46 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:44576 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726369AbfIRRwp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 13:52:45 -0400
+Received: by mail-ot1-f65.google.com with SMTP id 21so603305otj.11;
+        Wed, 18 Sep 2019 10:52:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=JWWH0nLE5gW80rwb17oSZfM6VHlugSoNSjEeC143ARI=;
-        b=kY3Nlxw4jpobVoe1JNyEjEGVhrVb4uyehLGgS2nDS2Limxn/shG8A6UvTSmRmamYf2
-         vpwJWEl0pAb1fTuvIm0LsMimt1aZGBGW7khdC8YTa6mZMWQBgNcgOjhkth8enlqk8txQ
-         Ae58XB9KDodcprJ1+qW2Vd2g3Hj7eg/CzfS+9/r+j6C/7zwelWxgfjiiVIBKflrizYNg
-         dLiTBEYyiQYtg7ouCjOE7MeRbNcfZPYmM4OpCYleG6Pv7X2Laj/RmtQzO8GQPnw7QWfJ
-         sfV41kc38Vx9O9JU4Osh/nqinznN8zZcm/K3WaI5q2HT2bNdBne56siHa6p/8uFHnYXR
-         XmZw==
+        bh=PCzoJtXlSlvmmhuZJXUJGfMf/+R9N4NUqoylP2gvkM8=;
+        b=s3U3h9kF7S2ZNzloy0+5/+cFc0Wrga8frJ4delCGCVbge2n1b4te5qTbTb2Zp7FHyr
+         MHQoaVwAV4OpiNWHC43iJVP2IPmI3fuTJgly248nBV40caVSQKCp/svrcdcnTrL8+VBe
+         TiHA4eXvt6Fq9/YBRJHldZEfNWOV+7LjvWdxQjWuNMrVQA1bzMTOJab5UmMC9+9hzcPw
+         x04R/znjNEQcmzlEOfPRo3fibwzQGa8fFhIJci5rhd5Z8YDlCZ9c0AUYO83lgNrNX0m+
+         RTSD395lLDqqdrLXjN6Hpi4dmZYI89r1c5yFxLvligEiFhhaYmdG+HZ1eQivbyZtP5Me
+         4Igw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=JWWH0nLE5gW80rwb17oSZfM6VHlugSoNSjEeC143ARI=;
-        b=ELuNAsZadH8QpBpZV2Y06ySgTkYqbPFmnK9Vd4Zx86YF78hscDQvb4MSpopsh82krx
-         YtUy0h5YyJdu6RjmgqHfizLnQOEsLJjRFejh1VeQL+OPL7YnxEi9g4UrmS8mxhyESAP7
-         vozlwnKwaURRvsqmH6zb4k7oRPgkk+rLynEJ0Lpv9IzNpDdhe9iXACiZAGlZUJlW16fD
-         /qi3ggOU2Cnjl0yJcb4ueJ4iaNCwXj0Pz+5lSby8z7oevPYm9z3Yf6Zk9oOH+qluEgZi
-         rKkqwHCZ35LbJfHMEyR5N2CssO2hCHukKoQZtN8g1prbnBbZuwxwHaE6YxcgUuwwieKO
-         U2WQ==
-X-Gm-Message-State: APjAAAWIoE4jFeXgAAl9UJi+/GJYMa4qpnKOc7EAF4zjqcHjylJrtdNe
-        sEbqsVUE8AYpIstxwe0j0Qc=
-X-Google-Smtp-Source: APXvYqyH5jZB85XcGwqiW8u/CLFVrXYTftFKTWVpkVfA0lyvGzPyLpjSrqJtEvx3oszxU7OaB0xUKw==
-X-Received: by 2002:a05:6830:214d:: with SMTP id r13mr3623505otd.121.1568829156454;
-        Wed, 18 Sep 2019 10:52:36 -0700 (PDT)
+        bh=PCzoJtXlSlvmmhuZJXUJGfMf/+R9N4NUqoylP2gvkM8=;
+        b=fbho5GLWN1PtAynPl8mSxpdls3HxjLLY+luC1ahW2y2nnqFx+ikCnqvrNOaMK+IMvD
+         hsv5U8YltwbrqGZyMv3vGNIqFqOLu+pERMBIdXU7wIVHMG10GpCzMiTrBn0vUMZbFWSq
+         dg4OySUNM6k85P56Q/Zm0xPkKv4KB1JxEFUYqXjGOf0HhkH0Tb1UnSVqh+oLak1oWArv
+         Mk3hvn7jmM1kW5L87OgbCDmbW62Q/GBiexzZwHcs5Qg01gO+Rw10GTPafWn+8Yj+V+N+
+         VRKAatQi/pkYj0gpFmkLZOXscI2pH1h2mHLA+2ymDVmzJ2XS29c34WLORLrlf4kFwsr6
+         l0/A==
+X-Gm-Message-State: APjAAAWGPH19icPNGhwypIV4A5YSk5tAT3PsHcum4AcSiTkY1s31XfDA
+        5CT1D/dTtd6NVSYU1fvDJEg=
+X-Google-Smtp-Source: APXvYqynMKlu1o1Yzkv7NcZAcihLIaOlGRphkTlW9id/lvcX3BwzI3TKbd/CmySspBt/EMHS3KSiKQ==
+X-Received: by 2002:a9d:7a55:: with SMTP id z21mr3193460otm.26.1568829164289;
+        Wed, 18 Sep 2019 10:52:44 -0700 (PDT)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id e5sm1998110otr.81.2019.09.18.10.52.34
+        by smtp.gmail.com with ESMTPSA id i5sm1879072otk.10.2019.09.18.10.52.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Sep 2019 10:52:35 -0700 (PDT)
-Subject: [PATCH v10 1/6] mm: Adjust shuffle code to allow for future
- coalescing
+        Wed, 18 Sep 2019 10:52:43 -0700 (PDT)
+Subject: [PATCH v10 2/6] mm: Use zone and order instead of free area in
+ free_list manipulators
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
         mst@redhat.com, david@redhat.com, dave.hansen@intel.com,
@@ -58,8 +58,8 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
         lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
         pbonzini@redhat.com, dan.j.williams@intel.com,
         alexander.h.duyck@linux.intel.com
-Date:   Wed, 18 Sep 2019 10:52:33 -0700
-Message-ID: <20190918175233.23474.93686.stgit@localhost.localdomain>
+Date:   Wed, 18 Sep 2019 10:52:41 -0700
+Message-ID: <20190918175241.23474.4680.stgit@localhost.localdomain>
 In-Reply-To: <20190918175109.23474.67039.stgit@localhost.localdomain>
 References: <20190918175109.23474.67039.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -73,200 +73,255 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-Move the head/tail adding logic out of the shuffle code and into the
-__free_one_page function since ultimately that is where it is really
-needed anyway. By doing this we should be able to reduce the overhead
-and can consolidate all of the list addition bits in one spot.
+In order to enable the use of the zone from the list manipulator functions
+I will need access to the zone pointer. As it turns out most of the
+accessors were always just being directly passed &zone->free_area[order]
+anyway so it would make sense to just fold that into the function itself
+and pass the zone and order as arguments instead of the free area.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+In order to be able to reference the zone we need to move the declaration
+of the functions down so that we have the zone defined before we define the
+list manipulation functions. Since the functions are only used in the file
+mm/page_alloc.c we can just move them there to reduce noise in the header.
+
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- include/linux/mmzone.h |   12 --------
- mm/page_alloc.c        |   71 ++++++++++++++++++++++++++++--------------------
- mm/shuffle.c           |   12 ++++----
- mm/shuffle.h           |    6 ++++
- 4 files changed, 54 insertions(+), 47 deletions(-)
+ include/linux/mmzone.h |   32 -----------------------
+ mm/page_alloc.c        |   68 +++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 49 insertions(+), 51 deletions(-)
 
 diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index bda20282746b..125f300981c6 100644
+index 125f300981c6..270a7b493174 100644
 --- a/include/linux/mmzone.h
 +++ b/include/linux/mmzone.h
-@@ -116,18 +116,6 @@ static inline void add_to_free_area_tail(struct page *page, struct free_area *ar
- 	area->nr_free++;
+@@ -100,29 +100,6 @@ struct free_area {
+ 	unsigned long		nr_free;
+ };
+ 
+-/* Used for pages not on another list */
+-static inline void add_to_free_area(struct page *page, struct free_area *area,
+-			     int migratetype)
+-{
+-	list_add(&page->lru, &area->free_list[migratetype]);
+-	area->nr_free++;
+-}
+-
+-/* Used for pages not on another list */
+-static inline void add_to_free_area_tail(struct page *page, struct free_area *area,
+-				  int migratetype)
+-{
+-	list_add_tail(&page->lru, &area->free_list[migratetype]);
+-	area->nr_free++;
+-}
+-
+-/* Used for pages which are on another list */
+-static inline void move_to_free_area(struct page *page, struct free_area *area,
+-			     int migratetype)
+-{
+-	list_move(&page->lru, &area->free_list[migratetype]);
+-}
+-
+ static inline struct page *get_page_from_free_area(struct free_area *area,
+ 					    int migratetype)
+ {
+@@ -130,15 +107,6 @@ static inline struct page *get_page_from_free_area(struct free_area *area,
+ 					struct page, lru);
  }
  
--#ifdef CONFIG_SHUFFLE_PAGE_ALLOCATOR
--/* Used to preserve page allocation order entropy */
--void add_to_free_area_random(struct page *page, struct free_area *area,
--		int migratetype);
--#else
--static inline void add_to_free_area_random(struct page *page,
--		struct free_area *area, int migratetype)
+-static inline void del_page_from_free_area(struct page *page,
+-		struct free_area *area)
 -{
--	add_to_free_area(page, area, migratetype);
+-	list_del(&page->lru);
+-	__ClearPageBuddy(page);
+-	set_page_private(page, 0);
+-	area->nr_free--;
 -}
--#endif
 -
- /* Used for pages which are on another list */
- static inline void move_to_free_area(struct page *page, struct free_area *area,
- 			     int migratetype)
+ static inline bool free_area_empty(struct free_area *area, int migratetype)
+ {
+ 	return list_empty(&area->free_list[migratetype]);
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 3334a769eb91..268a25830114 100644
+index 268a25830114..f8271ec8e06e 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -878,6 +878,36 @@ static inline struct capture_control *task_capc(struct zone *zone)
+@@ -877,6 +877,44 @@ static inline struct capture_control *task_capc(struct zone *zone)
+ }
  #endif /* CONFIG_COMPACTION */
  
- /*
-+ * If this is not the largest possible page, check if the buddy
-+ * of the next-highest order is free. If it is, it's possible
-+ * that pages are being freed that will coalesce soon. In case,
-+ * that is happening, add the free page to the tail of the list
-+ * so it's less likely to be used soon and more likely to be merged
-+ * as a higher order page
-+ */
-+static inline bool
-+buddy_merge_likely(unsigned long pfn, unsigned long buddy_pfn,
-+		   struct page *page, unsigned int order)
++/* Used for pages not on another list */
++static inline void add_to_free_list(struct page *page, struct zone *zone,
++				    unsigned int order, int migratetype)
 +{
-+	struct page *higher_page, *higher_buddy;
-+	unsigned long combined_pfn;
++	struct free_area *area = &zone->free_area[order];
 +
-+	if (order >= MAX_ORDER - 2)
-+		return false;
-+
-+	if (!pfn_valid_within(buddy_pfn))
-+		return false;
-+
-+	combined_pfn = buddy_pfn & pfn;
-+	higher_page = page + (combined_pfn - pfn);
-+	buddy_pfn = __find_buddy_pfn(combined_pfn, order + 1);
-+	higher_buddy = higher_page + (buddy_pfn - combined_pfn);
-+
-+	return pfn_valid_within(buddy_pfn) &&
-+	       page_is_buddy(higher_page, higher_buddy, order + 1);
++	list_add(&page->lru, &area->free_list[migratetype]);
++	area->nr_free++;
 +}
 +
-+/*
-  * Freeing function for a buddy system allocator.
-  *
-  * The concept of a buddy system is to maintain direct-mapped table
-@@ -906,11 +936,13 @@ static inline void __free_one_page(struct page *page,
- 		struct zone *zone, unsigned int order,
- 		int migratetype)
- {
--	unsigned long combined_pfn;
-+	struct capture_control *capc = task_capc(zone);
++/* Used for pages not on another list */
++static inline void add_to_free_list_tail(struct page *page, struct zone *zone,
++					 unsigned int order, int migratetype)
++{
++	struct free_area *area = &zone->free_area[order];
++
++	list_add_tail(&page->lru, &area->free_list[migratetype]);
++	area->nr_free++;
++}
++
++/* Used for pages which are on another list */
++static inline void move_to_free_list(struct page *page, struct zone *zone,
++				     unsigned int order, int migratetype)
++{
++	struct free_area *area = &zone->free_area[order];
++
++	list_move(&page->lru, &area->free_list[migratetype]);
++}
++
++static inline void del_page_from_free_list(struct page *page, struct zone *zone,
++					   unsigned int order)
++{
++	list_del(&page->lru);
++	__ClearPageBuddy(page);
++	set_page_private(page, 0);
++	zone->free_area[order].nr_free--;
++}
++
+ /*
+  * If this is not the largest possible page, check if the buddy
+  * of the next-highest order is free. If it is, it's possible
+@@ -939,7 +977,6 @@ static inline void __free_one_page(struct page *page,
+ 	struct capture_control *capc = task_capc(zone);
  	unsigned long uninitialized_var(buddy_pfn);
--	struct page *buddy;
-+	unsigned long combined_pfn;
-+	struct free_area *area;
+ 	unsigned long combined_pfn;
+-	struct free_area *area;
  	unsigned int max_order;
--	struct capture_control *capc = task_capc(zone);
-+	struct page *buddy;
-+	bool to_tail;
- 
- 	max_order = min_t(unsigned int, MAX_ORDER, pageblock_order + 1);
- 
-@@ -979,35 +1011,16 @@ static inline void __free_one_page(struct page *page,
+ 	struct page *buddy;
+ 	bool to_tail;
+@@ -977,7 +1014,7 @@ static inline void __free_one_page(struct page *page,
+ 		if (page_is_guard(buddy))
+ 			clear_page_guard(zone, buddy, order, migratetype);
+ 		else
+-			del_page_from_free_area(buddy, &zone->free_area[order]);
++			del_page_from_free_list(buddy, zone, order);
+ 		combined_pfn = buddy_pfn & pfn;
+ 		page = page + (combined_pfn - pfn);
+ 		pfn = combined_pfn;
+@@ -1011,16 +1048,15 @@ static inline void __free_one_page(struct page *page,
  done_merging:
  	set_page_order(page, order);
  
--	/*
--	 * If this is not the largest possible page, check if the buddy
--	 * of the next-highest order is free. If it is, it's possible
--	 * that pages are being freed that will coalesce soon. In case,
--	 * that is happening, add the free page to the tail of the list
--	 * so it's less likely to be used soon and more likely to be merged
--	 * as a higher order page
--	 */
--	if ((order < MAX_ORDER-2) && pfn_valid_within(buddy_pfn)
--			&& !is_shuffle_order(order)) {
--		struct page *higher_page, *higher_buddy;
--		combined_pfn = buddy_pfn & pfn;
--		higher_page = page + (combined_pfn - pfn);
--		buddy_pfn = __find_buddy_pfn(combined_pfn, order + 1);
--		higher_buddy = higher_page + (buddy_pfn - combined_pfn);
--		if (pfn_valid_within(buddy_pfn) &&
--		    page_is_buddy(higher_page, higher_buddy, order + 1)) {
--			add_to_free_area_tail(page, &zone->free_area[order],
--					      migratetype);
--			return;
--		}
--	}
--
-+	area = &zone->free_area[order];
+-	area = &zone->free_area[order];
  	if (is_shuffle_order(order))
--		add_to_free_area_random(page, &zone->free_area[order],
--				migratetype);
-+		to_tail = shuffle_pick_tail();
+ 		to_tail = shuffle_pick_tail();
  	else
--		add_to_free_area(page, &zone->free_area[order], migratetype);
-+		to_tail = buddy_merge_likely(pfn, buddy_pfn, page, order);
+ 		to_tail = buddy_merge_likely(pfn, buddy_pfn, page, order);
  
-+	if (to_tail)
-+		add_to_free_area_tail(page, area, migratetype);
-+	else
-+		add_to_free_area(page, area, migratetype);
+ 	if (to_tail)
+-		add_to_free_area_tail(page, area, migratetype);
++		add_to_free_list_tail(page, zone, order, migratetype);
+ 	else
+-		add_to_free_area(page, area, migratetype);
++		add_to_free_list(page, zone, order, migratetype);
  }
  
  /*
-diff --git a/mm/shuffle.c b/mm/shuffle.c
-index 3ce12481b1dc..923af4fe887e 100644
---- a/mm/shuffle.c
-+++ b/mm/shuffle.c
-@@ -183,11 +183,11 @@ void __meminit __shuffle_free_memory(pg_data_t *pgdat)
- 		shuffle_zone(z);
+@@ -2024,13 +2060,11 @@ void __init init_cma_reserved_pageblock(struct page *page)
+  * -- nyc
+  */
+ static inline void expand(struct zone *zone, struct page *page,
+-	int low, int high, struct free_area *area,
+-	int migratetype)
++	int low, int high, int migratetype)
+ {
+ 	unsigned long size = 1 << high;
+ 
+ 	while (high > low) {
+-		area--;
+ 		high--;
+ 		size >>= 1;
+ 		VM_BUG_ON_PAGE(bad_range(zone, &page[size]), &page[size]);
+@@ -2044,7 +2078,7 @@ static inline void expand(struct zone *zone, struct page *page,
+ 		if (set_page_guard(zone, &page[size], high, migratetype))
+ 			continue;
+ 
+-		add_to_free_area(&page[size], area, migratetype);
++		add_to_free_list(&page[size], zone, high, migratetype);
+ 		set_page_order(&page[size], high);
+ 	}
+ }
+@@ -2202,8 +2236,8 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
+ 		page = get_page_from_free_area(area, migratetype);
+ 		if (!page)
+ 			continue;
+-		del_page_from_free_area(page, area);
+-		expand(zone, page, order, current_order, area, migratetype);
++		del_page_from_free_list(page, zone, current_order);
++		expand(zone, page, order, current_order, migratetype);
+ 		set_pcppage_migratetype(page, migratetype);
+ 		return page;
+ 	}
+@@ -2211,7 +2245,6 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
+ 	return NULL;
  }
  
--void add_to_free_area_random(struct page *page, struct free_area *area,
--		int migratetype)
-+bool shuffle_pick_tail(void)
+-
+ /*
+  * This array describes the order lists are fallen back to when
+  * the free lists for the desirable migrate type are depleted
+@@ -2277,7 +2310,7 @@ static int move_freepages(struct zone *zone,
+ 		VM_BUG_ON_PAGE(page_zone(page) != zone, page);
+ 
+ 		order = page_order(page);
+-		move_to_free_area(page, &zone->free_area[order], migratetype);
++		move_to_free_list(page, zone, order, migratetype);
+ 		page += 1 << order;
+ 		pages_moved += 1 << order;
+ 	}
+@@ -2393,7 +2426,6 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
+ 		unsigned int alloc_flags, int start_type, bool whole_block)
  {
- 	static u64 rand;
- 	static u8 rand_bits;
-+	bool ret;
+ 	unsigned int current_order = page_order(page);
+-	struct free_area *area;
+ 	int free_pages, movable_pages, alike_pages;
+ 	int old_block_type;
+ 
+@@ -2464,8 +2496,7 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
+ 	return;
+ 
+ single_page:
+-	area = &zone->free_area[current_order];
+-	move_to_free_area(page, area, start_type);
++	move_to_free_list(page, zone, current_order, start_type);
+ }
+ 
+ /*
+@@ -3136,7 +3167,6 @@ void split_page(struct page *page, unsigned int order)
+ 
+ int __isolate_free_page(struct page *page, unsigned int order)
+ {
+-	struct free_area *area = &page_zone(page)->free_area[order];
+ 	unsigned long watermark;
+ 	struct zone *zone;
+ 	int mt;
+@@ -3162,7 +3192,7 @@ int __isolate_free_page(struct page *page, unsigned int order)
+ 
+ 	/* Remove page from free list */
+ 
+-	del_page_from_free_area(page, area);
++	del_page_from_free_list(page, zone, order);
  
  	/*
- 	 * The lack of locking is deliberate. If 2 threads race to
-@@ -198,10 +198,10 @@ void add_to_free_area_random(struct page *page, struct free_area *area,
- 		rand = get_random_u64();
- 	}
- 
--	if (rand & 1)
--		add_to_free_area(page, area, migratetype);
--	else
--		add_to_free_area_tail(page, area, migratetype);
-+	ret = rand & 1;
-+
- 	rand_bits--;
- 	rand >>= 1;
-+
-+	return ret;
- }
-diff --git a/mm/shuffle.h b/mm/shuffle.h
-index 777a257a0d2f..4d79f03b6658 100644
---- a/mm/shuffle.h
-+++ b/mm/shuffle.h
-@@ -22,6 +22,7 @@ enum mm_shuffle_ctl {
- DECLARE_STATIC_KEY_FALSE(page_alloc_shuffle_key);
- extern void page_alloc_shuffle(enum mm_shuffle_ctl ctl);
- extern void __shuffle_free_memory(pg_data_t *pgdat);
-+extern bool shuffle_pick_tail(void);
- static inline void shuffle_free_memory(pg_data_t *pgdat)
- {
- 	if (!static_branch_unlikely(&page_alloc_shuffle_key))
-@@ -44,6 +45,11 @@ static inline bool is_shuffle_order(int order)
- 	return order >= SHUFFLE_ORDER;
- }
- #else
-+static inline bool shuffle_pick_tail(void)
-+{
-+	return false;
-+}
-+
- static inline void shuffle_free_memory(pg_data_t *pgdat)
- {
- }
+ 	 * Set the pageblock if the isolated page is at least half of a
+@@ -8583,7 +8613,7 @@ void zone_pcp_reset(struct zone *zone)
+ 		pr_info("remove from free list %lx %d %lx\n",
+ 			pfn, 1 << order, end_pfn);
+ #endif
+-		del_page_from_free_area(page, &zone->free_area[order]);
++		del_page_from_free_list(page, zone, order);
+ 		for (i = 0; i < (1 << order); i++)
+ 			SetPageReserved((page+i));
+ 		pfn += (1 << order);
 
