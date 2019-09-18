@@ -2,81 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E0451B62AB
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 14:04:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6508FB62B0
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 14:04:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729656AbfIRMDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 08:03:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34908 "EHLO mail.kernel.org"
+        id S1730524AbfIRMEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 08:04:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64932 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729627AbfIRMDz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 08:03:55 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1730241AbfIRMEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 08:04:35 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C059B2054F;
-        Wed, 18 Sep 2019 12:03:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1568808234;
-        bh=4bS4vQGRl4R5tsRX0vZKSFN5Wb5+OQtj4Aq++O0+0gg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YIi2OK1Obg+QKN8Vi7HuyNuDE3ayU7wxxTr7TuYUHd6LVXrROlmPvlxl30RfHrpti
-         uvUI48+SOrpak0q+Bq+U8Wdy8hG8kFXhjoLoT192SjavJeiigp33H7hpAcctLVTG7T
-         RFF2V5jNnIQaiTsmNHTYeQ+P/dHYYLS/xvbvMzHA=
-Date:   Wed, 18 Sep 2019 14:03:52 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     wang.yi59@zte.com.cn
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xue.zhihong@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
-Subject: Re: [PATCH] kvm: x86: Use DEFINE_DEBUGFS_ATTRIBUTE for debugfs files
-Message-ID: <20190918120352.GB1901208@kroah.com>
-References: <31eec57f-2bc8-0ea0-e5fb-6b21ce902aae@redhat.com>
- <201909180819440437759@zte.com.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201909180819440437759@zte.com.cn>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        by mx1.redhat.com (Postfix) with ESMTPS id AF3A418C4297;
+        Wed, 18 Sep 2019 12:04:35 +0000 (UTC)
+Received: from thuth.com (ovpn-116-90.ams2.redhat.com [10.36.116.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 14585600CC;
+        Wed, 18 Sep 2019 12:04:30 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PULL 0/9] New s390x kvm-unit-tests
+Date:   Wed, 18 Sep 2019 14:04:17 +0200
+Message-Id: <20190918120426.20832-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 18 Sep 2019 12:04:35 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 18, 2019 at 08:19:44AM +0800, wang.yi59@zte.com.cn wrote:
-> Hi Paolo,
-> 
-> > On 22/07/19 09:33, Yi Wang wrote:
-> > > We got these coccinelle warning:
-> > > ./arch/x86/kvm/debugfs.c:23:0-23: WARNING: vcpu_timer_advance_ns_fops
-> > > should be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> > > ./arch/x86/kvm/debugfs.c:32:0-23: WARNING: vcpu_tsc_offset_fops should
-> > > be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> > > ./arch/x86/kvm/debugfs.c:41:0-23: WARNING: vcpu_tsc_scaling_fops should
-> > > be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> > > ./arch/x86/kvm/debugfs.c:49:0-23: WARNING: vcpu_tsc_scaling_frac_fops
-> > > should be defined with DEFINE_DEBUGFS_ATTRIBUTE
-> > >
-> > > Use DEFINE_DEBUGFS_ATTRIBUTE() rather than DEFINE_SIMPLE_ATTRIBUTE()
-> > > to fix this.
-> > >
-> > > Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> >
-> > It sucks though that you have to use a function with "unsafe" in the name.
-> 
-> Yes, it does, but I found some patches in the git log:
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?qt=grep&q=DEFINE_DEBUGFS_ATTRIBUTE+
-> 
-> And, do you think the function name "debugfs_create_file_unsafe" is not proper?
+ Hi Paolo, hi Radim,
 
-Only if you _KNOW_ you are creating/removing these files in a way that
-is safe is it ok to use these calls.  Hint, what is your locking
-strategy for when these files are removed?
+the following changes since commit 5eb7ccf658f29642ca6c197fd086f4da0d8d8a73:
 
-Is that the case here?  If not, please stick with what is there today,
-as we know it works, and it is "safe" to do so.
+  x86: VMX: INVEPT after modifying PA mapping in ept_untwiddle (2019-09-11 17:45:28 +0200)
 
-thanks,
+are available in the Git repository at:
 
-greg k-h
+  https://gitlab.com/huth/kvm-unit-tests.git tags/s390x-2019-09-18
+
+for you to fetch changes up to 47df95c747e1c46e7bfb524e734d98a7d9757cb1:
+
+  s390x: Add storage key removal facility (2019-09-18 13:48:09 +0200)
+
+----------------------------------------------------------------
+New s390x kvm-unit-tests from Janosch Frank
+----------------------------------------------------------------
+
+Janosch Frank (9):
+      s390x: Support PSW restart boot
+      s390x: Diag288 test
+      s390x: Move stsi to library
+      s390x: STSI tests
+      s390x: Add diag308 subcode 0 testing
+      s390x: Move pfmf to lib and make address void
+      s390x: Storage key library functions now take void ptr addresses
+      s390x: Bump march to zEC12
+      s390x: Add storage key removal facility
+
+ lib/s390x/asm/arch_def.h |  17 +++++++
+ lib/s390x/asm/mem.h      |  40 ++++++++++++---
+ s390x/Makefile           |   5 +-
+ s390x/cstart64.S         |  27 ++++++++++
+ s390x/diag288.c          | 114 +++++++++++++++++++++++++++++++++++++++++
+ s390x/diag308.c          |  31 ++++--------
+ s390x/flat.lds           |  14 ++++--
+ s390x/pfmf.c             |  71 +++++++++-----------------
+ s390x/skey.c             |  47 ++++++-----------
+ s390x/skrf.c             | 128 +++++++++++++++++++++++++++++++++++++++++++++++
+ s390x/stsi.c             |  84 +++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   7 +++
+ 12 files changed, 475 insertions(+), 110 deletions(-)
+ create mode 100644 s390x/diag288.c
+ create mode 100644 s390x/skrf.c
+ create mode 100644 s390x/stsi.c
