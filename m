@@ -2,148 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1F04B5F34
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 10:29:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70E38B5FF3
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 11:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730375AbfIRI3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 04:29:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57327 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725866AbfIRI3M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Sep 2019 04:29:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1568795350;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=LJ9x17++JlMAzSbihcUye9RvbBXaphj4wbKaTaSMCiA=;
-        b=RnPLYA54L5yauvo8L73l15emKnIr2OSjKNYZ8fZPMaepLM1D2CHyaAGxHISIF8uy4vKIy0
-        jWHLhHGJ/lOPa1W/L460DrU6SmvyI4BCvHK1u/I0LOsvl+W/9yrWIZqSWMiXDKsR4HhXwa
-        ZDp3TJuxtXd2tzRLTzAO1ojaEKGSxbo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-NW8XcV3FMMexrgwGnH1D6Q-1; Wed, 18 Sep 2019 04:29:09 -0400
-Received: by mail-wr1-f72.google.com with SMTP id z17so513272wru.13
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2019 01:29:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IrWbIprHqWMlOEd3b8M/gmFgeShWjRa194btm7DSbPI=;
-        b=WK/c0VqqdGNV4XTp0OTcn/B3WkYkpc9A5e6+wTqRfZDZY4YP4ozxs2kHo5a/tDo97V
-         wOGI2t0iKO2HU2YLtRsfshtFpADsy1SjsEQmlZcfYedTmbw0sWLdkLgVPFk7ZMeU8NVW
-         t2PpefRfbtuYuWaylOAgei5VYYKKLwKtrlEJurvPqjP/YVA1LmMaK2HcvZvMrKYMZFMk
-         bsPmpJJO0ojzpIU8SIORWNRSkmPPF2XkGTaT9ul+hHgwaM+KliWzjRlR2cdTFi2OzD1e
-         iuvRp475w1X+fpY6OaGUv9VxBbQdynhtG0oWP/P5E7kstpaiwa406ZOUhBrpvWad+fd1
-         fRuw==
-X-Gm-Message-State: APjAAAVDcc/ymmm3VwL5H/BR2rNaZtzMlmPC4OnXDWGI6fWQx6DhTMw6
-        sf7FRCyLNvRG7X7GmBk9m5QWqrPi/X2x50S4jktLEMPjbPZUTcgJ1i0kdXeG+ZAnHpo/BoKBfEx
-        8aEsGXxVadw4H
-X-Received: by 2002:a5d:5381:: with SMTP id d1mr1854472wrv.315.1568795347875;
-        Wed, 18 Sep 2019 01:29:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyonIjdT3rqMK/eFGzZQnLolYQxc5RAG8w8enPADilIGLfzNNbF2gDa1S1gTXGi5dhHblr98w==
-X-Received: by 2002:a5d:5381:: with SMTP id d1mr1854455wrv.315.1568795347599;
-        Wed, 18 Sep 2019 01:29:07 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id u22sm8125812wru.72.2019.09.18.01.29.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Sep 2019 01:29:07 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 3/6] timekeeping: Expose API allowing retrival of
- current clocksource and counter value
-To:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com,
-        Will.Deacon@arm.com, suzuki.poulose@arm.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        nd@arm.com, linux-arm-kernel@lists.infradead.org
-References: <20190918080716.64242-1-jianyong.wu@arm.com>
- <20190918080716.64242-4-jianyong.wu@arm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <aecdffc5-7d15-6183-f8ea-ed557631cf75@redhat.com>
-Date:   Wed, 18 Sep 2019 10:29:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728164AbfIRJRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 05:17:23 -0400
+Received: from foss.arm.com ([217.140.110.172]:37960 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726268AbfIRJRX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 05:17:23 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 63918337;
+        Wed, 18 Sep 2019 02:17:22 -0700 (PDT)
+Received: from localhost (unknown [10.37.6.20])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE9563F59C;
+        Wed, 18 Sep 2019 02:17:21 -0700 (PDT)
+Date:   Wed, 18 Sep 2019 10:17:20 +0100
+From:   Andrew Murray <andrew.murray@arm.com>
+To:     Denis Efremov <efremov@linux.com>
+Cc:     Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v3 17/26] vfio_pci: Loop using PCI_STD_NUM_BARS
+Message-ID: <20190918091719.GA9720@e119886-lin.cambridge.arm.com>
+References: <20190916204158.6889-1-efremov@linux.com>
+ <20190916204158.6889-18-efremov@linux.com>
 MIME-Version: 1.0
-In-Reply-To: <20190918080716.64242-4-jianyong.wu@arm.com>
-Content-Language: en-US
-X-MC-Unique: NW8XcV3FMMexrgwGnH1D6Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190916204158.6889-18-efremov@linux.com>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/09/19 10:07, Jianyong Wu wrote:
-> From Marc Zyngier <maz@kernel.org>
-> A number of PTP drivers (such as ptp-kvm) are assuming what the
-> current clock source is, which could lead to interesting effects on
-> systems where the clocksource can change depending on external events.
->=20
-> For this purpose, add a new API that retrives both the current
-> monotonic clock as well as its counter value.
->=20
-> From Jianyong Wu: export this API then modules can use it.
-
-See review of patch 4.  ktime_get_snapshot is even better for your
-needs, if I'm not mistaken.
-
-Paolo
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+On Mon, Sep 16, 2019 at 11:41:49PM +0300, Denis Efremov wrote:
+> Refactor loops to use idiomatic C style and avoid the fencepost error
+> of using "i < PCI_STD_RESOURCE_END" when "i <= PCI_STD_RESOURCE_END"
+> is required, e.g., commit 2f686f1d9bee ("PCI: Correct PCI_STD_RESOURCE_END
+> usage").
+> 
+> To iterate through all possible BARs, loop conditions changed to the
+> *number* of BARs "i < PCI_STD_NUM_BARS", instead of the index of the last
+> valid BAR "i <= PCI_STD_RESOURCE_END".
+> 
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Denis Efremov <efremov@linux.com>
 > ---
->  include/linux/timekeeping.h |  3 +++
->  kernel/time/timekeeping.c   | 13 +++++++++++++
->  2 files changed, 16 insertions(+)
->=20
-> diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
-> index a8ab0f143ac4..a5389adaa8bc 100644
-> --- a/include/linux/timekeeping.h
-> +++ b/include/linux/timekeeping.h
-> @@ -247,6 +247,9 @@ extern int get_device_system_crosststamp(
->  =09=09=09struct system_time_snapshot *history,
->  =09=09=09struct system_device_crosststamp *xtstamp);
-> =20
-> +/* Obtain current monotonic clock and its counter value  */
-> +extern void get_current_counterval(struct system_counterval_t *sc);
+>  drivers/vfio/pci/vfio_pci.c         | 11 ++++++----
+>  drivers/vfio/pci/vfio_pci_config.c  | 32 +++++++++++++++--------------
+>  drivers/vfio/pci/vfio_pci_private.h |  4 ++--
+>  3 files changed, 26 insertions(+), 21 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 703948c9fbe1..cb7d220d3246 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -110,13 +110,15 @@ static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
+>  static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
+>  {
+>  	struct resource *res;
+> -	int bar;
+> +	int i;
+>  	struct vfio_pci_dummy_resource *dummy_res;
+>  
+>  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+>  
+> -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
+> -		res = vdev->pdev->resource + bar;
+> +	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+> +		int bar = i + PCI_STD_RESOURCES;
 > +
->  /*
->   * Simultaneously snapshot realtime and monotonic raw clocks
->   */
-> diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-> index 44b726bab4bd..07a0969625b1 100644
-> --- a/kernel/time/timekeeping.c
-> +++ b/kernel/time/timekeeping.c
-> @@ -1098,6 +1098,19 @@ static bool cycle_between(u64 before, u64 test, u6=
-4 after)
->  =09return false;
->  }
-> =20
-> +/**
-> + * get_current_counterval - Snapshot the current clocksource and counter=
- value
-> + * @sc:=09Pointer to a struct containing the current clocksource and its=
- value
-> + */
-> +void get_current_counterval(struct system_counterval_t *sc)
-> +{
-> +=09struct timekeeper *tk =3D &tk_core.timekeeper;
-> +
-> +=09sc->cs =3D READ_ONCE(tk->tkr_mono.clock);
-> +=09sc->cycles =3D sc->cs->read(sc->cs);
-> +}
-> +EXPORT_SYMBOL_GPL(get_current_counterval);
-> +
->  /**
->   * get_device_system_crosststamp - Synchronously capture system/device t=
-imestamp
->   * @get_time_fn:=09Callback to get simultaneous device time and
->=20
+> +		res = &vdev->pdev->resource[bar];
 
+Why can't we just drop PCI_STD_RESOURCES and replace it was 0. I understand
+the abstraction here, but we don't do it elsewhere across the kernel. Is this
+necessary?
+
+Thanks,
+
+Andrew Murray
+
+>  
+>  		if (!IS_ENABLED(CONFIG_VFIO_PCI_MMAP))
+>  			goto no_mmap;
+> @@ -399,7 +401,8 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+>  
+>  	vfio_config_free(vdev);
+>  
+> -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
+> +	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+> +		bar = i + PCI_STD_RESOURCES;
+>  		if (!vdev->barmap[bar])
+>  			continue;
+>  		pci_iounmap(pdev, vdev->barmap[bar]);
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index f0891bd8444c..90c0b80f8acf 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -450,30 +450,32 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
+>  {
+>  	struct pci_dev *pdev = vdev->pdev;
+>  	int i;
+> -	__le32 *bar;
+> +	__le32 *vbar;
+>  	u64 mask;
+>  
+> -	bar = (__le32 *)&vdev->vconfig[PCI_BASE_ADDRESS_0];
+> +	vbar = (__le32 *)&vdev->vconfig[PCI_BASE_ADDRESS_0];
+>  
+> -	for (i = PCI_STD_RESOURCES; i <= PCI_STD_RESOURCE_END; i++, bar++) {
+> -		if (!pci_resource_start(pdev, i)) {
+> -			*bar = 0; /* Unmapped by host = unimplemented to user */
+> +	for (i = 0; i < PCI_STD_NUM_BARS; i++, vbar++) {
+> +		int bar = i + PCI_STD_RESOURCES;
+> +
+> +		if (!pci_resource_start(pdev, bar)) {
+> +			*vbar = 0; /* Unmapped by host = unimplemented to user */
+>  			continue;
+>  		}
+>  
+> -		mask = ~(pci_resource_len(pdev, i) - 1);
+> +		mask = ~(pci_resource_len(pdev, bar) - 1);
+>  
+> -		*bar &= cpu_to_le32((u32)mask);
+> -		*bar |= vfio_generate_bar_flags(pdev, i);
+> +		*vbar &= cpu_to_le32((u32)mask);
+> +		*vbar |= vfio_generate_bar_flags(pdev, bar);
+>  
+> -		if (*bar & cpu_to_le32(PCI_BASE_ADDRESS_MEM_TYPE_64)) {
+> -			bar++;
+> -			*bar &= cpu_to_le32((u32)(mask >> 32));
+> +		if (*vbar & cpu_to_le32(PCI_BASE_ADDRESS_MEM_TYPE_64)) {
+> +			vbar++;
+> +			*vbar &= cpu_to_le32((u32)(mask >> 32));
+>  			i++;
+>  		}
+>  	}
+>  
+> -	bar = (__le32 *)&vdev->vconfig[PCI_ROM_ADDRESS];
+> +	vbar = (__le32 *)&vdev->vconfig[PCI_ROM_ADDRESS];
+>  
+>  	/*
+>  	 * NB. REGION_INFO will have reported zero size if we weren't able
+> @@ -483,14 +485,14 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
+>  	if (pci_resource_start(pdev, PCI_ROM_RESOURCE)) {
+>  		mask = ~(pci_resource_len(pdev, PCI_ROM_RESOURCE) - 1);
+>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+> -		*bar &= cpu_to_le32((u32)mask);
+> +		*vbar &= cpu_to_le32((u32)mask);
+>  	} else if (pdev->resource[PCI_ROM_RESOURCE].flags &
+>  					IORESOURCE_ROM_SHADOW) {
+>  		mask = ~(0x20000 - 1);
+>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+> -		*bar &= cpu_to_le32((u32)mask);
+> +		*vbar &= cpu_to_le32((u32)mask);
+>  	} else
+> -		*bar = 0;
+> +		*vbar = 0;
+>  
+>  	vdev->bardirty = false;
+>  }
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index ee6ee91718a4..8a2c7607d513 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -86,8 +86,8 @@ struct vfio_pci_reflck {
+>  
+>  struct vfio_pci_device {
+>  	struct pci_dev		*pdev;
+> -	void __iomem		*barmap[PCI_STD_RESOURCE_END + 1];
+> -	bool			bar_mmap_supported[PCI_STD_RESOURCE_END + 1];
+> +	void __iomem		*barmap[PCI_STD_NUM_BARS];
+> +	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
+>  	u8			*pci_config_map;
+>  	u8			*vconfig;
+>  	struct perm_bits	*msi_perm;
+> -- 
+> 2.21.0
+> 
