@@ -2,251 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CDE7B69C7
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A223DB69E2
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:52:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728546AbfIRRnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 13:43:10 -0400
-Received: from mga06.intel.com ([134.134.136.31]:27720 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727824AbfIRRnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 13:43:09 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Sep 2019 10:43:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,521,1559545200"; 
-   d="scan'208";a="189334744"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga003.jf.intel.com with ESMTP; 18 Sep 2019 10:43:08 -0700
-Date:   Wed, 18 Sep 2019 10:43:08 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Steve Rutherford <srutherford@google.com>,
-        Jacob Xu <jacobhxu@google.com>, Peter Shier <pshier@google.com>
-Subject: Re: [RFC][PATCH] kvm: x86: Improve emulation of CPUID leaves 0BH and
- 1FH
-Message-ID: <20190918174308.GC14850@linux.intel.com>
-References: <20190912232753.85969-1-jmattson@google.com>
+        id S1727109AbfIRRw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 13:52:29 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:44344 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725899AbfIRRw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 13:52:29 -0400
+Received: by mail-oi1-f195.google.com with SMTP id w6so311391oie.11;
+        Wed, 18 Sep 2019 10:52:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:date:message-id:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=mGxYN8fKLFN6z5avB+andfhVV4A+WX96NEccYZ4KSJ0=;
+        b=qyqlBWw1TSg7WCQxN8G2wS400TI3RlB/WNNQy/BASpbQH7dai4KuaUPYwfRbQJqr83
+         tymtB88GT+36Ujs21eCz4GigdJaiPddygAeTaQj1gzZJ+74zk4+UB0saoe9kz5DZz2M6
+         G0BSXzcf3Q2OPAQHUYbpfqWO4wu8YWfOR9EIHVjmO3q4XxLsPDkl0HprogQDrFPkYkfP
+         /lr+jzZfDtW7yiTnakt1uKvk8Ma3MPDNgQgzxsp30RXU8TY7OJjOFvZJ3qs41Q5uHrPA
+         0InuSyusYyAZKzh4u57bf27Dr8GqXXXVKWk3VzKLHtEQr4qbjklhAn9g1vtqdMpKtLI3
+         E6Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=mGxYN8fKLFN6z5avB+andfhVV4A+WX96NEccYZ4KSJ0=;
+        b=X+lisZ+OG3i2tElSwm0EwFSASDhirJjWGsg8XIeFIuNPdDHsQVhzmV14wfLURPiOyy
+         jz417QWhtyqttHmn30DY438fu8tt+wUrRXVYZgyMn2t8Dm2YO7AV2rjlpDDICiK16pu0
+         5jVn/wFIOOjech5rQVuTAL7Y4QZOHypvj8co96OUdEIq4ogsYl3Q0OHUkNSDFnbXfB1W
+         OYhJxgXxVZQFmYiMtKgmd+ys9tMI2e8ZHQ1UZ6bmwSXRCwl4pXNE9moDNoE1yH+5HTFb
+         UnwNmd7KKYoKuAfoWXfEgy0LEuR5vTSkED7uFdG4QFE43CgSJ2nhqMN8PYssTk90Own3
+         EfiQ==
+X-Gm-Message-State: APjAAAXdGq+k5dsXO8VQeTpFzVWHEdBwoAVMTXPopHkfRIq8NRY5mNUI
+        AKv9LZydGa15fOA7uZ2aCTw=
+X-Google-Smtp-Source: APXvYqx3VRfarQJCxejKo+vbLPE/nAA+u3uNVEGvbb5/nNYHkpfJs6nxS+UG8lCLMNOa7yifkgs3Cg==
+X-Received: by 2002:a54:4f8a:: with SMTP id g10mr3314526oiy.147.1568829148372;
+        Wed, 18 Sep 2019 10:52:28 -0700 (PDT)
+Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id r7sm1994572oih.41.2019.09.18.10.52.26
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 18 Sep 2019 10:52:27 -0700 (PDT)
+Subject: [PATCH v10 0/6] mm / virtio: Provide support for unused page
+ reporting
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+To:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
+        mst@redhat.com, david@redhat.com, dave.hansen@intel.com,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, vbabka@suse.cz,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        linux-arm-kernel@lists.infradead.org, osalvador@suse.de
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
+        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com
+Date:   Wed, 18 Sep 2019 10:52:25 -0700
+Message-ID: <20190918175109.23474.67039.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190912232753.85969-1-jmattson@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 12, 2019 at 04:27:53PM -0700, Jim Mattson wrote:
-> If these CPUID leaves are implemented, the EDX output is always the
-> x2APIC ID, regardless of the ECX input. Furthermore, the low byte of
-> the ECX output is always identical to the low byte of the ECX input.
-> 
-> KVM's CPUID emulation doesn't report the correct ECX and EDX outputs
-> when the ECX input is greater than the first subleaf for which the
-> "level type" is zero. This is probably only significant in the case of
-> the x2APIC ID, which should be the result of CPUID(EAX=0BH):EDX or
-> CPUID(EAX=1FH):EDX, without even setting a particular ECX input value.
+This series provides an asynchronous means of reporting to a hypervisor
+that a guest page is no longer in use and can have the data associated
+with it dropped. To do this I have implemented functionality that allows
+for what I am referring to as unused page reporting. The advantage of
+unused page reporting is that we can support a significant amount of
+memory over-commit with improved performance as we can avoid having to
+write/read memory from swap as the VM will instead actively participate
+in freeing unused memory so it doesn't have to be written.
 
-At a glance, shouldn't leaf 0x1f be marked significant in do_host_cpuid()?
+The functionality for this is fairly simple. When enabled it will allocate
+statistics to track the number of reported pages in a given free area.
+When the number of free pages exceeds this value plus a high water value,
+currently 32, it will begin performing page reporting which consists of
+pulling non-reported pages off of the free lists of a given zone and
+placing them into a scatterlist. The scatterlist is then given to the page
+reporting device and it will perform the required action to make the pages
+"reported", in the case of virtio-balloon this results in the pages being
+madvised as MADV_DONTNEED. After this they are placed back on their
+original free list. If they are not merged in freeing an additional bit is
+set indicating that they are a "reported" buddy page instead of a standard
+buddy page. The cycle then repeats with additional non-reported pages
+being pulled until the free areas all consist of reported pages.
 
-> Create a "wildcard" kvm_cpuid_entry2 for leaves 0BH and 1FH in
-> response to the KVM_GET_SUPPORTED_CPUID ioctl. This entry does not
-> have the KVM_CPUID_FLAG_SIGNIFCANT_INDEX flag, so it matches all
-> subleaves for which there isn't a prior explicit index match.
-> 
-> Add a new KVM_CPUID flag that is only applicable to leaves 0BH and
-> 1FH: KVM_CPUID_FLAG_CL_IS_PASSTHROUGH. When KVM's CPUID emulation
-> encounters this flag, it will fix up ECX[7:0] in the CPUID output. Add
-> this flag to the aforementioned "wildcard" kvm_cpuid_entry2.
-> 
-> Note that userspace is still responsible for setting EDX to the x2APIC
-> ID of the vCPU in each of these structures, *including* the wildcard.
-> 
-> Qemu doesn't pass the flags from KVM_GET_SUPPORTED_CPUID to
-> KVM_SET_CPUID2, so it will have to be modified to take advantage of
-> these changes. Note that passing the new flag to older kernels will
-> have no effect.
-> 
-> Unfortunately, the new flag bit was not previously reserved, so it is
-> possible that a userspace agent that already sets this bit will be
-> unhappy with the new behavior. Technically, I suppose, this should be
-> implemented as a new set of ioctls. Posting as an RFC to get comments
-> on the API breakage.
-> 
-> Fixes: 0771671749b59a ("KVM: Enhance guest cpuid management")
-> Fixes: a87f2d3a6eadab ("KVM: x86: Add Intel CPUID.1F cpuid emulation support")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Steve Rutherford <srutherford@google.com>
-> Reviewed-by: Jacob Xu <jacobhxu@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Change-Id: I6b422427f78b530106af3f929518363895367e25
-> ---
->  Documentation/virt/kvm/api.txt  |  6 +++++
->  arch/x86/include/uapi/asm/kvm.h |  1 +
->  arch/x86/kvm/cpuid.c            | 39 +++++++++++++++++++++++++++------
->  3 files changed, 39 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index 2d067767b6170..be5cc42ad35f4 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -1396,6 +1396,7 @@ struct kvm_cpuid2 {
->  #define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		BIT(0)
->  #define KVM_CPUID_FLAG_STATEFUL_FUNC		BIT(1)
->  #define KVM_CPUID_FLAG_STATE_READ_NEXT		BIT(2)
-> +#define KVM_CPUID_FLAG_CL_IS_PASSTHROUGH	BIT(3)
->  
->  struct kvm_cpuid_entry2 {
->  	__u32 function;
-> @@ -1447,6 +1448,8 @@ emulate them efficiently. The fields in each entry are defined as follows:
->          KVM_CPUID_FLAG_STATE_READ_NEXT:
->             for KVM_CPUID_FLAG_STATEFUL_FUNC entries, set if this entry is
->             the first entry to be read by a cpu
-> +	KVM_CPUID_FLAG_CL_IS_PASSTHROUGH:
-> +	   If the output value of ECX[7:0] matches the input value of ECX[7:0]
->     eax, ebx, ecx, edx: the values returned by the cpuid instruction for
->           this function/index combination
->  
-> @@ -2992,6 +2995,7 @@ The member 'flags' is used for passing flags from userspace.
->  #define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		BIT(0)
->  #define KVM_CPUID_FLAG_STATEFUL_FUNC		BIT(1)
->  #define KVM_CPUID_FLAG_STATE_READ_NEXT		BIT(2)
-> +#define KVM_CPUID_FLAG_CL_IS_PASSTHROUGH	BIT(3)
->  
->  struct kvm_cpuid_entry2 {
->  	__u32 function;
-> @@ -3040,6 +3044,8 @@ The fields in each entry are defined as follows:
->          KVM_CPUID_FLAG_STATE_READ_NEXT:
->             for KVM_CPUID_FLAG_STATEFUL_FUNC entries, set if this entry is
->             the first entry to be read by a cpu
-> +	KVM_CPUID_FLAG_CL_IS_PASSTHROUGH:
-> +	   If the output value of ECX[7:0] matches the input value of ECX[7:0]
->     eax, ebx, ecx, edx: the values returned by the cpuid instruction for
->           this function/index combination
->  
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 503d3f42da167..3b67d21123946 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -223,6 +223,7 @@ struct kvm_cpuid_entry2 {
->  #define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		(1 << 0)
->  #define KVM_CPUID_FLAG_STATEFUL_FUNC		(1 << 1)
->  #define KVM_CPUID_FLAG_STATE_READ_NEXT		(1 << 2)
-> +#define KVM_CPUID_FLAG_CL_IS_PASSTHROUGH	(1 << 3)
->  
->  /* for KVM_SET_CPUID2 */
->  struct kvm_cpuid2 {
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index e7d25f4364664..280a796159cb2 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -612,19 +612,41 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
->  	 */
->  	case 0x1f:
->  	case 0xb: {
-> -		int i, level_type;
-> +		int i;
->  
-> -		/* read more entries until level_type is zero */
-> -		for (i = 1; ; ++i) {
-> +		/*
-> +		 * We filled in entry[0] for CPUID(EAX=<function>,
-> +		 * ECX=00H) above.  If its level type (ECX[15:8]) is
-> +		 * zero, then the leaf is unimplemented, and we're
-> +		 * done.  Otherwise, continue to populate entries
-> +		 * until the level type (ECX[15:8]) of the previously
-> +		 * added entry is zero.
-> +		 */
-> +		for (i = 1; entry[i - 1].ecx & 0xff00; ++i) {
->  			if (*nent >= maxnent)
->  				goto out;
->  
-> -			level_type = entry[i - 1].ecx & 0xff00;
-> -			if (!level_type)
-> -				break;
->  			do_host_cpuid(&entry[i], function, i);
->  			++*nent;
->  		}
+In order to try and keep the time needed to find a non-reported page to
+a minimum we maintain a "reported_boundary" pointer. This pointer is used
+by the get_unreported_pages iterator to determine at what point it should
+resume searching for non-reported pages. In order to guarantee pages do
+not get past the scan I have modified add_to_free_list_tail so that it
+will not insert pages behind the reported_boundary.
 
-This should be a standalone bugfix/enhancement path.  Bugfix because it
-eliminates a false positive on *nent >= maxnent.
+If another process needs to perform a massive manipulation of the free
+list, such as compaction, it can either reset a given individual boundary
+which will push the boundary back to the list_head, or it can clear the
+bit indicating the zone is actively processing which will result in the
+reporting process resetting all of the boundaries for a given zone.
 
-> +
-> +		if (i > 1) {
-> +			/*
-> +			 * If this leaf has multiple entries, treat
-> +			 * the final entry as a "wildcard." Clear the
-> +			 * "significant index" flag so that the index
-> +			 * will be ignored when we later look for an
-> +			 * entry that matches a CPUID
-> +			 * invocation. Since this entry will now match
-> +			 * CPUID(EAX=<function>, ECX=<index>) for any
-> +			 * <index> >= (i - 1), set the "CL
-> +			 * passthrough" flag to ensure that ECX[7:0]
-> +			 * will be set to (<index> & 0xff), per the SDM.
-> +			 */
-> +			entry[i - 1].flags &= ~KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+I am leaving a number of things hard-coded such as limiting the lowest
+order processed to pageblock_order, and have left it up to the guest to
+determine what the limit is on how many pages it wants to allocate to
+process the hints. The upper limit for this is based on the size of the
+queue used to store the scatterlist.
 
-If I'm reading the code correctly, this is fragile and subtle.  The order
-of cpuid entries is controlled by userspace, which means that clearing
-KVM_CPUID_FLAG_SIGNIFCANT_INDEX depends on this entry being kept after all
-other entries for this function.  In practice I'm guessing userspaces
-naturally sort entries with the same function by ascending index, but it
-seems like avoidable issue.
+I wanted to avoid gaming the performance testing for this. As far as
+possible gain a significant performance improvement should be visible in
+cases where guests are forced to write/read from swap. As such, testing
+it would be more of a benchmark of copying a page from swap versus just
+allocating a zero page. I have been verifying that the memory is being
+freed using memhog to allocate all the memory on the guest, and then
+watching /proc/meminfo to verify the host sees the memory returned after
+the test completes.
 
-Also, won't matching the last entry generate the wrong values for EAX, EBX
-and ECX, i.e. the valid values for the last index instead of zeroes?
+As far as possible regressions I have focused on cases where performing
+the hinting would be non-optimal, such as cases where the code isn't
+needed as memory is not over-committed, or the functionality is not in
+use. I have been using the will-it-scale/page_fault1 test running with 16
+vcpus and have modified it to use Transparent Huge Pages. With this I see
+almost no difference with the patches applied and the feature disabled.
+Likewise I see almost no difference with the feature enabled, but the
+madvise disabled in the hypervisor due to a device being assigned. With
+the feature fully enabled in both guest and hypervisor I see a regression
+between -1.86% and -8.84% versus the baseline. I found that most of the
+overhead was due to the page faulting/zeroing that comes as a result of
+the pages having been evicted from the guest.
 
-> +			entry[i - 1].flags |= KVM_CPUID_FLAG_CL_IS_PASSTHROUGH;
+For info on earlier versions you will need to follow the links provided
+with the respective versions.
 
-Lastly, do we actually need to enumerate this silliness to userspace?
-What if we handle this as a one-off case in CPUID emulation and avoid the
-ABI breakage that way?  E.g.:
+Changes from v9:
+https://lore.kernel.org/lkml/20190907172225.10910.34302.stgit@localhost.localdomain/
+Updated cover page
+Dropped per-cpu page randomization entropy patch
+Added "to_tail" boolean value to __free_one_page to improve readability
+Renamed __shuffle_pick_tail to shuffle_pick_tail, avoiding extra inline function
+Dropped arm64 HUGLE_TLB_ORDER movement patch since it is no longer needed
+Significant rewrite of page reporting functionality
+  Updated logic to support interruptions from compaction
+  get_unreported_page will now walk through reported sections
+  Moved free_list manipulators out of mmzone.h and into page_alloc.c
+  Removed page_reporting.h include from mmzone.h
+  Split page_reporting.h between include/linux/ and mm/
+  Added #include <asm/pgtable.h>" to mm/page_reporting.h
+  Renamed page_reporting_startup/shutdown to page_reporting_register/unregister
+Updated comments related to virtio page poison tracking feature
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index dd5985eb61b4..aaf5cdcb88c9 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1001,6 +1001,16 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
-        }
+---
 
- out:
-+       if (!best && (function == 0xb || function == 0x1f)) {
-+               best = check_cpuid_limit(vcpu, function, 0);
-+               if (best) {
-+                       *eax = 0;
-+                       *ebx = 0;
-+                       *ecx &= 0xff;
-+                       *edx = *best->edx;
-+               }
-+       }
-+
-        if (best) {
-                *eax = best->eax;
-                *ebx = best->ebx;
+Alexander Duyck (6):
+      mm: Adjust shuffle code to allow for future coalescing
+      mm: Use zone and order instead of free area in free_list manipulators
+      mm: Introduce Reported pages
+      mm: Add device side and notifier for unused page reporting
+      virtio-balloon: Pull page poisoning config out of free page hinting
+      virtio-balloon: Add support for providing unused page reports to host
 
-> +		}
-> +
->  		break;
->  	}
->  	case 0xd: {
-> @@ -1001,8 +1023,11 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->  		*ebx = best->ebx;
->  		*ecx = best->ecx;
->  		*edx = best->edx;
-> -	} else
-> +		if (best->flags & KVM_CPUID_FLAG_CL_IS_PASSTHROUGH)
-> +			*ecx = (*ecx & ~0xff) | (index & 0xff);
-> +	} else {
->  		*eax = *ebx = *ecx = *edx = 0;
-> +	}
->  	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, entry_found);
->  	return entry_found;
->  }
-> -- 
-> 2.23.0.237.gc6a4ce50a0-goog
-> 
+
+ drivers/virtio/Kconfig              |    1 
+ drivers/virtio/virtio_balloon.c     |   87 ++++++++-
+ include/linux/mmzone.h              |   60 ++----
+ include/linux/page-flags.h          |   11 +
+ include/linux/page_reporting.h      |   31 +++
+ include/uapi/linux/virtio_balloon.h |    1 
+ mm/Kconfig                          |   11 +
+ mm/Makefile                         |    1 
+ mm/compaction.c                     |    5 +
+ mm/memory_hotplug.c                 |    2 
+ mm/page_alloc.c                     |  194 +++++++++++++++----
+ mm/page_reporting.c                 |  350 +++++++++++++++++++++++++++++++++++
+ mm/page_reporting.h                 |  224 ++++++++++++++++++++++
+ mm/shuffle.c                        |   12 +
+ mm/shuffle.h                        |    6 +
+ 15 files changed, 893 insertions(+), 103 deletions(-)
+ create mode 100644 include/linux/page_reporting.h
+ create mode 100644 mm/page_reporting.c
+ create mode 100644 mm/page_reporting.h
+
+--
