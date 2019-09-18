@@ -2,101 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D5A7B672C
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 17:33:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB86BB689D
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:04:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730338AbfIRPdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 11:33:13 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:46604 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726983AbfIRPdM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 11:33:12 -0400
-Received: by mail-io1-f67.google.com with SMTP id d17so64760ios.13
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2019 08:33:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YyyqoKMzvgrtzqzYekctgZmNgeV8r3al5EpVVZgew9k=;
-        b=Rtva8T5Vbj9vctbozM/vV+Q6OSlA3kebewTu74PRTJDZyOvCDurQ7d/ZvAhAkl9Jkr
-         LcfuokOIioWAE80+2jdHdFNm6rlIbMOdVRH51cs2DO/b1q68/eIcy20mlb7L75MBUDsk
-         nJvQMOzZysoG31ijHCaOaojrrrRBfV8KkEKXmnPw6eAQTBy1CseExEbdW/uOOy/E4z/4
-         odVf4qMg4bI+ufliefHYzXO3JPLpAG4tLw2ZtbfhKB+vWzvrwfPBboi1D6BmuLFH9SNL
-         WiYPzLHGUu8bOPF+cWCILZjAQYlahuINA/Q2Opddh9W9mCnMXIuDolRy/8hMaFa8LDkj
-         idJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YyyqoKMzvgrtzqzYekctgZmNgeV8r3al5EpVVZgew9k=;
-        b=FLazWm9ohpiXW/JmWD1qwnon9IN5LQPjgO7qvLo9JbILEMQWbgYxTIYipmUUcJCik0
-         eKfJDHpjifwBfHSZYMKpJkq5Ya77bEKhZ90aQgwYeAmde0p/ReV6LugnWpoVuywF19H8
-         KC3Rqj1zFx/u2PnpvVXxOvG+gihpX4r90Ouh7+aF3wnHVqv1Vr+68VRde08L2a8pw3BH
-         xO+s2UJFgTFrQQGttz9RThp9KJUqkRXcUpKE2I1qQDumQdyWTTk0a4i6BaqDtQ6HrHWq
-         /tsb1K0Q4TojZ5xzXwjasj0jKdC0GuiJ+uBzFZpOcNxd6DLvcUMUR41v5S2cGA53tEi5
-         WA6A==
-X-Gm-Message-State: APjAAAUo9weD1+CInWaz4exjQO5AKOBlSuNnk5G4YZcMoOoTrYtUy7VA
-        5AkGP5KmzUVzmPpHAd/Ww5ttbs84jhL1nNjOVlFtJi8eamk=
-X-Google-Smtp-Source: APXvYqzj+efXJ5b9/Ie/wWzM5LpwVVP8q27A0mM2FUYwbsHX44PPooRyTAqsxZH6a472RT2ufpD6zAi6AB1dIZeqY4o=
-X-Received: by 2002:a6b:9085:: with SMTP id s127mr458570iod.26.1568820790093;
- Wed, 18 Sep 2019 08:33:10 -0700 (PDT)
+        id S1731207AbfIRREo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 13:04:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9306 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726559AbfIRREo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Sep 2019 13:04:44 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8IH1rpZ109467
+        for <kvm@vger.kernel.org>; Wed, 18 Sep 2019 13:04:43 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v3qmgjfg0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 18 Sep 2019 13:04:43 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Wed, 18 Sep 2019 18:04:41 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 18 Sep 2019 18:04:37 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8IH4YnM45351162
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Sep 2019 17:04:35 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D129FAE04D;
+        Wed, 18 Sep 2019 17:04:34 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 67571AE055;
+        Wed, 18 Sep 2019 17:04:34 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.108])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 18 Sep 2019 17:04:34 +0000 (GMT)
+Date:   Wed, 18 Sep 2019 19:04:33 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com, pmorel@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com
+Subject: Re: [PATCH v6 04/10] s390: vfio-ap: filter CRYCB bits for
+ unavailable queue devices
+In-Reply-To: <1568410018-10833-5-git-send-email-akrowiak@linux.ibm.com>
+References: <1568410018-10833-1-git-send-email-akrowiak@linux.ibm.com>
+        <1568410018-10833-5-git-send-email-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20190912232753.85969-1-jmattson@google.com>
-In-Reply-To: <20190912232753.85969-1-jmattson@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 18 Sep 2019 08:32:58 -0700
-Message-ID: <CALMp9eRz02uUbWdF_tfyoj0y1bfgeg3swsHW1wqxkSJQk-PrfQ@mail.gmail.com>
-Subject: Re: [RFC][PATCH] kvm: x86: Improve emulation of CPUID leaves 0BH and 1FH
-To:     kvm list <kvm@vger.kernel.org>
-Cc:     Steve Rutherford <srutherford@google.com>,
-        Jacob Xu <jacobhxu@google.com>, Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19091817-4275-0000-0000-000003681F0E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19091817-4276-0000-0000-0000387A8892
+Message-Id: <20190918190433.713f4a93.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-18_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=891 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909180158
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 12, 2019 at 4:28 PM Jim Mattson <jmattson@google.com> wrote:
->
-> If these CPUID leaves are implemented, the EDX output is always the
-> x2APIC ID, regardless of the ECX input. Furthermore, the low byte of
-> the ECX output is always identical to the low byte of the ECX input.
->
-> KVM's CPUID emulation doesn't report the correct ECX and EDX outputs
-> when the ECX input is greater than the first subleaf for which the
-> "level type" is zero. This is probably only significant in the case of
-> the x2APIC ID, which should be the result of CPUID(EAX=0BH):EDX or
-> CPUID(EAX=1FH):EDX, without even setting a particular ECX input value.
->
-> Create a "wildcard" kvm_cpuid_entry2 for leaves 0BH and 1FH in
-> response to the KVM_GET_SUPPORTED_CPUID ioctl. This entry does not
-> have the KVM_CPUID_FLAG_SIGNIFCANT_INDEX flag, so it matches all
-> subleaves for which there isn't a prior explicit index match.
->
-> Add a new KVM_CPUID flag that is only applicable to leaves 0BH and
-> 1FH: KVM_CPUID_FLAG_CL_IS_PASSTHROUGH. When KVM's CPUID emulation
-> encounters this flag, it will fix up ECX[7:0] in the CPUID output. Add
-> this flag to the aforementioned "wildcard" kvm_cpuid_entry2.
->
-> Note that userspace is still responsible for setting EDX to the x2APIC
-> ID of the vCPU in each of these structures, *including* the wildcard.
->
-> Qemu doesn't pass the flags from KVM_GET_SUPPORTED_CPUID to
-> KVM_SET_CPUID2, so it will have to be modified to take advantage of
-> these changes. Note that passing the new flag to older kernels will
-> have no effect.
->
-> Unfortunately, the new flag bit was not previously reserved, so it is
-> possible that a userspace agent that already sets this bit will be
-> unhappy with the new behavior. Technically, I suppose, this should be
-> implemented as a new set of ioctls. Posting as an RFC to get comments
-> on the API breakage.
->
-> Fixes: 0771671749b59a ("KVM: Enhance guest cpuid management")
-> Fixes: a87f2d3a6eadab ("KVM: x86: Add Intel CPUID.1F cpuid emulation support")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Steve Rutherford <srutherford@google.com>
-> Reviewed-by: Jacob Xu <jacobhxu@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
+On Fri, 13 Sep 2019 17:26:52 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-No comments on the API breakage? Shall I resubmit as an actual patch?
+> +static void vfio_ap_mdev_get_crycb_matrix(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	unsigned long apid, apqi;
+> +	unsigned long masksz = BITS_TO_LONGS(AP_DEVICES) *
+> +			       sizeof(unsigned long);
+> +
+> +	memset(matrix_mdev->crycb.apm, 0, masksz);
+> +	memset(matrix_mdev->crycb.apm, 0, masksz);
+
+I guess you wanted to zero out aqm here (and not apm again)!
+
+> +	memcpy(matrix_mdev->crycb.adm, matrix_mdev->matrix.adm, masksz);
+
