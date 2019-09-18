@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A223DB69E2
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:52:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38AC1B69E5
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:52:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727109AbfIRRw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 13:52:29 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:44344 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725899AbfIRRw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 13:52:29 -0400
-Received: by mail-oi1-f195.google.com with SMTP id w6so311391oie.11;
-        Wed, 18 Sep 2019 10:52:28 -0700 (PDT)
+        id S1729506AbfIRRwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 13:52:39 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:42808 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726369AbfIRRwj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 13:52:39 -0400
+Received: by mail-ot1-f67.google.com with SMTP id c10so618266otd.9;
+        Wed, 18 Sep 2019 10:52:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:from:to:cc:date:message-id:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=mGxYN8fKLFN6z5avB+andfhVV4A+WX96NEccYZ4KSJ0=;
-        b=qyqlBWw1TSg7WCQxN8G2wS400TI3RlB/WNNQy/BASpbQH7dai4KuaUPYwfRbQJqr83
-         tymtB88GT+36Ujs21eCz4GigdJaiPddygAeTaQj1gzZJ+74zk4+UB0saoe9kz5DZz2M6
-         G0BSXzcf3Q2OPAQHUYbpfqWO4wu8YWfOR9EIHVjmO3q4XxLsPDkl0HprogQDrFPkYkfP
-         /lr+jzZfDtW7yiTnakt1uKvk8Ma3MPDNgQgzxsp30RXU8TY7OJjOFvZJ3qs41Q5uHrPA
-         0InuSyusYyAZKzh4u57bf27Dr8GqXXXVKWk3VzKLHtEQr4qbjklhAn9g1vtqdMpKtLI3
-         E6Gw==
+        h=subject:from:to:cc:date:message-id:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=JWWH0nLE5gW80rwb17oSZfM6VHlugSoNSjEeC143ARI=;
+        b=kY3Nlxw4jpobVoe1JNyEjEGVhrVb4uyehLGgS2nDS2Limxn/shG8A6UvTSmRmamYf2
+         vpwJWEl0pAb1fTuvIm0LsMimt1aZGBGW7khdC8YTa6mZMWQBgNcgOjhkth8enlqk8txQ
+         Ae58XB9KDodcprJ1+qW2Vd2g3Hj7eg/CzfS+9/r+j6C/7zwelWxgfjiiVIBKflrizYNg
+         dLiTBEYyiQYtg7ouCjOE7MeRbNcfZPYmM4OpCYleG6Pv7X2Laj/RmtQzO8GQPnw7QWfJ
+         sfV41kc38Vx9O9JU4Osh/nqinznN8zZcm/K3WaI5q2HT2bNdBne56siHa6p/8uFHnYXR
+         XmZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
-         :mime-version:content-transfer-encoding;
-        bh=mGxYN8fKLFN6z5avB+andfhVV4A+WX96NEccYZ4KSJ0=;
-        b=X+lisZ+OG3i2tElSwm0EwFSASDhirJjWGsg8XIeFIuNPdDHsQVhzmV14wfLURPiOyy
-         jz417QWhtyqttHmn30DY438fu8tt+wUrRXVYZgyMn2t8Dm2YO7AV2rjlpDDICiK16pu0
-         5jVn/wFIOOjech5rQVuTAL7Y4QZOHypvj8co96OUdEIq4ogsYl3Q0OHUkNSDFnbXfB1W
-         OYhJxgXxVZQFmYiMtKgmd+ys9tMI2e8ZHQ1UZ6bmwSXRCwl4pXNE9moDNoE1yH+5HTFb
-         UnwNmd7KKYoKuAfoWXfEgy0LEuR5vTSkED7uFdG4QFE43CgSJ2nhqMN8PYssTk90Own3
-         EfiQ==
-X-Gm-Message-State: APjAAAXdGq+k5dsXO8VQeTpFzVWHEdBwoAVMTXPopHkfRIq8NRY5mNUI
-        AKv9LZydGa15fOA7uZ2aCTw=
-X-Google-Smtp-Source: APXvYqx3VRfarQJCxejKo+vbLPE/nAA+u3uNVEGvbb5/nNYHkpfJs6nxS+UG8lCLMNOa7yifkgs3Cg==
-X-Received: by 2002:a54:4f8a:: with SMTP id g10mr3314526oiy.147.1568829148372;
-        Wed, 18 Sep 2019 10:52:28 -0700 (PDT)
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=JWWH0nLE5gW80rwb17oSZfM6VHlugSoNSjEeC143ARI=;
+        b=ELuNAsZadH8QpBpZV2Y06ySgTkYqbPFmnK9Vd4Zx86YF78hscDQvb4MSpopsh82krx
+         YtUy0h5YyJdu6RjmgqHfizLnQOEsLJjRFejh1VeQL+OPL7YnxEi9g4UrmS8mxhyESAP7
+         vozlwnKwaURRvsqmH6zb4k7oRPgkk+rLynEJ0Lpv9IzNpDdhe9iXACiZAGlZUJlW16fD
+         /qi3ggOU2Cnjl0yJcb4ueJ4iaNCwXj0Pz+5lSby8z7oevPYm9z3Yf6Zk9oOH+qluEgZi
+         rKkqwHCZ35LbJfHMEyR5N2CssO2hCHukKoQZtN8g1prbnBbZuwxwHaE6YxcgUuwwieKO
+         U2WQ==
+X-Gm-Message-State: APjAAAWIoE4jFeXgAAl9UJi+/GJYMa4qpnKOc7EAF4zjqcHjylJrtdNe
+        sEbqsVUE8AYpIstxwe0j0Qc=
+X-Google-Smtp-Source: APXvYqyH5jZB85XcGwqiW8u/CLFVrXYTftFKTWVpkVfA0lyvGzPyLpjSrqJtEvx3oszxU7OaB0xUKw==
+X-Received: by 2002:a05:6830:214d:: with SMTP id r13mr3623505otd.121.1568829156454;
+        Wed, 18 Sep 2019 10:52:36 -0700 (PDT)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id r7sm1994572oih.41.2019.09.18.10.52.26
+        by smtp.gmail.com with ESMTPSA id e5sm1998110otr.81.2019.09.18.10.52.34
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Sep 2019 10:52:27 -0700 (PDT)
-Subject: [PATCH v10 0/6] mm / virtio: Provide support for unused page
- reporting
+        Wed, 18 Sep 2019 10:52:35 -0700 (PDT)
+Subject: [PATCH v10 1/6] mm: Adjust shuffle code to allow for future
+ coalescing
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
         mst@redhat.com, david@redhat.com, dave.hansen@intel.com,
@@ -58,8 +58,10 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
         lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
         pbonzini@redhat.com, dan.j.williams@intel.com,
         alexander.h.duyck@linux.intel.com
-Date:   Wed, 18 Sep 2019 10:52:25 -0700
-Message-ID: <20190918175109.23474.67039.stgit@localhost.localdomain>
+Date:   Wed, 18 Sep 2019 10:52:33 -0700
+Message-ID: <20190918175233.23474.93686.stgit@localhost.localdomain>
+In-Reply-To: <20190918175109.23474.67039.stgit@localhost.localdomain>
+References: <20190918175109.23474.67039.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -69,119 +71,202 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series provides an asynchronous means of reporting to a hypervisor
-that a guest page is no longer in use and can have the data associated
-with it dropped. To do this I have implemented functionality that allows
-for what I am referring to as unused page reporting. The advantage of
-unused page reporting is that we can support a significant amount of
-memory over-commit with improved performance as we can avoid having to
-write/read memory from swap as the VM will instead actively participate
-in freeing unused memory so it doesn't have to be written.
+From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-The functionality for this is fairly simple. When enabled it will allocate
-statistics to track the number of reported pages in a given free area.
-When the number of free pages exceeds this value plus a high water value,
-currently 32, it will begin performing page reporting which consists of
-pulling non-reported pages off of the free lists of a given zone and
-placing them into a scatterlist. The scatterlist is then given to the page
-reporting device and it will perform the required action to make the pages
-"reported", in the case of virtio-balloon this results in the pages being
-madvised as MADV_DONTNEED. After this they are placed back on their
-original free list. If they are not merged in freeing an additional bit is
-set indicating that they are a "reported" buddy page instead of a standard
-buddy page. The cycle then repeats with additional non-reported pages
-being pulled until the free areas all consist of reported pages.
+Move the head/tail adding logic out of the shuffle code and into the
+__free_one_page function since ultimately that is where it is really
+needed anyway. By doing this we should be able to reduce the overhead
+and can consolidate all of the list addition bits in one spot.
 
-In order to try and keep the time needed to find a non-reported page to
-a minimum we maintain a "reported_boundary" pointer. This pointer is used
-by the get_unreported_pages iterator to determine at what point it should
-resume searching for non-reported pages. In order to guarantee pages do
-not get past the scan I have modified add_to_free_list_tail so that it
-will not insert pages behind the reported_boundary.
-
-If another process needs to perform a massive manipulation of the free
-list, such as compaction, it can either reset a given individual boundary
-which will push the boundary back to the list_head, or it can clear the
-bit indicating the zone is actively processing which will result in the
-reporting process resetting all of the boundaries for a given zone.
-
-I am leaving a number of things hard-coded such as limiting the lowest
-order processed to pageblock_order, and have left it up to the guest to
-determine what the limit is on how many pages it wants to allocate to
-process the hints. The upper limit for this is based on the size of the
-queue used to store the scatterlist.
-
-I wanted to avoid gaming the performance testing for this. As far as
-possible gain a significant performance improvement should be visible in
-cases where guests are forced to write/read from swap. As such, testing
-it would be more of a benchmark of copying a page from swap versus just
-allocating a zero page. I have been verifying that the memory is being
-freed using memhog to allocate all the memory on the guest, and then
-watching /proc/meminfo to verify the host sees the memory returned after
-the test completes.
-
-As far as possible regressions I have focused on cases where performing
-the hinting would be non-optimal, such as cases where the code isn't
-needed as memory is not over-committed, or the functionality is not in
-use. I have been using the will-it-scale/page_fault1 test running with 16
-vcpus and have modified it to use Transparent Huge Pages. With this I see
-almost no difference with the patches applied and the feature disabled.
-Likewise I see almost no difference with the feature enabled, but the
-madvise disabled in the hypervisor due to a device being assigned. With
-the feature fully enabled in both guest and hypervisor I see a regression
-between -1.86% and -8.84% versus the baseline. I found that most of the
-overhead was due to the page faulting/zeroing that comes as a result of
-the pages having been evicted from the guest.
-
-For info on earlier versions you will need to follow the links provided
-with the respective versions.
-
-Changes from v9:
-https://lore.kernel.org/lkml/20190907172225.10910.34302.stgit@localhost.localdomain/
-Updated cover page
-Dropped per-cpu page randomization entropy patch
-Added "to_tail" boolean value to __free_one_page to improve readability
-Renamed __shuffle_pick_tail to shuffle_pick_tail, avoiding extra inline function
-Dropped arm64 HUGLE_TLB_ORDER movement patch since it is no longer needed
-Significant rewrite of page reporting functionality
-  Updated logic to support interruptions from compaction
-  get_unreported_page will now walk through reported sections
-  Moved free_list manipulators out of mmzone.h and into page_alloc.c
-  Removed page_reporting.h include from mmzone.h
-  Split page_reporting.h between include/linux/ and mm/
-  Added #include <asm/pgtable.h>" to mm/page_reporting.h
-  Renamed page_reporting_startup/shutdown to page_reporting_register/unregister
-Updated comments related to virtio page poison tracking feature
-
+Acked-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
+ include/linux/mmzone.h |   12 --------
+ mm/page_alloc.c        |   71 ++++++++++++++++++++++++++++--------------------
+ mm/shuffle.c           |   12 ++++----
+ mm/shuffle.h           |    6 ++++
+ 4 files changed, 54 insertions(+), 47 deletions(-)
 
-Alexander Duyck (6):
-      mm: Adjust shuffle code to allow for future coalescing
-      mm: Use zone and order instead of free area in free_list manipulators
-      mm: Introduce Reported pages
-      mm: Add device side and notifier for unused page reporting
-      virtio-balloon: Pull page poisoning config out of free page hinting
-      virtio-balloon: Add support for providing unused page reports to host
+diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+index bda20282746b..125f300981c6 100644
+--- a/include/linux/mmzone.h
++++ b/include/linux/mmzone.h
+@@ -116,18 +116,6 @@ static inline void add_to_free_area_tail(struct page *page, struct free_area *ar
+ 	area->nr_free++;
+ }
+ 
+-#ifdef CONFIG_SHUFFLE_PAGE_ALLOCATOR
+-/* Used to preserve page allocation order entropy */
+-void add_to_free_area_random(struct page *page, struct free_area *area,
+-		int migratetype);
+-#else
+-static inline void add_to_free_area_random(struct page *page,
+-		struct free_area *area, int migratetype)
+-{
+-	add_to_free_area(page, area, migratetype);
+-}
+-#endif
+-
+ /* Used for pages which are on another list */
+ static inline void move_to_free_area(struct page *page, struct free_area *area,
+ 			     int migratetype)
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index 3334a769eb91..268a25830114 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -878,6 +878,36 @@ static inline struct capture_control *task_capc(struct zone *zone)
+ #endif /* CONFIG_COMPACTION */
+ 
+ /*
++ * If this is not the largest possible page, check if the buddy
++ * of the next-highest order is free. If it is, it's possible
++ * that pages are being freed that will coalesce soon. In case,
++ * that is happening, add the free page to the tail of the list
++ * so it's less likely to be used soon and more likely to be merged
++ * as a higher order page
++ */
++static inline bool
++buddy_merge_likely(unsigned long pfn, unsigned long buddy_pfn,
++		   struct page *page, unsigned int order)
++{
++	struct page *higher_page, *higher_buddy;
++	unsigned long combined_pfn;
++
++	if (order >= MAX_ORDER - 2)
++		return false;
++
++	if (!pfn_valid_within(buddy_pfn))
++		return false;
++
++	combined_pfn = buddy_pfn & pfn;
++	higher_page = page + (combined_pfn - pfn);
++	buddy_pfn = __find_buddy_pfn(combined_pfn, order + 1);
++	higher_buddy = higher_page + (buddy_pfn - combined_pfn);
++
++	return pfn_valid_within(buddy_pfn) &&
++	       page_is_buddy(higher_page, higher_buddy, order + 1);
++}
++
++/*
+  * Freeing function for a buddy system allocator.
+  *
+  * The concept of a buddy system is to maintain direct-mapped table
+@@ -906,11 +936,13 @@ static inline void __free_one_page(struct page *page,
+ 		struct zone *zone, unsigned int order,
+ 		int migratetype)
+ {
+-	unsigned long combined_pfn;
++	struct capture_control *capc = task_capc(zone);
+ 	unsigned long uninitialized_var(buddy_pfn);
+-	struct page *buddy;
++	unsigned long combined_pfn;
++	struct free_area *area;
+ 	unsigned int max_order;
+-	struct capture_control *capc = task_capc(zone);
++	struct page *buddy;
++	bool to_tail;
+ 
+ 	max_order = min_t(unsigned int, MAX_ORDER, pageblock_order + 1);
+ 
+@@ -979,35 +1011,16 @@ static inline void __free_one_page(struct page *page,
+ done_merging:
+ 	set_page_order(page, order);
+ 
+-	/*
+-	 * If this is not the largest possible page, check if the buddy
+-	 * of the next-highest order is free. If it is, it's possible
+-	 * that pages are being freed that will coalesce soon. In case,
+-	 * that is happening, add the free page to the tail of the list
+-	 * so it's less likely to be used soon and more likely to be merged
+-	 * as a higher order page
+-	 */
+-	if ((order < MAX_ORDER-2) && pfn_valid_within(buddy_pfn)
+-			&& !is_shuffle_order(order)) {
+-		struct page *higher_page, *higher_buddy;
+-		combined_pfn = buddy_pfn & pfn;
+-		higher_page = page + (combined_pfn - pfn);
+-		buddy_pfn = __find_buddy_pfn(combined_pfn, order + 1);
+-		higher_buddy = higher_page + (buddy_pfn - combined_pfn);
+-		if (pfn_valid_within(buddy_pfn) &&
+-		    page_is_buddy(higher_page, higher_buddy, order + 1)) {
+-			add_to_free_area_tail(page, &zone->free_area[order],
+-					      migratetype);
+-			return;
+-		}
+-	}
+-
++	area = &zone->free_area[order];
+ 	if (is_shuffle_order(order))
+-		add_to_free_area_random(page, &zone->free_area[order],
+-				migratetype);
++		to_tail = shuffle_pick_tail();
+ 	else
+-		add_to_free_area(page, &zone->free_area[order], migratetype);
++		to_tail = buddy_merge_likely(pfn, buddy_pfn, page, order);
+ 
++	if (to_tail)
++		add_to_free_area_tail(page, area, migratetype);
++	else
++		add_to_free_area(page, area, migratetype);
+ }
+ 
+ /*
+diff --git a/mm/shuffle.c b/mm/shuffle.c
+index 3ce12481b1dc..923af4fe887e 100644
+--- a/mm/shuffle.c
++++ b/mm/shuffle.c
+@@ -183,11 +183,11 @@ void __meminit __shuffle_free_memory(pg_data_t *pgdat)
+ 		shuffle_zone(z);
+ }
+ 
+-void add_to_free_area_random(struct page *page, struct free_area *area,
+-		int migratetype)
++bool shuffle_pick_tail(void)
+ {
+ 	static u64 rand;
+ 	static u8 rand_bits;
++	bool ret;
+ 
+ 	/*
+ 	 * The lack of locking is deliberate. If 2 threads race to
+@@ -198,10 +198,10 @@ void add_to_free_area_random(struct page *page, struct free_area *area,
+ 		rand = get_random_u64();
+ 	}
+ 
+-	if (rand & 1)
+-		add_to_free_area(page, area, migratetype);
+-	else
+-		add_to_free_area_tail(page, area, migratetype);
++	ret = rand & 1;
++
+ 	rand_bits--;
+ 	rand >>= 1;
++
++	return ret;
+ }
+diff --git a/mm/shuffle.h b/mm/shuffle.h
+index 777a257a0d2f..4d79f03b6658 100644
+--- a/mm/shuffle.h
++++ b/mm/shuffle.h
+@@ -22,6 +22,7 @@ enum mm_shuffle_ctl {
+ DECLARE_STATIC_KEY_FALSE(page_alloc_shuffle_key);
+ extern void page_alloc_shuffle(enum mm_shuffle_ctl ctl);
+ extern void __shuffle_free_memory(pg_data_t *pgdat);
++extern bool shuffle_pick_tail(void);
+ static inline void shuffle_free_memory(pg_data_t *pgdat)
+ {
+ 	if (!static_branch_unlikely(&page_alloc_shuffle_key))
+@@ -44,6 +45,11 @@ static inline bool is_shuffle_order(int order)
+ 	return order >= SHUFFLE_ORDER;
+ }
+ #else
++static inline bool shuffle_pick_tail(void)
++{
++	return false;
++}
++
+ static inline void shuffle_free_memory(pg_data_t *pgdat)
+ {
+ }
 
-
- drivers/virtio/Kconfig              |    1 
- drivers/virtio/virtio_balloon.c     |   87 ++++++++-
- include/linux/mmzone.h              |   60 ++----
- include/linux/page-flags.h          |   11 +
- include/linux/page_reporting.h      |   31 +++
- include/uapi/linux/virtio_balloon.h |    1 
- mm/Kconfig                          |   11 +
- mm/Makefile                         |    1 
- mm/compaction.c                     |    5 +
- mm/memory_hotplug.c                 |    2 
- mm/page_alloc.c                     |  194 +++++++++++++++----
- mm/page_reporting.c                 |  350 +++++++++++++++++++++++++++++++++++
- mm/page_reporting.h                 |  224 ++++++++++++++++++++++
- mm/shuffle.c                        |   12 +
- mm/shuffle.h                        |    6 +
- 15 files changed, 893 insertions(+), 103 deletions(-)
- create mode 100644 include/linux/page_reporting.h
- create mode 100644 mm/page_reporting.c
- create mode 100644 mm/page_reporting.h
-
---
