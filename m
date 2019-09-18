@@ -2,127 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CA7AB5BBC
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 08:16:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 572E4B5DF0
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 09:23:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727007AbfIRGQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 02:16:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40382 "EHLO mx1.redhat.com"
+        id S1728404AbfIRHXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 03:23:35 -0400
+Received: from mga07.intel.com ([134.134.136.100]:60890 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726081AbfIRGQS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 02:16:18 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8CB7846288;
-        Wed, 18 Sep 2019 06:16:16 +0000 (UTC)
-Received: from [10.72.12.111] (ovpn-12-111.pek2.redhat.com [10.72.12.111])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E971719C6A;
-        Wed, 18 Sep 2019 06:15:55 +0000 (UTC)
-Subject: Re: [RFC PATCH 2/2] mdev: introduce device specific ops
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-Cc:     "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "airlied@linux.ie" <airlied@linux.ie>,
-        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
-        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "idos@mellanox.com" <idos@mellanox.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-        "Wang, Xiao W" <xiao.w.wang@intel.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "daniel@ffwll.ch" <daniel@ffwll.ch>,
-        "Wang, Zhihong" <zhihong.wang@intel.com>
-References: <20190912094012.29653-1-jasowang@redhat.com>
- <20190912094012.29653-3-jasowang@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D579F71@SHSMSX104.ccr.corp.intel.com>
- <6bb2c43c-25bb-16f9-1fa0-08cb08e42b94@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D57B49A@SHSMSX104.ccr.corp.intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <e3950e19-b815-1549-72b0-12b628fa2bc1@redhat.com>
-Date:   Wed, 18 Sep 2019 14:15:54 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726077AbfIRHXe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 03:23:34 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Sep 2019 00:23:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,519,1559545200"; 
+   d="scan'208";a="187694676"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+  by fmsmga007.fm.intel.com with ESMTP; 18 Sep 2019 00:23:32 -0700
+From:   Tao Xu <tao3.xu@intel.com>
+To:     pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+        mtosatti@redhat.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, tao3.xu@intel.com,
+        jingqi.liu@intel.com
+Subject: [PATCH RESEND v4 0/2] x86: Enable user wait instructions
+Date:   Wed, 18 Sep 2019 15:23:27 +0800
+Message-Id: <20190918072329.1911-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D57B49A@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 18 Sep 2019 06:16:17 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
 
-On 2019/9/18 上午10:57, Tian, Kevin wrote:
->> From: Jason Wang [mailto:jasowang@redhat.com]
->> Sent: Tuesday, September 17, 2019 6:17 PM
->>
->> On 2019/9/17 下午4:09, Tian, Kevin wrote:
->>>> From: Jason Wang
->>>> Sent: Thursday, September 12, 2019 5:40 PM
->>>>
->>>> Currently, except for the crate and remove. The rest fields of
->>>> mdev_parent_ops is just designed for vfio-mdev driver and may not
->> help
->>>> for kernel mdev driver. So follow the device id support by previous
->>>> patch, this patch introduces device specific ops which points to
->>>> device specific ops (e.g vfio ops). This allows the future drivers
->>>> like virtio-mdev to implement its own device specific ops.
->>> Can you give an example about what ops might be required to support
->>> kernel mdev driver? I know you posted a link earlier, but putting a small
->>> example here can save time and avoid inconsistent understanding. Then
->>> it will help whether the proposed split makes sense or there is a
->>> possibility of redefining the callbacks to meet the both requirements.
->>> imo those callbacks fulfill some basic requirements when mediating
->>> a device...
->> I put it in the cover letter.
->>
->> The link ishttps://lkml.org/lkml/2019/9/10/135  which abuses the current
->> VFIO based mdev parent ops.
->>
->> Thanks
-> So the main problem is the handling of userspace pointers vs.
-> kernel space pointers. You still implement read/write/ioctl
-> callbacks which is a subset of current parent_ops definition.
-> In that regard is it better to introduce some helper to handle
-> the pointer difference in mdev core, while still keeping the
-> same set of parent ops (in whatever form suitable for both)?
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
 
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
 
-Pointers is one of the issues. And read/write/ioctl is designed for 
-userspace API not kernel. Technically, we can use them for kernel but it 
-would not be as simple and straightforward a set of device specific 
-callbacks functions. The link above is just an example, e.g we can 
-simply pass the vring address through a dedicated API instead of 
-mandatory an offset of a file.
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
 
-Thanks
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
 
->
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it in kvm and provide a capability to
+enable it. Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
+QEMU use "-overcommit cpu-pm=on, a VM can use UMONITOR, UMWAIT and TPAUSE
+instructions. If the instruction causes a delay, the amount of time
+delayed is called here the physical delay. The physical delay is first
+computed by determining the virtual delay (the time to delay relative to
+the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT and TPAUSE cause
+an invalid-opcode exception(#UD).
+
+The dependency KVM patch link:
+https://lkml.org/lkml/2019/7/16/58
+
+The release document ref below link:
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Changelog:
+v4:
+	Set IA32_UMWAIT_CONTROL 32bits
+v3:
+	Simplify the patches, expose user wait instructions when the guest
+	has CPUID (Paolo)
+v2:
+	Separated from the series
+	https://www.mail-archive.com/qemu-devel@nongnu.org/msg549526.html
+	Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
+	QEMU use "-overcommit cpu-pm=on"	
+v1:
+	Sent out with MOVDIRI/MOVDIR64B instructions patches
+
+Tao Xu (2):
+  x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
+  target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
+
+ target/i386/cpu.c     |  3 ++-
+ target/i386/cpu.h     |  3 +++
+ target/i386/kvm.c     | 17 +++++++++++++++++
+ target/i386/machine.c | 20 ++++++++++++++++++++
+ 4 files changed, 42 insertions(+), 1 deletion(-)
+
+-- 
+2.20.1
+
