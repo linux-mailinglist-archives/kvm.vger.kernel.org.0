@@ -2,222 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63D41B68CA
-	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CDE7B69C7
+	for <lists+kvm@lfdr.de>; Wed, 18 Sep 2019 19:43:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731316AbfIRRQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 13:16:03 -0400
-Received: from mail-eopbgr60083.outbound.protection.outlook.com ([40.107.6.83]:6305
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726799AbfIRRQD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Sep 2019 13:16:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VFck5S15JJiV7PN/BFJJ8s3cr3UVgDoVqWOL7+c03XssBrZCpox3OTZG/Oi/6Bid6Kk7osy4qmzkBhEGl+E5+OOp+H3wbmuT2X6PqBiv0g7YA+UAm6Fi2SzymtucehCiXwxaa+V089iOOHPbpVTxngfLhBMdp+2mydjSe0d91ZAAtiWwvStK/m2mOhUdsNbT8foDvVxGnId2EA6FPIIe3y0kjgJykF2guxSD59EYzx4Rfvin7d7+l62Gjb3Ab65U1eEakR83/KVMo5vWuwL5XinfzHARMDuCgquz/zZD49S5WLhB0G1Ed82/IgY8FRnoxh59FeVfumdxbBBbFev/zQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y9dczobqtw8rbBsi6y3LaHyll5Q64WXKqJNZRuiPQ5U=;
- b=WXhF6DHdmKLeQfzZ12IeuSB2XlM/9uwZJ0oF2SRCpPiZhAqzmfEB8UGH0HJU/nV/df8ldGUzypmbAq4y+gp/9+6Iu6EypIAC4ClufxY/b7FXZ8AuQuz4NHfA/rU2cmgJZSH9VefAHANI3NLk7hDPIgpUQsMe4D5jkgbyzyMvKxKg+oiiUaLxYsQG7sKFRJs7JxBUslBtO73B27Mf7psSpL9hYurSBeKxzptB1hNIbtWbBgZ9SBP48j4baQc36ZarQI56Ph5T/OEdz6jQ4/IwVzhSGeo/BFuNGLSnYTFArO0Up8/ATbtFuMQja9JRpX660HvtXEC/XLtgN78YYUdLVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y9dczobqtw8rbBsi6y3LaHyll5Q64WXKqJNZRuiPQ5U=;
- b=YhdXqXnoJ2DeVUi99LPNQzCj9j+VwjJShrMCxSNQCdvPCm33itUthSeQ8Qo5EHgDzHELDwBGxmZysqoh3/TwWFdRrCnB1LyVU8ZMh9mX8jO3XOaXXp8P1BGLKwy2a42Vn1Kbhe9+sGmFSwsHE60Z7cdyYBizGoovT6tr3/xXF5U=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6388.eurprd05.prod.outlook.com (20.179.35.206) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.18; Wed, 18 Sep 2019 17:15:58 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::bc4c:7c4c:d3e2:8b28]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::bc4c:7c4c:d3e2:8b28%6]) with mapi id 15.20.2263.023; Wed, 18 Sep 2019
- 17:15:58 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v3 0/5] Introduce variable length mdev alias
-Thread-Topic: [PATCH v3 0/5] Introduce variable length mdev alias
-Thread-Index: AQHVYUZdAS6KYIr8SUO1vQ8myuXcNacvvq6AgAIHUSA=
-Date:   Wed, 18 Sep 2019 17:15:58 +0000
-Message-ID: <AM0PR05MB4866EA74D8C47F28C7435B0CD18E0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20190826204119.54386-1-parav@mellanox.com>
-        <20190902042436.23294-1-parav@mellanox.com>
- <20190917121357.02480c09.cohuck@redhat.com>
-In-Reply-To: <20190917121357.02480c09.cohuck@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 068a336b-8ebb-44bc-6ad9-08d73c5bdf70
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:AM0PR05MB6388;
-x-ms-traffictypediagnostic: AM0PR05MB6388:|AM0PR05MB6388:
-x-ms-exchange-purlcount: 3
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB6388F295205372DD6C405C71D18E0@AM0PR05MB6388.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2582;
-x-forefront-prvs: 01644DCF4A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(396003)(39860400002)(366004)(376002)(136003)(189003)(199004)(13464003)(54534003)(51914003)(8936002)(7736002)(66946007)(478600001)(66446008)(486006)(8676002)(66066001)(316002)(33656002)(476003)(25786009)(54906003)(4326008)(229853002)(81156014)(81166006)(52536014)(2906002)(6306002)(55016002)(76176011)(3846002)(86362001)(26005)(446003)(11346002)(102836004)(186003)(305945005)(6246003)(6506007)(74316002)(53546011)(71190400001)(9686003)(66476007)(6916009)(14444005)(256004)(64756008)(966005)(66556008)(71200400001)(76116006)(99286004)(7696005)(5660300002)(6436002)(6116002)(14454004);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6388;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: H/LqQOlhkHlsgw0qbJE2eUi/Q+f9X06e0HoQvGfm7fGlAAkV+wub+sCnuOEooUEpcD29OBQqpl3M66LVLZV7rhODtouCUIMkmRb6hnJ07nyOWZ3sV2mXtWIyKT16UpVEMteg9e2E7vYVJbzUt5VLqZGSgpZzSQ5SLJPtZbAmHiG/5YWOUVGSOIXWnojwizbcX5XLFtjs3OV2VZTQaimXp7FGWuzPMeNk4bTwZEyePDcUa6/JYc+rPw14JjGTO10U5egE4QyCl7Li9xdBU/VmZlksPTIrH7Hf5f9jGIdLIHnHEQtJml7u6+ce3UNICT5ExwZzCaj3LqCCCartzlXlesF6mQzfcqWKOqzC1sA3yFkhgBdNpY/c17+XfWyYtTlTMO/Ct1I0AMDKxKtMYgIbOs9PUpmIYAmbg68OK8Lw8+8=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1728546AbfIRRnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Sep 2019 13:43:10 -0400
+Received: from mga06.intel.com ([134.134.136.31]:27720 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727824AbfIRRnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 13:43:09 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Sep 2019 10:43:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,521,1559545200"; 
+   d="scan'208";a="189334744"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 18 Sep 2019 10:43:08 -0700
+Date:   Wed, 18 Sep 2019 10:43:08 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, Steve Rutherford <srutherford@google.com>,
+        Jacob Xu <jacobhxu@google.com>, Peter Shier <pshier@google.com>
+Subject: Re: [RFC][PATCH] kvm: x86: Improve emulation of CPUID leaves 0BH and
+ 1FH
+Message-ID: <20190918174308.GC14850@linux.intel.com>
+References: <20190912232753.85969-1-jmattson@google.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 068a336b-8ebb-44bc-6ad9-08d73c5bdf70
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2019 17:15:58.3332
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Xlz5265V5Pji2UY6vs5lkpsGIzxkgwfOvTAsxtvEeL42MPxeZ/kGWbZ6QPM+hwUId9Xk8bhJMtVygGhBKngelQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6388
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190912232753.85969-1-jmattson@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Cornelia,
+On Thu, Sep 12, 2019 at 04:27:53PM -0700, Jim Mattson wrote:
+> If these CPUID leaves are implemented, the EDX output is always the
+> x2APIC ID, regardless of the ECX input. Furthermore, the low byte of
+> the ECX output is always identical to the low byte of the ECX input.
+> 
+> KVM's CPUID emulation doesn't report the correct ECX and EDX outputs
+> when the ECX input is greater than the first subleaf for which the
+> "level type" is zero. This is probably only significant in the case of
+> the x2APIC ID, which should be the result of CPUID(EAX=0BH):EDX or
+> CPUID(EAX=1FH):EDX, without even setting a particular ECX input value.
 
-> -----Original Message-----
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Tuesday, September 17, 2019 5:14 AM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: alex.williamson@redhat.com; Jiri Pirko <jiri@mellanox.com>;
-> kwankhede@nvidia.com; davem@davemloft.net; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; netdev@vger.kernel.org
-> Subject: Re: [PATCH v3 0/5] Introduce variable length mdev alias
->=20
-> On Sun,  1 Sep 2019 23:24:31 -0500
-> Parav Pandit <parav@mellanox.com> wrote:
->=20
-> > To have consistent naming for the netdevice of a mdev and to have
-> > consistent naming of the devlink port [1] of a mdev, which is formed
-> > using phys_port_name of the devlink port, current UUID is not usable
-> > because UUID is too long.
-> >
-> > UUID in string format is 36-characters long and in binary 128-bit.
-> > Both formats are not able to fit within 15 characters limit of netdev
-> > name.
-> >
-> > It is desired to have mdev device naming consistent using UUID.
-> > So that widely used user space framework such as ovs [2] can make use
-> > of mdev representor in similar way as PCIe SR-IOV VF and PF representor=
-s.
-> >
-> > Hence,
-> > (a) mdev alias is created which is derived using sha1 from the mdev nam=
-e.
-> > (b) Vendor driver describes how long an alias should be for the child
-> > mdev created for a given parent.
-> > (c) Mdev aliases are unique at system level.
-> > (d) alias is created optionally whenever parent requested.
-> > This ensures that non networking mdev parents can function without
-> > alias creation overhead.
-> >
-> > This design is discussed at [3].
-> >
-> > An example systemd/udev extension will have,
-> >
-> > 1. netdev name created using mdev alias available in sysfs.
-> >
-> > mdev UUID=3D83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
-> > mdev 12 character alias=3Dcd5b146a80a5
-> >
-> > netdev name of this mdev =3D enmcd5b146a80a5 Here en =3D Ethernet link =
-m =3D
-> > mediated device
-> >
-> > 2. devlink port phys_port_name created using mdev alias.
-> > devlink phys_port_name=3Dpcd5b146a80a5
-> >
-> > This patchset enables mdev core to maintain unique alias for a mdev.
-> >
-> > Patch-1 Introduces mdev alias using sha1.
-> > Patch-2 Ensures that mdev alias is unique in a system.
-> > Patch-3 Exposes mdev alias in a sysfs hirerchy, update Documentation
-> > Patch-4 Introduces mdev_alias() API.
-> > Patch-5 Extends mtty driver to optionally provide alias generation.
-> > This also enables to test UUID based sha1 collision and trigger error
-> > handling for duplicate sha1 results.
-> >
-> > [1] http://man7.org/linux/man-pages/man8/devlink-port.8.html
-> > [2] https://docs.openstack.org/os-vif/latest/user/plugins/ovs.html
-> > [3] https://patchwork.kernel.org/cover/11084231/
-> >
-> > ---
-> > Changelog:
-> > v2->v3:
-> >  - Addressed comment from Yunsheng Lin
-> >  - Changed strcmp() =3D=3D0 to !strcmp()
-> >  - Addressed comment from Cornelia Hunk
-> >  - Merged sysfs Documentation patch with syfs patch
-> >  - Added more description for alias return value
-> > v1->v2:
-> >  - Corrected a typo from 'and' to 'an'
-> >  - Addressed comments from Alex Williamson
-> >  - Kept mdev_device naturally aligned
-> >  - Added error checking for crypt_*() calls
-> >  - Moved alias NULL check at beginning
-> >  - Added mdev_alias() API
-> >  - Updated mtty driver to show example mdev_alias() usage
-> >  - Changed return type of generate_alias() from int to char*
-> > v0->v1:
-> >  - Addressed comments from Alex Williamson, Cornelia Hunk and Mark
-> > Bloch
-> >  - Moved alias length check outside of the parent lock
-> >  - Moved alias and digest allocation from kvzalloc to kzalloc
-> >  - &alias[0] changed to alias
-> >  - alias_length check is nested under get_alias_length callback check
-> >  - Changed comments to start with an empty line
-> >  - Added comment where alias memory ownership is handed over to mdev
-> > device
-> >  - Fixed cleaunup of hash if mdev_bus_register() fails
-> >  - Updated documentation for new sysfs alias file
-> >  - Improved commit logs to make description more clear
-> >  - Fixed inclusiong of alias for NULL check
-> >  - Added ratelimited debug print for sha1 hash collision error
-> >
-> > Parav Pandit (5):
-> >   mdev: Introduce sha1 based mdev alias
-> >   mdev: Make mdev alias unique among all mdevs
-> >   mdev: Expose mdev alias in sysfs tree
-> >   mdev: Introduce an API mdev_alias
-> >   mtty: Optionally support mtty alias
-> >
-> >  .../driver-api/vfio-mediated-device.rst       |   9 ++
-> >  drivers/vfio/mdev/mdev_core.c                 | 142 +++++++++++++++++-
-> >  drivers/vfio/mdev/mdev_private.h              |   5 +-
-> >  drivers/vfio/mdev/mdev_sysfs.c                |  26 +++-
-> >  include/linux/mdev.h                          |   5 +
-> >  samples/vfio-mdev/mtty.c                      |  13 ++
-> >  6 files changed, 190 insertions(+), 10 deletions(-)
-> >
->=20
-> The patches on their own look sane (and I gave my R-b), but the consumer =
-of
-> this new API should be ready before this is merged, as already discussed =
-below.
+At a glance, shouldn't leaf 0x1f be marked significant in do_host_cpuid()?
 
-Thanks for the review. I will send v4 here to address all comments and to a=
-dd your R-b tag.
-I am waiting for Saeed to post other prep series of mlx5_core to be merged =
-before I post actual consumer series, as it depends on it.
-I will also drop the mtty sample patch and change-log to avoid confusion wi=
-th versions when I combine them with consumer series.
+> Create a "wildcard" kvm_cpuid_entry2 for leaves 0BH and 1FH in
+> response to the KVM_GET_SUPPORTED_CPUID ioctl. This entry does not
+> have the KVM_CPUID_FLAG_SIGNIFCANT_INDEX flag, so it matches all
+> subleaves for which there isn't a prior explicit index match.
+> 
+> Add a new KVM_CPUID flag that is only applicable to leaves 0BH and
+> 1FH: KVM_CPUID_FLAG_CL_IS_PASSTHROUGH. When KVM's CPUID emulation
+> encounters this flag, it will fix up ECX[7:0] in the CPUID output. Add
+> this flag to the aforementioned "wildcard" kvm_cpuid_entry2.
+> 
+> Note that userspace is still responsible for setting EDX to the x2APIC
+> ID of the vCPU in each of these structures, *including* the wildcard.
+> 
+> Qemu doesn't pass the flags from KVM_GET_SUPPORTED_CPUID to
+> KVM_SET_CPUID2, so it will have to be modified to take advantage of
+> these changes. Note that passing the new flag to older kernels will
+> have no effect.
+> 
+> Unfortunately, the new flag bit was not previously reserved, so it is
+> possible that a userspace agent that already sets this bit will be
+> unhappy with the new behavior. Technically, I suppose, this should be
+> implemented as a new set of ioctls. Posting as an RFC to get comments
+> on the API breakage.
+> 
+> Fixes: 0771671749b59a ("KVM: Enhance guest cpuid management")
+> Fixes: a87f2d3a6eadab ("KVM: x86: Add Intel CPUID.1F cpuid emulation support")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Steve Rutherford <srutherford@google.com>
+> Reviewed-by: Jacob Xu <jacobhxu@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> Change-Id: I6b422427f78b530106af3f929518363895367e25
+> ---
+>  Documentation/virt/kvm/api.txt  |  6 +++++
+>  arch/x86/include/uapi/asm/kvm.h |  1 +
+>  arch/x86/kvm/cpuid.c            | 39 +++++++++++++++++++++++++++------
+>  3 files changed, 39 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+> index 2d067767b6170..be5cc42ad35f4 100644
+> --- a/Documentation/virt/kvm/api.txt
+> +++ b/Documentation/virt/kvm/api.txt
+> @@ -1396,6 +1396,7 @@ struct kvm_cpuid2 {
+>  #define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		BIT(0)
+>  #define KVM_CPUID_FLAG_STATEFUL_FUNC		BIT(1)
+>  #define KVM_CPUID_FLAG_STATE_READ_NEXT		BIT(2)
+> +#define KVM_CPUID_FLAG_CL_IS_PASSTHROUGH	BIT(3)
+>  
+>  struct kvm_cpuid_entry2 {
+>  	__u32 function;
+> @@ -1447,6 +1448,8 @@ emulate them efficiently. The fields in each entry are defined as follows:
+>          KVM_CPUID_FLAG_STATE_READ_NEXT:
+>             for KVM_CPUID_FLAG_STATEFUL_FUNC entries, set if this entry is
+>             the first entry to be read by a cpu
+> +	KVM_CPUID_FLAG_CL_IS_PASSTHROUGH:
+> +	   If the output value of ECX[7:0] matches the input value of ECX[7:0]
+>     eax, ebx, ecx, edx: the values returned by the cpuid instruction for
+>           this function/index combination
+>  
+> @@ -2992,6 +2995,7 @@ The member 'flags' is used for passing flags from userspace.
+>  #define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		BIT(0)
+>  #define KVM_CPUID_FLAG_STATEFUL_FUNC		BIT(1)
+>  #define KVM_CPUID_FLAG_STATE_READ_NEXT		BIT(2)
+> +#define KVM_CPUID_FLAG_CL_IS_PASSTHROUGH	BIT(3)
+>  
+>  struct kvm_cpuid_entry2 {
+>  	__u32 function;
+> @@ -3040,6 +3044,8 @@ The fields in each entry are defined as follows:
+>          KVM_CPUID_FLAG_STATE_READ_NEXT:
+>             for KVM_CPUID_FLAG_STATEFUL_FUNC entries, set if this entry is
+>             the first entry to be read by a cpu
+> +	KVM_CPUID_FLAG_CL_IS_PASSTHROUGH:
+> +	   If the output value of ECX[7:0] matches the input value of ECX[7:0]
+>     eax, ebx, ecx, edx: the values returned by the cpuid instruction for
+>           this function/index combination
+>  
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 503d3f42da167..3b67d21123946 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -223,6 +223,7 @@ struct kvm_cpuid_entry2 {
+>  #define KVM_CPUID_FLAG_SIGNIFCANT_INDEX		(1 << 0)
+>  #define KVM_CPUID_FLAG_STATEFUL_FUNC		(1 << 1)
+>  #define KVM_CPUID_FLAG_STATE_READ_NEXT		(1 << 2)
+> +#define KVM_CPUID_FLAG_CL_IS_PASSTHROUGH	(1 << 3)
+>  
+>  /* for KVM_SET_CPUID2 */
+>  struct kvm_cpuid2 {
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index e7d25f4364664..280a796159cb2 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -612,19 +612,41 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>  	 */
+>  	case 0x1f:
+>  	case 0xb: {
+> -		int i, level_type;
+> +		int i;
+>  
+> -		/* read more entries until level_type is zero */
+> -		for (i = 1; ; ++i) {
+> +		/*
+> +		 * We filled in entry[0] for CPUID(EAX=<function>,
+> +		 * ECX=00H) above.  If its level type (ECX[15:8]) is
+> +		 * zero, then the leaf is unimplemented, and we're
+> +		 * done.  Otherwise, continue to populate entries
+> +		 * until the level type (ECX[15:8]) of the previously
+> +		 * added entry is zero.
+> +		 */
+> +		for (i = 1; entry[i - 1].ecx & 0xff00; ++i) {
+>  			if (*nent >= maxnent)
+>  				goto out;
+>  
+> -			level_type = entry[i - 1].ecx & 0xff00;
+> -			if (!level_type)
+> -				break;
+>  			do_host_cpuid(&entry[i], function, i);
+>  			++*nent;
+>  		}
 
+This should be a standalone bugfix/enhancement path.  Bugfix because it
+eliminates a false positive on *nent >= maxnent.
+
+> +
+> +		if (i > 1) {
+> +			/*
+> +			 * If this leaf has multiple entries, treat
+> +			 * the final entry as a "wildcard." Clear the
+> +			 * "significant index" flag so that the index
+> +			 * will be ignored when we later look for an
+> +			 * entry that matches a CPUID
+> +			 * invocation. Since this entry will now match
+> +			 * CPUID(EAX=<function>, ECX=<index>) for any
+> +			 * <index> >= (i - 1), set the "CL
+> +			 * passthrough" flag to ensure that ECX[7:0]
+> +			 * will be set to (<index> & 0xff), per the SDM.
+> +			 */
+> +			entry[i - 1].flags &= ~KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+
+If I'm reading the code correctly, this is fragile and subtle.  The order
+of cpuid entries is controlled by userspace, which means that clearing
+KVM_CPUID_FLAG_SIGNIFCANT_INDEX depends on this entry being kept after all
+other entries for this function.  In practice I'm guessing userspaces
+naturally sort entries with the same function by ascending index, but it
+seems like avoidable issue.
+
+Also, won't matching the last entry generate the wrong values for EAX, EBX
+and ECX, i.e. the valid values for the last index instead of zeroes?
+
+> +			entry[i - 1].flags |= KVM_CPUID_FLAG_CL_IS_PASSTHROUGH;
+
+Lastly, do we actually need to enumerate this silliness to userspace?
+What if we handle this as a one-off case in CPUID emulation and avoid the
+ABI breakage that way?  E.g.:
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index dd5985eb61b4..aaf5cdcb88c9 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1001,6 +1001,16 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+        }
+
+ out:
++       if (!best && (function == 0xb || function == 0x1f)) {
++               best = check_cpuid_limit(vcpu, function, 0);
++               if (best) {
++                       *eax = 0;
++                       *ebx = 0;
++                       *ecx &= 0xff;
++                       *edx = *best->edx;
++               }
++       }
++
+        if (best) {
+                *eax = best->eax;
+                *ebx = best->ebx;
+
+> +		}
+> +
+>  		break;
+>  	}
+>  	case 0xd: {
+> @@ -1001,8 +1023,11 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>  		*ebx = best->ebx;
+>  		*ecx = best->ecx;
+>  		*edx = best->edx;
+> -	} else
+> +		if (best->flags & KVM_CPUID_FLAG_CL_IS_PASSTHROUGH)
+> +			*ecx = (*ecx & ~0xff) | (index & 0xff);
+> +	} else {
+>  		*eax = *ebx = *ecx = *edx = 0;
+> +	}
+>  	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, entry_found);
+>  	return entry_found;
+>  }
+> -- 
+> 2.23.0.237.gc6a4ce50a0-goog
+> 
