@@ -2,132 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D07A5B87E4
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 00:59:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10EF8B87EC
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 01:02:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392180AbfISW7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 18:59:30 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:33034 "EHLO
+        id S2404482AbfISXCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 19:02:33 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:33060 "EHLO
         mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390868AbfISW7a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 18:59:30 -0400
-Received: by mail-pf1-f202.google.com with SMTP id z4so3299860pfn.0
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 15:59:29 -0700 (PDT)
+        with ESMTP id S2390172AbfISXCd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 19:02:33 -0400
+Received: by mail-pf1-f202.google.com with SMTP id z4so3307706pfn.0
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 16:02:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:message-id:mime-version:subject:from:to:cc;
-        bh=6Zlr8wuycCBeL7Zrxw1psZnttExi5o85U5sXHuZaYoc=;
-        b=AUA17vzQNnBlrNdpzLcSAVQAKoY3dolcqBXnoXQa9U0d01UijWP5dZWHusLICv2eWz
-         lbctqJbdXYpgx2LT7tKh6WFY9rgs4SxahbX2+BSQtbIeGirCUlUQ8PvFOV4VQPu/7OTZ
-         1Z4J0fHxFXu4MCzq7gAZO00ntHaul85mZWoFyidOX86i4bkFmhnkp2ZytihEGXp2vERV
-         rg9qJuUJBYW0wDtbfxzlzsTB5CCJNM55WxXTaLH3to+VE/YmCQf+8Vu7VEcjPhUyQ+3N
-         oFUQqCNmWgE4rZmEcmbhBAFvFpU1ees4a/Ro5c0Ro6pir1dZsZkUYFGm7mucyF3z41JS
-         CGeQ==
+        bh=3dI2aAeHuXV9dcgvDwt653/mfpUM3BDLO9nXnPwcIA8=;
+        b=FF9l9HQK+45Pl3gCa+8h7zVqzKPzH0YcpY1nuWQq1BaA9OdnOXDmJU7GzJNxRyXTUX
+         hEll1q4qLpIcKI7D8xa1+erFRevw+Hh7Xxtt+5H/7lLW5HrQyvDTK11de/2dJKyM0cMI
+         HZtCdsmqgjcKdIdQT5AkvzflQMza0CyD9TNaXuuxZlOiThy1lWzDrXbQuq9U9K8XW/cw
+         6+yOwKFijnJJfOLNI8o6S2d/kKT79g5juCC6WJGyK08Fyrgs/NwjZfFTbIybM9THVAav
+         n6Cw3YODmOW9Vss9Jr+AUTfG2SuWNp1epyHFfUyvCNkEjqoYyxLgdncXU6QSyrUWrqoV
+         3asw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=6Zlr8wuycCBeL7Zrxw1psZnttExi5o85U5sXHuZaYoc=;
-        b=keAcJro/sf2CAmST3GsfByR6xLbvwjvR+6OmCU4ZjwIrb5VBZ+yQfj0wrGSSTNZbzJ
-         SbB1tD1rZu7/3wPmmepvQnO40PLlC2xKuYCeDewwddbHwByQdiAwzAD9nuqd4RZFn2Bo
-         3B9xUEFQ+HderQuJdzZIk+Q2Y+RVZLJjxZ1J3ofAm5+CMDYclLxVBXPPxbB+U3CMKzNm
-         OrBcyywkP23Rc6AxlCIze9l7sMBdLzmhvn5NX/YdiHLCyiGHBRBGxhhl3c2MI33lOcBS
-         X7wNxN+cpctpFweFpBSqTFdBoFrxo6w9SpU2QX4Qr0TlQ1e9r0zynucQM/8JnpIb7e+6
-         mTUQ==
-X-Gm-Message-State: APjAAAXTiLop6uaVPWD85+c0gSJk7bzRPhk7YMmsfiyhwifC3s1iJWKa
-        QlYfosJvDqBGooBlEU9Fry45ht5758NDO6YUIxgnHkqyQd7YdgYVK23dS+eByP5X+9CAPcSk+R6
-        5etaIDliRa7cLPBCaSVqUdw/AqOXiHcNfUmuYrlPJwxHcvvXOiXdLQwjrXl+FqNQ=
-X-Google-Smtp-Source: APXvYqz1hDTKHONDLD0Id+mic4R7iXpqOirlGHtpF3j7qi9/HVjNHOx6r6Ool7so4f0UTrNRvn8fJMhbYgCsFg==
-X-Received: by 2002:a63:a0d:: with SMTP id 13mr10354462pgk.99.1568933968821;
- Thu, 19 Sep 2019 15:59:28 -0700 (PDT)
-Date:   Thu, 19 Sep 2019 15:59:17 -0700
-Message-Id: <20190919225917.36641-1-jmattson@google.com>
+        bh=3dI2aAeHuXV9dcgvDwt653/mfpUM3BDLO9nXnPwcIA8=;
+        b=ZleBHjh9ggvlCY17lC9p3HmS+Zm98t619jW5ZMD8PryLhHDrj2/Sn2lPZ4McpfdKyT
+         dvAcmIC8GQEgowjsJXlx1uodU2LSdqTcn3SER74PB8Z7iFuvEKqDc0YaQDgQPKMRCa4o
+         8XVKLFyQTQdbwSoTCGO6s9Ctx0eXY91bxLiEWKjxeOnPGPB2YhMKeh/KAgXJj8Sd1XpM
+         68JEOkq4OWRV5PkRWLbVKQNdXKRvwHeYYB9sYiZsx8AojQxHYQGKk4c233OU/xo8NbS6
+         GYjbAOIvNGCso2oVgISmW4bfSP+G0k50q3PHUVQiVYByvsGVhIsz1/hjnBxLTbczBBG+
+         bcTQ==
+X-Gm-Message-State: APjAAAU55Xv3049zS5NGlIoH96UkX6blyOY2AZ3N7TWWTzlJYI1PUPhP
+        cJTBqtze9QyBGdkErxdskhHaBrAkmrSeLFxZ6EkJk2HhkWgVaRzK7PNgaELTsFkiSh6n73mJuel
+        PNMY+pBMknL9MV1l+6xp3+qS8Q45BfmhdcqYepEPgyFmIg7lzio5PtA0WMk4w4dA=
+X-Google-Smtp-Source: APXvYqxgHc7uq5o4T8efx7CKrNZfcHJJsNVHyS3s28ovcwCBU3TzR6qCjHV3cBIJpTmZWeugwrvl/mU3iZgbOA==
+X-Received: by 2002:a63:1045:: with SMTP id 5mr11444857pgq.165.1568934151159;
+ Thu, 19 Sep 2019 16:02:31 -0700 (PDT)
+Date:   Thu, 19 Sep 2019 16:02:25 -0700
+Message-Id: <20190919230225.37796-1-jmattson@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.23.0.351.gc4317032e6-goog
-Subject: [PATCH] kvm: svm: Intercept RDPRU
+Subject: [kvm-unit-tests PATCH] kvm-unit-test: x86: Add RDPRU test
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>, Drew Schmitt <dasch@google.com>,
-        Jacob Xu <jacobhxu@google.com>, Peter Shier <pshier@google.com>
+Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The RDPRU instruction gives the guest read access to the IA32_APERF
-MSR and the IA32_MPERF MSR. According to volume 3 of the APM, "When
-virtualization is enabled, this instruction can be intercepted by the
-Hypervisor. The intercept bit is at VMCB byte offset 10h, bit 14."
-Since we don't enumerate the instruction in KVM_SUPPORTED_CPUID,
-intercept it and synthesize #UD.
+Ensure that support for RDPRU is not enumerated in the guest's CPUID
+and that the RDPRU instruction raises #UD.
 
 Signed-off-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Drew Schmitt <dasch@google.com>
-Reviewed-by: Jacob Xu <jacobhxu@google.com>
 Reviewed-by: Peter Shier <pshier@google.com>
 ---
- arch/x86/include/asm/svm.h      | 1 +
- arch/x86/include/uapi/asm/svm.h | 1 +
- arch/x86/kvm/svm.c              | 8 ++++++++
- 3 files changed, 10 insertions(+)
+ lib/x86/processor.h |  1 +
+ x86/Makefile.x86_64 |  1 +
+ x86/rdpru.c         | 23 +++++++++++++++++++++++
+ x86/unittests.cfg   |  5 +++++
+ 4 files changed, 30 insertions(+)
+ create mode 100644 x86/rdpru.c
 
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index dec9c1e84c78..6ece8561ba66 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -52,6 +52,7 @@ enum {
- 	INTERCEPT_MWAIT,
- 	INTERCEPT_MWAIT_COND,
- 	INTERCEPT_XSETBV,
-+	INTERCEPT_RDPRU,
- };
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index b1c579b..121f19c 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -150,6 +150,7 @@ static inline u8 cpuid_maxphyaddr(void)
+ #define	X86_FEATURE_RDPID		(CPUID(0x7, 0, ECX, 22))
+ #define	X86_FEATURE_SPEC_CTRL		(CPUID(0x7, 0, EDX, 26))
+ #define	X86_FEATURE_NX			(CPUID(0x80000001, 0, EDX, 20))
++#define	X86_FEATURE_RDPRU		(CPUID(0x80000008, 0, EBX, 4))
  
+ /*
+  * AMD CPUID features
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index 51f9b80..010102b 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -19,6 +19,7 @@ tests += $(TEST_DIR)/vmx.flat
+ tests += $(TEST_DIR)/tscdeadline_latency.flat
+ tests += $(TEST_DIR)/intel-iommu.flat
+ tests += $(TEST_DIR)/vmware_backdoors.flat
++tests += $(TEST_DIR)/rdpru.flat
  
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index a9731f8a480f..2e8a30f06c74 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -75,6 +75,7 @@
- #define SVM_EXIT_MWAIT         0x08b
- #define SVM_EXIT_MWAIT_COND    0x08c
- #define SVM_EXIT_XSETBV        0x08d
-+#define SVM_EXIT_RDPRU         0x08e
- #define SVM_EXIT_NPF           0x400
- #define SVM_EXIT_AVIC_INCOMPLETE_IPI		0x401
- #define SVM_EXIT_AVIC_UNACCELERATED_ACCESS	0x402
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 04fe21849b6e..cef00e959679 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -1539,6 +1539,7 @@ static void init_vmcb(struct vcpu_svm *svm)
- 	set_intercept(svm, INTERCEPT_SKINIT);
- 	set_intercept(svm, INTERCEPT_WBINVD);
- 	set_intercept(svm, INTERCEPT_XSETBV);
-+	set_intercept(svm, INTERCEPT_RDPRU);
- 	set_intercept(svm, INTERCEPT_RSM);
+ include $(SRCDIR)/$(TEST_DIR)/Makefile.common
  
- 	if (!kvm_mwait_in_guest(svm->vcpu.kvm)) {
-@@ -3830,6 +3831,12 @@ static int xsetbv_interception(struct vcpu_svm *svm)
- 	return 1;
- }
- 
-+static int rdpru_interception(struct vcpu_svm *svm)
+diff --git a/x86/rdpru.c b/x86/rdpru.c
+new file mode 100644
+index 0000000..a298960
+--- /dev/null
++++ b/x86/rdpru.c
+@@ -0,0 +1,23 @@
++/* RDPRU test */
++
++#include "libcflat.h"
++#include "processor.h"
++#include "desc.h"
++
++static int rdpru_checking(void)
 +{
-+	kvm_queue_exception(&svm->vcpu, UD_VECTOR);
-+	return 1;
++	asm volatile (ASM_TRY("1f")
++		      ".byte 0x0f,0x01,0xfd \n\t" /* rdpru */
++		      "1:" : : "c" (0) : "eax", "edx");
++	return exception_vector();
 +}
 +
- static int task_switch_interception(struct vcpu_svm *svm)
- {
- 	u16 tss_selector;
-@@ -4791,6 +4798,7 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
- 	[SVM_EXIT_MONITOR]			= monitor_interception,
- 	[SVM_EXIT_MWAIT]			= mwait_interception,
- 	[SVM_EXIT_XSETBV]			= xsetbv_interception,
-+	[SVM_EXIT_RDPRU]			= rdpru_interception,
- 	[SVM_EXIT_NPF]				= npf_interception,
- 	[SVM_EXIT_RSM]                          = rsm_interception,
- 	[SVM_EXIT_AVIC_INCOMPLETE_IPI]		= avic_incomplete_ipi_interception,
++int main(int ac, char **av)
++{
++	setup_idt();
++
++	report("RDPRU not supported", !this_cpu_has(X86_FEATURE_RDPRU));
++	report("RDPRU raises #UD", rdpru_checking() == UD_VECTOR);
++
++	return report_summary();
++}
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 694ee3d..9764e18 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -221,6 +221,11 @@ file = pcid.flat
+ extra_params = -cpu qemu64,+pcid
+ arch = x86_64
+ 
++[rdpru]
++file = rdpru.flat
++extra_params = -cpu host
++arch = x86_64
++
+ [umip]
+ file = umip.flat
+ extra_params = -cpu qemu64,+umip
 -- 
 2.23.0.351.gc4317032e6-goog
 
