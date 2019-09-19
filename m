@@ -2,64 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD5E6B7ABE
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 15:46:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23FAEB7BB1
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 16:08:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390500AbfISNqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 09:46:01 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:46780 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390329AbfISNqB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 09:46:01 -0400
-Received: by mail-lj1-f194.google.com with SMTP id e17so3607837ljf.13
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 06:45:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
-        bh=TcV8M7C8fHxJWCN8HA+47yWCZ7pSQ8wEec0s/4AyX8I=;
-        b=EBr9h523+bzrXOyDZsvFkC4mSDLNOKRkqux26TzER3UivnzmFPIASM3fHC51/9lm2G
-         QerCDw4m6AcCHcduC9y6gsmK4dvKVs0cFW5J4kG4YNFFiPI3TJtjleKoykvA7lAobcP/
-         jUBMfFJ/CF8XEISE40r/pO8AvAAZh4lYXppVjOx1CYDXMoR1/cqky3F6lr6ebkH7Xf1i
-         Na3A3/UeVCvGeLsFgM6h4OcZknJ3NGdtFmftbuHOO0JcLsTHS83IboB4iHv18JscOJfu
-         Hr1gXI7a6PwbTF7EXrGbOu4zNrQOlmUgMd1j94fhNNu4DwbXkXy0D5aTG7dRB3TXp8NR
-         DSjg==
+        id S2390269AbfISOIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 10:08:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52966 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388068AbfISOIa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 10:08:30 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 41A6D69084
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 14:08:30 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id h6so1884295wmb.2
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 07:08:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to;
-        bh=TcV8M7C8fHxJWCN8HA+47yWCZ7pSQ8wEec0s/4AyX8I=;
-        b=iZUR68oqVfzuWP7yTMya2WT7FXuut4mlx6u2ogZHtO4+EJaMGSprRhiad1thsOt4OQ
-         50K7d47RvpKofp63HGpeEq2thyK6O60Fru4XWtrBLTioJj8WuxAAmqrvwoXXpfngFo0K
-         acofLokbpesbWDVJ3nH3/1LAnllrZGv5d0Zw2CD8dxDe+Zg6pfWx8jC258XF+R7ywmDc
-         7RaU/Oigjq69lAA5MjvC/eI2qx1Hcm5h4vH6elrpKeX6zETSdqjY8Q7I2Hnjkp75Llhf
-         L3kRQRlD4AnPYgh5WpuoZapPygzml1ePvGYB7pmaCYXGz04Kr9RtABc02T2e5nZNI8FT
-         bkWw==
-X-Gm-Message-State: APjAAAUoLgcWdr/PdSzxGeVMLGIClmdVwY/A0umIu2LThYVT9A+J42XX
-        je/hXefrmAULVItsgLEB1wkqzPiVNQd/UOXNpI11A4ww
-X-Google-Smtp-Source: APXvYqz2FNtT/CiolyQY1zVSGBCuyoVBFu/ltwOMQOltWBlumncZf5CSG7wrvdvy8xzTwTAO2nME2CsGD2Sk0GQe9gU=
-X-Received: by 2002:a2e:551:: with SMTP id 78mr5537605ljf.48.1568900758851;
- Thu, 19 Sep 2019 06:45:58 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=sWppofEf+0Xf9T8YVPh73Hir/CIu5+9mJNluOrUbKEk=;
+        b=MMhixo8c8Qrys2edgUWuwvInS6KE7wSfF5FHJ4e8ZShOtSs0yQz5tLY+oiq27D4Ull
+         SyNSyriKYwsi3+0egX+2eouLciExUAHzXkz0FyX9mDU6I+tI1tfKrV4+7gJwrY6RuPmo
+         Ih3T7xutR6GQ8UxSyYJwmWXF4TDWIP2PWgkAbpUtGCV4aGUyNGclR0UkgjojqzF0lKGt
+         txDgICjZNO7OJ35oToZHskVFR9Rw48kgHRoCJYRaeIMVvX9BD4LoT+k3AWvJWVoUIQMs
+         nghojqcnyVTpgbZF34juH8ww6+/0x6PY1nOm5sF0O1Vk0govX0VRi+R4mSxp2UkdcVVB
+         Orjw==
+X-Gm-Message-State: APjAAAXPJT0bwGtt1ZAhDUD8DwKPJ9RhR6r5FIbhJ7/IL8mowfIHXf7Y
+        +5lXoyUJUj6gLtJNFR8HxfB99smqOjXLy1YQxMKDORvpdQtNzeIyOIFlSOSI8z0dPgVAVuHZD3b
+        Yl5wp8pvikdi/
+X-Received: by 2002:adf:fa10:: with SMTP id m16mr7390704wrr.322.1568902108698;
+        Thu, 19 Sep 2019 07:08:28 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzw3791bLrEM3sxJKp4ms/EYqTYy5eVpuSG5XRNNjAOswIC+XU11cpVl6WFDUloWFkVtH8H8w==
+X-Received: by 2002:adf:fa10:: with SMTP id m16mr7390693wrr.322.1568902108499;
+        Thu, 19 Sep 2019 07:08:28 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id t203sm8441156wmf.42.2019.09.19.07.08.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Sep 2019 07:08:27 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Subject: Re: [PATCH kvm-unit-tests 0/8]: x86: vmx: Test INIT processing in various CPU VMX states
+In-Reply-To: <20190919125211.18152-1-liran.alon@oracle.com>
+References: <20190919125211.18152-1-liran.alon@oracle.com>
+Date:   Thu, 19 Sep 2019 16:08:27 +0200
+Message-ID: <87a7b09y5g.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Reply-To: tanohadel@gmail.com
-Received: by 2002:ab3:560a:0:0:0:0:0 with HTTP; Thu, 19 Sep 2019 06:45:58
- -0700 (PDT)
-From:   Adele Tanoh <tanohadel2019@gmail.com>
-Date:   Thu, 19 Sep 2019 14:45:58 +0100
-X-Google-Sender-Auth: wwoCZ-Edey6-GCAu24Y2wZfx7nA
-Message-ID: <CALoi8MMeRFdLdqayZpAgBiaPbtFZ3PHE_+avVY-tPKsLBqdB_w@mail.gmail.com>
-Subject: Investment Funds
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Good Day,
-I am Miss Adele Tanoh. I will like to invest in your country. I have a
-Mutual business proposal which will benefit both of us. I will like to
-seek your consent first. This project involves a huge specific amount
-which I can't mention here for security reasons. If you feel you can
-handle this project, please let me know, so that I give you
-comprehensive details about me/the fund and explanations on my
-investment plan. Sincerely, Miss Adele
+Liran Alon <liran.alon@oracle.com> writes:
+
+> Hi,
+>
+> This patch series aims to add a vmx test to verify the functionality
+> introduced by KVM commit:
+> 4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various CPU states")
+>
+> The test verifies the following functionality:
+> 1) An INIT signal received when CPU is in VMX operation
+>   is latched until it exits VMX operation.
+> 2) If there is an INIT signal pending when CPU is in
+>   VMX non-root mode, it result in VMExit with (reason == 3).
+> 3) Exit from VMX non-root mode on VMExit do not clear
+>   pending INIT signal in LAPIC.
+> 4) When CPU exits VMX operation, pending INIT signal in
+>   LAPIC is processed.
+>
+> In order to write such a complex test, the vmx tests framework was
+> enhanced to support using VMX in non BSP CPUs. This enhancement is
+> implemented in patches 1-7. The test itself is implemented at patch 8.
+> This enhancement to the vmx tests framework is a bit hackish, but
+> I believe it's OK because this functionality is rarely required by
+> other VMX tests.
+>
+
+Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+Thanks!
+
+-- 
+Vitaly
