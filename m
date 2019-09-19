@@ -2,138 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A52CB79A1
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 14:39:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD2F0B79C7
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 14:52:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388228AbfISMji (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 08:39:38 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33171 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387968AbfISMji (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 08:39:38 -0400
-Received: by mail-wr1-f65.google.com with SMTP id b9so2980864wrs.0
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 05:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=/9nzlO3catDpxNdlSs/iGbOfKBBKO21YP3lcrEeeoEQ=;
-        b=fVAVkCOq71OXtZ7J4EkZQGbxKZNZc4L2c8WJZFECgaG3XjO3lNrIVHVYVh9IMMO4ZA
-         AEMbIHHCpAmXbRHlDLww47nqyk/M6i4cvDy2bdZBbYNq1s5u4q00FU+zNh0S2Yp1nA4n
-         SvkzakdSSmj8vYi6Ar6il9zvKCLbJwaDHnshr78mjr3P0x17Z3CufbcLB/mZSwXDj5EH
-         /WplZOw3NE8LiOTVDf9UUFR/qqmcmWBsXas8QqUU6xk9S92tLgHQizN88RYDhuMS65aT
-         U2bmsscollEChMPqNqFdZhT/EgQWz1m084k/kjn+s2p5SWl+QjVtuJHXpfpNQYdksxaA
-         DOJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=/9nzlO3catDpxNdlSs/iGbOfKBBKO21YP3lcrEeeoEQ=;
-        b=Y1ZqLwhrhe2ZxIBkxtIMlktG/LS+mHYJxM98Xi59auhf8DuLIQr796yUIEhqtKCAvp
-         3HqMXPxg94eO/FGwduBlYVhLXcZ4Efbq3fAiRWhKK9Uc73oqOpGNlaD+btsVpVjHkTfq
-         mDAD7wTUDCO2va7TigCrBwVD7cPTXVmKZmxcHk6649zn+HChaYaPCYLzhF+p4kho5uvN
-         eEbyPjM8yxpz5c1bJqaqjsTC8tcaFGCoT0QiW4w/irS5jOrKySdeUp3i1OGP+bplemv0
-         wNudHUgBsj/y2VaytoIZzpu7gBv1ME9Qs8cFNAmlG9tidJlAs9FYiuGWpydKk4P1vXh8
-         d/RQ==
-X-Gm-Message-State: APjAAAUjBo5+CBbT46q06owSfQzisRhBqjY7UXst3mocWohZlKLlGU8i
-        qquii9alvCsBMs9vAS72qo0Q8w==
-X-Google-Smtp-Source: APXvYqyLGBWany8mv0R6G9JKWZdXIcvLmproKvbB56WPUT5EotusdST4NAJsi4Wf0JYw0isKvhYwOg==
-X-Received: by 2002:adf:db06:: with SMTP id s6mr4131222wri.41.1568896775939;
-        Thu, 19 Sep 2019 05:39:35 -0700 (PDT)
-Received: from localhost ([109.190.253.11])
-        by smtp.gmail.com with ESMTPSA id d193sm8966640wmd.0.2019.09.19.05.39.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2019 05:39:35 -0700 (PDT)
-Date:   Thu, 19 Sep 2019 05:39:33 -0700 (PDT)
-From:   Paul Walmsley <paul.walmsley@sifive.com>
-X-X-Sender: paulw@viisi.sifive.com
-To:     Anup Patel <Anup.Patel@wdc.com>
-cc:     Palmer Dabbelt <palmer@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 03/21] RISC-V: Export few kernel symbols
-In-Reply-To: <20190904161245.111924-5-anup.patel@wdc.com>
-Message-ID: <alpine.DEB.2.21.9999.1909190537410.12151@viisi.sifive.com>
-References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-5-anup.patel@wdc.com>
-User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
+        id S2389554AbfISMwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 08:52:50 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46420 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389212AbfISMwu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 08:52:50 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8JCnVKU151063;
+        Thu, 19 Sep 2019 12:52:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=Yy1xBvxcpFEBS2osp67zPm6WU06C8m2M9p0BlIWsEbA=;
+ b=FPCOUs+zlcmEvQlZJGR+nO8irbP43kNfAJMmGOmlU769H1d/cNrALPZuso+DdEqGqRKb
+ t8DowOGy1sPIQi/GNV4azc2PKeDDuifENLgdM/BAOEwQABq6wazxMhM5/oey63R2K4kK
+ eVfGi74AEYxoYp8tDwAhvhonIZheSl4h66gQCUrH5gtmMr9M5EVe6/IJEPJu45dPrYHW
+ 7aSYk33O9MC6rR4rHT/8nzpaM3idRNle7eC+wCjBFQTlixsw+Y6271CsXfmj4U2rknW5
+ Nw97G+pBVoLfVFt2iSq9yaQ6Sf+Ee5OvI/cFB6t7MDy+IGvxSvyxtcxPBUDmE94x+fEi NQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2v3vb4kpt9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Sep 2019 12:52:27 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8JCmC2N178710;
+        Thu, 19 Sep 2019 12:52:27 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2v3vbs1kbq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Sep 2019 12:52:27 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8JCqQGv012161;
+        Thu, 19 Sep 2019 12:52:26 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 19 Sep 2019 05:52:26 -0700
+From:   Liran Alon <liran.alon@oracle.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com
+Subject: [PATCH kvm-unit-tests 0/8]: x86: vmx: Test INIT processing in various CPU VMX states
+Date:   Thu, 19 Sep 2019 15:52:03 +0300
+Message-Id: <20190919125211.18152-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9384 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=882
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909190121
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9384 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=961 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909190121
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 4 Sep 2019, Anup Patel wrote:
+Hi,
 
-> From: Atish Patra <atish.patra@wdc.com>
-> 
-> Export few symbols used by kvm module. Without this, kvm cannot
-> be compiled as a module.
-> 
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Alexander Graf <graf@amazon.com>
+This patch series aims to add a vmx test to verify the functionality
+introduced by KVM commit:
+4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various CPU states")
 
-Thanks, have updated this patch to apply and to clarify the patch title 
-and have queued the following for v5.4-rc.
+The test verifies the following functionality:
+1) An INIT signal received when CPU is in VMX operation
+  is latched until it exits VMX operation.
+2) If there is an INIT signal pending when CPU is in
+  VMX non-root mode, it result in VMExit with (reason == 3).
+3) Exit from VMX non-root mode on VMExit do not clear
+  pending INIT signal in LAPIC.
+4) When CPU exits VMX operation, pending INIT signal in
+  LAPIC is processed.
 
+In order to write such a complex test, the vmx tests framework was
+enhanced to support using VMX in non BSP CPUs. This enhancement is
+implemented in patches 1-7. The test itself is implemented at patch 8.
+This enhancement to the vmx tests framework is a bit hackish, but
+I believe it's OK because this functionality is rarely required by
+other VMX tests.
 
-- Paul
+Regards,
+-Liran
 
-From: Atish Patra <atish.patra@wdc.com>
-Date: Wed, 4 Sep 2019 16:14:06 +0000
-Subject: [PATCH] RISC-V: Export kernel symbols for kvm
-
-Export few symbols used by kvm module. Without this, kvm cannot
-be compiled as a module.
-
-Signed-off-by: Atish Patra <atish.patra@wdc.com>
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alexander Graf <graf@amazon.com>
-[paul.walmsley@sifive.com: updated to apply; clarified short patch 
- description]
-Signed-off-by: Paul Walmsley <paul.walmsley@sifive.com>
----
- arch/riscv/kernel/smp.c  | 1 +
- arch/riscv/kernel/time.c | 1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/arch/riscv/kernel/smp.c b/arch/riscv/kernel/smp.c
-index d70e3c0ee983..f849a2480600 100644
---- a/arch/riscv/kernel/smp.c
-+++ b/arch/riscv/kernel/smp.c
-@@ -210,3 +210,4 @@ void smp_send_reschedule(int cpu)
- {
- 	send_ipi_single(cpu, IPI_RESCHEDULE);
- }
-+EXPORT_SYMBOL_GPL(smp_send_reschedule);
-diff --git a/arch/riscv/kernel/time.c b/arch/riscv/kernel/time.c
-index 517d2153a933..8a25d1e440ca 100644
---- a/arch/riscv/kernel/time.c
-+++ b/arch/riscv/kernel/time.c
-@@ -9,6 +9,7 @@
- #include <asm/processor.h>
- 
- unsigned long riscv_timebase;
-+EXPORT_SYMBOL_GPL(riscv_timebase);
- 
- void __init time_init(void)
- {
--- 
-2.23.0
 
