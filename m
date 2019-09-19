@@ -2,285 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2064B79E5
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 14:56:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 325F0B7A27
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 15:08:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390449AbfISM4R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 08:56:17 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45294 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390440AbfISM4R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 08:56:17 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r5so2942158wrm.12
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 05:56:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FbuzH0daMt+MsoMW45qZdAf/7ra0L3lDjQjOsI2VHWQ=;
-        b=oBEzttwMR9rbIp1WYQ0uoKtd9fQVsAyv5adJg6k2jsN17FRK/uMFdPM+iWYhwyHUgY
-         Wv9otQwbkODuQaxad4JWGpV+NnSTy0AfrrK7qT/2Mq1omJkblCtRPp0vvickWuGdaEAo
-         9LwjkJo26aBKXkTzaguMdcy5yUjl0IFXDDEg5CshxjaSKj8PDWoO5cf1IWeIlv817pWl
-         GnFeewZA9/Mdg5g4HJZ0UuYrwLJvgs1twQCCW1q/dEnO7Yl7KGVIfz57DQCCrjeFEzHv
-         zt4PnAUp2JurM57cC4gFbCpH/qTbDXQlHCYpUwhhYXCFflKZubX3QVAjqvoPmuALF7VR
-         afzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FbuzH0daMt+MsoMW45qZdAf/7ra0L3lDjQjOsI2VHWQ=;
-        b=XSdmgk5xMp3ZtgutZaxeKNRlXoI6jyq6y4El/nU17qwdO3B4VBQCEIFjxlhHL9SZMl
-         G5CCbkn1fcqetYF55YBdUptFL0oUJ8BTfdHunRyx8heIOW3MqtNboT61XxBlo8Szp/tW
-         mK565Ck3H2PY0UeZUoQD8ApQ9qy5QFMfgpfrep7tmMcEkVyHWOmy12nRxaZelZAULrtT
-         5vr5Mv1rqyIRUmRGTJdpAO0iI4frisbDchXn624+SNxLGjRS2xhS5AqkmY7wJK2F7nox
-         rk+By33/sO/ND+cpu4SzXIlQWKXxZKIGBTMORF1FddYxJib7Hr976up6GH2p0P7Iha68
-         YiBw==
-X-Gm-Message-State: APjAAAVdFyMG5YQrNeBQz2Tfd+E6qBfEZU1VuY29abFMrma8zIIQ9kjQ
-        Tw0aAV9hVuURcyD4Vw4n57+ZIayFvhEFtJWa96clLw==
-X-Google-Smtp-Source: APXvYqxO8H0t5ovhrPmidpWD1aY3uJm4qdbUX/FofBcjV1DfA+0t9o9O4kMGJdkYbxAEiOpYaWykN8tDWG7Vnyi6zxc=
-X-Received: by 2002:a05:6000:110f:: with SMTP id z15mr6556036wrw.328.1568897774029;
- Thu, 19 Sep 2019 05:56:14 -0700 (PDT)
+        id S2388080AbfISNIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 09:08:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39868 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732271AbfISNIf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 09:08:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2765189810C;
+        Thu, 19 Sep 2019 13:08:35 +0000 (UTC)
+Received: from [10.72.12.81] (ovpn-12-81.pek2.redhat.com [10.72.12.81])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ABF825D9CC;
+        Thu, 19 Sep 2019 13:08:22 +0000 (UTC)
+Subject: Re: [RFC v4 0/3] vhost: introduce mdev based hardware backend
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+References: <20190917010204.30376-1-tiwei.bie@intel.com>
+ <993841ed-942e-c90b-8016-8e7dc76bf13a@redhat.com>
+ <20190917105801.GA24855@___>
+ <fa6957f3-19ad-f351-8c43-65bc8342b82e@redhat.com>
+ <20190918102923-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <d2efe7e4-cf13-437d-e2dc-e2779fac7d2f@redhat.com>
+Date:   Thu, 19 Sep 2019 21:08:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-4-anup.patel@wdc.com>
-In-Reply-To: <20190904161245.111924-4-anup.patel@wdc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 19 Sep 2019 18:26:02 +0530
-Message-ID: <CAAhSdy1n34wi9iR-QViBFo_ApQx-2R6Jkd8Zpvyt9aLB91jDSw@mail.gmail.com>
-Subject: Re: [PATCH v7 02/21] RISC-V: Add bitmap reprensenting ISA features
- common across CPUs
-To:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <Anup.Patel@wdc.com>
-Cc:     Palmer Dabbelt <palmer@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190918102923-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Thu, 19 Sep 2019 13:08:35 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paul,
 
-On Wed, Sep 4, 2019 at 9:43 PM Anup Patel <Anup.Patel@wdc.com> wrote:
->
-> This patch adds riscv_isa bitmap which represents Host ISA features
-> common across all Host CPUs. The riscv_isa is not same as elf_hwcap
-> because elf_hwcap will only have ISA features relevant for user-space
-> apps whereas riscv_isa will have ISA features relevant to both kernel
-> and user-space apps.
->
-> One of the use-case for riscv_isa bitmap is in KVM hypervisor where
-> we will use it to do following operations:
->
-> 1. Check whether hypervisor extension is available
-> 2. Find ISA features that need to be virtualized (e.g. floating
->    point support, vector extension, etc.)
+On 2019/9/18 下午10:32, Michael S. Tsirkin wrote:
+>>>> So I have some questions:
+>>>>
+>>>> 1) Compared to method 2, what's the advantage of creating a new vhost char
+>>>> device? I guess it's for keep the API compatibility?
+>>> One benefit is that we can avoid doing vhost ioctls on
+>>> VFIO device fd.
+>> Yes, but any benefit from doing this?
+> It does seem a bit more modular, but it's certainly not a big deal.
 
-I had addressed your previous comments on this patch by
-making riscv_isa as bitmap to cover Z-extensions.
 
-Please review it again.
+Ok, if we go this way, it could be as simple as provide some callback to 
+vhost, then vhost can just forward the ioctl through parent_ops.
 
-Regards,
-Anup
 
 >
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> Reviewed-by: Alexander Graf <graf@amazon.com>
-> ---
->  arch/riscv/include/asm/hwcap.h | 26 +++++++++++
->  arch/riscv/kernel/cpufeature.c | 79 ++++++++++++++++++++++++++++++++--
->  2 files changed, 102 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index 7ecb7c6a57b1..9b657375aa51 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -8,6 +8,7 @@
->  #ifndef __ASM_HWCAP_H
->  #define __ASM_HWCAP_H
->
-> +#include <linux/bits.h>
->  #include <uapi/asm/hwcap.h>
->
->  #ifndef __ASSEMBLY__
-> @@ -22,5 +23,30 @@ enum {
->  };
->
->  extern unsigned long elf_hwcap;
-> +
-> +#define RISCV_ISA_EXT_a                ('a' - 'a')
-> +#define RISCV_ISA_EXT_c                ('c' - 'a')
-> +#define RISCV_ISA_EXT_d                ('d' - 'a')
-> +#define RISCV_ISA_EXT_f                ('f' - 'a')
-> +#define RISCV_ISA_EXT_h                ('h' - 'a')
-> +#define RISCV_ISA_EXT_i                ('i' - 'a')
-> +#define RISCV_ISA_EXT_m                ('m' - 'a')
-> +#define RISCV_ISA_EXT_s                ('s' - 'a')
-> +#define RISCV_ISA_EXT_u                ('u' - 'a')
-> +#define RISCV_ISA_EXT_zicsr    (('z' - 'a') + 1)
-> +#define RISCV_ISA_EXT_zifencei (('z' - 'a') + 2)
-> +#define RISCV_ISA_EXT_zam      (('z' - 'a') + 3)
-> +#define RISCV_ISA_EXT_ztso     (('z' - 'a') + 4)
-> +
-> +#define RISCV_ISA_EXT_MAX      256
-> +
-> +unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap);
-> +
-> +#define riscv_isa_extension_mask(ext) BIT_MASK(RISCV_ISA_EXT_##ext)
-> +
-> +bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int bit);
-> +#define riscv_isa_extension_available(isa_bitmap, ext) \
-> +       __riscv_isa_extension_available(isa_bitmap, RISCV_ISA_EXT_##ext)
-> +
->  #endif
->  #endif
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> index b1ade9a49347..4ce71ce5e290 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -6,21 +6,64 @@
->   * Copyright (C) 2017 SiFive
->   */
->
-> +#include <linux/bitmap.h>
->  #include <linux/of.h>
->  #include <asm/processor.h>
->  #include <asm/hwcap.h>
->  #include <asm/smp.h>
->
->  unsigned long elf_hwcap __read_mostly;
-> +
-> +/* Host ISA bitmap */
-> +static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;
-> +
->  #ifdef CONFIG_FPU
->  bool has_fpu __read_mostly;
->  #endif
->
-> +/**
-> + * riscv_isa_extension_base - Get base extension word
-> + *
-> + * @isa_bitmap ISA bitmap to use
-> + * @returns base extension word as unsigned long value
-> + *
-> + * NOTE: If isa_bitmap is NULL then Host ISA bitmap will be used.
-> + */
-> +unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap)
-> +{
-> +       if (!isa_bitmap)
-> +               return riscv_isa[0];
-> +       return isa_bitmap[0];
-> +}
-> +EXPORT_SYMBOL_GPL(riscv_isa_extension_base);
-> +
-> +/**
-> + * __riscv_isa_extension_available - Check whether given extension
-> + * is available or not
-> + *
-> + * @isa_bitmap ISA bitmap to use
-> + * @bit bit position of the desired extension
-> + * @returns true or false
-> + *
-> + * NOTE: If isa_bitmap is NULL then Host ISA bitmap will be used.
-> + */
-> +bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int bit)
-> +{
-> +       const unsigned long *bmap = (isa_bitmap) ? isa_bitmap : riscv_isa;
-> +
-> +       if (bit >= RISCV_ISA_EXT_MAX)
-> +               return false;
-> +
-> +       return test_bit(bit, bmap) ? true : false;
-> +}
-> +EXPORT_SYMBOL_GPL(__riscv_isa_extension_available);
-> +
->  void riscv_fill_hwcap(void)
->  {
->         struct device_node *node;
->         const char *isa;
-> -       size_t i;
-> +       char print_str[BITS_PER_LONG+1];
-> +       size_t i, j, isa_len;
->         static unsigned long isa2hwcap[256] = {0};
->
->         isa2hwcap['i'] = isa2hwcap['I'] = COMPAT_HWCAP_ISA_I;
-> @@ -32,8 +75,11 @@ void riscv_fill_hwcap(void)
->
->         elf_hwcap = 0;
->
-> +       bitmap_zero(riscv_isa, RISCV_ISA_EXT_MAX);
-> +
->         for_each_of_cpu_node(node) {
->                 unsigned long this_hwcap = 0;
-> +               unsigned long this_isa = 0;
->
->                 if (riscv_of_processor_hartid(node) < 0)
->                         continue;
-> @@ -43,8 +89,20 @@ void riscv_fill_hwcap(void)
->                         continue;
->                 }
->
-> -               for (i = 0; i < strlen(isa); ++i)
-> +               i = 0;
-> +               isa_len = strlen(isa);
-> +#if defined(CONFIG_32BIT)
-> +               if (!strncmp(isa, "rv32", 4))
-> +                       i += 4;
-> +#elif defined(CONFIG_64BIT)
-> +               if (!strncmp(isa, "rv64", 4))
-> +                       i += 4;
-> +#endif
-> +               for (; i < isa_len; ++i) {
->                         this_hwcap |= isa2hwcap[(unsigned char)(isa[i])];
-> +                       if ('a' <= isa[i] && isa[i] <= 'z')
-> +                               this_isa |= (1UL << (isa[i] - 'a'));
-> +               }
->
->                 /*
->                  * All "okay" hart should have same isa. Set HWCAP based on
-> @@ -55,6 +113,11 @@ void riscv_fill_hwcap(void)
->                         elf_hwcap &= this_hwcap;
->                 else
->                         elf_hwcap = this_hwcap;
-> +
-> +               if (riscv_isa[0])
-> +                       riscv_isa[0] &= this_isa;
-> +               else
-> +                       riscv_isa[0] = this_isa;
->         }
->
->         /* We don't support systems with F but without D, so mask those out
-> @@ -64,7 +127,17 @@ void riscv_fill_hwcap(void)
->                 elf_hwcap &= ~COMPAT_HWCAP_ISA_F;
->         }
->
-> -       pr_info("elf_hwcap is 0x%lx\n", elf_hwcap);
-> +       memset(print_str, 0, sizeof(print_str));
-> +       for (i = 0, j = 0; i < BITS_PER_LONG; i++)
-> +               if (riscv_isa[0] & BIT_MASK(i))
-> +                       print_str[j++] = (char)('a' + i);
-> +       pr_info("riscv: ISA extensions %s\n", print_str);
-> +
-> +       memset(print_str, 0, sizeof(print_str));
-> +       for (i = 0, j = 0; i < BITS_PER_LONG; i++)
-> +               if (elf_hwcap & BIT_MASK(i))
-> +                       print_str[j++] = (char)('a' + i);
-> +       pr_info("riscv: ELF capabilities %s\n", print_str);
->
->  #ifdef CONFIG_FPU
->         if (elf_hwcap & (COMPAT_HWCAP_ISA_F | COMPAT_HWCAP_ISA_D))
-> --
-> 2.17.1
->
+>>>> 2) For method 2, is there any easy way for user/admin to distinguish e.g
+>>>> ordinary vfio-mdev for vhost from ordinary vfio-mdev?
+>>> I think device-api could be a choice.
+>> Ok.
+>>
+>>
+>>>> I saw you introduce
+>>>> ops matching helper but it's not friendly to management.
+>>> The ops matching helper is just to check whether a given
+>>> vfio-device is based on a mdev device.
+>>>
+>>>> 3) A drawback of 1) and 2) is that it must follow vfio_device_ops that
+>>>> assumes the parameter comes from userspace, it prevents support kernel
+>>>> virtio drivers.
+>>>>
+>>>> 4) So comes the idea of method 3, since it register a new vhost-mdev driver,
+>>>> we can use device specific ops instead of VFIO ones, then we can have a
+>>>> common API between vDPA parent and vhost-mdev/virtio-mdev drivers.
+>>> As the above draft shows, this requires introducing a new
+>>> VFIO device driver. I think Alex's opinion matters here.
+
+
+Just to clarify, a new type of mdev driver but provides dummy 
+vfio_device_ops for VFIO to make container DMA ioctl work.
+
+Thanks
+
+
+>> Yes, it is.
+>>
+>> Thanks
+>>
+>>
