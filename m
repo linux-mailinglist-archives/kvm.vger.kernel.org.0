@@ -2,91 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 619A1B7473
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 09:54:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 012D5B749C
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 10:01:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730929AbfISHyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 03:54:43 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:45416 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728879AbfISHyn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 03:54:43 -0400
-Received: by mail-pg1-f194.google.com with SMTP id 4so1381078pgm.12
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 00:54:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=lgSTmC+c9Vj9bE5WscDijHkLpjdSHeo7iIoLFicI/Ow=;
-        b=Z1jp9KabrnEgSNSQRJQKgxItKQkZ0/OIvbBIwjm00LGww/v2HjW0V63QhVE7ZwlBRX
-         +EObeLsxlxsluz6Sztq/BAUExQKy43X15vIHT9Al+hEqIfpISO5p9SMCxb3WLR0f2Jo2
-         cU6EObsPrgdOMm7vdyGLMl0QOluFlRfJewkDMd4XNSb9+nwZ3pDJZ83w/oDnNprGQir1
-         /zOdCpNfrZTXVAGpDZRkz1HrDawz8qteJV+6JHcuAsFz8hGTRZbfSg7WwHsDiG2IW0d8
-         ioRL7h9rj5wweNHTpuBRtn3TyozMsEyHRxgIEkkCF1BaBrkNpcdoH5yQFM6Qd78DA4vo
-         /QEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=lgSTmC+c9Vj9bE5WscDijHkLpjdSHeo7iIoLFicI/Ow=;
-        b=LlTId3mZOn/B9p1UctEMKh8zjmr+Pg9Idnd3bZh0XUtFXOde/HN0YnkbIE7jy+W0oU
-         THZMSBM6Sf8WmHLBKN9dIP31Ico96chDTHghCGZ+HwN/zCFDu0881bl6/zPkseuvu7PT
-         CSdqrsV+UleHETuIySiO7AsMnu37NPUzpYC7EMMxUn0ypI3dWUIDyAORKuWbOPTFJ58X
-         9KzjwF2rJyLKBlPS2OfndgdBn1rdgXkVMD6CK4aFxXe6+R34OS3M2aZ3rcV17mckzu5V
-         KBC288HrfZdqjSHGV1Od1gcPxzHDTxUXC7NvTC2EdvxmOcI6VHCqgWpOITNGaoxm5Fwj
-         GWCA==
-X-Gm-Message-State: APjAAAUutlGNgzQljM3GdNmtChW3wu4IvjpgFKLrd2zAE+0oyzevqw28
-        lyFWRKVZdTTlxvkrixkdWMKKlA==
-X-Google-Smtp-Source: APXvYqyZ1YfxJWZc/POGGnlnuSTSDOy5NhfymPV72q6hKL8KbUZaRUFsYbqH+mFYjWl6fs6PCi1YJA==
-X-Received: by 2002:a62:1888:: with SMTP id 130mr8993763pfy.72.1568879682508;
-        Thu, 19 Sep 2019 00:54:42 -0700 (PDT)
-Received: from localhost (57.sub-174-194-139.myvzw.com. [174.194.139.57])
-        by smtp.gmail.com with ESMTPSA id z12sm14193738pfj.41.2019.09.19.00.54.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2019 00:54:42 -0700 (PDT)
-Date:   Thu, 19 Sep 2019 00:54:38 -0700 (PDT)
-From:   Paul Walmsley <paul.walmsley@sifive.com>
-X-X-Sender: paulw@viisi.sifive.com
-To:     Anup Patel <Anup.Patel@wdc.com>
-cc:     Palmer Dabbelt <palmer@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Anup Patel <anup@brainfault.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 20/21] RISC-V: Enable VIRTIO drivers in RV64 and RV32
- defconfig
-In-Reply-To: <20190904161245.111924-22-anup.patel@wdc.com>
-Message-ID: <alpine.DEB.2.21.9999.1909190054230.28444@viisi.sifive.com>
-References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-22-anup.patel@wdc.com>
-User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
+        id S2388334AbfISIAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 04:00:42 -0400
+Received: from foss.arm.com ([217.140.110.172]:53208 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387523AbfISIAl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 04:00:41 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 24FA71000;
+        Thu, 19 Sep 2019 01:00:41 -0700 (PDT)
+Received: from localhost (unknown [10.37.6.20])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 91B463F575;
+        Thu, 19 Sep 2019 01:00:40 -0700 (PDT)
+Date:   Thu, 19 Sep 2019 09:00:38 +0100
+From:   Andrew Murray <andrew.murray@arm.com>
+To:     Denis Efremov <efremov@linux.com>
+Cc:     Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v3 17/26] vfio_pci: Loop using PCI_STD_NUM_BARS
+Message-ID: <20190919080038.GH9720@e119886-lin.cambridge.arm.com>
+References: <20190916204158.6889-1-efremov@linux.com>
+ <20190916204158.6889-18-efremov@linux.com>
+ <20190918091719.GA9720@e119886-lin.cambridge.arm.com>
+ <b2783460-1d70-f4f0-17fd-c7a901c41670@linux.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b2783460-1d70-f4f0-17fd-c7a901c41670@linux.com>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 4 Sep 2019, Anup Patel wrote:
-
-> This patch enables more VIRTIO drivers (such as console, rpmsg, 9p,
-> rng, etc.) which are usable on KVM RISC-V Guest and Xvisor RISC-V
-> Guest.
+On Wed, Sep 18, 2019 at 05:31:33PM +0300, Denis Efremov wrote:
+> On 9/18/19 12:17 PM, Andrew Murray wrote:
+> > On Mon, Sep 16, 2019 at 11:41:49PM +0300, Denis Efremov wrote:
+> >> Refactor loops to use idiomatic C style and avoid the fencepost error
+> >> of using "i < PCI_STD_RESOURCE_END" when "i <= PCI_STD_RESOURCE_END"
+> >> is required, e.g., commit 2f686f1d9bee ("PCI: Correct PCI_STD_RESOURCE_END
+> >> usage").
+> >>
+> >> To iterate through all possible BARs, loop conditions changed to the
+> >> *number* of BARs "i < PCI_STD_NUM_BARS", instead of the index of the last
+> >> valid BAR "i <= PCI_STD_RESOURCE_END".
+> >>
+> >> Cc: Cornelia Huck <cohuck@redhat.com>
+> >> Cc: Alex Williamson <alex.williamson@redhat.com>
+> >> Signed-off-by: Denis Efremov <efremov@linux.com>
+> >> ---
+> >>  drivers/vfio/pci/vfio_pci.c         | 11 ++++++----
+> >>  drivers/vfio/pci/vfio_pci_config.c  | 32 +++++++++++++++--------------
+> >>  drivers/vfio/pci/vfio_pci_private.h |  4 ++--
+> >>  3 files changed, 26 insertions(+), 21 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> >> index 703948c9fbe1..cb7d220d3246 100644
+> >> --- a/drivers/vfio/pci/vfio_pci.c
+> >> +++ b/drivers/vfio/pci/vfio_pci.c
+> >> @@ -110,13 +110,15 @@ static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
+> >>  static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
+> >>  {
+> >>  	struct resource *res;
+> >> -	int bar;
+> >> +	int i;
+> >>  	struct vfio_pci_dummy_resource *dummy_res;
+> >>  
+> >>  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+> >>  
+> >> -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
+> >> -		res = vdev->pdev->resource + bar;
+> >> +	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+> >> +		int bar = i + PCI_STD_RESOURCES;
+> >> +
+> >> +		res = &vdev->pdev->resource[bar];
+> > 
+> > Why can't we just drop PCI_STD_RESOURCES and replace it was 0. I understand
+> > the abstraction here, but we don't do it elsewhere across the kernel. Is this
+> > necessary?
 > 
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Alexander Graf <graf@amazon.com>
+> There was a discussion about this particular case:
+> https://lkml.org/lkml/2019/8/12/999
+> 
+> It was decided to save the original style for vfio drivers.
 
-Thanks, queued for v5.4-rc.
+OK no problem.
 
+Thanks,
 
-- Paul
+Andrew Murray
+
+> 
+> > 
+> > Thanks,
+> > 
+> > Andrew Murray
+> > 
+> >>  
+> >>  		if (!IS_ENABLED(CONFIG_VFIO_PCI_MMAP))
+> >>  			goto no_mmap;
+> >> @@ -399,7 +401,8 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+> >>  
+> >>  	vfio_config_free(vdev);
+> >>  
+> >> -	for (bar = PCI_STD_RESOURCES; bar <= PCI_STD_RESOURCE_END; bar++) {
+> >> +	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+> >> +		bar = i + PCI_STD_RESOURCES;
+> >>  		if (!vdev->barmap[bar])
+> >>  			continue;
+> >>  		pci_iounmap(pdev, vdev->barmap[bar]);
+> >> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> >> index f0891bd8444c..90c0b80f8acf 100644
+> >> --- a/drivers/vfio/pci/vfio_pci_config.c
+> >> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> >> @@ -450,30 +450,32 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
+> >>  {
+> >>  	struct pci_dev *pdev = vdev->pdev;
+> >>  	int i;
+> >> -	__le32 *bar;
+> >> +	__le32 *vbar;
+> >>  	u64 mask;
+> >>  
+> >> -	bar = (__le32 *)&vdev->vconfig[PCI_BASE_ADDRESS_0];
+> >> +	vbar = (__le32 *)&vdev->vconfig[PCI_BASE_ADDRESS_0];
+> >>  
+> >> -	for (i = PCI_STD_RESOURCES; i <= PCI_STD_RESOURCE_END; i++, bar++) {
+> >> -		if (!pci_resource_start(pdev, i)) {
+> >> -			*bar = 0; /* Unmapped by host = unimplemented to user */
+> >> +	for (i = 0; i < PCI_STD_NUM_BARS; i++, vbar++) {
+> >> +		int bar = i + PCI_STD_RESOURCES;
+> >> +
+> >> +		if (!pci_resource_start(pdev, bar)) {
+> >> +			*vbar = 0; /* Unmapped by host = unimplemented to user */
+> >>  			continue;
+> >>  		}
+> >>  
+> >> -		mask = ~(pci_resource_len(pdev, i) - 1);
+> >> +		mask = ~(pci_resource_len(pdev, bar) - 1);
+> >>  
+> >> -		*bar &= cpu_to_le32((u32)mask);
+> >> -		*bar |= vfio_generate_bar_flags(pdev, i);
+> >> +		*vbar &= cpu_to_le32((u32)mask);
+> >> +		*vbar |= vfio_generate_bar_flags(pdev, bar);
+> >>  
+> >> -		if (*bar & cpu_to_le32(PCI_BASE_ADDRESS_MEM_TYPE_64)) {
+> >> -			bar++;
+> >> -			*bar &= cpu_to_le32((u32)(mask >> 32));
+> >> +		if (*vbar & cpu_to_le32(PCI_BASE_ADDRESS_MEM_TYPE_64)) {
+> >> +			vbar++;
+> >> +			*vbar &= cpu_to_le32((u32)(mask >> 32));
+> >>  			i++;
+> >>  		}
+> >>  	}
+> >>  
+> >> -	bar = (__le32 *)&vdev->vconfig[PCI_ROM_ADDRESS];
+> >> +	vbar = (__le32 *)&vdev->vconfig[PCI_ROM_ADDRESS];
+> >>  
+> >>  	/*
+> >>  	 * NB. REGION_INFO will have reported zero size if we weren't able
+> >> @@ -483,14 +485,14 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
+> >>  	if (pci_resource_start(pdev, PCI_ROM_RESOURCE)) {
+> >>  		mask = ~(pci_resource_len(pdev, PCI_ROM_RESOURCE) - 1);
+> >>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+> >> -		*bar &= cpu_to_le32((u32)mask);
+> >> +		*vbar &= cpu_to_le32((u32)mask);
+> >>  	} else if (pdev->resource[PCI_ROM_RESOURCE].flags &
+> >>  					IORESOURCE_ROM_SHADOW) {
+> >>  		mask = ~(0x20000 - 1);
+> >>  		mask |= PCI_ROM_ADDRESS_ENABLE;
+> >> -		*bar &= cpu_to_le32((u32)mask);
+> >> +		*vbar &= cpu_to_le32((u32)mask);
+> >>  	} else
+> >> -		*bar = 0;
+> >> +		*vbar = 0;
+> >>  
+> >>  	vdev->bardirty = false;
+> >>  }
+> >> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> >> index ee6ee91718a4..8a2c7607d513 100644
+> >> --- a/drivers/vfio/pci/vfio_pci_private.h
+> >> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> >> @@ -86,8 +86,8 @@ struct vfio_pci_reflck {
+> >>  
+> >>  struct vfio_pci_device {
+> >>  	struct pci_dev		*pdev;
+> >> -	void __iomem		*barmap[PCI_STD_RESOURCE_END + 1];
+> >> -	bool			bar_mmap_supported[PCI_STD_RESOURCE_END + 1];
+> >> +	void __iomem		*barmap[PCI_STD_NUM_BARS];
+> >> +	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
+> >>  	u8			*pci_config_map;
+> >>  	u8			*vconfig;
+> >>  	struct perm_bits	*msi_perm;
+> >> -- 
+> >> 2.21.0
+> >>
+> 
