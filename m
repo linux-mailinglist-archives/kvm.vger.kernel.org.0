@@ -2,148 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6542B7123
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 03:36:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6C85B71CE
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 05:11:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387460AbfISBg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Sep 2019 21:36:28 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12804 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727114AbfISBg2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Sep 2019 21:36:28 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8J1O3CT166512;
-        Wed, 18 Sep 2019 21:36:20 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2v3ve0wqb2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Sep 2019 21:36:20 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8J1PStb169475;
-        Wed, 18 Sep 2019 21:36:20 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2v3ve0wqar-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Sep 2019 21:36:20 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8J1QRUQ002729;
-        Thu, 19 Sep 2019 01:36:19 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma02wdc.us.ibm.com with ESMTP id 2v3vbtsgxc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Sep 2019 01:36:19 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8J1aF2t58655170
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Sep 2019 01:36:15 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4ABB6BE058;
-        Thu, 19 Sep 2019 01:36:15 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39503BE051;
-        Thu, 19 Sep 2019 01:36:13 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.85.141.73])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Sep 2019 01:36:13 +0000 (GMT)
-Subject: Re: [PATCH v4 0/4] Retrieving zPCI specific info with VFIO
-To:     sebott@linux.ibm.com
-Cc:     gerald.schaefer@de.ibm.com, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, walling@linux.ibm.com,
-        linux-s390@vger.kernel.org, iommu@lists.linux-foundation.org,
-        joro@8bytes.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, kvm@vger.kernel.org,
-        heiko.carstens@de.ibm.com, robin.murphy@arm.com, gor@linux.ibm.com,
-        cohuck@redhat.com, pmorel@linux.ibm.com
-References: <1567815231-17940-1-git-send-email-mjrosato@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Openpgp: preference=signencrypt
-Message-ID: <b4af47c1-0dc1-938d-20e4-0eeca095a7d5@linux.ibm.com>
-Date:   Wed, 18 Sep 2019 21:36:12 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2388571AbfISDLN convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 18 Sep 2019 23:11:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54606 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728423AbfISDLN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Sep 2019 23:11:13 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 203477] [AMD][KVM] Windows L1 guest becomes extremely slow and
+ unusable after enabling Hyper-V
+Date:   Thu, 19 Sep 2019 03:11:12 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: edufrazao@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-203477-28872-j5x1ddChGR@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203477-28872@https.bugzilla.kernel.org/>
+References: <bug-203477-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <1567815231-17940-1-git-send-email-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-19_01:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909190010
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ping
+https://bugzilla.kernel.org/show_bug.cgi?id=203477
 
-On 9/6/19 8:13 PM, Matthew Rosato wrote:
-> Note: These patches by Pierre got lost in the ether a few months back
-> as he has been unavailable to carry them forward.  I've made changes
-> based upon comments received on his last version.
-> 
-> We define a new configuration entry for VFIO/PCI, VFIO_PCI_ZDEV
-> to configure access to a zPCI region dedicated for retrieving
-> zPCI features.
-> 
-> When the VFIO_PCI_ZDEV feature is configured we initialize
-> a new device region, VFIO_REGION_SUBTYPE_ZDEV_CLP, to hold
-> the information from the ZPCI device the userland needs to
-> give to a guest driving the zPCI function.
-> 
-> 
-> Note that in the current state we do not use the CLP instructions
-> to access the firmware but get the information directly from
-> the zdev device.
-> 
-> -This means that the patch 1, "s390: pci: Exporting access to CLP PCI
-> function and PCI group" is not used and can be let out of this series
-> without denying the good working of the other patches.
-> - But we will need this later, eventually in the next iteration
->   to retrieve values not being saved inside the zdev structure.
->   like maxstbl and the PCI supported version
-> 
-> To share the code with arch/s390/pci/pci_clp.c the original functions
-> in pci_clp.c to query PCI functions and PCI functions group are
-> modified so that they can be exported.
-> 
-> A new function clp_query_pci() replaces clp_query_pci_fn() and
-> the previous calls to clp_query_pci_fn() and clp_query_pci_fngrp()
-> are replaced with calls to zdev_query_pci_fn() and zdev_query_pci_fngrp()
-> using a zdev pointer as argument.
-> 
-> Changes since v3:
-> - New patch: define maxstbl
-> - Remove CLP_UTIL_STR_LEN references from uapi header
-> - Fix broken ifdef CONFIG_VFIO_PCI_ZDEV
-> - Change Kconfig option from tristate to bool
-> - Remove VFIO_REGION_TYPE_IBM_ZDEV, move VFIO_REGION_SUBTYPE_ZDEV_CLP to a 1014 subtype
-> - reject iswrite in .rw callback
-> - Remove rw restriction on identical buffer sizes
-> - Allow arbitrary sized read
-> 
-> Pierre Morel (4):
->   s390: pci: Exporting access to CLP PCI function and PCI group
->   s390: pci: Define the maxstbl CLP response entry
->   vfio: zpci: defining the VFIO headers
->   vfio: pci: Using a device region to retrieve zPCI information
-> 
->  arch/s390/include/asm/pci.h         |  3 ++
->  arch/s390/include/asm/pci_clp.h     |  2 +-
->  arch/s390/pci/pci_clp.c             | 71 ++++++++++++++++---------------
->  drivers/vfio/pci/Kconfig            |  7 +++
->  drivers/vfio/pci/Makefile           |  1 +
->  drivers/vfio/pci/vfio_pci.c         |  9 ++++
->  drivers/vfio/pci/vfio_pci_private.h | 10 +++++
->  drivers/vfio/pci/vfio_pci_zdev.c    | 85 +++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h           |  1 +
->  include/uapi/linux/vfio_zdev.h      | 35 +++++++++++++++
->  10 files changed, 189 insertions(+), 35 deletions(-)
->  create mode 100644 drivers/vfio/pci/vfio_pci_zdev.c
->  create mode 100644 include/uapi/linux/vfio_zdev.h
-> 
+--- Comment #3 from Eduardo Frazão (edufrazao@gmail.com) ---
+I have the exact same errors, but here my Windows 10 Pro L1 freezes few seconds
+start. I'm trying to use Windows SandBox.
 
+Ryzen 3700x // Gigabyte X570 Aorus Elite
+Kernel 5.3.0.
+
+I have AMD SVM enabled in BIOS and IOMMU disabled.
+
+
+
+beast ~ # grep -H '' /sys/module/kvm_amd/parameters/*
+/sys/module/kvm_amd/parameters/avic:0
+/sys/module/kvm_amd/parameters/dump_invalid_vmcb:N
+/sys/module/kvm_amd/parameters/nested:1
+/sys/module/kvm_amd/parameters/npt:1
+/sys/module/kvm_amd/parameters/nrips:1
+/sys/module/kvm_amd/parameters/pause_filter_count:3000
+/sys/module/kvm_amd/parameters/pause_filter_count_grow:2
+/sys/module/kvm_amd/parameters/pause_filter_count_max:65535
+/sys/module/kvm_amd/parameters/pause_filter_count_shrink:0
+/sys/module/kvm_amd/parameters/pause_filter_thresh:128
+/sys/module/kvm_amd/parameters/sev:0
+/sys/module/kvm_amd/parameters/vgif:1
+/sys/module/kvm_amd/parameters/vls:1
+
+beast ~ # grep -H '' /sys/module/kvm/parameters/*
+/sys/module/kvm/parameters/enable_vmware_backdoor:N
+/sys/module/kvm/parameters/force_emulation_prefix:N
+/sys/module/kvm/parameters/halt_poll_ns:200000
+/sys/module/kvm/parameters/halt_poll_ns_grow:2
+/sys/module/kvm/parameters/halt_poll_ns_grow_start:10000
+/sys/module/kvm/parameters/halt_poll_ns_shrink:0
+/sys/module/kvm/parameters/ignore_msrs:Y
+/sys/module/kvm/parameters/kvmclock_periodic_sync:Y
+/sys/module/kvm/parameters/lapic_timer_advance_ns:-1
+/sys/module/kvm/parameters/min_timer_period_us:200
+/sys/module/kvm/parameters/pi_inject_timer:0
+/sys/module/kvm/parameters/report_ignored_msrs:Y
+/sys/module/kvm/parameters/tsc_tolerance_ppm:250
+/sys/module/kvm/parameters/vector_hashing:Y
+
+
+QEMU Command line:
+usr/bin/qemu-system-x86_64 -name guest=Win10Devel,debug-threads=on -S -object
+secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-1-Win10Devel/master-key.aes
+-machine pc-q35-4.0.1,accel=kvm,usb=off,dump-guest-core=off -cpu
+EPYC-IBPB,svm=on,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=0x1fff -m 6072
+-overcommit mem-lock=off -smp 4,sockets=1,cores=2,threads=2 -uuid
+466412cf-36da-4297-ba3e-6f7e7b0b0b5d -no-user-config -nodefaults -chardev
+socket,id=charmonitor,fd=22,server,nowait -mon
+chardev=charmonitor,id=monitor,mode=control -rtc base=localtime,driftfix=slew
+-global kvm-pit.lost_tick_policy=delay -no-hpet -no-shutdown -global
+ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 -boot strict=on -device
+pcie-root-port,port=0x10,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x2
+-device pcie-root-port,port=0x11,chassis=2,id=pci.2,bus=pcie.0,addr=0x2.0x1
+-device pcie-root-port,port=0x12,chassis=3,id=pci.3,bus=pcie.0,addr=0x2.0x2
+-device pcie-root-port,port=0x13,chassis=4,id=pci.4,bus=pcie.0,addr=0x2.0x3
+-device pcie-root-port,port=0x14,chassis=5,id=pci.5,bus=pcie.0,addr=0x2.0x4
+-device pcie-root-port,port=0x15,chassis=6,id=pci.6,bus=pcie.0,addr=0x2.0x5
+-device qemu-xhci,p2=15,p3=15,id=usb,bus=pci.2,addr=0x0 -device
+virtio-serial-pci,id=virtio-serial0,bus=pci.3,addr=0x0 -drive
+file=/mnt/storage/Eduardo/VM/KVM/win10_desenvolvimento.qcow2,format=qcow2,if=none,id=drive-virtio-disk0,cache=none,aio=native
+-device
+virtio-blk-pci,scsi=off,bus=pci.4,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=2,write-cache=on
+-drive if=none,id=drive-sata0-0-1,readonly=on -device
+ide-cd,bus=ide.1,drive=drive-sata0-0-1,id=sata0-0-1,bootindex=1 -drive
+if=none,id=drive-fdc0-0-0 -device isa-fdc,driveA=drive-fdc0-0-0 -netdev
+tap,fd=24,id=hostnet0,vhost=on,vhostfd=25 -device
+virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:00:2f:ca,bus=pci.1,addr=0x0
+-chardev pty,id=charserial0 -device isa-serial,chardev=charserial0,id=serial0
+-chardev spicevmc,id=charchannel0,name=vdagent -device
+virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=com.redhat.spice.0
+-chardev socket,id=charchannel1,fd=26,server,nowait -device
+virtserialport,bus=virtio-serial0.0,nr=2,chardev=charchannel1,id=channel1,name=org.qemu.guest_agent.0
+-chardev spiceport,id=charchannel2,name=org.spice-space.webdav.0 -device
+virtserialport,bus=virtio-serial0.0,nr=3,chardev=charchannel2,id=channel2,name=org.spice-space.webdav.0
+-device usb-tablet,id=input0,bus=usb.0,port=1 -spice
+port=5900,addr=127.0.0.1,disable-ticketing,image-compression=off,seamless-migration=on
+-device
+qxl-vga,id=video0,ram_size=134217728,vram_size=134217728,vram64_size_mb=0,vgamem_mb=64,max_outputs=1,bus=pcie.0,addr=0x1
+-device virtio-balloon-pci,id=balloon0,bus=pci.5,addr=0x0 -sandbox
+on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny -msg
+timestamp=on
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
