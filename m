@@ -2,141 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5184DB7E66
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 17:41:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C696B7E7D
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 17:48:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731794AbfISPk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 11:40:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60699 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726007AbfISPk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 11:40:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1568907656;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=jtOOTxtBSH0XScdrTXtYNsOa16spVRV1/m7O55QYuzg=;
-        b=LTut5zdWab+uFf8fl/RKozzHFTM3FCe7L5/xbJNJZ+XWr/fT43nZniWGY0YvicJFDnDdfl
-        4iqv22e7xh0C2nW6PLTaPNkrsZG2/z7s5iN1YLPUG5h3XLd3lqhtuqEcNFatGlTcShPcVr
-        RAZ5Tvz9mY7uS3I20JwsRO8W//DdSiA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-IFjtD5VOPDm5gN35R8DYEA-1; Thu, 19 Sep 2019 11:40:54 -0400
-Received: by mail-wm1-f69.google.com with SMTP id h6so2008825wmb.2
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 08:40:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bAINjjRSlbUTjobcIGuJ8vNAwyPobHG3I1/jgsCdgXw=;
-        b=UgQ0TV/nB7zZQ7UG/cSXWLK4LHIb3hDuR2Nna4/ngB3NoitKAFzG6jmhLIzCwsZ34L
-         zlIE1DdMRpuUWjtfdvgKg4DGf20nr0XVVwGejFmSXbqQnHBLvMj2C36jnK85q8/Eazj7
-         k/fZ7xkY9psPSIhILf+XHliDzU8I1z6R1E+7iqRiopV8lQ6xsWZLy7DFLCcFt4YNr8qa
-         owpI0SPVR9qySr+9V9ZGgX2wlfPcMN+dJP3aQcI7ja+KTPmDpvgP1ZkS5z6Yn37aERBn
-         BZR4n4hn8ztB9oRU/+E5vNP6hmWBQ2gp6jI+FnpyTQz1f8kVO6+ulw4cYk+DaxgOx/wj
-         gM3g==
-X-Gm-Message-State: APjAAAW/hGu/1vW87rgzD4yRg3zMYA8VguGJbxQ/mCJU55vryzvzN1DI
-        nZnu5hXpGnOIxs9wBVpQ31nRgLXpvXeMWdMytif9pxtiIWVsUDUvv5pCqJul2D8dolIcpQoKdTD
-        pJIElKwVIJsaL
-X-Received: by 2002:adf:e488:: with SMTP id i8mr7375476wrm.20.1568907653242;
-        Thu, 19 Sep 2019 08:40:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwR9KVma4Xblc47G5SpP/XvO6PKkeiTk0NhW+haXvKEfP9pKSHtsHzJm0BanCJIZYw+ZParUA==
-X-Received: by 2002:adf:e488:: with SMTP id i8mr7375450wrm.20.1568907652977;
-        Thu, 19 Sep 2019 08:40:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
-        by smtp.gmail.com with ESMTPSA id t6sm9820328wmf.8.2019.09.19.08.40.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2019 08:40:52 -0700 (PDT)
-Subject: Re: [RFC patch 15/15] x86/kvm: Use GENERIC_EXIT_WORKPENDING
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org
-References: <20190919150314.054351477@linutronix.de>
- <20190919150809.964620570@linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ef1145d8-01af-57d2-1065-cf12db16e422@redhat.com>
-Date:   Thu, 19 Sep 2019 17:40:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2390060AbfISPsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 11:48:40 -0400
+Received: from mga17.intel.com ([192.55.52.151]:46951 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388700AbfISPsj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 11:48:39 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Sep 2019 08:48:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,524,1559545200"; 
+   d="scan'208";a="362555450"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.71])
+  by orsmga005.jf.intel.com with ESMTP; 19 Sep 2019 08:48:36 -0700
+Date:   Thu, 19 Sep 2019 23:45:52 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+Subject: Re: [RFC v4 0/3] vhost: introduce mdev based hardware backend
+Message-ID: <20190919154552.GA27657@___>
+References: <20190917010204.30376-1-tiwei.bie@intel.com>
+ <993841ed-942e-c90b-8016-8e7dc76bf13a@redhat.com>
+ <20190917105801.GA24855@___>
+ <fa6957f3-19ad-f351-8c43-65bc8342b82e@redhat.com>
+ <20190918102923-mutt-send-email-mst@kernel.org>
+ <d2efe7e4-cf13-437d-e2dc-e2779fac7d2f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190919150809.964620570@linutronix.de>
-Content-Language: en-US
-X-MC-Unique: IFjtD5VOPDm5gN35R8DYEA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d2efe7e4-cf13-437d-e2dc-e2779fac7d2f@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/09/19 17:03, Thomas Gleixner wrote:
-> Use the generic infrastructure to check for and handle pending work befor=
-e
-> entering into guest mode.
->=20
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+On Thu, Sep 19, 2019 at 09:08:11PM +0800, Jason Wang wrote:
+> On 2019/9/18 下午10:32, Michael S. Tsirkin wrote:
+> > > > > So I have some questions:
+> > > > > 
+> > > > > 1) Compared to method 2, what's the advantage of creating a new vhost char
+> > > > > device? I guess it's for keep the API compatibility?
+> > > > One benefit is that we can avoid doing vhost ioctls on
+> > > > VFIO device fd.
+> > > Yes, but any benefit from doing this?
+> > It does seem a bit more modular, but it's certainly not a big deal.
+> 
+> Ok, if we go this way, it could be as simple as provide some callback to
+> vhost, then vhost can just forward the ioctl through parent_ops.
+> 
+> > 
+> > > > > 2) For method 2, is there any easy way for user/admin to distinguish e.g
+> > > > > ordinary vfio-mdev for vhost from ordinary vfio-mdev?
+> > > > I think device-api could be a choice.
+> > > Ok.
+> > > 
+> > > 
+> > > > > I saw you introduce
+> > > > > ops matching helper but it's not friendly to management.
+> > > > The ops matching helper is just to check whether a given
+> > > > vfio-device is based on a mdev device.
+> > > > 
+> > > > > 3) A drawback of 1) and 2) is that it must follow vfio_device_ops that
+> > > > > assumes the parameter comes from userspace, it prevents support kernel
+> > > > > virtio drivers.
+> > > > > 
+> > > > > 4) So comes the idea of method 3, since it register a new vhost-mdev driver,
+> > > > > we can use device specific ops instead of VFIO ones, then we can have a
+> > > > > common API between vDPA parent and vhost-mdev/virtio-mdev drivers.
+> > > > As the above draft shows, this requires introducing a new
+> > > > VFIO device driver. I think Alex's opinion matters here.
+> 
+> Just to clarify, a new type of mdev driver but provides dummy
+> vfio_device_ops for VFIO to make container DMA ioctl work.
 
-Subject should be "x86/kvm: use exit_to_guestmode".
+I see. Thanks! IIUC, you mean we can provide a very tiny
+VFIO device driver in drivers/vhost/mdev.c, e.g.:
 
-Paolo
+static int vfio_vhost_mdev_open(void *device_data)
+{
+	if (!try_module_get(THIS_MODULE))
+		return -ENODEV;
+	return 0;
+}
 
-> ---
->  arch/x86/kvm/x86.c |   17 +++++------------
->  1 file changed, 5 insertions(+), 12 deletions(-)
->=20
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -52,6 +52,7 @@
->  #include <linux/irqbypass.h>
->  #include <linux/sched/stat.h>
->  #include <linux/sched/isolation.h>
-> +#include <linux/entry-common.h>
->  #include <linux/mem_encrypt.h>
-> =20
->  #include <trace/events/kvm.h>
-> @@ -7984,8 +7985,8 @@ static int vcpu_enter_guest(struct kvm_v
->  =09if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
->  =09=09kvm_x86_ops->sync_pir_to_irr(vcpu);
-> =20
-> -=09if (vcpu->mode =3D=3D EXITING_GUEST_MODE || kvm_request_pending(vcpu)
-> -=09    || need_resched() || signal_pending(current)) {
-> +=09if (vcpu->mode =3D=3D EXITING_GUEST_MODE || kvm_request_pending(vcpu)=
- ||
-> +=09    exit_to_guestmode_work_pending()) {
->  =09=09vcpu->mode =3D OUTSIDE_GUEST_MODE;
->  =09=09smp_wmb();
->  =09=09local_irq_enable();
-> @@ -8178,17 +8179,9 @@ static int vcpu_run(struct kvm_vcpu *vcp
-> =20
->  =09=09kvm_check_async_pf_completion(vcpu);
-> =20
-> -=09=09if (signal_pending(current)) {
-> -=09=09=09r =3D -EINTR;
-> -=09=09=09vcpu->run->exit_reason =3D KVM_EXIT_INTR;
-> -=09=09=09++vcpu->stat.signal_exits;
-> +=09=09r =3D exit_to_guestmode(kvm, vcpu);
-> +=09=09if (r)
->  =09=09=09break;
-> -=09=09}
-> -=09=09if (need_resched()) {
-> -=09=09=09srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
-> -=09=09=09cond_resched();
-> -=09=09=09vcpu->srcu_idx =3D srcu_read_lock(&kvm->srcu);
-> -=09=09}
->  =09}
-> =20
->  =09srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
->=20
->=20
+static void vfio_vhost_mdev_release(void *device_data)
+{
+	module_put(THIS_MODULE);
+}
 
+static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
+	.name		= "vfio-vhost-mdev",
+	.open		= vfio_vhost_mdev_open,
+	.release	= vfio_vhost_mdev_release,
+};
+
+static int vhost_mdev_probe(struct device *dev)
+{
+	struct mdev_device *mdev = to_mdev_device(dev);
+
+	... Check the mdev device_id proposed in ...
+	... https://lkml.org/lkml/2019/9/12/151 ...
+
+	return vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, mdev);
+}
+
+static void vhost_mdev_remove(struct device *dev)
+{
+	vfio_del_group_dev(dev);
+}
+
+static struct mdev_driver vhost_mdev_driver = {
+	.name	= "vhost_mdev",
+	.probe	= vhost_mdev_probe,
+	.remove	= vhost_mdev_remove,
+};
+
+So we can bind above mdev driver to the virtio-mdev compatible
+mdev devices when we want to use vhost-mdev.
+
+After binding above driver to the mdev device, we can setup IOMMU
+via VFIO and get VFIO device fd of this mdev device, and pass it
+to vhost fd (/dev/vhost-mdev) with a SET_BACKEND ioctl.
+
+Thanks,
+Tiwei
+
+> 
+> Thanks
+> 
+> 
+> > > Yes, it is.
+> > > 
+> > > Thanks
+> > > 
+> > > 
