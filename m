@@ -2,150 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C696B7E7D
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 17:48:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54D14B80C2
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 20:26:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390060AbfISPsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 11:48:40 -0400
-Received: from mga17.intel.com ([192.55.52.151]:46951 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388700AbfISPsj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 11:48:39 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Sep 2019 08:48:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,524,1559545200"; 
-   d="scan'208";a="362555450"
-Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.71])
-  by orsmga005.jf.intel.com with ESMTP; 19 Sep 2019 08:48:36 -0700
-Date:   Thu, 19 Sep 2019 23:45:52 +0800
-From:   Tiwei Bie <tiwei.bie@intel.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-Subject: Re: [RFC v4 0/3] vhost: introduce mdev based hardware backend
-Message-ID: <20190919154552.GA27657@___>
-References: <20190917010204.30376-1-tiwei.bie@intel.com>
- <993841ed-942e-c90b-8016-8e7dc76bf13a@redhat.com>
- <20190917105801.GA24855@___>
- <fa6957f3-19ad-f351-8c43-65bc8342b82e@redhat.com>
- <20190918102923-mutt-send-email-mst@kernel.org>
- <d2efe7e4-cf13-437d-e2dc-e2779fac7d2f@redhat.com>
+        id S2391517AbfISS01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 14:26:27 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:36882 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391505AbfISS00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 14:26:26 -0400
+Received: by mail-io1-f67.google.com with SMTP id b19so10135723iob.4
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 11:26:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IwUvR/4tcp2TNPi5HKxxq+Q4HUm6QLsbgorFVB29v+M=;
+        b=DR961+H7n5xGa/DM4V8+cpf2x0cChPz1xhRRQCZdHXeNit+95FTKO6LUECwBMbmHJA
+         qAGl1Xb48BQRwFOlLRiOr5aM+/wP/hvWw/8Zw2+Q3RTKSBDBO5EoQX0SSnFOfATu5V9Z
+         xHQPvh1EMnFvIqvazC+dH3wM2LH+jWSzBh9iZUrTU+t/QVcuAr5v6VrDOrIK3LBoQAkm
+         USDen0KpevVPE1RhR8AGF4F5FtdKmRf41dExn2SYxxAEB7U+ArbyotCqaTX/2146SRWn
+         dEV6LhRSOQbQE0rP6wD195XYTfmEFcBdJuVfqHBpYgXyies2mvlYN2b7ZSIHlx5ZO2PW
+         BAOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IwUvR/4tcp2TNPi5HKxxq+Q4HUm6QLsbgorFVB29v+M=;
+        b=B4FJPJ+J7Cjn0D6+tkQx1CCY65A5spCl+GDaTmY9rc4S/L77a+i+ACM1O+jEju+Wet
+         2yHKutF+IR/k2RwQyKLmxsjsPiV701CTkl13BH7r3jKmGKDz75S2+Qa3/W8U/VmRpP33
+         i18ZrSyHj2nP+YybUvE+cZKcAWVPbEemt12Bvbr1dATGLZ/7E5fo6/fOI3q3OkDHjIFI
+         SIHQY4W05lAdakP4wvGsFLOCwu90LhedRqWCPVijmOZm+VBaEwZ21GHU0Jpbq9IKuijm
+         AzTD0IdqP2Jvbs3eXAImEvSMEKsj8kd46c1mE3RktZ1TsCn5fvvSeobeBJSlznOven9K
+         fhDA==
+X-Gm-Message-State: APjAAAVRvm9YmfIYx9cmFNyjVF3GGG6sCtWX8CQBdrLyDV7X1SvNwoMw
+        Hj0hKsNNdgbR2Bl+V0II+nP0MdOGZjvV20YK9N7hjg==
+X-Google-Smtp-Source: APXvYqytVUJayJBVODl0Bphjg7wIJBjyMctGjETjfcnzsErgZzYiihVLBdG9YxB5VwQLuKJK7iFSYF3tSZo438cvK0k=
+X-Received: by 2002:a5e:8a43:: with SMTP id o3mr13747952iom.296.1568917584206;
+ Thu, 19 Sep 2019 11:26:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d2efe7e4-cf13-437d-e2dc-e2779fac7d2f@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20190912232753.85969-1-jmattson@google.com> <20190918174308.GC14850@linux.intel.com>
+ <CALMp9eQSd8kMKEdLYTF2ugAYjQO-wAR-PoYmf0NgD2Z4ZVr5FA@mail.gmail.com>
+ <CALMp9eSJkjO0CX2_s1QpgaYk-pDVCYoof_QVjxf9cpquaMOr1A@mail.gmail.com> <b3ebf989-8da9-6fa6-9296-ec694988e645@intel.com>
+In-Reply-To: <b3ebf989-8da9-6fa6-9296-ec694988e645@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 19 Sep 2019 11:26:13 -0700
+Message-ID: <CALMp9eRQRsOekTCnSvafrMv79WAymFtPcGGLvqSFPPoH0YnBJw@mail.gmail.com>
+Subject: Re: [RFC][PATCH] kvm: x86: Improve emulation of CPUID leaves 0BH and 1FH
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Steve Rutherford <srutherford@google.com>,
+        Jacob Xu <jacobhxu@google.com>, Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 09:08:11PM +0800, Jason Wang wrote:
-> On 2019/9/18 下午10:32, Michael S. Tsirkin wrote:
-> > > > > So I have some questions:
-> > > > > 
-> > > > > 1) Compared to method 2, what's the advantage of creating a new vhost char
-> > > > > device? I guess it's for keep the API compatibility?
-> > > > One benefit is that we can avoid doing vhost ioctls on
-> > > > VFIO device fd.
-> > > Yes, but any benefit from doing this?
-> > It does seem a bit more modular, but it's certainly not a big deal.
-> 
-> Ok, if we go this way, it could be as simple as provide some callback to
-> vhost, then vhost can just forward the ioctl through parent_ops.
-> 
-> > 
-> > > > > 2) For method 2, is there any easy way for user/admin to distinguish e.g
-> > > > > ordinary vfio-mdev for vhost from ordinary vfio-mdev?
-> > > > I think device-api could be a choice.
-> > > Ok.
-> > > 
-> > > 
-> > > > > I saw you introduce
-> > > > > ops matching helper but it's not friendly to management.
-> > > > The ops matching helper is just to check whether a given
-> > > > vfio-device is based on a mdev device.
-> > > > 
-> > > > > 3) A drawback of 1) and 2) is that it must follow vfio_device_ops that
-> > > > > assumes the parameter comes from userspace, it prevents support kernel
-> > > > > virtio drivers.
-> > > > > 
-> > > > > 4) So comes the idea of method 3, since it register a new vhost-mdev driver,
-> > > > > we can use device specific ops instead of VFIO ones, then we can have a
-> > > > > common API between vDPA parent and vhost-mdev/virtio-mdev drivers.
-> > > > As the above draft shows, this requires introducing a new
-> > > > VFIO device driver. I think Alex's opinion matters here.
-> 
-> Just to clarify, a new type of mdev driver but provides dummy
-> vfio_device_ops for VFIO to make container DMA ioctl work.
+On Wed, Sep 18, 2019 at 10:31 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+> I vote for Sean's one-off case, how about something like this:
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 22c2720cd948..6af5febf7b12 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -976,11 +976,23 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax,
+> u32 *ebx,
+>                 u32 *ecx, u32 *edx, bool check_limit)
+>   {
+>          u32 function = *eax, index = *ecx;
+> -       struct kvm_cpuid_entry2 *best;
+> +       struct kvm_cpuid_entry2 *best, tmp;
+>          bool entry_found = true;
+>
+>          best = kvm_find_cpuid_entry(vcpu, function, index);
+>
+> +       if (!best && (fuction == 0xb || function == 0x1f) && index > 0) {
+> +               best = kvm_find_cpuid_entry(vcpu, function, 0);
+> +               if (best) {
+> +                       tmp.eax = 0;
+> +                       tmp.ebx = 0;
+> +                       tmp.ecx = index & 0xff;
+> +                       tmp.edx = best->edx;
+> +                       best = &tmp;
+> +                       goto out;
+> +               }
+> +       }
+> +
 
-I see. Thanks! IIUC, you mean we can provide a very tiny
-VFIO device driver in drivers/vhost/mdev.c, e.g.:
-
-static int vfio_vhost_mdev_open(void *device_data)
-{
-	if (!try_module_get(THIS_MODULE))
-		return -ENODEV;
-	return 0;
-}
-
-static void vfio_vhost_mdev_release(void *device_data)
-{
-	module_put(THIS_MODULE);
-}
-
-static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
-	.name		= "vfio-vhost-mdev",
-	.open		= vfio_vhost_mdev_open,
-	.release	= vfio_vhost_mdev_release,
-};
-
-static int vhost_mdev_probe(struct device *dev)
-{
-	struct mdev_device *mdev = to_mdev_device(dev);
-
-	... Check the mdev device_id proposed in ...
-	... https://lkml.org/lkml/2019/9/12/151 ...
-
-	return vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, mdev);
-}
-
-static void vhost_mdev_remove(struct device *dev)
-{
-	vfio_del_group_dev(dev);
-}
-
-static struct mdev_driver vhost_mdev_driver = {
-	.name	= "vhost_mdev",
-	.probe	= vhost_mdev_probe,
-	.remove	= vhost_mdev_remove,
-};
-
-So we can bind above mdev driver to the virtio-mdev compatible
-mdev devices when we want to use vhost-mdev.
-
-After binding above driver to the mdev device, we can setup IOMMU
-via VFIO and get VFIO device fd of this mdev device, and pass it
-to vhost fd (/dev/vhost-mdev) with a SET_BACKEND ioctl.
-
-Thanks,
-Tiwei
-
-> 
-> Thanks
-> 
-> 
-> > > Yes, it is.
-> > > 
-> > > Thanks
-> > > 
-> > > 
+I don't believe this works for the case where 0BH or 1FH is the
+maximum basic leaf, in which case all out-of-range leaves should have
+this behavior. But I'll go ahead and work up a solution using this
+two-off :-) approach.
