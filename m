@@ -2,80 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFBABB839E
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 23:44:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F467B83C2
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 23:55:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403910AbfISVom (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 17:44:42 -0400
-Received: from mga09.intel.com ([134.134.136.24]:64359 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393087AbfISVom (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 17:44:42 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Sep 2019 14:44:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,526,1559545200"; 
-   d="scan'208";a="192180625"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga006.jf.intel.com with ESMTP; 19 Sep 2019 14:44:41 -0700
-Date:   Thu, 19 Sep 2019 14:44:41 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Bill Wendling <morbo@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marc Orr <marcorr@google.com>
-Subject: Re: [PATCH] x86: remove memory constraint from "mov" instruction
-Message-ID: <20190919214441.GH30495@linux.intel.com>
-References: <CAGG=3QXxGVs-s0H2Emw1tYMtcGtQsEHrYnmHztL=vOFanZegMw@mail.gmail.com>
- <20190912205944.120303-1-morbo@google.com>
+        id S2390683AbfISVzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 17:55:33 -0400
+Received: from werkudoro.jatengprov.go.id ([103.9.227.34]:53600 "EHLO
+        werkudoro.jatengprov.go.id" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389212AbfISVzd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Sep 2019 17:55:33 -0400
+X-Greylist: delayed 56171 seconds by postgrey-1.27 at vger.kernel.org; Thu, 19 Sep 2019 17:55:32 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=jatengprov.go.id; s=default; h=Message-ID:Reply-To:To:From:Date:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:Sender:Subject:Cc:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=0O74bB0m9ayKdDS8/MejnjZe64f4nqo9ovGQF1tik/s=; b=xMVg65rsvvsxI2cqbqKlVcoaU
+        7VDE3phGMIr3mjD2JDUQIPyhiI9qxEpw6KLg8S9m0ld7okft/sb+KQF/X7C5Zg25c2OY9L3gww8Bk
+        7yP2YiJgfZOHlmlgfZ6+D6gzjFRAz1Hdyp6Q6sbJajy/iBZQHsXqk14S7OWYY6P6kHBnnJZmnkizq
+        wvUC0RL12NEctnVBlXjeawb0G6VzPXtPQUXro3ya9mKhtSVnl120cTm7Gg780gyA+roHv16wMTKeO
+        a1wQeWabtHabrEvwu7vddDnMF8xHRPtMeFLhQMWPv5vmhK/7jJEVp09UZF6oRVw9lBK4HKP3Ci7A4
+        4oZTO7GvQ==;
+Received: from localhost ([127.0.0.1]:34332 helo=werkudoro.jatengprov.go.id)
+        by werkudoro.jatengprov.go.id with esmtpa (Exim 4.92)
+        (envelope-from <bpsdmd@jatengprov.go.id>)
+        id 1iApiH-0007wg-5O; Thu, 19 Sep 2019 13:14:46 +0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190912205944.120303-1-morbo@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Thu, 19 Sep 2019 13:14:45 +0700
+From:   =?UTF-8?Q?Qu=E1=BA=A3n_tr=E1=BB=8B_h=E1=BB=87_th=E1=BB=91ng?= 
+        <bpsdmd@jatengprov.go.id>
+To:     undisclosed-recipients:;
+Reply-To: mailsss@mail2world.com
+Mail-Reply-To: mailsss@mail2world.com
+Message-ID: <4d1dc8b7b56240ded9c7057b3fd40033@jatengprov.go.id>
+X-Sender: bpsdmd@jatengprov.go.id
+User-Agent: Roundcube Webmail/1.3.8
+X-OutGoing-Spam-Status: No, score=3.3
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - werkudoro.jatengprov.go.id
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - jatengprov.go.id
+X-Get-Message-Sender-Via: werkudoro.jatengprov.go.id: authenticated_id: bpsdmd@jatengprov.go.id
+X-Authenticated-Sender: werkudoro.jatengprov.go.id: bpsdmd@jatengprov.go.id
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+cc Paolo, Radim and Marc (to avoid saying the same thing twice)
 
-I recommend having Paolo and Radim in the To: field when sending patches
-for KVM or kvm-unit-tests, simply cc'ing the KVM list may not be enough to
-ensure Paolo/Radim sees the patch.
 
-https://lkml.kernel.org/r/0d59375c-9313-d31a-4af9-d68115e05d55@redhat.com
+-- 
+CHÚ Ý;
 
-On Thu, Sep 12, 2019 at 01:59:44PM -0700, Bill Wendling wrote:
-> Remove a bogus memory constraint as x86 does not have a generic
-> memory-to-memory "mov" instruction.
-> 
-> Signed-off-by: Bill Wendling <morbo@google.com>
+Hộp thư của bạn đã vượt quá giới hạn lưu trữ, là 5 GB
+theo quy định của quản trị viên, người hiện đang chạy
+trên 10,9 GB, bạn không thể gửi hoặc nhận thư mới cho đến
+khi bạn xác thực lại hộp thư của mình. Để xác nhận lại
+hộp thư của bạn, gửi thông tin sau đây:
 
-For the actual patch:
+Tên:
+Tên đăng nhập:
+mật khẩu:
+Xác nhận mật khẩu:
+E-mail:
+điện thoại:
 
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Nếu bạn không thể xác nhận lại hộp thư của mình, hộp
+thư của bạn sẽ bị vô hiệu hóa!
 
-> ---
->  lib/x86/desc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-> index 5f37cef..451f504 100644
-> --- a/lib/x86/desc.c
-> +++ b/lib/x86/desc.c
-> @@ -263,7 +263,7 @@ unsigned exception_error_code(void)
->  {
->      unsigned short error_code;
->  
-> -    asm("mov %%gs:6, %0" : "=rm"(error_code));
-> +    asm("mov %%gs:6, %0" : "=r"(error_code));
->      return error_code;
->  }
->  
-> -- 
-> 2.23.0.237.gc6a4ce50a0-goog
-> 
+Xin lỗi vì sự bất tiện.
+Mã xác minh: en: 006,524.VN
+Hỗ trợ kỹ thuật thư © 2019
+
+cảm ơn bạn
+Quản trị hệ thống.
