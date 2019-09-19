@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AEF48B799D
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 14:38:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A52CB79A1
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 14:39:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390367AbfISMhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 08:37:39 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39812 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388184AbfISMhj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 08:37:39 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r3so2923863wrj.6
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 05:37:37 -0700 (PDT)
+        id S2388228AbfISMji (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 08:39:38 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33171 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387968AbfISMji (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 08:39:38 -0400
+Received: by mail-wr1-f65.google.com with SMTP id b9so2980864wrs.0
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 05:39:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=sifive.com; s=google;
         h=date:from:to:cc:subject:in-reply-to:message-id:references
          :user-agent:mime-version;
-        bh=Vmayzz5+9ezfsk62AunM7OhcuY1qbK/2my5of3osq2Q=;
-        b=CPHzlLRpy1PttVfVK/tH5zuY0rcu5yRxCiJbqcJKiYlnzZXjMsZi9zST57LCLED/D+
-         RG6u7EiJSBX6YS2c+J2cfjL3+R9aiaw83XBaLMWlLITxRCATd2tPmtBUtirokGJfA+wh
-         tLvC9ZVf5XtA5QU/GxpW4gUZMjUsH0SVrI2BfBO2W0AVE26CknDVIhQ3scsfUVZ6Vuqp
-         i7whe6a8HxL52j44c5FBoUtntCnpvvAdRumpS8tg9uyKGR8k30X02mG2RBhMMXzLzj8j
-         d2oyyoBmC813K/tvFhuvjcYzMwQImmdEm75oMVLYPpG2hTPqTYl0RfwgqRJrO4t37jQZ
-         bhgw==
+        bh=/9nzlO3catDpxNdlSs/iGbOfKBBKO21YP3lcrEeeoEQ=;
+        b=fVAVkCOq71OXtZ7J4EkZQGbxKZNZc4L2c8WJZFECgaG3XjO3lNrIVHVYVh9IMMO4ZA
+         AEMbIHHCpAmXbRHlDLww47nqyk/M6i4cvDy2bdZBbYNq1s5u4q00FU+zNh0S2Yp1nA4n
+         SvkzakdSSmj8vYi6Ar6il9zvKCLbJwaDHnshr78mjr3P0x17Z3CufbcLB/mZSwXDj5EH
+         /WplZOw3NE8LiOTVDf9UUFR/qqmcmWBsXas8QqUU6xk9S92tLgHQizN88RYDhuMS65aT
+         U2bmsscollEChMPqNqFdZhT/EgQWz1m084k/kjn+s2p5SWl+QjVtuJHXpfpNQYdksxaA
+         DOJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
          :references:user-agent:mime-version;
-        bh=Vmayzz5+9ezfsk62AunM7OhcuY1qbK/2my5of3osq2Q=;
-        b=kU36cQcM7GDNH12GvGmBhy+eCfjHN9PEzs5l8RtAsE9ItL4ZvCG+EWGlxXOyMgykVu
-         aa+2+pGU2fuPfMndTNSDtdEuq4uS/ctfRdBFpZfdGTWJTQaFZKPTVBvG7t2gV243Xgts
-         5QUba7i6wns+K3qj+wkuN3bxbVsjZSY2n3UG/OBFkyBR/XQT6omNdf5Bs+jSDT5ugvI9
-         Lswx4Cz86PPM1KwxMPOxLhIx30cK8Q8t4/lEkgkBf/OXNsEfvIr1XwRfoWqQtPpYT650
-         Q4Opjpcl2V4mUyi3RojmrAYR5s//mkcrvUu+SLejvKIJNWOKtfk3BYW5tHRQ3W3In1w6
-         aBhw==
-X-Gm-Message-State: APjAAAU80daWB29z3uD6Bwd4FrtuZvE+1IY0b/UmuW9b+Bx/WLLkUHcO
-        inuF5HgKyiOxqhlVr1T8A4SBOw==
-X-Google-Smtp-Source: APXvYqy5AC/9imlDM23EMdY0qHqq/72VZqirSAcl6mbLggKWnGuZppcMG1fhJLwGcSfA4ItZqkmh2A==
-X-Received: by 2002:a5d:4444:: with SMTP id x4mr7022305wrr.11.1568896657158;
-        Thu, 19 Sep 2019 05:37:37 -0700 (PDT)
+        bh=/9nzlO3catDpxNdlSs/iGbOfKBBKO21YP3lcrEeeoEQ=;
+        b=Y1ZqLwhrhe2ZxIBkxtIMlktG/LS+mHYJxM98Xi59auhf8DuLIQr796yUIEhqtKCAvp
+         3HqMXPxg94eO/FGwduBlYVhLXcZ4Efbq3fAiRWhKK9Uc73oqOpGNlaD+btsVpVjHkTfq
+         mDAD7wTUDCO2va7TigCrBwVD7cPTXVmKZmxcHk6649zn+HChaYaPCYLzhF+p4kho5uvN
+         eEbyPjM8yxpz5c1bJqaqjsTC8tcaFGCoT0QiW4w/irS5jOrKySdeUp3i1OGP+bplemv0
+         wNudHUgBsj/y2VaytoIZzpu7gBv1ME9Qs8cFNAmlG9tidJlAs9FYiuGWpydKk4P1vXh8
+         d/RQ==
+X-Gm-Message-State: APjAAAUjBo5+CBbT46q06owSfQzisRhBqjY7UXst3mocWohZlKLlGU8i
+        qquii9alvCsBMs9vAS72qo0Q8w==
+X-Google-Smtp-Source: APXvYqyLGBWany8mv0R6G9JKWZdXIcvLmproKvbB56WPUT5EotusdST4NAJsi4Wf0JYw0isKvhYwOg==
+X-Received: by 2002:adf:db06:: with SMTP id s6mr4131222wri.41.1568896775939;
+        Thu, 19 Sep 2019 05:39:35 -0700 (PDT)
 Received: from localhost ([109.190.253.11])
-        by smtp.gmail.com with ESMTPSA id z3sm4117140wma.29.2019.09.19.05.37.36
+        by smtp.gmail.com with ESMTPSA id d193sm8966640wmd.0.2019.09.19.05.39.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2019 05:37:36 -0700 (PDT)
-Date:   Thu, 19 Sep 2019 05:37:34 -0700 (PDT)
+        Thu, 19 Sep 2019 05:39:35 -0700 (PDT)
+Date:   Thu, 19 Sep 2019 05:39:33 -0700 (PDT)
 From:   Paul Walmsley <paul.walmsley@sifive.com>
 X-X-Sender: paulw@viisi.sifive.com
 To:     Anup Patel <Anup.Patel@wdc.com>
@@ -62,11 +62,10 @@ cc:     Palmer Dabbelt <palmer@sifive.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 01/21] KVM: RISC-V: Add KVM_REG_RISCV for ONE_REG
- interface
-In-Reply-To: <20190904161245.111924-2-anup.patel@wdc.com>
-Message-ID: <alpine.DEB.2.21.9999.1909190537250.12151@viisi.sifive.com>
-References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-2-anup.patel@wdc.com>
+Subject: Re: [PATCH v7 03/21] RISC-V: Export few kernel symbols
+In-Reply-To: <20190904161245.111924-5-anup.patel@wdc.com>
+Message-ID: <alpine.DEB.2.21.9999.1909190537410.12151@viisi.sifive.com>
+References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-5-anup.patel@wdc.com>
 User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -77,15 +76,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, 4 Sep 2019, Anup Patel wrote:
 
-> We will be using ONE_REG interface accessing VCPU registers from
-> user-space hence we add KVM_REG_RISCV for RISC-V VCPU registers.
+> From: Atish Patra <atish.patra@wdc.com>
 > 
+> Export few symbols used by kvm module. Without this, kvm cannot
+> be compiled as a module.
+> 
+> Signed-off-by: Atish Patra <atish.patra@wdc.com>
 > Signed-off-by: Anup Patel <anup.patel@wdc.com>
 > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 > Reviewed-by: Alexander Graf <graf@amazon.com>
 
-Thanks, queued for v5.4-rc.
+Thanks, have updated this patch to apply and to clarify the patch title 
+and have queued the following for v5.4-rc.
 
 
 - Paul
+
+From: Atish Patra <atish.patra@wdc.com>
+Date: Wed, 4 Sep 2019 16:14:06 +0000
+Subject: [PATCH] RISC-V: Export kernel symbols for kvm
+
+Export few symbols used by kvm module. Without this, kvm cannot
+be compiled as a module.
+
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
+[paul.walmsley@sifive.com: updated to apply; clarified short patch 
+ description]
+Signed-off-by: Paul Walmsley <paul.walmsley@sifive.com>
+---
+ arch/riscv/kernel/smp.c  | 1 +
+ arch/riscv/kernel/time.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/arch/riscv/kernel/smp.c b/arch/riscv/kernel/smp.c
+index d70e3c0ee983..f849a2480600 100644
+--- a/arch/riscv/kernel/smp.c
++++ b/arch/riscv/kernel/smp.c
+@@ -210,3 +210,4 @@ void smp_send_reschedule(int cpu)
+ {
+ 	send_ipi_single(cpu, IPI_RESCHEDULE);
+ }
++EXPORT_SYMBOL_GPL(smp_send_reschedule);
+diff --git a/arch/riscv/kernel/time.c b/arch/riscv/kernel/time.c
+index 517d2153a933..8a25d1e440ca 100644
+--- a/arch/riscv/kernel/time.c
++++ b/arch/riscv/kernel/time.c
+@@ -9,6 +9,7 @@
+ #include <asm/processor.h>
+ 
+ unsigned long riscv_timebase;
++EXPORT_SYMBOL_GPL(riscv_timebase);
+ 
+ void __init time_init(void)
+ {
+-- 
+2.23.0
+
