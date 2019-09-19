@@ -2,119 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8E45B7785
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 12:34:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD34AB782A
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 13:07:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732071AbfISKep (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 06:34:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60190 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730959AbfISKeo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Sep 2019 06:34:44 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8JATNTf033543
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 06:34:43 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v46914jfa-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 06:34:43 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Thu, 19 Sep 2019 11:34:41 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 19 Sep 2019 11:34:39 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8JAYaka51773498
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Sep 2019 10:34:36 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 870784C04E;
-        Thu, 19 Sep 2019 10:34:36 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1AB414C04A;
-        Thu, 19 Sep 2019 10:34:36 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.63])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Sep 2019 10:34:36 +0000 (GMT)
-Date:   Thu, 19 Sep 2019 12:34:34 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com, pmorel@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com
-Subject: Re: [PATCH v6 04/10] s390: vfio-ap: filter CRYCB bits for
- unavailable queue devices
-In-Reply-To: <1568410018-10833-5-git-send-email-akrowiak@linux.ibm.com>
-References: <1568410018-10833-1-git-send-email-akrowiak@linux.ibm.com>
-        <1568410018-10833-5-git-send-email-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S2388883AbfISLHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 07:07:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37461 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388708AbfISLHd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 07:07:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1568891252;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=akH4tA+8boh2Z3ENSsOS4nb9YnmpMGx/umkuL11b15A=;
+        b=NxT3PXb7lvloacQa57fkf70iDgJmxYlRKHytbqtWpqp6mhYcBOeHX8bzJVbv8De28zGkm0
+        Frp7QzVCVkxlgdWv8fHmCHEiTT2srjV0ScJLvDl0ClaHBS5R/R9LYEjFxAHVhq4beWRff+
+        RMmoystyb0Gi8OxfKss/zi7Pliw0zHg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-ygKdLMiKNdus4n4__h4V5Q-1; Thu, 19 Sep 2019 07:07:29 -0400
+Received: by mail-wm1-f70.google.com with SMTP id 124so2694177wmz.1
+        for <kvm@vger.kernel.org>; Thu, 19 Sep 2019 04:07:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MrXngNBkRSb78QhU35+OjWCZncslayQbSrEJYxPwRu8=;
+        b=CHjuytW7+COnLAKEP5cKf/sfKpOACEesDqiUf8hQ9Y3VTkGD72RGn4U6SzL3gC9Ysi
+         hIYeEa28TIPINSKEPp91A++WUz8hB49FnP1RItrZfbysb9m6vcu8TDh2bMZBQHNqs6TH
+         rSfAXB/LYwqU6SdzHinhpOtbNvIMf1nHc82GgptQ4xhE3duYr3T+GTxYRVAGWWwrvsuH
+         PXkpjMZqIq3KKNkxamjmwKUuJ/tpxjOFzlM9DOBY9TWWsiTGHbbnyGQxeKUXsBNI2yDu
+         lLg5TOjufqW0/ENlgWCQbjv7RBYJ5VHAJQykbbW26NYlvVc8Zby9cW/31E3Z+saoAwy9
+         I33g==
+X-Gm-Message-State: APjAAAVsdLJPP7GvgoUWEQcp1t+qtrSyU/nJkNbVbOvZQUFXEz9VAvaD
+        iXljzVKUeUQnd/lIqnxmWy/UNRkJUV23PYi+Esc35BfUkITlRgq43m29A1FywSe2W9Lm+hmcNBH
+        tSjfYlGmLrjm1
+X-Received: by 2002:a5d:40d2:: with SMTP id b18mr6966167wrq.4.1568891247736;
+        Thu, 19 Sep 2019 04:07:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwckM+/LSaoom2PwxEmBix+GsMstuwLeTRInJeFdhoBW3jpxwLH/cidatmfnMnCjGzYBzirCw==
+X-Received: by 2002:a5d:40d2:: with SMTP id b18mr6966141wrq.4.1568891247420;
+        Thu, 19 Sep 2019 04:07:27 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
+        by smtp.gmail.com with ESMTPSA id b16sm14179405wrh.5.2019.09.19.04.07.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Sep 2019 04:07:26 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 4/6] psci: Add hvc call service for ptp_kvm.
+To:     "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        "Kaly Xin (Arm Technology China)" <Kaly.Xin@arm.com>,
+        "Justin He (Arm Technology China)" <Justin.He@arm.com>,
+        nd <nd@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <20190918080716.64242-1-jianyong.wu@arm.com>
+ <20190918080716.64242-5-jianyong.wu@arm.com>
+ <83ed7fac-277f-a31e-af37-8ec134f39d26@redhat.com>
+ <HE1PR0801MB1676F57B317AE85E3B934B32F48E0@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <629538ea-13fb-e666-8df6-8ad23f114755@redhat.com>
+ <HE1PR0801MB167639E2F025998058A77F86F4890@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <ef6ab8bd-41ad-88f8-9cfd-dc749ca65310@redhat.com>
+Date:   Thu, 19 Sep 2019 13:07:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19091910-0008-0000-0000-000003186382
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19091910-0009-0000-0000-00004A36E85C
-Message-Id: <20190919123434.28a29c00.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-19_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=943 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909190099
+In-Reply-To: <HE1PR0801MB167639E2F025998058A77F86F4890@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+Content-Language: en-US
+X-MC-Unique: ygKdLMiKNdus4n4__h4V5Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 Sep 2019 17:26:52 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 19/09/19 11:46, Jianyong Wu (Arm Technology China) wrote:
+>> On 18/09/19 11:57, Jianyong Wu (Arm Technology China) wrote:
+>>> Paolo Bonzini wrote:
+>>>> This is not Y2038-safe.  Please use ktime_get_real_ts64 instead, and
+>>>> split the 64-bit seconds value between val[0] and val[1].
+>
+> Val[] should be long not u32 I think, so in arm64 I can avoid that Y2038_=
+safe, but
+> also need rewrite for arm32.
 
-> +static void vfio_ap_mdev_get_crycb_matrix(struct ap_matrix_mdev *matrix_mdev)
-> +{
-> +	unsigned long apid, apqi;
-> +	unsigned long masksz = BITS_TO_LONGS(AP_DEVICES) *
-> +			       sizeof(unsigned long);
-> +
-> +	memset(matrix_mdev->crycb.apm, 0, masksz);
-> +	memset(matrix_mdev->crycb.apm, 0, masksz);
-> +	memcpy(matrix_mdev->crycb.adm, matrix_mdev->matrix.adm, masksz);
-> +
-> +	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm,
-> +			     matrix_mdev->matrix.apm_max + 1) {
-> +		for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
-> +				     matrix_mdev->matrix.aqm_max + 1) {
-> +			if (vfio_ap_find_queue(AP_MKQID(apid, apqi))) {
-> +				if (!test_bit_inv(apid, matrix_mdev->crycb.apm))
-> +					set_bit_inv(apid,
-> +						    matrix_mdev->crycb.apm);
-> +				if (!test_bit_inv(apqi, matrix_mdev->crycb.aqm))
-> +					set_bit_inv(apqi,
-> +						    matrix_mdev->crycb.aqm);
-> +			}
-> +		}
-> +	}
-> +}
+I don't think there's anything inherently wrong with u32 val[], and as
+you notice it lets you reuse code between arm and arm64.  It's up to you
+and Marc to decide.
 
-Even with the discussed typo fixed (zero crycb.aqm) this procedure does
-not make sense to me. :(
+>>>> However, it seems to me that the new function is not needed and you
+>>>> can just use ktime_get_snapshot.  You'll get the time in
+>>>> systime_snapshot->real and the cycles value in systime_snapshot->cycle=
+s.
+>>>
+>>> See patch 5/6, I need both counter cycle and clocksource,
+>> ktime_get_snapshot seems only offer cycles.
+>>
+>> No, patch 5/6 only needs the current clock (ptp_sc.cycles is never acces=
+sed).
+>> So you could just use READ_ONCE(tk->tkr_mono.clock).
+>>
+> Yeah, patch 5/6 just need clocksource, but I think tk->tkr_mono.clock can=
+'t read in external like module,
+> So I need an API to expose clocksource.
+> =20
+>> However, even then I don't think it is correct to use ptp_sc.cs blindly =
+in patch
+>> 5.  I think there is a misunderstanding on the meaning of
+>> system_counterval.cs as passed to get_device_system_crosststamp.
+>> system_counterval.cs is not the active clocksource; it's the clocksource=
+ on
+>> which system_counterval.cycles is based.
+>>
+>=20
+> I think we can use system_counterval_t as pass current clocksource to sys=
+tem_counterval_t.cs and its
+> corresponding cycles to system_counterval_t.cycles. is it a big problem?
 
-If in doubt please consider the following example:
-matrix_mdev->matrix.apm and matrix_mdev->matrix.aqm have both just bits
-0 and 1 set (i.e. first byte 0xC0 the rest of the bytes 0x0). Queues
-bound to the vfio_ap driver (0,0), (0,1), (1,0); not bound to vfio_ap is
-however (1,1). If I read this correctly this filtering logic would grant
-access to (1,1) which seems to contradict with the stated intention.
+Yes, it is.  Because...
 
-Regards,
-Halil
+>> Hypothetically, the clocksource could be one for which ptp_sc.cycles is =
+_not_
+>> a cycle value.  If you set system_counterval.cs to the system clocksourc=
+e,
+>> get_device_system_crosststamp will return a bogus value.
+>=20
+> Yeah, but in patch 3/6, we have a corresponding pair of clock source and =
+cycle value. So I think there will be no
+> that problem in this patch set.
+> In the implementation of get_device_system_crosststamp:
+> "
+> ...
+> if (tk->tkr_mono.clock !=3D system_counterval.cs)
+>                         return -ENODEV;
+> ...
+> "
+> We need tk->tkr_mono.clock passed to get_device_system_crosststamp, just =
+like patch 3/6 do, otherwise will return error.
 
+... if the hypercall returns an architectural timer value, you must not
+pass tk->tkr.mono.clock to get_device_system_crosststamp: you must pass
+&clocksource_counter.  This way, PTP is disabled when using any other
+clocksource.
 
+>> So system_counterval.cs should be set to something like
+>> &clocksource_counter (from drivers/clocksource/arm_arch_timer.c).
+>> Perhaps the right place to define kvm_arch_ptp_get_clock_fn is in that f=
+ile?
+>>
+> I have checked that ptp_sc.cs is arch_sys_counter.
+> Also move the module API to arm_arch_timer.c will looks a little
+> ugly and it's not easy to be accept by arm side I think.
+
+I don't think it's ugly but more important, using tk->tkr_mono.clock is
+incorrect.  See how the x86 code hardcodes &kvm_clock, it's the same for
+ARM.
+
+>> You also have to check here that the clocksource is based on the ARM
+>> architectural timer.  Again, maybe you could place the implementation in
+>> drivers/clocksource/arm_arch_timer.c, and make it return -ENODEV if the
+>> active clocksource is not clocksource_counter.  Then KVM can look for er=
+rors
+>> and return SMCCC_RET_NOT_SUPPORTED in that case.
+>=20
+> I have checked it. The clock source is arch_sys_counter which is arm arch=
+ timer.
+> I can try to do that but I'm not sure arm side will be happy for that cha=
+nge.
+
+Just try.  For my taste, it's nice to include both sides of the
+hypercall in drivers/clocksource/arm_arch_timer.c, possibly
+conditionalizing them on #ifdef CONFIG_KVM and #ifdef
+CONFIG_PTP_1588_CLOCK_KVM.  But there is an alternative which is simply
+to export the clocksource struct.  Both choices are easy to implement so
+you can just ask the ARM people what they prefer and they can judge from
+the code.
+
+Paolo
 
