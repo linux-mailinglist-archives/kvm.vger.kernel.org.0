@@ -2,80 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 651C9B7294
-	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 07:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B44B7295
+	for <lists+kvm@lfdr.de>; Thu, 19 Sep 2019 07:27:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388053AbfISFZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 01:25:58 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:38268 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387395AbfISFZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 01:25:58 -0400
-Received: by mail-ot1-f66.google.com with SMTP id e11so1984280otl.5
-        for <kvm@vger.kernel.org>; Wed, 18 Sep 2019 22:25:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to;
-        bh=RyOFMhPxWsGfG+Nb3DOKo9PI7GG1DXIkbdGBFl4xhxY=;
-        b=fPyasNQgmZTQRImeiWqyxAEkMczvOqouBqIL+ZXJWH2U11GZtzs2BQCz/m5JY9EXcp
-         7fRqR9GBVsgGz2Z77TR2ndayv4Bx4kVrw+fdrfumvDZlr6l1j8x7d+VhWG1NTAabmeUl
-         GA0Br5b2UG5EzJnvAW5aHcmqIa5Zc8wL0LtpvYUh+FeoCMMxM7WO57r1yhqkn43VZGED
-         56hIO+A+y+dmZLDZwg2tHgfzHeOF/IwolYlNCO8QMIwV80tFUoUGjLvWi9HuKI9/hP8Z
-         VUbI0iORsygear/pBCPPsgcoWw5lf5GT99OZZSyRA1d6Zpii2wX8mdIZ227o03B6Wh7U
-         d6cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to;
-        bh=RyOFMhPxWsGfG+Nb3DOKo9PI7GG1DXIkbdGBFl4xhxY=;
-        b=ARwFBrivgNY2NY3QH+KMGqDZNaC25etJlO/5ePiPEUQ+lpcV0twu9Mpq7SRVUgJ4xj
-         v012CJ7gdlk6JM3dAz1Mi8DSXdCOkwvMhX7hOgL51UbMFel0Ck67bIZ8l4nZDlNchxjL
-         vYpkXB0QGaV99Pfbn2e3itFotf4l1w2ZNjQNNZfSwxFHJsMj5wi3NeFYlP96BTA4S/1s
-         2gMcqm2FbiMYRYDo+59gJ1Xi7pxDNQzkdQcZSi24Soz1i/8goDkWngPlwdGaQKta4TQP
-         L518xREhWkY3objd6Cu52+lELxzvN8rtblds8rUerlBV6VxPA0OOkmFgcmG9f08ei3VH
-         lxeQ==
-X-Gm-Message-State: APjAAAUvlQoar2ygEZH0AV5lIs1o8KiENSGHIcrQiKOTRfhJaB4xsiDW
-        FzcUSJGMjAmhtU/VT+Jl0UcR6fyd6cLCZQYXcno=
-X-Google-Smtp-Source: APXvYqxXobFaNouYj0ncmnEGBAM9Rpu1g7Ge+5/B9XA21AV4SKpi2NdWthSlsq4x5gfFZOAQoV3VFErw1AcwSJ6FUYA=
-X-Received: by 2002:a9d:1e85:: with SMTP id n5mr5723187otn.54.1568870757228;
- Wed, 18 Sep 2019 22:25:57 -0700 (PDT)
+        id S2387604AbfISF16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 01:27:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40072 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387421AbfISF16 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 01:27:58 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 667A021848;
+        Thu, 19 Sep 2019 05:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1568870876;
+        bh=+NWu6f3vReGUBhYbFFCT6qpUPfEmWSF12iGfVW12Jr4=;
+        h=Date:From:To:Cc:Subject:From;
+        b=fcY6BfFuveEua6f3/QGdvHeqbytB4Qpt+45RIs2EIdoJqfuPry3BS9xpzGPXRiG7l
+         E1a5Ha2A/zcqxucaUjkOq1ETd7R10dX+yS7V0BphGyD0hGQ2rfOGlVx4076wZzyqBF
+         qmrfibO4Dskata1MywUM5mgYb/ClVNVs0akTv26s=
+Date:   Wed, 18 Sep 2019 22:27:54 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     syzkaller-bugs@googlegroups.com
+Subject: Reminder: 4 active syzbot reports in kvm subsystem
+Message-ID: <20190919052754.GD666@sol.localdomain>
+Mail-Followup-To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        syzkaller-bugs@googlegroups.com
 MIME-Version: 1.0
-Reply-To: mrahmedmuzashah@gmail.com
-Received: by 2002:a05:6808:607:0:0:0:0 with HTTP; Wed, 18 Sep 2019 22:25:56
- -0700 (PDT)
-From:   "Mr.Ahmed Muzashah" <ahmedmuzashah@gmail.com>
-Date:   Wed, 18 Sep 2019 22:25:56 -0700
-X-Google-Sender-Auth: Kfm8HgmNZoTfNn8SA4BdCjdEvmw
-Message-ID: <CAG832ZiEmypg9ipXbgVEQz4RavJfZBhxgyFjqGAs1VwAS63ZGw@mail.gmail.com>
-Subject: From: Mr.Ahmed Muzashah
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Good Day,
+[This email was generated by a script.  Let me know if you have any suggestions
+to make it better, or if you want it re-generated with the latest status.]
 
-Please accept my apologies for writing you a surprise letter.I am
-Mr.Ahmed Muzashah, account Manager with an investment bank here in
-Burkina Faso.I have a very important business I want to discuss with
-you.There is a draft account opened in my firm by a long-time client
-of our bank.I have the opportunity of transferring the left over fund
-(15.8 Million UsDollars)Fiftheen Million Eight Hundred Thousand United
-States of American Dollars of one of my Bank clients who died at the
-collapsing of the world trade center at the United States on September
-11th 2001.
+Of the syzbot reports that have (re-)occurred in the last 7 days, I've manually
+marked 4 of them as possibly being bugs in the kvm subsystem.  I've listed these
+bug reports below.
 
-I want to invest this funds and introduce you to our bank for this
-deal.All I require is your honest co-operation and I guarantee you
-that this will be executed under a legitimate arrangement that will
-protect us from any breach of the law.I agree that 40% of this money
-will be for you as my foreign partner,50% for me while 10% is for
-establishing of foundation for the less privilleges in your country.If
-you are really interested in my proposal further details of the
-Transfer will be forwarded unto you as soon as I receive your
-willingness mail for a successful transfer.
+Of these 4 reports, 1 was bisected to a commit from the following person:
 
-Yours Sincerely,
-Mr.Ahmed Muzashah,
+	Paolo Bonzini <pbonzini@redhat.com>
+
+I've manually checked that this bisection result looks plausible.
+
+If you believe a bug is no longer valid, please close it by sending a '#syz
+fix', '#syz dup', or '#syz invalid' command in reply to the original thread, as
+explained at https://goo.gl/tpsmEJ#status
+
+If you believe I misattributed a bug to the kvm subsystem, please let me know
+and (if possible) forward it to the correct place.
+
+Note: in total, I've actually assigned 25 open syzbot reports to this subsystem.
+But to help focus people's efforts, I've only listed the 4 that have
+(re-)occurred in the last week.  Let me know if you want the full list.
+
+Here are the bug reports:
+
+--------------------------------------------------------------------------------
+Title:              WARNING in kvm_arch_vcpu_ioctl_run (3)
+Last occurred:      0 days ago
+Reported:           539 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=4d7de0e6a195b6a5ffef01d2776e737a52c7de60
+Original thread:    https://lore.kernel.org/lkml/000000000000d05a78056873bc47@google.com/T/#u
+
+This bug has a C reproducer.
+
+syzbot has bisected this bug, but I think the bisection result is incorrect.
+
+The original thread for this bug received 1 reply, 539 days ago.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lore.kernel.org/r/000000000000d05a78056873bc47@google.com
+
+--------------------------------------------------------------------------------
+Title:              WARNING in handle_desc
+Last occurred:      2 days ago
+Reported:           7 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=9c858961f9778373a41ec7636352e378296c2dba
+Original thread:    https://lore.kernel.org/lkml/000000000000af123405924cff2c@google.com/T/#u
+
+This bug has a C reproducer.
+
+This bug was bisected to:
+
+		commit 0367f205a3b7c0efe774634eef1f4697c79a4132
+		Author: Paolo Bonzini <pbonzini@redhat.com>
+		Date:   Tue Jul 12 08:44:55 2016 +0000
+
+		  KVM: vmx: add support for emulating UMIP
+
+No one has replied to the original thread for this bug yet.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+0f1819555fbdce992df9@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please reply to the original
+thread.  For the git send-email command to use, or tips on how to reply if the
+thread isn't in your mailbox, see the "Reply instructions" at
+https://lore.kernel.org/r/000000000000af123405924cff2c@google.com
+
+--------------------------------------------------------------------------------
+Title:              general protection fault in __apic_accept_irq
+Last occurred:      1 day ago
+Reported:           13 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=85fb9ce5c7bd3f31a84a8d55a745959e39836bda
+Original thread:    https://lore.kernel.org/lkml/000000000000e3072b0591ca1937@google.com/T/#u
+
+This bug has a C reproducer.
+
+syzbot has bisected this bug, but I think the bisection result is incorrect.
+
+The original thread for this bug has received 3 replies; the last was 13 days
+ago.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please reply to the original
+thread, which had activity only 13 days ago.  For the git send-email command to
+use, or tips on how to reply if the thread isn't in your mailbox, see the "Reply
+instructions" at https://lore.kernel.org/r/000000000000e3072b0591ca1937@google.com
+
+--------------------------------------------------------------------------------
+Title:              INFO: rcu detected stall in __do_softirq
+Last occurred:      3 days ago
+Reported:           44 days ago
+Branches:           Mainline and others
+Dashboard link:     https://syzkaller.appspot.com/bug?id=d57ba39d3d527e3e1b1ad4fe390a47844f0b8a04
+Original thread:    https://lore.kernel.org/lkml/000000000000d3c7e0058f605a53@google.com/T/#u
+
+This bug has a syzkaller reproducer only.
+
+syzbot has bisected this bug, but I think the bisection result is incorrect.
+
+The original thread for this bug has received 2 replies; the last was 32 days
+ago.
+
+If you fix this bug, please add the following tag to the commit:
+    Reported-by: syzbot+6593c6b8c8b66a07cd98@syzkaller.appspotmail.com
+
+If you send any email or patch for this bug, please consider replying to the
+original thread.  For the git send-email command to use, or tips on how to reply
+if the thread isn't in your mailbox, see the "Reply instructions" at
+https://lore.kernel.org/r/000000000000d3c7e0058f605a53@google.com
+
