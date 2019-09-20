@@ -2,95 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F28ADB98CF
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 23:12:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E9CDB9907
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 23:28:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728368AbfITVM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 17:12:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44274 "EHLO mx1.redhat.com"
+        id S2405358AbfITV0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 17:26:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59066 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725842AbfITVM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 17:12:27 -0400
+        id S1730152AbfITVZN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 17:25:13 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5EE8518CB8FE;
-        Fri, 20 Sep 2019 21:12:27 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2067F5D9C3;
-        Fri, 20 Sep 2019 21:12:27 +0000 (UTC)
-Date:   Fri, 20 Sep 2019 15:12:26 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO updates for v5.4-rc1
-Message-ID: <20190920151226.541871fe@x1.home>
-Organization: Red Hat
+        by mx1.redhat.com (Postfix) with ESMTPS id B194E6412E;
+        Fri, 20 Sep 2019 21:25:12 +0000 (UTC)
+Received: from mail (ovpn-120-159.rdu2.redhat.com [10.10.120.159])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C10A5D9CD;
+        Fri, 20 Sep 2019 21:25:10 +0000 (UTC)
+From:   Andrea Arcangeli <aarcange@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 00/17] KVM monolithic v1
+Date:   Fri, 20 Sep 2019 17:24:52 -0400
+Message-Id: <20190920212509.2578-1-aarcange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Fri, 20 Sep 2019 21:12:27 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 20 Sep 2019 21:25:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+Hello,
 
-The following changes since commit e3fb13b7e47cd18b2bd067ea8a491020b4644baf:
+This patchset micro optimizes the vmexit to increase performance by
+dropping the kvm.ko kernel module.
 
-  Merge tag 'modules-for-v5.3-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/jeyu/linux (2019-08-23 09:22:00 -0700)
+All common KVM code gets linked twice into kvm-intel and kvm-amd with
+the only cons of using more disk space, but the pros of CPU (and RAM)
+runtime benefits.
 
-are available in the Git repository at:
+This improves the vmexit performance by two digits percent on
+microbenchmarks with the spectre_v2 default mitigation on both VMX and
+SVM. With spectre_v2=off or with CPUs with IBRS_ALL in
+ARCH_CAPABILITIES this still improve performance but it's more of the
+order of 1%.
 
-  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.4-rc1
+We'll still have to deal with CPUs without IBRS_ALL for a decade and
+reducing the vmexit latency is important to pass certain benchmarks
+with workloads that happen to trigger frequent vmexits without having
+to set spectre_v2=off in the host (which at least in theory would make
+the host kernel vulnerable from a spectre v2 attack from the guest,
+even through hyperthreading).
 
-for you to fetch changes up to e6c5d727db0a86a3ff21aca6824aae87f3bc055f:
+The first patch 1/17 should be splitted off from this series and it's
+intended to be merged separately, it's included here only to avoid any
+possible erroneous measurement if using kexec for testing, in turn if
+using kexec it's recommended to include it in the baseline
+measurements too.
 
-  Merge branches 'v5.4/vfio/alexey-tce-memory-free-v1', 'v5.4/vfio/connie-re-arrange-v2', 'v5.4/vfio/hexin-pci-reset-v3', 'v5.4/vfio/parav-mtty-uuid-v2' and 'v5.4/vfio/shameer-iova-list-v8' into v5.4/vfio/next (2019-08-23 11:26:24 -0600)
+A git clonable branch for quick testing is available here:
 
-----------------------------------------------------------------
-VFIO updates for v5.4-rc1
+  https://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git/log/?h=kvm-mono1
 
- - Fix spapr iommu error case case (Alexey Kardashevskiy)
+Thanks,
+Andrea
 
- - Consolidate region type definitions (Cornelia Huck)
+Andrea Arcangeli (17):
+  x86: spec_ctrl: fix SPEC_CTRL initialization after kexec
+  KVM: monolithic: x86: convert the kvm_x86_ops methods to external
+    functions
+  KVM: monolithic: x86: handle the request_immediate_exit variation
+  KVM: monolithic: x86: convert the kvm_pmu_ops methods to external
+    functions
+  KVM: monolithic: x86: enable the kvm_x86_ops external functions
+  KVM: monolithic: x86: enable the kvm_pmu_ops external functions
+  KVM: monolithic: x86: adjust the section prefixes
+  KVM: monolithic: adjust the section prefixes in the KVM common code
+  KVM: monolithic: x86: remove kvm.ko
+  KVM: monolithic: x86: use the external functions instead of
+    kvm_x86_ops
+  KVM: monolithic: x86: remove exports
+  KVM: monolithic: remove exports from KVM common code
+  KVM: monolithic: x86: drop the kvm_pmu_ops structure
+  KVM: monolithic: x86: inline more exit handlers in vmx.c
+  KVM: retpolines: x86: eliminate retpoline from vmx.c exit handlers
+  KVM: retpolines: x86: eliminate retpoline from svm.c exit handlers
+  x86: retpolines: eliminate retpoline from msr event handlers
 
- - Restore saved original PCI state on release (hexin)
+ arch/x86/events/intel/core.c     |  11 +
+ arch/x86/include/asm/kvm_host.h  |  15 +-
+ arch/x86/include/asm/kvm_ops.h   | 166 ++++++++
+ arch/x86/include/asm/msr-index.h |   2 +
+ arch/x86/kernel/cpu/bugs.c       |  20 +-
+ arch/x86/kvm/Makefile            |   5 +-
+ arch/x86/kvm/cpuid.c             |  27 +-
+ arch/x86/kvm/hyperv.c            |   8 +-
+ arch/x86/kvm/irq.c               |   4 -
+ arch/x86/kvm/irq_comm.c          |   2 -
+ arch/x86/kvm/kvm_cache_regs.h    |  10 +-
+ arch/x86/kvm/lapic.c             |  44 +-
+ arch/x86/kvm/mmu.c               |  50 +--
+ arch/x86/kvm/mmu.h               |   4 +-
+ arch/x86/kvm/mtrr.c              |   2 -
+ arch/x86/kvm/pmu.c               |  27 +-
+ arch/x86/kvm/pmu.h               |  21 +-
+ arch/x86/kvm/pmu_amd.c           |  15 +-
+ arch/x86/kvm/pmu_amd_ops.c       |  68 ++++
+ arch/x86/kvm/pmu_ops.h           |  22 +
+ arch/x86/kvm/svm.c               |  19 +-
+ arch/x86/kvm/svm_ops.c           | 672 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/trace.h             |   4 +-
+ arch/x86/kvm/vmx/pmu_intel.c     |  17 +-
+ arch/x86/kvm/vmx/pmu_intel_ops.c |  68 ++++
+ arch/x86/kvm/vmx/vmx.c           |  36 +-
+ arch/x86/kvm/vmx/vmx_ops.c       | 675 +++++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c               | 409 +++++++------------
+ arch/x86/kvm/x86.h               |   2 +-
+ virt/kvm/eventfd.c               |   1 -
+ virt/kvm/kvm_main.c              |  71 +---
+ 31 files changed, 1982 insertions(+), 515 deletions(-)
+ create mode 100644 arch/x86/include/asm/kvm_ops.h
+ create mode 100644 arch/x86/kvm/pmu_amd_ops.c
+ create mode 100644 arch/x86/kvm/pmu_ops.h
+ create mode 100644 arch/x86/kvm/svm_ops.c
+ create mode 100644 arch/x86/kvm/vmx/pmu_intel_ops.c
+ create mode 100644 arch/x86/kvm/vmx/vmx_ops.c
 
- - Simplify mtty sample driver interrupt path (Parav Pandit)
-
- - Support for reporting valid IOVA regions to user (Shameer Kolothum)
-
-----------------------------------------------------------------
-Alex Williamson (1):
-      Merge branches 'v5.4/vfio/alexey-tce-memory-free-v1', 'v5.4/vfio/connie-re-arrange-v2', 'v5.4/vfio/hexin-pci-reset-v3', 'v5.4/vfio/parav-mtty-uuid-v2' and 'v5.4/vfio/shameer-iova-list-v8' into v5.4/vfio/next
-
-Alexey Kardashevskiy (1):
-      vfio/spapr_tce: Fix incorrect tce_iommu_group memory free
-
-Cornelia Huck (1):
-      vfio: re-arrange vfio region definitions
-
-Parav Pandit (1):
-      vfio-mdev/mtty: Simplify interrupt generation
-
-Shameer Kolothum (6):
-      vfio/type1: Introduce iova list and add iommu aperture validity check
-      vfio/type1: Check reserved region conflict and update iova list
-      vfio/type1: Update iova list on detach
-      vfio/type1: check dma map request is within a valid iova range
-      vfio/type1: Add IOVA range capability support
-      vfio/type1: remove duplicate retrieval of reserved regions
-
-hexin (1):
-      vfio_pci: Restore original state on release
-
- drivers/vfio/pci/vfio_pci.c         |  17 +-
- drivers/vfio/vfio_iommu_spapr_tce.c |   9 +-
- drivers/vfio/vfio_iommu_type1.c     | 518 +++++++++++++++++++++++++++++++++++-
- include/uapi/linux/vfio.h           |  71 +++--
- samples/vfio-mdev/mtty.c            |  39 +--
- 5 files changed, 583 insertions(+), 71 deletions(-)
