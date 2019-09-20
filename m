@@ -2,118 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 18929B93C7
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 17:12:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C28FB93CD
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 17:14:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393355AbfITPMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 11:12:45 -0400
-Received: from foss.arm.com ([217.140.110.172]:46192 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387614AbfITPMp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 11:12:45 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9AC94337;
-        Fri, 20 Sep 2019 08:12:44 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D4343F575;
-        Fri, 20 Sep 2019 08:12:42 -0700 (PDT)
-Date:   Fri, 20 Sep 2019 16:12:40 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, James Morse <james.morse@arm.com>
-Subject: Re: [RFC patch 00/15] entry: Provide generic implementation for host
- and guest entry/exit work
-Message-ID: <20190920151240.GB55224@lakrids.cambridge.arm.com>
-References: <20190919150314.054351477@linutronix.de>
+        id S2403797AbfITPOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 11:14:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11356 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387614AbfITPOp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Sep 2019 11:14:45 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8KFEE2U022014;
+        Fri, 20 Sep 2019 11:14:37 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4y8angeg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Sep 2019 11:14:37 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8KFECYs021796;
+        Fri, 20 Sep 2019 11:14:36 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4y8angdu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Sep 2019 11:14:36 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8KFB389010798;
+        Fri, 20 Sep 2019 15:14:35 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma04dal.us.ibm.com with ESMTP id 2v3vbutjsd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Sep 2019 15:14:35 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8KFEVa758786272
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 20 Sep 2019 15:14:31 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39C9078060;
+        Fri, 20 Sep 2019 15:14:31 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FC877805C;
+        Fri, 20 Sep 2019 15:14:29 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.85.141.73])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 20 Sep 2019 15:14:29 +0000 (GMT)
+Subject: Re: [PATCH v4 3/4] vfio: zpci: defining the VFIO headers
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     sebott@linux.ibm.com, gerald.schaefer@de.ibm.com,
+        pasic@linux.ibm.com, borntraeger@de.ibm.com, walling@linux.ibm.com,
+        linux-s390@vger.kernel.org, iommu@lists.linux-foundation.org,
+        joro@8bytes.org, linux-kernel@vger.kernel.org,
+        alex.williamson@redhat.com, kvm@vger.kernel.org,
+        heiko.carstens@de.ibm.com, robin.murphy@arm.com, gor@linux.ibm.com,
+        pmorel@linux.ibm.com
+References: <1567815231-17940-1-git-send-email-mjrosato@linux.ibm.com>
+ <1567815231-17940-4-git-send-email-mjrosato@linux.ibm.com>
+ <20190919172009.71b1c246.cohuck@redhat.com>
+ <0a62aba7-578a-6875-da4d-13e8b145cf9b@linux.ibm.com>
+ <20190920160258.70631905.cohuck@redhat.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Openpgp: preference=signencrypt
+Message-ID: <86647083-7f94-44aa-8856-103836906f36@linux.ibm.com>
+Date:   Fri, 20 Sep 2019 11:14:28 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190919150314.054351477@linutronix.de>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+In-Reply-To: <20190920160258.70631905.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-20_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909200142
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Thomas,
-
-As a heads-up, I'm going to be away next week, and I likely won't have
-the chance to look at this in detail before October.
-
-On Thu, Sep 19, 2019 at 05:03:14PM +0200, Thomas Gleixner wrote:
-> When working on a way to move out the posix cpu timer expiry out of the
-> timer interrupt context, I noticed that KVM is not handling pending task
-> work before entering a guest. A quick hack was to add that to the x86 KVM
-> handling loop. The discussion ended with a request to make this a generic
-> infrastructure possible with also moving the per arch implementations of
-> the enter from and return to user space handling generic.
+On 9/20/19 10:02 AM, Cornelia Huck wrote:
+> On Thu, 19 Sep 2019 16:55:57 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 > 
->   https://lore.kernel.org/r/89E42BCC-47A8-458B-B06A-D6A20D20512C@amacapital.net
+>> On 9/19/19 11:20 AM, Cornelia Huck wrote:
+>>> On Fri,  6 Sep 2019 20:13:50 -0400
+>>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+>>>   
+>>>> From: Pierre Morel <pmorel@linux.ibm.com>
+>>>>
+>>>> We define a new device region in vfio.h to be able to
+>>>> get the ZPCI CLP information by reading this region from
+>>>> userland.
+>>>>
+>>>> We create a new file, vfio_zdev.h to define the structure
+>>>> of the new region we defined in vfio.h
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>>> ---
+>>>>  include/uapi/linux/vfio.h      |  1 +
+>>>>  include/uapi/linux/vfio_zdev.h | 35 +++++++++++++++++++++++++++++++++++
+>>>>  2 files changed, 36 insertions(+)
+>>>>  create mode 100644 include/uapi/linux/vfio_zdev.h
 > 
-> You asked for it, so don't complain that you have to review it :)
-
-I never asked for this! ;)
-
-> The series implements the syscall enter/exit and the general exit to
-> userspace work handling along with the pre guest enter functionality.
+>>>> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
+>>>> new file mode 100644
+>>>> index 0000000..55e0d6d
+>>>> --- /dev/null
+>>>> +++ b/include/uapi/linux/vfio_zdev.h
+>>>> @@ -0,0 +1,35 @@
+>>>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>>>> +/*
+>>>> + * Region definition for ZPCI devices
+>>>> + *
+>>>> + * Copyright IBM Corp. 2019
+>>>> + *
+>>>> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+>>>> + */
+>>>> +
+>>>> +#ifndef _VFIO_ZDEV_H_
+>>>> +#define _VFIO_ZDEV_H_
+>>>> +
+>>>> +#include <linux/types.h>
+>>>> +
+>>>> +/**
+>>>> + * struct vfio_region_zpci_info - ZPCI information.  
+>>>
+>>> Hm... probably should also get some more explanation. E.g. is that
+>>> derived from a hardware structure?
+>>>   
+>>
+>> The structure itself is not mapped 1:1 to a hardware structure, but it
+>> does serve as a collection of information that was derived from other
+>> hardware structures.
+>>
+>> "Used for passing hardware feature information about a zpci device
+>> between the host and guest" ?
 > 
-> The series converts x86 and ARM64. x86 is fully tested including selftests
-> etc. ARM64 is only compile tested for now as my only ARM64 testbox is not
-> available right now.
-
-I've been working on converting the arm64 entry code to C for a while
-now [1], gradually upstreaming the bits I can.
-
-James has picked up some of that [2] as a prerequisite for some RAS
-error handling, and I think building the arm64 bits atop of that would
-be preferable. IIUC that should get posted as a series come -rc1.
-
-Since there's immense scope for subtle breakage, I'd prefer that we do
-the arm64-specific asm->C conversion before migrating arm64 to generic
-code. That way us arm64 folk can ensure the asm->C conversion retains
-the existing behaviour, and it'll be easier for everyone to compare the
-arm64 and generic C implementations.
-
-Thanks,
-Mark.
-
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git
-[2] git://linux-arm.org/linux-jm.git -b deasm_sync_only/v1
-
+> "zPCI specific hardware feature information for a device"?
 > 
-> Thanks,
+> Are we reasonably sure that this is complete for now? I'm not sure if
+> expanding this structure would work; adding another should always be
+> possible, though (if a bit annoying).
 > 
-> 	tglx
+
+I think trying to make the structure expandable would be best...  If we
+allow arbitrary-sized reads of the info, and only add new fields onto
+the end it should be OK, no? (older qemu doesn't get the info it doesn't
+ask for / understand)....  But I guess that's not compatible with having
+util_str[] size being defined dynamically.  Another caveat would be if
+CLP_UTIL_STR_LEN were to grow in size in the future, and assuming
+util_str[] was no longer at the end of the structure, I guess the
+additional data would have to end up in a
+util_str2[CLP_UTIL_STR_LEN_NEW-CLP_UTIL_STR_LEN_OLD]...  To explain what
+I mean, something like:
+
+struct vfio_region_zpci_info {
+	<..>
+	__u8 util_str[CLP_UTIL_STR_LEN_OLD];
+	/* END OF V1 */
+	__u8 foo;
+	/* END OF V2 */
+	__u8 util_str2[CLP_UTIL_STR_LEN_NEW-CLP_UTIL_STR_LEN_OLD];
+	/* END OF V3 */
+} __packed;
+
+
+>>
+>>>> + *
+>>>> + */
+>>>> +struct vfio_region_zpci_info {
+>>>> +	__u64 dasm;
+>>>> +	__u64 start_dma;
+>>>> +	__u64 end_dma;
+>>>> +	__u64 msi_addr;
+>>>> +	__u64 flags;
+>>>> +	__u16 pchid;
+>>>> +	__u16 mui;
+>>>> +	__u16 noi;
+>>>> +	__u16 maxstbl;
+>>>> +	__u8 version;
+>>>> +	__u8 gid;
+>>>> +#define VFIO_PCI_ZDEV_FLAGS_REFRESH 1
+>>>> +	__u8 util_str[];
+>>>> +} __packed;
+>>>> +
+>>>> +#endif  
+>>>
+>>>   
+>>
 > 
-> ---
->  /Makefile                               |    3 
->  arch/Kconfig                            |    3 
->  arch/arm64/Kconfig                      |    1 
->  arch/arm64/include/asm/kvm_host.h       |    1 
->  arch/arm64/kernel/entry.S               |   18 -
->  arch/arm64/kernel/ptrace.c              |   65 ------
->  arch/arm64/kernel/signal.c              |   45 ----
->  arch/arm64/kernel/syscall.c             |   49 ----
->  arch/x86/Kconfig                        |    1 
->  arch/x86/entry/common.c                 |  265 +-------------------------
->  arch/x86/entry/entry_32.S               |   13 -
->  arch/x86/entry/entry_64.S               |   12 -
->  arch/x86/entry/entry_64_compat.S        |   21 --
->  arch/x86/include/asm/signal.h           |    1 
->  arch/x86/include/asm/thread_info.h      |    9 
->  arch/x86/kernel/signal.c                |    2 
->  arch/x86/kvm/x86.c                      |   17 -
->  b/arch/arm64/include/asm/entry-common.h |   76 +++++++
->  b/arch/x86/include/asm/entry-common.h   |  104 ++++++++++
->  b/include/linux/entry-common.h          |  324 ++++++++++++++++++++++++++++++++
->  b/kernel/entry/common.c                 |  220 +++++++++++++++++++++
->  kernel/Makefile                         |    1 
->  22 files changed, 776 insertions(+), 475 deletions(-)
-> 
-> 
+
