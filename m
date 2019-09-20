@@ -2,106 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A83FCB98FC
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 23:28:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C31AB99AB
+	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2019 00:29:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393915AbfITV0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 17:26:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57988 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393779AbfITVZO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 17:25:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 10B208980EA;
-        Fri, 20 Sep 2019 21:25:14 +0000 (UTC)
-Received: from mail (ovpn-120-159.rdu2.redhat.com [10.10.120.159])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E76295D6B2;
-        Fri, 20 Sep 2019 21:25:13 +0000 (UTC)
-From:   Andrea Arcangeli <aarcange@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 17/17] x86: retpolines: eliminate retpoline from msr event handlers
-Date:   Fri, 20 Sep 2019 17:25:09 -0400
-Message-Id: <20190920212509.2578-18-aarcange@redhat.com>
-In-Reply-To: <20190920212509.2578-1-aarcange@redhat.com>
-References: <20190920212509.2578-1-aarcange@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Fri, 20 Sep 2019 21:25:14 +0000 (UTC)
+        id S2404299AbfITW3t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 18:29:49 -0400
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:46954 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393819AbfITW3t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 18:29:49 -0400
+Received: by mail-pl1-f202.google.com with SMTP id k9so5331670pls.13
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 15:29:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=0CqcLhT+oLR+DR0w+CJZZE5EZQRtfGXdhud+TXHnaZ0=;
+        b=tB0gVAh4bcuHLG1fKCO4616SZbwq0b9sNdILRB3GDxhxDBL7jsWQlfEUmRfxq8aS//
+         biMBUZdD9xE3b2rPCoZxkx68eGJcQoCc5SSQ4hWxjqyjzwYC2vb73GVlj5iU+21FnTMh
+         3hLphxqAj32XncZGUDv1Pb1aIXDnKsN48eptcqtXjxcibdS2EMSCqewizDEex/Utbl6p
+         OA3+SZygoKeCRSfpk8xxb11V3VVURRKl6DFudPf6qC3vMW/I+2Nf9WmQQIJYMtfQRZ9j
+         E0BQOzEr6Ri6VCK4z0ZSS3hcweE7ioACstnRvp0yQ4yJN44LLaaQ9K9YUSWkJSWv4dqM
+         5B1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=0CqcLhT+oLR+DR0w+CJZZE5EZQRtfGXdhud+TXHnaZ0=;
+        b=iIiSt4ouKVkrd/H2N1sy465Q+NPgcMtSubnJXGdAieQH46HQ0CYezAeqr04ocJxl/W
+         y7+7dfqabVX8VwtK9JT+lIrKOmY5tW8Y/bl+FNceIGfyQji9qMkslBZUKwpsXpXavZWX
+         dl9Yc4Bb34sUl/k14w+3AKwLjc7Jy//AHxJYwVLn8W2Ov389hFI6syKYX8PcfezXaMoM
+         CfQJL4RVA0M2JuGQbJWtiZvxwHVyptrPDMDp/7pPIMIyN6XxHbd3ck1R82tkofRDZl6L
+         xHyajQz8igyxs1UabTl2J8OygdH24tPYmfYawD7YMIlQZMP905xHICwFnpafoszCuUeF
+         QTJw==
+X-Gm-Message-State: APjAAAURMhE8t4bb20Qd5I5SzmQP6zEb4zu0hiynE9i7YCBPqOopSaeU
+        ubAdDYdCFs4saBQQTnarI6u+3sgH+VkkZhSoa52SVEQplL7B9IsBwKzVd0WVfzmHNNzaiHPNn7L
+        iEBWNlx8qwR+4vIyka8dlSdcmHXG/Hqmg0LT7iWq9Ws0S2F2HG/PGrQ67D7zK
+X-Google-Smtp-Source: APXvYqyrpgx0g8Tl3W83GbmPvW4SN4TMLPl8YKx8uo67vB5nZkRZw/MpGbhrr2SuBWz2ZHFUWqf1DoZUjwAX
+X-Received: by 2002:a63:b70a:: with SMTP id t10mr18152759pgf.25.1569018588397;
+ Fri, 20 Sep 2019 15:29:48 -0700 (PDT)
+Date:   Fri, 20 Sep 2019 15:29:44 -0700
+Message-Id: <20190920222945.235480-1-marcorr@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.351.gc4317032e6-goog
+Subject: [kvm-unit-tests PATCH v6 1/2] x86: nvmx: fix bug in __enter_guest()
+From:   Marc Orr <marcorr@google.com>
+To:     kvm@vger.kernel.org, jmattson@google.com, pshier@google.com,
+        sean.j.christopherson@intel.com, krish.sadhukhan@oracle.com,
+        pbonzini@redhat.com, rkrcmar@redhat.com
+Cc:     Marc Orr <marcorr@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's enough to check the value and issue the direct call.
+__enter_guest() should only set the launched flag when a launch has
+succeeded. Thus, don't set the launched flag when the VMX_ENTRY_FAILURE,
+bit 31, is set in the VMCS exit reason.
 
-After this commit is applied, here the most common retpolines executed
-under a high resolution timer workload in the guest on a VMX host:
-
-[..]
-@[
-    trace_retpoline+1
-    __trace_retpoline+30
-    __x86_indirect_thunk_rax+33
-    do_syscall_64+89
-    entry_SYSCALL_64_after_hwframe+68
-]: 267
-@[]: 2256
-@[
-    trace_retpoline+1
-    __trace_retpoline+30
-    __x86_indirect_thunk_rax+33
-    __kvm_wait_lapic_expire+284
-    vmx_vcpu_run.part.97+1091
-    vcpu_enter_guest+377
-    kvm_arch_vcpu_ioctl_run+261
-    kvm_vcpu_ioctl+559
-    do_vfs_ioctl+164
-    ksys_ioctl+96
-    __x64_sys_ioctl+22
-    do_syscall_64+89
-    entry_SYSCALL_64_after_hwframe+68
-]: 2390
-@[]: 33410
-
-@total: 315707
-
-Note the highest hit above is __delay so probably not worth optimizing
-even if it would be more frequent than 2k hits per sec.
-
-Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Marc Orr <marcorr@google.com>
 ---
- arch/x86/events/intel/core.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+v5 -> v6
+* No changes.
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 27ee47a7be66..65b383d5e062 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -3323,8 +3323,19 @@ static int intel_pmu_hw_config(struct perf_event *event)
- 	return 0;
- }
+ x86/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/x86/vmx.c b/x86/vmx.c
+index 6079420db33a..7313c78f15c2 100644
+--- a/x86/vmx.c
++++ b/x86/vmx.c
+@@ -1820,7 +1820,7 @@ static void __enter_guest(u8 abort_flag, struct vmentry_failure *failure)
+ 		abort();
+ 	}
  
-+#ifdef CONFIG_RETPOLINE
-+static struct perf_guest_switch_msr *core_guest_get_msrs(int *nr);
-+static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr);
-+#endif
-+
- struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
- {
-+#ifdef CONFIG_RETPOLINE
-+	if (x86_pmu.guest_get_msrs == intel_guest_get_msrs)
-+		return intel_guest_get_msrs(nr);
-+	else if (x86_pmu.guest_get_msrs == core_guest_get_msrs)
-+		return core_guest_get_msrs(nr);
-+#endif
- 	if (x86_pmu.guest_get_msrs)
- 		return x86_pmu.guest_get_msrs(nr);
- 	*nr = 0;
+-	if (!failure->early) {
++	if (!failure->early && !(vmcs_read(EXI_REASON) & VMX_ENTRY_FAILURE)) {
+ 		launched = 1;
+ 		check_for_guest_termination();
+ 	}
+-- 
+2.23.0.351.gc4317032e6-goog
+
