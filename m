@@ -2,151 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 06BE9B99EF
-	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2019 01:08:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9963FB9AC9
+	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2019 01:38:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407052AbfITXIL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 19:08:11 -0400
-Received: from mail-qt1-f202.google.com ([209.85.160.202]:33856 "EHLO
-        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407049AbfITXIK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 19:08:10 -0400
-Received: by mail-qt1-f202.google.com with SMTP id y10so10011360qti.1
-        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 16:08:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=ytV4HUGMPUG3noaOCrZb1OFf1mumPpmyS7qh+vN6Ff8=;
-        b=YYyIbwXekgZXCnSg6HnHSYWc6LBE8WGSDTyilsi5rLDD7IZTUDeDeWT5SubSrOjR7S
-         p8g48EmtETsJXVbrtmNvMvA3tRnjiRl7rb+eVGJPa7FuwFGFCLNtdaISt0twQPD0ZO3w
-         j7V4TF5egHaMPNZZ7KoeoQE3avxoQHHshKKdE6PoOQwSlt+HNBBxAdO+BeO+o/bNm8x9
-         3CQdpgfhbgFwf31cnnDws6nlIremy7/ZR0c7YqzNpd3uI8v4HnJ4QUaXx9mjh02vSPjA
-         YXy31O4ZT6BSyuae8g/5+00vLDW1btC3Ji2zYvfb2hwBcV9vXOmqMOlSmKEybNDkd+Kv
-         YurQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=ytV4HUGMPUG3noaOCrZb1OFf1mumPpmyS7qh+vN6Ff8=;
-        b=DxDrdeUFQfhO/RSNyDANBAT18kixQ4vT130sji5iZzisww4KYk8NYTpOhousr2rCho
-         xdhHVDRaXHvxZ3f++5/XBjbp2dYCEv4O/M5t0V48r65L9r/ntHvFr8/uRfoTvx7gpueR
-         MrPVx6y0G4Ybrs2ymg4IQeZ34tXIl2RgEvNelGxO3g7j8ZbtrdrkSmkqlavSEDtrm8Qm
-         yvTPenjeGJfN75rZYuBgz07zIM2hiGtqFAvKcwDDf1Hr3Yl/gpTMFgJmClkpvmqJCN9n
-         XywFJSQp/bpdvYRsdtFuMb60/D0kM8ysWA86vYuPOQr1FKp6SxNhPLx2/JVTh+OlChx4
-         iIhQ==
-X-Gm-Message-State: APjAAAXAdL03DTFPjKFwGJAKV4sd9CSfXqfpzIq+JtlJSTOeXocSIcQF
-        0mkJhal9cqpZa7/S0zexPm9nF/gx7A5dsmBc+wohtN2D+/YxJpldN/Y2HNI10QHFTpxe91Ss3Yg
-        dn4MUqUlHi+kKVlpa+Mx58JJgFSTij/De+M/o+bcqhhqvQlmmj9QAKBBU1eFtdZM=
-X-Google-Smtp-Source: APXvYqyntiMVBkZ+US0xboMvO/T1n0+/PMD0f6Zea5CHE67rrcAfRXK+Gna0stR+yQ74biJAxw80QVfLL1F/Hw==
-X-Received: by 2002:a37:4c14:: with SMTP id z20mr6617564qka.296.1569020889719;
- Fri, 20 Sep 2019 16:08:09 -0700 (PDT)
-Date:   Fri, 20 Sep 2019 16:08:05 -0700
-Message-Id: <20190920230805.111064-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.23.0.351.gc4317032e6-goog
-Subject: [kvm-unit-tests PATCH v2] kvm-unit-test: x86: Add RDPRU test
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
+        id S2437317AbfITXim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 19:38:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47486 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2406848AbfITXil (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 19:38:41 -0400
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CDAC021971
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 23:38:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1569022721;
+        bh=Wik4rfMbhEVpjZ+F5SEOzlR8nFOtVPD464Wph4SfE/E=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=k5DPMFh3AuxisWELDYJaa5j3Ulyxpef64b2q3VHCKJrgvI8ybLFvMnT2lgdVq/8TP
+         CA5sfzDKaU5XattA7I43emW4xBOpxHB+cKTWLRk2wKZhFBZxvYmStQoFdnQR9XiOg2
+         g4ghnMkwM69M8vhJbcyQxBqTpcPjPCl6IHSb9P8k=
+Received: by mail-wm1-f46.google.com with SMTP id a6so4093764wma.5
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 16:38:40 -0700 (PDT)
+X-Gm-Message-State: APjAAAWX21Q42h1PRn3KWtoC+HQggXRDQUT59uSp/3Pw8kccQG3Biq50
+        yucTwLi7H35QK4t83DhJYZmgnztfAKH+3cwQNnovVw==
+X-Google-Smtp-Source: APXvYqybrxDHlJMFvoR9P/n6cEFiVjlH/cMiyx1q8imMAGyv/bfcWbKQkMLNmHx9YXEy0qPdX2hwoYoU/AoVAGVTR9U=
+X-Received: by 2002:a1c:5f0b:: with SMTP id t11mr5224781wmb.76.1569022719184;
+ Fri, 20 Sep 2019 16:38:39 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190919150314.054351477@linutronix.de> <20190919150808.521907403@linutronix.de>
+In-Reply-To: <20190919150808.521907403@linutronix.de>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Fri, 20 Sep 2019 16:38:28 -0700
+X-Gmail-Original-Message-ID: <CALCETrXB92rZqHMyhSULWVY3Q5=t9q4N9aZFCTn4k0DMNPJfMQ@mail.gmail.com>
+Message-ID: <CALCETrXB92rZqHMyhSULWVY3Q5=t9q4N9aZFCTn4k0DMNPJfMQ@mail.gmail.com>
+Subject: Re: [RFC patch 01/15] entry: Provide generic syscall entry functionality
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running in a VM, ensure that support for RDPRU is not enumerated
-in the guest's CPUID and that the RDPRU instruction raises #UD.
+On Thu, Sep 19, 2019 at 8:09 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+> On syscall entry certain work needs to be done conditionally like tracing,
+> seccomp etc. This code is duplicated in all architectures.
+>
+> Provide a generic version.
+>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>  arch/Kconfig                 |    3 +
+>  include/linux/entry-common.h |  122 +++++++++++++++++++++++++++++++++++++++++++
+>  kernel/Makefile              |    1
+>  kernel/entry/Makefile        |    3 +
+>  kernel/entry/common.c        |   33 +++++++++++
+>  5 files changed, 162 insertions(+)
+>
+> --- a/arch/Kconfig
+> +++ b/arch/Kconfig
+> @@ -27,6 +27,9 @@ config HAVE_IMA_KEXEC
+>  config HOTPLUG_SMT
+>         bool
+>
+> +config GENERIC_ENTRY
+> +       bool
+> +
+>  config OPROFILE
+>         tristate "OProfile system profiling"
+>         depends on PROFILING
+> --- /dev/null
+> +++ b/include/linux/entry-common.h
+> @@ -0,0 +1,122 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __LINUX_ENTRYCOMMON_H
+> +#define __LINUX_ENTRYCOMMON_H
+> +
+> +#include <linux/tracehook.h>
+> +#include <linux/syscalls.h>
+> +#include <linux/seccomp.h>
+> +#include <linux/sched.h>
+> +#include <linux/audit.h>
+> +
+> +#include <asm/entry-common.h>
+> +
+> +/*
+> + * Define dummy _TIF work flags if not defined by the architecture or for
+> + * disabled functionality.
+> + */
+> +#ifndef _TIF_SYSCALL_TRACE
+> +# define _TIF_SYSCALL_TRACE            (0)
+> +#endif
+> +
+> +#ifndef _TIF_SYSCALL_EMU
+> +# define _TIF_SYSCALL_EMU              (0)
+> +#endif
+> +
+> +#ifndef _TIF_SYSCALL_TRACEPOINT
+> +# define _TIF_SYSCALL_TRACEPOINT       (0)
+> +#endif
+> +
+> +#ifndef _TIF_SECCOMP
+> +# define _TIF_SECCOMP                  (0)
+> +#endif
+> +
+> +#ifndef _TIF_AUDIT
+> +# define _TIF_AUDIT                    (0)
+> +#endif
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
----
- lib/x86/processor.h |  2 ++
- x86/Makefile.x86_64 |  1 +
- x86/rdpru.c         | 27 +++++++++++++++++++++++++++
- x86/unittests.cfg   |  5 +++++
- 4 files changed, 35 insertions(+)
- create mode 100644 x86/rdpru.c
+I'm wondering if these should be __TIF (double-underscore) or
+MAYBE_TIF_ or something to avoid errors where people do flags |=
+TIF_WHATEVER and get surprised.
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index b1c579b..fe72c13 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -131,6 +131,7 @@ static inline u8 cpuid_maxphyaddr(void)
- #define	X86_FEATURE_XSAVE		(CPUID(0x1, 0, ECX, 26))
- #define	X86_FEATURE_OSXSAVE		(CPUID(0x1, 0, ECX, 27))
- #define	X86_FEATURE_RDRAND		(CPUID(0x1, 0, ECX, 30))
-+#define	X86_FEATURE_HYPERVISOR		(CPUID(0x1, 0, ECX, 31))
- #define	X86_FEATURE_MCE			(CPUID(0x1, 0, EDX, 7))
- #define	X86_FEATURE_APIC		(CPUID(0x1, 0, EDX, 9))
- #define	X86_FEATURE_CLFLUSH		(CPUID(0x1, 0, EDX, 19))
-@@ -150,6 +151,7 @@ static inline u8 cpuid_maxphyaddr(void)
- #define	X86_FEATURE_RDPID		(CPUID(0x7, 0, ECX, 22))
- #define	X86_FEATURE_SPEC_CTRL		(CPUID(0x7, 0, EDX, 26))
- #define	X86_FEATURE_NX			(CPUID(0x80000001, 0, EDX, 20))
-+#define	X86_FEATURE_RDPRU		(CPUID(0x80000008, 0, EBX, 4))
- 
- /*
-  * AMD CPUID features
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index 51f9b80..010102b 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -19,6 +19,7 @@ tests += $(TEST_DIR)/vmx.flat
- tests += $(TEST_DIR)/tscdeadline_latency.flat
- tests += $(TEST_DIR)/intel-iommu.flat
- tests += $(TEST_DIR)/vmware_backdoors.flat
-+tests += $(TEST_DIR)/rdpru.flat
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/x86/rdpru.c b/x86/rdpru.c
-new file mode 100644
-index 0000000..87a517e
---- /dev/null
-+++ b/x86/rdpru.c
-@@ -0,0 +1,27 @@
-+/* RDPRU test */
-+
-+#include "libcflat.h"
-+#include "processor.h"
-+#include "desc.h"
-+
-+static int rdpru_checking(void)
-+{
-+	asm volatile (ASM_TRY("1f")
-+		      ".byte 0x0f,0x01,0xfd \n\t" /* rdpru */
-+		      "1:" : : "c" (0) : "eax", "edx");
-+	return exception_vector();
-+}
-+
-+int main(int ac, char **av)
-+{
-+	setup_idt();
-+
-+	if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
-+		report("RDPRU not supported", !this_cpu_has(X86_FEATURE_RDPRU));
-+		report("RDPRU raises #UD", rdpru_checking() == UD_VECTOR);
-+	} else {
-+		report_skip("Not in a VM");
-+	}
-+
-+	return report_summary();
-+}
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 694ee3d..9764e18 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -221,6 +221,11 @@ file = pcid.flat
- extra_params = -cpu qemu64,+pcid
- arch = x86_64
- 
-+[rdpru]
-+file = rdpru.flat
-+extra_params = -cpu host
-+arch = x86_64
-+
- [umip]
- file = umip.flat
- extra_params = -cpu qemu64,+umip
--- 
-2.23.0.351.gc4317032e6-goog
+> +/**
+> + * syscall_enter_from_usermode - Check and handle work before invoking
+> + *                              a syscall
+> + * @regs:      Pointer to currents pt_regs
+> + * @syscall:   The syscall number
+> + *
+> + * Invoked from architecture specific syscall entry code with interrupts
+> + * enabled.
+> + *
+> + * Returns: The original or a modified syscall number
+> + */
 
+Maybe document that it can return -1 to skip the syscall and that, if
+this happens, it may use syscall_set_error() or
+syscall_set_return_value() first.  If neither of those is called and
+-1 is returned, then the syscall will fail with ENOSYS.
