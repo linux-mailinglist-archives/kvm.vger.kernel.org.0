@@ -2,80 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F021B8FAB
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 14:21:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53AF5B90B3
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 15:33:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408950AbfITMVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 08:21:21 -0400
-Received: from foss.arm.com ([217.140.110.172]:44126 "EHLO foss.arm.com"
+        id S1727819AbfITNdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 09:33:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:15821 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406276AbfITMVV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 08:21:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C784328;
-        Fri, 20 Sep 2019 05:21:20 -0700 (PDT)
-Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 599B73F67D;
-        Fri, 20 Sep 2019 05:21:19 -0700 (PDT)
-Date:   Fri, 20 Sep 2019 13:21:17 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org
-Subject: Re: [RFC patch 04/15] arm64/entry: Use generic syscall entry function
-Message-ID: <20190920122116.GA21231@arrakis.emea.arm.com>
-References: <20190919150314.054351477@linutronix.de>
- <20190919150808.830764150@linutronix.de>
+        id S1726798AbfITNdu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 09:33:50 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 28C2F368CF
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 13:33:50 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id f11so2286484wrt.18
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 06:33:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Nx/aQvRelzeLvCi79YG6MG8KeIQqwCv6VmFW22dXX5s=;
+        b=muhgBXtD2XFfhkEwFbRWibt0RsyISnRw98E/lHRoUvqmuJbE7kYp6PksHP6Byiu7nC
+         bR8dm+CDvOjLO9frPANn8vgFcWw76/vELEjfXV0IQbcEWmrNCqpDupp0NMV4cPZizmps
+         pMph2AVOMjlpzLMNg2JxGJpuMi+iVhPqlQrCNK+4KgeK1Eo/ZGe1pf5914VwcnU7Ry2x
+         nJ7sQf2pwSgcCnVeNQoo2YZyfKHWjkb6G+0lS+30DlmnITdH3yIa/Qg4gwZYcm3fMIgp
+         vWtxr5MYWlqh2gXrPOVvphUezCHK/FwvZgVPR7P9c5YghRlBG/oeAxHkPCaJ+lP9xYyG
+         ne0g==
+X-Gm-Message-State: APjAAAUbZFWh9dy8f4r9KjOXACDUdY5Rm+RxO9LsvLPNrvB1LuxwHpBq
+        wuz55Yxp+uyV3MRmiekV+N+w9c328K0U8Yyxqzn3BQzAy5D+DBPJqWzULDGqr9l6G/UGERF6DBm
+        G9eHKbVdEe+Yc
+X-Received: by 2002:a1c:608b:: with SMTP id u133mr3588935wmb.27.1568986428853;
+        Fri, 20 Sep 2019 06:33:48 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxK0NaSgNeM2SWzbThQeAoHLMH7PRhHAfioEXu+xSV+Ql4+lSoQwnNXX4A4YPUbKk9NRokT7A==
+X-Received: by 2002:a1c:608b:: with SMTP id u133mr3588918wmb.27.1568986428623;
+        Fri, 20 Sep 2019 06:33:48 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id c1sm1536496wmk.20.2019.09.20.06.33.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Sep 2019 06:33:48 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Suleiman Souhlal <suleiman@google.com>
+Cc:     john.stultz@linaro.org, sboyd@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Suleiman Souhlal <suleiman@google.com>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, tglx@linutronix.de
+Subject: Re: [RFC 2/2] x86/kvmclock: Use host timekeeping.
+In-Reply-To: <20190920062713.78503-3-suleiman@google.com>
+References: <20190920062713.78503-1-suleiman@google.com> <20190920062713.78503-3-suleiman@google.com>
+Date:   Fri, 20 Sep 2019 15:33:47 +0200
+Message-ID: <87woe38538.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190919150808.830764150@linutronix.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 05:03:18PM +0200, Thomas Gleixner wrote:
->  #ifdef CONFIG_ARM64_ERRATUM_1463225
-> @@ -97,19 +97,16 @@ static void el0_svc_common(struct pt_reg
->  
->  	regs->orig_x0 = regs->regs[0];
->  	regs->syscallno = scno;
-> +	/* Set default error number */
-> +	regs->regs[0] = -ENOSYS;
+Suleiman Souhlal <suleiman@google.com> writes:
 
-I think this corrupts the first argument of all valid syscalls.
-SC_ARM64_REGS_TO_ARGS uses regs[0] instead of orig_x0. ptrace should be
-fine since it calls syscall_get_arguments() which uses orig_x0.
+> When CONFIG_KVMCLOCK_HOST_TIMEKEEPING is enabled, and the host
+> supports it, update our timekeeping parameters to be the same as
+> the host. This lets us have our time synchronized with the host's,
+> even in the presence of host NTP or suspend.
+>
+> When enabled, kvmclock uses raw tsc instead of pvclock.
+>
+> When enabled, syscalls that can change time, such as settimeofday(2)
+> or adj_timex(2) are disabled in the guest.
+>
+> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+> ---
+>  arch/x86/Kconfig                |   9 +++
+>  arch/x86/include/asm/kvmclock.h |   2 +
+>  arch/x86/kernel/kvmclock.c      | 127 +++++++++++++++++++++++++++++++-
+>  kernel/time/timekeeping.c       |  21 ++++++
+>  4 files changed, 155 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 4195f44c6a09..37299377d9d7 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -837,6 +837,15 @@ config PARAVIRT_TIME_ACCOUNTING
+>  config PARAVIRT_CLOCK
+>  	bool
+>  
+> +config KVMCLOCK_HOST_TIMEKEEPING
+> +	bool "kvmclock uses host timekeeping"
+> +	depends on KVM_GUEST
+> +	---help---
+> +	  Select this option to make the guest use the same timekeeping
+> +	  parameters as the host. This means that time will be almost
+> +	  exactly the same between the two. Only works if the host uses "tsc"
+> +	  clocksource.
+> +
 
-We could change the SC_ARM64_REGS_TO_ARGS macro though (in theory there
-shouldn't be any performance hit as it's already cached).
-
->  
->  	cortex_a76_erratum_1463225_svc_handler();
->  	local_daif_restore(DAIF_PROCCTX);
->  	user_exit();
->  
-> -	if (has_syscall_work(flags)) {
-> -		/* set default errno for user-issued syscall(-1) */
-> -		if (scno == NO_SYSCALL)
-> -			regs->regs[0] = -ENOSYS;
-> -		scno = syscall_trace_enter(regs);
-> -		if (scno == NO_SYSCALL)
-> -			goto trace_exit;
-> -	}
-> +	scno = syscall_enter_from_usermode(regs, scno);
-> +	if (scno == NO_SYSCALL)
-> +		goto trace_exit;
->  
->  	invoke_syscall(regs, scno, sc_nr, syscall_table);
+I'd also like to speak up against this config, it is confusing. In case
+the goal is to come up with a TSC-based clock for guests which will
+return the same as clock_gettime() on the host (or, is the goal to just
+have the same reading for all guests on the host?) I'd suggest we create
+a separate (from KVMCLOCK) clocksource (mirroring host timekeeper) and
+guests will be free to pick the one they like.
 
 -- 
-Catalin
+Vitaly
