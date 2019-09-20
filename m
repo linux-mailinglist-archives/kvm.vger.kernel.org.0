@@ -2,74 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C28FB93CD
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 17:14:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 117CFB9454
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 17:44:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403797AbfITPOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 11:14:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11356 "EHLO
+        id S2404221AbfITPoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 11:44:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29004 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387614AbfITPOp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Sep 2019 11:14:45 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8KFEE2U022014;
-        Fri, 20 Sep 2019 11:14:37 -0400
+        by vger.kernel.org with ESMTP id S2392297AbfITPoM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 20 Sep 2019 11:44:12 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8KFSHWU068956;
+        Fri, 20 Sep 2019 11:44:09 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4y8angeg-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4ycspr1g-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Sep 2019 11:14:37 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8KFECYs021796;
-        Fri, 20 Sep 2019 11:14:36 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4y8angdu-1
+        Fri, 20 Sep 2019 11:44:09 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8KFT64M072224;
+        Fri, 20 Sep 2019 11:44:09 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4ycspr0k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Sep 2019 11:14:36 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8KFB389010798;
-        Fri, 20 Sep 2019 15:14:35 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma04dal.us.ibm.com with ESMTP id 2v3vbutjsd-1
+        Fri, 20 Sep 2019 11:44:09 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8KFVGUG000763;
+        Fri, 20 Sep 2019 15:44:07 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma02wdc.us.ibm.com with ESMTP id 2v3vbu72k6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Sep 2019 15:14:35 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8KFEVa758786272
+        Fri, 20 Sep 2019 15:44:07 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8KFi5WK40108482
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Sep 2019 15:14:31 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39C9078060;
-        Fri, 20 Sep 2019 15:14:31 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FC877805C;
-        Fri, 20 Sep 2019 15:14:29 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.85.141.73])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 20 Sep 2019 15:14:29 +0000 (GMT)
-Subject: Re: [PATCH v4 3/4] vfio: zpci: defining the VFIO headers
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     sebott@linux.ibm.com, gerald.schaefer@de.ibm.com,
-        pasic@linux.ibm.com, borntraeger@de.ibm.com, walling@linux.ibm.com,
-        linux-s390@vger.kernel.org, iommu@lists.linux-foundation.org,
-        joro@8bytes.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, kvm@vger.kernel.org,
-        heiko.carstens@de.ibm.com, robin.murphy@arm.com, gor@linux.ibm.com,
-        pmorel@linux.ibm.com
-References: <1567815231-17940-1-git-send-email-mjrosato@linux.ibm.com>
- <1567815231-17940-4-git-send-email-mjrosato@linux.ibm.com>
- <20190919172009.71b1c246.cohuck@redhat.com>
- <0a62aba7-578a-6875-da4d-13e8b145cf9b@linux.ibm.com>
- <20190920160258.70631905.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Openpgp: preference=signencrypt
-Message-ID: <86647083-7f94-44aa-8856-103836906f36@linux.ibm.com>
-Date:   Fri, 20 Sep 2019 11:14:28 -0400
+        Fri, 20 Sep 2019 15:44:05 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0C65AE066;
+        Fri, 20 Sep 2019 15:44:05 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 514A1AE062;
+        Fri, 20 Sep 2019 15:44:05 +0000 (GMT)
+Received: from [9.85.205.180] (unknown [9.85.205.180])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 20 Sep 2019 15:44:05 +0000 (GMT)
+Subject: Re: [PATCH v6 04/10] s390: vfio-ap: filter CRYCB bits for unavailable
+ queue devices
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com, pmorel@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com
+References: <1568410018-10833-1-git-send-email-akrowiak@linux.ibm.com>
+ <1568410018-10833-5-git-send-email-akrowiak@linux.ibm.com>
+ <20190919123434.28a29c00.pasic@linux.ibm.com>
+ <3c81ae10-79fc-d845-571f-66cb84e1227a@linux.ibm.com>
+Message-ID: <a587f900-352b-ae82-0c86-6c0fb173315e@linux.ibm.com>
+Date:   Fri, 20 Sep 2019 11:44:05 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20190920160258.70631905.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <3c81ae10-79fc-d845-571f-66cb84e1227a@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-20_05:,,
  signatures=0
@@ -77,122 +74,83 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorit
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909200142
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909200143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/20/19 10:02 AM, Cornelia Huck wrote:
-> On Thu, 19 Sep 2019 16:55:57 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> 
->> On 9/19/19 11:20 AM, Cornelia Huck wrote:
->>> On Fri,  6 Sep 2019 20:13:50 -0400
->>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
->>>   
->>>> From: Pierre Morel <pmorel@linux.ibm.com>
->>>>
->>>> We define a new device region in vfio.h to be able to
->>>> get the ZPCI CLP information by reading this region from
->>>> userland.
->>>>
->>>> We create a new file, vfio_zdev.h to define the structure
->>>> of the new region we defined in vfio.h
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>>> ---
->>>>  include/uapi/linux/vfio.h      |  1 +
->>>>  include/uapi/linux/vfio_zdev.h | 35 +++++++++++++++++++++++++++++++++++
->>>>  2 files changed, 36 insertions(+)
->>>>  create mode 100644 include/uapi/linux/vfio_zdev.h
-> 
->>>> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
->>>> new file mode 100644
->>>> index 0000000..55e0d6d
->>>> --- /dev/null
->>>> +++ b/include/uapi/linux/vfio_zdev.h
->>>> @@ -0,0 +1,35 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->>>> +/*
->>>> + * Region definition for ZPCI devices
->>>> + *
->>>> + * Copyright IBM Corp. 2019
->>>> + *
->>>> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
->>>> + */
->>>> +
->>>> +#ifndef _VFIO_ZDEV_H_
->>>> +#define _VFIO_ZDEV_H_
->>>> +
->>>> +#include <linux/types.h>
->>>> +
->>>> +/**
->>>> + * struct vfio_region_zpci_info - ZPCI information.  
->>>
->>> Hm... probably should also get some more explanation. E.g. is that
->>> derived from a hardware structure?
->>>   
+On 9/20/19 10:24 AM, Tony Krowiak wrote:
+> On 9/19/19 6:34 AM, Halil Pasic wrote:
+>> On Fri, 13 Sep 2019 17:26:52 -0400
+>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 >>
->> The structure itself is not mapped 1:1 to a hardware structure, but it
->> does serve as a collection of information that was derived from other
->> hardware structures.
+>>> +static void vfio_ap_mdev_get_crycb_matrix(struct ap_matrix_mdev 
+>>> *matrix_mdev)
+>>> +{
+>>> +    unsigned long apid, apqi;
+>>> +    unsigned long masksz = BITS_TO_LONGS(AP_DEVICES) *
+>>> +                   sizeof(unsigned long);
+>>> +
+>>> +    memset(matrix_mdev->crycb.apm, 0, masksz);
+>>> +    memset(matrix_mdev->crycb.apm, 0, masksz);
+>>> +    memcpy(matrix_mdev->crycb.adm, matrix_mdev->matrix.adm, masksz);
+>>> +
+>>> +    for_each_set_bit_inv(apid, matrix_mdev->matrix.apm,
+>>> +                 matrix_mdev->matrix.apm_max + 1) {
+>>> +        for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
+>>> +                     matrix_mdev->matrix.aqm_max + 1) {
+>>> +            if (vfio_ap_find_queue(AP_MKQID(apid, apqi))) {
+>>> +                if (!test_bit_inv(apid, matrix_mdev->crycb.apm))
+>>> +                    set_bit_inv(apid,
+>>> +                            matrix_mdev->crycb.apm);
+>>> +                if (!test_bit_inv(apqi, matrix_mdev->crycb.aqm))
+>>> +                    set_bit_inv(apqi,
+>>> +                            matrix_mdev->crycb.aqm);
+>>> +            }
+>>> +        }
+>>> +    }
+>>> +}
 >>
->> "Used for passing hardware feature information about a zpci device
->> between the host and guest" ?
-> 
-> "zPCI specific hardware feature information for a device"?
-> 
-> Are we reasonably sure that this is complete for now? I'm not sure if
-> expanding this structure would work; adding another should always be
-> possible, though (if a bit annoying).
-> 
-
-I think trying to make the structure expandable would be best...  If we
-allow arbitrary-sized reads of the info, and only add new fields onto
-the end it should be OK, no? (older qemu doesn't get the info it doesn't
-ask for / understand)....  But I guess that's not compatible with having
-util_str[] size being defined dynamically.  Another caveat would be if
-CLP_UTIL_STR_LEN were to grow in size in the future, and assuming
-util_str[] was no longer at the end of the structure, I guess the
-additional data would have to end up in a
-util_str2[CLP_UTIL_STR_LEN_NEW-CLP_UTIL_STR_LEN_OLD]...  To explain what
-I mean, something like:
-
-struct vfio_region_zpci_info {
-	<..>
-	__u8 util_str[CLP_UTIL_STR_LEN_OLD];
-	/* END OF V1 */
-	__u8 foo;
-	/* END OF V2 */
-	__u8 util_str2[CLP_UTIL_STR_LEN_NEW-CLP_UTIL_STR_LEN_OLD];
-	/* END OF V3 */
-} __packed;
-
-
+>> Even with the discussed typo fixed (zero crycb.aqm) this procedure does
+>> not make sense to me. :(
 >>
->>>> + *
->>>> + */
->>>> +struct vfio_region_zpci_info {
->>>> +	__u64 dasm;
->>>> +	__u64 start_dma;
->>>> +	__u64 end_dma;
->>>> +	__u64 msi_addr;
->>>> +	__u64 flags;
->>>> +	__u16 pchid;
->>>> +	__u16 mui;
->>>> +	__u16 noi;
->>>> +	__u16 maxstbl;
->>>> +	__u8 version;
->>>> +	__u8 gid;
->>>> +#define VFIO_PCI_ZDEV_FLAGS_REFRESH 1
->>>> +	__u8 util_str[];
->>>> +} __packed;
->>>> +
->>>> +#endif  
->>>
->>>   
+>> If in doubt please consider the following example:
+>> matrix_mdev->matrix.apm and matrix_mdev->matrix.aqm have both just bits
+>> 0 and 1 set (i.e. first byte 0xC0 the rest of the bytes 0x0). Queues
+>> bound to the vfio_ap driver (0,0), (0,1), (1,0); not bound to vfio_ap is
+>> however (1,1). If I read this correctly this filtering logic would grant
+>> access to (1,1) which seems to contradict with the stated intention.
+> 
+> Yep, I see your point. I'll have to rework this code.
+
+As I see it, we have two choices here:
+
+1. Do not set bit 1 in the APM of the guest's CRYCB because queue
+    01.0001 is not bound to the vfio_ap device driver. This would
+    preclude guest access to any domain in adapter 1 - i.e., the
+    guest would have access to queues 00.0000 and 00.0001.
+
+2. Do not set bit 1 in the AQM of the guest's CRYCB because queue
+    01.0001 is not bound to the vfio_ap device driver. This would
+    preclude guest access to domain 1 in both adapters - i.e., the
+    guest would have access to queues 00.0000 and 01.0000.
+
+There are ramifications for either choice. For example, if only one
+adapter is assigned to the mdev, then option 1 will result in the
+guest not having access to any AP queues. Likewise, the guest will
+not get access to any AP queues if only one domain is assigned to
+the mdev. Neither choice is optimal, but option 1 seems to make sense
+because it somewhat models the behavior of the host system. For example,
+only AP adapters can be configured online/offline and in order to
+add/remove domains, an adapter must first be configured offline.
+
+> 
+>>
+>> Regards,
+>> Halil
+>>
+>>
 >>
 > 
 
