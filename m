@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 461A3B9902
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 23:28:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F20B9B98E5
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 23:25:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394017AbfITV0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 17:26:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37392 "EHLO mx1.redhat.com"
+        id S2393817AbfITVZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 17:25:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57066 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391072AbfITVZN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 17:25:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S2393802AbfITVZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 17:25:16 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 32F81308123B;
-        Fri, 20 Sep 2019 21:25:13 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id CD8DCC054C52;
+        Fri, 20 Sep 2019 21:25:15 +0000 (UTC)
 Received: from mail (ovpn-120-159.rdu2.redhat.com [10.10.120.159])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 15B945D6B2;
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80AAB60BF4;
         Fri, 20 Sep 2019 21:25:13 +0000 (UTC)
 From:   Andrea Arcangeli <aarcange@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -26,66 +26,77 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 06/17] KVM: monolithic: x86: enable the kvm_pmu_ops external functions
-Date:   Fri, 20 Sep 2019 17:24:58 -0400
-Message-Id: <20190920212509.2578-7-aarcange@redhat.com>
+Subject: [PATCH 07/17] KVM: monolithic: x86: adjust the section prefixes
+Date:   Fri, 20 Sep 2019 17:24:59 -0400
+Message-Id: <20190920212509.2578-8-aarcange@redhat.com>
 In-Reply-To: <20190920212509.2578-1-aarcange@redhat.com>
 References: <20190920212509.2578-1-aarcange@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Fri, 20 Sep 2019 21:25:13 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 20 Sep 2019 21:25:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Plug in the new external functions and their extern declarations in
-the respective kernel modules (kvm-intel and kvm-amd).
+Adjusts the section prefixes of some KVM common code function because
+with the monolithic methods the section checker can now do a more
+accurate analysis at build time and this allows to build without
+CONFIG_SECTION_MISMATCH_WARN_ONLY=n.
 
 Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
 ---
- arch/x86/kvm/pmu.h           | 2 ++
- arch/x86/kvm/pmu_amd.c       | 2 ++
- arch/x86/kvm/vmx/pmu_intel.c | 2 ++
- 3 files changed, 6 insertions(+)
+ arch/x86/kvm/svm.c     | 2 +-
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ arch/x86/kvm/x86.c     | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 58265f761c3b..a9c2f68a40cc 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -19,6 +19,8 @@ struct kvm_event_hw_type_mapping {
- 	unsigned event_type;
- };
- 
-+#include "pmu_ops.h"
-+
- struct kvm_pmu_ops {
- 	unsigned (*find_arch_event)(struct kvm_pmu *pmu, u8 event_select,
- 				    u8 unit_mask);
-diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
-index c8388389a3b0..12d1fa3ba35a 100644
---- a/arch/x86/kvm/pmu_amd.c
-+++ b/arch/x86/kvm/pmu_amd.c
-@@ -301,6 +301,8 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
- 	}
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 3041abbd643b..5a48beb58083 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -1407,7 +1407,7 @@ static __init int svm_hardware_setup(void)
+ 	return r;
  }
  
-+#include "pmu_amd_ops.c"
-+
- struct kvm_pmu_ops amd_pmu_ops = {
- 	.find_arch_event = amd_find_arch_event,
- 	.find_fixed_event = amd_find_fixed_event,
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 4dea0e0e7e39..5ef36a75c31e 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -358,6 +358,8 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
- 		pmu->global_ovf_ctrl = 0;
+-static __exit void svm_hardware_unsetup(void)
++static void svm_hardware_unsetup(void)
+ {
+ 	int cpu;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9fc3969f6443..09e6a477e06f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7642,7 +7642,7 @@ static __init int hardware_setup(void)
+ 	return r;
  }
  
-+#include "pmu_intel_ops.c"
-+
- struct kvm_pmu_ops intel_pmu_ops = {
- 	.find_arch_event = intel_find_arch_event,
- 	.find_fixed_event = intel_find_fixed_event,
+-static __exit void hardware_unsetup(void)
++static void hardware_unsetup(void)
+ {
+ 	if (nested)
+ 		nested_vmx_hardware_unsetup();
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index dfd641243568..c04894b61384 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9206,7 +9206,7 @@ void kvm_arch_hardware_disable(void)
+ 	drop_user_return_notifiers();
+ }
+ 
+-int kvm_arch_hardware_setup(void)
++__init int kvm_arch_hardware_setup(void)
+ {
+ 	int r;
+ 
+@@ -9237,7 +9237,7 @@ void kvm_arch_hardware_unsetup(void)
+ 	kvm_x86_ops->hardware_unsetup();
+ }
+ 
+-int kvm_arch_check_processor_compat(void)
++__init int kvm_arch_check_processor_compat(void)
+ {
+ 	return kvm_x86_ops->check_processor_compatibility();
+ }
