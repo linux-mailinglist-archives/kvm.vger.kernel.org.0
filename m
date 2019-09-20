@@ -2,129 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C21C3B919D
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 16:24:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C152B91D6
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 16:26:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387928AbfITOYa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 10:24:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58612 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387915AbfITOY3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Sep 2019 10:24:29 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8KE8e4o014172;
-        Fri, 20 Sep 2019 10:24:24 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4yr0aajw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Sep 2019 10:24:23 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x8KE9GZR016762;
-        Fri, 20 Sep 2019 10:24:23 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v4yr0aajc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Sep 2019 10:24:23 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8KEDbp5004074;
-        Fri, 20 Sep 2019 14:24:22 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma01dal.us.ibm.com with ESMTP id 2v3vbua63b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Sep 2019 14:24:22 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8KEOJdQ52756922
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Sep 2019 14:24:19 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC6FEAE05F;
-        Fri, 20 Sep 2019 14:24:19 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 550F1AE062;
-        Fri, 20 Sep 2019 14:24:19 +0000 (GMT)
-Received: from [9.85.205.180] (unknown [9.85.205.180])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 20 Sep 2019 14:24:19 +0000 (GMT)
-Subject: Re: [PATCH v6 04/10] s390: vfio-ap: filter CRYCB bits for unavailable
- queue devices
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com, pmorel@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com
-References: <1568410018-10833-1-git-send-email-akrowiak@linux.ibm.com>
- <1568410018-10833-5-git-send-email-akrowiak@linux.ibm.com>
- <20190919123434.28a29c00.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <3c81ae10-79fc-d845-571f-66cb84e1227a@linux.ibm.com>
-Date:   Fri, 20 Sep 2019 10:24:19 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S2388934AbfITO0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 10:26:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35064 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388913AbfITO0P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 10:26:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7857F8980F5;
+        Fri, 20 Sep 2019 14:26:14 +0000 (UTC)
+Received: from gondolin (dhcp-192-230.str.redhat.com [10.33.192.230])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B2E2F5D717;
+        Fri, 20 Sep 2019 14:26:10 +0000 (UTC)
+Date:   Fri, 20 Sep 2019 16:26:07 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     sebott@linux.ibm.com, gerald.schaefer@de.ibm.com,
+        pasic@linux.ibm.com, borntraeger@de.ibm.com, walling@linux.ibm.com,
+        linux-s390@vger.kernel.org, iommu@lists.linux-foundation.org,
+        joro@8bytes.org, linux-kernel@vger.kernel.org,
+        alex.williamson@redhat.com, kvm@vger.kernel.org,
+        heiko.carstens@de.ibm.com, robin.murphy@arm.com, gor@linux.ibm.com,
+        pmorel@linux.ibm.com
+Subject: Re: [PATCH v4 4/4] vfio: pci: Using a device region to retrieve
+ zPCI information
+Message-ID: <20190920162607.16198c92.cohuck@redhat.com>
+In-Reply-To: <c5c5c46e-371b-5be0-064a-b89195cdc3f6@linux.ibm.com>
+References: <1567815231-17940-1-git-send-email-mjrosato@linux.ibm.com>
+        <1567815231-17940-5-git-send-email-mjrosato@linux.ibm.com>
+        <20190919172505.2eb075f8.cohuck@redhat.com>
+        <c5c5c46e-371b-5be0-064a-b89195cdc3f6@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20190919123434.28a29c00.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-20_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909200136
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Fri, 20 Sep 2019 14:26:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/19/19 6:34 AM, Halil Pasic wrote:
-> On Fri, 13 Sep 2019 17:26:52 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> 
->> +static void vfio_ap_mdev_get_crycb_matrix(struct ap_matrix_mdev *matrix_mdev)
->> +{
->> +	unsigned long apid, apqi;
->> +	unsigned long masksz = BITS_TO_LONGS(AP_DEVICES) *
->> +			       sizeof(unsigned long);
->> +
->> +	memset(matrix_mdev->crycb.apm, 0, masksz);
->> +	memset(matrix_mdev->crycb.apm, 0, masksz);
->> +	memcpy(matrix_mdev->crycb.adm, matrix_mdev->matrix.adm, masksz);
->> +
->> +	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm,
->> +			     matrix_mdev->matrix.apm_max + 1) {
->> +		for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
->> +				     matrix_mdev->matrix.aqm_max + 1) {
->> +			if (vfio_ap_find_queue(AP_MKQID(apid, apqi))) {
->> +				if (!test_bit_inv(apid, matrix_mdev->crycb.apm))
->> +					set_bit_inv(apid,
->> +						    matrix_mdev->crycb.apm);
->> +				if (!test_bit_inv(apqi, matrix_mdev->crycb.aqm))
->> +					set_bit_inv(apqi,
->> +						    matrix_mdev->crycb.aqm);
->> +			}
->> +		}
->> +	}
->> +}
-> 
-> Even with the discussed typo fixed (zero crycb.aqm) this procedure does
-> not make sense to me. :(
-> 
-> If in doubt please consider the following example:
-> matrix_mdev->matrix.apm and matrix_mdev->matrix.aqm have both just bits
-> 0 and 1 set (i.e. first byte 0xC0 the rest of the bytes 0x0). Queues
-> bound to the vfio_ap driver (0,0), (0,1), (1,0); not bound to vfio_ap is
-> however (1,1). If I read this correctly this filtering logic would grant
-> access to (1,1) which seems to contradict with the stated intention.
+On Thu, 19 Sep 2019 16:57:10 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Yep, I see your point. I'll have to rework this code.
+> On 9/19/19 11:25 AM, Cornelia Huck wrote:
+> > On Fri,  6 Sep 2019 20:13:51 -0400
+> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >   
+> >> From: Pierre Morel <pmorel@linux.ibm.com>
+> >>
+> >> We define a new configuration entry for VFIO/PCI, VFIO_PCI_ZDEV
+> >>
+> >> When the VFIO_PCI_ZDEV feature is configured we initialize
+> >> a new device region, VFIO_REGION_SUBTYPE_ZDEV_CLP, to hold
+> >> the information from the ZPCI device the use
+> >>
+> >> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> >> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> >> ---
+> >>  drivers/vfio/pci/Kconfig            |  7 +++
+> >>  drivers/vfio/pci/Makefile           |  1 +
+> >>  drivers/vfio/pci/vfio_pci.c         |  9 ++++
+> >>  drivers/vfio/pci/vfio_pci_private.h | 10 +++++
+> >>  drivers/vfio/pci/vfio_pci_zdev.c    | 85 +++++++++++++++++++++++++++++++++++++
+> >>  5 files changed, 112 insertions(+)
+> >>  create mode 100644 drivers/vfio/pci/vfio_pci_zdev.c
+> >>
+> >> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> >> index ac3c1dd..d4562a8 100644
+> >> --- a/drivers/vfio/pci/Kconfig
+> >> +++ b/drivers/vfio/pci/Kconfig
+> >> @@ -45,3 +45,10 @@ config VFIO_PCI_NVLINK2
+> >>  	depends on VFIO_PCI && PPC_POWERNV
+> >>  	help
+> >>  	  VFIO PCI support for P9 Witherspoon machine with NVIDIA V100 GPUs
+> >> +
+> >> +config VFIO_PCI_ZDEV
+> >> +	bool "VFIO PCI Generic for ZPCI devices"
+> >> +	depends on VFIO_PCI && S390
+> >> +	default y
+> >> +	help
+> >> +	  VFIO PCI support for S390 Z-PCI devices  
+> >   
+> >>From that description, I'd have no idea whether I'd want that or not.  
+> > Is there any downside to enabling it?
+> >   
+> 
+> :) Not really, you're just getting information from the hardware vs
+> using hard-coded defaults.  The only reason I could think of to turn it
+> off would be if you wanted/needed to restore this hard-coded behavior.
+
+I'm not really sure whether that's worth adding a Kconfig switch for.
+Won't older versions simply ignore the new region anyway?
+
+Also, I don't think we have any migration compatibility issues, as
+vfio-pci devices are not (yet) migrateable anyway.
 
 > 
-> Regards,
-> Halil
-> 
-> 
-> 
+> bool "VFIO PCI support for generic ZPCI devices" ?
 
+"Support zPCI-specific configuration for VFIO PCI" ?
+
+> 
+> "Support for sharing ZPCI hardware device information between the host
+> and guests." ?
+
+"Enabling this options exposes a region containing hardware
+configuration for zPCI devices. This enables userspace (e.g. QEMU) to
+supply proper configuration values instead of hard-coded defaults for
+zPCI devices passed through via VFIO on s390.
+
+Say Y here."
+
+?
