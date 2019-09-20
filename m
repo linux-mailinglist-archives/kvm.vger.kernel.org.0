@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 237A8B88C4
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 02:59:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05CD0B88EC
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 03:31:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394495AbfITA7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 20:59:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43612 "EHLO mx1.redhat.com"
+        id S2392787AbfITBbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 21:31:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36790 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389293AbfITA7q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 20:59:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S2391404AbfITBbU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 21:31:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2C55B81DE7;
-        Fri, 20 Sep 2019 00:59:46 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id CA48B308FB9D;
+        Fri, 20 Sep 2019 01:31:19 +0000 (UTC)
 Received: from [10.72.12.88] (ovpn-12-88.pek2.redhat.com [10.72.12.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F6D75D9CD;
-        Fri, 20 Sep 2019 00:59:34 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5392F100197A;
+        Fri, 20 Sep 2019 01:31:00 +0000 (UTC)
 Subject: Re: [RFC v4 0/3] vhost: introduce mdev based hardware backend
 To:     Tiwei Bie <tiwei.bie@intel.com>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>, alex.williamson@redhat.com,
@@ -35,8 +35,8 @@ References: <20190917010204.30376-1-tiwei.bie@intel.com>
  <d2efe7e4-cf13-437d-e2dc-e2779fac7d2f@redhat.com>
  <20190919154552.GA27657@___>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <11bc30a9-1cf5-4a5f-109a-f307d70c35fa@redhat.com>
-Date:   Fri, 20 Sep 2019 08:59:32 +0800
+Message-ID: <43aaf7dc-f08b-8898-3c55-908ff4d68866@redhat.com>
+Date:   Fri, 20 Sep 2019 09:30:58 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
@@ -44,8 +44,8 @@ In-Reply-To: <20190919154552.GA27657@___>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Fri, 20 Sep 2019 00:59:46 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Fri, 20 Sep 2019 01:31:19 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -115,8 +115,34 @@ On 2019/9/19 下午11:45, Tiwei Bie wrote:
 >
 > 	... Check the mdev device_id proposed in ...
 > 	... https://lkml.org/lkml/2019/9/12/151 ...
+
+
+To clarify, this should be done through the id_table fields in 
+vhost_mdev_driver, and it should claim it supports virtio-mdev device only:
+
+
+static struct mdev_class_id id_table[] = {
+     { MDEV_ID_VIRTIO },
+     { 0 },
+};
+
+
+static struct mdev_driver vhost_mdev_driver = {
+     ...
+     .id_table = id_table,
+}
+
+
 >
 > 	return vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, mdev);
+
+
+And in vfio_vhost_mdev_ops, all its need is to just implement vhost-net 
+ioctl and translate them to virtio-mdev transport (e.g device_ops I 
+proposed or ioctls other whatever other method) API. And it could have a 
+dummy ops implementation for the other device_ops.
+
+
 > }
 >
 > static void vhost_mdev_remove(struct device *dev)
@@ -136,16 +162,19 @@ On 2019/9/19 下午11:45, Tiwei Bie wrote:
 > After binding above driver to the mdev device, we can setup IOMMU
 > via VFIO and get VFIO device fd of this mdev device, and pass it
 > to vhost fd (/dev/vhost-mdev) with a SET_BACKEND ioctl.
->
-> Thanks,
-> Tiwei
 
 
-Yes, something like this.
+Then what vhost-mdev char device did is just forwarding ioctl back to 
+this vfio device fd which seems a overkill. It's simpler that just do 
+ioctl on the device ops directly.
 
 Thanks
 
 
+>
+> Thanks,
+> Tiwei
+>
 >> Thanks
 >>
 >>
