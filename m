@@ -2,234 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B18DCB99EE
-	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2019 01:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06BE9B99EF
+	for <lists+kvm@lfdr.de>; Sat, 21 Sep 2019 01:08:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407045AbfITXGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 19:06:24 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37087 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392315AbfITXGY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 19:06:24 -0400
-Received: by mail-wr1-f68.google.com with SMTP id i1so8301984wro.4
-        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 16:06:21 -0700 (PDT)
+        id S2407052AbfITXIL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 19:08:11 -0400
+Received: from mail-qt1-f202.google.com ([209.85.160.202]:33856 "EHLO
+        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407049AbfITXIK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 19:08:10 -0400
+Received: by mail-qt1-f202.google.com with SMTP id y10so10011360qti.1
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 16:08:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=RZTT5IlU3wluSa45SV/fuR1fBaHtRcVgqplKmV/xKOs=;
-        b=L/L7l7C7HfAivkrayC9uPOVFDyAGWXTLLSfOQSMapE0ej0fLKy9Kc9Xve6D64mEdmV
-         Mai1GwS4V3T0B1WSJKJcyx8sVKfkewogUrfn/1JBFdc3XRGrl7itrJ4sI50Sn50IiQPn
-         Hj7i0yPB6oZz1VuiG/ihOOMyeGRhR3raXvi4f+WMn5C3RIH82fNFfIrOnKixHcrT8Wz4
-         A6SZiFoM/auCJL42HFqgpsikhxvw7jzjm3MnHChtl1j1ESP3tW+gEJK/HC+FkfwhiZis
-         kdPM27usoCqe+wf4krtmrCxCT18HzbRTDhX2Pu4slSJRn8uHJfCZCWSrWSeCz8OaUZgj
-         T/hQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=ytV4HUGMPUG3noaOCrZb1OFf1mumPpmyS7qh+vN6Ff8=;
+        b=YYyIbwXekgZXCnSg6HnHSYWc6LBE8WGSDTyilsi5rLDD7IZTUDeDeWT5SubSrOjR7S
+         p8g48EmtETsJXVbrtmNvMvA3tRnjiRl7rb+eVGJPa7FuwFGFCLNtdaISt0twQPD0ZO3w
+         j7V4TF5egHaMPNZZ7KoeoQE3avxoQHHshKKdE6PoOQwSlt+HNBBxAdO+BeO+o/bNm8x9
+         3CQdpgfhbgFwf31cnnDws6nlIremy7/ZR0c7YqzNpd3uI8v4HnJ4QUaXx9mjh02vSPjA
+         YXy31O4ZT6BSyuae8g/5+00vLDW1btC3Ji2zYvfb2hwBcV9vXOmqMOlSmKEybNDkd+Kv
+         YurQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=RZTT5IlU3wluSa45SV/fuR1fBaHtRcVgqplKmV/xKOs=;
-        b=twTMa+qZftJhSeOa/NgeNUr7WEMfPQx7mWwOMOelOjJ0OxZOppGxRbLqlet+CQJUFJ
-         a9rF5sn3K35Y4Z82z/QpAxzjx3E4r3xleAY3/mMtVtZsOVWEiniPTcEg5H06Dm2f/nKs
-         sLDZr8oF/9hbNxMzlVeoH/9jEgftEvIHhGhoHQBdEPRYYk0GcPduFRHxfoVzlR+eVI1z
-         90icmBhaKk/G23BrJ3ox7rGLHMnnYx49fcYwZWuOB2Bk7mh6ackPFt4ffMp958rGfbtB
-         oNcwRG8fZ/iiZ8wK3Jhf6YAisveP2eMIkaiRwuw1oI0U5WViNX5SRnNoWJlttxgKcPMj
-         1kuQ==
-X-Gm-Message-State: APjAAAXzdKuVtV3wE2sulVrldhDB+9n3sUwDaDeF3Kmgyz0XwpyLxLcX
-        m9MQdLS4D19qOSxCbaioGC9nXBq7XlyZ0WAMckbHnA==
-X-Google-Smtp-Source: APXvYqygYEkNnvwha6Mef7gPQ5vJc7T35ES7k+0cuJjffa+mDP8ylPoyOmvlCSdzMyCCJEAJK+7IZw5xkusv76g4Jm0=
-X-Received: by 2002:adf:dc4b:: with SMTP id m11mr14470339wrj.269.1569020780696;
- Fri, 20 Sep 2019 16:06:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190917185057.224221-1-marcorr@google.com> <2dce168f-edab-8c56-6d29-dc73aace8b63@oracle.com>
-In-Reply-To: <2dce168f-edab-8c56-6d29-dc73aace8b63@oracle.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 20 Sep 2019 16:06:09 -0700
-Message-ID: <CAA03e5GjxP1MXXq15mUuU1trqLrEjv_arNEQxp+QfHqCCb2X9g@mail.gmail.com>
-Subject: Re: [PATCH v3] kvm: nvmx: limit atomic switch MSRs
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=ytV4HUGMPUG3noaOCrZb1OFf1mumPpmyS7qh+vN6Ff8=;
+        b=DxDrdeUFQfhO/RSNyDANBAT18kixQ4vT130sji5iZzisww4KYk8NYTpOhousr2rCho
+         xdhHVDRaXHvxZ3f++5/XBjbp2dYCEv4O/M5t0V48r65L9r/ntHvFr8/uRfoTvx7gpueR
+         MrPVx6y0G4Ybrs2ymg4IQeZ34tXIl2RgEvNelGxO3g7j8ZbtrdrkSmkqlavSEDtrm8Qm
+         yvTPenjeGJfN75rZYuBgz07zIM2hiGtqFAvKcwDDf1Hr3Yl/gpTMFgJmClkpvmqJCN9n
+         XywFJSQp/bpdvYRsdtFuMb60/D0kM8ysWA86vYuPOQr1FKp6SxNhPLx2/JVTh+OlChx4
+         iIhQ==
+X-Gm-Message-State: APjAAAXAdL03DTFPjKFwGJAKV4sd9CSfXqfpzIq+JtlJSTOeXocSIcQF
+        0mkJhal9cqpZa7/S0zexPm9nF/gx7A5dsmBc+wohtN2D+/YxJpldN/Y2HNI10QHFTpxe91Ss3Yg
+        dn4MUqUlHi+kKVlpa+Mx58JJgFSTij/De+M/o+bcqhhqvQlmmj9QAKBBU1eFtdZM=
+X-Google-Smtp-Source: APXvYqyntiMVBkZ+US0xboMvO/T1n0+/PMD0f6Zea5CHE67rrcAfRXK+Gna0stR+yQ74biJAxw80QVfLL1F/Hw==
+X-Received: by 2002:a37:4c14:: with SMTP id z20mr6617564qka.296.1569020889719;
+ Fri, 20 Sep 2019 16:08:09 -0700 (PDT)
+Date:   Fri, 20 Sep 2019 16:08:05 -0700
+Message-Id: <20190920230805.111064-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.351.gc4317032e6-goog
+Subject: [kvm-unit-tests PATCH v2] kvm-unit-test: x86: Add RDPRU test
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 4:05 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
->
-> On 09/17/2019 11:50 AM, Marc Orr wrote:
-> > Allowing an unlimited number of MSRs to be specified via the VMX
-> > load/store MSR lists (e.g., vm-entry MSR load list) is bad for two
-> > reasons. First, a guest can specify an unreasonable number of MSRs,
-> > forcing KVM to process all of them in software. Second, the SDM bounds
-> > the number of MSRs allowed to be packed into the atomic switch MSR list=
-s.
-> > Quoting the "Miscellaneous Data" section in the "VMX Capability
-> > Reporting Facility" appendix:
-> >
-> > "Bits 27:25 is used to compute the recommended maximum number of MSRs
-> > that should appear in the VM-exit MSR-store list, the VM-exit MSR-load
-> > list, or the VM-entry MSR-load list. Specifically, if the value bits
-> > 27:25 of IA32_VMX_MISC is N, then 512 * (N + 1) is the recommended
-> > maximum number of MSRs to be included in each list. If the limit is
-> > exceeded, undefined processor behavior may result (including a machine
-> > check during the VMX transition)."
-> >
-> > Because KVM needs to protect itself and can't model "undefined processo=
-r
-> > behavior", arbitrarily force a VM-entry to fail due to MSR loading when
-> > the MSR load list is too large. Similarly, trigger an abort during a VM
-> > exit that encounters an MSR load list or MSR store list that is too lar=
-ge.
-> >
-> > The MSR list size is intentionally not pre-checked so as to maintain
-> > compatibility with hardware inasmuch as possible.
-> >
-> > Test these new checks with the kvm-unit-test "x86: nvmx: test max atomi=
-c
-> > switch MSRs".
-> >
-> > Suggested-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Peter Shier <pshier@google.com>
-> > Signed-off-by: Marc Orr <marcorr@google.com>
-> > ---
-> > v2 -> v3
-> > * Updated commit message.
-> > * Removed superflous function declaration.
-> > * Expanded in-line comment.
-> >
-> >   arch/x86/include/asm/vmx.h |  1 +
-> >   arch/x86/kvm/vmx/nested.c  | 44 ++++++++++++++++++++++++++++---------=
--
-> >   2 files changed, 34 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> > index a39136b0d509..a1f6ed187ccd 100644
-> > --- a/arch/x86/include/asm/vmx.h
-> > +++ b/arch/x86/include/asm/vmx.h
-> > @@ -110,6 +110,7 @@
-> >   #define VMX_MISC_SAVE_EFER_LMA                      0x00000020
-> >   #define VMX_MISC_ACTIVITY_HLT                       0x00000040
-> >   #define VMX_MISC_ZERO_LEN_INS                       0x40000000
-> > +#define VMX_MISC_MSR_LIST_MULTIPLIER         512
-> >
-> >   /* VMFUNC functions */
-> >   #define VMX_VMFUNC_EPTP_SWITCHING               0x00000001
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index ced9fba32598..0e29882bb45f 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -190,6 +190,16 @@ static void nested_vmx_abort(struct kvm_vcpu *vcpu=
-, u32 indicator)
-> >       pr_debug_ratelimited("kvm: nested vmx abort, indicator %d\n", ind=
-icator);
-> >   }
-> >
-> > +static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> > +{
-> > +     return fixed_bits_valid(control, low, high);
-> > +}
-> > +
-> > +static inline u64 vmx_control_msr(u32 low, u32 high)
-> > +{
-> > +     return low | ((u64)high << 32);
-> > +}
-> > +
-> >   static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
-> >   {
-> >       secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS)=
-;
-> > @@ -856,18 +866,36 @@ static int nested_vmx_store_msr_check(struct kvm_=
-vcpu *vcpu,
-> >       return 0;
-> >   }
-> >
-> > +static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-> > +     u64 vmx_misc =3D vmx_control_msr(vmx->nested.msrs.misc_low,
-> > +                                    vmx->nested.msrs.misc_high);
-> > +
-> > +     return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTI=
-PLIER;
-> > +}
-> > +
-> >   /*
-> >    * Load guest's/host's msr at nested entry/exit.
-> >    * return 0 for success, entry index for failure.
-> > + *
-> > + * One of the failure modes for MSR load/store is when a list exceeds =
-the
-> > + * virtual hardware's capacity. To maintain compatibility with hardwar=
-e inasmuch
-> > + * as possible, process all valid entries before failing rather than p=
-recheck
-> > + * for a capacity violation.
-> >    */
-> >   static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 co=
-unt)
-> >   {
-> >       u32 i;
-> >       struct vmx_msr_entry e;
-> >       struct msr_data msr;
-> > +     u32 max_msr_list_size =3D nested_vmx_max_atomic_switch_msrs(vcpu)=
-;
-> >
-> >       msr.host_initiated =3D false;
-> >       for (i =3D 0; i < count; i++) {
-> > +             if (unlikely(i >=3D max_msr_list_size))
-> > +                     goto fail;
-> > +
-> >               if (kvm_vcpu_read_guest(vcpu, gpa + i * sizeof(e),
-> >                                       &e, sizeof(e))) {
-> >                       pr_debug_ratelimited(
-> > @@ -899,9 +927,14 @@ static int nested_vmx_store_msr(struct kvm_vcpu *v=
-cpu, u64 gpa, u32 count)
-> >   {
-> >       u32 i;
-> >       struct vmx_msr_entry e;
-> > +     u32 max_msr_list_size =3D nested_vmx_max_atomic_switch_msrs(vcpu)=
-;
-> >
-> >       for (i =3D 0; i < count; i++) {
-> >               struct msr_data msr_info;
-> > +
-> > +             if (unlikely(i >=3D max_msr_list_size))
-> > +                     return -EINVAL;
-> > +
-> >               if (kvm_vcpu_read_guest(vcpu,
-> >                                       gpa + i * sizeof(e),
-> >                                       &e, 2 * sizeof(u32))) {
-> > @@ -1009,17 +1042,6 @@ static u16 nested_get_vpid02(struct kvm_vcpu *vc=
-pu)
-> >       return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
-> >   }
-> >
-> > -
-> > -static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> > -{
-> > -     return fixed_bits_valid(control, low, high);
-> > -}
-> > -
-> > -static inline u64 vmx_control_msr(u32 low, u32 high)
-> > -{
-> > -     return low | ((u64)high << 32);
-> > -}
-> > -
-> >   static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
-> >   {
-> >       superset &=3D mask;
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+When running in a VM, ensure that support for RDPRU is not enumerated
+in the guest's CPUID and that the RDPRU instruction raises #UD.
 
-+Paolo Bonzini +Radim Kr=C4=8Dm=C3=A1=C5=99
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+---
+ lib/x86/processor.h |  2 ++
+ x86/Makefile.x86_64 |  1 +
+ x86/rdpru.c         | 27 +++++++++++++++++++++++++++
+ x86/unittests.cfg   |  5 +++++
+ 4 files changed, 35 insertions(+)
+ create mode 100644 x86/rdpru.c
 
-Ping. Thanks.
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index b1c579b..fe72c13 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -131,6 +131,7 @@ static inline u8 cpuid_maxphyaddr(void)
+ #define	X86_FEATURE_XSAVE		(CPUID(0x1, 0, ECX, 26))
+ #define	X86_FEATURE_OSXSAVE		(CPUID(0x1, 0, ECX, 27))
+ #define	X86_FEATURE_RDRAND		(CPUID(0x1, 0, ECX, 30))
++#define	X86_FEATURE_HYPERVISOR		(CPUID(0x1, 0, ECX, 31))
+ #define	X86_FEATURE_MCE			(CPUID(0x1, 0, EDX, 7))
+ #define	X86_FEATURE_APIC		(CPUID(0x1, 0, EDX, 9))
+ #define	X86_FEATURE_CLFLUSH		(CPUID(0x1, 0, EDX, 19))
+@@ -150,6 +151,7 @@ static inline u8 cpuid_maxphyaddr(void)
+ #define	X86_FEATURE_RDPID		(CPUID(0x7, 0, ECX, 22))
+ #define	X86_FEATURE_SPEC_CTRL		(CPUID(0x7, 0, EDX, 26))
+ #define	X86_FEATURE_NX			(CPUID(0x80000001, 0, EDX, 20))
++#define	X86_FEATURE_RDPRU		(CPUID(0x80000008, 0, EBX, 4))
+ 
+ /*
+  * AMD CPUID features
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index 51f9b80..010102b 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -19,6 +19,7 @@ tests += $(TEST_DIR)/vmx.flat
+ tests += $(TEST_DIR)/tscdeadline_latency.flat
+ tests += $(TEST_DIR)/intel-iommu.flat
+ tests += $(TEST_DIR)/vmware_backdoors.flat
++tests += $(TEST_DIR)/rdpru.flat
+ 
+ include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+ 
+diff --git a/x86/rdpru.c b/x86/rdpru.c
+new file mode 100644
+index 0000000..87a517e
+--- /dev/null
++++ b/x86/rdpru.c
+@@ -0,0 +1,27 @@
++/* RDPRU test */
++
++#include "libcflat.h"
++#include "processor.h"
++#include "desc.h"
++
++static int rdpru_checking(void)
++{
++	asm volatile (ASM_TRY("1f")
++		      ".byte 0x0f,0x01,0xfd \n\t" /* rdpru */
++		      "1:" : : "c" (0) : "eax", "edx");
++	return exception_vector();
++}
++
++int main(int ac, char **av)
++{
++	setup_idt();
++
++	if (this_cpu_has(X86_FEATURE_HYPERVISOR)) {
++		report("RDPRU not supported", !this_cpu_has(X86_FEATURE_RDPRU));
++		report("RDPRU raises #UD", rdpru_checking() == UD_VECTOR);
++	} else {
++		report_skip("Not in a VM");
++	}
++
++	return report_summary();
++}
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 694ee3d..9764e18 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -221,6 +221,11 @@ file = pcid.flat
+ extra_params = -cpu qemu64,+pcid
+ arch = x86_64
+ 
++[rdpru]
++file = rdpru.flat
++extra_params = -cpu host
++arch = x86_64
++
+ [umip]
+ file = umip.flat
+ extra_params = -cpu qemu64,+umip
+-- 
+2.23.0.351.gc4317032e6-goog
+
