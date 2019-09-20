@@ -2,124 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E333B8B81
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 09:28:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2CD3B8BC5
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 09:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395012AbfITH1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Sep 2019 03:27:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36782 "EHLO mx1.redhat.com"
+        id S2437606AbfITHsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Sep 2019 03:48:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40352 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390633AbfITH1y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Sep 2019 03:27:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2437593AbfITHsF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Sep 2019 03:48:05 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0D66C2A09B2;
-        Fri, 20 Sep 2019 07:27:54 +0000 (UTC)
-Received: from [10.36.117.220] (ovpn-117-220.ams2.redhat.com [10.36.117.220])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E12DE60606;
-        Fri, 20 Sep 2019 07:27:45 +0000 (UTC)
-To:     Will Deacon <will@kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Zhangfei Gao <zhangfei.gao@gmail.com>,
-        Andrew Jones <drjones@redhat.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Subject: Plumber VFIO/IOMMU/PCI "Dual Stage SMMUv3 Status" Follow-up
-Message-ID: <51ed9586-9973-4811-2cda-a2356fb3a1b4@redhat.com>
-Date:   Fri, 20 Sep 2019 09:27:44 +0200
+        by mx1.redhat.com (Postfix) with ESMTPS id 1D8D0C057FA6
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 07:48:05 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id j125so821207wmj.6
+        for <kvm@vger.kernel.org>; Fri, 20 Sep 2019 00:48:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GKORzqIRH8UFUe4Xtmmfu6KCmszYBGYE6BwrxWii7Vw=;
+        b=SHl9rD8pNYARjP+AG7r1KC4CSVhDd+fn/trzqaj+5k6Da0UKEYS6YfPUdcHN/voUEj
+         3XV0Ny4DeXOmwHTYhrMceWM+frTmROO40BsdjEytblDwTF1pqH6rpNR0duvWdkQWpHuY
+         0HGc9eYh1eHhw9wPtWzq9Cshysr/iudhRYEn9maRQRW2KYTEPEFH054Ulpf6a8qzyFcI
+         VeZ7BK/WkceQ8gRpA9yx+5nVhnID7Jmw/7U2xLFQlvcGRnhKQ6bc6+26uqUydkxzNQhn
+         BeovI0nXXPeFFg6OqyfB2EHJiUCiZlm7gCm+YrGtO0cQwAmbQBdcRbZyYF2s1jJ3Wvao
+         LAMQ==
+X-Gm-Message-State: APjAAAWzU0d/Zp5jhqwP1Az2VgnP2Syd+5+FGbtBwPAqqa0QicWKRl8a
+        myNGHQXXJCabKDRjqUduQVJuzJUsgxi+5S116Uosc7o0ADcNOz/91uxgEwVnxSpcECCY64RPbQa
+        k56XdwpHrbDZX
+X-Received: by 2002:a5d:4d42:: with SMTP id a2mr11317097wru.89.1568965683591;
+        Fri, 20 Sep 2019 00:48:03 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqydSp1q3IPC5Ee/GOcfWjH/pT4DM0fXSnx1nHrzzgH37xFQc+n72/iPZHmbuMH5HvPeGLyqsQ==
+X-Received: by 2002:a5d:4d42:: with SMTP id a2mr11317074wru.89.1568965683377;
+        Fri, 20 Sep 2019 00:48:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c46c:2acb:d8d2:21d8? ([2001:b07:6468:f312:c46c:2acb:d8d2:21d8])
+        by smtp.gmail.com with ESMTPSA id w125sm1665640wmg.32.2019.09.20.00.48.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Sep 2019 00:48:02 -0700 (PDT)
+Subject: Re: [RFC 0/2] kvm: Use host timekeeping in guest.
+To:     Suleiman Souhlal <suleiman@google.com>, rkrcmar@redhat.com,
+        tglx@linutronix.de
+Cc:     john.stultz@linaro.org, sboyd@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20190920062713.78503-1-suleiman@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <1ec0b238-61a7-8353-026e-3a2ee23e6240@redhat.com>
+Date:   Fri, 20 Sep 2019 09:48:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190920062713.78503-1-suleiman@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 20 Sep 2019 07:27:54 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On 20/09/19 08:27, Suleiman Souhlal wrote:
+> To do that, I am changing kvmclock to request to the host to copy
+> its timekeeping parameters (mult, base, cycle_last, etc), so that
+> the guest timekeeper can use the same values, so that time can
+> be synchronized between the guest and the host.
+> 
+> Any suggestions or feedback would be highly appreciated.
 
-As a follow-up of the VFIO/IOMMU/PCI "Dual Stage SMMUv3 Status"
-session, please find some further justifications about the
-SMMUv3 nested stage enablement series.
+I'm not a timekeeping maintainer, but I don't think the
+kernel/time/timekeeping.c changes are acceptable.
 
-In the text below, I only talk about use cases featuring
-VFIO assigned devices where the physical IOMMU is actually
-involved.
+Is the PTP driver not enough?
 
-The virtio-iommu solution, as currently specified, is expected
-to work efficiently as long as guest IOMMU mappings are static.
-This hopefully actually corresponds to the DPDK use case.
-The overhead of trapping on each MAP/UNMAP is then close to 0.
-
-I see 2 main use cases where guest uses dynamic mappings:
-  1) native drivers using DMA ops are used on the guest
-  2) shared virtual address on guest.
-
-1) can be addressed with current virtio-iommu spec. However
-the performance will be very poor: it behaves as Intel IOMMU
-with the driver operating with caching mode and strict mode
-set (80% perf downgrade is observed versus no iommu). This use
-case can be tested very easily. Dual stage implementation
-should bring much better results here.
-
-2) natural implementation for that is nested. Jean planned
-to introduce extensions to the current virtio-iommu spec to
-setup stage 1 config. As far as I understand this will require
-the exact same SMMUv3 driver modifications I introduced in
-my series. If this happens, after the specification process,
-the virtio-iommu driver upgrade, the virtio-iommu QEMU device
-upgrade, we will face the same problematics as the ones
-encountered in my series. This use case cannot be tested
-easily. There are in-flight series to support substream IDs
-in the SMMU driver and SVA/ARM but none of that code is
-upstream. Also I don't know if there is any PASID capable
-device easily available at the moment. So during the uC you
-said you would prefer this use case to be addressed first
-but according to me, this brings a lot of extra complexity
-and dependencies and the above series are also stalled due to
-that exact same issue.
-
-HW nested paging should satisfy all use cases including
-guest static mappings. At the moment it is difficult to
-run comparative benchmarks. First you may know virtio-iommu
-also suffer some FW integration delays, its QEMU VFIO
-integration needs to be rebased. Also I have access to
-some systems that feature a dual stage SMMUv3 but I am
-not sure their cache/TLB structures are dimensionned for
-exercising the 2 stages (that's a chicken and egg issue:
-no SW integration, no HW).
-
-If you consider those use cases are not sufficient to
-invest time now, I have no problem pausing this development.
-We can re-open the topic later when actual users show up,
-are interested to review and test with production HW and
-workloads.
-
-Of course if there are any people/company interested in
-getting this upstream in a decent timeframe, that's the right
-moment to let us know!
-
-Thanks
-
-Eric
-
-References:
-[1] [PATCH v9 00/11] SMMUv3 Nested Stage Setup (IOMMU part)
-https://patchwork.kernel.org/cover/11039871/
-[2] [PATCH v9 00/14] SMMUv3 Nested Stage Setup (VFIO part)
-https://patchwork.kernel.org/cover/11039995/
-
+Paolo
