@@ -2,184 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 05CD0B88EC
-	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 03:31:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 976C2B88FF
+	for <lists+kvm@lfdr.de>; Fri, 20 Sep 2019 03:45:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392787AbfITBbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Sep 2019 21:31:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36790 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391404AbfITBbU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Sep 2019 21:31:20 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CA48B308FB9D;
-        Fri, 20 Sep 2019 01:31:19 +0000 (UTC)
-Received: from [10.72.12.88] (ovpn-12-88.pek2.redhat.com [10.72.12.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5392F100197A;
-        Fri, 20 Sep 2019 01:31:00 +0000 (UTC)
-Subject: Re: [RFC v4 0/3] vhost: introduce mdev based hardware backend
-To:     Tiwei Bie <tiwei.bie@intel.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-References: <20190917010204.30376-1-tiwei.bie@intel.com>
- <993841ed-942e-c90b-8016-8e7dc76bf13a@redhat.com>
- <20190917105801.GA24855@___>
- <fa6957f3-19ad-f351-8c43-65bc8342b82e@redhat.com>
- <20190918102923-mutt-send-email-mst@kernel.org>
- <d2efe7e4-cf13-437d-e2dc-e2779fac7d2f@redhat.com>
- <20190919154552.GA27657@___>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <43aaf7dc-f08b-8898-3c55-908ff4d68866@redhat.com>
-Date:   Fri, 20 Sep 2019 09:30:58 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2394642AbfITBpt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Sep 2019 21:45:49 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:41618 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729760AbfITBpt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Sep 2019 21:45:49 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 171465FE99D9A574D1B7;
+        Fri, 20 Sep 2019 09:45:47 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Fri, 20 Sep 2019
+ 09:45:36 +0800
+Subject: Re: [PATCH v18 2/6] docs: APEI GHES generation and CPER record
+ description
+To:     Peter Maydell <peter.maydell@linaro.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        gengdongjiu <gengdongjiu@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        "QEMU Developers" <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+ <20190906083152.25716-3-zhengxiang9@huawei.com>
+ <CAFEAcA_MGiatTVCEbnoy5D7S_j9H1DyPkqWMb8uBKL_oycyVDg@mail.gmail.com>
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <8235139e-0b72-1e9c-23d0-2d87afcce5a0@huawei.com>
+Date:   Fri, 20 Sep 2019 09:45:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190919154552.GA27657@___>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA_MGiatTVCEbnoy5D7S_j9H1DyPkqWMb8uBKL_oycyVDg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Fri, 20 Sep 2019 01:31:19 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Peter, thanks for your review!
 
-On 2019/9/19 下午11:45, Tiwei Bie wrote:
-> On Thu, Sep 19, 2019 at 09:08:11PM +0800, Jason Wang wrote:
->> On 2019/9/18 下午10:32, Michael S. Tsirkin wrote:
->>>>>> So I have some questions:
->>>>>>
->>>>>> 1) Compared to method 2, what's the advantage of creating a new vhost char
->>>>>> device? I guess it's for keep the API compatibility?
->>>>> One benefit is that we can avoid doing vhost ioctls on
->>>>> VFIO device fd.
->>>> Yes, but any benefit from doing this?
->>> It does seem a bit more modular, but it's certainly not a big deal.
->> Ok, if we go this way, it could be as simple as provide some callback to
->> vhost, then vhost can just forward the ioctl through parent_ops.
+On 2019/9/19 21:25, Peter Maydell wrote:
+> On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
 >>
->>>>>> 2) For method 2, is there any easy way for user/admin to distinguish e.g
->>>>>> ordinary vfio-mdev for vhost from ordinary vfio-mdev?
->>>>> I think device-api could be a choice.
->>>> Ok.
->>>>
->>>>
->>>>>> I saw you introduce
->>>>>> ops matching helper but it's not friendly to management.
->>>>> The ops matching helper is just to check whether a given
->>>>> vfio-device is based on a mdev device.
->>>>>
->>>>>> 3) A drawback of 1) and 2) is that it must follow vfio_device_ops that
->>>>>> assumes the parameter comes from userspace, it prevents support kernel
->>>>>> virtio drivers.
->>>>>>
->>>>>> 4) So comes the idea of method 3, since it register a new vhost-mdev driver,
->>>>>> we can use device specific ops instead of VFIO ones, then we can have a
->>>>>> common API between vDPA parent and vhost-mdev/virtio-mdev drivers.
->>>>> As the above draft shows, this requires introducing a new
->>>>> VFIO device driver. I think Alex's opinion matters here.
->> Just to clarify, a new type of mdev driver but provides dummy
->> vfio_device_ops for VFIO to make container DMA ioctl work.
-> I see. Thanks! IIUC, you mean we can provide a very tiny
-> VFIO device driver in drivers/vhost/mdev.c, e.g.:
->
-> static int vfio_vhost_mdev_open(void *device_data)
-> {
-> 	if (!try_module_get(THIS_MODULE))
-> 		return -ENODEV;
-> 	return 0;
-> }
->
-> static void vfio_vhost_mdev_release(void *device_data)
-> {
-> 	module_put(THIS_MODULE);
-> }
->
-> static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
-> 	.name		= "vfio-vhost-mdev",
-> 	.open		= vfio_vhost_mdev_open,
-> 	.release	= vfio_vhost_mdev_release,
-> };
->
-> static int vhost_mdev_probe(struct device *dev)
-> {
-> 	struct mdev_device *mdev = to_mdev_device(dev);
->
-> 	... Check the mdev device_id proposed in ...
-> 	... https://lkml.org/lkml/2019/9/12/151 ...
-
-
-To clarify, this should be done through the id_table fields in 
-vhost_mdev_driver, and it should claim it supports virtio-mdev device only:
-
-
-static struct mdev_class_id id_table[] = {
-     { MDEV_ID_VIRTIO },
-     { 0 },
-};
-
-
-static struct mdev_driver vhost_mdev_driver = {
-     ...
-     .id_table = id_table,
-}
-
-
->
-> 	return vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, mdev);
-
-
-And in vfio_vhost_mdev_ops, all its need is to just implement vhost-net 
-ioctl and translate them to virtio-mdev transport (e.g device_ops I 
-proposed or ioctls other whatever other method) API. And it could have a 
-dummy ops implementation for the other device_ops.
-
-
-> }
->
-> static void vhost_mdev_remove(struct device *dev)
-> {
-> 	vfio_del_group_dev(dev);
-> }
->
-> static struct mdev_driver vhost_mdev_driver = {
-> 	.name	= "vhost_mdev",
-> 	.probe	= vhost_mdev_probe,
-> 	.remove	= vhost_mdev_remove,
-> };
->
-> So we can bind above mdev driver to the virtio-mdev compatible
-> mdev devices when we want to use vhost-mdev.
->
-> After binding above driver to the mdev device, we can setup IOMMU
-> via VFIO and get VFIO device fd of this mdev device, and pass it
-> to vhost fd (/dev/vhost-mdev) with a SET_BACKEND ioctl.
-
-
-Then what vhost-mdev char device did is just forwarding ioctl back to 
-this vfio device fd which seems a overkill. It's simpler that just do 
-ioctl on the device ops directly.
-
-Thanks
-
-
->
-> Thanks,
-> Tiwei
->
->> Thanks
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
 >>
+>> Add APEI/GHES detailed design document
 >>
->>>> Yes, it is.
->>>>
->>>> Thanks
->>>>
->>>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>> ---
+>>  docs/specs/acpi_hest_ghes.txt | 88 +++++++++++++++++++++++++++++++++++
+>>  1 file changed, 88 insertions(+)
+>>  create mode 100644 docs/specs/acpi_hest_ghes.txt
+> 
+> Hi; new documentation in docs/specs should be in rst format and
+> listed in the contents page for the manual at docs/specs/index.rst,
+> please. Conversion from plain text should hopefully be fairly
+> straightforward.
+> 
+
+Got it!
+
+> 
+> I've also provided some minor typo/grammar fixes below.
+> 
+Thanks, I will fix them soon.
+
+> 
+>> diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
+>> new file mode 100644
+>> index 0000000000..690d4b2bd0
+>> --- /dev/null
+>> +++ b/docs/specs/acpi_hest_ghes.txt
+>> @@ -0,0 +1,88 @@
+>> +APEI tables generating and CPER record
+>> +=============================
+>> +
+>> +Copyright (C) 2019 Huawei Corporation.
+>> +
+>> +Design Details:
+>> +-------------------
+>> +
+>> +       etc/acpi/tables                                 etc/hardware_errors
+>> +    ====================                      ==========================================
+>> ++ +--------------------------+            +-----------------------+
+>> +| | HEST                     |            |    address            |            +--------------+
+>> +| +--------------------------+            |    registers          |            | Error Status |
+>> +| | GHES1                    |            | +---------------------+            | Data Block 1 |
+>> +| +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
+>> +| | .................        | |          | +---------------------+            | |  CPER      |
+>> +| | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
+>> +| | .................        |   |        | +---------------------+        |   | |  ....      |
+>> +| | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
+>> +| | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
+>> +| | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
+>> ++ +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
+>> +| | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
+>> ++ +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
+>> +| | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
+>> +| | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
+>> +| | .................        |     | |    | |  .............      |      |     | |  CPER      |
+>> +| | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
+>> +| | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
+>> +| | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
+>> ++ +--------------------------|     |   |                                 |     | Error Status |
+>> +| | ...............          |     |   |                                 |     | Data Block N |
+>> ++ +--------------------------+     |   |                                 +---->| +------------+
+>> +| | GHESN                    |     |   |                                       | |  CPER      |
+>> ++ +--------------------------+     |   |                                       | |  CPER      |
+>> +| | .................        |     |   |                                       | |  ....      |
+>> +| | error_status_address-----+-----+   |                                       | |  CPER      |
+>> +| | .................        |         |                                       +-+------------+
+>> +| | read_ack_register--------+---------+
+>> +| | read_ack_preserve        |
+>> +| | read_ack_write           |
+>> ++ +--------------------------+
+>> +
+>> +(1) QEMU generates the ACPI HEST table. This table goes in the current
+>> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
+>> +    notification types.
+>> +
+>> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
+>> +    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob
+> 
+> "needs". "hardware_errors".
+> 
+>> +    contains an address registers table and an Error Status Data Block table.
+>> +
+>> +(3) The address registers table contains N Error Block Address entries
+>> +    and N Read Ack Register entries, the size for each entry is 8-byte.
+> 
+> ". The size".
+> 
+>> +    The Error Status Data Block table contains N Error Status Data Block
+>> +    entries, the size for each entry is 4096(0x1000) bytes. The total size
+> 
+> 
+> ". The size"
+> 
+>> +    for "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
+> 
+> "for the"
+> 
+>> +    N is the kinds of hardware error sources.
+> 
+> Not sure what you had in mind here. Possibly either "N is the number of kinds of
+> hardware error sources" or "N is the number of hardware error sources" ?
+
+Yes, I mean "N is the number of kinds of hardware error sources".
+
+> 
+>> +
+>> +(4) QEMU generates the ACPI linker/loader script for the firmware, the
+> 
+> ". The"
+> 
+>> +    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
+>> +    and copies blobs content there.
+> 
+> "blob contents"
+> 
+>> +
+>> +(5) QEMU generates N ADD_POINTER commands, which patch address in the
+> 
+> "addresses"
+> 
+>> +    "error_status_address" fields of the HEST table with a pointer to the
+>> +    corresponding "address registers" in "etc/hardware_errors" blob.
+> 
+> "in the"
+> 
+>> +
+>> +(6) QEMU generates N ADD_POINTER commands, which patch address in the
+> 
+> "addresses"
+> 
+>> +    "read_ack_register" fields of the HEST table with a pointer to the
+>> +    corresponding "address registers" in "etc/hardware_errors" blob.
+> 
+> "in the"
+> 
+>> +
+>> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
+>> +    address in the " error_block_address" fields with a pointer to the
+> 
+> "addresses". Stray extra space after open-quote.
+> 
+>> +    respective "Error Status Data Block" in "etc/hardware_errors" blob.
+> 
+> "in the"
+> 
+>> +
+>> +(8) QEMU defines a third and write-only fw_cfg blob which is called
+>> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
+>> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
+>> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER commands
+> 
+> "command"
+> 
+>> +    for the firmware, the firmware will write back the start address of
+> 
+> ". The"
+> 
+>> +    "etc/hardware_errors" blob to fw_cfg file "etc/hardware_errors_addr".
+> 
+> "to the fw_cfg file"
+> 
+>> +
+>> +(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
+> 
+> "a SIGBUS"
+> 
+>> +    guest memory, and then injects whatever interrupt (or assert whatever GPIO
+> 
+> "or asserts"
+> 
+>> +    line) as a notification which is necessary for notifying the guest.
+>> +
+>> +(10) This notification (in virtual hardware) will be handled by guest kernel,
+> 
+> "the guest kernel"
+> 
+>> +    guest APEI driver will read the CPER which is recorded by QEMU and do the
+> 
+> "and the guest APEI driver"
+> 
+>> +    recovery.
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
+
+-- 
+
+Thanks,
+Xiang
+
