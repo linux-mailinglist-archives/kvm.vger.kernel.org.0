@@ -2,146 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9061BA36A
-	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2019 19:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45778BA511
+	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2019 20:57:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388175AbfIVRtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Sep 2019 13:49:49 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36284 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387763AbfIVRtt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Sep 2019 13:49:49 -0400
-Received: by mail-wr1-f67.google.com with SMTP id y19so11501431wrd.3;
-        Sun, 22 Sep 2019 10:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=kgK/X3VpGqcc/rbAkUKNZHLXDiQ7XmfvEOywGehD8yU=;
-        b=H+GyNtLHVe2ZakTKP/bsSjH0/Gi0i5izt5gM/rHOMVP3Dz0AeZ3BoVNcx+cWDuaIHB
-         C1DIjU0MtLOqK2go/PhR5DahYAeV0IDOeFteazOG5RkWoFS55Qyi04nFqoSBRPiCF0Bf
-         Xh8b8FJ6r3JM9xyPj4T9kQ2KeRKaxr8TiHerwHf+72ZvfT+Jvoy/4mE/P/Tymssc36db
-         dA4K7kS3AxFw+7DpbD6tmK0ciS5NgtLT13nwj5bkqTD7NsrXPKeT+LBZAZ+VrlcNSM/t
-         kzonjUt6xih7e5JDYUZC39tYY2AkC5C3ZBkRcMgB0aX9dJdRVRFbnbPf1gmDR0CNJCqU
-         NIzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=kgK/X3VpGqcc/rbAkUKNZHLXDiQ7XmfvEOywGehD8yU=;
-        b=FiqPdxhJt4kiuGHTRe1EukHeOp03SkirwHFt5lSQk4fNJaSvoU1ehSxtNz9ZDHh+Bz
-         0/kbjy63mMh6XNgSkKWf/pmgZcl5oSQYS4bpLDgqzzm/IDbXGzEGayscZ7200EskBEnq
-         LiJOiiuViTZ14NN5dnNSQ8a3HwMIJwSD4iwsZuQMwaFSMMUx4B2P5IG0qpP+Me23J6Fl
-         9LjXfdj45NUEwogKMIHBqbnlOe2Arqfs1e+NfbYCPL9HIqSTQaDv5elxzNYZwbg3TiTB
-         qHwMb7BuDoQyXuiWTOEcuSgsXwkK2CWjv05Bv1A7VbQsbKMoL+vy3nGJudre1CnOiSby
-         C7Ow==
-X-Gm-Message-State: APjAAAWYYpTgPB1qHReZzzT4smF9PBzycSTwBLK9T0HKh41QZlwnlWFw
-        RJeBkgzX4Xn+IYP+vxoZK4c=
-X-Google-Smtp-Source: APXvYqw4urp6Mlx9fYHi/K3lMzE3HWmXRgBADCilF3JF8mWnQnOwK/j7Ve01dELAQcd+cItgUx1feg==
-X-Received: by 2002:a5d:678a:: with SMTP id v10mr18451194wru.145.1569174586586;
-        Sun, 22 Sep 2019 10:49:46 -0700 (PDT)
-Received: from scw-93ddc8.cloud.online.net ([2001:bc8:4400:2400::302d])
-        by smtp.googlemail.com with ESMTPSA id t8sm8065763wrx.76.2019.09.22.10.49.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 22 Sep 2019 10:49:45 -0700 (PDT)
-From:   Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
-To:     stefanha@redhat.com
-Cc:     davem@davemloft.net, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, matiasevara@gmail.com,
-        sgarzare@redhat.com
-Subject: [RFC] VSOCK: add support for MSG_PEEK
-Date:   Sun, 22 Sep 2019 17:48:27 +0000
-Message-Id: <1569174507-15267-1-git-send-email-matiasevara@gmail.com>
-X-Mailer: git-send-email 2.7.4
+        id S2393735AbfIVSyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Sep 2019 14:54:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54710 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2393719AbfIVSyP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Sep 2019 14:54:15 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0C07221D7A;
+        Sun, 22 Sep 2019 18:54:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1569178454;
+        bh=gvv0LsompVGXjpuBgj9I67q5B+fRbpqCxYEYavnNq64=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WQYDB8vrJum24O08vvDbyox++5rb4mUnhN2+nzk4ydu228ZZt8dLcXTGch0cexxtn
+         t76+buM9xoQNCUNXFuneALpgsu02DxT8UFEbon5Zf0KRjvzQudK6YW8cmnSFRl39JZ
+         HswLguDfw1tG5LTe6hTTfIEPaFjmcVcbwfOCLP9s=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     =?UTF-8?q?Ji=C5=99=C3=AD=20Pale=C4=8Dek?= <jpalecek@web.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 185/185] kvm: Nested KVM MMUs need PAE root too
+Date:   Sun, 22 Sep 2019 14:49:23 -0400
+Message-Id: <20190922184924.32534-185-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190922184924.32534-1-sashal@kernel.org>
+References: <20190922184924.32534-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds support for MSG_PEEK. In such a case, packets are not
-removed from the rx_queue and credit updates are not sent.
+From: Jiří Paleček <jpalecek@web.de>
 
-Signed-off-by: Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
+[ Upstream commit 1cfff4d9a5d01fa61e5768a6afffc81ae1c8ecb9 ]
+
+On AMD processors, in PAE 32bit mode, nested KVM instances don't
+work. The L0 host get a kernel OOPS, which is related to
+arch.mmu->pae_root being NULL.
+
+The reason for this is that when setting up nested KVM instance,
+arch.mmu is set to &arch.guest_mmu (while normally, it would be
+&arch.root_mmu). However, the initialization and allocation of
+pae_root only creates it in root_mmu. KVM code (ie. in
+mmu_alloc_shadow_roots) then accesses arch.mmu->pae_root, which is the
+unallocated arch.guest_mmu->pae_root.
+
+This fix just allocates (and frees) pae_root in both guest_mmu and
+root_mmu (and also lm_root if it was allocated). The allocation is
+subject to previous restrictions ie. it won't allocate anything on
+64-bit and AFAIK not on Intel.
+
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=203923
+Fixes: 14c07ad89f4d ("x86/kvm/mmu: introduce guest_mmu")
+Signed-off-by: Jiri Palecek <jpalecek@web.de>
+Tested-by: Jiri Palecek <jpalecek@web.de>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/vmw_vsock/virtio_transport_common.c | 59 +++++++++++++++++++++++++++++++--
- 1 file changed, 56 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 94cc0fa..830e890 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -264,6 +264,59 @@ static int virtio_transport_send_credit_update(struct vsock_sock *vsk,
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 66055ca29b6b4..9130152d5ed83 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -5607,13 +5607,13 @@ slot_handle_leaf(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 				 PT_PAGE_TABLE_LEVEL, lock_flush_tlb);
  }
  
- static ssize_t
-+virtio_transport_stream_do_peek(struct vsock_sock *vsk,
-+				struct msghdr *msg,
-+				size_t len)
-+{
-+	struct virtio_vsock_sock *vvs = vsk->trans;
-+	struct virtio_vsock_pkt *pkt;
-+	size_t bytes, off = 0, total = 0;
-+	int err = -EFAULT;
-+
-+	spin_lock_bh(&vvs->rx_lock);
-+
-+	if (list_empty(&vvs->rx_queue)) {
-+		spin_unlock_bh(&vvs->rx_lock);
-+		return 0;
-+	}
-+
-+	pkt = list_first_entry(&vvs->rx_queue,
-+			       struct virtio_vsock_pkt, list);
-+	do {
-+		bytes = len - total;
-+		if (bytes > pkt->len - off)
-+			bytes = pkt->len - off;
-+
-+		/* sk_lock is held by caller so no one else can dequeue.
-+		 * Unlock rx_lock since memcpy_to_msg() may sleep.
-+		 */
-+		spin_unlock_bh(&vvs->rx_lock);
-+
-+		err = memcpy_to_msg(msg, pkt->buf + off, bytes);
-+		if (err)
-+			goto out;
-+
-+		spin_lock_bh(&vvs->rx_lock);
-+
-+		total += bytes;
-+		off += bytes;
-+		if (off == pkt->len) {
-+			pkt = list_next_entry(pkt, list);
-+			off = 0;
-+		}
-+	} while ((total < len) && !list_is_first(&pkt->list, &vvs->rx_queue));
-+
-+	spin_unlock_bh(&vvs->rx_lock);
-+
-+	return total;
-+
-+out:
-+	if (total)
-+		err = total;
-+	return err;
-+}
-+
-+static ssize_t
- virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
- 				   struct msghdr *msg,
- 				   size_t len)
-@@ -330,9 +383,9 @@ virtio_transport_stream_dequeue(struct vsock_sock *vsk,
- 				size_t len, int flags)
+-static void free_mmu_pages(struct kvm_vcpu *vcpu)
++static void free_mmu_pages(struct kvm_mmu *mmu)
  {
- 	if (flags & MSG_PEEK)
--		return -EOPNOTSUPP;
--
--	return virtio_transport_stream_do_dequeue(vsk, msg, len);
-+		return virtio_transport_stream_do_peek(vsk, msg, len);
-+	else
-+		return virtio_transport_stream_do_dequeue(vsk, msg, len);
+-	free_page((unsigned long)vcpu->arch.mmu->pae_root);
+-	free_page((unsigned long)vcpu->arch.mmu->lm_root);
++	free_page((unsigned long)mmu->pae_root);
++	free_page((unsigned long)mmu->lm_root);
  }
- EXPORT_SYMBOL_GPL(virtio_transport_stream_dequeue);
+ 
+-static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
++static int alloc_mmu_pages(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+ {
+ 	struct page *page;
+ 	int i;
+@@ -5634,9 +5634,9 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
+ 	if (!page)
+ 		return -ENOMEM;
+ 
+-	vcpu->arch.mmu->pae_root = page_address(page);
++	mmu->pae_root = page_address(page);
+ 	for (i = 0; i < 4; ++i)
+-		vcpu->arch.mmu->pae_root[i] = INVALID_PAGE;
++		mmu->pae_root[i] = INVALID_PAGE;
+ 
+ 	return 0;
+ }
+@@ -5644,6 +5644,7 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
+ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ {
+ 	uint i;
++	int ret;
+ 
+ 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+@@ -5661,7 +5662,19 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.guest_mmu.prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
+ 
+ 	vcpu->arch.nested_mmu.translate_gpa = translate_nested_gpa;
+-	return alloc_mmu_pages(vcpu);
++
++	ret = alloc_mmu_pages(vcpu, &vcpu->arch.guest_mmu);
++	if (ret)
++		return ret;
++
++	ret = alloc_mmu_pages(vcpu, &vcpu->arch.root_mmu);
++	if (ret)
++		goto fail_allocate_root;
++
++	return ret;
++ fail_allocate_root:
++	free_mmu_pages(&vcpu->arch.guest_mmu);
++	return ret;
+ }
+ 
+ 
+@@ -6134,7 +6147,8 @@ unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm)
+ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_mmu_unload(vcpu);
+-	free_mmu_pages(vcpu);
++	free_mmu_pages(&vcpu->arch.root_mmu);
++	free_mmu_pages(&vcpu->arch.guest_mmu);
+ 	mmu_free_memory_caches(vcpu);
+ }
  
 -- 
-2.7.4
+2.20.1
 
