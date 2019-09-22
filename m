@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 45778BA511
-	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2019 20:57:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA52ABAAB9
+	for <lists+kvm@lfdr.de>; Sun, 22 Sep 2019 21:54:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393735AbfIVSyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Sep 2019 14:54:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54710 "EHLO mail.kernel.org"
+        id S2387397AbfIVTaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Sep 2019 15:30:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46374 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393719AbfIVSyP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Sep 2019 14:54:15 -0400
+        id S2392223AbfIVStT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Sep 2019 14:49:19 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0C07221D7A;
-        Sun, 22 Sep 2019 18:54:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BC71821A4C;
+        Sun, 22 Sep 2019 18:49:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569178454;
-        bh=gvv0LsompVGXjpuBgj9I67q5B+fRbpqCxYEYavnNq64=;
+        s=default; t=1569178158;
+        bh=GWfO61UdfkXShokBTmb/zORTeBkGVGwIc2HMawHQahk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WQYDB8vrJum24O08vvDbyox++5rb4mUnhN2+nzk4ydu228ZZt8dLcXTGch0cexxtn
-         t76+buM9xoQNCUNXFuneALpgsu02DxT8UFEbon5Zf0KRjvzQudK6YW8cmnSFRl39JZ
-         HswLguDfw1tG5LTe6hTTfIEPaFjmcVcbwfOCLP9s=
+        b=vk/FC1If6m5pecTy2UxEePJWWAktdh7xorezGhrjMUKyji43l735b9djGZFv5MWkw
+         Rw2FHG5E/mip5/4/cnn3dUIi9FeVSuM+Rzs6/l5in8QYX9GP756xhfjK62Saxl2hI9
+         OsEL81V8iGdT/VKOfIPyiPKyLf3Lr05B+egyy5RA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     =?UTF-8?q?Ji=C5=99=C3=AD=20Pale=C4=8Dek?= <jpalecek@web.de>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 185/185] kvm: Nested KVM MMUs need PAE root too
-Date:   Sun, 22 Sep 2019 14:49:23 -0400
-Message-Id: <20190922184924.32534-185-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.3 203/203] kvm: Nested KVM MMUs need PAE root too
+Date:   Sun, 22 Sep 2019 14:43:49 -0400
+Message-Id: <20190922184350.30563-203-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190922184924.32534-1-sashal@kernel.org>
-References: <20190922184924.32534-1-sashal@kernel.org>
+In-Reply-To: <20190922184350.30563-1-sashal@kernel.org>
+References: <20190922184350.30563-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +75,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 22 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 66055ca29b6b4..9130152d5ed83 100644
+index a63964e7cec7b..c68bf3aab12c1 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -5607,13 +5607,13 @@ slot_handle_leaf(struct kvm *kvm, struct kvm_memory_slot *memslot,
+@@ -5611,13 +5611,13 @@ slot_handle_leaf(struct kvm *kvm, struct kvm_memory_slot *memslot,
  				 PT_PAGE_TABLE_LEVEL, lock_flush_tlb);
  }
  
@@ -96,7 +96,7 @@ index 66055ca29b6b4..9130152d5ed83 100644
  {
  	struct page *page;
  	int i;
-@@ -5634,9 +5634,9 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
+@@ -5638,9 +5638,9 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
  	if (!page)
  		return -ENOMEM;
  
@@ -108,7 +108,7 @@ index 66055ca29b6b4..9130152d5ed83 100644
  
  	return 0;
  }
-@@ -5644,6 +5644,7 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
+@@ -5648,6 +5648,7 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
  int kvm_mmu_create(struct kvm_vcpu *vcpu)
  {
  	uint i;
@@ -116,7 +116,7 @@ index 66055ca29b6b4..9130152d5ed83 100644
  
  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
  	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
-@@ -5661,7 +5662,19 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+@@ -5665,7 +5666,19 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
  		vcpu->arch.guest_mmu.prev_roots[i] = KVM_MMU_ROOT_INFO_INVALID;
  
  	vcpu->arch.nested_mmu.translate_gpa = translate_nested_gpa;
@@ -137,7 +137,7 @@ index 66055ca29b6b4..9130152d5ed83 100644
  }
  
  
-@@ -6134,7 +6147,8 @@ unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm)
+@@ -6168,7 +6181,8 @@ unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm)
  void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
  {
  	kvm_mmu_unload(vcpu);
