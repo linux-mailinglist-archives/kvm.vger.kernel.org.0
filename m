@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D8C4BBEC5
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 01:07:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADB87BBEC7
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 01:07:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404306AbfIWXHe convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 23 Sep 2019 19:07:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52028 "EHLO mail.kernel.org"
+        id S2407688AbfIWXHz convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 23 Sep 2019 19:07:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52116 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729155AbfIWXHe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 19:07:34 -0400
+        id S1729164AbfIWXHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 19:07:55 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
 To:     kvm@vger.kernel.org
 Subject: [Bug 204975] AMD-Vi: Command buffer timeout
-Date:   Mon, 23 Sep 2019 23:07:33 +0000
+Date:   Mon, 23 Sep 2019 23:07:54 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -31,7 +31,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-204975-28872-38SI7kkiz6@https.bugzilla.kernel.org/>
+Message-ID: <bug-204975-28872-6vkngxH4Lv@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-204975-28872@https.bugzilla.kernel.org/>
 References: <bug-204975-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -46,10 +46,10 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=204975
 
---- Comment #1 from Gluzskiy Alexandr (sss123next@list.ru) ---
-Created attachment 285129
-  --> https://bugzilla.kernel.org/attachment.cgi?id=285129&action=edit
-dmesg frament with error
+--- Comment #2 from Gluzskiy Alexandr (sss123next@list.ru) ---
+Created attachment 285131
+  --> https://bugzilla.kernel.org/attachment.cgi?id=285131&action=edit
+dmesg fragment with error
 
 -- 
 You are receiving this mail because:
