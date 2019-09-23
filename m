@@ -2,143 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BCDEBB124
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 11:12:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7388BBB17A
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 11:32:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387962AbfIWJMm convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 23 Sep 2019 05:12:42 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2424 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726363AbfIWJMl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 05:12:41 -0400
-Received: from DGGEML403-HUB.china.huawei.com (unknown [172.30.72.54])
-        by Forcepoint Email with ESMTP id 9660478361A972C7BF5D;
-        Mon, 23 Sep 2019 17:12:39 +0800 (CST)
-Received: from DGGEML422-HUB.china.huawei.com (10.1.199.39) by
- DGGEML403-HUB.china.huawei.com (10.3.17.33) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 23 Sep 2019 17:12:39 +0800
-Received: from DGGEML525-MBX.china.huawei.com ([169.254.1.34]) by
- dggeml422-hub.china.huawei.com ([10.1.199.39]) with mapi id 14.03.0439.000;
- Mon, 23 Sep 2019 17:12:37 +0800
-From:   "wangxu (AE)" <wangxu72@huawei.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] vhost: It's better to use size_t for the 3rd parameter
- of vhost_exceeds_weight()
-Thread-Topic: [PATCH] vhost: It's better to use size_t for the 3rd parameter
- of vhost_exceeds_weight()
-Thread-Index: AQHVceXpZDJBVC0FwEyvtYFrPdoIc6c49ACA
-Date:   Mon, 23 Sep 2019 09:12:36 +0000
-Message-ID: <FCFCADD62FC0CA4FAEA05F13220975B01717A091@dggeml525-mbx.china.huawei.com>
-References: <1569224801-101248-1-git-send-email-wangxu72@huawei.com>
- <20190923040518-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190923040518-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.61.27.74]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S2407211AbfIWJcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 05:32:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54796 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2407150AbfIWJcC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 05:32:02 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E3BE9C049E10
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 09:32:01 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id r187so7132551wme.0
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 02:32:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=fIlK0Gqa2EqqMHp7X2xV9H/eOYI2l6FvewEZP+gEe0w=;
+        b=CAKjAuWXbAdxypMoWu5ulYNELc88OSEXqnXhKY0rV5UuX/ypoF+EWquxma+r8KoLkz
+         eRQiYptnB3Tb7CcqshVn1hxmNoPONG+RYLpIgIuDOyxAYrEUIf8g3mq0UQ7ILR5oz08y
+         Bs+oSnL5OIn1PnWjJjTRXRwnJsORmyZHb1gQBpNa5lMdRDc15LnJdlBVwQCssXOpIvoC
+         oVMYoVHN+B5+1G8pxL2j0tvyZWJ+Qw0GNOVw5x65G5p6E65GnJU0WJ4I4g/DAgG3wkA6
+         5s9JjaIeCYIu0INav4Vsf1nuhDW1BE0SjOf5zmsTiNQikLyD1icXceTOgY9uRco1kFeA
+         h0aA==
+X-Gm-Message-State: APjAAAU1/rf2GqMujdy7MAXZxQqo0+EvPWdCcCGclMR0YSjfzmYOWauG
+        mxOrjQwMX34XEMOLIIXF0EebOkZJmGOhEn2baI09eCcTP0mApxWc+q6f3ZYVlcrGutuJXNsSHfH
+        YvJukHyOyVw8f
+X-Received: by 2002:a5d:4a43:: with SMTP id v3mr20552621wrs.146.1569231120669;
+        Mon, 23 Sep 2019 02:32:00 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzSooD5cgGEoyLBTWPsXxrIrfqpCoWXBwb0C/X63O8YHe+RdRAExbsbPZ1BRXwFPWpIKgMBhQ==
+X-Received: by 2002:a5d:4a43:: with SMTP id v3mr20552599wrs.146.1569231120397;
+        Mon, 23 Sep 2019 02:32:00 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id x5sm19529043wrg.69.2019.09.23.02.31.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2019 02:31:59 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 15/17] KVM: retpolines: x86: eliminate retpoline from vmx.c exit handlers
+In-Reply-To: <20190920212509.2578-16-aarcange@redhat.com>
+References: <20190920212509.2578-1-aarcange@redhat.com> <20190920212509.2578-16-aarcange@redhat.com>
+Date:   Mon, 23 Sep 2019 11:31:58 +0200
+Message-ID: <87o8zb8ik1.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael
+Andrea Arcangeli <aarcange@redhat.com> writes:
 
-	Thanks for your fast reply.
-
-	As the following code, the 2nd branch of iov_iter_advance() does not check if i->count < size, when this happens, i->count -= size may cause len exceed INT_MAX, and then total_len exceed INT_MAX.
-
-	handle_tx_copy() ->
-		get_tx_bufs(..., &len, ...) ->
-			init_iov_iter() ->
-				iov_iter_advance(iter, ...) 	// has 3 branches: 
-					pipe_advance() 	 	// has checked the size: if (unlikely(i->count < size)) size = i->count;
-					iov_iter_is_discard() ... 	// no check.
-					iterate_and_advance() 	//has checked: if (unlikely(i->count < n)) n = i->count;
-				return iov_iter_count(iter);
-
------Original Message-----
-From: Michael S. Tsirkin [mailto:mst@redhat.com] 
-Sent: Monday, September 23, 2019 4:07 PM
-To: wangxu (AE) <wangxu72@huawei.com>
-Cc: jasowang@redhat.com; kvm@vger.kernel.org; virtualization@lists.linux-foundation.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost: It's better to use size_t for the 3rd parameter of vhost_exceeds_weight()
-
-On Mon, Sep 23, 2019 at 03:46:41PM +0800, wangxu wrote:
-> From: Wang Xu <wangxu72@huawei.com>
-> 
-> Caller of vhost_exceeds_weight(..., total_len) in drivers/vhost/net.c 
-> usually pass size_t total_len, which may be affected by rx/tx package.
-> 
-> Signed-off-by: Wang Xu <wangxu72@huawei.com>
-
-
-Puts a bit more pressure on the register file ...
-why do we care? Is there some way that it can exceed INT_MAX?
-
+> It's enough to check the exit value and issue a direct call to avoid
+> the retpoline for all the common vmexit reasons.
+>
+> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
 > ---
->  drivers/vhost/vhost.c | 4 ++--
->  drivers/vhost/vhost.h | 7 ++++---
->  2 files changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c index 
-> 36ca2cf..159223a 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -412,7 +412,7 @@ static void vhost_dev_free_iovecs(struct vhost_dev 
-> *dev)  }
+>  arch/x86/kvm/vmx/vmx.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index a6e597025011..9aa73e216df2 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5866,9 +5866,29 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
+>  	}
 >  
->  bool vhost_exceeds_weight(struct vhost_virtqueue *vq,
-> -			  int pkts, int total_len)
-> +			  int pkts, size_t total_len)
->  {
->  	struct vhost_dev *dev = vq->dev;
->  
-> @@ -454,7 +454,7 @@ static size_t vhost_get_desc_size(struct 
-> vhost_virtqueue *vq,
->  
->  void vhost_dev_init(struct vhost_dev *dev,
->  		    struct vhost_virtqueue **vqs, int nvqs,
-> -		    int iov_limit, int weight, int byte_weight)
-> +		    int iov_limit, int weight, size_t byte_weight)
->  {
->  	struct vhost_virtqueue *vq;
->  	int i;
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h index 
-> e9ed272..8d80389d 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -172,12 +172,13 @@ struct vhost_dev {
->  	wait_queue_head_t wait;
->  	int iov_limit;
->  	int weight;
-> -	int byte_weight;
-> +	size_t byte_weight;
->  };
->  
+>  	if (exit_reason < kvm_vmx_max_exit_handlers
+> -	    && kvm_vmx_exit_handlers[exit_reason])
+> +	    && kvm_vmx_exit_handlers[exit_reason]) {
+> +#ifdef CONFIG_RETPOLINE
+> +		if (exit_reason == EXIT_REASON_MSR_WRITE)
+> +			return handle_wrmsr(vcpu);
+> +		else if (exit_reason == EXIT_REASON_PREEMPTION_TIMER)
+> +			return handle_preemption_timer(vcpu);
+> +		else if (exit_reason == EXIT_REASON_PENDING_INTERRUPT)
+> +			return handle_interrupt_window(vcpu);
+> +		else if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
+> +			return handle_external_interrupt(vcpu);
+> +		else if (exit_reason == EXIT_REASON_HLT)
+> +			return handle_halt(vcpu);
+> +		else if (exit_reason == EXIT_REASON_PAUSE_INSTRUCTION)
+> +			return handle_pause(vcpu);
+> +		else if (exit_reason == EXIT_REASON_MSR_READ)
+> +			return handle_rdmsr(vcpu);
+> +		else if (exit_reason == EXIT_REASON_CPUID)
+> +			return handle_cpuid(vcpu);
+> +		else if (exit_reason == EXIT_REASON_EPT_MISCONFIG)
+> +			return handle_ept_misconfig(vcpu);
+> +#endif
+>  		return kvm_vmx_exit_handlers[exit_reason](vcpu);
 
+I agree with the identified set of most common vmexits, however, this
+still looks a bit random. Would it be too much if we get rid of
+kvm_vmx_exit_handlers completely replacing this code with one switch()?
 
-This just costs extra memory, and value is never large, so I don't think this matters.
+> -	else {
+> +	} else {
+>  		vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
+>  				exit_reason);
+>  		dump_vmcs();
 
-> -bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts, int 
-> total_len);
-> +bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts,
-> +			  size_t total_len);
->  void vhost_dev_init(struct vhost_dev *, struct vhost_virtqueue **vqs,
-> -		    int nvqs, int iov_limit, int weight, int byte_weight);
-> +		    int nvqs, int iov_limit, int weight, size_t byte_weight);
->  long vhost_dev_set_owner(struct vhost_dev *dev);  bool 
-> vhost_dev_has_owner(struct vhost_dev *dev);  long 
-> vhost_dev_check_owner(struct vhost_dev *);
-> --
-> 1.8.5.6
+-- 
+Vitaly
