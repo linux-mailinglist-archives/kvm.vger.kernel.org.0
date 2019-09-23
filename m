@@ -2,80 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0672BBB10
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 20:16:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 212A4BBB1B
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 20:18:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440371AbfIWSQA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 14:16:00 -0400
-Received: from mga12.intel.com ([192.55.52.136]:63537 "EHLO mga12.intel.com"
+        id S2438362AbfIWSSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 14:18:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54816 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2394280AbfIWSQA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 14:16:00 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Sep 2019 11:15:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,541,1559545200"; 
-   d="scan'208";a="203179266"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Sep 2019 11:15:59 -0700
-Date:   Mon, 23 Sep 2019 11:15:58 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 15/17] KVM: retpolines: x86: eliminate retpoline from
- vmx.c exit handlers
-Message-ID: <20190923181558.GI18195@linux.intel.com>
-References: <20190920212509.2578-1-aarcange@redhat.com>
- <20190920212509.2578-16-aarcange@redhat.com>
- <87o8zb8ik1.fsf@vitty.brq.redhat.com>
- <20190923163746.GE18195@linux.intel.com>
- <24dc5c23-eed8-22db-fd15-5a165a67e747@redhat.com>
- <20190923174244.GA19996@redhat.com>
+        id S2437962AbfIWSSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 14:18:03 -0400
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CB32021841
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 18:18:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1569262683;
+        bh=KQ8YtMSUvBH+IEHZPN4F+9fUdawjUfYBpTtUWbWv5xA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=EcTmLIqMPZQJAyFQKFNsUCMcomj2YImlbE7UswNurg5uOjUS7B+ZrDdmYbbiZXoSj
+         7hMyu8oOOf7xnjv5MJ0jhjA717vnLvJOhZys2yHl4jCElJn2dFfYMbs+Ky4tAeStgw
+         U3XBQmOfYiB7wqP6GXpDomgUvdOh8hhcEPuP3gEE=
+Received: by mail-wr1-f45.google.com with SMTP id a11so15123305wrx.1
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 11:18:02 -0700 (PDT)
+X-Gm-Message-State: APjAAAWW1J2JvBODBCsq3f6vU0qSWkxBjxbAEDvP1cy6S1zdr6Wzd80O
+        aUf1kjzkXiPRvtAh9ezYg4y1oYWSxvj7cmbk4OlcWw==
+X-Google-Smtp-Source: APXvYqw9QoPpUoxk4JNixTG3ZMLD68/a+CDLIBqUsLls0MSYtDH5cRZnjxNzbm5yL+MNYc9za6vT6Uwp++RwwMYwHhA=
+X-Received: by 2002:a5d:4647:: with SMTP id j7mr578006wrs.106.1569262681278;
+ Mon, 23 Sep 2019 11:18:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190923174244.GA19996@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190919150314.054351477@linutronix.de> <20190919150809.860645841@linutronix.de>
+In-Reply-To: <20190919150809.860645841@linutronix.de>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 23 Sep 2019 11:17:50 -0700
+X-Gmail-Original-Message-ID: <CALCETrWjDtcued8nYv=FtcjREz8C4Kj6OaCCirUkbZQForSo+A@mail.gmail.com>
+Message-ID: <CALCETrWjDtcued8nYv=FtcjREz8C4Kj6OaCCirUkbZQForSo+A@mail.gmail.com>
+Subject: Re: [RFC patch 14/15] workpending: Provide infrastructure for work
+ before entering a guest
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 01:42:44PM -0400, Andrea Arcangeli wrote:
-> On Mon, Sep 23, 2019 at 06:53:10PM +0200, Paolo Bonzini wrote:
-> > On 23/09/19 18:37, Sean Christopherson wrote:
-> > >> Would it be too much if we get rid of
-> > >> kvm_vmx_exit_handlers completely replacing this code with one switch()?
-> > > Hmm, that'd require redirects for nVMX functions since they are set at
-> > > runtime.  That isn't necessarily a bad thing.  The approach could also be
-> > > used if Paolo's idea of making kvm_vmx_max_exit_handlers const allows the
-> > > compiler to avoid retpoline.
-> > 
-> > But aren't switch statements also retpolin-ized if they use a jump table?
-> 
-> See commit a9d57ef15cbe327fe54416dd194ee0ea66ae53a4.
-> 
-> We disabled that feature or the kernel would potentially suffer the
-> downsides of the exit handlers through pointer to functions for every
-> switch statement in the kernel.
-> 
-> In turn you can't make it run any faster by converting my "if" to a
-> "switch" at least the "if" can deterministic control the order of what
-> is more likely that we should also re-review, but the order of secondary
-> effect, the important thing is to reduce the retpolines to zero during
-> normal hrtimer guest runtime.
+On Thu, Sep 19, 2019 at 8:09 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+> Entering a guest is similar to exiting to user space. Pending work like
+> handling signals, rescheduling, task work etc. needs to be handled before
+> that.
+>
+> Provide generic infrastructure to avoid duplication of the same handling code
+> all over the place.
+>
+> Update ARM64 struct kvm_vcpu_stat with a signal_exit member so the generic
+> code compiles.
+>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |    1
+>  include/linux/entry-common.h      |   66 ++++++++++++++++++++++++++++++++++++++
+>  kernel/entry/common.c             |   44 +++++++++++++++++++++++++
+>  3 files changed, 111 insertions(+)
+>
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -409,6 +409,7 @@ struct kvm_vcpu_stat {
+>         u64 wfi_exit_stat;
+>         u64 mmio_exit_user;
+>         u64 mmio_exit_kernel;
+> +       u64 signal_exits;
+>         u64 exits;
+>  };
+>
+> --- a/include/linux/entry-common.h
+> +++ b/include/linux/entry-common.h
+> @@ -255,4 +255,70 @@ static inline void arch_syscall_exit_tra
+>  /* Common syscall exit function */
+>  void syscall_exit_to_usermode(struct pt_regs *regs, long syscall, long retval);
+>
+> +#if IS_ENABLED(CONFIG_KVM)
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#ifndef ARCH_EXIT_TO_GUESTMODE_WORK
+> +# define ARCH_EXIT_TO_GUESTMODE_WORK   (0)
+> +#endif
+> +
+> +#define EXIT_TO_GUESTMODE_WORK                                         \
+> +       (_TIF_NEED_RESCHED | _TIF_SIGPENDING | _TIF_NOTIFY_RESUME |     \
+> +        ARCH_EXIT_TO_GUESTMODE_WORK)
+> +
+> +int core_exit_to_guestmode_work(struct kvm *kvm, struct kvm_vcpu *vcpu,
+> +                               unsigned long ti_work);
+> +
+> +/**
+> + * arch_exit_to_guestmode - Architecture specific exit to guest mode function
+> + * @kvm:       Pointer to the guest instance
+> + * @vcpu:      Pointer to current's VCPU data
+> + * @ti_work:   Cached TIF flags gathered in exit_to_guestmode()
+> + *
+> + * Invoked from core_exit_to_guestmode_work(). Can be replaced by
+> + * architecture specific code.
+> + */
+> +static inline int arch_exit_to_guestmode(struct kvm *kvm, struct kvm_vcpu *vcpu,
+> +                                        unsigned long ti_work);
 
-On the flip side, using a switch for the fast-path handlers gives the
-compiler more flexibility to rearrange and combine checks.  Of course that
-doesn't mean the compiler will actually generate faster code for our
-purposes :-)
-
-Anyways, getting rid of the retpolines is much more important.
+Can you add a comment about whether IRQs are supposed to be off (I
+assume they are) and perhaps a lockdep assertion to verify it?
