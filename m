@@ -2,137 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63CBEBB920
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 18:09:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14947BB8DF
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 18:01:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388153AbfIWQJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 12:09:18 -0400
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:47057 "EHLO
-        1.mo178.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387819AbfIWQJR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 12:09:17 -0400
-X-Greylist: delayed 747 seconds by postgrey-1.27 at vger.kernel.org; Mon, 23 Sep 2019 12:09:16 EDT
-Received: from player688.ha.ovh.net (unknown [10.109.160.239])
-        by mo178.mail-out.ovh.net (Postfix) with ESMTP id C1C6A7583E
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 17:50:09 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
-        (Authenticated sender: clg@kaod.org)
-        by player688.ha.ovh.net (Postfix) with ESMTPSA id C3ADEA0DF651;
-        Mon, 23 Sep 2019 15:49:56 +0000 (UTC)
-Subject: Re: [PATCH 2/6] KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when
- VPs are allocated
-To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-References: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
- <156925342310.974393.12235498904930019791.stgit@bahia.lan>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <10ba5a33-fe96-7672-3803-b4969056ac75@kaod.org>
-Date:   Mon, 23 Sep 2019 17:49:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        id S2387746AbfIWQA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 12:00:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47160 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732877AbfIWQAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 12:00:55 -0400
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8E9ABC058CBD
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 16:00:54 +0000 (UTC)
+Received: by mail-qk1-f199.google.com with SMTP id s28so18194446qkm.5
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 09:00:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FnrZlG9onHbzoUOas395WBpQBkqdPWiXJrz3kgJAMNs=;
+        b=Nrnbh/0GIIoBjL43k00VFprm22qlrqK+9zPb5ehVR+CmezwF6VBAiLZcAOsBKnOHrf
+         gs5ErvS0SQBRSZe38x6RkkJq0p4LH84ejUrGWliGKCl+A13wzr6gg4PftXaFYhA9dmcH
+         bPFb4Ot4VR7+GxwastdwPxzdnChGqA1ydHogqM36x7DPDuS87cDPU57fneio9wDL0D38
+         8iQLrGtlwPDy8ZIaXHlrF9tHhpyVU8zzIyonU/hh6XaqKf9IsQFLVLwOrBnG2Ut2+FKI
+         Jif4iuG1Oh75/onFMKcsLD8hGPmUmCzMuQ9Zh/hvMR3G/06PqwMOncOR9nMBsNtJ4L4l
+         YdwQ==
+X-Gm-Message-State: APjAAAW1XlcNa8djYBiRATQo3hx24LD61FlEp/it9ryFrt55ciOWGj1l
+        4ET0JZFh9P9OXHyKc9ywaJv9hJHI4aAS3ECVbxLqVhSDZ6b6EsmsvOQTfuZ+oLYV8WUJgt93Yx6
+        dVznCN9Aj0G2O
+X-Received: by 2002:a0c:e48b:: with SMTP id n11mr25662878qvl.38.1569254453755;
+        Mon, 23 Sep 2019 09:00:53 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzeS0qH7VWztyzQkjfFK33LHuBL/0r9aVYJeACu8zWG4i5I+VaFWBP3hOAewtn9oF8WJysLNw==
+X-Received: by 2002:a0c:e48b:: with SMTP id n11mr25662820qvl.38.1569254453463;
+        Mon, 23 Sep 2019 09:00:53 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+        by smtp.gmail.com with ESMTPSA id m125sm5840827qkd.3.2019.09.23.09.00.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2019 09:00:52 -0700 (PDT)
+Date:   Mon, 23 Sep 2019 12:00:41 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        tiwei.bie@intel.com, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, cohuck@redhat.com,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com
+Subject: Re: [PATCH 5/6] vringh: fix copy direction of vringh_iov_push_kern()
+Message-ID: <20190923115930-mutt-send-email-mst@kernel.org>
+References: <20190923130331.29324-1-jasowang@redhat.com>
+ <20190923130331.29324-6-jasowang@redhat.com>
+ <20190923094559.765da494@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <156925342310.974393.12235498904930019791.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 16839240482170833853
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdekgdelfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190923094559.765da494@x1.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/2019 17:43, Greg Kurz wrote:
-> If we cannot allocate the XIVE VPs in OPAL, the creation of a XIVE or
-> XICS-on-XIVE device is aborted as expected, but we leave kvm->arch.xive
-> set forever since the relase method isn't called in this case. Any
-
-release
-
-> subsequent tentative to create a XIVE or XICS-on-XIVE for this VM will
-> thus always fail. This is a problem for QEMU since it destroys and
-> re-creates these devices when the VM is reset: the VM would be
-> restricted to using the emulated XIVE or XICS forever.
+On Mon, Sep 23, 2019 at 09:45:59AM -0600, Alex Williamson wrote:
+> On Mon, 23 Sep 2019 21:03:30 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
 > 
-> As an alternative to adding rollback, do not assign kvm->arch.xive before
-> making sure the XIVE VPs are allocated in OPAL.
+> > We want to copy from iov to buf, so the direction was wrong.
+> > 
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> >  drivers/vhost/vringh.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> Fixes: 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method")
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-
-C.
-
-> ---
->  arch/powerpc/kvm/book3s_xive.c        |   11 +++++------
->  arch/powerpc/kvm/book3s_xive_native.c |    2 +-
->  2 files changed, 6 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index cd2006bfcd3e..2ef43d037a4f 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -2006,6 +2006,10 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  
->  	pr_devel("Creating xive for partition\n");
->  
-> +	/* Already there ? */
-> +	if (kvm->arch.xive)
-> +		return -EEXIST;
-> +
->  	xive = kvmppc_xive_get_device(kvm, type);
->  	if (!xive)
->  		return -ENOMEM;
-> @@ -2014,12 +2018,6 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  	xive->kvm = kvm;
->  	mutex_init(&xive->lock);
->  
-> -	/* Already there ? */
-> -	if (kvm->arch.xive)
-> -		ret = -EEXIST;
-> -	else
-> -		kvm->arch.xive = xive;
-> -
->  	/* We use the default queue size set by the host */
->  	xive->q_order = xive_native_default_eq_shift();
->  	if (xive->q_order < PAGE_SHIFT)
-> @@ -2040,6 +2038,7 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  		return ret;
->  
->  	dev->private = xive;
-> +	kvm->arch.xive = xive;
->  	return 0;
->  }
->  
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index e9cbb42de424..84a354b90f60 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -1087,7 +1087,6 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
->  
->  	xive->dev = dev;
->  	xive->kvm = kvm;
-> -	kvm->arch.xive = xive;
->  	mutex_init(&xive->mapping_lock);
->  	mutex_init(&xive->lock);
->  
-> @@ -1109,6 +1108,7 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
->  		return ret;
->  
->  	dev->private = xive;
-> +	kvm->arch.xive = xive;
->  	return 0;
->  }
->  
+> Why is this included in the series?  Seems like an unrelated fix being
+> held up within a proposal for a new feature.  Thanks,
 > 
+> Alex
 
+It's better to have it as patch 1/6, but it's a dependency of the
+example driver in the series. I can reorder when I apply.
+
+
+> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > index 08ad0d1f0476..a0a2d74967ef 100644
+> > --- a/drivers/vhost/vringh.c
+> > +++ b/drivers/vhost/vringh.c
+> > @@ -852,6 +852,12 @@ static inline int xfer_kern(void *src, void *dst, size_t len)
+> >  	return 0;
+> >  }
+> >  
+> > +static inline int kern_xfer(void *dst, void *src, size_t len)
+> > +{
+> > +	memcpy(dst, src, len);
+> > +	return 0;
+> > +}
+> > +
+> >  /**
+> >   * vringh_init_kern - initialize a vringh for a kernelspace vring.
+> >   * @vrh: the vringh to initialize.
+> > @@ -958,7 +964,7 @@ EXPORT_SYMBOL(vringh_iov_pull_kern);
+> >  ssize_t vringh_iov_push_kern(struct vringh_kiov *wiov,
+> >  			     const void *src, size_t len)
+> >  {
+> > -	return vringh_iov_xfer(wiov, (void *)src, len, xfer_kern);
+> > +	return vringh_iov_xfer(wiov, (void *)src, len, kern_xfer);
+> >  }
+> >  EXPORT_SYMBOL(vringh_iov_push_kern);
+> >  
