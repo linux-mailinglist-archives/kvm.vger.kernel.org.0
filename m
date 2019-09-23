@@ -2,86 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9292FBB22C
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 12:22:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE675BB237
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 12:27:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407636AbfIWKW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 06:22:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53502 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404970AbfIWKW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 06:22:26 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A665536961
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 10:22:25 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id k9so6451495wmb.0
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 03:22:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fOXb2zotSIWB4X/sQrsrANj/mMFRoi6WdNsUfB4y3ds=;
-        b=WwmWYkJp53ZL27chU7u8ACfFi1OE5aHNAqXc7mUb2iBmyVzddrW/40TqVAuUtGxJXr
-         otimUCJgzqDAKDbKF323W6xSOntLJwGdhzBD4LHxDoQzrPgtNrrVENSRWwC9+NBdXX1C
-         9WQcruIhVX6bExdtjlFvpGLn58QfXRQu0vfEp0I1afcoF9ahd/Iy5ItLIyC4h4bAlT6T
-         +zhCcQ4I3MSx07No+gs7m0638oisdmurZ49HS5zBwxKG6zLBdL64RWigN4ssLw8VAldJ
-         CtqmkpRat5iHsoItkixe3PVf1MUq6x+2x/4g8SknuG/7Eep4vF0qxdvlkR/AvAFXy1Vj
-         ejFg==
-X-Gm-Message-State: APjAAAVqwDmhlgHK5mXOA3+CE6thGIFmEbU2/7rd44qLAnHfM+bgkLyi
-        VDuvv3eKUZSjfLSKkTQsjYxjHJbwGyr275syZhqqToWwFo+JoeKoZHv4MeeNWB/uIwK4XoWLp4T
-        rYB2WvvShNcpH
-X-Received: by 2002:adf:f44e:: with SMTP id f14mr19897296wrp.290.1569234144366;
-        Mon, 23 Sep 2019 03:22:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz6zfWDCrO5uyrF7XiNRNtg5AchHWZTbVkzNHhwvuNee2mlm3NGz1GASMsttwusekXqn0QzPw==
-X-Received: by 2002:adf:f44e:: with SMTP id f14mr19897284wrp.290.1569234144093;
-        Mon, 23 Sep 2019 03:22:24 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id o12sm17311097wrm.23.2019.09.23.03.22.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2019 03:22:23 -0700 (PDT)
-Subject: Re: [PATCH 01/17] x86: spec_ctrl: fix SPEC_CTRL initialization after
- kexec
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190920212509.2578-1-aarcange@redhat.com>
- <20190920212509.2578-2-aarcange@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <c56d8911-5323-ac40-97b3-fa8920725197@redhat.com>
-Date:   Mon, 23 Sep 2019 12:22:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729524AbfIWK1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 06:27:54 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:57851 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728126AbfIWK1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 06:27:54 -0400
+Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iCLZM-00021F-1I; Mon, 23 Sep 2019 12:27:48 +0200
+Date:   Mon, 23 Sep 2019 12:27:47 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Peter Zijlstra <peterz@infradead.org>
+cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org
+Subject: Re: [RFC patch 10/15] x86/entry: Move irq tracing to C code
+In-Reply-To: <20190923084718.GG2349@hirez.programming.kicks-ass.net>
+Message-ID: <alpine.DEB.2.21.1909231227050.2003@nanos.tec.linutronix.de>
+References: <20190919150314.054351477@linutronix.de> <20190919150809.446771597@linutronix.de> <20190923084718.GG2349@hirez.programming.kicks-ass.net>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20190920212509.2578-2-aarcange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/09/19 23:24, Andrea Arcangeli wrote:
-> We can't assume the SPEC_CTRL msr is zero at boot because it could be
-> left enabled by a previous kernel booted with
-> spec_store_bypass_disable=on.
-> 
-> Without this fix a boot with spec_store_bypass_disable=on followed by
-> a kexec boot with spec_store_bypass_disable=off would erroneously and
-> unexpectedly leave bit 2 set in SPEC_CTRL.
-> 
-> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+On Mon, 23 Sep 2019, Peter Zijlstra wrote:
 
-Can you send this out separately, so that Thomas et al. can pick it up
-as a bug fix?
+> On Thu, Sep 19, 2019 at 05:03:24PM +0200, Thomas Gleixner wrote:
+> > To prepare for converting the exit to usermode code to the generic version,
+> > move the irqflags tracing into C code.
+> > 
+> > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> > ---
+> >  arch/x86/entry/common.c          |   10 ++++++++++
+> >  arch/x86/entry/entry_32.S        |   11 +----------
+> >  arch/x86/entry/entry_64.S        |   10 ++--------
+> >  arch/x86/entry/entry_64_compat.S |   21 ---------------------
+> >  4 files changed, 13 insertions(+), 39 deletions(-)
+> > 
+> > --- a/arch/x86/entry/common.c
+> > +++ b/arch/x86/entry/common.c
+> > @@ -102,6 +102,8 @@ static void exit_to_usermode_loop(struct
+> >  	struct thread_info *ti = current_thread_info();
+> >  	u32 cached_flags;
+> >  
+> > +	trace_hardirqs_off();
+> 
+> Bah.. so this gets called from:
+> 
+>  - C code, with IRQs disabled
+>  - entry_64.S:error_exit
+>  - entry_32.S:resume_userspace
+> 
+> The first obviously doesn't need this annotation, but this patch doesn't
+> remove the TRACE_IRQS_OFF from entry_64.S and only the 32bit case is
+> changed.
+> 
+> Is that entry_64.S case an oversight, or do we need an extensive comment
+> on this one?
+
+Lemme stare at that again. At some point I probably lost track in that maze.
 
 Thanks,
 
-Paolo
+	tglx
