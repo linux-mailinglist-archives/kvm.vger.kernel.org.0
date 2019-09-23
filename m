@@ -2,72 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F604BBCDB
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 22:31:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DCADBBD3E
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 22:43:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502632AbfIWUbD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 16:31:03 -0400
-Received: from mga09.intel.com ([134.134.136.24]:30585 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2502627AbfIWUbD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 16:31:03 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Sep 2019 13:31:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,541,1559545200"; 
-   d="scan'208";a="363749806"
-Received: from araj-mobl1.jf.intel.com ([10.24.10.67])
-  by orsmga005.jf.intel.com with ESMTP; 23 Sep 2019 13:31:02 -0700
-Date:   Mon, 23 Sep 2019 13:31:02 -0700
-From:   "Raj, Ashok" <ashok.raj@intel.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        sanjay.k.kumar@intel.com, jacob.jun.pan@linux.intel.com,
-        kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yi Sun <yi.y.sun@linux.intel.com>,
-        Ashok Raj <ashok.raj@intel.com>
-Subject: Re: [RFC PATCH 2/4] iommu/vt-d: Add first level page table interfaces
-Message-ID: <20190923203102.GB21816@araj-mobl1.jf.intel.com>
-References: <20190923122454.9888-1-baolu.lu@linux.intel.com>
- <20190923122454.9888-3-baolu.lu@linux.intel.com>
+        id S2388826AbfIWUnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 16:43:12 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:59856 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729108AbfIWUnL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 16:43:11 -0400
+Received: from pd9ef19d4.dip0.t-ipconnect.de ([217.239.25.212] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iCVAn-00066s-Nt; Mon, 23 Sep 2019 22:43:05 +0200
+Date:   Mon, 23 Sep 2019 22:43:04 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Andy Lutomirski <luto@kernel.org>
+cc:     LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>
+Subject: Re: [RFC patch 02/15] x86/entry: Remove _TIF_NOHZ from
+ _TIF_WORK_SYSCALL_ENTRY
+In-Reply-To: <CALCETrWHkRiXx_r8x6k=ArxTZc5YS0DewMQDVHFrjVY3Xt+H7A@mail.gmail.com>
+Message-ID: <alpine.DEB.2.21.1909232242370.1934@nanos.tec.linutronix.de>
+References: <20190919150314.054351477@linutronix.de> <20190919150808.617944343@linutronix.de> <CALCETrWHkRiXx_r8x6k=ArxTZc5YS0DewMQDVHFrjVY3Xt+H7A@mail.gmail.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190923122454.9888-3-baolu.lu@linux.intel.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 08:24:52PM +0800, Lu Baolu wrote:
-> This adds functions to manipulate first level page tables
-> which could be used by a scalale mode capable IOMMU unit.
+On Fri, 20 Sep 2019, Andy Lutomirski wrote:
 
-s/scalale/scalable
-
+> On Thu, Sep 19, 2019 at 8:09 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+> >
+> > Evaluating _TIF_NOHZ to decide whether to use the slow syscall entry path
+> > is not only pointless, it's actually counterproductive:
+> >
+> >  1) Context tracking code is invoked unconditionally before that flag is
+> >     evaluated.
+> >
+> >  2) If the flag is set the slow path is invoked for nothing due to #1
 > 
-> intel_mmmap_range(domain, addr, end, phys_addr, prot)
+> Can we also get rid of TIF_NOHZ on x86?
 
-Maybe think of a different name..? mmmap seems a bit weird :-)
+If we make the usage in context_tracking_cpu_set() conditional.
 
->  - Map an iova range of [addr, end) to the physical memory
->    started at @phys_addr with the @prot permissions.
-> 
-> intel_mmunmap_range(domain, addr, end)
->  - Tear down the map of an iova range [addr, end). A page
->    list will be returned which will be freed after iotlb
->    flushing.
-> 
-> Cc: Ashok Raj <ashok.raj@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Liu Yi L <yi.l.liu@intel.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+Thanks,
+
+	tglx
+
