@@ -2,272 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D0B1ABB49A
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 14:59:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E02ABB4B8
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 15:04:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394771AbfIWM7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 08:59:17 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35521 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394720AbfIWM7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 08:59:17 -0400
-Received: by mail-wm1-f65.google.com with SMTP id y21so9222178wmi.0
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 05:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HTuM7/0UVWYw13uPzi+JxNLECRLsoMfgODIyjcc3VMA=;
-        b=KHxg3sfhcAxqdoLBIjcXRxE8lVWuEiR3G6gv/GECDpR+XLvkcYfONyKgPhyWO12Pxx
-         bsoM3Ln/JaM6ElP9GokIc9e7ZaT3JRpe00aXBJLKz3S4DQXQNxqU1l5bED1DlOzaKfAv
-         bowzzJgpS8ooLWUkfNkTWPTGzDerYIiFNVxEUOuSQPrnOmYZkyF5nz8STB5vOw1hPANL
-         RdGwHspHWsGCDayIoY4pNRNM5sBD17QO/DUasnMzcH5w71bpRyAYsL1/b/Gwe8Qff8yx
-         3zGBlhk93p7X7uGHGWFiHM7aznecCqdV8N0avWMGCiIzzgAX63kBE6zAC3k7q6TJLyit
-         E2rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HTuM7/0UVWYw13uPzi+JxNLECRLsoMfgODIyjcc3VMA=;
-        b=lPSSeH10m0MUQ5+x8t3x1rboXvVQBSk7JzCX2TvXmA80oI1TFtYa5ks8Oh2j+Q9ia6
-         AzXDe0yk7Gib2VmIjb6CnDjUn3bkqwWWPOicVypL4+7F92mKE3d6Uyv4yQ8YjG7ANSks
-         bKXnl069YaQHGNJIjwCFGEqWoH+kMp4hF++1sEj7O53PjESJ8xno09W7Ds/7Ca9ZHhTX
-         i9gNbw+loneU44sIcClWYinkxbg3s4lSFHJQU5neFEWToHigzyOPXouW+JT0oGRpJI5B
-         JFyqImzAcLAgn4CObFDALijA3UQ7twR37FdQ4qFcbepbh8uWDDAiafzJJSGK4W5woge0
-         uMVA==
-X-Gm-Message-State: APjAAAWW6bTHK2PUh1D2La3XFyoz1kFHaEZ5y0h73/UDN1R74sQ0f24/
-        c6PVHfV6YnvLAt8A74dQi8MGKg+L9AGkklG3OwQNyw==
-X-Google-Smtp-Source: APXvYqzh2IBz0cIlPb7hv46bd1P8/dI9ldz/B7wmwEcTK3TnZ6Hf8lVRsJVYT/tG4aQeI5ajqHIpCC6rKKf/Oh9nAIE=
-X-Received: by 2002:a1c:5451:: with SMTP id p17mr13776037wmi.103.1569243552938;
- Mon, 23 Sep 2019 05:59:12 -0700 (PDT)
+        id S2395003AbfIWND6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 09:03:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55096 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390719AbfIWND5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 09:03:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 91A0310DCC84;
+        Mon, 23 Sep 2019 13:03:56 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-93.pek2.redhat.com [10.72.12.93])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B17CD10013D9;
+        Mon, 23 Sep 2019 13:03:33 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        Jason Wang <jasowang@redhat.com>
+Subject: [PATCH 0/6] mdev based hardware virtio offloading support
+Date:   Mon, 23 Sep 2019 21:03:25 +0800
+Message-Id: <20190923130331.29324-1-jasowang@redhat.com>
 MIME-Version: 1.0
-References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-20-anup.patel@wdc.com>
- <d144652e-898b-bf6b-dc73-352fb1fffd40@amazon.com>
-In-Reply-To: <d144652e-898b-bf6b-dc73-352fb1fffd40@amazon.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 23 Sep 2019 18:29:01 +0530
-Message-ID: <CAAhSdy3HE_s5mqGmC0w8WWxJ4C6HJPyo-9Pdc-7snQ4aN9vKOA@mail.gmail.com>
-Subject: Re: [PATCH v7 18/21] RISC-V: KVM: Add SBI v0.1 support
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Mon, 23 Sep 2019 13:03:57 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 12:31 PM Alexander Graf <graf@amazon.com> wrote:
->
->
->
-> On 04.09.19 18:16, Anup Patel wrote:
-> > From: Atish Patra <atish.patra@wdc.com>
-> >
-> > The KVM host kernel running in HS-mode needs to handle SBI calls coming
-> > from guest kernel running in VS-mode.
-> >
-> > This patch adds SBI v0.1 support in KVM RISC-V. All the SBI calls are
-> > implemented correctly except remote tlb flushes. For remote TLB flushes,
-> > we are doing full TLB flush and this will be optimized in future.
-> >
-> > Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >   arch/riscv/include/asm/kvm_host.h |   2 +
-> >   arch/riscv/kvm/Makefile           |   2 +-
-> >   arch/riscv/kvm/vcpu_exit.c        |   3 +
-> >   arch/riscv/kvm/vcpu_sbi.c         | 104 ++++++++++++++++++++++++++++++
-> >   4 files changed, 110 insertions(+), 1 deletion(-)
-> >   create mode 100644 arch/riscv/kvm/vcpu_sbi.c
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > index 928c67828b1b..269bfa5641b1 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -250,4 +250,6 @@ bool kvm_riscv_vcpu_has_interrupt(struct kvm_vcpu *vcpu);
-> >   void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
-> >   void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
-> >
-> > +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu);
-> > +
-> >   #endif /* __RISCV_KVM_HOST_H__ */
-> > diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> > index 3e0c7558320d..b56dc1650d2c 100644
-> > --- a/arch/riscv/kvm/Makefile
-> > +++ b/arch/riscv/kvm/Makefile
-> > @@ -9,6 +9,6 @@ ccflags-y := -Ivirt/kvm -Iarch/riscv/kvm
-> >   kvm-objs := $(common-objs-y)
-> >
-> >   kvm-objs += main.o vm.o vmid.o tlb.o mmu.o
-> > -kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o
-> > +kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o vcpu_timer.o vcpu_sbi.o
-> >
-> >   obj-$(CONFIG_KVM)   += kvm.o
-> > diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> > index 39469f67b241..0ee4e8943f4f 100644
-> > --- a/arch/riscv/kvm/vcpu_exit.c
-> > +++ b/arch/riscv/kvm/vcpu_exit.c
-> > @@ -594,6 +594,9 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >                   (vcpu->arch.guest_context.hstatus & HSTATUS_STL))
-> >                       ret = stage2_page_fault(vcpu, run, scause, stval);
-> >               break;
-> > +     case EXC_SUPERVISOR_SYSCALL:
-> > +             if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
-> > +                     ret = kvm_riscv_vcpu_sbi_ecall(vcpu);
->
-> implicit fall-through
+Hi all:
 
-Okay, I will add break here.
+There are hardware that can do virtio datapath offloading while having
+its own control path. This path tries to implement a mdev based
+unified API to support using kernel virtio driver to drive those
+devices. This is done by introducing a new mdev transport for virtio
+(virtio_mdev) and register itself as a new kind of mdev driver. Then
+it provides a unified way for kernel virtio driver to talk with mdev
+device implementation.
 
->
-> >       default:
-> >               break;
-> >       };
-> > diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> > new file mode 100644
-> > index 000000000000..b415b8b54bb1
-> > --- /dev/null
-> > +++ b/arch/riscv/kvm/vcpu_sbi.c
-> > @@ -0,0 +1,104 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/**
-> > + * Copyright (c) 2019 Western Digital Corporation or its affiliates.
-> > + *
-> > + * Authors:
-> > + *     Atish Patra <atish.patra@wdc.com>
-> > + */
-> > +
-> > +#include <linux/errno.h>
-> > +#include <linux/err.h>
-> > +#include <linux/kvm_host.h>
-> > +#include <asm/csr.h>
-> > +#include <asm/kvm_vcpu_timer.h>
-> > +
-> > +#define SBI_VERSION_MAJOR                    0
-> > +#define SBI_VERSION_MINOR                    1
-> > +
-> > +static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu, u32 type)
-> > +{
-> > +     int i;
-> > +     struct kvm_vcpu *tmp;
-> > +
-> > +     kvm_for_each_vcpu(i, tmp, vcpu->kvm)
-> > +             tmp->arch.power_off = true;
-> > +     kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
-> > +
-> > +     memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-> > +     vcpu->run->system_event.type = type;
-> > +     vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->
-> Is there a particular reason this has to be implemented in kernel space?
+Though the series only contains kernel driver support, the goal is to
+make the transport generic enough to support userspace drivers. This
+means vhost-mdev[1] could be built on top as well by resuing the
+transport.
 
-It's not implemented in kernel space. We are forwarding it to user space
-using exit reason KVM_EXIT_SYSTEM_EVENT. These exit reason is
-arch independent and both QEMU and KVMTOOL already implement
-it in arch independent way.
+A sample driver is also implemented which simulate a virito-net
+loopback ethernet device on top of vringh + workqueue. This could be
+used as a reference implementation for real hardware driver.
 
-> It's not performance critical and all stopping vcpus is something user
-> space should be able to do as well, no?
+Consider mdev framework only support VFIO device and driver right now,
+this series also extend it to support other types. This is done
+through introducing class id to the device and pairing it with
+id_talbe claimed by the driver. On top, this seris also decouple
+device specific parents ops out of the common ones.
 
-Yes, it's not performance critical but it's done in user space.
+Pktgen test was done with virito-net + mvnet loop back device.
 
->
-> > +}
-> > +
-> > +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu)
-> > +{
-> > +     int i, ret = 1;
-> > +     u64 next_cycle;
-> > +     struct kvm_vcpu *rvcpu;
-> > +     bool next_sepc = true;
-> > +     ulong hmask, ut_scause = 0;
-> > +     struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> > +
-> > +     if (!cp)
-> > +             return -EINVAL;
-> > +
-> > +     switch (cp->a7) {
-> > +     case SBI_SET_TIMER:
-> > +#if __riscv_xlen == 32
-> > +             next_cycle = ((u64)cp->a1 << 32) | (u64)cp->a0;
-> > +#else
-> > +             next_cycle = (u64)cp->a0;
-> > +#endif
-> > +             kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
-> > +             break;
-> > +     case SBI_CLEAR_IPI:
-> > +             kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_S_SOFT);
-> > +             break;
-> > +     case SBI_SEND_IPI:
-> > +             hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
-> > +                                                &ut_scause);
-> > +             if (ut_scause) {
-> > +                     kvm_riscv_vcpu_trap_redirect(vcpu, ut_scause,
-> > +                                                  cp->a0);
-> > +                     next_sepc = false;
-> > +             } else {
-> > +                     for_each_set_bit(i, &hmask, BITS_PER_LONG) {
-> > +                             rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
-> > +                             kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_S_SOFT);
-> > +                     }
-> > +             }
-> > +             break;
-> > +     case SBI_SHUTDOWN:
-> > +             kvm_sbi_system_shutdown(vcpu, KVM_SYSTEM_EVENT_SHUTDOWN);
-> > +             ret = 0;
-> > +             break;
-> > +     case SBI_REMOTE_FENCE_I:
-> > +             sbi_remote_fence_i(NULL);
-> > +             break;
-> > +     /*
-> > +      * TODO: There should be a way to call remote hfence.bvma.
-> > +      * Preferred method is now a SBI call. Until then, just flush
-> > +      * all tlbs.
-> > +      */
-> > +     case SBI_REMOTE_SFENCE_VMA:
-> > +             /* TODO: Parse vma range. */
-> > +             sbi_remote_sfence_vma(NULL, 0, 0);
-> > +             break;
-> > +     case SBI_REMOTE_SFENCE_VMA_ASID:
-> > +             /* TODO: Parse vma range for given ASID */
-> > +             sbi_remote_sfence_vma(NULL, 0, 0);
-> > +             break;
-> > +     default:
-> > +             /*
-> > +              * For now, just return error to Guest.
-> > +              * TODO: In-future, we will route unsupported SBI calls
-> > +              * to user-space.
-> > +              */
-> > +             cp->a0 = -ENOTSUPP;
-> > +             break;
-> > +     };
-> > +
-> > +     if (ret >= 0)
-> > +             cp->sepc += 4;
->
-> I don't see you ever setting ret except for shutdown?
->
-> Really, now is the time to plumb SBI calls down to user space. It allows
-> you to have a clean shutdown story from day 1.
+Please review.
 
-I agree with you.
+[1] https://lkml.org/lkml/2019/9/16/869
 
-I will implement unsupported SBI call forwarding to user-space in v8 series.
+Changes from RFC-V2:
+- silent compile warnings on some specific configuration
+- use u16 instead u8 for class id
+- reseve MDEV_ID_VHOST for future vhost-mdev work
+- introduce "virtio" type for mvnet and make "vhost" type for future
+  work
+- add entries in MAINTAINER
+- tweak and typos fixes in commit log
 
-Regards,
-Anup
+Changes from RFC-V1:
+
+- rename device id to class id
+- add docs for class id and device specific ops (device_ops)
+- split device_ops into seperate headers
+- drop the mdev_set_dma_ops()
+- use device_ops to implement the transport API, then it's not a part
+  of UAPI any more
+- use GFP_ATOMIC in mvnet sample device and other tweaks
+- set_vring_base/get_vring_base support for mvnet device
+
+Jason Wang (6):
+  mdev: class id support
+  mdev: introduce device specific ops
+  mdev: introduce virtio device and its device ops
+  virtio: introduce a mdev based transport
+  vringh: fix copy direction of vringh_iov_push_kern()
+  docs: sample driver to demonstrate how to implement virtio-mdev
+    framework
+
+ .../driver-api/vfio-mediated-device.rst       |  11 +-
+ MAINTAINERS                                   |   3 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  14 +-
+ drivers/vfio/mdev/Kconfig                     |   7 +
+ drivers/vfio/mdev/Makefile                    |   1 +
+ drivers/vfio/mdev/mdev_core.c                 |  21 +-
+ drivers/vfio/mdev/mdev_driver.c               |  14 +
+ drivers/vfio/mdev/mdev_private.h              |   1 +
+ drivers/vfio/mdev/vfio_mdev.c                 |  37 +-
+ drivers/vfio/mdev/virtio_mdev.c               | 416 +++++++++++
+ drivers/vhost/vringh.c                        |   8 +-
+ include/linux/mdev.h                          |  47 +-
+ include/linux/mod_devicetable.h               |   8 +
+ include/linux/vfio_mdev.h                     |  53 ++
+ include/linux/virtio_mdev.h                   | 144 ++++
+ samples/Kconfig                               |   7 +
+ samples/vfio-mdev/Makefile                    |   1 +
+ samples/vfio-mdev/mbochs.c                    |  19 +-
+ samples/vfio-mdev/mdpy.c                      |  19 +-
+ samples/vfio-mdev/mtty.c                      |  17 +-
+ samples/vfio-mdev/mvnet.c                     | 688 ++++++++++++++++++
+ 23 files changed, 1481 insertions(+), 89 deletions(-)
+ create mode 100644 drivers/vfio/mdev/virtio_mdev.c
+ create mode 100644 include/linux/vfio_mdev.h
+ create mode 100644 include/linux/virtio_mdev.h
+ create mode 100644 samples/vfio-mdev/mvnet.c
+
+-- 
+2.19.1
+
