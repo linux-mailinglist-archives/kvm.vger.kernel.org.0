@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 52186BB3E7
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 14:37:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8BA1BB479
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 14:54:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436953AbfIWMhS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 08:37:18 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52791 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390719AbfIWMhS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 08:37:18 -0400
-Received: by mail-wm1-f66.google.com with SMTP id x2so9758774wmj.2
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 05:37:15 -0700 (PDT)
+        id S2439709AbfIWMyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 08:54:20 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41383 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2439698AbfIWMyR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 08:54:17 -0400
+Received: by mail-wr1-f68.google.com with SMTP id h7so13804964wrw.8
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 05:54:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nT+7rSzFzl9ohdCpEtepkt+of0YH3ZJsWiyLqzd3cYs=;
-        b=ORms6xGaws01dtGaiH75TPByIntW6XwOMdAl72molJD1F8b0KU5pBJhP/rEQjYtJOi
-         nWR1Sklr0O+2Bw/9iPdAiSoMl/bFWmvM1kD7qBkjIK6wp3ajbnxTVjFtrl/myPrx8CX0
-         v1iEzHdPOx7ZnhJjpxrJbEjjejKiJ96AkYmrIMYIKt9pxQnRAkK9AEQK/n27fCliMt3v
-         rPg0dOt6Vz86mv+KAH2Y9ny1yLNvVAE9f3DSY4d6ZBwX4HORSDvf2dSXniBTdmF4Y+Rf
-         1JsEIueY+/4L2qK25zsedLLl04sgOnB4DX4pzm3xBBpXQ1mJ8Nq5NFthYv2+fZkNL6u0
-         QoKg==
+        bh=AovsfvrkVC8KgehdY4+Z592P7dBIQY37LqoSTZ8Zeho=;
+        b=HYeBM2QpSXqbmldBl/VrqKVlCePEW918eFcjyJyHTWUNdbLCTZvsYKhdc8gAKYhMQ3
+         onS/RCKaAqam1IA/rnrzUrG+d7bZJr2jWsdDZkfh4si4j5R5w4HYXf0LAGhhfEQta0VH
+         kOBETSMUfxF4BbeVChawSoHw5c/AqsVpt+ZYrtYpzU7nRnQBVA20F3pvTns/+ea10zfQ
+         3lBnqyOgUJHfGIr8j6LZs4YD/QrIBGZVH71lwS4eH1TSI15nbdNFNbGMZDcU0+pPHYDb
+         fKiRaH3Q7y7oQ6BZr9K95rEDYWpXA3J7EJA9gsU8++gi2Mp8u0O7xXR4hJuREj8UxXok
+         ifZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nT+7rSzFzl9ohdCpEtepkt+of0YH3ZJsWiyLqzd3cYs=;
-        b=hWXTWfWswy8G0FBfdbhvxPVFXRHehCDN+i+v99pflA1R/zBCPLhdwWpnYk5pXD+iE7
-         fE2Rp/QxMiOPIbIRR36q2UhT4NnufbVoP3pEuDX3+wFh9IA0q5e98POR44enobqUcSlU
-         dCC3VrXn9sV2vwx0XW4wNERlJYteywC212MONCNGmIrMwLleeUltHqJ1pue0dT6esQYO
-         MVzjCqCV259AwhR+yqb4AkrYHbIQF9XrajePckWSlyMWJ32S1UjBIRE98nMEP5Z74AIk
-         xQ8nmqTwQ4kjZtr224nS9Mavbgbxjq4JgX+JXogMdD1p+UdM1hNZx8pW9+uOoxJXqwW5
-         /tLw==
-X-Gm-Message-State: APjAAAWu5D8P5+fm5ZCMpDyZys1QWNQ3lL4pMiEJN1nuaWy+8ySjraLH
-        MemA/eWSjouFtpfqmLxuC6Pxhes7YmTW16Tb0oCH/Q==
-X-Google-Smtp-Source: APXvYqytGAFF6UUTeImuIoUQSKUPZ6j1zL0VHm3CfQoT1frjsg0FIDt5b/rxGFfKRF3Gb42DXvXRPHkhIJ00mZ77V2M=
-X-Received: by 2002:a05:600c:22da:: with SMTP id 26mr13191518wmg.177.1569242234306;
- Mon, 23 Sep 2019 05:37:14 -0700 (PDT)
+        bh=AovsfvrkVC8KgehdY4+Z592P7dBIQY37LqoSTZ8Zeho=;
+        b=Kd8+q0u2msw7S2/40NOn2MCKDEyGoY67CxLs4zZYTEawoYQm4KYD1V8W2GB4rQBpCy
+         2mqm/67M53JNiJCOdvVFgNSQLvkrYNJBmKd99zhzDBnxo+8calfRMy9P+pxX3zxh6mvk
+         iNq4Ux78z6IAEajh1PW+zwzJhD8fQAlvx01u5oddUKl5R/IXBPuG/tn3GG8WZqOjYpor
+         x+F2GhAdlSO58XART1fpO88dtfzYiZEPC0PNULGmBZRc/lXcp7jeRPs6YHkgWeTs5tXT
+         wimKHKlYJ5bDR92lFh2xiBsoCFY5Exx2ubWfcgHyrOHwEqyL9oAv6F4xSlxrNFBGMRTW
+         wz+w==
+X-Gm-Message-State: APjAAAX8KBnYudezplKKKKWQ/1UNTW7uOK3goI8tKXYQXQVOlS8VsmZ9
+        NMCXCMvMOzmk0aqlUv2617Yf0lr7EO5xsND+F1pdHw==
+X-Google-Smtp-Source: APXvYqwsHYbO+9L86VnJoBwoB8mk7eZ22lokkO725a1cKAw31Hv4kO0LqdHgIV0+Yju7xAlyzJlQVzY0aMbR9OJm2Ec=
+X-Received: by 2002:a05:6000:2:: with SMTP id h2mr20587928wrx.309.1569243255021;
+ Mon, 23 Sep 2019 05:54:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-8-anup.patel@wdc.com>
- <520eed26-9332-1519-44b1-fb08b6410116@amazon.com>
-In-Reply-To: <520eed26-9332-1519-44b1-fb08b6410116@amazon.com>
+References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-13-anup.patel@wdc.com>
+ <3c149ec4-38df-9073-2880-b28148d3c059@amazon.com>
+In-Reply-To: <3c149ec4-38df-9073-2880-b28148d3c059@amazon.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 23 Sep 2019 18:07:02 +0530
-Message-ID: <CAAhSdy0S9jOGUz3ufgMx_8E91VNQZGL3D+q+Hhuj+3ZkwmWkTQ@mail.gmail.com>
-Subject: Re: [PATCH v7 06/21] RISC-V: KVM: Implement VCPU create, init and
- destroy functions
+Date:   Mon, 23 Sep 2019 18:24:02 +0530
+Message-ID: <CAAhSdy1A-FZJ5DeyzFzZn8h-Vs4QR16uFgeeCNpJi2KMQMbPmQ@mail.gmail.com>
+Subject: Re: [PATCH v7 11/21] RISC-V: KVM: Handle WFI exits for VCPU
 To:     Alexander Graf <graf@amazon.com>
 Cc:     Anup Patel <Anup.Patel@wdc.com>,
         Palmer Dabbelt <palmer@sifive.com>,
@@ -70,19 +69,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 12:14 PM Alexander Graf <graf@amazon.com> wrote:
+On Mon, Sep 23, 2019 at 12:24 PM Alexander Graf <graf@amazon.com> wrote:
 >
 >
 >
-> On 04.09.19 18:14, Anup Patel wrote:
-> > This patch implements VCPU create, init and destroy functions
-> > required by generic KVM module. We don't have much dynamic
-> > resources in struct kvm_vcpu_arch so thest functions are quite
+> On 04.09.19 18:15, Anup Patel wrote:
+> > We get illegal instruction trap whenever Guest/VM executes WFI
+> > instruction.
+> >
+> > This patch handles WFI trap by blocking the trapped VCPU using
+> > kvm_vcpu_block() API. The blocked VCPU will be automatically
+> > resumed whenever a VCPU interrupt is injected from user-space
+> > or from in-kernel IRQCHIP emulation.
+> >
+> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >   arch/riscv/kvm/vcpu_exit.c | 72 ++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 72 insertions(+)
+> >
+> > diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> > index d75a6c35b6c7..39469f67b241 100644
+> > --- a/arch/riscv/kvm/vcpu_exit.c
+> > +++ b/arch/riscv/kvm/vcpu_exit.c
+> > @@ -12,6 +12,13 @@
+> >   #include <linux/kvm_host.h>
+> >   #include <asm/csr.h>
+> >
+> > +#define INSN_OPCODE_MASK     0x007c
+> > +#define INSN_OPCODE_SHIFT    2
+> > +#define INSN_OPCODE_SYSTEM   28
+> > +
+> > +#define INSN_MASK_WFI                0xffffff00
+> > +#define INSN_MATCH_WFI               0x10500000
+> > +
+> >   #define INSN_MATCH_LB               0x3
+> >   #define INSN_MASK_LB                0x707f
+> >   #define INSN_MATCH_LH               0x1003
+> > @@ -112,6 +119,67 @@
+> >                                (s32)(((insn) >> 7) & 0x1f))
+> >   #define MASK_FUNCT3         0x7000
+> >
+> > +static int truly_illegal_insn(struct kvm_vcpu *vcpu,
+> > +                           struct kvm_run *run,
+> > +                           ulong insn)
+> > +{
+> > +     /* Redirect trap to Guest VCPU */
+> > +     kvm_riscv_vcpu_trap_redirect(vcpu, EXC_INST_ILLEGAL, insn);
+> > +
+> > +     return 1;
+> > +}
+> > +
+> > +static int system_opcode_insn(struct kvm_vcpu *vcpu,
+> > +                           struct kvm_run *run,
+> > +                           ulong insn)
+> > +{
+> > +     if ((insn & INSN_MASK_WFI) == INSN_MATCH_WFI) {
+> > +             vcpu->stat.wfi_exit_stat++;
+> > +             if (!kvm_arch_vcpu_runnable(vcpu)) {
+> > +                     srcu_read_unlock(&vcpu->kvm->srcu, vcpu->arch.srcu_idx);
+> > +                     kvm_vcpu_block(vcpu);
+> > +                     vcpu->arch.srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > +                     kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> > +             }
+> > +             vcpu->arch.guest_context.sepc += INSN_LEN(insn);
+> > +             return 1;
+> > +     }
+> > +
+> > +     return truly_illegal_insn(vcpu, run, insn);
+> > +}
+> > +
+> > +static int illegal_inst_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> > +                           unsigned long insn)
+> > +{
+> > +     unsigned long ut_scause = 0;
+> > +     struct kvm_cpu_context *ct;
+> > +
+> > +     if (unlikely((insn & 3) != 3)) {
 >
-> Since you're respinning for v8 anyway, please s/thest/these/ :)
+> What do the low 2 bits mean here? Maybe you can use a define instead?
 
-Sure, I will update.
+These bits are for instruction length (16bit or 32bit).
 
+I will add appropriate defines for these bits.
+
+Regards,
+Anup
+
+>
 >
 > Alex
 >
@@ -98,6 +173,3 @@ Sure, I will update.
 > Ust-ID: DE 289 237 879
 >
 >
-
-Regards,
-Anup
