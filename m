@@ -2,143 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D976EBB879
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 17:50:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DB87BB8C5
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 17:58:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728792AbfIWPul (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 11:50:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37270 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728182AbfIWPul (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 11:50:41 -0400
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AA57BC053B26
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 15:50:40 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id w7so18099919qkf.10
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 08:50:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Cj6Y1lnq7bXcC3kz0vWm87eC1U075TsPfURyzMigVaw=;
-        b=U1ovUV/CxiHDu9g7WJQXAhxIJKRBfMM9swhoQLYA19n0xmUejC90zVUt/RdseueYlD
-         BHmNPw/qNNq+W7r4EkENxswzncCB/CO2s0w0vCeQvvuptl3TmqLPM4mCnv7HR8QrBfy/
-         afhRBKzyhC8Te6cLlRlvlS2ER7na1CvbyAVqVvlhXju4APTuBp2CAa3pvSoL44DNnt4s
-         kReYzxG59+A/TzYlNGOM82rvXdOccQCozGTna0u8oWb+VWlZJPcSXR1jE7O4ESWF914F
-         FsOGW4sLgpTrv9bjfIwY1LxLF9QCS3USGnJpS8erPSahvotTSL0DB4hRg2HiuKbXhRPv
-         HTng==
-X-Gm-Message-State: APjAAAU0dJRLR9ZJskqwGfcDadDrkp/+KVQ9Ep+/9yKhK1VrBzZvwKti
-        XYLtwitoa2mRdNKzIuQVyImOPu7dw9fKbmkeT5xFFQiThQeexTa+A1uXWrUEttwmjFYBjW5sWA0
-        34OIYkes4Ep/U
-X-Received: by 2002:a37:bc82:: with SMTP id m124mr466938qkf.231.1569253840058;
-        Mon, 23 Sep 2019 08:50:40 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxEKUtkTOCpbmKAVsuN5DEp8c5GEKKqBTQD9x7NMYUI+PUXnD6G5Fo6ixIl97M10Uj/81ScUg==
-X-Received: by 2002:a37:bc82:: with SMTP id m124mr466905qkf.231.1569253839907;
-        Mon, 23 Sep 2019 08:50:39 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
-        by smtp.gmail.com with ESMTPSA id g10sm5061349qki.41.2019.09.23.08.50.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2019 08:50:39 -0700 (PDT)
-Date:   Mon, 23 Sep 2019 11:50:31 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Alexander Duyck <alexander.duyck@gmail.com>,
-        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        linux-mm <linux-mm@kvack.org>, Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
+        id S2387626AbfIWP6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 11:58:46 -0400
+Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:35410 "EHLO
+        2.mo6.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387595AbfIWP6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 11:58:46 -0400
+X-Greylist: delayed 370 seconds by postgrey-1.27 at vger.kernel.org; Mon, 23 Sep 2019 11:58:44 EDT
+Received: from player158.ha.ovh.net (unknown [10.108.54.230])
+        by mo6.mail-out.ovh.net (Postfix) with ESMTP id C1E3B1E26DD
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 17:52:32 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+        (Authenticated sender: clg@kaod.org)
+        by player158.ha.ovh.net (Postfix) with ESMTPSA id 5974BA07B859;
+        Mon, 23 Sep 2019 15:52:22 +0000 (UTC)
+Subject: Re: [PATCH 3/6] KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in
+ use
+To:     Greg Kurz <groug@kaod.org>, Paul Mackerras <paulus@ozlabs.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Subject: Re: [PATCH v10 3/6] mm: Introduce Reported pages
-Message-ID: <20190923114946-mutt-send-email-mst@kernel.org>
-References: <20190918175109.23474.67039.stgit@localhost.localdomain>
- <20190918175249.23474.51171.stgit@localhost.localdomain>
- <20190923041330-mutt-send-email-mst@kernel.org>
- <CAKgT0UfFBO9h3heGSo+AaZgUNpy5uuOm3yh62bYwYJ5dq+t1gQ@mail.gmail.com>
- <20190923105746-mutt-send-email-mst@kernel.org>
- <CAKgT0Ufp0bdz3YkbAoKWd5DALFjAkHaSUn_UywW1+3hk4tjPSQ@mail.gmail.com>
- <20190923113722-mutt-send-email-mst@kernel.org>
- <baf3dd5c-9368-d621-a83a-114bb5ae8291@redhat.com>
- <49395e48-175f-8483-77f5-5fc3aca8b7cb@redhat.com>
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+References: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
+ <156925342885.974393.4930571278578115883.stgit@bahia.lan>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <2f772bd3-8ebe-214d-1d89-31eeb59df456@kaod.org>
+Date:   Mon, 23 Sep 2019 17:52:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <49395e48-175f-8483-77f5-5fc3aca8b7cb@redhat.com>
+In-Reply-To: <156925342885.974393.4930571278578115883.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 16879491406414777277
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdekgdelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 05:47:24PM +0200, David Hildenbrand wrote:
-> On 23.09.19 17:45, David Hildenbrand wrote:
-> > On 23.09.19 17:37, Michael S. Tsirkin wrote:
-> >> On Mon, Sep 23, 2019 at 08:28:00AM -0700, Alexander Duyck wrote:
-> >>> On Mon, Sep 23, 2019 at 8:00 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >>>>
-> >>>> On Mon, Sep 23, 2019 at 07:50:15AM -0700, Alexander Duyck wrote:
-> >>>>>>> +static inline void
-> >>>>>>> +page_reporting_reset_boundary(struct zone *zone, unsigned int order, int mt)
-> >>>>>>> +{
-> >>>>>>> +     int index;
-> >>>>>>> +
-> >>>>>>> +     if (order < PAGE_REPORTING_MIN_ORDER)
-> >>>>>>> +             return;
-> >>>>>>> +     if (!test_bit(ZONE_PAGE_REPORTING_ACTIVE, &zone->flags))
-> >>>>>>> +             return;
-> >>>>>>> +
-> >>>>>>> +     index = get_reporting_index(order, mt);
-> >>>>>>> +     reported_boundary[index] = &zone->free_area[order].free_list[mt];
-> >>>>>>> +}
-> >>>>>>
-> >>>>>> So this seems to be costly.
-> >>>>>> I'm guessing it's the access to flags:
-> >>>>>>
-> >>>>>>
-> >>>>>>         /* zone flags, see below */
-> >>>>>>         unsigned long           flags;
-> >>>>>>
-> >>>>>>         /* Primarily protects free_area */
-> >>>>>>         spinlock_t              lock;
-> >>>>>>
-> >>>>>>
-> >>>>>>
-> >>>>>> which is in the same cache line as the lock.
-> >>>>>
-> >>>>> I'm not sure what you mean by this being costly?
-> >>>>
-> >>>> I've just been wondering why does will it scale report a 1.5% regression
-> >>>> with this patch.
-> >>>
-> >>> Are you talking about data you have collected from a test you have
-> >>> run, or the data I have run?
-> >>
-> >> About the kernel test robot auto report that was sent recently.
-> > 
-> > https://lkml.org/lkml/2019/9/21/112
-> > 
-> > And if I'm correct, that regression is observable in case reporting is
-> > not enabled. (so with this patch applied only, e.g., on a bare-metal system)
-> > 
+On 23/09/2019 17:43, Greg Kurz wrote:
+> We currently prevent userspace to connect a new vCPU if we already have
+> one with the same vCPU id. This is good but unfortunately not enough,
+> because VP ids derive from the packed vCPU ids, and kvmppc_pack_vcpu_id()
+> can return colliding values. For examples, 348 stays unchanged since it
+> is < KVM_MAX_VCPUS, but it is also the packed value of 2392 when the
+> guest's core stride is 8. Nothing currently prevents userspace to connect
+> vCPUs with forged ids, that end up being associated to the same VP. This
+> confuses the irq layer and likely crashes the kernel:
 > 
-> To be even more precise: # CONFIG_PAGE_REPORTING is not set
+> [96631.670454] genirq: Flags mismatch irq 4161. 00010000 (kvm-1-2392) vs. 00010000 (kvm-1-348)
+> 
+> Check the VP id instead of the vCPU id when a new vCPU is connected.
+> The allocation of the XIVE CPU structure in kvmppc_xive_connect_vcpu()
+> is moved after the check to avoid the need for rollback.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Even if it was, I'd hope for 0 overhead when not present runtime.
 
--- 
-MST
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
+C.
+
+
+> ---
+>  arch/powerpc/kvm/book3s_xive.c        |   24 ++++++++++++++++--------
+>  arch/powerpc/kvm/book3s_xive.h        |   12 ++++++++++++
+>  arch/powerpc/kvm/book3s_xive_native.c |    6 ++++--
+>  3 files changed, 32 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index 2ef43d037a4f..01bff7befc9f 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -1217,6 +1217,7 @@ int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
+>  	struct kvmppc_xive *xive = dev->private;
+>  	struct kvmppc_xive_vcpu *xc;
+>  	int i, r = -EBUSY;
+> +	u32 vp_id;
+>  
+>  	pr_devel("connect_vcpu(cpu=%d)\n", cpu);
+>  
+> @@ -1228,25 +1229,32 @@ int kvmppc_xive_connect_vcpu(struct kvm_device *dev,
+>  		return -EPERM;
+>  	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
+>  		return -EBUSY;
+> -	if (kvmppc_xive_find_server(vcpu->kvm, cpu)) {
+> -		pr_devel("Duplicate !\n");
+> -		return -EEXIST;
+> -	}
+>  	if (cpu >= (KVM_MAX_VCPUS * vcpu->kvm->arch.emul_smt_mode)) {
+>  		pr_devel("Out of bounds !\n");
+>  		return -EINVAL;
+>  	}
+> -	xc = kzalloc(sizeof(*xc), GFP_KERNEL);
+> -	if (!xc)
+> -		return -ENOMEM;
+>  
+>  	/* We need to synchronize with queue provisioning */
+>  	mutex_lock(&xive->lock);
+> +
+> +	vp_id = kvmppc_xive_vp(xive, cpu);
+> +	if (kvmppc_xive_vp_in_use(xive->kvm, vp_id)) {
+> +		pr_devel("Duplicate !\n");
+> +		r = -EEXIST;
+> +		goto bail;
+> +	}
+> +
+> +	xc = kzalloc(sizeof(*xc), GFP_KERNEL);
+> +	if (!xc) {
+> +		r = -ENOMEM;
+> +		goto bail;
+> +	}
+> +
+>  	vcpu->arch.xive_vcpu = xc;
+>  	xc->xive = xive;
+>  	xc->vcpu = vcpu;
+>  	xc->server_num = cpu;
+> -	xc->vp_id = kvmppc_xive_vp(xive, cpu);
+> +	xc->vp_id = vp_id;
+>  	xc->mfrr = 0xff;
+>  	xc->valid = true;
+>  
+> diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
+> index 955b820ffd6d..fe3ed50e0818 100644
+> --- a/arch/powerpc/kvm/book3s_xive.h
+> +++ b/arch/powerpc/kvm/book3s_xive.h
+> @@ -220,6 +220,18 @@ static inline u32 kvmppc_xive_vp(struct kvmppc_xive *xive, u32 server)
+>  	return xive->vp_base + kvmppc_pack_vcpu_id(xive->kvm, server);
+>  }
+>  
+> +static inline bool kvmppc_xive_vp_in_use(struct kvm *kvm, u32 vp_id)
+> +{
+> +	struct kvm_vcpu *vcpu = NULL;
+> +	int i;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (vcpu->arch.xive_vcpu && vp_id == vcpu->arch.xive_vcpu->vp_id)
+> +			return true;
+> +	}
+> +	return false;
+> +}
+> +
+>  /*
+>   * Mapping between guest priorities and host priorities
+>   * is as follow.
+> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
+> index 84a354b90f60..53a22771908c 100644
+> --- a/arch/powerpc/kvm/book3s_xive_native.c
+> +++ b/arch/powerpc/kvm/book3s_xive_native.c
+> @@ -106,6 +106,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
+>  	struct kvmppc_xive *xive = dev->private;
+>  	struct kvmppc_xive_vcpu *xc = NULL;
+>  	int rc;
+> +	u32 vp_id;
+>  
+>  	pr_devel("native_connect_vcpu(server=%d)\n", server_num);
+>  
+> @@ -124,7 +125,8 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
+>  
+>  	mutex_lock(&xive->lock);
+>  
+> -	if (kvmppc_xive_find_server(vcpu->kvm, server_num)) {
+> +	vp_id = kvmppc_xive_vp(xive, server_num);
+> +	if (kvmppc_xive_vp_in_use(xive->kvm, vp_id)) {
+>  		pr_devel("Duplicate !\n");
+>  		rc = -EEXIST;
+>  		goto bail;
+> @@ -141,7 +143,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
+>  	xc->vcpu = vcpu;
+>  	xc->server_num = server_num;
+>  
+> -	xc->vp_id = kvmppc_xive_vp(xive, server_num);
+> +	xc->vp_id = vp_id;
+>  	xc->valid = true;
+>  	vcpu->arch.irq_type = KVMPPC_IRQ_XIVE;
+>  
+> 
+
