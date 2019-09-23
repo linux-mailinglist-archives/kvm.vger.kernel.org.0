@@ -2,294 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 12291BB0EB
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 11:07:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BCDEBB124
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 11:12:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726462AbfIWJGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 05:06:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35752 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726038AbfIWJGJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Sep 2019 05:06:09 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8N9540X046359
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 05:06:08 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v6recebps-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 05:06:08 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <rppt@linux.ibm.com>;
-        Mon, 23 Sep 2019 10:06:06 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 23 Sep 2019 10:06:02 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8N961g441419214
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Sep 2019 09:06:01 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0CAC1AE045;
-        Mon, 23 Sep 2019 09:06:01 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 193BDAE04D;
-        Mon, 23 Sep 2019 09:06:00 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.148.8.153])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 23 Sep 2019 09:05:59 +0000 (GMT)
-Date:   Mon, 23 Sep 2019 12:05:58 +0300
-From:   Mike Rapoport <rppt@linux.ibm.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org
-Subject: Re: [RFC patch 01/15] entry: Provide generic syscall entry
- functionality
-References: <20190919150314.054351477@linutronix.de>
- <20190919150808.521907403@linutronix.de>
+        id S2387962AbfIWJMm convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 23 Sep 2019 05:12:42 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2424 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726363AbfIWJMl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 05:12:41 -0400
+Received: from DGGEML403-HUB.china.huawei.com (unknown [172.30.72.54])
+        by Forcepoint Email with ESMTP id 9660478361A972C7BF5D;
+        Mon, 23 Sep 2019 17:12:39 +0800 (CST)
+Received: from DGGEML422-HUB.china.huawei.com (10.1.199.39) by
+ DGGEML403-HUB.china.huawei.com (10.3.17.33) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 23 Sep 2019 17:12:39 +0800
+Received: from DGGEML525-MBX.china.huawei.com ([169.254.1.34]) by
+ dggeml422-hub.china.huawei.com ([10.1.199.39]) with mapi id 14.03.0439.000;
+ Mon, 23 Sep 2019 17:12:37 +0800
+From:   "wangxu (AE)" <wangxu72@huawei.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] vhost: It's better to use size_t for the 3rd parameter
+ of vhost_exceeds_weight()
+Thread-Topic: [PATCH] vhost: It's better to use size_t for the 3rd parameter
+ of vhost_exceeds_weight()
+Thread-Index: AQHVceXpZDJBVC0FwEyvtYFrPdoIc6c49ACA
+Date:   Mon, 23 Sep 2019 09:12:36 +0000
+Message-ID: <FCFCADD62FC0CA4FAEA05F13220975B01717A091@dggeml525-mbx.china.huawei.com>
+References: <1569224801-101248-1-git-send-email-wangxu72@huawei.com>
+ <20190923040518-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190923040518-mutt-send-email-mst@kernel.org>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.61.27.74]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190919150808.521907403@linutronix.de>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-TM-AS-GCONF: 00
-x-cbid: 19092309-0028-0000-0000-000003A16AB4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092309-0029-0000-0000-000024637AA9
-Message-Id: <20190923090557.GA8357@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-23_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909230092
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 05:03:15PM +0200, Thomas Gleixner wrote:
-> On syscall entry certain work needs to be done conditionally like tracing,
-> seccomp etc. This code is duplicated in all architectures.
+Hi Michael
+
+	Thanks for your fast reply.
+
+	As the following code, the 2nd branch of iov_iter_advance() does not check if i->count < size, when this happens, i->count -= size may cause len exceed INT_MAX, and then total_len exceed INT_MAX.
+
+	handle_tx_copy() ->
+		get_tx_bufs(..., &len, ...) ->
+			init_iov_iter() ->
+				iov_iter_advance(iter, ...) 	// has 3 branches: 
+					pipe_advance() 	 	// has checked the size: if (unlikely(i->count < size)) size = i->count;
+					iov_iter_is_discard() ... 	// no check.
+					iterate_and_advance() 	//has checked: if (unlikely(i->count < n)) n = i->count;
+				return iov_iter_count(iter);
+
+-----Original Message-----
+From: Michael S. Tsirkin [mailto:mst@redhat.com] 
+Sent: Monday, September 23, 2019 4:07 PM
+To: wangxu (AE) <wangxu72@huawei.com>
+Cc: jasowang@redhat.com; kvm@vger.kernel.org; virtualization@lists.linux-foundation.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost: It's better to use size_t for the 3rd parameter of vhost_exceeds_weight()
+
+On Mon, Sep 23, 2019 at 03:46:41PM +0800, wangxu wrote:
+> From: Wang Xu <wangxu72@huawei.com>
 > 
-> Provide a generic version.
+> Caller of vhost_exceeds_weight(..., total_len) in drivers/vhost/net.c 
+> usually pass size_t total_len, which may be affected by rx/tx package.
 > 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Wang Xu <wangxu72@huawei.com>
+
+
+Puts a bit more pressure on the register file ...
+why do we care? Is there some way that it can exceed INT_MAX?
+
 > ---
->  arch/Kconfig                 |    3 +
->  include/linux/entry-common.h |  122 +++++++++++++++++++++++++++++++++++++++++++
->  kernel/Makefile              |    1 
->  kernel/entry/Makefile        |    3 +
->  kernel/entry/common.c        |   33 +++++++++++
->  5 files changed, 162 insertions(+)
+>  drivers/vhost/vhost.c | 4 ++--
+>  drivers/vhost/vhost.h | 7 ++++---
+>  2 files changed, 6 insertions(+), 5 deletions(-)
 > 
-> --- a/arch/Kconfig
-> +++ b/arch/Kconfig
-> @@ -27,6 +27,9 @@ config HAVE_IMA_KEXEC
->  config HOTPLUG_SMT
->  	bool
-> 
-> +config GENERIC_ENTRY
-> +       bool
-> +
->  config OPROFILE
->  	tristate "OProfile system profiling"
->  	depends on PROFILING
-> --- /dev/null
-> +++ b/include/linux/entry-common.h
-> @@ -0,0 +1,122 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __LINUX_ENTRYCOMMON_H
-> +#define __LINUX_ENTRYCOMMON_H
-> +
-> +#include <linux/tracehook.h>
-> +#include <linux/syscalls.h>
-> +#include <linux/seccomp.h>
-> +#include <linux/sched.h>
-> +#include <linux/audit.h>
-> +
-> +#include <asm/entry-common.h>
-> +
-> +/*
-> + * Define dummy _TIF work flags if not defined by the architecture or for
-> + * disabled functionality.
-> + */
-> +#ifndef _TIF_SYSCALL_TRACE
-> +# define _TIF_SYSCALL_TRACE		(0)
-> +#endif
-> +
-> +#ifndef _TIF_SYSCALL_EMU
-> +# define _TIF_SYSCALL_EMU		(0)
-> +#endif
-> +
-> +#ifndef _TIF_SYSCALL_TRACEPOINT
-> +# define _TIF_SYSCALL_TRACEPOINT	(0)
-> +#endif
-> +
-> +#ifndef _TIF_SECCOMP
-> +# define _TIF_SECCOMP			(0)
-> +#endif
-> +
-> +#ifndef _TIF_AUDIT
-> +# define _TIF_AUDIT			(0)
-> +#endif
-> +
-> +/*
-> + * TIF flags handled in syscall_enter_from_usermode()
-> + */
-> +#ifndef ARCH_SYSCALL_ENTER_WORK
-> +# define ARCH_SYSCALL_ENTER_WORK	(0)
-> +#endif
-> +
-> +#define SYSCALL_ENTER_WORK						\
-> +	(_TIF_SYSCALL_TRACE | _TIF_SYSCALL_AUDIT | TIF_SECCOMP |	\
-> +	 _TIF_SYSCALL_TRACEPOINT | _TIF_SYSCALL_EMU |			\
-> +	 ARCH_SYSCALL_ENTER_WORK)
-> +
-> +/**
-> + * arch_syscall_enter_tracehook - Wrapper around tracehook_report_syscall_entry()
-> + *
-> + * Defaults to tracehook_report_syscall_entry(). Can be replaced by
-> + * architecture specific code.
-> + *
-> + * Invoked from syscall_enter_from_usermode()
-> + */
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c index 
+> 36ca2cf..159223a 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -412,7 +412,7 @@ static void vhost_dev_free_iovecs(struct vhost_dev 
+> *dev)  }
+>  
+>  bool vhost_exceeds_weight(struct vhost_virtqueue *vq,
+> -			  int pkts, int total_len)
+> +			  int pkts, size_t total_len)
+>  {
+>  	struct vhost_dev *dev = vq->dev;
+>  
+> @@ -454,7 +454,7 @@ static size_t vhost_get_desc_size(struct 
+> vhost_virtqueue *vq,
+>  
+>  void vhost_dev_init(struct vhost_dev *dev,
+>  		    struct vhost_virtqueue **vqs, int nvqs,
+> -		    int iov_limit, int weight, int byte_weight)
+> +		    int iov_limit, int weight, size_t byte_weight)
+>  {
+>  	struct vhost_virtqueue *vq;
+>  	int i;
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h index 
+> e9ed272..8d80389d 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -172,12 +172,13 @@ struct vhost_dev {
+>  	wait_queue_head_t wait;
+>  	int iov_limit;
+>  	int weight;
+> -	int byte_weight;
+> +	size_t byte_weight;
+>  };
+>  
 
-Nit: the kernel-doc here and in other places in the patchset lacks
-parameter and return value descriptions, which will create lots of warnings
-for 'make *docs'.
 
-> +static inline __must_check int arch_syscall_enter_tracehook(struct pt_regs *regs);
-> +
-> +#ifndef arch_syscall_enter_tracehook
-> +static inline __must_check int arch_syscall_enter_tracehook(struct pt_regs *regs)
-> +{
-> +	return tracehook_report_syscall_entry(regs);
-> +}
-> +#endif
-> +
-> +/**
-> + * arch_syscall_enter_seccomp - Architecture specific seccomp invocation
-> + * @regs:	Pointer to currents pt_regs
-> + *
-> + * Invoked from syscall_enter_from_usermode(). Can be replaced by
-> + * architecture specific code.
-> + */
-> +static inline long arch_syscall_enter_seccomp(struct pt_regs *regs);
-> +
-> +#ifndef arch_syscall_enter_seccomp
-> +static inline long arch_syscall_enter_seccomp(struct pt_regs *regs)
-> +{
-> +	return secure_computing(NULL);
-> +}
-> +#endif
-> +
-> +/**
-> + * arch_syscall_enter_audit - Architecture specific audit invocation
-> + * @regs:	Pointer to currents pt_regs
-> + *
-> + * Invoked from syscall_enter_from_usermode(). Must be replaced by
-> + * architecture specific code if the architecture supports audit.
-> + */
-> +static inline void arch_syscall_enter_audit(struct pt_regs *regs);
-> +
-> +#ifndef arch_syscall_enter_audit
-> +static inline void arch_syscall_enter_audit(struct pt_regs *regs) { }
-> +#endif
-> +
-> +/* Common syscall enter function */
-> +long core_syscall_enter_from_usermode(struct pt_regs *regs, long syscall);
-> +
-> +/**
-> + * syscall_enter_from_usermode - Check and handle work before invoking
-> + *				 a syscall
-> + * @regs:	Pointer to currents pt_regs
-> + * @syscall:	The syscall number
-> + *
-> + * Invoked from architecture specific syscall entry code with interrupts
-> + * enabled.
-> + *
-> + * Returns: The original or a modified syscall number
-> + */
-> +static inline long syscall_enter_from_usermode(struct pt_regs *regs,
-> +					       long syscall)
-> +{
-> +	unsigned long ti_work = READ_ONCE(current_thread_info()->flags);
-> +
-> +	if (IS_ENABLED(CONFIG_DEBUG_ENTRY))
-> +		BUG_ON(regs != task_pt_regs(current));
-> +
-> +	if (ti_work & SYSCALL_ENTER_WORK)
-> +		syscall = core_syscall_enter_from_usermode(regs, syscall);
-> +	return syscall;
-> +}
-> +
-> +#endif
-> --- a/kernel/Makefile
-> +++ b/kernel/Makefile
-> @@ -43,6 +43,7 @@ obj-y += irq/
->  obj-y += rcu/
->  obj-y += livepatch/
->  obj-y += dma/
-> +obj-y += entry/
-> 
->  obj-$(CONFIG_CHECKPOINT_RESTORE) += kcmp.o
->  obj-$(CONFIG_FREEZER) += freezer.o
-> --- /dev/null
-> +++ b/kernel/entry/Makefile
-> @@ -0,0 +1,3 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +obj-$(CONFIG_GENERIC_ENTRY) += common.o
-> --- /dev/null
-> +++ b/kernel/entry/common.c
-> @@ -0,0 +1,33 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <linux/context_tracking.h>
-> +#include <linux/entry-common.h>
-> +
-> +#define CREATE_TRACE_POINTS
-> +#include <trace/events/syscalls.h>
-> +
-> +long core_syscall_enter_from_usermode(struct pt_regs *regs, long syscall)
-> +{
-> +	unsigned long ti_work = READ_ONCE(current_thread_info()->flags);
-> +	unsigned long ret = 0;
-> +
-> +	if (ti_work & (_TIF_SYSCALL_TRACE | _TIF_SYSCALL_EMU)) {
-> +		ret = arch_syscall_enter_tracehook(regs);
-> +		if (ret || (ti_work & _TIF_SYSCALL_EMU))
-> +			return -1L;
-> +	}
-> +
-> +	/* Do seccomp after ptrace, to catch any tracer changes. */
-> +	if (ti_work & _TIF_SECCOMP) {
-> +		ret = arch_syscall_enter_seccomp(regs);
-> +		if (ret == -1L)
-> +			return ret;
-> +	}
-> +
-> +	if (unlikely(test_thread_flag(TIF_SYSCALL_TRACEPOINT)))
-> +		trace_sys_enter(regs, syscall);
-> +
-> +	arch_syscall_enter_audit(regs);
-> +
-> +	return ret ? : syscall;
-> +}
-> 
-> 
+This just costs extra memory, and value is never large, so I don't think this matters.
 
--- 
-Sincerely yours,
-Mike.
-
+> -bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts, int 
+> total_len);
+> +bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts,
+> +			  size_t total_len);
+>  void vhost_dev_init(struct vhost_dev *, struct vhost_virtqueue **vqs,
+> -		    int nvqs, int iov_limit, int weight, int byte_weight);
+> +		    int nvqs, int iov_limit, int weight, size_t byte_weight);
+>  long vhost_dev_set_owner(struct vhost_dev *dev);  bool 
+> vhost_dev_has_owner(struct vhost_dev *dev);  long 
+> vhost_dev_check_owner(struct vhost_dev *);
+> --
+> 1.8.5.6
