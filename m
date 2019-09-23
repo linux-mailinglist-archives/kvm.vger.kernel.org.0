@@ -2,361 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E47B6BB57C
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 15:35:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16CA6BB606
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 15:59:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728460AbfIWNf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 09:35:59 -0400
-Received: from foss.arm.com ([217.140.110.172]:42416 "EHLO foss.arm.com"
+        id S2437390AbfIWN7x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 09:59:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58498 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730553AbfIWNf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 09:35:57 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C73E21000;
-        Mon, 23 Sep 2019 06:35:56 -0700 (PDT)
-Received: from e121566-lin.cambridge.arm.com (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C0EA33F694;
-        Mon, 23 Sep 2019 06:35:55 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     kvm@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com
-Cc:     maz@kernel.org, suzuki.poulose@arm.com, julien.grall@arm.com,
-        andre.przywara@arm.com
-Subject: [PATCH kvmtool 16/16] arm: Allow the user to define the MMIO regions
-Date:   Mon, 23 Sep 2019 14:35:22 +0100
-Message-Id: <1569245722-23375-17-git-send-email-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
-References: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
+        id S2406073AbfIWN7w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 09:59:52 -0400
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 185DFC057867
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 13:59:52 +0000 (UTC)
+Received: by mail-qt1-f199.google.com with SMTP id d1so17434526qtq.3
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 06:59:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FtApu15nyFEPJdV270MkGcXi5No4IIGcISN59p+vUsI=;
+        b=KzXZBWnf1AtRZHvD4gMxCFPzUaet3KuPhRaFENK+oEnFMXg1dUGAZcWXRUnokzlLmL
+         WGAO1IHYLCRqtNmvC9SCpk2m9tPTi4ka5ATRlI8Beae2ypGg424DE4+MTgWU9rpqnHzi
+         JUKURJ8F3o4VEMclPAUIvpIo+QR3aWy4TMCyJRVA9m1BdpptdtOWAoM7NZ2ArxmUsyhd
+         ubFm2dHpiTxXMFJ1wc9no+OS2rGjYGuL4cBJIpgNAuutTxDtwjD+U9ZwI+kdlQgZWra5
+         hFdG9sS90FB/KMVgeiFjltkNCuKW4XAQRxuBGh588/zbJVxW2lx1/732DC/qM2nxv4TN
+         OfxA==
+X-Gm-Message-State: APjAAAUk8URorq0T6GjQPkuVo5NKP+6Go9eMu9poKF/OnNezQdcuRK8Q
+        yYNrLeid/6wZb+Reny/BVffTChtz8Qngk5Hd8kY/O6OS1nSVMl17nZsKYHAFXMlv0Ulqstiy7uy
+        /9l52kbYAUlIb
+X-Received: by 2002:a37:a8ce:: with SMTP id r197mr17291100qke.374.1569247191424;
+        Mon, 23 Sep 2019 06:59:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyzyB1a60cl+6jXMDuajGY7ZKBy6qBhwd1rCHqj2guL5sYzzKUt4czPqrsZBqxQFgz2+CkCug==
+X-Received: by 2002:a37:a8ce:: with SMTP id r197mr17291071qke.374.1569247191247;
+        Mon, 23 Sep 2019 06:59:51 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
+        by smtp.gmail.com with ESMTPSA id j2sm4848892qki.15.2019.09.23.06.59.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2019 06:59:50 -0700 (PDT)
+Date:   Mon, 23 Sep 2019 09:59:38 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com
+Subject: Re: [PATCH 0/6] mdev based hardware virtio offloading support
+Message-ID: <20190923095820-mutt-send-email-mst@kernel.org>
+References: <20190923130331.29324-1-jasowang@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190923130331.29324-1-jasowang@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow the user to specify the I/O port (--ioport), MMIO (--mmio) and PCI
-MMIO (--pci-mmio) memory regions using the size@addr format.
+On Mon, Sep 23, 2019 at 09:03:25PM +0800, Jason Wang wrote:
+> Hi all:
+> 
+> There are hardware that can do virtio datapath offloading while having
+> its own control path. This path tries to implement a mdev based
+> unified API to support using kernel virtio driver to drive those
+> devices. This is done by introducing a new mdev transport for virtio
+> (virtio_mdev) and register itself as a new kind of mdev driver. Then
+> it provides a unified way for kernel virtio driver to talk with mdev
+> device implementation.
+> 
+> Though the series only contains kernel driver support, the goal is to
+> make the transport generic enough to support userspace drivers. This
+> means vhost-mdev[1] could be built on top as well by resuing the
+> transport.
+> 
+> A sample driver is also implemented which simulate a virito-net
+> loopback ethernet device on top of vringh + workqueue. This could be
+> used as a reference implementation for real hardware driver.
+> 
+> Consider mdev framework only support VFIO device and driver right now,
+> this series also extend it to support other types. This is done
+> through introducing class id to the device and pairing it with
+> id_talbe claimed by the driver. On top, this seris also decouple
+> device specific parents ops out of the common ones.
+> 
+> Pktgen test was done with virito-net + mvnet loop back device.
+> 
+> Please review.
+> 
+> [1] https://lkml.org/lkml/2019/9/16/869
+> 
+> Changes from RFC-V2:
+> - silent compile warnings on some specific configuration
+> - use u16 instead u8 for class id
+> - reseve MDEV_ID_VHOST for future vhost-mdev work
+> - introduce "virtio" type for mvnet and make "vhost" type for future
+>   work
+> - add entries in MAINTAINER
+> - tweak and typos fixes in commit log
+> 
+> Changes from RFC-V1:
+> 
+> - rename device id to class id
+> - add docs for class id and device specific ops (device_ops)
+> - split device_ops into seperate headers
+> - drop the mdev_set_dma_ops()
+> - use device_ops to implement the transport API, then it's not a part
+>   of UAPI any more
+> - use GFP_ATOMIC in mvnet sample device and other tweaks
+> - set_vring_base/get_vring_base support for mvnet device
+> 
+> Jason Wang (6):
+>   mdev: class id support
+>   mdev: introduce device specific ops
+>   mdev: introduce virtio device and its device ops
+>   virtio: introduce a mdev based transport
+>   vringh: fix copy direction of vringh_iov_push_kern()
+>   docs: sample driver to demonstrate how to implement virtio-mdev
+>     framework
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/include/arm-common/kvm-config-arch.h |  25 +++++
- arm/include/arm-common/memory.h          |   3 +
- arm/memory.c                             | 168 ++++++++++++++++++++++++++++---
- arm/pci.c                                |   5 +-
- kvm.c                                    |   5 +
- 5 files changed, 192 insertions(+), 14 deletions(-)
 
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46ab9e6..3d2be1ae4c60 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -6,6 +6,12 @@
- struct kvm_config_arch {
- 	const char	*dump_dtb_filename;
- 	unsigned int	force_cntfrq;
-+	u64		ioport_addr;
-+	u64		ioport_size;
-+	u64		mmio_addr;
-+	u64		mmio_size;
-+	u64		pci_mmio_addr;
-+	u64		pci_mmio_size;
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
-@@ -15,10 +21,29 @@ struct kvm_config_arch {
- };
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset);
-+int ioport_parser(const struct option *opt, const char *arg, int unset);
-+int mmio_parser(const struct option *opt, const char *arg, int unset);
-+int pci_mmio_parser(const struct option *opt, const char *arg, int unset);
- 
- #define OPT_ARCH_RUN(pfx, cfg)							\
- 	pfx,									\
- 	ARM_OPT_ARCH_RUN(cfg)							\
-+	OPT_CALLBACK('\0', "ioport", (cfg),					\
-+		     "size[@addr]",						\
-+		     "Virtual machine I/O port region size, "			\
-+		     "optionally starting at <addr> This is where "		\
-+		     "the 8250 UART is emulated.",				\
-+		     ioport_parser, NULL),					\
-+	OPT_CALLBACK('\0', "mmio", (cfg),					\
-+		     "size[@addr]",						\
-+		     "Virtual machine MMIO memory size, "			\
-+		     " optionally starting at <addr>.",				\
-+		     mmio_parser, NULL),					\
-+	OPT_CALLBACK('\0', "pci-mmio", (cfg),					\
-+		     "size[@addr]",						\
-+		     "Virtual machine PCI MMIO memory size, "			\
-+		     " optionally starting at <addr>.",				\
-+		     pci_mmio_parser, NULL),					\
- 	OPT_STRING('\0', "dump-dtb", &(cfg)->dump_dtb_filename,			\
- 		   ".dtb file", "Dump generated .dtb to specified file"),	\
- 	OPT_UINTEGER('\0', "override-bad-firmware-cntfrq", &(cfg)->force_cntfrq,\
-diff --git a/arm/include/arm-common/memory.h b/arm/include/arm-common/memory.h
-index a22e503f3349..074b2a5ff82c 100644
---- a/arm/include/arm-common/memory.h
-+++ b/arm/include/arm-common/memory.h
-@@ -7,4 +7,7 @@
- void memory_init(struct kvm *kvm);
- void memory_sanitize_cfg(struct kvm_config *cfg);
- 
-+u64 memory_get_ioport_size(void);
-+u64 memory_get_pci_mmio_size(void);
-+
- #endif
-diff --git a/arm/memory.c b/arm/memory.c
-index 39ed9e224c72..818a9add80e3 100644
---- a/arm/memory.c
-+++ b/arm/memory.c
-@@ -12,12 +12,58 @@ u64 mmio_addr = ALLOC_INVALID_ADDR;
- u64 pci_cfg_addr = ALLOC_INVALID_ADDR;
- u64 pci_mmio_addr = ALLOC_INVALID_ADDR;
- 
-+static u64 ioport_size;
-+
- static struct allocator *lomap_allocator;
- static struct allocator *mmio_allocator;
- static struct allocator *pci_mmio_allocator;
- 
-+int ioport_parser(const struct option *opt, const char *arg, int unset)
-+{
-+	struct kvm_config *cfg = opt->value;
-+	const char *p = arg;
-+	u64 size, addr;
-+
-+	kvm__parse_size_addr_option(p, &size, &addr);
-+
-+	cfg->arch.ioport_addr = addr;
-+	cfg->arch.ioport_size = size;
-+
-+	return 0;
-+}
-+
-+int mmio_parser(const struct option *opt, const char *arg, int unset)
-+{
-+	struct kvm_config *cfg = opt->value;
-+	const char *p = arg;
-+	u64 size, addr;
-+
-+	kvm__parse_size_addr_option(p, &size, &addr);
-+
-+	cfg->arch.mmio_addr = addr;
-+	cfg->arch.mmio_size = size;
-+
-+	return 0;
-+}
-+
-+int pci_mmio_parser(const struct option *opt, const char *arg, int unset)
-+{
-+	struct kvm_config *cfg = opt->value;
-+	const char *p = arg;
-+	u64 size, addr;
-+
-+	kvm__parse_size_addr_option(p, &size, &addr);
-+
-+	cfg->arch.pci_mmio_addr = addr;
-+	cfg->arch.pci_mmio_size = size;
-+
-+	return 0;
-+}
-+
- void memory_sanitize_cfg(struct kvm_config *cfg)
- {
-+	struct kvm_config_arch *arch = &cfg->arch;
-+
- 	if (cfg->ram_base == INVALID_MEM_ADDR)
- 		cfg->ram_base = ARM_MEMORY_AREA;
- 
-@@ -30,6 +76,102 @@ void memory_sanitize_cfg(struct kvm_config *cfg)
- 		cfg->ram_size = ARM_MAX_ADDR(cfg) - cfg->ram_base;
- 		pr_warning("Capping memory to %lluMB", cfg->ram_size >> 20);
- 	}
-+
-+	if (!arch->ioport_size)
-+		arch->ioport_size = ARM_IOPORT_SIZE;
-+
-+	if (arch->ioport_size < ALLOC_PAGE_SIZE) {
-+		/*
-+		 * Allocate at least one page of maximum size for ioports. No
-+		 * need to check the sized for general MMIO and PCI MMIO, as
-+		 * allocations from those regions are larger than the page size
-+		 * and they will fail if the regions are too small.
-+		 */
-+		arch->ioport_size = ALLOC_PAGE_SIZE;
-+		pr_warning("Changing IOPORT memory size to 0x%x", ALLOC_PAGE_SIZE);
-+	}
-+
-+	if (arch->ioport_size & (ALLOC_PAGE_SIZE - 1)) {
-+		arch->ioport_size = ALIGN(arch->ioport_size, ALLOC_PAGE_SIZE);
-+		pr_warning("Aligning IOPORT size to maximum page size (now is 0x%llx)",
-+			   arch->ioport_size);
-+	}
-+
-+	if (!cfg->arch.mmio_size)
-+		cfg->arch.mmio_size = ARM_MMIO_SIZE;
-+
-+	if (arch->mmio_size & (ALLOC_PAGE_SIZE - 1)) {
-+		arch->mmio_size = ALIGN(arch->mmio_size, ALLOC_PAGE_SIZE);
-+		pr_warning("Aligning MMIO size to maximum page size (now is 0x%llx)",
-+			   arch->mmio_size);
-+	}
-+
-+	if (!cfg->arch.pci_mmio_size)
-+		cfg->arch.pci_mmio_size = ARM_PCI_MMIO_SIZE;
-+
-+	if (arch->pci_mmio_size & (ALLOC_PAGE_SIZE - 1)) {
-+		arch->pci_mmio_size = ALIGN(arch->pci_mmio_size, ALLOC_PAGE_SIZE);
-+		pr_warning("Aligning PCI MMIO size to maximum page size (now is 0x%llx)",
-+			   arch->pci_mmio_size);
-+	}
-+}
-+
-+static void init_ioport_region(struct kvm *kvm)
-+{
-+	struct kvm_config_arch *arch = &kvm->cfg.arch;
-+	int ret;
-+
-+	if (arch->ioport_addr == INVALID_MEM_ADDR) {
-+		ioport_addr = allocator_alloc(lomap_allocator, arch->ioport_size);
-+		if (ioport_addr == ALLOC_INVALID_ADDR)
-+			die("Not enough memory to allocate KVM_IOPORT_AREA");
-+	} else {
-+		ret = allocator_reserve(lomap_allocator, arch->ioport_addr,
-+					arch->ioport_size);
-+		if (ret)
-+			die("Not enough memory to reserve KVM_IOPORT_AREA");
-+		ioport_addr = arch->ioport_addr;
-+	}
-+	ioport_size = arch->ioport_size;
-+}
-+
-+static void init_mmio_region(struct kvm *kvm)
-+{
-+	struct kvm_config_arch *arch = &kvm->cfg.arch;
-+	int ret;
-+
-+	if (arch->mmio_addr == INVALID_MEM_ADDR) {
-+		mmio_addr = allocator_alloc(lomap_allocator, arch->mmio_size);
-+		if (mmio_addr == ALLOC_INVALID_ADDR)
-+			die("Not enough memory to allocate KVM_MMIO_AREA");
-+	} else {
-+		ret = allocator_reserve(lomap_allocator, arch->mmio_addr,
-+					arch->mmio_size);
-+		if (ret)
-+			die("Not enough memory to reserve KVM_MMIO_AREA");
-+		mmio_addr = arch->mmio_addr;
-+	}
-+	mmio_allocator = allocator_create(mmio_addr, arch->mmio_size);
-+}
-+
-+static void init_pci_mmio_region(struct kvm *kvm)
-+{
-+	struct kvm_config_arch *arch = &kvm->cfg.arch;
-+	int ret;
-+
-+	if (arch->pci_mmio_addr == INVALID_MEM_ADDR) {
-+		pci_mmio_addr = allocator_alloc(lomap_allocator, arch->pci_mmio_size);
-+		if (pci_mmio_addr == ALLOC_INVALID_ADDR)
-+			die("Not enough memory to allocate KVM_PCI_MMIO_AREA");
-+	} else {
-+		ret = allocator_reserve(lomap_allocator,
-+					arch->pci_mmio_addr,
-+					arch->pci_mmio_size);
-+		if (ret)
-+			die("Not enough memory to reserve KVM_PCI_MMIO_AREA");
-+		pci_mmio_addr = arch->pci_mmio_addr;
-+	}
-+	pci_mmio_allocator = allocator_create(pci_mmio_addr, arch->pci_mmio_size);
- }
- 
- static void init_mmio(struct kvm *kvm)
-@@ -49,23 +191,15 @@ static void init_mmio(struct kvm *kvm)
- 	if (ret)
- 		die("Could not reserve RAM address space");
- 
--	ioport_addr = allocator_alloc(lomap_allocator, ARM_IOPORT_SIZE);
--	if (ioport_addr == ALLOC_INVALID_ADDR)
--		die("Not enough memory to allocate KVM_IOPORT_AREA");
--
--	mmio_addr = allocator_alloc(lomap_allocator, ARM_MMIO_SIZE);
--	if (mmio_addr == ALLOC_INVALID_ADDR)
--		die("Not enough memory to allocate KVM_MMIO_AREA");
--	mmio_allocator = allocator_create(mmio_addr, ARM_MMIO_SIZE);
-+	init_ioport_region(kvm);
-+	init_mmio_region(kvm);
- 
-+	/* The user cannot define the PCI CFG area. */
- 	pci_cfg_addr = allocator_alloc(lomap_allocator, PCI_CFG_SIZE);
- 	if (pci_cfg_addr == ALLOC_INVALID_ADDR)
- 		die("Not enough memory to allocate KVM_PCI_CFG_AREA");
- 
--	pci_mmio_addr = allocator_alloc(lomap_allocator, ARM_PCI_MMIO_SIZE);
--	if (pci_mmio_addr == ALLOC_INVALID_ADDR)
--		die("Not enough memory to allocate KVM_PCI_MMIO_AREA");
--	pci_mmio_allocator = allocator_create(pci_mmio_addr, ARM_PCI_MMIO_SIZE);
-+	init_pci_mmio_region(kvm);
- }
- 
- static void init_ram(struct kvm *kvm)
-@@ -180,3 +314,13 @@ u32 kvm__arch_alloc_pci_mmio_block(u32 size)
- 	 */
- 	return (u32)addr;
- }
-+
-+u64 memory_get_ioport_size(void)
-+{
-+	return ioport_size;
-+}
-+
-+u64 memory_get_pci_mmio_size(void)
-+{
-+	return pci_mmio_allocator->size;
-+}
-diff --git a/arm/pci.c b/arm/pci.c
-index 1a2fc2688c9e..01242017c143 100644
---- a/arm/pci.c
-+++ b/arm/pci.c
-@@ -6,6 +6,7 @@
- #include "kvm/util.h"
- 
- #include "arm-common/pci.h"
-+#include "arm-common/memory.h"
- 
- /*
-  * An entry in the interrupt-map table looks like:
-@@ -43,7 +44,7 @@ void pci__generate_fdt_nodes(void *fdt)
- 				.lo	= 0,
- 			},
- 			.cpu_addr	= cpu_to_fdt64(KVM_IOPORT_AREA),
--			.length		= cpu_to_fdt64(ARM_IOPORT_SIZE),
-+			.length		= cpu_to_fdt64(memory_get_ioport_size()),
- 		},
- 		{
- 			.pci_addr = {
-@@ -52,7 +53,7 @@ void pci__generate_fdt_nodes(void *fdt)
- 				.lo	= cpu_to_fdt32(KVM_PCI_MMIO_AREA),
- 			},
- 			.cpu_addr	= cpu_to_fdt64(KVM_PCI_MMIO_AREA),
--			.length		= cpu_to_fdt64(ARM_PCI_MMIO_SIZE),
-+			.length		= cpu_to_fdt64(memory_get_pci_mmio_size()),
- 		},
- 	};
- 
-diff --git a/kvm.c b/kvm.c
-index 4da413e0681d..b6b0abf7cd59 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -165,6 +165,11 @@ struct kvm *kvm__new(void)
- 	 * with an user specifying address 0.
- 	 */
- 	kvm->cfg.ram_base = INVALID_MEM_ADDR;
-+#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
-+	kvm->cfg.arch.ioport_addr = INVALID_MEM_ADDR;
-+	kvm->cfg.arch.mmio_addr = INVALID_MEM_ADDR;
-+	kvm->cfg.arch.pci_mmio_addr = INVALID_MEM_ADDR;
-+#endif
- 
- #ifdef KVM_BRLOCK_DEBUG
- 	kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
--- 
-2.7.4
+That's pretty clean, so how about we start by just merging this?
+Alex are you going to handle this through your next tree?
+If yes, pls include:
 
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+
+>  .../driver-api/vfio-mediated-device.rst       |  11 +-
+>  MAINTAINERS                                   |   3 +
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
+>  drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+>  drivers/s390/crypto/vfio_ap_ops.c             |  14 +-
+>  drivers/vfio/mdev/Kconfig                     |   7 +
+>  drivers/vfio/mdev/Makefile                    |   1 +
+>  drivers/vfio/mdev/mdev_core.c                 |  21 +-
+>  drivers/vfio/mdev/mdev_driver.c               |  14 +
+>  drivers/vfio/mdev/mdev_private.h              |   1 +
+>  drivers/vfio/mdev/vfio_mdev.c                 |  37 +-
+>  drivers/vfio/mdev/virtio_mdev.c               | 416 +++++++++++
+>  drivers/vhost/vringh.c                        |   8 +-
+>  include/linux/mdev.h                          |  47 +-
+>  include/linux/mod_devicetable.h               |   8 +
+>  include/linux/vfio_mdev.h                     |  53 ++
+>  include/linux/virtio_mdev.h                   | 144 ++++
+>  samples/Kconfig                               |   7 +
+>  samples/vfio-mdev/Makefile                    |   1 +
+>  samples/vfio-mdev/mbochs.c                    |  19 +-
+>  samples/vfio-mdev/mdpy.c                      |  19 +-
+>  samples/vfio-mdev/mtty.c                      |  17 +-
+>  samples/vfio-mdev/mvnet.c                     | 688 ++++++++++++++++++
+>  23 files changed, 1481 insertions(+), 89 deletions(-)
+>  create mode 100644 drivers/vfio/mdev/virtio_mdev.c
+>  create mode 100644 include/linux/vfio_mdev.h
+>  create mode 100644 include/linux/virtio_mdev.h
+>  create mode 100644 samples/vfio-mdev/mvnet.c
+> 
+> -- 
+> 2.19.1
