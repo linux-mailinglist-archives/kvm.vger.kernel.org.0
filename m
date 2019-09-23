@@ -2,109 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4933CBB9BA
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 18:37:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7013BB9C3
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 18:39:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389238AbfIWQhr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 12:37:47 -0400
-Received: from mga01.intel.com ([192.55.52.88]:60880 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389180AbfIWQhr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 12:37:47 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Sep 2019 09:37:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,541,1559545200"; 
-   d="scan'208";a="389536570"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga006.fm.intel.com with ESMTP; 23 Sep 2019 09:37:46 -0700
-Date:   Mon, 23 Sep 2019 09:37:46 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 15/17] KVM: retpolines: x86: eliminate retpoline from
- vmx.c exit handlers
-Message-ID: <20190923163746.GE18195@linux.intel.com>
-References: <20190920212509.2578-1-aarcange@redhat.com>
- <20190920212509.2578-16-aarcange@redhat.com>
- <87o8zb8ik1.fsf@vitty.brq.redhat.com>
+        id S2389642AbfIWQjQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 12:39:16 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:46883 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389238AbfIWQjQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 12:39:16 -0400
+Received: by mail-io1-f66.google.com with SMTP id c6so21840943ioo.13;
+        Mon, 23 Sep 2019 09:39:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RFFieyhD7JzCXe5ifm6amcb6+lfbnrSI8cAPQ36MW7I=;
+        b=R858SkgO5YchV55UFuoykyOJ1d6HANKAKcyNyXSnFjlDxWsun6RWo/szs6mFJe3Gl7
+         SpP8oCIxZAzjM/+mZzbvhek60QM+vQZHmgd6exOWOQ1rxiMl1xshylLYEEfBAIaAMWij
+         x17aBb18cOyd7Gg7jK7CY1adHHq+3GNeBb3vmLGvWhmMy13uO5l0VWhyyBV6WJQv0V4B
+         oHsBuvX5GMOyTZdaE6GRZMK00UfWpjPcuIlrVD0sbAPdGTfcZrfg/SegWSPVy3b6T3s9
+         rAjNxT2QY7bGNbKEXSyko1pUSYiwD2IyNLRIo+29fcBqwwXyf2UpdDm4+eCsUdBcDf0M
+         NGnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RFFieyhD7JzCXe5ifm6amcb6+lfbnrSI8cAPQ36MW7I=;
+        b=fOQdZrzm1Zuysos+GKJEdiFCAIyeP/DBo1G0ydNqg2//kqv6bT3qFMavr5hEuFJ/Zz
+         mdOA+2v/dxg5dxDPYLu8Mz+KGSkpjzNjTEkliZOhEe6KdQ2YgDu0pEG7VMrsK79TlsCz
+         c74JlDanSy/JY1xTJXyGqCLKiLkjsz/VB3eQd3I4yB9b9RCxjuxHEayjyVGb/F1YLMHG
+         Rde1g3itBXsf63UFUV1HIppSPHyMSo6Hs1xUzYxvdhD4DGDM6F3xndHzYA3+zUQgRuON
+         4APKwMr4mkuvqrJrJsnFSc1m8dQyIPkp7JFlf4slzLzwthlOQs85H5XquAZ1Q2GJF8Bz
+         yz/w==
+X-Gm-Message-State: APjAAAUdcmZ2iSZSgNMuNV74MRQGjQBCKKpzkS1J8al7Yvwn4xYkR2UO
+        wauVgpna7CiEZafCB+pSk/ql7VjS4+UAcRTIJjo6wQ==
+X-Google-Smtp-Source: APXvYqy3q7z0+B3zJnmH5mJA6m7Vv33JAsSr6VocMaurzTxah7VBiRqRJR2aBGpPsIduojTBLoR7xf0CVw90j+76/ro=
+X-Received: by 2002:a02:246:: with SMTP id 67mr278140jau.121.1569256755054;
+ Mon, 23 Sep 2019 09:39:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o8zb8ik1.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190918175109.23474.67039.stgit@localhost.localdomain>
+ <20190918175249.23474.51171.stgit@localhost.localdomain> <20190923041330-mutt-send-email-mst@kernel.org>
+ <CAKgT0UfFBO9h3heGSo+AaZgUNpy5uuOm3yh62bYwYJ5dq+t1gQ@mail.gmail.com>
+ <20190923105746-mutt-send-email-mst@kernel.org> <CAKgT0Ufp0bdz3YkbAoKWd5DALFjAkHaSUn_UywW1+3hk4tjPSQ@mail.gmail.com>
+ <20190923113722-mutt-send-email-mst@kernel.org> <baf3dd5c-9368-d621-a83a-114bb5ae8291@redhat.com>
+In-Reply-To: <baf3dd5c-9368-d621-a83a-114bb5ae8291@redhat.com>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Mon, 23 Sep 2019 09:39:03 -0700
+Message-ID: <CAKgT0UePDMnXRUxwWnkwb-WZTD+M02bZk+PbuHJ3i9ATzkM0WA@mail.gmail.com>
+Subject: Re: [PATCH v10 3/6] mm: Introduce Reported pages
+To:     David Hildenbrand <david@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        linux-mm <linux-mm@kvack.org>, Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 11:31:58AM +0200, Vitaly Kuznetsov wrote:
-> Andrea Arcangeli <aarcange@redhat.com> writes:
-> 
-> > It's enough to check the exit value and issue a direct call to avoid
-> > the retpoline for all the common vmexit reasons.
+On Mon, Sep 23, 2019 at 8:46 AM David Hildenbrand <david@redhat.com> wrote:
+>
+> On 23.09.19 17:37, Michael S. Tsirkin wrote:
+> > On Mon, Sep 23, 2019 at 08:28:00AM -0700, Alexander Duyck wrote:
+> >> On Mon, Sep 23, 2019 at 8:00 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >>>
+> >>> On Mon, Sep 23, 2019 at 07:50:15AM -0700, Alexander Duyck wrote:
+> >>>>>> +static inline void
+> >>>>>> +page_reporting_reset_boundary(struct zone *zone, unsigned int order, int mt)
+> >>>>>> +{
+> >>>>>> +     int index;
+> >>>>>> +
+> >>>>>> +     if (order < PAGE_REPORTING_MIN_ORDER)
+> >>>>>> +             return;
+> >>>>>> +     if (!test_bit(ZONE_PAGE_REPORTING_ACTIVE, &zone->flags))
+> >>>>>> +             return;
+> >>>>>> +
+> >>>>>> +     index = get_reporting_index(order, mt);
+> >>>>>> +     reported_boundary[index] = &zone->free_area[order].free_list[mt];
+> >>>>>> +}
+> >>>>>
+> >>>>> So this seems to be costly.
+> >>>>> I'm guessing it's the access to flags:
+> >>>>>
+> >>>>>
+> >>>>>         /* zone flags, see below */
+> >>>>>         unsigned long           flags;
+> >>>>>
+> >>>>>         /* Primarily protects free_area */
+> >>>>>         spinlock_t              lock;
+> >>>>>
+> >>>>>
+> >>>>>
+> >>>>> which is in the same cache line as the lock.
+> >>>>
+> >>>> I'm not sure what you mean by this being costly?
+> >>>
+> >>> I've just been wondering why does will it scale report a 1.5% regression
+> >>> with this patch.
+> >>
+> >> Are you talking about data you have collected from a test you have
+> >> run, or the data I have run?
 > >
-> > Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 24 ++++++++++++++++++++++--
-> >  1 file changed, 22 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index a6e597025011..9aa73e216df2 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -5866,9 +5866,29 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
-> >  	}
-> >  
-> >  	if (exit_reason < kvm_vmx_max_exit_handlers
-> > -	    && kvm_vmx_exit_handlers[exit_reason])
-> > +	    && kvm_vmx_exit_handlers[exit_reason]) {
-> > +#ifdef CONFIG_RETPOLINE
-> > +		if (exit_reason == EXIT_REASON_MSR_WRITE)
-> > +			return handle_wrmsr(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_PREEMPTION_TIMER)
-> > +			return handle_preemption_timer(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_PENDING_INTERRUPT)
-> > +			return handle_interrupt_window(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
-> > +			return handle_external_interrupt(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_HLT)
-> > +			return handle_halt(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_PAUSE_INSTRUCTION)
-> > +			return handle_pause(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_MSR_READ)
-> > +			return handle_rdmsr(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_CPUID)
-> > +			return handle_cpuid(vcpu);
-> > +		else if (exit_reason == EXIT_REASON_EPT_MISCONFIG)
-> > +			return handle_ept_misconfig(vcpu);
-> > +#endif
-> >  		return kvm_vmx_exit_handlers[exit_reason](vcpu);
-> 
-> I agree with the identified set of most common vmexits, however, this
-> still looks a bit random. Would it be too much if we get rid of
-> kvm_vmx_exit_handlers completely replacing this code with one switch()?
+> > About the kernel test robot auto report that was sent recently.
+>
+> https://lkml.org/lkml/2019/9/21/112
+>
+> And if I'm correct, that regression is observable in case reporting is
+> not enabled. (so with this patch applied only, e.g., on a bare-metal system)
 
-Hmm, that'd require redirects for nVMX functions since they are set at
-runtime.  That isn't necessarily a bad thing.  The approach could also be
-used if Paolo's idea of making kvm_vmx_max_exit_handlers const allows the
-compiler to avoid retpoline.
+Thanks. For whatever reason it looks like my gmail decided to pop it
+out of the thread so I hadn't seen it yet this morning.
 
-E.g.:
+I'll have to look into it. It doesn't make much sense to me why this
+would have this much impact since especially in the disabled case the
+changes should be quite small.
 
-static int handle_vmx_instruction(struct kvm_vcpu *vcpu)
-{
-	if (nested)
-		return nested_vmx_handle_exit(vcpu);
-
-	kvm_queue_exception(vcpu, UD_VECTOR);
-	return 1;
-}
+- Alex
