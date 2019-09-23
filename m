@@ -2,281 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91722BB8B4
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 17:54:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0F44BB8C1
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 17:57:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732869AbfIWPyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 11:54:24 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:29434 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732608AbfIWPyX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 11:54:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1569254063; x=1600790063;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=VsgaMYZYPxZ3VuFCLT3hIQiQyAHAw2ctQDrPes/rVB4=;
-  b=T7io/AnzbFuu+j12DEQpykZvptwtUJ7lmSm9dsVZGx0fMrxohvcZQX19
-   USXAhmEY68f2bmEmOUQi+M1WYpOV4lzwwZzDCv/jM8dq9/DZdhkeT3ROa
-   +qs02nDSFVavD3hD2tXuOyyhvG5Ompt/jMcSvqT+cxyKC424zphbe8U5D
-   TyUPplLvA41PvbpjBR+v3Q1Wz9Ea/mdLaEJ1RUtBNevnkOYjFhGjVsMK/
-   rXVRfWRUwCd9zGQ3O6d+SL+lLtULdHKS6W5JT+K/JT1kwHA0Nz28UBWLF
-   QvaW5EtwSSzCNeus3RNrzrZqNgyyws+zdlzSBpZlSCirg//1wgp1wncPn
-   Q==;
-IronPort-SDR: ESupE+JnmGYCtVe/KyD/c2T+F9eobYI3Vr6xFn0eYhWiEZ63sXsyE9e8lLvD3JcJzZKWByBOSn
- tEBAHW3SnsqHvu+lrgTdSChyhyrdxjq+yEWrtsEe2HpWFSadPaan+GpDjEChzJ0Sb+yorRf1G7
- Ls67zoNTujmLLbA8uTvH6Us9hx8ewAQ9TuLvYaKnt7nA5Aj62i88FuhRqaSTx/gt/2VySo/pB/
- jGBu7eFbtR41Ox3lal1HKfhKjToj5OuAsCnBCN5c1b5M0zQl8XSQ08FJEOOpVOwuuVXJ/upMqd
- gCA=
-X-IronPort-AV: E=Sophos;i="5.64,541,1559491200"; 
-   d="scan'208";a="118895028"
-Received: from mail-bn3nam04lp2054.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.54])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Sep 2019 23:54:20 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pzp60LK28k01qz27WgkvrCUJwZ4CMHwnjIeUVruEEB5EZ4xorAxZTVLvFksSx9Uv8CEPaJoF2UpxdQY1DZLR8MU0IL9mwhlPyuo2Zzd0QQl19kpqU14ftbTEc/icu9HXiBmrYr4SNTD3GTQ7XCpLdexyHJgjgzYuSPFXz7Uhc3wnmoIHaoBg8V11ScCvDDDFdgrTtskDFj1yOTIf76tWuiWDPYKrVsZ8hhizpMKWLZFUQTTopxCr8cPjX0Fslg0cx2bbNTiQxhcrTr7B85zSAt1PkOb1cBfJ694ITGvaCZaGUA/44z4PVo4fwc3taBeh9MrSyDRu0p41t2i5+sgCkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VsgaMYZYPxZ3VuFCLT3hIQiQyAHAw2ctQDrPes/rVB4=;
- b=UwiytMRizjPVZz5rqH2h/TQsGoPoofy6dmSa7mikpsk4tWSIhqiYz6ZoDRU88vJbSdQ0L8mBRNVgdEVhyAbnivgF4/hi1PgHWdbEQhcDCJVOM8k0erYLzLOqp5VXvtxBP5TjjXCOjf+jW4OAkZsArv28e424Lk5kvbgCIZmsbh2he0bskkfCU3ha6lRKsye+XB0UR0nkyqkPjvp3fFdYACaZoOx/I/6g5+HkkkkAg3OUTPLOVqfg79DW0g6IWNVlbv0C09MdAgBzuOCsuBHgNTY4XI30XF4dx88u4T2hM0cL4NeH1VFnSoqoHy81LRBm/GjVDAo/V7VQd9eBndT0NQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VsgaMYZYPxZ3VuFCLT3hIQiQyAHAw2ctQDrPes/rVB4=;
- b=jZtku2hmDSiNg/ZNjRTlF8Tthmvj2pFMyuWeV0SVqY1C/1vdMJUrfgTE3NE3vtRlXeP2IogZoszrUkA9a1eYOEwItfBXdCOB3wKgsGr7NcfDHP37GWOakCYWeVeh/yE5l+PTADTLc1BBbdCtzpBjfG9GzI1/JXX2JwIL6ZOMYjw=
-Received: from BYAPR04MB4901.namprd04.prod.outlook.com (52.135.232.206) by
- BYAPR04MB5349.namprd04.prod.outlook.com (20.178.50.30) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.18; Mon, 23 Sep 2019 15:54:19 +0000
-Received: from BYAPR04MB4901.namprd04.prod.outlook.com
- ([fe80::88bb:c568:c010:3208]) by BYAPR04MB4901.namprd04.prod.outlook.com
- ([fe80::88bb:c568:c010:3208%7]) with mapi id 15.20.2284.023; Mon, 23 Sep 2019
- 15:54:19 +0000
-From:   Alistair Francis <Alistair.Francis@wdc.com>
-To:     "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-        Anup Patel <Anup.Patel@wdc.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "anup@brainfault.org" <anup@brainfault.org>,
-        "palmer@sifive.com" <palmer@sifive.com>,
-        "hch@infradead.org" <hch@infradead.org>
-Subject: Re: [PATCH v7 02/21] RISC-V: Add bitmap reprensenting ISA features
- common across CPUs
-Thread-Topic: [PATCH v7 02/21] RISC-V: Add bitmap reprensenting ISA features
- common across CPUs
-Thread-Index: AQHVYzu9uPc5gAk8X0m4h7HdgR2XEKc2AJmAgAOHPwA=
-Date:   Mon, 23 Sep 2019 15:54:19 +0000
-Message-ID: <19bd7db1983e98de10ef1b083bc1b884f587aacc.camel@wdc.com>
-References: <20190904161245.111924-1-anup.patel@wdc.com>
-         <20190904161245.111924-4-anup.patel@wdc.com>
-         <alpine.DEB.2.21.9999.1909210245000.2030@viisi.sifive.com>
-In-Reply-To: <alpine.DEB.2.21.9999.1909210245000.2030@viisi.sifive.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Alistair.Francis@wdc.com; 
-x-originating-ip: [2601:646:8e00:37b2:d3fd:11e9:7cc1:adaf]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8a960ee0-436f-4ec2-aa56-08d7403e4b79
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BYAPR04MB5349;
-x-ms-traffictypediagnostic: BYAPR04MB5349:
-x-ms-exchange-purlcount: 1
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB5349392B35928B657089184C90850@BYAPR04MB5349.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1388;
-x-forefront-prvs: 0169092318
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(136003)(39850400004)(366004)(396003)(376002)(51444003)(199004)(189003)(71200400001)(4326008)(71190400001)(6306002)(229853002)(486006)(2616005)(118296001)(966005)(2906002)(6116002)(81156014)(81166006)(6486002)(186003)(14454004)(46003)(6436002)(256004)(6246003)(476003)(8936002)(11346002)(446003)(36756003)(76176011)(2501003)(8676002)(6512007)(99286004)(7416002)(66476007)(305945005)(66446008)(54906003)(6636002)(66946007)(316002)(110136005)(64756008)(66556008)(7736002)(76116006)(25786009)(102836004)(478600001)(5660300002)(6506007)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB5349;H:BYAPR04MB4901.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: GgUIF5TUDDFNze+BBhMLJfq/6cdslt+i3keGIaeV3lQu0RhRAwuIr4erO29xNzTylEh8nCYgrCOfmZIIs2BL48h5BVYXsrweEiqzWfoUWuPtoig6iOc26iOOy2Px4stuQVl2MMCtkfL9wgul0t0W94phxN5XgVYAM1RX3gNPliFiAcFI3UaqjyzBKh7Ptd0ltwHUhwWwnu22AfNp1X+fwjIH05Cy0XwIu7zpLtUTh6zjb7SpezhL27tuIDcoUqIve6xW4+HWqANkphHkqo+T1tayX72OtO5zh4LN6qBRBFA4+u6oWXRa5DspZ0o9aQESEEXnXuv2Yo/mqcZVoW+/yFwtoMBn1kK+F66BoGlHWBfJwqsxgDe7RGM8EKEe+TIFYyP1VEVi75Lpl2e7VZhpjXamDqka/Nm5ULnsbkrXSU8=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4B3CF02758A605449E45C785E6F3B0FA@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a960ee0-436f-4ec2-aa56-08d7403e4b79
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Sep 2019 15:54:19.2677
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mT9mO7Gq8KJF1Ric2/aR88B+tutlFF0VqZW2Db7HwROQHfzys1fKn1/mqjgkeHICFUb6dAJR/CzL1L8gLB21oKfrlp68Eg6myh5VLxg+4lU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5349
+        id S2387518AbfIWP5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 11:57:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38763 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2387399AbfIWP5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 11:57:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1569254266;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vqXr66p9BTOC4c6rO49LKpsEXcTiRdNwHlHSpVVSfek=;
+        b=FftqNWsNv86/b85gaMrG+n0ospv5RTzlhSpEd4iDDoqPJ8cI+/mFRGQSZm/vK4qCQ2oPpk
+        sqZ/r4YNPL01bBQnE1BBI6q4k8lb1032UhKO8CaKp7wCbN38GKOa+qH3RkQ7Epib/ip7HN
+        PzFJc+3j74/gTI5kczNG97uEA69vN58=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-VyyE7P39PWa72z0-79CpyA-1; Mon, 23 Sep 2019 11:57:45 -0400
+Received: by mail-wr1-f69.google.com with SMTP id a4so5007785wrg.8
+        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 08:57:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=qmOR/sRaPdaLp7pbdrzsHY8PX3GradHTD4pZ29KBFwE=;
+        b=qPphM7kFLTjRxcQaJ3dEkTtlqz9eWXouxW2U/zGDXwVcvTI9OOWeR00yRinxZX1e7g
+         evE9QeCptoQeAG2IENCODdRClDVC+e7vsaxGNHW364gmdOb+OVhAR7ooLrTqmB+qya5A
+         FgiGB3wGu0G4gudXtUrc7m6vj3nISD3hQDMUlTeMD66qhM/FgsSVi02tejovBLfdO4gA
+         hIYTJ+LSYlu6SNuh6D1FUJJE097jnDRaQqCCqwZx5M1h/IwJKk3V6FDZvmZMYs3x2wgt
+         EtpoPYpcIIcoDlJgYLwMkyxCcN5fuoZswbweOwHWrpiGd5l8xbVp3zu4TYMLOgrhEwtK
+         NQvg==
+X-Gm-Message-State: APjAAAWCUtRJrTnhO+CWVWWR96bmguJIdsxEtX0In3k3ZNQsvx1uomc5
+        HyWCR/7yvjcXWj/saaKiHvIzqeoX9WSxlcwFiiVwOotTVlgJ8iuUBX10OFmmFt5JwzGHP5mpKdy
+        vetvGZLumIsKB
+X-Received: by 2002:a7b:c7c5:: with SMTP id z5mr256393wmk.37.1569254263750;
+        Mon, 23 Sep 2019 08:57:43 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwRBJeUP5nWJ6EI3c/i7RuABKPQ/LjlnTfKN9L9IAUgMgSmzPiM3qsG5OOO6GhqwQbSEXMg4w==
+X-Received: by 2002:a7b:c7c5:: with SMTP id z5mr256371wmk.37.1569254263396;
+        Mon, 23 Sep 2019 08:57:43 -0700 (PDT)
+Received: from ?IPv6:2a01:e35:8b6a:1220:4519:9c66:87bb:ff1d? ([2a01:e35:8b6a:1220:4519:9c66:87bb:ff1d])
+        by smtp.gmail.com with ESMTPSA id n7sm12604644wrt.59.2019.09.23.08.57.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 23 Sep 2019 08:57:42 -0700 (PDT)
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [kvm-unit-tests PATCH v5 2/2] x86: nvmx: test max atomic switch
+ MSRs
+From:   Christophe de Dinechin <dinechin@redhat.com>
+In-Reply-To: <20190918222354.184162-2-marcorr@google.com>
+Date:   Mon, 23 Sep 2019 17:57:39 +0200
+Cc:     kvm@vger.kernel.org, jmattson@google.com, pshier@google.com,
+        sean.j.christopherson@intel.com, krish.sadhukhan@oracle.com
+Message-Id: <83A0AF0F-49DA-44FF-8EC0-2E462AA10C65@redhat.com>
+References: <20190918222354.184162-1-marcorr@google.com>
+ <20190918222354.184162-2-marcorr@google.com>
+To:     Marc Orr <marcorr@google.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-MC-Unique: VyyE7P39PWa72z0-79CpyA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gU2F0LCAyMDE5LTA5LTIxIGF0IDAzOjAxIC0wNzAwLCBQYXVsIFdhbG1zbGV5IHdyb3RlOg0K
-PiBIaSBBbnVwLA0KPiANCj4gVGhhbmtzIGZvciBjaGFuZ2luZyB0aGlzIHRvIHVzZSBhIGJpdG1h
-cC4gIEEgZmV3IGNvbW1lbnRzIGJlbG93IC0NCj4gDQo+IE9uIFdlZCwgNCBTZXAgMjAxOSwgQW51
-cCBQYXRlbCB3cm90ZToNCj4gDQo+ID4gVGhpcyBwYXRjaCBhZGRzIHJpc2N2X2lzYSBiaXRtYXAg
-d2hpY2ggcmVwcmVzZW50cyBIb3N0IElTQSBmZWF0dXJlcw0KPiA+IGNvbW1vbiBhY3Jvc3MgYWxs
-IEhvc3QgQ1BVcy4gVGhlIHJpc2N2X2lzYSBpcyBub3Qgc2FtZSBhcyBlbGZfaHdjYXANCj4gPiBi
-ZWNhdXNlIGVsZl9od2NhcCB3aWxsIG9ubHkgaGF2ZSBJU0EgZmVhdHVyZXMgcmVsZXZhbnQgZm9y
-IHVzZXItDQo+ID4gc3BhY2UNCj4gPiBhcHBzIHdoZXJlYXMgcmlzY3ZfaXNhIHdpbGwgaGF2ZSBJ
-U0EgZmVhdHVyZXMgcmVsZXZhbnQgdG8gYm90aA0KPiA+IGtlcm5lbA0KPiA+IGFuZCB1c2VyLXNw
-YWNlIGFwcHMuDQo+ID4gDQo+ID4gT25lIG9mIHRoZSB1c2UtY2FzZSBmb3IgcmlzY3ZfaXNhIGJp
-dG1hcCBpcyBpbiBLVk0gaHlwZXJ2aXNvciB3aGVyZQ0KPiA+IHdlIHdpbGwgdXNlIGl0IHRvIGRv
-IGZvbGxvd2luZyBvcGVyYXRpb25zOg0KPiA+IA0KPiA+IDEuIENoZWNrIHdoZXRoZXIgaHlwZXJ2
-aXNvciBleHRlbnNpb24gaXMgYXZhaWxhYmxlDQo+ID4gMi4gRmluZCBJU0EgZmVhdHVyZXMgdGhh
-dCBuZWVkIHRvIGJlIHZpcnR1YWxpemVkIChlLmcuIGZsb2F0aW5nDQo+ID4gICAgcG9pbnQgc3Vw
-cG9ydCwgdmVjdG9yIGV4dGVuc2lvbiwgZXRjLikNCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBB
-bnVwIFBhdGVsIDxhbnVwLnBhdGVsQHdkYy5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogQXRpc2gg
-UGF0cmEgPGF0aXNoLnBhdHJhQHdkYy5jb20+DQo+ID4gUmV2aWV3ZWQtYnk6IEFsZXhhbmRlciBH
-cmFmIDxncmFmQGFtYXpvbi5jb20+DQo+ID4gLS0tDQo+ID4gIGFyY2gvcmlzY3YvaW5jbHVkZS9h
-c20vaHdjYXAuaCB8IDI2ICsrKysrKysrKysrDQo+ID4gIGFyY2gvcmlzY3Yva2VybmVsL2NwdWZl
-YXR1cmUuYyB8IDc5DQo+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPiA+
-ICAyIGZpbGVzIGNoYW5nZWQsIDEwMiBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPiA+
-IA0KPiA+IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2L2luY2x1ZGUvYXNtL2h3Y2FwLmgNCj4gPiBi
-L2FyY2gvcmlzY3YvaW5jbHVkZS9hc20vaHdjYXAuaA0KPiA+IGluZGV4IDdlY2I3YzZhNTdiMS4u
-OWI2NTczNzVhYTUxIDEwMDY0NA0KPiA+IC0tLSBhL2FyY2gvcmlzY3YvaW5jbHVkZS9hc20vaHdj
-YXAuaA0KPiA+ICsrKyBiL2FyY2gvcmlzY3YvaW5jbHVkZS9hc20vaHdjYXAuaA0KPiA+IEBAIC04
-LDYgKzgsNyBAQA0KPiA+ICAjaWZuZGVmIF9fQVNNX0hXQ0FQX0gNCj4gPiAgI2RlZmluZSBfX0FT
-TV9IV0NBUF9IDQo+ID4gIA0KPiA+ICsjaW5jbHVkZSA8bGludXgvYml0cy5oPg0KPiA+ICAjaW5j
-bHVkZSA8dWFwaS9hc20vaHdjYXAuaD4NCj4gPiAgDQo+ID4gICNpZm5kZWYgX19BU1NFTUJMWV9f
-DQo+ID4gQEAgLTIyLDUgKzIzLDMwIEBAIGVudW0gew0KPiA+ICB9Ow0KPiA+ICANCj4gPiAgZXh0
-ZXJuIHVuc2lnbmVkIGxvbmcgZWxmX2h3Y2FwOw0KPiA+ICsNCj4gPiArI2RlZmluZSBSSVNDVl9J
-U0FfRVhUX2EJCSgnYScgLSAnYScpDQo+ID4gKyNkZWZpbmUgUklTQ1ZfSVNBX0VYVF9jCQkoJ2Mn
-IC0gJ2EnKQ0KPiA+ICsjZGVmaW5lIFJJU0NWX0lTQV9FWFRfZAkJKCdkJyAtICdhJykNCj4gPiAr
-I2RlZmluZSBSSVNDVl9JU0FfRVhUX2YJCSgnZicgLSAnYScpDQo+ID4gKyNkZWZpbmUgUklTQ1Zf
-SVNBX0VYVF9oCQkoJ2gnIC0gJ2EnKQ0KPiA+ICsjZGVmaW5lIFJJU0NWX0lTQV9FWFRfaQkJKCdp
-JyAtICdhJykNCj4gPiArI2RlZmluZSBSSVNDVl9JU0FfRVhUX20JCSgnbScgLSAnYScpDQo+ID4g
-KyNkZWZpbmUgUklTQ1ZfSVNBX0VYVF9zCQkoJ3MnIC0gJ2EnKQ0KPiA+ICsjZGVmaW5lIFJJU0NW
-X0lTQV9FWFRfdQkJKCd1JyAtICdhJykNCj4gPiArI2RlZmluZSBSSVNDVl9JU0FfRVhUX3ppY3Ny
-CSgoJ3onIC0gJ2EnKSArIDEpDQo+ID4gKyNkZWZpbmUgUklTQ1ZfSVNBX0VYVF96aWZlbmNlaQko
-KCd6JyAtICdhJykgKyAyKQ0KPiA+ICsjZGVmaW5lIFJJU0NWX0lTQV9FWFRfemFtCSgoJ3onIC0g
-J2EnKSArIDMpDQo+ID4gKyNkZWZpbmUgUklTQ1ZfSVNBX0VYVF96dHNvCSgoJ3onIC0gJ2EnKSAr
-IDQpDQo+IA0KPiBJZiB3ZSBhZGQgdGhlIFogZXh0ZW5zaW9ucyBoZXJlLCBpdCdzIHByb2JhYmx5
-IGJlc3QgaWYgd2UgZHJvcCBaYW0NCj4gZnJvbSANCj4gdGhpcyBsaXN0LiAgVGhlIHJhdGlvbmFs
-ZSBpcywgYXMgbWFpbnRhaW5lcnMsIHdlJ3JlIHBsYW5uaW5nIHRvIGhvbGQNCj4gb2ZmIA0KPiBv
-biBtZXJnaW5nIGFueSBzdXBwb3J0IGZvciBleHRlbnNpb25zIG9yIG1vZHVsZXMgdGhhdCBhcmVu
-J3QgaW4gdGhlIA0KPiAiZnJvemVuIiBvciAicmF0aWZpZWQiIHN0YXRlcywgYW5kIGFjY29yZGlu
-ZyB0byB0aGUgUklTQy1WIHNwZWNzLA0KPiBaaWNzciwgDQo+IFppZmVuY2VpLCBhbmQgWnRzbyBh
-cmUgYWxsIGVpdGhlciBmcm96ZW4gb3IgcmF0aWZpZWQuICBIb3dldmVyLCBzZWUgDQo+IGJlbG93
-IC0NCg0KSGV5IFBhdWwsDQoNCkkgdGhpbmsgdGhhdCB0aGlzIHNob3VsZCBiZSBkb2N1bWVudGVk
-IHNvbWV3aGVyZSBpbiB0aGUga2VybmVsIHRyZWUuIEluDQpRRU1VIGxhbmQgd2UgaGF2ZSBkZWNp
-ZWRlZCB0aGF0IGRyYWZ0IGV4dGVuc2lvbnMgd2lsbCBiZSBhY2NlcHRlZCBhbmQNCnRoZXJlIGFy
-ZSBjdXJyZW50bHkgdHdvIGV4dGVuc2lvbiBzZXJpZXMgb24gbGlzdCAoSHlwZXJ2aXNvciBmcm9t
-IFdEQw0KYW5kIFZlY3RvciBmcm9tIENTS1kpLiBJIHN1c3BlY3QgYXMgUklTQy1WIGdyb3dzIHRo
-ZXJlIGFyZSBnb2luZyB0byBiZQ0KbW9yZSBhbmQgbW9yZSBncm91cHMgdGhhdCBhcmUgaW50ZXJl
-c3RlZCBpbiBzb21lIHNwZWNpZmljIGV4dGVuc2lvbiBhbmQNCndhbnQgaXQgdXBzdHJlYW0uIElu
-IHRoaXMgY2FzZSBpdCBtYWtlcyBzZW5zZSB0byBoYXZlIGl0IHZlcnkgY2xlYXJseQ0KZG9jdW1l
-bmV0ZWQgc28gdGhhdCBldmVyeW9uZSBrbm93cyB3aGF0IHdpbGwvd29uJ3QgYmUgYWNjZXB0ZWQu
-DQoNCklmIGl0J3MgY2xlYXJseSBkb2N1bWVudGVkIHRoZW4gZXZlcnlvbmUgd2lsbCBiZSBvbiB0
-aGUgc2FtZSBwYWdlIGFzIHRvDQp3aGF0IHdpbGwvd29uJ3QgYmUgYWNjZXB0ZWQgYnkgaW5kaXZp
-ZHVhbCBwcm9qZWN0cy4gQXMgYSBzaWRlIG5vdGUgSSdsbA0KcHJvYmFibHkgbG9vayBhdCBhZGRp
-bmcgc29tZXRoaW5nIGZvciBRRU1VIGFzIHdlbGwgOikNCg0KQWxpc3RhaXINCg0KPiANCj4gPiAr
-DQo+ID4gKyNkZWZpbmUgUklTQ1ZfSVNBX0VYVF9NQVgJMjU2DQo+ID4gKw0KPiA+ICt1bnNpZ25l
-ZCBsb25nIHJpc2N2X2lzYV9leHRlbnNpb25fYmFzZShjb25zdCB1bnNpZ25lZCBsb25nDQo+ID4g
-KmlzYV9iaXRtYXApOw0KPiA+ICsNCj4gPiArI2RlZmluZSByaXNjdl9pc2FfZXh0ZW5zaW9uX21h
-c2soZXh0KQ0KPiA+IEJJVF9NQVNLKFJJU0NWX0lTQV9FWFRfIyNleHQpDQo+ID4gKw0KPiA+ICti
-b29sIF9fcmlzY3ZfaXNhX2V4dGVuc2lvbl9hdmFpbGFibGUoY29uc3QgdW5zaWduZWQgbG9uZw0K
-PiA+ICppc2FfYml0bWFwLCBpbnQgYml0KTsNCj4gPiArI2RlZmluZSByaXNjdl9pc2FfZXh0ZW5z
-aW9uX2F2YWlsYWJsZShpc2FfYml0bWFwLCBleHQpCVwNCj4gPiArCV9fcmlzY3ZfaXNhX2V4dGVu
-c2lvbl9hdmFpbGFibGUoaXNhX2JpdG1hcCwNCj4gPiBSSVNDVl9JU0FfRVhUXyMjZXh0KQ0KPiA+
-ICsNCj4gPiAgI2VuZGlmDQo+ID4gICNlbmRpZg0KPiA+IGRpZmYgLS1naXQgYS9hcmNoL3Jpc2N2
-L2tlcm5lbC9jcHVmZWF0dXJlLmMNCj4gPiBiL2FyY2gvcmlzY3Yva2VybmVsL2NwdWZlYXR1cmUu
-Yw0KPiA+IGluZGV4IGIxYWRlOWE0OTM0Ny4uNGNlNzFjZTVlMjkwIDEwMDY0NA0KPiA+IC0tLSBh
-L2FyY2gvcmlzY3Yva2VybmVsL2NwdWZlYXR1cmUuYw0KPiA+ICsrKyBiL2FyY2gvcmlzY3Yva2Vy
-bmVsL2NwdWZlYXR1cmUuYw0KPiA+IEBAIC02LDIxICs2LDY0IEBADQo+ID4gICAqIENvcHlyaWdo
-dCAoQykgMjAxNyBTaUZpdmUNCj4gPiAgICovDQo+ID4gIA0KPiA+ICsjaW5jbHVkZSA8bGludXgv
-Yml0bWFwLmg+DQo+ID4gICNpbmNsdWRlIDxsaW51eC9vZi5oPg0KPiA+ICAjaW5jbHVkZSA8YXNt
-L3Byb2Nlc3Nvci5oPg0KPiA+ICAjaW5jbHVkZSA8YXNtL2h3Y2FwLmg+DQo+ID4gICNpbmNsdWRl
-IDxhc20vc21wLmg+DQo+ID4gIA0KPiA+ICB1bnNpZ25lZCBsb25nIGVsZl9od2NhcCBfX3JlYWRf
-bW9zdGx5Ow0KPiA+ICsNCj4gPiArLyogSG9zdCBJU0EgYml0bWFwICovDQo+ID4gK3N0YXRpYyBE
-RUNMQVJFX0JJVE1BUChyaXNjdl9pc2EsIFJJU0NWX0lTQV9FWFRfTUFYKSBfX3JlYWRfbW9zdGx5
-Ow0KPiA+ICsNCj4gPiAgI2lmZGVmIENPTkZJR19GUFUNCj4gPiAgYm9vbCBoYXNfZnB1IF9fcmVh
-ZF9tb3N0bHk7DQo+ID4gICNlbmRpZg0KPiA+ICANCj4gPiArLyoqDQo+ID4gKyAqIHJpc2N2X2lz
-YV9leHRlbnNpb25fYmFzZSAtIEdldCBiYXNlIGV4dGVuc2lvbiB3b3JkDQo+ID4gKyAqDQo+ID4g
-KyAqIEBpc2FfYml0bWFwIElTQSBiaXRtYXAgdG8gdXNlDQo+ID4gKyAqIEByZXR1cm5zIGJhc2Ug
-ZXh0ZW5zaW9uIHdvcmQgYXMgdW5zaWduZWQgbG9uZyB2YWx1ZQ0KPiA+ICsgKg0KPiA+ICsgKiBO
-T1RFOiBJZiBpc2FfYml0bWFwIGlzIE5VTEwgdGhlbiBIb3N0IElTQSBiaXRtYXAgd2lsbCBiZSB1
-c2VkLg0KPiA+ICsgKi8NCj4gDQo+IEFtIGhhcHB5IHRvIHNlZSBjb21tZW50cyB0aGF0IGNhbiBi
-ZSBhdXRvbWF0aWNhbGx5IHBhcnNlZCwgYnV0IGNvdWxkDQo+IHlvdSANCj4gcmVmb3JtYXQgdGhl
-bSBpbnRvIGtlcm5lbC1kb2MgZm9ybWF0PyANCj4gDQo+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcv
-cHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdC90cmVlL0RvY3VtZW50
-YXRpb24vZG9jLWd1aWRlL2tlcm5lbC1kb2MucnN0DQo+IA0KPiA+ICt1bnNpZ25lZCBsb25nIHJp
-c2N2X2lzYV9leHRlbnNpb25fYmFzZShjb25zdCB1bnNpZ25lZCBsb25nDQo+ID4gKmlzYV9iaXRt
-YXApDQo+ID4gK3sNCj4gPiArCWlmICghaXNhX2JpdG1hcCkNCj4gPiArCQlyZXR1cm4gcmlzY3Zf
-aXNhWzBdOw0KPiA+ICsJcmV0dXJuIGlzYV9iaXRtYXBbMF07DQo+ID4gK30NCj4gPiArRVhQT1JU
-X1NZTUJPTF9HUEwocmlzY3ZfaXNhX2V4dGVuc2lvbl9iYXNlKTsNCj4gPiArDQo+ID4gKy8qKg0K
-PiA+ICsgKiBfX3Jpc2N2X2lzYV9leHRlbnNpb25fYXZhaWxhYmxlIC0gQ2hlY2sgd2hldGhlciBn
-aXZlbiBleHRlbnNpb24NCj4gPiArICogaXMgYXZhaWxhYmxlIG9yIG5vdA0KPiA+ICsgKg0KPiA+
-ICsgKiBAaXNhX2JpdG1hcCBJU0EgYml0bWFwIHRvIHVzZQ0KPiA+ICsgKiBAYml0IGJpdCBwb3Np
-dGlvbiBvZiB0aGUgZGVzaXJlZCBleHRlbnNpb24NCj4gPiArICogQHJldHVybnMgdHJ1ZSBvciBm
-YWxzZQ0KPiA+ICsgKg0KPiA+ICsgKiBOT1RFOiBJZiBpc2FfYml0bWFwIGlzIE5VTEwgdGhlbiBI
-b3N0IElTQSBiaXRtYXAgd2lsbCBiZSB1c2VkLg0KPiA+ICsgKi8NCj4gDQo+IFNhbWUgY29tbWVu
-dCBhcyBhYm92ZS4NCj4gDQo+ID4gK2Jvb2wgX19yaXNjdl9pc2FfZXh0ZW5zaW9uX2F2YWlsYWJs
-ZShjb25zdCB1bnNpZ25lZCBsb25nDQo+ID4gKmlzYV9iaXRtYXAsIGludCBiaXQpDQo+ID4gK3sN
-Cj4gPiArCWNvbnN0IHVuc2lnbmVkIGxvbmcgKmJtYXAgPSAoaXNhX2JpdG1hcCkgPyBpc2FfYml0
-bWFwIDoNCj4gPiByaXNjdl9pc2E7DQo+ID4gKw0KPiA+ICsJaWYgKGJpdCA+PSBSSVNDVl9JU0Ff
-RVhUX01BWCkNCj4gPiArCQlyZXR1cm4gZmFsc2U7DQo+ID4gKw0KPiA+ICsJcmV0dXJuIHRlc3Rf
-Yml0KGJpdCwgYm1hcCkgPyB0cnVlIDogZmFsc2U7DQo+ID4gK30NCj4gPiArRVhQT1JUX1NZTUJP
-TF9HUEwoX19yaXNjdl9pc2FfZXh0ZW5zaW9uX2F2YWlsYWJsZSk7DQo+ID4gKw0KPiA+ICB2b2lk
-IHJpc2N2X2ZpbGxfaHdjYXAodm9pZCkNCj4gPiAgew0KPiA+ICAJc3RydWN0IGRldmljZV9ub2Rl
-ICpub2RlOw0KPiA+ICAJY29uc3QgY2hhciAqaXNhOw0KPiA+IC0Jc2l6ZV90IGk7DQo+ID4gKwlj
-aGFyIHByaW50X3N0cltCSVRTX1BFUl9MT05HKzFdOw0KPiA+ICsJc2l6ZV90IGksIGosIGlzYV9s
-ZW47DQo+ID4gIAlzdGF0aWMgdW5zaWduZWQgbG9uZyBpc2EyaHdjYXBbMjU2XSA9IHswfTsNCj4g
-PiAgDQo+ID4gIAlpc2EyaHdjYXBbJ2knXSA9IGlzYTJod2NhcFsnSSddID0gQ09NUEFUX0hXQ0FQ
-X0lTQV9JOw0KPiA+IEBAIC0zMiw4ICs3NSwxMSBAQCB2b2lkIHJpc2N2X2ZpbGxfaHdjYXAodm9p
-ZCkNCj4gPiAgDQo+ID4gIAllbGZfaHdjYXAgPSAwOw0KPiA+ICANCj4gPiArCWJpdG1hcF96ZXJv
-KHJpc2N2X2lzYSwgUklTQ1ZfSVNBX0VYVF9NQVgpOw0KPiA+ICsNCj4gPiAgCWZvcl9lYWNoX29m
-X2NwdV9ub2RlKG5vZGUpIHsNCj4gPiAgCQl1bnNpZ25lZCBsb25nIHRoaXNfaHdjYXAgPSAwOw0K
-PiA+ICsJCXVuc2lnbmVkIGxvbmcgdGhpc19pc2EgPSAwOw0KPiA+ICANCj4gPiAgCQlpZiAocmlz
-Y3Zfb2ZfcHJvY2Vzc29yX2hhcnRpZChub2RlKSA8IDApDQo+ID4gIAkJCWNvbnRpbnVlOw0KPiA+
-IEBAIC00Myw4ICs4OSwyMCBAQCB2b2lkIHJpc2N2X2ZpbGxfaHdjYXAodm9pZCkNCj4gPiAgCQkJ
-Y29udGludWU7DQo+ID4gIAkJfQ0KPiA+ICANCj4gPiAtCQlmb3IgKGkgPSAwOyBpIDwgc3RybGVu
-KGlzYSk7ICsraSkNCj4gPiArCQlpID0gMDsNCj4gPiArCQlpc2FfbGVuID0gc3RybGVuKGlzYSk7
-DQo+ID4gKyNpZiBkZWZpbmVkKENPTkZJR18zMkJJVCkNCj4gPiArCQlpZiAoIXN0cm5jbXAoaXNh
-LCAicnYzMiIsIDQpKQ0KPiA+ICsJCQlpICs9IDQ7DQo+ID4gKyNlbGlmIGRlZmluZWQoQ09ORklH
-XzY0QklUKQ0KPiA+ICsJCWlmICghc3RybmNtcChpc2EsICJydjY0IiwgNCkpDQo+ID4gKwkJCWkg
-Kz0gNDsNCj4gPiArI2VuZGlmDQo+ID4gKwkJZm9yICg7IGkgPCBpc2FfbGVuOyArK2kpIHsNCj4g
-PiAgCQkJdGhpc19od2NhcCB8PSBpc2EyaHdjYXBbKHVuc2lnbmVkDQo+ID4gY2hhcikoaXNhW2ld
-KV07DQo+ID4gKwkJCWlmICgnYScgPD0gaXNhW2ldICYmIGlzYVtpXSA8PSAneicpDQo+ID4gKwkJ
-CQl0aGlzX2lzYSB8PSAoMVVMIDw8IChpc2FbaV0gLSAnYScpKTsNCj4gDQo+IENvbnRpbnVpbmcg
-ZnJvbSB0aGUgZWFybGllciBjb21tZW50LCB0aGlzIGNvZGUgd29uJ3QgcHJvcGVybHkgaGFuZGxl
-DQo+IHRoZSBYIA0KPiBhbmQgWiBwcmVmaXggZXh0ZW5zaW9ucy4gIFNvIG1heWJlIGZvciB0aGUg
-dGltZSBiZWluZywgd2Ugc2hvdWxkIGp1c3QNCj4gZHJvcCANCj4gdGhlIGxpbmVzIG1lbnRpb25l
-ZCBlYXJsaWVyIHRoYXQgaW1wbHkgdGhhdCB3ZSBjYW4gcGFyc2UgWi1wcmVmaXggDQo+IGV4dGVu
-c2lvbnMsIGFuZCBjaGFuZ2UgdGhpcyBsaW5lIHNvIGl0IGlnbm9yZXMgWCBhbmQgWiBsZXR0ZXJz
-Pw0KPiANCj4gVGhlbiBhIHN1YnNlcXVlbnQgcGF0Y2ggY2FuIGFkZCBzdXBwb3J0IGZvciBtb3Jl
-IGNvbXBsaWNhdGVkDQo+IGV4dGVuc2lvbiANCj4gc3RyaW5nIHBhcnNpbmcuDQo+IA0KPiANCj4g
-PiArCQl9DQo+ID4gIA0KPiA+ICAJCS8qDQo+ID4gIAkJICogQWxsICJva2F5IiBoYXJ0IHNob3Vs
-ZCBoYXZlIHNhbWUgaXNhLiBTZXQgSFdDQVANCj4gPiBiYXNlZCBvbg0KPiA+IEBAIC01NSw2ICsx
-MTMsMTEgQEAgdm9pZCByaXNjdl9maWxsX2h3Y2FwKHZvaWQpDQo+ID4gIAkJCWVsZl9od2NhcCAm
-PSB0aGlzX2h3Y2FwOw0KPiA+ICAJCWVsc2UNCj4gPiAgCQkJZWxmX2h3Y2FwID0gdGhpc19od2Nh
-cDsNCj4gPiArDQo+ID4gKwkJaWYgKHJpc2N2X2lzYVswXSkNCj4gPiArCQkJcmlzY3ZfaXNhWzBd
-ICY9IHRoaXNfaXNhOw0KPiA+ICsJCWVsc2UNCj4gPiArCQkJcmlzY3ZfaXNhWzBdID0gdGhpc19p
-c2E7DQo+ID4gIAl9DQo+ID4gIA0KPiA+ICAJLyogV2UgZG9uJ3Qgc3VwcG9ydCBzeXN0ZW1zIHdp
-dGggRiBidXQgd2l0aG91dCBELCBzbyBtYXNrIHRob3NlDQo+ID4gb3V0DQo+ID4gQEAgLTY0LDcg
-KzEyNywxNyBAQCB2b2lkIHJpc2N2X2ZpbGxfaHdjYXAodm9pZCkNCj4gPiAgCQllbGZfaHdjYXAg
-Jj0gfkNPTVBBVF9IV0NBUF9JU0FfRjsNCj4gPiAgCX0NCj4gPiAgDQo+ID4gLQlwcl9pbmZvKCJl
-bGZfaHdjYXAgaXMgMHglbHhcbiIsIGVsZl9od2NhcCk7DQo+ID4gKwltZW1zZXQocHJpbnRfc3Ry
-LCAwLCBzaXplb2YocHJpbnRfc3RyKSk7DQo+ID4gKwlmb3IgKGkgPSAwLCBqID0gMDsgaSA8IEJJ
-VFNfUEVSX0xPTkc7IGkrKykNCj4gPiArCQlpZiAocmlzY3ZfaXNhWzBdICYgQklUX01BU0soaSkp
-DQo+ID4gKwkJCXByaW50X3N0cltqKytdID0gKGNoYXIpKCdhJyArIGkpOw0KPiA+ICsJcHJfaW5m
-bygicmlzY3Y6IElTQSBleHRlbnNpb25zICVzXG4iLCBwcmludF9zdHIpOw0KPiA+ICsNCj4gPiAr
-CW1lbXNldChwcmludF9zdHIsIDAsIHNpemVvZihwcmludF9zdHIpKTsNCj4gPiArCWZvciAoaSA9
-IDAsIGogPSAwOyBpIDwgQklUU19QRVJfTE9ORzsgaSsrKQ0KPiA+ICsJCWlmIChlbGZfaHdjYXAg
-JiBCSVRfTUFTSyhpKSkNCj4gPiArCQkJcHJpbnRfc3RyW2orK10gPSAoY2hhcikoJ2EnICsgaSk7
-DQo+ID4gKwlwcl9pbmZvKCJyaXNjdjogRUxGIGNhcGFiaWxpdGllcyAlc1xuIiwgcHJpbnRfc3Ry
-KTsNCj4gPiAgDQo+ID4gICNpZmRlZiBDT05GSUdfRlBVDQo+ID4gIAlpZiAoZWxmX2h3Y2FwICYg
-KENPTVBBVF9IV0NBUF9JU0FfRiB8IENPTVBBVF9IV0NBUF9JU0FfRCkpDQo+ID4gLS0gDQo+ID4g
-Mi4xNy4xDQo+ID4gDQo+ID4gDQo+IA0KPiAtIFBhdWwNCg==
+
+
+> On 19 Sep 2019, at 00:23, Marc Orr <marcorr@google.com> wrote:
+>=20
+> Excerise nested VMX's atomic MSR switch code (e.g., VM-entry MSR-load
+
+Nit: Exercise
+
+> list) at the maximum number of MSRs supported, as described in the SDM,
+> in the appendix chapter titled "MISCELLANEOUS DATA".
+>=20
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Marc Orr <marcorr@google.com>
+> ---
+> v4 -> v5
+> * Replaced local pointer declarations for MSR lists with existing global
+>  declarations.
+> * Replaced atomic_switch_msr_limit_test_guest() with existing vmcall()
+>  funciton.
+> * Removed redundant assert_exit_reason(VMX_VMCALL).
+>=20
+> lib/alloc_page.c  |   5 ++
+> lib/alloc_page.h  |   1 +
+> x86/unittests.cfg |   2 +-
+> x86/vmx_tests.c   | 134 ++++++++++++++++++++++++++++++++++++++++++++++
+> 4 files changed, 141 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/lib/alloc_page.c b/lib/alloc_page.c
+> index 97d13395ff08..ed236389537e 100644
+> --- a/lib/alloc_page.c
+> +++ b/lib/alloc_page.c
+> @@ -53,6 +53,11 @@ void free_pages(void *mem, unsigned long size)
+> =09spin_unlock(&lock);
+> }
+>=20
+> +void free_pages_by_order(void *mem, unsigned long order)
+> +{
+> +=09free_pages(mem, 1ul << (order + PAGE_SHIFT));
+> +}
+> +
+> void *alloc_page()
+> {
+> =09void *p;
+> diff --git a/lib/alloc_page.h b/lib/alloc_page.h
+> index 5cdfec57a0a8..739a91def979 100644
+> --- a/lib/alloc_page.h
+> +++ b/lib/alloc_page.h
+> @@ -14,5 +14,6 @@ void *alloc_page(void);
+> void *alloc_pages(unsigned long order);
+> void free_page(void *page);
+> void free_pages(void *mem, unsigned long size);
+> +void free_pages_by_order(void *mem, unsigned long order);
+>=20
+> #endif
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 694ee3d42f3a..05122cf91ea1 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -227,7 +227,7 @@ extra_params =3D -cpu qemu64,+umip
+>=20
+> [vmx]
+> file =3D vmx.flat
+> -extra_params =3D -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept=
+_access* -vmx_smp* -vmx_vmcs_shadow_test"
+> +extra_params =3D -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept=
+_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test"
+> arch =3D x86_64
+> groups =3D vmx
+>=20
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index f035f24a771a..cc33ea7b5114 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -8570,6 +8570,137 @@ static int invalid_msr_entry_failure(struct vment=
+ry_failure *failure)
+> =09return VMX_TEST_VMEXIT;
+> }
+>=20
+> +/*
+> + * The max number of MSRs in an atomic switch MSR list is:
+> + * (111B + 1) * 512 =3D 4096
+> + *
+> + * Each list entry consumes:
+> + * 4-byte MSR index + 4 bytes reserved + 8-byte data =3D 16 bytes
+> + *
+> + * Allocate 128 kB to cover max_msr_list_size (i.e., 64 kB) and then som=
+e.
+> + */
+> +static const u32 msr_list_page_order =3D 5;
+> +
+> +static void atomic_switch_msr_limit_test_guest(void)
+> +{
+> +=09vmcall();
+> +}
+> +
+> +static void populate_msr_list(struct vmx_msr_entry *msr_list,
+> +=09=09=09      size_t byte_capacity, int count)
+> +{
+> +=09int i;
+> +
+> +=09for (i =3D 0; i < count; i++) {
+> +=09=09msr_list[i].index =3D MSR_IA32_TSC;
+> +=09=09msr_list[i].reserved =3D 0;
+> +=09=09msr_list[i].value =3D 0x1234567890abcdef;
+> +=09}
+> +
+> +=09memset(msr_list + count, 0xff,
+> +=09       byte_capacity - count * sizeof(*msr_list));
+> +}
+> +
+> +static int max_msr_list_size(void)
+> +{
+> +=09u32 vmx_misc =3D rdmsr(MSR_IA32_VMX_MISC);
+> +=09u32 factor =3D ((vmx_misc & GENMASK(27, 25)) >> 25) + 1;
+> +
+> +=09return factor * 512;
+> +}
+> +
+> +static void atomic_switch_msrs_test(int count)
+> +{
+> +=09struct vmx_msr_entry *vm_enter_load;
+> +=09struct vmx_msr_entry *vm_exit_load;
+> +=09struct vmx_msr_entry *vm_exit_store;
+> +=09int max_allowed =3D max_msr_list_size();
+> +=09int byte_capacity =3D 1ul << (msr_list_page_order + PAGE_SHIFT);
+> +=09/* KVM signals VM-Abort if an exit MSR list exceeds the max size. */
+> +=09int exit_count =3D MIN(count, max_allowed);
+> +
+> +=09/*
+> +=09 * Check for the IA32_TSC MSR,
+> +=09 * available with the "TSC flag" and used to populate the MSR lists.
+> +=09 */
+> +=09if (!(cpuid(1).d & (1 << 4))) {
+> +=09=09report_skip(__func__);
+> +=09=09return;
+> +=09}
+> +
+> +=09/* Set L2 guest. */
+> +=09test_set_guest(atomic_switch_msr_limit_test_guest);
+> +
+> +=09/* Setup atomic MSR switch lists. */
+> +=09vm_enter_load =3D alloc_pages(msr_list_page_order);
+> +=09vm_exit_load =3D alloc_pages(msr_list_page_order);
+> +=09vm_exit_store =3D alloc_pages(msr_list_page_order);
+> +
+> +=09vmcs_write(ENTER_MSR_LD_ADDR, (u64)vm_enter_load);
+> +=09vmcs_write(EXIT_MSR_LD_ADDR, (u64)vm_exit_load);
+> +=09vmcs_write(EXIT_MSR_ST_ADDR, (u64)vm_exit_store);
+> +
+> +=09/*
+> +=09 * VM-Enter should succeed up to the max number of MSRs per list, and
+> +=09 * should not consume junk beyond the last entry.
+> +=09 */
+> +=09populate_msr_list(vm_enter_load, byte_capacity, count);
+> +=09populate_msr_list(vm_exit_load, byte_capacity, exit_count);
+> +=09populate_msr_list(vm_exit_store, byte_capacity, exit_count);
+> +
+> +=09vmcs_write(ENT_MSR_LD_CNT, count);
+> +=09vmcs_write(EXI_MSR_LD_CNT, exit_count);
+> +=09vmcs_write(EXI_MSR_ST_CNT, exit_count);
+> +
+> +=09if (count <=3D max_allowed) {
+> +=09=09enter_guest();
+> +=09=09assert_exit_reason(VMX_VMCALL);
+> +=09=09skip_exit_vmcall();
+> +=09} else {
+> +=09=09u32 exit_reason;
+> +=09=09u32 exit_reason_want;
+> +=09=09u32 exit_qual;
+> +
+> +=09=09enter_guest_with_invalid_guest_state();
+> +
+> +=09=09exit_reason =3D vmcs_read(EXI_REASON);
+> +=09=09exit_reason_want =3D VMX_FAIL_MSR | VMX_ENTRY_FAILURE;
+> +=09=09report("exit_reason, %u, is %u.",
+> +=09=09       exit_reason =3D=3D exit_reason_want, exit_reason,
+> +=09=09       exit_reason_want);
+> +
+> +=09=09exit_qual =3D vmcs_read(EXI_QUALIFICATION);
+> +=09=09report("exit_qual, %u, is %u.", exit_qual =3D=3D max_allowed + 1,
+> +=09=09       exit_qual, max_allowed + 1);
+> +
+> +=09=09/*
+> +=09=09 * Re-enter the guest with valid counts
+> +=09=09 * and proceed past the single vmcall instruction.
+> +=09=09 */
+> +=09=09vmcs_write(ENT_MSR_LD_CNT, 0);
+> +=09=09vmcs_write(EXI_MSR_LD_CNT, 0);
+> +=09=09vmcs_write(EXI_MSR_ST_CNT, 0);
+> +=09=09enter_guest();
+> +=09=09skip_exit_vmcall();
+> +=09}
+> +
+> +=09/* Cleanup. */
+> +=09enter_guest();
+> +=09skip_exit_vmcall();
+> +=09free_pages_by_order(vm_enter_load, msr_list_page_order);
+> +=09free_pages_by_order(vm_exit_load, msr_list_page_order);
+> +=09free_pages_by_order(vm_exit_store, msr_list_page_order);
+> +}
+> +
+> +static void atomic_switch_max_msrs_test(void)
+> +{
+> +=09atomic_switch_msrs_test(max_msr_list_size());
+> +}
+> +
+> +static void atomic_switch_overflow_msrs_test(void)
+> +{
+> +=09atomic_switch_msrs_test(max_msr_list_size() + 1);
+> +}
+>=20
+> #define TEST(name) { #name, .v2 =3D name }
+>=20
+> @@ -8660,5 +8791,8 @@ struct vmx_test vmx_tests[] =3D {
+> =09TEST(ept_access_test_paddr_read_execute_ad_enabled),
+> =09TEST(ept_access_test_paddr_not_present_page_fault),
+> =09TEST(ept_access_test_force_2m_page),
+> +=09/* Atomic MSR switch tests. */
+> +=09TEST(atomic_switch_max_msrs_test),
+> +=09TEST(atomic_switch_overflow_msrs_test),
+> =09{ NULL, NULL, NULL, NULL, NULL, {0} },
+> };
+> --=20
+> 2.23.0.237.gc6a4ce50a0-goog
+>=20
+
