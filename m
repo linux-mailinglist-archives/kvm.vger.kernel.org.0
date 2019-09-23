@@ -2,151 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D7496BBA5F
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 19:24:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E34E1BBA92
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 19:34:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437718AbfIWRYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 13:24:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37190 "EHLO mail.kernel.org"
+        id S2440152AbfIWReZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 13:34:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42022 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393190AbfIWRYP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 13:24:15 -0400
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2389167AbfIWReZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 13:34:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B600521783
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 17:24:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569259455;
-        bh=DzycgKHCi19mMx4cgC/hY8TzO4MUiU13rQpq2YThoZE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=AgJtVR2zD2ID/COVmKJzNcv7L5FFBker86qUiq8xMUdR/grog+vdfoPdz1kl1i+2L
-         3n8nUR6vNH6n2v3jWM0ceUb6UNpa3UdN0CZnhldbm2yHmP8a/ZloneXsUX2qePAseX
-         7i/HLWr7tZbO8sx5lZGhoke2RMA9qDKtn6GgR5I4=
-Received: by mail-wr1-f46.google.com with SMTP id r3so14905140wrj.6
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 10:24:14 -0700 (PDT)
-X-Gm-Message-State: APjAAAW/mruHTHqjhkiBiXQM0BnBED/IRY9kTayz4xaCVr9wNfx8u5Yp
-        KrE+ciqNylLaeHJr6eeXva7QGFewJkakJig8Kxim/w==
-X-Google-Smtp-Source: APXvYqzcNw/Fw315XYUmtYdbQHBHfab17/P4MaPRH38Ob6gFaeYiPSmAfE5s06olKUIUuopNukGDlqBjM+ujZLSvy+8=
-X-Received: by 2002:adf:cc0a:: with SMTP id x10mr362155wrh.195.1569259453239;
- Mon, 23 Sep 2019 10:24:13 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id A26483082E6E;
+        Mon, 23 Sep 2019 17:34:24 +0000 (UTC)
+Received: from mail (ovpn-120-159.rdu2.redhat.com [10.10.120.159])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 12D4960852;
+        Mon, 23 Sep 2019 17:34:22 +0000 (UTC)
+Date:   Mon, 23 Sep 2019 13:34:21 -0400
+From:   Andrea Arcangeli <aarcange@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/17] x86: spec_ctrl: fix SPEC_CTRL initialization after
+ kexec
+Message-ID: <20190923173421.GA13551@redhat.com>
+References: <20190920212509.2578-1-aarcange@redhat.com>
+ <20190920212509.2578-2-aarcange@redhat.com>
+ <c56d8911-5323-ac40-97b3-fa8920725197@redhat.com>
+ <20190923153057.GA18195@linux.intel.com>
 MIME-Version: 1.0
-References: <20190919150314.054351477@linutronix.de> <20190919150809.446771597@linutronix.de>
- <20190923084718.GG2349@hirez.programming.kicks-ass.net> <alpine.DEB.2.21.1909231227050.2003@nanos.tec.linutronix.de>
- <20190923114920.GF2332@hirez.programming.kicks-ass.net> <20190923115551.GZ2386@hirez.programming.kicks-ass.net>
- <20190923121001.GG2332@hirez.programming.kicks-ass.net>
-In-Reply-To: <20190923121001.GG2332@hirez.programming.kicks-ass.net>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 23 Sep 2019 10:24:01 -0700
-X-Gmail-Original-Message-ID: <CALCETrW7T5KPCFO6vWUkExCYKdXVkv6mkfA53A542uxukP+eew@mail.gmail.com>
-Message-ID: <CALCETrW7T5KPCFO6vWUkExCYKdXVkv6mkfA53A542uxukP+eew@mail.gmail.com>
-Subject: Re: [RFC patch 10/15] x86/entry: Move irq tracing to C code
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Juergen Gross <jgross@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190923153057.GA18195@linux.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 23 Sep 2019 17:34:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 5:10 AM Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Mon, Sep 23, 2019 at 01:55:51PM +0200, Peter Zijlstra wrote:
-> > On Mon, Sep 23, 2019 at 01:49:20PM +0200, Peter Zijlstra wrote:
-> > > While walking the kids to school I wondered WTH we need to call
-> > > TRACE_IRQS_OFF in the first place. If this is the return from exception
-> > > path, interrupts had better be disabled already (in exception enter).
-> > >
-> > > For entry_64.S we have:
-> > >
-> > >   - idtentry_part; which does TRACE_IRQS_OFF at the start and error_exit
-> > >     at the end.
-> > >
-> > >   - xen_do_hypervisor_callback, xen_failsafe_callback -- which are
-> > >     confusing.
-> > >
-> > > So in the normal case, it appears we can simply do:
-> > >
-> > > diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-> > > index b7c3ea4cb19d..e9cf59ac554e 100644
-> > > --- a/arch/x86/entry/entry_64.S
-> > > +++ b/arch/x86/entry/entry_64.S
-> > > @@ -1368,8 +1368,6 @@ END(error_entry)
-> > >
-> > >  ENTRY(error_exit)
-> > >     UNWIND_HINT_REGS
-> > > -   DISABLE_INTERRUPTS(CLBR_ANY)
-> > > -   TRACE_IRQS_OFF
-> > >     testb   $3, CS(%rsp)
-> > >     jz      retint_kernel
-> > >     jmp     retint_user
-> > >
-> > > and all should be well. This leaves Xen...
-> > >
-> > > For entry_32.S it looks like nothing uses 'resume_userspace' so that
-> > > ENTRY can go away. Which then leaves:
-> > >
-> > >  * ret_from_intr:
-> > >   - common_spurious: TRACE_IRQS_OFF
-> > >   - common_interrupt: TRACE_IRQS_OFF
-> > >   - BUILD_INTERRUPT3: TRACE_IRQS_OFF
-> > >   - xen_do_upcall: ...
-> > >
-> > >  * ret_from_exception:
-> > >   - xen_failsafe_callback: ...
-> > >   - common_exception_read_cr2: TRACE_IRQS_OFF
-> > >   - common_exception: TRACE_IRQS_OFF
-> > >   - int3: TRACE_IRQS_OFF
-> > >
-> > > Which again suggests:
-> > >
-> > > diff --git a/arch/x86/entry/entry_32.S b/arch/x86/entry/entry_32.S
-> > > index f83ca5aa8b77..7a19e7413a8e 100644
-> > > --- a/arch/x86/entry/entry_32.S
-> > > +++ b/arch/x86/entry/entry_32.S
-> > > @@ -825,9 +825,6 @@ END(ret_from_fork)
-> > >     cmpl    $USER_RPL, %eax
-> > >     jb      restore_all_kernel              # not returning to v8086 or userspace
-> > >
-> > > -ENTRY(resume_userspace)
-> > > -   DISABLE_INTERRUPTS(CLBR_ANY)
-> > > -   TRACE_IRQS_OFF
-> > >     movl    %esp, %eax
-> > >     call    prepare_exit_to_usermode
-> > >     jmp     restore_all
-> > >
-> > > with the notable exception (oh teh pun!) being Xen... _again_.
-> > >
-> > > With these patchlets on, we'd want prepare_exit_to_usermode() to
-> > > validate the IRQ state, but AFAICT it _should_ all just 'work' (famous
-> > > last words).
-> > >
-> > > Cc Juergen because Xen
-> >
-> > Arrgh.. faults!! they do local_irq_enable() but never disable them
-> > again. Arguably those functions should be symmetric and restore IF when
-> > they muck with it instead of relying on the exit path fixing things up.
->
-> ---
-> diff --git a/arch/x86/entry/entry_32.S b/arch/x86/entry/entry_32.S
-> index f83ca5aa8b77..7a19e7413a8e 100644
-> --- a/arch/x86/entry/entry_32.S
-> +++ b/arch/x86/entry/entry_32.S
-> @@ -825,9 +825,6 @@ END(ret_from_fork)
->         cmpl    $USER_RPL, %eax
->         jb      restore_all_kernel              # not returning to v8086 or userspace
+Hello,
 
-...
+On Mon, Sep 23, 2019 at 08:30:57AM -0700, Sean Christopherson wrote:
+> On Mon, Sep 23, 2019 at 12:22:23PM +0200, Paolo Bonzini wrote:
+> > On 20/09/19 23:24, Andrea Arcangeli wrote:
+> > > We can't assume the SPEC_CTRL msr is zero at boot because it could be
+> > > left enabled by a previous kernel booted with
+> > > spec_store_bypass_disable=on.
+> > > 
+> > > Without this fix a boot with spec_store_bypass_disable=on followed by
+> > > a kexec boot with spec_store_bypass_disable=off would erroneously and
+> > > unexpectedly leave bit 2 set in SPEC_CTRL.
+> > > 
+> > > Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+> > 
+> > Can you send this out separately, so that Thomas et al. can pick it up
+> > as a bug fix?
 
-Yes, please, but can you add an assertion under CONFIG_DEBUG_ENTRY
-that IRQs are actually off?
+As specified in the cover letter 1/17 was already intended to be
+merged separately. I just keep this included in case people had the
+idea of using kexec to benchmark this work, because I was bitten by
+that bug myself and it wasted a few days worth of benchmarks.
+
+> Can all off the patches that are not directly related to the monolithic
+> conversion be sent separately?  AFAICT, patches 01, 03, 07, 08, 14, 15, 16
+> and 17 are not required or dependent on the conversion to a monolithic
+> module.  That's almost half the series...
+
+03 07 08 are directly related to the monolithic conversion as the
+subject of the patch clarifies. In fact I should try to reorder 7/8 in
+front to make things more bisectable under all config options.
+
+Per subject of the patch, 14 is also an optimization that while not a
+strict requirement, is somewhat related to the monolithic conversion
+because in fact it may naturally disappear if I rename the vmx/svm
+functions directly.
+
+15 16 17 don't have the monolithic tag in the subject of the patch and
+they're obviously unrelated to the monolithic conversion, but when I
+did the first research on this idea of dropping kvm.ko a couple of
+months ago, things didn't really work well until I got rid of those
+few last retpolines too. If felt as if the large retpoline regression
+wasn't linear with the number of retpolines executed for each vmexit,
+and that it was more linear with the percentage of vmexits that hit on
+any number of retpolines. So while they're not part of the monolithic
+conversion I assumed they're required to run any meaningful benchmark.
+
+I can drop 15 16 17 from further submits of course, after clarifying
+benchmark should be only run on the v1 full set I posted earlier, or
+they wouldn't be meaningful.
+
+Thanks,
+Andrea
