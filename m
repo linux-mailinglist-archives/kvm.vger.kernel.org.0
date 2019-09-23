@@ -2,536 +2,496 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F537BB670
-	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 16:16:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AD47BB722
+	for <lists+kvm@lfdr.de>; Mon, 23 Sep 2019 16:50:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730583AbfIWOQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 10:16:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28066 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728575AbfIWOQ0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Sep 2019 10:16:26 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8NEATNj054568
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 10:16:25 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v6x4g473f-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 10:16:20 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Mon, 23 Sep 2019 15:16:09 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 23 Sep 2019 15:16:05 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8NEFbJ930343512
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Sep 2019 14:15:37 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3056A4051;
-        Mon, 23 Sep 2019 14:16:04 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C1A77A4040;
-        Mon, 23 Sep 2019 14:16:03 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.36.175])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 23 Sep 2019 14:16:03 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH] s390x: Add initial smp code
-Date:   Mon, 23 Sep 2019 16:15:58 +0200
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <b60eee55-f013-411a-0e52-3f40a990b1c4@redhat.com>
-References: <b60eee55-f013-411a-0e52-3f40a990b1c4@redhat.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19092314-0008-0000-0000-00000319F784
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092314-0009-0000-0000-00004A38876B
-Message-Id: <20190923141558.3032-1-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-23_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909230139
+        id S2439949AbfIWOu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 10:50:28 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38967 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2438395AbfIWOu2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 10:50:28 -0400
+Received: by mail-io1-f66.google.com with SMTP id a1so34109715ioc.6;
+        Mon, 23 Sep 2019 07:50:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7Nd3CKf5FjQfvHJ6D/h33LRgK5F8lnMOSqBwhKuEq5Y=;
+        b=rP5oOBFqGkb44yhSCB/rLUqP+CtBQgqrmPWsad5zA7tFMfenpVbB9wh2V8KwcE8plz
+         hHfQQxoVRUC/qX7Gl+J/jd4gKJOeV+PxA8hLPdcO5dFyhY6aZbpLNOUcgR21EXQRkXIL
+         Q/zE/I01uJ263OWRDmKv/dliUqG51skTbNdEKzQYpjDal3uTU6xC+qmxCvCPeaHULYRv
+         +/D50eSNbGXncUUbZrrzKvx7r8EkKqVHELb1hyPupPATNS6D24cOaeVwDCPcjR19ASoi
+         GIA9ubc5zJ3elKYpukaM0SiVmIpzJAHzwZ3Bjg5e+Pd2qSPiA1vZPLQ7kADZFUnSopYs
+         hNwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7Nd3CKf5FjQfvHJ6D/h33LRgK5F8lnMOSqBwhKuEq5Y=;
+        b=KT52WFUjrYwoQUHvRNlBJIIuj3wvTg/TJceQ8GYEmEc79Ou4QT/Nbs9hQrIImnTIFu
+         ntCewcCou/M9B/GfsxU6PT0o9++XuRHmy4ebG+0hWwje6cUd77JwWfPdxjrJwMgv8msP
+         0Hj4LCiPYVlbIhyteingRDK6IyXh5Og0NW51t7/23m30Qd0wk7cXIgWUCQrWyBVIr0rI
+         1uyhMXzAxMLF+pEL9UtU193vZK6r7V9jZCgTbTmr266aL9brQ4H3mZw49WUypWjFSW0F
+         yx6hTFChjao+iH9/60O5fQT5HwRngRVCDz1LFkz7bt4wLMA9QM0UAvyqBWmGMU/VoN5R
+         BZwA==
+X-Gm-Message-State: APjAAAUhKofSprA9acj/oZTlUra108u0hDd5btdoAvSm+6hwGlOVLvQk
+        ljHeYgMT0eh+ESJaox+f+s0M+r2PKrBtWf3Mh9s=
+X-Google-Smtp-Source: APXvYqwelmkcS8fF4X7BkI3xfo/3OiC0q+PFOmLfXDz6qyIT0xipu0TlEgDl706EjEWbaoGzb3qFJJE4jxxff/4X/Ao=
+X-Received: by 2002:a6b:ac85:: with SMTP id v127mr297621ioe.97.1569250226739;
+ Mon, 23 Sep 2019 07:50:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190918175109.23474.67039.stgit@localhost.localdomain>
+ <20190918175249.23474.51171.stgit@localhost.localdomain> <20190923041330-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190923041330-mutt-send-email-mst@kernel.org>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Mon, 23 Sep 2019 07:50:15 -0700
+Message-ID: <CAKgT0UfFBO9h3heGSo+AaZgUNpy5uuOm3yh62bYwYJ5dq+t1gQ@mail.gmail.com>
+Subject: Re: [PATCH v10 3/6] mm: Introduce Reported pages
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        linux-mm <linux-mm@kvack.org>, Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's add a rudimentary SMP library, which will scan for cpus and has
-helper functions that manage the cpu state.
+On Mon, Sep 23, 2019 at 1:16 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Sep 18, 2019 at 10:52:49AM -0700, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> >
+> > In order to pave the way for free page reporting in virtualized
+> > environments we will need a way to get pages out of the free lists and
+> > identify those pages after they have been returned. To accomplish this,
+> > this patch adds the concept of a Reported Buddy, which is essentially
+> > meant to just be the Uptodate flag used in conjunction with the Buddy
+> > page type.
+> >
+> > It adds a set of pointers we shall call "reported_boundary" which
+> > represent the upper boundary between the unreported and reported pages.
+> > The general idea is that in order for a page to cross from one side of the
+> > boundary to the other it will need to verify that it went through the
+> > reporting process. Ultimately a free list has been fully processed when
+> > the boundary has been moved from the tail all they way up to occupying the
+> > first entry in the list.
+> >
+> > One limitation to this approach is that it is essentially a linear search
+> > and in the case of the free lists we can have pages added to either the
+> > head or the tail of the list. In order to place limits on this we only
+> > allow pages to be added before the reported_boundary instead of adding
+> > to the tail itself. An added advantage to this approach is that we should
+> > be reducing the overall memory footprint of the guest as it will be more
+> > likely to recycle warm pages versus trying to allocate the reported pages
+> > that were likely evicted from the guest memory.
+> >
+> > Since we will only be reporting one zone at a time we keep the boundary
+> > limited to being defined for just the zone we are currently reporting pages
+> > from. Doing this we can keep the number of additional pointers needed quite
+> > small. To flag that the boundaries are in place we use a single bit
+> > in the zone to indicate that reporting and the boundaries are active.
+> >
+> > We store the index of the boundary pointer used to track the reported page
+> > in the page->index value. Doing this we can avoid unnecessary computation
+> > to determine the index value again. There should be no issues with this as
+> > the value is unused when the page is in the buddy allocator, and is reset
+> > as soon as the page is removed from the free list.
+> >
+> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > ---
+> >  include/linux/mmzone.h     |   16 ++++
+> >  include/linux/page-flags.h |   11 +++
+> >  mm/Kconfig                 |   11 +++
+> >  mm/compaction.c            |    5 +
+> >  mm/memory_hotplug.c        |    2
+> >  mm/page_alloc.c            |   67 +++++++++++++++--
+> >  mm/page_reporting.h        |  178 ++++++++++++++++++++++++++++++++++++++++++++
+> >  7 files changed, 283 insertions(+), 7 deletions(-)
+> >  create mode 100644 mm/page_reporting.h
+> >
+> > diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+> > index 270a7b493174..53922c30b8d8 100644
+> > --- a/include/linux/mmzone.h
+> > +++ b/include/linux/mmzone.h
+> > @@ -463,6 +463,14 @@ struct zone {
+> >       seqlock_t               span_seqlock;
+> >  #endif
+> >
+> > +#ifdef CONFIG_PAGE_REPORTING
+> > +     /*
+> > +      * Pointer to reported page tracking statistics array. The size of
+> > +      * the array is MAX_ORDER - PAGE_REPORTING_MIN_ORDER. NULL when
+> > +      * unused page reporting is not present.
+> > +      */
+> > +     unsigned long           *reported_pages;
+> > +#endif
+> >       int initialized;
+> >
+> >       /* Write-intensive fields used from the page allocator */
+> > @@ -538,6 +546,14 @@ enum zone_flags {
+> >       ZONE_BOOSTED_WATERMARK,         /* zone recently boosted watermarks.
+> >                                        * Cleared when kswapd is woken.
+> >                                        */
+> > +     ZONE_PAGE_REPORTING_ACTIVE,     /* zone enabled page reporting and is
+> > +                                      * activly flushing the data out of
+> > +                                      * higher order pages.
+> > +                                      */
+> > +     ZONE_PAGE_REPORTING_REQUESTED,  /* zone enabled page reporting and has
+> > +                                      * requested flushing the data out of
+> > +                                      * higher order pages.
+> > +                                      */
+> >  };
+> >
+> >  static inline unsigned long zone_managed_pages(struct zone *zone)
+> > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> > index f91cb8898ff0..759a3b3956f2 100644
+> > --- a/include/linux/page-flags.h
+> > +++ b/include/linux/page-flags.h
+> > @@ -163,6 +163,9 @@ enum pageflags {
+> >
+> >       /* non-lru isolated movable page */
+> >       PG_isolated = PG_reclaim,
+> > +
+> > +     /* Buddy pages. Used to track which pages have been reported */
+> > +     PG_reported = PG_uptodate,
+> >  };
+> >
+> >  #ifndef __GENERATING_BOUNDS_H
+> > @@ -432,6 +435,14 @@ static inline bool set_hwpoison_free_buddy_page(struct page *page)
+> >  #endif
+> >
+> >  /*
+> > + * PageReported() is used to track reported free pages within the Buddy
+> > + * allocator. We can use the non-atomic version of the test and set
+> > + * operations as both should be shielded with the zone lock to prevent
+> > + * any possible races on the setting or clearing of the bit.
+> > + */
+> > +__PAGEFLAG(Reported, reported, PF_NO_COMPOUND)
+> > +
+> > +/*
+> >   * On an anonymous page mapped into a user virtual memory area,
+> >   * page->mapping points to its anon_vma, not to a struct address_space;
+> >   * with the PAGE_MAPPING_ANON bit set to distinguish it.  See rmap.h.
+> > diff --git a/mm/Kconfig b/mm/Kconfig
+> > index a5dae9a7eb51..0419b2a9be3e 100644
+> > --- a/mm/Kconfig
+> > +++ b/mm/Kconfig
+> > @@ -237,6 +237,17 @@ config COMPACTION
+> >            linux-mm@kvack.org.
+> >
+> >  #
+> > +# support for unused page reporting
+> > +config PAGE_REPORTING
+> > +     bool "Allow for reporting of unused pages"
+> > +     def_bool n
+> > +     help
+> > +       Unused page reporting allows for the incremental acquisition of
+> > +       unused pages from the buddy allocator for the purpose of reporting
+> > +       those pages to another entity, such as a hypervisor, so that the
+> > +       memory can be freed up for other uses.
+> > +
+> > +#
+> >  # support for page migration
+> >  #
+> >  config MIGRATION
+> > diff --git a/mm/compaction.c b/mm/compaction.c
+> > index ce08b39d85d4..60e064330b3a 100644
+> > --- a/mm/compaction.c
+> > +++ b/mm/compaction.c
+> > @@ -24,6 +24,7 @@
+> >  #include <linux/page_owner.h>
+> >  #include <linux/psi.h>
+> >  #include "internal.h"
+> > +#include "page_reporting.h"
+> >
+> >  #ifdef CONFIG_COMPACTION
+> >  static inline void count_compact_event(enum vm_event_item item)
+> > @@ -1325,6 +1326,8 @@ static int next_search_order(struct compact_control *cc, int order)
+> >                       continue;
+> >
+> >               spin_lock_irqsave(&cc->zone->lock, flags);
+> > +             page_reporting_free_area_release(cc->zone, order,
+> > +                                              MIGRATE_MOVABLE);
+> >               freelist = &area->free_list[MIGRATE_MOVABLE];
+> >               list_for_each_entry_reverse(freepage, freelist, lru) {
+> >                       unsigned long pfn;
+> > @@ -1681,6 +1684,8 @@ static unsigned long fast_find_migrateblock(struct compact_control *cc)
+> >                       continue;
+> >
+> >               spin_lock_irqsave(&cc->zone->lock, flags);
+> > +             page_reporting_free_area_release(cc->zone, order,
+> > +                                              MIGRATE_MOVABLE);
+> >               freelist = &area->free_list[MIGRATE_MOVABLE];
+> >               list_for_each_entry(freepage, freelist, lru) {
+> >                       unsigned long free_pfn;
+> > diff --git a/mm/memory_hotplug.c b/mm/memory_hotplug.c
+> > index 49f7bf91c25a..09c6f52e2bc5 100644
+> > --- a/mm/memory_hotplug.c
+> > +++ b/mm/memory_hotplug.c
+> > @@ -41,6 +41,7 @@
+> >
+> >  #include "internal.h"
+> >  #include "shuffle.h"
+> > +#include "page_reporting.h"
+> >
+> >  /*
+> >   * online_page_callback contains pointer to current page onlining function.
+> > @@ -1613,6 +1614,7 @@ static int __ref __offline_pages(unsigned long start_pfn,
+> >       if (!populated_zone(zone)) {
+> >               zone_pcp_reset(zone);
+> >               build_all_zonelists(NULL);
+> > +             page_reporting_reset_zone(zone);
+> >       } else
+> >               zone_pcp_update(zone);
+> >
+> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> > index f8271ec8e06e..ed0128c65936 100644
+> > --- a/mm/page_alloc.c
+> > +++ b/mm/page_alloc.c
+> > @@ -74,6 +74,7 @@
+> >  #include <asm/div64.h>
+> >  #include "internal.h"
+> >  #include "shuffle.h"
+> > +#include "page_reporting.h"
+> >
+> >  /* prevent >1 _updater_ of zone percpu pageset ->high and ->batch fields */
+> >  static DEFINE_MUTEX(pcp_batch_high_lock);
+> > @@ -891,10 +892,15 @@ static inline void add_to_free_list(struct page *page, struct zone *zone,
+> >  static inline void add_to_free_list_tail(struct page *page, struct zone *zone,
+> >                                        unsigned int order, int migratetype)
+> >  {
+> > -     struct free_area *area = &zone->free_area[order];
+> > +     struct list_head *tail = get_unreported_tail(zone, order, migratetype);
+> >
+> > -     list_add_tail(&page->lru, &area->free_list[migratetype]);
+> > -     area->nr_free++;
+> > +     /*
+> > +      * To prevent the unreported pages from slipping behind our iterator
+> > +      * we will force them to be inserted in front of it. By doing this
+> > +      * we should only need to make one pass through the freelist.
+> > +      */
+> > +     list_add_tail(&page->lru, tail);
+> > +     zone->free_area[order].nr_free++;
+> >  }
+> >
+> >  /* Used for pages which are on another list */
+> > @@ -903,12 +909,20 @@ static inline void move_to_free_list(struct page *page, struct zone *zone,
+> >  {
+> >       struct free_area *area = &zone->free_area[order];
+> >
+> > +     /* Make certain the page isn't occupying the boundary */
+> > +     if (unlikely(PageReported(page)))
+> > +             __del_page_from_reported_list(page, zone);
+> > +
+> >       list_move(&page->lru, &area->free_list[migratetype]);
+> >  }
+> >
+> >  static inline void del_page_from_free_list(struct page *page, struct zone *zone,
+> >                                          unsigned int order)
+> >  {
+> > +     /* remove page from reported list, and clear reported state */
+> > +     if (unlikely(PageReported(page)))
+> > +             del_page_from_reported_list(page, zone, order);
+> > +
+> >       list_del(&page->lru);
+> >       __ClearPageBuddy(page);
+> >       set_page_private(page, 0);
+> > @@ -972,7 +986,7 @@ static inline void del_page_from_free_list(struct page *page, struct zone *zone,
+> >  static inline void __free_one_page(struct page *page,
+> >               unsigned long pfn,
+> >               struct zone *zone, unsigned int order,
+> > -             int migratetype)
+> > +             int migratetype, bool reported)
+> >  {
+> >       struct capture_control *capc = task_capc(zone);
+> >       unsigned long uninitialized_var(buddy_pfn);
+> > @@ -1048,7 +1062,9 @@ static inline void __free_one_page(struct page *page,
+> >  done_merging:
+> >       set_page_order(page, order);
+> >
+> > -     if (is_shuffle_order(order))
+> > +     if (reported)
+> > +             to_tail = true;
+> > +     else if (is_shuffle_order(order))
+> >               to_tail = shuffle_pick_tail();
+> >       else
+> >               to_tail = buddy_merge_likely(pfn, buddy_pfn, page, order);
+> > @@ -1367,7 +1383,7 @@ static void free_pcppages_bulk(struct zone *zone, int count,
+> >               if (unlikely(isolated_pageblocks))
+> >                       mt = get_pageblock_migratetype(page);
+> >
+> > -             __free_one_page(page, page_to_pfn(page), zone, 0, mt);
+> > +             __free_one_page(page, page_to_pfn(page), zone, 0, mt, false);
+> >               trace_mm_page_pcpu_drain(page, 0, mt);
+> >       }
+> >       spin_unlock(&zone->lock);
+> > @@ -1383,7 +1399,7 @@ static void free_one_page(struct zone *zone,
+> >               is_migrate_isolate(migratetype))) {
+> >               migratetype = get_pfnblock_migratetype(page, pfn);
+> >       }
+> > -     __free_one_page(page, pfn, zone, order, migratetype);
+> > +     __free_one_page(page, pfn, zone, order, migratetype, false);
+> >       spin_unlock(&zone->lock);
+> >  }
+> >
+> > @@ -2245,6 +2261,43 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
+> >       return NULL;
+> >  }
+> >
+> > +#ifdef CONFIG_PAGE_REPORTING
+> > +struct list_head **reported_boundary __read_mostly;
+> > +
+> > +/**
+> > + * free_reported_page - Return a now-reported page back where we got it
+> > + * @page: Page that was reported
+> > + * @order: Order of the reported page
+> > + *
+> > + * This function will pull the migratetype and order information out
+> > + * of the page and attempt to return it where it found it. If the page
+> > + * is added to the free list without changes we will mark it as being
+> > + * reported.
+> > + */
+> > +void free_reported_page(struct page *page, unsigned int order)
+> > +{
+> > +     struct zone *zone = page_zone(page);
+> > +     unsigned long pfn;
+> > +     unsigned int mt;
+> > +
+> > +     /* zone lock should be held when this function is called */
+> > +     lockdep_assert_held(&zone->lock);
+> > +
+> > +     pfn = page_to_pfn(page);
+> > +     mt = get_pfnblock_migratetype(page, pfn);
+> > +     __free_one_page(page, pfn, zone, order, mt, true);
+> > +
+> > +     /*
+> > +      * If page was not comingled with another page we can consider
+> > +      * the result to be "reported" since part of the page hasn't been
+> > +      * modified, otherwise we would need to report on the new larger
+> > +      * page.
+> > +      */
+> > +     if (PageBuddy(page) && page_order(page) == order)
+> > +             add_page_to_reported_list(page, zone, order, mt);
+> > +}
+> > +#endif /* CONFIG_PAGE_REPORTING */
+> > +
+> >  /*
+> >   * This array describes the order lists are fallen back to when
+> >   * the free lists for the desirable migrate type are depleted
+> > diff --git a/mm/page_reporting.h b/mm/page_reporting.h
+> > new file mode 100644
+> > index 000000000000..c5e1bb58ad96
+> > --- /dev/null
+> > +++ b/mm/page_reporting.h
+> > @@ -0,0 +1,178 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef _MM_PAGE_REPORTING_H
+> > +#define _MM_PAGE_REPORTING_H
+> > +
+> > +#include <linux/mmzone.h>
+> > +#include <linux/pageblock-flags.h>
+> > +#include <linux/page-isolation.h>
+> > +#include <linux/jump_label.h>
+> > +#include <linux/slab.h>
+> > +#include <asm/pgtable.h>
+> > +
+> > +#define PAGE_REPORTING_MIN_ORDER     pageblock_order
+> > +#define PAGE_REPORTING_HWM           32
+> > +
+> > +#ifdef CONFIG_PAGE_REPORTING
+> > +/* Reported page accessors, defined in page_alloc.c */
+> > +void free_reported_page(struct page *page, unsigned int order);
+> > +
+> > +/* Free reported_pages and reset reported page tracking count to 0 */
+> > +static inline void page_reporting_reset_zone(struct zone *zone)
+> > +{
+> > +     kfree(zone->reported_pages);
+> > +     zone->reported_pages = NULL;
+> > +}
+> > +
+> > +/* Boundary functions */
+> > +static inline pgoff_t
+> > +get_reporting_index(unsigned int order, unsigned int migratetype)
+> > +{
+> > +     /*
+> > +      * We will only ever be dealing with pages greater-than or equal to
+> > +      * PAGE_REPORTING_MIN_ORDER. Since that is the case we can avoid
+> > +      * allocating unused space by limiting our index range to only the
+> > +      * orders that are supported for page reporting.
+> > +      */
+> > +     return (order - PAGE_REPORTING_MIN_ORDER) * MIGRATE_TYPES + migratetype;
+> > +}
+> > +
+> > +extern struct list_head **reported_boundary __read_mostly;
+> > +
+> > +static inline void
+> > +page_reporting_reset_boundary(struct zone *zone, unsigned int order, int mt)
+> > +{
+> > +     int index;
+> > +
+> > +     if (order < PAGE_REPORTING_MIN_ORDER)
+> > +             return;
+> > +     if (!test_bit(ZONE_PAGE_REPORTING_ACTIVE, &zone->flags))
+> > +             return;
+> > +
+> > +     index = get_reporting_index(order, mt);
+> > +     reported_boundary[index] = &zone->free_area[order].free_list[mt];
+> > +}
+>
+> So this seems to be costly.
+> I'm guessing it's the access to flags:
+>
+>
+>         /* zone flags, see below */
+>         unsigned long           flags;
+>
+>         /* Primarily protects free_area */
+>         spinlock_t              lock;
+>
+>
+>
+> which is in the same cache line as the lock.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
+I'm not sure what you mean by this being costly?
 
-I left the setup code untouched, as I didn't want to indent too many
-lines.
+Also, at least on my system, pahole seems to indicate they are in
+different cache lines.
 
----
- lib/s390x/asm/arch_def.h |   8 ++
- lib/s390x/asm/sigp.h     |  28 ++++-
- lib/s390x/io.c           |   5 +-
- lib/s390x/sclp.h         |   1 +
- lib/s390x/smp.c          | 252 +++++++++++++++++++++++++++++++++++++++
- lib/s390x/smp.h          |  51 ++++++++
- s390x/Makefile           |   1 +
- s390x/cstart64.S         |   7 ++
- 8 files changed, 347 insertions(+), 6 deletions(-)
- create mode 100644 lib/s390x/smp.c
- create mode 100644 lib/s390x/smp.h
+/* --- cacheline 3 boundary (192 bytes) --- */
+struct zone_padding        _pad1_;               /*   192     0 */
+struct free_area           free_area[11];        /*   192  1144 */
+/* --- cacheline 20 boundary (1280 bytes) was 56 bytes ago --- */
+long unsigned int          flags;                /*  1336     8 */
+/* --- cacheline 21 boundary (1344 bytes) --- */
+spinlock_t                 lock;                 /*  1344     4 */
 
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 5f8f45e..d5a7f51 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -157,6 +157,14 @@ struct cpuid {
- 	uint64_t reserved : 15;
- };
- 
-+static inline unsigned short stap(void)
-+{
-+	unsigned short cpu_address;
-+
-+	asm volatile("stap %0" : "=Q" (cpu_address));
-+	return cpu_address;
-+}
-+
- static inline int tprot(unsigned long addr)
- {
- 	int cc;
-diff --git a/lib/s390x/asm/sigp.h b/lib/s390x/asm/sigp.h
-index fbd94fc..2d52313 100644
---- a/lib/s390x/asm/sigp.h
-+++ b/lib/s390x/asm/sigp.h
-@@ -46,14 +46,32 @@
- 
- #ifndef __ASSEMBLER__
- 
--static inline void sigp_stop(void)
-+
-+static inline int sigp(uint16_t addr, uint8_t order, unsigned long parm,
-+		       uint32_t *status)
- {
--	register unsigned long status asm ("1") = 0;
--	register unsigned long cpu asm ("2") = 0;
-+	register unsigned long reg1 asm ("1") = parm;
-+	int cc;
- 
- 	asm volatile(
--		"	sigp %0,%1,0(%2)\n"
--		: "+d" (status)  : "d" (cpu), "d" (SIGP_STOP) : "cc");
-+		"	sigp	%1,%2,0(%3)\n"
-+		"	ipm	%0\n"
-+		"	srl	%0,28\n"
-+		: "=d" (cc), "+d" (reg1) : "d" (addr), "a" (order) : "cc");
-+	if (status)
-+		*status = reg1;
-+	return cc;
-+}
-+
-+static inline int sigp_retry(uint16_t addr, uint8_t order, unsigned long parm,
-+			     uint32_t *status)
-+{
-+	int cc;
-+
-+	do {
-+		cc = sigp(addr, order, parm, status);
-+	} while (cc == 2);
-+	return cc;
- }
- 
- #endif /* __ASSEMBLER__ */
-diff --git a/lib/s390x/io.c b/lib/s390x/io.c
-index becadfc..32f09b5 100644
---- a/lib/s390x/io.c
-+++ b/lib/s390x/io.c
-@@ -16,6 +16,7 @@
- #include <asm/facility.h>
- #include <asm/sigp.h>
- #include "sclp.h"
-+#include "smp.h"
- 
- extern char ipl_args[];
- uint8_t stfl_bytes[NR_STFL_BYTES] __attribute__((aligned(8)));
-@@ -37,12 +38,14 @@ void setup(void)
- 	setup_facilities();
- 	sclp_console_setup();
- 	sclp_memory_setup();
-+	smp_setup();
- }
- 
- void exit(int code)
- {
-+	smp_teardown();
- 	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
- 	while (1) {
--		sigp_stop();
-+		sigp(0, SIGP_STOP, 0, NULL);
- 	}
- }
-diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-index 98c482a..4e69845 100644
---- a/lib/s390x/sclp.h
-+++ b/lib/s390x/sclp.h
-@@ -19,6 +19,7 @@
- #define SCLP_CMD_CODE_MASK                      0xffff00ff
- 
- /* SCLP command codes */
-+#define SCLP_READ_CPU_INFO			0x00010001
- #define SCLP_CMDW_READ_SCP_INFO                 0x00020001
- #define SCLP_CMDW_READ_SCP_INFO_FORCED          0x00120001
- #define SCLP_READ_STORAGE_ELEMENT_INFO          0x00040001
-diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-new file mode 100644
-index 0000000..7602886
---- /dev/null
-+++ b/lib/s390x/smp.c
-@@ -0,0 +1,252 @@
-+/*
-+ * s390x smp
-+ * Based on Linux's arch/s390/kernel/smp.c and
-+ * arch/s390/include/asm/sigp.h
-+ *
-+ * Copyright (c) 2019 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+#include <libcflat.h>
-+#include <asm/arch_def.h>
-+#include <asm/sigp.h>
-+#include <asm/page.h>
-+#include <asm/barrier.h>
-+#include <asm/spinlock.h>
-+#include <asm/asm-offsets.h>
-+
-+#include <alloc.h>
-+#include <alloc_page.h>
-+
-+#include "smp.h"
-+#include "sclp.h"
-+
-+static char cpu_info_buffer[PAGE_SIZE] __attribute__((__aligned__(4096)));
-+static struct cpu *cpus;
-+static struct cpu *cpu0;
-+static struct spinlock lock;
-+
-+extern void smp_cpu_setup_state(void);
-+
-+int smp_query_num_cpus(void)
-+{
-+	struct ReadCpuInfo *info = (void *)cpu_info_buffer;
-+	return info->nr_configured;
-+}
-+
-+struct cpu *smp_cpu_from_addr(uint16_t addr)
-+{
-+	int i, num = smp_query_num_cpus();
-+
-+	for (i = 0; i < num; i++) {
-+		if (cpus[i].addr == addr)
-+			return &cpus[i];
-+	}
-+	return NULL;
-+}
-+
-+bool smp_cpu_stopped(uint16_t addr)
-+{
-+	uint32_t status;
-+
-+	if (sigp(addr, SIGP_SENSE, 0, &status) != SIGP_CC_STATUS_STORED)
-+		return false;
-+	return !!(status & (SIGP_STATUS_CHECK_STOP|SIGP_STATUS_STOPPED));
-+}
-+
-+bool smp_cpu_running(uint16_t addr)
-+{
-+	if (sigp(addr, SIGP_SENSE_RUNNING, 0, NULL) != SIGP_CC_STATUS_STORED)
-+		return true;
-+	/* Status stored condition code is equivalent to cpu not running. */
-+	return false;
-+}
-+
-+static int smp_cpu_stop_nolock(uint16_t addr, bool store)
-+{
-+	struct cpu *cpu;
-+	uint8_t order = store ? SIGP_STOP_AND_STORE_STATUS : SIGP_STOP;
-+
-+	cpu = smp_cpu_from_addr(addr);
-+	if (!cpu || cpu == cpu0)
-+		return -1;
-+
-+	if (sigp_retry(addr, order, 0, NULL))
-+		return -1;
-+
-+	while (!smp_cpu_stopped(addr))
-+		mb();
-+	cpu->active = false;
-+	return 0;
-+}
-+
-+int smp_cpu_stop(uint16_t addr)
-+{
-+	int rc;
-+
-+	spin_lock(&lock);
-+	rc = smp_cpu_stop_nolock(addr, false);
-+	spin_unlock(&lock);
-+	return rc;
-+}
-+
-+int smp_cpu_stop_store_status(uint16_t addr)
-+{
-+	int rc;
-+
-+	spin_lock(&lock);
-+	rc = smp_cpu_stop_nolock(addr, true);
-+	spin_unlock(&lock);
-+	return rc;
-+}
-+
-+int smp_cpu_restart(uint16_t addr)
-+{
-+	int rc = -1;
-+	struct cpu *cpu;
-+
-+	spin_lock(&lock);
-+	cpu = smp_cpu_from_addr(addr);
-+	if (cpu) {
-+		rc = sigp(addr, SIGP_RESTART, 0, NULL);
-+		cpu->active = true;
-+	}
-+	spin_unlock(&lock);
-+	return rc;
-+}
-+
-+int smp_cpu_start(uint16_t addr, struct psw psw)
-+{
-+	int rc = -1;
-+	struct cpu *cpu;
-+	struct lowcore *lc;
-+
-+	spin_lock(&lock);
-+	cpu = smp_cpu_from_addr(addr);
-+	if (cpu) {
-+		lc = cpu->lowcore;
-+		lc->restart_new_psw.mask = psw.mask;
-+		lc->restart_new_psw.addr = psw.addr;
-+		rc = sigp(addr, SIGP_RESTART, 0, NULL);
-+	}
-+	spin_unlock(&lock);
-+	return rc;
-+}
-+
-+int smp_cpu_destroy(uint16_t addr)
-+{
-+	struct cpu *cpu;
-+	int rc;
-+
-+	spin_lock(&lock);
-+	rc = smp_cpu_stop_nolock(addr, false);
-+	if (!rc) {
-+		cpu = smp_cpu_from_addr(addr);
-+		free_pages(cpu->lowcore, 2 * PAGE_SIZE);
-+		free_pages(cpu->stack, 4 * PAGE_SIZE);
-+		cpu->lowcore = (void *)-1UL;
-+		cpu->stack = (void *)-1UL;
-+	}
-+	spin_unlock(&lock);
-+	return rc;
-+}
-+
-+int smp_cpu_setup(uint16_t addr, struct psw psw)
-+{
-+	struct lowcore *lc;
-+	struct cpu *cpu;
-+	int rc = -1;
-+
-+	spin_lock(&lock);
-+
-+	if (!cpus)
-+		goto out;
-+
-+	cpu = smp_cpu_from_addr(addr);
-+
-+	if (!cpu || cpu->active)
-+		goto out;
-+
-+	sigp_retry(cpu->addr, SIGP_INITIAL_CPU_RESET, 0, NULL);
-+
-+	lc = alloc_pages(1);
-+	cpu->lowcore = lc;
-+	memset(lc, 0, PAGE_SIZE * 2);
-+	sigp_retry(cpu->addr, SIGP_SET_PREFIX, (unsigned long )lc, NULL);
-+
-+	/* Copy all exception psws. */
-+	memcpy(lc, cpu0->lowcore, 512);
-+
-+	/* Setup stack */
-+	cpu->stack = (uint64_t *)alloc_pages(2);
-+
-+	/* Start without DAT and any other mask bits. */
-+	cpu->lowcore->sw_int_grs[14] = psw.addr;
-+	cpu->lowcore->sw_int_grs[15] = (uint64_t)cpu->stack + (PAGE_SIZE * 4);
-+	lc->restart_new_psw.mask = 0x0000000180000000UL;
-+	lc->restart_new_psw.addr = (uint64_t)smp_cpu_setup_state;
-+	lc->sw_int_cr0 = 0x0000000000040000UL;
-+
-+	/* Start processing */
-+	rc = sigp_retry(cpu->addr, SIGP_RESTART, 0, NULL);
-+	if (!rc)
-+		cpu->active = true;
-+
-+out:
-+	spin_unlock(&lock);
-+	return rc;
-+}
-+
-+/*
-+ * Disregarding state, stop all cpus that once were online except for
-+ * calling cpu.
-+ */
-+void smp_teardown(void)
-+{
-+	int i = 0;
-+	uint16_t this_cpu = stap();
-+	struct ReadCpuInfo *info = (void *)cpu_info_buffer;
-+
-+	spin_lock(&lock);
-+	for (; i < info->nr_configured; i++) {
-+		if (cpus[i].active &&
-+		    cpus[i].addr != this_cpu) {
-+			sigp_retry(cpus[i].addr, SIGP_STOP, 0, NULL);
-+		}
-+	}
-+	spin_unlock(&lock);
-+}
-+
-+/*Expected to be called from boot cpu */
-+extern uint64_t *stackptr;
-+void smp_setup(void)
-+{
-+	int i = 0;
-+	unsigned short cpu0_addr = stap();
-+	struct ReadCpuInfo *info = (void *)cpu_info_buffer;
-+
-+	spin_lock(&lock);
-+	sclp_mark_busy();
-+	info->h.length = PAGE_SIZE;
-+	sclp_service_call(SCLP_READ_CPU_INFO, cpu_info_buffer);
-+
-+	if (smp_query_num_cpus() > 1)
-+		printf("SMP: Initializing, found %d cpus\n", info->nr_configured);
-+
-+	cpus = calloc(info->nr_configured, sizeof(cpus));
-+	for (i = 0; i < info->nr_configured; i++) {
-+		cpus[i].addr = info->entries[i].address;
-+		cpus[i].active = false;
-+		if (info->entries[i].address == cpu0_addr) {
-+			cpu0 = &cpus[i];
-+			cpu0->stack = stackptr;
-+			cpu0->lowcore = (void *)0;
-+			cpu0->active = true;
-+		}
-+	}
-+	spin_unlock(&lock);
-+}
-diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
-new file mode 100644
-index 0000000..4476c31
---- /dev/null
-+++ b/lib/s390x/smp.h
-@@ -0,0 +1,51 @@
-+/*
-+ * s390x smp
-+ *
-+ * Copyright (c) 2019 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+#ifndef SMP_H
-+#define SMP_H
-+
-+struct cpu {
-+	struct lowcore *lowcore;
-+	uint64_t *stack;
-+	uint16_t addr;
-+	bool active;
-+};
-+
-+struct cpu_status {
-+    uint64_t    fprs[16];                       /* 0x0000 */
-+    uint64_t    grs[16];                        /* 0x0080 */
-+    struct psw  psw;                            /* 0x0100 */
-+    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
-+    uint32_t    prefix;                         /* 0x0118 */
-+    uint32_t    fpc;                            /* 0x011c */
-+    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
-+    uint32_t    todpr;                          /* 0x0124 */
-+    uint64_t    cputm;                          /* 0x0128 */
-+    uint64_t    ckc;                            /* 0x0130 */
-+    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
-+    uint32_t    ars[16];                        /* 0x0140 */
-+    uint64_t    crs[16];                        /* 0x0384 */
-+};
-+
-+int smp_query_num_cpus(void);
-+struct cpu *smp_cpu_from_addr(uint16_t addr);
-+bool smp_cpu_stopped(uint16_t addr);
-+bool smp_cpu_running(uint16_t addr);
-+int smp_cpu_restart(uint16_t addr);
-+int smp_cpu_start(uint16_t addr, struct psw psw);
-+int smp_cpu_stop(uint16_t addr);
-+int smp_cpu_stop_store_status(uint16_t addr);
-+int smp_cpu_destroy(uint16_t addr);
-+int smp_cpu_setup(uint16_t addr, struct psw psw);
-+void smp_teardown(void);
-+void smp_setup(void);
-+
-+#endif
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 96033dd..d83dd0b 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -48,6 +48,7 @@ cflatobjs += lib/s390x/sclp.o
- cflatobjs += lib/s390x/sclp-console.o
- cflatobjs += lib/s390x/interrupt.o
- cflatobjs += lib/s390x/mmu.o
-+cflatobjs += lib/s390x/smp.o
- 
- OBJDIRS += lib/s390x
- 
-diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-index 36f7cab..5dc1577 100644
---- a/s390x/cstart64.S
-+++ b/s390x/cstart64.S
-@@ -172,6 +172,13 @@ diag308_load_reset:
- 	lhi	%r2, 1
- 	br	%r14
- 
-+.globl smp_cpu_setup_state
-+smp_cpu_setup_state:
-+	xgr	%r1, %r1
-+	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
-+	lctlg   %c0, %c0, GEN_LC_SW_INT_CR0
-+	br	%r14
-+
- pgm_int:
- 	SAVE_REGS
- 	brasl	%r14, handle_pgm_int
--- 
-2.17.2
+Basically these flags aren't supposed to be touched unless we are
+holding the lock anyway so I am not sure it would be all that costly
+for this setup. Basically we are holding the lock when the flag is set
+or cleared, and we only set it if it is not already set. If needed
+though I suppose I could look at moving the flags if you think that is
+an issue. However I would probably need to add some additional padding
+to prevent the lock from getting into the same cache line as the
+free_area values.
 
+- Alex
