@@ -2,56 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC7D4BC2AD
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 09:32:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3056FBC2B3
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 09:33:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408035AbfIXHcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 03:32:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56140 "EHLO mx1.redhat.com"
+        id S2502383AbfIXHdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 03:33:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50180 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391594AbfIXHcR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 03:32:17 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S2438456AbfIXHdF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 03:33:05 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2B47830860B9;
-        Tue, 24 Sep 2019 07:32:17 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3493E30860C8;
+        Tue, 24 Sep 2019 07:33:05 +0000 (UTC)
 Received: from redhat.com (ovpn-117-109.ams2.redhat.com [10.36.117.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B35D86017E;
-        Tue, 24 Sep 2019 07:32:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BB04410027B6;
+        Tue, 24 Sep 2019 07:33:04 +0000 (UTC)
 From:   Juan Quintela <quintela@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     kvm-devel <kvm@vger.kernel.org>
-Subject: Re: KVM call for 2019-09-24
-In-Reply-To: <87r24exdhu.fsf@trasno.org> (Juan Quintela's message of "Wed, 18
-        Sep 2019 09:36:13 +0200")
-References: <87r24exdhu.fsf@trasno.org>
+To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
+Subject: KVM call for 2019-10-08
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 Reply-To: quintela@redhat.com
-Date:   Tue, 24 Sep 2019 09:32:14 +0200
-Message-ID: <87ef0640ap.fsf@trasno.org>
+Date:   Tue, 24 Sep 2019 09:33:02 +0200
+Message-ID: <878sqe409d.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 24 Sep 2019 07:32:17 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 24 Sep 2019 07:33:05 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Juan Quintela <quintela@redhat.com> wrote:
-> Hi
->
-> Please, send any topic that you are interested in covering.
->
-> At the end of Monday I will send an email with the agenda or the
-> cancellation of the call, so hurry up.
->
-> After discussions on the QEMU Summit, we are going to have always open a
-> KVM call where you can add topics.
+
 
 Hi
 
-As there are no topics for the agenda, call gets cancelled.
+Please, send any topic that you are interested in covering.
 
-Happy hacking, Juan.
+At the end of Monday I will send an email with the agenda or the
+cancellation of the call, so hurry up.
+
+After discussions on the QEMU Summit, we are going to have always open a
+KVM call where you can add topics.
+
+ Call details:
+
+By popular demand, a google calendar public entry with it
+
+  https://www.google.com/calendar/embed?src=dG9iMXRqcXAzN3Y4ZXZwNzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+
+(Let me know if you have any problems with the calendar entry.  I just
+gave up about getting right at the same time CEST, CET, EDT and DST).
+
+If you need phone number details,  contact me privately.
+
+Thanks, Juan.
