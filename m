@@ -2,142 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A904FBD35F
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 22:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE480BD362
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 22:15:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731775AbfIXUOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 16:14:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36094 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726254AbfIXUOV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 16:14:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 81EA410CC201;
-        Tue, 24 Sep 2019 20:14:20 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F41860852;
-        Tue, 24 Sep 2019 20:14:17 +0000 (UTC)
-Date:   Tue, 24 Sep 2019 14:14:17 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tina Zhang <tina.zhang@intel.com>
-Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kechen Lu <kechen.lu@intel.com>,
-        kraxel@redhat.com, zhenyuw@linux.intel.com, zhiyuan.lv@intel.com,
-        zhi.a.wang@intel.com, kevin.tian@intel.com, hang.yuan@intel.com,
-        yi.l.liu@intel.com
-Subject: Re: [PATCH v6 5/6] drm/i915/gvt: Deliver async primary plane page
- flip events at vblank
-Message-ID: <20190924141417.7442bcb3@x1.home>
-In-Reply-To: <20190924064143.9282-6-tina.zhang@intel.com>
-References: <20190924064143.9282-1-tina.zhang@intel.com>
-        <20190924064143.9282-6-tina.zhang@intel.com>
-Organization: Red Hat
+        id S1726254AbfIXUPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 16:15:01 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44549 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732269AbfIXUPB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 16:15:01 -0400
+Received: by mail-io1-f65.google.com with SMTP id j4so7604831iog.11
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 13:15:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DI0egddMaTlmXPpI6j4ITK90qBcGxWnZ/Lc990IvF2Y=;
+        b=JTMndQ+nYpdyNF5MJOGWUHZv+QevSaM0HzuyG4IdtM+xtvoSK1XA6X5CBcgkwcsFmA
+         3GUTDUHSWAunyQPQX5jfxq+rvzj+h6POMg142essaWiGeLpd6xri8wEzS2VNPNctGHcg
+         +xxXg9XTK7XRkzjGWbajAgkQlVoz2vQx7NuKI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DI0egddMaTlmXPpI6j4ITK90qBcGxWnZ/Lc990IvF2Y=;
+        b=a8VSIe7inf0shLOtOBtLKnAtiSFBpTJDwvO5ue0sxm2mi5dDWu/lcaZp4YryScK5gM
+         b8Pn6whRr9dLxSipcTZY2YuAoCnK41mTukMbMO4875NiPzzt5x/cUaWo67Q1hk6VUln1
+         ArSVF6uERgbFqilYxKB9c0Aez95ovJaTxfvmoogFufgZcmetHvRjucl7QRN+cwdqQigC
+         CncsE6pr3fVde7+Y3I1/dXCXOmchzsrEp2JKhvRgATQbLhfb5Z7Vtwe7s336jYPKc2C2
+         2SEowzH64meC7s/SD9vE43HVzCfENYtgKRy/oeCUbDDx6NRiKKspyoniAGworMbjfM+W
+         bWwg==
+X-Gm-Message-State: APjAAAVKopMId+pA6RZsIpVzfX/fKyQK/lLQ8HTWcYM9/x9YS/GYyLbj
+        qes+bM5lOJNqiGYd3Beu/YmI2w==
+X-Google-Smtp-Source: APXvYqxn6tRAr9RxU9eibq7Mfj2KW3OBHKsrpfR/gHKH+DusHXd6HU+er1lZb6yRz3aWg8YmGuURRw==
+X-Received: by 2002:a02:cd8d:: with SMTP id l13mr744030jap.138.1569356100138;
+        Tue, 24 Sep 2019 13:15:00 -0700 (PDT)
+Received: from shuah-t480s.internal (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
+        by smtp.gmail.com with ESMTPSA id b24sm2007733iob.2.2019.09.24.13.14.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2019 13:14:59 -0700 (PDT)
+From:   Shuah Khan <skhan@linuxfoundation.org>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, shuah@kernel.org
+Cc:     Shuah Khan <skhan@linuxfoundation.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] selftests: kvm: Fix libkvm build error
+Date:   Tue, 24 Sep 2019 14:14:51 -0600
+Message-Id: <20190924201451.31977-1-skhan@linuxfoundation.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.65]); Tue, 24 Sep 2019 20:14:20 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 24 Sep 2019 14:41:42 +0800
-Tina Zhang <tina.zhang@intel.com> wrote:
+Fix the following build error:
 
-> From: Kechen Lu <kechen.lu@intel.com>
-> 
-> Only sync primary plane page flip events are checked and delivered
-> as the display refresh events before, this patch tries to deliver async
-> primary page flip events bounded by vblanks.
-> 
-> To deliver correct async page flip, the new async flip bitmap is
-> introduced and in vblank emulation handler to check bitset.
-> 
-> Signed-off-by: Kechen Lu <kechen.lu@intel.com>
-> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> ---
->  drivers/gpu/drm/i915/gvt/cmd_parser.c |  6 ++++--
->  drivers/gpu/drm/i915/gvt/display.c    | 10 ++++++++++
->  drivers/gpu/drm/i915/gvt/gvt.h        |  2 ++
->  drivers/gpu/drm/i915/gvt/handlers.c   |  5 +++--
->  4 files changed, 19 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/gpu/drm/i915/gvt/cmd_parser.c b/drivers/gpu/drm/i915/gvt/cmd_parser.c
-> index e753b1e706e2..1abb05431177 100644
-> --- a/drivers/gpu/drm/i915/gvt/cmd_parser.c
-> +++ b/drivers/gpu/drm/i915/gvt/cmd_parser.c
-> @@ -1365,9 +1365,11 @@ static int gen8_update_plane_mmio_from_mi_display_flip(
->  	if (info->plane == PLANE_PRIMARY)
->  		vgpu_vreg_t(vgpu, PIPE_FLIPCOUNT_G4X(info->pipe))++;
->  
-> -	if (info->async_flip)
-> +	if (info->async_flip) {
->  		intel_vgpu_trigger_virtual_event(vgpu, info->event);
-> -	else
-> +		set_bit(info->plane,
-> +			vgpu->display.async_flip_event[info->pipe]);
-> +	} else
->  		set_bit(info->event, vgpu->irq.flip_done_event[info->pipe]);
->  
->  	return 0;
-> diff --git a/drivers/gpu/drm/i915/gvt/display.c b/drivers/gpu/drm/i915/gvt/display.c
-> index 9f2c2cd10369..9acde0bdd5f4 100644
-> --- a/drivers/gpu/drm/i915/gvt/display.c
-> +++ b/drivers/gpu/drm/i915/gvt/display.c
-> @@ -419,6 +419,16 @@ static void emulate_vblank_on_pipe(struct intel_vgpu *vgpu, int pipe)
->  		intel_vgpu_trigger_virtual_event(vgpu, event);
->  	}
->  
-> +	for_each_set_bit(event, vgpu->display.async_flip_event[pipe],
-> +			I915_MAX_PLANES) {
-> +		clear_bit(event, vgpu->display.async_flip_event[pipe]);
-> +		if (!pipe_is_enabled(vgpu, pipe))
-> +			continue;
-> +
-> +		if (event == PLANE_PRIMARY)
-> +			eventfd_signal_val |= DISPLAY_PRI_REFRESH_EVENT_VAL;
+libkvm.a(assert.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be used when making a PIE object; recompile with -fPIC
 
-Is it worthwhile to continue the for_each_set_bit here, or should we
-clear the remaining bits and break from the loop?  Thanks,
+Add -fPIC to CFLAGS to fix it.
 
-Alex
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ tools/testing/selftests/kvm/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +	}
-> +
->  	if (eventfd_signal_val)
->  		vgpu->no_pageflip_count = 0;
->  	else if (!eventfd_signal_val && vgpu->no_pageflip_count > PAGEFLIP_DELAY_THR)
-> diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-> index cc39b449b061..73769a87b407 100644
-> --- a/drivers/gpu/drm/i915/gvt/gvt.h
-> +++ b/drivers/gpu/drm/i915/gvt/gvt.h
-> @@ -128,6 +128,8 @@ struct intel_vgpu_display {
->  	struct intel_vgpu_i2c_edid i2c_edid;
->  	struct intel_vgpu_port ports[I915_MAX_PORTS];
->  	struct intel_vgpu_sbi sbi;
-> +	DECLARE_BITMAP(async_flip_event[I915_MAX_PIPES],
-> +		       I915_MAX_PLANES);
->  };
->  
->  struct vgpu_sched_ctl {
-> diff --git a/drivers/gpu/drm/i915/gvt/handlers.c b/drivers/gpu/drm/i915/gvt/handlers.c
-> index 45a9124e53b6..e5a022c2e7bb 100644
-> --- a/drivers/gpu/drm/i915/gvt/handlers.c
-> +++ b/drivers/gpu/drm/i915/gvt/handlers.c
-> @@ -760,9 +760,10 @@ static int pri_surf_mmio_write(struct intel_vgpu *vgpu, unsigned int offset,
->  
->  	vgpu_vreg_t(vgpu, PIPE_FLIPCOUNT_G4X(pipe))++;
->  
-> -	if (vgpu_vreg_t(vgpu, DSPCNTR(pipe)) & PLANE_CTL_ASYNC_FLIP)
-> +	if (vgpu_vreg_t(vgpu, DSPCNTR(pipe)) & PLANE_CTL_ASYNC_FLIP) {
->  		intel_vgpu_trigger_virtual_event(vgpu, event);
-> -	else
-> +		set_bit(PLANE_PRIMARY, vgpu->display.async_flip_event[pipe]);
-> +	} else
->  		set_bit(event, vgpu->irq.flip_done_event[pipe]);
->  
->  	return 0;
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 62c591f87dab..b4a55d300e75 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -44,7 +44,7 @@ INSTALL_HDR_PATH = $(top_srcdir)/usr
+ LINUX_HDR_PATH = $(INSTALL_HDR_PATH)/include/
+ LINUX_TOOL_INCLUDE = $(top_srcdir)/tools/include
+ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+-	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
++	-fno-stack-protector -fPIC -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+ 	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(UNAME_M) -I..
+ 
+ no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
+-- 
+2.20.1
 
