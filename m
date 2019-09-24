@@ -2,93 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CE6EBBF74
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 02:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1598ABBF77
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 02:52:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503687AbfIXAq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Sep 2019 20:46:27 -0400
-Received: from mga03.intel.com ([134.134.136.65]:37123 "EHLO mga03.intel.com"
+        id S2391823AbfIXAv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Sep 2019 20:51:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57220 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390773AbfIXAq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Sep 2019 20:46:26 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Sep 2019 17:46:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,542,1559545200"; 
-   d="scan'208";a="195532991"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 23 Sep 2019 17:46:25 -0700
-Date:   Mon, 23 Sep 2019 17:46:25 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
+        id S2390912AbfIXAv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Sep 2019 20:51:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D28A110C0940;
+        Tue, 24 Sep 2019 00:51:56 +0000 (UTC)
+Received: from mail (ovpn-120-159.rdu2.redhat.com [10.10.120.159])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A398B10013A1;
+        Tue, 24 Sep 2019 00:51:53 +0000 (UTC)
+Date:   Mon, 23 Sep 2019 20:51:52 -0400
+From:   Andrea Arcangeli <aarcange@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrea Arcangeli <aarcange@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 15/17] KVM: retpolines: x86: eliminate retpoline from
- vmx.c exit handlers
-Message-ID: <20190924004625.GB13147@linux.intel.com>
+Subject: Re: [PATCH 13/17] KVM: monolithic: x86: drop the kvm_pmu_ops
+ structure
+Message-ID: <20190924005152.GA4658@redhat.com>
 References: <20190920212509.2578-1-aarcange@redhat.com>
- <20190920212509.2578-16-aarcange@redhat.com>
- <87o8zb8ik1.fsf@vitty.brq.redhat.com>
- <7329012d-0b3b-ce86-f58d-3d2d5dc5a790@redhat.com>
- <20190923190514.GB19996@redhat.com>
- <20190923202349.GL18195@linux.intel.com>
- <ccfa85b7-b484-7052-f991-78ad05ce7fe7@redhat.com>
+ <20190920212509.2578-14-aarcange@redhat.com>
+ <057fc5f2-7343-943f-ed86-59f1ad5122e5@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ccfa85b7-b484-7052-f991-78ad05ce7fe7@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <057fc5f2-7343-943f-ed86-59f1ad5122e5@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.66]); Tue, 24 Sep 2019 00:51:56 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 24, 2019 at 02:15:39AM +0200, Paolo Bonzini wrote:
-> On 23/09/19 22:23, Sean Christopherson wrote:
-> >  
-> > +int nested_vmx_handle_vmx_instruction(struct kvm_vcpu *vcpu)
-> > +{
-> > +	switch (to_vmx(vcpu)->exit_reason) {
-> > +	case EXIT_REASON_VMCLEAR:
-> > +		return handle_vmclear(vcpu);
-> > +	case EXIT_REASON_VMLAUNCH:
-> > +		return handle_vmlaunch(vcpu);
-> > +	case EXIT_REASON_VMPTRLD:
-> > +		return handle_vmptrld(vcpu);
-> > +	case EXIT_REASON_VMPTRST:
-> > +		return handle_vmptrst(vcpu);
-> > +	case EXIT_REASON_VMREAD:
-> > +		return handle_vmread(vcpu);
-> > +	case EXIT_REASON_VMRESUME:
-> > +		return handle_vmresume(vcpu);
-> > +	case EXIT_REASON_VMWRITE:
-> > +		return handle_vmwrite(vcpu);
-> > +	case EXIT_REASON_VMOFF:
-> > +		return handle_vmoff(vcpu);
-> > +	case EXIT_REASON_VMON:
-> > +		return handle_vmon(vcpu);
-> > +	case EXIT_REASON_INVEPT:
-> > +		return handle_invept(vcpu);
-> > +	case EXIT_REASON_INVVPID:
-> > +		return handle_invvpid(vcpu);
-> > +	case EXIT_REASON_VMFUNC:
-> > +		return handle_vmfunc(vcpu);
-> > +	}
-> > +
+On Mon, Sep 23, 2019 at 12:21:43PM +0200, Paolo Bonzini wrote:
+> On 20/09/19 23:25, Andrea Arcangeli wrote:
+> > Cleanup after this was finally left fully unused.
+> > 
+> > Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  3 ---
+> >  arch/x86/kvm/pmu.h              | 19 -------------------
+> >  arch/x86/kvm/pmu_amd.c          | 15 ---------------
+> >  arch/x86/kvm/svm.c              |  1 -
+> >  arch/x86/kvm/vmx/pmu_intel.c    | 15 ---------------
+> >  arch/x86/kvm/vmx/vmx.c          |  2 --
+> >  6 files changed, 55 deletions(-)
 > 
-> Do you really need that?  Why couldn't the handle_* functions simply be
-> exported from nested.c to vmx.c?
+> Is there any reason not to do the same for kvm_x86_ops?
 
-Nope, just personal preference to keep the nested code as isolated as
-possible.  We use a similar approach for vmx_{g,s}et_vmx_msr().
+This was covered in the commit header of patch 2:
 
-Though if we do want to go this route, it'd be better to simply move
-handle_vmx_instruction() to nested.c instead of bouncing through that
-and nested_vmx_handle_vmx_instruction().
+To reduce the rejecting parts while tracking upstream, this doesn't
+attempt to entirely remove the kvm_x86_ops structure yet, that is
+meant for a later cleanup. The pmu ops have been already cleaned up in
+this patchset because it was left completely unused right after the
+conversion from pointer to functions to external functions.
+
+Lot more patches are needed to get rid of kvm_x86_ops entirely because
+there are lots of places checking the actual value of the method
+before making the indirect call. I tried to start that, but then it
+got into potentially heavily rejecting territory, so I thought it was
+simpler to start with what I had, considering from a performance
+standpoint it's optimal already as far as retpolines are concerned.
+
+> (As an aside, patch 2 is not copying over the comments in the struct
+> kvm_x86_ops declarations.  Granted there aren't many, but we should not
+> lose the few that exist).
+
+Yes sorry, this was actually unintentional and the comment need to be
+retained in the header declaration.
+
+Thanks,
+Andrea
