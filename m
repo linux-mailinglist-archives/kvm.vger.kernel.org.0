@@ -2,134 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82EBEBD3A7
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 22:35:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 552B2BD3CE
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 22:51:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731179AbfIXUfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 16:35:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22499 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727071AbfIXUfN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 16:35:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 91AC118C8914;
-        Tue, 24 Sep 2019 20:35:12 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E70B5D9CA;
-        Tue, 24 Sep 2019 20:35:09 +0000 (UTC)
-Date:   Tue, 24 Sep 2019 14:35:09 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tina Zhang <tina.zhang@intel.com>
-Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kraxel@redhat.com,
-        zhenyuw@linux.intel.com, zhiyuan.lv@intel.com,
-        zhi.a.wang@intel.com, kevin.tian@intel.com, hang.yuan@intel.com,
-        yi.l.liu@intel.com
-Subject: Re: [PATCH v6 2/6] vfio: Introduce vGPU display irq type
-Message-ID: <20190924143509.181affe2@x1.home>
-In-Reply-To: <20190924064143.9282-3-tina.zhang@intel.com>
-References: <20190924064143.9282-1-tina.zhang@intel.com>
-        <20190924064143.9282-3-tina.zhang@intel.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Tue, 24 Sep 2019 20:35:12 +0000 (UTC)
+        id S2388292AbfIXUvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 16:51:14 -0400
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:39335 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731288AbfIXUvN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 16:51:13 -0400
+Received: by mail-pg1-f201.google.com with SMTP id t19so2069292pgh.6
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 13:51:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=cK0rz6GPB8sFkc3B+fwwxTP1+0Eh134HuJh0fwsbwJg=;
+        b=UJEfQGqxAA6lLw1NEwRj33/BhnUqc6DRlpLj4yz+I+mQaomwE6CDA6TqoPJ9XGQuOF
+         yy/B9uXMuXxEP0X+IL+rciL8EHjdTBX44eFYmun9ZqIYl8466kRzd2da9gC4IbRSwElz
+         CRcg16dVaGWccDBdmeWnQ8CDGUXTA8DmmrzyZ3DZgv1JqAxB718KxjTR9XBJsvyl7VS1
+         nRfFFa2UqLqk1hYSQD1EPywlLRmWXk4rUe1FTGL28OKMnBM0mSNP8Z4+AVqYfST2oeFm
+         sxPAzRZoXY9fHs0y0kPEAjQl8BFB5YWaZEgXLeBCxuGmM54RHo+hmptlSXPVqfRxhlFd
+         kEcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=cK0rz6GPB8sFkc3B+fwwxTP1+0Eh134HuJh0fwsbwJg=;
+        b=M2GQVtEIP6iqy9CrmMCL79Ar8K0Y/fR0lr0SckVvVBzPMbtz5q7XdHOpPDUoj3RoJJ
+         Oqx8CYbDEFX6ELG2bRhJdN651TVRBeTZ+2J42G+R5MBF+XYiLYz0Uv5PgTzDqOfwEGVA
+         qBcG5i69CS1Wk/fg7nQMygZxaEIs5cqM5VaanuSJXKbnPSicEta+s6Up8kwhwz190AbV
+         ZJIk4VNXd9kchhaJv8PiEyC0U6rMWBsMyFmtiv2ECFuMGkMJFKbH/fSkHSH2q8lwOBqC
+         dcx9qRPpHtwiTo+/FJPDfx8EZtt2Xzrrm1TlNK9k6RM8s2faYvi4lYBmPrxmzo7hLXqo
+         KuIQ==
+X-Gm-Message-State: APjAAAWQD3iMy5btbH1OOdvKdQmgWyJgQiHsZHYwLP99vrVuMbPYVJ6u
+        fT/Wco/srHfd1IA7eAy55+oVpJKzJifct7tzvcSzJ3QVfxaOOwljFfnhD/mvhCUtGyn/stzz7ew
+        Fu8TGGAYIzRJ02BpBBtHEmjWIqa5H2969vaDOmxa8Zsr+jTTt2hbpbvxlqv+9hAs=
+X-Google-Smtp-Source: APXvYqxXsQDeUlr1+fAdznIO2UuQLxYD1je6XT/Xaj6VskWVdZaj6xldEmjZ58rZGoFPMTNOAtb3f7/RvMSbTg==
+X-Received: by 2002:a63:d60:: with SMTP id 32mr4984367pgn.316.1569358272664;
+ Tue, 24 Sep 2019 13:51:12 -0700 (PDT)
+Date:   Tue, 24 Sep 2019 13:51:08 -0700
+Message-Id: <20190924205108.241657-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.351.gc4317032e6-goog
+Subject: [PATCH] kvm: x86: Enumerate support for CLZERO instruction
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 24 Sep 2019 14:41:39 +0800
-Tina Zhang <tina.zhang@intel.com> wrote:
+CLZERO is available to the guest if it is supported on the
+host. Therefore, enumerate support for the instruction in
+KVM_GET_SUPPORTED_CPUID whenever it is supported on the host.
 
-> Introduce vGPU specific irq type VFIO_IRQ_TYPE_GFX, and
-> VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ as the subtype for vGPU display.
-> 
-> Introduce vfio_irq_info_cap_display_plane_events capability to notify
-> user space with the vGPU's plane update events
-> 
-> v3:
-> - Add more description to VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ and
->   VFIO_IRQ_INFO_CAP_DISPLAY. (Alex & Gerd)
-> 
-> v2:
-> - Add VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ description. (Alex & Kechen)
-> - Introduce vfio_irq_info_cap_display_plane_events. (Gerd & Alex)
-> 
-> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> ---
->  include/uapi/linux/vfio.h | 38 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 38 insertions(+)
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index aa6850f1daef..2946a028b0c3 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -476,6 +476,44 @@ struct vfio_irq_info_cap_type {
->  	__u32 subtype;  /* type specific */
->  };
->  
-> +/* vGPU IRQ TYPE */
-> +#define VFIO_IRQ_TYPE_GFX			(1)
-> +
-> +/* sub-types for VFIO_IRQ_TYPE_GFX */
-> +/*
-> + * vGPU device display refresh interrupt request. This irq asking for
-> + * a user space display refresh, covers all display updates events,
-> + * i.e. user space can stop the display update timer and fully depend
-> + * on getting the notification if an update is needed.
-> + */
-> +#define VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ	(1)
-> +
-> +/*
-> + * Display capability of reporting display refresh interrupt events.
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/cpuid.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Perhaps, "Capability for interpreting GFX_DISPLAY_IRQ eventfd value"
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index dd5985eb61b4..787f1475bf77 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -479,8 +479,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 
+ 	/* cpuid 0x80000008.ebx */
+ 	const u32 kvm_cpuid_8000_0008_ebx_x86_features =
+-		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
+-		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON);
++		F(CLZERO) | F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) |
++		F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) | F(AMD_SSBD) |
++		F(VIRT_SSBD) | F(AMD_SSB_NO);
+ 
+ 	/* cpuid 0xC0000001.edx */
+ 	const u32 kvm_cpuid_C000_0001_edx_x86_features =
+-- 
+2.23.0.351.gc4317032e6-goog
 
-> + * This gives user space the capability to identify different display
-> + * updates events of the display refresh interrupt request.
-> + *
-> + * When notified by VFIO_IRQ_SUBTYPE_GFX_DISPLAY_IRQ, user space can
-> + * use the eventfd counter value to identify which plane has been
-> + * updated.
-> + *
-> + * Note that there might be some cases like counter_value >
-> + * (cur_event_val + pri_event_val), if notifications haven't been
-> + * handled on time in user mode. These cases can be handled as all
-> + * plane updated case or signle plane updated case depending on the
-> + * value.
-
-Seems like in the GVT-g implementation such a value is not possible.
-In fact, when this capability is provided, doesn't userspace interpret
-the eventfd value more as a bitmask of events rather than a counter?
-If so, (cur_event_val + pri_event_val) may be mathematically accurate,
-but maybe obfuscates the logical interpretation... or maybe that's just
-me.
-
-> + *
-> + * cur_event_val: eventfd counter value for cursor plane change event.
-> + * pri_event_val: eventfd counter value for primary plane change event.
-
-I think there should be a note that this capability is optional and
-lacking this feature, userspace should refresh all display events on
-notification.
-
-> + */
-> +#define VFIO_IRQ_INFO_CAP_DISPLAY	2
-> +
-> +struct vfio_irq_info_cap_display_plane_events {
-> +	struct vfio_info_cap_header header;
-> +	__u64 cur_event_val;
-> +	__u64 pri_event_val;
-
-AIUI, the GVT-g implementation sets a single bit and userspace expects
-one or both of those bits to be set on notification.  Should we
-simplify this a bit and just define these as cur_event_bit,
-pri_event_bit and use a __u8 for each to define the bit position?
-Thanks,
-
-Alex
