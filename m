@@ -2,91 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34C5EBC8F9
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 15:34:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2D4ABC91E
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 15:47:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728787AbfIXNer (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 09:34:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35144 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728300AbfIXNer (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 09:34:47 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id ECF398E582
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 13:34:46 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id 4so17587wmj.6
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 06:34:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=x8E8jJI8ppVYKUnDaKsY7fIXB00wM8h99RHCrtkZMJY=;
-        b=oQ6p03zMrDBw4jnd8phqqaXCbfECXkrVCwN3P6PoGMBxUhLhA94j+xGYTPPR7J8uxJ
-         Xe2sijktfMse77EIiyJ5J//XHWcCfsMyyKv0eL+9wRk3IHZyTn5oHY4G0YD2jJeR6ILP
-         I+pNoGQK/YQO4r3ia9UFtMsQMHsYDP7XhWqBdMvlXLjkkIXu9OPgMBVQcttVHRUqBuhf
-         24WEyqJEiJfD9Ny3TEHB6/piPaVipiMnXajgZl4U1InfkRQYbmeRhChtGL2u8sFGO1tM
-         6sDY4mErl38OG+EjfMunq1R+Kc239BJ1/mFijzvqkymhlkCxlBA/cMnwYjRt1GOQNlY8
-         9orA==
-X-Gm-Message-State: APjAAAX3AxCN34bgGWO6XSr8Mo8OjuiQPTZbn4irHILeEpaoWkFb1WsI
-        7ABqz76GPwSoZ67PZ7/X5H0WGKb4AxnOpKAZ5RzU2E5b6uiGtBhMSztN+ShXJOXHNB3ar+b1Pvj
-        T2C6wYbj8AuUU
-X-Received: by 2002:a05:6000:162e:: with SMTP id v14mr2417627wrb.112.1569332082362;
-        Tue, 24 Sep 2019 06:34:42 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzDHK+EXK5B0OIXOAT49NMwdLfyjrS5AP66vchxyMwjBlNGDUVHtaDt/ilNGZexHYZQsn3H2A==
-X-Received: by 2002:a05:6000:162e:: with SMTP id v14mr2417594wrb.112.1569332082028;
-        Tue, 24 Sep 2019 06:34:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id t13sm5090317wra.70.2019.09.24.06.34.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2019 06:34:41 -0700 (PDT)
-Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org,
-        imammedo@redhat.com, marcel.apfelbaum@gmail.com, rth@twiddle.net,
-        ehabkost@redhat.com, philmd@redhat.com, lersek@redhat.com,
-        kraxel@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org
-References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-9-slp@redhat.com>
- <2cbd2570-d158-c9ce-2a38-08c28cd291ea@redhat.com>
- <20190924092222-mutt-send-email-mst@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ee2e7983-7d80-a518-efd5-b52f8640bf90@redhat.com>
-Date:   Tue, 24 Sep 2019 15:34:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2390471AbfIXNrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 09:47:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37916 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727500AbfIXNrN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Sep 2019 09:47:13 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8ODeeQf087921;
+        Tue, 24 Sep 2019 09:47:03 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v7j7k5gsu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 Sep 2019 09:46:29 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8ODailS015223;
+        Tue, 24 Sep 2019 13:46:26 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma02dal.us.ibm.com with ESMTP id 2v5bg7c3dp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 Sep 2019 13:46:26 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8ODkPdk26673454
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Sep 2019 13:46:25 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B66F112064;
+        Tue, 24 Sep 2019 13:46:25 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9EA0A112063;
+        Tue, 24 Sep 2019 13:46:24 +0000 (GMT)
+Received: from leobras.br.ibm.com (unknown [9.18.235.184])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 24 Sep 2019 13:46:24 +0000 (GMT)
+Message-ID: <77a2a670b900dcde3e4d88094d5d04752db27b86.camel@linux.ibm.com>
+Subject: Re: [PATCH 0/3] Replace current->mm by kvm->mm on powerpc/kvm
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Date:   Tue, 24 Sep 2019 10:46:19 -0300
+In-Reply-To: <20190924020008.GA4011@oak.ozlabs.ibm.com>
+References: <20190923212409.7153-1-leonardo@linux.ibm.com>
+         <20190924020008.GA4011@oak.ozlabs.ibm.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-2jqimbQY+p+IkhB2VQWm"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-In-Reply-To: <20190924092222-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-24_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=995 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909240136
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/19 15:24, Michael S. Tsirkin wrote:
-> On Tue, Sep 24, 2019 at 03:12:15PM +0200, Paolo Bonzini wrote:
->> On 24/09/19 14:44, Sergio Lopez wrote:
->>> microvm.option-roms=bool (Set off to disable loading option ROMs)
->>
->> Please make this x-option-roms
-> 
-> Why? We don't plan to support this going forward?
 
-The option is only useful for SeaBIOS.  Since it doesn't have any effect
-for the default firmware, I think it's fair to consider it experimental.
+--=-2jqimbQY+p+IkhB2VQWm
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Tue, 2019-09-24 at 12:00 +1000, Paul Mackerras wrote:
+> On Mon, Sep 23, 2019 at 06:24:06PM -0300, Leonardo Bras wrote:
+> > By replacing, we would reduce the use of 'global' current on code,
+> > relying more in the contents of kvm struct.
+> >=20
+> > On code, I found that in kvm_create_vm() there is:
+> > kvm->mm =3D current->mm;
+> >=20
+> > And that on every kvm_*_ioctl we have tests like that:
+> > if (kvm->mm !=3D current->mm)
+> >         return -EIO;
+> >=20
+> > So this change would be safe.
+> >=20
+> > I split the changes in 3 patches, so it would be easier to read
+> > and reject separated parts. If decided that squashing is better,
+> > I see no problem doing that.
+>=20
+> The patch series looks fine.  It has missed the 5.4 merge window, and
+> it doesn't fix any bugs, so I will queue it up for the 5.5 merge
+> window, meaning that I will put it into my kvm-ppc-next branch when I
+> prepare it for the 5.5 merge window, probably in about a month from
+> now.
+>=20
+> This remark also applies to your other patch "Reduce calls to get
+> current->mm by storing the value locally".
+>=20
+> Thanks,
+> Paul.
 
->>> microvm.isa-serial=bool (Set off to disable the instantiation an ISA serial port)
->>> microvm.rtc=bool (Set off to disable the instantiation of an MC146818 RTC)
->>> microvm.kernel-cmdline=bool (Set off to disable adding virtio-mmio devices to the kernel cmdline)
->>
->> Perhaps auto-kernel-cmdline?
->>
->> Paolo
+Thanks!
+Leonardo Bras
+
+--=-2jqimbQY+p+IkhB2VQWm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2KHisACgkQlQYWtz9S
+ttQIfA/9G1Z3gXIzBuQy/Li1ffXn/K6+pga8zrZXxcXGnu3on0Qze5Z3sE4EKhhG
+w+BjJ2ir+JBsExKPpyAtO8AaBHk2TjeCxUha0z0g4o5QQ2wz62FRxTXv2u3MwR/4
+q8KqRuIdWd5lVAJ0YG7cR0NR/ICfoOErsX2uYRCMwFgHxkh9yjy63GrCaTZNQA+o
+YXBlqP/FfdEOI5OceveW7YZoNLGUuXgXXj/vWYY/+ry6yX46ctcwTCpboeOoc0uN
+lSupIJrX+jYULmH4pKlGqwWnanolzJ4oHV/zmVdqB+O0vU42EPPPymLB2Uh0USdw
+RY9wbKSxdqj074uPECr/mEMJCpFcvtRaRITG25V27b0KCn7u2GQPEt8cuKAXPCoa
+qlPyRMTtOFmLRrn5piFUrgXHYaIFtQCfWqUZ+prKK39Sbwugu9NMbrwABoCAVS3y
+vGywSZAukwlqgEYtaJsx2TlScMz92Pryze14HHxl4hDR5jtWWosAwtNxnjLm1tyQ
+QQBrD19Vh5g6XPUlf8ekSEBvLf0XKKMeQWNrJwUtWED26jnNCF1ux0xfaCbMkLif
+nV1w/WJQzH3fhxIptL8c2NnBDnLF1JE4bBaSs6sKeFcU2NFjx/a/RsitLLF/PHKP
+cvlBqahmGrl72efAnKyXHMrrGj2zl0AXoGcBI7uwGq2GMlQu0bw=
+=zz1z
+-----END PGP SIGNATURE-----
+
+--=-2jqimbQY+p+IkhB2VQWm--
 
