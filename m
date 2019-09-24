@@ -2,96 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 225A7BC139
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 07:08:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AA80BC165
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 07:29:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409010AbfIXFH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 01:07:57 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36698 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2409004AbfIXFH4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 01:07:56 -0400
-Received: by mail-wr1-f65.google.com with SMTP id y19so339834wrd.3
-        for <kvm@vger.kernel.org>; Mon, 23 Sep 2019 22:07:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2d47E32C9RUOC5wWI8ATuz+LPjAEghSrUhg7r5IgcGw=;
-        b=xk0WaUyL1bcfquknkF16bbwNOlHNKes+nkQlDlLr2dbIuiGGKwWswlpRW/npj90Pbp
-         z/MrEp/lBndbQrNq4ws8M1Js64R6OavvHdhzyDhYlGYMQIuFSZ031gDiODKzkZJUykM8
-         Oa4zpJXbWUqNf0m7Rfr65UFEO9v0GA4CtOfdmhfn3hal9uv3KrdOEJZ6EdTJlyc5ksZD
-         skdeBU7z+mE14MU6hxrVOoI1DonRXai40vjdsmQUsNwmmN12Sm9D5CE5EbNoe9QUb5eJ
-         dehyr2pMmM+b3jY5L+j2gihyQn5h2oJzty8UFT8PW2+chfCN9Q9V2sFZUPg+LOTY34Zz
-         RwTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2d47E32C9RUOC5wWI8ATuz+LPjAEghSrUhg7r5IgcGw=;
-        b=MecNAHBbBC9mn60+VH/HIfH4430C2V5gbwGM14VkVXnHXDSvAIsWiqzK3vtLyV+eCt
-         vEei04ULI+/803JJ+utbOLmQhx4rQ0BJSntm2RFhztYP0ZJ7WK0NMwIElBtsXreWP+8r
-         sQCBWppNkDM81GhmIy6RufLK0yCAguFCMER0E1C/Fo1x2vJAVIOQSZNKDjg9Nx3WYKGH
-         Zr/H/aGIif5ESYe+ONsud7SyS7eJGzYGUYxkxqDwkp+8TQg71eVn2+vdMkpPD7PfXYwZ
-         azFNIAaKidiEGbHU9EhV4XPg7edM0dXwkXsXL97OlB9xRqWtt7e50prDY2s9DAIspHGS
-         LBDA==
-X-Gm-Message-State: APjAAAVaAfVY/eS2TF6fmHpmtfzWE4s+SgIM81xVCt6lpJnhvIVgAFoL
-        WCh89SRwcAjeFdt0RKbruMey7TM9ANIEGw0tctCObA==
-X-Google-Smtp-Source: APXvYqwkgvLZ1ao9vw+cuFq1o7BDXNlJZMaWP1xTU3OzBpsnv6FrdOOWOJg+vki1pWF9gE3sE5XfxFfMzY+7t0S+mXc=
-X-Received: by 2002:adf:f1d1:: with SMTP id z17mr634403wro.330.1569301674793;
- Mon, 23 Sep 2019 22:07:54 -0700 (PDT)
+        id S2407865AbfIXF3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 01:29:05 -0400
+Received: from ozlabs.org ([203.11.71.1]:42677 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405894AbfIXF3F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 01:29:05 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46cqVk6xkmz9sPD; Tue, 24 Sep 2019 15:29:02 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1569302942; bh=cWBrw3Zi/RPCvFYg3Lc2bR5LpJV2EEerbQDk5nDnjws=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lsHOd319ouBslKv0bWFJtvzzImr1S6O0NLCnWmG+GyWfg2pTck+2Y3NuS4E0CVwlP
+         kXnqT54F182pmLGxgIx4KytqAGY9jUNTPe5EzqWqmxnSyNHHTM9AsFCIZLbpP9A2Of
+         BaoUHhbor8++OsLNA3sKLw8wlXZ/DUSlSPUKsl0BUauUVKt3pXiXEgG4E/sLU64La1
+         7gMYQXc2E7YBc8pw86aNwenMwogFvwLRNtjp82e7bc6jd+ViH2ATx6e1JljlZWZbMY
+         Rh9TJ1f7sqd+kU3mxQCJzKBjqXHnZDUTJSUMVDTCdEU4uNIvNnbyi07wdFgtVVGxcS
+         OUTB74fxWWagQ==
+Date:   Tue, 24 Sep 2019 15:28:55 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 1/6] KVM: PPC: Book3S HV: XIVE: initialize private
+ pointer when VPs are allocated
+Message-ID: <20190924052855.GA7950@oak.ozlabs.ibm.com>
+References: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
+ <156925341736.974393.18379970954169086891.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <20190904161245.111924-1-anup.patel@wdc.com> <20190904161245.111924-12-anup.patel@wdc.com>
- <8c44ac8a-3fdc-b9dd-1815-06e86cb73047@redhat.com> <CAAhSdy1-1yxMnjzppmUBxtSOAuwWaPtNZwW+QH1O7LAnEVP8pg@mail.gmail.com>
- <45fc3ee5-0f68-4e94-cfb3-0727ca52628f@redhat.com>
-In-Reply-To: <45fc3ee5-0f68-4e94-cfb3-0727ca52628f@redhat.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 24 Sep 2019 10:37:43 +0530
-Message-ID: <CAAhSdy29gi2d9c9tumtO68QbB=_+yUYp+ikN3dQ-wa2e-Lesfw@mail.gmail.com>
-Subject: Re: [PATCH v7 10/21] RISC-V: KVM: Handle MMIO exits for VCPU
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <156925341736.974393.18379970954169086891.stgit@bahia.lan>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 23, 2019 at 7:03 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 23/09/19 15:09, Anup Patel wrote:
-> >>> +#ifndef CONFIG_RISCV_ISA_C
-> >>> +                     "li %[tilen], 4\n"
-> >>> +#else
-> >>> +                     "li %[tilen], 2\n"
-> >>> +#endif
-> >>
-> >> Can you use an assembler directive to force using a non-compressed
-> >> format for ld and lw?  This would get rid of tilen, which is costing 6
-> >> bytes (if I did the RVC math right) in order to save two. :)
-> >
-> > I tried looking for it but could not find any assembler directive
-> > to selectively turn-off instruction compression.
->
-> ".option norvc"?
+On Mon, Sep 23, 2019 at 05:43:37PM +0200, Greg Kurz wrote:
+> From: Cédric Le Goater <clg@kaod.org>
+> 
+> Do not assign the device private pointer before making sure the XIVE
+> VPs are allocated in OPAL and test pointer validity when releasing
+> the device.
+> 
+> Fixes: 5422e95103cf ("KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method")
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Thanks for the hint. I will try ".option norvc"
+What happens in the case where the OPAL allocation fails?  Does the
+host crash, or hang, or leak resources?  I presume that users can
+trigger the allocation failure just by starting a suitably large
+number of guests - is that right?  Is there an easier way?  I'm trying
+to work out whether this is urgently needed in 5.4 and the stable
+trees or not.
 
-Regards,
-Anup
-
->
-> Paolo
+Paul.
