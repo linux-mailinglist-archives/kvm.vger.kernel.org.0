@@ -2,82 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 552B2BD3CE
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 22:51:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 839CEBD3FB
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 23:03:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388292AbfIXUvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 16:51:14 -0400
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:39335 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731288AbfIXUvN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 16:51:13 -0400
-Received: by mail-pg1-f201.google.com with SMTP id t19so2069292pgh.6
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 13:51:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=cK0rz6GPB8sFkc3B+fwwxTP1+0Eh134HuJh0fwsbwJg=;
-        b=UJEfQGqxAA6lLw1NEwRj33/BhnUqc6DRlpLj4yz+I+mQaomwE6CDA6TqoPJ9XGQuOF
-         yy/B9uXMuXxEP0X+IL+rciL8EHjdTBX44eFYmun9ZqIYl8466kRzd2da9gC4IbRSwElz
-         CRcg16dVaGWccDBdmeWnQ8CDGUXTA8DmmrzyZ3DZgv1JqAxB718KxjTR9XBJsvyl7VS1
-         nRfFFa2UqLqk1hYSQD1EPywlLRmWXk4rUe1FTGL28OKMnBM0mSNP8Z4+AVqYfST2oeFm
-         sxPAzRZoXY9fHs0y0kPEAjQl8BFB5YWaZEgXLeBCxuGmM54RHo+hmptlSXPVqfRxhlFd
-         kEcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=cK0rz6GPB8sFkc3B+fwwxTP1+0Eh134HuJh0fwsbwJg=;
-        b=M2GQVtEIP6iqy9CrmMCL79Ar8K0Y/fR0lr0SckVvVBzPMbtz5q7XdHOpPDUoj3RoJJ
-         Oqx8CYbDEFX6ELG2bRhJdN651TVRBeTZ+2J42G+R5MBF+XYiLYz0Uv5PgTzDqOfwEGVA
-         qBcG5i69CS1Wk/fg7nQMygZxaEIs5cqM5VaanuSJXKbnPSicEta+s6Up8kwhwz190AbV
-         ZJIk4VNXd9kchhaJv8PiEyC0U6rMWBsMyFmtiv2ECFuMGkMJFKbH/fSkHSH2q8lwOBqC
-         dcx9qRPpHtwiTo+/FJPDfx8EZtt2Xzrrm1TlNK9k6RM8s2faYvi4lYBmPrxmzo7hLXqo
-         KuIQ==
-X-Gm-Message-State: APjAAAWQD3iMy5btbH1OOdvKdQmgWyJgQiHsZHYwLP99vrVuMbPYVJ6u
-        fT/Wco/srHfd1IA7eAy55+oVpJKzJifct7tzvcSzJ3QVfxaOOwljFfnhD/mvhCUtGyn/stzz7ew
-        Fu8TGGAYIzRJ02BpBBtHEmjWIqa5H2969vaDOmxa8Zsr+jTTt2hbpbvxlqv+9hAs=
-X-Google-Smtp-Source: APXvYqxXsQDeUlr1+fAdznIO2UuQLxYD1je6XT/Xaj6VskWVdZaj6xldEmjZ58rZGoFPMTNOAtb3f7/RvMSbTg==
-X-Received: by 2002:a63:d60:: with SMTP id 32mr4984367pgn.316.1569358272664;
- Tue, 24 Sep 2019 13:51:12 -0700 (PDT)
-Date:   Tue, 24 Sep 2019 13:51:08 -0700
-Message-Id: <20190924205108.241657-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.23.0.351.gc4317032e6-goog
-Subject: [PATCH] kvm: x86: Enumerate support for CLZERO instruction
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S2633471AbfIXVDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 17:03:38 -0400
+Received: from mga02.intel.com ([134.134.136.20]:31891 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2633461AbfIXVDi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 17:03:38 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Sep 2019 14:03:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,545,1559545200"; 
+   d="scan'208";a="179612707"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga007.jf.intel.com with ESMTP; 24 Sep 2019 14:03:37 -0700
+Date:   Tue, 24 Sep 2019 14:03:37 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] KVM: VMX: Optimize VMX instrs error/fault handling
+Message-ID: <20190924210337.GE16218@linux.intel.com>
+References: <20190719204110.18306-1-sean.j.christopherson@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190719204110.18306-1-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CLZERO is available to the guest if it is supported on the
-host. Therefore, enumerate support for the instruction in
-KVM_GET_SUPPORTED_CPUID whenever it is supported on the host.
+Paolo,
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/cpuid.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Any chance this can be picked up for 5.4?  Josh's kvm_spurious_fault()
+changes went into 5.3, so this can be taken through the KVM tree, which
+probably makes the most sense since the non-KVM change is a one line
+deletion.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index dd5985eb61b4..787f1475bf77 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -479,8 +479,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 
- 	/* cpuid 0x80000008.ebx */
- 	const u32 kvm_cpuid_8000_0008_ebx_x86_features =
--		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
--		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON);
-+		F(CLZERO) | F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) |
-+		F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) | F(AMD_SSBD) |
-+		F(VIRT_SSBD) | F(AMD_SSB_NO);
- 
- 	/* cpuid 0xC0000001.edx */
- 	const u32 kvm_cpuid_C000_0001_edx_x86_features =
--- 
-2.23.0.351.gc4317032e6-goog
-
+On Fri, Jul 19, 2019 at 01:41:05PM -0700, Sean Christopherson wrote:
+> A recent commit reworked __kvm_handle_fault_on_reboot() to play nice with
+> objtool.  An unfortunate side effect is that JMP is now inserted after
+> most VMX instructions so that the reboot macro can use an actual CALL to
+> kvm_spurious_fault() instead of a funky PUSH+JMP facsimile in .fixup.
+> 
+> Rework the low level VMX instruction helpers to handle unexpected faults
+> manually instead of relying on the "fault on reboot" macro.  By using
+> asm-goto, most helpers can branch directly to an in-function call to
+> kvm_spurious_fault(), which can then be optimized by compilers to reside
+> out-of-line at the end of the function instead of inline as done by
+> "fault on reboot".
+> 
+> The net impact relative to the current code base is more or less a nop
+> when building with a compiler that supports __GCC_ASM_FLAG_OUTPUTS__.
+> A bunch of code that was previously in .fixup gets moved into the slow
+> paths of functions, but the fast paths are more basically unchanged.
+> 
+> Without __GCC_ASM_FLAG_OUTPUTS__, manually coding the Jcc is a net
+> positive as CC_SET() without compiler support almost always generates a
+> SETcc+CMP+Jcc sequence, which is now replaced with a single Jcc.
+> 
+> A small bonus is that the Jcc instrs are hinted to predict that the VMX
+> instr will be successful.
+> 
+> v2:
+>   - Rebased to x86/master, commit eceffd88ca20 ("Merge branch 'x86/urgent'")
+>   - Reworded changelogs to reference the commit instead lkml link for
+>     the recent changes to __kvm_handle_fault_on_reboot().
+>   - Added Paolo's acks for patch 1-4
+>   - Added patch 5 to do more cleanup, which was made possible by rebasing
+>     on top of the __kvm_handle_fault_on_reboot() changes.
+>   
+> Sean Christopherson (5):
+>   objtool: KVM: x86: Check kvm_rebooting in kvm_spurious_fault()
+>   KVM: VMX: Optimize VMX instruction error and fault handling
+>   KVM: VMX: Add error handling to VMREAD helper
+>   KVM: x86: Drop ____kvm_handle_fault_on_reboot()
+>   KVM: x86: Don't check kvm_rebooting in __kvm_handle_fault_on_reboot()
+> 
+>  arch/x86/include/asm/kvm_host.h | 16 ++----
+>  arch/x86/kvm/vmx/ops.h          | 93 ++++++++++++++++++++-------------
+>  arch/x86/kvm/vmx/vmx.c          | 42 +++++++++++++++
+>  arch/x86/kvm/x86.c              |  3 +-
+>  tools/objtool/check.c           |  1 -
+>  5 files changed, 104 insertions(+), 51 deletions(-)
+> 
+> -- 
+> 2.22.0
+> 
