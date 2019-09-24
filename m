@@ -2,120 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44EF7BD2AC
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 21:31:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F0DFBD2BE
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 21:35:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410142AbfIXTbJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 15:31:09 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:40318 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406532AbfIXTbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 15:31:09 -0400
-Received: by mail-pg1-f196.google.com with SMTP id w10so1842154pgj.7
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 12:31:07 -0700 (PDT)
+        id S1730660AbfIXTf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 15:35:26 -0400
+Received: from mail-vk1-f194.google.com ([209.85.221.194]:36045 "EHLO
+        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726717AbfIXTf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 15:35:26 -0400
+Received: by mail-vk1-f194.google.com with SMTP id w3so89377vkm.3
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 12:35:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=p2pBnsZXxEg5rYmgidE9LBdx2FaY/2F4BEMdBS7KpeU=;
-        b=I9OHVHn7cQ5l+k9iMlxbvpQwISoAvOi6GrQZK4LYfo5IzRUZ08OWDjvmevvV3bvcCu
-         MTyS7U1Gartx2+AoQGvAGlOWt8rMeoujoaZbiWRhtv4gXt2MvuC2VJnWLMKY5NPHZ28B
-         Q5+feuess4QsFcTMzrQvLxOSQvjqFuiPXDoLHr9JcI//OuxEtU7QdNmtSv5mIxwUJNx2
-         vIrlBOWBoh5krnaoQl2u0xaWwiByR8Y8ccU2nEFA1Zvxea+LFphAOlk1/+qgpaUlqizE
-         2NRM5koXdudgJAr+JxdbKr9zW5YJ49NaZJk4CqGi+HF9nC4wf71yp0m5osVLJr1abXRS
-         M9AA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=RXahQeK7cA3xBg4Yxa4oGPZXQaRxDeRbkTNGSpwm2s8=;
+        b=AqgvSbK5Pdbnv4nKaJlvyxdR47x2R6itw8LhlGtgeaQIcEKcTQZtIf66gdkEbPJdFU
+         LtPkRsEREO96Ukyn2Xd4zUu3jfPuOZNmsq0BJV2SU7iAMsx/eao1D9kzP6yCQUtzTx5v
+         QDpkg2Y0qrIfflxyrZeKirOX8s6oMm1cuiAV2XzksuK7m50tHZaG+xcKCcrmOW24X38m
+         UOjvyc+0qHiNpYCswgdQaIpbRZ2WWZnN0Q9cedOtDH3Y92UGQ9umIcXUpG+v8QJsdR/A
+         IkhWOwFcJUqjK1MW0Ya6S28Zd4r+0i+3DTnScOu1EzKsoCv8HCko9m9zq7OsgiHEQRKz
+         y/Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=p2pBnsZXxEg5rYmgidE9LBdx2FaY/2F4BEMdBS7KpeU=;
-        b=NFxN/S969ejI2vnEbvhgAUIHmAU+8C5rkLoCk3WLNrFHHJbtM5n0vFzFMvhXFotIUC
-         tO2Dl7r1ueBsR1eoYFBEO2jQOYmKUbZ1+W2EOvRjp8T8xVVFQ+vB+akp64zH3RgPrF8c
-         pF0kfTD0HNAg5Z8r3aJU6ae5tBfh6JMIyMkTy/YiFYYziE8BkBKw2he67Br68FvLZhJ2
-         L/49e9jShz968S4lVrk1TqB2v6YButrsvT1QQnDfl/rMNOt5wvJbbUkQSk+ByxgUJGU5
-         j1d12rbQqpkPGs9K/Wt2Dueq0AA2A0j/LkdH/l6P0lCWR0vFX5H+UVKSzW9FJmSrVCAY
-         avzQ==
-X-Gm-Message-State: APjAAAXl9iFt6xmaYDfYHR/xgzDtO7JRnhxm6QXy0m8vBXC3dvH+6LZC
-        ApLmahTfIiSrIq9TNEMIXf4=
-X-Google-Smtp-Source: APXvYqzckcw9tLzTz+AWY+bcfL7Q9LvXS7TCV1FaMwp8vGhztcGqYJrECO6rCISSnkZ1rKmCEELiPA==
-X-Received: by 2002:a17:90a:b012:: with SMTP id x18mr1866951pjq.116.1569353467147;
-        Tue, 24 Sep 2019 12:31:07 -0700 (PDT)
-Received: from [10.33.115.159] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id s14sm2793981pfe.52.2019.09.24.12.31.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 24 Sep 2019 12:31:05 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [kvm-unit-tests PATCH] kvm-unit-test: x86: Add RDPRU test
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CALMp9eTiM4+ZnnnXLP-TNrrjfn3DLAurkcY+2Jom5wWqzFe0Jw@mail.gmail.com>
-Date:   Tue, 24 Sep 2019 12:31:04 -0700
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        kvm list <kvm@vger.kernel.org>, Peter Shier <pshier@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=RXahQeK7cA3xBg4Yxa4oGPZXQaRxDeRbkTNGSpwm2s8=;
+        b=kOKuTLmTCXUogaSk2d3fFC+EU+RBS+IIsFGpyB0wI06hEKWtLyrZ1fU2Da9/D0ndfG
+         terpdPKxArQ8gb/6lHlcTgbu7KEAYVpXW1sNaf/PBONQ/uyNZvsi7R5UuC5/3uw59iaV
+         OD0RHbX6kSsqFs/JQ3sxfolZVn+SFqZ8NtHl0iYtt2evOibbWtnL/9LLNcDM2dVmWBm/
+         bJYsC19/btF5pf39ZWyQGmiWSsPKTZBD5ksKn9LpqMzl1A08RT5ypX0XCAZyvffXrZR0
+         28KoGEmEUM0Mf+lYmBebW9ozEN4gjcG/eeC4WaIRoo1rU69gOxG5F5cXZafINUDoyglB
+         nMrQ==
+X-Gm-Message-State: APjAAAVwQ4PsOD7lEjKtCgf6aFou/Yq0yZdqUh8SRBT9HN9rjsMhQEUJ
+        09Yj0wMbXEy29YxD4+m3ds2S56t6NU4A/PmcQ9jA
+X-Google-Smtp-Source: APXvYqxlsT5++ADNHLRKk72HPWyoCDra8TPkz/q84l0HYr2JZvUNmD1llRkI6Mvjw+ElVwMtm7ZvvGyfBrExsHsOWms=
+X-Received: by 2002:a1f:b987:: with SMTP id j129mr296367vkf.27.1569353725248;
+ Tue, 24 Sep 2019 12:35:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAGG=3QV-0hPrWx8dFptjqbKMNfne+iTfq2e-KL89ebecO8Ta1w@mail.gmail.com>
+ <20190911191127.GH1045@linux.intel.com> <CAGG=3QXbCriXR+FER2ex9nN_aHENRgDvJNQ_HDCFniPP0NJNpg@mail.gmail.com>
+In-Reply-To: <CAGG=3QXbCriXR+FER2ex9nN_aHENRgDvJNQ_HDCFniPP0NJNpg@mail.gmail.com>
+From:   Bill Wendling <morbo@google.com>
+Date:   Tue, 24 Sep 2019 12:35:13 -0700
+Message-ID: <CAGG=3QWrr9Tg+ZKVh0N1hZ+LbVdYDcFiu8cHL=S8Za0M1uKg5w@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: emulator: use "q" operand modifier
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <16025FFA-E83C-4DB9-B552-0480FA38AC77@gmail.com>
-References: <20190919230225.37796-1-jmattson@google.com>
- <368a94f2-3614-a9ea-3f72-d53d36a81f68@oracle.com>
- <CALMp9eQh445HEfw0rbUaJQhb7TeFszQX1KXe8YY-18FyMd6+tA@mail.gmail.com>
- <30499036-99CD-4008-A6CA-130DBC273062@gmail.com>
- <CALMp9eTT4mhVtkBCqW_YFDiYSoPCsir6u0j+rqOeoFZui+enzg@mail.gmail.com>
- <7ADCB7CB-605D-411A-A082-98B67B7982BE@gmail.com>
- <CALMp9eTiM4+ZnnnXLP-TNrrjfn3DLAurkcY+2Jom5wWqzFe0Jw@mail.gmail.com>
-To:     Jim Mattson <jmattson@google.com>
-X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Sep 24, 2019, at 12:29 PM, Jim Mattson <jmattson@google.com> wrote:
->=20
-> On Tue, Sep 24, 2019 at 11:14 AM Nadav Amit <nadav.amit@gmail.com> =
-wrote:
->>> On Sep 24, 2019, at 11:09 AM, Jim Mattson <jmattson@google.com> =
-wrote:
->>>=20
->>> On Tue, Sep 24, 2019 at 10:29 AM Nadav Amit <nadav.amit@gmail.com> =
-wrote:
->>>>> On Sep 20, 2019, at 12:44 PM, Jim Mattson <jmattson@google.com> =
-wrote:
->>>>>=20
->>>>> On Fri, Sep 20, 2019 at 12:36 PM Krish Sadhukhan
->>>>> <krish.sadhukhan@oracle.com> wrote:
->>>>>> On 9/19/19 4:02 PM, Jim Mattson wrote:
->>>>>>> Ensure that support for RDPRU is not enumerated in the guest's =
-CPUID
->>>>>>> and that the RDPRU instruction raises #UD.
->>>>>>=20
->>>>>>=20
->>>>>> The AMD spec says,
->>>>>>=20
->>>>>>       "When the CPL>0 with CR4.TSD=3D1, the RDPRUinstruction will
->>>>>> generate a #UD fault."
->>>>>>=20
->>>>>> So we don't need to check the CR4.TSD value here ?
->>>>>=20
->>>>> KVM should set CPUID Fn8000_0008_EBX[RDPRU] to 0.
->>>>>=20
->>>>> However, I should modify the test so it passes (or skips) on =
-hardware. :-)
->>>>=20
->>>> Thanks for making this exception. Just wondering: have you or =
-anyone else
->>>> used this functionality - of running tests on bare-metal?
->>>=20
->>> I have not. However, if there is a simple way to add this testing to
->>> our workflow, I would be happy to ask the team to do so before =
-sending
->>> submissions upstream.
->>=20
->> I guess I should build some script that uses idrac to automate this =
-process.
->=20
-> I'm not familiar with idrac. What sort of functionality do you need
-> from the test infrastructure to automate this process?
+Plain text now. Sorry for spam.
 
-Redirecting the serial port to the console and rebooting the machine
-remotely.
 
+On Tue, Sep 24, 2019 at 12:33 PM Bill Wendling <morbo@google.com> wrote:
+>
+> +Paolo Bonzini, Radim Kr=C4=8Dm=C3=A1=C5=99
+>
+> On Wed, Sep 11, 2019 at 12:11 PM Sean Christopherson <sean.j.christophers=
+on@intel.com> wrote:
+>>
+>> On Mon, Sep 09, 2019 at 02:28:22PM -0700, Bill Wendling wrote:
+>> > The extended assembly documentation list only "q" as an operand modifi=
+er
+>> > for DImode registers. The "d" seems to be an AMD-ism, which appears to
+>> > be only begrudgingly supported by gcc.
+>> >
+>> > Signed-off-by: Bill Wendling <morbo@google.com>
+>> > ---
+>>
+>> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
