@@ -2,276 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F357BCB69
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 17:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DACABCB9E
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 17:35:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389574AbfIXPao (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 11:30:44 -0400
-Received: from mga18.intel.com ([134.134.136.126]:47824 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389524AbfIXPao (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 11:30:44 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Sep 2019 08:30:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,544,1559545200"; 
-   d="scan'208";a="195727916"
-Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
-  by FMSMGA003.fm.intel.com with ESMTP; 24 Sep 2019 08:30:42 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH] KVM: CPUID: Fix IA32_XSS support in CPUID(0xd,i) enumeration
-Date:   Tue, 24 Sep 2019 23:32:50 +0800
-Message-Id: <20190924153250.20315-1-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
+        id S2390501AbfIXPfF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 11:35:05 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:59760 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388173AbfIXPfF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 11:35:05 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8OFYIN9177126;
+        Tue, 24 Sep 2019 15:34:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=QEIbhfL1lRjZRLhfXRyEIJQiBEMCHyObEwOy+3gAXd8=;
+ b=i1M48Y/Z3Sa7UruED12rIedqnM+NhYCvyrfl/C8he7nUGt7BMpP4JjoKkTqBvciwSGx0
+ 8zYEu4YyEm8e0god0m7Wn/H0AxF5I/ggAJqN+WJBCvemhxWSIqs9ERskaCjgIuUloRxM
+ 1cUvIa+c+7gartC90lA89a+MzL1YDsacrVdxNK2wktrEeSIoDC4ahzVt1MK+dxT8FLRv
+ EFRMTAuGhjL35O5Y7z05L8sv2tbKm6q42GbiI9UQC/ISD5sP8LeIt8lt0T4EdO8/YB9E
+ 7+lymE94TguBRoleIgsJUFO/jUJtBUwL6859RYBBi/XjZ2earW0yrWOIeB/F95Wp+x71 Kw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2v5cgqxw7w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Sep 2019 15:34:41 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8OFXREt148131;
+        Tue, 24 Sep 2019 15:34:41 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2v6yvrx6we-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Sep 2019 15:34:40 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8OFYeEx026820;
+        Tue, 24 Sep 2019 15:34:40 GMT
+Received: from [192.168.14.112] (/79.177.238.243)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 24 Sep 2019 08:34:40 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH kvm-unit-tests 0/8]: x86: vmx: Test INIT processing in
+ various CPU VMX states
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <87a7b09y5g.fsf@vitty.brq.redhat.com>
+Date:   Tue, 24 Sep 2019 18:34:36 +0300
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <8A53DB10-E776-40CC-BB33-0E9A84479194@oracle.com>
+References: <20190919125211.18152-1-liran.alon@oracle.com>
+ <87a7b09y5g.fsf@vitty.brq.redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9390 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909240146
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9390 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909240146
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The control bits in IA32_XSS MSR are being used for new features,
-but current CPUID(0xd,i) enumeration code doesn't support them, so
-fix existing code first.
+Gentle ping.
 
-The supervisor states in IA32_XSS haven't been used in public
-KVM code, so set KVM_SUPPORTED_XSS to 0 now, anyone who's developing
-IA32_XSS related feature may expand the macro to add the CPUID support,
-otherwise, CPUID(0xd,i>1) always reports 0 of the subleaf to guest.
-
-Extracted old code into a new filter and keep it same flavor as others.
-
-This patch passed selftest on a few Intel platforms.
-
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/cpuid.c            | 94 +++++++++++++++++++++------------
- arch/x86/kvm/svm.c              |  7 +++
- arch/x86/kvm/vmx/vmx.c          |  6 +++
- arch/x86/kvm/x86.h              |  7 +++
- 5 files changed, 82 insertions(+), 33 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 74e88e5edd9c..d018df8c5f32 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1209,6 +1209,7 @@ struct kvm_x86_ops {
- 	uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
- 
- 	bool (*need_emulation_on_page_fault)(struct kvm_vcpu *vcpu);
-+	u64 (*supported_xss)(void);
- };
- 
- struct kvm_arch_async_pf {
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 22c2720cd948..9d282fec0a62 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -62,6 +62,11 @@ u64 kvm_supported_xcr0(void)
- 	return xcr0;
- }
- 
-+u64 kvm_supported_xss(void)
-+{
-+	return KVM_SUPPORTED_XSS & kvm_x86_ops->supported_xss();
-+}
-+
- #define F(x) bit(X86_FEATURE_##x)
- 
- int kvm_update_cpuid(struct kvm_vcpu *vcpu)
-@@ -414,6 +419,50 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
- 	}
- }
- 
-+static inline void do_cpuid_0xd_mask(struct kvm_cpuid_entry2 *entry, int index)
-+{
-+	unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
-+	/* cpuid 0xD.1.eax */
-+	const u32 kvm_cpuid_D_1_eax_x86_features =
-+		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
-+	u64 u_supported = kvm_supported_xcr0();
-+	u64 s_supported = kvm_supported_xss();
-+	u64 supported;
-+
-+	switch (index) {
-+	case 0:
-+		entry->eax &= u_supported;
-+		entry->ebx = xstate_required_size(u_supported, false);
-+		entry->ecx = entry->ebx;
-+		entry->edx = 0;
-+		break;
-+	case 1:
-+		supported = u_supported | s_supported;
-+		entry->eax &= kvm_cpuid_D_1_eax_x86_features;
-+		cpuid_mask(&entry->eax, CPUID_D_1_EAX);
-+		entry->ebx = 0;
-+		entry->edx = 0;
-+		entry->ecx &= s_supported;
-+		if (entry->eax & (F(XSAVES) | F(XSAVEC)))
-+			entry->ebx = xstate_required_size(supported, true);
-+
-+		break;
-+	default:
-+		supported = (entry->ecx & 1) ? s_supported : u_supported;
-+		if (!(supported & ((u64)1 << index))) {
-+			entry->eax = 0;
-+			entry->ebx = 0;
-+			entry->ecx = 0;
-+			entry->edx = 0;
-+			return;
-+		}
-+		if (entry->ecx)
-+			entry->ebx = 0;
-+		entry->edx = 0;
-+		break;
-+	}
-+}
-+
- static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 				  int *nent, int maxnent)
- {
-@@ -428,7 +477,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 	unsigned f_lm = 0;
- #endif
- 	unsigned f_rdtscp = kvm_x86_ops->rdtscp_supported() ? F(RDTSCP) : 0;
--	unsigned f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
- 	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
- 
- 	/* cpuid 1.edx */
-@@ -482,10 +530,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
- 		F(PMM) | F(PMM_EN);
- 
--	/* cpuid 0xD.1.eax */
--	const u32 kvm_cpuid_D_1_eax_x86_features =
--		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
--
- 	/* all calls to cpuid_count() should be made on the same cpu */
- 	get_cpu();
- 
-@@ -622,38 +666,22 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 		break;
- 	}
- 	case 0xd: {
--		int idx, i;
--		u64 supported = kvm_supported_xcr0();
--
--		entry->eax &= supported;
--		entry->ebx = xstate_required_size(supported, false);
--		entry->ecx = entry->ebx;
--		entry->edx &= supported >> 32;
--		if (!supported)
--			break;
-+		int i, idx;
- 
--		for (idx = 1, i = 1; idx < 64; ++idx) {
--			u64 mask = ((u64)1 << idx);
-+		do_cpuid_0xd_mask(&entry[0], 0);
-+		for (i = 1, idx = 1; idx < 64; ++idx) {
- 			if (*nent >= maxnent)
- 				goto out;
--
- 			do_host_cpuid(&entry[i], function, idx);
--			if (idx == 1) {
--				entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
--				cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
--				entry[i].ebx = 0;
--				if (entry[i].eax & (F(XSAVES)|F(XSAVEC)))
--					entry[i].ebx =
--						xstate_required_size(supported,
--								     true);
--			} else {
--				if (entry[i].eax == 0 || !(supported & mask))
--					continue;
--				if (WARN_ON_ONCE(entry[i].ecx & 1))
--					continue;
--			}
--			entry[i].ecx = 0;
--			entry[i].edx = 0;
-+			if (entry[i].eax == 0 && entry[i].ebx == 0 &&
-+			    entry[i].ecx == 0 && entry[i].edx == 0)
-+				continue;
-+
-+			do_cpuid_0xd_mask(&entry[i], idx);
-+			if (entry[i].eax == 0 && entry[i].ebx == 0 &&
-+			    entry[i].ecx == 0 && entry[i].edx == 0)
-+				continue;
-+
- 			++*nent;
- 			++i;
- 		}
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index e0368076a1ef..be967bf9a81d 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -7193,6 +7193,11 @@ static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
- 	return false;
- }
- 
-+static u64 svm_supported_xss(void)
-+{
-+	return 0;
-+}
-+
- static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.cpu_has_kvm_support = has_svm,
- 	.disabled_by_bios = is_disabled,
-@@ -7329,6 +7334,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.nested_get_evmcs_version = NULL,
- 
- 	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
-+
-+	.supported_xss = svm_supported_xss,
- };
- 
- static int __init svm_init(void)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c6f6b05004d9..a84198cff397 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1651,6 +1651,11 @@ static inline bool vmx_feature_control_msr_valid(struct kvm_vcpu *vcpu,
- 	return !(val & ~valid_bits);
- }
- 
-+static inline u64 vmx_supported_xss(void)
-+{
-+	return host_xss;
-+}
-+
- static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
- {
- 	switch (msr->index) {
-@@ -7799,6 +7804,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 	.nested_enable_evmcs = NULL,
- 	.nested_get_evmcs_version = NULL,
- 	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
-+	.supported_xss = vmx_supported_xss,
- };
- 
- static void vmx_cleanup_l1d_flush(void)
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 6594020c0691..fbffabad0370 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -293,6 +293,13 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, unsigned long cr2,
- 				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU)
-+
-+/*
-+ * Right now, no XSS states are used on x86 platform,
-+ * expand the macro for new features.
-+ */
-+#define KVM_SUPPORTED_XSS	(0)
-+
- extern u64 host_xcr0;
- 
- extern u64 kvm_supported_xcr0(void);
--- 
-2.17.2
+> On 19 Sep 2019, at 17:08, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> 
+> Liran Alon <liran.alon@oracle.com> writes:
+> 
+>> Hi,
+>> 
+>> This patch series aims to add a vmx test to verify the functionality
+>> introduced by KVM commit:
+>> 4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various CPU states")
+>> 
+>> The test verifies the following functionality:
+>> 1) An INIT signal received when CPU is in VMX operation
+>>  is latched until it exits VMX operation.
+>> 2) If there is an INIT signal pending when CPU is in
+>>  VMX non-root mode, it result in VMExit with (reason == 3).
+>> 3) Exit from VMX non-root mode on VMExit do not clear
+>>  pending INIT signal in LAPIC.
+>> 4) When CPU exits VMX operation, pending INIT signal in
+>>  LAPIC is processed.
+>> 
+>> In order to write such a complex test, the vmx tests framework was
+>> enhanced to support using VMX in non BSP CPUs. This enhancement is
+>> implemented in patches 1-7. The test itself is implemented at patch 8.
+>> This enhancement to the vmx tests framework is a bit hackish, but
+>> I believe it's OK because this functionality is rarely required by
+>> other VMX tests.
+>> 
+> 
+> Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> 
+> Thanks!
+> 
+> -- 
+> Vitaly
 
