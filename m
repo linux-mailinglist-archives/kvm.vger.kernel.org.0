@@ -2,68 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D1B1BC9F9
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 16:17:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62F0DBCA12
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 16:20:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395504AbfIXORU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 10:17:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43920 "EHLO
+        id S2441322AbfIXOUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 10:20:24 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51711 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2394680AbfIXORT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Sep 2019 10:17:19 -0400
+        by vger.kernel.org with ESMTP id S2441302AbfIXOUV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Sep 2019 10:20:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1569334637;
+        s=mimecast20190719; t=1569334820;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ufjQPEsFm1xeguZRHsC9ByLLmAwWcgBv4sT0YNt9UKk=;
-        b=SHeT27AplZN+4gFJDtZfH50AXRrTU0n6UVXHExPh4Nrma23RzK12aueclNfCQEa5BbkWgz
-        rSFe8VD9KA73xQiMjrEeDQyklnGctnOBgjsv1vUPA6o+6thEIlLPze1UwvBk6BPR28jbgq
-        eZYQOgCnH+tF79MKFz3yZLL0mi6u7Qw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-kVSAQtOxPaC0l9RgyblwsA-1; Tue, 24 Sep 2019 10:17:15 -0400
-Received: by mail-wr1-f69.google.com with SMTP id w8so638969wrm.3
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 07:17:15 -0700 (PDT)
+        bh=L4qybsnzerq1m1MESjNMamZC3PQ0Zg5C9AXa25MzaeU=;
+        b=S5hzl7zjPCC4xdxYATZsJFUeD5SwePMdNYoYSZ4DWF8ZQjpDShr8tbUBHs1przxCZKDJG/
+        66cbqpUbE9CqRlYpqZ2rid1SeDwxyAYITH9tUQ+XjsyCjw/rHqAvtkyFL3J76JvVaOrGiq
+        9653Eu+f+Pn18ZqIIi5JGer7yQOK/d4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-EXQ5ofAQPI6oO-RSF5PXdg-1; Tue, 24 Sep 2019 10:20:18 -0400
+Received: by mail-wr1-f71.google.com with SMTP id w10so641257wrl.5
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 07:20:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=f7BWlWtqSdXGaQO+du21j+jMJq+N4Dnqgspn3thOEzk=;
-        b=Q1A5+oi13TWtvZbXv+6okp4DAXCOGzWNxuG+h0ojragWWcNaFKyi+72/Zx+sK+dLZh
-         YG0bZNNNZdXI6PwS2QPWof/AwLRbDLWkVx2aiVVcx5KKssmhTzeYXXJoaL1LqSvEarfD
-         y1hgIVNaNAqDfGi3IWgjmxdznvRTupT3HOEbLOKetuwvTDFly2W/BrwNlq7hvdfKBAZK
-         D0pes3iPTeDDX9Tt3tXyxqPIRmbTrW5oHulLOJny97QHi3MJjGRaEqpm07g4842s1gr4
-         5DCaChIJD3l/msHDYg+pzSezHdYuY8cLSkrHnwg9uak2UHPAvEHmXpuKUYEAF/XpOdz5
-         glpg==
-X-Gm-Message-State: APjAAAUmRR9aYZfB0uiuPSPvbQZoK4DIMkNLI9rhOfqJuTZp0sptmkRs
-        EQqIbBziTVDPZfkES5DQApx87Kpt12UXP5eaG/IXkdLZl7aTWmX2HOf9Hl4yvDaBLN9aM76vS48
-        Sp10asy2k+Jz/
-X-Received: by 2002:a5d:680d:: with SMTP id w13mr2484827wru.282.1569334634411;
-        Tue, 24 Sep 2019 07:17:14 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzddOK1kGg6+1DpeeqtXWPpUqKRUo47l/oChnbBCNBvnu24MyBy18otAWtT4eRN33u3NJR1HA==
-X-Received: by 2002:a5d:680d:: with SMTP id w13mr2484794wru.282.1569334634083;
-        Tue, 24 Sep 2019 07:17:14 -0700 (PDT)
+        bh=sEyk6USuWuluG4dEpZivpllBkGUrYY+s2EB287d40EY=;
+        b=cYqa2yG6hi8zaFZBtAo8RdtJH+ftL1D8sio8VZBOauDAYpN6qGxQyUL8xgIMFZqPRt
+         0yLkVB6Fnp18Z5IA/g2dkIF55pD/NKHNMdAKFBkViHng4B4/cm3WkmTrDcAvHIB+bpma
+         a761Y/IWasVlf0kaokSDp4l8kY4XST5wJ+SBRgQ918lH32YqL6rrZcSxQlpSmn6/vByr
+         dL3TKnrnkrEMk4FpK9ROViFqnNQJLbkI1aebYyTRAV3p6/LRz3yb+tug/PKcrSXG4ak5
+         1zINe5/zsL85nJNNDszW6e1JH+5btmqq6AkDtt+PRT3jeM9n6avnYwsP8bKvo7Lcb6jm
+         10ig==
+X-Gm-Message-State: APjAAAU8ErVogziJrDXYJhc9C2TtCJ+OYTTKjY6rqkkqJnIMpqLDK1Yd
+        P5K1oHpBEzd2ypgH1lAQDn2SbotQQ+xw6kp3NcqIERMFApoKs72V9MTz1TSxmLKYcFS4p7gDZOk
+        8NJCh2Q87RO/y
+X-Received: by 2002:a5d:69c7:: with SMTP id s7mr2469141wrw.295.1569334817101;
+        Tue, 24 Sep 2019 07:20:17 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx4LF7gV2lQhhn+yrMAt/0oOF5J6XmW/oOSZQJqYKd8ZZoV90deJE9Ub18ZwCF1a3Rr5w2N/g==
+X-Received: by 2002:a5d:69c7:: with SMTP id s7mr2469108wrw.295.1569334816822;
+        Tue, 24 Sep 2019 07:20:16 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id y14sm2839135wrd.84.2019.09.24.07.17.13
+        by smtp.gmail.com with ESMTPSA id h125sm183749wmf.31.2019.09.24.07.20.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2019 07:17:13 -0700 (PDT)
-Subject: Re: [PATCH v3] kvm: nvmx: limit atomic switch MSRs
-To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
-        jmattson@google.com, pshier@google.com,
-        sean.j.christopherson@intel.com
-References: <20190917185057.224221-1-marcorr@google.com>
+        Tue, 24 Sep 2019 07:20:15 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 4/6] psci: Add hvc call service for ptp_kvm.
+To:     "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        "Kaly Xin (Arm Technology China)" <Kaly.Xin@arm.com>,
+        "Justin He (Arm Technology China)" <Justin.He@arm.com>,
+        nd <nd@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <20190918080716.64242-1-jianyong.wu@arm.com>
+ <20190918080716.64242-5-jianyong.wu@arm.com>
+ <83ed7fac-277f-a31e-af37-8ec134f39d26@redhat.com>
+ <HE1PR0801MB1676F57B317AE85E3B934B32F48E0@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <629538ea-13fb-e666-8df6-8ad23f114755@redhat.com>
+ <HE1PR0801MB167639E2F025998058A77F86F4890@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <ef6ab8bd-41ad-88f8-9cfd-dc749ca65310@redhat.com>
+ <HE1PR0801MB1676A9D4A58118144F5C7B54F4850@HE1PR0801MB1676.eurprd08.prod.outlook.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <72cbee37-c66b-7a02-2b95-7ed829aee5c2@redhat.com>
-Date:   Tue, 24 Sep 2019 16:17:12 +0200
+Message-ID: <06264d8a-b9c0-5f19-db2c-6190976a2a05@redhat.com>
+Date:   Tue, 24 Sep 2019 16:20:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190917185057.224221-1-marcorr@google.com>
+In-Reply-To: <HE1PR0801MB1676A9D4A58118144F5C7B54F4850@HE1PR0801MB1676.eurprd08.prod.outlook.com>
 Content-Language: en-US
-X-MC-Unique: kVSAQtOxPaC0l9RgyblwsA-1
+X-MC-Unique: EXQ5ofAQPI6oO-RSF5PXdg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -72,165 +95,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/09/19 20:50, Marc Orr wrote:
-> Allowing an unlimited number of MSRs to be specified via the VMX
-> load/store MSR lists (e.g., vm-entry MSR load list) is bad for two
-> reasons. First, a guest can specify an unreasonable number of MSRs,
-> forcing KVM to process all of them in software. Second, the SDM bounds
-> the number of MSRs allowed to be packed into the atomic switch MSR lists.
-> Quoting the "Miscellaneous Data" section in the "VMX Capability
-> Reporting Facility" appendix:
->=20
-> "Bits 27:25 is used to compute the recommended maximum number of MSRs
-> that should appear in the VM-exit MSR-store list, the VM-exit MSR-load
-> list, or the VM-entry MSR-load list. Specifically, if the value bits
-> 27:25 of IA32_VMX_MISC is N, then 512 * (N + 1) is the recommended
-> maximum number of MSRs to be included in each list. If the limit is
-> exceeded, undefined processor behavior may result (including a machine
-> check during the VMX transition)."
->=20
-> Because KVM needs to protect itself and can't model "undefined processor
-> behavior", arbitrarily force a VM-entry to fail due to MSR loading when
-> the MSR load list is too large. Similarly, trigger an abort during a VM
-> exit that encounters an MSR load list or MSR store list that is too large=
-.
->=20
-> The MSR list size is intentionally not pre-checked so as to maintain
-> compatibility with hardware inasmuch as possible.
->=20
-> Test these new checks with the kvm-unit-test "x86: nvmx: test max atomic
-> switch MSRs".
->=20
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> ---
-> v2 -> v3
-> * Updated commit message.
-> * Removed superflous function declaration.
-> * Expanded in-line comment.
->=20
->  arch/x86/include/asm/vmx.h |  1 +
->  arch/x86/kvm/vmx/nested.c  | 44 ++++++++++++++++++++++++++++----------
->  2 files changed, 34 insertions(+), 11 deletions(-)
->=20
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index a39136b0d509..a1f6ed187ccd 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -110,6 +110,7 @@
->  #define VMX_MISC_SAVE_EFER_LMA=09=09=090x00000020
->  #define VMX_MISC_ACTIVITY_HLT=09=09=090x00000040
->  #define VMX_MISC_ZERO_LEN_INS=09=09=090x40000000
-> +#define VMX_MISC_MSR_LIST_MULTIPLIER=09=09512
-> =20
->  /* VMFUNC functions */
->  #define VMX_VMFUNC_EPTP_SWITCHING               0x00000001
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index ced9fba32598..0e29882bb45f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -190,6 +190,16 @@ static void nested_vmx_abort(struct kvm_vcpu *vcpu, =
-u32 indicator)
->  =09pr_debug_ratelimited("kvm: nested vmx abort, indicator %d\n", indicat=
-or);
->  }
-> =20
-> +static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> +{
-> +=09return fixed_bits_valid(control, low, high);
-> +}
-> +
-> +static inline u64 vmx_control_msr(u32 low, u32 high)
-> +{
-> +=09return low | ((u64)high << 32);
-> +}
-> +
->  static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
->  {
->  =09secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
-> @@ -856,18 +866,36 @@ static int nested_vmx_store_msr_check(struct kvm_vc=
-pu *vcpu,
->  =09return 0;
->  }
-> =20
-> +static u32 nested_vmx_max_atomic_switch_msrs(struct kvm_vcpu *vcpu)
-> +{
-> +=09struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-> +=09u64 vmx_misc =3D vmx_control_msr(vmx->nested.msrs.misc_low,
-> +=09=09=09=09       vmx->nested.msrs.misc_high);
-> +
-> +=09return (vmx_misc_max_msr(vmx_misc) + 1) * VMX_MISC_MSR_LIST_MULTIPLIE=
-R;
-> +}
-> +
->  /*
->   * Load guest's/host's msr at nested entry/exit.
->   * return 0 for success, entry index for failure.
-> + *
-> + * One of the failure modes for MSR load/store is when a list exceeds th=
-e
-> + * virtual hardware's capacity. To maintain compatibility with hardware =
-inasmuch
-> + * as possible, process all valid entries before failing rather than pre=
-check
-> + * for a capacity violation.
->   */
->  static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count=
-)
->  {
->  =09u32 i;
->  =09struct vmx_msr_entry e;
->  =09struct msr_data msr;
-> +=09u32 max_msr_list_size =3D nested_vmx_max_atomic_switch_msrs(vcpu);
-> =20
->  =09msr.host_initiated =3D false;
->  =09for (i =3D 0; i < count; i++) {
-> +=09=09if (unlikely(i >=3D max_msr_list_size))
-> +=09=09=09goto fail;
-> +
->  =09=09if (kvm_vcpu_read_guest(vcpu, gpa + i * sizeof(e),
->  =09=09=09=09=09&e, sizeof(e))) {
->  =09=09=09pr_debug_ratelimited(
-> @@ -899,9 +927,14 @@ static int nested_vmx_store_msr(struct kvm_vcpu *vcp=
-u, u64 gpa, u32 count)
->  {
->  =09u32 i;
->  =09struct vmx_msr_entry e;
-> +=09u32 max_msr_list_size =3D nested_vmx_max_atomic_switch_msrs(vcpu);
-> =20
->  =09for (i =3D 0; i < count; i++) {
->  =09=09struct msr_data msr_info;
-> +
-> +=09=09if (unlikely(i >=3D max_msr_list_size))
-> +=09=09=09return -EINVAL;
-> +
->  =09=09if (kvm_vcpu_read_guest(vcpu,
->  =09=09=09=09=09gpa + i * sizeof(e),
->  =09=09=09=09=09&e, 2 * sizeof(u32))) {
-> @@ -1009,17 +1042,6 @@ static u16 nested_get_vpid02(struct kvm_vcpu *vcpu=
-)
->  =09return vmx->nested.vpid02 ? vmx->nested.vpid02 : vmx->vpid;
->  }
-> =20
-> -
-> -static inline bool vmx_control_verify(u32 control, u32 low, u32 high)
-> -{
-> -=09return fixed_bits_valid(control, low, high);
-> -}
-> -
-> -static inline u64 vmx_control_msr(u32 low, u32 high)
-> -{
-> -=09return low | ((u64)high << 32);
-> -}
-> -
->  static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
->  {
->  =09superset &=3D mask;
->=20
+On 23/09/19 06:57, Jianyong Wu (Arm Technology China) wrote:
+>> On 19/09/19 11:46, Jianyong Wu (Arm Technology China) wrote:
+>>>> On 18/09/19 11:57, Jianyong Wu (Arm Technology China) wrote:
+>>>>> Paolo Bonzini wrote:
+>>>>>> This is not Y2038-safe.  Please use ktime_get_real_ts64 instead,
+>>>>>> and split the 64-bit seconds value between val[0] and val[1].
+>>>
+>>> Val[] should be long not u32 I think, so in arm64 I can avoid that
+>>> Y2038_safe, but also need rewrite for arm32.
+>>
+>> I don't think there's anything inherently wrong with u32 val[], and as y=
+ou
+>> notice it lets you reuse code between arm and arm64.  It's up to you and
+>> Marc to decide.
+>>
+> To compatible 32-bit, Integrates second value and nanosecond value as a n=
+anosecond value then split it into val[0] and val[1] and split cycle value =
+into val[2] and val[3],
+>  In this way, time will overflow at Y2262.
+> WDYT?
 
-Queued, thanks.
+So if I understand correctly you'd multiply by 10^9 (or better shift by
+30) the nanoseconds.
+
+That works, but why not provide 5 output registers?  Alternatively, take
+an address as input and write there.
+
+Finally, on x86 we added an argument for the CLOCK_* that is being read
+(currently only CLOCK_REALTIME, but having room for extensibility in the
+API is always nice).
 
 Paolo
 
