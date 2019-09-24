@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E8D6BCF89
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 19:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65502BCF36
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 19:01:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406221AbfIXQ6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 12:58:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42278 "EHLO mail.kernel.org"
+        id S2410890AbfIXQx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 12:53:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46464 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2410628AbfIXQtt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 12:49:49 -0400
+        id S2441616AbfIXQwl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 12:52:41 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5427221971;
-        Tue, 24 Sep 2019 16:49:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6B2992054F;
+        Tue, 24 Sep 2019 16:52:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569343789;
-        bh=5PN5gHuZThoRxTF4pnmnlVuDVJAKrvmI1Q8ep/YnmwI=;
+        s=default; t=1569343960;
+        bh=RlYKxXdLi0iG8jA3nBMsToaPxsGq9Tnp4BjvMwYQlnw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WnByi90U/5meoa2sq7WCqETuJH2FBWc0ZiJqyeX+fDiIOth9pupYjVRgPDQbKyoC2
-         f34yCOjIGq5Xfa0tTP/PPg7w0AI9aan+xGsLU5Yr7wSgUoBilExk21Lshv7iJ4zM0U
-         zJhIVAdbNlhpXc/bT7II1a2e+xoawyeZurmwhUJA=
+        b=MfTXGbo1fkdaX07vPXioWkt3ltJ9za0eaWLNjDq+489XXtYwkEglX5icy0DhATLGw
+         01ZYd8CAPJO5FbXryw/vNoS9xqU0Y8jHutrg8QO4sZiDLXX/tIl8soWm6M7jmiVGlu
+         62+iDJxXDqLLOfX495b/G3/jd662rGD/ZKP7yNHs=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     hexin <hexin.op@gmail.com>, hexin <hexin15@baidu.com>,
         Liu Qi <liuqi16@baidu.com>, Zhang Yu <zhangyu31@baidu.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 30/50] vfio_pci: Restore original state on release
-Date:   Tue, 24 Sep 2019 12:48:27 -0400
-Message-Id: <20190924164847.27780-30-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 11/14] vfio_pci: Restore original state on release
+Date:   Tue, 24 Sep 2019 12:52:09 -0400
+Message-Id: <20190924165214.28857-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190924164847.27780-1-sashal@kernel.org>
-References: <20190924164847.27780-1-sashal@kernel.org>
+In-Reply-To: <20190924165214.28857-1-sashal@kernel.org>
+References: <20190924165214.28857-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -68,10 +68,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 6cf00d9f512b7..a92c2868d9021 100644
+index 47b229fa5e8ec..4b62eb3b59233 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -373,11 +373,20 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+@@ -221,11 +221,20 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
  	pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
  
  	/*
