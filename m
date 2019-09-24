@@ -2,128 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B2D4ABC91E
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 15:47:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4566BC940
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 15:54:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390471AbfIXNrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 09:47:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37916 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727500AbfIXNrN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Sep 2019 09:47:13 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8ODeeQf087921;
-        Tue, 24 Sep 2019 09:47:03 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2v7j7k5gsu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Sep 2019 09:46:29 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x8ODailS015223;
-        Tue, 24 Sep 2019 13:46:26 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma02dal.us.ibm.com with ESMTP id 2v5bg7c3dp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Sep 2019 13:46:26 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8ODkPdk26673454
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Sep 2019 13:46:25 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7B66F112064;
-        Tue, 24 Sep 2019 13:46:25 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9EA0A112063;
-        Tue, 24 Sep 2019 13:46:24 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.184])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 24 Sep 2019 13:46:24 +0000 (GMT)
-Message-ID: <77a2a670b900dcde3e4d88094d5d04752db27b86.camel@linux.ibm.com>
-Subject: Re: [PATCH 0/3] Replace current->mm by kvm->mm on powerpc/kvm
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Date:   Tue, 24 Sep 2019 10:46:19 -0300
-In-Reply-To: <20190924020008.GA4011@oak.ozlabs.ibm.com>
-References: <20190923212409.7153-1-leonardo@linux.ibm.com>
-         <20190924020008.GA4011@oak.ozlabs.ibm.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-2jqimbQY+p+IkhB2VQWm"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S2441157AbfIXNyN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 09:54:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35932 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2441133AbfIXNyN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 09:54:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7AC747FDCA;
+        Tue, 24 Sep 2019 13:54:09 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-44.pek2.redhat.com [10.72.12.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5087C5B69A;
+        Tue, 24 Sep 2019 13:53:48 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V2 0/8] mdev based hardware virtio offloading support
+Date:   Tue, 24 Sep 2019 21:53:24 +0800
+Message-Id: <20190924135332.14160-1-jasowang@redhat.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-24_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=995 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909240136
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 24 Sep 2019 13:54:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi all:
 
---=-2jqimbQY+p+IkhB2VQWm
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+There are hardware that can do virtio datapath offloading while having
+its own control path. This path tries to implement a mdev based
+unified API to support using kernel virtio driver to drive those
+devices. This is done by introducing a new mdev transport for virtio
+(virtio_mdev) and register itself as a new kind of mdev driver. Then
+it provides a unified way for kernel virtio driver to talk with mdev
+device implementation.
 
-On Tue, 2019-09-24 at 12:00 +1000, Paul Mackerras wrote:
-> On Mon, Sep 23, 2019 at 06:24:06PM -0300, Leonardo Bras wrote:
-> > By replacing, we would reduce the use of 'global' current on code,
-> > relying more in the contents of kvm struct.
-> >=20
-> > On code, I found that in kvm_create_vm() there is:
-> > kvm->mm =3D current->mm;
-> >=20
-> > And that on every kvm_*_ioctl we have tests like that:
-> > if (kvm->mm !=3D current->mm)
-> >         return -EIO;
-> >=20
-> > So this change would be safe.
-> >=20
-> > I split the changes in 3 patches, so it would be easier to read
-> > and reject separated parts. If decided that squashing is better,
-> > I see no problem doing that.
->=20
-> The patch series looks fine.  It has missed the 5.4 merge window, and
-> it doesn't fix any bugs, so I will queue it up for the 5.5 merge
-> window, meaning that I will put it into my kvm-ppc-next branch when I
-> prepare it for the 5.5 merge window, probably in about a month from
-> now.
->=20
-> This remark also applies to your other patch "Reduce calls to get
-> current->mm by storing the value locally".
->=20
-> Thanks,
-> Paul.
+Though the series only contains kernel driver support, the goal is to
+make the transport generic enough to support userspace drivers. This
+means vhost-mdev[1] could be built on top as well by resuing the
+transport.
 
-Thanks!
-Leonardo Bras
+A sample driver is also implemented which simulate a virito-net
+loopback ethernet device on top of vringh + workqueue. This could be
+used as a reference implementation for real hardware driver.
 
---=-2jqimbQY+p+IkhB2VQWm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+Consider mdev framework only support VFIO device and driver right now,
+this series also extend it to support other types. This is done
+through introducing class id to the device and pairing it with
+id_talbe claimed by the driver. On top, this seris also decouple
+device specific parents ops out of the common ones.
 
------BEGIN PGP SIGNATURE-----
+Pktgen test was done with virito-net + mvnet loop back device.
 
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl2KHisACgkQlQYWtz9S
-ttQIfA/9G1Z3gXIzBuQy/Li1ffXn/K6+pga8zrZXxcXGnu3on0Qze5Z3sE4EKhhG
-w+BjJ2ir+JBsExKPpyAtO8AaBHk2TjeCxUha0z0g4o5QQ2wz62FRxTXv2u3MwR/4
-q8KqRuIdWd5lVAJ0YG7cR0NR/ICfoOErsX2uYRCMwFgHxkh9yjy63GrCaTZNQA+o
-YXBlqP/FfdEOI5OceveW7YZoNLGUuXgXXj/vWYY/+ry6yX46ctcwTCpboeOoc0uN
-lSupIJrX+jYULmH4pKlGqwWnanolzJ4oHV/zmVdqB+O0vU42EPPPymLB2Uh0USdw
-RY9wbKSxdqj074uPECr/mEMJCpFcvtRaRITG25V27b0KCn7u2GQPEt8cuKAXPCoa
-qlPyRMTtOFmLRrn5piFUrgXHYaIFtQCfWqUZ+prKK39Sbwugu9NMbrwABoCAVS3y
-vGywSZAukwlqgEYtaJsx2TlScMz92Pryze14HHxl4hDR5jtWWosAwtNxnjLm1tyQ
-QQBrD19Vh5g6XPUlf8ekSEBvLf0XKKMeQWNrJwUtWED26jnNCF1ux0xfaCbMkLif
-nV1w/WJQzH3fhxIptL8c2NnBDnLF1JE4bBaSs6sKeFcU2NFjx/a/RsitLLF/PHKP
-cvlBqahmGrl72efAnKyXHMrrGj2zl0AXoGcBI7uwGq2GMlQu0bw=
-=zz1z
------END PGP SIGNATURE-----
+Please review.
 
---=-2jqimbQY+p+IkhB2VQWm--
+[1] https://lkml.org/lkml/2019/9/16/869
+
+Changes from V1:
+
+- move virtio_mdev.c to drivers/virtio
+- store class_id in mdev_device instead of mdev_parent
+- store device_ops in mdev_device instead of mdev_parent
+- reorder the patch, vringh fix comes first
+- really silent compiling warnings
+- really switch to use u16 for class_id
+- uevent and modpost support for mdev class_id
+- vraious tweaks per comments from Parav
+
+Changes from RFC-V2:
+
+- silent compile warnings on some specific configuration
+- use u16 instead u8 for class id
+- reseve MDEV_ID_VHOST for future vhost-mdev work
+- introduce "virtio" type for mvnet and make "vhost" type for future
+  work
+- add entries in MAINTAINER
+- tweak and typos fixes in commit log
+
+Changes from RFC-V1:
+
+- rename device id to class id
+- add docs for class id and device specific ops (device_ops)
+- split device_ops into seperate headers
+- drop the mdev_set_dma_ops()
+- use device_ops to implement the transport API, then it's not a part
+  of UAPI any more
+- use GFP_ATOMIC in mvnet sample device and other tweaks
+- set_vring_base/get_vring_base support for mvnet device
+
+Jason Wang (8):
+  vringh: fix copy direction of vringh_iov_push_kern()
+  mdev: class id support
+  mdev: bus uevent support
+  modpost: add support for mdev class id
+  mdev: introduce device specific ops
+  mdev: introduce virtio device and its device ops
+  virtio: introduce a mdev based transport
+  docs: sample driver to demonstrate how to implement virtio-mdev
+    framework
+
+ .../driver-api/vfio-mediated-device.rst       |   7 +-
+ MAINTAINERS                                   |   2 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  18 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |  18 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  14 +-
+ drivers/vfio/mdev/mdev_core.c                 |  19 +
+ drivers/vfio/mdev/mdev_driver.c               |  22 +
+ drivers/vfio/mdev/mdev_private.h              |   2 +
+ drivers/vfio/mdev/vfio_mdev.c                 |  45 +-
+ drivers/vhost/vringh.c                        |   8 +-
+ drivers/virtio/Kconfig                        |   7 +
+ drivers/virtio/Makefile                       |   1 +
+ drivers/virtio/virtio_mdev.c                  | 417 +++++++++++
+ include/linux/mdev.h                          |  52 +-
+ include/linux/mod_devicetable.h               |   8 +
+ include/linux/vfio_mdev.h                     |  52 ++
+ include/linux/virtio_mdev.h                   | 145 ++++
+ samples/Kconfig                               |   7 +
+ samples/vfio-mdev/Makefile                    |   1 +
+ samples/vfio-mdev/mbochs.c                    |  20 +-
+ samples/vfio-mdev/mdpy.c                      |  20 +-
+ samples/vfio-mdev/mtty.c                      |  18 +-
+ samples/vfio-mdev/mvnet.c                     | 692 ++++++++++++++++++
+ scripts/mod/devicetable-offsets.c             |   3 +
+ scripts/mod/file2alias.c                      |  10 +
+ 25 files changed, 1524 insertions(+), 84 deletions(-)
+ create mode 100644 drivers/virtio/virtio_mdev.c
+ create mode 100644 include/linux/vfio_mdev.h
+ create mode 100644 include/linux/virtio_mdev.h
+ create mode 100644 samples/vfio-mdev/mvnet.c
+
+-- 
+2.19.1
 
