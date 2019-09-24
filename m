@@ -2,145 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 238D0BCB71
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 17:32:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F357BCB69
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 17:30:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389777AbfIXPco (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 11:32:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52030 "EHLO mx1.redhat.com"
+        id S2389574AbfIXPao (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 11:30:44 -0400
+Received: from mga18.intel.com ([134.134.136.126]:47824 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389742AbfIXPcn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 11:32:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C8D96309BF1A;
-        Tue, 24 Sep 2019 15:32:42 +0000 (UTC)
-Received: from [10.36.116.245] (ovpn-116-245.ams2.redhat.com [10.36.116.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E26EE60852;
-        Tue, 24 Sep 2019 15:32:26 +0000 (UTC)
-Subject: Re: [PATCH v10 0/6] mm / virtio: Provide support for unused page
- reporting
-To:     Michal Hocko <mhocko@kernel.org>,
-        Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
-        mst@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, willy@infradead.org,
-        linux-mm@kvack.org, vbabka@suse.cz, akpm@linux-foundation.org,
-        mgorman@techsingularity.net, linux-arm-kernel@lists.infradead.org,
-        osalvador@suse.de, yang.zhang.wz@gmail.com, pagupta@redhat.com,
-        konrad.wilk@oracle.com, nitesh@redhat.com, riel@surriel.com,
-        lcapitulino@redhat.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
-        alexander.h.duyck@linux.intel.com
-References: <20190918175109.23474.67039.stgit@localhost.localdomain>
- <20190924142342.GX23050@dhcp22.suse.cz>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <d2a7acdd-3bb9-05c9-42d0-70a500801cd6@redhat.com>
-Date:   Tue, 24 Sep 2019 17:32:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190924142342.GX23050@dhcp22.suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 24 Sep 2019 15:32:43 +0000 (UTC)
+        id S2389524AbfIXPao (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 11:30:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Sep 2019 08:30:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,544,1559545200"; 
+   d="scan'208";a="195727916"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by FMSMGA003.fm.intel.com with ESMTP; 24 Sep 2019 08:30:42 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH] KVM: CPUID: Fix IA32_XSS support in CPUID(0xd,i) enumeration
+Date:   Tue, 24 Sep 2019 23:32:50 +0800
+Message-Id: <20190924153250.20315-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.09.19 16:23, Michal Hocko wrote:
-> On Wed 18-09-19 10:52:25, Alexander Duyck wrote:
-> [...]
->> In order to try and keep the time needed to find a non-reported page to
->> a minimum we maintain a "reported_boundary" pointer. This pointer is used
->> by the get_unreported_pages iterator to determine at what point it should
->> resume searching for non-reported pages. In order to guarantee pages do
->> not get past the scan I have modified add_to_free_list_tail so that it
->> will not insert pages behind the reported_boundary.
->>
->> If another process needs to perform a massive manipulation of the free
->> list, such as compaction, it can either reset a given individual boundary
->> which will push the boundary back to the list_head, or it can clear the
->> bit indicating the zone is actively processing which will result in the
->> reporting process resetting all of the boundaries for a given zone.
-> 
-> Is this any different from the previous version? The last review
-> feedback (both from me and Mel) was that we are not happy to have an
-> externally imposed constrains on how the page allocator is supposed to
-> maintain its free lists.
-> 
-> If this is really the only way to go forward then I would like to hear
-> very convincing arguments about other approaches not being feasible.
+The control bits in IA32_XSS MSR are being used for new features,
+but current CPUID(0xd,i) enumeration code doesn't support them, so
+fix existing code first.
 
-Adding to what Alexander said, I don't consider the other approaches
-(especially the bitmap-based approach Nitesh is currently working on)
-infeasible. There might be more rough edges (e.g., sparse zones) and
-eventually sometimes a little more work to be done, but definitely
-feasible. Incorporating stuff into the buddy might make some tasks
-(e.g., identify free pages) more efficient.
+The supervisor states in IA32_XSS haven't been used in public
+KVM code, so set KVM_SUPPORTED_XSS to 0 now, anyone who's developing
+IA32_XSS related feature may expand the macro to add the CPUID support,
+otherwise, CPUID(0xd,i>1) always reports 0 of the subleaf to guest.
 
-I still somewhat like the idea of capturing hints of free pages (in
-whatever data structure) and then going over the hints, seeing if the
-pages are still free. Then only temporarily isolating the still-free
-pages, reporting them, and un-isolating them after they were reported. I
-like the idea that the pages are not fake-allocated but only temporarily
-blocked. That works nicely e.g., with the movable zone (contain only
-movable data).
+Extracted old code into a new filter and keep it same flavor as others.
 
-But anyhow, after decades of people working on free page
-hinting/reporting, I am happy with anything that gets accepted upstream :D
+This patch passed selftest on a few Intel platforms.
 
+Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            | 94 +++++++++++++++++++++------------
+ arch/x86/kvm/svm.c              |  7 +++
+ arch/x86/kvm/vmx/vmx.c          |  6 +++
+ arch/x86/kvm/x86.h              |  7 +++
+ 5 files changed, 82 insertions(+), 33 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 74e88e5edd9c..d018df8c5f32 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1209,6 +1209,7 @@ struct kvm_x86_ops {
+ 	uint16_t (*nested_get_evmcs_version)(struct kvm_vcpu *vcpu);
+ 
+ 	bool (*need_emulation_on_page_fault)(struct kvm_vcpu *vcpu);
++	u64 (*supported_xss)(void);
+ };
+ 
+ struct kvm_arch_async_pf {
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 22c2720cd948..9d282fec0a62 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -62,6 +62,11 @@ u64 kvm_supported_xcr0(void)
+ 	return xcr0;
+ }
+ 
++u64 kvm_supported_xss(void)
++{
++	return KVM_SUPPORTED_XSS & kvm_x86_ops->supported_xss();
++}
++
+ #define F(x) bit(X86_FEATURE_##x)
+ 
+ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+@@ -414,6 +419,50 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+ 	}
+ }
+ 
++static inline void do_cpuid_0xd_mask(struct kvm_cpuid_entry2 *entry, int index)
++{
++	unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
++	/* cpuid 0xD.1.eax */
++	const u32 kvm_cpuid_D_1_eax_x86_features =
++		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
++	u64 u_supported = kvm_supported_xcr0();
++	u64 s_supported = kvm_supported_xss();
++	u64 supported;
++
++	switch (index) {
++	case 0:
++		entry->eax &= u_supported;
++		entry->ebx = xstate_required_size(u_supported, false);
++		entry->ecx = entry->ebx;
++		entry->edx = 0;
++		break;
++	case 1:
++		supported = u_supported | s_supported;
++		entry->eax &= kvm_cpuid_D_1_eax_x86_features;
++		cpuid_mask(&entry->eax, CPUID_D_1_EAX);
++		entry->ebx = 0;
++		entry->edx = 0;
++		entry->ecx &= s_supported;
++		if (entry->eax & (F(XSAVES) | F(XSAVEC)))
++			entry->ebx = xstate_required_size(supported, true);
++
++		break;
++	default:
++		supported = (entry->ecx & 1) ? s_supported : u_supported;
++		if (!(supported & ((u64)1 << index))) {
++			entry->eax = 0;
++			entry->ebx = 0;
++			entry->ecx = 0;
++			entry->edx = 0;
++			return;
++		}
++		if (entry->ecx)
++			entry->ebx = 0;
++		entry->edx = 0;
++		break;
++	}
++}
++
+ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 				  int *nent, int maxnent)
+ {
+@@ -428,7 +477,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 	unsigned f_lm = 0;
+ #endif
+ 	unsigned f_rdtscp = kvm_x86_ops->rdtscp_supported() ? F(RDTSCP) : 0;
+-	unsigned f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+ 	unsigned f_intel_pt = kvm_x86_ops->pt_supported() ? F(INTEL_PT) : 0;
+ 
+ 	/* cpuid 1.edx */
+@@ -482,10 +530,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
+ 		F(PMM) | F(PMM_EN);
+ 
+-	/* cpuid 0xD.1.eax */
+-	const u32 kvm_cpuid_D_1_eax_x86_features =
+-		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+-
+ 	/* all calls to cpuid_count() should be made on the same cpu */
+ 	get_cpu();
+ 
+@@ -622,38 +666,22 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 		break;
+ 	}
+ 	case 0xd: {
+-		int idx, i;
+-		u64 supported = kvm_supported_xcr0();
+-
+-		entry->eax &= supported;
+-		entry->ebx = xstate_required_size(supported, false);
+-		entry->ecx = entry->ebx;
+-		entry->edx &= supported >> 32;
+-		if (!supported)
+-			break;
++		int i, idx;
+ 
+-		for (idx = 1, i = 1; idx < 64; ++idx) {
+-			u64 mask = ((u64)1 << idx);
++		do_cpuid_0xd_mask(&entry[0], 0);
++		for (i = 1, idx = 1; idx < 64; ++idx) {
+ 			if (*nent >= maxnent)
+ 				goto out;
+-
+ 			do_host_cpuid(&entry[i], function, idx);
+-			if (idx == 1) {
+-				entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
+-				cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
+-				entry[i].ebx = 0;
+-				if (entry[i].eax & (F(XSAVES)|F(XSAVEC)))
+-					entry[i].ebx =
+-						xstate_required_size(supported,
+-								     true);
+-			} else {
+-				if (entry[i].eax == 0 || !(supported & mask))
+-					continue;
+-				if (WARN_ON_ONCE(entry[i].ecx & 1))
+-					continue;
+-			}
+-			entry[i].ecx = 0;
+-			entry[i].edx = 0;
++			if (entry[i].eax == 0 && entry[i].ebx == 0 &&
++			    entry[i].ecx == 0 && entry[i].edx == 0)
++				continue;
++
++			do_cpuid_0xd_mask(&entry[i], idx);
++			if (entry[i].eax == 0 && entry[i].ebx == 0 &&
++			    entry[i].ecx == 0 && entry[i].edx == 0)
++				continue;
++
+ 			++*nent;
+ 			++i;
+ 		}
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index e0368076a1ef..be967bf9a81d 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -7193,6 +7193,11 @@ static bool svm_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++static u64 svm_supported_xss(void)
++{
++	return 0;
++}
++
+ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.cpu_has_kvm_support = has_svm,
+ 	.disabled_by_bios = is_disabled,
+@@ -7329,6 +7334,8 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.nested_get_evmcs_version = NULL,
+ 
+ 	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
++
++	.supported_xss = svm_supported_xss,
+ };
+ 
+ static int __init svm_init(void)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c6f6b05004d9..a84198cff397 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1651,6 +1651,11 @@ static inline bool vmx_feature_control_msr_valid(struct kvm_vcpu *vcpu,
+ 	return !(val & ~valid_bits);
+ }
+ 
++static inline u64 vmx_supported_xss(void)
++{
++	return host_xss;
++}
++
+ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+ {
+ 	switch (msr->index) {
+@@ -7799,6 +7804,7 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+ 	.nested_enable_evmcs = NULL,
+ 	.nested_get_evmcs_version = NULL,
+ 	.need_emulation_on_page_fault = vmx_need_emulation_on_page_fault,
++	.supported_xss = vmx_supported_xss,
+ };
+ 
+ static void vmx_cleanup_l1d_flush(void)
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 6594020c0691..fbffabad0370 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -293,6 +293,13 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, unsigned long cr2,
+ 				| XFEATURE_MASK_YMM | XFEATURE_MASK_BNDREGS \
+ 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+ 				| XFEATURE_MASK_PKRU)
++
++/*
++ * Right now, no XSS states are used on x86 platform,
++ * expand the macro for new features.
++ */
++#define KVM_SUPPORTED_XSS	(0)
++
+ extern u64 host_xcr0;
+ 
+ extern u64 kvm_supported_xcr0(void);
 -- 
+2.17.2
 
-Thanks,
-
-David / dhildenb
