@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 78B11BC816
+	by mail.lfdr.de (Postfix) with ESMTP id E7DF9BC817
 	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 14:45:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729513AbfIXMpF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 08:45:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47588 "EHLO mx1.redhat.com"
+        id S2395313AbfIXMpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 08:45:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44890 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729455AbfIXMpE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 08:45:04 -0400
+        id S2395292AbfIXMpL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 08:45:11 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 29B7518C37B;
-        Tue, 24 Sep 2019 12:45:04 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id CE74030860CB;
+        Tue, 24 Sep 2019 12:45:10 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 87B0D60852;
-        Tue, 24 Sep 2019 12:44:50 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8135160852;
+        Tue, 24 Sep 2019 12:45:04 +0000 (UTC)
 From:   Sergio Lopez <slp@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     mst@redhat.com, imammedo@redhat.com, marcel.apfelbaum@gmail.com,
@@ -26,175 +26,340 @@ Cc:     mst@redhat.com, imammedo@redhat.com, marcel.apfelbaum@gmail.com,
         philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
         mtosatti@redhat.com, kvm@vger.kernel.org,
         Sergio Lopez <slp@redhat.com>
-Subject: [PATCH v4 0/8] Introduce the microvm machine type
-Date:   Tue, 24 Sep 2019 14:44:25 +0200
-Message-Id: <20190924124433.96810-1-slp@redhat.com>
+Subject: [PATCH v4 1/8] hw/i386: Factorize PVH related functions
+Date:   Tue, 24 Sep 2019 14:44:26 +0200
+Message-Id: <20190924124433.96810-2-slp@redhat.com>
+In-Reply-To: <20190924124433.96810-1-slp@redhat.com>
+References: <20190924124433.96810-1-slp@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 24 Sep 2019 12:45:04 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 24 Sep 2019 12:45:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Microvm is a machine type inspired by both NEMU and Firecracker, and
-constructed after the machine model implemented by the latter.
+Extract PVH related functions from pc.c, and put them in pvh.c, so
+they can be shared with other components.
 
-It's main purpose is providing users a minimalist machine type free
-from the burden of legacy compatibility, serving as a stepping stone
-for future projects aiming at improving boot times, reducing the
-attack surface and slimming down QEMU's footprint.
-
-The microvm machine type supports the following devices:
-
- - ISA bus
- - i8259 PIC
- - LAPIC (implicit if using KVM)
- - IOAPIC (defaults to kernel_irqchip_split = true)
- - i8254 PIT
- - MC146818 RTC (optional)
- - kvmclock (if using KVM)
- - fw_cfg
- - One ISA serial port (optional)
- - Up to eight virtio-mmio devices (configured by the user)
-
-It supports the following machine-specific options:
-
-microvm.option-roms=bool (Set off to disable loading option ROMs)
-microvm.isa-serial=bool (Set off to disable the instantiation an ISA serial port)
-microvm.rtc=bool (Set off to disable the instantiation of an MC146818 RTC)
-microvm.kernel-cmdline=bool (Set off to disable adding virtio-mmio devices to the kernel cmdline)
-
-By default, microvm uses qboot as its BIOS, to obtain better boot
-times, but it's also compatible with SeaBIOS.
-
-As no current FW is able to boot from a block device using virtio-mmio
-as its transport, a microvm-based VM needs to be run using a host-side
-kernel and, optionally, an initrd image.
-
-This is an example of instantiating a microvm VM with a virtio-mmio
-based console:
-
-qemu-system-x86_64 -M microvm
- -enable-kvm -cpu host -m 512m -smp 2 \
- -kernel vmlinux -append "console=hvc0 root=/dev/vda" \
- -nodefaults -no-user-config -nographic \
- -chardev stdio,id=virtiocon0,server \
- -device virtio-serial-device \
- -device virtconsole,chardev=virtiocon0 \
- -drive id=test,file=test.img,format=raw,if=none \
- -device virtio-blk-device,drive=test \
- -netdev tap,id=tap0,script=no,downscript=no \
- -device virtio-net-device,netdev=tap0
-
-This is another example, this time using an ISA serial port, useful
-for debugging purposes:
-
-qemu-system-x86_64 -M microvm \
- -enable-kvm -cpu host -m 512m -smp 2 \
- -kernel vmlinux -append "earlyprintk=ttyS0 console=ttyS0 root=/dev/vda" \
- -nodefaults -no-user-config -nographic \
- -serial stdio \
- -drive id=test,file=test.img,format=raw,if=none \
- -device virtio-blk-device,drive=test \
- -netdev tap,id=tap0,script=no,downscript=no \
- -device virtio-net-device,netdev=tap0
-
-Finally, in this example a microvm VM is instantiated without RTC,
-without an ISA serial port and without loading the option ROMs,
-obtaining the smallest configuration:
-
-qemu-system-x86_64 -M microvm,rtc=off,isa-serial=off,option-roms=off \
- -enable-kvm -cpu host -m 512m -smp 2 \
- -kernel vmlinux -append "console=hvc0 root=/dev/vda" \
- -nodefaults -no-user-config -nographic \
- -chardev stdio,id=virtiocon0,server \
- -device virtio-serial-device \
- -device virtconsole,chardev=virtiocon0 \
- -drive id=test,file=test.img,format=raw,if=none \
- -device virtio-blk-device,drive=test \
- -netdev tap,id=tap0,script=no,downscript=no \
- -device virtio-net-device,netdev=tap0
-
+Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
-
-Changelog
-v4:
- - This is a complete rewrite of the whole patchset, with a focus on
-   reusing as much existing code as possible to ease the maintenance burden
-   and making the machine type as compatible as possible by default. As
-   a result, the number of lines dedicated specifically to microvm is
-   383 (code lines measured by "cloc") and, with the default
-   configuration, it's now able to boot both PVH ELF images and
-   bzImages with either SeaBIOS or qboot.
-
-v3:
-  - Add initrd support (thanks Stefano).
-
-v2:
-  - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
-  - Simplify machine definition (thanks Eduardo).
-  - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
-  - Add a patch to factorize PVH-related functions.
-  - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
-  
----
-Sergio Lopez (8):
-  hw/i386: Factorize PVH related functions
-  hw/i386: Factorize e820 related functions
-  hw/virtio: Factorize virtio-mmio headers
-  hw/i386: split PCMachineState deriving X86MachineState from it
-  fw_cfg: add "modify" functions for all types
-  roms: add microvm-bios (qboot) as binary and git submodule
-  docs/microvm.txt: document the new microvm machine type
-  hw/i386: Introduce the microvm machine type
-
- .gitmodules                      |   3 +
- default-configs/i386-softmmu.mak |   1 +
- docs/microvm.txt                 |  78 +++
- hw/acpi/cpu_hotplug.c            |  10 +-
- hw/i386/Kconfig                  |   4 +
- hw/i386/Makefile.objs            |   4 +
- hw/i386/acpi-build.c             |  31 +-
- hw/i386/amd_iommu.c              |   4 +-
- hw/i386/e820.c                   |  99 ++++
- hw/i386/e820.h                   |  11 +
- hw/i386/intel_iommu.c            |   4 +-
- hw/i386/microvm.c                | 512 +++++++++++++++++
- hw/i386/pc.c                     | 960 +++----------------------------
- hw/i386/pc_piix.c                |  48 +-
- hw/i386/pc_q35.c                 |  38 +-
- hw/i386/pc_sysfw.c               |  60 +-
- hw/i386/pvh.c                    | 113 ++++
- hw/i386/pvh.h                    |  10 +
- hw/i386/x86.c                    | 788 +++++++++++++++++++++++++
- hw/intc/ioapic.c                 |   3 +-
- hw/nvram/fw_cfg.c                |  29 +
- hw/virtio/virtio-mmio.c          |  35 +-
- include/hw/i386/microvm.h        |  80 +++
- include/hw/i386/pc.h             |  40 +-
- include/hw/i386/x86.h            |  97 ++++
- include/hw/nvram/fw_cfg.h        |  42 ++
- include/hw/virtio/virtio-mmio.h  |  60 ++
- pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
- roms/Makefile                    |   6 +
- roms/qboot                       |   1 +
- target/i386/kvm.c                |   1 +
- 31 files changed, 2102 insertions(+), 1070 deletions(-)
- create mode 100644 docs/microvm.txt
- create mode 100644 hw/i386/e820.c
- create mode 100644 hw/i386/e820.h
- create mode 100644 hw/i386/microvm.c
+ hw/i386/Makefile.objs |   1 +
+ hw/i386/pc.c          | 120 +++++-------------------------------------
+ hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
+ hw/i386/pvh.h         |  10 ++++
+ 4 files changed, 136 insertions(+), 108 deletions(-)
  create mode 100644 hw/i386/pvh.c
  create mode 100644 hw/i386/pvh.h
- create mode 100644 hw/i386/x86.c
- create mode 100644 include/hw/i386/microvm.h
- create mode 100644 include/hw/i386/x86.h
- create mode 100644 include/hw/virtio/virtio-mmio.h
- create mode 100755 pc-bios/bios-microvm.bin
- create mode 160000 roms/qboot
 
+diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+index 5d9c9efd5f..c5f20bbd72 100644
+--- a/hw/i386/Makefile.objs
++++ b/hw/i386/Makefile.objs
+@@ -1,5 +1,6 @@
+ obj-$(CONFIG_KVM) += kvm/
+ obj-y += multiboot.o
++obj-y += pvh.o
+ obj-y += pc.o
+ obj-$(CONFIG_I440FX) += pc_piix.o
+ obj-$(CONFIG_Q35) += pc_q35.o
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index bad866fe44..10e4ced0c6 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -42,6 +42,7 @@
+ #include "elf.h"
+ #include "migration/vmstate.h"
+ #include "multiboot.h"
++#include "pvh.h"
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/timer/i8254.h"
+@@ -116,9 +117,6 @@ static struct e820_entry *e820_table;
+ static unsigned e820_entries;
+ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+ 
+-/* Physical Address of PVH entry point read from kernel ELF NOTE */
+-static size_t pvh_start_addr;
+-
+ GlobalProperty pc_compat_4_1[] = {};
+ const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
+ 
+@@ -1076,109 +1074,6 @@ struct setup_data {
+     uint8_t data[0];
+ } __attribute__((packed));
+ 
+-
+-/*
+- * The entry point into the kernel for PVH boot is different from
+- * the native entry point.  The PVH entry is defined by the x86/HVM
+- * direct boot ABI and is available in an ELFNOTE in the kernel binary.
+- *
+- * This function is passed to load_elf() when it is called from
+- * load_elfboot() which then additionally checks for an ELF Note of
+- * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
+- * parse the PVH entry address from the ELF Note.
+- *
+- * Due to trickery in elf_opts.h, load_elf() is actually available as
+- * load_elf32() or load_elf64() and this routine needs to be able
+- * to deal with being called as 32 or 64 bit.
+- *
+- * The address of the PVH entry point is saved to the 'pvh_start_addr'
+- * global variable.  (although the entry point is 32-bit, the kernel
+- * binary can be either 32-bit or 64-bit).
+- */
+-static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
+-{
+-    size_t *elf_note_data_addr;
+-
+-    /* Check if ELF Note header passed in is valid */
+-    if (arg1 == NULL) {
+-        return 0;
+-    }
+-
+-    if (is64) {
+-        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
+-        uint64_t nhdr_size64 = sizeof(struct elf64_note);
+-        uint64_t phdr_align = *(uint64_t *)arg2;
+-        uint64_t nhdr_namesz = nhdr64->n_namesz;
+-
+-        elf_note_data_addr =
+-            ((void *)nhdr64) + nhdr_size64 +
+-            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+-    } else {
+-        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
+-        uint32_t nhdr_size32 = sizeof(struct elf32_note);
+-        uint32_t phdr_align = *(uint32_t *)arg2;
+-        uint32_t nhdr_namesz = nhdr32->n_namesz;
+-
+-        elf_note_data_addr =
+-            ((void *)nhdr32) + nhdr_size32 +
+-            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+-    }
+-
+-    pvh_start_addr = *elf_note_data_addr;
+-
+-    return pvh_start_addr;
+-}
+-
+-static bool load_elfboot(const char *kernel_filename,
+-                   int kernel_file_size,
+-                   uint8_t *header,
+-                   size_t pvh_xen_start_addr,
+-                   FWCfgState *fw_cfg)
+-{
+-    uint32_t flags = 0;
+-    uint32_t mh_load_addr = 0;
+-    uint32_t elf_kernel_size = 0;
+-    uint64_t elf_entry;
+-    uint64_t elf_low, elf_high;
+-    int kernel_size;
+-
+-    if (ldl_p(header) != 0x464c457f) {
+-        return false; /* no elfboot */
+-    }
+-
+-    bool elf_is64 = header[EI_CLASS] == ELFCLASS64;
+-    flags = elf_is64 ?
+-        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flags;
+-
+-    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
+-        error_report("elfboot unsupported flags = %x", flags);
+-        exit(1);
+-    }
+-
+-    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
+-    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
+-                           NULL, &elf_note_type, &elf_entry,
+-                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+-                           0, 0);
+-
+-    if (kernel_size < 0) {
+-        error_report("Error while loading elf kernel");
+-        exit(1);
+-    }
+-    mh_load_addr = elf_low;
+-    elf_kernel_size = elf_high - elf_low;
+-
+-    if (pvh_start_addr == 0) {
+-        error_report("Error loading uncompressed kernel without PVH ELF Note");
+-        exit(1);
+-    }
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
+-    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
+-
+-    return true;
+-}
+-
+ static void load_linux(PCMachineState *pcms,
+                        FWCfgState *fw_cfg)
+ {
+@@ -1218,6 +1113,9 @@ static void load_linux(PCMachineState *pcms,
+     if (ldl_p(header+0x202) == 0x53726448) {
+         protocol = lduw_p(header+0x206);
+     } else {
++        size_t pvh_start_addr;
++        uint32_t mh_load_addr = 0;
++        uint32_t elf_kernel_size = 0;
+         /*
+          * This could be a multiboot kernel. If it is, let's stop treating it
+          * like a Linux kernel.
+@@ -1235,10 +1133,16 @@ static void load_linux(PCMachineState *pcms,
+          * If load_elfboot() is successful, populate the fw_cfg info.
+          */
+         if (pcmc->pvh_enabled &&
+-            load_elfboot(kernel_filename, kernel_size,
+-                         header, pvh_start_addr, fw_cfg)) {
++            pvh_load_elfboot(kernel_filename,
++                             &mh_load_addr, &elf_kernel_size)) {
+             fclose(f);
+ 
++            pvh_start_addr = pvh_get_start_addr();
++
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
++            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
++
+             fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+                 strlen(kernel_cmdline) + 1);
+             fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
+diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
+new file mode 100644
+index 0000000000..1c81727811
+--- /dev/null
++++ b/hw/i386/pvh.c
+@@ -0,0 +1,113 @@
++/*
++ * PVH Boot Helper
++ *
++ * Copyright (C) 2019 Oracle
++ * Copyright (C) 2019 Red Hat, Inc
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "qemu/error-report.h"
++#include "hw/loader.h"
++#include "cpu.h"
++#include "elf.h"
++#include "pvh.h"
++
++static size_t pvh_start_addr;
++
++size_t pvh_get_start_addr(void)
++{
++    return pvh_start_addr;
++}
++
++/*
++ * The entry point into the kernel for PVH boot is different from
++ * the native entry point.  The PVH entry is defined by the x86/HVM
++ * direct boot ABI and is available in an ELFNOTE in the kernel binary.
++ *
++ * This function is passed to load_elf() when it is called from
++ * load_elfboot() which then additionally checks for an ELF Note of
++ * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
++ * parse the PVH entry address from the ELF Note.
++ *
++ * Due to trickery in elf_opts.h, load_elf() is actually available as
++ * load_elf32() or load_elf64() and this routine needs to be able
++ * to deal with being called as 32 or 64 bit.
++ *
++ * The address of the PVH entry point is saved to the 'pvh_start_addr'
++ * global variable.  (although the entry point is 32-bit, the kernel
++ * binary can be either 32-bit or 64-bit).
++ */
++
++static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
++{
++    size_t *elf_note_data_addr;
++
++    /* Check if ELF Note header passed in is valid */
++    if (arg1 == NULL) {
++        return 0;
++    }
++
++    if (is64) {
++        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
++        uint64_t nhdr_size64 = sizeof(struct elf64_note);
++        uint64_t phdr_align = *(uint64_t *)arg2;
++        uint64_t nhdr_namesz = nhdr64->n_namesz;
++
++        elf_note_data_addr =
++            ((void *)nhdr64) + nhdr_size64 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    } else {
++        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
++        uint32_t nhdr_size32 = sizeof(struct elf32_note);
++        uint32_t phdr_align = *(uint32_t *)arg2;
++        uint32_t nhdr_namesz = nhdr32->n_namesz;
++
++        elf_note_data_addr =
++            ((void *)nhdr32) + nhdr_size32 +
++            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
++    }
++
++    pvh_start_addr = *elf_note_data_addr;
++
++    return pvh_start_addr;
++}
++
++bool pvh_load_elfboot(const char *kernel_filename,
++                      uint32_t *mh_load_addr,
++                      uint32_t *elf_kernel_size)
++{
++    uint64_t elf_entry;
++    uint64_t elf_low, elf_high;
++    int kernel_size;
++    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
++
++    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
++                           NULL, &elf_note_type, &elf_entry,
++                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
++                           0, 0);
++
++    if (kernel_size < 0) {
++        error_report("Error while loading elf kernel");
++        return false;
++    }
++
++    if (pvh_start_addr == 0) {
++        error_report("Error loading uncompressed kernel without PVH ELF Note");
++        return false;
++    }
++
++    if (mh_load_addr) {
++        *mh_load_addr = elf_low;
++    }
++
++    if (elf_kernel_size) {
++        *elf_kernel_size = elf_high - elf_low;
++    }
++
++    return true;
++}
+diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
+new file mode 100644
+index 0000000000..ada67ff6e8
+--- /dev/null
++++ b/hw/i386/pvh.h
+@@ -0,0 +1,10 @@
++#ifndef HW_I386_PVH_H
++#define HW_I386_PVH_H
++
++size_t pvh_get_start_addr(void);
++
++bool pvh_load_elfboot(const char *kernel_filename,
++                      uint32_t *mh_load_addr,
++                      uint32_t *elf_kernel_size);
++
++#endif
 -- 
 2.21.0
 
