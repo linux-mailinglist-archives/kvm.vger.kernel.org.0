@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C9DCFBC8B4
-	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 15:18:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7515CBC8C3
+	for <lists+kvm@lfdr.de>; Tue, 24 Sep 2019 15:20:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729833AbfIXNSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 09:18:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46630 "EHLO mx1.redhat.com"
+        id S2505038AbfIXNUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Sep 2019 09:20:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45462 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727930AbfIXNSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 09:18:09 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        id S2505035AbfIXNUI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Sep 2019 09:20:08 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 229B5804F2
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 13:18:08 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id k9so13804wmb.0
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 06:18:08 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6942185362
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 13:20:07 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id w10so565098wrl.5
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 06:20:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=fDhHJknRHK/kyyBKkQt6AI1V+kYp6hpu6A1rqJMmhkg=;
-        b=osVzGX1VUOGcvvvwm1XPiQ6Rtd9D7/2cwaYFuJj8jJwlvZDMkV+sanxCo5M6p8mbfD
-         bJF9KcrCwAwg2lEtG6Vn6SCfR9tuKuTUjztGbyIzaj/QokyjI3TIKm95u5RNbbpgA3h+
-         jl2vGGIbkNONx2J3hI1OPaIYmfjJ/Ui/d0hIarFapVU3ZbhfODm6ymADhI+pYQvBsZQt
-         EBauxMzffiMBDX1iIV6rt6z0PN4OBkQhOHqpMhN5ke/2JZjEDDQUA6uVSWek5PU20HBc
-         Xe7Bd2rpv4v0fZXmBM2yvNc9oORxj3zK50kHZzq5ytEpSVZ3HdM1j/E89rfOiuKC4mpa
-         siYg==
-X-Gm-Message-State: APjAAAU3VYZufbSWB3SxjG74WAyUj7GlJFkxJHUcAc6q7U3gmg2uwNJ6
-        4vvTJG0bQtjroZhySKYjIk8JXSiNBB2AqKrIHysM0JTw69FwIuDLMmcEE4DVCQgr492xqno9mej
-        9v9x6u/XJUAps
-X-Received: by 2002:a05:6000:1002:: with SMTP id a2mr2267892wrx.272.1569331086558;
-        Tue, 24 Sep 2019 06:18:06 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzYeYS/3ORzLGJwvMHlqBQR8QbDMQ+bO/Rtje0DjTPUvVysDKpvKqwgeW/uDXwzidy06n+sUw==
-X-Received: by 2002:a05:6000:1002:: with SMTP id a2mr2267875wrx.272.1569331086281;
-        Tue, 24 Sep 2019 06:18:06 -0700 (PDT)
+        bh=iMkGwJ185A3EufEUUOg0LyczKk+WAbEF69Eb8rs7OnA=;
+        b=LoE83dxH1Zj8BaA6vl4jiw1I5/5/0BXoWzqK6/uIEvfQ5bsScsdzSLQSfIGxyDUN7W
+         ZJ+je6AVcV1O875OFJgu9lLZIb70nT4bjRgc3XpC8NV2Wx9XY9TmqYkC2U4Dll03ikiQ
+         N9qKyW00QiKU/MiWA40mW3ceMZoR5y4yZFb62B8rKKAS8kVdgEewoVTmnjSZdgRJozxO
+         E00Z/Nt0cSnnqFc0Qv5w2oGy3CO1OD5QBkcyi+LC/5DSU+/NiBxsDTiq73Mrv2pswQnS
+         8T3VAPMqXVvCJmcV412CtOnfAd4yWwY+x08u5Rmqn9O4raWfLCcoFkzIsVIgbavLSuAV
+         wGdw==
+X-Gm-Message-State: APjAAAXzKO+eGFThTZb5MzkRjTc8IeMjO8CdurVKenIH8I5WEGenKrfW
+        Ovnt2DPvXeBQxr2Vk2ZGxE+WaIQNOJISuCYkeZVuD/PDTd1jEz3L+zk1RIiBAl/qWE+GecUigdl
+        1oBjIP3M31AfS
+X-Received: by 2002:adf:fc05:: with SMTP id i5mr2366584wrr.134.1569331205837;
+        Tue, 24 Sep 2019 06:20:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyyaMvjwlFdhIxoFxQoMzGVN/wkrgJ63ddXRIQ10afUGF5nNdfveLzzGE6odTQNJVQshW/Bbg==
+X-Received: by 2002:adf:fc05:: with SMTP id i5mr2366565wrr.134.1569331205606;
+        Tue, 24 Sep 2019 06:20:05 -0700 (PDT)
 Received: from [192.168.1.115] (240.red-88-21-68.staticip.rima-tde.net. [88.21.68.240])
-        by smtp.gmail.com with ESMTPSA id g73sm1326655wme.10.2019.09.24.06.18.04
+        by smtp.gmail.com with ESMTPSA id v7sm2055981wru.87.2019.09.24.06.20.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2019 06:18:05 -0700 (PDT)
-Subject: Re: [PATCH v4 1/8] hw/i386: Factorize PVH related functions
+        Tue, 24 Sep 2019 06:20:04 -0700 (PDT)
+Subject: Re: [PATCH v4 2/8] hw/i386: Factorize e820 related functions
 To:     Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
 Cc:     mst@redhat.com, imammedo@redhat.com, marcel.apfelbaum@gmail.com,
         pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
         lersek@redhat.com, kraxel@redhat.com, mtosatti@redhat.com,
         kvm@vger.kernel.org
 References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-2-slp@redhat.com>
+ <20190924124433.96810-3-slp@redhat.com>
 From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1f1e944f-0076-6c96-3da0-ea196e2d21a1@redhat.com>
-Date:   Tue, 24 Sep 2019 15:18:04 +0200
+Message-ID: <474e1e49-6ae6-bf94-1a92-07c0142aff40@redhat.com>
+Date:   Tue, 24 Sep 2019 15:20:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190924124433.96810-2-slp@redhat.com>
+In-Reply-To: <20190924124433.96810-3-slp@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -67,337 +67,290 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sergio,
-
 On 9/24/19 2:44 PM, Sergio Lopez wrote:
-> Extract PVH related functions from pc.c, and put them in pvh.c, so
+> Extract e820 related functions from pc.c, and put them in e820.c, so
 > they can be shared with other components.
 > 
 > Signed-off-by: Sergio Lopez <slp@redhat.com>
 > ---
->  hw/i386/Makefile.objs |   1 +
->  hw/i386/pc.c          | 120 +++++-------------------------------------
->  hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
->  hw/i386/pvh.h         |  10 ++++
->  4 files changed, 136 insertions(+), 108 deletions(-)
->  create mode 100644 hw/i386/pvh.c
->  create mode 100644 hw/i386/pvh.h
+>  hw/i386/Makefile.objs |  1 +
+>  hw/i386/e820.c        | 99 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/e820.h        | 11 +++++
+>  hw/i386/pc.c          | 66 +----------------------------
+>  include/hw/i386/pc.h  | 11 -----
+>  target/i386/kvm.c     |  1 +
+>  6 files changed, 114 insertions(+), 75 deletions(-)
+>  create mode 100644 hw/i386/e820.c
+>  create mode 100644 hw/i386/e820.h
 > 
 > diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-> index 5d9c9efd5f..c5f20bbd72 100644
+> index c5f20bbd72..149712db07 100644
 > --- a/hw/i386/Makefile.objs
 > +++ b/hw/i386/Makefile.objs
-> @@ -1,5 +1,6 @@
->  obj-$(CONFIG_KVM) += kvm/
+> @@ -2,6 +2,7 @@ obj-$(CONFIG_KVM) += kvm/
 >  obj-y += multiboot.o
-> +obj-y += pvh.o
+>  obj-y += pvh.o
 >  obj-y += pc.o
+> +obj-y += e820.o
+
+Isn't that commit d6d059ca07ae907b8945f88c382fb54d43f9f03a?
+I'm confuse now.
+
 >  obj-$(CONFIG_I440FX) += pc_piix.o
 >  obj-$(CONFIG_Q35) += pc_q35.o
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index bad866fe44..10e4ced0c6 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -42,6 +42,7 @@
->  #include "elf.h"
->  #include "migration/vmstate.h"
->  #include "multiboot.h"
-> +#include "pvh.h"
->  #include "hw/timer/mc146818rtc.h"
->  #include "hw/dma/i8257.h"
->  #include "hw/timer/i8254.h"
-> @@ -116,9 +117,6 @@ static struct e820_entry *e820_table;
->  static unsigned e820_entries;
->  struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->  
-> -/* Physical Address of PVH entry point read from kernel ELF NOTE */
-> -static size_t pvh_start_addr;
-> -
->  GlobalProperty pc_compat_4_1[] = {};
->  const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
->  
-> @@ -1076,109 +1074,6 @@ struct setup_data {
->      uint8_t data[0];
->  } __attribute__((packed));
->  
-> -
-> -/*
-> - * The entry point into the kernel for PVH boot is different from
-> - * the native entry point.  The PVH entry is defined by the x86/HVM
-> - * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-> - *
-> - * This function is passed to load_elf() when it is called from
-> - * load_elfboot() which then additionally checks for an ELF Note of
-> - * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-> - * parse the PVH entry address from the ELF Note.
-> - *
-> - * Due to trickery in elf_opts.h, load_elf() is actually available as
-> - * load_elf32() or load_elf64() and this routine needs to be able
-> - * to deal with being called as 32 or 64 bit.
-> - *
-> - * The address of the PVH entry point is saved to the 'pvh_start_addr'
-> - * global variable.  (although the entry point is 32-bit, the kernel
-> - * binary can be either 32-bit or 64-bit).
-> - */
-> -static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
-> -{
-> -    size_t *elf_note_data_addr;
-> -
-> -    /* Check if ELF Note header passed in is valid */
-> -    if (arg1 == NULL) {
-> -        return 0;
-> -    }
-> -
-> -    if (is64) {
-> -        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
-> -        uint64_t nhdr_size64 = sizeof(struct elf64_note);
-> -        uint64_t phdr_align = *(uint64_t *)arg2;
-> -        uint64_t nhdr_namesz = nhdr64->n_namesz;
-> -
-> -        elf_note_data_addr =
-> -            ((void *)nhdr64) + nhdr_size64 +
-> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> -    } else {
-> -        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
-> -        uint32_t nhdr_size32 = sizeof(struct elf32_note);
-> -        uint32_t phdr_align = *(uint32_t *)arg2;
-> -        uint32_t nhdr_namesz = nhdr32->n_namesz;
-> -
-> -        elf_note_data_addr =
-> -            ((void *)nhdr32) + nhdr_size32 +
-> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> -    }
-> -
-> -    pvh_start_addr = *elf_note_data_addr;
-> -
-> -    return pvh_start_addr;
-> -}
-> -
-> -static bool load_elfboot(const char *kernel_filename,
-> -                   int kernel_file_size,
-> -                   uint8_t *header,
-> -                   size_t pvh_xen_start_addr,
-> -                   FWCfgState *fw_cfg)
-> -{
-> -    uint32_t flags = 0;
-> -    uint32_t mh_load_addr = 0;
-> -    uint32_t elf_kernel_size = 0;
-> -    uint64_t elf_entry;
-> -    uint64_t elf_low, elf_high;
-> -    int kernel_size;
-> -
-> -    if (ldl_p(header) != 0x464c457f) {
-> -        return false; /* no elfboot */
-> -    }
-> -
-> -    bool elf_is64 = header[EI_CLASS] == ELFCLASS64;
-> -    flags = elf_is64 ?
-> -        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flags;
-> -
-> -    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
-> -        error_report("elfboot unsupported flags = %x", flags);
-> -        exit(1);
-> -    }
-> -
-> -    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
-> -    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
-> -                           NULL, &elf_note_type, &elf_entry,
-> -                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-> -                           0, 0);
-> -
-> -    if (kernel_size < 0) {
-> -        error_report("Error while loading elf kernel");
-> -        exit(1);
-> -    }
-> -    mh_load_addr = elf_low;
-> -    elf_kernel_size = elf_high - elf_low;
-> -
-> -    if (pvh_start_addr == 0) {
-> -        error_report("Error loading uncompressed kernel without PVH ELF Note");
-> -        exit(1);
-> -    }
-> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
-> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
-> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
-> -
-> -    return true;
-> -}
-> -
->  static void load_linux(PCMachineState *pcms,
->                         FWCfgState *fw_cfg)
->  {
-> @@ -1218,6 +1113,9 @@ static void load_linux(PCMachineState *pcms,
->      if (ldl_p(header+0x202) == 0x53726448) {
->          protocol = lduw_p(header+0x206);
->      } else {
-> +        size_t pvh_start_addr;
-> +        uint32_t mh_load_addr = 0;
-> +        uint32_t elf_kernel_size = 0;
->          /*
->           * This could be a multiboot kernel. If it is, let's stop treating it
->           * like a Linux kernel.
-> @@ -1235,10 +1133,16 @@ static void load_linux(PCMachineState *pcms,
->           * If load_elfboot() is successful, populate the fw_cfg info.
->           */
->          if (pcmc->pvh_enabled &&
-> -            load_elfboot(kernel_filename, kernel_size,
-> -                         header, pvh_start_addr, fw_cfg)) {
-> +            pvh_load_elfboot(kernel_filename,
-> +                             &mh_load_addr, &elf_kernel_size)) {
->              fclose(f);
->  
-> +            pvh_start_addr = pvh_get_start_addr();
-> +
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
-> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
-> +
->              fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
->                  strlen(kernel_cmdline) + 1);
->              fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
-> diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
+>  obj-y += fw_cfg.o pc_sysfw.o
+> diff --git a/hw/i386/e820.c b/hw/i386/e820.c
 > new file mode 100644
-> index 0000000000..1c81727811
+> index 0000000000..d5c5c0d528
 > --- /dev/null
-> +++ b/hw/i386/pvh.c
-> @@ -0,0 +1,113 @@
+> +++ b/hw/i386/e820.c
+> @@ -0,0 +1,99 @@
 > +/*
-> + * PVH Boot Helper
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + * Copyright (c) 2019 Red Hat, Inc.
 > + *
-> + * Copyright (C) 2019 Oracle
-> + * Copyright (C) 2019 Red Hat, Inc
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
 > + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
 > + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
 > + */
 > +
 > +#include "qemu/osdep.h"
-> +#include "qemu/units.h"
 > +#include "qemu/error-report.h"
-> +#include "hw/loader.h"
-> +#include "cpu.h"
-> +#include "elf.h"
-> +#include "pvh.h"
+> +#include "qemu/cutils.h"
+> +#include "qemu/units.h"
 > +
-> +static size_t pvh_start_addr;
+> +#include "hw/i386/e820.h"
+> +#include "hw/i386/fw_cfg.h"
 > +
-> +size_t pvh_get_start_addr(void)
+> +#define E820_NR_ENTRIES		16
+> +
+> +struct e820_entry {
+> +    uint64_t address;
+> +    uint64_t length;
+> +    uint32_t type;
+> +} QEMU_PACKED __attribute((__aligned__(4)));
+> +
+> +struct e820_table {
+> +    uint32_t count;
+> +    struct e820_entry entry[E820_NR_ENTRIES];
+> +} QEMU_PACKED __attribute((__aligned__(4)));
+> +
+> +static struct e820_table e820_reserve;
+> +static struct e820_entry *e820_table;
+> +static unsigned e820_entries;
+> +
+> +int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
 > +{
-> +    return pvh_start_addr;
+> +    int index = le32_to_cpu(e820_reserve.count);
+> +    struct e820_entry *entry;
+> +
+> +    if (type != E820_RAM) {
+> +        /* old FW_CFG_E820_TABLE entry -- reservations only */
+> +        if (index >= E820_NR_ENTRIES) {
+> +            return -EBUSY;
+> +        }
+> +        entry = &e820_reserve.entry[index++];
+> +
+> +        entry->address = cpu_to_le64(address);
+> +        entry->length = cpu_to_le64(length);
+> +        entry->type = cpu_to_le32(type);
+> +
+> +        e820_reserve.count = cpu_to_le32(index);
+> +    }
+> +
+> +    /* new "etc/e820" file -- include ram too */
+> +    e820_table = g_renew(struct e820_entry, e820_table, e820_entries + 1);
+> +    e820_table[e820_entries].address = cpu_to_le64(address);
+> +    e820_table[e820_entries].length = cpu_to_le64(length);
+> +    e820_table[e820_entries].type = cpu_to_le32(type);
+> +    e820_entries++;
+> +
+> +    return e820_entries;
 > +}
 > +
-> +/*
-> + * The entry point into the kernel for PVH boot is different from
-> + * the native entry point.  The PVH entry is defined by the x86/HVM
-> + * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-> + *
-> + * This function is passed to load_elf() when it is called from
-> + * load_elfboot() which then additionally checks for an ELF Note of
-> + * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-> + * parse the PVH entry address from the ELF Note.
-> + *
-> + * Due to trickery in elf_opts.h, load_elf() is actually available as
-> + * load_elf32() or load_elf64() and this routine needs to be able
-> + * to deal with being called as 32 or 64 bit.
-> + *
-> + * The address of the PVH entry point is saved to the 'pvh_start_addr'
-> + * global variable.  (although the entry point is 32-bit, the kernel
-> + * binary can be either 32-bit or 64-bit).
-> + */
-> +
-> +static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
+> +int e820_get_num_entries(void)
 > +{
-> +    size_t *elf_note_data_addr;
-> +
-> +    /* Check if ELF Note header passed in is valid */
-> +    if (arg1 == NULL) {
-> +        return 0;
-> +    }
-> +
-> +    if (is64) {
-> +        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
-> +        uint64_t nhdr_size64 = sizeof(struct elf64_note);
-> +        uint64_t phdr_align = *(uint64_t *)arg2;
-> +        uint64_t nhdr_namesz = nhdr64->n_namesz;
-> +
-> +        elf_note_data_addr =
-> +            ((void *)nhdr64) + nhdr_size64 +
-> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> +    } else {
-> +        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
-> +        uint32_t nhdr_size32 = sizeof(struct elf32_note);
-> +        uint32_t phdr_align = *(uint32_t *)arg2;
-> +        uint32_t nhdr_namesz = nhdr32->n_namesz;
-> +
-> +        elf_note_data_addr =
-> +            ((void *)nhdr32) + nhdr_size32 +
-> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-> +    }
-> +
-> +    pvh_start_addr = *elf_note_data_addr;
-> +
-> +    return pvh_start_addr;
+> +    return e820_entries;
 > +}
 > +
-> +bool pvh_load_elfboot(const char *kernel_filename,
-> +                      uint32_t *mh_load_addr,
-> +                      uint32_t *elf_kernel_size)
+> +bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length)
 > +{
-> +    uint64_t elf_entry;
-> +    uint64_t elf_low, elf_high;
-> +    int kernel_size;
-> +    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
-> +
-> +    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
-> +                           NULL, &elf_note_type, &elf_entry,
-> +                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-> +                           0, 0);
-> +
-> +    if (kernel_size < 0) {
-> +        error_report("Error while loading elf kernel");
-> +        return false;
+> +    if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
+> +        *address = le64_to_cpu(e820_table[idx].address);
+> +        *length = le64_to_cpu(e820_table[idx].length);
+> +        return true;
 > +    }
-> +
-> +    if (pvh_start_addr == 0) {
-> +        error_report("Error loading uncompressed kernel without PVH ELF Note");
-> +        return false;
-> +    }
-> +
-> +    if (mh_load_addr) {
-> +        *mh_load_addr = elf_low;
-> +    }
-> +
-> +    if (elf_kernel_size) {
-> +        *elf_kernel_size = elf_high - elf_low;
-> +    }
-> +
-> +    return true;
+> +    return false;
 > +}
-> diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
+> +
+> +void e820_create_fw_entry(FWCfgState *fw_cfg)
+> +{
+> +    fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
+> +                     &e820_reserve, sizeof(e820_reserve));
+> +    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
+> +                    sizeof(struct e820_entry) * e820_entries);
+> +}
+> diff --git a/hw/i386/e820.h b/hw/i386/e820.h
 > new file mode 100644
-> index 0000000000..ada67ff6e8
+> index 0000000000..569d1f0ab5
 > --- /dev/null
-> +++ b/hw/i386/pvh.h
-> @@ -0,0 +1,10 @@
-
-License missing.
-
-> +#ifndef HW_I386_PVH_H
-> +#define HW_I386_PVH_H
+> +++ b/hw/i386/e820.h
+> @@ -0,0 +1,11 @@
+> +/* e820 types */
+> +#define E820_RAM        1
+> +#define E820_RESERVED   2
+> +#define E820_ACPI       3
+> +#define E820_NVS        4
+> +#define E820_UNUSABLE   5
 > +
-> +size_t pvh_get_start_addr(void);
-> +
-> +bool pvh_load_elfboot(const char *kernel_filename,
-> +                      uint32_t *mh_load_addr,
-> +                      uint32_t *elf_kernel_size);
-
-Can you document these functions?
-
-Thanks,
-
-Phil.
-
-> +
-> +#endif
+> +int e820_add_entry(uint64_t address, uint64_t length, uint32_t type);
+> +int e820_get_num_entries(void);
+> +bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length);
+> +void e820_create_fw_entry(FWCfgState *fw_cfg);
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 10e4ced0c6..3920aa7e85 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -30,6 +30,7 @@
+>  #include "hw/i386/apic.h"
+>  #include "hw/i386/topology.h"
+>  #include "hw/i386/fw_cfg.h"
+> +#include "hw/i386/e820.h"
+>  #include "sysemu/cpus.h"
+>  #include "hw/block/fdc.h"
+>  #include "hw/ide.h"
+> @@ -99,22 +100,6 @@
+>  #define DPRINTF(fmt, ...)
+>  #endif
+>  
+> -#define E820_NR_ENTRIES		16
+> -
+> -struct e820_entry {
+> -    uint64_t address;
+> -    uint64_t length;
+> -    uint32_t type;
+> -} QEMU_PACKED __attribute((__aligned__(4)));
+> -
+> -struct e820_table {
+> -    uint32_t count;
+> -    struct e820_entry entry[E820_NR_ENTRIES];
+> -} QEMU_PACKED __attribute((__aligned__(4)));
+> -
+> -static struct e820_table e820_reserve;
+> -static struct e820_entry *e820_table;
+> -static unsigned e820_entries;
+>  struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+>  
+>  GlobalProperty pc_compat_4_1[] = {};
+> @@ -878,50 +863,6 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
+>      x86_cpu_set_a20(cpu, level);
+>  }
+>  
+> -int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
+> -{
+> -    int index = le32_to_cpu(e820_reserve.count);
+> -    struct e820_entry *entry;
+> -
+> -    if (type != E820_RAM) {
+> -        /* old FW_CFG_E820_TABLE entry -- reservations only */
+> -        if (index >= E820_NR_ENTRIES) {
+> -            return -EBUSY;
+> -        }
+> -        entry = &e820_reserve.entry[index++];
+> -
+> -        entry->address = cpu_to_le64(address);
+> -        entry->length = cpu_to_le64(length);
+> -        entry->type = cpu_to_le32(type);
+> -
+> -        e820_reserve.count = cpu_to_le32(index);
+> -    }
+> -
+> -    /* new "etc/e820" file -- include ram too */
+> -    e820_table = g_renew(struct e820_entry, e820_table, e820_entries + 1);
+> -    e820_table[e820_entries].address = cpu_to_le64(address);
+> -    e820_table[e820_entries].length = cpu_to_le64(length);
+> -    e820_table[e820_entries].type = cpu_to_le32(type);
+> -    e820_entries++;
+> -
+> -    return e820_entries;
+> -}
+> -
+> -int e820_get_num_entries(void)
+> -{
+> -    return e820_entries;
+> -}
+> -
+> -bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length)
+> -{
+> -    if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
+> -        *address = le64_to_cpu(e820_table[idx].address);
+> -        *length = le64_to_cpu(e820_table[idx].length);
+> -        return true;
+> -    }
+> -    return false;
+> -}
+> -
+>  /* Calculates initial APIC ID for a specific CPU index
+>   *
+>   * Currently we need to be able to calculate the APIC ID from the CPU index
+> @@ -1024,10 +965,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
+>                       acpi_tables, acpi_tables_len);
+>      fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
+>  
+> -    fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
+> -                     &e820_reserve, sizeof(e820_reserve));
+> -    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
+> -                    sizeof(struct e820_entry) * e820_entries);
+> +    e820_create_fw_entry(fw_cfg);
+>  
+>      fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
+>      /* allocate memory for the NUMA channel: one (64bit) word for the number
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 19a837889d..062feeb69e 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -291,17 +291,6 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>                         const CPUArchIdList *apic_ids, GArray *entry);
+>  
+> -/* e820 types */
+> -#define E820_RAM        1
+> -#define E820_RESERVED   2
+> -#define E820_ACPI       3
+> -#define E820_NVS        4
+> -#define E820_UNUSABLE   5
+> -
+> -int e820_add_entry(uint64_t, uint64_t, uint32_t);
+> -int e820_get_num_entries(void);
+> -bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> -
+>  extern GlobalProperty pc_compat_4_1[];
+>  extern const size_t pc_compat_4_1_len;
+>  
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 8023c679ea..8ce56db7d4 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -41,6 +41,7 @@
+>  #include "hw/i386/apic-msidef.h"
+>  #include "hw/i386/intel_iommu.h"
+>  #include "hw/i386/x86-iommu.h"
+> +#include "hw/i386/e820.h"
+>  
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/msi.h"
 > 
