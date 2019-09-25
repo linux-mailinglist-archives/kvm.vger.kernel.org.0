@@ -2,24 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 69883BDF0A
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 15:32:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D93CBDF14
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 15:35:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391606AbfIYNcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 09:32:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38194 "EHLO mx1.redhat.com"
+        id S2406601AbfIYNfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 09:35:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33162 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391596AbfIYNcm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 09:32:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S2406589AbfIYNfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 09:35:21 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5D2FE7FDCA;
-        Wed, 25 Sep 2019 13:32:42 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9C92D30833A8;
+        Wed, 25 Sep 2019 13:35:20 +0000 (UTC)
 Received: from [10.36.117.14] (ovpn-117-14.ams2.redhat.com [10.36.117.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 52C2D1001B00;
-        Wed, 25 Sep 2019 13:32:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98CB260BF1;
+        Wed, 25 Sep 2019 13:35:19 +0000 (UTC)
 Subject: Re: [kvm-unit-tests PATCH v3 6/6] s390x: SMP test
+From:   David Hildenbrand <david@redhat.com>
 To:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org
@@ -27,7 +28,7 @@ References: <20190920080356.1948-1-frankja@linux.ibm.com>
  <20190920080356.1948-7-frankja@linux.ibm.com>
  <b8b574a0-aa5d-7a10-ccd3-d901bf2e0655@redhat.com>
  <df219ca6-b772-cfcb-2c9b-e53fe5b2c8b8@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
+ <4afbfdca-e028-4bb8-0ed0-41f907e9acf3@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -73,100 +74,111 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <4afbfdca-e028-4bb8-0ed0-41f907e9acf3@redhat.com>
-Date:   Wed, 25 Sep 2019 15:32:40 +0200
+Message-ID: <292dc9d3-c45c-8eb5-4f79-05572b84060d@redhat.com>
+Date:   Wed, 25 Sep 2019 15:35:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <df219ca6-b772-cfcb-2c9b-e53fe5b2c8b8@redhat.com>
+In-Reply-To: <4afbfdca-e028-4bb8-0ed0-41f907e9acf3@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 25 Sep 2019 13:32:42 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 25 Sep 2019 13:35:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.09.19 15:30, Thomas Huth wrote:
-> On 25/09/2019 15.27, David Hildenbrand wrote:
->> On 20.09.19 10:03, Janosch Frank wrote:
->>> Testing SIGP emulation for the following order codes:
->>> * start
->>> * stop
->>> * restart
->>> * set prefix
->>> * store status
->>> * stop and store status
->>> * reset
->>> * initial reset
->>> * external call
->>> * emegergency call
+On 25.09.19 15:32, David Hildenbrand wrote:
+> On 25.09.19 15:30, Thomas Huth wrote:
+>> On 25/09/2019 15.27, David Hildenbrand wrote:
+>>> On 20.09.19 10:03, Janosch Frank wrote:
+>>>> Testing SIGP emulation for the following order codes:
+>>>> * start
+>>>> * stop
+>>>> * restart
+>>>> * set prefix
+>>>> * store status
+>>>> * stop and store status
+>>>> * reset
+>>>> * initial reset
+>>>> * external call
+>>>> * emegergency call
+>>>>
+>>>> restart and set prefix are part of the library and needed to start
+>>>> other cpus.
+>>>>
+>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>> ---
+>>>>  s390x/Makefile      |   1 +
+>>>>  s390x/smp.c         | 242 ++++++++++++++++++++++++++++++++++++++++++++
+>>>>  s390x/unittests.cfg |   4 +
+>>>>  3 files changed, 247 insertions(+)
+>>>>  create mode 100644 s390x/smp.c
+>>>>
+>>>> diff --git a/s390x/Makefile b/s390x/Makefile
+>>>> index d83dd0b..3744372 100644
+>>>> --- a/s390x/Makefile
+>>>> +++ b/s390x/Makefile
+>>>> @@ -15,6 +15,7 @@ tests += $(TEST_DIR)/cpumodel.elf
+>>>>  tests += $(TEST_DIR)/diag288.elf
+>>>>  tests += $(TEST_DIR)/stsi.elf
+>>>>  tests += $(TEST_DIR)/skrf.elf
+>>>> +tests += $(TEST_DIR)/smp.elf
+>>>>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>>>  
+>>>>  all: directories test_cases test_cases_binary
+>>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>>> new file mode 100644
+>>>> index 0000000..7032494
+>>>> --- /dev/null
+>>>> +++ b/s390x/smp.c
+>>>> @@ -0,0 +1,242 @@
+>>>> +/*
+>>>> + * Tests sigp emulation
+>>>> + *
+>>>> + * Copyright 2019 IBM Corp.
+>>>> + *
+>>>> + * Authors:
+>>>> + *    Janosch Frank <frankja@linux.ibm.com>
+>>>> + *
+>>>> + * This code is free software; you can redistribute it and/or modify it
+>>>> + * under the terms of the GNU General Public License version 2.
+>>>> + */
+>>>> +#include <libcflat.h>
+>>>> +#include <asm/asm-offsets.h>
+>>>> +#include <asm/interrupt.h>
+>>>> +#include <asm/page.h>
+>>>> +#include <asm/facility.h>
+>>>> +#include <asm-generic/barrier.h>
+>>>> +#include <asm/sigp.h>
+>>>> +
+>>>> +#include <smp.h>
+>>>> +#include <alloc_page.h>
+>>>> +
+>>>> +static int testflag = 0;
+>>>> +
+>>>> +static void cpu_loop(void)
+>>>> +{
+>>>> +	for (;;) {}
 >>>
->>> restart and set prefix are part of the library and needed to start
->>> other cpus.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>  s390x/Makefile      |   1 +
->>>  s390x/smp.c         | 242 ++++++++++++++++++++++++++++++++++++++++++++
->>>  s390x/unittests.cfg |   4 +
->>>  3 files changed, 247 insertions(+)
->>>  create mode 100644 s390x/smp.c
->>>
->>> diff --git a/s390x/Makefile b/s390x/Makefile
->>> index d83dd0b..3744372 100644
->>> --- a/s390x/Makefile
->>> +++ b/s390x/Makefile
->>> @@ -15,6 +15,7 @@ tests += $(TEST_DIR)/cpumodel.elf
->>>  tests += $(TEST_DIR)/diag288.elf
->>>  tests += $(TEST_DIR)/stsi.elf
->>>  tests += $(TEST_DIR)/skrf.elf
->>> +tests += $(TEST_DIR)/smp.elf
->>>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->>>  
->>>  all: directories test_cases test_cases_binary
->>> diff --git a/s390x/smp.c b/s390x/smp.c
->>> new file mode 100644
->>> index 0000000..7032494
->>> --- /dev/null
->>> +++ b/s390x/smp.c
->>> @@ -0,0 +1,242 @@
->>> +/*
->>> + * Tests sigp emulation
->>> + *
->>> + * Copyright 2019 IBM Corp.
->>> + *
->>> + * Authors:
->>> + *    Janosch Frank <frankja@linux.ibm.com>
->>> + *
->>> + * This code is free software; you can redistribute it and/or modify it
->>> + * under the terms of the GNU General Public License version 2.
->>> + */
->>> +#include <libcflat.h>
->>> +#include <asm/asm-offsets.h>
->>> +#include <asm/interrupt.h>
->>> +#include <asm/page.h>
->>> +#include <asm/facility.h>
->>> +#include <asm-generic/barrier.h>
->>> +#include <asm/sigp.h>
->>> +
->>> +#include <smp.h>
->>> +#include <alloc_page.h>
->>> +
->>> +static int testflag = 0;
->>> +
->>> +static void cpu_loop(void)
->>> +{
->>> +	for (;;) {}
+>>> Won't that be optimized out completely?
 >>
->> Won't that be optimized out completely?
+>> Why? AFAIK this is the standard way to write and endless loop ... how
+>> can a compiler optimize that away?
 > 
-> Why? AFAIK this is the standard way to write and endless loop ... how
-> can a compiler optimize that away?
+> Was messing it up with "just" an empty loop body, I think you're right.
+> 
 
-Was messing it up with "just" an empty loop body, I think you're right.
+However
+
+https://stackoverflow.com/questions/2178115/are-compilers-allowed-to-eliminate-infinite-loops
+
+"This is intended to allow compiler transformations such as removal of
+empty loops even when termination cannot be proven."
+
+I think this might get optimized out.
 
 -- 
 
