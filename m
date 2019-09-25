@@ -2,149 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA34EBD97A
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 10:02:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B6EBD99C
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 10:10:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2633992AbfIYIC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 04:02:27 -0400
-Received: from mga17.intel.com ([192.55.52.151]:55094 "EHLO mga17.intel.com"
+        id S2634041AbfIYIKh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 04:10:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49228 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2437609AbfIYIC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 04:02:27 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 01:02:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,547,1559545200"; 
-   d="scan'208";a="340335542"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by orsmga004.jf.intel.com with ESMTP; 25 Sep 2019 01:02:25 -0700
-Received: from fmsmsx102.amr.corp.intel.com (10.18.124.200) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Sep 2019 01:02:25 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- FMSMSX102.amr.corp.intel.com (10.18.124.200) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Sep 2019 01:02:24 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.92]) with mapi id 14.03.0439.000;
- Wed, 25 Sep 2019 16:02:23 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     Lu Baolu <baolu.lu@linux.intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>
-Subject: RE: [RFC PATCH 0/4] Use 1st-level for DMA remapping in guest
-Thread-Topic: [RFC PATCH 0/4] Use 1st-level for DMA remapping in guest
-Thread-Index: AQHVcgo/pYehEUSjBUSa7tc1tTv1E6c5H56AgAAQYQCAATS/kIAAyIAAgABFVACAAIvPkP//gbuAgACG17A=
-Date:   Wed, 25 Sep 2019 08:02:23 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D58F5F5@SHSMSX104.ccr.corp.intel.com>
-References: <20190923122454.9888-1-baolu.lu@linux.intel.com>
- <20190923122715.53de79d0@jacob-builder>
- <20190923202552.GA21816@araj-mobl1.jf.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D58D1F1@SHSMSX104.ccr.corp.intel.com>
- <dfd9b7a2-5553-328a-08eb-16c8a3a2644e@linux.intel.com>
- <20190925065640.GO28074@xz-x1>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D58F4A3@SHSMSX104.ccr.corp.intel.com>
- <20190925074507.GP28074@xz-x1>
-In-Reply-To: <20190925074507.GP28074@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZGFjODZhMmEtMmY5NC00ODJkLTg1ODUtOTg0YTk0NmJmNjBhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoia3NsWWs5YUtWSHl2OVhjZEpxVjlLUGxERm8yVkFKU2hZZGVOZWVtOXgrWGhiOWZOamw0VkQ0Q3k2UE8xZmtWcCJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S2437449AbfIYIKh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 04:10:37 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DD2313D955
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 08:10:36 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id q10so1918759wro.22
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 01:10:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version;
+        bh=sSedf1PSQ4+XVQg27whbHXC5BsZOA0msBaOP6O2nXYA=;
+        b=ER8Qzq+0fPGFnmDn2UrrKUMQ7cq7fuE0O+IjjW7s+h2GKKoL+XxvWkGp8TUGQJkHOe
+         mrcWhr6f8Fsxib3VTBJ5IHPQqgWz4Mr4yva1GlhDOMN9a6qCEn5q1T+jp4UUXRv+pic3
+         8ELDpXYoEXPB42hYNQ/WwPMSun0w5SC8vo8vfhQhDR6DwHlzAuZPIY0R+Lrd/TggHjng
+         qFdR0nW0zGahQiXmbIz8QPBOuCUbf3LCrfTTItGScST8ZiQxCFkczD13C2xKrEmYhvQY
+         v7haKnTOqXZSkx5KE6PmmEUJv35GqPx4Pw6bRW/qIH5pejBF+Sk7l4kGCYdIlKRRJUJe
+         iodQ==
+X-Gm-Message-State: APjAAAXoqEcPK251F00jOvtTseyXCBXE9+s0Drrl/uP17e9VxIX3fWoZ
+        4sqtwU2FMhor6Xu4B5WBvBUOcUM7/bMEzq5iQ5toGVdndTtpLYx/vWzcGOlXeP2xqfptIIakMVP
+        NJBnokndNO4Mj
+X-Received: by 2002:a5d:4044:: with SMTP id w4mr8299095wrp.281.1569399035680;
+        Wed, 25 Sep 2019 01:10:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyRVq+g1VfZMi0d6Wj/uqNnTxYdPTROhRi471HFmLSLWvA0bKAZQLSNyzFlC9+e4gKyKQ97bg==
+X-Received: by 2002:a5d:4044:: with SMTP id w4mr8299057wrp.281.1569399035412;
+        Wed, 25 Sep 2019 01:10:35 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net. [95.120.215.139])
+        by smtp.gmail.com with ESMTPSA id d10sm2181806wma.42.2019.09.25.01.10.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2019 01:10:34 -0700 (PDT)
+References: <20190924124433.96810-1-slp@redhat.com> <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From:   Sergio Lopez <slp@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+        marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net,
+        ehabkost@redhat.com, philmd@redhat.com, lersek@redhat.com,
+        kraxel@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org,
+        Pankaj Gupta <pagupta@redhat.com>
+Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
+In-reply-to: <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com>
+Date:   Wed, 25 Sep 2019 10:10:32 +0200
+Message-ID: <87h850ssnb.fsf@redhat.com>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBXZWRu
-ZXNkYXksIFNlcHRlbWJlciAyNSwgMjAxOSAzOjQ1IFBNDQo+IA0KPiBPbiBXZWQsIFNlcCAyNSwg
-MjAxOSBhdCAwNzoyMTo1MUFNICswMDAwLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPiA+IEZyb206
-IFBldGVyIFh1IFttYWlsdG86cGV0ZXJ4QHJlZGhhdC5jb21dDQo+ID4gPiBTZW50OiBXZWRuZXNk
-YXksIFNlcHRlbWJlciAyNSwgMjAxOSAyOjU3IFBNDQo+ID4gPg0KPiA+ID4gT24gV2VkLCBTZXAg
-MjUsIDIwMTkgYXQgMTA6NDg6MzJBTSArMDgwMCwgTHUgQmFvbHUgd3JvdGU6DQo+ID4gPiA+IEhp
-IEtldmluLA0KPiA+ID4gPg0KPiA+ID4gPiBPbiA5LzI0LzE5IDM6MDAgUE0sIFRpYW4sIEtldmlu
-IHdyb3RlOg0KPiA+ID4gPiA+ID4gPiA+ICAgICAgICctLS0tLS0tLS0tLScNCj4gPiA+ID4gPiA+
-ID4gPiAgICAgICAnLS0tLS0tLS0tLS0nDQo+ID4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4g
-PiBUaGlzIHBhdGNoIHNlcmllcyBvbmx5IGFpbXMgdG8gYWNoaWV2ZSB0aGUgZmlyc3QgZ29hbCwg
-YS5rLmEgdXNpbmcNCj4gPiA+ID4gPiBmaXJzdCBnb2FsPyB0aGVuIHdoYXQgYXJlIG90aGVyIGdv
-YWxzPyBJIGRpZG4ndCBzcG90IHN1Y2ggaW5mb3JtYXRpb24uDQo+ID4gPiA+ID4NCj4gPiA+ID4N
-Cj4gPiA+ID4gVGhlIG92ZXJhbGwgZ29hbCBpcyB0byB1c2UgSU9NTVUgbmVzdGVkIG1vZGUgdG8g
-YXZvaWQgc2hhZG93IHBhZ2UNCj4gPiA+IHRhYmxlDQo+ID4gPiA+IGFuZCBWTUVYSVQgd2hlbiBt
-YXAgYW4gZ0lPVkEuIFRoaXMgaW5jbHVkZXMgYmVsb3cgNCBzdGVwcyAobWF5YmUNCj4gbm90DQo+
-ID4gPiA+IGFjY3VyYXRlLCBidXQgeW91IGNvdWxkIGdldCB0aGUgcG9pbnQuKQ0KPiA+ID4gPg0K
-PiA+ID4gPiAxKSBHSU9WQSBtYXBwaW5ncyBvdmVyIDFzdC1sZXZlbCBwYWdlIHRhYmxlOw0KPiA+
-ID4gPiAyKSBiaW5kaW5nIHZJT01NVSAxc3QgbGV2ZWwgcGFnZSB0YWJsZSB0byB0aGUgcElPTU1V
-Ow0KPiA+ID4gPiAzKSB1c2luZyBwSU9NTVUgc2Vjb25kIGxldmVsIGZvciBHUEEtPkhQQSB0cmFu
-c2xhdGlvbjsNCj4gPiA+ID4gNCkgZW5hYmxlIG5lc3RlZCAoYS5rLmEuIGR1YWwgc3RhZ2UpIHRy
-YW5zbGF0aW9uIGluIGhvc3QuDQo+ID4gPiA+DQo+ID4gPiA+IFRoaXMgcGF0Y2ggc2V0IGFpbXMg
-dG8gYWNoaWV2ZSAxKS4NCj4gPiA+DQo+ID4gPiBXb3VsZCBpdCBtYWtlIHNlbnNlIHRvIHVzZSAx
-c3QgbGV2ZWwgZXZlbiBmb3IgYmFyZS1tZXRhbCB0byByZXBsYWNlDQo+ID4gPiB0aGUgMm5kIGxl
-dmVsPw0KPiA+ID4NCj4gPiA+IFdoYXQgSSdtIHRoaW5raW5nIGlzIHRoZSBEUERLIGFwcHMgLSB0
-aGV5IGhhdmUgTU1VIHBhZ2UgdGFibGUgYWxyZWFkeQ0KPiA+ID4gdGhlcmUgZm9yIHRoZSBodWdl
-IHBhZ2VzLCB0aGVuIGlmIHRoZXkgY2FuIHVzZSAxc3QgbGV2ZWwgYXMgdGhlDQo+ID4gPiBkZWZh
-dWx0IGRldmljZSBwYWdlIHRhYmxlIHRoZW4gaXQgZXZlbiBkb2VzIG5vdCBuZWVkIHRvIG1hcCwg
-YmVjYXVzZQ0KPiA+ID4gaXQgY2FuIHNpbXBseSBiaW5kIHRoZSBwcm9jZXNzIHJvb3QgcGFnZSB0
-YWJsZSBwb2ludGVyIHRvIHRoZSAxc3QNCj4gPiA+IGxldmVsIHBhZ2Ugcm9vdCBwb2ludGVyIG9m
-IHRoZSBkZXZpY2UgY29udGV4dHMgdGhhdCBpdCB1c2VzLg0KPiA+ID4NCj4gPg0KPiA+IFRoZW4g
-eW91IG5lZWQgYmVhciB3aXRoIHBvc3NpYmxlIHBhZ2UgZmF1bHRzIGZyb20gdXNpbmcgQ1BVIHBh
-Z2UNCj4gPiB0YWJsZSwgd2hpbGUgbW9zdCBkZXZpY2VzIGRvbid0IHN1cHBvcnQgaXQgdG9kYXku
-DQo+IA0KPiBSaWdodCwgSSB3YXMganVzdCB0aGlua2luZyBhbG91ZC4gIEFmdGVyIGFsbCBuZWl0
-aGVyIGRvIHdlIGhhdmUgSU9NTVUNCj4gaGFyZHdhcmUgdG8gc3VwcG9ydCAxc3QgbGV2ZWwgKG9y
-IGFtIEkgd3Jvbmc/KS4uLiAgSXQncyBqdXN0IHRoYXQgd2hlbg0KDQpZb3UgYXJlIHJpZ2h0LiBD
-dXJyZW50IFZULWQgc3VwcG9ydHMgb25seSAybmQgbGV2ZWwuDQoNCj4gdGhlIDFzdCBsZXZlbCBp
-cyByZWFkeSBpdCBzaG91bGQgc291bmQgZG9hYmxlIGJlY2F1c2UgSUlVQyBQUkkgc2hvdWxkDQo+
-IGJlIGFsd2F5cyB3aXRoIHRoZSAxc3QgbGV2ZWwgc3VwcG9ydCBubyBtYXR0ZXIgb24gSU9NTVUg
-c2lkZSBvciB0aGUNCj4gZGV2aWNlIHNpZGU/DQoNCk5vLiBQUkkgaXMgbm90IHRpZWQgdG8gMXN0
-IG9yIDJuZCBsZXZlbC4gQWN0dWFsbHkgZnJvbSBkZXZpY2UgcC5vLnYsIGl0J3MNCmp1c3QgYSBw
-cm90b2NvbCB0byB0cmlnZ2VyIHBhZ2UgZmF1bHQsIGJ1dCB0aGUgZGV2aWNlIGRvZXNuJ3QgY2Fy
-ZSB3aGV0aGVyDQp0aGUgcGFnZSBmYXVsdCBpcyBvbiAxc3Qgb3IgMm5kIGxldmVsIGluIHRoZSBJ
-T01NVSBzaWRlLiBUaGUgb25seQ0KcmVsZXZhbnQgcGFydCBpcyB0aGF0IGEgUFJJIHJlcXVlc3Qg
-Y2FuIGhhdmUgUEFTSUQgdGFnZ2VkIG9yIGNsZWFyZWQuDQpXaGVuIGl0J3MgdGFnZ2VkIHdpdGgg
-UEFTSUQsIHRoZSBJT01NVSB3aWxsIGxvY2F0ZSB0aGUgdHJhbnNsYXRpb24NCnRhYmxlIHVuZGVy
-IHRoZSBnaXZlbiBQQVNJRCAoZWl0aGVyIDFzdCBvciAybmQgbGV2ZWwgaXMgZmluZSwgYWNjb3Jk
-aW5nDQp0byBQQVNJRCBlbnRyeSBzZXR0aW5nKS4gV2hlbiBubyBQQVNJRCBpcyBpbmNsdWRlZCwg
-dGhlIElPTU1VIGxvY2F0ZXMNCnRoZSB0cmFuc2xhdGlvbiBmcm9tIGRlZmF1bHQgZW50cnkgKGUu
-Zy4gUEFTSUQjMCBvciBhbnkgUEFTSUQgY29udGFpbmVkDQppbiBSSUQyUEFTSUQgaW4gVlQtZCku
-DQoNCllvdXIga25vd2xlZGdlIGhhcHBlbmVkIHRvIGJlIGNvcnJlY3QgaW4gZGVwcmVjYXRlZCBF
-Q1MgbW9kZS4gQXQNCnRoYXQgdGltZSwgdGhlcmUgaXMgb25seSBvbmUgMm5kIGxldmVsIHBlciBj
-b250ZXh0IGVudHJ5IHdoaWNoIGRvZXNuJ3QNCnN1cHBvcnQgcGFnZSBmYXVsdCwgYW5kIHRoZXJl
-IGlzIG9ubHkgb25lIDFzdCBsZXZlbCBwZXIgUEFTSUQgZW50cnkgd2hpY2gNCnN1cHBvcnRzIHBh
-Z2UgZmF1bHQuIFRoZW4gUFJJIGNvdWxkIGJlIGluZGlyZWN0bHkgY29ubmVjdGVkIHRvIDFzdCBs
-ZXZlbCwNCmJ1dCB0aGlzIGp1c3QgY2hhbmdlZCB3aXRoIG5ldyBzY2FsYWJsZSBtb2RlLg0KDQpB
-bm90aGVyIG5vdGUgaXMgdGhhdCB0aGUgUFJJIGNhcGFiaWxpdHkgb25seSBpbmRpY2F0ZXMgdGhh
-dCBhIGRldmljZSBpcw0KY2FwYWJsZSBvZiBoYW5kbGluZyBwYWdlIGZhdWx0cywgYnV0IG5vdCB0
-aGF0IGEgZGV2aWNlIGNhbiB0b2xlcmF0ZQ0KcGFnZSBmYXVsdCBmb3IgYW55IG9mIGl0cyBETUEg
-YWNjZXNzLiBJZiB0aGUgbGF0dGVyIGlzIGZhc2xlLCB1c2luZyBDUFUgDQpwYWdlIHRhYmxlIGZv
-ciBEUERLIHVzYWdlIGlzIHN0aWxsIHJpc2t5IChhbmQgc3BlY2lmaWMgdG8gZGV2aWNlIGJlaGF2
-aW9yKQ0KDQo+IA0KPiBJJ20gYWN0dWFsbHkgbm90IHN1cmUgYWJvdXQgd2hldGhlciBteSB1bmRl
-cnN0YW5kaW5nIGhlcmUgaXMNCj4gY29ycmVjdC4uLiBJIHRob3VnaHQgdGhlIHBhc2lkIGJpbmRp
-bmcgcHJldmlvdXNseSB3YXMgb25seSBmb3Igc29tZQ0KPiB2ZW5kb3Iga2VybmVsIGRyaXZlcnMg
-YnV0IG5vdCBhIGdlbmVyYWwgdGhpbmcgdG8gdXNlcnNwYWNlLiAgSSBmZWVsDQo+IGxpa2UgdGhh
-dCBzaG91bGQgYmUgZG9hYmxlIGluIHRoZSBmdXR1cmUgb25jZSB3ZSd2ZSBnb3Qgc29tZSBuZXcN
-Cj4gc3lzY2FsbCBpbnRlcmZhY2UgcmVhZHkgdG8gZGVsaXZlciAxc3QgbGV2ZWwgcGFnZSB0YWJs
-ZSAoZS5nLiwgdmlhDQo+IHZmaW8/KSB0aGVuIGFwcGxpY2F0aW9ucyBsaWtlIERQREsgc2VlbXMg
-dG8gYmUgYWJsZSB0byB1c2UgdGhhdCB0b28NCj4gZXZlbiBkaXJlY3RseSB2aWEgYmFyZSBtZXRh
-bC4NCj4gDQoNCnVzaW5nIDFzdCBsZXZlbCBmb3IgdXNlcnNwYWNlIGlzIGRpZmZlcmVudCBmcm9t
-IHN1cHBvcnRpbmcgRE1BIHBhZ2UNCmZhdWx0IGluIHVzZXJzcGFjZS4gVGhlIGZvcm1lciBpcyBw
-dXJlbHkgYWJvdXQgd2hpY2ggc3RydWN0dXJlIHRvDQprZWVwIHRoZSBtYXBwaW5nLiBJIHRoaW5r
-IHdlIG1heSBkbyB0aGUgc2FtZSB0aGluZyBmb3IgYm90aCBiYXJlDQptZXRhbCBhbmQgZ3Vlc3Qg
-KHVzaW5nIDJuZCBsZXZlbCBvbmx5IGZvciBHUEEgd2hlbiBuZXN0ZWQgaXMgZW5hYmxlZA0Kb24g
-dGhlIElPTU1VKS4gQnV0IHJldXNpbmcgQ1BVIHBhZ2UgdGFibGUgZm9yIHVzZXJzcGFjZSBpcyBt
-b3JlDQp0cmlja3kuIDotKQ0KDQpUaGFua3MNCktldmluDQo=
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+
+David Hildenbrand <david@redhat.com> writes:
+
+> On 24.09.19 14:44, Sergio Lopez wrote:
+>> Microvm is a machine type inspired by both NEMU and Firecracker, and
+>> constructed after the machine model implemented by the latter.
+>>=20
+>> It's main purpose is providing users a minimalist machine type free
+>> from the burden of legacy compatibility, serving as a stepping stone
+>> for future projects aiming at improving boot times, reducing the
+>> attack surface and slimming down QEMU's footprint.
+>>=20
+>> The microvm machine type supports the following devices:
+>>=20
+>>  - ISA bus
+>>  - i8259 PIC
+>>  - LAPIC (implicit if using KVM)
+>>  - IOAPIC (defaults to kernel_irqchip_split =3D true)
+>>  - i8254 PIT
+>>  - MC146818 RTC (optional)
+>>  - kvmclock (if using KVM)
+>>  - fw_cfg
+>>  - One ISA serial port (optional)
+>>  - Up to eight virtio-mmio devices (configured by the user)
+>
+> So I assume also no ACPI (CPU/memory hotplug), correct?
+
+Correct.
+
+> @Pankaj, I think it would make sense to make virtio-pmem play with
+> virtio-mmio/microvm.
+
+That would be great. I'm also looking forward for virtio-mem (and an
+hypothetical virtio-cpu) to eventually gain hotplug capabilities in
+microvm.
+
+Thanks,
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LIPgACgkQ9GknjS8M
+AjWl+A/+PSvLIkJIXkisI+8HPInHsOhI7krvdkj88nvO3vWQbDvRZR4wjKpzJls+
+QuB7L+5sZh4afO4t0zOOZ54AcN91lSMUL3ovOFbN2zsS3yWO3H1BIgroEdD3Ho2g
+wePVPnB65l10c2X6zqvLZlE06amQ1rG2ooYHJmF6AHl7L6ouHjTqioFoe3itzfqc
+5t3xdJx43IpXY5Zng6S8mNGji7q1PX/tKqYdoOSqafMxN9s9HqX6t9F6/kbUkH9j
+Q+xKcSg5wSHAV000jokgfgJe21Z3/O329Zckb+Vdp8RqZZaR5p1tYThevyshqvLK
+K2QKsT8hxflVPtyXe326UGaRQd/n+Uq9d9BFj4M+imvMsYu6EkV9hXDOq5U9PRtN
+uwiCQj3OlHjzvad18+ZbnPnjfkPDFnYTzgdiQ8o99+a8AK1SbdVi8ePMmFy8tvBF
+szKMv7fzfOGYNJnmd0At1nWMon+0qQKW7v/Ee4qMN+Xg5900ycDhsyf1fMdCj/52
+DkQaFc5Bo94CjhDjQetZd/EHJKfqd4NKACCUNs7Hkubrlj7p+xkI+Oj8jtI96cWK
+ytI43gzylvznVvlH16E0BTiEhAduBY5PGkGBOqpAkjk2wLUmGK7BsFAzpjtMDxdH
+XSR81ecBqDHJXAA0JekepxcEK+S3ho6j2NJpJ2jvuXsKCl8UGiI=
+=DOyt
+-----END PGP SIGNATURE-----
+--=-=-=--
