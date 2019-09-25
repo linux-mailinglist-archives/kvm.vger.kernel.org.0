@@ -2,119 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DAEA0BE2C8
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 18:47:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6865BBE451
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 20:09:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392143AbfIYQro (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 12:47:44 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:45914 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392099AbfIYQro (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 12:47:44 -0400
-Received: by mail-io1-f68.google.com with SMTP id c25so403328iot.12
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 09:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=NkXsROJEqHRyKdQlVbGyAe4U+SjsHNVLF9ZqIX8Inqc=;
-        b=cvIb5jN5ZNe3gcMhopMVIXvHGnL0ia+pw5VgYZdzsGtBj2PWdLn+6/6Xk9jV6bzT9o
-         h1LVnt9n0pL1jIZHv576RNKWXcxrLcUvyr2BwcIJic2f8GCwC3zB44tI4JW8yP/3Mpu3
-         gud32+/+nqFYxOuwA86a4BFK5VZcMfTsermAU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NkXsROJEqHRyKdQlVbGyAe4U+SjsHNVLF9ZqIX8Inqc=;
-        b=Ft6aBmDD3pRUqRqh4aK8VVDKYcQJ592Ye/KB6jC3+wwN/LxDwZ/xmY/Y6bEf52Ze8b
-         3SslqmjfyMCQMYIM6mXUCvwgsy0W4mdi6h8ZZOok4fhEsgyyidtHWbOR/KX0BvdA0OkY
-         oq9qrG7KFlMZL7AwLejhr+A2K7rjkfqiG749CplMbLr0Wx6LE9D4XJPiKifXHYOHCi4z
-         CBnGiUgXRVVW12GDpO4gXWiWO+ClYmXSQWJVR5+4ZXKUh/jMCTNN2N7qiwIJJXBsSeP2
-         2RkMFtAgPIL9kSsHB3yQCbZ6qP4EsASbeLRlSUmmDm2T1HavGCDIqGhvXnlZ1a/8gvNO
-         jsJg==
-X-Gm-Message-State: APjAAAX3RloXVjJwJhzC0eMe0z64Dle7Kc1X8ZG52E8nZA82ddhAFuJC
-        l455U9z1E8jDOv2QPbyZ8MLB0g==
-X-Google-Smtp-Source: APXvYqzdSzByx/7StFCVjxm7mpWRvxuckLEoPCZv+n1Qfdo3taMQ72Ag4Z6qoA4O/vT1bqCJUSjskw==
-X-Received: by 2002:a5d:8911:: with SMTP id b17mr267767ion.287.1569430063967;
-        Wed, 25 Sep 2019 09:47:43 -0700 (PDT)
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id s24sm75616iog.26.2019.09.25.09.47.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 25 Sep 2019 09:47:43 -0700 (PDT)
-Subject: Re: [PATCH] selftests: kvm: Fix libkvm build error
-To:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        shuah@kernel.org
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20190924201451.31977-1-skhan@linuxfoundation.org>
- <dbfb9d46-488a-b940-c86f-79ad750a324a@redhat.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <5fecb8a8-8a6a-1e2b-78e3-5660597a02e4@linuxfoundation.org>
-Date:   Wed, 25 Sep 2019 10:47:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2439969AbfIYSJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 14:09:33 -0400
+Received: from mga03.intel.com ([134.134.136.65]:35378 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2439944AbfIYSJc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 14:09:32 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 11:09:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,548,1559545200"; 
+   d="scan'208";a="191419403"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 25 Sep 2019 11:09:31 -0700
+Date:   Wed, 25 Sep 2019 11:09:31 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Fenghua Yu <fenghua.yu@intel.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org
+Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
+ lock
+Message-ID: <20190925180931.GG31852@linux.intel.com>
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
+ <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
+ <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+ <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <dbfb9d46-488a-b940-c86f-79ad750a324a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/25/19 1:48 AM, Paolo Bonzini wrote:
-> On 24/09/19 22:14, Shuah Khan wrote:
->> Fix the following build error:
->>
->> libkvm.a(assert.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be used when making a PIE object; recompile with -fPIC
->>
->> Add -fPIC to CFLAGS to fix it.
+On Wed, Jun 26, 2019 at 11:47:40PM +0200, Thomas Gleixner wrote:
+> So only one of the CPUs will win the cmpxchg race, set te variable to 1 and
+> warn, the other and any subsequent AC on any other CPU will not warn
+> either. So you don't need WARN_ONCE() at all. It's redundant and confusing
+> along with the atomic_set().
 > 
-> This is wrong, these testcases cannot be position-independent
-> executables.  Can you include the failing command line from "V=1"
-> output?
-> 
+> Whithout reading that link [1], what Ingo proposed was surely not the
+> trainwreck which you decided to put into that debugfs thing.
 
-You are right. This isn't correct.
+We're trying to sort out the trainwreck, but there's an additional wrinkle
+that I'd like your input on.
 
-> The problem seems to be that these definitions are not working properly:
-> 
-> no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
->          $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
-> 
-> LDFLAGS += -pthread $(no-pie-option)
-> 
+We overlooked the fact that MSR_TEST_CTRL is per-core, i.e. shared by
+sibling hyperthreads.  This is especially problematic for KVM, as loading
+MSR_TEST_CTRL during VM-Enter could cause spurious #AC faults in the kernel
+and bounce MSR_TEST_CTRL.split_lock.
 
-Yup. That is what is happening, when I build using
+E.g. if CPU0 and CPU1 are siblings and CPU1 is running a KVM guest with
+MSR_TEST_CTRL.split_lock=1, hitting an #AC on CPU0 in the host kernel will
+lead to suprious #AC faults and constant toggling of of the MSR.
 
-"make TARGETS=kvm kselftest"
+  CPU0               CPU1
 
-You can see this below:
+         split_lock=enabled
 
-gcc -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 
--fno-stack-protector -fno-PIE -I../../../../tools/include 
--I../../../../usr/include/ -Iinclude -Ix86_64 -Iinclude/x86_64 -I.. 
--pthread    x86_64/cr4_cpuid_sync_test.c
+  #AC -> disabled
+
+                     VM-Enter -> enabled
+
+  #AC -> disabled
+
+                     VM-Enter -> enabled
+
+  #AC -> disabled
 
 
-vs.
 
-Running make in kvm directory:
+My thought to handle this:
 
-gcc -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 
--fno-stack-protector -fPIC -fno-PIE -I../../../../tools/include 
--I../../../../usr/include/ -Iinclude -Ix86_64 -Iinclude/x86_64 -I.. 
--pthread  -no-pie   x86_64/cr4_cpuid_sync_test.c
+  - Remove the per-cpu cache.
 
-I was playing with both options yesterday and totally confused myself
-thinking that adding fPIC helps. It doesn't.
+  - Rework the atomic variable to differentiate between "disabled globally"
+    and "disabled by kernel (on some CPUs)".
 
-I am looking into this to see how we can make "make kselftest" work.
-Once I figure it out, will send v2. I think for some reason in the
-failing case, no-pie-option and pgste-option are null strings.
+  - Modify the #AC handler to test/set the same atomic variable as the
+    sysfs knob.  This is the "disabled by kernel" flow.
 
-thanks,
--- Shuah
+  - Modify the debugfs/sysfs knob to only allow disabling split-lock
+    detection.  This is the "disabled globally" path, i.e. sends IPIs to
+    clear MSR_TEST_CTRL.split_lock on all online CPUs.
+
+  - Modify the resume/init flow to clear MSR_TEST_CTRL.split_lock if it's
+    been disabled on *any* CPU via #AC or via the knob.
+
+  - Modify the debugs/sysfs read function to either print the raw atomic
+    variable, or differentiate between "enabled", "disabled globally" and
+   "disabled by kernel".
+
+  - Remove KVM loading of MSR_TEST_CTRL, i.e. KVM *never* writes the CPU's
+    actual MSR_TEST_CTRL.  KVM still emulates MSR_TEST_CTRL so that the
+    guest can do WRMSR and handle its own #AC faults, but KVM doesn't
+    change the value in hardware.
+
+      * Allowing guest to enable split-lock detection can induce #AC on
+        the host after it has been explicitly turned off, e.g. the sibling
+        hyperthread hits an #AC in the host kernel, or worse, causes a
+        different process in the host to SIGBUS.
+
+      * Allowing guest to disable split-lock detection opens up the host
+        to DoS attacks.
+
+  - KVM advertises split-lock detection to guest/userspace if and only if
+    split_lock_detect_disabled is zero.
+
+  - Add a pr_warn_once() in KVM that triggers if split locks are disabled
+    after support has been advertised to a guest.
+
+Does this sound sane?
+
+The question at the forefront of my mind is: why not have the #AC handler
+send a fire-and-forget IPI to online CPUs to disable split-lock detection
+on all CPUs?  Would the IPI be problematic?  Globally disabling split-lock
+on any #AC would (marginally) simplify the code and would eliminate the
+oddity of userspace process (and KVM guest) #AC behavior varying based on
+the physical CPU it's running on.
+
+
+Something like:
+
+#define SPLIT_LOCK_DISABLED_IN_KERNEL	BIT(0)
+#define SPLIT_LOCK_DISABLED_GLOBALLY	BIT(1)
+
+static atomic_t split_lock_detect_disabled = ATOMIT_INIT(0);
+
+void split_lock_detect_ac(void)
+{
+	lockdep_assert_irqs_disabled();
+
+	/* Disable split lock detection on this CPU to avoid reentrant #AC. */
+	wrmsrl(MSR_TEST_CTRL,
+	       rdmsrl(MSR_TEST_CTRL) & ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
+
+	/*
+	 * If split-lock detection has not been disabled, either by the kernel
+	 * or globally, record that it has been disabled by the kernel and
+	 * WARN.  Guarding WARN with the atomic ensures only the first #AC due
+	 * to split-lock is logged, e.g. if multiple CPUs encounter #AC or if
+	 * #AC is retriggered by a perf context NMI that interrupts the
+	 * original WARN.
+	 */
+	if (atomic_cmpxchg(&split_lock_detect_disabled, 0,
+			   SPLIT_LOCK_DISABLED_IN_KERNEL) == 0)
+	        WARN(1, "split lock operation detected\n");
+}
+
+static ssize_t split_lock_detect_wr(struct file *f, const char __user *user_buf,
+				    size_t count, loff_t *ppos)
+{
+	int old;
+
+	<parse or ignore input value?>
+	
+	old = atomic_fetch_or(SPLIT_LOCK_DISABLED_GLOBALLY,
+			      &split_lock_detect_disabled);
+
+	/* Update MSR_TEST_CTRL unless split-lock was already disabled. */
+	if (!(old & SPLIT_LOCK_DISABLED_GLOBALLY))
+		on_each_cpu(split_lock_update, NULL, 1);
+
+	return count;
+}
+
