@@ -2,165 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B86EBDA70
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 11:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19271BDA96
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 11:09:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727976AbfIYJEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 05:04:55 -0400
-Received: from mail-eopbgr1300107.outbound.protection.outlook.com ([40.107.130.107]:51226
-        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728213AbfIYJEi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 05:04:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fKAq+8KXV6EH9eyu6+Nbt9ne3FrY3BvgiQEacl6HJ3Pnt5X4ASw71sBQRSYtkalHEIVc30AOl5DK5XgmKQBdIv/9qa/Yj1T0plFvX78b+niVeIx46TFo3WYalDg+NlQ5GLu1bJpvIiIyc09cxSkdCJsBfm5sbGyKKXr/Yw9BpDtw6ivR+ldI++ydoHB3Gv4iSzaaUh59t+xLS3Nt5eoQjEmhmy5o2SBKE1qKsYz0EhN4zUXuMZghOc3McnE7zPkal95c5g93/guarGl+mGWSakhgetmAVLWm0XhUSkDyQIxdGL3oWP/m2WLuhQM11mqIJQLPv+gRcS7Yu7BVW9iqlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tEUIs17qan8uJ+h+w2Ocr7JjLaHx/tcfjHIYRqzhESE=;
- b=JEZybzGPyp4ybZ/C2p6fg2rsuLCEuVSdKgxUnqT3kxhhglNu9CiyTKDm1uRV8YFD+Zyw/i2FUiZeuOfQsWsdhtp/QWDrzw4P4lELG7Gpev3/2uJEW8Rjw83RlMJ1Mg7nIet9CPhvDwZ0wuu0fhEjdmc4pYAtCKa/p69pLIso/Shmfzzw+HYb28GVH+SUcxMvphqMogk+3eU7VXV2SSwd+TrA5f99huJnMc0ZrRR/2Hjin8GGLIkWKhuU8tAlgo0tLi5jGQCTthpm8n+cXRbAKiQUepLM1tJuuSK11zqoHitk/++yjrZlxyNLiIf3KuKmeCbDzuDUWsZbENRs82BoKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tEUIs17qan8uJ+h+w2Ocr7JjLaHx/tcfjHIYRqzhESE=;
- b=BQ+IY1beLVDJI6DcDQME5xttXYZQC8hCH9lawwgPq/Nq2hSx5t1FBABEowyWfyDfxfgXNvGduGSplyM5j0Idf0wIAJ4OebVUjR1ZOZw/PaJPVBA7Ahv+6zla4TnTByasCvrgyhjujMomOkak8Apr1uorLx+qsHkBcpEfyPbDiXw=
-Received: from KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM (52.132.240.14) by
- KL1P15301MB0023.APCP153.PROD.OUTLOOK.COM (10.170.167.148) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.10; Wed, 25 Sep 2019 09:03:44 +0000
-Received: from KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM
- ([fe80::d4ef:dc1e:e10:7318]) by KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM
- ([fe80::d4ef:dc1e:e10:7318%6]) with mapi id 15.20.2327.004; Wed, 25 Sep 2019
- 09:03:44 +0000
-From:   Tianyu Lan <Tianyu.Lan@microsoft.com>
-To:     vkuznets <vkuznets@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: RE: [PATCH] KVM: vmx: fix a build warning in
- hv_enable_direct_tlbflush() on i386
-Thread-Topic: [PATCH] KVM: vmx: fix a build warning in
- hv_enable_direct_tlbflush() on i386
-Thread-Index: AQHVc36qkKKFgQ9iEUSGwUPOJOh2r6c8F8+A
-Date:   Wed, 25 Sep 2019 09:03:43 +0000
-Message-ID: <KL1P15301MB0261653DB1FE73A1EB885E2D92870@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
-References: <20190925085304.24104-1-vkuznets@redhat.com>
-In-Reply-To: <20190925085304.24104-1-vkuznets@redhat.com>
+        id S1729361AbfIYJJe convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 25 Sep 2019 05:09:34 -0400
+Received: from mga05.intel.com ([192.55.52.43]:38724 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728608AbfIYJJd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 05:09:33 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 02:09:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,547,1559545200"; 
+   d="scan'208";a="191280732"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga003.jf.intel.com with ESMTP; 25 Sep 2019 02:09:29 -0700
+Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Sep 2019 02:09:29 -0700
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Sep 2019 02:09:23 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.92]) with mapi id 14.03.0439.000;
+ Wed, 25 Sep 2019 17:09:20 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Wang <jasowang@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "Bie, Tiwei" <tiwei.bie@intel.com>
+CC:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "Liang, Cunming" <cunming.liang@intel.com>,
+        "Wang, Zhihong" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "Wang, Xiao W" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "airlied@linux.ie" <airlied@linux.ie>,
+        "daniel@ffwll.ch" <daniel@ffwll.ch>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
+        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "freude@linux.ibm.com" <freude@linux.ibm.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        "idos@mellanox.com" <idos@mellanox.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "christophe.de.dinechin@gmail.com" <christophe.de.dinechin@gmail.com>
+Subject: RE: [PATCH V2 6/8] mdev: introduce virtio device and its device ops
+Thread-Topic: [PATCH V2 6/8] mdev: introduce virtio device and its device ops
+Thread-Index: AQHVct/nWfANpdabEEm3hvDI5WX0fqc8F18A
+Date:   Wed, 25 Sep 2019 09:09:19 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D58F7DA@SHSMSX104.ccr.corp.intel.com>
+References: <20190924135332.14160-1-jasowang@redhat.com>
+ <20190924135332.14160-7-jasowang@redhat.com>
+In-Reply-To: <20190924135332.14160-7-jasowang@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=tiala@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-09-25T09:03:41.3889275Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=e364f2d0-37b1-4156-8f8f-6dc661448a72;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Tianyu.Lan@microsoft.com; 
-x-originating-ip: [167.220.255.55]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c07c1af7-71ba-4fa7-8f12-08d741974492
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:KL1P15301MB0023;
-x-ms-traffictypediagnostic: KL1P15301MB0023:|KL1P15301MB0023:
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <KL1P15301MB00235B44249417720DA05A0492870@KL1P15301MB0023.APCP153.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 01713B2841
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(346002)(376002)(366004)(39860400002)(136003)(189003)(199004)(13464003)(6116002)(476003)(478600001)(86362001)(6506007)(54906003)(316002)(64756008)(71200400001)(5660300002)(14454004)(76116006)(66476007)(66946007)(66556008)(8676002)(66574012)(81166006)(186003)(10090500001)(110136005)(66446008)(81156014)(52536014)(71190400001)(256004)(102836004)(9686003)(76176011)(26005)(33656002)(14444005)(8990500004)(2906002)(25786009)(6436002)(55016002)(446003)(7696005)(4326008)(74316002)(66066001)(8936002)(486006)(6246003)(10290500003)(2501003)(3846002)(7736002)(11346002)(53546011)(229853002)(22452003)(99286004)(305945005)(334744003);DIR:OUT;SFP:1102;SCL:1;SRVR:KL1P15301MB0023;H:KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: H5yBJ05rUffBK4nHsWYWcYx1NC7Xw4/a07Q0/Vx5Fjgh+pE8gD+Ez7pqZoiQCKsdwTJ9JPvbGKCNSpnzYIMDZuvlZT9cV3yBHsaOb1fM0nPFNo8ae8qDQowlDrTUmhsBOICJfsHOI5CPegs2yxm0qpW0JCcBdk5Y3RSI9Ya7pPX/FFkrCrHntW9swTt4yGxaVQZs2PS7gYH1VgqePxya3+Wtd5O4qN/zi5El9ThBH4sp1UoRwYasGIC+7RBjPlq6TsSr+rzClhnnlfva/6e3pgEo04Dmf3WiYZQO+VMpy2YjA/WZIR4ci1sCkpTTTj7fu24uFF0xLrkqsDnv1jEHMYty1sV+SaqN60WUnenah+t7huQYCv6JllcOF7QYbfRCeNgHuFeUYyffsj0AY19pw5I1L4/LWIUe0AjvxNlbWJU=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjZkMjkzMjAtZTRmMy00NjZlLTg4NGQtMjk0MGE1YTdhNjhlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQStldm53XC92NkNoYndOZTZYXC9Fc1FPZEtpb3ZESVdKME9ZQ003eUw4U2tOZXl6THpyWFFoRWVkenNzc3BWclBQIn0=
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c07c1af7-71ba-4fa7-8f12-08d741974492
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2019 09:03:43.8389
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MptGJarMfagF3gz3YYUSkbs6U4WXDu6fmbOFUqoAzYtZaUMQ3XHi+BNohlae234qiElgWLJc2BF3nZKylkxTtw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1P15301MB0023
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is another warning in the report.
+> From: Jason Wang [mailto:jasowang@redhat.com]
+> Sent: Tuesday, September 24, 2019 9:54 PM
+> 
+> This patch implements basic support for mdev driver that supports
+> virtio transport for kernel virtio driver.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  include/linux/mdev.h        |   2 +
+>  include/linux/virtio_mdev.h | 145
+> ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 147 insertions(+)
+>  create mode 100644 include/linux/virtio_mdev.h
+> 
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 3414307311f1..73ac27b3b868 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -126,6 +126,8 @@ struct mdev_device *mdev_from_dev(struct device
+> *dev);
+> 
+>  enum {
+>  	MDEV_ID_VFIO = 1,
+> +	MDEV_ID_VIRTIO = 2,
+> +	MDEV_ID_VHOST = 3,
+>  	/* New entries must be added here */
+>  };
+> 
+> diff --git a/include/linux/virtio_mdev.h b/include/linux/virtio_mdev.h
+> new file mode 100644
+> index 000000000000..d1a40a739266
+> --- /dev/null
+> +++ b/include/linux/virtio_mdev.h
+> @@ -0,0 +1,145 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Virtio mediated device driver
+> + *
+> + * Copyright 2019, Red Hat Corp.
+> + *     Author: Jason Wang <jasowang@redhat.com>
+> + */
+> +#ifndef _LINUX_VIRTIO_MDEV_H
+> +#define _LINUX_VIRTIO_MDEV_H
+> +
+> +#include <linux/interrupt.h>
+> +#include <linux/mdev.h>
+> +#include <uapi/linux/vhost.h>
+> +
+> +#define VIRTIO_MDEV_DEVICE_API_STRING		"virtio-mdev"
+> +#define VIRTIO_MDEV_VERSION 0x1
 
-arch/x86/kvm/vmx/vmx.c: In function 'hv_enable_direct_tlbflush':
-arch/x86/kvm/vmx/vmx.c:507:20: warning: cast from pointer to integer of dif=
-ferent size [-Wpointer-to-int-cast]
-  evmcs->hv_vm_id =3D (u64)vcpu->kvm;
-                    ^
-The following change can fix it.
--       evmcs->hv_vm_id =3D (u64)vcpu->kvm;
-+       evmcs->hv_vm_id =3D (unsigned long)vcpu->kvm;
-        evmcs->hv_enlightenments_control.nested_flush_hypercall =3D 1;
+Just be curious. is this version identical to virtio spec version that below
+callbacks are created for, or just irrelevant?
 
------Original Message-----
-From: Vitaly Kuznetsov <vkuznets@redhat.com>=20
-Sent: Wednesday, September 25, 2019 4:53 PM
-To: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org; Paolo Bonzini <pbonzini@redhat.com>; Radi=
-m Kr=E8m=E1=F8 <rkrcmar@redhat.com>; Sean Christopherson <sean.j.christophe=
-rson@intel.com>; Jim Mattson <jmattson@google.com>; Tianyu Lan <Tianyu.Lan@=
-microsoft.com>
-Subject: [PATCH] KVM: vmx: fix a build warning in hv_enable_direct_tlbflush=
-() on i386
+> +
+> +struct virtio_mdev_callback {
+> +	irqreturn_t (*callback)(void *data);
+> +	void *private;
+> +};
+> +
+> +/**
+> + * struct vfio_mdev_device_ops - Structure to be registered for each
+> + * mdev device to register the device to virtio-mdev module.
+> + *
+> + * @set_vq_address:		Set the address of virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + *				@desc_area: address of desc area
+> + *				@driver_area: address of driver area
+> + *				@device_area: address of device area
+> + *				Returns integer: success (0) or error (< 0)
+> + * @set_vq_num:		Set the size of virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + *				@num: the size of virtqueue
+> + * @kick_vq:			Kick the virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + * @set_vq_cb:			Set the interrut calback function for
+> + *				a virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + *				@cb: virtio-mdev interrupt callback
+> structure
+> + * @set_vq_ready:		Set ready status for a virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + *				@ready: ready (true) not ready(false)
+> + * @get_vq_ready:		Get ready status for a virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + *				Returns boolean: ready (true) or not (false)
+> + * @set_vq_state:		Set the state for a virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + *				@state: virtqueue state (last_avail_idx)
+> + *				Returns integer: success (0) or error (< 0)
+> + * @get_vq_state:		Get the state for a virtqueue
+> + *				@mdev: mediated device
+> + *				@idx: virtqueue index
+> + *				Returns virtqueue state (last_avail_idx)
+> + * @get_vq_align:		Get the virtqueue align requirement
+> + *				for the device
+> + *				@mdev: mediated device
+> + *				Returns virtqueue algin requirement
+> + * @get_features:		Get virtio features supported by the device
+> + *				@mdev: mediated device
+> + *				Returns the features support by the
+> + *				device
+> + * @get_features:		Set virtio features supported by the driver
+> + *				@mdev: mediated device
+> + *				@features: feature support by the driver
+> + *				Returns integer: success (0) or error (< 0)
+> + * @set_config_cb:		Set the config interrupt callback
+> + *				@mdev: mediated device
+> + *				@cb: virtio-mdev interrupt callback
+> structure
+> + * @get_device_id:		Get virtio device id
+> + *				@mdev: mediated device
+> + *				Returns u32: virtio device id
+> + * @get_vendor_id:		Get virtio vendor id
+> + *				@mdev: mediated device
+> + *				Returns u32: virtio vendor id
+> + * @get_status:		Get the device status
+> + *				@mdev: mediated device
+> + *				Returns u8: virtio device status
+> + * @set_status:		Set the device status
+> + *				@mdev: mediated device
+> + *				@status: virtio device status
+> + * @get_config:		Read from device specific confiugration
+> space
 
-The following was reported on i386:
+configuration (and similar typos downward)
 
-  arch/x86/kvm/vmx/vmx.c: In function 'hv_enable_direct_tlbflush':
-  arch/x86/kvm/vmx/vmx.c:503:10: warning: cast from pointer to integer of d=
-ifferent size [-Wpointer-to-int-cast]
+> + *				@mdev: mediated device
+> + *				@offset: offset from the beginning of
+> + *				configuration space
+> + *				@buf: buffer used to read to
+> + *				@len: the length to read from
+> + *				configration space
+> + * @set_config:		Write to device specific confiugration space
+> + *				@mdev: mediated device
+> + *				@offset: offset from the beginning of
+> + *				configuration space
+> + *				@buf: buffer used to write from
+> + *				@len: the length to write to
+> + *				configration space
+> + * @get_version:		Get the version of virtio mdev device
+> + *				@mdev: mediated device
+> + *				Returns integer: version of the device
+> + * @get_generation:		Get device generaton
+> + *				@mdev: mediated device
+> + *				Returns u32: device generation
+> + */
+> +struct virtio_mdev_device_ops {
+> +	/* Virtqueue ops */
+> +	int (*set_vq_address)(struct mdev_device *mdev,
+> +			      u16 idx, u64 desc_area, u64 driver_area,
+> +			      u64 device_area);
+> +	void (*set_vq_num)(struct mdev_device *mdev, u16 idx, u32 num);
+> +	void (*kick_vq)(struct mdev_device *mdev, u16 idx);
+> +	void (*set_vq_cb)(struct mdev_device *mdev, u16 idx,
+> +			  struct virtio_mdev_callback *cb);
+> +	void (*set_vq_ready)(struct mdev_device *mdev, u16 idx, bool
+> ready);
+> +	bool (*get_vq_ready)(struct mdev_device *mdev, u16 idx);
+> +	int (*set_vq_state)(struct mdev_device *mdev, u16 idx, u64 state);
+> +	u64 (*get_vq_state)(struct mdev_device *mdev, u16 idx);
+> +
+> +	/* Device ops */
+> +	u16 (*get_vq_align)(struct mdev_device *mdev);
+> +	u64 (*get_features)(struct mdev_device *mdev);
+> +	int (*set_features)(struct mdev_device *mdev, u64 features);
+> +	void (*set_config_cb)(struct mdev_device *mdev,
+> +			      struct virtio_mdev_callback *cb);
+> +	u16 (*get_queue_max)(struct mdev_device *mdev);
+> +	u32 (*get_device_id)(struct mdev_device *mdev);
+> +	u32 (*get_vendor_id)(struct mdev_device *mdev);
+> +	u8 (*get_status)(struct mdev_device *mdev);
+> +	void (*set_status)(struct mdev_device *mdev, u8 status);
+> +	void (*get_config)(struct mdev_device *mdev, unsigned int offset,
+> +			   void *buf, unsigned int len);
+> +	void (*set_config)(struct mdev_device *mdev, unsigned int offset,
+> +			   const void *buf, unsigned int len);
+> +	int (*get_version)(struct mdev_device *mdev);
+> +	u32 (*get_generation)(struct mdev_device *mdev);
+> +};
 
-The particular pr_debug() causing it is more or less useless, let's just re=
-move it. Also, simplify the condition a little bit.
+I'm not sure how stable above ops are. Does it make sense if defining
+just two callbacks here, e.g. vq_ctrl and device_ctrl, and then let the
+vendor driver to handle specific ops in each category (similar to how
+ioctl works)?
 
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/vmx/vmx.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index a7c9922e=
-3905..812553b7270f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -495,13 +495,11 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu =
-*vcpu)
- 	 * Synthetic VM-Exit is not enabled in current code and so All
- 	 * evmcs in singe VM shares same assist page.
- 	 */
--	if (!*p_hv_pa_pg) {
-+	if (!*p_hv_pa_pg)
- 		*p_hv_pa_pg =3D kzalloc(PAGE_SIZE, GFP_KERNEL);
--		if (!*p_hv_pa_pg)
--			return -ENOMEM;
--		pr_debug("KVM: Hyper-V: allocated PA_PG for %llx\n",
--		       (u64)&vcpu->kvm);
--	}
-+
-+	if (!*p_hv_pa_pg)
-+		return -ENOMEM;
-=20
- 	evmcs =3D (struct hv_enlightened_vmcs *)to_vmx(vcpu)->loaded_vmcs->vmcs;
-=20
---
-2.20.1
+Thanks
+Kevin
 
