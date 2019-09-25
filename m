@@ -2,216 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C7D76BDABA
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 11:15:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F4216BDAD9
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 11:23:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388801AbfIYJO0 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 25 Sep 2019 05:14:26 -0400
-Received: from mga11.intel.com ([192.55.52.93]:36054 "EHLO mga11.intel.com"
+        id S1727888AbfIYJXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 05:23:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6244 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388718AbfIYJOB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 05:14:01 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 02:14:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,547,1559545200"; 
-   d="scan'208";a="191282057"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by orsmga003.jf.intel.com with ESMTP; 25 Sep 2019 02:13:59 -0700
-Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Sep 2019 02:13:59 -0700
-Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
- fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 25 Sep 2019 02:13:59 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.32]) by
- SHSMSX103.ccr.corp.intel.com ([169.254.4.140]) with mapi id 14.03.0439.000;
- Wed, 25 Sep 2019 17:13:57 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "Xia, Chenbo" <chenbo.xia@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>
-Subject: RE: [PATCH v2 00/13] vfio_pci: wrap pci device as a mediated device
-Thread-Topic: [PATCH v2 00/13] vfio_pci: wrap pci device as a mediated device
-Thread-Index: AQHVZIuKvRVFa0XUZUmQ/OLFqyeI/6c8OZog
-Date:   Wed, 25 Sep 2019 09:13:57 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0A42E9@SHSMSX104.ccr.corp.intel.com>
-References: <1567670370-4484-1-git-send-email-yi.l.liu@intel.com>
-In-Reply-To: <1567670370-4484-1-git-send-email-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYmQ5ZmFiZjItODBkMi00ZDA3LWJmOGYtOGIwNGZiZjNhYTc3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiVVhJNXlcL3NtcDZoZzRobUpBWXdEcGdBTnFCMjVNTE00MGxaT0tWUkhyT2lSRGRFaXJ4RmxUUHJoXC9ZMlJ3eGJlIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727714AbfIYJXF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 05:23:05 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 55FAA88305
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 09:23:04 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id h6so2036696wrh.6
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 02:23:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to;
+        bh=75vP+2MJBvefGCrTVRy48ER1COE2HocqUBh4GlZTNZY=;
+        b=e5zYyTjzANdpdMCX+X355IhDJ2XzfNFUCk6ykajxBe+5S2NR+Ipcba2T0CWMs4mm5H
+         i6yGfAZYlhrd/lhqEvfc1k20CvXLa0PrFV33N2vxd0f8hA6g1PV5jQELSXM+O/5FB9Dg
+         Aj0F/GIMlCyerGxXojE3KhSE2h0/6i0j0YG7HDclYtl8+5P/snI7yE7G95vFOoOLS1co
+         RoH9OXszNQURg0Yz+t7hJ1/HRXaAJSx7EEVpkCvjcMyMtvaztGZ9gZ1RCzfJJbp4Xw+O
+         QPWLwT3/jJ2DAtJPeigDcSiy21r2cGFcBXi+RYVPGnosejTqbO1qhlxxPcsUMX8DS3jb
+         Bdtg==
+X-Gm-Message-State: APjAAAXgeUR/URDTxdGWG5ZTCSte6z48GmGgouhbDWNcqUOn75v4yZM2
+        zvhlRdpQfob12E9+sbA2Cjx5HQIcSxuOvIlUSePx4gkQ7YLrdxc8PobSOPkZPX7L6p3htu3NSkQ
+        uXRbVnQWfBpb1
+X-Received: by 2002:a05:600c:141:: with SMTP id w1mr6426421wmm.75.1569403382658;
+        Wed, 25 Sep 2019 02:23:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzZKlzMKTnmLQOSNwFctg98fghNWCdft5r5Y+uT0gchhbRWTBvSTQxcFm4yUaKLHRaab7uVYQ==
+X-Received: by 2002:a05:600c:141:: with SMTP id w1mr6426384wmm.75.1569403382370;
+        Wed, 25 Sep 2019 02:23:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+        by smtp.gmail.com with ESMTPSA id v8sm9511508wra.79.2019.09.25.02.23.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Sep 2019 02:23:01 -0700 (PDT)
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+To:     Sergio Lopez <slp@redhat.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+        marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+        philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+        mtosatti@redhat.com, kvm@vger.kernel.org
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87r245rkld.fsf@redhat.com>
+ <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com> <87ftkksr9u.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3fb455f8-13ef-2930-a10d-9cecd6e5931e@redhat.com>
+Date:   Wed, 25 Sep 2019 11:22:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <87ftkksr9u.fsf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Go22DeJ8CHMJ33w8s3bLyNTlICVs4vuRO"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Go22DeJ8CHMJ33w8s3bLyNTlICVs4vuRO
+Content-Type: multipart/mixed; boundary="PKple2CdXrRnry8nK6YiAvZHZLK0YEOQr";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+ marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+ philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+ mtosatti@redhat.com, kvm@vger.kernel.org
+Message-ID: <3fb455f8-13ef-2930-a10d-9cecd6e5931e@redhat.com>
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87r245rkld.fsf@redhat.com>
+ <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com> <87ftkksr9u.fsf@redhat.com>
+In-Reply-To: <87ftkksr9u.fsf@redhat.com>
 
-Any comments on it? :-) With this version, the vfio-mdev-pci driver
-could work with non-singleton groups, also it works with vfio-pci
-as well.
+--PKple2CdXrRnry8nK6YiAvZHZLK0YEOQr
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Yi Liu
+On 25/09/19 10:40, Sergio Lopez wrote:
+>>> We need the PIT for non-KVM accel (if present with KVM and
+>>> kernel_irqchip_split =3D off, it basically becomes a placeholder)
+>> Why?
+>=20
+> Perhaps I'm missing something. Is some other device supposed to be
+> acting as a HW timer while running with TCG acceleration?
 
-> From: Liu, Yi L
-> Sent: Thursday, September 5, 2019 3:59 PM
-> To: alex.williamson@redhat.com; kwankhede@nvidia.com
-> Subject: [PATCH v2 00/13] vfio_pci: wrap pci device as a mediated device
-> 
-> This patchset aims to add a vfio-pci-like meta driver as a demo
-> user of the vfio changes introduced in "vfio/mdev: IOMMU aware
-> mediated device" patchset from Baolu Lu. Besides the test purpose,
-> per Alex's comments, it could also be a good base driver for
-> experimenting with device specific mdev migration.
-> 
-> Specific interface tested in this proposal:
->  *) int mdev_set_iommu_device(struct device *dev,
->  				struct device *iommu_device)
->     introduced in the patch as below:
->     "[PATCH v5 6/8] vfio/mdev: Add iommu related member in mdev_device"
-> 
-> Patch Overview:
->  *) patch 1 ~ 7: code refactor for existing vfio-pci module
->                  move the common codes from vfio_pci.c to
->                  vfio_pci_common.c
->  *) patch 8: add protection to perm_bits alloc/free
->  *) patch 9: add vfio-mdev-pci sample driver
->  *) patch 10: refine the sample driver
->  *) patch 11 - 13: make the sample driver work for non-singleton groups
->                    also work for vfio-pci and vfio-mdev-pci mixed usage
->                    includes vfio-mdev-pci driver change and vfio_iommu_type1
->                    changes.
-> 
-> Links:
->  *) Link of "vfio/mdev: IOMMU aware mediated device"
->          https://lwn.net/Articles/780522/
->  *) Previous versions:
->          RFC v1: https://lkml.org/lkml/2019/3/4/529
->          RFC v2: https://lkml.org/lkml/2019/3/13/113
->          RFC v3: https://lkml.org/lkml/2019/4/24/495
->          Patch v1: https://www.spinics.net/lists/kvm/msg188952.html
->  *) may try it with the codes in below repo
->     current version is branch "v5.3-rc7-pci-mdev":
->          https://github.com/luxis1999/vfio-mdev-pci-sample-driver.git
-> 
-> Test done on two NICs which share an iommu group.
-> 
-> -------------------------------------------------------------------
->          |  NIC0           |  NIC1      | vIOMMU  | VMs  | Passtrhu
-> -------------------------------------------------------------------
->   Test#0 |  vfio-pci       |  vfio-pci  | no      |  1   | pass
-> -------------------------------------------------------------------
->   Test#1 |  vfio-pci       |  vfio-pci  | no      |  2   | fail[1]
-> -------------------------------------------------------------------
->   Test#2 |  vfio-pci       |  vfio-pci  | yes     |  1   | fail[2]
-> -------------------------------------------------------------------
->   Test#3 |  vfio-pci-mdev  |  vfio-pci  | no      |  1   | pass
-> -------------------------------------------------------------------
->   Test#4 |  vfio-pci-mdev  |  vfio-pci  | no      |  2   | fail[3]
-> -------------------------------------------------------------------
->   Test#5 |  vfio-pci-mdev  |  vfio-pci  | yes     |  1   | fail[4]
-> -------------------------------------------------------------------
-> Tips:
-> [1] qemu-system-x86_64: -device vfio-pci,host=01:00.1,id=hostdev0,addr=0x6:
->      vfio 0000:01:00.1: failed to open /dev/vfio/1: Device or resource busy
-> [2] qemu-system-x86_64: -device vfio-pci,host=01:00.1,id=hostdev0,addr=0x6:
->      vfio 0000:01:00.1: group 1 used in multiple address spaces
-> [3] qemu-system-x86_64: -device vfio-pci,host=01:00.1,id=hostdev0,addr=0x6:
->      vfio 0000:01:00.1: failed to setup container for group 1: Failed to set
->      iommu for container: Device or resource busy
-> [4] qemu-system-x86_64: -device vfio-pci,host=01:00.1,id=hostdev0,addr=0x6:
->      vfio 0000:01:00.1: failed to setup container for group 1: Failed to set
->      iommu for container: Device or resource busy
->     Or
->     qemu-system-x86_64: -device vfio-pci,sysfsdev=/sys/bus/mdev/devices/
->      83b8f4f2-509f-382f-3c1e-e6bfe0fa1003: vfio 83b8f4f2-509f-382f-3c1e-
->      e6bfe0fa1003: failed to setup container for group 11: Failed to set iommu
->      for container: Device or resource busy
-> Some other tests are not listed. Like bind NIC0 to vfio-pci-mdev and try to
-> passthru it with "vfio-pci,host=01:00.0", kernel will throw a warn log and
-> fail the operation.
-> 
-> Please feel free give your comments.
-> 
-> Thanks,
-> Yi Liu
-> 
-> Change log:
->   patch v1 -> patch v2:
->   - the sample driver implementation refined
->   - the sample driver can work on non-singleton iommu groups
->   - the sample driver can work with vfio-pci, devices from a non-singleton
->     group can either be bound to vfio-mdev-pci or vfio-pci, and the
->     assignment of this group still follows current vfio assignment rule.
-> 
->   RFC v3 -> patch v1:
->   - split the patchset from 3 patches to 9 patches to better demonstrate
->     the changes step by step
-> 
->   v2->v3:
->   - use vfio-mdev-pci instead of vfio-pci-mdev
->   - place the new driver under drivers/vfio/pci while define
->     Kconfig in samples/Kconfig to clarify it is a sample driver
-> 
->   v1->v2:
->   - instead of adding kernel option to existing vfio-pci
->     module in v1, v2 follows Alex's suggestion to add a
->     separate vfio-pci-mdev module.
->   - new patchset subject: "vfio/pci: wrap pci device as a mediated device"
-> 
-> Alex Williamson (1):
->   samples: refine vfio-mdev-pci driver
-> 
-> Liu Yi L (12):
->   vfio_pci: move vfio_pci_is_vga/vfio_vga_disabled to header
->   vfio_pci: refine user config reference in vfio-pci module
->   vfio_pci: refine vfio_pci_driver reference in vfio_pci.c
->   vfio_pci: make common functions be extern
->   vfio_pci: duplicate vfio_pci.c
->   vfio_pci: shrink vfio_pci_common.c
->   vfio_pci: shrink vfio_pci.c
->   vfio/pci: protect cap/ecap_perm bits alloc/free with atomic op
->   samples: add vfio-mdev-pci driver
->   samples/vfio-mdev-pci: call vfio_add_group_dev()
->   vfio/type1: use iommu_attach_group() for wrapping PF/VF as mdev
->   vfio/type1: track iommu backed group attach
-> 
->  drivers/vfio/pci/Makefile           |    9 +-
->  drivers/vfio/pci/vfio_mdev_pci.c    |  497 ++++++++++++
->  drivers/vfio/pci/vfio_pci.c         | 1449 +---------------------------------
->  drivers/vfio/pci/vfio_pci_common.c  | 1455
-> +++++++++++++++++++++++++++++++++++
->  drivers/vfio/pci/vfio_pci_config.c  |    9 +
->  drivers/vfio/pci/vfio_pci_private.h |   36 +
->  drivers/vfio/vfio_iommu_type1.c     |  185 ++++-
->  samples/Kconfig                     |   11 +
->  8 files changed, 2194 insertions(+), 1457 deletions(-)
->  create mode 100644 drivers/vfio/pci/vfio_mdev_pci.c
->  create mode 100644 drivers/vfio/pci/vfio_pci_common.c
-> 
-> --
-> 2.7.4
+Sure, the LAPIC timer.  I wonder if Linux, however, wants to use the PIT
+in order to calibrate the LAPIC timer if TSC deadline mode is unavailable=
+=2E
 
+>>> and the PIC for both the PIT and the ISA serial port.
+>>
+>> Can't the ISA serial port work with the IOAPIC?
+>=20
+> Hm... I'm not sure. I wanted to give it a try, but then noticed that
+> multiple places in the code (like hw/intc/apic.c:560) do expect to have=
+
+> an ISA PIC present through the isa_pic global variable.
+>=20
+> I guess we should be able to work around this, but I'm not sure if it's=
+
+> really worth it. What do you think?
+
+You can add a paragraph saying that in the future the list could be
+reduced further.  I think that the direction we want to go is to only
+leave the IOAPIC around (the ISA devices in this respect are no
+different from the virtio-mmio devices).
+
+But you're right about isa_pic.  I wonder if it's as easy as this:
+
+diff --git a/hw/intc/apic.c b/hw/intc/apic.c
+index bce89911dc..5d03e48a19 100644
+--- a/hw/intc/apic.c
++++ b/hw/intc/apic.c
+@@ -610,7 +610,7 @@ int apic_accept_pic_intr(DeviceState *dev)
+
+     if ((s->apicbase & MSR_IA32_APICBASE_ENABLE) =3D=3D 0 ||
+         (lvt0 & APIC_LVT_MASKED) =3D=3D 0)
+-        return 1;
++        return isa_pic !=3D NULL;
+
+     return 0;
+ }
+
+Thanks,
+
+Paolo
+
+
+--PKple2CdXrRnry8nK6YiAvZHZLK0YEOQr--
+
+--Go22DeJ8CHMJ33w8s3bLyNTlICVs4vuRO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2LMfMACgkQv/vSX3jH
+roM12ggAkABdlQ9In+GxchMSxRw6z+yooeM6sT88LkAIxns3RvIA49BsUv/nOsPs
+UNm/jI50Fw78LYTykv4x4qHHJRnoV7L3WFCwc/9q1ZZXEwT1miQhkV+lmBJk+jQR
+HQq4uqH6wzeSDN8YiXsKCMWPt+Jhfw/ufWFZgGtsz2EpxCo3UN9aXyFh5HaR8HAJ
+/ohH19TEEVtizMSW7oUX017bUlVoNARRwShXMjKWLGQHUH6vJnaNmYg4LPH2pXSU
+YfxaNcff+35K+TabjJIv0pS/W9OYTepc/kHl1nlv6XJsxVuoOp5/g7a2WKmrtm2m
+Y//wA/icK/7P7YYr2+HGnZsj0u2quw==
+=BQuh
+-----END PGP SIGNATURE-----
+
+--Go22DeJ8CHMJ33w8s3bLyNTlICVs4vuRO--
