@@ -2,159 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A1D8BE2C2
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 18:47:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAEA0BE2C8
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 18:47:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392055AbfIYQrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 12:47:18 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:46987 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732903AbfIYQrR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 12:47:17 -0400
-Received: by mail-io1-f67.google.com with SMTP id c6so382234ioo.13
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 09:47:16 -0700 (PDT)
+        id S2392143AbfIYQro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 12:47:44 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:45914 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392099AbfIYQro (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 12:47:44 -0400
+Received: by mail-io1-f68.google.com with SMTP id c25so403328iot.12
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 09:47:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=98pgIm93kXtpiVnPdQGl6qYx3mDeiyiIIkaZo8B0nYw=;
-        b=WvgZ/tV+qz4PYThIjrZ62TklAy0Nk05OkM+Vs8mBky+mCDHKn5Q/ZucHDd4zO+3dIZ
-         eBUQoXg37LJOhxhC4UjoxsVO6yQffKbKEyk3BnEILbf13f/ogVpcNTTw7f6pNGRSMlEy
-         1wEaLrRPMEjkGgblfRCKEzlpYD0Y/yCcrb8au+B1hdjjcX6Ze7Bi0kbkXI7nbwEYyqYc
-         K63QGHh+/ko2XSFNZl8hmUxgaHkPdh0zAkGs5u2xO+r6JoceDJFy4zLPu5yStHVZcByj
-         ISD23aAxzowf3CpOvB2pXbDJ4ZrJD6zsVkrI7V4yjuwpzgTv5LeveW2S9XGiX85/iw8u
-         OutQ==
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=NkXsROJEqHRyKdQlVbGyAe4U+SjsHNVLF9ZqIX8Inqc=;
+        b=cvIb5jN5ZNe3gcMhopMVIXvHGnL0ia+pw5VgYZdzsGtBj2PWdLn+6/6Xk9jV6bzT9o
+         h1LVnt9n0pL1jIZHv576RNKWXcxrLcUvyr2BwcIJic2f8GCwC3zB44tI4JW8yP/3Mpu3
+         gud32+/+nqFYxOuwA86a4BFK5VZcMfTsermAU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=98pgIm93kXtpiVnPdQGl6qYx3mDeiyiIIkaZo8B0nYw=;
-        b=P48cEiC3ABbuF2q3VHzy1z7F8ac6HWPQCQaqguI145aK+f0bLOWXN5x9xJIBpFJs2S
-         re8LJ5Bv9m6QiQ0iKH69H7UKU3EB4qxjvzKXS5tLiRe3DFYoYqE7hM2bQi2IJ35W4Y9N
-         OLSZgnRjnG3ndy+lO5DDWzbPLe97AFZhkk0LQoNuZ7SArtNiSBEq8IICjxspAZsR1KC0
-         6wlt4+3s36h4HM5QTq+yIGtY12ZXzbWNYxfu8po/AP3qGKVTFuqNJdObPp0XaoYDNZgu
-         B6oqe4Ks8nNlPDuLAnE1jMsjAMhUGllpEPOsVFG5gtlKgZJpZ1lEzi+fibufHCxPkBr4
-         xXyw==
-X-Gm-Message-State: APjAAAXcYjOe3VSt2R8gilPhSMlXxZRUyoAUuGJmG8QckM2gLWKq5IeR
-        2usqbHKL22gBmGRetIcEgV0j2acuu4FK6woLdicQgw==
-X-Google-Smtp-Source: APXvYqzgqoO4yNpM6KKRUPIwFWPS2tgkT3U1hiQzPm9HsQ1SWUWqLYv+twNVVs76Tlmo5v+6nFST3fkvTU0jUl+S5XQ=
-X-Received: by 2002:a6b:6a01:: with SMTP id x1mr273843iog.119.1569430036059;
- Wed, 25 Sep 2019 09:47:16 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NkXsROJEqHRyKdQlVbGyAe4U+SjsHNVLF9ZqIX8Inqc=;
+        b=Ft6aBmDD3pRUqRqh4aK8VVDKYcQJ592Ye/KB6jC3+wwN/LxDwZ/xmY/Y6bEf52Ze8b
+         3SslqmjfyMCQMYIM6mXUCvwgsy0W4mdi6h8ZZOok4fhEsgyyidtHWbOR/KX0BvdA0OkY
+         oq9qrG7KFlMZL7AwLejhr+A2K7rjkfqiG749CplMbLr0Wx6LE9D4XJPiKifXHYOHCi4z
+         CBnGiUgXRVVW12GDpO4gXWiWO+ClYmXSQWJVR5+4ZXKUh/jMCTNN2N7qiwIJJXBsSeP2
+         2RkMFtAgPIL9kSsHB3yQCbZ6qP4EsASbeLRlSUmmDm2T1HavGCDIqGhvXnlZ1a/8gvNO
+         jsJg==
+X-Gm-Message-State: APjAAAX3RloXVjJwJhzC0eMe0z64Dle7Kc1X8ZG52E8nZA82ddhAFuJC
+        l455U9z1E8jDOv2QPbyZ8MLB0g==
+X-Google-Smtp-Source: APXvYqzdSzByx/7StFCVjxm7mpWRvxuckLEoPCZv+n1Qfdo3taMQ72Ag4Z6qoA4O/vT1bqCJUSjskw==
+X-Received: by 2002:a5d:8911:: with SMTP id b17mr267767ion.287.1569430063967;
+        Wed, 25 Sep 2019 09:47:43 -0700 (PDT)
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
+        by smtp.gmail.com with ESMTPSA id s24sm75616iog.26.2019.09.25.09.47.42
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 25 Sep 2019 09:47:43 -0700 (PDT)
+Subject: Re: [PATCH] selftests: kvm: Fix libkvm build error
+To:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
+        shuah@kernel.org
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Shuah Khan <skhan@linuxfoundation.org>
+References: <20190924201451.31977-1-skhan@linuxfoundation.org>
+ <dbfb9d46-488a-b940-c86f-79ad750a324a@redhat.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <5fecb8a8-8a6a-1e2b-78e3-5660597a02e4@linuxfoundation.org>
+Date:   Wed, 25 Sep 2019 10:47:42 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1569429286-35157-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1569429286-35157-1-git-send-email-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 25 Sep 2019 09:47:05 -0700
-Message-ID: <CALMp9eTBPTnsRDipdGDgmugWgfFEjQ2wd_9-JY0ZeM9YG2fBjg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: cleanup and fix host 64-bit mode checks
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <dbfb9d46-488a-b940-c86f-79ad750a324a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 25, 2019 at 9:34 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> KVM was incorrectly checking vmcs12->host_ia32_efer even if the "load
-> IA32_EFER" exit control was reset.  Also, some checks were not using
-> the new CC macro for tracing.
->
-> Cleanup everything so that the vCPU's 64-bit mode is determined
-> directly from EFER_LMA and the VMCS checks are based on that, which
-> matches section 26.2.4 of the SDM.
->
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Fixes: 5845038c111db27902bc220a4f70070fe945871c
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 53 ++++++++++++++++++++---------------------------
->  1 file changed, 22 insertions(+), 31 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 70d59d9304f2..e108847f6cf8 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2664,8 +2664,26 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
->             CC(!kvm_pat_valid(vmcs12->host_ia32_pat)))
->                 return -EINVAL;
->
-> -       ia32e = (vmcs12->vm_exit_controls &
-> -                VM_EXIT_HOST_ADDR_SPACE_SIZE) != 0;
-> +#ifdef CONFIG_X86_64
-> +       ia32e = !!(vcpu->arch.efer & EFER_LMA);
-> +#else
-> +       if (CC(vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE))
-> +               return -EINVAL;
+On 9/25/19 1:48 AM, Paolo Bonzini wrote:
+> On 24/09/19 22:14, Shuah Khan wrote:
+>> Fix the following build error:
+>>
+>> libkvm.a(assert.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be used when making a PIE object; recompile with -fPIC
+>>
+>> Add -fPIC to CFLAGS to fix it.
+> 
+> This is wrong, these testcases cannot be position-independent
+> executables.  Can you include the failing command line from "V=1"
+> output?
+> 
 
-This check is redundant, since it is checked in the else block below.
+You are right. This isn't correct.
 
-> +
-> +       ia32e = false;
-> +#endif
-> +
-> +       if (ia32e) {
-> +               if (CC(!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE)) ||
-> +                   CC(!(vmcs12->host_cr4 & X86_CR4_PAE)))
-> +                       return -EINVAL;
-> +       } else {
-> +               if (CC(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE) ||
-> +                   CC(vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) ||
-> +                   CC(vmcs12->host_cr4 & X86_CR4_PCIDE) ||
-> +                   CC(((vmcs12->host_rip) >> 32) & 0xffffffff))
+> The problem seems to be that these definitions are not working properly:
+> 
+> no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
+>          $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+> 
+> LDFLAGS += -pthread $(no-pie-option)
+> 
 
-The mask shouldn't be necessary.
+Yup. That is what is happening, when I build using
 
-> +                       return -EINVAL;
-> +       }
->
->         if (CC(vmcs12->host_cs_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK)) ||
->             CC(vmcs12->host_ss_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK)) ||
-> @@ -2684,35 +2702,8 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
->             CC(is_noncanonical_address(vmcs12->host_gs_base, vcpu)) ||
->             CC(is_noncanonical_address(vmcs12->host_gdtr_base, vcpu)) ||
->             CC(is_noncanonical_address(vmcs12->host_idtr_base, vcpu)) ||
-> -           CC(is_noncanonical_address(vmcs12->host_tr_base, vcpu)))
-> -               return -EINVAL;
-> -
-> -       if (!(vmcs12->host_ia32_efer & EFER_LMA) &&
-> -           ((vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) ||
-> -           (vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE))) {
-> -               return -EINVAL;
-> -       }
-> -
-> -       if ((vmcs12->host_ia32_efer & EFER_LMA) &&
-> -           !(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE)) {
-> -               return -EINVAL;
-> -       }
-> -
-> -       if (!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE) &&
-> -           ((vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) ||
-> -           (vmcs12->host_cr4 & X86_CR4_PCIDE) ||
-> -           (((vmcs12->host_rip) >> 32) & 0xffffffff))) {
-> -               return -EINVAL;
-> -       }
-> -
-> -       if ((vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE) &&
-> -           ((!(vmcs12->host_cr4 & X86_CR4_PAE)) ||
-> -           (is_noncanonical_address(vmcs12->host_rip, vcpu)))) {
-> -               return -EINVAL;
-> -       }
-> -#else
-> -       if (vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE ||
-> -           vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE)
-> +           CC(is_noncanonical_address(vmcs12->host_tr_base, vcpu)) ||
-> +           CC(is_noncanonical_address(vmcs12->host_rip, vcpu)))
->                 return -EINVAL;
->  #endif
->
-> --
-> 1.8.3.1
->
-Reviewed-by: Jim Mattson <jmattson@google.com>
+"make TARGETS=kvm kselftest"
+
+You can see this below:
+
+gcc -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 
+-fno-stack-protector -fno-PIE -I../../../../tools/include 
+-I../../../../usr/include/ -Iinclude -Ix86_64 -Iinclude/x86_64 -I.. 
+-pthread    x86_64/cr4_cpuid_sync_test.c
+
+
+vs.
+
+Running make in kvm directory:
+
+gcc -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 
+-fno-stack-protector -fPIC -fno-PIE -I../../../../tools/include 
+-I../../../../usr/include/ -Iinclude -Ix86_64 -Iinclude/x86_64 -I.. 
+-pthread  -no-pie   x86_64/cr4_cpuid_sync_test.c
+
+I was playing with both options yesterday and totally confused myself
+thinking that adding fPIC helps. It doesn't.
+
+I am looking into this to see how we can make "make kselftest" work.
+Once I figure it out, will send v2. I think for some reason in the
+failing case, no-pie-option and pgste-option are null strings.
+
+thanks,
+-- Shuah
