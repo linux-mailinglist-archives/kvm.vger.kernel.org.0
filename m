@@ -2,107 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 289DFBDF8F
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 15:57:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EDFCBE0C7
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 17:04:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406921AbfIYN5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 09:57:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54762 "EHLO mx1.redhat.com"
+        id S1731359AbfIYPEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 11:04:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56708 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406387AbfIYN5d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 09:57:33 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726036AbfIYPEm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 11:04:42 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A7AD8C057F20;
-        Wed, 25 Sep 2019 13:57:32 +0000 (UTC)
-Received: from [10.36.117.14] (ovpn-117-14.ams2.redhat.com [10.36.117.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A6AA608C0;
-        Wed, 25 Sep 2019 13:57:31 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 0/2] s390x: Quick fixes
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20190925135623.9740-1-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <65acf839-3dc6-4ff3-fb83-51434b86f025@redhat.com>
-Date:   Wed, 25 Sep 2019 15:57:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mx1.redhat.com (Postfix) with ESMTPS id ED628796ED
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 15:04:41 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id q10so2502372wro.22
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 08:04:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version;
+        bh=pLATcdGpRsaJe0HMHluCJ9++bIY/2wR5B6HNVL8voTk=;
+        b=IIvSTYr1TJ2UTi61id8WSHNiy98/MGhKDfV7G6OHZlidGk7f3mPIkcXDDmEC/sGmwx
+         Rz/ZeWuOPQrR1Shrl7wKbJ30LpcinKUU2Vb7iGJvisByuvMT7t6f9vaA2AgmRvZnk/U7
+         lCvjHG2e3yXuZ11oG/cvajwALi70hQkp6frRHw2eBb02TS+DqY57hUEMcUVaq8xnxMFe
+         XrxmfZ9I2oHaJDcZbLU7BAM3MkhLXYMmeEDi+khowX1jXrbdMbdh4a6PRAvVZUO4LX/C
+         4DfTEXiOsI7v49gGxRmXXryaLgkAR6ImKWPiFde2REpEUdv7vQ8xSuPeHTyNmZlEsI+m
+         F1Hg==
+X-Gm-Message-State: APjAAAWa2XuDMpihGSX9XDoHfJJq4kKlK9gG6rBXpo4HhIMjOzXloBht
+        JDzSWqM3tgPT2ytTyIvM6MigYNaHRDoDNw0GrwbA1/j1h1boSy1hyj9Xjtl+kuIJY7/Cv6gTvVn
+        cfI7jjXFm6FxV
+X-Received: by 2002:a1c:658b:: with SMTP id z133mr8495189wmb.130.1569423880124;
+        Wed, 25 Sep 2019 08:04:40 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwstO6O1CI8De4rqaohqlMbBBY47FrzUX4GAHLRSeSPlpVuyJ+L9+SDKUZQU+6rM5EaySPTNQ==
+X-Received: by 2002:a1c:658b:: with SMTP id z133mr8495167wmb.130.1569423879921;
+        Wed, 25 Sep 2019 08:04:39 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net. [95.120.215.139])
+        by smtp.gmail.com with ESMTPSA id c10sm8745245wrf.58.2019.09.25.08.04.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2019 08:04:38 -0700 (PDT)
+References: <20190924124433.96810-1-slp@redhat.com> <20190924124433.96810-8-slp@redhat.com> <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From:   Sergio Lopez <slp@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+        marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+        philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+        mtosatti@redhat.com, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine type
+In-reply-to: <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com>
+Date:   Wed, 25 Sep 2019 17:04:19 +0200
+Message-ID: <87a7ass9ho.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190925135623.9740-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Wed, 25 Sep 2019 13:57:32 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.09.19 15:56, Janosch Frank wrote:
-> Missing free and missing import.
-> 
-> Janosch Frank (2):
->   s390x: Add missing include in smp.h
->   s390x: Free allocated page in iep test
-> 
->  lib/s390x/smp.h | 2 ++
->  s390x/iep.c     | 1 +
->  2 files changed, 3 insertions(+)
-> 
+--=-=-=
+Content-Type: text/plain
 
-To both
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
--- 
+> On 24/09/19 14:44, Sergio Lopez wrote:
+>> +Microvm is a machine type inspired by both NEMU and Firecracker, and
+>> +constructed after the machine model implemented by the latter.
+>
+> I would say it's inspired by Firecracker only.  The NEMU virt machine
+> had virtio-pci and ACPI.
+>
+>> +It's main purpose is providing users a minimalist machine type free
+>> +from the burden of legacy compatibility,
+>
+> I think this is too strong, especially if you keep the PIC and PIT. :)
+> Maybe just "It's a minimalist machine type without PCI support designed
+> for short-lived guests".
+>
+>> +serving as a stepping stone
+>> +for future projects aiming at improving boot times, reducing the
+>> +attack surface and slimming down QEMU's footprint.
+>
+> "Microvm also establishes a baseline for benchmarking QEMU and operating
+> systems, since it is optimized for both boot time and footprint".
+>
+>> +The microvm machine type supports the following devices:
+>> +
+>> + - ISA bus
+>> + - i8259 PIC
+>> + - LAPIC (implicit if using KVM)
+>> + - IOAPIC (defaults to kernel_irqchip_split = true)
+>> + - i8254 PIT
+>
+> Do we need the PIT?  And perhaps the PIC even?
+>
+
+I'm going back to this level of the thread, because after your
+suggestion I took a deeper look at how things work around the PIC, and
+discovered I was completely wrong about my assumptions.
+
+For virtio-mmio devices, given that we don't have the ability to
+configure vectors (as it's done in the PCI case) we're stuck with the
+ones provided by the platform PIC, which in the x86 case is the i8259
+(at least from Linux's perspective).
+
+So we can get rid of the IOAPIC, but we need to keep the i8259 (we have
+both a userspace and a kernel implementation too, so it should be fine).
+
+As for the PIT, we can omit it if we're running with KVM acceleration,
+as kvmclock will be used to calculate loops per jiffie and avoid the
+calibration, leaving it enabled otherwise.
 
 Thanks,
+Sergio.
 
-David / dhildenb
+
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LgfMACgkQ9GknjS8M
+AjVOng/8D9mG+yeOmoGNjoqwhkfwuEOAeFQyZh577lA14fZmUL/2Ll1POHzG+VUR
+JEtcR7MMYoF7vpZetsuuuvxUmxG9euzAxtpDEi7DcIeIpevAUQClLFpNk/YCk+UG
+PoubELTebT4VLw8UoeCGnew8FzglDYpTvL/JJ+aGH4NROy6S7dzjIjCGkLGyHIE0
+kqZx98/SI7yrByCP6GvND9dQAl2fHjQroYhrYUZH5sK+rCFdtMFY7eSjmWjezjLL
+wY2k1yaRkmURkqflPZKUeudKG3bMltnZpv0kfadyJS6m5d0RMC7dMz/roDjHJfbQ
+sKrjFTBKmV0bM2gKefDKt40Aui/7iBcXj2/Eieb9au7MWKSmsVwDl9O0W3kNRiXV
+G5HD8RSE+vyQ1PVrNs3voRGTjr3q0GnScakWsmJ8NfV5LDP0ST3hYea0JqYb51Dx
+snIjkR5foEIEnYJoGsstr8cpbipHJQ8xnPYF3cpMmO6B1xuJL+5gjbwUHxmbHy6G
+WvP4srKnB1QaAKZ4lA0UDtEgw1Wt13Tt9uY1iGmiyTOF4kp7x/LomPIFsGz5Urde
+gDXh1VCQ9AOFjDGNoTpSHoNFaiCoEeBBn0vYxNCjaInT8AeYZHQNCSGXmR7yZws6
+n6Emm/n8cawrcopXAPPn0S/ks+PnOC+5aN5EFgsmWdSwy2o4nDM=
+=zIjv
+-----END PGP SIGNATURE-----
+--=-=-=--
