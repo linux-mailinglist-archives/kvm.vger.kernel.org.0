@@ -2,123 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E6EC3BDF05
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 15:31:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69883BDF0A
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 15:32:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391558AbfIYNbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 09:31:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59128 "EHLO mx1.redhat.com"
+        id S2391606AbfIYNcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 09:32:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38194 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391508AbfIYNbd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 09:31:33 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2391596AbfIYNcm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 09:32:42 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9496E5117D
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 13:31:32 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id s19so2077535wmj.0
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 06:31:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1HbTRgs4ZwTBdvJESliM5GK5A8G5L+4nogU+I4sznOA=;
-        b=NktjQICsUyGplqeMR7gcHmLB8nwkZQighQLaND4CMwsjgK8J9cTJP1oRaw6eQnHVYN
-         h1JTtmt+RO3kM6rsqw9ApYo/pX/OgpZ53XUWGLy6C+qnZay5GTUa0EaaAHp2t3I4Eso1
-         wnzKViDshtUYLaKhgGYWUbrjX8ej8PYA3s5MbJV/MZ42Utsc6+N4FMpZ8OnFsJGcTlsT
-         W3F8tSpPt80/2muW5gtFZbcCUjEgXw6+nO/c35PN5XDynI3Q7Bdz4UrXLD5yDqKdLCfl
-         qJveAW+wUFdLvPQmgCo0TyS5ocIAtHxVyyx2tp9JiSa+MjzWghOOMfcLyXHBhKPG1MvQ
-         /WFw==
-X-Gm-Message-State: APjAAAXp+CdACfjl1fpe0xhZLBS+50EL2UJ/zqxrRxuX407E2Rs6ZPwA
-        eksaLVFZ163PWtYn0PVIczrIigfjkURlNB7lYX9TH4+czQxgfk7PPdpwDb8TUecFFqds4UwHKqM
-        QRLbrkSkE5q4E
-X-Received: by 2002:adf:e392:: with SMTP id e18mr9131923wrm.87.1569418291256;
-        Wed, 25 Sep 2019 06:31:31 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwAwrqt6cqOZT+pbnFbG1k738GvnZ33vFNLMbkxyi7H/nPq5zKKsf7SGWlbYT53E8q7HgKA0A==
-X-Received: by 2002:adf:e392:: with SMTP id e18mr9131904wrm.87.1569418290977;
-        Wed, 25 Sep 2019 06:31:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id g185sm6562186wme.10.2019.09.25.06.31.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Sep 2019 06:31:30 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: vmx: fix build warnings in
- hv_enable_direct_tlbflush() on i386
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>
-References: <20190925133035.7576-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 5D2FE7FDCA;
+        Wed, 25 Sep 2019 13:32:42 +0000 (UTC)
+Received: from [10.36.117.14] (ovpn-117-14.ams2.redhat.com [10.36.117.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 52C2D1001B00;
+        Wed, 25 Sep 2019 13:32:41 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 6/6] s390x: SMP test
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org
+References: <20190920080356.1948-1-frankja@linux.ibm.com>
+ <20190920080356.1948-7-frankja@linux.ibm.com>
+ <b8b574a0-aa5d-7a10-ccd3-d901bf2e0655@redhat.com>
+ <df219ca6-b772-cfcb-2c9b-e53fe5b2c8b8@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <ed9d9b67-0d2b-fc08-e5f3-5a8dcca0ef1c@redhat.com>
-Date:   Wed, 25 Sep 2019 15:31:29 +0200
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
+ BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
+ 8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
+ xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
+ jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
+ s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
+ m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
+ MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
+ z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
+ dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
+ UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
+ 7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
+ uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
+ 0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
+ 2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
+ xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
+ 8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
+ hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
+ u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
+ gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
+ rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
+ BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
+ KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
+ NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
+ YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
+ lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
+ qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
+ C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
+ W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
+ TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
+ +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <4afbfdca-e028-4bb8-0ed0-41f907e9acf3@redhat.com>
+Date:   Wed, 25 Sep 2019 15:32:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190925133035.7576-1-vkuznets@redhat.com>
+In-Reply-To: <df219ca6-b772-cfcb-2c9b-e53fe5b2c8b8@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 25 Sep 2019 13:32:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/09/19 15:30, Vitaly Kuznetsov wrote:
-> The following was reported on i386:
+On 25.09.19 15:30, Thomas Huth wrote:
+> On 25/09/2019 15.27, David Hildenbrand wrote:
+>> On 20.09.19 10:03, Janosch Frank wrote:
+>>> Testing SIGP emulation for the following order codes:
+>>> * start
+>>> * stop
+>>> * restart
+>>> * set prefix
+>>> * store status
+>>> * stop and store status
+>>> * reset
+>>> * initial reset
+>>> * external call
+>>> * emegergency call
+>>>
+>>> restart and set prefix are part of the library and needed to start
+>>> other cpus.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>  s390x/Makefile      |   1 +
+>>>  s390x/smp.c         | 242 ++++++++++++++++++++++++++++++++++++++++++++
+>>>  s390x/unittests.cfg |   4 +
+>>>  3 files changed, 247 insertions(+)
+>>>  create mode 100644 s390x/smp.c
+>>>
+>>> diff --git a/s390x/Makefile b/s390x/Makefile
+>>> index d83dd0b..3744372 100644
+>>> --- a/s390x/Makefile
+>>> +++ b/s390x/Makefile
+>>> @@ -15,6 +15,7 @@ tests += $(TEST_DIR)/cpumodel.elf
+>>>  tests += $(TEST_DIR)/diag288.elf
+>>>  tests += $(TEST_DIR)/stsi.elf
+>>>  tests += $(TEST_DIR)/skrf.elf
+>>> +tests += $(TEST_DIR)/smp.elf
+>>>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>>  
+>>>  all: directories test_cases test_cases_binary
+>>> diff --git a/s390x/smp.c b/s390x/smp.c
+>>> new file mode 100644
+>>> index 0000000..7032494
+>>> --- /dev/null
+>>> +++ b/s390x/smp.c
+>>> @@ -0,0 +1,242 @@
+>>> +/*
+>>> + * Tests sigp emulation
+>>> + *
+>>> + * Copyright 2019 IBM Corp.
+>>> + *
+>>> + * Authors:
+>>> + *    Janosch Frank <frankja@linux.ibm.com>
+>>> + *
+>>> + * This code is free software; you can redistribute it and/or modify it
+>>> + * under the terms of the GNU General Public License version 2.
+>>> + */
+>>> +#include <libcflat.h>
+>>> +#include <asm/asm-offsets.h>
+>>> +#include <asm/interrupt.h>
+>>> +#include <asm/page.h>
+>>> +#include <asm/facility.h>
+>>> +#include <asm-generic/barrier.h>
+>>> +#include <asm/sigp.h>
+>>> +
+>>> +#include <smp.h>
+>>> +#include <alloc_page.h>
+>>> +
+>>> +static int testflag = 0;
+>>> +
+>>> +static void cpu_loop(void)
+>>> +{
+>>> +	for (;;) {}
+>>
+>> Won't that be optimized out completely?
 > 
->   arch/x86/kvm/vmx/vmx.c: In function 'hv_enable_direct_tlbflush':
->   arch/x86/kvm/vmx/vmx.c:503:10: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-> 
-> pr_debugs() in this function are  more or less useless, let's just
-> remove them. evmcs->hv_vm_id can use 'unsigned long' instead of 'u64'.
-> 
-> Also, simplify the code a little bit.
-> 
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a7c9922e3905..d5b978068209 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -495,23 +495,19 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
->  	 * Synthetic VM-Exit is not enabled in current code and so All
->  	 * evmcs in singe VM shares same assist page.
->  	 */
-> -	if (!*p_hv_pa_pg) {
-> +	if (!*p_hv_pa_pg)
->  		*p_hv_pa_pg = kzalloc(PAGE_SIZE, GFP_KERNEL);
-> -		if (!*p_hv_pa_pg)
-> -			return -ENOMEM;
-> -		pr_debug("KVM: Hyper-V: allocated PA_PG for %llx\n",
-> -		       (u64)&vcpu->kvm);
-> -	}
-> +
-> +	if (!*p_hv_pa_pg)
-> +		return -ENOMEM;
->  
->  	evmcs = (struct hv_enlightened_vmcs *)to_vmx(vcpu)->loaded_vmcs->vmcs;
->  
->  	evmcs->partition_assist_page =
->  		__pa(*p_hv_pa_pg);
-> -	evmcs->hv_vm_id = (u64)vcpu->kvm;
-> +	evmcs->hv_vm_id = (unsigned long)vcpu->kvm;
->  	evmcs->hv_enlightenments_control.nested_flush_hypercall = 1;
->  
-> -	pr_debug("KVM: Hyper-V: enabled DIRECT flush for %llx\n",
-> -		 (u64)vcpu->kvm);
->  	return 0;
->  }
->  
-> 
+> Why? AFAIK this is the standard way to write and endless loop ... how
+> can a compiler optimize that away?
 
-Queued, thanks.
+Was messing it up with "just" an empty loop body, I think you're right.
 
-Paolo
+-- 
+
+Thanks,
+
+David / dhildenb
