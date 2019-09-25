@@ -2,88 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F20ABD962
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 09:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C22CBD96C
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 09:57:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2442641AbfIYHw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 03:52:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36908 "EHLO mx1.redhat.com"
+        id S2442657AbfIYH5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 03:57:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35565 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2437273AbfIYHw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 03:52:56 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        id S2438033AbfIYH5t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 03:57:49 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4B474C059B6F
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 07:52:56 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id a4so1893199wrg.8
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 00:52:56 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 23C22796EF
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 07:57:49 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id j2so1914738wre.1
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 00:57:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vJ6wyP0bI3pA2TwxdshaPg0vZhCLWNJFj4q55kWGgHE=;
-        b=eiGS+Radj1DyDY41LfWM8MQtKbJmQY3PABylWI9ks0eFp8We8SwYYPTPL4fj8i0R2C
-         IPU0OVa7flk7Oxk7Hwc0BUxj2qCrsVzBz492XmIzjlrii/uDqzMQSDVSXFgHznHAmGMb
-         13gCsJdwYVX08foKscmpE46p/ra9Tkgu/KjFo3aN2UWj973Zs72mBDfKK8FlUx26YNu9
-         diN125X5zmACFCWBlT73M1d4ptS9NviUMMKtLZFypotaBogGOjc6AW1566RaedSHIa7l
-         S8KEIDcMXabopGTkje2eSfSq8Id6j9+PSoXXlxXh54sFutRphW5uqqoUid6qQVlHpS9R
-         5UYw==
-X-Gm-Message-State: APjAAAVpeLXcaLvArKrqZIm/0ezpLGUH0G6R75gMIjtROrXuyb6yGas/
-        HEXnDPgHpymIkvynjmM5jKgmi1zcDkUqKI2WB5KzFeUuXNI9hOnEWNnatWzdY9pDpx/x8DX6wFE
-        R86dV2bEWkcku
-X-Received: by 2002:a5d:6302:: with SMTP id i2mr8197508wru.249.1569397974558;
-        Wed, 25 Sep 2019 00:52:54 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzfc4fQeO64LjuPyyOE4zcmr6EaHOEpbv8tYk/ZlLRcmQbwHMYuPntDJ92EzbDHh7HONJehDA==
-X-Received: by 2002:a5d:6302:: with SMTP id i2mr8197404wru.249.1569397973453;
-        Wed, 25 Sep 2019 00:52:53 -0700 (PDT)
+         :date:user-agent:mime-version:in-reply-to;
+        bh=BBQ1WGoO/qpGXB8rTiM/z99z3rGQOB6O69irsJbKsnU=;
+        b=XvVMaIca/2Lu6cJEuuXqYreH1d633a856TNVXTH7OVRF/nvDgcXNmwQ+asKk9WJY1u
+         9enb5Tz+fjdtigDW0wYIBHki51cKdFdoQpE3fi7KZ3/Hw+lJvsEZowVdIrALPDuFfFvD
+         eiTN2/i9sX8hRbHzoDj/UhAeYhcedPS3W2CPtkm77UULcRvLalCNoGiKHCoKDFNgCind
+         TzZi+9/4ynCQVc3a9zxQ3sPBbO1zcpJ2lt2e+2uF/UIcfbV2Xb3MaK4vnCtskBXwOQ6T
+         SD4LsXKkpr8R3PhUoBazTUh5KOPqq+nOWlH9PjDwJyUb0oVGm7FgoAunbu37/oQ+nX1i
+         3XlQ==
+X-Gm-Message-State: APjAAAWoFPUuQDProqcZoElpWUOqyEaEg0QJ58vRHRwGTo9OjMDJRUwk
+        xzPJg1lAAEsIuwye4Bw9aY+PWB9dV2SNCHs5XfGp9IsfS8GWtxxK8z8QCmXMOBIJQWNGbTVh8zL
+        w11KjZaj3Wtyt
+X-Received: by 2002:adf:e612:: with SMTP id p18mr7411325wrm.218.1569398267322;
+        Wed, 25 Sep 2019 00:57:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwd4+QLxS9sts/MKqAeE/q13HOjkkPx3B9bGMmHMxIRdr2EEBa0pQkRo+6Kv7Nvkky4+4R+sg==
+X-Received: by 2002:adf:e612:: with SMTP id p18mr7411287wrm.218.1569398267049;
+        Wed, 25 Sep 2019 00:57:47 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id m18sm7610094wrg.97.2019.09.25.00.52.52
+        by smtp.gmail.com with ESMTPSA id y5sm3056418wma.14.2019.09.25.00.57.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Sep 2019 00:52:52 -0700 (PDT)
-Subject: Re: [PATCH 14/17] KVM: monolithic: x86: inline more exit handlers in
- vmx.c
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190920212509.2578-1-aarcange@redhat.com>
- <20190920212509.2578-15-aarcange@redhat.com>
- <6a1d66a1-74c0-25b9-692f-8875e33b2fae@redhat.com>
- <20190924010056.GB4658@redhat.com>
- <a75d04e1-cfd6-fa2e-6120-1f3956e14153@redhat.com>
- <20190924015527.GC4658@redhat.com>
+        Wed, 25 Sep 2019 00:57:46 -0700 (PDT)
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+To:     Sergio Lopez <slp@redhat.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+        marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+        philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+        mtosatti@redhat.com, kvm@vger.kernel.org
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87r245rkld.fsf@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <3ec06895-d05d-aacd-17cc-08eedb21ccba@redhat.com>
-Date:   Wed, 25 Sep 2019 09:52:52 +0200
+Message-ID: <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com>
+Date:   Wed, 25 Sep 2019 09:57:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190924015527.GC4658@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <87r245rkld.fsf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mDVZVal97fA1LjnG3jStglsB6w8rGOwz9"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/09/19 03:55, Andrea Arcangeli wrote:
->> So it's forty bytes.  I think we can leave this out.
-> This commit I reverted adds literally 3 inlines called by 3 functions,
-> in a very fast path, how many bytes of .text difference did you expect
-> by dropping some call/ret from a very fast path when you asked me to
-> test it? I mean it's just a couple of insn each.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mDVZVal97fA1LjnG3jStglsB6w8rGOwz9
+Content-Type: multipart/mixed; boundary="9K0MbSTT8fXB0xcZQYs5vcslLqWEvV6qU";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+ marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+ philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+ mtosatti@redhat.com, kvm@vger.kernel.org
+Message-ID: <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com>
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87r245rkld.fsf@redhat.com>
+In-Reply-To: <87r245rkld.fsf@redhat.com>
 
-Actually I was either expecting the difference to be zero, meaning GCC
-was already inlining them.
+--9K0MbSTT8fXB0xcZQYs5vcslLqWEvV6qU
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I think it is not inlining the functions because they are still
-referenced by vmx_exit_handlers.  After patch 15 you could drop them
-from the array, and then GCC should inline them.
+On 25/09/19 07:49, Sergio Lopez wrote:
+>>> +serving as a stepping stone
+>>> +for future projects aiming at improving boot times, reducing the
+>>> +attack surface and slimming down QEMU's footprint.
+>>
+>> "Microvm also establishes a baseline for benchmarking QEMU and operati=
+ng
+>> systems, since it is optimized for both boot time and footprint".
+>=20
+> Well, I prefer my paragraph, but I'm good with either.
+
+You're right my version sort of missed the point.  What about
+s/benchmarking/benchmarking and optimizing/?
+
+>>> +The microvm machine type supports the following devices:
+>>> +
+>>> + - ISA bus
+>>> + - i8259 PIC
+>>> + - LAPIC (implicit if using KVM)
+>>> + - IOAPIC (defaults to kernel_irqchip_split =3D true)
+>>> + - i8254 PIT
+>>
+>> Do we need the PIT?  And perhaps the PIC even?
+>=20
+> We need the PIT for non-KVM accel (if present with KVM and
+> kernel_irqchip_split =3D off, it basically becomes a placeholder)
+
+Why?
+
+> and the
+> PIC for both the PIT and the ISA serial port.
+
+Can't the ISA serial port work with the IOAPIC?
 
 Paolo
+
+
+--9K0MbSTT8fXB0xcZQYs5vcslLqWEvV6qU--
+
+--mDVZVal97fA1LjnG3jStglsB6w8rGOwz9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2LHfgACgkQv/vSX3jH
+roOpQgf/aiQvLFYTNQI5a6Bco3E6++pojDnNgz29HoMJn52fu5lGxi5AVMra2FjG
+uMSNDat8wB1yUkCIbjMGPmhFf2pcYfRu+AP7iN1ULr4Xg9EEdD1piIJPaKPry8PU
+qdrNFe1TYgZeTrjRaxCedEYl9y9u68y0YnqGGgfXuNz/hGgSrpKj9psBs9V6oJnZ
+QYU26ahyJ5w7SV0BnIK//TkNwhme4XBNwKMjAiicm8hfkY8PwdM6QkHzvyOuKvHn
+50rjvAR+jlaHJiJTbn4Z7+XYrGIZrPq0mYWU3NU0TBk/aOpTRUVRKx3DmJQzM3vI
+s3W5rayLrNXsf14sKp/hfxpwQ1Utlg==
+=dw3J
+-----END PGP SIGNATURE-----
+
+--mDVZVal97fA1LjnG3jStglsB6w8rGOwz9--
