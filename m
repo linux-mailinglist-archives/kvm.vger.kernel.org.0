@@ -2,64 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B8ED0BD7EE
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 07:51:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6AA4BD7F7
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 07:53:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404408AbfIYFvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 01:51:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52764 "EHLO mx1.redhat.com"
+        id S2411763AbfIYFxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 01:53:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57234 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404959AbfIYFvX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 01:51:23 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        id S2404361AbfIYFxX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 01:53:23 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 25A898665A
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 05:51:23 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id m6so1306787wmf.2
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 22:51:23 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6B1BB4E92A
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 05:53:22 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id j2so1736589wre.1
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 22:53:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:references:user-agent:from:to:cc:subject
          :in-reply-to:date:message-id:mime-version;
-        bh=OtEFV0m+GnWRM/tR47ubwOVlNUD3RY9PH6tuWisJOek=;
-        b=j269OuqLbkmiTyyVd5dTTDWC4BiBW+wGByEVaPZuOojmzQIZgOxcPZY91zkPMuArDr
-         HaR5ajo+Mr2HTHRCSEYrB7QLh/WuihXzSNKG8vbon43WBfU9fdRC/kfq8dBw35MJvPl7
-         SMrWzGJ2Yc0b0bp/vl1E1cdwc0emog+hUZxjbEbOb6dy7kO3clu3KK44YBH1f0C9vZ+t
-         QS/xNrThRCLzPZ9G0fEGx2gyVH6Zuf6UoKSxEWxb6TL2Z/vStYq57dd+GuZNxk0RljtU
-         QM0IU5Sw9vzYZMqD5w5MfOdmx7PEqgv7+Tv7ifHZGjJi+giA3LfFFjBZ8E/o/wNJ7Nkt
-         rEYw==
-X-Gm-Message-State: APjAAAXyxmeOToKGhnyBAUf5yU6SO7AZTwfneL1PuL8eyqdNiSm2ZdUP
-        rHbnC2aWzBZFk3qcTkCVtLvv1TNed+c1bIRdE2yi+MDarYoI376PI+DUW8LDCWK0puvMTOeXGHB
-        1MTTtXUpg/5mw
-X-Received: by 2002:a1c:1b14:: with SMTP id b20mr4953534wmb.122.1569390681857;
-        Tue, 24 Sep 2019 22:51:21 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzk/XSA8hgHlQwseDF2U3WU+JlYJtl/FUQYAHCtiXsg3G1to2Dj4NGideZ8SXt2mfq3cTXgWQ==
-X-Received: by 2002:a1c:1b14:: with SMTP id b20mr4953515wmb.122.1569390681711;
-        Tue, 24 Sep 2019 22:51:21 -0700 (PDT)
+        bh=7woLVgJ+KVYVdpUNNP/OKdOYyHMYlJN3b6YJJgwv2Mg=;
+        b=ejYjERRkLMuBmaZhKYrMwu3rSlAcvyZfIc3tMa5eAktQN7fVlul039G+nnqw9s/1vt
+         fMd0tJ1RpHHwJZFQ41RubnhJ+TxSP/UG4p9FRt1bTu/udm0W6VR0YYGEimOy+SYM5Dun
+         shsr7UXl2i2jUJbOgmjN271m+6q7chDBOP2u/Ush4dYYB/yKbY8D5166T+f1xZT/oOlI
+         9QxMHOSZZM8OEjfyPXWmLbABVJvtCCgx3S6uSLY4uNXmxo3b6EZTavMdZHuDggUaXqpC
+         /J/n9DxA7mww5nt2YLNKK9wnYPlH4A6xzPtMZUY2TSIMthaBVk1/HRDEUuh1OeQsrpZn
+         OZXw==
+X-Gm-Message-State: APjAAAVBP5Cw80jNtKcgQ3wU6ffMb6BWJJzsRXsd441VD154tAEEcA8k
+        iYGk1uahuP5fEUpBhMhDkaDzH1ErOCq67bauv9pNvy5t/pJY18MtmVossoO4pCAN9LFd3RyuqQb
+        VylFJyLhcRbAN
+X-Received: by 2002:adf:f9ce:: with SMTP id w14mr7310626wrr.132.1569390800990;
+        Tue, 24 Sep 2019 22:53:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxpOy6S9KG5JEGMS7+UMGl6cv6QPmCytFMF2tJor3GyybuL6Zygr8G2mNtKtbI+zvp6UGV9vg==
+X-Received: by 2002:adf:f9ce:: with SMTP id w14mr7310602wrr.132.1569390800830;
+        Tue, 24 Sep 2019 22:53:20 -0700 (PDT)
 Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net. [95.120.215.139])
-        by smtp.gmail.com with ESMTPSA id s10sm3389670wmf.48.2019.09.24.22.51.20
+        by smtp.gmail.com with ESMTPSA id b184sm2316815wmg.47.2019.09.24.22.53.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2019 22:51:21 -0700 (PDT)
-References: <20190924124433.96810-1-slp@redhat.com> <CAFEAcA_2-achqUpTk1fDGWXcWPvTTLPvEtL+owNSWuZ5L3p=XA@mail.gmail.com>
+        Tue, 24 Sep 2019 22:53:19 -0700 (PDT)
+References: <20190924124433.96810-1-slp@redhat.com> <20190924124433.96810-9-slp@redhat.com> <2cbd2570-d158-c9ce-2a38-08c28cd291ea@redhat.com>
 User-agent: mu4e 1.2.0; emacs 26.2
 From:   Sergio Lopez <slp@redhat.com>
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
-In-reply-to: <CAFEAcA_2-achqUpTk1fDGWXcWPvTTLPvEtL+owNSWuZ5L3p=XA@mail.gmail.com>
-Date:   Wed, 25 Sep 2019 07:51:18 +0200
-Message-ID: <87pnjosz3d.fsf@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+        marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+        philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+        mtosatti@redhat.com, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
+In-reply-to: <2cbd2570-d158-c9ce-2a38-08c28cd291ea@redhat.com>
+Date:   Wed, 25 Sep 2019 07:53:17 +0200
+Message-ID: <87o8z8sz02.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
         micalg=pgp-sha256; protocol="application/pgp-signature"
@@ -72,31 +65,22 @@ X-Mailing-List: kvm@vger.kernel.org
 Content-Type: text/plain
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On Tue, 24 Sep 2019 at 14:25, Sergio Lopez <slp@redhat.com> wrote:
->>
->> Microvm is a machine type inspired by both NEMU and Firecracker, and
->> constructed after the machine model implemented by the latter.
->>
->> It's main purpose is providing users a minimalist machine type free
->> from the burden of legacy compatibility, serving as a stepping stone
->> for future projects aiming at improving boot times, reducing the
->> attack surface and slimming down QEMU's footprint.
+> On 24/09/19 14:44, Sergio Lopez wrote:
+>> microvm.option-roms=bool (Set off to disable loading option ROMs)
 >
->
->>  docs/microvm.txt                 |  78 +++
->
-> I'm not sure how close to acceptance this patchset is at the
-> moment, so not necessarily something you need to do now,
-> but could new documentation in docs/ be in rst format, not
-> plain text, please? (Ideally also they should be in the right
-> manual subdirectory, but documentation of system emulation
-> machines at the moment is still in texinfo format, so we
-> don't have a subdir for it yet.)
+> Please make this x-option-roms
 
-Sure. What I didn't get is, should I put it in "docs/microvm.rst" or in
-some other subdirectory?
+OK.
+
+>> microvm.isa-serial=bool (Set off to disable the instantiation an ISA serial port)
+>> microvm.rtc=bool (Set off to disable the instantiation of an MC146818 RTC)
+>> microvm.kernel-cmdline=bool (Set off to disable adding virtio-mmio devices to the kernel cmdline)
+>
+> Perhaps auto-kernel-cmdline?
+
+Yeah, that sounds better.
 
 Thanks,
 Sergio.
@@ -106,18 +90,18 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LAFYACgkQ9GknjS8M
-AjUuNA/9HZkcHiAgWQjLv+hy9IJvlB94aSH8XhyJZ51P7tQtgJgxJMkWhUtLqm4x
-J77G7mDacT/B3X96mhOCaS7UEeqGCeE1JE9LRo9DNN5ivN9kbetfb7he+EE3yQ7Z
-5pQu2AhTm5e0BzFKDIpG9g0ybbRQERYpuPcqMNx1ZR1murW0XH+7yb7CCIuIozAm
-LRNyKtlRzu8H+hU/0TuDB2zPA3dQvBrx9YCLivA06Ekyl1OFk2pHqmmPF/800G2C
-tTHPTn2KqkeWjZmRoJS0cq5JloaMnfa59PWeGeCxB8b0JS69ZWXNCUpsYgN6Jzwc
-oB+7YJT043vB0b2rdMPZEesa5PdaBbXR2WqOIO6li4rhZANKakGzJH450Sc8P17A
-RC5aqCCse6ZXvsEAezoVR5C10w37YRxkZdMH8JB81jpcLZRRXYk0Gq/Gzar5eFBM
-Vo1rlxgKbI+3X6doKWsVy01oxC0S4JayW08uPdZ6rletlJJuHvuR2Hn6NQdj/9Ew
-5SUqZNo0j7/uOGBdDm/iWzLnh6prvl0LXl8OUvAwNM3PHxHSVHGY9mxUZSsHYiLO
-bEyxj++CgkAEc+qYMmb3Ykzf1WQ45Uyl2DE9iPaUcKVyg1a8q2e0WklcWVgn/Q4x
-u3j8gg6Yj/a8MfegbnQfP2+4u440reGFNDJGVlW9EJcTFlGK5L8=
-=Y289
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LAM0ACgkQ9GknjS8M
+AjUg2w/+ISuBhSmncT32Fm1YTvxEh2PDdUF/lq3mxoIxKfl2KOfRnj/jlrz6JofU
+L7M8lrc1+NXSf35Tbavcf/enK3Fs/gRF54h3J5NtlVNK6nbYb5+g7I3o8iUWbwJk
+FbwHv7SmRnOzyzQFlzFoW5C2kHfieRn+biVoFCVScdkM9CSJSZg4+vJUJoHcg7tB
+FItkCQfhm1R940qFmP7EmzrcY9pb0sUoJkOpoUhjr/2F32nJQexBCxn7dDDYvDPY
+g6o5QKR0jzbwye/luxKofqhMHrhlblg6MT8ygIDxtNuOfBJj+O67hXaXx+0lY9w9
+XxZ2mY9nHmRTXvP6c9CaN+bZUj20BhcpEU+hl6fDjx3aBw753I4pGCZJcNdOv682
+Cop3r/7HyHDs2Wr7/pJEhBXnFMKOanjmak1uef8c1JYz5VuKt2878Kd4dHfef9Xr
+IlNHmjjpiF5jjVtcBXw1i+xT5LQ2p53Hb2bUcu23W6qxSGji0rxA3W2F80qDk3m5
+tUJjuZ9ltF6995/oijT5wTxOSp/ahH9aBtz4lg9OcesdlJolyPvFMXDggxZRI0Vq
+fC27hF97dgK85qh/JgzhleMgwAzIzZRQwmzV0xiboonY+UnF1MaD1+WlNeLlo2pL
+pYkja5qRd9I+BOfzCdjanDE/uDE54yW8xcgJGxVpLLMrWY7dDec=
+=E2ve
 -----END PGP SIGNATURE-----
 --=-=-=--
