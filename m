@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E1C1BD811
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 08:05:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84585BD822
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 08:09:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2411849AbfIYGD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 02:03:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37832 "EHLO mx1.redhat.com"
+        id S2404392AbfIYGJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 02:09:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45212 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2411845AbfIYGDG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 02:03:06 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        id S1727791AbfIYGJm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 02:09:42 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0AF568535C
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 06:03:06 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id w10so1746323wrl.5
-        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 23:03:05 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id A064C356CE
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 06:09:41 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id z17so1752466wru.13
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 23:09:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:references:user-agent:from:to:cc:subject
          :in-reply-to:date:message-id:mime-version;
-        bh=kdVgmLDX3XC0MZB5e+D8RfcV20vQhEvu7mZJJoI2cYI=;
-        b=mdRlyprgs/3SN6k8JisBXp88r7xWb9U00kVWu6yjdEPVcm5nViohXxtlXPSTzyFo6/
-         SeIgSdWi2oM7/J8tWogzRcjFJe1nRArx9Epy8zovzejhccxj2EWCwnUXrMFakARBQjkO
-         OV5R7Nlqe68Nh7LqzYDf1GCCShNeUt3U4ki7p9FH1bFiKQkLJAxiXp3ang6XopiMmDOC
-         T2z5QCGfg/CD5nhTzTwRsYtLCvbUVRUZniKqZOVjwVx1HL/dsSWh5SfrAdkZR7efOLGM
-         sJ7IPQuvQAQsPYtqUaAYryJWgyaOfGTb7mPcgR0XSh2Y6XXlyCyJGQL6oLofR8G2MgHC
-         YVuA==
-X-Gm-Message-State: APjAAAVw+tfAiaVYgLD4CniwLKYk9BWudB+ul8mQhQ6k5qlrM3ornkIK
-        5C+jH+mQncmHOKUmYttEF8NwIyr4gNKqQdU+sO4QVuUNMu7eEWf8qZ3SZ0J2OGePbagz/uyn36H
-        pfxPHjqMbM74J
-X-Received: by 2002:adf:bb0a:: with SMTP id r10mr7363885wrg.13.1569391383754;
-        Tue, 24 Sep 2019 23:03:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxAbYS6gsCDr+G2KEN9U5KqgyI7/w95sCF5bkYJb7ePUh//1XmHS3yIhfV+Ixnh55zlkdDEFg==
-X-Received: by 2002:adf:bb0a:: with SMTP id r10mr7363842wrg.13.1569391383453;
-        Tue, 24 Sep 2019 23:03:03 -0700 (PDT)
+        bh=Si188qao9kPJzkFjk9t+bf+IeWcVWdlNBHRSpRcSBRI=;
+        b=mOtr5z10FXR1yeMIVXKGrcMA7WRToVdqmySoQvwrYgtTLo16ew0641X/YBjRr6jKu1
+         rXs5IE8HGnpKCnvcY5thYlfk8UApLjyLPlbTuPq8m0GXecWWCNO/N/2dlg2OfMfIrwRo
+         qopZsYxBR+z1M9zv0mj+zu56w+Ipek0QVYDfXe5tnsvUKIwgghSckw/SyDi946Re1CwX
+         HeKrpuOiEInLvyziBudlBo2I6J+1wqRIQ3/6epAgATY8sMd2gqG2kJoPgumvW+Fj+IGy
+         gqlJACH/FUm2mIIt7yBVIi0WRur6Ko9sZraLy5zAmQaz2++Dnlc3tLQR0HKRARW61aPd
+         l0Fg==
+X-Gm-Message-State: APjAAAXR6RggcrhnEtaE1jfeNYS7/xM7deatwgqQeoTBVHxnD96nvNa9
+        3GLd+iTJwicvMF4Q8OygpVaa1PSpNaELyvQ6+vglvii53hyts3eggxWz+fRac4FhJF0RI9pWznM
+        Vs14H3vBQY1ea
+X-Received: by 2002:a05:600c:c2:: with SMTP id u2mr5044045wmm.37.1569391779928;
+        Tue, 24 Sep 2019 23:09:39 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz/AmAB8uHJiiOeaFUEFosft/h4izWgD8JuBdJzg5t0+CdjlCILBq6Fx1b1kuu6bM11CbY14Q==
+X-Received: by 2002:a05:600c:c2:: with SMTP id u2mr5043999wmm.37.1569391779553;
+        Tue, 24 Sep 2019 23:09:39 -0700 (PDT)
 Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net. [95.120.215.139])
-        by smtp.gmail.com with ESMTPSA id v7sm4853071wru.87.2019.09.24.23.03.01
+        by smtp.gmail.com with ESMTPSA id r18sm2905613wme.48.2019.09.24.23.09.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2019 23:03:02 -0700 (PDT)
-References: <20190924124433.96810-1-slp@redhat.com> <20190924124433.96810-2-slp@redhat.com> <1f1e944f-0076-6c96-3da0-ea196e2d21a1@redhat.com>
+        Tue, 24 Sep 2019 23:09:38 -0700 (PDT)
+References: <20190924124433.96810-1-slp@redhat.com> <20190924124433.96810-7-slp@redhat.com> <f0827ffb-1bce-037d-44ee-c26156b4b221@redhat.com>
 User-agent: mu4e 1.2.0; emacs 26.2
 From:   Sergio Lopez <slp@redhat.com>
 To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
@@ -49,10 +49,10 @@ Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
         marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net,
         ehabkost@redhat.com, lersek@redhat.com, kraxel@redhat.com,
         mtosatti@redhat.com, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 1/8] hw/i386: Factorize PVH related functions
-In-reply-to: <1f1e944f-0076-6c96-3da0-ea196e2d21a1@redhat.com>
-Date:   Wed, 25 Sep 2019 08:03:00 +0200
-Message-ID: <87lfucsyjv.fsf@redhat.com>
+Subject: Re: [PATCH v4 6/8] roms: add microvm-bios (qboot) as binary and git submodule
+In-reply-to: <f0827ffb-1bce-037d-44ee-c26156b4b221@redhat.com>
+Date:   Wed, 25 Sep 2019 08:09:36 +0200
+Message-ID: <87k19wsy8v.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
         micalg=pgp-sha256; protocol="application/pgp-signature"
@@ -68,349 +68,261 @@ Content-Transfer-Encoding: quoted-printable
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Hi Sergio,
->
 > On 9/24/19 2:44 PM, Sergio Lopez wrote:
->> Extract PVH related functions from pc.c, and put them in pvh.c, so
->> they can be shared with other components.
+>> qboot is a minimalist x86 firmware for booting Linux kernels. It does
+>> the mininum amount of work required for the task, and it's able to
+>> boot both PVH images and bzImages without relying on option roms.
+>>=20
+>> This characteristics make it an ideal companion for the microvm
+>> machine type.
 >>=20
 >> Signed-off-by: Sergio Lopez <slp@redhat.com>
 >> ---
->>  hw/i386/Makefile.objs |   1 +
->>  hw/i386/pc.c          | 120 +++++-------------------------------------
->>  hw/i386/pvh.c         | 113 +++++++++++++++++++++++++++++++++++++++
->>  hw/i386/pvh.h         |  10 ++++
->>  4 files changed, 136 insertions(+), 108 deletions(-)
->>  create mode 100644 hw/i386/pvh.c
->>  create mode 100644 hw/i386/pvh.h
+>>  .gitmodules              |   3 +++
+>>  pc-bios/bios-microvm.bin | Bin 0 -> 65536 bytes
+>>  roms/Makefile            |   6 ++++++
+>>  roms/qboot               |   1 +
+>>  4 files changed, 10 insertions(+)
+>>  create mode 100755 pc-bios/bios-microvm.bin
+>>  create mode 160000 roms/qboot
 >>=20
->> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
->> index 5d9c9efd5f..c5f20bbd72 100644
->> --- a/hw/i386/Makefile.objs
->> +++ b/hw/i386/Makefile.objs
->> @@ -1,5 +1,6 @@
->>  obj-$(CONFIG_KVM) +=3D kvm/
->>  obj-y +=3D multiboot.o
->> +obj-y +=3D pvh.o
->>  obj-y +=3D pc.o
->>  obj-$(CONFIG_I440FX) +=3D pc_piix.o
->>  obj-$(CONFIG_Q35) +=3D pc_q35.o
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index bad866fe44..10e4ced0c6 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -42,6 +42,7 @@
->>  #include "elf.h"
->>  #include "migration/vmstate.h"
->>  #include "multiboot.h"
->> +#include "pvh.h"
->>  #include "hw/timer/mc146818rtc.h"
->>  #include "hw/dma/i8257.h"
->>  #include "hw/timer/i8254.h"
->> @@ -116,9 +117,6 @@ static struct e820_entry *e820_table;
->>  static unsigned e820_entries;
->>  struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
->>=20=20
->> -/* Physical Address of PVH entry point read from kernel ELF NOTE */
->> -static size_t pvh_start_addr;
->> -
->>  GlobalProperty pc_compat_4_1[] =3D {};
->>  const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
->>=20=20
->> @@ -1076,109 +1074,6 @@ struct setup_data {
->>      uint8_t data[0];
->>  } __attribute__((packed));
->>=20=20
->> -
->> -/*
->> - * The entry point into the kernel for PVH boot is different from
->> - * the native entry point.  The PVH entry is defined by the x86/HVM
->> - * direct boot ABI and is available in an ELFNOTE in the kernel binary.
->> - *
->> - * This function is passed to load_elf() when it is called from
->> - * load_elfboot() which then additionally checks for an ELF Note of
->> - * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
->> - * parse the PVH entry address from the ELF Note.
->> - *
->> - * Due to trickery in elf_opts.h, load_elf() is actually available as
->> - * load_elf32() or load_elf64() and this routine needs to be able
->> - * to deal with being called as 32 or 64 bit.
->> - *
->> - * The address of the PVH entry point is saved to the 'pvh_start_addr'
->> - * global variable.  (although the entry point is 32-bit, the kernel
->> - * binary can be either 32-bit or 64-bit).
->> - */
->> -static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
->> -{
->> -    size_t *elf_note_data_addr;
->> -
->> -    /* Check if ELF Note header passed in is valid */
->> -    if (arg1 =3D=3D NULL) {
->> -        return 0;
->> -    }
->> -
->> -    if (is64) {
->> -        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
->> -        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
->> -        uint64_t phdr_align =3D *(uint64_t *)arg2;
->> -        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
->> -
->> -        elf_note_data_addr =3D
->> -            ((void *)nhdr64) + nhdr_size64 +
->> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
->> -    } else {
->> -        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
->> -        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
->> -        uint32_t phdr_align =3D *(uint32_t *)arg2;
->> -        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
->> -
->> -        elf_note_data_addr =3D
->> -            ((void *)nhdr32) + nhdr_size32 +
->> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
->> -    }
->> -
->> -    pvh_start_addr =3D *elf_note_data_addr;
->> -
->> -    return pvh_start_addr;
->> -}
->> -
->> -static bool load_elfboot(const char *kernel_filename,
->> -                   int kernel_file_size,
->> -                   uint8_t *header,
->> -                   size_t pvh_xen_start_addr,
->> -                   FWCfgState *fw_cfg)
->> -{
->> -    uint32_t flags =3D 0;
->> -    uint32_t mh_load_addr =3D 0;
->> -    uint32_t elf_kernel_size =3D 0;
->> -    uint64_t elf_entry;
->> -    uint64_t elf_low, elf_high;
->> -    int kernel_size;
->> -
->> -    if (ldl_p(header) !=3D 0x464c457f) {
->> -        return false; /* no elfboot */
->> -    }
->> -
->> -    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
->> -    flags =3D elf_is64 ?
->> -        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_fla=
-gs;
->> -
->> -    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
->> -        error_report("elfboot unsupported flags =3D %x", flags);
->> -        exit(1);
->> -    }
->> -
->> -    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
->> -    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
->> -                           NULL, &elf_note_type, &elf_entry,
->> -                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->> -                           0, 0);
->> -
->> -    if (kernel_size < 0) {
->> -        error_report("Error while loading elf kernel");
->> -        exit(1);
->> -    }
->> -    mh_load_addr =3D elf_low;
->> -    elf_kernel_size =3D elf_high - elf_low;
->> -
->> -    if (pvh_start_addr =3D=3D 0) {
->> -        error_report("Error loading uncompressed kernel without PVH ELF=
- Note");
->> -        exit(1);
->> -    }
->> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
->> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
->> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
->> -
->> -    return true;
->> -}
->> -
->>  static void load_linux(PCMachineState *pcms,
->>                         FWCfgState *fw_cfg)
->>  {
->> @@ -1218,6 +1113,9 @@ static void load_linux(PCMachineState *pcms,
->>      if (ldl_p(header+0x202) =3D=3D 0x53726448) {
->>          protocol =3D lduw_p(header+0x206);
->>      } else {
->> +        size_t pvh_start_addr;
->> +        uint32_t mh_load_addr =3D 0;
->> +        uint32_t elf_kernel_size =3D 0;
->>          /*
->>           * This could be a multiboot kernel. If it is, let's stop treat=
-ing it
->>           * like a Linux kernel.
->> @@ -1235,10 +1133,16 @@ static void load_linux(PCMachineState *pcms,
->>           * If load_elfboot() is successful, populate the fw_cfg info.
->>           */
->>          if (pcmc->pvh_enabled &&
->> -            load_elfboot(kernel_filename, kernel_size,
->> -                         header, pvh_start_addr, fw_cfg)) {
->> +            pvh_load_elfboot(kernel_filename,
->> +                             &mh_load_addr, &elf_kernel_size)) {
->>              fclose(f);
->>=20=20
->> +            pvh_start_addr =3D pvh_get_start_addr();
->> +
->> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
->> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
->> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
->> +
->>              fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
->>                  strlen(kernel_cmdline) + 1);
->>              fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdli=
-ne);
->> diff --git a/hw/i386/pvh.c b/hw/i386/pvh.c
->> new file mode 100644
->> index 0000000000..1c81727811
->> --- /dev/null
->> +++ b/hw/i386/pvh.c
->> @@ -0,0 +1,113 @@
->> +/*
->> + * PVH Boot Helper
->> + *
->> + * Copyright (C) 2019 Oracle
->> + * Copyright (C) 2019 Red Hat, Inc
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or l=
-ater.
->> + * See the COPYING file in the top-level directory.
->> + *
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/units.h"
->> +#include "qemu/error-report.h"
->> +#include "hw/loader.h"
->> +#include "cpu.h"
->> +#include "elf.h"
->> +#include "pvh.h"
->> +
->> +static size_t pvh_start_addr;
->> +
->> +size_t pvh_get_start_addr(void)
->> +{
->> +    return pvh_start_addr;
->> +}
->> +
->> +/*
->> + * The entry point into the kernel for PVH boot is different from
->> + * the native entry point.  The PVH entry is defined by the x86/HVM
->> + * direct boot ABI and is available in an ELFNOTE in the kernel binary.
->> + *
->> + * This function is passed to load_elf() when it is called from
->> + * load_elfboot() which then additionally checks for an ELF Note of
->> + * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
->> + * parse the PVH entry address from the ELF Note.
->> + *
->> + * Due to trickery in elf_opts.h, load_elf() is actually available as
->> + * load_elf32() or load_elf64() and this routine needs to be able
->> + * to deal with being called as 32 or 64 bit.
->> + *
->> + * The address of the PVH entry point is saved to the 'pvh_start_addr'
->> + * global variable.  (although the entry point is 32-bit, the kernel
->> + * binary can be either 32-bit or 64-bit).
->> + */
->> +
->> +static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
->> +{
->> +    size_t *elf_note_data_addr;
->> +
->> +    /* Check if ELF Note header passed in is valid */
->> +    if (arg1 =3D=3D NULL) {
->> +        return 0;
->> +    }
->> +
->> +    if (is64) {
->> +        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
->> +        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
->> +        uint64_t phdr_align =3D *(uint64_t *)arg2;
->> +        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
->> +
->> +        elf_note_data_addr =3D
->> +            ((void *)nhdr64) + nhdr_size64 +
->> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
->> +    } else {
->> +        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
->> +        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
->> +        uint32_t phdr_align =3D *(uint32_t *)arg2;
->> +        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
->> +
->> +        elf_note_data_addr =3D
->> +            ((void *)nhdr32) + nhdr_size32 +
->> +            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
->> +    }
->> +
->> +    pvh_start_addr =3D *elf_note_data_addr;
->> +
->> +    return pvh_start_addr;
->> +}
->> +
->> +bool pvh_load_elfboot(const char *kernel_filename,
->> +                      uint32_t *mh_load_addr,
->> +                      uint32_t *elf_kernel_size)
->> +{
->> +    uint64_t elf_entry;
->> +    uint64_t elf_low, elf_high;
->> +    int kernel_size;
->> +    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
->> +
->> +    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
->> +                           NULL, &elf_note_type, &elf_entry,
->> +                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
->> +                           0, 0);
->> +
->> +    if (kernel_size < 0) {
->> +        error_report("Error while loading elf kernel");
->> +        return false;
->> +    }
->> +
->> +    if (pvh_start_addr =3D=3D 0) {
->> +        error_report("Error loading uncompressed kernel without PVH ELF=
- Note");
->> +        return false;
->> +    }
->> +
->> +    if (mh_load_addr) {
->> +        *mh_load_addr =3D elf_low;
->> +    }
->> +
->> +    if (elf_kernel_size) {
->> +        *elf_kernel_size =3D elf_high - elf_low;
->> +    }
->> +
->> +    return true;
->> +}
->> diff --git a/hw/i386/pvh.h b/hw/i386/pvh.h
->> new file mode 100644
->> index 0000000000..ada67ff6e8
->> --- /dev/null
->> +++ b/hw/i386/pvh.h
->> @@ -0,0 +1,10 @@
+>> diff --git a/.gitmodules b/.gitmodules
+>> index c5c474169d..19792c9a11 100644
+>> --- a/.gitmodules
+>> +++ b/.gitmodules
+>> @@ -58,3 +58,6 @@
+>>  [submodule "roms/opensbi"]
+>>  	path =3D roms/opensbi
+>>  	url =3D 	https://git.qemu.org/git/opensbi.git
+>> +[submodule "roms/qboot"]
+>> +	path =3D roms/qboot
+>> +	url =3D https://github.com/bonzini/qboot
+>> diff --git a/pc-bios/bios-microvm.bin b/pc-bios/bios-microvm.bin
+>> new file mode 100755
+>> index 0000000000000000000000000000000000000000..45eabc516692e2d134bbb630=
+d133c7c2dcc9a9b6
+>> GIT binary patch
+>> literal 65536
+>> zcmeI2eS8zwneS)hF_vth5y2#;brv;O^x_6mtAUMO%tn5}IEf)jY``G|XbMBqa_^-@
+>> zBBUXSyplo3+VMx9Ci}VFwz~@rx!t?By&v!0UdNb=3DV<BQ0NE-8!l)yH1LPAE!VDnNi
+>> zCSmUHnUQRVmuC0>GyaU`%sJ0_&U3!!Ij`fT?33lo8bTirhX$S6(dmK^Nu2qLAPZJO
+>> zd+n=3D&@XLYwWFdS~Zh2c2gidFUEU<VyB{hF24C^}E=3Djl<HQ(<+MP>-}gkOUzx)FqJ6
+>> z;W433mmmmAY+Noh;tibd?18@VxCH}v4GeX<kXL!tiyU!Hnn`6SuU6r$bB&SE_=3DSXJ
+>> zc+)=3D1$Iq|sgvbt9s)=3D?%V2RL(E{A7Ar52#~B&%`TJKuimt+%dx%KD*M-I%M^1gEP~
 >
-> License missing.
+> Now that using Docker is quite simple, I'd rather add a job building
+> this and commit the built binary, so we have reproducible builds.
 
-I'm a bit confused about the policy for license blocks in headers, as
-some do have it, while others don't (i.e. multiboot.h and acpi-build.h).
+I'm not sure how can we achieve this. Are we already doing it for some
+other binary? Could you please point me to an example?
 
->> +#ifndef HW_I386_PVH_H
->> +#define HW_I386_PVH_H
->> +
->> +size_t pvh_get_start_addr(void);
->> +
->> +bool pvh_load_elfboot(const char *kernel_filename,
->> +                      uint32_t *mh_load_addr,
->> +                      uint32_t *elf_kernel_size);
+>> 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
+nF
+>> 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
+>>=20
+>> literal 0
+>> HcmV?d00001
+>>=20
+>> diff --git a/roms/Makefile b/roms/Makefile
+>> index 775c963f9d..47eabc8633 100644
+>> --- a/roms/Makefile
+>> +++ b/roms/Makefile
+>> @@ -67,6 +67,7 @@ default:
+>>  	@echo "  opensbi32-virt     -- update OpenSBI for 32-bit virt machine"
+>>  	@echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
+>>  	@echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u mach=
+ine"
+>> +	@echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
 >
-> Can you document these functions?
+> I'd go the other way around:
+>
+>         @echo "  qboot -- update qboot (BIOS used by microvm)"
 
-Sure.
+I think it's better the other way. In all cases, "target" specifies the
+binary that will be built, not the name of the project holding it
+(the targets for SeaBIOS are bios.bin and vgabios.bin).
+
+I also want to clarify that the name bios-microvm was suggested by
+qboot's author (Paolo) ;-)
 
 Thanks,
 Sergio.
 
+>>  	@echo "  clean              -- delete the files generated by the previ=
+ous" \
+>>  	                              "build targets"
+>>=20=20
+>> @@ -185,6 +186,10 @@ opensbi64-sifive_u:
+>>  		PLATFORM=3D"qemu/sifive_u"
+>>  	cp opensbi/build/platform/qemu/sifive_u/firmware/fw_jump.bin ../pc-bio=
+s/opensbi-riscv64-sifive_u-fw_jump.bin
+>>=20=20
+>> +bios-microvm:
+>
+>    qboot:
+>
+> or
+>
+>    qboot bios-microvm:
+>
+>> +	$(MAKE) -C qboot
+>> +	cp qboot/bios.bin ../pc-bios/bios-microvm.bin
 >> +
->> +#endif
+>>  clean:
+>>  	rm -rf seabios/.config seabios/out seabios/builds
+>>  	$(MAKE) -C sgabios clean
+>> @@ -197,3 +202,4 @@ clean:
+>>  	$(MAKE) -C skiboot clean
+>>  	$(MAKE) -f Makefile.edk2 clean
+>>  	$(MAKE) -C opensbi clean
+>> +	$(MAKE) -C qboot clean
+>> diff --git a/roms/qboot b/roms/qboot
+>> new file mode 160000
+>> index 0000000000..cb1c49e0cf
+>> --- /dev/null
+>> +++ b/roms/qboot
+>> @@ -0,0 +1 @@
+>> +Subproject commit cb1c49e0cfac99b9961d136ac0194da62c28cf64
 >>=20
 
 
@@ -419,18 +331,18 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LAxQACgkQ9GknjS8M
-AjX4WBAAq/BtbV9mUG9GH3Os6D1hVFI+gMv1DccKyutkUhjFrzBZNlFBeeQCyDIl
-z1YaEkAxPzaTKhNYNV+XXHQxqtXn5uq0lRu48oIbsamFCvn8SPXWVAocszJ1m5ix
-xQ8GSE/xm0u/MJ2XLhy9O+7I5UD4ze1xS0+z4hFrBdRteCzF+MjFflhCUR5Eot9d
-Nac6DOrnP9hSce09IDsP6yGdXwePt/O5FKDTW9wRnZ66VzeM6No0GtXRiYpl3gZr
-lXmV/Xwv74LRHTCQPreQVN0n08eRzAfVCpmXSFQ9HULOFr8iJoVSLQlbxvFBOXn5
-eUvErXPhmsYKgOIzgqScYq3AvGQ24mI3aEFiHwn3hHa5or75hZ+s4WGAQPVyBsiy
-dIlcP3r/psOasnUEXlo7T7FiqmG0bJUWZBPDz94ewV9/fEXVuYeLZPsTcd26/XIf
-46Ka+qKcGBbh0KYsdHpP/ok6mOOl27ug/SndpS6o83giSB8faiJjuHh+ZxCMQcxF
-95LlZW3jlOnHuXrH6sgVn4DzqPkZgD1KXcpFNwgMD/uyKCAh5esaZY8WU36usRxc
-EUFjpNF2OB1YeLUq9arJPTvXOTAZMk3W7aogxdthz+dY4RgPB7CXwX4i2hv+uthu
-MdWsVoV18fCu+6h1hG2/ydzyvLSstSE42EMKSx0tmPQSPr+QrE4=
-=ey5j
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LBKAACgkQ9GknjS8M
+AjXKXA/+L32mP2YcXU2JaBiJa5wu2HDmCPhKS1lVNLTcwQzG++8VgPmB1LJgmOS9
+Jg2ZMVOKG0HXprGwsa1HWVT1uJOFoZO9PkFZ2lcgB3LxLM0w2SdJeWu43Rwnb+dd
+XQCVa7gn9sv8MgnTeBjDjRYvfk2dXh/hUMvU9gg0ZJWOWpgnFoyVyFPxAsUs3RH1
+KtqWeOsXw9WtJslq+psCY6JpxWxm1o6DmWKEOIToNsunV4iZ3KebpuEIjZkF5idW
+qKGQzvVPXORdD7eqkGwRyHdd0MU2pzUKCUpMHzbeprVexhsjoKTMmKBz8OYVSyAE
+Jt0y9tgHQFWEbbtVR14gd+YTRBhSqHbMhJ/3bAMrVxxsYB9MTeK9i8SLHypM42Ml
+DnTY+BxFFHhaWmdY20R7QwWq2hYmm3Mz0kUSIureAfm9GitYwHG4uAz+9gDayUFK
+Zv4XfuwebcVJMzrT+eAuxQSHgbXJqt+ekXurwO8C43moLnWAtW/0CPq8PescnDaf
+4HVcNh6n0hnw5dWZ2m6lF0lmNazJXWBtcUwpvOiKxKk52MfGrvbPrcvUhD3s44vo
+po+M32LpdEfDS7cwFFqzz9UvpJ9x78wiR0DjrHro8yds+n3F2rbRDTzutHiVcXhF
+g6mqHBaGvlOIEUvk/GzBWk03MKFuoGXSX8m+U+pxBl8uqk4re5g=
+=fPvM
 -----END PGP SIGNATURE-----
 --=-=-=--
