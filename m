@@ -2,126 +2,309 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BEC2BDE2D
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 14:39:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCEE6BDE43
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 14:47:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732410AbfIYMjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 08:39:37 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:46296 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726369AbfIYMjg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 08:39:36 -0400
-Received: by mail-oi1-f193.google.com with SMTP id k25so4713987oiw.13
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 05:39:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Xf5vFOXD7Mv1BXn2YAX9IJHa9Xt+SJ9sCNHzT8AZ1Ps=;
-        b=dCtfYAMuI1zy2cjUfy0dkwHxfOr7av8c3ZaGzCU4DRtX0mV0jBUKVvwXyTmeHU5HJv
-         HdmdaRaecpCXNkf8QdUjFwrYaLvjnq+gExJG4KrTo/xxXuqD4FXNLFuSSx8qe1T5ewkl
-         pxT26rXIDQ1m2bZa0rjApefRPbqCj+tXgHnbTIcJsUo2jqawOtClMe0fOJ8aiEGUDw2s
-         +ZTWnZfbFvJRp4hn4U3VTTkj+eQOFGGgcH10V1oBSjn3ARywPSGdFN+NRZ039vDIl+lf
-         3IRBi7uV9LdDHFmhQgAXk4JQkPQ70R6exw37A0nxxneOlc2Hsl2nXZoClQYra7H47EER
-         jeug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Xf5vFOXD7Mv1BXn2YAX9IJHa9Xt+SJ9sCNHzT8AZ1Ps=;
-        b=EF39W0lK/lMjmSWDs4y/5wEjfhVi6mSgMBPjBWZM36hT8lvwfFNGchBoVdn+o3IGj5
-         uU0WFCUUxUcqIZVbEnPXYOwPw5ZwpQzVvi2hPII8R69qjQdGJ7rJL87gffa2682EwejR
-         GFaQuL+AL/r72FlBvtvrWNzqlMvYtJd9d9CSyYPek5Jwmoby7dwL08NHpRVwwvgZjyX9
-         1PlXDSKNAF/19GNXPa6jxwrZCSU77Gy5pZZeZ8lFrXqJ9HCOVZYVEl/A8cfYRuOhBvHE
-         +46E6zzu1N5afXDZYFzMVrNKpUM4c01kgZ5uydhkPjOGeELgQGWRrQYIMcda61ZTE7nX
-         +5kg==
-X-Gm-Message-State: APjAAAWa8gc/iiF+AQG5GSx95INJFNf7vBLyv8VzHCMeS/2V8vL1w+Vz
-        gCU1jc1ccmGcN+ilWItyfQll0TTz6dO1z2lsVWGeCw==
-X-Google-Smtp-Source: APXvYqxYMpY1dlzqlS4B9tujbrtFz7tvtCmcTYopohKNOD2tKHVk1C09pXvx/8PLbfyHONbP+cLdD/90Th9/X6mBjFg=
-X-Received: by 2002:aca:b646:: with SMTP id g67mr4371688oif.163.1569415175883;
- Wed, 25 Sep 2019 05:39:35 -0700 (PDT)
+        id S2405726AbfIYMqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 08:46:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44904 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404621AbfIYMqx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 08:46:53 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4AFCC44BD1;
+        Wed, 25 Sep 2019 12:46:52 +0000 (UTC)
+Received: from [10.72.12.148] (ovpn-12-148.pek2.redhat.com [10.72.12.148])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E25A10018F8;
+        Wed, 25 Sep 2019 12:45:31 +0000 (UTC)
+Subject: Re: [PATCH V2 6/8] mdev: introduce virtio device and its device ops
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "Bie, Tiwei" <tiwei.bie@intel.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "Liang, Cunming" <cunming.liang@intel.com>,
+        "Wang, Zhihong" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "Wang, Xiao W" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        "airlied@linux.ie" <airlied@linux.ie>,
+        "daniel@ffwll.ch" <daniel@ffwll.ch>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
+        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "freude@linux.ibm.com" <freude@linux.ibm.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        "idos@mellanox.com" <idos@mellanox.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "christophe.de.dinechin@gmail.com" <christophe.de.dinechin@gmail.com>
+References: <20190924135332.14160-1-jasowang@redhat.com>
+ <20190924135332.14160-7-jasowang@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D58F7DA@SHSMSX104.ccr.corp.intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <2210d23d-38e4-e654-e53d-7867348de86a@redhat.com>
+Date:   Wed, 25 Sep 2019 20:45:21 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190924124433.96810-1-slp@redhat.com> <CAFEAcA_2-achqUpTk1fDGWXcWPvTTLPvEtL+owNSWuZ5L3p=XA@mail.gmail.com>
- <87pnjosz3d.fsf@redhat.com> <2d5d7297-0a02-276b-5482-948321f5a8bc@redhat.com>
-In-Reply-To: <2d5d7297-0a02-276b-5482-948321f5a8bc@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Wed, 25 Sep 2019 13:39:24 +0100
-Message-ID: <CAFEAcA-bQvP1vA1E6jCeDz4LnqTwT8HoQWtDE3r4--zkRJsMYw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc:     Sergio Lopez <slp@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D58F7DA@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 25 Sep 2019 12:46:52 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 25 Sep 2019 at 12:33, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+
+On 2019/9/25 下午5:09, Tian, Kevin wrote:
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Tuesday, September 24, 2019 9:54 PM
+>>
+>> This patch implements basic support for mdev driver that supports
+>> virtio transport for kernel virtio driver.
+>>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> ---
+>>   include/linux/mdev.h        |   2 +
+>>   include/linux/virtio_mdev.h | 145
+>> ++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 147 insertions(+)
+>>   create mode 100644 include/linux/virtio_mdev.h
+>>
+>> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+>> index 3414307311f1..73ac27b3b868 100644
+>> --- a/include/linux/mdev.h
+>> +++ b/include/linux/mdev.h
+>> @@ -126,6 +126,8 @@ struct mdev_device *mdev_from_dev(struct device
+>> *dev);
+>>
+>>   enum {
+>>   	MDEV_ID_VFIO = 1,
+>> +	MDEV_ID_VIRTIO = 2,
+>> +	MDEV_ID_VHOST = 3,
+>>   	/* New entries must be added here */
+>>   };
+>>
+>> diff --git a/include/linux/virtio_mdev.h b/include/linux/virtio_mdev.h
+>> new file mode 100644
+>> index 000000000000..d1a40a739266
+>> --- /dev/null
+>> +++ b/include/linux/virtio_mdev.h
+>> @@ -0,0 +1,145 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * Virtio mediated device driver
+>> + *
+>> + * Copyright 2019, Red Hat Corp.
+>> + *     Author: Jason Wang <jasowang@redhat.com>
+>> + */
+>> +#ifndef _LINUX_VIRTIO_MDEV_H
+>> +#define _LINUX_VIRTIO_MDEV_H
+>> +
+>> +#include <linux/interrupt.h>
+>> +#include <linux/mdev.h>
+>> +#include <uapi/linux/vhost.h>
+>> +
+>> +#define VIRTIO_MDEV_DEVICE_API_STRING		"virtio-mdev"
+>> +#define VIRTIO_MDEV_VERSION 0x1
+> Just be curious. is this version identical to virtio spec version that below
+> callbacks are created for, or just irrelevant?
+
+
+It could be a hint but basically it's a way for userspace driver 
+compatibility. For kernel we don't need this.
+
+
 >
-> On 9/25/19 7:51 AM, Sergio Lopez wrote:
-> > Peter Maydell <peter.maydell@linaro.org> writes:
-> >
-> >> On Tue, 24 Sep 2019 at 14:25, Sergio Lopez <slp@redhat.com> wrote:
-> >>>
-> >>> Microvm is a machine type inspired by both NEMU and Firecracker, and
-> >>> constructed after the machine model implemented by the latter.
-> >>>
-> >>> It's main purpose is providing users a minimalist machine type free
-> >>> from the burden of legacy compatibility, serving as a stepping stone
-> >>> for future projects aiming at improving boot times, reducing the
-> >>> attack surface and slimming down QEMU's footprint.
-> >>
-> >>
-> >>>  docs/microvm.txt                 |  78 +++
-> >>
-> >> I'm not sure how close to acceptance this patchset is at the
-> >> moment, so not necessarily something you need to do now,
-> >> but could new documentation in docs/ be in rst format, not
-> >> plain text, please? (Ideally also they should be in the right
-> >> manual subdirectory, but documentation of system emulation
-> >> machines at the moment is still in texinfo format, so we
-> >> don't have a subdir for it yet.)
-> >
-> > Sure. What I didn't get is, should I put it in "docs/microvm.rst" or in
-> > some other subdirectory?
+>> +
+>> +struct virtio_mdev_callback {
+>> +	irqreturn_t (*callback)(void *data);
+>> +	void *private;
+>> +};
+>> +
+>> +/**
+>> + * struct vfio_mdev_device_ops - Structure to be registered for each
+>> + * mdev device to register the device to virtio-mdev module.
+>> + *
+>> + * @set_vq_address:		Set the address of virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + *				@desc_area: address of desc area
+>> + *				@driver_area: address of driver area
+>> + *				@device_area: address of device area
+>> + *				Returns integer: success (0) or error (< 0)
+>> + * @set_vq_num:		Set the size of virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + *				@num: the size of virtqueue
+>> + * @kick_vq:			Kick the virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + * @set_vq_cb:			Set the interrut calback function for
+>> + *				a virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + *				@cb: virtio-mdev interrupt callback
+>> structure
+>> + * @set_vq_ready:		Set ready status for a virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + *				@ready: ready (true) not ready(false)
+>> + * @get_vq_ready:		Get ready status for a virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + *				Returns boolean: ready (true) or not (false)
+>> + * @set_vq_state:		Set the state for a virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + *				@state: virtqueue state (last_avail_idx)
+>> + *				Returns integer: success (0) or error (< 0)
+>> + * @get_vq_state:		Get the state for a virtqueue
+>> + *				@mdev: mediated device
+>> + *				@idx: virtqueue index
+>> + *				Returns virtqueue state (last_avail_idx)
+>> + * @get_vq_align:		Get the virtqueue align requirement
+>> + *				for the device
+>> + *				@mdev: mediated device
+>> + *				Returns virtqueue algin requirement
+>> + * @get_features:		Get virtio features supported by the device
+>> + *				@mdev: mediated device
+>> + *				Returns the features support by the
+>> + *				device
+>> + * @get_features:		Set virtio features supported by the driver
+>> + *				@mdev: mediated device
+>> + *				@features: feature support by the driver
+>> + *				Returns integer: success (0) or error (< 0)
+>> + * @set_config_cb:		Set the config interrupt callback
+>> + *				@mdev: mediated device
+>> + *				@cb: virtio-mdev interrupt callback
+>> structure
+>> + * @get_device_id:		Get virtio device id
+>> + *				@mdev: mediated device
+>> + *				Returns u32: virtio device id
+>> + * @get_vendor_id:		Get virtio vendor id
+>> + *				@mdev: mediated device
+>> + *				Returns u32: virtio vendor id
+>> + * @get_status:		Get the device status
+>> + *				@mdev: mediated device
+>> + *				Returns u8: virtio device status
+>> + * @set_status:		Set the device status
+>> + *				@mdev: mediated device
+>> + *				@status: virtio device status
+>> + * @get_config:		Read from device specific confiugration
+>> space
+> configuration (and similar typos downward)
+
+
+Let me fix.
+
+
 >
-> Should we introduce docs/machines/?
+>> + *				@mdev: mediated device
+>> + *				@offset: offset from the beginning of
+>> + *				configuration space
+>> + *				@buf: buffer used to read to
+>> + *				@len: the length to read from
+>> + *				configration space
+>> + * @set_config:		Write to device specific confiugration space
+>> + *				@mdev: mediated device
+>> + *				@offset: offset from the beginning of
+>> + *				configuration space
+>> + *				@buf: buffer used to write from
+>> + *				@len: the length to write to
+>> + *				configration space
+>> + * @get_version:		Get the version of virtio mdev device
+>> + *				@mdev: mediated device
+>> + *				Returns integer: version of the device
+>> + * @get_generation:		Get device generaton
+>> + *				@mdev: mediated device
+>> + *				Returns u32: device generation
+>> + */
+>> +struct virtio_mdev_device_ops {
+>> +	/* Virtqueue ops */
+>> +	int (*set_vq_address)(struct mdev_device *mdev,
+>> +			      u16 idx, u64 desc_area, u64 driver_area,
+>> +			      u64 device_area);
+>> +	void (*set_vq_num)(struct mdev_device *mdev, u16 idx, u32 num);
+>> +	void (*kick_vq)(struct mdev_device *mdev, u16 idx);
+>> +	void (*set_vq_cb)(struct mdev_device *mdev, u16 idx,
+>> +			  struct virtio_mdev_callback *cb);
+>> +	void (*set_vq_ready)(struct mdev_device *mdev, u16 idx, bool
+>> ready);
+>> +	bool (*get_vq_ready)(struct mdev_device *mdev, u16 idx);
+>> +	int (*set_vq_state)(struct mdev_device *mdev, u16 idx, u64 state);
+>> +	u64 (*get_vq_state)(struct mdev_device *mdev, u16 idx);
+>> +
+>> +	/* Device ops */
+>> +	u16 (*get_vq_align)(struct mdev_device *mdev);
+>> +	u64 (*get_features)(struct mdev_device *mdev);
+>> +	int (*set_features)(struct mdev_device *mdev, u64 features);
+>> +	void (*set_config_cb)(struct mdev_device *mdev,
+>> +			      struct virtio_mdev_callback *cb);
+>> +	u16 (*get_queue_max)(struct mdev_device *mdev);
+>> +	u32 (*get_device_id)(struct mdev_device *mdev);
+>> +	u32 (*get_vendor_id)(struct mdev_device *mdev);
+>> +	u8 (*get_status)(struct mdev_device *mdev);
+>> +	void (*set_status)(struct mdev_device *mdev, u8 status);
+>> +	void (*get_config)(struct mdev_device *mdev, unsigned int offset,
+>> +			   void *buf, unsigned int len);
+>> +	void (*set_config)(struct mdev_device *mdev, unsigned int offset,
+>> +			   const void *buf, unsigned int len);
+>> +	int (*get_version)(struct mdev_device *mdev);
+>> +	u32 (*get_generation)(struct mdev_device *mdev);
+>> +};
+> I'm not sure how stable above ops are.
 
-This should live in the not-yet-created docs/system (the "system emulation
-user's guide"), along with much of the content currently still in
-the texinfo docs. But we don't have that structure yet and won't
-until we do the texinfo conversion, so I think for the moment we
-have two reasonable choices:
- (1) put it in the texinfo, so it is at least shipped to
-     users until we get around to doing our docs conversion
- (2) leave it in docs/microvm.rst for now (we have a bunch
-     of other docs in docs/ which are basically there because
-     they're also awaiting the texinfo conversion and creation
-     of the docs/user and docs/system manuals)
 
-My ideal vision of how to do documentation of individual
-machines, incidentally, would be to do it via doc comments
-or some other kind of structured markup in the .c files
-that define the machine, so that we could automatically
-collect up the docs for the machines we're building,
-put them in to per-architecture sections of the docs,
-have autogenerated stub "this machine exists but isn't
-documented yet" entries, etc. But that's not something that
-we could easily do today so I don't want to block interim
-improvements to our documentation just because I have some
-nice theoretical idea for how it ought to work :-)
+It's the kernel internal API, so there's no strict requirement for this. 
+We will export a version value for userspace for compatibility.
 
-thanks
--- PMM
+
+> Does it make sense if defining
+> just two callbacks here, e.g. vq_ctrl and device_ctrl, and then let the
+> vendor driver to handle specific ops in each category (similar to how
+> ioctl works)?
+
+
+My understanding is that it introduce another indirection, you still 
+need to differ from different command, and it's less flexible than 
+direct callback.
+
+What's the value of doing this?
+
+Thanks
+
+
+>
+> Thanks
+> Kevin
+>
