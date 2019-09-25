@@ -2,99 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3D01BD7E3
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 07:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED048BD7EA
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 07:49:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2411782AbfIYFrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 01:47:17 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:36410 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404442AbfIYFrR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 01:47:17 -0400
-Received: by mail-pg1-f193.google.com with SMTP id t14so2147063pgs.3;
-        Tue, 24 Sep 2019 22:47:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=Eh8M+3jwlHqT1zqxVtZVbiy9DN02YJpr1pbJ56Y3aJw=;
-        b=H3BMqCM4fpx9/r8aQmcQLoZfSDjG38Ori/JsBght9/0VcgPT6fMKJujT46xn536f3S
-         gYDai1Q+094xJ6CPTlHxNccR31MfXKpYtdWnTWvoRTpqtYYARX6oXcJIsh+Cdtus/UsZ
-         nl7RlKHtVBbiaaP1AejOcflL8rLCwv0Sk8i4Xo0YIiahEgpGgg2rTB528ZIdqTx2mdwM
-         a1oCKGAtEIj3MVuINMM5/XAjM9Tnx70juFH6uG8/gw1KM0MzDUDdr54SwhB1/2wmZBiS
-         IhfxRV1qSkekwhhOauK9dGD3+08Kn9XcA4dYBUQXenkeU0uXgw5+uiKAtqrUeX4c5iPW
-         Qxiw==
+        id S2411802AbfIYFt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 01:49:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59576 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404277AbfIYFt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 01:49:56 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B6E90C057F20
+        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 05:49:55 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id k9so1401852wmb.0
+        for <kvm@vger.kernel.org>; Tue, 24 Sep 2019 22:49:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Eh8M+3jwlHqT1zqxVtZVbiy9DN02YJpr1pbJ56Y3aJw=;
-        b=AUneuELG8Tj9rheBa2o9PQi+0JPBb/VbAj6CWw5pLq8tUY92BKLgp0cYFFWirRW+0E
-         A9i/uOog3X/B5nNEG5u3ivtO2R2+ikEgiHjwlpYEMC/Tj118xCMvByEzXjvPOXyl+chq
-         K367fc+Vh1oR54lBQ4hU+Jeseq2YNqM/TxQS4YPQrN2oJEgalgrH+hSeYnBnGzid3CVN
-         I4TB+oEMg4IbUwpD4fDVmxfsOEgWmQAIKZ3IMcnGSAU65gYaMz7LzyMWCZlUPQtc0AeZ
-         5EdYA949Dn+MTv81qWepWCqX214dWk8zLTAiBlLcRNsVKbagkjepT7TQraRK62aUZb9Q
-         aluA==
-X-Gm-Message-State: APjAAAVgzHEXz1gAfJck8ZeqG6V90REFUpu4vQF1rFt9OxdwYgaeDRH2
-        z0nqBZ3AhLLB32SsPE+ekd7F9cgt
-X-Google-Smtp-Source: APXvYqzal/UUKYK2deJAe8JWlIx0ed7Hs3eIeBRQF4xuySPJ+8IKqG6brcmqHMwlOGPMTnYz61DwVQ==
-X-Received: by 2002:a63:e24:: with SMTP id d36mr5060897pgl.143.1569390436340;
-        Tue, 24 Sep 2019 22:47:16 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id k4sm1623829pjl.9.2019.09.24.22.47.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 24 Sep 2019 22:47:15 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: LAPIC: Loose fluctuation filter for auto tune lapic_timer_advance_ns
-Date:   Wed, 25 Sep 2019 13:47:04 +0800
-Message-Id: <1569390424-22031-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version;
+        bh=HSsroT4HC2j6oQ8x2w3C7SA7aQg1P5xbfLeT4Pk4g7M=;
+        b=gphyhfcGsrYXSOxgX/x+c1Vh8atTJWHsJqllOVRhh2eRohgl7SNPeVNKGTtP/N9N+0
+         +0Gyp2fSO+JLteEhe3rLeisyg3HWGUK8xkswTehIhfCsMu6p/RGGaQm0VUpAp0oKvAGR
+         OWthrOgokDXC8q25+BWpIltMPICMzdtNf4wZOh4NZFlNO0HrpZu0z/lKabUvlUMH+1XP
+         yimOz24AQ/QDdw2zB2JPdqMC+U4FMfnkUqjA3TGGCs+t0ei6xD08etxNeL7RAiPcdD74
+         TMkB3tqU0xlAN27P0XhZImdR6fAI5posRnm7byuPUSN5mERYMj9wrXsazIifKFlHvN6H
+         cblA==
+X-Gm-Message-State: APjAAAUpgbdMEprFBtyEzHGqLXHTilQfWe46on8523xykdVxw0qkrsok
+        BMvrM0LrDSONYR0reCRkeKf1ac/JiHJdSaX3MuXgFOEyv6hACn8u0IUvelcVNGVjJQZ2Ge8rsH1
+        TYBTgE4t9KeDG
+X-Received: by 2002:a5d:4689:: with SMTP id u9mr7042376wrq.78.1569390594236;
+        Tue, 24 Sep 2019 22:49:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwL4FR1FGuJ/FPsehgfbn7DutFbGl1HOLQJUHAiJW+F9qMjTpY/JwpIrmNKmqUEzHoMHYG6eA==
+X-Received: by 2002:a5d:4689:: with SMTP id u9mr7042354wrq.78.1569390594060;
+        Tue, 24 Sep 2019 22:49:54 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net. [95.120.215.139])
+        by smtp.gmail.com with ESMTPSA id x5sm4280279wrt.75.2019.09.24.22.49.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2019 22:49:53 -0700 (PDT)
+References: <20190924124433.96810-1-slp@redhat.com> <20190924124433.96810-8-slp@redhat.com> <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From:   Sergio Lopez <slp@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+        marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+        philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+        mtosatti@redhat.com, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine type
+In-reply-to: <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com>
+Date:   Wed, 25 Sep 2019 07:49:50 +0200
+Message-ID: <87r245rkld.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+--=-=-=
+Content-Type: text/plain
 
-5000 guest cycles delta is easy to encounter on desktop, per-vCPU 
-lapic_timer_advance_ns always keeps at 1000ns initial value, lets 
-loose fluctuation filter a bit to make auto tune can make some 
-progress.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 3a3a685..258407e 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -67,7 +67,7 @@
- 
- static bool lapic_timer_advance_dynamic __read_mostly;
- #define LAPIC_TIMER_ADVANCE_ADJUST_MIN 100
--#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 5000
-+#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 10000
- #define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-@@ -1504,7 +1504,7 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
- 		timer_advance_ns += ns/LAPIC_TIMER_ADVANCE_ADJUST_STEP;
- 	}
- 
--	if (unlikely(timer_advance_ns > LAPIC_TIMER_ADVANCE_ADJUST_MAX))
-+	if (unlikely(timer_advance_ns > LAPIC_TIMER_ADVANCE_ADJUST_MAX/2))
- 		timer_advance_ns = LAPIC_TIMER_ADVANCE_ADJUST_INIT;
- 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
- }
--- 
-2.7.4
+> On 24/09/19 14:44, Sergio Lopez wrote:
+>> +Microvm is a machine type inspired by both NEMU and Firecracker, and
+>> +constructed after the machine model implemented by the latter.
+>
+> I would say it's inspired by Firecracker only.  The NEMU virt machine
+> had virtio-pci and ACPI.
 
+Actually, the NEMU reference comes from the fact that, originally,
+microvm.c code was based on virt.c, but on v4 all that is already gone,
+so it makes sense to remove the reference.
+
+>> +It's main purpose is providing users a minimalist machine type free
+>> +from the burden of legacy compatibility,
+>
+> I think this is too strong, especially if you keep the PIC and PIT. :)
+> Maybe just "It's a minimalist machine type without PCI support designed
+> for short-lived guests".
+
+OK.
+
+>> +serving as a stepping stone
+>> +for future projects aiming at improving boot times, reducing the
+>> +attack surface and slimming down QEMU's footprint.
+>
+> "Microvm also establishes a baseline for benchmarking QEMU and operating
+> systems, since it is optimized for both boot time and footprint".
+
+Well, I prefer my paragraph, but I'm good with either.
+
+>> +The microvm machine type supports the following devices:
+>> +
+>> + - ISA bus
+>> + - i8259 PIC
+>> + - LAPIC (implicit if using KVM)
+>> + - IOAPIC (defaults to kernel_irqchip_split = true)
+>> + - i8254 PIT
+>
+> Do we need the PIT?  And perhaps the PIC even?
+
+We need the PIT for non-KVM accel (if present with KVM and
+kernel_irqchip_split = off, it basically becomes a placeholder), and the
+PIC for both the PIT and the ISA serial port.
+
+Thanks,
+Sergio.
+
+>> + - MC146818 RTC (optional)
+>> + - kvmclock (if using KVM)
+>> + - fw_cfg
+>> + - One ISA serial port (optional)
+>> + - Up to eight virtio-mmio devices (configured by the user)
+>> +
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2K//4ACgkQ9GknjS8M
+AjVmTw/9ElDYdyqk9aGcU379B23aC3XF0mWk40KFNEN6DxgVirVzkZwMuyajcxrq
+nZE3rj155US21V8yFWSk3Wewuv0GTmL2YjIUBqWMbY5XZ/4BACPfpolJfhVnWP03
+kn0usIuwAFPmIkrmy06I+eIF4/0Zu8W8TVe+cKA8QhTUL2W45o6hShTbFS4WQuvA
+m7OK875wf4g1Ca3p306Yug2hrn9yvcUajyWVkhZNiheI0juj5shE2VM05veCdZTz
+U/A7F7DBmJ2G61Fk4lyUggX6k/FRkdea/qwG8AfSBhD0DVCQFHvr5f/Ea0eqGs9r
+qiMnTftjSDBS+1H92Gyx5bCqZeb8Vihdn+hoNQ52/XdV18Vrh8/zP11fqHP4mRj3
+2zehKx0Qd7wLm+ZUwitgOif8+tE+Ehz8+hBdTbgloP5/2GqyM6QvhLrt9RNIbCqW
+Z36k1Az56L4rdTTdKXUwyBBfqNCTvSUuroGo1sX4u9RJfW+SK3vdLufF985kBn4Y
+65vSZlkS2t4geFo5F2PH0b6UlenrXdoIYKB+X1RD3r6FcSCGftn8EK5A63m5D81R
+LYGJQPB+eO2/q2/v2+pBgsCtMotFgapGmw5uap10M+cV+BmJg6Q+sgYIhBXO81SW
+oHa/DImvBu6FgvhRYblzjfGrJF2ixxBpqmYLf3xV52nS7ZdtVXM=
+=skTF
+-----END PGP SIGNATURE-----
+--=-=-=--
