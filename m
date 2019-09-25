@@ -2,197 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F7B9BD69C
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 05:15:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0882FBD6E7
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 06:00:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2411462AbfIYDPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Sep 2019 23:15:15 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:44225 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2411457AbfIYDPP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Sep 2019 23:15:15 -0400
-Received: by mail-ot1-f66.google.com with SMTP id 21so3458262otj.11;
-        Tue, 24 Sep 2019 20:15:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=afcCPGULCNOtz/0h05xsNOQts8+NcMH2hirofuxLTdQ=;
-        b=U+NMUppGyzVy2XDqOvfnHJt7FaU8Bs09UlndkxV+Isw+0giosZ4aNeiw+7XOfFXb8T
-         8zNlSSlpkOWrbsSOGKdqudl+lwQ0spV7CnZ9xQYXFDJ5Du26veLJ/NShlVLVapOh2g1a
-         v+BchHQ8LAQ9tAS1UgCGVwwWuw630X669rkFm3jsg6b4NQ7apKzJizHo61TAgNjPW/s3
-         ybmqVdQFqhB6k8y2FoQDo6zaXVZpGU/AY7a9WZ6PdbWHfU5gDeW2WJaHNLdIZDmhdmXb
-         b3u7qtOwp2g/nDygGnZARX4erkjePrmUmlbRNnP4qBEqPCAa2EaOOU7+pSyxzY5wxnr4
-         Lc2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=afcCPGULCNOtz/0h05xsNOQts8+NcMH2hirofuxLTdQ=;
-        b=HZSq3phJVa7wdy5cSS15apmuHZCzt1S5klO3QjpE800k3ztb8vEQ+0ifOsDn//bfKV
-         zLU+EtF74li1+7p1/vXlR6L9/qmMrN1DpfMHHewQIOaKiFWjZvl5GNpMDIFWZ+XothIZ
-         Hy8VzpNu8oXGHB0/BX4Tm+z9arS2wdgjHbF1oxBAxYV7d3/MaxN91oqj5LhFQLSVEGAr
-         ECdOhaBgmgkRqieFCvUiO4N4BGihMln/O/sH4nVBrOz3YtIm0UQCyVCIc8fs4cJvP/so
-         wIQRqHmjqfgwe3vEVEx2F06QSNXy/QDUnK5NkTFyYBQkZvgKA1HhktKTsXOb4RO5FsRI
-         5EcQ==
-X-Gm-Message-State: APjAAAWYS05is7EnC798m0d6aV1yrDhrT8wfz2muOqwMERbVpPkwiPG1
-        tWFIdN+rtjzExtLcxXHcE98YfKL2SAeoP8NIr08=
-X-Google-Smtp-Source: APXvYqx3uHu6GsUxdtRr8tl95tqn/QuheLHwAoSbpsrOzGMBbveA2admP6ZJxsCiutQSZnSIRfD7l6ZLmrRNVy1OUCE=
-X-Received: by 2002:a9d:aa8:: with SMTP id 37mr4453390otq.56.1569381314722;
- Tue, 24 Sep 2019 20:15:14 -0700 (PDT)
+        id S1726027AbfIYEAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 00:00:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42374 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725784AbfIYEAE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 00:00:04 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 02DB23DFD7;
+        Wed, 25 Sep 2019 04:00:04 +0000 (UTC)
+Received: from [10.72.12.148] (ovpn-12-148.pek2.redhat.com [10.72.12.148])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 83E855C21F;
+        Wed, 25 Sep 2019 03:59:58 +0000 (UTC)
+Subject: Re: [PATCH] vhost: It's better to use size_t for the 3rd parameter of
+ vhost_exceeds_weight()
+To:     "wangxu (AE)" <wangxu72@huawei.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <1569224801-101248-1-git-send-email-wangxu72@huawei.com>
+ <20190923040518-mutt-send-email-mst@kernel.org>
+ <FCFCADD62FC0CA4FAEA05F13220975B01717A091@dggeml525-mbx.china.huawei.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <fc06afd5-0e2d-c3ae-c118-3292e16db186@redhat.com>
+Date:   Wed, 25 Sep 2019 11:59:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1567993228-23668-1-git-send-email-wanpengli@tencent.com>
- <29d04ee4-60e7-4df9-0c4f-fc29f2b0c6a8@redhat.com> <CANRm+CxVXsQCmEpxNJSifmQJk5cqoSifFq+huHJE1s7a-=0iXw@mail.gmail.com>
- <2dda32db-5662-f7a6-f52d-b835df1f45f1@redhat.com> <9ef778df-c34a-897c-bcfa-780256fb78ff@redhat.com>
-In-Reply-To: <9ef778df-c34a-897c-bcfa-780256fb78ff@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 25 Sep 2019 11:15:02 +0800
-Message-ID: <CANRm+Cyckfhm59GoP1m_SsHcAAiUAaLtnMLKSY2nJJJeexmTjQ@mail.gmail.com>
-Subject: Re: [PATCH] Revert "locking/pvqspinlock: Don't wait if vCPU is preempted"
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Waiman Long <longman@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>, loobinliu@tencent.com,
-        "# v3 . 10+" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <FCFCADD62FC0CA4FAEA05F13220975B01717A091@dggeml525-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 25 Sep 2019 04:00:04 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 11 Sep 2019 at 21:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/09/19 06:25, Waiman Long wrote:
-> > On 9/10/19 6:56 AM, Wanpeng Li wrote:
-> >> On Mon, 9 Sep 2019 at 18:56, Waiman Long <longman@redhat.com> wrote:
-> >>> On 9/9/19 2:40 AM, Wanpeng Li wrote:
-> >>>> From: Wanpeng Li <wanpengli@tencent.com>
-> >>>>
-> >>>> This patch reverts commit 75437bb304b20 (locking/pvqspinlock: Don't =
-wait if
-> >>>> vCPU is preempted), we found great regression caused by this commit.
-> >>>>
-> >>>> Xeon Skylake box, 2 sockets, 40 cores, 80 threads, three VMs, each i=
-s 80 vCPUs.
-> >>>> The score of ebizzy -M can reduce from 13000-14000 records/s to 1700=
--1800
-> >>>> records/s with this commit.
-> >>>>
-> >>>>           Host                       Guest                score
-> >>>>
-> >>>> vanilla + w/o kvm optimizes     vanilla               1700-1800 reco=
-rds/s
-> >>>> vanilla + w/o kvm optimizes     vanilla + revert      13000-14000 re=
-cords/s
-> >>>> vanilla + w/ kvm optimizes      vanilla               4500-5000 reco=
-rds/s
-> >>>> vanilla + w/ kvm optimizes      vanilla + revert      14000-15500 re=
-cords/s
-> >>>>
-> >>>> Exit from aggressive wait-early mechanism can result in yield premat=
-ure and
-> >>>> incur extra scheduling latency in over-subscribe scenario.
-> >>>>
-> >>>> kvm optimizes:
-> >>>> [1] commit d73eb57b80b (KVM: Boost vCPUs that are delivering interru=
-pts)
-> >>>> [2] commit 266e85a5ec9 (KVM: X86: Boost queue head vCPU to mitigate =
-lock waiter preemption)
-> >>>>
-> >>>> Tested-by: loobinliu@tencent.com
-> >>>> Cc: Peter Zijlstra <peterz@infradead.org>
-> >>>> Cc: Thomas Gleixner <tglx@linutronix.de>
-> >>>> Cc: Ingo Molnar <mingo@kernel.org>
-> >>>> Cc: Waiman Long <longman@redhat.com>
-> >>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >>>> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> >>>> Cc: loobinliu@tencent.com
-> >>>> Cc: stable@vger.kernel.org
-> >>>> Fixes: 75437bb304b20 (locking/pvqspinlock: Don't wait if vCPU is pre=
-empted)
-> >>>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> >>>> ---
-> >>>>  kernel/locking/qspinlock_paravirt.h | 2 +-
-> >>>>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/kernel/locking/qspinlock_paravirt.h b/kernel/locking/qs=
-pinlock_paravirt.h
-> >>>> index 89bab07..e84d21a 100644
-> >>>> --- a/kernel/locking/qspinlock_paravirt.h
-> >>>> +++ b/kernel/locking/qspinlock_paravirt.h
-> >>>> @@ -269,7 +269,7 @@ pv_wait_early(struct pv_node *prev, int loop)
-> >>>>       if ((loop & PV_PREV_CHECK_MASK) !=3D 0)
-> >>>>               return false;
-> >>>>
-> >>>> -     return READ_ONCE(prev->state) !=3D vcpu_running || vcpu_is_pre=
-empted(prev->cpu);
-> >>>> +     return READ_ONCE(prev->state) !=3D vcpu_running;
-> >>>>  }
-> >>>>
-> >>>>  /*
-> >>> There are several possibilities for this performance regression:
-> >>>
-> >>> 1) Multiple vcpus calling vcpu_is_preempted() repeatedly may cause so=
-me
-> >>> cacheline contention issue depending on how that callback is implemen=
-ted.
-> >>>
-> >>> 2) KVM may set the preempt flag for a short period whenver an vmexit
-> >>> happens even if a vmenter is executed shortly after. In this case, we
-> >>> may want to use a more durable vcpu suspend flag that indicates the v=
-cpu
-> >>> won't get a real vcpu back for a longer period of time.
-> >>>
-> >>> Perhaps you can add a lock event counter to count the number of
-> >>> wait_early events caused by vcpu_is_preempted() being true to see if =
-it
-> >>> really cause a lot more wait_early than without the vcpu_is_preempted=
-()
-> >>> call.
-> >> pv_wait_again:1:179
-> >> pv_wait_early:1:189429
-> >> pv_wait_head:1:263
-> >> pv_wait_node:1:189429
-> >> pv_vcpu_is_preempted:1:45588
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3Dsleep 5=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >> pv_wait_again:1:181
-> >> pv_wait_early:1:202574
-> >> pv_wait_head:1:267
-> >> pv_wait_node:1:202590
-> >> pv_vcpu_is_preempted:1:46336
-> >>
-> >> The sampling period is 5s, 6% of wait_early events caused by
-> >> vcpu_is_preempted() being true.
-> >
-> > 6% isn't that high. However, when one vCPU voluntarily releases its
-> > vCPU, all the subsequently waiters in the queue will do the same. It is
-> > a cascading effect. Perhaps we wait early too aggressive with the
-> > original patch.
-> >
-> > I also look up the email chain of the original commit. The patch
-> > submitter did not provide any performance data to support this change.
-> > The patch just looked reasonable at that time. So there was no
-> > objection. Given that we now have hard evidence that this was not a goo=
-d
-> > idea. I think we should revert it.
-> >
-> > Reviewed-by: Waiman Long <longman@redhat.com>
-> >
-> > Thanks,
-> > Longman
-> >
->
-> Queued, thanks.
 
-Didn't see it in yesterday's updated kvm/queue. :)
+On 2019/9/23 下午5:12, wangxu (AE) wrote:
+> Hi Michael
+>
+> 	Thanks for your fast reply.
+>
+> 	As the following code, the 2nd branch of iov_iter_advance() does not check if i->count < size, when this happens, i->count -= size may cause len exceed INT_MAX, and then total_len exceed INT_MAX.
+>
+> 	handle_tx_copy() ->
+> 		get_tx_bufs(..., &len, ...) ->
+> 			init_iov_iter() ->
+> 				iov_iter_advance(iter, ...) 	// has 3 branches:
+> 					pipe_advance() 	 	// has checked the size: if (unlikely(i->count < size)) size = i->count;
+> 					iov_iter_is_discard() ... 	// no check.
 
-    Wanpeng
+
+Yes, but I don't think we use ITER_DISCARD.
+
+Thanks
+
+
+> 					iterate_and_advance() 	//has checked: if (unlikely(i->count < n)) n = i->count;
+> 				return iov_iter_count(iter);
+>
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Monday, September 23, 2019 4:07 PM
+> To: wangxu (AE) <wangxu72@huawei.com>
+> Cc: jasowang@redhat.com; kvm@vger.kernel.org; virtualization@lists.linux-foundation.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH] vhost: It's better to use size_t for the 3rd parameter of vhost_exceeds_weight()
+>
+> On Mon, Sep 23, 2019 at 03:46:41PM +0800, wangxu wrote:
+>> From: Wang Xu <wangxu72@huawei.com>
+>>
+>> Caller of vhost_exceeds_weight(..., total_len) in drivers/vhost/net.c
+>> usually pass size_t total_len, which may be affected by rx/tx package.
+>>
+>> Signed-off-by: Wang Xu <wangxu72@huawei.com>
+>
+> Puts a bit more pressure on the register file ...
+> why do we care? Is there some way that it can exceed INT_MAX?
+>
+>> ---
+>>   drivers/vhost/vhost.c | 4 ++--
+>>   drivers/vhost/vhost.h | 7 ++++---
+>>   2 files changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c index
+>> 36ca2cf..159223a 100644
+>> --- a/drivers/vhost/vhost.c
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -412,7 +412,7 @@ static void vhost_dev_free_iovecs(struct vhost_dev
+>> *dev)  }
+>>   
+>>   bool vhost_exceeds_weight(struct vhost_virtqueue *vq,
+>> -			  int pkts, int total_len)
+>> +			  int pkts, size_t total_len)
+>>   {
+>>   	struct vhost_dev *dev = vq->dev;
+>>   
+>> @@ -454,7 +454,7 @@ static size_t vhost_get_desc_size(struct
+>> vhost_virtqueue *vq,
+>>   
+>>   void vhost_dev_init(struct vhost_dev *dev,
+>>   		    struct vhost_virtqueue **vqs, int nvqs,
+>> -		    int iov_limit, int weight, int byte_weight)
+>> +		    int iov_limit, int weight, size_t byte_weight)
+>>   {
+>>   	struct vhost_virtqueue *vq;
+>>   	int i;
+>> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h index
+>> e9ed272..8d80389d 100644
+>> --- a/drivers/vhost/vhost.h
+>> +++ b/drivers/vhost/vhost.h
+>> @@ -172,12 +172,13 @@ struct vhost_dev {
+>>   	wait_queue_head_t wait;
+>>   	int iov_limit;
+>>   	int weight;
+>> -	int byte_weight;
+>> +	size_t byte_weight;
+>>   };
+>>   
+>
+> This just costs extra memory, and value is never large, so I don't think this matters.
+>
+>> -bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts, int
+>> total_len);
+>> +bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts,
+>> +			  size_t total_len);
+>>   void vhost_dev_init(struct vhost_dev *, struct vhost_virtqueue **vqs,
+>> -		    int nvqs, int iov_limit, int weight, int byte_weight);
+>> +		    int nvqs, int iov_limit, int weight, size_t byte_weight);
+>>   long vhost_dev_set_owner(struct vhost_dev *dev);  bool
+>> vhost_dev_has_owner(struct vhost_dev *dev);  long
+>> vhost_dev_check_owner(struct vhost_dev *);
+>> --
+>> 1.8.5.6
