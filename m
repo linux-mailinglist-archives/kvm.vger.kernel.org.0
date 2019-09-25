@@ -2,292 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1691DBDCD0
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 13:14:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF4E0BDA2E
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 10:49:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404457AbfIYLOA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 07:14:00 -0400
-Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:47622 "EHLO
-        3.mo3.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727829AbfIYLN7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 07:13:59 -0400
-X-Greylist: delayed 6593 seconds by postgrey-1.27 at vger.kernel.org; Wed, 25 Sep 2019 07:13:55 EDT
-Received: from player732.ha.ovh.net (unknown [10.108.35.12])
-        by mo3.mail-out.ovh.net (Postfix) with ESMTP id 13356229046
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 10:47:31 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player732.ha.ovh.net (Postfix) with ESMTPSA id 27BE5A1841BF;
-        Wed, 25 Sep 2019 08:47:20 +0000 (UTC)
-Date:   Wed, 25 Sep 2019 10:47:18 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 5/6] KVM: PPC: Book3S HV: XIVE: Make VP block size
- configurable
-Message-ID: <20190925104718.67a46fbb@bahia.lan>
-In-Reply-To: <156925344032.974393.7608316579545874447.stgit@bahia.lan>
-References: <156925341155.974393.11681611197111945710.stgit@bahia.lan>
-        <156925344032.974393.7608316579545874447.stgit@bahia.lan>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1729006AbfIYItd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 04:49:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53170 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726030AbfIYItd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 04:49:33 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0F14A8AC6FD;
+        Wed, 25 Sep 2019 08:49:33 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-109.ams2.redhat.com [10.36.116.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B0163600C8;
+        Wed, 25 Sep 2019 08:49:26 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 6/6] s390x: SMP test
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com
+References: <20190920080356.1948-1-frankja@linux.ibm.com>
+ <20190920080356.1948-7-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <ddb43c9c-e6d9-fbc0-b7a5-ec440756b0ec@redhat.com>
+Date:   Wed, 25 Sep 2019 10:49:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190920080356.1948-7-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 2999960302418762171
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Wed, 25 Sep 2019 08:49:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Sep 2019 17:44:00 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> The XIVE VP is an internal structure which allow the XIVE interrupt
-> controller to maintain the interrupt context state of vCPUs non
-> dispatched on HW threads.
+On 20/09/2019 10.03, Janosch Frank wrote:
+> Testing SIGP emulation for the following order codes:
+> * start
+> * stop
+> * restart
+> * set prefix
+> * store status
+> * stop and store status
+> * reset
+> * initial reset
+> * external call
+> * emegergency call
 > 
-> When a guest is started, the XIVE KVM device allocates a block of
-> XIVE VPs in OPAL, enough to accommodate the highest possible vCPU
-> id KVM_MAX_VCPU_ID (16384) packed down to KVM_MAX_VCPUS (2048).
-> With a guest's core stride of 8 and a threading mode of 1 (QEMU's
-> default), a VM must run at least 256 vCPUs to actually need such a
-> range of VPs.
+> restart and set prefix are part of the library and needed to start
+> other cpus.
 > 
-> A POWER9 system has a limited XIVE VP space : 512k and KVM is
-> currently wasting this HW resource with large VP allocations,
-> especially since a typical VM likely runs with a lot less vCPUs.
-> 
-> Make the size of the VP block configurable. Add an nr_servers
-> field to the XIVE structure and a function to set it for this
-> purpose.
-> 
-> Split VP allocation out of the device create function. Since the
-> VP block isn't used before the first vCPU connects to the XIVE KVM
-> device, allocation is now performed by kvmppc_xive_connect_vcpu().
-> This gives the opportunity to set nr_servers in between:
-> 
->           kvmppc_xive_create() / kvmppc_xive_native_create()
->                                .
->                                .
->                      kvmppc_xive_set_nr_servers()
->                                .
->                                .
->     kvmppc_xive_connect_vcpu() / kvmppc_xive_native_connect_vcpu()
-> 
-> The connect_vcpu() functions check that the vCPU id is below nr_servers
-> and if it is the first vCPU they allocate the VP block. This is protected
-> against a concurrent update of nr_servers by kvmppc_xive_set_nr_servers()
-> with the xive->lock mutex.
-> 
-> Also, the block is allocated once for the device lifetime: nr_servers
-> should stay constant otherwise connect_vcpu() could generate a boggus
-> VP id and likely crash OPAL. It is thus forbidden to update nr_servers
-> once the block is allocated.
-> 
-> If the VP allocation fail, return ENOSPC which seems more appropriate to
-> report the depletion of system wide HW resource than ENOMEM or ENXIO.
-> 
-> A VM using a stride of 8 and 1 thread per core with 32 vCPUs would hence
-> only need 256 VPs instead of 2048. If the stride is set to match the number
-> of threads per core, this goes further down to 32.
-> 
-> This will be exposed to userspace by a subsequent patch.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  arch/powerpc/kvm/book3s_xive.c        |   59 ++++++++++++++++++++++++++-------
->  arch/powerpc/kvm/book3s_xive.h        |    4 ++
->  arch/powerpc/kvm/book3s_xive_native.c |   18 +++-------
->  3 files changed, 56 insertions(+), 25 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index 9ac6315fb9ae..4a333dcfddd8 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -1213,13 +1213,13 @@ void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
->  
->  static bool kvmppc_xive_vcpu_id_valid(struct kvmppc_xive *xive, u32 cpu)
->  {
-> -	/* We have a block of KVM_MAX_VCPUS VPs. We just need to check
-> +	/* We have a block of xive->nr_servers VPs. We just need to check
->  	 * raw vCPU ids are below the expected limit for this guest's
->  	 * core stride ; kvmppc_pack_vcpu_id() will pack them down to an
->  	 * index that can be safely used to compute a VP id that belongs
->  	 * to the VP block.
->  	 */
-> -	return cpu < KVM_MAX_VCPUS * xive->kvm->arch.emul_smt_mode;
-> +	return cpu < xive->nr_servers * xive->kvm->arch.emul_smt_mode;
->  }
->  
->  int kvmppc_xive_compute_vp_id(struct kvmppc_xive *xive, u32 cpu, u32 *vp)
-> @@ -1231,6 +1231,14 @@ int kvmppc_xive_compute_vp_id(struct kvmppc_xive *xive, u32 cpu, u32 *vp)
->  		return -EINVAL;
->  	}
->  
-> +	if (xive->vp_base == XIVE_INVALID_VP) {
-> +		xive->vp_base = xive_native_alloc_vp_block(xive->nr_servers);
-> +		pr_devel("VP_Base=%x nr_servers=%d\n", xive->vp_base, xive->nr_servers);
+>  s390x/Makefile      |   1 +
+>  s390x/smp.c         | 242 ++++++++++++++++++++++++++++++++++++++++++++
+[...]
+> +int main(void)
+> +{
+> +	report_prefix_push("smp");
 > +
-> +		if (xive->vp_base == XIVE_INVALID_VP)
-> +			return -ENOSPC;
+> +	if (smp_query_num_cpus() == 1) {
+> +		report_abort("need at least 2 cpus for this test");
+
+nit: report_abort() aborts immediately, so the "goto done" below is dead
+code. Did you mean report_skip() instead?
+
+> +		goto done;
 > +	}
 > +
->  	vp_id = kvmppc_xive_vp(xive, cpu);
->  	if (kvmppc_xive_vp_in_use(xive->kvm, vp_id)) {
->  		pr_devel("Duplicate !\n");
-> @@ -1858,6 +1866,37 @@ int kvmppc_xive_set_irq(struct kvm *kvm, int irq_source_id, u32 irq, int level,
->  	return 0;
->  }
->  
-> +int kvmppc_xive_set_nr_servers(struct kvmppc_xive *xive, u64 addr)
-> +{
-> +	u32 __user *ubufp = (u32 __user *) addr;
-> +	u32 nr_servers;
-> +	int rc = 0;
+> +	test_start();
+> +	test_stop();
+> +	test_stop_store_status();
+> +	test_store_status();
+> +	test_ecall();
+> +	test_emcall();
+> +	test_reset();
+> +	test_reset_initial();
 > +
-> +	if (get_user(nr_servers, ubufp))
-> +		return -EFAULT;
-> +
-> +	pr_devel("%s nr_servers=%u\n", __func__, nr_servers);
-> +
-> +	if (nr_servers > KVM_MAX_VCPUS)
-
-Drat, this is wrong since QEMU can generate higher vCPU ids (which
-is why we need to pack them in the first place). We should check
-against KVM_MAX_VCPU_ID here...
-
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&xive->lock);
-> +	/* The VP block is allocated once and freed when the device is
-> +	 * released. Better not allow to change its size since its used
-> +	 * by connect_vcpu to validate vCPU ids are valid (eg, setting
-> +	 * it back to a higher value could allow connect_vcpu to come
-> +	 * up with a VP id that goes beyond the VP block, which is likely
-> +	 * to cause a crash in OPAL).
-> +	 */
-> +	if (xive->vp_base != XIVE_INVALID_VP)
-> +		rc = -EBUSY;
-> +	else
-> +		xive->nr_servers = nr_servers;
-
-... and clip down to KVM_MAX_VCPUS here.
-
-I'll fix this in v2.
-
-> +	mutex_unlock(&xive->lock);
-> +
-> +	return rc;
+> +done:
+> +	report_prefix_pop();
+> +	return report_summary();
 > +}
-> +
->  static int xive_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
->  {
->  	struct kvmppc_xive *xive = dev->private;
-> @@ -2034,7 +2073,6 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  {
->  	struct kvmppc_xive *xive;
->  	struct kvm *kvm = dev->kvm;
-> -	int ret = 0;
->  
->  	pr_devel("Creating xive for partition\n");
->  
-> @@ -2057,18 +2095,15 @@ static int kvmppc_xive_create(struct kvm_device *dev, u32 type)
->  	else
->  		xive->q_page_order = xive->q_order - PAGE_SHIFT;
->  
-> -	/* Allocate a bunch of VPs */
-> -	xive->vp_base = xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-> -	pr_devel("VP_Base=%x\n", xive->vp_base);
-> -
-> -	if (xive->vp_base == XIVE_INVALID_VP)
-> -		ret = -ENOMEM;
-> +	/* VP allocation is delayed to the first call to connect_vcpu */
-> +	xive->vp_base = XIVE_INVALID_VP;
-> +	/* KVM_MAX_VCPUS limits the number of VMs to roughly 64 per sockets
-> +	 * on a POWER9 system.
-> +	 */
-> +	xive->nr_servers = KVM_MAX_VCPUS;
->  
->  	xive->single_escalation = xive_native_has_single_escalation();
->  
-> -	if (ret)
-> -		return ret;
-> -
->  	dev->private = xive;
->  	kvm->arch.xive = xive;
->  	return 0;
-> diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
-> index 90cf6ec35a68..382e3a56e789 100644
-> --- a/arch/powerpc/kvm/book3s_xive.h
-> +++ b/arch/powerpc/kvm/book3s_xive.h
-> @@ -135,6 +135,9 @@ struct kvmppc_xive {
->  	/* Flags */
->  	u8	single_escalation;
->  
-> +	/* Number of entries in the VP block */
-> +	u32	nr_servers;
-> +
->  	struct kvmppc_xive_ops *ops;
->  	struct address_space   *mapping;
->  	struct mutex mapping_lock;
-> @@ -297,6 +300,7 @@ struct kvmppc_xive *kvmppc_xive_get_device(struct kvm *kvm, u32 type);
->  void xive_cleanup_single_escalation(struct kvm_vcpu *vcpu,
->  				    struct kvmppc_xive_vcpu *xc, int irq);
->  int kvmppc_xive_compute_vp_id(struct kvmppc_xive *xive, u32 cpu, u32 *vp);
-> +int kvmppc_xive_set_nr_servers(struct kvmppc_xive *xive, u64 addr);
->  
->  #endif /* CONFIG_KVM_XICS */
->  #endif /* _KVM_PPC_BOOK3S_XICS_H */
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index 6902319c5ee9..5e18364d52a9 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -1069,7 +1069,6 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
->  {
->  	struct kvmppc_xive *xive;
->  	struct kvm *kvm = dev->kvm;
-> -	int ret = 0;
->  
->  	pr_devel("Creating xive native device\n");
->  
-> @@ -1085,23 +1084,16 @@ static int kvmppc_xive_native_create(struct kvm_device *dev, u32 type)
->  	mutex_init(&xive->mapping_lock);
->  	mutex_init(&xive->lock);
->  
-> -	/*
-> -	 * Allocate a bunch of VPs. KVM_MAX_VCPUS is a large value for
-> -	 * a default. Getting the max number of CPUs the VM was
-> -	 * configured with would improve our usage of the XIVE VP space.
-> +	/* VP allocation is delayed to the first call to connect_vcpu */
-> +	xive->vp_base = XIVE_INVALID_VP;
-> +	/* KVM_MAX_VCPUS limits the number of VMs to roughly 64 per sockets
-> +	 * on a POWER9 system.
->  	 */
-> -	xive->vp_base = xive_native_alloc_vp_block(KVM_MAX_VCPUS);
-> -	pr_devel("VP_Base=%x\n", xive->vp_base);
-> -
-> -	if (xive->vp_base == XIVE_INVALID_VP)
-> -		ret = -ENXIO;
-> +	xive->nr_servers = KVM_MAX_VCPUS;
->  
->  	xive->single_escalation = xive_native_has_single_escalation();
->  	xive->ops = &kvmppc_xive_native_ops;
->  
-> -	if (ret)
-> -		return ret;
-> -
->  	dev->private = xive;
->  	kvm->arch.xive = xive;
->  	return 0;
-> 
 
+Apart from the nit, the patch looks fine to me. Since this is IIRC the
+only nit that is left in this series, I can also fix it up when picking
+up the patch, if you like - just tell me whether you prefer report_skip
+or deletion of the goto.
+
+ Thomas
