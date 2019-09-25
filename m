@@ -2,92 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3935EBD9FB
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 10:37:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18671BD9FD
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 10:37:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2442801AbfIYIhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 04:37:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43232 "EHLO mx1.redhat.com"
+        id S2442814AbfIYIhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 04:37:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40432 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405350AbfIYIhS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 04:37:18 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2438957AbfIYIhm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 04:37:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9E4422A09A1
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 08:37:18 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id o8so1684814wmc.2
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 01:37:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3VhPkSl2uf/qmkqWM+G9FNiQnG+Cpv4Ltq7GILMPAkM=;
-        b=ivXYQYk6lOnkb45uNryYrxRGMz0/WGV93aD5BDQH9WdCz0OtSxgT053WoPFLpMZIE+
-         jyesIdwM/In6TYFnt/zoXtTUZVCiKyjr2ez1nBql4Z0f2Pi36SNN82yG/LTTLNJgGLYk
-         u5AH2iz6AT6jbt7AvnDe8pCCfjbagKJUCPa/WFuqvY26lsWF1msZxXzzT7MfONNRFn7R
-         ZIu5NiA/zvsBOAvctYyv4xT4B7+W5HMy7A7l2RTA2sQGPbB2GWsvrfhUgVts5XsGlQrK
-         gMH4SkcebXRN8TYXeQ4rJhX6IxpiQgqCssNBZWhYtNK7Y86JM/eFjBhda1q1ESoAtxys
-         lerA==
-X-Gm-Message-State: APjAAAUHgJP3ck8EQAILt3WxD0e5Nc6OrbTGi15EOjMmO1DUL/3dQDxv
-        CFxmyyjQ2deWG51FQr7TaJYLFygjz0lp2/xnIupYH5Rv7nto+hCjI9HRC6FatT4kOFQNZm3n+Qi
-        8muhAPnZ0cLmH
-X-Received: by 2002:a5d:43c6:: with SMTP id v6mr7812245wrr.159.1569400637244;
-        Wed, 25 Sep 2019 01:37:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwpj8cZJO2WvbUNnAXQ6C5iaWnzdtKwZyC6kwcAoMuIyKyefQiOYUWdQIC6jIlpQBayN5GhhA==
-X-Received: by 2002:a5d:43c6:: with SMTP id v6mr7812222wrr.159.1569400636993;
-        Wed, 25 Sep 2019 01:37:16 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id t13sm11450667wra.70.2019.09.25.01.37.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Sep 2019 01:37:16 -0700 (PDT)
-Subject: Re: [kvm:queue 4/47] arch/x86/kvm/vmx/vmx.c:503:10: warning: cast
- from pointer to integer of different size
-To:     Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        vkuznets <vkuznets@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "kbuild-all@01.org" <kbuild-all@01.org>,
-        kbuild test robot <lkp@intel.com>,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>
-References: <201909250244.efVzzpnN%lkp@intel.com>
- <874l1093ra.fsf@vitty.brq.redhat.com>
- <KL1P15301MB0261174BE76F9F00BCEF68EB92870@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <6037ab4f-70e7-2fcf-84ae-e6b9ac41ad7d@redhat.com>
-Date:   Wed, 25 Sep 2019 10:37:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 94FED308AA12;
+        Wed, 25 Sep 2019 08:37:42 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BB1160872;
+        Wed, 25 Sep 2019 08:37:42 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 774AD1808876;
+        Wed, 25 Sep 2019 08:37:42 +0000 (UTC)
+Date:   Wed, 25 Sep 2019 04:37:42 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Sergio Lopez <slp@redhat.com>, ehabkost@redhat.com,
+        kvm@vger.kernel.org, mst@redhat.com, lersek@redhat.com,
+        mtosatti@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+        pbonzini@redhat.com, imammedo@redhat.com, philmd@redhat.com,
+        rth@twiddle.net
+Message-ID: <1911476948.2948619.1569400662114.JavaMail.zimbra@redhat.com>
+In-Reply-To: <3162a686-90c8-9ace-0258-37464390ca45@redhat.com>
+References: <20190924124433.96810-1-slp@redhat.com> <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com> <87h850ssnb.fsf@redhat.com> <3162a686-90c8-9ace-0258-37464390ca45@redhat.com>
+Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
 MIME-Version: 1.0
-In-Reply-To: <KL1P15301MB0261174BE76F9F00BCEF68EB92870@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.223, 10.4.195.3]
+Thread-Topic: Introduce the microvm machine type
+Thread-Index: REiSp/FSnA9gx3Er3v5VaYMdGNUqFQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 25 Sep 2019 08:37:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/09/19 10:35, Tianyu Lan wrote:
-> -----Original Message-----
-> From: Vitaly Kuznetsov <vkuznets@redhat.com> 
-> Sent: Wednesday, September 25, 2019 4:31 PM
-> To: kvm@vger.kernel.org
-> Cc: kbuild-all@01.org; kbuild test robot <lkp@intel.com>; Robert Hu <robert.hu@intel.com>; Farrah Chen <farrah.chen@intel.com>; Danmei Wei <danmei.wei@intel.com>; Paolo Bonzini <pbonzini@redhat.com>; Tianyu Lan <Tianyu.Lan@microsoft.com>
-> Subject: Re: [kvm:queue 4/47] arch/x86/kvm/vmx/vmx.c:503:10: warning: cast from pointer to integer of different size
-> 
-> kbuild test robot <lkp@intel.com> writes:
-> 
->>  > 502			pr_debug("KVM: Hyper-V: allocated PA_PG for %llx\n",
->>  > 503			       (u64)&vcpu->kvm);
-> 
-> (as a matter of fact, this wasn't in my original patch :-)
-> 
-> I'm not quite sure what this info is useful for, let's just remove it. I'll send a patch.
 
-Removing all pr_debug is better indeed.
+> >>> Microvm is a machine type inspired by both NEMU and Firecracker, and
+> >>> constructed after the machine model implemented by the latter.
+> >>>
+> >>> It's main purpose is providing users a minimalist machine type free
+> >>> from the burden of legacy compatibility, serving as a stepping stone
+> >>> for future projects aiming at improving boot times, reducing the
+> >>> attack surface and slimming down QEMU's footprint.
+> >>>
+> >>> The microvm machine type supports the following devices:
+> >>>
+> >>>  - ISA bus
+> >>>  - i8259 PIC
+> >>>  - LAPIC (implicit if using KVM)
+> >>>  - IOAPIC (defaults to kernel_irqchip_split = true)
+> >>>  - i8254 PIT
+> >>>  - MC146818 RTC (optional)
+> >>>  - kvmclock (if using KVM)
+> >>>  - fw_cfg
+> >>>  - One ISA serial port (optional)
+> >>>  - Up to eight virtio-mmio devices (configured by the user)
+> >>
+> >> So I assume also no ACPI (CPU/memory hotplug), correct?
+> > 
+> > Correct.
+> > 
+> >> @Pankaj, I think it would make sense to make virtio-pmem play with
+> >> virtio-mmio/microvm.
+> > 
+> > That would be great. I'm also looking forward for virtio-mem (and an
+> > hypothetical virtio-cpu) to eventually gain hotplug capabilities in
+> > microvm.
+> 
+> @Pankaj, do you have time to look into the virtio-pmem thingy? I guess
+> the virtio-mmio rapper shouldn't be too hard (very similar to the
+> virtio-pci wrapper - luckily I insisted to make it work independently
+> from PCI BARs and ACPI slots ;) ). The microvm bits would be properly
+> setting up device memory and wiring up the hotplug handlers, similar as
+> done in the other PC machine types (maybe that comes for free?).
 
-Paolo
+Yes, I can look at.
+
+> 
+> virtio-pmem will allow (in read-only mode) to place the rootfs on a fake
+> NVDIMM, as done e.g., in kata containers. We might have to include the
+> virtio-pmem kernel module in the initramfs, shouldn't  be too hard. Not
+> sure what else we'll need to make virtio-pmem get used as a rootfs.
+
+Sure, will work on it.
+
+Thanks,
+Pankaj
+
+> 
+> > 
+> > Thanks,
+> > Sergio.
+> > 
+> 
+> 
+> --
+> 
+> Thanks,
+> 
+> David / dhildenb
+> 
+> 
