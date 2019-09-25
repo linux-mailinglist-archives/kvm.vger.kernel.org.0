@@ -2,368 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF552BDA6B
-	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 11:03:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B86EBDA70
+	for <lists+kvm@lfdr.de>; Wed, 25 Sep 2019 11:05:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728414AbfIYJD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 05:03:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33450 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727916AbfIYJDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 05:03:36 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BD27C3082131;
-        Wed, 25 Sep 2019 09:03:35 +0000 (UTC)
-Received: from [10.36.117.14] (ovpn-117-14.ams2.redhat.com [10.36.117.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BC68D6012C;
-        Wed, 25 Sep 2019 09:03:32 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 6/6] s390x: SMP test
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20190920080356.1948-1-frankja@linux.ibm.com>
- <20190920080356.1948-7-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <47f9b150-c0fd-e497-7ee5-5c138f9b48fe@redhat.com>
-Date:   Wed, 25 Sep 2019 11:03:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190920080356.1948-7-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+        id S1727976AbfIYJEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 05:04:55 -0400
+Received: from mail-eopbgr1300107.outbound.protection.outlook.com ([40.107.130.107]:51226
+        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728213AbfIYJEi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 05:04:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fKAq+8KXV6EH9eyu6+Nbt9ne3FrY3BvgiQEacl6HJ3Pnt5X4ASw71sBQRSYtkalHEIVc30AOl5DK5XgmKQBdIv/9qa/Yj1T0plFvX78b+niVeIx46TFo3WYalDg+NlQ5GLu1bJpvIiIyc09cxSkdCJsBfm5sbGyKKXr/Yw9BpDtw6ivR+ldI++ydoHB3Gv4iSzaaUh59t+xLS3Nt5eoQjEmhmy5o2SBKE1qKsYz0EhN4zUXuMZghOc3McnE7zPkal95c5g93/guarGl+mGWSakhgetmAVLWm0XhUSkDyQIxdGL3oWP/m2WLuhQM11mqIJQLPv+gRcS7Yu7BVW9iqlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tEUIs17qan8uJ+h+w2Ocr7JjLaHx/tcfjHIYRqzhESE=;
+ b=JEZybzGPyp4ybZ/C2p6fg2rsuLCEuVSdKgxUnqT3kxhhglNu9CiyTKDm1uRV8YFD+Zyw/i2FUiZeuOfQsWsdhtp/QWDrzw4P4lELG7Gpev3/2uJEW8Rjw83RlMJ1Mg7nIet9CPhvDwZ0wuu0fhEjdmc4pYAtCKa/p69pLIso/Shmfzzw+HYb28GVH+SUcxMvphqMogk+3eU7VXV2SSwd+TrA5f99huJnMc0ZrRR/2Hjin8GGLIkWKhuU8tAlgo0tLi5jGQCTthpm8n+cXRbAKiQUepLM1tJuuSK11zqoHitk/++yjrZlxyNLiIf3KuKmeCbDzuDUWsZbENRs82BoKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tEUIs17qan8uJ+h+w2Ocr7JjLaHx/tcfjHIYRqzhESE=;
+ b=BQ+IY1beLVDJI6DcDQME5xttXYZQC8hCH9lawwgPq/Nq2hSx5t1FBABEowyWfyDfxfgXNvGduGSplyM5j0Idf0wIAJ4OebVUjR1ZOZw/PaJPVBA7Ahv+6zla4TnTByasCvrgyhjujMomOkak8Apr1uorLx+qsHkBcpEfyPbDiXw=
+Received: from KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM (52.132.240.14) by
+ KL1P15301MB0023.APCP153.PROD.OUTLOOK.COM (10.170.167.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.10; Wed, 25 Sep 2019 09:03:44 +0000
+Received: from KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM
+ ([fe80::d4ef:dc1e:e10:7318]) by KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM
+ ([fe80::d4ef:dc1e:e10:7318%6]) with mapi id 15.20.2327.004; Wed, 25 Sep 2019
+ 09:03:44 +0000
+From:   Tianyu Lan <Tianyu.Lan@microsoft.com>
+To:     vkuznets <vkuznets@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: RE: [PATCH] KVM: vmx: fix a build warning in
+ hv_enable_direct_tlbflush() on i386
+Thread-Topic: [PATCH] KVM: vmx: fix a build warning in
+ hv_enable_direct_tlbflush() on i386
+Thread-Index: AQHVc36qkKKFgQ9iEUSGwUPOJOh2r6c8F8+A
+Date:   Wed, 25 Sep 2019 09:03:43 +0000
+Message-ID: <KL1P15301MB0261653DB1FE73A1EB885E2D92870@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
+References: <20190925085304.24104-1-vkuznets@redhat.com>
+In-Reply-To: <20190925085304.24104-1-vkuznets@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 25 Sep 2019 09:03:35 +0000 (UTC)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=tiala@microsoft.com;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-09-25T09:03:41.3889275Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
+ Information Protection;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=e364f2d0-37b1-4156-8f8f-6dc661448a72;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Tianyu.Lan@microsoft.com; 
+x-originating-ip: [167.220.255.55]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c07c1af7-71ba-4fa7-8f12-08d741974492
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:KL1P15301MB0023;
+x-ms-traffictypediagnostic: KL1P15301MB0023:|KL1P15301MB0023:
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-microsoft-antispam-prvs: <KL1P15301MB00235B44249417720DA05A0492870@KL1P15301MB0023.APCP153.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01713B2841
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(346002)(376002)(366004)(39860400002)(136003)(189003)(199004)(13464003)(6116002)(476003)(478600001)(86362001)(6506007)(54906003)(316002)(64756008)(71200400001)(5660300002)(14454004)(76116006)(66476007)(66946007)(66556008)(8676002)(66574012)(81166006)(186003)(10090500001)(110136005)(66446008)(81156014)(52536014)(71190400001)(256004)(102836004)(9686003)(76176011)(26005)(33656002)(14444005)(8990500004)(2906002)(25786009)(6436002)(55016002)(446003)(7696005)(4326008)(74316002)(66066001)(8936002)(486006)(6246003)(10290500003)(2501003)(3846002)(7736002)(11346002)(53546011)(229853002)(22452003)(99286004)(305945005)(334744003);DIR:OUT;SFP:1102;SCL:1;SRVR:KL1P15301MB0023;H:KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: H5yBJ05rUffBK4nHsWYWcYx1NC7Xw4/a07Q0/Vx5Fjgh+pE8gD+Ez7pqZoiQCKsdwTJ9JPvbGKCNSpnzYIMDZuvlZT9cV3yBHsaOb1fM0nPFNo8ae8qDQowlDrTUmhsBOICJfsHOI5CPegs2yxm0qpW0JCcBdk5Y3RSI9Ya7pPX/FFkrCrHntW9swTt4yGxaVQZs2PS7gYH1VgqePxya3+Wtd5O4qN/zi5El9ThBH4sp1UoRwYasGIC+7RBjPlq6TsSr+rzClhnnlfva/6e3pgEo04Dmf3WiYZQO+VMpy2YjA/WZIR4ci1sCkpTTTj7fu24uFF0xLrkqsDnv1jEHMYty1sV+SaqN60WUnenah+t7huQYCv6JllcOF7QYbfRCeNgHuFeUYyffsj0AY19pw5I1L4/LWIUe0AjvxNlbWJU=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c07c1af7-71ba-4fa7-8f12-08d741974492
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2019 09:03:43.8389
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MptGJarMfagF3gz3YYUSkbs6U4WXDu6fmbOFUqoAzYtZaUMQ3XHi+BNohlae234qiElgWLJc2BF3nZKylkxTtw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1P15301MB0023
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20.09.19 10:03, Janosch Frank wrote:
-> Testing SIGP emulation for the following order codes:
-> * start
-> * stop
-> * restart
-> * set prefix
-> * store status
-> * stop and store status
-> * reset
-> * initial reset
-> * external call
-> * emegergency call
-> 
-> restart and set prefix are part of the library and needed to start
-> other cpus.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/Makefile      |   1 +
->  s390x/smp.c         | 242 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |   4 +
->  3 files changed, 247 insertions(+)
->  create mode 100644 s390x/smp.c
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index d83dd0b..3744372 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -15,6 +15,7 @@ tests += $(TEST_DIR)/cpumodel.elf
->  tests += $(TEST_DIR)/diag288.elf
->  tests += $(TEST_DIR)/stsi.elf
->  tests += $(TEST_DIR)/skrf.elf
-> +tests += $(TEST_DIR)/smp.elf
->  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->  
->  all: directories test_cases test_cases_binary
-> diff --git a/s390x/smp.c b/s390x/smp.c
-> new file mode 100644
-> index 0000000..7032494
-> --- /dev/null
-> +++ b/s390x/smp.c
-> @@ -0,0 +1,242 @@
-> +/*
-> + * Tests sigp emulation
-> + *
-> + * Copyright 2019 IBM Corp.
-> + *
-> + * Authors:
-> + *    Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2.
-> + */
-> +#include <libcflat.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/page.h>
-> +#include <asm/facility.h>
-> +#include <asm-generic/barrier.h>
-> +#include <asm/sigp.h>
-> +
-> +#include <smp.h>
-> +#include <alloc_page.h>
-> +
-> +static int testflag = 0;
-> +
-> +static void cpu_loop(void)
-> +{
-> +	for (;;) {}
-> +}
-> +
-> +static void test_func(void)
-> +{
-> +	testflag = 1;
-> +	mb();
-> +	cpu_loop();
-> +}
-> +
-> +static void test_start(void)
-> +{
-> +	struct psw psw;
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)test_func;
-> +
-> +	smp_cpu_setup(1, psw);
-> +	while (!testflag) {
-> +		mb();
-> +	}
-> +	report("start", 1);
-> +}
-> +
-> +static void test_stop(void)
-> +{
-> +	smp_cpu_stop(1);
-> +	/*
-> +	 * The smp library waits for the CPU to shut down, but let's
-> +	 * also do it here, so we don't rely on the library
-> +	 * implementation
-> +	 */
-> +	while (!smp_cpu_stopped(1)) {}
-> +	report("stop", 1);
-> +}
-> +
-> +static void test_stop_store_status(void)
-> +{
-> +	struct cpu *cpu = smp_cpu_from_addr(1);
-> +	struct lowcore *lc = (void *)0x0;
-> +
-> +	report_prefix_push("stop store status");
-> +	lc->prefix_sa = 0;
-> +	lc->grs_sa[15] = 0;
-> +	smp_cpu_stop_store_status(1);
-> +	mb();
-> +	report("prefix", lc->prefix_sa == (uint32_t)(uintptr_t)cpu->lowcore);
-> +	report("stack", lc->grs_sa[15]);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_store_status(void)
-> +{
-> +	struct cpu_status *status = alloc_pages(1);
-> +	uint32_t r;
-> +
-> +	report_prefix_push("store status at address");
-> +	memset(status, 0, PAGE_SIZE * 2);
-> +
-> +	report_prefix_push("running");
-> +	smp_cpu_restart(1);
-> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, &r);
-> +	report("incorrect state", r == SIGP_STATUS_INCORRECT_STATE);
-> +	report("status not written", !memcmp(status, (void*)status + PAGE_SIZE, PAGE_SIZE));
-> +	report_prefix_pop();
-> +
-> +	memset(status, 0, PAGE_SIZE);
-> +	report_prefix_push("stopped");
-> +	smp_cpu_stop(1);
-> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
-> +	while (!status->prefix) { mb(); }
-> +	report("status written", 1);
-> +	free_pages(status, PAGE_SIZE * 2);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +static void ecall(void)
-> +{
-> +	unsigned long mask;
-> +	struct lowcore *lc = (void *)0x0;
-> +
-> +	expect_ext_int();
-> +	ctl_set_bit(0, 13);
-> +	mask = extract_psw_mask();
-> +	mask |= PSW_MASK_EXT;
-> +	load_psw_mask(mask);
-> +	testflag = 1;
-> +	while (lc->ext_int_code != 0x1202) { mb(); }
-> +	report("ecall", 1);
-> +	testflag= 1;
-> +}
-> +
-> +static void test_ecall(void)
-> +{
-> +	struct psw psw;
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)ecall;
-> +
-> +	report_prefix_push("ecall");
-> +	testflag= 0;
-> +	smp_cpu_destroy(1);
-> +
-> +	smp_cpu_setup(1, psw);
-> +	while (!testflag) { mb(); }
-> +	testflag= 0;
-> +	sigp(1, SIGP_EXTERNAL_CALL, 0, NULL);
-> +	while(!testflag) {mb();}
-> +	smp_cpu_stop(1);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void emcall(void)
-> +{
-> +	unsigned long mask;
-> +	struct lowcore *lc = (void *)0x0;
-> +
-> +	expect_ext_int();
-> +	ctl_set_bit(0, 14);
-> +	mask = extract_psw_mask();
-> +	mask |= PSW_MASK_EXT;
-> +	load_psw_mask(mask);
-> +	testflag= 1;
-> +	while (lc->ext_int_code != 0x1201) { mb(); }
-> +	report("ecall", 1);
-> +	testflag = 1;
-> +}
-> +
-> +static void test_emcall(void)
-> +{
-> +	struct psw psw;
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)emcall;
-> +
-> +	report_prefix_push("emcall");
-> +	testflag= 0;
-> +	smp_cpu_destroy(1);
-> +
-> +	smp_cpu_setup(1, psw);
-> +	while (!testflag) { mb(); }
-> +	testflag= 0;
-> +	sigp(1, SIGP_EMERGENCY_SIGNAL, 0, NULL);
-> +	while(!testflag) { mb(); }
-> +	smp_cpu_stop(1);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_reset_initial(void)
-> +{
-> +	struct cpu_status *status = alloc_pages(0);
-> +	struct psw psw;
-> +
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)test_func;
-> +
-> +	report_prefix_push("reset initial");
-> +	smp_cpu_setup(1, psw);
-> +
-> +	sigp_retry(1, SIGP_INITIAL_CPU_RESET, 0, NULL);
-> +	sigp(1, SIGP_STORE_STATUS_AT_ADDRESS, (uintptr_t)status, NULL);
-> +
-> +	report_prefix_push("clear");
-> +	report("psw", !status->psw.mask && !status->psw.addr);
-> +	report("prefix", !status->prefix);
-> +	report("fpc", !status->fpc);
-> +	report("cpu timer", !status->cputm);
-> +	report("todpr", !status->todpr);
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("initialized");
-> +	report("cr0 == 0xE0", status->crs[0] == 0xE0UL);
-> +	report("cr14 == 0xC2000000", status->crs[14] == 0xC2000000UL);
-> +	report_prefix_pop();
-> +
-> +	report("cpu stopped", smp_cpu_stopped(1));
-> +	free_pages(status, PAGE_SIZE);
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_reset(void)
-> +{
-> +	struct psw psw;
-> +
-> +	psw.mask =  extract_psw_mask();
-> +	psw.addr = (unsigned long)test_func;
-> +
-> +	report_prefix_push("cpu reset");
-> +	smp_cpu_setup(1, psw);
-> +
-> +	sigp_retry(1, SIGP_CPU_RESET, 0, NULL);
-> +	report("cpu stopped", smp_cpu_stopped(1));
-> +	report_prefix_pop();
-> +}
-> +
-> +int main(void)
-> +{
-> +	report_prefix_push("smp");
-> +
-> +	if (smp_query_num_cpus() == 1) {
-> +		report_abort("need at least 2 cpus for this test");
-> +		goto done;
-> +	}
+There is another warning in the report.
 
-You should rather sense if CPU with the addr 1 is available. AFAIR, the
-number of CPUs and the CPU addresses are two types of shoes.
+arch/x86/kvm/vmx/vmx.c: In function 'hv_enable_direct_tlbflush':
+arch/x86/kvm/vmx/vmx.c:507:20: warning: cast from pointer to integer of dif=
+ferent size [-Wpointer-to-int-cast]
+  evmcs->hv_vm_id =3D (u64)vcpu->kvm;
+                    ^
+The following change can fix it.
+-       evmcs->hv_vm_id =3D (u64)vcpu->kvm;
++       evmcs->hv_vm_id =3D (unsigned long)vcpu->kvm;
+        evmcs->hv_enlightenments_control.nested_flush_hypercall =3D 1;
 
+-----Original Message-----
+From: Vitaly Kuznetsov <vkuznets@redhat.com>=20
+Sent: Wednesday, September 25, 2019 4:53 PM
+To: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org; Paolo Bonzini <pbonzini@redhat.com>; Radi=
+m Kr=E8m=E1=F8 <rkrcmar@redhat.com>; Sean Christopherson <sean.j.christophe=
+rson@intel.com>; Jim Mattson <jmattson@google.com>; Tianyu Lan <Tianyu.Lan@=
+microsoft.com>
+Subject: [PATCH] KVM: vmx: fix a build warning in hv_enable_direct_tlbflush=
+() on i386
 
+The following was reported on i386:
 
--- 
+  arch/x86/kvm/vmx/vmx.c: In function 'hv_enable_direct_tlbflush':
+  arch/x86/kvm/vmx/vmx.c:503:10: warning: cast from pointer to integer of d=
+ifferent size [-Wpointer-to-int-cast]
 
-Thanks,
+The particular pr_debug() causing it is more or less useless, let's just re=
+move it. Also, simplify the condition a little bit.
 
-David / dhildenb
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c index a7c9922e=
+3905..812553b7270f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -495,13 +495,11 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu =
+*vcpu)
+ 	 * Synthetic VM-Exit is not enabled in current code and so All
+ 	 * evmcs in singe VM shares same assist page.
+ 	 */
+-	if (!*p_hv_pa_pg) {
++	if (!*p_hv_pa_pg)
+ 		*p_hv_pa_pg =3D kzalloc(PAGE_SIZE, GFP_KERNEL);
+-		if (!*p_hv_pa_pg)
+-			return -ENOMEM;
+-		pr_debug("KVM: Hyper-V: allocated PA_PG for %llx\n",
+-		       (u64)&vcpu->kvm);
+-	}
++
++	if (!*p_hv_pa_pg)
++		return -ENOMEM;
+=20
+ 	evmcs =3D (struct hv_enlightened_vmcs *)to_vmx(vcpu)->loaded_vmcs->vmcs;
+=20
+--
+2.20.1
+
