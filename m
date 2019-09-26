@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EFEDBFB08
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 23:43:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F4E1BFB09
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 23:43:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbfIZVnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 17:43:04 -0400
+        id S1726394AbfIZVnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 17:43:09 -0400
 Received: from mga07.intel.com ([134.134.136.100]:8270 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725943AbfIZVnE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 17:43:04 -0400
+        id S1725943AbfIZVnF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 17:43:05 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 14:43:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,553,1559545200"; 
-   d="scan'208";a="192958527"
+   d="scan'208";a="192958528"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga003.jf.intel.com with ESMTP; 26 Sep 2019 14:43:03 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -29,10 +29,12 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>
-Subject: [PATCH 0/2] KVM: nVMX: Bug fix for consuming stale vmcs02.GUEST_CR3
-Date:   Thu, 26 Sep 2019 14:43:00 -0700
-Message-Id: <20190926214302.21990-1-sean.j.christopherson@intel.com>
+Subject: [PATCH 1/2] KVM: nVMX: Always write vmcs02.GUEST_CR3 during nested VM-Enter
+Date:   Thu, 26 Sep 2019 14:43:01 -0700
+Message-Id: <20190926214302.21990-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190926214302.21990-1-sean.j.christopherson@intel.com>
+References: <20190926214302.21990-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -40,43 +42,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reto Buerki reported a failure in a nested VMM when running with HLT
-interception disabled in L1.  When putting L2 into HLT, KVM never actually
-enters L2 and instead cancels the nested run and pretends that VM-Enter to
-L2 completed and then exited on HLT (which KVM intercepted).  Because KVM
-never actually runs L2, KVM skips the pending MMU update for L2 and so
-leaves a stale value in vmcs02.GUEST_CR3.  If the next wake event for L2
-triggers a nested VM-Exit, KVM will refresh vmcs12->guest_cr3 from
-vmcs02.GUEST_CR3 and consume the stale value.
+Write the desired L2 CR3 into vmcs02.GUEST_CR3 during nested VM-Enter
+isntead of deferring the VMWRITE until vmx_set_cr3().  If the VMWRITE
+is deferred, then KVM can consume a stale vmcs02.GUEST_CR3 when it
+refreshes vmcs12->guest_cr3 during nested_vmx_vmexit() if the emulated
+VM-Exit occurs without actually entering L2, e.g. if the nested run
+is squashed because L2 is being put into HLT.
 
-Fix the issue by unconditionally writing vmcs02.GUEST_CR3 during nested
-VM-Enter instead of deferring the update to vmx_set_cr3(), and skip the
-update of GUEST_CR3 in vmx_set_cr3() when running L2.  I.e. make the
-nested code fully responsible for vmcs02.GUEST_CR3.
+In an ideal world where EPT *requires* unrestricted guest (and vice
+versa), VMX could handle CR3 similar to how it handles RSP and RIP,
+e.g. mark CR3 dirty and conditionally load it at vmx_vcpu_run().  But
+the unrestricted guest silliness complicates the dirty tracking logic
+to the point that explicitly handling vmcs02.GUEST_CR3 during nested
+VM-Enter is a simpler overall implementation.
 
-I really wanted to go with a different fix of handling this as a one-off
-case in the HLT flow (in nested_vmx_run()), and then following that up
-with a cleanup of VMX's CR3 handling, e.g. to do proper dirty tracking
-instead of having the nested code do manual VMREADs and VMWRITEs.  I even
-went so far as to hide vcpu->arch.cr3 (put CR3 in vcpu->arch.regs), but
-things went south when I started working through the dirty tracking logic.
+Cc: stable@vger.kernel.org
+Reported-by: Reto Buerki <reet@codelabs.ch>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/nested.c | 8 ++++++++
+ arch/x86/kvm/vmx/vmx.c    | 9 ++++++---
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-Because EPT can be enabled *without* unrestricted guest, enabling EPT
-doesn't always mean GUEST_CR3 really is the guest CR3 (unlike SVM's NPT).
-And because the unrestricted guest handling of GUEST_CR3 is dependent on
-whether the guest has paging enabled, VMX can't even do a clean handoff
-based on unrestricted guest.  In a nutshell, dynamically handling the
-transitions of GUEST_CR3 ownership in VMX is a nightmare, so fixing this
-purely within the context of nested VMX turned out to be the cleanest fix.
-
-Sean Christopherson (2):
-  KVM: nVMX: Always write vmcs02.GUEST_CR3 during nested VM-Enter
-  KVM: VMX: Skip GUEST_CR3 VMREAD+VMWRITE if the VMCS is up-to-date
-
- arch/x86/kvm/vmx/nested.c |  8 ++++++++
- arch/x86/kvm/vmx/vmx.c    | 15 ++++++++++-----
- 2 files changed, 18 insertions(+), 5 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 41abc62c9a8a..971a24134081 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2418,6 +2418,14 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 				entry_failure_code))
+ 		return -EINVAL;
+ 
++	/*
++	 * Immediately write vmcs02.GUEST_CR3.  It will be propagated to vmcs12
++	 * on nested VM-Exit, which can occur without actually running L2, e.g.
++	 * if L2 is entering HLT state, and thus without hitting vmx_set_cr3().
++	 */
++	if (enable_ept)
++		vmcs_writel(GUEST_CR3, vmcs12->guest_cr3);
++
+ 	/* Late preparation of GUEST_PDPTRs now that EFER and CRs are set. */
+ 	if (load_guest_pdptrs_vmcs12 && nested_cpu_has_ept(vmcs12) &&
+ 	    is_pae_paging(vcpu)) {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d4575ffb3cec..b530950a9c2b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2985,6 +2985,7 @@ void vmx_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	unsigned long guest_cr3;
++	bool skip_cr3 = false;
+ 	u64 eptp;
+ 
+ 	guest_cr3 = cr3;
+@@ -3000,15 +3001,17 @@ void vmx_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 			spin_unlock(&to_kvm_vmx(kvm)->ept_pointer_lock);
+ 		}
+ 
+-		if (enable_unrestricted_guest || is_paging(vcpu) ||
+-		    is_guest_mode(vcpu))
++		if (is_guest_mode(vcpu))
++			skip_cr3 = true;
++		else if (enable_unrestricted_guest || is_paging(vcpu))
+ 			guest_cr3 = kvm_read_cr3(vcpu);
+ 		else
+ 			guest_cr3 = to_kvm_vmx(kvm)->ept_identity_map_addr;
+ 		ept_load_pdptrs(vcpu);
+ 	}
+ 
+-	vmcs_writel(GUEST_CR3, guest_cr3);
++	if (!skip_cr3)
++		vmcs_writel(GUEST_CR3, guest_cr3);
+ }
+ 
+ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
 -- 
 2.22.0
 
