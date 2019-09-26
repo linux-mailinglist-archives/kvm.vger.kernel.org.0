@@ -2,169 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BD60BF59E
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 17:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6403BF775
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 19:18:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727223AbfIZPOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 11:14:10 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:37239 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727209AbfIZPOK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 11:14:10 -0400
-Received: by mail-io1-f66.google.com with SMTP id b19so7516191iob.4;
-        Thu, 26 Sep 2019 08:14:09 -0700 (PDT)
+        id S1727677AbfIZRSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 13:18:32 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36925 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726029AbfIZRSb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 13:18:31 -0400
+Received: by mail-wr1-f68.google.com with SMTP id i1so3676001wro.4;
+        Thu, 26 Sep 2019 10:18:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MssJfGqFwiZbEoM1zlZJzw7b6l9jnzMrISJtN812IMw=;
-        b=miZFOhlNiZj9wBYrvD3inMkDNqgv/03t4AcXjQj2vy58QKPAeiC7S1h7B68x16WNV/
-         i1lezg04d6pVR4IRz8WyVw830gMROKU4UdL8wnoPCJuO6SnMUhwcs+nvve74gUyjCC+0
-         dEWOkaPClAf6T8s1PrbVlqv+mrCmj1k0Ah4qiy+kKDtgraf6/yaCSbKHbomFlke8r1wx
-         fBnyEFXRYlDog9LZtpdNVsigxIT+1NWnosgPw4fAH55SaUB/r/e6KHgMdTsvgZ+I87A/
-         3Q5UKNkb2fC5kBNIfAvwY+GoXGo78FhllVAulEEddtC23K3lN2LecL07/5+68vic0P64
-         wvHg==
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=G8ATWpvsPeQhyAU95P46GVmGRpo0pkchWBreGDYzCWE=;
+        b=KqkKqLFnIu9dqQ5CM5kJFw3B/WnvfuWZO2qxHridDqPjzx5ATenOPpny39CvD294pE
+         THmQ8q0FvnlmLc6fyCoZFF06RK+z9TUIvlDUlEVNzo+9wcFWmiB/m1axYi4otWr/WvW5
+         lGhXov7yRw+RTBnT/lnOCmJVEEFrssn7TzLWiV/efE/G42MsHMStGbvQYkFb2hHSqkPM
+         tm/MysLFkpLP1YfcNCyzSJFRZM77b01U0KFk63v0Z++nGCr0yfT4Wk05WQKaHuTWiCyu
+         Jg3mqVVKb0pX0RlWsVaYTdmjcnFy7ee/wqA0A45X7ODJtHir/gCkdVvVA0q0Hag018OC
+         /SPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MssJfGqFwiZbEoM1zlZJzw7b6l9jnzMrISJtN812IMw=;
-        b=WU76sRNLRM6gN4Gjm1cRNkeoIBTpRsjfY4AlGzh+zzddRFrw+xLS3L64rcaJQQFEOp
-         7KoP6M3I662uCPxL8lvTGaBxMvoXWsrpOCYToqQnvcYtMvJlM/MkkszTxKzlJGG3lh4M
-         8BnuoYkyk7SPZm7+gbqJoSf9O3CBTlktZXBTR2SDFYtsbmgr7Yn8583tmNd5Vuj1phkF
-         1UBnBR2MrJ+3n2t/RrtTOJ10nXUSjaefQU0Ch0U2ZFdePuFQ43zlVhkmBdQ1IKKHNnxD
-         z5WBm2BbbBg4jbHdvo9s9jDABGwCp7TGT2g+A7LLTc3ZibNWOtHzng6XY3e3gRWeRrMz
-         +6Fg==
-X-Gm-Message-State: APjAAAWIo/0L4qwic7HsNChUIAQRBvF4FZ/0HfimJRy3Z4xBrX6TjTl8
-        zer2o6j1SIaflasNJ8PRUElpTxrBTiEPa1B3m5s=
-X-Google-Smtp-Source: APXvYqzRpIn19KqBaKYU04aPj4mWJSsaF+aQ0+QWmOe3Z7+FA5esKkyUVbPU8f6HkvgdwnC6oeShzAoasKK/SjnjON0=
-X-Received: by 2002:a92:b743:: with SMTP id c3mr2993184ilm.237.1569510849064;
- Thu, 26 Sep 2019 08:14:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190918175109.23474.67039.stgit@localhost.localdomain>
- <20190924142342.GX23050@dhcp22.suse.cz> <CAKgT0UcYdA+LysVVO+8Beabsd-YBH+tNUKnQgaFmrZBW1xkFxA@mail.gmail.com>
- <20190926122208.GI20255@dhcp22.suse.cz>
-In-Reply-To: <20190926122208.GI20255@dhcp22.suse.cz>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Thu, 26 Sep 2019 08:13:58 -0700
-Message-ID: <CAKgT0UfMooLJ9bWAhAyyznwxcUyibJr28AaSKfYbdJkguOLcvw@mail.gmail.com>
-Subject: Re: [PATCH v10 0/6] mm / virtio: Provide support for unused page reporting
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>, Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=G8ATWpvsPeQhyAU95P46GVmGRpo0pkchWBreGDYzCWE=;
+        b=F6npoADVEQlMgzAir25gh+XTQ2Kta5HTtYmD2UcA7lIfoy38HzH1pkkqbKOUcLJHMg
+         NyTBONeIZ0s0VnCuMNPacuf9c6FMMe6yGe3ltHFESvs/wzW3jz88CJL813n6ZimPOqQe
+         hCAawew3anDbqa9tXUiuGvXViLwRvZoTazPCNyrfBd79sk03TVaCv3xPRc6AOo8dmA6S
+         hDIdW5FiXw6nyGA2niWwNLVYkunWWOhcDb8yUJkxK+BRfY575RtQcTKlYuIBc13PMWxj
+         0qNu1qrmOK+ZDZAeHJw5cojBnIdnWGxn7PUI+6ja18iVUShNk8rcBuWIu6uyL2RTx+TZ
+         IVkA==
+X-Gm-Message-State: APjAAAXPItwEvKB0hOv9TkZlt0AA0Zk4gfR+I3lWiwBgFTU+AQ5vAAl2
+        sC5FtJOFOT3grDZCCZPtIUVFr0Z1
+X-Google-Smtp-Source: APXvYqzmD5sjDJT/FzC/PxkKE9HLYAtS9TV5ircrgPv0vUA1Kjo6epfRGl/PyrlV7UFo+q17PiktvQ==
+X-Received: by 2002:a5d:6ace:: with SMTP id u14mr4147987wrw.385.1569518309013;
+        Thu, 26 Sep 2019 10:18:29 -0700 (PDT)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id v4sm4792782wrg.56.2019.09.26.10.18.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 26 Sep 2019 10:18:28 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: [PATCH 0/3] KVM: MMU: fix nested guest live migration with PML
+Date:   Thu, 26 Sep 2019 19:18:23 +0200
+Message-Id: <1569518306-46567-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 5:22 AM Michal Hocko <mhocko@kernel.org> wrote:
->
-> On Tue 24-09-19 08:20:22, Alexander Duyck wrote:
-> > On Tue, Sep 24, 2019 at 7:23 AM Michal Hocko <mhocko@kernel.org> wrote:
-> > >
-> > > On Wed 18-09-19 10:52:25, Alexander Duyck wrote:
-> > > [...]
-> > > > In order to try and keep the time needed to find a non-reported page to
-> > > > a minimum we maintain a "reported_boundary" pointer. This pointer is used
-> > > > by the get_unreported_pages iterator to determine at what point it should
-> > > > resume searching for non-reported pages. In order to guarantee pages do
-> > > > not get past the scan I have modified add_to_free_list_tail so that it
-> > > > will not insert pages behind the reported_boundary.
-> > > >
-> > > > If another process needs to perform a massive manipulation of the free
-> > > > list, such as compaction, it can either reset a given individual boundary
-> > > > which will push the boundary back to the list_head, or it can clear the
-> > > > bit indicating the zone is actively processing which will result in the
-> > > > reporting process resetting all of the boundaries for a given zone.
-> > >
-> > > Is this any different from the previous version? The last review
-> > > feedback (both from me and Mel) was that we are not happy to have an
-> > > externally imposed constrains on how the page allocator is supposed to
-> > > maintain its free lists.
-> >
-> > The main change for v10 versus v9 is that I allow the page reporting
-> > boundary to be overridden. Specifically there are two approaches that
-> > can be taken.
-> >
-> > The first is to simply reset the iterator for whatever list is
-> > updated. What this will do is reset the iterator back to list_head and
-> > then you can do whatever you want with that specific list.
->
-> OK, this is slightly better than pushing the allocator to the corner.
-> The allocator really has to be under control of its data structures.
-> I would still be happier if the allocator wouldn't really have to bother
-> about somebody snooping its internal state to do its own thing. So
-> please make sure to describe why and how much this really matters.
+Shadow paging is fundamentally incompatible with the page-modification
+log, because the GPAs in the log come from the wrong memory map.
+In particular, for the EPT page-modification log, the GPAs in the log come
+from L2 rather than L1.  (If there was a non-EPT page-modification log,
+we couldn't use it for shadow paging because it would log GVAs rather
+than GPAs).
 
-Okay I can try to do that. I suppose if nothing else I can put
-together a test patch that reverts these bits and can add
-documentation on the amount of regression seen without those bits. I
-should be able to get that taken care of and a v11 out in the next few
-days.
+Therefore, we need to rely on write protection to record dirty pages.
+This has the side effect of bypassing PML, since writes now result in an
+EPT violation vmexit.
 
-> > The other option is to simply clear the ZONE_PAGE_REPORTING_ACTIVE
-> > bit. That will essentially notify the page reporting code that any/all
-> > hints that were recorded have been discarded and that it needs to
-> > start over.
-> >
-> > All I am trying to do with this approach is reduce the work. Without
-> > doing this the code has to walk the entire free page list for the
-> > higher orders every iteration and that will not be cheap.
->
-> How expensive this will be?
+This turns out to be a surprisingly small patch---the testcase is what's
+guilty of the scary diffstat.  But that is because the KVM MMU code is
+absurdly clever, so a very close review is appreciated.
 
-Well without this I believe the work goes from being O(n) to O(n^2) as
-we would have to walk the list every time we pull the batch of pages,
-so without the iterator we end up having walk the page list
-repeatedly. I suspect it becomes more expensive the more memory we
-have. I'll be able to verify it later today once I can generate some
-numbers.
+Paolo
 
-> > Admittedly
-> > it is a bit more invasive than the cut/splice logic used in compaction
-> > which is taking the pages it has already processed and moving them to
-> > the other end of the list. However, I have reduced things so that we
-> > only really are limiting where add_to_free_list_tail can place pages,
-> > and we are having to check/push back the boundaries if a reported page
-> > is removed from a free_list.
-> >
-> > > If this is really the only way to go forward then I would like to hear
-> > > very convincing arguments about other approaches not being feasible.
-> > > There are none in this cover letter unfortunately. This will be really a
-> > > hard sell without them.
-> >
-> > So I had considered several different approaches.
->
-> Thanks this is certainly useful and it would have been even more so if
-> you gave some rough numbers to quantify how much overhead for different
-> solutions we are talking about here.
+Paolo Bonzini (3):
+  KVM: x86: assign two bits to track SPTE kinds
+  KVM: x86: fix nested guest live migration with PML
+  selftests: kvm: add test for dirty logging inside nested guests
 
-I'll see what I can do. As far as the bitmap solution I think Nitesh
-has numbers for what he has been able to get out of it. At this point
-I would assume his solution for the virtio/QEMU bits is probably
-identical to mine so it should be easier to get an apples to apples
-comparison.
+ arch/x86/include/asm/kvm_host.h                    |   7 -
+ arch/x86/kvm/mmu.c                                 |  58 ++++--
+ tools/testing/selftests/kvm/Makefile               |   1 +
+ .../selftests/kvm/include/x86_64/processor.h       |   3 +
+ tools/testing/selftests/kvm/include/x86_64/vmx.h   |  14 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c         |   2 +-
+ .../testing/selftests/kvm/lib/kvm_util_internal.h  |   3 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c       | 201 ++++++++++++++++++++-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c      | 156 ++++++++++++++++
+ 9 files changed, 424 insertions(+), 21 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
 
-Thanks.
+-- 
+1.8.3.1
 
-- Alex
