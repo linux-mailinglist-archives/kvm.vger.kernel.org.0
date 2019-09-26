@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DFADBFBC7
+	by mail.lfdr.de (Postfix) with ESMTP id 8E2A8BFBC6
 	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 01:18:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728913AbfIZXSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728924AbfIZXSj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 19:18:39 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:33586 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728929AbfIZXSi (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 26 Sep 2019 19:18:38 -0400
-Received: from mail-qk1-f201.google.com ([209.85.222.201]:47831 "EHLO
-        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728924AbfIZXSh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 19:18:37 -0400
-Received: by mail-qk1-f201.google.com with SMTP id y189so819729qkb.14
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:18:35 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id z4so512666pfn.0
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:18:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=u7wms7r+9Uw3K98byh8e1nIf7jClvzwZJK4DCYsuOWs=;
-        b=hQMEeARtS7m2tyjEcnwjGolTLGYDGgRW6YGgt4tN9iXnbREIABKj7hSIhoWMmjIEuH
-         PKy4DEcpln7oVvUXLRQjcbhSwoBWl8yfjskUWarkRHThN7Nbv/8ZdWWsgbo0xdunUVsg
-         EmY13pJ7iQmwfBPt9Cl+qdqtdbjJTA11ToDKlfBryGDbD5Bskq1uqg3lhULNV8fZaTnn
-         neCYPUjW0OGVvMtVES97rL6EG43S7XVW2dGlv4jWM+v/EUMk3zbaWfvSFLceJlqjir+y
-         SBJYpLhSeCfyk6Dp76tQ36SWSpWnidqEVPllkoM3hK1GASci/gciwGdd7+ryZXE+OpEi
-         oQgg==
+        bh=eNTPd+DTCd3OebIMAQPAzFyuA2Zn5iBi3EOKt04jDxU=;
+        b=YCq6sGeYsBo0Fs5pjpNrSPiXOqpiSKi6WQqPcN0vHF6UirDvcO/HYn0NJ3EFRIt30p
+         70y3QvbvZAuojow+ZxeJ6b0Sgh4TBwBKzliiMxVdBWWp3jT3PUKrCd+NbeiwZnQc92Ii
+         8yoszQAjrwweAD+O4kZIj1r44Gxj7wWBXaAdfX2jgA5lRY31NMowhdNrk/MttNVtgL7A
+         2W6M48RdFFziw3m4Q3Ln1zgk0LCkLutCmrUoqI6XD49nS08H5xjZ+bejpBUtNJ1tTc20
+         a6ntVpu908FjJ4hUyDumnJjVzzInPYiimcs1CdNWFPu6bdGJx9gSs+TiBKWHixe8JlCv
+         dNVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=u7wms7r+9Uw3K98byh8e1nIf7jClvzwZJK4DCYsuOWs=;
-        b=Ysu3biM/nwR1Hn0nccCdVUi7UTngorO6BKS8mY5thqKeXI8ud8odEFgfi+hjZ7b0ZQ
-         YFVV0fEtlYFV05FyFGwCe1xgPx2XbKBPCuWYnJCRCCfX1NJIF+ybLRRvX4PTNiHo4J4/
-         BhverEaJatFb1VfCvFAlS19VWUtQZ6wWCDHDvIEZLnxqrI1Mli8KDRX12RjpcYwOkRWd
-         HQb5MfOk0CwO31dZ/Ux8VYf1w2ni2mUIqEU5+1ARleW8w/g4NDblhJYIv8vu1dYdlZ+T
-         nu0RSWS2tA4vlLlMLqiEnDy2IhMX8Yy/CR3E9AkEuul7e0EZME+HM2JcZUnhPYFf8fxl
-         ER7g==
-X-Gm-Message-State: APjAAAWDqAL/cuqwmpNl2itWoZ3ubW8ciRhwQIC0HTouzeAcu6iGKzlR
-        /NzPM8bThIqeXZTOPoEI6DeKw4gmYDa7nLY5bxGLy2Jqba+HmTNdvWZPNBunvX+xnFDapXfxoRM
-        4F/b80k1hvoNztEDwZrrsdQKG3/CxL//ellCAbXfW83OybPIHsV6JOsn4v/wu
-X-Google-Smtp-Source: APXvYqzahzWsTxIn7OQmRfL+FE0xiEYyBoRHz2sC7TQTznm0XQTQzLHHr8VhT0ozV28mLEYsbfpRkX5u+I3D
-X-Received: by 2002:a0c:b999:: with SMTP id v25mr5361221qvf.80.1569539915106;
- Thu, 26 Sep 2019 16:18:35 -0700 (PDT)
-Date:   Thu, 26 Sep 2019 16:17:59 -0700
+        bh=eNTPd+DTCd3OebIMAQPAzFyuA2Zn5iBi3EOKt04jDxU=;
+        b=UG3u1mejHxy98tEj/JyPfUFxHmWtsJjJTn//5c7rLCw+64BAwySdqMPutOfsgnxxIb
+         4tqrpKJPSI6AaT1WcrJ/KITnDYhta72eKznV9mvprOkt06+VgdIhU74aPulTgfPJywBi
+         LFIAnXbLpN4ipZDou/4rlw3iwzjdr9p3nKqrS6+6eats5ziR1TPgRSoInQ2xRHgXepZM
+         LT7D2HcbSyboRR7UGwmvfKmOWcwANS7r8cL4ZYjfkBXzzVNvaHnoqO8wgTQqNZZZJpcO
+         hh/fbRyItZpnSyn29rraLuE8uwu0qTJ011V2sWMuDNipoypjgoOrGimZAP3EazbP8Wnf
+         Y0Iw==
+X-Gm-Message-State: APjAAAWuZtzUcSDGPXpkgSv+Yxe83UdysJXxtGmt2gP66UzQq3Ksxj0J
+        0b5TNXrg5ZLOXoFz+tiDLRSkggBhsKwuP6OOVj2Rg8ilt91LU0UzMJMmFGXoIDUqz9OmmVvKcFc
+        PYhg2Qc9VhfeDRXhIzHsisNDEeoN7uRm4ITtApGaciZUQ7E7JUfzVEfIywjBb
+X-Google-Smtp-Source: APXvYqxvO5MrPDXceVx9VzMqc0dmKVX6z29ss/HOncVR1XzdETw0B8MMoJ6xsI6HupVbEUGjymKn5P96iP/c
+X-Received: by 2002:a63:79c4:: with SMTP id u187mr6039593pgc.152.1569539917219;
+ Thu, 26 Sep 2019 16:18:37 -0700 (PDT)
+Date:   Thu, 26 Sep 2019 16:18:00 -0700
 In-Reply-To: <20190926231824.149014-1-bgardon@google.com>
-Message-Id: <20190926231824.149014-4-bgardon@google.com>
+Message-Id: <20190926231824.149014-5-bgardon@google.com>
 Mime-Version: 1.0
 References: <20190926231824.149014-1-bgardon@google.com>
 X-Mailer: git-send-email 2.23.0.444.g18eeb5a265-goog
-Subject: [RFC PATCH 03/28] kvm: mmu: Zero page cache memory at allocation time
+Subject: [RFC PATCH 04/28] kvm: mmu: Update the lpages stat atomically
 From:   Ben Gardon <bgardon@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -62,37 +62,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simplify use of the MMU page cache by allocating pages pre-zeroed. This
-ensures that future code does not accidentally add non-zeroed memory to
-the paging structure and moves the work of zeroing page page out from
-under the MMU lock.
+In order to pave the way for more concurrent MMU operations, updates to
+VM-global stats need to be done atomically. Change updates to the lpages
+stat to be atomic in preparation for the introduction of parallel page
+fault handling.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/x86/kvm/mmu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 7e5ab9c6e2b09..1ecd6d51c0ee0 100644
+index 1ecd6d51c0ee0..56587655aecb9 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -1037,7 +1037,7 @@ static int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache,
- 	if (cache->nobjs >= min)
- 		return 0;
- 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
--		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
- 		if (!page)
- 			return cache->nobjs >= min ? 0 : -ENOMEM;
- 		cache->objects[cache->nobjs++] = page;
-@@ -2548,7 +2548,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 		if (level > PT_PAGE_TABLE_LEVEL && need_sync)
- 			flush |= kvm_sync_pages(vcpu, gfn, &invalid_list);
+@@ -1532,7 +1532,7 @@ static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
+ 		WARN_ON(page_header(__pa(sptep))->role.level ==
+ 			PT_PAGE_TABLE_LEVEL);
+ 		drop_spte(kvm, sptep);
+-		--kvm->stat.lpages;
++		xadd(&kvm->stat.lpages, -1);
+ 		return true;
  	}
--	clear_page(sp->spt);
- 	trace_kvm_mmu_get_page(sp, true);
  
- 	kvm_mmu_flush_or_zap(vcpu, &invalid_list, false, flush);
+@@ -2676,7 +2676,7 @@ static bool mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
+ 		if (is_last_spte(pte, sp->role.level)) {
+ 			drop_spte(kvm, spte);
+ 			if (is_large_pte(pte))
+-				--kvm->stat.lpages;
++				xadd(&kvm->stat.lpages, -1);
+ 		} else {
+ 			child = page_header(pte & PT64_BASE_ADDR_MASK);
+ 			drop_parent_pte(child, spte);
+@@ -3134,7 +3134,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep, unsigned pte_access,
+ 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
+ 	trace_kvm_mmu_set_spte(level, gfn, sptep);
+ 	if (!was_rmapped && is_large_pte(*sptep))
+-		++vcpu->kvm->stat.lpages;
++		xadd(&vcpu->kvm->stat.lpages, 1);
+ 
+ 	if (is_shadow_present_pte(*sptep)) {
+ 		if (!was_rmapped) {
 -- 
 2.23.0.444.g18eeb5a265-goog
 
