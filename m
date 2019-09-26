@@ -2,117 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD3D6BF1DF
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 13:40:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C20B2BF1E9
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 13:42:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725955AbfIZLk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 07:40:28 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:49288 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725784AbfIZLk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 07:40:28 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8QBdJRK118388;
-        Thu, 26 Sep 2019 11:40:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=3ZDzS392YsOx3P3FXR8hI5rxh/lrDiequFKu9SGfspI=;
- b=HpTiezE6bMuX8zCjnOjoq7tPzxgSBfdM8GHrggwn8BJb1w9JlBeTr95cZNJszb5Kqrwe
- 6pMTPfXyprtu6DrX7ldLH5UQdsXKOlzhrt1yBN1U0UtjxAJS1IfONisXxEzERomIIXNB
- zQkxQ1+8vEKdi69i8hhjQ+cxU4PRhbg7LINgOEMXGpg+nxyoaaOoLB4PGNvbvzULmNvt
- pyKujQlj3KDwl78uWYZTopsWDhrJsYVr8X3Xe/BGRNwzkps0QyeJtxQzNe3ithOzIlLB
- m4sluANeX4WmrIDmcc5zuzydANDVj7PDtxScXFWxuc0QAPhvvMvJ9l5Hgtj6IN6Ig6XK lg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2v5cgrb06m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Sep 2019 11:40:24 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8QBdOv0131034;
-        Thu, 26 Sep 2019 11:40:24 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2v82qc47ae-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Sep 2019 11:40:23 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8QBeMKu028999;
-        Thu, 26 Sep 2019 11:40:23 GMT
-Received: from [192.168.14.112] (/79.179.213.143)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 26 Sep 2019 04:40:22 -0700
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH v3] kvm: nvmx: limit atomic switch MSRs
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190917185057.224221-1-marcorr@google.com>
-Date:   Thu, 26 Sep 2019 14:40:20 +0300
-Cc:     kvm@vger.kernel.org, jmattson@google.com, pshier@google.com,
-        sean.j.christopherson@intel.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8B36D2F5-470C-48E7-A53B-EC7E2AF4E1BF@oracle.com>
-References: <20190917185057.224221-1-marcorr@google.com>
-To:     Marc Orr <marcorr@google.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9391 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1909260112
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9391 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909260112
+        id S1726300AbfIZLmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 07:42:24 -0400
+Received: from foss.arm.com ([217.140.110.172]:47040 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725784AbfIZLmY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 07:42:24 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97FA5142F;
+        Thu, 26 Sep 2019 04:42:23 -0700 (PDT)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0C9173F67D;
+        Thu, 26 Sep 2019 04:42:18 -0700 (PDT)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com,
+        Will.Deacon@arm.com, suzuki.poulose@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        jianyong.wu@arm.com, nd@arm.com
+Subject: [RFC PATCH v4 0/6] Enable ptp_kvm for arm64
+Date:   Thu, 26 Sep 2019 19:42:07 +0800
+Message-Id: <20190926114212.5322-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+kvm ptp targets to provide high precision time sync between guest
+and host in virtualization environment. This patch enable kvm ptp
+for arm64.
+This patch set base on [1][2][3]
 
+change log:
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
 
-> On 17 Sep 2019, at 21:50, Marc Orr <marcorr@google.com> wrote:
->=20
-> Allowing an unlimited number of MSRs to be specified via the VMX
-> load/store MSR lists (e.g., vm-entry MSR load list) is bad for two
-> reasons. First, a guest can specify an unreasonable number of MSRs,
-> forcing KVM to process all of them in software. Second, the SDM bounds
-> the number of MSRs allowed to be packed into the atomic switch MSR =
-lists.
-> Quoting the "Miscellaneous Data" section in the "VMX Capability
-> Reporting Facility" appendix:
->=20
-> "Bits 27:25 is used to compute the recommended maximum number of MSRs
-> that should appear in the VM-exit MSR-store list, the VM-exit MSR-load
-> list, or the VM-entry MSR-load list. Specifically, if the value bits
-> 27:25 of IA32_VMX_MISC is N, then 512 * (N + 1) is the recommended
-> maximum number of MSRs to be included in each list. If the limit is
-> exceeded, undefined processor behavior may result (including a machine
-> check during the VMX transition)."
->=20
-> Because KVM needs to protect itself and can't model "undefined =
-processor
-> behavior", arbitrarily force a VM-entry to fail due to MSR loading =
-when
-> the MSR load list is too large. Similarly, trigger an abort during a =
-VM
-> exit that encounters an MSR load list or MSR store list that is too =
-large.
->=20
-> The MSR list size is intentionally not pre-checked so as to maintain
-> compatibility with hardware inasmuch as possible.
->=20
-> Test these new checks with the kvm-unit-test "x86: nvmx: test max =
-atomic
-> switch MSRs".
->=20
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> =E2=80=94
+[1]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=125ea89e4a21e2fc5235410f966a996a1a7148bf
+[2]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
+[3]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=6597490e005d0eeca8ed8c1c1d7b4318ee014681
 
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
+Jianyong Wu (5):
+  psci: Export psci_ops.conduit symbol as modules will use it.
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  psci: Add hvc call service for ptp_kvm.
+  ptp: arm64: Enable ptp_kvm for arm64
+  kvm: arm64: Add capability check extension for ptp_kvm
 
+ drivers/clocksource/arm_arch_timer.c | 28 +++++++++
+ drivers/firmware/psci/psci.c         |  6 ++
+ drivers/ptp/Kconfig                  |  2 +-
+ drivers/ptp/Makefile                 |  1 +
+ drivers/ptp/{ptp_kvm.c => kvm_ptp.c} | 79 +++++++------------------
+ drivers/ptp/ptp_kvm_arm64.c          | 73 +++++++++++++++++++++++
+ drivers/ptp/ptp_kvm_x86.c            | 87 ++++++++++++++++++++++++++++
+ include/asm-generic/ptp_kvm.h        | 12 ++++
+ include/linux/arm-smccc.h            | 14 ++++-
+ include/linux/psci.h                 |  1 +
+ include/uapi/linux/kvm.h             |  1 +
+ virt/kvm/arm/arm.c                   |  1 +
+ virt/kvm/arm/psci.c                  | 18 ++++++
+ 13 files changed, 262 insertions(+), 61 deletions(-)
+ rename drivers/ptp/{ptp_kvm.c => kvm_ptp.c} (63%)
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/asm-generic/ptp_kvm.h
+
+-- 
+2.17.1
 
