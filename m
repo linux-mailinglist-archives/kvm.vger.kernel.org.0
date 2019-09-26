@@ -2,119 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC035BEFA1
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 12:31:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B6A3BEFB3
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 12:34:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726087AbfIZKbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 06:31:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20269 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725208AbfIZKbK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 06:31:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1569493869;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=xCM2gmrRR22cE4S9oN112VCuGwqE6kkbJ9is9al5/Hc=;
-        b=LOX3RinaNWKrvgHRQPWpgGrp22KH9sS073aNVfIExLycveNg5LersJaX1KBBpcjluvQJ4M
-        lbo185D114bTA5mg798OqOBFEF35M7ReDW5ekidtU5aFPlcc8iJnj476zaL4w8ijwpgPAv
-        wo+I9mpF5Bir/mT/PBKXKQm/e5oyjqU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-6sQxyffKNQ2ADByEvfhpFg-1; Thu, 26 Sep 2019 06:31:08 -0400
-Received: by mail-wm1-f72.google.com with SMTP id f63so842443wma.7
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 03:31:07 -0700 (PDT)
+        id S1726151AbfIZKek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 06:34:40 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:34888 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726045AbfIZKej (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 06:34:39 -0400
+Received: by mail-oi1-f195.google.com with SMTP id x3so1654100oig.2;
+        Thu, 26 Sep 2019 03:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VXeaVOM54zatWXZ5qzke97zx1OY9L8LMNKUJXVt61MY=;
+        b=iJN0hGEaZGRHJ14GvmbCNXnDrCoeeLx4fe97E/cpDmg6w2uGQYVipwWQqDd53JIdM+
+         vs9jAiYVoa75JSlvm8LX50eorTh3fuKVoZQK9146Km+UNiu1sP1TYrwX/adpvXOoRzeC
+         uV6qbVwBxWTTzt2DCMgXDc+m2Ct4L2+UkEOXjM2Gi06p3iU4lLDv0mQFwnDWcKttohpI
+         0zvZa+xcT0Wj9KCR65w8hezyt5Zk3VH4oeDSe0/cIxM+T1NlG6+1etqtmijjV4BIGZfy
+         jQy+Qa7Sy4KIOXDPrGWq+f9eSxOc6uvLgl5k37XtJop+H/Ir53uQGHN9ILVFmCQZm5FE
+         WccA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dN2dNZ9PUSilO2/uPSojApb2GOkA+z7Wzm+fd/NDSCM=;
-        b=ZWz7JxYj2r22qL6UkE7R/yG8XxIxVPV/8HRbbssxTjE3JXdF7xwelCSfTO7CQ2E/Y9
-         dArp3uRDidWYod0AQkPZChOPayrqpj756WtgDJgTlrE/OZ88ISJ1CpR5tu2r9zoQqwM4
-         soieYfsXG5iO1l0nFL2HuvlLU8QhQc7cjdFx3eneG+LpVaLJnaPGKDIw4CZAZ8SytKAZ
-         gkL/PC4PEG4sWDf1lqhZxG/SqkZTQAhozXejOe+WiGpbxG1dknMvm9ixdjtPqsSzdmb3
-         oFLtDLMYMyDrvop9hrV7m9UUGNvHPFTl3i/NNoFxRCyALkkqjBQOZtc9klgTXmgpwxh7
-         SESw==
-X-Gm-Message-State: APjAAAVeI5QZev0i/y4YaTArfwnZu4n26ISoGLJF/nxdaYrzOJ+LDY35
-        ypn2N5UC6epmZU4lhiuITjfQ+8b5fqw40Xgp8vzpdizFI0oMBgTgM5O9Mbe+q4IvlxJy+wGYDrj
-        pWT8btpRPgO9f
-X-Received: by 2002:adf:f0c7:: with SMTP id x7mr2484763wro.2.1569493866751;
-        Thu, 26 Sep 2019 03:31:06 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxBvPo16QpIFnZEqAn1jL1Z6+eR77EJr8DDLEUtMfwMbC/U2nbiQRObc/rrpVNY+cHSt72gDQ==
-X-Received: by 2002:adf:f0c7:: with SMTP id x7mr2484724wro.2.1569493866164;
-        Thu, 26 Sep 2019 03:31:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id p7sm2432548wma.34.2019.09.26.03.31.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2019 03:31:05 -0700 (PDT)
-Subject: Re: [PATCH 2/2] kvm: x86: Use AMD CPUID semantics for AMD vCPUs
-To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Cc:     Marc Orr <marcorr@google.com>, Peter Shier <pshier@google.com>,
-        Jacob Xu <jacobhxu@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20190926000418.115956-1-jmattson@google.com>
- <20190926000418.115956-2-jmattson@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f678b935-bd80-6935-f686-9dc94d9b111d@redhat.com>
-Date:   Thu, 26 Sep 2019 12:31:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VXeaVOM54zatWXZ5qzke97zx1OY9L8LMNKUJXVt61MY=;
+        b=dqgWtOaUEaYmCDrUusk20S3VYFHIElT3iJvz2MmFzeVQ/jvbqmz8d1C+sYbQ40ZSFi
+         R5XKaZSne5EjtFH+5X7cP1NGtzWvHZphzJX/lVrFBl+eTvn1qjFVbeZ2Tku0+v5Zeg1X
+         7fqFstUYBBOuhJDUdCmj0CBO1YLxYPgWoPHEW+XJmBJ+QEDO4yFosad+GVKazYbFkR5J
+         YzzM5a1/SlM4EnkZAgwVsdCz28bqev5FUmB04tXhBilKTMs7yTjCT9Evij+o3/WYrW3V
+         VusQGfOyht+Efbb11079yOkMgsse8ePjNn9wSEIRRghWOrJ9LATYd5rlZb+CbBPVq1+g
+         bU7A==
+X-Gm-Message-State: APjAAAXNZl9d7gdjkmL4lEaxs4ve4abNwlQ9UPTwboJ6jIx7MkuLYfrI
+        3VMVnJkPqjximAj3paNe9n8Dp3LEL+WtwEwc+Ag=
+X-Google-Smtp-Source: APXvYqycDnwsock1UK2R5fmGlztj1V/5cvdqMfIleUEMrrjwaZhtHzAXaI7ImgqJE70hAfx6Lg8pEcoOlHvbMKtQJ8E=
+X-Received: by 2002:a05:6808:8da:: with SMTP id k26mr2063957oij.5.1569494079433;
+ Thu, 26 Sep 2019 03:34:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190926000418.115956-2-jmattson@google.com>
-Content-Language: en-US
-X-MC-Unique: 6sQxyffKNQ2ADByEvfhpFg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <1569459243-21950-1-git-send-email-wanpengli@tencent.com> <ea06c6bb-c6ff-ef34-55ca-c58cb77ed39e@redhat.com>
+In-Reply-To: <ea06c6bb-c6ff-ef34-55ca-c58cb77ed39e@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 26 Sep 2019 18:34:26 +0800
+Message-ID: <CANRm+CySCXpn=CUnfUYf+r4aAFOOVscryLQqDnYhTstb4Hv=Hw@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: LAPIC: Loose fluctuation filter for auto tune lapic_timer_advance_ns
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/09/19 02:04, Jim Mattson wrote:
-> When the guest CPUID information represents an AMD vCPU, return all
-> zeroes for queries of undefined CPUID leaves, whether or not they are
-> in range.
->=20
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Fixes: bd22f5cfcfe8f6 ("KVM: move and fix substitue search for missing CP=
-UID entries")
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Reviewed-by: Jacob Xu <jacobhxu@google.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/cpuid.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 35e2f930a4b79..0377d2820a7aa 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -988,9 +988,11 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 =
-*ebx,
->  =09/*
->  =09 * Intel CPUID semantics treats any query for an out-of-range
->  =09 * leaf as if the highest basic leaf (i.e. CPUID.0H:EAX) were
-> -=09 * requested.
-> +=09 * requested. AMD CPUID semantics returns all zeroes for any
-> +=09 * undefined leaf, whether or not the leaf is in range.
->  =09 */
-> -=09if (!entry && check_limit && !cpuid_function_in_range(vcpu, function)=
-) {
-> +=09if (!entry && check_limit && !guest_cpuid_is_amd(vcpu) &&
-> +=09    !cpuid_function_in_range(vcpu, function)) {
->  =09=09max =3D kvm_find_cpuid_entry(vcpu, 0, 0);
->  =09=09if (max) {
->  =09=09=09function =3D max->eax;
->=20
+On Thu, 26 Sep 2019 at 18:25, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 26/09/19 02:54, Wanpeng Li wrote:
+> > -#define LAPIC_TIMER_ADVANCE_ADJUST_MIN 100
+> > -#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 5000
+> > -#define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
+> > +#define LAPIC_TIMER_ADVANCE_EXPIRE_MIN       100
+> > +#define LAPIC_TIMER_ADVANCE_EXPIRE_MAX       10000
+> > +#define LAPIC_TIMER_ADVANCE_NS_INIT  1000
+> > +#define LAPIC_TIMER_ADVANCE_NS_MAX     5000
+>
+> I think the old #define value is good.  What about:
+>
+> -#define LAPIC_TIMER_ADVANCE_ADJUST_MIN 100
+> -#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 5000
+> -#define LAPIC_TIMER_ADVANCE_ADJUST_INIT 1000
+> +#define LAPIC_TIMER_ADVANCE_ADJUST_MIN 100     /* clock cycles */
+> +#define LAPIC_TIMER_ADVANCE_ADJUST_MAX 10000   /* clock cycles */
+> +#define LAPIC_TIMER_ADVANCE_NS_INIT    1000
+> +#define LAPIC_TIMER_ADVANCE_NS_MAX     5000
 
-Queued both, thanks.
+Looks good, I guess you can update the patch during apply. :)
 
-Paolo
-
+    Wanpeng
