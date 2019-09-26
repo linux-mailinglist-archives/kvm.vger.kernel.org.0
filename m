@@ -2,125 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 26A11BF2D5
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 14:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9310ABF3AE
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 15:06:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726203AbfIZMWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 08:22:14 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55872 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725768AbfIZMWO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 08:22:14 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id DA408B11E;
-        Thu, 26 Sep 2019 12:22:10 +0000 (UTC)
-Date:   Thu, 26 Sep 2019 14:22:08 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>, Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Subject: Re: [PATCH v10 0/6] mm / virtio: Provide support for unused page
- reporting
-Message-ID: <20190926122208.GI20255@dhcp22.suse.cz>
-References: <20190918175109.23474.67039.stgit@localhost.localdomain>
- <20190924142342.GX23050@dhcp22.suse.cz>
- <CAKgT0UcYdA+LysVVO+8Beabsd-YBH+tNUKnQgaFmrZBW1xkFxA@mail.gmail.com>
+        id S1726473AbfIZNGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 09:06:17 -0400
+Received: from foss.arm.com ([217.140.110.172]:49152 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725877AbfIZNGR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 09:06:17 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 58226142F;
+        Thu, 26 Sep 2019 06:06:16 -0700 (PDT)
+Received: from dawn-kernel.cambridge.arm.com (unknown [10.1.197.116])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B6E63F763;
+        Thu, 26 Sep 2019 06:06:14 -0700 (PDT)
+Subject: Re: [RFC PATCH v4 2/5] ptp: Reorganize ptp_kvm modules to make it
+ arch-independent.
+To:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
+        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
+        Will.Deacon@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        nd@arm.com
+References: <20190926114212.5322-1-jianyong.wu@arm.com>
+ <20190926114212.5322-3-jianyong.wu@arm.com>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <2f338b57-b0b2-e439-6089-72e5f5e4f017@arm.com>
+Date:   Thu, 26 Sep 2019 14:06:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0UcYdA+LysVVO+8Beabsd-YBH+tNUKnQgaFmrZBW1xkFxA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190926114212.5322-3-jianyong.wu@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue 24-09-19 08:20:22, Alexander Duyck wrote:
-> On Tue, Sep 24, 2019 at 7:23 AM Michal Hocko <mhocko@kernel.org> wrote:
-> >
-> > On Wed 18-09-19 10:52:25, Alexander Duyck wrote:
-> > [...]
-> > > In order to try and keep the time needed to find a non-reported page to
-> > > a minimum we maintain a "reported_boundary" pointer. This pointer is used
-> > > by the get_unreported_pages iterator to determine at what point it should
-> > > resume searching for non-reported pages. In order to guarantee pages do
-> > > not get past the scan I have modified add_to_free_list_tail so that it
-> > > will not insert pages behind the reported_boundary.
-> > >
-> > > If another process needs to perform a massive manipulation of the free
-> > > list, such as compaction, it can either reset a given individual boundary
-> > > which will push the boundary back to the list_head, or it can clear the
-> > > bit indicating the zone is actively processing which will result in the
-> > > reporting process resetting all of the boundaries for a given zone.
-> >
-> > Is this any different from the previous version? The last review
-> > feedback (both from me and Mel) was that we are not happy to have an
-> > externally imposed constrains on how the page allocator is supposed to
-> > maintain its free lists.
-> 
-> The main change for v10 versus v9 is that I allow the page reporting
-> boundary to be overridden. Specifically there are two approaches that
-> can be taken.
-> 
-> The first is to simply reset the iterator for whatever list is
-> updated. What this will do is reset the iterator back to list_head and
-> then you can do whatever you want with that specific list.
+Hi Jianyong,
 
-OK, this is slightly better than pushing the allocator to the corner.
-The allocator really has to be under control of its data structures.
-I would still be happier if the allocator wouldn't really have to bother
-about somebody snooping its internal state to do its own thing. So
-please make sure to describe why and how much this really matters.
- 
-> The other option is to simply clear the ZONE_PAGE_REPORTING_ACTIVE
-> bit. That will essentially notify the page reporting code that any/all
-> hints that were recorded have been discarded and that it needs to
-> start over.
+On 26/09/2019 12:42, Jianyong Wu wrote:
+> Currently, ptp_kvm modules implementation is only for x86 which includs
+> large part of arch-specific code.  This patch move all of those code
+> into new arch related file in the same directory.
 > 
-> All I am trying to do with this approach is reduce the work. Without
-> doing this the code has to walk the entire free page list for the
-> higher orders every iteration and that will not be cheap.
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>   drivers/ptp/Makefile                 |  1 +
+>   drivers/ptp/{ptp_kvm.c => kvm_ptp.c} | 77 ++++++------------------
+>   drivers/ptp/ptp_kvm_x86.c            | 87 ++++++++++++++++++++++++++++
+>   include/asm-generic/ptp_kvm.h        | 12 ++++
+>   4 files changed, 118 insertions(+), 59 deletions(-)
+>   rename drivers/ptp/{ptp_kvm.c => kvm_ptp.c} (63%)
 
-How expensive this will be?
+minor nit: Could we not skip renaming the file ? Given
+you are following the ptp_kvm_* for the arch specific
+files and the header files, wouldn't it be good to
+keep ptp_kvm.c ?
 
-> Admittedly
-> it is a bit more invasive than the cut/splice logic used in compaction
-> which is taking the pages it has already processed and moving them to
-> the other end of the list. However, I have reduced things so that we
-> only really are limiting where add_to_free_list_tail can place pages,
-> and we are having to check/push back the boundaries if a reported page
-> is removed from a free_list.
-> 
-> > If this is really the only way to go forward then I would like to hear
-> > very convincing arguments about other approaches not being feasible.
-> > There are none in this cover letter unfortunately. This will be really a
-> > hard sell without them.
-> 
-> So I had considered several different approaches.
+Rest looks fine.
 
-Thanks this is certainly useful and it would have been even more so if
-you gave some rough numbers to quantify how much overhead for different
-solutions we are talking about here.
--- 
-Michal Hocko
-SUSE Labs
+Cheers
+Suzuki
