@@ -2,272 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ECDBBE9EC
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 03:11:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79448BEA42
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 03:39:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729556AbfIZBLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 21:11:32 -0400
-Received: from mail-eopbgr680130.outbound.protection.outlook.com ([40.107.68.130]:42460
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725943AbfIZBLc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 21:11:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gXs5Y6X8Muf9QDYugqPTjcIChuSZMOs4fP2GuvKQjCwk57LdKoGo/4b0V/0uJA9+d+ed4hGciuzFCHlBHVaN8Xzx6kj0DRdKkMPoE5TLrKe7UMBSDEEJbSn16S5GtGOvgCZIqx3jvpB2lppgY6i9WWNlv1m+5I6o3/RV/Ol+z/072iyjnN580HTdr5m8nFynOBScY1L5ZpwpTNzpCy+Mt94zfQEMvujS112Z5X7jcLbRuXctI8L6bBc5MTWajhk4g8E3mgC2kM+RFQCjhy8a6kvSf3M+Q0gl47gaFtMr1RSoqhA0sj96dM96qpyRXGMN5gEFLI9MQjlEmhRY11fxyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kaSt70zK0SQxbnC2gp4oZ7f1ncDlx8JQAZhaoL/VWHI=;
- b=VkOKNsNG0sdT6V0FNxiZVED+wmWU60zSrrTytgHudHZl9Egp16c6+ULcGclF/qJiOVrxLLDewp/UizlIoLMVlIp/VtVrJELka7BDxXU1CEDubux3Gtl3NhQfHWwE5RXq5vhceMa8j+m9yPYYna3ugIiFCXl8KhgVhFNy4yv35hRQLEg1Hofv2gNm2oToEUBhFuE5AHpY/5Lfd6vxk49OIvRpQQi28hBb7TK8zK/4NzpM7OfYREhKxXSrj/HQNsJR7TJtQar5rYyL+J8HoEDGyG+iYiQbE6Tkkef6WU4uG+BUHG8Bm16j9w6ybkK1RZgqkOIjOr0jscpa4OY/dNYbDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kaSt70zK0SQxbnC2gp4oZ7f1ncDlx8JQAZhaoL/VWHI=;
- b=JxD1ijDTa1XQuiyc1pYCVItCE0CMvaWMJHZc7ymSYpjqREFlZum4R9EekZw5hBOz7rw4GvUt1+DAPzTGhUCJjangABLbpJzyLHG3SrU1chysBW7+35EdnAHPnfhL2QV3MVzISo5yWdFHt1yljTul961GRCjrJhwwe6Z56tnRRq8=
-Received: from SN6PR2101MB0942.namprd21.prod.outlook.com (52.132.114.19) by
- SN6PR2101MB0974.namprd21.prod.outlook.com (52.132.114.27) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2327.6; Thu, 26 Sep 2019 01:11:27 +0000
-Received: from SN6PR2101MB0942.namprd21.prod.outlook.com
- ([fe80::7d1a:ddb:3473:b383]) by SN6PR2101MB0942.namprd21.prod.outlook.com
- ([fe80::7d1a:ddb:3473:b383%9]) with mapi id 15.20.2327.004; Thu, 26 Sep 2019
- 01:11:27 +0000
-From:   Dexuan Cui <decui@microsoft.com>
-To:     "davem@davemloft.net" <davem@davemloft.net>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "sashal@kernel.org" <sashal@kernel.org>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "deepa.kernel@gmail.com" <deepa.kernel@gmail.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        "ytht.net@gmail.com" <ytht.net@gmail.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        id S2391352AbfIZBjH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 21:39:07 -0400
+Received: from mga03.intel.com ([134.134.136.65]:5786 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391342AbfIZBjG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 21:39:06 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 18:39:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,549,1559545200"; 
+   d="scan'208";a="201449048"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
+  by orsmga002.jf.intel.com with ESMTP; 25 Sep 2019 18:39:03 -0700
+Cc:     baolu.lu@linux.intel.com, "Raj, Ashok" <ashok.raj@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        "sgarzare@redhat.com" <sgarzare@redhat.com>,
-        "jhansen@vmware.com" <jhansen@vmware.com>
-Subject: [PATCH net v2] vsock: Fix a lockdep warning in __vsock_release()
-Thread-Topic: [PATCH net v2] vsock: Fix a lockdep warning in __vsock_release()
-Thread-Index: AQHVdAdSHQkvUaSfZES8M2hNpnvQKg==
-Date:   Thu, 26 Sep 2019 01:11:27 +0000
-Message-ID: <1569460241-57800-1-git-send-email-decui@microsoft.com>
-Reply-To: Dexuan Cui <decui@microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: MWHPR08CA0012.namprd08.prod.outlook.com
- (2603:10b6:301:5f::25) To SN6PR2101MB0942.namprd21.prod.outlook.com
- (2603:10b6:805:4::19)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=decui@microsoft.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 1.8.3.1
-x-originating-ip: [13.77.154.182]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7f6e13ac-ba2a-48c6-f94c-08d7421e74cb
-x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: SN6PR2101MB0974:|SN6PR2101MB0974:
-x-ms-exchange-transport-forked: True
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <SN6PR2101MB0974D0D64A0501309E9947C0BF860@SN6PR2101MB0974.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1468;
-x-forefront-prvs: 0172F0EF77
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(396003)(346002)(376002)(366004)(39860400002)(199004)(189003)(8936002)(66556008)(6436002)(81166006)(110136005)(81156014)(8676002)(2906002)(386003)(66946007)(6486002)(6506007)(476003)(66446008)(2201001)(66476007)(6306002)(10090500001)(52116002)(64756008)(7736002)(43066004)(50226002)(2616005)(4720700003)(22452003)(486006)(316002)(99286004)(14444005)(25786009)(66066001)(36756003)(5660300002)(1511001)(102836004)(86362001)(6116002)(3846002)(6512007)(71200400001)(14454004)(2501003)(966005)(256004)(3450700001)(71190400001)(186003)(26005)(10290500003)(305945005)(7416002)(478600001)(921003)(1121003);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR2101MB0974;H:SN6PR2101MB0942.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: zDxKH2hFQEvMhjrZEF6zg0k78XYP2yRBjwo0c5xeoumDjIO7UQjo3yg+NrxpmhhhUxR3zLZsGsm4ZGF/qz63wNfy4whHhLE2uiQKiX8ggh0fJuq/pjajlYUGk9SZAF9v+DbIEa7ghUMxrLXO0EQioLqVi4nVuxuhzr6BFhhC9qzPSVFq2BvwOz2zM1rmVQIlbFqmHw7Xf/4tNEjoR9UJki6m+2AJ6726FcZphevqkHFlIdIb1cZftH6cmtqWRimebAnF7S9lhKxt8HrY3+jBdkq7E6yWHW2veIgtCTSQybX9QrL0hLzX14hqFeyOY/3Fry3dKPVJBsSPGsk5WEzkahztWO0T7ZfK0tfwoItYhS1Bxaivgm2wTa9ONAeMwS+YBu9ub6nnMhYSrn4fp1qfKpx6HPIyXOQR6xAi7mfCjj7GUVoZvvYGfxMc63n2USBTj20vVBshkLcYrtyvNwBLzQ==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [RFC PATCH 0/4] Use 1st-level for DMA remapping in guest
+To:     Peter Xu <peterx@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>
+References: <20190923122454.9888-1-baolu.lu@linux.intel.com>
+ <20190923122715.53de79d0@jacob-builder>
+ <20190923202552.GA21816@araj-mobl1.jf.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D58D1F1@SHSMSX104.ccr.corp.intel.com>
+ <dfd9b7a2-5553-328a-08eb-16c8a3a2644e@linux.intel.com>
+ <20190925065640.GO28074@xz-x1>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D58F4A3@SHSMSX104.ccr.corp.intel.com>
+ <20190925074507.GP28074@xz-x1>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D58F5F5@SHSMSX104.ccr.corp.intel.com>
+ <20190925085204.GR28074@xz-x1>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <b14a39f3-6aba-8fd2-757a-c244dcbe7b6b@linux.intel.com>
+Date:   Thu, 26 Sep 2019 09:37:05 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f6e13ac-ba2a-48c6-f94c-08d7421e74cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2019 01:11:27.5779
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pDTK7QoOE/3Eq07vl5g7UEagi9bAe+QSzq43Uw/S5PYwHxGB8nniP05dIHeupm6dTXD990pv9/7oJs/YWKdH0w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR2101MB0974
+In-Reply-To: <20190925085204.GR28074@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Lockdep is unhappy if two locks from the same class are held.
+Hi Peter,
 
-Fix the below warning for hyperv and virtio sockets (vmci socket code
-doesn't have the issue) by using lock_sock_nested() when __vsock_release()
-is called recursively:
+On 9/25/19 4:52 PM, Peter Xu wrote:
+> On Wed, Sep 25, 2019 at 08:02:23AM +0000, Tian, Kevin wrote:
+>>> From: Peter Xu [mailto:peterx@redhat.com]
+>>> Sent: Wednesday, September 25, 2019 3:45 PM
+>>>
+>>> On Wed, Sep 25, 2019 at 07:21:51AM +0000, Tian, Kevin wrote:
+>>>>> From: Peter Xu [mailto:peterx@redhat.com]
+>>>>> Sent: Wednesday, September 25, 2019 2:57 PM
+>>>>>
+>>>>> On Wed, Sep 25, 2019 at 10:48:32AM +0800, Lu Baolu wrote:
+>>>>>> Hi Kevin,
+>>>>>>
+>>>>>> On 9/24/19 3:00 PM, Tian, Kevin wrote:
+>>>>>>>>>>        '-----------'
+>>>>>>>>>>        '-----------'
+>>>>>>>>>>
+>>>>>>>>>> This patch series only aims to achieve the first goal, a.k.a using
+>>>>>>> first goal? then what are other goals? I didn't spot such information.
+>>>>>>>
+>>>>>>
+>>>>>> The overall goal is to use IOMMU nested mode to avoid shadow page
+>>>>> table
+>>>>>> and VMEXIT when map an gIOVA. This includes below 4 steps (maybe
+>>> not
+>>>>>> accurate, but you could get the point.)
+>>>>>>
+>>>>>> 1) GIOVA mappings over 1st-level page table;
+>>>>>> 2) binding vIOMMU 1st level page table to the pIOMMU;
+>>>>>> 3) using pIOMMU second level for GPA->HPA translation;
+>>>>>> 4) enable nested (a.k.a. dual stage) translation in host.
+>>>>>>
+>>>>>> This patch set aims to achieve 1).
+>>>>>
+>>>>> Would it make sense to use 1st level even for bare-metal to replace
+>>>>> the 2nd level?
+>>>>>
+>>>>> What I'm thinking is the DPDK apps - they have MMU page table already
+>>>>> there for the huge pages, then if they can use 1st level as the
+>>>>> default device page table then it even does not need to map, because
+>>>>> it can simply bind the process root page table pointer to the 1st
+>>>>> level page root pointer of the device contexts that it uses.
+>>>>>
+>>>>
+>>>> Then you need bear with possible page faults from using CPU page
+>>>> table, while most devices don't support it today.
+>>>
+>>> Right, I was just thinking aloud.  After all neither do we have IOMMU
+>>> hardware to support 1st level (or am I wrong?)...  It's just that when
+>>
+>> You are right. Current VT-d supports only 2nd level.
+>>
+>>> the 1st level is ready it should sound doable because IIUC PRI should
+>>> be always with the 1st level support no matter on IOMMU side or the
+>>> device side?
+>>
+>> No. PRI is not tied to 1st or 2nd level. Actually from device p.o.v, it's
+>> just a protocol to trigger page fault, but the device doesn't care whether
+>> the page fault is on 1st or 2nd level in the IOMMU side. The only
+>> relevant part is that a PRI request can have PASID tagged or cleared.
+>> When it's tagged with PASID, the IOMMU will locate the translation
+>> table under the given PASID (either 1st or 2nd level is fine, according
+>> to PASID entry setting). When no PASID is included, the IOMMU locates
+>> the translation from default entry (e.g. PASID#0 or any PASID contained
+>> in RID2PASID in VT-d).
+>>
+>> Your knowledge happened to be correct in deprecated ECS mode. At
+>> that time, there is only one 2nd level per context entry which doesn't
+>> support page fault, and there is only one 1st level per PASID entry which
+>> supports page fault. Then PRI could be indirectly connected to 1st level,
+>> but this just changed with new scalable mode.
+>>
+>> Another note is that the PRI capability only indicates that a device is
+>> capable of handling page faults, but not that a device can tolerate
+>> page fault for any of its DMA access. If the latter is fasle, using CPU
+>> page table for DPDK usage is still risky (and specific to device behavior)
+>>
+>>>
+>>> I'm actually not sure about whether my understanding here is
+>>> correct... I thought the pasid binding previously was only for some
+>>> vendor kernel drivers but not a general thing to userspace.  I feel
+>>> like that should be doable in the future once we've got some new
+>>> syscall interface ready to deliver 1st level page table (e.g., via
+>>> vfio?) then applications like DPDK seems to be able to use that too
+>>> even directly via bare metal.
+>>>
+>>
+>> using 1st level for userspace is different from supporting DMA page
+>> fault in userspace. The former is purely about which structure to
+>> keep the mapping. I think we may do the same thing for both bare
+>> metal and guest (using 2nd level only for GPA when nested is enabled
+>> on the IOMMU). But reusing CPU page table for userspace is more
+>> tricky. :-)
+> 
+> Yes I should have mixed up the 1st level page table and PRI a bit, and
+> after all my initial question should be irrelevant to this series as
+> well so it's already a bit out of topic (sorry for that).
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-WARNING: possible recursive locking detected
-5.3.0+ #1 Not tainted
---------------------------------------------
-server/1795 is trying to acquire lock:
-ffff8880c5158990 (sk_lock-AF_VSOCK){+.+.}, at: hvs_release+0x10/0x120 [hv_s=
-ock]
+Never mind. Good discussion. :-)
 
-but task is already holding lock:
-ffff8880c5158150 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x2e/0xf0 [v=
-sock]
+Actually I have plan to use 1st level on bare metal as well. Just
+looking forward to more motivation and use cases.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
+> 
+> And, thanks for explaining these. :)
+> 
 
-       CPU0
-       ----
-  lock(sk_lock-AF_VSOCK);
-  lock(sk_lock-AF_VSOCK);
+Thanks for Kevin's explanation. :-)
 
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by server/1795:
- #0: ffff8880c5d05ff8 (&sb->s_type->i_mutex_key#10){+.+.}, at: __sock_relea=
-se+0x2d/0xa0
- #1: ffff8880c5158150 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x2e/0x=
-f0 [vsock]
-
-stack backtrace:
-CPU: 5 PID: 1795 Comm: server Not tainted 5.3.0+ #1
-Call Trace:
- dump_stack+0x67/0x90
- __lock_acquire.cold.67+0xd2/0x20b
- lock_acquire+0xb5/0x1c0
- lock_sock_nested+0x6d/0x90
- hvs_release+0x10/0x120 [hv_sock]
- __vsock_release+0x24/0xf0 [vsock]
- __vsock_release+0xa0/0xf0 [vsock]
- vsock_release+0x12/0x30 [vsock]
- __sock_release+0x37/0xa0
- sock_close+0x14/0x20
- __fput+0xc1/0x250
- task_work_run+0x98/0xc0
- do_exit+0x344/0xc60
- do_group_exit+0x47/0xb0
- get_signal+0x15c/0xc50
- do_signal+0x30/0x720
- exit_to_usermode_loop+0x50/0xa0
- do_syscall_64+0x24e/0x270
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x7f4184e85f31
-
-Signed-off-by: Dexuan Cui <decui@microsoft.com>
----
-
-NOTE: I only tested the code on Hyper-V. I can not test the code for
-virtio socket, as I don't have a KVM host. :-( Sorry.
-
-@Stefan, @Stefano: please review & test the patch for virtio socket,
-and let me know if the patch breaks anything. Thanks!
-
-Changes in v2:
-  Avoid the duplication of code in v1: https://lkml.org/lkml/2019/8/19/1361
-  Also fix virtio socket code.
-
- net/vmw_vsock/af_vsock.c                | 19 +++++++++++++++----
- net/vmw_vsock/hyperv_transport.c        |  2 +-
- net/vmw_vsock/virtio_transport_common.c |  2 +-
- 3 files changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index ab47bf3ab66e..dbae4373cbab 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -638,8 +638,10 @@ struct sock *__vsock_create(struct net *net,
- }
- EXPORT_SYMBOL_GPL(__vsock_create);
-=20
--static void __vsock_release(struct sock *sk)
-+static void __vsock_release(struct sock *sk, int level)
- {
-+	WARN_ON(level !=3D 1 && level !=3D 2);
-+
- 	if (sk) {
- 		struct sk_buff *skb;
- 		struct sock *pending;
-@@ -648,9 +650,18 @@ static void __vsock_release(struct sock *sk)
- 		vsk =3D vsock_sk(sk);
- 		pending =3D NULL;	/* Compiler warning. */
-=20
-+		/* The release call is supposed to use lock_sock_nested()
-+		 * rather than lock_sock(), if a sock lock should be acquired.
-+		 */
- 		transport->release(vsk);
-=20
--		lock_sock(sk);
-+		/* When "level" is 2, use the nested version to avoid the
-+		 * warning "possible recursive locking detected".
-+		 */
-+		if (level =3D=3D 1)
-+			lock_sock(sk);
-+		else
-+			lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
- 		sock_orphan(sk);
- 		sk->sk_shutdown =3D SHUTDOWN_MASK;
-=20
-@@ -659,7 +670,7 @@ static void __vsock_release(struct sock *sk)
-=20
- 		/* Clean up any sockets that never were accepted. */
- 		while ((pending =3D vsock_dequeue_accept(sk)) !=3D NULL) {
--			__vsock_release(pending);
-+			__vsock_release(pending, 2);
- 			sock_put(pending);
- 		}
-=20
-@@ -708,7 +719,7 @@ EXPORT_SYMBOL_GPL(vsock_stream_has_space);
-=20
- static int vsock_release(struct socket *sock)
- {
--	__vsock_release(sock->sk);
-+	__vsock_release(sock->sk, 1);
- 	sock->sk =3D NULL;
- 	sock->state =3D SS_FREE;
-=20
-diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transp=
-ort.c
-index 261521d286d6..c443db7af8d4 100644
---- a/net/vmw_vsock/hyperv_transport.c
-+++ b/net/vmw_vsock/hyperv_transport.c
-@@ -559,7 +559,7 @@ static void hvs_release(struct vsock_sock *vsk)
- 	struct sock *sk =3D sk_vsock(vsk);
- 	bool remove_sock;
-=20
--	lock_sock(sk);
-+	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
- 	remove_sock =3D hvs_close_lock_held(vsk);
- 	release_sock(sk);
- 	if (remove_sock)
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio=
-_transport_common.c
-index 5bb70c692b1e..a666ef8fc54e 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -820,7 +820,7 @@ void virtio_transport_release(struct vsock_sock *vsk)
- 	struct sock *sk =3D &vsk->sk;
- 	bool remove_sock =3D true;
-=20
--	lock_sock(sk);
-+	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
- 	if (sk->sk_type =3D=3D SOCK_STREAM)
- 		remove_sock =3D virtio_transport_close(vsk);
-=20
---=20
-2.19.1
-
+Best regards,
+Baolu
