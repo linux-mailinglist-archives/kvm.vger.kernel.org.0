@@ -2,107 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B6C9BF0E4
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 13:12:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC5EEBF139
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 13:24:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbfIZLM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 07:12:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40160 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725787AbfIZLM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 07:12:29 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0F7945AFF8
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 11:12:29 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id v18so787431wro.16
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 04:12:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UPVi3tI8CEMemOHf/10he6CY8X+DfeIz3MO+IJsehU0=;
-        b=JaQRg2C0bJ2E8bafmdDOBKErSYq/ri44cvnM163865lsTm+FcuVf05/zUJxQ7CM9J/
-         /V7+Jn9+qE5ZXYS06YQFwx/p12s0PMAOIl+yf3oOM3qk5t0FQxeqtvmnX8YYc78j+IG1
-         TznChczx3QQcCIHNhEVdAKPx2rJP/6IVcUjvUP6pl7M5a9JaXRJykXkECMMSwSzXl+me
-         1iFTo0DOsNUiV9JK3npmvjRJsBSNmtQ17kA9gc8iFn47n7PnOutpoHeegJL2zPP0uz7M
-         MZeVCjV5a7mPatiujXZsEphA6swqdsrVrd+VO29kuUZqMIda/bWlfYUuQW8xXN9MGGTf
-         gMpg==
-X-Gm-Message-State: APjAAAWXQSPjMXMGlGsp8VD6nbKfJzQ4SLr9XkA2sneIlSirzeZsO7TT
-        1XNZ6BLLmzwRUvkQHNTZW/49JhFqihTyyTTgY3R2bivBag0G8zjXeJHvpBNlERGxjmmsQR71G03
-        KAdo2I5M7Jc5J
-X-Received: by 2002:a7b:cd08:: with SMTP id f8mr2301019wmj.87.1569496347646;
-        Thu, 26 Sep 2019 04:12:27 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwYAIxJxco55ohaG5xtpGpLhZETW7NdZfp6F+5aWwyURr6YjlwB8rYcUNivGMCuXE7oSiCKkw==
-X-Received: by 2002:a7b:cd08:: with SMTP id f8mr2300996wmj.87.1569496347377;
-        Thu, 26 Sep 2019 04:12:27 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id r18sm1705421wme.48.2019.09.26.04.12.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2019 04:12:26 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: x86: Expose CLZERO and XSAVEERPTR to the guest
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-References: <20190925213721.21245-1-bigeasy@linutronix.de>
- <20190925213721.21245-3-bigeasy@linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dedea670-ca42-738e-a5ab-bdf87646fc5f@redhat.com>
-Date:   Thu, 26 Sep 2019 13:12:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190925213721.21245-3-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1725943AbfIZLYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 07:24:19 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47434 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725787AbfIZLYT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 07:24:19 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8QBNvpv059895;
+        Thu, 26 Sep 2019 11:24:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : content-type :
+ content-transfer-encoding : mime-version : subject : message-id : date :
+ to; s=corp-2019-08-05; bh=3aeH1pkkN2xdX8h3nwvuS+wpPZk2A7RjmGTlh03tyIk=;
+ b=qmlecneYRh8chAy270rb9gJjY5a+NM7FG49RyC1PheAYzLdWHKU0r3pB8OOR9ihAYiih
+ 7cvDzrev1tCPDlYMNDp/cM1y4LjedGFUr25yhP+qA04dv/mKowrawWfv1hCrg45OGZPz
+ yK2tr69W9iAjqmu9F1CSsn7bbpDQ+PPVVBEBzgw2wmAhQXVelfFeHg9epGXoLotKsfaI
+ CUewXZfCHgxU3rjCqOVu/91Mky7SdUOwSQ5uCTTCB0+LByhOcYXoP/RBSoUCjWIUoI35
+ eG2n0YFfD51mkfjY+2sv7aYTmjSFb//3RZm2brMabek0mULHIMPQXcEkBbgkYIDf9Q6O oQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2v5btqb082-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Sep 2019 11:24:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8QBNsX8097635;
+        Thu, 26 Sep 2019 11:24:06 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2v82qc3cmf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Sep 2019 11:24:06 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8QBO4m4014010;
+        Thu, 26 Sep 2019 11:24:05 GMT
+Received: from [192.168.14.112] (/79.179.213.143)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 26 Sep 2019 04:24:04 -0700
+From:   Liran Alon <liran.alon@oracle.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Suggest changing commit "KVM: vmx: Introduce handle_unexpected_vmexit
+ and handle WAITPKG vmexit"
+Message-Id: <B57A2AAE-9F9F-4697-8EFE-5F1CF4D8F7BC@oracle.com>
+Date:   Thu, 26 Sep 2019 14:24:02 +0300
+To:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, Tao Xu <tao3.xu@intel.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9391 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=437
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909260109
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9391 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=524 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909260109
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/09/19 23:37, Sebastian Andrzej Siewior wrote:
-> I was surprised to see that the guest reported `fxsave_leak' while the
-> host did not. After digging deeper I noticed that the bits are simply
-> masked out during enumeration.
-> The XSAVEERPTR feature is actually a bug fix on AMD which means the
-> kernel can disable a workaround.
-> While here, I've seen that CLZERO is also masked out. This opcode is
-> unprivilged so exposing it to the guest should not make any difference.
-> 
-> Pass CLZERO and XSAVEERPTR to the guest if available on the host.
-> 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  arch/x86/kvm/cpuid.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 22c2720cd948e..0ae9194d0f4d2 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -473,6 +473,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
->  
->  	/* cpuid 0x80000008.ebx */
->  	const u32 kvm_cpuid_8000_0008_ebx_x86_features =
-> +		F(CLZERO) | F(XSAVEERPTR) |
->  		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
->  		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON);
->  
-> 
 
-Applied (on top of Jim's CLZERO patch, so removing the CLZERO reference
-in the commit message).
+I just reviewed the patch "KVM: vmx: Introduce handle_unexpected_vmexit =
+and handle WAITPKG vmexit=E2=80=9D currently queued in kvm git tree
+=
+(https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?h=3Dqueue&id=3Dbf=
+653b78f9608d66db174eabcbda7454c8fde6d5)
 
-Paolo
+It seems to me that we shouldn=E2=80=99t apply this patch in it=E2=80=99s =
+current form.
+
+Instead of having a common handle_unexpected_vmexit() manually specified =
+for specific VMExit reasons,
+we should rely on the functionality I have added to vmx_handle_exit() in =
+case there is no valid handler for exit-reason.
+In this case (since commit 7396d337cfadc ("KVM: x86: Return to userspace =
+with internal error on unexpected exit reason=E2=80=9D),
+an internal-error will be raised to userspace as required. Instead of =
+silently skipping emulated instruction.
+
+-Liran
+
