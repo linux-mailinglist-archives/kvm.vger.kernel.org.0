@@ -2,246 +2,521 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED869BEAF7
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 05:49:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DC70BEB7F
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 06:58:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733213AbfIZDtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 23:49:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49260 "EHLO mx1.redhat.com"
+        id S2388299AbfIZE6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 00:58:00 -0400
+Received: from mga03.intel.com ([134.134.136.65]:20004 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733179AbfIZDtT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 23:49:19 -0400
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0798E1108
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 03:49:19 +0000 (UTC)
-Received: by mail-pf1-f200.google.com with SMTP id a1so813866pfn.1
-        for <kvm@vger.kernel.org>; Wed, 25 Sep 2019 20:49:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ShKNQbErac64XK8TSPHgRCKqoTFkkgB8tmVFA50VI9E=;
-        b=cJW5Jt30RKfUY20PJwuGJhR8Pwe17LNUUmYeJzMqeZU7nsRjcWglQkVeNeRe5pge4F
-         Dm+FGzPtlW60OL0QAJfwK2fOUOzBXquFIZwFlwfmz9W5ChxeBPuw+FWM3vZCaaAJxlsG
-         DCb4kp5bWUSQK6Yos2W0oAeSt3trzNNjrA778oiLuX2VWsmZtLnWnO+NbQ3PN6Fpbfe0
-         OaJ+HUr1nSVM8MgzYHEpLLm3DUin9WlVLYZYy/MXxVXIofLe+TcAFL3CP2RxCpiLpapg
-         EnUlin9GddEfpqgKndMTVxt6ia2flQdmwanaepq8elOnWS3b59rnWcoAVsjwg085owVV
-         IT2w==
-X-Gm-Message-State: APjAAAXJdA6UaQhb2dhSqBEOvWVWoHEaLwdMy4S9++BpScniln2Sudyk
-        uyb6JcPWLUowQhpTnTwXd4TXbKQM1nuV4A9ZJc5AMx7qA4wE2iLU/Y0Yq1l390rnsx2UL6B5SsJ
-        mKIm9DWqoN1Tp
-X-Received: by 2002:a63:df02:: with SMTP id u2mr1326647pgg.62.1569469758379;
-        Wed, 25 Sep 2019 20:49:18 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxs4/hDxEwwNdVu+EpMWqbEMaG9qmJxTI8+9ub9yU1tkFZwOu/oob4U27J3j3Xho1yCL2C8Xw==
-X-Received: by 2002:a63:df02:: with SMTP id u2mr1326630pgg.62.1569469758054;
-        Wed, 25 Sep 2019 20:49:18 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id f74sm576418pfa.34.2019.09.25.20.49.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2019 20:49:17 -0700 (PDT)
-Date:   Thu, 26 Sep 2019 11:49:05 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kevin.tian@intel.com, Yi Sun <yi.y.sun@linux.intel.com>,
-        ashok.raj@intel.com, kvm@vger.kernel.org, sanjay.k.kumar@intel.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        yi.y.sun@intel.com
-Subject: Re: [RFC PATCH 2/4] iommu/vt-d: Add first level page table interfaces
-Message-ID: <20190926034905.GW28074@xz-x1>
-References: <20190923122454.9888-1-baolu.lu@linux.intel.com>
- <20190923122454.9888-3-baolu.lu@linux.intel.com>
- <20190925052157.GL28074@xz-x1>
- <c9792e0b-bf42-1dbb-f060-0b1a43125f47@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c9792e0b-bf42-1dbb-f060-0b1a43125f47@linux.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+        id S1731361AbfIZE6A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 00:58:00 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 21:57:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,550,1559545200"; 
+   d="scan'208";a="180048349"
+Received: from dpdk-virtio-tbie-2.sh.intel.com ([10.67.104.73])
+  by orsmga007.jf.intel.com with ESMTP; 25 Sep 2019 21:57:56 -0700
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, lingshan.zhu@intel.com, tiwei.bie@intel.com
+Subject: [PATCH] vhost: introduce mdev based hardware backend
+Date:   Thu, 26 Sep 2019 12:54:27 +0800
+Message-Id: <20190926045427.4973-1-tiwei.bie@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 10:35:24AM +0800, Lu Baolu wrote:
+This patch introduces a mdev based hardware vhost backend.
+This backend is built on top of the same abstraction used
+in virtio-mdev and provides a generic vhost interface for
+userspace to accelerate the virtio devices in guest.
 
-[...]
+This backend is implemented as a mdev device driver on top
+of the same mdev device ops used in virtio-mdev but using
+a different mdev class id, and it will register the device
+as a VFIO device for userspace to use. Userspace can setup
+the IOMMU with the existing VFIO container/group APIs and
+then get the device fd with the device name. After getting
+the device fd of this device, userspace can use vhost ioctls
+to setup the backend.
 
-> > > @@ -0,0 +1,342 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +/**
-> > > + * intel-pgtable.c - Intel IOMMU page table manipulation library
-> > 
-> > Could this be a bit misleading?  Normally I'll use "IOMMU page table"
-> > to refer to the 2nd level page table only, and I'm always
-> > understanding it as "the new IOMMU will understand MMU page table as
-> > the 1st level".  At least mention "IOMMU 1st level page table"?
-> > 
-> 
-> This file is a place holder for all code that manipulating iommu page
-> tables (both first level and second level). Instead of putting
-> everything in intel_iommu.c, let's make the code more structured so that
-> it's easier for reading and maintaining. This is the motivation of this
-> file.
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+---
+This patch depends on below series:
+https://lkml.org/lkml/2019/9/24/357
 
-I see.
+RFC v4 -> v1:
+- Implement vhost-mdev as a mdev device driver directly and
+  connect it to VFIO container/group. (Jason);
+- Pass ring addresses as GPAs/IOVAs in vhost-mdev to avoid
+  meaningless HVA->GPA translations (Jason);
 
-> 
-> > > + *
-> > > + * Copyright (C) 2019 Intel Corporation
-> > > + *
-> > > + * Author: Lu Baolu <baolu.lu@linux.intel.com>
-> > > + */
-> > > +
-> > > +#define pr_fmt(fmt)     "DMAR: " fmt
-> > > +#include <linux/vmalloc.h>
-> > > +#include <linux/mm.h>
-> > > +#include <linux/sched.h>
-> > > +#include <linux/io.h>
-> > > +#include <linux/export.h>
-> > > +#include <linux/intel-iommu.h>
-> > > +#include <asm/cacheflush.h>
-> > > +#include <asm/pgtable.h>
-> > > +#include <asm/pgalloc.h>
-> > > +#include <trace/events/intel_iommu.h>
-> > > +
-> > > +#ifdef CONFIG_X86
-> > > +/*
-> > > + * mmmap: Map a range of IO virtual address to physical addresses.
-> > 
-> > "... to physical addresses using MMU page table"?
-> > 
-> > Might be clearer?
-> 
-> Yes.
-> 
-> > 
-> > > + */
-> > > +#define pgtable_populate(domain, nm)					\
-> > > +do {									\
-> > > +	void *__new = alloc_pgtable_page(domain->nid);			\
-> > > +	if (!__new)							\
-> > > +		return -ENOMEM;						\
-> > > +	smp_wmb();							\
-> > 
-> > Could I ask what's this wmb used for?
-> 
-> Sure. This is answered by a comment in __pte_alloc() in mm/memory.c. Let
-> me post it here.
-> 
->         /*
->          * Ensure all pte setup (eg. pte page lock and page clearing) are
->          * visible before the pte is made visible to other CPUs by being
->          * put into page tables.
->          *
->          * The other side of the story is the pointer chasing in the page
->          * table walking code (when walking the page table without locking;
->          * ie. most of the time). Fortunately, these data accesses consist
->          * of a chain of data-dependent loads, meaning most CPUs (alpha
->          * being the notable exception) will already guarantee loads are
->          * seen in-order. See the alpha page table accessors for the
->          * smp_read_barrier_depends() barriers in page table walking code.
->          */
->         smp_wmb(); /* Could be smp_wmb__xxx(before|after)_spin_lock */
+RFC v3 -> RFC v4:
+- Build vhost-mdev on top of the same abstraction used by
+  virtio-mdev (Jason);
+- Introduce vhost fd and pass VFIO fd via SET_BACKEND ioctl (MST);
 
-Ok.  I don't understand the rationale much behind but the comment
-seems to make sense...  Could you help to comment above, like "please
-reference to comment in __pte_alloc" above the line?
+RFC v2 -> RFC v3:
+- Reuse vhost's ioctls instead of inventing a VFIO regions/irqs
+  based vhost protocol on top of vfio-mdev (Jason);
 
-> 
-> > 
-> > > +	spin_lock(&(domain)->page_table_lock);				\
-> > 
-> > Is this intended to lock here instead of taking the lock during the
-> > whole page table walk?  Is it safe?
-> > 
-> > Taking the example where nm==PTE: when we reach here how do we
-> > guarantee that the PMD page that has this PTE is still valid?
-> 
-> We will always keep the non-leaf pages in the table,
+RFC v1 -> RFC v2:
+- Introduce a new VFIO device type to build a vhost protocol
+  on top of vfio-mdev;
 
-I see.  Though, could I ask why?  It seems to me that the existing 2nd
-level page table does not keep these when unmap, and it's not even use
-locking at all by leveraging cmpxchg()?
+ drivers/vhost/Kconfig      |   9 +
+ drivers/vhost/Makefile     |   3 +
+ drivers/vhost/mdev.c       | 381 +++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/vhost.h |   8 +
+ 4 files changed, 401 insertions(+)
+ create mode 100644 drivers/vhost/mdev.c
 
-> hence we only need
-> a spin lock to serialize multiple tries of populating a entry for pde.
-> As for pte, we can assume there is only single thread which can access
-> it at a time because different mappings will have different iova's.
-
-Ah yes sorry nm will never be pte here... so do you mean the upper
-layer, e.g., the iova allocator will make sure the ranges to be mapped
-will never collapse with each other so setting PTEs do not need lock?
-
-> 
-> > 
-> > > +	if (nm ## _present(*nm)) {					\
-> > > +		free_pgtable_page(__new);				\
-> > > +	} else {							\
-> > > +		set_##nm(nm, __##nm(__pa(__new) | _PAGE_TABLE));	\
-> > 
-> > It seems to me that PV could trap calls to set_pte().  Then these
-> > could also be trapped by e.g. Xen?  Are these traps needed?  Is there
-> > side effect?  I'm totally not familiar with this, but just ask aloud...
-> 
-> Good catch. But I don't think a vIOMMU could get a chance to run in a PV
-> environment. I might miss something?
-
-I don't know... Is there reason to not allow a Xen guest to use 1st
-level mapping?
-
-While on the other side... If the PV interface will never be used,
-then could native_set_##nm() be used directly?
-
-[...]
-
-> > > +static struct page *
-> > > +mmunmap_pte_range(struct dmar_domain *domain, pmd_t *pmd,
-> > > +		  unsigned long addr, unsigned long end,
-> > > +		  struct page *freelist, bool reclaim)
-> > > +{
-> > > +	int i;
-> > > +	unsigned long start;
-> > > +	pte_t *pte, *first_pte;
-> > > +
-> > > +	start = addr;
-> > > +	pte = pte_offset_kernel(pmd, addr);
-> > > +	first_pte = pte;
-> > > +	do {
-> > > +		set_pte(pte, __pte(0));
-> > > +	} while (pte++, addr += PAGE_SIZE, addr != end);
-> > > +
-> > > +	domain_flush_cache(domain, first_pte, (void *)pte - (void *)first_pte);
-> > > +
-> > > +	/* Add page to free list if all entries are empty. */
-> > > +	if (reclaim) {
-> > 
-> > Shouldn't we know whether to reclaim if with (addr, end) specified as
-> > long as they cover the whole range of this PMD?
-> 
-> Current policy is that we don't reclaim any pages until the whole page
-> table will be torn down.
-
-Ah OK.  But I saw that you're passing in relaim==!start_addr.
-Shouldn't that errornously trigger if one wants to unmap the 1st page
-as well even if not the whole address space?
-
-> The gain is that we don't have to use a
-> spinlock when map/unmap a pmd entry anymore.
-
-So this question should also related to above on the locking - have
-you thought about using the same way (IIUC) as the 2nd level page
-table to use cmpxchg()?  AFAIU that does not need any lock?
-
-For me it's perfectly fine to use a lock at least for initial version,
-I just want to know the considerations behind in case I missed
-anything important.
-
-Thanks,
-
+diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+index 3d03ccbd1adc..decf0be8efe9 100644
+--- a/drivers/vhost/Kconfig
++++ b/drivers/vhost/Kconfig
+@@ -34,6 +34,15 @@ config VHOST_VSOCK
+ 	To compile this driver as a module, choose M here: the module will be called
+ 	vhost_vsock.
+ 
++config VHOST_MDEV
++	tristate "Vhost driver for Mediated devices"
++	depends on EVENTFD && VFIO && VFIO_MDEV
++	select VHOST
++	default n
++	---help---
++	Say M here to enable the vhost_mdev module for use with
++	the mediated device based hardware vhost accelerators
++
+ config VHOST
+ 	tristate
+ 	---help---
+diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
+index 6c6df24f770c..ad9c0f8c6d8c 100644
+--- a/drivers/vhost/Makefile
++++ b/drivers/vhost/Makefile
+@@ -10,4 +10,7 @@ vhost_vsock-y := vsock.o
+ 
+ obj-$(CONFIG_VHOST_RING) += vringh.o
+ 
++obj-$(CONFIG_VHOST_MDEV) += vhost_mdev.o
++vhost_mdev-y := mdev.o
++
+ obj-$(CONFIG_VHOST)	+= vhost.o
+diff --git a/drivers/vhost/mdev.c b/drivers/vhost/mdev.c
+new file mode 100644
+index 000000000000..1c12a25b86a2
+--- /dev/null
++++ b/drivers/vhost/mdev.c
+@@ -0,0 +1,381 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2018-2019 Intel Corporation.
++ */
++
++#include <linux/compat.h>
++#include <linux/kernel.h>
++#include <linux/miscdevice.h>
++#include <linux/mdev.h>
++#include <linux/module.h>
++#include <linux/vfio.h>
++#include <linux/vhost.h>
++#include <linux/virtio_mdev.h>
++
++#include "vhost.h"
++
++struct vhost_mdev {
++	/* The lock is to protect this structure. */
++	struct mutex mutex;
++	struct vhost_dev dev;
++	struct vhost_virtqueue *vqs;
++	int nvqs;
++	u64 state;
++	u64 features;
++	u64 acked_features;
++	bool opened;
++	struct mdev_device *mdev;
++};
++
++static u8 mdev_get_status(struct mdev_device *mdev)
++{
++	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
++
++	return ops->get_status(mdev);
++}
++
++static void mdev_set_status(struct mdev_device *mdev, u8 status)
++{
++	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
++
++	return ops->set_status(mdev, status);
++}
++
++static void mdev_add_status(struct mdev_device *mdev, u8 status)
++{
++	status |= mdev_get_status(mdev);
++	mdev_set_status(mdev, status);
++}
++
++static void mdev_reset(struct mdev_device *mdev)
++{
++	mdev_set_status(mdev, 0);
++}
++
++static void handle_vq_kick(struct vhost_work *work)
++{
++	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
++						  poll.work);
++	struct vhost_mdev *m = container_of(vq->dev, struct vhost_mdev, dev);
++	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(m->mdev);
++
++	ops->kick_vq(m->mdev, vq - m->vqs);
++}
++
++static irqreturn_t vhost_mdev_virtqueue_cb(void *private)
++{
++	struct vhost_virtqueue *vq = private;
++	struct eventfd_ctx *call_ctx = vq->call_ctx;
++
++	if (call_ctx)
++		eventfd_signal(call_ctx, 1);
++	return IRQ_HANDLED;
++}
++
++static long vhost_mdev_reset(struct vhost_mdev *m)
++{
++	struct mdev_device *mdev = m->mdev;
++
++	mdev_reset(mdev);
++	mdev_add_status(mdev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
++	mdev_add_status(mdev, VIRTIO_CONFIG_S_DRIVER);
++	return 0;
++}
++
++static long vhost_mdev_start(struct vhost_mdev *m)
++{
++	struct mdev_device *mdev = m->mdev;
++	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
++	struct virtio_mdev_callback cb;
++	struct vhost_virtqueue *vq;
++	int idx;
++
++	ops->set_features(mdev, m->acked_features);
++
++	mdev_add_status(mdev, VIRTIO_CONFIG_S_FEATURES_OK);
++	if (!(mdev_get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK))
++		goto reset;
++
++	for (idx = 0; idx < m->nvqs; idx++) {
++		vq = &m->vqs[idx];
++
++		if (!vq->desc || !vq->avail || !vq->used)
++			break;
++
++		if (ops->set_vq_state(mdev, idx, vq->last_avail_idx))
++			goto reset;
++
++		/*
++		 * In vhost-mdev, userspace should pass ring addresses
++		 * in guest physical addresses when IOMMU is disabled or
++		 * IOVAs when IOMMU is enabled.
++		 */
++		if (ops->set_vq_address(mdev, idx, (u64)vq->desc,
++					(u64)vq->avail, (u64)vq->used))
++			goto reset;
++
++		ops->set_vq_num(mdev, idx, vq->num);
++
++		cb.callback = vhost_mdev_virtqueue_cb;
++		cb.private = vq;
++		ops->set_vq_cb(mdev, idx, &cb);
++
++		ops->set_vq_ready(mdev, idx, 1);
++	}
++
++	mdev_add_status(mdev, VIRTIO_CONFIG_S_DRIVER_OK);
++	if (mdev_get_status(mdev) & VIRTIO_CONFIG_S_NEEDS_RESET)
++		goto reset;
++	return 0;
++
++reset:
++	vhost_mdev_reset(m);
++	return -ENODEV;
++}
++
++static long vhost_set_state(struct vhost_mdev *m, u64 __user *statep)
++{
++	u64 state;
++	long r;
++
++	if (copy_from_user(&state, statep, sizeof(state)))
++		return -EFAULT;
++
++	if (state >= VHOST_MDEV_S_MAX)
++		return -EINVAL;
++
++	if (m->state == state)
++		return 0;
++
++	m->state = state;
++
++	switch (m->state) {
++	case VHOST_MDEV_S_RUNNING:
++		r = vhost_mdev_start(m);
++		break;
++	case VHOST_MDEV_S_STOPPED:
++		r = vhost_mdev_reset(m);
++		break;
++	default:
++		r = -EINVAL;
++		break;
++	}
++
++	return r;
++}
++
++static long vhost_get_features(struct vhost_mdev *m, u64 __user *featurep)
++{
++	if (copy_to_user(featurep, &m->features, sizeof(m->features)))
++		return -EFAULT;
++	return 0;
++}
++
++static long vhost_set_features(struct vhost_mdev *m, u64 __user *featurep)
++{
++	u64 features;
++
++	if (copy_from_user(&features, featurep, sizeof(features)))
++		return -EFAULT;
++
++	if (features & ~m->features)
++		return -EINVAL;
++
++	m->acked_features = features;
++
++	return 0;
++}
++
++static long vhost_get_vring_base(struct vhost_mdev *m, void __user *argp)
++{
++	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(m->mdev);
++	struct vhost_virtqueue *vq;
++	u32 idx;
++	long r;
++
++	r = get_user(idx, (u32 __user *)argp);
++	if (r < 0)
++		return r;
++	if (idx >= m->nvqs)
++		return -ENOBUFS;
++
++	vq = &m->vqs[idx];
++	vq->last_avail_idx = ops->get_vq_state(m->mdev, idx);
++
++	return vhost_vring_ioctl(&m->dev, VHOST_GET_VRING_BASE, argp);
++}
++
++static int vhost_mdev_open(void *device_data)
++{
++	struct vhost_mdev *m = device_data;
++	struct vhost_dev *dev;
++	struct vhost_virtqueue **vqs;
++	int nvqs, i, r;
++
++	if (!try_module_get(THIS_MODULE))
++		return -ENODEV;
++
++	mutex_lock(&m->mutex);
++
++	if (m->opened) {
++		r = -EBUSY;
++		goto err;
++	}
++
++	nvqs = m->nvqs;
++	vhost_mdev_reset(m);
++
++	memset(&m->dev, 0, sizeof(m->dev));
++	memset(m->vqs, 0, nvqs * sizeof(struct vhost_virtqueue));
++
++	vqs = kmalloc_array(nvqs, sizeof(*vqs), GFP_KERNEL);
++	if (!vqs) {
++		r = -ENOMEM;
++		goto err;
++	}
++
++	dev = &m->dev;
++	for (i = 0; i < nvqs; i++) {
++		vqs[i] = &m->vqs[i];
++		vqs[i]->handle_kick = handle_vq_kick;
++	}
++	vhost_dev_init(dev, vqs, nvqs, 0, 0, 0);
++	m->opened = true;
++	mutex_unlock(&m->mutex);
++
++	return 0;
++
++err:
++	mutex_unlock(&m->mutex);
++	module_put(THIS_MODULE);
++	return r;
++}
++
++static void vhost_mdev_release(void *device_data)
++{
++	struct vhost_mdev *m = device_data;
++
++	mutex_lock(&m->mutex);
++	vhost_mdev_reset(m);
++	vhost_dev_stop(&m->dev);
++	vhost_dev_cleanup(&m->dev);
++
++	kfree(m->dev.vqs);
++	m->opened = false;
++	mutex_unlock(&m->mutex);
++	module_put(THIS_MODULE);
++}
++
++static long vhost_mdev_unlocked_ioctl(void *device_data,
++				      unsigned int cmd, unsigned long arg)
++{
++	struct vhost_mdev *m = device_data;
++	void __user *argp = (void __user *)arg;
++	long r;
++
++	mutex_lock(&m->mutex);
++
++	switch (cmd) {
++	case VHOST_MDEV_SET_STATE:
++		r = vhost_set_state(m, argp);
++		break;
++	case VHOST_GET_FEATURES:
++		r = vhost_get_features(m, argp);
++		break;
++	case VHOST_SET_FEATURES:
++		r = vhost_set_features(m, argp);
++		break;
++	case VHOST_GET_VRING_BASE:
++		r = vhost_get_vring_base(m, argp);
++		break;
++	default:
++		r = vhost_dev_ioctl(&m->dev, cmd, argp);
++		if (r == -ENOIOCTLCMD)
++			r = vhost_vring_ioctl(&m->dev, cmd, argp);
++	}
++
++	mutex_unlock(&m->mutex);
++	return r;
++}
++
++static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
++	.name		= "vfio-vhost-mdev",
++	.open		= vhost_mdev_open,
++	.release	= vhost_mdev_release,
++	.ioctl		= vhost_mdev_unlocked_ioctl,
++};
++
++static int vhost_mdev_probe(struct device *dev)
++{
++	struct mdev_device *mdev = mdev_from_dev(dev);
++	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
++	struct vhost_mdev *m;
++	int nvqs, r;
++
++	m = kzalloc(sizeof(*m), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
++	if (!m)
++		return -ENOMEM;
++
++	mutex_init(&m->mutex);
++
++	nvqs = ops->get_queue_max(mdev);
++	m->nvqs = nvqs;
++
++	m->vqs = kmalloc_array(nvqs, sizeof(struct vhost_virtqueue),
++			       GFP_KERNEL);
++	if (!m->vqs) {
++		r = -ENOMEM;
++		goto err;
++	}
++
++	r = vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, m);
++	if (r)
++		goto err;
++
++	m->features = ops->get_features(mdev);
++	m->mdev = mdev;
++	return 0;
++
++err:
++	kfree(m->vqs);
++	kfree(m);
++	return r;
++}
++
++static void vhost_mdev_remove(struct device *dev)
++{
++	struct vhost_mdev *m;
++
++	m = vfio_del_group_dev(dev);
++	mutex_destroy(&m->mutex);
++	kfree(m->vqs);
++	kfree(m);
++}
++
++static struct mdev_class_id id_table[] = {
++	{ MDEV_ID_VHOST },
++	{ 0 },
++};
++
++static struct mdev_driver vhost_mdev_driver = {
++	.name	= "vhost_mdev",
++	.probe	= vhost_mdev_probe,
++	.remove	= vhost_mdev_remove,
++	.id_table = id_table,
++};
++
++static int __init vhost_mdev_init(void)
++{
++	return mdev_register_driver(&vhost_mdev_driver, THIS_MODULE);
++}
++module_init(vhost_mdev_init);
++
++static void __exit vhost_mdev_exit(void)
++{
++	mdev_unregister_driver(&vhost_mdev_driver);
++}
++module_exit(vhost_mdev_exit);
++
++MODULE_VERSION("0.0.1");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("Mediated device based accelerator for virtio");
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index 40d028eed645..5afbc2f08fa3 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -116,4 +116,12 @@
+ #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
+ #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
+ 
++/* VHOST_MDEV specific defines */
++
++#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
++
++#define VHOST_MDEV_S_STOPPED	0
++#define VHOST_MDEV_S_RUNNING	1
++#define VHOST_MDEV_S_MAX	2
++
+ #endif
 -- 
-Peter Xu
+2.17.1
+
