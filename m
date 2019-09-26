@@ -2,71 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9310ABF3AE
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 15:06:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DDE8BF3E9
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 15:17:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbfIZNGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 09:06:17 -0400
-Received: from foss.arm.com ([217.140.110.172]:49152 "EHLO foss.arm.com"
+        id S1726906AbfIZNRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 09:17:30 -0400
+Received: from mga05.intel.com ([192.55.52.43]:28880 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725877AbfIZNGR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 09:06:17 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 58226142F;
-        Thu, 26 Sep 2019 06:06:16 -0700 (PDT)
-Received: from dawn-kernel.cambridge.arm.com (unknown [10.1.197.116])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B6E63F763;
-        Thu, 26 Sep 2019 06:06:14 -0700 (PDT)
-Subject: Re: [RFC PATCH v4 2/5] ptp: Reorganize ptp_kvm modules to make it
- arch-independent.
-To:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
-        pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
-        Will.Deacon@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        nd@arm.com
-References: <20190926114212.5322-1-jianyong.wu@arm.com>
- <20190926114212.5322-3-jianyong.wu@arm.com>
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <2f338b57-b0b2-e439-6089-72e5f5e4f017@arm.com>
-Date:   Thu, 26 Sep 2019 14:06:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        id S1726106AbfIZNR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 09:17:29 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 06:17:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,552,1559545200"; 
+   d="scan'208";a="194124583"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.73])
+  by orsmga006.jf.intel.com with ESMTP; 26 Sep 2019 06:17:26 -0700
+Date:   Thu, 26 Sep 2019 21:14:39 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     jasowang@redhat.com, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
+Message-ID: <20190926131439.GA11652@___>
+References: <20190926045427.4973-1-tiwei.bie@intel.com>
+ <20190926042156-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190926114212.5322-3-jianyong.wu@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190926042156-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jianyong,
-
-On 26/09/2019 12:42, Jianyong Wu wrote:
-> Currently, ptp_kvm modules implementation is only for x86 which includs
-> large part of arch-specific code.  This patch move all of those code
-> into new arch related file in the same directory.
+On Thu, Sep 26, 2019 at 04:35:18AM -0400, Michael S. Tsirkin wrote:
+> On Thu, Sep 26, 2019 at 12:54:27PM +0800, Tiwei Bie wrote:
+[...]
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index 40d028eed645..5afbc2f08fa3 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -116,4 +116,12 @@
+> >  #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
+> >  #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
+> >  
+> > +/* VHOST_MDEV specific defines */
+> > +
+> > +#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
+> > +
+> > +#define VHOST_MDEV_S_STOPPED	0
+> > +#define VHOST_MDEV_S_RUNNING	1
+> > +#define VHOST_MDEV_S_MAX	2
+> > +
+> >  #endif
 > 
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> ---
->   drivers/ptp/Makefile                 |  1 +
->   drivers/ptp/{ptp_kvm.c => kvm_ptp.c} | 77 ++++++------------------
->   drivers/ptp/ptp_kvm_x86.c            | 87 ++++++++++++++++++++++++++++
->   include/asm-generic/ptp_kvm.h        | 12 ++++
->   4 files changed, 118 insertions(+), 59 deletions(-)
->   rename drivers/ptp/{ptp_kvm.c => kvm_ptp.c} (63%)
+> So assuming we have an underlying device that behaves like virtio:
 
-minor nit: Could we not skip renaming the file ? Given
-you are following the ptp_kvm_* for the arch specific
-files and the header files, wouldn't it be good to
-keep ptp_kvm.c ?
+I think they are really good questions/suggestions. Thanks!
 
-Rest looks fine.
+> 
+> 1. Should we use SET_STATUS maybe?
 
-Cheers
-Suzuki
+I like this idea. I will give it a try.
+
+> 2. Do we want a reset ioctl?
+
+I think it is helpful. If we use SET_STATUS, maybe we
+can use it to support the reset.
+
+> 3. Do we want ability to enable rings individually?
+
+I will make it possible at least in the vhost layer.
+
+> 4. Does device need to limit max ring size?
+> 5. Does device need to limit max number of queues?
+
+I think so. It's helpful to have ioctls to report the max
+ring size and max number of queues.
+
+Thanks!
+Tiwei
+
+
+> 
+> -- 
+> MST
