@@ -2,245 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AAB3BECD1
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 09:47:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 947FBBECD7
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 09:48:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731505AbfIZHr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 03:47:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53494 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729926AbfIZHrz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 03:47:55 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1035A53132
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 07:47:55 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id q10so564161wro.22
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 00:47:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=N2DZb0BJXpZgcpAahgI3rSwj96ykbSLsI5Vmg6oXhCM=;
-        b=k0ojME63XZhg4mTwlxgD6GcLoXvIjMFXH4j3F/dl11ubvgQnAWiyoz5cSedTu35jgu
-         VwU0g7oW4drBOKTTIs8RR+o4QNBVBSeZYi9eTFEisALgW2J1EAqfk+wSqEmhvc8xHaIf
-         AAoFL8cNwxshINh4u6VJdTHlRQqZTaeWDR9A8pd9yclVR3/bqBfc1mUERj1wIfLl23TS
-         XpyYRQt2rwdtNM3+vCht8ued/Z3PPHpvUbQWND/fEBrc5vZAHKrUj3cVDoxAuDoXZZAc
-         Gzyuu7Cuno/hWSr++wcXm6EDNfbzROHJbZdMHuCVqlxyPov3YmiKD4K6X7t1qm0jC6jr
-         0VZA==
-X-Gm-Message-State: APjAAAU0sP84FBz9HEcMvxiZTOZk1/dDthvs1vbkA7yUXg9O1A83GS3O
-        mTeQNxt0lrMuXcIFWWKnqzWIqvRviwfNZKbhi8yo+UpSJOz0fx/QJd4kFAD+gkSTc3pUCiufJKB
-        4Rq4BzTpNio3b
-X-Received: by 2002:a5d:4c48:: with SMTP id n8mr1704082wrt.192.1569484073629;
-        Thu, 26 Sep 2019 00:47:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzBHt91YivEK0i/YWPbwqxZI+CfJHbdKfyUlCW3lfvnleM1OckVhOwguQ/vgIrujXG4TLOX2g==
-X-Received: by 2002:a5d:4c48:: with SMTP id n8mr1704043wrt.192.1569484073321;
-        Thu, 26 Sep 2019 00:47:53 -0700 (PDT)
-Received: from steredhat.homenet.telecomitalia.it (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
-        by smtp.gmail.com with ESMTPSA id b7sm1269406wrj.28.2019.09.26.00.47.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2019 00:47:52 -0700 (PDT)
-Date:   Thu, 26 Sep 2019 09:47:49 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Dexuan Cui <decui@microsoft.com>
-Cc:     "davem@davemloft.net" <davem@davemloft.net>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "sashal@kernel.org" <sashal@kernel.org>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "deepa.kernel@gmail.com" <deepa.kernel@gmail.com>,
-        "ytht.net@gmail.com" <ytht.net@gmail.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        "jhansen@vmware.com" <jhansen@vmware.com>
-Subject: Re: [PATCH net v2] vsock: Fix a lockdep warning in __vsock_release()
-Message-ID: <20190926074749.sltehhkcgfduu7n2@steredhat.homenet.telecomitalia.it>
-References: <1569460241-57800-1-git-send-email-decui@microsoft.com>
+        id S1731225AbfIZHs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 03:48:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30776 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729343AbfIZHs2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Sep 2019 03:48:28 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8Q7ltOs016300
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 03:48:28 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2v8r55u1a5-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 03:48:27 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 26 Sep 2019 08:48:25 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 26 Sep 2019 08:48:21 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8Q7mKEX59637974
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Sep 2019 07:48:20 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A346AE045;
+        Thu, 26 Sep 2019 07:48:20 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89548AE051;
+        Thu, 26 Sep 2019 07:48:19 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 26 Sep 2019 07:48:19 +0000 (GMT)
+Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
+To:     Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+Cc:     mst@redhat.com, imammedo@redhat.com, marcel.apfelbaum@gmail.com,
+        pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+        philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+        mtosatti@redhat.com, kvm@vger.kernel.org
+References: <20190924124433.96810-1-slp@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Thu, 26 Sep 2019 09:48:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1569460241-57800-1-git-send-email-decui@microsoft.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190924124433.96810-1-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19092607-4275-0000-0000-0000036B574D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092607-4276-0000-0000-0000387DD4DE
+Message-Id: <7d3b903a-e696-9960-a7f0-cb45101876c5@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-26_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=958 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909260076
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dexuan,
 
-On Thu, Sep 26, 2019 at 01:11:27AM +0000, Dexuan Cui wrote:
-> Lockdep is unhappy if two locks from the same class are held.
-> 
-> Fix the below warning for hyperv and virtio sockets (vmci socket code
-> doesn't have the issue) by using lock_sock_nested() when __vsock_release()
-> is called recursively:
-> 
-> ============================================
-> WARNING: possible recursive locking detected
-> 5.3.0+ #1 Not tainted
-> --------------------------------------------
-> server/1795 is trying to acquire lock:
-> ffff8880c5158990 (sk_lock-AF_VSOCK){+.+.}, at: hvs_release+0x10/0x120 [hv_sock]
-> 
-> but task is already holding lock:
-> ffff8880c5158150 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x2e/0xf0 [vsock]
-> 
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
-> 
->        CPU0
->        ----
->   lock(sk_lock-AF_VSOCK);
->   lock(sk_lock-AF_VSOCK);
-> 
->  *** DEADLOCK ***
-> 
->  May be due to missing lock nesting notation
-> 
-> 2 locks held by server/1795:
->  #0: ffff8880c5d05ff8 (&sb->s_type->i_mutex_key#10){+.+.}, at: __sock_release+0x2d/0xa0
->  #1: ffff8880c5158150 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x2e/0xf0 [vsock]
-> 
-> stack backtrace:
-> CPU: 5 PID: 1795 Comm: server Not tainted 5.3.0+ #1
-> Call Trace:
->  dump_stack+0x67/0x90
->  __lock_acquire.cold.67+0xd2/0x20b
->  lock_acquire+0xb5/0x1c0
->  lock_sock_nested+0x6d/0x90
->  hvs_release+0x10/0x120 [hv_sock]
->  __vsock_release+0x24/0xf0 [vsock]
->  __vsock_release+0xa0/0xf0 [vsock]
->  vsock_release+0x12/0x30 [vsock]
->  __sock_release+0x37/0xa0
->  sock_close+0x14/0x20
->  __fput+0xc1/0x250
->  task_work_run+0x98/0xc0
->  do_exit+0x344/0xc60
->  do_group_exit+0x47/0xb0
->  get_signal+0x15c/0xc50
->  do_signal+0x30/0x720
->  exit_to_usermode_loop+0x50/0xa0
->  do_syscall_64+0x24e/0x270
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> RIP: 0033:0x7f4184e85f31
-> 
-> Signed-off-by: Dexuan Cui <decui@microsoft.com>
-> ---
-> 
-> NOTE: I only tested the code on Hyper-V. I can not test the code for
-> virtio socket, as I don't have a KVM host. :-( Sorry.
-> 
-> @Stefan, @Stefano: please review & test the patch for virtio socket,
-> and let me know if the patch breaks anything. Thanks!
 
-Comment below, I'll test it ASAP!
-
+On 24.09.19 14:44, Sergio Lopez wrote:
+> Microvm is a machine type inspired by both NEMU and Firecracker, and
+> constructed after the machine model implemented by the latter.
 > 
-> Changes in v2:
->   Avoid the duplication of code in v1: https://lkml.org/lkml/2019/8/19/1361
->   Also fix virtio socket code.
+> It's main purpose is providing users a minimalist machine type free
+> from the burden of legacy compatibility, serving as a stepping stone
+> for future projects aiming at improving boot times, reducing the
+> attack surface and slimming down QEMU's footprint.
 > 
->  net/vmw_vsock/af_vsock.c                | 19 +++++++++++++++----
->  net/vmw_vsock/hyperv_transport.c        |  2 +-
->  net/vmw_vsock/virtio_transport_common.c |  2 +-
->  3 files changed, 17 insertions(+), 6 deletions(-)
+> The microvm machine type supports the following devices:
 > 
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index ab47bf3ab66e..dbae4373cbab 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -638,8 +638,10 @@ struct sock *__vsock_create(struct net *net,
->  }
->  EXPORT_SYMBOL_GPL(__vsock_create);
->  
-> -static void __vsock_release(struct sock *sk)
-> +static void __vsock_release(struct sock *sk, int level)
->  {
-> +	WARN_ON(level != 1 && level != 2);
-> +
->  	if (sk) {
->  		struct sk_buff *skb;
->  		struct sock *pending;
-> @@ -648,9 +650,18 @@ static void __vsock_release(struct sock *sk)
->  		vsk = vsock_sk(sk);
->  		pending = NULL;	/* Compiler warning. */
->  
-> +		/* The release call is supposed to use lock_sock_nested()
-> +		 * rather than lock_sock(), if a sock lock should be acquired.
-> +		 */
->  		transport->release(vsk);
->  
-> -		lock_sock(sk);
-> +		/* When "level" is 2, use the nested version to avoid the
-> +		 * warning "possible recursive locking detected".
-> +		 */
-> +		if (level == 1)
-> +			lock_sock(sk);
+>  - ISA bus
+>  - i8259 PIC
+>  - LAPIC (implicit if using KVM)
+>  - IOAPIC (defaults to kernel_irqchip_split = true)
+>  - i8254 PIT
+>  - MC146818 RTC (optional)
+>  - kvmclock (if using KVM)
+>  - fw_cfg
+>  - One ISA serial port (optional)
+>  - Up to eight virtio-mmio devices (configured by the user)
 
-Since lock_sock() calls lock_sock_nested(sk, 0), could we use directly
-lock_sock_nested(sk, level) with level = 0 in vsock_release() and
-level = SINGLE_DEPTH_NESTING here in the while loop?
+Just out of curiosity. 
+What is the reason for not going virtio-pci? Is the PCI bus really
+that expensive and complicated?
+FWIW, I do not complain. When people start using virtio-mmio more
+often this would also help virtio-ccw (which I am interested in)
+as this forces people to think beyond virtio-pci.
 
-> +		else
-> +			lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
->  		sock_orphan(sk);
->  		sk->sk_shutdown = SHUTDOWN_MASK;
->  
-> @@ -659,7 +670,7 @@ static void __vsock_release(struct sock *sk)
->  
->  		/* Clean up any sockets that never were accepted. */
->  		while ((pending = vsock_dequeue_accept(sk)) != NULL) {
-> -			__vsock_release(pending);
-> +			__vsock_release(pending, 2);
->  			sock_put(pending);
->  		}
->  
-> @@ -708,7 +719,7 @@ EXPORT_SYMBOL_GPL(vsock_stream_has_space);
->  
->  static int vsock_release(struct socket *sock)
->  {
-> -	__vsock_release(sock->sk);
-> +	__vsock_release(sock->sk, 1);
->  	sock->sk = NULL;
->  	sock->state = SS_FREE;
->  
-> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-> index 261521d286d6..c443db7af8d4 100644
-> --- a/net/vmw_vsock/hyperv_transport.c
-> +++ b/net/vmw_vsock/hyperv_transport.c
-> @@ -559,7 +559,7 @@ static void hvs_release(struct vsock_sock *vsk)
->  	struct sock *sk = sk_vsock(vsk);
->  	bool remove_sock;
->  
-> -	lock_sock(sk);
-> +	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
->  	remove_sock = hvs_close_lock_held(vsk);
->  	release_sock(sk);
->  	if (remove_sock)
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 5bb70c692b1e..a666ef8fc54e 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -820,7 +820,7 @@ void virtio_transport_release(struct vsock_sock *vsk)
->  	struct sock *sk = &vsk->sk;
->  	bool remove_sock = true;
->  
-> -	lock_sock(sk);
-> +	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
->  	if (sk->sk_type == SOCK_STREAM)
->  		remove_sock = virtio_transport_close(vsk);
->  
-
-Thanks,
-Stefano
