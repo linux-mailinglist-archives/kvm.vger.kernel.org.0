@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 12923BFBDB
+	by mail.lfdr.de (Postfix) with ESMTP id B0E7ABFBDC
 	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 01:19:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729034AbfIZXTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1729071AbfIZXTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 26 Sep 2019 19:19:21 -0400
-Received: from mail-qk1-f201.google.com ([209.85.222.201]:46448 "EHLO
-        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729060AbfIZXTV (ORCPT <rfc822;kvm@vger.kernel.org>);
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:54436 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729048AbfIZXTV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 26 Sep 2019 19:19:21 -0400
-Received: by mail-qk1-f201.google.com with SMTP id x186so817032qke.13
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:19:18 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id m17so2321066pgh.21
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:19:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=zUj93KTO3Bj0DuO7C1ywcJksue4QOJ1xOkJ8pFn7qX0=;
-        b=AVaY56eN6ZkokF6BsY3KMUTU6xzOaYVEl9pcF61NUz4f1pT1/b4ep7zvdd6D6lkTO2
-         4xzLhnMeJDa9PpGARIlh5LvKCjijWxDEODkzLaBF5bvIKVXkv9w2mG/FLFNxCB+rmI1x
-         PFf6PFyQBl374jFYbVcLBGecHy2KQwEskmkSQ6BuWhm3vFCYHTKiuZaIKcPAFP8GYzqD
-         sqeLbvWg3dWC6Iu4yHAGj9U3r+gj9zRjQfe+EpaZAaJmhSQ+dTsfAlNDqmUiw67+jFfL
-         OuVNRG4yGW46busQtaK1JaLByJoer3plqIEmiTishskOBVXvS6pmGuR4eBgZN0ZVKXKQ
-         Ws+w==
+        bh=p5p3XErJyYwp3TttwsaCpTh9txi10KL45ED980LPgg0=;
+        b=GMFf7MPW942Con3/Rc2iJn8yCbxcqfm+v7lFZxdo86jyIW8VfsL43BcRgFVD2Ah715
+         dyQGfyf1ZOEXSobzfHyG3xt2MARUQtM8o3xx6SH4UEUYg1H88kmCjneD0dUv+FTJqZc9
+         O4jYISq6cfpSPzboZgcckHlbvtsAiF8hJ50qa25imoQ5eIIWjeUuWn2vtorO2p+J1Yv9
+         fgkmMgS5FArtQ0/C2VjpGlw5EdWNVUYOGq/LBa5+Gsq1elhsuqw50+qfzLnVaBP0Lduq
+         HSaFT/UOixGHKnYuBwU3YjfFdnXz0/DUkUywcCatgkeQmNiKiP5eYtRntErqOvI2Vsm3
+         xDqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=zUj93KTO3Bj0DuO7C1ywcJksue4QOJ1xOkJ8pFn7qX0=;
-        b=BhualqJ9knGxP1ngXqwbqOY4L9ZlQW1+t2GMX1n56Y5fxbtQyfmpDq9IOwQFdhXiSi
-         drbGoIUD8iMZt/rzh6mrRse/vBT3XnsQntlw9ky6zq8diHQ1apz20ZRlAPPbp9fvCUZo
-         H8tjtn4HFew4Ihvp4uReXyxGicUpTCYcUXdO01KCqtLbpPrtuWrXtPNzqPYoaMU1tLmr
-         QZVn3KRY0ddrfgwnY4qfnudpq+1WrEAelWHJtggKYnVD2cGFiw+KkLuZQZuD7suMV6sc
-         s0Ur/zxsDfUL8IEUNyKU6VM19ce7CLKci+/ylqcaOI/Bg0DjCExvU3UTdO7jyuZpEGGu
-         e5Lw==
-X-Gm-Message-State: APjAAAXYlFXpNZhMwuTSB1z4LH/dan0zwYGARdJlYSp6GPlkVyzvkN+a
-        asmTE6nje5l7gH/67L3j9plQFWH3LQiPIiQkPFqPnR055qk5t+s0FqeS25UYocC/Vavh/X2+LjF
-        mFzzWkSIwM/U3XbR44ygj9ZYB1zcUoCpcrH+aNpOsbuWGxrDV4y34wcDKYbLe
-X-Google-Smtp-Source: APXvYqwkjfOAxyVkFOdXaNuE2POb89kbOdFWBlXXqCMIcvwhdKkiX71CUbjWrn/i4wo5z3LEQDjhuvVDEbqq
-X-Received: by 2002:ac8:75cd:: with SMTP id z13mr6748518qtq.87.1569539958233;
- Thu, 26 Sep 2019 16:19:18 -0700 (PDT)
-Date:   Thu, 26 Sep 2019 16:18:18 -0700
+        bh=p5p3XErJyYwp3TttwsaCpTh9txi10KL45ED980LPgg0=;
+        b=nG5fdv0ru2EUS3gR/qXj4ZQEXEwaqF9IqwIQ2nYgxd23+OWkMhjqk9Qd0djbbfYuJ6
+         cHX1ELTY4/u4xOF3QyoQu1rquPyhJZ0E3UiuPxg7YCBAuQBmCPFwq/2NnEZP2NJo2N/X
+         cCXMeOuHLK+ms22Lg2End4HjPwH1Xl3y3M/8taaYsaG39+aN1c+qRkeB4FAqp4TqBryZ
+         s2O4dkiEU/3+YIK3Cosvj79Q/dZQzKlnzHtOIYxSUpBtFI4CaZ7rYUtZWeBMpZt38e/K
+         5CL4HY5k6zpsdu2AEMjqUFTd2AhINRe3daHI9ng9fgURdtkVJgYSwFFxp5T75B4FyqEm
+         6skg==
+X-Gm-Message-State: APjAAAXeiFjJ/0EPGCJuKwJdwz1wCVhj6XxdBxqGAAYe/+zDAUABx7EV
+        VbnaiAO/FyTuh8rL4kVnVMAy+wgn3tvmE3nQYp05NHGp6BU1UJk3zqQIqjDTjCJYb+L0sRpm0iR
+        OYNXhzXHKAyht5lP2Y6XR1klgCrH30j5WrHDKRAHO7ktT5gUTdNzyfP9jotBi
+X-Google-Smtp-Source: APXvYqx/tRFyJsYEGQZ+9leVtfPKHme5XskASyrx5EnjXQ6VY6WPrRUn5jYo8an8xbCeop9PnyfltsgTBxkc
+X-Received: by 2002:a63:6d0:: with SMTP id 199mr5758315pgg.299.1569539960545;
+ Thu, 26 Sep 2019 16:19:20 -0700 (PDT)
+Date:   Thu, 26 Sep 2019 16:18:19 -0700
 In-Reply-To: <20190926231824.149014-1-bgardon@google.com>
-Message-Id: <20190926231824.149014-23-bgardon@google.com>
+Message-Id: <20190926231824.149014-24-bgardon@google.com>
 Mime-Version: 1.0
 References: <20190926231824.149014-1-bgardon@google.com>
 X-Mailer: git-send-email 2.23.0.444.g18eeb5a265-goog
-Subject: [RFC PATCH 22/28] kvm: mmu: Implement access tracking for the direct MMU
+Subject: [RFC PATCH 23/28] kvm: mmu: Make mark_page_dirty_in_slot usable from
+ outside kvm_main
 From:   Ben Gardon <bgardon@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -62,264 +63,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adds functions for dealing with the accessed state of PTEs which
-can operate with the direct MMU.
+When operating on PTEs within a memslot, the dirty status of the page
+must be recorded for dirty logging. Currently the only mechanism for
+marking pages dirty in mmu.c is mark_page_dirty, which assumes address
+space 0. This means that dirty pages in other address spaces will be lost.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu.c  | 153 +++++++++++++++++++++++++++++++++++++++++---
- virt/kvm/kvm_main.c |   7 +-
- 2 files changed, 150 insertions(+), 10 deletions(-)
+ include/linux/kvm_host.h | 1 +
+ virt/kvm/kvm_main.c      | 6 ++----
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index b144c803c36d2..cc81ba5ee46d6 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -779,6 +779,17 @@ static bool spte_has_volatile_bits(u64 spte)
- 	return false;
- }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index ce6b22fcb90f3..1212d5c8a3f6d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -753,6 +753,7 @@ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len);
+ struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn);
+ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn);
+ unsigned long kvm_host_page_size(struct kvm *kvm, gfn_t gfn);
++void mark_page_dirty_in_slot(struct kvm_memory_slot *memslot, gfn_t gfn);
+ void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
  
-+static bool is_accessed_direct_pte(u64 pte, int level)
-+{
-+	if (!is_last_spte(pte, level))
-+		return false;
-+
-+	if (shadow_accessed_mask)
-+		return pte & shadow_accessed_mask;
-+
-+	return pte & shadow_acc_track_mask;
-+}
-+
- static bool is_accessed_spte(u64 spte)
- {
- 	u64 accessed_mask = spte_shadow_accessed_mask(spte);
-@@ -929,6 +940,14 @@ static u64 mmu_spte_get_lockless(u64 *sptep)
- 	return __get_spte_lockless(sptep);
- }
- 
-+static u64 save_pte_permissions_for_access_track(u64 pte)
-+{
-+	pte |= (pte & shadow_acc_track_saved_bits_mask) <<
-+		shadow_acc_track_saved_bits_shift;
-+	pte &= ~shadow_acc_track_mask;
-+	return pte;
-+}
-+
- static u64 mark_spte_for_access_track(u64 spte)
- {
- 	if (spte_ad_enabled(spte))
-@@ -944,16 +963,13 @@ static u64 mark_spte_for_access_track(u64 spte)
- 	 */
- 	WARN_ONCE((spte & PT_WRITABLE_MASK) &&
- 		  !spte_can_locklessly_be_made_writable(spte),
--		  "kvm: Writable SPTE is not locklessly dirty-trackable\n");
-+		  "kvm: Writable PTE is not locklessly dirty-trackable\n");
- 
- 	WARN_ONCE(spte & (shadow_acc_track_saved_bits_mask <<
- 			  shadow_acc_track_saved_bits_shift),
- 		  "kvm: Access Tracking saved bit locations are not zero\n");
- 
--	spte |= (spte & shadow_acc_track_saved_bits_mask) <<
--		shadow_acc_track_saved_bits_shift;
--	spte &= ~shadow_acc_track_mask;
--
-+	spte = save_pte_permissions_for_access_track(spte);
- 	return spte;
- }
- 
-@@ -1718,6 +1734,15 @@ static void free_pt_rcu_callback(struct rcu_head *rp)
- 	free_page((unsigned long)disconnected_pt);
- }
- 
-+static void handle_changed_pte_acc_track(u64 old_pte, u64 new_pte, int level)
-+{
-+	bool pfn_changed = spte_to_pfn(old_pte) != spte_to_pfn(new_pte);
-+
-+	if (is_accessed_direct_pte(old_pte, level) &&
-+	    (!is_accessed_direct_pte(new_pte, level) || pfn_changed))
-+		kvm_set_pfn_accessed(spte_to_pfn(old_pte));
-+}
-+
- /*
-  * Takes a snapshot of, and clears, the direct MMU disconnected pt list. Once
-  * TLBs have been flushed, this snapshot can be transferred to the direct MMU
-@@ -1847,6 +1872,7 @@ static void mark_pte_disconnected(struct kvm *kvm, int as_id, gfn_t gfn,
- 
- 	handle_changed_pte(kvm, as_id, gfn, old_pte, DISCONNECTED_PTE, level,
- 			   vm_teardown, disconnected_pts);
-+	handle_changed_pte_acc_track(old_pte, DISCONNECTED_PTE, level);
- }
- 
- /**
-@@ -2412,8 +2438,8 @@ static bool cmpxchg_pte(u64 *ptep, u64 old_pte, u64 new_pte, int level, u64 gfn)
- 	return r == old_pte;
- }
- 
--static bool direct_walk_iterator_set_pte(struct direct_walk_iterator *iter,
--					 u64 new_pte)
-+static bool direct_walk_iterator_set_pte_raw(struct direct_walk_iterator *iter,
-+					 u64 new_pte, bool handle_acc_track)
- {
- 	bool r;
- 
-@@ -2435,6 +2461,10 @@ static bool direct_walk_iterator_set_pte(struct direct_walk_iterator *iter,
- 				   iter->old_pte, new_pte, iter->level, false,
- 				   &iter->disconnected_pts);
- 
-+		if (handle_acc_track)
-+			handle_changed_pte_acc_track(iter->old_pte, new_pte,
-+						     iter->level);
-+
- 		if (iter->lock_mode & (MMU_WRITE_LOCK | MMU_READ_LOCK))
- 			iter->tlbs_dirty++;
- 	} else
-@@ -2443,6 +2473,18 @@ static bool direct_walk_iterator_set_pte(struct direct_walk_iterator *iter,
- 	return r;
- }
- 
-+static bool direct_walk_iterator_set_pte_no_acc_track(
-+		struct direct_walk_iterator *iter, u64 new_pte)
-+{
-+	return direct_walk_iterator_set_pte_raw(iter, new_pte, false);
-+}
-+
-+static bool direct_walk_iterator_set_pte(struct direct_walk_iterator *iter,
-+					 u64 new_pte)
-+{
-+	return direct_walk_iterator_set_pte_raw(iter, new_pte, true);
-+}
-+
- static u64 generate_nonleaf_pte(u64 *child_pt, bool ad_disabled)
- {
- 	u64 pte;
-@@ -2965,14 +3007,107 @@ static void rmap_recycle(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
- 			KVM_PAGES_PER_HPAGE(sp->role.level));
- }
- 
-+static int age_direct_gfn_range(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				 gfn_t start, gfn_t end, unsigned long ignored)
-+{
-+	struct direct_walk_iterator iter;
-+	int young = 0;
-+	u64 new_pte = 0;
-+
-+	direct_walk_iterator_setup_walk(&iter, kvm, slot->as_id, start, end,
-+					MMU_WRITE_LOCK);
-+	while (direct_walk_iterator_next_present_leaf_pte(&iter)) {
-+		/*
-+		 * If we have a non-accessed entry we don't need to change the
-+		 * pte.
-+		 */
-+		if (!is_accessed_direct_pte(iter.old_pte, iter.level))
-+			continue;
-+
-+		if (shadow_accessed_mask)
-+			new_pte = iter.old_pte & ~shadow_accessed_mask;
-+		else {
-+			new_pte = save_pte_permissions_for_access_track(
-+					iter.old_pte);
-+			new_pte |= shadow_acc_track_value;
-+		}
-+
-+		/*
-+		 * We've created a new pte with the accessed state cleared.
-+		 * Warn if we're about to put in a pte that still looks
-+		 * accessed.
-+		 */
-+		WARN_ON(is_accessed_direct_pte(new_pte, iter.level));
-+
-+		if (!direct_walk_iterator_set_pte_no_acc_track(&iter, new_pte))
-+			continue;
-+
-+		young = true;
-+
-+		if (shadow_accessed_mask)
-+			trace_kvm_age_page(iter.pte_gfn_start, iter.level, slot,
-+					   young);
-+	}
-+	direct_walk_iterator_end_traversal(&iter);
-+
-+	return young;
-+}
-+
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
- {
--	return kvm_handle_hva_range(kvm, start, end, 0, kvm_age_rmapp);
-+	int young = 0;
-+
-+	if (kvm->arch.direct_mmu_enabled)
-+		young |= kvm_handle_direct_hva_range(kvm, start, end, 0,
-+						     age_direct_gfn_range);
-+
-+	if (!kvm->arch.pure_direct_mmu)
-+		young |= kvm_handle_hva_range(kvm, start, end, 0,
-+					      kvm_age_rmapp);
-+	return young;
-+}
-+
-+static int test_age_direct_gfn_range(struct kvm *kvm,
-+				     struct kvm_memory_slot *slot,
-+				     gfn_t start, gfn_t end,
-+				     unsigned long ignored)
-+{
-+	struct direct_walk_iterator iter;
-+	int young = 0;
-+
-+	direct_walk_iterator_setup_walk(&iter, kvm, slot->as_id, start, end,
-+					MMU_WRITE_LOCK);
-+	while (direct_walk_iterator_next_present_leaf_pte(&iter)) {
-+		if (is_accessed_direct_pte(iter.old_pte, iter.level)) {
-+			young = true;
-+			break;
-+		}
-+	}
-+	direct_walk_iterator_end_traversal(&iter);
-+
-+	return young;
- }
- 
- int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
- {
--	return kvm_handle_hva(kvm, hva, 0, kvm_test_age_rmapp);
-+	int young = 0;
-+
-+	/*
-+	 * If there's no access bit in the secondary pte set by the
-+	 * hardware it's up to gup-fast/gup to set the access bit in
-+	 * the primary pte or in the page structure.
-+	 */
-+	if (!shadow_accessed_mask)
-+		return young;
-+
-+	if (kvm->arch.direct_mmu_enabled)
-+		young |= kvm_handle_direct_hva_range(kvm, hva, hva + 1, 0,
-+						     test_age_direct_gfn_range);
-+
-+	if (!kvm->arch.pure_direct_mmu)
-+		young |= kvm_handle_hva(kvm, hva, 0, kvm_test_age_rmapp);
-+
-+	return young;
- }
- 
- #ifdef MMU_DEBUG
+ struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d494044104270..771e159d6bea9 100644
+index 771e159d6bea9..ffc6951f2bc93 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -439,7 +439,12 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
- 	write_lock(&kvm->mmu_lock);
+@@ -130,8 +130,6 @@ static void hardware_disable_all(void);
  
- 	young = kvm_age_hva(kvm, start, end);
--	if (young)
-+
-+	/*
-+	 * If there was an accessed page in the provided range, or there are
-+	 * un-flushed paging structure changes, flush the TLBs.
-+	 */
-+	if (young || kvm->tlbs_dirty)
- 		kvm_flush_remote_tlbs(kvm);
+ static void kvm_io_bus_destroy(struct kvm_io_bus *bus);
  
- 	write_unlock(&kvm->mmu_lock);
+-static void mark_page_dirty_in_slot(struct kvm_memory_slot *memslot, gfn_t gfn);
+-
+ __visible bool kvm_rebooting;
+ EXPORT_SYMBOL_GPL(kvm_rebooting);
+ 
+@@ -2214,8 +2212,7 @@ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len)
+ }
+ EXPORT_SYMBOL_GPL(kvm_clear_guest);
+ 
+-static void mark_page_dirty_in_slot(struct kvm_memory_slot *memslot,
+-				    gfn_t gfn)
++void mark_page_dirty_in_slot(struct kvm_memory_slot *memslot, gfn_t gfn)
+ {
+ 	if (memslot && memslot->dirty_bitmap) {
+ 		unsigned long rel_gfn = gfn - memslot->base_gfn;
+@@ -2223,6 +2220,7 @@ static void mark_page_dirty_in_slot(struct kvm_memory_slot *memslot,
+ 		set_bit_le(rel_gfn, memslot->dirty_bitmap);
+ 	}
+ }
++EXPORT_SYMBOL_GPL(mark_page_dirty_in_slot);
+ 
+ void mark_page_dirty(struct kvm *kvm, gfn_t gfn)
+ {
 -- 
 2.23.0.444.g18eeb5a265-goog
 
