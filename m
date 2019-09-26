@@ -2,142 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 666FDBFA27
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 21:33:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1D86BFA31
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 21:38:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728653AbfIZTdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 15:33:39 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:40955 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728464AbfIZTdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 15:33:39 -0400
-Received: by mail-pg1-f196.google.com with SMTP id w10so2080862pgj.7;
-        Thu, 26 Sep 2019 12:33:39 -0700 (PDT)
+        id S1728601AbfIZTix (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 15:38:53 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:34199 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728377AbfIZTix (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 15:38:53 -0400
+Received: by mail-io1-f65.google.com with SMTP id q1so9751889ion.1
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 12:38:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=YNVcgmXz/4TZ89qYi72xdZ0yUZGHtVYXxe8ksb5z6rQ=;
-        b=LQcKNvFcjhf52vkDhChHAvJBub24+VVIdIOAN7luWyloJjj814Bt3XCZXIbMU8zj01
-         kS1rwkcd2Bg4aPyF0iZm2ti7VXkcCN03q0gQZdi2CTCJZW4UnpQfDmO6u1cIEeN8yyUD
-         rU8aQCPP7+ctSxT69wkStouEDALcngcJwVngjR7FkKHWFb8zuKRBB8jtYDII4mzB8EaY
-         KgJhQiVnwigoAvPDwF1NzdmCHQHJ9vSStF1HWIbSxnP7TcwpxT5P8YdIdrPPhrFudLzN
-         g0jNanX52MuZ6WBfXHPxRwuYD55Gs3lM6BBD/0heBQ112rVUjXhYL1F6zlPm/unQAp35
-         3yIQ==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=hQzy8LbHLkK3XnIVo/GXvWU/bK6fv1zYAo+OsxfceGU=;
+        b=fDyvd0OBUD8Xgor8CvYwe1J1pfELzvGHjrM7680Ec0fvfTdwHVyg8/Df6AhPaU7vcd
+         ep2OsmEI+s+kmgewoIFdV5y+1QC10ZUuDNeK9SnSOR29wRpx4i9L1Il0rKJExxJb280A
+         B15gF2PsgBC8S7kvqXcUIaajrLEs5sJkVOdfMmGijM08Yqs/SqbDb1GMiRgB/trTyQrf
+         7iNManTfRCRd6/+iQXScAYZeQvmWfAGF0kO+4oHR+9de+UWfFALrWgmRENXPqTqFwIzl
+         MBf91wlj00tPkO2IxR6+NcYSDjlq1jGW5RuY4hrro3v7GSGSMIWBqI89JgrERtdiDYlq
+         Fubw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YNVcgmXz/4TZ89qYi72xdZ0yUZGHtVYXxe8ksb5z6rQ=;
-        b=m78l8SwNICYAq6oO3nkH6i0XHxZWJp2DPOxxe6HKxwF0L5C0Ce3HbpFZvIbrxfOOEG
-         mbogRXgMgY4TBtdDDuspLE+PdRANztUvxfIwQ2fruB6Bnq8VVsm7WHMtaAoJ6GNYEhzB
-         ow1k3QTSA3yaTI++7W2y7/B9sqFTRn7zXym0r9moT8u+tl0fSSgFgtqgpK+a7xUpBy65
-         Kkgv1jzb/m+oiMIdA/fWdaIV4yiJ64rxZaJcRWZrmJLuVKCa4Zqmt5k7FMWpeIP4/YUk
-         bJmbsL37sNbvdjAIP11VrY2gv5llpu8HESw6xjKCzALgUI332DLCQNTirNyB4r8LaVcZ
-         psBA==
-X-Gm-Message-State: APjAAAV+3uYEeybtAOrjBzeYGIroUT5+z5VoO8m3tyfEj256NW57+bna
-        7A3riJEkvINyBnv+g1LPxdQ=
-X-Google-Smtp-Source: APXvYqwVC8CgaBAaZrZp18sW5w1ajggjrTQ+D9LBCv7HM3iy9PqeXuOf37BaQp134FgDRzhrNV1kIg==
-X-Received: by 2002:a17:90a:cf0c:: with SMTP id h12mr5257802pju.110.1569526418858;
-        Thu, 26 Sep 2019 12:33:38 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2c1:200:55c7:81e6:c7d8:94b? ([2620:15c:2c1:200:55c7:81e6:c7d8:94b])
-        by smtp.gmail.com with ESMTPSA id v12sm2984732pgr.31.2019.09.26.12.33.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2019 12:33:37 -0700 (PDT)
-Subject: Re: [PATCH] vsock/virtio: add support for MSG_PEEK
-To:     Matias Ezequiel Vara Larsen <matiasevara@gmail.com>,
-        stefanha@redhat.com
-Cc:     davem@davemloft.net, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sgarzare@redhat.com
-References: <1569522214-28223-1-git-send-email-matiasevara@gmail.com>
-From:   Eric Dumazet <eric.dumazet@gmail.com>
-Message-ID: <f069a65d-33b9-1fa8-d26e-b76cc51fc7cb@gmail.com>
-Date:   Thu, 26 Sep 2019 12:33:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hQzy8LbHLkK3XnIVo/GXvWU/bK6fv1zYAo+OsxfceGU=;
+        b=nWvzAwoFWvWeEo1AzBHUU0OyrUc3NLjlDkFiML6a98b88un2Z9+aOJS/ThouhGtWX2
+         3DVfL24SneqWK+1Ls9yADMhPbpfCpii2+LCc5nehOYJ8cZiwBnLEIG5rfsbmgOq5rlBs
+         DFE9Ic82Uxc7VuCO+OSjVV2xE0gI7lSkVyYacObc+cxzRbqS/FzMqeoEuye+Mm3Uz4QM
+         C9fzi0tDFav7CyF2S20UuKi549nMTXHH9gLq8xGIm9029SQXCyb14Vddp6OeYyLBt5pH
+         Ep6duO1dUtP9ap6jhwMKAFxVIrmA1RLXRi1t87PT3se+2OaXvcYWlZT0u6ZJlNx8mqKy
+         xpgg==
+X-Gm-Message-State: APjAAAX7Xec0Vgysc3/SavpaOhhZecx+bqKW0uNhReK9VBKVdtiu761n
+        eom3I1HjH3OfaoM5h4shHi2RjN/w+zvsAGKp3UDphg==
+X-Google-Smtp-Source: APXvYqw+XXX3Qm9wa9uiYcHg2E7ZyL3wSB3SpN20bzbD0/89oKcxh5MQy4NTRNOkcJa/XKKXc0ESen3+vZ1uiC5rJxw=
+X-Received: by 2002:a6b:1606:: with SMTP id 6mr5315905iow.108.1569526732080;
+ Thu, 26 Sep 2019 12:38:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1569522214-28223-1-git-send-email-matiasevara@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190926000418.115956-1-jmattson@google.com> <20190926000418.115956-2-jmattson@google.com>
+ <79a9e68d-808b-2975-ab78-43e0ae00bd1b@intel.com>
+In-Reply-To: <79a9e68d-808b-2975-ab78-43e0ae00bd1b@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 26 Sep 2019 12:38:41 -0700
+Message-ID: <CALMp9eRHnc0sPRmQu0Y9s=2uw0LPSumsw75pOjcaUD1JPB68UA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kvm: x86: Use AMD CPUID semantics for AMD vCPUs
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jacob Xu <jacobhxu@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 9/26/19 11:23 AM, Matias Ezequiel Vara Larsen wrote:
-> This patch adds support for MSG_PEEK. In such a case, packets are not
-> removed from the rx_queue and credit updates are not sent.
-> 
-> Signed-off-by: Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 50 +++++++++++++++++++++++++++++++--
->  1 file changed, 47 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 94cc0fa..938f2ed 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -264,6 +264,50 @@ static int virtio_transport_send_credit_update(struct vsock_sock *vsk,
->  }
->  
->  static ssize_t
-> +virtio_transport_stream_do_peek(struct vsock_sock *vsk,
-> +				struct msghdr *msg,
-> +				size_t len)
-> +{
-> +	struct virtio_vsock_sock *vvs = vsk->trans;
-> +	struct virtio_vsock_pkt *pkt;
-> +	size_t bytes, total = 0;
-> +	int err = -EFAULT;
-> +
-> +	spin_lock_bh(&vvs->rx_lock);
-> +
-> +	list_for_each_entry(pkt, &vvs->rx_queue, list) {
-> +		if (total == len)
-> +			break;
-> +
-> +		bytes = len - total;
-> +		if (bytes > pkt->len - pkt->off)
-> +			bytes = pkt->len - pkt->off;
-> +
-> +		/* sk_lock is held by caller so no one else can dequeue.
-> +		 * Unlock rx_lock since memcpy_to_msg() may sleep.
-> +		 */
-> +		spin_unlock_bh(&vvs->rx_lock);
-> +
-> +		err = memcpy_to_msg(msg, pkt->buf + pkt->off, bytes);
-> +		if (err)
-> +			goto out;
-> +
-> +		spin_lock_bh(&vvs->rx_lock);
-> +
-> +		total += bytes;
-> +	}
-> +
-> +	spin_unlock_bh(&vvs->rx_lock);
-> +
-> +	return total;
-> +
-> +out:
-> +	if (total)
-> +		err = total;
-> +	return err;
-> +}
+On Wed, Sep 25, 2019 at 7:30 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 >
+> On 9/26/2019 8:04 AM, Jim Mattson wrote:
+> > When the guest CPUID information represents an AMD vCPU, return all
+> > zeroes for queries of undefined CPUID leaves, whether or not they are
+> > in range.
+> >
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Fixes: bd22f5cfcfe8f6 ("KVM: move and fix substitue search for missing =
+CPUID entries")
+> > Reviewed-by: Marc Orr <marcorr@google.com>
+> > Reviewed-by: Peter Shier <pshier@google.com>
+> > Reviewed-by: Jacob Xu <jacobhxu@google.com>
+> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >   arch/x86/kvm/cpuid.c | 6 ++++--
+> >   1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index 35e2f930a4b79..0377d2820a7aa 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -988,9 +988,11 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u3=
+2 *ebx,
+> >       /*
+> >        * Intel CPUID semantics treats any query for an out-of-range
+> >        * leaf as if the highest basic leaf (i.e. CPUID.0H:EAX) were
+> > -      * requested.
+> > +      * requested. AMD CPUID semantics returns all zeroes for any
+> > +      * undefined leaf, whether or not the leaf is in range.
+> >        */
+> > -     if (!entry && check_limit && !cpuid_function_in_range(vcpu, funct=
+ion)) {
+> > +     if (!entry && check_limit && !guest_cpuid_is_amd(vcpu) &&
+> > +         !cpuid_function_in_range(vcpu, function)) {
+>
+> IIUC, the parameter check_limit is to indicate whether return highest
+> basic leaf when out-of-range. Here you just makes check_limit meaningless=
+.
 
-This seems buggy to me.
+That's right. For AMD CPUID semantics, there is no need for check_limit.
 
-virtio_transport_recv_enqueue() seems to be able to add payload to the last packet in the queue.
+> Maybe we can do like this to use check_limit reasonably=EF=BC=9A
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 0377d2820a7a..e6a61f3f6c0c 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1035,7 +1035,8 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
+>
+>          eax =3D kvm_rax_read(vcpu);
+>          ecx =3D kvm_rcx_read(vcpu);
+> -       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
+> +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx,
+> +                       guest_cpuid_is_amd(vcpu) ? false: true);
+>          kvm_rax_write(vcpu, eax);
+>          kvm_rbx_write(vcpu, ebx);
+>          kvm_rcx_write(vcpu, ecx);
+>
+> >               max =3D kvm_find_cpuid_entry(vcpu, 0, 0);
+> >               if (max) {
+> >                       function =3D max->eax;
 
-The loop you wrote here would miss newly added chunks while the vvs->rx_lock spinlock has been released.
-
-virtio_transport_stream_do_dequeue() is ok, because it makes sure pkt->off == pkt->len
-before cleaning the packet from the queue.
-
-
-
+Since over-limit CPUID queries should be rare, it seems unfortunate to
+pay the cost of guest_cpuid_is_amd() for every emulated CPUID
+instruction.
