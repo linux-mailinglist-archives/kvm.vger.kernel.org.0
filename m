@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBAE3BFBD9
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 01:19:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45F40BFBDA
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 01:19:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729029AbfIZXTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 19:19:16 -0400
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:45742 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729000AbfIZXTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 19:19:16 -0400
-Received: by mail-pg1-f202.google.com with SMTP id x31so2342209pgl.12
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:19:14 -0700 (PDT)
+        id S1729066AbfIZXTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 19:19:18 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:38234 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728923AbfIZXTS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 19:19:18 -0400
+Received: by mail-pf1-f202.google.com with SMTP id o73so506139pfg.5
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:19:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=pjsieQrVqzRo5zN4EmfN5iO0IfPCBNYoWVGBuyUs8Qg=;
-        b=M1Z2oAMkPk6JfY68Hizv1Zgi11SrxKxsM+aC/SXiywqyr2sRFyDTGTvblWAwG1X/iM
-         W2YMHZcx1SXFyy/ul87lZr+jBxxLaqNPBgGDaWr6dcY96W2gztU/u/fgfmHxZkf0BOXv
-         RKI7SjnTfA51x9DDO5HBVg9aZRVM57i6urq3dgbEkKUYXE5Ev4gTo++4Ys1Zf8tevaSh
-         v0sRnuJBFepPKbZO4YLmaIrBP/xh2v6DylcF/sKDHi0c7+B/QjXUxv78TqoI734EcLhk
-         nn7jvgIkR+yXIL82hQ/F4m3jflNTo4XPX3m3iP1+K9UMGWFnqrK3KP0S5ppyx3kzsHMD
-         lquw==
+        bh=F99sLOt6ycqNpVSwRazWYbJGaaY9sNjDqxSMusz0x3Q=;
+        b=iXWnTMR7sovsTNb7RwuU1sO/9obsyk5x2c2g8W9SWQLW5CMgjoQ99yNcU9qR8qCVlK
+         aogC9AjD8eGueFb6ve4S/u8IFwUDAWSzaTBLC/3Vb8+x9MvLk/thfUlQZ8gbitCNF89H
+         WpvCPJ0UInLXUaWLRRFMVZZXfAz4eoLaZWYpWmkBEzOumY9RmaZpa6+ID5MquLpp14ry
+         3CuCYiu9nqpXcu4r2svqE1gwd3KVihlU4RDjT3mQUNxnIgc1iKdhIO/VBoAVjCUhmdot
+         EJ/79gZEQdYIKC78FPBOxmCQ8+/nRvt05ivM+xFuzpJkNVmAH/6WtGZ1qX4B24p7nvmQ
+         aiKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=pjsieQrVqzRo5zN4EmfN5iO0IfPCBNYoWVGBuyUs8Qg=;
-        b=n8IWgllDJ6inpBkP5GXhdTBHpTo+pkh1CidjLFP80ORoBcRVQ7yPAJ3mPmHVjFJwLW
-         yzkzqVydTMOdhgegpZ3po8DMlA9Bwn2uTyZHFaxdFUEvGhjIbFDV1LJO6BGynRUMWUHP
-         JJUDZvXVGz1u6KHIjv34TYx9xtjDW/felB9gjU3l9wck8xsl6kRCZOQZyzgqsLMibbro
-         Sr9jjx3EehenkAl7RTvBsfV7L8TtEkEApWYZ6Vf8f7lwmbDKJQ1ku4rMp/I7SlYTR18Z
-         PtMKqKzwtzFodxAbQFSvR6HfZIAW68P03hTgiax8xzprhJIRDN7G1jNlOHhvboxjHWJ+
-         bgpg==
-X-Gm-Message-State: APjAAAW8YyeVn3GdLLFRdApoRi+bdBEx/eLKomgLAKPAanOLvt0Wpa+l
-        aGKti/RegdEZo3CurfscE7wee/RKFgk4ZQms9gfXQ/z2FgyHNL9b7JWxQ3zQuN92/hYFpF8EibD
-        YY9I+Kd6Xa/de3B8B0Cm6iJsn5eh0cCzfS4IfgNI6NQP5ubS/eiLloolAYMxv
-X-Google-Smtp-Source: APXvYqx7Faea5HKGs73dumpZ1D1T3gyHtvbcnqAcoCEIHi9dw7VbN5oB+yBP0Olfz1k48+/iGdL66ygWiojR
-X-Received: by 2002:a63:ca06:: with SMTP id n6mr5863067pgi.17.1569539953221;
- Thu, 26 Sep 2019 16:19:13 -0700 (PDT)
-Date:   Thu, 26 Sep 2019 16:18:16 -0700
+        bh=F99sLOt6ycqNpVSwRazWYbJGaaY9sNjDqxSMusz0x3Q=;
+        b=meq2vgkw63N2AZSlUWHZJXcJGQuWqnefgYeKOYPA9VCVzfuYgC+m+/dUsrAOmJAJf2
+         bXr1Ob178GWEiwq1/lxwMKP7xZxj3IydhQYI1griYJe0lmohUmr/Q+n/z9MI0GXZzPgq
+         7YoqzwrBJk+owNLFOrY1M4FNdUwWMMXNxvaXvd/u8k/N0GGBL/PgA0hfSuPfEHU457CE
+         FJIZjgzOsSlEyCHtBbyZF9AdhMUnyNqS61ZiYwv02keszchrQ+jPU2Zxyx18GtSvwYB5
+         nf2j9vOYBNRMlNrjMIrw8rjBL1Z6rwYEJ974N1dyICvqOYwCBgWWqRAQP8L+B/bLIVRo
+         NhZw==
+X-Gm-Message-State: APjAAAU8s0gH270N2j0ZjirXVK3KIdRkTIAPyU0/ZuqaQLGxsERyU9yj
+        XEyFvWrejM3iNb+sV5TcMYaJAnj4T8Ud1eruGQxWgTBHfVUOf/wG9UR7mXAk2U2Ok4PKu3B44LP
+        LOo6Rjlbcw0JRtOA1nRRdqPWZMD2jpSaRtEvhy8KsnyoG3oEb21ojmoReegPg
+X-Google-Smtp-Source: APXvYqxy4rEPW7fSq0jEXq3PQ3dro8OT2SKGdp0doBqa2qiOp3znwJyslw+3RPUpUKvQvBBrmk0rzSd8U74y
+X-Received: by 2002:a63:78cf:: with SMTP id t198mr6065109pgc.227.1569539955863;
+ Thu, 26 Sep 2019 16:19:15 -0700 (PDT)
+Date:   Thu, 26 Sep 2019 16:18:17 -0700
 In-Reply-To: <20190926231824.149014-1-bgardon@google.com>
-Message-Id: <20190926231824.149014-21-bgardon@google.com>
+Message-Id: <20190926231824.149014-22-bgardon@google.com>
 Mime-Version: 1.0
 References: <20190926231824.149014-1-bgardon@google.com>
 X-Mailer: git-send-email 2.23.0.444.g18eeb5a265-goog
-Subject: [RFC PATCH 20/28] kvm: mmu: Implement the invalidation MMU notifiers
- for the direct MMU
+Subject: [RFC PATCH 21/28] kvm: mmu: Integrate the direct mmu with the changed
+ pte notifier
 From:   Ben Gardon <bgardon@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -63,58 +63,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implements arch specific handler functions for the invalidation MMU
-notifiers, using a paging structure iterator. These handlers are
-responsible for zapping paging structure entries to enable the main MM
-to safely remap memory that was used to back guest memory.
+Implements arch specific handler functions for the changed pte MMU
+notifier. This handler uses the paging structure walk iterator and is
+needed to allow the main MM to update page permissions safely on pages
+backing guest memory.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu.c | 53 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 51 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 32426536723c6..ca9b3f574f401 100644
+index ca9b3f574f401..b144c803c36d2 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -2829,6 +2829,22 @@ static bool zap_direct_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
- 	return direct_walk_iterator_end_traversal(&iter);
+@@ -2386,7 +2386,6 @@ static bool direct_walk_iterator_next_present_pte(
+ /*
+  * As direct_walk_iterator_next_present_pte but skips over non-leaf ptes.
+  */
+-__attribute__((unused))
+ static bool direct_walk_iterator_next_present_leaf_pte(
+ 		struct direct_walk_iterator *iter)
+ {
+@@ -2867,9 +2866,59 @@ int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
+ 	return r;
  }
  
-+static int zap_direct_gfn_range_handler(struct kvm *kvm,
-+					struct kvm_memory_slot *slot,
-+					gfn_t start, gfn_t end,
-+					unsigned long data)
++static int set_direct_pte_gfn(struct kvm *kvm, struct kvm_memory_slot *slot,
++			      gfn_t start, gfn_t end, unsigned long pte)
 +{
-+	return zap_direct_gfn_range(kvm, slot->as_id, start, end,
-+				    MMU_WRITE_LOCK);
++	struct direct_walk_iterator iter;
++	pte_t host_pte;
++	kvm_pfn_t new_pfn;
++	u64 new_pte;
++
++	host_pte.pte = pte;
++	new_pfn = pte_pfn(host_pte);
++
++	direct_walk_iterator_setup_walk(&iter, kvm, slot->as_id, start, end,
++					MMU_WRITE_LOCK);
++	while (direct_walk_iterator_next_present_leaf_pte(&iter)) {
++		BUG_ON(iter.level != PT_PAGE_TABLE_LEVEL);
++
++		if (pte_write(host_pte))
++			new_pte = 0;
++		else {
++			new_pte = iter.old_pte & ~PT64_BASE_ADDR_MASK;
++			new_pte |= new_pfn << PAGE_SHIFT;
++			new_pte &= ~PT_WRITABLE_MASK;
++			new_pte &= ~SPTE_HOST_WRITEABLE;
++			new_pte &= ~shadow_dirty_mask;
++			new_pte &= ~shadow_accessed_mask;
++			new_pte = mark_spte_for_access_track(new_pte);
++		}
++
++		if (!direct_walk_iterator_set_pte(&iter, new_pte))
++			continue;
++	}
++	return direct_walk_iterator_end_traversal(&iter);
 +}
 +
-+static bool zap_direct_hva_range(struct kvm *kvm, unsigned long start,
-+		unsigned long end)
++static int set_direct_pte_hva(struct kvm *kvm, unsigned long address,
++			    pte_t host_pte)
 +{
-+	return kvm_handle_direct_hva_range(kvm, start, end, 0,
-+					   zap_direct_gfn_range_handler);
++	return kvm_handle_direct_hva_range(kvm, address, address + 1,
++					   host_pte.pte, set_direct_pte_gfn);
 +}
 +
- static int kvm_handle_hva(struct kvm *kvm, unsigned long hva,
- 			  unsigned long data,
- 			  int (*handler)(struct kvm *kvm,
-@@ -2842,7 +2858,13 @@ static int kvm_handle_hva(struct kvm *kvm, unsigned long hva,
- 
- int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
+ int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
  {
--	return kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
-+	int r = 0;
+-	return kvm_handle_hva(kvm, hva, (unsigned long)&pte, kvm_set_pte_rmapp);
++	int need_flush = 0;
++
++	WARN_ON(pte_huge(pte));
 +
 +	if (kvm->arch.direct_mmu_enabled)
-+		r |= zap_direct_hva_range(kvm, start, end);
++		need_flush |= set_direct_pte_hva(kvm, hva, pte);
 +	if (!kvm->arch.pure_direct_mmu)
-+		r |= kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
-+	return r;
++		need_flush |= kvm_handle_hva(kvm, hva, (unsigned long)&pte,
++					     kvm_set_pte_rmapp);
++	return need_flush;
  }
  
- int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+ static int kvm_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
 -- 
 2.23.0.444.g18eeb5a265-goog
 
