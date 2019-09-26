@@ -2,123 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 04C3DBEDF4
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 10:59:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47DBCBEE61
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 11:25:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730064AbfIZI7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 04:59:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59006 "EHLO mx1.redhat.com"
+        id S1726180AbfIZJZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 05:25:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57680 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728506AbfIZI7u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 04:59:50 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        id S1725554AbfIZJZA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 05:25:00 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CB4BD81F2F
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 08:59:49 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id 32so647715wrk.15
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 01:59:49 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 50A8D796E9
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 09:25:00 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id k9so887416wmb.0
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 02:25:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to;
-        bh=edpoGsqQ65H3Og8WvxTfFnznGLy9c4jNpqmavlqEW8I=;
-        b=G9btuc3oBrSjoEloHw4tWSlpUyBk5u371YtbYUoJWgKo5E6rPgxf5W+9wS1TOwzG8a
-         eVkZwu86uopkNg/k7OXiRh9JVPvLogKDP8IdeIBQwiIH5RDjCCgOABIlgtSSrIzV/F1/
-         ZAdidN9jIm4gPO9BvrqQNgWC5yGk1zElm6DRcRplKAUJf9oSX0AMV2owho6tmkP4EKW/
-         BNKghHDYSK3JwV+jJBh6MS4t/B83jB8SGO19wb86xafIJwiFqGq8vQxlKeqBkz2Tydub
-         6Z0JaxFcpj/8kuFjXNbi5W+mPoaZgkhE2LUqCZdtPVDXl4KaFRrZUbtWmegh4d0FMC/v
-         Petg==
-X-Gm-Message-State: APjAAAXIry1oQ3MYyr9aZRNN9tyU10sFrbHevhD9+Ig69whiPICt0rYK
-        SIDCfzuI9ymNdGn1QwOyoXbvtdTd4GPaaZ+35r9C4hQgo7ursstCSkFRxiknv6NvB/kysEoas1p
-        /glccKlIcq0zs
-X-Received: by 2002:a1c:a853:: with SMTP id r80mr1976697wme.140.1569488388136;
-        Thu, 26 Sep 2019 01:59:48 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyAUmUjHA/DfTedbR1Linvyr8n0uou69CP7kzs/Vp8bLNQl7s5q41Y3O/WX+P+knoO7zLlXMw==
-X-Received: by 2002:a1c:a853:: with SMTP id r80mr1976667wme.140.1569488387812;
-        Thu, 26 Sep 2019 01:59:47 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MitFebjy9vWMVAuqlSBlrNpkTJefENQshQKklNwCqZQ=;
+        b=pvczSXErFqXeS+gtc8k/9LV0RmxqpmScKRFY5y2E0TOSYKOqrmUFzkPKCgZpB3VdFW
+         9yneeNucoHpmKUE9ZOpdVANAkVNil4ufoIHIBS5mZif9zOw+ETGCdE4fvWXRqMH/x3uX
+         Zr78u9+QmzlVGiKHIwAjlcs5YETT7AxG3IdmnXZ8KNRZBRMEdiSOknGTHIhRjO9vFh1F
+         EgHP5CBipBcDOMaWHhndyZRbyxOdrIcncLrEdJaJmZzEvpWogHUPKB4hvYlenodmzhlH
+         e4rRSt6fbdbN00X1asDOIQGL8AGGdTyE8Oi7OVopr2X8YSge5wFhinVpqLDl+cp8pJvq
+         s0mA==
+X-Gm-Message-State: APjAAAWCdvnBhaT3mNXNqcW8pldRp10eTLT3xDSKu3/0NwCH085OitE+
+        6D8EBs0YXBj6S5GX+WwzxAsQTI13sMvsI3rjHWLFtY0ljDjFgv80He0ANtUCjoTNsrKdX5WisrZ
+        iI3Y3uyNYoRqx
+X-Received: by 2002:a5d:6a06:: with SMTP id m6mr2066471wru.190.1569489898736;
+        Thu, 26 Sep 2019 02:24:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwZ2fDG8gQ5uNKfB0wd8U2WGwatSmD2QMGSTUq4VWJEELsuwgzp4pvDqrWUNS1ijxKM9lOfMA==
+X-Received: by 2002:a5d:6a06:: with SMTP id m6mr2066454wru.190.1569489898443;
+        Thu, 26 Sep 2019 02:24:58 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id g4sm2290486wrw.9.2019.09.26.01.59.46
+        by smtp.gmail.com with ESMTPSA id s12sm4936540wra.82.2019.09.26.02.24.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2019 01:59:46 -0700 (PDT)
-Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
-To:     Sergio Lopez <slp@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
-        marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
-        lersek@redhat.com, kraxel@redhat.com, mtosatti@redhat.com,
-        kvm@vger.kernel.org
-References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-9-slp@redhat.com>
- <061b720c-2ef2-b270-f18b-b0619573862d@redhat.com> <87muer36sd.fsf@redhat.com>
+        Thu, 26 Sep 2019 02:24:57 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v7 2/2] x86: nvmx: test max atomic switch
+ MSRs
+To:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
+        jmattson@google.com, pshier@google.com,
+        sean.j.christopherson@intel.com, krish.sadhukhan@oracle.com,
+        rkrcmar@redhat.com, dinechin@redhat.com
+References: <20190925011821.24523-1-marcorr@google.com>
+ <20190925011821.24523-2-marcorr@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <95d0dc60-c418-4ad3-a0f7-dba0ff50515a@redhat.com>
-Date:   Thu, 26 Sep 2019 10:59:45 +0200
+Message-ID: <91eb40a0-c436-5737-aa8a-c657b7221be2@redhat.com>
+Date:   Thu, 26 Sep 2019 11:24:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87muer36sd.fsf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K"
+In-Reply-To: <20190925011821.24523-2-marcorr@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K
-Content-Type: multipart/mixed; boundary="EoJheJKDNp7fTYfkQWiKwoABRgq4OkHsM";
- protected-headers="v1"
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Sergio Lopez <slp@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
- marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
- lersek@redhat.com, kraxel@redhat.com, mtosatti@redhat.com,
- kvm@vger.kernel.org
-Message-ID: <95d0dc60-c418-4ad3-a0f7-dba0ff50515a@redhat.com>
-Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
-References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-9-slp@redhat.com>
- <061b720c-2ef2-b270-f18b-b0619573862d@redhat.com> <87muer36sd.fsf@redhat.com>
-In-Reply-To: <87muer36sd.fsf@redhat.com>
+On 25/09/19 03:18, Marc Orr wrote:
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 694ee3d42f3a..05122cf91ea1 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -227,7 +227,7 @@ extra_params = -cpu qemu64,+umip
+>  
+>  [vmx]
+>  file = vmx.flat
+> -extra_params = -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test"
+> +extra_params = -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test"
+>  arch = x86_64
+>  groups = vmx
 
---EoJheJKDNp7fTYfkQWiKwoABRgq4OkHsM
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 26/09/19 08:34, Sergio Lopez wrote:
->> Isn't this inherited from TYPE_X86_MACHINE?
-> Good question. Should we assume all x86 based machines have NMI, or jus=
-t
-> leave it to each board?
-
-NMI is hardcoded to exception 2 in the processor so it is there in all
-x86 machines.
+I just noticed this, why is the test disabled by default?
 
 Paolo
-
-
---EoJheJKDNp7fTYfkQWiKwoABRgq4OkHsM--
-
---mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2MfgEACgkQv/vSX3jH
-roPZEQf8CbicOml/CMfSZdGdwKF012b22PpkdV0y1zJok7WLvGoKWe5ul4k+liSH
-9k7YH2KoP2bKMwxai0uO5S7AMRm8OR0GzDlSDHT1r9kzhL/ZjrQi2cHa5ssGy4aS
-Y+q4svGEZ3DoGBY0xJ5DqJBm1WEHhuRY96xgt/FiHpmOOeHhuFyAp5LQYqhC5stb
-WF4/tDJVo00Ajrtm0FjQaSBOzadZwEanShhlF3EOHCumcLhsATiQOnxV4/QfUkDN
-zU7Pb6Y21L/oJqJe/rdBrrJj6deREGspRqT+C3YALHkT8LV44rtTKM0g231g5Acr
-Dl98TIPRYiP11SRAiwOKzBvQwuP/4w==
-=JDZc
------END PGP SIGNATURE-----
-
---mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K--
