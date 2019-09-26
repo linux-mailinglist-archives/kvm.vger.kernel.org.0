@@ -2,189 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA589BEF96
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 12:29:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC035BEFA1
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 12:31:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726061AbfIZK32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 06:29:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54430 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725883AbfIZK31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 06:29:27 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D8DA5D66B
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 10:29:26 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id j2so752463wre.1
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 03:29:26 -0700 (PDT)
+        id S1726087AbfIZKbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 06:31:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20269 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725208AbfIZKbK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 06:31:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1569493869;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=xCM2gmrRR22cE4S9oN112VCuGwqE6kkbJ9is9al5/Hc=;
+        b=LOX3RinaNWKrvgHRQPWpgGrp22KH9sS073aNVfIExLycveNg5LersJaX1KBBpcjluvQJ4M
+        lbo185D114bTA5mg798OqOBFEF35M7ReDW5ekidtU5aFPlcc8iJnj476zaL4w8ijwpgPAv
+        wo+I9mpF5Bir/mT/PBKXKQm/e5oyjqU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-6sQxyffKNQ2ADByEvfhpFg-1; Thu, 26 Sep 2019 06:31:08 -0400
+Received: by mail-wm1-f72.google.com with SMTP id f63so842443wma.7
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 03:31:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BY8HJnI4XVFhCNATjy1RWGMjwAHNDYeseMH3rD1F4Xc=;
-        b=O8A1rpHbqUZj4NAuUAUIWyuYGP1sTwuGDui8xKnvgk4HpJnUeCs9uifqrjOXzRUF9D
-         yYJTID731sY7IrZU25662kPxf/Mf7WR1aBUeDSlwACvjXlPPirlVS6l9MB4kNNC7riAI
-         xtdHgoDUUwnzlq9D3u/Usxwq2b0dfUWxwHuc3GwkEOVERNrp3PSQ8wSAKvJo74uGkCwX
-         mrHHHOTiJcPKWfB9rHnb+O+ppCG/8UQ9vqT+cU3ZBRLwBg3VGRWOeXbjTM22WI0fIB3S
-         hlj4MkhHnEppvGHViwVMOYhoqA3Pxq83crx3sc8EG6zcn8+amxs797asGfyWXyEUKO3t
-         FrfQ==
-X-Gm-Message-State: APjAAAU9WvU1nIE9sSJOksf2Fy/qqM7gNYuaf3UTmR8SV3pNVhOK8kRx
-        lLyHD14BaUPlo+hMbq+Tiw5GSDucNSvoqPDTJKKrVG1LF6Gr8HQUgVTNYFfwnGE6Mb9QtbTon2g
-        S3YG3vDr+GC7k
-X-Received: by 2002:a7b:c152:: with SMTP id z18mr2326489wmi.70.1569493765201;
-        Thu, 26 Sep 2019 03:29:25 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzE5lcwm+xbGXmpzIj2zShy+VtcwYstdlWDIfWOGZs9gThvQMeAx3wCPLig0ZwD1i+BFw7oaw==
-X-Received: by 2002:a7b:c152:: with SMTP id z18mr2326467wmi.70.1569493764888;
-        Thu, 26 Sep 2019 03:29:24 -0700 (PDT)
+        bh=dN2dNZ9PUSilO2/uPSojApb2GOkA+z7Wzm+fd/NDSCM=;
+        b=ZWz7JxYj2r22qL6UkE7R/yG8XxIxVPV/8HRbbssxTjE3JXdF7xwelCSfTO7CQ2E/Y9
+         dArp3uRDidWYod0AQkPZChOPayrqpj756WtgDJgTlrE/OZ88ISJ1CpR5tu2r9zoQqwM4
+         soieYfsXG5iO1l0nFL2HuvlLU8QhQc7cjdFx3eneG+LpVaLJnaPGKDIw4CZAZ8SytKAZ
+         gkL/PC4PEG4sWDf1lqhZxG/SqkZTQAhozXejOe+WiGpbxG1dknMvm9ixdjtPqsSzdmb3
+         oFLtDLMYMyDrvop9hrV7m9UUGNvHPFTl3i/NNoFxRCyALkkqjBQOZtc9klgTXmgpwxh7
+         SESw==
+X-Gm-Message-State: APjAAAVeI5QZev0i/y4YaTArfwnZu4n26ISoGLJF/nxdaYrzOJ+LDY35
+        ypn2N5UC6epmZU4lhiuITjfQ+8b5fqw40Xgp8vzpdizFI0oMBgTgM5O9Mbe+q4IvlxJy+wGYDrj
+        pWT8btpRPgO9f
+X-Received: by 2002:adf:f0c7:: with SMTP id x7mr2484763wro.2.1569493866751;
+        Thu, 26 Sep 2019 03:31:06 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxBvPo16QpIFnZEqAn1jL1Z6+eR77EJr8DDLEUtMfwMbC/U2nbiQRObc/rrpVNY+cHSt72gDQ==
+X-Received: by 2002:adf:f0c7:: with SMTP id x7mr2484724wro.2.1569493866164;
+        Thu, 26 Sep 2019 03:31:06 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id k9sm3285943wrd.7.2019.09.26.03.29.23
+        by smtp.gmail.com with ESMTPSA id p7sm2432548wma.34.2019.09.26.03.31.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2019 03:29:24 -0700 (PDT)
-Subject: Re: [PATCH v3] KVM: X86: Fix userspace set invalid CR4
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, stable@vger.kernel.org
-References: <1568800210-3127-1-git-send-email-wanpengli@tencent.com>
+        Thu, 26 Sep 2019 03:31:05 -0700 (PDT)
+Subject: Re: [PATCH 2/2] kvm: x86: Use AMD CPUID semantics for AMD vCPUs
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Marc Orr <marcorr@google.com>, Peter Shier <pshier@google.com>,
+        Jacob Xu <jacobhxu@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190926000418.115956-1-jmattson@google.com>
+ <20190926000418.115956-2-jmattson@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <851fbe10-289b-c11c-375a-c6daa188ce17@redhat.com>
-Date:   Thu, 26 Sep 2019 12:29:23 +0200
+Message-ID: <f678b935-bd80-6935-f686-9dc94d9b111d@redhat.com>
+Date:   Thu, 26 Sep 2019 12:31:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1568800210-3127-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190926000418.115956-2-jmattson@google.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MC-Unique: 6sQxyffKNQ2ADByEvfhpFg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/09/19 11:50, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Reported by syzkaller:
-> 
-> 	WARNING: CPU: 0 PID: 6544 at /home/kernel/data/kvm/arch/x86/kvm//vmx/vmx.c:4689 handle_desc+0x37/0x40 [kvm_intel]
-> 	CPU: 0 PID: 6544 Comm: a.out Tainted: G           OE     5.3.0-rc4+ #4
-> 	RIP: 0010:handle_desc+0x37/0x40 [kvm_intel]
-> 	Call Trace:
-> 	 vmx_handle_exit+0xbe/0x6b0 [kvm_intel]
-> 	 vcpu_enter_guest+0x4dc/0x18d0 [kvm]
-> 	 kvm_arch_vcpu_ioctl_run+0x407/0x660 [kvm]
-> 	 kvm_vcpu_ioctl+0x3ad/0x690 [kvm]
-> 	 do_vfs_ioctl+0xa2/0x690
-> 	 ksys_ioctl+0x6d/0x80
-> 	 __x64_sys_ioctl+0x1a/0x20
-> 	 do_syscall_64+0x74/0x720
-> 	 entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> When CR4.UMIP is set, guest should have UMIP cpuid flag. Current
-> kvm set_sregs function doesn't have such check when userspace inputs
-> sregs values. SECONDARY_EXEC_DESC is enabled on writes to CR4.UMIP
-> in vmx_set_cr4 though guest doesn't have UMIP cpuid flag. The testcast
-> triggers handle_desc warning when executing ltr instruction since
-> guest architectural CR4 doesn't set UMIP. This patch fixes it by
-> adding valid CR4 and CPUID combination checking in __set_sregs.
-> 
-> syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=138efb99600000
-> 
-> Reported-by: syzbot+0f1819555fbdce992df9@syzkaller.appspotmail.com
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+On 26/09/19 02:04, Jim Mattson wrote:
+> When the guest CPUID information represents an AMD vCPU, return all
+> zeroes for queries of undefined CPUID leaves, whether or not they are
+> in range.
+>=20
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Fixes: bd22f5cfcfe8f6 ("KVM: move and fix substitue search for missing CP=
+UID entries")
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> Reviewed-by: Jacob Xu <jacobhxu@google.com>
+> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/kvm/x86.c | 38 +++++++++++++++++++++-----------------
->  1 file changed, 21 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f7cfd8e..d23cf0d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -884,34 +884,42 @@ int kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
->  }
->  EXPORT_SYMBOL_GPL(kvm_set_xcr);
->  
-> -int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
-> +static int kvm_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->  {
-> -	unsigned long old_cr4 = kvm_read_cr4(vcpu);
-> -	unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE | X86_CR4_PAE |
-> -				   X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE;
-> -
->  	if (cr4 & CR4_RESERVED_BITS)
-> -		return 1;
-> +		return -EINVAL;
->  
->  	if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) && (cr4 & X86_CR4_OSXSAVE))
-> -		return 1;
-> +		return -EINVAL;
->  
->  	if (!guest_cpuid_has(vcpu, X86_FEATURE_SMEP) && (cr4 & X86_CR4_SMEP))
-> -		return 1;
-> +		return -EINVAL;
->  
->  	if (!guest_cpuid_has(vcpu, X86_FEATURE_SMAP) && (cr4 & X86_CR4_SMAP))
-> -		return 1;
-> +		return -EINVAL;
->  
->  	if (!guest_cpuid_has(vcpu, X86_FEATURE_FSGSBASE) && (cr4 & X86_CR4_FSGSBASE))
-> -		return 1;
-> +		return -EINVAL;
->  
->  	if (!guest_cpuid_has(vcpu, X86_FEATURE_PKU) && (cr4 & X86_CR4_PKE))
-> -		return 1;
-> +		return -EINVAL;
->  
->  	if (!guest_cpuid_has(vcpu, X86_FEATURE_LA57) && (cr4 & X86_CR4_LA57))
-> -		return 1;
-> +		return -EINVAL;
->  
->  	if (!guest_cpuid_has(vcpu, X86_FEATURE_UMIP) && (cr4 & X86_CR4_UMIP))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
-> +{
-> +	unsigned long old_cr4 = kvm_read_cr4(vcpu);
-> +	unsigned long pdptr_bits = X86_CR4_PGE | X86_CR4_PSE | X86_CR4_PAE |
-> +				   X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE;
-> +
-> +	if (kvm_valid_cr4(vcpu, cr4))
->  		return 1;
->  
->  	if (is_long_mode(vcpu)) {
-> @@ -8641,10 +8649,6 @@ EXPORT_SYMBOL_GPL(kvm_task_switch);
->  
->  static int kvm_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
->  {
-> -	if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-> -			(sregs->cr4 & X86_CR4_OSXSAVE))
-> -		return  -EINVAL;
-> -
->  	if ((sregs->efer & EFER_LME) && (sregs->cr0 & X86_CR0_PG)) {
->  		/*
->  		 * When EFER.LME and CR0.PG are set, the processor is in
-> @@ -8663,7 +8667,7 @@ static int kvm_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
->  			return -EINVAL;
->  	}
->  
-> -	return 0;
-> +	return kvm_valid_cr4(vcpu, sregs->cr4);
->  }
->  
->  static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
-> 
+>  arch/x86/kvm/cpuid.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 35e2f930a4b79..0377d2820a7aa 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -988,9 +988,11 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 =
+*ebx,
+>  =09/*
+>  =09 * Intel CPUID semantics treats any query for an out-of-range
+>  =09 * leaf as if the highest basic leaf (i.e. CPUID.0H:EAX) were
+> -=09 * requested.
+> +=09 * requested. AMD CPUID semantics returns all zeroes for any
+> +=09 * undefined leaf, whether or not the leaf is in range.
+>  =09 */
+> -=09if (!entry && check_limit && !cpuid_function_in_range(vcpu, function)=
+) {
+> +=09if (!entry && check_limit && !guest_cpuid_is_amd(vcpu) &&
+> +=09    !cpuid_function_in_range(vcpu, function)) {
+>  =09=09max =3D kvm_find_cpuid_entry(vcpu, 0, 0);
+>  =09=09if (max) {
+>  =09=09=09function =3D max->eax;
+>=20
 
-Queued, thanks.
+Queued both, thanks.
 
 Paolo
+
