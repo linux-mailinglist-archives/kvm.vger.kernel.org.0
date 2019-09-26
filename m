@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FF6EBFBDF
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 01:19:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3919EBFBE0
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 01:19:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729072AbfIZXT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 19:19:28 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:54810 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729073AbfIZXT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 19:19:28 -0400
-Received: by mail-pl1-f202.google.com with SMTP id j9so453609plk.21
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:19:28 -0700 (PDT)
+        id S1729090AbfIZXTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 19:19:33 -0400
+Received: from mail-qt1-f201.google.com ([209.85.160.201]:56643 "EHLO
+        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729070AbfIZXTc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 19:19:32 -0400
+Received: by mail-qt1-f201.google.com with SMTP id m6so3975547qtk.23
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 16:19:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=JfDeLVxckSbuxvoobfrDn0KoCHmXdzom4g1j7usnEf8=;
-        b=irIWD+rb7q97rYKemG2B/3ZPawfdoH6L4aaUTkeipkVYAmZGB5pn3p8/VoHyMJHviU
-         d4UKYVfL/oQIqnPIkd+ieV1wk0I+QfATqBVHIrswjG5F1akSR3Z2yKKKRnorGzW//3ee
-         AbooL3rflLP7OORaxz4uJ3D0clgEj4OCwPdDru7j8bdcI3ybiar1xoJ3ev8rcdUf3eFY
-         KjBnJHaXZNeT8aYYSbkvZjkK0p4d7N1MqQjcU1lkNNvltzC+WPJg4XHJBAFjEQC/0rx7
-         8sS2/ZII9X5Laycf/GqllgxrbhdPofuyTYoEitzDBSsoGbk+MUdovt5ILPLVUrCFEJBL
-         4ZwA==
+        bh=LsnPdTp5GaF/lyahKH1vXf0L/46JuHXj66N8OEChvcw=;
+        b=UHT5p+/fYiB2mVGalDD3QamKeFpexD5xPdbGirmdxGCOFk1bHht+I2nMePtIJT4ACs
+         UMfr9YhOfJ7YAPrSnxfyoksMvT6Yf9Etr9DixePSzgZ0zjHle7T3xyz8iK4tI/ksG+aT
+         lfxpZMzNhwQOy9H4kxJAgybMqxirsaQb6N+ocPVv4QThIHl7bRUo+YY31RyCplQp9jCW
+         LynlaxfM2B+buYzKFnQovEcu6kgxw5SJN+cAp0/LSZaDD4aCqfh1/+ft3tSAy+SD18MQ
+         AGP9ZWKzRRGw1p5JCfQ+BGhZ81YZwVPfJKxGPQhEMTlpewBAjLgNi5HNL3ClEwk/eb9h
+         eQng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=JfDeLVxckSbuxvoobfrDn0KoCHmXdzom4g1j7usnEf8=;
-        b=bOo+/BlTZlcL3PIoJXvtOqfBXoQtpDxLzs494Ff98tl/reCXPkImX7QN7dKsNZAnyU
-         uIqPo8GMQ2blBOEQD8OV6flgWfk2pzfit95g4Kk07VdnCn1HrqgBKzzM6EH7lNzPQ2N5
-         VGZRKEJzKRde8dO93H1yncMrsCyENYyFfU0IrhB843sTYQsSackp3URRoOc2YfnY+Ojl
-         nkYzsGNS08ffoa0JpQgrI7HDG76EYRtoi/wsVXgfAWnJ3GfiW1fw+lDmOned745/al6L
-         DxFdkIYDSuXSFgfnZj3xz7Y3AvnIkkHUfuvFBlAXifQDs/egmAETwZ8qc5Ys3u03UO8R
-         vQ5g==
-X-Gm-Message-State: APjAAAUSCVOskZdqtXeE3kpXUDLkP08SnmPOvaLzB6a5h0nHDJev9cFJ
-        VjEqychIhAdB9Yr1824C8B3Ordm4Cf8NljfsQdz/ZcccxK4syUqK+vqRJmZkTVYMJHmqZN4MEa/
-        l0xY/OFboVZ45w47wl3BXqqKZ+nGrhXff8JZ9lSfOam6UE+E0dEnfV/GuOHPi
-X-Google-Smtp-Source: APXvYqycUacQUNFjaesE8Ugk2g3b1EDiUnQse53R0VirEk/9laIBFfgjEKQJxlkUEZ0XZ+n9G3U1buoDFD3l
-X-Received: by 2002:a63:4857:: with SMTP id x23mr6080652pgk.142.1569539967277;
- Thu, 26 Sep 2019 16:19:27 -0700 (PDT)
-Date:   Thu, 26 Sep 2019 16:18:22 -0700
+        bh=LsnPdTp5GaF/lyahKH1vXf0L/46JuHXj66N8OEChvcw=;
+        b=CUyQHlITUuqnXCeTj9PbnzB0Pw+WUKreZMFR5HSfuhYbiY6bTjr06xk3vhlZj5c0HY
+         s9Nf3ibPj4v/ju/yDGIZIeMnJWAi53SjdISv2jWMNeOgvN4taIWbYf6SkW5dDaMW0XxH
+         dERZu/K0DrSzb1r72d88I1C8c6EL4I1rDcMwSsu/BnW7+qFqNAZUehtYJBfVzNevv/nT
+         GMCl3hVxOxg1ptoNp6kcl2UDNP/ypcB7mxp0rNuJbXWRCLgSuzBbSXAZJd33UfpcrBAk
+         VzoKvRsq07aHhuiK52BeLudYfSBgrMD30Gyj+z07U7jTgTOM7peqqwKREBKtOwEoD/nr
+         xKzw==
+X-Gm-Message-State: APjAAAU8A3jfP9nERsO74tUzDWy4oldOcxbwQF1hnSnNivUQftqi2E7B
+        1Lfoq4nb0WxQQ+HBHITxxeFfcyNRYJ+zR70c7EU1QrsANXDS4oc10qpbqqlv9P/cmVb7E7Vi/c5
+        6m6b1PIc1j76g2fHU2X9BfsUESzVX1h5eev0Wy8b9TWwMWlKv69HSEMIwKVXb
+X-Google-Smtp-Source: APXvYqwg4RzLJ/Y1SXOhSKcCwkH8r+t5GE/AuTwr5grm7ZIMxbjSFivGDBODkaxkwod3AB/GQYOtNclFsa2G
+X-Received: by 2002:ad4:42d2:: with SMTP id f18mr5314963qvr.52.1569539969639;
+ Thu, 26 Sep 2019 16:19:29 -0700 (PDT)
+Date:   Thu, 26 Sep 2019 16:18:23 -0700
 In-Reply-To: <20190926231824.149014-1-bgardon@google.com>
-Message-Id: <20190926231824.149014-27-bgardon@google.com>
+Message-Id: <20190926231824.149014-28-bgardon@google.com>
 Mime-Version: 1.0
 References: <20190926231824.149014-1-bgardon@google.com>
 X-Mailer: git-send-email 2.23.0.444.g18eeb5a265-goog
-Subject: [RFC PATCH 26/28] kvm: mmu: Integrate direct MMU with nesting
+Subject: [RFC PATCH 27/28] kvm: mmu: Lazily allocate rmap when direct MMU is enabled
 From:   Ben Gardon <bgardon@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -62,104 +62,153 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allows the existing nesting implementation to interoperate with the
-direct MMU.
+When the MMU is in pure direct mode, it uses a paging structure walk
+iterator and does not require the rmap. The rmap requires 8 bytes for
+every PTE that could be used to map guest memory. It is an expensive data
+strucutre at ~0.2% of the size of guest memory. Delay allocating the rmap
+until the MMU is no longer in pure direct mode. This could be caused,
+for example, by the guest launching a nested, L2 VM.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu.c | 51 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 45 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu.c | 15 ++++++++++
+ arch/x86/kvm/x86.c | 72 ++++++++++++++++++++++++++++++++++++++++++----
+ arch/x86/kvm/x86.h |  2 ++
+ 3 files changed, 83 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index a0c5271ae2381..e0f35da0d1027 100644
+index e0f35da0d1027..72c2289132c43 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -2742,6 +2742,29 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 		kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+@@ -5228,8 +5228,23 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	u64 pdptr, pm_mask;
+ 	gfn_t root_gfn, root_cr3;
+ 	int i;
++	int r;
+ 
+ 	write_lock(&vcpu->kvm->mmu_lock);
++	if (vcpu->kvm->arch.pure_direct_mmu) {
++		write_unlock(&vcpu->kvm->mmu_lock);
++		/*
++		 * If this is the first time a VCPU has allocated shadow roots
++		 * and the direct MMU is enabled on this VM, it will need to
++		 * allocate rmaps for all its memslots. If the rmaps are already
++		 * allocated, this call will have no effect.
++		 */
++		r = kvm_allocate_rmaps(vcpu->kvm);
++		if (r < 0)
++			return r;
++		write_lock(&vcpu->kvm->mmu_lock);
++	}
++
+ 	vcpu->kvm->arch.pure_direct_mmu = false;
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index edd7d7bece2fe..566521f956425 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9615,14 +9615,21 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ 	kvm_page_track_free_memslot(free, dont);
  }
  
-+static bool rmap_write_protect_direct_gfn(struct kvm *kvm,
-+					  struct kvm_memory_slot *slot,
-+					  gfn_t gfn)
-+{
-+	struct direct_walk_iterator iter;
-+	u64 new_pte;
+-int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			    unsigned long npages)
++static int allocate_memslot_rmap(struct kvm *kvm,
++				   struct kvm_memory_slot *slot,
++				   unsigned long npages)
+ {
+ 	int i;
+ 
++	/*
++	 * rmaps are allocated all-or-nothing under the slots
++	 * lock, so we only need to check that the first rmap
++	 * has been allocated.
++	 */
++	if (slot->arch.rmap[0])
++		return 0;
 +
-+	direct_walk_iterator_setup_walk(&iter, kvm, slot->as_id, gfn, gfn + 1,
-+					MMU_WRITE_LOCK);
-+	while (direct_walk_iterator_next_present_leaf_pte(&iter)) {
-+		if (!is_writable_pte(iter.old_pte) &&
-+		    !spte_can_locklessly_be_made_writable(iter.old_pte))
-+			break;
-+
-+		new_pte = iter.old_pte &
-+			~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
-+
-+		if (!direct_walk_iterator_set_pte(&iter, new_pte))
-+			continue;
+ 	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+-		struct kvm_lpage_info *linfo;
+-		unsigned long ugfn;
+ 		int lpages;
+ 		int level = i + 1;
+ 
+@@ -9634,8 +9641,61 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 				 GFP_KERNEL_ACCOUNT);
+ 		if (!slot->arch.rmap[i])
+ 			goto out_free;
+-		if (i == 0)
+-			continue;
 +	}
-+	return direct_walk_iterator_end_traversal(&iter);
++	return 0;
++
++out_free:
++	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
++		kvfree(slot->arch.rmap[i]);
++		slot->arch.rmap[i] = NULL;
++	}
++	return -ENOMEM;
 +}
 +
- /**
-  * kvm_arch_write_log_dirty - emulate dirty page logging
-  * @vcpu: Guest mode vcpu
-@@ -2764,6 +2787,10 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	int i;
- 	bool write_protected = false;
- 
-+	if (kvm->arch.direct_mmu_enabled)
-+		write_protected |= rmap_write_protect_direct_gfn(kvm, slot,
-+								 gfn);
++int kvm_allocate_rmaps(struct kvm *kvm)
++{
++	struct kvm_memslots *slots;
++	struct kvm_memory_slot *slot;
++	int r = 0;
++	int i;
 +
- 	for (i = PT_PAGE_TABLE_LEVEL; i <= PT_MAX_HUGEPAGE_LEVEL; ++i) {
- 		rmap_head = __gfn_to_rmap(gfn, i, slot);
- 		write_protected |= __rmap_write_protect(kvm, rmap_head, true);
-@@ -5755,6 +5782,8 @@ static bool cached_root_available(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 	uint i;
- 	struct kvm_mmu_root_info root;
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
-+	bool direct_mmu_root = (vcpu->kvm->arch.direct_mmu_enabled &&
-+				new_role.direct);
- 
- 	root.cr3 = mmu->root_cr3;
- 	root.hpa = mmu->root_hpa;
-@@ -5762,10 +5791,14 @@ static bool cached_root_available(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 	for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
- 		swap(root, mmu->prev_roots[i]);
- 
--		if (new_cr3 == root.cr3 && VALID_PAGE(root.hpa) &&
--		    page_header(root.hpa) != NULL &&
--		    new_role.word == page_header(root.hpa)->role.word)
--			break;
-+		if (new_cr3 == root.cr3 && VALID_PAGE(root.hpa)) {
-+			BUG_ON(direct_mmu_root &&
-+				!is_direct_mmu_root(vcpu->kvm, root.hpa));
-+
-+			if (direct_mmu_root || (page_header(root.hpa) != NULL &&
-+			    new_role.word == page_header(root.hpa)->role.word))
++	mutex_lock(&kvm->slots_lock);
++	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
++		slots = __kvm_memslots(kvm, i);
++		kvm_for_each_memslot(slot, slots) {
++			r = allocate_memslot_rmap(kvm, slot, slot->npages);
++			if (r < 0)
 +				break;
 +		}
- 	}
++	}
++	mutex_unlock(&kvm->slots_lock);
++	return r;
++}
++
++int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
++			    unsigned long npages)
++{
++	int i;
++	int r;
++
++	/* Set the rmap pointer for each level to NULL */
++	memset(slot->arch.rmap, 0,
++	       ARRAY_SIZE(slot->arch.rmap) * sizeof(*slot->arch.rmap));
++
++	if (!kvm->arch.pure_direct_mmu) {
++		r = allocate_memslot_rmap(kvm, slot, npages);
++		if (r < 0)
++			return r;
++	}
++
++	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
++		struct kvm_lpage_info *linfo;
++		unsigned long ugfn;
++		int lpages;
++		int level = i + 1;
++
++		lpages = gfn_to_index(slot->base_gfn + npages - 1,
++				      slot->base_gfn, level) + 1;
  
- 	mmu->root_hpa = root.hpa;
-@@ -5813,8 +5846,14 @@ static bool fast_cr3_switch(struct kvm_vcpu *vcpu, gpa_t new_cr3,
- 			 */
- 			vcpu_clear_mmio_info(vcpu, MMIO_GVA_ANY);
+ 		linfo = kvcalloc(lpages, sizeof(*linfo), GFP_KERNEL_ACCOUNT);
+ 		if (!linfo)
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index dbf7442a822b6..91bfbfd2c58d4 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -369,4 +369,6 @@ static inline bool kvm_pat_valid(u64 data)
+ void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu);
+ void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu);
  
--			__clear_sp_write_flooding_count(
--				page_header(mmu->root_hpa));
-+			/*
-+			 * If this is a direct MMU root page, it doesn't have a
-+			 * write flooding count.
-+			 */
-+			if (!(vcpu->kvm->arch.direct_mmu_enabled &&
-+			      new_role.direct))
-+				__clear_sp_write_flooding_count(
-+						page_header(mmu->root_hpa));
- 
- 			return true;
- 		}
++int kvm_allocate_rmaps(struct kvm *kvm);
++
+ #endif
 -- 
 2.23.0.444.g18eeb5a265-goog
 
