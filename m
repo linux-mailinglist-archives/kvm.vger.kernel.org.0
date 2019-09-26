@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DC09BEAA7
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 04:36:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68563BEAA9
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 04:36:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390217AbfIZCgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Sep 2019 22:36:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36614 "EHLO mx1.redhat.com"
+        id S2391058AbfIZCgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Sep 2019 22:36:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58788 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727880AbfIZCgV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Sep 2019 22:36:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S2390786AbfIZCgr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Sep 2019 22:36:47 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 848A481F0C;
-        Thu, 26 Sep 2019 02:36:21 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 478EF10C094D;
+        Thu, 26 Sep 2019 02:36:46 +0000 (UTC)
 Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B7620600C8;
-        Thu, 26 Sep 2019 02:36:20 +0000 (UTC)
-Date:   Wed, 25 Sep 2019 20:36:20 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7855E60E1C;
+        Thu, 26 Sep 2019 02:36:45 +0000 (UTC)
+Date:   Wed, 25 Sep 2019 20:36:44 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Liu Yi L <yi.l.liu@intel.com>
 Cc:     kwankhede@nvidia.com, kevin.tian@intel.com,
@@ -27,80 +27,283 @@ Cc:     kwankhede@nvidia.com, kevin.tian@intel.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         yan.y.zhao@intel.com, shaopeng.he@intel.com, chenbo.xia@intel.com,
         jun.j.tian@intel.com
-Subject: Re: [PATCH v2 08/13] vfio/pci: protect cap/ecap_perm bits
- alloc/free with atomic op
-Message-ID: <20190925203620.301c66ca@x1.home>
-In-Reply-To: <1567670370-4484-9-git-send-email-yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 10/13] samples: refine vfio-mdev-pci driver
+Message-ID: <20190925203644.7273028f@x1.home>
+In-Reply-To: <1567670370-4484-11-git-send-email-yi.l.liu@intel.com>
 References: <1567670370-4484-1-git-send-email-yi.l.liu@intel.com>
-        <1567670370-4484-9-git-send-email-yi.l.liu@intel.com>
+        <1567670370-4484-11-git-send-email-yi.l.liu@intel.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Thu, 26 Sep 2019 02:36:21 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.66]); Thu, 26 Sep 2019 02:36:46 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  5 Sep 2019 15:59:25 +0800
+On Thu,  5 Sep 2019 15:59:27 +0800
 Liu Yi L <yi.l.liu@intel.com> wrote:
 
-> There is a case in which cap_perms and ecap_perms can be reallocated
-> by different modules. e.g. the vfio-mdev-pci sample driver. To secure
-> the initialization of cap_perms and ecap_perms, this patch adds an
-> atomic variable to track the user of cap/ecap_perms bits. First caller
-> of vfio_pci_init_perm_bits() will initialize the bits. While the last
-> caller of vfio_pci_uninit_perm_bits() will free the bits.
-
-Yes, but it still allows races; we're not really protecting the data.
-If driver A begins freeing the shared data in the uninit path, driver B
-could start allocating shared data in the init path and we're left with
-either use after free issues or memory leaks.  Probably better to hold
-a semaphore around the allocation/free and a non-atomic for reference
-counting.  Thanks,
-
-Alex
- 
+> From: Alex Williamson <alex.williamson@redhat.com>
+> 
+> This patch refines the implementation of original vfio-mdev-pci driver.
+> 
+> And the vfio-mdev-pci-type_name will be named per the following rule:
+> 
+> 	vmdev->attr.name = kasprintf(GFP_KERNEL,
+> 				     "%04x:%04x:%04x:%04x:%06x:%02x",
+> 				     pdev->vendor, pdev->device,
+> 				     pdev->subsystem_vendor,
+> 				     pdev->subsystem_device, pdev->class,
+> 				     pdev->revision);
+> 
+> Before usage, check the /sys/bus/pci/devices/$bdf/mdev_supported_types/
+> to ensure the final mdev_supported_types.
+> 
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 > ---
->  drivers/vfio/pci/vfio_pci_config.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  drivers/vfio/pci/vfio_mdev_pci.c | 123 +++++++++++++++++++++++----------------
+>  1 file changed, 72 insertions(+), 51 deletions(-)
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> index f0891bd..1b3e6e5 100644
-> --- a/drivers/vfio/pci/vfio_pci_config.c
-> +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -992,11 +992,17 @@ static int __init init_pci_ext_cap_pwr_perm(struct perm_bits *perm)
->  	return 0;
+> diff --git a/drivers/vfio/pci/vfio_mdev_pci.c b/drivers/vfio/pci/vfio_mdev_pci.c
+> index 07c8067..09143d3 100644
+> --- a/drivers/vfio/pci/vfio_mdev_pci.c
+> +++ b/drivers/vfio/pci/vfio_mdev_pci.c
+> @@ -65,18 +65,22 @@ MODULE_PARM_DESC(disable_idle_d3,
+>  
+>  static struct pci_driver vfio_mdev_pci_driver;
+>  
+> -static ssize_t
+> -name_show(struct kobject *kobj, struct device *dev, char *buf)
+> -{
+> -	return sprintf(buf, "%s-type1\n", dev_name(dev));
+> -}
+> -
+> -MDEV_TYPE_ATTR_RO(name);
+> +struct vfio_mdev_pci_device {
+> +	struct vfio_pci_device vdev;
+> +	struct mdev_parent_ops ops;
+> +	struct attribute_group *groups[2];
+> +	struct attribute_group attr;
+> +	atomic_t avail;
+> +};
+>  
+>  static ssize_t
+>  available_instances_show(struct kobject *kobj, struct device *dev, char *buf)
+>  {
+> -	return sprintf(buf, "%d\n", 1);
+> +	struct vfio_mdev_pci_device *vmdev;
+> +
+> +	vmdev = pci_get_drvdata(to_pci_dev(dev));
+> +
+> +	return sprintf(buf, "%d\n", atomic_read(&vmdev->avail));
 >  }
 >  
-> +/* Track the user number of the cap/ecap perm_bits */
-> +atomic_t vfio_pci_perm_bits_users = ATOMIC_INIT(0);
-> +
->  /*
->   * Initialize the shared permission tables
->   */
->  void vfio_pci_uninit_perm_bits(void)
->  {
-> +	if (atomic_dec_return(&vfio_pci_perm_bits_users))
-> +		return;
-> +
->  	free_perm_bits(&cap_perms[PCI_CAP_ID_BASIC]);
+>  MDEV_TYPE_ATTR_RO(available_instances);
+> @@ -90,62 +94,57 @@ static ssize_t device_api_show(struct kobject *kobj, struct device *dev,
+>  MDEV_TYPE_ATTR_RO(device_api);
 >  
->  	free_perm_bits(&cap_perms[PCI_CAP_ID_PM]);
-> @@ -1013,6 +1019,9 @@ int __init vfio_pci_init_perm_bits(void)
+>  static struct attribute *vfio_mdev_pci_types_attrs[] = {
+> -	&mdev_type_attr_name.attr,
+>  	&mdev_type_attr_device_api.attr,
+>  	&mdev_type_attr_available_instances.attr,
+>  	NULL,
+>  };
+>  
+> -static struct attribute_group vfio_mdev_pci_type_group1 = {
+> -	.name  = "type1",
+> -	.attrs = vfio_mdev_pci_types_attrs,
+> -};
+> -
+> -struct attribute_group *vfio_mdev_pci_type_groups[] = {
+> -	&vfio_mdev_pci_type_group1,
+> -	NULL,
+> -};
+> -
+>  struct vfio_mdev_pci {
+>  	struct vfio_pci_device *vdev;
+>  	struct mdev_device *mdev;
+> -	unsigned long handle;
+>  };
+>  
+>  static int vfio_mdev_pci_create(struct kobject *kobj, struct mdev_device *mdev)
 >  {
+>  	struct device *pdev;
+> -	struct vfio_pci_device *vdev;
+> +	struct vfio_mdev_pci_device *vmdev;
+>  	struct vfio_mdev_pci *pmdev;
 >  	int ret;
 >  
-> +	if (atomic_inc_return(&vfio_pci_perm_bits_users) != 1)
-> +		return 0;
+>  	pdev = mdev_parent_dev(mdev);
+> -	vdev = dev_get_drvdata(pdev);
+> +	vmdev = dev_get_drvdata(pdev);
 > +
->  	/* Basic config space */
->  	ret = init_pci_cap_basic_perm(&cap_perms[PCI_CAP_ID_BASIC]);
+> +	if (atomic_dec_if_positive(&vmdev->avail) < 0)
+> +		return -ENOSPC;
+> +
+>  	pmdev = kzalloc(sizeof(struct vfio_mdev_pci), GFP_KERNEL);
+> -	if (pmdev == NULL) {
+> -		ret = -EBUSY;
+> -		goto out;
+> -	}
+> +	if (!pmdev)
+> +		return -ENOMEM;
+
+Needs an atomic_inc(&vmdev->avail) in this error path.  Thanks,
+
+Alex
+
 >  
+>  	pmdev->mdev = mdev;
+> -	pmdev->vdev = vdev;
+> +	pmdev->vdev = &vmdev->vdev;
+>  	mdev_set_drvdata(mdev, pmdev);
+>  	ret = mdev_set_iommu_device(mdev_dev(mdev), pdev);
+>  	if (ret) {
+>  		pr_info("%s, failed to config iommu isolation for mdev: %s on pf: %s\n",
+>  			__func__, dev_name(mdev_dev(mdev)), dev_name(pdev));
+> -		goto out;
+> +		kfree(pmdev);
+> +		atomic_inc(&vmdev->avail);
+> +		return ret;
+>  	}
+>  
+> -out:
+> -	return ret;
+> +	return 0;
+>  }
+>  
+>  static int vfio_mdev_pci_remove(struct mdev_device *mdev)
+>  {
+>  	struct vfio_mdev_pci *pmdev = mdev_get_drvdata(mdev);
+> +	struct vfio_mdev_pci_device *vmdev;
+> +
+> +	vmdev = container_of(pmdev->vdev, struct vfio_mdev_pci_device, vdev);
+>  
+>  	kfree(pmdev);
+> +	atomic_inc(&vmdev->avail);
+>  	pr_info("%s, succeeded for mdev: %s\n", __func__,
+>  		     dev_name(mdev_dev(mdev)));
+>  
+> @@ -237,24 +236,12 @@ static ssize_t vfio_mdev_pci_write(struct mdev_device *mdev,
+>  	return vfio_pci_write(pmdev->vdev, (char __user *)buf, count, ppos);
+>  }
+>  
+> -static const struct mdev_parent_ops vfio_mdev_pci_ops = {
+> -	.supported_type_groups	= vfio_mdev_pci_type_groups,
+> -	.create			= vfio_mdev_pci_create,
+> -	.remove			= vfio_mdev_pci_remove,
+> -
+> -	.open			= vfio_mdev_pci_open,
+> -	.release		= vfio_mdev_pci_release,
+> -
+> -	.read			= vfio_mdev_pci_read,
+> -	.write			= vfio_mdev_pci_write,
+> -	.mmap			= vfio_mdev_pci_mmap,
+> -	.ioctl			= vfio_mdev_pci_ioctl,
+> -};
+> -
+>  static int vfio_mdev_pci_driver_probe(struct pci_dev *pdev,
+>  				       const struct pci_device_id *id)
+>  {
+> +	struct vfio_mdev_pci_device *vmdev;
+>  	struct vfio_pci_device *vdev;
+> +	const struct mdev_parent_ops *ops;
+>  	int ret;
+>  
+>  	if (pdev->hdr_type != PCI_HEADER_TYPE_NORMAL)
+> @@ -273,10 +260,38 @@ static int vfio_mdev_pci_driver_probe(struct pci_dev *pdev,
+>  		return -EBUSY;
+>  	}
+>  
+> -	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
+> -	if (!vdev)
+> +	vmdev = kzalloc(sizeof(*vmdev), GFP_KERNEL);
+> +	if (!vmdev)
+>  		return -ENOMEM;
+>  
+> +	vmdev->attr.name = kasprintf(GFP_KERNEL,
+> +				     "%04x:%04x:%04x:%04x:%06x:%02x",
+> +				     pdev->vendor, pdev->device,
+> +				     pdev->subsystem_vendor,
+> +				     pdev->subsystem_device, pdev->class,
+> +				     pdev->revision);
+> +	if (!vmdev->attr.name) {
+> +		kfree(vmdev);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	atomic_set(&vmdev->avail, 1);
+> +
+> +	vmdev->attr.attrs = vfio_mdev_pci_types_attrs;
+> +	vmdev->groups[0] = &vmdev->attr;
+> +
+> +	vmdev->ops.supported_type_groups = vmdev->groups;
+> +	vmdev->ops.create = vfio_mdev_pci_create;
+> +	vmdev->ops.remove = vfio_mdev_pci_remove;
+> +	vmdev->ops.open	= vfio_mdev_pci_open;
+> +	vmdev->ops.release = vfio_mdev_pci_release;
+> +	vmdev->ops.read = vfio_mdev_pci_read;
+> +	vmdev->ops.write = vfio_mdev_pci_write;
+> +	vmdev->ops.mmap = vfio_mdev_pci_mmap;
+> +	vmdev->ops.ioctl = vfio_mdev_pci_ioctl;
+> +	ops = &vmdev->ops;
+> +
+> +	vdev = &vmdev->vdev;
+>  	vdev->pdev = pdev;
+>  	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+>  	mutex_init(&vdev->igate);
+> @@ -289,7 +304,7 @@ static int vfio_mdev_pci_driver_probe(struct pci_dev *pdev,
+>  #endif
+>  	vdev->disable_idle_d3 = disable_idle_d3;
+>  
+> -	pci_set_drvdata(pdev, vdev);
+> +	pci_set_drvdata(pdev, vmdev);
+>  
+>  	ret = vfio_pci_reflck_attach(vdev);
+>  	if (ret) {
+> @@ -320,7 +335,7 @@ static int vfio_mdev_pci_driver_probe(struct pci_dev *pdev,
+>  		vfio_pci_set_power_state(vdev, PCI_D3hot);
+>  	}
+>  
+> -	ret = mdev_register_device(&pdev->dev, &vfio_mdev_pci_ops);
+> +	ret = mdev_register_device(&pdev->dev, ops);
+>  	if (ret)
+>  		pr_err("Cannot register mdev for device %s\n",
+>  			dev_name(&pdev->dev));
+> @@ -332,12 +347,17 @@ static int vfio_mdev_pci_driver_probe(struct pci_dev *pdev,
+>  
+>  static void vfio_mdev_pci_driver_remove(struct pci_dev *pdev)
+>  {
+> +	struct vfio_mdev_pci_device *vmdev;
+>  	struct vfio_pci_device *vdev;
+>  
+> -	vdev = pci_get_drvdata(pdev);
+> -	if (!vdev)
+> +	mdev_unregister_device(&pdev->dev);
+> +
+> +	vmdev = pci_get_drvdata(pdev);
+> +	if (!vmdev)
+>  		return;
+>  
+> +	vdev = &vmdev->vdev;
+> +
+>  	vfio_pci_reflck_put(vdev->reflck);
+>  
+>  	kfree(vdev->region);
+> @@ -355,7 +375,8 @@ static void vfio_mdev_pci_driver_remove(struct pci_dev *pdev)
+>  				VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM);
+>  	}
+>  
+> -	kfree(vdev);
+> +	kfree(vmdev->attr.name);
+> +	kfree(vmdev);
+>  }
+>  
+>  static struct pci_driver vfio_mdev_pci_driver = {
 
