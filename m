@@ -2,129 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1D86BFA31
-	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 21:38:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EFEDBFB08
+	for <lists+kvm@lfdr.de>; Thu, 26 Sep 2019 23:43:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728601AbfIZTix (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 15:38:53 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:34199 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728377AbfIZTix (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 15:38:53 -0400
-Received: by mail-io1-f65.google.com with SMTP id q1so9751889ion.1
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 12:38:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=hQzy8LbHLkK3XnIVo/GXvWU/bK6fv1zYAo+OsxfceGU=;
-        b=fDyvd0OBUD8Xgor8CvYwe1J1pfELzvGHjrM7680Ec0fvfTdwHVyg8/Df6AhPaU7vcd
-         ep2OsmEI+s+kmgewoIFdV5y+1QC10ZUuDNeK9SnSOR29wRpx4i9L1Il0rKJExxJb280A
-         B15gF2PsgBC8S7kvqXcUIaajrLEs5sJkVOdfMmGijM08Yqs/SqbDb1GMiRgB/trTyQrf
-         7iNManTfRCRd6/+iQXScAYZeQvmWfAGF0kO+4oHR+9de+UWfFALrWgmRENXPqTqFwIzl
-         MBf91wlj00tPkO2IxR6+NcYSDjlq1jGW5RuY4hrro3v7GSGSMIWBqI89JgrERtdiDYlq
-         Fubw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=hQzy8LbHLkK3XnIVo/GXvWU/bK6fv1zYAo+OsxfceGU=;
-        b=nWvzAwoFWvWeEo1AzBHUU0OyrUc3NLjlDkFiML6a98b88un2Z9+aOJS/ThouhGtWX2
-         3DVfL24SneqWK+1Ls9yADMhPbpfCpii2+LCc5nehOYJ8cZiwBnLEIG5rfsbmgOq5rlBs
-         DFE9Ic82Uxc7VuCO+OSjVV2xE0gI7lSkVyYacObc+cxzRbqS/FzMqeoEuye+Mm3Uz4QM
-         C9fzi0tDFav7CyF2S20UuKi549nMTXHH9gLq8xGIm9029SQXCyb14Vddp6OeYyLBt5pH
-         Ep6duO1dUtP9ap6jhwMKAFxVIrmA1RLXRi1t87PT3se+2OaXvcYWlZT0u6ZJlNx8mqKy
-         xpgg==
-X-Gm-Message-State: APjAAAX7Xec0Vgysc3/SavpaOhhZecx+bqKW0uNhReK9VBKVdtiu761n
-        eom3I1HjH3OfaoM5h4shHi2RjN/w+zvsAGKp3UDphg==
-X-Google-Smtp-Source: APXvYqw+XXX3Qm9wa9uiYcHg2E7ZyL3wSB3SpN20bzbD0/89oKcxh5MQy4NTRNOkcJa/XKKXc0ESen3+vZ1uiC5rJxw=
-X-Received: by 2002:a6b:1606:: with SMTP id 6mr5315905iow.108.1569526732080;
- Thu, 26 Sep 2019 12:38:52 -0700 (PDT)
+        id S1726133AbfIZVnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 17:43:04 -0400
+Received: from mga07.intel.com ([134.134.136.100]:8270 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725943AbfIZVnE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 17:43:04 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 14:43:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,553,1559545200"; 
+   d="scan'208";a="192958527"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 26 Sep 2019 14:43:03 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>
+Subject: [PATCH 0/2] KVM: nVMX: Bug fix for consuming stale vmcs02.GUEST_CR3
+Date:   Thu, 26 Sep 2019 14:43:00 -0700
+Message-Id: <20190926214302.21990-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-References: <20190926000418.115956-1-jmattson@google.com> <20190926000418.115956-2-jmattson@google.com>
- <79a9e68d-808b-2975-ab78-43e0ae00bd1b@intel.com>
-In-Reply-To: <79a9e68d-808b-2975-ab78-43e0ae00bd1b@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 26 Sep 2019 12:38:41 -0700
-Message-ID: <CALMp9eRHnc0sPRmQu0Y9s=2uw0LPSumsw75pOjcaUD1JPB68UA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kvm: x86: Use AMD CPUID semantics for AMD vCPUs
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Marc Orr <marcorr@google.com>,
-        Peter Shier <pshier@google.com>,
-        Jacob Xu <jacobhxu@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 25, 2019 at 7:30 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> On 9/26/2019 8:04 AM, Jim Mattson wrote:
-> > When the guest CPUID information represents an AMD vCPU, return all
-> > zeroes for queries of undefined CPUID leaves, whether or not they are
-> > in range.
-> >
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > Fixes: bd22f5cfcfe8f6 ("KVM: move and fix substitue search for missing =
-CPUID entries")
-> > Reviewed-by: Marc Orr <marcorr@google.com>
-> > Reviewed-by: Peter Shier <pshier@google.com>
-> > Reviewed-by: Jacob Xu <jacobhxu@google.com>
-> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >   arch/x86/kvm/cpuid.c | 6 ++++--
-> >   1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 35e2f930a4b79..0377d2820a7aa 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -988,9 +988,11 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u3=
-2 *ebx,
-> >       /*
-> >        * Intel CPUID semantics treats any query for an out-of-range
-> >        * leaf as if the highest basic leaf (i.e. CPUID.0H:EAX) were
-> > -      * requested.
-> > +      * requested. AMD CPUID semantics returns all zeroes for any
-> > +      * undefined leaf, whether or not the leaf is in range.
-> >        */
-> > -     if (!entry && check_limit && !cpuid_function_in_range(vcpu, funct=
-ion)) {
-> > +     if (!entry && check_limit && !guest_cpuid_is_amd(vcpu) &&
-> > +         !cpuid_function_in_range(vcpu, function)) {
->
-> IIUC, the parameter check_limit is to indicate whether return highest
-> basic leaf when out-of-range. Here you just makes check_limit meaningless=
-.
+Reto Buerki reported a failure in a nested VMM when running with HLT
+interception disabled in L1.  When putting L2 into HLT, KVM never actually
+enters L2 and instead cancels the nested run and pretends that VM-Enter to
+L2 completed and then exited on HLT (which KVM intercepted).  Because KVM
+never actually runs L2, KVM skips the pending MMU update for L2 and so
+leaves a stale value in vmcs02.GUEST_CR3.  If the next wake event for L2
+triggers a nested VM-Exit, KVM will refresh vmcs12->guest_cr3 from
+vmcs02.GUEST_CR3 and consume the stale value.
 
-That's right. For AMD CPUID semantics, there is no need for check_limit.
+Fix the issue by unconditionally writing vmcs02.GUEST_CR3 during nested
+VM-Enter instead of deferring the update to vmx_set_cr3(), and skip the
+update of GUEST_CR3 in vmx_set_cr3() when running L2.  I.e. make the
+nested code fully responsible for vmcs02.GUEST_CR3.
 
-> Maybe we can do like this to use check_limit reasonably=EF=BC=9A
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0377d2820a7a..e6a61f3f6c0c 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1035,7 +1035,8 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
->
->          eax =3D kvm_rax_read(vcpu);
->          ecx =3D kvm_rcx_read(vcpu);
-> -       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);
-> +       kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx,
-> +                       guest_cpuid_is_amd(vcpu) ? false: true);
->          kvm_rax_write(vcpu, eax);
->          kvm_rbx_write(vcpu, ebx);
->          kvm_rcx_write(vcpu, ecx);
->
-> >               max =3D kvm_find_cpuid_entry(vcpu, 0, 0);
-> >               if (max) {
-> >                       function =3D max->eax;
+I really wanted to go with a different fix of handling this as a one-off
+case in the HLT flow (in nested_vmx_run()), and then following that up
+with a cleanup of VMX's CR3 handling, e.g. to do proper dirty tracking
+instead of having the nested code do manual VMREADs and VMWRITEs.  I even
+went so far as to hide vcpu->arch.cr3 (put CR3 in vcpu->arch.regs), but
+things went south when I started working through the dirty tracking logic.
 
-Since over-limit CPUID queries should be rare, it seems unfortunate to
-pay the cost of guest_cpuid_is_amd() for every emulated CPUID
-instruction.
+Because EPT can be enabled *without* unrestricted guest, enabling EPT
+doesn't always mean GUEST_CR3 really is the guest CR3 (unlike SVM's NPT).
+And because the unrestricted guest handling of GUEST_CR3 is dependent on
+whether the guest has paging enabled, VMX can't even do a clean handoff
+based on unrestricted guest.  In a nutshell, dynamically handling the
+transitions of GUEST_CR3 ownership in VMX is a nightmare, so fixing this
+purely within the context of nested VMX turned out to be the cleanest fix.
+
+Sean Christopherson (2):
+  KVM: nVMX: Always write vmcs02.GUEST_CR3 during nested VM-Enter
+  KVM: VMX: Skip GUEST_CR3 VMREAD+VMWRITE if the VMCS is up-to-date
+
+ arch/x86/kvm/vmx/nested.c |  8 ++++++++
+ arch/x86/kvm/vmx/vmx.c    | 15 ++++++++++-----
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+
+-- 
+2.22.0
+
