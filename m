@@ -2,63 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D699DC0467
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 13:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3206EC04A5
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 13:53:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbfI0LbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 07:31:10 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:45365 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725882AbfI0LbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 07:31:09 -0400
-Received: by mail-ot1-f66.google.com with SMTP id 41so1897244oti.12
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 04:31:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=HiRMA+CbDeLJs/A1OYP1TBLK1OX9Vb0kRVceztiRQPA=;
-        b=dVEFOk68WAhFYBy5OeMcpmPFHXAh97p8xA7mn9HH1THB/y7kO6MYRws7pfRiNdO5OC
-         h63PVY+q0lMMbxooXwBGyObhsRHgqWlV07ND122ZQtXLKwwubfAsxaYuD/tf95TBlcrc
-         1JPmnLzJ23VehWdxPu6w/P0NRkE/doqQkM+w8/4O/XyxgRAcFwUYW7vLLOZQKVrU6abm
-         vW6PV/eXC3wh/D1il7sUf2HgATnfJTrMdGi5pXpiosY4BmAYB0AYsXPtsjaKEOyiKmnG
-         DTKkc22wHaqZ9OkSu8qjizA/dG4SqQZMgQXx3jvrHii3x4n4L7RZ5KpjQGdJkyKL8yA0
-         zhCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=HiRMA+CbDeLJs/A1OYP1TBLK1OX9Vb0kRVceztiRQPA=;
-        b=Rp96c9bza5vn3n0COeqE8g+t4Q8wIbHl5bmI3lefuA2Dvyp4Vlu043kVYji8Dct5Fl
-         FBfbhV/7pDZPm+3viVsk+m+PT/Asy1LMShCfkdOg9NpONxmTzA2YUqHT5RSqaktQJ/Ki
-         6eQjib1rG60vB+Tz1/K3KAKiWe8ImB3xnUNMIxqGUL2/9Ih6C3/EKVkqp4ios3jOJqVf
-         wmmBXrTZreYesqcmVe9jVyJyruVxBV+gXGomDhMJ8fp7gC1mqgmUY+I1d4Ba6S/Quxkg
-         3viJzLEFDLGlivASe/UNerREbt+9ZjbBoFa5gvss8VQEG5Qn+a2Owh+KPfBAAxouiYrR
-         2XIA==
-X-Gm-Message-State: APjAAAUzDk3cabc7dDnzKce4OO72llluocWSV8gvhq/ZCOAlQTpZMQv4
-        kfeUeMXWeY2uCs++ugAdOjhY1g81LHY/D9W6wVY=
-X-Google-Smtp-Source: APXvYqz1ANkPwpy+6xvyXlQ/6nUuyHlWvFoZMOoCKMDvqB43ONUoXL0z5bh4WmcIiPVm+3UgfLA7xJoyxTTe9bTBaqk=
-X-Received: by 2002:a9d:5f8d:: with SMTP id g13mr2903534oti.268.1569583867819;
- Fri, 27 Sep 2019 04:31:07 -0700 (PDT)
+        id S1726295AbfI0Lxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 07:53:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51230 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726144AbfI0Lxn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Sep 2019 07:53:43 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8RBkiTp120526
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 07:53:40 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2v9gv3jdch-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 07:53:40 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <groug@kaod.org>;
+        Fri, 27 Sep 2019 12:53:38 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 27 Sep 2019 12:53:34 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8RBrXKQ24445092
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Sep 2019 11:53:33 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F326AAE057;
+        Fri, 27 Sep 2019 11:53:32 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 992F4AE055;
+        Fri, 27 Sep 2019 11:53:32 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.172.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Sep 2019 11:53:32 +0000 (GMT)
+Subject: [PATCH v2 0/6] KVM: PPC: Book3S: HV: XIVE: Allocate less VPs in OPAL
+From:   Greg Kurz <groug@kaod.org>
+To:     Paul Mackerras <paulus@ozlabs.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?b?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+Date:   Fri, 27 Sep 2019 13:53:32 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Received: by 2002:ac9:1370:0:0:0:0:0 with HTTP; Fri, 27 Sep 2019 04:31:07
- -0700 (PDT)
-Reply-To: katiehiggins953@gmail.com
-From:   Katie Higgins <allenwalker731@gmail.com>
-Date:   Fri, 27 Sep 2019 12:31:07 +0100
-Message-ID: <CAK9uXxOojKr9Hh-1fLALPOBc3nn3N8q_JLSj1DzbX5UPmNsq3A@mail.gmail.com>
-Subject: Hi dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19092711-4275-0000-0000-0000036BC507
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092711-4276-0000-0000-0000387E46F9
+Message-Id: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-27_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=330 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909270112
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi dear,
+This brings some fixes and allows to start more VMs with an in-kernel
+XIVE or XICS-on-XIVE device.
 
-I'm Capt Katie Higgins, from the United States,please i wish to have a
-communication with you.
+Changes since v1 (https://patchwork.ozlabs.org/cover/1166099/):
+- drop a useless patch
+- add a patch to show VP ids in debugfs
+- update some changelogs
+- fix buggy check in patch 5
+- Cc: stable 
 
-I am waiting for your answer,
+--
+Greg
 
-Capt Katie Higgins
+---
+
+Greg Kurz (6):
+      KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when VPs are allocated
+      KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use
+      KVM: PPC: Book3S HV: XIVE: Show VP id in debugfs
+      KVM: PPC: Book3S HV: XIVE: Compute the VP id in a common helper
+      KVM: PPC: Book3S HV: XIVE: Make VP block size configurable
+      KVM: PPC: Book3S HV: XIVE: Allow userspace to set the # of VPs
+
+
+ Documentation/virt/kvm/devices/xics.txt |   14 +++
+ Documentation/virt/kvm/devices/xive.txt |    8 ++
+ arch/powerpc/include/uapi/asm/kvm.h     |    3 +
+ arch/powerpc/kvm/book3s_xive.c          |  142 ++++++++++++++++++++++++-------
+ arch/powerpc/kvm/book3s_xive.h          |   17 ++++
+ arch/powerpc/kvm/book3s_xive_native.c   |   40 +++------
+ 6 files changed, 167 insertions(+), 57 deletions(-)
+
