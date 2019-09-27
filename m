@@ -2,124 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C7DDC062B
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 15:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4118BC0633
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 15:19:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727099AbfI0NSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 09:18:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53002 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726144AbfI0NSN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 09:18:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8AFDA30ADBBB;
-        Fri, 27 Sep 2019 13:18:12 +0000 (UTC)
-Received: from [10.72.12.24] (ovpn-12-24.pek2.redhat.com [10.72.12.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C9315D9C9;
-        Fri, 27 Sep 2019 13:17:58 +0000 (UTC)
-Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-References: <20190926045427.4973-1-tiwei.bie@intel.com>
- <20190926042156-mutt-send-email-mst@kernel.org> <20190926131439.GA11652@___>
- <8ab5a8d9-284d-bba5-803d-08523c0814e1@redhat.com>
- <20190927053935-mutt-send-email-mst@kernel.org>
- <a959fe1e-3095-e0f0-0c9b-57f6eaa9c8b7@redhat.com>
- <20190927084408-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b6f6ffb2-0b16-5041-be2e-94b805c6a4c9@redhat.com>
-Date:   Fri, 27 Sep 2019 21:17:56 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727334AbfI0NTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 09:19:45 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:36506 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726144AbfI0NTp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 09:19:45 -0400
+Received: by mail-oi1-f194.google.com with SMTP id k20so5169658oih.3
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 06:19:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Kau7tqDv4N5BfV3Vw5Rek2SevsQVcXfTdIXf3HFT2yo=;
+        b=cCX1WO/bNqbsVLei5AA6tys+J9PQMz1GCTn1ofd38X9yeB/fkI6TGDTPGAovh1gxGJ
+         zIGgaNSH3KW4LZLhHdSL7SW3IkKPLQQsZ9cI6spH+4/CRcYEGOykEIJT8bShZ+GDlW4o
+         b0kEQDvOms3LGJDEgJHj+O8DyaMzVBc1S9zGk9ZPfwSYtL9s50mUBfR4VRQKmM4DFHST
+         vFgJYE7O3m4pTQWNgqexAgCt6S4epYt3IsrczSUcQ8ZKZKa+sb4j+dTClfYstJyKBJSx
+         CtJw7FsCAuzm+ipAFreRZqtIRDMxlbBHuiZe58JntnoPNM+gS3QfEkbKM19+iDlMj/P1
+         M3NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Kau7tqDv4N5BfV3Vw5Rek2SevsQVcXfTdIXf3HFT2yo=;
+        b=AdELT6bWd3HkdeyGvHEZe4JF3KCiMfNg9kT6sNMqaIHeVbZnXea6STlWVYFJwjKXlG
+         p3VZs7hsHh5XfZS3pfqMfEWHmb/4WD/YgBQtp3ZASjlm9Z4X4PmA6YYGXbu8188TZsEG
+         loWIwOl5BhSn0gpoqaNTXumaSns6Pjc1Qk2MsT2/Y4YWHOznggBt5VXMmLkspFUDraTY
+         bYLz2NGUU10cFtAIC0Kx/2n2ZMA8GX5yltI9Lagqpvj71gWq8l7WLvE+e6qAtu+4HtJz
+         k6jpWZ6gzxBhC6V2tQleGz0N+QedVXfijANs+PThCtLROg6Prme9ia0383inwLwHcFpm
+         ZNPg==
+X-Gm-Message-State: APjAAAXNZXNk16kpvq/8x1ihvvm183gICD20corbSLlJY0EOuuZFeALo
+        pI2uMKRT1B4ClsVRmumu0yQERZkGn9acPChlyYHHcw==
+X-Google-Smtp-Source: APXvYqzXs1mVapIpMEL6Y2Ngi/4ZduF5Yd6EaPkjfeAoYTmuJS+fshgQqDDsgxIcpLAb2p6CPEx1T1EC892RovR100c=
+X-Received: by 2002:aca:f54d:: with SMTP id t74mr7264630oih.170.1569590383304;
+ Fri, 27 Sep 2019 06:19:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190927084408-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Fri, 27 Sep 2019 13:18:12 +0000 (UTC)
+References: <20190906083152.25716-1-zhengxiang9@huawei.com> <20190906083152.25716-5-zhengxiang9@huawei.com>
+In-Reply-To: <20190906083152.25716-5-zhengxiang9@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri, 27 Sep 2019 14:19:32 +0100
+Message-ID: <CAFEAcA_o6NkOGptWFOoVt4pUgHU+dNyWQ9h_VfNweR17CtHSnw@mail.gmail.com>
+Subject: Re: [Qemu-arm] [PATCH v18 4/6] KVM: Move hwpoison page related
+ functions into include/sysemu/kvm_int.h
+To:     Xiang Zheng <zhengxiang9@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        gengdongjiu <gengdongjiu@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+        wanghaibin.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/9/27 下午8:46, Michael S. Tsirkin wrote:
-> On Fri, Sep 27, 2019 at 08:17:47PM +0800, Jason Wang wrote:
->> On 2019/9/27 下午5:41, Michael S. Tsirkin wrote:
->>> On Fri, Sep 27, 2019 at 11:27:12AM +0800, Jason Wang wrote:
->>>> On 2019/9/26 下午9:14, Tiwei Bie wrote:
->>>>> On Thu, Sep 26, 2019 at 04:35:18AM -0400, Michael S. Tsirkin wrote:
->>>>>> On Thu, Sep 26, 2019 at 12:54:27PM +0800, Tiwei Bie wrote:
->>>>> [...]
->>>>>>> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
->>>>>>> index 40d028eed645..5afbc2f08fa3 100644
->>>>>>> --- a/include/uapi/linux/vhost.h
->>>>>>> +++ b/include/uapi/linux/vhost.h
->>>>>>> @@ -116,4 +116,12 @@
->>>>>>>     #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
->>>>>>>     #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
->>>>>>> +/* VHOST_MDEV specific defines */
->>>>>>> +
->>>>>>> +#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
->>>>>>> +
->>>>>>> +#define VHOST_MDEV_S_STOPPED	0
->>>>>>> +#define VHOST_MDEV_S_RUNNING	1
->>>>>>> +#define VHOST_MDEV_S_MAX	2
->>>>>>> +
->>>>>>>     #endif
->>>>>> So assuming we have an underlying device that behaves like virtio:
->>>>> I think they are really good questions/suggestions. Thanks!
->>>>>
->>>>>> 1. Should we use SET_STATUS maybe?
->>>>> I like this idea. I will give it a try.
->>>>>
->>>>>> 2. Do we want a reset ioctl?
->>>>> I think it is helpful. If we use SET_STATUS, maybe we
->>>>> can use it to support the reset.
->>>>>
->>>>>> 3. Do we want ability to enable rings individually?
->>>>> I will make it possible at least in the vhost layer.
->>>> Note the API support e.g set_vq_ready().
->>> virtio spec calls this "enabled" so let's stick to that.
->>
->> Ok.
->>
->>
->>>>>> 4. Does device need to limit max ring size?
->>>>>> 5. Does device need to limit max number of queues?
->>>>> I think so. It's helpful to have ioctls to report the max
->>>>> ring size and max number of queues.
->>>> An issue is the max number of queues is done through a device specific way,
->>>> usually device configuration space. This is supported by the transport API,
->>>> but how to expose it to userspace may need more thought.
->>>>
->>>> Thanks
->>> an ioctl for device config?  But for v1 I'd be quite happy to just have
->>> a minimal working device with 2 queues.
->>
->> I'm fully agree, and it will work as long as VIRTIO_NET_F_MQ and
->> VIRTIO_NET_F_CTRL_VQ is not advertised by the mdev device.
->>
->> Thanks
-> Hmm this means we need to validate the features bits,
-> not just pass them through to the hardware.
-> Problem is, how do we add more feature bits later,
-> without testing all hardware?
-> I guess this means the device specific driver must do it.
+On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
 >
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>
+> kvm_hwpoison_page_add() and kvm_unpoison_all() will both be used by X86
+> and ARM platforms, so moving them into "include/sysemu/kvm_int.h" to
+> avoid duplicate code.
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> ---
+>  accel/kvm/kvm-all.c      | 33 +++++++++++++++++++++++++++++++++
+>  include/sysemu/kvm_int.h | 23 +++++++++++++++++++++++
+>  target/arm/kvm.c         |  3 +++
+>  target/i386/kvm.c        | 34 ----------------------------------
+>  4 files changed, 59 insertions(+), 34 deletions(-)
 
-That looks not good, maybe a virtio device id based features blacklist 
-in vhost-mdev. Then MQ and CTRL_VQ could be filtered out by vhost-mdev.
+>  static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
+>  {
+>  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+> index 72b2d1b3ae..3ad49f9a28 100644
+> --- a/include/sysemu/kvm_int.h
+> +++ b/include/sysemu/kvm_int.h
+> @@ -41,4 +41,27 @@ typedef struct KVMMemoryListener {
+>  void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+>                                    AddressSpace *as, int as_id);
+>
+> +/**
+> + * kvm_hwpoison_page_add:
+> + *
+> + * Parameters:
+> + *  @ram_addr: the address in the RAM for the poisoned page
+> + *
+> + * Add a poisoned page to the list
+> + *
+> + * Return: None.
+> + */
+> +void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+> +
+> +/**
+> + * kvm_unpoison_all:
+> + *
+> + * Parameters:
+> + *  @param: some data may be passed to this function
+> + *
+> + * Free and remove all the poisoned pages in the list
+> + *
+> + * Return: None.
+> + */
+> +void kvm_unpoison_all(void *param);
+>  #endif
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index b2eaa50b8d..3a110be7b8 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -20,6 +20,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/kvm_int.h"
+> +#include "sysemu/reset.h"
+>  #include "kvm_arm.h"
+>  #include "cpu.h"
+>  #include "trace.h"
+> @@ -195,6 +196,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>
+>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+>
+> +    qemu_register_reset(kvm_unpoison_all, NULL);
+> +
 
-Thanks
+Rather than registering the same reset handler in
+all the architectures, we could register it in the
+generic kvm_init() function. (For architectures that
+don't use the poison-list functionality the reset handler
+will harmlessly do nothing, because there will be nothing
+in the list.)
 
+This would allow you to not have to make the
+kvm_unpoison_all() function global -- it can be static
+in accel/tcg/kvm-all.c.
 
->>>>> Thanks!
+>      return 0;
+>  }
+
+thanks
+-- PMM
