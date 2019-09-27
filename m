@@ -2,100 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B68C9C06D9
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 16:00:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C35BC06E0
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 16:02:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbfI0OAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 10:00:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60471 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726843AbfI0OAN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 10:00:13 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 367E6757CF
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 14:00:12 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id z8so1045283wrs.14
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 07:00:12 -0700 (PDT)
+        id S1727517AbfI0OCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 10:02:14 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:34686 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726843AbfI0OCO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 10:02:14 -0400
+Received: by mail-oi1-f195.google.com with SMTP id 83so5297511oii.1
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 07:02:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JNdVUv0zNXaOfCb4Gice9wMOQgdLgAnNhUj5m0MnIEY=;
+        b=nqHE+bAYeccazvFVv4LtPzdLNeAZIaYIXaJeBGsztk/vijCrzp/x4/pOciFBNgWWty
+         srCZWTEAJBBNAJbLoeqzhSTC8Ysao60knw8aGhi7JKL0NonKmbNeDDYt9xlLfeYheH3W
+         Ik+SxOBPsV+IASTgEq6dYZOg51EBiqjUIsWOy9zr37Rhb56dB/gMHLHDe0vTmT13vJJk
+         pMYt5c2m+c6jlRfO03Ea7rZp6vWsX20ovbG4Ujd4tQGvtWaI5RqtuZTUCG0ta2rzAzUI
+         XAeLYq+FYk7FbxUNu8ekRv5b8LBENW7U5YgNzNMaxtw6K9w8PA9wdWykZM3JjBoOvYz5
+         rASw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/OdoyPZCMccqXXjc+1N583bkKKd2Z+1Dhr6ugLufJbI=;
-        b=KrkdMka4vhwaksm6j1fCODDiANiceRKcbYDLxQILPqYT9uInHAB9orwkscFXsd+pl5
-         S/+UjIq/wx4DKVo7wC11f1tsd+NhxSanQ6QEPRzRF8E98ut2vJdNIjW+D92p29+Na9n+
-         YfWKdBCOg+Jgw9M/rbJdJUUhTNWT5I/cZFYfCBezQtaME6hHDsn6IVaHQO9PfbKvoqBH
-         mbX0eb+Yt9GJmqaaEWWVRfQPqEafzY33WX+++Cm98vU4Him3d6+WuJl9H5nR79mQJCKI
-         90i4rJ4KnjugN+GvtH5gCDFoo/9+pVCaK6BgFiMzLge/lrSTzDxux3/vh7FmyMBGhQ4d
-         OlXg==
-X-Gm-Message-State: APjAAAW67pUE8RC9qJ8RSFR8ycPvWzwk/FckFb7ylJV3DkQ3iNn1nnZi
-        XL71k1EV9LwqavQ+lJsfr8OPzm1r6VeezWe9PeQSiFSr5iLajsIEf5hQr6HZ07UzADj1zg8lWca
-        nPGgJ0KM9OaZT
-X-Received: by 2002:a1c:7c08:: with SMTP id x8mr7465409wmc.140.1569592810748;
-        Fri, 27 Sep 2019 07:00:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwU0mWODVsdotMCbIW7OfD3zO54AN48B/Jysamjp8eMfick8GypiygUwBVCdbBg7qUC3inl0A==
-X-Received: by 2002:a1c:7c08:: with SMTP id x8mr7465392wmc.140.1569592810509;
-        Fri, 27 Sep 2019 07:00:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
-        by smtp.gmail.com with ESMTPSA id s19sm3943573wrb.14.2019.09.27.07.00.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Sep 2019 07:00:09 -0700 (PDT)
-Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Eric Hankland <ehankland@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-References: <20190821182004.102768-1-jmattson@google.com>
- <CALMp9eTtA5ZXJyWcOpe-pQ66X3sTgCR4-BHec_R3e1-j1FZyZw@mail.gmail.com>
- <8907173e-9f27-6769-09fc-0b82c22d6352@oracle.com>
- <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
- <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com>
- <CALMp9eQULvr5wKt1Aw3MR+tbeNgvA_4p__6n1YTkWjMHCaEmLw@mail.gmail.com>
- <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com>
- <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com>
- <87ftkh6e19.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <6e6f46fe-6e11-c5e3-d80c-327f77b91907@redhat.com>
-Date:   Fri, 27 Sep 2019 16:00:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JNdVUv0zNXaOfCb4Gice9wMOQgdLgAnNhUj5m0MnIEY=;
+        b=swM9tLsUQ0csRAv75uOWc7F24o/DE0kHUPtmqei1dQ6TQgPTWiVc2A09yaNylsJMC1
+         pq6OkbPw8H0sGuce7aeRZjxPQA6A3pMFWHqE5hfTtk5+9/SfW0W3QtQ1c2a73AU9xaX5
+         vmWAy5Bx9wXzrp+PWhG0uzB+r6djLQuIvT+ZPrmybg5waJICeXQKv7PAfMnOfCkYW3hG
+         7B3/gwyBVhGSY6emklMZNvI1nQXt9rT0uYkmW/c0qtSPMrRNHT3A7cm03dEeg1hceYrC
+         h/clUOCGFT5476jTplmW3Itr05jSbZvcSBWPm1V98vCClSqz4q1X2HCz3r70EKOjkr9U
+         X9eg==
+X-Gm-Message-State: APjAAAVcDgZVe6GuTpHooB3pbxrFE7qNe1FN7WIYisShJd+v3cJLo6kg
+        hrGKIVZKYqimCcG9i25Ozf8laPW0SQBzaIgaWsLTfA==
+X-Google-Smtp-Source: APXvYqwr6tN8GXFQ7CSFaOjf/oLfGBMHKVf8cyd/Pii9KiQZKSXzWNxCXSDpmv1EfcdURgP92oDDz5CwwTPlogBzkDA=
+X-Received: by 2002:aca:b646:: with SMTP id g67mr7302016oif.163.1569592933016;
+ Fri, 27 Sep 2019 07:02:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87ftkh6e19.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190906083152.25716-1-zhengxiang9@huawei.com> <20190906083152.25716-2-zhengxiang9@huawei.com>
+In-Reply-To: <20190906083152.25716-2-zhengxiang9@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri, 27 Sep 2019 15:02:02 +0100
+Message-ID: <CAFEAcA9cQwAJfPBC9fRcxLZVzZqag0Si62nTBNwDPyQiPVwPcg@mail.gmail.com>
+Subject: Re: [PATCH v18 1/6] hw/arm/virt: Introduce RAS platform version and
+ RAS machine option
+To:     Xiang Zheng <zhengxiang9@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        gengdongjiu <gengdongjiu@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+        wanghaibin.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/09/19 15:53, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> Queued, thanks.
-> 
-> I'm sorry for late feedback but this commit seems to be causing
-> selftests failures for me, e.g.:
-> 
-> # ./x86_64/state_test 
-> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-> Guest physical address width detected: 46
-> ==== Test Assertion Failure ====
->   lib/x86_64/processor.c:1089: r == nmsrs
->   pid=14431 tid=14431 - Argument list too long
->      1	0x000000000040a55f: vcpu_save_state at processor.c:1088 (discriminator 3)
->      2	0x00000000004010e3: main at state_test.c:171 (discriminator 4)
->      3	0x00007f881eb453d4: ?? ??:0
->      4	0x0000000000401287: _start at ??:?
->   Unexpected result from KVM_GET_MSRS, r: 36 (failed at 194)
-> 
-> Is this something known already or should I investigate?
+On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>
+> Support RAS Virtualization feature since version 4.2, disable it by
+> default in the old versions. Also add a machine option which allows user
+> to enable it explicitly.
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> ---
+>  hw/arm/virt.c         | 33 +++++++++++++++++++++++++++++++++
+>  include/hw/arm/virt.h |  2 ++
+>  2 files changed, 35 insertions(+)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index d74538b021..e0451433c8 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1783,6 +1783,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+>      vms->its = value;
+>  }
+>
+> +static bool virt_get_ras(Object *obj, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    return vms->ras;
+> +}
+> +
+> +static void virt_set_ras(Object *obj, bool value, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    vms->ras = value;
+> +}
+> +
+>  static char *virt_get_gic_version(Object *obj, Error **errp)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(obj);
+> @@ -2026,6 +2040,19 @@ static void virt_instance_init(Object *obj)
+>                                      "Valid values are none and smmuv3",
+>                                      NULL);
+>
+> +    if (vmc->no_ras) {
+> +        vms->ras = false;
+> +    } else {
+> +        /* Default disallows RAS instantiation */
+> +        vms->ras = false;
+> +        object_property_add_bool(obj, "ras", virt_get_ras,
+> +                                 virt_set_ras, NULL);
+> +        object_property_set_description(obj, "ras",
+> +                                        "Set on/off to enable/disable "
+> +                                        "RAS instantiation",
+> +                                        NULL);
+> +    }
 
-No, I didn't know about it, it works here.
+For a property which is disabled by default, you don't need
+to have a separate flag in the VirtMachineClass struct.
+Those are only needed for properties where we need the old machine
+types to have the property be 'off' but new machine types
+need to default to it be 'on'. Since vms->ras is false
+by default anyway, you can just have this part:
 
-Paolo
+> +        /* Default disallows RAS instantiation */
+> +        vms->ras = false;
+> +        object_property_add_bool(obj, "ras", virt_get_ras,
+> +                                 virt_set_ras, NULL);
+> +        object_property_set_description(obj, "ras",
+> +                                        "Set on/off to enable/disable "
+> +                                        "RAS instantiation",
+> +                                        NULL);
+
+Compare the 'vms->secure' flag and associated property
+for an example of this.
+
+>      vms->irqmap = a15irqmap;
+>
+>      virt_flash_create(vms);
+> @@ -2058,8 +2085,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
+>
+>  static void virt_machine_4_1_options(MachineClass *mc)
+>  {
+> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> +
+>      virt_machine_4_2_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+> +    /* Disable memory recovery feature for 4.1 as RAS support was
+> +     * introduced with 4.2.
+> +     */
+> +    vmc->no_ras = true;
+>  }
+>  DEFINE_VIRT_MACHINE(4, 1)
+
+thanks
+-- PMM
