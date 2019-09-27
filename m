@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71D55C0289
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 11:40:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8DECC028E
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 11:41:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbfI0Jiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 05:38:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34036 "EHLO mx1.redhat.com"
+        id S1726438AbfI0JlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 05:41:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53068 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725946AbfI0Jiw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 05:38:52 -0400
+        id S1726030AbfI0JlO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 05:41:14 -0400
 Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5B88D4E926
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 09:38:51 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id i10so5190284qtq.3
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 02:38:51 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0D2404FCD6
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 09:41:14 +0000 (UTC)
+Received: by mail-qt1-f198.google.com with SMTP id f15so5171466qth.6
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 02:41:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=rOyYIzrWrloVuAx5hnkD3TMrF9pqyzmvSZFIAM/YQU8=;
-        b=tK/tTO5jpbkK3s2MGEWwf9z+2GlQzeIhvuNysI7WiPoGIiy9dehYqwdWBshHrXQgvy
-         UulFJ8rOWICtSPbKzkymU8f0kC/ofEalYWumkdDpejn9gG+1XHD/XipQatf51YFtbbv1
-         hHblkfVFgFYqa6qL6V9IR7IsA4oJH7V0rJmshcL5fauPVePy6GWxLh6kPbao0C+TxzXv
-         YG3543z4Apo0HlVn+N6tcOpNekBfPceCY3o8EFpijnn/BPfdDNrlOOXubG46UbR8Ry4l
-         0LiF4FjCAdoUtAMhN2ChPd89mhI9Z2a1hpVm1puTIghnkx0Su5S9K3LDc3cfP7VqDOre
-         UOOQ==
-X-Gm-Message-State: APjAAAViOY35FC9FWnRR0dpkykCnZyeHLikziLor8jWnziRSW4j3d/2n
-        vSp9C/bdrxVRKSmq7hZ0lnjGxHBdlWQGhAl+VOu75+hS1s0QOGVhB54s8qtJ2bFxhYzo52FRued
-        T0w6O41QRrrm6
-X-Received: by 2002:aed:3103:: with SMTP id 3mr8714975qtg.76.1569577130707;
-        Fri, 27 Sep 2019 02:38:50 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwDAuQ+kbM+rJGoW2H1RVZjcIQD6eUhHWI3ZWKcC6lLqGWDoGXC17Lib69zzC7/v1aBiaTSYg==
-X-Received: by 2002:aed:3103:: with SMTP id 3mr8714962qtg.76.1569577130523;
-        Fri, 27 Sep 2019 02:38:50 -0700 (PDT)
+        bh=hwNSPFXYcjt0ijpRdc1M38OvqU5g9p5x1VDMj8NBIGI=;
+        b=HmpSN+3M99tCDUzU6sK7aHXbkre+pS1EDQ1eBAx5iSr76SmAuPzkpXG50AdrNu5Beq
+         P0CMz+u11ZqQrZjeJ6HAQ6iDhk2tAKLNcXEYdj38OFWd19BUkoLMW5I8X5Xfj7/Z6PW7
+         tC8+aG+J87Uz53ezdEn6Wg2zY5gfT0Eh+qOI2y2vDS/VKLy/5jYZCCkPjZ81TI/TOCoh
+         2si+VVIfQ8bOPL+dEBfxyR8fE6NgEv8bdNyiK+S9HfsEKlDQgSVUXXu6InWMMZE48OyY
+         w9DbWq6vO8utnfef4Al8n5FkmiCZZSCtmRBhKM5p+YFaG6LaNmYsMP86D82m+6TPGiSB
+         +9lw==
+X-Gm-Message-State: APjAAAVJa1XM8eaAbJLMhpk8LYsHfpDfb/IhVx8ssJeLa33ZQdlIgk88
+        VXVNSIYvO4QiJOEYzTXhwUXksJzoPGCSc3XW0a/c5gQT0Ah/6FaaQ3Vq3kC9Ewzqtvv/Ahrww3Y
+        1Dq4da62VC+5U
+X-Received: by 2002:a37:aac8:: with SMTP id t191mr3503366qke.325.1569577273340;
+        Fri, 27 Sep 2019 02:41:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw/89V+twr9hPNLSOQXPg0tKZiJPuTDeybpYPFwNhDmewmUrIv8Fs6bzVi79PPZFA45J2U/tg==
+X-Received: by 2002:a37:aac8:: with SMTP id t191mr3503317qke.325.1569577272663;
+        Fri, 27 Sep 2019 02:41:12 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
-        by smtp.gmail.com with ESMTPSA id u39sm2417906qtj.34.2019.09.27.02.38.46
+        by smtp.gmail.com with ESMTPSA id v26sm3013791qta.88.2019.09.27.02.41.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Sep 2019 02:38:49 -0700 (PDT)
-Date:   Fri, 27 Sep 2019 05:38:43 -0400
+        Fri, 27 Sep 2019 02:41:11 -0700 (PDT)
+Date:   Fri, 27 Sep 2019 05:41:05 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
@@ -52,144 +52,78 @@ Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
         cunming.liang@intel.com, zhihong.wang@intel.com,
         lingshan.zhu@intel.com
 Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
-Message-ID: <20190927053829-mutt-send-email-mst@kernel.org>
+Message-ID: <20190927053935-mutt-send-email-mst@kernel.org>
 References: <20190926045427.4973-1-tiwei.bie@intel.com>
- <1b4b8891-8c14-1c85-1d6a-2eed1c90bcde@redhat.com>
- <20190927045438.GA17152@___>
- <05ab395e-6677-e8c3-becf-57bc1529921f@redhat.com>
+ <20190926042156-mutt-send-email-mst@kernel.org>
+ <20190926131439.GA11652@___>
+ <8ab5a8d9-284d-bba5-803d-08523c0814e1@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <05ab395e-6677-e8c3-becf-57bc1529921f@redhat.com>
+In-Reply-To: <8ab5a8d9-284d-bba5-803d-08523c0814e1@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 04:47:43PM +0800, Jason Wang wrote:
+On Fri, Sep 27, 2019 at 11:27:12AM +0800, Jason Wang wrote:
 > 
-> On 2019/9/27 下午12:54, Tiwei Bie wrote:
-> > On Fri, Sep 27, 2019 at 11:46:06AM +0800, Jason Wang wrote:
-> > > On 2019/9/26 下午12:54, Tiwei Bie wrote:
+> On 2019/9/26 下午9:14, Tiwei Bie wrote:
+> > On Thu, Sep 26, 2019 at 04:35:18AM -0400, Michael S. Tsirkin wrote:
+> > > On Thu, Sep 26, 2019 at 12:54:27PM +0800, Tiwei Bie wrote:
+> > [...]
+> > > > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > > > index 40d028eed645..5afbc2f08fa3 100644
+> > > > --- a/include/uapi/linux/vhost.h
+> > > > +++ b/include/uapi/linux/vhost.h
+> > > > @@ -116,4 +116,12 @@
+> > > >   #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
+> > > >   #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
+> > > > +/* VHOST_MDEV specific defines */
 > > > > +
-> > > > +static long vhost_mdev_start(struct vhost_mdev *m)
-> > > > +{
-> > > > +	struct mdev_device *mdev = m->mdev;
-> > > > +	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
-> > > > +	struct virtio_mdev_callback cb;
-> > > > +	struct vhost_virtqueue *vq;
-> > > > +	int idx;
+> > > > +#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
 > > > > +
-> > > > +	ops->set_features(mdev, m->acked_features);
+> > > > +#define VHOST_MDEV_S_STOPPED	0
+> > > > +#define VHOST_MDEV_S_RUNNING	1
+> > > > +#define VHOST_MDEV_S_MAX	2
 > > > > +
-> > > > +	mdev_add_status(mdev, VIRTIO_CONFIG_S_FEATURES_OK);
-> > > > +	if (!(mdev_get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK))
-> > > > +		goto reset;
-> > > > +
-> > > > +	for (idx = 0; idx < m->nvqs; idx++) {
-> > > > +		vq = &m->vqs[idx];
-> > > > +
-> > > > +		if (!vq->desc || !vq->avail || !vq->used)
-> > > > +			break;
-> > > > +
-> > > > +		if (ops->set_vq_state(mdev, idx, vq->last_avail_idx))
-> > > > +			goto reset;
-> > > If we do set_vq_state() in SET_VRING_BASE, we won't need this step here.
-> > Yeah, I plan to do it in the next version.
+> > > >   #endif
+> > > So assuming we have an underlying device that behaves like virtio:
+> > I think they are really good questions/suggestions. Thanks!
 > > 
-> > > > +
-> > > > +		/*
-> > > > +		 * In vhost-mdev, userspace should pass ring addresses
-> > > > +		 * in guest physical addresses when IOMMU is disabled or
-> > > > +		 * IOVAs when IOMMU is enabled.
-> > > > +		 */
-> > > A question here, consider we're using noiommu mode. If guest physical
-> > > address is passed here, how can a device use that?
-> > > 
-> > > I believe you meant "host physical address" here? And it also have the
-> > > implication that the HPA should be continuous (e.g using hugetlbfs).
-> > The comment is talking about the virtual IOMMU (i.e. iotlb in vhost).
-> > It should be rephrased to cover the noiommu case as well. Thanks for
-> > spotting this.
+> > > 1. Should we use SET_STATUS maybe?
+> > I like this idea. I will give it a try.
 > > 
+> > > 2. Do we want a reset ioctl?
+> > I think it is helpful. If we use SET_STATUS, maybe we
+> > can use it to support the reset.
 > > 
-> > > > +
-> > > > +	switch (cmd) {
-> > > > +	case VHOST_MDEV_SET_STATE:
-> > > > +		r = vhost_set_state(m, argp);
-> > > > +		break;
-> > > > +	case VHOST_GET_FEATURES:
-> > > > +		r = vhost_get_features(m, argp);
-> > > > +		break;
-> > > > +	case VHOST_SET_FEATURES:
-> > > > +		r = vhost_set_features(m, argp);
-> > > > +		break;
-> > > > +	case VHOST_GET_VRING_BASE:
-> > > > +		r = vhost_get_vring_base(m, argp);
-> > > > +		break;
-> > > Does it mean the SET_VRING_BASE may only take affect after
-> > > VHOST_MEV_SET_STATE?
-> > Yeah, in this version, SET_VRING_BASE won't set the base to the
-> > device directly. But I plan to not delay this anymore in the next
-> > version to support the SET_STATUS.
-> > 
-> > > > +	default:
-> > > > +		r = vhost_dev_ioctl(&m->dev, cmd, argp);
-> > > > +		if (r == -ENOIOCTLCMD)
-> > > > +			r = vhost_vring_ioctl(&m->dev, cmd, argp);
-> > > > +	}
-> > > > +
-> > > > +	mutex_unlock(&m->mutex);
-> > > > +	return r;
-> > > > +}
-> > > > +
-> > > > +static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
-> > > > +	.name		= "vfio-vhost-mdev",
-> > > > +	.open		= vhost_mdev_open,
-> > > > +	.release	= vhost_mdev_release,
-> > > > +	.ioctl		= vhost_mdev_unlocked_ioctl,
-> > > > +};
-> > > > +
-> > > > +static int vhost_mdev_probe(struct device *dev)
-> > > > +{
-> > > > +	struct mdev_device *mdev = mdev_from_dev(dev);
-> > > > +	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
-> > > > +	struct vhost_mdev *m;
-> > > > +	int nvqs, r;
-> > > > +
-> > > > +	m = kzalloc(sizeof(*m), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
-> > > > +	if (!m)
-> > > > +		return -ENOMEM;
-> > > > +
-> > > > +	mutex_init(&m->mutex);
-> > > > +
-> > > > +	nvqs = ops->get_queue_max(mdev);
-> > > > +	m->nvqs = nvqs;
-> > > The name could be confusing, get_queue_max() is to get the maximum number of
-> > > entries for a virtqueue supported by this device.
-> > OK. It might be better to rename it to something like:
-> > 
-> > 	get_vq_num_max()
-> > 
-> > which is more consistent with the set_vq_num().
-> > 
-> > > It looks to me that we need another API to query the maximum number of
-> > > virtqueues supported by the device.
-> > Yeah.
-> > 
-> > Thanks,
-> > Tiwei
+> > > 3. Do we want ability to enable rings individually?
+> > I will make it possible at least in the vhost layer.
 > 
 > 
-> One problem here:
-> 
-> Consider if we want to support multiqueue, how did userspace know about
-> this?
+> Note the API support e.g set_vq_ready().
 
-There's a feature bit for this, isn't there?
+virtio spec calls this "enabled" so let's stick to that.
 
-> Note this information could be fetched from get_config() via a device
-> specific way, do we want ioctl for accessing that area?
+> 
+> > 
+> > > 4. Does device need to limit max ring size?
+> > > 5. Does device need to limit max number of queues?
+> > I think so. It's helpful to have ioctls to report the max
+> > ring size and max number of queues.
+> 
+> 
+> An issue is the max number of queues is done through a device specific way,
+> usually device configuration space. This is supported by the transport API,
+> but how to expose it to userspace may need more thought.
 > 
 > Thanks
+
+an ioctl for device config?  But for v1 I'd be quite happy to just have
+a minimal working device with 2 queues.
+
+> 
+> > 
+> > Thanks!
