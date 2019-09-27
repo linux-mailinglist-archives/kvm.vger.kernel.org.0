@@ -2,92 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3A24C0E5E
-	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 01:37:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CF11C0E69
+	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 01:41:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728382AbfI0Xhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 19:37:38 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:44607 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727718AbfI0Xhi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 19:37:38 -0400
-Received: by mail-io1-f65.google.com with SMTP id j4so20890130iog.11
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 16:37:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YMZ9O3eRKTf/NLdRiOsF+GXcxfQDV+iSyTOvLX/Wcb4=;
-        b=XdPoEdvmSx4tupszIBhFg85LfTAkMRmdColwUTP6ZGjQr5jXWAEu5cEjRP6GgJRhPK
-         jaW4M5ooyQVUsgrUHx113bWTVwe9Bp0nMv0G3/rzSt8S4RS1/vyLcDClPdniU3MF2D6h
-         +POumf7BolXC/HfldPWR2lG0lJ0he8/qtTsaAEUKWmyKyS3bIB83Nq9nLZt/7MArL3Jv
-         vYoORvX4de//CAND1ZtsqNWPR5q77Nr2chGOGyAlLJFnlRi/4zi5oPQfqF/Yks4RjWyQ
-         6zSldVpTpuCLBWQIZ24uW2a6HI7i109I+x2nRWL8+bmKstC4eKh/JUHDLSMX6BcLq9EX
-         BIAA==
+        id S1728200AbfI0Xkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 19:40:51 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:35217 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725990AbfI0Xkv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 19:40:51 -0400
+Received: by mail-lf1-f67.google.com with SMTP id w6so3114025lfl.2;
+        Fri, 27 Sep 2019 16:40:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YMZ9O3eRKTf/NLdRiOsF+GXcxfQDV+iSyTOvLX/Wcb4=;
-        b=t3Lx/nl5Fxs2Gw3Gbd+TtukFhtZPX2mTPCSRXspLJ1h7xvK549B2mNPUOF3FdDvE2m
-         IwYAu/V8zsjoNErHgf4hYD7xtJaSugoXSSf5FD7f880sNzj+SGpDVnfk359us9ppZpdq
-         T2hwvTcEkvHzK1oJVbBWAtAYTYoaXkx4nIvbcFpuuB2zPxURBAEiwPnEVnJJlSZtQhQI
-         Z9BX5e62yH6VtSE/Vee91z4oukLJP7xtRwLeuFAuPzZ+uSVD3PtEYiQD3vLkDJd+sQJI
-         5UkxFAm0BhTVoIP2mekceaDt/lSWw7JFBSUsbLu7nz5A/tUXrKZRHDotzNzoabW3RSOH
-         108A==
-X-Gm-Message-State: APjAAAXmmKW42Gh0tE2NeokqKmpAOafn8WN/w0Y18ALfvAccEiRrsVXZ
-        lD5HL3Il+pUv7NQBrAMdbhm+udkVi1oO0YZeuNh6Jg==
-X-Google-Smtp-Source: APXvYqyAyqC145r4XgUlwodux+mPVgQ0s2/9frCnPDDLj+MzliGsh5edbzXHF81C1keruGiQ9tDmyXrLOnwP3G+pJUg=
-X-Received: by 2002:a6b:1606:: with SMTP id 6mr11821118iow.108.1569627456831;
- Fri, 27 Sep 2019 16:37:36 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=/vjA3feuVjhECJGCJlv7w7hKdoWzVAzTRzB0psX8g5s=;
+        b=cyYcyUamH/ZJxf1UPzvn/4gz0YorW7s+CfbhnVmploaBcmV29oJLvYo3uJwU0mjY58
+         3LWWSqUd8ot/ev0O7q3aZAJpUR1POuZMfY2vKm0V3xuUf7ZeMNZjutuJHIavuOa4azPF
+         XRNkWfLv6RBEMZcJX4IfJT5Z74EzX4Zvlb9ZknQvFacosYbT+VGJcv4Mq2iJhNU6D/Rt
+         hRwKC4wEfDeURwXeCr6uxvYfkyWO2U6rV+P7GGXXdtoEHmqk5vLIgYXe3uF8HCavjLaD
+         wG703e3baIwYGGDSZILhLVcOM/afcTqJG6Ume4iYUaX9aFh0llteu5a4JB4M53kygSxa
+         6Acw==
+X-Gm-Message-State: APjAAAXafwV/kRJo63q6NYOpyM5CSiynf+c+Iq9sebobZLx66zGoXoeb
+        pT2b/y18TMmkWfo3zr3cjKE=
+X-Google-Smtp-Source: APXvYqzJjAsZOxffDP6X1PyAJObAmIHMhsLPPyKIAwdxjZFuFJU1hlQRv1yAEhIhnnum3sSXraXujg==
+X-Received: by 2002:ac2:568c:: with SMTP id 12mr4300543lfr.133.1569627646034;
+        Fri, 27 Sep 2019 16:40:46 -0700 (PDT)
+Received: from localhost.localdomain (broadband-188-32-48-208.ip.moscow.rt.ru. [188.32.48.208])
+        by smtp.googlemail.com with ESMTPSA id x25sm778810ljb.60.2019.09.27.16.40.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Sep 2019 16:40:45 -0700 (PDT)
+From:   Denis Efremov <efremov@linux.com>
+To:     Bjorn Helgaas <bhelgaas@google.com>
+Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        x86@kernel.org, linux-s390@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-usb@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-serial@vger.kernel.org, linux-mmc@vger.kernel.org
+Subject: [PATCH RESEND v3 00/26] Add definition for the number of standard PCI BARs
+Date:   Sat, 28 Sep 2019 02:40:26 +0300
+Message-Id: <20190927234026.23342-1-efremov@linux.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190916204158.6889-3-efremov@linux.com>
+References: <20190916204158.6889-3-efremov@linux.com>
 MIME-Version: 1.0
-References: <20190927214523.3376-1-sean.j.christopherson@intel.com> <20190927214523.3376-2-sean.j.christopherson@intel.com>
-In-Reply-To: <20190927214523.3376-2-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 27 Sep 2019 16:37:25 -0700
-Message-ID: <CALMp9eQ5M+GPyxo_9aNdaUZfwZLZcxdtmQKCo1JjnAL-Jdh4-w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/8] KVM: nVMX: Always write vmcs02.GUEST_CR3 during
- nested VM-Enter
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Reto Buerki <reet@codelabs.ch>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 2:45 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Write the desired L2 CR3 into vmcs02.GUEST_CR3 during nested VM-Enter
-> instead of deferring the VMWRITE until vmx_set_cr3().  If the VMWRITE
-> is deferred, then KVM can consume a stale vmcs02.GUEST_CR3 when it
-> refreshes vmcs12->guest_cr3 during nested_vmx_vmexit() if the emulated
-> VM-Exit occurs without actually entering L2, e.g. if the nested run
-> is squashed because nested VM-Enter (from L1) is putting L2 into HLT.
->
-> Note, the above scenario can occur regardless of whether L1 is
-> intercepting HLT, e.g. L1 can intercept HLT and then re-enter L2 with
-> vmcs.GUEST_ACTIVITY_STATE=HALTED.  But practically speaking, a VMM will
-> likely put a guest into HALTED if and only if it's not intercepting HLT.
->
-> In an ideal world where EPT *requires* unrestricted guest (and vice
-> versa), VMX could handle CR3 similar to how it handles RSP and RIP,
-> e.g. mark CR3 dirty and conditionally load it at vmx_vcpu_run().  But
-> the unrestricted guest silliness complicates the dirty tracking logic
-> to the point that explicitly handling vmcs02.GUEST_CR3 during nested
-> VM-Enter is a simpler overall implementation.
->
-> Cc: stable@vger.kernel.org
-> Reported-and-tested-by: Reto Buerki <reet@codelabs.ch>
-> Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Reviewed-by: Liran Alon <liran.alon@oracle.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Code that iterates over all standard PCI BARs typically uses
+PCI_STD_RESOURCE_END, but this is error-prone because it requires
+"i <= PCI_STD_RESOURCE_END" rather than something like
+"i < PCI_STD_NUM_BARS". We could add such a definition and use it the same
+way PCI_SRIOV_NUM_BARS is used. The patchset also replaces constant (6)
+with new define PCI_STD_NUM_BARS where appropriate and removes local
+declarations for the number of PCI BARs.
+
+Changes in v3:
+  - Updated commits description.
+  - Refactored "< PCI_ROM_RESOURCE" with "< PCI_STD_NUM_BARS" in loops.
+  - Refactored "<= BAR_5" with "< PCI_STD_NUM_BARS" in loops.
+  - Removed local define GASKET_NUM_BARS.
+  - Removed local define PCI_NUM_BAR_RESOURCES.
+
+Changes in v2:
+  - Reversed checks in pci_iomap_range,pci_iomap_wc_range.
+  - Refactored loops in vfio_pci to keep PCI_STD_RESOURCES.
+  - Added 2 new patches to replace the magic constant with new define.
+  - Splitted net patch in v1 to separate stmmac and dwc-xlgmac patches.
+
+Denis Efremov (26):
+  PCI: Add define for the number of standard PCI BARs
+  PCI: hv: Use PCI_STD_NUM_BARS
+  PCI: dwc: Use PCI_STD_NUM_BARS
+  PCI: endpoint: Use PCI_STD_NUM_BARS
+  misc: pci_endpoint_test: Use PCI_STD_NUM_BARS
+  s390/pci: Use PCI_STD_NUM_BARS
+  x86/PCI: Loop using PCI_STD_NUM_BARS
+  alpha/PCI: Use PCI_STD_NUM_BARS
+  ia64: Use PCI_STD_NUM_BARS
+  stmmac: pci: Loop using PCI_STD_NUM_BARS
+  net: dwc-xlgmac: Loop using PCI_STD_NUM_BARS
+  ixgb: use PCI_STD_NUM_BARS
+  e1000: Use PCI_STD_NUM_BARS
+  rapidio/tsi721: Loop using PCI_STD_NUM_BARS
+  efifb: Loop using PCI_STD_NUM_BARS
+  fbmem: use PCI_STD_NUM_BARS
+  vfio_pci: Loop using PCI_STD_NUM_BARS
+  scsi: pm80xx: Use PCI_STD_NUM_BARS
+  ata: sata_nv: Use PCI_STD_NUM_BARS
+  staging: gasket: Use PCI_STD_NUM_BARS
+  serial: 8250_pci: Use PCI_STD_NUM_BARS
+  pata_atp867x: Use PCI_STD_NUM_BARS
+  memstick: use PCI_STD_NUM_BARS
+  USB: core: Use PCI_STD_NUM_BARS
+  usb: pci-quirks: Use PCI_STD_NUM_BARS
+  devres: use PCI_STD_NUM_BARS
+
+ arch/alpha/kernel/pci-sysfs.c                 |  8 ++---
+ arch/ia64/sn/pci/pcibr/pcibr_dma.c            |  4 +--
+ arch/s390/include/asm/pci.h                   |  5 +--
+ arch/s390/include/asm/pci_clp.h               |  6 ++--
+ arch/s390/pci/pci.c                           | 16 +++++-----
+ arch/s390/pci/pci_clp.c                       |  6 ++--
+ arch/x86/pci/common.c                         |  2 +-
+ arch/x86/pci/intel_mid_pci.c                  |  2 +-
+ drivers/ata/pata_atp867x.c                    |  2 +-
+ drivers/ata/sata_nv.c                         |  2 +-
+ drivers/memstick/host/jmb38x_ms.c             |  2 +-
+ drivers/misc/pci_endpoint_test.c              |  8 ++---
+ drivers/net/ethernet/intel/e1000/e1000.h      |  1 -
+ drivers/net/ethernet/intel/e1000/e1000_main.c |  2 +-
+ drivers/net/ethernet/intel/ixgb/ixgb.h        |  1 -
+ drivers/net/ethernet/intel/ixgb/ixgb_main.c   |  2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_pci.c  |  4 +--
+ .../net/ethernet/synopsys/dwc-xlgmac-pci.c    |  2 +-
+ drivers/pci/controller/dwc/pci-dra7xx.c       |  2 +-
+ .../pci/controller/dwc/pci-layerscape-ep.c    |  2 +-
+ drivers/pci/controller/dwc/pcie-artpec6.c     |  2 +-
+ .../pci/controller/dwc/pcie-designware-plat.c |  2 +-
+ drivers/pci/controller/dwc/pcie-designware.h  |  2 +-
+ drivers/pci/controller/pci-hyperv.c           | 10 +++---
+ drivers/pci/endpoint/functions/pci-epf-test.c | 10 +++---
+ drivers/pci/pci-sysfs.c                       |  4 +--
+ drivers/pci/pci.c                             | 13 ++++----
+ drivers/pci/proc.c                            |  4 +--
+ drivers/pci/quirks.c                          |  4 +--
+ drivers/rapidio/devices/tsi721.c              |  2 +-
+ drivers/scsi/pm8001/pm8001_hwi.c              |  2 +-
+ drivers/scsi/pm8001/pm8001_init.c             |  2 +-
+ drivers/staging/gasket/gasket_constants.h     |  3 --
+ drivers/staging/gasket/gasket_core.c          | 12 +++----
+ drivers/staging/gasket/gasket_core.h          |  4 +--
+ drivers/tty/serial/8250/8250_pci.c            |  8 ++---
+ drivers/usb/core/hcd-pci.c                    |  2 +-
+ drivers/usb/host/pci-quirks.c                 |  2 +-
+ drivers/vfio/pci/vfio_pci.c                   | 11 ++++---
+ drivers/vfio/pci/vfio_pci_config.c            | 32 ++++++++++---------
+ drivers/vfio/pci/vfio_pci_private.h           |  4 +--
+ drivers/video/fbdev/core/fbmem.c              |  4 +--
+ drivers/video/fbdev/efifb.c                   |  2 +-
+ include/linux/pci-epc.h                       |  2 +-
+ include/linux/pci.h                           |  2 +-
+ include/uapi/linux/pci_regs.h                 |  1 +
+ lib/devres.c                                  |  2 +-
+ 47 files changed, 112 insertions(+), 115 deletions(-)
+
+-- 
+2.21.0
+
