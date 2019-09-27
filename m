@@ -2,103 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC3C8C04E1
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 14:12:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1AF1C04F4
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 14:16:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727346AbfI0MMT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 08:12:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60316 "EHLO mx1.redhat.com"
+        id S1727465AbfI0MP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 08:15:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34854 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726540AbfI0MMT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 08:12:19 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726251AbfI0MP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 08:15:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C822A6412E
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 12:12:18 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id w8so937310wrm.3
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 05:12:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=1BKH6Vd2y0kjt5qb+nb7wXA/qqVsC/VTzacnT15CY10=;
-        b=gXX1iLE30VjKRDUsdxr68w0HNqHqcvcyKp3dBju2fDF9/qSVQ/RmoOem0GILwZk5u4
-         5hplliWi2yPDZf7Rb6g/dxSt9X3gpc4KelU9Hu2nGFVaUkQ5UNZOaw/md76mczrHZgHg
-         Z83wKyXaqzrP2jpc8syc9uYe0fV0QN97SiKA85u+evAuQwU4AH5EQhjLxFtmPdCM9WU2
-         n8AaKTXuzsF5dnqP7nsO60ZlU6U3xIQNX25/l62UfoqP+Pj4og1fufTsXZ1Wg6o/3bW5
-         uDKuW3g7T1bb9sCv/rV0rSeGI94Q0YZpDlaV6N+1NZFf6ztk8LNmcYZZwCI81H/i2aJS
-         cyCQ==
-X-Gm-Message-State: APjAAAXvvGU0hELKmkNHJeAJFARnJjI5aJe7wh43VTsIfbOadyAWSQLd
-        nlJaRqhS96+rzA/4qj10XNzfWFGAHP1Detb0YuKQylb0Dmz9T5k3LnqaJn3bgsZw0digYiZyEJh
-        rI6bOqFOlhaob
-X-Received: by 2002:adf:f58c:: with SMTP id f12mr2689595wro.38.1569586337497;
-        Fri, 27 Sep 2019 05:12:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxSk514eVf6BTYDMpnjdeyawo4kXOVNU56dKCoFHmvIyY7JVO1ee097ZFa9WRpTPQgMqrYSNA==
-X-Received: by 2002:adf:f58c:: with SMTP id f12mr2689586wro.38.1569586337260;
-        Fri, 27 Sep 2019 05:12:17 -0700 (PDT)
-Received: from vitty.brq.redhat.com ([95.82.135.182])
-        by smtp.gmail.com with ESMTPSA id a13sm6204997wrf.73.2019.09.27.05.12.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Sep 2019 05:12:16 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>
-Subject: Re: [PATCH 0/2] KVM: nVMX: Bug fix for consuming stale vmcs02.GUEST_CR3
-In-Reply-To: <20190926214302.21990-1-sean.j.christopherson@intel.com>
-References: <20190926214302.21990-1-sean.j.christopherson@intel.com>
-Date:   Fri, 27 Sep 2019 14:12:15 +0200
-Message-ID: <87o8z65468.fsf@vitty.brq.redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 96CF22D7E1;
+        Fri, 27 Sep 2019 12:15:55 +0000 (UTC)
+Received: from [10.72.12.24] (ovpn-12-24.pek2.redhat.com [10.72.12.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DC722608C2;
+        Fri, 27 Sep 2019 12:15:43 +0000 (UTC)
+Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+References: <20190926045427.4973-1-tiwei.bie@intel.com>
+ <1b4b8891-8c14-1c85-1d6a-2eed1c90bcde@redhat.com>
+ <20190927045438.GA17152@___>
+ <05ab395e-6677-e8c3-becf-57bc1529921f@redhat.com>
+ <20190927053829-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <552fc91c-2eb6-8870-3077-e808e7e0917b@redhat.com>
+Date:   Fri, 27 Sep 2019 20:15:41 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190927053829-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Fri, 27 Sep 2019 12:15:55 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-> Reto Buerki reported a failure in a nested VMM when running with HLT
-> interception disabled in L1.  When putting L2 into HLT, KVM never actually
-> enters L2 and instead cancels the nested run and pretends that VM-Enter to
-> L2 completed and then exited on HLT (which KVM intercepted).  Because KVM
-> never actually runs L2, KVM skips the pending MMU update for L2 and so
-> leaves a stale value in vmcs02.GUEST_CR3.  If the next wake event for L2
-> triggers a nested VM-Exit, KVM will refresh vmcs12->guest_cr3 from
-> vmcs02.GUEST_CR3 and consume the stale value.
->
-> Fix the issue by unconditionally writing vmcs02.GUEST_CR3 during nested
-> VM-Enter instead of deferring the update to vmx_set_cr3(), and skip the
-> update of GUEST_CR3 in vmx_set_cr3() when running L2.  I.e. make the
-> nested code fully responsible for vmcs02.GUEST_CR3.
->
-> I really wanted to go with a different fix of handling this as a one-off
-> case in the HLT flow (in nested_vmx_run()), and then following that up
-> with a cleanup of VMX's CR3 handling, e.g. to do proper dirty tracking
-> instead of having the nested code do manual VMREADs and VMWRITEs.  I even
-> went so far as to hide vcpu->arch.cr3 (put CR3 in vcpu->arch.regs), but
-> things went south when I started working through the dirty tracking logic.
->
-> Because EPT can be enabled *without* unrestricted guest, enabling EPT
-> doesn't always mean GUEST_CR3 really is the guest CR3 (unlike SVM's NPT).
-> And because the unrestricted guest handling of GUEST_CR3 is dependent on
-> whether the guest has paging enabled, VMX can't even do a clean handoff
-> based on unrestricted guest.  In a nutshell, dynamically handling the
-> transitions of GUEST_CR3 ownership in VMX is a nightmare, so fixing this
-> purely within the context of nested VMX turned out to be the cleanest fix.
->
-> Sean Christopherson (2):
->   KVM: nVMX: Always write vmcs02.GUEST_CR3 during nested VM-Enter
->   KVM: VMX: Skip GUEST_CR3 VMREAD+VMWRITE if the VMCS is up-to-date
->
+On 2019/9/27 下午5:38, Michael S. Tsirkin wrote:
+> On Fri, Sep 27, 2019 at 04:47:43PM +0800, Jason Wang wrote:
+>> On 2019/9/27 下午12:54, Tiwei Bie wrote:
+>>> On Fri, Sep 27, 2019 at 11:46:06AM +0800, Jason Wang wrote:
+>>>> On 2019/9/26 下午12:54, Tiwei Bie wrote:
+>>>>> +
+>>>>> +static long vhost_mdev_start(struct vhost_mdev *m)
+>>>>> +{
+>>>>> +	struct mdev_device *mdev = m->mdev;
+>>>>> +	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
+>>>>> +	struct virtio_mdev_callback cb;
+>>>>> +	struct vhost_virtqueue *vq;
+>>>>> +	int idx;
+>>>>> +
+>>>>> +	ops->set_features(mdev, m->acked_features);
+>>>>> +
+>>>>> +	mdev_add_status(mdev, VIRTIO_CONFIG_S_FEATURES_OK);
+>>>>> +	if (!(mdev_get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK))
+>>>>> +		goto reset;
+>>>>> +
+>>>>> +	for (idx = 0; idx < m->nvqs; idx++) {
+>>>>> +		vq = &m->vqs[idx];
+>>>>> +
+>>>>> +		if (!vq->desc || !vq->avail || !vq->used)
+>>>>> +			break;
+>>>>> +
+>>>>> +		if (ops->set_vq_state(mdev, idx, vq->last_avail_idx))
+>>>>> +			goto reset;
+>>>> If we do set_vq_state() in SET_VRING_BASE, we won't need this step here.
+>>> Yeah, I plan to do it in the next version.
+>>>
+>>>>> +
+>>>>> +		/*
+>>>>> +		 * In vhost-mdev, userspace should pass ring addresses
+>>>>> +		 * in guest physical addresses when IOMMU is disabled or
+>>>>> +		 * IOVAs when IOMMU is enabled.
+>>>>> +		 */
+>>>> A question here, consider we're using noiommu mode. If guest physical
+>>>> address is passed here, how can a device use that?
+>>>>
+>>>> I believe you meant "host physical address" here? And it also have the
+>>>> implication that the HPA should be continuous (e.g using hugetlbfs).
+>>> The comment is talking about the virtual IOMMU (i.e. iotlb in vhost).
+>>> It should be rephrased to cover the noiommu case as well. Thanks for
+>>> spotting this.
+>>>
+>>>
+>>>>> +
+>>>>> +	switch (cmd) {
+>>>>> +	case VHOST_MDEV_SET_STATE:
+>>>>> +		r = vhost_set_state(m, argp);
+>>>>> +		break;
+>>>>> +	case VHOST_GET_FEATURES:
+>>>>> +		r = vhost_get_features(m, argp);
+>>>>> +		break;
+>>>>> +	case VHOST_SET_FEATURES:
+>>>>> +		r = vhost_set_features(m, argp);
+>>>>> +		break;
+>>>>> +	case VHOST_GET_VRING_BASE:
+>>>>> +		r = vhost_get_vring_base(m, argp);
+>>>>> +		break;
+>>>> Does it mean the SET_VRING_BASE may only take affect after
+>>>> VHOST_MEV_SET_STATE?
+>>> Yeah, in this version, SET_VRING_BASE won't set the base to the
+>>> device directly. But I plan to not delay this anymore in the next
+>>> version to support the SET_STATUS.
+>>>
+>>>>> +	default:
+>>>>> +		r = vhost_dev_ioctl(&m->dev, cmd, argp);
+>>>>> +		if (r == -ENOIOCTLCMD)
+>>>>> +			r = vhost_vring_ioctl(&m->dev, cmd, argp);
+>>>>> +	}
+>>>>> +
+>>>>> +	mutex_unlock(&m->mutex);
+>>>>> +	return r;
+>>>>> +}
+>>>>> +
+>>>>> +static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
+>>>>> +	.name		= "vfio-vhost-mdev",
+>>>>> +	.open		= vhost_mdev_open,
+>>>>> +	.release	= vhost_mdev_release,
+>>>>> +	.ioctl		= vhost_mdev_unlocked_ioctl,
+>>>>> +};
+>>>>> +
+>>>>> +static int vhost_mdev_probe(struct device *dev)
+>>>>> +{
+>>>>> +	struct mdev_device *mdev = mdev_from_dev(dev);
+>>>>> +	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
+>>>>> +	struct vhost_mdev *m;
+>>>>> +	int nvqs, r;
+>>>>> +
+>>>>> +	m = kzalloc(sizeof(*m), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
+>>>>> +	if (!m)
+>>>>> +		return -ENOMEM;
+>>>>> +
+>>>>> +	mutex_init(&m->mutex);
+>>>>> +
+>>>>> +	nvqs = ops->get_queue_max(mdev);
+>>>>> +	m->nvqs = nvqs;
+>>>> The name could be confusing, get_queue_max() is to get the maximum number of
+>>>> entries for a virtqueue supported by this device.
+>>> OK. It might be better to rename it to something like:
+>>>
+>>> 	get_vq_num_max()
+>>>
+>>> which is more consistent with the set_vq_num().
+>>>
+>>>> It looks to me that we need another API to query the maximum number of
+>>>> virtqueues supported by the device.
+>>> Yeah.
+>>>
+>>> Thanks,
+>>> Tiwei
+>>
+>> One problem here:
+>>
+>> Consider if we want to support multiqueue, how did userspace know about
+>> this?
+> There's a feature bit for this, isn't there?
 
-Series:
-Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
--- 
-Vitaly
+Yes, but it needs to know how many queue pairs are available.
+
+Thanks
+
+
+>
+>> Note this information could be fetched from get_config() via a device
+>> specific way, do we want ioctl for accessing that area?
+>>
+>> Thanks
