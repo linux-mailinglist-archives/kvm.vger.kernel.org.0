@@ -2,52 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F759C0140
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 10:34:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60F97C014F
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 10:37:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726030AbfI0Idw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 04:33:52 -0400
-Received: from foss.arm.com ([217.140.110.172]:45422 "EHLO foss.arm.com"
+        id S1726061AbfI0Ihh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 04:37:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33376 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725938AbfI0Idw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 04:33:52 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E5F97337;
-        Fri, 27 Sep 2019 01:33:51 -0700 (PDT)
-Received: from dawn-kernel.cambridge.arm.com (unknown [10.1.197.116])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C66FD3F739;
-        Fri, 27 Sep 2019 01:33:50 -0700 (PDT)
-Subject: Re: [PATCH 1/5] arm64: Add ARM64_WORKAROUND_1319367 for all A57 and
- A72 versions
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20190925111941.88103-1-maz@kernel.org>
- <20190925111941.88103-2-maz@kernel.org>
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-Message-ID: <403cb5f2-b55a-0e5e-f228-954b3b746334@arm.com>
-Date:   Fri, 27 Sep 2019 09:33:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        id S1725946AbfI0Ihg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 04:37:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 38C8EC05AA52;
+        Fri, 27 Sep 2019 08:37:36 +0000 (UTC)
+Received: from [10.72.12.30] (ovpn-12-30.pek2.redhat.com [10.72.12.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18629600C6;
+        Fri, 27 Sep 2019 08:37:08 +0000 (UTC)
+Subject: Re: [PATCH V2 6/8] mdev: introduce virtio device and its device ops
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com
+References: <20190924135332.14160-1-jasowang@redhat.com>
+ <20190924135332.14160-7-jasowang@redhat.com>
+ <20190924170640.1da03bae@x1.home>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <baa742f5-8d4e-f1f1-1194-f362cdf51fea@redhat.com>
+Date:   Fri, 27 Sep 2019 16:37:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190925111941.88103-2-maz@kernel.org>
+In-Reply-To: <20190924170640.1da03bae@x1.home>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 27 Sep 2019 08:37:36 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 2019/9/25 上午7:06, Alex Williamson wrote:
+> On Tue, 24 Sep 2019 21:53:30 +0800
+> Jason Wang<jasowang@redhat.com>  wrote:
+>
+>> This patch implements basic support for mdev driver that supports
+>> virtio transport for kernel virtio driver.
+>>
+>> Signed-off-by: Jason Wang<jasowang@redhat.com>
+>> ---
+>>   include/linux/mdev.h        |   2 +
+>>   include/linux/virtio_mdev.h | 145 ++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 147 insertions(+)
+>>   create mode 100644 include/linux/virtio_mdev.h
+>>
+>> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+>> index 3414307311f1..73ac27b3b868 100644
+>> --- a/include/linux/mdev.h
+>> +++ b/include/linux/mdev.h
+>> @@ -126,6 +126,8 @@ struct mdev_device *mdev_from_dev(struct device *dev);
+>>   
+>>   enum {
+>>   	MDEV_ID_VFIO = 1,
+>> +	MDEV_ID_VIRTIO = 2,
+>> +	MDEV_ID_VHOST = 3,
+> MDEV_ID_VHOST isn't used yet here.  Also, given the strong
+> interdependence between the class_id and the ops structure, we might
+> wand to define them in the same place.  Thanks,
+>
+> Alex
+>
 
-On 25/09/2019 12:19, Marc Zyngier wrote:
-> Rework the EL2 vector hardening that is only selected for A57 and A72
-> so that the table can also be used for ARM64_WORKAROUND_1319367.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Rethink about this,  I believe it's better to define the device ops in 
+their own headers, and one set of device ops could be used for two 
+classes (e.g both virtio and vhost). And to avoid a duplicated ID 
+definition. I tend to keep this in the common mdev.h header.
+
+Thanks
+
