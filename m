@@ -2,98 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C431C039C
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 12:42:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38F07C03E4
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 13:18:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727213AbfI0Kml (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 06:42:41 -0400
-Received: from foss.arm.com ([217.140.110.172]:48772 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727033AbfI0Kmk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 06:42:40 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3F8F1570;
-        Fri, 27 Sep 2019 03:42:39 -0700 (PDT)
-Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 33DAD3F534;
-        Fri, 27 Sep 2019 03:42:39 -0700 (PDT)
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 6/6] arm: Add missing test name prefix calls
-Date:   Fri, 27 Sep 2019 11:42:27 +0100
-Message-Id: <20190927104227.253466-7-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190927104227.253466-1-andre.przywara@arm.com>
-References: <20190927104227.253466-1-andre.przywara@arm.com>
+        id S1726594AbfI0LPt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 07:15:49 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:54672 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725992AbfI0LPs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 07:15:48 -0400
+Received: by mail-wm1-f67.google.com with SMTP id p7so6150225wmp.4;
+        Fri, 27 Sep 2019 04:15:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=KM5/fL2Yt0ZifkcygAo4LHNxxbfupXEym28ra8qTLbk=;
+        b=J1It2fckNyXTHriDkvoPhArrNWQ61s/q+CcHPM86GDjlu3yV/E30GGKi06M5gZcTUJ
+         5Weme2PW+RFADwyGaVDgf+o1HyXScwzisYSrqzqlkaG92KV4s/IfPfHxGQeCqwNy9YZr
+         fyK0Qv+U1PlZ8A75KLv13rIFgMF62pDHMPhi4CaARRsuFBzziali0yDpdC0cD80EAxhi
+         ETza7tpuWouCNJTynMhq1UM4FTcr8eaSlqrfSD88BuahkZRYrrFI5LS3yVaxCexemLCs
+         4YnocKfMigCdOm7ulq4Kpi603M4DV4jlZRx2Uuhp6CHmEuuycQiXFCOcnYhdtElwxAYV
+         5ieA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=KM5/fL2Yt0ZifkcygAo4LHNxxbfupXEym28ra8qTLbk=;
+        b=LGwDq0/FiHw0dbQFGJBXydnOfVrUj+ByHpiMRfwQb+1A/MkFnKaprOrgJK2B9hoTP8
+         Fj+j6Bz3ay+Wv3AZ39K7Zdv0qFfgq53emo/zwwkV3ts5CtkGBgwzHtw/k9jnB2Wqn7j6
+         O5bM0jIWDgFSvJDXy0JgSLboSvLX4ClNUV5MOsPUzI45vwgGBiCE2yNlqORvsQAO/w3V
+         OaNPRtB+J6htOezYhJgxNimUju61Oggsqga9GqWIIjg3UGn1CHlKDTr2EQpuYS1NJNQw
+         RLFgGwEk7SlJYKWHfiTapOsSiKHHOQ7NBQAI0HvmZOFOYJzlGxwaLYfUYPETtoF6qPzJ
+         An+g==
+X-Gm-Message-State: APjAAAUiyPOVt96gblXV1r5feMqlI27AvBF/TvQy0GLAtqFjIN9AdQuF
+        XH4aed+kZnQSPBdpFRk/yfaLnBsu
+X-Google-Smtp-Source: APXvYqze5BcvyPMMQhinLxNxJJjbNrKHXTnEhYvRSJiYH2P41iv6PpSAah/uL9xk67roqKzZRCpsuw==
+X-Received: by 2002:a05:600c:290c:: with SMTP id i12mr7014897wmd.77.1569582946521;
+        Fri, 27 Sep 2019 04:15:46 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id r28sm2913848wrr.94.2019.09.27.04.15.45
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 27 Sep 2019 04:15:45 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: [PATCH v2 0/3] KVM: MMU: fix nested guest live migration with PML
+Date:   Fri, 27 Sep 2019 13:15:40 +0200
+Message-Id: <1569582943-13476-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running the unit tests in TAP mode (./run_tests.sh -t), every single
-test result is printed. This works fine for most tests which use the
-reporting prefix feature to indicate the actual test name.
-However psci and pci were missing those names, so the reporting left
-people scratching their head what was actually tested:
-...
-ok 74 - invalid-function
-ok 75 - affinity-info-on
-ok 76 - affinity-info-off
-ok 77 - cpu-on
+Shadow paging is fundamentally incompatible with the page-modification
+log, because the GPAs in the log come from the wrong memory map.
+In particular, for the EPT page-modification log, the GPAs in the log come
+from L2 rather than L1.  (If there was a non-EPT page-modification log,
+we couldn't use it for shadow paging because it would log GVAs rather
+than GPAs).
 
-Push a "psci" prefix before running those tests to make those report
-lines more descriptive.
-While at it, do the same for pci, even though it is less ambigious there.
-Also the GIC ITARGETSR test was missing a report_prefix_pop().
+Therefore, we need to rely on write protection to record dirty pages.
+This has the side effect of bypassing PML, since writes now result in an
+EPT violation vmexit.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm/gic.c      | 2 ++
- arm/pci-test.c | 2 ++
- arm/psci.c     | 2 ++
- 3 files changed, 6 insertions(+)
+This turns out to be a surprisingly small patch---the testcase is what's
+guilty of the scary diffstat.  But that is because the KVM MMU code is
+absurdly clever, so a very close review is appreciated.
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 66dcafe..ebb6ea2 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -480,6 +480,8 @@ static void test_targets(int nr_irqs)
- 	test_byte_access(targetsptr + GIC_FIRST_SPI, pattern, cpu_mask);
- 
- 	writel(orig_targets, targetsptr + GIC_FIRST_SPI);
-+
-+	report_prefix_pop();
- }
- 
- static void gic_test_mmio(void)
-diff --git a/arm/pci-test.c b/arm/pci-test.c
-index cf128ac..7c3836e 100644
---- a/arm/pci-test.c
-+++ b/arm/pci-test.c
-@@ -19,6 +19,8 @@ int main(void)
- 		return report_summary();
- 	}
- 
-+	report_prefix_push("pci");
-+
- 	pci_print();
- 
- 	ret = pci_testdev();
-diff --git a/arm/psci.c b/arm/psci.c
-index 5cb4d5c..536c9b7 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -126,6 +126,8 @@ int main(void)
- {
- 	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
- 
-+	report_prefix_push("psci");
-+
- 	if (nr_cpus < 2) {
- 		report_skip("At least 2 cpus required");
- 		goto done;
+Paolo
+
+v1->v2: don't place the new code in spte_clear_dirty [Junaid]
+
+Paolo Bonzini (3):
+  KVM: x86: assign two bits to track SPTE kinds
+  KVM: x86: fix nested guest live migration with PML
+  selftests: kvm: add test for dirty logging inside nested guests
+
+ arch/x86/include/asm/kvm_host.h                    |   7 -
+ arch/x86/kvm/mmu.c                                 |  65 +++++--
+ tools/testing/selftests/kvm/Makefile               |   1 +
+ .../selftests/kvm/include/x86_64/processor.h       |   3 +
+ tools/testing/selftests/kvm/include/x86_64/vmx.h   |  14 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c         |   2 +-
+ .../testing/selftests/kvm/lib/kvm_util_internal.h  |   3 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c       | 201 ++++++++++++++++++++-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c      | 156 ++++++++++++++++
+ 9 files changed, 426 insertions(+), 26 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
+
 -- 
-2.17.1
+1.8.3.1
 
