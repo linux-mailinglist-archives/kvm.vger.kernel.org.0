@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A3F1BFD1F
+	by mail.lfdr.de (Postfix) with ESMTP id D95E5BFD20
 	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 04:18:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728621AbfI0CRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 22:17:17 -0400
+        id S1728716AbfI0CRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 22:17:18 -0400
 Received: from mga17.intel.com ([192.55.52.151]:25572 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726140AbfI0CRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 22:17:16 -0400
+        id S1728656AbfI0CRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 22:17:17 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 19:17:15 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 19:17:17 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,553,1559545200"; 
-   d="scan'208";a="193020666"
+   d="scan'208";a="193020675"
 Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
-  by orsmga003.jf.intel.com with ESMTP; 26 Sep 2019 19:17:13 -0700
+  by orsmga003.jf.intel.com with ESMTP; 26 Sep 2019 19:17:15 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         pbonzini@redhat.com, sean.j.christopherson@intel.com
 Cc:     mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
         Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v7 3/7] KVM: VMX: Pass through CET related MSRs to Guest
-Date:   Fri, 27 Sep 2019 10:19:23 +0800
-Message-Id: <20190927021927.23057-4-weijiang.yang@intel.com>
+Subject: [PATCH v7 4/7] KVM: VMX: Load Guest CET via VMCS when CET is enabled in Guest
+Date:   Fri, 27 Sep 2019 10:19:24 +0800
+Message-Id: <20190927021927.23057-5-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190927021927.23057-1-weijiang.yang@intel.com>
 References: <20190927021927.23057-1-weijiang.yang@intel.com>
@@ -36,115 +36,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CET MSRs pass through Guest directly to enhance performance.
-CET runtime control settings are stored in MSR_IA32_{U,S}_CET,
-Shadow Stack Pointer(SSP) are stored in MSR_IA32_PL{0,1,2,3}_SSP,
-SSP table base address is stored in MSR_IA32_INT_SSP_TAB,
-these MSRs are defined in kernel and re-used here.
+"Load Guest CET state" bit controls whether Guest CET states
+will be loaded at Guest entry. Before doing that, KVM needs
+to check if CPU CET feature is enabled on host and available
+to Guest.
 
-MSR_IA32_U_CET and MSR_IA32_PL3_SSP are used for user mode protection,
-the contents could differ from process to process, therefore,
-kernel needs to save/restore them during context switch, it makes
-sense to pass through them so that the guest kernel can
-use xsaves/xrstors to operate them efficiently. Other MSRs are used
-for non-user mode protection. See CET spec for detailed info.
-
-The difference between CET VMCS state fields and xsave components is that,
-the former used for CET state storage during VMEnter/VMExit,
-whereas the latter used for state retention between Guest task/process
-switch.
+Note: SHSTK and IBT features share one control MSR:
+MSR_IA32_{U,S}_CET, which means it's difficult to hide
+one feature from another in the case of SHSTK != IBT,
+after discussed in community, it's agreed to allow Guest
+control two features independently as it won't introduce
+security hole.
 
 Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
 Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/cpuid.c   |  1 +
- arch/x86/kvm/cpuid.h   |  2 ++
- arch/x86/kvm/vmx/vmx.c | 39 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 1aa86b87b6ab..0a47b9e565be 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -66,6 +66,7 @@ u64 kvm_supported_xss(void)
- {
- 	return KVM_SUPPORTED_XSS & kvm_x86_ops->supported_xss();
- }
-+EXPORT_SYMBOL_GPL(kvm_supported_xss);
- 
- #define F(x) bit(X86_FEATURE_##x)
- 
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index d78a61408243..1d77b880084d 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -27,6 +27,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
- 
- int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu);
- 
-+u64 kvm_supported_xss(void);
-+
- static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.maxphyaddr;
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a84198cff397..f720baa7a9ba 100644
+index f720baa7a9ba..ba1a83d11e69 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7001,6 +7001,43 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
- 		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
+@@ -44,6 +44,7 @@
+ #include <asm/spec-ctrl.h>
+ #include <asm/virtext.h>
+ #include <asm/vmx.h>
++#include <asm/cet.h>
+ 
+ #include "capabilities.h"
+ #include "cpuid.h"
+@@ -2918,6 +2919,37 @@ void vmx_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 	vmcs_writel(GUEST_CR3, guest_cr3);
  }
  
-+static void vmx_intercept_cet_msrs(struct kvm_vcpu *vcpu)
++static int set_cet_bit(struct kvm_vcpu *vcpu, unsigned long cr4)
 +{
 +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	unsigned long *msr_bitmap;
-+	u64 kvm_xss;
-+	bool cet_en;
++	const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
++	bool cet_xss = vmx_xsaves_supported() &&
++		       (kvm_supported_xss() & cet_bits);
++	bool cet_cpuid = guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
++			 guest_cpuid_has(vcpu, X86_FEATURE_IBT);
++	bool cet_on = !!(cr4 & X86_CR4_CET);
 +
-+	msr_bitmap = vmx->vmcs01.msr_bitmap;
-+	kvm_xss = kvm_supported_xss();
-+	cet_en = guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
-+		 guest_cpuid_has(vcpu, X86_FEATURE_IBT);
++	if (cet_on && vmx->nested.vmxon)
++		return 1;
 +
-+	/*
-+	 * U_CET is a must for USER CET, per CET spec., U_CET and PL3_SPP are
-+	 * a bundle for USER CET xsaves.
-+	 */
-+	if (cet_en && (kvm_xss & XFEATURE_MASK_CET_USER)) {
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_U_CET, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL3_SSP, MSR_TYPE_RW);
-+	}
-+	/*
-+	 * S_CET is a must for KERNEL CET, PL0_SSP ... PL2_SSP are a bundle
-+	 * for CET KERNEL xsaves.
-+	 */
-+	if (cet_en && (kvm_xss & XFEATURE_MASK_CET_KERNEL)) {
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_S_CET, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL0_SSP, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL1_SSP, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL2_SSP, MSR_TYPE_RW);
++	if (cet_on && !cpu_x86_cet_enabled())
++		return 1;
 +
-+		/* SSP_TAB only available for KERNEL SHSTK.*/
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-+			vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_INT_SSP_TAB,
-+						      MSR_TYPE_RW);
-+	}
++	if (cet_on && !cet_xss)
++		return 1;
++
++	if (cet_on && !cet_cpuid)
++		return 1;
++
++	if (cet_on)
++		vmcs_set_bits(VM_ENTRY_CONTROLS,
++			      VM_ENTRY_LOAD_GUEST_CET_STATE);
++	else
++		vmcs_clear_bits(VM_ENTRY_CONTROLS,
++				VM_ENTRY_LOAD_GUEST_CET_STATE);
++	return 0;
 +}
 +
- static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
  {
  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -7025,6 +7062,8 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
- 	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
- 			guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
- 		update_intel_pt_cfg(vcpu);
-+
-+	vmx_intercept_cet_msrs(vcpu);
- }
+@@ -2958,6 +2990,9 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 			return 1;
+ 	}
  
- static void vmx_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
++	if (set_cet_bit(vcpu, cr4))
++		return 1;
++
+ 	if (vmx->nested.vmxon && !nested_cr4_valid(vcpu, cr4))
+ 		return 1;
+ 
 -- 
 2.17.2
 
