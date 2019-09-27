@@ -2,162 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20C15C0D8B
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 23:46:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3A24C0E5E
+	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 01:37:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728604AbfI0Vp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 17:45:29 -0400
-Received: from mga12.intel.com ([192.55.52.136]:45957 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728559AbfI0Vp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 17:45:29 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Sep 2019 14:45:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,557,1559545200"; 
-   d="scan'208";a="196852082"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 Sep 2019 14:45:27 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1728382AbfI0Xhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 19:37:38 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44607 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727718AbfI0Xhi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 19:37:38 -0400
+Received: by mail-io1-f65.google.com with SMTP id j4so20890130iog.11
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 16:37:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YMZ9O3eRKTf/NLdRiOsF+GXcxfQDV+iSyTOvLX/Wcb4=;
+        b=XdPoEdvmSx4tupszIBhFg85LfTAkMRmdColwUTP6ZGjQr5jXWAEu5cEjRP6GgJRhPK
+         jaW4M5ooyQVUsgrUHx113bWTVwe9Bp0nMv0G3/rzSt8S4RS1/vyLcDClPdniU3MF2D6h
+         +POumf7BolXC/HfldPWR2lG0lJ0he8/qtTsaAEUKWmyKyS3bIB83Nq9nLZt/7MArL3Jv
+         vYoORvX4de//CAND1ZtsqNWPR5q77Nr2chGOGyAlLJFnlRi/4zi5oPQfqF/Yks4RjWyQ
+         6zSldVpTpuCLBWQIZ24uW2a6HI7i109I+x2nRWL8+bmKstC4eKh/JUHDLSMX6BcLq9EX
+         BIAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YMZ9O3eRKTf/NLdRiOsF+GXcxfQDV+iSyTOvLX/Wcb4=;
+        b=t3Lx/nl5Fxs2Gw3Gbd+TtukFhtZPX2mTPCSRXspLJ1h7xvK549B2mNPUOF3FdDvE2m
+         IwYAu/V8zsjoNErHgf4hYD7xtJaSugoXSSf5FD7f880sNzj+SGpDVnfk359us9ppZpdq
+         T2hwvTcEkvHzK1oJVbBWAtAYTYoaXkx4nIvbcFpuuB2zPxURBAEiwPnEVnJJlSZtQhQI
+         Z9BX5e62yH6VtSE/Vee91z4oukLJP7xtRwLeuFAuPzZ+uSVD3PtEYiQD3vLkDJd+sQJI
+         5UkxFAm0BhTVoIP2mekceaDt/lSWw7JFBSUsbLu7nz5A/tUXrKZRHDotzNzoabW3RSOH
+         108A==
+X-Gm-Message-State: APjAAAXmmKW42Gh0tE2NeokqKmpAOafn8WN/w0Y18ALfvAccEiRrsVXZ
+        lD5HL3Il+pUv7NQBrAMdbhm+udkVi1oO0YZeuNh6Jg==
+X-Google-Smtp-Source: APXvYqyAyqC145r4XgUlwodux+mPVgQ0s2/9frCnPDDLj+MzliGsh5edbzXHF81C1keruGiQ9tDmyXrLOnwP3G+pJUg=
+X-Received: by 2002:a6b:1606:: with SMTP id 6mr11821118iow.108.1569627456831;
+ Fri, 27 Sep 2019 16:37:36 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190927214523.3376-1-sean.j.christopherson@intel.com> <20190927214523.3376-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20190927214523.3376-2-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 27 Sep 2019 16:37:25 -0700
+Message-ID: <CALMp9eQ5M+GPyxo_9aNdaUZfwZLZcxdtmQKCo1JjnAL-Jdh4-w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/8] KVM: nVMX: Always write vmcs02.GUEST_CR3 during
+ nested VM-Enter
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Reto Buerki <reet@codelabs.ch>,
         Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH v2 8/8] KVM: x86: Fold decache_cr3() into cache_reg()
-Date:   Fri, 27 Sep 2019 14:45:23 -0700
-Message-Id: <20190927214523.3376-9-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190927214523.3376-1-sean.j.christopherson@intel.com>
-References: <20190927214523.3376-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Handle caching CR3 (from VMX's VMCS) into struct kvm_vcpu via the common
-cache_reg() callback and drop the dedicated decache_cr3().  The name
-decache_cr3() is somewhat confusing as the caching behavior of CR3
-follows that of GPRs, RFLAGS and PDPTRs, (handled via cache_reg()), and
-has nothing in common with the caching behavior of CR0/CR4 (whose
-decache_cr{0,4}_guest_bits() likely provided the 'decache' verbiage).
-
-Note, this effectively adds a BUG() if KVM attempts to cache CR3 on SVM.
-Opportunistically add a WARN_ON_ONCE() in VMX to provide an equivalent
-check.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/kvm_cache_regs.h   |  2 +-
- arch/x86/kvm/svm.c              |  5 -----
- arch/x86/kvm/vmx/vmx.c          | 15 ++++++---------
- 4 files changed, 7 insertions(+), 16 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index a27f7f6b6b7a..0411dc0a27b0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1040,7 +1040,6 @@ struct kvm_x86_ops {
- 			    struct kvm_segment *var, int seg);
- 	void (*get_cs_db_l_bits)(struct kvm_vcpu *vcpu, int *db, int *l);
- 	void (*decache_cr0_guest_bits)(struct kvm_vcpu *vcpu);
--	void (*decache_cr3)(struct kvm_vcpu *vcpu);
- 	void (*decache_cr4_guest_bits)(struct kvm_vcpu *vcpu);
- 	void (*set_cr0)(struct kvm_vcpu *vcpu, unsigned long cr0);
- 	void (*set_cr3)(struct kvm_vcpu *vcpu, unsigned long cr3);
-diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
-index 9c2bc528800b..f18177cd0030 100644
---- a/arch/x86/kvm/kvm_cache_regs.h
-+++ b/arch/x86/kvm/kvm_cache_regs.h
-@@ -145,7 +145,7 @@ static inline ulong kvm_read_cr4_bits(struct kvm_vcpu *vcpu, ulong mask)
- static inline ulong kvm_read_cr3(struct kvm_vcpu *vcpu)
- {
- 	if (!kvm_register_is_available(vcpu, VCPU_EXREG_CR3))
--		kvm_x86_ops->decache_cr3(vcpu);
-+		kvm_x86_ops->cache_reg(vcpu, VCPU_EXREG_CR3);
- 	return vcpu->arch.cr3;
- }
- 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index f8ecb6df5106..3102c44c12c6 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2517,10 +2517,6 @@ static void svm_decache_cr0_guest_bits(struct kvm_vcpu *vcpu)
- {
- }
- 
--static void svm_decache_cr3(struct kvm_vcpu *vcpu)
--{
--}
--
- static void svm_decache_cr4_guest_bits(struct kvm_vcpu *vcpu)
- {
- }
-@@ -7208,7 +7204,6 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
- 	.get_cpl = svm_get_cpl,
- 	.get_cs_db_l_bits = kvm_get_cs_db_l_bits,
- 	.decache_cr0_guest_bits = svm_decache_cr0_guest_bits,
--	.decache_cr3 = svm_decache_cr3,
- 	.decache_cr4_guest_bits = svm_decache_cr4_guest_bits,
- 	.set_cr0 = svm_set_cr0,
- 	.set_cr3 = svm_set_cr3,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ed03d0cd1cc8..c84798026e85 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2188,7 +2188,12 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 		if (enable_ept)
- 			ept_save_pdptrs(vcpu);
- 		break;
-+	case VCPU_EXREG_CR3:
-+		if (enable_unrestricted_guest || (enable_ept && is_paging(vcpu)))
-+			vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
-+		break;
- 	default:
-+		WARN_ON_ONCE(1);
- 		break;
- 	}
- }
-@@ -2859,13 +2864,6 @@ static void vmx_decache_cr0_guest_bits(struct kvm_vcpu *vcpu)
- 	vcpu->arch.cr0 |= vmcs_readl(GUEST_CR0) & cr0_guest_owned_bits;
- }
- 
--static void vmx_decache_cr3(struct kvm_vcpu *vcpu)
--{
--	if (enable_unrestricted_guest || (enable_ept && is_paging(vcpu)))
--		vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
--	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
--}
--
- static void vmx_decache_cr4_guest_bits(struct kvm_vcpu *vcpu)
- {
- 	ulong cr4_guest_owned_bits = vcpu->arch.cr4_guest_owned_bits;
-@@ -2910,7 +2908,7 @@ static void ept_update_paging_mode_cr0(unsigned long *hw_cr0,
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
- 	if (!kvm_register_is_available(vcpu, VCPU_EXREG_CR3))
--		vmx_decache_cr3(vcpu);
-+		vmx_cache_reg(vcpu, VCPU_EXREG_CR3);
- 	if (!(cr0 & X86_CR0_PG)) {
- 		/* From paging/starting to nonpaging */
- 		exec_controls_setbit(vmx, CPU_BASED_CR3_LOAD_EXITING |
-@@ -7792,7 +7790,6 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
- 	.get_cpl = vmx_get_cpl,
- 	.get_cs_db_l_bits = vmx_get_cs_db_l_bits,
- 	.decache_cr0_guest_bits = vmx_decache_cr0_guest_bits,
--	.decache_cr3 = vmx_decache_cr3,
- 	.decache_cr4_guest_bits = vmx_decache_cr4_guest_bits,
- 	.set_cr0 = vmx_set_cr0,
- 	.set_cr3 = vmx_set_cr3,
--- 
-2.22.0
-
+On Fri, Sep 27, 2019 at 2:45 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Write the desired L2 CR3 into vmcs02.GUEST_CR3 during nested VM-Enter
+> instead of deferring the VMWRITE until vmx_set_cr3().  If the VMWRITE
+> is deferred, then KVM can consume a stale vmcs02.GUEST_CR3 when it
+> refreshes vmcs12->guest_cr3 during nested_vmx_vmexit() if the emulated
+> VM-Exit occurs without actually entering L2, e.g. if the nested run
+> is squashed because nested VM-Enter (from L1) is putting L2 into HLT.
+>
+> Note, the above scenario can occur regardless of whether L1 is
+> intercepting HLT, e.g. L1 can intercept HLT and then re-enter L2 with
+> vmcs.GUEST_ACTIVITY_STATE=HALTED.  But practically speaking, a VMM will
+> likely put a guest into HALTED if and only if it's not intercepting HLT.
+>
+> In an ideal world where EPT *requires* unrestricted guest (and vice
+> versa), VMX could handle CR3 similar to how it handles RSP and RIP,
+> e.g. mark CR3 dirty and conditionally load it at vmx_vcpu_run().  But
+> the unrestricted guest silliness complicates the dirty tracking logic
+> to the point that explicitly handling vmcs02.GUEST_CR3 during nested
+> VM-Enter is a simpler overall implementation.
+>
+> Cc: stable@vger.kernel.org
+> Reported-and-tested-by: Reto Buerki <reet@codelabs.ch>
+> Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
