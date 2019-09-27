@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 192B3BFD39
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 04:39:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0D13BFD3C
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 04:39:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727983AbfI0CjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 22:39:06 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:44490 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727505AbfI0CjG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 22:39:06 -0400
-Received: by mail-pl1-f193.google.com with SMTP id q15so441342pll.11
-        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 19:39:05 -0700 (PDT)
+        id S1728754AbfI0Cjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Sep 2019 22:39:39 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:36467 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728656AbfI0Cji (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Sep 2019 22:39:38 -0400
+Received: by mail-pl1-f196.google.com with SMTP id f19so455022plr.3
+        for <kvm@vger.kernel.org>; Thu, 26 Sep 2019 19:39:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=subject:to:cc:references:from:openpgp:autocrypt:organization
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=ugGWtC6tWcx2fP9kC+FkMWTMK1HTBdo3JgwsJvUVFAM=;
-        b=SaRopDJyNjchc597CXuHhCvlT0QteAtds1WgC0biPm73ZQCA7BguaTT5oK5rFSAhHv
-         lPr2yg95M41xVKeTGn2liVHJXpSC7d2KA+BAIV0LtRjtYpkn3bro1t24+OU3gOc5XnOi
-         TBffW5qggkacn0AlT56KXQDZ5UD5OXaUZ8N6UJk6N3m7NF4x0N5fcVTwWs+cinLcCxkt
-         /2b2kjCP5HB17T+VPdvQ6iWiQHZMbmeO2o0x+xOufA5Naizp08S0WdDLKL9k8gLfWPh8
-         HEwUS2iCDBm2TiqRmQH1WTYwNNtIfxwi4dB2r0MXXxwc+H+qRLHDGFXLMNicrEgp5bfe
-         IBvw==
+        bh=ekkVN8vNhuwBOppq3UunfHvXp65AzDqzg16gW/0egm4=;
+        b=jBc0voXismu32pO2BO8jhA3kP6wvG4Dep9PluZdWEtvYTvTjtK0DgIQg4nfrgne2Ys
+         mTZwYRW492bwtAOzfqrXgUGlKX4sjQ6mb3l3XXwUyglLuAkMxCUjP8YZwz9iMsP8zdbC
+         fA5QDdEse/a+B29GNdPzfvEGfX+oEun3890uLQFl+9epyDFNEbNkXjxRCRtEEF5oUVQI
+         kM/a1zavhJmfwV69p0cNu7L9pVsqePcuh1L8PTYVuPRfe2/JeXWw9Lo2S/oy4MpUqqJj
+         ENmdw9cnMBUnbDTRs5H9uatiOxsy4ryJrJjiRyYUdML+OrbbhU5lukDPIz0NUQ2iLOuO
+         7uyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
          :organization:message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=ugGWtC6tWcx2fP9kC+FkMWTMK1HTBdo3JgwsJvUVFAM=;
-        b=rOJujhvc+py7BtNEIqAMLrwBy9cOsS8jEVKuJNw2YmaVpJVvVgtElLqprfFaoX8Dmt
-         fhbWAVY2WCGNhdTfhdwheFBNFYG/yqZfHU9NEsTXYp6nD2y/mqq9oFwbZsMDmZTfpf1C
-         ID7pR+cEYSTDl0ZITdNm6b45l3AVVLgBJ8ZTxHuKtNGLfzB42YuKyKoaBAuP1wnXltnN
-         ZG3QiOTJNQSWvC8HV8k6dMggmIV7g95FJ0Q0cLu6UTjmZN7UOXWEtyNUBuEjG53lhmO3
-         UZ4mrHJ3TLqfIcydYWZtCXX8Ls9hUzCoBc1fiDfCNImr+VWrRkb+ep4aELt9MgQcjgCD
-         9ayw==
-X-Gm-Message-State: APjAAAUg5fQ21G1yvruyGU0v5wFlviRbNwlqjoI5jlJIwWHtKWEF+Cpv
-        /g4lbO0/xS1fP2U3V19D0cZenQ==
-X-Google-Smtp-Source: APXvYqx8ZK9cXLmKUyvQarXc8SJ2g7dMslv5karQmeS3tdVNMxnTTnjxYZT45TL6jU2YOkIJn71c1w==
-X-Received: by 2002:a17:902:5a44:: with SMTP id f4mr1886518plm.31.1569551944763;
-        Thu, 26 Sep 2019 19:39:04 -0700 (PDT)
+        bh=ekkVN8vNhuwBOppq3UunfHvXp65AzDqzg16gW/0egm4=;
+        b=Ig/DCwyZZFWMCN2gHjkeV2C4hoJEoAIhfegzS8Mnv3/oaoVkA9jCefzJR5wrFA6Nlu
+         9OjNubkzs021C5Ysf8dhradrI6bSeD1+DJuymzMyajOkMtdBIEUxbxdBsbBatWkvCgC7
+         srPC9Xbx0a8R4fqt6KkEh8sq9X7JY4ypgNM73gp6WAjrQsI0FO0HUt50RZmtUDvQ8zqk
+         5zeX3Ofny/2l+jyVQNJmXRS2hLngVmJMddAcNBTo81u5AWYMbfLFPUvcTdWOVDwHmH2K
+         ucvMS7RoyCqbIn7nR4SEJLNxdyPJaBYmu15p6q8xWB16KsLqVl5HMBfh671oam84/+vQ
+         ePAw==
+X-Gm-Message-State: APjAAAX7FFFCtwXsGWmwADYycBCCuZ3PQJ7RqZ4w6v4wXK2RhOjgBaS1
+        rdjzyKaj/vW4kvmmuKXN9lyNHg==
+X-Google-Smtp-Source: APXvYqz9YGl0y5Pfo2hmrpMviBp5e9aOQupBM21T2Mw4S1HNb/iO6gxYMd6jPC40h+6suhv6nexJ9Q==
+X-Received: by 2002:a17:902:7203:: with SMTP id ba3mr1922118plb.51.1569551976166;
+        Thu, 26 Sep 2019 19:39:36 -0700 (PDT)
 Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:2:5e41:bb1f:98fb:39da])
-        by smtp.gmail.com with ESMTPSA id 192sm602134pfb.110.2019.09.26.19.39.03
+        by smtp.gmail.com with ESMTPSA id l27sm619645pgc.53.2019.09.26.19.39.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2019 19:39:03 -0700 (PDT)
-Subject: Re: [PATCH 1/3] KVM: x86: assign two bits to track SPTE kinds
+        Thu, 26 Sep 2019 19:39:35 -0700 (PDT)
+Subject: Re: [PATCH 2/3] KVM: x86: fix nested guest live migration with PML
 To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
 References: <1569518306-46567-1-git-send-email-pbonzini@redhat.com>
- <1569518306-46567-2-git-send-email-pbonzini@redhat.com>
+ <1569518306-46567-3-git-send-email-pbonzini@redhat.com>
 From:   Junaid Shahid <junaids@google.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=junaids@google.com; keydata=
@@ -90,33 +90,36 @@ Autocrypt: addr=junaids@google.com; keydata=
  5X/clE5ZjNHVh8p8Ivv4UyZk2pfJxBgg9++M3EXfVuZpP4Rzna4ttKLdB5Ehv7YuGHu8E0n9
  iWogGkOc4UGfcj87Lt9ivHEsVoo/lwCTIiQ=
 Organization: Google
-Message-ID: <69e911cc-77eb-3083-660b-e74883636b53@google.com>
-Date:   Thu, 26 Sep 2019 19:39:02 -0700
+Message-ID: <f04f7517-67d9-856b-58e4-f3efdc4566d7@google.com>
+Date:   Thu, 26 Sep 2019 19:39:34 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1569518306-46567-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1569518306-46567-3-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
 On 9/26/19 10:18 AM, Paolo Bonzini wrote:
-> Currently, we are overloading SPTE_SPECIAL_MASK to mean both
-> "A/D bits unavailable" and MMIO, where the difference between the
-> two is determined by mio_mask and mmio_value.
-> 
-> However, the next patch will need two bits to distinguish
-> availability of A/D bits from write protection.  So, while at
-> it give MMIO its own bit pattern, and move the two bits from
-> bit 62 to bits 52..53 since Intel is allocating EPT page table
-> bits from the top.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+> @@ -1597,8 +1615,11 @@ static bool spte_clear_dirty(u64 *sptep)
+>  
+>  	rmap_printk("rmap_clear_dirty: spte %p %llx\n", sptep, *sptep);
+>  
+> -	spte &= ~shadow_dirty_mask;
+> +	WARN_ON(!spte_ad_enabled(spte));
+> +	if (spte_ad_need_write_protect(spte))
+> +		return spte_write_protect(sptep, false);
+>  
+> +	spte &= ~shadow_dirty_mask;
+>  	return mmu_spte_update(sptep, spte);
+>  }
+>  
+
+I think that it would be a bit cleaner to move the spte_ad_need_write_protect() check to the if statement inside __rmap_clear_dirty() instead, since it already checks for spte_ad_enabled() to decide between write-protection and dirty-clearing.
+
 
 Reviewed-by: Junaid Shahid <junaids@google.com>
