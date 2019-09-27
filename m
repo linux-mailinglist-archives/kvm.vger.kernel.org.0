@@ -2,99 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0521DC066D
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 15:37:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EA6DC06BD
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 15:55:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727273AbfI0NhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 09:37:04 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39971 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726549AbfI0NhD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 09:37:03 -0400
-Received: by mail-pf1-f195.google.com with SMTP id x127so1614637pfb.7;
-        Fri, 27 Sep 2019 06:37:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1T4A7cJVny4HjoF6OxbZSvzZ4Y1UkSovrypWVv8gRbg=;
-        b=SWHoTDkzvBeJqcKPvZyrZkqOXVuUR6EBz5Su5woWjy5/rlfjYqhJ2wrRV6QL49nhm/
-         bmfVbWGQ80YsKhDtpdgxr2JPTeVvzmLjzo11RPLSYELKno6cG5gS39en6vGS9Ws2tI7y
-         Q3teZwh7rTRO7526AepG31Ox+EfGaE91R319M/5yyI6oLyKjFsqd3567mzORAQMh2czy
-         spYWVD18HN6drbWfdRn4j66y1sn1JYs4bSb8ScSeHaw2j+X7xERn4eSJHxbWA4Rikw/d
-         X00ScOTt2TAIH1I3zTPkCQ039dg8kk5sOkG9lPv74ltkOD0B53ydCSqlQO1JNKKkRMS1
-         Ppyw==
+        id S1727707AbfI0Nx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 09:53:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12592 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726163AbfI0Nx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 09:53:57 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3D7E92A09CE
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 13:53:57 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id t11so1035125wrq.19
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 06:53:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1T4A7cJVny4HjoF6OxbZSvzZ4Y1UkSovrypWVv8gRbg=;
-        b=KdspHLc/kDlezNU/C1Uu/pccUT5+Bwr63GXRbQbxFJHLC2nqEP5VvBv3muB3by0Qh0
-         BsBdlIlY0MWRwZ7uz+NaYpeTUFev0SvehQOGMytYVIt8QJVwNOHAC/fGd7zNkzc6ZSrw
-         bCbpVPZ4C9a9yhTfctXkCDb8QFxC34waeBjJXhOh8bGs46B2cuZCUiLi9dmxpR7OSZya
-         FW8XAu+oMRY7ngnAQHql5owTUKGvXLUhobcFGxxVmCc/Q0bZpZ9oHnFF2F9Qph614ypz
-         X7izKYlfDA3h26WwFbtxAoCz3KI2/k6FJ3p3Jhwmg1O2BMKxYxNx+8TnKg72DWkN2/y0
-         hANg==
-X-Gm-Message-State: APjAAAXZ9eFQg67hBc/BxwCvDn4UGOsn7U4tc55POhUI7caj8BkNkIy4
-        QlhdXg01Z+DEiUak8LqVRszm39oL
-X-Google-Smtp-Source: APXvYqxUe7IKGHke3pkjd7PB0Ez46t+eLGYbvjqmLd4GYHlniOt1U8vXke2M0+FVndZs0g3h/TAyRw==
-X-Received: by 2002:a65:5043:: with SMTP id k3mr9570894pgo.406.1569591422724;
-        Fri, 27 Sep 2019 06:37:02 -0700 (PDT)
-Received: from [192.168.86.235] (c-73-241-150-70.hsd1.ca.comcast.net. [73.241.150.70])
-        by smtp.gmail.com with ESMTPSA id v9sm2605962pfe.1.2019.09.27.06.37.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Sep 2019 06:37:01 -0700 (PDT)
-Subject: Re: [PATCH] vsock/virtio: add support for MSG_PEEK
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
-Cc:     stefanha@redhat.com, davem@davemloft.net, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1569522214-28223-1-git-send-email-matiasevara@gmail.com>
- <f069a65d-33b9-1fa8-d26e-b76cc51fc7cb@gmail.com>
- <20190927085513.tdiofiisrpyehfe5@steredhat.homenet.telecomitalia.it>
-From:   Eric Dumazet <eric.dumazet@gmail.com>
-Message-ID: <a7a77f0b-a658-6e46-3381-3dfea55b14d1@gmail.com>
-Date:   Fri, 27 Sep 2019 06:37:00 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=gd7FrvlLlLRCKChbLW2u6ntiAuLh4NurMyAXEeeS9bw=;
+        b=COOLfpyJbvEuk9LMhtUXii/1xPmlMl4xVexogaIOVRmE7cQ6twl2GipzOIbK34lmZ/
+         pXd1Rcim5F1y0cz+ZxJ2x9X3cJ8S/5MWTOd4yR7FkXVtZfBZqdSbScyhZIKwuayhiuRP
+         KhoINsD8ocy+cUFHqsmYp8CJxy9ZSUZN0uLf/VvsqJfYjoNyZrOCZXdCsmDiBhVOwicg
+         RYSsnyA1ioH00ftfLjFJcQLmRXSjENShHFpZeHPf+HvcfqrTYixutw08ETH0MkLK9jVU
+         ZqVfRqetMz93V10vKY+KRSTXWQHZV04Ewodt5vcz3JB2nS4CdvnqVjmc3Z9JcdJUSZu3
+         T4eg==
+X-Gm-Message-State: APjAAAWCYCiWphTIKcjboh7grwWBQSgMbGmOzZ5vDGwVj8bTQIMNF443
+        vcsHqWbrfTaoG3GmP0hI+5yio78zfF3d6zbmcEfaWo++aMe9Zxb3rcLmmG2dI3Uv/stYQxQ/RYL
+        C1L/kKjcVa3Hk
+X-Received: by 2002:adf:e605:: with SMTP id p5mr3259220wrm.105.1569592435978;
+        Fri, 27 Sep 2019 06:53:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzZAreJITVYk5CoaSouF/d1FvWjHQVTpC2wb/tHJOtLB++11wia5Z9rRXfk5i7IBkrNOZ9tEg==
+X-Received: by 2002:adf:e605:: with SMTP id p5mr3259205wrm.105.1569592435788;
+        Fri, 27 Sep 2019 06:53:55 -0700 (PDT)
+Received: from vitty.brq.redhat.com ([95.82.135.182])
+        by smtp.gmail.com with ESMTPSA id a3sm8558894wmc.3.2019.09.27.06.53.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Sep 2019 06:53:55 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Eric Hankland <ehankland@google.com>,
+        Peter Shier <pshier@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
+In-Reply-To: <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com>
+References: <20190821182004.102768-1-jmattson@google.com> <CALMp9eTtA5ZXJyWcOpe-pQ66X3sTgCR4-BHec_R3e1-j1FZyZw@mail.gmail.com> <8907173e-9f27-6769-09fc-0b82c22d6352@oracle.com> <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com> <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com> <CALMp9eQULvr5wKt1Aw3MR+tbeNgvA_4p__6n1YTkWjMHCaEmLw@mail.gmail.com> <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com> <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com>
+Date:   Fri, 27 Sep 2019 15:53:54 +0200
+Message-ID: <87ftkh6e19.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190927085513.tdiofiisrpyehfe5@steredhat.homenet.telecomitalia.it>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
+> Queued, thanks.
 
-On 9/27/19 1:55 AM, Stefano Garzarella wrote:
+I'm sorry for late feedback but this commit seems to be causing
+selftests failures for me, e.g.:
 
-> Good catch!
-> 
-> Maybe we can solve in this way:
-> 
-> 	list_for_each_entry(pkt, &vvs->rx_queue, list) {
-> 		size_t off = pkt->off;
-> 
-> 		if (total == len)
-> 			break;
-> 
-> 		while (total < len && off < pkt->len) {
-> 			/* using 'off' instead of 'pkt->off' */
-> 			...
-> 
-> 			total += bytes;
-> 			off += bytes;
-> 		}
-> 	}
-> 
-> What do you think?
->
+# ./x86_64/state_test 
+Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+Guest physical address width detected: 46
+==== Test Assertion Failure ====
+  lib/x86_64/processor.c:1089: r == nmsrs
+  pid=14431 tid=14431 - Argument list too long
+     1	0x000000000040a55f: vcpu_save_state at processor.c:1088 (discriminator 3)
+     2	0x00000000004010e3: main at state_test.c:171 (discriminator 4)
+     3	0x00007f881eb453d4: ?? ??:0
+     4	0x0000000000401287: _start at ??:?
+  Unexpected result from KVM_GET_MSRS, r: 36 (failed at 194)
 
-Maybe, but I need to see a complete patch, evil is in the details :)
+Is this something known already or should I investigate?
 
+-- 
+Vitaly
