@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 28565C0394
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 12:42:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6712CC0399
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 12:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726884AbfI0Kmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 06:42:39 -0400
-Received: from foss.arm.com ([217.140.110.172]:48754 "EHLO foss.arm.com"
+        id S1727128AbfI0Kmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 06:42:40 -0400
+Received: from foss.arm.com ([217.140.110.172]:48764 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726179AbfI0Kmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 06:42:38 -0400
+        id S1726809AbfI0Kmj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 06:42:39 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3290142F;
-        Fri, 27 Sep 2019 03:42:37 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3E8328;
+        Fri, 27 Sep 2019 03:42:38 -0700 (PDT)
 Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 32E2C3F534;
-        Fri, 27 Sep 2019 03:42:37 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 330543F534;
+        Fri, 27 Sep 2019 03:42:38 -0700 (PDT)
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Andrew Jones <drjones@redhat.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 4/6] arm: selftest: Split variable output data from test name
-Date:   Fri, 27 Sep 2019 11:42:25 +0100
-Message-Id: <20190927104227.253466-5-andre.przywara@arm.com>
+Subject: [kvm-unit-tests PATCH 5/6] arm: selftest: Make MPIDR output stable
+Date:   Fri, 27 Sep 2019 11:42:26 +0100
+Message-Id: <20190927104227.253466-6-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190927104227.253466-1-andre.przywara@arm.com>
 References: <20190927104227.253466-1-andre.przywara@arm.com>
@@ -32,42 +32,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For some tests we mix variable diagnostic output with the test name,
-which leads to variable test line, confusing some higher level
-frameworks.
+At the moment the smp selftest outputs one line for each vCPU, with the
+CPU number and its MPIDR printed in the same test result line.
+For automated test frameworks this has the problem of including variable
+output in the test name, also the number of tests varies, depending on the
+number of vCPUs.
 
-Split the output to always use the same test name for a certain test,
-and put diagnostic output on a separate line using the INFO: tag.
+Fix this by only generating a single line of output for the SMP test,
+which summarises the result. We use two cpumasks, to let each vCPU report
+its result and completion of the test (code stolen from the GIC test).
+
+For informational purposes we keep the one line per CPU, but prefix it
+with an INFO: tag, so that frameworks can ignore it.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/selftest.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ arm/selftest.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/arm/selftest.c b/arm/selftest.c
-index 28a17f7..a0c1ab8 100644
+index a0c1ab8..e9dc5c0 100644
 --- a/arm/selftest.c
 +++ b/arm/selftest.c
-@@ -43,13 +43,16 @@ static void check_setup(int argc, char **argv)
- 			phys_addr_t memsize = PHYS_END - PHYS_OFFSET;
- 			phys_addr_t expected = ((phys_addr_t)val)*1024*1024;
+@@ -17,6 +17,8 @@
+ #include <asm/smp.h>
+ #include <asm/barrier.h>
  
--			report("size = %" PRIu64 " MB", memsize == expected,
--							memsize/1024/1024);
-+			report("memory size matches expectation",
-+			       memsize == expected);
-+			report_info("found %" PRIu64 " MB", memsize/1024/1024);
- 			++nr_tests;
++static cpumask_t ready, valid;
++
+ static void __user_psci_system_off(void)
+ {
+ 	psci_system_off();
+@@ -341,8 +343,11 @@ static void cpu_report(void *data __unused)
+ 	uint64_t mpidr = get_mpidr();
+ 	int cpu = smp_processor_id();
  
- 		} else if (strcmp(argv[i], "smp") == 0) {
+-	report("CPU(%3d) mpidr=%010" PRIx64,
+-		mpidr_to_cpu(mpidr) == cpu, cpu, mpidr);
++	if (mpidr_to_cpu(mpidr) == cpu)
++		cpumask_set_cpu(smp_processor_id(), &valid);
++	smp_wmb();		/* Paired with rmb in main(). */
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	report_info("CPU%3d: MPIDR=%010" PRIx64, cpu, mpidr);
+ }
  
--			report("nr_cpus = %d", nr_cpus == (int)val, nr_cpus);
-+			report("number of CPUs matches expectation",
-+			       nr_cpus == (int)val);
-+			report_info("found %d CPUs", nr_cpus);
- 			++nr_tests;
- 		}
+ int main(int argc, char **argv)
+@@ -371,6 +376,11 @@ int main(int argc, char **argv)
  
+ 		report("PSCI version", psci_check());
+ 		on_cpus(cpu_report, NULL);
++		while (!cpumask_full(&ready))
++			cpu_relax();
++		smp_rmb();		/* Paired with wmb in cpu_report(). */
++		report("MPIDR test on all CPUs", cpumask_full(&valid));
++		report_info("%d CPUs reported back", nr_cpus);
+ 
+ 	} else {
+ 		printf("Unknown subtest\n");
 -- 
 2.17.1
 
