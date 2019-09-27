@@ -2,67 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5E1BBFDCD
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 05:51:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADBF7BFE28
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 06:29:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729143AbfI0Dvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Sep 2019 23:51:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57093 "EHLO mx1.redhat.com"
+        id S1726423AbfI0E3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 00:29:48 -0400
+Received: from mga03.intel.com ([134.134.136.65]:11333 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728995AbfI0Dvs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Sep 2019 23:51:48 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7FA283B58C;
-        Fri, 27 Sep 2019 03:51:48 +0000 (UTC)
-Received: from [10.72.12.160] (ovpn-12-160.pek2.redhat.com [10.72.12.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 295B1614C1;
-        Fri, 27 Sep 2019 03:51:37 +0000 (UTC)
-Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
-From:   Jason Wang <jasowang@redhat.com>
-To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, maxime.coquelin@redhat.com
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        id S1725996AbfI0E3s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 00:29:48 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 21:29:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,554,1559545200"; 
+   d="scan'208";a="196598843"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.73])
+  by FMSMGA003.fm.intel.com with ESMTP; 26 Sep 2019 21:29:44 -0700
+Date:   Fri, 27 Sep 2019 12:26:57 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, zhihong.wang@intel.com,
         lingshan.zhu@intel.com
+Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
+Message-ID: <20190927042657.GA16052@___>
 References: <20190926045427.4973-1-tiwei.bie@intel.com>
  <1b4b8891-8c14-1c85-1d6a-2eed1c90bcde@redhat.com>
-Message-ID: <996bcaa3-1b13-2520-5be4-8a8f9c8c71d6@redhat.com>
-Date:   Fri, 27 Sep 2019 11:51:35 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <996bcaa3-1b13-2520-5be4-8a8f9c8c71d6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1b4b8891-8c14-1c85-1d6a-2eed1c90bcde@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 27 Sep 2019 03:51:48 +0000 (UTC)
+In-Reply-To: <996bcaa3-1b13-2520-5be4-8a8f9c8c71d6@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Sep 27, 2019 at 11:51:35AM +0800, Jason Wang wrote:
+> On 2019/9/27 上午11:46, Jason Wang wrote:
+> > +
+> > +static struct mdev_class_id id_table[] = {
+> > +    { MDEV_ID_VHOST },
+> > +    { 0 },
+> > +};
+> > +
+> > +static struct mdev_driver vhost_mdev_driver = {
+> > +    .name    = "vhost_mdev",
+> > +    .probe    = vhost_mdev_probe,
+> > +    .remove    = vhost_mdev_remove,
+> > +    .id_table = id_table,
+> > +};
+> > +
+> 
+> 
+> And you probably need to add MODULE_DEVICE_TABLE() as well.
 
-On 2019/9/27 上午11:46, Jason Wang wrote:
-> +
-> +static struct mdev_class_id id_table[] = {
-> +    { MDEV_ID_VHOST },
-> +    { 0 },
-> +};
-> +
-> +static struct mdev_driver vhost_mdev_driver = {
-> +    .name    = "vhost_mdev",
-> +    .probe    = vhost_mdev_probe,
-> +    .remove    = vhost_mdev_remove,
-> +    .id_table = id_table,
-> +};
-> + 
+Yeah, thanks!
 
 
-And you probably need to add MODULE_DEVICE_TABLE() as well.
-
-Thanks
-
+> 
+> Thanks
+> 
