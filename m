@@ -2,28 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A471AC0A0F
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 19:14:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAC1DC0A30
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 19:19:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfI0ROI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 13:14:08 -0400
-Received: from mga03.intel.com ([134.134.136.65]:10941 "EHLO mga03.intel.com"
+        id S1727955AbfI0RTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 13:19:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53338 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726027AbfI0ROI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 13:14:08 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Sep 2019 10:14:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,556,1559545200"; 
-   d="scan'208";a="214904665"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga004.fm.intel.com with ESMTP; 27 Sep 2019 10:14:05 -0700
-Date:   Fri, 27 Sep 2019 10:14:05 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        id S1726251AbfI0RTU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 13:19:20 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 04A5E7CB80
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 17:19:20 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id r187so5505455wme.0
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 10:19:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MLj0Ds0fMGlvN3qqug5k1W4pQwj/b2b7ywaePtYozL4=;
+        b=VFDE9taqb8XsZRx2Oqo7nkr1hcUTpKL9vS9har+UAhzxaDrLLEQOEijtHvfscHkZkr
+         LhrYygdshfSGQOfvcf0V7dsUfqPSiQ2rNIjBxId/DsO8n38vIpYRYNH/Pvih9BEFlDTo
+         zbbDAG/EaTws1LKQR6niAvHf4xa5ohtlXr0DukYDZ/wojzN/SeUZUuleoE1hJopxQvLN
+         1fQza4lkTvedZ3Po+vCaEC4wyVBezzcPioausqoMCwnkiyFnjV5G1PLg3kxUSxU3Cpeo
+         oKVmlK0bPDVTUE8VkAULgzAVIwxO/pOQkUur7NLD+PoevlbBzhEb2xEE72xnoHAEH/J6
+         mwYQ==
+X-Gm-Message-State: APjAAAUo2N3JaGTa+s8p6B2V6FZfGrVJkJEGMD5muHOpuZIUDv/84j2z
+        I0epX7psUN6zlhbcMNLxxe2yGf8Ny+zVcQEz4imKL3m5RVqJ+vZrlrlARHIcXLfmNHFKOioGbM3
+        O+iwnHiQ9n4zP
+X-Received: by 2002:a1c:9ec9:: with SMTP id h192mr8271629wme.105.1569604758673;
+        Fri, 27 Sep 2019 10:19:18 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzR0qylPwQ0Q3+h4mWlp4TwEkYTe6GvUhXma45KRseO6dN6sgQevHBu/q2zOvg/r2ArQcYeBA==
+X-Received: by 2002:a1c:9ec9:: with SMTP id h192mr8271610wme.105.1569604758419;
+        Fri, 27 Sep 2019 10:19:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+        by smtp.gmail.com with ESMTPSA id a14sm8649719wmm.44.2019.09.27.10.19.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Sep 2019 10:19:17 -0700 (PDT)
+Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Jim Mattson <jmattson@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -31,8 +51,6 @@ Cc:     Jim Mattson <jmattson@google.com>,
         Eric Hankland <ehankland@google.com>,
         Peter Shier <pshier@google.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-Message-ID: <20190927171405.GD25513@linux.intel.com>
 References: <87ftkh6e19.fsf@vitty.brq.redhat.com>
  <6e6f46fe-6e11-c5e3-d80c-327f77b91907@redhat.com>
  <87d0fl6bv4.fsf@vitty.brq.redhat.com>
@@ -43,83 +61,39 @@ References: <87ftkh6e19.fsf@vitty.brq.redhat.com>
  <e4a17cfb-8172-9ad8-7010-ee860c4898bf@redhat.com>
  <CALMp9eQcHbm6nLAQ_o8dS4B+2k6B0eHxuGvv6Ls_-HL9PC4mhQ@mail.gmail.com>
  <11f63bd6-50cc-a6ce-7a36-a6e1a4d8c5e9@redhat.com>
+ <20190927171405.GD25513@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <7a12a208-4969-e3fe-4a42-b432b91599d8@redhat.com>
+Date:   Fri, 27 Sep 2019 19:19:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11f63bd6-50cc-a6ce-7a36-a6e1a4d8c5e9@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190927171405.GD25513@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 06:32:27PM +0200, Paolo Bonzini wrote:
-> On 27/09/19 18:10, Jim Mattson wrote:
-> > On Fri, Sep 27, 2019 at 9:06 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 27/09/19 17:58, Xiaoyao Li wrote:
-> >>> Indeed, "KVM_GET_MSR_INDEX_LIST" returns the guest msrs that KVM supports and
-> >>> they are free from different guest configuration since they're initialized when
-> >>> kvm module is loaded.
-> >>>
-> >>> Even though some MSRs are not exposed to guest by clear their related cpuid
-> >>> bits, they are still saved/restored by QEMU in the same fashion.
-> >>>
-> >>> I wonder should we change "KVM_GET_MSR_INDEX_LIST" per VM?
-> >>
-> >> We can add a per-VM version too, yes.
-> 
-> There is one problem with that: KVM_SET_CPUID2 is a vCPU ioctl, not a VM
-> ioctl.
-> 
-> > Should the system-wide version continue to list *some* supported MSRs
-> > and *some* unsupported MSRs, with no rhyme or reason? Or should we
-> > codify what that list contains?
-> 
-> The optimal thing would be for it to list only MSRs that are
-> unconditionally supported by all VMs and are part of the runtime state.
->  MSRs that are not part of the runtime state, such as the VMX
-> capabilities, should be returned by KVM_GET_MSR_FEATURE_INDEX_LIST.
-> 
-> This also means that my own commit 95c5c7c77c06 ("KVM: nVMX: list VMX
-> MSRs in KVM_GET_MSR_INDEX_LIST", 2019-07-02) was incorrect.
-> Unfortunately, that commit was done because userspace (QEMU) has a
-> genuine need to detect whether KVM is new enough to support the
-> IA32_VMX_VMFUNC MSR.
-> 
-> Perhaps we can make all MSRs supported unconditionally if
-> host_initiated.  For unsupported performance counters it's easy to make
-> them return 0, and allow setting them to 0, if host_initiated 
+On 27/09/19 19:14, Sean Christopherson wrote:
+>>
+>> Perhaps we can make all MSRs supported unconditionally if
+>> host_initiated.  For unsupported performance counters it's easy to make
+>> them return 0, and allow setting them to 0, if host_initiated 
+> I don't think we need to go that far.  Allowing any ol' MSR access seems
+> like it would cause more problems than it would solve, e.g. userspace
+> could completely botch something and never know.
 
-I don't think we need to go that far.  Allowing any ol' MSR access seems
-like it would cause more problems than it would solve, e.g. userspace
-could completely botch something and never know.
+Well, I didn't mean really _all_ MSRs, only those returned by
+KVM_GET_MSR_INDEX_LIST.
 
-For the perf MSRs, could we enumerate all arch perf MSRs that are supported
-by hardware?  That would also be the list of MSRs that host_initiated MSR
-accesses can touch regardless of guest support.
+> For the perf MSRs, could we enumerate all arch perf MSRs that are supported
+> by hardware?  That would also be the list of MSRs that host_initiated MSR
+> accesses can touch regardless of guest support.
 
-Something like:
+Yes, that is easy indeed.  Any ideas about VMX?
 
-	case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0+INTEL_PMC_MAX_GENERIC:
-	case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0+INTEL_PMC_MAX_GENERIC:
-		if (kvm_pmu_is_valid_msr(vcpu, msr))
-			return kvm_pmu_set_msr(vcpu, msr_info);
-		else if (msr <= num_hw_counters)
-			break;
-		return 1;
-
-> (BTW, how did you pick 32?  is there any risk of conflicts with other MSRs?).
-
-Presumably because INTEL_PMC_MAX_GENERIC is 32.
-
-> I'm not sure of the best set of values to allow for VMX caps, especially
-> with the default0/default1 stuff going on for execution controls.  But
-> perhaps that would be the simplest thing to do.
-> 
-> One possibility would be to make a KVM_GET_MSR_INDEX_LIST variant that
-> is a system ioctl and takes a CPUID vector.  I'm worried that it would
-> be tedious to get right and hardish to keep correct---so I'm not sure
-> it's a good idea.
-> 
-> Paolo
+Paolo
