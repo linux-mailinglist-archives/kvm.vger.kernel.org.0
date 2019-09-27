@@ -2,152 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AF22C0644
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 15:25:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20450C0661
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 15:33:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727349AbfI0NX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 09:23:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:21405 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727213AbfI0NXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 09:23:55 -0400
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 30A0D81F0D
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 13:23:55 +0000 (UTC)
-Received: by mail-qk1-f198.google.com with SMTP id k67so2614900qkc.3
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 06:23:55 -0700 (PDT)
+        id S1727419AbfI0NdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 09:33:21 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:43771 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726549AbfI0NdU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 09:33:20 -0400
+Received: by mail-oi1-f196.google.com with SMTP id t84so5177707oih.10
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 06:33:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XpRff2jEEJjun5C2nBwnEy0mpg4KSV3BL/CHwT484IE=;
+        b=qcFWW4Gw2Z1hHz2R8mU/7PNImqDSLwQyb9YokkDvkIFBQGNra8ryGJ0Mu/u0rqwqLc
+         9NMqnwwG/iPr9oGSWsYCfiQOvZoZOLQcIx37TenROPvMxcIlNLsszFebmz/ISrP1I002
+         nNKTwl7k6+zZBC90PoaDCvyHQ5jsc8CZImfI/O+2g6UWFgnUHjMBN9edyv10srOnB0aB
+         zWVJKjFkmhJ7UTofs8uuCyw7EBlDbXtoflkBUeseFk0Qp/QkuOJsFy6S2GmeIhPT50fR
+         Imoh+XTDM1Uf1uKnWGcunaRpKbyBqhJWOUtLXAK8/mbTyTnfmhOR3Xdn1DX+1qi6udvt
+         1+og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=AyTMKGoGs/Lkq3kyZ5E07Ek1WWcR6PtX7h75NGzXR98=;
-        b=L8psFd7LA1JaNukhqtd28ZT93M7j5onAVHpkcoZkQf4am4v/29/MwMI399xMXkyxaq
-         7h1DA59WP+IbLlr0wKZLEmFeW1oTMi3RQLVDhg6c0OJ0dF/Q7dv4cTqZ4KuYiHSDua6E
-         TFfS6BINcvQZe/N0w7zZnh2tiZLUTsh4/MtLN2O6odAgpZmqohiKSpJFdNk/j4O/jXRg
-         oMEHXKPkD5HD/j69jXo3WXDhBaSzju57dueY7Z7P5S0QnpTzIqiGBZhF0em7zzw9aiwn
-         2mIZ17Hdf/oM0fehyyXctiymSchu0Bw3HrqWDVt2w2PRILeHFeB/v6Pfazkm15CXNxA3
-         zedg==
-X-Gm-Message-State: APjAAAVkOG6HUSwOXIxEEm4lP16cN3NN2yWL4uXD+JnznJptMyzCrpl4
-        jkYvhUBuVoOpEC9PCDMrui85AT0o7fTJrXW2maMvpBfmdqGKpveu05NqmhF84x/6flVV3BhGlet
-        fp+RFJQOim9TV
-X-Received: by 2002:ae9:ebcc:: with SMTP id b195mr4157302qkg.387.1569590634431;
-        Fri, 27 Sep 2019 06:23:54 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyd11e5rCRWe0bxFf6zGmoFapNlaYtDWeIQ/2TfJmDkfR/AHi55ZmXJPrcHHDUd2jtkidxpVA==
-X-Received: by 2002:ae9:ebcc:: with SMTP id b195mr4157280qkg.387.1569590634189;
-        Fri, 27 Sep 2019 06:23:54 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-40-226.red.bezeqint.net. [79.176.40.226])
-        by smtp.gmail.com with ESMTPSA id m14sm1073230qki.27.2019.09.27.06.23.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Sep 2019 06:23:52 -0700 (PDT)
-Date:   Fri, 27 Sep 2019 09:23:46 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
-Message-ID: <20190927092219-mutt-send-email-mst@kernel.org>
-References: <20190926045427.4973-1-tiwei.bie@intel.com>
- <20190926042156-mutt-send-email-mst@kernel.org>
- <20190926131439.GA11652@___>
- <8ab5a8d9-284d-bba5-803d-08523c0814e1@redhat.com>
- <20190927053935-mutt-send-email-mst@kernel.org>
- <a959fe1e-3095-e0f0-0c9b-57f6eaa9c8b7@redhat.com>
- <20190927084408-mutt-send-email-mst@kernel.org>
- <b6f6ffb2-0b16-5041-be2e-94b805c6a4c9@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XpRff2jEEJjun5C2nBwnEy0mpg4KSV3BL/CHwT484IE=;
+        b=mrcq8zptfgzP8tkhdYj9V/J7FN4FhiGB/RPdem+9FlDclG/Z3oXdhiJxZyySppM2Fi
+         McysP47Ur5HFT2wN1BzSjxnViO6uB6XAmWaqG3t02gpLJfGReR5I9idUB4CLbIbRNUJi
+         5cIfFcDjJILdokmopaDNTK2iB9HZQfUskyOcyjcIH82e8mwbf+RnLp3YIbfgDHNWXKAy
+         F4xSRhWhGVYeUyZak82jP36OGRvg12Nci1T4Rk63RP1rJnysyTsaS5c3v7VgfnSzqDcJ
+         nB7TNz4I9UQ8d/tK2r6kUE5WoDu+aQ3yqjyumEKdZENbREOchqZcZ3JSI0mRVwI3lVZ+
+         a3zw==
+X-Gm-Message-State: APjAAAV1E1uX6Z3ImbNT368iqKHefq2+Xi0SzDTNJFmXOVaDFafWKZOv
+        kXFZZRD8jZ4+MosReiGG+Bzbd+0i2Y7UWOXrXnf+vA==
+X-Google-Smtp-Source: APXvYqzq1Mf0Cwsntez7S0gT5ElVn+nWXKGzokuwMctHq6cA/F3Ytm0RCygkiV1cnVmxGAYhvxowxpAmouCw/rKpz6k=
+X-Received: by 2002:aca:b48a:: with SMTP id d132mr7301167oif.98.1569591198389;
+ Fri, 27 Sep 2019 06:33:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b6f6ffb2-0b16-5041-be2e-94b805c6a4c9@redhat.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com> <20190906083152.25716-6-zhengxiang9@huawei.com>
+In-Reply-To: <20190906083152.25716-6-zhengxiang9@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri, 27 Sep 2019 14:33:07 +0100
+Message-ID: <CAFEAcA-xc2XUq2Kwa1cK=4sAMq8B-2jUFAmxiGOQbmRCp-+UmQ@mail.gmail.com>
+Subject: Re: [PATCH v18 5/6] target-arm: kvm64: inject synchronous External Abort
+To:     Xiang Zheng <zhengxiang9@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        gengdongjiu <gengdongjiu@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+        wanghaibin.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 09:17:56PM +0800, Jason Wang wrote:
-> 
-> On 2019/9/27 下午8:46, Michael S. Tsirkin wrote:
-> > On Fri, Sep 27, 2019 at 08:17:47PM +0800, Jason Wang wrote:
-> > > On 2019/9/27 下午5:41, Michael S. Tsirkin wrote:
-> > > > On Fri, Sep 27, 2019 at 11:27:12AM +0800, Jason Wang wrote:
-> > > > > On 2019/9/26 下午9:14, Tiwei Bie wrote:
-> > > > > > On Thu, Sep 26, 2019 at 04:35:18AM -0400, Michael S. Tsirkin wrote:
-> > > > > > > On Thu, Sep 26, 2019 at 12:54:27PM +0800, Tiwei Bie wrote:
-> > > > > > [...]
-> > > > > > > > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > > > > > > > index 40d028eed645..5afbc2f08fa3 100644
-> > > > > > > > --- a/include/uapi/linux/vhost.h
-> > > > > > > > +++ b/include/uapi/linux/vhost.h
-> > > > > > > > @@ -116,4 +116,12 @@
-> > > > > > > >     #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
-> > > > > > > >     #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
-> > > > > > > > +/* VHOST_MDEV specific defines */
-> > > > > > > > +
-> > > > > > > > +#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
-> > > > > > > > +
-> > > > > > > > +#define VHOST_MDEV_S_STOPPED	0
-> > > > > > > > +#define VHOST_MDEV_S_RUNNING	1
-> > > > > > > > +#define VHOST_MDEV_S_MAX	2
-> > > > > > > > +
-> > > > > > > >     #endif
-> > > > > > > So assuming we have an underlying device that behaves like virtio:
-> > > > > > I think they are really good questions/suggestions. Thanks!
-> > > > > > 
-> > > > > > > 1. Should we use SET_STATUS maybe?
-> > > > > > I like this idea. I will give it a try.
-> > > > > > 
-> > > > > > > 2. Do we want a reset ioctl?
-> > > > > > I think it is helpful. If we use SET_STATUS, maybe we
-> > > > > > can use it to support the reset.
-> > > > > > 
-> > > > > > > 3. Do we want ability to enable rings individually?
-> > > > > > I will make it possible at least in the vhost layer.
-> > > > > Note the API support e.g set_vq_ready().
-> > > > virtio spec calls this "enabled" so let's stick to that.
-> > > 
-> > > Ok.
-> > > 
-> > > 
-> > > > > > > 4. Does device need to limit max ring size?
-> > > > > > > 5. Does device need to limit max number of queues?
-> > > > > > I think so. It's helpful to have ioctls to report the max
-> > > > > > ring size and max number of queues.
-> > > > > An issue is the max number of queues is done through a device specific way,
-> > > > > usually device configuration space. This is supported by the transport API,
-> > > > > but how to expose it to userspace may need more thought.
-> > > > > 
-> > > > > Thanks
-> > > > an ioctl for device config?  But for v1 I'd be quite happy to just have
-> > > > a minimal working device with 2 queues.
-> > > 
-> > > I'm fully agree, and it will work as long as VIRTIO_NET_F_MQ and
-> > > VIRTIO_NET_F_CTRL_VQ is not advertised by the mdev device.
-> > > 
-> > > Thanks
-> > Hmm this means we need to validate the features bits,
-> > not just pass them through to the hardware.
-> > Problem is, how do we add more feature bits later,
-> > without testing all hardware?
-> > I guess this means the device specific driver must do it.
-> > 
-> 
-> That looks not good, maybe a virtio device id based features blacklist in
-> vhost-mdev. Then MQ and CTRL_VQ could be filtered out by vhost-mdev.
-> 
-> Thanks
+On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>
+> Introduce kvm_inject_arm_sea() function in which we will setup the type
+> of exception and the syndrome information in order to inject a virtual
+> synchronous external abort. When switching to guest, it will jump to the
+> synchronous external abort vector table entry.
+>
+> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and
+> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
+> not valid and hold an UNKNOWN value. These values will be set to KVM
+> register structures through KVM_SET_ONE_REG IOCTL.
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
 
-Two implementations of e.g. virtio net can have different
-features whitelisted. So I think there's no way but let
-the driver do it. We should probably provide a standard place
-in the ops for driver to supply the whitelist, to make sure
-drivers don't forget.
+> +/* Inject synchronous external abort */
+> +static void kvm_inject_arm_sea(CPUState *c)
 
-> 
-> > > > > > Thanks!
+This will cause a compilation failure at this point in
+the patch series, because the compiler will complain about
+a static function which is defined but never used.
+To avoid breaking bisection, we need to put the definition
+of the function in the same patch where it's used.
+
+> +{
+> +    ARMCPU *cpu = ARM_CPU(c);
+> +    CPUARMState *env = &cpu->env;
+> +    CPUClass *cc = CPU_GET_CLASS(c);
+> +    uint32_t esr;
+> +    bool same_el;
+> +
+> +    /**
+> +     * Set the exception type to synchronous data abort
+> +     * and the target exception Level to EL1.
+> +     */
+
+This comment doesn't really tell us anything that's not obvious
+from the two lines of code that it's commenting on:
+
+> +    c->exception_index = EXCP_DATA_ABORT;
+> +    env->exception.target_el = 1;
+> +
+> +    /*
+> +     * Set the DFSC to synchronous external abort and set FnV to not valid,
+> +     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
+> +     */
+> +
+> +    /* This exception comes from lower or current exception level. */
+
+This comment too is stating the obvious I think.
+
+> +    same_el = arm_current_el(env) == env->exception.target_el;
+> +    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
+> +
+> +    env->exception.syndrome = esr;
+> +
+> +    /**
+
+There's a stray second '*' in this comment-start.
+
+
+> +     * The vcpu thread already hold BQL, so no need hold again when
+> +     * calling do_interrupt
+
+I think this requirement would be better placed as a
+comment at the top of the function noting that callers
+must hold the iothread lock.
+
+> +     */
+> +    cc->do_interrupt(c);
+> +}
+> +
+>  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+>
+> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+> index 5feb312941..499672ebbc 100644
+> --- a/target/arm/tlb_helper.c
+> +++ b/target/arm/tlb_helper.c
+> @@ -33,7 +33,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+>       * ISV field.
+>       */
+>      if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+> -        syn = syn_data_abort_no_iss(same_el,
+> +        syn = syn_data_abort_no_iss(same_el, 0,
+>                                      ea, 0, s1ptw, is_write, fsc);
+>      } else {
+>          /*
+> --
+> 2.19.1
+
+thanks
+-- PMM
