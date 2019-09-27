@@ -2,109 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D68CC0920
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 18:05:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0921C0925
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 18:06:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727887AbfI0QFV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 12:05:21 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39519 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727624AbfI0QFV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 12:05:21 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r3so3701086wrj.6;
-        Fri, 27 Sep 2019 09:05:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=gMGe1RxHLB7ktDM+P7ngRhIvwgy8WL2hbGJxbnP4AYg=;
-        b=tWZt3K4lxY9TyOFlfpmgYUURbaM2YtjqW2Tn6Qn9UB4suAdWVtz6rimKk/o2y17zIc
-         0D5Qq/LdkLObm/VAKzJFQSREpzD1ZdvWMom+0Jp3J0Sc7vxs/aq1a3S927C7GEVFROyY
-         OVolY6iVD3VCMYPzsN9RWpYGngxOl+RwW9j2jNI+yD/WGjhvUquuV5XSnM9QpPQ7qUOT
-         fBOIqw+YKVU69QzT+shWplvB24c7rOnchBpey6wqPw6HOmhDkCVnZChWz/OSQT/ltx9X
-         OY2RylsKsAuipYpV5ONedCVY4UejzzrDb+f9bJdjZmRWc1VE1Ppk4HKLm1rCPgfgDkh8
-         tRXw==
+        id S1727889AbfI0QGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 12:06:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59532 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727366AbfI0QGM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 12:06:12 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id ECF33C05AA56
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 16:06:11 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id w8so1316902wrm.3
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 09:06:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=gMGe1RxHLB7ktDM+P7ngRhIvwgy8WL2hbGJxbnP4AYg=;
-        b=ibo1x4LSAnXGxp+gP5e+7zYYFqHLJgR/zteQz9HtCpiwOWYiI1dkZ8/9KwqiVxuMRT
-         dNYu85P0hWwxz1B1Y8TxB16LWA33SUavqIRwGXwft6OEL8kY0bhclz0fL30WbyF3HuNQ
-         TVgKfipriC7d/5yPgnpAWtP5v2oj5Mvv0xJNzjdl2dzMgmAlvPD/6uZTuMbklt+6JLL+
-         VUDZkUh2PlXZRlH3p1xs1K9g+1WgzjU/1iFIpH9JSPWQqdREA+bIU2x615WUovmQWk4J
-         kbWKCPirq/7iG1/Qvu3sbGyhZrI8agHmCqLLTCrtpPcF3iWSZVPeVLty/v5X8xWX0glR
-         Shtw==
-X-Gm-Message-State: APjAAAWJQiwcdbzN5HWJMNf3g0FltA1vGyMsa12qEanQ0N6yx+4r3zm/
-        46B0AOlHIWt8ar5FGQaMRRmbTvWp
-X-Google-Smtp-Source: APXvYqzrf/BNCHYjyJATAYJdCzH3MpkGG2RZJC595mLoHIWxWvFh0FaUQydvQV/sCeYQrDbgNwgCyQ==
-X-Received: by 2002:adf:ce89:: with SMTP id r9mr685277wrn.335.1569600318893;
-        Fri, 27 Sep 2019 09:05:18 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id g24sm3475615wrb.35.2019.09.27.09.05.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 27 Sep 2019 09:05:17 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tlYFE41qduUsi9igPqMAFQ5dqyYqpx0jVUAbChdW/Eo=;
+        b=RN6TYnz94dy9DKDo1wPCKmgXzWd4OCoOehbyIda1j1yTUXodllJiVSGPPCJNFRWFkh
+         FNotRZlGtuxiwgIj+ySbi8PbOkYF/CE0cJXaXL4sCVIqPPAmruaG0Wy4Q8UBUoV8TrQV
+         TTOsj+Fh+q0B2QzUzxo0dK9gPv/Rm3XmKEReSf1DX2pmKr5uZ1bI9Y5jGSxjCPpCsCsK
+         pvfEOM1VoqJRpkbDnuN5V5sUPDiWNwskFvhv3Uzdyga+v+QGZiSlA3q0+55NAIs3mz6K
+         HZObBr4yPRPHA6cfTqupaYOM6I1y0WEmJ5VEnKbnEBkancrrSfgbbYluHbxuFkmeS1rI
+         dpyQ==
+X-Gm-Message-State: APjAAAU0fTd0i/Bc785VGQLB6VAvFsX8S7uVPK2r+TbqhBTKcV7l7J1e
+        +gxZgvW97sD4VLN3Enb+Zpff7z81BwlAF2YkbprA9yySf33r9XdlGyztrbRskXdgVXAHPME/7hT
+        eIxV67MFwqdTB
+X-Received: by 2002:a1c:3281:: with SMTP id y123mr7358547wmy.34.1569600370617;
+        Fri, 27 Sep 2019 09:06:10 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwFArU+p/KU2rbV17Ovb/ZTBtvnhY/hp2ypmjzNk5cpIipG3YqAAMHsuxC4y7l1J9dVv8+MFQ==
+X-Received: by 2002:a1c:3281:: with SMTP id y123mr7358526wmy.34.1569600370301;
+        Fri, 27 Sep 2019 09:06:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+        by smtp.gmail.com with ESMTPSA id h17sm17822385wme.6.2019.09.27.09.06.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Sep 2019 09:06:09 -0700 (PDT)
+Subject: Re: [PATCH] KVM: selftests: x86: clarify what is reported on
+ KVM_GET_MSRS failure
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20190927155413.31648-1-vkuznets@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     bp@alien8.de, Waiman Long <longman@redhat.com>
-Subject: [PATCH v2] KVM: VMX: Set VMENTER_L1D_FLUSH_NOT_REQUIRED if !X86_BUG_L1TF
-Date:   Fri, 27 Sep 2019 18:05:16 +0200
-Message-Id: <1569600316-35966-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Openpgp: preference=signencrypt
+Message-ID: <9af23f2e-6f82-e597-abec-ee69c9735faa@redhat.com>
+Date:   Fri, 27 Sep 2019 18:06:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190927155413.31648-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Waiman Long <longman@redhat.com>
+On 27/09/19 17:54, Vitaly Kuznetsov wrote:
+> When KVM_GET_MSRS fail the report looks like
+> 
+> ==== Test Assertion Failure ====
+>   lib/x86_64/processor.c:1089: r == nmsrs
+>   pid=28775 tid=28775 - Argument list too long
+>      1	0x000000000040a55f: vcpu_save_state at processor.c:1088 (discriminator 3)
+>      2	0x00000000004010e3: main at state_test.c:171 (discriminator 4)
+>      3	0x00007fb8e69223d4: ?? ??:0
+>      4	0x0000000000401287: _start at ??:?
+>   Unexpected result from KVM_GET_MSRS, r: 36 (failed at 194)
+> 
+> and it's not obvious that '194' here is the failed MSR index and that
+> it's printed in hex. Change that.
+> 
+> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index c53dbc6bc568..6698cb741e10 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1085,7 +1085,7 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
+>  	for (i = 0; i < nmsrs; i++)
+>  		state->msrs.entries[i].index = list->indices[i];
+>  	r = ioctl(vcpu->fd, KVM_GET_MSRS, &state->msrs);
+> -        TEST_ASSERT(r == nmsrs, "Unexpected result from KVM_GET_MSRS, r: %i (failed at %x)",
+> +        TEST_ASSERT(r == nmsrs, "Unexpected result from KVM_GET_MSRS, r: %i (failed MSR was 0x%x)",
+>                  r, r == nmsrs ? -1 : list->indices[r]);
+>  
+>  	r = ioctl(vcpu->fd, KVM_GET_DEBUGREGS, &state->debugregs);
+> 
 
-The l1tf_vmx_mitigation is only set to VMENTER_L1D_FLUSH_NOT_REQUIRED
-when the ARCH_CAPABILITIES MSR indicates that L1D flush is not required.
-However, if the CPU is not affected by L1TF, l1tf_vmx_mitigation will
-still be set to VMENTER_L1D_FLUSH_AUTO. This is certainly not the best
-option for a !X86_BUG_L1TF CPU.
+Queued, thanks.
 
-So force l1tf_vmx_mitigation to VMENTER_L1D_FLUSH_NOT_REQUIRED to make it
-more explicit in case users are checking the vmentry_l1d_flush parameter.
-
-Signed-off-by: Waiman Long <longman@redhat.com>
-[Patch rewritten accoring to Borislav Petkov's suggestion. - Paolo]
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/vmx.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d4575ffb3cec..e7970a2e8eae 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -209,6 +209,11 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
- 	struct page *page;
- 	unsigned int i;
- 
-+	if (!boot_cpu_has_bug(X86_BUG_L1TF)) {
-+		l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NOT_REQUIRED;
-+		return 0;
-+	}
-+
- 	if (!enable_ept) {
- 		l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_EPT_DISABLED;
- 		return 0;
-@@ -7995,12 +8000,10 @@ static int __init vmx_init(void)
- 	 * contain 'auto' which will be turned into the default 'cond'
- 	 * mitigation mode.
- 	 */
--	if (boot_cpu_has(X86_BUG_L1TF)) {
--		r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
--		if (r) {
--			vmx_exit();
--			return r;
--		}
-+	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
-+	if (r) {
-+		vmx_exit();
-+		return r;
- 	}
- 
- #ifdef CONFIG_KEXEC_CORE
--- 
-1.8.3.1
-
+Paolo
