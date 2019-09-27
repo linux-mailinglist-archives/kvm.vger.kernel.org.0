@@ -2,145 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DB54C09CB
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 18:46:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A471AC0A0F
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 19:14:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727836AbfI0QpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 12:45:11 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39125 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726251AbfI0QpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 12:45:10 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r3so3942678wrj.6;
-        Fri, 27 Sep 2019 09:45:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=og90qbQAXOicdq5w4qtLw6dYo5vnyUk8y6wc3hp/goU=;
-        b=RcW3JOWX3CaxFUDNoQDHbdGdVcFVnBOj7k7rc3z1VvB6lT5ldwqAICaj7FIaWmmLBa
-         E3822z+bFuwc702xgCM2HYqCKR9wEOFKHpYR/ZP6ZTdL2lvmPnI6k3K9hvJQgeRY5yTC
-         yMA5u4+AINc1hPUvJkP6yjv18x6r1XpxWZsXDcsqcGsGVCWWGTGlWudM0Ti6KMQoXvQf
-         gL6MmMMALNqvxqz0Gg5Uq0k7NSNR+drcdLv5LJSN5eVRCkmMN0XiKC29r7quWU2erzOe
-         xfNdMTKgKJs89lS7tv4BTRQhubJS/UTaAzzDX+mXoZc7ZTyvy8uqF98Zryq8oEGAWHgN
-         cVwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=og90qbQAXOicdq5w4qtLw6dYo5vnyUk8y6wc3hp/goU=;
-        b=j2PElocYRW0Krd2xB3KV5FYDdDbGWQwsjohA8ivRvoxQ+yggRVCPJofldnYnErNlKp
-         szWWV0UaFt3xyUTnJAaV/jJiEy/Vk7cpGGKnn58qn9wIxYoo+LeOdD1hgqEvz3G+2LOf
-         V692jqoG6hu6c9gVKLwsr9ijI5mYazEeqs0XMmoVhjuauK00Fo5gW3/pn3kCAOhlN88F
-         QiFXuXoPYfAM9igXfAr88Q6pV1vSWgfTYWm346tDJcmIbNmLmPXb1rBwBa38+jCZBl8V
-         K1O1nRgD1qk5fAkQqBxnL5dRZ8d1H4nEPDjN3KDSshvG5I0LuHesz6zvwxmE3MTVSh4L
-         5Bcg==
-X-Gm-Message-State: APjAAAUot2x48quyhH/cfrtu7oVLcd3Rl/VLfaEhT2kg19fnM/EuEVyZ
-        kEwigqDMOTHsAnqHlqZKxLk=
-X-Google-Smtp-Source: APXvYqzB8omaq85cbWYuSm9buXKmXpapBFdkbhwBVUoZfj9O4XopENPYw/IDgrNoGyrxG2qggAUQdQ==
-X-Received: by 2002:a1c:cb05:: with SMTP id b5mr7750360wmg.79.1569602706717;
-        Fri, 27 Sep 2019 09:45:06 -0700 (PDT)
-Received: from scw-93ddc8.cloud.online.net ([2001:bc8:4400:2400::302d])
-        by smtp.googlemail.com with ESMTPSA id h125sm11889243wmf.31.2019.09.27.09.45.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 27 Sep 2019 09:45:05 -0700 (PDT)
-From:   Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
-To:     stefanha@redhat.com
-Cc:     davem@davemloft.net, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, matiasevara@gmail.com,
-        sgarzare@redhat.com, eric.dumazet@gmail.com
-Subject: [PATCH v2] vsock/virtio: add support for MSG_PEEK
-Date:   Fri, 27 Sep 2019 16:44:23 +0000
-Message-Id: <1569602663-16815-1-git-send-email-matiasevara@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1569522214-28223-1-git-send-email-matiasevara@gmail.com>
-References: <1569522214-28223-1-git-send-email-matiasevara@gmail.com>
+        id S1726321AbfI0ROI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 13:14:08 -0400
+Received: from mga03.intel.com ([134.134.136.65]:10941 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726027AbfI0ROI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 13:14:08 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Sep 2019 10:14:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,556,1559545200"; 
+   d="scan'208";a="214904665"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga004.fm.intel.com with ESMTP; 27 Sep 2019 10:14:05 -0700
+Date:   Fri, 27 Sep 2019 10:14:05 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Eric Hankland <ehankland@google.com>,
+        Peter Shier <pshier@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
+Message-ID: <20190927171405.GD25513@linux.intel.com>
+References: <87ftkh6e19.fsf@vitty.brq.redhat.com>
+ <6e6f46fe-6e11-c5e3-d80c-327f77b91907@redhat.com>
+ <87d0fl6bv4.fsf@vitty.brq.redhat.com>
+ <19db28c0-375a-7bc0-7151-db566ae85de6@redhat.com>
+ <20190927152608.GC25513@linux.intel.com>
+ <87a7ap68st.fsf@vitty.brq.redhat.com>
+ <59934fa75540d493dabade5a3e66b7ed159c4aae.camel@intel.com>
+ <e4a17cfb-8172-9ad8-7010-ee860c4898bf@redhat.com>
+ <CALMp9eQcHbm6nLAQ_o8dS4B+2k6B0eHxuGvv6Ls_-HL9PC4mhQ@mail.gmail.com>
+ <11f63bd6-50cc-a6ce-7a36-a6e1a4d8c5e9@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11f63bd6-50cc-a6ce-7a36-a6e1a4d8c5e9@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds support for MSG_PEEK. In such a case, packets are not
-removed from the rx_queue and credit updates are not sent.
+On Fri, Sep 27, 2019 at 06:32:27PM +0200, Paolo Bonzini wrote:
+> On 27/09/19 18:10, Jim Mattson wrote:
+> > On Fri, Sep 27, 2019 at 9:06 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 27/09/19 17:58, Xiaoyao Li wrote:
+> >>> Indeed, "KVM_GET_MSR_INDEX_LIST" returns the guest msrs that KVM supports and
+> >>> they are free from different guest configuration since they're initialized when
+> >>> kvm module is loaded.
+> >>>
+> >>> Even though some MSRs are not exposed to guest by clear their related cpuid
+> >>> bits, they are still saved/restored by QEMU in the same fashion.
+> >>>
+> >>> I wonder should we change "KVM_GET_MSR_INDEX_LIST" per VM?
+> >>
+> >> We can add a per-VM version too, yes.
+> 
+> There is one problem with that: KVM_SET_CPUID2 is a vCPU ioctl, not a VM
+> ioctl.
+> 
+> > Should the system-wide version continue to list *some* supported MSRs
+> > and *some* unsupported MSRs, with no rhyme or reason? Or should we
+> > codify what that list contains?
+> 
+> The optimal thing would be for it to list only MSRs that are
+> unconditionally supported by all VMs and are part of the runtime state.
+>  MSRs that are not part of the runtime state, such as the VMX
+> capabilities, should be returned by KVM_GET_MSR_FEATURE_INDEX_LIST.
+> 
+> This also means that my own commit 95c5c7c77c06 ("KVM: nVMX: list VMX
+> MSRs in KVM_GET_MSR_INDEX_LIST", 2019-07-02) was incorrect.
+> Unfortunately, that commit was done because userspace (QEMU) has a
+> genuine need to detect whether KVM is new enough to support the
+> IA32_VMX_VMFUNC MSR.
+> 
+> Perhaps we can make all MSRs supported unconditionally if
+> host_initiated.  For unsupported performance counters it's easy to make
+> them return 0, and allow setting them to 0, if host_initiated 
 
-Signed-off-by: Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
----
- net/vmw_vsock/virtio_transport_common.c | 55 +++++++++++++++++++++++++++++++--
- 1 file changed, 52 insertions(+), 3 deletions(-)
+I don't think we need to go that far.  Allowing any ol' MSR access seems
+like it would cause more problems than it would solve, e.g. userspace
+could completely botch something and never know.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 94cc0fa..cf15751 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -264,6 +264,55 @@ static int virtio_transport_send_credit_update(struct vsock_sock *vsk,
- }
- 
- static ssize_t
-+virtio_transport_stream_do_peek(struct vsock_sock *vsk,
-+				struct msghdr *msg,
-+				size_t len)
-+{
-+	struct virtio_vsock_sock *vvs = vsk->trans;
-+	struct virtio_vsock_pkt *pkt;
-+	size_t bytes, total = 0, off;
-+	int err = -EFAULT;
-+
-+	spin_lock_bh(&vvs->rx_lock);
-+
-+	list_for_each_entry(pkt, &vvs->rx_queue, list) {
-+		off = pkt->off;
-+
-+		if (total == len)
-+			break;
-+
-+		while (total < len && off < pkt->len) {
-+			bytes = len - total;
-+			if (bytes > pkt->len - off)
-+				bytes = pkt->len - off;
-+
-+			/* sk_lock is held by caller so no one else can dequeue.
-+			 * Unlock rx_lock since memcpy_to_msg() may sleep.
-+			 */
-+			spin_unlock_bh(&vvs->rx_lock);
-+
-+			err = memcpy_to_msg(msg, pkt->buf + off, bytes);
-+			if (err)
-+				goto out;
-+
-+			spin_lock_bh(&vvs->rx_lock);
-+
-+			total += bytes;
-+			off += bytes;
-+		}
-+	}
-+
-+	spin_unlock_bh(&vvs->rx_lock);
-+
-+	return total;
-+
-+out:
-+	if (total)
-+		err = total;
-+	return err;
-+}
-+
-+static ssize_t
- virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
- 				   struct msghdr *msg,
- 				   size_t len)
-@@ -330,9 +379,9 @@ virtio_transport_stream_dequeue(struct vsock_sock *vsk,
- 				size_t len, int flags)
- {
- 	if (flags & MSG_PEEK)
--		return -EOPNOTSUPP;
--
--	return virtio_transport_stream_do_dequeue(vsk, msg, len);
-+		return virtio_transport_stream_do_peek(vsk, msg, len);
-+	else
-+		return virtio_transport_stream_do_dequeue(vsk, msg, len);
- }
- EXPORT_SYMBOL_GPL(virtio_transport_stream_dequeue);
- 
--- 
-2.7.4
+For the perf MSRs, could we enumerate all arch perf MSRs that are supported
+by hardware?  That would also be the list of MSRs that host_initiated MSR
+accesses can touch regardless of guest support.
 
+Something like:
+
+	case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0+INTEL_PMC_MAX_GENERIC:
+	case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0+INTEL_PMC_MAX_GENERIC:
+		if (kvm_pmu_is_valid_msr(vcpu, msr))
+			return kvm_pmu_set_msr(vcpu, msr_info);
+		else if (msr <= num_hw_counters)
+			break;
+		return 1;
+
+> (BTW, how did you pick 32?  is there any risk of conflicts with other MSRs?).
+
+Presumably because INTEL_PMC_MAX_GENERIC is 32.
+
+> I'm not sure of the best set of values to allow for VMX caps, especially
+> with the default0/default1 stuff going on for execution controls.  But
+> perhaps that would be the simplest thing to do.
+> 
+> One possibility would be to make a KVM_GET_MSR_INDEX_LIST variant that
+> is a system ioctl and takes a CPUID vector.  I'm worried that it would
+> be tedious to get right and hardish to keep correct---so I'm not sure
+> it's a good idea.
+> 
+> Paolo
