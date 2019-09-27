@@ -2,87 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3492AC0937
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 18:10:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19D7EC0939
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 18:11:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727518AbfI0QK2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 12:10:28 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:33989 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727349AbfI0QK2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 12:10:28 -0400
-Received: by mail-io1-f67.google.com with SMTP id q1so17784430ion.1
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 09:10:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UXV2Hn7JKmMTn9c+5xFmZirCbni1J6jzVcsI4Rgm4oA=;
-        b=k509PsPnpBgE5LT5/2e0zXjZ2xzfP/dBGvSqDj1ohAgZT7g3/6hvznBQ9Q4Fvows0m
-         bN0sHv7b9i/p/scqGZkzpL9TimYHpTERpy7ZiQu98pqwA8NhFo+StnjP70vM7XK4AXyc
-         mm8HhwTdzOIlAne9pq2n+YeT9mneNzWjCy5OEr+Uq7JPOrUvGvhH8FsaZRdZKxVAjtXz
-         PHlO0AmHYklf0bxWCtMdlPTIA2dt4wlNGvsO3P3KtsCWDQAXp2WT3lqTBtz0dlueHD6u
-         1/Z/dHz93Ou+R7tCEeOdhKDS4IAgJ2ZKPRP/UnE/mb4YCFIHX9pAsF0z88iwGB43nbOp
-         KPkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UXV2Hn7JKmMTn9c+5xFmZirCbni1J6jzVcsI4Rgm4oA=;
-        b=JkvmXQSZD97Ze/P74AF+BswvMTJHqj2iTqKmK9C4vI+ycpDuadRk6y/nVLfsIH+Cej
-         wF7tEKWpd02W6ehuILpJEpAbSjbpgfeQKTYU0POfy4i0y6sbQh8GCG/GiHSQFWFnBHeV
-         7i+k54PNcFEYCMUQ2afeCLqjg5eAu50hPreOGEBd7uZu+A13eqzexbyoTSIrH+ATUJD/
-         AyVGA5sC/6LuNSIquOkbLZlZVc4YQ9sKMmNcNzWPOv6BOmz2z3aJBCVbledryGrI3740
-         Wi2zoqTluc8whxSvWj+2zGoqZdD7V/CC9p14NACaLoRqpo/wQunAOkzzzX6MX+LCyUF+
-         TNpw==
-X-Gm-Message-State: APjAAAXNbUi4CcYgLC1xJsrs8XDTeF7VwCIZL20IWXffpRMZAq6eaBin
-        05OZwnMChK0ZFR1n4tWojCdokxfOxnZUt+4tFD1r9d9qlZM=
-X-Google-Smtp-Source: APXvYqyx23W9hvvIXxt0d9BGBS112UBS3vxsnUDx0fH7KHF8uZYw2MNK2DujNah/KOKs8haEy4LLyq2luAfoBPZlsjk=
-X-Received: by 2002:a05:6638:3:: with SMTP id z3mr3536305jao.54.1569600626086;
- Fri, 27 Sep 2019 09:10:26 -0700 (PDT)
+        id S1727830AbfI0QLS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 12:11:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45378 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727273AbfI0QLS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 12:11:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0A349369D3;
+        Fri, 27 Sep 2019 16:11:18 +0000 (UTC)
+Received: from llong.remote.csb (dhcp-17-160.bos.redhat.com [10.18.17.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8742A5C224;
+        Fri, 27 Sep 2019 16:11:17 +0000 (UTC)
+Subject: Re: [PATCH v2] KVM: VMX: Set VMENTER_L1D_FLUSH_NOT_REQUIRED if
+ !X86_BUG_L1TF
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     bp@alien8.de
+References: <1569600316-35966-1-git-send-email-pbonzini@redhat.com>
+From:   Waiman Long <longman@redhat.com>
+Organization: Red Hat
+Message-ID: <d8dc9ae5-7a97-1aed-4c22-051587795789@redhat.com>
+Date:   Fri, 27 Sep 2019 12:11:17 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <8907173e-9f27-6769-09fc-0b82c22d6352@oracle.com>
- <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
- <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com> <CALMp9eQULvr5wKt1Aw3MR+tbeNgvA_4p__6n1YTkWjMHCaEmLw@mail.gmail.com>
- <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com>
- <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com> <87ftkh6e19.fsf@vitty.brq.redhat.com>
- <6e6f46fe-6e11-c5e3-d80c-327f77b91907@redhat.com> <87d0fl6bv4.fsf@vitty.brq.redhat.com>
- <19db28c0-375a-7bc0-7151-db566ae85de6@redhat.com> <20190927152608.GC25513@linux.intel.com>
- <87a7ap68st.fsf@vitty.brq.redhat.com> <59934fa75540d493dabade5a3e66b7ed159c4aae.camel@intel.com>
- <e4a17cfb-8172-9ad8-7010-ee860c4898bf@redhat.com>
-In-Reply-To: <e4a17cfb-8172-9ad8-7010-ee860c4898bf@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 27 Sep 2019 09:10:14 -0700
-Message-ID: <CALMp9eQcHbm6nLAQ_o8dS4B+2k6B0eHxuGvv6Ls_-HL9PC4mhQ@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Eric Hankland <ehankland@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1569600316-35966-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Fri, 27 Sep 2019 16:11:18 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 9:06 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 9/27/19 12:05 PM, Paolo Bonzini wrote:
+> From: Waiman Long <longman@redhat.com>
 >
-> On 27/09/19 17:58, Xiaoyao Li wrote:
-> > Indeed, "KVM_GET_MSR_INDEX_LIST" returns the guest msrs that KVM supports and
-> > they are free from different guest configuration since they're initialized when
-> > kvm module is loaded.
-> >
-> > Even though some MSRs are not exposed to guest by clear their related cpuid
-> > bits, they are still saved/restored by QEMU in the same fashion.
-> >
-> > I wonder should we change "KVM_GET_MSR_INDEX_LIST" per VM?
+> The l1tf_vmx_mitigation is only set to VMENTER_L1D_FLUSH_NOT_REQUIRED
+> when the ARCH_CAPABILITIES MSR indicates that L1D flush is not required.
+> However, if the CPU is not affected by L1TF, l1tf_vmx_mitigation will
+> still be set to VMENTER_L1D_FLUSH_AUTO. This is certainly not the best
+> option for a !X86_BUG_L1TF CPU.
 >
-> We can add a per-VM version too, yes.
+> So force l1tf_vmx_mitigation to VMENTER_L1D_FLUSH_NOT_REQUIRED to make it
+> more explicit in case users are checking the vmentry_l1d_flush parameter.
+>
+> Signed-off-by: Waiman Long <longman@redhat.com>
+> [Patch rewritten accoring to Borislav Petkov's suggestion. - Paolo]
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index d4575ffb3cec..e7970a2e8eae 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -209,6 +209,11 @@ static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
+>  	struct page *page;
+>  	unsigned int i;
+>  
+> +	if (!boot_cpu_has_bug(X86_BUG_L1TF)) {
+> +		l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_NOT_REQUIRED;
+> +		return 0;
+> +	}
+> +
+>  	if (!enable_ept) {
+>  		l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_EPT_DISABLED;
+>  		return 0;
+> @@ -7995,12 +8000,10 @@ static int __init vmx_init(void)
+>  	 * contain 'auto' which will be turned into the default 'cond'
+>  	 * mitigation mode.
+>  	 */
+> -	if (boot_cpu_has(X86_BUG_L1TF)) {
+> -		r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
+> -		if (r) {
+> -			vmx_exit();
+> -			return r;
+> -		}
+> +	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
+> +	if (r) {
+> +		vmx_exit();
+> +		return r;
+>  	}
+>  
+>  #ifdef CONFIG_KEXEC_CORE
 
-Should the system-wide version continue to list *some* supported MSRs
-and *some* unsupported MSRs, with no rhyme or reason? Or should we
-codify what that list contains?
+That looks cleaner. Thanks for the suggestion and rewrite.
+
+Cheers,
+Longman
+
