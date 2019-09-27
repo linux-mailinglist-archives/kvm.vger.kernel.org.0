@@ -2,224 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D08ECC04B5
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 13:54:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1BB9C04D6
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 14:08:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727138AbfI0LyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 07:54:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21000 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727366AbfI0LyQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Sep 2019 07:54:16 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8RBkgRw109675
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 07:54:15 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2v9gejb9jd-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 07:54:14 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <groug@kaod.org>;
-        Fri, 27 Sep 2019 12:54:13 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 27 Sep 2019 12:54:08 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8RBs7CE59506738
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Sep 2019 11:54:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B12AB11C058;
-        Fri, 27 Sep 2019 11:54:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BEA211C052;
-        Fri, 27 Sep 2019 11:54:07 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.172.9])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Sep 2019 11:54:07 +0000 (GMT)
-Subject: [PATCH v2 6/6] KVM: PPC: Book3S HV: XIVE: Allow userspace to set
- the # of VPs
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?b?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-Date:   Fri, 27 Sep 2019 13:54:07 +0200
-In-Reply-To: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
-References: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19092711-0012-0000-0000-000003514B8B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092711-0013-0000-0000-0000218BE6CA
-Message-Id: <156958524691.1503771.2453080873820103723.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-27_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909270112
+        id S1727076AbfI0MII (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 08:08:08 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45718 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726163AbfI0MIH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 08:08:07 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r5so2416537wrm.12;
+        Fri, 27 Sep 2019 05:08:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=z7/9s3BxxTpVOqUwSt5oErpICTF5+R9LsJXWbH8WU0Y=;
+        b=T5eYcciSYy0hl1Z3CnsZPxVGZem+Tg/HkVuXzq/KvwM/AFoescyYYw6r1WB3gI/lFe
+         GWcyFvru3jp/UEvNxbN/TDMDjlxejjh+vuoCqWp4UERerKMVpoEWz4YlHC39zTdo9eYD
+         NC6I/kUXSWjRqFN/g8aOZZ/jGFuDmcVY4m+/LxQ5SSk896hDefx82NfIVAUcksYi6rIW
+         QOXsylaw7hk7tVw6Sh/mGDFtgz4xbdYwZSo9yo6nezYWGpiLg9FYJ0Dgx4VOawdQYvi9
+         dftyEs3q8F7yx+cdzlW/AmveYCSnCjWCGmvPyQbo0Jj9fEQ7ICrD3kuF/RJzT3WgMD0+
+         ZCsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=z7/9s3BxxTpVOqUwSt5oErpICTF5+R9LsJXWbH8WU0Y=;
+        b=PKB0r5JkfPamoHyr6lmr798+HVdCAhEG3ezsVxfvIU9vYgRwQ0hIffO3w6O43cIn12
+         /vc45QlghSbgAOIkEsNFZQxTd1iHiguWqzkepjWynivBG74YXwY9fAv+ZKfOVj9fD1tY
+         K6RRCfo84dD7a95H0O6komUOT4OoI0q5/htZCVQhFUNNf3reH1I6G43h0XhCBT2BOESA
+         u18/HO8P6p3tujxAep4Pd9HbZ3RJgFMEfWYwR7b4K3HakoJ5wHeOsUthd7GZRR1nfZls
+         Doz43Lea7tK6/D1iPC7feGmCkmazkTOvr46/ECGOK58DLEWNFUU4ZrmIDqeSUbaPUAO1
+         +EWA==
+X-Gm-Message-State: APjAAAUpTf+lOFNQ9ji61e0lI/ui20lk8yIJ2n4Hpzuvo9jJYyHbU0Xa
+        3CJEDBPPfOl96XS2qwTl9jQvBelM
+X-Google-Smtp-Source: APXvYqw+xZvHs7FtPH3B/HBeRf5/Du++X8PfFvrm/lhIDVT+mM4s/DjbTVi4oRpmjBGenbqbu2SWlw==
+X-Received: by 2002:adf:e612:: with SMTP id p18mr2623213wrm.218.1569586084352;
+        Fri, 27 Sep 2019 05:08:04 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id o188sm9540223wma.14.2019.09.27.05.08.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 27 Sep 2019 05:08:03 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for Linux 5.4 merge window
+Date:   Fri, 27 Sep 2019 14:08:02 +0200
+Message-Id: <1569586082-13995-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new attribute to both XIVE and XICS-on-XIVE KVM devices so that
-userspace can tell how many interrupt servers it needs. If a VM needs
-less than the current default of KVM_MAX_VCPUS (2048), we can allocate
-less VPs in OPAL. Combined with a core stride (VSMT) that matches the
-number of guest threads per core, this may substantially increases the
-number of VMs that can run concurrently with an in-kernel XIVE device.
+Linus,
 
-Since the legacy XIVE KVM device is exposed to userspace through the
-XICS KVM API, a new attribute group is added to it for this purpose.
-While here, fix the syntax of the existing KVM_DEV_XICS_GRP_SOURCES
-in the XICS documentation.
+The following changes since commit 4c07e2ddab5b6b57dbcb09aedbda1f484d5940cc:
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
----
-v2: - changelog update
----
- Documentation/virt/kvm/devices/xics.txt |   14 ++++++++++++--
- Documentation/virt/kvm/devices/xive.txt |    8 ++++++++
- arch/powerpc/include/uapi/asm/kvm.h     |    3 +++
- arch/powerpc/kvm/book3s_xive.c          |   10 ++++++++++
- arch/powerpc/kvm/book3s_xive_native.c   |    3 +++
- 5 files changed, 36 insertions(+), 2 deletions(-)
+  Merge tag 'mfd-next-5.4' of git://git.kernel.org/pub/scm/linux/kernel/git/lee/mfd (2019-09-23 19:37:49 -0700)
 
-diff --git a/Documentation/virt/kvm/devices/xics.txt b/Documentation/virt/kvm/devices/xics.txt
-index 42864935ac5d..423332dda7bc 100644
---- a/Documentation/virt/kvm/devices/xics.txt
-+++ b/Documentation/virt/kvm/devices/xics.txt
-@@ -3,9 +3,19 @@ XICS interrupt controller
- Device type supported: KVM_DEV_TYPE_XICS
- 
- Groups:
--  KVM_DEV_XICS_SOURCES
-+  1. KVM_DEV_XICS_GRP_SOURCES
-   Attributes: One per interrupt source, indexed by the source number.
- 
-+  2. KVM_DEV_XICS_GRP_CTRL
-+  Attributes:
-+    2.1 KVM_DEV_XICS_NR_SERVERS (write only)
-+  The kvm_device_attr.addr points to a __u32 value which is the number of
-+  interrupt server numbers (ie, highest possible vcpu id plus one).
-+  Errors:
-+    -EINVAL: Value greater than KVM_MAX_VCPU_ID.
-+    -EFAULT: Invalid user pointer for attr->addr.
-+    -EBUSY:  A vcpu is already connected to the device.
-+
- This device emulates the XICS (eXternal Interrupt Controller
- Specification) defined in PAPR.  The XICS has a set of interrupt
- sources, each identified by a 20-bit source number, and a set of
-@@ -38,7 +48,7 @@ least-significant end of the word:
- 
- Each source has 64 bits of state that can be read and written using
- the KVM_GET_DEVICE_ATTR and KVM_SET_DEVICE_ATTR ioctls, specifying the
--KVM_DEV_XICS_SOURCES attribute group, with the attribute number being
-+KVM_DEV_XICS_GRP_SOURCES attribute group, with the attribute number being
- the interrupt source number.  The 64 bit state word has the following
- bitfields, starting from the least-significant end of the word:
- 
-diff --git a/Documentation/virt/kvm/devices/xive.txt b/Documentation/virt/kvm/devices/xive.txt
-index 9a24a4525253..f5d1d6b5af61 100644
---- a/Documentation/virt/kvm/devices/xive.txt
-+++ b/Documentation/virt/kvm/devices/xive.txt
-@@ -78,6 +78,14 @@ the legacy interrupt mode, referred as XICS (POWER7/8).
-     migrating the VM.
-     Errors: none
- 
-+    1.3 KVM_DEV_XIVE_NR_SERVERS (write only)
-+    The kvm_device_attr.addr points to a __u32 value which is the number of
-+    interrupt server numbers (ie, highest possible vcpu id plus one).
-+    Errors:
-+      -EINVAL: Value greater than KVM_MAX_VCPU_ID.
-+      -EFAULT: Invalid user pointer for attr->addr.
-+      -EBUSY:  A vCPU is already connected to the device.
-+
-   2. KVM_DEV_XIVE_GRP_SOURCE (write only)
-   Initializes a new source in the XIVE device and mask it.
-   Attributes:
-diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
-index b0f72dea8b11..264e266a85bf 100644
---- a/arch/powerpc/include/uapi/asm/kvm.h
-+++ b/arch/powerpc/include/uapi/asm/kvm.h
-@@ -667,6 +667,8 @@ struct kvm_ppc_cpu_char {
- 
- /* PPC64 eXternal Interrupt Controller Specification */
- #define KVM_DEV_XICS_GRP_SOURCES	1	/* 64-bit source attributes */
-+#define KVM_DEV_XICS_GRP_CTRL		2
-+#define   KVM_DEV_XICS_NR_SERVERS	1
- 
- /* Layout of 64-bit source attribute values */
- #define  KVM_XICS_DESTINATION_SHIFT	0
-@@ -683,6 +685,7 @@ struct kvm_ppc_cpu_char {
- #define KVM_DEV_XIVE_GRP_CTRL		1
- #define   KVM_DEV_XIVE_RESET		1
- #define   KVM_DEV_XIVE_EQ_SYNC		2
-+#define   KVM_DEV_XIVE_NR_SERVERS	3
- #define KVM_DEV_XIVE_GRP_SOURCE		2	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_SOURCE_CONFIG	3	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_EQ_CONFIG	4	/* 64-bit EQ identifier */
-diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-index 6c35b3d95986..66858b7d3c6b 100644
---- a/arch/powerpc/kvm/book3s_xive.c
-+++ b/arch/powerpc/kvm/book3s_xive.c
-@@ -1911,6 +1911,11 @@ static int xive_set_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 	switch (attr->group) {
- 	case KVM_DEV_XICS_GRP_SOURCES:
- 		return xive_set_source(xive, attr->attr, attr->addr);
-+	case KVM_DEV_XICS_GRP_CTRL:
-+		switch (attr->attr) {
-+		case KVM_DEV_XICS_NR_SERVERS:
-+			return kvmppc_xive_set_nr_servers(xive, attr->addr);
-+		}
- 	}
- 	return -ENXIO;
- }
-@@ -1936,6 +1941,11 @@ static int xive_has_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 		    attr->attr < KVMPPC_XICS_NR_IRQS)
- 			return 0;
- 		break;
-+	case KVM_DEV_XICS_GRP_CTRL:
-+		switch (attr->attr) {
-+		case KVM_DEV_XICS_NR_SERVERS:
-+			return 0;
-+		}
- 	}
- 	return -ENXIO;
- }
-diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 8ab333eabeef..34bd123fa024 100644
---- a/arch/powerpc/kvm/book3s_xive_native.c
-+++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -921,6 +921,8 @@ static int kvmppc_xive_native_set_attr(struct kvm_device *dev,
- 			return kvmppc_xive_reset(xive);
- 		case KVM_DEV_XIVE_EQ_SYNC:
- 			return kvmppc_xive_native_eq_sync(xive);
-+		case KVM_DEV_XIVE_NR_SERVERS:
-+			return kvmppc_xive_set_nr_servers(xive, attr->addr);
- 		}
- 		break;
- 	case KVM_DEV_XIVE_GRP_SOURCE:
-@@ -960,6 +962,7 @@ static int kvmppc_xive_native_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_DEV_XIVE_RESET:
- 		case KVM_DEV_XIVE_EQ_SYNC:
-+		case KVM_DEV_XIVE_NR_SERVERS:
- 			return 0;
- 		}
- 		break;
+are available in the git repository at:
 
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to fd3edd4a9066f28de99a16685a586d68a9f551f8:
+
+  KVM: nVMX: cleanup and fix host 64-bit mode checks (2019-09-25 19:22:33 +0200)
+
+----------------------------------------------------------------
+x86 KVM changes:
+* The usual accuracy improvements for nested virtualization
+* The usual round of code cleanups from Sean
+* Added back optimizations that were prematurely removed in 5.2
+  (the bare minimum needed to fix the regression was in 5.3-rc8,
+  here comes the rest)
+* Support for UMWAIT/UMONITOR/TPAUSE
+* Direct L2->L0 TLB flushing when L0 is Hyper-V and L1 is KVM
+* Tell Windows guests if SMT is disabled on the host
+* More accurate detection of vmexit cost
+* Revert a pvqspinlock pessimization
+
+----------------------------------------------------------------
+Jim Mattson (3):
+      kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
+      kvm: x86: Add "significant index" flag to a few CPUID leaves
+      kvm: svm: Intercept RDPRU
+
+Krish Sadhukhan (1):
+      KVM: nVMX: Check Host Address Space Size on vmentry of nested guests
+
+Marc Orr (1):
+      kvm: nvmx: limit atomic switch MSRs
+
+Paolo Bonzini (1):
+      KVM: nVMX: cleanup and fix host 64-bit mode checks
+
+Peter Xu (4):
+      KVM: selftests: Move vm type into _vm_create() internally
+      KVM: selftests: Create VM earlier for dirty log test
+      KVM: selftests: Introduce VM_MODE_PXXV48_4K
+      KVM: selftests: Remove duplicate guest mode handling
+
+Sean Christopherson (30):
+      KVM: x86: Manually flush collapsible SPTEs only when toggling flags
+      KVM: x86: Relocate MMIO exit stats counting
+      KVM: x86: Clean up handle_emulation_failure()
+      KVM: x86: Refactor kvm_vcpu_do_singlestep() to remove out param
+      KVM: x86: Don't attempt VMWare emulation on #GP with non-zero error code
+      KVM: x86: Move #GP injection for VMware into x86_emulate_instruction()
+      KVM: x86: Add explicit flag for forced emulation on #UD
+      KVM: x86: Move #UD injection for failed emulation into emulation code
+      KVM: x86: Exit to userspace on emulation skip failure
+      KVM: x86: Handle emulation failure directly in kvm_task_switch()
+      KVM: x86: Move triple fault request into RM int injection
+      KVM: VMX: Remove EMULATE_FAIL handling in handle_invalid_guest_state()
+      KVM: x86: Remove emulation_result enums, EMULATE_{DONE,FAIL,USER_EXIT}
+      KVM: VMX: Handle single-step #DB for EMULTYPE_SKIP on EPT misconfig
+      KVM: x86: Add comments to document various emulation types
+      KVM: x86/mmu: Treat invalid shadow pages as obsolete
+      KVM: x86/mmu: Use fast invalidate mechanism to zap MMIO sptes
+      KVM: x86/mmu: Revert "Revert "KVM: MMU: show mmu_valid_gen in shadow page related tracepoints""
+      KVM: x86/mmu: Revert "Revert "KVM: MMU: add tracepoint for kvm_mmu_invalidate_all_pages""
+      KVM: x86/mmu: Revert "Revert "KVM: MMU: zap pages in batch""
+      KVM: x86/mmu: Revert "Revert "KVM: MMU: collapse TLB flushes when zap all pages""
+      KVM: x86/mmu: Revert "Revert "KVM: MMU: reclaim the zapped-obsolete page first""
+      KVM: x86/mmu: Revert "KVM: x86/mmu: Remove is_obsolete() call"
+      KVM: x86/mmu: Explicitly track only a single invalid mmu generation
+      KVM: x86/mmu: Skip invalid pages during zapping iff root_count is zero
+      KVM: x86: Check kvm_rebooting in kvm_spurious_fault()
+      KVM: VMX: Optimize VMX instruction error and fault handling
+      KVM: VMX: Add error handling to VMREAD helper
+      KVM: x86: Drop ____kvm_handle_fault_on_reboot()
+      KVM: x86: Don't check kvm_rebooting in __kvm_handle_fault_on_reboot()
+
+Tao Xu (3):
+      KVM: x86: Add support for user wait instructions
+      KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+      KVM: vmx: Introduce handle_unexpected_vmexit and handle WAITPKG vmexit
+
+Tianyu Lan (2):
+      x86/Hyper-V: Fix definition of struct hv_vp_assist_page
+      KVM/Hyper-V: Add new KVM capability KVM_CAP_HYPERV_DIRECT_TLBFLUSH
+
+Vitaly Kuznetsov (8):
+      KVM/Hyper-V/VMX: Add direct tlb flush support
+      KVM: x86: svm: remove unneeded nested_enable_evmcs() hook
+      KVM: x86: announce KVM_CAP_HYPERV_ENLIGHTENED_VMCS support only when it is available
+      cpu/SMT: create and export cpu_smt_possible()
+      KVM: x86: hyper-v: set NoNonArchitecturalCoreSharing CPUID bit when SMT is impossible
+      KVM: selftests: hyperv_cpuid: add check for NoNonArchitecturalCoreSharing bit
+      KVM: selftests: fix ucall on x86
+      KVM: vmx: fix build warnings in hv_enable_direct_tlbflush() on i386
+
+Wanpeng Li (3):
+      KVM: hyperv: Fix Direct Synthetic timers assert an interrupt w/o lapic_in_kernel
+      KVM: LAPIC: Tune lapic_timer_advance_ns smoothly
+      Revert "locking/pvqspinlock: Don't wait if vCPU is preempted"
+
+ Documentation/virt/kvm/api.txt                     |  13 +
+ arch/x86/include/asm/hyperv-tlfs.h                 |  31 ++-
+ arch/x86/include/asm/kvm_host.h                    |  64 +++--
+ arch/x86/include/asm/svm.h                         |   1 +
+ arch/x86/include/asm/vmx.h                         |   2 +
+ arch/x86/include/uapi/asm/svm.h                    |   1 +
+ arch/x86/include/uapi/asm/vmx.h                    |   6 +-
+ arch/x86/kernel/cpu/umwait.c                       |   6 +
+ arch/x86/kvm/cpuid.c                               |   8 +-
+ arch/x86/kvm/hyperv.c                              |  16 +-
+ arch/x86/kvm/lapic.c                               |  28 +-
+ arch/x86/kvm/lapic.h                               |   1 -
+ arch/x86/kvm/mmu.c                                 | 145 +++++-----
+ arch/x86/kvm/mmutrace.h                            |  42 ++-
+ arch/x86/kvm/svm.c                                 |  79 +++---
+ arch/x86/kvm/vmx/capabilities.h                    |   6 +
+ arch/x86/kvm/vmx/evmcs.h                           |   2 +
+ arch/x86/kvm/vmx/nested.c                          |  70 ++++-
+ arch/x86/kvm/vmx/ops.h                             |  93 ++++---
+ arch/x86/kvm/vmx/vmx.c                             | 306 ++++++++++++++-------
+ arch/x86/kvm/vmx/vmx.h                             |   9 +
+ arch/x86/kvm/x86.c                                 | 197 ++++++++-----
+ arch/x86/kvm/x86.h                                 |   2 +-
+ include/linux/cpu.h                                |   2 +
+ include/uapi/linux/kvm.h                           |   1 +
+ kernel/cpu.c                                       |  11 +-
+ kernel/locking/qspinlock_paravirt.h                |   2 +-
+ tools/objtool/check.c                              |   1 -
+ tools/testing/selftests/kvm/dirty_log_test.c       |  79 ++----
+ tools/testing/selftests/kvm/include/kvm_util.h     |  18 +-
+ .../selftests/kvm/include/x86_64/processor.h       |   3 +
+ .../testing/selftests/kvm/lib/aarch64/processor.c  |   3 +
+ tools/testing/selftests/kvm/lib/kvm_util.c         |  67 ++++-
+ tools/testing/selftests/kvm/lib/x86_64/processor.c |  30 +-
+ tools/testing/selftests/kvm/lib/x86_64/ucall.c     |   2 +-
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c  |  27 ++
+ 36 files changed, 906 insertions(+), 468 deletions(-)
