@@ -2,81 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 95808C0839
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 17:02:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15019C086B
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 17:19:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727952AbfI0PCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 11:02:20 -0400
-Received: from mga04.intel.com ([192.55.52.120]:61826 "EHLO mga04.intel.com"
+        id S1727517AbfI0PT3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 11:19:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39496 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727159AbfI0PCU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 11:02:20 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Sep 2019 08:02:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,555,1559545200"; 
-   d="scan'208";a="196740404"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 Sep 2019 08:02:19 -0700
-Date:   Fri, 27 Sep 2019 08:02:19 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>
-Subject: Re: [PATCH 1/2] KVM: nVMX: Always write vmcs02.GUEST_CR3 during
- nested VM-Enter
-Message-ID: <20190927150219.GB25513@linux.intel.com>
-References: <20190926214302.21990-1-sean.j.christopherson@intel.com>
- <20190926214302.21990-2-sean.j.christopherson@intel.com>
- <68340081-0094-4A74-9B33-3431F39659AA@oracle.com>
- <20190927142725.GC24889@linux.intel.com>
- <EF5C03E7-E3C2-4372-955C-06FB416EB164@oracle.com>
+        id S1727076AbfI0PT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 11:19:29 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id F19767FDFF
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 15:19:28 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id t11so1204960wrq.19
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 08:19:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=sdnXuMgVCkSQptdkOcAALAp2a/GdXCNohkF//CTeXXc=;
+        b=r/IeX24Kl0uVH8lwDmndtLcWf4nhmbTRhhkyjQ2bkqYouUBURbraUwFT3/M22WvlF9
+         Y3ouD38i5zY8yDLCVZHbRdgGQVawZu3ms9H7PhRVeZxVKHBFWlYEPpPIBJbZmPIO6/0b
+         afzuHglMDUrNacSdIrp0oZu6cL4ZbLF25mga+mZpR37AcE/fao2SQZeS9Jg6JgWM+LGt
+         mLSe60p/wyTxvA02Ihei7c5j2rEx/dpWDy4Sc7ACbu62zcSrNh6Cs96Ihf8pPxh6cpyf
+         a2i8rGjlJNMyCEL2lZQZaBLndCTlanBZWIpWORG8ufmGPfhuAWPpzb+HdayWXlccCAtH
+         V/UA==
+X-Gm-Message-State: APjAAAWC7VLSMmg0k4QXSReTh++sa06YQslIzbEsIb7h7jVF/U2YxjWx
+        NWrm8/7tm+EJFbcAJdtK6qyEhI4Ye/VVcyBZc6rCPmxlDNxv/OVRIngEckdJV5QZH3yjxbgCtcJ
+        mi1VBpQDzXitX
+X-Received: by 2002:a1c:a8d8:: with SMTP id r207mr7363853wme.135.1569597567586;
+        Fri, 27 Sep 2019 08:19:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxqPCNQ+D4SGupNg0RToIys4KdbhXv7CwXCoQHSs6eYcWy5AoelG7BoIvr5WDilwZ8IwvR+Iw==
+X-Received: by 2002:a1c:a8d8:: with SMTP id r207mr7363829wme.135.1569597567250;
+        Fri, 27 Sep 2019 08:19:27 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+        by smtp.gmail.com with ESMTPSA id c4sm2928725wru.31.2019.09.27.08.19.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Sep 2019 08:19:26 -0700 (PDT)
+Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Eric Hankland <ehankland@google.com>,
+        Peter Shier <pshier@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20190821182004.102768-1-jmattson@google.com>
+ <CALMp9eTtA5ZXJyWcOpe-pQ66X3sTgCR4-BHec_R3e1-j1FZyZw@mail.gmail.com>
+ <8907173e-9f27-6769-09fc-0b82c22d6352@oracle.com>
+ <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
+ <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com>
+ <CALMp9eQULvr5wKt1Aw3MR+tbeNgvA_4p__6n1YTkWjMHCaEmLw@mail.gmail.com>
+ <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com>
+ <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com>
+ <87ftkh6e19.fsf@vitty.brq.redhat.com>
+ <6e6f46fe-6e11-c5e3-d80c-327f77b91907@redhat.com>
+ <87d0fl6bv4.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <19db28c0-375a-7bc0-7151-db566ae85de6@redhat.com>
+Date:   Fri, 27 Sep 2019 17:19:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <87d0fl6bv4.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <EF5C03E7-E3C2-4372-955C-06FB416EB164@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 05:44:53PM +0300, Liran Alon wrote:
+On 27/09/19 16:40, Vitaly Kuznetsov wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 > 
-> > On 27 Sep 2019, at 17:27, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> > 
-> > On Fri, Sep 27, 2019 at 03:06:02AM +0300, Liran Alon wrote:
-> >> 
-> >>> On 27 Sep 2019, at 0:43, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
-> >>> 
-> >>> +	/*
-> >>> +	 * Immediately write vmcs02.GUEST_CR3.  It will be propagated to vmcs12
-> >>> +	 * on nested VM-Exit, which can occur without actually running L2, e.g.
-> >>> +	 * if L2 is entering HLT state, and thus without hitting vmx_set_cr3().
-> >>> +	 */
-> >> 
-> >> If I understand correctly, it’s not exactly if L2 is entering HLT state in
-> >> general.  (E.g. issue doesn’t occur if L2 runs HLT directly which is not
-> >> configured to be intercepted by vmcs12).  It’s specifically when L1 enters L2
-> >> with a HLT guest-activity-state. I suggest rephrasing comment.
-> > 
-> > I deliberately worded the comment so that it remains valid if there are
-> > more conditions in the future that cause KVM to skip running L2.  What if
-> > I split the difference and make the changelog more explicit, but leave the
-> > comment as is?
+>> On 27/09/19 15:53, Vitaly Kuznetsov wrote:
+>>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>>
+>>>> Queued, thanks.
+>>>
+>>> I'm sorry for late feedback but this commit seems to be causing
+>>> selftests failures for me, e.g.:
+>>>
+>>> # ./x86_64/state_test 
+>>> Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
+>>> Guest physical address width detected: 46
+>>> ==== Test Assertion Failure ====
+>>>   lib/x86_64/processor.c:1089: r == nmsrs
+>>>   pid=14431 tid=14431 - Argument list too long
+>>>      1	0x000000000040a55f: vcpu_save_state at processor.c:1088 (discriminator 3)
+>>>      2	0x00000000004010e3: main at state_test.c:171 (discriminator 4)
+>>>      3	0x00007f881eb453d4: ?? ??:0
+>>>      4	0x0000000000401287: _start at ??:?
+>>>   Unexpected result from KVM_GET_MSRS, r: 36 (failed at 194)
+>>>
+>>> Is this something known already or should I investigate?
+>>
+>> No, I didn't know about it, it works here.
+>>
 > 
-> I think what is confusing in comment is that it seems to also refer to the case
-> where L2 directly enters HLT state without L1 intercept. Which isn’t related.
-> So I would explicitly mention it’s when L1 enters L2 but don’t physically enter guest
-> with vmcs02 because L2 is in HLT state.
+> Ok, this is a bit weird :-) '194' is 'MSR_ARCH_PERFMON_EVENTSEL0 +
+> 14'. In intel_pmu_refresh() nr_arch_gp_counters is set to '8', however,
+> rdmsr_safe() for this MSR passes in kvm_init_msr_list() (but it fails
+> for 0x18e..0x193!) so it stay in the list. get_gp_pmc(), however, checks
+> it against nr_arch_gp_counters and returns a failure.
 
-Ah, gotcha, I'll tweak the wording.
+Huh, 194h apparently is a "FLEX_RATIO" MSR.  I agree that PMU MSRs need
+to be checked against CPUID before allowing them.
+
+Paolo
+
+> Oh, btw, this is Intel(R) Xeon(R) CPU E5-2603 v3
+> 
+> So apparently rdmsr_safe() check in kvm_init_msr_list() is not enough,
+> for PMU MSRs we need to do extra.
+
+
+
