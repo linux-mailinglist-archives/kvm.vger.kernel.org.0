@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38C26C0519
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 14:25:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E52DC051D
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 14:26:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727296AbfI0MZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 08:25:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42714 "EHLO mx1.redhat.com"
+        id S1727358AbfI0M0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 08:26:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36396 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726203AbfI0MZo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 08:25:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1725992AbfI0M0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 08:26:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 85D023067319;
-        Fri, 27 Sep 2019 12:25:44 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 86F4A301A3AE;
+        Fri, 27 Sep 2019 12:26:39 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 896D060C44;
-        Fri, 27 Sep 2019 12:25:43 +0000 (UTC)
-Date:   Fri, 27 Sep 2019 14:25:41 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 157176092F;
+        Fri, 27 Sep 2019 12:26:37 +0000 (UTC)
+Date:   Fri, 27 Sep 2019 14:26:35 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Andre Przywara <andre.przywara@arm.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 3/6] arm: timer: Split variable output
+Subject: Re: [kvm-unit-tests PATCH 4/6] arm: selftest: Split variable output
  data from test name
-Message-ID: <20190927122541.gci5duthtetiwjo4@kamzik.brq.redhat.com>
+Message-ID: <20190927122635.mqrmbltk2qevfl24@kamzik.brq.redhat.com>
 References: <20190927104227.253466-1-andre.przywara@arm.com>
- <20190927104227.253466-4-andre.przywara@arm.com>
+ <20190927104227.253466-5-andre.przywara@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190927104227.253466-4-andre.przywara@arm.com>
+In-Reply-To: <20190927104227.253466-5-andre.przywara@arm.com>
 User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Fri, 27 Sep 2019 12:25:44 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 27 Sep 2019 12:26:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 11:42:24AM +0100, Andre Przywara wrote:
+On Fri, Sep 27, 2019 at 11:42:25AM +0100, Andre Przywara wrote:
 > For some tests we mix variable diagnostic output with the test name,
 > which leads to variable test line, confusing some higher level
 > frameworks.
@@ -51,23 +51,33 @@ On Fri, Sep 27, 2019 at 11:42:24AM +0100, Andre Przywara wrote:
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  arm/timer.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  arm/selftest.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arm/timer.c b/arm/timer.c
-> index f2f6019..0b808d5 100644
-> --- a/arm/timer.c
-> +++ b/arm/timer.c
-> @@ -249,7 +249,8 @@ static void test_timer(struct timer_info *info)
->  	local_irq_enable();
->  	left = info->read_tval();
->  	report("interrupt received after TVAL/WFI", info->irq_received);
-> -	report("timer has expired (%d)", left < 0, left);
-> +	report("timer has expired", left < 0);
-> +	report_info("TVAL is %d ticks", left);
->  }
+> diff --git a/arm/selftest.c b/arm/selftest.c
+> index 28a17f7..a0c1ab8 100644
+> --- a/arm/selftest.c
+> +++ b/arm/selftest.c
+> @@ -43,13 +43,16 @@ static void check_setup(int argc, char **argv)
+>  			phys_addr_t memsize = PHYS_END - PHYS_OFFSET;
+>  			phys_addr_t expected = ((phys_addr_t)val)*1024*1024;
 >  
->  static void test_vtimer(void)
+> -			report("size = %" PRIu64 " MB", memsize == expected,
+> -							memsize/1024/1024);
+> +			report("memory size matches expectation",
+> +			       memsize == expected);
+> +			report_info("found %" PRIu64 " MB", memsize/1024/1024);
+>  			++nr_tests;
+>  
+>  		} else if (strcmp(argv[i], "smp") == 0) {
+>  
+> -			report("nr_cpus = %d", nr_cpus == (int)val, nr_cpus);
+> +			report("number of CPUs matches expectation",
+> +			       nr_cpus == (int)val);
+> +			report_info("found %d CPUs", nr_cpus);
+>  			++nr_tests;
+>  		}
+>  
 > -- 
 > 2.17.1
 >
