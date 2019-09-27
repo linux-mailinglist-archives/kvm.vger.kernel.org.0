@@ -2,97 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D3861C091E
-	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 18:04:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 056FAC090F
+	for <lists+kvm@lfdr.de>; Fri, 27 Sep 2019 18:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727563AbfI0QEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 12:04:55 -0400
-Received: from mga05.intel.com ([192.55.52.43]:24556 "EHLO mga05.intel.com"
+        id S1727355AbfI0QBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 12:01:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58694 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727447AbfI0QEz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 12:04:55 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Sep 2019 09:04:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,556,1559545200"; 
-   d="scan'208";a="202066420"
-Received: from lxy-dell.sh.intel.com ([10.239.159.46])
-  by orsmga002.jf.intel.com with ESMTP; 27 Sep 2019 09:04:52 -0700
-Message-ID: <59934fa75540d493dabade5a3e66b7ed159c4aae.camel@intel.com>
+        id S1726251AbfI0QBV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 12:01:21 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E82F769066
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 16:01:20 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id w8so1305852wrm.3
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 09:01:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SYUf3269swMCb356I8ten6acxDaLYy9zQ3oYoIzC4oc=;
+        b=tg/Mj9mffOH44BLqGiLbD7amr1BuZWTsuixVNGIhDBhpWAs7bdXXXrB+7mqPMlFE8/
+         GSG2i/dDHFQBEL5U2bPMksRPwuwX85IBKmE71kKXQibzuUfard+GvIQV7Heaet1cMO33
+         z2+RxoNJfdWhA0rAtUvMEgqpi564xyFlmjNhf/zk3ZQVlDvaj6vACZvAZlRjCmufmtfc
+         qwC4yOlbEuyYMXTmM+TCVSUWgly9oTcdebFyynQvvbercSPywAvptnjKJWa6KpY74gfY
+         A0Lu9WiCRefhA8pYI2g5QAEI/H7n3J7O7T4jC3SsAvGI7rpa/hbDHxhtnXTAho6I+LUR
+         J2Zg==
+X-Gm-Message-State: APjAAAVjyZPeh1Cl2u/EcdYFqKFG3hPsvko6VaRgbF96q+NSCwsaUEce
+        ixd7Do914fK/snnrHP0ibUGdFaxMNK9Z6Rfr1H+tufnxY7u6+th1haVUpdZduSoKNJjc1mYeLDJ
+        GE9bI43USXkRX
+X-Received: by 2002:a05:600c:118a:: with SMTP id i10mr937728wmf.80.1569600079574;
+        Fri, 27 Sep 2019 09:01:19 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxE2IgzLWO4GNLc7NBrPVSYif8q+vO+5CAneWuBqXudRIz16uLNlUao7ZiwB9xjb13xe+59Rg==
+X-Received: by 2002:a05:600c:118a:: with SMTP id i10mr937695wmf.80.1569600079310;
+        Fri, 27 Sep 2019 09:01:19 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36? ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+        by smtp.gmail.com with ESMTPSA id c18sm4263587wrv.10.2019.09.27.09.01.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Sep 2019 09:01:18 -0700 (PDT)
 Subject: Re: [PATCH] kvm: x86: Add Intel PMU MSRs to msrs_to_save[]
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
+To:     Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
         Eric Hankland <ehankland@google.com>,
         Peter Shier <pshier@google.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Date:   Fri, 27 Sep 2019 23:58:40 +0800
-In-Reply-To: <87a7ap68st.fsf@vitty.brq.redhat.com>
 References: <8907173e-9f27-6769-09fc-0b82c22d6352@oracle.com>
-         <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
-         <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com>
-         <CALMp9eQULvr5wKt1Aw3MR+tbeNgvA_4p__6n1YTkWjMHCaEmLw@mail.gmail.com>
-         <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com>
-         <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com>
-         <87ftkh6e19.fsf@vitty.brq.redhat.com>
-         <6e6f46fe-6e11-c5e3-d80c-327f77b91907@redhat.com>
-         <87d0fl6bv4.fsf@vitty.brq.redhat.com>
-         <19db28c0-375a-7bc0-7151-db566ae85de6@redhat.com>
-         <20190927152608.GC25513@linux.intel.com>
-         <87a7ap68st.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
+ <CALMp9eSkognb2hJSuENK+5PSgE8sYzQP=4ioERge6ZaFg1=PEA@mail.gmail.com>
+ <cb7c570c-389c-2e96-ba46-555218ba60ed@oracle.com>
+ <CALMp9eQULvr5wKt1Aw3MR+tbeNgvA_4p__6n1YTkWjMHCaEmLw@mail.gmail.com>
+ <CALMp9eS1fUVcnVHhty60fUgk3-NuvELMOUFqQmqPLE-Nqy0dFQ@mail.gmail.com>
+ <56e7fad0-d577-41db-0b81-363975dc2ca7@redhat.com>
+ <87ftkh6e19.fsf@vitty.brq.redhat.com>
+ <6e6f46fe-6e11-c5e3-d80c-327f77b91907@redhat.com>
+ <87d0fl6bv4.fsf@vitty.brq.redhat.com>
+ <19db28c0-375a-7bc0-7151-db566ae85de6@redhat.com>
+ <20190927152608.GC25513@linux.intel.com>
+ <87a7ap68st.fsf@vitty.brq.redhat.com>
+ <CALMp9eTqWamhCb6cu7AvnVi0u0Y2c5HsG3iaktNANa-JfBODLw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <61949e86-b42d-f658-f10a-e220fe04ae4d@redhat.com>
+Date:   Fri, 27 Sep 2019 18:01:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eTqWamhCb6cu7AvnVi0u0Y2c5HsG3iaktNANa-JfBODLw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2019-09-27 at 17:46 +0200, Vitaly Kuznetsov wrote:
-> > > > > > Is this something known already or should I investigate?
-> > > > > 
-> > > > > No, I didn't know about it, it works here.
-> > > > > 
-> > > > 
-> > > > Ok, this is a bit weird :-) '194' is 'MSR_ARCH_PERFMON_EVENTSEL0 +
-> > > > 14'. In intel_pmu_refresh() nr_arch_gp_counters is set to '8', however,
-> > > > rdmsr_safe() for this MSR passes in kvm_init_msr_list() (but it fails
-> > > > for 0x18e..0x193!) so it stay in the list. get_gp_pmc(), however, checks
-> > > > it against nr_arch_gp_counters and returns a failure.
-> > > 
-> > > Huh, 194h apparently is a "FLEX_RATIO" MSR.  I agree that PMU MSRs need
-> > > to be checked against CPUID before allowing them.
-> > 
-> > My vote would be to programmatically generate the MSRs using CPUID and the
-> > base MSR, as opposed to dumping them into the list and cross-referencing
-> > them against CPUID.  E.g. there should also be some form of check that the
-> > architectural PMUs are even supported.
+On 27/09/19 17:55, Jim Mattson wrote:
+>> "KVM_GET_MSR_INDEX_LIST returns the guest msrs that are supported.  The list
+>> varies by kvm version and host processor, but does not change otherwise."
+>>
+>> So it seems that PMU MSRs just can't be there. Revert?
 > 
-> Yes. The problem appears to be that msrs_to_save[] and emulated_msrs[]
-> are global and for the MSRs in question we check
-> kvm_find_cpuid_entry(vcpu, 0xa, ) to find out how many of them are
-> available so this can be different for different VMs (and even vCPUs :-)
-> However,
-> 
-> "KVM_GET_MSR_INDEX_LIST returns the guest msrs that are supported.  The list
-> varies by kvm version and host processor, but does not change otherwise."
-> 
+> The API design is unfortunate, but I would argue that any MSR that a
+> guest *might* support has to be in this list for live migration to
+> work with the vPMU enabled.
 
-Indeed, "KVM_GET_MSR_INDEX_LIST" returns the guest msrs that KVM supports and
-they are free from different guest configuration since they're initialized when
-kvm module is loaded.
+In theory yes, in practice this breaks any userspace that (such as
+state_test) blindly takes the list and passes it to KVM_GET_MSR.
 
-Even though some MSRs are not exposed to guest by clear their related cpuid
-bits, they are still saved/restored by QEMU in the same fashion.
+> I don't know about qemu, but Google's
+> userspace will only save/restore MSRs that are in this list
 
-I wonder should we change "KVM_GET_MSR_INDEX_LIST" per VM?
+Almost, there are a few MSRs that it saves/restores always (TSC,
+kvmclock, MTRR, PAT, sysenter CS/ESP/EIP, and on 64-bit machines
+CSTAR/KERNELGSBASE/FMASK/LSTAR) and some where it compiles the list fom
+KVM_GET_SUPPORTED_CPUID information (the PMU and processor tracing).
 
-> So it seems that PMU MSRs just can't be there. Revert?
-> 
+Of these, PMU and processor tracing seem to be the only one that vary
+per VM.  So yeah, it needs to be reverted I suppose.
 
+Paolo
