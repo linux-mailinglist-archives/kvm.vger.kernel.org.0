@@ -2,54 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CF11C0E69
-	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 01:41:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60BDBC0F3C
+	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 03:42:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728200AbfI0Xkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Sep 2019 19:40:51 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:35217 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725990AbfI0Xkv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Sep 2019 19:40:51 -0400
-Received: by mail-lf1-f67.google.com with SMTP id w6so3114025lfl.2;
-        Fri, 27 Sep 2019 16:40:46 -0700 (PDT)
+        id S1728244AbfI1BlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Sep 2019 21:41:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52724 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725990AbfI1BlA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Sep 2019 21:41:00 -0400
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5AA2718C37B
+        for <kvm@vger.kernel.org>; Sat, 28 Sep 2019 01:40:59 +0000 (UTC)
+Received: by mail-pf1-f197.google.com with SMTP id i28so3114775pfq.16
+        for <kvm@vger.kernel.org>; Fri, 27 Sep 2019 18:40:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/vjA3feuVjhECJGCJlv7w7hKdoWzVAzTRzB0psX8g5s=;
-        b=cyYcyUamH/ZJxf1UPzvn/4gz0YorW7s+CfbhnVmploaBcmV29oJLvYo3uJwU0mjY58
-         3LWWSqUd8ot/ev0O7q3aZAJpUR1POuZMfY2vKm0V3xuUf7ZeMNZjutuJHIavuOa4azPF
-         XRNkWfLv6RBEMZcJX4IfJT5Z74EzX4Zvlb9ZknQvFacosYbT+VGJcv4Mq2iJhNU6D/Rt
-         hRwKC4wEfDeURwXeCr6uxvYfkyWO2U6rV+P7GGXXdtoEHmqk5vLIgYXe3uF8HCavjLaD
-         wG703e3baIwYGGDSZILhLVcOM/afcTqJG6Ume4iYUaX9aFh0llteu5a4JB4M53kygSxa
-         6Acw==
-X-Gm-Message-State: APjAAAXafwV/kRJo63q6NYOpyM5CSiynf+c+Iq9sebobZLx66zGoXoeb
-        pT2b/y18TMmkWfo3zr3cjKE=
-X-Google-Smtp-Source: APXvYqzJjAsZOxffDP6X1PyAJObAmIHMhsLPPyKIAwdxjZFuFJU1hlQRv1yAEhIhnnum3sSXraXujg==
-X-Received: by 2002:ac2:568c:: with SMTP id 12mr4300543lfr.133.1569627646034;
-        Fri, 27 Sep 2019 16:40:46 -0700 (PDT)
-Received: from localhost.localdomain (broadband-188-32-48-208.ip.moscow.rt.ru. [188.32.48.208])
-        by smtp.googlemail.com with ESMTPSA id x25sm778810ljb.60.2019.09.27.16.40.44
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ky42kKvEgu1tdZiOICEE1JQBSJf2IPpUikQsHQIbtbs=;
+        b=auZX9s2I3GXDTWUSiS4dQAHJOcecMoH8tWr0qgur5N/uVBu8r7pBxaZZu5jllYGzrs
+         SqhKDQxCTkty8xEjeBSwzGt9MWiakGbMHLGHGX49rcU4YcMfJ2rziQW9wdj8rrAGKuu8
+         3+h/wUgdaCmdY8gueQd+QsHr71h7wCx6qyrlX86DpfNTU1W+Ual/lkM9foW51l4HC3kg
+         AHzdFo7NJmGn22eAZsu5rR/EfkbrZ0grPz6LDo/HAx3iOONGdeeLpnb6EflVn6llvX32
+         /CodLP1C+SD+qTbXBseqZDEOuN9KXeiciKUuX/T3NoxbVbEhEsSTJ8N+DaxGIhTlTczt
+         4dXw==
+X-Gm-Message-State: APjAAAWSJfMK9r8nj6li7t5wlsd3xjPwhKi8W82klBGncTSVWkzp2RDl
+        5KxQhL7VR9Ys5mYc5zr9dR5lrdC7Ia9oNplBwkRCbDg1/S0q6a7JY1N++BY26siM0lLuZLj+TRP
+        LAj18zxexkAJi
+X-Received: by 2002:a17:902:6c:: with SMTP id 99mr8033102pla.89.1569634858863;
+        Fri, 27 Sep 2019 18:40:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyBPMPLxsYGBRQQZkg2NdMe7+vlXq7pC8C3qOB86cmiFcfzkMiTyNDISkn8pQJFgJ8cCCb4FQ==
+X-Received: by 2002:a17:902:6c:: with SMTP id 99mr8033093pla.89.1569634858663;
+        Fri, 27 Sep 2019 18:40:58 -0700 (PDT)
+Received: from xz-x1.redhat.com ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id z12sm4196455pfj.41.2019.09.27.18.40.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Sep 2019 16:40:45 -0700 (PDT)
-From:   Denis Efremov <efremov@linux.com>
-To:     Bjorn Helgaas <bhelgaas@google.com>
-Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        x86@kernel.org, linux-s390@vger.kernel.org,
-        linux-alpha@vger.kernel.org, linux-ia64@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-usb@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-serial@vger.kernel.org, linux-mmc@vger.kernel.org
-Subject: [PATCH RESEND v3 00/26] Add definition for the number of standard PCI BARs
-Date:   Sat, 28 Sep 2019 02:40:26 +0300
-Message-Id: <20190927234026.23342-1-efremov@linux.com>
+        Fri, 27 Sep 2019 18:40:57 -0700 (PDT)
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH] KVM: Unlimit number of ioeventfd assignments for real
+Date:   Sat, 28 Sep 2019 09:40:45 +0800
+Message-Id: <20190928014045.10721-1-peterx@redhat.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190916204158.6889-3-efremov@linux.com>
-References: <20190916204158.6889-3-efremov@linux.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -57,104 +58,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Code that iterates over all standard PCI BARs typically uses
-PCI_STD_RESOURCE_END, but this is error-prone because it requires
-"i <= PCI_STD_RESOURCE_END" rather than something like
-"i < PCI_STD_NUM_BARS". We could add such a definition and use it the same
-way PCI_SRIOV_NUM_BARS is used. The patchset also replaces constant (6)
-with new define PCI_STD_NUM_BARS where appropriate and removes local
-declarations for the number of PCI BARs.
+Previously we've tried to unlimit ioeventfd creation (6ea34c9b78c1,
+"kvm: exclude ioeventfd from counting kvm_io_range limit",
+2013-06-04), because that can be easily done by fd limitations and
+otherwise it can easily reach the current maximum of 1000 iodevices.
+Meanwhile, we still use the counter to limit the maximum allowed kvm
+io devices to be created besides ioeventfd.
 
-Changes in v3:
-  - Updated commits description.
-  - Refactored "< PCI_ROM_RESOURCE" with "< PCI_STD_NUM_BARS" in loops.
-  - Refactored "<= BAR_5" with "< PCI_STD_NUM_BARS" in loops.
-  - Removed local define GASKET_NUM_BARS.
-  - Removed local define PCI_NUM_BAR_RESOURCES.
+6ea34c9b78c1 achieved that in most cases, however it'll still fali the
+ioeventfd creation when non-ioeventfd io devices overflows to 1000.
+Then the next ioeventfd creation will fail while logically it should
+be the next non-ioeventfd iodevice creation to fail.
 
-Changes in v2:
-  - Reversed checks in pci_iomap_range,pci_iomap_wc_range.
-  - Refactored loops in vfio_pci to keep PCI_STD_RESOURCES.
-  - Added 2 new patches to replace the magic constant with new define.
-  - Splitted net patch in v1 to separate stmmac and dwc-xlgmac patches.
+That's not really a big problem at all because when it happens it
+probably means something has leaked in userspace (or even malicious
+program) so it's a bug to fix there.  However the error message like
+"ioeventfd creation failed" with an -ENOSPACE is really confusing and
+may let people think about the fact that it's the ioeventfd that is
+leaked (while in most cases it's not!).
 
-Denis Efremov (26):
-  PCI: Add define for the number of standard PCI BARs
-  PCI: hv: Use PCI_STD_NUM_BARS
-  PCI: dwc: Use PCI_STD_NUM_BARS
-  PCI: endpoint: Use PCI_STD_NUM_BARS
-  misc: pci_endpoint_test: Use PCI_STD_NUM_BARS
-  s390/pci: Use PCI_STD_NUM_BARS
-  x86/PCI: Loop using PCI_STD_NUM_BARS
-  alpha/PCI: Use PCI_STD_NUM_BARS
-  ia64: Use PCI_STD_NUM_BARS
-  stmmac: pci: Loop using PCI_STD_NUM_BARS
-  net: dwc-xlgmac: Loop using PCI_STD_NUM_BARS
-  ixgb: use PCI_STD_NUM_BARS
-  e1000: Use PCI_STD_NUM_BARS
-  rapidio/tsi721: Loop using PCI_STD_NUM_BARS
-  efifb: Loop using PCI_STD_NUM_BARS
-  fbmem: use PCI_STD_NUM_BARS
-  vfio_pci: Loop using PCI_STD_NUM_BARS
-  scsi: pm80xx: Use PCI_STD_NUM_BARS
-  ata: sata_nv: Use PCI_STD_NUM_BARS
-  staging: gasket: Use PCI_STD_NUM_BARS
-  serial: 8250_pci: Use PCI_STD_NUM_BARS
-  pata_atp867x: Use PCI_STD_NUM_BARS
-  memstick: use PCI_STD_NUM_BARS
-  USB: core: Use PCI_STD_NUM_BARS
-  usb: pci-quirks: Use PCI_STD_NUM_BARS
-  devres: use PCI_STD_NUM_BARS
+Let's use this patch to unlimit the creation of ioeventfd for real
+this time, assuming this is also a bugfix of 6ea34c9b78c1.  To me more
+importantly, when with a bug in userspace this patch can probably give
+us another more meaningful failure on what has overflowed/leaked
+rather than "ioeventfd creation failure: -ENOSPC".
 
- arch/alpha/kernel/pci-sysfs.c                 |  8 ++---
- arch/ia64/sn/pci/pcibr/pcibr_dma.c            |  4 +--
- arch/s390/include/asm/pci.h                   |  5 +--
- arch/s390/include/asm/pci_clp.h               |  6 ++--
- arch/s390/pci/pci.c                           | 16 +++++-----
- arch/s390/pci/pci_clp.c                       |  6 ++--
- arch/x86/pci/common.c                         |  2 +-
- arch/x86/pci/intel_mid_pci.c                  |  2 +-
- drivers/ata/pata_atp867x.c                    |  2 +-
- drivers/ata/sata_nv.c                         |  2 +-
- drivers/memstick/host/jmb38x_ms.c             |  2 +-
- drivers/misc/pci_endpoint_test.c              |  8 ++---
- drivers/net/ethernet/intel/e1000/e1000.h      |  1 -
- drivers/net/ethernet/intel/e1000/e1000_main.c |  2 +-
- drivers/net/ethernet/intel/ixgb/ixgb.h        |  1 -
- drivers/net/ethernet/intel/ixgb/ixgb_main.c   |  2 +-
- .../net/ethernet/stmicro/stmmac/stmmac_pci.c  |  4 +--
- .../net/ethernet/synopsys/dwc-xlgmac-pci.c    |  2 +-
- drivers/pci/controller/dwc/pci-dra7xx.c       |  2 +-
- .../pci/controller/dwc/pci-layerscape-ep.c    |  2 +-
- drivers/pci/controller/dwc/pcie-artpec6.c     |  2 +-
- .../pci/controller/dwc/pcie-designware-plat.c |  2 +-
- drivers/pci/controller/dwc/pcie-designware.h  |  2 +-
- drivers/pci/controller/pci-hyperv.c           | 10 +++---
- drivers/pci/endpoint/functions/pci-epf-test.c | 10 +++---
- drivers/pci/pci-sysfs.c                       |  4 +--
- drivers/pci/pci.c                             | 13 ++++----
- drivers/pci/proc.c                            |  4 +--
- drivers/pci/quirks.c                          |  4 +--
- drivers/rapidio/devices/tsi721.c              |  2 +-
- drivers/scsi/pm8001/pm8001_hwi.c              |  2 +-
- drivers/scsi/pm8001/pm8001_init.c             |  2 +-
- drivers/staging/gasket/gasket_constants.h     |  3 --
- drivers/staging/gasket/gasket_core.c          | 12 +++----
- drivers/staging/gasket/gasket_core.h          |  4 +--
- drivers/tty/serial/8250/8250_pci.c            |  8 ++---
- drivers/usb/core/hcd-pci.c                    |  2 +-
- drivers/usb/host/pci-quirks.c                 |  2 +-
- drivers/vfio/pci/vfio_pci.c                   | 11 ++++---
- drivers/vfio/pci/vfio_pci_config.c            | 32 ++++++++++---------
- drivers/vfio/pci/vfio_pci_private.h           |  4 +--
- drivers/video/fbdev/core/fbmem.c              |  4 +--
- drivers/video/fbdev/efifb.c                   |  2 +-
- include/linux/pci-epc.h                       |  2 +-
- include/linux/pci.h                           |  2 +-
- include/uapi/linux/pci_regs.h                 |  1 +
- lib/devres.c                                  |  2 +-
- 47 files changed, 112 insertions(+), 115 deletions(-)
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/linux/kvm_host.h |  3 +++
+ virt/kvm/eventfd.c       |  4 ++--
+ virt/kvm/kvm_main.c      | 23 ++++++++++++++++++++---
+ 3 files changed, 25 insertions(+), 5 deletions(-)
 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index fcb46b3374c6..d8530e7d85d4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -192,6 +192,9 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
+ 		    int len, void *val);
+ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+ 			    int len, struct kvm_io_device *dev);
++int kvm_io_bus_register_dev_ioeventfd(struct kvm *kvm, enum kvm_bus bus_idx,
++				      gpa_t addr, int len,
++				      struct kvm_io_device *dev);
+ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+ 			       struct kvm_io_device *dev);
+ struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 67b6fc153e9c..3cb0e1c3279b 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -823,8 +823,8 @@ static int kvm_assign_ioeventfd_idx(struct kvm *kvm,
+ 
+ 	kvm_iodevice_init(&p->dev, &ioeventfd_ops);
+ 
+-	ret = kvm_io_bus_register_dev(kvm, bus_idx, p->addr, p->length,
+-				      &p->dev);
++	ret = kvm_io_bus_register_dev_ioeventfd(kvm, bus_idx, p->addr,
++						p->length, &p->dev);
+ 	if (ret < 0)
+ 		goto unlock_fail;
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c6a91b044d8d..242cfcaa9a56 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3809,8 +3809,10 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
+ }
+ 
+ /* Caller must hold slots_lock. */
+-int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+-			    int len, struct kvm_io_device *dev)
++static int __kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx,
++				     gpa_t addr, int len,
++				     struct kvm_io_device *dev,
++				     bool check_limit)
+ {
+ 	int i;
+ 	struct kvm_io_bus *new_bus, *bus;
+@@ -3821,7 +3823,8 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+ 		return -ENOMEM;
+ 
+ 	/* exclude ioeventfd which is limited by maximum fd */
+-	if (bus->dev_count - bus->ioeventfd_count > NR_IOBUS_DEVS - 1)
++	if (check_limit &&
++	    (bus->dev_count - bus->ioeventfd_count > NR_IOBUS_DEVS - 1))
+ 		return -ENOSPC;
+ 
+ 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count + 1),
+@@ -3851,6 +3854,20 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+ 	return 0;
+ }
+ 
++int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
++			    int len, struct kvm_io_device *dev)
++{
++	return __kvm_io_bus_register_dev(kvm, bus_idx, addr, len, dev, true);
++}
++
++int kvm_io_bus_register_dev_ioeventfd(struct kvm *kvm, enum kvm_bus bus_idx,
++				      gpa_t addr, int len,
++				      struct kvm_io_device *dev)
++{
++	return __kvm_io_bus_register_dev(kvm, bus_idx, addr, len, dev, false);
++}
++
++
+ /* Caller must hold slots_lock. */
+ void kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+ 			       struct kvm_io_device *dev)
 -- 
 2.21.0
 
