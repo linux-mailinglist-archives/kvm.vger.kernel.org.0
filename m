@@ -2,119 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C5CC1058
-	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 11:17:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18903C1178
+	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 19:23:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbfI1JPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Sep 2019 05:15:13 -0400
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:40500 "EHLO
-        9.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbfI1JPN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Sep 2019 05:15:13 -0400
-X-Greylist: delayed 602 seconds by postgrey-1.27 at vger.kernel.org; Sat, 28 Sep 2019 05:15:12 EDT
-Received: from player731.ha.ovh.net (unknown [10.108.54.52])
-        by mo179.mail-out.ovh.net (Postfix) with ESMTP id DFCE11427D8
-        for <kvm@vger.kernel.org>; Sat, 28 Sep 2019 10:55:34 +0200 (CEST)
-Received: from sk2.org (gw.sk2.org [88.186.243.14])
-        (Authenticated sender: steve@sk2.org)
-        by player731.ha.ovh.net (Postfix) with ESMTPSA id 6DB3AA260E0B;
-        Sat, 28 Sep 2019 08:55:23 +0000 (UTC)
-Date:   Sat, 28 Sep 2019 10:55:57 +0200
-From:   Stephen Kitt <steve@sk2.org>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     linux-doc@vger.kernel.org, bpf@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-afs@lists.infradead.org,
-        kvm@vger.kernel.org,
-        "Gustavo A . R . Silva" <gustavo@embeddedor.com>
-Subject: Re: [PATCH] docs: use flexible array members, not zero-length
-Message-ID: <20190928105557.221fb119@heffalump.sk2.org>
-In-Reply-To: <20190928011639.7c983e77@lwn.net>
-References: <20190927142927.27968-1-steve@sk2.org>
-        <20190928011639.7c983e77@lwn.net>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1728693AbfI1RXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Sep 2019 13:23:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33720 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725897AbfI1RXY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Sep 2019 13:23:24 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 82B6690B0A;
+        Sat, 28 Sep 2019 17:23:24 +0000 (UTC)
+Received: from mail (ovpn-125-159.rdu2.redhat.com [10.10.125.159])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 48291261B8;
+        Sat, 28 Sep 2019 17:23:24 +0000 (UTC)
+From:   Andrea Arcangeli <aarcange@redhat.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH 00/14] KVM monolithic v2
+Date:   Sat, 28 Sep 2019 13:23:09 -0400
+Message-Id: <20190928172323.14663-1-aarcange@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
- boundary="Sig_/6lwZ.M0KIAOHFlu0tCvHt6N"; protocol="application/pgp-signature"
-X-Ovh-Tracer-Id: 2307531860306840965
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeekgddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Sat, 28 Sep 2019 17:23:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/6lwZ.M0KIAOHFlu0tCvHt6N
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On Sat, 28 Sep 2019 01:16:39 -0600, Jonathan Corbet <corbet@lwn.net> wrote:
-> On Fri, 27 Sep 2019 16:29:27 +0200
-> Stephen Kitt <steve@sk2.org> wrote:
-> > diff --git a/Documentation/bpf/btf.rst b/Documentation/bpf/btf.rst
-> > index 4d565d202ce3..24ce50fc1fc1 100644
-> > --- a/Documentation/bpf/btf.rst
-> > +++ b/Documentation/bpf/btf.rst
-> > @@ -670,7 +670,7 @@ func_info for each specific ELF section.::
-> >          __u32   sec_name_off; /* offset to section name */
-> >          __u32   num_info;
-> >          /* Followed by num_info * record_size number of bytes */
-> > -        __u8    data[0];
-> > +        __u8    data[];
-> >       }; =20
->=20
-> I only checked this one, but found what I had expected: the actual
-> definition of this structure (found in tools/lib/bpf/libbpf_internal.h)
-> says "data[0]".  We can't really make the documentation read the way we
-> *wish* the source would be, we need to document reality.
->=20
-> I'm pretty sure that most of the other examples will be the same.
+as usual the last 4 patches could be splitted off but I did more
+measurements in that area and I altered the commit headers. They're
+fairly small commits compared to the previous part so I kept it
+considering they're needed to benchmark the previous part.
 
-Aargh, yes, of course, thanks for checking! I was locked in a =E2=80=9Cpres=
-criptive=E2=80=9D
-documentation mode, but this type of documentation has to be descriptive
-since it=E2=80=99s documenting shared structures, not structures which deve=
-lopers
-have to write.
+The KVM monolithic enhancement is easy to identify checking the word
+"monolithic" in the subject so there's no confusion about where that
+work stops.
 
-> If you really want to fix these, the right solution is to fix the offendi=
-ng
-> structures =E2=80=94 one patch per structure =E2=80=94 in the source, the=
-n update the
-> documentation to match the new reality.
+This renames all functions in place mixed up in whatever location they
+existed in svm.c or vmx.c. If they require an inline call they're
+defined now as extern before the kvm_x86_ops structure.
 
-Yes. I have a Coccinelle script which takes care of the code, but it doesn=
-=E2=80=99t
-work for docs ;-).
+Converting those small kvm_x86 functions to inlines requires more
+Makefile work and header restructuring so it's left for later.
 
-Wouldn=E2=80=99t it be better to update the docs simultaneously in each pat=
-ch which
-fixes a structure? Or is that unworkable with current development practices?
+The removal of kvm_x86_ops is also left for later because that
+requires lots of logic changes in the code scattered all over the
+place in KVM code. This patchset tries to do the conversion with as
+few logic changes as possible, so the code works the same and this
+only improves the implementation and the performance.
 
-Regards,
+Doing the conversion plus the logic changes at the same time would
+pose the risk of not being able to identify through bisection if any
+regression is caused by a bug in the conversion or in one small commit
+to alter the logic and to remove the need of one more pointer to
+function.
 
-Stephen
+It's best if each single removal of any pointer to functional change
+is done through a separate small commit. After all those small commits
+done incrementally with this patchset, the kvm_x86_ops structure can
+be deleted.
 
---Sig_/6lwZ.M0KIAOHFlu0tCvHt6N
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+https://git.kernel.org/pub/scm/linux/kernel/git/andrea/aa.git/log/?h=kvm-mono2
 
------BEGIN PGP SIGNATURE-----
+Thanks,
+Andrea
 
-iQIzBAEBCgAdFiEEnPVX/hPLkMoq7x0ggNMC9Yhtg5wFAl2PIB4ACgkQgNMC9Yht
-g5zsMRAAlq0QqSRyK8SmkZrHHi9ZrsTUhy9uZ0IHYFiFaDl5/P9JHqCOMgWCqjLI
-vjR/pTj6+Gc1h/87XgrOoWt72eqGmkP5TfqRFfrMmgTKyabiqnXjrhEEy/JpEegp
-wI1qjOrs/y2gWacnVssUmbrprK7dZWQ9DxSA5glafzxWyZgLgT5dEGCQKdHQX+1v
-QdYG7wZChDSuVUFxVryqIJM0zKGrOhbSlj3xHSGLDZa6+k6pvM+Sv+i7de0EJHkZ
-qssPQCsxIXBvS0Md1f1NqHS5K+7y4inCoh3U88A/YfEw2zPH7CwGXo+NrD8ihKkp
-aSAPICVP+ei48uuj8zGZcoCrCql7BiKSNgiTgguu3VZQ9+lIkzGuuidw84RcI4BU
-OHo3sKz1HE9+QeMowg0QcEpE5RJflJDMb/9PFciMkpSjFTOAZHQvvA8zZkLjVm2Y
-kSVmIoYAtGKb7PxqwBmZYyWGaHS090pie8PrdGAfo/KJPSHzPlK8ZnEwZJqGb2Ko
-GUyw/xNFefziyA35xSptguK4K4sSsIeD+Z5+Vt6xvyATEf5PS+9pQsKL3uxczUEV
-2WDYg6SXW2CU2nEpkGndHIQPcQSKZE2hASRwL7dtl89nM5tgviYAfOWdo1eBje0Q
-HkXRsGAUe6tlnlUDBjYa4VYLJMZS5vYTjY551oHzlfMmGQErvQM=
-=rxn4
------END PGP SIGNATURE-----
+Andrea Arcangeli (14):
+  KVM: monolithic: x86: remove kvm.ko
+  KVM: monolithic: x86: disable linking vmx and svm at the same time
+    into the kernel
+  KVM: monolithic: x86: convert the kvm_x86_ops and kvm_pmu_ops methods
+    to external functions
+  KVM: monolithic: x86: handle the request_immediate_exit variation
+  KVM: monolithic: add more section prefixes in the KVM common code
+  KVM: monolithic: x86: remove __exit section prefix from
+    machine_unsetup
+  KVM: monolithic: x86: remove __init section prefix from
+    kvm_x86_cpu_has_kvm_support
+  KVM: monolithic: x86: remove exports
+  KVM: monolithic: remove exports from KVM common code
+  KVM: monolithic: x86: drop the kvm_pmu_ops structure
+  KVM: x86: optimize more exit handlers in vmx.c
+  KVM: retpolines: x86: eliminate retpoline from vmx.c exit handlers
+  KVM: retpolines: x86: eliminate retpoline from svm.c exit handlers
+  x86: retpolines: eliminate retpoline from msr event handlers
 
---Sig_/6lwZ.M0KIAOHFlu0tCvHt6N--
+ arch/x86/events/intel/core.c    |  11 +
+ arch/x86/include/asm/kvm_host.h | 205 +++++++-
+ arch/x86/kvm/Kconfig            |  24 +-
+ arch/x86/kvm/Makefile           |   5 +-
+ arch/x86/kvm/cpuid.c            |  27 +-
+ arch/x86/kvm/hyperv.c           |   8 +-
+ arch/x86/kvm/irq.c              |   4 -
+ arch/x86/kvm/irq_comm.c         |   2 -
+ arch/x86/kvm/kvm_cache_regs.h   |  10 +-
+ arch/x86/kvm/lapic.c            |  46 +-
+ arch/x86/kvm/mmu.c              |  50 +-
+ arch/x86/kvm/mmu.h              |   4 +-
+ arch/x86/kvm/mtrr.c             |   2 -
+ arch/x86/kvm/pmu.c              |  27 +-
+ arch/x86/kvm/pmu.h              |  37 +-
+ arch/x86/kvm/pmu_amd.c          |  43 +-
+ arch/x86/kvm/svm.c              | 682 ++++++++++++++++-----------
+ arch/x86/kvm/trace.h            |   4 +-
+ arch/x86/kvm/vmx/nested.c       |  84 ++--
+ arch/x86/kvm/vmx/pmu_intel.c    |  46 +-
+ arch/x86/kvm/vmx/vmx.c          | 795 ++++++++++++++++++--------------
+ arch/x86/kvm/vmx/vmx.h          |  39 +-
+ arch/x86/kvm/x86.c              | 418 +++++++----------
+ arch/x86/kvm/x86.h              |   2 +-
+ include/linux/kvm_host.h        |   4 +-
+ virt/kvm/eventfd.c              |   1 -
+ virt/kvm/kvm_main.c             |  71 +--
+ 27 files changed, 1413 insertions(+), 1238 deletions(-)
