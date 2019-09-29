@@ -2,104 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08209C1183
-	for <lists+kvm@lfdr.de>; Sat, 28 Sep 2019 19:24:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBAC3C1299
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2019 02:58:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728817AbfI1RX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Sep 2019 13:23:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41910 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728793AbfI1RX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Sep 2019 13:23:26 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 27509307D853;
-        Sat, 28 Sep 2019 17:23:26 +0000 (UTC)
-Received: from mail (ovpn-125-159.rdu2.redhat.com [10.10.125.159])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 08ED25D9C3;
-        Sat, 28 Sep 2019 17:23:26 +0000 (UTC)
-From:   Andrea Arcangeli <aarcange@redhat.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH 14/14] x86: retpolines: eliminate retpoline from msr event handlers
-Date:   Sat, 28 Sep 2019 13:23:23 -0400
-Message-Id: <20190928172323.14663-15-aarcange@redhat.com>
-In-Reply-To: <20190928172323.14663-1-aarcange@redhat.com>
-References: <20190928172323.14663-1-aarcange@redhat.com>
+        id S1728820AbfI2A6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Sep 2019 20:58:12 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:43516 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728569AbfI2A6M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Sep 2019 20:58:12 -0400
+Received: by mail-oi1-f196.google.com with SMTP id t84so8218665oih.10;
+        Sat, 28 Sep 2019 17:58:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jDGwvCvb5E2eEWTa00TQPF5L0ICfXuc7lmyzsfISs80=;
+        b=L3RmqzENw0ntdeFscgJnviCqaVsfSg3zrlN9EIJki+GLrPs/NTxtDWKhWVPO8kGwBY
+         /ps5m50X6RcBEO3z2EzcLdeCxVbjVcg3mDJAq12at6WVu7riC4B7yBeo+bxp31+xQ0Kn
+         ShHBGAb0Zhlb+cR0ST9L29oOBljku1yrrd9Zxvz5RynrVkKf7HorawOqS1A5fRz5ohAE
+         SscTt2gWqSeE/qe0vGNywKOkpmhikqpL8Ni/3gj5AmtJZjPcxd5dOC8qMm/80ole1O0I
+         CzIAjnossrV+bc3wXP+EaDj12m9afNVpXiEjaek+JsW9bxW8u4xvkkkuQdqkokNEz5YP
+         gwEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jDGwvCvb5E2eEWTa00TQPF5L0ICfXuc7lmyzsfISs80=;
+        b=Sgkm3VGfDr2Yo6yDYr7TPDeDwMu4320uBAN0TNU5EMFvfU6L5CubcsgnkrmtYSAPXx
+         3dMXPsiY2gu26SJcFYYAYhUEFwHRBkuUCNE7wqfn57YNLNqBoxZ1TnpILpqfVbaVF4qx
+         lIKg1DjyUUQ0h16Mn7/YB8uZDfnmwuIlsBH67vMV6eBCgPDXznP+1EnotRD1EOJM29Wk
+         IPTR466BpkgVZfYe6+maQ4aC9gENwjj4OsOpAKus5sK7RVj3nplurNzm+JZMy4IxNM1f
+         Y46OIcGQLfTOW4fSw5p2sX6GtF8/rDmIjKO75gzPOnHA8FjCRKqsf9mEek10k996TXRC
+         pwuA==
+X-Gm-Message-State: APjAAAVpV2vP0QhWGJ1remQoloGLEJWDiS2lJRwP9joZyaX1+jB2D7w+
+        UHHpBehmtCql3ciuXFkWpMXX8UoRoWyHmJzcftw=
+X-Google-Smtp-Source: APXvYqwGtBpVsMcdjhBaD1LhsULDB/U95PMuv5imCGqFaOnUCn1MaM44S/bfn1C3U1NYcHgadMm7Nen9KvDOvmqhNoE=
+X-Received: by 2002:a05:6808:8da:: with SMTP id k26mr12805968oij.5.1569718689992;
+ Sat, 28 Sep 2019 17:58:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Sat, 28 Sep 2019 17:23:26 +0000 (UTC)
+References: <1569572822-28942-1-git-send-email-wanpengli@tencent.com> <20190927144234.GD24889@linux.intel.com>
+In-Reply-To: <20190927144234.GD24889@linux.intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Sun, 29 Sep 2019 08:57:55 +0800
+Message-ID: <CANRm+Cyajk9LEry3KSEt=q6EHB2v7WN87xYOa0pWhVqeJxeOeQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Don't shrink/grow vCPU halt_poll_ns if host side
+ polling is disabled
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's enough to check the value and issue the direct call.
+On Fri, 27 Sep 2019 at 22:42, Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Fri, Sep 27, 2019 at 04:27:02PM +0800, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Don't waste cycles to shrink/grow vCPU halt_poll_ns if host
+> > side polling is disabled.
+> >
+> > Cc: Marcelo Tosatti <mtosatti@redhat.com>
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 28 +++++++++++++++-------------
+> >  1 file changed, 15 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index e6de315..b368be4 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -2359,20 +2359,22 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+> >       kvm_arch_vcpu_unblocking(vcpu);
+> >       block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+> >
+> > -     if (!vcpu_valid_wakeup(vcpu))
+> > -             shrink_halt_poll_ns(vcpu);
+> > -     else if (halt_poll_ns) {
+> > -             if (block_ns <= vcpu->halt_poll_ns)
+> > -                     ;
+> > -             /* we had a long block, shrink polling */
+> > -             else if (vcpu->halt_poll_ns && block_ns > halt_poll_ns)
+> > +     if (!kvm_arch_no_poll(vcpu)) {
+>
+> Can vcpu->halt_poll_ns be cached and used both here and in the similar
+> check above?  E.g.:
+>
+>         unsigned int vcpu_halt_poll_ns;
+>
+>         vcpu_halt_poll_ns = kvm_arch_no_poll(vcpu) ? 0 : vcpu->halt_poll_ns;
+>
+>         if (vcpu_halt_poll_ns) {
+>                 ...
+>         }
 
-After this commit is applied, here the most common retpolines executed
-under a high resolution timer workload in the guest on a VMX host:
+This is not correct, !kvm_arch_no_poll(vcpu) && vcpu->halt_poll_ns ==
+0, you will stop grow.
 
-[..]
-@[
-    trace_retpoline+1
-    __trace_retpoline+30
-    __x86_indirect_thunk_rax+33
-    do_syscall_64+89
-    entry_SYSCALL_64_after_hwframe+68
-]: 267
-@[]: 2256
-@[
-    trace_retpoline+1
-    __trace_retpoline+30
-    __x86_indirect_thunk_rax+33
-    __kvm_wait_lapic_expire+284
-    vmx_vcpu_run.part.97+1091
-    vcpu_enter_guest+377
-    kvm_arch_vcpu_ioctl_run+261
-    kvm_vcpu_ioctl+559
-    do_vfs_ioctl+164
-    ksys_ioctl+96
-    __x64_sys_ioctl+22
-    do_syscall_64+89
-    entry_SYSCALL_64_after_hwframe+68
-]: 2390
-@[]: 33410
+>
+> > +             if (!vcpu_valid_wakeup(vcpu))
+> >                       shrink_halt_poll_ns(vcpu);
+> > -             /* we had a short halt and our poll time is too small */
+> > -             else if (vcpu->halt_poll_ns < halt_poll_ns &&
+> > -                     block_ns < halt_poll_ns)
+> > -                     grow_halt_poll_ns(vcpu);
+> > -     } else
+> > -             vcpu->halt_poll_ns = 0;
+> > +             else if (halt_poll_ns) {
+> > +                     if (block_ns <= vcpu->halt_poll_ns)
+> > +                             ;
+> > +                     /* we had a long block, shrink polling */
+> > +                     else if (vcpu->halt_poll_ns && block_ns > halt_poll_ns)
+> > +                             shrink_halt_poll_ns(vcpu);
+> > +                     /* we had a short halt and our poll time is too small */
+> > +                     else if (vcpu->halt_poll_ns < halt_poll_ns &&
+> > +                             block_ns < halt_poll_ns)
+> > +                             grow_halt_poll_ns(vcpu);
+> > +             } else
+> > +                     vcpu->halt_poll_ns = 0;
+>
+>
+> Not your code,
 
-@total: 315707
+Not the truth. :)
 
-Note the highest hit above is __delay so probably not worth optimizing
-even if it would be more frequent than 2k hits per sec.
+>but it'd be a good time to add braces to the 'if' and
+> 'else'.  Per Documentation/process/coding-style.rst:
+>
+>   Do not unnecessarily use braces where a single statement will do.
+>
+>   ...
+>
+>   This does not apply if only one branch of a conditional statement is a single
+>   statement; in the latter case use braces in both branches:
+>
+>         if (condition) {
+>                 do_this();
+>                 do_that();
+>         } else {
+>                 otherwise();
+>         }
 
-Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
----
- arch/x86/events/intel/core.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Will do in v2.
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 27ee47a7be66..65b383d5e062 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -3323,8 +3323,19 @@ static int intel_pmu_hw_config(struct perf_event *event)
- 	return 0;
- }
- 
-+#ifdef CONFIG_RETPOLINE
-+static struct perf_guest_switch_msr *core_guest_get_msrs(int *nr);
-+static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr);
-+#endif
-+
- struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
- {
-+#ifdef CONFIG_RETPOLINE
-+	if (x86_pmu.guest_get_msrs == intel_guest_get_msrs)
-+		return intel_guest_get_msrs(nr);
-+	else if (x86_pmu.guest_get_msrs == core_guest_get_msrs)
-+		return core_guest_get_msrs(nr);
-+#endif
- 	if (x86_pmu.guest_get_msrs)
- 		return x86_pmu.guest_get_msrs(nr);
- 	*nr = 0;
+    Wanpeng
