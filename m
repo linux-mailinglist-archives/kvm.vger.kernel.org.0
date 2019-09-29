@@ -2,143 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB0A2C13CE
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2019 09:39:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7205C15DA
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2019 16:51:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbfI2HjV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Sep 2019 03:39:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57164 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725906AbfI2HjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 29 Sep 2019 03:39:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 812D485360;
-        Sun, 29 Sep 2019 07:39:20 +0000 (UTC)
-Received: from [10.72.12.202] (ovpn-12-202.pek2.redhat.com [10.72.12.202])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F877600D1;
-        Sun, 29 Sep 2019 07:39:06 +0000 (UTC)
-Subject: Re: [PATCH] vhost: introduce mdev based hardware backend
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-References: <20190926045427.4973-1-tiwei.bie@intel.com>
- <20190926042156-mutt-send-email-mst@kernel.org> <20190926131439.GA11652@___>
- <8ab5a8d9-284d-bba5-803d-08523c0814e1@redhat.com>
- <20190927053935-mutt-send-email-mst@kernel.org>
- <a959fe1e-3095-e0f0-0c9b-57f6eaa9c8b7@redhat.com>
- <20190927084408-mutt-send-email-mst@kernel.org>
- <b6f6ffb2-0b16-5041-be2e-94b805c6a4c9@redhat.com>
- <20190927092219-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <1aba781c-d776-422d-2629-86b11990a9b5@redhat.com>
-Date:   Sun, 29 Sep 2019 15:39:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726827AbfI2OvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Sep 2019 10:51:15 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:56222 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbfI2OvP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 29 Sep 2019 10:51:15 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8TEdJNM101979;
+        Sun, 29 Sep 2019 14:50:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=Fhg9wY0MN9NjJv1FypLcGMLYNfuFMXgxdxO/SBR7uKs=;
+ b=dW0RJUVxZNqOKLVB4m+Vx0vKKB5xleGC1eSrsIzRYXflPuU8co3aQAYjsgAwIaPykxLw
+ MHisdHofIvqwOw/K6ZeTCB/OOJlyy/jC56abWODA450ADBuO68g1Djg3Qjgk1EF64K8P
+ hyvZbbDc1CUd3ShlTjJ4QEiOBc/VIM/fc32sb0hpoxBIbvMwKDnNFvLQT0D4TCpWBW52
+ W/SunpLvEY9HjDem40ZIoKBWE6dItKTGonJ/AWp3W1ybNIIzad22vgS2Q9YfuMAfeieF
+ xMh8cSBBN8GdHJUCSltImYbADvZDKsv6y3Mqd9EsWouvFZy4Ked/CjoV0Zpaz2Qt+9Rl iA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2va05raxmh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 29 Sep 2019 14:50:38 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8TEca9g074264;
+        Sun, 29 Sep 2019 14:50:37 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2vahp9k2kp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 29 Sep 2019 14:50:37 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x8TEob4j023636;
+        Sun, 29 Sep 2019 14:50:37 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 29 Sep 2019 07:50:36 -0700
+From:   Liran Alon <liran.alon@oracle.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc:     tao3.xu@intel.com, sean.j.christopherson@intel.com,
+        jmattson@google.com, vkuznets@redhat.com,
+        Liran Alon <liran.alon@oracle.com>
+Subject: [PATCH] KVM: VMX: Remove proprietary handling of unexpected exit-reasons
+Date:   Sun, 29 Sep 2019 17:50:18 +0300
+Message-Id: <20190929145018.120753-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190927092219-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Sun, 29 Sep 2019 07:39:20 +0000 (UTC)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9394 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1909290166
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9394 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1909290166
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Commit bf653b78f960 ("KVM: vmx: Introduce handle_unexpected_vmexit
+and handle WAITPKG vmexit") introduced proprietary handling of
+specific exit-reasons that should not be raised by CPU because
+KVM configures VMCS such that they should never be raised.
 
-On 2019/9/27 下午9:23, Michael S. Tsirkin wrote:
-> On Fri, Sep 27, 2019 at 09:17:56PM +0800, Jason Wang wrote:
->> On 2019/9/27 下午8:46, Michael S. Tsirkin wrote:
->>> On Fri, Sep 27, 2019 at 08:17:47PM +0800, Jason Wang wrote:
->>>> On 2019/9/27 下午5:41, Michael S. Tsirkin wrote:
->>>>> On Fri, Sep 27, 2019 at 11:27:12AM +0800, Jason Wang wrote:
->>>>>> On 2019/9/26 下午9:14, Tiwei Bie wrote:
->>>>>>> On Thu, Sep 26, 2019 at 04:35:18AM -0400, Michael S. Tsirkin wrote:
->>>>>>>> On Thu, Sep 26, 2019 at 12:54:27PM +0800, Tiwei Bie wrote:
->>>>>>> [...]
->>>>>>>>> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
->>>>>>>>> index 40d028eed645..5afbc2f08fa3 100644
->>>>>>>>> --- a/include/uapi/linux/vhost.h
->>>>>>>>> +++ b/include/uapi/linux/vhost.h
->>>>>>>>> @@ -116,4 +116,12 @@
->>>>>>>>>      #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
->>>>>>>>>      #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
->>>>>>>>> +/* VHOST_MDEV specific defines */
->>>>>>>>> +
->>>>>>>>> +#define VHOST_MDEV_SET_STATE	_IOW(VHOST_VIRTIO, 0x70, __u64)
->>>>>>>>> +
->>>>>>>>> +#define VHOST_MDEV_S_STOPPED	0
->>>>>>>>> +#define VHOST_MDEV_S_RUNNING	1
->>>>>>>>> +#define VHOST_MDEV_S_MAX	2
->>>>>>>>> +
->>>>>>>>>      #endif
->>>>>>>> So assuming we have an underlying device that behaves like virtio:
->>>>>>> I think they are really good questions/suggestions. Thanks!
->>>>>>>
->>>>>>>> 1. Should we use SET_STATUS maybe?
->>>>>>> I like this idea. I will give it a try.
->>>>>>>
->>>>>>>> 2. Do we want a reset ioctl?
->>>>>>> I think it is helpful. If we use SET_STATUS, maybe we
->>>>>>> can use it to support the reset.
->>>>>>>
->>>>>>>> 3. Do we want ability to enable rings individually?
->>>>>>> I will make it possible at least in the vhost layer.
->>>>>> Note the API support e.g set_vq_ready().
->>>>> virtio spec calls this "enabled" so let's stick to that.
->>>> Ok.
->>>>
->>>>
->>>>>>>> 4. Does device need to limit max ring size?
->>>>>>>> 5. Does device need to limit max number of queues?
->>>>>>> I think so. It's helpful to have ioctls to report the max
->>>>>>> ring size and max number of queues.
->>>>>> An issue is the max number of queues is done through a device specific way,
->>>>>> usually device configuration space. This is supported by the transport API,
->>>>>> but how to expose it to userspace may need more thought.
->>>>>>
->>>>>> Thanks
->>>>> an ioctl for device config?  But for v1 I'd be quite happy to just have
->>>>> a minimal working device with 2 queues.
->>>> I'm fully agree, and it will work as long as VIRTIO_NET_F_MQ and
->>>> VIRTIO_NET_F_CTRL_VQ is not advertised by the mdev device.
->>>>
->>>> Thanks
->>> Hmm this means we need to validate the features bits,
->>> not just pass them through to the hardware.
->>> Problem is, how do we add more feature bits later,
->>> without testing all hardware?
->>> I guess this means the device specific driver must do it.
->>>
->> That looks not good, maybe a virtio device id based features blacklist in
->> vhost-mdev. Then MQ and CTRL_VQ could be filtered out by vhost-mdev.
->>
->> Thanks
-> Two implementations of e.g. virtio net can have different
-> features whitelisted.
+However, since commit 7396d337cfad ("KVM: x86: Return to userspace
+with internal error on unexpected exit reason"), VMX & SVM
+exit handlers were modified to generically handle all unexpected
+exit-reasons by returning to userspace with internal error.
 
+Therefore, there is no need for proprietary handling of specific
+unexpected exit-reasons (This proprietary handling also introduced
+inconsistency for these exit-reasons to silently skip guest instruction
+instead of return to userspace on internal-error).
 
-I meant for kernel driver, we won't blacklist any feature, but for 
-vhost-mdev, we need to do that.
+Fixes: bf653b78f960 ("KVM: vmx: Introduce handle_unexpected_vmexit and handle WAITPKG vmexit")
 
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
->   So I think there's no way but let
-> the driver do it. We should probably provide a standard place
-> in the ops for driver to supply the whitelist, to make sure
-> drivers don't forget.
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d4575ffb3cec..e31317fc8c95 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5538,14 +5538,6 @@ static int handle_encls(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
+-static int handle_unexpected_vmexit(struct kvm_vcpu *vcpu)
+-{
+-	kvm_skip_emulated_instruction(vcpu);
+-	WARN_ONCE(1, "Unexpected VM-Exit Reason = 0x%x",
+-		vmcs_read32(VM_EXIT_REASON));
+-	return 1;
+-}
+-
+ /*
+  * The exit handlers return 1 if the exit was handled fully and guest execution
+  * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+@@ -5597,15 +5589,11 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+ 	[EXIT_REASON_INVVPID]                 = handle_vmx_instruction,
+ 	[EXIT_REASON_RDRAND]                  = handle_invalid_op,
+ 	[EXIT_REASON_RDSEED]                  = handle_invalid_op,
+-	[EXIT_REASON_XSAVES]                  = handle_unexpected_vmexit,
+-	[EXIT_REASON_XRSTORS]                 = handle_unexpected_vmexit,
+ 	[EXIT_REASON_PML_FULL]		      = handle_pml_full,
+ 	[EXIT_REASON_INVPCID]                 = handle_invpcid,
+ 	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
+ 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+ 	[EXIT_REASON_ENCLS]		      = handle_encls,
+-	[EXIT_REASON_UMWAIT]                  = handle_unexpected_vmexit,
+-	[EXIT_REASON_TPAUSE]                  = handle_unexpected_vmexit,
+ };
+ 
+ static const int kvm_vmx_max_exit_handlers =
+-- 
+2.20.1
 
-
-For 'driver' do you mean userspace driver of  the mdev device?
-
-Thanks
-
-
-
->
