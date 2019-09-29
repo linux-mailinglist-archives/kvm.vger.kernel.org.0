@@ -2,167 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4770FC12C4
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2019 04:07:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1A9BC137F
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2019 07:26:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728901AbfI2CFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Sep 2019 22:05:23 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:37866 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728569AbfI2CFX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Sep 2019 22:05:23 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id A16FD56EE928CBC06232;
-        Sun, 29 Sep 2019 10:05:21 +0800 (CST)
-Received: from [127.0.0.1] (10.133.224.57) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Sun, 29 Sep 2019
- 10:04:52 +0800
-Subject: Re: [PATCH v18 1/6] hw/arm/virt: Introduce RAS platform version and
- RAS machine option
-To:     Peter Maydell <peter.maydell@linaro.org>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        gengdongjiu <gengdongjiu@huawei.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
-        "QEMU Developers" <qemu-devel@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
-        <wanghaibin.wang@huawei.com>
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
- <20190906083152.25716-2-zhengxiang9@huawei.com>
- <CAFEAcA9cQwAJfPBC9fRcxLZVzZqag0Si62nTBNwDPyQiPVwPcg@mail.gmail.com>
-From:   Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <3d335a56-b90b-f8bb-cb05-95bf52ddade5@huawei.com>
-Date:   Sun, 29 Sep 2019 10:04:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        id S1726928AbfI2FZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Sep 2019 01:25:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44172 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725958AbfI2FZv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 29 Sep 2019 01:25:51 -0400
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8A68E83F42
+        for <kvm@vger.kernel.org>; Sun, 29 Sep 2019 05:25:50 +0000 (UTC)
+Received: by mail-pg1-f200.google.com with SMTP id h36so6485164pgb.3
+        for <kvm@vger.kernel.org>; Sat, 28 Sep 2019 22:25:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=U2Fqhrhhc3c5hT+09GB0Tz123AzZHSVYeE1k74C2N8Q=;
+        b=nAmoNxIzgTUqRxmJCg+EsNbr9jhaDcjtQD7MSompb/KGp591J7QR93grZ/8os1rbIO
+         4qen65f3G7A8S55+8+ZR+AWFkKI+5/og4U9XLwPtB8wDxQX7SIeAuPfxYW+3hXt7sLPo
+         sz1zoptih2Xe/RzpGzqwumgKmpwbPCWxUPQdvfytPGwItC/k6/KNDJepO0+6K2q/0oEh
+         e9lYKg6hmg2EG5FmJ04O/wTk+Hk5VDUUDk8oKNdmee9hHZNLQcw3KUyicDUXQmnRKGEM
+         w+3OlImjjb6cUylVj25OHaGqnF7BGaCXRVl2Rv3JMsM3q+cmXZwhsdmdz6yjNjYWBcs1
+         yBOQ==
+X-Gm-Message-State: APjAAAXVoUSYICEfd/lpsBBARikuBCS1bCbNq3N19tZf8vAX0egcKGtz
+        7bZfmrFd5RiZAxgERT1pO+YFB+Xb2QzzOsJ3EHBokxAms6DkW+MWOQTfq4ipNmgDVG/EzpDNTku
+        OBZ9Sk6S7j0o+
+X-Received: by 2002:a65:6111:: with SMTP id z17mr17809438pgu.415.1569734749963;
+        Sat, 28 Sep 2019 22:25:49 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxSwESBBqWbUZ8IYCB+ndAeHAFp/knXskQIwKbF6UdAPwArDrPxhK0qMIyDkQyFVFJVbYrxHA==
+X-Received: by 2002:a65:6111:: with SMTP id z17mr17809411pgu.415.1569734749539;
+        Sat, 28 Sep 2019 22:25:49 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id y6sm7985721pfp.82.2019.09.28.22.25.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Sep 2019 22:25:47 -0700 (PDT)
+Date:   Sun, 29 Sep 2019 13:25:32 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kevin.tian@intel.com, Yi Sun <yi.y.sun@linux.intel.com>,
+        ashok.raj@intel.com, kvm@vger.kernel.org, sanjay.k.kumar@intel.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        yi.y.sun@intel.com
+Subject: Re: [RFC PATCH 2/4] iommu/vt-d: Add first level page table interfaces
+Message-ID: <20190929052532.GA12953@xz-x1>
+References: <20190923122454.9888-1-baolu.lu@linux.intel.com>
+ <20190923122454.9888-3-baolu.lu@linux.intel.com>
+ <20190925052157.GL28074@xz-x1>
+ <c9792e0b-bf42-1dbb-f060-0b1a43125f47@linux.intel.com>
+ <20190926034905.GW28074@xz-x1>
+ <52778812-129b-0fa7-985d-5814e9d84047@linux.intel.com>
+ <20190927053449.GA9412@xz-x1>
+ <66823e27-aa33-5968-b5fd-e5221fb1fffe@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9cQwAJfPBC9fRcxLZVzZqag0Si62nTBNwDPyQiPVwPcg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.224.57]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <66823e27-aa33-5968-b5fd-e5221fb1fffe@linux.intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Sep 28, 2019 at 04:23:16PM +0800, Lu Baolu wrote:
+> Hi Peter,
+> 
+> On 9/27/19 1:34 PM, Peter Xu wrote:
+> > Hi, Baolu,
+> > 
+> > On Fri, Sep 27, 2019 at 10:27:24AM +0800, Lu Baolu wrote:
+> > > > > > > +	spin_lock(&(domain)->page_table_lock);				\
+> > > > > > 
+> > > > > > Is this intended to lock here instead of taking the lock during the
+> > > > > > whole page table walk?  Is it safe?
+> > > > > > 
+> > > > > > Taking the example where nm==PTE: when we reach here how do we
+> > > > > > guarantee that the PMD page that has this PTE is still valid?
+> > > > > 
+> > > > > We will always keep the non-leaf pages in the table,
+> > > > 
+> > > > I see.  Though, could I ask why?  It seems to me that the existing 2nd
+> > > > level page table does not keep these when unmap, and it's not even use
+> > > > locking at all by leveraging cmpxchg()?
+> > > 
+> > > I still need some time to understand how cmpxchg() solves the race issue
+> > > when reclaims pages. For example.
+> > > 
+> > > Thread A				Thread B
+> > > -A1: check all PTE's empty		-B1: up-level PDE valid
+> > > -A2: clear the up-level PDE
+> > > -A3: reclaim the page			-B2: populate the PTEs
+> > > 
+> > > Both (A1,A2) and (B1,B2) should be atomic. Otherwise, race could happen.
+> > 
+> > I'm not sure of this, but IMHO it is similarly because we need to
+> > allocate the iova ranges from iova allocator first, so thread A (who's
+> > going to unmap pages) and thread B (who's going to map new pages)
+> > should never have collapsed regions if happening concurrently.  I'm
+> 
+> Although they don't collapse, they might share a same pmd entry. If A
+> cleared the pmd entry and B goes ahead with populating the pte's. It
+> will crash.
 
+My understanding is that if A was not owning all the pages on that PMD
+entry then it will never free the page that was backing that PMD
+entry.  Please refer to the code in dma_pte_clear_level() where it
+has:
 
-On 2019/9/27 22:02, Peter Maydell wrote:
-> On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
->>
->> From: Dongjiu Geng <gengdongjiu@huawei.com>
->>
->> Support RAS Virtualization feature since version 4.2, disable it by
->> default in the old versions. Also add a machine option which allows user
->> to enable it explicitly.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->> ---
->>  hw/arm/virt.c         | 33 +++++++++++++++++++++++++++++++++
->>  include/hw/arm/virt.h |  2 ++
->>  2 files changed, 35 insertions(+)
->>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index d74538b021..e0451433c8 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -1783,6 +1783,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
->>      vms->its = value;
->>  }
->>
->> +static bool virt_get_ras(Object *obj, Error **errp)
->> +{
->> +    VirtMachineState *vms = VIRT_MACHINE(obj);
->> +
->> +    return vms->ras;
->> +}
->> +
->> +static void virt_set_ras(Object *obj, bool value, Error **errp)
->> +{
->> +    VirtMachineState *vms = VIRT_MACHINE(obj);
->> +
->> +    vms->ras = value;
->> +}
->> +
->>  static char *virt_get_gic_version(Object *obj, Error **errp)
->>  {
->>      VirtMachineState *vms = VIRT_MACHINE(obj);
->> @@ -2026,6 +2040,19 @@ static void virt_instance_init(Object *obj)
->>                                      "Valid values are none and smmuv3",
->>                                      NULL);
->>
->> +    if (vmc->no_ras) {
->> +        vms->ras = false;
->> +    } else {
->> +        /* Default disallows RAS instantiation */
->> +        vms->ras = false;
->> +        object_property_add_bool(obj, "ras", virt_get_ras,
->> +                                 virt_set_ras, NULL);
->> +        object_property_set_description(obj, "ras",
->> +                                        "Set on/off to enable/disable "
->> +                                        "RAS instantiation",
->> +                                        NULL);
->> +    }
-> 
-> For a property which is disabled by default, you don't need
-> to have a separate flag in the VirtMachineClass struct.
-> Those are only needed for properties where we need the old machine
-> types to have the property be 'off' but new machine types
-> need to default to it be 'on'. Since vms->ras is false
-> by default anyway, you can just have this part:
-> 
->> +        /* Default disallows RAS instantiation */
->> +        vms->ras = false;
->> +        object_property_add_bool(obj, "ras", virt_get_ras,
->> +                                 virt_set_ras, NULL);
->> +        object_property_set_description(obj, "ras",
->> +                                        "Set on/off to enable/disable "
->> +                                        "RAS instantiation",
->> +                                        NULL);
-> 
-> Compare the 'vms->secure' flag and associated property
-> for an example of this.
+        /* If range covers entire pagetable, free it */
+        if (start_pfn <= level_pfn &&
+                last_pfn >= level_pfn + level_size(level) - 1) {
+                ...
+        } else {
+                ...
+        }
 
-Thanks for pointing it out, I will remove the no_ras in the VirtMachineClass struct.
+Note that when going into the else block, the PMD won't be freed but
+only the PTEs that upon the PMD will be cleared.
 
-> 
->>      vms->irqmap = a15irqmap;
->>
->>      virt_flash_create(vms);
->> @@ -2058,8 +2085,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
->>
->>  static void virt_machine_4_1_options(MachineClass *mc)
->>  {
->> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
->> +
->>      virt_machine_4_2_options(mc);
->>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
->> +    /* Disable memory recovery feature for 4.1 as RAS support was
->> +     * introduced with 4.2.
->> +     */
->> +    vmc->no_ras = true;
->>  }
->>  DEFINE_VIRT_MACHINE(4, 1)
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
-
--- 
+In the case you mentioned above, IMHO it should go into that else
+block.  Say, thread A must not contain the whole range of that PMD
+otherwise thread B won't get allocated with pages within that range
+covered by the same PMD.
 
 Thanks,
-Xiang
 
+-- 
+Peter Xu
