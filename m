@@ -2,174 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BBC2C12C0
-	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2019 04:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4770FC12C4
+	for <lists+kvm@lfdr.de>; Sun, 29 Sep 2019 04:07:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728847AbfI2B5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Sep 2019 21:57:25 -0400
-Received: from mga03.intel.com ([134.134.136.65]:14348 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728569AbfI2B5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Sep 2019 21:57:25 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Sep 2019 18:57:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,561,1559545200"; 
-   d="scan'208";a="204501466"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
-  by fmsmga001.fm.intel.com with ESMTP; 28 Sep 2019 18:57:23 -0700
-From:   Tao Xu <tao3.xu@intel.com>
-To:     pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
-        mtosatti@redhat.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, tao3.xu@intel.com,
-        jingqi.liu@intel.com
-Subject: [PATCH v5 2/2] target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
-Date:   Sun, 29 Sep 2019 09:57:18 +0800
-Message-Id: <20190929015718.19562-3-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190929015718.19562-1-tao3.xu@intel.com>
-References: <20190929015718.19562-1-tao3.xu@intel.com>
+        id S1728901AbfI2CFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Sep 2019 22:05:23 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:37866 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728569AbfI2CFX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Sep 2019 22:05:23 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id A16FD56EE928CBC06232;
+        Sun, 29 Sep 2019 10:05:21 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Sun, 29 Sep 2019
+ 10:04:52 +0800
+Subject: Re: [PATCH v18 1/6] hw/arm/virt: Introduce RAS platform version and
+ RAS machine option
+To:     Peter Maydell <peter.maydell@linaro.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        gengdongjiu <gengdongjiu@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        "QEMU Developers" <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+ <20190906083152.25716-2-zhengxiang9@huawei.com>
+ <CAFEAcA9cQwAJfPBC9fRcxLZVzZqag0Si62nTBNwDPyQiPVwPcg@mail.gmail.com>
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <3d335a56-b90b-f8bb-cb05-95bf52ddade5@huawei.com>
+Date:   Sun, 29 Sep 2019 10:04:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA9cQwAJfPBC9fRcxLZVzZqag0Si62nTBNwDPyQiPVwPcg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UMWAIT and TPAUSE instructions use 32bits IA32_UMWAIT_CONTROL at MSR
-index E1H to determines the maximum time in TSC-quanta that the processor
-can reside in either C0.1 or C0.2.
 
-This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
-guest.
 
-Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+On 2019/9/27 22:02, Peter Maydell wrote:
+> On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>>
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>
+>> Support RAS Virtualization feature since version 4.2, disable it by
+>> default in the old versions. Also add a machine option which allows user
+>> to enable it explicitly.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>> ---
+>>  hw/arm/virt.c         | 33 +++++++++++++++++++++++++++++++++
+>>  include/hw/arm/virt.h |  2 ++
+>>  2 files changed, 35 insertions(+)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index d74538b021..e0451433c8 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1783,6 +1783,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+>>      vms->its = value;
+>>  }
+>>
+>> +static bool virt_get_ras(Object *obj, Error **errp)
+>> +{
+>> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+>> +
+>> +    return vms->ras;
+>> +}
+>> +
+>> +static void virt_set_ras(Object *obj, bool value, Error **errp)
+>> +{
+>> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+>> +
+>> +    vms->ras = value;
+>> +}
+>> +
+>>  static char *virt_get_gic_version(Object *obj, Error **errp)
+>>  {
+>>      VirtMachineState *vms = VIRT_MACHINE(obj);
+>> @@ -2026,6 +2040,19 @@ static void virt_instance_init(Object *obj)
+>>                                      "Valid values are none and smmuv3",
+>>                                      NULL);
+>>
+>> +    if (vmc->no_ras) {
+>> +        vms->ras = false;
+>> +    } else {
+>> +        /* Default disallows RAS instantiation */
+>> +        vms->ras = false;
+>> +        object_property_add_bool(obj, "ras", virt_get_ras,
+>> +                                 virt_set_ras, NULL);
+>> +        object_property_set_description(obj, "ras",
+>> +                                        "Set on/off to enable/disable "
+>> +                                        "RAS instantiation",
+>> +                                        NULL);
+>> +    }
+> 
+> For a property which is disabled by default, you don't need
+> to have a separate flag in the VirtMachineClass struct.
+> Those are only needed for properties where we need the old machine
+> types to have the property be 'off' but new machine types
+> need to default to it be 'on'. Since vms->ras is false
+> by default anyway, you can just have this part:
+> 
+>> +        /* Default disallows RAS instantiation */
+>> +        vms->ras = false;
+>> +        object_property_add_bool(obj, "ras", virt_get_ras,
+>> +                                 virt_set_ras, NULL);
+>> +        object_property_set_description(obj, "ras",
+>> +                                        "Set on/off to enable/disable "
+>> +                                        "RAS instantiation",
+>> +                                        NULL);
+> 
+> Compare the 'vms->secure' flag and associated property
+> for an example of this.
 
-No changes in v5.
+Thanks for pointing it out, I will remove the no_ras in the VirtMachineClass struct.
 
-Changes in v4:
-        Set IA32_UMWAIT_CONTROL 32bits
----
- target/i386/cpu.h     |  2 ++
- target/i386/kvm.c     | 13 +++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 3 files changed, 35 insertions(+)
+> 
+>>      vms->irqmap = a15irqmap;
+>>
+>>      virt_flash_create(vms);
+>> @@ -2058,8 +2085,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
+>>
+>>  static void virt_machine_4_1_options(MachineClass *mc)
+>>  {
+>> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+>> +
+>>      virt_machine_4_2_options(mc);
+>>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+>> +    /* Disable memory recovery feature for 4.1 as RAS support was
+>> +     * introduced with 4.2.
+>> +     */
+>> +    vmc->no_ras = true;
+>>  }
+>>  DEFINE_VIRT_MACHINE(4, 1)
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 33a0b8b365..bcd1cbbfc0 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -451,6 +451,7 @@ typedef enum X86Seg {
- 
- #define MSR_IA32_BNDCFGS                0x00000d90
- #define MSR_IA32_XSS                    0x00000da0
-+#define MSR_IA32_UMWAIT_CONTROL         0xe1
- 
- #define XSTATE_FP_BIT                   0
- #define XSTATE_SSE_BIT                  1
-@@ -1393,6 +1394,7 @@ typedef struct CPUX86State {
-     uint16_t fpregs_format_vmstate;
- 
-     uint64_t xss;
-+    uint32_t umwait;
- 
-     TPRAccess tpr_access_type;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ea9a87bfd8..8b715af8eb 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -95,6 +95,7 @@ static bool has_msr_hv_stimer;
- static bool has_msr_hv_frequencies;
- static bool has_msr_hv_reenlightenment;
- static bool has_msr_xss;
-+static bool has_msr_umwait;
- static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
-@@ -1909,6 +1910,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_XSS:
-                 has_msr_xss = true;
-                 break;
-+            case MSR_IA32_UMWAIT_CONTROL:
-+                has_msr_umwait = true;
-+                break;
-             case HV_X64_MSR_CRASH_CTL:
-                 has_msr_hv_crash = true;
-                 break;
-@@ -2459,6 +2463,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, env->xss);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, env->umwait);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
-     }
-@@ -2863,6 +2870,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, 0);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, 0);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
-     }
-@@ -3115,6 +3125,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_XSS:
-             env->xss = msrs[i].data;
-             break;
-+        case MSR_IA32_UMWAIT_CONTROL:
-+            env->umwait = msrs[i].data;
-+            break;
-         default:
-             if (msrs[i].index >= MSR_MC0_CTL &&
-                 msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 2767b3096d..6481f846f6 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -943,6 +943,25 @@ static const VMStateDescription vmstate_xss = {
-     }
- };
- 
-+static bool umwait_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->umwait != 0;
-+}
-+
-+static const VMStateDescription vmstate_umwait = {
-+    .name = "cpu/umwait",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = umwait_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.umwait, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- #ifdef TARGET_X86_64
- static bool pkru_needed(void *opaque)
- {
-@@ -1391,6 +1410,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_msr_hyperv_reenlightenment,
-         &vmstate_avx512,
-         &vmstate_xss,
-+        &vmstate_umwait,
-         &vmstate_tsc_khz,
-         &vmstate_msr_smi_count,
- #ifdef TARGET_X86_64
 -- 
-2.20.1
+
+Thanks,
+Xiang
 
