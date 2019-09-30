@@ -2,150 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B2655C1F81
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 12:48:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD8CCC1FA5
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 12:58:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730621AbfI3KsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 06:48:24 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:51284 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729415AbfI3KsY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 06:48:24 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8UAe6Ll116477;
-        Mon, 30 Sep 2019 10:48:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=7F7H5SLjs3foMT+TynlSB46iUyy63RErIehHNIdggJs=;
- b=iymTYXHAlaUQ8w+e7EahgHelGL1bOZGxtZ55HkYA1TaOYHWhkrrjeXX8iB+0S6WDg4yX
- IhlFY3BFG4lyXvV4N+/U+bfA3qNG7R4idIffJ+9/JHvTuVFG0qZogk0PR6U97BOrCep9
- 0YSQebTUuTxU70yrpPVJDhsefVR4cS69hs6DKc5bbx2e6JIQTC9lKcc/TlQFC3oO5xhi
- hVIzf5xdlLh8DGx7wqUjPMyFNiQ16gNH4LoE6SEeow1plsfFmiCvVfPm1bw2P14+Yh2G
- YQ2CyKrPBo5g5TkzEChBfct/5brNoaJvRjd3frMU67OPgaFk2akQIHZmMwTiuMeAIpx9 3w== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2v9xxue8p3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Sep 2019 10:48:21 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x8UAhZZ1135147;
-        Mon, 30 Sep 2019 10:48:21 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2vahngdyx7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Sep 2019 10:48:20 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x8UAmIEf030868;
-        Mon, 30 Sep 2019 10:48:19 GMT
-Received: from [10.0.0.13] (/79.180.87.74)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 30 Sep 2019 03:48:18 -0700
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: Broadwell server reboot with vmx: unexpected exit reason 0x3
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <CAMGffE=JTrCvj900OeMJQh06vogxKepRFn=7tdA965VJ9zSWow@mail.gmail.com>
-Date:   Mon, 30 Sep 2019 13:48:15 +0300
-Cc:     kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DDC3DE27-46A3-4CB4-9AB8-C3C2F1D54777@oracle.com>
-References: <CAMGffE=JTrCvj900OeMJQh06vogxKepRFn=7tdA965VJ9zSWow@mail.gmail.com>
-To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9395 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1909300116
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9395 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1909300116
+        id S1730889AbfI3K66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 06:58:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60872 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730621AbfI3K66 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 06:58:58 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 65B8DC04BD48
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 10:58:57 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id v18so4331971wro.16
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 03:58:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=j0qxT1IXvt9wIAlUjN9ddY7lEd1GUitjNHLdt8EqWYQ=;
+        b=I5fXtCODibgMo4EIDnUCKgIA2BhRUTjPL2VOGNhGDPHRaMNIQ3hdaN8iDXHhz8Un4O
+         gCN0BJnsDwYUHaJI0VL3IUSyjpYXFgE3u38WAhdLnBVj+haUaD81Rb7Qusg4kF0jhhvb
+         fxyMkj6gzQ2DQibiR6Z9Zb95g7PHXxwQqd4Nv+dGwHJGo2zC/kB+J7bFPh07EzFsSFZp
+         DmScm5qkMG7R+TnJGFQxfKkUSqOul4zShEEDKGRIx8KvqxtDQos5OZZoiJHcoyUHceX8
+         0MGXY1t//pU4mwM1Ht6z6fFetO17cxWh7iy3A+PQhCnKPgMxNHn2qa7V/Gjoy+fTQdKL
+         HlPQ==
+X-Gm-Message-State: APjAAAWvt/s5vLj47K5TYKJkQTa6jGkpyN+qBHl6iVHkkoEDxZKcelrT
+        C8mUtfMEeZ1WtMSrtAKM8uiCbIO5YY8R24L/ei6J8iblh8h0wbiCge08wCeQmvV0fMcdJvS3suX
+        sx075pd/I8HXN
+X-Received: by 2002:adf:ff8a:: with SMTP id j10mr13252877wrr.334.1569841135513;
+        Mon, 30 Sep 2019 03:58:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxHekuj02R8XtQy2iPD4+dRVTghrwvfXckbudnn8NOFFGFICy/+KtRZsKtOcn3qGWRNQi1jjw==
+X-Received: by 2002:adf:ff8a:: with SMTP id j10mr13252857wrr.334.1569841135272;
+        Mon, 30 Sep 2019 03:58:55 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id b194sm35531293wmg.46.2019.09.30.03.58.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2019 03:58:54 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>,
+        Liran Alon <liran.alon@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v2 8/8] KVM: x86: Fold decache_cr3() into cache_reg()
+In-Reply-To: <20190927214523.3376-9-sean.j.christopherson@intel.com>
+References: <20190927214523.3376-1-sean.j.christopherson@intel.com> <20190927214523.3376-9-sean.j.christopherson@intel.com>
+Date:   Mon, 30 Sep 2019 12:58:53 +0200
+Message-ID: <87a7am3v9u.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
+> Handle caching CR3 (from VMX's VMCS) into struct kvm_vcpu via the common
+> cache_reg() callback and drop the dedicated decache_cr3().  The name
+> decache_cr3() is somewhat confusing as the caching behavior of CR3
+> follows that of GPRs, RFLAGS and PDPTRs, (handled via cache_reg()), and
+> has nothing in common with the caching behavior of CR0/CR4 (whose
+> decache_cr{0,4}_guest_bits() likely provided the 'decache' verbiage).
+>
+> Note, this effectively adds a BUG() if KVM attempts to cache CR3 on SVM.
+> Opportunistically add a WARN_ON_ONCE() in VMX to provide an equivalent
+> check.
 
-> On 30 Sep 2019, at 11:43, Jinpu Wang <jinpu.wang@cloud.ionos.com> =
-wrote:
->=20
-> Dear KVM experts,
->=20
-> We have a Broadwell server reboot itself recently, before the reboot,
-> there were error messages from KVM in netconsole:
-> [5599380.317055] kvm [9046]: vcpu1, guest rIP: 0xffffffff816ad716 vmx:
-> unexpected exit reason 0x3
-> [5599380.317060] kvm [49626]: vcpu0, guest rIP: 0xffffffff81060fe6
-> vmx: unexpected exit reason 0x3
-> [5599380.317062] kvm [36632]: vcpu0, guest rIP: 0xffffffff8103970d
-> vmx: unexpected exit reason 0x3
-> [5599380.317064] kvm [9620]: vcpu1, guest rIP: 0xffffffffb6c1b08e vmx:
-> unexpected exit reason 0x3
-> [5599380.317067] kvm [49925]: vcpu5, guest rIP: 0xffffffff9b406ea2
-> vmx: unexpected exit reason 0x3
-> [5599380.317068] kvm [49925]: vcpu3, guest rIP: 0xffffffff9b406ea2
-> vmx: unexpected exit reason 0x3
-> [5599380.317070] kvm [33871]: vcpu2, guest rIP: 0xffffffff81060fe6
-> vmx: unexpected exit reason 0x3
-> [5599380.317072] kvm [49925]: vcpu4, guest rIP: 0xffffffff9b406ea2
-> vmx: unexpected exit reason 0x3
-> [5599380.317074] kvm [48505]: vcpu1, guest rIP: 0xffffffffaf36bf9b
-> vmx: unexpected exit reason 0x3
-> [5599380.317076] kvm [21880]: vcpu1, guest rIP: 0xffffffff8103970d
-> vmx: unexpected exit reason 0x3
+Just to justify my idea of replacing such occasions with
+KVM_INTERNAL_ERROR by setting a special 'kill ASAP' bit somewhere:
 
-The only way a CPU will raise this exit-reason (3 =3D=3D =
-EXIT_REASON_INIT_SIGNAL)
-is if CPU is in VMX non-root mode while it has a pending INIT signal in =
-LAPIC.
+This WARN_ON_ONCE() falls in the same category (IMO).
 
-In simple terms, it means that one CPU was running inside guest while
-another CPU have sent it a signal to reset itself.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 -
+>  arch/x86/kvm/kvm_cache_regs.h   |  2 +-
+>  arch/x86/kvm/svm.c              |  5 -----
+>  arch/x86/kvm/vmx/vmx.c          | 15 ++++++---------
+>  4 files changed, 7 insertions(+), 16 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index a27f7f6b6b7a..0411dc0a27b0 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1040,7 +1040,6 @@ struct kvm_x86_ops {
+>  			    struct kvm_segment *var, int seg);
+>  	void (*get_cs_db_l_bits)(struct kvm_vcpu *vcpu, int *db, int *l);
+>  	void (*decache_cr0_guest_bits)(struct kvm_vcpu *vcpu);
+> -	void (*decache_cr3)(struct kvm_vcpu *vcpu);
+>  	void (*decache_cr4_guest_bits)(struct kvm_vcpu *vcpu);
+>  	void (*set_cr0)(struct kvm_vcpu *vcpu, unsigned long cr0);
+>  	void (*set_cr3)(struct kvm_vcpu *vcpu, unsigned long cr3);
+> diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+> index 9c2bc528800b..f18177cd0030 100644
+> --- a/arch/x86/kvm/kvm_cache_regs.h
+> +++ b/arch/x86/kvm/kvm_cache_regs.h
+> @@ -145,7 +145,7 @@ static inline ulong kvm_read_cr4_bits(struct kvm_vcpu *vcpu, ulong mask)
+>  static inline ulong kvm_read_cr3(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!kvm_register_is_available(vcpu, VCPU_EXREG_CR3))
+> -		kvm_x86_ops->decache_cr3(vcpu);
+> +		kvm_x86_ops->cache_reg(vcpu, VCPU_EXREG_CR3);
+>  	return vcpu->arch.cr3;
+>  }
+>  
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index f8ecb6df5106..3102c44c12c6 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -2517,10 +2517,6 @@ static void svm_decache_cr0_guest_bits(struct kvm_vcpu *vcpu)
+>  {
+>  }
+>  
+> -static void svm_decache_cr3(struct kvm_vcpu *vcpu)
+> -{
+> -}
+> -
+>  static void svm_decache_cr4_guest_bits(struct kvm_vcpu *vcpu)
+>  {
+>  }
+> @@ -7208,7 +7204,6 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+>  	.get_cpl = svm_get_cpl,
+>  	.get_cs_db_l_bits = kvm_get_cs_db_l_bits,
+>  	.decache_cr0_guest_bits = svm_decache_cr0_guest_bits,
+> -	.decache_cr3 = svm_decache_cr3,
+>  	.decache_cr4_guest_bits = svm_decache_cr4_guest_bits,
+>  	.set_cr0 = svm_set_cr0,
+>  	.set_cr3 = svm_set_cr3,
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index ed03d0cd1cc8..c84798026e85 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2188,7 +2188,12 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+>  		if (enable_ept)
+>  			ept_save_pdptrs(vcpu);
+>  		break;
+> +	case VCPU_EXREG_CR3:
+> +		if (enable_unrestricted_guest || (enable_ept && is_paging(vcpu)))
+> +			vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
+> +		break;
+>  	default:
+> +		WARN_ON_ONCE(1);
+>  		break;
+>  	}
+>  }
+> @@ -2859,13 +2864,6 @@ static void vmx_decache_cr0_guest_bits(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.cr0 |= vmcs_readl(GUEST_CR0) & cr0_guest_owned_bits;
+>  }
+>  
+> -static void vmx_decache_cr3(struct kvm_vcpu *vcpu)
+> -{
+> -	if (enable_unrestricted_guest || (enable_ept && is_paging(vcpu)))
+> -		vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
+> -	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
+> -}
+> -
+>  static void vmx_decache_cr4_guest_bits(struct kvm_vcpu *vcpu)
+>  {
+>  	ulong cr4_guest_owned_bits = vcpu->arch.cr4_guest_owned_bits;
+> @@ -2910,7 +2908,7 @@ static void ept_update_paging_mode_cr0(unsigned long *hw_cr0,
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  
+>  	if (!kvm_register_is_available(vcpu, VCPU_EXREG_CR3))
+> -		vmx_decache_cr3(vcpu);
+> +		vmx_cache_reg(vcpu, VCPU_EXREG_CR3);
+>  	if (!(cr0 & X86_CR0_PG)) {
+>  		/* From paging/starting to nonpaging */
+>  		exec_controls_setbit(vmx, CPU_BASED_CR3_LOAD_EXITING |
+> @@ -7792,7 +7790,6 @@ static struct kvm_x86_ops vmx_x86_ops __ro_after_init = {
+>  	.get_cpl = vmx_get_cpl,
+>  	.get_cs_db_l_bits = vmx_get_cs_db_l_bits,
+>  	.decache_cr0_guest_bits = vmx_decache_cr0_guest_bits,
+> -	.decache_cr3 = vmx_decache_cr3,
+>  	.decache_cr4_guest_bits = vmx_decache_cr4_guest_bits,
+>  	.set_cr0 = vmx_set_cr0,
+>  	.set_cr3 = vmx_set_cr3,
 
-I see in code that kvm_init() does =
-register_reboot_notifier(&kvm_reboot_notifier).
-kvm_reboot() runs hardware_disable_nolock() on each CPU before reboot.
-Which should result on every CPU running VMX=E2=80=99s =
-hardware_disable() which should
-exit VMX operation (VMXOFF) and disable VMX (Clear CR4.VMXE).
+Reviewed (and Tested-On-Amd-By:): Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Therefore, I=E2=80=99m quite puzzled on how a server reboot triggers the =
-scenario you present here.
-Can you send your full kernel log?
-
->=20
-> Kernel version is: 4.14.129
-> CPU is Intel(R) Xeon(R) CPU E5-2680 v4 @ 2.40GHz
-> There is no crashdump generated, only above message right before =
-server reboot.
->=20
-> Anyone has an idea, what could cause the reboot? is there a known
-> problem in this regards?
->=20
-> I notice EXIT_REASON_INIT_SIGNAL(3) is introduced recently, is it =
-related?
-> =
-https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__git.kernel.org_pub_=
-scm_linux_kernel_git_torvalds_linux.git_commit_arch_x86_kvm-3Fid-3D4b9852f=
-4f38909a9ca74e71afb35aafba0871aa1&d=3DDwIBaQ&c=3DRoP1YumCXCgaWHvlZYR8PZh8B=
-v7qIrMUB65eapI_JnE&r=3DJk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=3D3JM=
-SVEOhF1eCpny7VowcBwzScGDxjUkUZpipoP8Hlqw&s=3Dwar3Qw8cey9BewvAWmnGQdx3TY7En=
-L6O5aUkrg3FQUg&e=3D=20
-
-As the author of this commit, this shouldn=E2=80=99t be related. i.e. It =
-won=E2=80=99t help you to apply this commit to your kernel.
-That commit changes the handling of *virtual* INIT signals inside guest.
-What you are seeing here are exits which results from a *physical* INIT =
-signal while CPU was in guest.
-
--Liran
-
->=20
-> Regards,
-> Jinpu
-
+-- 
+Vitaly
