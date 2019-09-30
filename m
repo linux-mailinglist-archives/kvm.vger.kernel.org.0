@@ -2,144 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 138DDC2855
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 23:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 043CAC2874
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 23:16:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732647AbfI3VLH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 17:11:07 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41505 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731678AbfI3VLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 17:11:07 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h7so12939710wrw.8;
-        Mon, 30 Sep 2019 14:11:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=Km4VVTEePyhHsFimVMjuG3mAp67V52rIi2SimlK34MU=;
-        b=F2+krCW9h4/vWnl412e0O5+BiYynOmqsu1GTfc8j8T1hPDRh/+RAH2TS+9oShSfFht
-         +DRLSK6QkQUf/q9kVU0q0Wjwa/b7b9EPcbkMCthJ69y2UmK0Q9ohogmqOrjvF3Faovgn
-         +c+DRShui0gK74MGaLgAd+Mf6ouSNMGaMZtUGB974GaAdsw7mHblL4mtYB9yIaygJ98L
-         wHtVcQy0rnKX+4Eg8KQdFXrAf+QZ225nTNmyyTIW9Y+3Tcwls5KigSdvTnen9WScAozr
-         V1YfI0PzPyhC3A2E1YaljJhKI3DQ0gqiXoBGXQvDawlO+2yHbso2owB0J6vnmQjBJ596
-         HWuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Km4VVTEePyhHsFimVMjuG3mAp67V52rIi2SimlK34MU=;
-        b=hdUmpW5NtPz1aEE3eSuI2QLkdaVczahFRDjXhBwb/rUkcdAtjXpRhYxiLPDgnwn2FI
-         OU8hYZxAncPCf1OHFMAlrVAUT2D0ybUl3pacMk0W46ONaJ530s+eSJsSA+3+XA+oFWjN
-         OYHupB1OOnD+iiojEt4elJI0EJvnKHLhY1UCCE3aGzz5jmOfIjFcZY/y3QXc2ta3nmMk
-         5LO1AU4b1KsUz1WqpzwV87IalgNml3xqsI3sYO0JAcrSy6oM434tmvXDyyWGJoNRCyq1
-         t3E+8nqCwJc6PkagwONvC8lSV29Zv91uTPsxLoglBBeKak4cP3sfMIYjkPsQ/UorVJJY
-         sSFw==
-X-Gm-Message-State: APjAAAVrPRZ4XK7Ii0ZU3Cvc68xKIanmjtwhWDx3lW/fE3JPCWxZC8w/
-        43XhK0HOhE8S5cfYzpoIRLgteVmFj/Cm7Q==
-X-Google-Smtp-Source: APXvYqzy7y5NjgWswAUhrWkzobKoCPCU2cj3zemHxu/pZIy6qbKJmrWtc0rOICC1+bZexktMTIyuxA==
-X-Received: by 2002:a5d:4d8c:: with SMTP id b12mr14184701wru.198.1569867973583;
-        Mon, 30 Sep 2019 11:26:13 -0700 (PDT)
-Received: from scw-93ddc8.cloud.online.net ([2001:bc8:4400:2400::302d])
-        by smtp.googlemail.com with ESMTPSA id r20sm15672256wrg.61.2019.09.30.11.26.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 30 Sep 2019 11:26:13 -0700 (PDT)
-From:   Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
-To:     stefanha@redhat.com
-Cc:     davem@davemloft.net, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, matiasevara@gmail.com,
-        sgarzare@redhat.com, eric.dumazet@gmail.com
-Subject: [PATCH net-next v2] vsock/virtio: add support for MSG_PEEK
-Date:   Mon, 30 Sep 2019 18:25:23 +0000
-Message-Id: <1569867923-28200-1-git-send-email-matiasevara@gmail.com>
-X-Mailer: git-send-email 2.7.4
+        id S1731840AbfI3VPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 17:15:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46020 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731050AbfI3VPy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 17:15:54 -0400
+Received: from localhost (unknown [69.71.4.100])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 67EDD224D7;
+        Mon, 30 Sep 2019 19:58:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1569873536;
+        bh=5YkIavbcZo/fLAlcbxRAjN/RrUGTMkGP8SzMSvE3lfY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=eQ2EwAbhTnIoCao80RsHAjyuX0FiFTAlEN6giJaMJlAygtJFtLFebghluVb1IgARK
+         QJIQQXZWBQEH68It6VK2j2PAMzsVDbeK0hNpsI8f9l+BsiWY2zGIHPbIo8lDV07B5v
+         nuE1LfjWC+uyDHhdEx/TeJU/HbfFo2GBNRL7OTVo=
+Date:   Mon, 30 Sep 2019 14:58:55 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Denis Efremov <efremov@linux.com>
+Cc:     linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, x86@kernel.org,
+        linux-s390@vger.kernel.org, linux-alpha@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-usb@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-serial@vger.kernel.org,
+        linux-mmc@vger.kernel.org
+Subject: Re: [PATCH RESEND v3 00/26] Add definition for the number of
+ standard PCI BARs
+Message-ID: <20190930195855.GA191519@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190927234026.23342-1-efremov@linux.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds support for MSG_PEEK. In such a case, packets are not
-removed from the rx_queue and credit updates are not sent.
+On Sat, Sep 28, 2019 at 02:40:26AM +0300, Denis Efremov wrote:
+> Code that iterates over all standard PCI BARs typically uses
+> PCI_STD_RESOURCE_END, but this is error-prone because it requires
+> "i <= PCI_STD_RESOURCE_END" rather than something like
+> "i < PCI_STD_NUM_BARS". We could add such a definition and use it the same
+> way PCI_SRIOV_NUM_BARS is used. The patchset also replaces constant (6)
+> with new define PCI_STD_NUM_BARS where appropriate and removes local
+> declarations for the number of PCI BARs.
+> 
+> Changes in v3:
+>   - Updated commits description.
+>   - Refactored "< PCI_ROM_RESOURCE" with "< PCI_STD_NUM_BARS" in loops.
+>   - Refactored "<= BAR_5" with "< PCI_STD_NUM_BARS" in loops.
+>   - Removed local define GASKET_NUM_BARS.
+>   - Removed local define PCI_NUM_BAR_RESOURCES.
+> 
+> Changes in v2:
+>   - Reversed checks in pci_iomap_range,pci_iomap_wc_range.
+>   - Refactored loops in vfio_pci to keep PCI_STD_RESOURCES.
+>   - Added 2 new patches to replace the magic constant with new define.
+>   - Splitted net patch in v1 to separate stmmac and dwc-xlgmac patches.
+> 
+> Denis Efremov (26):
+>   PCI: Add define for the number of standard PCI BARs
+>   PCI: hv: Use PCI_STD_NUM_BARS
+>   PCI: dwc: Use PCI_STD_NUM_BARS
+>   PCI: endpoint: Use PCI_STD_NUM_BARS
+>   misc: pci_endpoint_test: Use PCI_STD_NUM_BARS
+>   s390/pci: Use PCI_STD_NUM_BARS
+>   x86/PCI: Loop using PCI_STD_NUM_BARS
+>   alpha/PCI: Use PCI_STD_NUM_BARS
+>   ia64: Use PCI_STD_NUM_BARS
+>   stmmac: pci: Loop using PCI_STD_NUM_BARS
+>   net: dwc-xlgmac: Loop using PCI_STD_NUM_BARS
+>   ixgb: use PCI_STD_NUM_BARS
+>   e1000: Use PCI_STD_NUM_BARS
+>   rapidio/tsi721: Loop using PCI_STD_NUM_BARS
+>   efifb: Loop using PCI_STD_NUM_BARS
+>   fbmem: use PCI_STD_NUM_BARS
+>   vfio_pci: Loop using PCI_STD_NUM_BARS
+>   scsi: pm80xx: Use PCI_STD_NUM_BARS
+>   ata: sata_nv: Use PCI_STD_NUM_BARS
+>   staging: gasket: Use PCI_STD_NUM_BARS
+>   serial: 8250_pci: Use PCI_STD_NUM_BARS
+>   pata_atp867x: Use PCI_STD_NUM_BARS
+>   memstick: use PCI_STD_NUM_BARS
+>   USB: core: Use PCI_STD_NUM_BARS
+>   usb: pci-quirks: Use PCI_STD_NUM_BARS
+>   devres: use PCI_STD_NUM_BARS
+> 
+>  arch/alpha/kernel/pci-sysfs.c                 |  8 ++---
+>  arch/ia64/sn/pci/pcibr/pcibr_dma.c            |  4 +--
+>  arch/s390/include/asm/pci.h                   |  5 +--
+>  arch/s390/include/asm/pci_clp.h               |  6 ++--
+>  arch/s390/pci/pci.c                           | 16 +++++-----
+>  arch/s390/pci/pci_clp.c                       |  6 ++--
+>  arch/x86/pci/common.c                         |  2 +-
+>  arch/x86/pci/intel_mid_pci.c                  |  2 +-
+>  drivers/ata/pata_atp867x.c                    |  2 +-
+>  drivers/ata/sata_nv.c                         |  2 +-
+>  drivers/memstick/host/jmb38x_ms.c             |  2 +-
+>  drivers/misc/pci_endpoint_test.c              |  8 ++---
+>  drivers/net/ethernet/intel/e1000/e1000.h      |  1 -
+>  drivers/net/ethernet/intel/e1000/e1000_main.c |  2 +-
+>  drivers/net/ethernet/intel/ixgb/ixgb.h        |  1 -
+>  drivers/net/ethernet/intel/ixgb/ixgb_main.c   |  2 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_pci.c  |  4 +--
+>  .../net/ethernet/synopsys/dwc-xlgmac-pci.c    |  2 +-
+>  drivers/pci/controller/dwc/pci-dra7xx.c       |  2 +-
+>  .../pci/controller/dwc/pci-layerscape-ep.c    |  2 +-
+>  drivers/pci/controller/dwc/pcie-artpec6.c     |  2 +-
+>  .../pci/controller/dwc/pcie-designware-plat.c |  2 +-
+>  drivers/pci/controller/dwc/pcie-designware.h  |  2 +-
+>  drivers/pci/controller/pci-hyperv.c           | 10 +++---
+>  drivers/pci/endpoint/functions/pci-epf-test.c | 10 +++---
+>  drivers/pci/pci-sysfs.c                       |  4 +--
+>  drivers/pci/pci.c                             | 13 ++++----
+>  drivers/pci/proc.c                            |  4 +--
+>  drivers/pci/quirks.c                          |  4 +--
+>  drivers/rapidio/devices/tsi721.c              |  2 +-
+>  drivers/scsi/pm8001/pm8001_hwi.c              |  2 +-
+>  drivers/scsi/pm8001/pm8001_init.c             |  2 +-
+>  drivers/staging/gasket/gasket_constants.h     |  3 --
+>  drivers/staging/gasket/gasket_core.c          | 12 +++----
+>  drivers/staging/gasket/gasket_core.h          |  4 +--
+>  drivers/tty/serial/8250/8250_pci.c            |  8 ++---
+>  drivers/usb/core/hcd-pci.c                    |  2 +-
+>  drivers/usb/host/pci-quirks.c                 |  2 +-
+>  drivers/vfio/pci/vfio_pci.c                   | 11 ++++---
+>  drivers/vfio/pci/vfio_pci_config.c            | 32 ++++++++++---------
+>  drivers/vfio/pci/vfio_pci_private.h           |  4 +--
+>  drivers/video/fbdev/core/fbmem.c              |  4 +--
+>  drivers/video/fbdev/efifb.c                   |  2 +-
+>  include/linux/pci-epc.h                       |  2 +-
+>  include/linux/pci.h                           |  2 +-
+>  include/uapi/linux/pci_regs.h                 |  1 +
+>  lib/devres.c                                  |  2 +-
+>  47 files changed, 112 insertions(+), 115 deletions(-)
 
-Signed-off-by: Matias Ezequiel Vara Larsen <matiasevara@gmail.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Tested-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/virtio_transport_common.c | 55 +++++++++++++++++++++++++++++++--
- 1 file changed, 52 insertions(+), 3 deletions(-)
+Applied to pci/resource for v5.5, thanks!
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 94cc0fa..cf15751 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -264,6 +264,55 @@ static int virtio_transport_send_credit_update(struct vsock_sock *vsk,
- }
- 
- static ssize_t
-+virtio_transport_stream_do_peek(struct vsock_sock *vsk,
-+				struct msghdr *msg,
-+				size_t len)
-+{
-+	struct virtio_vsock_sock *vvs = vsk->trans;
-+	struct virtio_vsock_pkt *pkt;
-+	size_t bytes, total = 0, off;
-+	int err = -EFAULT;
-+
-+	spin_lock_bh(&vvs->rx_lock);
-+
-+	list_for_each_entry(pkt, &vvs->rx_queue, list) {
-+		off = pkt->off;
-+
-+		if (total == len)
-+			break;
-+
-+		while (total < len && off < pkt->len) {
-+			bytes = len - total;
-+			if (bytes > pkt->len - off)
-+				bytes = pkt->len - off;
-+
-+			/* sk_lock is held by caller so no one else can dequeue.
-+			 * Unlock rx_lock since memcpy_to_msg() may sleep.
-+			 */
-+			spin_unlock_bh(&vvs->rx_lock);
-+
-+			err = memcpy_to_msg(msg, pkt->buf + off, bytes);
-+			if (err)
-+				goto out;
-+
-+			spin_lock_bh(&vvs->rx_lock);
-+
-+			total += bytes;
-+			off += bytes;
-+		}
-+	}
-+
-+	spin_unlock_bh(&vvs->rx_lock);
-+
-+	return total;
-+
-+out:
-+	if (total)
-+		err = total;
-+	return err;
-+}
-+
-+static ssize_t
- virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
- 				   struct msghdr *msg,
- 				   size_t len)
-@@ -330,9 +379,9 @@ virtio_transport_stream_dequeue(struct vsock_sock *vsk,
- 				size_t len, int flags)
- {
- 	if (flags & MSG_PEEK)
--		return -EOPNOTSUPP;
--
--	return virtio_transport_stream_do_dequeue(vsk, msg, len);
-+		return virtio_transport_stream_do_peek(vsk, msg, len);
-+	else
-+		return virtio_transport_stream_do_dequeue(vsk, msg, len);
- }
- EXPORT_SYMBOL_GPL(virtio_transport_stream_dequeue);
- 
--- 
-2.7.4
-
+I ended up squashing these all together because they're all related
+and tiny.
