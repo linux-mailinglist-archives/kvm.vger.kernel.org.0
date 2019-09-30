@@ -2,142 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD9C7C24B4
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 17:55:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9545C253C
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 18:36:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731996AbfI3Pzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 11:55:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37096 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727767AbfI3Pzp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 11:55:45 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7C92BC04D293
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 15:55:44 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id m16so3983wmg.8
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 08:55:44 -0700 (PDT)
+        id S1732324AbfI3QgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 12:36:13 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38607 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731459AbfI3QgM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 12:36:12 -0400
+Received: by mail-io1-f66.google.com with SMTP id u8so39973490iom.5
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 09:36:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=57AYY0u9MsjJUEECwEHvJ6u5btLkPcCRtuHnRrQJapI=;
+        b=vLauWTgcxacCbWHTj6hvXFeeR30sX8SyJgIlTSPJr45xUSCPN0cc61USSem4QktzVu
+         1fLAbMtzn7E6wwIcQQ9Qd0RVLTIxhHY1MLeDcSpP9ufT4DJosLB+3r+OPzdZNHpkbKmz
+         mz+YMahFibVjm4rf/MZy96c+siAyc/yhRsvsYoW9ClHHo3L01GmmDVMCsien66ZsT9og
+         VF/owRigzm9RIzkwXRqavUQQfv3opkdTPdSklH3yVH4rP6CmaJIwNAyqlJUPXnACQtYF
+         /6Rj7pf1GvmVE5IUCx+kLdTB7Fqc6G1uUJKPthXf1KSDFmgzErceeWha/VLVbEybmO9Y
+         9xOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=+BD2ycFwWQSQrKNqGIpv6fduC0ZBdWw0d4zJAy9l8wA=;
-        b=qMs0Rid5Kuaoci69aqBSN09XOIltdJVIjwG2usJZXFh4fpe9Rhn1k6xA7LvbE1smiU
-         OCbR/picNCLywoKjuTgLf4DnnH2A0GnJ+tqdXi6QcNXaZObyWzBz6WcC8WmN5AO+sbI8
-         3FZ4AJwDiHFbdYBOtJD8qP86mkbMMFDt5QJy81DFnIdYmXeZMfLb+Bxl13Qqb69EH3+y
-         ZDehzRc6uJ9ZfCP2E8t0jES5wV8s7mGFcoz3kcRZmzK4J/Cxr0SyIzZj7rvaRFVUxXKx
-         IL3RBxucWXVYlISUWTUJ8+J4Hcs7PHxnhe56dg5KQMOSaZmUX//iGNssMoT8iQlqu+eL
-         N4UQ==
-X-Gm-Message-State: APjAAAUBjHUMSETMxINJxdaUPKqfYx2SNM7dIrIom6Y2SEXu1qo+B1pv
-        +SKYVuIRhYILmaDLovLNRZ9/TVgHit91AJTSd3go1n6AiXkVolhllvysB/44UO4hSJOvZVjiE8S
-        7ALw0NRluSE7X
-X-Received: by 2002:a1c:4946:: with SMTP id w67mr17840235wma.131.1569858943192;
-        Mon, 30 Sep 2019 08:55:43 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqybxKRnfhyeednrZhdUQjOiY96vN6kardd7AnGk13SqJ/2yQMIotgeHWc21k6F9JFkOSvQkwA==
-X-Received: by 2002:a1c:4946:: with SMTP id w67mr17840224wma.131.1569858942970;
-        Mon, 30 Sep 2019 08:55:42 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id x2sm17584453wrn.81.2019.09.30.08.55.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2019 08:55:42 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v2 4/8] KVM: VMX: Optimize vmx_set_rflags() for unrestricted guest
-In-Reply-To: <20190930151945.GB14693@linux.intel.com>
-References: <20190927214523.3376-1-sean.j.christopherson@intel.com> <20190927214523.3376-5-sean.j.christopherson@intel.com> <87muem40wi.fsf@vitty.brq.redhat.com> <20190930151945.GB14693@linux.intel.com>
-Date:   Mon, 30 Sep 2019 17:55:41 +0200
-Message-ID: <87k19p3hj6.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=57AYY0u9MsjJUEECwEHvJ6u5btLkPcCRtuHnRrQJapI=;
+        b=JkcfgffOtUu5As4oFGS8OZCkkog1LXPaZwDa2Dci1qA7REBEokfVE5BcqNEtPG7Qzw
+         PtTC3/SBblY+npcO3nW+fbwLx+W+rQv1PpQwSb85RKEqeF995hvJDYz/PfXieLb26P2Z
+         8Wgj84MG3NLYuJo+xKME1s2/YQLALP2CFx1pkJ9mO/6rUze5rUoMjhvd04/UhtpyaCVZ
+         ERbw6xnXANLGZMmBwCkp078wPzywkhxM9vVI7t2RMfcGUKFcN7yaZegsueQDqfRmseuB
+         R2gOGjmMM/ty2411jKxTJvn7C8ucF2FH+swDmkfB6yLZgtPuua5SZd4Do6S1u5t0kqTT
+         3N/g==
+X-Gm-Message-State: APjAAAUNmAG9SleZYy5R9Z33QzIG3U9iJR8+DfbfGk7ffiYqyamTAIiS
+        fTSJL2ug8D9g2Y+8rybTZmatfva9xUhwYi9WawEwdw==
+X-Google-Smtp-Source: APXvYqx2dfIYRy7h7yKIgZKiCnDmCdiQI5dNKGF/qRsXgS205w50n9oDynATQka9xJ5xedvTduDqhuq0gE1j/gyAa60=
+X-Received: by 2002:a02:ac82:: with SMTP id x2mr20116222jan.18.1569861371034;
+ Mon, 30 Sep 2019 09:36:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20190929145018.120753-1-liran.alon@oracle.com> <874l0u5jb4.fsf@vitty.brq.redhat.com>
+In-Reply-To: <874l0u5jb4.fsf@vitty.brq.redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 30 Sep 2019 09:35:59 -0700
+Message-ID: <CALMp9eS7wF1b6yBJrj_VL+HMEYjuZrYhmMHiCqJq8-33d9QE6A@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Remove proprietary handling of unexpected exit-reasons
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Liran Alon <liran.alon@oracle.com>, tao3.xu@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Mon, Sep 30, 2019 at 12:34 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Liran Alon <liran.alon@oracle.com> writes:
+>
+> > Commit bf653b78f960 ("KVM: vmx: Introduce handle_unexpected_vmexit
+> > and handle WAITPKG vmexit") introduced proprietary handling of
+> > specific exit-reasons that should not be raised by CPU because
+> > KVM configures VMCS such that they should never be raised.
+> >
+> > However, since commit 7396d337cfad ("KVM: x86: Return to userspace
+> > with internal error on unexpected exit reason"), VMX & SVM
+> > exit handlers were modified to generically handle all unexpected
+> > exit-reasons by returning to userspace with internal error.
+> >
+> > Therefore, there is no need for proprietary handling of specific
+> > unexpected exit-reasons (This proprietary handling also introduced
+> > inconsistency for these exit-reasons to silently skip guest instruction
+> > instead of return to userspace on internal-error).
+> >
+> > Fixes: bf653b78f960 ("KVM: vmx: Introduce handle_unexpected_vmexit and handle WAITPKG vmexit")
+> >
+> > Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>
+> (It's been awhile since in software world the word 'proprietary' became
+> an opposite of free/open-source to me so I have to admit your subject
+> line really got me interested :-)
+>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-> On Mon, Sep 30, 2019 at 10:57:17AM +0200, Vitaly Kuznetsov wrote:
->> Sean Christopherson <sean.j.christopherson@intel.com> writes:
->> 
->> > Rework vmx_set_rflags() to avoid the extra code need to handle emulation
->> > of real mode and invalid state when unrestricted guest is disabled.  The
->> > primary reason for doing so is to avoid the call to vmx_get_rflags(),
->> > which will incur a VMREAD when RFLAGS is not already available.  When
->> > running nested VMs, the majority of calls to vmx_set_rflags() will occur
->> > without an associated vmx_get_rflags(), i.e. when stuffing GUEST_RFLAGS
->> > during transitions between vmcs01 and vmcs02.
->> >
->> > Note, vmx_get_rflags() guarantees RFLAGS is marked available.
->> >
->> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> > ---
->> >  arch/x86/kvm/vmx/vmx.c | 28 ++++++++++++++++++----------
->> >  1 file changed, 18 insertions(+), 10 deletions(-)
->> >
->> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> > index 83fe8b02b732..814d3e6d0264 100644
->> > --- a/arch/x86/kvm/vmx/vmx.c
->> > +++ b/arch/x86/kvm/vmx/vmx.c
->> > @@ -1426,18 +1426,26 @@ unsigned long vmx_get_rflags(struct kvm_vcpu *vcpu)
->> >  void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
->> >  {
->> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> > -	unsigned long old_rflags = vmx_get_rflags(vcpu);
->> > +	unsigned long old_rflags;
->> >  
->> > -	__set_bit(VCPU_EXREG_RFLAGS, (ulong *)&vcpu->arch.regs_avail);
->> > -	vmx->rflags = rflags;
->> > -	if (vmx->rmode.vm86_active) {
->> > -		vmx->rmode.save_rflags = rflags;
->> > -		rflags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
->> > +	if (enable_unrestricted_guest) {
->> > +		__set_bit(VCPU_EXREG_RFLAGS, (ulong *)&vcpu->arch.regs_avail);
->> > +
->> > +		vmx->rflags = rflags;
->> > +		vmcs_writel(GUEST_RFLAGS, rflags);
->> > +	} else {
->> > +		old_rflags = vmx_get_rflags(vcpu);
->> > +
->> > +		vmx->rflags = rflags;
->> > +		if (vmx->rmode.vm86_active) {
->> > +			vmx->rmode.save_rflags = rflags;
->> > +			rflags |= X86_EFLAGS_IOPL | X86_EFLAGS_VM;
->> > +		}
->> > +		vmcs_writel(GUEST_RFLAGS, rflags);
->> > +
->> > +		if ((old_rflags ^ vmx->rflags) & X86_EFLAGS_VM)
->> > +			vmx->emulation_required = emulation_required(vcpu);
->> >  	}
->> > -	vmcs_writel(GUEST_RFLAGS, rflags);
->> 
->> We're doing vmcs_writel() in both branches so it could've stayed here, right?
->
-> Yes, but the resulting code is a bit ugly.  emulation_required() consumes
-> vmcs.GUEST_RFLAGS, i.e. the if statement that reads old_rflags would also
-> need to be outside of the else{} case.  
->
-> This isn't too bad:
->
-> 	if (!enable_unrestricted_guest && 
-> 	    ((old_rflags ^ vmx->rflags) & X86_EFLAGS_VM))
-> 		vmx->emulation_required = emulation_required(vcpu);
->
-> but gcc isn't smart enough to understand old_rflags won't be used if
-> enable_unrestricted_guest, so old_rflags either needs to be tagged with
-> uninitialized_var() or explicitly initialized in the if(){} case.
->
-> Duplicating a small amount of code felt like the lesser of two evils.
->
+I agree that proprietary is an unusual word choice.
 
-I see, thanks for these additional details!
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
--- 
-Vitaly
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 12 ------------
+> >  1 file changed, 12 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index d4575ffb3cec..e31317fc8c95 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -5538,14 +5538,6 @@ static int handle_encls(struct kvm_vcpu *vcpu)
+> >       return 1;
+> >  }
+> >
+> > -static int handle_unexpected_vmexit(struct kvm_vcpu *vcpu)
+> > -{
+> > -     kvm_skip_emulated_instruction(vcpu);
+> > -     WARN_ONCE(1, "Unexpected VM-Exit Reason = 0x%x",
+> > -             vmcs_read32(VM_EXIT_REASON));
+> > -     return 1;
+> > -}
+> > -
+> >  /*
+> >   * The exit handlers return 1 if the exit was handled fully and guest execution
+> >   * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+> > @@ -5597,15 +5589,11 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+> >       [EXIT_REASON_INVVPID]                 = handle_vmx_instruction,
+> >       [EXIT_REASON_RDRAND]                  = handle_invalid_op,
+> >       [EXIT_REASON_RDSEED]                  = handle_invalid_op,
+> > -     [EXIT_REASON_XSAVES]                  = handle_unexpected_vmexit,
+> > -     [EXIT_REASON_XRSTORS]                 = handle_unexpected_vmexit,
+> >       [EXIT_REASON_PML_FULL]                = handle_pml_full,
+> >       [EXIT_REASON_INVPCID]                 = handle_invpcid,
+> >       [EXIT_REASON_VMFUNC]                  = handle_vmx_instruction,
+> >       [EXIT_REASON_PREEMPTION_TIMER]        = handle_preemption_timer,
+> >       [EXIT_REASON_ENCLS]                   = handle_encls,
+> > -     [EXIT_REASON_UMWAIT]                  = handle_unexpected_vmexit,
+> > -     [EXIT_REASON_TPAUSE]                  = handle_unexpected_vmexit,
+> >  };
+> >
+> >  static const int kvm_vmx_max_exit_handlers =
+>
+> --
+> Vitaly
