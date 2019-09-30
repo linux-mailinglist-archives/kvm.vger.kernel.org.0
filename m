@@ -2,202 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAF49C21C5
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 15:20:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1125C2275
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 15:51:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731291AbfI3NUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 09:20:13 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27866 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731303AbfI3NUN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Sep 2019 09:20:13 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8UDILJ6099286
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 09:20:11 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2va2b5wxx5-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 09:20:08 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 30 Sep 2019 14:20:05 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 30 Sep 2019 14:20:01 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8UDJV4J38469904
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Sep 2019 13:19:31 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5669F52050;
-        Mon, 30 Sep 2019 13:19:59 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 3C2C65204E;
-        Mon, 30 Sep 2019 13:19:59 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id F1591E020F; Mon, 30 Sep 2019 15:19:58 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     qemu-devel <qemu-devel@nongnu.org>,
-        qemu-s390x <qemu-s390x@nongnu.org>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Thomas Huth <thuth@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Collin Walling <walling@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-        Peter Xu <peterx@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PULL 11/12] s390: do not call memory_region_allocate_system_memory() multiple times
-Date:   Mon, 30 Sep 2019 15:19:54 +0200
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190930131955.101131-1-borntraeger@de.ibm.com>
-References: <20190930131955.101131-1-borntraeger@de.ibm.com>
+        id S1731432AbfI3Nvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 09:51:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36876 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729738AbfI3Nvb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 09:51:31 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8863E5AFE9
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 13:51:30 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id j3so4539929wrn.7
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 06:51:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=KJecfdV4cU2EkR1odbrtXYLFF3/KCfbmiXi5v/OdwmM=;
+        b=A7WdEXtTSRC003hi+tLOMnPK9ogE7LyR0Io2pfZODIwX/YDDROv9A65Tqtpk/Iw7qd
+         nYmVw7gNdPiFGD2+tyYsYNZoV9rwdTpynmuimByzmrhGcAzWRBkqD3BQh4vRfHpIx1um
+         R4SoKJ7zzOPeZ8NSJsiTotwjyZd+D7JbrSUzffy9dugelsfGImGLO+7mgBG+X/BbbuwX
+         VHO8Zt0tIGWRJFHE03brBa66iQkqT5CSBsPMb+sXnl3up7F4BugHV78GUYa9sLGg4doX
+         HwTUnxQYNV5VdTD8VWPUWMk3+YsH+cxpvz7M5uV/vayE5fAfKwsFaLGfC5ABp0PF2VAs
+         cpvQ==
+X-Gm-Message-State: APjAAAVpTUm73HWXuIyxZzjoPtVR6LCzUSlEmn96pdP1OXtR5jZKDIjI
+        iEFJKOnN9+QtcfdfmBFl8cxq7RqFsmM5uUevet3q8qmazzwp/uw6JhgM/3KSNiUe0ydTFzFM4qS
+        RyIbyd34lAUlk
+X-Received: by 2002:a05:600c:238a:: with SMTP id m10mr18590252wma.51.1569851489005;
+        Mon, 30 Sep 2019 06:51:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwO29KpzdE/B4PZ3FyZQ0b+zqrWaXagG+JSizcZd8LEziw9BOwffjU331R6jmlmhQgquk4C4Q==
+X-Received: by 2002:a05:600c:238a:: with SMTP id m10mr18590238wma.51.1569851488775;
+        Mon, 30 Sep 2019 06:51:28 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
+        by smtp.gmail.com with ESMTPSA id h63sm26377926wmf.15.2019.09.30.06.51.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2019 06:51:28 -0700 (PDT)
+Date:   Mon, 30 Sep 2019 15:51:25 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Dexuan Cui <decui@microsoft.com>
+Cc:     "davem@davemloft.net" <davem@davemloft.net>,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "sashal@kernel.org" <sashal@kernel.org>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "deepa.kernel@gmail.com" <deepa.kernel@gmail.com>,
+        "ytht.net@gmail.com" <ytht.net@gmail.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        "jhansen@vmware.com" <jhansen@vmware.com>
+Subject: Re: [PATCH net v2] vsock: Fix a lockdep warning in __vsock_release()
+Message-ID: <20190930135125.prztj336splp74wq@steredhat>
+References: <1569460241-57800-1-git-send-email-decui@microsoft.com>
+ <20190926074749.sltehhkcgfduu7n2@steredhat.homenet.telecomitalia.it>
+ <PU1P153MB01698C46C9348B9762D5E122BF810@PU1P153MB0169.APCP153.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19093013-0012-0000-0000-00000352126E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19093013-0013-0000-0000-0000218CB4F0
-Message-Id: <20190930131955.101131-12-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-30_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909300138
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PU1P153MB01698C46C9348B9762D5E122BF810@PU1P153MB0169.APCP153.PROD.OUTLOOK.COM>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Igor Mammedov <imammedo@redhat.com>
+On Fri, Sep 27, 2019 at 05:37:20AM +0000, Dexuan Cui wrote:
+> > From: linux-hyperv-owner@vger.kernel.org
+> > <linux-hyperv-owner@vger.kernel.org> On Behalf Of Stefano Garzarella
+> > Sent: Thursday, September 26, 2019 12:48 AM
+> > 
+> > Hi Dexuan,
+> > 
+> > On Thu, Sep 26, 2019 at 01:11:27AM +0000, Dexuan Cui wrote:
+> > > ...
+> > > NOTE: I only tested the code on Hyper-V. I can not test the code for
+> > > virtio socket, as I don't have a KVM host. :-( Sorry.
+> > >
+> > > @Stefan, @Stefano: please review & test the patch for virtio socket,
+> > > and let me know if the patch breaks anything. Thanks!
+> > 
+> > Comment below, I'll test it ASAP!
+> 
+> Stefano, Thank you!
+> 
+> BTW, this is how I tested the patch:
+> 1. write a socket server program in the guest. The program calls listen()
+> and then calls sleep(10000 seconds). Note: accept() is not called.
+> 
+> 2. create some connections to the server program in the guest.
+> 
+> 3. kill the server program by Ctrl+C, and "dmesg" will show the scary
+> call-trace, if the kernel is built with 
+> 	CONFIG_LOCKDEP=y
+> 	CONFIG_LOCKDEP_SUPPORT=y
+> 
+> 4. Apply the patch, do the same test and we should no longer see the call-trace.
+> 
 
-s390 was trying to solve limited KVM memslot size issue by abusing
-memory_region_allocate_system_memory(), which breaks API contract
-where the function might be called only once.
+Hi Dexuan,
+I tested on virtio socket and it works as expected!
 
-Beside an invalid use of API, the approach also introduced migration
-issue, since RAM chunks for each KVM_SLOT_MAX_BYTES are transferred in
-migration stream as separate RAMBlocks.
+With your patch applied I don't have issues and call-trace. Without
+the patch I have a very similar call-trace (as expected):
+    ============================================
+    WARNING: possible recursive locking detected
+    5.3.0-vsock #17 Not tainted
+    --------------------------------------------
+    python3/872 is trying to acquire lock:
+    ffff88802b650110 (sk_lock-AF_VSOCK){+.+.}, at: virtio_transport_release+0x34/0x330 [vmw_vsock_virtio_transport_common]
 
-After discussion [1], it was agreed to break migration from older
-QEMU for guest with RAM >8Tb (as it was relatively new (since 2.12)
-and considered to be not actually used downstream).
-Migration should keep working for guests with less than 8TB and for
-more than 8TB with QEMU 4.2 and newer binary.
-In case user tries to migrate more than 8TB guest, between incompatible
-QEMU versions, migration should fail gracefully due to non-exiting
-RAMBlock ID or RAMBlock size mismatch.
+    but task is already holding lock:
+    ffff88803597ce10 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x3f/0x130 [vsock]
 
-Taking in account above and that now KVM code is able to split too
-big MemorySection into several memslots, partially revert commit
- (bb223055b s390-ccw-virtio: allow for systems larger that 7.999TB)
-and use kvm_set_max_memslot_size() to set KVMSlot size to
-KVM_SLOT_MAX_BYTES.
+    other info that might help us debug this:
+     Possible unsafe locking scenario:
 
-1) [PATCH RFC v2 4/4] s390: do not call  memory_region_allocate_system_memory() multiple times
+           CPU0
+           ----
+      lock(sk_lock-AF_VSOCK);
+      lock(sk_lock-AF_VSOCK);
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20190924144751.24149-5-imammedo@redhat.com>
-Acked-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/s390-virtio-ccw.c | 30 +++---------------------------
- target/s390x/kvm.c         | 11 +++++++++++
- 2 files changed, 14 insertions(+), 27 deletions(-)
+     *** DEADLOCK ***
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 8bfb6684cb72..18ad279a00a3 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -154,39 +154,15 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
- 
--/*
-- * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-- * as the dirty bitmap must be managed by bitops that take an int as
-- * position indicator. If we have a guest beyond that we will split off
-- * new subregions. The split must happen on a segment boundary (1MB).
-- */
--#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
--#define SEG_MSK (~0xfffffULL)
--#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
- static void s390_memory_init(ram_addr_t mem_size)
- {
-     MemoryRegion *sysmem = get_system_memory();
--    ram_addr_t chunk, offset = 0;
--    unsigned int number = 0;
-+    MemoryRegion *ram = g_new(MemoryRegion, 1);
-     Error *local_err = NULL;
--    gchar *name;
- 
-     /* allocate RAM for core */
--    name = g_strdup_printf("s390.ram");
--    while (mem_size) {
--        MemoryRegion *ram = g_new(MemoryRegion, 1);
--        uint64_t size = mem_size;
--
--        /* KVM does not allow memslots >= 8 TB */
--        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
--        memory_region_allocate_system_memory(ram, NULL, name, chunk);
--        memory_region_add_subregion(sysmem, offset, ram);
--        mem_size -= chunk;
--        offset += chunk;
--        g_free(name);
--        name = g_strdup_printf("s390.ram.%u", ++number);
--    }
--    g_free(name);
-+    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
-+    memory_region_add_subregion(sysmem, 0, ram);
- 
-     /*
-      * Configure the maximum page size. As no memory devices were created
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 97a662ad0ebf..54864c259c5e 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -28,6 +28,7 @@
- #include "cpu.h"
- #include "internal.h"
- #include "kvm_s390x.h"
-+#include "sysemu/kvm_int.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
-@@ -122,6 +123,15 @@
-  */
- #define VCPU_IRQ_BUF_SIZE(max_cpus) (sizeof(struct kvm_s390_irq) * \
-                                      (max_cpus + NR_LOCAL_IRQS))
-+/*
-+ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-+ * as the dirty bitmap must be managed by bitops that take an int as
-+ * position indicator. If we have a guest beyond that we will split off
-+ * new subregions. The split must happen on a segment boundary (1MB).
-+ */
-+#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
-+#define SEG_MSK (~0xfffffULL)
-+#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
- 
- static CPUWatchpoint hw_watchpoint;
- /*
-@@ -355,6 +365,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      */
-     /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
- 
-+    kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
-     return 0;
- }
- 
--- 
-2.21.0
+     May be due to missing lock nesting notation
 
+    2 locks held by python3/872:
+     #0: ffff88802c957180 (&sb->s_type->i_mutex_key#8){+.+.}, at: __sock_release+0x2d/0xb0
+     #1: ffff88803597ce10 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x3f/0x130 [vsock]
+
+    stack backtrace:
+    CPU: 0 PID: 872 Comm: python3 Not tainted 5.3.0-vsock #17
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-2.fc30 04/01/2014
+    Call Trace:
+     dump_stack+0x85/0xc0
+     __lock_acquire.cold+0xad/0x22b
+     lock_acquire+0xc4/0x1a0
+     ? virtio_transport_release+0x34/0x330 [vmw_vsock_virtio_transport_common]
+     lock_sock_nested+0x5d/0x80
+     ? virtio_transport_release+0x34/0x330 [vmw_vsock_virtio_transport_common]
+     virtio_transport_release+0x34/0x330 [vmw_vsock_virtio_transport_common]
+     ? mark_held_locks+0x49/0x70
+     ? _raw_spin_unlock_irqrestore+0x44/0x60
+     __vsock_release+0x2d/0x130 [vsock]
+     __vsock_release+0xb9/0x130 [vsock]
+     vsock_release+0x12/0x30 [vsock]
+     __sock_release+0x3d/0xb0
+     sock_close+0x14/0x20
+     __fput+0xc1/0x250
+     task_work_run+0x93/0xb0
+     exit_to_usermode_loop+0xd3/0xe0
+     syscall_return_slowpath+0x205/0x310
+     entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+
+Feel free to add:
+
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
