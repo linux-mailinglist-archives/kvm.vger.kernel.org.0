@@ -2,232 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF4C0C23F4
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 17:10:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FC70C240C
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 17:14:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731748AbfI3PKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 11:10:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52946 "EHLO mx1.redhat.com"
+        id S1731936AbfI3POh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 11:14:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44322 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731499AbfI3PKO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 11:10:14 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1730780AbfI3POh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 11:14:37 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 66AB33086272;
-        Mon, 30 Sep 2019 15:10:14 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id A0C2285542;
+        Mon, 30 Sep 2019 15:14:36 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E62516012A;
-        Mon, 30 Sep 2019 15:10:12 +0000 (UTC)
-Date:   Mon, 30 Sep 2019 17:10:10 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D3795D9C3;
+        Mon, 30 Sep 2019 15:14:34 +0000 (UTC)
+Date:   Mon, 30 Sep 2019 17:14:32 +0200
 From:   Andrew Jones <drjones@redhat.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         pbonzini@redhat.com, maz@kernel.org, mark.rutland@arm.com,
         andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH 3/3] arm64: Add cache code generation test
-Message-ID: <20190930151010.bizhegm3oh2cgefk@kamzik.brq.redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 2/3] lib: arm/arm64: Add function to clear
+ the PTE_USER bit
+Message-ID: <20190930151432.zgcaxtn7glrffkkn@kamzik.brq.redhat.com>
 References: <20190930142508.25102-1-alexandru.elisei@arm.com>
- <20190930142508.25102-4-alexandru.elisei@arm.com>
+ <20190930142508.25102-3-alexandru.elisei@arm.com>
+ <20190930145357.o7pq5ysttui2pjjm@kamzik.brq.redhat.com>
+ <a33705e8-fd12-86db-be64-dca9900a5555@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190930142508.25102-4-alexandru.elisei@arm.com>
+In-Reply-To: <a33705e8-fd12-86db-be64-dca9900a5555@arm.com>
 User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 30 Sep 2019 15:10:14 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 30 Sep 2019 15:14:36 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 03:25:08PM +0100, Alexandru Elisei wrote:
-> Caches are a misterious creature on arm64, requiring a more hands-on
-> approach from the programmer than on x86. When generating code, two cache
-> maintenance operations are generally required: an invalidation for the
-> stale instruction and a clean to the PoU (Point of Unification) for the new
-> instruction. Fortunately, the ARM architecture has features to alleviate
-> some of this overhead, which are advertised via the IDC and DIC bits in
-> CTR_EL0: if IDC is 1, then the dcache clean is not required, and if DIC is
-> 1, the icache invalidation can be absent. KVM exposes these bits to the
-> guest.
+On Mon, Sep 30, 2019 at 04:09:49PM +0100, Alexandru Elisei wrote:
+> Hi,
 > 
-> Until Linux v4.16.1, KVM performed an icache invalidation each time a stage
-> 2 page was mapped. This was then optimized so that the icache invalidation
-> was performed when the guest tried to execute code from the page for the
-> first time. And that was optimized again when support for the DIC bit was
-> added to KVM.
+> On 9/30/19 3:53 PM, Andrew Jones wrote:
 > 
-> The interactions between a guest that is generating code, the stage 2
-> tables and the IDC and DIC bits can be subtle, especially when KVM
-> optimizations come into play. Let's add a test that generates a few
-> instructions and checks that KVM indeed honors those bits.
+> > On Mon, Sep 30, 2019 at 03:25:07PM +0100, Alexandru Elisei wrote:
+> > > The PTE_USER bit (AP[1]) in a page entry means that lower privilege levels
+> > > (EL0, on arm64, or PL0, on arm) can read and write from that memory
+> > > location [1][2]. On arm64, it also implies PXN (Privileged execute-never)
+> > > when is set [3]. Add a function to clear the bit which we can use when we
+> > > want to execute code from that page or the prevent access from lower
+> > > exception levels.
+> > > 
+> > > Make it available to arm too, in case someone needs it at some point.
+> > > 
+> > > [1] ARM DDI 0406C.d, Table B3-6
+> > > [2] ARM DDI 0487E.a, table D5-28
+> > > [3] ARM DDI 0487E.a, table D5-33
+> > > 
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > >   lib/arm/asm/mmu-api.h |  1 +
+> > >   lib/arm/mmu.c         | 15 +++++++++++++++
+> > >   2 files changed, 16 insertions(+)
+> > > 
+> > > diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
+> > > index df3ccf7bc7e0..8fe85ba31ec9 100644
+> > > --- a/lib/arm/asm/mmu-api.h
+> > > +++ b/lib/arm/asm/mmu-api.h
+> > > @@ -22,4 +22,5 @@ extern void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
+> > >   extern void mmu_set_range_ptes(pgd_t *pgtable, uintptr_t virt_offset,
+> > >   			       phys_addr_t phys_start, phys_addr_t phys_end,
+> > >   			       pgprot_t prot);
+> > > +extern void mmu_clear_user(unsigned long vaddr);
+> > >   #endif
+> > > diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> > > index 3d38c8397f5a..78db22e6af14 100644
+> > > --- a/lib/arm/mmu.c
+> > > +++ b/lib/arm/mmu.c
+> > > @@ -217,3 +217,18 @@ unsigned long __phys_to_virt(phys_addr_t addr)
+> > >   	assert(!mmu_enabled() || __virt_to_phys(addr) == addr);
+> > >   	return addr;
+> > >   }
+> > > +
+> > > +void mmu_clear_user(unsigned long vaddr)
+> > > +{
+> > > +	pgd_t *pgtable;
+> > > +	pteval_t *pte;
+> > > +
+> > > +	if (!mmu_enabled())
+> > > +		return;
+> > > +
+> > > +	pgtable = current_thread_info()->pgtable;
+> > > +	pte = get_pte(pgtable, vaddr);
+> > > +
+> > > +	*pte &= ~PTE_USER;
+> > > +	flush_tlb_page(vaddr);
+> > > +}
+> > > -- 
+> > > 2.20.1
+> > > 
+> > This is fine, but I think you could just export get_pte() and then
+> > implement the PTE_USER clearing in the cache unit test instead. Anyway,
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/Makefile.arm64 |   1 +
->  arm/cache.c        | 122 +++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg  |   6 +++
->  3 files changed, 129 insertions(+)
->  create mode 100644 arm/cache.c
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 35de5ea333b4..6d3dc2c4a464 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -25,6 +25,7 @@ OBJDIRS += lib/arm64
->  # arm64 specific tests
->  tests = $(TEST_DIR)/timer.flat
->  tests += $(TEST_DIR)/micro-bench.flat
-> +tests += $(TEST_DIR)/cache.flat
->  
->  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  
-> diff --git a/arm/cache.c b/arm/cache.c
-> new file mode 100644
-> index 000000000000..2939b85a8c9a
-> --- /dev/null
-> +++ b/arm/cache.c
-> @@ -0,0 +1,122 @@
-> +#include <libcflat.h>
-> +#include <alloc_page.h>
-> +#include <asm/mmu.h>
-> +#include <asm/processor.h>
-> +
-> +#define NTIMES			(1 << 16)
-> +
-> +#define CTR_DIC			(1UL << 29)
-> +#define CTR_IDC			(1UL << 28)
-> +
-> +#define CLIDR_LOC_SHIFT		24
-> +#define CLIDR_LOC_MASK		(7UL << CLIDR_LOC_SHIFT)
-> +#define CLIDR_LOUU_SHIFT	27
-> +#define CLIDR_LOUU_MASK		(7UL << CLIDR_LOUU_SHIFT)
-> +#define CLIDR_LOUIS_SHIFT	21
-> +#define CLIDR_LOUIS_MASK	(7UL << CLIDR_LOUIS_SHIFT)
-> +
-> +#define RET			0xd65f03c0
-> +#define MOV_X0(x)		(0xd2800000 | (((x) & 0xffff) << 5))
-> +
-> +#define clean_dcache_pou(addr)			\
-> +	asm volatile("dc cvau, %0\n" :: "r" (addr) : "memory")
-> +#define inval_icache_pou(addr)			\
-> +	asm volatile("ic ivau, %0\n" :: "r" (addr) : "memory")
-> +
-> +typedef int (*fn_t)(void);
-> +
-> +static inline void prime_icache(u32 *code, u32 insn)
-> +{
-> +	*code = insn;
-> +	/* This is the sequence recommended in ARM DDI 0487E.a, page B2-136. */
-> +	clean_dcache_pou(code);
-> +	dsb(ish);
-> +	inval_icache_pou(code);
-> +	dsb(ish);
-> +	isb();
-> +
-> +	((fn_t)code)();
-> +}
-> +
-> +static void check_code_generation(bool dcache_clean, bool icache_inval)
-> +{
-> +	u32 fn[] = {MOV_X0(0x42), RET};
-> +	u32 *code = alloc_page();
-> +	unsigned long sctlr;
-> +	int i, ret;
-> +	bool success;
-> +
-> +	/* Make sure we can execute from a writable page */
-> +	mmu_clear_user((unsigned long)code);
-> +
-> +	sctlr = read_sysreg(sctlr_el1);
-> +	if (sctlr & SCTLR_EL1_WXN) {
-> +		sctlr &= ~SCTLR_EL1_WXN;
-> +		write_sysreg(sctlr, sctlr_el1);
-> +		isb();
-> +		/* SCTLR_EL1.WXN is permitted to be cached in a TLB. */
-> +		flush_tlb_all();
-> +	}
-> +
-> +	for (i = 0; i < ARRAY_SIZE(fn); i++) {
-> +		*(code + i) = fn[i];
-> +		clean_dcache_pou(code + i);
-> +		dsb(ish);
-> +		inval_icache_pou(code + i);
-> +	}
-> +	dsb(ish);
-> +	isb();
-> +
-> +	/* Sanity check */
-> +	((fn_t)code)();
-> +
-> +	success = true;
-> +	for (i = 0; i < NTIMES; i++) {
-> +		prime_icache(code, MOV_X0(0x42));
-> +		*code = MOV_X0(0x66);
-> +		if (dcache_clean)
-> +			clean_dcache_pou(code);
-> +		if (icache_inval) {
-> +			if (dcache_clean)
-> +				dsb(ish);
-> +			inval_icache_pou(code);
-> +		}
-> +		dsb(ish);
-> +		isb();
-> +
-> +		ret = ((fn_t)code)();
-> +		success &= (ret == 0x66);
-> +	}
-> +
-> +	report("code generation", success);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	u64 ctr, clidr;
-> +	bool dcache_clean, icache_inval;
-> +
-> +	report_prefix_push("IDC-DIC");
-> +
-> +	ctr = read_sysreg(ctr_el0);
-> +	dcache_clean = !(ctr & CTR_IDC);
-> +	icache_inval = !(ctr & CTR_DIC);
-> +
-> +	if (dcache_clean) {
-> +		clidr = read_sysreg(clidr_el1);
-> +		if ((clidr & CLIDR_LOC_MASK) == 0)
-> +			dcache_clean = false;
-> +		if ((clidr & CLIDR_LOUU_MASK) == 0 &&
-> +		    (clidr & CLIDR_LOUIS_MASK) == 0)
-> +			dcache_clean = false;
-> +	}
-> +
-> +	if (dcache_clean)
-> +		report_info("dcache clean to PoU required");
-> +	if (icache_inval)
-> +		report_info("icache invalidation to PoU required");
-> +
-> +	check_code_generation(dcache_clean, icache_inval);
-> +
-> +	return report_summary();
-> +}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 6d3df92a4e28..37f07788c5f0 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -142,3 +142,9 @@ smp = 2
->  groups = nodefault,micro-bench
->  accel = kvm
->  arch = arm64
-> +
-> +# Cache emulation tests
-> +[cache]
-> +file = cache.flat
-> +arch = arm64
-> +group = cache
+> I thought about that, but I opted to make this a library function because I
+> would like to modify it to also act on block mappings and use it in patch #4
+> from the EL2 series (the patch that adds the prefetch abort test), and send
+> that change as part of the EL2 series. I am assuming that this patch set
+> will get merged before the EL2 series.
 
-s/group/groups/
+Yeah, I need to get back to that EL2 series. I just need to wrap up a
+couple more things and then I'll be able to focus on it. If you have
+some plans to refresh it, then feel free to do that now. When I get
+back to it, I'll just jump into the refreshed version.
 
-Besides this 'groups' typo
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Thanks,
+drew
