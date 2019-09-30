@@ -2,108 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8619CC28D0
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 23:32:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2FD7C2937
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 23:59:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730042AbfI3Vaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 17:30:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43976 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729482AbfI3Vap (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 17:30:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A6ADC3066FD9;
-        Mon, 30 Sep 2019 17:54:50 +0000 (UTC)
-Received: from localhost (ovpn-116-88.gru2.redhat.com [10.97.116.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3954F5D9C9;
-        Mon, 30 Sep 2019 17:54:50 +0000 (UTC)
-Date:   Mon, 30 Sep 2019 14:54:49 -0300
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Robert Hoo <robert.hu@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Robert Hu <robert.hu@intel.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
-Message-ID: <20190930175449.GB4084@habkost.net>
-References: <1545227503-214403-1-git-send-email-robert.hu@linux.intel.com>
- <CALMp9eRZCoZbeyttZdvaCUpOFKygTNVF_x7+TWh6MktmF-ZK9A@mail.gmail.com>
- <263d31d9-b21e-ceb9-b47c-008e30bbd94f@redhat.com>
- <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
+        id S1727681AbfI3V7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 17:59:47 -0400
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:45096 "EHLO
+        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726005AbfI3V7r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 17:59:47 -0400
+Received: by mail-ua1-f68.google.com with SMTP id j5so4737961uak.12
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 14:59:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QtvBdRQvi1GH0t6lRFmlMlveMzJkrpmQEmG0i+pGsaA=;
+        b=tVGXXjv39mIHjDE8vkeaxDpBLSJTrjk0DQI3r8U1Tq3B3PLMJQQ1HSLscmpgLMoG/q
+         GUvWf5+0GWYee9ePx6k1nipidvubKzt1p+d8KQX4JKFqvLZb0LF2cgZ4yzdnZBHpVVKn
+         TxjN0QSDf64YxFyJL/hq4V4ScjryBUpp1rAnkuDkEQ9kLpN6gJ3Q+eYR8aQcJnQYwJP8
+         AOrEVEPvSp2XXdJg2CV3KZ98w7tuc/IsVtfp2WHr8JyAFgdnsYEG0kf0S2TDv7n7Yv/8
+         1sbw14NrtfuW1frpWa+oJ8tYnEesbQGff9u7axg7vPZXUhsc3nJ/QXIKCFiG6hcc2YKt
+         tNsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QtvBdRQvi1GH0t6lRFmlMlveMzJkrpmQEmG0i+pGsaA=;
+        b=HFTqOz9m/SCpjBAq7ny2lyEw5Wsx53Ff5HtLIgAhTNf7pL8Gq0NedkEeB/zTpMh/na
+         3L0DVX1QdZq+0rJHYNMmw+9xsiyuH5wdKiddmDQyDucTOwIXJK5Gw9Rn2/X4OXqhsQC6
+         bqY5IK0L+pOkel374MGurQD9ghPH50Mobzp1se1aV/Qt1LKoHXdgpVSU79TVYzbykmTu
+         d8XhDfHBVQH70ZXIBlMewLLWYdRLxH8HuPtlhpNJJo0kDPXvf1G6KwJrqKMElD9v/0bp
+         4Swri5u4ZDqldioXrKPM4u4qXtZCCIPcBh0wb5uKMTafeaEIUP/S4936B53MpbJyFoGo
+         lQsg==
+X-Gm-Message-State: APjAAAWSv+6EBGL/79biPmTd1WMpFnZG5yLVA4er9irzWqeMFLhF+6IW
+        nUizb2+WA2QkhSg4SoIP9jyzaw3QXk6Y+6akO7KN
+X-Google-Smtp-Source: APXvYqxrgOLUkrBWGYd7LUi01TPfr5SHcJMXNSkmDWYsJ3R89XLi6pDv6N/sv22wYx+0GbYBCqlEejnS+QzOf3ex0N4=
+X-Received: by 2002:ab0:6046:: with SMTP id o6mr12343745ual.75.1569880785522;
+ Mon, 30 Sep 2019 14:59:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 30 Sep 2019 17:54:50 +0000 (UTC)
+References: <CAGG=3QUL_OrjaWn+gF4z-R8brR2=3661hGk0uUAK2y8Dff7Mvg@mail.gmail.com>
+ <CALMp9eTm4sbr2GK+mM_ibazA9i9d4-eBcMhtZmfTf6HQbbD_Bg@mail.gmail.com>
+In-Reply-To: <CALMp9eTm4sbr2GK+mM_ibazA9i9d4-eBcMhtZmfTf6HQbbD_Bg@mail.gmail.com>
+From:   Bill Wendling <morbo@google.com>
+Date:   Mon, 30 Sep 2019 14:59:34 -0700
+Message-ID: <CAGG=3QWN8+b0pB9xWnhJsCqPmu+8VDDEdCeSbi=HJCZfRW-8jg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] lib: use an argument which doesn't require
+ default argument promotion
+To:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CCing qemu-devel.
-
-On Tue, Sep 24, 2019 at 01:30:04PM -0700, Jim Mattson wrote:
-> On Wed, Dec 19, 2018 at 1:02 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, Sep 10, 2019 at 9:43 AM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Mon, Sep 9, 2019 at 4:12 PM Bill Wendling <morbo@google.com> wrote:
 > >
-> > On 19/12/18 18:39, Jim Mattson wrote:
-> > > Is this an instruction that kvm has to be able to emulate before it
-> > > can enumerate its existence?
+> > Clang warns that passing an object that undergoes default argument
+> > promotion to "va_start" is undefined behavior:
 > >
-> > It doesn't have any operands, so no.
+> > lib/report.c:106:15: error: passing an object that undergoes default
+> > argument promotion to 'va_start' has undefined behavior
+> > [-Werror,-Wvarargs]
+> >         va_start(va, pass);
 > >
-> > Paolo
+> > Using an "unsigned" type removes the need for argument promotion.
 > >
-> > > On Wed, Dec 19, 2018 at 5:51 AM Robert Hoo <robert.hu@linux.intel.com> wrote:
-> > >>
-> > >> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > >> ---
-> > >>  arch/x86/include/asm/cpufeatures.h | 1 +
-> > >>  arch/x86/kvm/cpuid.c               | 2 +-
-> > >>  2 files changed, 2 insertions(+), 1 deletion(-)
-> > >>
-> > >> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> > >> index 28c4a50..932b19f 100644
-> > >> --- a/arch/x86/include/asm/cpufeatures.h
-> > >> +++ b/arch/x86/include/asm/cpufeatures.h
-> > >> @@ -280,6 +280,7 @@
-> > >>  /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
-> > >>  #define X86_FEATURE_CLZERO             (13*32+ 0) /* CLZERO instruction */
-> > >>  #define X86_FEATURE_IRPERF             (13*32+ 1) /* Instructions Retired Count */
-> > >> +#define X86_FEATURE_WBNOINVD           (13*32+ 9) /* Writeback and Don't invalid cache */
-> > >>  #define X86_FEATURE_XSAVEERPTR         (13*32+ 2) /* Always save/restore FP error pointers */
-> > >>  #define X86_FEATURE_AMD_IBPB           (13*32+12) /* "" Indirect Branch Prediction Barrier */
-> > >>  #define X86_FEATURE_AMD_IBRS           (13*32+14) /* "" Indirect Branch Restricted Speculation */
-> > >> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > >> index cc6dd65..763e115 100644
-> > >> --- a/arch/x86/kvm/cpuid.c
-> > >> +++ b/arch/x86/kvm/cpuid.c
-> > >> @@ -380,7 +380,7 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
-> > >>
-> > >>         /* cpuid 0x80000008.ebx */
-> > >>         const u32 kvm_cpuid_8000_0008_ebx_x86_features =
-> > >> -               F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
-> > >> +               F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
-> > >>                 F(AMD_SSB_NO) | F(AMD_STIBP);
-> > >>
-> > >>         /* cpuid 0xC0000001.edx */
-> > >> --
-> > >> 1.8.3.1
-> > >>
-> 
-> What is the point of enumerating support for WBNOINVD if kvm is going
-> to implement it as WBINVD?
-
-I expect GET_SUPPORTED_CPUID to return WBNOINVD, because it
-indicates to userspace what is supported by KVM.  Are there any
-expectations that GET_SUPPORTED_CPUID will also dictate what is
-enabled by default in some cases?
-
-In either case, your question applies to QEMU: why do we want
-WBNOINVD to be enabled by "-cpu host" by default and be part of
-QEMU's Icelake-* CPU model definitions?
-
--- 
-Eduardo
+> > Signed-off-by: Bill Wendling <morbo@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
