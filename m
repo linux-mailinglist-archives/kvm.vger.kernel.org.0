@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41FF0C21C1
+	by mail.lfdr.de (Postfix) with ESMTP id B0866C21C2
 	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 15:20:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731300AbfI3NUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 09:20:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47532 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730411AbfI3NUG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 30 Sep 2019 09:20:06 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8UDHx49001464
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 09:20:05 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vbhk7u4g7-1
+        id S1731261AbfI3NUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 09:20:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41204 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731264AbfI3NUH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 30 Sep 2019 09:20:07 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8UDI1Zm107282
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 09:20:06 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vbhdyuknp-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
         for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 09:20:05 -0400
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 30 Sep 2019 14:20:03 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Mon, 30 Sep 2019 14:20:04 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
         Mon, 30 Sep 2019 14:19:59 +0100
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8UDJvHo60358700
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x8UDJwE548693416
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Sep 2019 13:19:57 GMT
+        Mon, 30 Sep 2019 13:19:58 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A68D64C040;
+        by IMSVA (Postfix) with ESMTP id EAB6A4C046;
         Mon, 30 Sep 2019 13:19:57 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E8A44C044;
+        by IMSVA (Postfix) with ESMTP id D3C6C4C040;
         Mon, 30 Sep 2019 13:19:57 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Mon, 30 Sep 2019 13:19:57 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 4802BE01C8; Mon, 30 Sep 2019 15:19:57 +0200 (CEST)
+        id 8EB54E020F; Mon, 30 Sep 2019 15:19:57 +0200 (CEST)
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Peter Maydell <peter.maydell@linaro.org>
 Cc:     qemu-devel <qemu-devel@nongnu.org>,
@@ -56,20 +56,19 @@ Cc:     qemu-devel <qemu-devel@nongnu.org>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-        "Jason J . Herne" <jjherne@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PULL 06/12] s390x: sclp: Report insufficient SCCB length
-Date:   Mon, 30 Sep 2019 15:19:49 +0200
+Subject: [PULL 07/12] configure: Remove s390 (31-bit mode) from the list of supported CPUs
+Date:   Mon, 30 Sep 2019 15:19:50 +0200
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190930131955.101131-1-borntraeger@de.ibm.com>
 References: <20190930131955.101131-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19093013-0016-0000-0000-000002B21349
+x-cbid: 19093013-4275-0000-0000-0000036C8D86
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19093013-0017-0000-0000-00003312EE87
-Message-Id: <20190930131955.101131-7-borntraeger@de.ibm.com>
+x-cbparentid: 19093013-4276-0000-0000-0000387F14AB
+Message-Id: <20190930131955.101131-8-borntraeger@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-30_08:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
@@ -82,51 +81,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Return the correct error code when the SCCB buffer is too small to
-contain all of the output, for the Read SCP Information and
-Read CPU Information commands.
+On IBM Z, KVM in the kernel is only implemented for 64-bit mode, and
+with regards to TCG, we also only support 64-bit host CPUs (see the
+check at the beginning of tcg/s390/tcg-target.inc.c), so we should
+remove s390 (without "x", i.e. the old 31-bit mode CPUs) from the
+list of supported CPUs.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
-Message-Id: <1569591203-15258-5-git-send-email-imbrenda@linux.ibm.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190928190334.6897-1-thuth@redhat.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/s390x/sclp.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index abb6e5011f9c..f57ce7b73943 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -68,6 +68,12 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
- 
-     read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
- 
-+    if (be16_to_cpu(sccb->h.length) <
-+            (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
-+        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+        return;
-+    }
-+
-     /* Configuration Characteristic (Extension) */
-     s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR,
-                          read_info->conf_char);
-@@ -118,6 +124,12 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
-     cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
-     cpu_info->nr_standby = cpu_to_be16(0);
- 
-+    if (be16_to_cpu(sccb->h.length) <
-+            (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
-+        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-+        return;
-+    }
-+
-     /* The standby offset is 16-byte for each CPU */
-     cpu_info->offset_standby = cpu_to_be16(cpu_info->offset_configured
-         + cpu_info->nr_configured*sizeof(CPUEntry));
+diff --git a/configure b/configure
+index 542f6aea3f61..8f8446f52b92 100755
+--- a/configure
++++ b/configure
+@@ -728,7 +728,7 @@ ARCH=
+ # Normalise host CPU name and set ARCH.
+ # Note that this case should only have supported host CPUs, not guests.
+ case "$cpu" in
+-  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
++  ppc|ppc64|s390x|sparc64|x32|riscv32|riscv64)
+     supported_cpu="yes"
+   ;;
+   ppc64le)
 -- 
 2.21.0
 
