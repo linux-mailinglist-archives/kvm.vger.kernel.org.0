@@ -2,130 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9993DC2B2E
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 02:08:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13D53C2B33
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 02:12:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728217AbfJAAIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 20:08:43 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:45662 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726992AbfJAAIn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 20:08:43 -0400
-Received: by mail-pg1-f196.google.com with SMTP id q7so8300108pgi.12
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 17:08:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=qzNv40NLzWThBXJPgX2nx3MO+ppg/Ys/jFZDszfTqXA=;
-        b=tkKfIlJGysNRqommMIawpjXJlSVh44rjC8SBbwWNBQfxCYeINHRWQE1hvkyGC3T8qu
-         AWJ/QXf9+47LT8QBOIrpBUjUQgiPw6QQXszQtvt4u4cWsfBEWDi9OCOAW8iymjchWF/s
-         9dTGPA3J8EUGkcaAsCMt3y/B8FoqjslcT16LDta3g9YqHjDIuiHH8mo1qdnjvf9IVCt/
-         YBk8uC8A6CkhYCfC+oChK/b3Lrlo4BC61M5sQFNgHwOrT5GzhcRLqIAfOIikKOKuPWQC
-         FrDDZbgBek933QFJhcmt10PoUDXQaxEjivg2L8QNAo3Kg4eGQL3yB7kTLX7m3eA0C44p
-         xz2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=qzNv40NLzWThBXJPgX2nx3MO+ppg/Ys/jFZDszfTqXA=;
-        b=m87p6cTOU66HnHbcuEl66IsQbo2mGelgDzSjdd8seGEknhaP8hltqmTqKhYlrR4F5i
-         yy5sEquDAJnFofoZYqO1AKur00Wm2xg0soUQYpTVg5MaLMuEkBfpM2t3KcAay/OXvSgd
-         XX3qKSlDwlhEhK34IrcwSNBq/T/tKvgbRUBpuf+kn2emp9jOUF+9C1UVk4i4XCrvpfys
-         I4k1PGBfkQl2hGRZb3bV7w0lN4z+KsRe+a5K2BOZb2xUcxjFnrYR6YTEdExxzaAiP1Wk
-         TFpnvBxPYBREBCPmNp60nr9JEjofoSpkKYPyef4lbV8yZSLGsPLe++EKYN+rGpsCxBYh
-         aGlA==
-X-Gm-Message-State: APjAAAVe7RqaqKTJXpWuSwlRj81qSAOhjlzLmSjBjPl4Hreay0CfKhEM
-        wogIl61W1TbX9kcBIhTHQns=
-X-Google-Smtp-Source: APXvYqzYK87AfYGUcupUDbTP1u2f4YrQ1MfR6chWOCtWXd6aEMiEUOCIvxDfPM2GSiUpnvE35I/nAw==
-X-Received: by 2002:a63:2581:: with SMTP id l123mr20000129pgl.293.1569888522413;
-        Mon, 30 Sep 2019 17:08:42 -0700 (PDT)
-Received: from [10.2.144.69] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id s14sm11752001pfe.52.2019.09.30.17.08.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Sep 2019 17:08:41 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [kvm-unit-tests PATCH v7 2/2] x86: nvmx: test max atomic switch
- MSRs
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CAA03e5EZ-e0RemkakTab+CFo=P2kLLaLi0UROpsVtQEVt8p1Bw@mail.gmail.com>
-Date:   Mon, 30 Sep 2019 17:08:39 -0700
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C8510239-CEDD-496B-A772-12A8A8C03ADD@gmail.com>
-References: <20190925011821.24523-1-marcorr@google.com>
- <20190925011821.24523-2-marcorr@google.com>
- <91eb40a0-c436-5737-aa8a-c657b7221be2@redhat.com>
- <20190926143201.GA4738@linux.intel.com>
- <C94E79EE-EACF-40C1-AF7A-69E2A8EFAA35@gmail.com>
- <CAA03e5FPBdHhVY5AyOd68UkriG=+poWf0PCcsUVBOHW7YPF3VA@mail.gmail.com>
- <DDBD57EF-C9A9-40EE-ACFE-0E3B30C275F9@gmail.com>
- <CAA03e5EZ-e0RemkakTab+CFo=P2kLLaLi0UROpsVtQEVt8p1Bw@mail.gmail.com>
-To:     Marc Orr <marcorr@google.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1731781AbfJAAMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 20:12:46 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:33730 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731180AbfJAAMp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 20:12:45 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x910CTr5016221;
+        Tue, 1 Oct 2019 00:12:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=pbBcT1CvpMxQGXeCx8JUrXG+ZpeY1YqFtDqk4vobi9s=;
+ b=nxpJwVZY/S9Xnt1ZsvteIOdVkl2w3fdmaDll0qxo5K9n3qBC5sRP3T0PHwoT6qwqffwO
+ Zw27clL0pbGnUtmE+7hw6MVXh1ABAd/Z9OFUhAckufvWeGWOYxLq/+op9in/1A46CCUz
+ wSK20sw9teOTbhSfsChT9uIlzvdeUaP2tWiule6MQ4v//B2lTKwUPlv04BYoGHMxdu0W
+ O2/zIlsVpsk3e4TcdG9s+Azpo8QFfsVl1GcGz6ry0YLAaO4IaVBzqq10E8Y17sgKELdR
+ hbS37bfSgcndhfRuJUGKDn5bZdynQgY2moKjy2PHIpGFhWinsfUf5zaj/T9iHvei/oNG /g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2v9xxujgcb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Oct 2019 00:12:29 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9109t11127005;
+        Tue, 1 Oct 2019 00:12:23 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2vbmpx9xa6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Oct 2019 00:12:23 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x910CMnm025084;
+        Tue, 1 Oct 2019 00:12:22 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 30 Sep 2019 17:12:22 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, jmattson@google.com
+Subject: [PATCH] KVM: nVMX: Defer error from VM-entry MSR-load area to until after hardware verifies VMCS guest state-area
+Date:   Mon, 30 Sep 2019 19:36:25 -0400
+Message-Id: <20190930233626.22852-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=694
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910010000
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=776 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910010000
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Sep 30, 2019, at 5:03 PM, Marc Orr <marcorr@google.com> wrote:
->=20
->>>> Thanks for caring, but it would be better to explicitly skip the =
-test if it
->>>> is not running on bare-metal. For instance, I missed this thread =
-and needed
->>>> to check why the test fails on bare-metal...
->>>>=20
->>>> Besides, it seems that v6 was used and not v7, so the error =
-messages are
->>>> strange:
->>>>=20
->>>> Test suite: atomic_switch_overflow_msrs_test
->>>> FAIL: exit_reason, 18, is 2147483682.
->>>> FAIL: exit_qual, 0, is 513.
->>>> SUMMARY: 11 tests, 2 unexpected failures
->>>>=20
->>>> I also think that printing the exit-reason in hex format would be =
-more
->>>> readable.
->>>=20
->>> Exit reasons are enumerated in decimal rather than hex in the SDM
->>> (volume 3, appendix C).
->>=20
->> I know, but when the failed VM entry indication is on, it is just a =
-huge
->> mess. Never mind, this is a minor issue.
->>=20
->>> To be clear, are you saying you "opted in" to the test on bare =
-metal,
->>> and got confused when it failed? Or, are you saying that our patch =
-on
->>> unittest.cfg to make the test not run by default didn't work?
->>=20
->> I ran it on bare-metal and needed to spend some time to realize that =
-it is
->> expected to fail on bare-metal =E2=80=9Cby design=E2=80=9D.
->=20
-> Ack. Maybe we should move tests like this into a *_virt_only.c
-> counter-part? E.g., we could create a new, opt-in, file,
-> vmx_tests_virt_only.c for this test. When similar scenarios arise in
-> the future, this new precedent could be replicated, to make it obvious
-> which tests are expected to fail on bare metal.
+Some VM-entry checks can be offloaded from KVM to hardware. But if we want to
+do that, the current implementation of KVM creates a priority issue where the
+order in which VM-entry checks need to be performed according to the SDM, is
+not maintained. VM-entry fails in nested_vmx_enter_non_root_mode() if an error
+is encountered while processing the entries in VM-entry MSR-load area. This
+leads to VM-exit due to a VM-entry check that is supposed to be done after
+any guest-state checks done in hardware. This patch fixes this priority issue
+so that checks that can be offloaded to hardware can now be offloaded.
 
-Thanks for the willingness, but I don=E2=80=99t know whether any =
-intrusive change is
-needed at the moment. Even just getting the print-out to have something =
-like
-=E2=80=9C(KVM-specific)=E2=80=9D comment would be enough, assuming the =
-test can easily be
-disabled (as is the case with atomic_switch_overflow_msrs_test).
+
+[PATCH] nVMX: Defer error from VM-entry MSR-load area to until after
+ 
+ arch/x86/kvm/vmx/nested.c | 34 +++++++++++++++++++++++++++++++---
+ arch/x86/kvm/vmx/nested.h | 14 ++++++++++++--
+ arch/x86/kvm/vmx/vmcs.h   |  6 ++++++
+ 3 files changed, 49 insertions(+), 5 deletions(-)
+
+Krish Sadhukhan (1):
+      nVMX: Defer error from VM-entry MSR-load area to until after hardware verifies VMCS guest state-area
 
