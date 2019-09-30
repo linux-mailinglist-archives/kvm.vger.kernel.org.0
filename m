@@ -2,125 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D54D3C3281
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 13:33:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9703C33BC
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 14:04:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731379AbfJALcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 07:32:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59377 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725839AbfJALcg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 07:32:36 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F2A0E81DE0
-        for <kvm@vger.kernel.org>; Tue,  1 Oct 2019 11:32:35 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id k184so1294263wmk.1
-        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 04:32:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=kXv5iruapzFw1hsB9GePDq0/reKNI/98qxc8k7MxSvg=;
-        b=rQ+XYTvMLRS9IEbJM6hl7rCaaHUmDe6htYqDjuosdvL5udPq2+zm9x5OEz3h3skBTA
-         GLeM8kDtdbjNTttFyawIrQS5nSkQTI9wHv/uXIojhusJmpIndT9vrXgFgeyoYy8UAKOY
-         wrx4sUMcwn0lPe5RMuhikZ2WltoOSGPSmmyUl0zmbdQR92vA6EPR9ny4AnFRuKTA1+p9
-         Aru2tEqwSJslW9UzGdP2FlcFAnR5aofMp7IeDNV9FpFMj0k+65HIDKpcphsZa6V2BIRm
-         aJl2xyjtx0FwJNJNwuiz6ScAwWfjErl62kRIJFVVifjCWTj3DqTeva/fZ+ztdDj0zETH
-         4sSw==
-X-Gm-Message-State: APjAAAXVZe0vKvWhLkHnnCZ27vIVez16MLrUJgBlUjhNg1AGhJ5dHjvV
-        CQ7eqOltUI3TmpHS53oJcL7eg1/i3XELVBN1szume4CLqYsSuqj7rqq4jheMp4VEx6nqszFwt/P
-        JjKhBJhNMr2RC
-X-Received: by 2002:adf:f790:: with SMTP id q16mr16842682wrp.164.1569929554453;
-        Tue, 01 Oct 2019 04:32:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwIxnYkVu2Ibhkuh3y54PyOHrGHzpLXVlu4TExIrKE9Z8Nwkyku/JS0J8xB4o2+QGwXLux2xA==
-X-Received: by 2002:adf:f790:: with SMTP id q16mr16842668wrp.164.1569929554189;
-        Tue, 01 Oct 2019 04:32:34 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id s12sm34807303wra.82.2019.10.01.04.32.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2019 04:32:33 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] kvm: vmx: Limit guest PMCs to those supported on the host
-In-Reply-To: <20190930233854.158117-1-jmattson@google.com>
-References: <20190930233854.158117-1-jmattson@google.com>
-Date:   Tue, 01 Oct 2019 13:32:32 +0200
-Message-ID: <87blv03dm7.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S1732862AbfJAMET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 08:04:19 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:36838 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725821AbfJAMES (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 08:04:18 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x91C43p9171527;
+        Tue, 1 Oct 2019 12:04:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2019-08-05;
+ bh=tgOBFZObT23SyNVVIgjHtEVR3Av80X15fH43kUobLu8=;
+ b=ro25Eb2C5gb4RNQdAjQkaP92uhpi+c7yOPLkyY4qWDW6FlcnFWTiQSzJiQsyeUewKT7T
+ xv/FU7CliTpaPNK/aaqEyJjDXQ5VPb+yaviO2qsCzvVEJe+iok31aMR2VoxDLHZ03Pa/
+ 9i7aB5SFJAW+DE/CVYcMnYulFm5tgXq3CnYalVS7hyMpJ/bOPDFlJd4ec2yO45XOD+7/
+ 8jC4ISozo4Y/V3VOmwjOU/Jqr7dCH1VJVGpjMbsvRecCX8+MjM4Q3ICCtybLWlpposT3
+ wniKDbf7kI5d2oNL2JyX+I8y9g14cNqoaL31/gITFk24WDDKNSCNXehekdRFv36MRvfU qw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2va05rn82s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Oct 2019 12:04:13 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x91C3NUm157467;
+        Tue, 1 Oct 2019 12:04:12 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2vbnqcs96x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Oct 2019 12:04:12 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x91C4B9G017612;
+        Tue, 1 Oct 2019 12:04:11 GMT
+Received: from z2.cn.oracle.com (/10.182.71.205)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 01 Oct 2019 05:04:11 -0700
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     vkuznets@redhat.com, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Subject: [PATCH v2 0/3] Add a unified parameter "nopvspin"
+Date:   Mon, 30 Sep 2019 20:08:56 +0800
+Message-Id: <1569845340-11884-1-git-send-email-zhenzhong.duan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910010112
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910010112
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jim Mattson <jmattson@google.com> writes:
+There are cases folks want to disable spinlock optimization for
+debug/test purpose. Xen and hyperv already have parameters "xen_nopvspin"
+and "hv_nopvspin" to support that, but kvm doesn't.
 
-> KVM can only virtualize as many PMCs as the host supports.
->
-> Limit the number of generic counters and fixed counters to the number
-> of corresponding counters supported on the host, rather than to
-> INTEL_PMC_MAX_GENERIC and INTEL_PMC_MAX_FIXED, respectively.
->
-> Note that INTEL_PMC_MAX_GENERIC is currently 32, which exceeds the 18
-> contiguous MSR indices reserved by Intel for event selectors. Since
-> the existing code relies on a contiguous range of MSR indices for
-> event selectors, it can't possibly work for more than 18 general
-> purpose counters.
+The first patch adds that feature to KVM guest with "nopvspin".
 
-Should we also trim msrs_to_save[] by removing impossible entries
-(18-31) then?
+For compatibility reason original parameters "xen_nopvspin" and
+"hv_nopvspin" are retained and marked obsolete.
 
->
-> Fixes: f5132b01386b5a ("KVM: Expose a version 2 architectural PMU to a guests")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> ---
->  arch/x86/kvm/vmx/pmu_intel.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 4dea0e0e7e392..3e9c059099e94 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -262,6 +262,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	struct x86_pmu_capability x86_pmu;
->  	struct kvm_cpuid_entry2 *entry;
->  	union cpuid10_eax eax;
->  	union cpuid10_edx edx;
-> @@ -283,8 +284,10 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	if (!pmu->version)
->  		return;
->  
-> +	perf_get_x86_pmu_capability(&x86_pmu);
-> +
->  	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
-> -					INTEL_PMC_MAX_GENERIC);
-> +					 x86_pmu.num_counters_gp);
+v2:
+PATCH1: pick the print code change into seperate PATCH2,
+        updated patch description             [Vitaly Kuznetsov]
+PATCH2: new patch with print code change      [Vitaly Kuznetsov]
+PATCH3: add Reviewed-by                       [Juergen Gross]
 
-This is a theoretical fix which is orthogonal to the issue with
-state_test I reported on Friday, right? Because in my case
-'eax.split.num_counters' is already 8.
-
->  	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << eax.split.bit_width) - 1;
->  	pmu->available_event_types = ~entry->ebx &
->  					((1ull << eax.split.mask_length) - 1);
-> @@ -294,7 +297,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	} else {
->  		pmu->nr_arch_fixed_counters =
->  			min_t(int, edx.split.num_counters_fixed,
-> -				INTEL_PMC_MAX_FIXED);
-> +			      x86_pmu.num_counters_fixed);
->  		pmu->counter_bitmask[KVM_PMC_FIXED] =
->  			((u64)1 << edx.split.bit_width_fixed) - 1;
->  	}
-
--- 
-Vitaly
+Thanks
+Zhenzhong
