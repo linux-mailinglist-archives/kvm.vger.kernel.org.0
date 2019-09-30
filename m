@@ -2,121 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 356ADC259D
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 19:02:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8FB4C26A3
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 22:40:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730485AbfI3RCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 13:02:24 -0400
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:36815 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730563AbfI3RCY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 13:02:24 -0400
-Received: by mail-vs1-f68.google.com with SMTP id v19so7294516vsv.3
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 10:02:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dfWInwpAaXhuNaRHnFqf5Kb0nv75VBrMC3/txP8hcfk=;
-        b=vfEU9S+JHbvVzsKuQ850SjGfpwveObEbl3z5Q/cPU15GOhQM4I7irCZ/+GhRxmC7lu
-         VVNixPmC6dHcGkJE2agCguJjjB/pWBe36d15sL1qdrG0hDSryvAEhLUvxHeG1eQtOJdY
-         zH/QA3r767biQIir7H4+/iIfa5e1SoicT6pxFAXkflR6deUOmLgKVGm0WaDsvjuH+42e
-         QCqBt2KWtGf7H8kP1mbRvHuK6nqz1KqixB08aq00t3NzfRMHW9nFk8kPkYsHc55+yKPw
-         h6TW70DGiyS/Dy0JV3IWQ5tDCWkLRCJA5qiG3N0vDDrf88FXkS+fJLTsRPfRnDY0m8eM
-         xE5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dfWInwpAaXhuNaRHnFqf5Kb0nv75VBrMC3/txP8hcfk=;
-        b=RoqPoxuJGh4ybuU/GThd7u7QC++Mmb3kMgvzxBq52eqhjqwdzRIfro8jYlzRm4RXtL
-         oMl/WYBpEOcEcSpUNoJ0SbuLz1GhKQsMoSDVFc7NyljCPmz2PfiT3M5Si9/RgVCSviGk
-         hR8dpXI3ZK1MrpzMDl4iXU9BboMwGwm9iyvXA2UYdjjnOBqgoAzq7RElkG5w+JFMZUme
-         8fInIZcsHTdkJ9gzLTvKTy0YJ1iBuGG3svgPMWMnOKPfumYlqaol4Q4zXJ52FKBCDqLj
-         Sg+moZEVjl97kWpM93R9l0o56YijT7uBuKgOHrz4+wvsgUuPcMEmS7+Nd+Vr/8FEt+rn
-         vjWA==
-X-Gm-Message-State: APjAAAUZnWb1yHKynhk/aCwVAoYpRex93LdV5kJCZZcmiQeJLho1lEpT
-        yMvJyJlW7yqWzZOX4V7IvepadrjZtEAIDz0WLrz/xA==
-X-Google-Smtp-Source: APXvYqyqIeQ5pCQuEg2Zk62SjgpRI5+Pr2OmwMlOVkeeamN+h5XjCIT83r7aH1UTCZQjK5qi2XaXf9Oaw/wGHikvAfE=
-X-Received: by 2002:a67:db93:: with SMTP id f19mr10235459vsk.49.1569862942843;
- Mon, 30 Sep 2019 10:02:22 -0700 (PDT)
+        id S1731025AbfI3Uie (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 16:38:34 -0400
+Received: from mail-eopbgr30103.outbound.protection.outlook.com ([40.107.3.103]:38787
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726576AbfI3Uie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 16:38:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V100/ncP1ZCn1VlFtDtXI1juYVDyd3wONJrV6ltT7OsRjbY8y/HpqhxaZg7skuiNhXjHQ7lOtGGHGr9Deh4irWDS8lGdzGz5PUrPkBWzJ8vswXM08YfBlQ2PWxjV7nRLR2X+wyJkvCJ8+lB5xUrcTQoe89uYhqEJ/lg9UFPas2fxuU0TD0llmXDHUgNn5J03eS3jZcASaPutZFZaVEIdDT0tNeDF6cVRsiNNOtfniCSIIPIQYYm2wNyM5Cv6T5vql5CcER9uWDcf7rB9BxDjkYoRj/p6LW9QoA53D8SEl0hpgMZ/o1XU+J3mZW/d1+ZJRnFBn8FCyqQToYoyb1wTFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gUL/gxQRJkx6o5iqAU4uhq64IBw13J1KOJkiYkGiQoM=;
+ b=KbjW3vaaafp2Y7Eo2MjM4swiQwoy7jGRhgNrtzUTnrLgcfTlcX/w6azcqMMtd73gaRZvmdvzF8nooKZlxwJl2FEw6+7kZHznYpvC/16EK5kNvLi8GZL04Gcj1GjZbmHKQTCiJrb0lfCq8cIIb/QxRAVkK97gaBYJetwQ4Y1/oaD7RONrhWTLHowGmRNnT5BNE9zLacrHEwnx1OR+h/U0q2u/Bx19OSfcqbczhIqVuoFl7FY2wvQs8QF4DlPuypAUOYTnKTmlQWIOhM3CfLKaOAvS2QreJhCUYa4phYVWnCdV/jMyLBE7HkBKUw9jUbIf5qNKc/ytSkiHeWIzUo1rGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gUL/gxQRJkx6o5iqAU4uhq64IBw13J1KOJkiYkGiQoM=;
+ b=XIAoqFeu721f0vIJEiLx8ZeemATyTq/GoH5OcFEXjSM01YK0Xl1EN0KPB+1Fz2NZmob3ml9mjHWAyHjsoBFYET0TDjw1ZtZdgOqLhfAWnCBqKRFIZCpjb72zFuVKYqs5zXOqEB7sEXFSWckt/xE/6TuEizJUS6gy3SiNHif4olQ=
+Received: from AM0PR08MB5537.eurprd08.prod.outlook.com (20.179.36.87) by
+ AM0PR08MB3954.eurprd08.prod.outlook.com (20.178.202.77) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Mon, 30 Sep 2019 17:33:41 +0000
+Received: from AM0PR08MB5537.eurprd08.prod.outlook.com
+ ([fe80::a8ea:5223:db78:dd3]) by AM0PR08MB5537.eurprd08.prod.outlook.com
+ ([fe80::a8ea:5223:db78:dd3%7]) with mapi id 15.20.2305.017; Mon, 30 Sep 2019
+ 17:33:41 +0000
+From:   Roman Kagan <rkagan@virtuozzo.com>
+To:     Michael Kelley <mikelley@microsoft.com>,
+        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [PATCH] x86/hyperv: make vapic support x2apic mode
+Thread-Topic: [PATCH] x86/hyperv: make vapic support x2apic mode
+Thread-Index: AQHVd7Uz7GLeEx2RZ0ukSyO6D+H5XQ==
+Date:   Mon, 30 Sep 2019 17:33:40 +0000
+Message-ID: <20190930173332.13655-1-rkagan@virtuozzo.com>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR05CA0241.eurprd05.prod.outlook.com
+ (2603:10a6:3:fb::17) To AM0PR08MB5537.eurprd08.prod.outlook.com
+ (2603:10a6:208:148::23)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.21.0
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ddd9e317-1093-430f-ed6b-08d745cc558f
+x-ms-traffictypediagnostic: AM0PR08MB3954:
+x-microsoft-antispam-prvs: <AM0PR08MB3954D52D4D5179D11AACDEF4C9820@AM0PR08MB3954.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 01762B0D64
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(366004)(136003)(39840400004)(396003)(376002)(199004)(189003)(6512007)(1076003)(2201001)(4326008)(86362001)(99286004)(478600001)(2501003)(2906002)(52116002)(50226002)(14454004)(8936002)(81156014)(81166006)(3846002)(8676002)(6116002)(6436002)(102836004)(6486002)(66066001)(66446008)(66476007)(386003)(26005)(186003)(316002)(1511001)(6506007)(476003)(25786009)(486006)(2616005)(305945005)(66556008)(64756008)(71190400001)(71200400001)(7736002)(36756003)(66946007)(7416002)(110136005)(5660300002)(256004)(14444005)(921003)(1121003);DIR:OUT;SFP:1102;SCL:1;SRVR:AM0PR08MB3954;H:AM0PR08MB5537.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 46tZ8n/dj5uKvHz9iulYq+EaHaWald0SRU9t85AZCICfsEdV8xkNbnExJAr5J2kn37zqHxMOpSwlzrAo/2tzhajndVsDXQcvNYy1x4q9DnbIZKbxbvucyLhBz9DcOqdrZDFhX2vAsdSK6/X+v4XuLD9CBdJKjUlF93v79DFpct3HoXdQa8J8YXJ1piecSy2O9tMNxhAIxezTSzvCKsEVxreupvp1hYE5+CWVl4OBrxL8VFUnj6jn3J7KVED8JDuu8edSkNa+5/FurxGD4UnDQDWPvkc64CBsYXQD0nvTCGcJREXIaG8FxgkJYFIxmdIbqMo7fyVbS29QTPg/uBtNjc9Y66F7umY7s3wBs+OYDLQosc7bf1rzPv2oV2lgHEB9ARaSzR+7LO1edxn3P1nB75gC9Ml/VHo+yb1tmT0aJ/o=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190927161836.57978-1-bgardon@google.com> <20190929072248.GB8903@xz-x1>
-In-Reply-To: <20190929072248.GB8903@xz-x1>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 30 Sep 2019 10:02:11 -0700
-Message-ID: <CANgfPd-=OWEiVkQMzh2mkH1ch9VeZsoc_KykPp6AqtkpQh-7EQ@mail.gmail.com>
-Subject: Re: [PATCH 0/9] Create a userfaultfd demand paging test
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddd9e317-1093-430f-ed6b-08d745cc558f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2019 17:33:41.0653
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: N3mkV5k6K15VZFpYM5pNmyJM1JXRLdlFnM3VsI7GFtcysXR4IrHPdtI102reKDvnUfCFebR3wptS8x7q3lmF8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3954
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
-You're absolutely right that we could demonstrate more contention by
-avoiding UFFD and just letting the kernel resolve page faults. I used
-UFFD in this test and benchmarking for the other MMU patch set because
-I believe it's a more realistic scenario. A simpler page access
-benchmark would be better for identifying further scaling problems
-within the MMU, but the only situation I can think of where that would
-be used is VM boot. However, we don't usually see many vCPUs touching
-memory all over the place on boot. In a migration or restore without
-demand paging, the memory would have to be pre-populated with the
-contents of guest memory and the KVM MMU fault handler wouldn't be
-taking a fault in get_user_pages. In the interest of eliminating the
-delay from UFFD, I will add an option to use anonymous page faults or
-prefault memory instead.
+Now that there's Hyper-V IOMMU driver, Linux can switch to x2apic mode
+when supported by the vcpus.
 
-I don't have any plans to customize the UFFD implementation at the
-moment, but experimenting with UFFD strategies will be useful for
-building higher performance post-copy in QEMU and other userspaces in
-the future.
-Thank you for taking a look at these patches.
-Ben
+However, the apic access functions for Hyper-V enlightened apic assume
+xapic mode only.
 
-On Sun, Sep 29, 2019 at 12:23 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Fri, Sep 27, 2019 at 09:18:28AM -0700, Ben Gardon wrote:
-> > When handling page faults for many vCPUs during demand paging, KVM's MMU
-> > lock becomes highly contended. This series creates a test with a naive
-> > userfaultfd based demand paging implementation to demonstrate that
-> > contention. This test serves both as a functional test of userfaultfd
-> > and a microbenchmark of demand paging performance with a variable number
-> > of vCPUs and memory per vCPU.
-> >
-> > The test creates N userfaultfd threads, N vCPUs, and a region of memory
-> > with M pages per vCPU. The N userfaultfd polling threads are each set up
-> > to serve faults on a region of memory corresponding to one of the vCPUs.
-> > Each of the vCPUs is then started, and touches each page of its disjoint
-> > memory region, sequentially. In response to faults, the userfaultfd
-> > threads copy a static buffer into the guest's memory. This creates a
-> > worst case for MMU lock contention as we have removed most of the
-> > contention between the userfaultfd threads and there is no time required
-> > to fetch the contents of guest memory.
->
-> Hi, Ben,
->
-> Even though I may not have enough MMU knowledge to say this... this of
-> course looks like a good test at least to me.  I'm just curious about
-> whether you have plan to customize the userfaultfd handler in the
-> future with this infrastructure?
->
-> Asked because IIUC with this series userfaultfd only plays a role to
-> introduce a relatively adhoc delay to page faults.  In other words,
-> I'm also curious what would be the number look like (as you mentioned
-> in your MMU rework cover letter) if you simply start hundreds of vcpu
-> and do the same test like this, but use the default anonymous page
-> faults rather than uffd page faults.  I feel like even without uffd
-> that could be a huge contention already there.  Or did I miss anything
-> important on your decision to use userfaultfd?
->
-> Thanks,
->
-> --
-> Peter Xu
+As a result, Linux fails to bring up secondary cpus when run as a guest
+in QEMU/KVM with both hv_apic and x2apic enabled.
+
+I didn't manage to make my instance of Hyper-V expose x2apic to the
+guest; nor does Hyper-V spec document the expected behavior.  However,
+a Windows guest running in QEMU/KVM with hv_apic and x2apic and a big
+number of vcpus (so that it turns on x2apic mode) does use enlightened
+apic MSRs passing unshifted 32bit destination id and falls back to the
+regular x2apic MSRs for less frequently used apic fields.
+
+So implement the same behavior, by replacing enlightened apic access
+functions (only those where it makes a difference) with their
+x2apic-aware versions when x2apic is in use.
+
+Fixes: 29217a474683 ("iommu/hyper-v: Add Hyper-V stub IOMMU driver")
+Fixes: 6b48cb5f8347 ("X86/Hyper-V: Enlighten APIC access")
+Cc: stable@vger.kernel.org
+Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+---
+ arch/x86/hyperv/hv_apic.c | 48 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 45 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
+index 5c056b8aebef..9564fec00375 100644
+--- a/arch/x86/hyperv/hv_apic.c
++++ b/arch/x86/hyperv/hv_apic.c
+@@ -53,6 +53,11 @@ static void hv_apic_icr_write(u32 low, u32 id)
+ 	wrmsrl(HV_X64_MSR_ICR, reg_val);
+ }
+=20
++static void hv_x2apic_icr_write(u32 low, u32 id)
++{
++	wrmsr(HV_X64_MSR_ICR, low, id);
++}
++
+ static u32 hv_apic_read(u32 reg)
+ {
+ 	u32 reg_val, hi;
+@@ -70,6 +75,23 @@ static u32 hv_apic_read(u32 reg)
+ 	}
+ }
+=20
++static u32 hv_x2apic_read(u32 reg)
++{
++	u32 reg_val, hi;
++
++	switch (reg) {
++	case APIC_EOI:
++		rdmsr(HV_X64_MSR_EOI, reg_val, hi);
++		return reg_val;
++	case APIC_TASKPRI:
++		rdmsr(HV_X64_MSR_TPR, reg_val, hi);
++		return reg_val;
++
++	default:
++		return native_apic_msr_read(reg);
++	}
++}
++
+ static void hv_apic_write(u32 reg, u32 val)
+ {
+ 	switch (reg) {
+@@ -84,6 +106,20 @@ static void hv_apic_write(u32 reg, u32 val)
+ 	}
+ }
+=20
++static void hv_x2apic_write(u32 reg, u32 val)
++{
++	switch (reg) {
++	case APIC_EOI:
++		wrmsr(HV_X64_MSR_EOI, val, 0);
++		break;
++	case APIC_TASKPRI:
++		wrmsr(HV_X64_MSR_TPR, val, 0);
++		break;
++	default:
++		native_apic_msr_write(reg, val);
++	}
++}
++
+ static void hv_apic_eoi_write(u32 reg, u32 val)
+ {
+ 	struct hv_vp_assist_page *hvp =3D hv_vp_assist_page[smp_processor_id()];
+@@ -262,9 +298,15 @@ void __init hv_apic_init(void)
+ 	if (ms_hyperv.hints & HV_X64_APIC_ACCESS_RECOMMENDED) {
+ 		pr_info("Hyper-V: Using MSR based APIC access\n");
+ 		apic_set_eoi_write(hv_apic_eoi_write);
+-		apic->read      =3D hv_apic_read;
+-		apic->write     =3D hv_apic_write;
+-		apic->icr_write =3D hv_apic_icr_write;
++		if (x2apic_enabled()) {
++			apic->read      =3D hv_x2apic_read;
++			apic->write     =3D hv_x2apic_write;
++			apic->icr_write =3D hv_x2apic_icr_write;
++		} else {
++			apic->read      =3D hv_apic_read;
++			apic->write     =3D hv_apic_write;
++			apic->icr_write =3D hv_apic_icr_write;
++		}
+ 		apic->icr_read  =3D hv_apic_icr_read;
+ 	}
+ }
+--=20
+2.21.0
+
