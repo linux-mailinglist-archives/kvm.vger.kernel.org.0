@@ -2,135 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9545C253C
-	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 18:36:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D22FC2578
+	for <lists+kvm@lfdr.de>; Mon, 30 Sep 2019 18:53:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732324AbfI3QgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 12:36:13 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38607 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731459AbfI3QgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 12:36:12 -0400
-Received: by mail-io1-f66.google.com with SMTP id u8so39973490iom.5
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 09:36:11 -0700 (PDT)
+        id S1730095AbfI3Qwk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 12:52:40 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55050 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbfI3Qwk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 12:52:40 -0400
+Received: by mail-wm1-f65.google.com with SMTP id p7so238636wmp.4;
+        Mon, 30 Sep 2019 09:52:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=57AYY0u9MsjJUEECwEHvJ6u5btLkPcCRtuHnRrQJapI=;
-        b=vLauWTgcxacCbWHTj6hvXFeeR30sX8SyJgIlTSPJr45xUSCPN0cc61USSem4QktzVu
-         1fLAbMtzn7E6wwIcQQ9Qd0RVLTIxhHY1MLeDcSpP9ufT4DJosLB+3r+OPzdZNHpkbKmz
-         mz+YMahFibVjm4rf/MZy96c+siAyc/yhRsvsYoW9ClHHo3L01GmmDVMCsien66ZsT9og
-         VF/owRigzm9RIzkwXRqavUQQfv3opkdTPdSklH3yVH4rP6CmaJIwNAyqlJUPXnACQtYF
-         /6Rj7pf1GvmVE5IUCx+kLdTB7Fqc6G1uUJKPthXf1KSDFmgzErceeWha/VLVbEybmO9Y
-         9xOw==
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=S4meV0NsaDpqLa7tBEXkvORH5DuiHJR7oObrl4NCVW4=;
+        b=ZKFO2GkolErFUr68Pj8DzLdvfmN6K47nQm/2ypFNwkvAju1BtuE3hjRdgIslfArdCz
+         tcSel3xQCWbcB9PQrXVWPcuH3PEHd/hwfhCl2SuSzh4zQFu09bkn5UKDvsSgV48XA3IQ
+         wTXguVJwJVOrG22nKLayzi1SKn+1HdpDfx2i0URglXV/jfSSRFtVyGVfpdOy0GnJLv/8
+         ojpfSrPFo/YhMqVgCF38LrBx2u/NPItz1UqQK0tl1bDKUayanqN5P+6FDgtaA2HKX/+X
+         XtEYy4zUAt+Z4GNZDpFuC7GDd3hlHw46kI7Ko829sHQc3p9iGotQePXO/DoNFEA0pNyZ
+         Qe2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=57AYY0u9MsjJUEECwEHvJ6u5btLkPcCRtuHnRrQJapI=;
-        b=JkcfgffOtUu5As4oFGS8OZCkkog1LXPaZwDa2Dci1qA7REBEokfVE5BcqNEtPG7Qzw
-         PtTC3/SBblY+npcO3nW+fbwLx+W+rQv1PpQwSb85RKEqeF995hvJDYz/PfXieLb26P2Z
-         8Wgj84MG3NLYuJo+xKME1s2/YQLALP2CFx1pkJ9mO/6rUze5rUoMjhvd04/UhtpyaCVZ
-         ERbw6xnXANLGZMmBwCkp078wPzywkhxM9vVI7t2RMfcGUKFcN7yaZegsueQDqfRmseuB
-         R2gOGjmMM/ty2411jKxTJvn7C8ucF2FH+swDmkfB6yLZgtPuua5SZd4Do6S1u5t0kqTT
-         3N/g==
-X-Gm-Message-State: APjAAAUNmAG9SleZYy5R9Z33QzIG3U9iJR8+DfbfGk7ffiYqyamTAIiS
-        fTSJL2ug8D9g2Y+8rybTZmatfva9xUhwYi9WawEwdw==
-X-Google-Smtp-Source: APXvYqx2dfIYRy7h7yKIgZKiCnDmCdiQI5dNKGF/qRsXgS205w50n9oDynATQka9xJ5xedvTduDqhuq0gE1j/gyAa60=
-X-Received: by 2002:a02:ac82:: with SMTP id x2mr20116222jan.18.1569861371034;
- Mon, 30 Sep 2019 09:36:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190929145018.120753-1-liran.alon@oracle.com> <874l0u5jb4.fsf@vitty.brq.redhat.com>
-In-Reply-To: <874l0u5jb4.fsf@vitty.brq.redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 30 Sep 2019 09:35:59 -0700
-Message-ID: <CALMp9eS7wF1b6yBJrj_VL+HMEYjuZrYhmMHiCqJq8-33d9QE6A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Remove proprietary handling of unexpected exit-reasons
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Liran Alon <liran.alon@oracle.com>, tao3.xu@intel.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=S4meV0NsaDpqLa7tBEXkvORH5DuiHJR7oObrl4NCVW4=;
+        b=An34awI32oh+EqjtLvtVntQq6PYzXZcsjDWTYLbVdcg/qRrvg39u33irWvTA+SShmp
+         SNs9l4sdM/4MjnrpHm5AgzpzgKF17BjctMHY3T+xYiDxkKFQWaEczl41gCxXVpO7+d/P
+         PHPHo0poOAOfmFnk0s7tDZvGSWP7RW+rMYVl/WvcyQWM6XaFKpDr+A0G3SYGqKb+4O+0
+         UkR+EfbpgWFq98caK21xI94Rae7otbamU9KmNa14gg10YWmYfe6rcR4JDo2Oh6No3mHk
+         upBgP1D7t8cVgrCLvCWiS8WD/ppa0PmnEbRS0XAe8QEzk1LZPaNCHeMSu+kOJeSFjdQW
+         eVxg==
+X-Gm-Message-State: APjAAAWASdhu/rXgrXRKEYlHa726Kgdr17VrARdDMHve3yyW/44exLCH
+        JDWwv7aUOMV/ZkNtQZU+6WM6YusH
+X-Google-Smtp-Source: APXvYqzCLsczViMIVb7X3HfOf7obZBubZ1E1KCxx7eCgHu7Vt1z3KtWGQvxR+kz+c/TU/OFIY2h5pw==
+X-Received: by 2002:a7b:c4c9:: with SMTP id g9mr141219wmk.150.1569862355607;
+        Mon, 30 Sep 2019 09:52:35 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id n22sm139924wmk.19.2019.09.30.09.52.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 30 Sep 2019 09:52:34 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, kvm-ppc@vger.kernel.org
+Subject: [PATCH] kvm: x86, powerpc: do not allow clearing largepages debugfs entry
+Date:   Mon, 30 Sep 2019 18:52:31 +0200
+Message-Id: <1569862351-19760-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 12:34 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> Liran Alon <liran.alon@oracle.com> writes:
->
-> > Commit bf653b78f960 ("KVM: vmx: Introduce handle_unexpected_vmexit
-> > and handle WAITPKG vmexit") introduced proprietary handling of
-> > specific exit-reasons that should not be raised by CPU because
-> > KVM configures VMCS such that they should never be raised.
-> >
-> > However, since commit 7396d337cfad ("KVM: x86: Return to userspace
-> > with internal error on unexpected exit reason"), VMX & SVM
-> > exit handlers were modified to generically handle all unexpected
-> > exit-reasons by returning to userspace with internal error.
-> >
-> > Therefore, there is no need for proprietary handling of specific
-> > unexpected exit-reasons (This proprietary handling also introduced
-> > inconsistency for these exit-reasons to silently skip guest instruction
-> > instead of return to userspace on internal-error).
-> >
-> > Fixes: bf653b78f960 ("KVM: vmx: Introduce handle_unexpected_vmexit and handle WAITPKG vmexit")
-> >
-> > Signed-off-by: Liran Alon <liran.alon@oracle.com>
->
-> (It's been awhile since in software world the word 'proprietary' became
-> an opposite of free/open-source to me so I have to admit your subject
-> line really got me interested :-)
->
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+The largepages debugfs entry is incremented/decremented as shadow
+pages are created or destroyed.  Clearing it will result in an
+underflow, which is harmless to KVM but ugly (and could be
+misinterpreted by tools that use debugfs information), so make
+this particular statistic read-only.
 
-I agree that proprietary is an unusual word choice.
+Cc: kvm-ppc@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/powerpc/kvm/book3s.c |  8 ++++----
+ arch/x86/kvm/x86.c        |  6 +++---
+ include/linux/kvm_host.h  |  2 ++
+ virt/kvm/kvm_main.c       | 10 +++++++---
+ 4 files changed, 16 insertions(+), 10 deletions(-)
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index d7fcdfa7fee4..ec2547cc5ecb 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -36,8 +36,8 @@
+ #include "book3s.h"
+ #include "trace.h"
+ 
+-#define VM_STAT(x) offsetof(struct kvm, stat.x), KVM_STAT_VM
+-#define VCPU_STAT(x) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU
++#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
++#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
+ 
+ /* #define EXIT_DEBUG */
+ 
+@@ -69,8 +69,8 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "pthru_all",       VCPU_STAT(pthru_all) },
+ 	{ "pthru_host",      VCPU_STAT(pthru_host) },
+ 	{ "pthru_bad_aff",   VCPU_STAT(pthru_bad_aff) },
+-	{ "largepages_2M",    VM_STAT(num_2M_pages) },
+-	{ "largepages_1G",    VM_STAT(num_1G_pages) },
++	{ "largepages_2M",    VM_STAT(num_2M_pages, .mode = 0444) },
++	{ "largepages_1G",    VM_STAT(num_1G_pages, .mode = 0444) },
+ 	{ NULL }
+ };
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 180c7e88577a..8072acaaf028 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -92,8 +92,8 @@
+ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+ #endif
+ 
+-#define VM_STAT(x) offsetof(struct kvm, stat.x), KVM_STAT_VM
+-#define VCPU_STAT(x) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU
++#define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
++#define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
+ 
+ #define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
+                                     KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
+@@ -212,7 +212,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "mmu_cache_miss", VM_STAT(mmu_cache_miss) },
+ 	{ "mmu_unsync", VM_STAT(mmu_unsync) },
+ 	{ "remote_tlb_flush", VM_STAT(remote_tlb_flush) },
+-	{ "largepages", VM_STAT(lpages) },
++	{ "largepages", VM_STAT(lpages, .mode = 0444) },
+ 	{ "max_mmu_page_hash_collisions",
+ 		VM_STAT(max_mmu_page_hash_collisions) },
+ 	{ NULL }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index fcb46b3374c6..719fc3e15ea4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1090,6 +1090,7 @@ enum kvm_stat_kind {
+ 
+ struct kvm_stat_data {
+ 	int offset;
++	int mode;
+ 	struct kvm *kvm;
+ };
+ 
+@@ -1097,6 +1098,7 @@ struct kvm_stats_debugfs_item {
+ 	const char *name;
+ 	int offset;
+ 	enum kvm_stat_kind kind;
++	int mode;
+ };
+ extern struct kvm_stats_debugfs_item debugfs_entries[];
+ extern struct dentry *kvm_debugfs_dir;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e6de3159e682..fd68fbe0a75d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -617,8 +617,9 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 
+ 		stat_data->kvm = kvm;
+ 		stat_data->offset = p->offset;
++		stat_data->mode = p->mode ? p->mode : 0644;
+ 		kvm->debugfs_stat_data[p - debugfs_entries] = stat_data;
+-		debugfs_create_file(p->name, 0644, kvm->debugfs_dentry,
++		debugfs_create_file(p->name, stat_data->mode, kvm->debugfs_dentry,
+ 				    stat_data, stat_fops_per_vm[p->kind]);
+ 	}
+ 	return 0;
+@@ -3929,7 +3930,9 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
+ 	if (!refcount_inc_not_zero(&stat_data->kvm->users_count))
+ 		return -ENOENT;
+ 
+-	if (simple_attr_open(inode, file, get, set, fmt)) {
++	if (simple_attr_open(inode, file, get,
++			     stat_data->mode & S_IWUGO ? set : NULL,
++			     fmt)) {
+ 		kvm_put_kvm(stat_data->kvm);
+ 		return -ENOMEM;
+ 	}
+@@ -4177,7 +4180,8 @@ static void kvm_init_debug(void)
+ 
+ 	kvm_debugfs_num_entries = 0;
+ 	for (p = debugfs_entries; p->name; ++p, kvm_debugfs_num_entries++) {
+-		debugfs_create_file(p->name, 0644, kvm_debugfs_dir,
++		int mode = p->mode ? p->mode : 0644;
++		debugfs_create_file(p->name, mode, kvm_debugfs_dir,
+ 				    (void *)(long)p->offset,
+ 				    stat_fops[p->kind]);
+ 	}
+-- 
+1.8.3.1
 
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 12 ------------
-> >  1 file changed, 12 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index d4575ffb3cec..e31317fc8c95 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -5538,14 +5538,6 @@ static int handle_encls(struct kvm_vcpu *vcpu)
-> >       return 1;
-> >  }
-> >
-> > -static int handle_unexpected_vmexit(struct kvm_vcpu *vcpu)
-> > -{
-> > -     kvm_skip_emulated_instruction(vcpu);
-> > -     WARN_ONCE(1, "Unexpected VM-Exit Reason = 0x%x",
-> > -             vmcs_read32(VM_EXIT_REASON));
-> > -     return 1;
-> > -}
-> > -
-> >  /*
-> >   * The exit handlers return 1 if the exit was handled fully and guest execution
-> >   * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
-> > @@ -5597,15 +5589,11 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
-> >       [EXIT_REASON_INVVPID]                 = handle_vmx_instruction,
-> >       [EXIT_REASON_RDRAND]                  = handle_invalid_op,
-> >       [EXIT_REASON_RDSEED]                  = handle_invalid_op,
-> > -     [EXIT_REASON_XSAVES]                  = handle_unexpected_vmexit,
-> > -     [EXIT_REASON_XRSTORS]                 = handle_unexpected_vmexit,
-> >       [EXIT_REASON_PML_FULL]                = handle_pml_full,
-> >       [EXIT_REASON_INVPCID]                 = handle_invpcid,
-> >       [EXIT_REASON_VMFUNC]                  = handle_vmx_instruction,
-> >       [EXIT_REASON_PREEMPTION_TIMER]        = handle_preemption_timer,
-> >       [EXIT_REASON_ENCLS]                   = handle_encls,
-> > -     [EXIT_REASON_UMWAIT]                  = handle_unexpected_vmexit,
-> > -     [EXIT_REASON_TPAUSE]                  = handle_unexpected_vmexit,
-> >  };
-> >
-> >  static const int kvm_vmx_max_exit_handlers =
->
-> --
-> Vitaly
