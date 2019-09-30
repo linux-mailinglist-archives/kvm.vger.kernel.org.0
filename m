@@ -2,52 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BA1FBC2AFF
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 01:39:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 223F3C2B0F
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 01:45:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727850AbfI3XjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 19:39:03 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:44584 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbfI3XjD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 19:39:03 -0400
-Received: by mail-pl1-f202.google.com with SMTP id h11so6144238plt.11
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 16:39:01 -0700 (PDT)
+        id S1732471AbfI3Xo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 19:44:29 -0400
+Received: from mail-qt1-f201.google.com ([209.85.160.201]:55747 "EHLO
+        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732438AbfI3Xo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 19:44:27 -0400
+Received: by mail-qt1-f201.google.com with SMTP id o34so15648572qtf.22
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 16:44:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:message-id:mime-version:subject:from:to:cc;
-        bh=iUPETDwQOzy+tWSFOzHVyfsCygr1n/1h4IIKuJoGX2M=;
-        b=Uwa1QlFOrpNa9ZrKjpo0/hwszfHJJ8q0x+LT6BlIEIL5CLUil1+zcep30T+qrDiJDN
-         znh4vpvipMsXm/Gkm8AHUQC7XHCRoi1Nf8XsM5sW4T/hobVsRkZY5A1MBxsxcggc0qdi
-         AcxACNaieYq1WQe3vwrnMV56l2K/BORJ3b21OHd/UgR22la7iukrIX/lAt4/AKYMHMhg
-         wn1K3XKx+eJwCAFnCaNB8KMpJgePT7cevhxqzEtVzTKyMH+MbvzIbAMNB0jobxNEEwQM
-         Boy1niXxMfqKiNKRYUfH6ozMiVrXJPP4yhNRXNySnpz60qmUlWTxT7AchMjarHPJiHY1
-         VomA==
+        bh=0o2sDG2onspAdLwyFGUwXv4nf0zyggeaKnQ8TCNpMBU=;
+        b=wCynY8suLurhEP7wm6IueYAn/IwyDcEakAXk0edrFlxH6cXPEkdcpvnT5UdwXYkPR7
+         V6ezBXzv8hOtW+zkyO2K9HzpDMt1yv2nMa/C0Y+57zM2RZOWqaYmHyWRq6SKlbIaMwKs
+         qb5W2W1qb87tutUMCaT0zTWISywAwJsvfvMrkRO9rPYHqewSotL0zg0N3wMWMJ1w6HN0
+         gr7dzmhJIgu9UTALgQWzTU7FcMD1uxUryHHpx9vvXB6eyCbMEcWUGDyuab+TfF/lLCyG
+         PXPTQ5ST4ddKx+feoMu/MomFrqPO0pO7rLnsFewvS/WE6ppde92rUVjZf9SJIMgNECAW
+         xuDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=iUPETDwQOzy+tWSFOzHVyfsCygr1n/1h4IIKuJoGX2M=;
-        b=BYMexYJdM3Qs3+seg+yBX2dlHUcAmK22rvn8eZYDlWo0fJDhVN88vc7oXSGUTef2sf
-         x+NQEtUDjDnnndsVEk9lwu6PJyEAynXEUFdgJ9q6QpbTbu7rVTk7YkpLZ3LJQmJos9cs
-         AQLUjUMsp13nnS+dNp7l3HD1XJZMT4xE1okcqn0eqVY1U7535AuVOJ7CLngQaLW/F5pK
-         3Rk4gE0TxdP2bBQ4bYlCk2XugE+budIXJraIDW71NKPIRh0ldp3XHYNw4kQk/bbddtXu
-         h9jVqbv+sVjExV3UqR3uzGmIgSQgfCPX5aVERYgkSmhdC45GFKws3hktEDQPpv6srgfP
-         ME/Q==
-X-Gm-Message-State: APjAAAXf/aKSinkKcvdLiB6PzSlPSO3SGvXbleih01tsK6v34SZE2IA2
-        yzbn0YqouQlJLHmO8EHJ0BMyZMY3NFxpwS+D6GarevPd21PTzmWkZG9j/ojOtx0L4V8+3UHg7+l
-        p+vcvRwAvloKOg7xfTN7AK/mQF3R1D+DVSxFjqUGnnbwPNSjsiDLDbn/gupY3q30=
-X-Google-Smtp-Source: APXvYqyxR+yYPwgVw5DnJrJsuxH8VI6jzYJYRicK3ZV+eoeCu98pVcNGELJkM9SxyjzY/jaVMBAJhSWeGUgUug==
-X-Received: by 2002:a63:9a11:: with SMTP id o17mr26691806pge.434.1569886740859;
- Mon, 30 Sep 2019 16:39:00 -0700 (PDT)
-Date:   Mon, 30 Sep 2019 16:38:54 -0700
-Message-Id: <20190930233854.158117-1-jmattson@google.com>
+        bh=0o2sDG2onspAdLwyFGUwXv4nf0zyggeaKnQ8TCNpMBU=;
+        b=r/Qt9JKULfK8y4tvNrzqV07IqsYgge8//D8q26W7trmS60MMm9YS0a+clbx9QWPYIu
+         kkEvbucKhqml295rkbjAe0W65Ojr7xE0MeXrKCd+Mvm3iEyi11ySMTT/975eTKB2kZS4
+         4fJvD03vx3pjz6irIF89wqp1J6lfXJDp+gaaYN/JWeXrI4CfDeN09LgyzNC+oxoktH/2
+         /PejtcSc+RRqxK+f5OojtdngQdgRllPmQvNm6jIVF8TwajTgoRSAQAAN1FPq+Jiylmyj
+         P1mi3Xn8qt6+lmIWUHCpEjYkANFz0Nq0hKHJUp5xblR+b0YVBTcBni7DsTjFeoqy1i+w
+         FsVg==
+X-Gm-Message-State: APjAAAUoOsw8FL1pChwh/jKDDe5v3xGTWPmZMQmA+20takm6PgUmVGH8
+        Dd4Y6hkSO+C26WJBvIKsG7JDZcTRYqaP+TN20WFJS1LFF9FIkdamXfwlngCGP+jwBnZYfudZ5Wk
+        WQvyRmgPXeug4Pvb0TIv5jLdOiF7984N8XWRnxa7SbqySW7GfCGismRLUMY8oiIw=
+X-Google-Smtp-Source: APXvYqysnC8iWp8kv3PDj10qcTikP/WlC84GKiZEYgeRujY22YpJyxAosMFwQqteQ3WlWotL7dIMUaxefhyNRw==
+X-Received: by 2002:a05:6214:1549:: with SMTP id t9mr23091655qvw.68.1569887066151;
+ Mon, 30 Sep 2019 16:44:26 -0700 (PDT)
+Date:   Mon, 30 Sep 2019 16:44:22 -0700
+Message-Id: <20190930234422.159577-1-jmattson@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.23.0.444.g18eeb5a265-goog
-Subject: [PATCH] kvm: vmx: Limit guest PMCs to those supported on the host
+Subject: [PATCH v2] kvm: x86: Improve emulation of CPUID leaves 0BH and 1FH
 From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Jim Mattson <jmattson@google.com>, Marc Orr <marcorr@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
@@ -55,58 +53,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM can only virtualize as many PMCs as the host supports.
+For these CPUID leaves, the EDX output is not dependent on the ECX
+input (i.e. the SIGNIFCANT_INDEX flag doesn't apply to
+EDX). Furthermore, the low byte of the ECX output is always identical
+to the low byte of the ECX input. KVM does not produce the correct ECX
+and EDX outputs for any undefined subleaves beyond the first.
 
-Limit the number of generic counters and fixed counters to the number
-of corresponding counters supported on the host, rather than to
-INTEL_PMC_MAX_GENERIC and INTEL_PMC_MAX_FIXED, respectively.
+Special-case these CPUID leaves in kvm_cpuid, so that the ECX and EDX
+outputs are properly generated for all undefined subleaves.
 
-Note that INTEL_PMC_MAX_GENERIC is currently 32, which exceeds the 18
-contiguous MSR indices reserved by Intel for event selectors. Since
-the existing code relies on a contiguous range of MSR indices for
-event selectors, it can't possibly work for more than 18 general
-purpose counters.
-
-Fixes: f5132b01386b5a ("KVM: Expose a version 2 architectural PMU to a guests")
+Fixes: 0771671749b59a ("KVM: Enhance guest cpuid management")
+Fixes: a87f2d3a6eadab ("KVM: x86: Add Intel CPUID.1F cpuid emulation support")
 Signed-off-by: Jim Mattson <jmattson@google.com>
 Reviewed-by: Marc Orr <marcorr@google.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+v1 -> v2: Changed the way that kvm_cpuid() determines whether or not
+          leaf 0BH or 1FH is defined.
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 4dea0e0e7e392..3e9c059099e94 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -262,6 +262,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	struct x86_pmu_capability x86_pmu;
- 	struct kvm_cpuid_entry2 *entry;
- 	union cpuid10_eax eax;
- 	union cpuid10_edx edx;
-@@ -283,8 +284,10 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	if (!pmu->version)
- 		return;
+ arch/x86/kvm/cpuid.c | 82 +++++++++++++++++++++++++-------------------
+ 1 file changed, 46 insertions(+), 36 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 63316036f85a0..218d14d590f65 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -969,53 +969,63 @@ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry(struct kvm_vcpu *vcpu,
+ EXPORT_SYMBOL_GPL(kvm_find_cpuid_entry);
  
-+	perf_get_x86_pmu_capability(&x86_pmu);
+ /*
+- * If no match is found, check whether we exceed the vCPU's limit
+- * and return the content of the highest valid _standard_ leaf instead.
+- * This is to satisfy the CPUID specification.
++ * If the basic or extended CPUID leaf requested is higher than the
++ * maximum supported basic or extended leaf, respectively, then it is
++ * out of range.
+  */
+-static struct kvm_cpuid_entry2* check_cpuid_limit(struct kvm_vcpu *vcpu,
+-                                                  u32 function, u32 index)
++static bool cpuid_function_in_range(struct kvm_vcpu *vcpu, u32 function)
+ {
+-	struct kvm_cpuid_entry2 *maxlevel;
+-
+-	maxlevel = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
+-	if (!maxlevel || maxlevel->eax >= function)
+-		return NULL;
+-	if (function & 0x80000000) {
+-		maxlevel = kvm_find_cpuid_entry(vcpu, 0, 0);
+-		if (!maxlevel)
+-			return NULL;
+-	}
+-	return kvm_find_cpuid_entry(vcpu, maxlevel->eax, index);
++	struct kvm_cpuid_entry2 *max;
 +
- 	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
--					INTEL_PMC_MAX_GENERIC);
-+					 x86_pmu.num_counters_gp);
- 	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << eax.split.bit_width) - 1;
- 	pmu->available_event_types = ~entry->ebx &
- 					((1ull << eax.split.mask_length) - 1);
-@@ -294,7 +297,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	} else {
- 		pmu->nr_arch_fixed_counters =
- 			min_t(int, edx.split.num_counters_fixed,
--				INTEL_PMC_MAX_FIXED);
-+			      x86_pmu.num_counters_fixed);
- 		pmu->counter_bitmask[KVM_PMC_FIXED] =
- 			((u64)1 << edx.split.bit_width_fixed) - 1;
++	max = kvm_find_cpuid_entry(vcpu, function & 0x80000000, 0);
++	return max && function <= max->eax;
+ }
+ 
+ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+ 	       u32 *ecx, u32 *edx, bool check_limit)
+ {
+ 	u32 function = *eax, index = *ecx;
+-	struct kvm_cpuid_entry2 *best;
+-	bool entry_found = true;
+-
+-	best = kvm_find_cpuid_entry(vcpu, function, index);
+-
+-	if (!best) {
+-		entry_found = false;
+-		if (!check_limit)
+-			goto out;
++	struct kvm_cpuid_entry2 *entry;
++	struct kvm_cpuid_entry2 *max;
++	bool found;
+ 
+-		best = check_cpuid_limit(vcpu, function, index);
++	entry = kvm_find_cpuid_entry(vcpu, function, index);
++	found = entry;
++	/*
++	 * Intel CPUID semantics treats any query for an out-of-range
++	 * leaf as if the highest basic leaf (i.e. CPUID.0H:EAX) were
++	 * requested.
++	 */
++	if (!entry && check_limit && !cpuid_function_in_range(vcpu, function)) {
++		max = kvm_find_cpuid_entry(vcpu, 0, 0);
++		if (max) {
++			function = max->eax;
++			entry = kvm_find_cpuid_entry(vcpu, function, index);
++		}
  	}
+-
+-out:
+-	if (best) {
+-		*eax = best->eax;
+-		*ebx = best->ebx;
+-		*ecx = best->ecx;
+-		*edx = best->edx;
+-	} else
++	if (entry) {
++		*eax = entry->eax;
++		*ebx = entry->ebx;
++		*ecx = entry->ecx;
++		*edx = entry->edx;
++	} else {
+ 		*eax = *ebx = *ecx = *edx = 0;
+-	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, entry_found);
+-	return entry_found;
++		/*
++		 * When leaf 0BH or 1FH is defined, CL is pass-through
++		 * and EDX is always the x2APIC ID, even for undefined
++		 * subleaves. Leaf 0BH or 1FH is defined when ECX[15:8]
++		 * is non-zero for subleaf 0.
++		 */
++		if (function == 0xb || function == 0x1f) {
++			entry = kvm_find_cpuid_entry(vcpu, function, 0);
++			if (entry && (entry->ecx & 0xff00)) {
++				*ecx = index & 0xff;
++				*edx = entry->edx;
++			}
++		}
++	}
++	trace_kvm_cpuid(function, *eax, *ebx, *ecx, *edx, found);
++	return found;
+ }
+ EXPORT_SYMBOL_GPL(kvm_cpuid);
+ 
 -- 
 2.23.0.444.g18eeb5a265-goog
 
