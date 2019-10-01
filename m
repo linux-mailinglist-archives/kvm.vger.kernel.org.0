@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77D12C40D3
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 21:16:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 760EEC40DA
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 21:17:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726480AbfJATQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 15:16:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35336 "EHLO mx1.redhat.com"
+        id S1726368AbfJATRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 15:17:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42364 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725991AbfJATQS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 15:16:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1725844AbfJATRn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 15:17:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2579612A2;
-        Tue,  1 Oct 2019 19:16:17 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id D33AE8A1C93;
+        Tue,  1 Oct 2019 19:17:41 +0000 (UTC)
 Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 910EA5C22C;
-        Tue,  1 Oct 2019 19:16:05 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93618100EBA2;
+        Tue,  1 Oct 2019 19:17:37 +0000 (UTC)
 Subject: Re: [PATCH v11 0/6] mm / virtio: Provide support for unused page
  reporting
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
         Alexander Duyck <alexander.duyck@gmail.com>,
         virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
         mst@redhat.com, dave.hansen@intel.com,
@@ -36,6 +36,7 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
 References: <20191001152441.27008.99285.stgit@localhost.localdomain>
  <7233498c-2f64-d661-4981-707b59c78fd5@redhat.com>
  <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
+ <c1ebaefd-ea60-b0f0-1c45-06ac3c502b5b@redhat.com>
 From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
@@ -82,95 +83,54 @@ Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
  NK9ZhT0+qkiN7npFLtNtbzwqaqceq3XhafmCiw8xrtzCnlB/C4SiBr/93Ip4kihXJ0EuHSLn
  VujM7c/b4pps
 Organization: Red Hat Inc,
-Message-ID: <8bd303a6-6e50-b2dc-19ab-4c3f176c4b02@redhat.com>
-Date:   Tue, 1 Oct 2019 15:16:04 -0400
+Message-ID: <530ed9b2-aabd-da39-6717-33a6dd33f92d@redhat.com>
+Date:   Tue, 1 Oct 2019 15:17:36 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
+In-Reply-To: <c1ebaefd-ea60-b0f0-1c45-06ac3c502b5b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 01 Oct 2019 19:16:17 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Tue, 01 Oct 2019 19:17:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 10/1/19 12:21 PM, Alexander Duyck wrote:
-> On Tue, 2019-10-01 at 17:35 +0200, David Hildenbrand wrote:
->> On 01.10.19 17:29, Alexander Duyck wrote:
->>> This series provides an asynchronous means of reporting to a hypervisor
->>> that a guest page is no longer in use and can have the data associated
->>> with it dropped. To do this I have implemented functionality that allows
->>> for what I am referring to as unused page reporting. The advantage of
->>> unused page reporting is that we can support a significant amount of
->>> memory over-commit with improved performance as we can avoid having to
->>> write/read memory from swap as the VM will instead actively participate
->>> in freeing unused memory so it doesn't have to be written.
+On 10/1/19 2:41 PM, David Hildenbrand wrote:
+>>> I think Michal asked for a performance comparison against Nitesh's
+>>> approach, to evaluate if keeping the reported state + tracking inside
+>>> the buddy is really worth it. Do you have any such numbers already? (or
+>>> did my tired eyes miss them in this cover letter? :/)
 >>>
->>> The functionality for this is fairly simple. When enabled it will allocate
->>> statistics to track the number of reported pages in a given free area.
->>> When the number of free pages exceeds this value plus a high water value,
->>> currently 32, it will begin performing page reporting which consists of
->>> pulling non-reported pages off of the free lists of a given zone and
->>> placing them into a scatterlist. The scatterlist is then given to the page
->>> reporting device and it will perform the required action to make the pages
->>> "reported", in the case of virtio-balloon this results in the pages being
->>> madvised as MADV_DONTNEED. After this they are placed back on their
->>> original free list. If they are not merged in freeing an additional bit is
->>> set indicating that they are a "reported" buddy page instead of a standard
->>> buddy page. The cycle then repeats with additional non-reported pages
->>> being pulled until the free areas all consist of reported pages.
->>>
->>> In order to try and keep the time needed to find a non-reported page to
->>> a minimum we maintain a "reported_boundary" pointer. This pointer is used
->>> by the get_unreported_pages iterator to determine at what point it should
->>> resume searching for non-reported pages. In order to guarantee pages do
->>> not get past the scan I have modified add_to_free_list_tail so that it
->>> will not insert pages behind the reported_boundary. Doing this allows us
->>> to keep the overhead to a minimum as re-walking the list without the
->>> boundary will result in as much as 18% additional overhead on a 32G VM.
->>>
->>>
-> <snip>
+>> I thought what Michal was asking for was what was the benefit of using the
+>> boundary pointer. I added a bit up above and to the description for patch
+>> 3 as on a 32G VM it adds up to about a 18% difference without factoring in
+>> the page faulting and zeroing logic that occurs when we actually do the
+>> madvise.
+> "I would still be happier if the allocator wouldn't really have to
+> bother about somebody snooping its internal state to do its own thing.
+> So make sure to describe why and how much this really matters.
+> [...]
+> if you gave some rough numbers to quantify how much overhead for
+> different solutions we are talking about here.
+> "
 >
->>> As far as possible regressions I have focused on cases where performing
->>> the hinting would be non-optimal, such as cases where the code isn't
->>> needed as memory is not over-committed, or the functionality is not in
->>> use. I have been using the will-it-scale/page_fault1 test running with 16
->>> vcpus and have modified it to use Transparent Huge Pages. With this I see
->>> almost no difference with the patches applied and the feature disabled.
->>> Likewise I see almost no difference with the feature enabled, but the
->>> madvise disabled in the hypervisor due to a device being assigned. With
->>> the feature fully enabled in both guest and hypervisor I see a regression
->>> between -1.86% and -8.84% versus the baseline. I found that most of the
->>> overhead was due to the page faulting/zeroing that comes as a result of
->>> the pages having been evicted from the guest.
->> I think Michal asked for a performance comparison against Nitesh's
->> approach, to evaluate if keeping the reported state + tracking inside
->> the buddy is really worth it. Do you have any such numbers already? (or
->> did my tired eyes miss them in this cover letter? :/)
->>
-> I thought what Michal was asking for was what was the benefit of using the
-> boundary pointer. I added a bit up above and to the description for patch
-> 3 as on a 32G VM it adds up to about a 18% difference without factoring in
-> the page faulting and zeroing logic that occurs when we actually do the
-> madvise.
+> Could be that I'm misreading Michals comment, but I'd be interested in
+> the "how much" as well.
 >
-> Do we have a working patch set for Nitesh's code? The last time I tried
-> running his patch set I ran into issues with kernel panics. If we have a
-> known working/stable patch set I can give it a try.
+>> Do we have a working patch set for Nitesh's code? The last time I tried
+>> running his patch set I ran into issues with kernel panics. If we have a
+>> known working/stable patch set I can give it a try.
+> @Nitesh, is there a working branch?
 
-Did you try the v12 patch-set [1]?
-I remember that you reported the CPU stall issue, which I fixed in the v12.
-
-[1] https://lkml.org/lkml/2019/8/12/593
+For some unknown reason, I received these set of emails just now :)
+That's why couldn't respond earlier.
 
 >
-> - Alex
 >
 -- 
 Thanks
