@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 692FBC3CFD
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 18:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFBF1C3D9C
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 19:01:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727519AbfJAQ4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 12:56:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54118 "EHLO mail.kernel.org"
+        id S1729872AbfJAQkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 12:40:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51538 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731801AbfJAQmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 12:42:16 -0400
+        id S1729837AbfJAQkU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 12:40:20 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8A0E021855;
-        Tue,  1 Oct 2019 16:42:14 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F301121D79;
+        Tue,  1 Oct 2019 16:40:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569948135;
-        bh=TCP7dajGRAJRe3aycXPdbSr6pAIYTBVA4U0rkCcawpM=;
+        s=default; t=1569948018;
+        bh=8s8v0yNQxp/azENEIyJoN93RtdmY35h4AqfX90LSP/s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NRFELVzAQP5FS+U3vfTmV8g3VhDIgyid6SU+n5db/3MGrNJMQmn18Ht17pu/z8DgY
-         +Pe6TZze2t93i6DU3xsEqc4PJjcrCTxHLwbINy4t4n1ed6KieVaauMtmUNloiOmmC3
-         JwZpsgCqXXXrfW4KVKkTJhNYZJmcPkjMTAAO0px4=
+        b=UdtVQ9sSOclMBFocvgMDygixh8d9jNniGEWLGngStQYdQadiQZ9Gw9pJYT8npzaz4
+         z7ctlHkT3d6zLM/CqS4dFudLp2ptm/Bc3Uz4az5bRio6wWLY58dwgBnEQwMgyFnly2
+         z1EfWAcpyZwOxE4bZTT+ruKLhQ0Uzo98jXBXoFOk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Wanpeng Li <wanpengli@tencent.com>,
@@ -31,12 +31,12 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 35/63] KVM: hyperv: Fix Direct Synthetic timers assert an interrupt w/o lapic_in_kernel
-Date:   Tue,  1 Oct 2019 12:40:57 -0400
-Message-Id: <20191001164125.15398-35-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.3 39/71] KVM: hyperv: Fix Direct Synthetic timers assert an interrupt w/o lapic_in_kernel
+Date:   Tue,  1 Oct 2019 12:38:49 -0400
+Message-Id: <20191001163922.14735-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191001164125.15398-1-sashal@kernel.org>
-References: <20191001164125.15398-1-sashal@kernel.org>
+In-Reply-To: <20191001163922.14735-1-sashal@kernel.org>
+References: <20191001163922.14735-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
@@ -87,7 +87,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 742ecf5b6c009..72200998687cd 100644
+index fff790a3f4ee9..c0867b0aae3ec 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
 @@ -645,7 +645,9 @@ static int stimer_notify_direct(struct kvm_vcpu_hv_stimer *stimer)
@@ -101,7 +101,7 @@ index 742ecf5b6c009..72200998687cd 100644
  }
  
  static void stimer_expiration(struct kvm_vcpu_hv_stimer *stimer)
-@@ -1854,7 +1856,13 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+@@ -1852,7 +1854,13 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
  
  			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
  			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
