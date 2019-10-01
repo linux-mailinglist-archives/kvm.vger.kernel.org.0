@@ -2,148 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E051BC2B5E
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 02:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6D77C2B67
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 02:45:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731645AbfJAAhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 20:37:37 -0400
-Received: from mail-pl1-f182.google.com ([209.85.214.182]:37547 "EHLO
-        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728217AbfJAAhh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 20:37:37 -0400
-Received: by mail-pl1-f182.google.com with SMTP id u20so4596246plq.4
-        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 17:37:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=s8Rt9kutYLVn7K768cdGlB2asOYD+Qx9DjGQoaBYYHA=;
-        b=Bsi8faMu9emF8hR0sc9Ca4dtcK1Gw5Pu31q+3BFeD5Pfu5xpal9C9uEArn+je7YYhk
-         SslmTDJ2c9YpK+hd8OpvSUcmX14gYGksNKRwuGmSAxkjgXvbHM44epEpivf3usKX7DTY
-         BUMAtAGEKDUlS6K1daaWO1p5v8/sTf/s7/dDE75kfxWVPc88oFOCfNlG2s1DiPb9rs1/
-         sSZ+0idJIGzYyQE0WQ9eaeLqiViTTD/HkwzFCeutVQ70PelxrpKmlcF7OUgVoLF1XEvL
-         N1jtmgsTB2xI/LdoI7UIe9pOwdHPhDBZkjRH32rUu082NAogJoVRYI53i6GWdTqTIYVy
-         CFXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=s8Rt9kutYLVn7K768cdGlB2asOYD+Qx9DjGQoaBYYHA=;
-        b=A5rTbQcQdftW9HtwEwVMS8bcz4kTmLc+CU3P+1HQZY/GTdXe77WEp0ik00OlGP3BHv
-         lDBkfQHtHVWbbsb1w/ekp5dmkrehgaUbGhbmkU+zmVKN+Qch6CtN8p+xGtWPIh/bO1m1
-         FQ/frTOXQd5/rVvZbHQmrC/SdG3kf38xMtog4kZZf/O+A1uw7+bwFILzkelYdySTsOB1
-         pv/+awLLH64BKw0dYMzJ92DukNfu79+UxJbSddX79X8c5vhHo/02HiuBtmKqdkFDlI45
-         qY39Z0FAEYPmsU54D85BtHumX6lt8Q4AV+URPBZVBWVm08DghVgVKPVM5NYfguFcxaH3
-         Z62A==
-X-Gm-Message-State: APjAAAVTUhlPTUP4zE5i1K3ngtIu0xKpZ40tUi2j43c8GZphQ23gooMb
-        LtKkf5+ZzYQuul/GPSph+2AXcG3ghCQX9A==
-X-Google-Smtp-Source: APXvYqyD33Uk8H6b87PXu494ztiyzUom50sWNW+fmqOGPIYenQqSXucy0CiDWXd8JRjrUSyqzR/44A==
-X-Received: by 2002:a17:902:9a92:: with SMTP id w18mr22989756plp.201.1569890256270;
-        Mon, 30 Sep 2019 17:37:36 -0700 (PDT)
-Received: from [10.2.144.69] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id c125sm13649980pfa.107.2019.09.30.17.37.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Sep 2019 17:37:35 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [kvm-unit-tests PATCH v7 2/2] x86: nvmx: test max atomic switch
- MSRs
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CAA03e5F6WRN8UdUHxCFen3YkPbNQTQFQtMVkC_rexuPTNry0Ug@mail.gmail.com>
-Date:   Mon, 30 Sep 2019 17:37:33 -0700
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A4BA92E7-F025-4715-9E10-FD1A636F22CB@gmail.com>
-References: <20190925011821.24523-1-marcorr@google.com>
- <20190925011821.24523-2-marcorr@google.com>
- <91eb40a0-c436-5737-aa8a-c657b7221be2@redhat.com>
- <20190926143201.GA4738@linux.intel.com>
- <C94E79EE-EACF-40C1-AF7A-69E2A8EFAA35@gmail.com>
- <CAA03e5FPBdHhVY5AyOd68UkriG=+poWf0PCcsUVBOHW7YPF3VA@mail.gmail.com>
- <DDBD57EF-C9A9-40EE-ACFE-0E3B30C275F9@gmail.com>
- <CAA03e5EZ-e0RemkakTab+CFo=P2kLLaLi0UROpsVtQEVt8p1Bw@mail.gmail.com>
- <C8510239-CEDD-496B-A772-12A8A8C03ADD@gmail.com>
- <CAA03e5F6WRN8UdUHxCFen3YkPbNQTQFQtMVkC_rexuPTNry0Ug@mail.gmail.com>
-To:     Marc Orr <marcorr@google.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1727320AbfJAApq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 20:45:46 -0400
+Received: from mga04.intel.com ([192.55.52.120]:16374 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726157AbfJAApq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 20:45:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Sep 2019 17:45:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,569,1559545200"; 
+   d="scan'208";a="342825875"
+Received: from kmsmsx155.gar.corp.intel.com ([172.21.73.106])
+  by orsmga004.jf.intel.com with ESMTP; 30 Sep 2019 17:45:43 -0700
+Received: from pgsmsx112.gar.corp.intel.com ([169.254.3.2]) by
+ KMSMSX155.gar.corp.intel.com ([169.254.15.100]) with mapi id 14.03.0439.000;
+ Tue, 1 Oct 2019 08:45:42 +0800
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "jmattson@google.com" <jmattson@google.com>,
+        "ehabkost@redhat.com" <ehabkost@redhat.com>
+CC:     "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
+Thread-Topic: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
+Thread-Index: AQHUl6ICyHEZ6Vh8PkONC+8Lhubo/KWFzjkAgAA4pwCBtnFxAIAJQpyAgAAY1YCAAFnTgA==
+Date:   Tue, 1 Oct 2019 00:45:41 +0000
+Message-ID: <9bbe864ab8fb16d9e64745b930c89b1db24ccc3a.camel@intel.com>
+References: <1545227503-214403-1-git-send-email-robert.hu@linux.intel.com>
+         <CALMp9eRZCoZbeyttZdvaCUpOFKygTNVF_x7+TWh6MktmF-ZK9A@mail.gmail.com>
+         <263d31d9-b21e-ceb9-b47c-008e30bbd94f@redhat.com>
+         <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
+         <20190930175449.GB4084@habkost.net>
+         <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
+In-Reply-To: <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+x-originating-ip: [10.251.15.246]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B5538303D61E35489F4C245496899DF4@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Sep 30, 2019, at 5:12 PM, Marc Orr <marcorr@google.com> wrote:
->=20
->>>>>> Thanks for caring, but it would be better to explicitly skip the =
-test if it
->>>>>> is not running on bare-metal. For instance, I missed this thread =
-and needed
->>>>>> to check why the test fails on bare-metal...
->>>>>>=20
->>>>>> Besides, it seems that v6 was used and not v7, so the error =
-messages are
->>>>>> strange:
->>>>>>=20
->>>>>> Test suite: atomic_switch_overflow_msrs_test
->>>>>> FAIL: exit_reason, 18, is 2147483682.
->>>>>> FAIL: exit_qual, 0, is 513.
->>>>>> SUMMARY: 11 tests, 2 unexpected failures
->>>>>>=20
->>>>>> I also think that printing the exit-reason in hex format would be =
-more
->>>>>> readable.
->>>>>=20
->>>>> Exit reasons are enumerated in decimal rather than hex in the SDM
->>>>> (volume 3, appendix C).
->>>>=20
->>>> I know, but when the failed VM entry indication is on, it is just a =
-huge
->>>> mess. Never mind, this is a minor issue.
->>>>=20
->>>>> To be clear, are you saying you "opted in" to the test on bare =
-metal,
->>>>> and got confused when it failed? Or, are you saying that our patch =
-on
->>>>> unittest.cfg to make the test not run by default didn't work?
->>>>=20
->>>> I ran it on bare-metal and needed to spend some time to realize =
-that it is
->>>> expected to fail on bare-metal =E2=80=9Cby design=E2=80=9D.
->>>=20
->>> Ack. Maybe we should move tests like this into a *_virt_only.c
->>> counter-part? E.g., we could create a new, opt-in, file,
->>> vmx_tests_virt_only.c for this test. When similar scenarios arise in
->>> the future, this new precedent could be replicated, to make it =
-obvious
->>> which tests are expected to fail on bare metal.
->>=20
->> Thanks for the willingness, but I don=E2=80=99t know whether any =
-intrusive change is
->> needed at the moment. Even just getting the print-out to have =
-something like
->> =E2=80=9C(KVM-specific)=E2=80=9D comment would be enough, assuming =
-the test can easily be
->> disabled (as is the case with atomic_switch_overflow_msrs_test).
->=20
-> "(as is the case with atomic_switch_overflow_msrs_test)" --> now I'm
-> confused. Are you saying that the first test,
-> atomic_switch_max_msrs_test() failed on bare metal? That test is
-> expected to pass on bare metal. However, I did not test it on bare
-> metal.
-
-Sorry, my bad:
-
-atomic_switch_max_msrs_test() passes on bare-metal.
-atomic_switch_overflow_msrs_test() fails.
-
-Everything is as (I understand is) expected to be. I just copy-pasted =
-the
-wrong test name in my last reply.
-
+T24gTW9uLCAyMDE5LTA5LTMwIGF0IDEyOjIzIC0wNzAwLCBKaW0gTWF0dHNvbiB3cm90ZToNCj4g
+T24gTW9uLCBTZXAgMzAsIDIwMTkgYXQgMTA6NTQgQU0gRWR1YXJkbyBIYWJrb3N0IDxlaGFia29z
+dEByZWRoYXQuY29tPiB3cm90ZToNCj4gPiBDQ2luZyBxZW11LWRldmVsLg0KPiA+IA0KPiA+IE9u
+IFR1ZSwgU2VwIDI0LCAyMDE5IGF0IDAxOjMwOjA0UE0gLTA3MDAsIEppbSBNYXR0c29uIHdyb3Rl
+Og0KPiA+ID4gT24gV2VkLCBEZWMgMTksIDIwMTggYXQgMTowMiBQTSBQYW9sbyBCb256aW5pIDxw
+Ym9uemluaUByZWRoYXQuY29tPiB3cm90ZToNCj4gPiA+ID4gT24gMTkvMTIvMTggMTg6MzksIEpp
+bSBNYXR0c29uIHdyb3RlOg0KPiA+ID4gPiA+IElzIHRoaXMgYW4gaW5zdHJ1Y3Rpb24gdGhhdCBr
+dm0gaGFzIHRvIGJlIGFibGUgdG8gZW11bGF0ZSBiZWZvcmUgaXQNCj4gPiA+ID4gPiBjYW4gZW51
+bWVyYXRlIGl0cyBleGlzdGVuY2U/DQo+ID4gPiA+IA0KPiA+ID4gPiBJdCBkb2Vzbid0IGhhdmUg
+YW55IG9wZXJhbmRzLCBzbyBuby4NCj4gPiA+ID4gDQo+ID4gPiA+IFBhb2xvDQo+ID4gPiA+IA0K
+PiA+ID4gPiA+IE9uIFdlZCwgRGVjIDE5LCAyMDE4IGF0IDU6NTEgQU0gUm9iZXJ0IEhvbyA8cm9i
+ZXJ0Lmh1QGxpbnV4LmludGVsLmNvbT4NCj4gPiA+ID4gPiB3cm90ZToNCj4gPiA+ID4gPiA+IFNp
+Z25lZC1vZmYtYnk6IFJvYmVydCBIb28gPHJvYmVydC5odUBsaW51eC5pbnRlbC5jb20+DQo+ID4g
+PiA+ID4gPiAtLS0NCj4gPiA+ID4gPiA+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9jcHVmZWF0dXJl
+cy5oIHwgMSArDQo+ID4gPiA+ID4gPiAgYXJjaC94ODYva3ZtL2NwdWlkLmMgICAgICAgICAgICAg
+ICB8IDIgKy0NCj4gPiA+ID4gPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
+MSBkZWxldGlvbigtKQ0KPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiBkaWZmIC0tZ2l0IGEvYXJj
+aC94ODYvaW5jbHVkZS9hc20vY3B1ZmVhdHVyZXMuaA0KPiA+ID4gPiA+ID4gYi9hcmNoL3g4Ni9p
+bmNsdWRlL2FzbS9jcHVmZWF0dXJlcy5oDQo+ID4gPiA+ID4gPiBpbmRleCAyOGM0YTUwLi45MzJi
+MTlmIDEwMDY0NA0KPiA+ID4gPiA+ID4gLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20vY3B1ZmVh
+dHVyZXMuaA0KPiA+ID4gPiA+ID4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20vY3B1ZmVhdHVy
+ZXMuaA0KPiA+ID4gPiA+ID4gQEAgLTI4MCw2ICsyODAsNyBAQA0KPiA+ID4gPiA+ID4gIC8qIEFN
+RC1kZWZpbmVkIENQVSBmZWF0dXJlcywgQ1BVSUQgbGV2ZWwgMHg4MDAwMDAwOCAoRUJYKSwgd29y
+ZCAxMw0KPiA+ID4gPiA+ID4gKi8NCj4gPiA+ID4gPiA+ICAjZGVmaW5lIFg4Nl9GRUFUVVJFX0NM
+WkVSTyAgICAgICAgICAgICAoMTMqMzIrIDApIC8qIENMWkVSTw0KPiA+ID4gPiA+ID4gaW5zdHJ1
+Y3Rpb24gKi8NCj4gPiA+ID4gPiA+ICAjZGVmaW5lIFg4Nl9GRUFUVVJFX0lSUEVSRiAgICAgICAg
+ICAgICAoMTMqMzIrIDEpIC8qIEluc3RydWN0aW9ucw0KPiA+ID4gPiA+ID4gUmV0aXJlZCBDb3Vu
+dCAqLw0KPiA+ID4gPiA+ID4gKyNkZWZpbmUgWDg2X0ZFQVRVUkVfV0JOT0lOVkQgICAgICAgICAg
+ICgxMyozMisgOSkgLyogV3JpdGViYWNrIGFuZA0KPiA+ID4gPiA+ID4gRG9uJ3QgaW52YWxpZCBj
+YWNoZSAqLw0KPiA+ID4gPiA+ID4gICNkZWZpbmUgWDg2X0ZFQVRVUkVfWFNBVkVFUlBUUiAgICAg
+ICAgICgxMyozMisgMikgLyogQWx3YXlzDQo+ID4gPiA+ID4gPiBzYXZlL3Jlc3RvcmUgRlAgZXJy
+b3IgcG9pbnRlcnMgKi8NCj4gPiA+ID4gPiA+ICAjZGVmaW5lIFg4Nl9GRUFUVVJFX0FNRF9JQlBC
+ICAgICAgICAgICAoMTMqMzIrMTIpIC8qICIiIEluZGlyZWN0DQo+ID4gPiA+ID4gPiBCcmFuY2gg
+UHJlZGljdGlvbiBCYXJyaWVyICovDQo+ID4gPiA+ID4gPiAgI2RlZmluZSBYODZfRkVBVFVSRV9B
+TURfSUJSUyAgICAgICAgICAgKDEzKjMyKzE0KSAvKiAiIiBJbmRpcmVjdA0KPiA+ID4gPiA+ID4g
+QnJhbmNoIFJlc3RyaWN0ZWQgU3BlY3VsYXRpb24gKi8NCj4gPiA+ID4gPiA+IGRpZmYgLS1naXQg
+YS9hcmNoL3g4Ni9rdm0vY3B1aWQuYyBiL2FyY2gveDg2L2t2bS9jcHVpZC5jDQo+ID4gPiA+ID4g
+PiBpbmRleCBjYzZkZDY1Li43NjNlMTE1IDEwMDY0NA0KPiA+ID4gPiA+ID4gLS0tIGEvYXJjaC94
+ODYva3ZtL2NwdWlkLmMNCj4gPiA+ID4gPiA+ICsrKyBiL2FyY2gveDg2L2t2bS9jcHVpZC5jDQo+
+ID4gPiA+ID4gPiBAQCAtMzgwLDcgKzM4MCw3IEBAIHN0YXRpYyBpbmxpbmUgaW50IF9fZG9fY3B1
+aWRfZW50KHN0cnVjdA0KPiA+ID4gPiA+ID4ga3ZtX2NwdWlkX2VudHJ5MiAqZW50cnksIHUzMiBm
+dW5jdGlvbiwNCj4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gICAgICAgICAvKiBjcHVpZCAweDgw
+MDAwMDA4LmVieCAqLw0KPiA+ID4gPiA+ID4gICAgICAgICBjb25zdCB1MzIga3ZtX2NwdWlkXzgw
+MDBfMDAwOF9lYnhfeDg2X2ZlYXR1cmVzID0NCj4gPiA+ID4gPiA+IC0gICAgICAgICAgICAgICBG
+KEFNRF9JQlBCKSB8IEYoQU1EX0lCUlMpIHwgRihBTURfU1NCRCkgfA0KPiA+ID4gPiA+ID4gRihW
+SVJUX1NTQkQpIHwNCj4gPiA+ID4gPiA+ICsgICAgICAgICAgICAgICBGKFdCTk9JTlZEKSB8IEYo
+QU1EX0lCUEIpIHwgRihBTURfSUJSUykgfA0KPiA+ID4gPiA+ID4gRihBTURfU1NCRCkgfCBGKFZJ
+UlRfU1NCRCkgfA0KPiA+ID4gPiA+ID4gICAgICAgICAgICAgICAgIEYoQU1EX1NTQl9OTykgfCBG
+KEFNRF9TVElCUCk7DQo+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ICAgICAgICAgLyogY3B1aWQg
+MHhDMDAwMDAwMS5lZHggKi8NCj4gPiA+ID4gPiA+IC0tDQo+ID4gPiA+ID4gPiAxLjguMy4xDQo+
+ID4gPiA+ID4gPiANCj4gPiA+IA0KPiA+ID4gV2hhdCBpcyB0aGUgcG9pbnQgb2YgZW51bWVyYXRp
+bmcgc3VwcG9ydCBmb3IgV0JOT0lOVkQgaWYga3ZtIGlzIGdvaW5nDQo+ID4gPiB0byBpbXBsZW1l
+bnQgaXQgYXMgV0JJTlZEPw0KPiA+IA0KPiA+IEkgZXhwZWN0IEdFVF9TVVBQT1JURURfQ1BVSUQg
+dG8gcmV0dXJuIFdCTk9JTlZELCBiZWNhdXNlIGl0DQo+ID4gaW5kaWNhdGVzIHRvIHVzZXJzcGFj
+ZSB3aGF0IGlzIHN1cHBvcnRlZCBieSBLVk0uICBBcmUgdGhlcmUgYW55DQo+ID4gZXhwZWN0YXRp
+b25zIHRoYXQgR0VUX1NVUFBPUlRFRF9DUFVJRCB3aWxsIGFsc28gZGljdGF0ZSB3aGF0IGlzDQo+
+ID4gZW5hYmxlZCBieSBkZWZhdWx0IGluIHNvbWUgY2FzZXM/DQo+ID4gDQo+ID4gSW4gZWl0aGVy
+IGNhc2UsIHlvdXIgcXVlc3Rpb24gYXBwbGllcyB0byBRRU1VOiB3aHkgZG8gd2Ugd2FudA0KPiA+
+IFdCTk9JTlZEIHRvIGJlIGVuYWJsZWQgYnkgIi1jcHUgaG9zdCIgYnkgZGVmYXVsdCBhbmQgYmUg
+cGFydCBvZg0KPiA+IFFFTVUncyBJY2VsYWtlLSogQ1BVIG1vZGVsIGRlZmluaXRpb25zPw0KPiAN
+Cj4gSSBoYWQgb25seSBsb29rZWQgYXQgdGhlIFNWTSBpbXBsZW1lbnRhdGlvbiBvZiBXQk5PSU5W
+RCwgd2hpY2ggaXMNCj4gZXhhY3RseSB0aGUgc2FtZSBhcyB0aGUgU1ZNIGltcGxlbWVudGF0aW9u
+IG9mIFdCSU5WRC4gU28sIHRoZSBxdWVzdGlvbg0KPiBpcywgIndoeSBlbnVtZXJhdGUgV0JOT0lO
+VkQgaWYgaXRzIGltcGxlbWVudGF0aW9uIGlzIGV4YWN0bHkgdGhlIHNhbWUNCj4gYXMgV0JJTlZE
+PyINCj4gDQo+IFdCTk9JTlZEIGFwcGVhcnMgdG8gYmUgb25seSBwYXJ0aWFsbHkgZG9jdW1lbnRl
+ZCBpbiBJbnRlbCBkb2N1bWVudA0KPiAzMTk0MzMtMDM3LCAiSW50ZWzCriBBcmNoaXRlY3R1cmUg
+SW5zdHJ1Y3Rpb24gU2V0IEV4dGVuc2lvbnMgYW5kIEZ1dHVyZQ0KPiBGZWF0dXJlcyBQcm9ncmFt
+bWluZyBSZWZlcmVuY2UuIiBJbiBwYXJ0aWN1bGFyLCB0aGVyZSBpcyBubw0KPiBkb2N1bWVudGF0
+aW9uIHJlZ2FyZGluZyB0aGUgaW5zdHJ1Y3Rpb24ncyBiZWhhdmlvciBpbiBWTVggbm9uLXJvb3QN
+Cj4gbW9kZS4gRG9lcyBXQk5PSU5WRCBjYXVzZSBhIFZNLWV4aXQgd2hlbiB0aGUgVk0tZXhlY3V0
+aW9uIGNvbnRyb2wsDQo+ICJXQklOVkQgZXhpdGluZywiIGlzIHNldD8gSWYgc28sIGRvZXMgaXQg
+aGF2ZSB0aGUgc2FtZSBWTS1leGl0IHJlYXNvbg0KPiBhcyBXQklOVkQgKDU0KSwgb3IgYSBkaWZm
+ZXJlbnQgb25lPyBJZiBpdCBkb2VzIGhhdmUgdGhlIHNhbWUgVk0tZXhpdA0KPiByZWFzb24gKGEg
+bGEgU1ZNKSwgaG93IGRvZXMgb25lIGRpc3Rpbmd1aXNoIGEgV0JJTlZEIFZNLWV4aXQgZnJvbSBh
+DQo+IFdCTk9JTlZEIFZNLWV4aXQ/IElmIG9uZSBjYW4ndCBkaXN0aW5ndWlzaCAoYSBsYSBTVk0p
+LCB0aGVuIGl0IHdvdWxkDQo+IHNlZW0gdGhhdCB0aGUgVk1YIGltcGxlbWVudGF0aW9uIGFsc28g
+aW1wbGVtZW50cyBXQk5PSU5WRCBhcyBXQklOVkQuDQo+IElmIHRoYXQncyB0aGUgY2FzZSwgdGhl
+IHF1ZXN0aW9uIGZvciBWTVggaXMgdGhlIHNhbWUgYXMgZm9yIFNWTS4NCg0KVW5mb3J0dW5hdGVs
+eSBXQk5PSU5WRCBpbnRlcmFjdGlvbiB3aXRoIFZNWCBoYXMgbm90IGJlZW4gbWFkZSB0byBwdWJs
+aWMgeWV0LiBJDQphbSByZWFjaGluZyBvdXQgaW50ZXJuYWxseSB0byBzZWUgd2hlbiBpdCBjYW4g
+YmUgZG9uZS4gSSBhZ3JlZSBpdCBtYXkgbm90IGJlDQpuZWNlc3NhcnkgdG8gZXhwb3NlIFdCTk9J
+TlZEIGlmIGl0cyBpbXBsZW1lbnRhdGlvbiBpcyBleGFjdGx5IHRoZSBzYW1lIGFzDQpXQklOVkQs
+IGJ1dCBpdCBhbHNvIGRvZXNuJ3QgaGF2ZSBhbnkgaGFybSwgcmlnaHQ/DQoNClRoYW5rcywNCi1L
+YWkNCg0K
