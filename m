@@ -2,110 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0442AC3E26
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 19:07:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61B71C3E31
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 19:09:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727263AbfJARGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 13:06:48 -0400
-Received: from mga04.intel.com ([192.55.52.120]:12904 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726339AbfJARGs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 13:06:48 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Oct 2019 10:06:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,571,1559545200"; 
-   d="scan'208";a="197915381"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 01 Oct 2019 10:06:47 -0700
-Date:   Tue, 1 Oct 2019 10:06:46 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "ehabkost@redhat.com" <ehabkost@redhat.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: Re: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
-Message-ID: <20191001170646.GA27090@linux.intel.com>
-References: <1545227503-214403-1-git-send-email-robert.hu@linux.intel.com>
- <CALMp9eRZCoZbeyttZdvaCUpOFKygTNVF_x7+TWh6MktmF-ZK9A@mail.gmail.com>
- <263d31d9-b21e-ceb9-b47c-008e30bbd94f@redhat.com>
- <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
- <20190930175449.GB4084@habkost.net>
- <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
- <9bbe864ab8fb16d9e64745b930c89b1db24ccc3a.camel@intel.com>
- <CALMp9eSe_7on+F=ng05DkvvBpnWhSirEpSVz9Bua4Sy606xJnw@mail.gmail.com>
+        id S1726463AbfJARJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 13:09:50 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45864 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727686AbfJARJt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 13:09:49 -0400
+Received: by mail-io1-f66.google.com with SMTP id c25so49818679iot.12
+        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 10:09:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=m0MgQ5ppurdMXfi+V2kEZtMUpkmon2gEcNILAJgpTX4=;
+        b=HPDV3m0dgin1IfpbLLHsIc9K3EwoVG02de0uMssHZYpt4pYJtWZbNPesMaLgf02QvX
+         2Io6c+Sgc0vVpCgkY/ytQjLj4zAI9YkBdibY3hqYYhi5poyYHEZd1tX7Gq1f3LN5M4jx
+         3LaD6GAQxaO4rv32DCfOEezOLrBXK87XX9U2mEuKvVnCqmOuG8vkb5W33tJMVHYgSRH2
+         7xXLWqUYNMScpDOA044B3+4Jy6jt6yNW3AeQEaXH9MadAUsQpOvVITYtJiVWv8X2hRcX
+         ej5+C4XM8hr2PMM+iWIe+Dr+apKInQTzJ0jrYgwTOiOqb2Lfn9zrXuChtBP6s0vRUVPE
+         CHJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=m0MgQ5ppurdMXfi+V2kEZtMUpkmon2gEcNILAJgpTX4=;
+        b=uPws0ZHVwLwlAsXro3Itx2YZ2VLjIe8dX9B1jTTLDWxkIJ9yjd3lutOXaznOR2fkec
+         1IaFSzPZP0pJixu3Sb9WtLf4dap00jp9mSESqexrn8lSUwwq79mNwd5Qs0DeGDy4Yz//
+         RtdPxh62zH5BQXJNWSKO/XLmvVJ0O6V/oB1giOX3xILROQvheKyMjZtyPonF5gEEob1m
+         iATDsYZIzxGf2Z3gOFxD2aq3vVPc1e+XnodeP69E/0v0BJymqx8UngYAsXUsHkfgFMRi
+         Ig7oFHZM9tZSHQ/Rm7+ufcu5bnJ2YKrgaVcT0u8Av7XsEGGbEsQskEkPIhzn+Q3ZOJYI
+         907g==
+X-Gm-Message-State: APjAAAWh5H0ACVLYFwllL24jXzOQ/cIC2irsEumlnUPuwjqJySmVH10J
+        JLywR3BGfPlei8Wz+gSqDecfhwHBoJ7erhHj1uWUDyZbA+QArQ==
+X-Google-Smtp-Source: APXvYqzix/540/lY+fm0MA3r9GXjK7ZY/iCLIAuHUxABAMOL+U5GKfx8i4XN7RmiFNugUAH8yo7ajqWxaMnXIt6PFYw=
+X-Received: by 2002:a92:8e4f:: with SMTP id k15mr29184783ilh.108.1569949782557;
+ Tue, 01 Oct 2019 10:09:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eSe_7on+F=ng05DkvvBpnWhSirEpSVz9Bua4Sy606xJnw@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190930233626.22852-1-krish.sadhukhan@oracle.com> <20190930233626.22852-2-krish.sadhukhan@oracle.com>
+In-Reply-To: <20190930233626.22852-2-krish.sadhukhan@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 1 Oct 2019 10:09:31 -0700
+Message-ID: <CALMp9eRq+oib=S5X8rxJNxwqQUYRnLrSYcxKxWaxSKid69WJ=w@mail.gmail.com>
+Subject: Re: [PATCH] nVMX: Defer error from VM-entry MSR-load area to until
+ after hardware verifies VMCS guest state-area
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 01, 2019 at 07:20:17AM -0700, Jim Mattson wrote:
-> On Mon, Sep 30, 2019 at 5:45 PM Huang, Kai <kai.huang@intel.com> wrote:
-> >
-> > On Mon, 2019-09-30 at 12:23 -0700, Jim Mattson wrote:
-> > > On Mon, Sep 30, 2019 at 10:54 AM Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > I had only looked at the SVM implementation of WBNOINVD, which is
-> > > exactly the same as the SVM implementation of WBINVD. So, the question
-> > > is, "why enumerate WBNOINVD if its implementation is exactly the same
-> > > as WBINVD?"
-> > >
-> > > WBNOINVD appears to be only partially documented in Intel document
-> > > 319433-037, "Intel® Architecture Instruction Set Extensions and Future
-> > > Features Programming Reference." In particular, there is no
-> > > documentation regarding the instruction's behavior in VMX non-root
-> > > mode. Does WBNOINVD cause a VM-exit when the VM-execution control,
-> > > "WBINVD exiting," is set? If so, does it have the same VM-exit reason
-> > > as WBINVD (54), or a different one? If it does have the same VM-exit
-> > > reason (a la SVM), how does one distinguish a WBINVD VM-exit from a
-> > > WBNOINVD VM-exit? If one can't distinguish (a la SVM), then it would
-> > > seem that the VMX implementation also implements WBNOINVD as WBINVD.
-> > > If that's the case, the question for VMX is the same as for SVM.
-> >
-> > Unfortunately WBNOINVD interaction with VMX has not been made to public yet.
-
-Hint: WBNOINVD uses a previously ignored prefix, i.e. it looks a *lot*
-      like WBINVD...
-
-> > I am reaching out internally to see when it can be done. I agree it may not be
-> > necessary to expose WBNOINVD if its implementation is exactly the same as
-> > WBINVD, but it also doesn't have any harm, right?
-> 
-> If nested VMX changes are necessary to be consistent with hardware,
-> then enumerating WBNOINVD support in the guest CPUID information at
-> this time--without the attendant nested VMX changes--is premature. No
-> changes to nested SVM are necessary, so it's fine for AMD systems.
-> 
-> If no changes to nested VMX are necessary, then it is true that
-> WBNOINVD can be emulated by WBINVD. However, it provides no value to
-> specifically enumerate the instruction.
+On Mon, Sep 30, 2019 at 5:12 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
 >
-> If there is some value that I'm missing, then why make guest support
-> for the instruction contingent on host support for the instruction?
-> KVM can implement WBNOINVD as WBINVD on any host with WBINVD,
-> regardless of whether or not the host supports WBNOINVD.
+> According to section =E2=80=9CVM Entries=E2=80=9D in Intel SDM vol 3C, VM=
+-entry checks are
+> performed in a certain order. Checks on MSRs that are loaded on VM-entry
+> from VM-entry MSR-load area, should be done after verifying VMCS controls=
+,
+> host-state area and guest-state area. As KVM relies on CPU hardware to
+> perform some of these checks, we need to defer VM-exit due to invalid
+> VM-entry MSR-load area to until after CPU hardware completes the earlier
+> checks and is ready to do VMLAUNCH/VMRESUME.
+>
+> In order to defer errors arising from invalid VM-entry MSR-load area in
+> vmcs12, we set up a single invalid entry, which is illegal according to
+> section "Loading MSRs in Intel SDM vol 3C, in VM-entry MSR-load area of
+> vmcs02. This will cause the CPU hardware to VM-exit with "VM-entry failur=
+e
+> due to MSR loading" after it completes checks on VMCS controls, host-stat=
+e
+> area and guest-state area. We reflect a synthesized Exit Qualification to
+> our guest.
 
-Agreed.  To play nice with live migration, KVM should enumerate WBNOINVD
-regardless of host support.  Since WBNOINVD uses an ignored prefix, it
-will simply look like a regular WBINVD on platforms without WBNOINVD.
+This change addresses the priority inversion, but it still potentially
+leaves guest MSRs incorrectly loaded with values from the VMCS12
+VM-entry MSR-load area when a higher priority error condition would
+have precluded any processing of the VM-entry MSR-load area.
 
-Let's assume the WBNOINVD VM-Exit behavior is sane, i.e. allows software
-to easily differentiate between WBINVD and WBNOINVD.  In that case, the
-value added would be that KVM can do WBNOINVD instead of WBINVD in the
-unlikely event that (a) KVM needs to executed WBINVD on behalf of the
-guest (because the guest has non-coherent DMA), (b) WBNOINVD is supported
-on the host, and (c) WBNOINVD is used by the guest (I don't think it would
-be safe to assume that the guest doesn't need the caches invalidated on
-WBINVD).
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Reviewed-by: Mihai Carabas <mihai.carabas@oracle.com>
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 34 +++++++++++++++++++++++++++++++---
+>  arch/x86/kvm/vmx/nested.h | 14 ++++++++++++--
+>  arch/x86/kvm/vmx/vmcs.h   |  6 ++++++
+>  3 files changed, 49 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index ced9fba32598..b74491c04090 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3054,12 +3054,40 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcp=
+u *vcpu, bool from_vmentry)
+>                 goto vmentry_fail_vmexit_guest_mode;
+>
+>         if (from_vmentry) {
+> -               exit_reason =3D EXIT_REASON_MSR_LOAD_FAIL;
+>                 exit_qual =3D nested_vmx_load_msr(vcpu,
+>                                                 vmcs12->vm_entry_msr_load=
+_addr,
+>                                                 vmcs12->vm_entry_msr_load=
+_count);
+> -               if (exit_qual)
+> -                       goto vmentry_fail_vmexit_guest_mode;
+> +               if (exit_qual) {
+> +                       /*
+> +                        * According to section =E2=80=9CVM Entries=E2=80=
+=9D in Intel SDM
+> +                        * vol 3C, VM-entry checks are performed in a cer=
+tain
+> +                        * order. Checks on MSRs that are loaded on VM-en=
+try
+> +                        * from VM-entry MSR-load area, should be done af=
+ter
+> +                        * verifying VMCS controls, host-state area and
+> +                        * guest-state area. As KVM relies on CPU hardwar=
+e to
+> +                        * perform some of these checks, we need to defer
+> +                        * VM-exit due to invalid VM-entry MSR-load area =
+to
+> +                        * until after CPU hardware completes the earlier
+> +                        * checks and is ready to do VMLAUNCH/VMRESUME.
+> +                        *
+> +                        * In order to defer errors arising from invalid
+> +                        * VM-entry MSR-load area in vmcs12, we set up a
+> +                        * single invalid entry, which is illegal accordi=
+ng
+> +                        * to section "Loading MSRs in Intel SDM vol 3C, =
+in
+> +                        * VM-entry MSR-load area of vmcs02. This will ca=
+use
+> +                        * the CPU hardware to VM-exit with "VM-entry
+> +                        * failure due to MSR loading" after it completes
+> +                        * checks on VMCS controls, host-state area and
+> +                        * guest-state area.
+> +                        */
+> +                       vmx->loaded_vmcs->invalid_msr_load_area.index =3D
+> +                           MSR_FS_BASE;
+
+Can this field be statically populated during initialization?
+
+> +                       vmx->loaded_vmcs->invalid_msr_load_area.value =3D
+> +                           exit_qual;
+
+This seems awkward. Why not save 16 bytes per loaded_vmcs by
+allocating one invalid_msr_load_area system-wide and just add a 4 byte
+field to struct nested_vmx to store this value?
+
+> +                       vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, 1);
+> +                       vmcs_write64(VM_ENTRY_MSR_LOAD_ADDR,
+> +                           __pa(&(vmx->loaded_vmcs->invalid_msr_load_are=
+a)));
+> +               }
+
+Do you need to set vmx->nested.dirty_vmcs12 to ensure that
+prepare_vmcs02_constant_state() will be called at the next emulated
+VM-entry, to undo this change to VM_ENTRY_MSR_LOAD_ADDR?
+
+>         } else {
+>                 /*
+>                  * The MMU is not initialized to point at the right entit=
+ies yet and
+> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+> index 187d39bf0bf1..f3a384235b68 100644
+> --- a/arch/x86/kvm/vmx/nested.h
+> +++ b/arch/x86/kvm/vmx/nested.h
+> @@ -64,7 +64,9 @@ static inline bool nested_ept_ad_enabled(struct kvm_vcp=
+u *vcpu)
+>  static inline int nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu,
+>                                             u32 exit_reason)
+>  {
+> +       u32 exit_qual;
+>         u32 exit_intr_info =3D vmcs_read32(VM_EXIT_INTR_INFO);
+> +       struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+>
+>         /*
+>          * At this point, the exit interruption info in exit_intr_info
+> @@ -81,8 +83,16 @@ static inline int nested_vmx_reflect_vmexit(struct kvm=
+_vcpu *vcpu,
+>                         vmcs_read32(VM_EXIT_INTR_ERROR_CODE);
+>         }
+>
+> -       nested_vmx_vmexit(vcpu, exit_reason, exit_intr_info,
+> -                         vmcs_readl(EXIT_QUALIFICATION));
+> +       exit_qual =3D vmcs_readl(EXIT_QUALIFICATION);
+> +
+> +       if (vmx->loaded_vmcs->invalid_msr_load_area.index =3D=3D MSR_FS_B=
+ASE &&
+> +           (exit_reason =3D=3D (VMX_EXIT_REASONS_FAILED_VMENTRY |
+> +                           EXIT_REASON_MSR_LOAD_FAIL))) {
+
+Is the second conjunct sufficient? i.e. Isn't there a bug in kvm if
+the second conjunct is true and the first is not?
+
+> +               exit_qual =3D vmx->loaded_vmcs->invalid_msr_load_area.val=
+ue;
+> +       }
+> +
+> +       nested_vmx_vmexit(vcpu, exit_reason, exit_intr_info, exit_qual);
+> +
+>         return 1;
+>  }
+>
+> diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
+> index 481ad879197b..e272788bd4b8 100644
+> --- a/arch/x86/kvm/vmx/vmcs.h
+> +++ b/arch/x86/kvm/vmx/vmcs.h
+> @@ -70,6 +70,12 @@ struct loaded_vmcs {
+>         struct list_head loaded_vmcss_on_cpu_link;
+>         struct vmcs_host_state host_state;
+>         struct vmcs_controls_shadow controls_shadow;
+> +       /*
+> +        * This field is used to set up an invalid VM-entry MSR-load area
+> +        * for vmcs02 if an error is detected while processing the entrie=
+s
+> +        * in VM-entry MSR-load area of vmcs12.
+> +        */
+> +       struct vmx_msr_entry invalid_msr_load_area;
+>  };
+
+I'd suggest allocating just one invalid_msr_load_area system-wide, as
+mentioned above.
+
+>  static inline bool is_exception_n(u32 intr_info, u8 vector)
+> --
+> 2.20.1
+>
