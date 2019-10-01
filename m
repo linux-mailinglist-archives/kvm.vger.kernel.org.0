@@ -2,143 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6D77C2B67
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 02:45:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68B64C2B6B
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 02:49:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727320AbfJAApq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 20:45:46 -0400
-Received: from mga04.intel.com ([192.55.52.120]:16374 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726157AbfJAApq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 20:45:46 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Sep 2019 17:45:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,569,1559545200"; 
-   d="scan'208";a="342825875"
-Received: from kmsmsx155.gar.corp.intel.com ([172.21.73.106])
-  by orsmga004.jf.intel.com with ESMTP; 30 Sep 2019 17:45:43 -0700
-Received: from pgsmsx112.gar.corp.intel.com ([169.254.3.2]) by
- KMSMSX155.gar.corp.intel.com ([169.254.15.100]) with mapi id 14.03.0439.000;
- Tue, 1 Oct 2019 08:45:42 +0800
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "jmattson@google.com" <jmattson@google.com>,
-        "ehabkost@redhat.com" <ehabkost@redhat.com>
-CC:     "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: Re: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
-Thread-Topic: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
-Thread-Index: AQHUl6ICyHEZ6Vh8PkONC+8Lhubo/KWFzjkAgAA4pwCBtnFxAIAJQpyAgAAY1YCAAFnTgA==
-Date:   Tue, 1 Oct 2019 00:45:41 +0000
-Message-ID: <9bbe864ab8fb16d9e64745b930c89b1db24ccc3a.camel@intel.com>
-References: <1545227503-214403-1-git-send-email-robert.hu@linux.intel.com>
-         <CALMp9eRZCoZbeyttZdvaCUpOFKygTNVF_x7+TWh6MktmF-ZK9A@mail.gmail.com>
-         <263d31d9-b21e-ceb9-b47c-008e30bbd94f@redhat.com>
-         <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
-         <20190930175449.GB4084@habkost.net>
-         <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
-In-Reply-To: <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.30.5 (3.30.5-1.fc29) 
-x-originating-ip: [10.251.15.246]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B5538303D61E35489F4C245496899DF4@intel.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        id S1727884AbfJAAt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 20:49:27 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:40944 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726157AbfJAAt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 20:49:27 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x910muD5040225;
+        Tue, 1 Oct 2019 00:48:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=4VFTJtJR8eBtywmu4HtcI/CgatxgsSusKcadKjpNHMQ=;
+ b=BYPOK0BHalANjoVF9l5l1Y39llRtnl/nKXaN1/k26TiEcEDMcLgnaK2CTEdbmZcgsBAI
+ 9Moc4flGVm0x3vBCW3VdoKkMuFxejDoaOihRTOD0Bm6q57Uc7zKOVC/oWFlkAbXu67Bl
+ nu5Jj1kIbOpyMxJPghiU5pP1aAtnfZBdZl9bvyf4HN0hZGSkTjJwN2EtEzqV8BGkh5uM
+ Lb0nLxXdiVYoSA1fLYTyYaZju4Lv6cUmL7gChNKO8F0BkEcZyc5dHsiIGIvxonVZkAM7
+ gR1DKYpBp8dTNKl+Ix0eHXs+RTW7NJA5+5AjzbpvYrx8kIOSjDit2KLVPiv37kNriWXy kA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2v9xxujk5w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Oct 2019 00:48:56 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x910lmuX030731;
+        Tue, 1 Oct 2019 00:48:56 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2vbnqbqwq7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Oct 2019 00:48:56 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x910msPF014335;
+        Tue, 1 Oct 2019 00:48:54 GMT
+Received: from [192.168.14.112] (/79.183.234.224)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 30 Sep 2019 17:48:54 -0700
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH kvm-unit-tests 0/8]: x86: vmx: Test INIT processing in
+ various CPU VMX states
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <555E2BD4-3277-4261-BD54-D1924FBE9887@gmail.com>
+Date:   Tue, 1 Oct 2019 03:48:50 +0300
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
+        kvm@vger.kernel.org, sean.j.christopherson@intel.com,
+        jmattson@google.com, vkuznets@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5EB947BE-8494-46A7-927F-193822DD85E4@oracle.com>
+References: <20190919125211.18152-1-liran.alon@oracle.com>
+ <555E2BD4-3277-4261-BD54-D1924FBE9887@gmail.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910010007
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910010007
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gTW9uLCAyMDE5LTA5LTMwIGF0IDEyOjIzIC0wNzAwLCBKaW0gTWF0dHNvbiB3cm90ZToNCj4g
-T24gTW9uLCBTZXAgMzAsIDIwMTkgYXQgMTA6NTQgQU0gRWR1YXJkbyBIYWJrb3N0IDxlaGFia29z
-dEByZWRoYXQuY29tPiB3cm90ZToNCj4gPiBDQ2luZyBxZW11LWRldmVsLg0KPiA+IA0KPiA+IE9u
-IFR1ZSwgU2VwIDI0LCAyMDE5IGF0IDAxOjMwOjA0UE0gLTA3MDAsIEppbSBNYXR0c29uIHdyb3Rl
-Og0KPiA+ID4gT24gV2VkLCBEZWMgMTksIDIwMTggYXQgMTowMiBQTSBQYW9sbyBCb256aW5pIDxw
-Ym9uemluaUByZWRoYXQuY29tPiB3cm90ZToNCj4gPiA+ID4gT24gMTkvMTIvMTggMTg6MzksIEpp
-bSBNYXR0c29uIHdyb3RlOg0KPiA+ID4gPiA+IElzIHRoaXMgYW4gaW5zdHJ1Y3Rpb24gdGhhdCBr
-dm0gaGFzIHRvIGJlIGFibGUgdG8gZW11bGF0ZSBiZWZvcmUgaXQNCj4gPiA+ID4gPiBjYW4gZW51
-bWVyYXRlIGl0cyBleGlzdGVuY2U/DQo+ID4gPiA+IA0KPiA+ID4gPiBJdCBkb2Vzbid0IGhhdmUg
-YW55IG9wZXJhbmRzLCBzbyBuby4NCj4gPiA+ID4gDQo+ID4gPiA+IFBhb2xvDQo+ID4gPiA+IA0K
-PiA+ID4gPiA+IE9uIFdlZCwgRGVjIDE5LCAyMDE4IGF0IDU6NTEgQU0gUm9iZXJ0IEhvbyA8cm9i
-ZXJ0Lmh1QGxpbnV4LmludGVsLmNvbT4NCj4gPiA+ID4gPiB3cm90ZToNCj4gPiA+ID4gPiA+IFNp
-Z25lZC1vZmYtYnk6IFJvYmVydCBIb28gPHJvYmVydC5odUBsaW51eC5pbnRlbC5jb20+DQo+ID4g
-PiA+ID4gPiAtLS0NCj4gPiA+ID4gPiA+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9jcHVmZWF0dXJl
-cy5oIHwgMSArDQo+ID4gPiA+ID4gPiAgYXJjaC94ODYva3ZtL2NwdWlkLmMgICAgICAgICAgICAg
-ICB8IDIgKy0NCj4gPiA+ID4gPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
-MSBkZWxldGlvbigtKQ0KPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiBkaWZmIC0tZ2l0IGEvYXJj
-aC94ODYvaW5jbHVkZS9hc20vY3B1ZmVhdHVyZXMuaA0KPiA+ID4gPiA+ID4gYi9hcmNoL3g4Ni9p
-bmNsdWRlL2FzbS9jcHVmZWF0dXJlcy5oDQo+ID4gPiA+ID4gPiBpbmRleCAyOGM0YTUwLi45MzJi
-MTlmIDEwMDY0NA0KPiA+ID4gPiA+ID4gLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20vY3B1ZmVh
-dHVyZXMuaA0KPiA+ID4gPiA+ID4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20vY3B1ZmVhdHVy
-ZXMuaA0KPiA+ID4gPiA+ID4gQEAgLTI4MCw2ICsyODAsNyBAQA0KPiA+ID4gPiA+ID4gIC8qIEFN
-RC1kZWZpbmVkIENQVSBmZWF0dXJlcywgQ1BVSUQgbGV2ZWwgMHg4MDAwMDAwOCAoRUJYKSwgd29y
-ZCAxMw0KPiA+ID4gPiA+ID4gKi8NCj4gPiA+ID4gPiA+ICAjZGVmaW5lIFg4Nl9GRUFUVVJFX0NM
-WkVSTyAgICAgICAgICAgICAoMTMqMzIrIDApIC8qIENMWkVSTw0KPiA+ID4gPiA+ID4gaW5zdHJ1
-Y3Rpb24gKi8NCj4gPiA+ID4gPiA+ICAjZGVmaW5lIFg4Nl9GRUFUVVJFX0lSUEVSRiAgICAgICAg
-ICAgICAoMTMqMzIrIDEpIC8qIEluc3RydWN0aW9ucw0KPiA+ID4gPiA+ID4gUmV0aXJlZCBDb3Vu
-dCAqLw0KPiA+ID4gPiA+ID4gKyNkZWZpbmUgWDg2X0ZFQVRVUkVfV0JOT0lOVkQgICAgICAgICAg
-ICgxMyozMisgOSkgLyogV3JpdGViYWNrIGFuZA0KPiA+ID4gPiA+ID4gRG9uJ3QgaW52YWxpZCBj
-YWNoZSAqLw0KPiA+ID4gPiA+ID4gICNkZWZpbmUgWDg2X0ZFQVRVUkVfWFNBVkVFUlBUUiAgICAg
-ICAgICgxMyozMisgMikgLyogQWx3YXlzDQo+ID4gPiA+ID4gPiBzYXZlL3Jlc3RvcmUgRlAgZXJy
-b3IgcG9pbnRlcnMgKi8NCj4gPiA+ID4gPiA+ICAjZGVmaW5lIFg4Nl9GRUFUVVJFX0FNRF9JQlBC
-ICAgICAgICAgICAoMTMqMzIrMTIpIC8qICIiIEluZGlyZWN0DQo+ID4gPiA+ID4gPiBCcmFuY2gg
-UHJlZGljdGlvbiBCYXJyaWVyICovDQo+ID4gPiA+ID4gPiAgI2RlZmluZSBYODZfRkVBVFVSRV9B
-TURfSUJSUyAgICAgICAgICAgKDEzKjMyKzE0KSAvKiAiIiBJbmRpcmVjdA0KPiA+ID4gPiA+ID4g
-QnJhbmNoIFJlc3RyaWN0ZWQgU3BlY3VsYXRpb24gKi8NCj4gPiA+ID4gPiA+IGRpZmYgLS1naXQg
-YS9hcmNoL3g4Ni9rdm0vY3B1aWQuYyBiL2FyY2gveDg2L2t2bS9jcHVpZC5jDQo+ID4gPiA+ID4g
-PiBpbmRleCBjYzZkZDY1Li43NjNlMTE1IDEwMDY0NA0KPiA+ID4gPiA+ID4gLS0tIGEvYXJjaC94
-ODYva3ZtL2NwdWlkLmMNCj4gPiA+ID4gPiA+ICsrKyBiL2FyY2gveDg2L2t2bS9jcHVpZC5jDQo+
-ID4gPiA+ID4gPiBAQCAtMzgwLDcgKzM4MCw3IEBAIHN0YXRpYyBpbmxpbmUgaW50IF9fZG9fY3B1
-aWRfZW50KHN0cnVjdA0KPiA+ID4gPiA+ID4ga3ZtX2NwdWlkX2VudHJ5MiAqZW50cnksIHUzMiBm
-dW5jdGlvbiwNCj4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gICAgICAgICAvKiBjcHVpZCAweDgw
-MDAwMDA4LmVieCAqLw0KPiA+ID4gPiA+ID4gICAgICAgICBjb25zdCB1MzIga3ZtX2NwdWlkXzgw
-MDBfMDAwOF9lYnhfeDg2X2ZlYXR1cmVzID0NCj4gPiA+ID4gPiA+IC0gICAgICAgICAgICAgICBG
-KEFNRF9JQlBCKSB8IEYoQU1EX0lCUlMpIHwgRihBTURfU1NCRCkgfA0KPiA+ID4gPiA+ID4gRihW
-SVJUX1NTQkQpIHwNCj4gPiA+ID4gPiA+ICsgICAgICAgICAgICAgICBGKFdCTk9JTlZEKSB8IEYo
-QU1EX0lCUEIpIHwgRihBTURfSUJSUykgfA0KPiA+ID4gPiA+ID4gRihBTURfU1NCRCkgfCBGKFZJ
-UlRfU1NCRCkgfA0KPiA+ID4gPiA+ID4gICAgICAgICAgICAgICAgIEYoQU1EX1NTQl9OTykgfCBG
-KEFNRF9TVElCUCk7DQo+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ICAgICAgICAgLyogY3B1aWQg
-MHhDMDAwMDAwMS5lZHggKi8NCj4gPiA+ID4gPiA+IC0tDQo+ID4gPiA+ID4gPiAxLjguMy4xDQo+
-ID4gPiA+ID4gPiANCj4gPiA+IA0KPiA+ID4gV2hhdCBpcyB0aGUgcG9pbnQgb2YgZW51bWVyYXRp
-bmcgc3VwcG9ydCBmb3IgV0JOT0lOVkQgaWYga3ZtIGlzIGdvaW5nDQo+ID4gPiB0byBpbXBsZW1l
-bnQgaXQgYXMgV0JJTlZEPw0KPiA+IA0KPiA+IEkgZXhwZWN0IEdFVF9TVVBQT1JURURfQ1BVSUQg
-dG8gcmV0dXJuIFdCTk9JTlZELCBiZWNhdXNlIGl0DQo+ID4gaW5kaWNhdGVzIHRvIHVzZXJzcGFj
-ZSB3aGF0IGlzIHN1cHBvcnRlZCBieSBLVk0uICBBcmUgdGhlcmUgYW55DQo+ID4gZXhwZWN0YXRp
-b25zIHRoYXQgR0VUX1NVUFBPUlRFRF9DUFVJRCB3aWxsIGFsc28gZGljdGF0ZSB3aGF0IGlzDQo+
-ID4gZW5hYmxlZCBieSBkZWZhdWx0IGluIHNvbWUgY2FzZXM/DQo+ID4gDQo+ID4gSW4gZWl0aGVy
-IGNhc2UsIHlvdXIgcXVlc3Rpb24gYXBwbGllcyB0byBRRU1VOiB3aHkgZG8gd2Ugd2FudA0KPiA+
-IFdCTk9JTlZEIHRvIGJlIGVuYWJsZWQgYnkgIi1jcHUgaG9zdCIgYnkgZGVmYXVsdCBhbmQgYmUg
-cGFydCBvZg0KPiA+IFFFTVUncyBJY2VsYWtlLSogQ1BVIG1vZGVsIGRlZmluaXRpb25zPw0KPiAN
-Cj4gSSBoYWQgb25seSBsb29rZWQgYXQgdGhlIFNWTSBpbXBsZW1lbnRhdGlvbiBvZiBXQk5PSU5W
-RCwgd2hpY2ggaXMNCj4gZXhhY3RseSB0aGUgc2FtZSBhcyB0aGUgU1ZNIGltcGxlbWVudGF0aW9u
-IG9mIFdCSU5WRC4gU28sIHRoZSBxdWVzdGlvbg0KPiBpcywgIndoeSBlbnVtZXJhdGUgV0JOT0lO
-VkQgaWYgaXRzIGltcGxlbWVudGF0aW9uIGlzIGV4YWN0bHkgdGhlIHNhbWUNCj4gYXMgV0JJTlZE
-PyINCj4gDQo+IFdCTk9JTlZEIGFwcGVhcnMgdG8gYmUgb25seSBwYXJ0aWFsbHkgZG9jdW1lbnRl
-ZCBpbiBJbnRlbCBkb2N1bWVudA0KPiAzMTk0MzMtMDM3LCAiSW50ZWzCriBBcmNoaXRlY3R1cmUg
-SW5zdHJ1Y3Rpb24gU2V0IEV4dGVuc2lvbnMgYW5kIEZ1dHVyZQ0KPiBGZWF0dXJlcyBQcm9ncmFt
-bWluZyBSZWZlcmVuY2UuIiBJbiBwYXJ0aWN1bGFyLCB0aGVyZSBpcyBubw0KPiBkb2N1bWVudGF0
-aW9uIHJlZ2FyZGluZyB0aGUgaW5zdHJ1Y3Rpb24ncyBiZWhhdmlvciBpbiBWTVggbm9uLXJvb3QN
-Cj4gbW9kZS4gRG9lcyBXQk5PSU5WRCBjYXVzZSBhIFZNLWV4aXQgd2hlbiB0aGUgVk0tZXhlY3V0
-aW9uIGNvbnRyb2wsDQo+ICJXQklOVkQgZXhpdGluZywiIGlzIHNldD8gSWYgc28sIGRvZXMgaXQg
-aGF2ZSB0aGUgc2FtZSBWTS1leGl0IHJlYXNvbg0KPiBhcyBXQklOVkQgKDU0KSwgb3IgYSBkaWZm
-ZXJlbnQgb25lPyBJZiBpdCBkb2VzIGhhdmUgdGhlIHNhbWUgVk0tZXhpdA0KPiByZWFzb24gKGEg
-bGEgU1ZNKSwgaG93IGRvZXMgb25lIGRpc3Rpbmd1aXNoIGEgV0JJTlZEIFZNLWV4aXQgZnJvbSBh
-DQo+IFdCTk9JTlZEIFZNLWV4aXQ/IElmIG9uZSBjYW4ndCBkaXN0aW5ndWlzaCAoYSBsYSBTVk0p
-LCB0aGVuIGl0IHdvdWxkDQo+IHNlZW0gdGhhdCB0aGUgVk1YIGltcGxlbWVudGF0aW9uIGFsc28g
-aW1wbGVtZW50cyBXQk5PSU5WRCBhcyBXQklOVkQuDQo+IElmIHRoYXQncyB0aGUgY2FzZSwgdGhl
-IHF1ZXN0aW9uIGZvciBWTVggaXMgdGhlIHNhbWUgYXMgZm9yIFNWTS4NCg0KVW5mb3J0dW5hdGVs
-eSBXQk5PSU5WRCBpbnRlcmFjdGlvbiB3aXRoIFZNWCBoYXMgbm90IGJlZW4gbWFkZSB0byBwdWJs
-aWMgeWV0LiBJDQphbSByZWFjaGluZyBvdXQgaW50ZXJuYWxseSB0byBzZWUgd2hlbiBpdCBjYW4g
-YmUgZG9uZS4gSSBhZ3JlZSBpdCBtYXkgbm90IGJlDQpuZWNlc3NhcnkgdG8gZXhwb3NlIFdCTk9J
-TlZEIGlmIGl0cyBpbXBsZW1lbnRhdGlvbiBpcyBleGFjdGx5IHRoZSBzYW1lIGFzDQpXQklOVkQs
-IGJ1dCBpdCBhbHNvIGRvZXNuJ3QgaGF2ZSBhbnkgaGFybSwgcmlnaHQ/DQoNClRoYW5rcywNCi1L
-YWkNCg0K
+
+
+> On 1 Oct 2019, at 2:02, Nadav Amit <nadav.amit@gmail.com> wrote:
+>=20
+>> On Sep 19, 2019, at 5:52 AM, Liran Alon <liran.alon@oracle.com> =
+wrote:
+>>=20
+>> Hi,
+>>=20
+>> This patch series aims to add a vmx test to verify the functionality
+>> introduced by KVM commit:
+>> 4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various CPU =
+states")
+>>=20
+>> The test verifies the following functionality:
+>> 1) An INIT signal received when CPU is in VMX operation
+>> is latched until it exits VMX operation.
+>> 2) If there is an INIT signal pending when CPU is in
+>> VMX non-root mode, it result in VMExit with (reason =3D=3D 3).
+>> 3) Exit from VMX non-root mode on VMExit do not clear
+>> pending INIT signal in LAPIC.
+>> 4) When CPU exits VMX operation, pending INIT signal in
+>> LAPIC is processed.
+>>=20
+>> In order to write such a complex test, the vmx tests framework was
+>> enhanced to support using VMX in non BSP CPUs. This enhancement is
+>> implemented in patches 1-7. The test itself is implemented at patch =
+8.
+>> This enhancement to the vmx tests framework is a bit hackish, but
+>> I believe it's OK because this functionality is rarely required by
+>> other VMX tests.
+>>=20
+>> Regards,
+>> -Liran
+>=20
+> Hi Liran,
+>=20
+> I ran this test on bare-metal and it fails:
+>=20
+> Test suite: vmx_init_signal_test
+> PASS: INIT signal blocked when CPU in VMX operation
+> PASS: INIT signal during VMX non-root mode result in exit-reason =
+VMX_INIT (3)
+> FAIL: INIT signal processed after exit VMX operation
+> SUMMARY: 8 tests, 1 unexpected failures
+>=20
+> I don=E2=80=99t have time to debug this issue, but let me know if you =
+want some
+> print-outs.
+>=20
+> Nadav
+>=20
+
+Thanks Nadav for running this on bare-metal. This is very useful!
+
+It seems that when CPU exited on exit-reason VMX_INIT (3), the LAPIC =
+INIT pending event
+was consumed instead of still being latched until CPU exits VMX =
+operation.
+
+In my commit which this unit-test verifies 4b9852f4f389 ("KVM: x86: Fix =
+INIT signal handling in various CPU states=E2=80=9D),
+I have assumed that such exit-reason don=E2=80=99t consume the LAPIC =
+INIT pending event.
+My assumption was based on the phrasing of Intel SDM section 25.2 OTHER =
+CAUSES OF VM EXITS regarding INIT signals:
+"Such exits do not modify register state or clear pending events as they =
+would outside of VMX operation."
+I thought Intel logic behind this is that if an INIT signal is sent to a =
+CPU in VMX non-root mode, it would exit
+on exit-reason 3 which would allow hypervisor to decide to exit VMX =
+operation in order to consume INIT signal.
+
+Nadav, can you attempt to just add a delay in init_signal_test_thread() =
+between calling vmx_off() & setting init_signal_test_thread_continued to =
+true?
+It may be that real hardware delays a bit when the INIT signal is =
+released from LAPIC after exit VMX operation.
+
+Thanks,
+-Liran
+
+
