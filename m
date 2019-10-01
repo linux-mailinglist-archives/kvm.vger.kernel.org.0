@@ -2,103 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 59FC5C372D
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 16:25:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93D7DC3764
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 16:30:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389154AbfJAOYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 10:24:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43830 "EHLO mx1.redhat.com"
+        id S2388957AbfJAOaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 10:30:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41438 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388567AbfJAOYU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 10:24:20 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        id S1727132AbfJAOaL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 10:30:11 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 17B1446673
-        for <kvm@vger.kernel.org>; Tue,  1 Oct 2019 14:24:20 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id f11so6059211wrt.18
-        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 07:24:20 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 16406C057F88
+        for <kvm@vger.kernel.org>; Tue,  1 Oct 2019 14:30:11 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id j2so6092583wre.1
+        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 07:30:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=W3GR9papAEXHX043kiaC8LTFO8bg9XO+Ud3u2pcC4iI=;
-        b=KVgyeXNr310n9xSD8mOMMD3x7gtYqVtJaVHo7+a/ad7Sw/AIRLQDaSWdkgKoUlDAi/
-         DN7LHyTarbMiJuh1TWrHG95eMKdDkrBevCAdL2T6+6XY9MRtnvGbRNo+Yd1y44gsage8
-         aEveEtARm8ma4QpeopNB8LTKvKYMOSUoN8THQ/qCPdToK7crWF30Q6gBM3vDIPxXq+Z1
-         kmHYkGaCcGD5IwzaAdcPWHkq1tqK1CFLBApy4HYXI+dpsIN7bg58ASXxCOHc5OtAzZV/
-         P0ngPS7wcu7rhISTNqFGiIqvAxfY7tGQoACbXLr5zO7agAuje56IpsUdPqHi7sBwHwfl
-         C33Q==
-X-Gm-Message-State: APjAAAU0fay+UcwTba+DX03JFLJe49QNHwuXdAYpUcFkcdGuLZr+R1T2
-        hodYF6iExVdpi187BYHvxCwbH7cF302dy7VaPgRG+mPw46iqE2x1rioQt8B0PqhZdeVeK3wXfmx
-        Fx9BvOvU2h93a
-X-Received: by 2002:a5d:4c45:: with SMTP id n5mr19373862wrt.100.1569939858748;
-        Tue, 01 Oct 2019 07:24:18 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzORLkuNzHf4U1+bG8M7lcDYpyd5xZy4wuVHfWzHzhZ0mVWCWsuudhjwCKFJb/4kvVTW1gw8A==
-X-Received: by 2002:a5d:4c45:: with SMTP id n5mr19373835wrt.100.1569939858454;
-        Tue, 01 Oct 2019 07:24:18 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:dd94:29a5:6c08:c3b5? ([2001:b07:6468:f312:dd94:29a5:6c08:c3b5])
-        by smtp.gmail.com with ESMTPSA id h17sm2708084wmb.33.2019.10.01.07.24.17
+        bh=uYAaBtdM1jqbgvAOY1l3EFV1qXvd/OnWbcIm/a50FEs=;
+        b=YsAaIivkddD0h9c4uKB9tcECoSiYuShzUN/cvLk12T9KRpDeyNeXm7Oc509MMpNJuV
+         771yoPfvsL7F09VmV7I0Ji66YXWprgt+qjKMyIIu0ttpw5aWWylzwjJEl3TBkDRs1YYe
+         Hti4X0tcXyfBr5m1t9dzj07YvONDIwJImYM5ISMSWpPrEIzJqGPz8/EDCETdzLg+YnVX
+         /3HMks5/X0xhrqeXPjUkFwmYZwizUavYV8+BjZAc1gqWGkclQmyT2s6cfH/LKAt4vgrl
+         2/LpSEb7pPid2Nf22s0AHVfvE2iSSjZUvfa2xa0RJLSbM2oT+6M/4FdIA4xGEqrcxYIc
+         Anmg==
+X-Gm-Message-State: APjAAAVtiSn2lB1GAGjOTPR5FMNoU1DXpyQ1GykVu6u/BLon5ogmxANw
+        78SJ5GJ5eYFy7HglPuo5rPbtCNb9SvKypa9nYR3qehz8usMg93SEWT/b/9XKIGOGiT5tR1QQnk+
+        oQCBaEFM9mMGT
+X-Received: by 2002:a1c:1aca:: with SMTP id a193mr4161240wma.120.1569940209421;
+        Tue, 01 Oct 2019 07:30:09 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy/WlI+lYuUZS81xaehQkpRwr1hpFSG9V2x//ifO6p6Xm7Un5FeK4P1ilSGpeYn6EiKCXQ/Og==
+X-Received: by 2002:a1c:1aca:: with SMTP id a193mr4161215wma.120.1569940209148;
+        Tue, 01 Oct 2019 07:30:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
+        by smtp.gmail.com with ESMTPSA id g11sm2938837wmh.45.2019.10.01.07.30.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Oct 2019 07:24:17 -0700 (PDT)
-Subject: Re: [PATCH] kvm: vmx: Limit guest PMCs to those supported on the host
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
+        Tue, 01 Oct 2019 07:30:08 -0700 (PDT)
+Subject: Re: [PATCH] KVM: VMX: Remove proprietary handling of unexpected
+ exit-reasons
+To:     Liran Alon <liran.alon@oracle.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20190930233854.158117-1-jmattson@google.com>
- <87blv03dm7.fsf@vitty.brq.redhat.com>
- <08e172b2-eb75-04af-0b63-b0516c8455e1@redhat.com>
- <CALMp9eRu42dSwuZ5ZoGmPd9A5qw7wJmfh-OhCUFaWEke2vcHkg@mail.gmail.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, tao3.xu@intel.com,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20190929145018.120753-1-liran.alon@oracle.com>
+ <874l0u5jb4.fsf@vitty.brq.redhat.com>
+ <CALMp9eS7wF1b6yBJrj_VL+HMEYjuZrYhmMHiCqJq8-33d9QE6A@mail.gmail.com>
+ <20190930172038.GE14693@linux.intel.com>
+ <2299BCA8-8FEF-4857-9680-8CE3E58034A6@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <89918126-97f6-37ff-9d28-68440a15b710@redhat.com>
-Date:   Tue, 1 Oct 2019 16:24:16 +0200
+Message-ID: <dfacb83a-332a-69ec-fc2d-bd4ba841da05@redhat.com>
+Date:   Tue, 1 Oct 2019 16:30:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eRu42dSwuZ5ZoGmPd9A5qw7wJmfh-OhCUFaWEke2vcHkg@mail.gmail.com>
+In-Reply-To: <2299BCA8-8FEF-4857-9680-8CE3E58034A6@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/10/19 16:07, Jim Mattson wrote:
-> On Tue, Oct 1, 2019 at 6:29 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 01/10/19 13:32, Vitaly Kuznetsov wrote:
->>> Jim Mattson <jmattson@google.com> writes:
->>>
->>>> KVM can only virtualize as many PMCs as the host supports.
->>>>
->>>> Limit the number of generic counters and fixed counters to the number
->>>> of corresponding counters supported on the host, rather than to
->>>> INTEL_PMC_MAX_GENERIC and INTEL_PMC_MAX_FIXED, respectively.
->>>>
->>>> Note that INTEL_PMC_MAX_GENERIC is currently 32, which exceeds the 18
->>>> contiguous MSR indices reserved by Intel for event selectors. Since
->>>> the existing code relies on a contiguous range of MSR indices for
->>>> event selectors, it can't possibly work for more than 18 general
->>>> purpose counters.
->>>
->>> Should we also trim msrs_to_save[] by removing impossible entries
->>> (18-31) then?
->>
->> Yes, I'll send a patch in a second.
-> 
-> I thought you were going to revert that msrs_to_save patch. I've been
-> working on a replacement.
+On 01/10/19 02:33, Liran Alon wrote:
+> OK Ok I apologise for my bad English. ^_^
+> Paolo, feel free to reword this commit title & message to something else when applying…
 
-We can use a little more time to think more about it and discuss it.
-
-For example, trimming is enough for the basic usage of passing
-KVM_SET_SUPPORTED_CPUID output to KVM_SET_CPUID2 and then retrieving all
-MSRs in the list.  If that is also okay for Google's userspace, we might
-actually leave everything that way and retroactively decide that you
-need to filter the MSRs but only if you pass your own CPUID.
+I'll replace it with "specialized", no problem.  I agree with Sean's
+assessment. :)
 
 Paolo
