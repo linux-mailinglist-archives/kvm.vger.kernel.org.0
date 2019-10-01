@@ -2,102 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0223CC31A3
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 12:40:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D54D3C3281
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 13:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730462AbfJAKkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 06:40:15 -0400
-Received: from mail-oi1-f181.google.com ([209.85.167.181]:36921 "EHLO
-        mail-oi1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbfJAKkP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 06:40:15 -0400
-Received: by mail-oi1-f181.google.com with SMTP id i16so13941390oie.4
-        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 03:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kxIIsHuIPorDlLUxOBDcH6X4UgN2KxPMkflJuW7ONtQ=;
-        b=eFcGzOlCZygJlf1p+EEVH4IuViLnoP/QXni8qNyXrUCzENWM7zKKV0FJZmVvW36cxI
-         enCUfqhYuBZCVysqXCAOZAvpTWHfXSFcZscNUKL2tBucCiRkxPqyzDXvwN9NP/S01Fty
-         qUzZvT9vjnuNQQxyVbgGT4JKhM74KZnXNFPTAOhcEgfRYl6TapZrMtEABkThYrKvKL8w
-         fXLmpVcZpaF6t3oH9SqShvx776pSNhxaYf7LGU3jIVM90BgZvA1oerGgX6yqcXA5xUws
-         DXcagrNWXVhoV60hCzyEu8GPNKo+DkEr+544xu39bsBw8ky0o8CxjRl3RSDuGf0RYSFW
-         lKig==
+        id S1731379AbfJALcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 07:32:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59377 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725839AbfJALcg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 07:32:36 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id F2A0E81DE0
+        for <kvm@vger.kernel.org>; Tue,  1 Oct 2019 11:32:35 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id k184so1294263wmk.1
+        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 04:32:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kxIIsHuIPorDlLUxOBDcH6X4UgN2KxPMkflJuW7ONtQ=;
-        b=Q52pTx2uvpbH1rqDPHIHMpS6S8DdD2DkZxE3d3gfC2bv2lewMCA920AL1hOP6SwfLp
-         m/lGiJAFZ1AJpkgke7jv3XPUEdt0jip4kRanAoU4G9ecTAghDnocsU1EAY0Nz9Qr3JSi
-         a3Xj+FF+mu4KIEFWkodGCtuE7o0ISPg5A/4pu3RKwenq1QrZnKmHOT2ytnPpynYMWGjL
-         v8jSn9i3yZOdGGiP6zkOyyKX7EJfeiVjUgHyjxcNQrMJNrRCyUyuYwUV69W0LT4O2wV2
-         qnC1qgucuuSoQN/ZoidgNwoSK6DahfINOeuP/lA3mBWbHnO+5uQJUYQWWsv0SXrRTsDI
-         DXIw==
-X-Gm-Message-State: APjAAAVne24M71NubMZ5wNdeEUvm2AeDIh4kx7FrBIloLLFqQLfqo/ic
-        hMAwtN/5O14CWK6f1TBTcS5dFLexWfRLX+gXcoCDUQ==
-X-Google-Smtp-Source: APXvYqySOn8nL8o0y4pwH2lFYLOib+k1N9rcK2mnv+eOyuVTiX/hfi7lheTIvR0HlFDX3ZizqjA1Hic94Gt94almVWg=
-X-Received: by 2002:aca:b48a:: with SMTP id d132mr3210521oif.98.1569926414125;
- Tue, 01 Oct 2019 03:40:14 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=kXv5iruapzFw1hsB9GePDq0/reKNI/98qxc8k7MxSvg=;
+        b=rQ+XYTvMLRS9IEbJM6hl7rCaaHUmDe6htYqDjuosdvL5udPq2+zm9x5OEz3h3skBTA
+         GLeM8kDtdbjNTttFyawIrQS5nSkQTI9wHv/uXIojhusJmpIndT9vrXgFgeyoYy8UAKOY
+         wrx4sUMcwn0lPe5RMuhikZ2WltoOSGPSmmyUl0zmbdQR92vA6EPR9ny4AnFRuKTA1+p9
+         Aru2tEqwSJslW9UzGdP2FlcFAnR5aofMp7IeDNV9FpFMj0k+65HIDKpcphsZa6V2BIRm
+         aJl2xyjtx0FwJNJNwuiz6ScAwWfjErl62kRIJFVVifjCWTj3DqTeva/fZ+ztdDj0zETH
+         4sSw==
+X-Gm-Message-State: APjAAAXVZe0vKvWhLkHnnCZ27vIVez16MLrUJgBlUjhNg1AGhJ5dHjvV
+        CQ7eqOltUI3TmpHS53oJcL7eg1/i3XELVBN1szume4CLqYsSuqj7rqq4jheMp4VEx6nqszFwt/P
+        JjKhBJhNMr2RC
+X-Received: by 2002:adf:f790:: with SMTP id q16mr16842682wrp.164.1569929554453;
+        Tue, 01 Oct 2019 04:32:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwIxnYkVu2Ibhkuh3y54PyOHrGHzpLXVlu4TExIrKE9Z8Nwkyku/JS0J8xB4o2+QGwXLux2xA==
+X-Received: by 2002:adf:f790:: with SMTP id q16mr16842668wrp.164.1569929554189;
+        Tue, 01 Oct 2019 04:32:34 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id s12sm34807303wra.82.2019.10.01.04.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2019 04:32:33 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Marc Orr <marcorr@google.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] kvm: vmx: Limit guest PMCs to those supported on the host
+In-Reply-To: <20190930233854.158117-1-jmattson@google.com>
+References: <20190930233854.158117-1-jmattson@google.com>
+Date:   Tue, 01 Oct 2019 13:32:32 +0200
+Message-ID: <87blv03dm7.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <20190930131955.101131-1-borntraeger@de.ibm.com>
-In-Reply-To: <20190930131955.101131-1-borntraeger@de.ibm.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 1 Oct 2019 11:40:03 +0100
-Message-ID: <CAFEAcA8ooDuLxQ8rAFX1K4v3SpKqWO462+wX6pyvmuipZ20+XQ@mail.gmail.com>
-Subject: Re: [PULL 00/12] s390x qemu updates 20190930
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>,
-        qemu-s390x <qemu-s390x@nongnu.org>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Thomas Huth <thuth@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Collin Walling <walling@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 30 Sep 2019 at 14:20, Christian Borntraeger
-<borntraeger@de.ibm.com> wrote:
->
-> Peter,
->
-> The following changes since commit 786d36ad416c6c199b18b78cc31eddfb784fe15d:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190927' into staging (2019-09-30 11:02:22 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/borntraeger/qemu.git tags/s390x-20190930
->
-> for you to fetch changes up to c5b9ce518c0551d0198bcddadc82e03de9ac8de9:
->
->   s390/kvm: split kvm mem slots at 4TB (2019-09-30 13:51:50 +0200)
->
-> ----------------------------------------------------------------
-> - do not abuse memory_region_allocate_system_memory and split the memory
->   according to KVM memslots in KVM code instead (Paolo, Igor)
-> - change splitting to split at 4TB (Christian)
-> - do not claim s390 (31bit) support in configure (Thomas)
-> - sclp error checking (Janosch, Claudio)
-> - new s390 pci maintainer (Matt, Collin)
-> - fix s390 pci (again) (Matt)
+Jim Mattson <jmattson@google.com> writes:
 
+> KVM can only virtualize as many PMCs as the host supports.
+>
+> Limit the number of generic counters and fixed counters to the number
+> of corresponding counters supported on the host, rather than to
+> INTEL_PMC_MAX_GENERIC and INTEL_PMC_MAX_FIXED, respectively.
+>
+> Note that INTEL_PMC_MAX_GENERIC is currently 32, which exceeds the 18
+> contiguous MSR indices reserved by Intel for event selectors. Since
+> the existing code relies on a contiguous range of MSR indices for
+> event selectors, it can't possibly work for more than 18 general
+> purpose counters.
 
-Applied, thanks.
+Should we also trim msrs_to_save[] by removing impossible entries
+(18-31) then?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+>
+> Fixes: f5132b01386b5a ("KVM: Expose a version 2 architectural PMU to a guests")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> ---
+>  arch/x86/kvm/vmx/pmu_intel.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 4dea0e0e7e392..3e9c059099e94 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -262,6 +262,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +	struct x86_pmu_capability x86_pmu;
+>  	struct kvm_cpuid_entry2 *entry;
+>  	union cpuid10_eax eax;
+>  	union cpuid10_edx edx;
+> @@ -283,8 +284,10 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>  	if (!pmu->version)
+>  		return;
+>  
+> +	perf_get_x86_pmu_capability(&x86_pmu);
+> +
+>  	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+> -					INTEL_PMC_MAX_GENERIC);
+> +					 x86_pmu.num_counters_gp);
 
--- PMM
+This is a theoretical fix which is orthogonal to the issue with
+state_test I reported on Friday, right? Because in my case
+'eax.split.num_counters' is already 8.
+
+>  	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << eax.split.bit_width) - 1;
+>  	pmu->available_event_types = ~entry->ebx &
+>  					((1ull << eax.split.mask_length) - 1);
+> @@ -294,7 +297,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>  	} else {
+>  		pmu->nr_arch_fixed_counters =
+>  			min_t(int, edx.split.num_counters_fixed,
+> -				INTEL_PMC_MAX_FIXED);
+> +			      x86_pmu.num_counters_fixed);
+>  		pmu->counter_bitmask[KVM_PMC_FIXED] =
+>  			((u64)1 << edx.split.bit_width_fixed) - 1;
+>  	}
+
+-- 
+Vitaly
