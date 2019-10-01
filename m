@@ -2,136 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 760EEC40DA
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 21:17:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D858C4101
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 21:27:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726368AbfJATRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 15:17:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42364 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725844AbfJATRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 15:17:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D33AE8A1C93;
-        Tue,  1 Oct 2019 19:17:41 +0000 (UTC)
-Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93618100EBA2;
-        Tue,  1 Oct 2019 19:17:37 +0000 (UTC)
-Subject: Re: [PATCH v11 0/6] mm / virtio: Provide support for unused page
- reporting
-To:     David Hildenbrand <david@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
-        mst@redhat.com, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mgorman@techsingularity.net, vbabka@suse.cz, osalvador@suse.de
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com,
-        konrad.wilk@oracle.com, riel@surriel.com, lcapitulino@redhat.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com
-References: <20191001152441.27008.99285.stgit@localhost.localdomain>
- <7233498c-2f64-d661-4981-707b59c78fd5@redhat.com>
- <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
- <c1ebaefd-ea60-b0f0-1c45-06ac3c502b5b@redhat.com>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- VujM7c/b4pps
-Organization: Red Hat Inc,
-Message-ID: <530ed9b2-aabd-da39-6717-33a6dd33f92d@redhat.com>
-Date:   Tue, 1 Oct 2019 15:17:36 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726216AbfJAT1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 15:27:02 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45973 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726180AbfJAT1B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 15:27:01 -0400
+Received: by mail-io1-f66.google.com with SMTP id c25so50940634iot.12
+        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 12:27:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=CDB4Mr0iG0b8DZwf+9GVE2W/2/4rQLMQuTsEyTKgfxg=;
+        b=XWtd59gQjCBrAcOGNEPfbnOmeyLmC8q+y7bnqdcqPPAzsEIqnwuf8b7G/Ykbf2omhf
+         qSOmk8/mV4JnCZvGjSKNBoEX0S1OOYXBxd+7YRWt/O52zkwcPPb/2fJAe5SqAVMTWyK5
+         zjjkfAkywB0pP1bzx9ZlwC2xNzUCzeJ63dltV9z/0FMtS9BNIXcnUixa1nmw7tGWks2r
+         7HDJCH54iauzKpQMM0kDcgTdg/NeUOCNYTAfxxvPhJIOCP8r7ISWPPZkqCL73GmmeOz6
+         4fhbzzAZ1mZfgJZD49knx5oA/icUZ1tdbNKPlfgZuRJf+kHsRsqFGT9syWeP9yFVtGRN
+         bI3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=CDB4Mr0iG0b8DZwf+9GVE2W/2/4rQLMQuTsEyTKgfxg=;
+        b=nygdVP1EP3uyW8uCGmikI3GJBwxaUDWA6sXsNi4/4rePMO0SWtAXTr5i6SNbrMPAdb
+         5qViCqHG9IREyAHRt2AVa4DasxKCfNaeX/XlFe5f5YVxltt9hSvJN8HV5sXFr98UVbfK
+         F907QZTHg2XiCb6lhYcZr1yxpNyw1/MmrDBfbswbqsYFBtsXTpl86CFelEw0BiJWKt5s
+         APrldJgqt70ZwxPYjy5VNNNjecdImX/urC6POB1pS1UFtWDikvJrP/9jR86x4YQH3dYE
+         ymJZkZdYSe3RTgONq54vCdtiWoQzW5O72k5b/VNHBzChFz2CIdesIQPphTIA4nkubg1b
+         Q4aw==
+X-Gm-Message-State: APjAAAUiD/aEiX9+IJYd4SnuCSW+qe4lBWAOCruVS0O1yJmKM9iyUKWB
+        7rJHj7KdZKqiorE4e2a6mdfll+nar7yVAdRWaaTP4g==
+X-Google-Smtp-Source: APXvYqxa+XAZgS+BaZXqlx3MCcJxVxQdpqq/kdyykgpz0c7smVyWi9Y90pI/20bwlYl6cLmvD7qHH6A0LIJEnSELKek=
+X-Received: by 2002:a6b:6a01:: with SMTP id x1mr6160792iog.119.1569958020338;
+ Tue, 01 Oct 2019 12:27:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c1ebaefd-ea60-b0f0-1c45-06ac3c502b5b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Tue, 01 Oct 2019 19:17:42 +0000 (UTC)
+References: <1545227503-214403-1-git-send-email-robert.hu@linux.intel.com>
+ <CALMp9eRZCoZbeyttZdvaCUpOFKygTNVF_x7+TWh6MktmF-ZK9A@mail.gmail.com>
+ <263d31d9-b21e-ceb9-b47c-008e30bbd94f@redhat.com> <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
+ <20190930175449.GB4084@habkost.net> <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
+ <9bbe864ab8fb16d9e64745b930c89b1db24ccc3a.camel@intel.com>
+ <CALMp9eSe_7on+F=ng05DkvvBpnWhSirEpSVz9Bua4Sy606xJnw@mail.gmail.com>
+ <20191001170646.GA27090@linux.intel.com> <CALMp9eSj=KJC6SjOnPfN7R0vHB_75KjBeF3aYD2J75Sy3L7tcA@mail.gmail.com>
+ <20191001175415.GB27090@linux.intel.com>
+In-Reply-To: <20191001175415.GB27090@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 1 Oct 2019 12:26:48 -0700
+Message-ID: <CALMp9eTrP2FHA0+cwU7SPwsitJ7PA1gRe1i2xAJ0Lx9QWxV17A@mail.gmail.com>
+Subject: Re: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "ehabkost@redhat.com" <ehabkost@redhat.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Oct 1, 2019 at 10:54 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Tue, Oct 01, 2019 at 10:23:31AM -0700, Jim Mattson wrote:
+> > On Tue, Oct 1, 2019 at 10:06 AM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> > >
+> > > On Tue, Oct 01, 2019 at 07:20:17AM -0700, Jim Mattson wrote:
+> > > > On Mon, Sep 30, 2019 at 5:45 PM Huang, Kai <kai.huang@intel.com> wr=
+ote:
+> > > > >
+> > > > > On Mon, 2019-09-30 at 12:23 -0700, Jim Mattson wrote:
+> > > > > > On Mon, Sep 30, 2019 at 10:54 AM Eduardo Habkost <ehabkost@redh=
+at.com> wrote:
+> > > > > > I had only looked at the SVM implementation of WBNOINVD, which =
+is
+> > > > > > exactly the same as the SVM implementation of WBINVD. So, the q=
+uestion
+> > > > > > is, "why enumerate WBNOINVD if its implementation is exactly th=
+e same
+> > > > > > as WBINVD?"
+> > > > > >
+> > > > > > WBNOINVD appears to be only partially documented in Intel docum=
+ent
+> > > > > > 319433-037, "Intel=C2=AE Architecture Instruction Set Extension=
+s and Future
+> > > > > > Features Programming Reference." In particular, there is no
+> > > > > > documentation regarding the instruction's behavior in VMX non-r=
+oot
+> > > > > > mode. Does WBNOINVD cause a VM-exit when the VM-execution contr=
+ol,
+> > > > > > "WBINVD exiting," is set? If so, does it have the same VM-exit =
+reason
+> > > > > > as WBINVD (54), or a different one? If it does have the same VM=
+-exit
+> > > > > > reason (a la SVM), how does one distinguish a WBINVD VM-exit fr=
+om a
+> > > > > > WBNOINVD VM-exit? If one can't distinguish (a la SVM), then it =
+would
+> > > > > > seem that the VMX implementation also implements WBNOINVD as WB=
+INVD.
+> > > > > > If that's the case, the question for VMX is the same as for SVM=
+.
+> > > > >
+> > > > > Unfortunately WBNOINVD interaction with VMX has not been made to =
+public yet.
+> > >
+> > > Hint: WBNOINVD uses a previously ignored prefix, i.e. it looks a *lot=
+*
+> > >       like WBINVD...
+> >
+> > Because of the opcode selection, I would assume that we're not going
+> > to see a VM-execution control for "enable WBNOINVD." To avoid breaking
+> > legacy hypervisors, then, I would expect the "enable WBINVD exiting"
+> > control to apply to WBNOINVD as well, and I would expect the exit
+> > reason to be the same for both instructions. The exit qualification
+> > field is cleared for WBINVD exits, so perhaps we will see a bit in
+> > that field set to one for WBNOINVD.
+>
+> Those are all excellent assumptions.
+>
+> > If so, will this new behavior be indicated by a bit in one of the VMX
+> > capability MSRs?
+>
+> My crystal ball came up blank on this one.
+>
+> > That seems to be a closely guarded secret, for some reason.
+>
+> Not a closely guarded secret, just poor documentation.
+>
+> > > > > I am reaching out internally to see when it can be done. I agree =
+it may not be
+> > > > > necessary to expose WBNOINVD if its implementation is exactly the=
+ same as
+> > > > > WBINVD, but it also doesn't have any harm, right?
+> > > >
+> > > > If nested VMX changes are necessary to be consistent with hardware,
+> > > > then enumerating WBNOINVD support in the guest CPUID information at
+> > > > this time--without the attendant nested VMX changes--is premature. =
+No
+> > > > changes to nested SVM are necessary, so it's fine for AMD systems.
+> > > >
+> > > > If no changes to nested VMX are necessary, then it is true that
+> > > > WBNOINVD can be emulated by WBINVD. However, it provides no value t=
+o
+> > > > specifically enumerate the instruction.
+> > > >
+> > > > If there is some value that I'm missing, then why make guest suppor=
+t
+> > > > for the instruction contingent on host support for the instruction?
+> > > > KVM can implement WBNOINVD as WBINVD on any host with WBINVD,
+> > > > regardless of whether or not the host supports WBNOINVD.
+> > >
+> > > Agreed.  To play nice with live migration, KVM should enumerate WBNOI=
+NVD
+> > > regardless of host support.  Since WBNOINVD uses an ignored prefix, i=
+t
+> > > will simply look like a regular WBINVD on platforms without WBNOINVD.
+> > >
+> > > Let's assume the WBNOINVD VM-Exit behavior is sane, i.e. allows softw=
+are
+> > > to easily differentiate between WBINVD and WBNOINVD.
+> >
+> > That isn't the case with SVM, oddly.
+>
+> Assuming AMD uses the same opcode as Intel, maybe they're expecting VMMs
+> to use the decode assist feature to check for the prefix?
 
-On 10/1/19 2:41 PM, David Hildenbrand wrote:
->>> I think Michal asked for a performance comparison against Nitesh's
->>> approach, to evaluate if keeping the reported state + tracking inside
->>> the buddy is really worth it. Do you have any such numbers already? (or
->>> did my tired eyes miss them in this cover letter? :/)
->>>
->> I thought what Michal was asking for was what was the benefit of using the
->> boundary pointer. I added a bit up above and to the description for patch
->> 3 as on a 32G VM it adds up to about a 18% difference without factoring in
->> the page faulting and zeroing logic that occurs when we actually do the
->> madvise.
-> "I would still be happier if the allocator wouldn't really have to
-> bother about somebody snooping its internal state to do its own thing.
-> So make sure to describe why and how much this really matters.
-> [...]
-> if you gave some rough numbers to quantify how much overhead for
-> different solutions we are talking about here.
-> "
->
-> Could be that I'm misreading Michals comment, but I'd be interested in
-> the "how much" as well.
->
->> Do we have a working patch set for Nitesh's code? The last time I tried
->> running his patch set I ran into issues with kernel panics. If we have a
->> known working/stable patch set I can give it a try.
-> @Nitesh, is there a working branch?
+There are no specific decode assists for WBINVD/WBNOINVD in the
+EXITINFO* fields. The "generic" decode assist, where the instruction
+bytes are stored in the VMCB, only applies to nested page faults and
+#PF intercepts.
 
-For some unknown reason, I received these set of emails just now :)
-That's why couldn't respond earlier.
-
+> > > In that case, the
+> > > value added would be that KVM can do WBNOINVD instead of WBINVD in th=
+e
+> > > unlikely event that (a) KVM needs to executed WBINVD on behalf of the
+> > > guest (because the guest has non-coherent DMA), (b) WBNOINVD is suppo=
+rted
+> > > on the host, and (c) WBNOINVD is used by the guest (I don't think it =
+would
+> > > be safe to assume that the guest doesn't need the caches invalidated =
+on
+> > > WBINVD).
+> >
+> > I agree that there would be value if KVM implemented WBNOINVD using
+> > WBNOINVD, but that isn't what this change does. My question was, "What
+> > is the value in enumerating WBNOINVD if KVM is just going to implement
+> > it with WBINVD anyway?"
 >
+> Ah, I was stating what I would expect the KVM change to be, I didn't
+> realize this patch was merged almost a year ago.
 >
--- 
-Thanks
-Nitesh
+> I suppose theoretically it would allow live migrating from an old kernel
+> to a new kernel and gaining actual WBNOINVD support along the way?
