@@ -2,120 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CFBF1C3D9C
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 19:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0442AC3E26
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 19:07:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729872AbfJAQkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 12:40:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51538 "EHLO mail.kernel.org"
+        id S1727263AbfJARGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 13:06:48 -0400
+Received: from mga04.intel.com ([192.55.52.120]:12904 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729837AbfJAQkU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 12:40:20 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F301121D79;
-        Tue,  1 Oct 2019 16:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569948018;
-        bh=8s8v0yNQxp/azENEIyJoN93RtdmY35h4AqfX90LSP/s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UdtVQ9sSOclMBFocvgMDygixh8d9jNniGEWLGngStQYdQadiQZ9Gw9pJYT8npzaz4
-         z7ctlHkT3d6zLM/CqS4dFudLp2ptm/Bc3Uz4az5bRio6wWLY58dwgBnEQwMgyFnly2
-         z1EfWAcpyZwOxE4bZTT+ruKLhQ0Uzo98jXBXoFOk=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.3 39/71] KVM: hyperv: Fix Direct Synthetic timers assert an interrupt w/o lapic_in_kernel
-Date:   Tue,  1 Oct 2019 12:38:49 -0400
-Message-Id: <20191001163922.14735-39-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191001163922.14735-1-sashal@kernel.org>
-References: <20191001163922.14735-1-sashal@kernel.org>
+        id S1726339AbfJARGs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 13:06:48 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Oct 2019 10:06:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,571,1559545200"; 
+   d="scan'208";a="197915381"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by FMSMGA003.fm.intel.com with ESMTP; 01 Oct 2019 10:06:47 -0700
+Date:   Tue, 1 Oct 2019 10:06:46 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "ehabkost@redhat.com" <ehabkost@redhat.com>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
+Message-ID: <20191001170646.GA27090@linux.intel.com>
+References: <1545227503-214403-1-git-send-email-robert.hu@linux.intel.com>
+ <CALMp9eRZCoZbeyttZdvaCUpOFKygTNVF_x7+TWh6MktmF-ZK9A@mail.gmail.com>
+ <263d31d9-b21e-ceb9-b47c-008e30bbd94f@redhat.com>
+ <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
+ <20190930175449.GB4084@habkost.net>
+ <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
+ <9bbe864ab8fb16d9e64745b930c89b1db24ccc3a.camel@intel.com>
+ <CALMp9eSe_7on+F=ng05DkvvBpnWhSirEpSVz9Bua4Sy606xJnw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALMp9eSe_7on+F=ng05DkvvBpnWhSirEpSVz9Bua4Sy606xJnw@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Tue, Oct 01, 2019 at 07:20:17AM -0700, Jim Mattson wrote:
+> On Mon, Sep 30, 2019 at 5:45 PM Huang, Kai <kai.huang@intel.com> wrote:
+> >
+> > On Mon, 2019-09-30 at 12:23 -0700, Jim Mattson wrote:
+> > > On Mon, Sep 30, 2019 at 10:54 AM Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > I had only looked at the SVM implementation of WBNOINVD, which is
+> > > exactly the same as the SVM implementation of WBINVD. So, the question
+> > > is, "why enumerate WBNOINVD if its implementation is exactly the same
+> > > as WBINVD?"
+> > >
+> > > WBNOINVD appears to be only partially documented in Intel document
+> > > 319433-037, "Intel� Architecture Instruction Set Extensions and Future
+> > > Features Programming Reference." In particular, there is no
+> > > documentation regarding the instruction's behavior in VMX non-root
+> > > mode. Does WBNOINVD cause a VM-exit when the VM-execution control,
+> > > "WBINVD exiting," is set? If so, does it have the same VM-exit reason
+> > > as WBINVD (54), or a different one? If it does have the same VM-exit
+> > > reason (a la SVM), how does one distinguish a WBINVD VM-exit from a
+> > > WBNOINVD VM-exit? If one can't distinguish (a la SVM), then it would
+> > > seem that the VMX implementation also implements WBNOINVD as WBINVD.
+> > > If that's the case, the question for VMX is the same as for SVM.
+> >
+> > Unfortunately WBNOINVD interaction with VMX has not been made to public yet.
 
-[ Upstream commit a073d7e3ad687a7ef32b65affe80faa7ce89bf92 ]
+Hint: WBNOINVD uses a previously ignored prefix, i.e. it looks a *lot*
+      like WBINVD...
 
-Reported by syzkaller:
+> > I am reaching out internally to see when it can be done. I agree it may not be
+> > necessary to expose WBNOINVD if its implementation is exactly the same as
+> > WBINVD, but it also doesn't have any harm, right?
+> 
+> If nested VMX changes are necessary to be consistent with hardware,
+> then enumerating WBNOINVD support in the guest CPUID information at
+> this time--without the attendant nested VMX changes--is premature. No
+> changes to nested SVM are necessary, so it's fine for AMD systems.
+> 
+> If no changes to nested VMX are necessary, then it is true that
+> WBNOINVD can be emulated by WBINVD. However, it provides no value to
+> specifically enumerate the instruction.
+>
+> If there is some value that I'm missing, then why make guest support
+> for the instruction contingent on host support for the instruction?
+> KVM can implement WBNOINVD as WBINVD on any host with WBINVD,
+> regardless of whether or not the host supports WBNOINVD.
 
-	kasan: GPF could be caused by NULL-ptr deref or user memory access
-	general protection fault: 0000 [#1] PREEMPT SMP KASAN
-	RIP: 0010:__apic_accept_irq+0x46/0x740 arch/x86/kvm/lapic.c:1029
-	Call Trace:
-	kvm_apic_set_irq+0xb4/0x140 arch/x86/kvm/lapic.c:558
-	stimer_notify_direct arch/x86/kvm/hyperv.c:648 [inline]
-	stimer_expiration arch/x86/kvm/hyperv.c:659 [inline]
-	kvm_hv_process_stimers+0x594/0x1650 arch/x86/kvm/hyperv.c:686
-	vcpu_enter_guest+0x2b2a/0x54b0 arch/x86/kvm/x86.c:7896
-	vcpu_run+0x393/0xd40 arch/x86/kvm/x86.c:8152
-	kvm_arch_vcpu_ioctl_run+0x636/0x900 arch/x86/kvm/x86.c:8360
-	kvm_vcpu_ioctl+0x6cf/0xaf0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2765
+Agreed.  To play nice with live migration, KVM should enumerate WBNOINVD
+regardless of host support.  Since WBNOINVD uses an ignored prefix, it
+will simply look like a regular WBINVD on platforms without WBNOINVD.
 
-The testcase programs HV_X64_MSR_STIMERn_CONFIG/HV_X64_MSR_STIMERn_COUNT,
-in addition, there is no lapic in the kernel, the counters value are small
-enough in order that kvm_hv_process_stimers() inject this already-expired
-timer interrupt into the guest through lapic in the kernel which triggers
-the NULL deferencing. This patch fixes it by don't advertise direct mode
-synthetic timers and discarding the inject when lapic is not in kernel.
-
-syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=1752fe0a600000
-
-Reported-by: syzbot+dff25ee91f0c7d5c1695@syzkaller.appspotmail.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/kvm/hyperv.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index fff790a3f4ee9..c0867b0aae3ec 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -645,7 +645,9 @@ static int stimer_notify_direct(struct kvm_vcpu_hv_stimer *stimer)
- 		.vector = stimer->config.apic_vector
- 	};
- 
--	return !kvm_apic_set_irq(vcpu, &irq, NULL);
-+	if (lapic_in_kernel(vcpu))
-+		return !kvm_apic_set_irq(vcpu, &irq, NULL);
-+	return 0;
- }
- 
- static void stimer_expiration(struct kvm_vcpu_hv_stimer *stimer)
-@@ -1852,7 +1854,13 @@ int kvm_vcpu_ioctl_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
- 			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
--			ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
-+
-+			/*
-+			 * Direct Synthetic timers only make sense with in-kernel
-+			 * LAPIC
-+			 */
-+			if (lapic_in_kernel(vcpu))
-+				ent->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
- 
- 			break;
- 
--- 
-2.20.1
-
+Let's assume the WBNOINVD VM-Exit behavior is sane, i.e. allows software
+to easily differentiate between WBINVD and WBNOINVD.  In that case, the
+value added would be that KVM can do WBNOINVD instead of WBINVD in the
+unlikely event that (a) KVM needs to executed WBINVD on behalf of the
+guest (because the guest has non-coherent DMA), (b) WBNOINVD is supported
+on the host, and (c) WBNOINVD is used by the guest (I don't think it would
+be safe to assume that the guest doesn't need the caches invalidated on
+WBINVD).
