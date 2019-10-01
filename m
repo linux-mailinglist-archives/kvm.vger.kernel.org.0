@@ -2,136 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 05218C2B71
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 02:54:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BC76C2B96
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 03:14:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726504AbfJAAyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 20:54:53 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:46480 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726106AbfJAAyx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 20:54:53 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x910sPFZ044141;
-        Tue, 1 Oct 2019 00:54:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2019-08-05; bh=ONs2SYLamQotGg6e7nWLECdwnmymLC6XzGH89lGa0q4=;
- b=MlfXtjzG5jwNI2YrVFFxytoIBParj18rUsOewqPvr0o/TAn4cYgi5dJdhcL4y7Bl1hXT
- ZS++1WWWkviahaAo5GTlPjXe5Mi3+Cy0Sx/i26kfl2EnTmZLAjdrBC+O6BI7RRZSSpFC
- xdVlX/f4GYPVj4TIWevdbUG+dzY+9jpo5fun+Th1JIh0VAOyWIVspdTD3XdhcOK90uf1
- W5Q/dNHxQwsHTFw5IhAyWd3N0MzVuf6YjkoivhEKyS0PYQMEv/ubV0KctVq6/Egddyq3
- 4vgyua24QCwxYbcyYkARqALBZxq6hhOElAeCFZdU+imzOxVbpF/mHUbKKB05fqJFUzvJ OQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2v9xxujkq1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 01 Oct 2019 00:54:25 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x910rJXT040250;
-        Tue, 1 Oct 2019 00:54:24 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2vbnqbr3rb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 01 Oct 2019 00:54:24 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x910sN8t002278;
-        Tue, 1 Oct 2019 00:54:23 GMT
-Received: from spark.ravello.local (/213.57.127.2)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 30 Sep 2019 17:54:23 -0700
-From:   Liran Alon <liran.alon@oracle.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
-Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Liran Alon <liran.alon@oracle.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: [PATCH] KVM: VMX: Refactor to not compare set PI control bits directly to 1
-Date:   Tue,  1 Oct 2019 03:54:08 +0300
-Message-Id: <20191001005408.129099-1-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=765
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910010008
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9396 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=849 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910010008
+        id S1727645AbfJABOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Sep 2019 21:14:30 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:33000 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726314AbfJABOa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Sep 2019 21:14:30 -0400
+Received: by mail-pf1-f196.google.com with SMTP id q10so6702644pfl.0
+        for <kvm@vger.kernel.org>; Mon, 30 Sep 2019 18:14:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=oJ2YYB0wfUWvcMyPHe+VCvwlDe7RwIY5GJ67RiArZ+A=;
+        b=mvIa67j7Xnqcm04TaKdnHPkwrPIqBkWs85MeqHT4DJ0jsFwA2spbQYe0NerHaK+ei0
+         nSvgVHAW4AbozNl/PjVZO4UeULMGugyzjLY/bbX0msIH7VxDWE8js3WGsOhH9Kz/IK6A
+         ED1wv/bGoqcbwe2DdI9egU/mKGt19c2HkjENhdxnMPmWZzDayD84YSH1y9pjNijJ0GNp
+         8IMK8P85QFKi1aRMrbbRK65K2ZbZxtW4ePSxBYvMh4VXOg/bZYblYrlVVLU76LXWRz7z
+         xnXh4XnpB45ZPgeu/48fjAy9WqUrLPnoHx8z57WPeibU5a/cMyG6KGkOrF75a8O21mOe
+         csiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=oJ2YYB0wfUWvcMyPHe+VCvwlDe7RwIY5GJ67RiArZ+A=;
+        b=VT0MEARe9kxjmmiKSqLwb6oJb+vm/UalfNm6HJ7IIEuLI5wEE2eHz+5BZSIVQGhObK
+         IFgPl//xfxlZ29y0cYFUYabxIcUJw6mEBiPyRJ/Jcvz5FyRqhW+iM3hERZ4vBRyMUlfl
+         h2X4cu2z9B7gO/3RS5egm4v5EVHVvdfi6aQV0RK6RzSeUKVX2Vgfzd+f6bSs7wmIqzF7
+         YwUIhnpniDFwjPy5q/SBrbELB64375sGmTsjiCERK44wlaa1fWfruRpvGo6zQ3G/wYWf
+         ZoCICDk20W/LU4dVdOf1TxAPWsXI9WuLH8j2iWzvwTvMsluwVq10rwfKeE3aTBtS+V2Q
+         xZBA==
+X-Gm-Message-State: APjAAAWxpllwMYMVTqXL4ICu5VtSxlz1p0NR9XuhOnNx7chdnZMeWdZ6
+        a4gmbgML3MaCGJK1M21PqiImWaLsijjdXA==
+X-Google-Smtp-Source: APXvYqztZXq7Bt3bq0VgvNSPu63WL14qXw0WhH5JuYn+MTOP3jZCyTDmgqfCh7w4sumoFy+cgHbUNQ==
+X-Received: by 2002:a17:90a:f98f:: with SMTP id cq15mr2403606pjb.54.1569892469567;
+        Mon, 30 Sep 2019 18:14:29 -0700 (PDT)
+Received: from [10.2.144.69] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id x10sm20862856pfr.44.2019.09.30.18.14.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 30 Sep 2019 18:14:28 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH kvm-unit-tests 0/8]: x86: vmx: Test INIT processing in
+ various CPU VMX states
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <5EB947BE-8494-46A7-927F-193822DD85E4@oracle.com>
+Date:   Mon, 30 Sep 2019 18:14:27 -0700
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>, vkuznets@redhat.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E55E9CA1-34B1-4F9A-AAC3-AD5163A4B2D4@gmail.com>
+References: <20190919125211.18152-1-liran.alon@oracle.com>
+ <555E2BD4-3277-4261-BD54-D1924FBE9887@gmail.com>
+ <5EB947BE-8494-46A7-927F-193822DD85E4@oracle.com>
+To:     Liran Alon <liran.alon@oracle.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a pure code refactoring.
-No semantic change is expected.
+> On Sep 30, 2019, at 5:48 PM, Liran Alon <liran.alon@oracle.com> wrote:
+>=20
+>=20
+>=20
+>> On 1 Oct 2019, at 2:02, Nadav Amit <nadav.amit@gmail.com> wrote:
+>>=20
+>>> On Sep 19, 2019, at 5:52 AM, Liran Alon <liran.alon@oracle.com> =
+wrote:
+>>>=20
+>>> Hi,
+>>>=20
+>>> This patch series aims to add a vmx test to verify the functionality
+>>> introduced by KVM commit:
+>>> 4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various CPU =
+states")
+>>>=20
+>>> The test verifies the following functionality:
+>>> 1) An INIT signal received when CPU is in VMX operation
+>>> is latched until it exits VMX operation.
+>>> 2) If there is an INIT signal pending when CPU is in
+>>> VMX non-root mode, it result in VMExit with (reason =3D=3D 3).
+>>> 3) Exit from VMX non-root mode on VMExit do not clear
+>>> pending INIT signal in LAPIC.
+>>> 4) When CPU exits VMX operation, pending INIT signal in
+>>> LAPIC is processed.
+>>>=20
+>>> In order to write such a complex test, the vmx tests framework was
+>>> enhanced to support using VMX in non BSP CPUs. This enhancement is
+>>> implemented in patches 1-7. The test itself is implemented at patch =
+8.
+>>> This enhancement to the vmx tests framework is a bit hackish, but
+>>> I believe it's OK because this functionality is rarely required by
+>>> other VMX tests.
+>>>=20
+>>> Regards,
+>>> -Liran
+>>=20
+>> Hi Liran,
+>>=20
+>> I ran this test on bare-metal and it fails:
+>>=20
+>> Test suite: vmx_init_signal_test
+>> PASS: INIT signal blocked when CPU in VMX operation
+>> PASS: INIT signal during VMX non-root mode result in exit-reason =
+VMX_INIT (3)
+>> FAIL: INIT signal processed after exit VMX operation
+>> SUMMARY: 8 tests, 1 unexpected failures
+>>=20
+>> I don=E2=80=99t have time to debug this issue, but let me know if you =
+want some
+>> print-outs.
+>>=20
+>> Nadav
+>=20
+> Thanks Nadav for running this on bare-metal. This is very useful!
+>=20
+> It seems that when CPU exited on exit-reason VMX_INIT (3), the LAPIC =
+INIT pending event
+> was consumed instead of still being latched until CPU exits VMX =
+operation.
+>=20
+> In my commit which this unit-test verifies 4b9852f4f389 ("KVM: x86: =
+Fix INIT signal handling in various CPU states=E2=80=9D),
+> I have assumed that such exit-reason don=E2=80=99t consume the LAPIC =
+INIT pending event.
+> My assumption was based on the phrasing of Intel SDM section 25.2 =
+OTHER CAUSES OF VM EXITS regarding INIT signals:
+> "Such exits do not modify register state or clear pending events as =
+they would outside of VMX operation."
+> I thought Intel logic behind this is that if an INIT signal is sent to =
+a CPU in VMX non-root mode, it would exit
+> on exit-reason 3 which would allow hypervisor to decide to exit VMX =
+operation in order to consume INIT signal.
 
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
----
- arch/x86/kvm/vmx/vmx.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+I think this sentence can be read differently. It also reasonable not to
+bound the host to get an INIT signal the moment it disabled vmx.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e31317fc8c95..92eb4910fe9f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5302,6 +5302,11 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
-+{
-+	return pi_test_on(vcpu_to_pi_desc(vcpu));
-+}
-+
- /*
-  * Handler for POSTED_INTERRUPT_WAKEUP_VECTOR.
-  */
-@@ -5313,9 +5318,7 @@ static void wakeup_handler(void)
- 	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
- 	list_for_each_entry(vcpu, &per_cpu(blocked_vcpu_on_cpu, cpu),
- 			blocked_vcpu_list) {
--		struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
--
--		if (pi_test_on(pi_desc) == 1)
-+		if (vmx_dy_apicv_has_pending_interrupt(vcpu))
- 			kvm_vcpu_kick(vcpu);
- 	}
- 	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-@@ -6168,11 +6171,6 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
- 	return max_irr;
- }
- 
--static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
--{
--	return pi_test_on(vcpu_to_pi_desc(vcpu));
--}
--
- static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
- {
- 	if (!kvm_vcpu_apicv_active(vcpu))
-@@ -7336,7 +7334,7 @@ static int pi_pre_block(struct kvm_vcpu *vcpu)
- 	do {
- 		old.control = new.control = pi_desc->control;
- 
--		WARN((pi_desc->sn == 1),
-+		WARN(pi_desc->sn,
- 		     "Warning: SN field of posted-interrupts "
- 		     "is set before blocking\n");
- 
-@@ -7361,7 +7359,7 @@ static int pi_pre_block(struct kvm_vcpu *vcpu)
- 			   new.control) != old.control);
- 
- 	/* We should not block the vCPU if an interrupt is posted for it.  */
--	if (pi_test_on(pi_desc) == 1)
-+	if (pi_test_on(pi_desc))
- 		__pi_post_block(vcpu);
- 
- 	local_irq_enable();
--- 
-2.20.1
+> Nadav, can you attempt to just add a delay in =
+init_signal_test_thread() between calling vmx_off() & setting =
+init_signal_test_thread_continued to true?
+> It may be that real hardware delays a bit when the INIT signal is =
+released from LAPIC after exit VMX operation.
+
+I added =E2=80=9Cdelay(100000)=E2=80=9D between them, but got the same =
+result.
 
