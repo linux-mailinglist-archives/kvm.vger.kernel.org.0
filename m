@@ -2,79 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 93D7DC3764
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 16:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB9D9C3766
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 16:30:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388957AbfJAOaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Oct 2019 10:30:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41438 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727132AbfJAOaL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Oct 2019 10:30:11 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 16406C057F88
-        for <kvm@vger.kernel.org>; Tue,  1 Oct 2019 14:30:11 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id j2so6092583wre.1
-        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 07:30:11 -0700 (PDT)
+        id S2388987AbfJAOaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 10:30:13 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:43031 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388965AbfJAOaN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 10:30:13 -0400
+Received: by mail-io1-f66.google.com with SMTP id v2so48357445iob.10
+        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 07:30:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dA2LfRIGoffEi6e/trDGXZZsQS5EjYWmp4CzTn5oPEk=;
+        b=ru8l+MiFe0uxae7CzGyGkm95G4hi87/F8EHtAJGL5zhFx8MPmm2hQaH/4JmSmGLoJx
+         wSBEkH6DlVKE4w9EdEsNW3r1s4Afk9Xxvs+8S8t6Gy0GQS5GPtWGKA5/s0BbMuZb2nWM
+         QTWNjYmWcnLD3g8vKSeKe43a3FDoIgIoiICitLfDajqBcYAqorNoaqISkz6RiyR7DL3N
+         Q8qqiT2So/qw8CmnnsU5ztj7BYAI1RUc2pv2oczzUbEPd18QAA+QgYDuZk09hXY/2Etc
+         KC0QvYdSe9EZTKrX7mqkwSRPnMVtgf75A28iHmZttB/8RG6fCtN4P5/371AjyvXvixtH
+         y3uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uYAaBtdM1jqbgvAOY1l3EFV1qXvd/OnWbcIm/a50FEs=;
-        b=YsAaIivkddD0h9c4uKB9tcECoSiYuShzUN/cvLk12T9KRpDeyNeXm7Oc509MMpNJuV
-         771yoPfvsL7F09VmV7I0Ji66YXWprgt+qjKMyIIu0ttpw5aWWylzwjJEl3TBkDRs1YYe
-         Hti4X0tcXyfBr5m1t9dzj07YvONDIwJImYM5ISMSWpPrEIzJqGPz8/EDCETdzLg+YnVX
-         /3HMks5/X0xhrqeXPjUkFwmYZwizUavYV8+BjZAc1gqWGkclQmyT2s6cfH/LKAt4vgrl
-         2/LpSEb7pPid2Nf22s0AHVfvE2iSSjZUvfa2xa0RJLSbM2oT+6M/4FdIA4xGEqrcxYIc
-         Anmg==
-X-Gm-Message-State: APjAAAVtiSn2lB1GAGjOTPR5FMNoU1DXpyQ1GykVu6u/BLon5ogmxANw
-        78SJ5GJ5eYFy7HglPuo5rPbtCNb9SvKypa9nYR3qehz8usMg93SEWT/b/9XKIGOGiT5tR1QQnk+
-        oQCBaEFM9mMGT
-X-Received: by 2002:a1c:1aca:: with SMTP id a193mr4161240wma.120.1569940209421;
-        Tue, 01 Oct 2019 07:30:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy/WlI+lYuUZS81xaehQkpRwr1hpFSG9V2x//ifO6p6Xm7Un5FeK4P1ilSGpeYn6EiKCXQ/Og==
-X-Received: by 2002:a1c:1aca:: with SMTP id a193mr4161215wma.120.1569940209148;
-        Tue, 01 Oct 2019 07:30:09 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
-        by smtp.gmail.com with ESMTPSA id g11sm2938837wmh.45.2019.10.01.07.30.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Oct 2019 07:30:08 -0700 (PDT)
-Subject: Re: [PATCH] KVM: VMX: Remove proprietary handling of unexpected
- exit-reasons
-To:     Liran Alon <liran.alon@oracle.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, tao3.xu@intel.com,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm list <kvm@vger.kernel.org>
-References: <20190929145018.120753-1-liran.alon@oracle.com>
- <874l0u5jb4.fsf@vitty.brq.redhat.com>
- <CALMp9eS7wF1b6yBJrj_VL+HMEYjuZrYhmMHiCqJq8-33d9QE6A@mail.gmail.com>
- <20190930172038.GE14693@linux.intel.com>
- <2299BCA8-8FEF-4857-9680-8CE3E58034A6@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dfacb83a-332a-69ec-fc2d-bd4ba841da05@redhat.com>
-Date:   Tue, 1 Oct 2019 16:30:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dA2LfRIGoffEi6e/trDGXZZsQS5EjYWmp4CzTn5oPEk=;
+        b=WaNehyD31Ct5JsRyRXU4YSUkMs5yyyr3uWbxBVJEc9+gFir1kDW6NtOeYS/RrVWQEN
+         cSogVhmrQ2V95ELT0hcH40aqdQXoDHu54pn3HLP79vhwP1naITQHtIVRHbLToLDNGagh
+         hEUHTSKvEie23iuB6C0TZBMHchKnXNcViN9O80iZp2QqGo3Ib52Q5a73TID2lNsb29n+
+         sUKV4C6sZwzBw5TD8mR3IGLn4aLuebj+/MYiZbRVvQ3VQBxhfHunjlGrlS9nQ6j/zOaf
+         Lx6fSp3Wf0JUlpuwEE4VHr8wN0RxZnIy2j1hPEG5LdNFtwJqbfMDholW3BRI7Nzm1saG
+         BgOg==
+X-Gm-Message-State: APjAAAV0ksKQcLNbR/9nGKmAgfCmP4Q+U1VzVdcEpREeD1uDdmXWoZfN
+        VSJvIMuAbzN8vC+N4kX0GDIbDQ5GuFnl6VbvB2oWxg==
+X-Google-Smtp-Source: APXvYqycE3v06jZkRnvCfN0psatT+dZhlvH0vo17HvnA2GeszMRgF9/Bq+lsCPAwEs2yGRg899jwIYpidjn7BheKbkQ=
+X-Received: by 2002:a92:5e0b:: with SMTP id s11mr26984022ilb.26.1569940212259;
+ Tue, 01 Oct 2019 07:30:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2299BCA8-8FEF-4857-9680-8CE3E58034A6@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190930233854.158117-1-jmattson@google.com> <87blv03dm7.fsf@vitty.brq.redhat.com>
+ <08e172b2-eb75-04af-0b63-b0516c8455e1@redhat.com> <CALMp9eRu42dSwuZ5ZoGmPd9A5qw7wJmfh-OhCUFaWEke2vcHkg@mail.gmail.com>
+ <89918126-97f6-37ff-9d28-68440a15b710@redhat.com>
+In-Reply-To: <89918126-97f6-37ff-9d28-68440a15b710@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 1 Oct 2019 07:30:00 -0700
+Message-ID: <CALMp9eTZtHTWyEth7Hm1=goZask8viJ_3XuOF=UQKeLbqBABKQ@mail.gmail.com>
+Subject: Re: [PATCH] kvm: vmx: Limit guest PMCs to those supported on the host
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Marc Orr <marcorr@google.com>, kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/10/19 02:33, Liran Alon wrote:
-> OK Ok I apologise for my bad English. ^_^
-> Paolo, feel free to reword this commit title & message to something else when applying…
+On Tue, Oct 1, 2019 at 7:24 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 01/10/19 16:07, Jim Mattson wrote:
+> > On Tue, Oct 1, 2019 at 6:29 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 01/10/19 13:32, Vitaly Kuznetsov wrote:
+> >>> Jim Mattson <jmattson@google.com> writes:
+> >>>
+> >>>> KVM can only virtualize as many PMCs as the host supports.
+> >>>>
+> >>>> Limit the number of generic counters and fixed counters to the number
+> >>>> of corresponding counters supported on the host, rather than to
+> >>>> INTEL_PMC_MAX_GENERIC and INTEL_PMC_MAX_FIXED, respectively.
+> >>>>
+> >>>> Note that INTEL_PMC_MAX_GENERIC is currently 32, which exceeds the 18
+> >>>> contiguous MSR indices reserved by Intel for event selectors. Since
+> >>>> the existing code relies on a contiguous range of MSR indices for
+> >>>> event selectors, it can't possibly work for more than 18 general
+> >>>> purpose counters.
+> >>>
+> >>> Should we also trim msrs_to_save[] by removing impossible entries
+> >>> (18-31) then?
+> >>
+> >> Yes, I'll send a patch in a second.
+> >
+> > I thought you were going to revert that msrs_to_save patch. I've been
+> > working on a replacement.
+>
+> We can use a little more time to think more about it and discuss it.
+>
+> For example, trimming is enough for the basic usage of passing
+> KVM_SET_SUPPORTED_CPUID output to KVM_SET_CPUID2 and then retrieving all
+> MSRs in the list.  If that is also okay for Google's userspace, we might
+> actually leave everything that way and retroactively decide that you
+> need to filter the MSRs but only if you pass your own CPUID.
+>
+> Paolo
 
-I'll replace it with "specialized", no problem.  I agree with Sean's
-assessment. :)
-
-Paolo
+If just trimming the static list, remember to trim to even less than
+18, since Intel has used one of the reserved MSRs following the event
+selectors for something else. I was going to follow Sean's suggestion
+and specifically enumerate all of the PMU MSRs based on CPUID 0AH.
