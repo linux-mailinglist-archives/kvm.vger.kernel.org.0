@@ -2,311 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83E55C2C08
-	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 04:48:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF980C2E38
+	for <lists+kvm@lfdr.de>; Tue,  1 Oct 2019 09:47:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731847AbfJACrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Sep 2019 22:47:45 -0400
-Received: from mga18.intel.com ([134.134.136.126]:43806 "EHLO mga18.intel.com"
+        id S1732999AbfJAH2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Oct 2019 03:28:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38208 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726504AbfJACro (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Sep 2019 22:47:44 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Sep 2019 19:47:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,569,1559545200"; 
-   d="gz'50?scan'50,208,50";a="195514221"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 30 Sep 2019 19:47:32 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1iF8CJ-000Gt4-NZ; Tue, 01 Oct 2019 10:47:31 +0800
-Date:   Tue, 1 Oct 2019 10:46:46 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     kbuild-all@01.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        peterz@infradead.org, Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
-        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] perf/core: Provide a kernel-internal interface to
- recalibrate event period
-Message-ID: <201910011004.hj98cxIl%lkp@intel.com>
-References: <20190930072257.43352-2-like.xu@linux.intel.com>
+        id S1732925AbfJAH2h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Oct 2019 03:28:37 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 624BC2A09B2
+        for <kvm@vger.kernel.org>; Tue,  1 Oct 2019 07:28:36 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id z1so5575800wrw.21
+        for <kvm@vger.kernel.org>; Tue, 01 Oct 2019 00:28:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=rGxRLfEJC1VYNtKSX6kyfg0tMas1+rSvzHhUE5eK6q4=;
+        b=plQ0+7vYCbqPgTwEBtYA/W6vv9AI6juLGHTWXE3NMejtpWfgGTUajfa5pCRa9OT7+r
+         tP0jSzsLl8cUKjnIURmv0ceTFs8hbUkQ6FK3CmOwNsCsIrx8al5opm7QnmxwwfEvL4/4
+         n4qHowgr8XOZulrDoP8pxfpKTYOmDgJDVVwPL6lZxip6AdZHMHMyTklKac5LcFLoE9hl
+         pNvKUx2E2tanPRevdAPeuVnUG7UgoyL9iRXknnXglTinPKcZw79HGKEd+ZGmD0hi5ve2
+         74YJdheMnzTPsYepVuuCQqPe2jo1QRObSAzE8O43snUvZSa8bEqh2ss9Px91ntqHID07
+         tRcw==
+X-Gm-Message-State: APjAAAXEvYW/W8o4aj/lFUW8MNWL/rhHJV6MhiU6aSdFKFOde0wsKkJ4
+        u44JpvSXR+1VZpn02seKgWE5TBLm08orEQDkVHkoaqh4I10jGPLcO/P85xktzgy+emaoetX4jJt
+        MI9SdvnJ/BZlf
+X-Received: by 2002:a5d:5231:: with SMTP id i17mr16517836wra.142.1569914914942;
+        Tue, 01 Oct 2019 00:28:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwzfP3jzsJGYljEi7cfS5kj/VjiNXOMN2jPKXfvjeLCGNRNerLEOfzcw+u+tiV4YVMMyE9GAQ==
+X-Received: by 2002:a5d:5231:: with SMTP id i17mr16517808wra.142.1569914914666;
+        Tue, 01 Oct 2019 00:28:34 -0700 (PDT)
+Received: from steredhat.homenet.telecomitalia.it (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
+        by smtp.gmail.com with ESMTPSA id a71sm1892939wme.11.2019.10.01.00.28.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2019 00:28:34 -0700 (PDT)
+Date:   Tue, 1 Oct 2019 09:28:31 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Dexuan Cui <decui@microsoft.com>
+Cc:     "davem@davemloft.net" <davem@davemloft.net>,
+        KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "sashal@kernel.org" <sashal@kernel.org>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "deepa.kernel@gmail.com" <deepa.kernel@gmail.com>,
+        "ytht.net@gmail.com" <ytht.net@gmail.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Michael Kelley <mikelley@microsoft.com>,
+        "jhansen@vmware.com" <jhansen@vmware.com>
+Subject: Re: [PATCH net v3] vsock: Fix a lockdep warning in __vsock_release()
+Message-ID: <20191001072831.msry462b7l32fhsw@steredhat.homenet.telecomitalia.it>
+References: <1569868998-56603-1-git-send-email-decui@microsoft.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="jy3aobxgdk453czl"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190930072257.43352-2-like.xu@linux.intel.com>
-X-Patchwork-Hint: ignore
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <1569868998-56603-1-git-send-email-decui@microsoft.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 30, 2019 at 06:43:50PM +0000, Dexuan Cui wrote:
+> Lockdep is unhappy if two locks from the same class are held.
+> 
+> Fix the below warning for hyperv and virtio sockets (vmci socket code
+> doesn't have the issue) by using lock_sock_nested() when __vsock_release()
+> is called recursively:
+> 
+> ============================================
+> WARNING: possible recursive locking detected
+> 5.3.0+ #1 Not tainted
+> --------------------------------------------
+> server/1795 is trying to acquire lock:
+> ffff8880c5158990 (sk_lock-AF_VSOCK){+.+.}, at: hvs_release+0x10/0x120 [hv_sock]
+> 
+> but task is already holding lock:
+> ffff8880c5158150 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x2e/0xf0 [vsock]
+> 
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(sk_lock-AF_VSOCK);
+>   lock(sk_lock-AF_VSOCK);
+> 
+>  *** DEADLOCK ***
+> 
+>  May be due to missing lock nesting notation
+> 
+> 2 locks held by server/1795:
+>  #0: ffff8880c5d05ff8 (&sb->s_type->i_mutex_key#10){+.+.}, at: __sock_release+0x2d/0xa0
+>  #1: ffff8880c5158150 (sk_lock-AF_VSOCK){+.+.}, at: __vsock_release+0x2e/0xf0 [vsock]
+> 
+> stack backtrace:
+> CPU: 5 PID: 1795 Comm: server Not tainted 5.3.0+ #1
+> Call Trace:
+>  dump_stack+0x67/0x90
+>  __lock_acquire.cold.67+0xd2/0x20b
+>  lock_acquire+0xb5/0x1c0
+>  lock_sock_nested+0x6d/0x90
+>  hvs_release+0x10/0x120 [hv_sock]
+>  __vsock_release+0x24/0xf0 [vsock]
+>  __vsock_release+0xa0/0xf0 [vsock]
+>  vsock_release+0x12/0x30 [vsock]
+>  __sock_release+0x37/0xa0
+>  sock_close+0x14/0x20
+>  __fput+0xc1/0x250
+>  task_work_run+0x98/0xc0
+>  do_exit+0x344/0xc60
+>  do_group_exit+0x47/0xb0
+>  get_signal+0x15c/0xc50
+>  do_signal+0x30/0x720
+>  exit_to_usermode_loop+0x50/0xa0
+>  do_syscall_64+0x24e/0x270
+>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> RIP: 0033:0x7f4184e85f31
+> 
+> Tested-by: Stefano Garzarella <sgarzare@redhat.com>
+> Signed-off-by: Dexuan Cui <decui@microsoft.com>
+> ---
 
---jy3aobxgdk453czl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The patch LGTM and and functionally it's the same as the v2 that I tested, so:
 
-Hi Like,
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Thank you for the patch! Yet something to improve:
+Thanks,
+Stefano
 
-[auto build test ERROR on kvm/linux-next]
-[cannot apply to v5.4-rc1 next-20190930]
-[if your patch is applied to the wrong git tree, please drop us a note to help
-improve the system. BTW, we also suggest to use '--base' option to specify the
-base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> 
+> Changes in v2:
+>   Avoid the duplication of code in v1.
+>   Also fix virtio socket code.
+> 
+> 
+> Changes in v3:
+>   Use "lock_sock_nested(sk, level);" -- suggested by Stefano.
+>   Add Stefano's Tested-by.
+> 
+>  net/vmw_vsock/af_vsock.c                | 16 ++++++++++++----
+>  net/vmw_vsock/hyperv_transport.c        |  2 +-
+>  net/vmw_vsock/virtio_transport_common.c |  2 +-
+>  3 files changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> index ab47bf3ab66e..2ab43b2bba31 100644
+> --- a/net/vmw_vsock/af_vsock.c
+> +++ b/net/vmw_vsock/af_vsock.c
+> @@ -638,7 +638,7 @@ struct sock *__vsock_create(struct net *net,
+>  }
+>  EXPORT_SYMBOL_GPL(__vsock_create);
+>  
+> -static void __vsock_release(struct sock *sk)
+> +static void __vsock_release(struct sock *sk, int level)
+>  {
+>  	if (sk) {
+>  		struct sk_buff *skb;
+> @@ -648,9 +648,17 @@ static void __vsock_release(struct sock *sk)
+>  		vsk = vsock_sk(sk);
+>  		pending = NULL;	/* Compiler warning. */
+>  
+> +		/* The release call is supposed to use lock_sock_nested()
+> +		 * rather than lock_sock(), if a sock lock should be acquired.
+> +		 */
+>  		transport->release(vsk);
+>  
+> -		lock_sock(sk);
+> +		/* When "level" is SINGLE_DEPTH_NESTING, use the nested
+> +		 * version to avoid the warning "possible recursive locking
+> +		 * detected". When "level" is 0, lock_sock_nested(sk, level)
+> +		 * is the same as lock_sock(sk).
+> +		 */
+> +		lock_sock_nested(sk, level);
+>  		sock_orphan(sk);
+>  		sk->sk_shutdown = SHUTDOWN_MASK;
+>  
+> @@ -659,7 +667,7 @@ static void __vsock_release(struct sock *sk)
+>  
+>  		/* Clean up any sockets that never were accepted. */
+>  		while ((pending = vsock_dequeue_accept(sk)) != NULL) {
+> -			__vsock_release(pending);
+> +			__vsock_release(pending, SINGLE_DEPTH_NESTING);
+>  			sock_put(pending);
+>  		}
+>  
+> @@ -708,7 +716,7 @@ EXPORT_SYMBOL_GPL(vsock_stream_has_space);
+>  
+>  static int vsock_release(struct socket *sock)
+>  {
+> -	__vsock_release(sock->sk);
+> +	__vsock_release(sock->sk, 0);
+>  	sock->sk = NULL;
+>  	sock->state = SS_FREE;
+>  
+> diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> index 261521d286d6..c443db7af8d4 100644
+> --- a/net/vmw_vsock/hyperv_transport.c
+> +++ b/net/vmw_vsock/hyperv_transport.c
+> @@ -559,7 +559,7 @@ static void hvs_release(struct vsock_sock *vsk)
+>  	struct sock *sk = sk_vsock(vsk);
+>  	bool remove_sock;
+>  
+> -	lock_sock(sk);
+> +	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+>  	remove_sock = hvs_close_lock_held(vsk);
+>  	release_sock(sk);
+>  	if (remove_sock)
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 5bb70c692b1e..a666ef8fc54e 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -820,7 +820,7 @@ void virtio_transport_release(struct vsock_sock *vsk)
+>  	struct sock *sk = &vsk->sk;
+>  	bool remove_sock = true;
+>  
+> -	lock_sock(sk);
+> +	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+>  	if (sk->sk_type == SOCK_STREAM)
+>  		remove_sock = virtio_transport_close(vsk);
+>  
+> -- 
+> 2.19.1
+> 
 
-url:    https://github.com/0day-ci/linux/commits/Like-Xu/perf-core-Provide-a-kernel-internal-interface-to-recalibrate-event-period/20191001-081543
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
-config: sh-rsk7269_defconfig (attached as .config)
-compiler: sh4-linux-gcc (GCC) 7.4.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # save the attached .config to linux build tree
-        GCC_VERSION=7.4.0 make.cross ARCH=sh 
-
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   kernel/events/core.o: In function `_perf_ioctl':
->> core.c:(.text+0x7068): undefined reference to `__get_user_unknown'
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
-
---jy3aobxgdk453czl
-Content-Type: application/gzip
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
-
-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
-
---jy3aobxgdk453czl--
+-- 
