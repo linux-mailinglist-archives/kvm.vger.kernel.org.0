@@ -2,126 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53EDDC92C6
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 22:10:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D160C931F
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 22:58:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726364AbfJBUKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 16:10:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51530 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726034AbfJBUKX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 16:10:23 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 30ADC5945B
-        for <kvm@vger.kernel.org>; Wed,  2 Oct 2019 20:10:23 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id w10so45085wrl.5
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 13:10:23 -0700 (PDT)
+        id S1728918AbfJBU6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 16:58:06 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34333 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728894AbfJBU6D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Oct 2019 16:58:03 -0400
+Received: by mail-io1-f67.google.com with SMTP id q1so612243ion.1
+        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 13:58:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mxH4ymsGMb4jOpypYiX3Ngcl2ReJUcFD+OtXu9cpO30=;
+        b=Zb7ukMZDW3GVvpTCDpYW5lmOKDSHHWjljNPsTm+oq5S0HxsYLJcaqMCDnQlb/twjub
+         7QRJWuVWopM4Q9UWBp/G+dGWBByImCUEarWQYpMH2N0GyPAEmeVnmq8M3APWN0rNbIA7
+         OqzIA74SRLchR5auxdp0tZeBvOqKbw7sVmrM12w1FkUgv89vQkuUlav91g9qLzIC6wke
+         yWmYYPAMJESjpwdfALypK03bjosTQV08LeSXMhcZjj/OTbVIqkLHX7OMiGYlD3WSAZtf
+         KvDyqKWeGp8mp2N4uOh83Bzh9CvjP7MqUWC1Vf57Mclaly/Dycb4aqy8ptYzjvIqJ4zc
+         mRqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ECzmcjCSbbcsFSzX1mjy2hRL/7INCALmJsVRlbIqA+M=;
-        b=BCDrjYY+PB7MaRtomR66swUo312Csh7XA6SZ6musdpyiqf+gL58eNEoMRxx2Kte1vM
-         pA+Xa4xx709wcuaIAiqXaHTK6nA1lvucWVwhunsXmyJ0oH50n/wv96LVoaETIxo8ylca
-         0DjD/SBObn1HXXC2hYjbqrBTb/wvTSfQgF9p+eIulaI5S25p2jM7bBwLp7ojJAa8AFdV
-         gxMrPbRmOdp72XcjiantduvyJcMw++Kt3l+sJ6jnI59oW8b4dfa7KJDxh1eADPgqjz2K
-         r2UtWJlVKkxUzX4DPhOHRzwDk0MZB3nFkk31jYYQ/VsRz2QsJGI1B8y4erDrmjkNv/cS
-         MQ5g==
-X-Gm-Message-State: APjAAAUVPEobcNS4xdfO6cjL0P6EfCm3EGYpq+Z+ikD8J9O41qtMGFsU
-        69Dervn2PploO1XYOzjjncr+pcbvxQj+uCWts0ZyNrQtrRjASfF6t/4aJPHwR7TEJHqOHzXpysn
-        AqUTsH82vAPU5
-X-Received: by 2002:a5d:5185:: with SMTP id k5mr4309021wrv.341.1570047021834;
-        Wed, 02 Oct 2019 13:10:21 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwCrWt+T8lq0j3jrbvKKSdlpqYZ0reHvLDTlwAHJf9pBgzMN4snDZo/L2kojw/X0EwObK+tMQ==
-X-Received: by 2002:a5d:5185:: with SMTP id k5mr4309009wrv.341.1570047021557;
-        Wed, 02 Oct 2019 13:10:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e56d:fbdf:8b79:c79c? ([2001:b07:6468:f312:e56d:fbdf:8b79:c79c])
-        by smtp.gmail.com with ESMTPSA id 94sm642951wrk.92.2019.10.02.13.10.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Oct 2019 13:10:20 -0700 (PDT)
-Subject: Re: DANGER WILL ROBINSON, DANGER
-To:     Jerome Glisse <jglisse@redhat.com>
-Cc:     Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>,
-        =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        =?UTF-8?Q?Samuel_Laur=c3=a9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        Yu C <yu.c.zhang@intel.com>,
-        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
-References: <20190815191929.GA9253@redhat.com>
- <20190815201630.GA25517@redhat.com>
- <VI1PR02MB398411CA9A56081FF4D1248EBBA40@VI1PR02MB3984.eurprd02.prod.outlook.com>
- <20190905180955.GA3251@redhat.com>
- <5b0966de-b690-fb7b-5a72-bc7906459168@redhat.com>
- <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
- <20191002192714.GA5020@redhat.com>
- <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
- <20191002141542.GA5669@redhat.com>
- <f26710a4-424f-730c-a676-901bae451409@redhat.com>
- <20191002170429.GA8189@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <dd0ca0d3-f502-78a1-933a-7e1b5fb90baa@redhat.com>
-Date:   Wed, 2 Oct 2019 22:10:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mxH4ymsGMb4jOpypYiX3Ngcl2ReJUcFD+OtXu9cpO30=;
+        b=lpRh7V4WntZW1lRSvQbg21Q8cTK3lfLN/vzaJcx+V5HW5QZpoRd7RIvj5rvWmtH6Y9
+         YR0gt6XkwgQMviWsA2BPnTcwXmro9YJRLBlAuvlelwNukyH9y0r6rFlaxhChJWSb2yu0
+         6nGcD8dYHikuWuFfKpQoag5iIMBtcHxtd2lGPcFHvjPsJ/kP9sw54ZdTI+DXWSK+ZTBZ
+         bwX2ouq38anNCew/PY65RxDRSQcacsC6N/L+hHQbB07g+mRbF0cgB1PP/lZoUxuBY16r
+         qMpn1RbYciaxL1Jzj87s/EskesDmr2BeVDvgYyTMUGbL+QdMLokRZh5ZNDNnpRE76dAX
+         K1Cw==
+X-Gm-Message-State: APjAAAUSlJCZOjmMZCzIRM3mBd5wE2XZZBUPobfFxLTMV4wiYaOqa30v
+        2uEHpVtq4hNX/ZIfTM2dcnQ4UZjW6d6dTcX/9IshnwJHcTE=
+X-Google-Smtp-Source: APXvYqxTRTIwYH44WcXiALssV8QMLilhWTytjwXm9GXdcjbXaUQbGPn9KB0oaZ6gd6fOKVTGVQL0SLlZStUSjNvsn4s=
+X-Received: by 2002:a6b:9085:: with SMTP id s127mr5338252iod.26.1570049882086;
+ Wed, 02 Oct 2019 13:58:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191002170429.GA8189@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190927021927.23057-1-weijiang.yang@intel.com> <20190927021927.23057-8-weijiang.yang@intel.com>
+In-Reply-To: <20190927021927.23057-8-weijiang.yang@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 2 Oct 2019 13:57:50 -0700
+Message-ID: <CALMp9eQNDNmmCr8DM-2fMVYvQ-eTEpeE=bW8+BLbfxmBsTmQvg@mail.gmail.com>
+Subject: Re: [PATCH v7 7/7] KVM: x86: Add user-space access interface for CET MSRs
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/10/19 19:04, Jerome Glisse wrote:
-> On Wed, Oct 02, 2019 at 06:18:06PM +0200, Paolo Bonzini wrote:
->>>> If the mapping of the source VMA changes, mirroring can update the
->>>> target VMA via insert_pfn.  But what ensures that KVM's MMU notifier
->>>> dismantles its own existing page tables (so that they can be recreated
->>>> with the new mapping from the source VMA)?
->>
->> The KVM inspector process is also (or can be) a QEMU that will have to
->> create its own KVM guest page table.  So if a page in the source VMA is
->> unmapped we want:
->>
->> - the source KVM to invalidate its guest page table (done by the KVM MMU
->> notifier)
->>
->> - the target VMA to be invalidated (easy using mirroring)
->>
->> - the target KVM to invalidate its guest page table, as a result of
->> invalidation of the target VMA
-> 
-> You can do the target KVM invalidation inside the mirroring invalidation
-> code.
+On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
+>
+> There're two different places storing Guest CET states, the states
+> managed with XSAVES/XRSTORS, as restored/saved
+> in previous patch, can be read/write directly from/to the MSRs.
+> For those stored in VMCS fields, they're access via vmcs_read/
+> vmcs_write.
+>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 83 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 83 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 44913e4ab558..5265db7cd2af 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1671,6 +1671,49 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+>         return 0;
+>  }
+>
+> +static int check_cet_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 
-Why should the source and target KVMs behave differently?  If the source
-invalidates its guest page table via MMU notifiers, so should the target.
+I'd suggest changing return type to bool, since you are essentially
+returning true or false.
 
-The KVM MMU notifier exists so that nothing (including mirroring) needs
-to know that there is KVM on the other side.  Any interaction between
-KVM page tables and VMAs must be mediated by MMU notifiers, anything
-else is unacceptable.
-
-If it is possible to invoke the MMU notifiers around the calls to
-insert_pfn, that of course would be perfect.
-
-Thanks,
-
-Paolo
+> +{
+> +       u64 kvm_xss = kvm_supported_xss();
+> +
+> +       switch (msr_info->index) {
+> +       case MSR_IA32_PL0_SSP ... MSR_IA32_PL2_SSP:
+> +               if (!(kvm_xss | XFEATURE_MASK_CET_KERNEL))
+'|' should be '&'
+> +                       return 1;
+> +               if (!msr_info->host_initiated &&
+> +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
+> +                       return 1;
+> +               break;
+> +       case MSR_IA32_PL3_SSP:
+> +               if (!(kvm_xss | XFEATURE_MASK_CET_USER))
+'|' should be '&'
+> +                       return 1;
+> +               if (!msr_info->host_initiated &&
+> +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
+> +                       return 1;
+> +               break;
+> +       case MSR_IA32_U_CET:
+> +               if (!(kvm_xss | XFEATURE_MASK_CET_USER))
+'|' should be '&'
+> +                       return 1;
+> +               if (!msr_info->host_initiated &&
+> +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
+> +                   !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
+> +                       return 1;
+> +               break;
+> +       case MSR_IA32_S_CET:
+> +               if (!msr_info->host_initiated &&
+> +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
+> +                   !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
+> +                       return 1;
+> +               break;
+> +       case MSR_IA32_INT_SSP_TAB:
+> +               if (!msr_info->host_initiated &&
+> +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
+> +                       return 1;
+> +               break;
+> +       default:
+> +               return 1;
+> +       }
+> +       return 0;
+> +}
+>  /*
+>   * Reads an msr value (of 'msr_index') into 'pdata'.
+>   * Returns 0 on success, non-0 otherwise.
+> @@ -1788,6 +1831,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>                 else
+>                         msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>                 break;
+> +       case MSR_IA32_S_CET:
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+> +               msr_info->data = vmcs_readl(GUEST_S_CET);
+Have we ensured that this VMCS field exists?
+> +               break;
+> +       case MSR_IA32_INT_SSP_TAB:
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+> +               msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
+Have we ensured that this VMCS field exists?
+> +               break;
+> +       case MSR_IA32_U_CET:
+Can this be lumped together with MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP, below?
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+> +               rdmsrl(MSR_IA32_U_CET, msr_info->data);
+> +               break;
+> +       case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+> +               rdmsrl(msr_info->index, msr_info->data);
+> +               break;
+>         case MSR_TSC_AUX:
+>                 if (!msr_info->host_initiated &&
+>                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+> @@ -2039,6 +2102,26 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>                 else
+>                         vmx->pt_desc.guest.addr_a[index / 2] = data;
+>                 break;
+> +       case MSR_IA32_S_CET:
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+Bits 9:6 must be zero.
+> +               vmcs_writel(GUEST_S_CET, data);
+Have we ensured that this VMCS field exists?
+> +               break;
+> +       case MSR_IA32_INT_SSP_TAB:
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+Must be canonical. vCPU must support longmode.
+> +               vmcs_writel(GUEST_INTR_SSP_TABLE, data);
+Have we ensured that this VMCS field exists?
+> +               break;
+> +       case MSR_IA32_U_CET:
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+Bits 9:6 must be zero.
+> +               wrmsrl(MSR_IA32_U_CET, data);
+> +               break;
+> +       case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> +               if (check_cet_msr(vcpu, msr_info))
+> +                       return 1;
+'Data' must be canonical and 4-byte aligned. High dword must be zero
+on vCPUs that don't support longmode.
+> +               wrmsrl(msr_info->index, data);
+> +               break;
+>         case MSR_TSC_AUX:
+>                 if (!msr_info->host_initiated &&
+>                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+> --
+> 2.17.2
+>
