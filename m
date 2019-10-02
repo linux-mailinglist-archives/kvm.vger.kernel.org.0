@@ -2,122 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E6A6C8AB5
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 16:17:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED056C8B23
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 16:26:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727762AbfJBORJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 10:17:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49720 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727210AbfJBORJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 10:17:09 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 444F269089;
-        Wed,  2 Oct 2019 14:17:08 +0000 (UTC)
-Received: from redhat.com (ovpn-112-19.rdu2.redhat.com [10.10.112.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 79E37600CE;
-        Wed,  2 Oct 2019 14:16:58 +0000 (UTC)
-Date:   Wed, 2 Oct 2019 10:15:42 -0400
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>,
-        Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        Yu C <yu.c.zhang@intel.com>,
-        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
-Subject: Re: DANGER WILL ROBINSON, DANGER
-Message-ID: <20191002141542.GA5669@redhat.com>
-References: <20190809162444.GP5482@bombadil.infradead.org>
- <1565694095.D172a51.28640.@15f23d3a749365d981e968181cce585d2dcb3ffa>
- <20190815191929.GA9253@redhat.com>
- <20190815201630.GA25517@redhat.com>
- <VI1PR02MB398411CA9A56081FF4D1248EBBA40@VI1PR02MB3984.eurprd02.prod.outlook.com>
- <20190905180955.GA3251@redhat.com>
- <5b0966de-b690-fb7b-5a72-bc7906459168@redhat.com>
- <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
- <20191002192714.GA5020@redhat.com>
- <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
+        id S1727536AbfJBO0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 10:26:04 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:32852 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbfJBO0E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Oct 2019 10:26:04 -0400
+Received: by mail-io1-f65.google.com with SMTP id z19so57447935ior.0;
+        Wed, 02 Oct 2019 07:26:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=EZDH5fmtx84N/FA2DzFvaaolbsd+J9iBLD5hVgfYHUw=;
+        b=gaKYdTskfQ4v6HYIY+JvWXJsfXYA5zEifd8viqarIpymnW5yClMh0TTueb5O9TJG4m
+         B4QdL+HrLreSVUqjQM1wMDWrtcoRcIQdzm9s4uOJ6O8+aodZNqtfNr0U917vdd29+i18
+         XveTai6RxBsHly9KdDHGuPCP5nBf4N+N5RB9QHC5lleZy18zbCvSXsyjUsSfPpyGM3dZ
+         5TufF5sE+8fWpAoQys1SlsYwU/5FSsL2Jc/WwmFszl2VDaUUbY/9zAJzFCLZ5IhGrmh6
+         SbHwWwVAQfPM5sJcQmKKRAzZSROPb9rjpSn0eOgJ56DHcWs1GZzWmp85ZSV9EOiyx8tC
+         PRfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EZDH5fmtx84N/FA2DzFvaaolbsd+J9iBLD5hVgfYHUw=;
+        b=DIJvy2MMC2++U4u/mcZDxr9K7iKMy11wGTH/0nYJzYqfDDjkeP3yx6scAtsqEc5Bln
+         lO9wILYmhMLxdklW89s9WPsshgxGf9eBrej48Hh7Fp04DBccybr6uvVWzXre6lF9dS0k
+         4qQ2z68GSFCRmy3oQpCkhZv7IefS95rFJR+iDxtpBUqXpd9vTOCFVH5QZTUH4afT3iM5
+         eCPau4TJr2qTDMQt56Fp1nNRnrOUVzyWhFtUGxEvRsp7lK8Y8ejxX5K3K7KBxVvVUxPX
+         NUQ6c3uiWCrTMjj7M4XpiU62jaaxqI2B1JbPervUlmIFP2CbA3WVHlKiG9oBXBCJB5jl
+         VqZg==
+X-Gm-Message-State: APjAAAVSEQyZq73alSNK3qSCuFQ91EsYpGxtd3O3btNASAkisyNf8+4Z
+        Pk9er09yySV16a6HumSUQUtzXmvmNn0U6eJCyuY=
+X-Google-Smtp-Source: APXvYqwSvKuEL2HXaM2JPuO0AJ2TQbqnKScQq+YdzwN3RcglXqDUiH+8EcSdOBI+TqWjYK7nwQrpsxBsXYuWUhCs3y4=
+X-Received: by 2002:a02:8502:: with SMTP id g2mr1532070jai.87.1570026362893;
+ Wed, 02 Oct 2019 07:26:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 02 Oct 2019 14:17:08 +0000 (UTC)
+References: <20191001152441.27008.99285.stgit@localhost.localdomain>
+ <7233498c-2f64-d661-4981-707b59c78fd5@redhat.com> <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
+ <8bd303a6-6e50-b2dc-19ab-4c3f176c4b02@redhat.com> <CAKgT0Uf37xAFK2CWqUZJgn7bWznSAi6qncLxBpC55oSpBMG1HQ@mail.gmail.com>
+ <c06b68cb-5e94-ae3e-f84e-48087d675a8f@redhat.com>
+In-Reply-To: <c06b68cb-5e94-ae3e-f84e-48087d675a8f@redhat.com>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Wed, 2 Oct 2019 07:25:50 -0700
+Message-ID: <CAKgT0Ud6TT=XxqFx6ePHzbUYqMp5FHVPozRvnNZK3tKV7j2xjg@mail.gmail.com>
+Subject: Re: [PATCH v11 0/6] mm / virtio: Provide support for unused page reporting
+To:     Nitesh Narayan Lal <nitesh@redhat.com>
+Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 03:46:30PM +0200, Paolo Bonzini wrote:
-> On 02/10/19 21:27, Jerome Glisse wrote:
-> > On Tue, Sep 10, 2019 at 07:49:51AM +0000, Mircea CIRJALIU - MELIU wrote:
-> >>> On 05/09/19 20:09, Jerome Glisse wrote:
-> >>>> Not sure i understand, you are saying that the solution i outline
-> >>>> above does not work ? If so then i think you are wrong, in the above
-> >>>> solution the importing process mmap a device file and the resulting
-> >>>> vma is then populated using insert_pfn() and constantly keep
-> >>>> synchronize with the target process through mirroring which means that
-> >>>> you never have to look at the struct page ... you can mirror any kind
-> >>>> of memory from the remote process.
-> >>>
-> >>> If insert_pfn in turn calls MMU notifiers for the target VMA (which would be
-> >>> the KVM MMU notifier), then that would work.  Though I guess it would be
-> >>> possible to call MMU notifier update callbacks around the call to insert_pfn.
+On Wed, Oct 2, 2019 at 3:37 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+>
+>
+> On 10/1/19 8:55 PM, Alexander Duyck wrote:
+> > On Tue, Oct 1, 2019 at 12:16 PM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
 > >>
-> >> Can't do that.
-> >> First, insert_pfn() uses set_pte_at() which won't trigger the MMU notifier on
-> >> the target VMA. It's also static, so I'll have to access it thru vmf_insert_pfn()
-> >> or vmf_insert_mixed().
-> > 
-> > Why would you need to target mmu notifier on target vma ?
-> 
-> If the mapping of the source VMA changes, mirroring can update the
-> target VMA via insert_pfn.  But what ensures that KVM's MMU notifier
-> dismantles its own existing page tables (so that they can be recreated
-> with the new mapping from the source VMA)?
-> 
+> >> On 10/1/19 12:21 PM, Alexander Duyck wrote:
+> >>> On Tue, 2019-10-01 at 17:35 +0200, David Hildenbrand wrote:
+> >>>> On 01.10.19 17:29, Alexander Duyck wrote:
 
-So just to make sure i follow we have:
-      - qemu process on host with anonymous vma
-            -> host cpu page table
-      - kvm which maps host anonymous vma to guest
-            -> kvm guest page table
-      - kvm inspector process which mirror vma from qemu process
-            -> inspector process page table
+<snip>
 
-AFAIK the KVM notifier's will clear the kvm guest page table whenever
-necessary (through kvm_mmu_notifier_invalidate_range_start). This is
-what ensure that KVM's dismatles its own mapping, it abides to mmu-
-notifier callbacks. If you did not you would have bugs (at least i
-expect so). Am i wrong here ?
+> >>> Do we have a working patch set for Nitesh's code? The last time I tried
+> >>> running his patch set I ran into issues with kernel panics. If we have a
+> >>> known working/stable patch set I can give it a try.
+> >> Did you try the v12 patch-set [1]?
+> >> I remember that you reported the CPU stall issue, which I fixed in the v12.
+> >>
+> >> [1] https://lkml.org/lkml/2019/8/12/593
+> > So I tried testing with the spin_lock calls replaced with spin_lock
+> > _irq to resolve the IRQ issue. I also had shuffle enabled in order to
+> > increase the number of pages being dirtied.
+> >
+> > With that setup the bitmap approach is running significantly worse
+> > then my approach, even with the boundary removed. Since I had to
+> > modify the code to even getting working I am not comfortable posting
+> > numbers.
+>
+> I didn't face any issue in getting the code work or compile.
+> Before my v12 posting, I did try your previously suggested test
+> (will-it-scale/page_fault1 for 12 hours on a 60 GB) and didn't see any issues.
+> I think it would help more if you can share the setup which you are running.
 
-The mirroring kernel driver would also register the notifier against
-the quemu process and would also abide to notifier callbacks.
+So one issue with the standard page_fault1 is that it is only
+operating at the 4K page level. You won't see much impact from you
+patches with that as the overhead of splitting a MAX_ORDER - 2 page
+down to a 4K page will end up being the biggest thing you are
+benchmarking.
 
-What you want to maintain at all times is that none of the actors
-above ever look at different page for the same virtual address (ie
-one looking at older page while another look at new page).
+I think I have brought it up before but I am running with the
+page_fault1 modified to use THP. Making the change is pretty
+straightforward as  all you have to do is add an madvise to the test
+code. All that is needed is to add "madvise(c, MEMSIZE,
+MADV_HUGEPAGE);" between the assert and the for loop in the
+page_fault1 code and then rebuild the test. I actually copied
+page_fault1.c into a file I named page_fault4.c and added the line. As
+a result it seems like the code will build it as an additional test.
 
-This is where you have helper like HMM that make sure that you can
-not populate the mirroring vma while a notifier is on going. Which
-means that everything is serialize on the notifier.
+The only other alteration I can think of that might have much impact
+would be to enable the page shuffling. The idea is that it will cause
+us to use more pages because half of the pages freed are dumped to the
+tail of the list so we are constantly churning the memory.
 
-Cheers,
-Jérôme
+> > My suggestion would be to look at reworking the patch set and
+> > post numbers for my patch set versus the bitmap approach and we can
+> > look at them then.
+>
+> Agreed. However, in order to fix an issue I have to reproduce it first.
+
+With the tweak I have suggested above it should make it much easier to
+reproduce. Basically all you need is to have the allocation competing
+against hinting. Currently the hinting isn't doing this because the
+allocations are mostly coming out of 4K pages instead of higher order
+ones.
+
+Alternatively you could just make the suggestion I had proposed about
+using spin_lock/unlock_irq in your worker thread and that resolved it
+for me.
+
+> >  I would prefer not to spend my time fixing and
+> > tuning a patch set that I am still not convinced is viable.
+>
+> You  don't have to, I can fix the issues in my patch-set. :)
+
+Sounds good. Hopefully the stuff I pointed out above helps you to get
+a reproduction and resolve the issues.
+
+- Alex
