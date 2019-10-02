@@ -2,101 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 608BAC946A
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 00:40:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 571E6C9494
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 01:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726778AbfJBWkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 18:40:33 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:42603 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725799AbfJBWkc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 18:40:32 -0400
-Received: by mail-io1-f68.google.com with SMTP id n197so1036216iod.9
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 15:40:32 -0700 (PDT)
+        id S1728140AbfJBXDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 19:03:47 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38299 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727976AbfJBXDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Oct 2019 19:03:46 -0400
+Received: by mail-io1-f66.google.com with SMTP id u8so1200030iom.5
+        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 16:03:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CG5MaVf3Z1KMAMKeFQh1uIBejZ3JM9SIEVivV/4xQBs=;
-        b=jevIKBjdKR1V3mLIz/l+pm0we5gJPbhgRbQ8X2bodPtCvQPufCir6WG5aChHXEJ6fe
-         3yWu3+OYym7avxh6BJR7ggpqxsllyCM/3wqEa+i9gzUS37dQ2dgxjpW5RYbZ1+z0uQWv
-         lSX5TRjUu8YVIDO+w6q3Qjbw9yY7sEqXpFLGddwA0E4cZ/cspfeX+jhV+DVm3xDIoodz
-         ki1rOn1RktdVUzlBZUwkIIiXkf4lThlSpI+VWAcncYLlLhAjaDdXVB8E1eCCBtZtPagn
-         P/leRFNJaY/E3FvbeAu/j6dl6F4b/T/5w469bFAEnPGTE+CGvPVKfrSaJJpgA3ALoY/3
-         Bkfw==
+        d=linuxfoundation.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oV/9b2AKj59V2uwPpS7RJHBFX/8QSHfj0AU6FMbpQCA=;
+        b=dK+p1sIqIAJ8RGyefAphtb6lEwlpOLd/UkICw4usv/JjWR6t1kHw7a+p1pq3Qsqkj9
+         URSJmGJkWDsHaeuLD2TGa7MWq+2juzA/OirywcxzN3IXLaSzy7LVKAXYH0Q+B54Ejfr4
+         6PWic2A87QP2n0FYWCnFub7PPs/KIdmW0Lp+A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CG5MaVf3Z1KMAMKeFQh1uIBejZ3JM9SIEVivV/4xQBs=;
-        b=C0L5rlzL9Oh1yRK/oXwXlrVfAt6PyyfrH2fpi1KtwCEyh6pc/IOwOxldxyY/3CQqDk
-         fNRz3rGQdNo/QjFY779ktuEVet4iuL10nBRC6LQggHMVkUrUIzIFQs7e2LEBzcnFDIWF
-         lyYZ9XY8592B0x3NBW+70mIIVYozRIsKaURRmVFLMqk//VxeG+XIPDtTzpBMQMQrXPAd
-         3ng6HZKF9Dzm+LBqakqaGudreh37ZCh2e5ePj3AHAY30UC61/Dur2mt8AGYnJPUAuIpq
-         V76FncTi/t1HSJlEuijhRJwvlZDVh4MVsYWuSsTpxvlseaUjYJshJIpObhSX8D/dyJIN
-         9Klg==
-X-Gm-Message-State: APjAAAUyu+kVXai5ybpJ1Yg+gPSXlJJFXZ5Sv0s71Pfqmcn8uJX69Bjc
-        luZp0H2nMOpFmmto411LbiWVQuz5i23cQEX6m07/RA==
-X-Google-Smtp-Source: APXvYqxlvrft8PEQmQKVcpj60hnbSIn5b3Wo5J8M0jMa3GanhZRFjB1WSH0wkNjSHkd0UvAXHVDf9v7GCXI8D7jkHl4=
-X-Received: by 2002:a6b:9085:: with SMTP id s127mr5757464iod.26.1570056031670;
- Wed, 02 Oct 2019 15:40:31 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oV/9b2AKj59V2uwPpS7RJHBFX/8QSHfj0AU6FMbpQCA=;
+        b=P8xPUELAtfsfXNeFH5sISf5laOuP6qhvlppf4Oyw7slVXAMJJrobD/BJwNBXRUcMGl
+         eGkldRL9IJZUpn7C/kQMiRJ1rTxtIDYpBsuByncKbcMk3zGu3GpoUI6tbstGd4MSXMkg
+         ylSW2xe5BZPCxWDK8RXYVFUAjMguEa8DTpv1tndfST7KkJ0r0iZzei1UpmFY6fhqtZrC
+         jLkzrI6ySTh3tHSlNhcDkxQE5nauhGbYMW54rhcrOwXHMAxdMPZsq7XlEbVuL8/vytgF
+         /fPKhDNQHpYVlM05DOcAi47VOrKL/RmH45/UOKeDLM1OXRbLl2+rv6V7G/JGYl+8Kxzk
+         BjHw==
+X-Gm-Message-State: APjAAAVNx10ccANcx4o+Dc7d17XrmyxHslcAyTP2VdVgE6uGQPJ3/DHQ
+        e2BE4XcdGbN20meZn8pebSoj0A==
+X-Google-Smtp-Source: APXvYqygZWjkzv74/ZqaLQIipRxpUSbpqKXqXE5cRKwBIa0D4JgiRCE/Hg8dKE+sssxzkBGZVNthGA==
+X-Received: by 2002:a92:b74f:: with SMTP id c15mr6837193ilm.43.1570057425858;
+        Wed, 02 Oct 2019 16:03:45 -0700 (PDT)
+Received: from shuah-t480s.internal (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
+        by smtp.gmail.com with ESMTPSA id 128sm212298iox.35.2019.10.02.16.03.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Oct 2019 16:03:45 -0700 (PDT)
+From:   Shuah Khan <skhan@linuxfoundation.org>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, shuah@kernel.org
+Cc:     Shuah Khan <skhan@linuxfoundation.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] selftests: kvm: Fix libkvm build error
+Date:   Wed,  2 Oct 2019 17:03:43 -0600
+Message-Id: <20191002230343.5243-1-skhan@linuxfoundation.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190927021927.23057-1-weijiang.yang@intel.com>
-In-Reply-To: <20190927021927.23057-1-weijiang.yang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 2 Oct 2019 15:40:20 -0700
-Message-ID: <CALMp9eQ13Lve+9+61qCF1-7mQkeLLnhDufd-geKtz=34+YJdEg@mail.gmail.com>
-Subject: Re: [PATCH v7 0/7] Introduce support for Guest CET feature
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
->
-> Control-flow Enforcement Technology (CET) provides protection against
-> Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
-> sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
->
-> KVM modification is required to support Guest CET feature.
-> This patch serial implemented CET related CPUID/XSAVES enumeration, MSRs
-> and VMEntry configuration etc.so that Guest kernel can setup CET
-> runtime infrastructure based on them. Some MSRs and related feature
-> flags used in the patches reference the definitions in kernel patch.
+Fix the following build error from "make TARGETS=kvm kselftest":
 
-I am still trying to make my way through the 358 page (!) spec for
-this feature, but I already have some questions/comments about this
-series:
+libkvm.a(assert.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be used when making a PIE object; recompile with -fPIC
 
-1. Does CET "just work" with shadow paging? Shadow paging knows
-nothing about "shadow-stack pages," and it's not clear to me how
-shadow-stack pages will interact with dirty tracking.
-2. I see non-trivial changes to task switch under CET. Does
-emulator_do_task_switch need to be updated?
-3. What about all of the emulator routines that emulate control
-transfers (e.g. em_jmp_{far,abs}, em_call_(near_abs,far},
-em_ret_{far,far_imm,near_imm}, etc)? Don't these have to be modified
-to work correctly when CR4.CET is set?
-4. You don't use the new "enable supervisor shadow stack control" bit
-in the EPTP. I assume that this is entirely optional, right?
-5. I think the easiest way to handle the nested issue (rather than
-your explicit check for vmxon when setting CR4.CET when the vCPU is in
-VMX operation) is just to leave CR4.CET out of IA32_VMX_CR4_FIXED1
-(which is already the case).
-6. The function, exception_class(), in x86.c, should be updated to
-categorize #CP as contributory.
-7. The function, x86_exception_has_error_code(), in x86.h, should be
-updated to include #CP.
-8. There appear to be multiple changes to SMM that you haven't
-implemented (e.g saving/restoring the SSP registers in/from SMRAM.
+This error is seen when build is done from the main Makefile using
+kselftest target. In this case KBUILD_CPPFLAGS and CC_OPTION_CFLAGS
+are defined. When build is invoked using:
 
-CET is quite complex. Without any tests, I don't see how you can have
-any confidence in the correctness of this patch series.
+"make -C tools/testing/selftests/kvm" KBUILD_CPPFLAGS and CC_OPTION_CFLAGS
+aren't defined.
+
+There is no need to pass in KBUILD_CPPFLAGS and CC_OPTION_CFLAGS for the
+check to determine if --no-pie is necessary1s, which is the when these
+two aren't defined when "make -C tools/testing/selftests/kvm" runs.
+
+Fix it by simplifying the no-pie-option logic. With this change, bith
+build variations work.
+
+"make TARGETS=kvm kselftest"
+"make -C tools/testing/selftests/kvm"
+
+Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+---
+ tools/testing/selftests/kvm/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 62c591f87dab..02d20aab9440 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -48,8 +48,9 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+ 	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(UNAME_M) -I..
+ 
+ no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
+-        $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
++        $(CC) -Werror -no-pie -x c - -o "$$TMP", -no-pie)
+ 
++#
+ # On s390, build the testcases KVM-enabled
+ pgste-option = $(call try-run, echo 'int main() { return 0; }' | \
+ 	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
+-- 
+2.20.1
+
