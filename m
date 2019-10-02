@@ -2,237 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A37C7C868C
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 12:45:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B726AC8691
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 12:45:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728010AbfJBKpO convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 2 Oct 2019 06:45:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34566 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725851AbfJBKpO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 06:45:14 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8F56D30860BD;
-        Wed,  2 Oct 2019 10:45:13 +0000 (UTC)
-Received: from [10.40.204.213] (ovpn-204-213.brq.redhat.com [10.40.204.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4460E5C226;
-        Wed,  2 Oct 2019 10:44:51 +0000 (UTC)
-Subject: Re: [PATCH v11 0/6] mm / virtio: Provide support for unused page
- reporting
+        id S1728063AbfJBKpp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 06:45:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39250 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725851AbfJBKpo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Oct 2019 06:45:44 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x92Afhfu113790
+        for <kvm@vger.kernel.org>; Wed, 2 Oct 2019 06:45:43 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vcs0atrvg-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 06:45:43 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Wed, 2 Oct 2019 11:45:41 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 2 Oct 2019 11:45:39 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x92AjcXe48562406
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Oct 2019 10:45:38 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5004CA4040;
+        Wed,  2 Oct 2019 10:45:38 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 213C6A4053;
+        Wed,  2 Oct 2019 10:45:38 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  2 Oct 2019 10:45:38 +0000 (GMT)
+Subject: Re: [PATCH] KVM: s390: Cleanup kvm_arch_init error path
 To:     David Hildenbrand <david@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Oscar Salvador <osalvador@suse.de>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>
-References: <20191001152441.27008.99285.stgit@localhost.localdomain>
- <7233498c-2f64-d661-4981-707b59c78fd5@redhat.com>
- <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
- <8bd303a6-6e50-b2dc-19ab-4c3f176c4b02@redhat.com>
- <CAKgT0Uf37xAFK2CWqUZJgn7bWznSAi6qncLxBpC55oSpBMG1HQ@mail.gmail.com>
- <0603ca4a-d667-f461-4ba7-ff3c0e9fd4df@redhat.com>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
+        Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org
+References: <20191002075627.3582-1-frankja@linux.ibm.com>
+ <b758d2ec-3857-9fe0-b9d3-a9b6e70b6d14@redhat.com>
+ <22a388be-a1e1-e57f-1677-18470ed09f65@redhat.com>
+ <48e9dab7-03be-9acc-836b-e9e2700ca260@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- VujM7c/b4pps
-Organization: Red Hat Inc,
-Message-ID: <020ef7af-dae7-4d57-bed8-1ce912d50c1d@redhat.com>
-Date:   Wed, 2 Oct 2019 06:44:48 -0400
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Wed, 2 Oct 2019 12:45:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <0603ca4a-d667-f461-4ba7-ff3c0e9fd4df@redhat.com>
+In-Reply-To: <48e9dab7-03be-9acc-836b-e9e2700ca260@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 02 Oct 2019 10:45:13 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19100210-0008-0000-0000-0000031D4997
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19100210-0009-0000-0000-00004A3C4C5D
+Message-Id: <f48dca29-d2c1-09bd-918c-755516b2f76e@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-02_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910020101
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 10/2/19 3:13 AM, David Hildenbrand wrote:
-> On 02.10.19 02:55, Alexander Duyck wrote:
->> On Tue, Oct 1, 2019 at 12:16 PM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
->>>
->>> On 10/1/19 12:21 PM, Alexander Duyck wrote:
->>>> On Tue, 2019-10-01 at 17:35 +0200, David Hildenbrand wrote:
->>>>> On 01.10.19 17:29, Alexander Duyck wrote:
->>>>>> This series provides an asynchronous means of reporting to a hypervisor
->>>>>> that a guest page is no longer in use and can have the data associated
->>>>>> with it dropped. To do this I have implemented functionality that allows
->>>>>> for what I am referring to as unused page reporting. The advantage of
->>>>>> unused page reporting is that we can support a significant amount of
->>>>>> memory over-commit with improved performance as we can avoid having to
->>>>>> write/read memory from swap as the VM will instead actively participate
->>>>>> in freeing unused memory so it doesn't have to be written.
->>>>>>
->>>>>> The functionality for this is fairly simple. When enabled it will allocate
->>>>>> statistics to track the number of reported pages in a given free area.
->>>>>> When the number of free pages exceeds this value plus a high water value,
->>>>>> currently 32, it will begin performing page reporting which consists of
->>>>>> pulling non-reported pages off of the free lists of a given zone and
->>>>>> placing them into a scatterlist. The scatterlist is then given to the page
->>>>>> reporting device and it will perform the required action to make the pages
->>>>>> "reported", in the case of virtio-balloon this results in the pages being
->>>>>> madvised as MADV_DONTNEED. After this they are placed back on their
->>>>>> original free list. If they are not merged in freeing an additional bit is
->>>>>> set indicating that they are a "reported" buddy page instead of a standard
->>>>>> buddy page. The cycle then repeats with additional non-reported pages
->>>>>> being pulled until the free areas all consist of reported pages.
->>>>>>
->>>>>> In order to try and keep the time needed to find a non-reported page to
->>>>>> a minimum we maintain a "reported_boundary" pointer. This pointer is used
->>>>>> by the get_unreported_pages iterator to determine at what point it should
->>>>>> resume searching for non-reported pages. In order to guarantee pages do
->>>>>> not get past the scan I have modified add_to_free_list_tail so that it
->>>>>> will not insert pages behind the reported_boundary. Doing this allows us
->>>>>> to keep the overhead to a minimum as re-walking the list without the
->>>>>> boundary will result in as much as 18% additional overhead on a 32G VM.
->>>>>>
->>>>>>
->>>> <snip>
+
+On 02.10.19 10:20, David Hildenbrand wrote:
+> On 02.10.19 10:07, Thomas Huth wrote:
+>> On 02/10/2019 10.01, David Hildenbrand wrote:
+>>> On 02.10.19 09:56, Janosch Frank wrote:
+>>>> Both kvm_s390_gib_destroy and debug_unregister test if the needed
+>>>> pointers are not NULL and hence can be called unconditionally.
 >>>>
->>>>>> As far as possible regressions I have focused on cases where performing
->>>>>> the hinting would be non-optimal, such as cases where the code isn't
->>>>>> needed as memory is not over-committed, or the functionality is not in
->>>>>> use. I have been using the will-it-scale/page_fault1 test running with 16
->>>>>> vcpus and have modified it to use Transparent Huge Pages. With this I see
->>>>>> almost no difference with the patches applied and the feature disabled.
->>>>>> Likewise I see almost no difference with the feature enabled, but the
->>>>>> madvise disabled in the hypervisor due to a device being assigned. With
->>>>>> the feature fully enabled in both guest and hypervisor I see a regression
->>>>>> between -1.86% and -8.84% versus the baseline. I found that most of the
->>>>>> overhead was due to the page faulting/zeroing that comes as a result of
->>>>>> the pages having been evicted from the guest.
->>>>> I think Michal asked for a performance comparison against Nitesh's
->>>>> approach, to evaluate if keeping the reported state + tracking inside
->>>>> the buddy is really worth it. Do you have any such numbers already? (or
->>>>> did my tired eyes miss them in this cover letter? :/)
->>>>>
->>>> I thought what Michal was asking for was what was the benefit of using the
->>>> boundary pointer. I added a bit up above and to the description for patch
->>>> 3 as on a 32G VM it adds up to about a 18% difference without factoring in
->>>> the page faulting and zeroing logic that occurs when we actually do the
->>>> madvise.
+>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>> ---
+>>>>  arch/s390/kvm/kvm-s390.c | 18 +++++++-----------
+>>>>  1 file changed, 7 insertions(+), 11 deletions(-)
 >>>>
->>>> Do we have a working patch set for Nitesh's code? The last time I tried
->>>> running his patch set I ran into issues with kernel panics. If we have a
->>>> known working/stable patch set I can give it a try.
->>> Did you try the v12 patch-set [1]?
->>> I remember that you reported the CPU stall issue, which I fixed in the v12.
+>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>> index 895fb2006c0d..66720d69cd24 100644
+>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>> @@ -458,16 +458,14 @@ static void kvm_s390_cpu_feat_init(void)
+>>>>  
+>>>>  int kvm_arch_init(void *opaque)
+>>>>  {
+>>>> -	int rc;
+>>>> +	int rc = -ENOMEM;
+>>>>  
+>>>>  	kvm_s390_dbf = debug_register("kvm-trace", 32, 1, 7 * sizeof(long));
+>>>>  	if (!kvm_s390_dbf)
+>>>>  		return -ENOMEM;
+>>>>  
+>>>> -	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view)) {
+>>>> -		rc = -ENOMEM;
+>>>> -		goto out_debug_unreg;
+>>>> -	}
+>>>> +	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view))
+>>>> +		goto out;
+>>>>  
+>>>>  	kvm_s390_cpu_feat_init();
+>>>>  
+>>>> @@ -475,19 +473,17 @@ int kvm_arch_init(void *opaque)
+>>>>  	rc = kvm_register_device_ops(&kvm_flic_ops, KVM_DEV_TYPE_FLIC);
+>>>>  	if (rc) {
+>>>>  		pr_err("A FLIC registration call failed with rc=%d\n", rc);
+>>>> -		goto out_debug_unreg;
+>>>> +		goto out;
+>>>>  	}
+>>>>  
+>>>>  	rc = kvm_s390_gib_init(GAL_ISC);
+>>>>  	if (rc)
+>>>> -		goto out_gib_destroy;
+>>>> +		goto out;
+>>>>  
+>>>>  	return 0;
+>>>>  
+>>>> -out_gib_destroy:
+>>>> -	kvm_s390_gib_destroy();
+>>>> -out_debug_unreg:
+>>>> -	debug_unregister(kvm_s390_dbf);
+>>>> +out:
+>>>> +	kvm_arch_exit();
+>>>>  	return rc;
+>>>>  }
 >>>
->>> [1] https://lkml.org/lkml/2019/8/12/593
->> So I tried testing with the spin_lock calls replaced with spin_lock
->> _irq to resolve the IRQ issue. I also had shuffle enabled in order to
->> increase the number of pages being dirtied.
+>>> Wonder why "debug_info_t *kvm_s390_dbf" is not declared as static.
 >>
->> With that setup the bitmap approach is running significantly worse
->> then my approach, even with the boundary removed. Since I had to
-> It would make sense to share the setup+benchmark+performance indication
-> that you measured. You don't have to share the actual numbers.
+>> Because it is used in the KVM_EVENT macro?
+> 
+> Ah, makes sense.
+> 
+>>
+>>> Instead of the two manual calls we could also call kvm_arch_exit().
+>>
+>> Huh, isn't that what this patch is doing here?
+> 
+> Lol, still tired and thought only the two labels would get removed. Even
+> better :)
 
-+1
+So I guess we should not take your Reviewed-by: then? ;-)
 
->
->> modify the code to even getting working I am not comfortable posting
->> numbers. My suggestion would be to look at reworking the patch set and
->> post numbers for my patch set versus the bitmap approach and we can
->> look at them then. I would prefer not to spend my time fixing and
->> tuning a patch set that I am still not convinced is viable.
-> I agree, I think Nitesh should work on his patch set and try to
-> reproduce what you are seeing.
-
-Sure.
-I am always open to suggestions of different benchmarks/setup
-where I can run my patch-set.
-
->
-> Also, I think to make a precise statement of "which overhead comes with
-> external tracking", Nitesh should switch to an approach (motivated by
-> Michal) like
->
-> 1. Sense lockless if a page is still free
-> 2. start_isolate_page_range()
-> -> Failed? Skip
-> 3. test_pages_isolated()
-> -> No? undo_isolate_page_range(), skip
-> 4. Repeat for multiple pages + report
-> 5. undo_isolate_page_range()
->
-> That is the bare minimum any external tracking will need = some overhead
-> for the tracking data. As a nice side effect, it get's rid of taking the
-> zone lock manually AFAIKS.
->
-> But that's unrelated to your series, only to quantify "how much" does
-> external tracking actually cost.
-
-Exactly, first, we need to be sure that the overhead caused by bitmap
-scanning is not significant. If we are fine with the approach, I will
-certainly look into this as this would be an excellent enhancement.
-
--- 
-Thanks
-Nitesh
+> 
+>>
+>> To me, the patch is looking fine, so
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>
+> 
+> 
 
