@@ -2,155 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B7F75C914C
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 21:05:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1875BC915C
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 21:08:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728921AbfJBTFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 15:05:36 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38424 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726076AbfJBTFg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 15:05:36 -0400
-Received: by mail-io1-f68.google.com with SMTP id u8so59476330iom.5
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 12:05:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lpb4WgkPmWUTkRVSpOHj/p+ZluKtlvnqbYlL5hWyYz0=;
-        b=I0kAE/IAXqqlKuq1P6lWWyONMkXidKiaRq0vFyU1CR3sSTsuoNUNFNVzWEgZdNCks/
-         M1eeyImGPXFnsqCic1v2LON7yy5UkzsIuoltIUEyZ5HgXA1C+rn4gcMjs1EZn+pZ+9qp
-         1+uHiIzsG+/fwvIcVLgAmYf7v1TwYYiwh2/B7msOLchuXLm22Wng/TvYdDCYP275SCAm
-         rSnQy1omR9td3DlSlHrZX0PxKNHlo423ZALzaBs0N6rXe2zW+/ehFPDSfbn15psPZc2h
-         poE6KLfF+YTAGQbsKh3gr0dwczURAt9GcmUH1e4jE+v+k2EXnuOQVnB/C8q8iWjcWgRr
-         ESlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lpb4WgkPmWUTkRVSpOHj/p+ZluKtlvnqbYlL5hWyYz0=;
-        b=lqDe7q7MThcJLS4I86B5LLpsGpBXr7oow1JUiWmLfbyBOjBC/ExLHE2ZdLrlEohvgI
-         sgOx0cRf6zOV6Or6lxz2536TNEBgV1OHFRRnT+BrjbT049tCHxU9mjUmcwBrdTtNhErO
-         ituXrtUpK6TAaWTS3e+Z6PNNwwVOypAwNvpluGYAHrBCGAJeCY2Yh6uf9ZGFxlg6rtMc
-         XlxABTrgFVh6MoqrVGSjCXarZn8JCVwSMQVSG0MDkzKnqZo6kv5lI0Rt4IVczwNaW6om
-         K0WNk1K1pCDw+3dWYwNAM2c0ycPxUbYpH48IZIcFoRNc2vqG1GyisOXTz4c/yuuRQvV8
-         /UNw==
-X-Gm-Message-State: APjAAAX0XQrXz1p7S9fRJxKgwRg8xgh4ATQjfgnW/6eRFQy4hrL7DZEM
-        AkTkrWHnGocB4fKlU18mfAaGfheNBgwAhDMM4+LNYQ==
-X-Google-Smtp-Source: APXvYqzs8ceRiBPVCP0/ZNbxEA4UnFKcvpd7xrewIhVU8YRDsflFexOmJryKOoBp0Jc/l+FQYkc1LTc/4YkcSZfr40I=
-X-Received: by 2002:a02:b782:: with SMTP id f2mr5637473jam.48.1570043134772;
- Wed, 02 Oct 2019 12:05:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190927021927.23057-1-weijiang.yang@intel.com> <20190927021927.23057-6-weijiang.yang@intel.com>
-In-Reply-To: <20190927021927.23057-6-weijiang.yang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 2 Oct 2019 12:05:23 -0700
-Message-ID: <CALMp9eStz-VCv5G60KFtumQ8W1Jqf9bOcK_=KwL1P3LLjgajnQ@mail.gmail.com>
-Subject: Re: [PATCH v7 5/7] kvm: x86: Add CET CR4 bit and XSS support
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+        id S1729377AbfJBTIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 15:08:20 -0400
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:36040 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729356AbfJBTIT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 2 Oct 2019 15:08:19 -0400
+Received: from [192.168.4.242] (helo=deadeye)
+        by shadbolt.decadent.org.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1iFjyu-000365-Kv; Wed, 02 Oct 2019 20:08:13 +0100
+Received: from ben by deadeye with local (Exim 4.92.1)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1iFjyq-0003g8-4Y; Wed, 02 Oct 2019 20:08:08 +0100
 Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+From:   Ben Hutchings <ben@decadent.org.uk>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+CC:     akpm@linux-foundation.org, Denis Kirjanov <kda@linux-powerpc.org>,
+        rkrcmar@redhat.com,
+        "Alejandro Jimenez" <alejandro.j.jimenez@oracle.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Mark Kanda" <mark.kanda@oracle.com>,
+        "Liam Merwick" <liam.merwick@oracle.com>, bp@alien8.de,
+        kvm@vger.kernel.org, "Paolo Bonzini" <pbonzini@redhat.com>
+Date:   Wed, 02 Oct 2019 20:06:51 +0100
+Message-ID: <lsq.1570043211.306085585@decadent.org.uk>
+X-Mailer: LinuxStableQueue (scripts by bwh)
+X-Patchwork-Hint: ignore
+Subject: [PATCH 3.16 78/87] x86/speculation: Allow guests to use SSBD even
+ if host does not
+In-Reply-To: <lsq.1570043210.379046399@decadent.org.uk>
+X-SA-Exim-Connect-IP: 192.168.4.242
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on shadbolt.decadent.org.uk); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
->
-> CR4.CET(bit 23) is master enable bit for CET feature.
-> Previously, KVM did not support setting any bits in XSS
-> so it's hardcoded to check and inject a #GP if Guest
-> attempted to write a non-zero value to XSS, now it supports
-> CET related bits setting.
->
-> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  4 +++-
->  arch/x86/kvm/cpuid.c            | 11 +++++++++--
->  arch/x86/kvm/vmx/vmx.c          |  6 +-----
->  3 files changed, 13 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d018df8c5f32..8f97269d6d9f 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -90,7 +90,8 @@
->                           | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
->                           | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
->                           | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
-> -                         | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP))
-> +                         | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP \
-> +                         | X86_CR4_CET))
->
->  #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
->
-> @@ -623,6 +624,7 @@ struct kvm_vcpu_arch {
->
->         u64 xcr0;
->         u64 guest_supported_xcr0;
-> +       u64 guest_supported_xss;
->         u32 guest_xstate_size;
->
->         struct kvm_pio_request pio;
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0a47b9e565be..dd3ddc6daa58 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -120,8 +120,15 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
->         }
->
->         best = kvm_find_cpuid_entry(vcpu, 0xD, 1);
-> -       if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
-> -               best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
-> +       if (best && (best->eax & (F(XSAVES) | F(XSAVEC)))) {
+3.16.75-rc1 review patch.  If anyone has any objections, please let me know.
 
-Is XSAVEC alone sufficient? Don't we explicitly need XSAVES to
-save/restore the extended state components enumerated by IA32_XSS?
+------------------
 
-> +               u64 kvm_xss = kvm_supported_xss();
-> +
-> +               best->ebx =
-> +                       xstate_required_size(vcpu->arch.xcr0 | kvm_xss, true);
+From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
 
-Shouldn't this size be based on the *current* IA32_XSS value, rather
-than the supported IA32_XSS bits? (i.e.
-s/kvm_xss/vcpu->arch.ia32_xss/)
+commit c1f7fec1eb6a2c86d01bc22afce772c743451d88 upstream.
 
-> +               vcpu->arch.guest_supported_xss = best->ecx & kvm_xss;
+The bits set in x86_spec_ctrl_mask are used to calculate the guest's value
+of SPEC_CTRL that is written to the MSR before VMENTRY, and control which
+mitigations the guest can enable.  In the case of SSBD, unless the host has
+enabled SSBD always on mode (by passing "spec_store_bypass_disable=on" in
+the kernel parameters), the SSBD bit is not set in the mask and the guest
+can not properly enable the SSBD always on mitigation mode.
 
-Shouldn't unsupported bits in best->ecx be masked off, so that the
-guest CPUID doesn't mis-report the capabilities of the vCPU?
+This has been confirmed by running the SSBD PoC on a guest using the SSBD
+always on mitigation mode (booted with kernel parameter
+"spec_store_bypass_disable=on"), and verifying that the guest is vulnerable
+unless the host is also using SSBD always on mode. In addition, the guest
+OS incorrectly reports the SSB vulnerability as mitigated.
 
-> +       } else {
-> +               vcpu->arch.guest_supported_xss = 0;
-> +       }
->
->         /*
->          * The existing code assumes virtual address is 48-bit or 57-bit in the
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index ba1a83d11e69..44913e4ab558 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1973,11 +1973,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                      !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
->                        guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
->                         return 1;
-> -               /*
-> -                * The only supported bit as of Skylake is bit 8, but
-> -                * it is not supported on KVM.
-> -                */
-> -               if (data != 0)
-> +               if (data & ~vcpu->arch.guest_supported_xss)
->                         return 1;
->                 vcpu->arch.ia32_xss = data;
->                 if (vcpu->arch.ia32_xss != host_xss)
-> --
-> 2.17.2
->
+Always set the SSBD bit in x86_spec_ctrl_mask when the host CPU supports
+it, allowing the guest to use SSBD whether or not the host has chosen to
+enable the mitigation in any of its modes.
+
+Fixes: be6fcb5478e9 ("x86/bugs: Rework spec_ctrl base and mask logic")
+Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Cc: bp@alien8.de
+Cc: rkrcmar@redhat.com
+Cc: kvm@vger.kernel.org
+Link: https://lkml.kernel.org/r/1560187210-11054-1-git-send-email-alejandro.j.jimenez@oracle.com
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+ arch/x86/kernel/cpu/bugs.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -960,6 +960,16 @@ static enum ssb_mitigation __init __ssb_
+ 	}
+ 
+ 	/*
++	 * If SSBD is controlled by the SPEC_CTRL MSR, then set the proper
++	 * bit in the mask to allow guests to use the mitigation even in the
++	 * case where the host does not enable it.
++	 */
++	if (static_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD) ||
++	    static_cpu_has(X86_FEATURE_AMD_SSBD)) {
++		x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
++	}
++
++	/*
+ 	 * We have three CPU feature flags that are in play here:
+ 	 *  - X86_BUG_SPEC_STORE_BYPASS - CPU is susceptible.
+ 	 *  - X86_FEATURE_SSBD - CPU is able to turn off speculative store bypass
+@@ -976,7 +986,6 @@ static enum ssb_mitigation __init __ssb_
+ 			x86_amd_ssb_disable();
+ 		} else {
+ 			x86_spec_ctrl_base |= SPEC_CTRL_SSBD;
+-			x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
+ 			wrmsrl(MSR_IA32_SPEC_CTRL, x86_spec_ctrl_base);
+ 		}
+ 	}
+
