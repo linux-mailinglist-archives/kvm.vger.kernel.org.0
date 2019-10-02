@@ -2,114 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33A1AC8F20
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 18:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB39CC8F5B
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 19:06:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726928AbfJBQ7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 12:59:11 -0400
-Received: from sonic306-20.consmr.mail.sg3.yahoo.com ([106.10.241.140]:39310
-        "EHLO sonic306-20.consmr.mail.sg3.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726101AbfJBQ7L (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 2 Oct 2019 12:59:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1570035546; bh=VvuyvMElMBxMgVM065W8Mb7OgboYNAf/LGiLQZjTnyM=; h=Date:From:Reply-To:Subject:From:Subject; b=ZRzaoDHvRmejkQyd//WTcsXk8APRjLIL8WY1aYSOYj1Gv13Do1mYeCLb5b7TK9z1cYL4U/T5dM7mbIa6eo+UHC15K+0WUfZLPOFagf3Zigp2fNgtcybfjiYiEIcuas3JQYI3bGg6IkBL3GIcJzwWq1K6OqGThUkZq2bmjxv4zHpTON36EcNfD+ncVmci8D4jG5U95KHl8WOtqdMVFxc0AuOtzeab22cbHqQMcEb82KdpPD5XFCkK946el2r1cKCiY+DsNyY+zhly9gSDPy5S0h2VIO6SFbdyBRurnr9Rehe8BGhM8/883CPjJFoc5SY07ofzJMOwPO4on0pAFyaZyg==
-X-YMail-OSG: 9RoNTQ0VM1kVYLK4ih7paeKhbgVTdzagnuHnbeYMaSo7DfsxDFKDnHD84aUyMyY
- u8cIzGc6IdYxRMs8MOaN5Ki4UbAt9f4mF_I9S5j.gE6bh5pCp61ey0P52o0svIVHa5H.8Ucki0Sr
- QLlgNLsCDv0DGXDMZVL6V7KA4ofOTASUPJUNs6dEfLLC10k65Wtzko2iIk8bm.fiMknQLbVwQBGL
- 2NalyAHvu2qru7NAwAO.Xt8uWJt6TzkaUiGvN4zO1daYXidkM4V9R1dnvLdwilrgE1ZExRkf2iin
- VWbTdnBw.GaWSYsOSfSj3HwHcc8W5QZHvMNZbW49QCI8wzdX4UBr.4kJGeDn5_vcr9MosxvLnV5Q
- jZZvOtUQvutq2mOJHv8aeVK78qxxZ9XyQtmpNuMn6VDLS4A2QUC3o0rh6y0f_dA8sN28OcIdnLq.
- 9TLMKwdj7XboRamrQL73Fc9Q3uOg5gUkpAfP9LxJxUKGByd74w7Qa1GUzolaMxB5HxBeqNqmbCsc
- m9xwpBTe.IG2dcETdILxWfxW9VMwQTTliG1.kG2GZdpbMjL0UMoK1O8Zd.uV6SipcdDJ5NUr6tAz
- hoj_6Bf1UH8aak5qSBr98jeuq.MywW66IryfQwuwXPbUJMkXlGP1cQoOheGI0JkP8jSsYZhKuiUm
- LTEY2spZSGEni8XiR8OVq5bJVkHd3_ixTHI4vr5jPw2xVTyBudrxBsAl0oprqQ.V7RGhhZAS_Qbm
- SpComhfGVD7hNqxJN6jEmHlkeVDvAL3lodkC873cw8OFyZguIyJPR1Bg053fWWZbsLer9VxtNKIm
- PK.ArR0IZIj5g_rU3jNU3mKl6U7_JXeAAYXUrf6ry36dPW4JJY7HcMsuFxh6FUatr7xWI3e16h5b
- fnm3VrebuUeuUGCBMQk_eSP_GPTeYFlQVsqpQbYNnfB0Uo6zDozZFUK1M4HgyIaQWgqXBct9po_.
- bIjX89vhkEWWK_XxGiwAtO2PgjJ_KzodCoYreSM53YexplmSBp2FsHyqWdNWJ1SY7B93R.chFF8K
- hC_Xn2VLnHJMELazguc9eBBmJLzpwW2b6099J3bxssElswKsC1m.z9oyMFLMPhQN01BSk2pcAhiA
- 1Ku7mmy11B8wJswxGkUUayMm3rzB5T.RwAYuMC_ga5hzcSyLKuJRkM4xuoLgtzHXjEi8SE5pRNqv
- HcPys4cMsiEOwVqxBkMU0Gtrx35dehvdw7tkRpvR3jMmWrGX5o9uuyYK19SauGr0aDAQrMXS0QHl
- wM5xA2vzNniShqjKG9HLi51FBCEEGZTtknH3PSa1P1BFVfSMF1ItN
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.sg3.yahoo.com with HTTP; Wed, 2 Oct 2019 16:59:06 +0000
-Date:   Wed, 2 Oct 2019 16:59:05 +0000 (UTC)
-From:   mohamed <mohamed4bennani@gmail.com>
-Reply-To: mohamed4bennani@gmail.com
-Message-ID: <1900136144.2293884.1570035545049@mail.yahoo.com>
-Subject: Greetings My Dear Friend,
+        id S1727003AbfJBRF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 13:05:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52152 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725975AbfJBRF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Oct 2019 13:05:58 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 385CB87648;
+        Wed,  2 Oct 2019 17:05:57 +0000 (UTC)
+Received: from redhat.com (ovpn-112-77.rdu2.redhat.com [10.10.112.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7408F5C3F8;
+        Wed,  2 Oct 2019 17:05:46 +0000 (UTC)
+Date:   Wed, 2 Oct 2019 13:04:29 -0400
+From:   Jerome Glisse <jglisse@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>,
+        Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C <yu.c.zhang@intel.com>,
+        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
+Subject: Re: DANGER WILL ROBINSON, DANGER
+Message-ID: <20191002170429.GA8189@redhat.com>
+References: <20190815191929.GA9253@redhat.com>
+ <20190815201630.GA25517@redhat.com>
+ <VI1PR02MB398411CA9A56081FF4D1248EBBA40@VI1PR02MB3984.eurprd02.prod.outlook.com>
+ <20190905180955.GA3251@redhat.com>
+ <5b0966de-b690-fb7b-5a72-bc7906459168@redhat.com>
+ <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
+ <20191002192714.GA5020@redhat.com>
+ <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
+ <20191002141542.GA5669@redhat.com>
+ <f26710a4-424f-730c-a676-901bae451409@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f26710a4-424f-730c-a676-901bae451409@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 02 Oct 2019 17:05:57 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Oct 02, 2019 at 06:18:06PM +0200, Paolo Bonzini wrote:
+> On 02/10/19 16:15, Jerome Glisse wrote:
+> >>> Why would you need to target mmu notifier on target vma ?
+> >> If the mapping of the source VMA changes, mirroring can update the
+> >> target VMA via insert_pfn.  But what ensures that KVM's MMU notifier
+> >> dismantles its own existing page tables (so that they can be recreated
+> >> with the new mapping from the source VMA)?
+> >>
+> > So just to make sure i follow we have:
+> >       - qemu process on host with anonymous vma
+> >             -> host cpu page table
+> >       - kvm which maps host anonymous vma to guest
+> >             -> kvm guest page table
+> >       - kvm inspector process which mirror vma from qemu process
+> >             -> inspector process page table
+> > 
+> > AFAIK the KVM notifier's will clear the kvm guest page table whenever
+> > necessary (through kvm_mmu_notifier_invalidate_range_start). This is
+> > what ensure that KVM's dismatles its own mapping, it abides to mmu-
+> > notifier callbacks. If you did not you would have bugs (at least i
+> > expect so). Am i wrong here ?
+> 
+> The KVM inspector process is also (or can be) a QEMU that will have to
+> create its own KVM guest page table.
 
+Ok missed that part, thank you for explaining
 
-Greetings My Dear Friend,
+> 
+> So if a page in the source VMA is unmapped we want:
+> 
+> - the source KVM to invalidate its guest page table (done by the KVM MMU
+> notifier)
+> 
+> - the target VMA to be invalidated (easy using mirroring)
+> 
+> - the target KVM to invalidate its guest page table, as a result of
+> invalidation of the target VMA
 
- Before I introduce myself, I wish to inform you that this letter is not a =
-hoax mail and I urge you to treat it serious.This letter must come to you a=
-s a big surprise, but I believe it is only a day that people meet and becom=
-e great friends and business partners. Please I want you to read this lette=
-r very carefully and I must apologize for barging this message into your ma=
-il box without any formal introduction due to the urgency and confidentiali=
-ty of this business and I know that this message will come to you as a surp=
-rise. Please this is not a joke and I will not like you to joke with it ok,=
-With due respect to your person and much sincerity of purpose, I make this =
-contact with you as I believe that you can be of great assistance to me. My=
- name is Mr.Mohamed Bennani, from Burkina Faso, West Africa. I work in Bank=
- Of Africa (BOA) as telex manager, please see this as a confidential messag=
-e and do not reveal it to another person and let me know whether you can be=
- of assistance regarding my proposal below because it is top secret.
+You can do the target KVM invalidation inside the mirroring invalidation
+code.
 
- I am about to retire from active Banking service to start a new life but I=
- am skeptical to reveal this particular secret to a stranger. You must assu=
-re me that everything will be handled confidentially because we are not goi=
-ng to suffer again in life. It has been 10 years now that most of the greed=
-y African Politicians used our bank to launder money overseas through the h=
-elp of their Political advisers. Most of the funds which they transferred o=
-ut of the shores of Africa were gold and oil money that was supposed to hav=
-e been used to develop the continent. Their Political advisers always infla=
-ted the amounts before transferring to foreign accounts, so I also used the=
- opportunity to divert part of the funds hence I am aware that there is no =
-official trace of how much was transferred as all the accounts used for suc=
-h transfers were being closed after transfer. I acted as the Bank Officer t=
-o most of the politicians and when I discovered that they were using me to =
-succeed in their greedy act; I also cleaned some of their banking records f=
-rom the Bank files and no one cared to ask me because the money was too muc=
-h for them to control. They laundered over $5billion Dollars during the pro=
-cess.
-
- Before I send this message to you, I have already diverted ($10.5million D=
-ollars) to an escrow account belonging to no one in the bank. The bank is a=
-nxious now to know who the beneficiary to the funds is because they have ma=
-de a lot of profits with the funds. It is more than Eight years now and mos=
-t of the politicians are no longer using our bank to transfer funds oversea=
-s. The ($10.5million Dollars) has been laying waste in our bank and I don=
-=E2=80=99t want to retire from the bank without transferring the funds to a=
- foreign account to enable me share the proceeds with the receiver (a forei=
-gner). The money will be shared 60% for me and 40% for you. There is no one=
- coming to ask you about the funds because I secured everything. I only wan=
-t you to assist me by providing a reliable bank account where the funds can=
- be transferred.
-
- You are not to face any difficulties or legal implications as I am going t=
-o handle the transfer personally. If you are capable of receiving the funds=
-, do let me know immediately to enable me give you a detailed information o=
-n what to do. For me, I have not stolen the money from anyone because the o=
-ther people that took the whole money did not face any problems. This is my=
- chance to grab my own life opportunity but you must keep the details of th=
-e funds secret to avoid any leakages as no one in the bank knows about my p=
-lans.Please get back to me if you are interested and capable to handle this=
- project, I shall intimate you on what to do when I hear from your confirma=
-tion and acceptance.If you are capable of being my trusted associate, do de=
-clare your consent to me I am looking forward to hear from you immediately =
-for further information.
-
- Thanks with my best regards.
- Mr.Mohamed Bennani
- Telex Manager
- Bank Of Africa (BOA)
- Burkina Faso.
+Cheers,
+Jérôme
