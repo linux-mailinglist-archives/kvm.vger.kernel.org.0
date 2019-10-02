@@ -2,192 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E7ACC90A6
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 20:19:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB5F7C90B5
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 20:21:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728603AbfJBSSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 14:18:46 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:36701 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728486AbfJBSSq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 14:18:46 -0400
-Received: by mail-io1-f68.google.com with SMTP id b136so59142122iof.3
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 11:18:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sE4hIPJblfldPa9zZyykYwpbgFP0hJyev1rPxUtG4KU=;
-        b=Mt8Hq+v9ToEnDoCvIp6M0wjAgGNEwNOPReg2epy6vYbvl/pMZPfTqzbi+pk6693Jwo
-         b8M6cYYmjK1ZA9JIQXLHOwAtFvG/hfoywsmkqz4dn+9VfYL+RW0Z4vzptkiFMlh/WvTV
-         4n3+9gPw8qxd3sMf2A3oEYcnTjtREneF0GiH6EQS4nxh/jBAjNsvGxMry+tnPKU97zq7
-         kpliKL2gMwMzMOLsTucnIC6kfAP/hCLX2iIoe+Iec4J8CBzhbWYHLrvwfkaOXLhxobVf
-         21c5xnNTrKj2SdD58SwnMGLOec0RuNnO/eGjNbHIUjTWG2WNNQK4jdsPklpRux3YMHXO
-         GbKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sE4hIPJblfldPa9zZyykYwpbgFP0hJyev1rPxUtG4KU=;
-        b=oB2aKx7wBLw1hgqlivePCkVkYW9dvAbW5z/k5mck/HQMa9Z9VdzuSK7XB+RsRzswBn
-         vv/lOe7rGF2a8InCFbuMqPwKv8c9F4+aAnlbi5fF6KryDB715Moupy89oNYU3PUNp67H
-         MiGzjynjuA0SATYW18XxNdRHviZtSf3BmU1PTVktS2zhRK+3pI82c4JGORktai4e6ULA
-         3Qkk690MiBctEqXClwFk44QLxaLk7nZYG4Y4nImgbpITfmp5Z3yJ9v9aXZvJfWAhY9FB
-         JeoquaUaO2/X12DY8TrNg3j2NOoNlHBek7HizveYCUhHmJMX/EYQ623TITxu/yNWrAN7
-         gHLw==
-X-Gm-Message-State: APjAAAXhAJ0vpXJYIe9MqSc2EMZQP+P7qJ95Ln4UCQsC2uwykBv2X+dE
-        wYk5yWMldPTJyckM761aTdc27D3V3R1BabEQRwoYNQ==
-X-Google-Smtp-Source: APXvYqwLHrC3Z9URNH0104suwg+CjvRZfUUk7UJDrxyz3QC44afn5OStLQHrqzc3UxYA3K+ftuCXSLBAk1kB7I5s4yw=
-X-Received: by 2002:a92:b09:: with SMTP id b9mr1924153ilf.26.1570040323223;
- Wed, 02 Oct 2019 11:18:43 -0700 (PDT)
+        id S1728853AbfJBSVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 14:21:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54444 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726708AbfJBSVV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Oct 2019 14:21:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7677118C428B;
+        Wed,  2 Oct 2019 18:21:20 +0000 (UTC)
+Received: from [10.36.116.21] (ovpn-116-21.ams2.redhat.com [10.36.116.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C18071001B28;
+        Wed,  2 Oct 2019 18:21:15 +0000 (UTC)
+Subject: Re: [PATCH] KVM: s390: Cleanup kvm_arch_init error path
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org
+References: <20191002075627.3582-1-frankja@linux.ibm.com>
+ <b758d2ec-3857-9fe0-b9d3-a9b6e70b6d14@redhat.com>
+ <22a388be-a1e1-e57f-1677-18470ed09f65@redhat.com>
+ <48e9dab7-03be-9acc-836b-e9e2700ca260@redhat.com>
+ <f48dca29-d2c1-09bd-918c-755516b2f76e@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <02b32dcf-419c-7ea6-4f77-2eaaf3838492@redhat.com>
+Date:   Wed, 2 Oct 2019 20:21:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190927021927.23057-1-weijiang.yang@intel.com> <20190927021927.23057-4-weijiang.yang@intel.com>
-In-Reply-To: <20190927021927.23057-4-weijiang.yang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 2 Oct 2019 11:18:32 -0700
-Message-ID: <CALMp9eT3HJ3S6Mzzntje2Kb4m-y86GvkhaNXun-mLJukEy6wbA@mail.gmail.com>
-Subject: Re: [PATCH v7 3/7] KVM: VMX: Pass through CET related MSRs to Guest
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <f48dca29-d2c1-09bd-918c-755516b2f76e@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Wed, 02 Oct 2019 18:21:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
->
-> CET MSRs pass through Guest directly to enhance performance.
-> CET runtime control settings are stored in MSR_IA32_{U,S}_CET,
-> Shadow Stack Pointer(SSP) are stored in MSR_IA32_PL{0,1,2,3}_SSP,
-> SSP table base address is stored in MSR_IA32_INT_SSP_TAB,
-> these MSRs are defined in kernel and re-used here.
+On 02.10.19 12:45, Christian Borntraeger wrote:
+> 
+> 
+> On 02.10.19 10:20, David Hildenbrand wrote:
+>> On 02.10.19 10:07, Thomas Huth wrote:
+>>> On 02/10/2019 10.01, David Hildenbrand wrote:
+>>>> On 02.10.19 09:56, Janosch Frank wrote:
+>>>>> Both kvm_s390_gib_destroy and debug_unregister test if the needed
+>>>>> pointers are not NULL and hence can be called unconditionally.
+>>>>>
+>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>> ---
+>>>>>  arch/s390/kvm/kvm-s390.c | 18 +++++++-----------
+>>>>>  1 file changed, 7 insertions(+), 11 deletions(-)
+>>>>>
+>>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>>>>> index 895fb2006c0d..66720d69cd24 100644
+>>>>> --- a/arch/s390/kvm/kvm-s390.c
+>>>>> +++ b/arch/s390/kvm/kvm-s390.c
+>>>>> @@ -458,16 +458,14 @@ static void kvm_s390_cpu_feat_init(void)
+>>>>>  
+>>>>>  int kvm_arch_init(void *opaque)
+>>>>>  {
+>>>>> -	int rc;
+>>>>> +	int rc = -ENOMEM;
+>>>>>  
+>>>>>  	kvm_s390_dbf = debug_register("kvm-trace", 32, 1, 7 * sizeof(long));
+>>>>>  	if (!kvm_s390_dbf)
+>>>>>  		return -ENOMEM;
+>>>>>  
+>>>>> -	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view)) {
+>>>>> -		rc = -ENOMEM;
+>>>>> -		goto out_debug_unreg;
+>>>>> -	}
+>>>>> +	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view))
+>>>>> +		goto out;
+>>>>>  
+>>>>>  	kvm_s390_cpu_feat_init();
+>>>>>  
+>>>>> @@ -475,19 +473,17 @@ int kvm_arch_init(void *opaque)
+>>>>>  	rc = kvm_register_device_ops(&kvm_flic_ops, KVM_DEV_TYPE_FLIC);
+>>>>>  	if (rc) {
+>>>>>  		pr_err("A FLIC registration call failed with rc=%d\n", rc);
+>>>>> -		goto out_debug_unreg;
+>>>>> +		goto out;
+>>>>>  	}
+>>>>>  
+>>>>>  	rc = kvm_s390_gib_init(GAL_ISC);
+>>>>>  	if (rc)
+>>>>> -		goto out_gib_destroy;
+>>>>> +		goto out;
+>>>>>  
+>>>>>  	return 0;
+>>>>>  
+>>>>> -out_gib_destroy:
+>>>>> -	kvm_s390_gib_destroy();
+>>>>> -out_debug_unreg:
+>>>>> -	debug_unregister(kvm_s390_dbf);
+>>>>> +out:
+>>>>> +	kvm_arch_exit();
+>>>>>  	return rc;
+>>>>>  }
+>>>>
+>>>> Wonder why "debug_info_t *kvm_s390_dbf" is not declared as static.
+>>>
+>>> Because it is used in the KVM_EVENT macro?
+>>
+>> Ah, makes sense.
+>>
+>>>
+>>>> Instead of the two manual calls we could also call kvm_arch_exit().
+>>>
+>>> Huh, isn't that what this patch is doing here?
+>>
+>> Lol, still tired and thought only the two labels would get removed. Even
+>> better :)
+> 
+> So I guess we should not take your Reviewed-by: then? ;-)
 
-All of these new guest MSRs will have to be enumerated by
-KVM_GET_MSR_INDEX_LIST.
+No, please take it. ;)
 
-> MSR_IA32_U_CET and MSR_IA32_PL3_SSP are used for user mode protection,
-> the contents could differ from process to process, therefore,
-> kernel needs to save/restore them during context switch, it makes
-> sense to pass through them so that the guest kernel can
-> use xsaves/xrstors to operate them efficiently. Other MSRs are used
-> for non-user mode protection. See CET spec for detailed info.
 
-I assume that XSAVES & XRSTORS bypass the MSR permission bitmap, like
-other instructions that manipulate MSRs (e.g. SWAPGS, RDTSCP, etc.).
-Is the guest OS likely to use RDMSR/WRMSR to access these MSRs?
+-- 
 
-> The difference between CET VMCS state fields and xsave components is that,
-> the former used for CET state storage during VMEnter/VMExit,
-> whereas the latter used for state retention between Guest task/process
-> switch.
->
-> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c   |  1 +
->  arch/x86/kvm/cpuid.h   |  2 ++
->  arch/x86/kvm/vmx/vmx.c | 39 +++++++++++++++++++++++++++++++++++++++
->  3 files changed, 42 insertions(+)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 1aa86b87b6ab..0a47b9e565be 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -66,6 +66,7 @@ u64 kvm_supported_xss(void)
->  {
->         return KVM_SUPPORTED_XSS & kvm_x86_ops->supported_xss();
->  }
-> +EXPORT_SYMBOL_GPL(kvm_supported_xss);
->
->  #define F(x) bit(X86_FEATURE_##x)
->
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index d78a61408243..1d77b880084d 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -27,6 +27,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
->
->  int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu);
->
-> +u64 kvm_supported_xss(void);
-> +
->  static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
->  {
->         return vcpu->arch.maxphyaddr;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a84198cff397..f720baa7a9ba 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7001,6 +7001,43 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
->                 vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
->  }
->
-> +static void vmx_intercept_cet_msrs(struct kvm_vcpu *vcpu)
+Thanks,
 
-Nit: It seems like this function adjusts the MSR permission bitmap so
-as *not* to intercept the CET MSRs.
-
-> +{
-> +       struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +       unsigned long *msr_bitmap;
-> +       u64 kvm_xss;
-> +       bool cet_en;
-> +
-> +       msr_bitmap = vmx->vmcs01.msr_bitmap;
-
-What about nested guests? (i.e. vmcs02).
-
-> +       kvm_xss = kvm_supported_xss();
-> +       cet_en = guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
-> +                guest_cpuid_has(vcpu, X86_FEATURE_IBT);
-> +       /*
-> +        * U_CET is a must for USER CET, per CET spec., U_CET and PL3_SPP are
-> +        * a bundle for USER CET xsaves.
-> +        */
-> +       if (cet_en && (kvm_xss & XFEATURE_MASK_CET_USER)) {
-> +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_U_CET, MSR_TYPE_RW);
-> +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL3_SSP, MSR_TYPE_RW);
-> +       }
-
-Since this is called from vmx_cpuid_update, what happens if cet_en was
-previously true and now it's false?
-
-> +       /*
-> +        * S_CET is a must for KERNEL CET, PL0_SSP ... PL2_SSP are a bundle
-> +        * for CET KERNEL xsaves.
-> +        */
-> +       if (cet_en && (kvm_xss & XFEATURE_MASK_CET_KERNEL)) {
-> +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_S_CET, MSR_TYPE_RW);
-> +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL0_SSP, MSR_TYPE_RW);
-> +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL1_SSP, MSR_TYPE_RW);
-> +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL2_SSP, MSR_TYPE_RW);
-> +
-> +               /* SSP_TAB only available for KERNEL SHSTK.*/
-> +               if (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> +                       vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_INT_SSP_TAB,
-> +                                                     MSR_TYPE_RW);
-> +       }
-> +}
-> +
->  static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
->  {
->         struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -7025,6 +7062,8 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
->         if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
->                         guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
->                 update_intel_pt_cfg(vcpu);
-> +
-> +       vmx_intercept_cet_msrs(vcpu);
->  }
->
->  static void vmx_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
-> --
-> 2.17.2
->
+David / dhildenb
