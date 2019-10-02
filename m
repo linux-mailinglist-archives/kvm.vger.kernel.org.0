@@ -2,146 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 10ECFC92B5
-	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 21:57:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53EDDC92C6
+	for <lists+kvm@lfdr.de>; Wed,  2 Oct 2019 22:10:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728654AbfJBT4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 15:56:43 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38821 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728433AbfJBT4m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 15:56:42 -0400
-Received: by mail-io1-f66.google.com with SMTP id u8so156914iom.5
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 12:56:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dk1xiojtdSxbPGVXOgkiOKlECGbF1OR24opXqDPKZxw=;
-        b=UHPrEXbFQrG0siwewfg75PiGVJckTDFJGuIFc7BRtiCWnhRu7nMnAhwIcV/3QvpmNi
-         zcer5zsYAVVv8CzO9Aipmv7PzerrS0WlSawFvoOY1Py8/CHUKwoPYqYr+k9J/uwZu1rl
-         /+Y/O/WAV3PpFVbT4PdpYtHHCAesZYHsEWMdpw6nUU1FpfgK48zpyYxVdqmAj0fqLq7r
-         NY6YGf+uWBEGF+IB2b8R5gCMLGhtqt0hcK1L3OYqBymxcq9IFPDOcSDdaiy4ZVhRD60E
-         XKpSqkh4EiAwndm3lyGqfmsK4FMiQ2Lrc+zVgaLOo6rW7OAFPgYklgRkIFHmRzFp8mz0
-         3rtg==
+        id S1726364AbfJBUKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 16:10:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51530 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726034AbfJBUKX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Oct 2019 16:10:23 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 30ADC5945B
+        for <kvm@vger.kernel.org>; Wed,  2 Oct 2019 20:10:23 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id w10so45085wrl.5
+        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 13:10:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dk1xiojtdSxbPGVXOgkiOKlECGbF1OR24opXqDPKZxw=;
-        b=RlemiuRTkhJfVu6Cl05QdHEb2KLdf0FuwluFoHzgOplqLy8YjJDs2N2z/Tun0sM8Ol
-         2QJrTBIPiEhL4gLBAe6A6/Ab1p0L/NOcYm1CWSYpvfddEX6ecG4s6t1QwwpjST7j/P2v
-         ZAL5NuC0kdpXgxhRsR9ShRRVfNwrhE01OmXDf1rGHGrzqb+y4hQQdtV34+7D+Y9ukZaD
-         ogSPhORBVg0ic/wgSRjFN3boDcM0svloW62C0Wv462cYG7uMcFXkTW+B1nrUqE8BjPdB
-         rQl34jFbz0ICnQW7fiet0Z3UpU8QTuBCRrnebDiJGPNqqAE9GwFmsr8XZCezylnfEnX6
-         8gaA==
-X-Gm-Message-State: APjAAAXHCTF3eke2f/WoMT4D77qrD1BDjjOuzu8pyq7dX10zXmaiUPWH
-        rcP/kqKt2HxXWM5E8PM9BilT2rb/chxwM/tMnqOf0g==
-X-Google-Smtp-Source: APXvYqzpCMAUM0lWb0fNaqUjO6Ds3dQt38NZVJvOQUhcm7ricfA/gS7sIorLBcvFx0a/X97pDGUE2EJMWy+KF8x6Eog=
-X-Received: by 2002:a5e:8a43:: with SMTP id o3mr5067318iom.296.1570046201654;
- Wed, 02 Oct 2019 12:56:41 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ECzmcjCSbbcsFSzX1mjy2hRL/7INCALmJsVRlbIqA+M=;
+        b=BCDrjYY+PB7MaRtomR66swUo312Csh7XA6SZ6musdpyiqf+gL58eNEoMRxx2Kte1vM
+         pA+Xa4xx709wcuaIAiqXaHTK6nA1lvucWVwhunsXmyJ0oH50n/wv96LVoaETIxo8ylca
+         0DjD/SBObn1HXXC2hYjbqrBTb/wvTSfQgF9p+eIulaI5S25p2jM7bBwLp7ojJAa8AFdV
+         gxMrPbRmOdp72XcjiantduvyJcMw++Kt3l+sJ6jnI59oW8b4dfa7KJDxh1eADPgqjz2K
+         r2UtWJlVKkxUzX4DPhOHRzwDk0MZB3nFkk31jYYQ/VsRz2QsJGI1B8y4erDrmjkNv/cS
+         MQ5g==
+X-Gm-Message-State: APjAAAUVPEobcNS4xdfO6cjL0P6EfCm3EGYpq+Z+ikD8J9O41qtMGFsU
+        69Dervn2PploO1XYOzjjncr+pcbvxQj+uCWts0ZyNrQtrRjASfF6t/4aJPHwR7TEJHqOHzXpysn
+        AqUTsH82vAPU5
+X-Received: by 2002:a5d:5185:: with SMTP id k5mr4309021wrv.341.1570047021834;
+        Wed, 02 Oct 2019 13:10:21 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwCrWt+T8lq0j3jrbvKKSdlpqYZ0reHvLDTlwAHJf9pBgzMN4snDZo/L2kojw/X0EwObK+tMQ==
+X-Received: by 2002:a5d:5185:: with SMTP id k5mr4309009wrv.341.1570047021557;
+        Wed, 02 Oct 2019 13:10:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e56d:fbdf:8b79:c79c? ([2001:b07:6468:f312:e56d:fbdf:8b79:c79c])
+        by smtp.gmail.com with ESMTPSA id 94sm642951wrk.92.2019.10.02.13.10.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Oct 2019 13:10:20 -0700 (PDT)
+Subject: Re: DANGER WILL ROBINSON, DANGER
+To:     Jerome Glisse <jglisse@redhat.com>
+Cc:     Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>,
+        =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        =?UTF-8?Q?Samuel_Laur=c3=a9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C <yu.c.zhang@intel.com>,
+        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
+References: <20190815191929.GA9253@redhat.com>
+ <20190815201630.GA25517@redhat.com>
+ <VI1PR02MB398411CA9A56081FF4D1248EBBA40@VI1PR02MB3984.eurprd02.prod.outlook.com>
+ <20190905180955.GA3251@redhat.com>
+ <5b0966de-b690-fb7b-5a72-bc7906459168@redhat.com>
+ <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
+ <20191002192714.GA5020@redhat.com>
+ <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
+ <20191002141542.GA5669@redhat.com>
+ <f26710a4-424f-730c-a676-901bae451409@redhat.com>
+ <20191002170429.GA8189@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <dd0ca0d3-f502-78a1-933a-7e1b5fb90baa@redhat.com>
+Date:   Wed, 2 Oct 2019 22:10:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190927021927.23057-1-weijiang.yang@intel.com> <20190927021927.23057-7-weijiang.yang@intel.com>
-In-Reply-To: <20190927021927.23057-7-weijiang.yang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 2 Oct 2019 12:56:30 -0700
-Message-ID: <CALMp9eRouyhkKeadM_w80bisWB-VSBCf3NSei5hZXcDsRR7GJg@mail.gmail.com>
-Subject: Re: [PATCH v7 6/7] KVM: x86: Load Guest fpu state when accessing MSRs
- managed by XSAVES
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191002170429.GA8189@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
->
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> A handful of CET MSRs are not context switched through "traditional"
-> methods, e.g. VMCS or manual switching, but rather are passed through
-> to the guest and are saved and restored by XSAVES/XRSTORS, i.e. the
-> guest's FPU state.
->
-> Load the guest's FPU state if userspace is accessing MSRs whose values
-> are managed by XSAVES so that the MSR helper, e.g. vmx_{get,set}_msr(),
-> can simply do {RD,WR}MSR to access the guest's value.
->
-> Note that guest_cpuid_has() is not queried as host userspace is allowed
-> to access MSRs that have not been exposed to the guest, e.g. it might do
-> KVM_SET_MSRS prior to KVM_SET_CPUID2.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/x86.c | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 290c3c3efb87..5b8116028a59 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -104,6 +104,8 @@ static void enter_smm(struct kvm_vcpu *vcpu);
->  static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
->  static void store_regs(struct kvm_vcpu *vcpu);
->  static int sync_regs(struct kvm_vcpu *vcpu);
-> +static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
-> +static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
->
->  struct kvm_x86_ops *kvm_x86_ops __read_mostly;
->  EXPORT_SYMBOL_GPL(kvm_x86_ops);
-> @@ -2999,6 +3001,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  }
->  EXPORT_SYMBOL_GPL(kvm_get_msr_common);
->
-> +static bool is_xsaves_msr(u32 index)
-> +{
-> +       return index == MSR_IA32_U_CET ||
-> +              (index >= MSR_IA32_PL0_SSP && index <= MSR_IA32_PL3_SSP);
-> +}
-> +
->  /*
->   * Read or write a bunch of msrs. All parameters are kernel addresses.
->   *
-> @@ -3009,11 +3017,23 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
->                     int (*do_msr)(struct kvm_vcpu *vcpu,
->                                   unsigned index, u64 *data))
->  {
-> +       bool fpu_loaded = false;
->         int i;
-> +       const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
-> +       bool cet_xss = kvm_x86_ops->xsaves_supported() &&
-> +                      (kvm_supported_xss() & cet_bits);
+On 02/10/19 19:04, Jerome Glisse wrote:
+> On Wed, Oct 02, 2019 at 06:18:06PM +0200, Paolo Bonzini wrote:
+>>>> If the mapping of the source VMA changes, mirroring can update the
+>>>> target VMA via insert_pfn.  But what ensures that KVM's MMU notifier
+>>>> dismantles its own existing page tables (so that they can be recreated
+>>>> with the new mapping from the source VMA)?
+>>
+>> The KVM inspector process is also (or can be) a QEMU that will have to
+>> create its own KVM guest page table.  So if a page in the source VMA is
+>> unmapped we want:
+>>
+>> - the source KVM to invalidate its guest page table (done by the KVM MMU
+>> notifier)
+>>
+>> - the target VMA to be invalidated (easy using mirroring)
+>>
+>> - the target KVM to invalidate its guest page table, as a result of
+>> invalidation of the target VMA
+> 
+> You can do the target KVM invalidation inside the mirroring invalidation
+> code.
 
-It seems like I've seen a lot of checks like this. Can this be
-simplified (throughout this series) by sinking the
-kvm_x86_ops->xsaves_supported() check into kvm_supported_xss()? That
-is, shouldn't kvm_supported_xss() return 0 if
-kvm_x86_ops->xsaves_supported() is false?
+Why should the source and target KVMs behave differently?  If the source
+invalidates its guest page table via MMU notifiers, so should the target.
 
-> -       for (i = 0; i < msrs->nmsrs; ++i)
-> +       for (i = 0; i < msrs->nmsrs; ++i) {
-> +               if (!fpu_loaded && cet_xss &&
-> +                   is_xsaves_msr(entries[i].index)) {
-> +                       kvm_load_guest_fpu(vcpu);
-> +                       fpu_loaded = true;
-> +               }
->                 if (do_msr(vcpu, entries[i].index, &entries[i].data))
->                         break;
-> +       }
-> +       if (fpu_loaded)
-> +               kvm_put_guest_fpu(vcpu);
->
->         return i;
->  }
-> --
-> 2.17.2
->
+The KVM MMU notifier exists so that nothing (including mirroring) needs
+to know that there is KVM on the other side.  Any interaction between
+KVM page tables and VMAs must be mediated by MMU notifiers, anything
+else is unacceptable.
+
+If it is possible to invoke the MMU notifiers around the calls to
+insert_pfn, that of course would be perfect.
+
+Thanks,
+
+Paolo
