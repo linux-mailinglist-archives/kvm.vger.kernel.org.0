@@ -2,222 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B8D4FC9D57
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 13:33:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FE2EC9E2B
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 14:15:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730143AbfJCLcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 07:32:39 -0400
-Received: from foss.arm.com ([217.140.110.172]:42394 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730134AbfJCLci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 07:32:38 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 38B4B1570;
-        Thu,  3 Oct 2019 04:32:38 -0700 (PDT)
-Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 340233F706;
-        Thu,  3 Oct 2019 04:32:37 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     drjones@redhat.com, pbonzini@redhat.com, maz@kernel.org,
-        mark.rutland@arm.com, andre.przywara@arm.com
-Subject: [kvm-unit-tests PATCH v2 3/3] arm64: Add cache code generation test
-Date:   Thu,  3 Oct 2019 12:32:17 +0100
-Message-Id: <20191003113217.25464-4-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191003113217.25464-1-alexandru.elisei@arm.com>
-References: <20191003113217.25464-1-alexandru.elisei@arm.com>
+        id S1729080AbfJCMP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 08:15:57 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41683 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725827AbfJCMP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 08:15:56 -0400
+Received: by mail-wr1-f68.google.com with SMTP id q9so2656568wrm.8
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 05:15:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:in-reply-to:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=FzacPTlNUKnQ43tm7EzyKmuGlJNT1pooGj2dsuQ39pw=;
+        b=oJeYotOZ1UzvleQWhszkAyIkJPhKs5qAMr6JOyrtGbygYrJcdlKsGsyAzt9rJz/FfD
+         e7vf50UlsZ6N3ch1fT3EN+Rfsop0TwQO67KwiMMFG8JazsjZbtYs1v5zIQ2Rcs1RL8Ms
+         kvEfUQSj5tdD1EcdKK5QJ9qAzT5hJif+Zxt8T+4OgCGVGW2rYfR0XBa7hXF2R0V50LnK
+         i2ewCGySu1TDtYCRnAjoa5aNsy4oDAR6/Cs3r+Q6NinbMx/IQUmt6WQkuXiTwKuS73Mu
+         mDmKwDYkY99FlX7nNY1ydo/P5N2ldp7DVfeO6Dbh8wiI8V3Dx3rdQ53vD+Kzvp+MlZfJ
+         Z2rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+        bh=FzacPTlNUKnQ43tm7EzyKmuGlJNT1pooGj2dsuQ39pw=;
+        b=C9y/ckKsFmNt0oyU1IXMm4yV9Ta2Sy+KNDUWTfZALYaV2FAsw0KrlBjp4l5mzRQS17
+         MfxFkhpsPKlB/QMF0W2rFJ8gxMREmjii8dtxAHpmr+hKv+CRdP2j6Em+iPlAEihF7ZHP
+         AbNDertQSu3CsBX0FizWahNDexeV2x3bLjO8Bsn29kmYRtVUVaQHAN49Co7Q+5mUSMUB
+         Tk6wDTfVvdfd5oM/c8j4aqXI4jAkvaiwS3aemIWqMGoPwFNR/KgOCYonOtgbpxlX6Zu4
+         TFKdvaCkdWKIU6FeognNxov88+7cBh3I7v/ja6MWKPYuxQOCldetx3Qm8ao3BxlOg1XF
+         HcIw==
+X-Gm-Message-State: APjAAAXmi+pP5EPfuD0myA59oeQNy5wy1cM3GQmAu1pyAS2ercFmPJ3m
+        mrAGw34nHpr9LKI6cu7RgUzmiA==
+X-Google-Smtp-Source: APXvYqz6rb7lG0LDt/54GH/jok0jKcNhwWSfXupI21g4plWQlcz86hc0mG1FRlSJMcAkobpAhb0FMQ==
+X-Received: by 2002:a5d:61c4:: with SMTP id q4mr6565642wrv.327.1570104952445;
+        Thu, 03 Oct 2019 05:15:52 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id h14sm2337574wro.44.2019.10.03.05.15.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2019 05:15:51 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 39E881FF87;
+        Thu,  3 Oct 2019 13:15:50 +0100 (BST)
+References: <20191002102212.6100-1-alex.bennee@linaro.org>
+ <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
+ <20191003092213.etjzlwgd7nlnzqay@steredhat>
+ <e85b2eaa-1190-c372-5875-6a024ae3a9cd@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+        "open list\:Overall KVM CPUs" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] accel/kvm: ensure ret always set
+In-reply-to: <e85b2eaa-1190-c372-5875-6a024ae3a9cd@redhat.com>
+Date:   Thu, 03 Oct 2019 13:15:50 +0100
+Message-ID: <87sgoaja89.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Caches are a misterious creature on arm64, requiring a more hands-on
-approach from the programmer than on x86. When generating code, two cache
-maintenance operations are generally required: an invalidation for the
-stale instruction and a clean to the PoU (Point of Unification) for the new
-instruction. Fortunately, the ARM architecture has features to alleviate
-some of this overhead, which are advertised via the IDC and DIC bits in
-CTR_EL0: if IDC is 1, then the dcache clean is not required, and if DIC is
-1, the icache invalidation can be absent. KVM exposes these bits to the
-guest.
 
-Until Linux v4.16.1, KVM performed an icache invalidation each time a stage
-2 page was mapped. This was then optimized so that the icache invalidation
-was performed when the guest tried to execute code from the page for the
-first time. And that was optimized again when support for the DIC bit was
-added to KVM.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-The interactions between a guest that is generating code, the stage 2
-tables and the IDC and DIC bits can be subtle, especially when KVM
-optimizations come into play. Let's add a test that generates a few
-instructions and checks that KVM indeed honors those bits.
+> On 10/3/19 11:22 AM, Stefano Garzarella wrote:
+>> On Wed, Oct 02, 2019 at 01:08:40PM +0200, Paolo Bonzini wrote:
+>>> On 02/10/19 12:22, Alex Benn=C3=A9e wrote:
+>>>> Some of the cross compilers rightly complain there are cases where ret
+>>>> may not be set. 0 seems to be the reasonable default unless particular
+>>>> slot explicitly returns -1.
+>>>>
+>> Even Coverity reported it (CID 1405857).
+>
+> And GCC ;)
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/Makefile.arm64 |   1 +
- arm/cache.c        | 122 +++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg  |   6 +++
- 3 files changed, 129 insertions(+)
- create mode 100644 arm/cache.c
+So my normal gcc didn't catch that - which is odd as I didn't expect the
+shippable gcc's to be ahead of my local buster install.
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 35de5ea333b4..6d3dc2c4a464 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -25,6 +25,7 @@ OBJDIRS += lib/arm64
- # arm64 specific tests
- tests = $(TEST_DIR)/timer.flat
- tests += $(TEST_DIR)/micro-bench.flat
-+tests += $(TEST_DIR)/cache.flat
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/arm/cache.c b/arm/cache.c
-new file mode 100644
-index 000000000000..2939b85a8c9a
---- /dev/null
-+++ b/arm/cache.c
-@@ -0,0 +1,122 @@
-+#include <libcflat.h>
-+#include <alloc_page.h>
-+#include <asm/mmu.h>
-+#include <asm/processor.h>
-+
-+#define NTIMES			(1 << 16)
-+
-+#define CTR_DIC			(1UL << 29)
-+#define CTR_IDC			(1UL << 28)
-+
-+#define CLIDR_LOC_SHIFT		24
-+#define CLIDR_LOC_MASK		(7UL << CLIDR_LOC_SHIFT)
-+#define CLIDR_LOUU_SHIFT	27
-+#define CLIDR_LOUU_MASK		(7UL << CLIDR_LOUU_SHIFT)
-+#define CLIDR_LOUIS_SHIFT	21
-+#define CLIDR_LOUIS_MASK	(7UL << CLIDR_LOUIS_SHIFT)
-+
-+#define RET			0xd65f03c0
-+#define MOV_X0(x)		(0xd2800000 | (((x) & 0xffff) << 5))
-+
-+#define clean_dcache_pou(addr)			\
-+	asm volatile("dc cvau, %0\n" :: "r" (addr) : "memory")
-+#define inval_icache_pou(addr)			\
-+	asm volatile("ic ivau, %0\n" :: "r" (addr) : "memory")
-+
-+typedef int (*fn_t)(void);
-+
-+static inline void prime_icache(u32 *code, u32 insn)
-+{
-+	*code = insn;
-+	/* This is the sequence recommended in ARM DDI 0487E.a, page B2-136. */
-+	clean_dcache_pou(code);
-+	dsb(ish);
-+	inval_icache_pou(code);
-+	dsb(ish);
-+	isb();
-+
-+	((fn_t)code)();
-+}
-+
-+static void check_code_generation(bool dcache_clean, bool icache_inval)
-+{
-+	u32 fn[] = {MOV_X0(0x42), RET};
-+	u32 *code = alloc_page();
-+	unsigned long sctlr;
-+	int i, ret;
-+	bool success;
-+
-+	/* Make sure we can execute from a writable page */
-+	mmu_clear_user((unsigned long)code);
-+
-+	sctlr = read_sysreg(sctlr_el1);
-+	if (sctlr & SCTLR_EL1_WXN) {
-+		sctlr &= ~SCTLR_EL1_WXN;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+		/* SCTLR_EL1.WXN is permitted to be cached in a TLB. */
-+		flush_tlb_all();
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(fn); i++) {
-+		*(code + i) = fn[i];
-+		clean_dcache_pou(code + i);
-+		dsb(ish);
-+		inval_icache_pou(code + i);
-+	}
-+	dsb(ish);
-+	isb();
-+
-+	/* Sanity check */
-+	((fn_t)code)();
-+
-+	success = true;
-+	for (i = 0; i < NTIMES; i++) {
-+		prime_icache(code, MOV_X0(0x42));
-+		*code = MOV_X0(0x66);
-+		if (dcache_clean)
-+			clean_dcache_pou(code);
-+		if (icache_inval) {
-+			if (dcache_clean)
-+				dsb(ish);
-+			inval_icache_pou(code);
-+		}
-+		dsb(ish);
-+		isb();
-+
-+		ret = ((fn_t)code)();
-+		success &= (ret == 0x66);
-+	}
-+
-+	report("code generation", success);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	u64 ctr, clidr;
-+	bool dcache_clean, icache_inval;
-+
-+	report_prefix_push("IDC-DIC");
-+
-+	ctr = read_sysreg(ctr_el0);
-+	dcache_clean = !(ctr & CTR_IDC);
-+	icache_inval = !(ctr & CTR_DIC);
-+
-+	if (dcache_clean) {
-+		clidr = read_sysreg(clidr_el1);
-+		if ((clidr & CLIDR_LOC_MASK) == 0)
-+			dcache_clean = false;
-+		if ((clidr & CLIDR_LOUU_MASK) == 0 &&
-+		    (clidr & CLIDR_LOUIS_MASK) == 0)
-+			dcache_clean = false;
-+	}
-+
-+	if (dcache_clean)
-+		report_info("dcache clean to PoU required");
-+	if (icache_inval)
-+		report_info("icache invalidation to PoU required");
-+
-+	check_code_generation(dcache_clean, icache_inval);
-+
-+	return report_summary();
-+}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 6d3df92a4e28..daeb5a09ad39 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -142,3 +142,9 @@ smp = 2
- groups = nodefault,micro-bench
- accel = kvm
- arch = arm64
-+
-+# Cache emulation tests
-+[cache]
-+file = cache.flat
-+arch = arm64
-+groups = cache
--- 
-2.20.1
+>
+> /home/phil/source/qemu/accel/kvm/kvm-all.c: In function =E2=80=98kvm_log_=
+clear=E2=80=99:
+> /home/phil/source/qemu/accel/kvm/kvm-all.c:1121:8: error: =E2=80=98ret=E2=
+=80=99 may be
+> used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>      if (r < 0) {
+>         ^
+> cc1: all warnings being treated as errors
+> make[1]: *** [/home/phil/source/qemu/rules.mak:69:
+> accel/kvm/kvm-all.o] Error 1
+>
+> Fixes: 4222147dfb7
+>
+>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>> ---
+>>>>   accel/kvm/kvm-all.c | 6 +++---
+>>>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>>>> index aabe097c41..d2d96d73e8 100644
+>>>> --- a/accel/kvm/kvm-all.c
+>>>> +++ b/accel/kvm/kvm-all.c
+>>>> @@ -712,11 +712,11 @@ static int kvm_physical_log_clear(KVMMemoryListe=
+ner *kml,
+>>>>       KVMState *s =3D kvm_state;
+>>>>       uint64_t start, size, offset, count;
+>>>>       KVMSlot *mem;
+>>>> -    int ret, i;
+>>>> +    int ret =3D 0, i;
+>>>>         if (!s->manual_dirty_log_protect) {
+>>>>           /* No need to do explicit clear */
+>>>> -        return 0;
+>>>> +        return ret;
+>>>>       }
+>>>>         start =3D section->offset_within_address_space;
+>>>> @@ -724,7 +724,7 @@ static int kvm_physical_log_clear(KVMMemoryListene=
+r *kml,
+>>>>         if (!size) {
+>>>>           /* Nothing more we can do... */
+>>>> -        return 0;
+>>>> +        return ret;
+>>>>       }
+>>>>         kvm_slots_lock(kml);
+>>>>
+>>>
+>>> Queued, thanks.
+>>>
+>>> Paolo
+>>>
+>>
 
+
+--
+Alex Benn=C3=A9e
