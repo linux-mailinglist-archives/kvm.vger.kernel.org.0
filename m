@@ -2,113 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 177E4C9AAB
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 11:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 343F7C9B59
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 12:01:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728898AbfJCJWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 05:22:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51004 "EHLO mx1.redhat.com"
+        id S1729149AbfJCKAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 06:00:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48622 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727611AbfJCJWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 05:22:18 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        id S1729103AbfJCKAs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 06:00:48 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C5DBD796E9
-        for <kvm@vger.kernel.org>; Thu,  3 Oct 2019 09:22:17 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id v17so439194wru.12
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 02:22:17 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6280010F09
+        for <kvm@vger.kernel.org>; Thu,  3 Oct 2019 10:00:48 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id k2so887221wrn.7
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 03:00:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=HAKXNqxlu9hZBy+XRHRcb7TZaV3lei632APcndVyxUk=;
-        b=VZhtS7XZNPPEk4/smKUQ40Js9BZ/bcDjuQnZ4aUtOI9x+KxC0XuY86d6PUqWwNnrwg
-         wia75l9EylLAc4S9csKQ4Lwx7/ICcs5IsKY4Hs1tCOjKI5/IwJiTCRy7hLaiRgP/IAEz
-         XY9rEiOiPUue9MAZEdM8BBSWXQvQstfVBpRRzN13KXrxWhyt1tAjacihidR316VsJowC
-         dxE+rq3pmu0b0TxlT9kRzMArb8OrViSsWZ2bwMSv2DO7l3gzH2lgnhY0PlPRtWbi10Ga
-         oUDPyx3MTjCzpBBWFik70JCcR38d2CZfb1LeJM2KPnIPGVQZPUNofRzxc5NXfDFvMMog
-         +S0w==
-X-Gm-Message-State: APjAAAX1SIxQD+O3cblFT2S4t6HX+1zchtU61EwCEr8nNRVWI7fLCO4s
-        g7zr3PlTaMTY/5+o6w80bYIIgYChReav6dmHhzh3zut1rJVRER8mJ7WtxMSXo99kFuEftUbLfwm
-        C+fss5Uu14Q0m
-X-Received: by 2002:adf:e701:: with SMTP id c1mr6393786wrm.296.1570094536555;
-        Thu, 03 Oct 2019 02:22:16 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyKdm7DfRH9ongAz9t7tr/3VrJ7SkrtbeY99qjcjiPSRnYpusQl2V4khxoImjgoyGDORVpe6Q==
-X-Received: by 2002:adf:e701:: with SMTP id c1mr6393773wrm.296.1570094536306;
-        Thu, 03 Oct 2019 02:22:16 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
-        by smtp.gmail.com with ESMTPSA id l11sm2106255wmh.34.2019.10.03.02.22.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2019 02:22:15 -0700 (PDT)
-Date:   Thu, 3 Oct 2019 11:22:13 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc:     qemu-devel@nongnu.org,
-        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] accel/kvm: ensure ret always set
-Message-ID: <20191003092213.etjzlwgd7nlnzqay@steredhat>
-References: <20191002102212.6100-1-alex.bennee@linaro.org>
- <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=j4Sd4Y4ZJrOTf0nQAt0dRSPWuAZd0kaqiXKDLBQk1w4=;
+        b=bIgaYzSWtE0H9LtWf9vV0PV0turdtckaZzRAdvNO++pafY4SeW6QsW6pEADEiz453p
+         jipkeN8lRhMp9ovKKeVypJOuTdMCYwX37ZPucaHeLQyakUTl7tbfYGRq6NANktOBb44r
+         J4YJt+zSENepTLHohQwd/75ypF2wBl6ddVUuYi5cB7cMiLnSbICqa9ja5fAoESUU9baP
+         kk4TpX9AbfmjwZjHe5aohM0+8+RvbM6qkFhDPzJSov0MRMrFHbw/ELA96AdT0aIaQo6+
+         PqUIwPg8+/VJaby+h9iHF/3oaU1tb8vcIBFDQf4cQcMzbhJ1QMPZJv5cYIus2ksJ+pVH
+         whGw==
+X-Gm-Message-State: APjAAAXCvDElT0GI4OagbS/SVIGGBN4d/40E+IUDgp4rHLSxpb1ejtos
+        bOVyD1fk8WRCIQhff8d5JZuVq9LWhB28haEmb3Qerjwcz+6wnJHeybLtoOCewzmJ/miZumDYBgZ
+        7HuZUgDhGfVlg
+X-Received: by 2002:a5d:4d42:: with SMTP id a2mr6273521wru.89.1570096847044;
+        Thu, 03 Oct 2019 03:00:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx43Qbh0FZwMiSJLnAcybiyT39Q5fJhZPWfbU32Il+ItDqqHxpKQvd2OQb8SRTwGnd1gMfFyA==
+X-Received: by 2002:a5d:4d42:: with SMTP id a2mr6273499wru.89.1570096846686;
+        Thu, 03 Oct 2019 03:00:46 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
+        by smtp.gmail.com with ESMTPSA id l4sm2567905wrw.6.2019.10.03.03.00.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Oct 2019 03:00:45 -0700 (PDT)
+Subject: Re: [PATCH v3] selftests: kvm: Fix libkvm build error
+To:     Shuah Khan <skhan@linuxfoundation.org>, rkrcmar@redhat.com,
+        shuah@kernel.org
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20191002231430.5839-1-skhan@linuxfoundation.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4b46d043-9990-e95a-2665-a9382af1f723@redhat.com>
+Date:   Thu, 3 Oct 2019 12:00:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20191002231430.5839-1-skhan@linuxfoundation.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 01:08:40PM +0200, Paolo Bonzini wrote:
-> On 02/10/19 12:22, Alex Bennée wrote:
-> > Some of the cross compilers rightly complain there are cases where ret
-> > may not be set. 0 seems to be the reasonable default unless particular
-> > slot explicitly returns -1.
-> > 
-
-Even Coverity reported it (CID 1405857).
-
-> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> > ---
-> >  accel/kvm/kvm-all.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index aabe097c41..d2d96d73e8 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -712,11 +712,11 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
-> >      KVMState *s = kvm_state;
-> >      uint64_t start, size, offset, count;
-> >      KVMSlot *mem;
-> > -    int ret, i;
-> > +    int ret = 0, i;
-> >  
-> >      if (!s->manual_dirty_log_protect) {
-> >          /* No need to do explicit clear */
-> > -        return 0;
-> > +        return ret;
-> >      }
-> >  
-> >      start = section->offset_within_address_space;
-> > @@ -724,7 +724,7 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
-> >  
-> >      if (!size) {
-> >          /* Nothing more we can do... */
-> > -        return 0;
-> > +        return ret;
-> >      }
-> >  
-> >      kvm_slots_lock(kml);
-> > 
+On 03/10/19 01:14, Shuah Khan wrote:
+> Fix the following build error from "make TARGETS=kvm kselftest":
 > 
-> Queued, thanks.
+> libkvm.a(assert.o): relocation R_X86_64_32 against `.rodata.str1.1' can not be used when making a PIE object; recompile with -fPIC
 > 
-> Paolo
+> This error is seen when build is done from the main Makefile using
+> kselftest target. In this case KBUILD_CPPFLAGS and CC_OPTION_CFLAGS
+> are defined.
+> 
+> When build is invoked using:
+> 
+> "make -C tools/testing/selftests/kvm" KBUILD_CPPFLAGS and CC_OPTION_CFLAGS
+> aren't defined.
+> 
+> There is no need to pass in KBUILD_CPPFLAGS and CC_OPTION_CFLAGS for the
+> check to determine if --no-pie is necessary, which is the case when these
+> two aren't defined when "make -C tools/testing/selftests/kvm" runs.
+> 
+> Fix it by simplifying the no-pie-option logic. With this change, both
+> build variations work.
+> 
+> "make TARGETS=kvm kselftest"
+> "make -C tools/testing/selftests/kvm"
+> 
+> Signed-off-by: Shuah Khan <skhan@linuxfoundation.org>
+> ---
+> Changes since v2:
+> -- Removed extra blank line added by accident.
+> -- Fixed commit log.
+> 
+>  tools/testing/selftests/kvm/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 62c591f87dab..7ee097658ef0 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -48,7 +48,7 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+>  	-I$(LINUX_HDR_PATH) -Iinclude -I$(<D) -Iinclude/$(UNAME_M) -I..
+>  
+>  no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
+> -        $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+> +        $(CC) -Werror -no-pie -x c - -o "$$TMP", -no-pie)
+>  
+>  # On s390, build the testcases KVM-enabled
+>  pgste-option = $(call try-run, echo 'int main() { return 0; }' | \
 > 
 
--- 
+Queued, thanks.
+
+Paolo
