@@ -2,155 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 822CFCAF55
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 21:37:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88490CAF5C
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 21:38:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732409AbfJCThI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 15:37:08 -0400
-Received: from mail-eopbgr1320129.outbound.protection.outlook.com ([40.107.132.129]:31940
-        "EHLO APC01-PU1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728812AbfJCThI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 15:37:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FK4BRdWeXwCJVF59vDLq4L+yBSsQ02FZltIBBMw5wCDRerXUJ0jWVQKj7QVcQKeAJaYH4agoFZ8OTrKWs4s+KDF2Twz9/BBj7+B8oATp2xkDKm88XQzQYkG7Uug8bmUaAFc+u12sdT8ccu81HqytOJUl/kfQThAFS7q71c4OAyp3B7NTqe+cLMpPZUDjY++afRSwRJ46DtkEAlDeQY3YEDEmgDp4IzkxgcfMR26IDif3yYMg/+wjJtZKxwnl+2ZrjYey3KOOP5yOPQ6EVViJ7MssZvc0oJv5banTzsN/vMS9Wtricgey6BqYaEDpuquNz1ryNcbslVB0J1YOgfFAWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tOznQ6K8BDawJi6inDLukyC71uBlyb8CD1TXI0C3SoQ=;
- b=l31JrRb6ep10lJUeRTeySaN+9ZWwbTCTluqx+38oWbIZknlwBUl1JGOov3T6mPxPGjc5X2+PAMg7LVGM2j6fm946AvFskTrgItKXgOweLzF+4v9hsjQfJpoMtcq0Xt5G6gpsTrtHl3/o4vnWzGl8eFpXQeH2o2qOh5/vbBggPnnBRAlX1rF3Kjaqb4r8sK1F1oyYgwUKG4zrusYGrZrMJLaEfmadm6rybBXc6NGN/PGzPS1iOfiReX1YW93JlwHp39VjgkMNG/SFqaxNLQaq9Tx9ojVwmXo06IgE9UPW9LZUYfEaVmBJTnjDUYJD015T+tVJC4eSPrQOgXft4wDftQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tOznQ6K8BDawJi6inDLukyC71uBlyb8CD1TXI0C3SoQ=;
- b=bEB47uycE/H+72u5C8oJrh+O610GuU9v5qzthP7N3aK9mcw+yK17hIzpFAlRjnlX/wFc0szrLHDyfbS/ZU77WAycjnJg0I8yaVQBO8G8rdxk/Gfno7nQLFqZq+Bqj2RTEjqg5GVr73MzY/K+1TGpfQoWTe+PVGnIR9QZ5y1UJ64=
-Received: from KU1P153MB0166.APCP153.PROD.OUTLOOK.COM (10.170.173.13) by
- KU1P153MB0182.APCP153.PROD.OUTLOOK.COM (10.170.175.144) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.6; Thu, 3 Oct 2019 19:36:17 +0000
-Received: from KU1P153MB0166.APCP153.PROD.OUTLOOK.COM
- ([fe80::ccb6:acbd:7d4c:7f7c]) by KU1P153MB0166.APCP153.PROD.OUTLOOK.COM
- ([fe80::ccb6:acbd:7d4c:7f7c%6]) with mapi id 15.20.2347.011; Thu, 3 Oct 2019
- 19:36:17 +0000
-From:   Dexuan Cui <decui@microsoft.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC:     "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        KY Srinivasan <kys@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Sasha Levin <sashal@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        id S1731842AbfJCTij (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 15:38:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59508 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731750AbfJCTij (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 15:38:39 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EDA87C05AA64
+        for <kvm@vger.kernel.org>; Thu,  3 Oct 2019 19:38:38 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id s19so917612wmj.0
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 12:38:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7QLgfjpHoSlZ+ECWPNFBD+JW0vOaubyrwbW7qiEpfTs=;
+        b=RfFrJ0u/j+EhRtR+AlzPKvmTMjFYI6NOkZqJJElmmEF6UagHFkP1u/JscvIZzHTQP5
+         ssRMRI1CIagUeXbfhesIQT/DrgxGKaA1uXnmQniK9oRfXETMbQbJTThHzEKm1qyzUNEd
+         9VJhCm0vF0T16VjU+u1e/VQ4GJlVjhmekEV+NYaNmBkDdZx05IEZFNkwBsSxa7nCwe32
+         ZmdaOgxyePhWxUYT72+9oRTNA58A1BN8CTq6AmXC6FQwaihrTGVFU9ul3m5ZrTf0KodB
+         ga093zsRZ0NWaXJJhWxy+ccRHkbXDi9FngyvRRR7g1GZXcqXYYd7ehrRngdgwQLAh60q
+         dGrA==
+X-Gm-Message-State: APjAAAWEOs8FlfOAjCTtWsqjhw6Ce02dYvkem59x8QBoXyfaw2HEClEC
+        4YrcZcHcfQslLSw7V8c1vol8ojWpFwhjmpe3E6AMS18O3tUz6mONkKddAVZWPGVbyo3T/KKvAKQ
+        ajeJ/rAWcI75x
+X-Received: by 2002:adf:e28e:: with SMTP id v14mr8548952wri.184.1570131517629;
+        Thu, 03 Oct 2019 12:38:37 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwaEc996x92Bjfkrt/7/Bp3ePgLBVpbOA1h0uSvOWcidOkSjdp4RwK4EnTkpGFal4Tmi9DFQw==
+X-Received: by 2002:adf:e28e:: with SMTP id v14mr8548930wri.184.1570131517306;
+        Thu, 03 Oct 2019 12:38:37 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e56d:fbdf:8b79:c79c? ([2001:b07:6468:f312:e56d:fbdf:8b79:c79c])
+        by smtp.gmail.com with ESMTPSA id q124sm5331957wma.5.2019.10.03.12.38.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Oct 2019 12:38:36 -0700 (PDT)
+Subject: Re: DANGER WILL ROBINSON, DANGER
+To:     Jerome Glisse <jglisse@redhat.com>,
+        Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>
+Cc:     =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
+        Matthew Wilcox <willy@infradead.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Jorgen Hansen <jhansen@vmware.com>
-Subject: RE: [RFC PATCH 09/13] hv_sock: set VMADDR_CID_HOST in the
- hvs_remote_addr_init()
-Thread-Topic: [RFC PATCH 09/13] hv_sock: set VMADDR_CID_HOST in the
- hvs_remote_addr_init()
-Thread-Index: AQHVdSavCYSzGTajGEWMNaF3wKj8aadJVK/g
-Date:   Thu, 3 Oct 2019 19:36:17 +0000
-Message-ID: <KU1P153MB016631EC4AEA02A8AB8822F2BF9F0@KU1P153MB0166.APCP153.PROD.OUTLOOK.COM>
-References: <20190927112703.17745-1-sgarzare@redhat.com>
- <20190927112703.17745-10-sgarzare@redhat.com>
-In-Reply-To: <20190927112703.17745-10-sgarzare@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=decui@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-10-03T19:36:15.4668775Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=fd5fb71f-ff1a-4357-b430-a1e5f8fd6b4d;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=decui@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:9:4930:a527:7f59:8664]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4e7ec216-d22a-49a5-9fe4-08d74838f5f7
-x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: KU1P153MB0182:|KU1P153MB0182:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <KU1P153MB0182E10CC051BBC488649D9ABF9F0@KU1P153MB0182.APCP153.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:2331;
-x-forefront-prvs: 01792087B6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(136003)(346002)(376002)(39860400002)(366004)(199004)(189003)(14454004)(2906002)(446003)(11346002)(8936002)(186003)(256004)(478600001)(7416002)(10290500003)(74316002)(86362001)(81166006)(476003)(81156014)(52536014)(5660300002)(6436002)(14444005)(71200400001)(71190400001)(46003)(229853002)(8676002)(2501003)(102836004)(66946007)(64756008)(33656002)(66476007)(25786009)(66556008)(9686003)(305945005)(6246003)(66446008)(4326008)(486006)(6506007)(76176011)(7696005)(7736002)(53546011)(6116002)(316002)(22452003)(110136005)(76116006)(10090500001)(54906003)(8990500004)(99286004)(55016002);DIR:OUT;SFP:1102;SCL:1;SRVR:KU1P153MB0182;H:KU1P153MB0166.APCP153.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PUqo+BAl5swCmZCNUwDr6ptDu8ohnXDgoF2lQ8dhTt/AnlF3NuW50ZtyMOseBNU5bZV4Qu2B6zI14PuWOhnx6klNR2e0vB/mpDYodeIhNsl27fCozJT3FKNf03pdh1f2dxy7hvH1ZMrNMwiHsNzgHzZuGAwafFHUYwhlbGkRKXoPcUwoGjDqVR2NhRfIBde8pUsaiTVXY9arOoJE4QmGEXcS8umSLY8BdAGSIGR3fD939xmfE3HChHm+BgGbImO/7r+8ck6hMuLvcqB39/oRi3GenDUy8POuUeSd5H0w99MzFYXz/j0fJ4tHZ00KHPkgFVIUj737NRO4ZmWEMvPlbzgbVxnV5JAS6lliEsDaDXecVWy8YYNDd3QvAtQZNTYduRyLm0R6YXf9yLjjRrAyJuO8r3RPX/G+hnm0RrRvfMA=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        =?UTF-8?Q?Samuel_Laur=c3=a9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C <yu.c.zhang@intel.com>,
+        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
+References: <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
+ <20191002192714.GA5020@redhat.com>
+ <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
+ <20191002141542.GA5669@redhat.com>
+ <f26710a4-424f-730c-a676-901bae451409@redhat.com>
+ <20191002170429.GA8189@redhat.com>
+ <dd0ca0d3-f502-78a1-933a-7e1b5fb90baa@redhat.com>
+ <20191003154233.GA4421@redhat.com>
+ <d62a6720-e069-4e03-6a3a-798c020786f7@redhat.com>
+ <DB7PR02MB39796440DC81A5B53E86F029BB9F0@DB7PR02MB3979.eurprd02.prod.outlook.com>
+ <20191003183108.GA3557@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <afe2cf69-5c2c-95af-88ce-f3814fece2e2@redhat.com>
+Date:   Thu, 3 Oct 2019 21:38:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e7ec216-d22a-49a5-9fe4-08d74838f5f7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2019 19:36:17.3791
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mi/C7177I32orbMkK79hf9ANs3UIxyLsFPj/rm5Q7AONE2E+4BE7j75wKHs1wGkkCMcPhFU+BGt37GAbVHD0tQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KU1P153MB0182
+In-Reply-To: <20191003183108.GA3557@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> Sent: Friday, September 27, 2019 4:27 AM
-> To: netdev@vger.kernel.org
-> Cc: linux-hyperv@vger.kernel.org; KY Srinivasan <kys@microsoft.com>; Stef=
-an
-> Hajnoczi <stefanha@redhat.com>; Sasha Levin <sashal@kernel.org>;
-> linux-kernel@vger.kernel.org; kvm@vger.kernel.org; David S. Miller
-> <davem@davemloft.net>; virtualization@lists.linux-foundation.org; Stephen
-> Hemminger <sthemmin@microsoft.com>; Jason Wang
-> <jasowang@redhat.com>; Michael S. Tsirkin <mst@redhat.com>; Haiyang
-> Zhang <haiyangz@microsoft.com>; Dexuan Cui <decui@microsoft.com>;
-> Jorgen Hansen <jhansen@vmware.com>
-> Subject: [RFC PATCH 09/13] hv_sock: set VMADDR_CID_HOST in the
-> hvs_remote_addr_init()
->=20
-> Remote peer is always the host, so we set VMADDR_CID_HOST as
-> remote CID instead of VMADDR_CID_ANY.
->=20
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/hyperv_transport.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/net/vmw_vsock/hyperv_transport.c
-> b/net/vmw_vsock/hyperv_transport.c
-> index 4f47af2054dd..306310794522 100644
-> --- a/net/vmw_vsock/hyperv_transport.c
-> +++ b/net/vmw_vsock/hyperv_transport.c
-> @@ -186,7 +186,8 @@ static void hvs_remote_addr_init(struct sockaddr_vm
-> *remote,
->  	static u32 host_ephemeral_port =3D MIN_HOST_EPHEMERAL_PORT;
->  	struct sock *sk;
->=20
-> -	vsock_addr_init(remote, VMADDR_CID_ANY, VMADDR_PORT_ANY);
-> +	/* Remote peer is always the host */
-> +	vsock_addr_init(remote, VMADDR_CID_HOST, VMADDR_PORT_ANY);
->=20
->  	while (1) {
->  		/* Wrap around ? */
-> --
+On 03/10/19 20:31, Jerome Glisse wrote:
+> So in summary, the source qemu process has anonymous vma (regular
+> libc malloc for instance). The introspector qemu process which
+> mirror the the source qemu use mmap on /dev/kvm (assuming you can
+> reuse the kvm device file for this otherwise you can introduce a
+> new kvm device file). 
 
-Looks good to me, since hv_sock doesn't really use the CID in the=20
-transport layer.
+It should be a new device, something like /dev/kvmmem.  BitDefender's
+RFC patches already have the right userspace API, that was not an issue.
 
-Reviewed-by: Dexuan Cui <decui@microsoft.com>
+Paolo
