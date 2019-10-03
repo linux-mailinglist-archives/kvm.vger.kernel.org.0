@@ -2,150 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AB9CC9987
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 10:10:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 177E4C9AAB
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 11:22:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727385AbfJCIKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 04:10:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58468 "EHLO mx1.redhat.com"
+        id S1728898AbfJCJWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 05:22:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51004 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725907AbfJCIKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 04:10:16 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727611AbfJCJWS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 05:22:18 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6655C300BEA4;
-        Thu,  3 Oct 2019 08:10:16 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B529819C6A;
-        Thu,  3 Oct 2019 08:10:12 +0000 (UTC)
-Date:   Thu, 3 Oct 2019 10:10:10 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH 7/9] KVM: selftests: Add parameter to _vm_create for
- memslot 0 base paddr
-Message-ID: <20191003081010.shestpcaqc7knoct@kamzik.brq.redhat.com>
-References: <20190927161836.57978-1-bgardon@google.com>
- <20190927161836.57978-8-bgardon@google.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id C5DBD796E9
+        for <kvm@vger.kernel.org>; Thu,  3 Oct 2019 09:22:17 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id v17so439194wru.12
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 02:22:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=HAKXNqxlu9hZBy+XRHRcb7TZaV3lei632APcndVyxUk=;
+        b=VZhtS7XZNPPEk4/smKUQ40Js9BZ/bcDjuQnZ4aUtOI9x+KxC0XuY86d6PUqWwNnrwg
+         wia75l9EylLAc4S9csKQ4Lwx7/ICcs5IsKY4Hs1tCOjKI5/IwJiTCRy7hLaiRgP/IAEz
+         XY9rEiOiPUue9MAZEdM8BBSWXQvQstfVBpRRzN13KXrxWhyt1tAjacihidR316VsJowC
+         dxE+rq3pmu0b0TxlT9kRzMArb8OrViSsWZ2bwMSv2DO7l3gzH2lgnhY0PlPRtWbi10Ga
+         oUDPyx3MTjCzpBBWFik70JCcR38d2CZfb1LeJM2KPnIPGVQZPUNofRzxc5NXfDFvMMog
+         +S0w==
+X-Gm-Message-State: APjAAAX1SIxQD+O3cblFT2S4t6HX+1zchtU61EwCEr8nNRVWI7fLCO4s
+        g7zr3PlTaMTY/5+o6w80bYIIgYChReav6dmHhzh3zut1rJVRER8mJ7WtxMSXo99kFuEftUbLfwm
+        C+fss5Uu14Q0m
+X-Received: by 2002:adf:e701:: with SMTP id c1mr6393786wrm.296.1570094536555;
+        Thu, 03 Oct 2019 02:22:16 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyKdm7DfRH9ongAz9t7tr/3VrJ7SkrtbeY99qjcjiPSRnYpusQl2V4khxoImjgoyGDORVpe6Q==
+X-Received: by 2002:adf:e701:: with SMTP id c1mr6393773wrm.296.1570094536306;
+        Thu, 03 Oct 2019 02:22:16 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
+        by smtp.gmail.com with ESMTPSA id l11sm2106255wmh.34.2019.10.03.02.22.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2019 02:22:15 -0700 (PDT)
+Date:   Thu, 3 Oct 2019 11:22:13 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     qemu-devel@nongnu.org,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] accel/kvm: ensure ret always set
+Message-ID: <20191003092213.etjzlwgd7nlnzqay@steredhat>
+References: <20191002102212.6100-1-alex.bennee@linaro.org>
+ <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190927161836.57978-8-bgardon@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
 User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Thu, 03 Oct 2019 08:10:16 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 09:18:35AM -0700, Ben Gardon wrote:
-> KVM creates internal memslots between 3 and 4 GiB paddrs on the first
-> vCPU creation. If memslot 0 is large enough it collides with these
-> memslots an causes vCPU creation to fail. Add a paddr parameter for
-> memslot 0 so that tests which support large VMs can relocate memslot 0
-> above 4 GiB.
+On Wed, Oct 02, 2019 at 01:08:40PM +0200, Paolo Bonzini wrote:
+> On 02/10/19 12:22, Alex Bennée wrote:
+> > Some of the cross compilers rightly complain there are cases where ret
+> > may not be set. 0 seems to be the reasonable default unless particular
+> > slot explicitly returns -1.
+> > 
+
+Even Coverity reported it (CID 1405857).
+
+> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> > ---
+> >  accel/kvm/kvm-all.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > index aabe097c41..d2d96d73e8 100644
+> > --- a/accel/kvm/kvm-all.c
+> > +++ b/accel/kvm/kvm-all.c
+> > @@ -712,11 +712,11 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
+> >      KVMState *s = kvm_state;
+> >      uint64_t start, size, offset, count;
+> >      KVMSlot *mem;
+> > -    int ret, i;
+> > +    int ret = 0, i;
+> >  
+> >      if (!s->manual_dirty_log_protect) {
+> >          /* No need to do explicit clear */
+> > -        return 0;
+> > +        return ret;
+> >      }
+> >  
+> >      start = section->offset_within_address_space;
+> > @@ -724,7 +724,7 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
+> >  
+> >      if (!size) {
+> >          /* Nothing more we can do... */
+> > -        return 0;
+> > +        return ret;
+> >      }
+> >  
+> >      kvm_slots_lock(kml);
+> > 
 > 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
->  tools/testing/selftests/kvm/dirty_log_test.c     | 2 +-
->  tools/testing/selftests/kvm/include/kvm_util.h   | 3 ++-
->  tools/testing/selftests/kvm/lib/kvm_util.c       | 7 ++++---
->  4 files changed, 8 insertions(+), 6 deletions(-)
+> Queued, thanks.
 > 
-> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> index fe6c5a4f8b8c2..eb1f7e4b83de3 100644
-> --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> @@ -171,7 +171,7 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, int vcpus,
->  	pages += (2 * pages) / PTES_PER_PT;
->  	pages += ((2 * vcpus * vcpu_wss) >> PAGE_SHIFT_4K) / PTES_PER_PT;
->  
-> -	vm = _vm_create(mode, pages, O_RDWR);
-> +	vm = vm_create(mode, pages, O_RDWR);
-
-Eh, we should have removed/renamed _vm_create() with 12c386b23083 ("KVM:
-selftests: Move vm type into _vm_create() internally")
-
->  	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
->  #ifdef __x86_64__
->  	vm_create_irqchip(vm);
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> index 5614222a66285..181eac3a12b66 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -252,7 +252,7 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, uint32_t vcpuid,
->  	struct kvm_vm *vm;
->  	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
->  
-> -	vm = _vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
-> +	vm = vm_create(mode, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
->  	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
->  #ifdef __x86_64__
->  	vm_create_irqchip(vm);
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 29cccaf96baf6..4f672c00c9e9b 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -69,7 +69,8 @@ int kvm_check_cap(long cap);
->  int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
->  
->  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-> -struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-> +struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t guest_paddr,
-> +			  uint64_t phy_pages, int perm);
-
-But now we need it again. Or do we? How about just documenting that if
-phy_pages is >= some-limit then the base address will be 4G, otherwise
-it will be zero? The documentation (comment above _vm_create()) needs to
-be updated with this patch regardless. Either the behavior changes or a
-new parameter is added.
-
-If you go with my suggestion to just use 4G when phy_pages are large, then
-please rename _vm_create to vm_create.
-
-Thanks,
-drew
-
->  void kvm_vm_free(struct kvm_vm *vmp);
->  void kvm_vm_restart(struct kvm_vm *vmp, int perm);
->  void kvm_vm_release(struct kvm_vm *vmp);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 80a338b5403c3..7ec2bbdaba875 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -132,7 +132,8 @@ _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
->   * descriptor to control the created VM is created with the permissions
->   * given by perm (e.g. O_RDWR).
->   */
-> -struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
-> +struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t guest_paddr,
-> +			  uint64_t phy_pages, int perm)
->  {
->  	struct kvm_vm *vm;
->  
-> @@ -229,14 +230,14 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->  	vm->vpages_mapped = sparsebit_alloc();
->  	if (phy_pages != 0)
->  		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> -					    0, 0, phy_pages, 0);
-> +					    guest_paddr, 0, phy_pages, 0);
->  
->  	return vm;
->  }
->  
->  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->  {
-> -	return _vm_create(mode, phy_pages, perm);
-> +	return _vm_create(mode, 0, phy_pages, perm);
->  }
->  
->  /*
-> -- 
-> 2.23.0.444.g18eeb5a265-goog
+> Paolo
 > 
+
+-- 
