@@ -2,93 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DBC2DCA791
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 18:58:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FE9ACAB44
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 19:27:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406232AbfJCQwm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 12:52:42 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33953 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2406217AbfJCQwk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 3 Oct 2019 12:52:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1570121557;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=tybQJeiTvUGtxO8XDYAq0hVZIN5gzAPeQsA+LVu9afc=;
-        b=Waba46WaY2yd5NfmKGJO4zGMPTvomiLKa6s2EXlsCQpBMNPRITwMMX4pI5z0ur7BF0spQf
-        sRStIn9P79S1N5ufo7uOWdFIEQFN241HZ08HKzK4yxqTRZ53pYqQ3UcmPKL9Qo2vKpjZBb
-        ukPsCxgwNeikYNgeyviBJmtPNCYsx/k=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-bdLL8FwZOra7EW-D8e3w0A-1; Thu, 03 Oct 2019 12:52:35 -0400
-Received: by mail-wm1-f69.google.com with SMTP id z205so1365270wmb.7
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 09:52:35 -0700 (PDT)
+        id S1733107AbfJCQPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 12:15:17 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:37762 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732097AbfJCQPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 12:15:16 -0400
+Received: by mail-io1-f65.google.com with SMTP id b19so6909913iob.4
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 09:15:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QwoJ9x/CptVFOYYUSaQdv01VllsP4QeffyoClOX85BU=;
+        b=p0siVdZennr0gmzQGy0y2PNbP8WC6xILQpwIZyIfVtpaDWsfw9W7kEoyQGHNLq9CDu
+         GIXgz2iDHcr0w7X8IPRMXHymzrT+HUYBNGJ7SZsk1djkloZE9MhnCQW0JWwg8fJ/etUh
+         yJC91qdxoXQqkkKP83YyWe3yoT4PWixn+Ay5/H6g2KgO9//sXp+w9CpVQ/3xhFFbFahM
+         xajpZeexOEPzUGZnJGXwPIXNVE9T+0SrDWMHQjV22yUmeSfjFt2AnwbDPVBmEpeh8Pxz
+         bJkuEVn3Roy/Kpz83BZxo3HAtyQtdzrCAgcJ/KFy3iXCthrY3PnpIOxucRnS6jnBd++z
+         b+0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GnNfg+jK+d2HJELoS7JAVulpIPiPSgLEm7obVUrPELc=;
-        b=X3SXs5jFmEzej8H90BbR8xaPqKXpQtJLChVl9RPNqWouJqMM8UDAUfa1BXA/2MguCL
-         eSQ8VCPH6c3jLxP/IEBf5mhguNXmtYrhBu1SF3pIohTnO6ql1MWALkaiyrRcXx3O4R5x
-         zjglK0V0QKG/9dtXjeVbcd3KQcDUUxWVVDVxJnlukvCfujurRksoCP0ANFlFXgEjfZk/
-         /MvxwSzRnX5Kr069JPbSgUkLxfnI9P+ODI0+AJIiVyGh0hrz+c67BUvyzhgHmbKY0oMc
-         NvD4Cb0+RRi1fHA/tnWTs5L4fIp4ka63DenDga5799HlAonzXB/mA+Acn+G74ku3/TVm
-         3eJA==
-X-Gm-Message-State: APjAAAUViN/1U1LEMsx3o/aTazY6TdM6QWCRbkmGln/BdwxRbMZ7HcVX
-        u8oHWqfUsAuWtrKgw2E1PdoOCOk5tUliCUimRkZ2KEyt9jbVx0vABn59ABEqEvzaK0nq/q5xFsr
-        q0exjNmGEMChD
-X-Received: by 2002:a05:600c:20c4:: with SMTP id y4mr6905917wmm.87.1570121554534;
-        Thu, 03 Oct 2019 09:52:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx0/6l10Ef/AQsvBHVjpnUYHEyob5QbVKn35N6gSkHr2hx75ewq5tUPpyOsg0AJOHpewPbebg==
-X-Received: by 2002:a05:600c:20c4:: with SMTP id y4mr6905904wmm.87.1570121554237;
-        Thu, 03 Oct 2019 09:52:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
-        by smtp.gmail.com with ESMTPSA id r7sm3549284wrx.87.2019.10.03.09.52.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2019 09:52:33 -0700 (PDT)
-Subject: Re: A question about INVPCID without PCID
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-References: <CALMp9eRPgZygwsG+abEx96+dt6rKyAMQJQx0qoHVbaTKFh0CqA@mail.gmail.com>
- <6220e2b4-be59-736c-bc98-30573d506387@redhat.com>
- <CALMp9eS=QEnpQV7OQ3gS61PJecJG7vaah-yGb6MGw7CFDTFxKw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <0f67871c-aa5c-d961-a913-e9ea3827938e@redhat.com>
-Date:   Thu, 3 Oct 2019 18:52:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QwoJ9x/CptVFOYYUSaQdv01VllsP4QeffyoClOX85BU=;
+        b=Potx7Jl5ihlvpsBcXSSYdtN+n3DaldYyLL36QQmG9o2bcAeBownrUXJPh93WhCEaAr
+         4mkXzR8qLShJERnJEGwYnBmBw+l+p4gIjDP2tlalCqZJ290HJxScXFVB4T51s0fxt+Rk
+         48UI4q1UNDqczzYw9aCDqkKIvk8FXrMhWFGi4COwa5N1RxIRamCydHz/RsNWyHU18rfb
+         Bk5qgYUXAxn353SDJxqVhoL6nOLmi4tJDguRDJFplpCKYLzdppHQYBSsN92rpTHpUdCR
+         K25H3Kj9E6uCQ5tpFeh2ZXbnmGzDjljy7VV3Fa6U5z5Wmacz4vqrWbvqOxbXhzyQF1am
+         Ilhg==
+X-Gm-Message-State: APjAAAV8X42DygXWdcgMMfX70DiDobwpnfW+ADHpbOqYi5DkrrKRt+GD
+        xhPo/2bdyucwFqfAQk/FwFNWwXgFs/lLI2wf9bQ1FQ==
+X-Google-Smtp-Source: APXvYqwjgn5SEWkSn6gEiWnIv/MHcjJfhZQBJrtgdT9mYKPjN0d+d3MbuQO/RW1r+BHFMhA2eXDigFgh9GV1UrGHlFo=
+X-Received: by 2002:a92:4a0d:: with SMTP id m13mr10286192ilf.119.1570119314283;
+ Thu, 03 Oct 2019 09:15:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eS=QEnpQV7OQ3gS61PJecJG7vaah-yGb6MGw7CFDTFxKw@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: bdLL8FwZOra7EW-D8e3w0A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20190904001422.11809-1-aaronlewis@google.com> <87o900j98f.fsf@vitty.brq.redhat.com>
+ <CALMp9eRbDAB0NF=WVjHJWJNPgsTfE_s+4CeGMkpJpXSGP9zOyg@mail.gmail.com>
+ <87sgp5g88z.fsf@vitty.brq.redhat.com> <17bf8eb1-a63d-8081-776f-930133ea26e1@amd.com>
+In-Reply-To: <17bf8eb1-a63d-8081-776f-930133ea26e1@amd.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 3 Oct 2019 09:15:03 -0700
+Message-ID: <CALMp9eQVFnFB8p=10H4oDzw6TwAEFRNkyAQOpKNi8L0x_r+ivw@mail.gmail.com>
+Subject: Re: [Patch] KVM: SVM: Fix svm_xsaves_supported
+To:     "Moger, Babu" <Babu.Moger@amd.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/10/19 18:19, Jim Mattson wrote:
-> I was actually looking at the code a few lines lower:
->=20
-> if (!invpcid_enabled) {
->         exec_control &=3D ~SECONDARY_EXEC_ENABLE_INVPCID;
->         guest_cpuid_clear(vcpu, X86_FEATURE_INVPCID);
+On Thu, Oct 3, 2019 at 9:02 AM Moger, Babu <Babu.Moger@amd.com> wrote:
+>
+>
+>
+> On 9/9/19 3:54 AM, Vitaly Kuznetsov wrote:
+> > Jim Mattson <jmattson@google.com> writes:
+> >
+> >> On Wed, Sep 4, 2019 at 9:51 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >>
+> >>> Currently, VMX code only supports writing '0' to MSR_IA32_XSS:
+> >>>
+> >>>         case MSR_IA32_XSS:
+> >>>                 if (!vmx_xsaves_supported() ||
+> >>>                     (!msr_info->host_initiated &&
+> >>>                      !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
+> >>>                        guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
+> >>>                         return 1;
+> >>>                 /*
+> >>>                  * The only supported bit as of Skylake is bit 8, but
+> >>>                  * it is not supported on KVM.
+> >>>                  */
+> >>>                 if (data != 0)
+> >>>                         return 1;
+> >>>
+> >>>
+> >>> we will probably need the same limitation for SVM, however, I'd vote for
+> >>> creating separate kvm_x86_ops->set_xss() implementations.
+> >>
+> >> I hope separate implementations are unnecessary. The allowed IA32_XSS
+> >> bits should be derivable from guest_cpuid_has() in a
+> >> vendor-independent way. Otherwise, the CPU vendors have messed up. :-)
+> >>
+> >> At present, we use the MSR-load area to swap guest/host values of
+> >> IA32_XSS on Intel (when the host and guest values differ), but it
+> >> seems to me that IA32_XSS and %xcr0 should be swapped at the same
+> >> time, in kvm_load_guest_xcr0/kvm_put_guest_xcr0. This potentially adds
+> >> an additional L1 WRMSR VM-exit to every emulated VM-entry or VM-exit
+> >> for nVMX, but since the host currently sets IA32_XSS to 0 and we only
+> >> allow the guest to set IA32_XSS to 0, we can probably worry about this
+> >> later.
+> >
+> > Yea, I was suggesting to split implementations as a future proof but a
+> > comment like "This ought to be 0 for now" would also do)
+>
+> Hi, Anyone actively working on this?
+>
+> I was trying to expose xsaves on AMD qemu guest. Found out that we need to
+> get this above code working before I can expose xsaves on guest. I can
+> re-post these patches if it is ok.
+>
+> Sorry, I dont have the complete background. From what I understood, we
+> need to add the same check as Intel for MSR_IA32_XSS in get_msr and set_msr.
+>
+> static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> {
+> ..
+>
+>  case MSR_IA32_XSS:
+>                 if (!vmx_xsaves_supported() ||
+>                     (!msr_info->host_initiated &&
+>                      !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
+>                        guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
+>                         return 1;
+>                 msr_info->data = vcpu->arch.ia32_xss;
+>                 break;
+> ..
+> ..
 > }
->=20
-> The call to guest_cpuid_clear *does* disallow enumerating INVPCID if
-> PCID isn't also enumerated. I'm just wondering why we bothered, since
-> we do so little sanitization of guest CPUID.
+>
+> static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> {
+> ..
+> ..
+>   case MSR_IA32_XSS:
+>                 if (!vmx_xsaves_supported() ||
+>                     (!msr_info->host_initiated &&
+>                      !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
+>                        guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
+>                         return 1;
+>                 /*
+>                  * The only supported bit as of Skylake is bit 8, but
+>                  * it is not supported on KVM.
+>                  */
+>                 if (data != 0)
+>                         return 1;
+>                 vcpu->arch.ia32_xss = data;
+>                 if (vcpu->arch.ia32_xss != host_xss)
+>                         add_atomic_switch_msr(vmx, MSR_IA32_XSS,
+>                                 vcpu->arch.ia32_xss, host_xss, false);
+>                 else
+>                         clear_atomic_switch_msr(vmx, MSR_IA32_XSS);
+>                 break;
+> ...
+> }
+>
+> We probably don't need last "if & else" check as we are setting it 0 now.
+> Does this look accurate?
 
-Ah, that's because when INVPCID is disabled in VMX the behavior of
-INVPCID is different from when !INVPCID in CPUID even if CR4.PCIDE=3D0
-(#UD vs. #GP or #PF).
-
-Paolo
-
+Aaron is working on it, and I think he's close to being ready to send
+out the next revision.
