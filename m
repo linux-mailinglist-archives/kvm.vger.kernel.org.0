@@ -2,128 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B13D1CA11F
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:24:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3DE8CA131
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:37:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730275AbfJCPYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 11:24:40 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:46518 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727302AbfJCPYk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 11:24:40 -0400
-Received: by mail-wr1-f66.google.com with SMTP id o18so3204295wrv.13
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 08:24:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=ZRM8UhcRohD7Bt53XpU0TqsliASuoqYedkYx4gqC86I=;
-        b=g/32q7fJLjKwlwfjz4nMIB0KVXyrrysPfeZ5AGpTovt0yRYceiR5zcjmIX7EkucxLG
-         I1RRojWp8jfKwqdKp7yobSaXlSuMRvHOg30M1D+3EX8JsyorPRyHkjinnK+SD+PyZE/c
-         XmQL2TDcSJgunD6XirGGYf3CkNl8VUOq+VylzCKz4wFbHFgvkVrIPpkoFRIn88UEUaOq
-         C41YQJ1SGXIY6xUillzqoBD789LhgqsnEpwMLc7i9NpiZvBZK+/gecY/ngnKgnYP3kh5
-         34QR7pwFTZvJF9kUhQpJzdJLHnGF/vrb1T3wsH4kqoVTDnY76GaOzsSXNX3nsjEGQxDl
-         Tnxw==
+        id S1730203AbfJCPhZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 11:37:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35432 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729752AbfJCPhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 11:37:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1570117044;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qrz8YJPOUTLl2wYuvy1P4bMW9shlmohZvrrGhpPkIRs=;
+        b=KtFIyhWrCLLGKG2wtbF772zrUg/PsOhLQoHtmamc8jiE3coKlv378/n1YE09mmjekDcmzj
+        FuPrx71ncJbrdW1AX+DnBNn8oE2O6S0hvcH9w1fQKl9/6fT3gvU+eQVfTMj5zxc1TmSAEq
+        Bv+73Z/63RGEmV+H5eMottQgdTMCHvA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-ONUVShRTOpKc7E9a4LAoXQ-1; Thu, 03 Oct 2019 11:37:20 -0400
+Received: by mail-wr1-f69.google.com with SMTP id t11so1278463wro.10
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 08:37:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=ZRM8UhcRohD7Bt53XpU0TqsliASuoqYedkYx4gqC86I=;
-        b=HMjDS0/P35ioTrvZnQdEvCd+ReGOyFa1oLrALJstWN/oR0j4vbsdhNdUZFKJzA0R5w
-         Mu0dJjKZzvTwXwiYQhQHQqfErcJCNVZ9voyDXfYHuJLpvGtriB+GfGiskz0FENHJ5tKu
-         Mp5N+1FQniaUwhpQzsMWfgRYJnbFTWR+bitw8LyCOZa2i9vfyIo7Td+MWpnGUnJF9RVq
-         G6WAK8VXpORBsMbB1Ca5pt+h/sgi2gtc0NookATAngDO0Ia0NwTajpapKcvGEaF6699f
-         lte3nd6IUB16Wu7kzcocW5D+S27IDmjVf3ZTsaetki3WisfyGHJn2x8giu9fxF6dxHn+
-         8U6g==
-X-Gm-Message-State: APjAAAWFBHci4pUKvdsXHxyIzpH1EE6B3mDgVHKSTLEgZE0y7Yp33Ufi
-        3HrFVrFPCiViJdCgnEAIlWEarWVX
-X-Google-Smtp-Source: APXvYqzONuhyqR/NtrlUFzAdknQaYxBfLzty3tUjBuNFUYrBT4vRRtectyb2qjTb6oAccmEIFjHwTw==
-X-Received: by 2002:adf:d1a8:: with SMTP id w8mr3145322wrc.271.1570116276027;
-        Thu, 03 Oct 2019 08:24:36 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id n1sm5407670wrg.67.2019.10.03.08.24.34
-        for <kvm@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 03 Oct 2019 08:24:35 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mVVDjxqOVTW6Hr6MGw2wdGvPn8dr2/wzfFgapg8i2Zc=;
+        b=LY8g7OClafq+qKRAWT4i3h6VqfsMEqZtJSnJkKTRG7I6KmDpMbgTwS3t3ZKvkDltKd
+         FUOCJnhBbg6GrQ+G374nyDYuBaywN6N/5gnS4+PttejuExoNRt6ybF1svwAuc8fUx+u7
+         WV0HiwJR0cSAv4byb97Xw0z0cqbUERaUJzX95uK0Jle5reg6btQJ1s8LBu2sjZ5oTmO3
+         4qQIm2R2bjnLsTOZ1JTglIO3Ayi0fIjJgzpzO/xRXY6ZiKf58NSKe/Bv9jKzGU1oNPry
+         CLmpeKaIvIjudihWdHZmcJVKrLUcF4uaZ8kPa8cG6gJVZQVCtzAxu07NrR05vjLrQQz/
+         sPzQ==
+X-Gm-Message-State: APjAAAUvKf2/G55WXXXKN7aB2RVCaC8O9nM3AYjmTXND1kDMQvNDVwvr
+        uJmkJGYXJUy1b4Ipyf6IT0S70iUoB3J66CbhH29cyaLKx6QCtjl4tVQQUv/CZq7HjdkDpIPvRyy
+        RNEck/8V6/EMc
+X-Received: by 2002:a05:600c:22da:: with SMTP id 26mr7142089wmg.177.1570117039637;
+        Thu, 03 Oct 2019 08:37:19 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyaEH0vrDdtTn03vNIjY6XC27eAPbcWStCVYNFQxWvlASlLZpHw/85jrbDXb7655AqkOZtGkQ==
+X-Received: by 2002:a05:600c:22da:: with SMTP id 26mr7142073wmg.177.1570117039322;
+        Thu, 03 Oct 2019 08:37:19 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
+        by smtp.gmail.com with ESMTPSA id 143sm3117461wmb.33.2019.10.03.08.37.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Oct 2019 08:37:18 -0700 (PDT)
+Subject: Re: A question about INVPCID without PCID
+To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
+References: <CALMp9eRPgZygwsG+abEx96+dt6rKyAMQJQx0qoHVbaTKFh0CqA@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] vmexit: measure IPI and EOI cost
-Date:   Thu,  3 Oct 2019 17:24:31 +0200
-Message-Id: <1570116271-8038-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Message-ID: <6220e2b4-be59-736c-bc98-30573d506387@redhat.com>
+Date:   Thu, 3 Oct 2019 17:37:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CALMp9eRPgZygwsG+abEx96+dt6rKyAMQJQx0qoHVbaTKFh0CqA@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: ONUVShRTOpKc7E9a4LAoXQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/vmexit.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+On 01/10/19 21:48, Jim Mattson wrote:
+> Does anyone know why kvm disallows enumerating INVPCID in the guest
+> CPUID when PCID is not enumerated? There are many far more nonsensical
+> CPUID combinations that kvm does allow, such as AVX512F without XSAVE,
+> or even PCID without LM. Why is INVPCID without PCID of paramount
+> concern?
+>=20
 
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 66d3458..81b743b 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -65,22 +65,30 @@ static void nop(void *junk)
- }
- 
- volatile int x = 0;
-+volatile uint64_t tsc_eoi = 0;
-+volatile uint64_t tsc_ipi = 0;
- 
- static void self_ipi_isr(isr_regs_t *regs)
- {
- 	x++;
-+	uint64_t start = rdtsc();
- 	eoi();
-+	tsc_eoi += rdtsc() - start;
- }
- 
- static void x2apic_self_ipi(int vec)
- {
-+	uint64_t start = rdtsc();
- 	wrmsr(0x83f, vec);
-+	tsc_ipi += rdtsc() - start;
- }
- 
- static void apic_self_ipi(int vec)
- {
-+	uint64_t start = rdtsc();
-         apic_icr_write(APIC_INT_ASSERT | APIC_DEST_SELF | APIC_DEST_PHYSICAL |
- 		       APIC_DM_FIXED | IPI_TEST_VECTOR, vec);
-+	tsc_ipi += rdtsc() - start;
- }
- 
- static void self_ipi_sti_nop(void)
-@@ -180,7 +188,9 @@ static void x2apic_self_ipi_tpr_sti_hlt(void)
- 
- static void ipi(void)
- {
-+	uint64_t start = rdtsc();
- 	on_cpu(1, nop, 0);
-+	tsc_ipi += rdtsc() - start;
- }
- 
- static void ipi_halt(void)
-@@ -511,6 +521,7 @@ static bool do_test(struct test *test)
- 	}
- 
- 	do {
-+		tsc_eoi = tsc_ipi = 0;
- 		iterations *= 2;
- 		t1 = rdtsc();
- 
-@@ -523,6 +534,11 @@ static bool do_test(struct test *test)
- 		t2 = rdtsc();
- 	} while ((t2 - t1) < GOAL);
- 	printf("%s %d\n", test->name, (int)((t2 - t1) / iterations));
-+	if (tsc_ipi)
-+		printf("  ipi %s %d\n", test->name, (int)(tsc_ipi / iterations));
-+	if (tsc_eoi)
-+		printf("  eoi %s %d\n", test->name, (int)(tsc_eoi / iterations));
-+
- 	return test->next;
- }
- 
--- 
-1.8.3.1
+I guess you're looking at this code:
+
+                /* Exposing INVPCID only when PCID is exposed */
+                bool invpcid_enabled =3D
+                        guest_cpuid_has(vcpu, X86_FEATURE_INVPCID) &&
+                        guest_cpuid_has(vcpu, X86_FEATURE_PCID);
+
+The INVPCID instruction will be disabled if !PCID && INVPCID, but it
+doesn't really disallow *enumerating* INVPCID.  There is no particular
+reason for that, it was done like that originally ("KVM: VMX: Implement
+PCID/INVPCID for guests with EPT") and kept this way.
+
+With !PCID && INVPCID you could use PCID=3D0 operations as a fancy INVLPG,
+I suppose, but it is probably uninteresting enough that no one bothered
+changing it.
+
+Paolo
 
