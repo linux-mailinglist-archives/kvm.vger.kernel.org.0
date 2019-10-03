@@ -2,96 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C6FCCB067
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 22:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAC4DCB09B
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 22:57:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731413AbfJCUrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 16:47:18 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37126 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729193AbfJCUrR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 16:47:17 -0400
-Received: by mail-pf1-f194.google.com with SMTP id y5so2498963pfo.4
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 13:47:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=vDz4CNFWOTztzA1GiLBvWR2d/6AIBHLVshICPQcqmiQ=;
-        b=tpS9Xyq8UxQIeioJvhHyAjd/1b0w7dxkiB4JlCUpsBHPlN9IeqV0YiIS9Am3+2ep2U
-         oYpZ1Ax2M6ikdG4VRihJjXsQUF4ZsEUEIgpjZtrx/si4plvXxnPBvzWLU4Jfv4Agt6LR
-         9eqtwIy6VgWUkLzhdBw74/+Jn6JqNV4Y+Ew2E+GIM4HRQnBknVXVUw5VI7NSYmz47dmK
-         oBSbksdE8Q9nWAiML6dVV4QY0jbIIeTb4pHK8sWYb459SWj/2+wje1PVAJLumkw47IUR
-         cfOIgUqVz0Qn+LvqKjf2rst7CpfWvUqQQnZY5BKd96CINsFeFxLaw7MLxGzXKDlqxLRC
-         bfpw==
-X-Gm-Message-State: APjAAAVoWzMahV+y8X2Rsf3sl9438FEsUKpMBj1ini36LcEQ3sGprJ9+
-        fx8+UQ9MP/TEwo9vO8pjwCj5aw9rR6U=
-X-Google-Smtp-Source: APXvYqzEB7vDO7DrJWNuOzXa8QOUt1SdweDU5XBbGkmckSz/KjW6E24bo4JlLWa9Q413fYFPY7jWEg==
-X-Received: by 2002:a17:90a:e50e:: with SMTP id t14mr13023170pjy.62.1570135636656;
-        Thu, 03 Oct 2019 13:47:16 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id q29sm6100093pgc.88.2019.10.03.13.47.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2019 13:47:15 -0700 (PDT)
-From:   Nadav Amit <namit@vmware.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, sean.j.christopherson@intel.com,
-        Nadav Amit <namit@vmware.com>
-Subject: [kvm-unit-tests PATCH] x86: VMX: Mask advanced VM-exit info
-Date:   Thu,  3 Oct 2019 06:26:18 -0700
-Message-Id: <20191003132618.8485-1-namit@vmware.com>
-X-Mailer: git-send-email 2.17.1
+        id S1728031AbfJCU5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 16:57:52 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:42716 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727024AbfJCU5w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 16:57:52 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x93KnGHF189598;
+        Thu, 3 Oct 2019 20:57:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=91cRFym20Cd2kTHtY5tbeoGVgKr3+SZl2qG+o/AG188=;
+ b=kyzbDYm7+apkHgbAweWr/yckmpPTdsHlNrInNUoI0TdmNDR0JIzAUfU6c63U1n0q7Y6I
+ Kwoau9vcrJ6+JLbxxWwEEIS1cSkEeqhsEQ4bN27vlR5N3IurU+nqw1/7ohUXZgjnGMBE
+ iHWahbjIEQWI82ma+oiRknnvrrlqzG5n8RtPjUgg6sAdvqOx1SZswLJMJaDxtrfWCz8j
+ 94u6OzIw5qiF9WMCoH+hWhxwJ6GmDZIRgx8J9CYPLmbcOK6K31vshHn12tJG3sCUbApP
+ SVDSlMWTtqaDRdIRPOwqaPKl0hvp86GReAJ9Jc1wKfdHh0svZJHG/iOHcOgHKhKD8a1f VA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2v9yfqq502-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 03 Oct 2019 20:57:46 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x93Kmcgg169860;
+        Thu, 3 Oct 2019 20:57:45 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2vdk0sv86n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 03 Oct 2019 20:57:45 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x93Kviog010899;
+        Thu, 3 Oct 2019 20:57:44 GMT
+Received: from Konrads-MacBook-Pro.local (/10.11.64.190)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 03 Oct 2019 13:57:44 -0700
+Subject: Re: [PATCH kvm-unit-tests] vmexit: measure IPI and EOI cost
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <1570116271-8038-1-git-send-email-pbonzini@redhat.com>
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <73323608-bc33-5819-083d-7912dc7ee8b9@oracle.com>
+Date:   Thu, 3 Oct 2019 13:57:42 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
+ Gecko/20100101 Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <1570116271-8038-1-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9399 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910030169
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9399 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910030169
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bits [9:11] are undefined in the VM-exit qualification when "advanced
-VM-exit information for EPT violations" is not supported.
+On 10/3/19 8:24 AM, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Mask these bits for now to avoid false failures. If KVM supports this
-feature, the tests would need to be adapted, and the masking would need
-to be removed.
-
-Unfortunately, I do not have hardware that supports this feature
-available for my use to make a better fix.
-
-Signed-off-by: Nadav Amit <namit@vmware.com>
----
- x86/vmx.h       | 2 ++
- x86/vmx_tests.c | 7 +++++++
- 2 files changed, 9 insertions(+)
-
-diff --git a/x86/vmx.h b/x86/vmx.h
-index a8bc847..8496be7 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -618,6 +618,8 @@ enum vm_instruction_error_number {
- #define EPT_VLT_GUEST_USER	(1ull << 9)
- #define EPT_VLT_GUEST_RW	(1ull << 10)
- #define EPT_VLT_GUEST_EX	(1ull << 11)
-+#define EPT_VLT_GUEST_MASK	(EPT_VLT_GUEST_USER | EPT_VLT_GUEST_RW | \
-+				 EPT_VLT_GUEST_EX)
- 
- #define MAGIC_VAL_1		0x12345678ul
- #define MAGIC_VAL_2		0x87654321ul
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index f4b348b..6b9dc10 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -1409,6 +1409,13 @@ static int ept_exit_handler_common(bool have_ad)
- 		}
- 		return VMX_TEST_RESUME;
- 	case VMX_EPT_VIOLATION:
-+		/*
-+		 * Exit-qualifications are masked not to account for advanced
-+		 * VM-exit information. Once KVM supports this feature, this
-+		 * masking should be removed.
-+		 */
-+		exit_qual &= ~EPT_VLT_GUEST_MASK;
-+
- 		switch(vmx_get_test_stage()) {
- 		case 3:
- 			check_ept_ad(pml4, guest_cr3, (unsigned long)data_page1, 0,
--- 
-2.17.1
+Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 
