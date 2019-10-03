@@ -2,91 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF91BCA11B
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:23:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B13D1CA11F
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:24:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730105AbfJCPXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 11:23:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17936 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729991AbfJCPXe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 11:23:34 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 25F4989AC2
-        for <kvm@vger.kernel.org>; Thu,  3 Oct 2019 15:23:34 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id z1so1247055wrw.21
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 08:23:34 -0700 (PDT)
+        id S1730275AbfJCPYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 11:24:40 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46518 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727302AbfJCPYk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 11:24:40 -0400
+Received: by mail-wr1-f66.google.com with SMTP id o18so3204295wrv.13
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 08:24:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:subject:date:message-id;
+        bh=ZRM8UhcRohD7Bt53XpU0TqsliASuoqYedkYx4gqC86I=;
+        b=g/32q7fJLjKwlwfjz4nMIB0KVXyrrysPfeZ5AGpTovt0yRYceiR5zcjmIX7EkucxLG
+         I1RRojWp8jfKwqdKp7yobSaXlSuMRvHOg30M1D+3EX8JsyorPRyHkjinnK+SD+PyZE/c
+         XmQL2TDcSJgunD6XirGGYf3CkNl8VUOq+VylzCKz4wFbHFgvkVrIPpkoFRIn88UEUaOq
+         C41YQJ1SGXIY6xUillzqoBD789LhgqsnEpwMLc7i9NpiZvBZK+/gecY/ngnKgnYP3kh5
+         34QR7pwFTZvJF9kUhQpJzdJLHnGF/vrb1T3wsH4kqoVTDnY76GaOzsSXNX3nsjEGQxDl
+         Tnxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qoKp+Xu3p0rV9GLZTHe3NuxMOYdJi2iigLcisiBAhlw=;
-        b=BdUlB3bqb/Chx6FYgQdZ67153DE0kkSAfOXOIDpYWXonBUuWBk9Mii+FqyPc/ALgT8
-         UZg9iz3ae9MMCgJcEfKTBbwXlQYsWsNkcLj7Hh0kbboD/+xBuf0gQRFrA1iMHUbFE0Lk
-         Zx7p3UFWcW3O7mxDXG2SiIBKJxOzQ0ys1HcVrFO7RmApZYNOfgm8qV2LUdjwX0IH0QHB
-         ykbhWsN6n1qwlMcN2s8WRHq787JtVs2pnKQaWIrWSz0Cs0DOqeuRtQIoxm7hD8CyqWut
-         uIe3hsnq293OfBWaZuCHZTwMI1g5zpBcCZAsbSxyVGAM0ruZB4TvZ7Yf+sevAtbseRr2
-         7tnw==
-X-Gm-Message-State: APjAAAXBUIcS1z0BO8swnM7ewGvKNXKUqKL89PmqtkkKhj6iGoE8Wlkh
-        +ufQYs21/emfTFdTkIXMFogf/GrxB0EVyxJINRmRGZTlduqRFvOzdeypKcAcQS/CeQLOTtFjlfP
-        M62QdFaL3fn/g
-X-Received: by 2002:adf:f68f:: with SMTP id v15mr4862280wrp.210.1570116212661;
-        Thu, 03 Oct 2019 08:23:32 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwf/S5FwN3UK05IGT7/7YINNuBSZbZPYZrLMoJ2uKa2XDj8pX1CjOyKNDlcK9UuuCn41Wtrjw==
-X-Received: by 2002:adf:f68f:: with SMTP id v15mr4862264wrp.210.1570116212388;
-        Thu, 03 Oct 2019 08:23:32 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
-        by smtp.gmail.com with ESMTPSA id t83sm3979935wmt.18.2019.10.03.08.23.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2019 08:23:31 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] svm: Fixed error code comparison in test
- npt_rsvd_pfwalk
-To:     Cathy Avery <cavery@redhat.com>, kvm@vger.kernel.org
-References: <20191003123845.2895-1-cavery@redhat.com>
+        h=x-gm-message-state:sender:from:to:subject:date:message-id;
+        bh=ZRM8UhcRohD7Bt53XpU0TqsliASuoqYedkYx4gqC86I=;
+        b=HMjDS0/P35ioTrvZnQdEvCd+ReGOyFa1oLrALJstWN/oR0j4vbsdhNdUZFKJzA0R5w
+         Mu0dJjKZzvTwXwiYQhQHQqfErcJCNVZ9voyDXfYHuJLpvGtriB+GfGiskz0FENHJ5tKu
+         Mp5N+1FQniaUwhpQzsMWfgRYJnbFTWR+bitw8LyCOZa2i9vfyIo7Td+MWpnGUnJF9RVq
+         G6WAK8VXpORBsMbB1Ca5pt+h/sgi2gtc0NookATAngDO0Ia0NwTajpapKcvGEaF6699f
+         lte3nd6IUB16Wu7kzcocW5D+S27IDmjVf3ZTsaetki3WisfyGHJn2x8giu9fxF6dxHn+
+         8U6g==
+X-Gm-Message-State: APjAAAWFBHci4pUKvdsXHxyIzpH1EE6B3mDgVHKSTLEgZE0y7Yp33Ufi
+        3HrFVrFPCiViJdCgnEAIlWEarWVX
+X-Google-Smtp-Source: APXvYqzONuhyqR/NtrlUFzAdknQaYxBfLzty3tUjBuNFUYrBT4vRRtectyb2qjTb6oAccmEIFjHwTw==
+X-Received: by 2002:adf:d1a8:: with SMTP id w8mr3145322wrc.271.1570116276027;
+        Thu, 03 Oct 2019 08:24:36 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id n1sm5407670wrg.67.2019.10.03.08.24.34
+        for <kvm@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 03 Oct 2019 08:24:35 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d3eeb3b5-13d7-34d2-4ce0-fdd534f2bcc3@redhat.com>
-Date:   Thu, 3 Oct 2019 17:23:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191003123845.2895-1-cavery@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] vmexit: measure IPI and EOI cost
+Date:   Thu,  3 Oct 2019 17:24:31 +0200
+Message-Id: <1570116271-8038-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/10/19 14:38, Cathy Avery wrote:
-> According to the AMD64 spec Bit 3 (RSV) in exitinfo1 should be set
-> to 1 if reserved bits were set in the corresponding nested page
-> table entry. Exitinfo1 should be checking against error code
-> 0x20000000eULL not 0x200000006ULL.
-> 
-> Signed-off-by: Cathy Avery <cavery@redhat.com>
-> ---
->  x86/svm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/x86/svm.c b/x86/svm.c
-> index bc74e7c..bb39934 100644
-> --- a/x86/svm.c
-> +++ b/x86/svm.c
-> @@ -1066,7 +1066,7 @@ static bool npt_rsvd_pfwalk_check(struct test *test)
->      pdpe[0] &= ~(1ULL << 8);
->  
->      return (test->vmcb->control.exit_code == SVM_EXIT_NPF)
-> -            && (test->vmcb->control.exit_info_1 == 0x200000006ULL);
-> +            && (test->vmcb->control.exit_info_1 == 0x20000000eULL);
->  }
->  
->  static void npt_l1mmio_prepare(struct test *test)
-> 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/vmexit.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Queued, thanks.
+diff --git a/x86/vmexit.c b/x86/vmexit.c
+index 66d3458..81b743b 100644
+--- a/x86/vmexit.c
++++ b/x86/vmexit.c
+@@ -65,22 +65,30 @@ static void nop(void *junk)
+ }
+ 
+ volatile int x = 0;
++volatile uint64_t tsc_eoi = 0;
++volatile uint64_t tsc_ipi = 0;
+ 
+ static void self_ipi_isr(isr_regs_t *regs)
+ {
+ 	x++;
++	uint64_t start = rdtsc();
+ 	eoi();
++	tsc_eoi += rdtsc() - start;
+ }
+ 
+ static void x2apic_self_ipi(int vec)
+ {
++	uint64_t start = rdtsc();
+ 	wrmsr(0x83f, vec);
++	tsc_ipi += rdtsc() - start;
+ }
+ 
+ static void apic_self_ipi(int vec)
+ {
++	uint64_t start = rdtsc();
+         apic_icr_write(APIC_INT_ASSERT | APIC_DEST_SELF | APIC_DEST_PHYSICAL |
+ 		       APIC_DM_FIXED | IPI_TEST_VECTOR, vec);
++	tsc_ipi += rdtsc() - start;
+ }
+ 
+ static void self_ipi_sti_nop(void)
+@@ -180,7 +188,9 @@ static void x2apic_self_ipi_tpr_sti_hlt(void)
+ 
+ static void ipi(void)
+ {
++	uint64_t start = rdtsc();
+ 	on_cpu(1, nop, 0);
++	tsc_ipi += rdtsc() - start;
+ }
+ 
+ static void ipi_halt(void)
+@@ -511,6 +521,7 @@ static bool do_test(struct test *test)
+ 	}
+ 
+ 	do {
++		tsc_eoi = tsc_ipi = 0;
+ 		iterations *= 2;
+ 		t1 = rdtsc();
+ 
+@@ -523,6 +534,11 @@ static bool do_test(struct test *test)
+ 		t2 = rdtsc();
+ 	} while ((t2 - t1) < GOAL);
+ 	printf("%s %d\n", test->name, (int)((t2 - t1) / iterations));
++	if (tsc_ipi)
++		printf("  ipi %s %d\n", test->name, (int)(tsc_ipi / iterations));
++	if (tsc_eoi)
++		printf("  eoi %s %d\n", test->name, (int)(tsc_eoi / iterations));
++
+ 	return test->next;
+ }
+ 
+-- 
+1.8.3.1
 
-Paolo
