@@ -2,59 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DDD7C9F57
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 15:23:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9875BCA061
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 16:31:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730386AbfJCNX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 09:23:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50562 "EHLO mx1.redhat.com"
+        id S1730202AbfJCObL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 10:31:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43530 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726199AbfJCNX0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 09:23:26 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726393AbfJCObK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 10:31:10 -0400
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 238833C919;
-        Thu,  3 Oct 2019 13:23:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 093B510013A7;
-        Thu,  3 Oct 2019 13:23:23 +0000 (UTC)
-Date:   Thu, 3 Oct 2019 15:23:21 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v5 06/10] KVM: Allow kvm_device_ops to be const
-Message-ID: <20191003132321.jd7wtkbcdmyx7gnv@kamzik.brq.redhat.com>
-References: <20191002145037.51630-1-steven.price@arm.com>
- <20191002145037.51630-7-steven.price@arm.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 3B56220865;
+        Thu,  3 Oct 2019 14:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570113070;
+        bh=ja887EgzBcZzPkb4rXU45yrEXXzEuRz1I3W6sB1AWUk=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=YO+x/CU8yx5nIEieP2GQwzeKy8Bhu3L1P4StryiRUy79wgYddP6O1muAn0fbCoZMX
+         2PnZCz4yke0tVLVa6mS6ypabRHZMvmWWV/GYoVVntzXrSGAqXh0JjsU6jaQLw3QYmC
+         BH/XTSfQ6UqXIHe8QlaBHC0GmWhiOyfGua+RydXY=
+Subject: Re: Linux 5.4 kselftest known issues - update
+To:     Shuah Khan <skhan@linuxfoundation.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Christian Brauner <christian@brauner.io>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        bgolaszewski@baylibre.com, Daniel Borkmann <daniel@iogearbox.net>,
+        bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>,
+        shuah <shuah@kernel.org>
+References: <a293684f-4ab6-51af-60b1-caf4eb97ff05@linuxfoundation.org>
+From:   shuah <shuah@kernel.org>
+Message-ID: <2a835150-d7f1-1c4a-80cb-d385f799dd14@kernel.org>
+Date:   Thu, 3 Oct 2019 08:30:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191002145037.51630-7-steven.price@arm.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Thu, 03 Oct 2019 13:23:26 +0000 (UTC)
+In-Reply-To: <a293684f-4ab6-51af-60b1-caf4eb97ff05@linuxfoundation.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 03:50:33PM +0100, Steven Price wrote:
-> Currently a kvm_device_ops structure cannot be const without triggering
-> compiler warnings. However the structure doesn't need to be written to
-> and, by marking it const, it can be read-only in memory. Add some more
-> const keywords to allow this.
+On 9/26/19 11:41 AM, Shuah Khan wrote:
+> Here are the know kselftest issues on Linux 5.4 with
+> top commit commit 619e17cf75dd58905aa67ccd494a6ba5f19d6cc6
+> on x86_64:
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  include/linux/kvm_host.h | 4 ++--
->  virt/kvm/kvm_main.c      | 6 +++---
->  2 files changed, 5 insertions(+), 5 deletions(-)
->
+> The goal is to get these addressed before 5.4 comes out.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+All of these issues are now fixed, except the bpf llvm dependency.
+These fixes should all be in linux-next if they haven't already.
+
+> 
+> 3 build failures and status:
+> 
+> pidfd - undefined reference to `pthread_create' collect2: error: ld 
+> returned 1 exit status
+> 
+> Fixed: https://patchwork.kernel.org/patch/11159517/
+
+In
+> 
+> bfp (two issues)
+> 
+> 1. "make TARGETS=bpf kselftest" build fails
+> Makefile:127: tools/build/Makefile.include: No such file or directory
+
+https://patchwork.kernel.org/patch/11163601/
+In bpf fixes tree
+
+> 
+> This is due to recent kbuild changes and I have a patch ready to send.
+> 
+> 2. Related to llvm latest version dependency. This is a hard dependency.
+> Unless users upgrade to latest llvvm, bpf test won't run. The new llvm
+> might not be supported on all distros yet, in which case bpf will not
+> get tested in some rings and on some architectures.
+> 
+> gpio
+> 
+> "make TARGETS=gpio kselftest" build fails
+> 
+> Makefile:23: tools/build/Makefile.include: No such file or directory
+
+https://patchwork.kernel.org/patch/11163603/
+
+> 
+> This is due to recent kbuild changes and I have a patch ready to send.
+> 
+> kvm
+> 
+> "make TARGETS=kvm kselftest" build fails due --no-pie flags.
+
+https://patchwork.kernel.org/patch/11171893/
+
+I haven't found any new ones on x86_64 as of 5.4-rc1
+
+thanks,
+-- Shuah
