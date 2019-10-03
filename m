@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D91DCB143
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 23:39:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5448CB157
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 23:40:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388135AbfJCVjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 17:39:00 -0400
-Received: from mga09.intel.com ([134.134.136.24]:52653 "EHLO mga09.intel.com"
+        id S2389046AbfJCVjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 17:39:53 -0400
+Received: from mga09.intel.com ([134.134.136.24]:52651 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387933AbfJCVjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 17:39:00 -0400
+        id S1730739AbfJCVi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 17:38:59 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Oct 2019 14:38:57 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,253,1566889200"; 
-   d="scan'208";a="186051618"
+   d="scan'208";a="186051620"
 Received: from linksys13920.jf.intel.com (HELO rpedgeco-DESK5.jf.intel.com) ([10.54.75.11])
   by orsmga008.jf.intel.com with ESMTP; 03 Oct 2019 14:38:57 -0700
 From:   Rick Edgecombe <rick.p.edgecombe@intel.com>
@@ -26,10 +26,11 @@ To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         dave.hansen@intel.com, pbonzini@redhat.com,
         sean.j.christopherson@intel.com, keescook@chromium.org
 Cc:     kristen@linux.intel.com, deneen.t.dock@intel.com,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [RFC PATCH 02/13] kvm: Add support for X86_FEATURE_KVM_XO
-Date:   Thu,  3 Oct 2019 14:23:49 -0700
-Message-Id: <20191003212400.31130-3-rick.p.edgecombe@intel.com>
+        Rick Edgecombe <rick.p.edgecombe@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
+Subject: [RFC PATCH 03/13] kvm: Add XO memslot type
+Date:   Thu,  3 Oct 2019 14:23:50 -0700
+Message-Id: <20191003212400.31130-4-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191003212400.31130-1-rick.p.edgecombe@intel.com>
 References: <20191003212400.31130-1-rick.p.edgecombe@intel.com>
@@ -38,161 +39,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add X86_FEATURE_KVM_XO which reduces the physical address bits exposed by
-CPUID and uses the hosts highest physical address bit as an XO/NR
-permission bit in the guest page tables. Adjust reserved mask so KVM guest
-page tables walks are aware this bit is not reserved.
+Add XO memslot type to create execute-only guest physical memory based on
+the RO memslot. Like the RO memslot, disallow changing the memslot type
+to/from XO.
 
+In the EPT case ACC_USER_MASK represents the readable bit, so add the
+ability for set_spte() to unset this.
+
+This is based in part on a patch by Yu Zhang.
+
+Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
- arch/x86/include/asm/cpufeature.h    |  1 +
- arch/x86/include/asm/cpufeatures.h   |  3 +++
- arch/x86/include/uapi/asm/kvm_para.h |  3 +++
- arch/x86/kvm/cpuid.c                 |  7 +++++++
- arch/x86/kvm/cpuid.h                 |  1 +
- arch/x86/kvm/mmu.c                   | 18 ++++++++++++------
- 6 files changed, 27 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu.c             |  9 ++++++++-
+ include/uapi/linux/kvm.h       |  1 +
+ tools/include/uapi/linux/kvm.h |  1 +
+ virt/kvm/kvm_main.c            | 15 ++++++++++++++-
+ 4 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-index 58acda503817..17127ffbc2a2 100644
---- a/arch/x86/include/asm/cpufeature.h
-+++ b/arch/x86/include/asm/cpufeature.h
-@@ -30,6 +30,7 @@ enum cpuid_leafs
- 	CPUID_7_ECX,
- 	CPUID_8000_0007_EBX,
- 	CPUID_7_EDX,
-+	CPUID_4000_0030_EAX
- };
- 
- #ifdef CONFIG_X86_FEATURE_NAMES
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index e880f2408e29..7ba217e894ea 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -364,6 +364,9 @@
- #define X86_FEATURE_ARCH_CAPABILITIES	(18*32+29) /* IA32_ARCH_CAPABILITIES MSR (Intel) */
- #define X86_FEATURE_SPEC_CTRL_SSBD	(18*32+31) /* "" Speculative Store Bypass Disable */
- 
-+/* KVM-defined CPU features, CPUID level 0x40000030 (EAX), word 19 */
-+#define X86_FEATURE_KVM_XO		(19*32+0) /* KVM EPT based execute only memory support */
-+
- /*
-  * BUG word(s)
-  */
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index 2a8e0b6b9805..ecff0ff25cf4 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -34,6 +34,9 @@
- 
- #define KVM_HINTS_REALTIME      0
- 
-+#define KVM_CPUID_FEAT_GENERIC	0x40000030
-+#define KVM_FEATURE_GENERIC_XO		0
-+
- /* The last 8 bits are used to indicate how to interpret the flags field
-  * in pvclock structure. If no bits are set, all flags are ignored.
-  */
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 22c2720cd948..bcbf3f93602d 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -700,6 +700,12 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 		if (sched_info_on())
- 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
- 
-+		entry->ebx = 0;
-+		entry->ecx = 0;
-+		entry->edx = 0;
-+		break;
-+	case KVM_CPUID_FEAT_GENERIC:
-+		entry->eax = (1 << KVM_FEATURE_GENERIC_XO);
- 		entry->ebx = 0;
- 		entry->ecx = 0;
- 		entry->edx = 0;
-@@ -845,6 +851,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
- 		{ .func = 0x80000000 },
- 		{ .func = 0xC0000000, .qualifier = is_centaur_cpu },
- 		{ .func = KVM_CPUID_SIGNATURE },
-+		{ .func = KVM_CPUID_FEAT_GENERIC },
- 	};
- 
- 	if (cpuid->nent < 1)
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index d78a61408243..c36d462a0e01 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -53,6 +53,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
- 	[CPUID_7_ECX]         = {         7, 0, CPUID_ECX},
- 	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
- 	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
-+	[CPUID_4000_0030_EAX] = {0x40000030, 0, CPUID_EAX},
- };
- 
- static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned x86_feature)
 diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index a63964e7cec7..e44a8053af78 100644
+index e44a8053af78..338cc64cc821 100644
 --- a/arch/x86/kvm/mmu.c
 +++ b/arch/x86/kvm/mmu.c
-@@ -4358,12 +4358,15 @@ static void
- __reset_rsvds_bits_mask(struct kvm_vcpu *vcpu,
- 			struct rsvd_bits_validate *rsvd_check,
- 			int maxphyaddr, int level, bool nx, bool gbpages,
--			bool pse, bool amd)
-+			bool pse, bool amd, bool xo)
- {
- 	u64 exb_bit_rsvd = 0;
- 	u64 gbpages_bit_rsvd = 0;
- 	u64 nonleaf_bit8_rsvd = 0;
+@@ -2981,6 +2981,8 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
  
-+	/* Adjust maxphyaddr to include the XO bit if in use */
-+	maxphyaddr += xo;
+ 	if (pte_access & ACC_USER_MASK)
+ 		spte |= shadow_user_mask;
++	else
++		spte &= ~shadow_user_mask;
+ 
+ 	if (level > PT_PAGE_TABLE_LEVEL)
+ 		spte |= PT_PAGE_SIZE_MASK;
+@@ -3203,6 +3205,11 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
+ 	int ret;
+ 	gfn_t gfn = gpa >> PAGE_SHIFT;
+ 	gfn_t base_gfn = gfn;
++	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
++	unsigned int pte_access = ACC_ALL;
 +
- 	rsvd_check->bad_mt_xwr = 0;
++	if (slot && slot->flags & KVM_MEM_EXECONLY)
++		pte_access = ACC_EXEC_MASK;
  
- 	if (!nx)
-@@ -4448,10 +4451,12 @@ static void reset_rsvds_bits_mask(struct kvm_vcpu *vcpu,
- 				  struct kvm_mmu *context)
- {
- 	__reset_rsvds_bits_mask(vcpu, &context->guest_rsvd_check,
--				cpuid_maxphyaddr(vcpu), context->root_level,
-+				cpuid_maxphyaddr(vcpu),
-+				context->root_level,
- 				context->nx,
- 				guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES),
--				is_pse(vcpu), guest_cpuid_is_amd(vcpu));
-+				is_pse(vcpu), guest_cpuid_is_amd(vcpu),
-+				guest_cpuid_has(vcpu, X86_FEATURE_KVM_XO));
+ 	if (!VALID_PAGE(vcpu->arch.mmu->root_hpa))
+ 		return RET_PF_RETRY;
+@@ -3222,7 +3229,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
+ 		}
+ 	}
+ 
+-	ret = mmu_set_spte(vcpu, it.sptep, ACC_ALL,
++	ret = mmu_set_spte(vcpu, it.sptep, pte_access,
+ 			   write, level, base_gfn, pfn, prefault,
+ 			   map_writable);
+ 	direct_pte_prefetch(vcpu, it.sptep);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 5e3f12d5359e..ede487b7b216 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -109,6 +109,7 @@ struct kvm_userspace_memory_region {
+  */
+ #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+ #define KVM_MEM_READONLY	(1UL << 1)
++#define KVM_MEM_EXECONLY	(1UL << 2)
+ 
+ /* for KVM_IRQ_LINE */
+ struct kvm_irq_level {
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index 5e3f12d5359e..ede487b7b216 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -109,6 +109,7 @@ struct kvm_userspace_memory_region {
+  */
+ #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+ #define KVM_MEM_READONLY	(1UL << 1)
++#define KVM_MEM_EXECONLY	(1UL << 2)
+ 
+ /* for KVM_IRQ_LINE */
+ struct kvm_irq_level {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index c6a91b044d8d..65087c1d67be 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -865,6 +865,8 @@ static int check_memory_region_flags(const struct kvm_userspace_memory_region *m
+ 	valid_flags |= KVM_MEM_READONLY;
+ #endif
+ 
++	valid_flags |= KVM_MEM_EXECONLY;
++
+ 	if (mem->flags & ~valid_flags)
+ 		return -EINVAL;
+ 
+@@ -969,9 +971,12 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		if (!old.npages)
+ 			change = KVM_MR_CREATE;
+ 		else { /* Modify an existing slot. */
++			const __u8 changeable = KVM_MEM_READONLY
++					       | KVM_MEM_EXECONLY;
++
+ 			if ((mem->userspace_addr != old.userspace_addr) ||
+ 			    (npages != old.npages) ||
+-			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
++			    ((new.flags ^ old.flags) & changeable))
+ 				goto out;
+ 
+ 			if (base_gfn != old.base_gfn)
+@@ -1356,6 +1361,11 @@ static bool memslot_is_readonly(struct kvm_memory_slot *slot)
+ 	return slot->flags & KVM_MEM_READONLY;
  }
  
- static void
-@@ -4520,7 +4525,7 @@ reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu, struct kvm_mmu *context)
- 				shadow_phys_bits,
- 				context->shadow_root_level, uses_nx,
- 				guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES),
--				is_pse(vcpu), true);
-+				is_pse(vcpu), true, false);
++static bool memslot_is_execonly(struct kvm_memory_slot *slot)
++{
++	return slot->flags & KVM_MEM_EXECONLY;
++}
++
+ static unsigned long __gfn_to_hva_many(struct kvm_memory_slot *slot, gfn_t gfn,
+ 				       gfn_t *nr_pages, bool write)
+ {
+@@ -1365,6 +1375,9 @@ static unsigned long __gfn_to_hva_many(struct kvm_memory_slot *slot, gfn_t gfn,
+ 	if (memslot_is_readonly(slot) && write)
+ 		return KVM_HVA_ERR_RO_BAD;
  
- 	if (!shadow_me_mask)
- 		return;
-@@ -4557,7 +4562,7 @@ reset_tdp_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
- 					shadow_phys_bits,
- 					context->shadow_root_level, false,
- 					boot_cpu_has(X86_FEATURE_GBPAGES),
--					true, true);
-+					true, true, false);
- 	else
- 		__reset_rsvds_bits_mask_ept(shadow_zero_check,
- 					    shadow_phys_bits,
-@@ -4818,7 +4823,8 @@ static union kvm_mmu_extended_role kvm_calc_mmu_role_ext(struct kvm_vcpu *vcpu)
- 	ext.cr4_pse = !!is_pse(vcpu);
- 	ext.cr4_pke = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE);
- 	ext.cr4_la57 = !!kvm_read_cr4_bits(vcpu, X86_CR4_LA57);
--	ext.maxphyaddr = cpuid_maxphyaddr(vcpu);
-+	ext.maxphyaddr = cpuid_maxphyaddr(vcpu)
-+			 + guest_cpuid_has(vcpu, X86_FEATURE_KVM_XO);
- 
- 	ext.valid = 1;
++	if (memslot_is_execonly(slot) && write)
++		return KVM_HVA_ERR_RO_BAD;
++
+ 	if (nr_pages)
+ 		*nr_pages = slot->npages - (gfn - slot->base_gfn);
  
 -- 
 2.17.1
