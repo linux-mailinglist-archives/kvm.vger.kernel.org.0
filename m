@@ -2,192 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79BB8C9CBA
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 12:54:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D09AC9CDE
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 13:10:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729441AbfJCKyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 06:54:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36350 "EHLO mx1.redhat.com"
+        id S1729685AbfJCLJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 07:09:35 -0400
+Received: from foss.arm.com ([217.140.110.172]:41652 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728140AbfJCKyH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 06:54:07 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2F83B3C93D
-        for <kvm@vger.kernel.org>; Thu,  3 Oct 2019 10:54:07 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id q8so943176wrp.8
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 03:54:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=GffyjIVlPnvsrRSrHxajUWEZWrzULU9iPsHRwjh280A=;
-        b=jYpLErPm2I0e8YxbQIewe51yKHIGqUx2rBz8M7GIsKryxM8GKrJR1FknCXH/cO6CuT
-         0f077ATLD33WtFGmiVTALglx0uyhAx7qG7ReEHEMzMFVRN0+qEY6WyPfva9EruL7XLZX
-         DzHzAbkDJ8yV5QQcYM/Sk9ArNheYcBurUSwx5zI70Mdrc0ilAs5shkf4CY/1s6ELSiPl
-         xNKkc/RLNjpub+d9/qHPCnME0eNeM/GDxUyGfY+O7KKdePxDJt5yu3VlUmuxj0gwgjSY
-         XQnhBXzjTsBXrrfs4KIn1EOueBn1drQyoA9FXyh4bTw4JxkjVIN9mdnWPAxtR7Pburra
-         K/DA==
-X-Gm-Message-State: APjAAAW7TeehxaI5eoUnMQwv1s0wtW8bDUgH1JRx07cTi/KGVgPphw7j
-        Kzv4EdERamO/8EBZvC/zI7zCBvGVszd1R7F/aEWvyqVKZjYj1YYZ5S02PQc2xi0raD+Aca3tmZO
-        lzRTTdXxCiPmi
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr6708220wrv.248.1570100045802;
-        Thu, 03 Oct 2019 03:54:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyv3Z0Cd9/KSakZBKWO86WJgzxHATqe7HQh3z6HK3wpvt0UzrjZziBeGUCN3si1Uj2bHlWO1w==
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr6708199wrv.248.1570100045516;
-        Thu, 03 Oct 2019 03:54:05 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id z5sm3892422wrs.54.2019.10.03.03.54.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2019 03:54:04 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Roman Kagan <rkagan@virtuozzo.com>
-Cc:     "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "x86\@kernel.org" <x86@kernel.org>,
-        "linux-hyperv\@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] x86/hyperv: make vapic support x2apic mode
-In-Reply-To: <20191002101923.4981-1-rkagan@virtuozzo.com>
-References: <20191002101923.4981-1-rkagan@virtuozzo.com>
-Date:   Thu, 03 Oct 2019 12:54:03 +0200
-Message-ID: <87muei14ms.fsf@vitty.brq.redhat.com>
+        id S1728140AbfJCLJe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 07:09:34 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B4371000;
+        Thu,  3 Oct 2019 04:09:34 -0700 (PDT)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37C223F706;
+        Thu,  3 Oct 2019 04:09:33 -0700 (PDT)
+Subject: Re: [PATCH 4/5] arm64: KVM: Prevent speculative S1 PTW when restoring
+ vcpu context
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20190925111941.88103-1-maz@kernel.org>
+ <20190925111941.88103-5-maz@kernel.org>
+From:   James Morse <james.morse@arm.com>
+Message-ID: <0d52783d-2cff-0d2e-8421-74f815b90c47@arm.com>
+Date:   Thu, 3 Oct 2019 12:09:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190925111941.88103-5-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+Hi Marc,
 
-> Now that there's Hyper-V IOMMU driver, Linux can switch to x2apic mode
-> when supported by the vcpus.
->
-> However, the apic access functions for Hyper-V enlightened apic assume
-> xapic mode only.
->
-> As a result, Linux fails to bring up secondary cpus when run as a guest
-> in QEMU/KVM with both hv_apic and x2apic enabled.
->
-> I didn't manage to make my instance of Hyper-V expose x2apic to the
-> guest; nor does Hyper-V spec document the expected behavior.  However,
-> a Windows guest running in QEMU/KVM with hv_apic and x2apic and a big
-> number of vcpus (so that it turns on x2apic mode) does use enlightened
-> apic MSRs passing unshifted 32bit destination id and falls back to the
-> regular x2apic MSRs for less frequently used apic fields.
->
-> So implement the same behavior, by replacing enlightened apic access
-> functions (only those where it makes a difference) with their
-> x2apic-aware versions when x2apic is in use.
->
-> Fixes: 29217a474683 ("iommu/hyper-v: Add Hyper-V stub IOMMU driver")
-> Fixes: 6b48cb5f8347 ("X86/Hyper-V: Enlighten APIC access")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> ---
-> v1 -> v2:
-> - add ifdefs to handle !CONFIG_X86_X2APIC
->
->  arch/x86/hyperv/hv_apic.c | 54 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 51 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
-> index 5c056b8aebef..eb1434ae9e46 100644
-> --- a/arch/x86/hyperv/hv_apic.c
-> +++ b/arch/x86/hyperv/hv_apic.c
-> @@ -84,6 +84,44 @@ static void hv_apic_write(u32 reg, u32 val)
->  	}
->  }
->  
-> +#ifdef CONFIG_X86_X2APIC
-> +static void hv_x2apic_icr_write(u32 low, u32 id)
-> +{
-> +	wrmsr(HV_X64_MSR_ICR, low, id);
-> +}
+On 25/09/2019 12:19, Marc Zyngier wrote:
+> When handling erratum 1319367, we must ensure that the page table
+> walker cannot parse the S1 page tables while the guest is in an
+> inconsistent state. This is done as follows:
+> 
+> On guest entry:
+> - TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> - all system registers are restored, except for TCR_EL1 and SCTLR_EL1
+> - stage-2 is restored
+> - SCTLR_EL1 and TCR_EL1 are restored
+> 
+> On guest exit:
+> - SCTLR_EL1.M and TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> - stage-2 is disabled
+> - All host system registers are restored
 
-AFAIU you're trying to mirror native_x2apic_icr_write() here but this is
-different from what hv_apic_icr_write() does
-(SET_APIC_DEST_FIELD(id)). Is it actually correct? (I think you've
-tested this and it is but) Michael, could you please shed some light
-here?
-
-> +
-> +static u32 hv_x2apic_read(u32 reg)
-> +{
-> +	u32 reg_val, hi;
-> +
-> +	switch (reg) {
-> +	case APIC_EOI:
-> +		rdmsr(HV_X64_MSR_EOI, reg_val, hi);
-> +		return reg_val;
-> +	case APIC_TASKPRI:
-> +		rdmsr(HV_X64_MSR_TPR, reg_val, hi);
-> +		return reg_val;
-> +
-> +	default:
-> +		return native_apic_msr_read(reg);
-> +	}
-> +}
-> +
-> +static void hv_x2apic_write(u32 reg, u32 val)
-> +{
-> +	switch (reg) {
-> +	case APIC_EOI:
-> +		wrmsr(HV_X64_MSR_EOI, val, 0);
-> +		break;
-> +	case APIC_TASKPRI:
-> +		wrmsr(HV_X64_MSR_TPR, val, 0);
-> +		break;
-> +	default:
-> +		native_apic_msr_write(reg, val);
-> +	}
-> +}
-> +#endif /* CONFIG_X86_X2APIC */
-> +
->  static void hv_apic_eoi_write(u32 reg, u32 val)
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index e6adb90c12ae..4df47d013bec 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -156,6 +170,23 @@ static void __hyp_text __deactivate_traps_nvhe(void)
 >  {
->  	struct hv_vp_assist_page *hvp = hv_vp_assist_page[smp_processor_id()];
-> @@ -262,9 +300,19 @@ void __init hv_apic_init(void)
->  	if (ms_hyperv.hints & HV_X64_APIC_ACCESS_RECOMMENDED) {
->  		pr_info("Hyper-V: Using MSR based APIC access\n");
->  		apic_set_eoi_write(hv_apic_eoi_write);
-> -		apic->read      = hv_apic_read;
-> -		apic->write     = hv_apic_write;
-> -		apic->icr_write = hv_apic_icr_write;
-> +#ifdef CONFIG_X86_X2APIC
-> +		if (x2apic_enabled()) {
-> +			apic->read      = hv_x2apic_read;
-> +			apic->write     = hv_x2apic_write;
-> +			apic->icr_write = hv_x2apic_icr_write;
-> +		} else {
-> +#endif
-> +			apic->read      = hv_apic_read;
-> +			apic->write     = hv_apic_write;
-> +			apic->icr_write = hv_apic_icr_write;
+>  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
+>  
+> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
+> +		u64 val;
+> +
+> +		/*
+> +		 * Set the TCR and SCTLR registers in the exact opposite
+> +		 * sequence as __activate_traps_nvhe (first prevent walks,
+> +		 * then force the MMU on). A generous sprinkling of isb()
+> +		 * ensure that things happen in this exact order.
+> +		 */
+> +		val = read_sysreg_el1(SYS_TCR);
+> +		write_sysreg_el1(val | TCR_EPD1_MASK | TCR_EPD0_MASK, SYS_TCR);
+> +		isb();
+> +		val = read_sysreg_el1(SYS_SCTLR);
+> +		write_sysreg_el1(val | SCTLR_ELx_M, SYS_SCTLR);
+> +		isb();
+> +	}
 
-(just wondering): Is it always safe to assume that we cannot switch
-between apic_flat/x2apic in runtime? Moreover, the only difference
-between hv_apic_read/hv_apic_write and hv_x2apic_read/hv_x2apic_write is
-native_apic_mem_{read,write} -> native_apic_msr_{read,write}. Would it
-make sense to move if (x2apic_enabled()) and merge these functions?
+We are exiting the guest, and heading back to the host.
+This change forces stage-1 off. Stage-2 is still enabled, but its about to be disabled and
+have the host VMID restore in __deactivate_vm(). All good so far.
 
-> +#ifdef CONFIG_X86_X2APIC
-> +		}
-> +#endif
->  		apic->icr_read  = hv_apic_icr_read;
->  	}
->  }
+Then we hit __sysreg_restore_state_nvhe() for the host, which calls
+__sysreg_restore_el1_state()...
 
--- 
-Vitaly
+
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index 7ddbc849b580..adabdceacc10 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -117,12 +117,22 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+>  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+> -	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> +
+> +	/* Must only be done for guest registers, hence the context test */
+> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367) &&
+> +	    !ctxt->__hyp_running_vcpu) {
+> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1] |
+> +				 TCR_EPD1_MASK | TCR_EPD0_MASK,	SYS_TCR);
+> +		isb();
+> +	} else {
+
+... which will come in here.
+
+> +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+
+This reverses what we did in __deactivate_traps_nvhe(), but we haven't restored the host
+TTBRs yet. I don't think the vttbr_el2 write has been sync'd either.
+
+A speculative AT at this point could see the TCR EPDx bits clear, but the guest's TTBR
+values. It may also see the guest-VMID.
+
+
+I think the change to this function needs splitting up. Restore of guest state needs to be
+as you have it here, before the guest TTBRs are written.
+
+Restore of the host state needs to only clear the EPDx bits after the TTBRs are written,
+and sync'd.
+
+
+Assuming I'm making sense ... with that:
+Reviewed-by: James Morse <james.morse@arm.com>
+
+for the series.
+
+
+> +	}
+> +
+>  	write_sysreg(ctxt->sys_regs[ACTLR_EL1],		actlr_el1);
+>  	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	SYS_CPACR);
+>  	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	SYS_TTBR0);
+>  	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	SYS_TTBR1);
+> -	write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+>  	write_sysreg_el1(ctxt->sys_regs[ESR_EL1],	SYS_ESR);
+>  	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL1],	SYS_AFSR0);
+>  	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL1],	SYS_AFSR1);
+
+
+Thanks,
+
+James
