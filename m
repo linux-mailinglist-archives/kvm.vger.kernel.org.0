@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B998CB0EB
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 23:18:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5937CCB0F2
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 23:18:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732482AbfJCVRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 17:17:50 -0400
-Received: from mail-eopbgr730068.outbound.protection.outlook.com ([40.107.73.68]:39664
-        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        id S1732767AbfJCVSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 17:18:03 -0400
+Received: from mail-eopbgr810089.outbound.protection.outlook.com ([40.107.81.89]:24420
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732268AbfJCVRs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 17:17:48 -0400
+        id S1732586AbfJCVRv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 17:17:51 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NQg9lwBe/xKYIiGEhIiCXVeioC3cpy0x3IBysavQL52/WwVIgFsAU30d9u4vV5d8emGC2ywAmHp/Ty8RKz+qb8V//8n3eTuQMbqOKxBZHjL6SYbAFe0JGr359XpgnPq3CvoVFOTceRavTWmBCBHtnRAX6CDddmWOghnz6Zi9mj729AJ94VW2BmVXpSNg3TMUquYUES2LDmtoXtTedV/qS5YzW+AAXHjU3rRwCtGPOAeK71yv7CJq/F7Mh3uA/6hKZtcKPFns1iVpguLuFe4aI7/GZMgAUaGA6+ieFu+VCui08rIrpXLbdp9G+KLYWrvL/OllQE/0sIwBwp250hnYPQ==
+ b=UUeabHilvObj5H1B2cn34+CqwuoW/c8Xmf90pI9Xx0UV2yJcBTP6OdBPg6/huqcFWiaKjXu0STsxhbN36gyNpleR5avozeHd/N93eXSNhCr+wT6IuwzoE/CTfyDBpzy842cVG/94bOf3huxcx2n0kMzHoUqnfMN44hqAdqVkk7ljE4WItKH01eIQ0YyQ394jt8GIuiCpB9zaAsXBU546MbV/wdzUcOqmxVs39D/i89qNGarvVrA4L2PVOtBwTh34kJx10WFAeWYwO8e9J5clkMyPxeDjOynS2e0iBCViqhr80PcGI77FqrRaroGV/SIrAwCzscI3fC+T4FBZIsdj1g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z9I/0UGRVSRvqVS5xtsrQPtBrvSh7D5tXVguO/J5IjA=;
- b=ILfjExiwjO/l4XJD/xCr2gM3HGe3fuMrBrvF5d4A+sJBfwEKPHdTUQBpy06EHDKyj5mWIxMffflUZixPYUN2RuX5lUITk8/kqPc1N953RErdcm+6TEE3QBcKbyrkEOBFDfTxhbfsH2m0FaM4lF9ilMNBeZZ2R1PVJ/yYYebicjS34i0GfWKJNyxPLoMY2S3Vst13HUiG0jIFvF1vTsKSam6yL5GgQGaxIskEWG0Gi6Z9uUNyTflG30i8ovi/fbfQ4y7jTaxvtdsK3VmUDRVfBFHAIWYdtppr+mFUWcJjv/TID0jzgu3m0CRQ+1IpDaadMicFDN/pdPOxJMWfaqSKAQ==
+ bh=bKQ/yq6ZW8h+9ow7ZVEAoIjKY6GFVIc36Ic1VgCxzeI=;
+ b=n91ie/v0zpit3kY5EmuP5tToldu0uvx292DXZGUDD9Cm54SL2wBuaUOEevpqkt+t8b3RcEJtW2suynD2V68mmopC2GhUkSrlleYTV828uMzkKpAGOS25lZKzjIdXu+4Uygzu5+rPUhoL52ZK7jvvFeqUh1vj7cPy90MQGlp8AmG4OFsNRc0NcM412hPf4NVPttZXd7jIz7L4C/h4n1BlsFB0suIkewKKVDPYKtgUUYzKsPke6fVmUfIYw3Vx3lb9QeD44yfgc3ceCTmSFyj2qzokCpeRxwK2O6S8C8Dz4T4eelJSjhRVMzA93Sa99hXtkN8I9tkFpo46NVrdLQ2tZw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z9I/0UGRVSRvqVS5xtsrQPtBrvSh7D5tXVguO/J5IjA=;
- b=QU5KFunvo9Qlxhv1ryA6sgvX74JqDlyf875pRw5+rbTX18Ox2iIb2b//juCu2MKAQ1vzER9GMiQjRdjQK8KHX+8aQqgfEvp6JNaPNAOtbEqYYVd+019lYOZeYJE8CZeio0WnyhOrKGyj40uF23LnsRRc69OYYd5VgeAIcjvLzuI=
+ bh=bKQ/yq6ZW8h+9ow7ZVEAoIjKY6GFVIc36Ic1VgCxzeI=;
+ b=sXUcgtQtTS+FrLd2l+vvkK/amo3jdBHm3NvdyyKH8X/q3NnuJ2F0tRy8fcMj2GJpEPBCQsz4aa0FvhDCs03oR7pnevfSJB0FzMtAwce9w3uyv/pzDhJBlCle/yOTLoVE53lpWxggc97up8dxrdSy2vDuXFt0drLrOS2dStQnrvY=
 Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.104.150) by
- DM6PR12MB3211.namprd12.prod.outlook.com (20.179.105.75) with Microsoft SMTP
+ DM6PR12MB3115.namprd12.prod.outlook.com (20.178.31.21) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2305.20; Thu, 3 Oct 2019 21:17:46 +0000
+ 15.20.2305.20; Thu, 3 Oct 2019 21:17:47 +0000
 Received: from DM6PR12MB3163.namprd12.prod.outlook.com
  ([fe80::85b7:7456:1a67:78aa]) by DM6PR12MB3163.namprd12.prod.outlook.com
  ([fe80::85b7:7456:1a67:78aa%7]) with mapi id 15.20.2305.023; Thu, 3 Oct 2019
- 21:17:46 +0000
+ 21:17:47 +0000
 From:   "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
 To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
@@ -46,17 +46,14 @@ CC:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         "Singh, Brijesh" <brijesh.singh@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH 3/5] KVM: SVM: Remove unneeded WBINVD and DF_FLUSH when
- starting SEV guests
-Thread-Topic: [PATCH 3/5] KVM: SVM: Remove unneeded WBINVD and DF_FLUSH when
- starting SEV guests
-Thread-Index: AQHVejAArS5Tdu6ehkeZcenTy/XMgg==
-Date:   Thu, 3 Oct 2019 21:17:46 +0000
-Message-ID: <6108561e392460ade67f7f70d9bfa9f56a925d0a.1570137447.git.thomas.lendacky@amd.com>
+        David Rientjes <rientjes@google.com>
+Subject: [PATCH 4/5] KVM: SVM: Convert DEACTIVATE mutex to read/write
+ semaphore
+Thread-Topic: [PATCH 4/5] KVM: SVM: Convert DEACTIVATE mutex to read/write
+ semaphore
+Thread-Index: AQHVejAB/rHeFE4CtEK2sFRC1yAFBA==
+Date:   Thu, 3 Oct 2019 21:17:47 +0000
+Message-ID: <d6c131bd5e43138cdb5c0be98005ffbc582ca833.1570137447.git.thomas.lendacky@amd.com>
 References: <cover.1570137447.git.thomas.lendacky@amd.com>
 In-Reply-To: <cover.1570137447.git.thomas.lendacky@amd.com>
 Accept-Language: en-US
@@ -72,32 +69,32 @@ authentication-results: spf=none (sender IP is )
 x-ms-exchange-messagesentrepresentingtype: 1
 x-originating-ip: [165.204.78.1]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ec4c001e-0bbc-46e7-676f-08d7484722d6
+x-ms-office365-filtering-correlation-id: 205510b0-9e32-4f6d-45f7-08d748472382
 x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: DM6PR12MB3211:
+x-ms-traffictypediagnostic: DM6PR12MB3115:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB32118619FA16E946B3B6F93DEC9F0@DM6PR12MB3211.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-microsoft-antispam-prvs: <DM6PR12MB31152C2CABC13A6BA990850AEC9F0@DM6PR12MB3115.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3826;
 x-forefront-prvs: 01792087B6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(376002)(346002)(366004)(136003)(199004)(189003)(256004)(26005)(14444005)(386003)(6506007)(316002)(36756003)(66446008)(71200400001)(71190400001)(5660300002)(66476007)(66556008)(64756008)(66946007)(118296001)(66066001)(8936002)(2501003)(50226002)(7416002)(6512007)(102836004)(81156014)(8676002)(2906002)(14454004)(81166006)(7736002)(4326008)(6436002)(305945005)(478600001)(25786009)(86362001)(476003)(446003)(2616005)(11346002)(186003)(6486002)(54906003)(99286004)(110136005)(486006)(76176011)(52116002)(3846002)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3211;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(396003)(376002)(346002)(136003)(189003)(199004)(26005)(256004)(14444005)(186003)(2906002)(102836004)(6512007)(99286004)(66946007)(476003)(14454004)(6436002)(446003)(8676002)(81166006)(8936002)(81156014)(478600001)(2501003)(11346002)(50226002)(71190400001)(71200400001)(36756003)(6116002)(76176011)(52116002)(86362001)(3846002)(486006)(386003)(6506007)(7736002)(316002)(25786009)(305945005)(5660300002)(7416002)(118296001)(66556008)(66446008)(64756008)(66476007)(4326008)(54906003)(110136005)(6486002)(66066001)(2616005);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3115;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: sKkXl+lQqeGY10P0d8mVNPMqcg5xkZeChtFJpyHeeFnuZvCyZaMwxjavVZ/MraeeqVql5UxvcPjf5WrufzZD1ZpzUBsBciXGhvbNMGrChwej55uAdcq2MLkNI1EIwaVcTn4p6S2Ln4XiMLHa7y4p7WzcwYQjn2IiEnRj9WobQKChtKd+K1iz5cJM9Lge7mP32kuD4vSChvZHcMwIkftR8gavKHw2ughYVKw4xinSqHPU3Djo+zsZZOUIo9exSQ2JBOyxJ2R7ymJ+UuGyGJ+46YaaQxMFbZAh1zVCAGjTITKy6viNb8/dx86n7vWn7ciYbaxMmR4/+Uk66HftZe2jUIRk8bSiJ1J7I5SyOWPeOXn952rj13ba1tpcorEJhqziZAoJ97Wb7dQ2zT3IIyhGuV3uBHKd1UYS/OCe/+Rpgrs=
+x-microsoft-antispam-message-info: xQ3AGL+LgF8pEjrNl7Wc6Rrv6v4Dt8MV4joi7VdRQU6/Nzqu+neO6Qatvd6cCZqEEQTry/MSfps22kpuvbo+cA06hwZ6UoSls2WcPf8zBliVjIm5AKHSYBchlbIqdfp2YamvvhLiZhRNcToolgqsrMDiwRd2J6cwtEVOVLn8RkkUAFwfhywPf41WnsnVXkgGx7ursQVA+Wl1iArviyP1rWGA3uAI29hg/5kYJB0Gr5Kd/OMvcSY/TdrfbiW2L/3u/jOP78Qh4bkogync+kuaM2HwgLX58xhRHod/Ehr5z+GsLBLuKmUBq9hTnAXYE3HU4lwQqHE+kntdXlzlVslhg9J/HxeWETQlKEEl4bnIQXXRRAHGJrm22CwjOWAVKxuUiaykTvlbofW7pL7lyz0D0L5tiEfux3mnoUXWvSpJyOo=
 Content-Type: text/plain; charset="iso-8859-2"
-Content-ID: <E0FA8D53FBDFB549AA9564AE66FEBA65@namprd12.prod.outlook.com>
+Content-ID: <6D4B28A594D3E1478A7E242F0B73EBBA@namprd12.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec4c001e-0bbc-46e7-676f-08d7484722d6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2019 21:17:46.2607
+X-MS-Exchange-CrossTenant-Network-Message-Id: 205510b0-9e32-4f6d-45f7-08d748472382
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2019 21:17:47.3701
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: EwHs1jsil+VRuPes6vaJcX7ev2QWKYm2X6yrzvy6t5AZV9LzSI/209PcR9Hz3rMNV++P97yAMiJMv//TBlMo4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3211
+X-MS-Exchange-CrossTenant-userprincipalname: nGY7ig+M1gp6mG7vhpIYngkOVrBv+b7egxoYKi0QB4BcnCZPHjtCAmUOfvunn8UUE8ED/zx9zS4mZ9XEszSxzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3115
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -105,81 +102,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Performing a WBINVD and DF_FLUSH are expensive operations. The SEV support
-currently performs this WBINVD/DF_FLUSH combination when an SEV guest is
-terminated, so there is no need for it to be done before LAUNCH.
+In preparation for an upcoming patch, convert the mutex that guards the
+DEACTIVATE/WBINVD/DF_FLUSH sequence into a read/write semaphore. The
+conversion will convert the mutex lock and unlock into down_write and
+up_write so that the mutex behavior is maintained.
 
-However, when the SEV firmware transitions the platform from UNINIT state
-to INIT state, all ASIDs will be marked invalid across all threads.
-Therefore, as part of transitioning the platform to INIT state, perform a
-WBINVD/DF_FLUSH after a successful INIT in the PSP/SEV device driver.
-Since the PSP/SEV device driver is x86 only, it can reference and use the
-WBINVD related functions directly.
-
-Cc: Gary Hook <gary.hook@amd.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
 Tested-by: David Rientjes <rientjes@google.com>
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- arch/x86/kvm/svm.c           | 15 ---------------
- drivers/crypto/ccp/psp-dev.c |  9 +++++++++
- 2 files changed, 9 insertions(+), 15 deletions(-)
+ arch/x86/kvm/svm.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 1d217680cf83..389dfd7594eb 100644
+index 389dfd7594eb..b995d7ac1516 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -6329,21 +6329,6 @@ static int sev_bind_asid(struct kvm *kvm, unsigned i=
-nt handle, int *error)
- 	int asid =3D sev_get_asid(kvm);
- 	int ret;
+@@ -38,6 +38,7 @@
+ #include <linux/file.h>
+ #include <linux/pagemap.h>
+ #include <linux/swap.h>
++#include <linux/rwsem.h>
 =20
--	/*
--	 * Guard against a DEACTIVATE command before the DF_FLUSH command
--	 * has completed.
--	 */
+ #include <asm/apic.h>
+ #include <asm/perf_event.h>
+@@ -418,7 +419,7 @@ enum {
+=20
+ #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
+=20
+-static DEFINE_MUTEX(sev_deactivate_lock);
++static DECLARE_RWSEM(sev_deactivate_lock);
+ static DEFINE_MUTEX(sev_bitmap_lock);
+ static unsigned int max_sev_asid;
+ static unsigned int min_sev_asid;
+@@ -1762,14 +1763,14 @@ static void sev_unbind_asid(struct kvm *kvm, unsign=
+ed int handle)
+ 	 * Guard against a parallel DEACTIVATE command before the DF_FLUSH
+ 	 * command has completed.
+ 	 */
 -	mutex_lock(&sev_deactivate_lock);
--
--	wbinvd_on_all_cpus();
--
--	ret =3D sev_guest_df_flush(error);
--
++	down_write(&sev_deactivate_lock);
+=20
+ 	sev_guest_deactivate(data, NULL);
+=20
+ 	wbinvd_on_all_cpus();
+ 	sev_guest_df_flush(NULL);
+=20
 -	mutex_unlock(&sev_deactivate_lock);
--
--	if (ret)
--		return ret;
--
- 	data =3D kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
- 	if (!data)
- 		return -ENOMEM;
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 6b17d179ef8a..39fdd0641637 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -21,6 +21,8 @@
- #include <linux/ccp.h>
- #include <linux/firmware.h>
++	up_write(&sev_deactivate_lock);
 =20
-+#include <asm/smp.h>
-+
- #include "sp-dev.h"
- #include "psp-dev.h"
+ 	kfree(data);
 =20
-@@ -235,6 +237,13 @@ static int __sev_platform_init_locked(int *error)
- 		return rc;
-=20
- 	psp->sev_state =3D SEV_STATE_INIT;
-+
-+	/* Prepare for first SEV guest launch after INIT */
-+	wbinvd_on_all_cpus();
-+	rc =3D __sev_do_cmd_locked(SEV_CMD_DF_FLUSH, NULL, error);
-+	if (rc)
-+		return rc;
-+
- 	dev_dbg(psp->dev, "SEV firmware initialized\n");
-=20
- 	return rc;
 --=20
 2.17.1
 
