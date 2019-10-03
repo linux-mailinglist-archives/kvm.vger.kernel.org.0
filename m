@@ -2,74 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 51AEDC9631
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 03:32:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12203C966B
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 03:44:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726376AbfJCBcV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Oct 2019 21:32:21 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:33529 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725951AbfJCBcV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Oct 2019 21:32:21 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q10so670225pfl.0
-        for <kvm@vger.kernel.org>; Wed, 02 Oct 2019 18:32:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=RwqMv1VuRaNQclTV5klptGu189WWVB7hjqn7mDkEeqY=;
-        b=aeWI5RJf+eVNyMKraUN7BRHRo5SN14Aw0+F7zVSglx6sr59tGqjFSwUK1LkU/ulb6k
-         nONAs85vlEoXqo3NHPTC5rlh+23RnRr9uSjhzqXMDtW/8uutsUdvkKnrrWLjv9usIPWf
-         WdSS8jOzkJOJvZmTfr+YGStZdgqDg7bqz8HutcdwMYWjc5tDMiEYdygri/oqmCmhOTHy
-         z8W/WG8y4fQHwDVFbGdhXSGtiLVmnn+2waueXCQOZSHwDH4Gdw8wcpHI6J7YvRkYeYjh
-         eQkNFhUCmzubsHlE4019tZNKrg6hsS8Xr9y3zOU41FjxbGD0vT82DhIqmTNGrwFX3UOG
-         7uBw==
-X-Gm-Message-State: APjAAAWZoiAWoln8gO9eFeHoPg46jfJYHzYNXIg4YyoNZ5plv/2YvSCe
-        hB56+5Jc8gWM/9w58lEwR4s=
-X-Google-Smtp-Source: APXvYqxwmoJ4s8OsF7+Q7jyquKJEppkZNo4prre4ovJRzUIFLvcc9IpV81T8r+ZXMSn76em0fpGI2g==
-X-Received: by 2002:a62:a509:: with SMTP id v9mr7849498pfm.180.1570066340786;
-        Wed, 02 Oct 2019 18:32:20 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id v12sm564310pgr.31.2019.10.02.18.32.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2019 18:32:20 -0700 (PDT)
-From:   Nadav Amit <namit@vmware.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, sean.j.christopherson@intel.com,
-        Nadav Amit <namit@vmware.com>
-Subject: [kvm-unit-tests PATCH] x86: VMX: MSR_IA32_VMX_MISC[30] is not MBZ
-Date:   Wed,  2 Oct 2019 11:11:14 -0700
-Message-Id: <20191002181114.3448-1-namit@vmware.com>
-X-Mailer: git-send-email 2.17.1
+        id S1728294AbfJCBnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Oct 2019 21:43:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46354 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726364AbfJCBnM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Oct 2019 21:43:12 -0400
+Received: from paulmck-ThinkPad-P72.home (50-39-105-78.bvtn.or.frontiernet.net [50.39.105.78])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 16B52222C6;
+        Thu,  3 Oct 2019 01:43:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570066992;
+        bh=vJactgM3M2ccX7Qs5sz0+VAKv+twysNQWUyUR3pB7oQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=HUiGVvKyZr1aow3e8Bar+GnMPXkDxlGJVKuQwD++B2faft524sFpkWCjhyGlatxNc
+         m+ApIIqFWfp3SXG55n9nOJjt383I5KBFYF8VbHSUl0dB6uIXiMT+K5YeIVUny//ZSE
+         Q2ux/Zo6uD2Q3EXPFgYdMJlcRPc69VPK5Sr6qWoU=
+From:   paulmck@kernel.org
+To:     rcu@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, mingo@kernel.org,
+        jiangshanlai@gmail.com, dipankar@in.ibm.com,
+        akpm@linux-foundation.org, mathieu.desnoyers@efficios.com,
+        josh@joshtriplett.org, tglx@linutronix.de, peterz@infradead.org,
+        rostedt@goodmis.org, dhowells@redhat.com, edumazet@google.com,
+        fweisbec@gmail.com, oleg@redhat.com, joel@joelfernandes.org,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH tip/core/rcu 2/9] x86/kvm/pmu: Replace rcu_swap_protected() with rcu_replace()
+Date:   Wed,  2 Oct 2019 18:43:03 -0700
+Message-Id: <20191003014310.13262-2-paulmck@kernel.org>
+X-Mailer: git-send-email 2.9.5
+In-Reply-To: <20191003014153.GA13156@paulmck-ThinkPad-P72>
+References: <20191003014153.GA13156@paulmck-ThinkPad-P72>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-MSR_IA32_VMX_MISC[30] tells whehter "VM entry allows injection of a
-software interrupt, software exception, or privileged software exception
-with an instruction length of 0".
+From: "Paul E. McKenney" <paulmck@kernel.org>
 
-In other words, it is not MBZ (must be zero), so do not check that it is
-cleared.
+This commit replaces the use of rcu_swap_protected() with the more
+intuitively appealing rcu_replace() as a step towards removing
+rcu_swap_protected().
 
-Signed-off-by: Nadav Amit <namit@vmware.com>
+Link: https://lore.kernel.org/lkml/CAHk-=wiAsJLw1egFEE=Z7-GGtM6wcvtyytXZA1+BHqta4gg6Hw@mail.gmail.com/
+Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: <x86@kernel.org>
+Cc: <kvm@vger.kernel.org>
 ---
- x86/vmx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/pmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index d518102..647ab49 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -1486,7 +1486,7 @@ static void test_vmx_caps(void)
- 	report("MSR_IA32_VMX_MISC",
- 	       (!(ctrl_cpu_rev[1].clr & CPU_URG) || val & (1ul << 5)) &&
- 	       ((val >> 16) & 0x1ff) <= 256 &&
--	       (val & 0xc0007e00) == 0);
-+	       (val & 0x80007e00) == 0);
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 46875bb..4c37266 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -416,8 +416,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ 	*filter = tmp;
  
- 	for (n = 0; n < ARRAY_SIZE(vmx_ctl_msr); n++) {
- 		ctrl.val = rdmsr(vmx_ctl_msr[n].index);
+ 	mutex_lock(&kvm->lock);
+-	rcu_swap_protected(kvm->arch.pmu_event_filter, filter,
+-			   mutex_is_locked(&kvm->lock));
++	filter = rcu_replace(kvm->arch.pmu_event_filter, filter,
++			     mutex_is_locked(&kvm->lock));
+ 	mutex_unlock(&kvm->lock);
+ 
+ 	synchronize_srcu_expedited(&kvm->srcu);
 -- 
-2.17.1
+2.9.5
 
