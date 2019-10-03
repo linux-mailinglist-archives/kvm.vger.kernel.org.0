@@ -2,97 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3DE8CA131
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:37:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDF40CA148
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730203AbfJCPhZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 11:37:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35432 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729752AbfJCPhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 11:37:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1570117044;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qrz8YJPOUTLl2wYuvy1P4bMW9shlmohZvrrGhpPkIRs=;
-        b=KtFIyhWrCLLGKG2wtbF772zrUg/PsOhLQoHtmamc8jiE3coKlv378/n1YE09mmjekDcmzj
-        FuPrx71ncJbrdW1AX+DnBNn8oE2O6S0hvcH9w1fQKl9/6fT3gvU+eQVfTMj5zxc1TmSAEq
-        Bv+73Z/63RGEmV+H5eMottQgdTMCHvA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-ONUVShRTOpKc7E9a4LAoXQ-1; Thu, 03 Oct 2019 11:37:20 -0400
-Received: by mail-wr1-f69.google.com with SMTP id t11so1278463wro.10
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 08:37:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mVVDjxqOVTW6Hr6MGw2wdGvPn8dr2/wzfFgapg8i2Zc=;
-        b=LY8g7OClafq+qKRAWT4i3h6VqfsMEqZtJSnJkKTRG7I6KmDpMbgTwS3t3ZKvkDltKd
-         FUOCJnhBbg6GrQ+G374nyDYuBaywN6N/5gnS4+PttejuExoNRt6ybF1svwAuc8fUx+u7
-         WV0HiwJR0cSAv4byb97Xw0z0cqbUERaUJzX95uK0Jle5reg6btQJ1s8LBu2sjZ5oTmO3
-         4qQIm2R2bjnLsTOZ1JTglIO3Ayi0fIjJgzpzO/xRXY6ZiKf58NSKe/Bv9jKzGU1oNPry
-         CLmpeKaIvIjudihWdHZmcJVKrLUcF4uaZ8kPa8cG6gJVZQVCtzAxu07NrR05vjLrQQz/
-         sPzQ==
-X-Gm-Message-State: APjAAAUvKf2/G55WXXXKN7aB2RVCaC8O9nM3AYjmTXND1kDMQvNDVwvr
-        uJmkJGYXJUy1b4Ipyf6IT0S70iUoB3J66CbhH29cyaLKx6QCtjl4tVQQUv/CZq7HjdkDpIPvRyy
-        RNEck/8V6/EMc
-X-Received: by 2002:a05:600c:22da:: with SMTP id 26mr7142089wmg.177.1570117039637;
-        Thu, 03 Oct 2019 08:37:19 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyaEH0vrDdtTn03vNIjY6XC27eAPbcWStCVYNFQxWvlASlLZpHw/85jrbDXb7655AqkOZtGkQ==
-X-Received: by 2002:a05:600c:22da:: with SMTP id 26mr7142073wmg.177.1570117039322;
-        Thu, 03 Oct 2019 08:37:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
-        by smtp.gmail.com with ESMTPSA id 143sm3117461wmb.33.2019.10.03.08.37.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2019 08:37:18 -0700 (PDT)
-Subject: Re: A question about INVPCID without PCID
-To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
-References: <CALMp9eRPgZygwsG+abEx96+dt6rKyAMQJQx0qoHVbaTKFh0CqA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6220e2b4-be59-736c-bc98-30573d506387@redhat.com>
-Date:   Thu, 3 Oct 2019 17:37:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728564AbfJCPn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 11:43:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40122 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727024AbfJCPn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 11:43:59 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id CD2AD3082231;
+        Thu,  3 Oct 2019 15:43:58 +0000 (UTC)
+Received: from redhat.com (ovpn-112-54.rdu2.redhat.com [10.10.112.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DB7119C69;
+        Thu,  3 Oct 2019 15:43:49 +0000 (UTC)
+Date:   Thu, 3 Oct 2019 11:42:33 -0400
+From:   Jerome Glisse <jglisse@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>,
+        Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C <yu.c.zhang@intel.com>,
+        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
+Subject: Re: DANGER WILL ROBINSON, DANGER
+Message-ID: <20191003154233.GA4421@redhat.com>
+References: <VI1PR02MB398411CA9A56081FF4D1248EBBA40@VI1PR02MB3984.eurprd02.prod.outlook.com>
+ <20190905180955.GA3251@redhat.com>
+ <5b0966de-b690-fb7b-5a72-bc7906459168@redhat.com>
+ <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
+ <20191002192714.GA5020@redhat.com>
+ <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
+ <20191002141542.GA5669@redhat.com>
+ <f26710a4-424f-730c-a676-901bae451409@redhat.com>
+ <20191002170429.GA8189@redhat.com>
+ <dd0ca0d3-f502-78a1-933a-7e1b5fb90baa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eRPgZygwsG+abEx96+dt6rKyAMQJQx0qoHVbaTKFh0CqA@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: ONUVShRTOpKc7E9a4LAoXQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dd0ca0d3-f502-78a1-933a-7e1b5fb90baa@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 03 Oct 2019 15:43:59 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/10/19 21:48, Jim Mattson wrote:
-> Does anyone know why kvm disallows enumerating INVPCID in the guest
-> CPUID when PCID is not enumerated? There are many far more nonsensical
-> CPUID combinations that kvm does allow, such as AVX512F without XSAVE,
-> or even PCID without LM. Why is INVPCID without PCID of paramount
-> concern?
->=20
+On Wed, Oct 02, 2019 at 10:10:18PM +0200, Paolo Bonzini wrote:
+> On 02/10/19 19:04, Jerome Glisse wrote:
+> > On Wed, Oct 02, 2019 at 06:18:06PM +0200, Paolo Bonzini wrote:
+> >>>> If the mapping of the source VMA changes, mirroring can update the
+> >>>> target VMA via insert_pfn.  But what ensures that KVM's MMU notifier
+> >>>> dismantles its own existing page tables (so that they can be recreated
+> >>>> with the new mapping from the source VMA)?
+> >>
+> >> The KVM inspector process is also (or can be) a QEMU that will have to
+> >> create its own KVM guest page table.  So if a page in the source VMA is
+> >> unmapped we want:
+> >>
+> >> - the source KVM to invalidate its guest page table (done by the KVM MMU
+> >> notifier)
+> >>
+> >> - the target VMA to be invalidated (easy using mirroring)
+> >>
+> >> - the target KVM to invalidate its guest page table, as a result of
+> >> invalidation of the target VMA
+> > 
+> > You can do the target KVM invalidation inside the mirroring invalidation
+> > code.
+> 
+> Why should the source and target KVMs behave differently?  If the source
+> invalidates its guest page table via MMU notifiers, so should the target.
+> 
+> The KVM MMU notifier exists so that nothing (including mirroring) needs
+> to know that there is KVM on the other side.  Any interaction between
+> KVM page tables and VMAs must be mediated by MMU notifiers, anything
+> else is unacceptable.
+> 
+> If it is possible to invoke the MMU notifiers around the calls to
+> insert_pfn, that of course would be perfect.
 
-I guess you're looking at this code:
+Ok and yes you can do that exactly ie inside the mmu notifier callback
+from the target. For instance it is as easy as:
+    target_mirror_notifier_start_callback(start, end) {
+        struct kvm_mirror_struct *kvmms = from_mmun(...);
+        unsigned long target_foff, size;
 
-                /* Exposing INVPCID only when PCID is exposed */
-                bool invpcid_enabled =3D
-                        guest_cpuid_has(vcpu, X86_FEATURE_INVPCID) &&
-                        guest_cpuid_has(vcpu, X86_FEATURE_PCID);
+        size = end - start;
+        target_foff = kvmms_convert_mirror_address(start);
+        take_lock(kvmms->mirror_fault_exclusion_lock);
+        unmap_mapping_range(kvmms->address_space, target_foff, size, 1);
+        drop_lock(kvmms->mirror_fault_exclusion_lock);
+    }
 
-The INVPCID instruction will be disabled if !PCID && INVPCID, but it
-doesn't really disallow *enumerating* INVPCID.  There is no particular
-reason for that, it was done like that originally ("KVM: VMX: Implement
-PCID/INVPCID for guests with EPT") and kept this way.
+All that is needed is to make sure that vm_normal_page() will see those
+pte (inside the process that is mirroring the other process) as special
+which is the case either because insert_pfn() mark the pte as special or
+the kvm device driver which control the vm_operation struct set a
+find_special_page() callback that always return NULL, or the vma has
+either VM_PFNMAP or VM_MIXEDMAP set (which is the case with insert_pfn).
 
-With !PCID && INVPCID you could use PCID=3D0 operations as a fancy INVLPG,
-I suppose, but it is probably uninteresting enough that no one bothered
-changing it.
+So you can keep the existing kvm code unmodified.
 
-Paolo
-
+Cheers,
+Jérôme
