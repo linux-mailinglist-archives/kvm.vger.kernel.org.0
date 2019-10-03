@@ -2,72 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9661ACAE1C
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 20:23:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2132FCAE38
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 20:32:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388902AbfJCSXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 14:23:34 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:36830 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732868AbfJCSXe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 14:23:34 -0400
-Received: by mail-io1-f67.google.com with SMTP id b136so7838967iof.3
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 11:23:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=275AfUnj6aHBgYIbA3ON9mS0LQosy+5qsD0pGkCb32s=;
-        b=c1OGLMY44+4ckwsAl/G+KpSfgRdufeD7+g8abBklf/iVHaeStNDSGUTsrYn7KivMXy
-         gd7lalJgK9VamFzr9yNcORUcBx5LO1pQ2sKh6g5SI6nEq/O5eeoVknEsekuOaFOVig0P
-         zYYjsvfJfiVajqgUraogcoDmK5vSur/OJYeUyg678zQ8L9Ldoj0d7EV7q0dV+FC5SQgL
-         v7fWJu2DAffTqUxpZTW21k6xCZus+kt1iDjg4sFWAViYV57/B0bGZCATnzZyABpuHWln
-         h1mch2xYQlBObkXEVqmbDW9F1eJ7AryfZvM1PEe18JDRWm5Xki/wDJ5ZhgQKCOf6Cvfk
-         HexQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=275AfUnj6aHBgYIbA3ON9mS0LQosy+5qsD0pGkCb32s=;
-        b=YdFmKVuW9KUdRGy910BGC1nRgWeQppBiYJei3FnuQ7L7uFaCSg9GhZ9EPXMpFBw712
-         myBbgT7Whlfsa1SrBj8LvbPSw9b+mldUYLWL5RJlTm40wlPb+I6lHZ576bXV6JLJYVDp
-         p8dzKz6MC8teNCmUS80Ic3gD54NRH3hNFZw/hWQHBUGyt4ZnK72lOig/iBY2JIAmJVpc
-         LhwKqzTskWARfB/YEEcJdKZ0TwrGqUgeKb7WGsDIFmnWPv59PpTsrj+T/MLCqzrCeHeY
-         4ITKQi81ivY6ColZGQDdeOyTqb/Mkm3tl81lbEvXbCnuQa166Q/HVL+VIphQA0jX2x21
-         +8Ag==
-X-Gm-Message-State: APjAAAV+pf9jgBLlYMrSrQ342qBcEfDJR89RzwhtTWu630oAtsfrLwxr
-        /TOU2mOm8ddXnPnn1mbZGXEK00JK9EyCR2mDbE/WYw==
-X-Google-Smtp-Source: APXvYqz+qHo6hpknvwi0t3HRw6jBKEJsjcAIwLnUH/pYAlcuWzLA/cEliwwkK5mVPejYp8PluQHLQUxCAf9UTnBfCOA=
-X-Received: by 2002:a92:5a10:: with SMTP id o16mr11756152ilb.296.1570127012953;
- Thu, 03 Oct 2019 11:23:32 -0700 (PDT)
+        id S2388684AbfJCScf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 14:32:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43850 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731346AbfJCSce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 14:32:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4B26A3090FDA;
+        Thu,  3 Oct 2019 18:32:34 +0000 (UTC)
+Received: from redhat.com (ovpn-112-55.rdu2.redhat.com [10.10.112.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 828EE608A5;
+        Thu,  3 Oct 2019 18:32:25 +0000 (UTC)
+Date:   Thu, 3 Oct 2019 14:31:08 -0400
+From:   Jerome Glisse <jglisse@redhat.com>
+To:     Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Adalbert =?utf-8?B?TGF6xINy?= <alazar@bitdefender.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Tamas K Lengyel <tamas@tklengyel.com>,
+        Mathieu Tarral <mathieu.tarral@protonmail.com>,
+        Samuel =?iso-8859-1?Q?Laur=E9n?= <samuel.lauren@iki.fi>,
+        Patrick Colp <patrick.colp@oracle.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Yu C <yu.c.zhang@intel.com>,
+        Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>
+Subject: Re: DANGER WILL ROBINSON, DANGER
+Message-ID: <20191003183108.GA3557@redhat.com>
+References: <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
+ <20191002192714.GA5020@redhat.com>
+ <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
+ <20191002141542.GA5669@redhat.com>
+ <f26710a4-424f-730c-a676-901bae451409@redhat.com>
+ <20191002170429.GA8189@redhat.com>
+ <dd0ca0d3-f502-78a1-933a-7e1b5fb90baa@redhat.com>
+ <20191003154233.GA4421@redhat.com>
+ <d62a6720-e069-4e03-6a3a-798c020786f7@redhat.com>
+ <DB7PR02MB39796440DC81A5B53E86F029BB9F0@DB7PR02MB3979.eurprd02.prod.outlook.com>
 MIME-Version: 1.0
-References: <1570097418-42233-1-git-send-email-pbonzini@redhat.com>
- <CALMp9eRFUeSB035VEC61CzAg6PY=aApjyiQoSnRydH788COL4w@mail.gmail.com> <f8e169a5-4cf6-8df7-86bb-f70a480c33ad@redhat.com>
-In-Reply-To: <f8e169a5-4cf6-8df7-86bb-f70a480c33ad@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 3 Oct 2019 11:23:21 -0700
-Message-ID: <CALMp9eSCB-wyLm-QYS-7gTcSeuWWCvgYL3iDEP0y6BM4cWMFag@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: omit absent pmu MSRs from MSR list
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DB7PR02MB39796440DC81A5B53E86F029BB9F0@DB7PR02MB3979.eurprd02.prod.outlook.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 03 Oct 2019 18:32:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 3, 2019 at 10:38 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 03/10/19 19:20, Jim Mattson wrote:
-> > You've truncated the list I originally provided, so I think this need
-> > only go to MSR_ARCH_PERFMON_PERFCTR0 + 17. Otherwise, we could lose
-> > some valuable MSRs.
->
-> This is v2, so it was meant to replace the patch that truncates the
-> list.  But I can include the other one too, perhaps even ask the x86
-> maintainers about decreasing INTEL_PMC_MAX_GENERIC to 18.
+On Thu, Oct 03, 2019 at 04:42:20PM +0000, Mircea CIRJALIU - MELIU wrote:
+> > On 03/10/19 17:42, Jerome Glisse wrote:
+> > > All that is needed is to make sure that vm_normal_page() will see
+> > > those pte (inside the process that is mirroring the other process) as
+> > > special which is the case either because insert_pfn() mark the pte as
+> > > special or the kvm device driver which control the vm_operation struct
+> > > set a
+> > > find_special_page() callback that always return NULL, or the vma has
+> > > either VM_PFNMAP or VM_MIXEDMAP set (which is the case with
+> > insert_pfn).
+> > >
+> > > So you can keep the existing kvm code unmodified.
+> > 
+> > Great, thanks.  And KVM is already able to handle
+> > VM_PFNMAP/VM_MIXEDMAP, so that should work.
+> 
+> This means setting VM_PFNMAP/VM_MIXEDMAP on the anon VMA that acts as the VM's system RAM.
+> Will it have any side effects?
 
-The list should definitely be truncated, since
-MSR_ARCH_PERFMON_EVENTSEL0 + 18 is IA32_PERF_STATUS.
+You do not set it up on the anonymous vma but on the mmap of the
+kvm device file, the resulting vma is under the control of the
+kvm device file and is not an anonymous vma but a "device" special
+vma.
+
+So in summary, the source qemu process has anonymous vma (regular
+libc malloc for instance). The introspector qemu process which
+mirror the the source qemu use mmap on /dev/kvm (assuming you can
+reuse the kvm device file for this otherwise you can introduce a
+new kvm device file). The resulting mmap inside the introspector
+qemu process is a vma which has vma->vm_file pointing to the kvm
+device file and has VM_PFNMAP or VM_MIXEDMAP (i think you want the
+former). On architecture with ARCH_SPECIAL_PTE the pte will be
+mark as special when using insert_pfn() on other architecture you
+can either rely on VM_PFNMAP/VM_MIXEDMAP flag or set a specific
+find_special_page() callbacks in vm_ops.
+
+
+I am at a conference right now but i will put an example of what
+i mean next week.
+
+Cheers,
+Jérôme
