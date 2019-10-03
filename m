@@ -2,23 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D09AC9CDE
+	by mail.lfdr.de (Postfix) with ESMTP id 9AFBAC9CDF
 	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 13:10:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729685AbfJCLJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 07:09:35 -0400
-Received: from foss.arm.com ([217.140.110.172]:41652 "EHLO foss.arm.com"
+        id S1729757AbfJCLK1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 07:10:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:41688 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728140AbfJCLJe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 07:09:34 -0400
+        id S1728140AbfJCLK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 07:10:27 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B4371000;
-        Thu,  3 Oct 2019 04:09:34 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 649C31000;
+        Thu,  3 Oct 2019 04:10:26 -0700 (PDT)
 Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37C223F706;
-        Thu,  3 Oct 2019 04:09:33 -0700 (PDT)
-Subject: Re: [PATCH 4/5] arm64: KVM: Prevent speculative S1 PTW when restoring
- vcpu context
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4658B3F706;
+        Thu,  3 Oct 2019 04:10:25 -0700 (PDT)
+Subject: Re: [PATCH 3/5] arm64: KVM: Disable EL1 PTW when invalidating S2 TLBs
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -27,14 +26,14 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>
 References: <20190925111941.88103-1-maz@kernel.org>
- <20190925111941.88103-5-maz@kernel.org>
+ <20190925111941.88103-4-maz@kernel.org>
 From:   James Morse <james.morse@arm.com>
-Message-ID: <0d52783d-2cff-0d2e-8421-74f815b90c47@arm.com>
-Date:   Thu, 3 Oct 2019 12:09:30 +0100
+Message-ID: <030bbc8c-2304-5941-afc0-53f5a66fb143@arm.com>
+Date:   Thu, 3 Oct 2019 12:10:23 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190925111941.88103-5-maz@kernel.org>
+In-Reply-To: <20190925111941.88103-4-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -46,107 +45,70 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Marc,
 
 On 25/09/2019 12:19, Marc Zyngier wrote:
-> When handling erratum 1319367, we must ensure that the page table
-> walker cannot parse the S1 page tables while the guest is in an
-> inconsistent state. This is done as follows:
+> When erratum 1319367 is being worked around, special care must
+> be taken not to allow the page table walker to populate TLBs
+> while we have the stage-2 translation enabled (which would otherwise
+> result in a bizare mix of the host S1 and the guest S2).
 > 
-> On guest entry:
-> - TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
-> - all system registers are restored, except for TCR_EL1 and SCTLR_EL1
-> - stage-2 is restored
-> - SCTLR_EL1 and TCR_EL1 are restored
-> 
-> On guest exit:
-> - SCTLR_EL1.M and TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
-> - stage-2 is disabled
-> - All host system registers are restored
+> We enforce this by setting TCR_EL1.EPD{0,1} before restoring the S2
+> configuration, and clear the same bits after having disabled S2.
 
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index e6adb90c12ae..4df47d013bec 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -156,6 +170,23 @@ static void __hyp_text __deactivate_traps_nvhe(void)
+
+Some comment Nits...
+
+> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+> index eb0efc5557f3..4ef0bf0d76a6 100644
+> --- a/arch/arm64/kvm/hyp/tlb.c
+> +++ b/arch/arm64/kvm/hyp/tlb.c
+> @@ -63,6 +63,22 @@ static void __hyp_text __tlb_switch_to_guest_vhe(struct kvm *kvm,
+>  static void __hyp_text __tlb_switch_to_guest_nvhe(struct kvm *kvm,
+>  						  struct tlb_inv_context *cxt)
 >  {
->  	u64 mdcr_el2 = read_sysreg(mdcr_el2);
->  
 > +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
 > +		u64 val;
 > +
 > +		/*
-> +		 * Set the TCR and SCTLR registers in the exact opposite
-> +		 * sequence as __activate_traps_nvhe (first prevent walks,
-> +		 * then force the MMU on). A generous sprinkling of isb()
-> +		 * ensure that things happen in this exact order.
+> +		 * For CPUs that are affected by ARM 1319367, we need to
+> +		 * avoid a host Stage-1 walk while we have the guest's
+
+> +		 * Stage-2 set in the VTTBR in order to invalidate TLBs.
+
+Isn't HCR_EL2.VM==0 for all this? I think its the VMID that matters here:
+| ... have the guest's VMID set in VTTBR ...
+
+?
+
+
+> +		 * We're guaranteed that the S1 MMU is enabled, so we can
+> +		 * simply set the EPD bits to avoid any further TLB fill.
 > +		 */
-> +		val = read_sysreg_el1(SYS_TCR);
-> +		write_sysreg_el1(val | TCR_EPD1_MASK | TCR_EPD0_MASK, SYS_TCR);
-> +		isb();
-> +		val = read_sysreg_el1(SYS_SCTLR);
-> +		write_sysreg_el1(val | SCTLR_ELx_M, SYS_SCTLR);
+> +		val = cxt->tcr = read_sysreg_el1(SYS_TCR);
+> +		val |= TCR_EPD1_MASK | TCR_EPD0_MASK;
+> +		write_sysreg_el1(val, SYS_TCR);
 > +		isb();
 > +	}
-
-We are exiting the guest, and heading back to the host.
-This change forces stage-1 off. Stage-2 is still enabled, but its about to be disabled and
-have the host VMID restore in __deactivate_vm(). All good so far.
-
-Then we hit __sysreg_restore_state_nvhe() for the host, which calls
-__sysreg_restore_el1_state()...
-
-
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index 7ddbc849b580..adabdceacc10 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -117,12 +117,22 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+> +
+>  	__load_guest_stage2(kvm);
+>  	isb();
+>  }
+> @@ -100,6 +116,13 @@ static void __hyp_text __tlb_switch_to_host_nvhe(struct kvm *kvm,
+>  						 struct tlb_inv_context *cxt)
 >  {
->  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
->  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
-> -	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+>  	write_sysreg(0, vttbr_el2);
 > +
-> +	/* Must only be done for guest registers, hence the context test */
-> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367) &&
-> +	    !ctxt->__hyp_running_vcpu) {
-> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1] |
-> +				 TCR_EPD1_MASK | TCR_EPD0_MASK,	SYS_TCR);
+> +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
+> +		/* Ensure stage-2 is actually disabled */
+
+| Ensure the host's VMID has been written
+
+?
+
+
 > +		isb();
-> +	} else {
-
-... which will come in here.
-
-> +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
-> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
-
-This reverses what we did in __deactivate_traps_nvhe(), but we haven't restored the host
-TTBRs yet. I don't think the vttbr_el2 write has been sync'd either.
-
-A speculative AT at this point could see the TCR EPDx bits clear, but the guest's TTBR
-values. It may also see the guest-VMID.
-
-
-I think the change to this function needs splitting up. Restore of guest state needs to be
-as you have it here, before the guest TTBRs are written.
-
-Restore of the host state needs to only clear the EPDx bits after the TTBRs are written,
-and sync'd.
-
-
-Assuming I'm making sense ... with that:
-Reviewed-by: James Morse <james.morse@arm.com>
-
-for the series.
-
-
+> +		/* Restore the host's TCR_EL1 */
+> +		write_sysreg_el1(cxt->tcr, SYS_TCR);
 > +	}
-> +
->  	write_sysreg(ctxt->sys_regs[ACTLR_EL1],		actlr_el1);
->  	write_sysreg_el1(ctxt->sys_regs[CPACR_EL1],	SYS_CPACR);
->  	write_sysreg_el1(ctxt->sys_regs[TTBR0_EL1],	SYS_TTBR0);
->  	write_sysreg_el1(ctxt->sys_regs[TTBR1_EL1],	SYS_TTBR1);
-> -	write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
->  	write_sysreg_el1(ctxt->sys_regs[ESR_EL1],	SYS_ESR);
->  	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL1],	SYS_AFSR0);
->  	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL1],	SYS_AFSR1);
+>  }
 
 
 Thanks,
