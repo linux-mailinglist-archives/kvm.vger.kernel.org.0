@@ -2,104 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 395FACA119
-	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:23:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF91BCA11B
+	for <lists+kvm@lfdr.de>; Thu,  3 Oct 2019 17:23:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729394AbfJCPXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Oct 2019 11:23:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38959 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727302AbfJCPXL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Oct 2019 11:23:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1570116190;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ACYcsO5LsuCnnuz+aym6467+xvrSkMd0esdIlAnFhJA=;
-        b=RyJOT/x2zVPDpeE+W8ShdxBezrLjnweQjsIpLSO5uxjuimkccWke7S6EOAzt15F0udd+gB
-        UmllhRcZFEF9v+j/TVfvJ5PfGphuC/66HjK9V6pvCmYUw+I8c1AmEeqb9hCW1AWcDCLRLr
-        p0Xare+A7Uj1CoZdY+w+Ou/+VcdwLvo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-GB6cxvxLP32IYltfseJb6A-1; Thu, 03 Oct 2019 11:23:04 -0400
-Received: by mail-wr1-f71.google.com with SMTP id z17so1269657wru.13
-        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 08:23:04 -0700 (PDT)
+        id S1730105AbfJCPXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Oct 2019 11:23:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:17936 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729991AbfJCPXe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Oct 2019 11:23:34 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 25F4989AC2
+        for <kvm@vger.kernel.org>; Thu,  3 Oct 2019 15:23:34 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id z1so1247055wrw.21
+        for <kvm@vger.kernel.org>; Thu, 03 Oct 2019 08:23:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QgeiVRP5tMXZ1aGWjGfno8dOcRW0i0euoLLtYTrHYXg=;
-        b=F9cRJ35tSSZ6vXm8rOi9fjI5Jp0ZhzTkYHr7gz5eobG35mCLo2p23AUK/3JFpdWMPx
-         9AKKxTDH0ocQjQpzl/jpDHu4jjZAeKqOdsoAeROmYUVAK2XHIdVL3f3PvvE+MHuP17/V
-         DmllnlNwIMviCGASsqUTL/synoyLW5dsrpyHUoYROdzbhT+XF9wgNaMVE4szDhMdYscN
-         SXorvl/AXcvgS3cjFTE2waoweQLVYRnNZg5GeQRf96IqsR5Tkrx/O1ZXgfrSK3yS9NTo
-         M6m8diWAE2SHSTTm2NfFMWpx4k+cCM433Z87+nFmNNxbTiYBYBweZ3lnb+PaMBCMOwHE
-         0fBg==
-X-Gm-Message-State: APjAAAVDW5qkM+eRvGIvxFKkWVnd3qIPqG3421RlntJpa1abv6zdmW1X
-        o5lod6P6Zc4tn5o0tSScKD+Yu9xcvNWZRXvoj2ssCtK7M+nBoJktwBEgXAtvFiYDAIrgiU2NW22
-        /n3sZO5YiYh5H
-X-Received: by 2002:a7b:c84f:: with SMTP id c15mr7606102wml.52.1570116183643;
-        Thu, 03 Oct 2019 08:23:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxsmftxYDdLZIgTJtXmiSPDna8Xyn/lEwG7UsHtL9DbCpfQd9VxButfSW9NUGlbs3alDdg53g==
-X-Received: by 2002:a7b:c84f:: with SMTP id c15mr7606077wml.52.1570116183312;
-        Thu, 03 Oct 2019 08:23:03 -0700 (PDT)
+        bh=qoKp+Xu3p0rV9GLZTHe3NuxMOYdJi2iigLcisiBAhlw=;
+        b=BdUlB3bqb/Chx6FYgQdZ67153DE0kkSAfOXOIDpYWXonBUuWBk9Mii+FqyPc/ALgT8
+         UZg9iz3ae9MMCgJcEfKTBbwXlQYsWsNkcLj7Hh0kbboD/+xBuf0gQRFrA1iMHUbFE0Lk
+         Zx7p3UFWcW3O7mxDXG2SiIBKJxOzQ0ys1HcVrFO7RmApZYNOfgm8qV2LUdjwX0IH0QHB
+         ykbhWsN6n1qwlMcN2s8WRHq787JtVs2pnKQaWIrWSz0Cs0DOqeuRtQIoxm7hD8CyqWut
+         uIe3hsnq293OfBWaZuCHZTwMI1g5zpBcCZAsbSxyVGAM0ruZB4TvZ7Yf+sevAtbseRr2
+         7tnw==
+X-Gm-Message-State: APjAAAXBUIcS1z0BO8swnM7ewGvKNXKUqKL89PmqtkkKhj6iGoE8Wlkh
+        +ufQYs21/emfTFdTkIXMFogf/GrxB0EVyxJINRmRGZTlduqRFvOzdeypKcAcQS/CeQLOTtFjlfP
+        M62QdFaL3fn/g
+X-Received: by 2002:adf:f68f:: with SMTP id v15mr4862280wrp.210.1570116212661;
+        Thu, 03 Oct 2019 08:23:32 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwf/S5FwN3UK05IGT7/7YINNuBSZbZPYZrLMoJ2uKa2XDj8pX1CjOyKNDlcK9UuuCn41Wtrjw==
+X-Received: by 2002:adf:f68f:: with SMTP id v15mr4862264wrp.210.1570116212388;
+        Thu, 03 Oct 2019 08:23:32 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464? ([2001:b07:6468:f312:b903:6d6f:a447:e464])
-        by smtp.gmail.com with ESMTPSA id p85sm3795488wme.23.2019.10.03.08.23.02
+        by smtp.gmail.com with ESMTPSA id t83sm3979935wmt.18.2019.10.03.08.23.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2019 08:23:02 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] x86: VMX: MSR_IA32_VMX_MISC[30] is not MBZ
-To:     Nadav Amit <namit@vmware.com>
-Cc:     kvm@vger.kernel.org, sean.j.christopherson@intel.com
-References: <20191002181114.3448-1-namit@vmware.com>
+        Thu, 03 Oct 2019 08:23:31 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] svm: Fixed error code comparison in test
+ npt_rsvd_pfwalk
+To:     Cathy Avery <cavery@redhat.com>, kvm@vger.kernel.org
+References: <20191003123845.2895-1-cavery@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <951c1057-54b8-c944-ea65-68293fd5e397@redhat.com>
-Date:   Thu, 3 Oct 2019 17:23:02 +0200
+Message-ID: <d3eeb3b5-13d7-34d2-4ce0-fdd534f2bcc3@redhat.com>
+Date:   Thu, 3 Oct 2019 17:23:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191002181114.3448-1-namit@vmware.com>
+In-Reply-To: <20191003123845.2895-1-cavery@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: GB6cxvxLP32IYltfseJb6A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/10/19 20:11, Nadav Amit wrote:
-> MSR_IA32_VMX_MISC[30] tells whehter "VM entry allows injection of a
-> software interrupt, software exception, or privileged software exception
-> with an instruction length of 0".
->=20
-> In other words, it is not MBZ (must be zero), so do not check that it is
-> cleared.
->=20
-> Signed-off-by: Nadav Amit <namit@vmware.com>
+On 03/10/19 14:38, Cathy Avery wrote:
+> According to the AMD64 spec Bit 3 (RSV) in exitinfo1 should be set
+> to 1 if reserved bits were set in the corresponding nested page
+> table entry. Exitinfo1 should be checking against error code
+> 0x20000000eULL not 0x200000006ULL.
+> 
+> Signed-off-by: Cathy Avery <cavery@redhat.com>
 > ---
->  x86/vmx.c | 2 +-
+>  x86/svm.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/x86/vmx.c b/x86/vmx.c
-> index d518102..647ab49 100644
-> --- a/x86/vmx.c
-> +++ b/x86/vmx.c
-> @@ -1486,7 +1486,7 @@ static void test_vmx_caps(void)
->  =09report("MSR_IA32_VMX_MISC",
->  =09       (!(ctrl_cpu_rev[1].clr & CPU_URG) || val & (1ul << 5)) &&
->  =09       ((val >> 16) & 0x1ff) <=3D 256 &&
-> -=09       (val & 0xc0007e00) =3D=3D 0);
-> +=09       (val & 0x80007e00) =3D=3D 0);
-> =20
->  =09for (n =3D 0; n < ARRAY_SIZE(vmx_ctl_msr); n++) {
->  =09=09ctrl.val =3D rdmsr(vmx_ctl_msr[n].index);
->=20
+> 
+> diff --git a/x86/svm.c b/x86/svm.c
+> index bc74e7c..bb39934 100644
+> --- a/x86/svm.c
+> +++ b/x86/svm.c
+> @@ -1066,7 +1066,7 @@ static bool npt_rsvd_pfwalk_check(struct test *test)
+>      pdpe[0] &= ~(1ULL << 8);
+>  
+>      return (test->vmcb->control.exit_code == SVM_EXIT_NPF)
+> -            && (test->vmcb->control.exit_info_1 == 0x200000006ULL);
+> +            && (test->vmcb->control.exit_info_1 == 0x20000000eULL);
+>  }
+>  
+>  static void npt_l1mmio_prepare(struct test *test)
+> 
 
 Queued, thanks.
 
 Paolo
-
