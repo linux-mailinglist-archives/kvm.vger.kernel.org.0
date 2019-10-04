@@ -2,60 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 93531CB5CF
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 10:13:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4CB3CB604
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 10:21:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387588AbfJDINq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Oct 2019 04:13:46 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:39782 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725730AbfJDINq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Oct 2019 04:13:46 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1iGIic-0001Rs-IS; Fri, 04 Oct 2019 08:13:42 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] kvm: selftests: fix spelling mistake: missmatch -> mismatch
-Date:   Fri,  4 Oct 2019 09:13:42 +0100
-Message-Id: <20191004081342.22108-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.20.1
+        id S1730484AbfJDIVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Oct 2019 04:21:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48538 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730121AbfJDIVA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Oct 2019 04:21:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C62E77FDC9;
+        Fri,  4 Oct 2019 08:20:59 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E787E5D772;
+        Fri,  4 Oct 2019 08:20:53 +0000 (UTC)
+Date:   Fri, 4 Oct 2019 10:20:51 +0200
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Xiang Zheng <zhengxiang9@huawei.com>
+Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>,
+        <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, <rth@twiddle.net>,
+        <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+        <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <linuxarm@huawei.com>, wanghaibin.wang@huawei.com
+Subject: Re: [Qemu-devel] [PATCH v18 2/6] docs: APEI GHES generation and
+ CPER record description
+Message-ID: <20191004102051.4e45cbd2@redhat.com>
+In-Reply-To: <20190906083152.25716-3-zhengxiang9@huawei.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+        <20190906083152.25716-3-zhengxiang9@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 04 Oct 2019 08:21:00 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+On Fri, 6 Sep 2019 16:31:48 +0800
+Xiang Zheng <zhengxiang9@huawei.com> wrote:
 
-There is a spelling mistake in in an error message, fix it.
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+> 
+[...]
+> +
+> +(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
+> +    guest memory, and then injects whatever interrupt (or assert whatever GPIO
+s/whatever .../platform specific/
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- tools/testing/selftests/kvm/lib/sparsebit.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+and add concrete impl info like:
+  "in case of arm/virt machine it's ..."
 
-diff --git a/tools/testing/selftests/kvm/lib/sparsebit.c b/tools/testing/selftests/kvm/lib/sparsebit.c
-index 031ba3c932ed..59ffba902e61 100644
---- a/tools/testing/selftests/kvm/lib/sparsebit.c
-+++ b/tools/testing/selftests/kvm/lib/sparsebit.c
-@@ -1866,7 +1866,7 @@ void sparsebit_validate_internal(struct sparsebit *s)
- 		 * of total bits set.
- 		 */
- 		if (s->num_set != total_bits_set) {
--			fprintf(stderr, "Number of bits set missmatch,\n"
-+			fprintf(stderr, "Number of bits set mismatch,\n"
- 				"  s->num_set: 0x%lx total_bits_set: 0x%lx",
- 				s->num_set, total_bits_set);
- 
--- 
-2.20.1
-
+> +    line) as a notification which is necessary for notifying the guest.
+[...]
