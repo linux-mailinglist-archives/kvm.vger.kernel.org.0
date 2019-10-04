@@ -2,87 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BE04CB972
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 13:47:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D633CB989
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 13:54:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730020AbfJDLrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Oct 2019 07:47:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59684 "EHLO mx1.redhat.com"
+        id S1728954AbfJDLyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Oct 2019 07:54:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48810 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725826AbfJDLrC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Oct 2019 07:47:02 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        id S1727488AbfJDLyi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Oct 2019 07:54:38 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 52DF9B62C
-        for <kvm@vger.kernel.org>; Fri,  4 Oct 2019 11:47:01 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id s19so1512128wmj.0
-        for <kvm@vger.kernel.org>; Fri, 04 Oct 2019 04:47:01 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1FD332C9700
+        for <kvm@vger.kernel.org>; Fri,  4 Oct 2019 11:54:37 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id q10so2594651wro.22
+        for <kvm@vger.kernel.org>; Fri, 04 Oct 2019 04:54:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=+JwHgoEwrxaFZwrDe7mi7c34P6AQjAcW/4AJU211S7o=;
-        b=ryN/3Jn8DzAIPYgYuwmYJK0AYRqiqWMyG4HIeiLfJ8rPGD2laOX2hVEl8AkFqAi1wj
-         dCUUnxpIOsn+a0L/PhhJ4JKyXTgicRFImelTFic8MmjNyoziIf9tNfYNwggdihE0vcE+
-         //Vpzmn1xOxb3gY6Z6U496+NfaH/WT3FqDgDHW6T1eaiDurAniZugLtpLEpWGnjBCCdE
-         Sz+7wLZF+N8e43L3Gjc+wdQL5pBGr584gXuFjiHmr8eDieZbFqWihJ2zWDb1jYTJX/Sd
-         YuOM3LB+TV+FC4mtyOQZJXqrqBqPDRgm9OyZztxQh9GpOLdHwpcRI+XTkl8IVPT2OJKv
-         htrA==
-X-Gm-Message-State: APjAAAUUfa2ywxOGMls0FCmNUIpqpEeIo/ObFoSpvohQDhdfQDLWyR54
-        YJ3aG5J60fRHYgHQ6hUB/4r1SoMNWECHAO++ptGnl6g31qffi+atCRmeFiQgvql59BCDf4/RBEZ
-        PK3nFC8ctpDop
-X-Received: by 2002:a1c:61d6:: with SMTP id v205mr9957507wmb.35.1570189619910;
-        Fri, 04 Oct 2019 04:46:59 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyH/UQA0Hna+4tQRdNy2xgtBfIwlleCnezIJHKLxXIn6EMeOpPWe6+zaMeL8aGp+kphYLAp6g==
-X-Received: by 2002:a1c:61d6:: with SMTP id v205mr9957481wmb.35.1570189619580;
-        Fri, 04 Oct 2019 04:46:59 -0700 (PDT)
+        bh=MaDAtO5FuA07xsP/8gm3NAVFqF1Q5uvohKJcAR0Oaqc=;
+        b=jKHKmp3eVora1Tpr4aNsomV2TVJ7PHdGuuCKoNgI4UMVPCqBIMsbh/uuA+nowdBkgK
+         30B65H4WCNUnTA8gftq1PM1AOl9/WAK1sTphnNLDx+hCLkdXLSmDp/04/InVUq72mtCW
+         nz+3wA2X3JzpW6OT4ypCtwKRT588hzS1IZvp5uX7d3aIjc8/xR9YVoqA7yyBLKY6a58g
+         VkoOMlFHVIhR+WllLBvf21j9bK+aQ0+shHQnKcBYKzvqd4UNobSsvL1uClwdo4hOBYgn
+         gOnI5kdi0/cNxP0BpSD/Qu2ZOYAURGwWJeN94ShnW9HwjCjRmMOLMjy2Y8TkjZf5vtlJ
+         uSHw==
+X-Gm-Message-State: APjAAAXOm4bHrawxQKcyvM3XG6mFjKI42ZF/OzgzJvOOIcW2J1FcgZ2w
+        VTSOKI1rjFVbwPMnesGj6xp8t8bwZsHQzak94RZP4q666VeekA3TgNmBJsaszqT64ZRqzujBW+0
+        tzI2K7UyC8eAL
+X-Received: by 2002:adf:f691:: with SMTP id v17mr5922065wrp.81.1570190075669;
+        Fri, 04 Oct 2019 04:54:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwScKk603Pv+4O2QKax6w49Vr0Ji2Dd2f8VfsHyG9FPcoBcpXOVW6Yl0sGLbftH/qBiHn2oMQ==
+X-Received: by 2002:adf:f691:: with SMTP id v17mr5922045wrp.81.1570190075332;
+        Fri, 04 Oct 2019 04:54:35 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:e56d:fbdf:8b79:c79c? ([2001:b07:6468:f312:e56d:fbdf:8b79:c79c])
-        by smtp.gmail.com with ESMTPSA id y186sm11299530wmb.41.2019.10.04.04.46.56
+        by smtp.gmail.com with ESMTPSA id q10sm14380218wrd.39.2019.10.04.04.54.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Oct 2019 04:46:58 -0700 (PDT)
-Subject: Re: DANGER WILL ROBINSON, DANGER
-To:     Mircea CIRJALIU - MELIU <mcirjaliu@bitdefender.com>,
-        Jerome Glisse <jglisse@redhat.com>
-Cc:     =?UTF-8?Q?Adalbert_Laz=c4=83r?= <alazar@bitdefender.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        Mathieu Tarral <mathieu.tarral@protonmail.com>,
-        =?UTF-8?Q?Samuel_Laur=c3=a9n?= <samuel.lauren@iki.fi>,
-        Patrick Colp <patrick.colp@oracle.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        Yu C <yu.c.zhang@intel.com>,
-        =?UTF-8?Q?Mihai_Don=c8=9bu?= <mdontu@bitdefender.com>
-References: <DB7PR02MB3979D1143909423F8767ACE2BBB60@DB7PR02MB3979.eurprd02.prod.outlook.com>
- <20191002192714.GA5020@redhat.com>
- <ab461f02-e6cd-de0f-b6ce-0f5a95798eaa@redhat.com>
- <20191002141542.GA5669@redhat.com>
- <f26710a4-424f-730c-a676-901bae451409@redhat.com>
- <20191002170429.GA8189@redhat.com>
- <dd0ca0d3-f502-78a1-933a-7e1b5fb90baa@redhat.com>
- <20191003154233.GA4421@redhat.com>
- <d62a6720-e069-4e03-6a3a-798c020786f7@redhat.com>
- <DB7PR02MB39796440DC81A5B53E86F029BB9F0@DB7PR02MB3979.eurprd02.prod.outlook.com>
- <20191003183108.GA3557@redhat.com>
- <afe2cf69-5c2c-95af-88ce-f3814fece2e2@redhat.com>
- <DB7PR02MB39795E622880231C8F8A6478BB9E0@DB7PR02MB3979.eurprd02.prod.outlook.com>
+        Fri, 04 Oct 2019 04:54:34 -0700 (PDT)
+Subject: Re: [PATCH] powerpc: Fix up RTAS invocation for new qemu versions
+To:     David Gibson <david@gibson.dropbear.id.au>, lvivier@redhat.com,
+        thuth@redhat.com
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, rkrcmar@redhat.com
+References: <20191004103844.32590-1-david@gibson.dropbear.id.au>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <7ccbc431-0ca6-0049-fe60-ad232c628209@redhat.com>
-Date:   Fri, 4 Oct 2019 13:46:57 +0200
+Message-ID: <a384c5e2-472a-32e5-2ee1-65c40da29840@redhat.com>
+Date:   Fri, 4 Oct 2019 13:54:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <DB7PR02MB39795E622880231C8F8A6478BB9E0@DB7PR02MB3979.eurprd02.prod.outlook.com>
+In-Reply-To: <20191004103844.32590-1-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -91,51 +63,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/10/19 11:41, Mircea CIRJALIU - MELIU wrote:
-> I get it so far. I have a patch that does mirroring in a separate VMA.
-> We create an extra VMA with VM_PFNMAP/VM_MIXEDMAP that mirrors the 
-> source VMA in the other QEMU and is refreshed by the device MMU notifier.
+On 04/10/19 12:38, David Gibson wrote:
+> In order to call RTAS functions on powerpc kvm-unit-tests relies on the
+> RTAS blob supplied by qemu.  But new versions of qemu don't supply an RTAS
+> blob: since the normal way for guests to get RTAS is to call the guest
+> firmware's instantiate-rtas function, we now rely on that guest firmware
+> to provide the RTAS code itself.
+> 
+> But qemu-kvm-tests bypasses the usual guest firmware to just run itself,
+> so we can't get the rtas blob from SLOF.
+> 
+> But.. in fact the RTAS blob under qemu is a bit of a sham anyway - it's
+> a tiny wrapper that forwards the RTAS call to a hypercall.  So, we can
+> just invoke that hypercall directly.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-So for example on the host you'd have a new ioctl on the kvm file
-descriptor.  You pass a size and you get back a file descriptor for that
-guest's physical memory, which is mmap-able up to the size you specified
-in the ioctl.
-
-In turn, the file descriptor would have ioctls to map/unmap ranges of
-the guest memory into its mmap-able range.  Accessing an unmapped range
-produces a SIGSEGV.
-
-When asked via the QEMU monitor, QEMU will create the file descriptor
-and pass it back via SCM_RIGHTS.  The management application can then
-use it to hotplug memory into the destination...
-
-> Create a new memslot based on the mirror VMA, hotplug it into the guest as
-> new memory device (is this possible?) and have a guest-side driver allocate 
-> pages from that area.
-
-... using the existing ivshmem device, whose BAR can be accessed and
-mmap-ed from the guest via sysfs.  In other words, the hotplugging will
-use the file descriptor returned by QEMU when creating the ivshmem device.
-
-We then need an additional mechanism to invoke the map/unmap ioctls from
-the guest.  Without writing a guest-side driver it is possible to:
-
-- pass a socket into the "create guest physical memory view" ioctl
-above.  KVM will then associate that KVMI socket with the newly created
-file descriptor.
-
-- use KVMI messages to that socket to map/unmap sections of memory
-
-> Redirect (some) GFN->HVA translations into the new VMA based on a table 
-> of addresses required by the introspector process.
-
-That would be tricky because there are multiple paths (gfn_to_page,
-gfn_to_pfn, etc.).
-
-There is some complication in this because the new device has to be
-plumbed at multiple levels (KVM, QEMU, libvirt).  But it seems like a
-very easily separated piece of code (except for the KVMI socket part,
-which can be added later), so I suggest that you contribute the KVM
-parts first.
+Would it be hard to call instantiate-rtas?  I'm not sure if you have any
+interest in running kvm-unit-tests on hypervisors that might have a
+different way to process RTAS calls.
 
 Paolo
+
+> ---
+>  lib/powerpc/asm/hcall.h |  3 +++
+>  lib/powerpc/rtas.c      |  6 +++---
+>  powerpc/cstart64.S      | 20 ++++++++++++++++----
+>  3 files changed, 22 insertions(+), 7 deletions(-)
+> 
+> So.. "new versions of qemu" in this case means ones that incorporate
+> the pull request I just sent today.
+> 
+> diff --git a/lib/powerpc/asm/hcall.h b/lib/powerpc/asm/hcall.h
+> index a8bd7e3..1173fea 100644
+> --- a/lib/powerpc/asm/hcall.h
+> +++ b/lib/powerpc/asm/hcall.h
+> @@ -24,6 +24,9 @@
+>  #define H_RANDOM		0x300
+>  #define H_SET_MODE		0x31C
+>  
+> +#define KVMPPC_HCALL_BASE	0xf000
+> +#define KVMPPC_H_RTAS		(KVMPPC_HCALL_BASE + 0x0)
+> +
+>  #ifndef __ASSEMBLY__
+>  /*
+>   * hcall_have_broken_sc1 checks if we're on a host with a broken sc1.
+> diff --git a/lib/powerpc/rtas.c b/lib/powerpc/rtas.c
+> index 2e7e0da..41c0a24 100644
+> --- a/lib/powerpc/rtas.c
+> +++ b/lib/powerpc/rtas.c
+> @@ -46,9 +46,9 @@ void rtas_init(void)
+>  	prop = fdt_get_property(dt_fdt(), node,
+>  				"linux,rtas-entry", &len);
+>  	if (!prop) {
+> -		printf("%s: /rtas/linux,rtas-entry: %s\n",
+> -				__func__, fdt_strerror(len));
+> -		abort();
+> +		/* We don't have a qemu provided RTAS blob, enter_rtas
+> +		 * will use H_RTAS directly */
+> +		return;
+>  	}
+>  	data = (u32 *)prop->data;
+>  	rtas_entry = (unsigned long)fdt32_to_cpu(*data);
+> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+> index ec673b3..972851f 100644
+> --- a/powerpc/cstart64.S
+> +++ b/powerpc/cstart64.S
+> @@ -121,13 +121,25 @@ halt:
+>  
+>  .globl enter_rtas
+>  enter_rtas:
+> +	LOAD_REG_ADDR(r11, rtas_entry)
+> +	ld	r10, 0(r11)
+> +
+> +	cmpdi	r10,0
+> +	bne	external_rtas
+> +
+> +	/* Use H_RTAS directly */
+> +	mr	r4,r3
+> +	lis	r3,KVMPPC_H_RTAS@h
+> +	ori	r3,r3,KVMPPC_H_RTAS@l
+> +	b	hcall
+> +
+> +external_rtas:
+> +	/* Use external RTAS blob */
+>  	mflr	r0
+>  	std	r0, 16(r1)
+>  
+> -	LOAD_REG_ADDR(r10, rtas_return_loc)
+> -	mtlr	r10
+> -	LOAD_REG_ADDR(r11, rtas_entry)
+> -	ld	r10, 0(r11)
+> +	LOAD_REG_ADDR(r11, rtas_return_loc)
+> +	mtlr	r11
+>  
+>  	mfmsr	r11
+>  	LOAD_REG_IMMEDIATE(r9, RTAS_MSR_MASK)
+> 
+
