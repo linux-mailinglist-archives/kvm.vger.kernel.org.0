@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6128CCC57C
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 23:58:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DD7BCC550
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 23:57:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731819AbfJDV5q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Oct 2019 17:57:46 -0400
+        id S1731493AbfJDV43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Oct 2019 17:56:29 -0400
 Received: from mga09.intel.com ([134.134.136.24]:5964 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727647AbfJDV42 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1731447AbfJDV42 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 4 Oct 2019 17:56:28 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Oct 2019 14:56:27 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Oct 2019 14:56:28 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,257,1566889200"; 
-   d="scan'208";a="191710652"
+   d="scan'208";a="191710659"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga008.fm.intel.com with ESMTP; 04 Oct 2019 14:56:26 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 04 Oct 2019 14:56:27 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -42,9 +42,9 @@ Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         kvm@vger.kernel.org, linux-edac@vger.kernel.org,
         Borislav Petkov <bp@suse.de>,
         Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: [PATCH 02/16] x86/mce: WARN once if IA32_FEATURE_CONTROL MSR is left unlocked
-Date:   Fri,  4 Oct 2019 14:56:01 -0700
-Message-Id: <20191004215615.5479-3-sean.j.christopherson@intel.com>
+Subject: [PATCH 03/16] x86/centaur: Use common IA32_FEATURE_CONTROL MSR initialization
+Date:   Fri,  4 Oct 2019 14:56:02 -0700
+Message-Id: <20191004215615.5479-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191004215615.5479-1-sean.j.christopherson@intel.com>
 References: <20191004215615.5479-1-sean.j.christopherson@intel.com>
@@ -55,33 +55,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-WARN if the IA32_FEATURE_CONTROL MSR is somehow left unlocked now that
-CPU initialization unconditionally locks the MSR.
+Use the recently added IA32_FEATURE_CONTROL MSR initialization sequence
+to opportunstically enable VMX support when running on a Centaur CPU.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kernel/cpu/mce/intel.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ arch/x86/Kconfig.cpu          | 2 +-
+ arch/x86/kernel/cpu/centaur.c | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kernel/cpu/mce/intel.c b/arch/x86/kernel/cpu/mce/intel.c
-index 88cd9598fa57..1008f14b803b 100644
---- a/arch/x86/kernel/cpu/mce/intel.c
-+++ b/arch/x86/kernel/cpu/mce/intel.c
-@@ -117,11 +117,10 @@ static bool lmce_supported(void)
- 	 * generate a #GP fault.
- 	 */
- 	rdmsrl(MSR_IA32_FEATURE_CONTROL, tmp);
--	if ((tmp & (FEATURE_CONTROL_LOCKED | FEATURE_CONTROL_LMCE)) ==
--		   (FEATURE_CONTROL_LOCKED | FEATURE_CONTROL_LMCE))
--		return true;
-+	if (WARN_ON_ONCE(!(tmp & FEATURE_CONTROL_LOCKED)))
-+		return false;
+diff --git a/arch/x86/Kconfig.cpu b/arch/x86/Kconfig.cpu
+index aafc14a0abf7..9e4e41424dc2 100644
+--- a/arch/x86/Kconfig.cpu
++++ b/arch/x86/Kconfig.cpu
+@@ -389,7 +389,7 @@ config X86_DEBUGCTLMSR
  
--	return false;
-+	return tmp & FEATURE_CONTROL_LMCE;
+ config X86_FEATURE_CONTROL_MSR
+ 	def_bool y
+-	depends on CPU_SUP_INTEL
++	depends on CPU_SUP_INTEL || CPU_SUP_CENTAUR
+ 
+ menuconfig PROCESSOR_SELECT
+ 	bool "Supported processor vendors" if EXPERT
+diff --git a/arch/x86/kernel/cpu/centaur.c b/arch/x86/kernel/cpu/centaur.c
+index 14433ff5b828..a6ca4c31c1b6 100644
+--- a/arch/x86/kernel/cpu/centaur.c
++++ b/arch/x86/kernel/cpu/centaur.c
+@@ -250,6 +250,8 @@ static void init_centaur(struct cpuinfo_x86 *c)
+ 	set_cpu_cap(c, X86_FEATURE_LFENCE_RDTSC);
+ #endif
+ 
++	init_feature_control_msr(c);
++
+ 	if (cpu_has(c, X86_FEATURE_VMX))
+ 		centaur_detect_vmx_virtcap(c);
  }
- 
- bool mce_intel_cmci_poll(void)
 -- 
 2.22.0
 
