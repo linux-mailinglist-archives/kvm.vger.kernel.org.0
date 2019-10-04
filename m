@@ -2,93 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF22CCB71E
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 11:13:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 617CECB72C
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 11:16:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730252AbfJDJNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Oct 2019 05:13:44 -0400
-Received: from foss.arm.com ([217.140.110.172]:39618 "EHLO foss.arm.com"
+        id S2387696AbfJDJQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Oct 2019 05:16:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47384 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725958AbfJDJNo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Oct 2019 05:13:44 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7066C1597;
-        Fri,  4 Oct 2019 02:13:43 -0700 (PDT)
-Received: from [10.1.196.133] (e112269-lin.cambridge.arm.com [10.1.196.133])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5FCE83F739;
-        Fri,  4 Oct 2019 02:13:41 -0700 (PDT)
-Subject: Re: [PATCH v5 05/10] KVM: arm64: Support stolen time reporting via
- shared structure
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20191002145037.51630-1-steven.price@arm.com>
- <20191002145037.51630-6-steven.price@arm.com>
- <20191003132235.ruanyfmdim5s6npj@kamzik.brq.redhat.com>
- <20191004070301.d7ari5rjlu3uuara@kamzik.brq.redhat.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <b107c1ca-6804-dc47-af25-fcd0b201472f@arm.com>
-Date:   Fri, 4 Oct 2019 10:13:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1731286AbfJDJQK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Oct 2019 05:16:10 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 28ACC4FCC7
+        for <kvm@vger.kernel.org>; Fri,  4 Oct 2019 09:16:10 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id k4so2280713wru.1
+        for <kvm@vger.kernel.org>; Fri, 04 Oct 2019 02:16:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=hhPEpgLhkjexE7wGXfmiyqeRzNcW/U3S79ip8ewXhIg=;
+        b=g5Vy0DcPD5cpxlVrtL3FEAI0zCGhuQLtbUfGdJdMDYCGDDXyM/mSXM6UClmvThabq1
+         4oQCeHUoxV0bpOEDat0bJ+SEok2Ou3We6GbNPETPjStR4i3Y2Wa7M1K7je0ckvvhkupF
+         p6lYUJdPru1owMqbuSO1C1ylMypGN+P8TKOJVmnLWYnu4CDcjIj2VU9kuWTE6LWSGjG1
+         Z/1HktgIg0CnMqjsQWtLZTLVZl3o7vfNziFcgr+hYkS8B7rdsiMJuDzCOpuTnj01ya8m
+         r4fBHs3m5YNZYnaLOuqfoNzhQG+/tEuugv8nxpuAEVa8KEpUoEGIXhRwx6DsrQMfjO3W
+         PknQ==
+X-Gm-Message-State: APjAAAVgOaIEmPqmzeo5O8zpLvJyKDMS/sx0NCpNP5Z29B9lHTnL3OSH
+        nOXXE3eqJMSG/9mbeyeD2kIYFv0CosPAeOv8iwltbeviUgUs9votR+eevSOsuD5aVXVJfdN4ubU
+        vRhV/UeIRHc5m
+X-Received: by 2002:a1c:9d15:: with SMTP id g21mr10287380wme.96.1570180568809;
+        Fri, 04 Oct 2019 02:16:08 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwYyFXc0psA9cM79xGyuf3QCE7kgh2CziA2e0KZxOqK4U+Rh82+kx6tnfpcYC/+KSgegIYtMA==
+X-Received: by 2002:a1c:9d15:: with SMTP id g21mr10287358wme.96.1570180568530;
+        Fri, 04 Oct 2019 02:16:08 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
+        by smtp.gmail.com with ESMTPSA id q192sm7660110wme.23.2019.10.04.02.16.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2019 02:16:07 -0700 (PDT)
+Date:   Fri, 4 Oct 2019 11:16:05 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Dexuan Cui <decui@microsoft.com>
+Cc:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        KY Srinivasan <kys@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Sasha Levin <sashal@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Jorgen Hansen <jhansen@vmware.com>
+Subject: Re: [RFC PATCH 00/13] vsock: add multi-transports support
+Message-ID: <20191004091605.ayed7iqjhurzrdap@steredhat>
+References: <20190927112703.17745-1-sgarzare@redhat.com>
+ <PU1P153MB0169970A7DD4383F06CDAB60BF9E0@PU1P153MB0169.APCP153.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-In-Reply-To: <20191004070301.d7ari5rjlu3uuara@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PU1P153MB0169970A7DD4383F06CDAB60BF9E0@PU1P153MB0169.APCP153.PROD.OUTLOOK.COM>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/10/2019 08:03, Andrew Jones wrote:
-> On Thu, Oct 03, 2019 at 03:22:35PM +0200, Andrew Jones wrote:
->> On Wed, Oct 02, 2019 at 03:50:32PM +0100, Steven Price wrote:
->>> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
->>> +{
->>> +	struct kvm *kvm = vcpu->kvm;
->>> +	u64 steal;
->>> +	u64 steal_le;
->>> +	u64 offset;
->>> +	int idx;
->>> +	u64 base = vcpu->arch.steal.base;
->>> +
->>> +	if (base == GPA_INVALID)
->>> +		return -ENOTSUPP;
->>> +
->>> +	/* Let's do the local bookkeeping */
->>> +	steal = vcpu->arch.steal.steal;
->>> +	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
->>> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
->>> +	vcpu->arch.steal.steal = steal;
->>> +
->>> +	steal_le = cpu_to_le64(steal);
->>
->> Agreeing on a byte order for this interface makes sense, but I don't see
->> it documented anywhere. Is this an SMCCC thing? Because I skimmed some
->> of those specs and other users too but didn't see anything obvious. Anyway
->> even if everybody but me knows that all data returned from SMCCC calls
->> should be LE, it might be nice to document that in the pvtime doc.
-
-A very good point - I'll document this in the Linux document and feed
-that back for DEN0057A.
-
+On Fri, Oct 04, 2019 at 12:04:46AM +0000, Dexuan Cui wrote:
+> > From: Stefano Garzarella <sgarzare@redhat.com>
+> > Sent: Friday, September 27, 2019 4:27 AM
+> >  ...
+> > Patch 9 changes the hvs_remote_addr_init(). setting the
+> > VMADDR_CID_HOST as remote CID instead of VMADDR_CID_ANY to make
+> > the choice of transport to be used work properly.
+> > @Dexuan Could this change break anything?
 > 
-> I have another [potentially dumb] SMCCC byte order question. If we need
-> to worry about using LE for the members of this structure, then why don't
-> we need to worry about the actual return values of the SMCCC calls? Like
-> the IPA of the structure?
+> This patch looks good to me.
+> 
 
-The SMCCC calls pass values in registers. It's only when reading/writing
-these values from/to memory that the endianness actually has any meaning.
+Thank you very much for your reviews!
 
-Steve
+> > @Dexuan please can you test on HyperV that I didn't break anything
+> > even without nested VMs?
+> 
+> I did some quick tests with the 13 patches in a Linux VM (this is not
+> a nested VM) on Hyper-V and it looks nothing is broken. :-)
+> 
+
+Great :-)
+
+> > I'll try to setup a Windows host where to test the nested VMs
+> 
+> I suppose you're going to run a Linux VM on a Hyper-V host,
+> and the Linux VM itself runs KVM/VmWare so it can create its own child 
+> VMs. IMO this is similar to the test "nested KVM ( ..., virtio-transport[L1,L2]"
+> you have done.
+
+Yes, I think so. If the Hyper-V transport works well without nested VM,
+it should work the same with a nested KVM/VMware.
+
+Thanks,
+Stefano
