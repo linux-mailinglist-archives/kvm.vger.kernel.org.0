@@ -2,190 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BDEFCB7E7
-	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 12:08:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 631AACB877
+	for <lists+kvm@lfdr.de>; Fri,  4 Oct 2019 12:38:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731310AbfJDKIg convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 4 Oct 2019 06:08:36 -0400
-Received: from inca-roads.misterjones.org ([213.251.177.50]:41152 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729291AbfJDKIf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 4 Oct 2019 06:08:35 -0400
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
-        (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1iGKVj-0007Rq-CG; Fri, 04 Oct 2019 12:08:31 +0200
-Date:   Fri, 4 Oct 2019 11:08:29 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Murray <andrew.murray@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [PATCH] KVM: arm64: pmu: Fix cycle counter truncation on
- counter stop
-Message-ID: <20191004110829.63f397de@why>
-In-Reply-To: <20191004085554.GQ42880@e119886-lin.cambridge.arm.com>
-References: <20191003172400.21157-1-maz@kernel.org>
-        <20191004085554.GQ42880@e119886-lin.cambridge.arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1729291AbfJDKix (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Oct 2019 06:38:53 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45301 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725788AbfJDKix (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Oct 2019 06:38:53 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 46l5vZ2Hgkz9sNw; Fri,  4 Oct 2019 20:38:50 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1570185530;
+        bh=6ZYAP3kzygIvshHZBkrCIgOhh+ZjXOmnm0g1aJ4p4m8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=pb1FvXcOt4ClvFpDA07cag6IunhntVyApGw7VA/Srgc7/IJk+7VDMPZ/aZFvMP0cQ
+         qY7Dye93O1U0YS/u3RfoXe1htmaUixXK3320U0+MKYxxw9DnOz3EnRdrc4J0zTHoL4
+         CddYkk1Gg2ZuGuLLGDHI/kjgZNIdtGcQFv6nk9HQ=
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     lvivier@redhat.com, thuth@redhat.com
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, pbonzini@redhat.com,
+        rkrcmar@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] powerpc: Fix up RTAS invocation for new qemu versions
+Date:   Fri,  4 Oct 2019 20:38:44 +1000
+Message-Id: <20191004103844.32590-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, suzuki.poulose@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 4 Oct 2019 09:55:55 +0100
-Andrew Murray <andrew.murray@arm.com> wrote:
+In order to call RTAS functions on powerpc kvm-unit-tests relies on the
+RTAS blob supplied by qemu.  But new versions of qemu don't supply an RTAS
+blob: since the normal way for guests to get RTAS is to call the guest
+firmware's instantiate-rtas function, we now rely on that guest firmware
+to provide the RTAS code itself.
 
-> On Thu, Oct 03, 2019 at 06:24:00PM +0100, Marc Zyngier wrote:
-> > When a counter is disabled, its value is sampled before the event
-> > is being disabled, and the value written back in the shadow register.
-> > 
-> > In that process, the value gets truncated to 32bit, which is adequate  
-> 
-> Doh, that shouldn't have happened.
-> 
-> > for any counter but the cycle counter, which can be configured to
-> > hold a 64bit value. This obviously results in a corrupted counter,
-> > and things like "perf record -e cycles" not working at all when
-> > run in a guest...
-> > 
-> > Make the truncation conditional on the counter not being 64bit.
-> > 
-> > Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
-> > Cc: Andrew Murray <andrew.murray@arm.com>
-> > Reported-by: Julien Thierry Julien Thierry <julien.thierry.kdev@gmail.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  virt/kvm/arm/pmu.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > index 362a01886bab..d716aef2bae9 100644
-> > --- a/virt/kvm/arm/pmu.c
-> > +++ b/virt/kvm/arm/pmu.c
-> > @@ -206,9 +206,11 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
-> >  		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
-> >  		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
-> >  	} else {
-> > +		if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-> > +			counter = lower_32_bits(counter);
-> >  		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
-> >  		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
-> > -		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
-> > +		__vcpu_sys_reg(vcpu, reg) = counter;  
-> 
-> The other uses of lower_32_bits look OK to me.
-> 
-> Reviewed-by: Andrew Murray <andrew.murray@arm.com>
-> 
-> As a side note, I'm not convinced that the implementation (or perhaps the
-> use of) kvm_pmu_idx_is_64bit is correct:
-> 
-> static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> {
->         return (select_idx == ARMV8_PMU_CYCLE_IDX &&
->                 __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-> }
-> 
-> We shouldn't truncate the value of a cycle counter to 32 bits just because
-> _PMCR_LC is unset. We should only be interested in _PMCR_LC when setting
-> the sample_period.
+But qemu-kvm-tests bypasses the usual guest firmware to just run itself,
+so we can't get the rtas blob from SLOF.
 
-That's a good point. The ARMv8 ARM says:
+But.. in fact the RTAS blob under qemu is a bit of a sham anyway - it's
+a tiny wrapper that forwards the RTAS call to a hypercall.  So, we can
+just invoke that hypercall directly.
 
-"Long cycle counter enable. Determines when unsigned overflow is
-recorded by the cycle counter overflow bit."
-
-which doesn't say anything about the counter being truncated one way or
-another.
-
-> If you agree this is wrong, I'll spin a change.
-
-I still think kvm_pmu_idx_is_64bit() correct, and would be easily
-extended to supporting the ARMv8.5-PMU extension. However, it'd be
-better to just detect the cycle counter in the current patch rather
-than relying on the above helper:
-
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index d716aef2bae9..90a90d8f7280 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -206,7 +206,7 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
- 		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
- 		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
- 	} else {
--		if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-+		if (pmc->idx != ARMV8_PMU_CYCLE_IDX)
- 			counter = lower_32_bits(counter);
- 		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
- 		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
-
-
-As for revamping the rest of the code, that's 5.5 material.
-
-> Though unsetting _PMCR_LC is deprecated so I can't imagine this causes any
-> issue.
-
-Deprecated, yes. Disallowed, no. We'll have to support this as long as
-we have 32bit capable stuff in the wild. But we could at least start
-with correctly emulating the setting of the LC bit, see below.
-
-Thanks,
-
-	M.
-
-From c421c17ae1e9c90db4b73bd25485580833321f4b Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Fri, 4 Oct 2019 11:03:09 +0100
-Subject: [PATCH] arm64: KVM: Handle PMCR_EL0.LC as RES1 on pure AArch64
- systems
-
-Of PMCR_EL0.LC, the ARMv8 ARM says:
-
-	"In an AArch64 only implementation, this field is RES 1."
-
-So be it.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- arch/arm64/kvm/sys_regs.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ lib/powerpc/asm/hcall.h |  3 +++
+ lib/powerpc/rtas.c      |  6 +++---
+ powerpc/cstart64.S      | 20 ++++++++++++++++----
+ 3 files changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2071260a275b..46822afc57e0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -632,6 +632,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	 */
- 	val = ((pmcr & ~ARMV8_PMU_PMCR_MASK)
- 	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
-+	if (!system_supports_32bit_el0())
-+		val |= ARMV8_PMU_PMCR_LC;
- 	__vcpu_sys_reg(vcpu, r->reg) = val;
- }
+So.. "new versions of qemu" in this case means ones that incorporate
+the pull request I just sent today.
+
+diff --git a/lib/powerpc/asm/hcall.h b/lib/powerpc/asm/hcall.h
+index a8bd7e3..1173fea 100644
+--- a/lib/powerpc/asm/hcall.h
++++ b/lib/powerpc/asm/hcall.h
+@@ -24,6 +24,9 @@
+ #define H_RANDOM		0x300
+ #define H_SET_MODE		0x31C
  
-@@ -682,6 +684,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		val = __vcpu_sys_reg(vcpu, PMCR_EL0);
- 		val &= ~ARMV8_PMU_PMCR_MASK;
- 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
-+		if (!system_supports_32bit_el0())
-+			val |= ARMV8_PMU_PMCR_LC;
- 		__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
- 		kvm_pmu_handle_pmcr(vcpu, val);
- 		kvm_vcpu_pmu_restore_guest(vcpu);
++#define KVMPPC_HCALL_BASE	0xf000
++#define KVMPPC_H_RTAS		(KVMPPC_HCALL_BASE + 0x0)
++
+ #ifndef __ASSEMBLY__
+ /*
+  * hcall_have_broken_sc1 checks if we're on a host with a broken sc1.
+diff --git a/lib/powerpc/rtas.c b/lib/powerpc/rtas.c
+index 2e7e0da..41c0a24 100644
+--- a/lib/powerpc/rtas.c
++++ b/lib/powerpc/rtas.c
+@@ -46,9 +46,9 @@ void rtas_init(void)
+ 	prop = fdt_get_property(dt_fdt(), node,
+ 				"linux,rtas-entry", &len);
+ 	if (!prop) {
+-		printf("%s: /rtas/linux,rtas-entry: %s\n",
+-				__func__, fdt_strerror(len));
+-		abort();
++		/* We don't have a qemu provided RTAS blob, enter_rtas
++		 * will use H_RTAS directly */
++		return;
+ 	}
+ 	data = (u32 *)prop->data;
+ 	rtas_entry = (unsigned long)fdt32_to_cpu(*data);
+diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+index ec673b3..972851f 100644
+--- a/powerpc/cstart64.S
++++ b/powerpc/cstart64.S
+@@ -121,13 +121,25 @@ halt:
+ 
+ .globl enter_rtas
+ enter_rtas:
++	LOAD_REG_ADDR(r11, rtas_entry)
++	ld	r10, 0(r11)
++
++	cmpdi	r10,0
++	bne	external_rtas
++
++	/* Use H_RTAS directly */
++	mr	r4,r3
++	lis	r3,KVMPPC_H_RTAS@h
++	ori	r3,r3,KVMPPC_H_RTAS@l
++	b	hcall
++
++external_rtas:
++	/* Use external RTAS blob */
+ 	mflr	r0
+ 	std	r0, 16(r1)
+ 
+-	LOAD_REG_ADDR(r10, rtas_return_loc)
+-	mtlr	r10
+-	LOAD_REG_ADDR(r11, rtas_entry)
+-	ld	r10, 0(r11)
++	LOAD_REG_ADDR(r11, rtas_return_loc)
++	mtlr	r11
+ 
+ 	mfmsr	r11
+ 	LOAD_REG_IMMEDIATE(r9, RTAS_MSR_MASK)
 -- 
-2.20.1
+2.21.0
 
-
--- 
-Jazz is not dead. It just smells funny...
