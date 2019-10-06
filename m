@@ -2,111 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 029ACCD373
-	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2019 18:15:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10A7DCD376
+	for <lists+kvm@lfdr.de>; Sun,  6 Oct 2019 18:16:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726430AbfJFQPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Oct 2019 12:15:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23085 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725847AbfJFQPp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 6 Oct 2019 12:15:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1570378543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=lg/L4laSYBgn56jpgnIalr4DbesZh37mDelXP/b99M8=;
-        b=hdkIWRzHyUe+hKhECd7I6uIpxrlgQYsIMPszsdobn672hNa/9WhiKRIv7CoCvCAseznylt
-        Rowhrg54W+Oix3RNjoitODm+Ib2t4OcIn/7dEXVwU7JYMb8sQ19zhYEyHRmUzQWvMIqLyQ
-        R7ckJnKydYyTbcScj4lg1/XnLvrLGL8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-R7cFIfhNMHyKFniNuA4psg-1; Sun, 06 Oct 2019 12:15:41 -0400
-Received: by mail-wr1-f72.google.com with SMTP id i10so5776287wrb.20
-        for <kvm@vger.kernel.org>; Sun, 06 Oct 2019 09:15:41 -0700 (PDT)
+        id S1726678AbfJFQQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Oct 2019 12:16:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43016 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726670AbfJFQQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Oct 2019 12:16:25 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7F53A58E23
+        for <kvm@vger.kernel.org>; Sun,  6 Oct 2019 16:16:24 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id m14so5770552wru.17
+        for <kvm@vger.kernel.org>; Sun, 06 Oct 2019 09:16:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dSabhuo9kaFmFYjPX/sZannVbv6ltNxrU4vHa5iavb4=;
-        b=VXR45MtIJ5ZXFDxWBlqTjRCh2wgL3Z+eV+VIqsd/Uk52o47FszClLG2GIRj9kwOQDY
-         19xBDo4EGjNT4JNzEOsnHAdD6+njA7G3gcCH/DouLWfPz28fAiac3THtidleSIhN13cM
-         hvpFwZl2rvBYRgFJvWMTVig3OvXxMNbKCgL0sOuw5sj4piUM65shz1DJ3jdJthfFb3ma
-         NUcwMe0MkXic73bvNLcREwKOg5N8qxeSOjAoby613iu9Cu85M4ne7e9VV1otGdWCZtDR
-         47wiWr4PyGBtb9RSgNDeEpyJjLcJ211+gTRv4szkpQMxljYf6wJbSTSoOhSYKBsa2deD
-         JczQ==
-X-Gm-Message-State: APjAAAUMdzFAV7US43u51tsFs6+ZIrsVdV8EMtiupB7j5hCnvMdleH1l
-        Y2NkZGHRghCJZR2B7bZi6nSlVaAznnaBhkQDBSpRXi4OGfImcsfQzuveRbmXdUh40xjBJiiAzfO
-        6GRY4pnPAlB6H
-X-Received: by 2002:a5d:4b0a:: with SMTP id v10mr12968306wrq.322.1570378540331;
-        Sun, 06 Oct 2019 09:15:40 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxvzrU+IMTZGu3nozR8V5nr53z8D0g5+my60K97mvMSKYkYzbKZF246Mhkyzo6mVd/AG2JaoA==
-X-Received: by 2002:a5d:4b0a:: with SMTP id v10mr12968297wrq.322.1570378540063;
-        Sun, 06 Oct 2019 09:15:40 -0700 (PDT)
+         :date:user-agent:mime-version:in-reply-to;
+        bh=Ne1NJ5apj4J7eKlGNACdxKeCUyhDUcktu7RQPHLTi2s=;
+        b=kiIkxUi+XNGm75swByLwNJ1XmxbHZSfKq3N4rj8OkM9aeBUhrAaUKq1yS8dld5wvgY
+         e/3TMSfV/YfkIKdIvhvD0naxPkfYJCXCiHgFKxUmvOTV39TccvgMVS2Om3F5HWTg2Rkj
+         HVYtWscIBtckv+KPlfXYFkmpYvfR2XjuD5MIFnNbzqhDHxvE+17n6Gd0p2r2KZaWc2NI
+         FEC55bT5Rp0PxKF4t0LGr/yPsZngnf6JXAKmsnsQgkmi4sBtG3IMB/jIwjHxCZ9mT5UD
+         QrGygyR9a1oEmK2uIzlPVDFCSJWUdjTVVujIS0tUC0mBPcb49TDT8uy3h4GM4+MjiJaw
+         MapA==
+X-Gm-Message-State: APjAAAXJirKm1ICA9oKIh33QwlsfAwu4++Kxqe0I09bz4NyXkqIxNjNA
+        oON6hpEvIxYH+642+YSvzeDXV08XukI8f0jlVrSMY/lot9PBgOcxw560a8E9agtvMIwfLY1TKz3
+        N8FlQKp2MypJ1
+X-Received: by 2002:a05:600c:22da:: with SMTP id 26mr16923410wmg.177.1570378583123;
+        Sun, 06 Oct 2019 09:16:23 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw7wvePKVU7og1wqb7GoCsGM1r5WqI/eu+qH+uH0thL7bVJo393LXZHuzcaf2milPUHaaaqrw==
+X-Received: by 2002:a05:600c:22da:: with SMTP id 26mr16923397wmg.177.1570378582849;
+        Sun, 06 Oct 2019 09:16:22 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:e876:e214:dc8e:2846? ([2001:b07:6468:f312:e876:e214:dc8e:2846])
-        by smtp.gmail.com with ESMTPSA id a10sm13273923wrm.52.2019.10.06.09.15.35
+        by smtp.gmail.com with ESMTPSA id t8sm11111207wrx.76.2019.10.06.09.16.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Oct 2019 09:15:36 -0700 (PDT)
-Subject: Re: [RFC PATCH 03/13] kvm: Add XO memslot type
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>
-Cc:     "kristen@linux.intel.com" <kristen@linux.intel.com>,
-        "Dock, Deneen T" <deneen.t.dock@intel.com>,
-        "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>
-References: <20191003212400.31130-1-rick.p.edgecombe@intel.com>
- <20191003212400.31130-4-rick.p.edgecombe@intel.com>
- <5201724e-bded-1af1-7f46-0f3e1763c797@redhat.com>
- <9b885e65c3ec0ab8b4de0d38f2f20686a7afe0d0.camel@intel.com>
+        Sun, 06 Oct 2019 09:16:21 -0700 (PDT)
+Subject: Re: [PATCH] powerpc: Fix up RTAS invocation for new qemu versions
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     lvivier@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, rkrcmar@redhat.com
+References: <20191004103844.32590-1-david@gibson.dropbear.id.au>
+ <a384c5e2-472a-32e5-2ee1-65c40da29840@redhat.com>
+ <20191005081122.GB29310@umbus.fritz.box>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <dc9ea270-489a-cd7c-fd68-26f22b5e49c6@redhat.com>
-Date:   Sun, 6 Oct 2019 18:15:38 +0200
+Message-ID: <22526d83-737f-c4aa-2fd5-84eb91b285d6@redhat.com>
+Date:   Sun, 6 Oct 2019 18:16:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <9b885e65c3ec0ab8b4de0d38f2f20686a7afe0d0.camel@intel.com>
-Content-Language: en-US
-X-MC-Unique: R7cFIfhNMHyKFniNuA4psg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191005081122.GB29310@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RzIEYKulmZEWf9TATdnOFeZymPQtn8n0G"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/10/19 21:06, Edgecombe, Rick P wrote:
-> The reasoning was that it seems like KVM leaves it to userspace to contro=
-l the
-> physical address space layout since userspace decides the supported physi=
-cal
-> address bits and lays out memory in the physical address space. So duplic=
-ation
-> with XO memslots was an attempt was to keep the logic around that togethe=
-r.
->=20
-> I'll take another look at doing it this way though. I think userspace may=
- still
-> need to adjust the MAXPHYADDR and be aware it can't layout memory in the =
-XO
-> range.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RzIEYKulmZEWf9TATdnOFeZymPQtn8n0G
+Content-Type: multipart/mixed; boundary="dRNMGZyFagwZW3GezYwng5NqrIJ2ijKIT";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
+ kvm-ppc@vger.kernel.org, rkrcmar@redhat.com
+Message-ID: <22526d83-737f-c4aa-2fd5-84eb91b285d6@redhat.com>
+Subject: Re: [PATCH] powerpc: Fix up RTAS invocation for new qemu versions
+References: <20191004103844.32590-1-david@gibson.dropbear.id.au>
+ <a384c5e2-472a-32e5-2ee1-65c40da29840@redhat.com>
+ <20191005081122.GB29310@umbus.fritz.box>
+In-Reply-To: <20191005081122.GB29310@umbus.fritz.box>
 
-Right, you would have to use KVM_ENABLE_CAP passing the desired X bit
-(which must be < MAXPHYADDR) as the argument.  Userspace needs to know
-that it must then make MAXPHYADDR in the guest CPUID equal to the
-argument.  When the MSR is written to 1, bit "MAXPHYADDR-1" in the page
-table entries becomes an XO bit.
+--dRNMGZyFagwZW3GezYwng5NqrIJ2ijKIT
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 05/10/19 10:11, David Gibson wrote:
+> Fairly.  First, we'd have to not use -bios to replace the normal SLOF
+> firmware - that could significantly slow down tests, since SLOF itself
+> takes a little while to start up.
+
+Oh, I forgot that PPC kvm-unit-tests use -bios.  That makes everything mo=
+ot.
 
 Paolo
 
+
+--dRNMGZyFagwZW3GezYwng5NqrIJ2ijKIT--
+
+--RzIEYKulmZEWf9TATdnOFeZymPQtn8n0G
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2aE1gACgkQv/vSX3jH
+roNzIwf/f8yhazxJUkYyq59AxfaY4mq6uI/lW3Ia+keEXOpjXEQwuKeQnTi/62YY
+7Zdr1vBvH+eEAUClgKaIf8JwvzSTk82ZwTIHe9kUqtlfHM4XPWukKpRjPFuG8IJQ
+hf2nGE6ALB1pkxppPz2ZM0Gb+ELixsKr0p/30Uiymox+/E//ndl4PPzQRbYpjZlQ
+LesUr9cHJ3q8JYWtRSn0mApSc2FoyrtAk6vgAam/pcMMdDAUiNdIHObOyNLQ2Kp7
+EoH2kJGTYVsfmXewd4vRDd0VzsjRazZOwJwEgSmLZijfME5wyRZqTQ0K8yGDGElN
+yf140pGxkWr3W04qGfr6ZpTktsVVkA==
+=Shs5
+-----END PGP SIGNATURE-----
+
+--RzIEYKulmZEWf9TATdnOFeZymPQtn8n0G--
