@@ -2,112 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 32055CF548
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 10:48:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F762CF579
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 11:01:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730036AbfJHIsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Oct 2019 04:48:52 -0400
-Received: from mga01.intel.com ([192.55.52.88]:11201 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729949AbfJHIsw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Oct 2019 04:48:52 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Oct 2019 01:48:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,270,1566889200"; 
-   d="scan'208";a="223175721"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by fmsmga002.fm.intel.com with ESMTP; 08 Oct 2019 01:48:50 -0700
-Date:   Tue, 8 Oct 2019 16:50:49 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH v7 0/7] Introduce support for Guest CET feature
-Message-ID: <20191008085049.GA21631@local-michael-cet-test>
-References: <20190927021927.23057-1-weijiang.yang@intel.com>
- <CALMp9eQ13Lve+9+61qCF1-7mQkeLLnhDufd-geKtz=34+YJdEg@mail.gmail.com>
- <20191003130145.GA25798@local-michael-cet-test.sh.intel.com>
- <CALMp9eQUiLNmF6oF5uEuT-VhRnzp3S9rsnAE0jpK+=38LQBHQA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQUiLNmF6oF5uEuT-VhRnzp3S9rsnAE0jpK+=38LQBHQA@mail.gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+        id S1729935AbfJHJBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Oct 2019 05:01:46 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:51306 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729772AbfJHJBq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Oct 2019 05:01:46 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x988haR7176900;
+        Tue, 8 Oct 2019 08:59:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2019-08-05;
+ bh=GG6cP5QBwbQ2dOIhVepa60W9cY9VD9HYe0NrpQU/UHY=;
+ b=nIpOjhZaA3ifKtsH0MHXkLf4tMmBywm1QxQ96NRefEzjE95zQCiQPfBvoYxwfCBr4KlO
+ qAce0qW7xqpqNHa7p1EmhX3yZuqiOHScxixjwp56SLrO6+F8e1dV+7Y3rOYu2/3g8GDZ
+ QtuNZ/1XZIezCDNk7b+qubWSWk+BIHQszJNW0wS75FAxowm6eDvYHWV9j5RyfTWn+KJr
+ dwHIAeZz5Rxlrr3Flc9fcd8WIGIha9Crhndms+TSZDUEkANNcEaRbWJmke//TvSENj4P
+ CmB/YZOVwSw+74WwXUSmiO0Nci2mQL7LEOx35zGw45HFk8fXwUPNw4bXliYcf7bvnF/T 9g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2vektrbvhx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Oct 2019 08:59:56 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x988hu2O027563;
+        Tue, 8 Oct 2019 08:59:56 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2vg205ur5k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Oct 2019 08:59:56 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x988xoHX006734;
+        Tue, 8 Oct 2019 08:59:50 GMT
+Received: from z2.cn.oracle.com (/10.182.71.205)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 08 Oct 2019 01:59:50 -0700
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     vkuznets@redhat.com, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, pbonzini@redhat.com,
+        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        sstabellini@kernel.org, peterz@infradead.org,
+        Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Subject: [PATCH v5 0/5] Add a unified parameter "nopvspin"
+Date:   Mon,  7 Oct 2019 17:04:26 +0800
+Message-Id: <1570439071-9814-1-git-send-email-zhenzhong.duan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9403 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910080089
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9403 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910080089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 03, 2019 at 09:33:45AM -0700, Jim Mattson wrote:
-> On Thu, Oct 3, 2019 at 5:59 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> >
-> > On Wed, Oct 02, 2019 at 03:40:20PM -0700, Jim Mattson wrote:
-> > > On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> > > >
-> > > > Control-flow Enforcement Technology (CET) provides protection against
-> > > > Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
-> > > > sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
-> > > >
-> > > > KVM modification is required to support Guest CET feature.
-> > > > This patch serial implemented CET related CPUID/XSAVES enumeration, MSRs
-> > > > and VMEntry configuration etc.so that Guest kernel can setup CET
-> > > > runtime infrastructure based on them. Some MSRs and related feature
-> > > > flags used in the patches reference the definitions in kernel patch.
-> > >
-> > > I am still trying to make my way through the 358 page (!) spec for
-> > > this feature, but I already have some questions/comments about this
-> > > series:
-> > >
-> > > 1. Does CET "just work" with shadow paging? Shadow paging knows
-> > > nothing about "shadow-stack pages," and it's not clear to me how
-> > > shadow-stack pages will interact with dirty tracking.
-> > > 2. I see non-trivial changes to task switch under CET. Does
-> > > emulator_do_task_switch need to be updated?
-> > > 3. What about all of the emulator routines that emulate control
-> > > transfers (e.g. em_jmp_{far,abs}, em_call_(near_abs,far},
-> > > em_ret_{far,far_imm,near_imm}, etc)? Don't these have to be modified
-> > > to work correctly when CR4.CET is set?
-> > > 4. You don't use the new "enable supervisor shadow stack control" bit
-> > > in the EPTP. I assume that this is entirely optional, right?
-> > > 5. I think the easiest way to handle the nested issue (rather than
-> > > your explicit check for vmxon when setting CR4.CET when the vCPU is in
-> > > VMX operation) is just to leave CR4.CET out of IA32_VMX_CR4_FIXED1
-> > > (which is already the case).
-> > > 6. The function, exception_class(), in x86.c, should be updated to
-> > > categorize #CP as contributory.
-> > > 7. The function, x86_exception_has_error_code(), in x86.h, should be
-> > > updated to include #CP.
-> > > 8. There appear to be multiple changes to SMM that you haven't
-> > > implemented (e.g saving/restoring the SSP registers in/from SMRAM.
-> > >
-> > > CET is quite complex. Without any tests, I don't see how you can have
-> > > any confidence in the correctness of this patch series.
-> > Thanks Jim for the detailed comments.
-> >
-> > I missed adding test platform and
-> > result introduction in cover letter. This serial of patch has passed CET
-> > test in guest on Intel x86 emulator platform and develop machine.
-> > Some feature mentioned in the spec. has not been implemented yet. e.g.,
-> > "supervisor shadow stack control".
-> 
-> What I should have said is that I'd like to see kvm-unit-tests to
-> exercise the new functionality, even if no one outside Intel can run
-> them yet.
->
-OK, let me figure out how to test it either in unit-test or selftest.
-Thank you!
-> > CET feature itself is complex, most of the enabling work is
-> > inside kernel, the role of KVM is to expose CET related CPUID and MSRs
-> > etc. to guest, and make guest take over control of the MSRs directly so that
-> > CET can work efficiently for guest. There're QEMU patches for CET too.
-> >
-> > I'll review your comments carefully, thank you again!
+There are cases folks want to disable spinlock optimization for
+debug/test purpose. Xen and hyperv already have parameters "xen_nopvspin"
+and "hv_nopvspin" to support that, but kvm doesn't.
+
+The first patch adds that feature to KVM guest with "nopvspin".
+
+For compatibility reason original parameters "xen_nopvspin" and
+"hv_nopvspin" are retained and marked obsolete.
+
+v5:
+PATCH1: new patch to revert a currently unnecessory commit,
+        code is simpler a bit after that change.         [Boris Ostrovsky]
+PATCH3: fold 'if' statement,add comments on virt_spin_lock_key,
+        reorder with PATCH2 to better reflect dependency                               
+PATCH4: fold 'if' statement, add Reviewed-by             [Boris Ostrovsky]
+PATCH5: add Reviewed-by                                  [Michael Kelley]
+
+v4:
+PATCH1: use variable name nopvspin instead of pvspin and
+        defined it as __initdata, changed print message,
+        updated patch description                     [Sean Christopherson]
+PATCH2: remove Suggested-by, use "kvm-guest:" prefix  [Sean Christopherson]
+PATCH3: make variable nopvsin and xen_pvspin coexist
+        remove Reviewed-by due to code change         [Sean Christopherson]
+PATCH4: make variable nopvsin and hv_pvspin coexist   [Sean Christopherson]
+
+v3:
+PATCH2: Fix indentation
+
+v2:
+PATCH1: pick the print code change into separate PATCH2,
+        updated patch description             [Vitaly Kuznetsov]
+PATCH2: new patch with print code change      [Vitaly Kuznetsov]
+PATCH3: add Reviewed-by                       [Juergen Gross]
+
+Zhenzhong Duan (5):
+  Revert "KVM: X86: Fix setup the virt_spin_lock_key before static key
+    get initialized"
+  x86/kvm: Change print code to use pr_*() format
+  x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
+  xen: Mark "xen_nopvspin" parameter obsolete
+  x86/hyperv: Mark "hv_nopvspin" parameter obsolete
+
+ Documentation/admin-guide/kernel-parameters.txt | 14 +++++-
+ arch/x86/hyperv/hv_spinlock.c                   |  4 ++
+ arch/x86/include/asm/qspinlock.h                |  1 +
+ arch/x86/kernel/kvm.c                           | 63 ++++++++++++++-----------
+ arch/x86/xen/spinlock.c                         |  4 +-
+ kernel/locking/qspinlock.c                      |  7 +++
+ 6 files changed, 62 insertions(+), 31 deletions(-)
+
+-- 
+1.8.3.1
+
