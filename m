@@ -2,119 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFF95CE0FB
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 13:57:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E23FFCE0FC
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 13:57:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727514AbfJGL5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 07:57:40 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41316 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727467AbfJGL5k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Oct 2019 07:57:40 -0400
-Received: by mail-ed1-f66.google.com with SMTP id f20so12106119edv.8
-        for <kvm@vger.kernel.org>; Mon, 07 Oct 2019 04:57:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=rDQ20V9uLNcqWB97jPsuLuN7Jzo7LgwLu2gpmwH3EQs=;
-        b=cuFw0ZfReMx1L8G+e346BwYa/kgKz8QgVeIglP1hXoNGGZ8GqO6vPY6mW3O/TW1OXr
-         Opl1B/noBKQLtIkcZHCyzd3kuCAUUulxYDsNLj91S7qpsBh271CTNIOyLvzuImcWBVRi
-         FJ9r0WXgmRU0U2i/i0w1JGSuR2QaFgQkDuM6sSuxVB6apZTrafVQHoVjHUX2TJM2wgoo
-         wOSYwL2gp41s7XkRWwcQ9pXNbUzUjbiQRmo0+bylRi9+qbg/i93eVUmRYtIHPx7gSDEW
-         KKJCoMBJbtozJ2/3nUD0CgLEt4XgHjIwPNvFaytgGg4/MiMGzEgpiAzgn5XhptC7pqLX
-         gQtQ==
+        id S1727580AbfJGL55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 07:57:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40152 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727554AbfJGL55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Oct 2019 07:57:57 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DB8FAC0495A1
+        for <kvm@vger.kernel.org>; Mon,  7 Oct 2019 11:57:55 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id o128so409985wmo.1
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2019 04:57:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=rDQ20V9uLNcqWB97jPsuLuN7Jzo7LgwLu2gpmwH3EQs=;
-        b=bx6FQbhd0drZQJow7KJ3o8wL+h9FB791+9xOASSSmJGigTfdkLERURbjs1qjFZVENj
-         EH5zYfBuLA22/tFEGfLK8zpv1uggIungPEWWj4QDHb860vzDnIsjPTTY8LIspiocYgR3
-         gSc5cHTAYHL12mn9vXo/JNxUXsWiQZMYs6LJAhUJoYN8htlBL+Xe+BXGtnk2tJZEwlEa
-         eXZVdyK1phbtVG+ShORJ1kFplhHhQw8rwufY1mmNcoHEHHTTOYQNuTDnnjmcLoPOrVDo
-         su115vOfiGymIBO4JooCeVP+olbgQSrdpyCx/mCnjSmG1Ke54Cp0u/LSom0EzUXWY18q
-         H2hA==
-X-Gm-Message-State: APjAAAWN80UflW/Ti4Xqo6iv293s5dRpKD6U6Kl31n6b8hBoAakIOnQQ
-        O9cZt2PdOBOukyMfOH6BxzA=
-X-Google-Smtp-Source: APXvYqxiQi7T1g2y9gARkUZyVVwryGrZs1cOyEin4et4UcEm8vqXVbEmwX+zoqnkCLt8ZK+quKxgAw==
-X-Received: by 2002:a17:906:8041:: with SMTP id x1mr23663753ejw.132.1570449458022;
-        Mon, 07 Oct 2019 04:57:38 -0700 (PDT)
-Received: from jwang-Latitude-5491.pb.local ([2001:1438:4010:2558:f50b:fd6b:fe5b:ba84])
-        by smtp.gmail.com with ESMTPSA id m19sm1793068eja.35.2019.10.07.04.57.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2019 04:57:37 -0700 (PDT)
-From:   Jack Wang <jinpuwang@gmail.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, x86@kernel.org, kvm@vger.kernel.org
-Cc:     Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH] kvm: avoid NULL pointer deref in kvm_write_guest_virt_system
-Date:   Mon,  7 Oct 2019 13:57:36 +0200
-Message-Id: <20191007115736.15354-1-jinpuwang@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YrxF1/4HajPgR+xeq6q6rAZJgqX9N62r+CkH+L1AyJc=;
+        b=Fzqc2Ct/4iWAgr/xQ+fiIltaz2nnPOTyjOOydk7BAtEB/kceIhxSuBIvVqNDsVduRy
+         HVwIqMtJ4WvPvSZw4AplYP59NOnf71J4nrahk73crtyqkunf0nioNoqX7K4cg2ibc4ea
+         Jb3i+mxT99ZN3VelTlz0e11c+JOHJEqkd5Hy+49XhQSmppd3M8C/1WP6xt+qj4iY6kVL
+         tA927sC4s/EgZeGpF6N4YOjXSh7qw+eTIyrJYzKAZGcrgcsJhZvI7TwHsimm5UrvODx5
+         ULnnctAQlX7lqfA9wuePxLW/Ec1F06oB5YYVu6rtxq3RBGdf7gy0/sRX2HttnhqD0n/r
+         0KaQ==
+X-Gm-Message-State: APjAAAWBcp7na6/0wv078gUXsF5lyV/6N0dW2iROhOc0HwlWAsg0y/fS
+        Otqb4vSvHg4JP7H3zDzhmkcLhMpkKXDGxGiI4m2zog0wWxIOR2lYb83dLRdx6PRsUvbXFjq0KAH
+        WE+LymTcSPf8h
+X-Received: by 2002:a1c:5fd6:: with SMTP id t205mr19990748wmb.124.1570449474492;
+        Mon, 07 Oct 2019 04:57:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz5Fqt3SdQFDKAvmwLezrPzgfekV57+TAB8Po1qVS2eG/v58soOnt//sbyMAOb6mrdQYDXvng==
+X-Received: by 2002:a1c:5fd6:: with SMTP id t205mr19990733wmb.124.1570449474146;
+        Mon, 07 Oct 2019 04:57:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9dd9:ce92:89b5:d1f2? ([2001:b07:6468:f312:9dd9:ce92:89b5:d1f2])
+        by smtp.gmail.com with ESMTPSA id a4sm13317431wmm.10.2019.10.07.04.57.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Oct 2019 04:57:53 -0700 (PDT)
+Subject: Re: [PATCH] KVM: VMX: Refactor to not compare set PI control bits
+ directly to 1
+To:     Liran Alon <liran.alon@oracle.com>, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20191001005408.129099-1-liran.alon@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <41e58834-9951-344c-0312-372ef6a62ae7@redhat.com>
+Date:   Mon, 7 Oct 2019 13:57:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20191001005408.129099-1-liran.alon@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jack Wang <jinpu.wang@cloud.ionos.com>
+On 01/10/19 02:54, Liran Alon wrote:
+> This is a pure code refactoring.
+> No semantic change is expected.
+> 
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 18 ++++++++----------
+>  1 file changed, 8 insertions(+), 10 deletions(-)
 
-kvm-unit-test triggered a NULL pointer deref below:
-[  948.518437] kvm [24114]: vcpu0, guest rIP: 0x407ef9 kvm_set_msr_common: MSR_IA32_DEBUGCTLMSR 0x3, nop
-[  949.106464] BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
-[  949.106707] PGD 0 P4D 0
-[  949.106872] Oops: 0002 [#1] SMP
-[  949.107038] CPU: 2 PID: 24126 Comm: qemu-2.7 Not tainted 4.19.77-pserver #4.19.77-1+feature+daily+update+20191005.1625+a4168bb~deb9
-[  949.107283] Hardware name: Dell Inc. Precision Tower 3620/09WH54, BIOS 2.7.3 01/31/2018
-[  949.107549] RIP: 0010:kvm_write_guest_virt_system+0x12/0x40 [kvm]
-[  949.107719] Code: c0 5d 41 5c 41 5d 41 5e 83 f8 03 41 0f 94 c0 41 c1 e0 02 e9 b0 ed ff ff 0f 1f 44 00 00 48 89 f0 c6 87 59 56 00 00 01 48 89 d6 <49> c7 00 00 00 00 00 89 ca 49 c7 40 08 00 00 00 00 49 c7 40 10 00
-[  949.108044] RSP: 0018:ffffb31b0a953cb0 EFLAGS: 00010202
-[  949.108216] RAX: 000000000046b4d8 RBX: ffff9e9f415b0000 RCX: 0000000000000008
-[  949.108389] RDX: ffffb31b0a953cc0 RSI: ffffb31b0a953cc0 RDI: ffff9e9f415b0000
-[  949.108562] RBP: 00000000d2e14928 R08: 0000000000000000 R09: 0000000000000000
-[  949.108733] R10: 0000000000000000 R11: 0000000000000000 R12: ffffffffffffffc8
-[  949.108907] R13: 0000000000000002 R14: ffff9e9f4f26f2e8 R15: 0000000000000000
-[  949.109079] FS:  00007eff8694c700(0000) GS:ffff9e9f51a80000(0000) knlGS:0000000031415928
-[  949.109318] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  949.109495] CR2: 0000000000000000 CR3: 00000003be53b002 CR4: 00000000003626e0
-[  949.109671] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  949.109845] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  949.110017] Call Trace:
-[  949.110186]  handle_vmread+0x22b/0x2f0 [kvm_intel]
-[  949.110356]  ? vmexit_fill_RSB+0xc/0x30 [kvm_intel]
-[  949.110549]  kvm_arch_vcpu_ioctl_run+0xa98/0x1b30 [kvm]
-[  949.110725]  ? kvm_vcpu_ioctl+0x388/0x5d0 [kvm]
-[  949.110901]  kvm_vcpu_ioctl+0x388/0x5d0 [kvm]
-[  949.111072]  do_vfs_ioctl+0xa2/0x620
+I'm not sure this is an improvement, for two reasons:
 
-The commit introduced the bug is 541ab2aeb282, it has been backported to
-at least stable 4.14.145+ and 4.19.74+, to fix it, just check the
-exception not NULL before do the memset. The fix should go to stable.
+1) the "dy" in vmx_dy_apicv_has_pending_interrupt callback is meant for
+directed yield, so it's a bit ugly to call it from wakeup_handler.
 
-Fixes: 541ab2aeb282 ("KVM: x86: work around leak of uninitialized stack contents")
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+2) the wakeup_handler is an interrupt handler specific to posted
+interrupts, so it makes sense to check the posted interrupts descriptor.
 
----
-I did the kvm-unit-tests on top of 4.19.77, it no longer crash with the fix,
-and it applies cleanly to v5.4-rc2.
----
- arch/x86/kvm/x86.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I wouldn't say ON is a control bit in fact (unlike for example SN or
+NV), since it is written by the processor or IOMMU rather than the
+hypervisor.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 661e2bf38526..9fd734fcacb5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5438,7 +5438,8 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu, gva_t addr, void *val,
- 	 * call kvm_inject_page_fault.  Ensure that they at least do not leak
- 	 * uninitialized kernel stack memory into cr2 and error code.
- 	 */
--	memset(exception, 0, sizeof(*exception));
-+	if (exception)
-+		memset(exception, 0, sizeof(*exception));
- 	return kvm_write_guest_virt_helper(addr, val, bytes, vcpu,
- 					   PFERR_WRITE_MASK, exception);
- }
--- 
-2.17.1
+Paolo
+
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e31317fc8c95..92eb4910fe9f 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5302,6 +5302,11 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
+> +{
+> +	return pi_test_on(vcpu_to_pi_desc(vcpu));
+> +}
+> +
+>  /*
+>   * Handler for POSTED_INTERRUPT_WAKEUP_VECTOR.
+>   */
+> @@ -5313,9 +5318,7 @@ static void wakeup_handler(void)
+>  	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+>  	list_for_each_entry(vcpu, &per_cpu(blocked_vcpu_on_cpu, cpu),
+>  			blocked_vcpu_list) {
+> -		struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+> -
+> -		if (pi_test_on(pi_desc) == 1)
+> +		if (vmx_dy_apicv_has_pending_interrupt(vcpu))
+>  			kvm_vcpu_kick(vcpu);
+>  	}
+>  	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
+> @@ -6168,11 +6171,6 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+>  	return max_irr;
+>  }
+>  
+> -static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
+> -{
+> -	return pi_test_on(vcpu_to_pi_desc(vcpu));
+> -}
+> -
+>  static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+>  {
+>  	if (!kvm_vcpu_apicv_active(vcpu))
+> @@ -7336,7 +7334,7 @@ static int pi_pre_block(struct kvm_vcpu *vcpu)
+>  	do {
+>  		old.control = new.control = pi_desc->control;
+>  
+> -		WARN((pi_desc->sn == 1),
+> +		WARN(pi_desc->sn,
+>  		     "Warning: SN field of posted-interrupts "
+>  		     "is set before blocking\n");
+>  
+> @@ -7361,7 +7359,7 @@ static int pi_pre_block(struct kvm_vcpu *vcpu)
+>  			   new.control) != old.control);
+>  
+>  	/* We should not block the vCPU if an interrupt is posted for it.  */
+> -	if (pi_test_on(pi_desc) == 1)
+> +	if (pi_test_on(pi_desc))
+>  		__pi_post_block(vcpu);
+>  
+>  	local_irq_enable();
+> 
 
