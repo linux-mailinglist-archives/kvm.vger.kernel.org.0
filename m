@@ -2,112 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 825F6CEB91
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 20:15:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDF88CEBE4
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 20:30:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729099AbfJGSOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 14:14:43 -0400
-Received: from mga09.intel.com ([134.134.136.24]:17856 "EHLO mga09.intel.com"
+        id S1729501AbfJGSab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 14:30:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59548 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728079AbfJGSOn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Oct 2019 14:14:43 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Oct 2019 11:14:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,269,1566889200"; 
-   d="scan'208";a="192354361"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
-  by fmsmga008.fm.intel.com with ESMTP; 07 Oct 2019 11:14:41 -0700
-Received: from orsmsx152.amr.corp.intel.com (10.22.226.39) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 7 Oct 2019 11:14:41 -0700
-Received: from orsmsx112.amr.corp.intel.com ([169.254.3.161]) by
- ORSMSX152.amr.corp.intel.com ([169.254.8.128]) with mapi id 14.03.0439.000;
- Mon, 7 Oct 2019 11:14:41 -0700
-From:   "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To:     "luto@kernel.org" <luto@kernel.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "Dock, Deneen T" <deneen.t.dock@intel.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kristen@linux.intel.com" <kristen@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>
-Subject: Re: [RFC PATCH 00/13] XOM for KVM guest userspace
-Thread-Topic: [RFC PATCH 00/13] XOM for KVM guest userspace
-Thread-Index: AQHVejL3BY31w2dp/kGOlEfaBbHp/adLCOMAgABXcoCAAFpLgIAEPH4A
-Date:   Mon, 7 Oct 2019 18:14:40 +0000
-Message-ID: <50df3c452b25ff4823fba223dd56216bc2f33644.camel@intel.com>
-References: <20191003212400.31130-1-rick.p.edgecombe@intel.com>
-         <CALCETrW9MEvNt+kB_65cbX9VJiLxktAFagkzSGR0VQfd4VHOiQ@mail.gmail.com>
-         <d5be8611158108a05fbb67c23b10357f2fb19816.camel@intel.com>
-         <CALCETrWDFYO4LZu_OM24FAcnphm4jwvbz4j31q8w7eeHUR_4EA@mail.gmail.com>
-In-Reply-To: <CALCETrWDFYO4LZu_OM24FAcnphm4jwvbz4j31q8w7eeHUR_4EA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.54.75.11]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <700DB460C502A948B445FC5846B46BD3@intel.com>
-Content-Transfer-Encoding: base64
+        id S1729495AbfJGSaa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Oct 2019 14:30:30 -0400
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9325F3CA1E
+        for <kvm@vger.kernel.org>; Mon,  7 Oct 2019 18:30:30 +0000 (UTC)
+Received: by mail-qt1-f197.google.com with SMTP id c8so16196222qtd.20
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2019 11:30:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=Veqvl+qM0CfutM3PPjJjEy4hKVrp4NP3ezEQkZHIQPg=;
+        b=qLOKFka1JgGhHV8PinCIX6TEuQunPcfjmiCoqSclrk2iFLvTOsidLDev5wWsvDTXfe
+         zMWEJEOpJyROOkj8ckjwV9sRO2wDfL62QB6D4BmeKf3SIuiDeB5SqsNuMV3b70+fmzBh
+         6R6NqTnIBPuuCzmcNveXLO9DnGUTkVUM5EAxLVjlyGCaC7z2zaxWJArsOMx+sMugMSJz
+         bCLVZ5vn8jMoBd0IFEWClaZncTYRUCij1/nqL+0fdumeHeX0lxc++MmS5PHkrWI5V0Sd
+         Veq0pFTpjY3nVNlaAINfNzs0a2NRZLlF9lohg3Rpt4cabYvrZwlwSR2wggm80Et4pic5
+         nstg==
+X-Gm-Message-State: APjAAAWB8bnjtJTb0XTlW9j17d/6sDHEcr69/kN5mKed7lTyZ51raVLn
+        8c1R9OiZ57nSAVw1hWkBQM1c/yzNrgDlEel49YPGR9mHcDtyjuhBW/6cG0IdVotnc1SBH74TTvS
+        ytksdBb9TCofC
+X-Received: by 2002:a37:8f86:: with SMTP id r128mr14609058qkd.392.1570473029368;
+        Mon, 07 Oct 2019 11:30:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx5hMQXVRiXUEyBzpDI1RwgrB4b7tr07l8zU3XqKSSML03JT2g+x+mug176n0y6vIeLAWA/TQ==
+X-Received: by 2002:a37:8f86:: with SMTP id r128mr14609014qkd.392.1570473029025;
+        Mon, 07 Oct 2019 11:30:29 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+        by smtp.gmail.com with ESMTPSA id s50sm9515361qth.92.2019.10.07.11.30.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2019 11:30:28 -0700 (PDT)
+Date:   Mon, 7 Oct 2019 14:30:23 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH] vhost/test: stop device before reset
+Message-ID: <20191007183019.12522-1-mst@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gRnJpLCAyMDE5LTEwLTA0IGF0IDE4OjMzIC0wNzAwLCBBbmR5IEx1dG9taXJza2kgd3JvdGU6
-DQo+IE9uIEZyaSwgT2N0IDQsIDIwMTkgYXQgMToxMCBQTSBFZGdlY29tYmUsIFJpY2sgUA0KPiA8
-cmljay5wLmVkZ2Vjb21iZUBpbnRlbC5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IE9uIEZyaSwgMjAx
-OS0xMC0wNCBhdCAwNzo1NiAtMDcwMCwgQW5keSBMdXRvbWlyc2tpIHdyb3RlOg0KPiA+ID4gT24g
-VGh1LCBPY3QgMywgMjAxOSBhdCAyOjM4IFBNIFJpY2sgRWRnZWNvbWJlDQo+ID4gPiA8cmljay5w
-LmVkZ2Vjb21iZUBpbnRlbC5jb20+IHdyb3RlOg0KPiA+ID4gPiANCj4gPiA+ID4gVGhpcyBwYXRj
-aHNldCBlbmFibGVzIHRoZSBhYmlsaXR5IGZvciBLVk0gZ3Vlc3RzIHRvIGNyZWF0ZSBleGVjdXRl
-LW9ubHkNCj4gPiA+ID4gKFhPKQ0KPiA+ID4gPiBtZW1vcnkgYnkgdXRpbGl6aW5nIEVQVCBiYXNl
-ZCBYTyBwZXJtaXNzaW9ucy4gWE8gbWVtb3J5IGlzIGN1cnJlbnRseQ0KPiA+ID4gPiBzdXBwb3J0
-ZWQNCj4gPiA+ID4gb24gSW50ZWwgaGFyZHdhcmUgbmF0aXZlbHkgZm9yIENQVSdzIHdpdGggUEtV
-LCBidXQgdGhpcyBlbmFibGVzIGl0IG9uDQo+ID4gPiA+IG9sZGVyDQo+ID4gPiA+IHBsYXRmb3Jt
-cywgYW5kIGNhbiBzdXBwb3J0IFhPIGZvciBrZXJuZWwgbWVtb3J5IGFzIHdlbGwuDQo+ID4gPiAN
-Cj4gPiA+IFRoZSBwYXRjaHNldCBzZWVtcyB0byBzb21ldGltZXMgY2FsbCB0aGlzIGZlYXR1cmUg
-IlhPIiBhbmQgc29tZXRpbWVzDQo+ID4gPiBjYWxsIGl0ICJOUiIuICBUbyBtZSwgWE8gaW1wbGll
-cyBuby1yZWFkIGFuZCBuby13cml0ZSwgd2hlcmVhcyBOUg0KPiA+ID4gaW1wbGllcyBqdXN0IG5v
-LXJlYWQuICBDYW4geW91IHBsZWFzZSBjbGFyaWZ5ICpleGFjdGx5KiB3aGF0IHRoZSBuZXcNCj4g
-PiA+IGJpdCBkb2VzIGFuZCBiZSBjb25zaXN0ZW50Pw0KPiA+ID4gDQo+ID4gPiBJIHN1Z2dlc3Qg
-dGhhdCB5b3UgbWFrZSBpdCBOUiwgd2hpY2ggYWxsb3dzIGZvciBQUk9UX0VYRUMgYW5kDQo+ID4g
-PiBQUk9UX0VYRUN8UFJPVF9XUklURSBhbmQgcGxhaW4gUFJPVF9XUklURS4gIFdYIGlzIG9mIGR1
-YmlvdXMgdmFsdWUsDQo+ID4gPiBidXQgSSBjYW4gaW1hZ2luZSBwbGFpbiBXIGJlaW5nIGdlbnVp
-bmVseSB1c2VmdWwgZm9yIGxvZ2dpbmcgYW5kIGZvcg0KPiA+ID4gSklUcyB0aGF0IGNvdWxkIG1h
-aW50YWluIGEgVyBhbmQgYSBzZXBhcmF0ZSBYIG1hcHBpbmcgb2Ygc29tZSBjb2RlLg0KPiA+ID4g
-SW4gb3RoZXIgd29yZHMsIHdpdGggYW4gTlIgYml0LCBhbGwgOCBsb2dpY2FsIGFjY2VzcyBtb2Rl
-cyBhcmUNCj4gPiA+IHBvc3NpYmxlLiAgQWxzbywga2VlcGluZyB0aGUgcGFnaW5nIGJpdHMgbW9y
-ZSBvcnRob2dvbmFsIHNlZW1zIG5pY2UgLS0NCj4gPiA+IHdlIGFscmVhZHkgaGF2ZSBhIGJpdCB0
-aGF0IGNvbnRyb2xzIHdyaXRlIGFjY2Vzcy4NCj4gPiANCj4gPiBTb3JyeSwgeWVzIHRoZSBiZWhh
-dmlvciBvZiB0aGlzIGJpdCBuZWVkcyB0byBiZSBkb2N1bWVudGVkIGEgbG90IGJldHRlci4gSQ0K
-PiA+IHdpbGwNCj4gPiBkZWZpbml0ZWx5IGRvIHRoaXMgZm9yIHRoZSBuZXh0IHZlcnNpb24uDQo+
-ID4gDQo+ID4gVG8gY2xhcmlmeSwgc2luY2UgdGhlIEVQVCBwZXJtaXNzaW9ucyBpbiB0aGUgWE8v
-TlIgcmFuZ2UgYXJlIGV4ZWN1dGFibGUsIGFuZA0KPiA+IG5vdA0KPiA+IHJlYWRhYmxlIG9yIHdy
-aXRlYWJsZSB0aGUgbmV3IGJpdCByZWFsbHkgbWVhbnMgWE8sIGJ1dCBvbmx5IHdoZW4gTlggaXMg
-MA0KPiA+IHNpbmNlDQo+ID4gdGhlIGd1ZXN0IHBhZ2UgdGFibGVzIGFyZSBiZWluZyBjaGVja2Vk
-IGFzIHdlbGwuIFdoZW4gTlI9MSwgVz0xLCBhbmQgTlg9MCwNCj4gPiB0aGUNCj4gPiBtZW1vcnkg
-aXMgc3RpbGwgWE8uDQo+ID4gDQo+ID4gTlIgd2FzIHBpY2tlZCBvdmVyIFhPIGJlY2F1c2UgYXMg
-eW91IHNheS4gVGhlIGlkZWEgaXMgdGhhdCBpdCBjYW4gYmUgZGVmaW5lZA0KPiA+IHRoYXQgaW4g
-dGhlIGNhc2Ugb2YgS1ZNIFhPLCBOUiBhbmQgd3JpdGFibGUgaXMgbm90IGEgdmFsaWQgY29tYmlu
-YXRpb24sIGxpa2UNCj4gPiB3cml0ZWFibGUgYnV0IG5vdCByZWFkYWJsZSBpcyBkZWZpbmVkIGFz
-IG5vdCB2YWxpZCBmb3IgdGhlIEVQVC4NCj4gPiANCj4gDQo+IFVnaCwgSSBzZWUsIHRoaXMgaXMg
-YW4gIkVQVCBNaXNjb25maWd1cmF0aW9uIi4gIE9oLCB3ZWxsLiAgSSBndWVzcw0KPiBqdXN0IGtl
-ZXAgdGhpbmdzIGFzIHRoZXkgYXJlIGFuZCBkb2N1bWVudCB0aGluZ3MgYmV0dGVyLCBwbGVhc2Uu
-DQo+IERvbid0IHRyeSB0byBlbXVsYXRlLg0KDQpBaCwgSSBzZWUgd2hhdCB5b3Ugd2VyZSB0aGlu
-a2luZy4gT2sgd2lsbCBkby4NCg0KPiBJIGRvbid0IHN1cHBvc2UgSW50ZWwgY291bGQgYmUgY29u
-dmluY2VkIHRvIGdldCByaWQgb2YgdGhhdCBpbiBhDQo+IGZ1dHVyZSBDUFUgYW5kIGFsbG93IHdy
-aXRlLW9ubHkgbWVtb3J5Pw0KDQpIbW0sIEknbSBub3Qgc3VyZS4gSSBjYW4gdHJ5IHRvIHBhc3Mg
-aXQgYWxvbmcuDQoNCj4gQlRXLCBpcyB5b3VyIHBhdGNoIGNoZWNraW5nIGZvciBzdXBwb3J0IGlu
-IElBMzJfVk1YX0VQVF9WUElEX0NBUD8gIEkNCj4gZGlkbid0IG5vdGljZSBpdCwgYnV0IEkgZGlk
-bid0IGxvb2sgdGhhdCBoYXJkLg0KDQpZZXAsIHRoZXJlIHdhcyBhbHJlYWR5IGEgaGVscGVyOiBj
-cHVfaGFzX3ZteF9lcHRfZXhlY3V0ZV9vbmx5KCkuDQoNCg==
+When device stop was moved out of reset, test device wasn't updated to
+stop before reset, this resulted in a use after free.  Fix by invoking
+stop appropriately.
+
+Fixes: b211616d7125 ("vhost: move -net specific code out")
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/vhost/test.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+index 04edd8db62fc..e3a8e9db22cd 100644
+--- a/drivers/vhost/test.c
++++ b/drivers/vhost/test.c
+@@ -170,6 +170,7 @@ static int vhost_test_release(struct inode *inode, struct file *f)
+ 
+ 	vhost_test_stop(n, &private);
+ 	vhost_test_flush(n);
++	vhost_dev_stop(&n->dev);
+ 	vhost_dev_cleanup(&n->dev);
+ 	/* We do an extra flush before freeing memory,
+ 	 * since jobs can re-queue themselves. */
+@@ -246,6 +247,7 @@ static long vhost_test_reset_owner(struct vhost_test *n)
+ 	}
+ 	vhost_test_stop(n, &priv);
+ 	vhost_test_flush(n);
++	vhost_dev_stop(&n->dev);
+ 	vhost_dev_reset_owner(&n->dev, umem);
+ done:
+ 	mutex_unlock(&n->dev.mutex);
+-- 
+MST
