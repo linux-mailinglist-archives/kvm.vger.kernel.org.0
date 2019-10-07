@@ -2,64 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B31A3CDD6C
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 10:34:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 040FFCDD9F
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 10:48:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727258AbfJGIem (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 04:34:42 -0400
-Received: from sonic315-15.consmr.mail.bf2.yahoo.com ([74.6.134.125]:41351
-        "EHLO sonic315-15.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726969AbfJGIem (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Oct 2019 04:34:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1570437279; bh=wJiYxOkZYzdnbN0s1CbZ6fzxfWsxxT0VKX0IkhwwSIA=; h=Date:From:Reply-To:Subject:From:Subject; b=WVn6SEhdV4N0fOI4gGtAT2RQWF70lw4frlICcC63OPmj7Cz9qqdFx2sG2TjQWsWseXzuvO6ogVFFOQ1xHpjszKprX87bqdd77FJ6P4MWjANSFzv25LxvHIbXedpQ8i/S6t91fkrNWiB1Y1YoL59cMK5EeNBqbOWbwW0Dz0NsiJ4ycU7fcT+aTTrdjA6IR0LskYnnvzJjLNhZHaMa6Q5covfkP+WvxEPvgLJ+rFlaQrzArnk3S2QsNuaqsOnzedevMPLPJ9G6R4/12ptO+rWM68xJ+wAJ8SuiDVabB170VErXh368SUFEUVhypD7kVhoog+YM4ojB9s+r7as8M/mkRQ==
-X-YMail-OSG: 7iiFl2MVM1np8C8lqxHDa5f2vI0OUIt__5EBgWq1VysGeEwkQtKDRC7a6T4Q2_k
- fGejeSSODmr7dTOtl6AMfo379xMs4gjIfy6O1oGM7p4Qi7Mxmjm4ZY57S0n.xFkJri3SVo2mgA2v
- vXEJY_LuNwUwAvBvzwESSTO4VjwojatYgGCuzOQUwI7YQRNAQZ9Y5XCoVqpydc3EohZsycqlPyI3
- uOYDOe78ItsKGWxN0jhqnEG8Lrq3Gap2EEP1Ar2VxpyQzwDlNSI9DSPPub2Y2nrBpC1hHF1..B4R
- pPDiWg_0r.P40FCSGQmri0FCaZQ6gQ7VZhvJOZaFhVFWmfgoZ2J9amAyzIFSRzr9dF9ylTHRJT5S
- RYJsh1e92M1I83hnuFEAjXvvzBpD_9wMni0OdwIyLoy_gtOc426hi0RfB9YL5qvVgXoNIPMMY72j
- UW0EpQ6MEcHu6tpcasa0FgDxDVC0Autc0fplmJIHpsJ0.R8ShCPzpLV7WJADBt1uXEt2ZxPgwGK2
- FiZJ6uZbaTOpHHsE3dlxW_.LaLc.VMSACdCC4Pcr6XcowmLCluTIa40jwkiWkZlR_nNm63j5uqkB
- Gr7tgRvZtlBXnfEVJ8Y3ApDRcZ2562YCQdifAlhXAXWGFCuk6Qzto9rwB2.4_13IkdRp8KJaDfQX
- NvtlxzLtMwaQGkXinfloi5.2mVX7XXTwKaut9B5DmtwzA9qgabXUw9DiXlZF3k4F11dng.0cgpyC
- OHFwdYycl26TnFAGf4F.o3O3_EKDUZqCLdQPTXxVzVm8lZDOtLphu0JaQp3Afl1SMJ3DAITpwNUa
- CgkiC6rPl9EZqzaUapBNwNI8pl0dwTImoKHJrzcXvTOYZlG1tFQEWDAbN8GQunSVuvGQ87xGjbX7
- tgGwbsnHmX.bJdADTqV12uZQOi1OI0jXVKaEm8ytGhe_0SBgiG9wIN5hkp9tMLtZmXQ_2Smn66Dh
- DdQl29MPtvU2beGPY.1BrsKvNxu.M9VRBJMgJyxyIcvoaODo_lUwHX8Vcwnj_d4TbGqbGMYrPFQa
- YyBYAeHGpDIHmCjsP6ywduxRXhvS.3RrWBPbWCABBJ7wsmKt7jnuiVBTV7tuCWT2qOa3jiF351sz
- ynF.xyhMNywUFaWcXw1asX3OPndLYCdHuCmmiw7.NMPxabixTyB8hsbGXSVfYJ.u5MRl8S_lxY1r
- jxUu6lTvZRf_swZkWmOMJUnaqQ5zAH7RG_Eq3y8fNi2zaX4OjPoy.3umeh1uEmC28kc_mBa7sp5C
- __CI.LVYp3ajqCyn17IDXnqjsreI0aOB_Ojtr..Z5rIOKuzcxsQ--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.bf2.yahoo.com with HTTP; Mon, 7 Oct 2019 08:34:39 +0000
-Date:   Mon, 7 Oct 2019 08:34:36 +0000 (UTC)
-From:   "Mrs. Aminatou Zainab" <aminatuosemi2009@gmail.com>
-Reply-To: miss.aminatouzainab@gmail.com
-Message-ID: <817583427.2942848.1570437276943@mail.yahoo.com>
-Subject:  "As-Salam-u-Alaikum, Dear Friend...
+        id S1727262AbfJGIsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 04:48:03 -0400
+Received: from foss.arm.com ([217.140.110.172]:57780 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727103AbfJGIsD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Oct 2019 04:48:03 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A681A1570;
+        Mon,  7 Oct 2019 01:48:02 -0700 (PDT)
+Received: from localhost (unknown [10.37.6.20])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29A753F68E;
+        Mon,  7 Oct 2019 01:48:02 -0700 (PDT)
+Date:   Mon, 7 Oct 2019 09:48:00 +0100
+From:   Andrew Murray <andrew.murray@arm.com>
+To:     maz@kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: pmu: Fix cycle counter truncation
+Message-ID: <20191007084800.GW42880@e119886-lin.cambridge.arm.com>
+References: <20191006104636.11194-1-maz@kernel.org>
+ <20191006104636.11194-2-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191006104636.11194-2-maz@kernel.org>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ATTENTION: DEAR BENEFICIARY CONGRATULATIONS TO YOU,
+On Sun, Oct 06, 2019 at 11:46:34AM +0100, maz@kernel.org wrote:
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> When a counter is disabled, its value is sampled before the event
+> is being disabled, and the value written back in the shadow register.
+> 
+> In that process, the value gets truncated to 32bit, which is adequate
+> for any counter but the cycle counter (defined as a 64bit counter).
+> 
+> This obviously results in a corrupted counter, and things like
+> "perf record -e cycles" not working at all when run in a guest...
+> A similar, but less critical bug exists in kvm_pmu_get_counter_value.
+> 
+> Make the truncation conditional on the counter not being the cycle
+> counter, which results in a minor code reorganisation.
+> 
+> Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
+> Cc: Andrew Murray <andrew.murray@arm.com>
+> Reported-by: Julien Thierry <julien.thierry.kdev@gmail.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
 
-I RECEIVE YOUR CONTENT OF YOUR EMAIL FROM THIS DHL MASTER CARD OFFICES FUND OF $10.5 USD MILLION AFTER THE BOARD OF DIRECTORS MEETINGS, THE UNITED NATIONS GOVERNMENT HAVE DECIDED TO ISSUE YOU YOUR (ATM) VALUED AT 10.5 MILLION UNITED STATES DOLLAR.THIS IS TO BRING TO YOUR NOTICE THAT YOUR VALUED SUM OF 10.5 MILLION DOLLAR HAS BEING TODAY CREDITED INTO (ATM) MASTER CARD AND HAS BEEN HANDLE TO THE FOREIGN REMITTANCE DEPARTMENT TO SEND IT TO YOU TODAY IN YOUR FAVOR.
+Reviewed-by: Andrew Murray <andrew.murray@arm.com>
 
-WITH YOUR (ATM) YOU WILL HAVE ACCESS TO MAKE DAILY WITHDRAWALS OF $2,500 UNITED STATE DOLLARS DAILIES AS ALREADY PROGRAMMED UNTIL YOU WITHDRAW YOUR TOTAL SUM IN YOUR (ATM) CARD WHICH HAS REGISTERED IN OUR SYSTEM FOR PAYMENT RECORD, AS SOON AS WE RECEIVE YOUR INFORMATIONS AND YOUR HOME ADDRESS OF YOUR COUNTRY AS ALREADY PROGRAMMED, WE WILL SEND YOUR (ATM) CARD THROUGH DHL COURIER SERVICE,  WE HAVE RECEIVED A SIGNAL FROM THE SWISS WORLD BANK TO INFECT YOUR TRANSFER TO YOU WITHIN ONE WEEK,
-
-WE HAVE JUST FINISHED OUR ANNUAL GENERAL MEETING WITH THE CENTRAL BANK OF AMERICA (BOA). AT THE END OF THE BOARD OF DIRECTORS MEETING TODAY, WE HAVE CONCLUDED TO IMMEDIATELY ISSUE YOU AS SOON AS POSSIBLE, 
-
-AND YOUR VALUE SUM HAS BEEN CREDITED INTO YOUR (ATM) VISA CARD ACCOUNT. WHICH YOU WILL USE TO WITHDRAW YOUR FUND IN ANY PART OF THE WORLD, WE HAVE ISSUED AND CREDITED YOUR (ATM) CARD IN YOUR NAME TODAY,
-
-YOUR (ATM) WILL BE INSURE BY THE INSURANCE COMPANY AND SEND TO YOU THROUGH ANY AVAILABLE COURIER COMPANY OF OUR CHOICE.
-
-ONCE AGAIN CONGRATULATIONS TO YOU,
-
-DIRECTOR DHL SERVICE,
-THANKS,
-SINCERELY.
-
+>  virt/kvm/arm/pmu.c | 22 ++++++++++++----------
+>  1 file changed, 12 insertions(+), 10 deletions(-)
+> 
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 362a01886bab..c30c3a74fc7f 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -146,8 +146,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>  	if (kvm_pmu_pmc_is_chained(pmc) &&
+>  	    kvm_pmu_idx_is_high_counter(select_idx))
+>  		counter = upper_32_bits(counter);
+> -
+> -	else if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
+> +	else if (select_idx != ARMV8_PMU_CYCLE_IDX)
+>  		counter = lower_32_bits(counter);
+>  
+>  	return counter;
+> @@ -193,7 +192,7 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+>   */
+>  static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>  {
+> -	u64 counter, reg;
+> +	u64 counter, reg, val;
+>  
+>  	pmc = kvm_pmu_get_canonical_pmc(pmc);
+>  	if (!pmc->perf_event)
+> @@ -201,16 +200,19 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>  
+>  	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+>  
+> -	if (kvm_pmu_pmc_is_chained(pmc)) {
+> -		reg = PMEVCNTR0_EL0 + pmc->idx;
+> -		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
+> -		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
+> +	if (pmc->idx == ARMV8_PMU_CYCLE_IDX) {
+> +		reg = PMCCNTR_EL0;
+> +		val = counter;
+>  	} else {
+> -		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> -		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+> -		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
+> +		reg = PMEVCNTR0_EL0 + pmc->idx;
+> +		val = lower_32_bits(counter);
+>  	}
+>  
+> +	__vcpu_sys_reg(vcpu, reg) = val;
+> +
+> +	if (kvm_pmu_pmc_is_chained(pmc))
+> +		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
+> +
+>  	kvm_pmu_release_perf_event(pmc);
+>  }
+>  
+> -- 
+> 2.20.1
+> 
