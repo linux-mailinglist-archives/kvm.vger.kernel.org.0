@@ -2,151 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84FE2CDE5B
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 11:43:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1EBBCDE86
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 11:56:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727355AbfJGJnb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 05:43:31 -0400
-Received: from foss.arm.com ([217.140.110.172]:58612 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727103AbfJGJna (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Oct 2019 05:43:30 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CE99015BE;
-        Mon,  7 Oct 2019 02:43:29 -0700 (PDT)
-Received: from localhost (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 51FC03F68E;
-        Mon,  7 Oct 2019 02:43:29 -0700 (PDT)
-Date:   Mon, 7 Oct 2019 10:43:27 +0100
-From:   Andrew Murray <andrew.murray@arm.com>
-To:     maz@kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: pmu: Reset sample period on overflow
- handling
-Message-ID: <20191007094325.GX42880@e119886-lin.cambridge.arm.com>
-References: <20191006104636.11194-1-maz@kernel.org>
- <20191006104636.11194-4-maz@kernel.org>
+        id S1727355AbfJGJ4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 05:56:39 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55367 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727347AbfJGJ4j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Oct 2019 05:56:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1570442197;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JGCddKS718FipsNyp6Li0RaGymGo1SIlI0BWkQKGgdk=;
+        b=RAaekNza/Y5pwbfBEtFlBIE6wUSbmGfqZ+8U1yuT9cKk0tGN3Sh3IoiV7Bx6QlYyFThOVx
+        tl29aW5VSsN14+85DO7gjSdTBUfVAWhrkR2/LKAA+5Ch6SHKCTnvCausqPI43e/+zocKOn
+        GkhF/JsP5kBy05hPl4z1nWL8/1PXkAk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-OzOJIsdyMsihvVyZ5KZGsA-1; Mon, 07 Oct 2019 05:56:35 -0400
+Received: by mail-wr1-f72.google.com with SMTP id j7so5487510wrx.14
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2019 02:56:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=urt/KbjJhYcqSFQ63RnNBAJj2B/Our2AbfxPZ2gH52U=;
+        b=at6ACvRriEltBCqk/wnc/gkwEGy7IYrD9gjm116vdLVFaUy1mB80Sa0eXpXYN1VEF4
+         TLzo7KMMRpe3KQot3byN0oIEbZ8Q/JUdmgXF++tgYoc3HbEKTrNYY3UcMOMoxKnyBu3E
+         CKRtGTXM7Sj9amjls7szbBvwk0EUhw6F/i3EOGUsdA3CP6oGKaSpgupegg3YjDaKY9Br
+         I1RSgEw037wsdnIFPnO8SGcbw2vH+gVl5AIgSwKC+Q2lDbIVPitRyjRtWBKmuO5PVgF1
+         IoKd1/nqB72C7CmTGlzpLWiuuvhVM4q3B/kDtNRSN+9s+Lzsp5oMviMrUu+LjrgbezZj
+         285g==
+X-Gm-Message-State: APjAAAXIr0BmFjfu0uapuWuqheONa4HVyy6W/oNTOGFyKt0ZkTe5ChMT
+        tVaK7EUaqUA1ZVfldDAk9YlKOdln+TaRRtCMwEOpBT3qvPGeS9wTLMJfcpqgm74HGZciccnX+fi
+        6WqVf1eT9SeUA
+X-Received: by 2002:adf:fa0e:: with SMTP id m14mr16747232wrr.11.1570442194415;
+        Mon, 07 Oct 2019 02:56:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz/QTDsxrozaHomcYJqEjutSznmkT5BmfHMBnH0Ov6V8bBAITHDVDRdMgzoANgHUE4PNehwPw==
+X-Received: by 2002:adf:fa0e:: with SMTP id m14mr16747218wrr.11.1570442194188;
+        Mon, 07 Oct 2019 02:56:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9dd9:ce92:89b5:d1f2? ([2001:b07:6468:f312:9dd9:ce92:89b5:d1f2])
+        by smtp.gmail.com with ESMTPSA id l11sm16433892wmh.34.2019.10.07.02.56.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Oct 2019 02:56:33 -0700 (PDT)
+Subject: Re: [PATCH] kvm: x86: Expose RDPID in KVM_GET_SUPPORTED_CPUID
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+References: <20191004202247.179660-1-jmattson@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c562a64d-baf3-42f6-3a97-0dc0a5918127@redhat.com>
+Date:   Mon, 7 Oct 2019 11:56:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191006104636.11194-4-maz@kernel.org>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+In-Reply-To: <20191004202247.179660-1-jmattson@google.com>
+Content-Language: en-US
+X-MC-Unique: OzOJIsdyMsihvVyZ5KZGsA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 06, 2019 at 11:46:36AM +0100, maz@kernel.org wrote:
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> The PMU emulation code uses the perf event sample period to trigger
-> the overflow detection. This works fine  for the *first* overflow
-> handling
-
-Although, even though the first overflow is timed correctly, the value
-the guest reads may be wrong...
-
-Assuming a Linux guest with the arm_pmu.c driver, if I recall correctly
-this writes the -remainingperiod to the counter upon stopping/starting.
-In the case of a perf_event that is pinned to a task, this will happen
-upon every context switch of that task. If the counter was getting close
-to overflow before the context switch, then the value written to the
-guest counter will be very high and thus the sample_period written in KVM
-will be very low...
-
-The best scenario is when the host handles the overflow, the guest
-handles its overflow and rewrites the guest counter (resulting in a new
-host perf_event) - all before the first host perf_event fires again. This
-is clearly the assumption the code makes.
-
-Or - the host handles its overflow and kicks the guest, but the guest
-doesn't respond in time, so we end up endlessly and pointlessly kicking it
-for each host overflow - thus resulting in the large difference between number
-of interrupts between host and guest. This isn't ideal, because when the
-guest does read its counter, the value isn't correct (because it overflowed
-a zillion times at a value less than the arrchitected max).
-
-Worse still is when the sample_period is so small, the host doesn't
-even keep up.
-
-> , but results in a huge number of interrupts on the host,
-> unrelated to the number of interrupts handled in the guest (a x20
-> factor is pretty common for the cycle counter). On a slow system
-> (such as a SW model), this can result in the guest only making
-> forward progress at a glacial pace.
-> 
-> It turns out that the clue is in the name. The sample period is
-> exactly that: a period. And once the an overflow has occured,
-> the following period should be the full width of the associated
-> counter, instead of whatever the guest had initially programed.
-> 
-> Reset the sample period to the architected value in the overflow
-> handler, which now results in a number of host interrupts that is
-> much closer to the number of interrupts in the guest.
-
-This seems a reasonable pragmatic approach - though of course you will end
-up counting slightly slower due to the host interrupt latency. But that's
-better than the status quo.
-
-It may be possible with perf to have a single-fire counter (this mitigates
-against my third scenario but you still end up with a loss of precision) -
-See PERF_EVENT_IOC_REFRESH.
-
-Ideally the PERF_EVENT_IOC_REFRESH type of functionality could be updated
-to reload to a different value after the first hit.
-
-This problem also exists on arch/x86/kvm/pmu.c (though I'm not sure what
-their PMU drivers do with respect to the value they write).
-
-> 
-> Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On 04/10/19 22:22, Jim Mattson wrote:
+> When the RDPID instruction is supported on the host, enumerate it in
+> KVM_GET_SUPPORTED_CPUID.
+>=20
+> Signed-off-by: Jim Mattson <jmattson@google.com>
 > ---
->  virt/kvm/arm/pmu.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index c30c3a74fc7f..3ca4761fc0f5 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -444,6 +444,18 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
->  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
->  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
->  	int idx = pmc->idx;
-> +	u64 val, period;
-> +
-> +	/* Start by resetting the sample period to the architectural limit */
-> +	val = kvm_pmu_get_pair_counter_value(vcpu, pmc);
-> +
-> +	if (kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+>  arch/x86/kvm/cpuid.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 9c5029cf6f3f..f68c0c753c38 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -363,7 +363,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_e=
+ntry2 *entry, int index)
+> =20
+>  =09/* cpuid 7.0.ecx*/
+>  =09const u32 kvm_cpuid_7_0_ecx_x86_features =3D
+> -=09=09F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ |
+> +=09=09F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
+>  =09=09F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+>  =09=09F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+>  =09=09F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/;
+>=20
 
-This is correct, because in this case we *do* care about _PMCR_LC.
+Queued, thanks.
 
-> +		period = (-val) & GENMASK(63, 0);
-> +	else
-> +		period = (-val) & GENMASK(31, 0);
-> +
-> +	pmc->perf_event->attr.sample_period = period;
-> +	pmc->perf_event->hw.sample_period = period;
+Paolo
 
-I'm not sure about the above line - does direct manipulation of sample_period
-work on a running perf event? As far as I can tell this is already done in the
-kernel with __perf_event_period - however this also does other stuff (such as
-disable and re-enable the event).
-
->  
-
-Thanks,
-
-Andrew Murray
-
->  	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
->  
-> -- 
-> 2.20.1
-> 
