@@ -2,84 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3450ECEA5A
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 19:13:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28BB3CEA69
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 19:17:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728796AbfJGRNg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 13:13:36 -0400
-Received: from mga03.intel.com ([134.134.136.65]:19108 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728028AbfJGRNg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Oct 2019 13:13:36 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Oct 2019 10:13:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,268,1566889200"; 
-   d="scan'208";a="206457829"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 07 Oct 2019 10:13:34 -0700
-Date:   Mon, 7 Oct 2019 10:13:33 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH 09/16] x86/vmx: Introduce VMX_FEATURES_*
-Message-ID: <20191007171333.GE18016@linux.intel.com>
-References: <20191004215615.5479-1-sean.j.christopherson@intel.com>
- <20191004215615.5479-10-sean.j.christopherson@intel.com>
- <149d4422-b955-9118-e7df-e135075ad490@redhat.com>
+        id S1728323AbfJGRRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 13:17:43 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:41004 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727970AbfJGRRn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 7 Oct 2019 13:17:43 -0400
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iHWdf-0006c7-Lx; Mon, 07 Oct 2019 19:17:39 +0200
+Date:   Mon, 7 Oct 2019 18:17:38 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Murray <andrew.murray@arm.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: pmu: Reset sample period on overflow
+ handling
+Message-ID: <20191007181738.1b39ded9@why>
+In-Reply-To: <20191007130457.GZ42880@e119886-lin.cambridge.arm.com>
+References: <20191006104636.11194-1-maz@kernel.org>
+        <20191006104636.11194-4-maz@kernel.org>
+        <20191007094325.GX42880@e119886-lin.cambridge.arm.com>
+        <86sgo4zv9a.wl-maz@kernel.org>
+        <20191007130457.GZ42880@e119886-lin.cambridge.arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <149d4422-b955-9118-e7df-e135075ad490@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, julien.thierry.kdev@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 07, 2019 at 07:08:28PM +0200, Paolo Bonzini wrote:
-> On 04/10/19 23:56, Sean Christopherson wrote:
-> > +#define VMX_FEATURE_RDSEED_EXITING	( 2*32+ 16) /* "" VM-Exit on RDSEED */
-> > +#define VMX_FEATURE_PAGE_MOD_LOGGING	( 2*32+ 17) /* "pml" Log dirty pages into buffer */
-> > +#define VMX_FEATURE_EPT_VIOLATION_VE	( 2*32+ 18) /* "" Conditionally reflect EPT violations as #VE exceptions */
-> > +#define VMX_FEATURE_PT_CONCEAL_VMX	( 2*32+ 19) /* "" Suppress VMX indicators in Processor Trace */
-> > +#define VMX_FEATURE_XSAVES		( 2*32+ 20) /* "" Enable XSAVES and XRSTORS in guest */
-> > +#define VMX_FEATURE_RESERVED_PIN_21	( 2*32+ 21) /* "" Reserved */
-> > +#define VMX_FEATURE_MODE_BASED_EPT_EXEC	( 2*32+ 22) /* Enable separate EPT EXEC bits for supervisor vs. user */
-> > +#define VMX_FEATURE_RESERVED_PIN_23	( 2*32+ 23) /* "" Reserved */
-> > +#define VMX_FEATURE_PT_USE_GPA		( 2*32+ 24) /* "" Processor Trace logs GPAs */
-> > +#define VMX_FEATURE_TSC_SCALING		( 2*32+ 25) /* Scale hardware TSC when read in guest */
-> > +#define VMX_FEATURE_RESERVED_PIN_26	( 2*32+ 26) /* "" Reserved */
-> > +#define VMX_FEATURE_RESERVED_PIN_27	( 2*32+ 27) /* "" Reserved */
-> > +#define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
-> > +#define VMX_FEATURE_RESERVED_PIN_29	( 2*32+ 29) /* "" Reserved */
-> > +#define VMX_FEATURE_RESERVED_PIN_30	( 2*32+ 30) /* "" Reserved */
-> > +#define VMX_FEATURE_RESERVED_PIN_31	( 2*32+ 31) /* "" Reserved */
-> 
-> Pasto on the reserved bit names, but in general why is it useful to
-> define them?
+On Mon, 7 Oct 2019 14:04:58 +0100
+Andrew Murray <andrew.murray@arm.com> wrote:
 
-Doh.  It was mostly so that I could more easily cross-reference the SDM
-and visually see that I wasn't skipping bits.  No argument from me if it'd
-be preferably to omit them.
+> On Mon, Oct 07, 2019 at 11:48:33AM +0100, Marc Zyngier wrote:
+> > On Mon, 07 Oct 2019 10:43:27 +0100,
+> > Andrew Murray <andrew.murray@arm.com> wrote:  
+> > > 
+> > > On Sun, Oct 06, 2019 at 11:46:36AM +0100, maz@kernel.org wrote:  
+> > > > From: Marc Zyngier <maz@kernel.org>
+> > > > 
+> > > > The PMU emulation code uses the perf event sample period to trigger
+> > > > the overflow detection. This works fine  for the *first* overflow
+> > > > handling  
+> > > 
+> > > Although, even though the first overflow is timed correctly, the value
+> > > the guest reads may be wrong...
+> > > 
+> > > Assuming a Linux guest with the arm_pmu.c driver, if I recall correctly
+> > > this writes the -remainingperiod to the counter upon stopping/starting.
+> > > In the case of a perf_event that is pinned to a task, this will happen
+> > > upon every context switch of that task. If the counter was getting close
+> > > to overflow before the context switch, then the value written to the
+> > > guest counter will be very high and thus the sample_period written in KVM
+> > > will be very low...
+> > > 
+> > > The best scenario is when the host handles the overflow, the guest
+> > > handles its overflow and rewrites the guest counter (resulting in a new
+> > > host perf_event) - all before the first host perf_event fires again. This
+> > > is clearly the assumption the code makes.
+> > > 
+> > > Or - the host handles its overflow and kicks the guest, but the guest
+> > > doesn't respond in time, so we end up endlessly and pointlessly kicking it
+> > > for each host overflow - thus resulting in the large difference between number
+> > > of interrupts between host and guest. This isn't ideal, because when the
+> > > guest does read its counter, the value isn't correct (because it overflowed
+> > > a zillion times at a value less than the arrchitected max).
+> > > 
+> > > Worse still is when the sample_period is so small, the host doesn't
+> > > even keep up.  
+> > 
+> > Well, there are plenty of ways to make this code go mad. The
+> > overarching reason is that we abuse the notion of sampling period to
+> > generate interrupts, while what we'd really like is something that
+> > says "call be back in that many events", rather than the sampling
+> > period which doesn't match the architecture.
+> > 
+> > Yes, small values will results in large drifts. Nothing we can do
+> > about it.
+> >   
+> > >   
+> > > > , but results in a huge number of interrupts on the host,
+> > > > unrelated to the number of interrupts handled in the guest (a x20
+> > > > factor is pretty common for the cycle counter). On a slow system
+> > > > (such as a SW model), this can result in the guest only making
+> > > > forward progress at a glacial pace.
+> > > > 
+> > > > It turns out that the clue is in the name. The sample period is
+> > > > exactly that: a period. And once the an overflow has occured,
+> > > > the following period should be the full width of the associated
+> > > > counter, instead of whatever the guest had initially programed.
+> > > > 
+> > > > Reset the sample period to the architected value in the overflow
+> > > > handler, which now results in a number of host interrupts that is
+> > > > much closer to the number of interrupts in the guest.  
+> > > 
+> > > This seems a reasonable pragmatic approach - though of course you will end
+> > > up counting slightly slower due to the host interrupt latency. But that's
+> > > better than the status quo.  
+> > 
+> > Slower than what?
+> >   
+> 
+> Slower than the guest should expect. Assuming a cycle counter (with LC) is
+> initially programmed to 0, you'd target a guest interrupt period of 2^64 x cycle
+> period...
+
+What is exactly what is expected, isn't it?
+
+> But I'm wrong in saying that you end up counting slightly slower - as you're
+> not restarting the perf counter or changing the value so there should be no change
+> in the interrupt period to the guest.
+> 
+> I was considering the case where the kernel perf event is recreated in the
+> overflow handler, in which case unless you consider the time elapsed between the
+> event firing and changing the sample_period then you end up with a larger period.
+
+The only thing that changes is the point at which the next period will
+end, matching the expected overflow.
+
+> > > 
+> > > It may be possible with perf to have a single-fire counter (this mitigates
+> > > against my third scenario but you still end up with a loss of precision) -
+> > > See PERF_EVENT_IOC_REFRESH.  
+> > 
+> > Unfortunately, that's a userspace interface, not something that's
+> > available to the kernel at large...  
+> 
+> The mechanism to change the value of event->event_limit is only available via
+> ioctl, though I was implying that an in-kernel mechansim could be provided.
+> This would be trivial. (But it doesn't help, as I don't think you could create
+> another perf kernel event in that context).
+>  
+> >   
+> > > Ideally the PERF_EVENT_IOC_REFRESH type of functionality could be updated
+> > > to reload to a different value after the first hit.  
+> > 
+> > Which is what I was hinting at above. I'd like a way to reload the
+> > next period on each expiration, much like a timer.
+> >   
+> > > 
+> > > This problem also exists on arch/x86/kvm/pmu.c (though I'm not sure what
+> > > their PMU drivers do with respect to the value they write).
+> > >   
+> > > > 
+> > > > Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
+> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > ---
+> > > >  virt/kvm/arm/pmu.c | 12 ++++++++++++
+> > > >  1 file changed, 12 insertions(+)
+> > > > 
+> > > > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > > > index c30c3a74fc7f..3ca4761fc0f5 100644
+> > > > --- a/virt/kvm/arm/pmu.c
+> > > > +++ b/virt/kvm/arm/pmu.c
+> > > > @@ -444,6 +444,18 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+> > > >  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+> > > >  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> > > >  	int idx = pmc->idx;
+> > > > +	u64 val, period;
+> > > > +
+> > > > +	/* Start by resetting the sample period to the architectural limit */
+> > > > +	val = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> > > > +
+> > > > +	if (kvm_pmu_idx_is_64bit(vcpu, pmc->idx))  
+> > > 
+> > > This is correct, because in this case we *do* care about _PMCR_LC.
+> > >   
+> > > > +		period = (-val) & GENMASK(63, 0);
+> > > > +	else
+> > > > +		period = (-val) & GENMASK(31, 0);
+> > > > +
+> > > > +	pmc->perf_event->attr.sample_period = period;
+> > > > +	pmc->perf_event->hw.sample_period = period;  
+> > > 
+> > > I'm not sure about the above line - does direct manipulation of sample_period
+> > > work on a running perf event? As far as I can tell this is already done in the
+> > > kernel with __perf_event_period - however this also does other stuff (such as
+> > > disable and re-enable the event).  
+> > 
+> > I'm not sure you could do that in the handler, which is run in atomic
+> > context. It doesn't look like anything bad happens when updating the
+> > sample period directly (the whole thing has stopped getting crazy),
+> > but I'd really like someone who understands the perf internals to help
+> > here (hence Mark being on cc).  
+> 
+> I suspect this is working lazily - when you want to change the underlying pmu
+> period, you need to write the new period to the host PMU counters. This is done
+> in armpmu_start. __perf_event_period would normally stop and then start the
+> PMU to achieve this (hence the PERF_EF_RELOAD flag). Your code doesn't do this.
+
+And yet I don't get these extra interrupts, so something must be
+happening.
+
+> However, the perf counter set up in KVM is always pinned to the guest process
+> and thus when switching to/from this task the counter are stopped and started.
+> Therefore I suspect the sample_period you change goes into effect at this point
+> in time. So it probably stops going crazy - but not immediately.
+
+Fair enough. I wonder if we can tell perf to always stop the event
+before calling the handler, and resume it on return from the handler.
+
+> I think the underlying counter also gets reset to the new period just before it
+> calls perf_event_overflow (see armv8pmu_handle_irq) - so worse case you'll wait
+> until it overflows for the second time.
+> 
+> In any case this is still better than the status quo.
+
+Well, I'd still like to have something that is in line with the perf
+usage model... It's been broken forever, so I guess it can wait another
+few weeks to be correctly solved.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
