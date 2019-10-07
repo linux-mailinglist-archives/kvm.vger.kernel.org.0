@@ -2,235 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 28BB3CEA69
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 19:17:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2343CCEA71
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 19:20:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728323AbfJGRRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 13:17:43 -0400
-Received: from inca-roads.misterjones.org ([213.251.177.50]:41004 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727970AbfJGRRn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 7 Oct 2019 13:17:43 -0400
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
-        (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1iHWdf-0006c7-Lx; Mon, 07 Oct 2019 19:17:39 +0200
-Date:   Mon, 7 Oct 2019 18:17:38 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Murray <andrew.murray@arm.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: pmu: Reset sample period on overflow
- handling
-Message-ID: <20191007181738.1b39ded9@why>
-In-Reply-To: <20191007130457.GZ42880@e119886-lin.cambridge.arm.com>
-References: <20191006104636.11194-1-maz@kernel.org>
-        <20191006104636.11194-4-maz@kernel.org>
-        <20191007094325.GX42880@e119886-lin.cambridge.arm.com>
-        <86sgo4zv9a.wl-maz@kernel.org>
-        <20191007130457.GZ42880@e119886-lin.cambridge.arm.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1728132AbfJGRUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 13:20:30 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:39302 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727801AbfJGRUa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Oct 2019 13:20:30 -0400
+Received: by mail-io1-f67.google.com with SMTP id a1so30349345ioc.6;
+        Mon, 07 Oct 2019 10:20:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zItQYDcvuHTLB/BG0kFpgFOOl/Cp+I0Y+DHKlQs1lYU=;
+        b=I0iPOmF+k+2yO4TMQjpDoZQfvAhNOQTqgIPUgeuyJvaThkfuPfzbim04FoSJXKogSP
+         Jb0O4ZUlhQsFdpmMi4127L5WlT1Xd1U3IO+aKKHd70Dl67msenwA9xNctmhdugusomDz
+         Gsb1SJrdmr429R7f8MPvt0DnmiyXO46k8B0Y4KeW7wxHlOF6bO/olmpicy2rJNKGQaSU
+         RrKR7wOqJsLZAXnAY4BgZYjWMx9i5G5G2YGgUDFJFQItLKlLG3NZalUOgkuDR6skr/wK
+         ST0fbqX+2duPJSjaWV1z2MHtkw7DTWLSGXvuk1UGEoNdBPjfs9MY2uVyW58ojqmGO3cl
+         i9wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zItQYDcvuHTLB/BG0kFpgFOOl/Cp+I0Y+DHKlQs1lYU=;
+        b=cP0RVW48mcDR/4pwCWL71E2I/WUNXuWEd7oNR/MkNydyJ9mcun19PHKWVn3FzLDwiq
+         6NHopbAiX/vi65ATKW6ixR4XgcrOcVS5B0raxwfVQN/9JDC2sTgoDpkwfsAapCSUvsDD
+         M3YwFzkE5MrNzy23u1r5zxmTpNx0XJ3/k4spCnjCxiY5tXPGrD8ayCLf1VwBy4Cpnf3w
+         ujN2waoMoJQdXfn3RYmysURNg3bvMAmfjzH10OAifYzdbeinta7IHf/skysa/eEHF044
+         Sfa3Jpn0EqftuLTRFSaTITXCNE7Y6JM6BCK6ZiBiAsLL026aGHCQs6czOlVs3i5/kM++
+         2xaA==
+X-Gm-Message-State: APjAAAV3zS/k848v6zQhyZo9ZpQo8T64uBnm8v/BiJY95D+ZrtrEPrM9
+        3jXL5fOgd4mydjUeuqF0ArKWU8hFvR7ylZLDqqs=
+X-Google-Smtp-Source: APXvYqzVBCxbJEjsyVorehVQUCUTbGDBtTHgmBnWns/gS1UhilxPENaIY0/ENbnzBxwHI9LKPVOdtVMRBAxqzJChoiI=
+X-Received: by 2002:a6b:720a:: with SMTP id n10mr24641643ioc.64.1570468828721;
+ Mon, 07 Oct 2019 10:20:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: andrew.murray@arm.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, julien.thierry.kdev@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+References: <20191001152441.27008.99285.stgit@localhost.localdomain>
+ <7233498c-2f64-d661-4981-707b59c78fd5@redhat.com> <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
+ <8bd303a6-6e50-b2dc-19ab-4c3f176c4b02@redhat.com> <CAKgT0Uf37xAFK2CWqUZJgn7bWznSAi6qncLxBpC55oSpBMG1HQ@mail.gmail.com>
+ <c06b68cb-5e94-ae3e-f84e-48087d675a8f@redhat.com> <CAKgT0Ud6TT=XxqFx6ePHzbUYqMp5FHVPozRvnNZK3tKV7j2xjg@mail.gmail.com>
+ <0a16b11e-ec3b-7196-5b7f-e7395876cf28@redhat.com> <d96f744d2c48f5a96c6962c6a0a89d2429e5cab8.camel@linux.intel.com>
+ <7fc13837-546c-9c4a-1456-753df199e171@redhat.com> <5b6e0b6df46c03bfac906313071ac0362d43c432.camel@linux.intel.com>
+ <c2fd074b-1c86-cd93-41ea-ae1a6b2ca841@redhat.com>
+In-Reply-To: <c2fd074b-1c86-cd93-41ea-ae1a6b2ca841@redhat.com>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Mon, 7 Oct 2019 10:20:17 -0700
+Message-ID: <CAKgT0Uecy96y-bOj4TpXBxSwJhn3jaCtGjD2+Zswh9gN7i+Otg@mail.gmail.com>
+Subject: Re: [PATCH v11 0/6] mm / virtio: Provide support for unused page reporting
+To:     Nitesh Narayan Lal <nitesh@redhat.com>
+Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        David Hildenbrand <david@redhat.com>,
+        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Oscar Salvador <osalvador@suse.de>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 7 Oct 2019 14:04:58 +0100
-Andrew Murray <andrew.murray@arm.com> wrote:
+On Mon, Oct 7, 2019 at 10:07 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+>
+>
+> On 10/7/19 12:27 PM, Alexander Duyck wrote:
+> > On Mon, 2019-10-07 at 12:19 -0400, Nitesh Narayan Lal wrote:
+> >> On 10/7/19 11:33 AM, Alexander Duyck wrote:
+> >>> On Mon, 2019-10-07 at 08:29 -0400, Nitesh Narayan Lal wrote:
+> >>>> On 10/2/19 10:25 AM, Alexander Duyck wrote:
 
-> On Mon, Oct 07, 2019 at 11:48:33AM +0100, Marc Zyngier wrote:
-> > On Mon, 07 Oct 2019 10:43:27 +0100,
-> > Andrew Murray <andrew.murray@arm.com> wrote:  
-> > > 
-> > > On Sun, Oct 06, 2019 at 11:46:36AM +0100, maz@kernel.org wrote:  
-> > > > From: Marc Zyngier <maz@kernel.org>
-> > > > 
-> > > > The PMU emulation code uses the perf event sample period to trigger
-> > > > the overflow detection. This works fine  for the *first* overflow
-> > > > handling  
-> > > 
-> > > Although, even though the first overflow is timed correctly, the value
-> > > the guest reads may be wrong...
-> > > 
-> > > Assuming a Linux guest with the arm_pmu.c driver, if I recall correctly
-> > > this writes the -remainingperiod to the counter upon stopping/starting.
-> > > In the case of a perf_event that is pinned to a task, this will happen
-> > > upon every context switch of that task. If the counter was getting close
-> > > to overflow before the context switch, then the value written to the
-> > > guest counter will be very high and thus the sample_period written in KVM
-> > > will be very low...
-> > > 
-> > > The best scenario is when the host handles the overflow, the guest
-> > > handles its overflow and rewrites the guest counter (resulting in a new
-> > > host perf_event) - all before the first host perf_event fires again. This
-> > > is clearly the assumption the code makes.
-> > > 
-> > > Or - the host handles its overflow and kicks the guest, but the guest
-> > > doesn't respond in time, so we end up endlessly and pointlessly kicking it
-> > > for each host overflow - thus resulting in the large difference between number
-> > > of interrupts between host and guest. This isn't ideal, because when the
-> > > guest does read its counter, the value isn't correct (because it overflowed
-> > > a zillion times at a value less than the arrchitected max).
-> > > 
-> > > Worse still is when the sample_period is so small, the host doesn't
-> > > even keep up.  
-> > 
-> > Well, there are plenty of ways to make this code go mad. The
-> > overarching reason is that we abuse the notion of sampling period to
-> > generate interrupts, while what we'd really like is something that
-> > says "call be back in that many events", rather than the sampling
-> > period which doesn't match the architecture.
-> > 
-> > Yes, small values will results in large drifts. Nothing we can do
-> > about it.
-> >   
-> > >   
-> > > > , but results in a huge number of interrupts on the host,
-> > > > unrelated to the number of interrupts handled in the guest (a x20
-> > > > factor is pretty common for the cycle counter). On a slow system
-> > > > (such as a SW model), this can result in the guest only making
-> > > > forward progress at a glacial pace.
-> > > > 
-> > > > It turns out that the clue is in the name. The sample period is
-> > > > exactly that: a period. And once the an overflow has occured,
-> > > > the following period should be the full width of the associated
-> > > > counter, instead of whatever the guest had initially programed.
-> > > > 
-> > > > Reset the sample period to the architected value in the overflow
-> > > > handler, which now results in a number of host interrupts that is
-> > > > much closer to the number of interrupts in the guest.  
-> > > 
-> > > This seems a reasonable pragmatic approach - though of course you will end
-> > > up counting slightly slower due to the host interrupt latency. But that's
-> > > better than the status quo.  
-> > 
-> > Slower than what?
-> >   
-> 
-> Slower than the guest should expect. Assuming a cycle counter (with LC) is
-> initially programmed to 0, you'd target a guest interrupt period of 2^64 x cycle
-> period...
+<snip>
 
-What is exactly what is expected, isn't it?
+> >>>> page_reporting.c change:
+> >>>> @@ -101,8 +101,12 @@ static void scan_zone_bitmap(struct page_reporting_config
+> >>>> *phconf,
+> >>>>                 /* Process only if the page is still online */
+> >>>>                 page = pfn_to_online_page((setbit << PAGE_REPORTING_MIN_ORDER) +
+> >>>>                                           zone->base_pfn);
+> >>>> -               if (!page)
+> >>>> +               if (!page || !PageBuddy(page)) {
+> >>>> +                       clear_bit(setbit, zone->bitmap);
+> >>>> +                       atomic_dec(&zone->free_pages);
+> >>>>                         continue;
+> >>>> +               }
+> >>>>
+> >>> I suspect the zone->free_pages is going to be expensive for you to deal
+> >>> with. It is a global atomic value and is going to have the cacheline
+> >>> bouncing that it is contained in. As a result thinks like setting the
+> >>> bitmap with be more expensive as every tome a CPU increments free_pages it
+> >>> will likely have to take the cache line containing the bitmap pointer as
+> >>> well.
+> >> I see I will have to explore this more. I am wondering if there is a way to
+> >> measure this If its effect is not visible in will-it-scale/page_fault1. If
+> >> there is a noticeable amount of degradation, I will have to address this.
+> > If nothing else you might look at seeing if you can split up the
+> > structures so that the bitmap and nr_bits is in a different region
+> > somewhere since those are read-mostly values.
+>
+> ok, I will try to understand the issue and your suggestion.
+> Thank you for bringing this up.
+>
+> > Also you are now updating the bitmap and free_pages both inside and
+> > outside of the zone lock so that will likely have some impact.
+>
+> So as per your previous suggestion, I have made the bitmap structure
+> object as a rcu protected pointer. So we are safe from that side.
+> The other downside which I can think of is a race where one page
+> trying to increment free_pages and other trying to decrements it.
+> However, being an atomic variable that should not be a problem.
+> Did I miss anything?
 
-> But I'm wrong in saying that you end up counting slightly slower - as you're
-> not restarting the perf counter or changing the value so there should be no change
-> in the interrupt period to the guest.
-> 
-> I was considering the case where the kernel perf event is recreated in the
-> overflow handler, in which case unless you consider the time elapsed between the
-> event firing and changing the sample_period then you end up with a larger period.
+I'm not so much worried about a race as the cache line bouncing
+effect. Basically your notifier combined within this hinting thread
+will likely result in more time spent by the thread that holds the
+lock since it will be trying to access the bitmap to set the bit and
+the free_pages to report the bit, but at the same time you will have
+this thread clearing bits and decrementing the free_pages values.
 
-The only thing that changes is the point at which the next period will
-end, matching the expected overflow.
+One thing you could consider in your worker thread would be to do
+reallocate and replace the bitmap every time you plan to walk it. By
+doing that you would avoid the cacheline bouncing on the bitmap since
+you would only have to read it, and you would no longer have another
+thread dirtying it. You could essentially reset the free_pages at the
+same time you replace the bitmap. It would need to all happen with the
+zone lock held though when you swap it out.
 
-> > > 
-> > > It may be possible with perf to have a single-fire counter (this mitigates
-> > > against my third scenario but you still end up with a loss of precision) -
-> > > See PERF_EVENT_IOC_REFRESH.  
-> > 
-> > Unfortunately, that's a userspace interface, not something that's
-> > available to the kernel at large...  
-> 
-> The mechanism to change the value of event->event_limit is only available via
-> ioctl, though I was implying that an in-kernel mechansim could be provided.
-> This would be trivial. (But it doesn't help, as I don't think you could create
-> another perf kernel event in that context).
->  
-> >   
-> > > Ideally the PERF_EVENT_IOC_REFRESH type of functionality could be updated
-> > > to reload to a different value after the first hit.  
-> > 
-> > Which is what I was hinting at above. I'd like a way to reload the
-> > next period on each expiration, much like a timer.
-> >   
-> > > 
-> > > This problem also exists on arch/x86/kvm/pmu.c (though I'm not sure what
-> > > their PMU drivers do with respect to the value they write).
-> > >   
-> > > > 
-> > > > Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  virt/kvm/arm/pmu.c | 12 ++++++++++++
-> > > >  1 file changed, 12 insertions(+)
-> > > > 
-> > > > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> > > > index c30c3a74fc7f..3ca4761fc0f5 100644
-> > > > --- a/virt/kvm/arm/pmu.c
-> > > > +++ b/virt/kvm/arm/pmu.c
-> > > > @@ -444,6 +444,18 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-> > > >  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
-> > > >  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> > > >  	int idx = pmc->idx;
-> > > > +	u64 val, period;
-> > > > +
-> > > > +	/* Start by resetting the sample period to the architectural limit */
-> > > > +	val = kvm_pmu_get_pair_counter_value(vcpu, pmc);
-> > > > +
-> > > > +	if (kvm_pmu_idx_is_64bit(vcpu, pmc->idx))  
-> > > 
-> > > This is correct, because in this case we *do* care about _PMCR_LC.
-> > >   
-> > > > +		period = (-val) & GENMASK(63, 0);
-> > > > +	else
-> > > > +		period = (-val) & GENMASK(31, 0);
-> > > > +
-> > > > +	pmc->perf_event->attr.sample_period = period;
-> > > > +	pmc->perf_event->hw.sample_period = period;  
-> > > 
-> > > I'm not sure about the above line - does direct manipulation of sample_period
-> > > work on a running perf event? As far as I can tell this is already done in the
-> > > kernel with __perf_event_period - however this also does other stuff (such as
-> > > disable and re-enable the event).  
-> > 
-> > I'm not sure you could do that in the handler, which is run in atomic
-> > context. It doesn't look like anything bad happens when updating the
-> > sample period directly (the whole thing has stopped getting crazy),
-> > but I'd really like someone who understands the perf internals to help
-> > here (hence Mark being on cc).  
-> 
-> I suspect this is working lazily - when you want to change the underlying pmu
-> period, you need to write the new period to the host PMU counters. This is done
-> in armpmu_start. __perf_event_period would normally stop and then start the
-> PMU to achieve this (hence the PERF_EF_RELOAD flag). Your code doesn't do this.
-
-And yet I don't get these extra interrupts, so something must be
-happening.
-
-> However, the perf counter set up in KVM is always pinned to the guest process
-> and thus when switching to/from this task the counter are stopped and started.
-> Therefore I suspect the sample_period you change goes into effect at this point
-> in time. So it probably stops going crazy - but not immediately.
-
-Fair enough. I wonder if we can tell perf to always stop the event
-before calling the handler, and resume it on return from the handler.
-
-> I think the underlying counter also gets reset to the new period just before it
-> calls perf_event_overflow (see armv8pmu_handle_irq) - so worse case you'll wait
-> until it overflows for the second time.
-> 
-> In any case this is still better than the status quo.
-
-Well, I'd still like to have something that is in line with the perf
-usage model... It's been broken forever, so I guess it can wait another
-few weeks to be correctly solved.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+- Alex
