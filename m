@@ -2,56 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11997CEA2E
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 19:08:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A70E8CEA3D
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 19:10:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729032AbfJGRI3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 13:08:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33710 "EHLO mx1.redhat.com"
+        id S1728941AbfJGRKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 13:10:15 -0400
+Received: from mga01.intel.com ([192.55.52.88]:15254 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728796AbfJGRI2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Oct 2019 13:08:28 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 40261811BF
-        for <kvm@vger.kernel.org>; Mon,  7 Oct 2019 17:08:28 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id i14so5958394wro.19
-        for <kvm@vger.kernel.org>; Mon, 07 Oct 2019 10:08:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4dMNikcs4E1Y6yKRSwkPQbM0//TiQDXUZcr0YM9OD1c=;
-        b=R79biPrgNimi7m7xshKEbkpXGCqL8zjcSspx5+Je9NlyRpqaCUjFTKIj4jhtGIUFG6
-         ZoQoEJw8fpVwj18SLNIGOso/x9UVSRQX+jxXrm9DjxIWIUlRC922UAUvZmBPeEH9scMs
-         ruyeg9oNN9+U+ZJVvvtKCgN298Jlas3mYlxX/uFBO9bf+1ry2MsBq1JRB2K6SMlPSc5R
-         /5wy7ttKPp5VANuE58rA7N/Q4DALDdkvT7TY4nvHQFLQYZJjq/WZ3v+efiTMSeQZOUy0
-         nk9UsWHZkTHKlxN776pKOSX4dny2DyBSzQlG08Ic7xeVamJN/Ll4kSd0Q0TB0N8jHDJi
-         sd4g==
-X-Gm-Message-State: APjAAAU3Em7YtNl3Jtp5P/v6myUzTveXDlIyHVIK0gis2Dd9cPJXXumV
-        rN692/y9RL/ESsBHBnz7+IoOjguC4Lnmxhvb+BUKFWSFpCxtRJkDVjzEpxUKpiVLrrFrkj61Ijt
-        ia0ilfj5ltOZc
-X-Received: by 2002:a1c:658a:: with SMTP id z132mr234261wmb.174.1570468106767;
-        Mon, 07 Oct 2019 10:08:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyl2zL9+JMyC3FnFxnpfwEeHdK9iIlPFdBf18ZjZZ5+fIVvZmESnuAYRAzXBT2rMkqUBPJFMg==
-X-Received: by 2002:a1c:658a:: with SMTP id z132mr234231wmb.174.1570468106497;
-        Mon, 07 Oct 2019 10:08:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9dd9:ce92:89b5:d1f2? ([2001:b07:6468:f312:9dd9:ce92:89b5:d1f2])
-        by smtp.gmail.com with ESMTPSA id 79sm330487wmb.7.2019.10.07.10.08.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Oct 2019 10:08:25 -0700 (PDT)
-Subject: Re: [PATCH 09/16] x86/vmx: Introduce VMX_FEATURES_*
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        id S1728048AbfJGRKO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Oct 2019 13:10:14 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Oct 2019 10:10:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,268,1566889200"; 
+   d="scan'208";a="368177334"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga005.jf.intel.com with ESMTP; 07 Oct 2019 10:10:13 -0700
+Date:   Mon, 7 Oct 2019 10:10:13 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
         Arnaldo Carvalho de Melo <acme@kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Mark Rutland <mark.rutland@arm.com>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Jiri Olsa <jolsa@redhat.com>,
@@ -63,43 +43,35 @@ Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         kvm@vger.kernel.org, linux-edac@vger.kernel.org,
         Borislav Petkov <bp@suse.de>,
         Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH 01/16] x86/intel: Initialize IA32_FEATURE_CONTROL MSR at
+ boot
+Message-ID: <20191007171013.GD18016@linux.intel.com>
 References: <20191004215615.5479-1-sean.j.christopherson@intel.com>
- <20191004215615.5479-10-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <149d4422-b955-9118-e7df-e135075ad490@redhat.com>
-Date:   Mon, 7 Oct 2019 19:08:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <20191004215615.5479-2-sean.j.christopherson@intel.com>
+ <afd37a28-d135-7c34-bd63-7c11099998bc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191004215615.5479-10-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <afd37a28-d135-7c34-bd63-7c11099998bc@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/10/19 23:56, Sean Christopherson wrote:
-> +#define VMX_FEATURE_RDSEED_EXITING	( 2*32+ 16) /* "" VM-Exit on RDSEED */
-> +#define VMX_FEATURE_PAGE_MOD_LOGGING	( 2*32+ 17) /* "pml" Log dirty pages into buffer */
-> +#define VMX_FEATURE_EPT_VIOLATION_VE	( 2*32+ 18) /* "" Conditionally reflect EPT violations as #VE exceptions */
-> +#define VMX_FEATURE_PT_CONCEAL_VMX	( 2*32+ 19) /* "" Suppress VMX indicators in Processor Trace */
-> +#define VMX_FEATURE_XSAVES		( 2*32+ 20) /* "" Enable XSAVES and XRSTORS in guest */
-> +#define VMX_FEATURE_RESERVED_PIN_21	( 2*32+ 21) /* "" Reserved */
-> +#define VMX_FEATURE_MODE_BASED_EPT_EXEC	( 2*32+ 22) /* Enable separate EPT EXEC bits for supervisor vs. user */
-> +#define VMX_FEATURE_RESERVED_PIN_23	( 2*32+ 23) /* "" Reserved */
-> +#define VMX_FEATURE_PT_USE_GPA		( 2*32+ 24) /* "" Processor Trace logs GPAs */
-> +#define VMX_FEATURE_TSC_SCALING		( 2*32+ 25) /* Scale hardware TSC when read in guest */
-> +#define VMX_FEATURE_RESERVED_PIN_26	( 2*32+ 26) /* "" Reserved */
-> +#define VMX_FEATURE_RESERVED_PIN_27	( 2*32+ 27) /* "" Reserved */
-> +#define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
-> +#define VMX_FEATURE_RESERVED_PIN_29	( 2*32+ 29) /* "" Reserved */
-> +#define VMX_FEATURE_RESERVED_PIN_30	( 2*32+ 30) /* "" Reserved */
-> +#define VMX_FEATURE_RESERVED_PIN_31	( 2*32+ 31) /* "" Reserved */
+On Mon, Oct 07, 2019 at 07:05:32PM +0200, Paolo Bonzini wrote:
+> On 04/10/19 23:56, Sean Christopherson wrote:
+> > Always lock IA32_FEATURE_CONTROL if it exists, even if the CPU doesn't
+> > support VMX, so that other existing and future kernel code that queries
+> > IA32_FEATURE_CONTROL can assume it's locked.
+> 
+> Possibly stupid question: why bother locking it?  It makes sense to lock
+> the MSR bits to _off_ in the firmware, but if the BIOS hasn't locked it,
+> why should the OS?
+> 
+> It seems to me that locking introduces a lot of complication.
 
-Pasto on the reserved bit names, but in general why is it useful to
-define them?
-
-Paolo
+None of the enable bits take effect until the MSR is locked.  If I had to
+guess, ucode likely goes and pokes the enabled features during the WRMSR
+with the lock bit set, as opposed to the relevant features querying the
+MSR value as needed (querying the MSR is likely slow).
