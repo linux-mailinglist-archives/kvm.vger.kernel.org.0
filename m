@@ -2,91 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EDF88CEBE4
-	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 20:30:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EEA0CED06
+	for <lists+kvm@lfdr.de>; Mon,  7 Oct 2019 21:54:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729501AbfJGSab (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 14:30:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59548 "EHLO mx1.redhat.com"
+        id S1729005AbfJGTyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 15:54:24 -0400
+Received: from mga14.intel.com ([192.55.52.115]:57605 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729495AbfJGSaa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Oct 2019 14:30:30 -0400
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9325F3CA1E
-        for <kvm@vger.kernel.org>; Mon,  7 Oct 2019 18:30:30 +0000 (UTC)
-Received: by mail-qt1-f197.google.com with SMTP id c8so16196222qtd.20
-        for <kvm@vger.kernel.org>; Mon, 07 Oct 2019 11:30:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=Veqvl+qM0CfutM3PPjJjEy4hKVrp4NP3ezEQkZHIQPg=;
-        b=qLOKFka1JgGhHV8PinCIX6TEuQunPcfjmiCoqSclrk2iFLvTOsidLDev5wWsvDTXfe
-         zMWEJEOpJyROOkj8ckjwV9sRO2wDfL62QB6D4BmeKf3SIuiDeB5SqsNuMV3b70+fmzBh
-         6R6NqTnIBPuuCzmcNveXLO9DnGUTkVUM5EAxLVjlyGCaC7z2zaxWJArsOMx+sMugMSJz
-         bCLVZ5vn8jMoBd0IFEWClaZncTYRUCij1/nqL+0fdumeHeX0lxc++MmS5PHkrWI5V0Sd
-         Veq0pFTpjY3nVNlaAINfNzs0a2NRZLlF9lohg3Rpt4cabYvrZwlwSR2wggm80Et4pic5
-         nstg==
-X-Gm-Message-State: APjAAAWB8bnjtJTb0XTlW9j17d/6sDHEcr69/kN5mKed7lTyZ51raVLn
-        8c1R9OiZ57nSAVw1hWkBQM1c/yzNrgDlEel49YPGR9mHcDtyjuhBW/6cG0IdVotnc1SBH74TTvS
-        ytksdBb9TCofC
-X-Received: by 2002:a37:8f86:: with SMTP id r128mr14609058qkd.392.1570473029368;
-        Mon, 07 Oct 2019 11:30:29 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx5hMQXVRiXUEyBzpDI1RwgrB4b7tr07l8zU3XqKSSML03JT2g+x+mug176n0y6vIeLAWA/TQ==
-X-Received: by 2002:a37:8f86:: with SMTP id r128mr14609014qkd.392.1570473029025;
-        Mon, 07 Oct 2019 11:30:29 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
-        by smtp.gmail.com with ESMTPSA id s50sm9515361qth.92.2019.10.07.11.30.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2019 11:30:28 -0700 (PDT)
-Date:   Mon, 7 Oct 2019 14:30:23 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH] vhost/test: stop device before reset
-Message-ID: <20191007183019.12522-1-mst@redhat.com>
+        id S1728187AbfJGTyY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Oct 2019 15:54:24 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Oct 2019 12:54:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,269,1566889200"; 
+   d="scan'208";a="199612480"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by FMSMGA003.fm.intel.com with ESMTP; 07 Oct 2019 12:54:22 -0700
+Date:   Mon, 7 Oct 2019 12:54:22 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
+        Borislav Petkov <bp@suse.de>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH 10/16] x86/cpu: Detect VMX features on Intel, Centaur and
+ Zhaoxin CPUs
+Message-ID: <20191007195422.GF18016@linux.intel.com>
+References: <20191004215615.5479-1-sean.j.christopherson@intel.com>
+ <20191004215615.5479-11-sean.j.christopherson@intel.com>
+ <f26580de-d423-3369-42f4-682824dd592d@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
+In-Reply-To: <f26580de-d423-3369-42f4-682824dd592d@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When device stop was moved out of reset, test device wasn't updated to
-stop before reset, this resulted in a use after free.  Fix by invoking
-stop appropriately.
+On Mon, Oct 07, 2019 at 07:11:24PM +0200, Paolo Bonzini wrote:
+> On 04/10/19 23:56, Sean Christopherson wrote:
+> > +	/*
+> > +	 * The high bits contain the allowed-1 settings, i.e. features that can
+> > +	 * be turned on.  The low bits contain the allowed-0 settings, i.e.
+> > +	 * features that can be turned off.  Ignore the allowed-0 settings,
+> > +	 * if a feature can be turned on then it's supported.
+> > +	 */
+> > +	rdmsr(MSR_IA32_VMX_PINBASED_CTLS, ign, supported);
+> 
+> For QEMU, we're defining a feature as supported if a feature can be
+> turned both on and off.  Since msr_low and msr_high can be defined
+> respectively as must-be-one and can-be-one, the features become
+> "msr_high & ~msr_low".
 
-Fixes: b211616d7125 ("vhost: move -net specific code out")
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/test.c | 2 ++
- 1 file changed, 2 insertions(+)
+That makes sense for Qemu, but I don't think it's appropriate for this
+type of reporting.  E.g. if EPT and Unrestricted Guest are must-be-one on
+a hypothetical (virtual) CPU, it'd be odd to not list them as a supported
+feature.
 
-diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-index 04edd8db62fc..e3a8e9db22cd 100644
---- a/drivers/vhost/test.c
-+++ b/drivers/vhost/test.c
-@@ -170,6 +170,7 @@ static int vhost_test_release(struct inode *inode, struct file *f)
- 
- 	vhost_test_stop(n, &private);
- 	vhost_test_flush(n);
-+	vhost_dev_stop(&n->dev);
- 	vhost_dev_cleanup(&n->dev);
- 	/* We do an extra flush before freeing memory,
- 	 * since jobs can re-queue themselves. */
-@@ -246,6 +247,7 @@ static long vhost_test_reset_owner(struct vhost_test *n)
- 	}
- 	vhost_test_stop(n, &priv);
- 	vhost_test_flush(n);
-+	vhost_dev_stop(&n->dev);
- 	vhost_dev_reset_owner(&n->dev, umem);
- done:
- 	mutex_unlock(&n->dev.mutex);
--- 
-MST
+For actual hardware (well, Intel hardware), as proposed it's a moot point.
+The only features that are must-be-one (even without "true" MSRs) and are
+documented in the SDM are CR3_LOAD_EXITING, CR3_STORE_EXITING,
+SAVE_DEBUG_CONTROLS, and LOAD_DEBUG_CONTROLS, none of which are reported
+in /proc/cpuinfo.
+
+> Also, shouldn't this use the "true" feature availability MSRs if available?
+
+Only if incorporating the "& ~msr_low" can-be-one logic.  If a feature is
+considered supported if it must-be-one or can-be-one then the true MSR and
+vanilla MSR will yield the same feature set.
+
+> 
+> Paolo
