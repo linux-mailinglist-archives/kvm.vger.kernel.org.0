@@ -2,402 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D057CFA54
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 14:48:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40FEBCFAAC
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 14:57:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730371AbfJHMst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Oct 2019 08:48:49 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60712 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730199AbfJHMst (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Oct 2019 08:48:49 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 6665B76A80E735CDFC6C;
-        Tue,  8 Oct 2019 20:48:45 +0800 (CST)
-Received: from [127.0.0.1] (10.133.224.57) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 8 Oct 2019
- 20:48:35 +0800
-Subject: Re: [PATCH v18 3/6] ACPI: Add APEI GHES table generation support
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     <peter.maydell@linaro.org>, <ehabkost@redhat.com>,
-        <kvm@vger.kernel.org>, <wanghaibin.wang@huawei.com>,
-        <mtosatti@redhat.com>, <linuxarm@huawei.com>,
-        <qemu-devel@nongnu.org>, <gengdongjiu@huawei.com>,
-        <shannon.zhaosl@gmail.com>, <qemu-arm@nongnu.org>,
-        <james.morse@arm.com>, <jonathan.cameron@huawei.com>,
-        <imammedo@redhat.com>, <pbonzini@redhat.com>, <xuwei5@huawei.com>,
-        <lersek@redhat.com>, <rth@twiddle.net>
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
- <20190906083152.25716-4-zhengxiang9@huawei.com>
- <20190927113018-mutt-send-email-mst@kernel.org>
- <b554117d-87c2-a469-d3fe-fc2444b33fcc@huawei.com>
- <20191008033417-mutt-send-email-mst@kernel.org>
-From:   Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <f5fe5853-b0f0-4d8a-75e9-3da647e810e6@huawei.com>
-Date:   Tue, 8 Oct 2019 20:48:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+        id S1730890AbfJHM5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Oct 2019 08:57:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6992 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730674AbfJHM5W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Oct 2019 08:57:22 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x98CvL06091343
+        for <kvm@vger.kernel.org>; Tue, 8 Oct 2019 08:57:21 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vgs8jv4ef-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 08 Oct 2019 08:57:19 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Tue, 8 Oct 2019 13:57:11 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 8 Oct 2019 13:57:10 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x98Cv8Ct47448312
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Oct 2019 12:57:08 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6DC03A405F;
+        Tue,  8 Oct 2019 12:57:08 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1B7E4A4060;
+        Tue,  8 Oct 2019 12:57:08 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.34])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Oct 2019 12:57:08 +0000 (GMT)
+Subject: Re: [PATCH v6 00/10] s390: vfio-ap: dynamic configuration support
+To:     Halil Pasic <pasic@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        jjherne@linux.ibm.com
+References: <1568410018-10833-1-git-send-email-akrowiak@linux.ibm.com>
+ <20191008124807.49022238.pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Tue, 8 Oct 2019 14:57:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191008033417-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+In-Reply-To: <20191008124807.49022238.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.224.57]
-X-CFilter-Loop: Reflected
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19100812-4275-0000-0000-000003701639
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19100812-4276-0000-0000-000038831735
+Message-Id: <ddd4e91a-312d-99e4-1f54-7bf3b03fb63e@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-08_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910080125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 10/8/19 12:48 PM, Halil Pasic wrote:
+> On Fri, 13 Sep 2019 17:26:48 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> The current design for AP pass-through does not support making dynamic
+>> changes to the AP matrix of a running guest resulting in three deficiencies
+>> this patch series is intended to mitigate:
+>>
+>> 1. Adapters, domains and control domains can not be added to or removed
+>>     from a running guest. In order to modify a guest's AP configuration,
+>>     the guest must be terminated; only then can AP resources be assigned
+>>     to or unassigned from the guest's matrix mdev. The new AP configuration
+>>     becomes available to the guest when it is subsequently restarted.
+>>
+>> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
+>>     be modified by a root user without any restrictions. A change to either
+>>     mask can result in AP queue devices being unbound from the vfio_ap
+>>     device driver and bound to a zcrypt device driver even if a guest is
+>>     using the queues, thus giving the host access to the guest's private
+>>     crypto data and vice versa.
+>>
+>> 3. The APQNs derived from the Cartesian product of the APIDs of the
+>>     adapters and APQIs of the domains assigned to a matrix mdev must
+>>     reference an AP queue device bound to the vfio_ap device driver.
+>>
+>> This patch series introduces the following changes to the current design
+>> to alleviate the shortcomings described above as well as to implement more
+>> of the AP architecture:
+>>
+>> 1. A root user will be prevented from making changes to the AP bus's
+>>     /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the ownership of an APQN
+>>     changes from the vfio_ap device driver to a zcrypt driver when the APQN
+>>     is assigned to a matrix mdev.
+>>
+>> 2. The sysfs bind/unbind interfaces will be disabled for the vfio_ap
+>>     device driver.
+>>
+> Doesn't this have the potential of breaking some userspace stuff that
+> might be out there?
+>
+>> 3. Allow AP resources to be assigned to or removed from a matrix mdev
+>>     while a guest is using it and hot plug the resource into or hot unplug
+>>     the resource from the running guest.
+> This looks like a natural extension of the interface -- i.e. should not
+> break any userspace.
+>
+>> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if it
+>>     results in assignment of an APQN that does not reference an AP queue
+>>     device bound to the vfio_ap device driver, as long as the APQN is owned
+>>     by the vfio_ap driver. Allowing over-provisioning of AP resources
+>>     better models the architecture which does not preclude assigning AP
+>>     resources that are not yet available in the system. If/when the queue
+>>     becomes available to the host, it will immediately also become available
+>>     to the guest.
+> Same here -- I don't think this change breaks any userspace.
+>
+>> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
+>> ----------------------------------------------------------
+>> Due to the extremely sensitive nature of cryptographic data, it is
+>> imperative that great care be taken to ensure that such data is secured.
+>> Allowing a root user, either inadvertently or maliciously, to configure
+>> these masks such that a queue is shared between the host and a guest is
+>> not only avoidable, it is advisable.
 
-On 2019/10/8 15:45, Michael S. Tsirkin wrote:
-> On Tue, Oct 08, 2019 at 02:00:56PM +0800, Xiang Zheng wrote:
->> Hi Michael,
->>
->> Thanks for your review!
->>
->> On 2019/9/27 23:43, Michael S. Tsirkin wrote:
->>> On Fri, Sep 06, 2019 at 04:31:49PM +0800, Xiang Zheng wrote:
->>>> From: Dongjiu Geng <gengdongjiu@huawei.com>
->>>>
->>>> This patch implements APEI GHES Table generation via fw_cfg blobs. Now
->>>> it only supports ARMv8 SEA, a type of GHESv2 error source. Afterwards,
->>>> we can extend the supported types if needed. For the CPER section,
->>>> currently it is memory section because kernel mainly wants userspace to
->>>> handle the memory errors.
->>>>
->>>> This patch follows the spec ACPI 6.2 to build the Hardware Error Source
->>>> table. For more detailed information, please refer to document:
->>>> docs/specs/acpi_hest_ghes.txt
->>>>
->>>> Suggested-by: Laszlo Ersek <lersek@redhat.com>
->>>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->>>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->>>> ---
->>>>  default-configs/arm-softmmu.mak |   1 +
->>>>  hw/acpi/Kconfig                 |   4 +
->>>>  hw/acpi/Makefile.objs           |   1 +
->>>>  hw/acpi/acpi_ghes.c             | 210 ++++++++++++++++++++++++++++++++
->>>>  hw/acpi/aml-build.c             |   2 +
->>>>  hw/arm/virt-acpi-build.c        |  12 ++
->>>>  include/hw/acpi/acpi_ghes.h     | 103 ++++++++++++++++
->>>>  include/hw/acpi/aml-build.h     |   1 +
->>>>  8 files changed, 334 insertions(+)
->>>>  create mode 100644 hw/acpi/acpi_ghes.c
->>>>  create mode 100644 include/hw/acpi/acpi_ghes.h
->>>>
->>>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->>>> index 1f2e0e7fde..5722f3130e 100644
->>>> --- a/default-configs/arm-softmmu.mak
->>>> +++ b/default-configs/arm-softmmu.mak
->>>> @@ -40,3 +40,4 @@ CONFIG_FSL_IMX25=y
->>>>  CONFIG_FSL_IMX7=y
->>>>  CONFIG_FSL_IMX6UL=y
->>>>  CONFIG_SEMIHOSTING=y
->>>> +CONFIG_ACPI_APEI=y
->>>> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
->>>> index 7c59cf900b..2c4d0b9826 100644
->>>> --- a/hw/acpi/Kconfig
->>>> +++ b/hw/acpi/Kconfig
->>>> @@ -23,6 +23,10 @@ config ACPI_NVDIMM
->>>>      bool
->>>>      depends on ACPI
->>>>  
->>>> +config ACPI_APEI
->>>> +    bool
->>>> +    depends on ACPI
->>>> +
->>>>  config ACPI_PCI
->>>>      bool
->>>>      depends on ACPI && PCI
->>>> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->>>> index 9bb2101e3b..93fd8e8f64 100644
->>>> --- a/hw/acpi/Makefile.objs
->>>> +++ b/hw/acpi/Makefile.objs
->>>> @@ -5,6 +5,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
->>>>  common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->>>>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->>>>  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->>>> +common-obj-$(CONFIG_ACPI_APEI) += acpi_ghes.o
->>>>  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
->>>>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->>>>  
->>>> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
->>>> new file mode 100644
->>>> index 0000000000..20c45179ff
->>>> --- /dev/null
->>>> +++ b/hw/acpi/acpi_ghes.c
->>>> @@ -0,0 +1,210 @@
->>>> +/* Support for generating APEI tables and record CPER for Guests
->>>> + *
->>>> + * Copyright (C) 2019 Huawei Corporation.
->>>> + *
->>>> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
->>>> + *
->>>> + * This program is free software; you can redistribute it and/or modify
->>>> + * it under the terms of the GNU General Public License as published by
->>>> + * the Free Software Foundation; either version 2 of the License, or
->>>> + * (at your option) any later version.
->>>> +
->>>> + * This program is distributed in the hope that it will be useful,
->>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>>> + * GNU General Public License for more details.
->>>> +
->>>> + * You should have received a copy of the GNU General Public License along
->>>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->>>> + */
->>>> +
->>>> +#include "qemu/osdep.h"
->>>> +#include "hw/acpi/acpi.h"
->>>> +#include "hw/acpi/aml-build.h"
->>>> +#include "hw/acpi/acpi_ghes.h"
->>>> +#include "hw/nvram/fw_cfg.h"
->>>> +#include "sysemu/sysemu.h"
->>>> +#include "qemu/error-report.h"
->>>> +
->>>> +/* Hardware Error Notification
->>>> + * ACPI 4.0: 17.3.2.7 Hardware Error Notification
->>>> + */
->>>> +static void acpi_ghes_build_notify(GArray *table, const uint8_t type,
->>>> +                                   uint8_t length, uint16_t config_write_enable,
->>>> +                                   uint32_t poll_interval, uint32_t vector,
->>>> +                                   uint32_t polling_threshold_value,
->>>> +                                   uint32_t polling_threshold_window,
->>>> +                                   uint32_t error_threshold_value,
->>>> +                                   uint32_t error_threshold_window)
->>>
->>>
->>> This function has too many arguments.
->>> How about we just hard code all the 0's until we need to set them
->>> to something else?
->>
->> Yes, and we can also hard code the value of length which is always 28 and
->> indicates the total length of the structure in bytes.
->>
->>>
->>>> +{
->>>> +        /* Type */
->>>> +        build_append_int_noprefix(table, type, 1);
->>>> +        /* Length */
->>>> +        build_append_int_noprefix(table, length, 1);
->>>> +        /* Configuration Write Enable */
->>>> +        build_append_int_noprefix(table, config_write_enable, 2);
->>>> +        /* Poll Interval */
->>>> +        build_append_int_noprefix(table, poll_interval, 4);
->>>> +        /* Vector */
->>>> +        build_append_int_noprefix(table, vector, 4);
->>>> +        /* Switch To Polling Threshold Value */
->>>> +        build_append_int_noprefix(table, polling_threshold_value, 4);
->>>> +        /* Switch To Polling Threshold Window */
->>>> +        build_append_int_noprefix(table, polling_threshold_window, 4);
->>>> +        /* Error Threshold Value */
->>>> +        build_append_int_noprefix(table, error_threshold_value, 4);
->>>> +        /* Error Threshold Window */
->>>> +        build_append_int_noprefix(table, error_threshold_window, 4);
->>>> +}
->>>> +
->>>> +/* Build table for the hardware error fw_cfg blob */
->>>> +void acpi_ghes_build_error_table(GArray *hardware_errors, BIOSLinker *linker)
->>>> +{
->>>> +    int i, error_status_block_offset;
->>>> +
->>>> +    /*
->>>> +     * | +--------------------------+
->>>> +     * | |    error_block_address   |
->>>> +     * | |      ..........          |
->>>> +     * | +--------------------------+
->>>> +     * | |    read_ack_register     |
->>>> +     * | |     ...........          |
->>>> +     * | +--------------------------+
->>>> +     * | |  Error Status Data Block |
->>>> +     * | |      ........            |
->>>> +     * | +--------------------------+
->>>> +     */
->>>> +
->>>> +    /* Build error_block_address */
->>>> +    build_append_int_noprefix(hardware_errors, 0,
->>>> +        ACPI_GHES_ADDRESS_SIZE * ACPI_GHES_ERROR_SOURCE_COUNT);
->>>
->>> This works for adding more than 8 bytes but it's a bit of a hack,
->>> only works when value is 0. A loop would be a bit cleaner imho.
->>
->> Yes, this might confuse someone and it's better to use a loop instead.
->>
->>>
->>>> +
->>>> +    /* Build read_ack_register */
->>>> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->>>> +        /* Initialize the value of read_ack_register to 1, so GHES can be
->>>> +         * writeable in the first time.
->>>> +         * ACPI 6.2: 18.3.2.8 Generic Hardware Error Source version 2
->>>> +         * (GHESv2 - Type 10)
->>>> +         */
->>>> +        build_append_int_noprefix(hardware_errors, 1, ACPI_GHES_ADDRESS_SIZE);
->>>> +    }
->>>> +
->>>> +    /* Build Error Status Data Block */
->>>> +    build_append_int_noprefix(hardware_errors, 0,
->>>> +        ACPI_GHES_MAX_RAW_DATA_LENGTH * ACPI_GHES_ERROR_SOURCE_COUNT);
->>>> +
->>>> +    /* Allocate guest memory for the hardware error fw_cfg blob */
->>>> +    bios_linker_loader_alloc(linker, ACPI_GHES_ERRORS_FW_CFG_FILE,
->>>> +                             hardware_errors, 1, false);
->>>> +
->>>> +    /* Generic Error Status Block offset in the hardware error fw_cfg blob */
->>>> +    error_status_block_offset = ACPI_GHES_ADDRESS_SIZE * 2 *
->>>> +                                ACPI_GHES_ERROR_SOURCE_COUNT;
->>>
->>> a better way to get this is to save hardware_errors->len just before
->>> you append the padding where the value should be.
->>
->> Thanks, this really makes it better.
->>
->>>
->>>> +
->>>> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->>>> +        /* Patch address of Error Status Data Block into
->>>> +         * the error_block_address of hardware_errors fw_cfg blob
->>>> +         */
->>>> +        bios_linker_loader_add_pointer(linker,
->>>> +            ACPI_GHES_ERRORS_FW_CFG_FILE, ACPI_GHES_ADDRESS_SIZE * i,
->>>> +            ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE,
->>>> +            error_status_block_offset + i * ACPI_GHES_MAX_RAW_DATA_LENGTH);
->>>> +    }
->>>> +
->>>> +    /* Write address of hardware_errors fw_cfg blob into the
->>>> +     * hardware_errors_addr fw_cfg blob.
->>>> +     */
->>>> +    bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
->>>> +        0, ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
->>>> +}
->>>> +
->>>> +/* Build Hardware Error Source Table */
->>>> +void acpi_ghes_build_hest(GArray *table_data, GArray *hardware_errors,
->>>> +                          BIOSLinker *linker)
->>>> +{
->>>> +    uint32_t i, hest_start = table_data->len;
->>>> +
->>>> +    /* Reserve Hardware Error Source Table header size */
->>>> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
->>>> +
->>>> +    /* Error Source Count */
->>>> +    build_append_int_noprefix(table_data, ACPI_GHES_ERROR_SOURCE_COUNT, 4);
->>>> +
->>>> +    /* Generic Hardware Error Source version 2(GHESv2 - Type 10) */
->>>> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->>>> +        /* Type */
->>>> +        build_append_int_noprefix(table_data,
->>>> +            ACPI_GHES_SOURCE_GENERIC_ERROR_V2, 2);
->>>> +        /* Source Id */
->>>> +        build_append_int_noprefix(table_data, i, 2);
->>>> +        /* Related Source Id */
->>>> +        build_append_int_noprefix(table_data, 0xffff, 2);
->>>> +        /* Flags */
->>>> +        build_append_int_noprefix(table_data, 0, 1);
->>>> +        /* Enabled */
->>>> +        build_append_int_noprefix(table_data, 1, 1);
->>>> +
->>>> +        /* Number of Records To Pre-allocate */
->>>> +        build_append_int_noprefix(table_data, 1, 4);
->>>> +        /* Max Sections Per Record */
->>>> +        build_append_int_noprefix(table_data, 1, 4);
->>>> +        /* Max Raw Data Length */
->>>> +        build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->>>> +
->>>> +        /* Error Status Address */
->>>> +        build_append_gas(table_data, AML_SYSTEM_MEMORY, 0x40, 0,
->>>> +                         4 /* QWord access */, 0);
->>>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->>>> +            ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, i),
->>>> +            ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE,
->>>> +            i * ACPI_GHES_ADDRESS_SIZE);
->>>> +
->>>> +        if (i == 0) {
->>>> +            /* Notification Structure
->>>> +             * Now only enable ARMv8 SEA notification type
->>>> +             */
->>>> +            acpi_ghes_build_notify(table_data, ACPI_GHES_NOTIFY_SEA, 28,
->>>
->>>
->>> what's the magic 28? generally acpi_ghes_build_notify isn't self
->>> contained.
->>>
->>
->> According to "ACPI 6.2: 18.3.2.9 Hardware Error Notification", the number "28" indicates
->> the total length of the hardware error notifaction structure in bytes. I will add a new
->> macro such as ACPI_GHES_HW_ERROR_NOTIF_LENGTH.
-> 
-> 
-> no need - just write a comment near where you use it.
+Just curious: how is it possible to do such a configuration?
 
-OK, thanks.
 
-> 
->>>
->>>> 0,
->>>> +                                   0, 0, 0, 0, 0, 0);
->>>> +        } else {
->>>> +            g_assert_not_reached();
->>>
->>> OK so how about we just drop all these loops for
->>> ACPI_GHES_ERROR_SOURCE_COUNT?
->>
->> Even though we only support ARMv8 SEA notification type now, we still use these loops for
->> scalability. Maybe we need to add a new staic array for these loops, like below:
->>
->> static uint8_t acpi_ghes_hw_srouces[ACPI_GHES_ERROR_SOURCE_COUNT] = {
->>     ACPI_GHES_NOTIFY_SEA
->> };
-> 
-> just keep code simple, it won't be hard to add loops when needed.
-> 
+>>   It was suggested that this scenario
+>> is better handled in user space with management software, but that does
+>> not preclude a malicious administrator from using the sysfs interfaces
+>> to gain access to a guest's crypto data. It was also suggested that this
+>> scenario could be avoided by taking access to the adapter away from the
+>> guest and zeroing out the queues prior to the vfio_ap driver releasing the
+>> device; however, stealing an adapter in use from a guest as a by-product
+>> of an operation is bad and will likely cause problems for the guest
+>> unnecessarily. It was decided that the most effective solution with the
+>> least number of negative side effects is to prevent the situation at the
+>> source.
 
-OK, I will drop these loops.
 
-> 
->>>
->>>
->>>> +        }
->>>> +
->>>> +        /* Error Status Block Length */
->>>> +        build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->>>> +
->>>> +        /* Read Ack Register
->>>> +         * ACPI 6.1: 18.3.2.8 Generic Hardware Error Source
->>>> +         * version 2 (GHESv2 - Type 10)
->>>> +         */
->>>> +        build_append_gas(table_data, AML_SYSTEM_MEMORY, 0x40, 0,
->>>> +                         4 /* QWord access */, 0);
->>>> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->>>> +            ACPI_GHES_READ_ACK_REGISTER_ADDRESS_OFFSET(hest_start, i),
->>>> +            ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE,
->>>> +            (ACPI_GHES_ERROR_SOURCE_COUNT + i) * ACPI_GHES_ADDRESS_SIZE);
->>>> +
->>>> +        /* Read Ack Preserve */
->>>> +        build_append_int_noprefix(table_data, 0xfffffffffffffffe, 8);
->>>
->>> don't we need to specify ULL? Also isn't this just ~0x1ULL?
->>
->> Yes, I will use ~0x1ULL instead.
->>
->>>
->>> you should try to document values not just field names.
->>> e.g. why is ~0x1ULL specifically? which bits are clear?
->>
->> OK, I will document it. According to "ACPI 6.2: 18.3.2.8 Generic Hardware Error
->> Source version 2 (GHESv2 - Type 10)", we only provide the first bit to OSPM while
->> the other bits are preserved. That's why we initialize the value of Read Ack Register
->> to 1.
-> 
-> so write comments near each value.
-> 
+Stealing an adapter in use by a guest, insn't it what is done if we 
+allow to unassign an AP/Domain using the unassign sysfs interface when 
+the mediated device is in use by the guest?
 
-Got it.
 
+>>
+>> 2. Rationale for disabling bind/unbind interfaces for vfio_ap driver:
+>> -----------------------------------------------------------------
+>> By disabling the bind/unbind interfaces for the vfio_ap device driver,
+>> the user is forced to use the AP bus's apmask/aqmask interfaces to control
+>> the probing and removing of AP queues. There are two primary reasons for
+>> disabling the bind/unbind interfaces for the vfio_ap device driver:
+>>
+>> * The device architecture does not provide a means to prevent unbinding
+>>    a device from a device driver, so an AP queue device can be unbound
+>>    from the vfio_ap driver even when the queue is in use by a guest. By
+>>    disabling the unbind interface, the user is forced to use the AP bus's
+>>    apmask/aqmask interfaces which will prevent this.
+>>
+> Isn't this fixed by your filtering (if implemented correctly)? BTW I believe
+> it solves the problem regardless whether the unbind was triggered by the
+> drivers unbind attribute or by a[pq]mask
+>
+>> * Binding of AP queues is controlled by the AP bus /sys/bus/ap/apmask and
+>>    /sys/bus/ap/aqmask interfaces. If the masks indicate that an APQN is
+>>    owned by zcrypt, trying to bind it to the vfio_ap device driver will
+>>    fail; therefore, the bind interface is somewhat redundant and certainly
+>>    unnecessary.
+>>    
+>>
+>>
+>> Tony Krowiak (10):
+>>    s390: vfio-ap: Refactor vfio_ap driver probe and remove callbacks
+>>    s390: vfio-ap: allow assignment of unavailable AP resources to mdev
+>>      device
+>>    s390: vfio-ap: allow hot plug/unplug of AP resources using mdev device
+>>    s390: vfio-ap: filter CRYCB bits for unavailable queue devices
+>>    s390: vfio-ap: sysfs attribute to display the guest CRYCB
+>>    s390: vfio-ap: update guest CRYCB in vfio_ap probe and remove
+>>      callbacks
+>>    s390: zcrypt: driver callback to indicate resource in use
+>>    s390: vfio-ap: implement in-use callback for vfio_ap driver
+>>    s390: vfio-ap: added versioning to vfio_ap module
+>>    s390: vfio-ap: update documentation
+> I believe it would be worthwhile to reorder the patches (fixes and
+> re-factoring first, the features).
+>
+> Regards,
+> Halil
+>
+>>   Documentation/s390/vfio-ap.rst        | 899 +++++++++++++++++++++++++---------
+>>   drivers/s390/crypto/ap_bus.c          | 144 +++++-
+>>   drivers/s390/crypto/ap_bus.h          |   4 +
+>>   drivers/s390/crypto/vfio_ap_drv.c     |  27 +-
+>>   drivers/s390/crypto/vfio_ap_ops.c     | 610 ++++++++++++++---------
+>>   drivers/s390/crypto/vfio_ap_private.h |  12 +-
+>>   6 files changed, 1200 insertions(+), 496 deletions(-)
+>>
 -- 
-
-Thanks,
-Xiang
+Pierre Morel
+IBM Lab Boeblingen
 
