@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF885CFE63
+	by mail.lfdr.de (Postfix) with ESMTP id 14675CFE61
 	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 18:02:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728459AbfJHQB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Oct 2019 12:01:57 -0400
-Received: from inca-roads.misterjones.org ([213.251.177.50]:54549 "EHLO
+        id S1728352AbfJHQB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Oct 2019 12:01:56 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:34689 "EHLO
         inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727970AbfJHQB5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 8 Oct 2019 12:01:57 -0400
+        by vger.kernel.org with ESMTP id S1728081AbfJHQB4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Oct 2019 12:01:56 -0400
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by cheepnis.misterjones.org with esmtpsa (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.80)
         (envelope-from <maz@kernel.org>)
-        id 1iHrvs-0001rs-DQ; Tue, 08 Oct 2019 18:01:52 +0200
+        id 1iHrvs-0001rs-VO; Tue, 08 Oct 2019 18:01:53 +0200
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -24,10 +24,12 @@ Cc:     Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v2 0/5] KVM: arm64: Assorted PMU emulation fixes
-Date:   Tue,  8 Oct 2019 17:01:23 +0100
-Message-Id: <20191008160128.8872-1-maz@kernel.org>
+Subject: [PATCH v2 1/5] KVM: arm64: pmu: Fix cycle counter truncation
+Date:   Tue,  8 Oct 2019 17:01:24 +0100
+Message-Id: <20191008160128.8872-2-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191008160128.8872-1-maz@kernel.org>
+References: <20191008160128.8872-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -39,39 +41,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I recently came across a number of PMU emulation bugs, all which can
-result in unexpected behaviours in an unsuspecting guest. The first
-two patches already have been discussed on the list, but I'm including
-them here as part of a slightly longer series.
+When a counter is disabled, its value is sampled before the event
+is being disabled, and the value written back in the shadow register.
 
-The third patch is new as of v2, and fixes a bug preventing chained
-events from ever being used.
+In that process, the value gets truncated to 32bit, which is adequate
+for any counter but the cycle counter (defined as a 64bit counter).
 
-The fourth patch is also new as of v2, and is an arm64 PMU change for
-which I clearly don't know what I'm doing. I'd appreciate some
-guidance from Will or Mark.
+This obviously results in a corrupted counter, and things like
+"perf record -e cycles" not working at all when run in a guest...
+A similar, but less critical bug exists in kvm_pmu_get_counter_value.
 
-The last patch fixes an issue that has been here from day one, where
-we confuse architectural overflow of a counter and perf sampling
-period, and uses patch #4 to fix the issue.
+Make the truncation conditional on the counter not being the cycle
+counter, which results in a minor code reorganisation.
 
-I'l planning to send patches 1 through to 3 as fixes shortly, but I
-expect the last two patches to require more discussions.
+Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
+Reviewed-by: Andrew Murray <andrew.murray@arm.com>
+Reported-by: Julien Thierry <julien.thierry.kdev@gmail.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ virt/kvm/arm/pmu.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-Marc Zyngier (5):
-  KVM: arm64: pmu: Fix cycle counter truncation
-  arm64: KVM: Handle PMCR_EL0.LC as RES1 on pure AArch64 systems
-  KVM: arm64: pmu: Set the CHAINED attribute before creating the
-    in-kernel event
-  arm64: perf: Add reload-on-overflow capability
-  KVM: arm64: pmu: Reset sample period on overflow handling
-
- arch/arm64/include/asm/perf_event.h |  4 +++
- arch/arm64/kernel/perf_event.c      |  8 ++++-
- arch/arm64/kvm/sys_regs.c           |  4 +++
- virt/kvm/arm/pmu.c                  | 45 +++++++++++++++++++----------
- 4 files changed, 45 insertions(+), 16 deletions(-)
-
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 362a01886bab..c30c3a74fc7f 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -146,8 +146,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+ 	if (kvm_pmu_pmc_is_chained(pmc) &&
+ 	    kvm_pmu_idx_is_high_counter(select_idx))
+ 		counter = upper_32_bits(counter);
+-
+-	else if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
++	else if (select_idx != ARMV8_PMU_CYCLE_IDX)
+ 		counter = lower_32_bits(counter);
+ 
+ 	return counter;
+@@ -193,7 +192,7 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
+  */
+ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+ {
+-	u64 counter, reg;
++	u64 counter, reg, val;
+ 
+ 	pmc = kvm_pmu_get_canonical_pmc(pmc);
+ 	if (!pmc->perf_event)
+@@ -201,16 +200,19 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+ 
+ 	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+ 
+-	if (kvm_pmu_pmc_is_chained(pmc)) {
+-		reg = PMEVCNTR0_EL0 + pmc->idx;
+-		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
+-		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
++	if (pmc->idx == ARMV8_PMU_CYCLE_IDX) {
++		reg = PMCCNTR_EL0;
++		val = counter;
+ 	} else {
+-		reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+-		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+-		__vcpu_sys_reg(vcpu, reg) = lower_32_bits(counter);
++		reg = PMEVCNTR0_EL0 + pmc->idx;
++		val = lower_32_bits(counter);
+ 	}
+ 
++	__vcpu_sys_reg(vcpu, reg) = val;
++
++	if (kvm_pmu_pmc_is_chained(pmc))
++		__vcpu_sys_reg(vcpu, reg + 1) = upper_32_bits(counter);
++
+ 	kvm_pmu_release_perf_event(pmc);
+ }
+ 
 -- 
 2.20.1
 
