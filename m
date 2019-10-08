@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D3812CFE67
+	by mail.lfdr.de (Postfix) with ESMTP id 5BB04CFE66
 	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 18:02:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728702AbfJHQCC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Oct 2019 12:02:02 -0400
-Received: from inca-roads.misterjones.org ([213.251.177.50]:40856 "EHLO
+        id S1728081AbfJHQCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Oct 2019 12:02:01 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:47634 "EHLO
         inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727514AbfJHQB5 (ORCPT
+        by vger.kernel.org with ESMTP id S1728116AbfJHQB5 (ORCPT
         <rfc822;kvm@vger.kernel.org>); Tue, 8 Oct 2019 12:01:57 -0400
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by cheepnis.misterjones.org with esmtpsa (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.80)
         (envelope-from <maz@kernel.org>)
-        id 1iHrvt-0001rs-Gx; Tue, 08 Oct 2019 18:01:53 +0200
+        id 1iHrvu-0001rs-3X; Tue, 08 Oct 2019 18:01:54 +0200
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -24,9 +24,9 @@ Cc:     Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Andrew Murray <andrew.murray@arm.com>
-Subject: [PATCH v2 2/5] arm64: KVM: Handle PMCR_EL0.LC as RES1 on pure AArch64 systems
-Date:   Tue,  8 Oct 2019 17:01:25 +0100
-Message-Id: <20191008160128.8872-3-maz@kernel.org>
+Subject: [PATCH v2 3/5] KVM: arm64: pmu: Set the CHAINED attribute before creating the in-kernel event
+Date:   Tue,  8 Oct 2019 17:01:26 +0100
+Message-Id: <20191008160128.8872-4-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191008160128.8872-1-maz@kernel.org>
 References: <20191008160128.8872-1-maz@kernel.org>
@@ -41,41 +41,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Of PMCR_EL0.LC, the ARMv8 ARM says:
+The current convention for KVM to request a chained event from the
+host PMU is to set bit[0] in attr.config1 (PERF_ATTR_CFG1_KVM_PMU_CHAINED).
 
-	"In an AArch64 only implementation, this field is RES 1."
+But as it turns out, this bit gets set *after* we create the kernel
+event that backs our virtual counter, meaning that we never get
+a 64bit counter.
 
-So be it.
+Moving the setting to an earlier point solves the problem.
 
-Fixes: ab9468340d2bc ("arm64: KVM: Add access handler for PMCR register")
-Reviewed-by: Andrew Murray <andrew.murray@arm.com>
+Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ virt/kvm/arm/pmu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2071260a275b..46822afc57e0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -632,6 +632,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	 */
- 	val = ((pmcr & ~ARMV8_PMU_PMCR_MASK)
- 	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
-+	if (!system_supports_32bit_el0())
-+		val |= ARMV8_PMU_PMCR_LC;
- 	__vcpu_sys_reg(vcpu, r->reg) = val;
- }
- 
-@@ -682,6 +684,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		val = __vcpu_sys_reg(vcpu, PMCR_EL0);
- 		val &= ~ARMV8_PMU_PMCR_MASK;
- 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
-+		if (!system_supports_32bit_el0())
-+			val |= ARMV8_PMU_PMCR_LC;
- 		__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
- 		kvm_pmu_handle_pmcr(vcpu, val);
- 		kvm_vcpu_pmu_restore_guest(vcpu);
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index c30c3a74fc7f..f291d4ac3519 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -569,12 +569,12 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+ 		 * high counter.
+ 		 */
+ 		attr.sample_period = (-counter) & GENMASK(63, 0);
++		if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
++			attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
++
+ 		event = perf_event_create_kernel_counter(&attr, -1, current,
+ 							 kvm_pmu_perf_overflow,
+ 							 pmc + 1);
+-
+-		if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
+-			attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
+ 	} else {
+ 		/* The initial sample period (overflow count) of an event. */
+ 		if (kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
 -- 
 2.20.1
 
