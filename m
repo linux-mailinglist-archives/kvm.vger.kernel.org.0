@@ -2,84 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2859D011E
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 21:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 373E6D015C
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 21:44:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729616AbfJHTWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Oct 2019 15:22:37 -0400
-Received: from foss.arm.com ([217.140.110.172]:44026 "EHLO foss.arm.com"
+        id S1730452AbfJHTnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Oct 2019 15:43:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55416 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726439AbfJHTWh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Oct 2019 15:22:37 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A380F15BE;
-        Tue,  8 Oct 2019 12:22:36 -0700 (PDT)
-Received: from localhost (unknown [10.37.6.20])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 272D53F6C4;
-        Tue,  8 Oct 2019 12:22:36 -0700 (PDT)
-Date:   Tue, 8 Oct 2019 20:22:34 +0100
-From:   Andrew Murray <andrew.murray@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 3/5] KVM: arm64: pmu: Set the CHAINED attribute before
- creating the in-kernel event
-Message-ID: <20191008192233.GI42880@e119886-lin.cambridge.arm.com>
-References: <20191008160128.8872-1-maz@kernel.org>
- <20191008160128.8872-4-maz@kernel.org>
+        id S1728465AbfJHTnm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Oct 2019 15:43:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 27CA2A44AF2;
+        Tue,  8 Oct 2019 19:43:42 +0000 (UTC)
+Received: from vitty.brq.redhat.com (ovpn-204-92.brq.redhat.com [10.40.204.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4396A5D6A7;
+        Tue,  8 Oct 2019 19:43:40 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: [PATCH 0/3] selftests: kvm: improvements to VMX support check
+Date:   Tue,  8 Oct 2019 21:43:35 +0200
+Message-Id: <20191008194338.24159-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191008160128.8872-4-maz@kernel.org>
-User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Tue, 08 Oct 2019 19:43:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 08, 2019 at 05:01:26PM +0100, Marc Zyngier wrote:
-> The current convention for KVM to request a chained event from the
-> host PMU is to set bit[0] in attr.config1 (PERF_ATTR_CFG1_KVM_PMU_CHAINED).
-> 
-> But as it turns out, this bit gets set *after* we create the kernel
-> event that backs our virtual counter, meaning that we never get
-> a 64bit counter.
-> 
-> Moving the setting to an earlier point solves the problem.
-> 
-> Fixes: 80f393a23be6 ("KVM: arm/arm64: Support chained PMU counters")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+vmx_dirty_log_test fails on AMD and this is no surprise as it is VMX
+specific. Consolidate checks from other VMX tests into a library routine
+and add a check to skip the test when !VMX.
 
-Reviewed-by: Andrew Murray <andrew.murray@arm.com>
+Vitaly Kuznetsov (3):
+  selftests: kvm: vmx_set_nested_state_test: don't check for VMX support
+    twice
+  selftests: kvm: consolidate VMX support checks
+  selftests: kvm: vmx_dirty_log_test: skip the test when VMX is not
+    supported
 
-> ---
->  virt/kvm/arm/pmu.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index c30c3a74fc7f..f291d4ac3519 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -569,12 +569,12 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  		 * high counter.
->  		 */
->  		attr.sample_period = (-counter) & GENMASK(63, 0);
-> +		if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
-> +			attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
-> +
->  		event = perf_event_create_kernel_counter(&attr, -1, current,
->  							 kvm_pmu_perf_overflow,
->  							 pmc + 1);
-> -
-> -		if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
-> -			attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
->  	} else {
->  		/* The initial sample period (overflow count) of an event. */
->  		if (kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-> -- 
-> 2.20.1
-> 
+ tools/testing/selftests/kvm/include/x86_64/vmx.h    |  2 ++
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c        | 10 ++++++++++
+ .../kvm/x86_64/vmx_close_while_nested_test.c        |  6 +-----
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c       |  2 ++
+ .../kvm/x86_64/vmx_set_nested_state_test.c          | 13 ++-----------
+ .../selftests/kvm/x86_64/vmx_tsc_adjust_test.c      |  6 +-----
+ 6 files changed, 18 insertions(+), 21 deletions(-)
+
+-- 
+2.20.1
+
