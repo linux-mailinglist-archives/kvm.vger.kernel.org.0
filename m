@@ -2,117 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CACE6CFF4F
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 18:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94206D0035
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 19:55:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729472AbfJHQx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Oct 2019 12:53:58 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:33173 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727336AbfJHQx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Oct 2019 12:53:57 -0400
-Received: by mail-io1-f66.google.com with SMTP id z19so38155583ior.0
-        for <kvm@vger.kernel.org>; Tue, 08 Oct 2019 09:53:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fme5fFYUj0wdKTaXtPchzRO/hZyN3IQGJxfMnt1qVJI=;
-        b=nF6ztrceJdjl9xNuXNv5mwqCWU5zJiJnq0FWCZzdURWJFCyF8lq29UW/vjWY6vTYma
-         A2vyFCS8QnTpZRdKfqpcLtymIzPuly4yfU+HNeOcaOe8C0t7yiMkXCpg2oYL6hJvEsee
-         Up6y0FoUSqnDLGgBNM9DYqZNWygDKvbsDednwj+Rj3AVL0cd8Y1O1AwblvHbnErAyM1s
-         Oq0JalZDIlpzXA79i8F9OCTZDMF/7uK8H/ZB1T0tKbINfE1H1l9gPgxcdjjjRcVQZPUw
-         RGUnyj/xgKxNMmLsrq5wWKfa0asvyNQqKOi+g7hq2lwcgkhXkMCPWXJ4T/K8unUXl+j+
-         FosQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fme5fFYUj0wdKTaXtPchzRO/hZyN3IQGJxfMnt1qVJI=;
-        b=MH4R0pasd5TrISzDH9ahir/bQNHQOpo3jjWHPAKYHJr2SDhx+Fn02IuLolrDY9Flnd
-         0x9X+WEnY6a4OzKovSu8YP5OMPfuVg0YLVBuBbtifZ4BmfedINeoEzSoFfCsVZZ8CG8G
-         HClSr78ucjecfhu2zgk4nGSvpbFjPRDN9IiWTRPuHdO+jYSf2eWW3glfeKU23QUT88bL
-         sUlpfcjUEp2zJk98DvL+2SjYweZzWOj+G1qqovmJ2jtV9mUaj9VZQ5au4hkYitDImor3
-         O9tN05a3rbCeLcJl0kHN+U/aryrteijcNH/hnqj45iyGlvRTPlOhZNq6BXVR308wedqF
-         pa/w==
-X-Gm-Message-State: APjAAAW0BZXybv4JUL2X9cs5qL9EZ4u6mgBFXAFIPbhMN2Y7pS2XDZsC
-        ZDaulmNdzBorGLl1mavD9lOGIiMQBURoWKLN+Yhsgg==
-X-Google-Smtp-Source: APXvYqwDWGOf+yElISRWjmDcwEri92PuzaR9Mbp5SH1x+dezCLs5TRcNt3I5EnwbB6Klb9T5kpEFj0FvbeItRICFmbk=
-X-Received: by 2002:a6b:1606:: with SMTP id 6mr32477437iow.108.1570553635857;
- Tue, 08 Oct 2019 09:53:55 -0700 (PDT)
+        id S1727865AbfJHRzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Oct 2019 13:55:35 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:47313 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726320AbfJHRzf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 8 Oct 2019 13:55:35 -0400
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iHthr-0003Vi-1f; Tue, 08 Oct 2019 19:55:31 +0200
+Date:   Tue, 8 Oct 2019 18:55:29 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Andrew Murray <andrew.murray@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [PATCH v2 4/5] arm64: perf: Add reload-on-overflow capability
+Message-ID: <20191008185529.75477da0@why>
+In-Reply-To: <20191008160128.8872-5-maz@kernel.org>
+References: <20191008160128.8872-1-maz@kernel.org>
+        <20191008160128.8872-5-maz@kernel.org>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-References: <20191004215615.5479-1-sean.j.christopherson@intel.com>
- <20191004215615.5479-12-sean.j.christopherson@intel.com> <55f45459-47bf-df37-a12b-17c4c5c6c19a@redhat.com>
- <20191007195638.GG18016@linux.intel.com> <bd2cffea-6427-b3cc-7098-a881e3d4522d@redhat.com>
-In-Reply-To: <bd2cffea-6427-b3cc-7098-a881e3d4522d@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 8 Oct 2019 09:53:44 -0700
-Message-ID: <CALMp9eSM=rq+jEEzPwWNHNxv03F1s2Dysa7euWJ==PaE=b1sMw@mail.gmail.com>
-Subject: Re: [PATCH 11/16] x86/cpu: Print VMX features as separate line item
- in /proc/cpuinfo
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-edac@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, mark.rutland@arm.com, suzuki.poulose@arm.com, james.morse@arm.com, andrew.murray@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 7, 2019 at 11:57 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 07/10/19 21:56, Sean Christopherson wrote:
-> > On Mon, Oct 07, 2019 at 07:12:37PM +0200, Paolo Bonzini wrote:
-> >> On 04/10/19 23:56, Sean Christopherson wrote:
-> >>> diff --git a/arch/x86/kernel/cpu/proc.c b/arch/x86/kernel/cpu/proc.c
-> >>> index cb2e49810d68..4eec8889b0ff 100644
-> >>> --- a/arch/x86/kernel/cpu/proc.c
-> >>> +++ b/arch/x86/kernel/cpu/proc.c
-> >>> @@ -7,6 +7,10 @@
-> >>>
-> >>>  #include "cpu.h"
-> >>>
-> >>> +#ifdef CONFIG_X86_VMX_FEATURE_NAMES
-> >>> +extern const char * const x86_vmx_flags[NVMXINTS*32];
-> >>> +#endif
-> >>> +
-> >>>  /*
-> >>>   * Get CPU information for use by the procfs.
-> >>>   */
-> >>> @@ -102,6 +106,17 @@ static int show_cpuinfo(struct seq_file *m, void *v)
-> >>>             if (cpu_has(c, i) && x86_cap_flags[i] != NULL)
-> >>>                     seq_printf(m, " %s", x86_cap_flags[i]);
-> >>
-> >> I'm afraid this is going to break some scripts in the wild.  I would
-> >> simply remove the seq_puts below.
-> >
-> > Can you elaborate?  I'm having trouble connecting the dots...
->
-> Somebody is bound to have scripts doing "grep ^flags.*ept /proc/cpuinfo"
-> or checking for VMX flags under some kind of "if (/^flags/)", so it's
-> safer not to separate VMX and non-VMX flags.
+On Tue,  8 Oct 2019 17:01:27 +0100
+Marc Zyngier <maz@kernel.org> wrote:
 
-Yep. Not quite that exact syntax, but we do have, e.g.:
+> As KVM uses perf as a way to emulate an ARMv8 PMU, it needs to
+> be able to change the sample period as part of the overflow
+> handling (once an overflow has taken place, the following
+> overflow point is the overflow of the virtual counter).
+> 
+> Deleting and recreating the in-kernel event is difficult, as
+> we're in interrupt context. Instead, we can teach the PMU driver
+> a new trick, which is to stop the event before the overflow handling,
+> and reprogram it once it has been handled. This would give KVM
+> the opportunity to adjust the next sample period. This feature
+> is gated on a new flag that can get set by KVM in a subsequent
+> patch.
+> 
+> Whilst we're at it, move the CHAINED flag from the KVM emulation
+> to the perf_event.h file and adjust the PMU code accordingly.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/perf_event.h | 4 ++++
+>  arch/arm64/kernel/perf_event.c      | 8 +++++++-
+>  virt/kvm/arm/pmu.c                  | 4 +---
+>  3 files changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
+> index 2bdbc79bbd01..8b6b38f2db8e 100644
+> --- a/arch/arm64/include/asm/perf_event.h
+> +++ b/arch/arm64/include/asm/perf_event.h
+> @@ -223,4 +223,8 @@ extern unsigned long perf_misc_flags(struct pt_regs *regs);
+>  	(regs)->pstate = PSR_MODE_EL1h;	\
+>  }
+>  
+> +/* Flags used by KVM, among others */
+> +#define PERF_ATTR_CFG1_CHAINED_EVENT	(1U << 0)
+> +#define PERF_ATTR_CFG1_RELOAD_EVENT	(1U << 1)
+> +
+>  #endif
+> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+> index a0b4f1bca491..98907c9e5508 100644
+> --- a/arch/arm64/kernel/perf_event.c
+> +++ b/arch/arm64/kernel/perf_event.c
+> @@ -322,7 +322,7 @@ PMU_FORMAT_ATTR(long, "config1:0");
+>  
+>  static inline bool armv8pmu_event_is_64bit(struct perf_event *event)
+>  {
+> -	return event->attr.config1 & 0x1;
+> +	return event->attr.config1 & PERF_ATTR_CFG1_CHAINED_EVENT;
+>  }
+>  
+>  static struct attribute *armv8_pmuv3_format_attrs[] = {
+> @@ -736,8 +736,14 @@ static irqreturn_t armv8pmu_handle_irq(struct arm_pmu *cpu_pmu)
+>  		if (!armpmu_event_set_period(event))
+>  			continue;
+>  
+> +		if (event->attr.config1 & PERF_ATTR_CFG1_RELOAD_EVENT)
+> +			cpu_pmu->pmu.stop(event, PERF_EF_RELOAD);
+> +
 
-./x86/feature_check.sh ept
+Actually, I just realized that there is probably no need for this patch
+as a standalone change. I can perfectly fold the stop() and start()
+calls into the last patch, as part of the overflow handler.
 
-...and you can imagine what feature_check.sh does.
+The question is still whether that's a good idea or not.
+
+Thanks,
+
+	M.
+
+
+>  		if (perf_event_overflow(event, &data, regs))
+>  			cpu_pmu->disable(event);
+> +
+> +		if (event->attr.config1 & PERF_ATTR_CFG1_RELOAD_EVENT)
+> +			cpu_pmu->pmu.start(event, PERF_EF_RELOAD);
+>  	}
+>  	armv8pmu_start(cpu_pmu);
+>  
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index f291d4ac3519..25a483a04beb 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -15,8 +15,6 @@
+>  
+>  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+>  
+> -#define PERF_ATTR_CFG1_KVM_PMU_CHAINED 0x1
+> -
+>  /**
+>   * kvm_pmu_idx_is_64bit - determine if select_idx is a 64bit counter
+>   * @vcpu: The vcpu pointer
+> @@ -570,7 +568,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  		 */
+>  		attr.sample_period = (-counter) & GENMASK(63, 0);
+>  		if (kvm_pmu_counter_is_enabled(vcpu, pmc->idx + 1))
+> -			attr.config1 |= PERF_ATTR_CFG1_KVM_PMU_CHAINED;
+> +			attr.config1 |= PERF_ATTR_CFG1_CHAINED_EVENT;
+>  
+>  		event = perf_event_create_kernel_counter(&attr, -1, current,
+>  							 kvm_pmu_perf_overflow,
+
+
+
+-- 
+Jazz is not dead. It just smells funny...
