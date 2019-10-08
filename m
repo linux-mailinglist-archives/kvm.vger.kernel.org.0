@@ -2,128 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0547CF0CA
-	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 04:22:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3634CF14C
+	for <lists+kvm@lfdr.de>; Tue,  8 Oct 2019 05:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729707AbfJHCW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Oct 2019 22:22:27 -0400
-Received: from mga07.intel.com ([134.134.136.100]:42692 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729212AbfJHCW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Oct 2019 22:22:27 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Oct 2019 19:22:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,269,1566889200"; 
-   d="scan'208";a="192455888"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
-  by fmsmga008.fm.intel.com with ESMTP; 07 Oct 2019 19:22:22 -0700
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kevin.tian@intel.com, Yi Sun <yi.y.sun@linux.intel.com>,
-        ashok.raj@intel.com, kvm@vger.kernel.org, sanjay.k.kumar@intel.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        yi.y.sun@intel.com
-Subject: Re: [RFC PATCH 2/4] iommu/vt-d: Add first level page table interfaces
-To:     Peter Xu <peterx@redhat.com>
-References: <20190923122454.9888-1-baolu.lu@linux.intel.com>
- <20190923122454.9888-3-baolu.lu@linux.intel.com>
- <20190925052157.GL28074@xz-x1>
- <c9792e0b-bf42-1dbb-f060-0b1a43125f47@linux.intel.com>
- <20190926034905.GW28074@xz-x1>
- <52778812-129b-0fa7-985d-5814e9d84047@linux.intel.com>
- <20190927053449.GA9412@xz-x1>
- <66823e27-aa33-5968-b5fd-e5221fb1fffe@linux.intel.com>
- <20190929052532.GA12953@xz-x1>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <27232499-4f13-83c0-a1d3-e82e9183f3f0@linux.intel.com>
-Date:   Tue, 8 Oct 2019 10:20:10 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729885AbfJHDdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Oct 2019 23:33:04 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:38548 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729832AbfJHDdE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Oct 2019 23:33:04 -0400
+Received: by mail-ot1-f66.google.com with SMTP id e11so12906627otl.5
+        for <kvm@vger.kernel.org>; Mon, 07 Oct 2019 20:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yuW76c0/ER82/tkCBIRalTq4scViyGLhE1Z95m1TAug=;
+        b=Fts0c2I0YcUgXi30eEOJd03JfJk6nxgfrygQ6EDM9HGxGTsxumuUVaPrG7pqctWpij
+         JnUFC8o1SSj8dBi0BPFspg8NitgFBbd1UaTO3rxCH5/sAUPj9IhVZX1EH+VDa9RH30kX
+         IyeM2VMxe22rlwo+kNj+1QfQgZC0IhgXYeZMblAr1+UeqjjteX70t12nshIDflRtikB0
+         JpMfCZUupsdJLVOTO9Mojv63SxT2V03O5CrYWs/cr6L+bg+uxu2pAB7tVJ+t5LnmZLlZ
+         udeV4hv6NTtTuuI3RTvEaqXIK3zmyYNrjcScPB15AFzMoJz2zErjlqh4UhAEb/uMnfzU
+         iHZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yuW76c0/ER82/tkCBIRalTq4scViyGLhE1Z95m1TAug=;
+        b=UZof1ZyJks6OO0djK9K8eH02cFT7dgsSR4Hp0H3rRnHJfKkjMTp9RGsRkMzsLIfaWM
+         JnYy1Sn1r0WGEU4fKzSXBoKXPFZIeCE8n1YIfByPkUKqBUw6SNiPL4P38WFvuOh5rtjR
+         Usybp/V4BvJHaiVQHZc5hjge+7muob0YsfFGX6GKMg+zRV+aVgJJbhtOjoS4RaJkPawY
+         Eshh1xGFx8Fwtb5emGfdYbHUokZY9WUzpRPByLM47aH3TEfspU2N/IyT8LbWtjizfEa6
+         16UWsqAl/HawXUjdDpL9VGsNdYRaTEFWnu+pR19ReIaluTB1c48n8Hn0/Hh+mDu+eacT
+         f7Eg==
+X-Gm-Message-State: APjAAAUzPqkB4GYVdvKx1ZSzROZvd64/7dfU6yCH+Ltl5kE9DRHQLrj9
+        +4bmQU1BXZbNIJORxJeZsS/hrg0bGKXKwlMhkYg=
+X-Google-Smtp-Source: APXvYqxcseVvFihJAVHaeLfdiZl4VG1tx23O5Rsl8W0LPCtopQzHtzPQURCefwalFKTD/MvV5LM0wfU3rffjUjG5ig8=
+X-Received: by 2002:a9d:aa8:: with SMTP id 37mr22785406otq.56.1570505583446;
+ Mon, 07 Oct 2019 20:33:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190929052532.GA12953@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1570116271-8038-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1570116271-8038-1-git-send-email-pbonzini@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 8 Oct 2019 11:32:52 +0800
+Message-ID: <CANRm+Cz21QqUjoDMtj5Os0s63gJqL2LtCwVPdEsqGhuX=9Am7A@mail.gmail.com>
+Subject: Re: [PATCH kvm-unit-tests] vmexit: measure IPI and EOI cost
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, 4 Oct 2019 at 00:00, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  x86/vmexit.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> diff --git a/x86/vmexit.c b/x86/vmexit.c
+> index 66d3458..81b743b 100644
+> --- a/x86/vmexit.c
+> +++ b/x86/vmexit.c
+> @@ -65,22 +65,30 @@ static void nop(void *junk)
+>  }
+>
+>  volatile int x = 0;
+> +volatile uint64_t tsc_eoi = 0;
+> +volatile uint64_t tsc_ipi = 0;
+>
+>  static void self_ipi_isr(isr_regs_t *regs)
+>  {
+>         x++;
+> +       uint64_t start = rdtsc();
+>         eoi();
+> +       tsc_eoi += rdtsc() - start;
+>  }
+>
+>  static void x2apic_self_ipi(int vec)
+>  {
+> +       uint64_t start = rdtsc();
+>         wrmsr(0x83f, vec);
+> +       tsc_ipi += rdtsc() - start;
+>  }
+>
+>  static void apic_self_ipi(int vec)
+>  {
+> +       uint64_t start = rdtsc();
+>          apic_icr_write(APIC_INT_ASSERT | APIC_DEST_SELF | APIC_DEST_PHYSICAL |
+>                        APIC_DM_FIXED | IPI_TEST_VECTOR, vec);
+> +       tsc_ipi += rdtsc() - start;
+>  }
+>
+>  static void self_ipi_sti_nop(void)
+> @@ -180,7 +188,9 @@ static void x2apic_self_ipi_tpr_sti_hlt(void)
+>
+>  static void ipi(void)
+>  {
+> +       uint64_t start = rdtsc();
+>         on_cpu(1, nop, 0);
+> +       tsc_ipi += rdtsc() - start;
+>  }
+>
+>  static void ipi_halt(void)
+> @@ -511,6 +521,7 @@ static bool do_test(struct test *test)
+>         }
+>
+>         do {
+> +               tsc_eoi = tsc_ipi = 0;
+>                 iterations *= 2;
+>                 t1 = rdtsc();
+>
+> @@ -523,6 +534,11 @@ static bool do_test(struct test *test)
+>                 t2 = rdtsc();
+>         } while ((t2 - t1) < GOAL);
+>         printf("%s %d\n", test->name, (int)((t2 - t1) / iterations));
+> +       if (tsc_ipi)
+> +               printf("  ipi %s %d\n", test->name, (int)(tsc_ipi / iterations));
+> +       if (tsc_eoi)
+> +               printf("  eoi %s %d\n", test->name, (int)(tsc_eoi / iterations));
+> +
+>         return test->next;
+>  }
 
-On 9/29/19 1:25 PM, Peter Xu wrote:
-> On Sat, Sep 28, 2019 at 04:23:16PM +0800, Lu Baolu wrote:
->> Hi Peter,
->>
->> On 9/27/19 1:34 PM, Peter Xu wrote:
->>> Hi, Baolu,
->>>
->>> On Fri, Sep 27, 2019 at 10:27:24AM +0800, Lu Baolu wrote:
->>>>>>>> +	spin_lock(&(domain)->page_table_lock);				\
->>>>>>>
->>>>>>> Is this intended to lock here instead of taking the lock during the
->>>>>>> whole page table walk?  Is it safe?
->>>>>>>
->>>>>>> Taking the example where nm==PTE: when we reach here how do we
->>>>>>> guarantee that the PMD page that has this PTE is still valid?
->>>>>>
->>>>>> We will always keep the non-leaf pages in the table,
->>>>>
->>>>> I see.  Though, could I ask why?  It seems to me that the existing 2nd
->>>>> level page table does not keep these when unmap, and it's not even use
->>>>> locking at all by leveraging cmpxchg()?
->>>>
->>>> I still need some time to understand how cmpxchg() solves the race issue
->>>> when reclaims pages. For example.
->>>>
->>>> Thread A				Thread B
->>>> -A1: check all PTE's empty		-B1: up-level PDE valid
->>>> -A2: clear the up-level PDE
->>>> -A3: reclaim the page			-B2: populate the PTEs
->>>>
->>>> Both (A1,A2) and (B1,B2) should be atomic. Otherwise, race could happen.
->>>
->>> I'm not sure of this, but IMHO it is similarly because we need to
->>> allocate the iova ranges from iova allocator first, so thread A (who's
->>> going to unmap pages) and thread B (who's going to map new pages)
->>> should never have collapsed regions if happening concurrently.  I'm
->>
->> Although they don't collapse, they might share a same pmd entry. If A
->> cleared the pmd entry and B goes ahead with populating the pte's. It
->> will crash.
-> 
-> My understanding is that if A was not owning all the pages on that PMD
-> entry then it will never free the page that was backing that PMD
-> entry.  Please refer to the code in dma_pte_clear_level() where it
-> has:
-> 
->          /* If range covers entire pagetable, free it */
->          if (start_pfn <= level_pfn &&
->                  last_pfn >= level_pfn + level_size(level) - 1) {
->                  ...
->          } else {
->                  ...
->          }
-> 
-> Note that when going into the else block, the PMD won't be freed but
-> only the PTEs that upon the PMD will be cleared.
+Thanks for this, do you have more idea to optimize the virtual ipi latency?
 
-Exactly! Thanks for pointing this out.
-
-I will do the same thing in v2.
-
-> 
-> In the case you mentioned above, IMHO it should go into that else
-> block.  Say, thread A must not contain the whole range of that PMD
-> otherwise thread B won't get allocated with pages within that range
-> covered by the same PMD.
-> 
-> Thanks,
-> 
-
-Best regards,
-Baolu
+    Wanpeng
