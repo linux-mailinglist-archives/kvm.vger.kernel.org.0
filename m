@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 64EDCD1610
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 19:27:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E038BD15A9
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 19:25:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732778AbfJIR1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 13:27:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49202 "EHLO mail.kernel.org"
+        id S1732458AbfJIRYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 13:24:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49666 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732342AbfJIRYa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 13:24:30 -0400
+        id S1732430AbfJIRYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 13:24:45 -0400
 Received: from sasha-vm.mshome.net (unknown [167.220.2.234])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 946A121920;
-        Wed,  9 Oct 2019 17:24:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9C101206BB;
+        Wed,  9 Oct 2019 17:24:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570641869;
+        s=default; t=1570641884;
         bh=IjH+bROqetUGmXA7UF4W5sV7vyoaBnjMEt2boHPj0CE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bqYdZpy5a223ipmxyE9X42uSREekM1b4Xf8KeQAyH4qvHDCh3FhT/5Ju4N/gqWRL1
-         XGetRdT/8nTTNCs21Hlu6SGWxEnvuekLT36uChN5ZhRdpdem0aeA2BeCg25UWwUukn
-         88oMw2gJa2/eMQ4WMn3NweuAgg+iHSOb3Ji/FBe0=
+        b=q0YDTYfCs4rVsuAPpf/XZJkjPGwYQQ5IsRmC4IlnzbypESEo+YpA/2ZItcxEPAAtg
+         adgsldHYfV+QGhIbUH/d0GB62vaBsrEJBYYy83jH8/9qDjCKWXPr6Z706g0FQm3j5I
+         ieRA09bpY5FT8fTd3y9Zg+D0eLVHtUbc3XDix7rE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>, Marc Orr <marcorr@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 13/21] kvm: vmx: Limit guest PMCs to those supported on the host
-Date:   Wed,  9 Oct 2019 13:06:06 -0400
-Message-Id: <20191009170615.32750-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 07/13] kvm: vmx: Limit guest PMCs to those supported on the host
+Date:   Wed,  9 Oct 2019 13:06:26 -0400
+Message-Id: <20191009170635.536-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191009170615.32750-1-sashal@kernel.org>
-References: <20191009170615.32750-1-sashal@kernel.org>
+In-Reply-To: <20191009170635.536-1-sashal@kernel.org>
+References: <20191009170635.536-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
