@@ -2,43 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CCEAD0981
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 10:21:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A139D099B
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 10:25:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728839AbfJIIVj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 04:21:39 -0400
-Received: from mga02.intel.com ([134.134.136.20]:56676 "EHLO mga02.intel.com"
+        id S1729778AbfJIIZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 04:25:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46126 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725848AbfJIIVj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 04:21:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 01:21:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; 
-   d="scan'208";a="205678883"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.191]) ([10.239.196.191])
-  by orsmga002.jf.intel.com with ESMTP; 09 Oct 2019 01:21:36 -0700
-Subject: Re: [PATCH v5 1/2] x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "rth@twiddle.net" <rth@twiddle.net>,
-        "ehabkost@redhat.com" <ehabkost@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Liu, Jingqi" <jingqi.liu@intel.com>
-References: <20190929015718.19562-1-tao3.xu@intel.com>
- <20190929015718.19562-2-tao3.xu@intel.com>
- <6762960d-80a6-be31-399d-f62e33b31f28@redhat.com>
-From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <7e43e268-d94e-a66f-9254-3de03313a064@intel.com>
-Date:   Wed, 9 Oct 2019 16:21:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729677AbfJIIZG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 04:25:06 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8DA612A09AA
+        for <kvm@vger.kernel.org>; Wed,  9 Oct 2019 08:25:06 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id w10so755980wrl.5
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 01:25:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FGjIyp+V4zvVe8nGelmZ1TCF9IV0uDpPZ4FIyT58LwQ=;
+        b=O6VmLZyQEIJUWwrQMgI8nI5SZq4tQrFZc17Lgvw9+QKc5/NhsP8rouZf0iZ8etNCt0
+         TSZRvdySQX2jXt8d/OEqXOV6KihzD8o5s2m2Gcu2VMRNri5hkAS6K/0rOVVfcwN2ogmW
+         1zS17TdOnyyBa8VY0t32cYRlT9+263dQHwG+OC4sUhH/NUpl6YlbYGdnKZCYu2ucFR45
+         ZoJIrDAirQQm3fnLJsTt8rHB7h0hk4K9IouBWbZpyc4agJHcDYSaXWAVyZGVfwSUyBgU
+         3wD0BYc8lQLPDk+SQRKrWfH98gt2jLEXaUQTA/a1yXAZTAvW4ElOU2FDLDS//4WgXSY0
+         2AWA==
+X-Gm-Message-State: APjAAAU9MWzDQm3bpYSx41w4eIjyTmFrMgEAJ6iSnQpVA9AiEzQtvY04
+        BWfysSITA52/IZKIEZHU/XIrtQR3Jd3LH4PJ0RgH+yZijjhAQnzSYpAVPFmlY9ksTxXuK9F1qQR
+        5FrwvMToYZR5t
+X-Received: by 2002:a1c:7d92:: with SMTP id y140mr1738593wmc.151.1570609505001;
+        Wed, 09 Oct 2019 01:25:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy//6CNNk9hUQud3U2UoX3ktP6Hte2hMVzeCR9fMVrPj3cI2AfYDQdE2xyUu9Pm90qtjWUvFg==
+X-Received: by 2002:a1c:7d92:: with SMTP id y140mr1738573wmc.151.1570609504741;
+        Wed, 09 Oct 2019 01:25:04 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id b12sm1168930wrt.21.2019.10.09.01.25.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2019 01:25:04 -0700 (PDT)
+Subject: Re: [PATCH v3 06/16] kvm: x86: svm: Add support to
+ activate/deactivate posted interrupts
+To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "graf@amazon.com" <graf@amazon.com>,
+        "jschoenh@amazon.de" <jschoenh@amazon.de>,
+        "karahmed@amazon.de" <karahmed@amazon.de>,
+        "rimasluk@amazon.com" <rimasluk@amazon.com>,
+        "Grimm, Jon" <Jon.Grimm@amd.com>
+References: <1568401242-260374-1-git-send-email-suravee.suthikulpanit@amd.com>
+ <1568401242-260374-7-git-send-email-suravee.suthikulpanit@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f3fc86e3-e20f-e84c-237d-d1dbcb5d60a8@redhat.com>
+Date:   Wed, 9 Oct 2019 10:25:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6762960d-80a6-be31-399d-f62e33b31f28@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1568401242-260374-7-git-send-email-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -46,20 +73,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/9/2019 4:06 PM, Paolo Bonzini wrote:
-> On 29/09/19 03:57, Tao Xu wrote:
->> +    } else if (function == 7 && index == 0 && reg == R_ECX) {
->> +        if (enable_cpu_pm) {
->> +            ret |= CPUID_7_0_ECX_WAITPKG;
-> 
-> This is incorrect.  You should disable WAITPKG if !enable_cpu_pm, but
-> you should not enable it forcefully if enable_cpu_pm is true.
-> 
-> Paolo
-> 
->> +        } else {
->> +            ret &= ~CPUID_7_0_ECX_WAITPKG;
->> +        }
-> 
+On 13/09/19 21:00, Suthikulpanit, Suravee wrote:
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7198,6 +7198,9 @@ void kvm_vcpu_activate_apicv(struct kvm_vcpu *vcpu)
+>  	kvm_apic_update_apicv(vcpu);
+>  
+>  	kvm_x86_ops->refresh_apicv_exec_ctrl(vcpu);
+> +
+> +	if (kvm_x86_ops->activate_pi_irte)
+> +		kvm_x86_ops->activate_pi_irte(vcpu);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_vcpu_activate_apicv);
+>  
+> @@ -7212,6 +7215,8 @@ void kvm_vcpu_deactivate_apicv(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu->arch.apicv_active = false;
+>  	kvm_apic_update_apicv(vcpu);
+> +	if (kvm_x86_ops->deactivate_pi_irte)
+> +		kvm_x86_ops->deactivate_pi_irte(vcpu);
+>  	kvm_x86_ops->refresh_apicv_exec_ctrl(vcpu);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_vcpu_deactivate_apicv);
 
-Got it, thank you.
+This can be done in refresh_apicv_exec_ctrl.
+
+Paolo
