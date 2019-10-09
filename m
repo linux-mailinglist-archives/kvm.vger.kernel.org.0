@@ -2,120 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D033D1AA9
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 23:15:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E91BD1AED
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 23:29:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731736AbfJIVPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 17:15:13 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34311 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728804AbfJIVPN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 9 Oct 2019 17:15:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1570655712;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=7VmgJlX8pTLTmeUK2iuzqG3qzkbe72v0AjNOA3U4FSc=;
-        b=WYNlHkfUJTeuvp9XqqfI/mVvOGdjOqx7gQAxp+np9u0lSvg9RrE/5uJSv2INz/dtbKMcbi
-        l7tL41yZ3E8VcmVf2CuUkRfz1oBdsByLfrBFmBOGpxCcpWLLg9MYzgJYQyGsDRroclOQ2y
-        7DyRwI1ucAcHgNgpAKAlKXRdSV8YAdk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-7KoEE-aAMJ2kUveXpWw8DA-1; Wed, 09 Oct 2019 17:15:11 -0400
-Received: by mail-wm1-f69.google.com with SMTP id r21so1137476wme.5
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 14:15:10 -0700 (PDT)
+        id S1732069AbfJIV32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 17:29:28 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45886 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732038AbfJIV31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 17:29:27 -0400
+Received: by mail-io1-f66.google.com with SMTP id c25so8678216iot.12
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 14:29:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=53RDSTgRTc4OIaltPTdnTdVl82bbEDBXdYsk9AgolP0=;
+        b=PtttGKZ4CYT4Zoi/nq6emZ9TtWyk5GVdkhBrRLPlI9OVwkZLg4h5bEi4rT/oXAjJSn
+         g8HDZuNJ2+hZr35v0F8Qa2+ADjeIaks0ChZYpoNnQ4PrkJ5Q5v4SijQEx6kOTAbcpanL
+         Eq9wYy4gcJczW80QtaoG5gxb6JxJJwGE+FYeSCtYkab+CqcdlrgoZ7IeTpXqEXh4ty5K
+         MmlbSe9JrteqfSrMCSWAWd8Wh+Yc5xWsfojMZLmZDzUnyeQiSLokBKw4adwxensx3tlx
+         5pbyXLureK6Fm7dWQaMTSfj/yo8ACqBsuN7aBOHaK5uVZ7izn/mrlA9An6+YK8t9+xF5
+         RvmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=i6l3KX7zHJ5HDKx9SqXKsfD5zGuc3xvROj8VyAucjM0=;
-        b=LuXvohTgyfBbABijNDnrWR9t/QZaEWK43GPbTQSyzNMEyMpkPSvhETjr74bOtGzH+O
-         ym2W5Ydn4JSsAMXgwv+dNUngRlywZI1jBNot5xQLahsDa4/fRAVf5r9gd+oAL9FH+3Ab
-         SvRjSVkKFywHTdyBFf+fUSGaJ+wf9Ld89/efv20nyrIi9uEdfbwxd4/XNOMVXiiMlFL4
-         bbkW9kYitCHKG5S7SGxAxuP3V+DSOWDO7O+4fNTrxWilgTTmgC97EED3pnf4dtUJkYTh
-         d2two7HjNz5EfhpKRmxWPdDh/utiRq9IV2ViT9aKE4BGMjVnoczUtMSpo9snlzBvrp6L
-         SQkQ==
-X-Gm-Message-State: APjAAAX1QlcxCD510dAD4wpUs+d0arbFZgkE9M+G57X78uEMmuLhJj9H
-        h3WLy6r+lgdRf54q08lc5+rCsQ98VZ91wYIAlFzO7yWkpBxAFLxwXvI5wP/hj6hY+OHc7Nkc7lx
-        zCdCI76xPTEf/
-X-Received: by 2002:a7b:cb54:: with SMTP id v20mr4103778wmj.91.1570655709795;
-        Wed, 09 Oct 2019 14:15:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyZjJA1LTm5EeJ/fmz3nZAMmXsY1yAaPjxR1Gi2GVNEpEkekFZxvaPx1RlKODkjSwiZVB8kTw==
-X-Received: by 2002:a7b:cb54:: with SMTP id v20mr4103761wmj.91.1570655709497;
-        Wed, 09 Oct 2019 14:15:09 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1032:7ea1:7f8f:1e5? ([2001:b07:6468:f312:1032:7ea1:7f8f:1e5])
-        by smtp.gmail.com with ESMTPSA id l9sm2821110wme.45.2019.10.09.14.15.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2019 14:15:08 -0700 (PDT)
-Subject: Re: [PATCH AUTOSEL 5.3 28/68] KVM: x86: Expose XSAVEERPTR to the
- guest
-To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        kvm@vger.kernel.org
-References: <20191009170547.32204-1-sashal@kernel.org>
- <20191009170547.32204-28-sashal@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <05acd554-dd0a-d7cd-e17c-90627fa0ec67@redhat.com>
-Date:   Wed, 9 Oct 2019 23:15:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=53RDSTgRTc4OIaltPTdnTdVl82bbEDBXdYsk9AgolP0=;
+        b=QNtC8K4+H+kXgEj3tgUjl+iHvVyu3ZMwb5GkruwfHYWz2ULqOntFIKZN5d815IdyQP
+         rYgfeY/RzEScRWuirtvHDYHZmFrKKNI1EM8pWsW7VvDl/g1crxOFWShbpRKdKHbWMu58
+         49RmBio+iBKXV1Fooqk1W7YpT2xIXHg3V6QFDPrKGcd2bn7gzCkCEHSDNX76ctYJ3V2X
+         LDCjgxTAKBgS0SFwy1ENmDEHtRBHEAoD+knzoje3aqKjSNsMZckoP6GlzCkCL/dwPTcI
+         PrkevNjc3pzk4LhtzUV+IkyEvPe2+jytIa3g4ahTmUmIgEQ6jZnXtli/R/sTj95gRM2P
+         YiHg==
+X-Gm-Message-State: APjAAAWl2LLzbtBZJIGBeCCGpfB/nF1e1oTq66obDMJTXENTUAtMlNQw
+        Lcp3Tp6wAer2rR7jgHiaLVdX14b9Nu25W8K5nM1bWg==
+X-Google-Smtp-Source: APXvYqyXc5EEY4YQVj5Xm0skYSBjSmyAQTXp4JSHqnNLHi2cb+5b2sXfKa07KGIB2GkuIVn8XbPw+8iW1n4qKYGFtXQ=
+X-Received: by 2002:a6b:d210:: with SMTP id q16mr6374946iob.108.1570656566545;
+ Wed, 09 Oct 2019 14:29:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191009170547.32204-28-sashal@kernel.org>
-Content-Language: en-US
-X-MC-Unique: 7KoEE-aAMJ2kUveXpWw8DA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20191009004142.225377-1-aaronlewis@google.com>
+ <20191009004142.225377-3-aaronlewis@google.com> <56cf7ca1-d488-fc6e-1c20-b477dd855d84@redhat.com>
+In-Reply-To: <56cf7ca1-d488-fc6e-1c20-b477dd855d84@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 9 Oct 2019 14:29:15 -0700
+Message-ID: <CALMp9eRNdLdb7zR=wwx2tTc8n-ewCKuhrw9pxXGVQVUBjNpRow@mail.gmail.com>
+Subject: Re: [Patch 3/6] kvm: svm: Add support for XSAVES on AMD
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>,
+        Babu Moger <Babu.Moger@amd.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        kvm list <kvm@vger.kernel.org>,
+        Luwei Kang <luwei.kang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/10/19 19:05, Sasha Levin wrote:
-> From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->=20
-> [ Upstream commit 504ce1954fba888936c9d13ccc1e3db9b8f613d5 ]
->=20
-> I was surprised to see that the guest reported `fxsave_leak' while the
-> host did not. After digging deeper I noticed that the bits are simply
-> masked out during enumeration.
->=20
-> The XSAVEERPTR feature is actually a bug fix on AMD which means the
-> kernel can disable a workaround.
->=20
-> Pass XSAVEERPTR to the guest if available on the host.
->=20
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  arch/x86/kvm/cpuid.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index fd1b8db8bf242..59b66e343fa5a 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -479,6 +479,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_en=
-try2 *entry, u32 function,
-> =20
->  =09/* cpuid 0x80000008.ebx */
->  =09const u32 kvm_cpuid_8000_0008_ebx_x86_features =3D
-> +=09=09F(XSAVEERPTR) |
->  =09=09F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSB=
-D) |
->  =09=09F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON);
-> =20
->=20
+On Wed, Oct 9, 2019 at 12:02 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 09/10/19 02:41, Aaron Lewis wrote:
+> > -             /*
+> > -              * The only supported bit as of Skylake is bit 8, but
+> > -              * it is not supported on KVM.
+> > -              */
+> > -             if (data != 0)
+> > -                     return 1;
+>
+> This comment is actually not true anymore; Intel supports PT (bit 8) on
+> Cascade Lake, so it could be changed to something like
+>
+>         /*
+>          * We do support PT (bit 8) if kvm_x86_ops->pt_supported(), but
+>          * guests will have to configure it using WRMSR rather than
+>          * XSAVES.
+>          */
+>
+> Paolo
 
-Yet another example of a patch that shouldn't be stable material (in
-this case it's fine, but there can certainly be cases where just adding
-a single flag depends on core kernel changes).
+Isn't it necessary for the host to set IA32_XSS to a superset of the
+guest IA32_XSS for proper host-level context-switching?
 
-Paolo
+arch/x86/kernel/fpu/xstate.c has this comment:
 
+ * Note that we do not currently set any bits on IA32_XSS so
+ * 'XCR0 | IA32_XSS == XCR0' for now.
