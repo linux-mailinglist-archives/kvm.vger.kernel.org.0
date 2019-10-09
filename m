@@ -2,191 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E423FD0711
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 08:13:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EE9CD0740
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 08:32:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727029AbfJIGNQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 02:13:16 -0400
-Received: from mga06.intel.com ([134.134.136.31]:24049 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726254AbfJIGNP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 02:13:15 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Oct 2019 23:13:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; 
-   d="scan'208";a="196829032"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by orsmga003.jf.intel.com with ESMTP; 08 Oct 2019 23:13:12 -0700
-Date:   Wed, 9 Oct 2019 14:15:09 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH v7 3/7] KVM: VMX: Pass through CET related MSRs to Guest
-Message-ID: <20191009061509.GB27851@local-michael-cet-test>
-References: <20190927021927.23057-1-weijiang.yang@intel.com>
- <20190927021927.23057-4-weijiang.yang@intel.com>
- <CALMp9eT3HJ3S6Mzzntje2Kb4m-y86GvkhaNXun-mLJukEy6wbA@mail.gmail.com>
+        id S1728839AbfJIGcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 02:32:36 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35843 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727572AbfJIGcg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 9 Oct 2019 02:32:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1570602755;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=88rO8maf6ORE/54FW3Gxqd5KR1vxX04MoPoXPbMbvSQ=;
+        b=hDoMCFoKJmEDdkcI8iEyP3Er97QQfIDR9DNkny13sp7D3F1/txyIcrZMvcQEiGoMnNs/bp
+        CggVQec3Bl7tnCJszVqi/hHpuqHHqdLhYHuWe38BKLvvZRMMUavXTmyQ8Uf2gDA3tOoZNI
+        5c9p4pFGua13xBMQzLojZ3qh9rXTcLE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-DK08zQh9MLCN9UXBkYNNGA-1; Wed, 09 Oct 2019 02:32:32 -0400
+Received: by mail-wr1-f70.google.com with SMTP id 32so617531wrk.15
+        for <kvm@vger.kernel.org>; Tue, 08 Oct 2019 23:32:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MOn7ZTJOBGzAGfz9gxMmUiw0rDGTShgSG278+JF42T8=;
+        b=ZsUC/pCyyjVAloMtWtsF7dwi9+WadeWQRYM17gEcyzJJNLQAPbz6DgQW7uAzT1Avdc
+         biWAm6AuG2VYAwW8V0MR2GLBeWNkB0e5ZWDRFJImu92Huwwyn/zohOvlKgTe28C6RB74
+         Ile2vBeBzh8eU5ijjkU7vqp0/FZA/nzwqs90e0Gy7htN8V323g1NGIjnYq1Dbg4V2Dk2
+         rRgLXEdX3nlc1IYMaEpu32mmCR9FzB4/TxdZpPfAmglf0PvJRVOvq6bljvxCmkazbnTM
+         TzAOOykkdT0dYOOR1y3oXL5KNkg0Y8BuTYBt7gNByM4QUMaJY3WUB3Z8ryGTTNv/Wk/k
+         CnNg==
+X-Gm-Message-State: APjAAAWk0vvkhHDAZNH0OGQl55keseC/6drxHVF5NYYSdeRhh9jOMPEc
+        Lc6bImoHYFKzTPoB1yw3TuN4qUfoiivsDyxNsNp1aiod78YoQs0hVH3urMIFZcxNGaHLdZxkZy6
+        3snatkE+i7pbJ
+X-Received: by 2002:a7b:ce93:: with SMTP id q19mr1211708wmj.11.1570602751163;
+        Tue, 08 Oct 2019 23:32:31 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwZUGDLNHAuLfndh4fo/jxMh7I12iE3PRp07j3+lCXCkRGTKjM4VaIpVfIPXIginXD8KU5XdQ==
+X-Received: by 2002:a7b:ce93:: with SMTP id q19mr1211696wmj.11.1570602750877;
+        Tue, 08 Oct 2019 23:32:30 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id 33sm4023040wra.41.2019.10.08.23.32.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2019 23:32:30 -0700 (PDT)
+Subject: Re: [Patch 6/6] kvm: tests: Add test to verify MSR_IA32_XSS
+To:     Aaron Lewis <aaronlewis@google.com>,
+        Babu Moger <Babu.Moger@amd.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>
+References: <20191009004142.225377-1-aaronlewis@google.com>
+ <20191009004142.225377-6-aaronlewis@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f3bcebe3-d82d-7578-0dd9-95391fe522e0@redhat.com>
+Date:   Wed, 9 Oct 2019 08:30:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eT3HJ3S6Mzzntje2Kb4m-y86GvkhaNXun-mLJukEy6wbA@mail.gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20191009004142.225377-6-aaronlewis@google.com>
+Content-Language: en-US
+X-MC-Unique: DK08zQh9MLCN9UXBkYNNGA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 11:18:32AM -0700, Jim Mattson wrote:
-> On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> >
-> > CET MSRs pass through Guest directly to enhance performance.
-> > CET runtime control settings are stored in MSR_IA32_{U,S}_CET,
-> > Shadow Stack Pointer(SSP) are stored in MSR_IA32_PL{0,1,2,3}_SSP,
-> > SSP table base address is stored in MSR_IA32_INT_SSP_TAB,
-> > these MSRs are defined in kernel and re-used here.
-> 
-> All of these new guest MSRs will have to be enumerated by
-> KVM_GET_MSR_INDEX_LIST.
-> 
-Since CET feature is Intel platform specific, but looks like KVM_GET_MSR_INDEX_LIST
-fetchs x86 common MSRs, I have patch in QEMU to support CET
-MSRs, the patch is here:
-https://patchwork.ozlabs.org/patch/1058265/
+On 09/10/19 02:41, Aaron Lewis wrote:
+>   * Set value of MSR for VCPU.
+>   */
+> -void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index=
+,
+> -=09uint64_t msr_value)
+> +void vcpu_set_msr_expect_result(struct kvm_vm *vm, uint32_t vcpuid,
+> +=09=09=09=09uint64_t msr_index, uint64_t msr_value,
+> +=09=09=09=09int result)
+>  {
+>  =09struct vcpu *vcpu =3D vcpu_find(vm, vcpuid);
+>  =09struct {
+> @@ -899,10 +901,30 @@ void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpui=
+d, uint64_t msr_index,
+>  =09buffer.entry.index =3D msr_index;
+>  =09buffer.entry.data =3D msr_value;
+>  =09r =3D ioctl(vcpu->fd, KVM_SET_MSRS, &buffer.header);
+> -=09TEST_ASSERT(r =3D=3D 1, "KVM_SET_MSRS IOCTL failed,\n"
+> +=09TEST_ASSERT(r =3D=3D result, "KVM_SET_MSRS IOCTL failed,\n"
+>  =09=09"  rc: %i errno: %i", r, errno);
+>  }
 
-> > MSR_IA32_U_CET and MSR_IA32_PL3_SSP are used for user mode protection,
-> > the contents could differ from process to process, therefore,
-> > kernel needs to save/restore them during context switch, it makes
-> > sense to pass through them so that the guest kernel can
-> > use xsaves/xrstors to operate them efficiently. Other MSRs are used
-> > for non-user mode protection. See CET spec for detailed info.
-> 
-> I assume that XSAVES & XRSTORS bypass the MSR permission bitmap, like
-> other instructions that manipulate MSRs (e.g. SWAPGS, RDTSCP, etc.).
-> Is the guest OS likely to use RDMSR/WRMSR to access these MSRs?
-> 
-Yes, exactly, you may check the CET kernel code.
+This is a library, so the functions to some extent should make sense
+even outside tests.  Please make a function _vcpu_set_msr that returns
+the result of the ioctl; it can still be used in vcpu_set_msr, and the
+tests can TEST_ASSERT what they want.
 
-> > The difference between CET VMCS state fields and xsave components is that,
-> > the former used for CET state storage during VMEnter/VMExit,
-> > whereas the latter used for state retention between Guest task/process
-> > switch.
-> >
-> > Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> > Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c   |  1 +
-> >  arch/x86/kvm/cpuid.h   |  2 ++
-> >  arch/x86/kvm/vmx/vmx.c | 39 +++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 42 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 1aa86b87b6ab..0a47b9e565be 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -66,6 +66,7 @@ u64 kvm_supported_xss(void)
-> >  {
-> >         return KVM_SUPPORTED_XSS & kvm_x86_ops->supported_xss();
-> >  }
-> > +EXPORT_SYMBOL_GPL(kvm_supported_xss);
-> >
-> >  #define F(x) bit(X86_FEATURE_##x)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> > index d78a61408243..1d77b880084d 100644
-> > --- a/arch/x86/kvm/cpuid.h
-> > +++ b/arch/x86/kvm/cpuid.h
-> > @@ -27,6 +27,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
-> >
-> >  int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu);
-> >
-> > +u64 kvm_supported_xss(void);
-> > +
-> >  static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
-> >  {
-> >         return vcpu->arch.maxphyaddr;
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index a84198cff397..f720baa7a9ba 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7001,6 +7001,43 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
-> >                 vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
-> >  }
-> >
-> > +static void vmx_intercept_cet_msrs(struct kvm_vcpu *vcpu)
-> 
-> Nit: It seems like this function adjusts the MSR permission bitmap so
-> as *not* to intercept the CET MSRs.
->
-OK, will rename it.
-> > +{
-> > +       struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > +       unsigned long *msr_bitmap;
-> > +       u64 kvm_xss;
-> > +       bool cet_en;
-> > +
-> > +       msr_bitmap = vmx->vmcs01.msr_bitmap;
-> 
-> What about nested guests? (i.e. vmcs02).
-> 
-Hmm, I need to check the nested case, thank you.
+> +uint32_t kvm_get_cpuid_max_basic(void)
+> +{
+> +=09return kvm_get_supported_cpuid_entry(0)->eax;
+> +}
+> +
+> +uint32_t kvm_get_cpuid_max_extended(void)
 
-> > +       kvm_xss = kvm_supported_xss();
-> > +       cet_en = guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
-> > +                guest_cpuid_has(vcpu, X86_FEATURE_IBT);
-> > +       /*
-> > +        * U_CET is a must for USER CET, per CET spec., U_CET and PL3_SPP are
-> > +        * a bundle for USER CET xsaves.
-> > +        */
-> > +       if (cet_en && (kvm_xss & XFEATURE_MASK_CET_USER)) {
-> > +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_U_CET, MSR_TYPE_RW);
-> > +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL3_SSP, MSR_TYPE_RW);
-> > +       }
-> 
-> Since this is called from vmx_cpuid_update, what happens if cet_en was
-> previously true and now it's false?
-> 
-Yes, it's likely, but guest CPUID usually is fixed before
-guest is launched, do you have any suggestion?
-> > +       /*
-> > +        * S_CET is a must for KERNEL CET, PL0_SSP ... PL2_SSP are a bundle
-> > +        * for CET KERNEL xsaves.
-> > +        */
-> > +       if (cet_en && (kvm_xss & XFEATURE_MASK_CET_KERNEL)) {
-> > +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_S_CET, MSR_TYPE_RW);
-> > +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL0_SSP, MSR_TYPE_RW);
-> > +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL1_SSP, MSR_TYPE_RW);
-> > +               vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_PL2_SSP, MSR_TYPE_RW);
-> > +
-> > +               /* SSP_TAB only available for KERNEL SHSTK.*/
-> > +               if (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> > +                       vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_INT_SSP_TAB,
-> > +                                                     MSR_TYPE_RW);
-> > +       }
-> > +}
-> > +
-> >  static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
-> >  {
-> >         struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > @@ -7025,6 +7062,8 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
-> >         if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
-> >                         guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
-> >                 update_intel_pt_cfg(vcpu);
-> > +
-> > +       vmx_intercept_cet_msrs(vcpu);
-> >  }
-> >
-> >  static void vmx_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
-> > --
-> > 2.17.2
-> >
+I would leave the existing function aside, and call this one
+kvm_get_cpuid_max_amd() since CPUID leaves at 0x80000000 are allocated
+by AMD.
+
+Otherwise looks good.
+
+Paolo
+
