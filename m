@@ -2,37 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 439DAD16CA
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 19:33:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02AB8D16A3
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 19:31:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731897AbfJIRXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 13:23:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47952 "EHLO mail.kernel.org"
+        id S1732457AbfJIRbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 13:31:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48098 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730490AbfJIRXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 13:23:53 -0400
+        id S1732071AbfJIRYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 13:24:00 -0400
 Received: from sasha-vm.mshome.net (unknown [167.220.2.234])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 126CA206BB;
-        Wed,  9 Oct 2019 17:23:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4D35E21D7D;
+        Wed,  9 Oct 2019 17:24:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570641833;
-        bh=BnNP/S94t0ycyVIws48GAEBsgOMeY35JYl69u3+93fc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=kU6CQGlrQqr5rwGxHL3NP8rtMt8jQRFHeJcBGjHpZkp9ry50kUKJs9rL2p3hWTihu
-         tT+/xZgCS1iO/FqE8mKljpiJju3puOerUBhhuY13uy3st7nM9WHd00Nt5XyneaES2/
-         4khjHPm+/pgHD9XJkm77SZiL+hpfjr9WMHEoMuNU=
+        s=default; t=1570641840;
+        bh=BYFgJp0e0Z6OyadI7GisGIAIEU45czqzFvrwyIa7xZk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=sDp5vv8fm2edPHebdCJ992gDrt8JUvWlekVD+ec3wbwVLazZLmvq3VXaSN3Xyel82
+         fFB6sG3tiY00EYAu5fZguFreCZPneEdqnhRYxljwO2Vx2o9RSvc9TYbzuycdImuz05
+         gkzuqqpY/ZgKJjfDbCMqJ7SF/nU9kGu/SbSVT2Vk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Zenghui Yu <yuzenghui@huawei.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Marc Zyngier <maz@kernel.org>, Sasha Levin <sashal@kernel.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.3 01/68] KVM: arm/arm64: vgic: Use the appropriate TRACE_INCLUDE_PATH
-Date:   Wed,  9 Oct 2019 13:04:40 -0400
-Message-Id: <20191009170547.32204-1-sashal@kernel.org>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.3 25/68] kvm: x86: Fix a spurious -E2BIG in __do_cpuid_func
+Date:   Wed,  9 Oct 2019 13:05:04 -0400
+Message-Id: <20191009170547.32204-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191009170547.32204-1-sashal@kernel.org>
+References: <20191009170547.32204-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -42,37 +45,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+From: Jim Mattson <jmattson@google.com>
 
-[ Upstream commit aac60f1a867773de9eb164013d89c99f3ea1f009 ]
+[ Upstream commit a1a640b8c0cd8a2a7f84ab694f04bc64dc6988af ]
 
-Commit 49dfe94fe5ad ("KVM: arm/arm64: Fix TRACE_INCLUDE_PATH") fixes
-TRACE_INCLUDE_PATH to the correct relative path to the define_trace.h
-and explains why did the old one work.
+Don't return -E2BIG from __do_cpuid_func when processing function 0BH
+or 1FH and the last interesting subleaf occupies the last allocated
+entry in the result array.
 
-The same fix should be applied to virt/kvm/arm/vgic/trace.h.
-
-Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Fixes: 831bf664e9c1fc ("KVM: Refactor and simplify kvm_dev_ioctl_get_supported_cpuid")
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- virt/kvm/arm/vgic/trace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/cpuid.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/trace.h b/virt/kvm/arm/vgic/trace.h
-index 55fed77a9f739..4fd4f6db181b0 100644
---- a/virt/kvm/arm/vgic/trace.h
-+++ b/virt/kvm/arm/vgic/trace.h
-@@ -30,7 +30,7 @@ TRACE_EVENT(vgic_update_irq_pending,
- #endif /* _TRACE_VGIC_H */
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index e7d25f4364664..429648ae5653f 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -612,16 +612,20 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 	 */
+ 	case 0x1f:
+ 	case 0xb: {
+-		int i, level_type;
++		int i;
  
- #undef TRACE_INCLUDE_PATH
--#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm/vgic
-+#define TRACE_INCLUDE_PATH ../../virt/kvm/arm/vgic
- #undef TRACE_INCLUDE_FILE
- #define TRACE_INCLUDE_FILE trace
+-		/* read more entries until level_type is zero */
+-		for (i = 1; ; ++i) {
++		/*
++		 * We filled in entry[0] for CPUID(EAX=<function>,
++		 * ECX=00H) above.  If its level type (ECX[15:8]) is
++		 * zero, then the leaf is unimplemented, and we're
++		 * done.  Otherwise, continue to populate entries
++		 * until the level type (ECX[15:8]) of the previously
++		 * added entry is zero.
++		 */
++		for (i = 1; entry[i - 1].ecx & 0xff00; ++i) {
+ 			if (*nent >= maxnent)
+ 				goto out;
  
+-			level_type = entry[i - 1].ecx & 0xff00;
+-			if (!level_type)
+-				break;
+ 			do_host_cpuid(&entry[i], function, i);
+ 			++*nent;
+ 		}
 -- 
 2.20.1
 
