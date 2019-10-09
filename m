@@ -2,188 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED726D1322
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 17:41:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5375BD138B
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 18:05:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731234AbfJIPlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 11:41:51 -0400
-Received: from mail-eopbgr820107.outbound.protection.outlook.com ([40.107.82.107]:2148
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729471AbfJIPlv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 11:41:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O6825v05wRq2WV/gUrzMvlQl/sEF4JB8VJ1O3kmkOO7gvm8k5X/o2VzuIByWIAoGk4Nff8o7eAIRAOrjRTVmeNWcx6GdTlCAGyTM6/Luw3qk81wNJ2/wthuobl8Dk0JNKs+P8VCMTLXpHEnBLXd7tap3N3iMM+X26xD2Co0V90zzUEIXOm3cEqmduvHTnmIWQgkrTxRbFZZ2poE+qvJ8nvcQEIw1ZTZI/PliOft7aPuCmIHcNvT9YFMW8HXL1u6WLdPBmranEdWGJ6gUJPCYidHyR1HgMFwNuw8ErlibQHF4bcpuZJa9ZIAMON705a2QcSGSQWdNDogT6RRLfNTqhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oZvdziPe6+cKDNWWFX7y0SFniLkFt2qvM5ncTzsvFfo=;
- b=SV/7HkpKLQUlJDn1UBlabHdF3NNZVpd60qEj6qJ3XHI+h8Wos+1G2q3AOjjEeR02x1khDg1z56hfBuZLXmqO1mW9XweK8taYtX14jfQj5oJ6/MJ5Z1jEVKEvdIWYUlh3Z2/p1QLuUZAOPmLBY3JVqxyR6y/BZ7BV+TRTdC9PFfbyizKK+1UF5GV6bdjWDEmazVLGWCEnHTPrjL+g/sTVJCmATgbF/ZPGDYuAf4NzdotKdrMal3hW3hcNaaCubTwi2fUkLOm0Uj1CNUXrXoJTqCAud8JjvHll6HyxfFng7SMKJ4yXR1wQsaMpKGhZ9jXmPtftvOOrdaNpAo5P5qP4Pg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oZvdziPe6+cKDNWWFX7y0SFniLkFt2qvM5ncTzsvFfo=;
- b=LDcvTEGgB1i1WQpok5mOqznZNG5aXuAW1MFgBcDD56EzaJSSwgeH3/Cm1BHARJ7exPtKdgMb/TCH4e9onmDAGtdrKoQgEfcPniaHcbPzHL3Npn8Uk/nAF5TEdR85AOHGsurTiI1NZHpXpC7l+J54A3mX1hLhTC2H8aoAxPrnmYY=
-Received: from DM5PR21MB0137.namprd21.prod.outlook.com (10.173.173.12) by
- DM5PR21MB0778.namprd21.prod.outlook.com (10.173.172.148) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2367.4; Wed, 9 Oct 2019 15:41:47 +0000
-Received: from DM5PR21MB0137.namprd21.prod.outlook.com
- ([fe80::a50f:aa3c:c7d6:f05e]) by DM5PR21MB0137.namprd21.prod.outlook.com
- ([fe80::a50f:aa3c:c7d6:f05e%11]) with mapi id 15.20.2347.016; Wed, 9 Oct 2019
- 15:41:47 +0000
-From:   Michael Kelley <mikelley@microsoft.com>
-To:     vkuznets <vkuznets@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3] x86/hyperv: make vapic support x2apic mode
-Thread-Topic: [PATCH v3] x86/hyperv: make vapic support x2apic mode
-Thread-Index: AQHVfrDkN3MUr0xlFEms4FiPcOct8adSbqIAgAADTaA=
-Date:   Wed, 9 Oct 2019 15:41:46 +0000
-Message-ID: <DM5PR21MB0137FF88DDA803A2A383B20BD7950@DM5PR21MB0137.namprd21.prod.outlook.com>
-References: <20191009145022.28442-1-rkagan@virtuozzo.com>
- <87r23mx7lh.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87r23mx7lh.fsf@vitty.brq.redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=mikelley@ntdev.microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-10-09T15:41:44.9226580Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=a135cf7c-30a6-4cf5-982b-2cc681e9e102;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=mikelley@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:3:8162:b7c1:8631:b292]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f5bc5e01-158e-4d1a-1295-08d74ccf31a4
-x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: DM5PR21MB0778:|DM5PR21MB0778:|DM5PR21MB0778:
-x-ms-exchange-transport-forked: True
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <DM5PR21MB07786B1DAED36DF4354452ADD7950@DM5PR21MB0778.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1107;
-x-forefront-prvs: 018577E36E
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(39860400002)(136003)(376002)(396003)(366004)(199004)(189003)(7736002)(5660300002)(55016002)(305945005)(99286004)(2906002)(7696005)(74316002)(6116002)(256004)(22452003)(14444005)(110136005)(54906003)(229853002)(6436002)(10290500003)(81166006)(4326008)(8936002)(8676002)(81156014)(52536014)(6246003)(316002)(9686003)(14454004)(478600001)(33656002)(66556008)(76116006)(66476007)(25786009)(186003)(102836004)(64756008)(66446008)(6506007)(66946007)(86362001)(8990500004)(7416002)(10090500001)(76176011)(71200400001)(486006)(71190400001)(446003)(46003)(11346002)(476003);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR21MB0778;H:DM5PR21MB0137.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kLJoZDzPkwF70akO1h2ZajXK9wSmvwQZ0z6huEdapCSdrPpJ4cSTSNWS77q6/xNvdvMWf1H6uAjDjI/CMh/TRhRTU4+5FCWuT1wovb60cDlsaztv24RwLvlK/yWi+6F/BLP8FafqT5CAB1e7VDXOc+aVMQjOYK9xYrfQvWihDAQSC4GvvJZgTrV7VKsrdi6xAZOpjacfDgPBOovuk/XV5P+kiURIlMNe4X7OmXb7emQIKwzfR7/d+pGlJyNs8lOoooB3MbpAqCRN1GplTIH+bWcTQ7Rga2/8HiV9ifihoaoar0p1zm4nAFnbbnNNv/9wKpIALYVApp0o7fA6zqosinaZnbwouqsVSpcMtQJIOqUoeziuRGIgJsGBD/YgqlZp7vQ71ZP3wb2pgejqIKrA9mNZJGbi0fI7QN691YPDr40=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1731478AbfJIQFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 12:05:44 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53206 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731375AbfJIQFo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 12:05:44 -0400
+Received: by mail-wm1-f66.google.com with SMTP id r19so3252496wmh.2
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 09:05:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OcoDswvcpgORUe+MjF3j+myWKBr/y/JxVMKqWxIZdns=;
+        b=PlMwn9qd6erojZKwrGuwRQoT3mBFtPJPdxKkIoi+g/d953cHVVQVDyFhTmkAOHq9HS
+         VH6Kz+ynJOta/5jpwjQNaOKkCz8EqFOd8eFpwMkcdLBa/lGr9vFX4ZH9Odb0ZasRfZfg
+         hL4ixrbd5H9Gn9ce4slb2XkurFpkRA99mVhAJRq0EpElm5jcHAq+hLY5NEFSOcYi8T5c
+         XDGKEmdJaOWe6vEv1mdkMetvYaOe5w19Ke0Q6x3RRBcLXohUpsQ+H+tsU7xqCcKjV69C
+         oJPkEMkoDqtuEHAJMbrD0RUQcVb80wtCimLZE2tavU+7cfhJGR2bsMlGyBuIYnXcbGRM
+         T4sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OcoDswvcpgORUe+MjF3j+myWKBr/y/JxVMKqWxIZdns=;
+        b=JspAcTvH4GWvaQpojkeyepTdvEc0v7syQJfhAD2SDSy0MJJgrrSSNXzFpLdOQODuch
+         gQv6BknSyjRVj3z4MQ98IEg+r4/nz+5GH88VTsIQq6tzHRDioDDh//hCP8ivzG4e3LwV
+         8qAeGETlDDbCeJS846HPAQKSTJp2cmSYE9w0Qk23XQB1/SiUBhMo5OQK0CgiPiFfUTFv
+         jqueKtrk+lHOjWXEd/yQGs+y2fv0b3mcnCb+xarHlK7sIwIzrIJLIJ3OYYfrOOXnGLRa
+         IB+PQEhg5inVSDBP3PFiS9YpdkW/ASIAGva9tBWiHunLsqh42RmGlH59tC83eVQFb0/W
+         nFjQ==
+X-Gm-Message-State: APjAAAVOg2bv1KncyVdhQ8UBXRmzVuMoycknMr/TkhxI4poGViQSY93B
+        ryCF+G2iC9eLCrijdZnOgI4IO6jgMTeIFCrIdXFRrg==
+X-Google-Smtp-Source: APXvYqwf2k+wes8U4KHH/Mq/y7m8PrdEQhLEFToIcu4WDfCk10VCZnURO4OVa/kXncgoav9k+nk3ezXxb9qFfCb0MU8=
+X-Received: by 2002:a1c:a8c9:: with SMTP id r192mr3238811wme.152.1570637140793;
+ Wed, 09 Oct 2019 09:05:40 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5bc5e01-158e-4d1a-1295-08d74ccf31a4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2019 15:41:47.0242
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Z9bA1y3jwVWhH/fSp7H70wSSN5fcXeFRo9HiBBPEm65ETQ5uA8TNmt2Ws+43bsk+UmbAzoQQBZtdR/RP8bM/JodMcQBwcJTQ9TsQL0sJCdg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR21MB0778
+References: <20190918080716.64242-1-jianyong.wu@arm.com> <20190918080716.64242-5-jianyong.wu@arm.com>
+ <83ed7fac-277f-a31e-af37-8ec134f39d26@redhat.com> <HE1PR0801MB1676F57B317AE85E3B934B32F48E0@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <629538ea-13fb-e666-8df6-8ad23f114755@redhat.com> <HE1PR0801MB167639E2F025998058A77F86F4890@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <ef6ab8bd-41ad-88f8-9cfd-dc749ca65310@redhat.com> <a1b554b8-4417-5305-3419-fe71a8c50842@kernel.org>
+ <56a5b885-62c8-c4ef-e2f8-e945c0eb700e@redhat.com> <HE1PR0801MB1676115C248E6DF09F9DD5A6F4950@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <1cc145ca-1af2-d46f-d530-0ae434005f0b@redhat.com> <HE1PR0801MB1676B1AD68544561403C3196F4950@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <6b8b59b2-a07e-7e33-588c-1da7658e3f1e@redhat.com>
+In-Reply-To: <6b8b59b2-a07e-7e33-588c-1da7658e3f1e@redhat.com>
+From:   John Stultz <john.stultz@linaro.org>
+Date:   Wed, 9 Oct 2019 09:05:29 -0700
+Message-ID: <CALAqxLVa-BSY0i007GfzKEVU1uak4=eY=TJ3wj6JL_Y-EfY3ng@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 4/6] psci: Add hvc call service for ptp_kvm.
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        "Kaly Xin (Arm Technology China)" <Kaly.Xin@arm.com>,
+        "Justin He (Arm Technology China)" <Justin.He@arm.com>,
+        nd <nd@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com> Sent: Wednesday, October 9, 20=
-19 8:27 AM
->=20
-> Roman Kagan <rkagan@virtuozzo.com> writes:
->=20
-> > Now that there's Hyper-V IOMMU driver, Linux can switch to x2apic mode
-> > when supported by the vcpus.
+On Wed, Oct 9, 2019 at 2:13 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 09/10/19 10:18, Jianyong Wu (Arm Technology China) wrote:
 > >
-> > However, the apic access functions for Hyper-V enlightened apic assume
-> > xapic mode only.
-> >
-> > As a result, Linux fails to bring up secondary cpus when run as a guest
-> > in QEMU/KVM with both hv_apic and x2apic enabled.
-> >
-> > According to Michael Kelley, when in x2apic mode, the Hyper-V synthetic
-> > apic MSRs behave exactly the same as the corresponding architectural
-> > x2apic MSRs, so there's no need to override the apic accessors.  The
-> > only exception is hv_apic_eoi_write, which benefits from lazy EOI when
-> > available; however, its implementation works for both xapic and x2apic
-> > modes.
-> >
-> > Fixes: 29217a474683 ("iommu/hyper-v: Add Hyper-V stub IOMMU driver")
-> > Fixes: 6b48cb5f8347 ("X86/Hyper-V: Enlighten APIC access")
-> > Cc: stable@vger.kernel.org
-> > Suggested-by: Michael Kelley <mikelley@microsoft.com>
-> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> > ---
-> > v2 -> v3:
-> > - do not introduce x2apic-capable hv_apic accessors; leave original
-> >   x2apic accessors instead
-> >
-> > v1 -> v2:
-> > - add ifdefs to handle !CONFIG_X86_X2APIC
-> >
-> >  arch/x86/hyperv/hv_apic.c | 17 +++++++++++++----
-> >  1 file changed, 13 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
-> > index 5c056b8aebef..26eeff5bd535 100644
-> > --- a/arch/x86/hyperv/hv_apic.c
-> > +++ b/arch/x86/hyperv/hv_apic.c
-> > @@ -261,10 +261,19 @@ void __init hv_apic_init(void)
-> >
-> >  	if (ms_hyperv.hints & HV_X64_APIC_ACCESS_RECOMMENDED) {
-> >  		pr_info("Hyper-V: Using MSR based APIC access\n");
->=20
-> This pr_info() becomes a bit misleading in x2apic mode, maybe do
-> something like
->=20
-> pr_info("Hyper-V: using Enlightened APIC (%s mode)",
->         x2apic_enabled() ? "x2apic" : "xapic");
+> > We must ensure both of the host and guest using the same clocksource.
+> > get_device_system_crosststamp will check the clocksource of guest and we also need check
+> > the clocksource in host, and struct type can't be transferred from host to guest using arm hypercall.
+> > now we lack of a mechanism to check the current clocksource. I think this will be useful if we add one.
+>
+> Got it---yes, I think adding a struct clocksource to struct
+> system_time_snapshot would make sense.  Then the hypercall can just use
+> ktime_get_snapshot and fail if the clocksource is not the ARM arch counter.
+>
+> John (Stultz), does that sound good to you?  The context is that
+> Jianyong would like to add a hypercall that returns a (cycles,
+> nanoseconds) pair to the guest.  On x86 we're relying on the vclock_mode
+> field that is already there for the vDSO, but being able to just use
+> ktime_get_snapshot would be much nicer.
 
-Yes, I like this.  But tweak the capitalization of the message:
+I've not really looked at the code closely in awhile, so I'm not sure
+my suggestions will be too useful.
 
-pr_info("Hyper-V: Using enlightened APIC (%s mode)",
+My only instinct is maybe to not include the clocksource pointer in
+the system_time_snapshot, as I worry that structure will then be
+abused by the interface users.  If you're just wanting to make sure
+the clocksource is what you're expecting, would instead putting only
+the clocksource name in the structure suffice?
 
->=20
-> > +		/*
-> > +		 * With x2apic, architectural x2apic MSRs are equivalent to the
-> > +		 * respective synthetic MSRs, so there's no need to override
-> > +		 * the apic accessors.  The only exception is
-> > +		 * hv_apic_eoi_write, because it benefits from lazy EOI when
-> > +		 * available, but it works for both xapic and x2apic modes.
-> > +		 */
-> >  		apic_set_eoi_write(hv_apic_eoi_write);
-> > -		apic->read      =3D hv_apic_read;
-> > -		apic->write     =3D hv_apic_write;
-> > -		apic->icr_write =3D hv_apic_icr_write;
-> > -		apic->icr_read  =3D hv_apic_icr_read;
-> > +		if (!x2apic_enabled()) {
-> > +			apic->read      =3D hv_apic_read;
-> > +			apic->write     =3D hv_apic_write;
-> > +			apic->icr_write =3D hv_apic_icr_write;
-> > +			apic->icr_read  =3D hv_apic_icr_read;
-> > +		}
-> >  	}
-> >  }
->=20
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->=20
-Reviewed-by: Michael Kelley <mikelley@microsoft.com>
+thanks
+-john
