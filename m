@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9837D13F4
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 18:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82800D1421
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 18:35:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731426AbfJIQZN convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 9 Oct 2019 12:25:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38138 "EHLO mx1.redhat.com"
+        id S1731719AbfJIQfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 12:35:19 -0400
+Received: from mga14.intel.com ([192.55.52.115]:46952 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730503AbfJIQZN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 12:25:13 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 769C5806A75;
-        Wed,  9 Oct 2019 16:25:12 +0000 (UTC)
-Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A3BBD60166;
-        Wed,  9 Oct 2019 16:25:01 +0000 (UTC)
+        id S1730490AbfJIQfT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 12:35:19 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 09:35:18 -0700
+X-IronPort-AV: E=Sophos;i="5.67,276,1566889200"; 
+   d="scan'208";a="187670690"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 09:35:17 -0700
+Message-ID: <22ce946f7a5cf0b7b4c8058c400d8b9b4c63a5a5.camel@linux.intel.com>
 Subject: Re: [PATCH v11 0/6] mm / virtio: Provide support for unused page
  reporting
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        David Hildenbrand <david@redhat.com>,
-        virtio-dev@lists.oasis-open.org, kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     Nitesh Narayan Lal <nitesh@redhat.com>,
         Dave Hansen <dave.hansen@intel.com>,
-        Matthew Wilcox <willy@infradead.org>,
         Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
         Mel Gorman <mgorman@techsingularity.net>,
-        Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-mm <linux-mm@kvack.org>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
         Oscar Salvador <osalvador@suse.de>,
         Yang Zhang <yang.zhang.wz@gmail.com>,
         Pankaj Gupta <pagupta@redhat.com>,
@@ -43,156 +44,107 @@ Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
         Andrea Arcangeli <aarcange@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 09 Oct 2019 09:35:17 -0700
+In-Reply-To: <5c640ecb-cfef-2fa6-57aa-1352f1036f4e@redhat.com>
 References: <20191001152441.27008.99285.stgit@localhost.localdomain>
- <7233498c-2f64-d661-4981-707b59c78fd5@redhat.com>
- <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
- <8bd303a6-6e50-b2dc-19ab-4c3f176c4b02@redhat.com>
- <CAKgT0Uf37xAFK2CWqUZJgn7bWznSAi6qncLxBpC55oSpBMG1HQ@mail.gmail.com>
- <c06b68cb-5e94-ae3e-f84e-48087d675a8f@redhat.com>
- <CAKgT0Ud6TT=XxqFx6ePHzbUYqMp5FHVPozRvnNZK3tKV7j2xjg@mail.gmail.com>
- <0a16b11e-ec3b-7196-5b7f-e7395876cf28@redhat.com>
- <d96f744d2c48f5a96c6962c6a0a89d2429e5cab8.camel@linux.intel.com>
- <7fc13837-546c-9c4a-1456-753df199e171@redhat.com>
- <5b6e0b6df46c03bfac906313071ac0362d43c432.camel@linux.intel.com>
- <c2fd074b-1c86-cd93-41ea-ae1a6b2ca841@redhat.com>
- <CAKgT0Uecy96y-bOj4TpXBxSwJhn3jaCtGjD2+Zswh9gN7i+Otg@mail.gmail.com>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- VujM7c/b4pps
-Organization: Red Hat Inc,
-Message-ID: <9bd52b8e-fa9e-a5ad-de39-660684757cdb@redhat.com>
-Date:   Wed, 9 Oct 2019 12:25:00 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+         <7233498c-2f64-d661-4981-707b59c78fd5@redhat.com>
+         <1ea1a4e11617291062db81f65745b9c95fd0bb30.camel@linux.intel.com>
+         <8bd303a6-6e50-b2dc-19ab-4c3f176c4b02@redhat.com>
+         <CAKgT0Uf37xAFK2CWqUZJgn7bWznSAi6qncLxBpC55oSpBMG1HQ@mail.gmail.com>
+         <c06b68cb-5e94-ae3e-f84e-48087d675a8f@redhat.com>
+         <CAKgT0Ud6TT=XxqFx6ePHzbUYqMp5FHVPozRvnNZK3tKV7j2xjg@mail.gmail.com>
+         <0a16b11e-ec3b-7196-5b7f-e7395876cf28@redhat.com>
+         <d96f744d2c48f5a96c6962c6a0a89d2429e5cab8.camel@linux.intel.com>
+         <7fc13837-546c-9c4a-1456-753df199e171@redhat.com>
+         <5b6e0b6df46c03bfac906313071ac0362d43c432.camel@linux.intel.com>
+         <c2fd074b-1c86-cd93-41ea-ae1a6b2ca841@redhat.com>
+         <5c640ecb-cfef-2fa6-57aa-1352f1036f4e@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0Uecy96y-bOj4TpXBxSwJhn3jaCtGjD2+Zswh9gN7i+Otg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Wed, 09 Oct 2019 16:25:12 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 2019-10-09 at 11:21 -0400, Nitesh Narayan Lal wrote:
+> On 10/7/19 1:06 PM, Nitesh Narayan Lal wrote:
+> [...]
+> > > So what was the size of your guest? One thing that just occurred to me is
+> > > that you might be running a much smaller guest than I was.
+> > I am running a 30 GB guest.
+> > 
+> > > > >  If so I would have expected a much higher difference versus
+> > > > > baseline as zeroing/faulting the pages in the host gets expensive fairly
+> > > > > quick. What is the host kernel you are running your test on? I'm just
+> > > > > wondering if there is some additional overhead currently limiting your
+> > > > > setup. My host kernel was just the same kernel I was running in the guest,
+> > > > > just built without the patches applied.
+> > > > Right now I have a different host-kernel. I can install the same kernel to the
+> > > > host as well and see if that changes anything.
+> > > The host kernel will have a fairly significant impact as I recall. For
+> > > example running a stock CentOS kernel lowered the performance compared to
+> > > running a linux-next kernel. As a result the numbers looked better since
+> > > the overall baseline was lower to begin with as the host OS was
+> > > introducing additional overhead.
+> > I see in that case I will try by installing the same guest kernel
+> > to the host as well.
+> 
+> As per your suggestion, I tried replacing the host kernel with an
+> upstream kernel without my patches i.e., my host has a kernel built on top
+> of the upstream kernel's master branch which has Sept 23rd commit and the guest
+> has the same kernel for the no-hinting case and same kernel + my patches
+> for the page reporting case.
+> 
+> With the changes reported earlier on top of v12, I am not seeing any further
+> degradation (other than what I have previously reported).
+> 
+> To be sure that THP is actively used, I did an experiment where I changed the
+> MEMSIZE in the page_fault. On doing so THP usage checked via /proc/meminfo also
+> increased as I expected.
+> 
+> In any case, if you find something else please let me know and I will look into it
+> again.
+> 
+> 
+> I am still looking into your suggestion about cache line bouncing and will reply
+> to it, if I have more questions.
+> 
+> 
+> [...]
 
-On 10/7/19 1:20 PM, Alexander Duyck wrote:
-> On Mon, Oct 7, 2019 at 10:07 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
->>
->> On 10/7/19 12:27 PM, Alexander Duyck wrote:
->>> On Mon, 2019-10-07 at 12:19 -0400, Nitesh Narayan Lal wrote:
->>>> On 10/7/19 11:33 AM, Alexander Duyck wrote:
->>>>> On Mon, 2019-10-07 at 08:29 -0400, Nitesh Narayan Lal wrote:
->>>>>> On 10/2/19 10:25 AM, Alexander Duyck wrote:
-> <snip>
->
->>>>>> page_reporting.c change:
->>>>>> @@ -101,8 +101,12 @@ static void scan_zone_bitmap(struct page_reporting_config
->>>>>> *phconf,
->>>>>>                 /* Process only if the page is still online */
->>>>>>                 page = pfn_to_online_page((setbit << PAGE_REPORTING_MIN_ORDER) +
->>>>>>                                           zone->base_pfn);
->>>>>> -               if (!page)
->>>>>> +               if (!page || !PageBuddy(page)) {
->>>>>> +                       clear_bit(setbit, zone->bitmap);
->>>>>> +                       atomic_dec(&zone->free_pages);
->>>>>>                         continue;
->>>>>> +               }
->>>>>>
->>>>> I suspect the zone->free_pages is going to be expensive for you to deal
->>>>> with. It is a global atomic value and is going to have the cacheline
->>>>> bouncing that it is contained in. As a result thinks like setting the
->>>>> bitmap with be more expensive as every tome a CPU increments free_pages it
->>>>> will likely have to take the cache line containing the bitmap pointer as
->>>>> well.
->>>> I see I will have to explore this more. I am wondering if there is a way to
->>>> measure this If its effect is not visible in will-it-scale/page_fault1. If
->>>> there is a noticeable amount of degradation, I will have to address this.
->>> If nothing else you might look at seeing if you can split up the
->>> structures so that the bitmap and nr_bits is in a different region
->>> somewhere since those are read-mostly values.
->> ok, I will try to understand the issue and your suggestion.
->> Thank you for bringing this up.
->>
->>> Also you are now updating the bitmap and free_pages both inside and
->>> outside of the zone lock so that will likely have some impact.
->> So as per your previous suggestion, I have made the bitmap structure
->> object as a rcu protected pointer. So we are safe from that side.
->> The other downside which I can think of is a race where one page
->> trying to increment free_pages and other trying to decrements it.
->> However, being an atomic variable that should not be a problem.
->> Did I miss anything?
-> I'm not so much worried about a race as the cache line bouncing
-> effect. Basically your notifier combined within this hinting thread
-> will likely result in more time spent by the thread that holds the
-> lock since it will be trying to access the bitmap to set the bit and
-> the free_pages to report the bit, but at the same time you will have
-> this thread clearing bits and decrementing the free_pages values.
->
-> One thing you could consider in your worker thread would be to do
-> reallocate and replace the bitmap every time you plan to walk it. By
-> doing that you would avoid the cacheline bouncing on the bitmap since
-> you would only have to read it, and you would no longer have another
-> thread dirtying it. You could essentially reset the free_pages at the
-> same time you replace the bitmap. It would need to all happen with the
-> zone lock held though when you swap it out.
+I really feel like this discussion has gone off course. The idea here is
+to review this patch set[1] and provide working alternatives if there are
+issues with the current approach.
 
-If I am not mistaken then from what you are suggesting, I will have to hold
-the zone lock for the entire duration of swap & scan which would be costly if
-the bitmap is large, isn't? Also, we might end up missing free pages that are
-getting
-freed while we are scanning.
+The bitmap based approach still has a number of outstanding issues
+including sparse memory and hotplug which have yet to be addressed. We can
+gloss over that, but there is a good chance that resolving those would
+have potential performance implications. With this most recent change
+there is now also the fact that it can only really support reporting at
+one page order so the solution is now much more prone to issues with
+memory fragmentation than it was before. I would consider the fact that my
+solution works with multiple page orders while the bitmap approach
+requires MAX_ORDER - 1 seems like another obvious win for my solution.
+Until we can get back to the point where we are comparing apples to apples
+I would prefer not to benchmark the bitmap solution as without the extra
+order limitation it was over 20% worse then my solution performance wise.
 
-As far as free_pages count is concerned, I am thinking if I should
-replace it with zone->free_area[REPORTING_ORDER].nr_free which is already there
-(I still need to explore this in a bit more depth).
+Ideally I would like to get code review for patches 3 and 4, and spend my
+time addressing issues reported there. The main things I need input on is
+if the solution of allowing the list iterators to be reset is good enough
+to address the compaction issues that were pointed out several releases
+ago or if I have to look for another solution. Also I have changed things
+so that page_reporting.h was split over two files with the new one now
+living in the mm/ folder. By doing that I was hoping to reduce the
+exposure of the internal state of the free-lists so that essentially all
+we end up providing is an interface for the notifier to be used by virtio-
+balloon.
 
->
-> - Alex
--- 
-Thanks
-Nitesh
+Thanks.
+
+- Alex
+
+[1]: https://lore.kernel.org/lkml/20191001152441.27008.99285.stgit@localhost.localdomain/
 
