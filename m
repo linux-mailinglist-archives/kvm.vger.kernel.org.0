@@ -2,158 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6E6FD0B8B
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 11:42:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D8C0D0BA3
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 11:46:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729918AbfJIJmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 05:42:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38972 "EHLO mx1.redhat.com"
+        id S1730718AbfJIJoi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 05:44:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51324 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726734AbfJIJmU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 05:42:20 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        id S1730041AbfJIJoi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 05:44:38 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8634A2A09A1
-        for <kvm@vger.kernel.org>; Wed,  9 Oct 2019 09:42:19 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id k9so804390wmb.0
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 02:42:19 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id CDE6C3CBE2
+        for <kvm@vger.kernel.org>; Wed,  9 Oct 2019 09:44:37 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id f3so827798wrr.23
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 02:44:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2SfK+bwB/cF2Z8hlX+aReQdgBCXk+L/5n2wFayhP4Gk=;
-        b=IPjB5bWHdSnAlYmsLTQhiSc4YsQdOi5QUOfr04ZiPXcFScxO+llj8jINdUvM778JRz
-         7eZzXCEae2QdCDuWwvJJP00N3c0OLeQkQaGzD7iFl6yAU1YjEDxNV52tBopLzuBXoYT2
-         e9JNKtepj6BWyhemnnpQ568N7Y7ZeSubD7luHMT9HihzpN3VM2j7e65YyiU8LFxRSvnS
-         CJ6ysMGj5GxNX0sXb/VK55fGx6URQggglSwGKJo/7X1BAGUkMeDAewMbkZI6PJr7EPiy
-         xOPfbis9ufeqfnmPX+LcyitG9yA9DDMxKn5mhiXPBcZZb2VxFtaxDuFCYrr7XcJro3ja
-         awtw==
-X-Gm-Message-State: APjAAAUWfk3FekPcfT+OREHYo9T8ghtzY6+CxS3vg+VdyTA67hWCdEGQ
-        eeyhT1aEeRrTCxLRh3+kiELgWm5FOfDebd9cgmwxgd0fIfpstF66OHCC3pk1sKw/Rgom8tXByZ6
-        TUZaTXtxcLS1h
-X-Received: by 2002:a1c:a8c9:: with SMTP id r192mr1857211wme.152.1570614138030;
-        Wed, 09 Oct 2019 02:42:18 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyKjouqMbMNxTFuGL86nTyCiQqhfx17sz5oE1whEuLV7eS6sbY4ojO1la5n7F9GzBChRhx60g==
-X-Received: by 2002:a1c:a8c9:: with SMTP id r192mr1857192wme.152.1570614137681;
-        Wed, 09 Oct 2019 02:42:17 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id c9sm1607213wrt.7.2019.10.09.02.42.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2019 02:42:17 -0700 (PDT)
-Subject: Re: [PATCH] selftests: kvm: fix sync_regs_test with newer gccs
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>
-References: <20191008180808.14181-1-vkuznets@redhat.com>
- <20191008183634.GF14020@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <b7d20806-4e88-91af-31c1-8cbb0a8a330b@redhat.com>
-Date:   Wed, 9 Oct 2019 11:42:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=IgLlslTtHyY/DsCT/GempjMqnPIRbjKjjsT71GS80BU=;
+        b=H67ptIrE81+ct0JSyznDPPG7lh8Bv6MnhdjudDo+WSRa538k8cIrAxDZaQZvBasd1W
+         I96LT51S6TdV0M7fEulzRWAoPqakxVkgVS/qH9xEX+iVDjGL3GD5I4ZSFVoiO4Hf7H+s
+         yg4gZ7ql0lLCfIZiCD7RvpAzpwHMLuihMKJv7gLzsg64CtDu+lGMLyHe52VUg9jD/Gzh
+         TCGZbmbAlsF8IVI3OhdsMAJ7of77eI4nrwDhIR+Zqy9xFcMSAmzBhMtZw4c7GflNT0lk
+         0i0Ke7D2CGlXMK62IivgULYtectDHJ9RYAG0ibVpBPjxNDsXaFdIvY8erRvw/jm8qBiv
+         1orA==
+X-Gm-Message-State: APjAAAXvyjycss22U/byhEUUMNFCOZ60FJuAuip7JLPbS9FqR1U5RMAJ
+        sUJubVBLmpBrkSrfeVk7lB7QiVjsUdlDXbYn2Mb10jFGJZ3d/W1JjDRZZOn5+i5qipKDX2BwJyd
+        JdbZMiSEHoGxL
+X-Received: by 2002:a1c:7311:: with SMTP id d17mr1768165wmb.49.1570614275926;
+        Wed, 09 Oct 2019 02:44:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy4Wse3vGoQIgd/ml9oYw6+IUa/k66QMkr3IXKbfsrgPgFKxrYzXylx/6gMsMm5PeJvNXxJPg==
+X-Received: by 2002:a1c:7311:: with SMTP id d17mr1768146wmb.49.1570614275686;
+        Wed, 09 Oct 2019 02:44:35 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
+        by smtp.gmail.com with ESMTPSA id a3sm1320859wmj.35.2019.10.09.02.44.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2019 02:44:35 -0700 (PDT)
+Date:   Wed, 9 Oct 2019 11:44:32 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     linux-hyperv@vger.kernel.org,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        Jorgen Hansen <jhansen@vmware.com>
+Subject: Re: [RFC PATCH 11/13] vsock: add 'transport_hg' to handle g2h\h2g
+ transports
+Message-ID: <20191009094432.by5zs4c3binrznpp@steredhat>
+References: <20190927112703.17745-1-sgarzare@redhat.com>
+ <20190927112703.17745-12-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191008183634.GF14020@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190927112703.17745-12-sgarzare@redhat.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/10/19 20:36, Sean Christopherson wrote:
-> On Tue, Oct 08, 2019 at 08:08:08PM +0200, Vitaly Kuznetsov wrote:
->> Commit 204c91eff798a ("KVM: selftests: do not blindly clobber registers in
->>  guest asm") was intended to make test more gcc-proof, however, the result
->> is exactly the opposite: on newer gccs (e.g. 8.2.1) the test breaks with
->>
->> ==== Test Assertion Failure ====
->>   x86_64/sync_regs_test.c:168: run->s.regs.regs.rbx == 0xBAD1DEA + 1
->>   pid=14170 tid=14170 - Invalid argument
->>      1	0x00000000004015b3: main at sync_regs_test.c:166 (discriminator 6)
->>      2	0x00007f413fb66412: ?? ??:0
->>      3	0x000000000040191d: _start at ??:?
->>   rbx sync regs value incorrect 0x1.
->>
->> Apparently, compile is still free to play games with registers even
->> when they have variables attaches.
->>
->> Re-write guest code with 'asm volatile' by embedding ucall there and
->> making sure rbx is preserved.
->>
->> Fixes: 204c91eff798a ("KVM: selftests: do not blindly clobber registers in guest asm")
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  .../selftests/kvm/x86_64/sync_regs_test.c     | 21 ++++++++++---------
->>  1 file changed, 11 insertions(+), 10 deletions(-)
->>
->> diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
->> index 11c2a70a7b87..5c8224256294 100644
->> --- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
->> +++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
->> @@ -22,18 +22,19 @@
->>  
->>  #define VCPU_ID 5
->>  
->> +#define UCALL_PIO_PORT ((uint16_t)0x1000)
->> +
->> +/*
->> + * ucall is embedded here to protect against compiler reshuffling registers
->> + * before calling a function. In this test we only need to get KVM_EXIT_IO
->> + * vmexit and preserve RBX, no additional information is needed.
->> + */
->>  void guest_code(void)
->>  {
->> -	/*
->> -	 * use a callee-save register, otherwise the compiler
->> -	 * saves it around the call to GUEST_SYNC.
->> -	 */
->> -	register u32 stage asm("rbx");
->> -	for (;;) {
->> -		GUEST_SYNC(0);
->> -		stage++;
->> -		asm volatile ("" : : "r" (stage));
->> -	}
->> +	asm volatile("1: in %[port], %%al\n"
->> +		     "add $0x1, %%rbx\n"
->> +		     "jmp 1b"
->> +		     : : [port] "d" (UCALL_PIO_PORT) : "rax", "rbx");
->>  }
+On Fri, Sep 27, 2019 at 01:27:01PM +0200, Stefano Garzarella wrote:
+> VMCI transport provides both g2h and h2g behaviors in a single
+> transport.
+> We are able to set (or not) the g2h behavior, detecting if we
+> are in a VMware guest (or not), but the h2g feature is always set.
+> This prevents to load other h2g transports while we are in a
+> VMware guest.
 > 
-> To make the code truly bulletproof, is it possible to rename guest_code()
-> to guest_code_wrapper() and then export 1: as guest_code?  VM-Enter will
-> jump directly to the relevant code and gcc can't touch rbx.  E.g.:
+> This patch adds a new 'transport_hg' to handle this case, reducing
+> the priority of transports that provide both g2h and h2g
+> behaviors. A transport that has g2h and h2g features, can be
+> bypassed by a transport that has only the h2g feature.
 > 
-> 	asm volatile("1: ..."
-> 		     ".global guest_code"
-> 		     "guest_code: " _ASM_PTR " 1b");
-> 
-> Not sure if that works with how the selftests are compiled.  It may also
-> be possible to simply replace '1' with 'guest_code'.
 
-There is no practical difference with Vitaly's patch.  The first
-_vcpu_run has no pre-/post-conditions on the value of %rbx:
+Since I'm enabling the VSOCK_TRANSPORT_F_G2H in the vmci_transport only
+when we run in a VMware guest, this patch doesn't work well if a KVM (or
+HyperV) guest application create an AF_VSOCK socket and no transports are
+loaded, because in this case the vmci_transport is loaded
+(MODULE_ALIAS_NETPROTO(PF_VSOCK)) and it is registered as transport_h2g.
 
+At this point, if we want to run a nested VM using vhost_transport, we
+can't load it.
 
-        run->kvm_valid_regs = TEST_SYNC_FIELDS;
-        rv = _vcpu_run(vm, VCPU_ID);
-        TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-                    "Unexpected exit reason: %u (%s),\n",
-                    run->exit_reason,
-                    exit_reason_str(run->exit_reason));
+So, I can leave VSOCK_TRANSPORT_F_G2H always set in the vmci_transport
+and this should fix this issue.
+Or maybe I need to change how the registering works, e.g. handling a list
+of transport registered, setting priority or using the last registered
+transport.
 
-	/*
-	 * Then it goes on comparing regs/sregs/events, but does not
-	 * check for specific values.
-	 */
+Any suggestion?
 
-As soon as that first _vcpu_run succeeds, you're stuck in the in/add/jmp
-loop and the compiler can't trick you anymore.
-
-So, I'm queuing the patch.
-
-Paolo
+Thanks,
+Stefano
