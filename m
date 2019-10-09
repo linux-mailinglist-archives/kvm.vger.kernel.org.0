@@ -2,78 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D065AD078A
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 08:44:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60307D0793
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 08:45:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725879AbfJIGoa convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 9 Oct 2019 02:44:30 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:50236 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725440AbfJIGoa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 02:44:30 -0400
-Received: from bigeasy by Galois.linutronix.de with local (Exim 4.80)
-        (envelope-from <bigeasy@linutronix.de>)
-        id 1iI5hx-0006Nx-RK; Wed, 09 Oct 2019 08:44:25 +0200
-Date:   Wed, 9 Oct 2019 08:44:25 +0200
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     Babu Moger <Babu.Moger@amd.com>,
-        Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        id S1726349AbfJIGoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 02:44:55 -0400
+Received: from mga01.intel.com ([192.55.52.88]:37246 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725914AbfJIGoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 02:44:54 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Oct 2019 23:44:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; 
+   d="scan'208";a="368658906"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga005.jf.intel.com with ESMTP; 08 Oct 2019 23:44:51 -0700
+Date:   Wed, 9 Oct 2019 14:46:48 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [Patch 3/6] kvm: svm: Add support for XSAVES on AMD
-Message-ID: <20191009064425.mxxiegsyr7ugiqum@linutronix.de>
-References: <20191009004142.225377-1-aaronlewis@google.com>
- <20191009004142.225377-3-aaronlewis@google.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v7 6/7] KVM: x86: Load Guest fpu state when accessing
+ MSRs managed by XSAVES
+Message-ID: <20191009064648.GD27851@local-michael-cet-test>
+References: <20190927021927.23057-1-weijiang.yang@intel.com>
+ <20190927021927.23057-7-weijiang.yang@intel.com>
+ <CALMp9eRouyhkKeadM_w80bisWB-VSBCf3NSei5hZXcDsRR7GJg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <20191009004142.225377-3-aaronlewis@google.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <CALMp9eRouyhkKeadM_w80bisWB-VSBCf3NSei5hZXcDsRR7GJg@mail.gmail.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-10-08 17:41:39 [-0700], Aaron Lewis wrote:
-> Hoist support for IA32_XSS so it can be used for both AMD and Intel,
-
-Hoist
-
-> instead of for just Intel.
+On Wed, Oct 02, 2019 at 12:56:30PM -0700, Jim Mattson wrote:
+> On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
+> >
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> >
+ >  /*
+> >   * Read or write a bunch of msrs. All parameters are kernel addresses.
+> >   *
+> > @@ -3009,11 +3017,23 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
+> >                     int (*do_msr)(struct kvm_vcpu *vcpu,
+> >                                   unsigned index, u64 *data))
+> >  {
+> > +       bool fpu_loaded = false;
+> >         int i;
+> > +       const u64 cet_bits = XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL;
+> > +       bool cet_xss = kvm_x86_ops->xsaves_supported() &&
+> > +                      (kvm_supported_xss() & cet_bits);
 > 
-> AMD has no equivalent of Intel's "Enable XSAVES/XRSTORS" VM-execution
-> control. Instead, XSAVES is always available to the guest when supported
-> on the host.
+> It seems like I've seen a lot of checks like this. Can this be
+> simplified (throughout this series) by sinking the
+> kvm_x86_ops->xsaves_supported() check into kvm_supported_xss()? That
+> is, shouldn't kvm_supported_xss() return 0 if
+> kvm_x86_ops->xsaves_supported() is false?
+>
+OK, let me add this check, thank you!
 
-You could add that implement the XSAVES check based on host's features
-and move the MSR_IA32_XSS msr R/W from Intel only code to the common
-code.
-
-…
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e90e658fd8a9..77f2e8c05047 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2702,6 +2702,15 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	case MSR_IA32_TSC:
->  		kvm_write_tsc(vcpu, msr_info);
->  		break;
-> +	case MSR_IA32_XSS:
-> +		if (!kvm_x86_ops->xsaves_supported() ||
-> +		    (!msr_info->host_initiated &&
-> +		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
-> +			return 1;
-
-I wouldn't ditch the comment. You could explain why only zero is allowed
-to be written. The Skylake is not true for both but this probably
-requires an explanation.
-
-> +		if (data != 0)
-> +			return 1;
-> +		vcpu->arch.ia32_xss = data;
-> +		break;
->  	case MSR_SMI_COUNT:
->  		if (!msr_info->host_initiated)
->  			return 1;
+> > -       for (i = 0; i < msrs->nmsrs; ++i)
+> > +       for (i = 0; i < msrs->nmsrs; ++i) {
+> > +               if (!fpu_loaded && cet_xss &&
+> > +                   is_xsaves_msr(entries[i].index)) {
+> > +                       kvm_load_guest_fpu(vcpu);
+> > +                       fpu_loaded = true;
+> > +               }
+> >                 if (do_msr(vcpu, entries[i].index, &entries[i].data))
+> >                         break;
+> > +       }
+> > +       if (fpu_loaded)
+> > +               kvm_put_guest_fpu(vcpu);
+> >
+> >         return i;
+> >  }
+> > --
+> > 2.17.2
+> >
