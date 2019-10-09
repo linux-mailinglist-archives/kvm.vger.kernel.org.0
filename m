@@ -2,122 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B48E6D17BD
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 20:49:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88710D17D1
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 20:54:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731451AbfJIStC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 14:49:02 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39047 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730490AbfJIStC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 14:49:02 -0400
-Received: by mail-pf1-f194.google.com with SMTP id v4so2192885pff.6
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 11:49:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=5JT5BqYzWgdcUuJqlGrdUisKxLgRHHYApsGEuvTJYwE=;
-        b=cxWoJdy2ZHq7VOTxRUSY/YfP9mJZf/7DjAFU4/WqQAD1iybZn2Y0M/SaR4qmuYBW9I
-         bLERDLcktnoUEEcjQHz5qxF02Hs2y/oMv3TQZBky8yu3k1RifY+btYs0fgGSsRn9IQBU
-         J/Bm/gIVQGosNw31tNFw4/h1hG7SRYsCZTlLqEdkoQL7G/IjEk6UyPZ+nr+bMefdVnUM
-         QeoLww1TfWfqR+ZknkoW+VeeoYklsimselT+JAo8ImdAiAOykfHWRAXCRM1x+QPt64W6
-         WzDpjOVHvXYz+YTdnc2NIfKTdKx7Dh08v7DdIbBMlCjfthuRohvCWFkaOs3/FF28cDMQ
-         42fw==
-X-Gm-Message-State: APjAAAUib04Lf7W1MtrlCPBO3JyxhRrk1+gwVI8Fe5ziFQp1z7hsT4Kt
-        17wIedIqadJDeIr3cj7CQsOjzpuAJV8=
-X-Google-Smtp-Source: APXvYqzbA2YcqR791W0R4HuiJWTyS2VFof6CIto1USMYTkrG6ttoyVRYL5ZJapcdIQGblVx4lWkpcA==
-X-Received: by 2002:a17:90a:be15:: with SMTP id a21mr6005311pjs.52.1570646940894;
-        Wed, 09 Oct 2019 11:49:00 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id q88sm6448818pjq.9.2019.10.09.11.48.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2019 11:49:00 -0700 (PDT)
-From:   Nadav Amit <namit@vmware.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, sean.j.christopherson@intel.com,
-        Nadav Amit <namit@vmware.com>
-Subject: [kvm-unit-tests PATCH] x86: vmx: Fix the check whether CMCI is supported
-Date:   Wed,  9 Oct 2019 04:27:54 -0700
-Message-Id: <20191009112754.36805-1-namit@vmware.com>
-X-Mailer: git-send-email 2.17.1
+        id S1731642AbfJISxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 14:53:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39040 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730490AbfJISxt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 14:53:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C08F1C057F20;
+        Wed,  9 Oct 2019 18:53:48 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-121-204.rdu2.redhat.com [10.10.121.204])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2765A5D9E2;
+        Wed,  9 Oct 2019 18:53:48 +0000 (UTC)
+Subject: Re: KVM-unit-tests on AMD
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <E15A5945-440C-4E59-A82A-B22B61769884@gmail.com>
+ <875zkz1lbh.fsf@vitty.brq.redhat.com>
+ <912C44BF-308B-4F74-A145-04FF58F94046@gmail.com>
+ <E01ED83B-53E8-4AEE-915C-3AE1DA1660E8@gmail.com>
+ <6534845f-df5b-67d7-57b8-e049bb258db6@redhat.com>
+ <96411F08-F442-42E1-9F28-33365184BFED@gmail.com>
+From:   Cathy Avery <cavery@redhat.com>
+Message-ID: <8f1df357-b186-5899-79e1-b5d727a46c4e@redhat.com>
+Date:   Wed, 9 Oct 2019 14:53:46 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <96411F08-F442-42E1-9F28-33365184BFED@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Wed, 09 Oct 2019 18:53:48 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The logic of figuring out whether CMCI is supported is broken, causing
-the CMCI accessing tests to fail on Skylake bare-metal.
+On 10/9/19 1:32 PM, Nadav Amit wrote:
+> On Oct 9, 2019, at 4:39 AM, Cathy Avery <cavery@redhat.com> wrote:
+>> On 10/8/19 4:02 PM, Nadav Amit wrote:
+>>>> On Oct 8, 2019, at 9:30 AM, Nadav Amit <nadav.amit@gmail.com> wrote:
+>>>>
+>>>>> On Oct 8, 2019, at 5:19 AM, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>>>>>
+>>>>> Nadav Amit <nadav.amit@gmail.com> writes:
+>>>>>
+>>>>>> Is kvm-unit-test supposed to pass on AMD machines or AMD VMs?.
+>>>>> It is supposed to but it doesn't :-) Actually, not only kvm-unit-tests
+>>>>> but the whole SVM would appreciate some love ...
+>>>>>
+>>>>>> Clearly, I ask since they do not pass on AMD on bare-metal.
+>>>>> On my AMD EPYC 7401P 24-Core Processor bare metal I get the following
+>>>>> failures:
+>>>>>
+>>>>> FAIL vmware_backdoors (11 tests, 8 unexpected failures)
+>>>>>
+>>>>> (Why can't we just check
+>>>>> /sys/module/kvm/parameters/enable_vmware_backdoor btw???)
+>>>>>
+>>>>> FAIL svm (15 tests, 1 unexpected failures)
+>>>>>
+>>>>> There is a patch for that:
+>>>>>
+>>>>> https://lore.kernel.org/kvm/d3eeb3b5-13d7-34d2-4ce0-fdd534f2bcc3@redhat.com/T/#t
+>>>>>
+>>>>> Inside a VM on this host I see the following:
+>>>>>
+>>>>> FAIL apic-split (timeout; duration=90s)
+>>>>> FAIL apic (timeout; duration=30)
+>>>>>
+>>>>> (I manually inreased the timeout but it didn't help - this is worrisome,
+>>>>> most likely this is a hang)
+>>>>>
+>>>>> FAIL vmware_backdoors (11 tests, 8 unexpected failures)
+>>>>>
+>>>>> - same as on bare metal
+>>>>>
+>>>>> FAIL port80 (timeout; duration=90s)
+>>>>>
+>>>>> - hang again?
+>>>>>
+>>>>> FAIL svm (timeout; duration=90s)
+>>>>>
+>>>>> - most likely a hang but this is 3-level nesting so oh well..
+>>>>>
+>>>>> FAIL kvmclock_test
+>>>>>
+>>>>> - bad but maybe something is wrong with TSC on the host? Need to
+>>>>> investigate ...
+>>>>>
+>>>>> FAIL hyperv_clock
+>>>>>
+>>>>> - this is expected as it doesn't work when the clocksource is not TSC
+>>>>> (e.g. kvm-clock)
+>>>>>
+>>>>> Are you seeing different failures?
+>>>> Thanks for your quick response.
+>>>>
+>>>> I only ran the “apic” tests so far and I got the following failures:
+>>>>
+>>>> FAIL: correct xapic id after reset
+>>>> …
+>>>> x2apic not detected
+>>>> FAIL: enable unsupported x2apic
+>>>> FAIL: apicbase: relocate apic
+>>>>
+>>>> The test gets stuck after “apicbase: reserved low bits”.
+>>>>
+>>>> Well, I understand it is not a bare-metal thing.
+>>> I ran the SVM test, and on bare-metal it does not pass.
+>>>
+>>> I don’t have the AMD machine for long enough to fix the issues, but for the
+>>> record, here are test failures and crashes I encountered while running the
+>>> tests on bare-metal.
+>>>
+>>> Failures:
+>>> - cr3 read intercept emulate
+>>> - npt_nx
+>>> - npt_rsvd
+>>> - npt_rsvd_pfwalk
+>>> - npt_rw_pfwalk
+>>> - npt_rw_l1mmio
+>>>
+>>> Crashes:
+>>> - test_dr_intercept - Access to DR4 causes #UD
+>>> - tsc_adjust_prepare - MSR access causes #GP
+>>>
+>> Interesting. I just ran the latest on bare-metal and it did pass.
+>>
+>> enabling apic
+>> enabling apic
+>> paging enabled
+>> cr0 = 80010011
+>> cr3 = 62a000
+>> cr4 = 20
+>> NPT detected - running all tests with NPT enabled
+>> PASS: null
+>> PASS: vmrun
+>> PASS: ioio
+>> PASS: vmrun intercept check
+>> PASS: cr3 read intercept
+>> PASS: cr3 read nointercept
+>> PASS: cr3 read intercept emulate
+>> PASS: dr intercept check
+>> PASS: next_rip
+>> PASS: msr intercept check
+>> PASS: mode_switch
+>> PASS: asid_zero
+>> PASS: sel_cr0_bug
+>> PASS: npt_nx
+>> PASS: npt_us
+>> PASS: npt_rsvd
+>> PASS: npt_rw
+>> PASS: npt_rsvd_pfwalk
+>> PASS: npt_rw_pfwalk
+>> PASS: npt_l1mmio
+>> PASS: npt_rw_l1mmio
+>> PASS: tsc_adjust
+>>      Latency VMRUN : max: 49300 min: 3160 avg: 3228
+>>      Latency VMEXIT: max: 607780 min: 2940 avg: 2999
+>> PASS: latency_run_exit
+>>      Latency VMLOAD: max: 29720 min: 300 avg: 306
+>>      Latency VMSAVE: max: 31660 min: 280 avg: 282
+>>      Latency STGI:   max: 18860 min: 40 avg: 54
+>>      Latency CLGI:   max: 16060 min: 40 avg: 53
+>> PASS: latency_svm_insn
+>> SUMMARY: 24 tests
+> Just to make sure, you actually ran it on bare-metal? Without KVM?
+>
+The tests were run on a Fedora 29 server with recent upstream kernel, 
+qemu, and yes with KVM.
 
-Determine whether CMCI is supported according to the maximum entries in
-the LVT as encoded in the APIC version register.
-
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Nadav Amit <namit@vmware.com>
----
- lib/x86/apic.h  |  7 +++++++
- x86/vmx_tests.c | 10 +---------
- 2 files changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/lib/x86/apic.h b/lib/x86/apic.h
-index b5bf208..a7eff63 100644
---- a/lib/x86/apic.h
-+++ b/lib/x86/apic.h
-@@ -70,6 +70,11 @@ static inline u32 x2apic_msr(u32 reg)
- 	return APIC_BASE_MSR + (reg >> 4);
- }
- 
-+static inline bool apic_lvt_entry_supported(int idx)
-+{
-+	return GET_APIC_MAXLVT(apic_read(APIC_LVR)) >= idx;
-+}
-+
- static inline bool x2apic_reg_reserved(u32 reg)
- {
- 	switch (reg) {
-@@ -83,6 +88,8 @@ static inline bool x2apic_reg_reserved(u32 reg)
- 	case 0x3a0 ... 0x3d0:
- 	case 0x3f0:
- 		return true;
-+	case APIC_CMCI:
-+		return !apic_lvt_entry_supported(6);
- 	default:
- 		return false;
- 	}
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index f4b348b..0c710cd 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -5863,11 +5863,6 @@ static u64 virt_x2apic_mode_nibble1(u64 val)
- 	return val & 0xf0;
- }
- 
--static bool is_cmci_enabled(void)
--{
--	return rdmsr(MSR_IA32_MCG_CAP) & BIT_ULL(10);
--}
--
- static void virt_x2apic_mode_rd_expectation(
- 	u32 reg, bool virt_x2apic_mode_on, bool disable_x2apic,
- 	bool apic_register_virtualization, bool virtual_interrupt_delivery,
-@@ -5877,9 +5872,6 @@ static void virt_x2apic_mode_rd_expectation(
- 		!x2apic_reg_reserved(reg) &&
- 		reg != APIC_EOI;
- 
--	if (reg == APIC_CMCI && !is_cmci_enabled())
--		readable = false;
--
- 	expectation->rd_exit_reason = VMX_VMCALL;
- 	expectation->virt_fn = virt_x2apic_mode_identity;
- 	if (virt_x2apic_mode_on && apic_register_virtualization) {
-@@ -5943,7 +5935,7 @@ static bool get_x2apic_wr_val(u32 reg, u64 *val)
- 		*val = apic_read(reg);
- 		break;
- 	case APIC_CMCI:
--		if (!is_cmci_enabled())
-+		if (!apic_lvt_entry_supported(6))
- 			return false;
- 		*val = apic_read(reg);
- 		break;
--- 
-2.17.1
 
