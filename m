@@ -2,218 +2,335 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99AD5D06BA
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 06:47:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3EBCD06C9
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 06:58:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730004AbfJIErf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 00:47:35 -0400
-Received: from mga02.intel.com ([134.134.136.20]:40112 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729040AbfJIErf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 00:47:35 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Oct 2019 21:47:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; 
-   d="scan'208";a="183955396"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by orsmga007.jf.intel.com with ESMTP; 08 Oct 2019 21:47:32 -0700
-Date:   Wed, 9 Oct 2019 12:49:30 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     Babu Moger <Babu.Moger@amd.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [Patch 2/6] KVM: VMX: Use wrmsr for switching between guest and
- host IA32_XSS
-Message-ID: <20191009044930.GA27370@local-michael-cet-test>
-References: <20191009004142.225377-1-aaronlewis@google.com>
- <20191009004142.225377-2-aaronlewis@google.com>
+        id S1729677AbfJIE6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 00:58:42 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53185 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729040AbfJIE6m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 00:58:42 -0400
+Received: by mail-wm1-f68.google.com with SMTP id r19so786492wmh.2
+        for <kvm@vger.kernel.org>; Tue, 08 Oct 2019 21:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6Th+89a5V8k+uKydsUbUW6spU9f1K+uJVHbWR12xq0U=;
+        b=ogVzvixbP+uJxJej5W5+DjT4uNHQ/WOSKO6djitiFeatVfHpjeRJOfCr7eAGKGZLih
+         f1ZdfUfrSQ1c756p6jtcplyJHvxxEgHFS2tdRFsLXt4G3jtWMIqYA0cUfNczPLWloYTe
+         IP3mjojpp33DwQYBxRsOPicILJ42abyhaVPWyd1bArsRie+/mUJq9h/zg6PKml4rQVEd
+         Yz27x153PzyOsLC0DvlKh4AJUKYfs2Nt1Xs4MWGkGJIzglF8dUkW23sxA8JVfwIL8vqH
+         KUD+WZ5WXHPRvcM55FqU5yTVGB5w704q1swulrnc5/z6xEvws7fKe+s3ISr1kZ9A3HnR
+         FAOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6Th+89a5V8k+uKydsUbUW6spU9f1K+uJVHbWR12xq0U=;
+        b=m/D+61j9wsKIc0DDWEqSAnOSCm9tuu1aVgxsddz9WTimnWyka+t3BWWg1fnAXmkRjj
+         V0vuGfexL4rabyxHCkvLbVzXOCTARHfAsOEiJwt++wpknjGpSpbL/M8PZGdv8ZzJoQvd
+         a6WJFnjTxgIv1uY7DIt6UqdjIXXVzqVr1jFIOKBWAPFM9awyLbRmv01sE7vn4oWQAZeo
+         nkaav9xIg/QX0CDfiv86O6OnUj4mzGCs00MoXQ7tnCAdi2ndg0bWj92HCo90TMpQfL/L
+         wxlurUfW2ie+V2LGcdev4cGhE05TI44KSNMK0959Nflv8mQUy2CnrZfmZnJbAETwVi42
+         HCFw==
+X-Gm-Message-State: APjAAAUGEm7iboZOW4zdxLm2AgwVDx51GwgF+L5tYuEwl6qhspbHVvXr
+        T4qGD6goULsL/c4+7Ywj3js+8GiYn4KswCn/5+mpWw==
+X-Google-Smtp-Source: APXvYqy5u6kq+4SJdMVdXnURdzYZT62+C9HNe8iqMeSCC4izfqlpzEOSHo7J+ufOxKrh7drq+MegcTV2iXdufEbb01c=
+X-Received: by 2002:a7b:c775:: with SMTP id x21mr1012389wmk.52.1570597119427;
+ Tue, 08 Oct 2019 21:58:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191009004142.225377-2-aaronlewis@google.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+References: <8c44ac8a-3fdc-b9dd-1815-06e86cb73047@redhat.com> <mhng-610a5897-96ce-44fc-aa0f-82653808dd86@palmer-si-x1e>
+In-Reply-To: <mhng-610a5897-96ce-44fc-aa0f-82653808dd86@palmer-si-x1e>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Wed, 9 Oct 2019 10:28:28 +0530
+Message-ID: <CAAhSdy3=Y7YjXJN5qJUQhpy2ZBaBSEJx7twafrVASi+5jBt33w@mail.gmail.com>
+Subject: Re: [PATCH v7 10/21] RISC-V: KVM: Handle MMIO exits for VCPU
+To:     Palmer Dabbelt <palmer@sifive.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Anup Patel <Anup.Patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Graf <graf@amazon.com>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        KVM General <kvm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 08, 2019 at 05:41:38PM -0700, Aaron Lewis wrote:
-> Set IA32_XSS for the guest and host during VM Enter and VM Exit
-> transitions rather than by using the MSR-load areas.
-> 
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> ---
->  arch/x86/kvm/svm.c     |  4 ++--
->  arch/x86/kvm/vmx/vmx.c | 14 ++------------
->  arch/x86/kvm/x86.c     | 25 +++++++++++++++++++++----
->  arch/x86/kvm/x86.h     |  4 ++--
->  4 files changed, 27 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index f8ecb6df5106..e2d7a7738c76 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5628,7 +5628,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->  	svm->vmcb->save.cr2 = vcpu->arch.cr2;
->  
->  	clgi();
-> -	kvm_load_guest_xcr0(vcpu);
-> +	kvm_load_guest_xsave_controls(vcpu);
->  
->  	if (lapic_in_kernel(vcpu) &&
->  		vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> @@ -5778,7 +5778,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->  	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
->  		kvm_before_interrupt(&svm->vcpu);
->  
-> -	kvm_put_guest_xcr0(vcpu);
-> +	kvm_load_host_xsave_controls(vcpu);
->  	stgi();
->  
->  	/* Any pending NMI will happen here */
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 409e9a7323f1..ff5ba28abecb 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -106,8 +106,6 @@ module_param(enable_apicv, bool, S_IRUGO);
->  static bool __read_mostly nested = 1;
->  module_param(nested, bool, S_IRUGO);
->  
-> -static u64 __read_mostly host_xss;
-> -
->  bool __read_mostly enable_pml = 1;
->  module_param_named(pml, enable_pml, bool, S_IRUGO);
->  
-> @@ -2074,11 +2072,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		if (data != 0)
->  			return 1;
->  		vcpu->arch.ia32_xss = data;
-> -		if (vcpu->arch.ia32_xss != host_xss)
-> -			add_atomic_switch_msr(vmx, MSR_IA32_XSS,
-> -				vcpu->arch.ia32_xss, host_xss, false);
-> -		else
-> -			clear_atomic_switch_msr(vmx, MSR_IA32_XSS);
->  		break;
->  	case MSR_IA32_RTIT_CTL:
->  		if ((pt_mode != PT_MODE_HOST_GUEST) ||
-> @@ -6540,7 +6533,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
->  		vmx_set_interrupt_shadow(vcpu, 0);
->  
-> -	kvm_load_guest_xcr0(vcpu);
-> +	kvm_load_guest_xsave_controls(vcpu);
->  
->  	if (static_cpu_has(X86_FEATURE_PKU) &&
->  	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
-> @@ -6647,7 +6640,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  			__write_pkru(vmx->host_pkru);
->  	}
->  
-> -	kvm_put_guest_xcr0(vcpu);
-> +	kvm_load_host_xsave_controls(vcpu);
->  
->  	vmx->nested.nested_run_pending = 0;
->  	vmx->idt_vectoring_info = 0;
-> @@ -7599,9 +7592,6 @@ static __init int hardware_setup(void)
->  		WARN_ONCE(host_bndcfgs, "KVM: BNDCFGS in host will be lost");
->  	}
->  
-> -	if (boot_cpu_has(X86_FEATURE_XSAVES))
-> -		rdmsrl(MSR_IA32_XSS, host_xss);
-> -
->  	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
->  	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
->  		enable_vpid = 0;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 661e2bf38526..e90e658fd8a9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -176,6 +176,8 @@ struct kvm_shared_msrs {
->  static struct kvm_shared_msrs_global __read_mostly shared_msrs_global;
->  static struct kvm_shared_msrs __percpu *shared_msrs;
->  
-> +static u64 __read_mostly host_xss;
-> +
->  struct kvm_stats_debugfs_item debugfs_entries[] = {
->  	{ "pf_fixed", VCPU_STAT(pf_fixed) },
->  	{ "pf_guest", VCPU_STAT(pf_guest) },
-> @@ -812,27 +814,39 @@ void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw)
->  }
->  EXPORT_SYMBOL_GPL(kvm_lmsw);
->  
-> -void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu)
-> +void kvm_load_guest_xsave_controls(struct kvm_vcpu *vcpu)
->  {
->  	if (kvm_read_cr4_bits(vcpu, X86_CR4_OSXSAVE) &&
->  			!vcpu->guest_xcr0_loaded) {
->  		/* kvm_set_xcr() also depends on this */
->  		if (vcpu->arch.xcr0 != host_xcr0)
->  			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
-> +
-> +		if (kvm_x86_ops->xsaves_supported() &&
-> +		    guest_cpuid_has(vcpu, X86_FEATURE_XSAVES) &&
-> +		    vcpu->arch.ia32_xss != host_xss)
-> +			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
-> +
->  		vcpu->guest_xcr0_loaded = 1;
->  	}
->  }
-> -EXPORT_SYMBOL_GPL(kvm_load_guest_xcr0);
-> +EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_controls);
->  
-> -void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu)
-> +void kvm_load_host_xsave_controls(struct kvm_vcpu *vcpu)
->  {
->  	if (vcpu->guest_xcr0_loaded) {
->  		if (vcpu->arch.xcr0 != host_xcr0)
->  			xsetbv(XCR_XFEATURE_ENABLED_MASK, host_xcr0);
-> +
-> +		if (kvm_x86_ops->xsaves_supported() &&
-> +		    guest_cpuid_has(vcpu, X86_FEATURE_XSAVES) &&
-Should it check guest/VMX XSAVES support before load *host*
-XSS states?
-> +		    vcpu->arch.ia32_xss != host_xss)
-> +			wrmsrl(MSR_IA32_XSS, host_xss);
-> +
->  		vcpu->guest_xcr0_loaded = 0;
->  	}
->  }
-> -EXPORT_SYMBOL_GPL(kvm_put_guest_xcr0);
-> +EXPORT_SYMBOL_GPL(kvm_load_host_xsave_controls);
->  
->  static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
->  {
-> @@ -9293,6 +9307,9 @@ int kvm_arch_hardware_setup(void)
->  		kvm_default_tsc_scaling_ratio = 1ULL << kvm_tsc_scaling_ratio_frac_bits;
->  	}
->  
-> +	if (boot_cpu_has(X86_FEATURE_XSAVES))
-> +		rdmsrl(MSR_IA32_XSS, host_xss);
-> +
->  	kvm_init_msr_list();
->  	return 0;
->  }
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index dbf7442a822b..0d04e865665b 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -366,7 +366,7 @@ static inline bool kvm_pat_valid(u64 data)
->  	return (data | ((data & 0x0202020202020202ull) << 1)) == data;
->  }
->  
-> -void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu);
-> -void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu);
-> +void kvm_load_guest_xsave_controls(struct kvm_vcpu *vcpu);
-> +void kvm_load_host_xsave_controls(struct kvm_vcpu *vcpu);
->  
->  #endif
-> -- 
-> 2.23.0.581.g78d2f28ef7-goog
+On Wed, Oct 9, 2019 at 4:14 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Mon, 23 Sep 2019 04:12:17 PDT (-0700), pbonzini@redhat.com wrote:
+> > On 04/09/19 18:15, Anup Patel wrote:
+> >> +    unsigned long guest_sstatus =
+> >> +                    vcpu->arch.guest_context.sstatus | SR_MXR;
+> >> +    unsigned long guest_hstatus =
+> >> +                    vcpu->arch.guest_context.hstatus | HSTATUS_SPRV;
+> >> +    unsigned long guest_vsstatus, old_stvec, tmp;
+> >> +
+> >> +    guest_sstatus = csr_swap(CSR_SSTATUS, guest_sstatus);
+> >> +    old_stvec = csr_swap(CSR_STVEC, (ulong)&__kvm_riscv_unpriv_trap);
+> >> +
+> >> +    if (read_insn) {
+> >> +            guest_vsstatus = csr_read_set(CSR_VSSTATUS, SR_MXR);
+> >
+> > Is this needed?  IIUC SSTATUS.MXR encompasses a wider set of permissions:
+> >
+> >   The HS-level MXR bit makes any executable page readable.  {\tt
+> >   vsstatus}.MXR makes readable those pages marked executable at the VS
+> >   translation level, but only if readable at the guest-physical
+> >   translation level.
+> >
+> > So it should be enough to set SSTATUS.MXR=1 I think.  But you also
+> > shouldn't set SSTATUS.MXR=1 in the !read_insn case.
+> >
+> > Also, you can drop the irq save/restore (which is already a save/restore
+> > of SSTATUS) since you already write 0 to SSTATUS.SIE in your csr_swap.
+> > Perhaps add a BUG_ON(guest_sstatus & SR_SIE) before the csr_swap?
+> >
+> >> +            asm volatile ("\n"
+> >> +                    "csrrw %[hstatus], " STR(CSR_HSTATUS) ", %[hstatus]\n"
+> >> +                    "li %[tilen], 4\n"
+> >> +                    "li %[tscause], 0\n"
+> >> +                    "lhu %[val], (%[addr])\n"
+> >> +                    "andi %[tmp], %[val], 3\n"
+> >> +                    "addi %[tmp], %[tmp], -3\n"
+> >> +                    "bne %[tmp], zero, 2f\n"
+> >> +                    "lhu %[tmp], 2(%[addr])\n"
+> >> +                    "sll %[tmp], %[tmp], 16\n"
+> >> +                    "add %[val], %[val], %[tmp]\n"
+> >> +                    "2: csrw " STR(CSR_HSTATUS) ", %[hstatus]"
+> >> +            : [hstatus] "+&r"(guest_hstatus), [val] "=&r" (val),
+> >> +              [tmp] "=&r" (tmp), [tilen] "+&r" (tilen),
+> >> +              [tscause] "+&r" (tscause)
+> >> +            : [addr] "r" (addr));
+> >> +            csr_write(CSR_VSSTATUS, guest_vsstatus);
+> >
+> >>
+> >> +#ifndef CONFIG_RISCV_ISA_C
+> >> +                    "li %[tilen], 4\n"
+> >> +#else
+> >> +                    "li %[tilen], 2\n"
+> >> +#endif
+> >
+> > Can you use an assembler directive to force using a non-compressed
+> > format for ld and lw?  This would get rid of tilen, which is costing 6
+> > bytes (if I did the RVC math right) in order to save two. :)
+> >
+> > Paolo
+> >
+> >> +                    "li %[tscause], 0\n"
+> >> +#ifdef CONFIG_64BIT
+> >> +                    "ld %[val], (%[addr])\n"
+> >> +#else
+> >> +                    "lw %[val], (%[addr])\n"
+> >> +#endif
+> To:          anup@brainfault.org
+> CC:          pbonzini@redhat.com
+> CC:          Anup Patel <Anup.Patel@wdc.com>
+> CC:          Paul Walmsley <paul.walmsley@sifive.com>
+> CC:          rkrcmar@redhat.com
+> CC:          daniel.lezcano@linaro.org
+> CC:          tglx@linutronix.de
+> CC:          graf@amazon.com
+> CC:          Atish Patra <Atish.Patra@wdc.com>
+> CC:          Alistair Francis <Alistair.Francis@wdc.com>
+> CC:          Damien Le Moal <Damien.LeMoal@wdc.com>
+> CC:          Christoph Hellwig <hch@infradead.org>
+> CC:          kvm@vger.kernel.org
+> CC:          linux-riscv@lists.infradead.org
+> CC:          linux-kernel@vger.kernel.org
+> Subject:     Re: [PATCH v7 10/21] RISC-V: KVM: Handle MMIO exits for VCPU
+> In-Reply-To: <CAAhSdy1-1yxMnjzppmUBxtSOAuwWaPtNZwW+QH1O7LAnEVP8pg@mail.gmail.com>
+>
+> On Mon, 23 Sep 2019 06:09:43 PDT (-0700), anup@brainfault.org wrote:
+> > On Mon, Sep 23, 2019 at 4:42 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 04/09/19 18:15, Anup Patel wrote:
+> >> > +     unsigned long guest_sstatus =
+> >> > +                     vcpu->arch.guest_context.sstatus | SR_MXR;
+> >> > +     unsigned long guest_hstatus =
+> >> > +                     vcpu->arch.guest_context.hstatus | HSTATUS_SPRV;
+> >> > +     unsigned long guest_vsstatus, old_stvec, tmp;
+> >> > +
+> >> > +     guest_sstatus = csr_swap(CSR_SSTATUS, guest_sstatus);
+> >> > +     old_stvec = csr_swap(CSR_STVEC, (ulong)&__kvm_riscv_unpriv_trap);
+> >> > +
+> >> > +     if (read_insn) {
+> >> > +             guest_vsstatus = csr_read_set(CSR_VSSTATUS, SR_MXR);
+> >>
+> >> Is this needed?  IIUC SSTATUS.MXR encompasses a wider set of permissions:
+> >>
+> >>   The HS-level MXR bit makes any executable page readable.  {\tt
+> >>   vsstatus}.MXR makes readable those pages marked executable at the VS
+> >>   translation level, but only if readable at the guest-physical
+> >>   translation level.
+> >>
+> >> So it should be enough to set SSTATUS.MXR=1 I think.  But you also
+> >> shouldn't set SSTATUS.MXR=1 in the !read_insn case.
+> >
+> > I was being overly cautious here. Initially, I thought SSTATUS.MXR
+> > applies only to Stage2 and VSSTATUS.MXR applies only to Stage1.
+> >
+> > I agree with you. The HS-mode should only need to set SSTATUS.MXR.
+> >
+> >>
+> >> Also, you can drop the irq save/restore (which is already a save/restore
+> >> of SSTATUS) since you already write 0 to SSTATUS.SIE in your csr_swap.
+> >> Perhaps add a BUG_ON(guest_sstatus & SR_SIE) before the csr_swap?
+> >
+> > I had already dropped irq save/restore in v7 series and having BUG_ON()
+> > on guest_sstatus here would be better.
+> >
+> >>
+> >> > +             asm volatile ("\n"
+> >> > +                     "csrrw %[hstatus], " STR(CSR_HSTATUS) ", %[hstatus]\n"
+> >> > +                     "li %[tilen], 4\n"
+> >> > +                     "li %[tscause], 0\n"
+> >> > +                     "lhu %[val], (%[addr])\n"
+> >> > +                     "andi %[tmp], %[val], 3\n"
+> >> > +                     "addi %[tmp], %[tmp], -3\n"
+> >> > +                     "bne %[tmp], zero, 2f\n"
+> >> > +                     "lhu %[tmp], 2(%[addr])\n"
+> >> > +                     "sll %[tmp], %[tmp], 16\n"
+> >> > +                     "add %[val], %[val], %[tmp]\n"
+> >> > +                     "2: csrw " STR(CSR_HSTATUS) ", %[hstatus]"
+> >> > +             : [hstatus] "+&r"(guest_hstatus), [val] "=&r" (val),
+> >> > +               [tmp] "=&r" (tmp), [tilen] "+&r" (tilen),
+> >> > +               [tscause] "+&r" (tscause)
+> >> > +             : [addr] "r" (addr));
+> >> > +             csr_write(CSR_VSSTATUS, guest_vsstatus);
+> >>
+> >> >
+> >> > +#ifndef CONFIG_RISCV_ISA_C
+> >> > +                     "li %[tilen], 4\n"
+> >> > +#else
+> >> > +                     "li %[tilen], 2\n"
+> >> > +#endif
+> >>
+> >> Can you use an assembler directive to force using a non-compressed
+> >> format for ld and lw?  This would get rid of tilen, which is costing 6
+> >> bytes (if I did the RVC math right) in order to save two. :)
+> >
+> > I tried looking for it but could not find any assembler directive
+> > to selectively turn-off instruction compression.
+> >
+> >>
+> >> Paolo
+> >>
+> >> > +                     "li %[tscause], 0\n"
+> >> > +#ifdef CONFIG_64BIT
+> >> > +                     "ld %[val], (%[addr])\n"
+> >> > +#else
+> >> > +                     "lw %[val], (%[addr])\n"
+> >> > +#endif
+> >
+> > Regards,
+> > Anup
+> To:          pbonzini@redhat.com
+> CC:          anup@brainfault.org
+> CC:          Anup Patel <Anup.Patel@wdc.com>
+> CC:          Paul Walmsley <paul.walmsley@sifive.com>
+> CC:          rkrcmar@redhat.com
+> CC:          daniel.lezcano@linaro.org
+> CC:          tglx@linutronix.de
+> CC:          graf@amazon.com
+> CC:          Atish Patra <Atish.Patra@wdc.com>
+> CC:          Alistair Francis <Alistair.Francis@wdc.com>
+> CC:          Damien Le Moal <Damien.LeMoal@wdc.com>
+> CC:          Christoph Hellwig <hch@infradead.org>
+> CC:          kvm@vger.kernel.org
+> CC:          linux-riscv@lists.infradead.org
+> CC:          linux-kernel@vger.kernel.org
+> Subject:     Re: [PATCH v7 10/21] RISC-V: KVM: Handle MMIO exits for VCPU
+> In-Reply-To: <45fc3ee5-0f68-4e94-cfb3-0727ca52628f@redhat.com>
+>
+> On Mon, 23 Sep 2019 06:33:14 PDT (-0700), pbonzini@redhat.com wrote:
+> > On 23/09/19 15:09, Anup Patel wrote:
+> >>>> +#ifndef CONFIG_RISCV_ISA_C
+> >>>> +                     "li %[tilen], 4\n"
+> >>>> +#else
+> >>>> +                     "li %[tilen], 2\n"
+> >>>> +#endif
+> >>>
+> >>> Can you use an assembler directive to force using a non-compressed
+> >>> format for ld and lw?  This would get rid of tilen, which is costing 6
+> >>> bytes (if I did the RVC math right) in order to save two. :)
+> >>
+> >> I tried looking for it but could not find any assembler directive
+> >> to selectively turn-off instruction compression.
+> >
+> > ".option norvc"?
+> >
+> > Paolo
+> To:          anup@brainfault.org
+> CC:          pbonzini@redhat.com
+> CC:          Anup Patel <Anup.Patel@wdc.com>
+> CC:          Paul Walmsley <paul.walmsley@sifive.com>
+> CC:          rkrcmar@redhat.com
+> CC:          daniel.lezcano@linaro.org
+> CC:          tglx@linutronix.de
+> CC:          graf@amazon.com
+> CC:          Atish Patra <Atish.Patra@wdc.com>
+> CC:          Alistair Francis <Alistair.Francis@wdc.com>
+> CC:          Damien Le Moal <Damien.LeMoal@wdc.com>
+> CC:          Christoph Hellwig <hch@infradead.org>
+> CC:          kvm@vger.kernel.org
+> CC:          linux-riscv@lists.infradead.org
+> CC:          linux-kernel@vger.kernel.org
+> Subject:     Re: [PATCH v7 10/21] RISC-V: KVM: Handle MMIO exits for VCPU
+> In-Reply-To: <CAAhSdy29gi2d9c9tumtO68QbB=_+yUYp+ikN3dQ-wa2e-Lesfw@mail.gmail.com>
+>
+> On Mon, 23 Sep 2019 22:07:43 PDT (-0700), anup@brainfault.org wrote:
+> > On Mon, Sep 23, 2019 at 7:03 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 23/09/19 15:09, Anup Patel wrote:
+> >> >>> +#ifndef CONFIG_RISCV_ISA_C
+> >> >>> +                     "li %[tilen], 4\n"
+> >> >>> +#else
+> >> >>> +                     "li %[tilen], 2\n"
+> >> >>> +#endif
+> >> >>
+> >> >> Can you use an assembler directive to force using a non-compressed
+> >> >> format for ld and lw?  This would get rid of tilen, which is costing 6
+> >> >> bytes (if I did the RVC math right) in order to save two. :)
+> >> >
+> >> > I tried looking for it but could not find any assembler directive
+> >> > to selectively turn-off instruction compression.
+> >>
+> >> ".option norvc"?
+> >
+> > Thanks for the hint. I will try ".option norvc"
+>
+> It should be something like
+>
+>     .option push
+>     .option norvc
+>     ld ...
+>     .option pop
+>
+> which preserves C support for the rest of the file.
+
+I have done exactly same thing in v8 patch series sent-out
+last week.
+
+Thanks,
+Anup
+
+>
+> >
+> > Regards,
+> > Anup
+> >
+> >>
+> >> Paolo
