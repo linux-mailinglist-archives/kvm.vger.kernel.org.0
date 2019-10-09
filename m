@@ -2,202 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B169D07B0
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 08:55:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2BF5D07BE
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 09:02:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726496AbfJIGzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 02:55:00 -0400
-Received: from mga09.intel.com ([134.134.136.24]:65443 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725848AbfJIGy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 02:54:59 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Oct 2019 23:54:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; 
-   d="scan'208";a="200042363"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by FMSMGA003.fm.intel.com with ESMTP; 08 Oct 2019 23:54:54 -0700
-Date:   Wed, 9 Oct 2019 14:56:51 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH v7 7/7] KVM: x86: Add user-space access interface for CET
- MSRs
-Message-ID: <20191009065651.GE27851@local-michael-cet-test>
-References: <20190927021927.23057-1-weijiang.yang@intel.com>
- <20190927021927.23057-8-weijiang.yang@intel.com>
- <CALMp9eQNDNmmCr8DM-2fMVYvQ-eTEpeE=bW8+BLbfxmBsTmQvg@mail.gmail.com>
+        id S1725879AbfJIHCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 03:02:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38342 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725440AbfJIHCE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 03:02:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1570604523;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=jq9NMJJ6aC6x31llQky9nN2iVQnmzY3MT7LdFGPCTXs=;
+        b=FwC2n7j9ybVXlxVfsw8r8sGYXHg64JR5DtdDUG1cyOVLCNcPFU7lBnUbTQSzru7D3XRJJC
+        9NVX9GiFUgpJg/kXD2ZdP49tfnoJx/5zqsCf/qWA7PTQW2/IfvaP5bAeKZrgZRjolr/8b7
+        aeNXKmCTAQfr4Ni8/J4k9uhU5Yu81Ao=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-7-6lCnoR_WPQOeP3IiUUAarg-1; Wed, 09 Oct 2019 03:01:59 -0400
+Received: by mail-wr1-f72.google.com with SMTP id z1so639825wrw.21
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 00:01:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WbTf2DyuK7rqiyaYhQzII2F7cDh00yENfhYa1eMTZt8=;
+        b=RmyVhsnawA3FCGXufoiop7BZig66zZpd/5WWcRTjTZfGHLlppYHINaWMhTbVv12g2u
+         L52BJe7PLFViz/woTV+1CvQdwXInucs8S7Ir17ECVXHOPsiGG0H9IUAYstzTgoRZlYDg
+         lrZ/nCRW+hNcMr05GdI+Cn5d9YT0nYbEbGMGpoHmNxXNDIuiXmEigzXE0Ld/I70rh3aC
+         JnEDjpigcmdb81iviEplGPNqIyFrNBX4H0i7s7hk9uH2MJLvZcljiiiSl4UHjllUKIcQ
+         TJi86L6XoCDu9d9s7GhF6MouK5bk+Ru2QLDjYWQWr3dj4sqemBPHgPldkxlNksD2ypVc
+         0YMA==
+X-Gm-Message-State: APjAAAX94n7DwLxf9GFVOr11ZqDCm90xXCzoFym18x+Bk9GiYQ+SZ4R2
+        e031ueORVEf839ts1hcsevfFXJGhA2Nf5xsDA3iudpzkccc/m/g+vrRdougsoXAAVgRSS3zvcdZ
+        EfCsOk0fxX2zt
+X-Received: by 2002:a5d:65c1:: with SMTP id e1mr79935wrw.364.1570604518318;
+        Wed, 09 Oct 2019 00:01:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw1lqgb50BqZK8E4sTx1gR5italRruZXOR7kppeyZn9eabFv31kK/RI/42KdoVkvqpWHzQ7lg==
+X-Received: by 2002:a5d:65c1:: with SMTP id e1mr79913wrw.364.1570604518060;
+        Wed, 09 Oct 2019 00:01:58 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id i11sm1186807wrw.57.2019.10.09.00.01.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2019 00:01:57 -0700 (PDT)
+Subject: Re: [Patch 3/6] kvm: svm: Add support for XSAVES on AMD
+To:     Aaron Lewis <aaronlewis@google.com>,
+        Babu Moger <Babu.Moger@amd.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>,
+        Luwei Kang <luwei.kang@intel.com>
+References: <20191009004142.225377-1-aaronlewis@google.com>
+ <20191009004142.225377-3-aaronlewis@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <56cf7ca1-d488-fc6e-1c20-b477dd855d84@redhat.com>
+Date:   Wed, 9 Oct 2019 09:01:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQNDNmmCr8DM-2fMVYvQ-eTEpeE=bW8+BLbfxmBsTmQvg@mail.gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20191009004142.225377-3-aaronlewis@google.com>
+Content-Language: en-US
+X-MC-Unique: 6lCnoR_WPQOeP3IiUUAarg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 01:57:50PM -0700, Jim Mattson wrote:
-> On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> >
-> > There're two different places storing Guest CET states, the states
-> > managed with XSAVES/XRSTORS, as restored/saved
-> > in previous patch, can be read/write directly from/to the MSRs.
-> > For those stored in VMCS fields, they're access via vmcs_read/
-> > vmcs_write.
-> >
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 83 ++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 83 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 44913e4ab558..5265db7cd2af 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -1671,6 +1671,49 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
-> >         return 0;
-> >  }
-> >
-> > +static int check_cet_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> 
-> I'd suggest changing return type to bool, since you are essentially
-> returning true or false.
->
-Sure, will change it.
+On 09/10/19 02:41, Aaron Lewis wrote:
+> -=09=09/*
+> -=09=09 * The only supported bit as of Skylake is bit 8, but
+> -=09=09 * it is not supported on KVM.
+> -=09=09 */
+> -=09=09if (data !=3D 0)
+> -=09=09=09return 1;
 
-> > +{
-> > +       u64 kvm_xss = kvm_supported_xss();
-> > +
-> > +       switch (msr_info->index) {
-> > +       case MSR_IA32_PL0_SSP ... MSR_IA32_PL2_SSP:
-> > +               if (!(kvm_xss | XFEATURE_MASK_CET_KERNEL))
-> '|' should be '&'
-Oops, thanks for the capture!
+This comment is actually not true anymore; Intel supports PT (bit 8) on
+Cascade Lake, so it could be changed to something like
 
-> > +                       return 1;
-> > +               if (!msr_info->host_initiated &&
-> > +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> > +                       return 1;
-> > +               break;
-> > +       case MSR_IA32_PL3_SSP:
-> > +               if (!(kvm_xss | XFEATURE_MASK_CET_USER))
-> '|' should be '&'
-> > +                       return 1;
-> > +               if (!msr_info->host_initiated &&
-> > +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> > +                       return 1;
-> > +               break;
-> > +       case MSR_IA32_U_CET:
-> > +               if (!(kvm_xss | XFEATURE_MASK_CET_USER))
-> '|' should be '&'
-> > +                       return 1;
-> > +               if (!msr_info->host_initiated &&
-> > +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
-> > +                   !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
-> > +                       return 1;
-> > +               break;
-> > +       case MSR_IA32_S_CET:
-> > +               if (!msr_info->host_initiated &&
-> > +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
-> > +                   !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
-> > +                       return 1;
-> > +               break;
-> > +       case MSR_IA32_INT_SSP_TAB:
-> > +               if (!msr_info->host_initiated &&
-> > +                   !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> > +                       return 1;
-> > +               break;
-> > +       default:
-> > +               return 1;
-> > +       }
-> > +       return 0;
-> > +}
-> >  /*
-> >   * Reads an msr value (of 'msr_index') into 'pdata'.
-> >   * Returns 0 on success, non-0 otherwise.
-> > @@ -1788,6 +1831,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >                 else
-> >                         msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
-> >                 break;
-> > +       case MSR_IA32_S_CET:
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> > +               msr_info->data = vmcs_readl(GUEST_S_CET);
-> Have we ensured that this VMCS field exists?
-> > +               break;
-> > +       case MSR_IA32_INT_SSP_TAB:
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> > +               msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
-> Have we ensured that this VMCS field exists?
-If host kernel sets correct info, we can make sure here.
+=09/*
+=09 * We do support PT (bit 8) if kvm_x86_ops->pt_supported(), but
+=09 * guests will have to configure it using WRMSR rather than
+=09 * XSAVES.
+=09 */
 
-> > +               break;
-> > +       case MSR_IA32_U_CET:
-> Can this be lumped together with MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP, below?
-Unfortunately, this MSR is not adjacent to below MSRs.
+Paolo
 
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> > +               rdmsrl(MSR_IA32_U_CET, msr_info->data);
-> > +               break;
-> > +       case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> > +               rdmsrl(msr_info->index, msr_info->data);
-> > +               break;
-> >         case MSR_TSC_AUX:
-> >                 if (!msr_info->host_initiated &&
-> >                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> > @@ -2039,6 +2102,26 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >                 else
-> >                         vmx->pt_desc.guest.addr_a[index / 2] = data;
-> >                 break;
-> > +       case MSR_IA32_S_CET:
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> Bits 9:6 must be zero.
-> > +               vmcs_writel(GUEST_S_CET, data);
-> Have we ensured that this VMCS field exists?
-> > +               break;
-> > +       case MSR_IA32_INT_SSP_TAB:
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> Must be canonical. vCPU must support longmode.
-> > +               vmcs_writel(GUEST_INTR_SSP_TABLE, data);
-> Have we ensured that this VMCS field exists?
-> > +               break;
-> > +       case MSR_IA32_U_CET:
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> Bits 9:6 must be zero.
-> > +               wrmsrl(MSR_IA32_U_CET, data);
-> > +               break;
-> > +       case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> > +               if (check_cet_msr(vcpu, msr_info))
-> > +                       return 1;
-> 'Data' must be canonical and 4-byte aligned. High dword must be zero
-> on vCPUs that don't support longmode.
-
-Thanks a lot for all above captures, will add sanity checks in next
-version.
-
-> > +               wrmsrl(msr_info->index, data);
-> > +               break;
-> >         case MSR_TSC_AUX:
-> >                 if (!msr_info->host_initiated &&
-> >                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> > --
-> > 2.17.2
-> >
