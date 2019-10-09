@@ -2,109 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 542B3D1B4D
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 23:58:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4899D1C03
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 00:41:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731155AbfJIV6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 17:58:17 -0400
-Received: from mail-io1-f44.google.com ([209.85.166.44]:39363 "EHLO
-        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730809AbfJIV6R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 17:58:17 -0400
-Received: by mail-io1-f44.google.com with SMTP id a1so8959890ioc.6
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 14:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gzBYOvNgy3z7BPU6I6KZ4ksIvxWAfhs9HM+Yo4vRGz4=;
-        b=f5SSlwPMoXvmmAVETZPh2nk2tpM46NefQN8IKzDNpIqwti0zXtvtRp5SiwT2TsvaZ/
-         mCGL3dTPMVIEHK2oy4FZUxwaDDMfIiFkuSa70AVFVj5HdXhFjAZbr7mdX+pcEwUPfCUy
-         rtTgjGTj9XfspHKkNHShd+xjw63XOtTmE6WxQlxEYylwF0XL84MuuTUDJdekp31qnSbX
-         d/vqvHnJsiJlP05Fd3kDz3dv0C/Lffj93hbbLzjLlXkl+mi8kzjQtEXZ1z7lMb9IckQe
-         wyGV9vJV3O6o1BRtLN0/cgkcs3xTrS64dP1SfZuF6US9dAcZjZ5nFT5NpL/Pa+S+D16L
-         CjBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gzBYOvNgy3z7BPU6I6KZ4ksIvxWAfhs9HM+Yo4vRGz4=;
-        b=qnoSZe78XUZ1ocsc6WMTXfoO9EFhWHc/XPKyK/6tlDQKVKrf70cBGhTZbNbfIm11Yu
-         sbC91v+RGEcpfCkYRbq+qgPjxjWwac2enMKTwQr/9hpm7k+etlSm/vo6wv4s6gNKgnmq
-         S2m+/qTLcUh2M6tjKJegkomk4hpSf9ahSmMG18NmzmkAifBlZzKgS4F/0pzvXJ4dlJOq
-         3I9AgVo158cLpQGqrQvHkrhhiQnmfipzgrVjrqEqETf57Ue+7yG7RyPDCXpIBR6+psxk
-         MLlwpQ014Vr+JjBmkVUJigmX13j8XKxPflsoVMr4gsMP8cE6I//pjZr6vDlhPb4OlJTM
-         Z4Ag==
-X-Gm-Message-State: APjAAAXhkLRvWzjGugrhpPBLdHZ2VB1H5EAdpcxZ+1tUMnJoKeAMGQ8Z
-        qaKsM6BY05O+U/z9XdktTnffGl9+vSzPFSd9hk9teQ==
-X-Google-Smtp-Source: APXvYqzwxeZMapNzaqarOUXXhEf/yRmoC5t+83izz7vaQGu60lPEjq6ZuCUESkF3vIIs8FWooOKAD09Agf/UZnum7Xo=
-X-Received: by 2002:a5d:8d8f:: with SMTP id b15mr6262526ioj.296.1570658296182;
- Wed, 09 Oct 2019 14:58:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191009004142.225377-1-aaronlewis@google.com>
- <20191009004142.225377-3-aaronlewis@google.com> <56cf7ca1-d488-fc6e-1c20-b477dd855d84@redhat.com>
- <CALMp9eRNdLdb7zR=wwx2tTc8n-ewCKuhrw9pxXGVQVUBjNpRow@mail.gmail.com> <9335c3c7-e2dd-cb2d-454a-c41143c94b63@redhat.com>
-In-Reply-To: <9335c3c7-e2dd-cb2d-454a-c41143c94b63@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 9 Oct 2019 14:58:05 -0700
-Message-ID: <CALMp9eTW56TDny5MehuW-wS8dHWwfVEdzEvZQkOfVumEwcMWAA@mail.gmail.com>
-Subject: Re: [Patch 3/6] kvm: svm: Add support for XSAVES on AMD
+        id S1732422AbfJIWlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 18:41:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58870 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731763AbfJIWlb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 18:41:31 -0400
+Received: from localhost (unknown [167.220.2.234])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 57856206A1;
+        Wed,  9 Oct 2019 22:41:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570660890;
+        bh=luGiKPn3ZU8w68DlafUoK10zfzRgHpkeep6teIAuOgQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Rc+irKPrpeqwQXpHSoFE706kLoxQRqfJ4NCeM0WtUSQT+q5uICxdJzogjbqxY5P3j
+         JkMocUaDBVj+nyR0jXTypZNF+enLHpy30f3R84LqUesXoViZZzLzsvuR7mK8KX6St2
+         5xJzqjsa/nm2GLyP0YOcVKzcyNj0mNo7z2JFWBmg=
+Date:   Wed, 9 Oct 2019 18:41:29 -0400
+From:   Sasha Levin <sashal@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        kvm list <kvm@vger.kernel.org>,
-        Luwei Kang <luwei.kang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Marc Orr <marcorr@google.com>, Peter Shier <pshier@google.com>,
+        Jacob Xu <jacobhxu@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 4.19 08/26] kvm: x86: Improve emulation of CPUID
+ leaves 0BH and 1FH
+Message-ID: <20191009224129.GX1396@sasha-vm>
+References: <20191009170558.32517-1-sashal@kernel.org>
+ <20191009170558.32517-8-sashal@kernel.org>
+ <5fcb0e38-3542-dd39-6a1c-449b4f9f435e@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <5fcb0e38-3542-dd39-6a1c-449b4f9f435e@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 9, 2019 at 2:40 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Oct 09, 2019 at 10:58:35PM +0200, Paolo Bonzini wrote:
+>On 09/10/19 19:05, Sasha Levin wrote:
+>> From: Jim Mattson <jmattson@google.com>
+>>
+>> [ Upstream commit 43561123ab3759eb6ff47693aec1a307af0aef83 ]
+>>
+>> For these CPUID leaves, the EDX output is not dependent on the ECX
+>> input (i.e. the SIGNIFCANT_INDEX flag doesn't apply to
+>> EDX). Furthermore, the low byte of the ECX output is always identical
+>> to the low byte of the ECX input. KVM does not produce the correct ECX
+>> and EDX outputs for any undefined subleaves beyond the first.
+>>
+>> Special-case these CPUID leaves in kvm_cpuid, so that the ECX and EDX
+>> outputs are properly generated for all undefined subleaves.
+>>
+>> Fixes: 0771671749b59a ("KVM: Enhance guest cpuid management")
+>> Fixes: a87f2d3a6eadab ("KVM: x86: Add Intel CPUID.1F cpuid emulation support")
+>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>> Reviewed-by: Marc Orr <marcorr@google.com>
+>> Reviewed-by: Peter Shier <pshier@google.com>
+>> Reviewed-by: Jacob Xu <jacobhxu@google.com>
+>> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>> ---
+>>  arch/x86/kvm/cpuid.c | 83 +++++++++++++++++++++++++-------------------
+>>  1 file changed, 47 insertions(+), 36 deletions(-)
 >
-> On 09/10/19 23:29, Jim Mattson wrote:
-> > On Wed, Oct 9, 2019 at 12:02 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 09/10/19 02:41, Aaron Lewis wrote:
-> >>> -             /*
-> >>> -              * The only supported bit as of Skylake is bit 8, but
-> >>> -              * it is not supported on KVM.
-> >>> -              */
-> >>> -             if (data != 0)
-> >>> -                     return 1;
-> >>
-> >> This comment is actually not true anymore; Intel supports PT (bit 8) on
-> >> Cascade Lake, so it could be changed to something like
-> >>
-> >>         /*
-> >>          * We do support PT (bit 8) if kvm_x86_ops->pt_supported(), but
-> >>          * guests will have to configure it using WRMSR rather than
-> >>          * XSAVES.
-> >>          */
-> >>
-> >> Paolo
-> >
-> > Isn't it necessary for the host to set IA32_XSS to a superset of the
-> > guest IA32_XSS for proper host-level context-switching?
->
-> Yes, this is why we cannot allow the guest to set bit 8.  But the
-> comment is obsolete:
->
-> 1) of course Skylake is not the newest model
->
-> 2) processor tracing was not supported at all when the comment was
-> written; but on CascadeLake, guest PT is now supported---just not the
-> processor tracing XSAVES component.
+>This is absolutely not stable material.  Is it possible for KVM to opt
+>out of this AUTOSEL nonsense?
 
-I think we're on the same page. I was just confused by your wording;
-it sounded like you were saying that KVM supported bit 8.
+Sure, I've opted out KVM and removed all KVM patches from this series:
 
-How about:
+c1fac4516a61d kvm: vmx: Limit guest PMCs to those supported on the host
+75b118586ec81 kvm: x86, powerpc: do not allow clearing largepages debugfs entry
+06cd1710feaed KVM: VMX: Set VMENTER_L1D_FLUSH_NOT_REQUIRED if !X86_BUG_L1TF
+c89fc5c082aa6 KVM: x86: Expose XSAVEERPTR to the guest
+1eec6b4068e2e kvm: x86: Use AMD CPUID semantics for AMD vCPUs
+5c56e6ba0afc8 kvm: x86: Improve emulation of CPUID leaves 0BH and 1FH
+94a3c6f010bd2 kvm: x86: Fix a spurious -E2BIG in __do_cpuid_func
+79a7ad6330bc5 KVM: arm/arm64: vgic: Use the appropriate TRACE_INCLUDE_PATH
 
-/*
- * We do support PT if kvm_x86_ops->pt_supported(), but we do not
- * support IA32_XSS[bit 8]. Guests will have to use WRMSR rather than
- * XSAVES/XRSTORS to save/restore PT MSRs.
- */
+--
+Thanks,
+Sasha
