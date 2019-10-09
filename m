@@ -2,90 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E91BD1AED
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 23:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A146D1AF5
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 23:30:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732069AbfJIV32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 17:29:28 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:45886 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732038AbfJIV31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 17:29:27 -0400
-Received: by mail-io1-f66.google.com with SMTP id c25so8678216iot.12
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 14:29:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=53RDSTgRTc4OIaltPTdnTdVl82bbEDBXdYsk9AgolP0=;
-        b=PtttGKZ4CYT4Zoi/nq6emZ9TtWyk5GVdkhBrRLPlI9OVwkZLg4h5bEi4rT/oXAjJSn
-         g8HDZuNJ2+hZr35v0F8Qa2+ADjeIaks0ChZYpoNnQ4PrkJ5Q5v4SijQEx6kOTAbcpanL
-         Eq9wYy4gcJczW80QtaoG5gxb6JxJJwGE+FYeSCtYkab+CqcdlrgoZ7IeTpXqEXh4ty5K
-         MmlbSe9JrteqfSrMCSWAWd8Wh+Yc5xWsfojMZLmZDzUnyeQiSLokBKw4adwxensx3tlx
-         5pbyXLureK6Fm7dWQaMTSfj/yo8ACqBsuN7aBOHaK5uVZ7izn/mrlA9An6+YK8t9+xF5
-         RvmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=53RDSTgRTc4OIaltPTdnTdVl82bbEDBXdYsk9AgolP0=;
-        b=QNtC8K4+H+kXgEj3tgUjl+iHvVyu3ZMwb5GkruwfHYWz2ULqOntFIKZN5d815IdyQP
-         rYgfeY/RzEScRWuirtvHDYHZmFrKKNI1EM8pWsW7VvDl/g1crxOFWShbpRKdKHbWMu58
-         49RmBio+iBKXV1Fooqk1W7YpT2xIXHg3V6QFDPrKGcd2bn7gzCkCEHSDNX76ctYJ3V2X
-         LDCjgxTAKBgS0SFwy1ENmDEHtRBHEAoD+knzoje3aqKjSNsMZckoP6GlzCkCL/dwPTcI
-         PrkevNjc3pzk4LhtzUV+IkyEvPe2+jytIa3g4ahTmUmIgEQ6jZnXtli/R/sTj95gRM2P
-         YiHg==
-X-Gm-Message-State: APjAAAWl2LLzbtBZJIGBeCCGpfB/nF1e1oTq66obDMJTXENTUAtMlNQw
-        Lcp3Tp6wAer2rR7jgHiaLVdX14b9Nu25W8K5nM1bWg==
-X-Google-Smtp-Source: APXvYqyXc5EEY4YQVj5Xm0skYSBjSmyAQTXp4JSHqnNLHi2cb+5b2sXfKa07KGIB2GkuIVn8XbPw+8iW1n4qKYGFtXQ=
-X-Received: by 2002:a6b:d210:: with SMTP id q16mr6374946iob.108.1570656566545;
- Wed, 09 Oct 2019 14:29:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191009004142.225377-1-aaronlewis@google.com>
- <20191009004142.225377-3-aaronlewis@google.com> <56cf7ca1-d488-fc6e-1c20-b477dd855d84@redhat.com>
-In-Reply-To: <56cf7ca1-d488-fc6e-1c20-b477dd855d84@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 9 Oct 2019 14:29:15 -0700
-Message-ID: <CALMp9eRNdLdb7zR=wwx2tTc8n-ewCKuhrw9pxXGVQVUBjNpRow@mail.gmail.com>
-Subject: Re: [Patch 3/6] kvm: svm: Add support for XSAVES on AMD
+        id S1732095AbfJIVaX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 17:30:23 -0400
+Received: from mga14.intel.com ([192.55.52.115]:5036 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729908AbfJIVaW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 17:30:22 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 14:30:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,277,1566889200"; 
+   d="scan'208";a="205880605"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga002.jf.intel.com with ESMTP; 09 Oct 2019 14:30:21 -0700
+Date:   Wed, 9 Oct 2019 14:30:21 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        kvm list <kvm@vger.kernel.org>,
-        Luwei Kang <luwei.kang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>,
+        Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v2 4/8] KVM: VMX: Optimize vmx_set_rflags() for
+ unrestricted guest
+Message-ID: <20191009213021.GH19952@linux.intel.com>
+References: <20190927214523.3376-1-sean.j.christopherson@intel.com>
+ <20190927214523.3376-5-sean.j.christopherson@intel.com>
+ <99e57095-d855-99d7-e10e-a415c6ef13b2@redhat.com>
+ <20191009163835.GB19952@linux.intel.com>
+ <aee0fe86-6a5a-680a-4147-3b68fc3718c9@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aee0fe86-6a5a-680a-4147-3b68fc3718c9@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 9, 2019 at 12:02 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/10/19 02:41, Aaron Lewis wrote:
-> > -             /*
-> > -              * The only supported bit as of Skylake is bit 8, but
-> > -              * it is not supported on KVM.
-> > -              */
-> > -             if (data != 0)
-> > -                     return 1;
->
-> This comment is actually not true anymore; Intel supports PT (bit 8) on
-> Cascade Lake, so it could be changed to something like
->
->         /*
->          * We do support PT (bit 8) if kvm_x86_ops->pt_supported(), but
->          * guests will have to configure it using WRMSR rather than
->          * XSAVES.
->          */
->
-> Paolo
+On Wed, Oct 09, 2019 at 10:59:10PM +0200, Paolo Bonzini wrote:
+> On 09/10/19 18:38, Sean Christopherson wrote:
+> > On Wed, Oct 09, 2019 at 12:40:53PM +0200, Paolo Bonzini wrote:
+> >> On 27/09/19 23:45, Sean Christopherson wrote:
+> >>> Rework vmx_set_rflags() to avoid the extra code need to handle emulation
+> >>> of real mode and invalid state when unrestricted guest is disabled.  The
+> >>> primary reason for doing so is to avoid the call to vmx_get_rflags(),
+> >>> which will incur a VMREAD when RFLAGS is not already available.  When
+> >>> running nested VMs, the majority of calls to vmx_set_rflags() will occur
+> >>> without an associated vmx_get_rflags(), i.e. when stuffing GUEST_RFLAGS
+> >>> during transitions between vmcs01 and vmcs02.
+> >>>
+> >>> Note, vmx_get_rflags() guarantees RFLAGS is marked available.
+> >>
+> >> Slightly nicer this way:
+> >>
+> >> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> >> index 8de9853d7ab6..62ab19d65efd 100644
+> >> --- a/arch/x86/kvm/vmx/vmx.c
+> >> +++ b/arch/x86/kvm/vmx/vmx.c
+> >> @@ -1431,9 +1431,17 @@ unsigned long vmx_get_rflags(struct kvm_vcpu *vcpu)
+> >>  void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+> >>  {
+> >>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >> -	unsigned long old_rflags = vmx_get_rflags(vcpu);
+> >> +	unsigned long old_rflags;
+> >> +
+> >> +	if (enable_unrestricted_guest) {
+> >> +		__set_bit(VCPU_EXREG_RFLAGS, (ulong *)&vcpu->arch.regs_avail);
+> >> +		vmx->rflags = rflags;
+> >> +		vmcs_writel(GUEST_RFLAGS, rflags);
+> >> +		return;
+> >> +	}
+> >> +
+> >> +	old_rflags = vmx_get_rflags(vcpu);
+> >>  
+> >> -	__set_bit(VCPU_EXREG_RFLAGS, (ulong *)&vcpu->arch.regs_avail);
+> >>  	vmx->rflags = rflags;
+> >>  	if (vmx->rmode.vm86_active) {
+> >>  		vmx->rmode.save_rflags = rflags;
+> > 
+> > Works for me.  Do you want me to spin a v3 to incorporate this and remove
+> > the open coding of the RIP/RSP accessors?  Or are you planning on squashing
+> > the changes as you apply?
+> 
+> If it's okay for you I can squash it.
 
-Isn't it necessary for the host to set IA32_XSS to a superset of the
-guest IA32_XSS for proper host-level context-switching?
-
-arch/x86/kernel/fpu/xstate.c has this comment:
-
- * Note that we do not currently set any bits on IA32_XSS so
- * 'XCR0 | IA32_XSS == XCR0' for now.
+Squash away.
