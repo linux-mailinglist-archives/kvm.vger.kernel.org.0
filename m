@@ -2,94 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C7B4BD0AF4
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 11:22:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D79AD0B41
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 11:32:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730638AbfJIJVz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 05:21:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56646 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730595AbfJIJVz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 05:21:55 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1E45D7E422
-        for <kvm@vger.kernel.org>; Wed,  9 Oct 2019 09:21:55 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id v17so811132wru.12
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 02:21:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3tiCUrFM7UgQAaYpJ9O5BDQtkAGta+t5JLpREvoir9o=;
-        b=RWu/hAoiWKLBIMvB46QLwBi/hbl1jBHc55JOdrlaXSjfjSUl06R6TQ6Bu9Yw5Vaw7X
-         pCeP2ILw0eVFBvc5Moc9tf2rOBMJSFGHSeqHnBg5lQL2UxK57Dea3B/d5ecO3umhkuTo
-         vYHpKIXOrixmYFd1B5AOC6ijS6PBlg9PcA0i+Dfre30gfIyVjddSPvrPATI7yxiz1Bqn
-         4miRTuAobQaRzk0A+j8HdS8ECRh4gmv+TzXhIs31vHgyryIGhMVc/EXohnSv9jGv3MTQ
-         oIv0GmYX3bWTnxyKdnxFfVKl5ompFdfe3Bifu1G+G/ezy/LfN7DIKChQacjOGL5I/g7o
-         15zA==
-X-Gm-Message-State: APjAAAUEJVNd5hCsXbcn69R8NhOfeIDaekIk5clr9x0FG3ePlQrezjEv
-        lqGPMSaeQyT4jfzOg3RPw53aBO55/VlBXMi5Bs091lkiiOefnCOSwllsVmXrc5dovazse9jhm/2
-        mjrQqaCuK4VyA
-X-Received: by 2002:a5d:6383:: with SMTP id p3mr2022218wru.117.1570612913652;
-        Wed, 09 Oct 2019 02:21:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyt4jidLqSxvWUpFVvEmT+Zc0ViyZ4kyo/v4ezLgFfgvWATdcGptPkPtWtKPREHv7Wr2f1eHQ==
-X-Received: by 2002:a5d:6383:: with SMTP id p3mr2022201wru.117.1570612913395;
-        Wed, 09 Oct 2019 02:21:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f4b0:55d4:57da:3527? ([2001:b07:6468:f312:f4b0:55d4:57da:3527])
-        by smtp.gmail.com with ESMTPSA id 59sm2695456wrc.23.2019.10.09.02.21.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2019 02:21:52 -0700 (PDT)
-Subject: Re: [PATCH v3 09/16] kvm: x86: hyperv: Use APICv deactivate request
- interface
-To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-References: <1568401242-260374-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1568401242-260374-10-git-send-email-suravee.suthikulpanit@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <449c5ea4-9353-1822-10e6-7b10f5a1a6f3@redhat.com>
-Date:   Wed, 9 Oct 2019 11:21:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1730514AbfJIJcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 05:32:17 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:46406 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730069AbfJIJcR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 05:32:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=48pe5fCaWDIwrzy6iukfLBqQeWQALW/aO1iPRgAYzPk=; b=Qr7myM7ZXdn2gg2NbRatgtVte
+        4xY/GjCZbskHfRr4Cczc+KOR1pRiR951pP6CQP5A+9339Mz1PM0p+aWCtg/uHmI9D4mHzlKcokwP2
+        xw7RDSd0CZg2//zf3knh2p0OwG/cfLZkun5oitVOXrAw86jmuFq8XL+g+uDc4aQlkReuoWm6ySIVq
+        SFM5DZr5QaqMhdcEGN82EcXStgfvOuJQzilPfDkj7FlEQQAmdrr2Uu50ySAANCXb3sdpR49504dyH
+        RW276ytHQtKwThS9bSL7wqGxYRNXg2xw7sc9QXciwiDfYmhXc6+OHzqJE3XNeZAzGNHWRZNhsVI3H
+        VMyWaJ8bA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.2 #3 (Red Hat Linux))
+        id 1iI8KK-00045E-MD; Wed, 09 Oct 2019 09:32:12 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BDAEC305DE2;
+        Wed,  9 Oct 2019 11:31:18 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 8167B2022BA0D; Wed,  9 Oct 2019 11:32:10 +0200 (CEST)
+Date:   Wed, 9 Oct 2019 11:32:10 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
+        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, Jim Mattson <jmattson@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
+        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] KVM: x86/vPMU: Add lazy mechanism to release
+ perf_event per vPMC
+Message-ID: <20191009093210.GK2328@hirez.programming.kicks-ass.net>
+References: <20190930072257.43352-1-like.xu@linux.intel.com>
+ <20190930072257.43352-4-like.xu@linux.intel.com>
+ <20191001082321.GL4519@hirez.programming.kicks-ass.net>
+ <e77fe471-1c65-571d-2b9e-d97c2ee0706f@linux.intel.com>
+ <20191008121140.GN2294@hirez.programming.kicks-ass.net>
+ <d492e08e-bf14-0a8b-bc8c-397f8893ddb5@linux.intel.com>
+ <bfd23868-064e-4bf5-4dfb-211d36c409c1@redhat.com>
+ <20191009081602.GI2328@hirez.programming.kicks-ass.net>
+ <795f5e36-0211-154f-fcf0-f2f1771bf724@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1568401242-260374-10-git-send-email-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <795f5e36-0211-154f-fcf0-f2f1771bf724@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/09/19 21:01, Suthikulpanit, Suravee wrote:
-> +	 *
-> +	 * Since this requires updating
-> +	 * APIC_ACCESS_PAGE_PRIVATE_MEMSLOT,
-> +	 * also take srcu lock.
+On Wed, Oct 09, 2019 at 11:21:30AM +0200, Paolo Bonzini wrote:
+> On 09/10/19 10:16, Peter Zijlstra wrote:
 
-This comment is incorrect, it says you are entering a read-side critical
-section to update the data structure.  It's only needed because
-kvm_make_apicv_deactivate_request expects that it needs to unlock and
-relock kvm->srcu.
+> >> bool bitfields preserve the magic behavior where something like this:
+> >>
+> >>   foo->x = y;
+> >>
+> >> (x is a bool bitfield) would be compiled as
+> >>
+> >>   foo->x = (y != 0);
+> > 
+> > This is confusion; if y is a single bit bitfield, then there is
+> > absolutely _NO_ difference between these two expressions.
+> 
+> y is not in a struct so it cannot be a single bit bitfield. :) If y is
+> an int and foo->x is a bool bitfield, you get the following:
+> 
+> 	foo->x = 6;	/* foo->x is 1, it would be 0 for int:1 */
+> 	foo->x = 7;	/* foo->x is 1, it would be 1 for int:1 */
+> 
 
-Paolo
-
->  	 */
-> -	kvm_vcpu_deactivate_apicv(vcpu);
-> +	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> +	kvm_make_apicv_deactivate_request(vcpu, true);
-> +	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
-> +
-
+Urgh, reading hard. You're right!
