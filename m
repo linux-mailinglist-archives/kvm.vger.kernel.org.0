@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0085CD0D31
-	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 12:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27114D0D53
+	for <lists+kvm@lfdr.de>; Wed,  9 Oct 2019 13:00:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730871AbfJIKw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 06:52:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42232 "EHLO mx1.redhat.com"
+        id S1729784AbfJILA1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 07:00:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44976 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727035AbfJIKw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 06:52:28 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        id S1725953AbfJILA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 07:00:27 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1FC402BF73
-        for <kvm@vger.kernel.org>; Wed,  9 Oct 2019 10:52:28 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id g67so530666wmg.4
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 03:52:28 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4F7452BF73
+        for <kvm@vger.kernel.org>; Wed,  9 Oct 2019 11:00:27 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id i14so929436wro.19
+        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 04:00:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=P0MsNQfXnUWl/0sGblTAdgyCu1Yy72Z6SXuCSt57gtc=;
-        b=agO+vx07rfKwQxEK7VAASk3476UvcoDJjjfkX15xCDxPdQnIb4hnwdpmrxH75H2OVE
-         J8qVgqVTFKV+xi9MxiHIm8vegQNU+beuus1BytUZhsFePeDBRFiiX/0Ful2pYtcn8/0Q
-         eb7aDc1iK+uHgLkVyk48bl6DnIVdIiYWn0213mtZeG1xESxQftV6IwqIB2FRd5cXkKuW
-         RSSU51cz5qieX36LFGNFq/bLMQw6QsNVFsOQwu2dbBYHqTI4CCF7n6W/ePOV1TVauBn3
-         vukTmOHeF34LciR+wlfAMvd0Wir9ojiv4B3cfQGlR56L28vG5za8oMoPyclUXEpVzAvE
-         1ZMA==
-X-Gm-Message-State: APjAAAX7teabkDYDCHITaLjwP+01OmlEx5zKMko//J8YEnOG5NnIL/i5
-        rBba3mhM496q7l1uVfqunPj+Sc5V4iBukhwGGNoKpvv0tt9D5JyCSUYm4/d4U57eUNbBir8GAJQ
-        c2c5LtzcT1ZGD
-X-Received: by 2002:adf:fa86:: with SMTP id h6mr2319360wrr.186.1570618346574;
-        Wed, 09 Oct 2019 03:52:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxmJzk1u2HM8iYqz2RgPoWZLZRsaTlP8C1e8mq6Mn5bVWWmvWx4BsMaX0BzdRLhQT3V0cWn6w==
-X-Received: by 2002:adf:fa86:: with SMTP id h6mr2319339wrr.186.1570618346361;
-        Wed, 09 Oct 2019 03:52:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f4b0:55d4:57da:3527? ([2001:b07:6468:f312:f4b0:55d4:57da:3527])
-        by smtp.gmail.com with ESMTPSA id y14sm2575792wrd.84.2019.10.09.03.52.25
+        bh=9UqErDD43mG5SKxbp+McxigQPLmUudq5RASPl2m5uPA=;
+        b=Warn3Z2Yzfg5o+R9h8jRC5j1Ks8YZThOiTkHPwr19Ro/ik+0Qy/kMfT9ACVu1eAPfH
+         xisFKUh+Fuq9vnluXtji/xW8vT8rw+5G8qfco/+JgBJOuf3qdmsVcAJrOzb1dZwYVP0X
+         odkhefXrFCkFhDgnaXi6K0fIb/NxACTTe6R+kdWVhCdO7B6zqXK3jZ7i/58dPTgikevb
+         HmIs9xLF38oc74+GwWIuq7qjJka9OTDZeEx2l2fTMVf5r3DIe3mrPZvDdpuGUPwKRqxn
+         oGuTQm0+mQQh9RX1OMPikA5vh3/hDtsxKVE3GLTLohxpGsCUQ66XzcmQrYemwbTQWN53
+         NFlw==
+X-Gm-Message-State: APjAAAU81keonFPfoeq9eUdFNps8S6ZzPEuxlXNF2kVpWsANYV7u5e3j
+        PJ1PpbSFZ2b+I41klNNHaA0xfu4FROoAjhJK4BmyrIlHFeXCFtt8OtjnjBNYGdlHagoe3ECxZ6t
+        1X4osnYvb5Hq8
+X-Received: by 2002:a1c:7311:: with SMTP id d17mr2011543wmb.49.1570618825894;
+        Wed, 09 Oct 2019 04:00:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqweL8Kb0PbyoP7eI4TqxXo2aLMgPodvhxLW/eM5SrCLDlTwol4G+3OmyXdf6S62kdmehbv0lw==
+X-Received: by 2002:a1c:7311:: with SMTP id d17mr2011527wmb.49.1570618825635;
+        Wed, 09 Oct 2019 04:00:25 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id c17sm2489079wrc.60.2019.10.09.04.00.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2019 03:52:25 -0700 (PDT)
-Subject: Re: [PATCH v2 6/8] KVM: x86: Fold 'enum kvm_ex_reg' definitions into
- 'enum kvm_reg'
+        Wed, 09 Oct 2019 04:00:25 -0700 (PDT)
+Subject: Re: [PATCH v2 7/8] KVM: x86: Add helpers to test/mark reg
+ availability and dirtiness
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Reto Buerki <reet@codelabs.ch>,
-        Liran Alon <liran.alon@oracle.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+        Liran Alon <liran.alon@oracle.com>
 References: <20190927214523.3376-1-sean.j.christopherson@intel.com>
- <20190927214523.3376-7-sean.j.christopherson@intel.com>
- <87ftke3zll.fsf@vitty.brq.redhat.com>
+ <20190927214523.3376-8-sean.j.christopherson@intel.com>
+ <87d0fi3zai.fsf@vitty.brq.redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <57cae37d-acd0-074c-26cd-aaf7a7989905@redhat.com>
-Date:   Wed, 9 Oct 2019 12:52:23 +0200
+Message-ID: <f874f2c0-2f9f-935b-fc4f-2b70a5b5520a@redhat.com>
+Date:   Wed, 9 Oct 2019 13:00:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87ftke3zll.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87d0fi3zai.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,12 +71,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/09/19 11:25, Vitaly Kuznetsov wrote:
->> -enum kvm_reg_ex {
->>  	VCPU_EXREG_PDPTR = NR_VCPU_REGS,
-> (Personally, I would've changed that to NR_VCPU_REGS + 1)
+On 30/09/19 11:32, Vitaly Kuznetsov wrote:
+>> +static inline void kvm_register_mark_dirty(struct kvm_vcpu *vcpu,
+>> +					   enum kvm_reg reg)
+>> +{
+>> +	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
+>> +	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
+>> +}
+>> +
+> Personal preference again, but I would've named this
+> "kvm_register_mark_avail_dirty" to indicate what we're actually doing
+> (and maybe even shortened 'kvm_register_' to 'kvm_reg_' everywhere as I
+> can't see how 'reg' could be misread).
 > 
 
-Why?
+I think this is okay, a register can be either not cached, available or
+dirty.  But dirty means we have to write it back, so it implies
+availability.
 
 Paolo
