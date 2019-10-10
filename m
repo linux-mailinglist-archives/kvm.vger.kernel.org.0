@@ -2,47 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7118CD21D9
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 09:39:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50B76D21E4
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 09:39:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733127AbfJJHiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 03:38:09 -0400
-Received: from mail-qk1-f202.google.com ([209.85.222.202]:41501 "EHLO
+        id S1733135AbfJJHiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 03:38:10 -0400
+Received: from mail-qk1-f202.google.com ([209.85.222.202]:40191 "EHLO
         mail-qk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733058AbfJJHbD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 03:31:03 -0400
-Received: by mail-qk1-f202.google.com with SMTP id z128so4611934qke.8
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 00:31:03 -0700 (PDT)
+        with ESMTP id S1733062AbfJJHbL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 03:31:11 -0400
+Received: by mail-qk1-f202.google.com with SMTP id x62so4621583qkb.7
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 00:31:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=v+LLFtvEckUzputJIuZrPxx3By/lN1gL3OtSQmwVR94=;
-        b=oXEBvVog+GYUFdZS6nbRFPX4kM5tulvoNbWDK0JlCK400aDOdG4fx5K78mB6fw1Fnb
-         Fm/aDMafzZO4rtJf0joBPsIyrpFyATrh7QSU+3AYy74LjXVida1xyOxzXn7UrGELefsV
-         lwHyei54XzSIN3/WPOjeNgX5yGAXeNFQtmWh8R7eBTihLnIqZV6YLz9yitStMSbpsVzY
-         7IjUa8EkxXDbtnvlL7uTVehZkq+NCKBweJxZtau7cCa5rFxix2DPSA9XYlPJg3E4sgJb
-         Ua07w0RDFseYndhi1zZK7z4vSrkgzhswMZOjck1bNu0VR4HLdJ6U3ZQlVflHjxLdUqPZ
-         tyeA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=cqfOgbBFq1cuCJ9mBVUN432MN6WUG2Cztrp58NLs2Vw=;
+        b=C/ywy926tafCeZE7HfHuO7rwVEIl1bPrxo0phIi3BlyVKKzbYBsdlulXvZwVmVv152
+         pSDnC5TXL5u/rIOqk5sCwwe9zTponYR5613RtFPYKxAnp1P2hQy46QRdfWSTvAyKgHxT
+         +s8OWL8JsfxGoGswhx87REvg1bxy6UD5+Z5N5/cwKMK++NsW9zmTgwvwrmXvdsO+RD46
+         /CW3FiWNnaeM+/a58dWILDDj6hT3tHScRgNcUFz14HaFjyNfynJpHIgxuskOLZUyUB3u
+         A58hwqSvLbz9Bz6p6Nydy/epNL3Cu9kha1GvBWk/w8LyVjBW7G6GiF68ffWwZtt7wfWn
+         Xjlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=v+LLFtvEckUzputJIuZrPxx3By/lN1gL3OtSQmwVR94=;
-        b=ChGRUiaOaJgCqS9MeM7CqDcakB6e+1aEzjF3oYVIzWBSBTD1UmcUQ7ePV+0bu454m3
-         EvE0+WkwC1rtevOz5v2RotCa8YmeQ6mrcYkbUFkWZdJnFj8leRXg3TsvE6uKSrs6edaV
-         mfwXnt+7R1mGlxd3Sthq6Z6qkM586P27y5s0VOWrWDx5zP5h6cylCn7XMf/Xc3G0YlSV
-         iowN7rxFUfPliZkURgF62/kkuib5bb8pXp7rWuzm/76W6rGRb2gjH4eHugIGF4OiXJ31
-         8d0d6yhAARlLxYD/izip/65XGmhqmBZ68QlpOOW3a0nAnLdJbM683B/JhDHGPXcXSYuA
-         J0uA==
-X-Gm-Message-State: APjAAAUkJP8ha0gZJ7d5rZS2m095Gu1DKHDahUfAzZ8NpFupme7YKEIq
-        e79UUl1BeZf8cswFqeD/edkj5qzUPTM0fA==
-X-Google-Smtp-Source: APXvYqyD9HKOtk0SarlzT8pp42sYiLkFHwAn9eUk83sA8rOiisTkHGAPdmKoPBCuQTQeRxenoJbZZHPVIHB7Jw==
-X-Received: by 2002:ac8:3158:: with SMTP id h24mr8582490qtb.370.1570692662399;
- Thu, 10 Oct 2019 00:31:02 -0700 (PDT)
-Date:   Thu, 10 Oct 2019 16:30:53 +0900
-Message-Id: <20191010073055.183635-1-suleiman@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=cqfOgbBFq1cuCJ9mBVUN432MN6WUG2Cztrp58NLs2Vw=;
+        b=ZGFWua94nRDszJMiwm1utT/gpE/25P3kbSiP5DhQBRyuNNw1OLeLmgl74jSuwLxMJ3
+         7M2EkAZv+pEa64Oi9V0dh5YTWJZetMonzzhmsAvQYR8KykjRmYxInod8n82wonQIK7+D
+         k10t0Lw6ddrOKTmFWhzDeYJenOteqQtDMxm9BVBz52EtfKeEwxZ580bG1ERWWDKS+WEd
+         uXFhfBzTfYGz1HNqk+ng6MJ8gOpmVe+j2loSXSuUm/9/8+N1fgEJCSRKGJ2fz1F5u0PL
+         aaoHtlvV7RACD6oBy9rcZXGtnvavwRBA9EaP0hqXJw+7z9vqurE5lMez7QI9ulg1Yfhm
+         1V1Q==
+X-Gm-Message-State: APjAAAVbaAcg5zLn8GrqgbLCKB4T90abhxE1bxYPENCLkoMDT+DtWBNA
+        71RcarD9TGM3LqLg7K6nEpDDjs6+oqrnmQ==
+X-Google-Smtp-Source: APXvYqwCqV1V0a/8Ms8j/bNzW6sJqTHXo4TnK3h/ScttMp4kqMIWGm+wYIgZKsfhzUHRlf4rOEsV57bcyS0uBw==
+X-Received: by 2002:a05:620a:136e:: with SMTP id d14mr8147013qkl.393.1570692668234;
+ Thu, 10 Oct 2019 00:31:08 -0700 (PDT)
+Date:   Thu, 10 Oct 2019 16:30:54 +0900
+In-Reply-To: <20191010073055.183635-1-suleiman@google.com>
+Message-Id: <20191010073055.183635-2-suleiman@google.com>
 Mime-Version: 1.0
+References: <20191010073055.183635-1-suleiman@google.com>
 X-Mailer: git-send-email 2.23.0.581.g78d2f28ef7-goog
-Subject: [RFC v2 0/2] kvm: Use host timekeeping in guest.
+Subject: [RFC v2 1/2] kvm: Mechanism to copy host timekeeping parameters into guest.
 From:   Suleiman Souhlal <suleiman@google.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de
 Cc:     john.stultz@linaro.org, sboyd@kernel.org,
@@ -55,73 +59,252 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This RFC is to try to solve the following problem:
+This is used to synchronize time between host and guest.
+The guest can request the (guest) physical address it wants the
+data in through the MSR_KVM_TIMEKEEPER_EN MSR.
 
-We have some applications that are currently running in their
-own namespace, that still talk to other processes on the
-machine, using IPC, and expect to run on the same machine.
+It currently assumes the host timekeeper is "tsc".
 
-We want to move them into a virtual machine, for the usual
-benefits of virtualization.
-
-However, some of these programs use CLOCK_MONOTONIC and
-CLOCK_BOOTTIME timestamps, as part of their protocol, when talking
-to the host.
-
-Generally speaking, we have multiple event sources, for example
-sensors, input devices, display controller vsync, etc and we would
-like to rely on them in the guest for various scenarios.
-
-As a specific example, we are trying to run some wayland clients
-(in the guest) who talk to the server (in the host), and the server
-gives input events based on host time. Additionally, there are also
-vsync events that the clients use for timing their rendering.
-
-Another use case we have are timestamps from IIO sensors and cameras.
-There are applications that need to determine how the timestamps
-relate to the current time and the only way to get current time is
-clock_gettime(), which would return a value from a different time
-domain than the timestamps.
-
-In this case, it is not feasible to change these programs, due to
-the number of the places we would have to change.
-
-We spent some time thinking about this, and the best solution we
-could come up with was the following:
-
-Make the guest kernel return the same CLOCK_MONOTONIC and
-CLOCK_GETTIME timestamps as the host.
-
-To do that, I am changing kvmclock to request to the host to copy
-its timekeeping parameters (mult, base, cycle_last, etc), so that
-the guest timekeeper can use the same values, so that time can
-be synchronized between the guest and the host.
-
-Any suggestions or feedback would be highly appreciated.
-
-Changes in v2:
-- Move out of kvmclock and into its own clocksource and file.
-- Remove timekeeping.c #ifdefs.
-- Fix i386 build.
-
-Suleiman Souhlal (2):
-  kvm: Mechanism to copy host timekeeping parameters into guest.
-  x86/kvmclock: Introduce kvm-hostclock clocksource.
-
- arch/x86/Kconfig                     |   9 ++
+Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+---
  arch/x86/include/asm/kvm_host.h      |   3 +
- arch/x86/include/asm/kvmclock.h      |  12 +++
  arch/x86/include/asm/pvclock-abi.h   |  27 ++++++
  arch/x86/include/uapi/asm/kvm_para.h |   1 +
- arch/x86/kernel/Makefile             |   2 +
- arch/x86/kernel/kvmclock.c           |   5 +-
- arch/x86/kernel/kvmhostclock.c       | 130 +++++++++++++++++++++++++++
- arch/x86/kvm/x86.c                   | 121 +++++++++++++++++++++++++
- include/linux/timekeeper_internal.h  |   8 ++
- kernel/time/timekeeping.c            |   2 +
- 11 files changed, 319 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kernel/kvmhostclock.c
+ arch/x86/kvm/x86.c                   | 121 +++++++++++++++++++++++++++
+ 4 files changed, 152 insertions(+)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 50eb430b0ad8..4d622450cb4a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -659,7 +659,10 @@ struct kvm_vcpu_arch {
+ 	struct pvclock_vcpu_time_info hv_clock;
+ 	unsigned int hw_tsc_khz;
+ 	struct gfn_to_hva_cache pv_time;
++	struct gfn_to_hva_cache pv_timekeeper_g2h;
++	struct pvclock_timekeeper pv_timekeeper;
+ 	bool pv_time_enabled;
++	bool pv_timekeeper_enabled;
+ 	/* set guest stopped flag in pvclock flags field */
+ 	bool pvclock_set_guest_stopped_request;
+ 
+diff --git a/arch/x86/include/asm/pvclock-abi.h b/arch/x86/include/asm/pvclock-abi.h
+index 1436226efe3e..2809008b9b26 100644
+--- a/arch/x86/include/asm/pvclock-abi.h
++++ b/arch/x86/include/asm/pvclock-abi.h
+@@ -40,6 +40,33 @@ struct pvclock_wall_clock {
+ 	u32   nsec;
+ } __attribute__((__packed__));
+ 
++struct pvclock_read_base {
++	u64 mask;
++	u64 cycle_last;
++	u32 mult;
++	u32 shift;
++	u64 xtime_nsec;
++	u64 base;
++} __attribute__((__packed__));
++
++struct pvclock_timekeeper {
++	u64 gen;
++	u64 flags;
++	struct pvclock_read_base tkr_mono;
++	struct pvclock_read_base tkr_raw;
++	u64 xtime_sec;
++	u64 ktime_sec;
++	u64 wall_to_monotonic_sec;
++	u64 wall_to_monotonic_nsec;
++	u64 offs_real;
++	u64 offs_boot;
++	u64 offs_tai;
++	u64 raw_sec;
++	u64 tsc_offset;
++} __attribute__((__packed__));
++
++#define	PVCLOCK_TIMEKEEPER_ENABLED (1 << 0)
++
+ #define PVCLOCK_TSC_STABLE_BIT	(1 << 0)
+ #define PVCLOCK_GUEST_STOPPED	(1 << 1)
+ /* PVCLOCK_COUNTS_FROM_ZERO broke ABI and can't be used anymore. */
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index 2a8e0b6b9805..3ebb1d87db3a 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -50,6 +50,7 @@
+ #define MSR_KVM_STEAL_TIME  0x4b564d03
+ #define MSR_KVM_PV_EOI_EN      0x4b564d04
+ #define MSR_KVM_POLL_CONTROL	0x4b564d05
++#define MSR_KVM_TIMEKEEPER_EN	0x4b564d06
+ 
+ struct kvm_steal_time {
+ 	__u64 steal;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 661e2bf38526..937f83cdda4b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -157,6 +157,8 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
+ int __read_mostly pi_inject_timer = -1;
+ module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
+ 
++static atomic_t pv_timekeepers_nr;
++
+ #define KVM_NR_SHARED_MSRS 16
+ 
+ struct kvm_shared_msrs_global {
+@@ -2729,6 +2731,16 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 
+ 		break;
+ 	}
++	case MSR_KVM_TIMEKEEPER_EN:
++		if (kvm_gfn_to_hva_cache_init(vcpu->kvm,
++		    &vcpu->arch.pv_timekeeper_g2h, data,
++		    sizeof(struct pvclock_timekeeper)))
++			vcpu->arch.pv_timekeeper_enabled = false;
++		else {
++			vcpu->arch.pv_timekeeper_enabled = true;
++			atomic_inc(&pv_timekeepers_nr);
++		}
++		break;
+ 	case MSR_KVM_ASYNC_PF_EN:
+ 		if (kvm_pv_enable_async_pf(vcpu, data))
+ 			return 1;
+@@ -7097,6 +7109,109 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+ };
+ 
+ #ifdef CONFIG_X86_64
++static DEFINE_SPINLOCK(shadow_pvtk_lock);
++static struct pvclock_timekeeper shadow_pvtk;
++
++static void
++pvclock_copy_read_base(struct pvclock_read_base *pvtkr,
++    struct tk_read_base *tkr)
++{
++	pvtkr->cycle_last = tkr->cycle_last;
++	pvtkr->mult = tkr->mult;
++	pvtkr->shift = tkr->shift;
++	pvtkr->mask = tkr->mask;
++	pvtkr->xtime_nsec = tkr->xtime_nsec;
++	pvtkr->base = tkr->base;
++}
++
++static void
++kvm_copy_into_pvtk(struct kvm_vcpu *vcpu)
++{
++	struct pvclock_timekeeper *pvtk;
++	unsigned long flags;
++
++	if (!vcpu->arch.pv_timekeeper_enabled)
++		return;
++
++	pvtk = &vcpu->arch.pv_timekeeper;
++	if (pvclock_gtod_data.clock.vclock_mode == VCLOCK_TSC) {
++		pvtk->flags |= PVCLOCK_TIMEKEEPER_ENABLED;
++		spin_lock_irqsave(&shadow_pvtk_lock, flags);
++		pvtk->tkr_mono = shadow_pvtk.tkr_mono;
++		pvtk->tkr_raw = shadow_pvtk.tkr_raw;
++
++		pvtk->xtime_sec = shadow_pvtk.xtime_sec;
++		pvtk->ktime_sec = shadow_pvtk.ktime_sec;
++		pvtk->wall_to_monotonic_sec =
++		    shadow_pvtk.wall_to_monotonic_sec;
++		pvtk->wall_to_monotonic_nsec =
++		    shadow_pvtk.wall_to_monotonic_nsec;
++		pvtk->offs_real = shadow_pvtk.offs_real;
++		pvtk->offs_boot = shadow_pvtk.offs_boot;
++		pvtk->offs_tai = shadow_pvtk.offs_tai;
++		pvtk->raw_sec = shadow_pvtk.raw_sec;
++		spin_unlock_irqrestore(&shadow_pvtk_lock, flags);
++
++		pvtk->tsc_offset = kvm_x86_ops->read_l1_tsc_offset(vcpu);
++	} else
++		pvtk->flags &= ~PVCLOCK_TIMEKEEPER_ENABLED;
++
++	BUILD_BUG_ON(offsetof(struct pvclock_timekeeper, gen) != 0);
++
++	/*
++	 * Make the gen count odd to indicate we are in the process of
++	 * updating.
++	 */
++	vcpu->arch.pv_timekeeper.gen++;
++	vcpu->arch.pv_timekeeper.gen |= 1;
++
++	/*
++	 * See comment in kvm_guest_time_update() for why we have to do
++	 * multiple writes.
++	 */
++	kvm_write_guest_cached(vcpu->kvm, &vcpu->arch.pv_timekeeper_g2h,
++	    &vcpu->arch.pv_timekeeper, sizeof(vcpu->arch.pv_timekeeper.gen));
++
++	smp_wmb();
++
++	kvm_write_guest_cached(vcpu->kvm, &vcpu->arch.pv_timekeeper_g2h,
++	    &vcpu->arch.pv_timekeeper, sizeof(vcpu->arch.pv_timekeeper));
++
++	smp_wmb();
++
++	vcpu->arch.pv_timekeeper.gen++;
++
++	kvm_write_guest_cached(vcpu->kvm, &vcpu->arch.pv_timekeeper_g2h,
++	    &vcpu->arch.pv_timekeeper, sizeof(vcpu->arch.pv_timekeeper.gen));
++}
++
++static void
++update_shadow_pvtk(struct timekeeper *tk)
++{
++	struct pvclock_timekeeper *pvtk;
++	unsigned long flags;
++
++	pvtk = &shadow_pvtk;
++
++	if (atomic_read(&pv_timekeepers_nr) == 0 ||
++	    pvclock_gtod_data.clock.vclock_mode != VCLOCK_TSC)
++		return;
++
++	spin_lock_irqsave(&shadow_pvtk_lock, flags);
++	pvclock_copy_read_base(&pvtk->tkr_mono, &tk->tkr_mono);
++	pvclock_copy_read_base(&pvtk->tkr_raw, &tk->tkr_raw);
++
++	pvtk->xtime_sec = tk->xtime_sec;
++	pvtk->ktime_sec = tk->ktime_sec;
++	pvtk->wall_to_monotonic_sec = tk->wall_to_monotonic.tv_sec;
++	pvtk->wall_to_monotonic_nsec = tk->wall_to_monotonic.tv_nsec;
++	pvtk->offs_real = tk->offs_real;
++	pvtk->offs_boot = tk->offs_boot;
++	pvtk->offs_tai = tk->offs_tai;
++	pvtk->raw_sec = tk->raw_sec;
++	spin_unlock_irqrestore(&shadow_pvtk_lock, flags);
++}
++
+ static void pvclock_gtod_update_fn(struct work_struct *work)
+ {
+ 	struct kvm *kvm;
+@@ -7124,6 +7239,7 @@ static int pvclock_gtod_notify(struct notifier_block *nb, unsigned long unused,
+ 	struct timekeeper *tk = priv;
+ 
+ 	update_pvclock_gtod(tk);
++	update_shadow_pvtk(tk);
+ 
+ 	/* disable master clock if host does not trust, or does not
+ 	 * use, TSC based clocksource.
+@@ -7940,6 +8056,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 	bool req_immediate_exit = false;
+ 
++	kvm_copy_into_pvtk(vcpu);
++
+ 	if (kvm_request_pending(vcpu)) {
+ 		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu))
+ 			kvm_x86_ops->get_vmcs12_pages(vcpu);
+@@ -9020,6 +9138,9 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ 
+ 	kvmclock_reset(vcpu);
+ 
++	if (vcpu->arch.pv_timekeeper_enabled)
++		atomic_dec(&pv_timekeepers_nr);
++
+ 	kvm_x86_ops->vcpu_free(vcpu);
+ 	free_cpumask_var(wbinvd_dirty_mask);
+ }
 -- 
 2.23.0.581.g78d2f28ef7-goog
 
