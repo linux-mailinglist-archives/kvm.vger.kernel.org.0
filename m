@@ -2,48 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14EDDD3074
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 20:35:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 247AAD3076
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 20:35:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbfJJSfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 14:35:38 -0400
-Received: from mail-vk1-f201.google.com ([209.85.221.201]:47718 "EHLO
-        mail-vk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbfJJSfi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 14:35:38 -0400
-Received: by mail-vk1-f201.google.com with SMTP id h186so2464983vkg.14
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 11:35:37 -0700 (PDT)
+        id S1726628AbfJJSfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 14:35:44 -0400
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:56927 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbfJJSfn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 14:35:43 -0400
+Received: by mail-pl1-f202.google.com with SMTP id x8so4371069plr.23
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 11:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=8qITtlfN7DfL4So8PtImqvXvjqN5KVqQfKSdHZjpQwI=;
-        b=sLfik+CoQgyisPX1rVG1AxBqN8+xor9OJPAnqpsJopbYdTAgc3xH33PexjCwI31r8q
-         hYG+Tp/Z99iVIjWsZ60vbvz8mbgAhOMdl3IvHuNi2vU70kozugqUkDGM+Iy9Yg0/HrIz
-         WjDwuWZQFNELHdM+1rjKB4wq0W/mmi2Mg669/BZZ5X7D5+tKLeoez4XY4TnSgGTOkBAW
-         qrnPXJkyckuZY51IkBS3fgRKx25HLUKQhtHORI6ZA/aAHUAcpIrC/Z5ciCljWjuf6Vjs
-         GvwAD1VfRhD0HhGtoU88PHarF4uJsw5D0pJ43/PaqEY1smBkCf9XP2PsbPr10hPy1YX1
-         u1gg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=XTuI7th3+9dwO3nKtBiY4qgOMbcjEb2zppHYOAbpHRc=;
+        b=kKdN3OX3CtBaAFl02mXXGN9Uw9dpGcwGpg9dBRYNrYe+L/yTf7H2ZLZJZK2knPepwa
+         vtBZYFcyb3823+jWUniHF+ovklg4cHR2CBJfkXCDjshpGhSBhiJu8S8GD1OErEsr2JvN
+         Uml0+MFhqs0Ium2VRXFp9k7RE9Xl5XBRbmn5a7f9AGxS5oaDXK60PowXAILjTwM5Oopm
+         +B4GqcXZv7sEth/Ua24ySRWpbRxXDB8pngGF4dzalrsSWROXSglxtog6gTlGS93vyrPI
+         ngK2v2GbXlm+bcn9/WGl5IrpaO2sjzv3PDRj5D7MH55T3Lh65HRW7FiRFQnmusHLQhlq
+         tiwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=8qITtlfN7DfL4So8PtImqvXvjqN5KVqQfKSdHZjpQwI=;
-        b=jTMpVkr97S1Vs9kud6Xgu/KCSoIePnczpoIw3JfzTB2yw8AbSbSpudhU9Pt/fksGks
-         zxS8USkX8ySGlqImDLUdcl2wR+U84jisuPelA+iqD8YqWLSIX9o+Yq+V8x5jPYxObnG0
-         7SWk1WT0sqTOuPP50QWVvKzlSpTysAdagLz8bkRoxVxaryXo/xlaIfv8qvCRzxZU7MZ7
-         JkyYoBH15YkxeLv7Algk/Q/zlQOBKFn4/jpv8XvdPQw6xO0QtUgmh8dASzbLMvxSY9tJ
-         41leQ8zP0y1d4DTuBkhQlVVI/xt886NcEgJqIvWnzZ+VZK8qEHzOvvMHzD4b1HowJFfF
-         I8ww==
-X-Gm-Message-State: APjAAAVwWFNkZhMc3z+ljoeTxod8lsxQJT0dfImAvhpomn7bYIbscT5q
-        BgRsIF6aCJtyF9dS8VOvG+v1ur+/8y8cGQY6jY5jIBxH5kIW6Tdm2cSvc6/b1kPxTfHfCm/uiOx
-        dpf5v33l0kAaLoqRE8DWWN9Z3aVwLHrS4zDposFCKCoMrbmrcjukcgg==
-X-Google-Smtp-Source: APXvYqxxu7e1OVMjCAdG2h8urjxkXs88G8V4HqqHfmeAB6ebIKPJStoJzZ47IITOifPxPaFNLMUbQS5IYA==
-X-Received: by 2002:a05:6102:2142:: with SMTP id h2mr6450721vsg.27.1570732537228;
- Thu, 10 Oct 2019 11:35:37 -0700 (PDT)
-Date:   Thu, 10 Oct 2019 11:35:03 -0700
-Message-Id: <20191010183506.129921-1-morbo@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=XTuI7th3+9dwO3nKtBiY4qgOMbcjEb2zppHYOAbpHRc=;
+        b=P1g40f5LmZ1ZSSLL+BkxBrelPR71kfsURUqD2h3IRVvC15VIwyqRXitW6QjWhArnHP
+         3OgnyjOeETD20hCUME/svvfVuWwyy2+hfi+keIE5R0agAFi66Ov9GaVYj87BXPimgGUu
+         xKFVguOoD43E+zCaxSW+7ZTj6IoK6vQ7YbOKTYRWQELoxicj8pIIkYMZISNEkqnoOsUC
+         yFtpuAi+Tx7GJJpHf9q7kBCn+jDL3mD+0+cXAAAAv6Hx2wOlFTxapMDza9ZveiIuCX0t
+         gyno80RlOs95I0QWMsqegkG6soAj1VWDjEzgXmFc5NJkqU5yjFjfTWq8MwG19dldd29k
+         bqrA==
+X-Gm-Message-State: APjAAAVJki3iGVs9QMw9rxHXJONqNG704fLSIfux5f2N4mv8CiC2x8v+
+        LwGWqQTRDlOCRyCFiMhN49v1odyNRgrHEVil1vsB7TWfW65Ew/ymKdDDDvFTxLAERDlf18MI7o0
+        ZFuXXJR6A/fQYvARajCDqdf3/NuAT35EgfcEOWu5cE1PzJG5ljBljnA==
+X-Google-Smtp-Source: APXvYqxaFHpZyRfjoYxSLO8vh1f5AyAY5wQ6uNQfo+9W+NQpK40h4qWKe74eEGWtwF+3QqinDw94Z3UU9w==
+X-Received: by 2002:a63:dc49:: with SMTP id f9mr12828634pgj.91.1570732541309;
+ Thu, 10 Oct 2019 11:35:41 -0700 (PDT)
+Date:   Thu, 10 Oct 2019 11:35:04 -0700
+In-Reply-To: <20191010183506.129921-1-morbo@google.com>
+Message-Id: <20191010183506.129921-2-morbo@google.com>
 Mime-Version: 1.0
+References: <20191010183506.129921-1-morbo@google.com>
 X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [kvm-unit-tests PATCH 0/3] Patches for clang compilation
+Subject: [kvm-unit-tests PATCH 1/3] x86: emulator: use "SSE2" for the target
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com
 Cc:     jmattson@google.com, Bill Wendling <morbo@google.com>
@@ -53,20 +57,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These three patches fixes some compilation issues that clang's
-encountering. I ran the tests and there are no regressions with gcc.
+The movdqu and movapd instructions are SSE2 instructions. Clang
+interprets the __attribute__((target("sse"))) as allowing SSE only
+instructions. Using SSE2 instructions cause an error.
 
-Bill Wendling (3):
-  x86: emulator: use "SSE2" for the target
-  pci: use uint64_t for unsigned long values
-  Makefile: use "-Werror" in cc-option
+Signed-off-by: Bill Wendling <morbo@google.com>
+---
+ x86/emulator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- Makefile       | 19 +++++++++++--------
- lib/pci.c      | 18 +++++++++---------
- lib/pci.h      |  4 ++--
- x86/emulator.c |  2 +-
- 4 files changed, 23 insertions(+), 20 deletions(-)
-
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 621caf9..bec0154 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -657,7 +657,7 @@ static bool sseeq(sse_union *v1, sse_union *v2)
+     return ok;
+ }
+ 
+-static __attribute__((target("sse"))) void test_sse(sse_union *mem)
++static __attribute__((target("sse2"))) void test_sse(sse_union *mem)
+ {
+     sse_union v;
+ 
 -- 
 2.23.0.700.g56cf767bdb-goog
 
