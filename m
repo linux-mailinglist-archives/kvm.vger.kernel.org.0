@@ -2,167 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC426D327E
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 22:43:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B410D3398
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 23:46:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727266AbfJJUgj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 16:36:39 -0400
-Received: from mail-io1-f53.google.com ([209.85.166.53]:34089 "EHLO
-        mail-io1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726533AbfJJUgj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 16:36:39 -0400
-Received: by mail-io1-f53.google.com with SMTP id q1so16816560ion.1;
-        Thu, 10 Oct 2019 13:36:37 -0700 (PDT)
+        id S1727413AbfJJVnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 17:43:03 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:46638 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725867AbfJJVnD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 17:43:03 -0400
+Received: by mail-io1-f68.google.com with SMTP id c6so17016641ioo.13
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 14:43:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=j6sP383Qyl95I8Z25iYfBokkV8+qGYi/AFX1IOAtUrQ=;
-        b=Q34QMYZdc+pG/I0r+KiZJAKEidQQcZ2vbxo8k9oDD4D6VIPmYiq55Vl8FsfktvflZ1
-         geL58/bUA0mtFR47tlZu2j4y5nyoh6nr3nbLTNHkg1ELYWX+/603QIlIc6C9qGTvJEVH
-         /OV01/zQ0gJm86BrSxhYKIRGDmGIZ/QFs10Q63SPCEM7VSvHNWPiuruDhU0z8hBKWlr0
-         ut+GGyVUAUwLhs0eDZ8tDj8rMnUgzUkpLsCtWwDLAVPG2wXubGVbOU4TaIDXm+L9JdEg
-         aKivN5ksqTd7qzsgKDhbNZ1zxa9gBHJr8qTDucMKj/bW+/2NV5zDDIbA5y2vAKGmTK0f
-         MzWQ==
+        bh=cgBbezehA3ikP9oZRce9D/NdIFW9A/2nwCHvWz1qbio=;
+        b=PXWibDixpgKJCby0TQFLHsZui075Akm20g2TmZP0MeUZu3m3TF2pxyJ6S0YjeAMB9k
+         BNLlTLTKCcnK4fLg9rTzwLxxAE8f37HmurDGiwgHD846Eire0Z+6V97ptIkKb/Pw4WZQ
+         JMSVx2LWoEFLhcZvxaggKnTPoNhmm0x/mCblauI4fbockAsXT2GtwizjO/RPdB2iPzPS
+         KoZHu81rUu/NoB97BqerCDfp1ZwOIMHhsBzYxM9zAkAV+QumBorRWlW1Ui1MYMHgBs/t
+         nAw0lKVjeuQqcj4TsSy+XCp6RuzzXuEk81yruvFRraHNrYc2NHN3gVLwcB8XqkwJAEMe
+         fjVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=j6sP383Qyl95I8Z25iYfBokkV8+qGYi/AFX1IOAtUrQ=;
-        b=J/8jAk8g+MmC6g3jNTBu/YP/HvAOj2luS8HRMbqlbRXVVH2CXloMKmo6MEsf2cB5HX
-         giNbesO9qTHG8VT/TGIORXwVyFLFpVs5lRxGvMwTVk520r4Xdkh3x8B1U4msCo9sM9eD
-         bJzIHcbH0kuQMAheEKCdPHZGGu5TuJAmP0wFIVBrEpHNy0fOVMRuQ0liamHOvCHSEpX8
-         h0WeGepC3qRmCoR5mcpYqQgKmZjqc2YohK47LWQi6TsW8JD2VnoB4jSX0NjzKkCzYMa/
-         1IPMNvCGa0Z0EWCF+xvyRco2MmMRPesPOwTHSV0M2STFU1M3NJIsHd/zyi0YLdttpmkj
-         xm2Q==
-X-Gm-Message-State: APjAAAVXe8uagK0/pzxRGsVJ4gV5OPZ3goanxykdmyiRwnvu6W752sLF
-        nsove5nTO+to6JUB7ZXLXXWOxyQl+WoXs6pJ15DHQ6f5
-X-Google-Smtp-Source: APXvYqzkmsXfTfl7HoZDw6+IGIW9qLazyM4wbybRpN2KG5iGlsQrQr34VW4QNZUtyUVWWSac/24naMiXdyfmk6TwusI=
-X-Received: by 2002:a6b:6605:: with SMTP id a5mr13224254ioc.237.1570739797276;
- Thu, 10 Oct 2019 13:36:37 -0700 (PDT)
+        bh=cgBbezehA3ikP9oZRce9D/NdIFW9A/2nwCHvWz1qbio=;
+        b=sIK6diNWbrpp8Lw4t0olDFNa+zT0Kmt8UDKLKDzIbJCSuzNiPGhciEEX7a63ZmCKoE
+         LqTXzJEw4c14ljG9h/8D1+Pf2j/EdLJogB7JQ086lfzkuDI3nEgFJWFr1LceJQCdZ/9O
+         J/giYt3IrjA+SUU0VtSP57BXMA15Arw/Kjd+5jwqa2S8cz70JLLspqwYDOIaThGu8KBi
+         Fh5CGHOK8RukQsrE+Zejmtr11y1wYl0h9KJuesZxeqMmoK/rTeXvxVZ70JyqHrdyS9qQ
+         YUa+xEfvwUr0FwZpvsPUh3KTYwcp106rJYs8epjFoRaG3vLHyO578ho0/MnPegfs5WHH
+         f4Bw==
+X-Gm-Message-State: APjAAAXndXMNCFKnlJu2IuYI6YVxeVeSn3523cl+RPmI7inakKev7cRB
+        gJBIDLKCCUFMkdiGSTcHWwJw6i6DhNtaMGvNe6eG6g==
+X-Google-Smtp-Source: APXvYqzyL4eIxkMFi6sg1vb8I0p+Byp7KJS0VWOUTKHzD3FfxdDEDF/ndhyoviKqw/bxI8kk0ZY7KIOYr8HJSACfp78=
+X-Received: by 2002:a5d:9057:: with SMTP id v23mr1741177ioq.119.1570743782188;
+ Thu, 10 Oct 2019 14:43:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190812131235.27244-1-nitesh@redhat.com> <20190812131235.27244-2-nitesh@redhat.com>
-In-Reply-To: <20190812131235.27244-2-nitesh@redhat.com>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Thu, 10 Oct 2019 13:36:26 -0700
-Message-ID: <CAKgT0UeKxCYtg6+aCPyxJcAGrBgvCWziUpZM6Tmw-9PSChcGVA@mail.gmail.com>
-Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
-To:     Nitesh Narayan Lal <nitesh@redhat.com>
+References: <20190917085304.16987-1-weijiang.yang@intel.com>
+In-Reply-To: <20190917085304.16987-1-weijiang.yang@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 10 Oct 2019 14:42:51 -0700
+Message-ID: <CALMp9eSTz+XbmLtWZLqWvSNjjb4Ado4s+SfABtRuVNQBXUHStQ@mail.gmail.com>
+Subject: Re: [PATCH v5 0/9] Enable Sub-page Write Protection Support
+To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
-        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-        Pankaj Gupta <pagupta@redhat.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Rik van Riel <riel@surriel.com>,
-        David Hildenbrand <david@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
-        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
-        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 6:13 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+On Tue, Sep 17, 2019 at 1:52 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
 >
+> EPT-Based Sub-Page write Protection(SPP)is a HW capability which allows
+> Virtual Machine Monitor(VMM) to specify write-permission for guest
+> physical memory at a sub-page(128 byte) granularity. When this
+> capability is enabled, the CPU enforces write-access check for sub-pages
+> within a 4KB page.
+>
+> The feature is targeted to provide fine-grained memory protection for
+> usages such as device virtualization, memory check-point and VM
+> introspection etc.
+>
+> SPP is active when the "sub-page write protection" (bit 23) is 1 in
+> Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+> Permission Table(SPPT), SPPT is referenced via a 64-bit control field
+> called Sub-Page Permission Table Pointer (SPPTP) which contains a
+> 4K-aligned physical address.
+>
+> To enable SPP for certain physical page, the gfn should be first mapped
+> to a 4KB entry, then set bit 61 of the corresponding EPT leaf entry.
+> While HW walks EPT, if bit 61 is set, it traverses SPPT with the guset
+> physical address to find out the sub-page permissions at the leaf entry.
+> If the corresponding bit is set, write to sub-page is permitted,
+> otherwise, SPP induced EPT violation is generated.
 
-<snip>
-
-> +static int process_free_page(struct page *page,
-> +                            struct page_reporting_config *phconf, int count)
-> +{
-> +       int mt, order, ret = 0;
-> +
-> +       mt = get_pageblock_migratetype(page);
-> +       order = page_private(page);
-> +       ret = __isolate_free_page(page, order);
-> +
-> +       if (ret) {
-> +               /*
-> +                * Preserving order and migratetype for reuse while
-> +                * releasing the pages back to the buddy.
-> +                */
-> +               set_pageblock_migratetype(page, mt);
-> +               set_page_private(page, order);
-> +
-> +               sg_set_page(&phconf->sg[count++], page,
-> +                           PAGE_SIZE << order, 0);
-> +       }
-> +
-> +       return count;
-> +}
-> +
-> +/**
-> + * scan_zone_bitmap - scans the bitmap for the requested zone.
-> + * @phconf: page reporting configuration object initialized by the backend.
-> + * @zone: zone for which page reporting is requested.
-> + *
-> + * For every page marked in the bitmap it checks if it is still free if so it
-> + * isolates and adds them to a scatterlist. As soon as the number of isolated
-> + * pages reach the threshold set by the backend, they are reported to the
-> + * hypervisor by the backend. Once the hypervisor responds after processing
-> + * they are returned back to the buddy for reuse.
-> + */
-> +static void scan_zone_bitmap(struct page_reporting_config *phconf,
-> +                            struct zone *zone)
-> +{
-> +       unsigned long setbit;
-> +       struct page *page;
-> +       int count = 0;
-> +
-> +       sg_init_table(phconf->sg, phconf->max_pages);
-> +
-> +       for_each_set_bit(setbit, zone->bitmap, zone->nbits) {
-> +               /* Process only if the page is still online */
-> +               page = pfn_to_online_page((setbit << PAGE_REPORTING_MIN_ORDER) +
-> +                                         zone->base_pfn);
-> +               if (!page)
-> +                       continue;
-> +
-> +               spin_lock(&zone->lock);
-> +
-> +               /* Ensure page is still free and can be processed */
-> +               if (PageBuddy(page) && page_private(page) >=
-> +                   PAGE_REPORTING_MIN_ORDER)
-> +                       count = process_free_page(page, phconf, count);
-> +
-> +               spin_unlock(&zone->lock);
-> +               /* Page has been processed, adjust its bit and zone counter */
-> +               clear_bit(setbit, zone->bitmap);
-> +               atomic_dec(&zone->free_pages);
-> +
-> +               if (count == phconf->max_pages) {
-> +                       /* Report isolated pages to the hypervisor */
-> +                       phconf->report(phconf, count);
-> +
-> +                       /* Return processed pages back to the buddy */
-> +                       return_isolated_page(zone, phconf);
-> +
-> +                       /* Reset for next reporting */
-> +                       sg_init_table(phconf->sg, phconf->max_pages);
-> +                       count = 0;
-> +               }
-> +       }
-> +       /*
-> +        * If the number of isolated pages does not meet the max_pages
-> +        * threshold, we would still prefer to report them as we have already
-> +        * isolated them.
-> +        */
-> +       if (count) {
-> +               sg_mark_end(&phconf->sg[count - 1]);
-> +               phconf->report(phconf, count);
-> +
-> +               return_isolated_page(zone, phconf);
-> +       }
-> +}
-> +
-
-So one thing that occurred to me is that this code is missing checks
-so that it doesn't try to hint isolated pages. With the bitmap
-approach you need an additional check so that you aren't pulling
-isolated pages out and reporting them.
+How do you handle sub-page permissions for instructions emulated by kvm?
