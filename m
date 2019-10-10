@@ -2,52 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2728CD1EBD
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 05:01:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56663D1FEF
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 07:17:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732448AbfJJDBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 23:01:30 -0400
-Received: from m17617.mail.qiye.163.com ([59.111.176.17]:10034 "EHLO
-        m17617.mail.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726621AbfJJDBa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 23:01:30 -0400
-X-Greylist: delayed 522 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Oct 2019 23:01:29 EDT
-Received: from P80254710 (unknown [121.12.147.249])
-        by m17617.mail.qiye.163.com (Hmail) with ESMTPA id 3A9C7261AAB;
-        Thu, 10 Oct 2019 10:52:45 +0800 (CST)
-Date:   Thu, 10 Oct 2019 10:52:49 +0800
-From:   "richard.peng@oppo.com" <richard.peng@oppo.com>
-To:     pbonzini <pbonzini@redhat.com>, rkrcmar <rkrcmar@redhat.com>
-Cc:     kvm <kvm@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: [PATCH] kvm/x86 : Replace BUG_ON(1) with BUG()
-X-Priority: 3
-X-GUID: DC6DBE28-1918-4988-81E0-F1DEDA6BAD10
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.10.151[cn]
-Mime-Version: 1.0
-Message-ID: <201910101052488242114@oppo.com>
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: base64
-X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZVk9VTE5NS0tKT0xJT0xISk9ZV1koWU
-        FJSUtLSjdXWS1ZQUlXWQkOFx4IWUFZNTQpNjo3JCkuNz5ZBg++
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6MSI6Tgw4QzlNFUw9AywJGh0a
-        NhxPFEtVSlVKTkxLTUxOQk1OTE5JVTMWGhIXVQkSGBMaCR9VCx4VHDsUCwsUVRgUFkVZV1kSC1lB
-        WUpJSlVKSVVKT0xVSU9CWVdZCAFZQUpNSk03Bg++
-X-HM-Tid: 0a6db3953e9b9375kuws3a9c7261aab
+        id S1727806AbfJJFRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 01:17:01 -0400
+Received: from mga07.intel.com ([134.134.136.100]:13392 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726065AbfJJFRB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 01:17:01 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 22:17:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,279,1566889200"; 
+   d="scan'208";a="193089168"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+  by fmsmga008.fm.intel.com with ESMTP; 09 Oct 2019 22:16:59 -0700
+From:   Tao Xu <tao3.xu@intel.com>
+To:     pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+        mtosatti@redhat.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, tao3.xu@intel.com,
+        jingqi.liu@intel.com
+Subject: [PATCH v6 0/2] x86: Enable user wait instructions
+Date:   Thu, 10 Oct 2019 13:16:55 +0800
+Message-Id: <20191010051657.28163-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-U2lnbmVkLW9mZi1ieTogUGVuZyBIYW8gPHJpY2hhcmQucGVuZ0BvcHBvLmNvbT4KLS0tCsKgYXJj
-aC94ODYva3ZtL3ZteC9uZXN0ZWQuYyB8IDMgKy0tCsKgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0
-aW9uKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS92bXgvbmVz
-dGVkLmMgYi9hcmNoL3g4Ni9rdm0vdm14L25lc3RlZC5jCmluZGV4IGU3NmViNGYuLmQwZTZjNDAg
-MTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2t2bS92bXgvbmVzdGVkLmMKKysrIGIvYXJjaC94ODYva3Zt
-L3ZteC9uZXN0ZWQuYwpAQCAtNDk0NSw4ICs0OTQ1LDcgQEAgc3RhdGljIGludCBoYW5kbGVfaW52
-ZXB0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKwqAJICovCsKgCQlicmVhazsKwqAJZGVmYXVsdDoK
-LQkJQlVHX09OKDEpOwotCQlicmVhazsKKwkJQlVHKCk7CsKgCX0KwqAKwqAJcmV0dXJuIG5lc3Rl
-ZF92bXhfc3VjY2VlZCh2Y3B1KTsKLS3CoAoyLjcuNA==
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
+
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
+
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
+
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
+
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
+
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it in kvm and provide a capability to
+enable it. Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
+QEMU use "-overcommit cpu-pm=on, a VM can use UMONITOR, UMWAIT and TPAUSE
+instructions. If the instruction causes a delay, the amount of time
+delayed is called here the physical delay. The physical delay is first
+computed by determining the virtual delay (the time to delay relative to
+the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT and TPAUSE cause
+an invalid-opcode exception(#UD).
+
+The release document ref below link:
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Changelog:
+v6:
+	Only remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set.
+        (Paolo)
+v5:
+	Remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set. (Paolo)
+v4:
+	Set IA32_UMWAIT_CONTROL 32bits
+v3:
+	Simplify the patches, expose user wait instructions when the guest
+	has CPUID (Paolo)
+v2:
+	Separated from the series
+	https://www.mail-archive.com/qemu-devel@nongnu.org/msg549526.html
+	Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
+	QEMU use "-overcommit cpu-pm=on"	
+v1:
+	Sent out with MOVDIRI/MOVDIR64B instructions patches
+
+Tao Xu (2):
+  x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
+  target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
+
+ target/i386/cpu.c     |  3 ++-
+ target/i386/cpu.h     |  3 +++
+ target/i386/kvm.c     | 17 +++++++++++++++++
+ target/i386/machine.c | 20 ++++++++++++++++++++
+ 4 files changed, 42 insertions(+), 1 deletion(-)
+
+-- 
+2.20.1
 
