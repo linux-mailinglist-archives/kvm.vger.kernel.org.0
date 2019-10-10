@@ -2,132 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A06ED2794
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 12:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1579D27A9
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 13:04:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726604AbfJJKzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 06:55:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37552 "EHLO mx1.redhat.com"
+        id S1729045AbfJJLEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 07:04:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33528 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726237AbfJJKzb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 06:55:31 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726230AbfJJLEa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 07:04:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E93A3883CA
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 10:55:30 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id o8so2449193wmc.2
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 03:55:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cSwY5qjlZoDMf13ZGbgpfesejkb6FeuV+G9YLcC+7pQ=;
-        b=Bvko+j10Ie0lycI3PJTqlo3RRv5oRkQGzkRR6QJD2Bf2r0ipR7uyvHgcHdCsRtMgNZ
-         ApGpg76o6TL1IoKtm2J+8QQSotlGajEXv8dMnw1qrtEmU2pYo/CFHpScMRJqxh3gLSLb
-         YQtwDhmcluxZSKMjT5pd6qfmqqdQ/GBZMGMyVSLm+2E3yIhUmjz59vahfpLQPpr7sRsk
-         VllFATRXwZ29kdlDQ7jrgAu3Xje2cocQHgvg8OHE+f0fVRP0tRfeD7MYTycsq85rdEmO
-         Lf4BLQNq4FTnnPmClu3Sm0z1GnUt5OoLLPPcsrZDQMc7Ihkji8T9aXlXqJ/8mLkb1k/t
-         R3xg==
-X-Gm-Message-State: APjAAAX5TljgW3Y5iLQZbQ/Rey9P0y6xqg6VM7HtVj64UrRMLoVrPPT4
-        Q1gNfx5hQwrXkH4pzyB2HEdDyEYB/f87O7evv33/g8TGpTiU6X5vC81JLTYkxSfRe5eY77X2VYx
-        FgmRhHtO0cMsS
-X-Received: by 2002:a05:6000:1043:: with SMTP id c3mr7968473wrx.83.1570704929566;
-        Thu, 10 Oct 2019 03:55:29 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqySoMN1eIJ4n2ryWs4xEqq8Fh+ttgSXxTH/uhDp/leaeEOfqnPg5ZQvlgCz4zJ9qa7KIWjzuw==
-X-Received: by 2002:a05:6000:1043:: with SMTP id c3mr7968447wrx.83.1570704929313;
-        Thu, 10 Oct 2019 03:55:29 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id c9sm4798935wrt.7.2019.10.10.03.55.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2019 03:55:28 -0700 (PDT)
-Subject: Re: [RFC v2 2/2] x86/kvmclock: Introduce kvm-hostclock clocksource.
-To:     Suleiman Souhlal <suleiman@google.com>, rkrcmar@redhat.com,
-        tglx@linutronix.de
-Cc:     john.stultz@linaro.org, sboyd@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        ssouhlal@freebsd.org, tfiga@chromium.org, vkuznets@redhat.com
-References: <20191010073055.183635-1-suleiman@google.com>
- <20191010073055.183635-3-suleiman@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <2e6e5b14-fa68-67bd-1436-293659c8d92c@redhat.com>
-Date:   Thu, 10 Oct 2019 12:55:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 1D01630655F9;
+        Thu, 10 Oct 2019 11:04:30 +0000 (UTC)
+Received: from gondolin (dhcp-192-233.str.redhat.com [10.33.192.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B76456060D;
+        Thu, 10 Oct 2019 11:04:26 +0000 (UTC)
+Date:   Thu, 10 Oct 2019 13:04:24 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] KVM: s390: filter and count invalid yields
+Message-ID: <20191010130424.7c269bb9.cohuck@redhat.com>
+In-Reply-To: <8c17bc83-c572-7284-3cf7-c3bbd5f63ff9@de.ibm.com>
+References: <20191010102131.109736-1-borntraeger@de.ibm.com>
+        <4323a6bb-35b7-bd23-8fb8-abb7c589d7fc@redhat.com>
+        <8c17bc83-c572-7284-3cf7-c3bbd5f63ff9@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191010073055.183635-3-suleiman@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 10 Oct 2019 11:04:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/19 09:30, Suleiman Souhlal wrote:
-> +kvm_hostclock_enable(struct clocksource *cs)
-> +{
-> +	pv_timekeeper_enabled = 1;
-> +
-> +	old_vclock_mode = kvm_clock.archdata.vclock_mode;
-> +	kvm_clock.archdata.vclock_mode = VCLOCK_TSC;
-> +	return 0;
-> +}
-> +
-> +static void
-> +kvm_hostclock_disable(struct clocksource *cs)
-> +{
-> +	pv_timekeeper_enabled = 0;
-> +	kvm_clock.archdata.vclock_mode = old_vclock_mode;
-> +}
-> +
+On Thu, 10 Oct 2019 12:28:50 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Why do you poke at kvm_clock?  Instead you should add
+> On 10.10.19 12:25, David Hildenbrand wrote:
+> > On 10.10.19 12:21, Christian Borntraeger wrote:  
+> >> To analyze some performance issues with lock contention and scheduling
+> >> it is nice to know when diag9c did not result in any action.
+> >> At the same time avoid calling the scheduler (which can be expensive)
+> >> if we know that it does not make sense.
+> >>
+> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> ---
+> >>  arch/s390/include/asm/kvm_host.h |  2 ++
+> >>  arch/s390/kvm/diag.c             | 23 +++++++++++++++++++----
+> >>  arch/s390/kvm/kvm-s390.c         |  2 ++
+> >>  3 files changed, 23 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> >> index abe60268335d..743cd5a63b37 100644
+> >> --- a/arch/s390/include/asm/kvm_host.h
+> >> +++ b/arch/s390/include/asm/kvm_host.h
+> >> @@ -392,6 +392,8 @@ struct kvm_vcpu_stat {
+> >>  	u64 diagnose_10;
+> >>  	u64 diagnose_44;
+> >>  	u64 diagnose_9c;
+> >> +	u64 diagnose_9c_success;
+> >> +	u64 diagnose_9c_ignored;  
+> > 
+> > Can't you derive the one from the other with diagnose_9c? Just sayin,
+> > one would be sufficient.  
+> 
+> You mean diagnose9c = diagnose_9c_success + diagnose_9c_ignored anyway so this is redundant?
+> Could just do diagnose_9c  and diagnose_9c_ignored if you prefer that.
 
-	.archdata               = { .vclock_mode = VCLOCK_TSC },
-
-to the kvm_hostclock declaration.
-
-Please also check that the invariant TSC CPUID bit
-CPUID[0x80000007].EDX[8] is set before enabling this feature.
-
-Paolo
-
-> +	pvtk = &pv_timekeeper;
-> +	do {
-> +		gen = pvtk_read_begin(pvtk);
-> +		if (!(pv_timekeeper.flags & PVCLOCK_TIMEKEEPER_ENABLED))
-> +			return;
-> +
-> +		pvclock_copy_into_read_base(pvtk, &tk->tkr_mono,
-> +		    &pvtk->tkr_mono);
-> +		pvclock_copy_into_read_base(pvtk, &tk->tkr_raw, &pvtk->tkr_raw);
-> +
-> +		tk->xtime_sec = pvtk->xtime_sec;
-> +		tk->ktime_sec = pvtk->ktime_sec;
-> +		tk->wall_to_monotonic.tv_sec = pvtk->wall_to_monotonic_sec;
-> +		tk->wall_to_monotonic.tv_nsec = pvtk->wall_to_monotonic_nsec;
-> +		tk->offs_real = pvtk->offs_real;
-> +		tk->offs_boot = pvtk->offs_boot;
-> +		tk->offs_tai = pvtk->offs_tai;
-> +		tk->raw_sec = pvtk->raw_sec;
-> +	} while (pvtk_read_retry(pvtk, gen));
-> +}
-> +
-
-Should you write an "enabled value" (basically the flags) into pvtk as well?
+Voting for that :)
 
 > 
-> +kvm_hostclock_init(void)
-> +{
-> +	unsigned long pa;
-> +
-> +	pa = __pa(&pv_timekeeper);
-> +	wrmsrl(MSR_KVM_TIMEKEEPER_EN, pa);
+> 
+> >   
+> >>  	u64 diagnose_258;
+> >>  	u64 diagnose_308;
+> >>  	u64 diagnose_500;
+> >> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
+> >> index 45634b3d2e0a..2c729f020585 100644
+> >> --- a/arch/s390/kvm/diag.c
+> >> +++ b/arch/s390/kvm/diag.c
+> >> @@ -158,14 +158,29 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
+> >>  
+> >>  	tid = vcpu->run->s.regs.gprs[(vcpu->arch.sie_block->ipa & 0xf0) >> 4];
+> >>  	vcpu->stat.diagnose_9c++;
+> >> -	VCPU_EVENT(vcpu, 5, "diag time slice end directed to %d", tid);
+> >>  
+> >> +	/* yield to self */
+> >>  	if (tid == vcpu->vcpu_id)
+> >> -		return 0;
+> >> +		goto no_yield;
+> >>  
+> >> +	/* yield to invalid */
+> >>  	tcpu = kvm_get_vcpu_by_id(vcpu->kvm, tid);
+> >> -	if (tcpu)
+> >> -		kvm_vcpu_yield_to(tcpu);
+> >> +	if (!tcpu)
+> >> +		goto no_yield;
+> >> +
+> >> +	/* target already running */
+> >> +	if (tcpu->cpu >= 0)
+> >> +		goto no_yield;  
+> > 
+> > Wonder if it's wort moving this optimization to a separate patch.  
+> 
+> Could do if you prefer that. 
 
+Voting for that as well :)
 
-As Vitaly said, a new CPUID bit must be defined in
-Documentation/virt/kvm/cpuid.txt, and used here.  Also please make bit 0
-an enable bit.
+> 
+> 
+> >   
+> >> +
+> >> +	if (kvm_vcpu_yield_to(tcpu) <= 0)
+> >> +		goto no_yield;
+> >> +
+> >> +	VCPU_EVENT(vcpu, 5, "diag time slice end directed to %d: done", tid);
+> >> +	vcpu->stat.diagnose_9c_success++;
+> >> +	return 0;
+> >> +no_yield:
+> >> +	VCPU_EVENT(vcpu, 5, "diag time slice end directed to %d: ignored", tid);
+> >> +	vcpu->stat.diagnose_9c_ignored++;
+> >>  	return 0;
+> >>  }
+> >>  
+> >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> >> index 4a3bc40ca1a4..b368e835f2f7 100644
+> >> --- a/arch/s390/kvm/kvm-s390.c
+> >> +++ b/arch/s390/kvm/kvm-s390.c
+> >> @@ -155,6 +155,8 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+> >>  	{ "instruction_diag_10", VCPU_STAT(diagnose_10) },
+> >>  	{ "instruction_diag_44", VCPU_STAT(diagnose_44) },
+> >>  	{ "instruction_diag_9c", VCPU_STAT(diagnose_9c) },
+> >> +	{ "diag_9c_success", VCPU_STAT(diagnose_9c_success) },
+> >> +	{ "diag_9c_ignored", VCPU_STAT(diagnose_9c_ignored) },
+> >>  	{ "instruction_diag_258", VCPU_STAT(diagnose_258) },
+> >>  	{ "instruction_diag_308", VCPU_STAT(diagnose_308) },
+> >>  	{ "instruction_diag_500", VCPU_STAT(diagnose_500) },
+> >>  
+> > 
+> >   
+> 
+
