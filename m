@@ -2,169 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B470D2988
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 14:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB0DBD2A15
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 14:55:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387583AbfJJMdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 08:33:22 -0400
-Received: from mail-eopbgr70134.outbound.protection.outlook.com ([40.107.7.134]:51810
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726923AbfJJMdW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 08:33:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ay26mq05w/y77uUjxGA2gU3omDIgyQ1/Hu4+2+kNMdGUaaKMOlVoiS5JB5cEfYkrYeUQnRln4d/mMEiUWH7kK8fPwOgUf+7HcBLg8yh0QQrd9HkDytEGs2xt+FyxqOMV11EzZ0IA3lXid7UBPLDJG5PiKRJ5AwWchFBCr44K2P23kmB86tNxYZmqJPqynZVvrE7EY05pljY+ESX8/VHWWzvUn9vCX2gTJhacWHG2jD9fEVuV+RqBRYUOA0nNzJzHWMqAXvs2xxKx1bAwj5y+Tj0sFe/tRYODen6pdxu1FMHqoLqToSvIz67AxrPIXTLXoaTWPkpi82/hlSDwlyaPxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lrk0oUG60Jr/2lcLKT0L9p6LapgtXHX/LG9XubPNpmw=;
- b=BWyEfnAmRKUXmxHGEXYexNlr7mon1PLp9niDzr8EPtB8J8ucKIjadZInkz6Kj2ChPOs9CU87TI/IbJTJkylLNyj+RHQYY3GyUTqBVGNJqHy4mHepHfV9ug/IrMnWmeX30+vqnm4w66pdyo5S6U5TVwbRnQGG5OSwTUFD7YjyLrG9kt8Jjo/lU4y3sypHoCMlIfxicwCrQvEHiduyCRimDw6dggHTcxnxgXXruC2C03nGTrm+sU/fC4IYj6SdTtcKA/apRoW9zJ73HTzhm3uKQX9tzBsHyQ7433lOszMas8kO6aASKyJ2BquySpeG4uK6xTrHx7XjJlGizpirUH063w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lrk0oUG60Jr/2lcLKT0L9p6LapgtXHX/LG9XubPNpmw=;
- b=lVZ70xQxwNpjxeyoaDa0o1tXnpn8fadRikV+n3XCHcgutql85k1I2ud/XDjMiT58drHl8YrxdCZ9oyrTZ9G9sv4TNkvkH1OX7gqGyZaO5+n1ZgdWFADmL0+h0DIF63GSzPkvK3CGq8V1RkeUVgJLtEBk0rGxW90BmhVqG6qExyY=
-Received: from AM0PR08MB5537.eurprd08.prod.outlook.com (20.179.36.87) by
- AM0PR08MB3953.eurprd08.prod.outlook.com (20.178.117.157) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Thu, 10 Oct 2019 12:33:06 +0000
-Received: from AM0PR08MB5537.eurprd08.prod.outlook.com
- ([fe80::a8ea:5223:db78:dd3]) by AM0PR08MB5537.eurprd08.prod.outlook.com
- ([fe80::a8ea:5223:db78:dd3%7]) with mapi id 15.20.2347.016; Thu, 10 Oct 2019
- 12:33:05 +0000
-From:   Roman Kagan <rkagan@virtuozzo.com>
-To:     Michael Kelley <mikelley@microsoft.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
+        id S2387901AbfJJMz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 08:55:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58972 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387450AbfJJMz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 08:55:26 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B023B368E2
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 12:55:25 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id m6so1746759wmf.2
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 05:55:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Nq/uA9hbiLadGUMtvDysqPg6doejpIGdIlN33a9wYx0=;
+        b=KKgoI8dcs1wZ2FF5RNG/Sc1TG2N0HFcnx47Y7DDtXhDfJObMaha6VkLd2OrUrcOeU1
+         35RDBTlnvihXjCWUMNSkysSyianjTA0frB56QNx+yUbthz2Q1S6uFSPa0nTJHoVWS2gR
+         1yDxjZQ4RQDGTwEes988Dcr3M+H7XwKHwEjVdi4YM523z9P5r2qkD+IFJ3qcEVZXiWzq
+         ZSxWwthwYJ+Gbx7fTkbkZBjHXjl2fo2vkuWVQbgP6Be/3Iw8YzO4dXeD8D1pdeelH/zg
+         ynLOWO+rh91b3tY9fH1nH7Z2wYLF/vvX/QUfvAmie/6pEWyxCqZom/TnqPbOTRx0kkBC
+         ElUQ==
+X-Gm-Message-State: APjAAAWeiAgQHVJtFRfEVpaeusErtBMX5qBY5+LbnKwqLHIF8cpfFdpU
+        7uITqKV06JI0QQBeDZmoDwbNTCtEe8nvlmpZa+IvuR/EPklUseOfm0CgMoVwxGmvL7L2DqAgYUX
+        5WfCeDV/NleHj
+X-Received: by 2002:a05:600c:2291:: with SMTP id 17mr7030797wmf.171.1570712124315;
+        Thu, 10 Oct 2019 05:55:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyHOfBhX3Ib0GwJrD9aqpSGkSJYDsUzMmEl6DpZun/qWkG6+vpHW5DvYVap0QI8aDPovc/J9Q==
+X-Received: by 2002:a05:600c:2291:: with SMTP id 17mr7030775wmf.171.1570712124033;
+        Thu, 10 Oct 2019 05:55:24 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
+        by smtp.gmail.com with ESMTPSA id u68sm8140030wmu.12.2019.10.10.05.55.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2019 05:55:23 -0700 (PDT)
+Date:   Thu, 10 Oct 2019 14:55:21 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     netdev@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+        linux-hyperv@vger.kernel.org,
         Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [PATCH v4] x86/hyperv: make vapic support x2apic mode
-Thread-Topic: [PATCH v4] x86/hyperv: make vapic support x2apic mode
-Thread-Index: AQHVf2bd3sDcAG/lCUuldIC8p8n4Qw==
-Date:   Thu, 10 Oct 2019 12:33:05 +0000
-Message-ID: <20191010123258.16919-1-rkagan@virtuozzo.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1P190CA0004.EURP190.PROD.OUTLOOK.COM (2603:10a6:3:bc::14)
- To AM0PR08MB5537.eurprd08.prod.outlook.com (2603:10a6:208:148::23)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.21.0
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9c6076ea-86bb-4fd6-ee67-08d74d7e0001
-x-ms-traffictypediagnostic: AM0PR08MB3953:
-x-microsoft-antispam-prvs: <AM0PR08MB3953803B65CFE212FAAB4BF5C9940@AM0PR08MB3953.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 018632C080
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(39850400004)(376002)(396003)(366004)(199004)(189003)(71200400001)(14444005)(478600001)(66556008)(81156014)(316002)(5660300002)(99286004)(71190400001)(52116002)(2906002)(110136005)(81166006)(8676002)(66066001)(66446008)(6436002)(26005)(6486002)(6506007)(1511001)(256004)(8936002)(386003)(64756008)(1076003)(6512007)(2501003)(66476007)(102836004)(186003)(50226002)(66946007)(25786009)(4326008)(2616005)(486006)(6116002)(2201001)(86362001)(3846002)(14454004)(7736002)(305945005)(36756003)(7416002)(476003)(921003)(1121003);DIR:OUT;SFP:1102;SCL:1;SRVR:AM0PR08MB3953;H:AM0PR08MB5537.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +QgMTUgx10hm4a7+gr7C7Nstc9JegdK7eKzYtERDa66Z9Yx1JUXMqS4NOLrNaYFrZCYae5D2bHcw/wpZGm3KYfVTAtCrnSNRKIpKU9MzAuljrK10ASvbkiZo7253615E/5nuzFygk7IguPeBT/worZ4Din2UeveW86/DT0F15Tr5hoJbbKxB1iGLTLX/trnRNNhzoiLYGYdudy8UJ66JdtAS/ItsOuOMwPLo9FBHxHZrxxpqnDS16WvXdWzK53PcxK15p5WY0FUjrF2w2Ldl45w24wmfZoH1iOcSgtsOA3AWXS5HmXRhBzFUJg20uZuMmqqIrfu5quES+c0+B1CNA1e17NjlLUoo8zQKhITFpFYynnDVzzlknztJ2frTyJAEDsHiQPom1wPUXYjrmAOUKqHi1O29yaqLHkXY6RjF0Xk=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jorgen Hansen <jhansen@vmware.com>
+Subject: Re: [RFC PATCH 10/13] vsock: add multi-transports support
+Message-ID: <20191010125521.mf7elqjpwhwjhwpo@steredhat>
+References: <20190927112703.17745-1-sgarzare@redhat.com>
+ <20190927112703.17745-11-sgarzare@redhat.com>
+ <20191009131123.GK5747@stefanha-x1.localdomain>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c6076ea-86bb-4fd6-ee67-08d74d7e0001
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2019 12:33:05.8738
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QUrkhrEgdL6NseTTYaDK8cvu5MWPf+5NuF/xnluFppJdyRNHZI+oUnywM4SW0KaHawQO++85kjuZUA09NNVMew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3953
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191009131123.GK5747@stefanha-x1.localdomain>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that there's Hyper-V IOMMU driver, Linux can switch to x2apic mode
-when supported by the vcpus.
+On Wed, Oct 09, 2019 at 02:11:23PM +0100, Stefan Hajnoczi wrote:
+> On Fri, Sep 27, 2019 at 01:27:00PM +0200, Stefano Garzarella wrote:
+> > RFC:
+> > - I'd like to move MODULE_ALIAS_NETPROTO(PF_VSOCK) to af_vsock.c.
+> >   @Jorgen could this break the VMware products?
+> 
+> What will cause the vmw_vsock_vmci_transport.ko module to be loaded
+> after you remove MODULE_ALIAS_NETPROTO(PF_VSOCK)?  Perhaps
+> drivers/misc/vmw_vmci/vmci_guest.c:vmci_guest_probe_device() could do
+> something when the guest driver loads.
 
-However, the apic access functions for Hyper-V enlightened apic assume
-xapic mode only.
+Good idea, maybe we can call some function provided by vmci_transport
+to register it as a guest (I'll remove the type from the transport
+and I add it as a parameter of vsock_core_register())
 
-As a result, Linux fails to bring up secondary cpus when run as a guest
-in QEMU/KVM with both hv_apic and x2apic enabled.
+>                                         There would need to be something
+> equivalent for the host side too.
 
-According to Michael Kelley, when in x2apic mode, the Hyper-V synthetic
-apic MSRs behave exactly the same as the corresponding architectural
-x2apic MSRs, so there's no need to override the apic accessors.  The
-only exception is hv_apic_eoi_write, which benefits from lazy EOI when
-available; however, its implementation works for both xapic and x2apic
-modes.
+Maybe in the vmci_host_do_init_context().
 
-Fixes: 29217a474683 ("iommu/hyper-v: Add Hyper-V stub IOMMU driver")
-Fixes: 6b48cb5f8347 ("X86/Hyper-V: Enlighten APIC access")
-Cc: stable@vger.kernel.org
-Suggested-by: Michael Kelley <mikelley@microsoft.com>
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reviewed-by: Michael Kelley <mikelley@microsoft.com>
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
----
-v3 -> v4:
-- adjust the log message [Vitaly, Michael]
+> 
+> This will solve another issue too.  Today the VMCI transport can be
+> loaded if an application creates an AF_VSOCK socket during early boot
+> before the virtio transport has been probed.  This happens because the
+> VMCI transport uses MODULE_ALIAS_NETPROTO(PF_VSOCK) *and* it does not
+> probe whether this system is actually a VMware guest.
+> 
+> If we instead load the core af_vsock.ko module and transports are only
+> loaded based on hardware feature probing (e.g. the presence of VMware
+> guest mode, a virtio PCI adapter, etc) then transports will be
+> well-behaved.
 
-v2 -> v3:
-- do not introduce x2apic-capable hv_apic accessors; leave original
-  x2apic accessors instead
+Yes, I completely agree with you. I'll try to follow your suggestion,
 
-v1 -> v2:
-- add ifdefs to handle !CONFIG_X86_X2APIC
+> 
+> > - DGRAM sockets are handled as before, I don't know if make sense work
+> >   on it now, or when another transport will support DGRAM. The big
+> >   issues here is that we cannot link 1-1 a socket to transport as
+> >   for stream sockets since DGRAM is not connection-oriented.
+> 
+> Let's ignore DGRAM for now since only VMCI supports it and we therefore
+> do not require multi-transpor) support.
 
- arch/x86/hyperv/hv_apic.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+Okay :)
 
-diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
-index 5c056b8aebef..e01078e93dd3 100644
---- a/arch/x86/hyperv/hv_apic.c
-+++ b/arch/x86/hyperv/hv_apic.c
-@@ -260,11 +260,21 @@ void __init hv_apic_init(void)
- 	}
-=20
- 	if (ms_hyperv.hints & HV_X64_APIC_ACCESS_RECOMMENDED) {
--		pr_info("Hyper-V: Using MSR based APIC access\n");
-+		pr_info("Hyper-V: Using enlightened APIC (%s mode)",
-+			x2apic_enabled() ? "x2apic" : "xapic");
-+		/*
-+		 * With x2apic, architectural x2apic MSRs are equivalent to the
-+		 * respective synthetic MSRs, so there's no need to override
-+		 * the apic accessors.  The only exception is
-+		 * hv_apic_eoi_write, because it benefits from lazy EOI when
-+		 * available, but it works for both xapic and x2apic modes.
-+		 */
- 		apic_set_eoi_write(hv_apic_eoi_write);
--		apic->read      =3D hv_apic_read;
--		apic->write     =3D hv_apic_write;
--		apic->icr_write =3D hv_apic_icr_write;
--		apic->icr_read  =3D hv_apic_icr_read;
-+		if (!x2apic_enabled()) {
-+			apic->read      =3D hv_apic_read;
-+			apic->write     =3D hv_apic_write;
-+			apic->icr_write =3D hv_apic_icr_write;
-+			apic->icr_read  =3D hv_apic_icr_read;
-+		}
- 	}
- }
---=20
-2.21.0
+> 
+> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > index 86f8f463e01a..2a081d19e20d 100644
+> > --- a/include/net/af_vsock.h
+> > +++ b/include/net/af_vsock.h
+> > @@ -94,7 +94,13 @@ struct vsock_transport_send_notify_data {
+> >  	u64 data2; /* Transport-defined. */
+> >  };
+> >  
+> > +#define VSOCK_TRANSPORT_F_H2G		0x00000001
+> > +#define VSOCK_TRANSPORT_F_G2H		0x00000002
+> > +#define VSOCK_TRANSPORT_F_DGRAM		0x00000004
+> 
+> Documentation comments, please.
 
+I'll fix!
+
+> 
+> > +void vsock_core_unregister(const struct vsock_transport *t)
+> > +{
+> > +	mutex_lock(&vsock_register_mutex);
+> > +
+> > +	/* RFC-TODO: maybe we should check if there are open sockets
+> > +	 * assigned to that transport and avoid the unregistration
+> > +	 */
+> 
+> If unregister() is only called from module_exit() functions then holding
+> a reference to the transport module would be enough to prevent this
+> case.  The transport could only be removed once all sockets have been
+> destroyed (and dropped their transport module reference).
+
+Yes. I did this in
+"[RFC PATCH 12/13] vsock: prevent transport modules unloading".
+
+Maybe I can merge it in this patch...
+
+Thanks,
+Stefano
