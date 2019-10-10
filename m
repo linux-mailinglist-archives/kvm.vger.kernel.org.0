@@ -2,80 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F843D2765
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 12:43:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB1E9D277C
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 12:50:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727545AbfJJKnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 06:43:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57824 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726304AbfJJKnP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 06:43:15 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CCA7B9AE9C
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 10:43:14 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id z205so2425120wmb.7
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 03:43:14 -0700 (PDT)
+        id S1726869AbfJJKuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 06:50:24 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38081 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbfJJKuY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 06:50:24 -0400
+Received: by mail-wr1-f68.google.com with SMTP id w12so7281560wro.5;
+        Thu, 10 Oct 2019 03:50:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=nq8aTTwxoQayVKhvN2A/zAYVKjb3yhvqqfb15ovxI+M=;
+        b=Yb24pgwv0com25khkQ7ORavf/pBJRJm3rpESqTdZkOZtcXq+ARHRuW+CRxkr1sJsWR
+         KE6YW+UzKirDnW0aIcPiVPt1kM3xQuxe9FLmpwRkOEIbvRIz2WFALGdAK/UIgoIDiu9t
+         em7GV6TWc4GphRF9D12b5S/BEhygUD3xcY8qR31ht7A8mAwHAFFLzt9FhCUurF/l8zBG
+         okEmUb+TZiaXsP/7OByG0ZtGpNCeCko+fxF9IWuCKAhKnI3+DbNLrpfLW39WFJWuwWYL
+         hQRdMB5eKvDS6YzE/fUs/VxQhyHDom4p0tQ3Z1+g36Mds6PGcJjK4tlb1vTjuKPnqUgF
+         Hulw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=E85BCGQmqVsmCuJEJ/4DUXdYmnYWuqddkfV+jB9bC0I=;
-        b=EKE0osT1Z3r2T5rlQSTaoT6seN/XCeKfNhV+cKZd7TOpNGhw7SIb2oHZCROJ+n7blO
-         PRWzSP2LKGMEbCyNxs4O7qgSRgLnP4+B8+NhasaNZrT+S/FuZ8fN3CQI0tlnPDbVw6IR
-         X1KSQ5AtaF27e3tnYI9blPhAuE2I62YnBa4Zk1J9wElUXNn20qerjhXkoWH6DQAZ8TOT
-         SQJNYnBz6Qa2Vlf10JYQtEB9+po56sxbdJnXmtowni1Ihe5tIp4yaNGeEp0qhk2EQaN4
-         Cn9XqZJ9fnhEg9e1cXRASF52JLyRodVZKYdqZOZwyU1IwZHnMzeFj/eZmSunuB1JTF85
-         L9Dw==
-X-Gm-Message-State: APjAAAUfNsIT5q70XKmLbkzhveKIq4fuoR0L+RNviR1Qzx0FqAb8LN2n
-        CsuOP8XIFCZ/lMabAuRiFs+6v7fn//Re/y+SjbIb5mm3mbFkxvEiy+oZRYgLL8l879bEnYdrFj1
-        Y79dTppQz6KSJ
-X-Received: by 2002:adf:9e02:: with SMTP id u2mr8269572wre.329.1570704193457;
-        Thu, 10 Oct 2019 03:43:13 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxj+cNEr44B5+Ya5hop2TN6bpLeUDycV9++bm0c33NmD+aE03zGdR7jC6/ouvh33i25Mt2QWQ==
-X-Received: by 2002:adf:9e02:: with SMTP id u2mr8269546wre.329.1570704193084;
-        Thu, 10 Oct 2019 03:43:13 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a204sm7425238wmh.21.2019.10.10.03.43.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2019 03:43:12 -0700 (PDT)
-Subject: Re: [RFC v2 0/2] kvm: Use host timekeeping in guest.
-To:     Suleiman Souhlal <suleiman@google.com>, rkrcmar@redhat.com,
-        tglx@linutronix.de
-Cc:     john.stultz@linaro.org, sboyd@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        ssouhlal@freebsd.org, tfiga@chromium.org, vkuznets@redhat.com
-References: <20191010073055.183635-1-suleiman@google.com>
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=nq8aTTwxoQayVKhvN2A/zAYVKjb3yhvqqfb15ovxI+M=;
+        b=RsrfSRZ09sRN74NA9XKO6PsxyYMTv0f+w+G+Xq9e4KorbqXNP21J6EnId2BTaFaUYr
+         6HH6w1vGUNz/9MSNA3kVOgWPirlDDlzTcfUUKP5Q9Ojrf7NKrBCFpHhhVxe8c2c09vGj
+         kcIm9se0j99/LtG3y4hptFt+NLP7GyNXSeFflZxKSaPgQw/G2BHTwO6tT0Qvi8FPhW3n
+         rc3LlFJsXDVK3RE0v/+EdO0VdYssXhG8kRN8B5QYcgHPkVtUx7Ry8WOjuVXR9F7DjOC6
+         He8kYGsqiCrWd/h7Kbo+Z+SbELKpRY1tUXqpBSXp1b6qGkptuRHBVKDMTNE0nfYB+kMD
+         TxwA==
+X-Gm-Message-State: APjAAAXiw38Qy4tL+3PpZaHrI+fppozq3Iwjrzaye+QmU4AdtmBdjh4B
+        5y9tgwxukLbCExzuzMrlYuL3cF3F
+X-Google-Smtp-Source: APXvYqxNdZDbsK/iylAAYtWtc/CfhmfYlIQCb8cl6+RLKC/VLgmHbsWHZm5/d3QSMOjUDMV90ZJnyw==
+X-Received: by 2002:adf:e3cb:: with SMTP id k11mr8573250wrm.80.1570704620325;
+        Thu, 10 Oct 2019 03:50:20 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id r13sm8259118wrn.0.2019.10.10.03.50.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 10 Oct 2019 03:50:18 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3120662b-9ea6-d86c-dc04-5f06a6e60afc@redhat.com>
-Date:   Thu, 10 Oct 2019 12:43:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191010073055.183635-1-suleiman@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     vkuznets@redhat.com, suleiman@google.com
+Subject: [PATCH] kvm: clear kvmclock MSR on reset
+Date:   Thu, 10 Oct 2019 12:50:17 +0200
+Message-Id: <1570704617-32285-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/19 09:30, Suleiman Souhlal wrote:
-> 
-> Changes in v2:
-> - Move out of kvmclock and into its own clocksource and file.
-> - Remove timekeeping.c #ifdefs.
-> - Fix i386 build.
+After resetting the vCPU, the kvmclock MSR keeps the previous value but it is
+not enabled.  This can be confusing, so fix it.
 
-This is now pretty clean, so my objections are more or less gone.  I
-haven't put much thought into this, but are all fields of struct
-timekeeping necessary?  Some of them are redundant with the existing
-wallclock MSRs.  The handling of versioning probably varies depending on
-the exact set of fields, too.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/x86.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Paolo
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f26f8be4e621..a55252c69118 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2533,6 +2533,7 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+ static void kvmclock_reset(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.pv_time_enabled = false;
++	vcpu->arch.time = 0;
+ }
+ 
+ static void kvm_vcpu_flush_tlb(struct kvm_vcpu *vcpu, bool invalidate_gpa)
+@@ -2698,8 +2699,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_KVM_SYSTEM_TIME: {
+ 		struct kvm_arch *ka = &vcpu->kvm->arch;
+ 
+-		kvmclock_reset(vcpu);
+-
+ 		if (vcpu->vcpu_id == 0 && !msr_info->host_initiated) {
+ 			bool tmp = (msr == MSR_KVM_SYSTEM_TIME);
+ 
+@@ -2713,14 +2712,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
+ 
+ 		/* we verify if the enable bit is set... */
++		vcpu->arch.pv_time_enabled = false;
+ 		if (!(data & 1))
+ 			break;
+ 
+ 		if (kvm_gfn_to_hva_cache_init(vcpu->kvm,
+ 		     &vcpu->arch.pv_time, data & ~1ULL,
+ 		     sizeof(struct pvclock_vcpu_time_info)))
+-			vcpu->arch.pv_time_enabled = false;
+-		else
+ 			vcpu->arch.pv_time_enabled = true;
+ 
+ 		break;
+-- 
+1.8.3.1
+
