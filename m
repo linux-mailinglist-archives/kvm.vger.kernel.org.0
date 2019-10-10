@@ -2,95 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B790D2A4F
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 15:04:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48084D2A65
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 15:09:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387853AbfJJNEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 09:04:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55429 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387710AbfJJNEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 09:04:43 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2289811A30
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 13:04:43 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id w10so2736172wrl.5
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 06:04:43 -0700 (PDT)
+        id S2387624AbfJJNJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 09:09:37 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39178 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387430AbfJJNJh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 09:09:37 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r3so7839994wrj.6
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 06:09:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ub-ac-id.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=GO77O9NugfDMF3sM0pFxjAVwqVXEKORDEOteZl6SPpM=;
+        b=iJ+QKl0m3JEIdWTVcDoJ7wb/twesRJycWvgrJaOvxGsPbPgJJnruxRUY9vcaveTrjH
+         a1ZEKmcpPFv89x4SF6ytgLMFV9phO0VVm5ZcKaw1Dr7yMT4ykTvOJi38t0ORl4gJXbgm
+         NwdZymfpIT62j66r+5ahei721cyxIK4ot3luD2pdjWfF7Nx7sUEBCoHxT8EARHRCprz6
+         rKNgq1Bp0j3KjdTJi6xU559dr3clxbyF2iyn70qhnodZqM8CANsx1sh5R21V8EvnSKHA
+         ejjidIRJ9WVY6gmhBaDE8VF4UwPl+iUO4F4grr8bMl6DXu26bVTTr6GpJRqwaE/O9nBq
+         0huA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=2MtH4zvS+teTx0r1qM2asg1XxOF0qUFTTboopmawOE4=;
-        b=W0iqLv5jpkAdzXL76jbpS2EU24FPwY3vG2imw2bE3F0xvjzCvny1Wuc8ZD6t+dDw/t
-         pYnE2jjtEyTUcM4P8b7FgZR+R8n/I/lDaEhkVOhpSJMDV9AC25b/yAwgz4Wj92IGItpL
-         3yTifN5xDZVg8W3ELLVGVqtu0dd18/9WAL9+aWq+30HGCguoNdSHkl4j5tyW2cSqVGOc
-         VxQSU1DXuz6Zy/ZygFMjrR4eBxXxrEOwLSjiizk0tB1NbNUripLdkxcX6ZdoONfV0QVr
-         hL14tXHfJ72B51pMZkOtapDRdslFPNoqnxTzZ9iBzFx6snTTG9/WZbeo1RiScA7v+45E
-         65nA==
-X-Gm-Message-State: APjAAAWdTqPx+3NmUvAnu/4ifwCZW83vzpIN3USqc0wd2IuiEw99Bc85
-        Zg0XrUEf4git0i1iNWM9wRDL+TvHG6Rk7lDya47yWR8JQ/U+9afOw9O6/8gi6AknGCSdMwDEjGP
-        480/AJBMiTWeQ
-X-Received: by 2002:a05:600c:2549:: with SMTP id e9mr7070286wma.74.1570712681805;
-        Thu, 10 Oct 2019 06:04:41 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyKWS9Yagf4LaasayMPOMgQigEaVeXAInUpVNhLSOAsaDv27fYHGGISL/SEaullOo401iX5OQ==
-X-Received: by 2002:a05:600c:2549:: with SMTP id e9mr7070261wma.74.1570712681580;
-        Thu, 10 Oct 2019 06:04:41 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
-        by smtp.gmail.com with ESMTPSA id r7sm4504378wrt.28.2019.10.10.06.04.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2019 06:04:40 -0700 (PDT)
-Date:   Thu, 10 Oct 2019 15:04:38 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     netdev@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
-        linux-hyperv@vger.kernel.org,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jorgen Hansen <jhansen@vmware.com>
-Subject: Re: [RFC PATCH 11/13] vsock: add 'transport_hg' to handle g2h\h2g
- transports
-Message-ID: <20191010130438.3hbv33fgslmlprtf@steredhat>
-References: <20190927112703.17745-1-sgarzare@redhat.com>
- <20190927112703.17745-12-sgarzare@redhat.com>
- <20191009131643.GL5747@stefanha-x1.localdomain>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=GO77O9NugfDMF3sM0pFxjAVwqVXEKORDEOteZl6SPpM=;
+        b=rzuAptTIezwJIhNEBZWfGi32iyUbT5giG3rWw8gQ/p6rldbh5teMVbT7r+oQ65pZL9
+         aMO7nN2mtCfXPmoux1dzkaIfs82M1t/CPdQQ2+gRaZbDvt1kOnp58mqSZL/ZH3joEy1f
+         PJVIr/uXnOB4aH5HxJ17Mzxi4f+PrbM6oBllsM320J1fLYncOml5NWoNtXJ/vmvEnzam
+         RNOq3ARBqkQkoy8yOK7Scrk4Ri/znjyMiXMsxPC/iCyuTo8TXjkRMVTB4hDFfdFU6Nh8
+         q9ruBZ3liYhuuD0M6JdIng6pmPWcqnOppHyfz6H2e2J/MdDtScROiiULDYG4e/K3Yp8s
+         GYUw==
+X-Gm-Message-State: APjAAAUGJlQfxVQR09LLDgykppjkgkz9BlkB5se7dslj3NLvdu/Gro3U
+        zhfXKUayU8KK0uCpnDpaSYiozyvKaFglyxCm7LDeUA==
+X-Google-Smtp-Source: APXvYqwCLi3tV3Ge9iLpvWfqa0rWI3DGIhcXnLY66lYX1k07kR1Ywt1ehc35EY/gwW8BGC7FA96egmVLk7ZF3Xg5KjI=
+X-Received: by 2002:a5d:5270:: with SMTP id l16mr4018576wrc.201.1570712974067;
+ Thu, 10 Oct 2019 06:09:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191009131643.GL5747@stefanha-x1.localdomain>
-User-Agent: NeoMutt/20180716
+Received: by 2002:adf:efc4:0:0:0:0:0 with HTTP; Thu, 10 Oct 2019 06:09:33
+ -0700 (PDT)
+Reply-To: sunrisefundingltd50@gmail.com
+From:   "Coryna Rizky Amelia, SST" <coryna_fk@ub.ac.id>
+Date:   Thu, 10 Oct 2019 14:09:33 +0100
+Message-ID: <CADotR_oWL61nWCVVw3CDA4a-OXY2NmYCtTwe+QXJUSkPRR4NfQ@mail.gmail.com>
+Subject: Apply For Financial investment at a lower rate 2%
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 09, 2019 at 02:16:43PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Sep 27, 2019 at 01:27:01PM +0200, Stefano Garzarella wrote:
-> > VMCI transport provides both g2h and h2g behaviors in a single
-> > transport.
-> > We are able to set (or not) the g2h behavior, detecting if we
-> > are in a VMware guest (or not), but the h2g feature is always set.
-> > This prevents to load other h2g transports while we are in a
-> > VMware guest.
-> 
-> In the vhost_vsock.ko case we only register the h2g transport when
-> userspace has loaded the module (by opening /dev/vhost-vsock).
-> 
-> VMCI has something kind of similar: /dev/vmci and the
-> vmci_host_active_users counter.  Maybe we can use this instead of
-> introducing the transport_hg concept?
+-- 
+Hello,
 
-Yes, maybe we can register the host in the vmci_host_do_init_context().
+We are private lenders based in UK.
+Do you need a loan (credit) as soon as possible. Are you in search of
+money to solve your personal needs or finance your business venture,
+then get Your desired loan today! Consult us at Sunrise Funding Ltd.
 
-I also don't like a lot the transport_hg concept, so I'll try to found
-an alternative.
+* We offer personal loan & huge capital loan at 2% interest rate to
+the general public both locally and internationally.
+* Credit amount range from $5,000.00 -- $500,000.00 and above.
+* Special $10,000,000.00 Loan offer for huge project also available.
+* Loan period of 6 months -- 10 years.
+* Loan is granted 24 hours after approval and accredited, directly in
+hand or bank account.
 
-Thanks,
-Stefano
+Please note that you are advised to contact us for more details via
+the following e-mail address below;
+
+EMAIL : sunrisefundingltd50@gmail.com
+FIRM : Sunrise Funding Ltd UK.
