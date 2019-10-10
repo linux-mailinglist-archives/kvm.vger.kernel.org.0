@@ -2,174 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 186DDD1FF6
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 07:20:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B433D20D2
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 08:35:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732252AbfJJFRF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 01:17:05 -0400
-Received: from mga07.intel.com ([134.134.136.100]:13392 "EHLO mga07.intel.com"
+        id S1732759AbfJJGfP convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 10 Oct 2019 02:35:15 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:48394 "EHLO mxhk.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726065AbfJJFRF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 01:17:05 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 22:17:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,279,1566889200"; 
-   d="scan'208";a="193089188"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
-  by fmsmga008.fm.intel.com with ESMTP; 09 Oct 2019 22:17:02 -0700
-From:   Tao Xu <tao3.xu@intel.com>
-To:     pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
-        mtosatti@redhat.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, tao3.xu@intel.com,
-        jingqi.liu@intel.com
-Subject: [PATCH v6 2/2] target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
-Date:   Thu, 10 Oct 2019 13:16:57 +0800
-Message-Id: <20191010051657.28163-3-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191010051657.28163-1-tao3.xu@intel.com>
-References: <20191010051657.28163-1-tao3.xu@intel.com>
+        id S1727041AbfJJGfP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 02:35:15 -0400
+Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
+        by Forcepoint Email with ESMTPS id D24F9A31057175D3B519;
+        Thu, 10 Oct 2019 14:35:12 +0800 (CST)
+Received: from notes_smtp.zte.com.cn (notes_smtp.zte.com.cn [10.30.1.239])
+        by mse-fl2.zte.com.cn with ESMTP id x9A6Z01J026849;
+        Thu, 10 Oct 2019 14:35:00 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-host8.localdomain ([10.74.120.8])
+          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
+          with ESMTP id 2019101014352792-4203136 ;
+          Thu, 10 Oct 2019 14:35:27 +0800 
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     pbonzini@redhat.com
+Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        wang.yi59@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
+Subject: [PATCH] x86/kvm: Fix -Wmissing-prototypes warnings
+Date:   Thu, 10 Oct 2019 14:37:25 +0800
+Message-Id: <1570689445-43358-1-git-send-email-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
+ 21, 2013) at 2019-10-10 14:35:28,
+        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
+ 2019-10-10 14:35:04
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-MAIL: mse-fl2.zte.com.cn x9A6Z01J026849
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UMWAIT and TPAUSE instructions use 32bits IA32_UMWAIT_CONTROL at MSR
-index E1H to determines the maximum time in TSC-quanta that the processor
-can reside in either C0.1 or C0.2.
+We get two warning when build kernel with W=1:
+arch/x86/kernel/kvm.c:872:6: warning: no previous prototype for ‘arch_haltpoll_enable’ [-Wmissing-prototypes]
+arch/x86/kernel/kvm.c:885:6: warning: no previous prototype for ‘arch_haltpoll_disable’ [-Wmissing-prototypes]
 
-This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
-guest.
+Including the missing head file can fix this.
 
-Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 ---
+ arch/x86/kernel/kvm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-No changes in v5 and v6.
-
-Changes in v4:
-        Set IA32_UMWAIT_CONTROL 32bits
----
- target/i386/cpu.h     |  2 ++
- target/i386/kvm.c     | 13 +++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 3 files changed, 35 insertions(+)
-
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 4e3206c8a2..134d14d14d 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -451,6 +451,7 @@ typedef enum X86Seg {
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index e820568..32ef1ee 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -33,6 +33,7 @@
+ #include <asm/apicdef.h>
+ #include <asm/hypervisor.h>
+ #include <asm/tlb.h>
++#include <asm/cpuidle_haltpoll.h>
  
- #define MSR_IA32_BNDCFGS                0x00000d90
- #define MSR_IA32_XSS                    0x00000da0
-+#define MSR_IA32_UMWAIT_CONTROL         0xe1
+ static int kvmapf = 1;
  
- #define MSR_IA32_VMX_BASIC              0x00000480
- #define MSR_IA32_VMX_PINBASED_CTLS      0x00000481
-@@ -1534,6 +1535,7 @@ typedef struct CPUX86State {
-     uint16_t fpregs_format_vmstate;
- 
-     uint64_t xss;
-+    uint32_t umwait;
- 
-     TPRAccess tpr_access_type;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index d2a85b1572..9d21e22529 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -95,6 +95,7 @@ static bool has_msr_hv_stimer;
- static bool has_msr_hv_frequencies;
- static bool has_msr_hv_reenlightenment;
- static bool has_msr_xss;
-+static bool has_msr_umwait;
- static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
-@@ -1944,6 +1945,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_XSS:
-                 has_msr_xss = true;
-                 break;
-+            case MSR_IA32_UMWAIT_CONTROL:
-+                has_msr_umwait = true;
-+                break;
-             case HV_X64_MSR_CRASH_CTL:
-                 has_msr_hv_crash = true;
-                 break;
-@@ -2623,6 +2627,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, env->xss);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, env->umwait);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
-     }
-@@ -3036,6 +3043,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, 0);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, 0);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
-     }
-@@ -3288,6 +3298,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_XSS:
-             env->xss = msrs[i].data;
-             break;
-+        case MSR_IA32_UMWAIT_CONTROL:
-+            env->umwait = msrs[i].data;
-+            break;
-         default:
-             if (msrs[i].index >= MSR_MC0_CTL &&
-                 msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 2767b3096d..6481f846f6 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -943,6 +943,25 @@ static const VMStateDescription vmstate_xss = {
-     }
- };
- 
-+static bool umwait_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->umwait != 0;
-+}
-+
-+static const VMStateDescription vmstate_umwait = {
-+    .name = "cpu/umwait",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = umwait_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.umwait, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- #ifdef TARGET_X86_64
- static bool pkru_needed(void *opaque)
- {
-@@ -1391,6 +1410,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_msr_hyperv_reenlightenment,
-         &vmstate_avx512,
-         &vmstate_xss,
-+        &vmstate_umwait,
-         &vmstate_tsc_khz,
-         &vmstate_msr_smi_count,
- #ifdef TARGET_X86_64
 -- 
-2.20.1
+1.8.3.1
 
