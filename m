@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB0DBD2A15
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 14:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B790D2A4F
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 15:04:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387901AbfJJMz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 08:55:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58972 "EHLO mx1.redhat.com"
+        id S2387853AbfJJNEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 09:04:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55429 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387450AbfJJMz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 08:55:26 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        id S2387710AbfJJNEn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 09:04:43 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B023B368E2
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 12:55:25 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id m6so1746759wmf.2
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 05:55:25 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2289811A30
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 13:04:43 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id w10so2736172wrl.5
+        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 06:04:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Nq/uA9hbiLadGUMtvDysqPg6doejpIGdIlN33a9wYx0=;
-        b=KKgoI8dcs1wZ2FF5RNG/Sc1TG2N0HFcnx47Y7DDtXhDfJObMaha6VkLd2OrUrcOeU1
-         35RDBTlnvihXjCWUMNSkysSyianjTA0frB56QNx+yUbthz2Q1S6uFSPa0nTJHoVWS2gR
-         1yDxjZQ4RQDGTwEes988Dcr3M+H7XwKHwEjVdi4YM523z9P5r2qkD+IFJ3qcEVZXiWzq
-         ZSxWwthwYJ+Gbx7fTkbkZBjHXjl2fo2vkuWVQbgP6Be/3Iw8YzO4dXeD8D1pdeelH/zg
-         ynLOWO+rh91b3tY9fH1nH7Z2wYLF/vvX/QUfvAmie/6pEWyxCqZom/TnqPbOTRx0kkBC
-         ElUQ==
-X-Gm-Message-State: APjAAAWeiAgQHVJtFRfEVpaeusErtBMX5qBY5+LbnKwqLHIF8cpfFdpU
-        7uITqKV06JI0QQBeDZmoDwbNTCtEe8nvlmpZa+IvuR/EPklUseOfm0CgMoVwxGmvL7L2DqAgYUX
-        5WfCeDV/NleHj
-X-Received: by 2002:a05:600c:2291:: with SMTP id 17mr7030797wmf.171.1570712124315;
-        Thu, 10 Oct 2019 05:55:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyHOfBhX3Ib0GwJrD9aqpSGkSJYDsUzMmEl6DpZun/qWkG6+vpHW5DvYVap0QI8aDPovc/J9Q==
-X-Received: by 2002:a05:600c:2291:: with SMTP id 17mr7030775wmf.171.1570712124033;
-        Thu, 10 Oct 2019 05:55:24 -0700 (PDT)
+        bh=2MtH4zvS+teTx0r1qM2asg1XxOF0qUFTTboopmawOE4=;
+        b=W0iqLv5jpkAdzXL76jbpS2EU24FPwY3vG2imw2bE3F0xvjzCvny1Wuc8ZD6t+dDw/t
+         pYnE2jjtEyTUcM4P8b7FgZR+R8n/I/lDaEhkVOhpSJMDV9AC25b/yAwgz4Wj92IGItpL
+         3yTifN5xDZVg8W3ELLVGVqtu0dd18/9WAL9+aWq+30HGCguoNdSHkl4j5tyW2cSqVGOc
+         VxQSU1DXuz6Zy/ZygFMjrR4eBxXxrEOwLSjiizk0tB1NbNUripLdkxcX6ZdoONfV0QVr
+         hL14tXHfJ72B51pMZkOtapDRdslFPNoqnxTzZ9iBzFx6snTTG9/WZbeo1RiScA7v+45E
+         65nA==
+X-Gm-Message-State: APjAAAWdTqPx+3NmUvAnu/4ifwCZW83vzpIN3USqc0wd2IuiEw99Bc85
+        Zg0XrUEf4git0i1iNWM9wRDL+TvHG6Rk7lDya47yWR8JQ/U+9afOw9O6/8gi6AknGCSdMwDEjGP
+        480/AJBMiTWeQ
+X-Received: by 2002:a05:600c:2549:: with SMTP id e9mr7070286wma.74.1570712681805;
+        Thu, 10 Oct 2019 06:04:41 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyKWS9Yagf4LaasayMPOMgQigEaVeXAInUpVNhLSOAsaDv27fYHGGISL/SEaullOo401iX5OQ==
+X-Received: by 2002:a05:600c:2549:: with SMTP id e9mr7070261wma.74.1570712681580;
+        Thu, 10 Oct 2019 06:04:41 -0700 (PDT)
 Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
-        by smtp.gmail.com with ESMTPSA id u68sm8140030wmu.12.2019.10.10.05.55.22
+        by smtp.gmail.com with ESMTPSA id r7sm4504378wrt.28.2019.10.10.06.04.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2019 05:55:23 -0700 (PDT)
-Date:   Thu, 10 Oct 2019 14:55:21 +0200
+        Thu, 10 Oct 2019 06:04:40 -0700 (PDT)
+Date:   Thu, 10 Oct 2019 15:04:38 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Stefan Hajnoczi <stefanha@gmail.com>
 Cc:     netdev@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
@@ -55,101 +55,42 @@ Cc:     netdev@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jorgen Hansen <jhansen@vmware.com>
-Subject: Re: [RFC PATCH 10/13] vsock: add multi-transports support
-Message-ID: <20191010125521.mf7elqjpwhwjhwpo@steredhat>
+Subject: Re: [RFC PATCH 11/13] vsock: add 'transport_hg' to handle g2h\h2g
+ transports
+Message-ID: <20191010130438.3hbv33fgslmlprtf@steredhat>
 References: <20190927112703.17745-1-sgarzare@redhat.com>
- <20190927112703.17745-11-sgarzare@redhat.com>
- <20191009131123.GK5747@stefanha-x1.localdomain>
+ <20190927112703.17745-12-sgarzare@redhat.com>
+ <20191009131643.GL5747@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191009131123.GK5747@stefanha-x1.localdomain>
+In-Reply-To: <20191009131643.GL5747@stefanha-x1.localdomain>
 User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 09, 2019 at 02:11:23PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Sep 27, 2019 at 01:27:00PM +0200, Stefano Garzarella wrote:
-> > RFC:
-> > - I'd like to move MODULE_ALIAS_NETPROTO(PF_VSOCK) to af_vsock.c.
-> >   @Jorgen could this break the VMware products?
+On Wed, Oct 09, 2019 at 02:16:43PM +0100, Stefan Hajnoczi wrote:
+> On Fri, Sep 27, 2019 at 01:27:01PM +0200, Stefano Garzarella wrote:
+> > VMCI transport provides both g2h and h2g behaviors in a single
+> > transport.
+> > We are able to set (or not) the g2h behavior, detecting if we
+> > are in a VMware guest (or not), but the h2g feature is always set.
+> > This prevents to load other h2g transports while we are in a
+> > VMware guest.
 > 
-> What will cause the vmw_vsock_vmci_transport.ko module to be loaded
-> after you remove MODULE_ALIAS_NETPROTO(PF_VSOCK)?  Perhaps
-> drivers/misc/vmw_vmci/vmci_guest.c:vmci_guest_probe_device() could do
-> something when the guest driver loads.
-
-Good idea, maybe we can call some function provided by vmci_transport
-to register it as a guest (I'll remove the type from the transport
-and I add it as a parameter of vsock_core_register())
-
->                                         There would need to be something
-> equivalent for the host side too.
-
-Maybe in the vmci_host_do_init_context().
-
+> In the vhost_vsock.ko case we only register the h2g transport when
+> userspace has loaded the module (by opening /dev/vhost-vsock).
 > 
-> This will solve another issue too.  Today the VMCI transport can be
-> loaded if an application creates an AF_VSOCK socket during early boot
-> before the virtio transport has been probed.  This happens because the
-> VMCI transport uses MODULE_ALIAS_NETPROTO(PF_VSOCK) *and* it does not
-> probe whether this system is actually a VMware guest.
-> 
-> If we instead load the core af_vsock.ko module and transports are only
-> loaded based on hardware feature probing (e.g. the presence of VMware
-> guest mode, a virtio PCI adapter, etc) then transports will be
-> well-behaved.
+> VMCI has something kind of similar: /dev/vmci and the
+> vmci_host_active_users counter.  Maybe we can use this instead of
+> introducing the transport_hg concept?
 
-Yes, I completely agree with you. I'll try to follow your suggestion,
+Yes, maybe we can register the host in the vmci_host_do_init_context().
 
-> 
-> > - DGRAM sockets are handled as before, I don't know if make sense work
-> >   on it now, or when another transport will support DGRAM. The big
-> >   issues here is that we cannot link 1-1 a socket to transport as
-> >   for stream sockets since DGRAM is not connection-oriented.
-> 
-> Let's ignore DGRAM for now since only VMCI supports it and we therefore
-> do not require multi-transpor) support.
-
-Okay :)
-
-> 
-> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> > index 86f8f463e01a..2a081d19e20d 100644
-> > --- a/include/net/af_vsock.h
-> > +++ b/include/net/af_vsock.h
-> > @@ -94,7 +94,13 @@ struct vsock_transport_send_notify_data {
-> >  	u64 data2; /* Transport-defined. */
-> >  };
-> >  
-> > +#define VSOCK_TRANSPORT_F_H2G		0x00000001
-> > +#define VSOCK_TRANSPORT_F_G2H		0x00000002
-> > +#define VSOCK_TRANSPORT_F_DGRAM		0x00000004
-> 
-> Documentation comments, please.
-
-I'll fix!
-
-> 
-> > +void vsock_core_unregister(const struct vsock_transport *t)
-> > +{
-> > +	mutex_lock(&vsock_register_mutex);
-> > +
-> > +	/* RFC-TODO: maybe we should check if there are open sockets
-> > +	 * assigned to that transport and avoid the unregistration
-> > +	 */
-> 
-> If unregister() is only called from module_exit() functions then holding
-> a reference to the transport module would be enough to prevent this
-> case.  The transport could only be removed once all sockets have been
-> destroyed (and dropped their transport module reference).
-
-Yes. I did this in
-"[RFC PATCH 12/13] vsock: prevent transport modules unloading".
-
-Maybe I can merge it in this patch...
+I also don't like a lot the transport_hg concept, so I'll try to found
+an alternative.
 
 Thanks,
 Stefano
