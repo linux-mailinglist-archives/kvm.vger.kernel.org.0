@@ -2,177 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BB1DD2737
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 12:31:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5732BD2751
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 12:40:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728549AbfJJKbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 06:31:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60236 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725601AbfJJKbO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 06:31:14 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3DC703090FDE;
-        Thu, 10 Oct 2019 10:31:13 +0000 (UTC)
-Received: from [10.36.117.138] (ovpn-117-138.ams2.redhat.com [10.36.117.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA9261001DC2;
-        Thu, 10 Oct 2019 10:31:11 +0000 (UTC)
-Subject: Re: [PATCH] KVM: s390: filter and count invalid yields
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>
-References: <20191010102131.109736-1-borntraeger@de.ibm.com>
- <4323a6bb-35b7-bd23-8fb8-abb7c589d7fc@redhat.com>
- <8c17bc83-c572-7284-3cf7-c3bbd5f63ff9@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <dc0cdd81-65a7-f1f6-7350-fba1679f5c07@redhat.com>
-Date:   Thu, 10 Oct 2019 12:31:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <8c17bc83-c572-7284-3cf7-c3bbd5f63ff9@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+        id S1727330AbfJJKj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 06:39:57 -0400
+Received: from mail-he1eur04hn2042.outbound.protection.outlook.com ([52.101.137.42]:15818
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726201AbfJJKj5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 06:39:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hBtPKlnWTVUPK177pYFOm6gjmGqzw8ufbZt+LInMYycWzeYdX6HQtI5ZrOACS6dg+nhpbfxRmeYha8M+VEWCk6eLIBvbGoXA8WLHIqWhu7vCdyCcuYHOpxTKy2GtSX/Gmp5X/l63OVfIoj1CoVmYkd+MJC0+eUqzAQXnjUlVwoTOhJd5gAth5cJOleSs+lSiVuMrRzV9dwLhRo3gzFnQRChCnUMRFkaJN+XdvC3XwChGn5rx5drai5MpNR2ZwwGO5iuSaJBRotk1qa0RF/F6WjiwH4W9rXnUAVilGpBNxkSuG9IQyFj9UB2r8TndQayxz5szhRbp0OncdWJY/ks50Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B6eBVNXImVRJ+Zn4ZBwLcdGsAa2x61fQwWnkjI78fng=;
+ b=dD0DHVloyGqwpZORVeJJIXgqkydU1MEueNs7ffFzCkNDkzIDLkseL6uNOv9ADVPhjus0VVaFZ958Ql37j7+wffmdLiNVIBbJpHLO8Mlme815wqNTEFPkCSUWF0krm8iusL3lYfb11umDzdjhh7HpZPN/0mCLfn/fuGnno61CJ5h65ghh25uv//pX9N3WRpQZkKgHxLsd3prPkbSHZYX+RtcgiQ1yIE8cJmzLsWPW+wdKIW7KEmx6oaQNxbgF8gL37AmlTSJ2sXrZ+Wq8VjQO1N6MqmD7Mwek/o6oxSxvlkzs//yDQYYL0ajcbxlUvitSVgkeU/BmNXVt0FAva17Z3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B6eBVNXImVRJ+Zn4ZBwLcdGsAa2x61fQwWnkjI78fng=;
+ b=dNzU6hrjPTJp7FadkEiADpDpWub5lY7VSZJj0QUCWMFRcK+0dzQO7bCQfMDIMvMbJ0ugPZdafNKMI+phC0+kU8EU+LrjSRLAW73pItuPiVRHaoDIf/C4NXTV6OiGKR2qYnGMcb3x9x8BlgnVTH9IIcSywOQNKx6aiOWFpO8asDo=
+Received: from AM0PR08MB5537.eurprd08.prod.outlook.com (20.179.36.87) by
+ AM0PR08MB3588.eurprd08.prod.outlook.com (20.177.43.159) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.16; Thu, 10 Oct 2019 10:39:43 +0000
+Received: from AM0PR08MB5537.eurprd08.prod.outlook.com
+ ([fe80::a8ea:5223:db78:dd3]) by AM0PR08MB5537.eurprd08.prod.outlook.com
+ ([fe80::a8ea:5223:db78:dd3%7]) with mapi id 15.20.2347.016; Thu, 10 Oct 2019
+ 10:39:43 +0000
+From:   Roman Kagan <rkagan@virtuozzo.com>
+To:     Suleiman Souhlal <suleiman@google.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "sboyd@kernel.org" <sboyd@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "ssouhlal@freebsd.org" <ssouhlal@freebsd.org>,
+        "tfiga@chromium.org" <tfiga@chromium.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+Subject: Re: [RFC v2 0/2] kvm: Use host timekeeping in guest.
+Thread-Topic: [RFC v2 0/2] kvm: Use host timekeeping in guest.
+Thread-Index: AQHVfz3XFkTdoUspUUGNpMNFnoCXM6dTr42A
+Date:   Thu, 10 Oct 2019 10:39:42 +0000
+Message-ID: <20191010103939.GA12088@rkaganb.sw.ru>
+References: <20191010073055.183635-1-suleiman@google.com>
+In-Reply-To: <20191010073055.183635-1-suleiman@google.com>
+Accept-Language: en-US, ru-RU
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 10 Oct 2019 10:31:13 +0000 (UTC)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mutt/1.12.1 (2019-06-15)
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,   Suleiman Souhlal
+ <suleiman@google.com>, pbonzini@redhat.com,    rkrcmar@redhat.com,
+ tglx@linutronix.de, john.stultz@linaro.org,    sboyd@kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,     ssouhlal@freebsd.org,
+ tfiga@chromium.org, vkuznets@redhat.com
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR02CA0089.eurprd02.prod.outlook.com
+ (2603:10a6:7:29::18) To AM0PR08MB5537.eurprd08.prod.outlook.com
+ (2603:10a6:208:148::23)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bc42a1a9-cec7-4eb4-8343-08d74d6e290e
+x-ms-traffictypediagnostic: AM0PR08MB3588:|AM0PR08MB3588:|AM0PR08MB3588:
+x-microsoft-antispam-prvs: <AM0PR08MB35887AAA3B1EDE7C904996C8C9940@AM0PR08MB3588.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 018632C080
+x-forefront-antispam-report: SFV:SPM;SFS:(10019020)(39850400004)(136003)(346002)(376002)(396003)(366004)(199004)(189003)(14454004)(7736002)(71190400001)(6116002)(3846002)(6512007)(9686003)(305945005)(71200400001)(4326008)(1076003)(478600001)(7416002)(256004)(8936002)(8676002)(54906003)(316002)(58126008)(2906002)(81156014)(14444005)(81166006)(6916009)(33656002)(446003)(11346002)(76176011)(26005)(52116002)(86362001)(186003)(102836004)(25786009)(66066001)(476003)(386003)(6506007)(99286004)(486006)(6436002)(66446008)(64756008)(66556008)(66476007)(66946007)(229853002)(5660300002)(36756003)(6246003)(6486002)(30126002);DIR:OUT;SFP:1501;SCL:5;SRVR:AM0PR08MB3588;H:AM0PR08MB5537.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-transport-forked: True
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Nrjblv7FVESy1nM0szf/Mz+f/Fa0htb7VW0DcbSyTlrASSE8G2g4kA6p1bTYNbx40D4u/9DBbMraOarfTfX7IYpjEdQUPr2/A/KvWRHZj7k5BhpFVqXlPgre2/0ghvrpzM1IEbirLSZYEEKdMrTwsuMVadCZzPTHOkw7IP/j/f7l8daTwr/MWfU46W5IhiGup026CRJMrhtv3UkF+XRtG+b15tH0rldoqW5TluDQclXEXEuwxreDxm/qn9qBB6sBHncCoVRPNhcAgOXU53Ek/tN0zR3OZUvr8DzknvoLddMD8R8ZSvP+0AWB905DRff9bXMHGcw/ACxisnd8sz6dVaLj4srXGN+7ErZxWKEhudz0WgEtYEZZxgdjkLuA/P4P55uWYOVpMnGaTi7dUzq7hP+0vMEcm96FUTlGMQJ79PnxHz0MiOG9RKCGGXfY68oYKKuXtcq8aW+TfndEFlVbGZhvCUd9rSMYT6s/Kl8xyldpwcpVL0p44c3l0Dp5wyKF
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A759E52CEAD51B4D92FA891FBABF161B@eurprd08.prod.outlook.com>
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc42a1a9-cec7-4eb4-8343-08d74d6e290e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2019 10:39:42.8311
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zr6LULSiXO5e7tNpsAJlbR5LJ5mWMD9JJCOtIURDmw0H7uJVHZhBR5UtMp76FIpcHbLHFN/y3BQ/ebXK5mY7xQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3588
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10.10.19 12:28, Christian Borntraeger wrote:
+On Thu, Oct 10, 2019 at 04:30:53PM +0900, Suleiman Souhlal wrote:
+> This RFC is to try to solve the following problem:
 > 
+> We have some applications that are currently running in their
+> own namespace, that still talk to other processes on the
+> machine, using IPC, and expect to run on the same machine.
 > 
-> On 10.10.19 12:25, David Hildenbrand wrote:
->> On 10.10.19 12:21, Christian Borntraeger wrote:
->>> To analyze some performance issues with lock contention and scheduling
->>> it is nice to know when diag9c did not result in any action.
->>> At the same time avoid calling the scheduler (which can be expensive)
->>> if we know that it does not make sense.
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>>  arch/s390/include/asm/kvm_host.h |  2 ++
->>>  arch/s390/kvm/diag.c             | 23 +++++++++++++++++++----
->>>  arch/s390/kvm/kvm-s390.c         |  2 ++
->>>  3 files changed, 23 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->>> index abe60268335d..743cd5a63b37 100644
->>> --- a/arch/s390/include/asm/kvm_host.h
->>> +++ b/arch/s390/include/asm/kvm_host.h
->>> @@ -392,6 +392,8 @@ struct kvm_vcpu_stat {
->>>  	u64 diagnose_10;
->>>  	u64 diagnose_44;
->>>  	u64 diagnose_9c;
->>> +	u64 diagnose_9c_success;
->>> +	u64 diagnose_9c_ignored;
->>
->> Can't you derive the one from the other with diagnose_9c? Just sayin,
->> one would be sufficient.
+> We want to move them into a virtual machine, for the usual
+> benefits of virtualization.
 > 
-> You mean diagnose9c = diagnose_9c_success + diagnose_9c_ignored anyway so this is redundant?
-> Could just do diagnose_9c  and diagnose_9c_ignored if you prefer that.
+> However, some of these programs use CLOCK_MONOTONIC and
+> CLOCK_BOOTTIME timestamps, as part of their protocol, when talking
+> to the host.
 > 
-
-I think that would make sense, but however you prefer.
-
+> Generally speaking, we have multiple event sources, for example
+> sensors, input devices, display controller vsync, etc and we would
+> like to rely on them in the guest for various scenarios.
 > 
->>
->>>  	u64 diagnose_258;
->>>  	u64 diagnose_308;
->>>  	u64 diagnose_500;
->>> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
->>> index 45634b3d2e0a..2c729f020585 100644
->>> --- a/arch/s390/kvm/diag.c
->>> +++ b/arch/s390/kvm/diag.c
->>> @@ -158,14 +158,29 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
->>>  
->>>  	tid = vcpu->run->s.regs.gprs[(vcpu->arch.sie_block->ipa & 0xf0) >> 4];
->>>  	vcpu->stat.diagnose_9c++;
->>> -	VCPU_EVENT(vcpu, 5, "diag time slice end directed to %d", tid);
->>>  
->>> +	/* yield to self */
->>>  	if (tid == vcpu->vcpu_id)
->>> -		return 0;
->>> +		goto no_yield;
->>>  
->>> +	/* yield to invalid */
->>>  	tcpu = kvm_get_vcpu_by_id(vcpu->kvm, tid);
->>> -	if (tcpu)
->>> -		kvm_vcpu_yield_to(tcpu);
->>> +	if (!tcpu)
->>> +		goto no_yield;
->>> +
->>> +	/* target already running */
->>> +	if (tcpu->cpu >= 0)
->>> +		goto no_yield;
->>
->> Wonder if it's wort moving this optimization to a separate patch.
+> As a specific example, we are trying to run some wayland clients
+> (in the guest) who talk to the server (in the host), and the server
+> gives input events based on host time. Additionally, there are also
+> vsync events that the clients use for timing their rendering.
 > 
-> Could do if you prefer that. 
+> Another use case we have are timestamps from IIO sensors and cameras.
+> There are applications that need to determine how the timestamps
+> relate to the current time and the only way to get current time is
+> clock_gettime(), which would return a value from a different time
+> domain than the timestamps.
 > 
+> In this case, it is not feasible to change these programs, due to
+> the number of the places we would have to change.
+> 
+> We spent some time thinking about this, and the best solution we
+> could come up with was the following:
+> 
+> Make the guest kernel return the same CLOCK_MONOTONIC and
+> CLOCK_GETTIME timestamps as the host.
+> 
+> To do that, I am changing kvmclock to request to the host to copy
+> its timekeeping parameters (mult, base, cycle_last, etc), so that
+> the guest timekeeper can use the same values, so that time can
+> be synchronized between the guest and the host.
 
-Whatever you prefer, I would have put it into a separate patch :)
+I wonder how feasible it is to map the host's vdso into the guest and
+thus make the guest use the *same* (as opposed to "synchronized") clock
+as the host's userspace?  Another benefit is that it's essentially an
+ABI so is not changed as liberally as internal structures like
+timekeeper, etc.  There is probably certain complication in handling the
+syscall fallback in the vdso when used in the guest kernel, though.
 
-Take my
+You'll also need to ensure neither tsc scaling and nor offsetting is
+applied to the VM once this clock is enabled.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
-for either changes.
-
--- 
-
-Thanks,
-
-David / dhildenb
+Roman.
