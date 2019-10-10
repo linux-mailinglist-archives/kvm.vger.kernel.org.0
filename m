@@ -2,108 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61971D1CFB
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 01:44:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66978D1D86
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 02:42:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732450AbfJIXoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Oct 2019 19:44:25 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:43656 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732438AbfJIXoY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Oct 2019 19:44:24 -0400
-Received: by mail-io1-f66.google.com with SMTP id v2so9466109iob.10
-        for <kvm@vger.kernel.org>; Wed, 09 Oct 2019 16:44:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1rIDTbz4/jxXG5RR4Vf/DrkF9W2wHj/3R7V9+nN/Cgk=;
-        b=SkdgJBy3nNZy/b9Zk4J02rek8Ec/NlC8IyIbm0wxODNk21+BPAIrJfZLF1hTOBwivy
-         fe9H1XsSyAG4uSgVf4tkh42w7SRnMbKOxiT8GgwZwPcxLeCVwWnJta3XekeXHWDc+cOY
-         90hKg6xvnlxuaD78Swvp7GyzyB7ZB4iVgrYvnG8YrsTw6j4fI/jbx//9E669v6G3Zgrf
-         ldG2tWQIPAjS8fBPzAPzh/RbGOf/JiyiSYII8cXmmcihKd7NGWgJPlOwiEc2RR9ylCal
-         oydPOt/LNGyhRTskiPOAkmW+blBp93TgnEbHJX9XgZkXfuijccI7a3twItSMkhXnP9Xf
-         sKkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1rIDTbz4/jxXG5RR4Vf/DrkF9W2wHj/3R7V9+nN/Cgk=;
-        b=MC2R0VdCfN5bAGOten78DL4XOUWO0La4pixMZ8i+YQF4ZB55E7FOrxtRORfN9a9UQ5
-         WTtzu/lYcxwyyWmh4hYAC8J6qqVUz7WD54RRGKxeXruq3OJuvtnFApb/R8EcYO6c9bTc
-         JciqaA7TPDYzfLA/qNfgj6hZJws1MmVL9qCfIXd2hqf0BicvvRgYtJVg6Nfq9oZd2M2q
-         rMZ5PE8COa4JisS3Rouxfd5lmlZEWyYcDl57iNvqN0n+qAblIM1TmZwQtqTOISSGdN/Y
-         xgxZkbyBJWRxsoyyK0heY01sF4OYLmlwreqMsqt2oF5jvrl6lmdJu3QFdIpVOhWWElb6
-         3Juw==
-X-Gm-Message-State: APjAAAUS89oZhmWf28d0QW2WYhQPPnZK5gXwQMccMMUMOx781DRNMI+H
-        o3fGrdjUhvs+ctBKO1xfQE9Cco+DlpzasDydJhACoA==
-X-Google-Smtp-Source: APXvYqzigVj1v/bsFRp0OAAJ+PMPjptR7xVT6vHd9hK/qs0mnSkflu92HUavKfsT6uOtB8V50rBK/BqaPx9TpiJCuIM=
-X-Received: by 2002:a02:a99d:: with SMTP id q29mr6398547jam.18.1570664662189;
- Wed, 09 Oct 2019 16:44:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191009004142.225377-1-aaronlewis@google.com>
- <20191009004142.225377-6-aaronlewis@google.com> <f3bcebe3-d82d-7578-0dd9-95391fe522e0@redhat.com>
-In-Reply-To: <f3bcebe3-d82d-7578-0dd9-95391fe522e0@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 9 Oct 2019 16:44:11 -0700
-Message-ID: <CALMp9eSqy2k2xJo+j2eFf5LNTGctywSt9bFq33iX4nR1gErFcQ@mail.gmail.com>
-Subject: Re: [Patch 6/6] kvm: tests: Add test to verify MSR_IA32_XSS
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
+        id S1732034AbfJJAm0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Oct 2019 20:42:26 -0400
+Received: from mga02.intel.com ([134.134.136.20]:8073 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731834AbfJJAm0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Oct 2019 20:42:26 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 17:42:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,278,1566889200"; 
+   d="scan'208";a="277599342"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga001.jf.intel.com with ESMTP; 09 Oct 2019 17:42:25 -0700
+Received: from fmsmsx157.amr.corp.intel.com (10.18.116.73) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 9 Oct 2019 17:42:24 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ FMSMSX157.amr.corp.intel.com (10.18.116.73) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 9 Oct 2019 17:42:24 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.166]) by
+ SHSMSX152.ccr.corp.intel.com ([10.239.6.52]) with mapi id 14.03.0439.000;
+ Thu, 10 Oct 2019 08:42:22 +0800
+From:   "Kang, Luwei" <luwei.kang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+CC:     Aaron Lewis <aaronlewis@google.com>,
         Babu Moger <Babu.Moger@amd.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
+        "Yang, Weijiang" <weijiang.yang@intel.com>,
         Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
         kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: RE: [Patch 3/6] kvm: svm: Add support for XSAVES on AMD
+Thread-Topic: [Patch 3/6] kvm: svm: Add support for XSAVES on AMD
+Thread-Index: AQHVfjpj4nSHkdRV8Emp7gZltXMOiKdRXE2AgADyVICAAAM/AIAABNCAgAAOO4CAAKFJ4A==
+Date:   Thu, 10 Oct 2019 00:42:22 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E173828A91@SHSMSX104.ccr.corp.intel.com>
+References: <20191009004142.225377-1-aaronlewis@google.com>
+ <20191009004142.225377-3-aaronlewis@google.com>
+ <56cf7ca1-d488-fc6e-1c20-b477dd855d84@redhat.com>
+ <CALMp9eRNdLdb7zR=wwx2tTc8n-ewCKuhrw9pxXGVQVUBjNpRow@mail.gmail.com>
+ <9335c3c7-e2dd-cb2d-454a-c41143c94b63@redhat.com>
+ <CALMp9eTW56TDny5MehuW-wS8dHWwfVEdzEvZQkOfVumEwcMWAA@mail.gmail.com>
+ <85d601ec-9f69-6c71-0839-b9291f540efb@redhat.com>
+In-Reply-To: <85d601ec-9f69-6c71-0839-b9291f540efb@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTYxNTE4NjEtMTllYy00Y2E3LTliZDgtNTRkNjBhODk5ODA0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiMVVQK2o0ZEpFUFFmT2hBRkltMEhveFFuMHhlYkp2YkZZcU8zazlPZUFJM09JQlVNek1NUmlDOXhZTFlGQldaSyJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 8, 2019 at 11:32 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/10/19 02:41, Aaron Lewis wrote:
-> >   * Set value of MSR for VCPU.
-> >   */
-> > -void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
-> > -     uint64_t msr_value)
-> > +void vcpu_set_msr_expect_result(struct kvm_vm *vm, uint32_t vcpuid,
-> > +                             uint64_t msr_index, uint64_t msr_value,
-> > +                             int result)
-> >  {
-> >       struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-> >       struct {
-> > @@ -899,10 +901,30 @@ void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
-> >       buffer.entry.index = msr_index;
-> >       buffer.entry.data = msr_value;
-> >       r = ioctl(vcpu->fd, KVM_SET_MSRS, &buffer.header);
-> > -     TEST_ASSERT(r == 1, "KVM_SET_MSRS IOCTL failed,\n"
-> > +     TEST_ASSERT(r == result, "KVM_SET_MSRS IOCTL failed,\n"
-> >               "  rc: %i errno: %i", r, errno);
-> >  }
->
-> This is a library, so the functions to some extent should make sense
-> even outside tests.  Please make a function _vcpu_set_msr that returns
-> the result of the ioctl; it can still be used in vcpu_set_msr, and the
-> tests can TEST_ASSERT what they want.
->
-> > +uint32_t kvm_get_cpuid_max_basic(void)
-> > +{
-> > +     return kvm_get_supported_cpuid_entry(0)->eax;
-> > +}
-> > +
-> > +uint32_t kvm_get_cpuid_max_extended(void)
->
-> I would leave the existing function aside, and call this one
-> kvm_get_cpuid_max_amd() since CPUID leaves at 0x80000000 are allocated
-> by AMD.
-
-The existing function *is* the one that gives the largest
-AMD-allocated leaf. Note that Intel documents CPUID.80000000:EAX as
-"Maximum Input Value for Extended Function CPUID Information," and AMD
-documents this as "Largest extended function."
-
-> Otherwise looks good.
->
-> Paolo
->
+PiA+IEkgd2FzIGp1c3QgY29uZnVzZWQgYnkgeW91ciB3b3JkaW5nOw0KPiA+IGl0IHNvdW5kZWQg
+bGlrZSB5b3Ugd2VyZSBzYXlpbmcgdGhhdCBLVk0gc3VwcG9ydGVkIGJpdCA4Lg0KPiA+DQo+ID4g
+SG93IGFib3V0Og0KPiA+DQo+ID4gLyoNCj4gPiAgKiBXZSBkbyBzdXBwb3J0IFBUIGlmIGt2bV94
+ODZfb3BzLT5wdF9zdXBwb3J0ZWQoKSwgYnV0IHdlIGRvIG5vdA0KPiA+ICAqIHN1cHBvcnQgSUEz
+Ml9YU1NbYml0IDhdLiBHdWVzdHMgd2lsbCBoYXZlIHRvIHVzZSBXUk1TUiByYXRoZXIgdGhhbg0K
+PiA+ICAqIFhTQVZFUy9YUlNUT1JTIHRvIHNhdmUvcmVzdG9yZSBQVCBNU1JzLg0KPiA+ICAqLw0K
+PiANCj4gR29vZCENCg0KTG9va3MgZ29vZCB0byBtZS4NCg0KVGhhbmtzLA0KTHV3ZWkgS2FuZw0K
+DQo+IA0KPiBQYW9sbw0KDQo=
