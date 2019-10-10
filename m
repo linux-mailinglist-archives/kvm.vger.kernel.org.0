@@ -2,76 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 48084D2A65
-	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 15:09:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDBCFD2C89
+	for <lists+kvm@lfdr.de>; Thu, 10 Oct 2019 16:30:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387624AbfJJNJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 09:09:37 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39178 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387430AbfJJNJh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 09:09:37 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r3so7839994wrj.6
-        for <kvm@vger.kernel.org>; Thu, 10 Oct 2019 06:09:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ub-ac-id.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=GO77O9NugfDMF3sM0pFxjAVwqVXEKORDEOteZl6SPpM=;
-        b=iJ+QKl0m3JEIdWTVcDoJ7wb/twesRJycWvgrJaOvxGsPbPgJJnruxRUY9vcaveTrjH
-         a1ZEKmcpPFv89x4SF6ytgLMFV9phO0VVm5ZcKaw1Dr7yMT4ykTvOJi38t0ORl4gJXbgm
-         NwdZymfpIT62j66r+5ahei721cyxIK4ot3luD2pdjWfF7Nx7sUEBCoHxT8EARHRCprz6
-         rKNgq1Bp0j3KjdTJi6xU559dr3clxbyF2iyn70qhnodZqM8CANsx1sh5R21V8EvnSKHA
-         ejjidIRJ9WVY6gmhBaDE8VF4UwPl+iUO4F4grr8bMl6DXu26bVTTr6GpJRqwaE/O9nBq
-         0huA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=GO77O9NugfDMF3sM0pFxjAVwqVXEKORDEOteZl6SPpM=;
-        b=rzuAptTIezwJIhNEBZWfGi32iyUbT5giG3rWw8gQ/p6rldbh5teMVbT7r+oQ65pZL9
-         aMO7nN2mtCfXPmoux1dzkaIfs82M1t/CPdQQ2+gRaZbDvt1kOnp58mqSZL/ZH3joEy1f
-         PJVIr/uXnOB4aH5HxJ17Mzxi4f+PrbM6oBllsM320J1fLYncOml5NWoNtXJ/vmvEnzam
-         RNOq3ARBqkQkoy8yOK7Scrk4Ri/znjyMiXMsxPC/iCyuTo8TXjkRMVTB4hDFfdFU6Nh8
-         q9ruBZ3liYhuuD0M6JdIng6pmPWcqnOppHyfz6H2e2J/MdDtScROiiULDYG4e/K3Yp8s
-         GYUw==
-X-Gm-Message-State: APjAAAUGJlQfxVQR09LLDgykppjkgkz9BlkB5se7dslj3NLvdu/Gro3U
-        zhfXKUayU8KK0uCpnDpaSYiozyvKaFglyxCm7LDeUA==
-X-Google-Smtp-Source: APXvYqwCLi3tV3Ge9iLpvWfqa0rWI3DGIhcXnLY66lYX1k07kR1Ywt1ehc35EY/gwW8BGC7FA96egmVLk7ZF3Xg5KjI=
-X-Received: by 2002:a5d:5270:: with SMTP id l16mr4018576wrc.201.1570712974067;
- Thu, 10 Oct 2019 06:09:34 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:adf:efc4:0:0:0:0:0 with HTTP; Thu, 10 Oct 2019 06:09:33
- -0700 (PDT)
-Reply-To: sunrisefundingltd50@gmail.com
-From:   "Coryna Rizky Amelia, SST" <coryna_fk@ub.ac.id>
-Date:   Thu, 10 Oct 2019 14:09:33 +0100
-Message-ID: <CADotR_oWL61nWCVVw3CDA4a-OXY2NmYCtTwe+QXJUSkPRR4NfQ@mail.gmail.com>
-Subject: Apply For Financial investment at a lower rate 2%
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+        id S1726354AbfJJO26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Oct 2019 10:28:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40356 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725923AbfJJO26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Oct 2019 10:28:58 -0400
+Received: from localhost.localdomain (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B5579206B6;
+        Thu, 10 Oct 2019 14:28:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570717737;
+        bh=JFPH/A6NZ3j9qzNoCJjMrAN/lWSFEF0+cBX8xEbnPnw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=bLpTpHbKuY0f3fbqL+b9781T4xlsCwiddWV9OsL5iA9IbyKgg7jYcUySuSV3D/n69
+         2YDFa/THxKFyT0ySIEkIkz+6n4U11bNlWo9+qp8hRjKCtiPbapCQg71Ynv2hDd44Hu
+         kKYnJ3ZdDKjLS+UfttDpL1KYG/lNpb4ZhNf4tCaI=
+From:   Will Deacon <will@kernel.org>
+To:     kvm@vger.kernel.org
+Cc:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH kvmtool] virtio: Ensure virt_queue is always initialised
+Date:   Thu, 10 Oct 2019 15:28:52 +0100
+Message-Id: <20191010142852.15437-1-will@kernel.org>
+X-Mailer: git-send-email 2.11.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Failing to initialise the virt_queue via virtio_init_device_vq() leaves,
+amongst other things, the endianness unspecified. On arm/arm64 this
+results in virtio_guest_to_host_uxx() treating the queue as big-endian
+and trying to translate bogus addresses:
+
+  Warning: unable to translate guest address 0x80b8249800000000 to host
+
+Ensure the virt_queue is always initialised by the virtio device during
+setup.
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ virtio/balloon.c | 1 +
+ virtio/rng.c     | 1 +
+ virtio/scsi.c    | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/virtio/balloon.c b/virtio/balloon.c
+index 15a9a46e77e0..0bd16703dfee 100644
+--- a/virtio/balloon.c
++++ b/virtio/balloon.c
+@@ -212,6 +212,7 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 
+ 	thread_pool__init_job(&bdev->jobs[vq], kvm, virtio_bln_do_io, queue);
+ 	vring_init(&queue->vring, VIRTIO_BLN_QUEUE_SIZE, p, align);
++	virtio_init_device_vq(&bdev->vdev, queue);
+ 
+ 	return 0;
+ }
+diff --git a/virtio/rng.c b/virtio/rng.c
+index 9dd757b7e6e9..78eaa64bda17 100644
+--- a/virtio/rng.c
++++ b/virtio/rng.c
+@@ -103,6 +103,7 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 	job = &rdev->jobs[vq];
+ 
+ 	vring_init(&queue->vring, VIRTIO_RNG_QUEUE_SIZE, p, align);
++	virtio_init_device_vq(&rdev->vdev, queue);
+ 
+ 	*job = (struct rng_dev_job) {
+ 		.vq	= queue,
+diff --git a/virtio/scsi.c b/virtio/scsi.c
+index a72bb2a9a206..1ec78fe0945a 100644
+--- a/virtio/scsi.c
++++ b/virtio/scsi.c
+@@ -72,6 +72,7 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+ 	p		= virtio_get_vq(kvm, queue->pfn, page_size);
+ 
+ 	vring_init(&queue->vring, VIRTIO_SCSI_QUEUE_SIZE, p, align);
++	virtio_init_device_vq(&sdev->vdev, queue);
+ 
+ 	if (sdev->vhost_fd == 0)
+ 		return 0;
 -- 
-Hello,
+2.23.0.700.g56cf767bdb-goog
 
-We are private lenders based in UK.
-Do you need a loan (credit) as soon as possible. Are you in search of
-money to solve your personal needs or finance your business venture,
-then get Your desired loan today! Consult us at Sunrise Funding Ltd.
-
-* We offer personal loan & huge capital loan at 2% interest rate to
-the general public both locally and internationally.
-* Credit amount range from $5,000.00 -- $500,000.00 and above.
-* Special $10,000,000.00 Loan offer for huge project also available.
-* Loan period of 6 months -- 10 years.
-* Loan is granted 24 hours after approval and accredited, directly in
-hand or bank account.
-
-Please note that you are advised to contact us for more details via
-the following e-mail address below;
-
-EMAIL : sunrisefundingltd50@gmail.com
-FIRM : Sunrise Funding Ltd UK.
