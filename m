@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C20BDD4897
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 21:41:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A0A1D4898
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 21:41:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729052AbfJKTlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 15:41:10 -0400
-Received: from mail-vk1-f202.google.com ([209.85.221.202]:56314 "EHLO
-        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729014AbfJKTlK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 15:41:10 -0400
-Received: by mail-vk1-f202.google.com with SMTP id n79so3808907vkf.22
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2019 12:41:08 -0700 (PDT)
+        id S1729055AbfJKTlL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 15:41:11 -0400
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:35699 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729014AbfJKTlL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 15:41:11 -0400
+Received: by mail-pg1-f202.google.com with SMTP id s1so7667041pgm.2
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2019 12:41:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ON/0K3CYe4fzFmLLTzBkiEEMt0N/ljXg9UJFmSda9AA=;
-        b=QbSuIu//nhva29h/Kq00Eq91V8nEPt/Yx76aazGFKY2mb7tPhGZk5L/eBFGMmX8WVV
-         4d77ZQ4bYjzJ4NJfr2bI7inlRudtlW8/IAhBtoW/kFEyp+oR8qOE81rjeih8oS7FymWd
-         mdPtAg//D/XKiVt2q9e4RIQ8g4lwjedRwAS08nfGPR5zM5ZfY8s4vmVEq+x7zFr3F5gQ
-         41KcuRhqgtDnbvMy3pfId6wEbI5etaK+//Yu5rpU0+2u0kteyxRQ8sGLPN6gdHduzdda
-         7sh1ATE+H/zcczifpX5XQaA0D1+nTPR4oiVil9wM2Jn6zyol+pPD2/fOnRugAat3bBso
-         zuhg==
+        bh=WBZQuUCDQHNl1l1bGWNs/9RUHosUT5fVUoCeqs6NXeU=;
+        b=nLsiobK7toiL0tMAZXKCM1qFRtLPxSTfoj/qE/UTRLVQRuWan3v8eGF73Sgx58Jphl
+         WOEs1kOjviwRoZFhV7kX2k4QrzuyoZqK13v0TSlZqTKu/FN64Gh2xiT5u68HNP9K6ydM
+         thU551rToDNNg9sJxgbynIuPQCI0w8qFx/DbAhZxlAxzK4MLp6QPSgpWM/FYauPZu1ev
+         vbyNTQql6/J+VE/aQEQQAAM77ENhfd2JAJAl9+IA9DZIXOHUmXP8/CEDjAE/roiP05nu
+         Bn6sqy9XKPG80Gjg1LVWlq7aRcMLZyCn6M45v7Yg/XLrWE+LNExFQCWbveJ+65t+BHHW
+         my/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ON/0K3CYe4fzFmLLTzBkiEEMt0N/ljXg9UJFmSda9AA=;
-        b=CxezMqAoLj/Weuh126mdWSyJ1w9N35/gN50LCLSSmSnR9lm9ITUg3tTGpZ4mjRihED
-         HNteFIV9Qyaq7iodi8taWh4AYZaP64NPRTevBMC9Ff+SnDdFWSJoImj7vg9GplvS7Cqi
-         VyiC35+7HMCbo6d+fdKYvcHS3ViCSuQcEre5m3c/W116HSXzyXKyO+ZFxc3wdCW3wANO
-         Istw9wQvuKXccw0YSVDSW8h1n3WXTUupZcIdvgHxHJak+k4sSjL0mEvZnYiHABIcSnZT
-         oy65b+8FuH5j5oLUZxoV4agOhTaiPLxT6ir4CL5wRqrBFgdzUvLQmk7ZeESGpv3XhSUQ
-         U5Mw==
-X-Gm-Message-State: APjAAAUkJGtlvEPZ2IB0xDzZaJHyejLdvVBRMOuQpevJSiXah+FFFqfe
-        FTzUUDh058eygOZL5ONrDiL7Iq9vZj/nxrzh
-X-Google-Smtp-Source: APXvYqz3g59DaEpRZ9PIrFku/yxegH2bBPveigBehSSPq4e/c9Y4HpsDDjPkTH8cQgW3N73hXzJ7vggIUofckxiB
-X-Received: by 2002:ac5:c84c:: with SMTP id g12mr9886010vkm.23.1570822867364;
- Fri, 11 Oct 2019 12:41:07 -0700 (PDT)
-Date:   Fri, 11 Oct 2019 12:40:30 -0700
+        bh=WBZQuUCDQHNl1l1bGWNs/9RUHosUT5fVUoCeqs6NXeU=;
+        b=rAwdQSeHBnnuZJNCHniafw/N04G/lMNagl2GsClva37bZpua+JWRE9GjRCf6ugR9JI
+         2A1U7gSjPuS5YPRc8mFApWPeGWfqza3aw0eGStwxdntjdGkIfj6WWTBdLLL//HSlYTTb
+         mGvlhs8PBTGQbpBRg82eO9bf2sJ+znx9Q0vfVR/FDBvCfut7qLdkCbySSgnEpAAdeoPU
+         NpxmWkxSTGqyqsbp39Y2jzkGcYp82PLXu3Lr1ruVHIgKpnEdPFDCogWvOscxb+LYtCO1
+         INkmhx+PjElcZNhaPjqu1a9n24ofzjpAjERJkTaYMYyfDP0UrDr/Go+oJ8GmxI8pfPHP
+         xjWw==
+X-Gm-Message-State: APjAAAVrNaD3SZU8MskxtyQkAjD/3u2SF33AGDWW4kbZbopE6pITGkZa
+        j3xbZnj/5neQUuhg/xtFR9o0LGXQMPguYSfL
+X-Google-Smtp-Source: APXvYqzePMsEtzf0mOV1afpqsOBDPe2zZKsh3WkM5xBc7EgmtzQ6pZkFJ66dkvg2MfmQqfhPAN/k+HTNXANDm31T
+X-Received: by 2002:a65:66d1:: with SMTP id c17mr18364033pgw.169.1570822870397;
+ Fri, 11 Oct 2019 12:41:10 -0700 (PDT)
+Date:   Fri, 11 Oct 2019 12:40:31 -0700
 In-Reply-To: <20191011194032.240572-1-aaronlewis@google.com>
-Message-Id: <20191011194032.240572-4-aaronlewis@google.com>
+Message-Id: <20191011194032.240572-5-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20191011194032.240572-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [PATCH v2 3/5] kvm: svm: Add support for XSAVES on AMD
+Subject: [PATCH v2 4/5] kvm: x86: Add IA32_XSS to the emulated_msrs list
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     Babu Moger <Babu.Moger@amd.com>,
         Yang Weijiang <weijiang.yang@intel.com>,
@@ -61,115 +61,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hoist support for RDMSR/WRMSR of IA32_XSS from vmx into common code so
-that it can be used for AMD as well.
-
-AMD has no equivalent of Intel's "Enable XSAVES/XRSTORS" VM-execution
-control. Instead, XSAVES is always available to the guest when supported
-on the host.
-
-Unfortunately, right now, kvm only allows the guest IA32_XSS to be zero,
-so the guest's usage of XSAVES will be exactly the same as XSAVEC.
+Add IA32_XSS to the list of emulated MSRs if it is supported in the
+guest.  At the moment, the guest IA32_XSS must be zero, but this change
+prepares for expanded support in the future.
 
 Reviewed-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- arch/x86/kvm/svm.c     |  2 +-
- arch/x86/kvm/vmx/vmx.c | 20 --------------------
- arch/x86/kvm/x86.c     | 22 ++++++++++++++++++++++
- 3 files changed, 23 insertions(+), 21 deletions(-)
+ arch/x86/kvm/svm.c     | 12 +++++++-----
+ arch/x86/kvm/vmx/vmx.c |  2 ++
+ arch/x86/kvm/x86.c     |  1 +
+ 3 files changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index da69e95beb4d..1953898e37ce 100644
+index 1953898e37ce..e23a5013c812 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -5965,7 +5965,7 @@ static bool svm_mpx_supported(void)
- 
- static bool svm_xsaves_supported(void)
- {
--	return false;
-+	return boot_cpu_has(X86_FEATURE_XSAVES);
+@@ -498,6 +498,11 @@ static inline bool avic_vcpu_is_running(struct kvm_vcpu *vcpu)
+ 	return (READ_ONCE(*entry) & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
  }
  
++static bool svm_xsaves_supported(void)
++{
++	return boot_cpu_has(X86_FEATURE_XSAVES);
++}
++
+ static void recalc_intercepts(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_control_area *c, *h;
+@@ -5871,6 +5876,8 @@ static bool svm_has_emulated_msr(int index)
+ 	case MSR_IA32_MCG_EXT_CTL:
+ 	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
+ 		return false;
++	case MSR_IA32_XSS:
++		return svm_xsaves_supported();
+ 	default:
+ 		break;
+ 	}
+@@ -5963,11 +5970,6 @@ static bool svm_mpx_supported(void)
+ 	return false;
+ }
+ 
+-static bool svm_xsaves_supported(void)
+-{
+-	return boot_cpu_has(X86_FEATURE_XSAVES);
+-}
+-
  static bool svm_umip_emulated(void)
+ {
+ 	return false;
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ce3020914c69..18bea844fffc 100644
+index 18bea844fffc..4ba62ebd8703 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1818,13 +1818,6 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		return vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
- 				       &msr_info->data);
--	case MSR_IA32_XSS:
--		if (!vmx_xsaves_supported() ||
--		    (!msr_info->host_initiated &&
--		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
--			return 1;
--		msr_info->data = vcpu->arch.ia32_xss;
--		break;
- 	case MSR_IA32_RTIT_CTL:
- 		if (pt_mode != PT_MODE_HOST_GUEST)
- 			return 1;
-@@ -2060,19 +2053,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (!nested_vmx_allowed(vcpu))
- 			return 1;
- 		return vmx_set_vmx_msr(vcpu, msr_index, data);
--	case MSR_IA32_XSS:
--		if (!vmx_xsaves_supported() ||
--		    (!msr_info->host_initiated &&
--		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
--			return 1;
--		/*
--		 * The only supported bit as of Skylake is bit 8, but
--		 * it is not supported on KVM.
--		 */
--		if (data != 0)
--			return 1;
--		vcpu->arch.ia32_xss = data;
--		break;
- 	case MSR_IA32_RTIT_CTL:
- 		if ((pt_mode != PT_MODE_HOST_GUEST) ||
- 			vmx_rtit_ctl_check(vcpu, data) ||
+@@ -6272,6 +6272,8 @@ static bool vmx_has_emulated_msr(int index)
+ 	case MSR_AMD64_VIRT_SPEC_CTRL:
+ 		/* This is AMD only.  */
+ 		return false;
++	case MSR_IA32_XSS:
++		return vmx_xsaves_supported();
+ 	default:
+ 		return true;
+ 	}
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a61570d7034b..2104e21855fc 100644
+index 2104e21855fc..e3b7dbb8be8f 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2700,6 +2700,21 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_TSC:
- 		kvm_write_tsc(vcpu, msr_info);
- 		break;
-+	case MSR_IA32_XSS:
-+		if (!kvm_x86_ops->xsaves_supported() ||
-+		    (!msr_info->host_initiated &&
-+		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
-+			return 1;
-+		/*
-+		 * We do support PT if kvm_x86_ops->pt_supported(), but we do
-+		 * not support IA32_XSS[bit 8]. Guests will have to use
-+		 * RDMSR/WRMSR rather than XSAVES/XRSTORS to save/restore PT
-+		 * MSRs.
-+		 */
-+		if (data != 0)
-+			return 1;
-+		vcpu->arch.ia32_xss = data;
-+		break;
- 	case MSR_SMI_COUNT:
- 		if (!msr_info->host_initiated)
- 			return 1;
-@@ -3030,6 +3045,13 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
- 		return get_msr_mce(vcpu, msr_info->index, &msr_info->data,
- 				   msr_info->host_initiated);
-+	case MSR_IA32_XSS:
-+		if (!kvm_x86_ops->xsaves_supported() ||
-+		    (!msr_info->host_initiated &&
-+		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
-+			return 1;
-+		msr_info->data = vcpu->arch.ia32_xss;
-+		break;
- 	case MSR_K7_CLK_CTL:
- 		/*
- 		 * Provide expected ramp-up count for K7. All other
+@@ -1227,6 +1227,7 @@ static u32 emulated_msrs[] = {
+ 	MSR_MISC_FEATURES_ENABLES,
+ 	MSR_AMD64_VIRT_SPEC_CTRL,
+ 	MSR_IA32_POWER_CTL,
++	MSR_IA32_XSS,
+ 
+ 	/*
+ 	 * The following list leaves out MSRs whose values are determined
 -- 
 2.23.0.700.g56cf767bdb-goog
 
