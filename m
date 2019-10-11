@@ -2,162 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 13DFFD3DE3
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 13:03:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B7F2D3E70
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 13:28:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727399AbfJKLDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 07:03:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40978 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726935AbfJKLDX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 07:03:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 063E5883856;
-        Fri, 11 Oct 2019 11:03:22 +0000 (UTC)
-Received: from [10.40.205.236] (unknown [10.40.205.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C7E35DAAE;
-        Fri, 11 Oct 2019 11:03:01 +0000 (UTC)
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
-        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-        Pankaj Gupta <pagupta@redhat.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Rik van Riel <riel@surriel.com>,
-        David Hildenbrand <david@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
-        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
-        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
-Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
-References: <20190812131235.27244-1-nitesh@redhat.com>
- <20190812131235.27244-2-nitesh@redhat.com>
- <CAKgT0UeKxCYtg6+aCPyxJcAGrBgvCWziUpZM6Tmw-9PSChcGVA@mail.gmail.com>
-Organization: Red Hat Inc,
-Message-ID: <be33c1fe-ce15-aaef-3f15-617fc5b792f4@redhat.com>
-Date:   Fri, 11 Oct 2019 07:02:56 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727538AbfJKL2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 07:28:53 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:37471 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727198AbfJKL2x (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 11 Oct 2019 07:28:53 -0400
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iIt6H-00052y-N4; Fri, 11 Oct 2019 13:28:49 +0200
+Date:   Fri, 11 Oct 2019 12:28:48 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Murray <andrew.murray@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: pmu: Reset sample period on overflow
+ handling
+Message-ID: <20191011122848.748da6f6@why>
+In-Reply-To: <20191008224221.GK42880@e119886-lin.cambridge.arm.com>
+References: <20191008160128.8872-1-maz@kernel.org>
+        <20191008160128.8872-6-maz@kernel.org>
+        <20191008224221.GK42880@e119886-lin.cambridge.arm.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UeKxCYtg6+aCPyxJcAGrBgvCWziUpZM6Tmw-9PSChcGVA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Fri, 11 Oct 2019 11:03:22 +0000 (UTC)
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: andrew.murray@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will@kernel.org, mark.rutland@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/19 4:36 PM, Alexander Duyck wrote:
-> On Mon, Aug 12, 2019 at 6:13 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
-> <snip>
->
->> +static int process_free_page(struct page *page,
->> +                            struct page_reporting_config *phconf, int count)
->> +{
->> +       int mt, order, ret = 0;
->> +
->> +       mt = get_pageblock_migratetype(page);
->> +       order = page_private(page);
->> +       ret = __isolate_free_page(page, order);
->> +
->> +       if (ret) {
->> +               /*
->> +                * Preserving order and migratetype for reuse while
->> +                * releasing the pages back to the buddy.
->> +                */
->> +               set_pageblock_migratetype(page, mt);
->> +               set_page_private(page, order);
->> +
->> +               sg_set_page(&phconf->sg[count++], page,
->> +                           PAGE_SIZE << order, 0);
->> +       }
->> +
->> +       return count;
->> +}
->> +
->> +/**
->> + * scan_zone_bitmap - scans the bitmap for the requested zone.
->> + * @phconf: page reporting configuration object initialized by the backend.
->> + * @zone: zone for which page reporting is requested.
->> + *
->> + * For every page marked in the bitmap it checks if it is still free if so it
->> + * isolates and adds them to a scatterlist. As soon as the number of isolated
->> + * pages reach the threshold set by the backend, they are reported to the
->> + * hypervisor by the backend. Once the hypervisor responds after processing
->> + * they are returned back to the buddy for reuse.
->> + */
->> +static void scan_zone_bitmap(struct page_reporting_config *phconf,
->> +                            struct zone *zone)
->> +{
->> +       unsigned long setbit;
->> +       struct page *page;
->> +       int count = 0;
->> +
->> +       sg_init_table(phconf->sg, phconf->max_pages);
->> +
->> +       for_each_set_bit(setbit, zone->bitmap, zone->nbits) {
->> +               /* Process only if the page is still online */
->> +               page = pfn_to_online_page((setbit << PAGE_REPORTING_MIN_ORDER) +
->> +                                         zone->base_pfn);
->> +               if (!page)
->> +                       continue;
->> +
->> +               spin_lock(&zone->lock);
->> +
->> +               /* Ensure page is still free and can be processed */
->> +               if (PageBuddy(page) && page_private(page) >=
->> +                   PAGE_REPORTING_MIN_ORDER)
->> +                       count = process_free_page(page, phconf, count);
->> +
->> +               spin_unlock(&zone->lock);
->> +               /* Page has been processed, adjust its bit and zone counter */
->> +               clear_bit(setbit, zone->bitmap);
->> +               atomic_dec(&zone->free_pages);
->> +
->> +               if (count == phconf->max_pages) {
->> +                       /* Report isolated pages to the hypervisor */
->> +                       phconf->report(phconf, count);
->> +
->> +                       /* Return processed pages back to the buddy */
->> +                       return_isolated_page(zone, phconf);
->> +
->> +                       /* Reset for next reporting */
->> +                       sg_init_table(phconf->sg, phconf->max_pages);
->> +                       count = 0;
->> +               }
->> +       }
->> +       /*
->> +        * If the number of isolated pages does not meet the max_pages
->> +        * threshold, we would still prefer to report them as we have already
->> +        * isolated them.
->> +        */
->> +       if (count) {
->> +               sg_mark_end(&phconf->sg[count - 1]);
->> +               phconf->report(phconf, count);
->> +
->> +               return_isolated_page(zone, phconf);
->> +       }
->> +}
->> +
-> So one thing that occurred to me is that this code is missing checks
-> so that it doesn't try to hint isolated pages. With the bitmap
-> approach you need an additional check so that you aren't pulling
-> isolated pages out and reporting them.
+On Tue, 8 Oct 2019 23:42:22 +0100
+Andrew Murray <andrew.murray@arm.com> wrote:
 
-I think you mean that we should not report pages of type MIGRATE_ISOLATE.
+> On Tue, Oct 08, 2019 at 05:01:28PM +0100, Marc Zyngier wrote:
+> > The PMU emulation code uses the perf event sample period to trigger
+> > the overflow detection. This works fine  for the *first* overflow
+> > handling, but results in a huge number of interrupts on the host,
+> > unrelated to the number of interrupts handled in the guest (a x20
+> > factor is pretty common for the cycle counter). On a slow system
+> > (such as a SW model), this can result in the guest only making
+> > forward progress at a glacial pace.
+> > 
+> > It turns out that the clue is in the name. The sample period is
+> > exactly that: a period. And once the an overflow has occured,
+> > the following period should be the full width of the associated
+> > counter, instead of whatever the guest had initially programed.
+> > 
+> > Reset the sample period to the architected value in the overflow
+> > handler, which now results in a number of host interrupts that is
+> > much closer to the number of interrupts in the guest.
+> > 
+> > Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  virt/kvm/arm/pmu.c | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> > 
+> > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> > index 25a483a04beb..8b524d74c68a 100644
+> > --- a/virt/kvm/arm/pmu.c
+> > +++ b/virt/kvm/arm/pmu.c
+> > @@ -442,6 +442,20 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+> >  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+> >  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> >  	int idx = pmc->idx;
+> > +	u64 period;
+> > +
+> > +	/*
+> > +	 * Reset the sample period to the architectural limit,
+> > +	 * i.e. the point where the counter overflows.
+> > +	 */
+> > +	period = -(local64_read(&pmc->perf_event->count));
+> > +
+> > +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> > +		period &= GENMASK(31, 0);
+> > +
+> > +	local64_set(&pmc->perf_event->hw.period_left, 0);
+> > +	pmc->perf_event->attr.sample_period = period;
+> > +	pmc->perf_event->hw.sample_period = period;  
+> 
+> I believe that above, you are reducing the period by the amount period_left
+> would have been - they cancel each other out.
 
-The current code on which I am working, I have added the
-is_migrate_isolate_page() check
-to ensure that I am not processing these pages.
+That's not what I see happening, having put some traces:
 
+ kvm_pmu_perf_overflow: count = 308 left = 129
+ kvm_pmu_perf_overflow: count = 409 left = 47
+ kvm_pmu_perf_overflow: count = 585 left = 223
+ kvm_pmu_perf_overflow: count = 775 left = 413
+ kvm_pmu_perf_overflow: count = 1368 left = 986
+ kvm_pmu_perf_overflow: count = 2086 left = 1716
+ kvm_pmu_perf_overflow: count = 958 left = 584
+ kvm_pmu_perf_overflow: count = 1907 left = 1551
+ kvm_pmu_perf_overflow: count = 7292 left = 6932
+
+although I've now moved the stop/start calls inside the overflow
+handler so that I don't have to mess with the PMU backend.
+
+> Given that kvm_pmu_perf_overflow is now always called between a
+> cpu_pmu->pmu.stop and a cpu_pmu->pmu.start, it means armpmu_event_update
+> has been called prior to this function, and armpmu_event_set_period will
+> be called after...
+> 
+> Therefore, I think the above could be reduced to:
+> 
+> +	/*
+> +	 * Reset the sample period to the architectural limit,
+> +	 * i.e. the point where the counter overflows.
+> +	 */
+> +	u64 period = GENMASK(63, 0);
+> +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> +		period = GENMASK(31, 0);
+> +
+> +	pmc->perf_event->attr.sample_period = period;
+> +	pmc->perf_event->hw.sample_period = period;
+> 
+> This is because armpmu_event_set_period takes into account the overflow
+> and the counter wrapping via the "if (unlikely(left <= 0)) {" block.
+
+I think that's an oversimplification. As shown above, the counter has
+moved forward, and there is a delta to be accounted for.
+
+> Though this code confuses me easily, so I may be talking rubbish.
+
+Same here! ;-)
+
+> 
+> >  
+> >  	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
+> >  
+> > @@ -557,6 +571,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  	attr.exclude_host = 1; /* Don't count host events */
+> >  	attr.config = (pmc->idx == ARMV8_PMU_CYCLE_IDX) ?
+> >  		ARMV8_PMUV3_PERFCTR_CPU_CYCLES : eventsel;
+> > +	attr.config1 = PERF_ATTR_CFG1_RELOAD_EVENT;  
+> 
+> I'm not sure that this flag, or patch 4 is really needed. As the perf
+> events created by KVM are pinned to the task and exclude_(host,hv) are set -
+> I think the perf event is not active at this point. Therefore if you change
+> the sample period, you can wait until the perf event gets scheduled back in
+> (when you return to the guest) where it's call to pmu.start will result in
+> armpmu_event_set_period being called. In other words the pmu.start and
+> pmu.stop you add in patch 4 is effectively being done for you by perf when
+> the KVM task is switched out.
+> 
+> I'd be interested to see if the following works:
+> 
+> +	WARN_ON(pmc->perf_event->state == PERF_EVENT_STATE_ACTIVE)
+> +
+> +	/*
+> +	 * Reset the sample period to the architectural limit,
+> +	 * i.e. the point where the counter overflows.
+> +	 */
+> +	u64 period = GENMASK(63, 0);
+> +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> +		period = GENMASK(31, 0);
+> +
+> +	pmc->perf_event->attr.sample_period = period;
+> +	pmc->perf_event->hw.sample_period = period;
+> 
+> >  
+> >  	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
+> >    
+
+The warning fires, which is expected: for event to be inactive, you
+need to have the vcpu being scheduled out. When the PMU interrupt
+fires, it is bound to preempt the vcpu itself, and the event is of
+course still active.
+
+> What about ARM 32 bit support for this?
+
+What about it? 32bit KVM/arm doesn't support the PMU at all. A 32bit
+guest on a 64bit host could use the PMU just fine (it is just that
+32bit Linux doesn't have a PMUv3 driver -- I had patches for that, but
+they never made it upstream).
+
+Thanks,
+
+	M.
 -- 
-Thanks
-Nitesh
+Jazz is not dead. It just smells funny...
