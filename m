@@ -2,166 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 543BFD3C06
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 11:12:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13DFFD3DE3
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 13:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727581AbfJKJMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 05:12:52 -0400
-Received: from foss.arm.com ([217.140.110.172]:54074 "EHLO foss.arm.com"
+        id S1727399AbfJKLDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 07:03:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40978 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726555AbfJKJMw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 05:12:52 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A26FD337;
-        Fri, 11 Oct 2019 02:12:51 -0700 (PDT)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C3573F703;
-        Fri, 11 Oct 2019 02:12:50 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 2/3] pci: use uint64_t for unsigned long
- values
-To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Cc:     jmattson@google.com
-References: <20191010183506.129921-1-morbo@google.com>
- <20191010183506.129921-3-morbo@google.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <81990077-23b0-b150-1373-2bb5734d4f23@arm.com>
-Date:   Fri, 11 Oct 2019 10:12:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+        id S1726935AbfJKLDX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 07:03:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 063E5883856;
+        Fri, 11 Oct 2019 11:03:22 +0000 (UTC)
+Received: from [10.40.205.236] (unknown [10.40.205.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C7E35DAAE;
+        Fri, 11 Oct 2019 11:03:01 +0000 (UTC)
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, virtio-dev@lists.oasis-open.org,
+        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+        Pankaj Gupta <pagupta@redhat.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Rik van Riel <riel@surriel.com>,
+        David Hildenbrand <david@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>,
+        john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
+        Michal Hocko <mhocko@suse.com>, cohuck@redhat.com
+Subject: Re: [RFC][Patch v12 1/2] mm: page_reporting: core infrastructure
+References: <20190812131235.27244-1-nitesh@redhat.com>
+ <20190812131235.27244-2-nitesh@redhat.com>
+ <CAKgT0UeKxCYtg6+aCPyxJcAGrBgvCWziUpZM6Tmw-9PSChcGVA@mail.gmail.com>
+Organization: Red Hat Inc,
+Message-ID: <be33c1fe-ce15-aaef-3f15-617fc5b792f4@redhat.com>
+Date:   Fri, 11 Oct 2019 07:02:56 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191010183506.129921-3-morbo@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAKgT0UeKxCYtg6+aCPyxJcAGrBgvCWziUpZM6Tmw-9PSChcGVA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Fri, 11 Oct 2019 11:03:22 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On 10/10/19 7:35 PM, Bill Wendling wrote:
-> The "pci_bar_*" functions work with unsigned long values, but were using
-> uint32_t for the data types. Clang complains about this. So we bump up
-> the type to uint64_t.
-
-Your patch might fix the warning, but the bar functions were returning 32 bits 
-because the bars are 32 bits and because they are being read using functions 
-that return 32 bit values.
-
+On 10/10/19 4:36 PM, Alexander Duyck wrote:
+> On Mon, Aug 12, 2019 at 6:13 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+> <snip>
 >
->    lib/pci.c:110:3: error: implicit conversion from 'unsigned long' to 'uint32_t' (aka 'unsigned int') changes value from 18446744073709551612 to 4294967292 [-Werror,-Wconstant-conversion]
->                    PCI_BASE_ADDRESS_IO_MASK : PCI_BASE_ADDRESS_MEM_MASK;
->                  ^~~~~~~~~~~~~~~~~~~~~~~~
->    /usr/local/google/home/morbo/kvm-unit-tests/lib/linux/pci_regs.h:100:36: note: expanded from macro 'PCI_BASE_ADDRESS_IO_MASK'
->    #define  PCI_BASE_ADDRESS_IO_MASK       (~0x03UL)
->                                             ^~~~~~~
->    lib/pci.c:110:30: error: implicit conversion from 'unsigned long' to 'uint32_t' (aka 'unsigned int') changes value from 18446744073709551600 to 4294967280 [-Werror,-Wconstant-conversion]
->                    PCI_BASE_ADDRESS_IO_MASK : PCI_BASE_ADDRESS_MEM_MASK;
->                                             ^~~~~~~~~~~~~~~~~~~~~~~~~
->    /usr/local/google/home/morbo/kvm-unit-tests/lib/linux/pci_regs.h:99:37: note: expanded from macro 'PCI_BASE_ADDRESS_MEM_MASK'
->    #define  PCI_BASE_ADDRESS_MEM_MASK      (~0x0fUL)
+>> +static int process_free_page(struct page *page,
+>> +                            struct page_reporting_config *phconf, int count)
+>> +{
+>> +       int mt, order, ret = 0;
+>> +
+>> +       mt = get_pageblock_migratetype(page);
+>> +       order = page_private(page);
+>> +       ret = __isolate_free_page(page, order);
+>> +
+>> +       if (ret) {
+>> +               /*
+>> +                * Preserving order and migratetype for reuse while
+>> +                * releasing the pages back to the buddy.
+>> +                */
+>> +               set_pageblock_migratetype(page, mt);
+>> +               set_page_private(page, order);
+>> +
+>> +               sg_set_page(&phconf->sg[count++], page,
+>> +                           PAGE_SIZE << order, 0);
+>> +       }
+>> +
+>> +       return count;
+>> +}
+>> +
+>> +/**
+>> + * scan_zone_bitmap - scans the bitmap for the requested zone.
+>> + * @phconf: page reporting configuration object initialized by the backend.
+>> + * @zone: zone for which page reporting is requested.
+>> + *
+>> + * For every page marked in the bitmap it checks if it is still free if so it
+>> + * isolates and adds them to a scatterlist. As soon as the number of isolated
+>> + * pages reach the threshold set by the backend, they are reported to the
+>> + * hypervisor by the backend. Once the hypervisor responds after processing
+>> + * they are returned back to the buddy for reuse.
+>> + */
+>> +static void scan_zone_bitmap(struct page_reporting_config *phconf,
+>> +                            struct zone *zone)
+>> +{
+>> +       unsigned long setbit;
+>> +       struct page *page;
+>> +       int count = 0;
+>> +
+>> +       sg_init_table(phconf->sg, phconf->max_pages);
+>> +
+>> +       for_each_set_bit(setbit, zone->bitmap, zone->nbits) {
+>> +               /* Process only if the page is still online */
+>> +               page = pfn_to_online_page((setbit << PAGE_REPORTING_MIN_ORDER) +
+>> +                                         zone->base_pfn);
+>> +               if (!page)
+>> +                       continue;
+>> +
+>> +               spin_lock(&zone->lock);
+>> +
+>> +               /* Ensure page is still free and can be processed */
+>> +               if (PageBuddy(page) && page_private(page) >=
+>> +                   PAGE_REPORTING_MIN_ORDER)
+>> +                       count = process_free_page(page, phconf, count);
+>> +
+>> +               spin_unlock(&zone->lock);
+>> +               /* Page has been processed, adjust its bit and zone counter */
+>> +               clear_bit(setbit, zone->bitmap);
+>> +               atomic_dec(&zone->free_pages);
+>> +
+>> +               if (count == phconf->max_pages) {
+>> +                       /* Report isolated pages to the hypervisor */
+>> +                       phconf->report(phconf, count);
+>> +
+>> +                       /* Return processed pages back to the buddy */
+>> +                       return_isolated_page(zone, phconf);
+>> +
+>> +                       /* Reset for next reporting */
+>> +                       sg_init_table(phconf->sg, phconf->max_pages);
+>> +                       count = 0;
+>> +               }
+>> +       }
+>> +       /*
+>> +        * If the number of isolated pages does not meet the max_pages
+>> +        * threshold, we would still prefer to report them as we have already
+>> +        * isolated them.
+>> +        */
+>> +       if (count) {
+>> +               sg_mark_end(&phconf->sg[count - 1]);
+>> +               phconf->report(phconf, count);
+>> +
+>> +               return_isolated_page(zone, phconf);
+>> +       }
+>> +}
+>> +
+> So one thing that occurred to me is that this code is missing checks
+> so that it doesn't try to hint isolated pages. With the bitmap
+> approach you need an additional check so that you aren't pulling
+> isolated pages out and reporting them.
 
-I think the issue is that the mask should be 32 bits, but unsigned long is 64 
-bits on your architecture. I think it's safe to use ~0x0fU here, because we're 
-only interested in the least significant 4 bits.
+I think you mean that we should not report pages of type MIGRATE_ISOLATE.
 
-Regards,
-Alex
->                                           ^~~~~~~
->
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> ---
->   lib/pci.c | 18 +++++++++---------
->   lib/pci.h |  4 ++--
->   2 files changed, 11 insertions(+), 11 deletions(-)
->
-> diff --git a/lib/pci.c b/lib/pci.c
-> index daa33e1..e554209 100644
-> --- a/lib/pci.c
-> +++ b/lib/pci.c
-> @@ -104,13 +104,13 @@ pcidevaddr_t pci_find_dev(uint16_t vendor_id, uint16_t device_id)
->   	return PCIDEVADDR_INVALID;
->   }
->   
-> -uint32_t pci_bar_mask(uint32_t bar)
-> +uint64_t pci_bar_mask(uint32_t bar)
->   {
->   	return (bar & PCI_BASE_ADDRESS_SPACE_IO) ?
->   		PCI_BASE_ADDRESS_IO_MASK : PCI_BASE_ADDRESS_MEM_MASK;
->   }
->   
-> -uint32_t pci_bar_get(struct pci_dev *dev, int bar_num)
-> +uint64_t pci_bar_get(struct pci_dev *dev, int bar_num)
->   {
->   	ASSERT_BAR_NUM(bar_num);
->   
-> @@ -120,13 +120,13 @@ uint32_t pci_bar_get(struct pci_dev *dev, int bar_num)
->   
->   static phys_addr_t __pci_bar_get_addr(struct pci_dev *dev, int bar_num)
->   {
-> -	uint32_t bar = pci_bar_get(dev, bar_num);
-> -	uint32_t mask = pci_bar_mask(bar);
-> +	uint64_t bar = pci_bar_get(dev, bar_num);
-> +	uint64_t mask = pci_bar_mask(bar);
->   	uint64_t addr = bar & mask;
->   	phys_addr_t phys_addr;
->   
->   	if (pci_bar_is64(dev, bar_num))
-> -		addr |= (uint64_t)pci_bar_get(dev, bar_num + 1) << 32;
-> +		addr |= pci_bar_get(dev, bar_num + 1) << 32;
->   
->   	phys_addr = pci_translate_addr(dev->bdf, addr);
->   	assert(phys_addr != INVALID_PHYS_ADDR);
-> @@ -189,7 +189,7 @@ static uint32_t pci_bar_size_helper(struct pci_dev *dev, int bar_num)
->   
->   phys_addr_t pci_bar_size(struct pci_dev *dev, int bar_num)
->   {
-> -	uint32_t bar, size;
-> +	uint64_t bar, size;
->   
->   	size = pci_bar_size_helper(dev, bar_num);
->   	if (!size)
-> @@ -210,7 +210,7 @@ phys_addr_t pci_bar_size(struct pci_dev *dev, int bar_num)
->   
->   bool pci_bar_is_memory(struct pci_dev *dev, int bar_num)
->   {
-> -	uint32_t bar = pci_bar_get(dev, bar_num);
-> +	uint64_t bar = pci_bar_get(dev, bar_num);
->   
->   	return !(bar & PCI_BASE_ADDRESS_SPACE_IO);
->   }
-> @@ -222,7 +222,7 @@ bool pci_bar_is_valid(struct pci_dev *dev, int bar_num)
->   
->   bool pci_bar_is64(struct pci_dev *dev, int bar_num)
->   {
-> -	uint32_t bar = pci_bar_get(dev, bar_num);
-> +	uint64_t bar = pci_bar_get(dev, bar_num);
->   
->   	if (bar & PCI_BASE_ADDRESS_SPACE_IO)
->   		return false;
-> @@ -234,7 +234,7 @@ bool pci_bar_is64(struct pci_dev *dev, int bar_num)
->   void pci_bar_print(struct pci_dev *dev, int bar_num)
->   {
->   	phys_addr_t size, start, end;
-> -	uint32_t bar;
-> +	uint64_t bar;
->   
->   	if (!pci_bar_is_valid(dev, bar_num))
->   		return;
-> diff --git a/lib/pci.h b/lib/pci.h
-> index 689f03c..cd12938 100644
-> --- a/lib/pci.h
-> +++ b/lib/pci.h
-> @@ -60,8 +60,8 @@ extern pcidevaddr_t pci_find_dev(uint16_t vendor_id, uint16_t device_id);
->   extern phys_addr_t pci_bar_get_addr(struct pci_dev *dev, int bar_num);
->   extern void pci_bar_set_addr(struct pci_dev *dev, int bar_num, phys_addr_t addr);
->   extern phys_addr_t pci_bar_size(struct pci_dev *dev, int bar_num);
-> -extern uint32_t pci_bar_get(struct pci_dev *dev, int bar_num);
-> -extern uint32_t pci_bar_mask(uint32_t bar);
-> +extern uint64_t pci_bar_get(struct pci_dev *dev, int bar_num);
-> +extern uint64_t pci_bar_mask(uint32_t bar);
->   extern bool pci_bar_is64(struct pci_dev *dev, int bar_num);
->   extern bool pci_bar_is_memory(struct pci_dev *dev, int bar_num);
->   extern bool pci_bar_is_valid(struct pci_dev *dev, int bar_num);
+The current code on which I am working, I have added the
+is_migrate_isolate_page() check
+to ensure that I am not processing these pages.
+
+-- 
+Thanks
+Nitesh
