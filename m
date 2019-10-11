@@ -2,33 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08745D4554
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 18:25:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A84AD4582
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 18:36:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728360AbfJKQZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 12:25:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58862 "EHLO mx1.redhat.com"
+        id S1728322AbfJKQgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 12:36:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58264 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726331AbfJKQZE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 12:25:04 -0400
+        id S1726331AbfJKQgk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 12:36:40 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4315CC01B808;
-        Fri, 11 Oct 2019 16:25:04 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9DD6F68835;
+        Fri, 11 Oct 2019 16:36:39 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9200560A9F;
-        Fri, 11 Oct 2019 16:25:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AA0B060600;
+        Fri, 11 Oct 2019 16:36:32 +0000 (UTC)
 Subject: Re: [kvm-unit-tests PATCH] lib: use an argument which doesn't require
  default argument promotion
+From:   Thomas Huth <thuth@redhat.com>
 To:     David Hildenbrand <david@redhat.com>,
         Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
         =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-References: <CAGG=3QUL_OrjaWn+gF4z-R8brR2=3661hGk0uUAK2y8Dff7Mvg@mail.gmail.com>
- <986a6fc2-ef7b-4df4-8d4e-a4ab94238b32@redhat.com>
 Cc:     David Gibson <dgibson@redhat.com>,
         Laurent Vivier <lvivier@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
+References: <CAGG=3QUL_OrjaWn+gF4z-R8brR2=3661hGk0uUAK2y8Dff7Mvg@mail.gmail.com>
+ <986a6fc2-ef7b-4df4-8d4e-a4ab94238b32@redhat.com>
+ <30edb4bd-535d-d29c-3f4e-592adfa41163@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -73,143 +74,155 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <30edb4bd-535d-d29c-3f4e-592adfa41163@redhat.com>
-Date:   Fri, 11 Oct 2019 18:24:59 +0200
+Message-ID: <7f7fa66f-9e6c-2e48-03b2-64ebca36df99@redhat.com>
+Date:   Fri, 11 Oct 2019 18:36:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <986a6fc2-ef7b-4df4-8d4e-a4ab94238b32@redhat.com>
+In-Reply-To: <30edb4bd-535d-d29c-3f4e-592adfa41163@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 11 Oct 2019 16:25:04 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 11 Oct 2019 16:36:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/10/2019 16.19, David Hildenbrand wrote:
-> On 10.09.19 01:11, Bill Wendling wrote:
->> Clang warns that passing an object that undergoes default argument
->> promotion to "va_start" is undefined behavior:
+On 11/10/2019 18.24, Thomas Huth wrote:
+> On 11/10/2019 16.19, David Hildenbrand wrote:
+>> On 10.09.19 01:11, Bill Wendling wrote:
+>>> Clang warns that passing an object that undergoes default argument
+>>> promotion to "va_start" is undefined behavior:
+>>>
+>>> lib/report.c:106:15: error: passing an object that undergoes default
+>>> argument promotion to 'va_start' has undefined behavior
+>>> [-Werror,-Wvarargs]
+>>>          va_start(va, pass);
+>>>
+>>> Using an "unsigned" type removes the need for argument promotion.
+>>>
+>>> Signed-off-by: Bill Wendling <morbo@google.com>
+>>> ---
+>>>   lib/libcflat.h | 4 ++--
+>>>   lib/report.c   | 6 +++---
+>>>   2 files changed, 5 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/lib/libcflat.h b/lib/libcflat.h
+>>> index b94d0ac..b6635d9 100644
+>>> --- a/lib/libcflat.h
+>>> +++ b/lib/libcflat.h
+>>> @@ -99,9 +99,9 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
+>>>    __attribute__((format(printf, 1, 2)));
+>>>   extern void report_prefix_push(const char *prefix);
+>>>   extern void report_prefix_pop(void);
+>>> -extern void report(const char *msg_fmt, bool pass, ...)
+>>> +extern void report(const char *msg_fmt, unsigned pass, ...)
+>>>    __attribute__((format(printf, 1, 3)));
+>>> -extern void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
+>>> +extern void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
+>>>    __attribute__((format(printf, 1, 4)));
+>>>   extern void report_abort(const char *msg_fmt, ...)
+>>>    __attribute__((format(printf, 1, 2)))
+>>> diff --git a/lib/report.c b/lib/report.c
+>>> index ca9b4fd..7d259f6 100644
+>>> --- a/lib/report.c
+>>> +++ b/lib/report.c
+>>> @@ -81,7 +81,7 @@ void report_prefix_pop(void)
+>>>   }
+>>>
+>>>   static void va_report(const char *msg_fmt,
+>>> - bool pass, bool xfail, bool skip, va_list va)
+>>> + unsigned pass, bool xfail, bool skip, va_list va)
+>>>   {
+>>>    const char *prefix = skip ? "SKIP"
+>>>      : xfail ? (pass ? "XPASS" : "XFAIL")
+>>> @@ -104,7 +104,7 @@ static void va_report(const char *msg_fmt,
+>>>    spin_unlock(&lock);
+>>>   }
+>>>
+>>> -void report(const char *msg_fmt, bool pass, ...)
+>>> +void report(const char *msg_fmt, unsigned pass, ...)
+>>>   {
+>>>    va_list va;
+>>>    va_start(va, pass);
+>>> @@ -112,7 +112,7 @@ void report(const char *msg_fmt, bool pass, ...)
+>>>    va_end(va);
+>>>   }
+>>>
+>>> -void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
+>>> +void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
+>>>   {
+>>>    va_list va;
+>>>    va_start(va, pass);
+>>>
 >>
->> lib/report.c:106:15: error: passing an object that undergoes default
->> argument promotion to 'va_start' has undefined behavior
->> [-Werror,-Wvarargs]
->>          va_start(va, pass);
+>> This patch breaks the selftest on s390x:
 >>
->> Using an "unsigned" type removes the need for argument promotion.
+>> t460s: ~/git/kvm-unit-tests (kein Branch, Rebase von Branch master im Gange) $ ./run_tests.sh 
+>> FAIL selftest-setup (14 tests, 2 unexpected failures)
 >>
->> Signed-off-by: Bill Wendling <morbo@google.com>
->> ---
->>   lib/libcflat.h | 4 ++--
->>   lib/report.c   | 6 +++---
->>   2 files changed, 5 insertions(+), 5 deletions(-)
+>> t460s: ~/git/kvm-unit-tests (kein Branch, Rebase von Branch master im Gange) $ cat logs/selftest-setup.log 
+>> timeout -k 1s --foreground 90s /usr/bin/qemu-system-s390x -nodefaults -nographic -machine s390-ccw-virtio,accel=tcg -chardev stdio,id=con0 -device sclpconsole,chardev=con0 -kernel s390x/selftest.elf -smp 1 -append test 123 # -initrd /tmp/tmp.JwIjS9RWlv
+>> PASS: selftest: true
+>> PASS: selftest: argc == 3
+>> PASS: selftest: argv[0] == PROGNAME
+>> PASS: selftest: argv[1] == test
+>> PASS: selftest: argv[2] == 123
+>> PASS: selftest: 3.0/2.0 == 1.5
+>> PASS: selftest: Program interrupt: expected(1) == received(1)
+>> PASS: selftest: Program interrupt: expected(5) == received(5)
+>> FAIL: selftest: malloc: got vaddr
+>> PASS: selftest: malloc: access works
+>> FAIL: selftest: malloc: got 2nd vaddr
+>> PASS: selftest: malloc: access works
+>> PASS: selftest: malloc: addresses differ
+>> PASS: selftest: Program interrupt: expected(5) == received(5)
+>> SUMMARY: 14 tests, 2 unexpected failures
 >>
->> diff --git a/lib/libcflat.h b/lib/libcflat.h
->> index b94d0ac..b6635d9 100644
->> --- a/lib/libcflat.h
->> +++ b/lib/libcflat.h
->> @@ -99,9 +99,9 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
->>    __attribute__((format(printf, 1, 2)));
->>   extern void report_prefix_push(const char *prefix);
->>   extern void report_prefix_pop(void);
->> -extern void report(const char *msg_fmt, bool pass, ...)
->> +extern void report(const char *msg_fmt, unsigned pass, ...)
->>    __attribute__((format(printf, 1, 3)));
->> -extern void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
->> +extern void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
->>    __attribute__((format(printf, 1, 4)));
->>   extern void report_abort(const char *msg_fmt, ...)
->>    __attribute__((format(printf, 1, 2)))
->> diff --git a/lib/report.c b/lib/report.c
->> index ca9b4fd..7d259f6 100644
->> --- a/lib/report.c
->> +++ b/lib/report.c
->> @@ -81,7 +81,7 @@ void report_prefix_pop(void)
->>   }
+>> EXIT: STATUS=3
 >>
->>   static void va_report(const char *msg_fmt,
->> - bool pass, bool xfail, bool skip, va_list va)
->> + unsigned pass, bool xfail, bool skip, va_list va)
->>   {
->>    const char *prefix = skip ? "SKIP"
->>      : xfail ? (pass ? "XPASS" : "XFAIL")
->> @@ -104,7 +104,7 @@ static void va_report(const char *msg_fmt,
->>    spin_unlock(&lock);
->>   }
 >>
->> -void report(const char *msg_fmt, bool pass, ...)
->> +void report(const char *msg_fmt, unsigned pass, ...)
->>   {
->>    va_list va;
->>    va_start(va, pass);
->> @@ -112,7 +112,7 @@ void report(const char *msg_fmt, bool pass, ...)
->>    va_end(va);
->>   }
 >>
->> -void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
->> +void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
->>   {
->>    va_list va;
->>    va_start(va, pass);
+>> A fix for the test would look like this:
 >>
+>> diff --git a/s390x/selftest.c b/s390x/selftest.c
+>> index f4acdc4..dc1c476 100644
+>> --- a/s390x/selftest.c
+>> +++ b/s390x/selftest.c
+>> @@ -49,9 +49,10 @@ static void test_malloc(void)
+>>         *tmp2 = 123456789;
+>>         mb();
+>>  
+>> -       report("malloc: got vaddr", (uintptr_t)tmp & 0xf000000000000000ul);
+>> +       report("malloc: got vaddr", !!((uintptr_t)tmp & 0xf000000000000000ul));
+>>         report("malloc: access works", *tmp == 123456789);
+>> -       report("malloc: got 2nd vaddr", (uintptr_t)tmp2 & 0xf000000000000000ul);
+>> +       report("malloc: got 2nd vaddr",
+>> +              !!((uintptr_t)tmp2 & 0xf000000000000000ul));
+>>         report("malloc: access works", (*tmp2 == 123456789));
+>>         report("malloc: addresses differ", tmp != tmp2);
+>>
+>>
+>> But I am not sure if that is the right fix.
+>>
+>> (why don't we run sanity tests to detect that, this tests works
+>> just fine with s390x TCG)
 > 
-> This patch breaks the selftest on s390x:
+> This patch also broke the test_64bit() function in powerpc/emulator.c:
 > 
-> t460s: ~/git/kvm-unit-tests (kein Branch, Rebase von Branch master im Gange) $ ./run_tests.sh 
-> FAIL selftest-setup (14 tests, 2 unexpected failures)
-> 
-> t460s: ~/git/kvm-unit-tests (kein Branch, Rebase von Branch master im Gange) $ cat logs/selftest-setup.log 
-> timeout -k 1s --foreground 90s /usr/bin/qemu-system-s390x -nodefaults -nographic -machine s390-ccw-virtio,accel=tcg -chardev stdio,id=con0 -device sclpconsole,chardev=con0 -kernel s390x/selftest.elf -smp 1 -append test 123 # -initrd /tmp/tmp.JwIjS9RWlv
-> PASS: selftest: true
-> PASS: selftest: argc == 3
-> PASS: selftest: argv[0] == PROGNAME
-> PASS: selftest: argv[1] == test
-> PASS: selftest: argv[2] == 123
-> PASS: selftest: 3.0/2.0 == 1.5
-> PASS: selftest: Program interrupt: expected(1) == received(1)
-> PASS: selftest: Program interrupt: expected(5) == received(5)
-> FAIL: selftest: malloc: got vaddr
-> PASS: selftest: malloc: access works
-> FAIL: selftest: malloc: got 2nd vaddr
-> PASS: selftest: malloc: access works
-> PASS: selftest: malloc: addresses differ
-> PASS: selftest: Program interrupt: expected(5) == received(5)
-> SUMMARY: 14 tests, 2 unexpected failures
-> 
-> EXIT: STATUS=3
-> 
-> 
-> 
-> A fix for the test would look like this:
-> 
-> diff --git a/s390x/selftest.c b/s390x/selftest.c
-> index f4acdc4..dc1c476 100644
-> --- a/s390x/selftest.c
-> +++ b/s390x/selftest.c
-> @@ -49,9 +49,10 @@ static void test_malloc(void)
->         *tmp2 = 123456789;
->         mb();
->  
-> -       report("malloc: got vaddr", (uintptr_t)tmp & 0xf000000000000000ul);
-> +       report("malloc: got vaddr", !!((uintptr_t)tmp & 0xf000000000000000ul));
->         report("malloc: access works", *tmp == 123456789);
-> -       report("malloc: got 2nd vaddr", (uintptr_t)tmp2 & 0xf000000000000000ul);
-> +       report("malloc: got 2nd vaddr",
-> +              !!((uintptr_t)tmp2 & 0xf000000000000000ul));
->         report("malloc: access works", (*tmp2 == 123456789));
->         report("malloc: addresses differ", tmp != tmp2);
-> 
-> 
-> But I am not sure if that is the right fix.
-> 
-> (why don't we run sanity tests to detect that, this tests works
-> just fine with s390x TCG)
+>  https://gitlab.com/huth/kvm-unit-tests/-/jobs/318694752
 
-This patch also broke the test_64bit() function in powerpc/emulator.c:
+... and I think it even broke the intel_iommu test:
 
- https://gitlab.com/huth/kvm-unit-tests/-/jobs/318694752
+ https://gitlab.com/huth/kvm-unit-tests/-/jobs/318694755
+ https://travis-ci.com/huth/kvm-unit-tests/jobs/244827719#L1087
+
+... why did nobody notice at least that one?
+
+(I strongly like to recommend to run either Travis or gitlab-ci on
+changes in the common lib/ directory first, to see whether it breaks
+anything for the other architectures)
 
  Thomas
