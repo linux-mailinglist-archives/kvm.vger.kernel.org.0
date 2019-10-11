@@ -2,52 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24D33D4896
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 21:41:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C20BDD4897
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 21:41:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729050AbfJKTlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 15:41:05 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:55460 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728889AbfJKTlE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 15:41:04 -0400
-Received: by mail-pl1-f202.google.com with SMTP id g11so6628785plm.22
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2019 12:41:04 -0700 (PDT)
+        id S1729052AbfJKTlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 15:41:10 -0400
+Received: from mail-vk1-f202.google.com ([209.85.221.202]:56314 "EHLO
+        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729014AbfJKTlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 15:41:10 -0400
+Received: by mail-vk1-f202.google.com with SMTP id n79so3808907vkf.22
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2019 12:41:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=a2OnAlUknYYYhqmTtsWzMoB6MeANxh1WTSsk/O3pEpc=;
-        b=YsNz8AkLaJTQgxGg+QXyX7+VAOL658TEwLUVIt2UyEElxsB9w9xx7Kv9SNZ99ASNpL
-         7wA1UC0SuVgts76d+xOlhthD22u7ZNz8czQrbPLL0qncZqfoqoBcnmJEGB+QVk9+PFZJ
-         NLONgR2T+ONKOz8J4r1OQdtf0ICxHLoV7I5MG80koaqghzr5knRs+JuaZVcWnx5z9kvD
-         +par5b+WwGc0gRJ39JaWzJou/mId036IkIE/tlf9MOcR8l07OmZzBG82tYBVCpfVdps/
-         Z/JGv+iFv+aT/zVihfXWzQhWqiSTaWeSbfaOu6OFselIaR2m6G13X0lsIFRv7DS0K9qZ
-         O2fA==
+        bh=ON/0K3CYe4fzFmLLTzBkiEEMt0N/ljXg9UJFmSda9AA=;
+        b=QbSuIu//nhva29h/Kq00Eq91V8nEPt/Yx76aazGFKY2mb7tPhGZk5L/eBFGMmX8WVV
+         4d77ZQ4bYjzJ4NJfr2bI7inlRudtlW8/IAhBtoW/kFEyp+oR8qOE81rjeih8oS7FymWd
+         mdPtAg//D/XKiVt2q9e4RIQ8g4lwjedRwAS08nfGPR5zM5ZfY8s4vmVEq+x7zFr3F5gQ
+         41KcuRhqgtDnbvMy3pfId6wEbI5etaK+//Yu5rpU0+2u0kteyxRQ8sGLPN6gdHduzdda
+         7sh1ATE+H/zcczifpX5XQaA0D1+nTPR4oiVil9wM2Jn6zyol+pPD2/fOnRugAat3bBso
+         zuhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=a2OnAlUknYYYhqmTtsWzMoB6MeANxh1WTSsk/O3pEpc=;
-        b=fPrpSOumuRdSCR8szp8FS9xMT8SRBKkGmUuRH/IGy/g+mfsMmf6F+nolF4RUiVL5K5
-         W6urerCnFyXRuaaF94SaU7FDNip50fJ5DT6/SMvkySGSBNHhnYQGnqqJz1Pbtcyl1EyI
-         Xc2DpRhitKFhse+szM4i6N/2uPEJkSih6Jky8Q93MhYsyyatJM8RQT8GGVqOZ5P9JFN9
-         E1bt0uiIGzG5m4jBMiOY/IaIsw6Um1cyhs/rt2EkV9Y0sg54wmYSE/6k6Jt9ljmrv8/n
-         2oHFUbFTi708325ocRj5sWmgyAIXcyKppdPq0YfQctHA0xZjK8BkWPwPZDO2h3+AH6EZ
-         9L/A==
-X-Gm-Message-State: APjAAAWeX4SWUqWssElzBGvzOOxA8VH8VwjjMGsjcK3d6SHJTP7FKCvv
-        T5Mt4J2kuoLMC2zmBxBN61y1HiQVVtF/AFrX
-X-Google-Smtp-Source: APXvYqw7l85FkDQ6L1kWK3acvPoCbEuO9qcCzjOECbGAivNKspaTi8oq8A/5LLOx8FISDEpbu3TuOWN5Re4jtbky
-X-Received: by 2002:a63:f40e:: with SMTP id g14mr6300583pgi.62.1570822863853;
- Fri, 11 Oct 2019 12:41:03 -0700 (PDT)
-Date:   Fri, 11 Oct 2019 12:40:29 -0700
+        bh=ON/0K3CYe4fzFmLLTzBkiEEMt0N/ljXg9UJFmSda9AA=;
+        b=CxezMqAoLj/Weuh126mdWSyJ1w9N35/gN50LCLSSmSnR9lm9ITUg3tTGpZ4mjRihED
+         HNteFIV9Qyaq7iodi8taWh4AYZaP64NPRTevBMC9Ff+SnDdFWSJoImj7vg9GplvS7Cqi
+         VyiC35+7HMCbo6d+fdKYvcHS3ViCSuQcEre5m3c/W116HSXzyXKyO+ZFxc3wdCW3wANO
+         Istw9wQvuKXccw0YSVDSW8h1n3WXTUupZcIdvgHxHJak+k4sSjL0mEvZnYiHABIcSnZT
+         oy65b+8FuH5j5oLUZxoV4agOhTaiPLxT6ir4CL5wRqrBFgdzUvLQmk7ZeESGpv3XhSUQ
+         U5Mw==
+X-Gm-Message-State: APjAAAUkJGtlvEPZ2IB0xDzZaJHyejLdvVBRMOuQpevJSiXah+FFFqfe
+        FTzUUDh058eygOZL5ONrDiL7Iq9vZj/nxrzh
+X-Google-Smtp-Source: APXvYqz3g59DaEpRZ9PIrFku/yxegH2bBPveigBehSSPq4e/c9Y4HpsDDjPkTH8cQgW3N73hXzJ7vggIUofckxiB
+X-Received: by 2002:ac5:c84c:: with SMTP id g12mr9886010vkm.23.1570822867364;
+ Fri, 11 Oct 2019 12:41:07 -0700 (PDT)
+Date:   Fri, 11 Oct 2019 12:40:30 -0700
 In-Reply-To: <20191011194032.240572-1-aaronlewis@google.com>
-Message-Id: <20191011194032.240572-3-aaronlewis@google.com>
+Message-Id: <20191011194032.240572-4-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20191011194032.240572-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [PATCH v2 2/5] KVM: VMX: Use wrmsr for switching between guest and
- host IA32_XSS
+Subject: [PATCH v2 3/5] kvm: svm: Add support for XSAVES on AMD
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     Babu Moger <Babu.Moger@amd.com>,
         Yang Weijiang <weijiang.yang@intel.com>,
@@ -62,220 +61,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set IA32_XSS for the guest and host during VM Enter and VM Exit
-transitions rather than by using the MSR-load areas.
+Hoist support for RDMSR/WRMSR of IA32_XSS from vmx into common code so
+that it can be used for AMD as well.
 
-By moving away from using the MSR-load area we can have a unified
-solution for both AMD and Intel.
+AMD has no equivalent of Intel's "Enable XSAVES/XRSTORS" VM-execution
+control. Instead, XSAVES is always available to the guest when supported
+on the host.
+
+Unfortunately, right now, kvm only allows the guest IA32_XSS to be zero,
+so the guest's usage of XSAVES will be exactly the same as XSAVEC.
 
 Reviewed-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/svm.c              |  7 +++++--
- arch/x86/kvm/vmx/vmx.c          | 22 ++++++++++------------
- arch/x86/kvm/x86.c              | 23 +++++++++++++++++++----
- arch/x86/kvm/x86.h              |  4 ++--
- 5 files changed, 37 insertions(+), 20 deletions(-)
+ arch/x86/kvm/svm.c     |  2 +-
+ arch/x86/kvm/vmx/vmx.c | 20 --------------------
+ arch/x86/kvm/x86.c     | 22 ++++++++++++++++++++++
+ 3 files changed, 23 insertions(+), 21 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 50eb430b0ad8..634c2598e389 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -562,6 +562,7 @@ struct kvm_vcpu_arch {
- 	u64 smbase;
- 	u64 smi_count;
- 	bool tpr_access_reporting;
-+	bool xsaves_enabled;
- 	u64 ia32_xss;
- 	u64 microcode_version;
- 	u64 arch_capabilities;
 diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index f8ecb6df5106..da69e95beb4d 100644
+index da69e95beb4d..1953898e37ce 100644
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -5628,7 +5628,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
- 	svm->vmcb->save.cr2 = vcpu->arch.cr2;
+@@ -5965,7 +5965,7 @@ static bool svm_mpx_supported(void)
  
- 	clgi();
--	kvm_load_guest_xcr0(vcpu);
-+	kvm_load_guest_xsave_controls(vcpu);
- 
- 	if (lapic_in_kernel(vcpu) &&
- 		vcpu->arch.apic->lapic_timer.timer_advance_ns)
-@@ -5778,7 +5778,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
- 		kvm_before_interrupt(&svm->vcpu);
- 
--	kvm_put_guest_xcr0(vcpu);
-+	kvm_load_host_xsave_controls(vcpu);
- 	stgi();
- 
- 	/* Any pending NMI will happen here */
-@@ -5887,6 +5887,9 @@ static void svm_cpuid_update(struct kvm_vcpu *vcpu)
+ static bool svm_xsaves_supported(void)
  {
- 	struct vcpu_svm *svm = to_svm(vcpu);
+-	return false;
++	return boot_cpu_has(X86_FEATURE_XSAVES);
+ }
  
-+	vcpu->arch.xsaves_enabled = guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-+				    boot_cpu_has(X86_FEATURE_XSAVES);
-+
- 	/* Update nrips enabled cache */
- 	svm->nrips_enabled = !!guest_cpuid_has(&svm->vcpu, X86_FEATURE_NRIPS);
- 
+ static bool svm_umip_emulated(void)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 409e9a7323f1..ce3020914c69 100644
+index ce3020914c69..18bea844fffc 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -106,8 +106,6 @@ module_param(enable_apicv, bool, S_IRUGO);
- static bool __read_mostly nested = 1;
- module_param(nested, bool, S_IRUGO);
- 
--static u64 __read_mostly host_xss;
--
- bool __read_mostly enable_pml = 1;
- module_param_named(pml, enable_pml, bool, S_IRUGO);
- 
-@@ -2074,11 +2072,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (data != 0)
+@@ -1818,13 +1818,6 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
  			return 1;
- 		vcpu->arch.ia32_xss = data;
--		if (vcpu->arch.ia32_xss != host_xss)
--			add_atomic_switch_msr(vmx, MSR_IA32_XSS,
--				vcpu->arch.ia32_xss, host_xss, false);
--		else
--			clear_atomic_switch_msr(vmx, MSR_IA32_XSS);
- 		break;
+ 		return vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+ 				       &msr_info->data);
+-	case MSR_IA32_XSS:
+-		if (!vmx_xsaves_supported() ||
+-		    (!msr_info->host_initiated &&
+-		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
+-			return 1;
+-		msr_info->data = vcpu->arch.ia32_xss;
+-		break;
+ 	case MSR_IA32_RTIT_CTL:
+ 		if (pt_mode != PT_MODE_HOST_GUEST)
+ 			return 1;
+@@ -2060,19 +2053,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (!nested_vmx_allowed(vcpu))
+ 			return 1;
+ 		return vmx_set_vmx_msr(vcpu, msr_index, data);
+-	case MSR_IA32_XSS:
+-		if (!vmx_xsaves_supported() ||
+-		    (!msr_info->host_initiated &&
+-		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
+-			return 1;
+-		/*
+-		 * The only supported bit as of Skylake is bit 8, but
+-		 * it is not supported on KVM.
+-		 */
+-		if (data != 0)
+-			return 1;
+-		vcpu->arch.ia32_xss = data;
+-		break;
  	case MSR_IA32_RTIT_CTL:
  		if ((pt_mode != PT_MODE_HOST_GUEST) ||
-@@ -4038,6 +4031,8 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
- 			guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
- 			guest_cpuid_has(vcpu, X86_FEATURE_XSAVES);
- 
-+		vcpu->arch.xsaves_enabled = xsaves_enabled;
-+
- 		if (!xsaves_enabled)
- 			exec_control &= ~SECONDARY_EXEC_XSAVES;
- 
-@@ -6540,7 +6535,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
- 		vmx_set_interrupt_shadow(vcpu, 0);
- 
--	kvm_load_guest_xcr0(vcpu);
-+	kvm_load_guest_xsave_controls(vcpu);
- 
- 	if (static_cpu_has(X86_FEATURE_PKU) &&
- 	    kvm_read_cr4_bits(vcpu, X86_CR4_PKE) &&
-@@ -6647,7 +6642,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 			__write_pkru(vmx->host_pkru);
- 	}
- 
--	kvm_put_guest_xcr0(vcpu);
-+	kvm_load_host_xsave_controls(vcpu);
- 
- 	vmx->nested.nested_run_pending = 0;
- 	vmx->idt_vectoring_info = 0;
-@@ -7091,6 +7086,12 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-+	/*
-+	 * This will be set back to true in vmx_compute_secondary_exec_control()
-+	 * if it should be true, so setting it to false here is okay.
-+	 */
-+	vcpu->arch.xsaves_enabled = false;
-+
- 	if (cpu_has_secondary_exec_ctrls()) {
- 		vmx_compute_secondary_exec_control(vmx);
- 		vmcs_set_secondary_exec_control(vmx);
-@@ -7599,9 +7600,6 @@ static __init int hardware_setup(void)
- 		WARN_ONCE(host_bndcfgs, "KVM: BNDCFGS in host will be lost");
- 	}
- 
--	if (boot_cpu_has(X86_FEATURE_XSAVES))
--		rdmsrl(MSR_IA32_XSS, host_xss);
--
- 	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
- 	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
- 		enable_vpid = 0;
+ 			vmx_rtit_ctl_check(vcpu, data) ||
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 661e2bf38526..a61570d7034b 100644
+index a61570d7034b..2104e21855fc 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -176,6 +176,8 @@ struct kvm_shared_msrs {
- static struct kvm_shared_msrs_global __read_mostly shared_msrs_global;
- static struct kvm_shared_msrs __percpu *shared_msrs;
- 
-+static u64 __read_mostly host_xss;
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	{ "pf_fixed", VCPU_STAT(pf_fixed) },
- 	{ "pf_guest", VCPU_STAT(pf_guest) },
-@@ -812,27 +814,37 @@ void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw)
- }
- EXPORT_SYMBOL_GPL(kvm_lmsw);
- 
--void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu)
-+void kvm_load_guest_xsave_controls(struct kvm_vcpu *vcpu)
- {
- 	if (kvm_read_cr4_bits(vcpu, X86_CR4_OSXSAVE) &&
- 			!vcpu->guest_xcr0_loaded) {
- 		/* kvm_set_xcr() also depends on this */
- 		if (vcpu->arch.xcr0 != host_xcr0)
- 			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
-+
-+		if (vcpu->arch.xsaves_enabled &&
-+		    vcpu->arch.ia32_xss != host_xss)
-+			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
-+
- 		vcpu->guest_xcr0_loaded = 1;
- 	}
- }
--EXPORT_SYMBOL_GPL(kvm_load_guest_xcr0);
-+EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_controls);
- 
--void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu)
-+void kvm_load_host_xsave_controls(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu->guest_xcr0_loaded) {
- 		if (vcpu->arch.xcr0 != host_xcr0)
- 			xsetbv(XCR_XFEATURE_ENABLED_MASK, host_xcr0);
-+
-+		if (vcpu->arch.xsaves_enabled &&
-+		    vcpu->arch.ia32_xss != host_xss)
-+			wrmsrl(MSR_IA32_XSS, host_xss);
-+
- 		vcpu->guest_xcr0_loaded = 0;
- 	}
- }
--EXPORT_SYMBOL_GPL(kvm_put_guest_xcr0);
-+EXPORT_SYMBOL_GPL(kvm_load_host_xsave_controls);
- 
- static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
- {
-@@ -9293,6 +9305,9 @@ int kvm_arch_hardware_setup(void)
- 		kvm_default_tsc_scaling_ratio = 1ULL << kvm_tsc_scaling_ratio_frac_bits;
- 	}
- 
-+	if (boot_cpu_has(X86_FEATURE_XSAVES))
-+		rdmsrl(MSR_IA32_XSS, host_xss);
-+
- 	kvm_init_msr_list();
- 	return 0;
- }
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index dbf7442a822b..0d04e865665b 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -366,7 +366,7 @@ static inline bool kvm_pat_valid(u64 data)
- 	return (data | ((data & 0x0202020202020202ull) << 1)) == data;
- }
- 
--void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu);
--void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu);
-+void kvm_load_guest_xsave_controls(struct kvm_vcpu *vcpu);
-+void kvm_load_host_xsave_controls(struct kvm_vcpu *vcpu);
- 
- #endif
+@@ -2700,6 +2700,21 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_TSC:
+ 		kvm_write_tsc(vcpu, msr_info);
+ 		break;
++	case MSR_IA32_XSS:
++		if (!kvm_x86_ops->xsaves_supported() ||
++		    (!msr_info->host_initiated &&
++		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
++			return 1;
++		/*
++		 * We do support PT if kvm_x86_ops->pt_supported(), but we do
++		 * not support IA32_XSS[bit 8]. Guests will have to use
++		 * RDMSR/WRMSR rather than XSAVES/XRSTORS to save/restore PT
++		 * MSRs.
++		 */
++		if (data != 0)
++			return 1;
++		vcpu->arch.ia32_xss = data;
++		break;
+ 	case MSR_SMI_COUNT:
+ 		if (!msr_info->host_initiated)
+ 			return 1;
+@@ -3030,6 +3045,13 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+ 		return get_msr_mce(vcpu, msr_info->index, &msr_info->data,
+ 				   msr_info->host_initiated);
++	case MSR_IA32_XSS:
++		if (!kvm_x86_ops->xsaves_supported() ||
++		    (!msr_info->host_initiated &&
++		     !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES)))
++			return 1;
++		msr_info->data = vcpu->arch.ia32_xss;
++		break;
+ 	case MSR_K7_CLK_CTL:
+ 		/*
+ 		 * Provide expected ramp-up count for K7. All other
 -- 
 2.23.0.700.g56cf767bdb-goog
 
