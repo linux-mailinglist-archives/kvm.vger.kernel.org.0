@@ -2,337 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 464E7D489A
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 21:41:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E897D4951
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 22:32:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729060AbfJKTlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 15:41:16 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:35436 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728985AbfJKTlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 15:41:16 -0400
-Received: by mail-pl1-f202.google.com with SMTP id o12so6652798pll.2
-        for <kvm@vger.kernel.org>; Fri, 11 Oct 2019 12:41:14 -0700 (PDT)
+        id S1729186AbfJKUbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 16:31:23 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:38082 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728930AbfJKUbX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 16:31:23 -0400
+Received: by mail-io1-f68.google.com with SMTP id u8so24211452iom.5
+        for <kvm@vger.kernel.org>; Fri, 11 Oct 2019 13:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=uigccOC75UQVYGcTvnAyLucq/FZ2h1PCnP1UNKyHaxs=;
-        b=spE3SI/tGJXcTgjoJJxWOj/KdkWX0410GrN0KcOwG4VW9rZYSS/wuVhc82WkTWDuo7
-         aXLJ+16OZRQAiZoRtH6JD81rsKHkXjk9thEvAq/vlxTCXpfXeifqABYSFGLK6L2higcK
-         tWDA/rvHFtPFwzQNvblwJ2PL0nKDmFbR/B8C5wy1xUC24hZKtUx3mSQRWtSbYQFoxz2s
-         Nu9g8MZ/nSBfTdGAXkIvhmjIzfKWuHGGMAVvXf95+PfPvlZUQHQzj+2XWrB8K60VQzhr
-         cdh0bcTFkAdNuWObxSUiGO3RR43qN2IKIgj386ZGkuZLxV3oCnvOrv7Pv9Q1wQdCj+z1
-         xubw==
+        bh=lQtIpCqUeRMtNnzQ8ls8iatc+M9YfN+mnKLz1N2MKoY=;
+        b=KISjVuAnSe9J2G2N/COr2s8rOK0qoujhQlFDb+YKFoGabkgDMWt+rJY7rXRcplRuy/
+         K7pCDaq5hYTWQ+LCEh7HMpR77VFRx39WQpwfa+7vwyhZgxvsNjPvO9SkUqOfDi9dwOEL
+         RWbzbgQrKYSpqD+F5BXi6olEP9wEKO4frgO9DXs/k1aEVbil2zDq+LkgT4VZRZ5lErE0
+         sIir6mvh3jiCWeK/zc0ELhodBags16jNdSseFZGxA9r0DCECo534vO/cXwX6PihG3Pm9
+         odOnxFhkFlqoWH3Hka8D7AL8BAWyeS/hhn97GzqlyZhxd7YfkF6LjBI4UdOIPL2KHq2F
+         PJzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=uigccOC75UQVYGcTvnAyLucq/FZ2h1PCnP1UNKyHaxs=;
-        b=Y0jdcw5GmJc87L63gmu9rhSwVw9Tlj8s2RWZjNDlf9BvcmPM8avl9yp/o13LuFiOPt
-         d5kbISSgBCj6jY9oxQLhe8VVWpmP9rexjGaYWjfN/XynKwf0Wk450i/SOHih3Ue8SYw0
-         MsRGsO3tCdXRGw4xVbv1lV+ehbzbCDOnW+GIdM4Buiwfz+v9qUEi6Zbet9Gb+g4SFVop
-         BTriOL+YOFewj9/pI7zmYtyHvUMNBQGoCGDIqv8v/qoZFIUWmaIk73gaKEM743KCiCrq
-         kiX2dkAAvcARZfW7bTUMGdfdR3vevvYvJYq3/92fTW5ZJ5uK+9HW2X7mJis59/u8IBS6
-         cX0g==
-X-Gm-Message-State: APjAAAWr6IufDYjuGDYUBf8L0v6pXRn/V26NAP7Z6p78E+r0oCSqMfAl
-        IX7i5e0jPvbHtBwIoINFXamBjx0KMxDxanOG
-X-Google-Smtp-Source: APXvYqzhYsMJnMSrzhwSujmHuTAOVj0OLASdf47quEOEGjwuXvyT01Gvfpa1Rn1yK7XLdGLnZYYEyOL+jhO5vpXm
-X-Received: by 2002:a63:e156:: with SMTP id h22mr18232130pgk.266.1570822874169;
- Fri, 11 Oct 2019 12:41:14 -0700 (PDT)
-Date:   Fri, 11 Oct 2019 12:40:32 -0700
-In-Reply-To: <20191011194032.240572-1-aaronlewis@google.com>
-Message-Id: <20191011194032.240572-6-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20191011194032.240572-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [PATCH v2 5/5] kvm: tests: Add test to verify MSR_IA32_XSS
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     Babu Moger <Babu.Moger@amd.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Aaron Lewis <aaronlewis@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lQtIpCqUeRMtNnzQ8ls8iatc+M9YfN+mnKLz1N2MKoY=;
+        b=qIJokrWA4Onfo+s39QrfBJsp+xO0ElZg9QsVuJM6It7F2T4eROonjTHQupDaJHSF6y
+         gaRlWvjt8wPf6Ew5dv8dyUyTq4tG50GybpGmSII1dn2zM3EGcS2LA8F0/qnMPpf4Rvwz
+         ujt/ZLhp9lJeUp2w4R/htEmCVqqieXQvrWuubkXNxY6lPPmvu/MCsRnIkkM3Erh5JYeY
+         T0vlpIzLxKLbaCLEg6+dQpjGkdEd3aZIK3cCKKlzT6U9azTBdQG/TLoXwi6WkN1yPCh8
+         W3rNtuWQExXvoXZnZeo8ndYIz0/P2APXgJakL5QCsg6nqodSIjetH9OqdEtMJvpm+/j5
+         isDw==
+X-Gm-Message-State: APjAAAUhS3Qjus188f1ZPevo3SDsGNpVyuoDPmlKwaGTf4x6vS8/Fl4G
+        ajkNkIB4Gy2+Z8hI4R3yVvt3Wd1jfshP0lgdvbt1pQ==
+X-Google-Smtp-Source: APXvYqxnyDJFKHvj6FgQUFn0LQRVE/S+usuUfmhao2k7voBMhuu06zhCI78zyjDAG1Uc6rOTP4k1tw6Iq5YhmkvwUQU=
+X-Received: by 2002:a6b:ee07:: with SMTP id i7mr12618562ioh.26.1570825880204;
+ Fri, 11 Oct 2019 13:31:20 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190917085304.16987-1-weijiang.yang@intel.com> <20190917085304.16987-2-weijiang.yang@intel.com>
+In-Reply-To: <20190917085304.16987-2-weijiang.yang@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 11 Oct 2019 13:31:08 -0700
+Message-ID: <CALMp9eT+P5QTGy=LfZzMozkTC7jdEhbupbfza2tTE3U1grtZkQ@mail.gmail.com>
+Subject: Re: [PATCH v5 1/9] Documentation: Introduce EPT based Subpage Protection
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that calling get and set for MSR_IA32_XSS returns expected results.
+On Tue, Sep 17, 2019 at 1:52 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
+>
+> Co-developed-by: yi.z.zhang@linux.intel.com
+> Signed-off-by: yi.z.zhang@linux.intel.com
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  Documentation/virtual/kvm/spp_kvm.txt | 178 ++++++++++++++++++++++++++
+>  1 file changed, 178 insertions(+)
+>  create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
+>
+> diff --git a/Documentation/virtual/kvm/spp_kvm.txt b/Documentation/virtual/kvm/spp_kvm.txt
+> new file mode 100644
+> index 000000000000..1bd1c11d0a99
+> --- /dev/null
+> +++ b/Documentation/virtual/kvm/spp_kvm.txt
+> @@ -0,0 +1,178 @@
+> +EPT-Based Sub-Page Protection (SPP) for KVM
+> +====================================================
+> +
+> +1.Overview
+> +  EPT-based Sub-Page Protection(SPP) allows VMM to specify
+> +  fine-grained(128byte per sub-page) write-protection for guest physical
+> +  memory. When it's enabled, the CPU enforces write-access permission
+> +  for the sub-pages within a 4KB page, if corresponding bit is set in
+> +  permission vector, write to sub-page region is allowed, otherwise,
+> +  it's prevented with a EPT violation.
+> +
+> +  *Note*: In current implementation, SPP is exclusive with nested flag,
+> +  if it's on, SPP feature won't work.
+> +
+> +2.SPP Operation
+> +  Sub-Page Protection Table (SPPT) is introduced to manage sub-page
+> +  write-access permission.
+> +
+> +  It is active when:
+> +  a) nested flag is turned off.
+> +  b) "sub-page write protection" VM-execution control is 1.
+> +  c) SPP is initialized with KVM_INIT_SPP ioctl.
+> +  d) Sub-page permissions are set with KVM_SUBPAGES_SET_ACCESS ioctl.
+> +     see below sections for details.
+> +
+> +  __________________________________________________________________________
+> +
+> +  How SPP hardware works:
+> +  __________________________________________________________________________
+> +
+> +  Guest write access --> GPA --> Walk EPT --> EPT leaf entry -----|
+> +  |---------------------------------------------------------------|
+> +  |-> if VMexec_control.spp && ept_leaf_entry.spp_bit (bit 61)
+> +       |
+> +       |-> <false> --> EPT legacy behavior
+> +       |
+> +       |
+> +       |-> <true>  --> if ept_leaf_entry.writable
+> +                        |
+> +                        |-> <true>  --> Ignore SPP
+> +                        |
+> +                        |-> <false> --> GPA --> Walk SPP 4-level table--|
+> +                                                                        |
+> +  |------------<----------get-the-SPPT-point-from-VMCS-filed-----<------|
+/filed/field/
+> +  |
+> +  Walk SPP L4E table
+> +  |
+> +  |---> if-entry-misconfiguration ------------>-------|-------<---------|
+> +   |                                                  |                 |
+> +  else                                                |                 |
+> +   |                                                  |                 |
+> +   |   |------------------SPP VMexit<-----------------|                 |
+> +   |   |                                                                |
+> +   |   |-> exit_qualification & sppt_misconfig --> sppt misconfig       |
+> +   |   |                                                                |
+> +   |   |-> exit_qualification & sppt_miss --> sppt miss                 |
+> +   |---|                                                                |
+> +       |                                                                |
+> +  walk SPPT L3E--|--> if-entry-misconfiguration------------>------------|
+> +                 |                                                      |
+> +                else                                                    |
+> +                 |                                                      |
+> +                 |                                                      |
+> +          walk SPPT L2E --|--> if-entry-misconfiguration-------->-------|
+> +                          |                                             |
+> +                         else                                           |
+> +                          |                                             |
+> +                          |                                             |
+> +                   walk SPPT L1E --|-> if-entry-misconfiguration--->----|
+> +                                   |
+> +                                 else
+> +                                   |
+> +                                   |-> if sub-page writable
+> +                                   |-> <true>  allow, write access
+> +                                   |-> <false> disallow, EPT violation
+> +  ______________________________________________________________________________
+> +
+> +3.IOCTL Interfaces
+> +
+> +    KVM_INIT_SPP:
+> +    Allocate storage for sub-page permission vectors and SPPT root page.
+> +
+> +    KVM_SUBPAGES_GET_ACCESS:
+> +    Get sub-page write permission vectors for given continuous guest pages.
+/continuous/contiguous/
+> +
+> +    KVM_SUBPAGES_SET_ACCESS
+> +    Set SPP bit in EPT leaf entries for given continuous guest pages. The
+/continuous/contiguous/
+> +    actual SPPT setup is triggered when SPP miss vm-exit is handled.
+> +
+> +    /* for KVM_SUBPAGES_GET_ACCESS and KVM_SUBPAGES_SET_ACCESS */
+> +    struct kvm_subpage_info {
+> +       __u64 gfn; /* the first page gfn of the continuous pages */
+/continuous/contiguous/
+> +       __u64 npages; /* number of 4K pages */
+> +       __u64 *access_map; /* sub-page write-access bitmap array */
+> +    };
+> +
+> +    #define KVM_SUBPAGES_GET_ACCESS   _IOR(KVMIO,  0x49, __u64)
+> +    #define KVM_SUBPAGES_SET_ACCESS   _IOW(KVMIO,  0x4a, __u64)
+> +    #define KVM_INIT_SPP              _IOW(KVMIO,  0x4b, __u64)
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../selftests/kvm/include/x86_64/processor.h  |  7 +-
- .../selftests/kvm/lib/x86_64/processor.c      | 72 ++++++++++++++++---
- .../selftests/kvm/x86_64/xss_msr_test.c       | 70 ++++++++++++++++++
- 5 files changed, 141 insertions(+), 10 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/xss_msr_test.c
+The ioctls should be documented in api.txt.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index b35da375530a..6e9ec34f8124 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -11,6 +11,7 @@
- /x86_64/vmx_close_while_nested_test
- /x86_64/vmx_set_nested_state_test
- /x86_64/vmx_tsc_adjust_test
-+/x86_64/xss_msr_test
- /clear_dirty_log_test
- /dirty_log_test
- /kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c5ec868fa1e5..3138a916574a 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -25,6 +25,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_dirty_log_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
-+TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index ff234018219c..635ee6c33ad2 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -308,6 +308,8 @@ struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid);
- void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid,
- 		     struct kvm_x86_state *state);
- 
-+struct kvm_msr_list *kvm_get_msr_index_list(void);
-+
- struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
- void vcpu_set_cpuid(struct kvm_vm *vm, uint32_t vcpuid,
- 		    struct kvm_cpuid2 *cpuid);
-@@ -322,10 +324,13 @@ kvm_get_supported_cpuid_entry(uint32_t function)
- }
- 
- uint64_t vcpu_get_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index);
-+int _vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
-+		  uint64_t msr_value);
- void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
- 	  	  uint64_t msr_value);
- 
--uint32_t kvm_get_cpuid_max(void);
-+uint32_t kvm_get_cpuid_max_basic(void);
-+uint32_t kvm_get_cpuid_max_extended(void);
- void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits);
- 
- /*
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 6698cb741e10..683d3bdb8f6a 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -869,7 +869,7 @@ uint64_t vcpu_get_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index)
- 	return buffer.entry.data;
- }
- 
--/* VCPU Set MSR
-+/* _VCPU Set MSR
-  *
-  * Input Args:
-  *   vm - Virtual Machine
-@@ -879,12 +879,12 @@ uint64_t vcpu_get_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index)
-  *
-  * Output Args: None
-  *
-- * Return: On success, nothing. On failure a TEST_ASSERT is produced.
-+ * Return: The result of KVM_SET_MSRS.
-  *
-- * Set value of MSR for VCPU.
-+ * Sets the value of an MSR for the given VCPU.
-  */
--void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
--	uint64_t msr_value)
-+int _vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
-+		  uint64_t msr_value)
- {
- 	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
- 	struct {
-@@ -899,6 +899,29 @@ void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
- 	buffer.entry.index = msr_index;
- 	buffer.entry.data = msr_value;
- 	r = ioctl(vcpu->fd, KVM_SET_MSRS, &buffer.header);
-+	return r;
-+}
-+
-+/* VCPU Set MSR
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   vcpuid - VCPU ID
-+ *   msr_index - Index of MSR
-+ *   msr_value - New value of MSR
-+ *
-+ * Output Args: None
-+ *
-+ * Return: On success, nothing. On failure a TEST_ASSERT is produced.
-+ *
-+ * Set value of MSR for VCPU.
-+ */
-+void vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
-+	uint64_t msr_value)
-+{
-+	int r;
-+
-+	r = _vcpu_set_msr(vm, vcpuid, msr_index, msr_value);
- 	TEST_ASSERT(r == 1, "KVM_SET_MSRS IOCTL failed,\n"
- 		"  rc: %i errno: %i", r, errno);
- }
-@@ -1000,19 +1023,45 @@ struct kvm_x86_state {
- 	struct kvm_msrs msrs;
- };
- 
--static int kvm_get_num_msrs(struct kvm_vm *vm)
-+static int kvm_get_num_msrs_fd(int kvm_fd)
- {
- 	struct kvm_msr_list nmsrs;
- 	int r;
- 
- 	nmsrs.nmsrs = 0;
--	r = ioctl(vm->kvm_fd, KVM_GET_MSR_INDEX_LIST, &nmsrs);
-+	r = ioctl(kvm_fd, KVM_GET_MSR_INDEX_LIST, &nmsrs);
- 	TEST_ASSERT(r == -1 && errno == E2BIG, "Unexpected result from KVM_GET_MSR_INDEX_LIST probe, r: %i",
- 		r);
- 
- 	return nmsrs.nmsrs;
- }
- 
-+static int kvm_get_num_msrs(struct kvm_vm *vm)
-+{
-+	return kvm_get_num_msrs_fd(vm->kvm_fd);
-+}
-+
-+struct kvm_msr_list *kvm_get_msr_index_list(void)
-+{
-+	struct kvm_msr_list *list;
-+	int nmsrs, r, kvm_fd;
-+
-+	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
-+	if (kvm_fd < 0)
-+		exit(KSFT_SKIP);
-+
-+	nmsrs = kvm_get_num_msrs_fd(kvm_fd);
-+	list = malloc(sizeof(*list) + nmsrs * sizeof(list->indices[0]));
-+	list->nmsrs = nmsrs;
-+	r = ioctl(kvm_fd, KVM_GET_MSR_INDEX_LIST, list);
-+	close(kvm_fd);
-+
-+	TEST_ASSERT(r == 0, "Unexpected result from KVM_GET_MSR_INDEX_LIST, r: %i",
-+		r);
-+
-+	return list;
-+}
-+
- struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid)
- {
- 	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
-@@ -1158,7 +1207,12 @@ bool is_intel_cpu(void)
- 	return (ebx == chunk[0] && edx == chunk[1] && ecx == chunk[2]);
- }
- 
--uint32_t kvm_get_cpuid_max(void)
-+uint32_t kvm_get_cpuid_max_basic(void)
-+{
-+	return kvm_get_supported_cpuid_entry(0)->eax;
-+}
-+
-+uint32_t kvm_get_cpuid_max_extended(void)
- {
- 	return kvm_get_supported_cpuid_entry(0x80000000)->eax;
- }
-@@ -1169,7 +1223,7 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
- 	bool pae;
- 
- 	/* SDM 4.1.4 */
--	if (kvm_get_cpuid_max() < 0x80000008) {
-+	if (kvm_get_cpuid_max_extended() < 0x80000008) {
- 		pae = kvm_get_supported_cpuid_entry(1)->edx & (1 << 6);
- 		*pa_bits = pae ? 36 : 32;
- 		*va_bits = 32;
-diff --git a/tools/testing/selftests/kvm/x86_64/xss_msr_test.c b/tools/testing/selftests/kvm/x86_64/xss_msr_test.c
-new file mode 100644
-index 000000000000..17db23336673
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/xss_msr_test.c
-@@ -0,0 +1,70 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2019, Google LLC.
-+ *
-+ * Tests for the IA32_XSS MSR.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "vmx.h"
-+
-+#define VCPU_ID	      1
-+
-+#define X86_FEATURE_XSAVES	(1<<3)
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_cpuid_entry2 *entry;
-+	struct kvm_msr_list *list;
-+	bool found_xss = false;
-+	struct kvm_vm *vm;
-+	uint64_t xss_val;
-+	int i, r;
-+
-+	/* Create VM */
-+	vm = vm_create_default(VCPU_ID, 0, 0);
-+
-+	list = kvm_get_msr_index_list();
-+	for (i = 0; i < list->nmsrs; ++i) {
-+		if (list->indices[i] == MSR_IA32_XSS) {
-+			found_xss = true;
-+			break;
-+		}
-+	}
-+
-+	if (kvm_get_cpuid_max_basic() < 0xd) {
-+		printf("XSAVES is not supported by the CPU.\n");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	entry = kvm_get_supported_cpuid_index(0xd, 1);
-+	TEST_ASSERT(found_xss == !!(entry->eax & X86_FEATURE_XSAVES),
-+		    "Support for IA32_XSS and support for XSAVES do not match.");
-+
-+	if (!found_xss) {
-+		printf("IA32_XSS and XSAVES are not supported.  Skipping test.\n");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	xss_val = vcpu_get_msr(vm, VCPU_ID, MSR_IA32_XSS);
-+	TEST_ASSERT(xss_val == 0, "MSR_IA32_XSS should always be zero\n");
-+
-+	vcpu_set_msr(vm, VCPU_ID, MSR_IA32_XSS, xss_val);
-+	/*
-+	 * At present, KVM only supports a guest IA32_XSS value of 0. Verify
-+	 * that trying to set the guest IA32_XSS to an unsupported value fails.
-+	 *
-+	 * Using '1' which is an illegal value since bit 0 is x87 state, which
-+	 * is covered by XCR0.
-+	 */
-+	r = _vcpu_set_msr(vm, VCPU_ID, MSR_IA32_XSS, 1);
-+	TEST_ASSERT(r == 0,
-+		    "KVM_SET_MSRS IOCTL failed,\n  rc: %i errno: %i", r, errno);
-+
-+	free(list);
-+	kvm_vm_free(vm);
-+}
--- 
-2.23.0.700.g56cf767bdb-goog
+> +4.Set Sub-Page Permission
+> +
+> +  * To enable SPP protection, system admin sets sub-page permission via
+Why system admin? Can't any kvm user do this?
+> +    KVM_SUBPAGES_SET_ACCESS ioctl:
+> +    (1) It first stores the access permissions in bitmap array.
+> +
+> +    (2) Then, if the target 4KB page is mapped as PT_PAGE_TABLE_LEVEL entry in EPT,
+/page is/pages are/
+> +       it sets SPP bit of the corresponding entry to mark sub-page protection.
+> +       If the 4KB page is mapped as PT_DIRECTORY_LEVEL or PT_PDPE_LEVEL, it
+/page is/pages are/
+> +       zapps the hugepage entry and let following memroy access to trigger EPT
+/zapps/zaps/, /entry/enttries/, /memroy/memory/
+> +       page fault, there the gfn is check against SPP permission bitmap and
+/page fault/violation/
+> +       proper level is selected to set up EPT entry.
+> +
+> +
+> +   The SPPT paging structure format is as below:
+> +
+> +   Format of the SPPT L4E, L3E, L2E:
+> +   | Bit    | Contents                                                                 |
+> +   | :----- | :------------------------------------------------------------------------|
+> +   | 0      | Valid entry when set; indicates whether the entry is present             |
+> +   | 11:1   | Reserved (0)                                                             |
+> +   | N-1:12 | Physical address of 4KB aligned SPPT LX-1 Table referenced by this entry |
+> +   | 51:N   | Reserved (0)                                                             |
+> +   | 63:52  | Reserved (0)                                                             |
+> +   Note: N is the physical address width supported by the processor. X is the page level
+> +
+> +   Format of the SPPT L1E:
+> +   | Bit   | Contents                                                          |
+> +   | :---- | :---------------------------------------------------------------- |
+> +   | 0+2i  | Write permission for i-th 128 byte sub-page region.               |
+> +   | 1+2i  | Reserved (0).                                                     |
+> +   Note: 0<=i<=31
+> +
+> +5.SPPT-induced VM exit
+> +
+> +  * SPPT miss and misconfiguration induced VM exit
+> +
+> +    A SPPT missing VM exit occurs when walk the SPPT, there is no SPPT
+> +    misconfiguration but a paging-structure entry is not
+> +    present in any of L4E/L3E/L2E entries.
+> +
+> +    A SPPT misconfiguration VM exit occurs when reserved bits or unsupported values
+> +    are set in SPPT entry.
+> +
+> +    *NOTE* SPPT miss and SPPT misconfigurations can occur only due to an
+> +    attempt to write memory with a guest physical address.
 
+Can you clarify what this means? For instance, setting an A or D bit
+in a PTE is an attempt to "write memory with a guest physical
+address," but per the SDM, it is not an operation that is eligible for
+sub-page write permissions.
+
+> +  * SPP permission induced VM exit
+> +    SPP sub-page permission induced violation is reported as EPT violation
+> +    thesefore causes VM exit.
+/thesefore/therefore/
+
+> +
+> +6.SPPT-induced VM exit handling
+> +
+> +  #define EXIT_REASON_SPP                 66
+> +
+> +  static int (*const kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+> +    ...
+> +    [EXIT_REASON_SPP]                     = handle_spp,
+> +    ...
+> +  };
+> +
+> +  New exit qualification for SPPT-induced vmexits.
+> +
+> +  | Bit   | Contents                                                          |
+> +  | :---- | :---------------------------------------------------------------- |
+> +  | 10:0  | Reserved (0).                                                     |
+> +  | 11    | SPPT VM exit type. Set for SPPT Miss, cleared for SPPT Misconfig. |
+> +  | 12    | NMI unblocking due to IRET                                        |
+> +  | 63:13 | Reserved (0)                                                      |
+> +
+> +  In addition to the exit qualification, guest linear address and guest
+> +  physical address fields will be reported.
+> +
+> +  * SPPT miss and misconfiguration induced VM exit
+> +    Set up SPPT entries correctly.
+> +
+> +  * SPP permission induced VM exit
+> +    This kind of VM exit is left to VMI tool to handle.
+> --
+> 2.17.2
+>
